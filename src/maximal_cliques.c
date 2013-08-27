@@ -384,3 +384,22 @@ int igraph_maximal_cliques_file(const igraph_t *graph,
 #include "maximal_cliques_template.h"
 #undef IGRAPH_MC_FILE
 
+/**
+ * \function igraph_maximal_cliques_subset
+ * Maximal cliques for a subset of initial vertices
+ *
+ * TODO
+ */
+
+int igraph_maximal_cliques_subset(const igraph_t *graph,
+				  igraph_vector_int_t *subset,
+				  igraph_vector_ptr_t *res,
+				  igraph_integer_t *no,
+				  FILE *outfile,
+				  igraph_integer_t min_size,
+				  igraph_integer_t max_size);
+
+#define IGRAPH_MC_FULL
+#include "maximal_cliques_template.h"
+#undef IGRAPH_MC_FULL
+

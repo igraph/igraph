@@ -6337,18 +6337,23 @@ SEXP R_igraph_largest_cliques(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_maximal_cliques(SEXP graph, SEXP pminsize, SEXP pmaxsize) {
+SEXP R_igraph_maximal_cliques(SEXP graph, SEXP psubset, 
+			      SEXP pminsize, SEXP pmaxsize) {
   
   igraph_t g;
   igraph_vector_ptr_t ptrvec;
   long int i;
   igraph_integer_t minsize=(igraph_integer_t) REAL(pminsize)[0];
   igraph_integer_t maxsize=(igraph_integer_t) REAL(pmaxsize)[0];
+  igraph_vector_int_t subset;
   SEXP result;
   
   R_SEXP_to_igraph(graph, &g);
+  if (!isNull(psubset)) { R_SEXP_to_vector_int(psubset, &subset); }
   igraph_vector_ptr_init(&ptrvec,0);
-  igraph_maximal_cliques(&g, &ptrvec, minsize, maxsize);
+  igraph_maximal_cliques_subset(&g, isNull(psubset) ? 0 : &subset, 
+				&ptrvec, /*no=*/ 0, /*file=*/ 0, 
+				minsize, maxsize);
   PROTECT(result=NEW_LIST(igraph_vector_ptr_size(&ptrvec)));
   for (i=0; i<igraph_vector_ptr_size(&ptrvec); i++) {
     igraph_vector_t *vec=VECTOR(ptrvec)[i];
@@ -6363,12 +6368,13 @@ SEXP R_igraph_maximal_cliques(SEXP graph, SEXP pminsize, SEXP pmaxsize) {
   return result;
 }
 
-SEXP R_igraph_maximal_cliques_file(SEXP graph, SEXP file, SEXP pminsize,
-				   SEXP pmaxsize) {
+SEXP R_igraph_maximal_cliques_file(SEXP graph, SEXP psubset, SEXP file, 
+				   SEXP pminsize, SEXP pmaxsize) {
   igraph_t g;
   long int i;
   igraph_integer_t minsize=(igraph_integer_t) REAL(pminsize)[0];
   igraph_integer_t maxsize=(igraph_integer_t) REAL(pmaxsize)[0];
+  igraph_vector_int_t subset;
   SEXP result;
   FILE *stream;
 #if HAVE_OPEN_MEMSTREAM == 1
@@ -6377,6 +6383,7 @@ SEXP R_igraph_maximal_cliques_file(SEXP graph, SEXP file, SEXP pminsize,
 #endif
   
   R_SEXP_to_igraph(graph, &g);
+  if (!isNull(psubset)) { R_SEXP_to_vector_int(psubset, &subset); }
 #if HAVE_OPEN_MEMSTREAM == 1
   stream=open_memstream(&bp, &size);
 #else
@@ -6384,7 +6391,9 @@ SEXP R_igraph_maximal_cliques_file(SEXP graph, SEXP file, SEXP pminsize,
 #endif
   if (stream==0) { igraph_error("Cannot write cliques", __FILE__,
 				__LINE__, IGRAPH_EFILE); }
-  igraph_maximal_cliques_file(&g, stream, minsize, maxsize);
+  igraph_maximal_cliques_subset(&g, isNull(psubset) ? 0 : &subset, 
+				/*ptr=*/ 0, /*no=*/ 0, /*file=*/ stream, 
+				minsize, maxsize);
   fclose(stream);
 #if HAVE_OPEN_MEMSTREAM == 1
   PROTECT(result=allocVector(RAWSXP, size));
@@ -6396,6 +6405,36 @@ SEXP R_igraph_maximal_cliques_file(SEXP graph, SEXP file, SEXP pminsize,
 
   UNPROTECT(1);
   return result;
+}
+
+SEXP R_igraph_maximal_cliques_count(SEXP graph, SEXP psubset,
+				    SEXP min_size, SEXP max_size) {
+                                        /* Declarations */
+  igraph_t c_graph;
+  igraph_integer_t c_no;
+  igraph_integer_t c_min_size;
+  igraph_integer_t c_max_size;
+  igraph_vector_int_t subset;
+  SEXP no;
+
+  SEXP result;
+                                        /* Convert input */
+  R_SEXP_to_igraph(graph, &c_graph);
+  if (!isNull(psubset)) { R_SEXP_to_vector_int(psubset, &subset); }
+  c_min_size=INTEGER(min_size)[0];
+  c_max_size=INTEGER(max_size)[0];
+                                        /* Call igraph */
+  igraph_maximal_cliques_subset(&c_graph, isNull(psubset) ? 0 : &subset, 
+				/*ptr=*/ 0, &c_no, /*file=*/ 0, 
+				c_min_size, c_max_size);
+
+                                        /* Convert output */
+  PROTECT(no=NEW_INTEGER(1)); 
+  INTEGER(no)[0]=c_no;
+  result=no;
+
+  UNPROTECT(1);
+  return(result);
 }
 
 SEXP R_igraph_clique_number(SEXP graph) {

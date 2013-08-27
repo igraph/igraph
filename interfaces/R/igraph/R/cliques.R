@@ -49,7 +49,8 @@ largest.cliques <- function(graph) {
   lapply(res, function(x) x+1)  
 }
 
-maximal.cliques <- function(graph, min=NULL, max=NULL, file=NULL) {
+maximal.cliques <- function(graph, min=NULL, max=NULL,
+                            subset=NULL, file=NULL) {
   if (!is.igraph(graph)) {
     stop("Not a graph object");
   }
@@ -57,6 +58,8 @@ maximal.cliques <- function(graph, min=NULL, max=NULL, file=NULL) {
   if (is.null(min)) { min <- 0 }
   if (is.null(max)) { max <- 0 }
 
+  if (!is.null(subset)) { subset <- as.integer(subset-1) }
+  
   if (!is.null(file)) {
     if (!is.character(file) ||
         length(grep("://", file, fixed=TRUE)) > 0 ||
@@ -68,7 +71,7 @@ maximal.cliques <- function(graph, min=NULL, max=NULL, file=NULL) {
       tmpfile <- FALSE
     }
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-    res <- .Call("R_igraph_maximal_cliques_file", graph, file,
+    res <- .Call("R_igraph_maximal_cliques_file", graph, subset, file,
                  as.numeric(min), as.numeric(max), PACKAGE="igraph")
     if (tmpfile) {
       buffer <- read.graph.toraw(file)
@@ -77,11 +80,31 @@ maximal.cliques <- function(graph, min=NULL, max=NULL, file=NULL) {
     invisible(NULL)
   } else { 
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-    res <- .Call("R_igraph_maximal_cliques", graph, as.numeric(min),
-                 as.numeric(max),
+    res <- .Call("R_igraph_maximal_cliques", graph, subset,
+                 as.numeric(min), as.numeric(max),
                  PACKAGE="igraph")
     lapply(res, function(x) x+1)
   }
+}
+
+maximal.cliques.count <- function(graph, min=NULL, max=NULL,
+                                  subset=NULL) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+
+  if (is.null(min)) { min <- 0 }
+  if (is.null(max)) { max <- 0 }
+  min <- as.integer(min)
+  max <- as.integer(max)
+
+  if (!is.null(subset)) { subset <- as.integer(subset-1) }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_maximal_cliques_count", graph, subset, min, max,
+               PACKAGE="igraph")
+
+  res
 }
 
 clique.number <- function(graph) {
