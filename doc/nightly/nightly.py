@@ -55,7 +55,11 @@ def list_files(db):
     files = db.execute("SELECT type, version, branch, hash, \
                                date, size FROM downloads    \
                         ORDER BY version DESC, date DESC").fetchall()
-    return bottle.template('main', files=files)
+    versions = sorted(list(set([ f['version'] for f in files ])), reverse=True)
+    types = sorted(list(set([ f['type'] for f in files ])))
+    branches = sorted(list(set([ f['branch'] for f in files ])))
+    return bottle.template('main', files=files, versions=versions,
+                           types=types, branches=branches)
 
 # This is the one that serves the files. 
 # <type> can be 'c', 'python', 'r' or 'msvc' and 

@@ -24,20 +24,21 @@
     <th><!-- download buttons --></th>
     <th><select id="type">
 	<option value="a">File type</option>
-	<option value="c">C library</option>
-	<option value="r">R package</option>
-	<option value="p">Python extension</option>
-	<option value="m">C library for MSVC</option>
+	% for t in types:
+	    <option value="{{t}}">{{t}}</option>
+	% end
     </select></th>
     <th><select id="version">
 	<option value="a">Version</option>
-	<option value="7">0.7.x</option>
-	<option value="6">0.6.x</option>
+	% for v in versions:
+	    <option value="{{v}}">{{v}}</option>
+	% end
     </select></th>
     <th><select id="branch">
 	<option value="all">Branch</option>
-	<option value="develop">Development branch</option>
-	<option value="maste">Master branch</option>
+	% for b in branches:
+	    <option value="{{b}}">{{b}}</option>
+	% end
     </select></th>
     <th><button id="commit">Commit</button></th>
     <th><button id="date">Uploaded</button></th>
