@@ -7,9 +7,6 @@
 
 <body>
 
-% urlmap={ 'C library': 'c', 'R package': 'r', 'Python extension': 'python', 
-%          'C library for MSVC': 'msvc' }
-
 <h2>igraph nightly builds</h2>
 
 <h3>Latest files</h3>

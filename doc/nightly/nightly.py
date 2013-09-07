@@ -49,6 +49,10 @@ plugin = bottle_sqlite.Plugin(dbfile='nightly.db')
 nightly=bottle.Bottle()
 nightly.install(plugin)
 
+urlmap={ 'C library': 'c', 'R package': 'r', 'Python extension': 'python',
+         'C library for MSVC': 'msvc' }
+revurlmap=dict((v,k) for k, v in urlmap.iteritems())
+
 # This is the main web page, you can choose your download here
 @nightly.route("/")
 def list_files(db):
@@ -59,7 +63,7 @@ def list_files(db):
     types = sorted(list(set([ f['type'] for f in files ])))
     branches = sorted(list(set([ f['branch'] for f in files ])))
     return bottle.template('main', files=files, versions=versions,
-                           types=types, branches=branches)
+                           types=types, branches=branches, urlmap=urlmap)
 
 # This is the one that serves the files. 
 # <type> can be 'c', 'python', 'r' or 'msvc' and 
@@ -68,6 +72,8 @@ def list_files(db):
 @nightly.route("/get/<type>/<hash>")
 def get_file(db, type, hash=None):
     filename=type + "/" + hash
+    db.execute("UPDATE downloads SET count=count+1 WHERE type=? AND hash=?", \
+               (revurlmap[type], hash))
     return bottle.static_file(filename, ".")
 
 @nightly.error(404)
