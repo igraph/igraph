@@ -69,11 +69,16 @@ def list_files(db):
 # <type> can be 'c', 'python', 'r' or 'msvc' and 
 # <hash> is a git hash for the commit to get. If <hash> is 
 # None, then the latest version is served
-@nightly.route("/get/<type>/<hash>")
-def get_file(db, type, hash=None):
-    filename=type + "/" + hash
+@nightly.route("/get/<dtype>/<hash>")
+@nightly.route("/get/<dtype>")
+def get_file(db, dtype, hash=None):
+    ltype=revurlmap[dtype]
+    if hash is None:
+        hash=db.execute("SELECT hash, max(date) FROM downloads WHERE type=?",
+                        (ltype,)).fetchone()[0]
+    filename=dtype + "/" + hash
     db.execute("UPDATE downloads SET count=count+1 WHERE type=? AND hash=?", \
-               (revurlmap[type], hash))
+               (ltype, hash))
     return bottle.static_file(filename, ".")
 
 @nightly.error(404)
