@@ -20,13 +20,13 @@
 <table><thead><tr>
     <th><!-- download buttons --></th>
     <th><select id="type">
-	<option value="a">File type</option>
+	<option value="all">File type</option>
 	% for t in types:
 	    <option value="{{t}}">{{t}}</option>
 	% end
     </select></th>
     <th><select id="version">
-	<option value="a">Version</option>
+	<option value="all">Version</option>
 	% for v in versions:
 	    <option value="{{v}}">{{v}}</option>
 	% end

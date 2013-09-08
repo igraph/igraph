@@ -54,14 +54,42 @@ urlmap={ 'C library': 'c', 'R package': 'r', 'Python extension': 'python',
 revurlmap=dict((v,k) for k, v in urlmap.iteritems())
 
 # This is the main web page, you can choose your download here
+# It can be filtered
 @nightly.route("/")
-def list_files(db):
+@nightly.route("/list/")
+@nightly.route("/list")
+@nightly.route("/list/<dtype>")
+@nightly.route("/list/<dtype>/<version>")
+@nightly.route("/list/<dtype>/<version>/<branch>")
+def list_files(db, dtype="all", version="all", branch="all"):
+
+    if dtype=="all":
+        dtype="%"
+    else:
+        dtype=revurlmap[dtype]
+    if version=="all":
+        version="%"
+    if branch=="all":
+        branch="%"
+
     files = db.execute("SELECT type, version, branch, hash, \
                                date, size FROM downloads    \
-                        ORDER BY version DESC, date DESC").fetchall()
-    versions = sorted(list(set([ f['version'] for f in files ])), reverse=True)
-    types = sorted(list(set([ f['type'] for f in files ])))
-    branches = sorted(list(set([ f['branch'] for f in files ])))
+                        WHERE type LIKE ? AND version LIKE ? AND branch LIKE ? \
+                        ORDER BY version DESC, date DESC",
+                       (dtype, version, branch)).fetchall()
+
+    versions=db.execute("SELECT DISTINCT version FROM downloads \
+                         ORDER BY version DESC").fetchall()
+    versions=[ e[0] for e in versions ]
+
+    types=db.execute("SELECT DISTINCT type FROM downloads \
+                      ORDER BY type").fetchall()
+    types=[ e[0] for e in types ]
+
+    branches=db.execute("SELECT DISTINCT branch FROM downloads \
+                         ORDER BY branch").fetchall()
+    branches=[ e[0] for e in branches ]
+
     return bottle.template('main', files=files, versions=versions,
                            types=types, branches=branches, urlmap=urlmap)
 
