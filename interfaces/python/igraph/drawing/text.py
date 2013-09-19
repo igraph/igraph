@@ -10,10 +10,18 @@ from igraph.compat import property
 from igraph.drawing.baseclasses import AbstractCairoDrawer
 from warnings import warn
 
-__all__ = ["TextDrawer"]
+__all__ = ["TextAlignment", "TextDrawer"]
 __license__ = "GPL"
 
 __docformat__ = "restructuredtext en" 
+
+#####################################################################
+
+class TextAlignment(object):
+    """Text alignment constants."""
+
+    LEFT, CENTER, RIGHT = "left", "center", "right"
+    TOP, BOTTOM = "top", "bottom"
 
 #####################################################################
 
