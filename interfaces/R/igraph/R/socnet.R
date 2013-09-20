@@ -807,7 +807,7 @@ tkigraph <- function() {
   }
     
   if (!read$interactive) {
-    fun <- function(...) { x11() ; plot.igraph(...) }
+    fun <- function(...) { dev.new() ; plot.igraph(...) }
   } else {
     fun <- tkplot
   }
@@ -1134,11 +1134,11 @@ tkigraph <- function() {
       log <- ""
       if (read$logx) { log <- paste(sep="", log, "x") }
       if (read$logy) { log <- paste(sep="", log, "y") }
-      x11()
+      dev.new()
       plot(0:max(value[,2]), h, xlab="Degree", ylab="Relative frequency",
            type="b", main="Degree distribution", log=log)
     } else {
-      x11()
+      dev.new()
       hist(value[,2], main="Degree distribution", xlab="Degree")
     }
   }
@@ -1164,7 +1164,7 @@ tkigraph <- function() {
                                 values=c("Out", "In", "Total")))
   mode <- c("out", "in", "all")[read$type+1]
   deg <- degree(graphs[[gnos]], mode=mode)
-  x11()
+  dev.new()
   h <- hist(deg, -1:max(deg), plot=FALSE)$density
   plot(0:max(deg), h, xlab="Degree", ylab="Relative frequency",
        type="b", main="Degree distribution", log="xy")
@@ -1438,12 +1438,12 @@ tkigraph <- function() {
       log <- ""
       if (read$logx) { log <- paste(sep="", log, "x") }
       if (read$logy) { log <- paste(sep="", log, "y") }
-      x11()
+      dev.new()
       plot(1:max(value[,2]), h, xlab="Component size",
            ylab="Relative frequency",
            type="b", main="Component size distribution", log=log)
     } else {
-      x11()
+      dev.new()
       hist(value[,2], main="Component size distribution", xlab="Degree")
     }
   }
@@ -1554,7 +1554,7 @@ tkigraph <- function() {
     cols <- 3
   }
   names <- as.character(seq(no)-1)
-  x11()
+  dev.new()
   layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)-1) {
@@ -1587,7 +1587,7 @@ tkigraph <- function() {
   graphs <- get("graphs", .tkigraph.env)
   motifs <- graph.motifs(graphs[[gnos]], size=read$size)
 
-  x11()
+  dev.new()
   barplot(motifs)
 
   if (read$size == 3) {
@@ -1611,7 +1611,7 @@ tkigraph <- function() {
     cols <- 3
   }
   names <- as.character(seq(no)-1)
-  x11()
+  dev.new()
   layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)-1) {
