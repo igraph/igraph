@@ -34,7 +34,7 @@ dist-hook:
 MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make deb will generate Debian packages
-.PHONY: framework msvc
+.PHONY: framework msvc parsersources
 
 framework: all
 	rm -rf $(top_builddir)/igraph.framework
@@ -56,7 +56,10 @@ test: all
 	 	fi; \
 	done
 
-msvc: all
+parsersources:
+	cd src; make parsersources
+
+msvc: parsersources
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/include
