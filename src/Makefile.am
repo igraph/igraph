@@ -289,3 +289,5 @@ echoheadersprivate:
 	$(info $(HEADERS_PRIVATE))
 
 .PHONY: sources
+
+parsersources: $(DIST_COMMON)
