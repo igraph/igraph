@@ -9,7 +9,8 @@ if [ $# -lt 1 ]; then
     echo "Error: not enough arguments, need script to run at least"
     exit 1
 fi
-script=$1 shift
+script=$1 
+shift
 
 if [ ! -f "../scripts/$script" ]; then
     echo "Script '$script' does not exist"
@@ -22,4 +23,4 @@ if [ ! -x "../scripts/$script" ]; then
 fi
 
 vagrant up
-vagrant ssh -c "/tekton/$script $@"
+vagrant ssh -- /tekton/$script $@
