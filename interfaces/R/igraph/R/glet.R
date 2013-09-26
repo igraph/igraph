@@ -1,55 +1,29 @@
 
-
-## Algorithm 1:
-## D is NxN non-negative weighted matrix
-## level is a number between minimum and maximum element in D
-## puts a Threshold on D at level and returns all maximal cliques of
-## the binary network 
-
-threshold.net <- function(graph, level) {
-  N <- vcount(graph)
-  graph.t <- delete.edges(graph, which(E(graph)$weight < level))
-
-  clqt <- maximal.cliques(graph.t)
-  clqt <- lapply(clqt, sort)
-  clqt[order(sapply(clqt, length), decreasing=TRUE)]
-}
-
-## Naive algorithm, do all thresholds for the whole graph
-
-graphlets <- function(graph, iter) {
-
-  if (!is.weighted(graph)) { stop("Graph not weighted") }
-  if (min(E(graph)$weight) <= 0 || !is.finite(E(graph)$weight)) {
-    stop("Edge weights must be non-negative and finite")
+graphlets <- function(graph, weights=NULL) {
+  ## Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
   }
-  if (length(iter) != 1 || !is.numeric(iter) ||
-      !is.finite(iter) || iter != as.integer(iter)) {
-    stop("`iter' must be a non-negative finite integer scalar")
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
   }
 
-  ## Do all thresholds
-  cl <- lapply(sort(unique(E(graph)$weight)), function(w) {
-    threshold.net(graph, w)
-  })
+  ## Drop all attributes, we don't want to deal with them, TODO
+  graph2 <- graph
+  graph2[[9]] <- list(c(1,0,1), list(), list(), list())
 
-  ## Put the cliques in one long list
-  clv <- unlist(cl, recursive=FALSE)
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  ## Function call
+  res <- .Call("R_igraph_graphlets", graph2, weights,
+               PACKAGE="igraph")
 
-  ## Sort the vertices within the cliques
-  cls <- lapply(clv, sort)
-
-  ## Delete duplicate cliques
-  clu <- unique(cls)
-
-  ## Delete cliques that consist of single vertices
-  clf <- clu[sapply(clu, length) != 1]
-
-  ## Project
-  graphlets.project(graph, clf, iter)
+  res
 }
 
-graphlets.project <- function(graph, cliques, iter, Mu=NULL) {
+graphlets.project.old <- function(graph, cliques, iter, Mu=NULL) {
 
   if (!is.weighted(graph)) { stop("Graph not weighted") }
   if (min(E(graph)$weight) <= 0 || !is.finite(E(graph)$weight)) {

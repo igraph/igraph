@@ -1292,6 +1292,17 @@ igraph_community_infomap:
         DEPS: e_weights ON graph, v_weights ON graph
         IGNORE: RR
 
+igraph_graphlets:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                OUT VERTEXSETLIST cliques, OUT VECTOR thresholds
+        NAME-R: graphlets
+        DEPS: weights ON graph
+        IGNORE: RR, RC
+
+igraph_graphlets_project:
+        PARAMS: GRAPH graph, VECTORLIST cliques, INOUT VECTOR Mu
+        NAME-R: graphlets.project
+
 #######################################
 # Conversion
 #######################################

@@ -40,18 +40,25 @@
 
 __BEGIN_DECLS
 
-int igraph_subclique_next(const igraph_t *graph, 
-													const igraph_vector_t *weights,
-													const igraph_vector_int_t *ids,
-													const igraph_vector_ptr_t *cliques,
-													igraph_vector_ptr_t *result,
-													igraph_vector_ptr_t *resultweights,
-													igraph_vector_ptr_t *resultids,
-													igraph_vector_t *clique_thr,
-													igraph_vector_t *next_thr);
+int igraph_subclique_next(const igraph_t *graph,
+			  const igraph_vector_t *weights,
+			  const igraph_vector_int_t *ids,
+			  const igraph_vector_ptr_t *cliques,
+			  igraph_vector_ptr_t *result,
+			  igraph_vector_ptr_t *resultweights,
+			  igraph_vector_ptr_t *resultids,
+			  igraph_vector_t *clique_thr,
+			  igraph_vector_t *next_thr);
 
+int igraph_graphlets(const igraph_t *graph,
+		     const igraph_vector_t *weights,
+		     igraph_vector_ptr_t *cliques,
+		     igraph_vector_t *thresholds);
+
+int igraph_graphlets_project(const igraph_t *graph,
+			     const igraph_vector_ptr_t *cliques,
+			     igraph_vector_t *Mu);
 
 __END_DECLS
 
 #endif
-
