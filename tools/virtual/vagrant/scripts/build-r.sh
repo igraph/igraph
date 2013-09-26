@@ -33,11 +33,7 @@ cd interfaces/R
 make
 
 ## Canonical filename
-if [ $branch = "0.5-main" ]; then
-    package=igraph0
-else
-    package=igraph
-fi
+package=`cat igraph/DESCRIPTION | grep ^Package: | cut -f2 -d" "`
 filename=${package}_${version}-${branch}-$commit.tar.gz
 mv ${package}_${version}.tar.gz $filename
 
