@@ -24,7 +24,7 @@ cd igraph
 ./bootstrap.sh
 ./configure
 ./bootstrap.sh
-make
+make parsersources
 
 version=`grep " VERSION " config.h | cut -f3 -d" " | tr -d '"'`
 commit=`git rev-parse --short HEAD`
