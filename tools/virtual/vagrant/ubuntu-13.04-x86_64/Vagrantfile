@@ -11,6 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.synced_folder "../scripts/", "/tekton"
 
+  config.vm.provision :shell, :path => "../provisioners/apt-update.sh"
   config.vm.provision :shell, :path => "../provisioners/sshkey.sh"
   config.vm.provision :shell, :path => "../provisioners/createdir.sh", :args => "~vagrant/vagrant/provisions"
   config.vm.provision :shell, :path => "../provisioners/createdir.sh", :args => "~vagrant/vagrant/scripts"
