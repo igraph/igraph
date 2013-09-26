@@ -21,9 +21,9 @@
 	<integer>30</integer>
     </dict>
     <key>StandardOutPath</key>
-    <string>output/build-r-develop.txt</string>
+    <string>output/build-r-0.5-main.txt</string>
     <key>StandardErrorPath</key>
-    <string>error/build-r-develop.txt</string>
+    <string>error/build-r-0.5-main.txt</string>
     <key>KeepAlive</key>
     <false/>
   </dict>
