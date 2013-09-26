@@ -13,6 +13,7 @@
       <string>check-r.sh</string>
       <string>develop</string>
       <string>~vagrant/R/R-3.0.1/bin/R</string>
+      <string>R-3.0.1</string>
     </array>
     <key>StartCalendarInterval</key>
     <dict>

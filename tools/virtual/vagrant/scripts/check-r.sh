@@ -14,6 +14,9 @@ branch=${1-master}
 ## If not specified, we use the system R version
 R=${2-R}
 
+## If not specified, no R version is used to determine output location
+Rversion=${3-}
+
 ## We freshly clone the repo from github and build igraph from scratch.
 builddir=`mktemp -d`
 trap "rm -rf $builddir" EXIT
@@ -59,9 +62,9 @@ R_LIBS=${libdir} ${R} CMD check --as-cran ${package}_${version}.tar.gz || true
 eval `ssh-agent -s` 
 trap "kill $SSH_AGENT_PID" EXIT
 ssh-add
-ssh -p 2222 csardi@igraph.org mkdir -p www/nightly/check/r/${branch}/${commit}
+ssh -p 2222 csardi@igraph.org mkdir -p www/nightly/check/r/${Rversion}/${branch}/${commit}
 scp -P 2222 ${package}.Rcheck/00check.log ${package}.Rcheck/00install.out \
-    csardi@igraph.org:www/nightly/check/r/${branch}/${commit}/
+    csardi@igraph.org:www/nightly/check/r/$Rversion/${branch}/${commit}/
 
 ## Clean up
 rm -rf $builddir
