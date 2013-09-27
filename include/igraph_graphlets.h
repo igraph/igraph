@@ -56,8 +56,10 @@ int igraph_graphlets(const igraph_t *graph,
 		     igraph_vector_t *thresholds);
 
 int igraph_graphlets_project(const igraph_t *graph,
+			     const igraph_vector_t *weights,
 			     const igraph_vector_ptr_t *cliques,
-			     igraph_vector_t *Mu);
+			     igraph_vector_t *Mu, igraph_bool_t startMu,
+			     int niter);
 
 __END_DECLS
 

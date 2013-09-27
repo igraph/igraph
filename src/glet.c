@@ -27,8 +27,7 @@
 #include "igraph_cliques.h"
 #include "igraph_structural.h"
 #include "igraph_qsort.h"
-
-#include <stdio.h>
+#include "igraph_conversion.h"
 
 typedef struct {
   igraph_vector_int_t *newidvectors;
@@ -494,11 +493,17 @@ int igraph_graphlets(const igraph_t *graph,
   int no_of_edges=igraph_ecount(graph);
   igraph_real_t minthr;
   igraph_vector_int_t ids;
+  igraph_bool_t simple;
   int i;
 
   /* Some checks */
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
+
+  igraph_is_simple(graph, &simple);
+  if (!simple) {
+    IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
   }
 
   minthr=igraph_vector_min(weights);
@@ -518,13 +523,182 @@ int igraph_graphlets(const igraph_t *graph,
   return 0;
 }
 
+int igraph_i_graphlets_project(const igraph_t *graph,
+			       const igraph_vector_t *weights,
+			       const igraph_vector_ptr_t *cliques,
+			       igraph_vector_t *Mu, igraph_bool_t startMu,
+			       int niter, int vid1) {
+
+  int no_of_nodes=igraph_vcount(graph);
+  int no_of_edges=igraph_ecount(graph);
+  int no_cliques=igraph_vector_ptr_size(cliques);
+  igraph_vector_int_t vcl, vclidx, ecl, eclidx, cel, celidx;
+  igraph_vector_t edgelist, newweights, normfact;
+  int i, total_vertices, e, ptr, total_edges;
+  igraph_bool_t simple;
+
+  /* Check arguments */
+  if (no_of_edges != igraph_vector_size(weights)) {
+    IGRAPH_ERROR("Invalid weight vector size", IGRAPH_EINVAL);
+  }
+  if (startMu && igraph_vector_size(Mu) != no_cliques) {
+    IGRAPH_ERROR("Invalid start coefficient vector size", IGRAPH_EINVAL);
+  }
+  if (niter < 0) {
+    IGRAPH_ERROR("Number of iterations must be non-negative", IGRAPH_EINVAL);
+  }
+  igraph_is_simple(graph, &simple);
+  if (!simple) {
+    IGRAPH_ERROR("Graphlets work on simple graphs only", IGRAPH_EINVAL);
+  }
+
+  if (!startMu) {
+    igraph_vector_resize(Mu, no_cliques);
+    igraph_vector_fill(Mu, 1);
+  }
+
+  /* Count # cliques per vertex. Also, create an index
+     for the edges per clique. */
+  igraph_vector_int_init(&vclidx, no_of_nodes+2);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &vclidx);
+  igraph_vector_int_init(&celidx, no_cliques+2);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &celidx);
+  for (i=0, total_vertices=0, total_edges=0; i<no_cliques; i++) {
+    igraph_vector_t *v=VECTOR(*cliques)[i];
+    int j, n=igraph_vector_size(v);
+    total_vertices += n;
+    total_edges += n*(n-1)/2;
+    VECTOR(celidx)[i+2]=total_edges;
+    for (j=0; j<n; j++) {
+      int vv=VECTOR(*v)[j]-vid1;
+      VECTOR(vclidx)[vv+2] += 1;
+    }
+  }
+  VECTOR(celidx)[i+2]=total_edges;
+
+  /* Finalize index vector */
+  for (i=0; i<=no_cliques; i++) {
+    VECTOR(vclidx)[i+2] += VECTOR(vclidx)[i+1];
+  }
+
+  /* Create vertex-clique list, the cliques for each vertex. */
+  igraph_vector_int_init(&vcl, total_vertices);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &vcl);
+  for (i=0; i<no_cliques; i++) {
+    igraph_vector_t *v=VECTOR(*cliques)[i];
+    int j, n=igraph_vector_size(v);
+    for (j=0; j<n; j++) {
+      int vv=VECTOR(*v)[j]-vid1;
+      int p=VECTOR(vclidx)[vv+1];
+      VECTOR(vcl)[p]=i;
+      VECTOR(vclidx)[vv+1] += 1;
+    }
+  }
+
+  /* Create an edge-clique list, the cliques of each edge */
+  igraph_vector_int_init(&ecl, total_edges);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &ecl);
+  igraph_vector_int_init(&eclidx, no_of_edges+1);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &eclidx);
+  igraph_vector_init(&edgelist, no_of_edges*2);
+  IGRAPH_FINALLY(igraph_vector_destroy, &edgelist);
+  igraph_get_edgelist(graph, &edgelist, /*by_col=*/ 0);
+  for (i=0, e=0, ptr=0; e<no_of_edges; e++) {
+    int from=VECTOR(edgelist)[i++];
+    int to=VECTOR(edgelist)[i++];
+    int from_s=VECTOR(vclidx)[from];
+    int from_e=VECTOR(vclidx)[from+1];
+    int to_s=VECTOR(vclidx)[to];
+    int to_e=VECTOR(vclidx)[to+1];
+    VECTOR(eclidx)[e]=ptr;
+    while (from_s < from_e && to_s < to_e) {
+      int from_v=VECTOR(vcl)[from_s];
+      int to_v=VECTOR(vcl)[to_s];
+      if (from_v==to_v) {
+	VECTOR(ecl)[ptr++] = from_v;
+	from_s++; to_s++;
+      } else if (from_v < to_v) {
+	from_s++;
+      } else {
+	to_s++;
+      }
+    }
+  }
+  VECTOR(eclidx)[e]=ptr;
+
+  igraph_vector_destroy(&edgelist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  /* Convert the edge-clique list to a clique-edge list */
+  igraph_vector_int_init(&cel, total_edges);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &cel);
+  for (i=0; i<no_of_edges; i++) {
+    int ecl_s=VECTOR(eclidx)[i], ecl_e=VECTOR(eclidx)[i+1], j;
+    for (j=ecl_s; j<ecl_e; j++) {
+      int cl=VECTOR(ecl)[j];
+      int epos=VECTOR(celidx)[cl+1];
+      VECTOR(cel)[epos] = i;
+      VECTOR(celidx)[cl+1] += 1;
+    }
+  }
+
+  /* Normalizing factors for the iteration */
+  igraph_vector_init(&normfact, no_cliques);
+  IGRAPH_FINALLY(igraph_vector_destroy, &normfact);
+  for (i=0; i<no_cliques; i++) {
+    igraph_vector_t *v=VECTOR(*cliques)[i];
+    int n=igraph_vector_size(v);
+    VECTOR(normfact)[i] = n * (n+1) / 2;
+  }
+
+  /* We have the clique-edge list, so do the projection now */
+  igraph_vector_init(&newweights, no_of_edges);
+  IGRAPH_FINALLY(igraph_vector_destroy, &newweights);
+  for (i=0; i<niter; i++) {
+    for (e=0; e<no_of_edges; e++) {
+      int start=VECTOR(eclidx)[e];
+      int end=VECTOR(eclidx)[e+1];
+      VECTOR(newweights)[e]=0.0001;
+      while (start < end) {
+	int clique=VECTOR(ecl)[start++];
+	VECTOR(newweights)[e] += VECTOR(*Mu)[clique];
+      }
+    }
+    for (e=0; e<no_cliques; e++) {
+      igraph_real_t sumratio=0;
+      int start=VECTOR(celidx)[e];
+      int end=VECTOR(celidx)[e+1];
+      while (start < end) {
+	int edge=VECTOR(cel)[start++];
+	sumratio += VECTOR(*weights)[edge] / VECTOR(newweights)[edge];
+      }
+      VECTOR(*Mu)[e] *= sumratio / VECTOR(normfact)[e];
+    }
+  }
+
+  igraph_vector_destroy(&newweights);
+  igraph_vector_destroy(&normfact);
+  igraph_vector_int_destroy(&cel);
+  igraph_vector_int_destroy(&eclidx);
+  igraph_vector_int_destroy(&ecl);
+  igraph_vector_int_destroy(&vcl);
+  igraph_vector_int_destroy(&celidx);
+  igraph_vector_int_destroy(&vclidx);
+  IGRAPH_FINALLY_CLEAN(8);
+
+  return 0;
+}
+
 /**
  * \function igraph_graphlets_project
  */
 
 int igraph_graphlets_project(const igraph_t *graph,
+			     const igraph_vector_t *weights,
 			     const igraph_vector_ptr_t *cliques,
-			     igraph_vector_t *Mu) {
-  /* TODO */
-  return 0;
+			     igraph_vector_t *Mu, igraph_bool_t startMu,
+			     int niter) {
+
+  return igraph_i_graphlets_project(graph, weights, cliques, Mu, startMu,
+				    niter, /*vid1=*/ 0);
 }

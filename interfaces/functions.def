@@ -1300,8 +1300,12 @@ igraph_graphlets:
         IGNORE: RR, RC
 
 igraph_graphlets_project:
-        PARAMS: GRAPH graph, VECTORLIST cliques, INOUT VECTOR Mu
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                VERTEXSETLIST cliques, INOUT VECTOR Mu, BOOLEAN startMu=False, \
+                INT niter=1000
         NAME-R: graphlets.project
+        DEPS: weights ON graph
+        IGNORE: RR, RC
 
 #######################################
 # Conversion

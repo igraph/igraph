@@ -23,63 +23,27 @@ graphlets <- function(graph, weights=NULL) {
   res
 }
 
-graphlets.project.old <- function(graph, cliques, iter, Mu=NULL) {
-
-  if (!is.weighted(graph)) { stop("Graph not weighted") }
-  if (min(E(graph)$weight) <= 0 || !is.finite(E(graph)$weight)) {
-    stop("Edge weights must be non-negative and finite")
+graphlets.project <- function(graph, weights=NULL, cliques, niter=1000,
+                              Mu=rep(1, length(cliques))) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
   }
-  if (length(iter) != 1 || !is.numeric(iter) ||
-      !is.finite(iter) || iter != as.integer(iter)) {
-    stop("`iter' must be a non-negative finite integer scalar")
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
   }
-  
-  clf <- cliques
-  
-  ## Create vertex-clique list first
-  vcl <- vector(length=vcount(graph), mode="list")
-  for (i in 1:length(clf)) {
-    for (j in clf[[i]]) {
-      vcl[[j]] <- c(vcl[[j]], i)
-    }
-  }
+  Mu <- as.numeric(Mu)
+  niter <- as.integer(niter)
 
-  ## Create edge-clique list from this, it is useful to have the edge list
-  ## of the graph at hand
-  el <- get.edgelist(graph, names=FALSE)
-  ecl <- vector(length=ecount(graph), mode="list")
-  for (i in 1:ecount(graph)) {
-    edge <- el[i,]
-    ecl[[i]] <- intersect(vcl[[edge[1]]], vcl[[edge[2]]])
-  }
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_graphlets_project", graph, weights, cliques, Mu, niter,
+        PACKAGE="igraph")
 
-  ## We will also need a clique-edge list, the edges in the cliques
-  system.time({
-    cel <- vector(length=length(clf), mode="list")
-    for (i in 1:length(ecl)) {
-      for (j in ecl[[i]]) {
-        cel[[j]] <- c(cel[[j]], i)
-      }
-    }
-  })
-
-  ## OK, we are ready to do the projection now
-  if (is.null(Mu)) { Mu <- rep(1, length(clf)) }
-  origw <- E(graph)$weight
-  w <- numeric(length(ecl))
-  a <- sapply(clf, function(x) length(x) * (length(x) + 1) / 2)
-  for (i in 1:iter) {
-    for (j in 1:length(ecl)) {
-      w[j] <- sum(Mu[ ecl[[j]] ])
-    }
-    for (j in 1:length(clf)) {
-      Mu[j] <- Mu[j] * sum(origw[cel[[j]]] / (w[cel[[j]]] + .0001)) / a[j]
-    }
-  }
-
-  ## Sort the cliques according to their weights
-  Smb <- sort(Mu, decreasing=TRUE, index=TRUE)
-  list(Bc=clf[Smb$ix], Muc=Mu[Smb$ix])
+  res
 }
 
 #################
