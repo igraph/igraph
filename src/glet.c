@@ -484,10 +484,10 @@ int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * \function igraph_graphlets
  */
 
-int igraph_graphlets(const igraph_t *graph,
-		     const igraph_vector_t *weights,
-		     igraph_vector_ptr_t *cliques,
-		     igraph_vector_t *thresholds) {
+int igraph_graphlets_candidate_basis(const igraph_t *graph,
+				     const igraph_vector_t *weights,
+				     igraph_vector_ptr_t *cliques,
+				     igraph_vector_t *thresholds) {
 
   int no_of_nodes=igraph_vcount(graph);
   int no_of_edges=igraph_ecount(graph);
@@ -701,4 +701,24 @@ int igraph_graphlets_project(const igraph_t *graph,
 
   return igraph_i_graphlets_project(graph, weights, cliques, Mu, startMu,
 				    niter, /*vid1=*/ 0);
+}
+
+int igraph_graphlets(const igraph_t *graph,
+		     const igraph_vector_t *weights,
+		     igraph_vector_ptr_t *cliques,
+		     igraph_vector_t *Mu, int niter) {
+
+  igraph_vector_t thresholds;
+
+  igraph_vector_init(&thresholds, 0);
+  IGRAPH_FINALLY(igraph_vector_destroy, &thresholds);
+  igraph_graphlets_candidate_basis(graph, weights, cliques, &thresholds);
+  igraph_vector_destroy(&thresholds);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  igraph_graphlets_project(graph, weights, cliques, Mu, /*startMu=*/ 0, niter);
+
+  /* TODO: sort */
+
+  return 0;
 }

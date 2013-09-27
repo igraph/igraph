@@ -1,5 +1,5 @@
 
-graphlets <- function(graph, weights=NULL) {
+graphlets.candidate.basis <- function(graph, weights=NULL) {
   ## Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
@@ -17,7 +17,7 @@ graphlets <- function(graph, weights=NULL) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   ## Function call
-  res <- .Call("R_igraph_graphlets", graph2, weights,
+  res <- .Call("R_igraph_graphlets_candidate_basis", graph2, weights,
                PACKAGE="igraph")
 
   res

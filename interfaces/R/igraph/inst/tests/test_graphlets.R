@@ -45,7 +45,7 @@ test_that("Graphlets work for some simple graphs", {
 
   g <- graph.full(5)
   E(g)$weight <- 1
-  gl <- graphlets(g)
+  gl <- graphlets.candidate.basis(g)
 
   expect_that(names(gl), equals(c("cliques", "thresholds")))
   expect_that(length(gl$cliques), equals(1))
@@ -55,7 +55,7 @@ test_that("Graphlets work for some simple graphs", {
   g2 <- graph.full(5)
   E(g2)$weight <- 1
   E(g2)[1%--%2]$weight <- 2
-  gl2 <- sortgl(graphlets(g2))
+  gl2 <- sortgl(graphlets.candidate.basis(g2))
 
   expect_that(gl2, equals(list(cliques=list(1:2, 1:5), thresholds=c(2,1))))
 })
@@ -67,7 +67,7 @@ test_that("Graphlets filtering works", {
                    weight=c( 8 ,  8 ,  8 ,  5 ,  5 ,  5 ,  5 ,  5 ))
 
   g <- graph.data.frame(gt, directed=FALSE, vertices=data.frame(LETTERS[1:5]))
-  gl <- sortgl(graphlets(g))
+  gl <- sortgl(graphlets.candidate.basis(g))
 
   expect_that(gl$cliques, equals(list(1:3, 2:5)))
   expect_that(gl$thresholds, equals(c(8, 5)))
@@ -117,7 +117,7 @@ test_that("Graphlets work for a bigger graph", {
   g <- graph.famous("zachary")
   E(g)$weight <- sample(1:5, ecount(g), replace=TRUE)
 
-  gl <- graphlets(g)
+  gl <- graphlets.candidate.basis(g)
   gl2 <- graphlets.old(g)
 
   glo <- sort(sapply(gl$cliques, paste, collapse="-"))
@@ -197,10 +197,9 @@ test_that("Graphlet projection works", {
   g <- graph.adjacency(D1 + D2 + D3, mode="undirected", weighted=TRUE)
   g <- simplify(g)
 
-  gl <- graphlets(g)
-
-  glp <- graphlets.project(g, cliques=gl$cliques)
+  gl <- graphlets.candidate.basis(g)
+  glp <- graphlets(g)
   glp2 <- graphlets.project.old(g, cliques=gl$cliques, iter=1000)
 
-  expect_that(sort(glp), equals(sort(glp2$Muc)))
+  expect_that(glp$Mu, equals(glp2$Muc))
 })

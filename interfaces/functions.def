@@ -1294,15 +1294,22 @@ igraph_community_infomap:
 
 igraph_graphlets:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
-                OUT VERTEXSETLIST cliques, OUT VECTOR thresholds
+                OUT VERTEXSETLIST cliques, OUT VECTOR Mu, INT niter=1000
         NAME-R: graphlets
+        DEPS: weights ON graph
+        IGNORE: RC
+
+igraph_graphlets_candidate_basis:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                OUT VERTEXSETLIST cliques, OUT VECTOR thresholds
+        NAME-R: graphlets.candidate.basis
         DEPS: weights ON graph
         IGNORE: RR, RC
 
 igraph_graphlets_project:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
-                VERTEXSETLIST cliques, INOUT VECTOR Mu, BOOLEAN startMu=False, \
-                INT niter=1000
+                VERTEXSETLIST cliques, INOUT VECTOR Muc, \
+                BOOLEAN startMu=False, INT niter=1000
         NAME-R: graphlets.project
         DEPS: weights ON graph
         IGNORE: RR, RC

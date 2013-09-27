@@ -8512,9 +8512,66 @@ SEXP R_igraph_subisomorphic_lad(SEXP pattern, SEXP target, SEXP domains,
 }
 
 /*-------------------------------------------/
-/ igraph_graphlets                           /
+  / igraph_graphlets                           /
+  /-------------------------------------------*/
+SEXP R_igraph_graphlets(SEXP graph, SEXP weights, SEXP niter) {
+  /* Declarations */
+  igraph_t c_graph;
+  igraph_vector_t c_weights;
+  igraph_vector_ptr_t c_cliques;
+  igraph_vector_t c_Mu;
+  int c_niter;
+  SEXP cliques;
+  SEXP Mu;
+  SEXP result, names;
+
+  PROTECT(R_igraph_attribute_protected=NEW_LIST(100));
+  R_igraph_attribute_protected_size=0;
+  IGRAPH_FINALLY(R_igraph_attribute_protected_destroy, 0);
+
+  /* Convert input */
+  R_SEXP_to_igraph(graph, &c_graph);
+  if (!isNull(weights)) { R_SEXP_to_vector(weights, &c_weights); }
+  if (0 != igraph_vector_ptr_init(&c_cliques, 0)) {
+    igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &c_cliques);
+  if (0 != igraph_vector_init(&c_Mu, 0)) {
+    igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_vector_destroy, &c_Mu);
+  c_niter=INTEGER(niter)[0];
+  /* Call igraph */
+  igraph_graphlets(&c_graph, (isNull(weights) ? 0 : &c_weights), &c_cliques,
+		   &c_Mu, c_niter);
+
+  /* Convert output */
+  PROTECT(result=NEW_LIST(2));
+  PROTECT(names=NEW_CHARACTER(2));
+  PROTECT(cliques=R_igraph_vectorlist_to_SEXP_p1(&c_cliques));
+  R_igraph_vectorlist_destroy(&c_cliques);
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(Mu=R_igraph_vector_to_SEXP(&c_Mu));
+  igraph_vector_destroy(&c_Mu); 
+  IGRAPH_FINALLY_CLEAN(1);
+  SET_VECTOR_ELT(result, 0, cliques);
+  SET_VECTOR_ELT(result, 1, Mu);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("cliques"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("Mu"));
+  SET_NAMES(result, names);
+
+  UNPROTECT(5);			/* protected list must be on top */
+  IGRAPH_FINALLY_CLEAN(1);
+  R_igraph_attribute_protected=0;
+  R_igraph_attribute_protected_size=0;
+
+  return(result);
+}
+
+/*-------------------------------------------/
+/ igraph_graphlets_candidate_basis           /
 /-------------------------------------------*/
-SEXP R_igraph_graphlets(SEXP graph, SEXP weights) {
+SEXP R_igraph_graphlets_candidate_basis(SEXP graph, SEXP weights) {
   /* Declarations */
   igraph_t c_graph;
   igraph_vector_t c_weights;
@@ -8541,8 +8598,8 @@ SEXP R_igraph_graphlets(SEXP graph, SEXP weights) {
   }
   IGRAPH_FINALLY(igraph_vector_destroy, &c_thresholds);
   /* Call igraph */
-  igraph_graphlets(&c_graph, (isNull(weights) ? 0 : &c_weights), &c_cliques,
-		   &c_thresholds);
+  igraph_graphlets_candidate_basis(&c_graph, (isNull(weights) ? 0 : &c_weights),
+				   &c_cliques, &c_thresholds);
 
   /* Convert output */
   PROTECT(result=NEW_LIST(2));
