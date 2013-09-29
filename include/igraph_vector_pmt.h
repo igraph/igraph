@@ -21,21 +21,10 @@
 
 */
 
-/** 
- * Vector, dealing with arrays efficiently.
- * \ingroup types
- */
-
-typedef struct TYPE(igraph_vector) {
-  BASE* stor_begin;
-  BASE* stor_end;
-  BASE* end;
-} TYPE(igraph_vector);
-
 /*--------------------*/
 /* Allocation         */
 /*--------------------*/
- 
+
 int FUNCTION(igraph_vector,init)(TYPE(igraph_vector)* v, long int size);
 int FUNCTION(igraph_vector,init_copy)(TYPE(igraph_vector)* v, 
 				       BASE* data, long int length);
