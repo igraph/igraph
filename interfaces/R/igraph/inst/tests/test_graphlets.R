@@ -182,7 +182,7 @@ graphlets.project.old <- function(graph, cliques, iter, Mu=NULL) {
 
   ## Sort the cliques according to their weights
   Smb <- sort(Mu, decreasing=TRUE, index=TRUE)
-  list(Bc=clf[Smb$ix], Muc=Mu[Smb$ix])
+  list(cliques=clf[Smb$ix], Mu=Mu[Smb$ix])
 }
 
 test_that("Graphlet projection works", {
@@ -201,5 +201,5 @@ test_that("Graphlet projection works", {
   glp <- graphlets(g)
   glp2 <- graphlets.project.old(g, cliques=gl$cliques, iter=1000)
 
-  expect_that(glp$Mu, equals(glp2$Muc))
+  expect_that(glp, equals(glp2))
 })
