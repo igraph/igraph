@@ -258,3 +258,6 @@ int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
 int FUNCTION(igraph_vector,index)(const TYPE(igraph_vector) *v,
                                   TYPE(igraph_vector) *newv,
                                   const igraph_vector_t *idx);
+
+int FUNCTION(igraph_vector,index_int)(TYPE(igraph_vector) *v,
+				      const igraph_vector_int_t *idx);
