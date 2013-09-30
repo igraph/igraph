@@ -43,15 +43,15 @@ graphlets.project (graph, weights = NULL, cliques, niter = 1000,
 }
 \value{
   \code{graphlets} returns a list with two members:
-  \item{cliques}, a list of subgraphs, the candidate graphlet
-  basis. Each subgraph is give by a vector of vertex ids.
-  \item{Mu} The weights of the subgraphs in graphlet basis.
+  \item{cliques}{A list of subgraphs, the candidate graphlet
+    basis. Each subgraph is give by a vector of vertex ids.}
+  \item{Mu}{The weights of the subgraphs in graphlet basis.}
 
   \code{graphlets.candidate.basis} returns a list of two elements:
-  \item{cliques}, a list of subgraphs, the candidate graphlet
-  basis. Each subgraph is give by a vector of vertex ids.
-  \item{thresholds} The weight thresholds used for finding the
-  subgraphs.
+  \item{cliques}{A list of subgraphs, the candidate graphlet
+    basis. Each subgraph is give by a vector of vertex ids.}
+  \item{thresholds}{The weight thresholds used for finding the
+    subgraphs.}
 
   \code{graphlets.project} return a numeric vector, the weights
   of the graphlet basis subgraphs.
@@ -62,9 +62,6 @@ graphlets.project (graph, weights = NULL, cliques, niter = 1000,
 }
 % \seealso{}
 \examples{
-
-  }
-}
 ## Create an example graph first
 D1 <- matrix(0, 5, 5)
 D2 <- matrix(0, 5, 5)
