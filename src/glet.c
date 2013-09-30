@@ -29,6 +29,31 @@
 #include "igraph_qsort.h"
 #include "igraph_conversion.h"
 
+/**
+ * \section graphlets_intro Introduction
+ * 
+ * <para> 
+ * Graphlet decomposition models a weighted undirected graph
+ * via the union of potentially overlapping dense social groups.
+ * This is done by a two-step algorithm. In the first step a candidate
+ * set of groups (a candidate basis) is created by finding cliques
+ * if the thresholded input graph. In the second step these 
+ * the graph is projected on the candidate basis, resulting a 
+ * weight coefficient for each clique in the candidate basis.
+ * </para>
+ * 
+ * <para>
+ * igraph contains three functions for performing the graph 
+ * decomponsition of a graph. The first is \ref igraph_graphlets(), which 
+ * performed both steps on the method and returns a list of subgraphs,
+ * with their corresponding weights. The second and third functions 
+ * correspond to the first and second steps of the algorithm, and they are 
+ * useful if the user wishes to perform them individually: 
+ * \ref igraph_graphlets_candidate_basis() and 
+ * \ref igraph_graphlets_project().
+ * </para>
+ */
+
 typedef struct {
   igraph_vector_int_t *newidvectors;
   igraph_t *newgraphs;
@@ -497,7 +522,21 @@ int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
 }
 
 /**
- * \function igraph_graphlets
+ * \function igraph_graphlets_candidate_basis
+ * Calculate a candidate graphlets basis
+ *
+ * \param graph The input graph, it must be a simple graph, edge directions are 
+ *        ignored.
+ * \param weights Weights of the edges, a vector.
+ * \param cliques An initialized vector of pointers. 
+ *        The graphlet basis is stored here. Each element of the pointer 
+ *        vector will be a vector of vertex ids. 
+ * \param thresholds An initialized vector, the (highest possible)
+ *        weight thresholds for finding the basis subgraphs are stored
+ *        here.
+ * \return Error code.
+ * 
+ * See also: \ref igraph_graphlets() and \ref igraph_graphlets_project().
  */
 
 int igraph_graphlets_candidate_basis(const igraph_t *graph,
@@ -707,6 +746,29 @@ int igraph_i_graphlets_project(const igraph_t *graph,
 
 /**
  * \function igraph_graphlets_project
+ * Project a graph on a graphlets basis
+ * 
+ * Note that the graph projected does not have to be the same that 
+ * was used to calculate the graphlet basis, but it is assumed that 
+ * it has the same number of vertices, and the vertex ids of the two
+ * graphs match.
+ * \param graph The input graph, it must be a simple graph, edge directions are 
+ *        ignored.
+ * \param weights Weights of the edges in the input graph, a vector.
+ * \param cliques The graphlet basis, a pointer vector, in which each
+ *        element is a vector of vertex ids.
+ * \param Mu An initialized vector, the weights of the graphlets will
+ *        be stored here. This vector is also used to initialize the 
+ *        the weight vector for the iterative algorithm, if the 
+ *        \c startMu argument is true (non-zero).
+ * \param startMu If true (non-zero), then the supplied Mu vector is 
+ *        used as the starting point of the iteration. Otherwise a
+ *        constant 1 vector is used.
+ * \param niter Integer scalar, the number of iterations to perform.
+ * \return Error code.
+ * 
+ * See also: \ref igraph_graphlets() and 
+ * \ref igraph_graphlets_candidate_basis().
  */
 
 int igraph_graphlets_project(const igraph_t *graph,
@@ -739,6 +801,29 @@ int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b) {
     return 0;
   }
 }
+
+/** 
+ * \function igraph_graphlets
+ * Calculate graphlets basis and project the graph on it
+ *
+ * This function simply calls \ref igraph_graphlets_candidate_basis()
+ * and \ref igraph_graphlets_project(), and then orders the graphlets
+ * according to decreasing weights.
+ * \param graph The input graph, it must be a simple graph, edge directions are 
+ *        ignored.
+ * \param weights Weights of the edges, a vector.
+ * \param cliques An initialized vector of pointers. 
+ *        The graphlet basis is stored here. Each element of the pointer 
+ *        vector will be a vector of vertex ids. 
+ * \param Mu An initialized vector, the weights of the graphlets will
+ *        be stored here. 
+ * \param niter Integer scalar, the number of iterations to perform 
+ *        for the projection step.
+ * \return Error code.
+ * 
+ * See also: \ref igraph_graphlets_candidate_basis() and
+ * \ref igraph_graphlets_project().
+ */
 
 int igraph_graphlets(const igraph_t *graph,
 		     const igraph_vector_t *weights,

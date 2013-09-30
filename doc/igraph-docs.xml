@@ -93,6 +93,8 @@
   <xi:include href="separators.xml"/>
 
   <xi:include href="community.xml"/>
+  
+  <xi:include href="graphlets.xml"/>
 
   <xi:include href="hrg.xml"/>
 
