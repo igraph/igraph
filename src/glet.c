@@ -38,14 +38,30 @@ typedef struct {
 
 void igraph_i_subclique_next_free(void *ptr) {
   igraph_i_subclique_next_free_t *data=ptr;
+  int i;
   if (data->newidvectors) {
-    /* TODO */
+    for (i=0; i<data->nc; i++) {
+      if (data->newidvectors+i) {
+	igraph_vector_int_destroy(data->newidvectors+i);
+      }
+    }
+    igraph_Free(data->newidvectors);
   }
   if (data->newgraphs) {
-    /* TODO */
+    for (i=0; i<data->nc; i++) {
+      if (data->newgraphs+i) {
+	igraph_destroy(data->newgraphs+i);
+      }
+    }
+    igraph_Free(data->newgraphs);
   }
   if (data->newweights) {
-    /* TODO */
+    for (i=0; i<data->nc; i++) {
+      if (data->newweights+i) {
+	igraph_vector_destroy(data->newweights+i);
+      }
+    }
+    igraph_Free(data->newweights);
   }
 }
 
