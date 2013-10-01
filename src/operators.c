@@ -473,10 +473,11 @@ void igraph_i_union_many_free3(igraph_vector_ptr_t *v) {
  * \param graphs Pointer vector, contains pointers to graphs objects,
  *        the operands of the intersection operator.
  * \param edgemaps If not a null pointer, then it must be an initialized 
- *        pointer vector and the mappings of edges from the result graph
- *        to the argument graphs will be stored here, in the same order as 
+ *        pointer vector and the mappings of edges from the graphs to the
+ *        result graph will be stored here, in the same order as
  *        \p graphs. Each mapping is stored in a separate 
- *        \type igraph_vector_t object.
+ *        \type igraph_vector_t object. For the edges that are not in
+ *        the intersection, -1 is stored.
  * \return Error code.
  * \sa \ref igraph_intersection() for the intersection of two graphs, 
  * \ref igraph_union_many(), \ref igraph_union() and \ref
