@@ -68,15 +68,8 @@ graph.attributes <- function(graph) {
     stop("Value must be a named list with unique names")
   }
             
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 2L, value,
+  .Call("R_igraph_mybracket2_set", graph, 9L, 2L, value,
         PACKAGE="igraph")
-  
-  newgraph
 }
 
 get.vertex.attribute <- function(graph, name, index=V(graph)) {
@@ -127,15 +120,8 @@ vertex.attributes <- function(graph) {
     stop("Invalid attribute value length, must match number of vertices")
   }
   
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-  
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 3L, value,
+  .Call("R_igraph_mybracket2_set", graph, 9L, 3L, value,
         PACKAGE="igraph")
-  
-  newgraph
 }
 
 get.edge.attribute <- function(graph, name, index=E(graph)) {
@@ -188,15 +174,8 @@ edge.attributes <- function(graph) {
     stop("Invalid attribute value length, must match number of edges")
   }
   
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-  
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 4L, value,
+  .Call("R_igraph_mybracket2_set", graph, 9L, 4L, value,
         PACKAGE="igraph")
-  
-  newgraph
 }
 
 list.graph.attributes <- function(graph) {
