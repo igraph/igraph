@@ -80,6 +80,7 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
   long int i, n, a;
   igraph_vector_t *num;
   igraph_strvector_t *str;
+  igraph_vector_bool_t *boolvec;
   igraph_attribute_record_t *rec;
   for (a=0; a<3; a++) {
     n=igraph_vector_ptr_size(als[a]);
@@ -94,6 +95,10 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
 	  str=(igraph_strvector_t*)rec->value;
 	  igraph_strvector_destroy(str);
 	  igraph_free(str);
+	} else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+	  boolvec=(igraph_vector_bool_t*)rec->value;
+	  igraph_vector_bool_destroy(boolvec);
+	  igraph_free(boolvec);
 	}
 	igraph_free((char*)rec->name);
 	igraph_free(rec);
@@ -504,7 +509,7 @@ int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec,
     igraph_vector_t *idx=VECTOR(*merges)[i];
     long int j, n=igraph_vector_size(idx);
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s += VECTOR(*oldv)[x];
     }
     VECTOR(*newv)[i]=s;
@@ -535,7 +540,7 @@ int igraph_i_cattributes_cn_prod(const igraph_attribute_record_t *oldrec,
     igraph_vector_t *idx=VECTOR(*merges)[i];
     long int j, n=igraph_vector_size(idx);
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s *= VECTOR(*oldv)[x];
     }
     VECTOR(*newv)[i]=s;
@@ -567,7 +572,7 @@ int igraph_i_cattributes_cn_min(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t m= n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
     for (j=1; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       igraph_real_t val=VECTOR(*oldv)[x];
       if (val < m) { m=val; }
     }
@@ -600,7 +605,7 @@ int igraph_i_cattributes_cn_max(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t m= n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
     for (j=1; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       igraph_real_t val=VECTOR(*oldv)[x];
       if (val > m) { m=val; }
     }
@@ -736,7 +741,7 @@ int igraph_i_cattributes_cn_mean(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t s= n > 0 ? 0.0 : nan;
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s += VECTOR(*oldv)[x];
     }
     if (n>0) { s=s/n; }
@@ -780,7 +785,7 @@ int igraph_i_cattributes_cn_func(const igraph_attribute_record_t *oldrec,
     igraph_real_t res;
     IGRAPH_CHECK(igraph_vector_resize(&values, n));
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];
+      long int x=(long int) VECTOR(*idx)[j];
       VECTOR(values)[j] = VECTOR(*oldv)[x];
     }
     IGRAPH_CHECK(func(&values, &res));
@@ -976,7 +981,7 @@ int igraph_i_cattributes_sn_func(const igraph_attribute_record_t *oldrec,
     char *res;
     IGRAPH_CHECK(igraph_strvector_resize(&values, n));
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];
+      long int x=(long int) VECTOR(*idx)[j];
       char *elem;
       igraph_strvector_get(oldv, x, &elem);
       IGRAPH_CHECK(igraph_strvector_set(newv, j, elem));
@@ -1042,9 +1047,13 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
   for (i=0, j=0; i<valno; i++) {
     igraph_attribute_record_t *newrec, *oldrec=VECTOR(*val)[i];
     const char *name=oldrec->name;
-    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_combination_type_t todo=
+      (igraph_attribute_combination_type_t) (TODO[i]);
     igraph_attribute_type_t type=oldrec->type;
-    void *voidfunc=funcs[i];
+    igraph_cattributes_combine_num_t *numfunc=
+      (igraph_cattributes_combine_num_t*) funcs[i];
+    igraph_cattributes_combine_str_t *strfunc=
+      (igraph_cattributes_combine_str_t*) funcs[i];
     
     if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
 	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
@@ -1064,7 +1073,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  numfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
@@ -1107,7 +1116,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_sn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  strfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
@@ -1554,9 +1563,13 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
   for (i=0, j=0; i<ealno; i++) {
     igraph_attribute_record_t *newrec, *oldrec=VECTOR(*eal)[i];
     const char *name=oldrec->name;
-    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_combination_type_t todo=
+      (igraph_attribute_combination_type_t) (TODO[i]);
     igraph_attribute_type_t type=oldrec->type;
-    void *voidfunc=funcs[i];
+    igraph_cattributes_combine_num_t *numfunc=
+      (igraph_cattributes_combine_num_t*) funcs[i];
+    igraph_cattributes_combine_str_t *strfunc=
+      (igraph_cattributes_combine_str_t*) funcs[i];
     
     if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
 	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
@@ -1576,7 +1589,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  numfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
@@ -1619,7 +1632,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_sn_func(oldrec, newrec, merges, 
-						  voidfunc));
+						  strfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);

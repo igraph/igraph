@@ -30,6 +30,7 @@ int main() {
   igraph_integer_t k1, k2 = (igraph_integer_t) INT_MAX;
   igraph_real_t tmpk;
   long int i, j, n;
+  igraph_maxflow_stats_t stats;
 
   /* --------------------------------------------------- */
   
@@ -47,7 +48,8 @@ int main() {
       igraph_maxflow_value(&gbar, &tmpk, 
 			   /* source= */ i + n, 
 			   /* target= */ j, 
-			   /* capacity= */ 0);
+			   /* capacity= */ 0,
+			   &stats);
       if (tmpk < k2) { k2=tmpk; }
     }
   }

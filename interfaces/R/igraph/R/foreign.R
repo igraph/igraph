@@ -70,7 +70,8 @@ read.graph <- function(file, format=c("edgelist", "pajek", "ncol", "lgl",
                                "graphml", "dimacs", "graphdb", "gml", "dl"),
                        ...) {
 
-  if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
+  if (!is.character(file) || length(grep("://", file, fixed=TRUE)) > 0 ||
+      length(grep("~", file, fixed=TRUE)) > 0) {
     buffer <- read.graph.toraw(file)
     file <- tempfile()
     write.graph.fromraw(buffer, file)
@@ -98,7 +99,8 @@ write.graph <- function(graph, file, format=c("edgelist", "pajek", "ncol", "lgl"
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (!is.character(file) || length(grep("://", file, fixed=TRUE))>0) {
+  if (!is.character(file) || length(grep("://", file, fixed=TRUE)) > 0 ||
+      length(grep("~", file, fixed=TRUE)) > 0) {
     tmpfile <- TRUE
     origfile <- file
     file <- tempfile()

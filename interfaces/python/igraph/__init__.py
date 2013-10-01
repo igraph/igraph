@@ -42,7 +42,7 @@ from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
 from igraph.matching import *
-from igraph.nexus import *
+from igraph.remote.nexus import *
 from igraph.statistics import *
 from igraph.summary import *
 from igraph.utils import *
@@ -119,7 +119,7 @@ class Graph(GraphBase):
       True
       >>> g["A", "B"] = 2
       >>> g["A", "B"]
-      2.0
+      2
       >>> g.es["weight"]
       [1.0, 1.0, 2]
     """
@@ -597,6 +597,31 @@ class Graph(GraphBase):
         """
         return [self.incident(idx, mode) for idx in xrange(self.vcount())]
 
+    def gomory_hu_tree(self, capacity=None, flow="flow"):
+        """gomory_hu_tree(capacity=None, flow="flow")
+
+        Calculates the Gomory-Hu tree of an undirected graph with optional
+        edge capacities.
+
+        The Gomory-Hu tree is a concise representation of the value of all the
+        maximum flows (or minimum cuts) in a graph. The vertices of the tree
+        correspond exactly to the vertices of the original graph in the same order.
+        Edges of the Gomory-Hu tree are annotated by flow values.  The value of
+        the maximum flow (or minimum cut) between an arbitrary (u,v) vertex
+        pair in the original graph is then given by the minimum flow value (i.e.
+        edge annotation) along the shortest path between u and v in the
+        Gomory-Hu tree.
+
+        @param capacity: the edge capacities (weights). If C{None}, all
+          edges have equal weight. May also be an attribute name.
+        @param flow: the name of the edge attribute in the returned graph
+          in which the flow values will be stored.
+        @return: the Gomory-Hu tree as a L{Graph} object.
+        """
+        graph, flow_values = GraphBase.gomory_hu_tree(self, capacity)
+        graph.es[flow] = flow_values
+        return graph
+
     def is_named(self):
         """is_named()
 
@@ -640,16 +665,33 @@ class Graph(GraphBase):
         """
         return Flow(self, *GraphBase.maxflow(self, source, target, capacity))
 
-    def mincut(self, capacity=None):
-        """mincut(capacity=None)
+    def mincut(self, source=None, target=None, capacity=None):
+        """mincut(source=None, target=None, capacity=None)
 
-        Returns a minimum cut in a graph.
+        Calculates the minimum cut between the given source and target vertices
+        or within the whole graph.
 
+        The minimum cut is the minimum set of edges that needs to be removed to
+        separate the source and the target (if they are given) or to disconnect the
+        graph (if neither the source nor the target are given). The minimum is
+        calculated using the weights (capacities) of the edges, so the cut with
+        the minimum total capacity is calculated.
+
+        For undirected graphs and no source and target, the method uses the
+        Stoer-Wagner algorithm. For a given source and target, the method uses the
+        push-relabel algorithm; see the references below.
+
+        @param source: the source vertex ID. If C{None}, the target must also be
+          C{None} and the calculation will be done for the entire graph (i.e.
+          all possible vertex pairs).
+        @param target: the target vertex ID. If C{None}, the source must also be
+          C{None} and the calculation will be done for the entire graph (i.e.
+          all possible vertex pairs).
         @param capacity: the edge capacities (weights). If C{None}, all
           edges have equal weight. May also be an attribute name.
         @return: a L{Cut} object describing the minimum cut
         """
-        return Cut(self, *GraphBase.mincut(self, capacity))
+        return Cut(self, *GraphBase.mincut(self, source, target, capacity))
 
     def st_mincut(self, source, target, capacity=None):
         """st_mincut(source, target, capacity=None)
@@ -1786,11 +1828,14 @@ class Graph(GraphBase):
     # pylint: disable-msg=C0301,C0323
     # C0301: line too long.
     # C0323: operator not followed by a space - well, print >>f looks OK
-    def write_svg(self, fname, layout, width = None, height = None, \
-                  labels = "label", colors = "color", shapes = "shape", \
-                  vertex_size = 10, edge_colors = "color", \
-                  font_size = 16, *args, **kwds):
+    def write_svg(self, fname, layout="auto", width=None, height=None, \
+                  labels="label", colors="color", shapes="shape", \
+                  vertex_size=10, edge_colors="color", \
+                  font_size=16, *args, **kwds):
         """Saves the graph as an SVG (Scalable Vector Graphics) file
+        
+        The file will be Inkscape (http://inkscape.org) compatible.
+        In Inkscape, as nodes are rearranged, the edges auto-update.
         
         @param fname: the name of the file
         @param layout: the layout of the graph. Can be either an
@@ -1810,7 +1855,8 @@ class Graph(GraphBase):
         @param shapes: the vertex shapes. Either it is the name of
           a vertex attribute to use, or a list explicitly specifying
           the shapes as integers. Shape 0 means hidden (nothing is drawn),
-          shape 1 is a circle, shape 2 is a rectangle.
+          shape 1 is a circle, shape 2 is a rectangle and shape 3 is a
+          rectangle that automatically sizes to the inner text.
         @param vertex_size: vertex size in pixels
         @param edge_colors: the edge colors. Either it is the name
           of an edge attribute to use, or a list explicitly specifying
@@ -1854,8 +1900,8 @@ class Graph(GraphBase):
             try:
                 shapes = self.vs.get_attribute_values(shapes)
             except KeyError:
-                shapes = [1]*self.vcount()
-
+                shapes = [1] * self.vcount()
+        
         if isinstance(edge_colors, str):
             try:
                 edge_colors = self.es.get_attribute_values(edge_colors)
@@ -1877,9 +1923,8 @@ class Graph(GraphBase):
         bbox = BoundingBox(layout.bounding_box())
 
         sizes = [width-2*vertex_size, height-2*vertex_size]
-        halfsizes = [(bbox.left + bbox.right) / 2., \
-                   (bbox.top + bbox.bottom) / 2.]
         w, h = bbox.width, bbox.height
+        
         ratios = []
         if w == 0:
             ratios.append(1.0)
@@ -1889,90 +1934,119 @@ class Graph(GraphBase):
             ratios.append(1.0)
         else:
             ratios.append(sizes[1] / h)
-        layout = [[(row[0] - halfsizes[0]) * ratios[0], \
-                  (row[1] - halfsizes[1]) * ratios[1]] \
+        
+        layout = [[(row[0] - bbox.left) * ratios[0] + vertex_size, \
+                  (row[1] - bbox.top) * ratios[1] + vertex_size] \
                   for row in layout]
                 
         directed = self.is_directed()
 
-        print >>f, "<?xml version=\"1.0\" standalone=\"no\"?>"
-        print >>f, "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\""
-        print >>f, "\"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd\">"
+        print >> f, '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+        print >> f, '<!-- Created by igraph (http://igraph.sourceforge.net/) for use in Inkscape (http://www.inkscape.org/) -->'
+        print >> f
+        print >> f, '<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"'
+        print >> f, 'width="{0}px" height="{1}px">'.format(width, height),
         
-        print >>f, "<svg width=\"%d\" height=\"%d\"" % (width, height),
-        print >>f, "version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"",
-        print >>f, "xmlns:xlink=\"http://www.w3.org/1999/xlink\">"
-
-        print >>f, "<!-- Created by igraph -->"
-        print >>f
-        print >>f, "<defs>"
-        print >>f, "  <symbol id=\"Triangle\" overflow=\"visible\">"
-        print >>f, "    <path d=\"M 0 0 L 10 -5 L 10 5 z\"/>"
-        print >>f, "  </symbol>"
-        print >>f, "  <style type=\"text/css\">"
-        print >>f, "    <![CDATA["
-        print >>f, "#vertices circle { stroke: black; stroke-width: 1 }"
-        print >>f, "#vertices rect { stroke: black; stroke-width: 1 }"
-        print >>f, ("#vertices text { text-anchor: middle; "+
-                   ("font-size: %s; " % font_size)+
-                   "font-family: sans-serif; font-weight: normal }")
-        print >>f, "#edges line { stroke-width: 1 }"
-        print >>f, "    ]]>"
-        print >>f, "  </style>"
-        print >>f, "</defs>"
-        print >>f
-        print >>f, "<g transform=\"translate(%.4f,%.4f)\">" % \
-                   (width/2.0, height/2.0)
-        print >>f, "  <g id=\"edges\">"
-        print >>f, "  <!-- Edges -->"
-
+        
+        edge_color_dict = {}
+        print >> f, '<defs id="defs3">'
+        for e_col in set(edge_colors):
+            if e_col == "#000000":
+                marker_index = ""
+            else:
+                marker_index = str(len(edge_color_dict))
+            # Print an arrow marker for each possible line color 
+            # This is a copy of Inkscape's standard Arrow 2 marker
+            print >> f, '<marker'
+            print >> f, '   inkscape:stockid="Arrow2Lend{0}"'.format(marker_index)
+            print >> f, '   orient="auto"'
+            print >> f, '   refY="0.0"'
+            print >> f, '   refX="0.0"'
+            print >> f, '   id="Arrow2Lend{0}"'.format(marker_index)
+            print >> f, '   style="overflow:visible;">'
+            print >> f, '  <path'
+            print >> f, '     id="pathArrow{0}"'.format(marker_index)
+            print >> f, '     style="font-size:12.0;fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;fill:{0}"'.format(e_col)
+            print >> f, '     d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "'
+            print >> f, '     transform="scale(1.1) rotate(180) translate(1,0)" />'
+            print >> f, '</marker>'
+            
+            edge_color_dict[e_col] = "Arrow2Lend{0}".format(marker_index)
+        print >> f, '</defs>'
+        print >> f, '<g inkscape:groupmode="layer" id="layer2" inkscape:label="Lines" sodipodi:insensitive="true">'
+       
         for eidx, edge in enumerate(self.es):
             vidxs = edge.tuple
             x1 = layout[vidxs[0]][0]
             y1 = layout[vidxs[0]][1]
             x2 = layout[vidxs[1]][0]
             y2 = layout[vidxs[1]][1]
-            angle = math.atan2(y2-y1, x2-x1)
-            x2 = x2 - vertex_size*math.cos(angle)
-            y2 = y2 - vertex_size*math.sin(angle)
-            if directed:
-                # Dirty hack because of the SVG specification:
-                # markers do not inherit stroke colors
-                print >>f, "    <g transform=\"translate(%.4f,%.4f)\" fill=\"%s\" stroke=\"%s\">" % (x2, y2, edge_colors[eidx], edge_colors[eidx]) 
-                print >>f, "      <line x1=\"%.4f\" y1=\"%.4f\" x2=\"0\" y2=\"0\"/>" % (x1-x2, y1-y2)
-                print >>f, "      <use x=\"0\" y=\"0\" xlink:href=\"#Triangle\" transform=\"rotate(%.4f)\"/>" % (180+angle*180/math.pi,)
-                print >>f, "    </g>\n"
-            else:
-                print >>f, "    <line x1=\"%.4f\" y1=\"%.4f\" x2=\"%.4f\" y2=\"%.4f\" style=\"stroke: %s\"/>" % (x1, y1, x2, y2, edge_colors[eidx])
+            angle = math.atan2(y2 - y1, x2 - x1)
+            x2 = x2 - vertex_size * math.cos(angle)
+            y2 = y2 - vertex_size * math.sin(angle)
+            
+            print >> f, '<path'
+            print >> f, '    style="fill:none;stroke:{0};stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none{1}"'\
+                        .format(edge_colors[eidx], ";marker-end:url(#{0})".\
+                                format(edge_color_dict[edge_colors[eidx]]) \
+                                if directed else "")
+            print >> f, '    d="M {0},{1} {2},{3}"'.format(x1, y1, x2, y2)
+            print >> f, '    id="path{0}"'.format(eidx)
+            print >> f, '    inkscape:connector-type="polyline"'
+            print >> f, '    inkscape:connector-curvature="0"'
+            print >> f, '    inkscape:connection-start="#g{0}"'.format(edge.source)
+            print >> f, '    inkscape:connection-start-point="d4"'
+            print >> f, '    inkscape:connection-end="#g{0}"'.format(edge.target)
+            print >> f, '    inkscape:connection-end-point="d4" />'
 
-        print >>f, "  </g>"
-        print >>f
+        print >> f, "  </g>"
+        print >> f
 
-        print >>f, "  <g id=\"vertices\">"
-        print >>f, "  <!-- Vertices -->"
+        print >> f, '  <g inkscape:label="Nodes" \
+                    inkscape:groupmode="layer" id="layer1">'
+        print >> f, '  <!-- Vertices -->'
+
+        if any(x == 3 for x in shapes):
+            # Only import tkFont if we really need it. Unfortunately, this will
+            # flash up an unneccesary Tk window in some cases        
+            import tkFont
+            import Tkinter as tk
+            # This allows us to dynamically size the width of the nodes
+            font = tkFont.Font(root=tk.Tk(), font=("Sans", font_size, tkFont.NORMAL))
+        
         for vidx in range(self.vcount()):
-            print >>f, "    <g transform=\"translate(%.4f %.4f)\">" % \
-                    tuple(layout[vidx])
+            print >> f, '    <g id="g{0}" transform="translate({1},{2})">'.\
+                        format(vidx, layout[vidx][0], layout[vidx][1])
             if shapes[vidx] == 1:
-                # Undocumented feature: can handle two colors
+                # Undocumented feature: can handle two colors but only for circles
                 c = str(colors[vidx])
                 if " " in c:
                     c = c.split(" ")
                     vs = str(vertex_size)
-                    print >>f, "      <path d=\"M -%s,0 A%s,%s 0 0,0 %s,0 L -%s,0\" fill=\"%s\"/>" % (vs,vs,vs,vs,vs,c[0])
-                    print >>f, "      <path d=\"M -%s,0 A%s,%s 0 0,1 %s,0 L -%s,0\" fill=\"%s\"/>" % (vs,vs,vs,vs,vs,c[1])
-                    print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"none\"/>" % vs
+                    print >> f, '     <path d="M -{0},0 A{0},{0} 0 0,0 {0},0 L \
+                                -{0},0" fill="{1}"/>'.format(vs, c[0])
+                    print >> f, '     <path d="M -{0},0 A{0},{0} 0 0,1 {0},0 L \
+                                -{0},0" fill="{1}"/>'.format(vs, c[1])
+                    print >> f, '     <circle cx="0" cy="0" r="{0}" fill="none"/>'\
+                                .format(vs)
                 else:
-                    print >>f, "      <circle cx=\"0\" cy=\"0\" r=\"%s\" fill=\"%s\"/>" % (str(vertex_size), str(colors[vidx]))
+                    print >> f, '     <circle cx="0" cy="0" r="{0}" fill="{1}"/>'.\
+                        format(str(vertex_size), str(colors[vidx]))
             elif shapes[vidx] == 2:
-                print >>f, "      <rect x=\"-%s\" y=\"-%s\" width=\"%s\" height=\"%s\" fill=\"%s\"/>" % (vertex_size, vertex_size, 2*vertex_size, 2*vertex_size, colors[vidx])
-            print >>f, "      <text x=\"0\" y=\"5\">%s</text>" % str(labels[vidx])
-            print >>f, "    </g>"
+                print >> f, '      <rect x="-{0}" y="-{0}" width="{1}" height="{1}" id="rect{2}" style="fill:{3};fill-opacity:1" />'.\
+                    format(vertex_size, vertex_size * 2, vidx, colors[vidx])
+            elif shapes[vidx] == 3:
+                (vertex_width, vertex_height) = (font.measure(str(labels[vidx])) + 2, font.metrics("linespace") + 2)
+                print >> f, '      <rect ry="5" rx="5" x="-{0}" y="-{1}" width="{2}" height="{3}" id="rect{4}" style="fill:{5};fill-opacity:1" />'.\
+                    format(vertex_width / 2., vertex_height / 2., vertex_width, vertex_height, vidx, colors[vidx])
+            
+            print >> f, '      <text sodipodi:linespacing="125%" y="{0}" x="0" id="text{1}" style="font-size:{2}px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans">'.format(vertex_size / 2.,vidx, font_size)
+            print >> f, '<tspan y="{0}" x="0" id="tspan{1}" sodipodi:role="line">{2}</tspan></text>'.format(vertex_size / 2.,vidx, str(labels[vidx]))
+            print >> f, '    </g>'
 
-        print >>f, "  </g>"
-        print >>f, "</g>"
-        print >>f
-        print >>f, "</svg>"
+        print >> f, '</g>'
+        print >> f
+        print >> f, '</svg>'
                 
         f.close()
 
@@ -2362,6 +2436,7 @@ class Graph(GraphBase):
 
     #############################################
     # Friendlier interface for bipartite methods
+    
     @classmethod
     def Bipartite(klass, types, *args, **kwds):
         """Bipartite(types, edges, directed=False)
@@ -2419,6 +2494,34 @@ class Graph(GraphBase):
           stores the vertex classes.
         """
         result, types = klass._Full_Bipartite(*args, **kwds)
+        result.vs["type"] = types
+        return result
+
+    @classmethod
+    def Random_Bipartite(klass, *args, **kwds):
+        """Generates a random bipartite graph with the given number of vertices and
+        edges (if m is given), or with the given number of vertices and the given
+        connection probability (if p is given).
+
+        If m is given but p is not, the generated graph will have n1 vertices of
+        type 1, n2 vertices of type 2 and m randomly selected edges between them. If
+        p is given but m is not, the generated graph will have n1 vertices of type 1
+        and n2 vertices of type 2, and each edge will exist between them with
+        probability p.
+
+        @param n1: the number of vertices of type 1.
+        @param n2: the number of vertices of type 2.
+        @param p: the probability of edges. If given, C{m} must be missing.
+        @param m: the number of edges. If given, C{p} must be missing.
+        @param directed: whether to generate a directed graph.
+        @param neimode: if the graph is directed, specifies how the edges will be
+          generated. If it is C{"all"}, edges will be generated in both directions
+          (from type 1 to type 2 and vice versa) independently. If it is C{"out"}
+          edges will always point from type 1 to type 2. If it is C{"in"}, edges
+          will always point from type 2 to type 1. This argument is ignored for
+          undirected graphs.
+        """
+        result, types = klass._Random_Bipartite(*args, **kwds)
         result.vs["type"] = types
         return result
 
@@ -2794,6 +2897,15 @@ class Graph(GraphBase):
             It is safe to omit this keyword argument unless you need to use
             a specific graph drawer.
 
+          - C{keep_aspect_ratio}: whether to keep the aspect ratio of the layout
+            that igraph calculates to place the nodes. C{True} means that the
+            layout will be scaled proportionally to fit into the bounding box
+            where the graph is to be drawn but the aspect ratio will be kept
+            the same (potentially leaving empty space next to, below or above
+            the graph). C{False} means that the layout will be scaled independently
+            along the X and Y axis in order to fill the entire bounding box.
+            The default is C{False}.
+
           - C{layout}: the layout to be used. If not an instance of
             L{Layout}, it will be passed to L{Graph.layout} to calculate
             the layout. Note that if you want a deterministic layout that
@@ -2842,6 +2954,11 @@ class Graph(GraphBase):
             vertices. The corresponding vertex attribute is C{frame_color},
             the default is black. See C{vertex_color} for the possible ways
             of specifying a color.
+
+          - C{vertex_frame_width}: the width of the frame (i.e. stroke) of the
+            vertices. The corresponding vertex attribute is C{frame_width}.
+            The default is 1. Vertex frame widths are measured in the unit of the
+            Cairo context on which igraph is drawing.
 
           - C{vertex_shape}: shape of the vertices. Alternatively it can
             be specified by the C{shape} vertex attribute. Possibilities
@@ -3488,7 +3605,7 @@ class EdgeSeq(_igraph.EdgeSeq):
         For instance, the following would calculate betweenness centralities
         twice:
 
-          >>> edges = g.es.select(_edge_betweenness_gt=10,
+          >>> edges = g.es.select(_edge_betweenness_gt=10,       # doctest:+SKIP
           ...                     _edge_betweenness_lt=30)
 
         It is advised to use this instead:

@@ -92,7 +92,7 @@ class Cut(VertexClustering):
         self._cut = cut
 
     def __repr__(self):
-        return "%s(%r,%r,%r,%r)" % \
+        return "%s(%r, %r, %r, %r)" % \
           (self.__class__.__name__, self._graph, \
            self._value, self._cut, self._partition)
 
@@ -174,7 +174,7 @@ class Flow(Cut):
         self._flow = flow
 
     def __repr__(self):
-        return "%s(%r,%r,%r,%r,%r)" % \
+        return "%s(%r, %r, %r, %r, %r)" % \
           (self.__class__.__name__, self._graph, \
            self._value, self._flow, self._cut, self._partition)
 

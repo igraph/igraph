@@ -859,7 +859,7 @@ int FUNCTION(igraph_matrix,rbind)(TYPE(igraph_matrix) *to,
   offset=torows; offset2=0;
   for (c=0; c<tocols; c++) {
     memcpy(VECTOR(to->data)+offset, VECTOR(from->data)+offset2,
-	   sizeof(BASE)*fromrows);
+	   sizeof(BASE) * (size_t) fromrows);
     offset+=fromrows+torows;
     offset2+=fromrows;
   }
@@ -1568,6 +1568,23 @@ int FUNCTION(igraph_matrix,print)(const TYPE(igraph_matrix) *m) {
   
   return 0;
 }
+
+int FUNCTION(igraph_matrix,printf)(const TYPE(igraph_matrix) *m,
+																	 const char *format) {
+  long int nr=FUNCTION(igraph_matrix,nrow)(m);
+  long int nc=FUNCTION(igraph_matrix,ncol)(m);
+  long int i, j;
+  for (i=0; i<nr; i++) {
+    for (j=0; j<nc; j++) {
+      if (j!=0) { putchar(' '); }
+      printf(format, MATRIX(*m, i, j));
+    }
+    printf("\n");
+  }
+
+  return 0;
+}
+
 #endif
 
 int FUNCTION(igraph_matrix,fprint)(const TYPE(igraph_matrix) *m,

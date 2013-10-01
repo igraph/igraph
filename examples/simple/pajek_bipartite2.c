@@ -60,7 +60,11 @@ int print_attributes(const igraph_t *g) {
 
   for (i=0; i<igraph_ecount(g); i++) {
     long int j;
-    printf("Edge %li (%i-%i): ", i, (int)IGRAPH_FROM(g,i), (int)IGRAPH_TO(g,i));
+    int u = IGRAPH_FROM(g, i), v = IGRAPH_TO(g, i);
+    if (u < v && !igraph_is_directed(g)) {
+      u = IGRAPH_TO(g, i); v = IGRAPH_FROM(g, i);
+    }
+    printf("Edge %li (%i-%i): ", i, u, v);
     for (j=0; j<igraph_strvector_size(&enames); j++) {
       printf("%s=", STR(enames, j));
       if (VECTOR(etypes)[j]==IGRAPH_ATTRIBUTE_NUMERIC) {

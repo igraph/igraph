@@ -105,6 +105,11 @@ __BEGIN_DECLS
   do { IGRAPH_CHECK(igraph_vector_bool_init(v, size)); \
   IGRAPH_FINALLY(igraph_vector_bool_destroy, v); } while (0)
 #endif
+#ifndef IGRAPH_VECTOR_LONG_INIT_FINALLY
+#define IGRAPH_VECTOR_LONG_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_long_init(v, size)); \
+  IGRAPH_FINALLY(igraph_vector_long_destroy, v); } while (0)
+#endif
 
 /* -------------------------------------------------- */
 /* Type-specific vector functions                     */
@@ -122,6 +127,8 @@ int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
 			igraph_vector_t* res, igraph_real_t maxval);
 int igraph_vector_order1(const igraph_vector_t* v, 
 			 igraph_vector_t* res, igraph_real_t maxval);
+int igraph_vector_order1_int(const igraph_vector_t* v,
+			 igraph_vector_int_t* res, igraph_real_t maxval);
 int igraph_vector_order2(igraph_vector_t *v);
 int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res, 
 		       long int nodes);

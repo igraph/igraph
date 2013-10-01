@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#pragma clang diagnostic ignored "-Wconversion"
+
 #include "cs.h"
 /* sparse QR factorization [V,beta,pinv,R] = qr (A) */
 csn *cs_qr (const cs *A, const css *S)

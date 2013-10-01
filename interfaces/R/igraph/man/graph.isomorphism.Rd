@@ -187,10 +187,16 @@ graph.isocreate(size, number, directed=TRUE)
     vector otherwise.}
   \item{info1}{Some information about the canonical form calculation
     for \code{graph1}. A named list, see the return value of
-    \code{\link{canonical.permutation}} for details. }
+    \code{\link{canonical.permutation}} for details. Note that if the
+		two graphs have different number of vertices or edges, then the
+		BLISS algorithm is not run at all, and the contents of \code{info1}
+		is incorrect.}
   \item{info2}{Some information about the canonical form calculation
     for \code{graph2}. A named list, see the return value of
-    \code{\link{canonical.permutation}} for details. }
+    \code{\link{canonical.permutation}} for details. Note that if the
+		two graphs have different number of vertices or edges, then the
+		BLISS algorithm is not run at all, and the contents of \code{info2}
+		is incorrect.}
 
   \code{graph.isomorphic.vf2} returns a names list with three elements:
   \item{iso}{A logical scalar, whether the two graphs are isomorphic.}
@@ -256,6 +262,9 @@ graph.isocreate(size, number, directed=TRUE)
   An improved algorithm for matching large graphs,
   \emph{Proc. of the 3rd IAPR TC-15 Workshop on Graphbased
     Representations in Pattern Recognition}, 149--159, 2001.
+
+  C. Solnon: AllDifferent-based Filtering for Subgraph Isomorphism,
+  \emph{Artificial Intelligence} 174(12-13):850--864, 2010.
 }
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph.motifs}}}

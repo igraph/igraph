@@ -128,7 +128,11 @@ i.get.edge.labels <- function(graph, edge.labels=NULL) {
 i.get.labels <- function(graph, labels=NULL) {
 
   if (is.null(labels)) {
-    labels <- seq_len(vcount(graph))
+    if ("name" %in% list.vertex.attributes(graph)) {
+      labels <- get.vertex.attribute(graph, "name")
+    } else {
+      labels <- seq_len(vcount(graph))
+    }
   }
   labels
 }

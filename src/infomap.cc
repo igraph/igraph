@@ -50,7 +50,7 @@ int infomap_partition(FlowGraph * fgraph, bool rcall) {
   // "real" number of vertex, ie. number of vertex of the graph	
 
   int iteration = 0;
-  double outer_oldCodeLength;
+  double outer_oldCodeLength, newCodeLength;
   
   int *initial_move = NULL;
   bool initial_move_done = true;
@@ -151,7 +151,7 @@ int infomap_partition(FlowGraph * fgraph, bool rcall) {
     /**********************************************************************/
     //  SECOND PART: greedy optimizing it self
     // ===========================================
-    double oldCodeLength, newCodeLength;
+    double oldCodeLength;
     
     do {
       // greedy optimizing object creation
@@ -205,7 +205,7 @@ int infomap_partition(FlowGraph * fgraph, bool rcall) {
     
     iteration++;
     if (!rcall) IGRAPH_ALLOW_INTERRUPTION();
-  } while (outer_oldCodeLength - greedy->codeLength > 1.0e-10);
+  } while (outer_oldCodeLength - newCodeLength > 1.0e-10);
   
   delete cpy_fgraph;
   IGRAPH_FINALLY_CLEAN(1);

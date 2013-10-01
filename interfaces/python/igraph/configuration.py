@@ -152,6 +152,16 @@ class Configuration(object):
         - B{nexus.url}: the root URL of the Nexus repository. Default:
           C{http://nexus.igraph.org}.
 
+    Shell settings
+    --------------
+    
+    These settings specify options for external environments in which igraph is
+    embedded (e.g., IPython and its Qt console). These settings are stored in
+    section C{shell}.
+
+        - B{ipython.inlining.Plot}: whether to show instances of the L{Plot} class
+          inline in IPython's console if the console supports it. Default: C{True}
+
     @undocumented: _item_to_section_key, _types, _sections, _definitions, _instance
     """
 
@@ -225,7 +235,7 @@ class Configuration(object):
         }
     }
 
-    _sections = ("general", "apps", "plotting", "remote")
+    _sections = ("general", "apps", "plotting", "remote", "shell")
     _definitions = {
         "general.shells": { "default": "IPythonShell,ClassicPythonShell" },
         "general.verbose": { "default": True, "type": "boolean" },
@@ -237,7 +247,9 @@ class Configuration(object):
         "plotting.palette": { "default": "gray" },
         "plotting.wrap_labels": { "default": False, "type": "boolean" },
 
-        "remote.nexus.url": { "default": "http://nexus.igraph.org" }
+        "remote.nexus.url": { "default": "http://nexus.igraph.org" },
+
+        "shell.ipython.inlining.Plot": { "default": True, "type": "boolean" }
     }
 
     # The singleton instance we are using throughout other modules

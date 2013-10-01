@@ -5,7 +5,9 @@
 \alias{tkplot.fit.to.screen}
 \alias{tkplot.reshape}
 \alias{tkplot.export.postscript}
+\alias{tkplot.canvas}
 \alias{tkplot.getcoords}
+\alias{tkplot.setcoords}
 \alias{tkplot.center}
 \alias{tkplot.rotate}
 \concept{Visualization}
@@ -22,7 +24,9 @@ tkplot.off()
 tkplot.fit.to.screen(tkp.id, width = NULL, height = NULL)
 tkplot.reshape(tkp.id, newlayout, \dots)
 tkplot.export.postscript(tkp.id)
+tkplot.canvas(tkp.id)
 tkplot.getcoords(tkp.id, norm = FALSE)
+tkplot.setcoords(tkp.id, coords)
 tkplot.center(tkp.id)
 tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
 }
@@ -39,6 +43,8 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \item{newlayout}{The new layout, see the \code{layout} parameter of
     tkplot.}
   \item{norm}{Logical, should we norm the coordinates.}
+  \item{coords}{Two-column numeric matrix, the new coordinates
+    of the vertices, in absolute coordinates.}
   \item{degree}{The degree to rotate the plot.}
   \item{rad}{The degree to rotate the plot, in radian.}
   \item{\dots}{Additional plotting parameters. See
@@ -91,9 +97,18 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \code{tkplot.export.postscript} creates a dialog window for saving the
   plot in postscript format.
 
+  \code{tkplot.canvas} returns the Tk canvas object that belongs to a
+  graph plot. The canvas can be directly manipulated then, eg. labels
+  can be added, it could be saved to a file programatically, etc. See an
+  example below.
+  
   \code{tkplot.getcoords} returns the coordinates of the vertices in a
   matrix. Each row corresponds to one vertex.
 
+  \code{tkplot.setcoords} sets the coordinates of the vertices. A
+  two-column matrix specifies the new positions, with each row
+  corresponding to a single vertex.
+  
   \code{tkplot.center} shifts the figure to the center of its plot window.
 
   \code{tkplot.rotate} rotates the figure, its parameter can be given
@@ -103,6 +118,8 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
   \code{tkplot} returns an integer, the id of the plot, this can be used
   to manipulate it from the command line.
 
+  \code{tkplot.canvas} retuns \code{tkwin} object, the Tk canvas.
+  
   \code{tkplot.getcoords} returns a matrix with the coordinates.
 
   \code{tkplot.close}, \code{tkplot.off}, \code{tkplot.fit.to.screen},
@@ -116,5 +133,35 @@ tkplot.rotate(tkp.id, degree = NULL, rad = NULL)
 \examples{
 g <- graph.ring(10)
 \dontrun{tkplot(g)}
+
+\dontrun{
+## Saving a tkplot() to a file programatically
+g <- graph.star(10, center=10) \%u\% graph.ring(9, directed=TRUE)
+E(g)$width <- sample(1:10, ecount(g), replace=TRUE)
+lay <- layout.auto(g)
+
+id <- tkplot(g, layout=lay)
+canvas <- tkplot.canvas(id)
+tkpostscript(canvas, file="/tmp/output.eps")
+tkplot.close(id)
+}
+
+\dontrun{
+## Setting the coordinates and adding a title label
+g <- graph.ring(10)
+id <- tkplot(graph.ring(10), canvas.width=450, canvas.height=500)
+
+canvas <- tkplot.canvas(id)
+padding <- 20
+coords <- layout.norm(layout.circle(g), 0+padding, 450-padding,
+                      50+padding, 500-padding)
+tkplot.setcoords(id, coords)
+
+width <- as.numeric(tkcget(canvas, "-width"))
+height <- as.numeric(tkcget(canvas, "-height"))
+tkcreate(canvas, "text", width/2, 25, text="My title",
+         justify="center", font=tkfont.create(family="helvetica"
+                             ,size=20,weight="bold"))
+}
 }
 \keyword{graphs}

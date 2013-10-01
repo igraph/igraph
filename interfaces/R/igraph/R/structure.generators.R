@@ -129,6 +129,8 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
                  "lower"=3,
                  "min"=4,
                  "plus"=5)
+
+  mode(adjmatrix) <- "double"
   
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
@@ -144,7 +146,7 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
 
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_weighted_adjacency", adjmatrix,
-                 as.numeric(mode), "weight", diag,
+                 as.numeric(mode), weighted, diag,
                  PACKAGE="igraph")
   } else {
     
@@ -152,6 +154,8 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
     attrs <- attributes(adjmatrix)
     adjmatrix <- as.numeric(adjmatrix)
     attributes(adjmatrix) <- attrs
+
+    if (!diag) { diag(adjmatrix) <- 0 }
     
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_graph_adjacency", adjmatrix, as.numeric(mode),

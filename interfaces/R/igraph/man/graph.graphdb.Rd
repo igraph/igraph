@@ -69,6 +69,9 @@ g <- graph.graphdb(prefix="iso", type="r001", nodes=20, pair="A",
 g2 <- graph.graphdb(prefix="iso", type="r001", nodes=20, pair="B",
   which=10, compressed=TRUE)
 graph.isomorphic.vf2(g, g2)	% should be TRUE
-g3 <- graph.graphdb(url="http://cneurocvs.rmki.kfki.hu/graphdb/gzip/iso/bvg/b06m/iso_b06m_m200.A09.gz")
+g3 <- graph.graphdb(url=paste(sep="/",
+                              "http://cneurocvs.rmki.kfki.hu",
+                              "graphdb/gzip/iso/bvg/b06m",
+                              "iso_b06m_m200.A09.gz"))
 }}
 \keyword{graphs}

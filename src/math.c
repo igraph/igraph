@@ -55,28 +55,6 @@ double igraph_log2(const double a) {
   return log(a)/log(2.0);
 }
 
-/*
- * Written by J.T. Conklin <jtc@netbsd.org>.
- * Changes for long double by Ulrich Drepper <drepper@cygnus.com>
- * Public domain.
- */
-
-#ifndef HAVE_LOGBL
-long double igraph_logbl(long double x) {
-  long double res;
-#if defined(_MSC_VER)
-  __asm { fld [x] }
-  __asm { fxtract }
-  __asm { fstp st }
-  __asm { fistp [res] }
-#else
-  __asm__ ("fxtract\n\t"
-	   "fstp	%%st" : "=t" (res) : "0" (x));
-#endif
-  return res;
-}
-#endif
-
 int igraph_chebyshev_init(const double *dos, int nos, double eta)
 {
     int i, ii;

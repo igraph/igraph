@@ -76,6 +76,7 @@
 #define ZERO 0
 #define ONE 1
 #define MULTIPLICITY 1
+#define UNSIGNED 1
 
 #elif defined(BASE_PTR)
 #define BASE void*

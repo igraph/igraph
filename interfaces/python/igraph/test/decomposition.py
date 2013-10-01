@@ -248,10 +248,16 @@ class CommunityTests(unittest.TestCase):
     def testOptimalModularity(self):
         try:
             g = Graph.Famous("bull")
+
             cl = g.community_optimal_modularity()
             self.failUnless(len(cl) == 2)
             self.failUnless(cl.membership == [0, 0, 1, 0, 1])
             self.assertAlmostEqual(cl.q, 0.08, places=7)
+
+            ws = [i % 5 for i in xrange(g.ecount())]
+            cl = g.community_optimal_modularity(weights=ws)
+            self.assertAlmostEqual(cl.q, g.modularity(cl.membership, weights=ws),
+                    places=7)
 
             g = Graph.Famous("zachary")
             cl = g.community_optimal_modularity()
@@ -260,6 +266,12 @@ class CommunityTests(unittest.TestCase):
                     0, 0, 0, 2, 2, 1, 0, 2, 0, 2, 0, 2, 3, 3, 3, 2, 3, 3, \
                     2, 2, 3, 2, 2])
             self.assertAlmostEqual(cl.q, 0.4197896, places=7)
+
+            ws = [2+(i % 3) for i in xrange(g.ecount())]
+            cl = g.community_optimal_modularity(weights=ws)
+            self.assertAlmostEqual(cl.q, g.modularity(cl.membership, weights=ws),
+                    places=7)
+
         except NotImplementedError:
             # Well, meh
             pass

@@ -19,7 +19,12 @@ FLIBS=`"${R_HOME}/bin/R" CMD config FLIBS`
 AC_LANG(C)
 AC_PROG_CC
 
+# Fortran compiler, we need to check if it is the GNU compiler
 AC_PROG_FC
+if test "x$ac_cv_fc_compiler_gnu" == xyes; then
+  AC_DEFINE([HAVE_GFORTRAN], [1], [Define to 1 if using the GNU fortran compiler])
+fi
+
 
 # Tricky check for C++ compiler, because Autoconf has a weird bug:
 # http://lists.gnu.org/archive/html/autoconf/2006-03/msg00067.html
@@ -36,7 +41,9 @@ AC_LANG_POP([C++])
 
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([rintf finite expm1 rint log2 logbl snprintf log1p round fmin])
+AC_CHECK_FUNCS([rintf finite expm1 rint log2 logbl snprintf log1p round fmin stpcpy])
+AC_CHECK_DECL([stpcpy],
+	[AC_DEFINE([HAVE_STPCPY_SIGNATURE], [1], [Define to 1 if the stpcpy function has a signature])])
 LIBS=$LIBS_SAVE
 
 AC_CHECK_HEADER([sys/times.h], 

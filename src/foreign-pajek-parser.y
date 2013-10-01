@@ -44,8 +44,14 @@
 
 */
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include <stdio.h>
 #include <string.h>
+#include "igraph_hacks_internal.h"
 #include "igraph_types.h"
 #include "igraph_types_internal.h"
 #include "igraph_memory.h"
@@ -467,7 +473,7 @@ adjmatrix: matrixline NEWLINE adjmatrixlines;
 
 matrixline: MATRIXLINE { context->actfrom=0; 
                          context->actto=0; 
-                         if (context->vcount2==0) { context->directed=1; }
+                         context->directed=(context->vcount2==0);
                        };
 
 adjmatrixlines: /* empty */ | adjmatrixlines adjmatrixline;

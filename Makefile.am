@@ -1,7 +1,7 @@
 
 
 SUBDIRS=src tests interfaces
-DOC_FILES = 	$(top_builddir)/doc/book/Makefile.in \
+DOC_FILES =
 	$(top_srcdir)/doc/Makefile.in \
 	$(top_srcdir)/doc/igraph.3
 
@@ -34,7 +34,7 @@ dist-hook:
 MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make deb will generate Debian packages
-.PHONY: framework msvc
+.PHONY: framework msvc parsersources
 
 framework: all
 	rm -rf $(top_builddir)/igraph.framework
@@ -56,7 +56,10 @@ test: all
 	 	fi; \
 	done
 
-msvc: all
+parsersources:
+	cd src; make parsersources
+
+msvc: parsersources
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/include
@@ -70,7 +73,11 @@ msvc: all
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*~
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/include/*~
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
-	cp $(top_srcdir)/msvc/igraph.{sln,vcproj} $(top_builddir)/igraph-$(VERSION)-msvc/
+	$(top_srcdir)/tools/create-msvc-projectfile.py		\
+		$(top_builddir)/igraph-$(VERSION)-msvc 	\
+		$(top_srcdir)/msvc/igraph.vcproj        \
+		$(top_builddir)/src/Makefile
+	cp $(top_srcdir)/msvc/igraph.sln $(top_builddir)/igraph-$(VERSION)-msvc
 	cp -r $(top_srcdir)/msvc/igraphtest .
 	rm -rf igraph-$(VERSION)-msvc.zip
 	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest

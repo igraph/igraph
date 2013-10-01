@@ -11,6 +11,7 @@
 <!-- doxrox-include igraph_maxflow -->
 <!-- doxrox-include igraph_maxflow_value -->
 <!-- doxrox-include igraph_dominator_tree -->
+<!-- doxrox-include igraph_maxflow_stats_t -->
 </section>
 
 <section><title>Cuts and minimum cuts</title>

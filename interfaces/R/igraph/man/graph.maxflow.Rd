@@ -78,6 +78,14 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   \item{partition2}{A numeric vector of vertex ids, the vertices in the
     second partition of the minimum cut corresponding to the maximum
     flow.}
+  \item{stats}{A list with some statistics from the push-relabel
+    algorithm. Five integer values currently: \code{nopush} is the
+    number of push operations, \code{norelabel} the number of
+    relabelings, \code{nogap} is the number of times the gap heuristics
+    was used, \code{nogapnodes} is the total number of gap nodes omitted
+    because of the gap heuristics and \code{nobfs} is the number of
+    times a global breadth-first-search update was performed to assign
+    better height (=distance) values to the vertices.}
   
   For \code{graph.mincut} a numeric constant, the value of the minimum
   cut, except if \code{value.only=FALSE}. In this case a named list with

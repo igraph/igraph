@@ -226,6 +226,11 @@ class LayoutAlgorithmTests(unittest.TestCase):
         self.assertEqual(set([0, 5, 10]), set(coord[0] for coord in lo if coord[1] == 1))
         self.assertEqual(set([2.5, 7.5]), set(coord[0] for coord in lo if coord[1] == 0))
 
+    def testDRL(self):
+        # Regression test for bug #1091891
+        g = Graph.Ring(10, circular=False) + 1
+        lo = g.layout("drl")
+
 
 def suite():
     layout_suite = unittest.makeSuite(LayoutTests)

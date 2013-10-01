@@ -91,7 +91,7 @@ int igraph_lapack_dgeev(const igraph_matrix_t *A,
 			igraph_matrix_t *vectorsleft,
 			igraph_matrix_t *vectorsright, int *info);
 
-typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE, 
+typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE=0, 
 	       IGRAPH_LAPACK_DGEEVX_BALANCE_PERM,
 	       IGRAPH_LAPACK_DGEEVX_BALANCE_SCALE,
 	       IGRAPH_LAPACK_DGEEVX_BALANCE_BOTH } 

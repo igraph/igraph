@@ -157,7 +157,7 @@ int igraph_bfs(const igraph_t *graph,
     long int i, n=igraph_vector_size(restricted);
     igraph_vector_char_fill(&added, 1);
     for (i=0; i<n; i++) {
-      long int v=VECTOR(*restricted)[i];
+      long int v=(long int) VECTOR(*restricted)[i];
       VECTOR(added)[v]=0;
     }
   }
@@ -182,7 +182,7 @@ int igraph_bfs(const igraph_t *graph,
 
     if (roots && rootpos < noroots) {
       /* We are still going through the 'roots' vector */
-      actroot=VECTOR(*roots)[rootpos++];
+      actroot=(long int) VECTOR(*roots)[rootpos++];
     } else if (!roots && rootpos==0) {
       /* We have a single root vertex given, and start now */
       actroot=root;
@@ -210,10 +210,11 @@ int igraph_bfs(const igraph_t *graph,
     pred_vec=-1;
 
     while (!igraph_dqueue_empty(&Q)) {
-      long int actvect=igraph_dqueue_pop(&Q);
-      long int actdist=igraph_dqueue_pop(&Q);
+      long int actvect=(long int) igraph_dqueue_pop(&Q);
+      long int actdist=(long int) igraph_dqueue_pop(&Q);
       long int succ_vec;
-      igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
+      igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, 
+						    (igraph_integer_t) actvect);
       long int i, n=igraph_vector_size(neis);    
       
       if (pred) { VECTOR(*pred)[actvect] = pred_vec; }
@@ -222,7 +223,7 @@ int igraph_bfs(const igraph_t *graph,
       if (dist) { VECTOR(*dist)[actvect] = actdist; }      
       
       for (i=0; i<n; i++) {
-	long int nei=VECTOR(*neis)[i];
+	long int nei=(long int) VECTOR(*neis)[i];
 	if (! VECTOR(added)[nei]) {
 	  VECTOR(added)[nei] = 1;
 	  IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
@@ -231,11 +232,14 @@ int igraph_bfs(const igraph_t *graph,
 	}
       }
 
-      succ_vec = igraph_dqueue_empty(&Q) ? -1 : igraph_dqueue_head(&Q);
+      succ_vec = igraph_dqueue_empty(&Q) ? -1L : 
+	(long int) igraph_dqueue_head(&Q);
       if (callback) {
 	igraph_bool_t terminate=
-	  callback(graph, actvect, pred_vec, succ_vec, 
-		   act_rank-1, actdist, extra);
+	  callback(graph, (igraph_integer_t) actvect, (igraph_integer_t) 
+		   pred_vec, (igraph_integer_t) succ_vec, 
+		   (igraph_integer_t) act_rank-1, (igraph_integer_t) actdist, 
+		   extra);
 	if (terminate) {
 	  igraph_lazy_adjlist_destroy(&adjlist);
 	  igraph_dqueue_destroy(&Q);
@@ -312,11 +316,12 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
   added[(long int)vid]=1;
   
   while (!igraph_dqueue_empty(&q)) {
-    long int actvect=igraph_dqueue_pop(&q);
-    long int actdist=igraph_dqueue_pop(&q);
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, actvect, mode));
+    long int actvect=(long int) igraph_dqueue_pop(&q);
+    long int actdist=(long int) igraph_dqueue_pop(&q);
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actvect, 
+				  mode));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int neighbor=VECTOR(neis)[i];
+      long int neighbor=(long int) VECTOR(neis)[i];
       if (added[neighbor]==0) {
 	added[neighbor]=1;
 	VECTOR(*parents)[neighbor]=actvect;
@@ -468,14 +473,16 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
       if (dist) { VECTOR(*dist)[actroot] = 0; }
 
       if (in_callback) {
-	igraph_bool_t terminate=in_callback(graph, actroot, 0, extra);
+	igraph_bool_t terminate=in_callback(graph, (igraph_integer_t) actroot,
+					    0, extra);
 	if (terminate) { FREE_ALL(); return 0; }
       }
     }
     
     while (!igraph_stack_empty(&stack)) {
-      long int actvect=igraph_stack_top(&stack);
-      igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, actvect);
+      long int actvect=(long int) igraph_stack_top(&stack);
+      igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, 
+						    (igraph_integer_t) actvect);
       long int n=igraph_vector_size(neis);
       long int *ptr=igraph_vector_long_e_ptr(&nptr, actvect);
 
@@ -483,7 +490,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
       igraph_bool_t any=0;
       long int nei;
       while (!any && (*ptr) <n) {
-	nei=VECTOR(*neis)[(*ptr)];
+	nei=(long int) VECTOR(*neis)[(*ptr)];
 	any=!VECTOR(added)[nei];
 	(*ptr) ++;
       }
@@ -497,7 +504,9 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 	if (dist) { VECTOR(*dist)[nei] = act_dist; }
 
 	if (in_callback) {
-	  igraph_bool_t terminate=in_callback(graph, nei, act_dist, extra);
+	  igraph_bool_t terminate=in_callback(graph, (igraph_integer_t) nei,
+					      (igraph_integer_t) act_dist, 
+					      extra);
 	  if (terminate) { FREE_ALL(); return 0; }
 	}
 
@@ -508,7 +517,9 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 	act_dist--;
 
 	if (out_callback) {
-	  igraph_bool_t terminate=out_callback(graph, actvect, act_dist, extra);
+	  igraph_bool_t terminate=out_callback(graph, (igraph_integer_t) 
+					       actvect, (igraph_integer_t) 
+					       act_dist, extra);
 	  if (terminate) { FREE_ALL(); return 0; }
 	}
       }

@@ -94,8 +94,8 @@ int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
     }
   }
   
-  IGRAPH_CHECK(igraph_create(graphbar, &edges, new_no_of_nodes, 
-			     IGRAPH_DIRECTED));
+  IGRAPH_CHECK(igraph_create(graphbar, &edges, (igraph_integer_t) 
+			     new_no_of_nodes, IGRAPH_DIRECTED));
 
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
@@ -139,7 +139,8 @@ int igraph_i_residual_graph(const igraph_t *graph,
     }
   }
 
-  IGRAPH_CHECK(igraph_create(residual, tmp, no_of_nodes, IGRAPH_DIRECTED));  
+  IGRAPH_CHECK(igraph_create(residual, tmp, (igraph_integer_t) no_of_nodes,
+			     IGRAPH_DIRECTED));  
 
   return 0;
 }
@@ -208,7 +209,8 @@ int igraph_i_reverse_residual_graph(const igraph_t *graph,
     }
   }
   
-  IGRAPH_CHECK(igraph_create(residual, tmp, no_of_nodes, IGRAPH_DIRECTED));
+  IGRAPH_CHECK(igraph_create(residual, tmp, (igraph_integer_t) no_of_nodes,
+			     IGRAPH_DIRECTED));
   
   return 0;
 }
@@ -458,7 +460,7 @@ int igraph_dominator_tree(const igraph_t *graph,
 
   for (i=0; i<no_of_nodes; i++) {
     if (IGRAPH_FINITE(VECTOR(vertex)[i])) {
-      long int t=VECTOR(vertex)[i];
+      long int t=(long int) VECTOR(vertex)[i];
       VECTOR(semi)[t] = component_size+1;
       VECTOR(vertex)[component_size] = t+1;
       component_size++;
@@ -481,7 +483,7 @@ int igraph_dominator_tree(const igraph_t *graph,
     igraph_vector_t *v=igraph_adjlist_get(&pred, i);
     long int j, n=igraph_vector_size(v);
     for (j=0; j<n; ) {
-      long int v2=VECTOR(*v)[j];
+      long int v2=(long int) VECTOR(*v)[j];
       if (IGRAPH_FINITE(VECTOR(parent)[v2])) {
 	j++; 
       } else {
@@ -495,21 +497,21 @@ int igraph_dominator_tree(const igraph_t *graph,
   /* Now comes the main algorithm, steps 2 & 3 */
 
   for (i=component_size-1; i>0; i--) {
-    long int w=VECTOR(vertex)[i]-1;
+    long int w=(long int) VECTOR(vertex)[i]-1;
     igraph_vector_t *predw=igraph_adjlist_get(&pred, w);
     long int j, n=igraph_vector_size(predw);
     for (j=0; j<n; j++) {
-      long int v=VECTOR(*predw)[j];
+      long int v=(long int) VECTOR(*predw)[j];
       long int u=igraph_i_dominator_EVAL(v, &ancestor, &label, &semi);
       if (VECTOR(semi)[u] < VECTOR(semi)[w]) {
 	VECTOR(semi)[w]=VECTOR(semi)[u];
       }
     }
-    igraph_i_dbucket_insert(&bucket, 
+    igraph_i_dbucket_insert(&bucket, (long int) 
 			    VECTOR(vertex)[ VECTOR(semi)[w]-1 ]-1, w);
-    igraph_i_dominator_LINK(VECTOR(parent)[w], w, &ancestor);
-    while (!igraph_i_dbucket_empty(&bucket, VECTOR(parent)[w])) {
-      long int v=igraph_i_dbucket_delete(&bucket, VECTOR(parent)[w]);
+    igraph_i_dominator_LINK((long int) VECTOR(parent)[w], w, &ancestor);
+    while (!igraph_i_dbucket_empty(&bucket, (long int) VECTOR(parent)[w])) {
+      long int v=igraph_i_dbucket_delete(&bucket, (long int) VECTOR(parent)[w]);
       long int u=igraph_i_dominator_EVAL(v, &ancestor, &label, &semi);
       VECTOR(*mydom)[v] = VECTOR(semi)[u] < VECTOR(semi)[v] ? u : 
 	VECTOR(parent)[w];
@@ -519,7 +521,7 @@ int igraph_dominator_tree(const igraph_t *graph,
   /* Finally, step 4 */
 
   for (i=1; i<component_size; i++) {
-    long int w=VECTOR(vertex)[i]-1;
+    long int w=(long int) VECTOR(vertex)[i]-1;
     if (VECTOR(*mydom)[w] != VECTOR(vertex)[VECTOR(semi)[w]-1]-1) {
       VECTOR(*mydom)[w] = VECTOR(*mydom)[(long int)VECTOR(*mydom)[w]];
     }
@@ -551,7 +553,7 @@ int igraph_dominator_tree(const igraph_t *graph,
 	}
       }
     }
-    IGRAPH_CHECK(igraph_create(domtree, &edges, no_of_nodes,
+    IGRAPH_CHECK(igraph_create(domtree, &edges, (igraph_integer_t) no_of_nodes,
 			       IGRAPH_DIRECTED));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -587,13 +589,13 @@ igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_incb(const igraph_t *graph,
   igraph_vector_bool_t *nomark=data->nomark;
   const igraph_vector_bool_t *GammaX=data->GammaX;
   const igraph_vector_t *map=data->map;
-  long int realvid=VECTOR(*map)[(long int)vid];
+  long int realvid=(long int) VECTOR(*map)[(long int)vid];
 
   IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
   if (VECTOR(*GammaX)[(long int)realvid]) {
     if (!igraph_stack_empty(stack)) {
-      long int top=igraph_stack_top(stack);
+      long int top=(long int) igraph_stack_top(stack);
       VECTOR(*nomark)[top]=1;	/* we just found a smaller one */
     }
     igraph_stack_push(stack, realvid); /* TODO: error check */
@@ -609,7 +611,7 @@ igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_otcb(const igraph_t *graph,
   igraph_i_all_st_cuts_minimal_dfs_data_t *data=extra;
   igraph_stack_t *stack=data->stack;
   const igraph_vector_t *map=data->map;
-  long int realvid=VECTOR(*map)[(long int)vid];
+  long int realvid=(long int) VECTOR(*map)[(long int)vid];
 
   IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
@@ -659,8 +661,8 @@ int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
      vertex after (=below) another GammaX vertex, we mark the higher
      one as non-minimal. */
 
-  IGRAPH_CHECK(igraph_dfs(domtree, root, IGRAPH_IN, /*unreachable=*/ 0,
-			  /*order=*/ 0,
+  IGRAPH_CHECK(igraph_dfs(domtree, (igraph_integer_t) root, IGRAPH_IN, 
+			  /*unreachable=*/ 0, /*order=*/ 0,
 			  /*order_out=*/ 0, /*father=*/ 0, 
 			  /*dist=*/ 0, /*in_callback=*/ 
 			  igraph_i_all_st_cuts_minimal_dfs_incb,
@@ -729,13 +731,14 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   IGRAPH_FINALLY(igraph_destroy, &Sbar);
 
-  root=VECTOR(Sbar_map)[target]-1;
+  root=(long int) VECTOR(Sbar_map)[target]-1;
 
   /* -------------------------------------------------------------*/
   /* Construct the dominator tree of Sbar */
 
   IGRAPH_VECTOR_INIT_FINALLY(&leftout, 0);
-  IGRAPH_CHECK(igraph_dominator_tree(&Sbar, root, /*dom=*/ 0, &domtree,
+  IGRAPH_CHECK(igraph_dominator_tree(&Sbar, (igraph_integer_t) root, 
+				     /*dom=*/ 0, &domtree,
 				     &leftout, IGRAPH_IN));
   IGRAPH_FINALLY(igraph_destroy, &domtree);
 
@@ -755,10 +758,11 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 	igraph_vector_t neis;
 	long int j, n;
 	IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-	IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+	IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
+				      IGRAPH_OUT));
 	n=igraph_vector_size(&neis);
 	for (j=0; j<n; j++) {
-	  long int nei=VECTOR(neis)[j];
+	  long int nei=(long int) VECTOR(neis)[j];
 	  if (!igraph_marked_queue_iselement(S, nei)) {
 	    VECTOR(GammaS)[nei]=1;
 	  }
@@ -792,10 +796,10 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
        Nu(v) contains all vertices that are dominated by v, for every
        v, this is a subtree of the dominator tree, rooted at v. The
        different subtrees are disjoint. */
-    long int min=VECTOR(Sbar_map)[(long int) VECTOR(M)[i] ]-1;
+    long int min=(long int) VECTOR(Sbar_map)[(long int) VECTOR(M)[i] ]-1;
     long int nuvsize, isvlen, j;
-    IGRAPH_CHECK(igraph_dfs(&domtree, min, IGRAPH_IN, /*unreachable=*/ 0, 
-			    /*order=*/ &Nuv, 
+    IGRAPH_CHECK(igraph_dfs(&domtree, (igraph_integer_t) min, IGRAPH_IN, 
+			    /*unreachable=*/ 0, /*order=*/ &Nuv, 
 			    /*order_out=*/ 0, /*father=*/ 0, /*dist=*/ 0,
 			    /*in_callback=*/ 0, /*out_callback=*/ 0, 
 			    /*extra=*/ 0));
@@ -830,17 +834,17 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
        such a v is found, compute Isv={x|v[Nu(v) U K]x} and return v and 
        Isv; otherwise return Isv={}. */
     for (j=0; j<isvlen; j++) {
-      long int v=VECTOR(Isv_min)[j];
+      long int v=(long int) VECTOR(Isv_min)[j];
       if (igraph_estack_iselement(T, v) || v==target) { break; }
     }
     /* We might have found one */
     if (j==isvlen) {
-      *v=VECTOR(M)[i];
+      *v=(long int) VECTOR(M)[i];
       /* Calculate real Isv */
       IGRAPH_CHECK(igraph_vector_append(&Nuv, &leftout));
-      IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v, /*roots=*/ 0,
-			      /*mode=*/ IGRAPH_OUT, /*unreachable=*/ 0,
-			      /*restricted=*/ &Nuv, 
+      IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ (igraph_integer_t) *v, 
+			      /*roots=*/ 0, /*mode=*/ IGRAPH_OUT, 
+			      /*unreachable=*/ 0, /*restricted=*/ &Nuv, 
 			      /*order=*/ &Isv_min, /*rank=*/ 0,
 			      /*father=*/ 0, /*pred=*/ 0, /*succ=*/ 0,
 			      /*dist=*/ 0, /*callback=*/ 0, /*extra=*/ 0));
@@ -914,8 +918,8 @@ int igraph_provan_shier_list(const igraph_t *graph,
     igraph_marked_queue_start_batch(S);
     n=igraph_vector_size(&Isv);
     for (i=0; i<n; i++) {
-      if (!igraph_marked_queue_iselement(S, VECTOR(Isv)[i])) {
-	igraph_marked_queue_push(S, VECTOR(Isv)[i]);
+      if (!igraph_marked_queue_iselement(S, (long int) VECTOR(Isv)[i])) {
+	igraph_marked_queue_push(S, (long int) VECTOR(Isv)[i]);
       }
     }
 
@@ -1024,7 +1028,7 @@ int igraph_all_st_cuts(const igraph_t *graph,
       long int j, partlen=igraph_vector_size(part);
       /* Mark elements */
       for (j=0; j<partlen; j++) {
-	long int v=VECTOR(*part)[j];
+	long int v=(long int) VECTOR(*part)[j];
 	VECTOR(inS)[v] = i+1;
       }
       /* Check how many edges */
@@ -1107,12 +1111,13 @@ int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
       IGRAPH_CHECK(igraph_dqueue_push(&to_visit, i));
     }
     while (!igraph_dqueue_empty(&to_visit)) {
-      long int rv=igraph_dqueue_pop(&to_visit);
+      long int rv=(long int) igraph_dqueue_pop(&to_visit);
       long int j, n;
-      IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, rv, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, (igraph_integer_t) rv,
+				    IGRAPH_OUT));
       n=igraph_vector_size(&neis);
       for (j=0; j<n; j++) {
-	long int nei=VECTOR(neis)[j];
+	long int nei=(long int) VECTOR(neis)[j];
 	VECTOR(indeg)[nei] -= 1;
 	if (VECTOR(indeg)[nei] == 0) {
 	  IGRAPH_CHECK(igraph_dqueue_push(&to_visit, nei));
@@ -1207,7 +1212,7 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
   igraph_vector_clear(Isv);
   nomin=igraph_vector_size(&M);
   for (i=0; i<nomin; i++) {
-    long int min=VECTOR(Sbar_invmap)[ (long int) VECTOR(M)[i] ];
+    long int min=(long int) VECTOR(Sbar_invmap)[ (long int) VECTOR(M)[i] ];
     if (!igraph_estack_iselement(T, min)) { break; }
   }
   if (i!=nomin) {
@@ -1216,9 +1221,9 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     igraph_vector_t Isv_min;
     long int isvlen;
     IGRAPH_VECTOR_INIT_FINALLY(&Isv_min, 0);
-    *v=VECTOR(Sbar_invmap)[ (long int) VECTOR(M)[i] ];
+    *v=(long int) VECTOR(Sbar_invmap)[ (long int) VECTOR(M)[i] ];
     /* TODO: restricted == keep ? */
-    IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ *v, /*roots=*/ 0,
+    IGRAPH_CHECK(igraph_bfs(graph, /*root=*/ (igraph_integer_t) *v,/*roots=*/ 0,
 			    /*mode=*/ IGRAPH_IN, /*unreachable=*/ 0,
 			    /*restricted=*/ &keep, /*order=*/ &Isv_min,
 			    /*rank=*/ 0, /*father=*/ 0, /*pred=*/ 0,
@@ -1306,6 +1311,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   igraph_vector_t revmap_ptr, revmap_next;
   igraph_vector_ptr_t closedsets;
   igraph_vector_ptr_t *mypartition1s=partition1s, vpartition1s;
+  igraph_maxflow_stats_t stats;
 
   /* -------------------------------------------------------------------- */
   /* Error checks */
@@ -1335,7 +1341,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   IGRAPH_CHECK(igraph_maxflow(graph, value, &flow, /*cut=*/ 0, 
 			      /*partition1=*/ 0, /*partition2=*/ 0, 
 			      /*source=*/ source, /*target=*/ target, 
-			      capacity));
+			      capacity, &stats));
 
   /* -------------------------------------------------------------------- */
   /* Then we need the reverse residual graph */
@@ -1354,8 +1360,8 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   IGRAPH_CHECK(igraph_simplify(&residual, /*multiple=*/ 1, /*loops=*/ 1,
 			       /*edge_comb=*/ 0));
 
-  newsource=VECTOR(NtoL)[(long int)source];
-  newtarget=VECTOR(NtoL)[(long int)target];
+  newsource=(long int) VECTOR(NtoL)[(long int)source];
+  newtarget=(long int) VECTOR(NtoL)[(long int)target];
 
   /* TODO: handle the newsource == newtarget case */
 
@@ -1368,8 +1374,8 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     if (VECTOR(flow)[i] > 0) {
       long int from=IGRAPH_FROM(graph, i);
       long int to=IGRAPH_TO(graph, i);
-      long int pfrom=VECTOR(NtoL)[from];
-      long int pto=VECTOR(NtoL)[to];
+      long int pfrom=(long int) VECTOR(NtoL)[from];
+      long int pto=(long int) VECTOR(NtoL)[to];
       if (!VECTOR(VE1bool)[pfrom]) { 
 	VECTOR(VE1bool)[pfrom] = 1;
 	VE1size++;
@@ -1412,7 +1418,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   IGRAPH_VECTOR_INIT_FINALLY(&revmap_ptr, igraph_vcount(&residual));
   IGRAPH_VECTOR_INIT_FINALLY(&revmap_next, no_of_nodes);
   for (i=0; i<no_of_nodes; i++) {
-    long int id=VECTOR(NtoL)[i];
+    long int id=(long int) VECTOR(NtoL)[i];
     VECTOR(revmap_next)[i]=VECTOR(revmap_ptr)[id];
     VECTOR(revmap_ptr)[id]=i+1;
   }
@@ -1426,12 +1432,12 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     igraph_vector_t *cut=igraph_Calloc(1, igraph_vector_t);
     IGRAPH_VECTOR_INIT_FINALLY(cut, 0); /* TODO: better allocation */
     for (j=0; j<supercutsize; j++) {
-      long int vtx=VECTOR(*supercut)[j];
-      long int ovtx=VECTOR(revmap_ptr)[vtx];
+      long int vtx=(long int) VECTOR(*supercut)[j];
+      long int ovtx=(long int) VECTOR(revmap_ptr)[vtx];
       while (ovtx != 0) {
 	ovtx--;
 	IGRAPH_CHECK(igraph_vector_push_back(cut, ovtx));
-	ovtx=VECTOR(revmap_next)[ovtx];
+	ovtx=(long int) VECTOR(revmap_next)[ovtx];
       }
     }
     igraph_vector_ptr_push_back(mypartition1s, cut);
@@ -1462,7 +1468,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
       }
       IGRAPH_VECTOR_INIT_FINALLY(v, 0);
       for (j=0; j<n; j++) {
-	long int vtx=VECTOR(*part)[j];
+	long int vtx=(long int) VECTOR(*part)[j];
 	VECTOR(memb)[vtx]=i+1;
       }
       for (j=0; j<no_of_edges; j++) {

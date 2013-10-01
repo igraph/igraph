@@ -12,6 +12,7 @@ lib_LTLIBRARIES         = libigraph.la
 include lapack/blas.inc
 include lapack/lapack.inc
 include lapack/arpack.inc
+include plfit/plfit.inc
 
 F2C =	f2c/abort_.c	  f2c/dolio.c	    f2c/r_sin.c\
 	f2c/dummy.c	  f2c/dtime_.c	    f2c/iio.c	      f2c/r_sinh.c\
@@ -107,7 +108,11 @@ if INTERNAL_GLPK
   GLPK_LIB = libglpk.la
 endif
 
-noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
+libplfit_la_SOURCES = $(PLFIT)
+PLFIT_LIB = libplfit.la
+
+noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) \
+					 $(GLPK_LIB) $(PLFIT_LIB)
 
 CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
@@ -162,7 +167,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		hrg_graph_simp.h foreign-gml-header.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
 		foreign-pajek-header.h igraph_interrupt_internal.h \
-		scg_headers.h
+		scg_headers.h igraph_hacks_internal.h triangles_template.h \
+    triangles_template1.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -201,12 +207,11 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_scg.h		../include/igraph_qsort.h \
 		../include/igraph_matching.h
 
-libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
-			     basic_query.c games.c cocitation.c iterators.c \
+SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
 			     structure_generators.c conversion.c \
 			     type_indexededgelist.c spanning_trees.c \
-			     error.c interrupt.c other.c foreign.c random.c \
+			     igraph_error.c interrupt.c other.c foreign.c random.c \
 			     attributes.c \
 			     foreign-ncol-parser.y foreign-ncol-lexer.l \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
@@ -253,13 +258,14 @@ libigraph_la_SOURCES       = $(HEADERS_PRIVATE) \
 			     distances.c fortran_intrinsics.c matching.c \
 			     scg.c scg_approximate_methods.c scg_exact_scg.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
-			     qsort.c qsort_r.c types.c lad.c
+			     qsort.c qsort_r.c types.c lad.c hacks.c triangles.c
 
+libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
-				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB)
+				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB) $(PLFIT_LIB)
 
 if INTERNAL_GLPK
   libigraph_la_CFLAGS   += -I$(top_srcdir)/optional/glpk
@@ -270,3 +276,17 @@ includedir = $(prefix)/include/igraph
 include_HEADERS = $(HEADERS_PUBLIC)
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
+
+echosources:
+	$(info $(SOURCES) $(LAPACK) $(ARPACK) $(BLAS) $(libf2c_la_SOURCES) \
+	$(libdlamch_la_SOURCES) $(libplfit_la_SOURCES))
+
+echoheaders:
+	$(info $(HEADERS_PUBLIC))
+
+echoheadersprivate:
+	$(info $(HEADERS_PRIVATE))
+
+.PHONY: sources
+
+parsersources: $(DIST_COMMON)

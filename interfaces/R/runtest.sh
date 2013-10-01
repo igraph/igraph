@@ -19,5 +19,8 @@ else
 fi
 
 ## Run the tests
-echo Running tests in $tmpdir
-cd $tmpdir && echo "tools:::.runPackageTestsR()" | R --no-save -q && echo
+cd $tmpdir && echo "tools:::.runPackageTestsR()" | R --no-save && echo
+
+## Echo temporary directory name
+echo "Tests were run in"
+echo $tmpdir

@@ -4,6 +4,7 @@ Coordinate systems and related plotting routines
 
 from igraph.compat import property
 from igraph.drawing.baseclasses import AbstractCairoDrawer
+from igraph.drawing.utils import BoundingBox
 
 __license__ = "GPL"
 
@@ -58,11 +59,11 @@ class DescartesCoordinateSystem(CoordinateSystem):
           system.
         @param bounds: minimum and maximum X and Y values in a 4-tuple.
         """
-        CoordinateSystem.__init__(self, context, bbox)
-
         self._bounds, self._bbox = None, None
         self._sx, self._sy = None, None
         self._ox, self._oy, self._ox2, self._oy2 = None, None, None, None
+
+        CoordinateSystem.__init__(self, context, bbox)
 
         self.bbox = bbox
         self.bounds = bounds

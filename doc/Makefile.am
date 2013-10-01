@@ -53,8 +53,8 @@ vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $
 	$(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c \
 	$(INCLUDEDIR)/igraph_vector_ptr.h
 
-error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/error.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/error.c
+error.xml: error.xxml $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/igraph_error.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_error.h $(SRCDIR)/igraph_error.c
 
 matrix.xml: matrix.xxml $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_matrix.h $(SRCDIR)/matrix.pmt
@@ -95,15 +95,14 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c \
 		$(SRCDIR)/mixing.c $(INCLUDEDIR)/igraph_arpack.h \
 		$(SRCDIR)/distances.c $(SRCDIR)/feedback_arc_set.c \
-		$(SRCDIR)/matching.c
-
+		$(SRCDIR)/matching.c $(SRCDIR)/triangles.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structural_properties.c $(SRCDIR)/spanning_trees.c \
 	$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c \
 	$(SRCDIR)/components.c $(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
 	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c $(SRCDIR)/mixing.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
-	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c
+	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
@@ -120,8 +119,8 @@ foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/foreign.c \
 	$(SRCDIR)/foreign-graphml.c
 
-nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c
+nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c $(INCLUDEDIR)/igraph_nongraph.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_nongraph.h $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c
 
 isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
@@ -132,8 +131,8 @@ motifs.xml: motifs.xxml $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c
 operators.xml: operators.xxml $(SRCDIR)/operators.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/operators.c
 
-flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c
+flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c $(INCLUDEDIR)/igraph_flow.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c $(INCLUDEDIR)/igraph_flow.h
 
 community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc

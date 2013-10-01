@@ -4,14 +4,17 @@
 \description{Randomly rewires a graph while preserving the degree
   distribution.}
 \usage{
-rewire(graph, mode = "simple", niter = 100) 
+rewire(graph, mode = c("simple", "loops"), niter = 100) 
 }
 \arguments{
   \item{graph}{The graph to be rewired.}
   \item{mode}{The rewiring algorithm to be used. It can be one of the
     following: \code{simple}: simple rewiring algorithm which
     chooses two arbitrary edges in each step (namely (a,b) and (c,d))
-    and substitutes them with (a,d) and (c,b) if they don't yet exist.}
+    and substitutes them with (a,d) and (c,b) if they don't yet exist,
+    avoiding the creation or destruction of loop edges or \code{loops}:
+    similar to \code{simple} but allows the creation and destruction of
+    loop edges.}
   \item{niter}{Number of rewiring trials to perform.}
 }
 \details{

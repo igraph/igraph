@@ -132,7 +132,7 @@
       \dQuote{\code{circle}}, \dQuote{\code{square}},
       \dQuote{\code{csquare}}, \dQuote{\code{rectangle}},
       \dQuote{\code{crectangle}}, \dQuote{\code{vrectangle}},
-      \dQuote{\code{\link[vertex.shape.pie]{pie}}},
+      \dQuote{\code{pie}} (see \link{vertex.shape.pie}),
       \sQuote{\code{sphere}}, and \dQuote{\code{none}} are supported,
       and only by the \code{\link{plot.igraph}}
       command. \dQuote{\code{none}} does not draw the vertices at all,
@@ -434,7 +434,7 @@ plot(g, layout=layout.fruchterman.reingold, vertex.size=5, vertex.label=NA)
 
 # plot communities in a graph
 g <- graph.full(5) \%du\% graph.full(5) \%du\% graph.full(5)
-g <- add.edges(g, c(0,5, 0,10, 5,10))
+g <- add.edges(g, c(1,6, 1,11, 6,11))
 com <- spinglass.community(g, spins=5)
 V(g)$color <- com$membership+1
 g <- set.graph.attribute(g, "layout", layout.kamada.kawai(g))

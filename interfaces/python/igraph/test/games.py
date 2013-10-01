@@ -47,7 +47,111 @@ class GameTests(unittest.TestCase):
     def testWattsStrogatz(self):
         g=Graph.Watts_Strogatz(1, 20, 1, 0.2)
         self.failUnless(isinstance(g, Graph) and g.vcount()==20 and g.ecount()==20)
-        
+
+    def testRandomBipartiteNP(self):
+        # Test np mode, undirected
+        g = Graph.Random_Bipartite(10, 20, p=0.25)
+        self.assertTrue(g.is_simple())
+        self.assertTrue(g.is_bipartite())
+        self.assertFalse(g.is_directed())
+        self.assertEquals([False]*10 + [True]*20, g.vs["type"])
+
+        # Test np mode, directed, "out"
+        g = Graph.Random_Bipartite(10, 20, p=0.25, directed=True, neimode="out")
+        self.assertTrue(g.is_simple())
+        self.assertTrue(g.is_bipartite())
+        self.assertTrue(g.is_directed())
+        self.assertEquals([False]*10 + [True]*20, g.vs["type"])
+        self.assertTrue(all(g.vs[e.tuple]["type"] == [False, True] for e in g.es))
+
+        # Test np mode, directed, "in"
+        g = Graph.Random_Bipartite(10, 20, p=0.25, directed=True, neimode="in")
+        self.assertTrue(g.is_simple())
+        self.assertTrue(g.is_bipartite())
+        self.assertTrue(g.is_directed())
+        self.assertEquals([False]*10 + [True]*20, g.vs["type"])
+        self.assertTrue(all(g.vs[e.tuple]["type"] == [True, False] for e in g.es))
+
+        # Test np mode, directed, "all"
+        g = Graph.Random_Bipartite(10, 20, p=0.25, directed=True, neimode="all")
+        self.assertTrue(g.is_simple())
+        self.assertTrue(g.is_bipartite())
+        self.assertTrue(g.is_directed())
+        self.assertEquals([False]*10 + [True]*20, g.vs["type"])
+
+    def testRandomBipartiteNM(self):
+        # Test np mode, undirected
+        g = Graph.Random_Bipartite(10, 20, m=50)
+        self.assertTrue(g.is_simple())
+        self.assertTrue(g.is_bipartite())
+        self.assertFalse(g.is_directed())
+        self.assertEquals(50, g.ecount())
+        self.assertEquals([False]*10 + [True]*20, g.vs["type"])
+
+        # Test np mode, directed, "out"
+        g = Graph.Random_Bipartite(10, 20, m=50, directed=True, neimode="out")
+        self.assertTrue(g.is_simple())
+        self.assertTrue(g.is_bipartite())
+        self.assertTrue(g.is_directed())
+        self.assertEquals(50, g.ecount())
+        self.assertEquals([False]*10 + [True]*20, g.vs["type"])
+        self.assertTrue(all(g.vs[e.tuple]["type"] == [False, True] for e in g.es))
+
+        # Test np mode, directed, "in"
+        g = Graph.Random_Bipartite(10, 20, m=50, directed=True, neimode="in")
+        self.assertTrue(g.is_simple())
+        self.assertTrue(g.is_bipartite())
+        self.assertTrue(g.is_directed())
+        self.assertEquals(50, g.ecount())
+        self.assertEquals([False]*10 + [True]*20, g.vs["type"])
+        self.assertTrue(all(g.vs[e.tuple]["type"] == [True, False] for e in g.es))
+
+        # Test np mode, directed, "all"
+        g = Graph.Random_Bipartite(10, 20, m=50, directed=True, neimode="all")
+        self.assertTrue(g.is_simple())
+        self.assertTrue(g.is_bipartite())
+        self.assertTrue(g.is_directed())
+        self.assertEquals(50, g.ecount())
+        self.assertEquals([False]*10 + [True]*20, g.vs["type"])
+
+    def testRewire(self):
+        # Undirected graph
+        g=Graph.GRG(25, 0.4)
+        degrees=g.degree()
+
+        # Rewiring without loops
+        g.rewire(10000)
+        self.assertEquals(degrees, g.degree())
+        self.assertTrue(g.is_simple())
+
+        # Rewiring with loops (1)
+        g.rewire(10000, mode="loops")
+        self.assertEquals(degrees, g.degree())
+        self.assertFalse(any(g.is_multiple()))
+
+        # Rewiring with loops (2)
+        g = Graph.Full(4)
+        g[1,3] = 0
+        degrees = g.degree()
+        g.rewire(100, mode="loops")
+        self.assertEquals(degrees, g.degree())
+        self.assertFalse(any(g.is_multiple()))
+
+        # Directed graph
+        g=Graph.GRG(25, 0.4)
+        g.to_directed("mutual")
+        indeg, outdeg = g.indegree(), g.outdegree()
+        g.rewire(10000)
+        self.assertEquals(indeg, g.indegree())
+        self.assertEquals(outdeg, g.outdegree())
+        self.assertTrue(g.is_simple())
+
+        # Directed graph with loops
+        g.rewire(10000, mode="loops")
+        self.assertEquals(indeg, g.indegree())
+        self.assertEquals(outdeg, g.outdegree())
+        self.assertFalse(any(g.is_multiple()))
+
 def suite():
     game_suite = unittest.makeSuite(GameTests)
     return unittest.TestSuite([game_suite])

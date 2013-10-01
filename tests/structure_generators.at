@@ -41,9 +41,14 @@ AT_KEYWORDS([erdos renyi erdos-renyi igraph_erdos_renyi_game])
 AT_COMPILE_CHECK([simple/igraph_erdos_renyi_game.c])
 AT_CLEANUP
 
-AT_SETUP([Degree sequence(igraph_degree_sequence_game):])
+AT_SETUP([Degree sequence (igraph_degree_sequence_game):])
 AT_KEYWORDS([degree sequence igraph_degree_sequence_game])
 AT_COMPILE_CHECK([simple/igraph_degree_sequence_game.c], [simple/igraph_degree_sequence_game.out])
+AT_CLEANUP
+
+AT_SETUP([k-regular graphs (igraph_k_regular_game):])
+AT_KEYWORDS([regular k-regular igraph_k_regular_game])
+AT_COMPILE_CHECK([simple/igraph_k_regular_game.c], [simple/igraph_k_regular_game.out])
 AT_CLEANUP
 
 AT_SETUP([Growing random (igraph_growing_random_game):])

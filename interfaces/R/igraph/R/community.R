@@ -518,6 +518,8 @@ edge.betweenness.community <- function(graph, weights=E(graph)$weight,
   res$algorithm <- "edge betweenness"
   res$membership <- res$membership + 1
   res$merges <- res$merges + 1
+  res$removed.edges <- res$removed.edges + 1
+  res$bridges <- res$bridges + 1
   class(res) <- "communities"
   res
 }

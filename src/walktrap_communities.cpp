@@ -61,6 +61,10 @@
 
 #include "config.h"
 
+namespace igraph {
+
+namespace walktrap {
+
 IGRAPH_THREAD_LOCAL int Probabilities::length = 0;
 IGRAPH_THREAD_LOCAL Communities* Probabilities::C = 0;
 IGRAPH_THREAD_LOCAL float* Probabilities::tmp_vector1 = 0;
@@ -440,6 +444,8 @@ Communities::Communities(Graph* graph, int random_walks_length,
 
 /*   int c = 0; */
   Neighbor* N = H->get_first();  
+  if (N == 0)
+    return;   /* this can happen if there are no edges */
   while(!N->exact) {
     update_neighbor(N, compute_delta_sigma(N->community1, N->community2));
     N->exact = true;
@@ -833,3 +839,5 @@ double Communities::compute_delta_sigma(int community1, int community2) {
   
   return communities[community1].P->compute_distance(communities[community2].P)*double(communities[community1].size)*double(communities[community2].size)/double(communities[community1].size + communities[community2].size);
 }
+
+} }    /* end of namespaces */

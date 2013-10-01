@@ -105,7 +105,7 @@ This tells us that `g` is an instance of |igraph|'s :class:`Graph` class and
 that it is currently living at the memory address ``0x4c87a0`` (the exact
 output will almost surely be different for your platform). To obtain a more
 user-friendly output, we can try to print the graph using Python's
-:keyword:`print` statement:
+``print`` statement:
 
 >>> print(g)
 IGRAPH U--- 0 0 --
@@ -341,7 +341,7 @@ themselves can also behave as dictionaries:
 2009-01-10
 
 Finally, it should be mentioned that attributes can be deleted by the Python keyword
-:keyword:`del` just as you would do with any member of an ordinary dictionary:
+``del`` just as you would do with any member of an ordinary dictionary:
 
 >>> g.vs[3]["foo"] = "bar"
 >>> g.vs["foo"]
@@ -447,7 +447,7 @@ vertices. The way it filters the vertices depends on its positional and keyword
 arguments. Positional arguments (the ones without an explicit name like
 ``_degree`` above) are always processed before keyword arguments as follows:
 
-- If the first positional argument is :keyword:`None`, an empty sequence (containing no
+- If the first positional argument is ``None``, an empty sequence (containing no
   vertices) is returned:
 
   >>> seq = g.vs.select(None)
@@ -456,7 +456,7 @@ arguments. Positional arguments (the ones without an explicit name like
 
 - If the first positional argument is a callable object (i.e., a function, a bound
   method or anything that behaves like a function), the object will be called for
-  every vertex that's currently in the sequence. If the function returns :keyword:`True`,
+  every vertex that's currently in the sequence. If the function returns ``True``,
   the vertex will be included, otherwise it will be excluded:
 
   >>> graph = Graph.Full(10)
@@ -740,7 +740,8 @@ layout algorithm as follows:
 >>> plot(g, layout = layout)
 
 This should open an external image viewer showing a visual representation of the network,
-something like the one on the following figure:
+something like the one on the following figure (although the exact placement of
+nodes may be different on your machine since the layout is not deterministic):
 
 .. figure:: figures/tutorial_social_network_1.png
    :alt: The visual representation of our social network
@@ -771,7 +772,7 @@ to fit the labels (20 pixels). The result is:
 Instead of specifying the visual properties as vertex and edge attributes, you can
 also give them as keyword arguments to :func:`plot`:
 
->>> color_dict = {"m": "black", "f": "white"}
+>>> color_dict = {"m": "blue", "f": "pink"}
 >>> plot(g, layout = layout, vertex_color = [color_dict[gender] for gender in g.vs["gender"]])
 
 This latter approach is preferred if you want to keep the properties of the visual

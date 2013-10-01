@@ -304,11 +304,11 @@ int FUNCTION(igraph_dqueue,push) (TYPE(igraph_dqueue)* q, BASE elem) {
 
 		if (q->stor_end - q->begin) {
 			memcpy(bigger, q->begin, 
-			       (q->stor_end - q->begin) * sizeof(BASE));
+			       (size_t)(q->stor_end - q->begin) * sizeof(BASE));
 		}
 		if (q->end - q->stor_begin > 0) {
-			memcpy(bigger + (q->stor_end - q->begin),
-			       q->stor_begin, (q->end - q->stor_begin) * sizeof(BASE));
+			memcpy(bigger + (q->stor_end - q->begin), q->stor_begin,
+			       (size_t)(q->end - q->stor_begin) * sizeof(BASE));
 		}
 		
 		q->end       =bigger + (q->stor_end - q->stor_begin);

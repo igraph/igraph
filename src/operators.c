@@ -89,17 +89,18 @@ int igraph_disjoint_union(igraph_t *res, const igraph_t *left,
   IGRAPH_CHECK(igraph_vector_reserve(&edges, 
 				     2*(no_of_edges_left+no_of_edges_right)));
   for (i=0; i<no_of_edges_left; i++) {
-    igraph_edge(left, i, &from, &to);
+    igraph_edge(left, (igraph_integer_t) i, &from, &to);
     igraph_vector_push_back(&edges, from);
     igraph_vector_push_back(&edges, to);
   }
   for (i=0; i<no_of_edges_right; i++) {
-    igraph_edge(right, i, &from, &to);
+    igraph_edge(right, (igraph_integer_t) i, &from, &to);
     igraph_vector_push_back(&edges, from+no_of_nodes_left);
     igraph_vector_push_back(&edges, to+no_of_nodes_left);
   }
   
-  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes_left+no_of_nodes_right, 
+  IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) 
+			     (no_of_nodes_left+no_of_nodes_right), 
 			     directed_left));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
@@ -169,14 +170,14 @@ int igraph_disjoint_union_many(igraph_t *res,
     graph=VECTOR(*graphs)[i];    
     ec=igraph_ecount(graph);
     for (j=0; j<ec; j++) {
-      igraph_edge(graph, j, &from, &to);
+      igraph_edge(graph, (igraph_integer_t) j, &from, &to);
       igraph_vector_push_back(&edges, from+shift);
       igraph_vector_push_back(&edges, to+shift);
     }
     shift += igraph_vcount(graph);
   }
   
-  IGRAPH_CHECK(igraph_create(res, &edges, shift, directed));
+  IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) shift, directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
@@ -638,7 +639,8 @@ int igraph_intersection_many(igraph_t *res,
   igraph_vector_long_destroy(&no_edges);
   IGRAPH_FINALLY_CLEAN(1);  
 
-  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+  IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
+			     directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   if (edgemaps) { IGRAPH_FINALLY_CLEAN(1); }    
@@ -859,7 +861,8 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
   igraph_vector_long_destroy(&no_edges);
   IGRAPH_FINALLY_CLEAN(1);
 
-  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+  IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
+			     directed));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   if (edgemaps) { IGRAPH_FINALLY_CLEAN(1); }    
@@ -934,8 +937,8 @@ int igraph_difference(igraph_t *res,
     n1=igraph_vector_size(nei1)-1;
     n2=igraph_vector_size(nei2)-1;
     while (n1>=0 && n2>=0) {
-      e1=VECTOR(*nei1)[n1];
-      e2=VECTOR(*nei2)[n2];
+      e1=(long int) VECTOR(*nei1)[n1];
+      e2=(long int) VECTOR(*nei2)[n2];
       v1=IGRAPH_OTHER(orig, e1, i);
       v2=IGRAPH_OTHER(sub, e2, i);
       
@@ -958,7 +961,7 @@ int igraph_difference(igraph_t *res,
     
     /* Copy remaining edges */
     while (n1>=0) {
-      e1=VECTOR(*nei1)[n1];
+      e1=(long int) VECTOR(*nei1)[n1];
       v1=IGRAPH_OTHER(orig, e1, i);
       if (directed || v1 >= i) { 
 	IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
@@ -975,7 +978,7 @@ int igraph_difference(igraph_t *res,
     nei1=igraph_inclist_get(&inc_orig, i);
     n1=igraph_vector_size(nei1)-1;
     while (n1>=0) {
-      e1=VECTOR(*nei1)[n1];
+      e1=(long int) VECTOR(*nei1)[n1];
       v1=IGRAPH_OTHER(orig, e1, i);
       if (directed || v1 >= i) { 
 	IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
@@ -989,7 +992,8 @@ int igraph_difference(igraph_t *res,
   igraph_inclist_destroy(&inc_sub);
   igraph_inclist_destroy(&inc_orig);
   IGRAPH_FINALLY_CLEAN(2);
-  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+  IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
+			     directed));
   igraph_vector_destroy(&edges);  
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -1047,7 +1051,8 @@ int igraph_complementer(igraph_t *res, const igraph_t *graph,
   
   for (i=0; i<no_of_nodes; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i, 
+				  IGRAPH_OUT));
     if (loops) {
       for (j=no_of_nodes-1; j>=*limit; j--) {
 	if (igraph_vector_empty(&neis) || j>igraph_vector_tail(&neis)) {
@@ -1071,7 +1076,7 @@ int igraph_complementer(igraph_t *res, const igraph_t *graph,
     }      
   }
   
-  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, 
+  IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes, 
 			     igraph_is_directed(graph)));  
   igraph_vector_destroy(&edges);
   igraph_vector_destroy(&neis);
@@ -1135,11 +1140,13 @@ int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2) {
   
   for (i=0; i<no_of_nodes_left; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
-    IGRAPH_CHECK(igraph_neighbors(g1, &neis1, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(g1, &neis1, (igraph_integer_t) i, 
+				  IGRAPH_OUT));
     while (!igraph_vector_empty(&neis1)) {
-      long int con=igraph_vector_pop_back(&neis1);
+      long int con=(long int) igraph_vector_pop_back(&neis1);
       if (con<no_of_nodes_right) {
-	IGRAPH_CHECK(igraph_neighbors(g2, &neis2, con, IGRAPH_OUT));
+	IGRAPH_CHECK(igraph_neighbors(g2, &neis2, (igraph_integer_t) con,
+				      IGRAPH_OUT));
       }
       while (!igraph_vector_empty(&neis2)) {
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
@@ -1153,7 +1160,8 @@ int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2) {
   igraph_vector_destroy(&neis2);
   IGRAPH_FINALLY_CLEAN(2);
 
-  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, directed));
+  IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
+			     directed));
 
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);

@@ -96,6 +96,10 @@ SRCFILES_ORIGPLACE15 =  $(wildcard $(top_srcdir)/optional/simpleraytracer/*.cpp)
 
 SRCFILES_ORIGPLACE16 =  $(wildcard $(top_srcdir)/optional/simpleraytracer/*.h)
 
+SRCFILES_ORIGPLACE17 =  $(wildcard $(top_srcdir)/src/plfit/*.h)
+
+SRCFILES_ORIGPLACE18 =  $(wildcard $(top_srcdir)/src/plfit/*.c)
+
 SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/include/%,igraph/src/%,$(SRCFILES_ORIGPLACE6)) \
 	$(patsubst $(top_srcdir)/src/cs/%,igraph/src/%,$(SRCFILES_ORIGPLACE7)) \
@@ -107,7 +111,9 @@ SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/optional/glpk/colamd/%,igraph/src/%,$(SRCFILES_ORIGPLACE13)) \
 	$(patsubst $(top_srcdir)/optional/glpk/colamd/%,igraph/src/glpk/colamd/%,$(SRCFILES_ORIGPLACE14)) \
 	$(patsubst $(top_srcdir)/optional/simpleraytracer/%,igraph/src/%,$(SRCFILES_ORIGPLACE15)) \
-	$(patsubst $(top_srcdir)/optional/simpleraytracer/%,igraph/src/%,$(SRCFILES_ORIGPLACE16))
+	$(patsubst $(top_srcdir)/optional/simpleraytracer/%,igraph/src/%,$(SRCFILES_ORIGPLACE16)) \
+	$(patsubst $(top_srcdir)/src/plfit/%,igraph/src/plfit/%,$(SRCFILES_ORIGPLACE17)) \
+	$(patsubst $(top_srcdir)/src/plfit/%,igraph/src/%,$(SRCFILES_ORIGPLACE18))
 
 igraph/src/cs/%.h: $(top_srcdir)/src/cs/%.h
 	cp $(top_srcdir)/src/cs/$(@F) igraph/src/cs/$(@F)
@@ -118,6 +124,11 @@ igraph/src/glpk/colamd/%.h: $(top_srcdir)/optional/glpk/colamd/%.h
 	cp $(top_srcdir)/optional/glpk/colamd/$(@F) igraph/src/glpk/colamd/$(@F)
 igraph/src/glpk/%.h: $(top_srcdir)/optional/glpk/%.h
 	cp $(top_srcdir)/optional/glpk/$(@F) igraph/src/glpk/$(@F)
+
+igraph/src/%.c: $(top_srcdir)/src/plfit/%.c
+	cp $(top_srcdir)/src/plfit/$(@F) igraph/src/$(@F)
+igraph/src/plfit/%.h: $(top_srcdir)/src/plfit/%.h
+	cp $(top_srcdir)/src/plfit/$(@F) igraph/src/plfit/$(@F)
 
 igraph/src/%.c: $(top_srcdir)/src/%.c
 	cp $(top_srcdir)/src/$(@F) $@
@@ -149,7 +160,17 @@ igraph/src/%.h: $(top_srcdir)/optional/simpleraytracer/%.h
 igraph/src/%.h: $(top_srcdir)/include/%.h
 	cp $(top_srcdir)/include/$(@F) $@
 
-igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
+DIRS: 
+	mkdir -p igraph/src
+	mkdir -p igraph/src/cs
+	mkdir -p igraph/src/glpk
+	mkdir -p igraph/src/glpk/amd
+	mkdir -p igraph/src/glpk/colamd
+	mkdir -p igraph/src/plfit
+
+.PHONY: DIRS
+
+igraph_$(VERSION).tar.gz: DIRS $(RFILES) $(SRCFILES)
 	echo $(top_scrdir)
 	rm -f igraph/R/config.R
 	rm -f igraph/src/config.h
@@ -157,7 +178,13 @@ igraph_$(VERSION).tar.gz: $(RFILES) $(SRCFILES)
 	R CMD build igraph
 
 tests:
-	cd igraph/tests && echo "tools:::.runPackageTestsR()" | \
+	cd tests && echo "tools:::.runPackageTestsR()" | \
+	R --no-save && echo
+
+homepagetests:
+	$(eval $@_TMP := $(shell mktemp -d -t igraph))
+	cp -r ../../doc/homepage/examples $($@_TMP) && \
+	cd $($@_TMP)/examples && echo "tools:::.runPackageTestsR()" | \
 	R --no-save && echo
 
 .PHONY: tests

@@ -86,7 +86,7 @@ int main() {
   igraph_vector_bool_destroy(&types);
 
   /*******************************************************/
-  /* More sophisticated test
+  /* More sophisticated test                             */
   /*******************************************************/
   
   igraph_ring(&g, 100, /*directed=*/ 1, /*mutual=*/ 1, 

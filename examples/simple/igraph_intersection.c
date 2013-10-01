@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int print_vector(igraph_vector_t *v) {
+void print_vector(igraph_vector_t *v) {
   long int i, l=igraph_vector_size(v);
   for (i=0; i<l; i++) {
     printf(" %li", (long int) VECTOR(*v)[i]);

@@ -10,6 +10,7 @@ import string
 import glob
 import os.path
 import re
+import HTMLParser
 
 def detect_newsfile():
     """Tries to detect the full path of the NEWS file"""
@@ -54,6 +55,15 @@ def process_newsfile(fname):
     
     return news
 
+def addExamples(text):
+    ex=re.search("<example[^>]*>", text)
+    while ex:
+        exfile=re.search(' file="([^"]*)"', ex.group()).groups()[0]
+        extext=open("examples/" + exfile).read()
+        text = text[0:ex.start()] + extext + text[ex.end():]
+        ex=re.search("<example[^>]*>", text)
+    return text
+
 if len(sys.argv)<2:
     print __doc__
     sys.exit(1)
@@ -72,6 +82,7 @@ files = glob.glob('*.html.in')
 for file in files:
     f = open(file[:-3], "w")
     content = open(file).read()
+    content = addExamples(content)
     tokens["CONTENT"] = string.Template(content).safe_substitute(tokens)
     tokens["PAGENAME"] = file[:-8]
     for tmpl in template:

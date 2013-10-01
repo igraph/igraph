@@ -45,14 +45,37 @@ __BEGIN_DECLS
 /* MAximum flows, minimum cuts & such                 */
 /* -------------------------------------------------- */
 
+/**
+ * \typedef igraph_maxflow_stats_t
+ * A simple data type to return some statistics from the
+ * push-relabel maximum flow solver.
+ *
+ * \param nopush The number of push operations performed.
+ * \param norelabel The number of relabel operarions performed.
+ * \param nogap The number of times the gap heuristics was used.
+ * \param nogapnodes The total number of vertices that were
+ *        omitted form further calculations because of the gap
+ *        heuristics.
+ * \param nobfs The number of times the reverse BFS was run to
+ *        assign good values to the height function. This includes
+ *        an initial run before the whole algorithm, so it is always
+ *        at least one.
+ */
+
+typedef struct {
+  int nopush, norelabel, nogap, nogapnodes, nobfs;
+} igraph_maxflow_stats_t;
+
 int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 		   igraph_vector_t *flow, igraph_vector_t *cut,
 		   igraph_vector_t *partition, igraph_vector_t *partition2,
 		   igraph_integer_t source, igraph_integer_t target,
-		   const igraph_vector_t *capacity);
+		   const igraph_vector_t *capacity,
+		   igraph_maxflow_stats_t *stats);
 int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
 			 igraph_integer_t source, igraph_integer_t target,
-			 const igraph_vector_t *capacity);
+			 const igraph_vector_t *capacity,
+			 igraph_maxflow_stats_t *stats);
 
 int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 		     igraph_vector_t *cut, igraph_vector_t *partition,
@@ -143,6 +166,11 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			  igraph_vector_ptr_t *partition1s,
 			  igraph_integer_t source,
 			  igraph_integer_t target,
+			  const igraph_vector_t *capacity);
+
+int igraph_gomory_hu_tree(const igraph_t *graph,
+			  igraph_t *tree,
+			  igraph_vector_t *flows,
 			  const igraph_vector_t *capacity);
 
 __END_DECLS

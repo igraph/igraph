@@ -572,6 +572,13 @@ tkplot.getcoords <- function(tkp.id, norm=FALSE) {
   coords
 }
 
+tkplot.setcoords <- function(tkp.id, coords) {
+  stopifnot(is.matrix(coords), ncol(coords)==2)
+  .tkplot.set(tkp.id, "coords", coords)
+  .tkplot.update.vertices(tkp.id)
+  invisible(NULL)
+}
+
 tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   coords <- .tkplot.get(tkp.id, "coords")
 
@@ -593,6 +600,10 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   .tkplot.set(tkp.id, "coords", coords)
   tkplot.center(tkp.id)
   invisible(NULL)
+}
+
+tkplot.canvas <- function(tkp.id) {
+  .tkplot.get(tkp.id)$canvas
 }
 
 ###################################################################

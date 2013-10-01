@@ -50,6 +50,44 @@ class BasicTests(unittest.TestCase):
         self.failUnless(g.vcount() == 5 and g.ecount() == 0)
         self.assertEquals(g.vs[2:]["name"], ["spam", "bacon", "eggs"])
 
+    def testDeleteVertices(self):
+        g = Graph([(0,1), (1,2), (2,3), (0,2), (3,4), (4,5)])
+        self.assertEquals(6, g.vcount())
+        self.assertEquals(6, g.ecount())
+
+        # Delete a single vertex
+        g.delete_vertices(4)
+        self.assertEquals(5, g.vcount())
+        self.assertEquals(4, g.ecount())
+
+        # Delete multiple vertices
+        g.delete_vertices([1,3])
+        self.assertEquals(3, g.vcount())
+        self.assertEquals(1, g.ecount())
+
+        # Delete a vertex sequence
+        g.delete_vertices(g.vs[:2])
+        self.assertEquals(1, g.vcount())
+        self.assertEquals(0, g.ecount())
+
+        # Delete a single vertex object
+        g.vs[0].delete()
+        self.assertEquals(0, g.vcount())
+        self.assertEquals(0, g.ecount())
+
+        # Delete vertices by name
+        g = Graph.Full(4)
+        g.vs["name"] = ["spam", "bacon", "eggs", "ham"]
+        self.assertEquals(4, g.vcount())
+        g.delete_vertices("spam")
+        self.assertEquals(3, g.vcount())
+        g.delete_vertices(["bacon", "ham"])
+        self.assertEquals(1, g.vcount())
+
+        # Deleting a nonexistent vertex
+        self.assertRaises(ValueError, g.delete_vertices, "no-such-vertex")
+        self.assertRaises(InternalError, g.delete_vertices, 2)
+
     def testAddEdges(self):
         g = Graph()
         g.add_vertices(["spam", "bacon", "eggs", "ham"])
@@ -65,6 +103,54 @@ class BasicTests(unittest.TestCase):
         g.add_edges([("spam", "eggs"), ("spam", "ham")])
         self.assertEquals(g.vcount(), 4)
         self.assertEquals(g.get_edgelist(), [(0, 1), (1, 2), (2, 3), (1, 3), (0, 2), (0, 3)])
+
+    def testDeleteEdges(self):
+        g = Graph.Famous("petersen")
+        g.vs["name"] = list("ABCDEFGHIJ")
+        el = g.get_edgelist()
+
+        self.assertEquals(15, g.ecount())
+
+        # Deleting single edge
+        g.delete_edges(14)
+        el[14:] = []
+        self.assertEquals(14, g.ecount())
+        self.assertEquals(el, g.get_edgelist())
+
+        # Deleting multiple edges
+        g.delete_edges([2,5,7])
+        el[7:8] = []; el[5:6] = []; el[2:3] = []
+        self.assertEquals(11, g.ecount())
+        self.assertEquals(el, g.get_edgelist())
+
+        # Deleting edge object
+        g.es[6].delete()
+        el[6:7] = []
+        self.assertEquals(10, g.ecount())
+        self.assertEquals(el, g.get_edgelist())
+
+        # Deleting edge sequence object
+        g.es[1:4].delete()
+        el[1:4] = []
+        self.assertEquals(7, g.ecount())
+        self.assertEquals(el, g.get_edgelist())
+
+        # Deleting edges by IDs
+        g.delete_edges([(2,7), (5,8)])
+        el[4:5] = []; el[1:2] = []
+        self.assertEquals(5, g.ecount())
+        self.assertEquals(el, g.get_edgelist())
+
+        # Deleting edges by names
+        g.delete_edges([("D", "I"), ("G", "I")])
+        el[3:4] = []; el[1:2] = []
+        self.assertEquals(3, g.ecount())
+        self.assertEquals(el, g.get_edgelist())
+
+        # Deleting nonexistent edges
+        self.assertRaises(ValueError, g.delete_edges, [(0,2)])
+        self.assertRaises(ValueError, g.delete_edges, [("A", "C")])
+        self.assertRaises(ValueError, g.delete_edges, [(0,15)])
 
     def testGraphGetEids(self):
         g = Graph.Famous("petersen")

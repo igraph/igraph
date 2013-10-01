@@ -84,7 +84,9 @@ layout.drl (graph, use.seed = FALSE, seed = matrix(runif(vcount(graph) *
   A numeric matrix with two columns.
 }
 \references{
-  \url{http://www.cs.sandia.gov/~smartin/software.html}
+  See the following technical report:
+  Martin, S., Brown, W.M., Klavans, R., Boyack, K.W., DrL: Distributed
+  Recursive (Graph) Layout. SAND Reports, 2008. 2936: p. 1-10. 
 }
 \author{Shawn Martin \email{google@for.it} and Gabor Csardi
   \email{csardi.gabor@gmail.com} for the R/igraph interface and the three

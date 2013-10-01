@@ -54,7 +54,8 @@ int igraph_i_create_outseq(igraph_vector_t *real_outseq,
   if (outseq) {
     igraph_vector_clear(real_outseq);
     igraph_vector_append(real_outseq, outseq);    
-    no_of_edges=igraph_vector_sum(real_outseq)-VECTOR(*real_outseq)[0];
+    no_of_edges=(long int) (igraph_vector_sum(real_outseq) - 
+			    VECTOR(*real_outseq)[0]);
   } else if (outdist) {    
     igraph_vector_t cumsum;
     long int i, n=igraph_vector_size(outdist);   
@@ -84,7 +85,7 @@ int igraph_i_create_outseq(igraph_vector_t *real_outseq,
   }
   
   if (edges) {
-    *edges=no_of_edges;
+    *edges=(igraph_integer_t) no_of_edges;
   }
   
   return 0;
@@ -137,7 +138,7 @@ int igraph_evolver_d(igraph_t *graph,
   
   for (i=1; i<no_of_nodes; i++) {
     igraph_real_t sum=igraph_psumtree_sum(&sumtree);
-    long int no_of_neighbors=VECTOR(real_outseq)[i];
+    long int no_of_neighbors=(long int) VECTOR(real_outseq)[i];
     long int edgeptr_save;
     long int to;
     
@@ -152,10 +153,10 @@ int igraph_evolver_d(igraph_t *graph,
  
     /* Update probabilities */
     for (j=0; j<no_of_neighbors; j++) {
-      long int to=VECTOR(edges)[edgeptr_save+j*2+1];
-      long int deg=VECTOR(degree)[to];
-      long int a= deg < kernel_size ? VECTOR(*kernel)[deg] : 
-	VECTOR(*kernel)[kernel_size-1];
+      long int to=(long int) VECTOR(edges)[edgeptr_save+j*2+1];
+      long int deg=(long int) VECTOR(degree)[to];
+      long int a= deg < kernel_size ? (long int) VECTOR(*kernel)[deg] : 
+	(long int) VECTOR(*kernel)[kernel_size-1];
       igraph_psumtree_update(&sumtree, to, a);
     }
 			     

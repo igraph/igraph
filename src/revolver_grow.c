@@ -65,8 +65,8 @@ int igraph_revolver_d_d(const igraph_t *graph,
     IGRAPH_ERROR("Invalid etime length", IGRAPH_EINVAL);
   }
   
-  vnoev=igraph_vector_max(vtime)+1;
-  enoev=igraph_vector_max(etime)+1;
+  vnoev=(igraph_integer_t) igraph_vector_max(vtime)+1;
+  enoev=(igraph_integer_t) igraph_vector_max(etime)+1;
   no_of_events= vnoev > enoev ? vnoev : enoev;
 
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_events);
@@ -273,7 +273,7 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
     eptr_save=eptr;
     while (eptr < no_of_edges &&
 	   VECTOR(*etime)[(long int)VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge), to=IGRAPH_TO(graph, edge);
       long int xidx=VECTOR(degree)[from];
       long int yidx=VECTOR(degree)[to];
@@ -300,17 +300,17 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
     eptr=eptr_save;
     while (eptr < no_of_edges && 
 	   VECTOR(*etime)[(long int) VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge);
       long int to=IGRAPH_TO(graph, edge);
       long int xidx=VECTOR(degree)[from];
       long int yidx=VECTOR(degree)[to];
       long int n;
 
-      adjedges=igraph_lazy_inclist_get(inclist, from);
+      adjedges=igraph_lazy_inclist_get(inclist, (igraph_integer_t) from);
       n=igraph_vector_size(adjedges);
       for (i=0; i<n; i++) {
-	long int edge=VECTOR(*adjedges)[i];
+	long int edge=(long int) VECTOR(*adjedges)[i];
 	if (VECTOR(added)[edge]) {
 	  long int otherv=IGRAPH_OTHER(graph, edge, from); /* other than from */
 	  long int deg=VECTOR(degree)[otherv];
@@ -328,10 +328,10 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
 	  }
 	}
       }
-      adjedges=igraph_lazy_inclist_get(inclist, to);
+      adjedges=igraph_lazy_inclist_get(inclist, (igraph_integer_t) to);
       n=igraph_vector_size(adjedges);
       for (i=0; i<n; i++) {
-	long int edge=VECTOR(*adjedges)[i];
+	long int edge=(long int) VECTOR(*adjedges)[i];
 	if (VECTOR(added)[edge]) {
 	  long int otherv=IGRAPH_OTHER(graph, edge, to); /* other than to */
 	  long int deg=VECTOR(degree)[otherv];
@@ -361,9 +361,9 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
 
       for (i=0; i<maxdegree+1; i++) {
 	long int before, after;
-	before=NTKK(xidx,i); 
+	before=(long int) NTKK(xidx,i); 
 	VECTOR(ntk)[xidx] -= 1;
-	after=NTKK(xidx,i);
+	after=(long int) NTKK(xidx,i);
 	VECTOR(ntk)[xidx] += 1;
 	if (before > 0 && after==0) {
 	  MATRIX(*normfact, xidx, i) += eptr_new-MATRIX(ch, xidx, i);
@@ -374,9 +374,9 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
 
       for (i=0; i<maxdegree+1; i++) {
 	long int before, after;
-	before=NTKK(yidx, i); 
+	before=(long int) NTKK(yidx, i); 
 	VECTOR(ntk)[yidx] -= 1;
-	after=NTKK(yidx, i);
+	after=(long int) NTKK(yidx, i);
 	VECTOR(ntk)[yidx] += 1;
 	if (before > 0 && after==0) {
 	  MATRIX(*normfact, yidx, i) += eptr_new-MATRIX(ch, yidx, i);
@@ -387,9 +387,9 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
 
       for (i=0; i<maxdegree+1; i++) {
 	long int before, after;
-	before=NTKK(xidx+1, i);
+	before=(long int) NTKK(xidx+1, i);
 	VECTOR(ntk)[xidx+1] += 1;
-	after=NTKK(xidx+1, i);
+	after=(long int) NTKK(xidx+1, i);
 	VECTOR(ntk)[xidx+1] -= 1;
 	if (before==0 && after > 0) {
 	  MATRIX(ch, xidx+1, i) = eptr_new;
@@ -400,9 +400,9 @@ int igraph_revolver_mes_d_d(const igraph_t *graph,
 
       for (i=0; i<maxdegree+1; i++) {
 	long int before, after;
-	before=NTKK(yidx+1, i);
+	before=(long int) NTKK(yidx+1, i);
 	VECTOR(ntk)[yidx+1] += 1;
-	after=NTKK(yidx+1, i);
+	after=(long int) NTKK(yidx+1, i);
 	VECTOR(ntk)[yidx+1] -= 1;
 	if (before == 0 && after == 0) {
 	  MATRIX(ch, yidx+1, i) = eptr_new;
@@ -518,7 +518,7 @@ int igraph_revolver_st_d_d(const igraph_t *graph,
     VECTOR(*st)[timestep+1] = VECTOR(*st)[timestep];
     while (eptr < no_of_edges && 
 	   VECTOR(*etime)[ (long int) VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge);
       long int to=IGRAPH_TO(graph, edge);
       long int xidx=VECTOR(degree)[from];
@@ -544,10 +544,10 @@ int igraph_revolver_st_d_d(const igraph_t *graph,
       VECTOR(ntk)[xidx+1]++;
       VECTOR(ntk)[yidx+1]++;
       
-      adjedges=igraph_lazy_inclist_get(inclist, from);
+      adjedges=igraph_lazy_inclist_get(inclist, (igraph_integer_t) from);
       n=igraph_vector_size(adjedges);
       for (i=0; i<n; i++) {
-	long int edge=VECTOR(*adjedges)[i];
+	long int edge=(long int) VECTOR(*adjedges)[i];
 	if (VECTOR(added)[edge]) {
 	  long int otherv=IGRAPH_OTHER(graph, edge, from);
 	  long int deg=VECTOR(degree)[otherv];
@@ -555,10 +555,10 @@ int igraph_revolver_st_d_d(const igraph_t *graph,
 	  inc -= MATRIX(*kernel, xidx+1, deg);
 	}
       }
-      adjedges=igraph_lazy_inclist_get(inclist, to);
+      adjedges=igraph_lazy_inclist_get(inclist, (igraph_integer_t) to);
       n=igraph_vector_size(adjedges);
       for (i=0; i<n; i++) {
-	long int edge=VECTOR(*adjedges)[i];
+	long int edge=(long int) VECTOR(*adjedges)[i];
 	if (VECTOR(added)[edge]) {
 	  long int otherv=IGRAPH_OTHER(graph, edge, to);
 	  long int deg=VECTOR(degree)[otherv];
@@ -646,7 +646,7 @@ int igraph_revolver_error_d_d(const igraph_t *graph,
     eptr_save=eptr;
     while (eptr < no_of_edges && 
 	   VECTOR(*etime)[ (long int) VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge);
       long int to=IGRAPH_TO(graph, edge);
       long int xidx=VECTOR(degree)[from];
@@ -665,7 +665,7 @@ int igraph_revolver_error_d_d(const igraph_t *graph,
     eptr=eptr_save;
     while (eptr < no_of_edges && 
 	   VECTOR(*etime)[ (long int) VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge);
       long int to=IGRAPH_TO(graph, edge);
       VECTOR(degree)[from] += 1;
@@ -715,7 +715,7 @@ int igraph_revolver_p_p(const igraph_t *graph,
     IGRAPH_ERROR("Invalid etime length", IGRAPH_EINVAL);
   }
 
-  no_of_events=igraph_vector_size(eventsizes);
+  no_of_events=(igraph_integer_t) igraph_vector_size(eventsizes);
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_events);
   for (i=0; i<no_of_events; i++) {
@@ -725,10 +725,10 @@ int igraph_revolver_p_p(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_long_init(&papers, igraph_vcount(graph)));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &papers);
   for (i=0; i<igraph_vector_size(authors); i++) {
-    long int author=VECTOR(*authors)[i];
+    long int author=(long int) VECTOR(*authors)[i];
     VECTOR(papers)[author] += 1;
     if (VECTOR(papers)[author] > maxpapers) {
-      maxpapers=VECTOR(papers)[author];
+      maxpapers=(igraph_integer_t) VECTOR(papers)[author];
     }
   }
   igraph_vector_long_destroy(&papers);
@@ -924,7 +924,7 @@ int igraph_revolver_mes_p_p(const igraph_t *graph,
     eptr_save=eptr;
     while (eptr < no_of_edges &&
 	   VECTOR(*etime)[(long int)VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge), to=IGRAPH_TO(graph, edge);
       long int xidx=VECTOR(papers)[from];
       long int yidx=VECTOR(papers)[to];
@@ -949,14 +949,14 @@ int igraph_revolver_mes_p_p(const igraph_t *graph,
     /* update ntkk, the new papers change the type of their authors */
     eptr_new=eptr;
     for (i=aptr; i<aptr+VECTOR(*eventsizes)[timestep]; i++) {
-      long int aut=VECTOR(*authors)[i];
+      long int aut=(long int) VECTOR(*authors)[i];
       long int pap=VECTOR(papers)[aut];
       long int j, n;
 
-      adjedges=igraph_lazy_inclist_get(inclist, aut);
+      adjedges=igraph_lazy_inclist_get(inclist, (igraph_integer_t) aut);
       n=igraph_vector_size(adjedges);
       for (j=0; j<n; j++) {
-	long int edge=VECTOR(*adjedges)[j];
+	long int edge=(long int) VECTOR(*adjedges)[j];
 	if (VECTOR(added)[edge]) {
 	  long int otherv=IGRAPH_OTHER(graph, edge, aut);
 	  long int otherpap=VECTOR(papers)[otherv];
@@ -980,9 +980,9 @@ int igraph_revolver_mes_p_p(const igraph_t *graph,
       /* update ntk too */
       for (j=0; j<maxpapers+1; j++) {
 	long int before, after;
-	before=NTKK(pap, j);
+	before=(long int) NTKK(pap, j);
 	VECTOR(ntk)[pap]-=1;
-	after=NTKK(pap, j);
+	after=(long int) NTKK(pap, j);
 	VECTOR(ntk)[pap]+=1;
 	if (before > 0 && after==0) {
 	  MATRIX(*normfact, pap, j) += eptr_new-MATRIX(ch, pap, j);
@@ -993,9 +993,9 @@ int igraph_revolver_mes_p_p(const igraph_t *graph,
       
       for (j=0; j<maxpapers+1; j++) { 
 	long int before, after;
-	before=NTKK(pap+1, j);
+	before=(long int) NTKK(pap+1, j);
 	VECTOR(ntk)[pap+1] += 1;
-	after=NTKK(pap+1, j);
+	after=(long int) NTKK(pap+1, j);
 	VECTOR(ntk)[pap+1] -= 1;
 	if (before == 0 && after > 0) {
 	  MATRIX(ch, pap+1, j) = eptr_new;
@@ -1012,7 +1012,7 @@ int igraph_revolver_mes_p_p(const igraph_t *graph,
     eptr=eptr_save;
     while (eptr < no_of_edges && 
 	   VECTOR(*etime)[(long int) VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge), to=IGRAPH_TO(graph, edge);
       long int xidx=VECTOR(papers)[from];
       long int yidx=VECTOR(papers)[to];
@@ -1134,7 +1134,7 @@ int igraph_revolver_st_p_p(const igraph_t *graph,
     VECTOR(*st)[timestep+1] = VECTOR(*st)[timestep];
     
     for (i=aptr; i<aptr+VECTOR(*eventsizes)[timestep]; i++) {
-      long int aut=VECTOR(*authors)[i];
+      long int aut=(long int) VECTOR(*authors)[i];
       long int pap=VECTOR(papers)[aut];
       long int j, n;
       
@@ -1149,10 +1149,10 @@ int igraph_revolver_st_p_p(const igraph_t *graph,
       VECTOR(ntk)[pap]--;
       VECTOR(ntk)[pap+1]++;
 
-      adjedges=igraph_lazy_inclist_get(inclist, aut);
+      adjedges=igraph_lazy_inclist_get(inclist, (igraph_integer_t) aut);
       n=igraph_vector_size(adjedges);
       for (j=0; j<n; j++) {
-	long int edge=VECTOR(*adjedges)[j];
+	long int edge=(long int) VECTOR(*adjedges)[j];
 	if (VECTOR(added)[edge]) {
 	  long int otherv=IGRAPH_OTHER(graph, edge, aut);
 	  long int otherpap=VECTOR(papers)[otherv];
@@ -1167,7 +1167,7 @@ int igraph_revolver_st_p_p(const igraph_t *graph,
     
     while (eptr < no_of_edges && 
 	   VECTOR(*etime)[ (long int) VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge);
       long int to=IGRAPH_TO(graph, edge);
       long int xidx=VECTOR(papers)[from];
@@ -1253,7 +1253,7 @@ int igraph_revolver_error_p_p(const igraph_t *graph,
     eptr_save=eptr;
     while (eptr < no_of_edges && 
 	   VECTOR(*etime)[ (long int) VECTOR(*etimeidx)[eptr] ] == timestep) {
-      long int edge=VECTOR(*etimeidx)[eptr];
+      long int edge=(long int) VECTOR(*etimeidx)[eptr];
       long int from=IGRAPH_FROM(graph, edge);
       long int to=IGRAPH_TO(graph, edge);
       long int xidx=VECTOR(papers)[from];
@@ -1270,7 +1270,7 @@ int igraph_revolver_error_p_p(const igraph_t *graph,
     }
     
     for (i=aptr; i<aptr+VECTOR(*eventsizes)[timestep]; i++) {
-      long int aut=VECTOR(*authors)[i];
+      long int aut=(long int) VECTOR(*authors)[i];
       VECTOR(papers)[aut] += 1;
     }
     aptr += VECTOR(*eventsizes)[timestep];

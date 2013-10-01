@@ -205,6 +205,13 @@ g3 -> g1 g2}
 }
 % \seealso{}
 \examples{
+
+## We are not running these examples any more, because they
+## take a long time (~15 seconds) to run and this is against the CRAN
+## repository policy. Copy and paste them by hand to your R prompt if
+## you want to run them.
+
+\dontrun{
 ## A graph with two dense groups
 g <- erdos.renyi.game(10, p=1/2) + erdos.renyi.game(10, p=1/2)
 hrg <- hrg.fit(g)
@@ -216,5 +223,6 @@ hrg.consensus(g, hrg=hrg, start=TRUE)
 ## Prediction of missing edges
 g2 <- graph.full(4) + (graph.full(4) - path(1,2))
 hrg.predict(g2)
+}
 }
 \keyword{graphs}

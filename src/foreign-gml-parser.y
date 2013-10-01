@@ -44,6 +44,11 @@
 
 */
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -51,6 +56,7 @@
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "config.h"
+#include "igraph_hacks_internal.h"
 #include "igraph_math.h"
 #include "igraph_gml_tree.h"
 #include "foreign-gml-header.h"

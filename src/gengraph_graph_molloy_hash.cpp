@@ -234,7 +234,7 @@ int graph_molloy_hash::random_edge_swap(int K, int *Kbuff, bool *visited) {
 unsigned long graph_molloy_hash::shuffle(unsigned long times, 
 					 unsigned long maxtimes, int type) {
   igraph_progress("Shuffle", 0, 0);
-  assert(verify());
+  // assert(verify());
   // counters
   unsigned long nb_swaps = 0;
   unsigned long all_swaps = 0;
@@ -519,7 +519,7 @@ double graph_molloy_hash::effective_K(int K, int quality) {
   int i;
   for(i=0; i<n; i++) visited[i] = false;
   for(int i=0; i<quality; i++) {
-    assert(verify());
+    // assert(verify());
     int f1,f2,t1,t2;
     int *f1t1, *f2t2;
     do {
@@ -538,14 +538,14 @@ double graph_molloy_hash::effective_K(int K, int quality) {
     while (t1==t2 || f1==t2 || f2==t1 || is_edge(f1,t2) || is_edge(f2,t1));
     // swap
     swap_edges(f1,t2,f2,t1);
-    assert(verify());
+    // assert(verify());
     sum_K += effective_isolated(deg[f1]>deg[t2] ? f1 : t2, K, Kbuff, visited);
-    assert(verify());
+    // assert(verify());
     sum_K += effective_isolated(deg[f2]>deg[t1] ? f2 : t1, K, Kbuff, visited);
-    assert(verify());
+    // assert(verify());
     // undo swap
     swap_edges(f1,t2,f2,t1);
-    assert(verify());
+    // assert(verify());
   }
   delete[] Kbuff;
   delete[] visited;

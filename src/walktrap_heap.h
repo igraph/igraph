@@ -56,6 +56,10 @@
 #ifndef HEAP_H
 #define HEAP_H
 
+namespace igraph {
+
+namespace walktrap {
+
 class Neighbor {
 public:
   int community1;   // the two adjacent communities
@@ -122,5 +126,8 @@ public:
   Min_delta_sigma_heap(int max_size);
   ~Min_delta_sigma_heap();
 };
+
+} }        /* end of namespaces */
+
 #endif
 

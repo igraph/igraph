@@ -51,9 +51,20 @@ int main() {
 	   VECTOR(modularity)[i]);
   }
   
+  igraph_destroy(&g);
+
+  /* isolated vertices */
+  igraph_small(&g, 5, IGRAPH_UNDIRECTED, -1);
+  if (igraph_community_walktrap(&g, 0 /* no weights */, 4 /* steps */, &merges,
+      &modularity, /* membership = */ 0)) {
+    return 1;
+  }
+  if (igraph_vector_min(&modularity) != 0 || igraph_vector_max(&modularity) != 0) {
+    return 2;
+  }
+  igraph_destroy(&g);
+
   igraph_matrix_destroy(&merges);
   igraph_vector_destroy(&modularity);
-  igraph_destroy(&g);
-  
   return 0;
 }

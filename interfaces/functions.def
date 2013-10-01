@@ -304,6 +304,13 @@ igraph_static_power_law_game:
                        finite_size_correction
         FLAGS: PROGRESS
                 
+igraph_k_regular_game:
+        PARAMS: OUT GRAPH graph, INTEGER no_of_nodes, INTEGER k, \
+                BOOLEAN directed=False, BOOLEAN multiple=False
+        NAME-R: k.regular.game
+        GATTR-R: name IS k-regular graph
+        GATTR-PARAM-R: k
+
 #######################################
 # Basic query functions
 #######################################
@@ -364,7 +371,8 @@ igraph_shortest_paths:
 igraph_get_shortest_paths:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, 
                 OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
-                NEIMODE mode=OUT
+                NEIMODE mode=OUT, OUT VECTOR_LONG_OR_0 predecessors=0, \
+                OUT VECTOR_LONG_OR_0 inbound_edges=0
         DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph
         IGNORE: RR, RC, RNamespace
 
@@ -382,7 +390,9 @@ igraph_shortest_paths_dijkstra:
 igraph_get_shortest_paths_dijkstra:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, \
                 OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
-                EDGEWEIGHTS weights=NULL, NEIMODE mode=ALL
+                EDGEWEIGHTS weights=NULL, NEIMODE mode=OUT, \
+                OUT VECTOR_LONG_OR_0 predecessors=0, \
+                OUT VECTOR_LONG_OR_0 inbound_edges=0
         DEPS: vertices ON graph, edges ON graph, from ON graph, to ON graph,\
               weights ON graph
         IGNORE: RR, RC, RNamespace
@@ -635,7 +645,7 @@ igraph_arpack_rnsolve:
         IGNORE: RR, RC, RNamespace
 
 igraph_arpack_unpack_complex:
-         PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, REAL nev
+         PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, INTEGER nev
          NAME-R: arpack.unpack.complex
 
 igraph_unfold_tree:
@@ -710,7 +720,7 @@ igraph_centralization_closeness:
 
 igraph_centralization_closeness_tmax:
         PARAMS: GRAPH_OR_0 graph=NULL, INTEGER nodes=0, \
-                BOOLEAN directed=True, OUT REALPTR res
+                NEIMODE mode=OUT, OUT REALPTR res
         NAME-R: centralization.closeness.tmax
 
 igraph_centralization_eigenvector_centrality:
@@ -766,14 +776,12 @@ igraph_diversity:
 #######################################
 
 igraph_is_degree_sequence:
-        PARAMS: VECTOR out_deg, VECTOR in_deg, OUT BOOLEANPTR res
+        PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
         NAME-R: is.degree.sequence
-        IGNORE: RR, RC, RNamespace
 
 igraph_is_graphical_degree_sequence:
-        PARAMS: VECTOR out_deg, VECTOR in_deg, OUT BOOLEANPTR res
+        PARAMS: VECTOR out_deg, VECTOR_OR_0 in_deg=NULL, OUT BOOLEANPTR res
         NAME-R: is.graphical.degree.sequence
-        IGNORE: RR, RC, RNamespace
 
 #######################################
 # Visitors
@@ -839,6 +847,18 @@ igraph_get_incidence:
 igraph_is_bipartite:
         PARAMS: GRAPH graph, OUT BOOLEANPTR res, OUT VECTOR_BOOL_OR_0 type
         NAME-R: bipartite.mapping
+
+igraph_bipartite_game_gnp:
+        PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, \
+                INTEGER n1, INTEGER n2, REAL p, BOOLEAN directed, \
+                NEIMODE mode
+        IGNORE: RR, RNamespace
+
+igraph_bipartite_game_gnm:
+        PARAMS: OUT GRAPH graph, OUT VECTOR_BOOL_OR_0 types, \
+                INTEGER n1, INTEGER n2, INTEGER m, BOOLEAN directed, \
+                NEIMODE mode
+        IGNORE: RR, RNamespace
 
 #######################################
 # Spectral properties
@@ -1207,7 +1227,8 @@ igraph_community_multilevel:
 
 igraph_community_optimal_modularity:
         PARAMS: GRAPH graph, OUT REALPTR modularity, \
-                OUT VECTOR_OR_0 membership
+                OUT VECTOR_OR_0 membership, \
+                EDGEWEIGHTS weights=NULL
         NAME-R: optimal.community
         IGNORE: RR
 
@@ -1288,7 +1309,7 @@ igraph_get_stochastic:
         IGNORE: RR
 
 igraph_get_stochastic_sparsemat:
-        PARAMS: GRAPH graph, OUT SPARSEMAT sparsemat, \
+        PARAMS: GRAPH graph, OUT SPARSEMATPTR sparsemat, \
                 BOOLEAN column_wise=False
         IGNORE: RR, RNamespace
 
@@ -1400,6 +1421,11 @@ igraph_triad_census:
         NAME-R: triad.census
         RETURN: ERROR
 
+igraph_adjacenct_triangles:
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL
+        DEPS: vids ON graph
+        NAME-R: adjacent.triangles
+
 #######################################
 # Graph operators
 #######################################
@@ -1450,12 +1476,12 @@ igraph_maxflow:
         PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
                 OUT VECTORM1_OR_0 cut, OUT VECTORM1_OR_0 partition1, \
                 OUT VECTORM1_OR_0 partition2, VERTEX source, VERTEX target, \
-                EDGECAPACITY capacity=NULL
+                EDGECAPACITY capacity=NULL, OUT MAXFLOW_STATS stats
         DEPS: capacity ON graph, source ON graph, target ON graph
 
 igraph_maxflow_value:
         PARAMS: GRAPH graph, OUT REALPTR value, VERTEX source, VERTEX target, \
-                VECTOR_OR_0 capacity
+                VECTOR_OR_0 capacity, OUT MAXFLOW_STATS stats
         DEPS: source ON graph, target ON graph
         IGNORE: RR, RC, RNamespace
 
@@ -1696,7 +1722,7 @@ igraph_scg_grouping:
 igraph_scg_semiprojectors:
         PARAMS: VECTORM1 groups, SCGMAT mtype=Default, \
                 OUT MATRIX_OR_0 L, OUT MATRIX_OR_0 R, \
-                OUT SPARSEMAT_OR_0 Lsparse, OUT SPARSEMAT_OR_0 Rsparse, \
+                OUT SPARSEMATPTR_OR_0 Lsparse, OUT SPARSEMATPTR_OR_0 Rsparse, \
                 VECTOR_OR_0 p=NULL, SCGNORM norm=Default
         NAME-R: scgSemiProjectors
         IGNORE: RR, RC
@@ -1716,8 +1742,8 @@ igraph_scg_adjacency:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 igraph_scg_stochastic:
@@ -1730,8 +1756,8 @@ igraph_scg_stochastic:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 igraph_scg_laplacian:
@@ -1744,8 +1770,8 @@ igraph_scg_laplacian:
                 BOOLEAN use_arpack=False, INTEGER maxiter, \
                 OUT GRAPH_OR_0 scg_graph, OUT MATRIX_OR_0 scg_matrix, \
                 OUT SPARSEMAT_OR_0 scg_sparsemat, OUT MATRIX_OR_0 L, \
-                OUT MATRIX_OR_0 R, OUT SPARSEMAT_OR_0 Lsparse, \
-                OUT SPARSEMAT_OR_0 Rsparse
+                OUT MATRIX_OR_0 R, OUT SPARSEMATPTR_OR_0 Lsparse, \
+                OUT SPARSEMATPTR_OR_0 Rsparse
         IGNORE: RR, RC, RNamespace
 
 
@@ -1776,6 +1802,28 @@ igraph_maximum_bipartite_matching:
        DEPS: types ON graph, weights ON graph
        NAME-R: maximum.bipartite.matching
        IGNORE: RR
+
+#######################################
+# Eigensolvers
+#######################################
+
+igraph_eigen_adjacency:
+       PARAMS: GRAPH graph, EIGENALGO algorithm=ARPACK, \
+               EIGENWHICH which=Default, \
+               INOUT ARPACKOPT options=igraph.arpack.default, \
+               NULL storage, OUT VECTOR values, OUT MATRIX vectors, \
+               NULL cmplxvalues, NULL cmplxvectors
+       NAME-R: graph.eigen
+
+#######################################
+# Fitting power laws
+#######################################
+
+igraph_power_law_fit:
+       PARAMS: VECTOR data, OUT PLFIT res, REAL xmin=-1, \
+               BOOLEAN force_continuous=False
+       NAME-R: power.law.fit.new
+       IGNORE: RNamespace
 
 #######################################
 # Other, not graph related

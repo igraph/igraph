@@ -94,7 +94,7 @@
 
 int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al, 
 			  igraph_neimode_t mode) {
-  long int i;
+  igraph_integer_t i;
 
   if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
     IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_EINVMODE);
@@ -176,7 +176,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 				       igraph_adjlist_t *al, 
 				       igraph_neimode_t mode,
 				       igraph_bool_t loops) {
-  long int i, j, k, n;
+  igraph_integer_t i, j, k, n;
   igraph_bool_t* seen;
   igraph_vector_t vec;
 
@@ -206,7 +206,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
   for (i=0; i<al->length; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     igraph_neighbors(graph, &vec, i, mode);
-    memset(seen, 0, sizeof(igraph_bool_t)*al->length);
+    memset(seen, 0, sizeof(igraph_bool_t)*(unsigned) al->length);
     n=al->length;
     if (!loops) { seen[i] = 1; n--; }
     for (j=0; j<igraph_vector_size(&vec); j++) {
@@ -319,7 +319,7 @@ int igraph_adjlist_simplify(igraph_adjlist_t *al) {
     long int j, l=igraph_vector_size(v);
     VECTOR(mark)[i] = i+1;
     for (j=0; j<l; /* nothing */) {
-      long int e=VECTOR(*v)[j];
+      long int e=(long int) VECTOR(*v)[j];
       if (VECTOR(mark)[e] != i+1) {
 	VECTOR(mark)[e]=i+1;
 	j++;
@@ -345,7 +345,7 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
     igraph_vector_t *v=&al->adjs[i];
     long int j, p=1, l=igraph_vector_size(v);
     for (j=1; j<l; j++) {
-      long int e=VECTOR(*v)[j];
+      long int e=(long int) VECTOR(*v)[j];
       /* Non-loop edges, and one end of loop edges are fine. */
       /* We use here, that the vector is sorted and we also keep it sorted */
       if (e != i || VECTOR(*v)[j-1] != e) {
@@ -437,7 +437,7 @@ int igraph_inclist_remove_duplicate(const igraph_t *graph,
     igraph_vector_t *v=&al->incs[i];
     long int j, p=1, l=igraph_vector_size(v);
     for (j=1; j<l; j++) {
-      long int e=VECTOR(*v)[j];
+      long int e=(long int) VECTOR(*v)[j];
       /* Non-loop edges and one end of loop edges are fine. */
       /* We use here, that the vector is sorted and we also keep it sorted */
       if (IGRAPH_FROM(graph, e) != IGRAPH_TO(graph, e) ||
@@ -497,7 +497,7 @@ int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
 int igraph_inclist_init(const igraph_t *graph, 
 			      igraph_inclist_t *il, 
 			      igraph_neimode_t mode) {
-  long int i;
+  igraph_integer_t i;
 
   if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
     IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_EINVMODE);
@@ -670,7 +670,7 @@ void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al) {
 
 igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 						igraph_integer_t pno) {
-  long int no=pno;
+  igraph_integer_t no=pno;
   int ret;
   if (al->adjs[no] == 0) {
     al->adjs[no] = igraph_Calloc(1, igraph_vector_t);
@@ -824,7 +824,7 @@ void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il) {
 
 igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
 						    igraph_integer_t pno) {
-  long int no=pno;
+  igraph_integer_t no=pno;
   int ret;
   if (il->incs[no] == 0) {
     il->incs[no] = igraph_Calloc(1, igraph_vector_t);

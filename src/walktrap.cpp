@@ -67,6 +67,7 @@
 #include "igraph_interrupt_internal.h"
 
 using namespace std;
+using namespace igraph::walktrap;
 
 /** 
  * \function igraph_community_walktrap
@@ -83,8 +84,9 @@ using namespace std;
  * source code.
  *
  * </para><para>
- * Note that the graph must not contain isolated vertices in order to
- * use this method.
+ * In contrast to the original implementation, isolated vertices are allowed
+ * in the graph and they are assumed to have a single incident loop edge with
+ * weight 1.
  *
  * \param graph The input graph, edge directions are ignored.
  * \param weights Numeric vector giving the weights of the edges. 
@@ -107,8 +109,8 @@ using namespace std;
  *     each merge operation. 
  * \param membership Pointer to a vector. If not a NULL pointer, then
  *     the membership vector corresponding to the maximal modularity
- *     score is stored here. If it is not a NULL pointer, then \p
- *     modularity must not be a NULL pointer, either.
+ *     score is stored here. If it is not a NULL pointer, then neither
+ *     \p modularity nor \p merges may be NULL.
  * \return Error code.
  * 
  * \sa \ref igraph_community_spinglass(), \ref
@@ -131,14 +133,14 @@ int igraph_community_walktrap(const igraph_t *graph,
   int length=steps;
   long max_memory=-1;
 
-  if (membership && !modularity) {
-    IGRAPH_ERROR("Cannot calculate membership without modularity",
+  if (membership && !(modularity && merges)) {
+    IGRAPH_ERROR("Cannot calculate membership without modularity or merges",
 		 IGRAPH_EINVAL);
   }
 
   Graph* G = new Graph;
   if (G->convert_from_igraph(graph, weights))
-      IGRAPH_ERROR("isolated vertex found in graph", IGRAPH_EINVAL);
+      IGRAPH_ERROR("Cannot convert igraph graph into walktrap format", IGRAPH_EINVAL);
   
   if (merges) {
     igraph_integer_t no;
@@ -159,7 +161,7 @@ int igraph_community_walktrap(const igraph_t *graph,
   
   delete G;
 
-  if (membership && modularity) {
+  if (membership) {
     long int m=igraph_vector_which_max(modularity);
     IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes, 
 						/*steps=*/ m,

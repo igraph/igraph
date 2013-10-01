@@ -16,6 +16,8 @@
  * checked).
  */
 
+#pragma clang diagnostic ignored "-Wsign-conversion"
+
 #include "amd_internal.h"
 
 GLOBAL size_t AMD_aat   /* returns nz in A+A' */

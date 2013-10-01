@@ -130,7 +130,7 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
     stop("Not a graph object")
   }
   cs <- degree(graph, ...)
-  hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities
+  hi <- hist(cs, -1:max(cs), plot=FALSE)$density
   if (!cumulative) {
     res <- hi
   } else {
@@ -188,7 +188,8 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
 get.shortest.paths <- function(graph, from, to=V(graph),
                                mode=c("out", "all", "in"),
                                weights=NULL,
-                               output=c("vpath", "epath", "both")) {
+                               output=c("vpath", "epath", "both"),
+                               predecessors=FALSE, inbound.edges=FALSE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -213,15 +214,24 @@ get.shortest.paths <- function(graph, from, to=V(graph),
   to <- as.igraph.vs(graph, to)-1
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_shortest_paths", graph,
-               as.igraph.vs(graph, from)-1, to, as.numeric(mode), as.numeric(length(to)),
-               weights, as.numeric(output), PACKAGE="igraph")
+               as.igraph.vs(graph, from)-1, to, as.numeric(mode),
+               as.numeric(length(to)), weights, as.numeric(output),
+               as.logical(predecessors), as.logical(inbound.edges), 
+               PACKAGE="igraph")
 
-  if (output !=2 ) {
-    res <- lapply(res, function(x) x+1)
-  } else {
-    res <- list(vpath=lapply(res$vpath, function(x) x+1),
-                epath=lapply(res$epath, function(x) x+1))
+  if (!is.null(res$vpath)) {
+    res$vpath <- lapply(res$vpath, function(x) x+1)
   }
+  if (!is.null(res$epath)) {
+    res$epath <- lapply(res$epath, function(x) x+1)
+  }
+  if (!is.null(res$predecessors)) {
+    res$predecessors <- res$predecessors + 1
+  }
+  if (!is.null(res$inbound_edges)) {
+    res$inbound_edges <- res$inbound_edges + 1
+  }
+
   res
 }
 
@@ -519,14 +529,14 @@ reciprocity <- function(graph, ignore.loops=TRUE,
         as.numeric(mode), PACKAGE="igraph")
 }
 
-rewire <- function(graph, mode="simple", niter=100) {
+rewire <- function(graph, mode=c("simple", "loops"), niter=100) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   
   mode <- igraph.match.arg(mode)
-  mode <- switch(mode, "simple"=0)
+  mode <- switch(mode, "simple"=0, "loops"=1)
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_rewire", graph, as.numeric(niter), as.numeric(mode),
@@ -576,7 +586,7 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
   id <- Diagonal(vg)
 
   ## solve it
-  ev <- solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
+  ev <- Matrix::solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
 
   if (rescale) {
     ev <- ev/sum(ev)
@@ -621,6 +631,9 @@ alpha.centrality.dense <- function(graph, nodes=V(graph), alpha=1,
   } else if (is.null(weights)) {
     ## weights == NULL, but there is no "weight" edge attribute
     attr <- NULL
+  } else if (is.character(weights) && length(weights)==1) {
+    ## name of an edge attribute, nothing to do
+    attr <- "weight"
   } else if (any(!is.na(weights))) {
     ## weights != NULL and weights != rep(NA, x)
     graph <- set.edge.attribute(graph, "weight", value=as.numeric(weights))
@@ -630,7 +643,7 @@ alpha.centrality.dense <- function(graph, nodes=V(graph), alpha=1,
     attr <- NULL
   }
 
-  d <- t(get.adjacency(graph, attr=attr))
+  d <- t(get.adjacency(graph, attr=attr, sparse=FALSE))
   if (!loops) {
     diag(d) <- 0
   }
@@ -661,11 +674,14 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
   } else if (is.null(weights)) {
     ## weights == NULL, but there is no "weight" edge attribute
     weights <- rep(1, ecount(graph))
+  } else if (is.character(weights) && length(weights)==1) {
+    weights <- get.edge.attribute(graph, weights)
   } else if (any(!is.na(weights))) {
     weights <- as.numeric(weights)
+  } else {
     ## weights != NULL, but weights == rep(NA, x)
     weights <- rep(1, ecount(graph))
-  }
+  } 
   
   el <- get.edgelist(graph, names=FALSE)
   M <- sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
@@ -680,7 +696,7 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
 
   ## Solve the equation
   M3 <- M2-alpha*M
-  r <- solve(M3, tol=tol, exo)
+  r <- Matrix::solve(M3, tol=tol, exo)
   
   r[ as.numeric(nodes)]
 }

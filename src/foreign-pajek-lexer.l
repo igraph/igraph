@@ -44,10 +44,15 @@
 
 */
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include "config.h"
 #include <stdlib.h>
-#include "foreign-pajek-parser.h"
 #include "foreign-pajek-header.h"
+#include "foreign-pajek-parser.h"
 #define YY_EXTRA_TYPE igraph_i_pajek_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 /* We assume that 'file' is 'stderr' here. */
