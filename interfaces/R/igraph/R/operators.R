@@ -266,7 +266,7 @@ graph.intersection <- function(..., byname="auto",
     }
   } else {
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-    res <- .Call("R_igraph_intersection", graphs,
+    res <- .Call("R_igraph_intersection", graphs, edgemaps,
                  PACKAGE="igraph")
     maps <- res$edgemaps
     res <- res$graph
