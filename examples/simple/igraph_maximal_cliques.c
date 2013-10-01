@@ -74,7 +74,7 @@ int main() {
     g=g2;
     
     /* Add a clique */
-    igraph_union(&g2, &g, &cli);
+    igraph_union(&g2, &g, &cli, /*edge_map1=*/ 0, /*edge_map2=*/ 0);
     igraph_destroy(&g);
     g=g2;
   }
