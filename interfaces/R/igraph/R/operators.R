@@ -35,7 +35,8 @@ rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
     newval <- getfun(graphs[[which]], name)
     if (!is.null(maps)) {
       idx <- rep(NA, newsize)
-      idx[ maps[[which]] + 1 ] <- seq_along(maps[[which]])
+      midx <- maps[[which]][ maps[[which]] >= 0 ]
+      idx[ midx + 1 ] <- seq_along(midx)
       newval <- newval[idx]
     }
     if (!is.null(newsize)) { length(newval) <- newsize }
@@ -204,7 +205,8 @@ graph.union <- function(..., byname="auto", keep.all.vertices=TRUE) {
   graph.union(x,y)
 }
 
-graph.intersection <- function(...) {
+graph.intersection <- function(..., byname="auto",
+                               keep.all.vertices=FALSE) {
 
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
     if (is.igraph(l)) list(l) else l
@@ -212,10 +214,76 @@ graph.intersection <- function(...) {
   if (!all(sapply(graphs, is.igraph))) {
     stop("Not a graph object")
   }
+  if (byname != "auto" && !is.logical(byname)) {
+    stop("`bynam' must be \"auto\", or logical")
+  }
+  nonamed <- sum(sapply(graphs, is.named))
+  if (byname == "auto") {
+    byname <- all(sapply(graphs, is.named))
+    if (nonamed != 0 && nonamed != length(graphs)) {
+      warning("Some, but not all graphs are named, not using vertex names")
+    }
+  } else if (byname && nonamed != 0 && nonamed != length(graphs)) {
+    stop("Some graphs are not named")
+  }
 
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_intersection", graphs,
-        PACKAGE="igraph")
+  edgemaps <- length(unlist(lapply(graphs, list.edge.attributes))) != 0
+
+  if (byname) {
+    allnames <- lapply(graphs, get.vertex.attribute, "name")
+    if (keep.all.vertices) {
+      uninames <- unique(unlist(allnames))
+      newgraphs <- lapply(graphs, function(g) {
+        g <- g + setdiff(uninames, V(g)$name)
+        permute.vertices(g, match(V(g)$name, uninames))
+      })
+    } else {
+      uninames <- Reduce(intersect, allnames)
+      newgraphs <- lapply(graphs, function(g) {
+        g <- g - setdiff(V(g)$name, uninames)
+        permute.vertices(g, match(V(g)$name, uninames))
+      })
+    }
+
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    res <- .Call("R_igraph_intersection", newgraphs, edgemaps,
+                 PACKAGE="igraph")
+    maps <- res$edgemaps
+    res <- res$graph
+
+    ## We might need to rename all attributes
+    graph.attributes(res) <- rename.attr.if.needed("g", graphs)
+    vertex.attributes(res) <- rename.attr.if.needed("v", graphs,
+                                                    vcount(res),
+                                                    ignore="name")
+    V(res)$name <- uninames
+
+    ## Edges are a bit more difficult, we need a mapping
+    if (edgemaps) {
+      edge.attributes(res) <- rename.attr.if.needed("e", graphs,
+                                                    ecount(res),
+                                                    maps=maps)
+    }
+  } else {
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    res <- .Call("R_igraph_intersection", graphs,
+                 PACKAGE="igraph")
+    maps <- res$edgemaps
+    res <- res$graph
+
+    ## We might need to rename all attributes
+    graph.attributes(res) <- rename.attr.if.needed("g", graphs)
+    vertex.attributes(res) <- rename.attr.if.needed("v", graphs,
+                                                    vcount(res))
+
+    ## Edges are a bit more difficult, we need a mapping
+    if (edgemaps) {
+      edge.attributes(res) <- rename.attr.if.needed("e", graphs,
+                                                    ecount(res),
+                                                    maps=maps)
+    }
+  }
+  res
 }
 
 "%s%" <- function(x,y) {

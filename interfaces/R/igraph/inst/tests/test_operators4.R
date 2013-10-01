@@ -188,3 +188,90 @@ j 10 20    j
   expect_that(df2$edges, equals(gg.e))
   
 })
+
+test_that("intersection of named graphs works", {
+
+  library(igraph)
+
+  g1 <- graph.ring(10)
+  g2 <- graph.ring(13)
+  V(g1)$name <- letters[V(g1)]
+  V(g2)$name <- letters[V(g2)]
+
+  g1$foo <- "bar"
+  E(g1)$weight <- 1:10
+  E(g2)$weight <- 13:1
+
+  V(g1)$a1 <- 1:10
+  V(g2)$a2 <- 11:23
+
+  E(g1)$b1 <- letters[1:10]
+  E(g2)$b2 <- letters[11:23]
+
+  g <- graph.intersection(g1, g2)
+
+  expect_that(sort(list.graph.attributes(g)),
+              equals(c("circular_1", "circular_2", "foo", "mutual_1",
+                       "mutual_2", "name_1", "name_2")))
+  expect_that(sort(list.vertex.attributes(g)),
+              equals(c("a1", "a2", "name")))
+  expect_that(sort(list.edge.attributes(g)),
+              equals(c("b1", "b2", "weight_1", "weight_2")))
+
+  df1 <- get.data.frame(g, what="both")
+
+  g.e <- read.table(stringsAsFactors=FALSE, textConnection("
+  from to weight_1 weight_2 b1 b2
+1    i  j        9        5  i  s
+2    h  i        8        6  h  r
+3    g  h        7        7  g  q
+4    f  g        6        8  f  p
+5    e  f        5        9  e  o
+6    d  e        4       10  d  n
+7    c  d        3       11  c  m
+8    b  c        2       12  b  l
+9    a  b        1       13  a  k
+"))
+  rownames(df1$edges) <- rownames(df1$edges)
+  expect_that(df1$edges, equals(g.e))
+
+  g.v <- read.table(stringsAsFactors=FALSE, textConnection("
+  a1 a2 name
+a  1 11    a
+b  2 12    b
+c  3 13    c
+d  4 14    d
+e  5 15    e
+f  6 16    f
+g  7 17    g
+h  8 18    h
+i  9 19    i
+j 10 20    j
+"))
+  expect_that(df1$vertices, equals(g.v))
+
+  gg <- graph.intersection(g1, g2, keep.all.vertices=TRUE)
+
+  df2 <- get.data.frame(gg, what="both")
+
+  rownames(df2$edges) <- rownames(df2$edges)
+  expect_that(df2$edges, equals(g.e))
+
+  gg.v <- read.table(stringsAsFactors=FALSE, textConnection("
+  a1 a2 name
+a  1 11    a
+b  2 12    b
+c  3 13    c
+d  4 14    d
+e  5 15    e
+f  6 16    f
+g  7 17    g
+h  8 18    h
+i  9 19    i
+j 10 20    j
+k NA 21    k
+l NA 22    l
+m NA 23    m
+"))
+  expect_that(df2$vertices, equals(gg.v))
+})
