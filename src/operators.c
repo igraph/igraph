@@ -533,7 +533,7 @@ int igraph_intersection_many(igraph_t *res,
     for (i=0; i<no_of_graphs; i++) {
       VECTOR(*edgemaps)[i]=igraph_Calloc(1, igraph_vector_t);
       if (!VECTOR(*edgemaps)[i]) {
-	IGRAPH_ERROR("Cannot union graphs", IGRAPH_ENOMEM);
+	IGRAPH_ERROR("Cannot intersect graphs", IGRAPH_ENOMEM);
       }
       IGRAPH_CHECK(igraph_vector_init(VECTOR(*edgemaps)[i],
 				      VECTOR(no_edges)[i]));
@@ -551,7 +551,7 @@ int igraph_intersection_many(igraph_t *res,
     VECTOR(edge_vects)[i]=igraph_Calloc(1, igraph_vector_t);
     VECTOR(order_vects)[i]=igraph_Calloc(1, igraph_vector_long_t);
     if (! VECTOR(edge_vects)[i] || ! VECTOR(order_vects)[i]) { 
-      IGRAPH_ERROR("Cannot union graphs", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot intersect graphs", IGRAPH_ENOMEM);
     }
     IGRAPH_CHECK(igraph_vector_init(VECTOR(edge_vects)[i],
 				    2 * VECTOR(no_edges)[i]));
