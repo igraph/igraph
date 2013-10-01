@@ -499,6 +499,7 @@ int igraph_intersection_many(igraph_t *res,
   long int i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto=-1;
   igraph_vector_long_t no_edges;
   igraph_bool_t allne= no_of_graphs == 0 ? 0 : 1, allsame=0;
+  long int idx=0;
   
   /* Check directedness */
   if (no_of_graphs != 0) {
@@ -537,6 +538,7 @@ int igraph_intersection_many(igraph_t *res,
       }
       IGRAPH_CHECK(igraph_vector_init(VECTOR(*edgemaps)[i],
 				      VECTOR(no_edges)[i]));
+      igraph_vector_fill(VECTOR(*edgemaps)[i], -1);
     }
   }
 
@@ -599,8 +601,7 @@ int igraph_intersection_many(igraph_t *res,
     }
     
     /* OK, now remove all elements from the tail(s) that are bigger
-       than the smallest tail element. Remove the smallest tail
-       element as well, if present. */
+       than the smallest tail element. */
     for (j=0, allsame=1; j<no_of_graphs; j++) { 
       long int from=-1, to=-1;
       while (1) {
@@ -608,18 +609,17 @@ int igraph_intersection_many(igraph_t *res,
 	igraph_vector_t *ev=VECTOR(edge_vects)[j];
 	from=VECTOR(*ev)[2*edge];
 	to=VECTOR(*ev)[2*edge+1];
-	if (from > tailfrom || (from==tailfrom && to >= tailto)) {
+	if (from > tailfrom || (from==tailfrom && to > tailto)) {
 	  igraph_vector_long_pop_back(VECTOR(order_vects)[j]);
-	  if (igraph_vector_long_empty(VECTOR(order_vects)[j])) { 
-	    allne=0; 
+	  if (igraph_vector_long_empty(VECTOR(order_vects)[j])) {
+	    allne=0;
 	    break;
 	  }
-	  if (from == tailfrom && to == tailto) { break; }
 	} else {
 	  break;
 	}
       }
-      if (from != tailfrom ||to != tailto) { allsame=0; }
+      if (from != tailfrom || to != tailto) { allsame=0; }
     } 
 
     /* Add the edge, if the smallest tail element was present 
@@ -627,8 +627,31 @@ int igraph_intersection_many(igraph_t *res,
     if (allsame) { 
       IGRAPH_CHECK(igraph_vector_push_back(&edges, tailfrom));
       IGRAPH_CHECK(igraph_vector_push_back(&edges, tailto));
-    }    
-  }
+    }
+
+    /* Drop edges matching the smalles tail elements
+       from the order vectors, build edge maps */
+    if (allne) {
+      for (j=0; j<no_of_graphs; j++) {
+	long int edge=igraph_vector_long_tail(VECTOR(order_vects)[j]);
+	igraph_vector_t *ev=VECTOR(edge_vects)[j];
+	long int from=VECTOR(*ev)[2*edge];
+	long int to=VECTOR(*ev)[2*edge+1];
+	if (from == tailfrom && to == tailto) {
+	  igraph_vector_long_pop_back(VECTOR(order_vects)[j]);
+	  if (igraph_vector_long_empty(VECTOR(order_vects)[j])) {
+	    allne=0;
+	  }
+	  if (edgemaps && allsame) {
+	    igraph_vector_t *map=VECTOR(*edgemaps)[j];
+	    VECTOR(*map)[edge]=idx;
+	  }
+	}
+      }
+      if (allsame) { idx++; }
+    }
+
+  } /* while allne */
 
   if (no_of_graphs > 0) {
     igraph_i_union_many_free2(&order_vects);
