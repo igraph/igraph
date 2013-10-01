@@ -619,7 +619,7 @@ int igraph_intersection_many(igraph_t *res,
 	  break;
 	}
       }
-      if (!allne || from != tailfrom ||to != tailto) { allsame=0; }
+      if (from != tailfrom ||to != tailto) { allsame=0; }
     } 
 
     /* Add the edge, if the smallest tail element was present 
