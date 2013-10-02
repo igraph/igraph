@@ -224,15 +224,47 @@ graph.intersection <- function(..., byname="auto",
   graph.intersection(x,y)
 }
 
-graph.difference <- function(big, small) {
+graph.difference <- function(big, small, byname="auto") {
 
   if (!is.igraph(big) || !is.igraph(small)) {
     stop("argument is not a graph")
   }
+  if (byname != "auto" && !is.logical(byname)) {
+    stop("`bynam' must be \"auto\", or logical")
+  }
+  nonamed <- is.named(big) + is.named(small)
+  if (byname == "auto") {
+    byname <- nonamed == 2
+    if (nonamed == 1) {
+      warning("One, but not both graphs are named, not using vertex names")
+    }
+  } else if (byname && nonamed != 2) {
+    stop("Some graphs are not named")
+  }
   
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_difference", big, small,
-        PACKAGE="igraph")
+  if (byname) {
+    bnames <- V(big)$name
+    snames <- V(small)$name
+    if (any(! snames %in% bnames)) {
+      small <- small - setdiff(snames, bnames)
+      snames <- V(small)$name
+    }
+    perm <- match(bnames, snames)
+    if (any(is.na(perm))) {
+      perm[is.na(perm)] <- seq(from=vcount(small)+1, to=vcount(big))
+    }
+    big <- permute.vertices(big, perm)
+
+    on.exit(.Call("R_igraph_finalizer", PACKAGE="igraph"))
+    res <- .Call("R_igraph_difference", big, small,
+                 PACKAGE="igraph")
+    permute.vertices(res, match(V(res)$name, bnames))
+
+  } else {
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    .Call("R_igraph_difference", big, small,
+          PACKAGE="igraph")
+  }
 }
     
 "%m%" <- function(x,y) {

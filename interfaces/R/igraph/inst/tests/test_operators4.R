@@ -275,3 +275,51 @@ m NA 23    m
 "))
   expect_that(df2$vertices, equals(gg.v))
 })
+
+test_that("difference of named graphs works", {
+
+  library(igraph)
+
+  g1 <- graph.ring(10)
+  g2 <- graph.star(11, center=11, mode="undirected")
+  V(g1)$name <- letters[1:10]
+  V(g2)$name <- letters[1:11]
+  g <- g1 %u% g2
+
+  sg <- graph.ring(4)
+  V(sg)$name <- letters[c(1,2,3,11)]
+
+  df1 <- get.data.frame(g - sg, what="both")
+
+  t1.e <- read.table(stringsAsFactors=FALSE,
+                                           textConnection("
+   from to
+1     a  j
+2     b  k
+3     c  d
+4     j  k
+5     i  k
+6     h  k
+7     g  k
+8     f  k
+9     e  k
+10    d  k
+11    d  e
+12    e  f
+13    f  g
+14    g  h
+15    h  i
+16    i  j
+"))
+  rownames(df1$edges) <- rownames(df1$edges)
+  expect_that(df1$edges, equals(t1.e))
+
+  expect_that(df1$vertices, equals(data.frame(row.names=letters[1:11],
+                                              name=letters[1:11],
+                                              stringsAsFactors=FALSE)))
+
+  gg <- sg - g
+
+  expect_that(ecount(gg), equals(0))
+  expect_that(V(gg)$name, equals(letters[c(1:3,11)]))
+})
