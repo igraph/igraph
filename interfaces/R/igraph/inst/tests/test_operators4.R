@@ -39,6 +39,18 @@ test_that("disjoint union works for named graphs", {
 
 })
 
+test_that("disjoint union gives warning for non-unique vertex names", {
+
+  library(igraph)
+
+  g1 <- graph.ring(5); V(g1)$name <- letters[1:5]
+  g2 <- graph.ring(5); V(g2)$name <- letters[5:9]
+  
+  expect_that(graph.disjoint.union(g1, g2),
+              gives_warning("Duplicate vertex names in disjoint union"))
+})
+  
+
 test_that("union of unnamed graphs works", {
 
   library(igraph)

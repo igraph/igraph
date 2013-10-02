@@ -27,7 +27,7 @@ graph.disjoint.union(\dots)
 
   Note that if both graphs have vertex names (ie. a \code{name} vertex
   attribute), then the concatenated vertex names might be non-unique
-  in the result.
+  in the result. A warning is given if this happens.
   
   An error is generated if some input graphs are directed and others are
   undirected.

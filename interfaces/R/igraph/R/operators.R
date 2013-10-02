@@ -96,6 +96,10 @@ graph.disjoint.union <- function(...) {
   }
   vertex.attributes(res) <- attr
 
+  if ("name" %in% names(attr) && any(duplicated(attr$name))) {
+    warning("Duplicate vertex names in disjoint union")
+  }
+  
   ## Edge attributes
   attr <- list()
   ec <- sapply(graphs, ecount)
