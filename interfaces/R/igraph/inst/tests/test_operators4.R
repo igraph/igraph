@@ -165,7 +165,7 @@ test_that("intersection of named graphs works", {
   E(g1)$b1 <- letters[1:10]
   E(g2)$b2 <- letters[11:23]
 
-  g <- graph.intersection(g1, g2)
+  g <- graph.intersection(g1, g2, keep.all.vertices=FALSE)
 
   expect_that(sort(list.graph.attributes(g)),
               equals(c("circular_1", "circular_2", "foo", "mutual_1",

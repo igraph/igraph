@@ -214,7 +214,7 @@ graph.union <- function(..., byname="auto") {
 }
 
 graph.intersection <- function(..., byname="auto",
-                               keep.all.vertices=FALSE) {
+                               keep.all.vertices=TRUE) {
   .igraph.graph.union.or.intersection("R_igraph_intersection", ...,
                                       byname=byname,
                                       keep.all.vertices=keep.all.vertices)
