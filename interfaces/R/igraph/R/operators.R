@@ -204,9 +204,9 @@ graph.disjoint.union <- function(...) {
   res
 }
 
-graph.union <- function(..., byname="auto", keep.all.vertices=TRUE) {
+graph.union <- function(..., byname="auto") {
   .igraph.graph.union.or.intersection("R_igraph_union", ..., byname=byname,
-                                      keep.all.vertices=keep.all.vertices)
+                                      keep.all.vertices=TRUE)
 }
 
 "%u%" <- function(x,y) {

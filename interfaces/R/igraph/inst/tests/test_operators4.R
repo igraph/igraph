@@ -104,19 +104,7 @@ test_that("union of named graphs works", {
   expect_that(sort(list.edge.attributes(g)),
               equals(c("b1", "b2", "weight_1", "weight_2")))
   
-  gg <- graph.union(g1, g2, keep.all.vertices=FALSE)
-
-  expect_that(sort(list.graph.attributes(gg)),
-              equals(c("circular_1", "circular_2", "foo",
-                       "mutual_1", "mutual_2", "name_1", "name_2")))
-  expect_that(sort(list.vertex.attributes(gg)),
-              equals(c("a1", "a2", "name")))
-  expect_that(sort(list.edge.attributes(gg)),
-              equals(c("b1", "b2", "weight_1", "weight_2")))
-  expect_that(V(gg)$name, equals(letters[1:10]))
-
   df1 <- get.data.frame(g, what="both")
-  df2 <- get.data.frame(gg, what="both")
 
   g.v <- read.table(stringsAsFactors=FALSE, textConnection("
   a1 a2 name
@@ -155,37 +143,6 @@ m NA 23    m
 "))
   rownames(df1$edges) <- rownames(df1$edges)
   expect_that(df1$edges, equals(g.e))
-
-  gg.v <- read.table(stringsAsFactors=FALSE, textConnection("
-  a1 a2 name
-a  1 11    a
-b  2 12    b
-c  3 13    c
-d  4 14    d
-e  5 15    e
-f  6 16    f
-g  7 17    g
-h  8 18    h
-i  9 19    i
-j 10 20    j
-"))
-  expect_that(df2$vertices, equals(gg.v))
-
-  gg.e <- read.table(stringsAsFactors=FALSE, textConnection("
-   from to weight_1 weight_2 b1   b2
-1     i  j        9        5  i    s
-2     h  i        8        6  h    r
-3     g  h        7        7  g    q
-4     f  g        6        8  f    p
-5     e  f        5        9  e    o
-6     d  e        4       10  d    n
-7     c  d        3       11  c    m
-8     b  c        2       12  b    l
-9     a  j       10       NA  j   NA
-10    a  b        1       13  a    k
-"))
-  rownames(df2$edges) <- rownames(df2$edges)
-  expect_that(df2$edges, equals(gg.e))
   
 })
 
