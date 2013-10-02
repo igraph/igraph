@@ -19,7 +19,7 @@ test_that("disjoint union works for named graphs", {
   E(g1)$b1 <- 1:10
   E(g2)$b2 <- 11:20
   
-  g <- g1 + g2
+  g <- graph.disjoint.union(g1, g2)
 
   expect_that(sort(list.graph.attributes(g)),
               equals(c("circular_1", "circular_2", "foo", "mutual_1",

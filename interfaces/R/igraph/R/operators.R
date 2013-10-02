@@ -333,7 +333,10 @@ path <- function(...) {
     e1 <- e2
     e2 <- tmp
   }
-  if (is.igraph(e2)) {
+  if (is.igraph(e2) && is.named(e1) && is.named(e2)) {
+    ## Union of graphs
+    res <- graph.union(e1, e2)
+  } else if (is.igraph(e2)) {
     ## Disjoint union of graphs
     res <- graph.disjoint.union(e1,e2)
 
