@@ -183,6 +183,18 @@ graph.disjoint.union <- function(...) {
                                                     maps=maps)
     }
   } else {
+
+    if (!keep.all.vertices) {
+      minsize <- min(sapply(graphs, vcount))
+      graphs <- lapply(graphs, function(g) {
+        vc <- vcount(g)
+        if (vc > minsize) {
+          g <- g - (minsize+1):vc
+        }
+        g
+      })
+    }
+
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call(call, graphs, edgemaps, PACKAGE="igraph")
     maps <- res$edgemaps
