@@ -142,7 +142,7 @@ graph.disjoint.union <- function(...) {
     if (nonamed != 0 && nonamed != length(graphs)) {
       warning("Some, but not all graphs are named, not using vertex names")
     }
-  } else if (byname && nonamed != 0 && nonamed != length(graphs)) {
+  } else if (byname && nonamed != length(graphs)) {
     stop("Some graphs are not named")
   }
 
