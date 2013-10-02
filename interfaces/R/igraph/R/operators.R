@@ -297,14 +297,59 @@ graph.complementer <- function(graph, loops=FALSE) {
         PACKAGE="igraph")
 }
 
-graph.compose <- function(g1, g2) {
+graph.compose <- function(g1, g2, byname="auto") {
 
   if (!is.igraph(g1) || !is.igraph(g2)) {
     stop("Not a graph object")
   }
+
+  if (byname != "auto" && !is.logical(byname)) {
+    stop("`byname' must be \"auto\", or logical")
+  }
+  nonamed <- is.named(g1) + is.named(g2)
+  if (byname == "auto") {
+    byname <- nonamed == 2
+    if (nonamed == 1) {
+      warning("One, but not both graphs are named, not using vertex names")
+    }
+  } else if (byname && nonamed != 2) {
+    stop("Some graphs are not named")
+  }
+
+  if (byname) {
+    uninames <- unique(c(V(g1)$name, V(g2)$name))
+    if (vcount(g1) < length(uninames)) {
+      g1 <- g1 + setdiff(uninames, V(g1)$name)
+    }
+    if (vcount(g2) < length(uninames)) {
+      g2 <- g2 + setdiff(uninames, V(g2)$name)
+    }
+    if (any(uninames != V(g1)$name)) {
+      g1 <- permute.vertices(g1, match(V(g1)$name, uninames))
+    }
+    if (any(uninames != V(g2)$name)) {
+      g2 <- permute.vertices(g2, match(V(g2)$name, uninames))
+    }
+  }
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_compose", g1, g2,
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_compose", g1, g2,
+               PACKAGE="igraph")
+
+  ## We might need to rename all attributes
+  graphs <- list(g1, g2)
+  graph.attributes(res) <- rename.attr.if.needed("g", graphs)
+
+  if (byname) {
+    vertex.attributes(res) <-
+      rename.attr.if.needed("v", graphs, vcount(res), ignore="name")
+    V(res)$name <- uninames
+  } else {
+    vertex.attributes(res) <- rename.attr.if.needed("v", graphs,
+                                                    vcount(res))
+  }
+
+  res
 }
 
 "%c%" <- function(x,y) {

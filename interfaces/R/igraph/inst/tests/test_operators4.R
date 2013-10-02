@@ -292,3 +292,35 @@ test_that("difference of named graphs works", {
   expect_that(ecount(gg), equals(0))
   expect_that(V(gg)$name, equals(letters[c(1:3,11)]))
 })
+
+test_that("compose works for named graphs", {
+
+  library(igraph)
+
+  g1 <- graph.formula( A-B:D:E, B-C:D, C-D, D-E )
+  g2 <- graph.formula( A-B-E-A )
+
+  V(g1)$bar1 <- seq_len(vcount(g1))
+  V(g2)$bar2 <- seq_len(vcount(g2))
+  V(g1)$foo <- letters[seq_len(vcount(g1))]
+  V(g2)$foo <- letters[seq_len(vcount(g2))]
+
+  E(g1)$bar1 <- seq_len(ecount(g1))
+  E(g2)$bar2 <- seq_len(ecount(g2))
+  E(g1)$foo <- letters[seq_len(ecount(g1))]
+  E(g2)$foo <- letters[seq_len(ecount(g2))]
+
+  g <- graph.compose(g1, g2)
+  df <- get.data.frame(g, what="both")
+
+  df.v <- read.table(stringsAsFactors=FALSE, textConnection("
+  bar1 foo_1 foo_2 bar2 name
+A    1     a     a    1    A
+B    2     b     b    2    B
+D    3     c    NA   NA    D
+E    4     d     c    3    E
+C    5     e    NA   NA    C
+"))
+  expect_that(df$vertices, equals(df.v))
+
+})
