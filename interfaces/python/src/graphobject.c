@@ -9134,7 +9134,7 @@ PyObject *igraphmodule_Graph_union(igraphmodule_GraphObject * self,
     Py_DECREF(it);
 
     /* Create union */
-    if (igraph_union_many(&g, &gs)) {
+    if (igraph_union_many(&g, &gs, /*edgemaps=*/ 0)) {
       igraph_vector_ptr_destroy(&gs);
       igraphmodule_handle_igraph_error();
       return NULL;
@@ -9150,7 +9150,8 @@ PyObject *igraphmodule_Graph_union(igraphmodule_GraphObject * self,
     }
     o = (igraphmodule_GraphObject *) other;
 
-    if (igraph_union(&g, &self->g, &o->g)) {
+    if (igraph_union(&g, &self->g, &o->g, /*edge_map1=*/ 0, 
+		     /*edge_map2=*/ 0)) {
       igraphmodule_handle_igraph_error();
       return NULL;
     }
@@ -9196,7 +9197,7 @@ PyObject *igraphmodule_Graph_intersection(igraphmodule_GraphObject * self,
     Py_DECREF(it);
 
     /* Create union */
-    if (igraph_intersection_many(&g, &gs)) {
+    if (igraph_intersection_many(&g, &gs, /*edgemaps=*/ 0)) {
       igraph_vector_ptr_destroy(&gs);
       igraphmodule_handle_igraph_error();
       return NULL;
@@ -9212,7 +9213,8 @@ PyObject *igraphmodule_Graph_intersection(igraphmodule_GraphObject * self,
     }
     o = (igraphmodule_GraphObject *) other;
 
-    if (igraph_intersection(&g, &self->g, &o->g)) {
+    if (igraph_intersection(&g, &self->g, &o->g, /*edge_map1=*/ 0, 
+			    /*edge_map2=*/ 0)) {
       igraphmodule_handle_igraph_error();
       return NULL;
     }
@@ -9315,7 +9317,8 @@ PyObject *igraphmodule_Graph_compose(igraphmodule_GraphObject * self,
   }
   o = (igraphmodule_GraphObject *) other;
 
-  if (igraph_compose(&g, &self->g, &o->g)) {
+  if (igraph_compose(&g, &self->g, &o->g, /*edge_map1=*/ 0, 
+		     /*edge_map2=*/ 0)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
