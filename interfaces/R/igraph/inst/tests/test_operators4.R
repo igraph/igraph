@@ -323,4 +323,26 @@ C    5     e    NA   NA    C
 "))
   expect_that(df$vertices, equals(df.v))
 
+  df.e <- read.table(stringsAsFactors=FALSE, textConnection("
+   from to bar1 foo_1 foo_2 bar2
+1     A  B    3     c     c    3
+2     A  A    3     c     b    2
+3     A  E    1     a     c    3
+4     A  A    1     a     a    1
+5     B  E    1     a     b    2
+6     B  B    1     a     a    1
+7     B  D    6     f     c    3
+8     A  D    6     f     b    2
+9     D  E    4     d     c    3
+10    A  D    4     d     a    1
+11    D  E    2     b     b    2
+12    B  D    2     b     a    1
+13    E  E    3     c     b    2
+14    B  E    3     c     a    1
+15    E  C    5     e     c    3
+16    A  C    5     e     a    1
+"))
+  rownames(df$edges) <- rownames(df$edges)
+  expect_that(df$edges, equals(df.e))
+
 })

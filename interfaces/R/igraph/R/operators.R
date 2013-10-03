@@ -21,7 +21,7 @@
 ###################################################################
 
 rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
-                                  ignore=character()) {
+                                  maps2=NULL, ignore=character()) {
   listfun <- switch(type, "g"=list.graph.attributes,
                     "v"=list.vertex.attributes, "e"=list.edge.attributes,
                     stop("Internal igraph error"))
@@ -38,6 +38,9 @@ rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
       midx <- maps[[which]][ maps[[which]] >= 0 ]
       idx[ midx + 1 ] <- seq_along(midx)
       newval <- newval[idx]
+    }
+    if (!is.null(maps2)) {
+      newval <- newval[ maps2[[which]] + 1 ]
     }
     if (!is.null(newsize)) { length(newval) <- newsize }
     newval
@@ -332,9 +335,14 @@ graph.compose <- function(g1, g2, byname="auto") {
     }
   }
 
+  edgemaps <- (length(list.edge.attributes(g1)) != 0 ||
+               length(list.edge.attributes(g2)) != 0)
+
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_compose", g1, g2,
+  res <- .Call("R_igraph_compose", g1, g2, edgemaps,
                PACKAGE="igraph")
+  maps <- list(res$edge_map1, res$edge_map2)
+  res <- res$graph
 
   ## We might need to rename all attributes
   graphs <- list(g1, g2)
@@ -347,6 +355,11 @@ graph.compose <- function(g1, g2, byname="auto") {
   } else {
     vertex.attributes(res) <- rename.attr.if.needed("v", graphs,
                                                     vcount(res))
+  }
+
+  if (edgemaps) {
+    edge.attributes(res) <- rename.attr.if.needed("e", graphs, ecount(res),
+                                                  maps2=maps)
   }
 
   res
