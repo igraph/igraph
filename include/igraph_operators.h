@@ -64,7 +64,8 @@ int igraph_difference(igraph_t *res,
 		      const igraph_t *orig, const igraph_t *sub);
 int igraph_complementer(igraph_t *res, const igraph_t *graph, 
 			igraph_bool_t loops);
-int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2);
+int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
+		   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
 
 __END_DECLS
 
