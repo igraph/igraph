@@ -27,7 +27,7 @@ graph.intersection(\dots, byname = "auto", keep.all.vertices = TRUE)
   graphs are named), then the operation is performed on symbolic vertex
   names instead of the internal numeric vertex ids.
 
-  \code{graph.intersection} keeps the attributes of both graphs. All
+  \code{graph.intersection} keeps the attributes of all graphs. All
   graph, vertex and edge attributes are copied to the result. If an
   attribute is present in multiple graphs and would result a name clash,
   then this attribute is renamed by adding suffixes: _1, _2, etc.
