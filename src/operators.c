@@ -1185,7 +1185,7 @@ int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
 	IGRAPH_CHECK(igraph_incident(g2, &neis2, (igraph_integer_t) v1,
 				     IGRAPH_OUT));
       } else {
-	break;
+	continue;
       }
       while (!igraph_vector_empty(&neis2)) {
 	long int con2=igraph_vector_pop_back(&neis2);
