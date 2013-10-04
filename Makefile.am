@@ -11,7 +11,12 @@ EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) \
 	examples $(top_srcdir)/interfaces/R/Makefile.in \
 	$(top_srcdir)/interfaces/R/DESCRIPTION.in \
 	$(top_srcdir)/interfaces/R/configure.in.in \
-	optional
+	$(wildcard $(top_srcdir)/optional/glpk/*.{inc,c,h})      \
+	$(wildcard $(top_srcdir)/optional/glpk/{README,COPYING}) \
+	$(wildcard $(top_srcdir)/optional/glpk/amd/*.{c,h})      \
+	$(wildcard $(top_srcdir)/optional/glpk/amd/{README,COPYING}) \
+	$(wildcard $(top_srcdir)/optional/glpk/colamd/*.{c,h}) \
+	$(wildcard $(top_srcdir)/optional/glpk/colamd/{README,COPYING})
 
 install-exec-hook:
 	if test -f $(top_builddir)/src/.libs/cygigraph-0.dll ; \
