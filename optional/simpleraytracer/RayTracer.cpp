@@ -3,6 +3,7 @@
 #include <fstream>
 #include <iostream>
 
+namespace igraph {
 
 RayTracer::RayTracer() : mBackgroundColor(0,0,0,0), mAmbientColor(0,0,0), mEyePoint(0,0,0), mSpecularColor(1,1,1)
 {
@@ -250,3 +251,5 @@ void RayTracer::AmbientIntensity(double vAmbientIntensity)
 {
 	mAmbientIntensity = unit_limiter(vAmbientIntensity);
 }
+
+} // namespace igraph

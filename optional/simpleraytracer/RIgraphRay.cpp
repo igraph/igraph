@@ -34,6 +34,8 @@
 #include <Rinternals.h>
 #include <Rdefines.h>
 
+using namespace igraph;
+
 extern "C" {
 
 SEXP R_igraph_getsphere(SEXP pos, SEXP radius, SEXP color, SEXP bgcolor,

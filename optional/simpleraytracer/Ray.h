@@ -7,6 +7,8 @@
 #include "RayVector.h"
 #include "Point.h"
 
+namespace igraph {
+
 class Ray
 {
 public:
@@ -25,5 +27,7 @@ private:
 	Vector mDirection;
 	Point mOrigin;
 };
+
+} // namespace igraph
 
 #endif

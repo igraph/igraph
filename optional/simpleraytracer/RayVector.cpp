@@ -1,6 +1,8 @@
 #include "RayVector.h"
 #include <math.h>
 
+namespace igraph {
+
 Vector::Vector()
 {
 	mI = mJ = mK = 0.0;
@@ -122,3 +124,5 @@ double Vector::Magnitude() const
 {
 	return sqrt(mI*mI + mJ*mJ + mK*mK);
 }
+
+} // namespace igraph
