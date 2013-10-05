@@ -1,4 +1,4 @@
-AC_INIT(igraph, 0.7, csardi.gabor@gmail.com)
+AC_INIT(igraph, esyscmd([tr -d '\n' < VERSION]), csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS([config.h])
@@ -299,7 +299,7 @@ if test "$use_gprof" = "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h include/igraph_threading.h])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])

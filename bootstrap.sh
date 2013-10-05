@@ -1,4 +1,10 @@
 #! /bin/sh
+
+## Find out our version number, need git for this
+printf "Finding out version number/string... "
+git describe HEAD --tags | rev | sed 's/g-/./' | sed 's/-/+/' | rev > VERSION
+cat VERSION
+
 for i in glibtoolize libtoolize; do
   LIBTOOLIZE=`which $i` && break
 done
@@ -13,5 +19,3 @@ $LIBTOOLIZE --force --copy
 autoheader
 automake --add-missing --copy
 autoconf
-cd interfaces/R && autoheader && autoconf
-cd -

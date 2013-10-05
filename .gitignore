@@ -2,6 +2,7 @@
 *.pyc
 *.so
 INSTALL
+/VERSION
 /Makefile
 /src/Makefile
 /doc/Makefile
@@ -32,7 +33,6 @@ debian/Makefile
 debian/Makefile.in
 interfaces/Makefile
 interfaces/Makefile.in
-interfaces/R/DESCRIPTION
 interfaces/R/Makefile
 interfaces/R/Makefile.in
 interfaces/R/autom4te.cache

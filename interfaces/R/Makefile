@@ -1,7 +1,21 @@
 
+VERSION=$(shell ./convertversion.sh ../../VERSION)
 DATAVERSION=0.1
+top_srcdir=../..
 
 all: igraph_$(VERSION).tar.gz igraphdata_$(DATAVERSION).tar.gz
+
+YACC=bison -d
+LEX=flex
+
+%.c: %.y
+	$(YACC) $<
+	mv -f y.tab.c $@
+	mv -f y.tab.h $(@:.c=.h)
+
+%.c: %.l
+	$(LEX) $< $@
+	mv -f lex.yy.r $@
 
 DATAFILES = $(wildcard igraphdata/data/*.rda) igraphdata/DESCRIPTION \
 	igraphdata/LICENSE $(wildcard igraphdata/man/*.Rd) \
@@ -14,21 +28,11 @@ RFILES = $(wildcard igraph/R/*.R) $(wildcard igraph/man/*.Rd) \
 	igraph/src/config.h igraph/src/config.h.in igraph/src/Makevars.in \
 	igraph/src/Makevars.win igraph/DESCRIPTION \
 	igraph/NAMESPACE igraph/R/auto.R igraph/src/rinterface.c \
-	igraph/configure igraph/configure.in igraph/src/rinterface.h arpack/stamp
+	igraph/src/rinterface.h arpack/stamp
 
 igraph/src/config.h: src/config.h
 	cp $< $@
-igraph/src/config.h.in: src/config.h.in
-	cp $< $@
 igraph/src/Makevars.in: src/Makevars.in
-	cp $< $@
-igraph/src/Makevars.win: src/Makevars.win
-	cp $< $@
-igraph/DESCRIPTION: DESCRIPTION
-	cp $< $@
-igraph/configure: configure
-	cp $< $@
-igraph/configure.in: configure.in
 	cp $< $@
 igraph/src/rinterface.h: src/rinterface.h
 	cp $< $@
@@ -72,7 +76,7 @@ SRCFILES_ORIGPLACE = $(wildcard $(top_srcdir)/src/*.c) \
 	$(wildcard $(top_srcdir)/src/*.hh) \
 	$(wildcard $(top_srcdir)/src/*.cpp) \
 	$(wildcard $(top_srcdir)/src/*.pmt) \
-	$(YFILES:.y=.c) $(YFILES:.y=.h) $(LFILES:.l=.c)
+	$(YFILES) $(LFILES)
 
 SRCFILES_ORIGPLACE6 =   $(wildcard $(top_srcdir)/include/*.h)
 
@@ -113,7 +117,11 @@ SRCFILES = $(patsubst $(top_srcdir)/src/%,igraph/src/%,$(SRCFILES_ORIGPLACE)) \
 	$(patsubst $(top_srcdir)/optional/simpleraytracer/%,igraph/src/%,$(SRCFILES_ORIGPLACE15)) \
 	$(patsubst $(top_srcdir)/optional/simpleraytracer/%,igraph/src/%,$(SRCFILES_ORIGPLACE16)) \
 	$(patsubst $(top_srcdir)/src/plfit/%,igraph/src/plfit/%,$(SRCFILES_ORIGPLACE17)) \
-	$(patsubst $(top_srcdir)/src/plfit/%,igraph/src/%,$(SRCFILES_ORIGPLACE18))
+	$(patsubst $(top_srcdir)/src/plfit/%,igraph/src/%,$(SRCFILES_ORIGPLACE18)) \
+	$(patsubst $(top_srcdir)/src/%,igraph/src/%,$(YFILES:.y=.c)) \
+	$(patsubst $(top_srcdir)/src/%,igraph/src/%,$(YFILES:.y=.h)) \
+	$(patsubst $(top_srcdir)/src/%,igraph/src/%,$(LFILES:.l=.c)) \
+	igraph/src/igraph_threading.h igraph/src/igraph_version.h
 
 igraph/src/cs/%.h: $(top_srcdir)/src/cs/%.h
 	cp $(top_srcdir)/src/cs/$(@F) igraph/src/cs/$(@F)
@@ -142,6 +150,10 @@ igraph/src/%.pmt: $(top_srcdir)/src/%.pmt
 	cp $(top_srcdir)/src/$(@F) $@
 igraph/src/%.h: $(top_srcdir)/src/%.h
 	cp $(top_srcdir)/src/$(@F) $@
+igraph/src/%.y: $(top_srcdir)/src/%.y
+	cp $(top_srcdir)/src/$(@F) $@
+igraph/src/%.l: $(top_srcdir)/src/%.l
+	cp $(top_srcdir)/src/$(@F) $@
 
 igraph/src/%.c: $(top_srcdir)/src/cs/%.c
 	cp $(top_srcdir)/src/cs/$(@F) igraph/src/$(@F)
@@ -160,6 +172,12 @@ igraph/src/%.h: $(top_srcdir)/optional/simpleraytracer/%.h
 igraph/src/%.h: $(top_srcdir)/include/%.h
 	cp $(top_srcdir)/include/$(@F) $@
 
+igraph/src/igraph_threading.h: $(top_srcdir)/include/igraph_threading.h.in
+	sed 's/@HAVE_TLS@/0/g' $< >$@
+
+igraph/src/igraph_version.h: $(top_srcdir)/include/igraph_version.h.in
+	sed 's/@VERSION@/'$(VERSION)'/g' $< >$@
+
 DIRS: 
 	mkdir -p igraph/src
 	mkdir -p igraph/src/cs
@@ -170,8 +188,17 @@ DIRS:
 
 .PHONY: DIRS
 
-igraph_$(VERSION).tar.gz: DIRS $(RFILES) $(SRCFILES)
-	echo $(top_scrdir)
+igraph/configure igraph/src/config.h.in: igraph/configure.in
+	cd igraph; autoheader; autoconf
+
+igraph/src/Makevars.win: src/Makevars.win
+	sed 's/@VERSION@/'$(VERSION)'/g' $< >$@
+
+igraph/DESCRIPTION: src/DESCRIPTION ../../VERSION
+	sed 's/^Version: .*$$/Version: '$(VERSION)'/' $<     | \
+        sed 's/^Date: .*$$/Date: '`date "+%Y-%m-%d"`'/' > $@
+
+igraph_$(VERSION).tar.gz: DIRS $(RFILES) $(SRCFILES) igraph/DESCRIPTION
 	rm -f igraph/R/config.R
 	rm -f igraph/src/config.h
 	touch igraph/src/config.h

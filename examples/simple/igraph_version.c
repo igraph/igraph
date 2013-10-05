@@ -37,7 +37,7 @@ int main() {
     sprintf(tmp, "%i.%i", major, minor);    
   }
 
-  if (strcmp(string, tmp)) {
+  if (strncmp(string, tmp, strlen(tmp))) {
     return 1;
   }
 

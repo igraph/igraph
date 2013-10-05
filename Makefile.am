@@ -1,16 +1,13 @@
 
 
-SUBDIRS=src tests interfaces
+SUBDIRS=src tests
 DOC_FILES = $(top_srcdir)/doc/Makefile.in \
 	$(top_srcdir)/doc/igraph.3
 
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
 
-EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) \
-	examples $(top_srcdir)/interfaces/R/Makefile.in \
-	$(top_srcdir)/interfaces/R/DESCRIPTION.in \
-	$(top_srcdir)/interfaces/R/configure.in.in \
+EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) examples \
 	$(wildcard $(top_srcdir)/optional/glpk/*.{inc,c,h})      \
 	$(wildcard $(top_srcdir)/optional/glpk/{README,COPYING}) \
 	$(wildcard $(top_srcdir)/optional/glpk/amd/*.{c,h})      \
