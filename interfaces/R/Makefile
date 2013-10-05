@@ -14,8 +14,8 @@ LEX=flex
 	mv -f y.tab.h $(@:.c=.h)
 
 %.c: %.l
-	$(LEX) $< $@
-	mv -f lex.yy.r $@
+	$(LEX) $<
+	mv -f lex.yy.c $@
 
 DATAFILES = $(wildcard igraphdata/data/*.rda) igraphdata/DESCRIPTION \
 	igraphdata/LICENSE $(wildcard igraphdata/man/*.Rd) \
