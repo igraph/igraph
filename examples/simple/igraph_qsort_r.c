@@ -59,6 +59,7 @@ int main() {
   for (i=0; i<len; i++) { 
     printf("%g ", VECTOR(v)[ VECTOR(idx)[i] ]);
   }
+  printf("\n");
   
   igraph_vector_int_destroy(&idx);
   igraph_vector_destroy(&v);
