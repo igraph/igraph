@@ -204,10 +204,6 @@ igraph_$(VERSION).tar.gz: DIRS $(RFILES) $(SRCFILES) igraph/DESCRIPTION
 	touch igraph/src/config.h
 	R CMD build igraph
 
-tests:
-	cd tests && echo "tools:::.runPackageTestsR()" | \
-	R --no-save && echo
-
 homepagetests:
 	$(eval $@_TMP := $(shell mktemp -d -t igraph))
 	cp -r ../../doc/homepage/examples $($@_TMP) && \
