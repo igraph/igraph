@@ -25,7 +25,7 @@ m4_define([AT_COMPILE_CHECK], [
 AT_CHECK([m4_if([[$4]],[[]],
 	[[$CC ${abs_top_srcdir}/examples/$1 -I${abs_top_srcdir}/include -I${abs_top_builddir}/include -L${abs_top_builddir}/src/.libs -ligraph -lm $5 -o itest]], 
 	[[$CC ${abs_top_srcdir}/examples/$1 -I${abs_top_srcdir}/include -I${abs_top_srcdir}/src -I${abs_top_builddir}/include -I${abs_top_builddir} -L${abs_top_builddir}/src/.libs -ligraph -lm $5 -o itest]])])
-AT_CHECK([m4_if([[$2]],[[]],[[>expout]],[[cp ${abs_top_srcdir}/examples/'$2' expout]])])
+AT_CHECK([m4_if([[$2]],[[]],[[>expout]],[[cat ${abs_top_srcdir}/examples/'$2' | sed "s/@VERSION@/$(cat ${abs_top_srcdir}/VERSION)/g" > expout]])])
 AT_CHECK([m4_if([[$3]],[[]],[[]],[[cp ${abs_top_srcdir}/examples/$3 .]])])
 AT_CHECK([DYLD_LIBRARY_PATH=${abs_top_builddir}/src/.libs${DYLD_LIBRARY_PATH+:$DYLD_LIBRARY_PATH} LD_LIBRARY_PATH=${abs_top_builddir}/src/.libs${LD_LIBRARY_PATH+:$LD_LIBRARY_PATH} ./itest], [], [expout])])
 
