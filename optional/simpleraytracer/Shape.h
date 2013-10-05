@@ -9,6 +9,11 @@
 #include "Ray.h"
 #include "Point.h"
 
+#include <list>
+using namespace std;
+
+namespace igraph {
+
 class Shape
 {
 public:
@@ -52,9 +57,9 @@ private:
 	double mAmbientReflectivity; // from 0 to 1
 };
 
-#include <list>
-using namespace std;
 typedef list<Shape*> ShapeList;
 typedef list<Shape*>::iterator ShapeListIterator;
+
+} // namespace igraph
 
 #endif

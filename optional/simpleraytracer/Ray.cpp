@@ -1,5 +1,7 @@
 #include "Ray.h"
 
+namespace igraph {
+
 Ray::Ray()
 {}
 
@@ -38,3 +40,5 @@ void Ray::Direction(Vector vDirection)
 {
 	mDirection = vDirection;
 }
+
+} // namespace igraph

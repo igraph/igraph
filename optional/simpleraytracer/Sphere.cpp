@@ -1,6 +1,8 @@
 #include "Sphere.h"
 #include <math.h>
 
+namespace igraph {
+
 Sphere::Sphere()
 {}
 
@@ -65,3 +67,5 @@ const Point& Sphere::Center() const
 {
 	return mCenter;
 }
+
+} // namespace igraph
