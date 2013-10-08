@@ -252,7 +252,7 @@ BLISSSH:
 BLISSINFO:
 
 ADJLIST:
-    INCONV: %I% <- lapply(%I%, function(x) as.numeric(x)-1)
+    INCONV: %I% <- lapply(%I%, function(x) as.integer(x)-1L)
 
 COMMCMP:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0, "nmi"=1, \
