@@ -57,4 +57,24 @@
     % end
   </tbody>
 </table>
+<noscript><input type="submit" value="Submit"></noscript>
 </form>
+
+<script>
+
+document.getElementById('type').value="{{dtype}}";
+document.getElementById('version').value="{{version}}";
+document.getElementById('branch').value="{{branch}}";
+
+function redirect() {
+  var type=document.getElementById('type').value || "all";
+  var version=document.getElementById('version').value || "all";
+  var branch=document.getElementById('branch').value || "all";
+  var goto = "/list/" + type + "/" + version + "/" + branch
+  window.location = goto;
+};
+document.getElementById('type').onchange = redirect;
+document.getElementById('version').onchange = redirect;
+document.getElementById('branch').onchange = redirect;
+
+</script>
