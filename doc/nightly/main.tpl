@@ -20,21 +20,21 @@
 <table><thead><tr>
     <th><!-- download buttons --></th>
     <th><select id="type">
-	<option value="all">File type</option>
+	<option value="all">File type (all)</option>
 	% for t in types:
-	    <option value="{{t}}">{{t}}</option>
+	    <option value="{{t}}">Type {{urlmap[t]}}</option>
 	% end
     </select></th>
     <th><select id="version">
-	<option value="all">Version</option>
+	<option value="all">Version (all)</option>
 	% for v in versions:
-	    <option value="{{v}}">{{v}}</option>
+	    <option value="{{v}}">Version {{v}}</option>
 	% end
     </select></th>
     <th><select id="branch">
-	<option value="all">Branch</option>
+	<option value="all">Branch (all)</option>
 	% for b in branches:
-	    <option value="{{b}}">{{b}}</option>
+	    <option value="{{b}}">Branch {{b}}</option>
 	% end
     </select></th>
     <th><button id="commit">Commit</button></th>
@@ -43,12 +43,11 @@
   </tr></thead>
   <tbody>
     % for file in files:
-    %   dir=urlmap[file['type']]
-    %   hash=file['hash']
+    %   filename=file['filename']
         <tr>
 	  <td><input type="button" value="&#x25BC;" 
-		     onclick="location.href='/get/{{dir}}/{{hash}}';"/></td>
-	  <td>{{file['type']}}</td>
+		     onclick="location.href='/get/{{filename}}';"/></td>
+	  <td>{{urlmap[file['type']]}}</td>
 	  <td>{{file['version']}}</td>
 	  <td>{{file['branch']}}</td>
 	  <td><code>{{file['hash']}}</code></td>
