@@ -2228,7 +2228,7 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   duplicate = duplicate && (mode == IGRAPH_ALL); /* only duplicate if undirected */
   
   for (i=0; i<no_of_nodes; i++) {
-    no_of_edges += igraph_vector_size(igraph_adjlist_get(adjlist, i));
+    no_of_edges += igraph_vector_int_size(igraph_adjlist_get(adjlist, i));
   }
   
   if (duplicate) {
@@ -2238,8 +2238,8 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
   
   for (i=0; i<no_of_nodes; i++) {
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, i);
-    long int j, n=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, i);
+    long int j, n=igraph_vector_int_size(neis);
     long int loops=0;
 
     for (j=0; j<n; j++) {

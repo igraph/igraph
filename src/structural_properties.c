@@ -101,7 +101,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
   long int res=0;
 
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_neimode_t dirmode;
   igraph_adjlist_t allneis;
   
@@ -136,7 +136,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
       }
       
       neis=igraph_adjlist_get(&allneis, actnode);
-      n=igraph_vector_size(neis);
+      n=igraph_vector_int_size(neis);
       for (j=0; j<n; j++) {
 	long int neighbor=(long int) VECTOR(*neis)[j];
 	if (already_added[neighbor] == i+1) { continue; }
@@ -229,7 +229,7 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
   igraph_real_t normfact=0.0;
 
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_neimode_t dirmode;
   igraph_adjlist_t allneis;
 
@@ -258,7 +258,7 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
       long int actdist=(long int) igraph_dqueue_pop(&q);
     
       neis=igraph_adjlist_get(&allneis, actnode);
-      n=igraph_vector_size(neis);
+      n=igraph_vector_int_size(neis);
       for (j=0; j<n; j++) {
 	long int neighbor=(long int) VECTOR(*neis)[j];
 	if (already_added[neighbor] == i+1) { continue; }
@@ -325,7 +325,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
   long int nodes_reached;
   
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_neimode_t dirmode;
   igraph_adjlist_t allneis;
   igraph_real_t unconn = 0;
@@ -357,7 +357,7 @@ int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
       long int actdist=(long int) igraph_dqueue_pop(&q);
       
       neis=igraph_adjlist_get(&allneis, actnode);
-      n=igraph_vector_size(neis);
+      n=igraph_vector_int_size(neis);
       for (j=0; j<n; j++) {
 	long int neighbor=(long int) VECTOR(*neis)[j];
 	if (VECTOR(already_added)[neighbor] == i+1) { continue; }
@@ -461,7 +461,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
   long int *already_counted;
   igraph_adjlist_t adjlist;
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_bool_t all_to;
 
   long int i, j;
@@ -536,7 +536,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
       }
       
       neis = igraph_adjlist_get(&adjlist, act);
-      for (j=0; j<igraph_vector_size(neis); j++) {
+      for (j=0; j<igraph_vector_int_size(neis); j++) {
         long int neighbor=(long int) VECTOR(*neis)[j];
         if (already_counted[neighbor] == i+1) { continue; }
         already_counted[neighbor] = i+1;
@@ -1363,7 +1363,8 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
   long int no_of_nodes=igraph_vcount(graph);
   long int i, j, n, nodes_to_calc;
   igraph_real_t *prvec, *prvec_new, *prvec_aux, *prvec_scaled;
-  igraph_vector_t *neis, outdegree;
+  igraph_vector_int_t *neis;
+  igraph_vector_t outdegree;
   igraph_neimode_t dirmode;
   igraph_adjlist_t allneis;
   igraph_real_t maxdiff=eps;
@@ -1441,7 +1442,7 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
 
       prvec_new[i]=0;
       neis=igraph_adjlist_get(&allneis, i);
-      n=igraph_vector_size(neis);
+      n=igraph_vector_int_size(neis);
       for (j=0; j<n; j++) {
 	long int neighbor=(long int) VECTOR(*neis)[j];
 	prvec_new[i]+=prvec_scaled[neighbor];

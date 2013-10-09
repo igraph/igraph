@@ -104,7 +104,7 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
   for (i=0; i<no_of_nodes; i++) {
-    igraph_vector_t *neis1;
+    igraph_vector_int_t *neis1;
     long int neilen1, j;
     long int *ecptr;
     if (VECTOR(*types)[i]) { 
@@ -115,11 +115,11 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
       ecptr=&ec1;
     }
     neis1=igraph_adjlist_get(&adjlist, i);
-    neilen1=igraph_vector_size(neis1);
+    neilen1=igraph_vector_int_size(neis1);
     for (j=0; j<neilen1; j++) {
       long int k, neilen2, nei=(long int) VECTOR(*neis1)[j];
-      igraph_vector_t *neis2=igraph_adjlist_get(&adjlist, nei);
-      neilen2=igraph_vector_size(neis2);
+      igraph_vector_int_t *neis2=igraph_adjlist_get(&adjlist, nei);
+      neilen2=igraph_vector_int_size(neis2);
       for (k=0; k<neilen2; k++) {
 	long int nei2=(long int) VECTOR(*neis2)[k];
 	if (nei2 <= i) { continue; }
@@ -154,7 +154,7 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
   igraph_vector_t vertex_perm, vertex_index;
   igraph_vector_t edges;
   igraph_adjlist_t adjlist;
-  igraph_vector_t *neis1, *neis2;
+  igraph_vector_int_t *neis1, *neis2;
   long int neilen1, neilen2;
   igraph_vector_long_t added;
   igraph_vector_t mult;
@@ -186,11 +186,11 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
       long int new_i=(long int) VECTOR(vertex_index)[i]-1;
       long int iedges=0;
       neis1=igraph_adjlist_get(&adjlist, i);
-      neilen1=igraph_vector_size(neis1);
+      neilen1=igraph_vector_int_size(neis1);
       for (j=0; j<neilen1; j++) {
 	long int nei=(long int) VECTOR(*neis1)[j];
 	neis2=igraph_adjlist_get(&adjlist, nei);
-	neilen2=igraph_vector_size(neis2);
+	neilen2=igraph_vector_int_size(neis2);
 	for (k=0; k<neilen2; k++) {
 	  long int nei2=(long int) VECTOR(*neis2)[k], new_nei2;
 	  if (nei2 <= i) { continue; }

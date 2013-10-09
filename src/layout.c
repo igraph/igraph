@@ -1667,7 +1667,7 @@ int igraph_i_layout_reingold_tilford(const igraph_t *graph,
   long int i, n, j;
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   igraph_adjlist_t allneis;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   struct igraph_i_reingold_tilford_vertex *vdata;
     
   IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
@@ -1702,7 +1702,7 @@ int igraph_i_layout_reingold_tilford(const igraph_t *graph,
     long int actnode=(long int) igraph_dqueue_pop(&q);
     long int actdist=(long int) igraph_dqueue_pop(&q);
     neis=igraph_adjlist_get(&allneis, actnode);
-    n=igraph_vector_size(neis);
+    n=igraph_vector_int_size(neis);
     for (j=0; j<n; j++) {
       long int neighbor=(long int) VECTOR(*neis)[j];
       if (vdata[neighbor].parent >= 0) { continue; }

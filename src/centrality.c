@@ -78,12 +78,12 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
 				    int n, void *extra) {
   igraph_adjlist_t *adjlist=extra;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   long int i, j, nlen;
   
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
       long int nei=(long int) VECTOR(*neis)[j];
@@ -129,16 +129,16 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
 int igraph_i_eigenvector_centrality_loop(igraph_adjlist_t *adjlist) {
   
   long int i, j, k, nlen, n=igraph_adjlist_size(adjlist);
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
 
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
-    nlen=igraph_vector_size(neis);    
+    nlen=igraph_vector_int_size(neis);    
     for (j=0; j<nlen && VECTOR(*neis)[j]<i; j++) ;
     for (k=j; k<nlen && VECTOR(*neis)[k]==i; k++) ;
     if (k!=j) {
       /* First loop edge is 'j', first non-loop edge is 'k' */
-      igraph_vector_remove_section(neis, j+(k-j)/2, k);
+      igraph_vector_int_remove_section(neis, j+(k-j)/2, k);
     }
   }
 
@@ -571,12 +571,12 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
   igraph_adjlist_t *in = data->in;
   igraph_adjlist_t *out = data->out;
   igraph_vector_t *tmp = data->tmp;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   long int i, j, nlen;
   
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(in, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     VECTOR(*tmp)[i]=0.0;
     for (j=0; j<nlen; j++) {
       long int nei=(long int) VECTOR(*neis)[j];
@@ -586,7 +586,7 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
   
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(out, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
       long int nei=(long int) VECTOR(*neis)[j];
@@ -909,7 +909,7 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
   igraph_vector_t *outdegree=data->outdegree;
   igraph_vector_t *tmp=data->tmp;
   igraph_vector_t *reset=data->reset;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   long int i, j, nlen;
   igraph_real_t sumfrom=0.0;
   igraph_real_t fact=1-data->damping;
@@ -933,7 +933,7 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
    * moving along links (and not from teleportation) */
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
       long int nei=(long int) VECTOR(*neis)[j];
@@ -1573,8 +1573,8 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 	igraph_real_t curdist=VECTOR(dist)[to];
 	if (curdist==0) {
 	  /* This is the first non-infinite distance */
-	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
-	  igraph_vector_resize(v,1);
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_resize(v,1);
 	  VECTOR(*v)[0]=minnei;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
@@ -1582,16 +1582,16 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (altdist < curdist-1) {
 	  /* This is a shorter path */
-	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
-	  igraph_vector_resize(v,1);
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_resize(v,1);
 	  VECTOR(*v)[0]=minnei;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
 	  VECTOR(dist)[to]=altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	} else if (altdist == curdist-1) {
-	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
-	  igraph_vector_push_back(v, minnei);
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_push_back(v, minnei);
 	  VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
 	}
       }
@@ -1600,8 +1600,8 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 
     while (!igraph_stack_empty(&S)) {
       long int w=(long int) igraph_stack_pop(&S);
-      igraph_vector_t *fatv=igraph_adjlist_get(&fathers, w);
-      long int fatv_len=igraph_vector_size(fatv);
+      igraph_vector_int_t *fatv=igraph_adjlist_get(&fathers, w);
+      long int fatv_len=igraph_vector_int_size(fatv);
       for (j=0; j<fatv_len; j++) {
 	long int f=(long int) VECTOR(*fatv)[j];
 	VECTOR(tmpscore)[f] += VECTOR(nrgeo)[f]/VECTOR(nrgeo)[w] * (1+VECTOR(tmpscore)[w]);
@@ -1611,7 +1611,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(tmpscore)[w]=0;
       VECTOR(dist)[w]=0;
       VECTOR(nrgeo)[w]=0;
-      igraph_vector_clear(igraph_adjlist_get(&fathers, w));
+      igraph_vector_int_clear(igraph_adjlist_get(&fathers, w));
     }
     
   } /* source < no_of_nodes */
@@ -1727,7 +1727,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
   long int j, k, nneis;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
   igraph_vit_t vit;
 
@@ -1768,7 +1768,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     adjlist_in_p=&adjlist_in;
   }
   for (j=0; j<no_of_nodes; j++) {
-    igraph_vector_clear(igraph_adjlist_get(adjlist_in_p, j));
+    igraph_vector_int_clear(igraph_adjlist_get(adjlist_in_p, j));
   }
   
   distance=igraph_Calloc(no_of_nodes, long int);
@@ -1831,7 +1831,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
       if (cutoff >= 0 && distance[actnode] >= cutoff+1) { continue; }
       
       neis = igraph_adjlist_get(adjlist_out_p, actnode);
-      nneis = igraph_vector_size(neis);
+      nneis = igraph_vector_int_size(neis);
       for (j=0; j<nneis; j++) {
         long int neighbor=(long int) VECTOR(*neis)[j];
         if (distance[neighbor]==0) {
@@ -1839,8 +1839,9 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	} 
 	if (distance[neighbor]==distance[actnode]+1) {
-	  igraph_vector_t *v=igraph_adjlist_get(adjlist_in_p, neighbor);
-	  igraph_vector_push_back(v, actnode);
+	  igraph_vector_int_t *v=igraph_adjlist_get(adjlist_in_p, 
+						    neighbor);
+	  igraph_vector_int_push_back(v, actnode);
 	  if (nobigint) { 
 	    nrgeo[neighbor]+=nrgeo[actnode];
 	  } else {
@@ -1858,7 +1859,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     while (!igraph_stack_empty(&stack)) {
       long int actnode=(long int) igraph_stack_pop(&stack);
       neis = igraph_adjlist_get(adjlist_in_p, actnode);
-      nneis = igraph_vector_size(neis);
+      nneis = igraph_vector_int_size(neis);
       for (j=0; j<nneis; j++) {
         long int neighbor=(long int) VECTOR(*neis)[j];
 	if (nobigint) {
@@ -1888,7 +1889,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 	igraph_biguint_set_limb(&big_nrgeo[actnode], 0);
       }
       tmpscore[actnode]=0;
-      igraph_vector_clear(igraph_adjlist_get(adjlist_in_p, actnode));      
+      igraph_vector_int_clear(igraph_adjlist_get(adjlist_in_p, actnode));
     }
 
   } /* for source < no_of_nodes */
@@ -2570,7 +2571,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
                               igraph_real_t cutoff,
 			      const igraph_vector_t *weights) {
   long int no_of_nodes=igraph_vcount(graph);
-  igraph_vector_t already_counted, *neis;
+  igraph_vector_t already_counted;
+  igraph_vector_int_t *neis;
   long int i, j;
   long int nodes_reached;
   igraph_adjlist_t allneis;
@@ -2625,7 +2627,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
       if (cutoff>0 && actdist>=cutoff) continue;   /* NOT break!!! */
 
       neis=igraph_adjlist_get(&allneis, act);
-      for (j=0; j<igraph_vector_size(neis); j++) {
+      for (j=0; j<igraph_vector_int_size(neis); j++) {
         long int neighbor=(long int) VECTOR(*neis)[j];
         if (VECTOR(already_counted)[neighbor] == i+1) { continue; }
         VECTOR(already_counted)[neighbor] = i+1;

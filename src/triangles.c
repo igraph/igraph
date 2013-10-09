@@ -81,7 +81,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
   igraph_integer_t count=0;
   long int node, i, j, nn;
   igraph_adjlist_t allneis;
-  igraph_vector_t *neis1, *neis2;
+  igraph_vector_int_t *neis1, *neis2;
   long int neilen1, neilen2;
   igraph_integer_t triples;
   long int *neis;
@@ -125,7 +125,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     neis1=igraph_adjlist_get(&allneis, node);
-    neilen1=igraph_vector_size(neis1);
+    neilen1=igraph_vector_int_size(neis1);
     triples = (igraph_integer_t) ((double)neilen1 * (neilen1-1) / 2);
     /* Mark the neighbors of 'node' */
     for (i=0; i<neilen1; i++) {
@@ -136,7 +136,7 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
       long int nei=(long int) VECTOR(*neis1)[i];
       if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
 				neis2=igraph_adjlist_get(&allneis, nei);
-				neilen2=igraph_vector_size(neis2);
+				neilen2=igraph_vector_int_size(neis2);
 				for (j=0; j<neilen2; j++) {
 					long int nei2=(long int) VECTOR(*neis2)[j];
 					if (VECTOR(rank)[nei2] < VECTOR(rank)[nei]) {
@@ -586,7 +586,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
   igraph_vector_t degree;
   
   igraph_adjlist_t allneis;
-  igraph_vector_t *neis1, *neis2;
+  igraph_vector_int_t *neis1, *neis2;
   long int i, j, neilen1, neilen2;
 
   IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
@@ -619,7 +619,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     neis1=igraph_adjlist_get(&allneis, node);
-    neilen1=igraph_vector_size(neis1);
+    neilen1=igraph_vector_int_size(neis1);
     triples += (double)neilen1 * (neilen1-1);
     /* Mark the neighbors of 'node' */
     for (i=0; i<neilen1; i++) {
@@ -631,7 +631,7 @@ int igraph_transitivity_undirected(const igraph_t *graph,
       /* If 'nei' is not ready yet */      
       if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
 				neis2=igraph_adjlist_get(&allneis, nei);
-				neilen2=igraph_vector_size(neis2);
+				neilen2=igraph_vector_int_size(neis2);
 				for (j=0; j<neilen2; j++) {
 					long int nei2=(long int) VECTOR(*neis2)[j];
 					if (neis[nei2] == node+1) {

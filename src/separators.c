@@ -287,8 +287,8 @@ int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
     
     while (!igraph_dqueue_empty(Q)) {
       long int act_node=(long int) igraph_dqueue_pop(Q);
-      igraph_vector_t *neis=igraph_adjlist_get(adjlist, act_node);
-      long int j, n=igraph_vector_size(neis);
+      igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, act_node);
+      long int j, n=igraph_vector_int_size(neis);
       for (j=0; j<n; j++) {
 	long int nei=(long int) VECTOR(*neis)[j];
 	if (VECTOR(*leaveout)[nei]== *mark) continue;
@@ -345,8 +345,8 @@ int igraph_i_separators_store(igraph_vector_ptr_t *separators,
     cptr=saved;
 
     while ( (next=(long int) VECTOR(*components)[cptr++]) != -1) {
-      igraph_vector_t *neis=igraph_adjlist_get(adjlist, next);
-      long int j, nn=igraph_vector_size(neis);
+      igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, next);
+      long int j, nn=igraph_vector_int_size(neis);
       for (j=0; j<nn; j++) {
 	long int nei=(long int) VECTOR(*neis)[j];
 	if (VECTOR(*leaveout)[nei] != *mark) {
@@ -478,8 +478,8 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
   for (v=0; v<no_of_nodes; v++) {
 
     /* Mark v and its neighbors */
-    igraph_vector_t *neis=igraph_adjlist_get(&adjlist, v);
-    long int i, n=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(&adjlist, v);
+    long int i, n=igraph_vector_int_size(neis);
     VECTOR(leaveout)[v]=mark;
     for (i=0; i<n; i++) {
       long int nei=(long int) VECTOR(*neis)[i];
@@ -508,8 +508,8 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
 
       /* Remove N(x) U basis */
       long int x=(long int) VECTOR(*basis)[b];
-      igraph_vector_t *neis=igraph_adjlist_get(&adjlist, x);
-      long int i, n=igraph_vector_size(neis);
+      igraph_vector_int_t *neis=igraph_adjlist_get(&adjlist, x);
+      long int i, n=igraph_vector_int_size(neis);
       for (i=0; i<basislen; i++) {
 	long int sn=(long int) VECTOR(*basis)[i];
 	VECTOR(leaveout)[sn]=mark;

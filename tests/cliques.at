@@ -34,6 +34,24 @@ AT_COMPILE_CHECK([simple/igraph_maximal_cliques.c],
 		 [simple/igraph_maximal_cliques.out])
 AT_CLEANUP
 
+AT_SETUP([More maximal cliques (igraph_maximal_cliques):])
+AT_KEYWORDS([igraph_maximal_cliques cliques maximal cliques])
+AT_COMPILE_CHECK([simple/igraph_maximal_cliques2.c], 
+                 [simple/igraph_maximal_cliques2.out])
+AT_CLEANUP
+
+AT_SETUP([Maximal cliques 3 (igraph_maximal_cliques):])
+AT_KEYWORDS([igraph_maximal_cliques cliques maximal cliques])
+AT_COMPILE_CHECK([simple/igraph_maximal_cliques3.c], 
+                 [simple/igraph_maximal_cliques3.out])
+AT_CLEANUP
+
+AT_SETUP([Maximal cliques for a subset (igraph_maximal_cliques):])
+AT_KEYWORDS([igraph_maximal_cliques cliques maximal cliques])
+AT_COMPILE_CHECK([simple/igraph_maximal_cliques4.c], 
+                 [simple/igraph_maximal_cliques4.out])
+AT_CLEANUP
+
 AT_SETUP([Calculating independent vertex sets (igraph_independent_vertex_sets): ])
 AT_KEYWORDS([igraph_independent_vertex_sets,
 	igraph_maximal_independent_vertex_sets,
