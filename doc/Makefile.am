@@ -14,7 +14,8 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
 	      separators.xml memory.xml sparsemat.xml hrg.xml \
-	      scg.xml spatialgames.xml threading.xml progress.xml status.xml
+	      scg.xml spatialgames.xml threading.xml progress.xml status.xml \
+	      graphlets.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -187,6 +188,9 @@ progress.xml: progress.xxml $(INCLUDEDIR)/igraph_progress.h $(SRCDIR)/progress.c
 
 status.xml: status.xxml $(INCLUDEDIR)/igraph_statusbar.h $(SRCDIR)/statusbar.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_statusbar.h $(SRCDIR)/statusbar.c
+
+graphlets.xml: graphlets.xxml $(SRCDIR)/glet.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/glet.c
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

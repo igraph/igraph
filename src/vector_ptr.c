@@ -545,6 +545,23 @@ void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, c
 	compar);
 }
 
+int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
+				const igraph_vector_int_t *idx) {
+  void **tmp;
+  int i, n=igraph_vector_int_size(idx);
+
+  tmp=igraph_Calloc(n, void*);
+  if (!tmp) { IGRAPH_ERROR("Cannot index pointer vector", IGRAPH_ENOMEM); }
+
+  for (i=0; i<n; i++) { tmp[i] = VECTOR(*v)[ VECTOR(*idx)[i] ]; }
+
+  igraph_Free(v->stor_begin);
+  v->stor_begin = tmp;
+  v->stor_end = v->end = tmp + n;
+
+  return 0;
+}
+
 int igraph_vector_ptr_append    (igraph_vector_ptr_t *to, 
 				 const igraph_vector_ptr_t *from) {
   long int origsize=igraph_vector_ptr_size(to);

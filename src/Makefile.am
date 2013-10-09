@@ -205,7 +205,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h \
 		../include/igraph_interrupt.h   ../include/igraph_threading.h \
 		../include/igraph_scg.h		../include/igraph_qsort.h \
-		../include/igraph_matching.h	../include/igraph_graphlets.h
+		../include/igraph_matching.h	../include/igraph_graphlets.h \
+		../include/igraph_vector_type.h
 
 SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
