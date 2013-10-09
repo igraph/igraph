@@ -45,11 +45,11 @@ def list_files(db, dtype="all", version="all", branch="all"):
                            types=types, branches=branches, urlmap=urlmap,
                            dtype=dtype, branch=branch, version=version)
 
-@nightly.route("/get/<filename>")
+@nightly.route("/get/<filename:path>")
 def get_file(db, filename):
     db.execute("UPDATE files SET count=count+1 WHERE filename=?", \
                (filename,))
-    return bottle.static_file(filename, ".")
+    return bottle.static_file(filename, "../files")
 
 @nightly.error(404)
 def error404(error):
