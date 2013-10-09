@@ -837,7 +837,6 @@ interfaces/R/src/config.h.in
 /examples/simple/igraph_maximal_cliques0.c
 /examples/simple/igraph_maximal_cliques0.c.xml
 /examples/simple/igraph_maximal_cliques2.c.xml
-/examples/simple/igraph_maximal_cliques2.out
 /examples/simple/igraph_maximal_cliques3.c.xml
 /examples/simple/igraph_maximum_bipartite_matching.c.xml
 /examples/simple/igraph_power_law_fit.c.xml
