@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+import cgi
 import bottle
 import bottle_sqlite
 import socket
@@ -55,8 +56,8 @@ def error404(error):
     return "Page does not exist, maybe your syntax is wrong"
 
 myname=socket.gethostname()
-if myname[-4] == ".com":
-    bottle.run(nightly, server="cgi")
-else:
+if myname[-6] == ".local":
     bottle.run(nightly, host="localhost", port=8080, debug=True, 
                reloader=True)
+else:
+    bottle.run(nightly, server="cgi")
