@@ -56,7 +56,7 @@ def error404(error):
     return "Page does not exist, maybe your syntax is wrong"
 
 myname=socket.gethostname()
-if myname[-6] == ".local":
+if myname[-6:] == ".local":
     bottle.run(nightly, host="localhost", port=8080, debug=True, 
                reloader=True)
 else:
