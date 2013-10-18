@@ -56,20 +56,72 @@ typedef struct igraph_i_cattributes_t {
   igraph_vector_ptr_t eal;
 } igraph_i_cattributes_t;
 
+int igraph_i_cattributes_copy_attribute_record(igraph_attribute_record_t **newrec, 
+					       const igraph_attribute_record_t *rec) {
+  igraph_vector_t *num, *newnum;
+  igraph_strvector_t *str, *newstr;
+  
+  *newrec=igraph_Calloc(1, igraph_attribute_record_t);
+  if (!(*newrec)) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
+  IGRAPH_FINALLY(igraph_free, *newrec);
+  (*newrec)->type=rec->type;
+  (*newrec)->name=strdup(rec->name);
+  if (!(*newrec)->name) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
+  IGRAPH_FINALLY(igraph_free, (void*)(*newrec)->name);
+  if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+    num=(igraph_vector_t *)rec->value;
+    newnum=igraph_Calloc(1, igraph_vector_t);
+    if (!newnum) { 
+      IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); 
+    }
+    IGRAPH_FINALLY(igraph_free, newnum);
+    IGRAPH_CHECK(igraph_vector_copy(newnum, num));
+    IGRAPH_FINALLY(igraph_vector_destroy, newnum);
+    (*newrec)->value=newnum;
+  } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
+    str=(igraph_strvector_t*)rec->value;
+    newstr=igraph_Calloc(1, igraph_strvector_t);
+    if (!newstr) { 
+      IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); 
+    }
+    IGRAPH_FINALLY(igraph_free, newstr);
+    IGRAPH_CHECK(igraph_strvector_copy(newstr, str));
+    IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
+    (*newrec)->value=newstr;
+  }
+
+  IGRAPH_FINALLY_CLEAN(4);
+  return 0;
+}
+
+
 int igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
+  igraph_attribute_record_t *attr_rec;
+  long int i, n;
+
+  n = attr ? igraph_vector_ptr_size(attr) : 0;
+
   igraph_i_cattributes_t *nattr=igraph_Calloc(1, igraph_i_cattributes_t);
   if (!nattr) {
     IGRAPH_ERROR("Can't init attributes", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, nattr);
-  IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->gal, 0));
+
+  IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->gal, n));
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->val, 0));
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->eal, 0));
-  
   IGRAPH_FINALLY_CLEAN(3);
+
+  for (i=0; i<n; i++) {
+    IGRAPH_CHECK(igraph_i_cattributes_copy_attribute_record(
+	  &attr_rec, VECTOR(*attr)[i]));
+    VECTOR(nattr->gal)[i] = attr_rec;
+  }
+
   graph->attr=nattr;
+
   return 0;
 }
 
@@ -133,45 +185,6 @@ void igraph_i_cattribute_copy_free(igraph_i_cattributes_t *attr) {
     }
   }  
 }
-
-int igraph_i_cattributes_copy_attribute_record(igraph_attribute_record_t **newrec, 
-					       const igraph_attribute_record_t *rec) {
-  igraph_vector_t *num, *newnum;
-  igraph_strvector_t *str, *newstr;
-  
-  *newrec=igraph_Calloc(1, igraph_attribute_record_t);
-  if (!(*newrec)) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
-  IGRAPH_FINALLY(igraph_free, *newrec);
-  (*newrec)->type=rec->type;
-  (*newrec)->name=strdup(rec->name);
-  if (!(*newrec)->name) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
-  IGRAPH_FINALLY(igraph_free, (void*)(*newrec)->name);
-  if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-    num=(igraph_vector_t *)rec->value;
-    newnum=igraph_Calloc(1, igraph_vector_t);
-    if (!newnum) { 
-      IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); 
-    }
-    IGRAPH_FINALLY(igraph_free, newnum);
-    IGRAPH_CHECK(igraph_vector_copy(newnum, num));
-    IGRAPH_FINALLY(igraph_vector_destroy, newnum);
-    (*newrec)->value=newnum;
-  } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-    str=(igraph_strvector_t*)rec->value;
-    newstr=igraph_Calloc(1, igraph_strvector_t);
-    if (!newstr) { 
-      IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); 
-    }
-    IGRAPH_FINALLY(igraph_free, newstr);
-    IGRAPH_CHECK(igraph_strvector_copy(newstr, str));
-    IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
-    (*newrec)->value=newstr;
-  }
-
-  IGRAPH_FINALLY_CLEAN(4);
-  return 0;
-}
-
 
 /* No reference counting here. If you use attributes in C you should
    know what you're doing. */
