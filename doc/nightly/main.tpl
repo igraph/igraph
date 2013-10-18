@@ -120,8 +120,8 @@
 		    <i class="icon-download"></i></a></td>
 		<td>{{urlmap[file['type']]}}</td>
 		<td>{{file['version']}}</td>
-		<td>{{file['branch']}}</td>
-		<td><code>{{file['hash']}}</code></td>
+		<td><a href="https://github.com/igraph/igraph/tree/{{file['branch']}}">{{file['branch']}}</a></td>
+		<td><a href="https://github.com/igraph/igraph/commits/{{file['hash']}}"><code>{{file['hash']}}</code></a></td>
 		<td>{{file['date']}}</td>
 		<td>{{human_size(file['size'])}}</td>
 	      </tr>
