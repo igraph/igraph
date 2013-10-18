@@ -12,6 +12,15 @@ nightly.install(plugin)
 urlmap={ 'c': 'C library', 'r': 'R package', 'python': 'Python extension',
          'msvc': 'C library for MSVC' }
 
+def human_size(num):
+    num=long(num)
+    for x in ['bytes','KB','MB','GB','TB']:
+        if num < 1024.0:
+            return "%3.1f %s" % (num, x)
+        num /= 1024.0
+
+bottle.SimpleTemplate.defaults['human_size'] = human_size
+
 # This is the main web page, you can choose your download here
 # It can be filtered
 @nightly.route("/")
@@ -56,7 +65,7 @@ def error404(error):
     return "Page does not exist, maybe your syntax is wrong"
 
 myname=socket.gethostname()
-if myname[-6] == ".local":
+if myname[-6:] == ".local":
     bottle.run(nightly, host="localhost", port=8080, debug=True, 
                reloader=True)
 else:
