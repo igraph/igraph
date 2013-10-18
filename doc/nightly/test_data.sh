@@ -10,4 +10,4 @@ INSERT INTO 'files'
 INSERT INTO 'files'
        VALUES ('r/igraph_0.6.999-523.tar.gz', 'r', '0.7.0-pre',
                'develop', '50c1ec0', '2013-10-08', 2367155, 0);
-" | sqlite3 nightly.db
+" | sqlite3 nightly-test.db

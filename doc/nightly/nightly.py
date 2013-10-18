@@ -5,7 +5,11 @@ import bottle
 import bottle_sqlite
 import socket
 
-plugin = bottle_sqlite.Plugin(dbfile='nightly.db')
+myname=socket.gethostname()
+i_am_local = (myname[-6:] == ".local")
+dbfile = "nightly-test.db" if i_am_local else "nightly.db"
+
+plugin = bottle_sqlite.Plugin(dbfile=dbfile)
 nightly=bottle.Bottle()
 nightly.install(plugin)
 
@@ -64,8 +68,7 @@ def get_file(db, filename):
 def error404(error):
     return "Page does not exist, maybe your syntax is wrong"
 
-myname=socket.gethostname()
-if myname[-6:] == ".local":
+if i_am_local:
     bottle.run(nightly, host="localhost", port=8080, debug=True, 
                reloader=True)
 else:

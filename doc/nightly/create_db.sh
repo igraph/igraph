@@ -1,6 +1,6 @@
 #! /bin/sh
 
-rm -f nightly.db
+rm -f nightly-test.db
 echo "
 CREATE TABLE 'files' (
        filename TEXT,
@@ -19,4 +19,4 @@ CREATE TABLE 'tests' (
        PRIMARY KEY(filename, result),
        FOREIGN KEY(filename) REFERENCES files(filename)
 );
-" | sqlite3 nightly.db 
+" | sqlite3 nightly-test.db 
