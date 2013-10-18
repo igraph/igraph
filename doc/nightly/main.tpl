@@ -123,7 +123,7 @@
 		<td>{{file['branch']}}</td>
 		<td><code>{{file['hash']}}</code></td>
 		<td>{{file['date']}}</td>
-		<td>{{file['size']}}</td>
+		<td>{{human_size(file['size'])}}</td>
 	      </tr>
 	      % end
 	    </tbody>
