@@ -58,11 +58,30 @@ def list_files(db, dtype="all", version="all", branch="all"):
                            types=types, branches=branches, urlmap=urlmap,
                            dtype=dtype, branch=branch, version=version)
 
+@nightly.route("/steal/<filename:path>")
+def steal_file(filename):
+    return bottle.static_file(filename, "../files", download=True)
+
 @nightly.route("/get/<filename:path>")
 def get_file(db, filename):
     db.execute("UPDATE files SET count=count+1 WHERE filename=?", \
                (filename,))
-    return bottle.static_file(filename, "../files")
+    return steal_file(filename)
+
+@nightly.route("/latest/<dtype>")
+@nightly.route("/latest/<dtype>/<branch>")
+def get_latest(db, dtype, branch="develop"):
+
+    latest = db.execute("SELECT filename FROM files  \
+                         WHERE type=? AND branch=?   \
+                         ORDER BY date DESC LIMIT 1",
+                        (dtype, branch)).fetchall()
+    filename=latest[0][0]
+
+    # Need to redirect here, otherwise "smart" browsers uncompress
+    # the .tar.gz file, because the Content-Encoding: gzip header is
+    # present.
+    bottle.redirect("/steal/" + filename)
 
 @nightly.error(404)
 def error404(error):
