@@ -39,19 +39,21 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">
+          <a class="navbar-brand" href="http://www.igraph.org">
             <img src="http://www.igraph.org/img/igraph2.svg" width=25>
             igraph
           </a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-left">
-            <li class="active"><a href="#">Home</a></li>
-            <li><a href="">News</a></li>
-            <li><a href="">Get started</a></li>
-            <li><a href="">Download</a></li>
-            <li><a href="">Get help</a></li>
-            <li><a href="">Contribute</a></li>
+            <li><a href="http://www.igraph.org">Home</a></li>
+            <li><a href="http://www.igraph.org/news">News</a></li>
+            <li><a href="http://www.igraph.org/all.html">Get started</a></li>
+            <li><a href="http://www.igraph.org/all.html#downloads">
+		Download</a></li>
+            <li><a href="http://www.igraph.org/all.html#help">Get help</a></li>
+            <li><a href="http://www.igraph.org/all.html#contribute">
+		Contribute</a></li>
           </ul>
           <form class="navbar-form navbar-right">
             <div class="form-group">
