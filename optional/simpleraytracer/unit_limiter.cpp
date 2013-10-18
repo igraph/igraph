@@ -1,5 +1,7 @@
 #include "unit_limiter.h"
 
+namespace igraph {
+
 double unit_limiter(double vUnitDouble)
 {
 	double result = vUnitDouble;
@@ -9,3 +11,5 @@ double unit_limiter(double vUnitDouble)
 		result = 1.0;
 	return result;
 }
+
+} // namespace igraph

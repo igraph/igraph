@@ -275,6 +275,7 @@ VERTEXSETLIST:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%
   INCONV:
+    IN:  if (!isNull(%I%)) { R_igraph_SEXP_to_vectorlist(%I%, &%C%); }
     OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
          } \

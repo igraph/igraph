@@ -538,6 +538,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
   igraph_adjlist_t tight_phantom_edges; /* adjacency list to manage tight phantom edges */
   igraph_integer_t alternating_path_endpoint;
   igraph_vector_t* neis;
+  igraph_vector_int_t *neis2;
   igraph_inclist_t inclist;         /* incidence list of the original graph */ 
 
   /* The Hungarian algorithm is originally for complete bipartite graphs.
@@ -702,10 +703,10 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
       }
 
       /* Now do the same with the phantom edges */
-      neis = igraph_adjlist_get(&tight_phantom_edges, v);
-      n = igraph_vector_size(neis);
+      neis2 = igraph_adjlist_get(&tight_phantom_edges, v);
+      n = igraph_vector_int_size(neis2);
       for (i = 0; i < n; i++) {
-        u = (igraph_integer_t) VECTOR(*neis)[i];
+        u = (igraph_integer_t) VECTOR(*neis2)[i];
         /* Have we seen u already? */
         if (VECTOR(parent)[u] >= 0)
           continue;
@@ -905,10 +906,10 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
           /* Tight phantom edge found. Note that we don't have to check whether
            * u and v are connected; if they were, then the slack of this edge
            * would be negative. */
-          neis = igraph_adjlist_get(&tight_phantom_edges, u);
-          if (!igraph_vector_binsearch(neis, v, &i)) {
+          neis2 = igraph_adjlist_get(&tight_phantom_edges, u);
+          if (!igraph_vector_int_binsearch(neis2, v, &i)) {
             debug("New tight phantom edge: %ld -- %ld\n", (long)u, (long)v);
-            IGRAPH_CHECK(igraph_vector_insert(neis, i, v));
+            IGRAPH_CHECK(igraph_vector_int_insert(neis2, i, v));
           }
         }
       }
@@ -929,8 +930,8 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
 
     if (VECTOR(match)[i] != -1) {
       j = VECTOR(match)[i];
-      neis = igraph_adjlist_get(&tight_phantom_edges, i);
-      if (igraph_vector_binsearch(neis, j, 0)) {
+      neis2 = igraph_adjlist_get(&tight_phantom_edges, i);
+      if (igraph_vector_int_binsearch(neis2, j, 0)) {
         VECTOR(match)[i] = VECTOR(match)[j] = -1;
         msize--;
       }

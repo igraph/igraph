@@ -53,6 +53,42 @@ __BEGIN_DECLS
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
+#include "igraph_vector_type.h"
+#include "igraph_pmt_off.h"
+#undef BASE_IGRAPH_REAL
+
+#define BASE_LONG
+#include "igraph_pmt.h"
+#include "igraph_vector_type.h"
+#include "igraph_pmt_off.h"
+#undef BASE_LONG
+
+#define BASE_CHAR
+#include "igraph_pmt.h"
+#include "igraph_vector_type.h"
+#include "igraph_pmt_off.h"
+#undef BASE_CHAR
+
+#define BASE_BOOL
+#include "igraph_pmt.h"
+#include "igraph_vector_type.h"
+#include "igraph_pmt_off.h"
+#undef BASE_BOOL
+
+#define BASE_INT
+#include "igraph_pmt.h"
+#include "igraph_vector_type.h"
+#include "igraph_pmt_off.h"
+#undef BASE_INT
+
+#define BASE_COMPLEX
+#include "igraph_pmt.h"
+#include "igraph_vector_type.h"
+#include "igraph_pmt_off.h"
+#undef BASE_COMPLEX
+
+#define BASE_IGRAPH_REAL
+#include "igraph_pmt.h"
 #include "igraph_vector_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL

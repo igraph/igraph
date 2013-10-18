@@ -89,7 +89,7 @@ typedef struct{
 int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
   long int i, j, n;
   long int no_of_nodes=igraph_vcount(igraph);
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   
   IGRAPH_VECTOR_INIT_FINALLY(&graph->nbSucc, no_of_nodes);
   IGRAPH_CHECK(igraph_degree(igraph, &graph->nbSucc, igraph_vss_all(), 
@@ -105,7 +105,7 @@ int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
 	
   for (i=0; i<no_of_nodes; i++) {
     neis=igraph_adjlist_get(&graph->succ, i);
-    n=igraph_vector_size(neis);
+    n=igraph_vector_int_size(neis);
     for (j=0; j<n; j++) {
       int v=(int)VECTOR(*neis)[j];
       if (MATRIX(graph->isEdge, i, v)) {
@@ -281,8 +281,8 @@ int igraph_i_lad_removeAllValuesButOne(int u, int v, Tdomain* D, Tgraph* Gp,
      toFilter return false if an inconsistency is detected wrt to
      global all diff */
   int j, oldPos, newPos;
-  igraph_vector_t *uneis=igraph_adjlist_get(&Gp->succ, u);
-  int n=(int) igraph_vector_size(uneis);
+  igraph_vector_int_t *uneis=igraph_adjlist_get(&Gp->succ, u);
+  int n=(int) igraph_vector_int_size(uneis);
   /* add all successors of u in toFilter */
   for (j=0; j<n; j++) {
     igraph_i_lad_addToFilter((int) VECTOR(*uneis)[j], D, 
@@ -314,9 +314,10 @@ int igraph_i_lad_removeValue(int u, int v, Tdomain* D, Tgraph* Gp,
   /* remove v from D(u) and add all successors of u in toFilter
      return false if an inconsistency is detected wrt global all diff */
   int j;
-  igraph_vector_t *uneis=igraph_adjlist_get(&Gp->succ, u);
-  int n=(int) igraph_vector_size(uneis);
+  igraph_vector_int_t *uneis=igraph_adjlist_get(&Gp->succ, u);
+  int n=(int) igraph_vector_int_size(uneis);
   int oldPos, newPos;
+
   /* add all successors of u in toFilter */
   for (j=0; j<n; j++) {
     igraph_i_lad_addToFilter((int) VECTOR(*uneis)[j], D,
@@ -354,7 +355,7 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
      return false if an inconsistency is detected by FC(Edges) or
      FC(diff); true otherwise; */
   int j, u, v, u2, oldNbVal;
-  igraph_vector_t *vneis;
+  igraph_vector_int_t *vneis;
   bool result;
 
   while (nb>0) {
@@ -527,7 +528,7 @@ int igraph_i_lad_initDomains(bool initialDomains,
   matchingSize = 0;
 	
   for (u=0; u<Gp->nbVertices; u++) {
-    Gp_uneis=igraph_adjlist_get(&Gp->succ, u);
+    igraph_vector_int_t *Gp_uneis=igraph_adjlist_get(&Gp->succ, u);
     if (initialDomains) { 
       /* read the list of target vertices which are compatible with u */
       vec=VECTOR(*domains)[u];
@@ -543,7 +544,7 @@ int igraph_i_lad_initDomains(bool initialDomains,
     VECTOR(D->nbVal)[u] = 0;
     VECTOR(D->firstVal)[u] = D->valSize;
     for (v=0; v<Gt->nbVertices; v++) {
-      Gt_vneis=igraph_adjlist_get(&Gt->succ, v);
+      igraph_vector_int_t *Gt_vneis=igraph_adjlist_get(&Gt->succ, v);
       if ((initialDomains) && (!dom[v])) { /* v not in D(u) */
 	MATRIX(D->posInVal, u, v) = (int) (VECTOR(D->firstVal)[u] + 
 					   Gt->nbVertices);
@@ -1109,8 +1110,7 @@ int igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
      otherwise */
   int u2, v2, i, j;
   int nbMatched = 0;
-  igraph_vector_t *Gp_uneis=igraph_adjlist_get(&Gp->succ, u);
-  igraph_vector_t *Gt_vneis;
+  igraph_vector_int_t *Gp_uneis=igraph_adjlist_get(&Gp->succ, u);
 	
   int *num, *numInv;
   igraph_vector_int_t nbComp;
@@ -1197,7 +1197,7 @@ int igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
 	}
       }
     } else {
-      Gt_vneis=igraph_adjlist_get(&Gt->succ, v);
+      igraph_vector_int_t *Gt_vneis=igraph_adjlist_get(&Gt->succ, v);
       for (j=0; j<VECTOR(Gt->nbSucc)[v]; j++) {
 	v2 = (int) VECTOR(*Gt_vneis)[j]; /* v2 is a successor of v */
 	if (igraph_i_lad_isInD(u2, v2, D)) { /* v2 belongs to D[u2] */

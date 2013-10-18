@@ -1,6 +1,8 @@
 #include "Color.h"
 #include "unit_limiter.h"
 
+namespace igraph {
+
 Color::Color()
 {
 }
@@ -90,3 +92,5 @@ unsigned char Color::ByteValue(double vZeroToOne) const
 {
 	return (unsigned char)(vZeroToOne*255.0);
 }
+
+} // namespace igraph

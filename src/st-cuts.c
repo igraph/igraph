@@ -480,15 +480,15 @@ int igraph_dominator_tree(const igraph_t *graph,
   /* We need to go over 'pred' because it should contain only the
      edges towards the target vertex. */
   for (i=0; i<no_of_nodes; i++) {
-    igraph_vector_t *v=igraph_adjlist_get(&pred, i);
-    long int j, n=igraph_vector_size(v);
+    igraph_vector_int_t *v=igraph_adjlist_get(&pred, i);
+    long int j, n=igraph_vector_int_size(v);
     for (j=0; j<n; ) {
       long int v2=(long int) VECTOR(*v)[j];
       if (IGRAPH_FINITE(VECTOR(parent)[v2])) {
 	j++; 
       } else {
 	VECTOR(*v)[j]=VECTOR(*v)[n-1];
-	igraph_vector_pop_back(v);
+	igraph_vector_int_pop_back(v);
 	n--;
       }
     }
@@ -498,8 +498,8 @@ int igraph_dominator_tree(const igraph_t *graph,
 
   for (i=component_size-1; i>0; i--) {
     long int w=(long int) VECTOR(vertex)[i]-1;
-    igraph_vector_t *predw=igraph_adjlist_get(&pred, w);
-    long int j, n=igraph_vector_size(predw);
+    igraph_vector_int_t *predw=igraph_adjlist_get(&pred, w);
+    long int j, n=igraph_vector_int_size(predw);
     for (j=0; j<n; j++) {
       long int v=(long int) VECTOR(*predw)[j];
       long int u=igraph_i_dominator_EVAL(v, &ancestor, &label, &semi);

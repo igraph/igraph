@@ -25,7 +25,7 @@ from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer
 from igraph.drawing.colors import color_to_html_format, color_name_to_rgb
 from igraph.drawing.edge import ArrowEdgeDrawer
-from igraph.drawing.text import TextDrawer
+from igraph.drawing.text import TextAlignment, TextDrawer
 from igraph.drawing.metamagic import AttributeCollectorBase
 from igraph.drawing.shapes import PolygonDrawer
 from igraph.drawing.utils import Point
@@ -397,6 +397,41 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 label_drawer.bbox = (cx - half_size, cy - half_size,
                                      cx + half_size, cy + half_size)
                 label_drawer.draw(wrap=wrap)
+
+        # Draw the edge labels
+        for edge, visual_edge in izip(graph.es, edge_builder):
+            if visual_edge.label is None:
+                continue
+
+            # Set the font size, color and text
+            context.set_font_size(visual_edge.label_size)
+            context.set_source_rgba(*visual_edge.label_color)
+            label_drawer.text = visual_edge.label
+
+            # Ask the edge drawer to propose an anchor point for the label
+            src, dest = edge.tuple
+            src_vertex, dest_vertex = vertex_builder[src], vertex_builder[dest]
+            (x, y), (halign, valign) = \
+                    edge_drawer.get_label_position(edge, src_vertex, dest_vertex)
+
+            _, yb, w, h, _, _ = label_drawer.text_extents()
+            w /= 2.0
+            h /= 2.0
+
+            if halign == TextAlignment.RIGHT:
+                x -= w
+            elif halign == TextAlignment.LEFT:
+                x += w
+            if valign == TextAlignment.BOTTOM:
+                y -= h - yb / 2.0
+            elif valign == TextAlignment.TOP:
+                y += h
+
+            label_drawer.halign = halign
+            label_drawer.valign = valign
+            label_drawer.bbox = (x-w, y-h, x+w, y+h)
+            label_drawer.draw(wrap=wrap)
+
 
 #####################################################################
 

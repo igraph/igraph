@@ -24,6 +24,45 @@ class VertexTests(unittest.TestCase):
         v.update_attributes(dict(b=44, c=55))
         self.assertEquals(v.attributes(), dict(a=3, b=44, c=55, d=6))
 
+    def testProxyMethods(self):
+        g = Graph.GRG(10, 0.5)
+        v = g.vs[0]
+
+        # - neighbors(), predecessors() and succesors() are ignored because they
+        #   return vertex lists while the methods in Graph return vertex index
+        #   lists.
+        # - pagerank() and personalized_pagerank() are ignored because of numerical
+        #   inaccuracies
+        # - delete() is ignored because it mutates the graph
+        ignore = "neighbors predecessors successors pagerank personalized_pagerank"\
+                " delete"
+        ignore = set(ignore.split())
+
+        # Methods not listed here are expected to return an int or a float
+        return_types = {
+                "get_shortest_paths": list,
+                "shortest_paths": list
+        }
+
+        for name in Vertex.__dict__:
+            if name in ignore:
+                continue
+
+            func = getattr(v, name)
+            docstr = func.__doc__
+
+            if not docstr.startswith("Proxy method"):
+                continue
+
+            result = func()
+            self.assertEquals(getattr(g, name)(v.index), result,
+                    msg=("Vertex.%s proxy method misbehaved" % name))
+
+            return_type = return_types.get(name, (int, float))
+            self.assertTrue(isinstance(result, return_type),
+                    msg=("Vertex.%s proxy method did not return %s" % (name, return_type))
+            )
+
 
 class VertexSeqTests(unittest.TestCase):
     def setUp(self):

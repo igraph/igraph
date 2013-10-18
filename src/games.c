@@ -906,7 +906,7 @@ int igraph_degree_sequence_game_no_multiple_undirected(
     igraph_t *graph, const igraph_vector_t *seq) {
 
   igraph_vector_t stubs=IGRAPH_VECTOR_NULL;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_vector_t residual_degrees=IGRAPH_VECTOR_NULL;
   igraph_set_t incomplete_vertices;
   igraph_adjlist_t al;
@@ -978,7 +978,7 @@ int igraph_degree_sequence_game_no_multiple_undirected(
         }
 
         neis = igraph_adjlist_get(&al, from);
-        if (from == to || igraph_vector_binsearch(neis, to, &j)) {
+        if (from == to || igraph_vector_int_binsearch(neis, to, &j)) {
           /* Edge exists already */
           VECTOR(residual_degrees)[from]++;
           VECTOR(residual_degrees)[to]++;
@@ -986,7 +986,7 @@ int igraph_degree_sequence_game_no_multiple_undirected(
           IGRAPH_CHECK(igraph_set_add(&incomplete_vertices, to));
         } else {
           /* Insert the edge */
-          IGRAPH_CHECK(igraph_vector_insert(neis, j, to));
+          IGRAPH_CHECK(igraph_vector_int_insert(neis, j, to));
         }
       }
 
@@ -1009,7 +1009,7 @@ int igraph_degree_sequence_game_no_multiple_undirected(
               dummy = from; from = to; to = dummy;
             }
             neis = igraph_adjlist_get(&al, from);
-            if (!igraph_vector_binsearch(neis, to, 0)) {
+            if (!igraph_vector_int_binsearch(neis, to, 0)) {
               /* Found a suitable pair, so we can continue */
               failed = 0;
               break;
@@ -1048,7 +1048,7 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
   igraph_bool_t deg_seq_ok, failed, finished;
   igraph_vector_t in_stubs = IGRAPH_VECTOR_NULL;
   igraph_vector_t out_stubs = IGRAPH_VECTOR_NULL;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_vector_t residual_in_degrees=IGRAPH_VECTOR_NULL;
   igraph_vector_t residual_out_degrees=IGRAPH_VECTOR_NULL;
   igraph_set_t incomplete_in_vertices;
@@ -1128,7 +1128,7 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
         to = (igraph_integer_t) VECTOR(in_stubs)[i];
 
         neis = igraph_adjlist_get(&al, from);
-        if (from == to || igraph_vector_binsearch(neis, to, &j)) {
+        if (from == to || igraph_vector_int_binsearch(neis, to, &j)) {
           /* Edge exists already */
           VECTOR(residual_out_degrees)[from]++;
           VECTOR(residual_in_degrees)[to]++;
@@ -1136,7 +1136,7 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
           IGRAPH_CHECK(igraph_set_add(&incomplete_in_vertices, to));
         } else {
           /* Insert the edge */
-          IGRAPH_CHECK(igraph_vector_insert(neis, j, to));
+          IGRAPH_CHECK(igraph_vector_int_insert(neis, j, to));
         }
       }
 
@@ -1153,7 +1153,7 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
           j = 0;
           while (igraph_set_iterate(&incomplete_in_vertices, &j, &to)) {
             neis = igraph_adjlist_get(&al, from);
-            if (from != to && !igraph_vector_binsearch(neis, to, 0)) {
+            if (from != to && !igraph_vector_int_binsearch(neis, to, 0)) {
               /* Found a suitable pair, so we can continue */
               failed = 0;
               break;
@@ -3599,7 +3599,7 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
   } else {
     /* Multiple edges are disallowed */
     igraph_adjlist_t al;
-    igraph_vector_t* neis;
+    igraph_vector_int_t* neis;
 
     IGRAPH_CHECK(igraph_adjlist_init_empty(&al, no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
@@ -3626,11 +3626,11 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
 
       /* Is there already an edge? If so, try again */
       neis = igraph_adjlist_get(&al, from);
-      if (igraph_vector_binsearch(neis, to, &pos))
+      if (igraph_vector_int_binsearch(neis, to, &pos))
         continue;
 
       /* Insert the edge */
-      IGRAPH_CHECK(igraph_vector_insert(neis, pos, to));
+      IGRAPH_CHECK(igraph_vector_int_insert(neis, pos, to));
 
       no_of_edges--;
     }

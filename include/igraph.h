@@ -93,5 +93,6 @@
 #include "igraph_matching.h"
 #include "igraph_embedding.h"
 #include "igraph_scan.h"
+#include "igraph_graphlets.h"
 
 #endif

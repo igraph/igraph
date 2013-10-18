@@ -925,6 +925,18 @@ igraph_maximal_cliques:
         DEPS: res ON graph
         IGNORE: RR, RC, RNamespace
 
+igraph_maximal_cliques_count:
+        PARAMS: GRAPH graph, OUT INTEGERPTR no, INTEGER min_size=0, \
+                INTEGER max_size=0
+        NAME-R: maximal.cliques.count
+        IGNORE: RR, RC
+
+igraph_maximal_cliques_file:
+        PARAMS: GRAPH graph, OUTFILE res, INTEGER min_size=0, \
+                INTEGER max_size=0
+        NAME-R: maximal.cliques.file
+        IGNORE: RR, RC, RNamespace
+
 igraph_clique_number:
         PARAMS: GRAPH graph, OUT INTEGERPTR no
         IGNORE: RR, RC, RNamespace
@@ -1227,7 +1239,8 @@ igraph_community_multilevel:
 
 igraph_community_optimal_modularity:
         PARAMS: GRAPH graph, OUT REALPTR modularity, \
-                OUT VECTOR_OR_0 membership
+                OUT VECTOR_OR_0 membership, \
+                EDGEWEIGHTS weights=NULL
         NAME-R: optimal.community
         IGNORE: RR
 
@@ -1279,6 +1292,28 @@ igraph_community_infomap:
         NAME-R: infomap.community
         DEPS: e_weights ON graph, v_weights ON graph
         IGNORE: RR
+
+igraph_graphlets:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                OUT VERTEXSETLIST cliques, OUT VECTOR Mu, INT niter=1000
+        NAME-R: graphlets
+        DEPS: weights ON graph
+        IGNORE: RC
+
+igraph_graphlets_candidate_basis:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                OUT VERTEXSETLIST cliques, OUT VECTOR thresholds
+        NAME-R: graphlets.candidate.basis
+        DEPS: weights ON graph
+        IGNORE: RR, RC
+
+igraph_graphlets_project:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                VERTEXSETLIST cliques, INOUT VECTOR Muc, \
+                BOOLEAN startMu=False, INT niter=1000
+        NAME-R: graphlets.project
+        DEPS: weights ON graph
+        IGNORE: RR, RC
 
 #######################################
 # Conversion
@@ -1443,11 +1478,13 @@ igraph_scan1_approximate_eigen:
 #######################################
 
 igraph_disjoint_union:
-        PARAMS: OUT GRAPH res, GRAPH left, GRAPH right
+        PARAMS: OUT GRAPH res, GRAPH left, GRAPH right, \
+                OUT EDGESET edge_map_left, OUT EDGESET edge_map_right
+        DEPS: edge_map_left ON left, edge_map_right ON right      
         IGNORE: RR, RC, RNamespace
 
 igraph_disjoint_union_many:
-        PARAMS: OUT GRAPH res, GRAPHLIST graphs
+        PARAMS: OUT GRAPH res, GRAPHLIST graphs, OUT VECTORLIST edgemaps
         IGNORE: RR, RC, RNamespace
 
 igraph_union:

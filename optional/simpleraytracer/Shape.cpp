@@ -1,6 +1,8 @@
 #include "Shape.h"
 #include "unit_limiter.h"
 
+namespace igraph {
+
 Shape::Shape()
 {
 	mName = 0;
@@ -100,3 +102,5 @@ void Shape::SpecularSize(int vSpecularSize)
 {
 	mSpecularSize = vSpecularSize;
 }
+
+} // namespace igraph

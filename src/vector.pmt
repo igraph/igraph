@@ -2625,3 +2625,20 @@ int FUNCTION(igraph_vector,index)(const TYPE(igraph_vector) *v,
   
   return 0;
 }
+
+int FUNCTION(igraph_vector,index_int)(TYPE(igraph_vector) *v,
+				      const igraph_vector_int_t *idx) {
+  BASE *tmp;
+  int i, n=igraph_vector_int_size(idx);
+
+  tmp=igraph_Calloc(n, BASE);
+  if (!tmp) { IGRAPH_ERROR("Cannot index vector", IGRAPH_ENOMEM); }
+
+  for (i=0; i<n; i++) { tmp[i] = VECTOR(*v)[ VECTOR(*idx)[i] ]; }
+
+  igraph_Free(v->stor_begin);
+  v->stor_begin = tmp;
+  v->stor_end = v->end = tmp + n;
+
+  return 0;
+}

@@ -6,6 +6,11 @@
 #ifndef POINT_H
 #define POINT_H
 
+#include <list>
+using namespace std;
+
+namespace igraph {
+
 class Point
 {
 public:
@@ -32,9 +37,9 @@ private:
 	int mName;	
 };
 
-#include <list>
-using namespace std;
 typedef list<Point> PointList;
 typedef list<Point>::iterator PointListIterator;
+
+} // namespace igraph
 
 #endif
