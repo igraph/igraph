@@ -93,8 +93,11 @@
 		<th><div class="btn-group btn-block">
 		    <button type="button"
 			    class="btn btn-primary btn-block dropdown-toggle"
-			    data-toggle="dropdown">
-		      File type <i class="icon-filter"></i></button>
+			    data-toggle="dropdown">File type
+		      % if dtype != "all":
+		        <i class="icon-filter"></i>
+		      % end
+		    </button>
 		    <ul class="dropdown-menu" role="menu">
 		      <li><a href="/list/all/{{version}}/{{branch}}">
 			  All types
@@ -117,8 +120,11 @@
 		<th><div class="btn-group btn-block">
 		    <button type="button"
 			    class="btn btn-primary btn-block dropdown-toggle"
-			    data-toggle="dropdown">
-		      Version <i class="icon-filter"></i></button>
+			    data-toggle="dropdown">Version
+		      % if version != "all":
+		        <i class="icon-filter"></i>
+		      % end
+		    </button>
 		    <ul class="dropdown-menu" role="menu">
 		      <li><a href="/list/{{dtype}}/all/{{branch}}">
 			  All versions
@@ -141,8 +147,11 @@
 		<th><div class="btn-group btn-block">
 		    <button type="button"
 			    class="btn btn-primary btn-block dropdown-toggle"
-			    data-toggle="dropdown">
-		      Branch <i class="icon-filter"></i></button>
+			    data-toggle="dropdown">Branch
+		      % if branch != "all":
+		        <i class="icon-filter"></i>
+		      % end
+		    </button>
 		    <ul class="dropdown-menu" role="menu">
 		      <li><a href="/list/{{dtype}}/{{version}}/all">
 			  All branches
