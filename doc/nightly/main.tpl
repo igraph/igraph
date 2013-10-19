@@ -10,7 +10,7 @@
 	rel="stylesheet">
   <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700'
         rel='stylesheet' type='text/css'>
-  <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+  <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
 	rel="stylesheet">
 
   <link rel="stylesheet" href="style.css" type="text/css" />
@@ -89,29 +89,87 @@
 	<form>
 	  <table class="table table-striped table-condensed"><thead><tr>
 		<th><!-- download buttons --></th>
-		<th><select id="type" class="form-control btn-primary">
-		    <option value="all">File type (all)</option>
-		    % for t in types:
-		    <option value="{{t}}">Type {{urlmap[t]}}</option>
-		    % end
-		</select></th>
-		<th><select id="version" class="form-control btn-primary">
-		    <option value="all">Version (all)</option>
-		    % for v in versions:
-		    <option value="{{v}}">Version {{v}}</option>
-		    % end
-		</select></th>
-		<th><select id="branch" class="form-control btn-primary">
-		    <option value="all">Branch (all)</option>
-		    % for b in branches:
-		    <option value="{{b}}">Branch {{b}}</option>
-		    % end
-		</select></th>
-		<th><button id="commit" class="btn btn-primary">
+
+		<th><div class="btn-group btn-block">
+		    <button type="button"
+			    class="btn btn-primary btn-block dropdown-toggle"
+			    data-toggle="dropdown">
+		      File type <i class="icon-filter"></i></button>
+		    <ul class="dropdown-menu" role="menu">
+		      <li><a href="/list/all/{{version}}/{{branch}}">
+			  All types
+			  % if dtype=="all":
+			    <i class="icon-ok"></i>
+			  % end
+		      </a></li>
+		      <li class="divider"></li>
+		      % for t in types:
+		        <li><a href="/list/{{t}}/{{version}}/{{branch}}">
+			    {{urlmap[t]}}
+			% if dtype==t:
+			    <i class="icon-ok"></i>
+			% end
+			</a></li>
+		      % end
+		    </ul>
+		</div></th>
+
+		<th><div class="btn-group btn-block">
+		    <button type="button"
+			    class="btn btn-primary btn-block dropdown-toggle"
+			    data-toggle="dropdown">
+		      Version <i class="icon-filter"></i></button>
+		    <ul class="dropdown-menu" role="menu">
+		      <li><a href="/list/{{dtype}}/all/{{branch}}">
+			  All versions
+			  % if version=="all":
+			    <i class="icon-ok"></i>
+			  % end
+		      </a></li>
+		      <li class="divider"></li>
+		      % for v in versions:
+		        <li><a href="/list/{{dtype}}/{{v}}/{{branch}}">
+			    {{v}}
+			% if version==v:
+			    <i class="icon-ok"></i>
+			% end
+			</a></li>
+		      % end
+		  </ul>
+		</div></th>
+
+		<th><div class="btn-group btn-block">
+		    <button type="button"
+			    class="btn btn-primary btn-block dropdown-toggle"
+			    data-toggle="dropdown">
+		      Branch <i class="icon-filter"></i></button>
+		    <ul class="dropdown-menu" role="menu">
+		      <li><a href="/list/{{dtype}}/{{version}}/all">
+			  All branches
+			  % if branch=="all":
+			    <i class="icon-ok"></i>
+			  % end
+		      </a></li>
+		      <li class="divider"></li>
+		      % for b in branches:
+		        <li><a href="/list/{{dtype}}/{{version}}/{{b}}">
+			    {{b}}
+			% if branch==b:
+			    <i class="icon-ok"></i>
+			% end
+			</a></li>
+		      % end
+		    </ul>
+		</div></th>
+
+		<th><button type="button" class="btn btn-block btn-primary"
+			    disabled="disabled">
 		    Commit</button></th>
-		<th><button id="date" class="btn btn-primary">
+		<th><button type="button" class="btn btn-block btn-primary"
+			    disabled="disabled">
 		    Uploaded</button></th>
-		<th><button id="size" class="btn btn-primary">
+		<th><button type="button" class="btn btn-block btn-primary"
+			    disabled="disabled">
 		    File size</button></th>
 	    </tr></thead>
 	    <tbody>
@@ -135,25 +193,6 @@
       </div>
     </div>
 
-<script>
-
-document.getElementById('type').value="{{dtype}}";
-document.getElementById('version').value="{{version}}";
-document.getElementById('branch').value="{{branch}}";
-
-function redirect() {
-  var type=document.getElementById('type').value || "all";
-  var version=document.getElementById('version').value || "all";
-  var branch=document.getElementById('branch').value || "all";
-  var goto = "/list/" + type + "/" + version + "/" + branch
-  window.location = goto;
-};
-document.getElementById('type').onchange = redirect;
-document.getElementById('version').onchange = redirect;
-document.getElementById('branch').onchange = redirect;
-
-</script>
-
     <div class="container footer">
       <div class="row">
         <div class="col-xs-6">
@@ -167,18 +206,10 @@ document.getElementById('branch').onchange = redirect;
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="js/jquery-2.0.3.min.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="js/affix.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function(){
-        $( ".thumbnail" ).mouseenter(function() {
-          $(this).find('.caption').removeClass("flipOutY").addClass("flipInY").show();
-        })
-        .mouseleave(function() {
-          $(this).find('.caption').removeClass("flipInY").addClass("flipOutY");
-});
-})
+    <script src="http://www.igraph.org/js/jquery-2.0.3.min.js"></script>
+    <script src="http://www.igraph.org/bootstrap/js/bootstrap.min.js"></script>
+    <script>
+      $('.dropdown-toggle').dropdown()
     </script>
   </body>
 </html>
