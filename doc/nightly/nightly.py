@@ -89,7 +89,7 @@ def get_latest(db, dtype, branch="develop"):
     # Need to redirect here, otherwise "smart" browsers uncompress
     # the .tar.gz file, because the Content-Encoding: gzip header is
     # present.
-    bottle.redirect("/steal/" + filename)
+    bottle.redirect("/get/" + filename)
 
 @nightly.route("/tests/<filename:path>")
 def get_tests(db, filename):
