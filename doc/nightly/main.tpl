@@ -98,7 +98,7 @@
 		      % end
 		    </button>
 		    <ul class="dropdown-menu" role="menu">
-		      <li><a href="/list/all/{{version}}/{{branch}}">
+		      <li><a href="/{{url}}/all/{{version}}/{{branch}}">
 			  All types
 			  % if dtype=="all":
 			    <i class="icon-ok"></i>
@@ -106,7 +106,7 @@
 		      </a></li>
 		      <li class="divider"></li>
 		      % for t in types:
-		        <li><a href="/list/{{t}}/{{version}}/{{branch}}">
+		        <li><a href="/{{url}}/{{t}}/{{version}}/{{branch}}">
 			    {{urlmap[t]}}
 			% if dtype==t:
 			    <i class="icon-ok"></i>
@@ -125,7 +125,7 @@
 		      % end
 		    </button>
 		    <ul class="dropdown-menu" role="menu">
-		      <li><a href="/list/{{dtype}}/all/{{branch}}">
+		      <li><a href="/{{url}}/{{dtype}}/all/{{branch}}">
 			  All versions
 			  % if version=="all":
 			    <i class="icon-ok"></i>
@@ -133,7 +133,7 @@
 		      </a></li>
 		      <li class="divider"></li>
 		      % for v in versions:
-		        <li><a href="/list/{{dtype}}/{{v}}/{{branch}}">
+		        <li><a href="/{{url}}/{{dtype}}/{{v}}/{{branch}}">
 			    {{v}}
 			% if version==v:
 			    <i class="icon-ok"></i>
@@ -152,7 +152,7 @@
 		      % end
 		    </button>
 		    <ul class="dropdown-menu" role="menu">
-		      <li><a href="/list/{{dtype}}/{{version}}/all">
+		      <li><a href="/{{url}}/{{dtype}}/{{version}}/all">
 			  All branches
 			  % if branch=="all":
 			    <i class="icon-ok"></i>
@@ -160,7 +160,7 @@
 		      </a></li>
 		      <li class="divider"></li>
 		      % for b in branches:
-		        <li><a href="/list/{{dtype}}/{{version}}/{{b}}">
+		        <li><a href="/{{url}}/{{dtype}}/{{version}}/{{b}}">
 			    {{b}}
 			% if branch==b:
 			    <i class="icon-ok"></i>

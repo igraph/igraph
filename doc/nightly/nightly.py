@@ -25,22 +25,7 @@ def human_size(num):
 
 bottle.SimpleTemplate.defaults['human_size'] = human_size
 
-# This is the main web page, you can choose your download here
-# It can be filtered
-@nightly.route("/")
-@nightly.route("/list/")
-@nightly.route("/list")
-@nightly.route("/list/<dtype>")
-@nightly.route("/list/<dtype>/<version>")
-@nightly.route("/list/<dtype>/<version>/<branch>")
-def list_files(db, dtype="all", version="all", branch="all"):
-
-    files = db.execute("SELECT * FROM files    \
-                        WHERE type LIKE ? AND version LIKE ? AND branch LIKE ? \
-                        ORDER BY version DESC, date DESC",
-                       ("%" if dtype=="all" else dtype,
-                        "%" if version=="all" else version,
-                        "%" if branch=="all" else branch)).fetchall()
+def list_files_common(db, files, url, dtype, version, branch):
 
     versions=db.execute("SELECT DISTINCT version FROM files \
                          ORDER BY version DESC").fetchall()
@@ -61,10 +46,46 @@ def list_files(db, dtype="all", version="all", branch="all"):
              GROUP BY filename' % ','.join(filenames)
     tests = dict(db.execute(query).fetchall())
 
-    return bottle.template('main', files=files, versions=versions,
+    return bottle.template('main', url=url, files=files, versions=versions,
                            types=types, branches=branches, urlmap=urlmap,
                            dtype=dtype, branch=branch, version=version,
                            tests=tests)
+
+@nightly.route("/")
+@nightly.route("/listlatest/")
+@nightly.route("/listlatest")
+@nightly.route("/listlatest/<dtype>")
+@nightly.route("/listlatest/<dtype>/<version>")
+@nightly.route("/listlatest/<dtype>/<version>/<branch>")
+def list_latest_files(db, dtype="all", version="all", branch="all"):
+
+    files = db.execute("SELECT *, MAX(date) AS tmp FROM files    \
+                        WHERE type LIKE ? AND version LIKE ? AND branch LIKE ? \
+                        GROUP BY type, branch \
+                        ORDER BY version DESC, date DESC",
+                       ("%" if dtype=="all" else dtype,
+                        "%" if version=="all" else version,
+                        "%" if branch=="all" else branch)).fetchall()
+
+    return list_files_common(db, files, url="listlatest", dtype=dtype,
+                             version=version, branch=branch)
+
+@nightly.route("/list/")
+@nightly.route("/list")
+@nightly.route("/list/<dtype>")
+@nightly.route("/list/<dtype>/<version>")
+@nightly.route("/list/<dtype>/<version>/<branch>")
+def list_files(db, dtype="all", version="all", branch="all"):
+
+    files = db.execute("SELECT * FROM files    \
+                        WHERE type LIKE ? AND version LIKE ? AND branch LIKE ? \
+                        ORDER BY version DESC, date DESC",
+                       ("%" if dtype=="all" else dtype,
+                        "%" if version=="all" else version,
+                        "%" if branch=="all" else branch)).fetchall()
+
+    return list_files_common(db, files, url="list", dtype=dtype,
+                             version=version, branch=branch)
 
 @nightly.route("/steal/<filename:path>")
 def steal_file(filename):
