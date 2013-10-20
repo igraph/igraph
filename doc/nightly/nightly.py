@@ -54,9 +54,17 @@ def list_files(db, dtype="all", version="all", branch="all"):
                          ORDER BY branch").fetchall()
     branches=[ e[0] for e in branches ]
 
+    # Add test results
+    filenames = [ "'" + f['filename'] + "'" for f in files ]
+    query = 'SELECT filename, MAX(resultcode) FROM tests \
+             WHERE filename IN (%s)            \
+             GROUP BY filename, platform, test' % ','.join(filenames)
+    tests = dict(db.execute(query).fetchall())
+
     return bottle.template('main', files=files, versions=versions,
                            types=types, branches=branches, urlmap=urlmap,
-                           dtype=dtype, branch=branch, version=version)
+                           dtype=dtype, branch=branch, version=version,
+                           tests=tests)
 
 @nightly.route("/steal/<filename:path>")
 def steal_file(filename):

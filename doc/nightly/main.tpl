@@ -180,6 +180,9 @@
 		<th><button type="button" class="btn btn-block btn-primary"
 			    disabled="disabled">
 		    File size</button></th>
+		<th><button type="button" class="btn btn-block btn-primary">
+		    Tests</button></th>
+
 	    </tr></thead>
 	    <tbody>
 	      % for file in files:
@@ -193,6 +196,26 @@
 		<td><a href="https://github.com/igraph/igraph/commits/{{file['hash']}}"><code>{{file['hash']}}</code></a></td>
 		<td>{{file['date']}}</td>
 		<td>{{human_size(file['size'])}}</td>
+		<td>
+		  % if filename in tests:
+		  %   testcode=long(tests[filename])
+		  %   if testcode == 0:
+		        <button class="btn btn-block btn-xs btn-success">
+			  OK</button>
+		  %   elif testcode == 1:
+			<button class="btn btn-block btn-xs btn-info">
+			  NOTE</button>
+		  %   elif testcode == 2:
+			<button class="btn btn-block btn-xs btn-warning">
+			  WARNING</button>
+		  %   elif testcode == 3:
+			<button class="btn btn-block btn-xs btn-danger">
+			  ERROR</button>
+                  %   end
+		  % else:
+			<!-- Untested -->
+		  % end
+		</td>
 	      </tr>
 	      % end
 	    </tbody>
