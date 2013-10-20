@@ -58,7 +58,7 @@ def list_files(db, dtype="all", version="all", branch="all"):
     filenames = [ "'" + f['filename'] + "'" for f in files ]
     query = 'SELECT filename, MAX(resultcode) FROM tests \
              WHERE filename IN (%s)            \
-             GROUP BY filename, platform, test' % ','.join(filenames)
+             GROUP BY filename' % ','.join(filenames)
     tests = dict(db.execute(query).fetchall())
 
     return bottle.template('main', files=files, versions=versions,
