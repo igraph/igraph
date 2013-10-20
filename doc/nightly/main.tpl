@@ -6,8 +6,6 @@
 
   <link href="http://www.igraph.org/bootstrap/css/bootstrap.css"
 	rel="stylesheet">
-  <link href="http://www.igraph.org/css/other.css"
-	rel="stylesheet">
   <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700'
         rel='stylesheet' type='text/css'>
   <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
@@ -78,16 +76,17 @@
 	    nightly builds
         </h1>
         <p class="lead">
-	  Nightly builds from the branches under active development
+	  Nightly builds from branches under active development.
         </p>
       </div>
     </div>
 
     <div class="container">
-      <div class="col-xs-12 bs-docs-section" role="main">
+      <div class="col-xs-12" role="main">
 
 	<form>
-	  <table class="table table-striped table-condensed"><thead><tr>
+	  <table class="table table-striped table-condensed table-hover">
+	    <thead><tr>
 		<th><!-- download buttons --></th>
 
 		<th><div class="btn-group btn-block">
@@ -171,14 +170,11 @@
 		    </ul>
 		</div></th>
 
-		<th><button type="button" class="btn btn-block btn-primary"
-			    disabled="disabled">
+		<th><button type="button" class="btn btn-block btn-primary">
 		    Commit</button></th>
-		<th><button type="button" class="btn btn-block btn-primary"
-			    disabled="disabled">
+		<th><button type="button" class="btn btn-block btn-primary">
 		    Uploaded</button></th>
-		<th><button type="button" class="btn btn-block btn-primary"
-			    disabled="disabled">
+		<th><button type="button" class="btn btn-block btn-primary">
 		    File size</button></th>
 		<th><button type="button" class="btn btn-block btn-primary">
 		    Tests</button></th>
