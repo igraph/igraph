@@ -397,26 +397,26 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
 	 "backwards" according to the rank vector. */
 
 int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
-																const igraph_vector_int_t *rank) {
-	long int i;
-	long int n=al->length;
-	igraph_vector_int_t mark;
-	igraph_vector_int_init(&mark, n);
-	IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
-	for (i=0; i<n; i++) {
-    igraph_vector_t *v=&al->adjs[i];
-    int j, l=igraph_vector_size(v);
-		int irank=VECTOR(*rank)[i];
+				const igraph_vector_int_t *rank) {
+  long int i;
+  long int n=al->length;
+  igraph_vector_int_t mark;
+  igraph_vector_int_init(&mark, n);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
+  for (i=0; i<n; i++) {
+    igraph_vector_int_t *v=&al->adjs[i];
+    int j, l=igraph_vector_int_size(v);
+    int irank=VECTOR(*rank)[i];
     VECTOR(mark)[i] = i+1;
     for (j=0; j<l; /* nothing */) {
       long int e=(long int) VECTOR(*v)[j];
       if (VECTOR(*rank)[e] > irank && VECTOR(mark)[e] != i+1) {
-				VECTOR(mark)[e]=i+1;
-				j++;
+	VECTOR(mark)[e]=i+1;
+	j++;
       } else {
-				VECTOR(*v)[j] = igraph_vector_tail(v);
-				igraph_vector_pop_back(v);
-				l--;
+	VECTOR(*v)[j] = igraph_vector_int_tail(v);
+	igraph_vector_int_pop_back(v);
+	l--;
       }
     }
   }
