@@ -84,7 +84,6 @@
     <div class="container">
       <div class="col-xs-12" role="main">
 
-	<form>
 	  <table class="table table-striped table-condensed table-hover">
 	    <thead><tr>
 		<th><!-- download buttons --></th>
@@ -216,8 +215,6 @@
 	      % end
 	    </tbody>
 	  </table>
-	  <noscript><input type="submit" value="Submit"></noscript>
-	</form>
       </div>
     </div>
 
