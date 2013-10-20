@@ -91,6 +91,13 @@ def get_latest(db, dtype, branch="develop"):
     # present.
     bottle.redirect("/steal/" + filename)
 
+@nightly.route("/tests/<filename:path>")
+def get_tests(db, filename):
+    testres = db.execute("SELECT * FROM tests WHERE filename=?",
+                         (filename,)).fetchall()
+    print(testres)
+    return bottle.template('tests', testres=testres, filename=filename)
+
 @nightly.error(404)
 def error404(error):
     return "Page does not exist, maybe your syntax is wrong"

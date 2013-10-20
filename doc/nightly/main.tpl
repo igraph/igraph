@@ -192,7 +192,7 @@
 		<td><a href="https://github.com/igraph/igraph/commits/{{file['hash']}}"><code>{{file['hash']}}</code></a></td>
 		<td>{{file['date']}}</td>
 		<td>{{human_size(file['size'])}}</td>
-		<td>
+		<td><a href="/tests/{{filename}}">
 		  % if filename in tests:
 		  %   testcode=long(tests[filename])
 		  %   if testcode == 0:
@@ -211,7 +211,7 @@
 		  % else:
 			<!-- Untested -->
 		  % end
-		</td>
+		</a></td>
 	      </tr>
 	      % end
 	    </tbody>
