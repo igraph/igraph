@@ -1256,33 +1256,33 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
 }
 
 int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
-																					 const igraph_real_t *from,
-																					 int n, void *extra) {
-	igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
-	igraph_vector_t *neis;
-	int i, j, nlen;
-	
-	for (i=0; i<n; i++) {
-		neis=igraph_adjlist_get(adjlist, i);
-		nlen=igraph_vector_size(neis);
-		to[i] = 0.0;
-		for (j=0; j<nlen; j++) {
-			int nei=(int) VECTOR(*neis)[j];
-			to[i] += from[nei];
-		}
-	}
-	
-	return 0;
+					   const igraph_real_t *from,
+					   int n, void *extra) {
+  igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
+  igraph_vector_int_t *neis;
+  int i, j, nlen;
+
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(adjlist, i);
+    nlen=igraph_vector_int_size(neis);
+    to[i] = 0.0;
+    for (j=0; j<nlen; j++) {
+      int nei = VECTOR(*neis)[j];
+      to[i] += from[nei];
+    }
+  }
+
+  return 0;
 }
 
 int igraph_i_eigen_adjacency_arpack(const igraph_t *graph, 
-							const igraph_eigen_which_t *which,
-							igraph_arpack_options_t *options,
-							igraph_arpack_storage_t* storage, 
-							igraph_vector_t *values,
-							igraph_matrix_t *vectors, 
-							igraph_vector_complex_t *cmplxvalues,
-							igraph_matrix_complex_t *cmplxvectors){
+				    const igraph_eigen_which_t *which,
+				    igraph_arpack_options_t *options,
+				    igraph_arpack_storage_t* storage,
+				    igraph_vector_t *values,
+				    igraph_matrix_t *vectors,
+				    igraph_vector_complex_t *cmplxvalues,
+				    igraph_matrix_complex_t *cmplxvectors){
 
 	igraph_adjlist_t adjlist;
 	void *extra=(void*) &adjlist;
@@ -1290,81 +1290,80 @@ int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
 
   if (!options) { 
     IGRAPH_ERROR("`options' must be given for ARPACK algorithm",
-								 IGRAPH_EINVAL);
+		 IGRAPH_EINVAL);
   }
 	
-	if (igraph_is_directed(graph)) {
-		IGRAPH_ERROR("ARPACK adjacency eigensolver not implemented for "
-								 "directed graphs", IGRAPH_UNIMPLEMENTED);
-	}
-	if (which->pos == IGRAPH_EIGEN_INTERVAL) {
-		IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
-								 "`INTERNAL' eigenvalues", IGRAPH_UNIMPLEMENTED);
-	}
-	if (which->pos == IGRAPH_EIGEN_SELECT) {
-		IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
-								 "`SELECT' eigenvalues", IGRAPH_UNIMPLEMENTED);
-	}
-	if (which->pos == IGRAPH_EIGEN_ALL) {
-		IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
-								 "`ALL' eigenvalues", IGRAPH_UNIMPLEMENTED);
-	}
+  if (igraph_is_directed(graph)) {
+    IGRAPH_ERROR("ARPACK adjacency eigensolver not implemented for "
+		 "directed graphs", IGRAPH_UNIMPLEMENTED);
+  }
+  if (which->pos == IGRAPH_EIGEN_INTERVAL) {
+    IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+		 "`INTERNAL' eigenvalues", IGRAPH_UNIMPLEMENTED);
+  }
+  if (which->pos == IGRAPH_EIGEN_SELECT) {
+    IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+		 "`SELECT' eigenvalues", IGRAPH_UNIMPLEMENTED);
+  }
+  if (which->pos == IGRAPH_EIGEN_ALL) {
+    IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+		 "`ALL' eigenvalues", IGRAPH_UNIMPLEMENTED);
+  }
 
-	switch (which->pos) {
-	case IGRAPH_EIGEN_LM:
-		options->which[0]='L'; options->which[1]='M';
-		options->nev=which->howmany;
-		break;
-	case IGRAPH_EIGEN_SM:
-		options->which[0]='S'; options->which[1]='M';
-		options->nev=which->howmany;
-		break;
-	case IGRAPH_EIGEN_LA:
-		options->which[0]='L'; options->which[1]='A';
-		options->nev=which->howmany;
-		break;
-	case IGRAPH_EIGEN_SA:
-		options->which[0]='S'; options->which[1]='A';
-		options->nev=which->howmany;
-		break;
-	case IGRAPH_EIGEN_ALL:
-		options->which[0]='L'; options->which[1]='M';
-		options->nev=n;
-		break;
-	case IGRAPH_EIGEN_BE:
-		IGRAPH_ERROR("Eigenvectors from both ends with ARPACK", 
-								 IGRAPH_UNIMPLEMENTED);
-		/* TODO */
-		break;
-	case IGRAPH_EIGEN_INTERVAL:
-		IGRAPH_ERROR("Interval of eigenvectors with ARPACK", 
-								 IGRAPH_UNIMPLEMENTED);
-		/* TODO */
-		break;
-	case IGRAPH_EIGEN_SELECT:
-		IGRAPH_ERROR("Selected eigenvalues with ARPACK",
-								 IGRAPH_UNIMPLEMENTED);
-		/* TODO */
-		break;
-	default:
-		/* This cannot happen */
-		break;
-	}
-	
-	options->n=n;
-	options->ncv= 2*options->nev < n ? 2*options->nev : n;
+  switch (which->pos) {
+  case IGRAPH_EIGEN_LM:
+    options->which[0]='L'; options->which[1]='M';
+    options->nev=which->howmany;
+    break;
+  case IGRAPH_EIGEN_SM:
+    options->which[0]='S'; options->which[1]='M';
+    options->nev=which->howmany;
+    break;
+  case IGRAPH_EIGEN_LA:
+    options->which[0]='L'; options->which[1]='A';
+    options->nev=which->howmany;
+    break;
+  case IGRAPH_EIGEN_SA:
+    options->which[0]='S'; options->which[1]='A';
+    options->nev=which->howmany;
+    break;
+  case IGRAPH_EIGEN_ALL:
+    options->which[0]='L'; options->which[1]='M';
+    options->nev=n;
+    break;
+  case IGRAPH_EIGEN_BE:
+    IGRAPH_ERROR("Eigenvectors from both ends with ARPACK",
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_INTERVAL:
+    IGRAPH_ERROR("Interval of eigenvectors with ARPACK",
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_SELECT:
+    IGRAPH_ERROR("Selected eigenvalues with ARPACK",
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  default:
+    /* This cannot happen */
+    break;
+  }
 
-	IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
-	IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-	
-	IGRAPH_CHECK(igraph_arpack_rssolve(
-													 igraph_i_eigen_adjacency_arpack_sym_cb, 
-													 extra, options, storage, values, vectors));
-	
-	igraph_adjlist_destroy(&adjlist);
-	IGRAPH_FINALLY_CLEAN(1);
-	
-	return 0;
+  options->n=n;
+  options->ncv= 2*options->nev < n ? 2*options->nev : n;
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+  IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigen_adjacency_arpack_sym_cb,
+				     extra, options, storage, values, vectors));
+
+  igraph_adjlist_destroy(&adjlist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
 }
 
 /** 

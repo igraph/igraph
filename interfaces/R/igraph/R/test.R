@@ -25,3 +25,8 @@ igraphtest <- function() {
   tdir <- system.file("tests", package="igraph")
   do.call("test_dir", list(tdir))
 }
+
+igraph.version <- function() {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  .Call("R_igraph_version", PACKAGE="igraph")
+}

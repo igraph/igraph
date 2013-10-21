@@ -1,5 +1,6 @@
 
-VERSION=$(shell ./tools/convertversion.sh ../../VERSION)
+REALVERSION=$(shell ../../tools/getversion.sh)
+VERSION=$(shell ./tools/convertversion.sh)
 DATAVERSION=0.1
 top_srcdir=../..
 
@@ -176,7 +177,7 @@ igraph/src/igraph_threading.h: $(top_srcdir)/include/igraph_threading.h.in
 	sed 's/@HAVE_TLS@/0/g' $< >$@
 
 igraph/src/igraph_version.h: $(top_srcdir)/include/igraph_version.h.in
-	sed 's/@VERSION@/'$(VERSION)'/g' $< >$@
+	sed 's/@VERSION@/'$(REALVERSION)'/g' $< >$@
 
 DIRS: 
 	mkdir -p igraph/src
@@ -210,4 +211,4 @@ homepagetests:
 	cd $($@_TMP)/examples && echo "tools:::.runPackageTestsR()" | \
 	R --no-save && echo
 
-.PHONY: tests
+.PHONY: tests igraph/DESCRIPTION

@@ -245,7 +245,7 @@ int igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV, bool* result) {
 	/* v is free => augmenting path found */
 	j=0;
 	while (u2 != u) { /* update global matching wrt path */
-	  if (j>100) { exit(1); }
+	  if (j>100) { IGRAPH_ERROR("LAD failed", IGRAPH_EINTERNAL); }
 	  j++;
 	  v2 = VECTOR(D->globalMatchingP)[u2];
 	  VECTOR(D->globalMatchingP)[u2]=v;

@@ -58,7 +58,9 @@ maximal.cliques <- function(graph, min=NULL, max=NULL,
   if (is.null(min)) { min <- 0 }
   if (is.null(max)) { max <- 0 }
 
-  if (!is.null(subset)) { subset <- as.integer(subset-1) }
+  if (!is.null(subset)) {
+    subset <- as.integer(as.igraph.vs(graph, subset)-1)
+  }
   
   if (!is.null(file)) {
     if (!is.character(file) ||
@@ -97,7 +99,9 @@ maximal.cliques.count <- function(graph, min=NULL, max=NULL,
   min <- as.integer(min)
   max <- as.integer(max)
 
-  if (!is.null(subset)) { subset <- as.integer(subset-1) }
+  if (!is.null(subset)) {
+    subset <- as.integer(as.igraph.vs(graph, subset)-1)
+  }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call

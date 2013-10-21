@@ -22,11 +22,10 @@
 
 */
 
-
   long int no_of_nodes=igraph_vcount(graph);
   long int node, i, j, nn;
   igraph_adjlist_t allneis;
-  igraph_vector_t *neis1, *neis2;
+  igraph_vector_int_t *neis1, *neis2;
   long int neilen1, neilen2, deg1;
 #ifdef TRIPLES
   igraph_integer_t triples;
@@ -71,8 +70,8 @@
     IGRAPH_ALLOW_INTERRUPTION();
     
     neis1=igraph_adjlist_get(&allneis, node);
-    neilen1=igraph_vector_size(neis1);
-		deg1=(long int) VECTOR(degree)[node];
+    neilen1=igraph_vector_int_size(neis1);
+    deg1=(long int) VECTOR(degree)[node];
 #ifdef TRIPLES
     triples=(igraph_integer_t) ((double)deg1*(deg1-1)/2);
 #endif
@@ -83,15 +82,15 @@
     
     for (i=0; i<neilen1; i++) {
       long int nei=(long int) VECTOR(*neis1)[i];
-			neis2=igraph_adjlist_get(&allneis, nei);
-			neilen2=igraph_vector_size(neis2);
-			for (j=0; j<neilen2; j++) {
-				long int nei2=(long int) VECTOR(*neis2)[j];
-				if (neis[nei2] == node+1) {
-					VECTOR(*res)[nei2] += 1;
-					VECTOR(*res)[nei] += 1;
-					VECTOR(*res)[node] += 1;
-				}
+      neis2=igraph_adjlist_get(&allneis, nei);
+      neilen2=igraph_vector_int_size(neis2);
+      for (j=0; j<neilen2; j++) {
+	long int nei2=(long int) VECTOR(*neis2)[j];
+	if (neis[nei2] == node+1) {
+	  VECTOR(*res)[nei2] += 1;
+	  VECTOR(*res)[nei] += 1;
+	  VECTOR(*res)[node] += 1;
+	}
       }
     }
 

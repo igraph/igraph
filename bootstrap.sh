@@ -2,7 +2,7 @@
 
 ## Find out our version number, need git for this
 printf "Finding out version number/string... "
-git describe HEAD --tags | rev | sed 's/g-/./' | sed 's/-/+/' | rev > VERSION
+tools/getversion.sh > VERSION
 cat VERSION
 
 for i in glibtoolize libtoolize; do
