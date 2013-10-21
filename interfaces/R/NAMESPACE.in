@@ -191,7 +191,7 @@ export(graph.disjoint.union, "%du%", graph.intersection, "%s%",
 
 # parameters, config
 
-export(igraph.par, igraph.options, getIgraphOpt, igraphtest)
+export(igraph.par, igraph.options, getIgraphOpt, igraphtest, igraph.version)
 
 # console
 
