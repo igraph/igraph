@@ -1,6 +1,6 @@
 #! /bin/sh
 
-vstring=`cat ../../VERSION`
+vstring=`../../tools/getversion.sh`
 if echo "$vstring" | grep -q '\+'; then
     pvstring=`echo $vstring | 
          sed 's/\(^[0-9\.]*\)[^+]*[+]*\([0-9][0-9]*\)\.\([0-9a-f]*\)$/\1|\2|\3/'`
