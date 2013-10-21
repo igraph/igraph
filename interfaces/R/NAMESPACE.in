@@ -151,7 +151,7 @@ export(cluster.distribution, is.connected, decompose.graph,
 # centrality
 
 export(evcent, bonpow, alpha.centrality, subgraph.centrality)
-export(igraph.arpack.default)
+export(igraph.arpack.default, igraph.eigen.default)
 
 # dynamics measurement
 
