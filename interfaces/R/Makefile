@@ -1,5 +1,5 @@
 
-VERSION=$(shell ./tools/convertversion.sh ../../VERSION)
+VERSION=$(shell ./tools/convertversion.sh)
 DATAVERSION=0.1
 top_srcdir=../..
 
