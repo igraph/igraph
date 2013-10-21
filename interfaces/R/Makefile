@@ -219,4 +219,4 @@ homepagetests:
 	cd $($@_TMP)/examples && echo "tools:::.runPackageTestsR()" | \
 	R --no-save && echo
 
-.PHONY: tests
+.PHONY: tests igraph/DESCRIPTION
