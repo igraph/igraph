@@ -7,11 +7,15 @@
   This function calculates the optimal community structure of a graph,
   by maximizing the modularity measure over all possible partitions.}
 \usage{
-optimal.community(graph)
+optimal.community(graph, weights = NULL)
 }
 \arguments{
   \item{graph}{The input graph. Edge directions are ignored for directed
     graphs.}
+  \item{weights}{Optional positive weight vector for optimizing
+    weighted modularity. If the graph has a \code{weight} edge
+    attribute, then this is used by default. Supply \code{NA} to ignore
+    the weights of a weighted graph.}
 }
 \details{
   This function calculates the optimal community structure for a
