@@ -35,6 +35,9 @@ VERTEXINDEX_OR_0:
 VECTOR_LONG:
     INCONV: %I% <- as.numeric(%I%)
 
+VECTOR_INT:
+    INCONV: %I% <- as.integer(%I%)
+
 VECTORM1:
     INCONV: %I% <- as.numeric(%I%)-1
 
