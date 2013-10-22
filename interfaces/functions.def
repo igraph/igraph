@@ -311,6 +311,14 @@ igraph_k_regular_game:
         GATTR-R: name IS k-regular graph
         GATTR-PARAM-R: k
 
+igraph_sbm_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, MATRIX pref_matrix, \
+                VECTOR_INT block_sizes, BOOLEAN directed=False, \
+                BOOLEAN loops=False
+        NAME-R: sbm.game
+        GATTR-R: name IS Stochastic block-model
+        GATTR-PARAM-R: loops
+
 #######################################
 # Basic query functions
 #######################################
