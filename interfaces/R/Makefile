@@ -195,7 +195,7 @@ igraph/configure igraph/src/config.h.in: igraph/configure.in
 igraph/src/Makevars.win: src/Makevars.win
 	sed 's/@VERSION@/'$(VERSION)'/g' $< >$@
 
-igraph/DESCRIPTION: src/DESCRIPTION ../../VERSION
+igraph/DESCRIPTION: src/DESCRIPTION
 	sed 's/^Version: .*$$/Version: '$(VERSION)'/' $<     | \
         sed 's/^Date: .*$$/Date: '`date "+%Y-%m-%d"`'/' > $@
 
