@@ -55,6 +55,7 @@
 <!---doxrox-include igraph_lastcit_game -->
 <!-- doxrox-include igraph_cited_type_game -->
 <!-- doxrox-include igraph_citing_cited_type_game -->
+<!-- doxrox-include igraph_sbm_game -->
 </section>
 
 </chapter>

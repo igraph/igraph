@@ -31,6 +31,38 @@
 
 /**
  * \function igraph_sbm_game
+ * Sample from a stochastic block model
+ *
+ * This function samples graphs from a stochastic block
+ * model by (doing the equivalent of) Bernoulli
+ * trials for each potential edge with the probabilities
+ * given by the Bernoulli rate matrix, \p pref_matrix.
+ * See Faust, K., &amp; Wasserman, S. (1992a). Blockmodels:
+ * Interpretation and evaluation. Social Networks, 14, 5-–61.
+ *
+ * </para><para>
+ * The order of the vertex ids in the generated graph corresponds to
+ * the \p block_sizes argument.
+ *
+ * \param graph The output graph.
+ * \param n Number of vertices.
+ * \param pref_matrix The matrix giving the Bernoulli rates.
+ *     This is a KxK matrix, where K is the number of groups.
+ *     The probability of creating an edge between vertices from
+ *     groups i and j is given by element (i,j).
+ * \param block_sizes An integer vector giving the number of
+ *     vertices in each group.
+ * \param directed Boolean, whether to create a directed graph. If
+ *     this argument is false, then \p pref_matrix must be symmetric.
+ * \param loops Boolean, whether to create self-loops.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|+K^2), where |V| is the number of
+ * vertices, |E| is the number of edges, and K is the number of
+ * groups.
+ *
+ * \sa \ref igraph_erdos_renyi_game() for a simple Bernoulli graph.
+ *
  */
 
 int igraph_sbm_game(igraph_t *graph, igraph_integer_t n, 
