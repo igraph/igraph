@@ -80,13 +80,15 @@ generators.xml: generators.xxml \
 		$(SRCDIR)/forestfire.c \
 		$(SRCDIR)/games.c \
 		$(SRCDIR)/structure_generators.c \
-		$(SRCDIR)/structural_properties.c
+		$(SRCDIR)/structural_properties.c \
+		$(SRCDIR)/sbm.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/atlas.c \
 	$(SRCDIR)/forestfire.c \
 	$(SRCDIR)/games.c \
 	$(SRCDIR)/structure_generators.c \
-	$(SRCDIR)/structural_properties.c
+	$(SRCDIR)/structural_properties.c \
+	$(SRCDIR)/sbm.c
 
 structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/spanning_trees.c \
