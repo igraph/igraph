@@ -260,25 +260,30 @@ else
 fi
 
 glpk_support=no
-if test "$internal_glpk" = "no"; then
-  AC_CHECK_LIB([glpk], [glp_read_mps], [
-    AC_CHECK_HEADER([glpk.h], [
-      AC_EGREP_CPP(yes, [
-        #include <glpk.h>
-        #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
-          yes
-        #endif
-      ], [
-        AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-        glpk_support=yes
-        LDFLAGS="${LDFLAGS} -lglpk"
+AC_ARG_ENABLE(glpk, AC_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
+if test "x$enable_glpk" != "xno"; then
+  if test "$internal_glpk" = "no"; then
+    AC_CHECK_LIB([glpk], [glp_read_mps], [
+      AC_CHECK_HEADER([glpk.h], [
+        AC_EGREP_CPP(yes, [
+          #include <glpk.h>
+          #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
+            yes
+          #endif
+        ], [
+          AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+          glpk_support=yes
+          LDFLAGS="${LDFLAGS} -lglpk"
+        ])
       ])
     ])
-  ])
+  else
+    AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+    AC_DEFINE([INTERNAL_GLPK], [1], [Define to 1 if you use the internal GLPK library])
+    glpk_support=yes
+  fi
 else
-  AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-  AC_DEFINE([INTERNAL_GLPK], [1], [Define to 1 if you use the internal GLPK library])
-  glpk_support=yes
+  internal_glpk=no
 fi
 
 AM_CONDITIONAL(INTERNAL_GLPK, test x$internal_glpk = xyes)
@@ -311,6 +316,8 @@ AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
 AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
 AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])
 AC_MSG_RESULT([  Use internal F2C       -- $internal_f2c])
-AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
+if test "$glpk_support" != "no"; then
+  AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
+fi
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
