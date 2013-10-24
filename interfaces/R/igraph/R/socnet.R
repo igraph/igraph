@@ -1863,10 +1863,10 @@ tkigraph <- function() {
   tkinsert(txt, "end", paste("  Outer links:", comm$outer.links, "\n"))
 
   tkinsert(txt, "end", "\nThe community:\n")
-  con <- textConnection(".tkigraph.ttt", open="w")
+  con <- textConnection(NULL, open="w", local=TRUE)
   cat(sort(comm$community), file=con, fill=TRUE, sep=", ")
+  tkinsert(txt, "end", textConnectionValue(con))
   close(con)
-  tkinsert(txt, "end", .tkigraph.ttt)
   tkconfigure(txt, state="disabled")
 
   plot.communities <- function(simple=FALSE) {
