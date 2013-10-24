@@ -191,9 +191,13 @@ plot(g, vertex.shape="star", vertex.color=rainbow(vcount(g)),
 # Pictures as vertices.
 # Similar musicians from last.fm, we start from an artist and
 # will query two levels. We will use the XML, png and jpeg packages
-# for this.
+# for this, so these must be available. Otherwise the example is
+# skipped
 
-if (require(XML) && require(png) && require(jpeg)) {
+loadIfYouCan <- function(pkg) suppressWarnings(do.call(require, list(pkg)))
+
+if (loadIfYouCan("XML") && loadIfYouCan("png") &&
+    loadIfYouCan("jpeg")) {
   url <- paste(sep="",
                'http://ws.audioscrobbler.com/',
                '2.0/?method=artist.getinfo&artist=\%s',
@@ -241,6 +245,8 @@ if (require(XML) && require(png) && require(jpeg)) {
        vertex.label=V(musnet)$name, margin=.2,
        vertex.size=50, vertex.size2=50,
        vertex.label.dist=2, vertex.label.degree=0)
+} else {
+  message("You need the `XML', `png' and `jpeg' packages to run this")
 }
 
 }

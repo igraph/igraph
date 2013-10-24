@@ -1,0 +1,28 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  # Every Vagrant virtual environment requires a box to build off of.
+  config.vm.box = "ubuntu-x86_64"
+  config.vm.box_url = "file:///Users/csardi/BOX/ubuntu-x86_64/package.box"
+
+  config.vm.synced_folder "../scripts/", "/tekton"
+
+  config.vm.provision :shell, :path => "../provisioners/apt-update.sh"
+  config.vm.provision :shell, :path => "../provisioners/sshkey.sh"
+  config.vm.provision :shell, :path => "../provisioners/createdir.sh", :args => "~vagrant/vagrant/provisions"
+  config.vm.provision :shell, :path => "../provisioners/createdir.sh", :args => "~vagrant/vagrant/scripts"
+  config.vm.provision :shell, :path => "../provisioners/apt-get-install.sh", :args => "task-spooler"
+  config.vm.provision :shell, :path => "../provisioners/apt-get-install.sh", :args => "python"
+  config.vm.provision :shell, :path => "../provisioners/compilers.sh"
+  config.vm.provision :shell, :path => "../provisioners/igraphdeps.sh"
+  config.vm.provision :shell, :path => "../provisioners/installR.sh", :args => "2.15.3"
+  config.vm.provision :shell, :path => "../provisioners/installR.sh", :args => "3.0.1"
+  config.vm.provision :shell, :path => "../provisioners/installR-asan.sh", :args => "3.0.1"
+  config.vm.provision :shell, :path => "../provisioners/installR-svn.sh"
+
+end

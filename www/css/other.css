@@ -1,0 +1,107 @@
+body
+{
+    padding-top: 50px;
+}
+
+.centered
+{
+    text-align: center;
+    margin: auto;
+}
+
+.navbar-brand
+{
+    margin-right: 30px;
+}
+
+@media(max-width:767px){
+    .jumbotron {
+	padding: 10px;
+    }
+}
+@media(min-width:992px){
+    .jumbotron {
+	padding: 20px;
+    }
+}
+
+.thumbnail {
+    border: 0 none;
+    position: relative;
+}
+
+.thumbnail img {
+    opacity: .7;
+    transition: opacity .25s ease-in-out;
+    -moz-transition: opacity .25s ease-in-out;
+    -webkit-transition: opacity .25s ease-in-out;
+    -ms-transition: opacity .25s ease-in-out;
+    -o-transition: opacity .25s ease-in-out;
+}
+
+.thumbnail img:hover {
+    opacity: 1;
+}
+
+.caption {
+    position:absolute;
+    bottom:-50px;
+    right:0;
+    background:rgba(79, 189, 79, 0.75);
+    width:100%;
+    height:auto;
+    display: none;
+    padding:2%;
+    text-align:center;
+    color:#fff !important;
+    z-index:2;
+}
+
+@media(max-width:767px){
+    .lead {
+	font-size: 90%;
+    }
+}
+@media(max-width:991px) {
+    .lead {
+	font-size: 100%;
+    }
+}
+@media(min-width:992px){
+    .lead {
+	font-size: 150%;
+    }
+}
+
+.footer {
+    margin-top: 100px;
+}
+
+.gist {
+    line-height: 1.2;
+}
+
+@media(min-width:768px) {
+    .bs-docs-section {
+	font-size: 140%;
+    }
+    .bs-sidebar {
+	font-size: 140%;
+    }
+    .gist .gist-file .gist-data {
+	font-size: 80% !important;
+    }
+}
+
+code {
+    color: #87556e;
+}
+
+code.rpkg,
+code.rfun {
+    color: navy;
+}
+
+code.rfun:after {
+    content: "()";
+}
