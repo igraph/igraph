@@ -205,6 +205,7 @@ igraph_$(VERSION).tar.gz: DIRS $(RFILES) $(SRCFILES) igraph/DESCRIPTION
 	rm -f igraph/R/config.R
 	rm -f igraph/src/config.h
 	rm -rf igraph/a.out*
+	rm -f igraph/src/Makevars
 	touch igraph/src/config.h
 	R CMD build igraph
 
