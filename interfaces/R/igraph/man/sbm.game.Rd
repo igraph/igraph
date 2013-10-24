@@ -30,7 +30,7 @@ sbm.game (n, pref.matrix, block.sizes, directed = FALSE, loops = FALSE)
 \value{An igraph graph.}
 \references{
   Faust, K., & Wasserman, S. (1992a). Blockmodels:
-  Interpretation and evaluation. \emph{Social Networks}, 14, 5-–61.
+  Interpretation and evaluation. \emph{Social Networks}, 14, 5--61.
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{random.graph.game}}}
