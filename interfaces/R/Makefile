@@ -28,7 +28,7 @@ RFILES = $(wildcard igraph/R/*.R) $(wildcard igraph/man/*.Rd) \
 	igraph/src/config.h igraph/src/config.h.in igraph/src/Makevars.in \
 	igraph/src/Makevars.win igraph/DESCRIPTION \
 	igraph/NAMESPACE igraph/R/auto.R igraph/src/rinterface.c \
-	igraph/src/rinterface.h arpack/stamp
+	igraph/src/rinterface.h arpack/stamp igraph/src/rinterface_extra.c
 
 igraph/src/config.h: src/config.h
 	cp $< $@
@@ -197,6 +197,9 @@ igraph/src/Makevars.win: src/Makevars.win
 igraph/DESCRIPTION: src/DESCRIPTION ../../VERSION
 	sed 's/^Version: .*$$/Version: '$(VERSION)'/' $<     | \
         sed 's/^Date: .*$$/Date: '`date "+%Y-%m-%d"`'/' > $@
+
+igraph/src/rinterface_extra.c: src/rinterface_extra.c
+	cp $< $@
 
 igraph_$(VERSION).tar.gz: DIRS $(RFILES) $(SRCFILES) igraph/DESCRIPTION
 	rm -f igraph/R/config.R

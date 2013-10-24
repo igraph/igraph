@@ -61,6 +61,7 @@ Peter McMahan		Cohesive blocking
 Andrew Makhorin		GLPK
 David Morton de Lachapelle	Spectral coarse graining
 Laurence Muller		Fixes for compilation on MS Visual Studio
+Fionn Murtagh		Order a hierarchical clustering
 Emmanuel Navarro	infomap community detection
 	 		Various fixes and patches
 Tamas Nepusz		Most of igraph
