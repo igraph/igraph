@@ -38,13 +38,13 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
 	igraph_adjlist_t *inlist=data->inlist;
 	const igraph_vector_t *cvec=data->cvec;
 	igraph_vector_t *tmp=data->tmp;
-	igraph_vector_t *neis;
+	igraph_vector_int_t *neis;
 	int i, j, nlen;
 
 	/* tmp = (A+cD)' from */
 	for (i=0; i<n; i++) {
 		neis=igraph_adjlist_get(inlist, i);
-		nlen=igraph_vector_size(neis);
+		nlen=igraph_vector_int_size(neis);
 		VECTOR(*tmp)[i]=0.0;
 		for (j=0; j<nlen; j++) {
 			long int nei=(long int) VECTOR(*neis)[j];
@@ -56,7 +56,7 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
 	/* to = (A+cD) tmp */
 	for (i=0; i<n; i++) {
 		neis=igraph_adjlist_get(outlist, i);
-		nlen=igraph_vector_size(neis);
+		nlen=igraph_vector_int_size(neis);
 		to[i]=0.0;
 		for (j=0; j<nlen; j++) {
 			long int nei=(long int) VECTOR(*neis)[j];
