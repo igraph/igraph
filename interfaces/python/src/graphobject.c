@@ -2976,6 +2976,53 @@ PyObject *igraphmodule_Graph_Ring(PyTypeObject * type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a graph based on a stochastic blockmodel
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_sbm_game
+ */
+PyObject *igraphmodule_Graph_SBM(PyTypeObject * type,
+                                 PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  igraph_t g;
+  long int n;
+  PyObject *block_sizes_o, *pref_matrix_o;
+  PyObject *directed_o = Py_False;
+  PyObject *loops_o = Py_False;
+  igraph_matrix_t pref_matrix;
+  igraph_vector_int_t block_sizes;
+
+  static char *kwlist[] = { "n", "pref_matrix", "block_sizes", "directed",
+	"loops", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO!O!|OO", kwlist,
+                                   &n, &PyList_Type, &pref_matrix_o,
+                                   &PyList_Type, &block_sizes_o,
+                                   &directed_o, &loops_o))
+    return NULL;
+
+  if (igraphmodule_PyList_to_matrix_t(pref_matrix_o, &pref_matrix)) return NULL;
+  if (igraphmodule_PyObject_to_vector_int_t(block_sizes_o, &block_sizes)) {
+    igraph_matrix_destroy(&pref_matrix);
+    return NULL;
+  }
+
+  if (igraph_sbm_game(&g, (igraph_integer_t) n, &pref_matrix, &block_sizes,
+                      PyObject_IsTrue(directed_o), PyObject_IsTrue(loops_o))) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&pref_matrix);
+    igraph_vector_int_destroy(&block_sizes);
+    return NULL;
+  }
+
+  igraph_matrix_destroy(&pref_matrix);
+  igraph_vector_int_destroy(&block_sizes);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a star graph
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_star
@@ -11858,6 +11905,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param power: the power constant of the nonlinear model.\n"
    "  It can be omitted, and in this case the usual linear model\n"
    "  will be used.\n"},
+
+  /* interface to igraph_sbm_game */
+  {"SBM", (PyCFunction) igraphmodule_Graph_SBM,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "SBM(n, pref_matrix, block_sizes, directed=False, loops=False)\n\n"
+   "Generates a graph based on a stochastic blockmodel.\n\n"
+   "A given number of vertices are generated. Every vertex is assigned to a\n"
+   "vertex type according to the given block sizes. Vertices of the same\n"
+   "type will be assigned consecutive vertex IDs. Finally, every\n"
+   "vertex pair is evaluated and an edge is created between them with a\n"
+   "probability depending on the types of the vertices involved. The\n"
+   "probabilities are taken from the preference matrix.\n\n"
+   "@param n: the number of vertices in the graph\n"
+   "@param pref_matrix: matrix giving the connection probabilities for\n"
+   "  different vertex types.\n"
+   "@param block_sizes: list giving the number of vertices in each block; must\n"
+   "  sum up to I{n}.\n"
+   "@param directed: whether to generate a directed graph.\n"
+   "@param loops: whether loop edges are allowed.\n"},
 
   // interface to igraph_star
   {"Star", (PyCFunction) igraphmodule_Graph_Star,
