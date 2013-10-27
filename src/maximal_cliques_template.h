@@ -40,6 +40,7 @@
     IGRAPH_FINALLY(igraph_i_maximal_cliques_free, res);	\
   } while (0)
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
 #ifdef IGRAPH_MC_COUNT
@@ -49,6 +50,7 @@
 #define RECORD (*res)++
 #define FINALLY *res=0;
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
 #ifdef IGRAPH_MC_FILE
@@ -58,6 +60,7 @@
 #define RECORD igraph_vector_int_fprint(R, res)
 #define FINALLY
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
 #ifdef IGRAPH_MC_FULL
@@ -91,8 +94,10 @@
   } while (0)
 #define FOR_LOOP_OVER_VERTICES					\
   nn= subset ? igraph_vector_int_size(subset) : no_of_nodes;	\
-    for (ii=0; ii<nn; ii++) {	                                \
-    i= subset ? VECTOR(*subset)[ii] : ii;
+    for (ii=0; ii<nn; ii++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE do {  \
+    i= subset ? VECTOR(*subset)[ii] : ii;    \
+} while (0)
 #endif
 
 #ifdef IGRAPH_MC_ORIG
@@ -241,6 +246,8 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
     int Pptr=0, Xptr=vdeg-1, PS=0, PE, XS, XE=vdeg-1;
     int j;
 
+	FOR_LOOP_OVER_VERTICES_PREPARE;
+
     pg--;
     if (pg <= 0) {
       IGRAPH_PROGRESS("Maximal cliques: ", pgc++, NULL);
@@ -330,3 +337,4 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
 #undef RECORD
 #undef FINALLY
 #undef FOR_LOOP_OVER_VERTICES
+#undef FOR_LOOP_OVER_VERTICES_PREPARE
