@@ -111,7 +111,7 @@ int igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->gal, n));
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->val, 0));
-  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->val);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->eal, 0));
   IGRAPH_FINALLY_CLEAN(3);
 
