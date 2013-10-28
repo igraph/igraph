@@ -67,6 +67,7 @@ scgSemiProjectors(groups, mtype = c("symmetric", "laplacian",
 \seealso{\link{SCG} for a detailed introduction. \code{\link{scg}},
   \code{\link{scgNormEps}}, \code{\link{scgGrouping}}}
 \examples{
+library(Matrix)
 # compute the semi-projectors and projector for the partition
 # provided by a community detection method
 g <- barabasi.game(20, m=1.5)
