@@ -592,7 +592,7 @@ bonpow <- function(graph, nodes=V(graph),
                    rescale=FALSE, tol=1e-7, sparse=TRUE){
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse && require(Matrix)) {
+  if (sparse) {
     res <- bonpow.sparse(graph, nodes, loops, exponent, rescale, tol)
   }  else {
     res <- bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
@@ -696,7 +696,7 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
                              tol=1e-7, sparse=TRUE) {
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse && require(Matrix)) {
+  if (sparse) {
     res <- alpha.centrality.sparse(graph, nodes, alpha, loops,
                                    exo, weights, tol)
   } else {
