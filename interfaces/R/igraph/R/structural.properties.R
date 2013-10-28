@@ -567,6 +567,8 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
     graph <- simplify(graph, remove.multiple=FALSE, remove.loops=TRUE)
   }
 
+  require(Matrix)
+  
   vg <- vcount(graph)
   
   ## sparse adjacency matrix
@@ -652,6 +654,8 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
     stop("Not a graph object")
   }
 
+  require(Matrix)
+  
   vc <- vcount(graph)
 
   if (!loops) {

@@ -95,6 +95,8 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
     stop("Not a graph object")
   }
 
+  require(Matrix)
+  
   type <- igraph.match.arg(type)
 
   vc <- vcount(graph)
@@ -403,6 +405,8 @@ get.incidence.sparse <- function(graph, types, names, attr) {
   if (length(types) != vc) {
     stop("Invalid types vector")
   }
+
+  require(Matrix)
   
   el <- get.edgelist(graph, names=FALSE)
   if (any(types[el[,1]] == types[el[,2]])) {
