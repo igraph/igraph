@@ -135,8 +135,8 @@ class GeneratorTests(unittest.TestCase):
         # Check directedness
         g = Graph.SBM(n, pref_matrix, types, directed=True)
         self.assertTrue(g.is_directed())
-        self.assertTrue(sum(g.is_mutual() < g.ecount()))
-        self.assertTrue(sum(g.is_loop()) > 0)
+        self.assertTrue(sum(g.is_mutual()) < g.ecount())
+        self.assertTrue(sum(g.is_loop()) == 0)
 
         # Check error conditions
         self.assertRaises(InternalError, Graph.SBM, -1, pref_matrix, types)
