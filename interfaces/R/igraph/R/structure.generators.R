@@ -171,6 +171,8 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
 
   mode <- igraph.match.arg(mode)
 
+  require(Matrix)
+  
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
       weighted <- "weight"
