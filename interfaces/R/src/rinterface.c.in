@@ -2696,13 +2696,13 @@ SEXP R_igraph_named(SEXP attr) {
 
 SEXP R_igraph_mybracket(SEXP graph, SEXP pidx) {
   int idx=INTEGER(pidx)[0]-1;
-  return VECTOR_ELT(graph, idx);
+  return duplicate(VECTOR_ELT(graph, idx));
 }
 
 SEXP R_igraph_mybracket2(SEXP graph, SEXP pidx1, SEXP pidx2) {
   int idx1=INTEGER(pidx1)[0]-1;
   int idx2=INTEGER(pidx2)[0]-1;  
-  return VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2);
+  return duplicate(VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2));
 }
 
 SEXP R_igraph_mybracket2_set(SEXP graph, SEXP pidx1, SEXP pidx2,
@@ -2722,10 +2722,13 @@ SEXP R_igraph_mybracket3_set(SEXP graph, SEXP pidx1, SEXP pidx2,
   int idx1=INTEGER(pidx1)[0]-1;
   int idx2=INTEGER(pidx2)[0]-1;
   const char *name=CHAR(STRING_ELT(pname, 0));
-  SEXP attrs=VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2);
-  SEXP names=getAttrib(attrs, R_NamesSymbol);
-  int i, n=length(attrs);
+  SEXP attrs, names;
+  int i, n;
+
   PROTECT(newgraph=duplicate(graph));
+  attrs=VECTOR_ELT(VECTOR_ELT(newgraph, idx1), idx2);
+  names=getAttrib(attrs, R_NamesSymbol);
+  n=length(attrs);
   
   for (i=0; i<n; i++) {
     if (strcmp(CHAR(STRING_ELT(names, i)), name) == 0) { break; }    
