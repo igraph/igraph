@@ -239,14 +239,20 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
   FINALLY;
 
   FOR_LOOP_OVER_VERTICES
-    int v=VECTOR(order)[i];
-    int vrank=VECTOR(rank)[v];
-    igraph_vector_int_t *vneis=igraph_adjlist_get(&fulladjlist, v);
-    int vdeg=igraph_vector_int_size(vneis);
-    int Pptr=0, Xptr=vdeg-1, PS=0, PE, XS, XE=vdeg-1;
+    int v;
+    int vrank;
+    igraph_vector_int_t *vneis;
+    int vdeg;
+    int Pptr, Xptr, PS, PE, XS, XE;
     int j;
 
-	FOR_LOOP_OVER_VERTICES_PREPARE;
+    FOR_LOOP_OVER_VERTICES_PREPARE;
+
+    v=VECTOR(order)[i];
+    vrank=VECTOR(rank)[v];
+    vneis=igraph_adjlist_get(&fulladjlist, v);
+    vdeg=igraph_vector_int_size(vneis);
+    Pptr=0; Xptr=vdeg-1; PS=0; XE=vdeg-1;
 
     pg--;
     if (pg <= 0) {
