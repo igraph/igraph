@@ -12,6 +12,7 @@ except ImportError:
 from distutils.core import Extension
 from distutils.file_util import copy_file
 from distutils.util import get_platform
+import distutils.ccompiler
 from sys import argv, version_info, exit
 import os.path
 import glob
@@ -22,6 +23,24 @@ from subprocess import Popen, PIPE
 LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include/igraph', '/usr/local/include/igraph']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
 LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
+
+if os.name == 'nt' and distutils.ccompiler.get_default_compiler() == 'msvc':
+    # if this setup is run in the source checkout *and* the igraph msvc was build,
+    # this code adds the right library and include dir
+    all_msvc_dirs = glob.glob(os.path.join('..', '..', 'igraph-*-msvc'))
+    if len(all_msvc_dirs) > 0:
+        if len(all_msvc_dirs) > 1:
+            print("More than one msvc build directory (..\\..\\igraph-*-msvc) found!")
+            print("It could happen that setup.py uses the wrong one! Please remove all but the right one!\n")
+        msvc_builddir = all_msvc_dirs[-1]
+        if not os.path.exists(os.path.join(msvc_builddir, "Release")):
+            print("There is no 'Release' dir in the msvc build directory\n(%s)" % msvc_builddir)
+            print("Please build the msvc build first!\n")
+        else:
+            print("Using msvc build dir as a fallback: %s\n\n" % msvc_builddir)
+            LIBIGRAPH_FALLBACK_INCLUDE_DIRS = [os.path.join(msvc_builddir, "include")]
+            LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
+            LIBIGRAPH_FALLBACK_LIBRARY_DIRS = [os.path.join(msvc_builddir, "Release")]
 
 if version_info < (2, 5):
     print("This module requires Python >= 2.5")
