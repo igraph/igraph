@@ -1,6 +1,8 @@
 
 importFrom(stats, as.dendrogram)
 importFrom(stats, as.hclust)
+import(methods)
+import(Matrix)
 
 # The igraph interface
 
