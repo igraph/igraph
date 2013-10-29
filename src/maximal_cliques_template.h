@@ -40,6 +40,7 @@
     IGRAPH_FINALLY(igraph_i_maximal_cliques_free, res);	\
   } while (0)
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
 #ifdef IGRAPH_MC_COUNT
@@ -49,6 +50,7 @@
 #define RECORD (*res)++
 #define FINALLY *res=0;
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
 #ifdef IGRAPH_MC_FILE
@@ -58,6 +60,7 @@
 #define RECORD igraph_vector_int_fprint(R, res)
 #define FINALLY
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
 #ifdef IGRAPH_MC_FULL
@@ -91,8 +94,10 @@
   } while (0)
 #define FOR_LOOP_OVER_VERTICES					\
   nn= subset ? igraph_vector_int_size(subset) : no_of_nodes;	\
-    for (ii=0; ii<nn; ii++) {	                                \
-    i= subset ? VECTOR(*subset)[ii] : ii;
+    for (ii=0; ii<nn; ii++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE do {  \
+    i= subset ? VECTOR(*subset)[ii] : ii;    \
+} while (0)
 #endif
 
 #ifdef IGRAPH_MC_ORIG
@@ -234,12 +239,20 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
   FINALLY;
 
   FOR_LOOP_OVER_VERTICES
-    int v=VECTOR(order)[i];
-    int vrank=VECTOR(rank)[v];
-    igraph_vector_int_t *vneis=igraph_adjlist_get(&fulladjlist, v);
-    int vdeg=igraph_vector_int_size(vneis);
-    int Pptr=0, Xptr=vdeg-1, PS=0, PE, XS, XE=vdeg-1;
+    int v;
+    int vrank;
+    igraph_vector_int_t *vneis;
+    int vdeg;
+    int Pptr, Xptr, PS, PE, XS, XE;
     int j;
+
+    FOR_LOOP_OVER_VERTICES_PREPARE;
+
+    v=VECTOR(order)[i];
+    vrank=VECTOR(rank)[v];
+    vneis=igraph_adjlist_get(&fulladjlist, v);
+    vdeg=igraph_vector_int_size(vneis);
+    Pptr=0; Xptr=vdeg-1; PS=0; XE=vdeg-1;
 
     pg--;
     if (pg <= 0) {
@@ -330,3 +343,4 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
 #undef RECORD
 #undef FINALLY
 #undef FOR_LOOP_OVER_VERTICES
+#undef FOR_LOOP_OVER_VERTICES_PREPARE

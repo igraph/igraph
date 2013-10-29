@@ -1,13 +1,45 @@
+============
+igraph 0.6.6
+============
+
+Released Oct 28, 2013
+
+Some bugs fixed:
+
+- Fixed a potential crash in the infomap.community() function.
+- Various fixed for the operators that work on vertex names (#136).
+- Fixed an example in the arpack() manual page.
+- arpack() now gives error message if unknown options
+  are supplied (#492).
+- Better arpack() error messages.
+- Fixed missing whitespace in Pajek writer when ID attribute
+  was numeric.
+- Fixed dyad census instability, sometimes incorrect 
+  results were reported (#496).
+- Fixed a bug that caused the GML reader to crash when the ID
+  attribute was non-numeric
+- Fixed a potential segfault if the two graphs in BLISS
+  differ in the number of vertices or edges (#500).
+- Added the igraphtest() function to run tests from R (#485).
+- Dyad census detects integer overflow now and gives a warning (#497).
+- R: add.edges() does not allow now zeros in the vertex set (#503).
+- Add C++ namespace to the files that didn't have one. 
+  Fixes some incompatibility with other packages (e.g. rgl) 
+  and mysterious crashes (#523).
+- Fixed a bug that caused a side effect in set.vertex.attributes(),
+  set.edge.attributes() and set.graph.attributes() (#533).
+- Fixed a bug in degree.distribution() and cluster.distribution()
+  (#257).
+
 ==============
 igraph 0.6.5-2
 ==============
 
 Released May 16, 2013
 
-Worked two CRAN check problems, one that is possibly a clang bug
-(since when do C compilers optimize based on constness?) and 
-a gfortran bug (string bound checking does not work if code is called 
-from C and without string length arguments at the "right" place).
+Worked two CRAN check problems, and a gfortran bug (string bound
+checking does not work if code is called from C and without string
+length arguments at the "right" place).
 
 Otherwise identical to 0.6.5-1.
 

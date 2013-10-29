@@ -98,10 +98,11 @@ int igraph_i_cattributes_copy_attribute_record(igraph_attribute_record_t **newre
 int igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   igraph_attribute_record_t *attr_rec;
   long int i, n;
+  igraph_i_cattributes_t *nattr;
 
   n = attr ? igraph_vector_ptr_size(attr) : 0;
 
-  igraph_i_cattributes_t *nattr=igraph_Calloc(1, igraph_i_cattributes_t);
+  nattr=igraph_Calloc(1, igraph_i_cattributes_t);
   if (!nattr) {
     IGRAPH_ERROR("Can't init attributes", IGRAPH_ENOMEM);
   }
@@ -110,7 +111,7 @@ int igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->gal, n));
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->val, 0));
-  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->val);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->eal, 0));
   IGRAPH_FINALLY_CLEAN(3);
 
