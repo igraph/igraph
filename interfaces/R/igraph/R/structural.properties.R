@@ -567,15 +567,13 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
     graph <- simplify(graph, remove.multiple=FALSE, remove.loops=TRUE)
   }
 
-  require(Matrix)
-  
   vg <- vcount(graph)
   
   ## sparse adjacency matrix
   d <- get.adjacency(graph, sparse=TRUE)
 
   ## sparse identity matrix
-  id <- Diagonal(vg)
+  id <- Matrix::Diagonal(vg)
 
   ## solve it
   ev <- solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
@@ -654,8 +652,6 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
     stop("Not a graph object")
   }
 
-  require(Matrix)
-  
   vc <- vcount(graph)
 
   if (!loops) {
@@ -678,11 +674,11 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
   } 
   
   el <- get.edgelist(graph, names=FALSE)
-  M <- sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
+  M <- Matrix::sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
   M <- as(M, "dgCMatrix")
   
   ## Create an identity matrix
-  M2 <- sparseMatrix(dims=c(vc, vc), i=1:vc, j=1:vc, x=rep(1, vc))
+  M2 <- Matrix::sparseMatrix(dims=c(vc, vc), i=1:vc, j=1:vc, x=rep(1, vc))
   M2 <- as(M2, "dgCMatrix")
 
   ## exo

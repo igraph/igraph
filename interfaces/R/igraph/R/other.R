@@ -57,9 +57,8 @@ igraph.match.arg <- function(arg, choices, several.ok=FALSE) {
 }
 
 igraph.i.spMatrix <- function(M) {
-  require(Matrix)
   if (M$type == "triplet") {
-    sparseMatrix(dims=M$dim, i=M$i+1L, j=M$p+1L, x=M$x)
+    Matrix::sparseMatrix(dims=M$dim, i=M$i+1L, j=M$p+1L, x=M$x)
   } else {
     new("dgCMatrix", Dim=M$dim, Dimnames=list(NULL, NULL),
         factors=list(), i=M$i, p=M$p, x=M$x)

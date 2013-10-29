@@ -171,8 +171,6 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
 
   mode <- igraph.match.arg(mode)
 
-  require(Matrix)
-  
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
       weighted <- "weight"
@@ -181,7 +179,9 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
       stop("invalid value supplied for `weighted' argument, please see docs.")
     }
   }
-  
+
+  mysummary <- Matrix::summary
+
   if (nrow(adjmatrix) != ncol(adjmatrix)) {
     stop("not a square matrix")
   }
@@ -197,23 +197,23 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
   
   if (mode == "directed") {
     ## DIRECTED
-    el <- selectMethod("summary", "sparseMatrix")(adjmatrix)
+    el <- mysummary(adjmatrix)
     if (!diag) { el <- el[ el[,1] != el[,2], ] }      
   } else if (mode == "undirected") {
     ## UNDIRECTED, must be symmetric if weighted
     if (!is.null(weighted) &&
-        !selectMethod("isSymmetric", "sparseMatrix")(adjmatrix)) {
+        Matrix::isSymmetric(adjmatrix)) {
       stop("Please supply a symmetric matrix if you want to create a weighted graph with mode=UNDIRECTED.")
     }
     if (diag) {
-      adjmatrix <- tril(adjmatrix)
+      adjmatrix <- Matrix::tril(adjmatrix)
     } else {
-      adjmatrix <- tril(adjmatrix, -1)
+      adjmatrix <- Matrix::tril(adjmatrix, -1)
     }      
-    el <- selectMethod("summary", "sparseMatrix")(adjmatrix)
+    el <- mysummary(adjmatrix)
   } else if (mode=="max") {
     ## MAXIMUM
-    el <- selectMethod("summary", "sparseMatrix")(adjmatrix)
+    el <- mysummary(adjmatrix)
     rm(adjmatrix)
     if (!diag) { el <- el[ el[,1] != el[,2], ] }
     el <- el[ el[,3] != 0, ]
@@ -242,7 +242,7 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     } else {
       adjmatrix <- triu(adjmatrix, 1)
     }
-    el <- selectMethod("summary", "sparseMatrix")(adjmatrix)
+    el <- mysummary(adjmatrix)
     rm(adjmatrix)
     if (!diag) { el <- el[ el[,1] != el[,2], ] }      
   } else if (mode=="lower") {
@@ -252,13 +252,13 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     } else {
       adjmatrix <- tril(adjmatrix, -1)
     }
-    el <- selectMethod("summary", "sparseMatrix")(adjmatrix)
+    el <- mysummary(adjmatrix)
     rm(adjmatrix)
     if (!diag) { el <- el[ el[,1] != el[,2], ] }      
   } else if (mode=="min") {
     ## MINIMUM
     adjmatrix <- sign(adjmatrix) * sign(Matrix::t(adjmatrix)) * adjmatrix
-    el <- selectMethod("summary", "sparseMatrix")(adjmatrix)
+    el <- mysummary(adjmatrix)
     if (!diag) { el <- el[ el[,1] != el[,2], ] }
     el <- el[ el[,3] != 0, ]
     w <- el[,3]
@@ -287,7 +287,7 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     } else {
       adjmatrix <- tril(adjmatrix, -1)
     }
-    el <- selectMethod("summary", "sparseMatrix")(adjmatrix)
+    el <- mysummary(adjmatrix)
     if (diag) {
       loop <- el[,1] == el[,2]
       el[loop,3] <- el[loop,3] / 2
@@ -724,7 +724,7 @@ graph.incidence.sparse <- function(incidence, directed, mode, multiple,
                                    weighted) {
   n1 <- nrow(incidence)
   n2 <- ncol(incidence)
-  el <- selectMethod("summary", signature=c(object="sparseMatrix"))(incidence)
+  el <- Matrix::summary(incidence)
   ## el <- summary(incidence)
   el[,2] <- el[,2] + n1
 
