@@ -238,9 +238,9 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
   } else if (mode=="upper") {
     ## UPPER
     if (diag) {
-      adjmatrix <- triu(adjmatrix)
+      adjmatrix <- Matrix::triu(adjmatrix)
     } else {
-      adjmatrix <- triu(adjmatrix, 1)
+      adjmatrix <- Matrix::triu(adjmatrix, 1)
     }
     el <- mysummary(adjmatrix)
     rm(adjmatrix)
@@ -248,9 +248,9 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
   } else if (mode=="lower") {
     ## LOWER
     if (diag) {
-      adjmatrix <- tril(adjmatrix)
+      adjmatrix <- Matrix::tril(adjmatrix)
     } else {
-      adjmatrix <- tril(adjmatrix, -1)
+      adjmatrix <- Matrix::tril(adjmatrix, -1)
     }
     el <- mysummary(adjmatrix)
     rm(adjmatrix)
@@ -283,9 +283,9 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     ## PLUS
     adjmatrix <- adjmatrix + Matrix::t(adjmatrix)
     if (diag) {
-      adjmatrix <- tril(adjmatrix)
+      adjmatrix <- Matrix::tril(adjmatrix)
     } else {
-      adjmatrix <- tril(adjmatrix, -1)
+      adjmatrix <- Matrix::tril(adjmatrix, -1)
     }
     el <- mysummary(adjmatrix)
     if (diag) {
