@@ -61,7 +61,7 @@ def list_latest_files(db, dtype="all", version="all", branch="all"):
 
     files = db.execute("SELECT *, MAX(date) AS tmp FROM files    \
                         WHERE type LIKE ? AND version LIKE ? AND branch LIKE ? \
-                        GROUP BY type, branch \
+                        GROUP BY type, version, branch \
                         ORDER BY version DESC, date DESC",
                        ("%" if dtype=="all" else dtype,
                         "%" if version=="all" else version,
