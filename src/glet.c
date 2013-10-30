@@ -616,7 +616,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
      for the edges per clique. */
   igraph_vector_int_init(&vclidx, no_of_nodes+2);
   IGRAPH_FINALLY(igraph_vector_int_destroy, &vclidx);
-  igraph_vector_int_init(&celidx, no_cliques+2);
+  igraph_vector_int_init(&celidx, no_cliques+3);
   IGRAPH_FINALLY(igraph_vector_int_destroy, &celidx);
   for (i=0, total_vertices=0, total_edges=0; i<no_cliques; i++) {
     igraph_vector_t *v=VECTOR(*cliques)[i];
