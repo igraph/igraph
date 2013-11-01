@@ -1,2 +1,4 @@
 name: igraph &ndash; the network analysis package
 pygments: false
+include: [ .htaccess ]
+exclude: [ Makefile ]

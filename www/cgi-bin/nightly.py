@@ -4,10 +4,13 @@ import cgi
 import bottle
 import bottle_sqlite
 import socket
+import os.path
 
+home = os.path.expanduser("~")
 myname=socket.gethostname()
 i_am_local = (myname[-6:] == ".local")
-dbfile = "nightly-test.db" if i_am_local else "nightly.db"
+dbfile = "nightly-test.db" if i_am_local else (home + "/nightly/nightly.db")
+filesdir = home + "/www2/files"
 
 plugin = bottle_sqlite.Plugin(dbfile=dbfile)
 nightly=bottle.Bottle()
@@ -25,6 +28,7 @@ def human_size(num):
         num /= 1024.0
 
 bottle.SimpleTemplate.defaults['human_size'] = human_size
+bottle.SimpleTemplate.defaults['baseurl'] = "/nightly"
 
 def list_files_common(db, files, url, dtype, version, branch):
 
@@ -47,7 +51,7 @@ def list_files_common(db, files, url, dtype, version, branch):
              GROUP BY filename' % ','.join(filenames)
     tests = dict(db.execute(query).fetchall())
 
-    return bottle.template('main', url=url, files=files, versions=versions,
+    return bottle.template('main.html', url=url, files=files, versions=versions,
                            types=types, branches=branches, urlmap=urlmap,
                            dtype=dtype, branch=branch, version=version,
                            tests=tests)
@@ -90,7 +94,7 @@ def list_files(db, dtype="all", version="all", branch="all"):
 
 @nightly.route("/steal/<filename:path>")
 def steal_file(filename):
-    return bottle.static_file(filename, "../files", download=True)
+    return bottle.static_file(filename, filesdir, download=True)
 
 @nightly.route("/get/<filename:path>")
 def get_file(db, filename):
@@ -117,8 +121,7 @@ def get_latest(db, dtype, branch="develop"):
 def get_tests(db, filename):
     testres = db.execute("SELECT * FROM tests WHERE filename=?",
                          (filename,)).fetchall()
-    print(testres)
-    return bottle.template('tests', testres=testres, filename=filename)
+    return bottle.template('tests.html', testres=testres, filename=filename)
 
 @nightly.error(404)
 def error404(error):

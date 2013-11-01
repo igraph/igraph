@@ -1,8 +1,25 @@
-% from bottle import template
-% include('header.tpl')
-% include('github.tpl')
-% include('navbar.tpl')
-% include('ijumbo.tpl')
+---
+layout: default
+title: igraph nightly builds
+---
+
+{% raw %}
+
+    <div class="jumbotron">
+      <div class="container">
+        <h1 class="hidden-xs mainheader">
+          <img src="http://igraph.org/img/igraph2.svg"> igraph
+          nightly builds
+        </h1>
+        <h1 class="visible-xs">
+            igraph<br/>
+	    nightly builds
+        </h1>
+        <p class="lead">
+	  Nightly builds from branches under active development.
+        </p>
+      </div>
+    </div>
 
     <div class="container">
       <div class="col-xs-12" role="main">
@@ -20,7 +37,7 @@
 		      % end
 		    </button>
 		    <ul class="dropdown-menu" role="menu">
-		      <li><a href="/{{url}}/all/{{version}}/{{branch}}">
+		      <li><a href="{{baseurl}}/{{url}}/all/{{version}}/{{branch}}">
 			  All types
 			  % if dtype=="all":
 			    <i class="icon-ok"></i>
@@ -28,7 +45,7 @@
 		      </a></li>
 		      <li class="divider"></li>
 		      % for t in types:
-		        <li><a href="/{{url}}/{{t}}/{{version}}/{{branch}}">
+		        <li><a href="{{baseurl}}/{{url}}/{{t}}/{{version}}/{{branch}}">
 			    {{urlmap[t]}}
 			% if dtype==t:
 			    <i class="icon-ok"></i>
@@ -47,7 +64,7 @@
 		      % end
 		    </button>
 		    <ul class="dropdown-menu" role="menu">
-		      <li><a href="/{{url}}/{{dtype}}/all/{{branch}}">
+		      <li><a href="{{baseurl}}/{{url}}/{{dtype}}/all/{{branch}}">
 			  All versions
 			  % if version=="all":
 			    <i class="icon-ok"></i>
@@ -55,7 +72,7 @@
 		      </a></li>
 		      <li class="divider"></li>
 		      % for v in versions:
-		        <li><a href="/{{url}}/{{dtype}}/{{v}}/{{branch}}">
+		        <li><a href="{{baseurl}}/{{url}}/{{dtype}}/{{v}}/{{branch}}">
 			    {{v}}
 			% if version==v:
 			    <i class="icon-ok"></i>
@@ -74,7 +91,7 @@
 		      % end
 		    </button>
 		    <ul class="dropdown-menu" role="menu">
-		      <li><a href="/{{url}}/{{dtype}}/{{version}}/all">
+		      <li><a href="{{baseurl}}/{{url}}/{{dtype}}/{{version}}/all">
 			  All branches
 			  % if branch=="all":
 			    <i class="icon-ok"></i>
@@ -82,7 +99,7 @@
 		      </a></li>
 		      <li class="divider"></li>
 		      % for b in branches:
-		        <li><a href="/{{url}}/{{dtype}}/{{version}}/{{b}}">
+		        <li><a href="{{baseurl}}/{{url}}/{{dtype}}/{{version}}/{{b}}">
 			    {{b}}
 			% if branch==b:
 			    <i class="icon-ok"></i>
@@ -106,7 +123,7 @@
 	      % for file in files:
 	      %   filename=file['filename']
               <tr>
-		<td><a href="/get/{{filename}}">
+		<td><a href="{{baseurl}}/get/{{filename}}">
 		    <i class="icon-download"></i></a></td>
 		<td>{{urlmap[file['type']]}}</td>
 		<td>{{file['version']}}</td>
@@ -114,7 +131,7 @@
 		<td><a href="https://github.com/igraph/igraph/commits/{{file['hash']}}"><code>{{file['hash']}}</code></a></td>
 		<td>{{file['date']}}</td>
 		<td>{{human_size(file['size'])}}</td>
-		<td><a href="/tests/{{filename}}">
+		<td><a href="{{baseurl}}/tests/{{filename}}">
 		  % if filename in tests:
 		  %   testcode=long(tests[filename])
 		  %   if testcode == 0:
@@ -141,4 +158,4 @@
       </div>
     </div>
 
-% include('footer.tpl')
+{% endraw %}
