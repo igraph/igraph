@@ -14,7 +14,8 @@ nightly=bottle.Bottle()
 nightly.install(plugin)
 
 urlmap={ 'c': 'C library', 'r': 'R package', 'python': 'Python extension',
-         'msvc': 'C library for MSVC', 'r-osx': 'R binary OSX package' }
+         'msvc': 'C library for MSVC', 'r-osx': 'R binary OSX package',
+         'r-win': 'R binary Windows package' }
 
 def human_size(num):
     num=long(num)
