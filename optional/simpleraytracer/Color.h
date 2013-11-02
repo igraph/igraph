@@ -4,6 +4,8 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+namespace igraph {
+
 class Color
 {
 public:
@@ -32,5 +34,7 @@ private:
 	unsigned char ByteValue(double vZeroToOne) const;
 	double mRed, mGreen, mBlue, mTransparent;
 };
+
+} // namespace igraph
 
 #endif

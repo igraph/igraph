@@ -40,12 +40,16 @@
    for more details
 */
 
+/* Several modifications had to be made to the original LAD implementation
+   to make it compile with non-C99-compliant compilers such as MSVC. In
+   particular, I had to remove all the variable-sized arrays.
+   -- Tamas Nepusz, 11 July 2013
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <getopt.h>
-#include <sys/time.h>
 #include <time.h>
 #include <limits.h>
 
@@ -62,6 +66,15 @@
 #define false 0
 #define bool char
 
+/* helper to allocate an array of given size */
+#define ALLOC_ARRAY(VAR, SIZE, TYPE) { \
+  VAR = igraph_Calloc(SIZE, TYPE);   \
+  if (VAR == 0) {                    \
+    IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
+  }  \
+  IGRAPH_FINALLY(igraph_free, VAR);  \
+}
+
 /* ---------------------------------------------------------*/
 /* Coming from graph.c                                      */
 /* ---------------------------------------------------------*/
@@ -76,7 +89,7 @@ typedef struct{
 int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
   long int i, j, n;
   long int no_of_nodes=igraph_vcount(igraph);
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   
   IGRAPH_VECTOR_INIT_FINALLY(&graph->nbSucc, no_of_nodes);
   IGRAPH_CHECK(igraph_degree(igraph, &graph->nbSucc, igraph_vss_all(), 
@@ -92,9 +105,9 @@ int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
 	
   for (i=0; i<no_of_nodes; i++) {
     neis=igraph_adjlist_get(&graph->succ, i);
-    n=igraph_vector_size(neis);
+    n=igraph_vector_int_size(neis);
     for (j=0; j<n; j++) {
-      int v=VECTOR(*neis)[j];
+      int v=(int)VECTOR(*neis)[j];
       if (MATRIX(graph->isEdge, i, v)) {
 	IGRAPH_ERROR("LAD functions only work on simple graphs, "
 		     "simplify your graph", IGRAPH_EINVAL);
@@ -193,26 +206,31 @@ bool igraph_i_lad_isInD(int u, int v, Tdomain* D) {
 	  VECTOR(D->firstVal)[u] + VECTOR(D->nbVal)[u]);
 }
 
-bool igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV) {
+int igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV, bool* result) {
   /* return true if there exists an augmenting path starting from u and 
      ending on a free vertex v in the bipartite directed graph G=(U,
      V, E) such that U=pattern nodes, V=target nodes, and 
      E={(u, v), v in D(u)} U {(v, u), D->globalMatchingP[u]=v}
      update D-globalMatchingP and D->globalMatchingT consequently */
-  int fifo[nbV];
-  int pred[nbV];
+  int *fifo, *pred;
+  bool *marked;
   int nextIn = 0;
   int nextOut = 0;
   int i, v, v2, u2, j;
-  bool marked[nbV];
-  memset(marked, false, nbV);
+
+  /* Allocate memory */
+  ALLOC_ARRAY(fifo, nbV, int);
+  ALLOC_ARRAY(pred, nbV, int);
+  ALLOC_ARRAY(marked, nbV, bool);
+
   for (i=0; i < VECTOR(D->nbVal)[u]; i++) {
     v = VECTOR(D->val)[ VECTOR(D->firstVal)[u]+i ];  /* v in D(u) */
     if (VECTOR(D->globalMatchingT)[v] < 0) { 
       /* v is free => augmenting path found */
       VECTOR(D->globalMatchingP)[u]=v;
       VECTOR(D->globalMatchingT)[v]=u;
-      return true;
+      *result = true;
+      goto cleanup;
     }
     /* v is not free => add it to fifo */
     pred[v] = u;
@@ -227,7 +245,7 @@ bool igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV) {
 	/* v is free => augmenting path found */
 	j=0;
 	while (u2 != u) { /* update global matching wrt path */
-	  if (j>100) { exit(1); }
+	  if (j>100) { IGRAPH_ERROR("LAD failed", IGRAPH_EINTERNAL); }
 	  j++;
 	  v2 = VECTOR(D->globalMatchingP)[u2];
 	  VECTOR(D->globalMatchingP)[u2]=v;
@@ -237,7 +255,8 @@ bool igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV) {
 	}
 	VECTOR(D->globalMatchingP)[u]=v;
 	VECTOR(D->globalMatchingT)[v]=u;
-	return true;
+	*result = true;
+	goto cleanup;
       }
       if (!marked[v]) { /* v is not free and not marked => add it to fifo */
 	pred[v] = u2;
@@ -246,20 +265,28 @@ bool igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV) {
       }
     }
   }
-  return false;
+
+cleanup:
+  igraph_free(fifo);
+  igraph_free(pred);
+  igraph_free(marked);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
 }
 
-bool igraph_i_lad_removeAllValuesButOne(int u, int v, Tdomain* D, Tgraph* Gp,
-					Tgraph* Gt) {
+int igraph_i_lad_removeAllValuesButOne(int u, int v, Tdomain* D, Tgraph* Gp,
+					Tgraph* Gt, bool* result) {
   /* remove all values but v from D(u) and add all successors of u in
      toFilter return false if an inconsistency is detected wrt to
      global all diff */
   int j, oldPos, newPos;
-  igraph_vector_t *uneis=igraph_adjlist_get(&Gp->succ, u);
-  int n=igraph_vector_size(uneis);
+  igraph_vector_int_t *uneis=igraph_adjlist_get(&Gp->succ, u);
+  int n=(int) igraph_vector_int_size(uneis);
   /* add all successors of u in toFilter */
   for (j=0; j<n; j++) {
-    igraph_i_lad_addToFilter(VECTOR(*uneis)[j], D, Gp->nbVertices);
+    igraph_i_lad_addToFilter((int) VECTOR(*uneis)[j], D, 
+			     (int) (Gp->nbVertices));
   }
   /* remove all values but v from D[u] */
   oldPos = MATRIX(D->posInVal, u, v);
@@ -274,27 +301,32 @@ bool igraph_i_lad_removeAllValuesButOne(int u, int v, Tdomain* D, Tgraph* Gp,
   if (VECTOR(D->globalMatchingP)[u] != v) {
     VECTOR(D->globalMatchingT)[ VECTOR(D->globalMatchingP)[u] ]=-1;
     VECTOR(D->globalMatchingP)[u] = -1;
-    return igraph_i_lad_augmentingPath(u, D, Gt->nbVertices);
+    IGRAPH_CHECK(igraph_i_lad_augmentingPath(u, D, (int) (Gt->nbVertices), result));
+  } else {
+    *result = true;
   }
-  return true;
+  return 0;
 }
 
 
-bool igraph_i_lad_removeValue(int u, int v, Tdomain* D, Tgraph* Gp,
-			      Tgraph* Gt) {
+int igraph_i_lad_removeValue(int u, int v, Tdomain* D, Tgraph* Gp,
+			      Tgraph* Gt, bool* result) {
   /* remove v from D(u) and add all successors of u in toFilter
      return false if an inconsistency is detected wrt global all diff */
   int j;
-  igraph_vector_t *uneis=igraph_adjlist_get(&Gp->succ, u);
-  int n=igraph_vector_size(uneis);
+  igraph_vector_int_t *uneis=igraph_adjlist_get(&Gp->succ, u);
+  int n=(int) igraph_vector_int_size(uneis);
+  int oldPos, newPos;
+
   /* add all successors of u in toFilter */
   for (j=0; j<n; j++) {
-    igraph_i_lad_addToFilter(VECTOR(*uneis)[j], D, Gp->nbVertices);
+    igraph_i_lad_addToFilter((int) VECTOR(*uneis)[j], D,
+			     (int) (Gp->nbVertices));
   }
   /* remove v from D[u] */
-  int oldPos = MATRIX(D->posInVal, u, v);
+  oldPos = MATRIX(D->posInVal, u, v);
   VECTOR(D->nbVal)[u]--;
-  int newPos = VECTOR(D->firstVal)[u] + VECTOR(D->nbVal)[u];
+  newPos = VECTOR(D->firstVal)[u] + VECTOR(D->nbVal)[u];
   VECTOR(D->val)[oldPos] = VECTOR(D->val)[newPos];
   VECTOR(D->val)[newPos] = v;
   MATRIX(D->posInVal, u, VECTOR(D->val)[oldPos]) = oldPos;
@@ -304,9 +336,11 @@ bool igraph_i_lad_removeValue(int u, int v, Tdomain* D, Tgraph* Gp,
   if (VECTOR(D->globalMatchingP)[u] == v) {
     VECTOR(D->globalMatchingP)[u] = -1;
     VECTOR(D->globalMatchingT)[v] = -1;
-    return igraph_i_lad_augmentingPath(u, D, Gt->nbVertices);
+    IGRAPH_CHECK(igraph_i_lad_augmentingPath(u, D, (int) (Gt->nbVertices), result));
+  } else {
+    *result = true;
   }
-  return true;
+  return 0;
 }
 
 
@@ -321,7 +355,9 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
      return false if an inconsistency is detected by FC(Edges) or
      FC(diff); true otherwise; */
   int j, u, v, u2, oldNbVal;
-  igraph_vector_t *vneis;
+  igraph_vector_int_t *vneis;
+  bool result;
+
   while (nb>0) {
     u = VECTOR(*toBeMatched)[--nb];
     v = VECTOR(D->val)[ VECTOR(D->firstVal)[u] ]; 
@@ -330,9 +366,11 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
     for (u2=0; u2<Gp->nbVertices; u2++) {
       if (u != u2) {
 	oldNbVal = VECTOR(D->nbVal)[u2];
-	if (igraph_i_lad_isInD(u2, v, D) && 
-	    !igraph_i_lad_removeValue(u2, v, D, Gp, Gt)) {
-	  *invalid = 1 ; return 0;
+	if (igraph_i_lad_isInD(u2, v, D)) {
+	  IGRAPH_CHECK(igraph_i_lad_removeValue(u2, v, D, Gp, Gt, &result));
+	  if (!result) {
+	    *invalid = 1 ; return 0;
+	  }
 	}
 	if (MATRIX(Gp->isEdge, u, u2)) { 
 	  /* remove from D[u2] vertices which are not adjacent to v */
@@ -340,8 +378,11 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
 	  while (j < VECTOR(D->firstVal)[u2] + VECTOR(D->nbVal)[u2]) {
 	    if (MATRIX(Gt->isEdge, v, VECTOR(D->val)[j])) { 
 	      j++; 
-	    } else if (!igraph_i_lad_removeValue(u2, VECTOR(D->val)[j], D, Gp, Gt)) { 
-	      *invalid = 1; return 0;
+	    } else {
+	      IGRAPH_CHECK(igraph_i_lad_removeValue(u2, VECTOR(D->val)[j], D, Gp, Gt, &result));
+	      if (!result) {
+		*invalid = 1; return 0;
+	      }
 	    }
 	  }
 	} else if (induced) {
@@ -351,17 +392,20 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
 	    while (j < VECTOR(D->firstVal)[u2] + VECTOR(D->nbVal)[u2]) {
 	      if (!MATRIX(Gt->isEdge, v, VECTOR(D->val)[j])) {
 		j++;
-	      } else if (!igraph_i_lad_removeValue(u2, VECTOR(D->val)[j], D, 
-						   Gp, Gt)) {
-		*invalid = 1; return 0;
+	      } else {
+		IGRAPH_CHECK(igraph_i_lad_removeValue(u2, VECTOR(D->val)[j], D, Gp, Gt, &result));
+		if (!result) {
+		  *invalid = 1; return 0;
+	        }
 	      }
 	    }
 	  } else {
 	    for (j=0; j<VECTOR(Gt->nbSucc)[v]; j++) {
-	      if ((igraph_i_lad_isInD(u2, VECTOR(*vneis)[j], D)) && 
-		  (!igraph_i_lad_removeValue(u2, VECTOR(*vneis)[j], D, Gp, 
-					     Gt))) {
-		*invalid = 1; return 0; 
+	      if (igraph_i_lad_isInD(u2, (int) VECTOR(*vneis)[j], D)) {
+		IGRAPH_CHECK(igraph_i_lad_removeValue(u2, (int) VECTOR(*vneis)[j], D, Gp, Gt, &result));
+		if (!result) {
+		  *invalid = 1; return 0; 
+		}
 	      }
 	    }
 	  }
@@ -391,7 +435,7 @@ bool igraph_i_lad_matchVertex(int u, bool induced, Tdomain* D, Tgraph* Gp,
      return false if an inconsistency is detected by FC(Edges) or
      FC(diff); true otherwise; */
   igraph_vector_int_t toBeMatched;
-  IGRAPH_CHECK(igraph_vector_int_init(&toBeMatched, Gp->nbVertices));
+  igraph_vector_int_init(&toBeMatched, Gp->nbVertices);
   IGRAPH_FINALLY(igraph_vector_int_destroy, &toBeMatched);
   VECTOR(toBeMatched)[0]=u;
   igraph_i_lad_matchVertices(1, &toBeMatched, induced, D, Gp, Gt, 
@@ -414,8 +458,8 @@ bool igraph_i_lad_compare(int size_mu, int* mu, int size_mv, int* mv) {
      a different element v of mv such that u <= v; 
      return false otherwise */
   int i, j;
-  qsort(mu, size_mu, sizeof(int), igraph_i_lad_qcompare);
-  qsort(mv, size_mv, sizeof(int), igraph_i_lad_qcompare);
+  qsort(mu, (size_t) size_mu, sizeof(int), igraph_i_lad_qcompare);
+  qsort(mv, (size_t) size_mv, sizeof(int), igraph_i_lad_qcompare);
   i = size_mv-1;
   for (j=size_mu-1; j>=0; j--) {
     if (mu[j]>mv[i]) { return false; }
@@ -433,10 +477,25 @@ int igraph_i_lad_initDomains(bool initialDomains,
      if initialDomains, then filter initial domains wrt
      compatibilities given in file 
      return false if a domain is empty and true otherwise */
-  int val[Gp->nbVertices*Gt->nbVertices];
-  bool dom[Gt->nbVertices];
+  int *val;
+  bool *dom;
+  int *mu, *mv;
   int matchingSize, u, v, i, j;
+  igraph_vector_t *vec;
+  igraph_vector_t *Gp_uneis;
+  igraph_vector_t *Gt_vneis;
 
+  val = igraph_Calloc(Gp->nbVertices*Gt->nbVertices, int);
+  if (val == 0) {
+    IGRAPH_ERROR("cannot allocated 'val' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
+  }
+
+  dom = igraph_Calloc(Gt->nbVertices, bool);
+  if (dom == 0) {
+    igraph_free(val);
+    IGRAPH_ERROR("cannot allocated 'dom' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
+  }
+  
   IGRAPH_CHECK(igraph_vector_int_init(&D->globalMatchingP, Gp->nbVertices));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &D->globalMatchingP);
   igraph_vector_int_fill(&D->globalMatchingP, -1L);
@@ -469,14 +528,14 @@ int igraph_i_lad_initDomains(bool initialDomains,
   matchingSize = 0;
 	
   for (u=0; u<Gp->nbVertices; u++) {
-    igraph_vector_t *Gp_uneis=igraph_adjlist_get(&Gp->succ, u);
+    igraph_vector_int_t *Gp_uneis=igraph_adjlist_get(&Gp->succ, u);
     if (initialDomains) { 
       /* read the list of target vertices which are compatible with u */
-      igraph_vector_t *vec=VECTOR(*domains)[u];
-      i=igraph_vector_size(vec);
-      memset(dom, false, sizeof(bool)*Gt->nbVertices);
+      vec=VECTOR(*domains)[u];
+      i=(int) igraph_vector_size(vec);
+      memset(dom, false, sizeof(bool)*(size_t)(Gt->nbVertices));
       for (j=0; j<i; j++) {
-	int v=VECTOR(*vec)[j];
+	v=(int) VECTOR(*vec)[j];
 	dom[v] = true;
       }
     }
@@ -485,37 +544,51 @@ int igraph_i_lad_initDomains(bool initialDomains,
     VECTOR(D->nbVal)[u] = 0;
     VECTOR(D->firstVal)[u] = D->valSize;
     for (v=0; v<Gt->nbVertices; v++) {
-      igraph_vector_t *Gt_vneis=igraph_adjlist_get(&Gt->succ, v);
+      igraph_vector_int_t *Gt_vneis=igraph_adjlist_get(&Gt->succ, v);
       if ((initialDomains) && (!dom[v])) { /* v not in D(u) */
-	MATRIX(D->posInVal, u, v) = VECTOR(D->firstVal)[u] + Gt->nbVertices;
+	MATRIX(D->posInVal, u, v) = (int) (VECTOR(D->firstVal)[u] + 
+					   Gt->nbVertices);
       } else {
 	MATRIX(D->firstMatch, u, v) = matchingSize;
 	matchingSize += VECTOR(Gp->nbSucc)[u];
 	if (VECTOR(Gp->nbSucc)[u] <= VECTOR(Gt->nbSucc)[v]) {
-	  int mu[(long int) VECTOR(Gp->nbSucc)[u]], 
-	    mv[(long int) VECTOR(Gt->nbSucc)[v]];
+	  mu = igraph_Calloc((long int) VECTOR(Gp->nbSucc)[u], int);
+	  if (mu == 0) {
+	    igraph_free(val); igraph_free(dom);
+	    IGRAPH_ERROR("cannot allocate 'mu' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
+	  }
+	  mv = igraph_Calloc((long int) VECTOR(Gt->nbSucc)[v], int);
+	  if (mv == 0) {
+	    igraph_free(mu); igraph_free(val); igraph_free(dom);
+	    IGRAPH_ERROR("cannot allocate 'mv' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
+	  }
 	  for (i=0; i<VECTOR(Gp->nbSucc)[u]; i++) { 
-	    mu[i]=VECTOR(Gp->nbSucc)[(long int) VECTOR(*Gp_uneis)[i]];
+	    mu[i]=(int) VECTOR(Gp->nbSucc)[(long int) VECTOR(*Gp_uneis)[i]];
 	  }
 	  for (i=0; i<VECTOR(Gt->nbSucc)[v]; i++) { 
-	    mv[i]=VECTOR(Gt->nbSucc)[(long int) VECTOR(*Gt_vneis)[i]];
+	    mv[i]=(int) VECTOR(Gt->nbSucc)[(long int) VECTOR(*Gt_vneis)[i]];
 	  }
-	  if (igraph_i_lad_compare(VECTOR(Gp->nbSucc)[u], mu, 
-				   VECTOR(Gt->nbSucc)[v], mv)==1) {
+	  if (igraph_i_lad_compare((int) VECTOR(Gp->nbSucc)[u], mu, 
+				   (int) VECTOR(Gt->nbSucc)[v], mv)==1) {
 	    val[D->valSize] = v;
 	    VECTOR(D->nbVal)[u]++;
 	    MATRIX(D->posInVal, u, v) = D->valSize++;
 	  } else {  /* v not in D(u) */
 	    MATRIX(D->posInVal, u, v) = 
-	      VECTOR(D->firstVal)[u] + Gt->nbVertices;
+	      (int)(VECTOR(D->firstVal)[u] + Gt->nbVertices);
 	  }
+	  igraph_free(mu); mu = 0;
+	  igraph_free(mv); mv = 0;
 	} else {  /* v not in D(u) */
-	  MATRIX(D->posInVal, u, v) = VECTOR(D->firstVal)[u] + Gt->nbVertices;
+	  MATRIX(D->posInVal, u, v) = 
+	    (int) (VECTOR(D->firstVal)[u] + Gt->nbVertices);
 	}
       }
     }
     if (VECTOR(D->nbVal)[u] == 0) { 
       *empty = 1;  /* empty domain */
+      igraph_free(val);
+      igraph_free(dom);
       return 0;
     }
   }
@@ -528,8 +601,11 @@ int igraph_i_lad_initDomains(bool initialDomains,
   igraph_vector_int_fill(&D->matching, -1);
 
   D->nextOutToFilter = 0;
-  D->lastInToFilter = Gp->nbVertices-1;
+  D->lastInToFilter = (int) (Gp->nbVertices-1);
   *empty=0;
+
+  igraph_free(val);
+  igraph_free(dom);
   return 0;
 }
 
@@ -570,35 +646,53 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
      for every u in 0..nbU-1, there exists a different v in 0..nb-1
      such that v is adjacent to u; returns false otherwise */
 	
-  if (sizeOfU>sizeOfV) {
-    *invalid = 1; /* trivial case of infeasibility */
-    return 0; 
-  }
-	
-  int matchedWithV[sizeOfV]; /* matchedWithV[matchedWithU[u]]=u */
-  int nbPred[sizeOfV]; /* nbPred[i] = nb of predecessors of the ith
-			  vertex of V in the DAG */
-  int pred[sizeOfV][sizeOfU]; /* pred[i][j] = jth predecessor the ith
-				 vertex of V in the DAG */
-  int nbSucc[sizeOfU]; /* nbSucc[i] = nb of successors of the ith
-			  vertex of U in the DAG */
-  int succ[sizeOfU][sizeOfV]; /* succ[i][j] = jth successor of the ith
-				 vertex of U in the DAG */
-  int listV[sizeOfV], listU[sizeOfU], listDV[sizeOfV], listDU[sizeOfU];
+  int *matchedWithV; /* matchedWithV[matchedWithU[u]]=u */
+  int *nbPred; /* nbPred[i] = nb of predecessors of the ith
+		  vertex of V in the DAG */
+  int *pred; /* pred[i][j] = jth predecessor the ith
+		 vertex of V in the DAG */
+  int *nbSucc; /* nbSucc[i] = nb of successors of the ith
+		  vertex of U in the DAG */
+  int *succ; /* succ[i][j] = jth successor of the ith
+		 vertex of U in the DAG */
+  int *listV, *listU, *listDV, *listDU;
   int nbV, nbU, nbDV, nbDU;
   int i, j, k, stop, u, v, w;
-  int markedV[sizeOfV], markedU[sizeOfU];
+  int *markedV, *markedU;
   /* markedX[i]=white if X[i] is not in the DAG
      markedX[i]=grey if X[i] has been added to the DAG, but not its successors
      markedX[i]=black if X[i] and its successors have been added to the DAG
      markedX[i]=toBeDeleted if X[i] must be deleted from the DAG
      markedX[i]=deleted if X[i] has been deleted from the DAG */
   int nbUnmatched = 0; /* number of vertices of U that are not matched */
-  int unmatched[sizeOfU]; /* vertices of U that are not matched */
-  int posInUnmatched[sizeOfU]; /* unmatched[posInUnmatched[u]]=u */
+  int *unmatched;      /* vertices of U that are not matched */
+  int *posInUnmatched; /* unmatched[posInUnmatched[u]]=u */
+  igraph_vector_int_t path;
+
+  if (sizeOfU>sizeOfV) {
+    *invalid = 1; /* trivial case of infeasibility */
+    return 0; 
+  }
 	
+  ALLOC_ARRAY(matchedWithV, sizeOfV, int);
+  ALLOC_ARRAY(nbPred, sizeOfV, int);
+  ALLOC_ARRAY(pred, sizeOfV*sizeOfU, int);
+  ALLOC_ARRAY(nbSucc, sizeOfU, int);
+  ALLOC_ARRAY(succ, sizeOfU*sizeOfV, int);
+  ALLOC_ARRAY(listV, sizeOfV, int);
+  ALLOC_ARRAY(listU, sizeOfU, int);
+  ALLOC_ARRAY(listDV, sizeOfV, int);
+  ALLOC_ARRAY(listDU, sizeOfU, int);
+  ALLOC_ARRAY(markedV, sizeOfV, int);
+  ALLOC_ARRAY(markedU, sizeOfU, int);
+  ALLOC_ARRAY(unmatched, sizeOfU, int);
+  ALLOC_ARRAY(posInUnmatched, sizeOfU, int);
+
+  IGRAPH_CHECK(igraph_vector_int_init(&path, 0));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &path);
+
   /* initialize matchedWithV and unmatched */
-  memset(matchedWithV, -1, sizeOfV*sizeof(int));
+  memset(matchedWithV, -1, (size_t)sizeOfV*sizeof(int));
   for (u=0; u<sizeOfU; u++) {
     if (VECTOR(*matchedWithU)[u] >= 0) {
       matchedWithV[VECTOR(*matchedWithU)[u]]=u;
@@ -628,10 +722,10 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
   while (nbUnmatched > 0) { 
     /* Try to increase the number of matched vertices */
     /* step 1 : build the DAG */
-    memset(markedU, white, sizeOfU*sizeof(int));
-    memset(nbSucc, 0, sizeOfU*sizeof(int));
-    memset(markedV, white, sizeOfV*sizeof(int));
-    memset(nbPred, 0, sizeOfV*sizeof(int));
+    memset(markedU, white, (size_t) sizeOfU*sizeof(int));
+    memset(nbSucc, 0, (size_t) sizeOfU*sizeof(int));
+    memset(markedV, white, (size_t) sizeOfV*sizeof(int));
+    memset(nbPred, 0, (size_t) sizeOfV*sizeof(int));
     /* first layer of the DAG from the free nodes of U */
     nbV=0;
     for (j=0; j<nbUnmatched; j++) {
@@ -640,8 +734,8 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
       for (i = VECTOR(*firstAdj)[u]; 
 	   i < VECTOR(*firstAdj)[u] + VECTOR(*degree)[u]; i++) {
 	v=VECTOR(*adj)[i]; /* add edge (u, v) to the DAG */
-	pred[v][nbPred[v]++]=u;
-	succ[u][nbSucc[u]++]=v;
+	pred[v*sizeOfU + (nbPred[v]++)]=u;
+	succ[u*sizeOfV + (nbSucc[u]++)]=v;
 	if (markedV[v]==white) { /* first time v is added to the DAG*/
 	  markedV[v]=grey; 
 	  listV[nbV++]=v;
@@ -670,8 +764,8 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
 	     i < VECTOR(*firstAdj)[u] + VECTOR(*degree)[u];i++) {
 	  v=VECTOR(*adj)[i]; 
 	  if (markedV[v]!=black) { /* add edge (u, v) to the DAG */
-	    pred[v][nbPred[v]++]=u;
-	    succ[u][nbSucc[u]++]=v;
+	    pred[v*sizeOfU + (nbPred[v]++)]=u;
+	    succ[u*sizeOfV + (nbSucc[u]++)]=v;
 	    if (markedV[v]==white) { /* first time v is added to the DAG */
 	      markedV[v]=grey; 
 	      listV[nbV++]=v;
@@ -684,8 +778,9 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
       }
     }
     if (nbV==0) {
-      *invalid = 1; 
-      return 0;
+      *invalid = 1;
+      /* I know it's ugly. */
+      goto cleanup;
     }
 		
     /* step 2: look for augmenting paths */
@@ -693,21 +788,20 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
       v=listV[k];
       if ((matchedWithV[v]==-1) && (nbPred[v]>0)) {
 	/* v is the final node of an augmenting path */
-	int path[sizeOfU+sizeOfV];
-	int length = 1;
-	path[0]=v;
+	IGRAPH_CHECK(igraph_vector_int_resize(&path, 1));
+	VECTOR(path)[0]=v;
 	nbDV=0; 
 	nbDU=0;
 	igraph_i_lad_addToDelete(v, listDV, &nbDV, markedV);
 	do{
-	  u=pred[v][0]; /* (u, v) belongs to the augmenting path */
-	  path[length++]=u;
+	  u=pred[v*sizeOfU + 0]; /* (u, v) belongs to the augmenting path */
+	  IGRAPH_CHECK(igraph_vector_int_push_back(&path, u));
 	  igraph_i_lad_addToDelete(u, listDU, &nbDU, markedU);
 	  if (VECTOR(*matchedWithU)[u]!=-1) {
 	    /* u is not the initial node of the augmenting path */
 	    v=VECTOR(*matchedWithU)[u]; /* (v, u) belongs to the
 					   augmenting path */
-	    path[length++]=v;
+	    IGRAPH_CHECK(igraph_vector_int_push_back(&path, v));
 	    igraph_i_lad_addToDelete(v, listDV, &nbDV, markedV);
 	  }
 	} while (VECTOR(*matchedWithU)[u]!=-1);
@@ -721,9 +815,9 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
 	      igraph_i_lad_addToDelete(u, listDU, &nbDU, markedU); 
 	    }
 	    for (i=0; i<nbPred[v]; i++) {
-	      u=pred[v][i]; /* delete edge (u, v) */
-	      for (j=0; ((j<nbSucc[u]) && (v!=succ[u][j])); j++) { }
-	      succ[u][j]=succ[u][--nbSucc[u]];
+	      u=pred[v*sizeOfU + i]; /* delete edge (u, v) */
+	      for (j=0; ((j<nbSucc[u]) && (v!=succ[u*sizeOfV + j])); j++) { }
+	      succ[u*sizeOfV + j]=succ[u*sizeOfV + (--nbSucc[u])];
 	      if (nbSucc[u]==0) {
 		igraph_i_lad_addToDelete(u, listDU, &nbDU, markedU);
 	      }
@@ -737,9 +831,9 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
 	    }
 	    j=0;
 	    for (i=0; i<nbSucc[u]; i++) { /* delete edge (u, v) */
-	      v=succ[u][i];
-	      for (j=0; ((j<nbPred[v]) && (u!=pred[v][j])); j++) { }
-	      pred[v][j]=pred[v][--nbPred[v]];
+	      v=succ[u*sizeOfV + i];
+	      for (j=0; ((j<nbPred[v]) && (u!=pred[v*sizeOfU + j])); j++) { }
+	      pred[v*sizeOfU + j]=pred[v*sizeOfU + (--nbPred[v])];
 	      if (nbPred[v]==0) {
 		igraph_i_lad_addToDelete(v, listDV, &nbDV, markedV);
 	      }
@@ -748,13 +842,14 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
 	}
 	/* Remove the last node of the augmenting path from the set of
 	   unmatched vertices */
-	u=path[length-1]; 
+	u=VECTOR(path)[igraph_vector_int_size(&path)-1]; 
 	i=posInUnmatched[u];
 	unmatched[i]=unmatched[--nbUnmatched];
 	posInUnmatched[unmatched[i]]=i;
 	/* Update the matching wrt the augmenting path */
-	while (length>1) {
-	  u=path[length-1]; v=path[length-2]; length-=2;
+	while (igraph_vector_int_size(&path)>1) {
+	  u=igraph_vector_int_pop_back(&path);
+	  v=igraph_vector_int_pop_back(&path);
 	  w=matchedWithV[v]; /* match v with u instead of v with w */
 	  VECTOR(*matchedWithU)[u]=v; 
 	  matchedWithV[v]=u;
@@ -763,11 +858,29 @@ int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
     }
   }
   *invalid=0;
+
+cleanup:
+  /* Free the allocated arrays */
+  igraph_vector_int_destroy(&path);
+  igraph_free(posInUnmatched);
+  igraph_free(unmatched);
+  igraph_free(markedU);
+  igraph_free(markedV);
+  igraph_free(listDU);
+  igraph_free(listDV);
+  igraph_free(listU);
+  igraph_free(listV);
+  igraph_free(succ);
+  igraph_free(nbSucc);
+  igraph_free(pred);
+  igraph_free(nbPred);
+  igraph_free(matchedWithV);
+  IGRAPH_FINALLY_CLEAN(14);
   return 0;
 }
 
 void igraph_i_lad_DFS(int nbU, int nbV, int u, bool* marked, int* nbSucc, 
-		      int succ[nbV][nbU], igraph_vector_int_t * matchedWithU,
+		      int* succ, igraph_vector_int_t * matchedWithU,
 		      int* order, int* nb) {
   /* perform a depth first search, starting from u, in the bipartite
      graph Go=(U, V, E) such that 
@@ -780,11 +893,11 @@ void igraph_i_lad_DFS(int nbU, int nbV, int u, bool* marked, int* nbSucc,
      succ[v]=list of successors of v. order[nb^out+1..nb^in] contains
      the vertices discovered by the DFS */
   int i;
-  marked[u]=true;
   int v=VECTOR(*matchedWithU)[u]; /* the only one predecessor of v is u */
+  marked[u]=true;
   for (i=0; i<nbSucc[v]; i++) {
-    if (!marked[succ[v][i]]) {
-      igraph_i_lad_DFS(nbU, nbV, succ[v][i], marked, nbSucc, succ, 
+    if (!marked[succ[v*nbU + i]]) {
+      igraph_i_lad_DFS(nbU, nbV, succ[v*nbU + i], marked, nbSucc, succ, 
 		       matchedWithU, order, nb);
     }
   }
@@ -792,9 +905,9 @@ void igraph_i_lad_DFS(int nbU, int nbV, int u, bool* marked, int* nbSucc,
   order[*nb]=u; (*nb)--;
 }
 
-void igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU, 
-		      int* nbSucc, int succ[nbV][nbU], 
-		      int* nbPred, int pred[nbU][nbV], 
+int igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU, 
+		      int* nbSucc, int* succ,
+		      int* nbPred, int* pred,
 		      igraph_vector_int_t * matchedWithU,
 		      igraph_vector_int_t * matchedWithV) {
   /* postrelation: numV[v]==numU[u] iff they belong to the same
@@ -807,13 +920,17 @@ void igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU,
 
      Given a vertex v of Gt, nbSucc[v]=number of sucessors of v and
      succ[v]=list of successors of v */
-  int order[nbU];
-  bool marked[nbU];
-  int fifo[nbV];
+  int *order;
+  bool *marked;
+  int *fifo;
   int u, v, i, j, k, nbSCC, nb;
-	
+
+  /* Allocate memory */
+  ALLOC_ARRAY(order, nbU, int);
+  ALLOC_ARRAY(marked, nbU, bool);
+  ALLOC_ARRAY(fifo, nbV, int);
+
   /* Order vertices of Gp wrt DFS */
-  memset(marked, false, nbU*sizeof(int));
   nb=nbU-1;
   for (u=0; u<nbU; u++) {
     if (!marked[u]) {
@@ -824,8 +941,8 @@ void igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU,
 	
   /* traversal starting from order[0], then order[1], ... */
   nbSCC=0;
-  memset(numU, -1, nbU*sizeof(int));
-  memset(numV, -1, nbV*sizeof(int));
+  memset(numU, -1, (size_t) nbU*sizeof(int));
+  memset(numV, -1, (size_t) nbV*sizeof(int));
   for (i=0; i<nbU; i++) {
     u=order[i];
     v=VECTOR(*matchedWithU)[u];
@@ -839,7 +956,7 @@ void igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU,
 	if (u!=-1) {
 	  numU[u]=nbSCC;
 	  for (j=0; j<nbPred[u]; j++) {
-	    v=pred[u][j];
+	    v=pred[u*nbV+j];
 	    if (numV[v]==-1) {
 	      numV[v]=nbSCC;
 	      fifo[k++]=v;
@@ -849,6 +966,14 @@ void igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU,
       }
     }
   }
+
+  /* Free memory */
+  igraph_free(fifo);
+  igraph_free(marked);
+  igraph_free(order);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
 }
 
 
@@ -864,36 +989,44 @@ int igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
             v=D->globalMatchingP[u])} U 
          { (v, u) / v is a vertex of Gt which is in D(u) but is not
 	   matched to u} */
-  int nbPred[Gp->nbVertices]; /* nbPred[u] = nb of predecessors of u in Go */
-  int pred[Gp->nbVertices][Gt->nbVertices]; /* pred[u][i] = ith
+  int *nbPred;                 /* nbPred[u] = nb of predecessors of u in Go */
+  int *pred;                                /* pred[u][i] = ith
 					       predecessor of u in Go */
-  int nbSucc[Gt->nbVertices]; /* nbSucc[v] = nb of successors of v in Go */
-  int succ[Gt->nbVertices][Gp->nbVertices]; /* succ[v][i] = ith
+  int *nbSucc;                 /* nbSucc[v] = nb of successors of v in Go */
+  int *succ;                                /* succ[v][i] = ith
 					       successor of v in Go */
   int u, v, i, w, oldNbVal, nbToMatch;  
-  int numV[Gt->nbVertices], numU[Gp->nbVertices];
+  int *numV, *numU;
   igraph_vector_int_t toMatch;
-  bool used[Gp->nbVertices][Gt->nbVertices];
+  bool *used;
+  int *list;
+  int nb=0;
+  bool result;
+
+  /* Allocate memory */
+  ALLOC_ARRAY(nbPred, Gp->nbVertices, int);
+  ALLOC_ARRAY(pred, Gp->nbVertices*Gt->nbVertices, int);
+  ALLOC_ARRAY(nbSucc, Gt->nbVertices, int);
+  ALLOC_ARRAY(succ, Gt->nbVertices*Gp->nbVertices, int);
+  ALLOC_ARRAY(numV, Gt->nbVertices, int);
+  ALLOC_ARRAY(numU, Gp->nbVertices, int);
+  ALLOC_ARRAY(used, Gp->nbVertices*Gt->nbVertices, bool);
+  ALLOC_ARRAY(list, Gt->nbVertices, int);
   IGRAPH_CHECK(igraph_vector_int_init(&toMatch, Gp->nbVertices));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &toMatch);
-  memset(numV, false, Gt->nbVertices*sizeof(int));
-  memset(nbSucc, 0, Gt->nbVertices*sizeof(int));
-  memset(nbPred, 0, Gp->nbVertices*sizeof(int));
-  memset(numU, false, Gp->nbVertices*sizeof(int));
+
   for (u=0; u<Gp->nbVertices; u++) {
     for (i=0; i < VECTOR(D->nbVal)[u]; i++) {
       v=VECTOR(D->val)[ VECTOR(D->firstVal)[u]+i ]; /* v in D(u) */
-      used[u][v]=false;
+      used[u*Gt->nbVertices+v]=false;
       if (v != VECTOR(D->globalMatchingP)[u]) {
-	pred[u][nbPred[u]++]=v; 
-	succ[v][nbSucc[v]++]=u; 
+	pred[u*Gt->nbVertices + (nbPred[u]++)]=v; 
+	succ[v*Gp->nbVertices + (nbSucc[v]++)]=u; 
       }
     }
   }
 	
   /* mark as used all edges of paths starting from free vertices */
-  int list[Gt->nbVertices];
-  int nb=0;
   for (v=0; v<Gt->nbVertices; v++) {
     if (VECTOR(D->globalMatchingT)[v] < 0) { /* v is free */
       list[nb++]=v;
@@ -903,12 +1036,12 @@ int igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
   while (nb>0) {
     v=list[--nb];
     for (i=0; i<nbSucc[v]; i++) {
-      u=succ[v][i];
-      used[u][v]=true;
+      u=succ[v*Gp->nbVertices + i];
+      used[u*Gt->nbVertices+v]=true;
       if (numU[u]==false) {
 	numU[u]=true;
 	w=VECTOR(D->globalMatchingP)[u];
-	used[u][w]=true;
+	used[u*Gt->nbVertices+w]=true;
 	if (numV[w]==false) {
 	  list[nb++]=w;
 	  numV[w]=true;
@@ -918,8 +1051,9 @@ int igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
   }
 	
   /* look for strongly connected components in Go */
-  igraph_i_lad_SCC(Gp->nbVertices, Gt->nbVertices, numV, numU, nbSucc, succ, 
-		   nbPred, pred, &D->globalMatchingP, &D->globalMatchingT);
+  IGRAPH_CHECK(
+	  igraph_i_lad_SCC((int)(Gp->nbVertices), (int)(Gt->nbVertices), numV, numU,
+	      nbSucc, succ, nbPred, pred, &D->globalMatchingP, &D->globalMatchingT));
 	
   /* remove v from D[u] if (u, v) is not marked as used 
                         and u and v are not in the same SCC 
@@ -929,17 +1063,20 @@ int igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
     oldNbVal = VECTOR(D->nbVal)[u];
     for (i=0; i < VECTOR(D->nbVal)[u]; i++) {
       v=VECTOR(D->val)[ VECTOR(D->firstVal)[u]+i ]; /* v in D(u) */
-      if ((!used[u][v]) && (numV[v]!=numU[u]) &&
+      if ((!used[u*Gt->nbVertices+v]) && (numV[v]!=numU[u]) &&
 	  (VECTOR(D->globalMatchingP)[u]!=v)) {
-	if (!igraph_i_lad_removeValue(u, v, D, Gp, Gt)) {
+	IGRAPH_CHECK(igraph_i_lad_removeValue(u, v, D, Gp, Gt, &result));
+	if (!result) {
 	  *invalid = 1;
-	  return 0;
+	  /* Yes, this is ugly. */
+	  goto cleanup;
 	}
       }
     }
     if (VECTOR(D->nbVal)[u] == 0) {
       *invalid = 1; 
-      return 0;
+      /* Yes, this is ugly. */
+      goto cleanup;
     }
     if ((oldNbVal>1) && (VECTOR(D->nbVal)[u]==1)) {
       VECTOR(toMatch)[nbToMatch++] = u; 
@@ -947,9 +1084,18 @@ int igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
   }
   IGRAPH_CHECK(igraph_i_lad_matchVertices(nbToMatch, &toMatch, induced, 
 					  D, Gp, Gt, invalid));
-  
+
+cleanup:
   igraph_vector_int_destroy(&toMatch);
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_free(list);
+  igraph_free(used);
+  igraph_free(numU);
+  igraph_free(numV);
+  igraph_free(succ);
+  igraph_free(nbSucc);
+  igraph_free(pred);
+  igraph_free(nbPred);
+  IGRAPH_FINALLY_CLEAN(9);
   
   return 0;
 }
@@ -958,69 +1104,82 @@ int igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
 /* Coming from lad.c                                        */
 /* ---------------------------------------------------------*/
 
-bool igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt) {
+int igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
+	bool *result) {
   /* return true if G_(u, v) has a adj(u)-covering matching; false
      otherwise */
   int u2, v2, i, j;
   int nbMatched = 0;
-  igraph_vector_t *Gp_uneis=igraph_adjlist_get(&Gp->succ, u);
+  igraph_vector_int_t *Gp_uneis=igraph_adjlist_get(&Gp->succ, u);
 	
+  int *num, *numInv;
+  igraph_vector_int_t nbComp;
+  igraph_vector_int_t firstComp;
+  igraph_vector_int_t comp;
+  int nbNum=0;
+  int posInComp=0;
+  igraph_vector_int_t matchedWithU;
+  int invalid;
+
   /* special case when u has only 1 adjacent node => no need to call
      Hopcroft and Karp */
   if (VECTOR(Gp->nbSucc)[u]==1) {
-    u2 = VECTOR(*Gp_uneis)[0]; /* u2 is the only node adjacent to u */
+    u2 = (int) VECTOR(*Gp_uneis)[0]; /* u2 is the only node adjacent to u */
     v2 = VECTOR(D->matching)[ MATRIX(D->firstMatch, u, v) ];
-    if ((v2 != -1) && (igraph_i_lad_isInD(u2, v2, D))) { return true; }
+    if ((v2 != -1) && (igraph_i_lad_isInD(u2, v2, D))) {
+      *result = true;
+      return 0;
+    }
     /* look for a support of edge (u, u2) for v */
     for (i=VECTOR(D->firstVal)[u2]; 
 	 i < VECTOR(D->firstVal)[u2] + VECTOR(D->nbVal)[u2]; i++) {
       if (MATRIX(Gt->isEdge, v, VECTOR(D->val)[i])) {
 	VECTOR(D->matching)[ MATRIX(D->firstMatch, u, v) ] = 
 	  VECTOR(D->val)[i];
-	return true;
+	*result = true;
+	return 0;
       }
     }
-    return false;
+    *result = false;
+    return 0;
   }
-	
+
   /* general case (when u has more than 1 adjacent node) */
   for (i=0; i<VECTOR(Gp->nbSucc)[u]; i++) { 
     /* remove from the matching of G_(u, v) edges which no longer
        belong to G_(u, v) */
-    u2 = VECTOR(*Gp_uneis)[i];
+    u2 = (int) VECTOR(*Gp_uneis)[i];
     v2 = VECTOR(D->matching)[ MATRIX(D->firstMatch, u, v)+i];
     if ((v2 != -1) && (igraph_i_lad_isInD(u2, v2, D))) { nbMatched++; }
   }
   if (nbMatched == VECTOR(Gp->nbSucc)[u]) { 
-    return true; 
+    *result = true;
+    return 0;
   } /* The matching still covers adj(u) */
 	
+  /* Allocate memory */
+  ALLOC_ARRAY(num, Gt->nbVertices, int);
+  ALLOC_ARRAY(numInv, Gt->nbVertices, int);
+
   /* Build the bipartite graph
      let U be the set of nodes adjacent to u
      let V be the set of nodes that are adjacent to v, and that belong
      to domains of nodes of U */
-  int num[Gt->nbVertices], numInv[Gt->nbVertices];
   /* nbComp[u]=number of elements of V that are compatible with u */
-  igraph_vector_int_t nbComp;
-  IGRAPH_CHECK(igraph_vector_int_init(&nbComp, VECTOR(Gp->nbSucc)[u]));
+  IGRAPH_CHECK(igraph_vector_int_init(&nbComp, (long int) VECTOR(Gp->nbSucc)[u]));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &nbComp);
-  igraph_vector_int_t firstComp;
-  IGRAPH_CHECK(igraph_vector_int_init(&firstComp, VECTOR(Gp->nbSucc)[u]));
+  IGRAPH_CHECK(igraph_vector_int_init(&firstComp, (long int) VECTOR(Gp->nbSucc)[u]));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &firstComp);
   /* comp[firstComp[u]..firstComp[u]+nbComp[u]-1] = nodes of Gt that
      are compatible with u */
-  igraph_vector_int_t comp;
-  IGRAPH_CHECK(igraph_vector_int_init(&comp, 
-		      VECTOR(Gp->nbSucc)[u] * Gt->nbVertices));
+  IGRAPH_CHECK(igraph_vector_int_init(&comp, (long int) (VECTOR(Gp->nbSucc)[u] * 
+					    Gt->nbVertices)));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &comp);
-  int nbNum=0;
-  int posInComp=0;
-  igraph_vector_int_t matchedWithU;
-  IGRAPH_CHECK(igraph_vector_int_init(&matchedWithU, VECTOR(Gp->nbSucc)[u]));
+  IGRAPH_CHECK(igraph_vector_int_init(&matchedWithU, (long int) VECTOR(Gp->nbSucc)[u]));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &matchedWithU);
-  memset(num, -1, Gt->nbVertices * sizeof(int));
+  memset(num, -1, (size_t) (Gt->nbVertices) * sizeof(int));
   for (i=0; i<VECTOR(Gp->nbSucc)[u]; i++) {
-    u2 = VECTOR(*Gp_uneis)[i]; /* u2 is adjacent to u */
+    u2 = (int) VECTOR(*Gp_uneis)[i]; /* u2 is adjacent to u */
     /* search for all nodes v2 in D[u2] which are adjacent to v */
     VECTOR(nbComp)[i]=0;
     VECTOR(firstComp)[i]=posInComp;
@@ -1038,9 +1197,9 @@ bool igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt) {
 	}
       }
     } else {
-      igraph_vector_t *Gt_vneis=igraph_adjlist_get(&Gt->succ, v);
+      igraph_vector_int_t *Gt_vneis=igraph_adjlist_get(&Gt->succ, v);
       for (j=0; j<VECTOR(Gt->nbSucc)[v]; j++) {
-	v2 = VECTOR(*Gt_vneis)[j]; /* v2 is a successor of v */
+	v2 = (int) VECTOR(*Gt_vneis)[j]; /* v2 is a successor of v */
 	if (igraph_i_lad_isInD(u2, v2, D)) { /* v2 belongs to D[u2] */
 	  if (num[v2]<0) { /* v2 has not yet been added to V */
 	    num[v2]=nbNum;
@@ -1052,12 +1211,8 @@ bool igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt) {
       }			
     }
     if (VECTOR(nbComp)[i]==0) { 
-      igraph_vector_int_destroy(&matchedWithU);
-      igraph_vector_int_destroy(&comp);
-      igraph_vector_int_destroy(&firstComp);
-      igraph_vector_int_destroy(&nbComp);
-      IGRAPH_FINALLY_CLEAN(4);
-      return false; /* u2 has no compatible vertex in succ[v] */
+      *result = false; /* u2 has no compatible vertex in succ[v] */
+      goto cleanup;
     }
     /* u2 is matched to v2 in the matching that supports (u, v) */
     v2 = VECTOR(D->matching)[ MATRIX(D->firstMatch, u, v)+i]; 
@@ -1068,64 +1223,72 @@ bool igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt) {
     }
   }
   /* Call Hopcroft Karp to update the matching */
-  int invalid;
-  igraph_i_lad_updateMatching(VECTOR(Gp->nbSucc)[u], nbNum, &nbComp, 
-			      &firstComp, &comp, &matchedWithU, &invalid);
+  IGRAPH_CHECK(
+    igraph_i_lad_updateMatching((int) VECTOR(Gp->nbSucc)[u], nbNum, &nbComp, 
+			        &firstComp, &comp, &matchedWithU, &invalid)
+  );
   if (invalid) { 
-    igraph_vector_int_destroy(&matchedWithU);
-    igraph_vector_int_destroy(&comp);
-    igraph_vector_int_destroy(&firstComp);
-    igraph_vector_int_destroy(&nbComp);
-    IGRAPH_FINALLY_CLEAN(4);
-    return false; 
+    *result = false;
+    goto cleanup; 
   }
   for (i=0; i<VECTOR(Gp->nbSucc)[u]; i++) {
     VECTOR(D->matching)[ MATRIX(D->firstMatch, u, v)+i] =
       numInv[ VECTOR(matchedWithU)[i] ];
   }
+  *result = true;
+
+cleanup:
+  igraph_free(numInv);
+  igraph_free(num);
   igraph_vector_int_destroy(&matchedWithU);
   igraph_vector_int_destroy(&comp);
   igraph_vector_int_destroy(&firstComp);
   igraph_vector_int_destroy(&nbComp);
-  IGRAPH_FINALLY_CLEAN(4);
-  return true;
+  IGRAPH_FINALLY_CLEAN(6);
+
+  return 0;
 }
 
 /* ---------------------------------------------------------*/
 /* Coming from main.c                                      */
 /* ---------------------------------------------------------*/
 
-bool igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, Tgraph* Gt) {
+int igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
+	bool *result) {
   /* filter domains of all vertices in D->toFilter wrt LAD and ensure
      GAC(allDiff) 
      return false if some domain becomes empty; true otherwise */
   int u, v, i, oldNbVal;
+  int invalid;
+  bool result2;
   while (!igraph_i_lad_toFilterEmpty(D)) {
     while (!igraph_i_lad_toFilterEmpty(D)) {
-      u=igraph_i_lad_nextToFilter(D, Gp->nbVertices); 
+      u=igraph_i_lad_nextToFilter(D, (int) (Gp->nbVertices));
       oldNbVal = VECTOR(D->nbVal)[u];
       i = VECTOR(D->firstVal)[u]; 
       while (i < VECTOR(D->firstVal)[u] + VECTOR(D->nbVal)[u]) {
 	/* for every target node v in D(u), check if G_(u, v) has a
 	   covering matching */
 	v=VECTOR(D->val)[i]; 
-	if (igraph_i_lad_checkLAD(u, v, D, Gp, Gt)) {
+	IGRAPH_CHECK(igraph_i_lad_checkLAD(u, v, D, Gp, Gt, &result2));
+	if (result2) {
 	  i++;
 	} else { 
-	  if (!igraph_i_lad_removeValue(u, v, D, Gp, Gt)) { return false; }
+	  IGRAPH_CHECK(igraph_i_lad_removeValue(u, v, D, Gp, Gt, &result2));
+	  if (!result2) { *result = false; return 0; }
 	}
       }
       if ((VECTOR(D->nbVal)[u]==1) && (oldNbVal>1) && 
 	  (!igraph_i_lad_matchVertex(u, induced, D, Gp, Gt))) { 
-	return false; 
+	*result = false; return 0;
       }
-      if (VECTOR(D->nbVal)[u]==0) { return false; }
+      if (VECTOR(D->nbVal)[u]==0) { *result = false; return 0; }
     }
-    int invalid;
     igraph_i_lad_ensureGACallDiff(induced, Gp, Gt, D, &invalid);
-    if (invalid) { return false; }
+    if (invalid) { *result = false; return 0; }
   }
-  return true;
+  *result = true;
+  return 0;
 }
 
 
@@ -1143,9 +1306,12 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
      completed, return true otherwise */
 	
   int u, v, minDom, i; 
-  int nbVal[Gp->nbVertices];
-  int globalMatching[Gp->nbVertices];
+  int* nbVal;
+  int* globalMatching;
   clock_t end=clock();
+  igraph_vector_t *vec;
+  int* val;
+  bool result;
 
   (*nbNodes)++;
 
@@ -1153,13 +1319,18 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
     /* CPU time limit exceeded */
     IGRAPH_ERROR("LAD CPU time exceeded", IGRAPH_CPUTIME);
   }
-	
-  if (!igraph_i_lad_filter(induced, D, Gp, Gt)) { 
+
+  /* Allocate memory */
+  ALLOC_ARRAY(nbVal, Gp->nbVertices, int);
+  ALLOC_ARRAY(globalMatching, Gp->nbVertices, int);
+
+  IGRAPH_CHECK(igraph_i_lad_filter(induced, D, Gp, Gt, &result));
+  if (!result) { 
     /* filtering has detected an inconsistency */
     (*nbFail)++;
     igraph_i_lad_resetToFilter(D);
     *invalid=0;
-    return 0;
+    goto cleanup;
   }	
 	
   /* The current node of the search tree is consistent wrt to LAD and
@@ -1185,7 +1356,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
       }
     }
     if (maps) {
-      igraph_vector_t *vec=igraph_Calloc(1, igraph_vector_t);
+      vec=igraph_Calloc(1, igraph_vector_t);
       if (!vec) { IGRAPH_ERROR("LAD failed", IGRAPH_ENOMEM); }
       IGRAPH_FINALLY(igraph_free, vec);
       IGRAPH_CHECK(igraph_vector_init(vec, Gp->nbVertices));
@@ -1198,11 +1369,11 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
     }
     igraph_i_lad_resetToFilter(D);
     *invalid=0;
-    return 0;
+    goto cleanup;
   }
 	
   /* save the domain of minDom to iterate on its values */
-  int val[ VECTOR(D->nbVal)[minDom] ];
+  ALLOC_ARRAY(val, VECTOR(D->nbVal)[minDom], int);
   for (i=0; i < VECTOR(D->nbVal)[minDom]; i++) {
     val[i]=VECTOR(D->val)[ VECTOR(D->firstVal)[minDom]+i ]; 
   }
@@ -1210,16 +1381,15 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   /* branch on minDom=v, for every target node v in D(u) */
   for(i=0; ((i<nbVal[minDom]) && ((firstSol==0)||(*nbSol==0))); i++) {
     IGRAPH_ALLOW_INTERRUPTION();
-    v = val[i]; 
-    if ((!igraph_i_lad_removeAllValuesButOne(minDom, v, D, Gp, Gt)) || 
-	(!igraph_i_lad_matchVertex(minDom, induced, D, Gp, Gt))) {
+    v = val[i];
+    IGRAPH_CHECK(igraph_i_lad_removeAllValuesButOne(minDom, v, D, Gp, Gt, &result));
+    if (!result || (!igraph_i_lad_matchVertex(minDom, induced, D, Gp, Gt))) {
       (*nbFail)++; 
       (*nbNodes)++;
       igraph_i_lad_resetToFilter(D);
     } else {
-      int invalid;
       IGRAPH_CHECK(igraph_i_lad_solve(timeLimit, firstSol, induced,
-				      D, Gp, Gt, &invalid, iso, map, maps, 
+				      D, Gp, Gt, invalid, iso, map, maps, 
 				      nbNodes, nbFail, nbSol, begin));
     }
     /* restore domain sizes and global all different matching */
@@ -1231,6 +1401,15 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
     }
   }
   *invalid=0;
+
+  igraph_free(val);
+  IGRAPH_FINALLY_CLEAN(1);
+
+cleanup:
+  igraph_free(globalMatching);
+  igraph_free(nbVal);
+  IGRAPH_FINALLY_CLEAN(2);
+
   return 0;
 }
 
@@ -1321,13 +1500,14 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
 					&Gt, &invalidDomain));
   if (invalidDomain) { goto exit2; }
   
-  IGRAPH_CHECK(igraph_i_lad_updateMatching(Gp.nbVertices, Gt.nbVertices, 
+  IGRAPH_CHECK(igraph_i_lad_updateMatching((int) (Gp.nbVertices), 
+					   (int) (Gt.nbVertices),
 					   &D.nbVal, &D.firstVal, &D.val, 
 					   &D.globalMatchingP, 
 					   &invalidDomain));
   if (invalidDomain) { goto exit; }
 
-  IGRAPH_CHECK(igraph_i_lad_ensureGACallDiff(induced, &Gp, &Gt, &D, 
+  IGRAPH_CHECK(igraph_i_lad_ensureGACallDiff((char) induced, &Gp, &Gt, &D, 
 					     &invalidDomain));
   if (invalidDomain) { goto exit; }
 
@@ -1341,13 +1521,13 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   for (u=0; u<Gp.nbVertices; u++) {
     if (VECTOR(D.nbVal)[u] == 1) { VECTOR(toMatch)[nbToMatch++] = u; }
   }
-  IGRAPH_CHECK(igraph_i_lad_matchVertices(nbToMatch, &toMatch, induced, &D, 
-					  &Gp, &Gt, &invalidDomain));
+  IGRAPH_CHECK(igraph_i_lad_matchVertices(nbToMatch, &toMatch, (char) induced, 
+					  &D, &Gp, &Gt, &invalidDomain));
   igraph_vector_int_destroy(&toMatch);
   IGRAPH_FINALLY_CLEAN(1);
   if (invalidDomain) { goto exit; }
 	
-  IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, induced, &D, 
+  IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, (char) induced, &D, 
 				  &Gp, &Gt, &invalidDomain, iso, map, maps, 
 				  &nbNodes, &nbFail, &nbSol, &begin));
 

@@ -14,6 +14,7 @@ I'm not linking to it :)).
 
 from __future__ import with_statement
 
+from cStringIO import StringIO
 from warnings import warn
 
 import os
@@ -38,6 +39,14 @@ except ImportError:
     # pylint: disable-msg=C0103
     from igraph.drawing.utils import FakeModule
     cairo = FakeModule()
+
+IN_IPYTHON = False
+try:
+    # If this calls succeed without importing, we are in IPython and we can use the display facilities available via IPython
+    get_ipython()
+    IN_IPYTHON = True
+except NameError:
+    pass
 
 #####################################################################
 
@@ -338,6 +347,23 @@ class Plot(object):
                     # we wait here a little bit. Yes, this is quite hackish :(
                     time.sleep(5)
 
+    def _repr_svg_(self):
+        """Returns an SVG representation of this plot as a string.
+
+        This method is used by IPython to display this plot inline.
+        """
+        io = StringIO()
+        # Create a new SVG surface and use that to get the SVG representation,
+        # which will end up in io
+        surface = cairo.SVGSurface(io, self.bbox.width, self.bbox.height)
+        context = cairo.Context(surface)
+        # Plot the graph on this context
+        self.redraw(context)
+        # No idea why this is needed but python crashes without
+        context.show_page()
+        surface.finish()
+        # Return the raw SVG representation
+        return io.getvalue()
 
     @property
     def bounding_box(self):
@@ -415,6 +441,13 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
       will be re-used until the length is at least 4. The default margin
       is 20 on each side.
 
+    @keyword inline: whether to try and show the plot object inline in the
+      current IPython notebook. Passing ``None`` here or omitting this keyword
+      argument will look up the preferred behaviour from the
+      C{shell.ipython.inlining.Plot} configuration key.  Note that this keyword
+      argument has an effect only if igraph is run inside IPython and C{target}
+      is C{None}.
+
     @return: an appropriate L{Plot} object.
 
     @see: Graph.__plot__
@@ -431,12 +464,31 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
         bbox = bbox.contract(20)
     result.add(obj, bbox, *args, **kwds)
 
+    if IN_IPYTHON and target is None:
+        # Get the default value of the `inline` argument from the configuration if
+        # needed
+        inline = kwds.get("inline")
+        if inline is None:
+            config = Configuration.instance()
+            inline = config["shell.ipython.inlining.Plot"]
+
+        # If we requested an inline plot, just return the result and IPython will
+        # call its _repr_svg_ method. If we requested a non-inline plot, show the
+        # plot in a separate window and return nothing
+        if inline:
+            return result
+        else:
+            result.show()
+            return
+
+    # We are either not in IPython or the user specified an explicit plot target,
+    # so just show or save the result
     if target is None:
         result.show()
-
-    if isinstance(target, basestring):
+    elif isinstance(target, basestring):
         result.save()
 
+    # Also return the plot itself
     return result
 
 #####################################################################

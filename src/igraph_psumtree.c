@@ -37,7 +37,7 @@ double igraph_i_log2(double f) {
 
 int igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
   t->size=size;
-  t->offset=pow(2, ceil(igraph_i_log2(size)))-1;
+  t->offset=(long int) (pow(2, ceil(igraph_i_log2(size)))-1);
   IGRAPH_CHECK(igraph_vector_init((igraph_vector_t *)t, t->offset+t->size));
   return 0;
 }

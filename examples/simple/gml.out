@@ -78,7 +78,7 @@ undirected
 31 33
 32 33
 -----------------
-Creator "igraph version 0.7 test suite"
+Creator "igraph version @VERSION@ test suite"
 Version 1
 graph
 [

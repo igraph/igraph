@@ -193,7 +193,11 @@ delete.vertices(graph, v)
   The actual operation that is performed depends on the type of the
   right hand side argument.
   \itemize{
-  \item If it is another igraph graph object, then the disjoint union of
+  \item If is is another igraph graph object and they are both
+    named graphs, then the union of the two graphs are calculated,
+    see \code{\link{graph.union}}.
+  \item If it is another igraph graph object, but either of the two
+    are not named, then the disjoint union of
     the two graphs is calculated, see \code{\link{graph.disjoint.union}}.
   \item If it is a numeric scalar, then the specified number of vertices
     are added to the graph.

@@ -27,6 +27,7 @@
 
 void *thread_function(void *arg) {
   IGRAPH_FINALLY(0, 0);
+  return 0;
 }
 
 int main() {

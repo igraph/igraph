@@ -1,6 +1,12 @@
 # vim:ts=4 sw=4 sts=4:
+
 import unittest
 from igraph import *
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
 
 class EdgeTests(unittest.TestCase):
     def setUp(self):
@@ -26,6 +32,38 @@ class EdgeTests(unittest.TestCase):
         e.update_attributes(dict(b=44, c=55))
         self.assertEquals(e.attributes(), dict(a=3, b=44, c=55, d=6))
 
+    def testProxyMethods(self):
+        g = Graph.GRG(10, 0.5)
+        e = g.es[0]
+
+        # - delete() is ignored because it mutates the graph
+        ignore = "delete"
+        ignore = set(ignore.split())
+
+        # Methods not listed here are expected to return an int or a float
+        return_types = {
+        }
+
+        for name in Edge.__dict__:
+            if name in ignore:
+                continue
+
+            func = getattr(e, name)
+            docstr = func.__doc__
+
+            if not docstr.startswith("Proxy method"):
+                continue
+
+            result = func()
+            self.assertEquals(getattr(g, name)(e.index), result,
+                    msg=("Edge.%s proxy method misbehaved" % name))
+
+            return_type = return_types.get(name, (int, float))
+            self.assertTrue(isinstance(result, return_type),
+                    msg=("Edge.%s proxy method did not return %s" % (name, return_type))
+            )
+
+
 
 class EdgeSeqTests(unittest.TestCase):
     def setUp(self):
@@ -40,6 +78,24 @@ class EdgeSeqTests(unittest.TestCase):
         self.assertRaises(ValueError, EdgeSeq, self.g, 112)
         self.assertRaises(ValueError, EdgeSeq, self.g, [112])
         self.failUnless(self.g.es.graph == self.g)
+
+    def testIndexing(self):
+        for i in xrange(self.g.ecount()):
+            self.assertEquals(i, self.g.es[i].index)
+        self.assertRaises(IndexError, self.g.es.__getitem__, -1)
+        self.assertRaises(KeyError, self.g.es.__getitem__, 1.5)
+
+    @unittest.skipIf(np is None, "test case depends on NumPy")
+    def testNumPyIndexing(self):
+        for i in xrange(self.g.ecount()):
+            arr = np.array([i])
+            self.assertEquals(i, self.g.es[arr[0]].index)
+
+        arr = np.array([-1])
+        self.assertRaises(IndexError, self.g.es.__getitem__, arr[0])
+
+        arr = np.array([1.5])
+        self.assertRaises(KeyError, self.g.es.__getitem__, arr[0])
 
     def testPartialAttributeAssignment(self):
         only_even = self.g.es.select(lambda e: (e.index % 2 == 0))

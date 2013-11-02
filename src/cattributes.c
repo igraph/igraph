@@ -56,21 +56,73 @@ typedef struct igraph_i_cattributes_t {
   igraph_vector_ptr_t eal;
 } igraph_i_cattributes_t;
 
+int igraph_i_cattributes_copy_attribute_record(igraph_attribute_record_t **newrec, 
+					       const igraph_attribute_record_t *rec) {
+  igraph_vector_t *num, *newnum;
+  igraph_strvector_t *str, *newstr;
+  
+  *newrec=igraph_Calloc(1, igraph_attribute_record_t);
+  if (!(*newrec)) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
+  IGRAPH_FINALLY(igraph_free, *newrec);
+  (*newrec)->type=rec->type;
+  (*newrec)->name=strdup(rec->name);
+  if (!(*newrec)->name) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
+  IGRAPH_FINALLY(igraph_free, (void*)(*newrec)->name);
+  if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
+    num=(igraph_vector_t *)rec->value;
+    newnum=igraph_Calloc(1, igraph_vector_t);
+    if (!newnum) { 
+      IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); 
+    }
+    IGRAPH_FINALLY(igraph_free, newnum);
+    IGRAPH_CHECK(igraph_vector_copy(newnum, num));
+    IGRAPH_FINALLY(igraph_vector_destroy, newnum);
+    (*newrec)->value=newnum;
+  } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
+    str=(igraph_strvector_t*)rec->value;
+    newstr=igraph_Calloc(1, igraph_strvector_t);
+    if (!newstr) { 
+      IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); 
+    }
+    IGRAPH_FINALLY(igraph_free, newstr);
+    IGRAPH_CHECK(igraph_strvector_copy(newstr, str));
+    IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
+    (*newrec)->value=newstr;
+  }
+
+  IGRAPH_FINALLY_CLEAN(4);
+  return 0;
+}
+
+
 int igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
-  igraph_i_cattributes_t *nattr=igraph_Calloc(1, igraph_i_cattributes_t);
-  IGRAPH_UNUSED(attr);
+  igraph_attribute_record_t *attr_rec;
+  long int i, n;
+  igraph_i_cattributes_t *nattr;
+
+  n = attr ? igraph_vector_ptr_size(attr) : 0;
+
+  nattr=igraph_Calloc(1, igraph_i_cattributes_t);
   if (!nattr) {
     IGRAPH_ERROR("Can't init attributes", IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, nattr);
-  IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->gal, 0));
+
+  IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->gal, n));
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->val, 0));
-  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->val);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->eal, 0));
-  
   IGRAPH_FINALLY_CLEAN(3);
+
+  for (i=0; i<n; i++) {
+    IGRAPH_CHECK(igraph_i_cattributes_copy_attribute_record(
+	  &attr_rec, VECTOR(*attr)[i]));
+    VECTOR(nattr->gal)[i] = attr_rec;
+  }
+
   graph->attr=nattr;
+
   return 0;
 }
 
@@ -80,6 +132,7 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
   long int i, n, a;
   igraph_vector_t *num;
   igraph_strvector_t *str;
+  igraph_vector_bool_t *boolvec;
   igraph_attribute_record_t *rec;
   for (a=0; a<3; a++) {
     n=igraph_vector_ptr_size(als[a]);
@@ -94,6 +147,10 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
 	  str=(igraph_strvector_t*)rec->value;
 	  igraph_strvector_destroy(str);
 	  igraph_free(str);
+	} else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+	  boolvec=(igraph_vector_bool_t*)rec->value;
+	  igraph_vector_bool_destroy(boolvec);
+	  igraph_free(boolvec);
 	}
 	igraph_free((char*)rec->name);
 	igraph_free(rec);
@@ -134,45 +191,6 @@ void igraph_i_cattribute_copy_free(igraph_i_cattributes_t *attr) {
     }
   }  
 }
-
-int igraph_i_cattributes_copy_attribute_record(igraph_attribute_record_t **newrec, 
-					       const igraph_attribute_record_t *rec) {
-  igraph_vector_t *num, *newnum;
-  igraph_strvector_t *str, *newstr;
-  
-  *newrec=igraph_Calloc(1, igraph_attribute_record_t);
-  if (!(*newrec)) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
-  IGRAPH_FINALLY(igraph_free, *newrec);
-  (*newrec)->type=rec->type;
-  (*newrec)->name=strdup(rec->name);
-  if (!(*newrec)->name) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
-  IGRAPH_FINALLY(igraph_free, (void*)(*newrec)->name);
-  if (rec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
-    num=(igraph_vector_t *)rec->value;
-    newnum=igraph_Calloc(1, igraph_vector_t);
-    if (!newnum) { 
-      IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); 
-    }
-    IGRAPH_FINALLY(igraph_free, newnum);
-    IGRAPH_CHECK(igraph_vector_copy(newnum, num));
-    IGRAPH_FINALLY(igraph_vector_destroy, newnum);
-    (*newrec)->value=newnum;
-  } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
-    str=(igraph_strvector_t*)rec->value;
-    newstr=igraph_Calloc(1, igraph_strvector_t);
-    if (!newstr) { 
-      IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); 
-    }
-    IGRAPH_FINALLY(igraph_free, newstr);
-    IGRAPH_CHECK(igraph_strvector_copy(newstr, str));
-    IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
-    (*newrec)->value=newstr;
-  }
-
-  IGRAPH_FINALLY_CLEAN(4);
-  return 0;
-}
-
 
 /* No reference counting here. If you use attributes in C you should
    know what you're doing. */
@@ -504,7 +522,7 @@ int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec,
     igraph_vector_t *idx=VECTOR(*merges)[i];
     long int j, n=igraph_vector_size(idx);
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s += VECTOR(*oldv)[x];
     }
     VECTOR(*newv)[i]=s;
@@ -535,7 +553,7 @@ int igraph_i_cattributes_cn_prod(const igraph_attribute_record_t *oldrec,
     igraph_vector_t *idx=VECTOR(*merges)[i];
     long int j, n=igraph_vector_size(idx);
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s *= VECTOR(*oldv)[x];
     }
     VECTOR(*newv)[i]=s;
@@ -567,7 +585,7 @@ int igraph_i_cattributes_cn_min(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t m= n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
     for (j=1; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       igraph_real_t val=VECTOR(*oldv)[x];
       if (val < m) { m=val; }
     }
@@ -600,7 +618,7 @@ int igraph_i_cattributes_cn_max(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t m= n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
     for (j=1; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       igraph_real_t val=VECTOR(*oldv)[x];
       if (val > m) { m=val; }
     }
@@ -736,7 +754,7 @@ int igraph_i_cattributes_cn_mean(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t s= n > 0 ? 0.0 : nan;
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s += VECTOR(*oldv)[x];
     }
     if (n>0) { s=s/n; }
@@ -780,7 +798,7 @@ int igraph_i_cattributes_cn_func(const igraph_attribute_record_t *oldrec,
     igraph_real_t res;
     IGRAPH_CHECK(igraph_vector_resize(&values, n));
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];
+      long int x=(long int) VECTOR(*idx)[j];
       VECTOR(values)[j] = VECTOR(*oldv)[x];
     }
     IGRAPH_CHECK(func(&values, &res));
@@ -976,7 +994,7 @@ int igraph_i_cattributes_sn_func(const igraph_attribute_record_t *oldrec,
     char *res;
     IGRAPH_CHECK(igraph_strvector_resize(&values, n));
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];
+      long int x=(long int) VECTOR(*idx)[j];
       char *elem;
       igraph_strvector_get(oldv, x, &elem);
       IGRAPH_CHECK(igraph_strvector_set(newv, j, elem));
@@ -1042,9 +1060,13 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
   for (i=0, j=0; i<valno; i++) {
     igraph_attribute_record_t *newrec, *oldrec=VECTOR(*val)[i];
     const char *name=oldrec->name;
-    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_combination_type_t todo=
+      (igraph_attribute_combination_type_t) (TODO[i]);
     igraph_attribute_type_t type=oldrec->type;
-    void *voidfunc=funcs[i];
+    igraph_cattributes_combine_num_t *numfunc=
+      (igraph_cattributes_combine_num_t*) funcs[i];
+    igraph_cattributes_combine_str_t *strfunc=
+      (igraph_cattributes_combine_str_t*) funcs[i];
     
     if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
 	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
@@ -1064,7 +1086,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  numfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
@@ -1107,7 +1129,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_sn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  strfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
@@ -1554,9 +1576,13 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
   for (i=0, j=0; i<ealno; i++) {
     igraph_attribute_record_t *newrec, *oldrec=VECTOR(*eal)[i];
     const char *name=oldrec->name;
-    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_combination_type_t todo=
+      (igraph_attribute_combination_type_t) (TODO[i]);
     igraph_attribute_type_t type=oldrec->type;
-    void *voidfunc=funcs[i];
+    igraph_cattributes_combine_num_t *numfunc=
+      (igraph_cattributes_combine_num_t*) funcs[i];
+    igraph_cattributes_combine_str_t *strfunc=
+      (igraph_cattributes_combine_str_t*) funcs[i];
     
     if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
 	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
@@ -1576,7 +1602,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  numfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
@@ -1619,7 +1645,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_sn_func(oldrec, newrec, merges, 
-						  voidfunc));
+						  strfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);

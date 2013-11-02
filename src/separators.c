@@ -104,12 +104,12 @@ int igraph_i_is_separator(const igraph_t *graph,
   igraph_dqueue_push(Q, start);
   VECTOR(*removed)[start]=1;
   while (!igraph_dqueue_empty(Q)) {
-    long int node=igraph_dqueue_pop(Q);
+    long int node=(long int) igraph_dqueue_pop(Q);
     long int j, n;
-    igraph_neighbors(graph, neis, node, IGRAPH_ALL);
+    igraph_neighbors(graph, neis, (igraph_integer_t) node, IGRAPH_ALL);
     n=igraph_vector_size(neis);
     for (j=0; j<n; j++) {
-      long int nei=VECTOR(*neis)[j];
+      long int nei=(long int) VECTOR(*neis)[j];
       if (!VECTOR(*removed)[nei]) {
 	IGRAPH_CHECK(igraph_dqueue_push(Q, nei));
 	VECTOR(*removed)[nei]=1;
@@ -286,11 +286,11 @@ int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
     igraph_vector_push_back(components, i);
     
     while (!igraph_dqueue_empty(Q)) {
-      long int act_node=igraph_dqueue_pop(Q);
-      igraph_vector_t *neis=igraph_adjlist_get(adjlist, act_node);
-      long int j, n=igraph_vector_size(neis);
+      long int act_node=(long int) igraph_dqueue_pop(Q);
+      igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, act_node);
+      long int j, n=igraph_vector_int_size(neis);
       for (j=0; j<n; j++) {
-	long int nei=VECTOR(*neis)[j];
+	long int nei=(long int) VECTOR(*neis)[j];
 	if (VECTOR(*leaveout)[nei]== *mark) continue;
 	IGRAPH_CHECK(igraph_dqueue_push(Q, nei));
 	VECTOR(*leaveout)[nei]= *mark;
@@ -339,16 +339,16 @@ int igraph_i_separators_store(igraph_vector_ptr_t *separators,
 
     /* Calculate N(C) for the next C */
 
-    while ( (next=VECTOR(*components)[cptr++]) != -1) {
+    while ( (next=(long int) VECTOR(*components)[cptr++]) != -1) {
       VECTOR(*leaveout)[next] = *mark;
     }
     cptr=saved;
 
-    while ( (next=VECTOR(*components)[cptr++]) != -1) {
-      igraph_vector_t *neis=igraph_adjlist_get(adjlist, next);
-      long int j, nn=igraph_vector_size(neis);
+    while ( (next=(long int) VECTOR(*components)[cptr++]) != -1) {
+      igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, next);
+      long int j, nn=igraph_vector_int_size(neis);
       for (j=0; j<nn; j++) {
-	long int nei=VECTOR(*neis)[j];
+	long int nei=(long int) VECTOR(*neis)[j];
 	if (VECTOR(*leaveout)[nei] != *mark) {
 	  igraph_vector_push_back(sorter, nei);
 	  VECTOR(*leaveout)[nei] = *mark;
@@ -478,11 +478,11 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
   for (v=0; v<no_of_nodes; v++) {
 
     /* Mark v and its neighbors */
-    igraph_vector_t *neis=igraph_adjlist_get(&adjlist, v);
-    long int i, n=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(&adjlist, v);
+    long int i, n=igraph_vector_int_size(neis);
     VECTOR(leaveout)[v]=mark;
     for (i=0; i<n; i++) {
-      long int nei=VECTOR(*neis)[i];
+      long int nei=(long int) VECTOR(*neis)[i];
       VECTOR(leaveout)[nei]=mark;
     }
 
@@ -507,15 +507,15 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
     for (b=0; b<basislen; b++) {
 
       /* Remove N(x) U basis */
-      long int x=VECTOR(*basis)[b];
-      igraph_vector_t *neis=igraph_adjlist_get(&adjlist, x);
-      long int i, n=igraph_vector_size(neis);
+      long int x=(long int) VECTOR(*basis)[b];
+      igraph_vector_int_t *neis=igraph_adjlist_get(&adjlist, x);
+      long int i, n=igraph_vector_int_size(neis);
       for (i=0; i<basislen; i++) {
-	long int sn=VECTOR(*basis)[i];
+	long int sn=(long int) VECTOR(*basis)[i];
 	VECTOR(leaveout)[sn]=mark;
       }
       for (i=0; i<n; i++) {
-	long int nei=VECTOR(*neis)[i];
+	long int nei=(long int) VECTOR(*neis)[i];
 	VECTOR(leaveout)[nei]=mark;
       }
       
@@ -653,6 +653,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
   igraph_vector_t phi;
   igraph_t graph_copy;
   igraph_vector_t capacity;
+  igraph_maxflow_stats_t stats;
 
   igraph_vector_ptr_clear(separators);
   IGRAPH_FINALLY(igraph_i_separators_free, separators);
@@ -747,12 +748,13 @@ int igraph_minimum_size_separators(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
 
     for (j=0; j<no_of_nodes; j++) {
-      long int ii=VECTOR(X)[i];
+      long int ii=(long int) VECTOR(X)[i];
       igraph_real_t phivalue;
       igraph_bool_t conn;
 
       if (ii == j) { continue; } /* the same vertex */
-      igraph_are_connected(&graph_copy, ii,  j, &conn);
+      igraph_are_connected(&graph_copy, (igraph_integer_t) ii,  
+			   (igraph_integer_t) j, &conn);
       if (conn) { continue; }	/* they are connected */
 
       /* --------------------------------------------------------------- */  
@@ -760,9 +762,10 @@ int igraph_minimum_size_separators(const igraph_t *graph,
 	 If |phi|=k, then */      
       IGRAPH_CHECK(igraph_maxflow(&Gbar, &phivalue, &phi, /*cut=*/ 0, 
 				  /*partition=*/ 0, /*partition2=*/ 0, 
-				  /* source= */ ii+no_of_nodes, 
-				  /* target= */ j,
-				  &capacity));
+				  /* source= */ 
+				  (igraph_integer_t) (ii+no_of_nodes),
+				  /* target= */ (igraph_integer_t) j,
+				  &capacity, &stats));
 
       if (phivalue == k) {
 
@@ -774,8 +777,9 @@ int igraph_minimum_size_separators(const igraph_t *graph,
 	IGRAPH_CHECK(igraph_all_st_mincuts(&Gbar, /*value=*/ 0, 
 					   /*cuts=*/ &stcuts,
 					   /*partition1s=*/ 0, 
-					   /*source=*/ ii+no_of_nodes,
-					   /*target=*/ j,
+					   /*source=*/ (igraph_integer_t) 
+					   (ii+no_of_nodes),
+					   /*target=*/ (igraph_integer_t) j,
 					   /*capacity=*/ &capacity));
 
 	IGRAPH_CHECK(igraph_i_minimum_size_separators_append(separators,
@@ -787,9 +791,12 @@ int igraph_minimum_size_separators(const igraph_t *graph,
       
       /* --------------------------------------------------------------- */
       /* 8 Add edge (x[i],v[j]) to G. */
-      IGRAPH_CHECK(igraph_add_edge(&graph_copy, ii, j));
-      IGRAPH_CHECK(igraph_add_edge(&Gbar, ii+no_of_nodes, j));
-      IGRAPH_CHECK(igraph_add_edge(&Gbar, j+no_of_nodes, ii));
+      IGRAPH_CHECK(igraph_add_edge(&graph_copy, (igraph_integer_t) ii, 
+				   (igraph_integer_t) j));
+      IGRAPH_CHECK(igraph_add_edge(&Gbar, (igraph_integer_t) (ii+no_of_nodes),
+				   (igraph_integer_t) j));
+      IGRAPH_CHECK(igraph_add_edge(&Gbar, (igraph_integer_t) (j+no_of_nodes),
+				   (igraph_integer_t) ii));
       IGRAPH_CHECK(igraph_vector_push_back(&capacity, no_of_nodes));
       IGRAPH_CHECK(igraph_vector_push_back(&capacity, no_of_nodes));
       

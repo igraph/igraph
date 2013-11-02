@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC -//Apple Computer//DTD PLIST 1.0//EN
+          http://www.apple.com/DTDs/PropertyList-1.0.dtd >
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>org.igraph.tekton.check-r-develop</string>
+    <key>WorkingDirectory</key>
+    <string>$PWD/ubuntu-13.04-x86_64</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>../run-script.sh</string>
+      <string>check-r.sh</string>
+      <string>develop</string>
+      <string>~vagrant/R/R-3.0.1/bin/R</string>
+      <string>R-3.0.1</string>
+    </array>
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>1</integer>
+	<key>Minute</key>
+	<integer>00</integer>
+    </dict>
+    <key>StandardOutPath</key>
+    <string>output/check-r-develop.txt</string>
+    <key>StandardErrorPath</key>
+    <string>error/check-r-develop.txt</string>
+    <key>KeepAlive</key>
+    <false/>
+  </dict>
+</plist>

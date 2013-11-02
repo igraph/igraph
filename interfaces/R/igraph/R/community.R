@@ -678,13 +678,21 @@ multilevel.community <- function(graph, weights=NULL) {
   res
 }
 
-optimal.community <- function(graph) {
+optimal.community <- function(graph, weights=NULL) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
+  }
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
+  }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_community_optimal_modularity", graph,
+  res <- .Call("R_igraph_community_optimal_modularity", graph, weights,
                PACKAGE="igraph")
   if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
     res$names <- V(graph)$name

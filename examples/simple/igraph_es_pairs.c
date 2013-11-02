@@ -42,7 +42,7 @@ int main() {
     igraph_es_size(&g, &es, &size);
     IGRAPH_EIT_RESET(it);
     while (!IGRAPH_EIT_END(it)) {
-      IGRAPH_EIT_GET(it);
+      (void) IGRAPH_EIT_GET(it);
       IGRAPH_EIT_NEXT(it);
       size--;
     }
@@ -65,7 +65,7 @@ int main() {
     igraph_eit_create(&g, es, &it);
     IGRAPH_EIT_RESET(it);
     while (!IGRAPH_EIT_END(it)) {
-      IGRAPH_EIT_GET(it);
+      (void) IGRAPH_EIT_GET(it);
       IGRAPH_EIT_NEXT(it);
     }
     igraph_eit_destroy(&it);

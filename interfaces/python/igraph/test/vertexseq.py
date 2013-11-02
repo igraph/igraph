@@ -1,6 +1,12 @@
 # vim:ts=4 sw=4 sts=4:
+
 import unittest
 from igraph import *
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
 
 class VertexTests(unittest.TestCase):
     def setUp(self):
@@ -18,6 +24,45 @@ class VertexTests(unittest.TestCase):
         v.update_attributes(dict(b=44, c=55))
         self.assertEquals(v.attributes(), dict(a=3, b=44, c=55, d=6))
 
+    def testProxyMethods(self):
+        g = Graph.GRG(10, 0.5)
+        v = g.vs[0]
+
+        # - neighbors(), predecessors() and succesors() are ignored because they
+        #   return vertex lists while the methods in Graph return vertex index
+        #   lists.
+        # - pagerank() and personalized_pagerank() are ignored because of numerical
+        #   inaccuracies
+        # - delete() is ignored because it mutates the graph
+        ignore = "neighbors predecessors successors pagerank personalized_pagerank"\
+                " delete"
+        ignore = set(ignore.split())
+
+        # Methods not listed here are expected to return an int or a float
+        return_types = {
+                "get_shortest_paths": list,
+                "shortest_paths": list
+        }
+
+        for name in Vertex.__dict__:
+            if name in ignore:
+                continue
+
+            func = getattr(v, name)
+            docstr = func.__doc__
+
+            if not docstr.startswith("Proxy method"):
+                continue
+
+            result = func()
+            self.assertEquals(getattr(g, name)(v.index), result,
+                    msg=("Vertex.%s proxy method misbehaved" % name))
+
+            return_type = return_types.get(name, (int, float))
+            self.assertTrue(isinstance(result, return_type),
+                    msg=("Vertex.%s proxy method did not return %s" % (name, return_type))
+            )
+
 
 class VertexSeqTests(unittest.TestCase):
     def setUp(self):
@@ -33,6 +78,24 @@ class VertexSeqTests(unittest.TestCase):
         self.assertRaises(ValueError, VertexSeq, self.g, 12)
         self.assertRaises(ValueError, VertexSeq, self.g, [12])
         self.failUnless(self.g.vs.graph == self.g)
+
+    def testIndexing(self):
+        for i in xrange(self.g.vcount()):
+            self.assertEquals(i, self.g.vs[i].index)
+        self.assertRaises(IndexError, self.g.vs.__getitem__, -1)
+        self.assertRaises(KeyError, self.g.vs.__getitem__, 1.5)
+
+    @unittest.skipIf(np is None, "test case depends on NumPy")
+    def testNumPyIndexing(self):
+        for i in xrange(self.g.vcount()):
+            arr = np.array([i])
+            self.assertEquals(i, self.g.vs[arr[0]].index)
+
+        arr = np.array([-1])
+        self.assertRaises(IndexError, self.g.vs.__getitem__, arr[0])
+
+        arr = np.array([1.5])
+        self.assertRaises(KeyError, self.g.vs.__getitem__, arr[0])
 
     def testPartialAttributeAssignment(self):
         only_even = self.g.vs.select(lambda v: (v.index % 2 == 0))

@@ -95,8 +95,6 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
     stop("Not a graph object")
   }
 
-  require(Matrix)
-  
   type <- igraph.match.arg(type)
 
   vc <- vcount(graph)
@@ -219,7 +217,9 @@ get.adjedgelist <- function(graph, mode=c("all", "out", "in", "total")) {
 igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
                                  unlist.attrs=TRUE) {
 
-  require(graph)
+  if (! "graph" %in% .packages()) {
+    library(graph, pos="package:base")
+  }
 
   if (!inherits(graphNEL, "graphNEL")) {
     stop("Not a graphNEL graph")
@@ -274,7 +274,9 @@ igraph.to.graphNEL <- function(graph) {
     stop("Not an igraph graph")
   }
   
-  require(graph)
+  if (! "graph" %in% .packages()) {
+    library(graph, pos="package:base")
+  }
 
   if ("name" %in% list.vertex.attributes(graph) &&
       is.character(V(graph)$name)) {
@@ -406,7 +408,6 @@ get.incidence.sparse <- function(graph, types, names, attr) {
     stop("Invalid types vector")
   }
   
-  require(Matrix)
   el <- get.edgelist(graph, names=FALSE)
   if (any(types[el[,1]] == types[el[,2]])) {
     stop("Invalid types vector, not a bipartite graph")

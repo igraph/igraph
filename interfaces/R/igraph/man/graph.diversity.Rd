@@ -25,7 +25,7 @@ graph.diversity(graph, weights = NULL, vids = V(graph))
     H(i) = -sum(p[i,j] log(p[i,j]), j=1..k[i]),}
   where
   \deqn{p_{ij}=\frac{w_{ij}}{\sum_{l=1}^{k_i}}V_{il},}{%
-    p[i,j] = sum(w[i,l], l=1..k[i]),}
+    p[i,j] = w[i,j] / sum(w[i,l], l=1..k[i]),}
   and \eqn{k_i}{k[i]} is the (total) degree of vertex \eqn{i},
   \eqn{w_{ij}}{w[i,j]} is the weight of the edge(s) between vertices
   \eqn{i} and \eqn{j}.

@@ -1,0 +1,121 @@
+<h2>igraph 0.6.4 Release Notes</h2>
+
+<p class="news">
+igraph 0.6.4 is a minor release that contains only few big changes,
+and fixes a number of very annoying bugs. 
+</p>
+
+<p class="news">
+See the <a href="news.html">news page</a> for the complete list of 
+changes. Here we only mention the most important new features and changes.
+</p>
+
+<h3>
+  <img src="images/icon_r.png" />
+  Vertex shape API in R
+</h3>
+
+<p class="news">
+It is now possible to create user-defined vertex shapes for drawing 
+graphs in R. See <a href="doc-0.6.4/R/igraph.vertex.shapes.html">
+    vertex.shapes() in the R manual</a>. 
+</p>
+
+<h3>
+  <img src="images/icon_r.png" />
+Convert graphs to data frames in R
+</h3>
+
+<p class="news">
+Function <a href="doc-0.6.4/R/graph.data.frame.html">get.data.frame()</a> 
+does the opposite of <a href="doc-0.6.4/R/graph.data.frame.html">
+    graph.data.frame()</a>, it converts a graph to one or two data frames
+that contain vertex and/or edge data.
+</p>
+
+<h3>
+  <img src="images/icon_python.png" />
+Convert lists of tuples to graphs in Python
+</h3>
+
+<p class="news">
+The <a href="doc-0.6.4/python/igraph.Graph-class.html#TupleList">Graph.TupleList()</a>
+static method in Python now allows easy conversion of lists of tuples (such as
+database records or contents of CSV files) into graphs with named vertices and
+edge attributes.
+</p>
+
+<h3>
+  <img src="images/icon_c.png"/>
+  <img src="images/icon_r.png" />
+  <img src="images/icon_python.png" />
+  Pajek reader supports bipartite graphs
+</h3>
+
+<p class="news">
+See more in the <a href="doc-0.6.4/R/read.graph.html">R manual</a>, 
+<a href="doc-0.6.4/python/igraph.Graph-class.html#Read">
+  Python documentation</a> or 
+<a href="doc-0.6.4/html/ch19s05.html#igraph_read_graph_pajek">C
+  reference</a>.
+</p>
+
+<h3>
+  <img src="images/icon_c.png"/>
+  <img src="images/icon_r.png" />
+  <img src="images/icon_python.png" />
+  Graphical degree sequences
+</h3>
+
+<p class="news">
+We added some new functions if a sequence of integers is graphial, i.e. it 
+can be the degree sequence of a simple graph. See more in
+the <a href="doc-0.6.4/R/is.degree.sequence.html">R manual</a>
+<a href="doc-0.6.4/python/igraph._igraph-module.html#is_graphical_degree_sequence">Python documentation</a>
+or in the 
+<a href="doc-0.6.4/html/ch13s05.html#igraph_is_graphical_degree_sequence"> 
+  C reference</a>.
+</p>
+
+<h3>
+  <img src="images/icon_c.png"/>
+  <img src="images/icon_r.png" />
+  <img src="images/icon_python.png" />
+  k-regular random graphs
+</h3>
+
+<p class="news">
+It is possible now to generate regular random graphs, faster than 
+the general degree sequence based generator. See more in
+the <a href="doc-0.6.4/R/k.regular.game.html">R manual</a>,
+<a href="doc-0.6.4/python/igraph.GraphBase-class.html#K_Regular">Python documentation</a>
+or the <a href="doc-0.6.4/html/ch09s02.html#igraph_k_regular_game">
+    C reference</a>.
+</p>
+
+<h3>
+  <img src="images/icon_c.png"/>
+  <img src="images/icon_r.png" />
+  <img src="images/icon_python.png" />
+  Fitting power law distributions
+</h3>
+
+<p class="news">
+This release includes the plfit library to maximum likelihood fit 
+power laws to discrete or contiouous data. See more in
+the <a href="doc-0.6.4/R/power.law.fit.html">R manual</a>,
+<a href="doc-0.6.4/python/igraph.statistics-module.html#power_law_fit">Python documentation</a>
+or the <a href="doc-0.6.4/html/ch29s05.html#igraph_power_law_fit">
+C reference</a>.
+</p>
+
+<h3>
+  <img src="images/icon_r.png" />
+  Speedup in R
+</h3>
+
+<p class="news">
+Many basic graph operations (eg. printing the summary to the screen,
+querying attribute values) now avoid copying the graph, so these
+operations are now much faster in R.
+</p>

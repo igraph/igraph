@@ -6,6 +6,8 @@
 
 #include "Shape.h"
 
+namespace igraph {
+
 class Triangle : public Shape
 {
 public:
@@ -19,5 +21,7 @@ public:
 private:
 	Point mPoint1, mPoint2, mPoint3;
 };
+
+} // namespace igraph
 
 #endif

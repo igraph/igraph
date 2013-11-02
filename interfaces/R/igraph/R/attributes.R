@@ -47,15 +47,29 @@ set.graph.attribute <- function(graph, name, value) {
     stop("Not a graph object")
   }
 
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-  
-  ## !!! Modifies the graph is place
-  .Call("R_igraph_mybracket3_set", newgraph, 9L, 2L, name, value,
+  .Call("R_igraph_mybracket3_set", graph, 9L, 2L, name, value,
         PACKAGE="igraph")
+}
 
-  newgraph
+graph.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_mybracket2_copy", graph, 9L, 2L,
+        PACKAGE="igraph")
+} 
+
+"graph.attributes<-" <- function(graph, value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (!is.list(value) || (length(value) > 0 && is.null(names(value))) ||
+      any(names(value) == "") || any(duplicated(names(value)))) {
+    stop("Value must be a named list with unique names")
+  }
+            
+  .Call("R_igraph_mybracket2_set", graph, 9L, 2L, value,
+        PACKAGE="igraph")
 }
 
 get.vertex.attribute <- function(graph, name, index=V(graph)) {
@@ -84,14 +98,30 @@ set.vertex.attribute <- function(graph, name, index=V(graph), value) {
   vattrs[[name]][index] <- value
   length(vattrs[[name]]) <- vc
   
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
+  .Call("R_igraph_mybracket2_set", graph, 9L, 3L, vattrs, PACKAGE="igraph")
+}
 
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 3L, vattrs, PACKAGE="igraph")
+vertex.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_mybracket2_copy", graph, 9L, 3L, PACKAGE="igraph")  
+}
 
-  newgraph
+"vertex.attributes<-" <- function(graph, value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (!is.list(value) || (length(value) > 0 && is.null(names(value))) ||
+      any(names(value) == "") || any(duplicated(names(value)))) {
+    stop("Value must be a named list with unique names")
+  }
+  if ( any(sapply(value, length) != vcount(graph)) ) {
+    stop("Invalid attribute value length, must match number of vertices")
+  }
+  
+  .Call("R_igraph_mybracket2_set", graph, 9L, 3L, value,
+        PACKAGE="igraph")
 }
 
 get.edge.attribute <- function(graph, name, index=E(graph)) {
@@ -121,14 +151,31 @@ set.edge.attribute <- function(graph, name, index=E(graph), value) {
   eattrs[[name]][index] <- value
   length(eattrs[[name]]) <- ec
 
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
+  .Call("R_igraph_mybracket2_set", graph, 9L, 4L, eattrs, PACKAGE="igraph")
+}
 
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 4L, eattrs, PACKAGE="igraph")
+edge.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_mybracket2_copy", graph, 9L, 4L, PACKAGE="igraph")  
+}
 
-  newgraph
+"edge.attributes<-" <- function(graph, value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (!is.list(value) || (length(value) > 0 && is.null(names(value))) ||
+      any(names(value) == "") || any(duplicated(names(value)))) {
+    stop("Value must be a named list with unique names")
+  }
+  if ( any(sapply(value, length) != ecount(graph)) ) {
+    stop("Invalid attribute value length, must match number of edges")
+  }
+  
+  .Call("R_igraph_mybracket2_set", graph, 9L, 4L, value,
+        PACKAGE="igraph")
 }
 
 list.graph.attributes <- function(graph) {
@@ -171,14 +218,7 @@ remove.graph.attribute <- function(graph, name) {
   gattr <- .Call("R_igraph_mybracket2", graph, 9L, 2L, PACKAGE="igraph")
   gattr[[name]] <- NULL
   
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 2L, gattr, PACKAGE="igraph")
-
-  newgraph
+  .Call("R_igraph_mybracket2_set", graph, 9L, 2L, gattr, PACKAGE="igraph")
 }
 
 remove.vertex.attribute <- function(graph, name) {
@@ -193,14 +233,7 @@ remove.vertex.attribute <- function(graph, name) {
   vattr <- .Call("R_igraph_mybracket2", graph, 9L, 3L, PACKAGE="igraph")
   vattr[[name]] <- NULL
   
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 3L, vattr, PACKAGE="igraph")
-
-  newgraph
+  .Call("R_igraph_mybracket2_set", graph, 9L, 3L, vattr, PACKAGE="igraph")
 }
 
 remove.edge.attribute <- function(graph, name) {
@@ -215,14 +248,7 @@ remove.edge.attribute <- function(graph, name) {
   eattr <- .Call("R_igraph_mybracket2", graph, 9L, 4L, PACKAGE="igraph")
   eattr[[name]] <- NULL
   
-  ## Trick to make R copy the graph
-  newgraph <- graph
-  attr(newgraph, "foo") <- NULL
-
-  ## !!! Modifies the graph in place
-  .Call("R_igraph_mybracket2_set", newgraph, 9L, 4L, eattr, PACKAGE="igraph")
-
-  newgraph
+  .Call("R_igraph_mybracket2_set", graph, 9L, 4L, eattr, PACKAGE="igraph")
 }
 
 #############

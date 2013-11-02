@@ -46,7 +46,7 @@
 #include <math.h>
 
 int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
-  long int no=igraph_vector_max(membership)+1;
+  long int no=(long int) igraph_vector_max(membership)+1;
   igraph_vector_t idx;
   long int realno=0;
   long int i;
@@ -54,7 +54,7 @@ int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
   
   IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
   for (i=0; i<len; i++) {
-    long int t=VECTOR(*membership)[i];
+    long int t=(long int) VECTOR(*membership)[i];
     if (VECTOR(idx)[t]) {
       VECTOR(*membership)[i]=VECTOR(idx)[t]-1;
     } else {
@@ -120,11 +120,11 @@ int igraph_i_community_eb_get_merges2(const igraph_t *graph,
   }
 
   for (i=igraph_vector_size(edges)-1; i>=0; i--) {
-    long int edge=VECTOR(*edges)[i];
+    long int edge=(long int) VECTOR(*edges)[i];
     long int from=IGRAPH_FROM(graph, edge);
     long int to=IGRAPH_TO(graph, edge);
-    long int c1=VECTOR(mymembership)[from];
-    long int c2=VECTOR(mymembership)[to];
+    long int c1=(long int) VECTOR(mymembership)[from];
+    long int c2=(long int) VECTOR(mymembership)[to];
     igraph_real_t actmod;
     long int j;
     if (c1 != c2) {		/* this is a merge */
@@ -250,18 +250,17 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
   }
   
   for (i=igraph_vector_size(edges)-1; i>=0; i--) {
-    long int edge=VECTOR(*edges)[i];
-    igraph_integer_t from, to;
-    long int c1, c2, idx;
+    igraph_integer_t edge=(igraph_integer_t) VECTOR(*edges)[i];
+    igraph_integer_t from, to, c1, c2, idx;
     igraph_edge(graph, edge, &from, &to);
     idx=from+1;
     while (VECTOR(ptr)[idx-1] != 0) {
-      idx=VECTOR(ptr)[idx-1];
+      idx=(igraph_integer_t) VECTOR(ptr)[idx-1];
     }
     c1=idx-1;
     idx=to+1;
     while (VECTOR(ptr)[idx-1] != 0) {
-      idx=VECTOR(ptr)[idx-1];
+      idx=(igraph_integer_t) VECTOR(ptr)[idx-1];
     }
     c2=idx-1;
     if (c1 != c2) {		/* this is a merge */
@@ -275,8 +274,8 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
       
       VECTOR(ptr)[c1]=no_of_nodes+midx+1;
       VECTOR(ptr)[c2]=no_of_nodes+midx+1;
-      VECTOR(ptr)[(long int)from]=no_of_nodes+midx+1;
-      VECTOR(ptr)[(long int)to]=no_of_nodes+midx+1;
+      VECTOR(ptr)[from]=no_of_nodes+midx+1;
+      VECTOR(ptr)[to]=no_of_nodes+midx+1;
       
       midx++;
     }
@@ -453,7 +452,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &heap);
-    IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
+    IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, 
+					   (igraph_integer_t) no_of_nodes));
     IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
   }
 
@@ -498,9 +498,9 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        memset(distance, 0, no_of_nodes*sizeof(double));
-        memset(nrgeo, 0, no_of_nodes*sizeof(unsigned long long int));
-        memset(tmpscore, 0, no_of_nodes*sizeof(double));
+        memset(distance, 0, (size_t) no_of_nodes*sizeof(double));
+        memset(nrgeo, 0, (size_t) no_of_nodes*sizeof(unsigned long long int));
+        memset(tmpscore, 0, (size_t) no_of_nodes*sizeof(double));
         igraph_stack_clear(&stack); /* it should be empty anyway... */
         
         IGRAPH_CHECK(igraph_dqueue_push(&q, source));
@@ -509,12 +509,12 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
         distance[source]=0;
         
         while (!igraph_dqueue_empty(&q)) {
-          long int actnode=igraph_dqueue_pop(&q);
+          long int actnode=(long int) igraph_dqueue_pop(&q);
           
           neip=igraph_inclist_get(elist_out_p, actnode);
           neino=igraph_vector_size(neip);
           for (i=0; i<neino; i++) {
-            igraph_integer_t edge=VECTOR(*neip)[i], from, to;
+            igraph_integer_t edge=(igraph_integer_t) VECTOR(*neip)[i], from, to;
             long int neighbor;
             igraph_edge(graph, edge, &from, &to);
             neighbor = actnode!=from ? from : to;
@@ -537,14 +537,14 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
            shortest paths to them. Now we do an inverse search, starting
            with the farthest nodes. */
         while (!igraph_stack_empty(&stack)) {
-          long int actnode=igraph_stack_pop(&stack);
+          long int actnode=(long int) igraph_stack_pop(&stack);
           if (distance[actnode]<1) { continue; } /* skip source node */
           
           /* set the temporary score of the friends */
           neip=igraph_inclist_get(elist_in_p, actnode);
           neino=igraph_vector_size(neip);
           for (i=0; i<neino; i++) {
-            long int edge = VECTOR(*neip)[i];
+            long int edge = (long int) VECTOR(*neip)[i];
             long int neighbor = IGRAPH_OTHER(graph, edge, actnode);
             if (distance[neighbor]==distance[actnode]-1 &&
                 nrgeo[neighbor] != 0) {
@@ -566,9 +566,9 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
         /* This will contain the edge betweenness in the current step */
         IGRAPH_ALLOW_INTERRUPTION();
 
-        memset(distance, 0, no_of_nodes*sizeof(double));
-        memset(nrgeo, 0, no_of_nodes*sizeof(unsigned long long int));
-        memset(tmpscore, 0, no_of_nodes*sizeof(double));
+        memset(distance, 0, (size_t) no_of_nodes*sizeof(double));
+        memset(nrgeo, 0, (size_t) no_of_nodes*sizeof(unsigned long long int));
+        memset(tmpscore, 0, (size_t) no_of_nodes*sizeof(double));
 
         igraph_2wheap_push_with_index(&heap, source, 0);
         distance[source]=1.0;
@@ -584,7 +584,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
           neino=igraph_vector_size(neip);
 
           for (i=0; i<neino; i++) {
-            long int edge=VECTOR(*neip)[i];
+            long int edge=(long int) VECTOR(*neip)[i];
             long int to=IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = distance[to];
@@ -616,12 +616,12 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
         } /* igraph_2wheap_empty(&Q) */
 
         while (!igraph_stack_empty(&stack)) {
-          long int w = igraph_stack_pop(&stack);
+          long int w = (long int) igraph_stack_pop(&stack);
           igraph_vector_t *fatv = igraph_inclist_get(&fathers, w);
           long int fatv_len = igraph_vector_size(fatv);
 
           for (i = 0; i < fatv_len; i++) {
-            long int fedge = VECTOR(*fatv)[i];
+            long int fedge = (long int) VECTOR(*fatv)[i];
             long int neighbor = IGRAPH_OTHER(graph, fedge, w);
             tmpscore[neighbor] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
             VECTOR(eb)[fedge] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
@@ -646,7 +646,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
       }
     }
     passive[maxedge]=1;
-    igraph_edge(graph, maxedge, &from, &to);
+    igraph_edge(graph, (igraph_integer_t) maxedge, &from, &to);
 
     neip=igraph_inclist_get(elist_in_p, to);
     neino=igraph_vector_size(neip);
@@ -781,8 +781,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, steps);
   
   for (i=steps-1; i>=0; i--) {
-    long int c1=MATRIX(*merges, i, 0);
-    long int c2=MATRIX(*merges, i, 1);
+    long int c1=(long int) MATRIX(*merges, i, 0);
+    long int c2=(long int) MATRIX(*merges, i, 1);
 
     /* new component? */
     if (VECTOR(tmp)[i]==0) {
@@ -791,7 +791,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     }
 
     if (c1<no_of_nodes) {
-      long int cid=VECTOR(tmp)[i]-1;
+      long int cid=(long int) VECTOR(tmp)[i]-1;
       if (membership) { VECTOR(*membership)[c1]=cid+1; }
       if (csize) { VECTOR(*csize)[cid] += 1; }
     } else {
@@ -799,7 +799,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
     }
     
     if (c2<no_of_nodes) { 
-      long int cid=VECTOR(tmp)[i]-1;
+      long int cid=(long int) VECTOR(tmp)[i]-1;
       if (membership) {	VECTOR(*membership)[c2]=cid+1; }
       if (csize) { VECTOR(*csize)[cid] += 1; }
     } else {
@@ -810,7 +810,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
   
   if (membership || csize) {
     for (i=0; i<no_of_nodes; i++) {
-      long int tmp=VECTOR(*membership)[i];
+      long int tmp=(long int) VECTOR(*membership)[i];
       if (tmp!=0) {
 	if (membership) {
 	  VECTOR(*membership)[i]=tmp-1;
@@ -839,7 +839,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * 
  * The modularity of a graph with respect to some division (or vertex
  * types) measures how good the division is, or how separated are the 
- * different vertex types from each other. It defined as 
+ * different vertex types from each other. It is defined as 
  * Q=1/(2m) * sum(Aij-ki*kj/(2m)delta(ci,cj),i,j), here `m' is the
  * number of edges, `Aij' is the element of the `A' adjacency matrix
  * in row `i' and column `j', `ki' is the degree of `i', `kj' is the
@@ -877,10 +877,11 @@ int igraph_modularity(const igraph_t *graph,
 			  const igraph_vector_t *weights) {
   
   igraph_vector_t e, a;
-  long int types=igraph_vector_max(membership)+1;
+  long int types=(long int) igraph_vector_max(membership)+1;
   long int no_of_edges=igraph_ecount(graph);
   long int i;
-  igraph_integer_t from, to, m;
+  igraph_integer_t from, to;
+  igraph_real_t m;
   long int c1, c2;
 
   if (igraph_vector_size(membership) < igraph_vcount(graph)) {
@@ -900,9 +901,9 @@ int igraph_modularity(const igraph_t *graph,
       igraph_real_t w=VECTOR(*weights)[i];
       if (w < 0)
         IGRAPH_ERROR("negative weight in weight vector", IGRAPH_EINVAL);
-      igraph_edge(graph, i, &from, &to);
-      c1=VECTOR(*membership)[(long int)from];
-      c2=VECTOR(*membership)[(long int)to];
+      igraph_edge(graph, (igraph_integer_t) i, &from, &to);
+      c1=(long int) VECTOR(*membership)[from];
+      c2=(long int) VECTOR(*membership)[to];
       if (c1==c2) VECTOR(e)[c1] += 2*w;
       VECTOR(a)[c1] += w;
       VECTOR(a)[c2] += w;
@@ -910,9 +911,9 @@ int igraph_modularity(const igraph_t *graph,
   } else {
     m=no_of_edges;
     for (i=0; i<no_of_edges; i++) {
-      igraph_edge(graph, i, &from, &to);
-      c1=VECTOR(*membership)[(long int)from];
-      c2=VECTOR(*membership)[(long int)to];
+      igraph_edge(graph, (igraph_integer_t) i, &from, &to);
+      c1=(long int) VECTOR(*membership)[from];
+      c2=(long int) VECTOR(*membership)[to];
       if (c1==c2) VECTOR(e)[c1] += 2;
       VECTOR(a)[c1] += 1;
       VECTOR(a)[c2] += 1;
@@ -1140,14 +1141,14 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
 
   /* Ax */
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    nlen=igraph_vector_size(neis);
+    long int oldid=(long int) VECTOR(*idx)[j];
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    nlen=igraph_vector_int_size(neis);
     to[j]=0.0;
     VECTOR(*tmp)[j]=0.0;
     for (k=0; k<nlen; k++) {
-      long int nei=VECTOR(*neis)[k];
-      long int neimemb=VECTOR(*mymembership)[nei];
+      long int nei=(long int) VECTOR(*neis)[k];
+      long int neimemb=(long int) VECTOR(*mymembership)[nei];
       if (neimemb==comm) {
 	to[j] += from[ (long int) VECTOR(*idx2)[nei] ];
 	VECTOR(*tmp)[j] += 1;
@@ -1158,9 +1159,9 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
   /* Now calculate k^Tx/2m */
   ktx=0.0; ktx2=0.0;
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    long int degree=igraph_vector_size(neis);
+    long int oldid=(long int) VECTOR(*idx)[j];
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    long int degree=igraph_vector_int_size(neis);
     ktx += from[j] * degree;
     ktx2 += degree;
   }
@@ -1169,9 +1170,9 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
   
   /* Now calculate Bx */
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    igraph_real_t degree=igraph_vector_size(neis);
+    long int oldid=(long int) VECTOR(*idx)[j];
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    igraph_real_t degree=igraph_vector_int_size(neis);
     to[j] = to[j] - ktx*degree;
     VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2*degree;
   }
@@ -1201,16 +1202,16 @@ int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
 
   /* Ax */
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    nlen=igraph_vector_size(neis);
+    long int oldid=(long int) VECTOR(*idx)[j];
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    nlen=igraph_vector_int_size(neis);
     to[j]=0.0;
     VECTOR(*tmp)[j]=0.0;
     for (k=0; k<nlen; k++) {
-      long int nei=VECTOR(*neis)[k];
-      long int neimemb=VECTOR(*mymembership)[nei];
+      long int nei=(long int) VECTOR(*neis)[k];
+      long int neimemb=(long int) VECTOR(*mymembership)[nei];
       if (neimemb==comm) {
-	long int fi=VECTOR(*idx2)[nei];
+	long int fi=(long int) VECTOR(*idx2)[nei];
 	if (fi < size) {
 	  to[j] += from[fi];
 	}
@@ -1222,9 +1223,9 @@ int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
   /* Now calculate k^Tx/2m */
   ktx=0.0; ktx2=0.0;
   for (j=0; j<size+1; j++) {
-    long int oldid=VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    long int degree=igraph_vector_size(neis);
+    long int oldid=(long int) VECTOR(*idx)[j];
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    long int degree=igraph_vector_int_size(neis);
     if (j<size) {
       ktx += from[j] * degree;
     }
@@ -1235,9 +1236,9 @@ int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
   
   /* Now calculate Bx */
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, oldid);
-    igraph_real_t degree=igraph_vector_size(neis);
+    long int oldid=(long int) VECTOR(*idx)[j];
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, oldid);
+    igraph_real_t degree=igraph_vector_int_size(neis);
     to[j] = to[j] - ktx*degree;
     VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2*degree;
   }
@@ -1270,16 +1271,16 @@ int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
   
   /* Ax */
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
+    long int oldid=(long int) VECTOR(*idx)[j];
     igraph_vector_t *inc=igraph_inclist_get(inclist, oldid);
     nlen=igraph_vector_size(inc);
     to[j]=0.0;
     VECTOR(*tmp)[j]=0.0;
     for (k=0; k<nlen; k++) {
-      long int edge=VECTOR(*inc)[k];
+      long int edge=(long int) VECTOR(*inc)[k];
       igraph_real_t w=VECTOR(*weights)[edge];
       long int nei=IGRAPH_OTHER(graph, edge, oldid);
-      long int neimemb=VECTOR(*mymembership)[nei];
+      long int neimemb=(long int) VECTOR(*mymembership)[nei];
       if (neimemb==comm) {
 	to[j] += from[ (long int) VECTOR(*idx2)[nei] ] * w;
 	VECTOR(*tmp)[j] += w;
@@ -1290,7 +1291,7 @@ int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
   /* k^Tx/2m */
   ktx=0.0; ktx2=0.0;
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
+    long int oldid=(long int) VECTOR(*idx)[j];
     igraph_real_t str=VECTOR(*strength)[oldid];
     ktx += from[j] * str;
     ktx2 += str;
@@ -1300,7 +1301,7 @@ int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
 
   /* Bx */
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
+    long int oldid=(long int) VECTOR(*idx)[j];
     igraph_real_t str=VECTOR(*strength)[oldid];
     to[j] = to[j] - ktx * str;
     VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2*str;
@@ -1334,18 +1335,18 @@ int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
 
   /* Ax */
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
+    long int oldid=(long int) VECTOR(*idx)[j];
     igraph_vector_t *inc=igraph_inclist_get(inclist, oldid);
     nlen=igraph_vector_size(inc);
     to[j]=0.0;
     VECTOR(*tmp)[j]=0.0;
     for (k=0; k<nlen; k++) {
-      long int edge=VECTOR(*inc)[k];
+      long int edge=(long int) VECTOR(*inc)[k];
       igraph_real_t w=VECTOR(*weights)[edge];
       long int nei=IGRAPH_OTHER(graph, edge, oldid);
-      long int neimemb=VECTOR(*mymembership)[nei];
+      long int neimemb=(long int) VECTOR(*mymembership)[nei];
       if (neimemb==comm) {
-	long int fi=VECTOR(*idx2)[nei];
+	long int fi=(long int) VECTOR(*idx2)[nei];
 	if (fi < size) {
 	  to[j] += from[fi] * w;
 	}
@@ -1357,7 +1358,7 @@ int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
   /* k^Tx/2m */
   ktx=0.0; ktx2=0.0;
   for (j=0; j<size+1; j++) {
-    long int oldid=VECTOR(*idx)[j];
+    long int oldid=(long int) VECTOR(*idx)[j];
     igraph_real_t str=VECTOR(*strength)[oldid];
     if (j<size) { 
       ktx += from[j] * str;
@@ -1369,7 +1370,7 @@ int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
 
   /* Bx */
   for (j=0; j<size; j++) {
-    long int oldid=VECTOR(*idx)[j];
+    long int oldid=(long int) VECTOR(*idx)[j];
     igraph_real_t str=VECTOR(*strength)[oldid];
     to[j] = to[j] - ktx * str;
     VECTOR(*tmp)[j] = VECTOR(*tmp)[j] - ktx2 * str;
@@ -1564,7 +1565,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   }
   
   if (steps < 0 || steps > no_of_nodes-1) {
-    steps=no_of_nodes-1;
+    steps=(igraph_integer_t) no_of_nodes-1;
   }
   
   if (!membership) {
@@ -1595,7 +1596,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }
   } else {
     /* Just create the idx vector for the given membership vector */
-    communities=igraph_vector_max(mymembership)+1;
+    communities=(long int) igraph_vector_max(mymembership)+1;
     IGRAPH_STATUSF(("Starting from given membership vector with %li "
 		    "communities.\n", 0, communities));
     if (history) { 
@@ -1606,7 +1607,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(&idx, communities));
     igraph_vector_null(&idx);
     for (i=0; i<no_of_nodes; i++) {
-      int t=VECTOR(*mymembership)[i];
+      int t=(int) VECTOR(*mymembership)[i];
       VECTOR(idx)[t] += 1;
     }
   }
@@ -1665,8 +1666,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   /* Memory for ARPACK */
   /* We are allocating memory for 20 eigenvectors since options->ncv won't be
    * larger than 20 when using automatic mode in igraph_arpack_rssolve */
-  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, no_of_nodes, 20, 
-					  no_of_nodes, 1));
+  IGRAPH_CHECK(igraph_arpack_storage_init(&storage, (int) no_of_nodes, 20,
+					  (int) no_of_nodes, 1));
   IGRAPH_FINALLY(igraph_arpack_storage_destroy, &storage);
   extra.idx=&idx;
   extra.idx2=&idx2;
@@ -1681,7 +1682,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
   extra.mymembership=mymembership;
 
   while (!igraph_dqueue_empty(&tosplit) && staken < steps) {
-    long int comm=igraph_dqueue_pop_back(&tosplit); /* depth first search */
+    long int comm=(long int) igraph_dqueue_pop_back(&tosplit); 
+				/* depth first search */
     long int size=0;
     igraph_real_t tmpev;
 
@@ -1709,7 +1711,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
     /* We start with the smaller eigenproblem. */
 
-    options->n=size-1;
+    options->n=(int) size-1;
     options->info=0;
     options->nev=1;
     options->ldv=0;
@@ -1719,16 +1721,19 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     extra.comm=comm;
 
     /* We try calling the solver twice, once from a random starting
-       point, onece from a fixed one. This is because for some hard
+       point, once from a fixed one. This is because for some hard
        cases it tends to fail. We need to suppress error handling for
        the first call. */
     {
       int i;
       igraph_error_handler_t *errh=
 	igraph_set_error_handler(igraph_i_error_handler_none);
+      igraph_warning_handler_t *warnh=
+	igraph_set_warning_handler(igraph_warning_handler_ignore);
       igraph_arpack_rssolve(arpcb2, &extra, options, &storage,
 			    /*values=*/ 0, /*vectors=*/ 0);
       igraph_set_error_handler(errh);
+      igraph_set_warning_handler(warnh);
       if (options->nconv < 1) {
 	/* Call again, from a fixed starting point */
 	options->start=1;
@@ -1752,7 +1757,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
     /* Now we do the original eigenproblem, again, twice if needed */
 
-    options->n=size;
+    options->n=(int) size;
     options->info=0;
     options->nev=1;
     options->ldv=0;
@@ -1886,7 +1891,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     }
 
     /* Check that Q increases with our choice of split */
-    arpcb1(storage.v+size, storage.v, size, &extra);
+    arpcb1(storage.v+size, storage.v, (int) size, &extra);
     mod=0;
     for (i=0; i<size; i++) {
       mod += storage.v[size+i] * storage.v[i];
@@ -1907,7 +1912,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     /* Rewrite the mymembership vector */
     for (j=0; j<size; j++) {
       if (storage.v[j] < 0) {
-        long int oldid=VECTOR(idx)[j];
+        long int oldid=(long int) VECTOR(idx)[j];
         VECTOR(*mymembership)[oldid]=communities-1;
       }
     }
@@ -1955,8 +1960,8 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
     j=0;
     IGRAPH_CHECK(igraph_matrix_resize(merges, l/2, 2));
     for (i=l; i>0; i-=2) {
-      long int from=VECTOR(mymerges)[i-1];
-      long int to=VECTOR(mymerges)[i-2];
+      long int from=(long int) VECTOR(mymerges)[i-1];
+      long int to=(long int) VECTOR(mymerges)[i-2];
       MATRIX(*merges, j, 0)=VECTOR(mymerges)[i-2];
       MATRIX(*merges, j, 1)=VECTOR(mymerges)[i-1];    
       if (VECTOR(idx)[from]!=0) {
@@ -2023,7 +2028,7 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
     IGRAPH_ERROR("`steps' to big or `merges' matrix too short", IGRAPH_EINVAL);
   }    
   
-  components=igraph_vector_max(membership)+1;
+  components=(long int) igraph_vector_max(membership)+1;
   if (components > no_of_nodes) { 
     IGRAPH_ERROR("Invalid membership vector, too many components", IGRAPH_EINVAL);
   }
@@ -2047,7 +2052,8 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
     }
   }
   
-  IGRAPH_CHECK(igraph_community_to_membership(merges, components, steps, 
+  IGRAPH_CHECK(igraph_community_to_membership(merges, (igraph_integer_t)
+					      components, steps, 
 					      &fake_memb, 0));
   
   /* Ok, now we have the membership of the initial components, 
@@ -2128,7 +2134,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
   igraph_inclist_t il;
   igraph_bool_t running = 1;
 
-  igraph_vector_t label_counters, dominant_labels, node_order;
+  igraph_vector_t label_counters, dominant_labels, nonzero_labels, node_order;
 
   /* The implementation uses a trick to avoid negative array indexing:
    * elements of the membership vector are increased by 1 at the start
@@ -2159,10 +2165,10 @@ int igraph_community_label_propagation(const igraph_t *graph,
     }
     /* Check if the labels used are valid, initialize membership vector */
     for (i=0; i<no_of_nodes; i++) {
-      if (VECTOR(*initial)[i] < -1) {
+      if (VECTOR(*initial)[i] < 0) {
         VECTOR(*membership)[i] = 0;
       } else {
-        VECTOR(*membership)[i] = VECTOR(*initial)[i] + 1;
+        VECTOR(*membership)[i] = floor(VECTOR(*initial)[i]) + 1;
       }
     }
     if (fixed) {
@@ -2178,7 +2184,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
       }
     }
 
-    i = igraph_vector_max(membership);
+    i = (long int) igraph_vector_max(membership);
     if (i > no_of_nodes) {
       IGRAPH_ERROR("elements of the initial labeling vector must be between 0 and |V|-1", IGRAPH_EINVAL);
     }
@@ -2205,6 +2211,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
   /* Create storage space for counting distinct labels and dominant ones */
   IGRAPH_VECTOR_INIT_FINALLY(&label_counters, no_of_nodes+1);
   IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, 0);
   IGRAPH_CHECK(igraph_vector_reserve(&dominant_labels, 2));
 
   RNG_BEGIN();
@@ -2227,7 +2234,9 @@ int igraph_community_label_propagation(const igraph_t *graph,
   while (running) {
     long int v1, num_neis;
     igraph_real_t max_count;
-    igraph_vector_t *neis;
+    igraph_vector_int_t *neis;
+    igraph_vector_t *ineis;
+    igraph_bool_t was_zero;
 
     running = 0;
 
@@ -2235,40 +2244,52 @@ int igraph_community_label_propagation(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
     /* In the prescribed order, loop over the vertices and reassign labels */
     for (i=0; i<no_of_not_fixed_nodes; i++) {
-      v1 = VECTOR(node_order)[i];
+      v1 = (long int) VECTOR(node_order)[i];
 
       /* Count the weights corresponding to different labels */
-      igraph_vector_null(&label_counters);
       igraph_vector_clear(&dominant_labels);
+      igraph_vector_clear(&nonzero_labels);
       max_count = 0.0;
       if (weights) {
-        neis = igraph_inclist_get(&il, v1);
-        num_neis = igraph_vector_size(neis);
+        ineis = igraph_inclist_get(&il, v1);
+        num_neis = igraph_vector_size(ineis);
         for (j=0; j<num_neis; j++) {
-          k = VECTOR(*membership)[(long)IGRAPH_OTHER(graph, VECTOR(*neis)[j], v1)];
-          if (k == 0) continue;   /* skip if it has no label yet */
-          VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*neis)[j]];
+          k = (long int) VECTOR(*membership)[
+		     (long)IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1) ];
+          if (k == 0)
+            continue;   /* skip if it has no label yet */
+          was_zero = (VECTOR(label_counters)[k] == 0);
+          VECTOR(label_counters)[k] += VECTOR(*weights)[(long)VECTOR(*ineis)[j]];
+          if (was_zero && VECTOR(label_counters)[k] != 0) {
+            /* counter just became nonzero */
+            IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
+          }
           if (max_count < VECTOR(label_counters)[k]) {
             max_count = VECTOR(label_counters)[k];
-            igraph_vector_resize(&dominant_labels, 1);
+            IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
             VECTOR(dominant_labels)[0] = k;
           } else if (max_count == VECTOR(label_counters)[k]) {
-            igraph_vector_push_back(&dominant_labels, k);
+            IGRAPH_CHECK(igraph_vector_push_back(&dominant_labels, k));
           }
         }
       } else {
         neis = igraph_adjlist_get(&al, v1);
-        num_neis = igraph_vector_size(neis);
+        num_neis = igraph_vector_int_size(neis);
         for (j=0; j<num_neis; j++) {
-          k = VECTOR(*membership)[(long)VECTOR(*neis)[j]];
-          if (k == 0) continue;   /* skip if it has no label yet */
+          k = (long int) VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+          if (k == 0)
+            continue;   /* skip if it has no label yet */
           VECTOR(label_counters)[k]++;
+          if (VECTOR(label_counters)[k] == 1) {
+            /* counter just became nonzero */
+            IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
+          }
           if (max_count < VECTOR(label_counters)[k]) {
             max_count = VECTOR(label_counters)[k];
-            igraph_vector_resize(&dominant_labels, 1);
+            IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
             VECTOR(dominant_labels)[0] = k;
           } else if (max_count == VECTOR(label_counters)[k]) {
-            igraph_vector_push_back(&dominant_labels, k);
+            IGRAPH_CHECK(igraph_vector_push_back(&dominant_labels, k));
           }
         }
       }
@@ -2276,13 +2297,19 @@ int igraph_community_label_propagation(const igraph_t *graph,
       if (igraph_vector_size(&dominant_labels) > 0) {
         /* Select randomly from the dominant labels */
         k = RNG_INTEGER(0, igraph_vector_size(&dominant_labels)-1); 
-        k = VECTOR(dominant_labels)[k];
+        k = (long int) VECTOR(dominant_labels)[k];
         /* Check if the _current_ label of the node is also dominant */
         if (VECTOR(label_counters)[(long)VECTOR(*membership)[v1]]!=max_count) {
           /* Nope, we need at least one more iteration */
           running = 1;
         }
         VECTOR(*membership)[v1] = k;
+      }
+
+      /* Clear the nonzero elements in label_counters */
+      num_neis = igraph_vector_size(&nonzero_labels);
+      for (j = 0; j < num_neis; j++) {
+        VECTOR(label_counters)[(long int)VECTOR(nonzero_labels)[j]] = 0;
       }
     }
   }
@@ -2302,7 +2329,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
         k = j;
         j++;
       } else {
-        k = VECTOR(label_counters)[k];
+        k = (long int) VECTOR(label_counters)[k];
       }
     } else {
       /* This is an unlabeled vertex */
@@ -2314,6 +2341,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     igraph_inclist_destroy(&il);
   else
     igraph_adjlist_destroy(&al);
+  IGRAPH_FINALLY_CLEAN(1);
 
   if (modularity) {
     IGRAPH_CHECK(igraph_modularity(graph, membership, modularity,
@@ -2323,6 +2351,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
   igraph_vector_destroy(&node_order);
   igraph_vector_destroy(&label_counters);
   igraph_vector_destroy(&dominant_labels);
+  igraph_vector_destroy(&nonzero_labels);
   IGRAPH_FINALLY_CLEAN(4);
 
   return 0;
@@ -2373,10 +2402,10 @@ int igraph_i_multilevel_link_cmp(const void *a, const void *b)
 {
   long int r = (((igraph_i_multilevel_link*)a)->from -
                 ((igraph_i_multilevel_link*)b)->from);
-  if (r != 0) return r;
+  if (r != 0) return (int) r;
   
-  return (((igraph_i_multilevel_link*)a)->to -
-          ((igraph_i_multilevel_link*)b)->to);
+  return (int) (((igraph_i_multilevel_link*)a)->to -
+		((igraph_i_multilevel_link*)b)->to);
 }
 
 /* removes multiple edges and returns new edge id's for each edge in |E|log|E| */
@@ -2398,13 +2427,13 @@ int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids
   IGRAPH_FINALLY(free, links);
 
   for (i = 0; i < ecount; i++) {
-    igraph_edge(graph, i, &from, &to);
+    igraph_edge(graph, (igraph_integer_t) i, &from, &to);
     links[i].from = from;
     links[i].to = to;
     links[i].id = i;
   }  
 
-  qsort((void*)links, ecount, sizeof(igraph_i_multilevel_link),
+  qsort((void*)links, (size_t) ecount, sizeof(igraph_i_multilevel_link),
       igraph_i_multilevel_link_cmp);
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -2444,8 +2473,8 @@ typedef struct {
 
 int igraph_i_multilevel_community_link_cmp(const void *a, const void *b)
 {
-  return (((igraph_i_multilevel_community_link*)a)->community -
-          ((igraph_i_multilevel_community_link*)b)->community);
+  return (int) (((igraph_i_multilevel_community_link*)a)->community -
+		((igraph_i_multilevel_community_link*)b)->community);
 }
 
 /**
@@ -2489,7 +2518,7 @@ int igraph_i_multilevel_community_links(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_free, links);
 
   for (i = 0; i < n; i++) {
-    long int eidx = VECTOR(*edges)[i];
+    long int eidx = (long int) VECTOR(*edges)[i];
     weight = VECTOR(*communities->weights)[eidx];
 
     to = IGRAPH_OTHER(graph, eidx, vertex);
@@ -2514,7 +2543,7 @@ int igraph_i_multilevel_community_links(const igraph_t *graph,
   }
 
   /* Sort links by community ID and merge the same */
-  qsort((void*)links, n, sizeof(igraph_i_multilevel_community_link),
+  qsort((void*)links, (size_t) n, sizeof(igraph_i_multilevel_community_link),
       igraph_i_multilevel_community_link_cmp);
   for (i = 0; i < n; i++) {
     to_community = links[i].community;
@@ -2586,8 +2615,9 @@ int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
 
   /* Create the new graph */
   igraph_destroy(graph);
-  no_of_nodes = igraph_vector_max(membership)+1;
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  no_of_nodes = (long int) igraph_vector_max(membership)+1;
+  IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+			     directed));
 
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
@@ -2675,7 +2705,7 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
   /* Some more initialization :) */
   for (i = 0; i < ecount; i++) {
     igraph_real_t weight = 1;
-    igraph_edge(graph, i, &ffrom, &fto);
+    igraph_edge(graph, (igraph_integer_t) i, &ffrom, &fto);
 
     weight = VECTOR(*weights)[i];
     communities.item[(long int) ffrom].weight_all += weight;
@@ -2702,11 +2732,14 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
       igraph_real_t weight_inside = 0;
       igraph_real_t weight_loop = 0;
       igraph_real_t max_q_gain = 0;
-      igraph_integer_t max_weight;
+      igraph_real_t max_weight;
       long int old_id, new_id, n;
 
-      igraph_i_multilevel_community_links(graph, &communities, i, &edges,
-        &weight_all, &weight_inside, &weight_loop, &links_community, &links_weight);
+      igraph_i_multilevel_community_links(graph, &communities, 
+					  (igraph_integer_t) i, &edges,
+					  &weight_all, &weight_inside, 
+					  &weight_loop, &links_community,
+					  &links_weight);
 
       old_id = (long int)VECTOR(*(communities.membership))[i];
       new_id = old_id;
@@ -2729,7 +2762,11 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
         long int c = (long int) VECTOR(links_community)[j];
         igraph_real_t w = VECTOR(links_weight)[j];
 
-        igraph_real_t q_gain = igraph_i_multilevel_community_modularity_gain(&communities, c, i, weight_all, w);
+        igraph_real_t q_gain = 
+	  igraph_i_multilevel_community_modularity_gain(&communities, 
+							(igraph_integer_t) c, 
+							(igraph_integer_t) i,
+							weight_all, w);
         /* debug("Link %ld -> %ld weight: %lf gain: %lf\n", i, c, (double) w, (double) q_gain); */
         if (q_gain > max_q_gain) {
           new_id = c;
@@ -2924,6 +2961,21 @@ int igraph_community_multilevel(const igraph_t *graph,
 
     /* Increase the level counter */
     level++;
+  }
+
+  /* It might happen that there are no merges, so every vertex is in its 
+     own community. We still might want the modularity score for that. */
+  if (modularity && igraph_vector_size(modularity) == 0) {
+    igraph_vector_t tmp;
+    igraph_real_t mod;
+    int i;
+    IGRAPH_VECTOR_INIT_FINALLY(&tmp, vcount);
+    for (i=0; i<vcount; i++) { VECTOR(tmp)[i]=i; }
+    IGRAPH_CHECK(igraph_modularity(graph, &tmp, &mod, weights));
+    igraph_vector_destroy(&tmp);
+    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_CHECK(igraph_vector_resize(modularity, 1));
+    VECTOR(*modularity)[0]=mod;
   }
 
   /* If we need the final membership vector, copy it to the output */
@@ -3344,8 +3396,8 @@ int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_vector_
   IGRAPH_FINALLY_CLEAN(1);
 
   /* Calculate the distances */
-  *distance12 = n - igraph_vector_sum(&rowmax);
-  *distance21 = n - igraph_vector_sum(&colmax);
+  *distance12 = (igraph_integer_t) (n - igraph_vector_sum(&rowmax));
+  *distance21 = (igraph_integer_t) (n - igraph_vector_sum(&colmax));
 
   igraph_vector_destroy(&rowmax);
   igraph_vector_destroy(&colmax);

@@ -14,6 +14,8 @@
  * AMD_postorder routine.
  */
 
+#pragma clang diagnostic ignored "-Wconversion"
+
 #include "amd_internal.h"
 
 /* ========================================================================= */

@@ -23,10 +23,89 @@ along with this program; if not, write to the Free Software
 Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
 02110-1301 USA
 """
+
 import math
 
-__all__ = ["Histogram", "RunningMean", "mean", "median", "percentile",
-           "quantile", "power_law_fit"]
+__all__ = ["FittedPowerLaw", "Histogram", "RunningMean", "mean", "median", \
+        "percentile", "quantile", "power_law_fit"]
+
+
+class FittedPowerLaw(object):
+    """Result of fitting a power-law to a vector of samples
+
+    Example:
+
+        >>> result = power_law_fit([1, 2, 3, 4, 5, 6])
+        >>> result                   # doctest:+ELLIPSIS
+        FittedPowerLaw(continuous=False, alpha=2.425828..., xmin=3.0, L=-7.54633..., D=0.2138..., p=0.99311...)
+        >>> print result             # doctest:+ELLIPSIS
+        Fitted power-law distribution on discrete data
+        <BLANKLINE>
+        Exponent (alpha)  = 2.425828
+        Cutoff (xmin)     = 3.000000
+        <BLANKLINE>
+        Log-likelihood    = -7.546337
+        <BLANKLINE>
+        H0: data was drawn from the fitted distribution
+        <BLANKLINE>
+        KS test statistic = 0.213817
+        p-value           = 0.993111
+        <BLANKLINE>
+        H0 could not be rejected at significance level 0.05
+        >>> result.alpha             # doctest:+ELLIPSIS
+        2.425828...
+        >>> result.xmin
+        3.0
+        >>> result.continuous
+        False
+    """
+
+    def __init__(self, continuous, alpha, xmin, L, D, p):
+        self.continuous = continuous
+        self.xmin = xmin
+        self.alpha = alpha
+        self.L = L
+        self.D = D
+        self.p = p
+
+    def __repr__(self):
+        return "%s(continuous=%r, alpha=%r, xmin=%r, L=%r, D=%r, p=%r)" % \
+                (self.__class__.__name__, self.continuous, self.alpha, \
+                self.xmin, self.L, self.D, self.p)
+
+    def __str__(self):
+        return self.summary(significance=0.05)
+
+    def summary(self, significance=0.05):
+        """Returns the summary of the power law fit.
+
+        @param significance: the significance level of the Kolmogorov-Smirnov test
+          used to decide whether the input data could have come from the fitted
+          distribution
+        @return: the summary as a string
+        """
+        result = ["Fitted power-law distribution on %s data" % \
+                ("discrete", "continuous")[bool(self.continuous)]]
+        result.append("")
+        result.append("Exponent (alpha)  = %f" % self.alpha)
+        result.append("Cutoff (xmin)     = %f" % self.xmin)
+        result.append("")
+        result.append("Log-likelihood    = %f" % self.L)
+        result.append("")
+        result.append("H0: data was drawn from the fitted distribution")
+        result.append("")
+        result.append("KS test statistic = %f" % self.D)
+        result.append("p-value           = %f" % self.p)
+        result.append("")
+        if self.p < significance:
+            result.append("H0 rejected at significance level %g" \
+                    % significance)
+        else:
+            result.append("H0 could not be rejected at significance "\
+                    "level %g" % significance)
+
+        return "\n".join(result)
+
 
 class Histogram(object):
     """Generic histogram class for real numbers
@@ -374,7 +453,7 @@ class RunningMean(object):
         return complex(self._mean)
 
     def __len__(self):
-        return self._nitems
+        return int(self._nitems)
 
 
 def mean(xs):
@@ -443,13 +522,13 @@ def percentile(xs, p=(25, 50, 75), sort=True):
         return quantile(xs, (x/100.0 for x in p), sort)
     return quantile(xs, p/100.0, sort)
 
-def power_law_fit(x, xmin=None, method="discrete_approx"):
+def power_law_fit(data, xmin=None, method="auto", return_alpha_only=False):
     """Fitting a power-law distribution to empirical data
 
-    @param x: the data to fit, a list containing integer values
-    @param xmin: the lower bound for fitting the power-law. If C{None}, the
-      smallest x value is used. This argument makes it possible to fit
-      only the tail of the distribution.
+    @param data: the data to fit, a list containing integer values
+    @param xmin: the lower bound for fitting the power-law. If C{None},
+      the optimal xmin value will be estimated as well. Zero means that
+      the smallest possible xmin value will be used.
     @param method: the fitting method to use. The following methods are
       implemented so far:
 
@@ -460,36 +539,45 @@ def power_law_fit(x, xmin=None, method="discrete_approx"):
           estimated exponent and M{n} is the number of data points above
           M{xmin}. The estimator is known to exhibit a small finite
           sample-size bias of order M{O(n^-1)}, which is small when
-          M{n > 100}.
+          M{n > 100}. igraph will try to compensate for the finite sample
+          size if n is small.
 
-        - C{discrete_approx}: approximation of the maximum likelihood
-          estimation in discrete case (see Clauset et al among the
-          references). This is said to produce quite results provided
-          M{xmin} >= 6 (approx.).
+        - C{discrete}: exact maximum likelihood estimation when the
+          input comes from a discrete scale (see Clauset et al among the
+          references).
 
-    @return: the estimated power-law exponent
+        - C{auto}: exact maximum likelihood estimation where the continuous
+          method is used if the input vector contains at least one fractional
+          value and the discrete method is used if the input vector contains
+          integers only.
+
+    @return: a L{FittedPowerLaw} object. The fitted C{xmin} value and the
+      power-law exponent can be queried from the C{xmin} and C{alpha}
+      properties of the returned object.
     
     @newfield ref: Reference
     @ref: MEJ Newman: Power laws, Pareto distributions and Zipf's law.
       Contemporary Physics 46, 323-351 (2005)
     @ref: A Clauset, CR Shalizi, MEJ Newman: Power-law distributions
       in empirical data. E-print (2007). arXiv:0706.1062"""
-    real_xmin = float(min(x))
-    if xmin is not None:
-        real_xmin = float(max(xmin, real_xmin))
-    filtered_xs = [x1 for x1 in x if x1 >= xmin]
+    from igraph._igraph import _power_law_fit
+
+    if xmin is None or xmin < 0:
+        xmin = -1
 
     method = method.lower()
+    if method not in ("continuous", "hill", "discrete", "auto"):
+        raise ValueError("unknown method: %s" % method)
 
-    if method in ("continuous", "hill", "discrete_approx"):
-        if method == "discrete_approx":
-            real_xmin -= 0.5
-        log_sum = sum(math.log(x/real_xmin) for x in filtered_xs)
-        if log_sum == 0:
-            raise ValueError("lower bound too high")
-        return 1.0+len(filtered_xs)/log_sum
-
-    raise ValueError("unknown method: %s" % method)
+    force_continuous = method in ("continuous", "hill")
+    fit = FittedPowerLaw(*_power_law_fit(data, xmin, force_continuous))
+    if return_alpha_only:
+        from igraph import deprecated
+        deprecated("The return_alpha_only keyword argument of power_law_fit is "\
+                "deprecated from igraph 0.7 and will be removed in igraph 0.8")
+        return fit.alpha
+    else:
+        return fit
 
 def quantile(xs, q=(0.25, 0.5, 0.75), sort=True):
     """Returns the qth quantile of an unsorted or sorted numeric vector.

@@ -125,7 +125,6 @@ void *thread_function(void *arg) {
     if ( *(data->othersteps) == *(data->steps) ) { 
       pthread_cond_signal(cond);
     }
-    pthread_mutex_unlock(mutex);
 
     while ( *(data->othersteps) < *(data->steps) && *(data->othersteps) != -1 ) {
       pthread_cond_wait(cond, mutex);

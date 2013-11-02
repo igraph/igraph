@@ -1,18 +1,19 @@
 
 
-SUBDIRS=src tests interfaces
-DOC_FILES = 	$(top_builddir)/doc/book/Makefile.in \
-	$(top_srcdir)/doc/Makefile.in \
+SUBDIRS=src tests
+DOC_FILES = $(top_srcdir)/doc/Makefile.in \
 	$(top_srcdir)/doc/igraph.3
 
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
 
-EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) \
-	examples $(top_srcdir)/interfaces/R/Makefile.in \
-	$(top_srcdir)/interfaces/R/DESCRIPTION.in \
-	$(top_srcdir)/interfaces/R/configure.in.in \
-	optional
+EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) examples \
+	$(wildcard $(top_srcdir)/optional/glpk/*.{inc,c,h})      \
+	$(wildcard $(top_srcdir)/optional/glpk/{README,COPYING}) \
+	$(wildcard $(top_srcdir)/optional/glpk/amd/*.{c,h})      \
+	$(wildcard $(top_srcdir)/optional/glpk/amd/{README,COPYING}) \
+	$(wildcard $(top_srcdir)/optional/glpk/colamd/*.{c,h}) \
+	$(wildcard $(top_srcdir)/optional/glpk/colamd/{README,COPYING})
 
 install-exec-hook:
 	if test -f $(top_builddir)/src/.libs/cygigraph-0.dll ; \
@@ -34,7 +35,7 @@ dist-hook:
 MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make deb will generate Debian packages
-.PHONY: framework msvc
+.PHONY: framework msvc parsersources
 
 framework: all
 	rm -rf $(top_builddir)/igraph.framework
@@ -56,7 +57,10 @@ test: all
 	 	fi; \
 	done
 
-msvc: all
+parsersources:
+	cd src; make parsersources
+
+msvc: parsersources
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/include
@@ -70,7 +74,11 @@ msvc: all
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*~
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/include/*~
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
-	cp $(top_srcdir)/msvc/igraph.{sln,vcproj} $(top_builddir)/igraph-$(VERSION)-msvc/
+	$(top_srcdir)/tools/create-msvc-projectfile.py		\
+		$(top_builddir)/igraph-$(VERSION)-msvc 	\
+		$(top_srcdir)/msvc/igraph.vcproj        \
+		$(top_builddir)/src/Makefile
+	cp $(top_srcdir)/msvc/igraph.sln $(top_builddir)/igraph-$(VERSION)-msvc
 	cp -r $(top_srcdir)/msvc/igraphtest .
 	rm -rf igraph-$(VERSION)-msvc.zip
 	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest

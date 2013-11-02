@@ -1,6 +1,6 @@
-AC_INIT(igraph, 0.7, csardi.gabor@gmail.com)
+AC_INIT(igraph, esyscmd([tr -d '\n' < VERSION]), csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/games.c)
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 
 m4_include(tools/autoconf/ax_tls.m4)
@@ -40,7 +40,9 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([stdarg.h stdlib.h string.h time.h unistd.h stdint.h sys/int_types.h])
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([expm1 rint rintf finite log2 logbl snprintf log1p round fabsl fmin strcasecmp isnan strdup _strdup ftruncate])
+AC_CHECK_FUNCS([expm1 rint rintf finite log2 snprintf log1p round fabsl fmin strcasecmp isnan strdup _strdup ftruncate stpcpy])
+AC_CHECK_DECL([stpcpy],
+	[AC_DEFINE([HAVE_STPCPY_SIGNATURE], [1], [Define to 1 if the stpcpy function has a signature])])
 LIBS=$LIBS_SAVE
 
 AC_DEFUN([IGRAPH_WARNING],
@@ -170,6 +172,11 @@ HAVE_TLS=0
 THREAD_LOCAL=
 AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
 if test "x$enable_tls" != "xno"; then
+  keywords="__thread __declspec(thread)"
+  for kw in $keywords ; do
+      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw)
+      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw ; break ;)
+  done
   AX_TLS([
     AC_DEFINE([HAVE_TLS], [1], [Define to 1 if you want to use thread-local storage for global igraph structures])
     tls_support=yes
@@ -253,25 +260,30 @@ else
 fi
 
 glpk_support=no
-if test "$internal_glpk" = "no"; then
-  AC_CHECK_LIB([glpk], [glp_read_mps], [
-    AC_CHECK_HEADER([glpk.h], [
-      AC_EGREP_CPP(yes, [
-        #include <glpk.h>
-        #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
-          yes
-        #endif
-      ], [
-        AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-        glpk_support=yes
-        LDFLAGS="${LDFLAGS} -lglpk"
+AC_ARG_ENABLE(glpk, AC_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
+if test "x$enable_glpk" != "xno"; then
+  if test "$internal_glpk" = "no"; then
+    AC_CHECK_LIB([glpk], [glp_read_mps], [
+      AC_CHECK_HEADER([glpk.h], [
+        AC_EGREP_CPP(yes, [
+          #include <glpk.h>
+          #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
+            yes
+          #endif
+        ], [
+          AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+          glpk_support=yes
+          LDFLAGS="${LDFLAGS} -lglpk"
+        ])
       ])
     ])
-  ])
+  else
+    AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+    AC_DEFINE([INTERNAL_GLPK], [1], [Define to 1 if you use the internal GLPK library])
+    glpk_support=yes
+  fi
 else
-  AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-  AC_DEFINE([INTERNAL_GLPK], [1], [Define to 1 if you use the internal GLPK library])
-  glpk_support=yes
+  internal_glpk=no
 fi
 
 AM_CONDITIONAL(INTERNAL_GLPK, test x$internal_glpk = xyes)
@@ -292,7 +304,7 @@ if test "$use_gprof" = "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h include/igraph_threading.h])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
@@ -304,6 +316,8 @@ AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
 AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
 AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])
 AC_MSG_RESULT([  Use internal F2C       -- $internal_f2c])
-AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
+if test "$glpk_support" != "no"; then
+  AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
+fi
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])

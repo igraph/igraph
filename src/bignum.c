@@ -108,7 +108,7 @@ const char *bn2d(limb_t *a, count_t nlimb)
 	size--;
 	while (0 != bn_cmp_limb(v, 0, n)) {
 		r = bn_div_limb(v, v, 10, n);
-		dst[--size] = '0' + r;
+		dst[--size] = '0' + (char) r;
 	}
 	return &dst[size];
 }
@@ -153,14 +153,14 @@ const char *bn2f(limb_t *a, count_t alimb, limb_t *b, count_t blimb)
 	size = 12 * alimb;
 	while (0 != bn_cmp_limb(w, 0, blimb) && size < 12 * (alimb + blimb)) {
 		r = bn_mul_limb(w, w, 10, blimb);
-		dst[size++] = '0' + r;
+		dst[size++] = '0' + (char) r;
 	}
 
 	size = 12 * alimb;
 	dst[size] = '.';
 	while (0 != bn_cmp_limb(v, 0, alimb) && size > 0) {
 		r = bn_div_limb(v, v, 10, alimb);
-		dst[--size] = '0' + r;
+		dst[--size] = '0' + (char) r;
 	}
 
 	return &dst[size];
@@ -204,7 +204,7 @@ const char *bn2b(limb_t *a, count_t nlimb)
 	while (size-- > 0) {
 		r = (a[n/LIMBBITS] >> (n%LIMBBITS)) & 1;
 		n++;
-		dst[size] = '0' + r;
+		dst[size] = '0' + (char) r;
 	}
 	return &dst[size];
 }
@@ -597,7 +597,7 @@ limb_t sl_div(limb_t *q, limb_t *r, limb_t u[2], limb_t v)
 		/* division by zero */
 		return LIMBMASK;
 	dd = ((dlimb_t)u[1] << LIMBBITS) | u[0];
-	*q = dd / v;
+	*q = (limb_t) (dd / v);
 	*r = dd % v;
 #endif
 	return 0;
@@ -1049,7 +1049,7 @@ limb_t bn_div_hdig(limb_t q[], limb_t u[], limb_t v, count_t nlimb)
 	limb_t r = 0;
 	if (v > HALFMASK) {
 	        igraph_errorf("bn_div_hdig called with v:%x", __FILE__,
-			      __LINE__, v);
+			      __LINE__, (int) v);
 	}
 	
 	if (0 == nlimb)
@@ -1120,7 +1120,7 @@ limb_t bn_mod_hdig(limb_t u[], limb_t v, count_t nlimb)
 
 	if (v > HALFMASK) {
 	        igraph_errorf("bn_mod_hdig called with v:%x", __FILE__,
-			      __LINE__, v);
+			      __LINE__, (int) v);
 	}
 
 	/* Work from left to right */
@@ -1445,7 +1445,7 @@ int bn_div(limb_t q[], limb_t r[], limb_t u[], limb_t v[],
 
 	/* Catch special cases */
 	if (0 == n)
-		return LIMBMASK;	/* Error: divide by zero */
+	  return (int) LIMBMASK;	/* Error: divide by zero */
 
 	if (1 == n) {
 		/* Use short division instead */
@@ -1619,7 +1619,7 @@ limb_t bn_mod(limb_t r[], limb_t u[], count_t ulimb, limb_t v[], count_t vlimb)
 	limb_t d0;
 
 	/* rr[] = u[] % v[n] */
-	d0 = bn_div(qq, rr, u, v, ulimb, vlimb);
+	d0 = (limb_t) bn_div(qq, rr, u, v, ulimb, vlimb);
 
 	/* copy vlimb limbs of remainder */
 	bn_copy(r, rr, vlimb);

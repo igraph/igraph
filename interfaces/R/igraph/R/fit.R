@@ -25,7 +25,20 @@
 # this is a common degree distribution in networks
 ###################################################################
 
-power.law.fit <- function(x, xmin=NULL, start=2, ...) {
+power.law.fit <- function(x, xmin=NULL, start=2, force.continuous=FALSE,
+                          implementation=c("plfit", "R.mle"), ...) {
+
+  implementation <- igraph.match.arg(implementation)
+
+  if (implementation == "r.mle") {
+    power.law.fit.old(x, xmin, start, ...)
+  } else if (implementation == "plfit") {
+    if (is.null(xmin)) xmin <- -1
+    power.law.fit.new(x, xmin=xmin, force.continuous=force.continuous)
+  }
+}
+
+power.law.fit.old <- function(x, xmin=NULL, start=2, ...) {
 
   if (length(x) == 0) {
     stop("zero length vector")
@@ -41,7 +54,6 @@ power.law.fit <- function(x, xmin=NULL, start=2, ...) {
   n <- length(x)
   x <- x[ x >= xmin]
   if (length(x) != n) {
-    warning("too small values eliminated from vector")
     n <- length(x)
   }
   

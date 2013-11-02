@@ -23,6 +23,14 @@
 
 #include <igraph.h>
 
+void prepare_weights_vector(igraph_vector_t* weights, const igraph_t* graph) {
+  int i, n = igraph_ecount(graph);
+  igraph_vector_resize(weights, n);
+  for (i = 0; i < n; i++) {
+    VECTOR(*weights)[i] = i % 5;
+  }
+}
+
 int main() {
   igraph_t graph;
 
@@ -41,13 +49,16 @@ int main() {
   };
 
   igraph_vector_t membership;
+  igraph_vector_t weights;
   igraph_real_t modularity;
   igraph_bool_t simple;
   int retval;
 
   igraph_vector_view(&v, edges, sizeof(edges)/sizeof(double));
   igraph_create(&graph, &v, 0, IGRAPH_UNDIRECTED);
-  
+
+  igraph_vector_init(&weights, 0);
+
   igraph_is_simple(&graph, &simple);
   if (!simple) { return 1; }
 
@@ -55,22 +66,33 @@ int main() {
 
   igraph_set_error_handler(&igraph_error_handler_printignore);
 
-  /* Zachary karate club */
+  /* Zachary karate club, unweighted */
   retval = igraph_community_optimal_modularity(&graph, &modularity,
-					       &membership);
+					       &membership, 0);
   if (retval == IGRAPH_UNIMPLEMENTED) { return 77; }
   if (fabs(modularity - 0.4197896) > 0.0000001) { return 2; }
+  /* Zachary karate club, weighted */
+  prepare_weights_vector(&weights, &graph);
+  igraph_community_optimal_modularity(&graph, &modularity,
+				      &membership, &weights);
+  if (fabs(modularity - 0.5115767) > 0.0000001) { return 4; }
   igraph_destroy(&graph);
 
-  /* simple graph with loop edges */
+  /* simple graph with loop edges, unweighted */
   igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
           0,1,1,2,2,3,3,4,4,5,5,0,0,0,2,2,-1);
   igraph_community_optimal_modularity(&graph, &modularity,
-				      &membership);
-  if (fabs(modularity - 0.28125) > 0.0000001) { return 3; }
+				      &membership, 0);
+  if (fabs(modularity - 0.28125) > 0.00001) { return 3; }
+  /* simple graph with loop edges, weighted */
+  prepare_weights_vector(&weights, &graph);
+  igraph_community_optimal_modularity(&graph, &modularity,
+				      &membership, &weights);
+  if (fabs(modularity - 0.36686) > 0.00001) { return 5; }
   igraph_destroy(&graph);
 
   igraph_vector_destroy(&membership);
+  igraph_vector_destroy(&weights);
 
   return 0;
 }

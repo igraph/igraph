@@ -598,7 +598,7 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
   q = (igraph_real_t)VECTOR(*quantities)[vid];
   if (optimality == IGRAPH_MAXIMUM) {
     for (k = 0; k < igraph_vector_size(&adj); k++) {
-      v = VECTOR(adj)[k];
+      v = (igraph_integer_t) VECTOR(adj)[k];
       if ((igraph_real_t)VECTOR(*quantities)[v] > q) {
 	i = v;
 	q = (igraph_real_t)VECTOR(*quantities)[v];
@@ -606,7 +606,7 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
     }
   } else { /* minimum deterministic imitation */
     for (k = 0; k < igraph_vector_size(&adj); k++) {
-      v = VECTOR(adj)[k];
+      v = (igraph_integer_t) VECTOR(adj)[k];
       if ((igraph_real_t)VECTOR(*quantities)[v] < q) {
 	i = v;
 	q = (igraph_real_t)VECTOR(*quantities)[v];
@@ -1151,9 +1151,9 @@ int igraph_stochastic_imitation(const igraph_t *graph,
   if (algo == IGRAPH_IMITATE_BLIND) {
     IGRAPH_CHECK(igraph_vector_push_back(&adj, vid));
     RNG_BEGIN();
-    i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+    i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
     RNG_END();
-    u = VECTOR(adj)[i];
+    u = (igraph_integer_t) VECTOR(adj)[i];
     VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
   }
   /* Augmented imitation. Let v be the vertex whose strategy we want to */
@@ -1163,9 +1163,9 @@ int igraph_stochastic_imitation(const igraph_t *graph,
   /* retains its current strategy. */
   else if (algo == IGRAPH_IMITATE_AUGMENTED) {
     RNG_BEGIN();
-    i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+    i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
     RNG_END();
-    u = VECTOR(adj)[i];
+    u = (igraph_integer_t) VECTOR(adj)[i];
     if (VECTOR(*quantities)[u] > VECTOR(*quantities)[vid])
       VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
   }
@@ -1176,9 +1176,9 @@ int igraph_stochastic_imitation(const igraph_t *graph,
   /* Otherwise v retains its current strategy. */
   else if (algo == IGRAPH_IMITATE_CONTRACTED) {
     RNG_BEGIN();
-    i = RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+    i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
     RNG_END();
-    u = VECTOR(adj)[i];
+    u = (igraph_integer_t) VECTOR(adj)[i];
     if (VECTOR(*quantities)[u] < VECTOR(*quantities)[vid])
       VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
   }

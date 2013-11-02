@@ -19,12 +19,13 @@ from math import atan2, cos, pi, sin, tan
 from warnings import warn
 
 from igraph._igraph import convex_hull, VertexSeq
+from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer
 from igraph.drawing.colors import color_to_html_format, color_name_to_rgb
 from igraph.drawing.edge import ArrowEdgeDrawer
-from igraph.drawing.text import TextDrawer
+from igraph.drawing.text import TextAlignment, TextDrawer
 from igraph.drawing.metamagic import AttributeCollectorBase
 from igraph.drawing.shapes import PolygonDrawer
 from igraph.drawing.utils import Point
@@ -184,7 +185,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
 
         # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)
-        layout.fit_into(bbox, keep_aspect_ratio=False)
+        layout.fit_into(bbox, keep_aspect_ratio=kwds.get("keep_aspect_ratio", False))
 
         # Decide whether we need to calculate the curvature of edges
         # automatically -- and calculate them if needed.
@@ -396,6 +397,41 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 label_drawer.bbox = (cx - half_size, cy - half_size,
                                      cx + half_size, cy + half_size)
                 label_drawer.draw(wrap=wrap)
+
+        # Draw the edge labels
+        for edge, visual_edge in izip(graph.es, edge_builder):
+            if visual_edge.label is None:
+                continue
+
+            # Set the font size, color and text
+            context.set_font_size(visual_edge.label_size)
+            context.set_source_rgba(*visual_edge.label_color)
+            label_drawer.text = visual_edge.label
+
+            # Ask the edge drawer to propose an anchor point for the label
+            src, dest = edge.tuple
+            src_vertex, dest_vertex = vertex_builder[src], vertex_builder[dest]
+            (x, y), (halign, valign) = \
+                    edge_drawer.get_label_position(edge, src_vertex, dest_vertex)
+
+            _, yb, w, h, _, _ = label_drawer.text_extents()
+            w /= 2.0
+            h /= 2.0
+
+            if halign == TextAlignment.RIGHT:
+                x -= w
+            elif halign == TextAlignment.LEFT:
+                x += w
+            if valign == TextAlignment.BOTTOM:
+                y -= h - yb / 2.0
+            elif valign == TextAlignment.TOP:
+                y += h
+
+            label_drawer.halign = halign
+            label_drawer.valign = valign
+            label_drawer.bbox = (x-w, y-h, x+w, y+h)
+            label_drawer.draw(wrap=wrap)
+
 
 #####################################################################
 
@@ -768,4 +804,61 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
 
 #####################################################################
 
+class GephiGraphStreamingDrawer(AbstractGraphDrawer):
+    """Graph drawer that sends a graph to a file-like object (e.g., socket, URL
+    connection, file) using the Gephi graph streaming format.
+
+    The Gephi graph streaming format is a simple JSON-based format that can be used
+    to post mutations to a graph (i.e. node and edge additions, removals and updates)
+    to a remote component. For instance, one can open up Gephi (U{http://www.gephi.org}),
+    install the Gephi graph streaming plugin and then send a graph from igraph
+    straight into the Gephi window by using C{GephiGraphStreamingDrawer} with the
+    appropriate URL where Gephi is listening.
+
+    The C{connection} property exposes the L{GephiConnection} that the drawer
+    uses. The drawer also has a property called C{streamer} which exposes the underlying
+    L{GephiGraphStreamer} that is responsible for generating the JSON objects,
+    encoding them and writing them to a file-like object. If you want to customize
+    the encoding process, this is the object where you can tweak things to your taste.
+    """
+
+    def __init__(self, conn=None, *args, **kwds):
+        """Constructs a Gephi graph streaming drawer that will post graphs to the
+        given Gephi connection. If C{conn} is C{None}, the remaining arguments of
+        the constructor are forwarded intact to the constructor of
+        L{GephiConnection} in order to create a connection. This means that any of
+        the following are valid:
+
+          - C{GephiGraphStreamingDrawer()} will construct a drawer that connects to
+            workspace 0 of the local Gephi instance on port 8080.
+
+          - C{GephiGraphStreamingDrawer(workspace=2)} will connect to workspace 2
+            of the local Gephi instance on port 8080.
+
+          - C{GephiGraphStreamingDrawer(port=1234)} will connect to workspace 0
+            of the local Gephi instance on port 1234.
+
+          - C{GephiGraphStreamingDrawer(host="remote", port=1234, workspace=7)}
+            will connect to workspace 7 of the Gephi instance on host C{remote},
+            port 1234.
+
+          - C{GephiGraphStreamingDrawer(url="http://remote:1234/workspace7)} is
+            the same as above, but with an explicit URL.
+        """
+        super(GephiGraphStreamingDrawer, self).__init__()
+
+        from igraph.remote.gephi import GephiGraphStreamer, GephiConnection
+        self.connection = conn or GephiConnection(*args, **kwds)
+        self.streamer = GephiGraphStreamer()
+
+    def draw(self, graph, *args, **kwds):
+        """Draws (i.e. sends) the given graph to the destination of the drawer using
+        the Gephi graph streaming API.
+        
+        The following keyword arguments are allowed:
+            
+            - ``encoder`` lets one specify an instance of ``json.JSONEncoder`` that
+              will be used to encode the JSON objects.
+        """
+        self.streamer.post(graph, self.connection, encoder=kwds.get("encoder"))
 

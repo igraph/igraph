@@ -22,6 +22,11 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wunused-label"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#endif
+
 #include "glpapi.h"
 
 /***********************************************************************

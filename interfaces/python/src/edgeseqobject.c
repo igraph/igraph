@@ -306,9 +306,13 @@ PyObject* igraphmodule_EdgeSeq_is_all(igraphmodule_EdgeSeqObject* self) {
 }
 
 PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeqObject *self, PyObject *o) {
+  Py_ssize_t index;
+
   /* Handle integer indices according to the sequence protocol */
-  if (PyInt_Check(o))
-    return igraphmodule_EdgeSeq_sq_item(self, PyInt_AsLong(o));
+  if (PyIndex_Check(o)) {
+    index = PyNumber_AsSsize_t(o, 0);
+    return igraphmodule_EdgeSeq_sq_item(self, index);
+  }
 
   /* Handle strings according to the mapping protocol */
   if (PyBaseString_Check(o))

@@ -31,6 +31,11 @@
  * SUCH DAMAGE.
  */
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#endif
+
 #ifdef _MSC_VER
 /* MSVC does not have inline when compiling C source files */
 #define inline __inline

@@ -130,7 +130,7 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
     stop("Not a graph object")
   }
   cs <- degree(graph, ...)
-  hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities
+  hi <- hist(cs, -1:max(cs), plot=FALSE)$density
   if (!cumulative) {
     res <- hi
   } else {
@@ -188,7 +188,8 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
 get.shortest.paths <- function(graph, from, to=V(graph),
                                mode=c("out", "all", "in"),
                                weights=NULL,
-                               output=c("vpath", "epath", "both")) {
+                               output=c("vpath", "epath", "both"),
+                               predecessors=FALSE, inbound.edges=FALSE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -213,15 +214,24 @@ get.shortest.paths <- function(graph, from, to=V(graph),
   to <- as.igraph.vs(graph, to)-1
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_shortest_paths", graph,
-               as.igraph.vs(graph, from)-1, to, as.numeric(mode), as.numeric(length(to)),
-               weights, as.numeric(output), PACKAGE="igraph")
+               as.igraph.vs(graph, from)-1, to, as.numeric(mode),
+               as.numeric(length(to)), weights, as.numeric(output),
+               as.logical(predecessors), as.logical(inbound.edges), 
+               PACKAGE="igraph")
 
-  if (output !=2 ) {
-    res <- lapply(res, function(x) x+1)
-  } else {
-    res <- list(vpath=lapply(res$vpath, function(x) x+1),
-                epath=lapply(res$epath, function(x) x+1))
+  if (!is.null(res$vpath)) {
+    res$vpath <- lapply(res$vpath, function(x) x+1)
   }
+  if (!is.null(res$epath)) {
+    res$epath <- lapply(res$epath, function(x) x+1)
+  }
+  if (!is.null(res$predecessors)) {
+    res$predecessors <- res$predecessors + 1
+  }
+  if (!is.null(res$inbound_edges)) {
+    res$inbound_edges <- res$inbound_edges + 1
+  }
+
   res
 }
 
@@ -576,7 +586,7 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
   id <- Diagonal(vg)
 
   ## solve it
-  ev <- solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
+  ev <- Matrix::solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
 
   if (rescale) {
     ev <- ev/sum(ev)
@@ -592,7 +602,7 @@ bonpow <- function(graph, nodes=V(graph),
                    rescale=FALSE, tol=1e-7, sparse=TRUE){
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse && require(Matrix)) {
+  if (sparse) {
     res <- bonpow.sparse(graph, nodes, loops, exponent, rescale, tol)
   }  else {
     res <- bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
@@ -686,7 +696,7 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
 
   ## Solve the equation
   M3 <- M2-alpha*M
-  r <- solve(M3, tol=tol, exo)
+  r <- Matrix::solve(M3, tol=tol, exo)
   
   r[ as.numeric(nodes)]
 }
@@ -696,7 +706,7 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
                              tol=1e-7, sparse=TRUE) {
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse && require(Matrix)) {
+  if (sparse) {
     res <- alpha.centrality.sparse(graph, nodes, alpha, loops,
                                    exo, weights, tol)
   } else {

@@ -382,7 +382,7 @@ add.vertex.shape <- function(shape, clip=igraph.shape.noclip,
     vsize2 <- if (length(vertex.size2)==1) {
       vertex.size2
     } else {
-      vertex.size2[ el[,1] ]
+      vertex.size2[ el[,2] ]
     }
     res <- res2 <- rec.shift(coords[,1], coords[,2], coords[,3], coords[,4],
                              vsize, vsize2)
@@ -470,7 +470,7 @@ add.vertex.shape <- function(shape, clip=igraph.shape.noclip,
     vsize2 <- if (length(vertex.size2)==1) {
       vertex.size2
     } else {
-      vertex.size2[ el[,1] ]
+      vertex.size2[ el[,2] ]
     }
     res <- res2 <- rec.shift(coords[,1], coords[,2], coords[,3], coords[,4],
                              vsize, vsize2)
@@ -530,7 +530,7 @@ add.vertex.shape <- function(shape, clip=igraph.shape.noclip,
     vsize2 <- if (length(vertex.size2)==1) {
       vertex.size2
     } else {
-      vertex.size2[ el[,1] ]
+      vertex.size2[ el[,2] ]
     }
     res <- res2 <- rec.shift(coords[,1], coords[,2], coords[,3], coords[,4],
                              vsize, vsize2)

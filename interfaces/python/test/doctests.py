@@ -13,7 +13,7 @@ if __name__ == "__main__":
     doctest.testmod(igraph.datatypes)
     doctest.testmod(igraph.drawing.utils)
     doctest.testmod(igraph.formula)
-    doctest.testmod(igraph.nexus)
+    doctest.testmod(igraph.remote.nexus)
     doctest.testmod(igraph.statistics)
     doctest.testmod(igraph.utils)
 

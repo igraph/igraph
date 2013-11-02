@@ -617,22 +617,32 @@ function (x1, y1, x2, y2,
   
   ## shaft
   lx <- length(x1)
-  theta <- atan2((y2 - y1) * uin[2], (x2 - x1) * uin[1])
   r.seg <- rep(cin*sh.adj, lx)
-  th.seg <- theta + rep(atan2(0, -cin), lx)
+  theta1 <- atan2((y1 - y2) * uin[2], (x1 - x2) * uin[1])
+  th.seg1 <- theta1 + rep(atan2(0, -cin), lx)
+  theta2 <- atan2((y2 - y1) * uin[2], (x2 - x1) * uin[1])
+  th.seg2 <- theta2 + rep(atan2(0, -cin), lx)
+  x1d <- y1d <- x2d <- y2d <- 0
+  if (code %in% c(1,3)) {
+    x2d <- r.seg*cos(th.seg2)/uin[1]
+    y2d <- r.seg*sin(th.seg2)/uin[2]
+  }
+  if (code %in% c(2,3)) {
+    x1d <- r.seg*cos(th.seg1)/uin[1]
+    y1d <- r.seg*sin(th.seg1)/uin[2]
+  }
   if (is.logical(curved) && all(!curved)) {
-    segments(x1, y1, x2+r.seg*cos(th.seg)/uin[1], y2+r.seg*sin(th.seg)/uin[2], 
-             lwd=sh.lwd, col=sh.col, lty=sh.lty)
+    segments(x1+x1d, y1+y1d, x2+x2d, y2+y2d, lwd=sh.lwd, col=sh.col, lty=sh.lty)
   } else {
     if (is.numeric(curved)) {
       lambda <- curved
     } else {
       lambda <- as.logical(curved) * 0.5
     }
-    c.x1 <- x1
-    c.y1 <- y1
-    c.x2 <- x2+r.seg*cos(th.seg)/uin[1]
-    c.y2 <- y2+r.seg*sin(th.seg)/uin[2]
+    c.x1 <- x1+x1d
+    c.y1 <- y1+y1d
+    c.x2 <- x2+x2d
+    c.y2 <- y2+y2d
 
     midx <- (x1+x2)/2
     midy <- (y1+y2)/2  

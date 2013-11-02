@@ -19,7 +19,7 @@ from os import mkdir
 from shutil import copy2
 from subprocess import Popen, PIPE
 
-LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include', '/usr/local/include']
+LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include/igraph', '/usr/local/include/igraph']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
 LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
 
@@ -66,18 +66,22 @@ include_dirs=[]
 library_dirs=[]
 libraries=[]
 
-line, exit_code = get_output("pkg-config igraph")
-if exit_code>0:
-    print("Using default include and library paths for compilation")
-    print("If the compilation fails, please edit the LIBIGRAPH_FALLBACK_*")
-    print("variables in setup.py or include_dirs and library_dirs in ")
-    print("setup.cfg to point to the correct directories and libraries")
-    print("where the C core of igraph is installed")
-    print()
-    
-include_dirs.extend(detect_igraph_include_dirs())
-library_dirs.extend(detect_igraph_library_dirs())
-libraries.extend(detect_igraph_libraries())
+if "--no-pkg-config" in argv:
+    argv.remove("--no-pkg-config")
+    libraries.append("igraph")
+else:
+    line, exit_code = get_output("pkg-config igraph")
+    if exit_code>0:
+        print("Using default include and library paths for compilation")
+        print("If the compilation fails, please edit the LIBIGRAPH_FALLBACK_*")
+        print("variables in setup.py or include_dirs and library_dirs in ")
+        print("setup.cfg to point to the correct directories and libraries")
+        print("where the C core of igraph is installed")
+        print("")
+
+    include_dirs.extend(detect_igraph_include_dirs())
+    library_dirs.extend(detect_igraph_library_dirs())
+    libraries.extend(detect_igraph_libraries())
 
 print("Include path: %s" % " ".join(include_dirs))
 print("Library path: %s" % " ".join(library_dirs))
@@ -103,6 +107,10 @@ so they should work out of the box. Linux users should refer to the
 compilation instructions (but check your distribution first, maybe
 there are pre-compiled packages available). OS X Snow Leopard users may
 benefit from the disk images in the Python Package Index.
+
+Unofficial installers for 64-bit Windows machines and/or different Python
+versions can also be found `here <http://www.lfd.uci.edu/~gohlke/pythonlibs>`_.
+Many thanks to the maintainers of this page!
 """
 
 plat = get_platform()
@@ -119,7 +127,7 @@ options = dict(
     ext_modules = [igraph_extension],
     package_dir = {'igraph': 'igraph'},
     packages = ['igraph', 'igraph.test', 'igraph.app', 'igraph.drawing',
-        'igraph.vendor'],
+        'igraph.remote', 'igraph.vendor'],
     scripts = ['scripts/igraph'],
     test_suite = "igraph.test.suite",
 

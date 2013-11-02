@@ -6,31 +6,39 @@
 \description{It is often useful to create a graph with given vertex
   degrees. This is exactly what \code{degree.sequence.game} does.}
 \usage{
-degree.sequence.game(out.deg, in.deg = numeric(0),
-     method = c("simple", "vl"), \dots)
+degree.sequence.game(out.deg, in.deg = NULL,
+     method = c("simple", "vl", "simple.no.multiple"), \dots)
 }
 \arguments{
   \item{out.deg}{Numeric vector, the sequence of degrees (for undirected
   graphs) or out-degrees (for directed graphs). For undirected graphs
   its sum should be even. For directed graphs its sum should be the same
   as the sum of \code{in.deg}.}
-  \item{in.deg}{For directed graph, the in-degree sequence.}
+  \item{in.deg}{For directed graph, the in-degree sequence. By default
+    this is \code{NULL} and an undirected graph is created.}
   \item{method}{Character, the method for generating the graph. Right
-    now the \dQuote{simple} and \dQuote{vl} methods are implemented.}
+    now the \dQuote{simple}, \dQuote{simple.no.multiple} and \dQuote{vl}
+    methods are implemented.}
   \item{\dots}{Additional arguments, these are used as graph
     attributes.}
 }
 \details{The \dQuote{simple} method connects the out-stubs of the
   edges (undirected graphs) or the out-stubs and in-stubs
   (directed graphs) together. This way loop edges and also multiple
-  edges may be generated.
-
-  This method is not adequate if one needs to
+  edges may be generated. This method is not adequate if one needs to
   generate simple graphs with a given degree sequence. The multiple and
   loop edges can be deleted, but then the degree sequence is distorted
   and there is nothing to ensure that the graphs are sampled uniformly.
 
-  THe \dQuote{vl} method is a more sophisticated generator. The
+  The \dQuote{simple.no.multiple} method is similar to \dQuote{simple},
+  but tries to avoid multiple and loop edges and restarts the
+  generation from scratch if it gets stuck. It is not guaranteed
+  to sample uniformly from the space of all possible graphs with
+  the given sequence, but it is relatively fast and it will
+  eventually succeed if the provided degree sequence is graphical,
+  but there is no upper bound on the number of iterations.
+  
+  The \dQuote{vl} method is a more sophisticated generator. The
   algorithm and the implementation was done by Fabien Viger and Matthieu
   Latapy. This generator always generates undirected, connected simple
   graphs, it is an error to pass the \code{in.deg} argument to it.

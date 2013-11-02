@@ -11,8 +11,8 @@
   vertex shapes when plotting graphs.}
 \usage{
 vertex.shapes (shape = NULL)
-add.vertex.shape (shape, clip = igraph_shape.noclip,
-       plot = igraph.shape.noplot, parameters = character())
+add.vertex.shape (shape, clip = igraph.shape.noclip,
+       plot = igraph.shape.noplot, parameters = list())
 igraph.shape.noclip (coords, el, params, end = c("both", "from", "to"))
 igraph.shape.noplot (coords, v = NULL, params)
 }
@@ -22,11 +22,13 @@ igraph.shape.noplot (coords, v = NULL, params)
     vertex shapes are returned.} 
   \item{clip}{An R function object, the clipping function.}
   \item{plot}{An R function object, the plotting function.}
-  \item{parameters}{Character vector, additional plot/vertex/edge
-    parameters. Vertex parameters should have a prefix
+  \item{parameters}{Named list, additional plot/vertex/edge
+    parameters. The element named define the new parameters, and the
+    elements themselves define their default values.
+    Vertex parameters should have a prefix
     \sQuote{\code{vertex.}}, edge parameters a prefix
     \sQuote{\code{edge.}}. Other general plotting parameters should have
-    a prefix \sQuote{\code{plot.}}.}
+    a prefix \sQuote{\code{plot.}}. See Details below.}
   \item{coords,el,params,end,v}{See parameters of the clipping/plotting
     functions below.} 
 }
@@ -189,10 +191,17 @@ plot(g, vertex.shape="star", vertex.color=rainbow(vcount(g)),
 # Pictures as vertices.
 # Similar musicians from last.fm, we start from an artist and
 # will query two levels. We will use the XML, png and jpeg packages
-# for this.
+# for this, so these must be available. Otherwise the example is
+# skipped
 
-if (require(XML) && require(png) && require(jpeg)) {
-  url <- 'http://ws.audioscrobbler.com/2.0/?method=artist.getinfo&artist=\%s&api_key=1784468ada3f544faf9172ee8b99fca3'
+loadIfYouCan <- function(pkg) suppressWarnings(do.call(require, list(pkg)))
+
+if (loadIfYouCan("XML") && loadIfYouCan("png") &&
+    loadIfYouCan("jpeg")) {
+  url <- paste(sep="",
+               'http://ws.audioscrobbler.com/',
+               '2.0/?method=artist.getinfo&artist=\%s',
+               '&api_key=1784468ada3f544faf9172ee8b99fca3')
   getartist <- function(artist) {
     cat("Downloading from last.fm. ... ")
     txt <- readLines(sprintf(url, URLencode(artist)))
@@ -207,6 +216,8 @@ if (require(XML) && require(png) && require(jpeg)) {
         rast <- readPNG(bin, native=TRUE)
       } else if (grepl("\\\\.jpe?g$", img)) {
         rast <- readJPEG(bin, native=TRUE)
+      } else {
+        rast <- as.raster(matrix())
       }
     } else {
       rast <- as.raster(numeric())
@@ -216,7 +227,7 @@ if (require(XML) && require(png) && require(jpeg)) {
     list(name=artist, image=rast, similar=sim)
   }
 
-  ego <- getartist("Muse")
+  ego <- getartist("Placebo")
   similar <- lapply(ego$similar, getartist)
   
   edges1 <- cbind(ego$name, ego$similar)
@@ -234,6 +245,8 @@ if (require(XML) && require(png) && require(jpeg)) {
        vertex.label=V(musnet)$name, margin=.2,
        vertex.size=50, vertex.size2=50,
        vertex.label.dist=2, vertex.label.degree=0)
+} else {
+  message("You need the `XML', `png' and `jpeg' packages to run this")
 }
 
 }

@@ -1,6 +1,8 @@
 #include "Triangle.h"
 #include <math.h>
 
+namespace igraph {
+
 Triangle::Triangle()
 {}
 
@@ -84,3 +86,5 @@ Vector Triangle::Normal(const Point& rSurfacePoint, const Point& rOffSurface) co
 
 	return plane_normal;
 }
+
+} // namespace igraph

@@ -4,7 +4,7 @@
 \description{Randomly rewires a graph while preserving the degree
   distribution.}
 \usage{
-rewire(graph, mode = "simple", niter = 100) 
+rewire(graph, mode = c("simple", "loops"), niter = 100) 
 }
 \arguments{
   \item{graph}{The graph to be rewired.}

@@ -1,3 +1,9 @@
+igraph (0.6.5-1) unstable; urgency=low
+
+  * Updated package for igraph 0.6.5.
+
+ -- Tamas Nepusz <ntamas@gmail.com>  Thu, 28 Feb 2013 11:03:20 +0100
+
 igraph (0.6-3) unstable; urgency=low
 
   * Fixing build problems with dh --with python2.

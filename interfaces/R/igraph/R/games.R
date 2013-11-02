@@ -113,16 +113,18 @@ erdos.renyi.game <- function(n, p.or.m, type=c("gnp", "gnm"),
 
 random.graph.game <- erdos.renyi.game
 
-degree.sequence.game <- function(out.deg, in.deg=numeric(0),
-                                 method=c("simple", "vl"),
+degree.sequence.game <- function(out.deg, in.deg=NULL,
+                                 method=c("simple", "vl",
+                                   "simple.no.multiple"),
                                  ...) {
 
   method <- igraph.match.arg(method)
-  method1 <- switch(method, "simple"=0, "vl"=1)
+  method1 <- switch(method, "simple"=0, "vl"=1, "simple.no.multiple"=2)
+  if (!is.null(in.deg)) { in.deg <- as.numeric(in.deg) }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_degree_sequence_game", as.numeric(out.deg),
-               as.numeric(in.deg), as.numeric(method1),
+               in.deg, as.numeric(method1),
                PACKAGE="igraph")
   if (getIgraphOpt("add.params")) {
     res$name <- "Degree sequence random graph"

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="/favicon.png">
+
+    <title>{{ page.title }}</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700'
+          rel='stylesheet' type='text/css'>
+    <link href="css/other.css" rel="stylesheet">
+    <link href="css/affix.css" rel="stylesheet">
+    <link href="css/animate.css" rel="stylesheet">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" 
+          rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements 
+         and media queries -->
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.js"></script>
+      <script src="js/respond.min.js"></script>
+    <![endif]-->
+
+  <script>
+    var shiftWindow = function() { scrollBy(0, -70) };
+    window.addEventListener("hashchange", shiftWindow);
+    function load() { if (window.location.hash) shiftWindow(); }
+  </script>
+
+  </head>
+
+  <body>
+
+    <div>
+      <a href="https://github.com/igraph/igraph">
+        <img style="position: absolute; top:50px; right: 0; border: 0; z-index:1000" 
+             src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png"
+             alt="Fork me on GitHub">
+      </a>
+    </div>
+  
+    <div class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle"
+                  data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">
+            <img src="img/igraph2.svg" width=25>
+            igraph
+          </a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-left">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="">News</a></li>
+            <li><a href="">Get started</a></li>
+            <li><a href="">Download</a></li>
+            <li><a href="">Get help</a></li>
+            <li><a href="">Contribute</a></li>
+          </ul>
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <input type="text" placeholder="Search documentation"
+                     class="form-control" size="25">
+            </div>
+            <button type="submit" class="btn btn-success">
+              <span class="glyphicon glyphicon-search"></span></button>
+          </form>
+        </div><!--/.navbar-collapse -->
+      </div>
+    </div>
+
+    {{content}}
+
+    <div class="container footer">
+      <div class="row">
+        <div class="col-xs-6">
+        </div>
+        <div class="col-xs-6 text-right">
+          &copy; 2013 The igraph core team
+        </div>      
+      </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="js/jquery-2.0.3.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/affix.js"></script>
+    <script type="text/javascript">
+      $(document).ready(function(){
+        $( ".thumbnail" ).mouseenter(function() {
+          $(this).find('.caption').removeClass("flipOutY").addClass("flipInY").show();
+        })
+        .mouseleave(function() {
+          $(this).find('.caption').removeClass("flipInY").addClass("flipOutY");
+});
+})    
+    </script>
+  </body>
+</html>

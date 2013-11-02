@@ -33,7 +33,7 @@ void custom_destructor(void* ptr) {
 int main() {
   
   igraph_vector_ptr_t v1, v2;
-  const igraph_vector_ptr_t v3=IGRAPH_VECTOR_PTR_NULL;
+  igraph_vector_ptr_t v3=IGRAPH_VECTOR_PTR_NULL;
   int i;
   void ** ptr;
   int d1=1, d2=2, d3=3, d4=4, d5=5;

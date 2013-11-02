@@ -1,6 +1,8 @@
 #include "Point.h"
 #include <math.h>
 
+namespace igraph {
+
 Point::Point()
 {
 	X(0.0);
@@ -100,3 +102,5 @@ bool Point::operator==(const Point& vRhs) const
 
 	return result;
 }
+
+} // namespace igraph

@@ -558,7 +558,7 @@ PyObject *igraphmodule_Graph_delete_edges(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O", kwlist, &list))
     return NULL;
 	
-  if (igraphmodule_PyObject_to_es_t(list, &es, 0)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, 0)) {
     /* something bad happened during conversion, return immediately */
     return NULL;
   }
@@ -648,6 +648,7 @@ PyObject *igraphmodule_Graph_diversity(igraphmodule_GraphObject * self,
   igraph_vector_t result, *weights = 0;
   igraph_vs_t vs;
   igraph_bool_t return_single = 0;
+  igraph_integer_t no_of_nodes;
 
   static char *kwlist[] = { "vertices", "weights", NULL };
 
@@ -672,15 +673,33 @@ PyObject *igraphmodule_Graph_diversity(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  if (igraph_diversity(&self->g, weights, &result, vs)) {
-    igraphmodule_handle_igraph_error();
-    igraph_vs_destroy(&vs);
-    igraph_vector_destroy(&result);
-    if (weights) { igraph_vector_destroy(weights); free(weights); }
-    return NULL;
+  if (weights == 0) {
+    /* Handle this case here because igraph_diversity bails out when no weights
+     * are given. */
+    if (igraph_vs_size(&self->g, &vs, &no_of_nodes)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&result);
+      return NULL;
+    }
+    if (igraph_vector_resize(&result, no_of_nodes)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&result);
+      return NULL;
+    }
+    igraph_vector_fill(&result, 1.0);
+  } else {
+    if (igraph_diversity(&self->g, weights, &result, vs)) {
+      igraphmodule_handle_igraph_error();
+      igraph_vs_destroy(&vs);
+      igraph_vector_destroy(&result);
+      igraph_vector_destroy(weights); free(weights);
+      return NULL;
+    }
+    igraph_vector_destroy(weights); free(weights);
   }
 
-  if (weights) { igraph_vector_destroy(weights); free(weights); }
 
   if (!return_single)
     list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
@@ -853,7 +872,7 @@ PyObject *igraphmodule_Graph_is_loop(igraphmodule_GraphObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -901,7 +920,7 @@ PyObject *igraphmodule_Graph_is_multiple(igraphmodule_GraphObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -949,7 +968,7 @@ PyObject *igraphmodule_Graph_is_mutual(igraphmodule_GraphObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -1015,7 +1034,7 @@ PyObject *igraphmodule_Graph_count_multiple(igraphmodule_GraphObject *self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &list))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, &return_single)) {
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, &return_single)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -2957,6 +2976,53 @@ PyObject *igraphmodule_Graph_Ring(PyTypeObject * type,
 }
 
 /** \ingroup python_interface_graph
+ * \brief Generates a graph based on a stochastic blockmodel
+ * \return a reference to the newly generated Python igraph object
+ * \sa igraph_sbm_game
+ */
+PyObject *igraphmodule_Graph_SBM(PyTypeObject * type,
+                                 PyObject * args, PyObject * kwds)
+{
+  igraphmodule_GraphObject *self;
+  igraph_t g;
+  long int n;
+  PyObject *block_sizes_o, *pref_matrix_o;
+  PyObject *directed_o = Py_False;
+  PyObject *loops_o = Py_False;
+  igraph_matrix_t pref_matrix;
+  igraph_vector_int_t block_sizes;
+
+  static char *kwlist[] = { "n", "pref_matrix", "block_sizes", "directed",
+	"loops", NULL };
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "lO!O!|OO", kwlist,
+                                   &n, &PyList_Type, &pref_matrix_o,
+                                   &PyList_Type, &block_sizes_o,
+                                   &directed_o, &loops_o))
+    return NULL;
+
+  if (igraphmodule_PyList_to_matrix_t(pref_matrix_o, &pref_matrix)) return NULL;
+  if (igraphmodule_PyObject_to_vector_int_t(block_sizes_o, &block_sizes)) {
+    igraph_matrix_destroy(&pref_matrix);
+    return NULL;
+  }
+
+  if (igraph_sbm_game(&g, (igraph_integer_t) n, &pref_matrix, &block_sizes,
+                      PyObject_IsTrue(directed_o), PyObject_IsTrue(loops_o))) {
+    igraphmodule_handle_igraph_error();
+    igraph_matrix_destroy(&pref_matrix);
+    igraph_vector_int_destroy(&block_sizes);
+    return NULL;
+  }
+
+  igraph_matrix_destroy(&pref_matrix);
+  igraph_vector_int_destroy(&block_sizes);
+
+  CREATE_GRAPH_FROM_TYPE(self, g, type);
+  return (PyObject *) self;
+}
+
+/** \ingroup python_interface_graph
  * \brief Generates a star graph
  * \return a reference to the newly generated Python igraph object
  * \sa igraph_star
@@ -3862,7 +3928,7 @@ PyObject *igraphmodule_Graph_clusters(igraphmodule_GraphObject * self,
 PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
                                         PyObject * args, PyObject * kwds)
 {
-  char *kwlist[] = { "vertices", "weights", NULL };
+  static char *kwlist[] = { "vertices", "weights", NULL };
   PyObject *vids_obj = Py_None, *weight_obj = Py_None, *list;
   igraph_vector_t result, weights;
   igraph_vs_t vids;
@@ -3899,7 +3965,11 @@ PyObject *igraphmodule_Graph_constraint(igraphmodule_GraphObject * self,
     return NULL;
   }
 
-  list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+  if (!return_single)
+    list = igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
+  else
+    list = PyFloat_FromDouble((double)VECTOR(result)[0]);
+
   igraph_vs_destroy(&vids);
   igraph_vector_destroy(&result);
   igraph_vector_destroy(&weights);
@@ -4361,7 +4431,7 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   }
 
   if (igraph_get_shortest_paths_dijkstra(&self->g, use_edges ? 0 : ptrvec,
-        use_edges ? ptrvec : 0, from, to, weights, mode)) {
+        use_edges ? ptrvec : 0, from, to, weights, mode, 0, 0)) {
     igraphmodule_handle_igraph_error();
     for (j = 0; j < no_of_target_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
@@ -5337,7 +5407,7 @@ PyObject *igraphmodule_Graph_subgraph_edges(igraphmodule_GraphObject * self,
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|O", kwlist, &list, &delete_vertices))
     return NULL;
 
-  if (igraphmodule_PyObject_to_es_t(list, &es, 0))
+  if (igraphmodule_PyObject_to_es_t(list, &es, &self->g, 0))
     return NULL;
 
   if (igraph_subgraph_edges(&self->g, &sg, es, PyObject_IsTrue(delete_vertices))) {
@@ -8122,7 +8192,7 @@ PyObject *igraphmodule_Graph_isomorphic_vf2(igraphmodule_GraphObject * self,
 
   if (!PyArg_ParseTupleAndKeywords
       (args, kwds, "|O!OOOOOOOOO", kwlist, &igraphmodule_GraphType, &o,
-       &color1_o, &color2_o, &edge_color1, &edge_color2, &return1, &return2,
+       &color1_o, &color2_o, &edge_color1_o, &edge_color2_o, &return1, &return2,
        &callback_fn, &node_compat_fn, &edge_compat_fn))
     return NULL;
 
@@ -9111,7 +9181,7 @@ PyObject *igraphmodule_Graph_union(igraphmodule_GraphObject * self,
     Py_DECREF(it);
 
     /* Create union */
-    if (igraph_union_many(&g, &gs)) {
+    if (igraph_union_many(&g, &gs, /*edgemaps=*/ 0)) {
       igraph_vector_ptr_destroy(&gs);
       igraphmodule_handle_igraph_error();
       return NULL;
@@ -9127,7 +9197,8 @@ PyObject *igraphmodule_Graph_union(igraphmodule_GraphObject * self,
     }
     o = (igraphmodule_GraphObject *) other;
 
-    if (igraph_union(&g, &self->g, &o->g)) {
+    if (igraph_union(&g, &self->g, &o->g, /*edge_map1=*/ 0, 
+		     /*edge_map2=*/ 0)) {
       igraphmodule_handle_igraph_error();
       return NULL;
     }
@@ -9173,7 +9244,7 @@ PyObject *igraphmodule_Graph_intersection(igraphmodule_GraphObject * self,
     Py_DECREF(it);
 
     /* Create union */
-    if (igraph_intersection_many(&g, &gs)) {
+    if (igraph_intersection_many(&g, &gs, /*edgemaps=*/ 0)) {
       igraph_vector_ptr_destroy(&gs);
       igraphmodule_handle_igraph_error();
       return NULL;
@@ -9189,7 +9260,8 @@ PyObject *igraphmodule_Graph_intersection(igraphmodule_GraphObject * self,
     }
     o = (igraphmodule_GraphObject *) other;
 
-    if (igraph_intersection(&g, &self->g, &o->g)) {
+    if (igraph_intersection(&g, &self->g, &o->g, /*edge_map1=*/ 0, 
+			    /*edge_map2=*/ 0)) {
       igraphmodule_handle_igraph_error();
       return NULL;
     }
@@ -9292,7 +9364,8 @@ PyObject *igraphmodule_Graph_compose(igraphmodule_GraphObject * self,
   }
   o = (igraphmodule_GraphObject *) other;
 
-  if (igraph_compose(&g, &self->g, &o->g)) {
+  if (igraph_compose(&g, &self->g, &o->g, /*edge_map1=*/ 0, 
+		     /*edge_map2=*/ 0)) {
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -9454,6 +9527,7 @@ PyObject *igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject * self,
   igraph_real_t result;
   long int vid1 = -1, vid2 = -1;
   igraph_integer_t v1, v2;
+  igraph_maxflow_stats_t stats;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
                                    &vid1, &vid2, &capacity_object))
@@ -9467,7 +9541,8 @@ PyObject *igraphmodule_Graph_maxflow_value(igraphmodule_GraphObject * self,
     return igraphmodule_handle_igraph_error();
 
 
-  if (igraph_maxflow_value(&self->g, &result, v1, v2, &capacity_vector)) {
+  if (igraph_maxflow_value(&self->g, &result, v1, v2, &capacity_vector, 
+			   &stats)) {
     igraph_vector_destroy(&capacity_vector);
     return igraphmodule_handle_igraph_error();
   }
@@ -9489,6 +9564,7 @@ PyObject *igraphmodule_Graph_maxflow(igraphmodule_GraphObject * self,
   long int vid1 = -1, vid2 = -1;
   igraph_integer_t v1, v2;
   igraph_vector_t flow, cut, partition;
+  igraph_maxflow_stats_t stats;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|O", kwlist,
                                    &vid1, &vid2, &capacity_object))
@@ -9520,7 +9596,7 @@ PyObject *igraphmodule_Graph_maxflow(igraphmodule_GraphObject * self,
   }
 
   if (igraph_maxflow(&self->g, &result, &flow, &cut, &partition, 0,
-        v1, v2, &capacity_vector)) {
+		     v1, v2, &capacity_vector, &stats)) {
     igraph_vector_destroy(&capacity_vector);
     igraph_vector_destroy(&flow);
     igraph_vector_destroy(&cut);
@@ -9850,6 +9926,57 @@ PyObject *igraphmodule_Graph_mincut(igraphmodule_GraphObject * self,
 
   result = Py_BuildValue("dNNN", (double)value, cut_o, part_o, part2_o);
   return result;
+}
+
+/** \ingroup python_interface_graph
+ * \brief Calculates the Gomory-Hu tree of an undirected graph
+ */
+PyObject *igraphmodule_Graph_gomory_hu_tree(igraphmodule_GraphObject * self,
+                                            PyObject *args, PyObject *kwds)
+{
+  static char* kwlist[] = { "capacity", NULL };
+  igraph_vector_t capacity_vector;
+  igraph_vector_t flow_vector;
+  igraph_t tree;
+  PyObject *capacity_o = Py_None;
+  PyObject *flow_o;
+  igraphmodule_GraphObject *tree_o;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &capacity_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_attribute_values(capacity_o,
+                                                &capacity_vector,
+                                                self, ATTRHASH_IDX_EDGE, 1.0))
+    return igraphmodule_handle_igraph_error();
+
+  if (igraph_vector_init(&flow_vector, 0)) {
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  if (igraph_gomory_hu_tree(&self->g, &tree, &flow_vector, &capacity_vector)) {
+    igraph_vector_destroy(&flow_vector);
+    igraph_vector_destroy(&capacity_vector);
+    return igraphmodule_handle_igraph_error();
+  }
+
+  igraph_vector_destroy(&capacity_vector);
+
+  flow_o = igraphmodule_vector_t_to_PyList(&flow_vector, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_vector_destroy(&flow_vector);
+  if (!flow_o) {
+    igraph_destroy(&tree);
+    return 0;
+  }
+
+  CREATE_GRAPH(tree_o, tree);
+  if (!tree_o) {
+    igraph_destroy(&tree);
+    return 0;
+  }
+
+  return Py_BuildValue("NN", tree_o, flow_o);
 }
 
 /** \ingroup python_interface_graph
@@ -10968,20 +11095,41 @@ PyObject *igraphmodule_Graph_community_multilevel(igraphmodule_GraphObject *self
  * Optimal modularity by integer programming
  */
 PyObject *igraphmodule_Graph_community_optimal_modularity(
-	igraphmodule_GraphObject *self) {
+	igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = {"weights", NULL};
+  PyObject *weights_o = Py_None;
   igraph_real_t modularity;
   igraph_vector_t membership;
+  igraph_vector_t* weights = 0;
   PyObject *res;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist,
+        &weights_o))
+    return NULL;
 
   if (igraph_vector_init(&membership, igraph_vcount(&self->g))) {
 	igraphmodule_handle_igraph_error();
     return NULL;
   }
 
-  if (igraph_community_optimal_modularity(&self->g, &modularity, &membership)) {
+  if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
+	  ATTRIBUTE_TYPE_EDGE)) {
+    igraph_vector_destroy(&membership);
+    return NULL;
+  }
+
+  if (igraph_community_optimal_modularity(&self->g, &modularity,
+        &membership, weights)) {
 	igraphmodule_handle_igraph_error();
 	igraph_vector_destroy(&membership);
+    if (weights != 0) {
+      igraph_vector_destroy(weights); free(weights);
+    }
     return NULL;
+  }
+
+  if (weights != 0) {
+    igraph_vector_destroy(weights); free(weights);
   }
 
   res = igraphmodule_vector_t_to_PyList(&membership, IGRAPHMODULE_TYPE_INT);
@@ -11757,6 +11905,25 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param power: the power constant of the nonlinear model.\n"
    "  It can be omitted, and in this case the usual linear model\n"
    "  will be used.\n"},
+
+  /* interface to igraph_sbm_game */
+  {"SBM", (PyCFunction) igraphmodule_Graph_SBM,
+   METH_VARARGS | METH_CLASS | METH_KEYWORDS,
+   "SBM(n, pref_matrix, block_sizes, directed=False, loops=False)\n\n"
+   "Generates a graph based on a stochastic blockmodel.\n\n"
+   "A given number of vertices are generated. Every vertex is assigned to a\n"
+   "vertex type according to the given block sizes. Vertices of the same\n"
+   "type will be assigned consecutive vertex IDs. Finally, every\n"
+   "vertex pair is evaluated and an edge is created between them with a\n"
+   "probability depending on the types of the vertices involved. The\n"
+   "probabilities are taken from the preference matrix.\n\n"
+   "@param n: the number of vertices in the graph\n"
+   "@param pref_matrix: matrix giving the connection probabilities for\n"
+   "  different vertex types.\n"
+   "@param block_sizes: list giving the number of vertices in each block; must\n"
+   "  sum up to I{n}.\n"
+   "@param directed: whether to generate a directed graph.\n"
+   "@param loops: whether loop edges are allowed.\n"},
 
   // interface to igraph_star
   {"Star", (PyCFunction) igraphmodule_Graph_Star,
@@ -14456,6 +14623,13 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  advised to use that.\n"
   },
 
+  {"gomory_hu_tree", (PyCFunction) igraphmodule_Graph_gomory_hu_tree,
+   METH_VARARGS | METH_KEYWORDS,
+   "gomory_hu_tree(capacity=None)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.gomory_hu_tree()\n\n"
+  },
+
   /*********************/
   /* VERTEX SEPARATORS */
   /*********************/
@@ -14812,8 +14986,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   },
   {"community_optimal_modularity",
    (PyCFunction) igraphmodule_Graph_community_optimal_modularity,
-   METH_NOARGS,
-   "community_optimal_modularity()\n\n"
+   METH_VARARGS | METH_KEYWORDS,
+   "community_optimal_modularity(weights=None)\n\n"
    "Calculates the optimal modularity score of the graph and the\n"
    "corresponding community structure.\n\n"
    "This function uses the GNU Linear Programming Kit to solve a large\n"
@@ -14822,6 +14996,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "unlikely to work for graphs larger than a few (less than a hundred)\n"
    "vertices. Consider using one of the heuristic approaches instead if\n"
    "you have such a large graph.\n\n"
+  "@param weights: name of an edge attribute or a list containing\n"
+  "  edge weights.\n\n"
    "@return: the calculated membership vector and the corresponding\n"
    "  modularity in a tuple.\n"
   },

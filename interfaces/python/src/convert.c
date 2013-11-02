@@ -2294,7 +2294,7 @@ int igraphmodule_PyObject_to_vid(PyObject *o, igraph_integer_t *vid, igraph_t *g
   }
 
   if (*vid < 0) {
-    PyErr_SetString(PyExc_ValueError, "vertex IDs must be positive");
+    PyErr_Format(PyExc_ValueError, "vertex IDs must be positive, got: %ld", (long)(*vid));
     return 1;
   }
 
@@ -2402,7 +2402,7 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
     IGRAPH_CHECK(igraph_vector_reserve(&vector, 20));
 
     while ((item = PyIter_Next(iterator))) {
-      igraph_integer_t vid=-1;
+      vid = -1;
 
       if (igraphmodule_PyObject_to_vid(item, &vid, graph))
         break;
@@ -2439,6 +2439,100 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
   return 0;
 }
 
+/**
+ * \ingroup python_interface_conversion
+ * \brief Tries to interpret a Python object as a single edge ID
+ * 
+ * \param o      the Python object
+ * \param eid    the edge ID will be stored here
+ * \param graph  the graph that will be used to interpret vertex names and
+ *               indices if o is a tuple. It may also be a null pointer
+ *               if we don't want to handle tuples.
+ * \return 0 if everything was OK, 1 otherwise
+ */
+int igraphmodule_PyObject_to_eid(PyObject *o, igraph_integer_t *eid, igraph_t *graph) {
+  int retval, tmp;
+  igraph_integer_t vid1, vid2;
+
+  if (o == Py_None || o == 0) {
+    *eid = 0;
+  } else if (PyInt_Check(o)) {
+    /* Single edge ID */
+    if (PyInt_AsInt(o, &tmp))
+      return 1;
+    *eid = tmp;
+  } else if (PyLong_Check(o)) {
+    /* Single edge ID */
+    if (PyLong_AsInt(o, &tmp))
+      return 1;
+    *eid = tmp;
+  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_EdgeType)) {
+    /* Single edge ID from Edge object */
+    igraphmodule_EdgeObject *eo = (igraphmodule_EdgeObject*)o;
+    *eid = igraphmodule_Edge_get_index_igraph_integer(eo);
+  } else if (PyIndex_Check(o)) {
+    /* Other numeric type that can be converted to an index */
+    PyObject* num = PyNumber_Index(o);
+    if (num) {
+      if (PyInt_Check(num)) {
+        retval = PyInt_AsInt(num, &tmp);
+        if (retval) {
+          Py_DECREF(num);
+          return 1;
+        }
+        *eid = tmp;
+      } else if (PyLong_Check(num)) {
+        retval = PyLong_AsInt(num, &tmp);
+        if (retval) {
+          Py_DECREF(num);
+          return 1;
+        }
+        *eid = tmp;
+      } else {
+        PyErr_SetString(PyExc_TypeError, "PyNumber_Index returned invalid type");
+        Py_DECREF(num);
+        return 1;
+      }
+      Py_DECREF(num);
+    } else
+      return 1;
+  } else if (graph != 0 && PyTuple_Check(o)) {
+    PyObject *o1, *o2;
+    
+    o1 = PyTuple_GetItem(o, 0);
+    if (!o1)
+      return 1;
+
+    o2 = PyTuple_GetItem(o, 1);
+    if (!o2)
+      return 1;
+
+    if (igraphmodule_PyObject_to_vid(o1, &vid1, graph))
+      return 1;
+    if (igraphmodule_PyObject_to_vid(o2, &vid2, graph))
+      return 1;
+
+    igraph_get_eid(graph, eid, vid1, vid2, 1, 0);
+    if (*eid < 0) {
+      PyErr_Format(PyExc_ValueError, "no edge from vertex #%ld to #%ld",
+          (long int)vid1, (long int)vid2);
+      return 1;
+    }
+  } else {
+    PyErr_SetString(PyExc_TypeError,
+        "only numbers, igraph.Edge objects or tuples of vertex IDs can be "
+        "converted to edge IDs");
+    return 1;
+  }
+
+  if (*eid < 0) {
+    PyErr_Format(PyExc_ValueError, "edge IDs must be positive, got: %ld", (long)(*eid));
+    return 1;
+  }
+
+  return 0;
+}
+
 
 /**
  * \ingroup python_interface_conversion
@@ -2446,107 +2540,102 @@ int igraphmodule_PyObject_to_vs_t(PyObject *o, igraph_vs_t *vs,
  * 
  * \param o the Python object
  * \param vs the \c igraph_es_t which will contain the result
+ * \param graph  an \c igraph_t object which will be used to interpret vertex
+ *               names and tuples (if the supplied Python object contains them)
  * \param return_single will be 1 if the selector selected only a single edge,
  * 0 otherwise
  * \return 0 if everything was OK, 1 otherwise
  */
-int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es,
+int igraphmodule_PyObject_to_es_t(PyObject *o, igraph_es_t *es, igraph_t *graph,
                   igraph_bool_t *return_single) {
-  if (return_single) *return_single=0;
-  if (o==NULL || o == Py_None) {
-    /* Returns a vertex sequence for all edges */
+  igraph_integer_t eid;
+  igraph_vector_t vector;
+
+  if (o == 0 || o == Py_None) {
+    /* Returns an edge sequence for all edges */
+    if (return_single)
+      *return_single = 0;
     igraph_es_all(es, IGRAPH_EDGEORDER_ID);
-  } else if (PyInt_Check(o)) {
-    /* Returns an edge sequence for a single edge ID */
-    igraph_es_1(es, (igraph_integer_t)PyInt_AsLong(o));
-    if (return_single) *return_single=1;
-  } else if (PyLong_Check(o)) {
-    /* Returns an edge sequence for a single edge ID */
-    igraph_es_1(es, (igraph_integer_t)PyLong_AsLong(o));
-    if (return_single) *return_single=1;
-  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_EdgeSeqType)) {
+    return 0;
+  }
+
+  if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_EdgeSeqType)) {
+    /* Returns an edge sequence from an EdgeSeq object */
     igraphmodule_EdgeSeqObject *eso = (igraphmodule_EdgeSeqObject*)o;
     if (igraph_es_copy(es, &eso->es)) {
       igraphmodule_handle_igraph_error();
       return 1;
     }
-  } else if (PyObject_IsInstance(o, (PyObject*)&igraphmodule_EdgeType)) {
-    igraphmodule_EdgeObject *eo = (igraphmodule_EdgeObject*)o;
-    igraph_es_1(es, igraphmodule_Edge_get_index_igraph_integer(eo));
     if (return_single)
-      *return_single=1;
-  } else {
-    /* Returns an edge sequence with the IDs returned by the iterator */
-    PyObject *iterator = PyObject_GetIter(o);
+      *return_single = 0;
+    return 0;
+  }
+
+  if (igraphmodule_PyObject_to_eid(o, &eid, graph)) {
+    /* Object cannot be converted to a single edge ID,
+     * assume it is a sequence or iterable */
+
+    PyObject *iterator;
     PyObject *item;
-    igraph_vector_t vector;
-    igraph_vector_t tuples;
+
+    /* Clear the exception set by igraphmodule_PyObject_to_eid */
+    PyErr_Clear();
+
+    iterator = PyObject_GetIter(o);
 
     if (iterator == NULL) {
-      PyErr_SetString(PyExc_TypeError, "integer, long, iterable, Edge, EdgeSeq or None expected");
+      PyErr_SetString(PyExc_TypeError, "conversion to edge sequene failed");
       return 1;
     }
 
     IGRAPH_CHECK(igraph_vector_init(&vector, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &vector);
-    IGRAPH_CHECK(igraph_vector_init(&tuples, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &tuples);
+    IGRAPH_CHECK(igraph_vector_reserve(&vector, 20));
 
     while ((item = PyIter_Next(iterator))) {
-      long val=-1;
-      if (PyInt_Check(item))
-        val=PyInt_AsLong(item);
-      else if (PyLong_Check(item))
-        val=PyLong_AsLong(item);
-      else if (PyTuple_Check(item) && PyTuple_Size(item) >= 2) {
-        PyObject *o1, *o2;
-        o1=PyTuple_GetItem(item, 0);
-        o2=PyTuple_GetItem(item, 1);
-        if (PyInt_Check(o1) && PyInt_Check(o2)) {
-          if (igraph_vector_push_back(&tuples, PyInt_AsLong(o1)))
-            PyErr_NoMemory();
-          else if (igraph_vector_push_back(&tuples, PyInt_AsLong(o2)))
-            PyErr_NoMemory();
-        }
-        val=-2;
-      }
+      eid = -1;
+
+      if (igraphmodule_PyObject_to_eid(item, &eid, graph))
+        break;
 
       Py_DECREF(item);
-
-      if (val >= 0) {
-        if (igraph_vector_push_back(&vector, val)) PyErr_NoMemory();
-      } else if (val == -1) {
-        PyErr_SetString(PyExc_TypeError, "integer, long or integer tuple expected");
-      }
-
-      if (PyErr_Occurred()) break;
+      igraph_vector_push_back(&vector, eid);
     }
     Py_DECREF(iterator);
 
     if (PyErr_Occurred()) {
       igraph_vector_destroy(&vector);
-      igraph_vector_destroy(&tuples);
-      IGRAPH_FINALLY_CLEAN(2);
+      IGRAPH_FINALLY_CLEAN(1);
       return 1;
-    } else {
-      if (igraph_vector_size(&vector) > 0 && igraph_vector_size(&tuples) == 0)
-        igraph_es_vector_copy(es, &vector);
-      else if (igraph_vector_size(&tuples) > 0 && igraph_vector_size(&vector) == 0)
-        igraph_es_pairs(es, &tuples, 1);
-      else if (igraph_vector_size(&tuples) == 0 && igraph_vector_size(&vector) == 0)
-        igraph_es_none(es);
-      else
-        PyErr_SetString(PyExc_TypeError, "edge IDs and from-to tuples can not be mixed");
-      igraph_vector_destroy(&vector);
-      igraph_vector_destroy(&tuples);
-      IGRAPH_FINALLY_CLEAN(2);
     }
+    
+    if (igraph_vector_size(&vector) > 0) {
+      igraph_es_vector_copy(es, &vector);
+    } else {
+      igraph_es_none(es);
+    }
+
+    igraph_vector_destroy(&vector);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    if (return_single)
+      *return_single = 0;
+    
+    return 0;
   }
-  if (PyErr_Occurred())
-    return 1;
+
+  /* The object can be converted into a single edge ID */
+  if (return_single)
+    *return_single = 1;
+  /*
+  if (single_eid)
+    *single_eid = eid;
+  */
+
+  igraph_es_1(es, eid);
+
   return 0;
 }
-
 
 /**
  * \ingroup python_interface_conversion

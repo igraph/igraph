@@ -134,6 +134,12 @@ int main() {
   show_results(&g, &modularity, &merges, stdout);
   igraph_destroy(&g);
 
+  /* Regression test -- graph with two vertices and two edges */
+  igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,0,1,1,-1);
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
+  show_results(&g, &modularity, &merges, stdout);
+  igraph_destroy(&g);
+
   igraph_vector_destroy(&modularity);
   igraph_vector_destroy(&weights);
   igraph_matrix_destroy(&merges);

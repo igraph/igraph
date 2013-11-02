@@ -22,6 +22,11 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wself-assign"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include "glpenv.h"
 #include "glpluf.h"
 #define xfault xerror

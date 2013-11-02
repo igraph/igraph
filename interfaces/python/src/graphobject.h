@@ -94,6 +94,7 @@ PyObject* igraphmodule_Graph_LCF(PyTypeObject *type, PyObject *args, PyObject *k
 PyObject* igraphmodule_Graph_Preference(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Recent_Degree(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Ring(PyTypeObject *type, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_SBM(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Star(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Tree(PyTypeObject *type, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_Watts_Strogatz(PyTypeObject *type, PyObject *args, PyObject *kwds);
@@ -213,7 +214,7 @@ PyObject* igraphmodule_Graph_community_label_propagation(igraphmodule_GraphObjec
 PyObject* igraphmodule_Graph_community_leading_eigenvector(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_leading_eigenvector_naive(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject *igraphmodule_Graph_community_multilevel(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
-PyObject *igraphmodule_Graph_community_optimal_modularity(igraphmodule_GraphObject *self);
+PyObject *igraphmodule_Graph_community_optimal_modularity(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_spinglass(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_community_walktrap(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_modularity(igraphmodule_GraphObject* self, PyObject *args, PyObject *kwds);

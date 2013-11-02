@@ -50,14 +50,15 @@ int igraph_biguint_extend(igraph_biguint_t *b, limb_t l) {
 }
 
 int igraph_biguint_size(igraph_biguint_t *b) {
-  return igraph_vector_limb_size(&b->v);
+  return (int) igraph_vector_limb_size(&b->v);
 }
 
 int igraph_biguint_resize(igraph_biguint_t *b, int newlength) {
-  long int origlen=igraph_biguint_size(b);
+  int origlen=igraph_biguint_size(b);
   IGRAPH_CHECK(igraph_vector_limb_resize(&b->v, newlength));
   if (newlength > origlen) {
-    memset(VECTOR(b->v) + origlen, 0, (newlength-origlen) * sizeof(limb_t));
+    memset(VECTOR(b->v) + origlen, 0,
+	   (size_t) (newlength-origlen) * sizeof(limb_t));
   }
   return 0;
 }
@@ -73,13 +74,13 @@ int igraph_biguint_zero(igraph_biguint_t *b) {
 
 int igraph_biguint_set_limb(igraph_biguint_t *b, int value) {
   IGRAPH_CHECK(igraph_vector_limb_resize(&b->v, 1));
-  VECTOR(b->v)[0]=value;
+  VECTOR(b->v)[0]=(limb_t) value;
   return 0;
 }
 
 igraph_real_t igraph_biguint_get(igraph_biguint_t *b) {
-  long int size=igraph_biguint_size(b);
-  long int i;
+  int size=igraph_biguint_size(b);
+  int i;
   double val=VECTOR(b->v)[size-1];
   if (size==0) { return 0.0; }
   for (i=size-2; i>=0; i--) {
@@ -90,22 +91,22 @@ igraph_real_t igraph_biguint_get(igraph_biguint_t *b) {
 }
 
 int igraph_biguint_compare_limb(igraph_biguint_t *b, limb_t l) {
-  long int n=igraph_biguint_size(b);
-  return bn_cmp_limb(VECTOR(b->v), l, n);
+  int n=igraph_biguint_size(b);
+  return bn_cmp_limb(VECTOR(b->v), l, (count_t) n);
 }
 
 int igraph_biguint_compare(igraph_biguint_t *left, igraph_biguint_t *right) {
   /* bn_cmp requires the two numbers to have the same number of limbs,
      so we do this partially by hand here */
-  long int size_left=igraph_biguint_size(left);
-  long int size_right=igraph_biguint_size(right);
+  int size_left=igraph_biguint_size(left);
+  int size_right=igraph_biguint_size(right);
   while (size_left > size_right) { 
     if (VECTOR(left->v)[--size_left] > 0) { return +1; }
   }
   while (size_right > size_left) {
     if (VECTOR(right->v)[--size_right] > 0) { return -1; }
   }
-  return bn_cmp( VECTOR(left->v), VECTOR(right->v), size_right );
+  return bn_cmp( VECTOR(left->v), VECTOR(right->v), (count_t) size_right );
 }
 
 
@@ -136,12 +137,12 @@ int igraph_biguint_dec(igraph_biguint_t *res, igraph_biguint_t *b) {
 
 int igraph_biguint_add_limb(igraph_biguint_t *res, igraph_biguint_t *b, 
 			    limb_t l) {
-  long int nlimb=igraph_biguint_size(b);
+  int nlimb=igraph_biguint_size(b);
   limb_t carry;
   
   if (res != b) { IGRAPH_CHECK(igraph_biguint_resize(res, nlimb)); }
   
-  carry=bn_add_limb( VECTOR(res->v), VECTOR(b->v), l, nlimb);
+  carry=bn_add_limb( VECTOR(res->v), VECTOR(b->v), l, (count_t) nlimb);
   if (carry) { 
     IGRAPH_CHECK(igraph_biguint_extend(res, carry));
   }
@@ -150,24 +151,24 @@ int igraph_biguint_add_limb(igraph_biguint_t *res, igraph_biguint_t *b,
 
 int igraph_biguint_sub_limb(igraph_biguint_t *res, igraph_biguint_t *b, 
 			    limb_t l) {
-  long int nlimb=igraph_biguint_size(b);
+  int nlimb=igraph_biguint_size(b);
   
   if (res != b) { IGRAPH_CHECK(igraph_biguint_resize(res, nlimb)); }
 
   /* We don't check the return value here */
-  bn_sub_limb( VECTOR(res->v), VECTOR(b->v), l, nlimb);
+  bn_sub_limb( VECTOR(res->v), VECTOR(b->v), l, (count_t) nlimb);
 
   return 0;
 }
 
 int igraph_biguint_mul_limb(igraph_biguint_t *res, igraph_biguint_t *b,
 			    limb_t l) {
-  long int nlimb=igraph_biguint_size(b);
+  int nlimb=igraph_biguint_size(b);
   limb_t carry;
   
   if (res!= b) { IGRAPH_CHECK(igraph_biguint_resize(res, nlimb)); }
   
-  carry=bn_mul_limb( VECTOR(res->v), VECTOR(b->v), l, nlimb);
+  carry=bn_mul_limb( VECTOR(res->v), VECTOR(b->v), l, (count_t) nlimb);
   if (carry) { 
     IGRAPH_CHECK(igraph_biguint_extend(res, carry));
   }
@@ -177,8 +178,8 @@ int igraph_biguint_mul_limb(igraph_biguint_t *res, igraph_biguint_t *b,
 int igraph_biguint_add(igraph_biguint_t *res, igraph_biguint_t *left, 
 		       igraph_biguint_t *right) {
 
-  long int size_left=igraph_biguint_size(left);
-  long int size_right=igraph_biguint_size(right);
+  int size_left=igraph_biguint_size(left);
+  int size_right=igraph_biguint_size(right);
   limb_t carry;
 
   if (size_left > size_right) { 
@@ -190,7 +191,8 @@ int igraph_biguint_add(igraph_biguint_t *res, igraph_biguint_t *left,
   }
   IGRAPH_CHECK(igraph_biguint_resize(res, size_left));
   
-  carry=bn_add( VECTOR(res->v), VECTOR(left->v), VECTOR(right->v), size_left);
+  carry=bn_add( VECTOR(res->v), VECTOR(left->v), VECTOR(right->v), 
+		(count_t) size_left);
   if (carry) {
     IGRAPH_CHECK(igraph_biguint_extend(res, carry));
   }
@@ -200,8 +202,8 @@ int igraph_biguint_add(igraph_biguint_t *res, igraph_biguint_t *left,
 int igraph_biguint_sub(igraph_biguint_t *res, igraph_biguint_t *left, 
 		       igraph_biguint_t *right) {
  
-  long int size_left=igraph_biguint_size(left);
-  long int size_right=igraph_biguint_size(right);
+  int size_left=igraph_biguint_size(left);
+  int size_right=igraph_biguint_size(right);
   
   if (size_left > size_right) { 
     IGRAPH_CHECK(igraph_biguint_resize(right, size_left));
@@ -213,7 +215,8 @@ int igraph_biguint_sub(igraph_biguint_t *res, igraph_biguint_t *left,
   IGRAPH_CHECK(igraph_biguint_resize(res, size_left));
 
   /* We don't check return value, left should not be smaller than right! */
-  bn_sub( VECTOR(res->v), VECTOR(left->v), VECTOR(right->v), size_left);
+  bn_sub( VECTOR(res->v), VECTOR(left->v), VECTOR(right->v), 
+	  (count_t) size_left);
   
   return 0;
 }
@@ -221,8 +224,8 @@ int igraph_biguint_sub(igraph_biguint_t *res, igraph_biguint_t *left,
 int igraph_biguint_mul(igraph_biguint_t *res, igraph_biguint_t *left,
 		       igraph_biguint_t *right) {
 
-  long int size_left=igraph_biguint_size(left);
-  long int size_right=igraph_biguint_size(right);
+  int size_left=igraph_biguint_size(left);
+  int size_right=igraph_biguint_size(right);
   
   if (size_left > size_right) { 
     IGRAPH_CHECK(igraph_biguint_resize(right, size_left));
@@ -233,7 +236,8 @@ int igraph_biguint_mul(igraph_biguint_t *res, igraph_biguint_t *left,
   }
   IGRAPH_CHECK(igraph_biguint_resize(res, 2*size_left));
   
-  bn_mul( VECTOR(res->v), VECTOR(left->v), VECTOR(right->v), size_left );
+  bn_mul( VECTOR(res->v), VECTOR(left->v), VECTOR(right->v), 
+	  (count_t) size_left );
   return 0;
 }
 
@@ -241,11 +245,11 @@ int igraph_biguint_div(igraph_biguint_t *q, igraph_biguint_t *r,
 		       igraph_biguint_t *u, igraph_biguint_t *v) {
 
   int ret;
-  long int size_q=igraph_biguint_size(q);
-  long int size_r=igraph_biguint_size(r);
-  long int size_u=igraph_biguint_size(u);
-  long int size_v=igraph_biguint_size(v);
-  long int size_qru = size_q > size_r ? size_q : size_r;
+  int size_q=igraph_biguint_size(q);
+  int size_r=igraph_biguint_size(r);
+  int size_u=igraph_biguint_size(u);
+  int size_v=igraph_biguint_size(v);
+  int size_qru = size_q > size_r ? size_q : size_r;
   size_qru = size_u > size_qru ? size_u : size_qru;
   
   if (size_q < size_qru) { IGRAPH_CHECK(igraph_biguint_resize(q, size_qru)); }
@@ -253,7 +257,7 @@ int igraph_biguint_div(igraph_biguint_t *q, igraph_biguint_t *r,
   if (size_u < size_qru) { IGRAPH_CHECK(igraph_biguint_resize(u, size_qru)); }
 
   ret=bn_div( VECTOR(q->v), VECTOR(r->v), VECTOR(u->v), VECTOR(v->v), 
-	      size_qru, size_v );
+	      (count_t) size_qru, (count_t) size_v );
   
   if (ret) {
     IGRAPH_ERROR("Bigint division by zero", IGRAPH_EDIVZERO);
@@ -273,14 +277,14 @@ int igraph_biguint_fprint(igraph_biguint_t *b, FILE *file) {
   /* It is hard to control memory allocation for the bn2d function,
      so we do our own version */
 
-  long int n=igraph_biguint_size(b);
+  int n=igraph_biguint_size(b);
   long int size=12*n+1;
   igraph_biguint_t tmp;
   char *dst;
   limb_t r;
 
   /* Zero? */
-  if (!bn_cmp_limb(VECTOR(b->v), 0, n)) {
+  if (!bn_cmp_limb(VECTOR(b->v), 0, (count_t) n)) {
     fputs("0", file);
     return 0;
   }
@@ -295,9 +299,9 @@ int igraph_biguint_fprint(igraph_biguint_t *b, FILE *file) {
   
   size--;
   dst[size]='\0';
-  while (0 != bn_cmp_limb(VECTOR(tmp.v), 0, n)) {
-    r=bn_div_limb(VECTOR(tmp.v), VECTOR(tmp.v), 10, n);
-    dst[--size] = '0' + r;
+  while (0 != bn_cmp_limb(VECTOR(tmp.v), 0, (count_t) n)) {
+    r=bn_div_limb(VECTOR(tmp.v), VECTOR(tmp.v), 10, (count_t) n);
+    dst[--size] = '0' + (char) r;
   }
 
   fputs(&dst[size], file);

@@ -40,6 +40,12 @@ AT_COMPILE_CHECK([simple/igraph_intersection.c],
 	[simple/igraph_intersection.out])
 AT_CLEANUP
 
+AT_SETUP([Intersection 2 (igraph_intersection, igraph_intersection_many):])
+AT_KEYWORDS([igraph_intersection, igraph_intersection_many, intersection])
+AT_COMPILE_CHECK([simple/igraph_intersection2.c],
+	[simple/igraph_intersection2.out])
+AT_CLEANUP
+
 AT_SETUP([Difference (igraph_difference):])
 AT_KEYWORDS([igraph_difference, difference])
 AT_COMPILE_CHECK([simple/igraph_difference.c], 

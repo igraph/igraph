@@ -34,6 +34,8 @@
 # define __END_DECLS /* empty */
 #endif
 
+#include "igraph_vector.h"
+
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
@@ -81,6 +83,8 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
 void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos);
 void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int(*compar)(const void*, const void*));
+int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
+				const igraph_vector_int_t *idx);
 
 igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector_ptr_t *v);
 igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(igraph_vector_ptr_t *v,

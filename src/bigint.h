@@ -44,6 +44,7 @@
 
 #define BASE_LIMB
 #include "igraph_pmt.h"
+#include "igraph_vector_type.h"
 #include "igraph_vector_pmt.h"
 #include "igraph_pmt_off.h"
 #undef BASE_LIMB

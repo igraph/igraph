@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int print_vector(igraph_vector_t *v) {
+void print_vector(igraph_vector_t *v) {
   long int i, l=igraph_vector_size(v);
   for (i=0; i<l; i++) {
     printf(" %li", (long int) VECTOR(*v)[i]);
@@ -37,6 +37,7 @@ int main() {
   igraph_vector_t v;
   igraph_vector_ptr_t glist;
   igraph_t g1, g2, g3;
+  igraph_vector_t edge_map1, edge_map2;
 
   igraph_vector_init_int_end(&v, -1, 0,1, 1,2, 2,3, -1);
   igraph_create(&left, &v, 0, IGRAPH_DIRECTED);
@@ -45,19 +46,28 @@ int main() {
   igraph_vector_init_int_end(&v, -1, 1,0, 5,4, 1,2, 3,2, -1);
   igraph_create(&right, &v, 0, IGRAPH_DIRECTED);
   igraph_vector_destroy(&v);
+
+  igraph_vector_init(&edge_map1, 0);
+  igraph_vector_init(&edge_map2, 0);
   
-  igraph_intersection(&isec, &left, &right);
+  igraph_intersection(&isec, &left, &right, &edge_map1, &edge_map2);
   igraph_vector_init(&v, 0);
   igraph_get_edgelist(&isec, &v, 0);
+  printf("---\n");
   print_vector(&v);
+  print_vector(&edge_map1);
+  print_vector(&edge_map2);
+  printf("---\n");
   igraph_vector_destroy(&v);
   igraph_destroy(&left);
   igraph_destroy(&right);
-  igraph_destroy(&isec);    
+  igraph_destroy(&isec);
+  igraph_vector_destroy(&edge_map1);
+  igraph_vector_destroy(&edge_map2);
 
   /* empty graph list */
   igraph_vector_ptr_init(&glist, 0);
-  igraph_intersection_many(&isec, &glist);
+  igraph_intersection_many(&isec, &glist, 0);
   if (igraph_vcount(&isec) != 0 || !igraph_is_directed(&isec)) {
     return 1;
   }
@@ -77,7 +87,7 @@ int main() {
   VECTOR(glist)[0]=&g1;
   VECTOR(glist)[1]=&g2;
   VECTOR(glist)[2]=&g3;
-  igraph_intersection_many(&isec, &glist);
+  igraph_intersection_many(&isec, &glist, 0);
   if (igraph_ecount(&isec) != 0 || igraph_vcount(&isec) != 10) {
     return 2;
   }
@@ -102,7 +112,7 @@ int main() {
   VECTOR(glist)[0]=&g1;
   VECTOR(glist)[1]=&g2;
   VECTOR(glist)[2]=&g3;
-  igraph_intersection_many(&isec, &glist);
+  igraph_intersection_many(&isec, &glist, 0);
   igraph_write_graph_edgelist(&isec, stdout);
   igraph_destroy(&g1);
   igraph_destroy(&g2);

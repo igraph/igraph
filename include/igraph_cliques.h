@@ -44,12 +44,28 @@ __BEGIN_DECLS
 /* Cliques, maximal independent vertex sets           */
 /* -------------------------------------------------- */
 
+int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
+                   igraph_integer_t min_size, igraph_integer_t max_size);
+int igraph_maximal_cliques_file(const igraph_t *graph,
+				FILE *outfile,
+				igraph_integer_t min_size, 
+				igraph_integer_t max_size);
+int igraph_maximal_cliques_count(const igraph_t *graph,
+				 igraph_integer_t *res, 
+				 igraph_integer_t min_size, 
+				 igraph_integer_t max_size);
+int igraph_maximal_cliques_subset(const igraph_t *graph,
+				  igraph_vector_int_t *subset,
+				  igraph_vector_ptr_t *res,
+				  igraph_integer_t *no,
+				  FILE *outfile,
+				  igraph_integer_t min_size,
+				  igraph_integer_t max_size);
+
 int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                    igraph_integer_t min_size, igraph_integer_t max_size);
 int igraph_largest_cliques(const igraph_t *graph, 
 			   igraph_vector_ptr_t *cliques);
-int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
-                   igraph_integer_t min_size, igraph_integer_t max_size);
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no);
 int igraph_independent_vertex_sets(const igraph_t *graph,
 				   igraph_vector_ptr_t *res,

@@ -52,6 +52,12 @@ AT_COMPILE_CHECK([simple/igraph_get_shortest_paths.c],
 		 [simple/igraph_get_shortest_paths.out])
 AT_CLEANUP
 
+AT_SETUP([Get the shortest paths #2 (igraph_get_shortest_paths): ])
+AT_KEYWORDS([igraph_get_shortest_paths shortest paths geodesic])
+AT_COMPILE_CHECK([simple/igraph_get_shortest_paths2.c], 
+		 [simple/igraph_get_shortest_paths2.out])
+AT_CLEANUP
+
 AT_SETUP([Weighted shortest paths (Dijkstra): ])
 AT_KEYWORDS([igraph_shortest_paths_dijkstra Dijkstra shortest paths geodesic])
 AT_COMPILE_CHECK([simple/dijkstra.c], [simple/dijkstra.out])

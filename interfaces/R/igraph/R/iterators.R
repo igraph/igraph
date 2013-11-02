@@ -368,12 +368,18 @@ as.igraph.vs <- function(graph, v, na.ok=FALSE) {
       stop("Invalid vertex names")
     }
     v
-  } else if (is.logical(v)) {
-    as.vector(V(graph))[v]
-  } else if (is.numeric(v) && any(v<=0)){
-    as.vector(V(graph))[v]
   } else {
-    as.numeric(v)
+    if (is.logical(v)) {
+      res <- as.vector(V(graph))[v]
+    } else if (is.numeric(v) && any(v<0)){
+      res <- as.vector(V(graph))[v]
+    } else {
+      res <- as.numeric(v)
+    }
+    if (!na.ok && any(is.na(res))) {
+      stop("Invalid vertex name(s)")
+    }
+    res
   }
 }
 

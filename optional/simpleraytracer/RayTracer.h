@@ -11,6 +11,8 @@
 #include "Color.h"
 #include "Light.h"
 
+namespace igraph {
+
 class Image
 {
  public: 
@@ -55,5 +57,7 @@ private:
 	int mRecursionLimit;
 	int mAntiAliasDetail;
 };
+
+} // namespace igraph
 
 #endif

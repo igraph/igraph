@@ -1,0 +1,1 @@
+<a href="http://www.inside-r.org/packages/cran/{{ include.p }}"><code class="rman">{{ include.p }}</code></a>

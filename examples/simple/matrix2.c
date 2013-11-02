@@ -80,9 +80,9 @@ int main() {
 
   /* igraph_matrix_set */
   printf("igraph_matrix_set\n");
-  apply(m, igraph_matrix_set(&m, i, j, i),0 );
+  apply(m, igraph_matrix_set(&m, i, j, i), (void) 0 );
   print_matrix(&m);
-  apply(m, igraph_matrix_set(&m, i, j, j),0 );
+  apply(m, igraph_matrix_set(&m, i, j, j), (void) 0 );
   print_matrix(&m);
 
   /* igraph_matrix_fill */
@@ -294,7 +294,7 @@ int main() {
   /* igraph_matrix_select_cols */
   printf("igraph_matrix_select_cols\n");
   igraph_matrix_resize(&m, 6, 5);
-  apply(m, igraph_matrix_set(&m, i, j, j),0 );
+  apply(m, igraph_matrix_set(&m, i, j, j), (void) 0 );
   igraph_vector_resize(&v, 3);
   VECTOR(v)[0]=0; VECTOR(v)[1]=4; VECTOR(v)[2]=2;
   igraph_matrix_select_cols(&m, &m2, &v);

@@ -129,6 +129,8 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
                  "lower"=3,
                  "min"=4,
                  "plus"=5)
+
+  mode(adjmatrix) <- "double"
   
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
@@ -152,6 +154,8 @@ graph.adjacency.dense <- function(adjmatrix, mode=c("directed", "undirected", "m
     attrs <- attributes(adjmatrix)
     adjmatrix <- as.numeric(adjmatrix)
     attributes(adjmatrix) <- attrs
+
+    if (!diag) { diag(adjmatrix) <- 0 }
     
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
     res <- .Call("R_igraph_graph_adjacency", adjmatrix, as.numeric(mode),
@@ -165,8 +169,6 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
                                                 "min", "upper", "lower", "plus"),
                                    weighted=NULL, diag=TRUE) {
 
-  require(Matrix)
-  
   mode <- igraph.match.arg(mode)
 
   if (!is.null(weighted)) {
@@ -712,8 +714,6 @@ graph.bipartite <- function(types, edges, directed=FALSE) {
 
 graph.incidence.sparse <- function(incidence, directed, mode, multiple,
                                    weighted) {
-  require(Matrix)
-
   n1 <- nrow(incidence)
   n2 <- ncol(incidence)
   el <- selectMethod("summary", signature=c(object="sparseMatrix"))(incidence)

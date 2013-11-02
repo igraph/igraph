@@ -38,7 +38,8 @@
                  vcount(object), " ", ecount(object), " -- ")
   w <- getOption("width")
   if (nchar(title) < w && "name" %in% list.graph.attributes(object)) {
-    title <- substring(paste(sep="", title, object$name), 1, w-1)
+    title <- substring(paste(sep="", title,
+                             as.character(object$name)[1]), 1, w-1)
   }
   cat(title, "\n", sep="")
 
@@ -290,7 +291,8 @@ summary.igraph <- function(object, ...) {
                  vcount(object), " ", ecount(object), " -- ")
   w <- getOption("width")
   if (nchar(title) < w && "name" %in% list.graph.attributes(object)) {
-    title <- substring(paste(sep="", title, object$name), 1, w-1)
+    title <- substring(paste(sep="", title,
+                             as.character(object$name)[1]), 1, w-1)
   }
   cat(title, "\n", sep="")
 

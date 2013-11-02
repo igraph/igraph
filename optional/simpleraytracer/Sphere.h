@@ -6,6 +6,8 @@
 
 #include "Shape.h"
 
+namespace igraph {
+
 class Sphere : public Shape
 {
 public:
@@ -23,5 +25,7 @@ private:
 	Point mCenter;
 	double mRadius;
 };
+
+} // namespace igraph
 
 #endif

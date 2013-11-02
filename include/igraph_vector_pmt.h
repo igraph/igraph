@@ -21,21 +21,10 @@
 
 */
 
-/** 
- * Vector, dealing with arrays efficiently.
- * \ingroup types
- */
-
-typedef struct TYPE(igraph_vector) {
-  BASE* stor_begin;
-  BASE* stor_end;
-  BASE* end;
-} TYPE(igraph_vector);
-
 /*--------------------*/
 /* Allocation         */
 /*--------------------*/
- 
+
 int FUNCTION(igraph_vector,init)(TYPE(igraph_vector)* v, long int size);
 int FUNCTION(igraph_vector,init_copy)(TYPE(igraph_vector)* v, 
 				       BASE* data, long int length);
@@ -221,6 +210,8 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
 /*-----------*/
 
 int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v);
+int FUNCTION(igraph_vector,printf)(const TYPE(igraph_vector) *v,
+																	 const char *format);
 int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file);
 
 #ifdef BASE_COMPLEX
@@ -269,3 +260,6 @@ int FUNCTION(igraph_vector,intersect_sorted)(const TYPE(igraph_vector) *v1,
 int FUNCTION(igraph_vector,index)(const TYPE(igraph_vector) *v,
                                   TYPE(igraph_vector) *newv,
                                   const igraph_vector_t *idx);
+
+int FUNCTION(igraph_vector,index_int)(TYPE(igraph_vector) *v,
+				      const igraph_vector_int_t *idx);

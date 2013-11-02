@@ -419,44 +419,48 @@ class PathTests(unittest.TestCase):
     def testGetAllShortestPaths(self):
         g = Graph(4, [(0,1), (1, 2), (1, 3), (2, 4), (3, 4), (4, 5)], directed=True)
 
+        sps = sorted(g.get_all_shortest_paths(0, 0))
+        expected = [[0]]
+        self.assertEquals(expected, sps)
+
         sps = sorted(g.get_all_shortest_paths(0, 5))
         expected = [[0, 1, 2, 4, 5], [0, 1, 3, 4, 5]]
-        self.failUnless(sps == expected)
+        self.assertEquals(expected, sps)
 
         sps = sorted(g.get_all_shortest_paths(1, 4))
         expected = [[1, 2, 4], [1, 3, 4]]
-        self.failUnless(sps == expected)
+        self.assertEquals(expected, sps)
 
         g = Graph.Lattice([5, 5], circular=False)
         
         sps = sorted(g.get_all_shortest_paths(0, 12))
         expected = [[0, 1, 2, 7, 12], [0, 1, 6, 7, 12], [0, 1, 6, 11, 12], \
                     [0, 5, 6, 7, 12], [0, 5, 6, 11, 12], [0, 5, 10, 11, 12]]
-        self.failUnless(sps == expected)
+        self.assertEquals(expected, sps)
 
         g = Graph.Lattice([100, 100], circular=False)
         sps = sorted(g.get_all_shortest_paths(0, 202))
         expected = [[0, 1, 2, 102, 202], [0, 1, 101, 102, 202], [0, 1, 101, 201, 202], \
                     [0, 100, 101, 102, 202], [0, 100, 101, 201, 202], [0, 100, 200, 201, 202]]
-        self.failUnless(sps == expected)
+        self.assertEquals(expected, sps)
 
         g = Graph.Lattice([100, 100], circular=False)
         sps = sorted(g.get_all_shortest_paths(0, [0, 202]))
-        self.failUnless(sps == [[0]] + expected)
+        self.assertEquals([[0]] + expected, sps)
 
         g = Graph([(0,1), (1,2), (0,2)])
         g.es["weight"] = [0.5, 0.5, 1]
         sps = sorted(g.get_all_shortest_paths(0, weights="weight"))
-        self.failUnless(sps == [[0], [0,1], [0,1,2], [0,2]])
+        self.assertEquals([[0], [0,1], [0,1,2], [0,2]], sps)
 
         g = Graph.Lattice([4, 4], circular=False)
         g.es["weight"] = 1
         g.es[2,8]["weight"] = 100
         sps = sorted(g.get_all_shortest_paths(0, [3, 12, 15], weights="weight"))
-        self.failUnless(len(sps) == 20)
-        self.failUnless(sum(1 for path in sps if path[-1] == 3) == 4)
-        self.failUnless(sum(1 for path in sps if path[-1] == 12) == 4)
-        self.failUnless(sum(1 for path in sps if path[-1] == 15) == 12)
+        self.assertEquals(20, len(sps))
+        self.assertEquals(4, sum(1 for path in sps if path[-1] == 3))
+        self.assertEquals(4, sum(1 for path in sps if path[-1] == 12))
+        self.assertEquals(12, sum(1 for path in sps if path[-1] == 15))
 
 
     def testPathLengthHist(self):

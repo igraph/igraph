@@ -36,11 +36,11 @@ tkigraph <- function() {
 
   options(scipen=10000)
   
-  if (!exists(".tkigraph.env", envir=.GlobalEnv)) {
-    assign(".tkigraph.env", new.env(parent=.GlobalEnv), envir=.GlobalEnv)
-    assign("graphs", list(), .tkigraph.env)
-    assign("selected", list(), .tkigraph.env)
-    assign("tklines", list(), .tkigraph.env)
+  if (!exists("window", envir=.tkigraph.env, inherits=FALSE)) {
+    assign("window", TRUE, envir=.tkigraph.env)
+    assign("graphs", list(), envir=.tkigraph.env)
+    assign("selected", list(), envir=.tkigraph.env)
+    assign("tklines", list(), envir=.tkigraph.env)
   } else {
     stop("tkigraph window is already open!")
   }
@@ -54,7 +54,7 @@ tkigraph <- function() {
   tkplace(topframe, x=0, y=0, relwidth=1.0)
   
   # Store myself in the environment if needed
-  if (!exists("top", envir=.tkigraph.env)) {
+  if (!exists("top", envir=.tkigraph.env, inherits=FALSE)) {
     assign("top", top, envir=.tkigraph.env)
     assign("topframe", topframe, envir=.tkigraph.env)
   }
@@ -294,7 +294,7 @@ tkigraph <- function() {
   top <- get("top", .tkigraph.env)
   tkbind(top, "<Destroy>", "")
   tkdestroy(top)
-  rm(.tkigraph.env, envir=.GlobalEnv)
+  rm(list=ls(envir=.tkigraph.env), envir=.tkigraph.env)
 }
 
 .tkigraph.get.selected <- function() {
@@ -1863,10 +1863,10 @@ tkigraph <- function() {
   tkinsert(txt, "end", paste("  Outer links:", comm$outer.links, "\n"))
 
   tkinsert(txt, "end", "\nThe community:\n")
-  con <- textConnection(".tkigraph.ttt", open="w")
+  con <- textConnection(NULL, open="w", local=TRUE)
   cat(sort(comm$community), file=con, fill=TRUE, sep=", ")
+  tkinsert(txt, "end", textConnectionValue(con))
   close(con)
-  tkinsert(txt, "end", .tkigraph.ttt)
   tkconfigure(txt, state="disabled")
 
   plot.communities <- function(simple=FALSE) {
@@ -2032,13 +2032,13 @@ tkigraph <- function() {
         stop("rownumbers argument must be TRUE, FALSE or have length nrow(dataframe)")
     oldwidth <- unlist(options("width"))
     options(width = 10000)
-    conn <- textConnection(".tkigraph.ttt", open="w")
+    conn <- textConnection(NULL, open="w", local=TRUE)
     sink(conn)
     options(max.print=10000000)
     print(dataframe, right=right)
     sink()
+    zz <- strsplit(textConnectionValue(conn), "\n", fixed=TRUE)
     close(conn)
-    zz <- strsplit(.tkigraph.ttt, "\n", fixed=TRUE)
     if (length(zz) > 1 + nrow(dataframe)) stop(
        "data frame too wide")
     options(width = oldwidth)

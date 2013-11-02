@@ -1,4 +1,4 @@
-PKG_CFLAGS=-DUSING_R -I. -Ics -Iglpk -Iglpk/amd -Iglpk/colamd \
+PKG_CFLAGS=-DUSING_R -I. -Ics -Iglpk -Iglpk/amd -Iglpk/colamd -Iplfit \
 	@CPPFLAGS@ @CFLAGS@ -DNDEBUG \
 	-DPACKAGE_VERSION=\"@PACKAGE_VERSION@\" -DINTERNAL_ARPACK \
 	-DIGRAPH_THREAD_LOCAL=/**/
