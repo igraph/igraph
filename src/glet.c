@@ -131,7 +131,7 @@ int igraph_subclique_next(const igraph_t *graph,
   igraph_integer_t no_of_edges=igraph_ecount(graph);
   igraph_vector_int_t *newidvectors=0;
   igraph_t *newgraphs=0;
-  igraph_vector_t *newweights;
+  igraph_vector_t *newweights=0;
   igraph_i_subclique_next_free_t freedata={ newidvectors, newgraphs,
                                             newweights, nc };
 
