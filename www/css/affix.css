@@ -55,18 +55,18 @@
 }
 
 /* Show and affix the side nav when space allows it */
-@media screen and (min-width: 992px) {
+@media (min-width: 992px) {
   .bs-sidebar .nav > .active > ul {
     display: block;
   }
   /* Widen the fixed sidebar */
   .bs-sidebar.affix,
   .bs-sidebar.affix-bottom {
-    width: 253px;
+    width: 213px;
   }
   .bs-sidebar.affix {
     position: fixed; /* Undo the static from mobile first approach */
-    top: 62px;
+    top: 80px;
   }
   .bs-sidebar.affix-bottom {
     position: absolute; /* Undo the static from mobile first approach */
@@ -77,10 +77,10 @@
     margin-bottom: 0;
   }
 }
-@media screen and (min-width: 1200px) {
+@media (min-width: 1200px) {
   /* Widen the fixed sidebar again */
   .bs-sidebar.affix-bottom,
   .bs-sidebar.affix {
-    width: 333px;
+    width: 263px;
   }
 }

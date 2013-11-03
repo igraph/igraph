@@ -1,5 +1,11 @@
-  
+
   Options -Indexes
   RewriteEngine on
   RewriteRule ^nightly$ /cgi-bin/nightly.py [PT]
   RewriteRule ^nightly/(.*)$ /cgi-bin/nightly.py/$1 [PT]
+
+  AuthType Basic
+  AuthName "Secured"
+  AuthUserFile .htpasswd
+  Require valid-user
+  Satisfy Any

@@ -1,17 +1,20 @@
 ---
 layout: default
 title: igraph &ndash; Network analysis software
+mainheader: Get started with igraph
+lead: Install and start using the R package, Python extension
+  or the C library.
 ---
 
 <div class="container bs-docs-container">
 
   <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3">
       <div class="bs-sidebar hidden-print" role="complementary" 
            data-spy="affix">
         <ul class="nav bs-sidenav">
           
-          <li><a href="#startr">Get started with R igraph</a>
+          <li><a href="#startr">Start with <strong>R</strong> igraph</a>
             <ul class="nav">
               <li><a href="#rinstall">Installation</a></li>
               <li><a href="#rreq">Requirements</a></li>
@@ -19,8 +22,9 @@ title: igraph &ndash; Network analysis software
               <li><a href="#rdoc1">Tutorials</a></li>
             </ul>
           </li>
-          <li><a href="#startpy">Get started with Python igraph</a></li>
-          <li><a href="#startc">Get started with C igraph</a>
+          <li><a href="#startpy">Start with <strong>Python</strong>
+            igraph</a></li>
+          <li><a href="#startc">Start with <strong>C</strong> igraph</a>
             <ul class="nav">
               <li><a href="#creq">Requirements</a></li>
               <li><a href="#cinstall">Installation</a></li>
@@ -31,7 +35,7 @@ title: igraph &ndash; Network analysis software
                 Visual C++<a></li>
               <li><a href="#ctut">Tutorials</a></li>
             </ul>
-          </li>          
+          </li>
           <li>
             <a href="#docs">Documentation</a>
             <ul class="nav">
@@ -43,6 +47,7 @@ title: igraph &ndash; Network analysis software
               <li><a href="#wiki">Wiki</a></li>
             </ul>
           </li>
+
           <li><a href="#downloads">Downloads</a>
             <ul class="nav">
               <li><a href="#rdown">R package</a></li>
@@ -52,38 +57,49 @@ title: igraph &ndash; Network analysis software
               <li><a href="#devdown">Development version</a></li>
             </ul>
           </li>
+
           <li><a href="#help">Get help</a>
             <ul class="nav">
               <li><a href="#list">Mailing list</a></li>
-              <li><a href="#so">Stach Overflow</a></li>
+              <li><a href="#so">Stack Overflow</a></li>
             </ul>
           </li>
-          <li><a href="#contribute">Contribute</a></li>
-          <li><a href="#license">License</a></li>
+
+          <li><a href="#contribute">Contribute</a>
+            <ul class="nav">
+              <li><a href="#contributebugs">Report bugs</a></li>
+              <li><a href="#contributewiki">Improve the Wiki</a></li>
+              <li><a href="#contributecode">Contribute code</a></li>
+            </ul>
+          </li>
+
         </ul>
       </div>
     </div>
 
-    <div class="col-md-8" role="main">
+    <div class="col-md-8">
       <div class="bs-docs-section">
 
         <div class="page-header">
-          <h1 id="startr">Get started with R igraph</h1>
+          <h1><span id="startr" class="anchor">&nbsp;</span>
+            Start with R igraph</h1>
         </div>
 
-        <h3 id="rinstall">Installation</h3>
+        <h3><span id="rinstall" class="anchor">&nbsp;</span>
+           Installation</h3>
         <p>
           igraph is on CRAN and can be installed from within R:
         </p>
         <p> {% gist 6952578 %} </p>
 
-        <h3 id="rreq">Requirements</h3>
+        <h3><span id="rreq" class="anchor">&nbsp;</span>Requirements</h3>
         <p>On Linux (and other Unix-like systems, but not on OSX),
           a C and a C++ compiler is needed, and also the tool
           <code>make</code>. On Debian and Ubuntu Linux the 
           <code>build-essential</code> package installs these.</p>
 
-        <h3 id="rreqopt">Optional requirements</h3>
+        <h3><span id="rreqopt" class="anchor">&nbsp;</span>
+          Optional requirements</h3>
 
         <p>
           <ul>
@@ -103,7 +119,7 @@ title: igraph &ndash; Network analysis software
           </ul>
         </p>
 
-        <h3 id="rdoc1">Tutorials</h3>
+        <h3><span id="rdoc1" class="anchor">&nbsp;</span>Tutorials</h3>
 
         <p>
           <ul>
@@ -121,7 +137,8 @@ title: igraph &ndash; Network analysis software
         </p>
 
         <div class="page-header">
-          <h1 id="startpy">Get started with Python igraph</h1>
+          <h1><span id="startpy" class="anchor">&nbsp;</span>
+            Start with Python igraph</h1>
         </div>
 
         <p>
@@ -129,10 +146,11 @@ title: igraph &ndash; Network analysis software
         </p>
 
         <div class="page-header">
-          <h1 id="startc">Get started with C igraph</h1>
+          <h1><span id="startc" class="anchor">&nbsp;</span>
+            Start with C igraph</h1>
         </div>
 
-        <h3 id="creq">Requirements</h3>
+        <h3><span id="creq" class="anchor">&nbsp;</span>Requirements</h3>
         <p>
           Make sure you have the following before installing igraph:
           <ul>
@@ -152,7 +170,7 @@ title: igraph &ndash; Network analysis software
           <code>libxml2-dev</code> packages is sufficient.
         </p>
 
-        <h3 id="cinstall">Installation</h3>
+        <h3><span id="cinstall" class="anchor">&nbsp;</span>Installation</h3>
         <p>
           The standard installation method uses the
           <code>autoconf</code>/<code>automake</code> toolset. After
@@ -164,14 +182,16 @@ title: igraph &ndash; Network analysis software
           useful to spot problems early on.
         </p>
 
-        <h3 id="cinstallosx">Installation on Mac OS X</h3>
+        <h3><span id="cinstallosx" class="anchor">&nbsp;</span>
+          Installation on Mac OS X</h3>
         <p>
           You can use the regular Unix way (as above), or
           <a href="http://brew.sh/">Homebrew</a>, the
           <code>homebrew/science/igraph</code> formula.
         </p>
 
-        <h3 id="cinstallcygwin">Installation on Windows under Cygwin</h3>
+        <h3><span id="cinstallcygwin" class="anchor">&nbsp;</span>
+          Installation on Windows under Cygwin</h3>
         <p>
           One way to install igraph on Windows is to use 
           <a href="http://www.cygwin.com/">Cygwin</a>. From a Cygwin
@@ -179,8 +199,8 @@ title: igraph &ndash; Network analysis software
           above.
         </p>
 
-        <h3 id="cinstallmsvc">Installation on Windows using
-          Microsoft Visual C++</h3>
+        <h3><span id="cinstallmsvc" class="anchor">&nbsp;</span>
+          Installation on Windows using Microsoft Visual C++</h3>
         <p>
           It is also possible to use Microsoft Visual C++
           (MSVC). Download the ZIP file made for MSVC, uncompress it,
@@ -192,7 +212,7 @@ title: igraph &ndash; Network analysis software
             Windows port</a> of <code>libxml2</code>.
         </p>
 
-        <h3 id="ctut">Tutorials</h3>
+        <h3><span id="ctut" class="anchor">&nbsp;</span>Tutorials</h3>
         <p>
           <ul>
             <li>The source code comes with some examples (also used
@@ -204,10 +224,10 @@ title: igraph &ndash; Network analysis software
         </p>
 
         <div class="page-header">
-          <h1 id="docs">Documentation</h1>
+          <h1><span id="docs" class="anchor">&nbsp;</span>Documentation</h1>
         </div>
 
-        <h3 id="rmanual">R manual pages</h3>
+        <h3><span id="rmanual" class="anchor">&nbsp;</span>R manual pages</h3>
         <p>
           <ul class="icons-ul list-unstyled">
             <li><i class="icon-li icon-link"></i>
@@ -223,7 +243,7 @@ title: igraph &ndash; Network analysis software
           or <code>help("igraph")</code> as a starting point.
         </p>
 
-        <h3 id="pymanual">Python manual</h3>
+        <h3><span id="pymanual" class="anchor">&nbsp;</span>Python manual</h3>
         <p>
           <ul class="icons-ul list-unstyled">
             <li><i class="icon-li icon-link"></i>
@@ -243,7 +263,8 @@ title: igraph &ndash; Network analysis software
           the built-in Python help facility as well.
         </p>
 
-        <h3 id="cmanual">C Reference Manual</h3>
+        <h3><span id="cmanual" class="anchor">&nbsp;</span>
+          C Reference Manual</h3>
         <p>
           <ul class="icons-ul list-unstyled">
             <li><i class="icon-li icon-link"></i>
@@ -264,7 +285,8 @@ title: igraph &ndash; Network analysis software
           github</a>.
         </p>
 
-        <h3 id="screenshots">Screenshots and examples</h3>
+        <h3><span id="screenshots" class="anchor">&nbsp;</span>
+          Screenshots and examples</h3>
         <p>
           TODO
         </p>
@@ -274,16 +296,16 @@ title: igraph &ndash; Network analysis software
               igraph wiki.</a>
         </p>
 
-        <h3 id="wiki">Wiki</h3>
+        <h3><span id="wiki" class="anchor">&nbsp;</span>Wiki</h3>
         <p>
           TODO
         </p>
 
         <div class="page-header">
-          <h1 id="downloads">Downloads</h1>
+          <h1><span id="downloads" class="anchor">&nbsp;</span>Downloads</h1>
         </div>
 
-        <h3 id="rdown">R package</h3>
+        <h3><span id="rdown" class="anchor">&nbsp;</span>R package</h3>
         <p>
           <small> Note: the simplest way to install the igraph R
             package is typing <code>install.packages("igraph")</code>
@@ -300,7 +322,8 @@ title: igraph &ndash; Network analysis software
           </ul>
         </p>
 
-        <h3 id="pydown">Python extension module</h3>
+        <h3><span id="pydown" class="anchor">&nbsp;</span>
+          Python extension module</h3>
         <p>
           <ul class="icons-ul list-unstyled">
             <li><i class="icon-li icon-windows"></i>
@@ -320,7 +343,7 @@ title: igraph &ndash; Network analysis software
           </ul>
         </p>
 
-        <h3 id="cdown">C library</h3>
+        <h3><span id="cdown" class="anchor">&nbsp;</span>C library</h3>
         <p>
           <ul class="icons-ul list-unstyled">
             <li><i class="icon-li icon-file-text"></i>
@@ -331,13 +354,15 @@ title: igraph &ndash; Network analysis software
           </ul>
         </p>
 
-        <h3 id="nightlydown">Nightly builds</h3>
+        <h3><span id="nightlydown" class="anchor">&nbsp;</span>
+          Nightly builds</h3>
         <p>
           Builds from our development branch(es) are available from
-          <a href="http://nightly.igraph.org">our nightly build server</a>.
+          <a href="http://igraph.org/nightly">our nightly build server</a>.
         </p>
 
-        <h3 id="devdown">Development version</h3>
+        <h3><span id="devdown" class="anchor">&nbsp;</span>
+          Development version</h3>
         <p>
           Clone (or fork) the <code>develop</code> branch from the
           <a href="https://github.com/igraph/igraph">igraph git
@@ -345,18 +370,20 @@ title: igraph &ndash; Network analysis software
         </p>
 
         <div class="page-header">
-          <h1 id="help">Get help</h1>
+          <h1><span id="help" class="anchor">&nbsp;</span>Get help</h1>
         </div>
 
-        <h3 id="list">Mailing list</h3>
+        <h3><span id="list" class="anchor">&nbsp;</span>Mailing list</h3>
         <p>
           Post a question on the
           <a href="https://lists.nongnu.org/mailman/listinfo/igraph-help">
             igraph-help mailing list</a>. To avoid spam
-          on the list, you need to sign up first.
+          on the list, you need to sign up first. You can also 
+          <a href="http://lists.nongnu.org/archive/html/igraph-help/">
+          search the mailing list.</a>
         </p>
 
-        <h3 id="so">Stack Overflow</h3>
+        <h3><span id="so" class="anchor">&nbsp;</span>Stack Overflow</h3>
         <p>
           Post specific igraph questions on
           <a href="http://stackoverflow.com/questions/tagged/igraph">
@@ -366,56 +393,39 @@ title: igraph &ndash; Network analysis software
         </p>
 
         <div class="page-header">
-          <h1 id="contribute">Contribute</h1>
+          <h1><span id="contribute" class="anchor">&nbsp;</span>Contribute</h1>
         </div>
 
         <p>
-          Your contribution is welcome:
-          <ul>
-            <li>Report bugs or suggest new features or algorithms in
-              the <a href="https://github.com/igraph/igraph/issues">
-              github issue tracker</a>.</li>
-            <li>Add your work to the gallery in the
-              <a href="https://github.com/igraph/igraph/wiki">
-                igraph wiki</a>.</li>
-            <li>Send a pull request on
-              <a href="https://github.com/igraph/igraph">
-                github</a>.</li>
-          </ul>
-          Please note that igraph can contain only code that is
-          compatible with its GPL license.
+          Your contribution is more than welcome!
+        </p>
+        
+        <h3><span id="contributecode" class="anchor">&nbsp;</span>
+          Report bugs</h3>
+
+        <p>Report bugs or suggest new features or algorithms in the 
+          <a href="https://github.com/igraph/igraph/issues">
+          github issue tracker</a>.
+        </p>
+        
+        <h3><span id="contributewiki" class="anchor">&nbsp;</span>
+          Improve the wiki</h3>
+        
+        <p>Add your work to the gallery in the
+          <a href="https://github.com/igraph/igraph/wiki">
+                igraph wiki</a>.
         </p>
 
-        <div class="page-header">
-          <h1 id="license">License</h1>
-        </div>
+        <h3><span id="contributecode" class="anchor">&nbsp;</span>
+          Contribute code</h3>
+          
+        <p>Send a pull request on <a href="https://github.com/igraph/igraph">
+                github.</a> Please note that igraph can contain only
+          code that is compatible with its GPL license.
+        </p>
 
-        <p>
-          igraph library. Copyright &copy; 2003-2013 Gábor Csárdi
-          <code>&lt;csardi.gabor@gmail.com></code> and
-          Tamás Nepusz <code>&lt;ntamas@gmail.com></code>
-        </p>
-        <p>
-          This program is free software; you can redistribute it
-          and/or modify it under the terms of the GNU General Public
-          License as published by the Free Software Foundation; either
-          version 2 of the License, or (at your option) any later
-          version.
-        </p>
-        <p>
-          This program is distributed in the hope that it will be
-          useful, but WITHOUT ANY WARRANTY; without even the implied
-          warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-          PURPOSE. See the GNU General Public License for more
-          details.
-        </p>
-        <p>
-          You should have received a copy of the GNU General Public
-          License along with this program; if not, write to the Free
-          Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
-          Boston, MA 02110-1301 USA.
-        </p>
       </div>
-      </div>
+    </div>
   </div>
+
 </div>

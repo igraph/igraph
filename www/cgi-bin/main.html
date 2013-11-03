@@ -1,25 +1,11 @@
 ---
 layout: default
 title: igraph nightly builds
+mainheader: Nightly builds
+lead: Nightly builds from our active development branches
 ---
 
 {% raw %}
-
-    <div class="jumbotron">
-      <div class="container">
-        <h1 class="hidden-xs mainheader">
-          <img src="http://igraph.org/img/igraph2.svg"> igraph
-          nightly builds
-        </h1>
-        <h1 class="visible-xs">
-            igraph<br/>
-	    nightly builds
-        </h1>
-        <p class="lead">
-	  Nightly builds from branches under active development.
-        </p>
-      </div>
-    </div>
 
     <div class="container">
       <div class="col-xs-12" role="main">
@@ -120,9 +106,14 @@ title: igraph nightly builds
 
 	    </tr></thead>
 	    <tbody>
+              % prev = None
 	      % for file in files:
-	      %   filename=file['filename']
-              <tr>
+                % if prev != None and prev == file['version']:
+                    <tr>
+                % else:
+                    <tr class="tr-first-in-group">
+                % end
+	        % filename=file['filename']
 		<td><a href="{{baseurl}}/get/{{filename}}">
 		    <i class="icon-download"></i></a></td>
 		<td>{{urlmap[file['type']]}}</td>
@@ -152,6 +143,7 @@ title: igraph nightly builds
 		  % end
 		</a></td>
 	      </tr>
+              % prev = file['version']
 	      % end
 	    </tbody>
 	  </table>

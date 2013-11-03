@@ -1,0 +1,283 @@
+---
+layout: newstemp
+title: igraph 0.5.1
+date: July 14, 2008
+---
+
+igraph 0.5.1
+============
+
+July 14, 2008
+
+igraph 0.5.1 Release Notes
+--------------------------
+
+igraph 0.5.1 is a bugfix release, but it actually contains many 
+important new things as well. Here is a brief summary about each of 
+them. See below for the complete list of changes.
+
+### [C][R][PY] The DrL layout generator was added
+
+This is a sophisticated and efficient layout generator written by 
+Shawn Martin and colleagues. See more in the 
+<a href="doc-0.5.1/R/layout.drl.html">R manual</a>, in the 
+<a href="">Python documentation</a>
+or in the <a href="doc-0.5.1/html/ch14s01s04.html">C library reference
+manual.</a>
+
+### [C][R][PY] Uniform sampling of random graphs with given degree sequence
+
+A nice random graph generator that conditions on the degree of vertices 
+was added. It can generate undirected connected graphs.
+The algorithm and the implementation was done by Fabien Viger and Matthieu Latapy.
+See more in the 
+<a href="doc-0.5.1/R/degree.sequence.game.html">R manual</a>, 
+in the <a href="">Python documentation</a> or in the 
+<a href="doc-0.5.1/html/igraph_degree_sequence_game.html">C library
+reference manual.</a>
+
+### [R] Conversions
+
+igraph includes some functions to convert graphs to and from 
+`graphNEL` objects as defined in the graph package
+(<a href="doc-0.5.1/R/graphNEL.html">`igraph.to.graphNEL`</a>,
+<a href="doc-0.5.1/R/graphNEL.html">`igraph.from.graphNEL`</a>) and 
+sparse matrices using the Matrix package 
+(<a href="doc-0.5.1/R/conversion.html">`get.adjacency`</a>, 
+<a href="doc-0.5.1/R/graph.adjacency.html">`graph.adjacency`</a>,
+see the `sparse` argument).
+
+### [R] New graph constructors
+
+A new function was added to create graphs from adjacency lists
+(<a href="doc-0.5.1/R/graph.adjlist.html">`graph.adjlist`</a>), 
+and <a href="doc-0.5.1/R/graph.data.frame.html">`graph.data.frame`</a>
+has an argument call `vertices`, this allows easy
+construction of graphs with vertex and edge meta data.
+
+### [C][R][PY] Weighted shortest path algorithms
+
+Both the Dijkstra and the Belmann-Ford algorithms were added. 
+See more in the 
+<a href="doc-0.5.1/R/shortest.paths.html">R documentation</a>, the
+<a href="doc-0.5.1/python/igraph.GraphBase-class.html#shortest_paths">Python manual</a> or in the 
+<a href="doc-0.5.1/html/ch10s02.html">C library reference manual.</a>
+
+### [C][R][PY] Function to test edge reciprocity
+
+Mutuality can be tested for each edge now. See more in the 
+<a href="doc-0.5.1/R/is.mutual.html">R documentation</a>, in the 
+<a href="">Python manual</a>, or in the 
+<a href="doc-0.5.1/html/igraph_is_mutual.html">C reference manual.</a>
+
+### [R] Vertex shapes
+
+The R interface now supports different vertex shapes when plotting. 
+See more in the <a href="doc-0.5.1/R/igraph.vertex.shapes.html">R documentation.</a>
+
+New in the R interface
+----------------------
+
+- A new layout generator called DrL.
+- Uniform sampling of random connected undirected graphs with a 
+  given degree sequence.
+- Edge labels are plotted at 1/3 of the edge, this is better if 
+  the graph has mutual edges.
+- Initial and experimental vertex shape support in `plot`.
+- New function, `graph.adjlist` creates igraph graphs from
+  adjacency lists.
+- Conversion to/from graphNEL graphs, from the `graph` R package.
+- Fastgreedy community detection can utilize edge weights now, this 
+  was missing from the R interface.
+- The `arrow.width` graphical parameter was added.
+- `graph.data.frame` has a new argument `vertices`.
+- `graph.adjacency` and `get.adjacency` support sparse matrices, 
+  the `Matrix` package is required to use this functionality.
+- `graph.adjacency` adds column/row names as `name` attribute.
+- Weighted shortest paths using Dijkstra's or the Belmann-Ford 
+  algorithm.
+- Shortest path functions return `Inf` for unreachable vertices.
+- New function `is.mutual` to find mutual edges in a directed graph.
+- Added inverse log-weighted similarity measure (a.k.a. Adamic/Adar
+  similarity).
+- `preference.game` and `asymmetric.preference.game` were 
+  rewritten, they are O(|V|+|E|) now, instead of O(|V|^2).
+- Edge weight support in function `get.shortest.paths`, it uses 
+  Dijkstra's algorithm.
+
+Bugs corrected in the R interface
+---------------------------------
+  
+- A bug was corrected in `write.pajek.bgraph`.
+- Several bugs were corrected in `graph.adjacency`.
+- Pajek reader bug corrected, used to segfault if `*Vertices`
+  was missing.
+- Directedness is handled correctly when writing GML files.
+  (But note that 'correct' conflicts the standard here.)
+- Corrected a bug when calculating weighted, directed PageRank on an 
+  undirected graph. (Which does not make sense anyway.)
+- Several bugs were fixed in the Reingold-Tilford layout to avoid 
+  edge crossings.
+- A bug was fixed in the GraphML reader, when the value of a graph
+  attribute was not specified.
+- Fixed a bug in the graph isomorphism routine for small (3-4 vertices)
+  graphs.
+- Corrected the random sampling implementation (`igraph_random_sample`),
+  now it always generates unique numbers. This affects the 
+  G(n,m) Erdos-Renyi generator, it always generates simple graphs now.
+- The basic igraph constructor (`igraph_empty_attrs`, all functions 
+  are expected to call this internally) now checks whether the number
+  of vertices is finite.
+- The LGL, NCOL and Pajek graph readers handle errors properly now.
+- The non-symmetric ARPACK solver returns results in a consistent form
+  now.
+- The fast greedy community detection routine now checks that the graph
+  is simple.
+- The LGL and NCOL parsers were corrected to work with all 
+  kinds of end-of-line encodings.
+- Hub & authority score calculations initialize ARPACK parameters now.
+- Fixed a bug in the Walktrap community detection routine, when applied 
+  to unconnected graphs.
+- Several small memory leaks were removed, and a big one from the Spinglass
+  community structure detection function
+
+New in the Python interface
+---------------------------
+
+- A new layout generator called DrL.
+- Uniform sampling of random connected undirected graphs with a 
+  given degree sequence.
+- Methods parameters accepting `igraph.IN`, `igraph.OUT` and `igraph.ALL`
+  constants now also accept these as strings (`"in"`, `"out"` and `"all"`).
+  Prefix matches also allowed as long as the prefix match is unique.
+- `Graph.shortest_paths()` now supports edge weights (Dijkstra's and
+  Bellman-Ford algorithm implemented)
+- `Graph.get_shortest_paths()` also supports edge weights
+  (only Dijkstra's algorithm yet)
+- Added `Graph.is_mutual()` to find mutual edges in a directed graph.
+- Added inverse log-weighted similarity measure (a.k.a. Adamic/Adar
+  similarity).
+- `preference.game` and `asymmetric.preference.game` were 
+  rewritten, they are O(|V|+|E|) now, instead of O(|V|^2).
+- ARPACK options can now be modified from the Python interface
+  (thanks to Kurt Jacobson)
+- `Layout.to_radial()` added -- now you can create a top-down tree
+  layout by the Reingold-Tilford algorithm and then turn it to a
+  radial tree layout
+- Added `Graph.write_pajek()` to save graphs in Pajek format
+- Some vertex and edge related methods can now also be accessed via
+  the methods of `VertexSeq` and `EdgeSeq`, restricted to the current
+  vertex/edge sequence of course
+- Visualisations now support triangle shaped vertices
+- Added `Graph.mincut()`
+- Added `Graph.Weighted_Adjacency()` to create graphs from weighted
+  adjacency matrices
+- Kamada-Kawai and Fruchterman-Reingold layouts now accept initial
+  vertex positions
+- `Graph.Preference()` and `Graph.Asymmetric_Preference()` were 
+  rewritten, they are O(|V|+|E|) now, instead of O(|V|^2).
+
+Bugs corrected in the Python interface
+--------------------------------------
+
+- `Graph.constraint()` now properly returns floats instead of integers
+  (thanks to Eytan Bakshy)
+- Graphs given by adjacency matrices are now finally loaded and saved
+  properly
+- `Graph.Preference()` now accepts floats in type distributions
+- A small bug in `Graph.community_edge_betweenness()` corrected
+- Some bugs in numeric attribute handling resolved
+- `VertexSeq` and `EdgeSeq` objects can now be subsetted by lists and
+  tuples as well
+- Fixed a bug when dealing with extremely small layout sizes
+- Eigenvector centality now always return positive values
+- `Graph.authority_score()` now really returns the authority scores
+  instead of the hub scores (blame copypasting)
+- Pajek reader bug corrected, used to segfault if `*Vertices`
+  was missing.
+- Directedness is handled correctly when writing GML files.
+  (But note that 'correct' conflicts the standard here.)
+- Corrected a bug when calculating weighted, directed PageRank on an 
+  undirected graph. (Which does not make sense anyway.)
+- Several bugs were fixed in the Reingold-Tilford layout to avoid 
+  edge crossings.
+- A bug was fixed in the GraphML reader, when the value of a graph
+  attribute was not specified.
+- Fixed a bug in the graph isomorphism routine for small (3-4 vertices)
+  graphs.
+- Corrected the random sampling implementation (`igraph_random_sample`),
+  now it always generates unique numbers. This affects the 
+  G(n,m) Erdos-Renyi generator, it always generates simple graphs now.
+- The LGL, NCOL and Pajek graph readers handle errors properly now.
+- The non-symmetric ARPACK solver returns results in a consistent form
+  now.
+- The fast greedy community detection routine now checks that the graph
+  is simple.
+- The LGL and NCOL parsers were corrected to work with all 
+  kinds of end-of-line encodings.
+- Hub & authority score calculations initialize ARPACK parameters now.
+- Fixed a bug in the Walktrap community detection routine, when applied 
+  to unconnected graphs.
+- Several small memory leaks were removed, and a big one from the Spinglass
+  community structure detection function
+
+New in the C layer
+------------------
+
+- A new layout generator called DrL.
+- Uniform sampling of random connected undirected graphs with a 
+  given degree sequence.
+- Some stochastic test results are ignored (for spinglass community
+  detection, some Erdos-Renyi generator tests)
+- Weighted shortest paths, Dijkstra's algorithm.
+- The unweigthed shortest path routine returns `Inf` for unreachable
+  vertices.
+- New function, `igraph_adjlist` can create igraph graphs from 
+  adjacency lists.
+- New function, `igraph_weighted_adjacency` can create weighted graphs 
+  from weight matrices.
+- New function, `igraph_is_mutual` to search for mutual edges.
+- Added inverse log-weighted similarity measure (a.k.a. Adamic/Adar
+  similarity).
+- `igraph_preference_game` and `igraph_asymmetric_preference_game` were 
+  rewritten, they are O(|V|+|E|) now, instead of O(|V|^2).
+- The Bellman-Ford shortest path algorithm was added.
+- Added weighted variant of `igraph_get_shortest_paths`, based on
+  Dijkstra's algorithm.
+- Several small memory leaks were removed, and a big one from the Spinglass
+  community structure detection function
+
+Bugs corrected in the C layer
+-----------------------------
+
+- Several bugs were corrected in the (still experimental) C attribute
+  handler.
+- Pajek reader bug corrected, used to segfault if `*Vertices`
+  was missing.
+- Directedness is handled correctly when writing GML files.
+  (But note that 'correct' conflicts the standard here.)
+- Corrected a bug when calculating weighted, directed PageRank on an 
+  undirected graph. (Which does not make sense anyway.)
+- Some code polish to make igraph compile with GCC 4.3
+- Several bugs were fixed in the Reingold-Tilford layout to avoid 
+  edge crossings.
+- A bug was fixed in the GraphML reader, when the value of a graph
+  attribute was not specified.
+- Fixed a bug in the graph isomorphism routine for small (3-4 vertices)
+  graphs.
+- Corrected the random sampling implementation (`igraph_random_sample`),
+  now it always generates unique numbers. This affects the 
+  G(n,m) Erdos-Renyi generator, it always generates simple graphs now.
+- The basic igraph constructor (`igraph_empty_attrs`, all functions 
+  are expected to call this internally) now checks whether the number
+  of vertices is finite.
+- The LGL, NCOL and Pajek graph readers handle errors properly now.
+- The non-symmetric ARPACK solver returns results in a consistent form
+  now.
+- The fast greedy community detection routine now checks that the graph
+  is simple.
+- The LGL and NCOL parsers were corrected to work with all 
+  kinds of end-of-line encodings.
+- Hub & authority score calculations initialize ARPACK parameters now.x
+- Fixed a bug in the Walktrap community detection routine, when applied 
+  to unconnected graphs.
