@@ -22,6 +22,8 @@ of the documentation. New features in R, Python, and C are all listed here.
 
 See at the end for a (more) complete list of changes.
 
+<!--more-->
+
 ### [R][PY] The Nexus repository
 
 igraph supports the <a href="http://nexus.igraph.org">Nexus network

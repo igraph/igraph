@@ -22,6 +22,8 @@ to connect opposite kinds. Think of the Hollywood movie graph with
 actors and movies. igraph 0.5.2 now contains some functions to deal
 with these kind of networks.
 
+<!--more-->
+
 ### [C][R][PY] The label propagation community finding algorithm
 
 This is a simple and intuitive community finding algorithm, published

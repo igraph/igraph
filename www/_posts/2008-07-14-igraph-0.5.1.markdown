@@ -16,6 +16,8 @@ igraph 0.5.1 is a bugfix release, but it actually contains many
 important new things as well. Here is a brief summary about each of 
 them. See below for the complete list of changes.
 
+<!--more-->
+
 ### [C][R][PY] The DrL layout generator was added
 
 This is a sophisticated and efficient layout generator written by 

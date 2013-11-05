@@ -21,6 +21,8 @@ and fixes a number of very annoying bugs.
 See at the end for the complete list of changes. First let's see
 the most important new features and changes. 
 
+<!--more-->
+
 ### [R] Vertex shape API in R
 
 It is now possible to create user-defined vertex shapes for drawing 

@@ -2,6 +2,7 @@
 layout: newstemp
 title: igraph 0.5
 date: February 14, 2008
+tags: release
 ---
 
 igraph 0.5
@@ -20,6 +21,8 @@ comments and ideas!
 
 Here is a list of major changes, with links to the relevant sections of the 
 documentation. See below for the complete list of changes.
+
+<!--more-->
 
 ### [C] igraph as a platform
 

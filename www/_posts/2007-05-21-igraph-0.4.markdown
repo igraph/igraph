@@ -13,6 +13,8 @@ The major new additions in this release is a bunch of community
 detection algorithms and support for the GML file format. Here 
 is the complete list of changes:
 
+<!--more-->
+
 New in the C library
 --------------------
 

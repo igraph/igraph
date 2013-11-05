@@ -13,6 +13,8 @@ This is a new major release, it contains many new things:
 geometric random graphs, creating a graph with attributes from a data frame
 in R, local transitivity, etc.
 
+<!--more-->
+
 Changes in the C library
 ------------------------
 

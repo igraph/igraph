@@ -12,6 +12,6 @@ lead: New releases and other major changes
       <a href="{{ post.url }}">{{ post.title }}</a></h1>
   </div>
     
-  {{ post.content | extract_excerpt }}
+  {{ post.content | extract_excerpt: post.url }}
 
 {% endfor %}

@@ -23,6 +23,8 @@ Bugs corrected in the R interface
 - Fixed a bug in `bipartite.projection()` that caused occasional crashes 
   on some systems
 
+<!--more-->
+
 New in the Python interface
 ---------------------------
 
