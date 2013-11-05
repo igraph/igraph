@@ -6,6 +6,12 @@
 
   AuthType Basic
   AuthName "Secured"
-  AuthUserFile .htpasswd
+  AuthUserFile /home4/csardi/www/.htpasswd
+
+<Files "index.html">
   Require valid-user
-  Satisfy Any
+</Files>
+
+<Files "news.html">
+  Require valid-user
+</Files>
