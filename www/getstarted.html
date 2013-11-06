@@ -90,7 +90,15 @@ lead: Install and start using the R package, Python extension
         <p>
           igraph is on CRAN and can be installed from within R:
         </p>
-        <p> {% gist 6952578 %} </p>
+        <p>
+        {% highlight r %}
+## Download and install the package
+install.packages("igraph")
+
+## Load package
+library(igraph)
+{% endhighlight %}
+        </p>
 
         <h3><span id="rreq" class="anchor">&nbsp;</span>Requirements</h3>
         <p>On Linux (and other Unix-like systems, but not on OSX),
@@ -177,7 +185,13 @@ lead: Install and start using the R package, Python extension
           downloading and uncompression the source code run the
           following commands from the top-level directory of the code.
         </p>
-        <p> {% gist 7026295 %}</p>
+        <p>
+          {% highlight sh %}
+ ./configure
+ make
+ make check
+ make install  {% endhighlight %}
+        </p>
         <p>The <code>make check</code> step is optional, but it is
           useful to spot problems early on.
         </p>
