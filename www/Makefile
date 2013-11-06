@@ -50,6 +50,7 @@ doc/r/igraph.pdf: $(RMAN)
 stamp: $(HTML) $(CSS) doc/c/stamp doc/r/stamp doc/r/igraph.pdf \
                doc/c/igraph.info doc/c/igraph-docs.pdf
 	../tools/getversion.sh > _includes/igraph-version
+	../interfaces/R/tools/convertversion.sh > _includes/igraph-rversion
 	jekyll build
 	touch stamp
 
