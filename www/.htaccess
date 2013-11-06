@@ -5,13 +5,10 @@
   RewriteRule ^nightly/(.*)$ /cgi-bin/nightly.py/$1 [PT]
 
   AuthType Basic
-  AuthName "Secured"
+  AuthName "Please Log In"
   AuthUserFile /home4/csardi/www/.htpasswd
-
-<Files "index.html">
   Require valid-user
-</Files>
-
-<Files "news.html">
-  Require valid-user
-</Files>
+  Order deny,allow
+  Deny from all
+  Allow from 140.247.28.49
+  Satisfy any
