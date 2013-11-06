@@ -5,12 +5,18 @@ import bottle
 import bottle_sqlite
 import socket
 import os.path
+import re
 
 home = os.path.expanduser("~")
 myname=socket.gethostname()
 i_am_local = (myname[-6:] == ".local")
 dbfile = "nightly-test.db" if i_am_local else (home + "/nightly/nightly.db")
 filesdir = home + "/www2/files"
+
+sanitize_pattern = re.compile('[^\w_\-\./\+]+')
+
+def sanitize(text):
+    return sanitize_pattern.sub('', text)
 
 plugin = bottle_sqlite.Plugin(dbfile=dbfile)
 nightly=bottle.Bottle()
@@ -64,6 +70,10 @@ def list_files_common(db, files, url, dtype, version, branch):
 @nightly.route("/listlatest/<dtype>/<version>/<branch>")
 def list_latest_files(db, dtype="all", version="all", branch="all"):
 
+    dtype=sanitize(dtype)
+    version=sanitize(version)
+    branch=sanitize(branch)
+
     files = db.execute("SELECT *, MAX(date) AS tmp FROM files    \
                         WHERE type LIKE ? AND version LIKE ? AND branch LIKE ? \
                         GROUP BY type, version, branch \
@@ -82,6 +92,10 @@ def list_latest_files(db, dtype="all", version="all", branch="all"):
 @nightly.route("/list/<dtype>/<version>/<branch>")
 def list_files(db, dtype="all", version="all", branch="all"):
 
+    dtype=sanitize(dtyle)
+    version=sanitize(version)
+    branch=sanitize(branch)
+
     files = db.execute("SELECT * FROM files    \
                         WHERE type LIKE ? AND version LIKE ? AND branch LIKE ? \
                         ORDER BY version DESC, date DESC",
@@ -94,10 +108,12 @@ def list_files(db, dtype="all", version="all", branch="all"):
 
 @nightly.route("/steal/<filename:path>")
 def steal_file(filename):
+    filename=sanitize(filename)
     return bottle.static_file(filename, filesdir, download=True)
 
 @nightly.route("/get/<filename:path>")
 def get_file(db, filename):
+    filename=sanitize(filename)
     db.execute("UPDATE files SET count=count+1 WHERE filename=?", \
                (filename,))
     return steal_file(filename)
@@ -105,6 +121,9 @@ def get_file(db, filename):
 @nightly.route("/latest/<dtype>")
 @nightly.route("/latest/<dtype>/<branch>")
 def get_latest(db, dtype, branch="develop"):
+
+    dtype=sanitize(dtype)
+    branch=sanitize(branch)
 
     latest = db.execute("SELECT filename FROM files  \
                          WHERE type=? AND branch=?   \
@@ -119,6 +138,7 @@ def get_latest(db, dtype, branch="develop"):
 
 @nightly.route("/tests/<filename:path>")
 def get_tests(db, filename):
+    filename=sanitize(filename)
     testres = db.execute("SELECT * FROM tests WHERE filename=?",
                          (filename,)).fetchall()
     return bottle.template('tests.html', testres=testres, filename=filename)
