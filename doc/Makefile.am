@@ -250,8 +250,9 @@ igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
 	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
 	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
 	&& cat igraph-docs3.xml >> igraph-docs4.xml \
-	&& env < /dev/null hash_extra=650000 docbook2pdf igraph-docs4.xml \
-	&& mv igraph-docs4.pdf igraph-docs.pdf
+	&& xsltproc /usr/local/share/docbook-xsl-1.73.2/fo/docbook.xsl \
+	   igraph-docs4.xml > igraph-docs.fo \
+	&& fop -fo igraph-docs.fo -pdf igraph-docs.pdf
 
 CLEANFILES=$(DOCINCLUDES) html/*.html html/stamp \
 	igraph-docs.{dvi,info,pdf,ps,texi,txml} igraph-docs2.xml 
