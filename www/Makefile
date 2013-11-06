@@ -18,6 +18,20 @@ doc/c/stamp: ../doc/jekyll/stamp
 	mkdir -p doc
 	cp -r ../doc/jekyll doc/c
 
+../doc/igraph-docs.pdf: ../doc/igraph-docs.xml
+	cd ../doc && make igraph-docs.pdf
+
+doc/c/igraph-docs.pdf: ../doc/igraph-docs.pdf
+	mkdir -p doc/c
+	cp ../doc/igraph-docs.pdf doc/c/
+
+../doc/igraph.info: ../doc/igraph-docs.xml
+	cd ../doc && make igraph.info
+
+doc/c/igraph.info: ../doc/igraph.info
+	mkdir -p doc/c
+	cp ../doc/igraph.info doc/c/
+
 doc/r/stamp: $(RMAN)
 	cd ../interfaces/R && make && \
 	R CMD INSTALL --html --no-inst -l $(TMP) igraph
@@ -33,7 +47,8 @@ doc/r/igraph.pdf: $(RMAN)
 	R CMD Rd2pdf --no-preview --force -o doc/r/igraph.pdf \
 	  ../interfaces/R/igraph
 
-stamp: $(HTML) $(CSS) doc/c/stamp doc/r/stamp doc/r/igraph.pdf
+stamp: $(HTML) $(CSS) doc/c/stamp doc/r/stamp doc/r/igraph.pdf \
+               doc/c/igraph.info doc/c/igraph-docs.pdf
 	jekyll build
 	touch stamp
 
