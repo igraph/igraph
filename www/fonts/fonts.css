@@ -30,7 +30,3 @@
 .icon-rlogo-r2:before {
 	content: "\e601";
 }
-
-[class*="icon-"] {
-    color: #666
-}

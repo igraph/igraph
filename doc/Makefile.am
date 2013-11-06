@@ -26,6 +26,8 @@ all: doctemplate
 
 html: html/stamp
 
+jekyll: jekyll/stamp
+
 info: igraph.info
 
 dvi: igraph-docs.dvi
@@ -198,6 +200,15 @@ html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
 	&& touch html/stamp
+
+jekyll/stamp: html/stamp
+	rm -rf jekyll && mkdir jekyll && cp html/* jekyll/ && rm jekyll/stamp
+	cd html && for i in *.html; do                        \
+	  cat $$i | ../../tools/extract_body.sh               \
+		  | ../../tools/protect_braces.sh             \
+		  | ../../tools/jekyll_header.sh              \
+                  > ../jekyll/$$i; done
+	touch jekyll/stamp
 
 igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

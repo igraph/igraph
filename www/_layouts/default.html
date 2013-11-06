@@ -28,9 +28,14 @@
       <script src="/js/respond.min.js"></script>
     <![endif]-->
 
+    {{ page.extrahead }}
+
   </head>
 
+  {% capture prefix %}{{ page.url | firstdir }}{% endcapture %}
+
   <body {% if page.url == "/index.html" %} class="start-page" {% endif %}>
+
   <div id="wrap">
 
     <div class="navbar navbar-default navbar-fixed-top">
@@ -50,7 +55,7 @@
           <ul class="nav navbar-nav navbar-left">
             <li {% if page.url == "/index.html" %} class="active" {% endif %}>
               <a href="/">Overview</a></li>
-            <li {% if page.url == "/getstarted.html" or page.url == "/cgi-bin/main.html" or page.url == "cgi-bin/tests.html" %} class="active" 
+            <li {% if page.url == "/getstarted.html" or page.url == "/cgi-bin/main.html" or page.url == "cgi-bin/tests.html" or prefix == "/doc/" %} class="active" 
                 {% endif %}><a href="/getstarted.html">Documentation</a></li>
             <li {% if page.url == "/news.html" or page.id %} class="active" {% endif %}>
               <a href="/news.html">News</a></li>
@@ -111,6 +116,7 @@
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <script src="/js/affix.js"></script>
     <script src="/js/tooltips.js"></script>
+    <script src="/js/toggle.js"></script>
     <script type="text/javascript">
       $(document).ready(function(){
         $( ".thumbnail" ).mouseenter(function() {
