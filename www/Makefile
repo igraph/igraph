@@ -20,14 +20,20 @@ doc/c/stamp: ../doc/jekyll/stamp
 
 doc/r/stamp: $(RMAN)
 	cd ../interfaces/R && make && \
-	R CMD INSTALL --html --no-inst --no-configure -l $(TMP) igraph
+	R CMD INSTALL --html --no-inst -l $(TMP) igraph
 	rm -rf doc/r
 	mkdir -p doc/r
 	../tools/rhtml.sh $(TMP)/igraph/html doc/r
 	ln -s 00Index.html doc/r/index.html
 	touch doc/r/stamp
 
-stamp: $(HTML) $(CSS) doc/c/stamp doc/r/stamp
+doc/r/igraph.pdf: $(RMAN)
+	mkdir -p doc/r
+	cd ../interfaces/R/ && make
+	R CMD Rd2pdf --no-preview --force -o doc/r/igraph.pdf \
+	  ../interfaces/R/igraph
+
+stamp: $(HTML) $(CSS) doc/c/stamp doc/r/stamp doc/r/igraph.pdf
 	jekyll build
 	touch stamp
 
