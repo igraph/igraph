@@ -30,7 +30,7 @@ grg.game(nodes, radius, torus = FALSE, coords = FALSE)
 }
 % \references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}, first version was
-  written by Keith Briggs \email{keith.briggs@bt.com}}
+  written by Keith Briggs (\url{http://keithbriggs.info/}).}
 \seealso{\code{\link{random.graph.game}}}
 \examples{
 g <- grg.game(1000, 0.05, torus=FALSE)

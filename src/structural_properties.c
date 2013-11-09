@@ -1314,7 +1314,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  * <para>
  * For the explanation of the PageRank algorithm, see the following
  * webpage:
- * http://www-db.stanford.edu/~backrub/google.html, or the
+ * http://infolab.stanford.edu/~backrub/google.html , or the
  * following reference:
  * </para>
  * 

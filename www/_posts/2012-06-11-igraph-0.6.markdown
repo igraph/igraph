@@ -53,7 +53,7 @@ from zero, as these languages traditionally use zero-based indexing.)
 The Python interface of igraph now supports Python 3. The current release was
 tested with Python 3.2 on Windows, Linux and Mac OS X. Please report any bugs
 you encounter when using igraph in Python 3.x through the
-<a href="bugs.html">usual channels</a>.
+usual channels.
 
 ### [C][R][PY] Community detection improvements
 

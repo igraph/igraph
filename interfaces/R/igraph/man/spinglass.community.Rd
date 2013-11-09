@@ -123,13 +123,14 @@ spinglass.community(graph, weights=NULL, vertex=NULL, spins=25,
   (2008).
   
 }
-\author{Jorg Reichardt \email{lastname@physik.uni-wuerzburg.de} for the
+\author{Jorg Reichardt
+  (\url{http://theorie.physik.uni-wuerzburg.de/~reichardt/}) for the
   original code and Gabor Csardi \email{csardi.gabor@gmail.com} for the
   igraph glue code.
   
   Changes to the original function for including the
   possibility of negative ties were implemented 
-  by Vincent Traag \email{vtraag@f-m.fm}.}
+  by Vincent Traag (\url{http://www.traag.net/}).}
 \seealso{\code{\link{communities}}, \code{\link{clusters}}}
 \examples{
   g <- erdos.renyi.game(10, 5/10) \%du\% erdos.renyi.game(9, 5/9)

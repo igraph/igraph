@@ -1044,7 +1044,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * <para>
  * For the explanation of the PageRank algorithm, see the following
  * webpage:
- * http://www-db.stanford.edu/~backrub/google.html, or the
+ * http://infolab.stanford.edu/~backrub/google.html , or the
  * following reference:
  * </para>
  * 

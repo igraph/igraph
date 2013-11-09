@@ -47,10 +47,11 @@ graph.graphdb (url = NULL, prefix = "iso", type = "r001", nodes = NULL,
   If \code{url} is \code{NULL}, and this is the default, then the
   filename is assembled from the \code{base}, \code{prefix}, \code{type},
   \code{nodes}, \code{pair} and \code{which} arguments.
-  
-  See the documentation for the graph database at
-  \url{http://amalfi.dis.unina.it/graph/db/doc/graphdbat.html} for
-  the actual format of a graph database file and other information.
+
+  Unfortunately the original graph database homepage is now defunct,
+  but see its old version at
+  \url{http://web.archive.org/web/20090215182331/http://amalfi.dis.unina.it/graph/db/doc/graphdbat.html}
+  for the actual format of a graph database file and other information.
 }
 \value{
   A new graph object.

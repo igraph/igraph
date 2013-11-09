@@ -201,7 +201,7 @@ betweenness (<a href="doc-0.5/html/igraph_edge_betweenness_estimate.html">C</a>,
 
 Two vertex similarity measures based on the number of common neighbors
 are introduced, the Jaccard (<a
-href="doc-0.5/html/igraph_similarity_jaccard">C</a>, 
+href="doc-0.5/html/igraph_similarity_jaccard.html">C</a>, 
 <a href="doc-0.5/R/similarity.html">R</a>, <a
 href="doc-0.5/python/igraph.GraphBase-class.html#similarity_jaccard">Python</a>) and the Dice (<a
 href="doc-0.5/html/igraph_similarity_dice.html">C</a>, 

@@ -134,8 +134,7 @@ D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking
     Matrix Analysis and Applications}, 2008.
   \url{http://people.epfl.ch/david.morton} 
 }
-\author{David Morton de Lachapelle \email{david.morton@epfl.ch},
-  \email{david.mortondelachapelle@swissquote.ch}} 
+\author{David Morton de Lachapelle, \url{http://people.epfl.ch/david.morton}.}
 \seealso{\link{SCG} for an introduction.
   \code{\link{scgNormEps}}, \code{\link{scgGrouping}} and
   \code{\link{scgSemiProjectors}}.}
