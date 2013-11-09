@@ -916,12 +916,12 @@ Color specification in CSS syntax
     This is a string according to one of the following formats (where *R*, *G* and
     *B* denote the red, green and blue components, respectively):
 
-      - ``#RRGGBB``, components range from 0 to 255 in hexadecimal format.
-        Example: ``"#0088ff"``.
-      - ``#RGB``, components range from 0 to 15 in hexadecimal format. Example:
-        ``"#08f"``.
-      - ``rgb(R, G, B)``, components range from 0 to 255 or from 0% to
-        100%. Example: ``"rgb(0, 127, 255)"`` or ``"rgb(0%, 50%, 100%)"``.
+    - ``#RRGGBB``, components range from 0 to 255 in hexadecimal format.
+      Example: ``"#0088ff"``.
+    - ``#RGB``, components range from 0 to 15 in hexadecimal format. Example:
+      ``"#08f"``.
+    - ``rgb(R, G, B)``, components range from 0 to 255 or from 0% to
+      100%. Example: ``"rgb(0, 127, 255)"`` or ``"rgb(0%, 50%, 100%)"``.
 
 List, tuple or whitespace-separated string of RGB values
     Example: ``(255, 128, 0)``, ``[255, 128, 0]`` or ``"255, 128, 0"``.
