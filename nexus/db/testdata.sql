@@ -56,7 +56,7 @@ INSERT INTO metadata values (2, 1, 'edge', 'numeric', 'weight',
 INSERT INTO format VALUES('R-igraph', 
        'Rdata file for use with the igraph R package',
        'igraph is an R package for network analysis, with support for large graphs. This data file can be loaded into an R session via the ''load'' function, after loading the igraph package itself using the ''library'' function. See the igraph homepage for details.', 
-       'http://igraph.sourceforge.net', '.Rdata');
+       'http://igraph.org', '.Rdata');
 
 INSERT INTO format VALUES('GraphML',
        'XML-based graph description language',
@@ -76,7 +76,7 @@ INSERT INTO format VALUES('Excel',
 INSERT INTO format VALUES('Python-igraph',
        'Pickled Python object for use with the igraph Python module',
        'igraph is a Python module for network analysis, with support for large graphs. This file can be loaded from a Python script using the ''load'' function of the ''pickle'' module if you have installed the ''igraph'' module before. See the igraph homepage for details.',
-       'http://igraph.sourceforge.net', '.pickle');
+       'http://igraph.org', '.pickle');
 
 INSERT INTO user VALUES('gabor.csardi', 
        'https://launchpad.net/~gabor.csardi', 1);

@@ -103,7 +103,7 @@ From release 0.5, the C core of the igraph library is **not** included
 in the Python distribution - you must compile and install the C core
 separately. Windows installers already contain a compiled igraph DLL,
 so they should work out of the box. Linux users should refer to the
-`igraph homepage <http://igraph.sourceforge.net>`_ for
+`igraph homepage <http://igraph.org>`_ for
 compilation instructions (but check your distribution first, maybe
 there are pre-compiled packages available). OS X Snow Leopard users may
 benefit from the disk images in the Python Package Index.

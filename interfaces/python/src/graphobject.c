@@ -11752,7 +11752,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
 	 "the Chvatal graph, the Petersen graph or the Tutte graph. This method\n"
 	 "generates one of them based on its name (case insensitive). See the\n"
 	 "documentation of the C interface of C{igraph} for the names available:\n"
-	 "U{http://igraph.sourceforge.net/doc/html/igraph_famous.html}.\n\n"
+	 "U{http://igraph.org/doc/c}.\n\n"
 	 "@param name: the name of the graph to be generated.\n"
 	},
 

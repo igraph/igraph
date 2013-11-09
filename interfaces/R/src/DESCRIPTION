@@ -11,5 +11,5 @@ Depends: methods
 Imports: Matrix
 Suggests: igraphdata, stats4, rgl, tcltk, graph, ape
 License: GPL (>= 2)
-URL: http://igraph.sourceforge.net
+URL: http://igraph.org
 SystemRequirements: gmp, libxml2

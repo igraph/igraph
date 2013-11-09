@@ -72,7 +72,7 @@ function create_igraph_debian_pkg {
   if [ -f ${CURR_DIR}/igraph_$1.orig.tar.gz ]; then
     cp ${CURR_DIR}/igraph_$1.orig.tar.gz .
   else
-    wget -O igraph_$1.orig.tar.gz http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-$1.tar.gz
+    wget -O igraph_$1.orig.tar.gz http://files.igraph.org/c/igraph-$1.tar.gz
   fi
   tar -xvvzf igraph_$1.orig.tar.gz
   cd igraph-$1
