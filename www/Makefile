@@ -34,7 +34,8 @@ doc/c/igraph.info: ../doc/igraph.info
 
 doc/r/stamp: $(RMAN)
 	cd ../interfaces/R && make && \
-	R CMD INSTALL --html --no-inst -l $(TMP) igraph
+	R CMD INSTALL --html --no-R --no-configure --no-inst \
+	  --no-libs --no-exec --no-test-load -l $(TMP) igraph
 	rm -rf doc/r
 	mkdir -p doc/r
 	../tools/rhtml.sh $(TMP)/igraph/html doc/r
