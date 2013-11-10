@@ -1,0 +1,38 @@
+{# Import the theme's layout. #}
+{% extends "!layout.html" %}
+
+{# Include our new CSS files. #}
+{% set css_files = css_files + ['http://www.igraph.org/bootstrap/css/bootstrap.min.css', '_static/other.css', 'http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css'] %}
+{% set script_files = script_files + ['http://www.igraph.org/bootstrap/js/bootstrap.min.js'] %}
+
+{# Update the content width and offset #}
+{% set bs_content_width_real = "9" %}
+{% set bs_content_offset = "1" %}
+
+{# Tweak the main documentation area #}
+{%- block content %}
+<div class="bs-header-outer"><div class="bs-header">
+	<div class="container">
+		<h1>python-igraph Manual</h1>
+		<p class="lead">For using igraph from Python</p>
+	</div>
+</div></div>
+
+<div class="container bs-docs-container">
+	<div class="row">
+		<div class="{{ bs_span_prefix }}{{ bs_content_width_real }} {{ bs_span_prefix }}offset-{{ bs_content_offset }}">
+			{{ navBar() }}
+		</div>
+	</div>
+	<div class="row">
+		{%- block sidebar1 %}{{ bsidebar() }}{% endblock %}
+		<div class="{{ bs_span_prefix }}{{ bs_content_width_real }} {{ bs_span_prefix }}offset-{{ bs_content_offset }}">
+			<div class="bs-docs-section">
+				{% block body %}{% endblock %}
+			</div>
+		</div>
+		{%- block sidebar2 %} {# possible location for sidebar #} {% endblock %}
+	</div>
+</div>
+
+{%- endblock %}
