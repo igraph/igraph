@@ -123,6 +123,7 @@ code.rfun:after {
 
 .bs-masthead .btn {
   margin-bottom: 5px;
+  border: 1px solid;
 }
 
 .bs-masthead .btn:hover {
