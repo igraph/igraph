@@ -1,6 +1,6 @@
 name: igraph &ndash; the network analysis package
 pygments: true
-include: [ .htaccess, .htpasswd ]
+include: [ .htaccess, .htpasswd, _static, _sources, _images ]
 exclude: [ Makefile ]
 markdown: redcarpet
 redcarpet:

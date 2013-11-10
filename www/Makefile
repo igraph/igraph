@@ -48,8 +48,28 @@ doc/r/igraph.pdf: $(RMAN)
 	R CMD Rd2pdf --no-preview --force -o doc/r/igraph.pdf \
 	  ../interfaces/R/igraph
 
+../interfaces/python/doc/api/pdf/api.pdf:
+	cd ../interfaces/python && scripts/mkdoc.sh
+
+doc/python/python-igraph.pdf: ../interfaces/python/doc/api/pdf/api.pdf
+	mkdir -p doc/python
+	cp $< $@
+
+doc/python/stamp: ../interfaces/python/doc/api/html/igraph-module.html
+	mkdir -p doc/python
+	cp -r ../interfaces/python/doc/api/html/ doc/python
+	touch $@
+
+doc/python/tutorial/stamp: ../interfaces/python/doc/source/tutorial.rst
+	mkdir -p doc/python/tutorial
+	cd ../interfaces/python/doc && sphinx-build source api/tutorial
+	cp -r ../interfaces/python/doc/api/tutorial/ doc/python/tutorial/
+	touch $@
+
 stamp: $(HTML) $(CSS) doc/c/stamp doc/r/stamp doc/r/igraph.pdf \
-               doc/c/igraph.info doc/c/igraph-docs.pdf
+               doc/c/igraph.info doc/c/igraph-docs.pdf \
+	       doc/python/python-igraph.pdf doc/python/stamp \
+	       doc/python/tutorial/stamp
 	../tools/getversion.sh > _includes/igraph-version
 	../interfaces/R/tools/convertversion.sh > _includes/igraph-rversion
 	jekyll build
