@@ -989,7 +989,7 @@ Pickled graph    ``pickle``    :meth:`Graph.Read_Pickle`    :meth:`Graph.write_p
 .. _Pajek: http://pajek.imfm.si/doku.php
 
 As an exercise, download the graph representation of the well-known
-`Zachary karate club study <http://igraph.sourceforge.net/karate.net>`_, save it to
+`Zachary karate club study <http://igraph.org/karate.net>`_, save it to
 a folder and try to load it into |igraph|. Since it is a Pajek network file, you
 must use the Pajek reader method from the table above (make sure you use the
 appropriate path to the downloaded file):
