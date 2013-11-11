@@ -17,7 +17,7 @@ body {
 /* Set the fixed height of the footer here */
 #footer {
   padding-top: 5px;
-  background-color: #f5f5f5;
+/*  background-color: #f5f5f5; */
 }
 
 #wrap > .bs-header-outer {
