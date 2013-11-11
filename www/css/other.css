@@ -189,3 +189,10 @@ span.anchor {
     border-color: lightgray;
     padding-top: 10px;
 }
+
+/* To hide the empty python index */
+
+#indices-and-tables {
+    visibility: hidden;
+    display: none;
+}

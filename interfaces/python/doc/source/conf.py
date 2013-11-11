@@ -99,7 +99,8 @@ html_theme = 'bootstrap'
 # documentation.
 html_theme_options = {
         "navbar_fixed_top": "false",
-        "navbar_class": "navbar navbar-inverse"
+        "navbar_class": "navbar navbar-inverse",
+        "bootstrap_version": "3"
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
@@ -142,10 +143,10 @@ html_static_path = ['_static']
 #html_additional_pages = {}
 
 # If false, no module index is generated.
-#html_domain_indices = True
+html_domain_indices = False
 
 # If false, no index is generated.
-#html_use_index = True
+html_use_index = False
 
 # If true, the index is split into individual pages for each letter.
 #html_split_index = False
