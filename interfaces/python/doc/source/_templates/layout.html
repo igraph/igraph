@@ -21,6 +21,9 @@ extrahead: {%- block linktags %}
     <link rel="stylesheet" href="{{ pathto('_static/' + style, 1) }}" type="text/css" />
     <link rel="stylesheet" href="{{ pathto('_static/pygments.css', 1) }}" type="text/css" />
     <link rel="stylesheet" href="{{ pathto('_static/bootstrap-sphinx.css', 1) }}" type="text/css" />
+extrafoot:
+    <script src="{{ pathto('_static/js/jquery-fix.js', 1) }}"></script>
+    <script src="{{ pathto('_static/bootstrap-sphinx.js', 1) }}"></script>
 ---
 
 {# Sidebar: Rework into our Bootstrap nav section. #}

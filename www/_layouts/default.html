@@ -118,15 +118,8 @@
     <script src="/js/affix.js"></script>
     <script src="/js/tooltips.js"></script>
     <script src="/js/toggle.js"></script>
-    <script type="text/javascript">
-      $(document).ready(function(){
-        $( ".thumbnail" ).mouseenter(function() {
-          $(this).find('.caption').removeClass("flipOutY").addClass("flipInY").show();
-        })
-        .mouseleave(function() {
-          $(this).find('.caption').removeClass("flipInY").addClass("flipOutY");
-});
-})    
-    </script>
+
+    {{ page.extrafoot }}
+
   </body>
 </html>
