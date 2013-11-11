@@ -58,6 +58,7 @@ doc/python/python-igraph.pdf: ../interfaces/python/doc/api/pdf/api.pdf
 doc/python/stamp: ../interfaces/python/doc/api/html/igraph-module.html
 	mkdir -p doc/python
 	cp -r ../interfaces/python/doc/api/html/ doc/python
+	../tools/pyhtml.sh doc/python
 	touch $@
 
 doc/python/tutorial/stamp: ../interfaces/python/doc/source/tutorial.rst
