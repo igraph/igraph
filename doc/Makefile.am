@@ -250,7 +250,7 @@ igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
 	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
 	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
 	&& cat igraph-docs3.xml >> igraph-docs4.xml \
-	&& xsltproc /usr/local/share/docbook-xsl-1.73.2/fo/docbook.xsl \
+	&& xsltproc http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl \
 	   igraph-docs4.xml > igraph-docs.fo \
 	&& fop -fo igraph-docs.fo -pdf igraph-docs.pdf
 
