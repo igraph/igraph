@@ -88,9 +88,10 @@ layout.drl (graph, use.seed = FALSE, seed = matrix(runif(vcount(graph) *
   Martin, S., Brown, W.M., Klavans, R., Boyack, K.W., DrL: Distributed
   Recursive (Graph) Layout. SAND Reports, 2008. 2936: p. 1-10. 
 }
-\author{Shawn Martin \email{google@for.it} and Gabor Csardi
-  \email{csardi.gabor@gmail.com} for the R/igraph interface and the three
-    dimensional version.}
+\author{Shawn Martin
+  (\url{http://www.cs.otago.ac.nz/homepages/smartin/})
+  and Gabor Csardi \email{csardi.gabor@gmail.com} for the R/igraph
+  interface and the three dimensional version.}
 \seealso{\code{\link{layout}} for other layout generators.}
 \examples{
 g <- as.undirected(ba.game(100, m=1))

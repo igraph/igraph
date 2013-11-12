@@ -43,7 +43,7 @@ Compilation steps
 -----------------
 
 First, compile and install the C core of igraph (see the corresponding
-[documentation](http://igraph.sourceforge.net). After that,
+[documentation](http://igraph.org). After that,
 change to `interfaces/java` and type `ant build`.
 This should generate two files in the `dist/` subdirectory:
 

@@ -1942,7 +1942,7 @@ class Graph(GraphBase):
         directed = self.is_directed()
 
         print >> f, '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-        print >> f, '<!-- Created by igraph (http://igraph.sourceforge.net/) for use in Inkscape (http://www.inkscape.org/) -->'
+        print >> f, '<!-- Created by igraph (http://igraph.org/) for use in Inkscape (http://www.inkscape.org/) -->'
         print >> f
         print >> f, '<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"'
         print >> f, 'width="{0}px" height="{1}px">'.format(width, height),

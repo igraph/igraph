@@ -48,7 +48,7 @@ multilevel.community (graph, weights = NULL)
   Lefebvre: Fast unfolding of communities in large
   networks. J. Stat. Mech. (2008) P10008   
 }
-\author{Tom Gregorovic, Tamas Nepusz \email{tamas@cs.rhul.ac.uk}}
+\author{Tom Gregorovic, Tamas Nepusz \email{ntamas@gmail.com}}
 \seealso{
   See \code{\link{communities}} for extracting the membership,
   modularity scores, etc. from the results.

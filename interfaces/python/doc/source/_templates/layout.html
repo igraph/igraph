@@ -1,0 +1,71 @@
+---
+layout: default
+title: {{ title|striptags|e }}{{ titlesuffix }}
+mainheader: python-igraph Manual
+lead: For using igraph from Python
+extrahead: {%- block linktags %}
+    {%- if hasdoc('about') %}
+    <link rel="author" title="{{ _('About these documents') }}" href="{{ pathto('about') }}" />
+    {%- endif %}
+    <link rel="top" title="{{ docstitle|e }}" href="{{ pathto('index') }}" />
+    {%- if parents %}
+    <link rel="up" title="{{ parents[-1].title|striptags|e }}" href="{{ parents[-1].link|e }}" />
+    {%- endif %}
+    {%- if next %}
+    <link rel="next" title="{{ next.title|striptags|e }}" href="{{ next.link|e }}" />
+    {%- endif %}
+    {%- if prev %}
+    <link rel="prev" title="{{ prev.title|striptags|e }}" href="{{ prev.link|e }}" />
+    {%- endif %}
+{%- endblock %}
+    <link rel="stylesheet" href="{{ pathto('_static/' + style, 1) }}" type="text/css" />
+    <link rel="stylesheet" href="{{ pathto('_static/pygments.css', 1) }}" type="text/css" />
+    <link rel="stylesheet" href="{{ pathto('_static/bootstrap-sphinx.css', 1) }}" type="text/css" />
+extrafoot:
+    <script src="{{ pathto('_static/js/jquery-fix.js', 1) }}"></script>
+    <script src="{{ pathto('_static/bootstrap-sphinx.js', 1) }}"></script>
+---
+
+{# Sidebar: Rework into our Bootstrap nav section. #}
+{% macro navBar() %}
+{% include "navbar.html" %}
+{% endmacro %}
+
+{# Update the content width and offset #}
+{% set bs_content_width_real = "9" %}
+{% set bs_content_offset = "1" %}
+
+{# Tweak the main documentation area #}
+{%- block content %}
+<div class="container bs-docs-container">
+  <div class="row">
+    <div class="col-md-9 col-md-offset-1">
+        {{ navBar() }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-9 col-md-offset-1">
+      <div class="bs-docs-section">
+        {% block body %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{%- endblock %}
+
+{# Modified basic/layout.html #}
+
+{%- block doctype -%}{%- endblock %}
+{%- set reldelim1 = reldelim1 is not defined and ' &raquo;' or reldelim1 %}
+{%- set reldelim2 = reldelim2 is not defined and ' |' or reldelim2 %}
+{%- set render_sidebar = (not embedded) and (not theme_nosidebar|tobool) and
+                         (sidebars != []) %}
+{%- set url_root = pathto('', 1) %}
+{# XXX necessary? #}
+{%- if url_root == '#' %}{% set url_root = '' %}{% endif %}
+{%- if not embedded and docstitle %}
+  {%- set titlesuffix = " &mdash; "|safe + docstitle|e %}
+{%- else %}
+  {%- set titlesuffix = "" %}
+{%- endif %}

@@ -22,7 +22,7 @@ interconnected.islands.game (islands.n, islands.size, islands.pin,
   An igraph graph.
 }
 % \references{}
-\author{Samuel Thiriot \email{samuel.thiriot at res-ear dot ch}}
+\author{Samuel Thiriot (\url{http://samuelthiriot.res-ear.ch/})}
 \seealso{\code{\link{erdos.renyi.game}}}
 \examples{
 g <- interconnected.islands.game(3, 10, 5/10, 1)

@@ -4,6 +4,7 @@ newer than 0.6 when reST is used as a markup language"""
 
 from epydoc.cli import cli
 from epydoc.markup.restructuredtext import parse_docstring
+from epydoc.docwriter.latex import LatexWriter
 
 # Check whether Epydoc needs patching
 doc = parse_docstring("aaa", [])
@@ -15,4 +16,5 @@ except AttributeError:
 	from docutils.nodes import Text
 	Text.data=""
 
+LatexWriter.PREAMBLE += [r'\usepackage[T1]{fontenc}']
 cli()

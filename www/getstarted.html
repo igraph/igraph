@@ -1,0 +1,448 @@
+---
+layout: default
+title: igraph &ndash; Network analysis software
+mainheader: Get started with igraph
+lead: Install and start using the R package, Python extension
+  or the C library.
+---
+
+<div class="container bs-docs-container">
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="bs-sidebar hidden-print" role="complementary" 
+           data-spy="affix">
+        <ul class="nav bs-sidenav">
+          
+          <li><a href="#startr">Start with <strong>R</strong> igraph</a>
+            <ul class="nav">
+              <li><a href="#rinstall">Installation</a></li>
+              <li><a href="#rreq">Requirements</a></li>
+              <li><a href="#rreqopt">Optional requirements</a></li>
+              <li><a href="#rdoc1">Tutorials</a></li>
+            </ul>
+          </li>
+          <li><a href="#startpy">Start with <strong>Python</strong>
+            igraph</a></li>
+          <li><a href="#startc">Start with <strong>C</strong> igraph</a>
+            <ul class="nav">
+              <li><a href="#creq">Requirements</a></li>
+              <li><a href="#cinstall">Installation</a></li>
+              <li><a href="#cinstallosx">Installation on Mac OS X</a></li>
+              <li><a href="#cinstallcygwin">Installation on Windows under
+                Cygwin</a></li>
+              <li><a href="#cinstallmsvc">Installation using Microsoft
+                Visual C++<a></li>
+              <li><a href="#ctut">Tutorials</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="#docs">Documentation</a>
+            <ul class="nav">
+              <li><a href="#rmanual">R manual pages</a></li>
+              <li><a href="#pymanual">Python manual</a></li>
+              <li><a href="#cmanual">C reference manual</a></li>
+<!--               <li><a href="#screenshots">Screenshots and -->
+<!--                 examples</a></li>                        -->
+<!--               <li><a href="#wiki">Wiki</a></li>          -->
+            </ul>
+          </li>
+
+          <li><a href="#downloads">Downloads</a>
+            <ul class="nav">
+              <li><a href="#rdown">R package</a></li>
+              <li><a href="#pydown">Python extension module</a></li>
+              <li><a href="#cdown">C library</a></li>
+              <li><a href="#nightlydown">Nightly builds</a></li>
+              <li><a href="#devdown">Development version</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#help">Get help</a>
+            <ul class="nav">
+              <li><a href="#list">Mailing list</a></li>
+              <li><a href="#so">Stack Overflow</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#contribute">Contribute</a>
+            <ul class="nav">
+              <li><a href="#contributebugs">Report bugs</a></li>
+              <!-- <li><a href="#contributewiki">Improve the Wiki</a></li> -->
+              <li><a href="#contributecode">Contribute code</a></li>
+            </ul>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="bs-docs-section">
+
+        <div class="page-header">
+          <h1><span id="startr" class="anchor">&nbsp;</span>
+            Start with R igraph</h1>
+        </div>
+
+        <h3><span id="rinstall" class="anchor">&nbsp;</span>
+           Installation</h3>
+        <p>
+          igraph is on CRAN and can be installed from within R:
+        </p>
+        <p>
+        {% highlight r %}
+## Download and install the package
+install.packages("igraph")
+
+## Load package
+library(igraph)
+{% endhighlight %}
+        </p>
+
+        <h3><span id="rreq" class="anchor">&nbsp;</span>Requirements</h3>
+        <p>On Linux (and other Unix-like systems, but not on OSX),
+          a C and a C++ compiler is needed, and also the tool
+          <code>make</code>. On Debian and Ubuntu Linux the 
+          <code>build-essential</code> package installs these.</p>
+
+        <h3><span id="rreqopt" class="anchor">&nbsp;</span>
+          Optional requirements</h3>
+
+        <p>
+          <ul>
+            <li>On Linux (and other Unix-like systems, but not on OSX), 
+              the <code>libxml2</code> library, including header files,
+              is needed for the ability of reading GraphML files. On
+              Ubuntu and Debian Linux the <code>lixml2</code> and
+              <code>libxml2-dev</code> packages are needed.</li>
+            <li>The {% include rbasepkg p="tcltk" %} R package is needed for
+              {% include rfun f="tkplot" %} and 
+              {% include rfun f="tkigraph" %} to work.</li>
+            <li>The {% include rpkg p="rgl" %} R package is needed for
+              {% include rfun f="rglplot" %} to work.</li>
+            <li>The {% include rpkg p="ape" %} package is needed to
+              plot nice dendrograms with 
+              {% include rfun f="dendPlot" %}.</li>
+          </ul>
+        </p>
+
+        <h3><span id="rdoc1" class="anchor">&nbsp;</span>Tutorials</h3>
+
+        <p>
+          <ul>
+            <li>Manual pages <a href="/doc/r/aaa-igraph-package.html">
+              <code class="rman">igraph</code></a> and
+              {% include rman p="graph.structure" %} are good places
+              to start.</li>
+<!--             <li>Some screenshots and examples are -->
+<!--               <a href="">here.</a></li>           -->
+            <li>Type in <code>demo(package="igraph")</code> 
+              (or use {% include rfun f="igraphdemo" %} if you have
+              <span style="white-space:nowrap;">
+                {% include rbasepkg p="tcltk" %})</span> to get a list of
+              demos.</li>
+          </ul>
+        </p>
+
+        <div class="page-header">
+          <h1><span id="startpy" class="anchor">&nbsp;</span>
+            Start with Python igraph</h1>
+        </div>
+
+        <p>
+          TODO
+        </p>
+
+        <div class="page-header">
+          <h1><span id="startc" class="anchor">&nbsp;</span>
+            Start with C igraph</h1>
+        </div>
+
+        <h3><span id="creq" class="anchor">&nbsp;</span>Requirements</h3>
+        <p>
+          Make sure you have the following before installing igraph:
+          <ul>
+            <li>A <strong>Linux</strong>, <strong>Mac OS X</strong> or
+              <strong>MS Windows</strong> system. Other
+              Unix and similar systems probably work as well,
+              e.g. Oracle Solaris, BSD systems, etc.</li>
+            <li>C and C++ compilers, <code>gcc</code>,
+              <code>clang</code> or others.</li>
+            <li>The GNU <code>make</code> tool.</li>
+            <li>Optionally the <a href="http://www.xmlsoft.org/"> 
+              <code>libxml2</code></a> library for reading GraphML
+              files.</li> 
+          </ul>
+          On Ubuntu and Debian Linux, installing the
+          <code>build-essential</code> and the
+          <code>libxml2-dev</code> packages is sufficient.
+        </p>
+
+        <h3><span id="cinstall" class="anchor">&nbsp;</span>Installation</h3>
+        <p>
+          The standard installation method uses the
+          <code>autoconf</code>/<code>automake</code> toolset. After
+          downloading and uncompression the source code run the
+          following commands from the top-level directory of the code.
+        </p>
+        <p>
+          {% highlight sh %}
+ ./configure
+ make
+ make check
+ make install  {% endhighlight %}
+        </p>
+        <p>The <code>make check</code> step is optional, but it is
+          useful to spot problems early on.
+        </p>
+
+        <h3><span id="cinstallosx" class="anchor">&nbsp;</span>
+          Installation on Mac OS X</h3>
+        <p>
+          You can use the regular Unix way (as above), or
+          <a href="http://brew.sh/">Homebrew</a>, the
+          <code>homebrew/science/igraph</code> formula.
+        </p>
+
+        <h3><span id="cinstallcygwin" class="anchor">&nbsp;</span>
+          Installation on Windows under Cygwin</h3>
+        <p>
+          One way to install igraph on Windows is to use 
+          <a href="http://www.cygwin.com/">Cygwin</a>. From a Cygwin
+          shell, use the standard installation method, as
+          above.
+        </p>
+
+        <h3><span id="cinstallmsvc" class="anchor">&nbsp;</span>
+          Installation on Windows using Microsoft Visual C++</h3>
+        <p>
+          It is also possible to use Microsoft Visual C++
+          (MSVC). Download the ZIP file made for MSVC, uncompress it,
+          and open the solution file <code>igraph.sln</code> from
+          MSVC. You can build the library the usual way then. For
+          GraphML support you'll need to install the
+          <code>libxml2</code> library by hand, see the 
+          <a href="http://www.zlatkovic.com/libxml.en.html">
+            Windows port</a> of <code>libxml2</code>.
+        </p>
+
+        <h3><span id="ctut" class="anchor">&nbsp;</span>Tutorials</h3>
+        <p>
+          <ul>
+            <li>The source code comes with some examples (also used
+              for testing). You can find them in the
+              <code>examples/simple</code> directory.</li>
+            <li>Most of the examples are also included in the 
+              <a href="/doc/c/">Reference Manual</a>.
+          </ul>
+        </p>
+
+        <div class="page-header">
+          <h1><span id="docs" class="anchor">&nbsp;</span>Documentation
+          <small>&ndash; for version {% include igraph-version %}</small></h1>
+        </div>
+
+        <h3><span id="rmanual" class="anchor">&nbsp;</span>R manual pages</h3>
+        <p>
+          <ul class="icons-ul list-unstyled">
+            <li><i class="icon-li icon-link"></i>
+            <a href="/doc/r/">Browse online</a></li>
+            <li><i class="icon-li icon-book"></i>
+            <a href="/doc/r/igraph.pdf">PDF file</a></li>
+          </ul>
+        </p>
+
+        <p>
+          Note that this documentation is included in the R
+          package. You can use <code>library(help="igraph")</code>
+          or <code>help("igraph")</code> as a starting point.
+        </p>
+
+        <h3><span id="pymanual" class="anchor">&nbsp;</span>Python manual</h3>
+        <p>
+          <ul class="icons-ul list-unstyled">
+            <li><i class="icon-li icon-link"></i>
+              <a href="/doc/python/tutorial/tutorial.html">Tutorial &ndash; read
+                online</a></li>
+            <li><i class="icon-li icon-link"></i>
+              <a href="/doc/python/igraph-module.html">
+                Reference manual &ndash; browse online</a></li>
+            <li><i class="icon-li icon-book"></i>
+              <a href="/doc/python/python-igraph.pdf">PDF file</a></li>
+          </ul>
+        </p>
+
+        <p>
+          Documentation for the Python interface is also included in
+          the Python docstrings, so you can use <code>pydoc</code> or
+          the built-in Python help facility as well.
+        </p>
+
+        <h3><span id="cmanual" class="anchor">&nbsp;</span>
+          C Reference Manual</h3>
+        <p>
+          <ul class="icons-ul list-unstyled">
+            <li><i class="icon-li icon-link"></i>
+              <a href="/doc/c/">Browse online</a></li>
+            <li><i class="icon-li icon-book"></i>
+              <a href="/doc/c/igraph-docs.pdf">PDF file</a></li>
+            <!-- <li><i class="icon-li icon-briefcase"></i> -->
+            <!--   <a href="/doc/c/igraph-docs.tar.gz">HTML bundle</a></li> -->
+            <li><i class="icon-li icon-info"></i>
+              <a href="/doc/c/igraph.info">GNU info document</a></li>
+          </ul>
+        </p>
+
+        <p>
+          The original XML DocBook format of the C Reference Manual can be
+          obtained by downloading the latest igraph development
+          version from <a href="https://github.com/igraph/igraph">
+          github</a>.
+        </p>
+
+        <!-- <h3><span id="screenshots" class="anchor">&nbsp;</span> -->
+        <!--   Screenshots and examples</h3> -->
+        <!-- <p> -->
+        <!--   TODO -->
+        <!-- </p> -->
+        <!-- <p> -->
+        <!--   See also the gallery in the -->
+        <!--   <a href="https://github.com/igraph/igraph/wiki"> -->
+        <!--       igraph wiki.</a> -->
+        <!-- </p> -->
+
+        <!-- <h3><span id="wiki" class="anchor">&nbsp;</span>Wiki</h3> -->
+        <!-- <p> -->
+        <!--   TODO -->
+        <!-- </p> -->
+
+        <div class="page-header">
+          <h1><span id="downloads" class="anchor">&nbsp;</span>Downloads
+          <small>&ndash; version {% include igraph-version %}</h1>
+        </div>
+
+        <h3><span id="rdown" class="anchor">&nbsp;</span>R package</h3>
+        <p>
+          <small> Note: the simplest way to install the igraph R
+            package is typing <code>install.packages("igraph")</code>
+            in your R session.</small>
+        </p>
+        <p>
+          <ul class="icons-ul list-unstyled">
+            <li><i class="icon-li icon-windows"></i>
+              <a href="/nightly/get/r-win/igraph_{% include igraph-rversion %}.zip">Windows binary package</a></li>
+            <li><i class="icon-li icon-apple"></i>
+              <a href="/nightly/get/r-osx/igraph_{% include igraph-rversion %}.tgz">Mac OS X universal binary package</a></li>
+            <li><i class="icon-li icon-file-text"></i>
+              <a href="/nightly/get/r/igraph_{% include igraph-rversion %}.tar.gz">Source package</a></li>
+          </ul>
+        </p>
+
+        <h3><span id="pydown" class="anchor">&nbsp;</span>
+          Python extension module</h3>
+        <p>
+          <ul class="icons-ul list-unstyled">
+            <li><i class="icon-li icon-windows"></i>
+              <a href="/nightly/python/python-igraph-{% include igraph-version %}.win32-py3.2.msi">Windows installer for Python 3.2</a></li>
+            <li><i class="icon-li icon-windows"></i>
+              <a href="/nightly/python/python-igraph-{% include igraph-version %}.win32-py2.7.msi">Windows installer for Python 2.7</a></li>
+            <li><i class="icon-li icon-windows"></i>
+              <a href="/nightly/python/python-igraph-{% include igraph-version %}.win32-py2.6.msi">Windows installer for Python 2.6</a></li>
+            <li><i class="icon-li icon-apple"></i>
+              <a href="/nightly/python/python_igraph-{% include igraph-version %}-py2.7-macosx10.8.dmg">OS X Lion installer (Python 2.7)</a></li>
+            <li><i class="icon-li icon-apple"></i>
+              <a href="/nightly/python/python_igraph-{% include igraph-version %}-py2.6-macosx10.8.dmg">OS X Lion installer (Python 2.6)</a></li>
+            <li><i class="icon-li icon-file-text"></i>
+              <a href="/nightly/python/python-igraph-{% include igraph-version %}.tar.gz">Source code</a></li>
+            <li><i class="icon-li icon-external-link"></i>
+              <a href="https://pypi.python.org/pypi/python-igraph">Python Package Index page</a></li>
+          </ul>
+        </p>
+
+        <h3><span id="cdown" class="anchor">&nbsp;</span>C library</h3>
+        <p>
+          <ul class="icons-ul list-unstyled">
+            <li><i class="icon-li icon-file-text"></i>
+              <a href="/nightly/get/c/igraph-{% include igraph-version %}.tar.gz">Source code</a></li>
+            <li><i class="icon-li icon-windows"></i>
+              <a href="/nightly/get/msvc/igraph-{% include igraph-version %}.zip">Source code for Microsoft Visual
+              Studio</a></li>
+          </ul>
+        </p>
+
+        <h3><span id="nightlydown" class="anchor">&nbsp;</span>
+          Nightly builds</h3>
+        <p>
+          Builds from our development branch(es) are available from
+          <a href="http://igraph.org/nightly">our nightly build server</a>.
+        </p>
+
+        <h3><span id="devdown" class="anchor">&nbsp;</span>
+          Development version</h3>
+        <p>
+          Clone (or fork) the <code>develop</code> branch from the
+          <a href="https://github.com/igraph/igraph">igraph git
+            reposity on github.</a>
+        </p>
+
+        <div class="page-header">
+          <h1><span id="help" class="anchor">&nbsp;</span>Get help</h1>
+        </div>
+
+        <h3><span id="list" class="anchor">&nbsp;</span>Mailing list</h3>
+        <p>
+          Post a question on the
+          <a href="https://lists.nongnu.org/mailman/listinfo/igraph-help">
+            igraph-help mailing list</a>. To avoid spam
+          on the list, you need to sign up first. You can also 
+          <a href="http://lists.nongnu.org/archive/html/igraph-help/">
+          search the mailing list.</a>
+        </p>
+
+        <h3><span id="so" class="anchor">&nbsp;</span>Stack Overflow</h3>
+        <p>
+          Post specific igraph questions on
+          <a href="http://stackoverflow.com/questions/tagged/igraph">
+            Stack Overflow</a>. Make sure that you include the
+          <code>igraph</code> tag and that you include a reproducible
+          example, complete with code and data.
+        </p>
+
+        <div class="page-header">
+          <h1><span id="contribute" class="anchor">&nbsp;</span>Contribute</h1>
+        </div>
+
+        <p>
+          Your contribution is more than welcome!
+        </p>
+        
+        <h3><span id="contributebugs" class="anchor">&nbsp;</span>
+          Report bugs</h3>
+
+        <p>Report bugs or suggest new features or algorithms in the 
+          <a href="https://github.com/igraph/igraph/issues">
+          github issue tracker</a>.
+        </p>
+        
+        <!-- <h3><span id="contributewiki" class="anchor">&nbsp;</span> -->
+        <!--   Improve the wiki</h3> -->
+        
+        <!-- <p>Add your work to the gallery in the -->
+        <!--   <a href="https://github.com/igraph/igraph/wiki"> -->
+        <!--         igraph wiki</a>. -->
+        <!-- </p> -->
+
+        <h3><span id="contributecode" class="anchor">&nbsp;</span>
+          Contribute code</h3>
+          
+        <p>Send a pull request on <a href="https://github.com/igraph/igraph">
+                github.</a> Please note that igraph can contain only
+          code that is compatible with its GPL license.
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+</div>

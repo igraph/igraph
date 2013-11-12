@@ -916,12 +916,12 @@ Color specification in CSS syntax
     This is a string according to one of the following formats (where *R*, *G* and
     *B* denote the red, green and blue components, respectively):
 
-      - ``#RRGGBB``, components range from 0 to 255 in hexadecimal format.
-        Example: ``"#0088ff"``.
-      - ``#RGB``, components range from 0 to 15 in hexadecimal format. Example:
-        ``"#08f"``.
-      - ``rgb(R, G, B)``, components range from 0 to 255 or from 0% to
-        100%. Example: ``"rgb(0, 127, 255)"`` or ``"rgb(0%, 50%, 100%)"``.
+    - ``#RRGGBB``, components range from 0 to 255 in hexadecimal format.
+      Example: ``"#0088ff"``.
+    - ``#RGB``, components range from 0 to 15 in hexadecimal format. Example:
+      ``"#08f"``.
+    - ``rgb(R, G, B)``, components range from 0 to 255 or from 0% to
+      100%. Example: ``"rgb(0, 127, 255)"`` or ``"rgb(0%, 50%, 100%)"``.
 
 List, tuple or whitespace-separated string of RGB values
     Example: ``(255, 128, 0)``, ``[255, 128, 0]`` or ``"255, 128, 0"``.
@@ -989,20 +989,21 @@ Pickled graph    ``pickle``    :meth:`Graph.Read_Pickle`    :meth:`Graph.write_p
 .. _Pajek: http://pajek.imfm.si/doku.php
 
 As an exercise, download the graph representation of the well-known
-`Zachary karate club study <http://igraph.sourceforge.net/karate.net>`_, save it to
-a folder and try to load it into |igraph|. Since it is a Pajek network file, you
-must use the Pajek reader method from the table above (make sure you use the
+`Zachary karate club study <http://nexus.igraph.org/api/dataset?id=1&format=GraphML>`_
+from igraph's own graph repository called `Nexus <http://nexus.igraph.org>`_,
+unzip it and try to load it into |igraph|. Since it is a GraphML file, you must
+must use the GraphML reader method from the table above (make sure you use the
 appropriate path to the downloaded file):
 
->>> karate = Graph.Read_Pajek("karate.net")
+>>> karate = Graph.Read_GraphML("karate.GraphML")
 >>> summary(karate)
 IGRAPH UNW- 34 78 -- Zachary's karate club network
 + attr: Author (g), Citation (g), name (g), Faction (v), id (v), name (v), weight (e)
 
-If you want to convert the very same graph into GraphML, you can do it with the
-GraphML writer method from the table above:
+If you want to convert the very same graph into, say, Pajek's format, you can do it
+with the Pajek writer method from the table above:
 
->>> karate.write_graphml("karate.graphml")
+>>> karate.write_pajek("karate.net")
 
 .. note:: Most of the formats have their own limitations; for instance, not all of
    them can store attributes. Your best bet is probably GraphML or GML if you
@@ -1021,8 +1022,8 @@ the preferred format is again inferred from the extension. The format detection 
 :func:`load` and :meth:`Graph.save` can be overridden by the ``format`` keyword
 argument which accepts the short names of the formats from the above table:
 
->>> karate = load("karate.net")
->>> karate.save("karate.graphml")
+>>> karate = load("karate.GraphML")
+>>> karate.save("karate.net")
 >>> karate.save("karate.my_extension", format="gml")
 
 
@@ -1037,7 +1038,7 @@ full `API documentation`_ which should provide information about almost every
 of the `Graph class`_. Should you get stuck, drop a mail to the `igraph mailing
 list`_ - maybe there is someone out there who can help you out immediately.
 
-.. _API documentation: http://igraph.sourceforge.net/doc/python/
-.. _Graph class: http://igraph.sourceforge.net/doc/python/igraph.Graph-class.html
+.. _API documentation: http://igraph.org/doc/python/
+.. _Graph class: http://igraph.org/doc/python/igraph.Graph-class.html
 .. _igraph mailing list: http://lists.nongnu.org/mailman/listinfo/igraph-help
 

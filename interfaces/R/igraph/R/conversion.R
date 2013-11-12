@@ -117,19 +117,19 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   }
 
   if (is.directed(graph)) {
-    res <- sparseMatrix(dims=c(vc, vc), i=el[,1], j=el[,2], x=value)
+    res <- Matrix::sparseMatrix(dims=c(vc, vc), i=el[,1], j=el[,2], x=value)
   } else {
     if (type=="upper") {
       ## upper
-      res <- sparseMatrix(dims=c(vc, vc), i=pmin(el[,1],el[,2]),
+      res <- Matrix::sparseMatrix(dims=c(vc, vc), i=pmin(el[,1],el[,2]),
                           j=pmax(el[,1],el[,2]), x=value)
     } else if (type=="lower") {
       ## lower
-      res <- sparseMatrix(dims=c(vc, vc), i=pmax(el[,1],el[,2]),
+      res <- Matrix::sparseMatrix(dims=c(vc, vc), i=pmax(el[,1],el[,2]),
                           j=pmin(el[,1],el[,2]), x=value)
     } else if (type=="both") {
       ## both
-      res <- sparseMatrix(dims=c(vc, vc), i=pmin(el[,1],el[,2]),
+      res <- Matrix::sparseMatrix(dims=c(vc, vc), i=pmin(el[,1],el[,2]),
                           j=pmax(el[,1],el[,2]), x=value, symmetric=TRUE)
       res <- as(res, "dgCMatrix")
     }
@@ -407,7 +407,7 @@ get.incidence.sparse <- function(graph, types, names, attr) {
   if (length(types) != vc) {
     stop("Invalid types vector")
   }
-  
+
   el <- get.edgelist(graph, names=FALSE)
   if (any(types[el[,1]] == types[el[,2]])) {
     stop("Invalid types vector, not a bipartite graph")
@@ -437,7 +437,7 @@ get.incidence.sparse <- function(graph, types, names, attr) {
     value <- rep(1, nrow(el))
   }
 
-  res <- spMatrix(n1, n2, i=el[,1], j=el[,2], x=value)
+  res <- Matrix::spMatrix(n1, n2, i=el[,1], j=el[,2], x=value)
 
   if (names && "name" %in% list.vertex.attributes(graph)) {
     rownames(res) <- V(graph)$name[which(!types)]

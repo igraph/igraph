@@ -138,7 +138,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  * 
  * </para><para>
  * This format is used by the Large Graph Layout program
- * (http://bioinformatics.icmb.utexas.edu/lgl/), and it is simply a
+ * (http://lgl.sourceforge.net), and it is simply a
  * symbolic weighted edge list. It is a simple text file with one edge
  * per line. An edge is defined by two symbolic vertex names separated
  * by whitespace. (The symbolic vertex names themselves cannot contain 
@@ -307,7 +307,7 @@ void igraph_lgl_yyset_in  (FILE * in_str, void* yyscanner );
  * </para><para>
  * The <code>.lgl</code> format is used by the Large Graph
  * Layout visualization software
- * (http://bioinformatics.icmb.utexas.edu/lgl/), it can 
+ * (http://lgl.sourceforge.net), it can 
  * describe undirected optionally weighted graphs. From the LGL
  * manual: 
  * 
@@ -888,9 +888,8 @@ int igraph_i_read_graph_graphdb_getword(FILE *instream) {
  * \brief Read a graph in the binary graph database format.
  * 
  * This is a binary format, used in the graph database
- * for isomorphism testing (http://amalfi.dis.unina.it/graph/)
- * From the graph database homepage
- * (http://amalfi.dis.unina.it/graph/db/doc/graphdbat-2.html):
+ * for isomorphism testing. From the (now defunct) graph database 
+ * homepage: 
  * </para>
  * 
  * \blockquote <para>
@@ -1050,7 +1049,7 @@ const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
  * \brief Read a graph in GML format.
  * 
  * GML is a simple textual format, see
- * http://www.infosun.fim.uni-passau.de/Graphlet/GML/ for details.
+ * http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html for details.
  * 
  * </para><para>
  * Although all syntactically correct GML can be parsed, 
@@ -2485,7 +2484,7 @@ int igraph_i_gml_convert_to_key(const char *orig, char **key) {
  * \brief Write the graph to a stream in GML format 
  * 
  * GML is a quite general textual format, see 
- * http://www.infosun.fim.uni-passau.de/Graphlet/GML/ for details.
+ * http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html for details.
  * 
  * </para><para> The graph, vertex and edges attributes are written to the
  * file as well, if they are numeric of string.

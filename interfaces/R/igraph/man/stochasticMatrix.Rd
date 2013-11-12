@@ -35,6 +35,7 @@ get.stochastic(graph, column.wise = FALSE, sparse =
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{get.adjacency}}}
 \examples{
+library(Matrix)
 ## g is a large sparse graph
 g <- barabasi.game(n = 10^5, power = 2, directed = FALSE)
 W <- get.stochastic(g, sparse=TRUE)

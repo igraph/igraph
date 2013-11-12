@@ -1,0 +1,395 @@
+---
+layout: newstemp
+title: igraph 0.5
+date: February 14, 2008
+tags: release
+---
+
+igraph 0.5
+=========
+
+February 14, 2008
+
+Release notes
+-------------
+
+There are a lot of improvements and corrections in this version. 
+We would like to thank all the people who sent comments, bug reports,
+patches, or just questions. Without their contribution igraph would be 
+definitely much less and worse than it is now. Please keep sending your 
+comments and ideas!
+
+Here is a list of major changes, with links to the relevant sections of the 
+documentation. See below for the complete list of changes.
+
+<!--more-->
+
+### [C] igraph as a platform
+
+We took some step towards turning igraph to an efficient platform for 
+implementing graph algorithms. In particular, we have a set of 
+<a href="doc-0.5/html/ch06.html">utility types</a> that support general
+scientific computing and working with graphs: vectors, matrices,
+stacks, queues, heaps, adjacency lists, etc.
+
+### [C][R][PY] Graph isomorphism
+
+igraph includes the BLISS graph isomorphism algorithm and
+implementation now. This and the improved VF2 implementation, which
+can now calculate subgraph isomorphism, make igraph support the
+bleeding edge of graph isomorphism algorithms. Many thanks to the
+authors of BLISS. See the details in the 
+<a href="doc-0.5/html/igraph-Isomorphism.html">Reference Manual</a>, in
+the <a href="doc-0.5/R/graph.isomorphism.html">R documentation</a> or in the
+<a href="doc-0.5/python/igraph.GraphBase-class.html#isomorphic">Python
+documentation.</a>
+
+### [C][R][PY] ARPACK for eigenvalue problems
+
+ARPACK is a library for solving large scale sparse eigenvalue
+problems. In igraph it is very handy, as many centrality problems are
+in fact eigenvalue problems: Kleinberg's hub and authority scores, 
+PageRank, the leading eigenvector community detection algorithm are
+some examples. Many thanks to the authors of ARPACK and James Fowler,
+who suggested to include it in igraph. 
+
+See the details in the
+<a href="doc-0.5/html/igraph-Arpack.html">Reference Manual</a>, in the
+<a href="doc-0.5/R/arpack.html">R documentation</a> or the 
+<a href="doc-0.5/python/igraph.Graph-class.html#evcent">evcent</a>,
+<a href="doc-0.5/python/igraph.Graph-class.html#pagerank">pagerank</a>,
+<a href="doc-0.5/python/igraph.Graph-class.html#hub_score">hub_score</a>, etc.
+functions in the Python documentation.
+
+### [PY] Plotting from Python
+
+Plotting functionality based on the Cairo graphics library (so you need to
+install python-cairo if you want to use it). Currently the following
+objects can be plotted: graphs, adjacency matrices and dendrograms. Some
+crude support for plotting histograms is also implemented. Plots can be
+saved in PNG, SVG and PDF formats.
+
+See the details <a href="doc-0.5/python/igraph.drawing-module.html">in the documentation.</a>
+
+### [C][R][PY] Other bits
+
+#### [PY] Shell interface in Python
+
+igraph can now be invoked by calling the script called
+`igraph` from the command line. The script launches the
+Python interpreter and automatically imports igraph functions into the
+main namespace.
+
+#### [C][R][PY] Create famous graphs easily
+
+Some classic graphs can be created by giving their name. This is
+very handy if one needs a test graph quickly. See 
+<a href="doc-0.5/html/igraph_famous.html">`igraph_famous`</a> (C), 
+<a href="doc-0.5/R/graph.famous.html">`graph.famous()`</a> (R) or 
+<a href="doc-0.5/python/igraph.GraphBase-class.html#Famous">Famous</a> (Python).
+(The idea is based on Combinatorica, a Mathematica extension.)
+
+#### [R] Create graphs using formulas in R
+
+The new 
+<a href="doc-0.5/R/graph.formula.html">`graph.formula()`</a>
+function provides a simple, concise way to create (small) graphs.
+Numerous examples are included in the 
+<a href="doc-0.5/R/graph.formula.html">manual page.</a>
+
+#### [C][R][PY] Improvements for weighted graphs
+
+Many functions were updated to handle weighted graphs: fast greedy
+community detection (<a href="doc-0.5/html/igraph_community_fastgreedy.html">C</a>, 
+<a href="doc-0.5/R/fastgreedy.community.html">R</a>, <a
+href="doc-0.5/python/igraph.Graph-class.html#community_fastgreedy">Python</a>), 
+Page Rank (<a href="doc-0.5/html/igraph_pagerank.html">C</a>, 
+<a href="doc-0.5/R/page.rank.html">R</a>, <a
+href="doc-0.5/python/igraph.GraphBase-class.html#pagerank">Python</a>), 
+modularity calculation (<a href="doc-0.5/html/igraph_modularity.html">C</a>, 
+<a href="doc-0.5/R/modularity.html">R</a>, <a
+href="doc-0.5/python/igraph.clustering.VertexClustering-class.html#modularity">Python</a>),
+the Fruchterman-Reingold layout algorithm (<a
+href="doc-0.5/html/igraph_layout_fruchterman_reingold.html">C</a>, 
+<a href="doc-0.5/R/layout.html">R</a>,
+<a href="doc-0.5/python/igraph.GraphBase-class.html#layout_fruchterman_reingold">Python</a>). 
+
+#### [C][R][PY] Non-simple graphs
+
+Some functions were added and improved to handle non-simple graphs
+(i.e. graphs with loop and/or multiple edges) better: testing that a
+graph is simple (<a href="doc-0.5/html/igraph_is_simple.html">C</a>, 
+<a href="doc-0.5/R/simplify.html">R</a>, <a
+href="doc-0.5/python/igraph.GraphBase-class.html#is_simple">Python</a>), testing for loop edges (<a
+href="doc-0.5/html/igraph_is_loop.html">C</a>, <a
+href="doc-0.5/R/is.multiple.html">R</a>, 
+<a href="doc-0.5/python/igraph.GraphBase-class.html#is_loop">Python</a>), 
+testing for multiple edges (<a href="doc-0.5/html/igraph_is_multiple.html">C</a>, <a
+href="doc-0.5/R/is.multiple.html">R</a>, <a
+href="doc-0.5/python/igraph.GraphBase-class.html#is_multiple">Python</a>) and counting the multiplicity of 
+edges (<a href="doc-0.5/html/igraph_count_multiple.html">C</a>, 
+<a href="doc-0.5/R/is.multiple.html">R</a>, <a href="doc-0.5/python/igraph.GraphBase-class.html#count_multiple">Python</a>).
+
+#### [PY] Pickling support in Python
+
+igraph Graph objects can be serialized (pickled) in Python.
+
+#### [C][R][PY] The graphopt layout algorithm
+
+This is a nice force-based layout algorithm. See the documentation of
+details (<a href="doc-0.5/html/igraph_layout_graphopt.html">C</a>, 
+<a href="doc-0.5/R/layout.html">R</a>, <a href="doc-0.5/python/igraph.GraphBase-class.html#layout_graphopt">Python</a>).
+
+#### [C][R][PY] Support for the DOT file format
+
+igraph can now write graphs to files in the DOT format, used by
+GraphViz. See documentation: <a
+href="doc-0.5/html/igraph_write_graph_dot.html">C</a>, 
+<a href="doc-0.5/R/write.graph.html">R</a>, <a
+href="doc-0.5/python/igraph.GraphBase-class.html#write_dot">Python</a>.
+
+#### [C][R][PY] Dyad and triad census
+
+Classic social network analysis tools for classifying the dyads (<a
+href="doc-0.5/html/igraph_dyad_census.html">C</a>, 
+<a href="doc-0.5/R/dyad.census.html">R</a>, <a href="doc-0.5/python/igraph.Graph-class.html#dyad_census">Python</a>) and triads (<a
+href="doc-0.5/html/igraph_triad_census.html">C</a>, 
+<a href="doc-0.5/R/triad.census.html">R</a>, <a href="doc-0.5/python/igraph.Graph-class.html#triad_census">Python</a>) of a network.
+
+#### [C][R][PY] Biconnected components and articulation points
+
+igraph is now able to calculate biconnected components (<a
+href="doc-0.5/html/igraph_biconnected_components.html">C</a>, 
+<a href="doc-0.5/R/biconnected.components.html">R</a>, <a href="doc-0.5/python/igraph.Graph-class.html#biconnected_components">Python</a>) 
+and articulation points (<a
+href="doc-0.5/html/igraph_articulation_points.html">C</a>, 
+<a href="doc-0.5/R/articulation.points.html">R</a>, <a
+href="doc-0.5/python/igraph.Graph-class.html#biconnected_components">Python</a>).
+
+#### [R] R graphics improvements
+
+There were some minor improvements in R graphics. New graphical
+parameters: `frame`, `asp`, `rescale`
+and `shape` for different vertex shapes, right now only
+circles and squares are supported. 
+<a href="doc-0.5/R/plot.graph.html">`plot.igraph`</a> has as
+argument (`add`) to plot many graphs on the same plot,
+maybe on top of each other. It also supports the `main` and
+`sub` arguments now. <a href="doc-0.5/R/plot.common.html">See more here.</a>
+
+#### [R] Always free memory in R after an interrupted calculation
+
+In previous versions of the igraph R package the allocated memory
+was not freed if the computation was interrupted. This surely affected 
+MS Windows platforms, maybe also OSX. (Not Linux.) igraph 0.5
+correctly deallocates all memory on all platforms after an
+interruption.
+
+#### [C][R][PY] Estimating closeness and betweenness
+
+These measures can be quickly estimated by specifying an upper bound
+for path lengths to be considered. This is useful for larger graphs,
+for which the calculation takes a long time. See documentation for
+closeness (<a href="doc-0.5/html/igraph_closeness_estimate.html">C</a>, 
+<a href="doc-0.5/R/closeness.html">R</a>, <a href="doc-0.5/python/igraph.GraphBase-class.html#closeness">Python</a>),
+betweenness (<a href="doc-0.5/html/igraph_betweenness_estimate.html">C</a>, 
+<a href="doc-0.5/R/betweenness.html">R</a>, <a href="doc-0.5/python/igraph.GraphBase-class.html#betweenness">Python</a>) and edge
+betweenness (<a href="doc-0.5/html/igraph_edge_betweenness_estimate.html">C</a>, 
+<a href="doc-0.5/R/betweenness.html">R</a>, <a href="doc-0.5/python/igraph.GraphBase-class.html#edge_betweenness">Python</a>).
+
+#### [C][R][PY] Functions for vertex similarity measures
+
+Two vertex similarity measures based on the number of common neighbors
+are introduced, the Jaccard (<a
+href="doc-0.5/html/igraph_similarity_jaccard.html">C</a>, 
+<a href="doc-0.5/R/similarity.html">R</a>, <a
+href="doc-0.5/python/igraph.GraphBase-class.html#similarity_jaccard">Python</a>) and the Dice (<a
+href="doc-0.5/html/igraph_similarity_dice.html">C</a>, 
+<a href="doc-0.5/R/similarity.html">R</a>,
+<a href="doc-0.5/python/igraph.GraphBase-class.html#similarity_dice">Python</a>) similarities.
+
+#### [R] Proper warnings in R
+
+Up to now igraph warnings were dumped to the console when using the
+igraph R package. In many cases this meant that they were effectively
+lost. In the new version igraph warnings are converted to proper R
+warnings.
+
+#### [C] Handle attributes from C
+
+An experimental C attribute interface was added. This allows using
+graph/vertex/edge attributes when programming from C. <a
+href="doc-0.5/html/ch09s02.html">See
+more here.</a>
+
+New in the R interface
+----------------------
+
+- The `rescale`, `asp` and `frame` graphical parameters were added
+- Create graphs from a formula notation (`graph.formula`)
+- Handle graph attributes properly
+- Calculate the actual minimum cut for undirected graphs
+- Adjacency lists, `get.adjlist` and `get.adjedgelist` added
+- Eigenvector centrality computation is much faster now
+- Proper R warnings, instead of writing the warning to the terminal
+- R checks graphical parameters now, the unknown ones are not just
+  ignored, but an error message is given.
+- `plot.igraph` has an `add` argument now to compose plots with multiple
+  graphs
+- `plot.igraph` supports the `main` and `sub` arguments
+- `layout.norm` is public now, it can normalize a layout
+- It is possible to supply startup positions to layout generators
+- Always free memory when `CTRL+C/ESC is` pressed, in all operating
+  systems
+- `plot.igraph` can plot square vertices now, see the `shape` parameter
+- `graph.adjacency` rewritten when creating weighted graphs
+- We use `match.arg` whenever possible. This means that character scalar 
+  options can be abbreviated and they are always case insensitive
+
+- VF2 graph isomorphism routines can check subgraph isomorphism now,
+  and they are able to return matching(s)
+- The BLISS graph isomorphism algorithm is included in igraph now. See
+  `canonical.permutation`, `graph.isomorphic.bliss`
+- We use ARPACK for eigenvalue/eigenvector calculation. This means that the
+  following functions were rewritten: `page.rank`,
+  `leading.eigenvector.community.*`, `evcent`. New functions based on
+  ARPACK: `hub.score`, `authority.score`, `arpack`.
+- Edge weights for Fruchterman-Reingold layout (`layout.fruchterman.reingold`).
+- Line graph calculation (`line.graph`)
+- Kautz and de Bruijn graph generators (`graph.kautz`, `graph.de.bruijn`)
+- Support for writing graphs in DOT format
+- Jaccard and Dice similarity coefficients added (`similarity.jaccard`,
+  `similarity.dice`)
+- Counting the multiplicity of edges (`count.multiple`)
+- The graphopt layout algorithm was added, `layout.graphopt`
+- Generation of "famous" graphs (`graph.famous`).
+- Create graphs from LCF notation (`graph.cf`).
+- Dyad census and triad cencus functions (`dyad.census`, `triad.census`)
+- Cheking for simple graphs (`is.simple`)
+- Create full citation networks (`graph.full.citation`)
+- Create a histogram of path lengths (`path.length.hist`)
+- Forest fire model added (`forest.fire.game`)
+- DIMACS reader can handle different file types now
+- Biconnected components and articulation points (`biconnected.components`,
+  `articulation.points`)
+- Kleinberg's hub and authority scores (`hub.score`, `authority.score`)
+- `as.undirected` handles attributes now
+- Geometric random graph generator (`grg.game`) can return the
+  coordinates of the vertices
+- Function added to convert leading eigenvector community structure result to
+  a membership vector (`community.le.to.membership`)
+- Weighted fast greedy community detection
+- Weighted page rank calculation
+- Functions for estimating closeness, betweenness, edge betweenness by 
+  introducing a cutoff for path lengths (`closeness.estimate`,
+  `betweenness.estimate`, `edge.betweenness.estimate`)
+- Weighted modularity calculation
+- Function for permuting vertices (`permute.vertices`)
+- Betweenness and closeness calculations are speeded up
+- `read.graph` can handle all possible line terminators now (\r, \n, \r\n, \n\r)
+- Error handling was rewritten for walktrap community detection,
+  the calculation can be interrupted now
+- The maxflow/mincut functions allow to supply NULL pointer for edge
+  capacities, implying unit capacities for all edges
+
+Bugs corrected in the R interface
+---------------------------------
+
+- Fixed a bug in `cohesive.blocks`, cohesive blocks were sometimes not
+  calculated correctly
+
+New in the Python interface
+---------------------------
+
+- Added shell interface: igraph can now be invoked by calling the script called
+  `igraph` from the command line. The script launches the Python interpreter and
+  automatically imports igraph functions into the main namespace
+- Pickling (serialization) support for `Graph` objects
+- Plotting functionality based on the Cairo graphics library (so you need to
+  install python-cairo if you want to use it). Currently the following
+  objects can be plotted: graphs, adjacency matrices and dendrograms. Some
+  crude support for plotting histograms is also implemented. Plots can be
+  saved in PNG, SVG and PDF formats.
+- Unified `Graph.layout` method for accessing layout algorithms
+- Added interfaces to walktrap community detection and the BLISS isomorphism
+  algorithm
+- Added dyad and triad census functionality and motif counting
+- `VertexSeq` and `EdgeSeq` objects can now be restricted to subsets of the
+  whole network (e.g., you can select vertices/edges based on attributes,
+  degree, centrality and so on)
+
+New in the C library
+--------------------
+
+- Many types (stack, matrix, dqueue, etc.) are templates now
+  They were also rewritten to provide a better organized interface
+- VF2 graph isomorphism routines can check subgraph isomorphism now,
+  and they are able to return matching(s)
+- The BLISS graph isomorphism algorithm is included in igraph now. See
+  `igraph_canonical_permutation`, `igraph_isomorphic_bliss`
+- We use ARPACK for eigenvalue/eigenvector calculation. This means that the
+  following functions were rewritten: `igraph_pagerank`,
+  `igraph_community_leading_eigenvector_*`. New functions based on
+  ARPACK: `igraph_eigenvector_centrality`, `igraph_hub_score`,
+  `igraph_authority_score`, `igraph_arpack_rssolve`, `igraph_arpack_rnsolve`
+- Experimental C attribute interface added. I.e. it is possible to use
+  graph/vertex/edge attributes from C code now.
+
+- Edge weights for Fruchterman-Reingold layout.
+- Line graph calculation.
+- Kautz and de Bruijn graph generators
+- Support for writing graphs in DOT format
+- Jaccard and Dice similarity coefficients added
+- `igraph_count_multiple` added
+- `igraph_is_loop` and `igraph_is_multiple` "return" boolean vectors
+- The graphopt layout algorithm was added, `igraph_layout_graphopt`
+- Generation of "famous" graphs, `igraph_famous`
+- Create graphs from LCF notation, `igraph_lcf`, `igraph_lcf_vector`
+- `igraph_add_edge` adds a single edge to the graph
+- Dyad census and triad cencus functions added
+- `igraph_is_simple` added
+- progress handlers are allowed to stop calculation
+- `igraph_full_citation` to create full citation networks
+- `igraph_path_length_hist`, create a histogram of path lengths
+- forest fire model added
+- DIMACS reader can handle different file types now
+- Adjacency list types made public now (`igraph_adjlist_t`,
+  `igraph_adjedgelist_t`)
+- Biconnected components and articulation points can be computed
+- Eigenvector centrality computation
+- Kleinberg's hub and authority scores
+- igraph_to_undirected handles attributes now
+- Geometric random graph generator can return the coordinates of the vertices
+- Function added to convert leading eigenvector community structure result to
+  a membership vector (`igraph_le_community_to_membership`)
+- Weighted fast greedy community detection
+- Weighted page rank calculation
+- Functions for estimating closeness, betweenness, edge betweenness by 
+  introducing a cutoff for path lengths
+- Weighted modularity calculation
+- `igraph_permute_vertices` added
+- Betweenness ans closeness calculations are speeded up
+- Startup positions can be supplied to the Kamada-Kawai layout
+  algorithms
+- `igraph_read_graph_*` functions can handle all possible line
+  terminators now (\r, \n, \r\n, \n\r)
+- Error handling was rewritten for walktrap community detection,
+  the calculation can be interrupted now
+- The maxflow/mincut functions allow to supply a null pointer for edge
+  capacities, implying unit capacities for all edges
+
+Bugs corrected in the C library
+-------------------------------
+
+- Memory leak fixed in adjacency list handling
+- Memory leak fixed in maximal independent vertex set calculation
+- Fixed a bug when rewiring undirected graphs with igraph_rewire
+- Fixed edge betweenness community structure detection for unconnected graphs
+- Make igraph compile with Sun Studio
+- Betweenness bug fixed, when not computing for all vertices
+- memory usage of clique finding reduced
+- Corrected bugs for motif counts when not all motifs were counted,
+  but a `cut` vector was used
+- Bugs fixed in trait games and cited type game
+- Accept underscore as letter in GML files
+- GML file directedness notation reversed, more logical this way

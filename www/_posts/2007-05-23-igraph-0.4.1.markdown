@@ -1,0 +1,13 @@
+---
+layout: newstemp
+title: igraph 0.4.1
+date: May 23, 2007
+---
+
+igraph 0.4.1
+=========
+
+May 23, 2007
+
+This is a minor release, it corrects a number of bugs, mostly in the 
+R package.

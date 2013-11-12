@@ -45,8 +45,8 @@
 // 02110-1301 USA
 //-----------------------------------------------------------------------------
 // Author   : Pascal Pons 
-// Email    : pons@liafa.jussieu.fr
-// Web page : http://www.liafa.jussieu.fr/~pons/
+// Email    : pascal.pons@gmail.com
+// Web page : http://www-rp.lip6.fr/~latapy/PP/walktrap.html
 // Location : Paris, France
 // Time	    : June 2005
 //-----------------------------------------------------------------------------

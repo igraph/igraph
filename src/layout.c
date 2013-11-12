@@ -1180,7 +1180,7 @@ void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  * </para><para>
  * This is a layout generator similar to the Large Graph Layout
  * algorithm and program
- * (http://bioinformatics.icmb.utexas.edu/lgl/). But unlike LGL, this
+ * (http://lgl.sourceforge.net/). But unlike LGL, this
  * version uses a Fruchterman-Reingold style simulated annealing
  * algorithm for placing the vertices. The speedup is achieved by
  * placing the vertices on a grid and calculating the repulsion only

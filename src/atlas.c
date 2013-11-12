@@ -42,8 +42,8 @@
  *      \endolist
  *
  * </para><para>
- * The data was converted from the networkx software package, 
- * see http://networkx.lanl.gov.
+ * The data was converted from the NetworkX software package, 
+ * see http://networkx.github.io .
  * 
  * </para><para>
  * See \emb An Atlas of Graphs \eme by Ronald C. Read and Robin J. Wilson, 
