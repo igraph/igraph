@@ -42,6 +42,14 @@
 #include "bigint.h"
 #include "prpack.h"
 
+int igraph_personalized_pagerank_arpack(const igraph_t *graph, 
+		    igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping, 
+		    igraph_vector_t *reset,
+		    const igraph_vector_t *weights,
+		    igraph_arpack_options_t *options);
+
 igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
   /* Many of the centrality measures correspond to the eigenvector of some
    * matrix. When v is an eigenvector, c*v is also an eigenvector, therefore
@@ -1091,13 +1099,14 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \example examples/simple/igraph_pagerank.c
  */
 
-int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
+		    igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
-		    const igraph_vector_t *weights,
-		    igraph_arpack_options_t *options) {
-	return igraph_personalized_pagerank(graph, vector, value, vids, directed,
-			damping, 0, weights, options);
+		    const igraph_vector_t *weights, void *options) {
+  return igraph_personalized_pagerank(graph, algo, vector, value, vids, 
+				      directed, damping, 0, weights, 
+				      options);
 }
 
 /**
@@ -1159,12 +1168,13 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
  * the underlying machinery.
  */
 
-int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vector,
+int igraph_personalized_pagerank_vs(const igraph_t *graph, 
+		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vs_t reset_vids,
 		    const igraph_vector_t *weights,
-		    igraph_arpack_options_t *options) {
+		    void *options) {
 	igraph_vector_t reset;
 	igraph_vit_t vit;
 
@@ -1179,8 +1189,10 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vect
 	igraph_vit_destroy(&vit);
 	IGRAPH_FINALLY_CLEAN(1);
 	
-	IGRAPH_CHECK(igraph_personalized_pagerank(graph, vector, value, vids, directed, damping,
-				&reset, weights, options));
+	IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, vector, 
+						  value, vids, directed, 
+						  damping, &reset, weights,
+						  options));
 
 	igraph_vector_destroy(&reset);
 	IGRAPH_FINALLY_CLEAN(1);
@@ -1241,15 +1253,38 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vect
  * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
  * the underlying machinery.
  */
-int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+int igraph_personalized_pagerank(const igraph_t *graph, 
+		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vector_t *reset,
 		    const igraph_vector_t *weights,
-		    igraph_arpack_options_t *options) {
+		    void *options) {
 
+  if (algo == IGRAPH_PAGERANK_ALGO_POWER) {
+    igraph_pagerank_power_options_t *o = 
+      (igraph_pagerank_power_options_t *) options;
+    if (reset) { 
+      IGRAPH_WARNING("Cannot use weights with power method, "
+		     "weights will be ignored");
+    }
+    return igraph_pagerank_old(graph, vector, vids, directed, 
+			       o->niter, o->eps, damping, 
+			       /*old=*/ 0);
+  } else if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
+    igraph_arpack_options_t *o= (igraph_arpack_options_t*) options;
+    return igraph_personalized_pagerank_arpack(graph, vector, value, vids,
+					       directed, damping, reset, 
+					       weights, o);
+  } else if (algo == IGRAPH_PAGERANK_ALGO_PRPACK) {
     return igraph_personalized_pagerank_prpack(graph, vector, value, vids,
-        directed, damping, reset, weights);
+					       directed, damping, reset, 
+					       weights);
+  } else {
+    IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);
+  }
+
+  return 0;
 }
 
 /*

@@ -1370,6 +1370,9 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
   igraph_real_t maxdiff=eps;
   igraph_vit_t vit;
 
+  IGRAPH_WARNING("igraph_pagerank_old is deprecated from igraph 0.7, "
+		 "use igraph_pagerank instead");
+
   if (niter<=0) IGRAPH_ERROR("Invalid iteration count", IGRAPH_EINVAL);
   if (eps<=0) IGRAPH_ERROR("Invalid epsilon value", IGRAPH_EINVAL);
   if (damping<=0 || damping>=1) IGRAPH_ERROR("Invalid damping factor", IGRAPH_EINVAL);
