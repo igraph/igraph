@@ -4744,12 +4744,10 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
 {
   static char *kwlist[] =
     { "vertices", "directed", "damping", "reset", "reset_vertices", "weights",
-      "arpack_options", NULL };
+      NULL };
   PyObject *directed = Py_True;
   PyObject *vobj = Py_None, *wobj = Py_None, *robj = Py_None, *rvsobj = Py_None;
   PyObject *list;
-  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
-  igraphmodule_ARPACKOptionsObject *arpack_options;
   double damping = 0.85;
   igraph_vector_t res;
   igraph_vector_t *reset = 0;
@@ -4759,9 +4757,8 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
   int retval;
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOOOO!", kwlist, &vobj,
-                                   &directed, &damping, &robj, &rvsobj, &wobj,
-                                   &igraphmodule_ARPACKOptionsType,
-                                   &arpack_options_o))
+                                   &directed, &damping, &robj,
+				   &rvsobj, &wobj))
     return NULL;
 
   if (robj != Py_None && rvsobj != Py_None) {
@@ -4805,13 +4802,16 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
     return igraphmodule_handle_igraph_error();
   }
 
-  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (rvsobj != Py_None)
-    retval = igraph_personalized_pagerank_vs(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
-        damping, reset_vs, &weights, igraphmodule_ARPACKOptions_get(arpack_options));
+    retval = igraph_personalized_pagerank_vs(&self->g,
+	     IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0, vs,
+	     PyObject_IsTrue(directed), damping, reset_vs,
+	     &weights, /*options=*/ 0);
   else
-    retval = igraph_personalized_pagerank(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
-        damping, reset, &weights, igraphmodule_ARPACKOptions_get(arpack_options));
+    retval = igraph_personalized_pagerank(&self->g,
+	  IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0, vs,
+	  PyObject_IsTrue(directed), damping, reset, &weights,
+	  /*options=*/ 0);
 
   if (retval) {
     igraphmodule_handle_igraph_error();
@@ -12839,9 +12839,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  vertices.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
-   "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
-   "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
-   "  variable called C{arpack_options} is used.\n"
    "@return: a list with the personalized PageRank values of the specified\n"
    "  vertices.\n"},
 
