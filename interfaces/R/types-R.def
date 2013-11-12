@@ -358,3 +358,20 @@ EIGENWHICH:
             %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
     DEFAULT: 
       Default: list()
+
+PAGERANKALGO:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "power"=0L, "arpack"=1L, \
+                          "prpack"=2L)
+    DEFAULT:
+      PRPACK: c("prpack", "arpack", "power")
+
+PAGERANKOPT:
+    INCONV: if (is.null(%I%)) {                         \
+              if (%I1% == 0L) {                         \
+                %I% <- list(niter=1000, eps=0.001)      \
+              } else if (%I1% == 1L) {                  \
+                %I% <- igraph.arpack.default            \
+              } else {                                  \
+                %I% <- NULL                             \
+              }                                         \
+            }

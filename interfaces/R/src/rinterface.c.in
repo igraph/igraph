@@ -84,6 +84,8 @@ int R_SEXP_to_vector_long_copy(SEXP sv, igraph_vector_long_t *v);
 int R_SEXP_to_hrg(SEXP shrg, igraph_hrg_t *hrg);
 int R_SEXP_to_hrg_copy(SEXP shrg, igraph_hrg_t *hrg);
 int R_SEXP_to_sparsemat(SEXP pakl, igraph_sparsemat_t *akl);
+int R_SEXP_to_pagerank_power_options(SEXP popt,
+				     igraph_pagerank_power_options_t *opt);
 
 SEXP R_igraph_i_lang7(SEXP s, SEXP t, SEXP u, SEXP v, SEXP w, SEXP x, SEXP y)
 {
@@ -2547,6 +2549,13 @@ int R_SEXP_to_sparsemat(SEXP pakl, igraph_sparsemat_t *akl) {
 			  /*p=*/ INTEGER(p), /*i=*/ INTEGER(i), 
 			  /*x=*/ REAL(x), /*nz=*/ -1);
   
+  return 0;
+}
+
+int R_SEXP_to_pagerank_power_options(SEXP popt,
+				     igraph_pagerank_power_options_t *opt) {
+  opt->niter=INTEGER(AS_INTEGER(R_igraph_getListElement(popt, "niter")))[0];
+  opt->eps=REAL(R_igraph_getListElement(popt, "eps"))[0];
   return 0;
 }
 

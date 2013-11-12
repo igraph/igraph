@@ -967,3 +967,31 @@ EIGENWHICH:
   CALL: &%C%
   INCONV:
     IN: R_SEXP_to_igraph_eigen_which(%I%, &%C%);
+
+PAGERANKALGO:
+  CTYPE: igraph_pagerank_algo_t
+  INCONV:
+    IN: %C%=(igraph_pagerank_algo_t) INTEGER(%I%)[0];
+
+PAGERANKOPT:
+  CTYPE: igraph_pagerank_power_options_t %C%1; \
+         igraph_arpack_options_t %C%2; \
+         void*
+  INCONV:
+    INOUT: if (%C1% == IGRAPH_PAGERANK_ALGO_POWER) {          \
+             R_SEXP_to_pagerank_power_options(%I%, &%C%1);    \
+             %C% = &%C%1;                                     \
+           } else if (%C1% == IGRAPH_PAGERANK_ALGO_ARPACK) {  \
+             R_SEXP_to_igraph_arpack_options(%I%, &%C%2);     \
+             %C% = &%C%2;	                              \
+           } else {                                           \
+             %C% = 0;                                         \
+           }
+  OUTCONV:
+    INOUT: if (%C1% == IGRAPH_PAGERANK_ALGO_POWER) {                \
+             PROTECT(%I%);                                          \
+           } else if (%C1% == IGRAPH_PAGERANK_ALGO_ARPACK) {        \
+             PROTECT(%I% = R_igraph_arpack_options_to_SEXP(&%C%2)); \
+           } else {                                                 \
+             PROTECT(%I%);                                          \
+           }

@@ -465,23 +465,25 @@ igraph_pagerank_old:
         NAME-R: page.rank.old
 
 igraph_pagerank:
-        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
+        PARAMS: GRAPH graph, PAGERANKALGO algo=PRPACK, \
+                OUT VERTEXINDEX vector, OUT REALPTR value, \
                 VERTEXSET vids=ALL, BOOLEAN directed=True, \
                 REAL damping=0.85, EDGEWEIGHTS weights=NULL, \
-                INOUT ARPACKOPT options=igraph.arpack.default
-        DEPS: vids ON graph, weights ON graph, vector ON graph vids
-        DEFAULT-R: options=igraph.arpack.default
+                INOUT PAGERANKOPT options=NULL
+        DEPS: vids ON graph, weights ON graph, vector ON graph vids \
+              options ON algo
         NAME-R: page.rank
         IGNORE: RR, RC, RNamespace
 
 igraph_personalized_pagerank:
-        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
+        PARAMS: GRAPH graph, PAGERANKALGO algo=PRPACK, \
+                OUT VERTEXINDEX vector, OUT REALPTR value, \
                 VERTEXSET vids=ALL, BOOLEAN directed=True, \
                 REAL damping=0.85, VECTOR_OR_0 personalized=NULL, \
                 EDGEWEIGHTS weights=NULL, \
-                INOUT ARPACKOPT options=igraph.arpack.default
-        DEPS: vids ON graph, weights ON graph, vector ON graph vids
-        DEFAULT-R: options=igraph.arpack.default
+                INOUT PAGERANKOPT options=NULL
+        DEPS: vids ON graph, weights ON graph, vector ON graph vids, \
+              options ON algo
         NAME-R: page.rank
 
 igraph_rewire:
