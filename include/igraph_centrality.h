@@ -73,13 +73,37 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
 			igraph_integer_t niter, igraph_real_t eps, 
 			igraph_real_t damping, igraph_bool_t old);
 
+/**
+ * \typedef igraph_pagerank_algo_t
+ * \brief PageRank algorithm implementation
+ *
+ * Algorithms to calculate PageRank.
+ * \enumval IGRAPH_PAGERANK_ALGO_POWER Use a simple power iteration,
+ *   as it was implemented before igraph version 0.5.
+ * \enumval IGRAPH_PAGERANK_ALGO_ARPACK Use the ARPACK library, this
+ *   was the PageRank implementation in igraph from version 0.5, until
+ *   version 0.7.
+ * \enumval IGRAPH_PAGERANK_ALGO_PRPACK Use the PRPACK
+ *   library. Currently this implementation is recommended.
+ */
+
 typedef enum {
   IGRAPH_PAGERANK_ALGO_POWER=0,
   IGRAPH_PAGERANK_ALGO_ARPACK=1,
   IGRAPH_PAGERANK_ALGO_PRPACK=2
 } igraph_pagerank_algo_t;
 
-typedef struct {
+/**
+ * \struct igraph_pagerank_power_options_t
+ * \brief Options for the power method
+ *
+ * \member niter The number of iterations to perform, integer.
+ * \member eps  The algorithm will consider the calculation as complete
+ *        if the difference of values between iterations change
+ *        less than this value for every vertex.
+ */
+
+typedef struct igraph_pagerank_power_options_t {
   igraph_integer_t niter;
   igraph_real_t eps;
 } igraph_pagerank_power_options_t;

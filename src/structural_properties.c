@@ -1297,6 +1297,11 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  * it is provided for compatibility with igraph versions earlier than 
  * 0.5. Please use the new implementation \ref igraph_pagerank() in 
  * new projects.
+ *
+ * </para><para>
+ * From version 0.7 this function is deprecated and its use gives a
+ * warning message.
+ *
  * </para><para>
  * Please note that the PageRank of a given vertex depends on the PageRank
  * of all other vertices, so even if you want to calculate the PageRank for
