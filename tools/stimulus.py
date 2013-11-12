@@ -627,7 +627,7 @@ class RCCodeGenerator(CodeGenerator):
                 else:
                     decl="  " + ctype + " " + cname + ";"
             else:
-                decl=""            
+                decl=""
             return decl.replace("%C%", cname).replace("%I%", pname)
 
         inout=[ do_par(n) for n in params.keys() ]
@@ -741,6 +741,11 @@ class RCCodeGenerator(CodeGenerator):
                 outconv="  " + t['OUTCONV'][mode]
             else:
                 outconv=""
+
+            if pname in self.deps.keys():
+                deps = self.deps[pname]
+                for i in range(len(deps)):
+                    outconv=outconv.replace("%C"+str(i+1)+"%", "c_"+deps[i])
             return outconv.replace("%C%", cname).replace("%I%", pname)
 
         outconv=[ do_par(n) for n in params.keys() ]
