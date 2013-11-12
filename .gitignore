@@ -59,6 +59,13 @@
 /src/foreign-*-parser.h
 /src/.deps
 /src/.libs
+/src/cs/.deps
+/src/f2c/.deps
+/src/lapack/.deps
+/src/plfit/.deps
+/optional/glpk/.deps
+/optional/glpk/amd/.deps
+/optional/glpk/colamd/.deps
 /include/igraph_version.h
 /include/igraph_threading.h
 
@@ -91,11 +98,11 @@
 /interfaces/java/configure
 
 /interfaces/R/DESCRIPTION
-/interfaces/R/autom4te.cache
+/interfaces/R/igraph/autom4te.cache
 /interfaces/R/configure
 /interfaces/R/configure.in
 /interfaces/R/src/Makevars.win
-interfaces/R/src/config.h.in
+/interfaces/R/src/config.h.in
 /interfaces/R/arpack/stamp
 /interfaces/R/igraph_*.tar.gz
 /interfaces/R/igraphdata_*.tar.gz
@@ -417,6 +424,9 @@ interfaces/R/src/config.h.in
 /examples/simple/tls1.c.xml
 /examples/simple/tls2.c.xml
 /examples/simple/vector3.c.xml
+/examples/simple/igraph_gomory_hu_tree.c.xml
+/examples/simple/igraph_intersection2.c.xml
+/examples/simple/igraph_maximal_cliques4.c.xml
 
 /doc/html/stamp
 /doc/tags
@@ -456,12 +466,32 @@ interfaces/R/src/config.h.in
 /doc/scg.xml
 /doc/status.xml
 /doc/threading.xml
+/doc/graphlets.xml
+/doc/tutorial-info.xml
+/doc/igraph-docs-info.xml
+/doc/igraph-docs-info2.xml
+/doc/igraph-docs-info3.xml
+/doc/igraph-docs-info4.xml
+/doc/igraph-docs.fo
+/doc/igraph-docs.pdf
+/doc/igraph-docs2.xml
+/doc/igraph-docs3.xml
+/doc/igraph-docs4.xml
+/doc/igraph.info
+/doc/igraph.info.orig
+/doc/igraph.texi
+/doc/igraph.txml
 /doc/html/*.html
+/doc/jekyll
 
-nexus/cgi-bin/.openid_secret_key
-nexus/sessions/*
-nexus/config/emailpass
-nexus/config/Rscript
-nexus/data/*
+/nexus/cgi-bin/.openid_secret_key
+/nexus/sessions/*
+/nexus/config/emailpass
+/nexus/config/Rscript
+/nexus/data/*
 
-www/_site
+/www/_site
+/www/_includes/igraph-rversion
+/www/_includes/igraph-version
+/www/doc/
+/www/stamp
