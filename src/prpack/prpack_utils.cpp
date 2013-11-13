@@ -12,6 +12,10 @@
 using namespace prpack;
 using namespace std;
 
+#ifdef PRPACK_IGRAPH_SUPPORT
+#include "igraph_error.h"
+#endif
+
 #if defined(_WIN32) || defined(_WIN64)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -37,8 +41,13 @@ double prpack_utils::get_time() {
 // Fails and outputs 'msg' if 'condition' is false.
 void prpack_utils::validate(const bool condition, const string& msg) {
     if (!condition) {
+#ifdef PRPACK_IGRAPH_SUPPORT
+        igraph_error("Internal error in PRPACK", __FILE__, __LINE__, 
+	             IGRAPH_EINTERNAL);
+#else
         cerr << msg << endl;
         exit(-1);
+#endif
     }
 }
 
