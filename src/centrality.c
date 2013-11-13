@@ -1047,7 +1047,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  *
  * The third and recommmended implementation is \c
  * IGRAPH_PAGERANK_ALGO_PRPACK. This is using the the PRPACK package,
- * see https://github.com/DavidKurokawa/prpack .
+ * see https://github.com/dgleich/prpack .
  *
  * </para><para>
  * Please note that the PageRank of a given vertex depends on the PageRank

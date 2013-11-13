@@ -16,7 +16,7 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
   \item{graph}{The graph object. }
   \item{algo}{Character scalar, which implementation to use to carry out
     the calculation. The default is \code{"prpack"}, which uses the
-    PRPACK library (https://github.com/DavidKurokawa/prpack). This is a
+    PRPACK library (https://github.com/dgleich/prpack). This is a
     new implementation in igraph version 0.7, and the suggested one, as
     it is the most stable and the fastest for all but small graphs.
     \code{"arpack"} uses the ARPACK library, the default implementation
