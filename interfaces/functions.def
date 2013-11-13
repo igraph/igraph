@@ -831,7 +831,7 @@ igraph_bipartite_projection:
                 OUT VECTOR_OR_0 multiplicity2, INTEGER probe1=-1
         DEPS: types ON graph
         NAME-R: bipartite.projection
-        IGNORE: RR
+        IGNORE: RR, RC
 
 igraph_create_bipartite:
         PARAMS: OUT GRAPH graph, IN VECTOR_BOOL types, \

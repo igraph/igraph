@@ -35,3 +35,22 @@ test_that("bipartite.projection works", {
   expect_that(bs$vcount2, equals(vcount(proj2[[2]])))
   expect_that(bs$ecount2, equals(ecount(proj2[[2]])))
 })
+
+test_that("bipartite.projection can calculate only one projection", {
+  library(igraph)
+  set.seed(42)
+
+  g <- bipartite.random.game(5, 10, p=.3)
+  proj <- bipartite.projection(g)
+  proj1 <- bipartite.projection(g, which="false")
+  proj2 <- bipartite.projection(g, which="true")
+
+  expect_that(graph.isomorphic(proj$proj1, proj1), is_true())
+  expect_that(graph.isomorphic(proj$proj2, proj2), is_true())
+  expect_that(vertex.attributes(proj$proj1), equals(vertex.attributes(proj1)))
+  expect_that(vertex.attributes(proj$proj2), equals(vertex.attributes(proj2)))
+  expect_that(edge.attributes(proj$proj1), equals(edge.attributes(proj1)))
+  expect_that(edge.attributes(proj$proj2), equals(edge.attributes(proj2)))
+
+})
+
