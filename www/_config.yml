@@ -1,4 +1,5 @@
 name: igraph &ndash; the network analysis package
+future: false
 pygments: true
 include: [ .htaccess, .htpasswd, _static, _sources, _images ]
 exclude: [ Makefile ]
