@@ -19,9 +19,9 @@ from os import mkdir
 from shutil import copy2
 from subprocess import Popen, PIPE
 
-LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/usr/include/igraph', '/usr/local/include/igraph']
+LIBIGRAPH_FALLBACK_INCLUDE_DIRS = ['/tmp/include/igraph']
 LIBIGRAPH_FALLBACK_LIBRARIES = ['igraph']
-LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
+LIBIGRAPH_FALLBACK_LIBRARY_DIRS = ['/tmp/lib']
 
 if version_info < (2, 5):
     print("This module requires Python >= 2.5")
