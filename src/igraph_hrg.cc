@@ -354,14 +354,22 @@ int igraph_hrg_fit(const igraph_t *graph,
   int no_of_nodes=igraph_vcount(graph);
   dendro *d;
 
-  IGRAPH_CHECK(igraph_hrg_resize(hrg, no_of_nodes));
-
   RNG_BEGIN();
 
   d = new dendro;  
 
   // Convert the igraph graph
   IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+
+  // If we want to start from HRG
+  if (start) {
+    if (igraph_hrg_size(hrg) != no_of_nodes) {
+      IGRAPH_ERROR("Invalid HRG to start from", IGRAPH_EINVAL);
+    }
+    d->importDendrogramStructure(hrg);
+  } else {
+    IGRAPH_CHECK(igraph_hrg_resize(hrg, no_of_nodes));
+  }
 
   // Run fixed number of steps, or until convergence
   if (steps > 0) {
