@@ -68,6 +68,23 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   res
 }
 
+"[[.igraph.vs" <- function(x, i) {
+  if (length(i) != 1) {
+    stop("Invalid `[[` indexing, need single vertex")
+  }
+  if (is.numeric(i) || is.integer(i)) {
+    res <- i [ i %in% x ]
+    attributes(res) <- attributes(x)
+  } else if (is.character(i)) {
+    res <- as.igraph.vs(get("graph", attr(x, "env")), i)
+    attributes(res) <- attributes(x)
+  } else {
+    stop("Invalid `[[` indexing, index must be numeric of character scalar")
+  }
+  attr(res, "single") <- TRUE
+  res
+}
+
 "[.igraph.vs" <- function(x, i) {
   i <- substitute(i)
   if (is.numeric(i) || is.integer(i)) {
@@ -158,6 +175,23 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     }
   }
 
+  res
+}
+
+"[[.igraph.es" <- function(x, i) {
+  if (length(i) != 1) {
+    stop("Invalid `[[` indexing, need single edge")
+  }
+  if (is.numeric(i) || is.integer(i)) {
+    res <- i [ i %in% x ]
+    attributes(res) <- attributes(x)
+  } else if (is.character(i)) {
+    res <- as.igraph.es(get("graph", attr(x, "env")), i)
+    attributes(res) <- attributes(x)
+  } else {
+    stop("Invalid `[[` indexing, index must be numeric of character scalar")
+  }
+  attr(res, "single") <- TRUE
   res
 }
 
@@ -262,7 +296,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   }
 }
 
-"[<-.igraph.vs" <- function(x, i, value) {
+"[<-.igraph.vs" <- "[[<-.igraph.vs" <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
@@ -270,7 +304,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   value
 }
 
-"[<-.igraph.es" <- function(x, i, value) {
+"[<-.igraph.es" <- "[[<-.igraph.es" <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
@@ -287,11 +321,21 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
   
 "$.igraph.vs" <- function(x, name) {
-  get.vertex.attribute(get("graph", attr(x, "env")), name, x)
+  res <- get.vertex.attribute(get("graph", attr(x, "env")), name, x)
+  if ("single" %in% names(attributes(x)) && attr(x, "single")) {
+    res[[1]]
+  } else {
+    res
+  }
 }
 
 "$.igraph.es" <- function(x, name) {
-  get.edge.attribute(get("graph", attr(x, "env")), name, x)
+  res <- get.edge.attribute(get("graph", attr(x, "env")), name, x)
+  if ("single" %in% names(attributes(x)) && attr(x, "single")) {
+    res[[1]]
+  } else {
+    res
+  }
 }
 
 "$<-.igraph.vs" <- function(x, name, value) {
