@@ -3812,16 +3812,17 @@ PyObject *igraphmodule_Graph_bipartite_projection_size(igraphmodule_GraphObject 
 PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "vertices", "mode", "cutoff", "weights", NULL };
+  static char *kwlist[] = { "vertices", "mode", "cutoff", "weights",
+			    "normalized", NULL };
   PyObject *vobj = Py_None, *list = NULL, *cutoff = Py_None,
-           *mode_o = Py_None, *weights_o = Py_None;
+           *mode_o = Py_None, *weights_o = Py_None, *normalized_o = Py_True;
   igraph_vector_t res, *weights = 0;
   igraph_neimode_t mode = IGRAPH_ALL;
   int return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist, &vobj,
-      &mode_o, &cutoff, &weights_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist, &vobj,
+      &mode_o, &cutoff, &weights_o, &normalized_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
@@ -3843,7 +3844,8 @@ PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
   }
 
   if (cutoff == Py_None) {
-    if (igraph_closeness(&self->g, &res, vs, mode, weights)) {
+    if (igraph_closeness(&self->g, &res, vs, mode, weights,
+			 PyObject_IsTrue(normalized_o))) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
       if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -3857,7 +3859,8 @@ PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
       return NULL;
     }
     if (igraph_closeness_estimate(&self->g, &res, vs, mode,
-        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights)) {
+        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights,
+	PyObject_IsTrue(normalized_o))) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
       if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -12300,7 +12303,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_closeness */
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
    METH_VARARGS | METH_KEYWORDS,
-   "closeness(vertices=None, mode=ALL, cutoff=None, weights=None)\n\n"
+   "closeness(vertices=None, mode=ALL, cutoff=None, weights=None,\n"
+   "          normalized=True)\n\n"
    "Calculates the closeness centralities of given vertices in a graph.\n\n"
    "The closeness centerality of a vertex measures how easily other\n"
    "vertices can be reached from it (or the other way: how easily it\n"
@@ -12325,6 +12329,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  returned.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
+   "@param normalized: Whether to normalize the raw closeness scores by\n"
+   "  multiplying by the number of vertices minus one.\n"
    "@return: the calculated closenesses in a list\n"},
 
   /* interface to igraph_clusters */

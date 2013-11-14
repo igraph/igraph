@@ -2371,6 +2371,8 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  * \param weights An optional vector containing edge weights for
  *        weighted closeness. Supply a null pointer here for
  *        traditional, unweighted closeness.
+ * \param normalized Boolean, whether to normalize results by multiplying
+ *        by the number of vertices minus one.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -2392,8 +2394,10 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  */
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
                      const igraph_vs_t vids, igraph_neimode_t mode, 
-		     const igraph_vector_t *weights) {
-  return igraph_closeness_estimate(graph, res, vids, mode, -1, weights);
+		     const igraph_vector_t *weights,
+		     igraph_bool_t normalized) {
+  return igraph_closeness_estimate(graph, res, vids, mode, -1, weights,
+				   normalized);
 }
 
 int igraph_i_closeness_estimate_weighted(const igraph_t *graph, 
@@ -2401,7 +2405,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 				       const igraph_vs_t vids, 
 				       igraph_neimode_t mode,
 				       igraph_real_t cutoff,
-				       const igraph_vector_t *weights) {
+				       const igraph_vector_t *weights,
+				       igraph_bool_t normalized) {
 
   /* See igraph_shortest_paths_dijkstra() for the implementation 
      details and the dirty tricks. */
@@ -2492,6 +2497,12 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 
   } /* !IGRAPH_VIT_END(vit) */
 
+  if (!normalized) {
+    for (i=0; i<nodes_to_calc; i++) {
+      VECTOR(*res)[i] /= (no_of_nodes-1);
+    }
+  }
+
   igraph_vector_long_destroy(&which);
   igraph_vector_destroy(&dist);
   igraph_lazy_inclist_destroy(&inclist);
@@ -2548,6 +2559,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  * \param weights An optional vector containing edge weights for
  *        weighted closeness. Supply a null pointer here for
  *        traditional, unweighted closeness.
+ * \param normalized Boolean, whether to normalize results by multiplying
+ *        by the number of vertices minus one.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -2569,7 +2582,9 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
                               igraph_real_t cutoff,
-			      const igraph_vector_t *weights) {
+			      const igraph_vector_t *weights,
+			      igraph_bool_t normalized) {
+
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t already_counted;
   igraph_vector_int_t *neis;
@@ -2584,7 +2599,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   if (weights) { 
     return igraph_i_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
-					      weights);
+						weights, normalized);
   }
 
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -2639,6 +2654,12 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
     /* using igraph_real_t here instead of igraph_integer_t to avoid overflow */
     VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
+  }
+
+  if (!normalized) {
+    for (i=0; i<nodes_to_calc; i++) {
+      VECTOR(*res)[i] /= (no_of_nodes-1);
+    }
   }
 
   IGRAPH_PROGRESS("Closeness: ", 100.0, NULL);
@@ -3054,7 +3075,7 @@ int igraph_centralization_closeness(const igraph_t *graph,
   }
   
   IGRAPH_CHECK(igraph_closeness(graph, scores, igraph_vss_all(), mode, 
-				/*weights=*/ 0));
+				/*weights=*/ 0, /*normalize=*/ 1));
 
   IGRAPH_CHECK(igraph_centralization_closeness_tmax(graph, 0, mode, 
 						    tmax));
