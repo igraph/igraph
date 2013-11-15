@@ -215,8 +215,9 @@ maxcohesion(blocks)
     Review}, 68(1):103--127, Feb 2003. 
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com} for the current
-  implementation, Peter McMahan \email{peter.mcmahan@gmail.com} wrote
-  the first version in R.}
+  implementation, Peter McMahan
+  (\url{http://home.uchicago.edu/~mcmahan/})
+  wrote the first version in R.}
 \seealso{\code{\link{graph.cohesion}}}
 \examples{
 ## The graph from the Moody-White paper

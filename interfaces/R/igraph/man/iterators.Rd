@@ -9,10 +9,14 @@
 \alias{\%<-\%}
 \alias{[<-.igraph.es}
 \alias{[.igraph.es}
+\alias{[[<-.igraph.es}
+\alias{[[.igraph.es}
 \alias{$<-.igraph.es}
 \alias{$.igraph.es}
 \alias{[<-.igraph.vs}
 \alias{[.igraph.vs}
+\alias{[[<-.igraph.vs}
+\alias{[[.igraph.vs}
 \alias{$<-.igraph.vs}
 \alias{$.igraph.vs}
 \alias{print.igraph.es}

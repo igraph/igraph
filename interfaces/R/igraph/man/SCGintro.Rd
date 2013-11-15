@@ -152,6 +152,5 @@
   Networks, \emph{Physical Review Letters}, \bold{99}(3), 2007. 
   \url{http://arxiv.org/abs/0706.0812}
 }
-\author{David Morton de Lachapelle \email{david.morton@epfl.ch},
-  \email{david.mortondelachapelle@swissquote.ch}}
+\author{David Morton de Lachapelle, \url{http://people.epfl.ch/david.morton}.}
 \keyword{graphs}

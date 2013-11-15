@@ -42,7 +42,7 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
 }
 \details{
   For the explanation of the PageRank algorithm, see the following
-  webpage: \url{http://www-db.stanford.edu/~backrub/google.html}, or the
+  webpage: \url{http://infolab.stanford.edu/~backrub/google.html}, or the
   following reference: 
 
   Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual

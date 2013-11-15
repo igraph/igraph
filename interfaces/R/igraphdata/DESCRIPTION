@@ -10,5 +10,5 @@ Description: A small collection of various network data sets,
   to use with the igraph package. They also work with the igraph0 
   package.
 License: CC BY-SA 2.0 + file LICENSE
-URL: http://igraph.sourceforge.net
-BugReports: http://bugs.launchpad.net/igraph
+URL: http://igraph.org
+BugReports: https://github.com/igraph/igraph/issues

@@ -38,37 +38,75 @@ def get_output(command):
         line = str(line, encoding="utf-8")
     return line, p.returncode
     
-def detect_igraph_include_dirs(default = LIBIGRAPH_FALLBACK_INCLUDE_DIRS):
+def detect_igraph_include_dirs(default = LIBIGRAPH_FALLBACK_INCLUDE_DIRS, \
+        static = False):
     """Tries to detect the igraph include directory"""
-    line, exit_code = get_output("pkg-config igraph --cflags")
+    cmd = "pkg-config igraph --cflags"
+    if static:
+        cmd += " --static"
+    line, exit_code = get_output(cmd)
     if exit_code > 0 or len(line) == 0:
         return default
     opts=line.split()
     return [opt[2:] for opt in opts if opt.startswith("-I")]
 
-def detect_igraph_libraries(default = LIBIGRAPH_FALLBACK_LIBRARIES):
+def detect_igraph_libraries(default = LIBIGRAPH_FALLBACK_LIBRARIES, \
+        static = False):
     """Tries to detect the libraries that igraph uses"""
-    line, exit_code = get_output("pkg-config igraph --libs")
+    cmd = "pkg-config igraph --libs"
+    if static:
+        cmd += " --static"
+    line, exit_code = get_output(cmd)
     if exit_code>0 or len(line) == 0:
         return default
     opts=line.split()
     return [opt[2:] for opt in opts if opt.startswith("-l")]
     
-def detect_igraph_library_dirs(default = LIBIGRAPH_FALLBACK_LIBRARY_DIRS):
+def detect_igraph_library_dirs(default = LIBIGRAPH_FALLBACK_LIBRARY_DIRS, \
+        static = False):
     """Tries to detect the igraph library directory"""
-    line, exit_code = get_output("pkg-config igraph --libs")
-    if exit_code>0 or len(line) == 0: return default
+    cmd = "pkg-config igraph --libs"
+    if static:
+        cmd += " --static"
+    line, exit_code = get_output(cmd)
+    if exit_code>0 or len(line) == 0:
+        return default
     opts=line.split()
-    return [opt[2:] for opt in opts if opt[0:2]=="-L"]
+    return [opt[2:] for opt in opts if opt.startswith("-L")]
+
+def find_static_library(library_name, library_path):
+    variants = ["lib{0}.a", "{0}.a", "{0}.lib", "lib{0}.lib"]
+    extra_libdirs = ["/usr/local/lib64", "/usr/local/lib",
+            "/usr/lib64", "/usr/lib", "/lib64", "/lib"]
+
+    for path in extra_libdirs:
+        if path not in library_path and os.path.isdir(path):
+            library_path.append(path)
+
+    for path in library_path:
+        for variant in variants:
+            full_path = os.path.join(path, variant.format(library_name))
+            if os.path.isfile(full_path):
+                return full_path
 
 sources=glob.glob(os.path.join('src', '*.c'))
 include_dirs=[]
 library_dirs=[]
 libraries=[]
+extra_objects=[]
+extra_link_args=[]
+static_extension=False
+
+if "--static" in argv:
+    argv.remove("--static")
+    static_extension=True
 
 if "--no-pkg-config" in argv:
     argv.remove("--no-pkg-config")
     libraries.append("igraph")
+    if static:
+        # Educated guess.
+        libraries.extend(["xml2", "z", "m"])
 else:
     line, exit_code = get_output("pkg-config igraph")
     if exit_code>0:
@@ -79,16 +117,26 @@ else:
         print("where the C core of igraph is installed")
         print("")
 
-    include_dirs.extend(detect_igraph_include_dirs())
-    library_dirs.extend(detect_igraph_library_dirs())
-    libraries.extend(detect_igraph_libraries())
+    include_dirs.extend(detect_igraph_include_dirs(static=static_extension))
+    library_dirs.extend(detect_igraph_library_dirs(static=static_extension))
+    libraries.extend(detect_igraph_libraries(static=static_extension))
 
 print("Include path: %s" % " ".join(include_dirs))
 print("Library path: %s" % " ".join(library_dirs))
 
+if static_extension:
+    print("Linking statically to igraph.")
+    extra_link_args.append("-static")
+    for library_name in libraries[:]:
+        static_lib = find_static_library(library_name, library_dirs)
+        if static_lib:
+            libraries.remove(library_name)
+            extra_objects.append(static_lib)
+
 igraph_extension = Extension('igraph._igraph', sources, \
   library_dirs=library_dirs, libraries=libraries, \
-  include_dirs=include_dirs)
+  include_dirs=include_dirs, \
+  extra_objects=extra_objects, extra_link_args=extra_link_args)
        
 description = """Python interface to the igraph high performance graph
 library, primarily aimed at complex network research and analysis.
@@ -103,7 +151,7 @@ From release 0.5, the C core of the igraph library is **not** included
 in the Python distribution - you must compile and install the C core
 separately. Windows installers already contain a compiled igraph DLL,
 so they should work out of the box. Linux users should refer to the
-`igraph homepage <http://igraph.sourceforge.net>`_ for
+`igraph homepage <http://igraph.org>`_ for
 compilation instructions (but check your distribution first, maybe
 there are pre-compiled packages available). OS X Snow Leopard users may
 benefit from the disk images in the Python Package Index.

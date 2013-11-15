@@ -39,6 +39,7 @@ test_that("authority scores of a ring are all one", {
 
 test_that("authority.score survives stress test", {
   library(igraph)
+  library(Matrix)
   set.seed(42)
 
   is.principal <- function(M, lambda) {

@@ -360,14 +360,16 @@ igraph_minimum_spanning_tree_prim:
 
 igraph_closeness:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
-                NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL
+                NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, \
+                BOOLEAN normalized=False
         DEPS: vids ON graph, weights ON graph
         NAME-R: closeness
         IGNORE: RR
 
 igraph_closeness_estimate:
         PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
-                NEIMODE mode=OUT, REAL cutoff, EDGEWEIGHTS weights=NULL
+                NEIMODE mode=OUT, REAL cutoff, EDGEWEIGHTS weights=NULL, \
+                BOOLEAN normalized=False
         DEPS: vids ON graph, weights ON graph, res ON graph vids
         NAME-R: closeness.estimate
 
@@ -831,7 +833,7 @@ igraph_bipartite_projection:
                 OUT VECTOR_OR_0 multiplicity2, INTEGER probe1=-1
         DEPS: types ON graph
         NAME-R: bipartite.projection
-        IGNORE: RR
+        IGNORE: RR, RC
 
 igraph_create_bipartite:
         PARAMS: OUT GRAPH graph, IN VECTOR_BOOL types, \

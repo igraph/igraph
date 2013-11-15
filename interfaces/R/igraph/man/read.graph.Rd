@@ -162,7 +162,7 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 }
 \section{GML file format}{
       GML is a simple textual format, see
-      \url{http://www.infosun.fim.uni-passau.de/Graphlet/GML/} for details.
+      \url{http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html} for details.
  
       Although all syntactically correct GML can be parsed, 
       we implement only a subset of this format, some attributes might be
@@ -308,9 +308,8 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 }
 \section{GraphDB format}{
       This is a binary format, used in the graph database
-      for isomorphism testing (\url{http://amalfi.dis.unina.it/graph/})
-      From the graph database homepage
-      (\url{http://amalfi.dis.unina.it/graph/db/doc/graphdbat-2.html}):
+      for isomorphism testing. From the (now defunct) graph database
+      homepage:
 
       \emph{The graphs are stored in a compact binary format, one graph per
 	file. The file is composed of 16 bit words, which are represented
@@ -323,6 +322,9 @@ read.graph(file, format = c("edgelist", "pajek", "ncol", "lgl",
 	destination node of the edge. Node numeration is 0-based, so the
 	first node of the graph has index 0.}
 
+      A copy of the graph database homepage can be found here:
+      \url{http://web.archive.org/web/20090215182331/http://amalfi.dis.unina.it/graph/db/doc/graphdbat.html}.
+      
       See also \code{\link{graph.graphdb}}.
       
       Only unlabelled graphs are implemented.

@@ -39,7 +39,7 @@ walktrap.community(graph, weights = E(graph)$weight, steps = 4, merges =
   communities in large networks using random walks, 
   http://arxiv.org/abs/physics/0512106
 }
-\author{Pascal Pons \email{google@for.it} and Gabor Csardi
+\author{Pascal Pons (\url{http://psl.pons.free.fr/}) and Gabor Csardi
   \email{csardi.gabor@gmail.com} for the R and igraph interface}
 \seealso{
   See \code{\link{communities}} on getting the actual membership vector,

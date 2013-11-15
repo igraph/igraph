@@ -9,7 +9,7 @@
 closeness(graph, vids=V(graph), mode = c("out", "in", "all", "total"),
         weights = NULL, normalized = FALSE)
 closeness.estimate(graph, vids=V(graph), mode = c("out", "in", "all",
-       "total"), cutoff, weights = NULL) 
+       "total"), cutoff, weights = NULL, normalized = FALSE) 
 }
 \arguments{
   \item{graph}{The graph to analyze.}

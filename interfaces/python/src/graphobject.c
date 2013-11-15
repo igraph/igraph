@@ -3778,19 +3778,28 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
 PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * self,
 		PyObject* args, PyObject* kwds) {
   PyObject *types_o = Py_None, *multiplicity_o = Py_True, *mul1 = 0, *mul2 = 0;
-  igraphmodule_GraphObject *result1, *result2;
+  igraphmodule_GraphObject *result1 = 0, *result2 = 0;
   igraph_vector_bool_t* types = 0;
   igraph_vector_t multiplicities[2];
   igraph_t g1, g2;
+  igraph_t *p_g1 = &g1, *p_g2 = &g2;
   long int probe1 = -1;
+  long int which = -1;
 
-  static char* kwlist[] = {"types", "multiplicity", "probe1", NULL};
+  static char* kwlist[] = {"types", "multiplicity", "probe1", "which", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|Ol", kwlist, &types_o, &multiplicity_o, &probe1))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|Oll", kwlist, &types_o,
+        &multiplicity_o, &probe1, &which))
     return NULL;
 
   if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
 	return NULL;
+
+  if (which == 0) {
+    p_g2 = 0;
+  } else if (which == 1) {
+    p_g1 = 0;
+  }
 
   if (PyObject_IsTrue(multiplicity_o)) {
     if (igraph_vector_init(&multiplicities[0], 0)) {
@@ -3806,8 +3815,10 @@ PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * sel
       return NULL;
     }
 
-    if (igraph_bipartite_projection(&self->g, types, &g1, &g2,
-        &multiplicities[0], &multiplicities[1], (igraph_integer_t) probe1)) {
+    if (igraph_bipartite_projection(&self->g, types, p_g1, p_g2,
+        p_g1 ? &multiplicities[0] : 0,
+        p_g2 ? &multiplicities[1] : 0,
+        (igraph_integer_t) probe1)) {
       igraph_vector_destroy(&multiplicities[0]);
       igraph_vector_destroy(&multiplicities[1]);
       if (types) { igraph_vector_bool_destroy(types); free(types); }
@@ -3815,7 +3826,7 @@ PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * sel
       return NULL;
     }
   } else {
-    if (igraph_bipartite_projection(&self->g, types, &g1, &g2, 0, 0,
+    if (igraph_bipartite_projection(&self->g, types, p_g1, p_g2, 0, 0,
           (igraph_integer_t) probe1)) {
       if (types) { igraph_vector_bool_destroy(types); free(types); }
       igraphmodule_handle_igraph_error();
@@ -3825,23 +3836,49 @@ PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * sel
 
   if (types) { igraph_vector_bool_destroy(types); free(types); }
 
-  CREATE_GRAPH(result1, g1);
-  CREATE_GRAPH(result2, g2);
+  if (p_g1) {
+    CREATE_GRAPH(result1, g1);
+  }
+  if (p_g2) {
+    CREATE_GRAPH(result2, g2);
+  }
 
   if (PyObject_IsTrue(multiplicity_o)) {
-    mul1 = igraphmodule_vector_t_to_PyList(&multiplicities[0], IGRAPHMODULE_TYPE_INT);
-    igraph_vector_destroy(&multiplicities[0]);
-    if (mul1 == NULL) {
-      igraph_vector_destroy(&multiplicities[1]);
-      return NULL;
+    if (p_g1) {
+      mul1 = igraphmodule_vector_t_to_PyList(&multiplicities[0], IGRAPHMODULE_TYPE_INT);
+      igraph_vector_destroy(&multiplicities[0]);
+      if (mul1 == NULL) {
+        igraph_vector_destroy(&multiplicities[1]);
+        return NULL;
+      }
+    } else {
+      igraph_vector_destroy(&multiplicities[0]);
     }
-    mul2 = igraphmodule_vector_t_to_PyList(&multiplicities[1], IGRAPHMODULE_TYPE_INT);
-    igraph_vector_destroy(&multiplicities[1]);
-    if (mul2 == NULL)
-      return NULL;
-    return Py_BuildValue("NNNN", result1, result2, mul1, mul2);
+
+    if (p_g2) {
+      mul2 = igraphmodule_vector_t_to_PyList(&multiplicities[1], IGRAPHMODULE_TYPE_INT);
+      igraph_vector_destroy(&multiplicities[1]);
+      if (mul2 == NULL)
+        return NULL;
+    } else {
+      igraph_vector_destroy(&multiplicities[1]);
+    }
+
+    if (p_g1 && p_g2) {
+      return Py_BuildValue("NNNN", result1, result2, mul1, mul2);
+    } else if (p_g1) {
+      return Py_BuildValue("NN", result1, mul1);
+    } else {
+      return Py_BuildValue("NN", result2, mul2);
+    }
   } else {
-    return Py_BuildValue("NN", result1, result2);
+    if (p_g1 && p_g2) {
+      return Py_BuildValue("NN", result1, result2);
+    } else if (p_g1) {
+      return (PyObject*)result1;
+    } else {
+      return (PyObject*)result2;
+    }
   }
 }
 
@@ -3884,16 +3921,17 @@ PyObject *igraphmodule_Graph_bipartite_projection_size(igraphmodule_GraphObject 
 PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
                                        PyObject * args, PyObject * kwds)
 {
-  static char *kwlist[] = { "vertices", "mode", "cutoff", "weights", NULL };
+  static char *kwlist[] = { "vertices", "mode", "cutoff", "weights",
+			    "normalized", NULL };
   PyObject *vobj = Py_None, *list = NULL, *cutoff = Py_None,
-           *mode_o = Py_None, *weights_o = Py_None;
+           *mode_o = Py_None, *weights_o = Py_None, *normalized_o = Py_True;
   igraph_vector_t res, *weights = 0;
   igraph_neimode_t mode = IGRAPH_ALL;
   int return_single = 0;
   igraph_vs_t vs;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOO", kwlist, &vobj,
-      &mode_o, &cutoff, &weights_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOOOO", kwlist, &vobj,
+      &mode_o, &cutoff, &weights_o, &normalized_o))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode)) return NULL;
@@ -3915,7 +3953,8 @@ PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
   }
 
   if (cutoff == Py_None) {
-    if (igraph_closeness(&self->g, &res, vs, mode, weights)) {
+    if (igraph_closeness(&self->g, &res, vs, mode, weights,
+			 PyObject_IsTrue(normalized_o))) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
       if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -3929,7 +3968,8 @@ PyObject *igraphmodule_Graph_closeness(igraphmodule_GraphObject * self,
       return NULL;
     }
     if (igraph_closeness_estimate(&self->g, &res, vs, mode,
-        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights)) {
+        (igraph_integer_t)PyInt_AsLong(cutoff_num), weights,
+	PyObject_IsTrue(normalized_o))) {
       igraph_vs_destroy(&vs);
       igraph_vector_destroy(&res);
       if (weights) { igraph_vector_destroy(weights); free(weights); }
@@ -11988,7 +12028,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
 	 "the Chvatal graph, the Petersen graph or the Tutte graph. This method\n"
 	 "generates one of them based on its name (case insensitive). See the\n"
 	 "documentation of the C interface of C{igraph} for the names available:\n"
-	 "U{http://igraph.sourceforge.net/doc/html/igraph_famous.html}.\n\n"
+	 "U{http://igraph.org/doc/c}.\n\n"
 	 "@param name: the name of the graph to be generated.\n"
 	},
 
@@ -12527,7 +12567,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_bipartite_projection */
   {"bipartite_projection", (PyCFunction) igraphmodule_Graph_bipartite_projection,
    METH_VARARGS | METH_KEYWORDS,
-   "bipartite_projection(types, multiplicity=True, probe1=-1)\n\n"
+   "bipartite_projection(types, multiplicity=True, probe1=-1, which=-1)\n\n"
    "Internal function, undocumented.\n\n"
    "@see: Graph.bipartite_projection()\n"},
 
@@ -12541,7 +12581,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_closeness */
   {"closeness", (PyCFunction) igraphmodule_Graph_closeness,
    METH_VARARGS | METH_KEYWORDS,
-   "closeness(vertices=None, mode=ALL, cutoff=None, weights=None)\n\n"
+   "closeness(vertices=None, mode=ALL, cutoff=None, weights=None,\n"
+   "          normalized=True)\n\n"
    "Calculates the closeness centralities of given vertices in a graph.\n\n"
    "The closeness centerality of a vertex measures how easily other\n"
    "vertices can be reached from it (or the other way: how easily it\n"
@@ -12566,6 +12607,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  returned.\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
+   "@param normalized: Whether to normalize the raw closeness scores by\n"
+   "  multiplying by the number of vertices minus one.\n"
    "@return: the calculated closenesses in a list\n"},
 
   /* interface to igraph_clusters */

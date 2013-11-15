@@ -8,7 +8,7 @@
 \usage{
 bipartite.projection.size(graph, types = NULL)
 bipartite.projection (graph, types = NULL, multiplicity = TRUE,
-       probe1 = NULL)
+       probe1 = NULL, which=c("both", "true", "false"))
 }
 \arguments{
   \item{graph}{The input graph. It can be directed, but edge directions
@@ -24,7 +24,11 @@ bipartite.projection (graph, types = NULL, multiplicity = TRUE,
   \item{probe1}{This argument can be used to specify the order of the
     projections in the resulting list. If given, then it is considered
     as a vertex id (or a symbolic vertex name); the projection
-    containing this vertex will be the first one in the result list.}
+    containing this vertex will be the first one in the result list.
+    This argument is ignored if only one projection is requested in
+    argument \code{which}.}
+  \item{which}{A character scalar to specify which projection(s) to
+    calculate. The default is to calculate both.}
 }
 \details{
   Bipartite graphs have a \code{type} vertex attribute in

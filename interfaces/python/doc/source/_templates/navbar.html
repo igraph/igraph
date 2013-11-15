@@ -1,0 +1,20 @@
+<div class="navigation-header" width="100%" summary="Navigation header">
+    <div class="btn-group">
+        {% if theme_navbar_links %}
+            {%- for link in theme_navbar_links %}
+                <a class="btn btn-default" href="{{ pathto(*link[1:]) }}">{{ link[0] }}</a>
+            {%- endfor %}
+        {% endif %}
+        {% if theme_navbar_sidebarrel %}
+             {% block sidebarrel %}
+                 {% include "relations.html" %}
+             {% endblock %}
+        {% endif %}
+        {% block navbarextra %}
+        {% endblock %}
+        {% if theme_source_link_position == "nav" %}
+            {% include "sourcelink.html" %}
+        {% endif %}
+    </div>
+</div>
+

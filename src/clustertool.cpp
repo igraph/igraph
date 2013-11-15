@@ -101,12 +101,12 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  * This function implements the community structure detection
  * algorithm proposed by Joerg Reichardt and Stefan Bornholdt. 
  * The algorithm is described in their paper: Statistical Mechanics of 
- * Community Detection, http://arxiv.org/abs/cond-mat/0603718.
+ * Community Detection, http://arxiv.org/abs/cond-mat/0603718 .
  * 
  * </para><para> From version 0.6 igraph also supports an extension to
  * the algorithm that allows negative edge weights. This is described
  * in  V.A. Traag and Jeroen Bruggeman: Community detection in networks 
- * with positive and negative links, http://arxiv.org/abs/0811.2329.
+ * with positive and negative links, http://arxiv.org/abs/0811.2329 .
  * \param graph The input graph, it may be directed but the direction
  *     of the edge is not used in the algorithm.
  * \param weights The vector giving the edge weights, it may be \c NULL, 
@@ -371,7 +371,7 @@ int igraph_i_community_spinglass_orig(const igraph_t *graph,
  * This function implements the community structure detection
  * algorithm proposed by Joerg Reichardt and Stefan Bornholdt. It is
  * described in their paper: Statistical Mechanics of 
- * Community Detection, http://arxiv.org/abs/cond-mat/0603718.
+ * Community Detection, http://arxiv.org/abs/cond-mat/0603718 .
  * 
  * </para><para>
  * This function calculates the community of a single vertex without

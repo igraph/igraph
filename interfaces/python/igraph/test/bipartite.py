@@ -64,18 +64,33 @@ class BipartiteTests(unittest.TestCase):
 
     def testBipartiteProjection(self):
         g = Graph.Full_Bipartite(10, 5)
+
         g1, g2 = g.bipartite_projection()
         self.failUnless(g1.isomorphic(Graph.Full(10)))
         self.failUnless(g2.isomorphic(Graph.Full(5)))
+        self.failUnless(g.bipartite_projection(which=0).isomorphic(g1))
+        self.failUnless(g.bipartite_projection(which=1).isomorphic(g2))
+        self.failUnless(g.bipartite_projection(which=False).isomorphic(g1))
+        self.failUnless(g.bipartite_projection(which=True).isomorphic(g2))
         self.failUnless(g1.es["weight"] == [5] * 45)
         self.failUnless(g2.es["weight"] == [10] * 10)
         self.failUnless(g.bipartite_projection_size() == (10, 45, 5, 10))
+
         g1, g2 = g.bipartite_projection(probe1=10)
         self.failUnless(g1.isomorphic(Graph.Full(5)))
         self.failUnless(g2.isomorphic(Graph.Full(10)))
+        self.failUnless(g.bipartite_projection(which=0).isomorphic(g2))
+        self.failUnless(g.bipartite_projection(which=1).isomorphic(g1))
+        self.failUnless(g.bipartite_projection(which=False).isomorphic(g2))
+        self.failUnless(g.bipartite_projection(which=True).isomorphic(g1))
+
         g1, g2 = g.bipartite_projection(multiplicity=False)
         self.failUnless(g1.isomorphic(Graph.Full(10)))
         self.failUnless(g2.isomorphic(Graph.Full(5)))
+        self.failUnless(g.bipartite_projection(which=0).isomorphic(g1))
+        self.failUnless(g.bipartite_projection(which=1).isomorphic(g2))
+        self.failUnless(g.bipartite_projection(which=False).isomorphic(g1))
+        self.failUnless(g.bipartite_projection(which=True).isomorphic(g2))
         self.failUnless("weight" not in g1.edge_attributes())
         self.failUnless("weight" not in g2.edge_attributes())
 

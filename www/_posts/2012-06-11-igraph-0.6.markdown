@@ -1,0 +1,638 @@
+---
+layout: newstemp
+title: igraph 0.6
+date: June 11, 2012
+---
+
+igraph 0.6
+==========
+
+June 11, 2012
+
+Release Notes
+-------------
+
+igraph 0.6 is a major new release of igraph. It contains many new
+features and major changes, a lot of bug fixes and improvements. 
+As always, we are grateful to the people who sent comments, bug 
+reports, questions, and specially to people who contributed code.
+
+See below a list of major changes, with links to the relevant sections
+of the documentation. New features in R, Python, and C are all listed here.
+
+See at the end for a (more) complete list of changes.
+
+<!--more-->
+
+### [R][PY] The Nexus repository
+
+igraph supports the <a href="http://nexus.igraph.org">Nexus network
+    repository</a> from R and from Python. Nexus is an online database
+of network data sets. You can search Nexus and download network from
+it directly from R and Python. See the <a href="doc-0.6/R/nexus.html">R
+    manual</a> or the <a href="doc-0.6/python/igraph.nexus.NexusConnection-class.html">Python documentation</a> for details.
+
+### [R] Numbering from 1 in R
+
+The biggest change in the R interface is that starting from this version
+vertices and edges are numbered from one. This change might be
+painful for many people, because it makes already existing code
+incompatible with igraph 0.6. To make the switch easier, there is now an
+<a href="http://cran.r-project.org/web/packages/igraph0/index.html">
+igraph0</a> package on CRAN; igraph0 uses 0-based vertex and
+edge ids, and it can be used to run old code. Note, however, that
+igraph0 will not be developed in the future. Please use the 
+<a href="http://cran.r-project.org/web/packages/igraph/index.html">
+igraph</a> package for current and future work.
+
+(Also note that in Python and C vertices and edges are still numbered
+from zero, as these languages traditionally use zero-based indexing.)
+
+### [PY] Support for Python 3.x
+
+The Python interface of igraph now supports Python 3. The current release was
+tested with Python 3.2 on Windows, Linux and Mac OS X. Please report any bugs
+you encounter when using igraph in Python 3.x through the
+usual channels.
+
+### [C][R][PY] Community detection improvements
+
+Community structure detection via exact modularity optimization. As
+modularity optimization in an NP-complete problem, this works only for
+small graphs. 
+<a href="doc-0.6/html/ch22s01.html#igraph_community_optimal_modularity">C manual</a>, 
+<a href="doc-0.6/R/optimal.community.html">R manual</a>,
+<a href="doc-0.6/python/igraph.Graph-class.html#community_optimal_modularity">Python manual</a>.
+
+The multi-level modularity optimization algorithm by Blondel et
+al. was added. See
+the <a href="doc-0.6/html/ch22s06.html#igraph_community_multilevel">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/multilevel.community.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html#community_multilevel">Python documentation</a>.
+
+Hierarchical random graphs and community finding, based on the code
+from Aaron Clauset. In <a href="doc-0.6/html/igraph-HRG.html">C</a>,
+and <a href="doc-0.6/R/hrg.html">R</a>.
+
+We support now the InfoMAP community finding method, thanks to
+Emmanuel Navarro for the code. In
+<a href="doc-0.6/html/ch22s08.html#igraph_community_infomap">C</a>,
+<a href="doc-0.6/R/infomap.html">R</a> and
+<a href="doc-0.6/python/igraph.Graph-class.html#community_infomap">Python</a>.
+
+The edge betweenness community detection method of Newman and Girvan now also
+works on weighted graphs. See
+the <a href="doc-0.6/html/ch22s05.html">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/community.edge.betweenness.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html#community_edge_betweenness">Python documentation</a>.
+
+We have added some functions to compare various community structures.
+See the <a href="doc-0.6/html/ch22s01.html#igraph_compare_communities">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/compare.communities.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.clustering-module.html#compare_communities">Python documentation</a>.
+
+Igraph now implements the Spectral Coarse Graining method, by David
+Morton, our implementation is based on his code. See the 
+<a href="doc-0.6/html/igraph-SCG.html">C
+    Reference manual</a> or the 
+<a href="doc-0.6/R/scg.html">R documentation</a>.
+
+The cohesive block finding functions were rewritten from scratch in
+C. They are much faster now, and they have a nicer API, too. See
+the <a href="doc-0.6/html/ch20s06.html#igraph_cohesive_blocks">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/cohesive.blocks.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html#cohesive_blocks">Python documentation</a>.
+
+In R, all community detection functions return a
+`communities` object now. We have defined various
+operations for these objects, see the
+<a href="doc-0.6/R/communities.html">R manual</a> for more.
+
+### [C][R][PY] Centrality-related functions
+
+Centralization scores for degree, closeness, betweenness and 
+eigenvector centrality. See
+the <a href="doc-0.6/html/ch13s07.html">C
+    Reference manual</a> or the 
+<a href="doc-0.6/R/centralization.html">R documentation</a>.
+
+Personalized PageRank scores. See
+the <a href="doc-0.6/html/ch13s05.html#igraph_personalized_pagerank">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/page.rank.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.GraphBase-class.html#personalized_pagerank">Python documentation</a>.
+
+Authority and hub scores, betweenness and closeness
+calculations all support edge weights now. See
+the <a href="doc-0.6/html/ch13s05.html">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/00Index.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html">Python documentation</a>.
+
+### [C][R][PY] Sugiyama layout
+
+Igraph now implements the Sugiyama layout algorithm for layered
+directed acyclic graphs. See
+the <a href="doc-0.6/html/ch18s01.html#igraph_layout_sugiyama">C
+    Reference manual</a>, the 
+<a href="doc-0.6/R/layout.sugiyama.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html#layout_sugiyama">Python documentation</a>.
+
+### [C][R][PY] Maximum matchings in bipartite graphs
+
+Igraph now implements the push-relabel algorithm and the Kuhn-Munkres algorithm
+(also known as the Hungarian method) to find maximum matchings in unweighted and
+weighted bipartite graphs. See
+the <a href="doc-0.6/html/ch13s18.html">
+    Reference manual</a>, the 
+<a href="doc-0.6/R/matching.html">R documentation</a>, or
+the <a href="doc-0.6/python/igraph.Graph-class.html#maximum_bipartite_matching">Python documentation</a>.
+
+### [R] Hiding the graph structure by default
+
+In R, if you type in the name of an igraph object, the edges of the 
+graph are not dumped to the screen any more, only a short summary of
+the graph is printed:
+
+```r
+> karate
+IGRAPH UNW- 34 78 -- Zachary's karate club network
++ attr: name (g/c), Citation (g/c), Author (g/c), Faction (v/n), name (v/c), weight (e/n)
+```
+
+To see the graph structure, you can use the `str()` function.
+See more in the <a href="doc-0.6/R/print.graph.html">R
+    documentation</a>.
+
+### [PY] Named graph vertices
+
+The Python interface now treats the `name` attributes in a special way.
+The values of the attribute are indexed in the background, allowing the retrieval of
+a vertex with a given name in amortized constant time. Furthermore, most of the
+graph query methods accept vertex names as well as vertex indices.
+See the <a href="doc-0.6/python/igraph.VertexSeq-class.html#find">Python documentation</a>
+for more information.
+
+### [PY] Pretty-printed graph summaries
+
+The same graph summary format used by R is now also adopted by Python.
+Printing a graph with the `print` statement now prints the
+summary and the edge list in a concise format:
+
+```python
+>>> print karate
+IGRAPH UNW- 34 78 -- Zachary's karate club network
++ attr: Author (g), Citation (g), name (g), Faction (v), id (v), name(v),
+  weight (e)
++ edges (vertex names):
+    Mr Hi -- Actor 2, Actor 3, Actor 4, Actor 5, ...
+  Actor 2 -- Mr Hi, Actor 3, Actor 4, ...
+...
+```
+
+Printing a graph with the `summary()` function (in
+the igraph namespace) prints the short summary only, without the edge list:
+
+```python
+>>> summary(karate)
+IGRAPH UNW- 34 78 -- Zachary's karate club network
++ attr: Author (g), Citation (g), name (g), Faction (v), id (v), name(v),
+  weight (e)
+```
+
+Printing a graph with `summary(graph, full=True)` prints
+the summary, the edge list, the vertex and the edge attributes as well.
+
+### [R][PY] Easier manipulation of graphs
+
+In R, there are now new and easier ways to add new vertices/edges to a
+graph, or remove existing ones. See the details in the 
+<a href="doc-0.6/R/graph.structure.html">R documentation</a>. In Python,
+you can treat the graph as a virtual adjacency matrix. See the details in
+the <a href="doc-0.6/python/igraph.Graph-class.html">Python
+	documentation</a>.
+
+### [R] The `igraphdata` package
+
+The new R package 
+<a href="http://cran.r-project.org/web/packages/igraphdata/index.html">
+igraphdata</a> contains some example graph data sets.
+
+### [R][PY] Mark groups of vertices in R and Python plots
+
+In R and Python, you can mark vertex groups on graph plots, using shaded
+areas. Communities and cohesive blocks are plotted using technique by
+default. See the `mark.groups` argument of
+the <a href="doc-0.6/R/plot.graph.html">`plot.igraph()`</a>
+function in R and the `mark_groups` argument of the
+<a href="doc-0.6/python/igraph.Graph-class.html#__plot__">`Graph.__plot__`</a>
+function in Python.
+
+### [PY] Refactored graph drawers in the Python interface
+
+Graphs in the Python interface are plotted by graph drawer classes now instead
+of a monolithic plotting function. This allows one to replace the
+<a href="doc-0.6/python/igraph.drawing.graph.DefaultGraphDrawer-class.html">default
+	graph drawer</a> with custom graph drawers; for instance, a drawer that
+sends an igraph graph to an
+<a href="doc-0.6/python/igraph.drawing.graph.UbiGraphDrawer-class.html">UbiGraph display</a>
+or to
+<a href="doc-0.6/python/igraph.drawing.graph.CytoscapeGraphDrawer-class.html">Cytoscape</a>.
+The default graph drawer also allows the partial customization of the plot with
+pluggable <a href="doc-0.6/python/igraph.drawing.shapes-module.html">vertex shapes</a>
+and <a href="doc-0.6/python/igraph.drawing.edge-module.html">edge drawers</a>.
+
+### [R] igraph demos in the R package
+
+We have included some demos in the igraph R package, to get a list of
+the demos, type this at your R prompt:
+
+```r
+> demo(package="igraph")
+Demos in package ‘igraph’:
+  centrality              Classic and other vertex centrality indices
+  cohesive                Cohesive blocking, the Moody & White method
+  community               Community structure detection
+  crashR                  A crash-course into R
+  smallworld              Small-world networks
+```
+
+### [R][PY] Better handling of attributes in R and Python
+
+In R and Python, many igraph functions keep the vertex, edge and graph attributes
+now, when one manipulates the graph. The attributes can also be
+combined using a flexible API. See
+the <a href="doc-0.6/R/attribute.combination.html">R manual</a> and the 
+`combine_edges` and `combine_attrs` arguments
+of many graph methods in the <a href="doc-0.6/python/igraph.Graph-class.html">Python documentation</a> for more.
+
+R: Major new features
+---------------------
+
+- Vertices and edges are numbered from 1 instead of 0. 
+  Note that this makes most of the old R igraph code incompatible
+  with igraph 0.6. If you want to use your old code, please use 
+  the `igraph0` package.
+- The `[` and `[[` operators can now be used on igraph graphs, 
+  for `[` the graph behaves as an adjacency matrix, for `[[` is 
+  is treated as an adjacency list. It is also much simpler to
+  manipulate the graph structure, i.e. add/remove edges and vertices, 
+  with some new operators. See more at `?graph.structure`.
+- In all functions that take a vector or list of vertices or edges, 
+  vertex/edge names can be given instead of the numeric ids.
+- New package `igraphdata`, contains a number of data sets that can
+  be used directly in igraph.
+- Igraph now supports loading graphs from the Nexus online data
+  repository, see `nexus.get()`, `nexus.info()`, `nexus.list()` and 
+  `nexus.search()`.
+- All the community structure finding algorithm return a `communities`
+  object now, which has a bunch of useful operations, see 
+  `?communities` for details.
+- Vertex and edge attributes are handled much better now. They 
+  are kept whenever possible, and can be combined via a flexible API.
+  See `?attribute.combination`.
+- R now prints igraph graphs to the screen in a more structured and 
+  informative way. The output of `summary()` was also updated
+  accordingly.
+
+R: Other new features
+---------------------
+
+- It is possible to mark vertex groups on plots, via
+  shading. Communities and cohesive blocks are plotted using this by
+  default.
+- Some igraph demos are now available, see a list via 
+  `demo(package="igraph")`.
+- igraph now tries to select the optimal layout algorithm, when
+  plotting a graph.
+- Added a simple console, using Tcl/Tk. It contains a text area
+  for status messages and also a status bar. See `igraph.console()`.
+- Reimplemented igraph options support, see `igraph.options()` and 
+  `getIgraphOpt()`.
+- Igraph functions can now print status messages.
+
+R: New or updated functions
+---------------------------
+
+### Community detection
+
+- The multi-level modularity optimization community structure detection 
+  algorithm by Blondel et al. was added, see `multilevel.community()`.
+- Distance between two community structures: `compare.communities()`.
+- Community structure via exact modularity optimization,
+  `optimal.community()`.
+- Hierarchical random graphs and community finding, porting the code
+  from Aaron Clauset. See `hrg.game()`, `hrg.fit()`, etc.
+- Added the InfoMAP community finding method, thanks to Emmanuel
+  Navarro for the code. See `infomap.community()`.
+
+### Shortest paths
+
+- Eccentricity (`eccentricity()`), and radius (`radius()`) calculations.
+- Shortest path calculations with `get.shortest.paths()` can now 
+  return the edges along the shortest paths.
+- `get.all.shortest.paths()` now supports edge weights.
+
+### Centrality
+
+- Centralization scores for degree, closeness, betweenness and 
+  eigenvector centrality. See `centralization.scores()`.
+- Personalized Page-Rank scores, see `page.rank()`.
+- Subgraph centrality, `subgraph.centrality()`.
+- Authority (`authority.score()`) and hub (`hub.score()`) scores support 
+  edge weights now.
+- Support edge weights in betweenness and closeness calculations.
+- `bonpow()`, Bonacich's power centrality and `alpha.centrality()`,
+  Alpha centrality calculations now use sparse matrices by default.
+- Eigenvector centrality calculation, `evcent()` now works for 
+  directed graphs.
+- Betweenness calculation can now use arbitrarily large integers,
+  this is required for some lattice-like graphs to avoid overflow.
+
+### Input/output and file formats
+
+- Support the DL file format in `graph.read()`. See 
+  http://www.analytictech.com/networks/dataentry.htm.
+- Support writing the LEDA file format in `write.graph()`.
+
+### Plotting and layouts
+
+- Star layout: `layout.star()`.
+- Layout based on multidimensional scaling, `layout.mds()`.
+- New layouts `layout.grid()` and `layout.grid.3d()`.
+- Sugiyama layout algorithm for layered directed acyclic graphs, 
+  `layout.sugiyama()`.
+
+### Graph generators
+
+- New graph generators: `static.fitness.game()`, `static.power.law.game()`.
+- `barabasi.game()` was rewritten and it supports three algorithms now,
+  the default algorithm does not generate multiple or loop edges.
+  The graph generation process can now start from a supplied graph.
+- The Watts-Strogatz graph generator, `igraph_watts_strogatz()` can 
+  now create graphs without loop edges.
+
+### Others
+
+- Added the Spectral Coarse Graining algorithm, see `scg()`. 
+- The `cohesive.blocks()` function was rewritten in C, it is much faster
+  now. It has a nicer API, too. See `demo("cohesive")`.
+- Added generic breadth-first and depth-first search implementations
+  with many callbacks, `graph.bfs()` and `graph_dfs()`.
+- Support vertex and edge coloring in the VF2 (sub)graph isomorphism 
+  functions (`graph.isomorphic.vf2()`, `graph.count.isomorphisms.vf2()`, 
+  `graph.get.isomorphisms.vf2()`, `graph.subisomorphic.vf2()`, 
+  `graph.count.subisomorphisms.vf2()`, `graph.get.subisomorphisms.vf2()`).
+- Assortativity coefficient, `assortativity()`, `assortativity.nominal()`
+  and `assortativity.degree()`.
+- Vertex operators that work by vertex names: 
+  `graph.intersection.by.name()`, `graph.union.by.name()`,
+  `graph.difference.by.name()`. Thanks to Magnus Torfason for 
+  contributing his code!
+- Function to calculate a non-induced subraph: `subgraph.edges()`.
+- More comprehensive maximum flow and minimum cut calculation, 
+  see functions `graph.maxflow()`, `graph.mincut()`, `stCuts()`, `stMincuts()`.
+- Check whether a directed graph is a DAG, `is.dag()`.
+- `has.multiple()` to decide whether a graph has multiple edges.
+- Added a function to calculate a diversity score for the vertices,
+  `graph.diversity()`.
+- Graph Laplacian calculation (`graph.laplacian()`) supports edge 
+  weights now.
+- Biconnected component calculation, `biconnected.components()` 
+  now returns the components themselves.
+- `bipartite.projection()` calculates multiplicity of edges.
+- Maximum cardinality search: `maximum.cardinality.search()` and 
+  chordality test: `is.chordal()`
+- Convex hull computation, `convex.hull()`.
+- Contract vertices, `contract.vertices()`.
+
+New in the Python interface
+---------------------------
+
+### General updates
+
+- Python 3.x is now supported by the Python interface.
+- Graphs can now be treated as adjacency matrices by indexing the
+  graph object using a pair of vertex ids or vertex names.
+- Methods accepting a vertex id or a list of vertex ids should now
+  also accept vertex names instead. Names should be given in the
+  `name` vertex attribute.
+- Igraph now supports loading graphs from the Nexus online data
+  repository, see `Nexus.get()`, `Nexus.info()`, `Nexus.list()` and 
+  `Nexus.search()`.
+
+### Community detection
+
+- The multi-level modularity optimization community structure detection 
+  algorithm by Blondel et al. was added, see `Graph.community_multilevel()`.
+- Distance between two community structures: `compare_communities()`.
+- Community structure via exact modularity optimization,
+  `Graph.community_optimal_modularity()`.
+- Added the InfoMAP community finding method, thanks to Emmanuel
+  Navarro for the code. See `Graph.community_infomap()`.
+- Edge betweenness community detection now supports weighted graphs;
+  see `Graph.community_edge_betweenness()`.
+
+### Shortest paths
+
+- Eccentricity (`Graph.eccentricity()`), and radius (`Graph.radius()`)
+  calculations.
+- Shortest path calculations with `Graph.get_shortest_paths()` can now 
+  return the vertex or edge ids along the shortest paths.
+- `Graph.get_all_shortest_paths()` now supports edge weights.
+- Neighborhood of a vertex can now be retrieved with `Graph.neighborhood()`
+
+### Centrality
+
+- Personalized Page-Rank scores, see `Graph.pagerank()`.
+- Authority (`Graph.authority_score()`) and hub (`Graph.hub_score()`)
+  scores support edge weights now.
+- Support edge weights in betweenness and closeness calculations.
+- Eigenvector centrality calculation, `Graph.evcent()` now works for 
+  directed graphs.
+- Betweenness calculation can now use arbitrarily large integers,
+  this is required for some lattice-like graphs to avoid overflow.
+
+### Input/output and file formats
+
+- Support the DL file format in `Graph.read()`. See 
+  http://www.analytictech.com/networks/dataentry.htm.
+- Support writing the LEDA file format in `Graph.write()`.
+
+### Plotting and layouts
+
+- Star layout: `Graph.layout_star()`.
+- Layout based on multidimensional scaling, `Graph.layout_mds()`
+- Grid layouts: `Graph.layout_grid()`, `Graph.layout_grid_3d()`
+- Sugiyama layout algorithm for layered directed acyclic graphs:
+  `Graph.layout_sugiyama()`.
+- It is possible to mark vertex groups on plots using the `mark_groups`
+  keyword argument of `Graph.__plot__()`. Communities and cohesive blocks are
+  plotted using this by default. Note that the same keyword argument is
+  also accepted by `plot()` of course.
+- Redesigned graph plotting framework: graph drawers are now derived
+  from `AbstractGraphDrawer`. The framework allows the implementation of
+  custom graph drawers such as `UbiGraphDrawer` or `CytoscapeDrawer`.
+  Edges are drawn by edge drawer classes (derived from `AbstractEdgeDrawer`),
+  custom vertex shapes are now possible by `ShapeDrawers`.
+- Multiple edges are now drawn curved to make them visible. See
+  the `autocurve` and `edge_curved` keyword arguments of
+  `Graph.__plot__()`. Note that these are also accepted by `plot()` of
+  course.
+- Better label placement algorithm supports multi-line labels and the
+  specification of the distance and angle of the label relative to the
+  center of the node.
+- Added `rescale()` function to rescale a list of numeric values to a
+  different range, suitable for plotting.
+
+### Graph generators
+
+- New graph generators: `Graph.Static_Fitness()`, `Graph.Static_Power_Law()`.
+- `Graph.Barabasi()` was rewritten and it supports three algorithms now,
+  the default algorithm does not generate multiple or loop edges.
+  The graph generation process can now start from a supplied graph.
+- The Watts-Strogatz graph generator, `Graph.Watts_Strogatz()` can 
+  now create graphs without loop edges.
+
+### Others
+
+- Vertex and edge attributes are handled much better now. They 
+  are kept whenever possible, and can be combined via the
+  `combine_edges` and `combine_attrs` keyword arguments of
+  `Graph.simplify()`, `Graph.contract_vertices()` and
+  `Graph.to_undirected()`.
+- Graphs are now printed in a more concise and informative way.
+  `print()` prints a short information header and the edge list,
+  while `summary()` prints the heder only. `summary()` also
+  understands keyword arguments that control which parts of the
+  output should be added; see the `GraphSummary` class.
+- Motif search can now call a callback function for every motif found,
+  see `Graph.motifs_randesu()`
+- Transitivity calculations now support weights,
+  see `Graph.transitivity_local_undirected()`
+- Added cohesive block calculation, see `Graph.cohesive_blocks()`
+- Added feedback arc sets, see `Graph.feedback_arc_set()`
+- It is now possible to ask for the Jaccard or Dice similarities of
+  pairs of vertices only, see `Graph.similarity_jaccard_pairs()`
+  and similar functions.
+- Support vertex and edge coloring in the VF2 (sub)graph isomorphism 
+  functions (`Graph.isomorphic_vf2()`, `Graph.count_isomorphisms.vf2()`,
+  `Graph.get_isomorphisms_vf2()`, `Graph.subisomorphic_vf2()`, 
+  `Graph.count_subisomorphisms_vf2()`, `Graph.get_subisomorphisms_vf2()`).
+- Assortativity coefficient, `Graph.assortativity()`,
+  `Graph.assortativity_nominal()` and `Graph.assortativity_degree()`.
+- Function to calculate a non-induced subraph: `Graph.subgraph_edges()`.
+- `Graph.has_multiple()` to decide whether a graph has multiple edges.
+- Added a function to calculate a diversity score for the vertices,
+  `Graph.diversity()`.
+- Graph Laplacian calculation (`Graph.laplacian()`) supports edge 
+  weights now.
+- `Graph.bipartite_projection()` calculates multiplicity of edges.
+- Vertex contraction, `Graph.contract_vertices()`.
+
+New in the C layer
+------------------
+
+- Maximum cardinality search: `igraph_maximum_cardinality_search()` and 
+  chordality test: `igraph_is_chordal()`.
+- Support the DL file format, `igraph_read_graph_dl()`. See 
+  http://www.analytictech.com/networks/dataentry.htm.
+- Added generic breadth-first and depth-first search implementations
+  with many callbacks (`igraph_bfs()`, `igraph_dfs()`).
+- Centralization scores for degree, closeness, betweenness and
+  eigenvector centrality, see `igraph_centralization()`.
+- Added `igraph_sparsemat_t`, a type that implements sparse 
+  matrices based on the CXSparse library by Tim Davis.
+  See http://www.cise.ufl.edu/research/sparse/CXSparse/.
+- Personalized Page-Rank scores, `igraph_personalized_pagerank()` and 
+  `igraph_personalized_pagerank_vs()`.
+- Assortativity coefficient, `igraph_assortativity()`, 
+  `igraph_assortativity_nominal()`, and `igraph_assortativity_degree()`.
+- The multi-level modularity optimization community structure detection 
+  algorithm by Blondel et al. was added, see `igraph_community_multilevel()`.
+- Added the `igraph_version()` function.
+- Star layout: `igraph_layout_star()`.
+- Function to calculate a non-induced subraph: `igraph_subgraph_edges()`.
+- Distance between two community structures: `igraph_compare_communities()`.
+- Community structure via exact modularity optimization,
+  `igraph_community_optimal_community()`.
+- More comprehensive maximum flow and minimum cut calculation, 
+  see functions `igraph_maxflow()`, `igraph_mincut()`, 
+  `igraph_all_st_cuts()`, `igraph_all_st_mincuts()`.
+- Layout based on multidimensional scaling, `igraph_layout_mds()`.
+- It is now possible to access the random number generator(s) via an
+  API. Multiple RNGs can be used, from external sources as well. 
+  The default RNG is MT19937.
+- Added `igraph_get_all_shortest_paths_dijkstra`, for calculating all
+  non-negatively weighted shortest paths.
+- Check whether a directed graph is a DAG, `igraph_is_dag()`.
+- Cohesive blocking, a'la Moody & White, `igraph_cohesive_blocks()`.
+- Igraph functions can now print status messages, see `igraph_status()`
+  and related functions.
+- Support writing the LEDA file format, `igraph_write_graph_leda()`.
+- Contract vertices, `igraph_contract_vertices()`.
+- The C reference manual has now a lot of example programs.
+- Hierarchical random graphs and community finding, porting the code
+  from Aaron Clauset. See `igraph_hrg_game()`, `igraph_hrg_fit()`, etc.
+- `igraph_has_multiple()` to decide whether a graph has multiple edges.
+- New layouts `igraph_layout_grid()` and `igraph_layout_grid_3d()`.
+- `igraph_integer_t` is really an integer now, it used to be a double.
+- `igraph_minimum_spanning_tree()`, calls either the weighted or 
+  the unweighted implementation.
+- Eccentricity (`igraph_eccentricity()`), and radius (`igraph_radius()`)
+  calculations.
+- Several game theory update rules, written by Minh Van Nguyen. See
+  `igraph_deterministic_optimal_imitation()`,
+  `igraph_stochastic_imitation()`, `igraph_roulette_wheel_imitation()`,
+  `igraph_moran_process()`, 
+- Sugiyama layout algorithm for layered directed acyclic graphs, 
+  `igraph_layout_sugiyama()`.
+- New graph generators: `igraph_static_fitness_game()`, 
+  `igraph_static_power_law_game()`.
+- Added the InfoMAP community finding method, thanks to Emmanuel
+  Navarro for the code. See `igraph_community_infomap()`.
+- Added the Spectral Coarse Graining algorithm, see `igraph_scg()`. 
+- Added a function to calculate a diversity score for the vertices,
+  `igraph_diversity()`.
+
+Major changes in the C layer
+----------------------------
+
+- Authority (`igraph_authority_score()`) and hub (`igraph_hub_score()`) scores 
+  support edge weights now.
+- Graph Laplacian calculation (`igraph_laplacian()`) supports edge 
+  weights now.
+- Support edge weights in betweenness (`igraph_betweenness()`) and closeness
+  (`igraph_closeness()`) calculations.
+- Support vertex and edge coloring in the VF2 graph isomorphism 
+  algorithm (`igraph_isomorphic_vf2()`, `igraph_count_isomorphisms_vf2()`,
+  `igraph_get_isomorphisms_vf2()`, `igraph_subisomorphic_vf2()`, 
+  `igraph_count_subisomorphisms_vf2()`, `igraph_get_subisomorphisms_vf2()`).
+- Added print operations for the `igraph_vector*_t`, `igraph_matrix*_t` and 
+  `igraph_strvector_t` types.
+- Biconnected component calculation (`igraph_biconnected_components()`)
+  can now return the components themselves.
+- Eigenvector centrality calculation, `igraph_eigenvector_centrality()` 
+  now works for directed graphs.
+- Shortest path calculations with `get_shortest_paths()` and 
+  `get_shortest_paths_dijkstra()` can now return the edges along the paths.
+- Betweenness calculation can now use arbitrarily large integers,
+  this is required for some lattice-like graphs to avoid overflow.
+- `igraph_bipartite_projection()` calculates multiplicity of edges.
+- `igraph_barabasi_game()` was rewritten and it supports three 
+  algorithms now, the default algorithm does not generate multiple or
+  loop edges.
+- The Watts-Strogatz graph generator, `igraph_watts_strogatz()` can 
+  now create graphs without loop edges.
+- igraph should be now thread-safe, on architectures that support 
+  thread-local storage (Linux and Windows: yes, Mac OSX: no).
+
+We also fixed numerous bugs, too many to include them here, sorry.
+You may look at our bug tracker at https://bugs.launchpad.net/igraph
+to check whether a bug was fixed or not. Thanks for all the people
+reporting bugs. Special thanks to Minh Van Nguyen for a lot of bug
+reports, documentation fixes and contributed code!

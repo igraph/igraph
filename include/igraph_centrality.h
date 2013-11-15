@@ -48,11 +48,12 @@ __BEGIN_DECLS
 
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res, 
 		     const igraph_vs_t vids, igraph_neimode_t mode,
-		     const igraph_vector_t *weights);
+		     const igraph_vector_t *weights, igraph_bool_t normalized);
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
                               igraph_real_t cutoff,
-			      const igraph_vector_t *weights);
+			      const igraph_vector_t *weights,
+			      igraph_bool_t normalized);
 
 int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res, 
                        const igraph_vs_t vids, igraph_bool_t directed,

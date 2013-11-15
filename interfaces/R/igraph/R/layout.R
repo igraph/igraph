@@ -288,7 +288,7 @@ layout.reingold.tilford <- function(graph, ..., params=list()) {
     params <- list(...)
   }
 
-  if (is.null(params$root))          { params$root       <- numeric()  }
+  if (is.null(params$root))          { params$root       <- 1          }
   if (is.null(params$circular))      { params$circular   <- FALSE      }
   if (is.null(params$rootlevel))     { params$rootlevel  <- numeric()  }
   if (is.null(params$mode))          { params$mode       <- "out"      }

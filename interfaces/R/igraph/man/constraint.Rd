@@ -34,8 +34,9 @@ constraint(graph, nodes=V(graph), weights=NULL)
   graph adjacency matrix. For isolated vertices, constraint is undefined.
 }
 \value{A numeric vector of constraint scores}
-\author{Jeroen Bruggeman \email{j.p.bruggeman@uva.nl} and Gabor Csardi
-  \email{csardi.gabor@gmail.com}
+\author{Jeroen Bruggeman
+  (\url{https://sites.google.com/site/jebrug/jeroen-bruggeman-social-science})
+  and Gabor Csardi \email{csardi.gabor@gmail.com}
 }
 \references{Burt, R.S. (2004). Structural holes and good ideas. \emph{American
     Journal of Sociology} 110, 349-399.

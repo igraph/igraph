@@ -1,80 +1,37 @@
-body
-{
-    padding-top: 50px;
+/* Sticky footer, http://getbootstrap.com/examples/sticky-footer-navbar/ */
+
+html,
+body {
+  height: 100%;
 }
 
-.centered
-{
-    text-align: center;
-    margin: auto;
+#wrap {
+  min-height: 100%;
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 auto -60px;
+  /* Pad bottom by footer height */
+  padding: 0 0 60px;
+}
+
+/* Set the fixed height of the footer here */
+#footer {
+  padding-top: 5px;
+/*  background-color: #f5f5f5; */
+}
+
+#wrap > .bs-header-outer {
+  padding: 50px 0px 0;
 }
 
 .navbar-brand
 {
-    margin-right: 30px;
+    margin-right: 40px;
 }
 
-@media(max-width:767px){
-    .jumbotron {
-	padding: 10px;
-    }
-}
-@media(min-width:992px){
-    .jumbotron {
-	padding: 20px;
-    }
-}
-
-.thumbnail {
-    border: 0 none;
-    position: relative;
-}
-
-.thumbnail img {
-    opacity: .7;
-    transition: opacity .25s ease-in-out;
-    -moz-transition: opacity .25s ease-in-out;
-    -webkit-transition: opacity .25s ease-in-out;
-    -ms-transition: opacity .25s ease-in-out;
-    -o-transition: opacity .25s ease-in-out;
-}
-
-.thumbnail img:hover {
-    opacity: 1;
-}
-
-.caption {
-    position:absolute;
-    bottom:-50px;
-    right:0;
-    background:rgba(79, 189, 79, 0.75);
-    width:100%;
-    height:auto;
-    display: none;
-    padding:2%;
-    text-align:center;
-    color:#fff !important;
-    z-index:2;
-}
-
-@media(max-width:767px){
-    .lead {
-	font-size: 90%;
-    }
-}
-@media(max-width:991px) {
-    .lead {
-	font-size: 100%;
-    }
-}
-@media(min-width:992px){
-    .lead {
-	font-size: 150%;
-    }
-}
-
-.footer {
-    margin-top: 100px;
+.navbar-brand img
+{
+    margin-right: 5px;
 }
 
 .gist {
@@ -86,7 +43,7 @@ body
 	font-size: 140%;
     }
     .bs-sidebar {
-	font-size: 140%;
+	font-size: 120%;
     }
     .gist .gist-file .gist-data {
 	font-size: 80% !important;
@@ -104,4 +61,138 @@ code.rfun {
 
 code.rfun:after {
     content: "()";
+}
+
+/* Page headers */
+.bs-header {
+  padding: 20px 15px 20px; /* side padding builds on .container 15px, so 30px */
+  font-size: 16px;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0,0,0,.15);
+  background: #eee;
+  margin-bottom: 10px;
+}
+.bs-header p {
+  font-weight: 300;
+  line-height: 1.5;
+}
+.bs-header .container {
+  position: relative;
+}
+
+@media (min-width: 768px) {
+  .bs-header {
+    font-size: 21px;
+    text-align: left;
+  }
+  .bs-header h1 {
+    font-size: 60px;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 992px) {
+  .bs-header p {
+    margin-right: 380px;
+  }
+}
+
+.tooltip-inner {
+    font-size: medium;
+}
+
+#footer {
+    border-top: 1px solid;
+}
+
+.start-page {
+    background: #eee;
+}
+
+/* Masthead (headings and download button) */
+.bs-masthead {
+  position: relative;
+  padding: 80px 15px;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0,0,0,.15);
+}
+.bs-masthead h1 {
+  font-size: 50px;
+  line-height: 1;
+}
+
+.bs-masthead .btn {
+  margin-bottom: 5px;
+  border: 1px solid;
+}
+
+.bs-masthead .btn:hover {
+  background: darkblue;
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .bs-masthead {
+    text-align: left;
+    padding-top:    110px;
+    padding-bottom: 80px;
+  }
+  .bs-masthead h1 {
+    font-size: 70px;
+  }
+  .bs-masthead .lead {
+    margin-right: 25%;
+    font-size: 20px;
+  }
+  .bs-masthead .btn {
+    width: auto;
+    margin: 20px 5px 20px 0px;
+    padding: 18px 24px;
+    font-size: 21px;
+  }
+}
+
+@media (min-width: 992px) {
+  .bs-masthead {
+    text-align: left;
+    padding-top:    130px;
+    padding-bottom: 80px;
+  }
+  .bs-masthead h1 {
+    font-size: 100px;
+  }
+  .bs-masthead .lead {
+    margin-right: 25%;
+    font-size: 30px;
+  }
+  .bs-masthead .btn {
+    width: auto;
+    margin: 20px 5px 20px 0;
+    padding: 18px 24px;
+    font-size: 21px;
+  }
+}
+
+.bs-docs-container {
+    margin-bottom: 200px;
+}
+
+span.anchor { 
+  margin-top: -70px;        /* Size of fixed header */
+  padding-bottom: 70px;
+  height: 0px;
+  display: block;
+}
+
+.tr-first-in-group {
+    border-top: 2px solid;
+    border-color: lightgray;
+    padding-top: 10px;
+}
+
+/* To hide the empty python index */
+
+#indices-and-tables {
+    visibility: hidden;
+    display: none;
 }

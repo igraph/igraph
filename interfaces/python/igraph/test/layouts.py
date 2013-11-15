@@ -76,10 +76,17 @@ class LayoutTests(unittest.TestCase):
         self.assertEqual(layout.boundaries(), ([0,0,0],[2,1,3]))
         self.assertEqual(layout.boundaries(1), ([-1,-1,-1],[3,2,4]))
 
+        layout = Layout([])
+        self.assertRaises(ValueError, layout.boundaries)
+        layout = Layout([], dim=3)
+        self.assertRaises(ValueError, layout.boundaries)
+
     def testBoundingBox(self):
         layout = Layout([(0,1), (2,7)])
         self.assertEqual(layout.bounding_box(), BoundingBox(0,1,2,7))
         self.assertEqual(layout.bounding_box(1), BoundingBox(-1,0,3,8))
+        layout = Layout([])
+        self.assertEqual(layout.bounding_box(), BoundingBox(0,0,0,0))
 
     def testCenter(self):
         layout = Layout([(-2,0), (-2,-2), (0,-2), (0,0)])
@@ -103,6 +110,10 @@ class LayoutTests(unittest.TestCase):
         self.assertEqual(layout.coords, \
                 [[0, 0, 0], [2, 2, 2], [4, 4, 4], [6, 6, 2], [8, 8, 0]]
         )
+
+        layout = Layout([])
+        layout.fit_into((6,7,8,11))
+        self.assertEqual(layout.coords, [])
 
     def testToPolar(self):
         import math

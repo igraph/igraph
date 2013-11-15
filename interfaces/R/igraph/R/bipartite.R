@@ -21,7 +21,8 @@
 ###################################################################
 
 bipartite.projection <- function(graph, types=NULL,
-                                 multiplicity=TRUE, probe1=NULL) {
+                                 multiplicity=TRUE, probe1=NULL,
+				 which=c("both", "true", "false")) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
   if (is.null(types) && "type" %in% list.vertex.attributes(graph)) { 
@@ -43,14 +44,27 @@ bipartite.projection <- function(graph, types=NULL,
   } else {
     probe1 <- -1
   }
+  which <- switch(igraph.match.arg(which), "both"=0L, "false"=1L,
+                  "true"=2L)
+  if (which != "both" && probe1 != -1) {
+    warning("`probe1' ignored if only one projection is requested")
+  }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_bipartite_projection", graph, types, probe1,
-        PACKAGE="igraph")
-  if (multiplicity) {
-    E(res[[1]])$weight <- res[[3]]
-    E(res[[2]])$weight <- res[[4]]
+  res <- .Call("R_igraph_bipartite_projection", graph, types,
+               as.integer(probe1), which, PACKAGE="igraph")
+  if (which == 0L) {
+    if (multiplicity) {
+      E(res[[1]])$weight <- res[[3]]
+      E(res[[2]])$weight <- res[[4]]
+    }
+    res[1:2]
+  } else if (which == 1L) {
+    if (multiplicity) { E(res[[1]])$weight <- res[[3]] }
+    res[[1]]
+  } else {
+    if (multiplicity) { E(res[[2]])$weight <- res[[4]] }
+    res[[2]]
   }
-  res[1:2]
 }

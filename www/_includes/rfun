@@ -1,1 +1,1 @@
-<a href="/doc/R/{{ include.f }}.html"><code class="rfun">{{ include.f }}</code></a>
+<a href="/doc/r/{{ include.f }}.html"><code class="rfun">{{ include.f }}</code></a>

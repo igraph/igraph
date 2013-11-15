@@ -1942,7 +1942,7 @@ class Graph(GraphBase):
         directed = self.is_directed()
 
         print >> f, '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-        print >> f, '<!-- Created by igraph (http://igraph.sourceforge.net/) for use in Inkscape (http://www.inkscape.org/) -->'
+        print >> f, '<!-- Created by igraph (http://igraph.org/) for use in Inkscape (http://www.inkscape.org/) -->'
         print >> f
         print >> f, '<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"'
         print >> f, 'width="{0}px" height="{1}px">'.format(width, height),
@@ -2577,11 +2577,9 @@ class Graph(GraphBase):
         result.vs["type"] = types
         return result
 
-    def bipartite_projection(self, types="type", multiplicity=True, \
-            *args, **kwds):
-        """bipartite_projection(types="type", multiplicity=True, probe1=-1)
-
-        Projects a bipartite graph into two one-mode graphs. Edge directions
+    def bipartite_projection(self, types="type", multiplicity=True, probe1=-1,
+            which="both"):
+        """Projects a bipartite graph into two one-mode graphs. Edge directions
         are ignored while projecting.
 
         Examples:
@@ -2606,16 +2604,48 @@ class Graph(GraphBase):
           projections in the resulting list. If given and non-negative, then
           it is considered as a vertex ID; the projection containing the
           vertex will be the first one in the result.
-        @return: a tuple containing the two projected one-mode graphs.
+        @param which: this argument can be used to specify which of the two
+          projections should be returned if only one of them is needed. Passing
+          0 here means that only the first projection is returned, while 1 means
+          that only the second projection is returned. (Note that we use 0 and 1
+          because Python indexing is zero-based). C{False} is equivalent to 0 and
+          C{True} is equivalent to 1. Any other value means that both projections
+          will be returned in a tuple.
+        @return: a tuple containing the two projected one-mode graphs if C{which}
+          is not 1 or 2, or the projected one-mode graph specified by the
+          C{which} argument if its value is 0, 1, C{False} or C{True}.
         """
         superclass_meth = super(Graph, self).bipartite_projection
+
+        if which == False:
+            which = 0
+        elif which == True:
+            which = 1
+        if which != 0 and which != 1:
+            which = -1
+
         if multiplicity:
-            g1, g2, w1, w2 = superclass_meth(types, True, *args, **kwds)
-            g1.es["weight"] = w1
-            g2.es["weight"] = w2
-            return g1, g2
+            if which == 0:
+                g1, w1 = superclass_meth(types, True, probe1, which)
+                g2, w2 = None, None
+            elif which == 1:
+                g1, w1 = None, None
+                g2, w2 = superclass_meth(types, True, probe1, which)
+            else:
+                g1, g2, w1, w2 = superclass_meth(types, True, probe1, which)
+
+            if g1 is not None:
+                g1.es["weight"] = w1
+                if g2 is not None:
+                    g2.es["weight"] = w2
+                    return g1, g2
+                else:
+                    return g1
+            else:
+                g2.es["weight"] = w2
+                return g2
         else:
-            return superclass_meth(types, False, *args, **kwds)
+            return superclass_meth(types, False, probe1, which)
 
     def bipartite_projection_size(self, types="type", *args, **kwds):
         """bipartite_projection(types="type")
