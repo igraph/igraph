@@ -261,8 +261,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     scg.c scg_approximate_methods.c scg_exact_scg.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
 			     qsort.c qsort_r.c types.c lad.c hacks.c \
-			     embedding.c scan.c qsort.c qsort_r.c types.c \
-			     lad.c hacks.c triangles.c glet.c \
+			     embedding.c scan.c triangles.c glet.c \
 			     maximal_cliques.c sbm.c
 
 libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
