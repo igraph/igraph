@@ -189,6 +189,10 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 		    const igraph_vector_int_t *block_sizes,
 		    igraph_bool_t directed, igraph_bool_t loops);
 
+int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n, 
+		     igraph_integer_t m, const igraph_vector_t *rho,
+		     const igraph_matrix_t *C, igraph_real_t p);
+
 __END_DECLS
 
 #endif

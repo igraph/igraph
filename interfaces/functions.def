@@ -319,6 +319,13 @@ igraph_sbm_game:
         GATTR-R: name IS Stochastic block-model
         GATTR-PARAM-R: loops
 
+igraph_hsbm_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, \
+                VECTOR rho, MATRIX C, REAL p
+        NAME-R: hsbm.game
+        GATTR-R: name IS Hierarchical stochastic block model
+        GATTR-PARAM-R: m, rho, C, p
+
 #######################################
 # Basic query functions
 #######################################
