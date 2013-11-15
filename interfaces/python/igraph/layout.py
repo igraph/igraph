@@ -326,7 +326,11 @@ class Layout(object):
         @return: the minimum and maximum coordinates along all dimensions,
           in a tuple containing two lists, one for the minimum coordinates,
           the other one for the maximum.
+        @raises ValueError: if the layout contains no layout items
         """
+        if not self._coords:
+            raise ValueError("layout contains no layout items")
+
         mins, maxs = [], []
         for dim in xrange(self._dim):
             col = [row[dim] for row in self._coords]
@@ -349,8 +353,12 @@ class Layout(object):
         """
         if self._dim != 2:
             raise ValueError("Layout.boundary_box() supports 2D layouts only")
-        (x0, y0), (x1, y1) = self.boundaries(border)
-        return BoundingBox(x0, y0, x1, y1)
+
+        try:
+            (x0, y0), (x1, y1) = self.boundaries(border)
+            return BoundingBox(x0, y0, x1, y1)
+        except ValueError:
+            return BoundingBox(0, 0, 0, 0)
 
 
     def center(self, *args, **kwds):
@@ -410,7 +418,10 @@ class Layout(object):
             target_sizes = [max_val-min_val \
                     for min_val, max_val in izip(corner, opposite_corner)]
 
-        mins, maxs = self.boundaries()
+        try:
+            mins, maxs = self.boundaries()
+        except ValueError:
+            mins, maxs = [0.0] * self._dim, [0.0] * self._dim
         sizes = [max_val - min_val for min_val, max_val in izip(mins, maxs)]
 
         for i, size in enumerate(sizes):
@@ -418,7 +429,6 @@ class Layout(object):
                 sizes[i] = 2
                 mins[i] -= 1
                 maxs[i] += 1
-
 
         ratios = [float(target_size) / current_size \
                   for current_size, target_size in izip(sizes, target_sizes)]

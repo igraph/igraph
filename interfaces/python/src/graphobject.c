@@ -3706,19 +3706,28 @@ PyObject *igraphmodule_Graph_biconnected_components(igraphmodule_GraphObject *se
 PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * self,
 		PyObject* args, PyObject* kwds) {
   PyObject *types_o = Py_None, *multiplicity_o = Py_True, *mul1 = 0, *mul2 = 0;
-  igraphmodule_GraphObject *result1, *result2;
+  igraphmodule_GraphObject *result1 = 0, *result2 = 0;
   igraph_vector_bool_t* types = 0;
   igraph_vector_t multiplicities[2];
   igraph_t g1, g2;
+  igraph_t *p_g1 = &g1, *p_g2 = &g2;
   long int probe1 = -1;
+  long int which = -1;
 
-  static char* kwlist[] = {"types", "multiplicity", "probe1", NULL};
+  static char* kwlist[] = {"types", "multiplicity", "probe1", "which", NULL};
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|Ol", kwlist, &types_o, &multiplicity_o, &probe1))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|Oll", kwlist, &types_o,
+        &multiplicity_o, &probe1, &which))
     return NULL;
 
   if (igraphmodule_attrib_to_vector_bool_t(types_o, self, &types, ATTRIBUTE_TYPE_VERTEX))
 	return NULL;
+
+  if (which == 0) {
+    p_g2 = 0;
+  } else if (which == 1) {
+    p_g1 = 0;
+  }
 
   if (PyObject_IsTrue(multiplicity_o)) {
     if (igraph_vector_init(&multiplicities[0], 0)) {
@@ -3734,8 +3743,10 @@ PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * sel
       return NULL;
     }
 
-    if (igraph_bipartite_projection(&self->g, types, &g1, &g2,
-        &multiplicities[0], &multiplicities[1], (igraph_integer_t) probe1)) {
+    if (igraph_bipartite_projection(&self->g, types, p_g1, p_g2,
+        p_g1 ? &multiplicities[0] : 0,
+        p_g2 ? &multiplicities[1] : 0,
+        (igraph_integer_t) probe1)) {
       igraph_vector_destroy(&multiplicities[0]);
       igraph_vector_destroy(&multiplicities[1]);
       if (types) { igraph_vector_bool_destroy(types); free(types); }
@@ -3743,7 +3754,7 @@ PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * sel
       return NULL;
     }
   } else {
-    if (igraph_bipartite_projection(&self->g, types, &g1, &g2, 0, 0,
+    if (igraph_bipartite_projection(&self->g, types, p_g1, p_g2, 0, 0,
           (igraph_integer_t) probe1)) {
       if (types) { igraph_vector_bool_destroy(types); free(types); }
       igraphmodule_handle_igraph_error();
@@ -3753,23 +3764,49 @@ PyObject *igraphmodule_Graph_bipartite_projection(igraphmodule_GraphObject * sel
 
   if (types) { igraph_vector_bool_destroy(types); free(types); }
 
-  CREATE_GRAPH(result1, g1);
-  CREATE_GRAPH(result2, g2);
+  if (p_g1) {
+    CREATE_GRAPH(result1, g1);
+  }
+  if (p_g2) {
+    CREATE_GRAPH(result2, g2);
+  }
 
   if (PyObject_IsTrue(multiplicity_o)) {
-    mul1 = igraphmodule_vector_t_to_PyList(&multiplicities[0], IGRAPHMODULE_TYPE_INT);
-    igraph_vector_destroy(&multiplicities[0]);
-    if (mul1 == NULL) {
-      igraph_vector_destroy(&multiplicities[1]);
-      return NULL;
+    if (p_g1) {
+      mul1 = igraphmodule_vector_t_to_PyList(&multiplicities[0], IGRAPHMODULE_TYPE_INT);
+      igraph_vector_destroy(&multiplicities[0]);
+      if (mul1 == NULL) {
+        igraph_vector_destroy(&multiplicities[1]);
+        return NULL;
+      }
+    } else {
+      igraph_vector_destroy(&multiplicities[0]);
     }
-    mul2 = igraphmodule_vector_t_to_PyList(&multiplicities[1], IGRAPHMODULE_TYPE_INT);
-    igraph_vector_destroy(&multiplicities[1]);
-    if (mul2 == NULL)
-      return NULL;
-    return Py_BuildValue("NNNN", result1, result2, mul1, mul2);
+
+    if (p_g2) {
+      mul2 = igraphmodule_vector_t_to_PyList(&multiplicities[1], IGRAPHMODULE_TYPE_INT);
+      igraph_vector_destroy(&multiplicities[1]);
+      if (mul2 == NULL)
+        return NULL;
+    } else {
+      igraph_vector_destroy(&multiplicities[1]);
+    }
+
+    if (p_g1 && p_g2) {
+      return Py_BuildValue("NNNN", result1, result2, mul1, mul2);
+    } else if (p_g1) {
+      return Py_BuildValue("NN", result1, mul1);
+    } else {
+      return Py_BuildValue("NN", result2, mul2);
+    }
   } else {
-    return Py_BuildValue("NN", result1, result2);
+    if (p_g1 && p_g2) {
+      return Py_BuildValue("NN", result1, result2);
+    } else if (p_g1) {
+      return (PyObject*)result1;
+    } else {
+      return (PyObject*)result2;
+    }
   }
 }
 
@@ -12289,7 +12326,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_bipartite_projection */
   {"bipartite_projection", (PyCFunction) igraphmodule_Graph_bipartite_projection,
    METH_VARARGS | METH_KEYWORDS,
-   "bipartite_projection(types, multiplicity=True, probe1=-1)\n\n"
+   "bipartite_projection(types, multiplicity=True, probe1=-1, which=-1)\n\n"
    "Internal function, undocumented.\n\n"
    "@see: Graph.bipartite_projection()\n"},
 
