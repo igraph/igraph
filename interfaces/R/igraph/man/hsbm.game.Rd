@@ -40,4 +40,4 @@ if (require(Matrix)) {
   image(g[])
 }
 }
-\keyword(graphs)
+\keyword{graphs}
