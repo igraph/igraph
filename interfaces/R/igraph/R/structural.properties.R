@@ -1119,57 +1119,73 @@ maximum.bipartite.matching <- function(graph, types=NULL, weights=NULL,
   res
 }
 
-local.scan <- function(g, gp=NULL, k=1, mode="out", FUN=ecount,
-                       weighted=FALSE) {
+local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
+                       weighted=FALSE, mode=c("out", "in", "all"), ...) {
 
+  ## Must be igraph object
+  stopifnot(is.igraph(graph.us))
+
+  ## Must be NULL or igraph object
+  stopifnot(is.null(graph.them) || is.igraph(graph.them))
+
+  ## If given, number of vertices must match
+  stopifnot(is.null(graph.them) || vcount(graph.them) == vcount(graph.us))
+
+  ## k must be non-negative integer
+  stopifnot(length(k)==1, k >= 0, as.integer(k) == k)
+
+  ## Must be NULL or a function
+  stopifnot(is.null(FUN) || is.function(FUN))
+
+  ## Logical scalar
+  stopifnot(is.logical(weighted), length(weighted )== 1)
+
+  ## If weighted, then the graph(s) must be weighted
+  stopifnot(!weighted || (is.weighted(graph.us) && (is.null(graph.them) ||
+                                                    is.weighted(graph.them))))
+
+  ## Check mode argument
+  mode <- igraph.match.arg(mode)
+
+  if (is.null(FUN)) {
+    if (weighted) {
+      FUN <- function(g) sum(E(g)$weight)
+    } else {
+      FUN <- ecount
+    }
+  }
+  
   require(Matrix)
 
-  wstat <- function(g,...) {
-    A <- get.adjacency(g, attr="weight")
-    if (k==0) { # weighted degree
-      indeg <- Matrix::colSums(A)
-      outdeg <- Matrix::rowSums(A)
-      if (mode=="in") {
-        out <- indeg
-      } else if (mode=="out") {
-        out <- outdeg
+  if (is.null(graph.them)) {
+    
+    if (k == 0) {
+      if (! weighted) {
+        degree(graph.us, mode=mode)
       } else {
-        out <- indeg + outdeg
+        graph.strength(graph.us, mode=mode)
       }
-    } else { # weighted ecount
-      out <- sum(A)
-      if (mode=="in" | mode=="out") out <- out/2
-    }
-    return(out)
-  }
-
-  if(k < 0) { stop("Error: k should be a non-negative integer!\n") }
-  if(k == 0) { FUN <- degree }
-  if(weighted) { FUN <- wstat }
-
-  if (is.matrix(g) | is.matrix(gp)) {
-    gmode <- ifelse((mode=="out" | mode=="in"),"directed","undirected")
-    g <- simplify(graph.adjacency(g, mode=gmode))
-    if (!is.null(gp)) { gp <- simplify(graph.adjacency(gp, mode=gmode)) }
-  }
-
-  n <- vcount(g)
-  if (is.null(gp)) {
-    if (k==0) {
-      out <- FUN(g,mode=mode)
     } else {
-      out <- sapply(graph.neighborhood(g, k, V(g), mode), FUN)
+      sapply(graph.neighborhood(graph.us, order=k, V(graph.us), mode=mode),
+             FUN, ...)
     }
-  } else { # them
-    if (k==0) {
-      out <- unlist(sapply(1:n, function(x) {
-        vid <- unlist(neighborhood(g, k+1, x, mode));
-        x.rank <- which(sort(vid)==x);
-        FUN(induced.subgraph(gp, vid), mode=mode)[x.rank]}))
+    
+  } else {
+    
+    if (k == 0) {
+      if (! weighted) {
+        gi <- graph.intersection(graph.us, graph.them, byname=FALSE)
+        degree(gi, mode=mode)
+      } else {
+        gi <- graph.intersection(graph.us, graph.them, byname=FALSE)
+        E(gi)$weight <- E(gi)$weight_2
+        graph.strength(gi, mode=mode)
+      }
     } else {
-      out <- sapply(V(g), function(x) {
-        FUN(induced.subgraph(gp,unlist(neighborhood(g, k, x, mode))))})
+      sapply(V(graph.us), function(x) {
+        vei <- neighborhood(graph.us, order=k, nodes=x, mode=mode)[[1]]
+        FUN(induced.subgraph(graph.them, vei), ...)
+      })
     }
   }
-  return(out)
 }
