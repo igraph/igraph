@@ -34,10 +34,10 @@ rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
   getval <- function(which, name) {
     newval <- getfun(graphs[[which]], name)
     if (!is.null(maps)) {
-      idx <- rep(NA, newsize)
-      midx <- maps[[which]][ maps[[which]] >= 0 ]
-      idx[ midx + 1 ] <- seq_along(midx)
-      newval <- newval[idx]
+      tmpval <- newval[ maps[[which]] >= 0 ]
+      mm <- maps[[which]][ maps[[which]] >= 0 ] + 1
+      newval <- rep(NA, newsize)
+      newval[mm] <- tmpval
     }
     if (!is.null(maps2)) {
       newval <- newval[ maps2[[which]] + 1 ]
