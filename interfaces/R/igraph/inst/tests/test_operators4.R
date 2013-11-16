@@ -346,3 +346,58 @@ C    5     e    NA   NA    C
   expect_that(df$edges, equals(df.e))
 
 })
+
+test_that("intersection of non-named graphs keeps attributes properly", {
+  library(igraph)
+  set.seed(42)
+
+  g <- erdos.renyi.game(10, 1/2)
+  g2 <- erdos.renyi.game(10, 1/2)
+  E(g)$weight <- sample(ecount(g))
+  E(g2)$weight <- sample(ecount(g2))
+
+  gi <- graph.intersection(g, g2)
+
+  rn <- function(D) {
+    rownames(D) <- paste(D[,1], D[,2], sep="-")
+    D
+  }
+
+  df <- rn(get.data.frame(g))
+  df2 <- rn(get.data.frame(g2))
+  dfi <- rn(get.data.frame(gi))
+
+  expect_that(df[rownames(dfi), ], is_equivalent_to(dfi[, 1:3]))
+  expect_that(df2[rownames(dfi), ], is_equivalent_to(dfi[, c(1,2,4)]))
+
+})
+
+test_that("union of non-named graphs keeps attributes properly", {
+  library(igraph)
+  set.seed(42)
+
+  g <- erdos.renyi.game(10, 1/2)
+  g2 <- erdos.renyi.game(10, 1/2)
+  E(g)$weight <- sample(ecount(g))
+  E(g2)$weight <- sample(ecount(g2))
+
+  gu <- graph.union(g, g2)
+
+  rn <- function(D) {
+    rownames(D) <- paste(D[,1], D[,2], sep="-")
+    D
+  }
+
+  df <- rn(get.data.frame(g))
+  df2 <- rn(get.data.frame(g2))
+  dfu <- rn(get.data.frame(gu))
+
+  expect_that(dfu[rownames(df), 1:3], is_equivalent_to(df))
+  expect_that(dfu[rownames(df2), c(1,2,4)], is_equivalent_to(df2))
+
+  expect_that(dfu[!rownames(dfu) %in% rownames(df), 3],
+              equals(rep(NA_real_, ecount(gu)-ecount(g))))
+  expect_that(dfu[!rownames(dfu) %in% rownames(df2), 4],
+              equals(rep(NA_real_, ecount(gu)-ecount(g2))))
+
+})
