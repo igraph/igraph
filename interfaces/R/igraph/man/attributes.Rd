@@ -28,15 +28,18 @@
 \usage{
 get.graph.attribute(graph, name)
 set.graph.attribute(graph, name, value)
+list.graph.attributes(graph)
 graph.attributes(graph)
 remove.graph.attribute(graph, name)
 get.vertex.attribute(graph, name, index=V(graph))
 set.vertex.attribute(graph, name, index=V(graph), value)
 remove.vertex.attribute(graph, name)
+list.vertex.attributes(graph)
 vertex.attributes(graph)
 get.edge.attribute(graph, name, index=E(graph))
 set.edge.attribute(graph, name, index=E(graph), value)
 remove.edge.attribute(graph, name)
+list.edge.attributes(graph)
 edge.attributes(graph)
 }
 \arguments{
