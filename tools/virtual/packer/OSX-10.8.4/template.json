@@ -46,6 +46,10 @@
       "type": "shell"
     },
     {
+      "type": "shell",
+      "script": "../scripts/install-python.sh"
+    },
+    {
       "execute_command": "chmod +x {{ .Path }}; sudo {{ .Vars }} {{ .Path }}",
       "inline": [
         "[ -z \"{{user `autologin_vagrant_user`}}\" ] && exit",

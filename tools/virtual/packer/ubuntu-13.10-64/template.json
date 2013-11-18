@@ -80,6 +80,10 @@
     },
     {
       "type": "shell",
+      "script": "../scripts/install-python.sh"
+    },
+    {
+      "type": "shell",
       "script": "../scripts/cleanup.sh",
       "override": {
         "ubuntu-13.10-64": {
