@@ -7,7 +7,7 @@ DOC_FILES = $(top_srcdir)/doc/Makefile.in \
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
 
-EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) examples \
+EXTRA_DIST = igraph.pc VERSION $(top_srcdir)/include/* $(DOC_FILES) examples \
 	$(wildcard $(top_srcdir)/optional/glpk/*.{inc,c,h})      \
 	$(wildcard $(top_srcdir)/optional/glpk/{README,COPYING}) \
 	$(wildcard $(top_srcdir)/optional/glpk/amd/*.{c,h})      \
