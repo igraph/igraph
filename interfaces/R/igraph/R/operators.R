@@ -177,15 +177,15 @@ graph.disjoint.union <- function(...) {
     res <- res$graph
 
     ## We might need to rename all attributes
-    graph.attributes(res) <- rename.attr.if.needed("g", graphs)
-    vertex.attributes(res) <- rename.attr.if.needed("v", graphs,
+    graph.attributes(res) <- rename.attr.if.needed("g", newgraphs)
+    vertex.attributes(res) <- rename.attr.if.needed("v", newgraphs,
                                                     vcount(res),
                                                     ignore="name")
     V(res)$name <- uninames
 
     ## Edges are a bit more difficult, we need a mapping
     if (edgemaps) {
-      edge.attributes(res) <- rename.attr.if.needed("e", graphs,
+      edge.attributes(res) <- rename.attr.if.needed("e", newgraphs,
                                                     ecount(res),
                                                     maps=maps)
     }
