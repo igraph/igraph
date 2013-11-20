@@ -33,7 +33,11 @@ benchmark_this <- function(label, ..., init={}, init_each={}, replications=100,
   replicator <- function(test, repl) {
     res <- replicate(repl, {
       eval(init_each, environment)
-      st <- system.time(eval(test, environment))
+      st <- try(system.time(eval(test, environment)), silent=TRUE)
+      if (inherits(st, "try-error")) {
+        st <- system.time(eval({}, environment))
+        st[] <- NA
+      }
       if (!child) { st <- st[!grepl("\\.child$", names(st))] }
       st
     })
