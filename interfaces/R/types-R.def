@@ -233,6 +233,10 @@ VECTORLIST:
 
 VECTORLIST_OR_0:
 
+MATRIXLIST:
+  INCONV:
+    IN: if (!all(sapply(%I%, is.matrix))) { stop("%I is not a list of matrices") }
+
 VERTEXSETLIST:
 
 VERTEXSETLIST_OR_0:
