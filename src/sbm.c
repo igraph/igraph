@@ -245,6 +245,9 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     IGRAPH_ERROR("`rho' must be between zero and one for HSBM", 
 		 IGRAPH_EINVAL);
   }
+  if (igraph_matrix_min(C) < 0 || igraph_matrix_max(C) > 1) {
+    IGRAPH_ERROR("`C' must be between zero and one for HSBM", IGRAPH_EINVAL);
+  }
   if (fabs(igraph_vector_sum(rho) - 1.0) > sq_dbl_epsilon) {
     IGRAPH_ERROR("`rho' must sum up to 1 for HSBM", IGRAPH_EINVAL);
   }
