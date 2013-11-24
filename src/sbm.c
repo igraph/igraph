@@ -371,3 +371,187 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
 
   return 0;
 }
+
+int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
+			  const igraph_vector_int_t *mlist,
+			  const igraph_vector_ptr_t *rholist,
+			  const igraph_vector_ptr_t *Clist,
+			  igraph_real_t p) {
+
+  int i, no_blocks=igraph_vector_ptr_size(rholist);
+  igraph_real_t sq_dbl_epsilon=sqrt(DBL_EPSILON);
+  igraph_vector_t csizes, edges;
+  int b, offset=0;
+
+  if (n < 1) { 
+    IGRAPH_ERROR("`n' must be positive for HSBM", IGRAPH_EINVAL); 
+  }
+  if (no_blocks == 0) {
+    IGRAPH_ERROR("`rholist' empty for HSBM", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_ptr_size(Clist) != no_blocks && 
+      igraph_vector_int_size(mlist) != no_blocks) {
+    IGRAPH_ERROR("`rholist' must have same length as `Clist' and `m' "
+		 "for HSBM", IGRAPH_EINVAL);
+  }
+  if (p < 0 || p > 1) {
+    IGRAPH_ERROR("`p' must be a probability for HSBM", IGRAPH_EINVAL);
+  }
+  /* Checks for m's */
+  if (igraph_vector_int_sum(mlist) != n) {
+    IGRAPH_ERROR("`m' must sum up to `n' for HSBM", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_int_min(mlist) < 1) { 
+    IGRAPH_ERROR("`m' must be positive for HSBM", IGRAPH_EINVAL);
+  }
+  /* Checks for the rhos */
+  for (i=0; i<no_blocks; i++) {
+    const igraph_vector_t *rho=VECTOR(*rholist)[i];
+    if (!igraph_vector_isininterval(rho, 0, 1)) {
+      IGRAPH_ERROR("`rho' must be between zero and one for HSBM", 
+		   IGRAPH_EINVAL);
+    }
+    if (fabs(igraph_vector_sum(rho) - 1.0) > sq_dbl_epsilon) {
+      IGRAPH_ERROR("`rho' must sum up to 1 for HSBM", IGRAPH_EINVAL);
+    }
+  }
+  /* Checks for the Cs */
+  for (i=0; i<no_blocks; i++) {
+    const igraph_matrix_t *C=VECTOR(*Clist)[i];
+    if (igraph_matrix_min(C) < 0 || igraph_matrix_max(C) > 1) {
+      IGRAPH_ERROR("`C' must be between zero and one for HSBM", 
+		   IGRAPH_EINVAL);
+    }
+    if (!igraph_matrix_is_symmetric(C)) {
+      IGRAPH_ERROR("`C' must be a symmetric matrix", IGRAPH_EINVAL);
+    }
+  }
+  /* Check that C and rho sizes match */
+  for (i=0; i<no_blocks; i++) {
+    const igraph_vector_t *rho=VECTOR(*rholist)[i];
+    const igraph_matrix_t *C=VECTOR(*Clist)[i];
+    int k=igraph_vector_size(rho);
+    if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
+      IGRAPH_ERROR("`C' dimensions must match `rho' dimensions in HSBM",
+		   IGRAPH_EINVAL);
+    }
+  }
+  /* Check that rho * m is integer */
+  for (i=0; i<no_blocks; i++) {
+    const igraph_vector_t *rho=VECTOR(*rholist)[i];
+    igraph_real_t m=VECTOR(*mlist)[i];
+    int j, k=igraph_vector_size(rho);
+    for (j=0; j<k; j++) {
+      igraph_real_t s=VECTOR(*rho)[j] * m;
+      if (fabs(floor(s)-s) > sq_dbl_epsilon) {
+	IGRAPH_ERROR("`rho' * `m' is not integer in HSBM", IGRAPH_EINVAL);
+      }
+    }
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&csizes, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  
+  RNG_BEGIN();
+
+  /* Block models first */
+  
+  for (b=0; b<no_blocks; b++) {
+    int from, to, fromoff=0;
+    const igraph_vector_t *rho=VECTOR(*rholist)[b];
+    const igraph_matrix_t *C=VECTOR(*Clist)[b];
+    igraph_real_t m=VECTOR(*mlist)[b];
+    int k=igraph_vector_size(rho);
+    
+    igraph_vector_resize(&csizes, k);
+    for (i=0; i<k; i++) {
+      VECTOR(csizes)[i] = round(VECTOR(*rho)[i] * m);
+    }
+    
+    for (from=0; from < k; from++) {
+      int fromsize=VECTOR(csizes)[from];
+      int i, tooff=0;
+      for (i=0; i<from; i++) {
+	tooff += VECTOR(csizes)[i];
+      }
+      for (to = from; to < k; to++) {
+	int tosize = VECTOR(csizes)[to];
+	igraph_real_t prob=MATRIX(*C, from, to);
+	igraph_real_t maxedges;
+	igraph_real_t last=RNG_GEOM(prob);
+	if (from != to) {
+	  maxedges = fromsize * tosize;	
+	  while (last < maxedges) {
+	    int vto=floor(last/fromsize);
+	    int vfrom=last - (igraph_real_t)vto * fromsize;
+	    igraph_vector_push_back(&edges, offset + fromoff + vfrom);
+	    igraph_vector_push_back(&edges, offset + tooff + vto);
+	    last += RNG_GEOM(prob);
+	    last += 1;
+	  }
+	} else /* from==to */ {
+	  maxedges = fromsize * (fromsize-1) / 2.0;
+	  while (last < maxedges) {
+	    int vto=floor((sqrt(8*last+1)+1)/2);
+	    int vfrom=last-(((igraph_real_t)vto)*(vto-1))/2;
+	    igraph_vector_push_back(&edges, offset + fromoff + vfrom);
+	    igraph_vector_push_back(&edges, offset + tooff + vto);
+	    last += RNG_GEOM(prob);
+	    last += 1;
+	  }
+	}
+
+	tooff += tosize;
+      }
+      fromoff += fromsize;
+    }
+    
+    offset += m;
+  }
+
+  /* And now the rest, if not a special case */
+
+  if (p == 1) {    
+    int fromoff=0, tooff=VECTOR(*mlist)[0];
+    for (b=0; b<no_blocks; b++) {
+      igraph_real_t fromsize = VECTOR(*mlist)[b];
+      igraph_real_t tosize = n - tooff;
+      int from, to;
+      for (from=0; from<fromsize; from++) {
+	for (to=0; to<tosize; to++) {
+	  igraph_vector_push_back(&edges, fromoff + from);
+	  igraph_vector_push_back(&edges, tooff + to);
+	}
+      }
+      fromoff += fromsize;
+      if (b+1 < no_blocks) { tooff += VECTOR(*mlist)[b+1]; }
+    }    
+  } else if (p > 0) {    
+    int fromoff=0, tooff=VECTOR(*mlist)[0];
+    for (b=0; b<no_blocks; b++) {
+      igraph_real_t fromsize = VECTOR(*mlist)[b];
+      igraph_real_t tosize = n - tooff;
+      igraph_real_t maxedges= fromsize * tosize;
+      igraph_real_t last=RNG_GEOM(p);
+      while (last < maxedges) {
+	int vto = floor(last/fromsize);
+	int vfrom = last - (igraph_real_t) vto * fromsize;
+	igraph_vector_push_back(&edges, fromoff + vfrom);
+	igraph_vector_push_back(&edges, tooff + vto);
+	last += RNG_GEOM(p);
+	last += 1;
+      }
+      
+      fromoff += fromsize;
+      if (b+1 < no_blocks) { tooff += VECTOR(*mlist)[b+1]; }
+    }
+  }
+  
+  igraph_create(graph, &edges, n, /*directed=*/ 0);
+
+  igraph_vector_destroy(&edges);
+  igraph_vector_destroy(&csizes);
+  IGRAPH_FINALLY_CLEAN(2);  
+  
+  return 0;
+}

@@ -10,13 +10,16 @@ hsbm.game (n, m, rho, C, p)
 \arguments{
   \item{n}{Integer scalar, the number of vertices.}
   \item{m}{Integer scalar, the number of vertices per block. \code{n /
-      m} must be integer.}
+      m} must be integer. Alternatively, an integer vector of block
+    sizes, if not all the blocks have equal sizes.}
   \item{rho}{Numeric vector, the fraction of vretices per cluster,
     within a block. Must sum up to 1, and \code{rho * m} must be integer
-    for all elements of rho.}
+    for all elements of rho. Alternatively a list of rho vectors, one
+    for each block, if they are not the same for all blocks.}
   \item{C}{A square, symmetric numeric matrix, the Bernoulli rates for
     the clusters within a block. Its size must mach the size of the
-    \code{rho} vector.}
+    \code{rho} vector. Alternatively, a list of square matrices, if
+    the Bernoulli rates differ in different blocks.}
   \item{p}{Numeric scalar, the Bernoulli rate of connections between
     vertices that in different blocks.}
 }

@@ -39,6 +39,7 @@
 #include "igraph_matrix.h"
 #include "igraph_vector.h"
 #include "igraph_datatype.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
@@ -192,6 +193,12 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n, 
 		     igraph_integer_t m, const igraph_vector_t *rho,
 		     const igraph_matrix_t *C, igraph_real_t p);
+
+int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
+			  const igraph_vector_int_t *mlist,
+			  const igraph_vector_ptr_t *rholist,
+			  const igraph_vector_ptr_t *Clist,
+			  igraph_real_t p);
 
 __END_DECLS
 

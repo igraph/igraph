@@ -322,9 +322,18 @@ igraph_sbm_game:
 igraph_hsbm_game:
         PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, \
                 VECTOR rho, MATRIX C, REAL p
-        NAME-R: hsbm.game
+        NAME-R: hsbm.1.game
         GATTR-R: name IS Hierarchical stochastic block model
         GATTR-PARAM-R: m, rho, C, p
+        IGNORE: RNamespace
+
+igraph_hsbm_list_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT mlist, \
+                VECTORLIST rholist, MATRIXLIST Clist, REAL p
+        NAME-R: hsbm.list.game
+        GATTR-R: name IS Hierarchical stochastic block model
+        GATTR-PARAM-R: p
+        IGNORE: RNamespace
 
 #######################################
 # Basic query functions
