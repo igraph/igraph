@@ -72,6 +72,17 @@ int FUNCTION(igraph_matrix,init)(TYPE(igraph_matrix) *m, long int nrow, long int
   return ret1;
 }
 
+const TYPE(igraph_matrix) *FUNCTION(igraph_matrix,view)(const TYPE(igraph_matrix) *m,
+							const BASE *data,
+							long int nrow,
+							long int ncol) {
+  TYPE(igraph_matrix) *m2=(TYPE(igraph_matrix)*)m;
+  FUNCTION(igraph_vector,view)(&m2->data, data, nrow * ncol);
+  m2->nrow=nrow;
+  m2->ncol=ncol;
+  return m;
+}
+
 /** 
  * \ingroup matrix
  * \function igraph_matrix_destroy
