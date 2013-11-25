@@ -19,6 +19,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+import urllib2
 
 from distutils.core import Extension
 from distutils.util import get_platform
@@ -48,6 +49,29 @@ def cleanup_tmpdir(dirname):
     if dirname is not None and os.path.exists(dirname):
         shutil.rmtree(dirname)
 
+def find_static_library(library_name, library_path):
+    """Given the raw name of a library in `library_name`, tries to find a
+    static library with this name in the given `library_path`. `library_path`
+    is automatically extended with common library directories on Linux and Mac
+    OS X."""
+
+    variants = ["lib{0}.a", "{0}.a", "{0}.lib", "lib{0}.lib"]
+    if is_unix_like():
+        extra_libdirs = ["/usr/local/lib64", "/usr/local/lib",
+                "/usr/lib64", "/usr/lib", "/lib64", "/lib"]
+    else:
+        extra_libdirs = []
+
+    for path in extra_libdirs:
+        if path not in library_path and os.path.isdir(path):
+            library_path.append(path)
+
+    for path in library_path:
+        for variant in variants:
+            full_path = os.path.join(path, variant.format(library_name))
+            if os.path.isfile(full_path):
+                return full_path
+
 def first(iterable):
     """Returns the first element from the given iterable."""
     for item in iterable:
@@ -64,7 +88,59 @@ def get_output(command):
     if type(line).__name__ == "bytes":
         line = str(line, encoding="utf-8")
     return line, p.returncode
-    
+
+def http_url_exists(url):
+    """Returns whether the given HTTP URL 'exists' in the sense that it is returning
+    an HTTP error code or not. A URL is considered to exist if it does not return
+    an HTTP error code."""
+    class HEADRequest(urllib2.Request):
+        def get_method(self):
+            return "HEAD"
+    try:
+        response = urllib2.urlopen(HEADRequest(url))
+        return True
+    except urllib2.URLError:
+        return False
+
+def is_unix_like(platform=None):
+    """Returns whether the given platform is a Unix-like platform with the usual
+    Unix filesystem. When the parameter is omitted, it defaults to ``sys.platform``
+    """
+    platform = platform or sys.platform
+    platform = platform.lower()
+    return platform.startswith("linux") or platform.startswith("darwin") or \
+            platform.startswith("cygwin")
+
+def preprocess_args():
+    """Preprocesses the command line options before they are passed to
+    setup.py"""
+    # Yes, this is ugly, but we don't want to interfere with setup.py's own
+    # option handling
+    opts_to_remove = []
+    for idx, option in enumerate(sys.argv):
+        if not option.startswith("--"):
+            continue
+        if option == "--static":
+            opts_to_remove.append(idx)
+            buildcfg.static_extension = True
+        elif option == "--no-download":
+            opts_to_remove.append(idx)
+            buildcfg.download_igraph_if_needed = False
+        elif option == "--no-pkg-config":
+            opts_to_remove.append(idx)
+            buildcfg.use_pkgconfig = False
+        elif option.startswith("--c-core-version"):
+            opts_to_remove.append(idx)
+            if option == "--c-core-version":
+                value = sys.argv[idx+1]
+                opts_to_remove.append(idx+1)
+            else:
+                value = option.split("=", 1)[1]
+            buildcfg.c_core_versions = [value]
+
+    for idx in reversed(opts_to_remove):
+        sys.argv[idx:(idx+1)] = []
+
 def preprocess_fallback_config():
     """Preprocesses the fallback include and library paths depending on the
     platform."""
@@ -90,37 +166,21 @@ def preprocess_fallback_config():
                 LIBIGRAPH_FALLBACK_INCLUDE_DIRS = [os.path.join(msvc_builddir, "include")]
                 LIBIGRAPH_FALLBACK_LIBRARY_DIRS = [os.path.join(msvc_builddir, "Release")]
 
-def is_unix_like(platform=None):
-    """Returns whether the given platform is a Unix-like platform with the usual
-    Unix filesystem. When the parameter is omitted, it defaults to ``sys.platform``
-    """
-    platform = platform or sys.platform
-    platform = platform.lower()
-    return platform.startswith("linux") or platform.startswith("darwin") or \
-            platform.startswith("cygwin")
+def version_variants(version):
+    """Given an igraph version number, returns a list of possible version
+    number variants to try when looking for a suitable nightly build of the
+    C core to download from igraph.org."""
 
-def find_static_library(library_name, library_path):
-    """Given the raw name of a library in `library_name`, tries to find a
-    static library with this name in the given `library_path`. `library_path`
-    is automatically extended with common library directories on Linux and Mac
-    OS X."""
+    result = [version]
 
-    variants = ["lib{0}.a", "{0}.a", "{0}.lib", "lib{0}.lib"]
-    if is_unix_like():
-        extra_libdirs = ["/usr/local/lib64", "/usr/local/lib",
-                "/usr/lib64", "/usr/lib", "/lib64", "/lib"]
-    else:
-        extra_libdirs = []
+    # Add trailing ".0" as needed to ensure that we have at least
+    # major.minor.patch
+    parts = version.split(".")
+    while len(parts) < 3:
+        parts.append("0")
+        result.append(".".join(parts))
 
-    for path in extra_libdirs:
-        if path not in library_path and os.path.isdir(path):
-            library_path.append(path)
-
-    for path in library_path:
-        for variant in variants:
-            full_path = os.path.join(path, variant.format(library_name))
-            if os.path.isfile(full_path):
-                return full_path
+    return result
 
 ###########################################################################
 
@@ -128,13 +188,8 @@ class IgraphCCoreBuilder(object):
     """Class responsible for downloading and building the C core of igraph
     if it is not installed yet."""
 
-    def __init__(self, version=None):
-        global VERSION
-
-        # Testing
-        version = "0.7.0-pre+757.902ed5f"
-
-        self.version = version or VERSION
+    def __init__(self, versions_to_try):
+        self.versions_to_try = versions_to_try
         self._builddir = None
         self._tmpdir = None
 
@@ -156,11 +211,6 @@ class IgraphCCoreBuilder(object):
     def download_and_compile(self):
         """Downloads and compiles the C core of igraph."""
 
-        # Download the C core first
-        remote_url = self.get_download_url()
-        local_file = "igraph-%s.tar.gz" % self.version
-        local_file_full_path = os.path.join(self.tmpdir, local_file)
-
         def _progress_hook(count, block_size, total_size):
             if total_size < 0:
                 sys.stdout.write("\rDownloading %s... please wait." % local_file)
@@ -170,6 +220,20 @@ class IgraphCCoreBuilder(object):
                 sys.stdout.write("\rDownloading %s... %.2f%%" % (local_file, percentage))
             sys.stdout.flush()
 
+        # Determine the remote URL
+        version, remote_url = self.find_first_version()
+        if not version:
+            print("Version %s of the C core of igraph is not found among the "
+                    "nightly builds." % self.versions_to_try[0])
+            print("Use the --c-core-version switch to try a different version.")
+            print("")
+            return False
+
+        # Now determine the local filename of the C core
+        local_file = "igraph-%s.tar.gz" % version
+        local_file_full_path = os.path.join(self.tmpdir, local_file)
+
+        # Download the C core
         urlretrieve(remote_url, local_file_full_path, reporthook=_progress_hook)
         print("")
 
@@ -211,8 +275,17 @@ class IgraphCCoreBuilder(object):
 
         return False
 
-    def get_download_url(self):
-        return "http://igraph.org/nightly/get/c/igraph-%s.tar.gz" % self.version
+    def find_first_version(self):
+        """Finds the first version of igraph that exists in the nightly build
+        repo from the version numbers provided in ``self.versions_to_try``."""
+        for version in self.versions_to_try:
+            remote_url = self.get_download_url(version=version)
+            if http_url_exists(remote_url):
+                return version, remote_url
+        return None, None
+
+    def get_download_url(self, version):
+        return "http://igraph.org/nightly/get/c/igraph-%s.tar.gz" % version
 
     def run(self):
         return self.download_and_compile()
@@ -220,6 +293,8 @@ class IgraphCCoreBuilder(object):
 
 class BuildConfiguration(object):
     def __init__(self):
+        global VERSION
+        self.c_core_versions = version_variants(VERSION)
         self.include_dirs = []
         self.library_dirs = []
         self.libraries = []
@@ -321,9 +396,12 @@ class BuildConfiguration(object):
     def download_and_compile_igraph(self):
         """Downloads and compiles the C core of igraph."""
         print("We will now try to download and compile the C core from scratch.")
+        print("Version number of the C core: %s" % self.c_core_versions[0])
+        if len(self.c_core_versions) > 1:
+            print("We will also try: %s" % ", ".join(self.c_core_versions[1:]))
         print("")
 
-        igraph_builder = IgraphCCoreBuilder()
+        igraph_builder = IgraphCCoreBuilder(self.c_core_versions)
         if igraph_builder.run():
             self.include_dirs = igraph_builder.include_dirs
             self.library_dirs = igraph_builder.library_dirs
@@ -332,6 +410,7 @@ class BuildConfiguration(object):
             return True
         else:
             print("Could not download and compile the C core of igraph.")
+            print("")
             return False
 
     def print_build_info(self):
@@ -414,17 +493,7 @@ buildcfg = BuildConfiguration()
 ###########################################################################
 
 # Process command line options
-if "--static" in sys.argv:
-    sys.argv.remove("--static")
-    buildcfg.static_extension = True
-
-if "--no-download" in sys.argv:
-    sys.argv.remove("--no-download")
-    buildcfg.download_igraph_if_needed = False
-
-if "--no-pkg-config" in sys.argv:
-    sys.argv.remove("--no-pkg-config")
-    buildcfg.use_pkgconfig = False
+preprocess_args()
 
 # Define the extension
 sources=glob.glob(os.path.join('src', '*.c'))
