@@ -137,6 +137,14 @@ def preprocess_args():
             else:
                 value = option.split("=", 1)[1]
             buildcfg.c_core_versions = [value]
+        elif option.startswith("--c-core-url"):
+            opts_to_remove.append(idx)
+            if option == "--c-core-url":
+                value = sys.argv[idx+1]
+                opts_to_remove.append(idx+1)
+            else:
+                value = option.split("=", 1)[1]
+            buildcfg.c_core_url = value
 
     for idx in reversed(opts_to_remove):
         sys.argv[idx:(idx+1)] = []
@@ -188,8 +196,9 @@ class IgraphCCoreBuilder(object):
     """Class responsible for downloading and building the C core of igraph
     if it is not installed yet."""
 
-    def __init__(self, versions_to_try):
+    def __init__(self, versions_to_try, remote_url=None):
         self.versions_to_try = versions_to_try
+        self.remote_url = remote_url
         self._builddir = None
         self._tmpdir = None
 
@@ -220,17 +229,21 @@ class IgraphCCoreBuilder(object):
                 sys.stdout.write("\rDownloading %s... %.2f%%" % (local_file, percentage))
             sys.stdout.flush()
 
-        # Determine the remote URL
-        version, remote_url = self.find_first_version()
-        if not version:
-            print("Version %s of the C core of igraph is not found among the "
-                    "nightly builds." % self.versions_to_try[0])
-            print("Use the --c-core-version switch to try a different version.")
-            print("")
-            return False
+        # Determine the remote URL if needed
+        if self.remote_url is None:
+            version, remote_url = self.find_first_version()
+            if not version:
+                print("Version %s of the C core of igraph is not found among the "
+                        "nightly builds." % self.versions_to_try[0])
+                print("Use the --c-core-version switch to try a different version.")
+                print("")
+                return False
+            local_file = "igraph-%s.tar.gz" % version
+        else:
+            remote_url = self.remote_url
+            local_file = remote_url.rsplit("/", 1)[1]
 
-        # Now determine the local filename of the C core
-        local_file = "igraph-%s.tar.gz" % version
+        # Now determine the full path where the C core will be downloaded
         local_file_full_path = os.path.join(self.tmpdir, local_file)
 
         # Download the C core
@@ -295,6 +308,7 @@ class BuildConfiguration(object):
     def __init__(self):
         global VERSION
         self.c_core_versions = version_variants(VERSION)
+        self.c_core_url = None
         self.include_dirs = []
         self.library_dirs = []
         self.libraries = []
@@ -401,7 +415,7 @@ class BuildConfiguration(object):
             print("We will also try: %s" % ", ".join(self.c_core_versions[1:]))
         print("")
 
-        igraph_builder = IgraphCCoreBuilder(self.c_core_versions)
+        igraph_builder = IgraphCCoreBuilder(self.c_core_versions, self.c_core_url)
         if igraph_builder.run():
             self.include_dirs = igraph_builder.include_dirs
             self.library_dirs = igraph_builder.library_dirs
