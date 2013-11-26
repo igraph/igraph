@@ -514,7 +514,7 @@ class BuildConfiguration(object):
 
         self.libraries = LIBIGRAPH_FALLBACK_LIBRARIES[:]
         if self.static_extension:
-            self.libraries.extend(["xml2", "z", "m"])
+            self.libraries.extend(["xml2", "z", "m", "pthread"])
         self.include_dirs = LIBIGRAPH_FALLBACK_INCLUDE_DIRS[:]
         self.library_dirs = LIBIGRAPH_FALLBACK_LIBRARY_DIRS[:]
 
