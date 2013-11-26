@@ -111,44 +111,6 @@ def is_unix_like(platform=None):
     return platform.startswith("linux") or platform.startswith("darwin") or \
             platform.startswith("cygwin")
 
-def preprocess_args():
-    """Preprocesses the command line options before they are passed to
-    setup.py"""
-    # Yes, this is ugly, but we don't want to interfere with setup.py's own
-    # option handling
-    opts_to_remove = []
-    for idx, option in enumerate(sys.argv):
-        if not option.startswith("--"):
-            continue
-        if option == "--static":
-            opts_to_remove.append(idx)
-            buildcfg.static_extension = True
-        elif option == "--no-download":
-            opts_to_remove.append(idx)
-            buildcfg.download_igraph_if_needed = False
-        elif option == "--no-pkg-config":
-            opts_to_remove.append(idx)
-            buildcfg.use_pkgconfig = False
-        elif option.startswith("--c-core-version"):
-            opts_to_remove.append(idx)
-            if option == "--c-core-version":
-                value = sys.argv[idx+1]
-                opts_to_remove.append(idx+1)
-            else:
-                value = option.split("=", 1)[1]
-            buildcfg.c_core_versions = [value]
-        elif option.startswith("--c-core-url"):
-            opts_to_remove.append(idx)
-            if option == "--c-core-url":
-                value = sys.argv[idx+1]
-                opts_to_remove.append(idx+1)
-            else:
-                value = option.split("=", 1)[1]
-            buildcfg.c_core_url = value
-
-    for idx in reversed(opts_to_remove):
-        sys.argv[idx:(idx+1)] = []
-
 def preprocess_fallback_config():
     """Preprocesses the fallback include and library paths depending on the
     platform."""
@@ -196,18 +158,12 @@ class IgraphCCoreBuilder(object):
     """Class responsible for downloading and building the C core of igraph
     if it is not installed yet."""
 
-    def __init__(self, versions_to_try, remote_url=None):
+    def __init__(self, versions_to_try, remote_url=None,
+            show_progress_bar=True):
         self.versions_to_try = versions_to_try
         self.remote_url = remote_url
-        self._builddir = None
+        self.show_progress_bar = show_progress_bar
         self._tmpdir = None
-
-    @property
-    def builddir(self):
-        """The directory in which igraph is built."""
-        if self._builddir is None:
-            self._builddir = os.path.join(self.tmpdir, "igraph-%s" % self.version)
-        return self._builddir
 
     @property
     def tmpdir(self):
@@ -231,14 +187,14 @@ class IgraphCCoreBuilder(object):
 
         # Determine the remote URL if needed
         if self.remote_url is None:
-            version, remote_url = self.find_first_version()
-            if not version:
+            self.version, remote_url = self.find_first_version()
+            if not self.version:
                 print("Version %s of the C core of igraph is not found among the "
                         "nightly builds." % self.versions_to_try[0])
                 print("Use the --c-core-version switch to try a different version.")
                 print("")
                 return False
-            local_file = "igraph-%s.tar.gz" % version
+            local_file = "igraph-%s.tar.gz" % self.version
         else:
             remote_url = self.remote_url
             local_file = remote_url.rsplit("/", 1)[1]
@@ -247,13 +203,31 @@ class IgraphCCoreBuilder(object):
         local_file_full_path = os.path.join(self.tmpdir, local_file)
 
         # Download the C core
-        urlretrieve(remote_url, local_file_full_path, reporthook=_progress_hook)
-        print("")
+        if self.show_progress_bar:
+            urlretrieve(remote_url, local_file_full_path, reporthook=_progress_hook)
+            print("")
+        else:
+            print("Downloading %s... " % local_file)
+            urlretrieve(remote_url, local_file_full_path)
 
         # Extract it in the temporary directory
         print("Extracting %s..." % local_file)
         archive = tarfile.open(local_file_full_path, "r:gz")
         archive.extractall(self.tmpdir)
+
+        # Determine the name of the build directory
+        self.builddir = None
+        for name in os.listdir(self.tmpdir):
+            full_path = os.path.join(self.tmpdir, name)
+            print full_path
+            if name.startswith("igraph") and os.path.isdir(full_path):
+                self.builddir = full_path
+                break
+
+        if not self.builddir:
+            print("Downloaded tarball did not contain a directory whose name "
+                    "started with igraph; giving up build.")
+            return False
 
         # Try to compile
         cwd = os.getcwd()
@@ -315,6 +289,7 @@ class BuildConfiguration(object):
         self.extra_compile_args = []
         self.extra_link_args = []
         self.extra_objects = []
+        self.show_progress_bar = True
         self.static_extension = False
         self.download_igraph_if_needed = True
         self.use_pkgconfig = True
@@ -441,6 +416,47 @@ class BuildConfiguration(object):
         print("Extra compiler options: %s" % " ".join(self.extra_compile_args))
         print("Extra linker options: %s" % " ".join(self.extra_link_args))
 
+    def process_args_from_command_line(self):
+        """Preprocesses the command line options before they are passed to
+        setup.py and sets up the build configuration."""
+        # Yes, this is ugly, but we don't want to interfere with setup.py's own
+        # option handling
+        opts_to_remove = []
+        for idx, option in enumerate(sys.argv):
+            if not option.startswith("--"):
+                continue
+            if option == "--static":
+                opts_to_remove.append(idx)
+                self.static_extension = True
+            elif option == "--no-download":
+                opts_to_remove.append(idx)
+                self.download_igraph_if_needed = False
+            elif option == "--no-pkg-config":
+                opts_to_remove.append(idx)
+                self.use_pkgconfig = False
+            elif option == "--no-progress-bar":
+                opts_to_remove.append(idx)
+                self.show_progress_bar = False
+            elif option.startswith("--c-core-version"):
+                opts_to_remove.append(idx)
+                if option == "--c-core-version":
+                    value = sys.argv[idx+1]
+                    opts_to_remove.append(idx+1)
+                else:
+                    value = option.split("=", 1)[1]
+                self.c_core_versions = [value]
+            elif option.startswith("--c-core-url"):
+                opts_to_remove.append(idx)
+                if option == "--c-core-url":
+                    value = sys.argv[idx+1]
+                    opts_to_remove.append(idx+1)
+                else:
+                    value = option.split("=", 1)[1]
+                self.c_core_url = value
+
+        for idx in reversed(opts_to_remove):
+            sys.argv[idx:(idx+1)] = []
+
     def replace_static_libraries(self):
         """Replaces references to libraries with full paths to their static
         versions if the static version is to be found on the library path."""
@@ -502,12 +518,12 @@ class BuildConfiguration(object):
         self.include_dirs = LIBIGRAPH_FALLBACK_INCLUDE_DIRS[:]
         self.library_dirs = LIBIGRAPH_FALLBACK_LIBRARY_DIRS[:]
 
-buildcfg = BuildConfiguration()
 
 ###########################################################################
 
 # Process command line options
-preprocess_args()
+buildcfg = BuildConfiguration()
+buildcfg.process_args_from_command_line()
 
 # Define the extension
 sources=glob.glob(os.path.join('src', '*.c'))
