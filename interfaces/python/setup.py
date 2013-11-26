@@ -219,7 +219,6 @@ class IgraphCCoreBuilder(object):
         self.builddir = None
         for name in os.listdir(self.tmpdir):
             full_path = os.path.join(self.tmpdir, name)
-            print full_path
             if name.startswith("igraph") and os.path.isdir(full_path):
                 self.builddir = full_path
                 break
@@ -390,7 +389,8 @@ class BuildConfiguration(object):
             print("We will also try: %s" % ", ".join(self.c_core_versions[1:]))
         print("")
 
-        igraph_builder = IgraphCCoreBuilder(self.c_core_versions, self.c_core_url)
+        igraph_builder = IgraphCCoreBuilder(self.c_core_versions, self.c_core_url,
+                show_progress_bar=self.show_progress_bar)
         if igraph_builder.run():
             self.include_dirs = igraph_builder.include_dirs
             self.library_dirs = igraph_builder.library_dirs
