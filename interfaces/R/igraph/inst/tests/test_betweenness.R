@@ -49,3 +49,19 @@ test_that("weighted betweenness works", {
   expect_that(bet, equals(nontrivRes))
 })
 
+test_that("normalization works well", {
+  library(igraph)
+
+  g1 <- graph.formula( 0 +-+ 1 +-+ 2 )
+
+  b11 <- betweenness(g1, normalized=TRUE, directed=FALSE)
+  expect_that(b11, equals(c('0'=0, '1'=1, '2'=0)))
+
+  b12 <- betweenness(g1, normalized=TRUE, directed=TRUE)
+  expect_that(b12, equals(c('0'=0, '1'=1, '2'=0)))
+
+  g2 <- graph.formula( 0 --- 1 --- 2 )
+
+  b2  <- betweenness(g2, normalized=TRUE)
+  expect_that(b2, equals(c('0'=0, '1'=1, '2'=0)))
+})
