@@ -2769,9 +2769,16 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
   igraph_integer_t no_of_nodes=igraph_vcount(graph);
   igraph_real_t no_of_edges=igraph_ecount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
-  
+
+  if (no_of_nodes == 0) {
+    *res = IGRAPH_NAN;
+    return 0;
+  }
+
   if (!loops) {
-    if (directed) {
+    if (no_of_nodes == 1) {
+      *res = IGRAPH_NAN;
+    } else if (directed) {
       *res = no_of_edges / no_of_nodes / (no_of_nodes-1);
     } else {
       *res = no_of_edges / no_of_nodes * 2.0 / (no_of_nodes-1);
@@ -2780,7 +2787,7 @@ int igraph_density(const igraph_t *graph, igraph_real_t *res,
     if (directed) {
       *res = no_of_edges / no_of_nodes / no_of_nodes;
     } else {
-      *res = no_of_edges / no_of_nodes * 2.0 / no_of_nodes;
+      *res = no_of_edges / no_of_nodes * 2.0 / (no_of_nodes+1);
     }
   }
   

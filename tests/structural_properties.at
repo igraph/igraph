@@ -26,6 +26,11 @@ AT_KEYWORDS([igraph_are_connected])
 AT_COMPILE_CHECK([simple/igraph_are_connected.c])
 AT_CLEANUP
 
+AT_SETUP([Density of a graph (igraph_density):])
+AT_KEYWORDS([igraph_density density])
+AT_COMPILE_CHECK([simple/igraph_density.c], [simple/igraph_density.out])
+AT_CLEANUP
+
 AT_SETUP([Diameter of a graph (igraph_diameter):])
 AT_KEYWORDS([igraph_diameter])
 AT_COMPILE_CHECK([simple/igraph_diameter.c], [simple/igraph_diameter.out])
