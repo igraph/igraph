@@ -1157,7 +1157,7 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   
   require(Matrix)
 
-  if (is.null(graph.them)) {
+  res <- if (is.null(graph.them)) {
     
     if (k == 0) {
       if (! weighted) {
@@ -1188,4 +1188,6 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
       })
     }
   }
+
+  as.numeric(res)
 }
