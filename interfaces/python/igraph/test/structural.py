@@ -1,3 +1,5 @@
+from __future__ import division
+
 import unittest
 
 from igraph import *
@@ -11,13 +13,13 @@ class SimplePropertiesTests(unittest.TestCase):
     tree = Graph.Tree(14, 3)
 
     def testDensity(self):
-        self.failUnless(self.gfull.density() == 1.0)
-        self.failUnless(self.gempty.density() == 0.0)
-        self.failUnless(self.g.density() == 5.0/6.0)
-        self.failUnless(self.g.density(True) == 5.0/8.0)
-        self.failUnless(self.gdir.density() == 7.0/12.0)
-        self.failUnless(self.gdir.density(True) == 7.0/16.0)
-        self.assertAlmostEquals(self.tree.density(), 1/7., places=5)
+        self.assertAlmostEquals(1.0, self.gfull.density(), places=5)
+        self.assertAlmostEquals(0.0, self.gempty.density(), places=5)
+        self.assertAlmostEquals(5/6, self.g.density(), places=5)
+        self.assertAlmostEquals(1/2, self.g.density(True), places=5)
+        self.assertAlmostEquals(7/12, self.gdir.density(), places=5)
+        self.assertAlmostEquals(7/16, self.gdir.density(True), places=5)
+        self.assertAlmostEquals(1/7, self.tree.density(), places=5)
         
     def testDiameter(self):
         self.failUnless(self.gfull.diameter() == 1)
@@ -74,10 +76,10 @@ class SimplePropertiesTests(unittest.TestCase):
                 [0.0] * self.tree.vcount())
 
         l = self.g.transitivity_local_undirected(mode="zero")
-        self.assertAlmostEqual(l[0], 2/3., places=4)
-        self.assertAlmostEqual(l[1], 2/3., places=4)
-        self.assertEquals(l[2], 1)
-        self.assertEquals(l[3], 1)
+        self.assertAlmostEqual(2/3, l[0], places=4)
+        self.assertAlmostEqual(2/3, l[1], places=4)
+        self.assertEquals(1, l[2])
+        self.assertEquals(1, l[3])
 
         g = Graph.Full(4) + 1 + [(0, 4)]
         g.es["weight"] = [1, 1, 1, 1, 1, 1, 5]
