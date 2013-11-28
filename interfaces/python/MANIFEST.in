@@ -6,7 +6,6 @@ include debian/changelog
 include debian/compat
 include debian/control
 include debian/copyright
-include debian/pycompat
 include debian/rules
 include debian/source/format
 include scripts/mkdoc.sh
