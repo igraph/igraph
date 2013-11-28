@@ -36,8 +36,12 @@
 
 #include "igraph_datatype.h"
 #include "igraph_arpack.h"
+#include "igraph_constants.h"
 
 __BEGIN_DECLS
+
+int igraph_scan0(const igraph_t *graph, igraph_vector_t *res,
+		 const igraph_vector_t *weights, igraph_neimode_t mode);
 
 int igraph_scan1_ecount(const igraph_t *graph, igraph_vector_t *res);
 int igraph_scan1_ecount_approximate(const igraph_t *graph,

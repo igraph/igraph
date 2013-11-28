@@ -1486,6 +1486,12 @@ igraph_adjacenct_triangles:
         DEPS: vids ON graph
         NAME-R: adjacent.triangles
 
+igraph_scan0:
+        PARAMS: GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
+                NEIMODE mode=OUT
+        DEPS: weights ON graph
+        IGNORE: RR, RNamespace
+
 igraph_scan1_ecount:
         PARAMS: GRAPH graph, OUT VECTOR res
         NAME-R: local.scan1.ecount

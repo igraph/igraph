@@ -1160,11 +1160,11 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   res <- if (is.null(graph.them)) {
     
     if (k == 0) {
-      if (! weighted) {
-        degree(graph.us, mode=mode)
-      } else {
-        graph.strength(graph.us, mode=mode)
-      }
+      mode <- switch(mode, out = 1, `in` = 2, all = 3, total = 3)
+      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+      .Call("R_igraph_scan0", graph.us,
+            if (weighted) as.numeric(E(graph.us)$weight) else NULL, mode,
+            PACKAGE="igraph")
     } else {
       sapply(graph.neighborhood(graph.us, order=k, V(graph.us), mode=mode),
              FUN, ...)

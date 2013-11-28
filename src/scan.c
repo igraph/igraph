@@ -29,6 +29,17 @@
 #include "igraph_arpack.h"
 #include "igraph_eigen.h"
 
+int igraph_scan0(const igraph_t *graph, igraph_vector_t *res,
+		 const igraph_vector_t *weights, igraph_neimode_t mode) {
+  if (weights) {
+    igraph_strength(graph, res, igraph_vss_all(), mode, /*loops=*/ 1,
+		    weights);
+  } else {
+    igraph_degree(graph, res, igraph_vss_all(), mode, /*loops=*/ 1);
+  }
+  return 0;
+}
+
 int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
 																const igraph_vector_int_t *rank);
 
