@@ -19,14 +19,20 @@ import subprocess
 import sys
 import tarfile
 import tempfile
-import urllib2
+
+try:
+    from urllib import urlretrieve
+    from urllib2 import Request, urlopen, URLError
+except:
+    # Maybe Python 3?
+    from urllib.request import Request, urlopen, urlretrieve
+    from urllib.error import URLError
 
 from distutils.core import Extension
 from distutils.util import get_platform
 from select import select
 from subprocess import Popen, PIPE
 from textwrap import dedent
-from urllib import urlretrieve
 
 # Global version number. Keep the format of the next line intact.
 VERSION = '0.7'
@@ -105,13 +111,13 @@ def http_url_exists(url):
     """Returns whether the given HTTP URL 'exists' in the sense that it is returning
     an HTTP error code or not. A URL is considered to exist if it does not return
     an HTTP error code."""
-    class HEADRequest(urllib2.Request):
+    class HEADRequest(Request):
         def get_method(self):
             return "HEAD"
     try:
-        response = urllib2.urlopen(HEADRequest(url))
+        response = urlopen(HEADRequest(url))
         return True
-    except urllib2.URLError:
+    except URLError:
         return False
 
 def is_unix_like(platform=None):
