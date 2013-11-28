@@ -81,12 +81,12 @@ class MotifTests(unittest.TestCase):
         dc = self.g.dyad_census()
         accessors = ["mut", "mutual", "asym", "asymm", "asymmetric", "null"]
         for a in accessors:
-            self.failUnless(isinstance(getattr(dc, a), int))
-            self.failUnless(isinstance(dc[a], int))
-        self.failUnless(isinstance(list(dc), list))
-        self.failUnless(isinstance(tuple(dc), tuple))
-        self.failUnless(len(list(dc)) == 3)
-        self.failUnless(len(tuple(dc)) == 3)
+            self.assertTrue(isinstance(getattr(dc, a), int))
+            self.assertTrue(isinstance(dc[a], int))
+        self.assertTrue(isinstance(list(dc), list))
+        self.assertTrue(isinstance(tuple(dc), tuple))
+        self.assertTrue(len(list(dc)) == 3)
+        self.assertTrue(len(tuple(dc)) == 3)
 
     def testTriads(self):
         """
@@ -96,12 +96,12 @@ class MotifTests(unittest.TestCase):
         tc = self.g.triad_census()
         accessors = ["003", "012", "021d", "030C"]
         for a in accessors:
-            self.failUnless(isinstance(getattr(tc, "t"+a), int))
-            self.failUnless(isinstance(tc[a], int))
-        self.failUnless(isinstance(list(tc), list))
-        self.failUnless(isinstance(tuple(tc), tuple))
-        self.failUnless(len(list(tc)) == 16)
-        self.failUnless(len(tuple(tc)) == 16)
+            self.assertTrue(isinstance(getattr(tc, "t"+a), int))
+            self.assertTrue(isinstance(tc[a], int))
+        self.assertTrue(isinstance(list(tc), list))
+        self.assertTrue(isinstance(tuple(tc), tuple))
+        self.assertTrue(len(list(tc)) == 16)
+        self.assertTrue(len(tuple(tc)) == 16)
 
 class CliqueBenchmark(object):
     """This is a benchmark, not a real test case. You can run it

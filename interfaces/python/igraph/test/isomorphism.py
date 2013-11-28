@@ -148,24 +148,24 @@ class IsomorphismTests(unittest.TestCase):
         6743 7436 7458 7634 7854 8547 8745"
         all_subiso = sorted([int(x) for x in item] for item in all_subiso.split())
 
-        self.assertEquals(all_subiso, sorted(g.get_subisomorphisms_lad(g2)))
-        self.assertEquals([], sorted(g2.get_subisomorphisms_lad(g)))
+        self.assertEqual(all_subiso, sorted(g.get_subisomorphisms_lad(g2)))
+        self.assertEqual([], sorted(g2.get_subisomorphisms_lad(g)))
 
         # Test 'induced'
         induced_subiso = "1375 1573 3751 5731 7513 7315 5137 3157"
         induced_subiso = sorted([int(x) for x in item] for item in induced_subiso.split())
         all_subiso_extra = sorted(all_subiso + induced_subiso)
-        self.assertEquals(induced_subiso,
+        self.assertEqual(induced_subiso,
                 sorted(g3.get_subisomorphisms_lad(g2, induced=True)))
-        self.assertEquals([], g3.get_subisomorphisms_lad(g, induced=True))
+        self.assertEqual([], g3.get_subisomorphisms_lad(g, induced=True))
         
         # Test with limited vertex matching
         limited_subiso = [iso for iso in all_subiso if iso[0] == 4]
         domains = [[4], [0,1,2,3,5,6,7,8], [0,1,2,3,5,6,7,8], [0,1,2,3,5,6,7,8]]
-        self.assertEquals(limited_subiso,
+        self.assertEqual(limited_subiso,
                 sorted(g.get_subisomorphisms_lad(g2, domains=domains)))
         domains = [[], [0,1,2,3,5,6,7,8], [0,1,2,3,5,6,7,8], [0,1,2,3,5,6,7,8]]
-        self.assertEquals([], sorted(g.get_subisomorphisms_lad(g2, domains=domains)))
+        self.assertEqual([], sorted(g.get_subisomorphisms_lad(g2, domains=domains)))
 
     def testSubisomorphicVF2(self):
         g = Graph.Lattice([3,3], circular=False)

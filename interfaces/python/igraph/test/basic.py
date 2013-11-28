@@ -4,85 +4,85 @@ from igraph import *
 class BasicTests(unittest.TestCase):
     def testGraphCreation(self):
         g = Graph()
-        self.failUnless(isinstance(g, Graph))
-        self.failUnless(g.vcount() == 0 and g.ecount() == 0 and g.is_directed() == False)
+        self.assertTrue(isinstance(g, Graph))
+        self.assertTrue(g.vcount() == 0 and g.ecount() == 0 and g.is_directed() == False)
 
         g=Graph(3, [(0,1), (1,2), (2,0)])
-        self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == True)
+        self.assertTrue(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == True)
         g=Graph(2, [(0,1), (1,2), (2,3)], True)
-        self.failUnless(g.vcount() == 4 and g.ecount() == 3 and g.is_directed() == True and g.is_simple())
+        self.assertTrue(g.vcount() == 4 and g.ecount() == 3 and g.is_directed() == True and g.is_simple())
         g=Graph([(0,1), (1,2), (2,1)])
-        self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
+        self.assertTrue(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
         g=Graph([(0,1), (0,0), (1,2)])
-        self.failUnless(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
+        self.assertTrue(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
     def testAddVertex(self):
         g = Graph()
         g.add_vertex()
-        self.failUnless(g.vcount() == 1 and g.ecount() == 0)
-        self.failIf("name" in g.vertex_attributes())
+        self.assertTrue(g.vcount() == 1 and g.ecount() == 0)
+        self.assertFalse("name" in g.vertex_attributes())
         g.add_vertex("foo")
-        self.failUnless(g.vcount() == 2 and g.ecount() == 0)
-        self.failUnless("name" in g.vertex_attributes())
-        self.assertEquals(g.vs["name"], [None, "foo"])
+        self.assertTrue(g.vcount() == 2 and g.ecount() == 0)
+        self.assertTrue("name" in g.vertex_attributes())
+        self.assertEqual(g.vs["name"], [None, "foo"])
         g.add_vertex(3)
-        self.failUnless(g.vcount() == 3 and g.ecount() == 0)
-        self.failUnless("name" in g.vertex_attributes())
-        self.assertEquals(g.vs["name"], [None, "foo", 3])
+        self.assertTrue(g.vcount() == 3 and g.ecount() == 0)
+        self.assertTrue("name" in g.vertex_attributes())
+        self.assertEqual(g.vs["name"], [None, "foo", 3])
         g.add_vertex(name="bar")
-        self.failUnless(g.vcount() == 4 and g.ecount() == 0)
-        self.failUnless("name" in g.vertex_attributes())
-        self.assertEquals(g.vs["name"], [None, "foo", 3, "bar"])
+        self.assertTrue(g.vcount() == 4 and g.ecount() == 0)
+        self.assertTrue("name" in g.vertex_attributes())
+        self.assertEqual(g.vs["name"], [None, "foo", 3, "bar"])
         g.add_vertex(name="frob", spam="cheese", ham=42)
-        self.failUnless(g.vcount() == 5 and g.ecount() == 0)
-        self.assertEquals(sorted(g.vertex_attributes()), ["ham", "name", "spam"])
-        self.assertEquals(g.vs["spam"], [None]*4 + ["cheese"])
-        self.assertEquals(g.vs["ham"], [None]*4 + [42])
+        self.assertTrue(g.vcount() == 5 and g.ecount() == 0)
+        self.assertEqual(sorted(g.vertex_attributes()), ["ham", "name", "spam"])
+        self.assertEqual(g.vs["spam"], [None]*4 + ["cheese"])
+        self.assertEqual(g.vs["ham"], [None]*4 + [42])
 
     def testAddVertices(self):
         g = Graph()
         g.add_vertices(2)
-        self.failUnless(g.vcount() == 2 and g.ecount() == 0)
+        self.assertTrue(g.vcount() == 2 and g.ecount() == 0)
         g.add_vertices("spam")
-        self.failUnless(g.vcount() == 3 and g.ecount() == 0)
-        self.assertEquals(g.vs[2]["name"], "spam")
+        self.assertTrue(g.vcount() == 3 and g.ecount() == 0)
+        self.assertEqual(g.vs[2]["name"], "spam")
         g.add_vertices(["bacon", "eggs"])
-        self.failUnless(g.vcount() == 5 and g.ecount() == 0)
-        self.assertEquals(g.vs[2:]["name"], ["spam", "bacon", "eggs"])
+        self.assertTrue(g.vcount() == 5 and g.ecount() == 0)
+        self.assertEqual(g.vs[2:]["name"], ["spam", "bacon", "eggs"])
 
     def testDeleteVertices(self):
         g = Graph([(0,1), (1,2), (2,3), (0,2), (3,4), (4,5)])
-        self.assertEquals(6, g.vcount())
-        self.assertEquals(6, g.ecount())
+        self.assertEqual(6, g.vcount())
+        self.assertEqual(6, g.ecount())
 
         # Delete a single vertex
         g.delete_vertices(4)
-        self.assertEquals(5, g.vcount())
-        self.assertEquals(4, g.ecount())
+        self.assertEqual(5, g.vcount())
+        self.assertEqual(4, g.ecount())
 
         # Delete multiple vertices
         g.delete_vertices([1,3])
-        self.assertEquals(3, g.vcount())
-        self.assertEquals(1, g.ecount())
+        self.assertEqual(3, g.vcount())
+        self.assertEqual(1, g.ecount())
 
         # Delete a vertex sequence
         g.delete_vertices(g.vs[:2])
-        self.assertEquals(1, g.vcount())
-        self.assertEquals(0, g.ecount())
+        self.assertEqual(1, g.vcount())
+        self.assertEqual(0, g.ecount())
 
         # Delete a single vertex object
         g.vs[0].delete()
-        self.assertEquals(0, g.vcount())
-        self.assertEquals(0, g.ecount())
+        self.assertEqual(0, g.vcount())
+        self.assertEqual(0, g.ecount())
 
         # Delete vertices by name
         g = Graph.Full(4)
         g.vs["name"] = ["spam", "bacon", "eggs", "ham"]
-        self.assertEquals(4, g.vcount())
+        self.assertEqual(4, g.vcount())
         g.delete_vertices("spam")
-        self.assertEquals(3, g.vcount())
+        self.assertEqual(3, g.vcount())
         g.delete_vertices(["bacon", "ham"])
-        self.assertEquals(1, g.vcount())
+        self.assertEqual(1, g.vcount())
 
         # Deleting a nonexistent vertex
         self.assertRaises(ValueError, g.delete_vertices, "no-such-vertex")
@@ -93,59 +93,59 @@ class BasicTests(unittest.TestCase):
         g.add_vertices(["spam", "bacon", "eggs", "ham"])
 
         g.add_edges([(0, 1)])
-        self.assertEquals(g.vcount(), 4)
-        self.assertEquals(g.get_edgelist(), [(0, 1)])
+        self.assertEqual(g.vcount(), 4)
+        self.assertEqual(g.get_edgelist(), [(0, 1)])
 
         g.add_edges([(1, 2), (2, 3), (1, 3)])
-        self.assertEquals(g.vcount(), 4)
-        self.assertEquals(g.get_edgelist(), [(0, 1), (1, 2), (2, 3), (1, 3)])
+        self.assertEqual(g.vcount(), 4)
+        self.assertEqual(g.get_edgelist(), [(0, 1), (1, 2), (2, 3), (1, 3)])
 
         g.add_edges([("spam", "eggs"), ("spam", "ham")])
-        self.assertEquals(g.vcount(), 4)
-        self.assertEquals(g.get_edgelist(), [(0, 1), (1, 2), (2, 3), (1, 3), (0, 2), (0, 3)])
+        self.assertEqual(g.vcount(), 4)
+        self.assertEqual(g.get_edgelist(), [(0, 1), (1, 2), (2, 3), (1, 3), (0, 2), (0, 3)])
 
     def testDeleteEdges(self):
         g = Graph.Famous("petersen")
         g.vs["name"] = list("ABCDEFGHIJ")
         el = g.get_edgelist()
 
-        self.assertEquals(15, g.ecount())
+        self.assertEqual(15, g.ecount())
 
         # Deleting single edge
         g.delete_edges(14)
         el[14:] = []
-        self.assertEquals(14, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
+        self.assertEqual(14, g.ecount())
+        self.assertEqual(el, g.get_edgelist())
 
         # Deleting multiple edges
         g.delete_edges([2,5,7])
         el[7:8] = []; el[5:6] = []; el[2:3] = []
-        self.assertEquals(11, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
+        self.assertEqual(11, g.ecount())
+        self.assertEqual(el, g.get_edgelist())
 
         # Deleting edge object
         g.es[6].delete()
         el[6:7] = []
-        self.assertEquals(10, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
+        self.assertEqual(10, g.ecount())
+        self.assertEqual(el, g.get_edgelist())
 
         # Deleting edge sequence object
         g.es[1:4].delete()
         el[1:4] = []
-        self.assertEquals(7, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
+        self.assertEqual(7, g.ecount())
+        self.assertEqual(el, g.get_edgelist())
 
         # Deleting edges by IDs
         g.delete_edges([(2,7), (5,8)])
         el[4:5] = []; el[1:2] = []
-        self.assertEquals(5, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
+        self.assertEqual(5, g.ecount())
+        self.assertEqual(el, g.get_edgelist())
 
         # Deleting edges by names
         g.delete_edges([("D", "I"), ("G", "I")])
         el[3:4] = []; el[1:2] = []
-        self.assertEquals(3, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
+        self.assertEqual(3, g.ecount())
+        self.assertEqual(el, g.get_edgelist())
 
         # Deleting nonexistent edges
         self.assertRaises(ValueError, g.delete_edges, [(0,2)])
@@ -155,62 +155,62 @@ class BasicTests(unittest.TestCase):
     def testGraphGetEids(self):
         g = Graph.Famous("petersen")
         eids = g.get_eids(pairs=[(0,1), (0,5), (1, 6), (4, 9), (8, 6)])
-        self.failUnless(eids == [0, 2, 4, 9, 12])
+        self.assertTrue(eids == [0, 2, 4, 9, 12])
         eids = g.get_eids(path=[0, 1, 2, 3, 4])
-        self.failUnless(eids == [0, 3, 5, 7])
+        self.assertTrue(eids == [0, 3, 5, 7])
         eids = g.get_eids(pairs=[(7,9), (9,6)], path = [7, 9, 6])
-        self.failUnless(eids == [14, 13, 14, 13])
+        self.assertTrue(eids == [14, 13, 14, 13])
         self.assertRaises(InternalError, g.get_eids, pairs=[(0,1), (0,2)])
 
     def testAdjacency(self):
         g=Graph(4, [(0,1), (1,2), (2,0), (2,3)], directed=True)
-        self.failUnless(g.neighbors(2) == [0, 1, 3])
-        self.failUnless(g.predecessors(2) == [1])
-        self.failUnless(g.successors(2) == [0, 3])
-        self.failUnless(g.get_adjlist() == [[1], [2], [0,3], []])
-        self.failUnless(g.get_adjlist(IN) == [[2], [0], [1], [2]])
-        self.failUnless(g.get_adjlist(ALL) == [[1,2], [0,2], [0,1,3], [2]])
+        self.assertTrue(g.neighbors(2) == [0, 1, 3])
+        self.assertTrue(g.predecessors(2) == [1])
+        self.assertTrue(g.successors(2) == [0, 3])
+        self.assertTrue(g.get_adjlist() == [[1], [2], [0,3], []])
+        self.assertTrue(g.get_adjlist(IN) == [[2], [0], [1], [2]])
+        self.assertTrue(g.get_adjlist(ALL) == [[1,2], [0,2], [0,1,3], [2]])
         
     def testEdgeIncidency(self):
         g=Graph(4, [(0,1), (1,2), (2,0), (2,3)], directed=True)
-        self.failUnless(g.incident(2) == [2, 3])
-        self.failUnless(g.incident(2, IN) == [1])
-        self.failUnless(g.incident(2, ALL) == [2, 3, 1])
-        self.failUnless(g.get_inclist() == [[0], [1], [2,3], []])
-        self.failUnless(g.get_inclist(IN) == [[2], [0], [1], [3]])
-        self.failUnless(g.get_inclist(ALL) == [[0,2], [1,0], [2,3,1], [3]])
+        self.assertTrue(g.incident(2) == [2, 3])
+        self.assertTrue(g.incident(2, IN) == [1])
+        self.assertTrue(g.incident(2, ALL) == [2, 3, 1])
+        self.assertTrue(g.get_inclist() == [[0], [1], [2,3], []])
+        self.assertTrue(g.get_inclist(IN) == [[2], [0], [1], [3]])
+        self.assertTrue(g.get_inclist(ALL) == [[0,2], [1,0], [2,3,1], [3]])
 
 
     def testMultiplesLoops(self):
         g=Graph.Tree(7, 2)
 
         # has_multiple
-        self.failIf(g.has_multiple())
+        self.assertFalse(g.has_multiple())
 
         g.add_vertices(1)
         g.add_edges([(0,1), (7,7), (6,6), (6,6), (6,6)])
         
         # is_loop
-        self.failUnless(g.is_loop() == [False, False, False, False, \
+        self.assertTrue(g.is_loop() == [False, False, False, False, \
             False, False, False, True, True, True, True])
-        self.failUnless(g.is_loop(g.ecount()-2))
-        self.failUnless(g.is_loop(range(6,8)) == [False, True])
+        self.assertTrue(g.is_loop(g.ecount()-2))
+        self.assertTrue(g.is_loop(range(6,8)) == [False, True])
 
         # is_multiple
-        self.failUnless(g.is_multiple() == [False, False, False, False, \
+        self.assertTrue(g.is_multiple() == [False, False, False, False, \
             False, False, True, False, False, True, True])
 
         # has_multiple
-        self.failUnless(g.has_multiple())
+        self.assertTrue(g.has_multiple())
 
         # count_multiple
-        self.failUnless(g.count_multiple() == [2, 1, 1, 1, 1, 1, 2, 1, 3, 3, 3])
-        self.failUnless(g.count_multiple(g.ecount()-1) == 3)
-        self.failUnless(g.count_multiple(range(2,5)) == [1, 1, 1])
+        self.assertTrue(g.count_multiple() == [2, 1, 1, 1, 1, 1, 2, 1, 3, 3, 3])
+        self.assertTrue(g.count_multiple(g.ecount()-1) == 3)
+        self.assertTrue(g.count_multiple(range(2,5)) == [1, 1, 1])
 
         # check if a mutual directed edge pair is reported as multiple
         g=Graph(2, [(0,1), (1,0)], directed=True)
-        self.failUnless(g.is_multiple() == [False, False])
+        self.assertTrue(g.is_multiple() == [False, False])
 
 
     def testPickling(self):
@@ -223,60 +223,60 @@ class BasicTests(unittest.TestCase):
         pickled=pickle.dumps(g)
 
         g2=pickle.loads(pickled)
-        self.failUnless(g["data"] == g2["data"])
-        self.failUnless(g.vs["data"] == g2.vs["data"])
-        self.failUnless(g.es["data"] == g2.es["data"])
-        self.failUnless(g.vcount() == g2.vcount())
-        self.failUnless(g.ecount() == g2.ecount())
-        self.failUnless(g.is_directed() == g2.is_directed())
-        self.failUnless(g2.custom_data == g.custom_data)
+        self.assertTrue(g["data"] == g2["data"])
+        self.assertTrue(g.vs["data"] == g2.vs["data"])
+        self.assertTrue(g.es["data"] == g2.es["data"])
+        self.assertTrue(g.vcount() == g2.vcount())
+        self.assertTrue(g.ecount() == g2.ecount())
+        self.assertTrue(g.is_directed() == g2.is_directed())
+        self.assertTrue(g2.custom_data == g.custom_data)
 
 
 class DatatypeTests(unittest.TestCase):
     def testMatrix(self):
         m = Matrix([[1,2,3], [4,5], [6,7,8]])
-        self.failUnless(m.shape == (3, 3))
+        self.assertTrue(m.shape == (3, 3))
 
         # Reading data
-        self.failUnless(m.data == [[1,2,3], [4,5,0], [6,7,8]])
-        self.failUnless(m[1,1] == 5)
-        self.failUnless(m[0] == [1,2,3])
-        self.failUnless(m[0,:] == [1,2,3])
-        self.failUnless(m[:,0] == [1,4,6])
-        self.failUnless(m[2,0:2] == [6,7])
-        self.failUnless(m[:,:].data == [[1,2,3], [4,5,0], [6,7,8]])
-        self.failUnless(m[:,1:3].data == [[2,3], [5,0], [7,8]])
+        self.assertTrue(m.data == [[1,2,3], [4,5,0], [6,7,8]])
+        self.assertTrue(m[1,1] == 5)
+        self.assertTrue(m[0] == [1,2,3])
+        self.assertTrue(m[0,:] == [1,2,3])
+        self.assertTrue(m[:,0] == [1,4,6])
+        self.assertTrue(m[2,0:2] == [6,7])
+        self.assertTrue(m[:,:].data == [[1,2,3], [4,5,0], [6,7,8]])
+        self.assertTrue(m[:,1:3].data == [[2,3], [5,0], [7,8]])
 
         # Writing data
         m[1,1] = 10
-        self.failUnless(m[1,1] == 10)
+        self.assertTrue(m[1,1] == 10)
         m[1] = (6,5,4)
-        self.failUnless(m[1] == [6,5,4])
+        self.assertTrue(m[1] == [6,5,4])
         m[1:3] = [[4,5,6], (7,8,9)]
-        self.failUnless(m[1:3].data == [[4,5,6], [7,8,9]])
+        self.assertTrue(m[1:3].data == [[4,5,6], [7,8,9]])
 
         # Minimums and maximums
-        self.failUnless(m.min() == 1)
-        self.failUnless(m.max() == 9)
-        self.failUnless(m.min(0) == [1,2,3])
-        self.failUnless(m.max(0) == [7,8,9])
-        self.failUnless(m.min(1) == [1,4,7])
-        self.failUnless(m.max(1) == [3,6,9])
+        self.assertTrue(m.min() == 1)
+        self.assertTrue(m.max() == 9)
+        self.assertTrue(m.min(0) == [1,2,3])
+        self.assertTrue(m.max(0) == [7,8,9])
+        self.assertTrue(m.min(1) == [1,4,7])
+        self.assertTrue(m.max(1) == [3,6,9])
 
         # Special constructors
         m=Matrix.Fill(2, (3,3))
-        self.failUnless(m.min() == 2 and m.max() == 2 and m.shape == (3,3))
+        self.assertTrue(m.min() == 2 and m.max() == 2 and m.shape == (3,3))
         m=Matrix.Zero(5, 4)
-        self.failUnless(m.min() == 0 and m.max() == 0 and m.shape == (5,4))
+        self.assertTrue(m.min() == 0 and m.max() == 0 and m.shape == (5,4))
         m=Matrix.Identity(3)
-        self.failUnless(m.data == [[1,0,0], [0,1,0], [0,0,1]])
+        self.assertTrue(m.data == [[1,0,0], [0,1,0], [0,0,1]])
         m=Matrix.Identity(3, 2)
-        self.failUnless(m.data == [[1,0], [0,1], [0,0]])
+        self.assertTrue(m.data == [[1,0], [0,1], [0,0]])
 
         # Conversion to string
         m=Matrix.Identity(3)
-        self.failUnless(str(m) == "[[1, 0, 0]\n [0, 1, 0]\n [0, 0, 1]]")
-        self.failUnless(repr(m) == "Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])")
+        self.assertTrue(str(m) == "[[1, 0, 0]\n [0, 1, 0]\n [0, 0, 1]]")
+        self.assertTrue(repr(m) == "Matrix([[1, 0, 0], [0, 1, 0], [0, 0, 1]])")
 
 
 class GraphDictListTests(unittest.TestCase):
@@ -316,13 +316,13 @@ class GraphDictListTests(unittest.TestCase):
     def testGraphFromDictListExtraVertexName(self):
         del self.vertices[2:]      # No data for "Cecil" and "David"
         g = Graph.DictList(self.vertices, self.edges)
-        self.failUnless(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
-        self.failUnless(g.vs["name"] == ["Alice", "Bob", "Cecil", "David"])
-        self.failUnless(g.vs["age"] == [48, 33, None, None])
-        self.failUnless(g.vs["gender"] == ["F", "M", None, None])
-        self.failUnless(g.es["friendship"] == [4, 5, 5, 2, 1])
-        self.failUnless(g.es["advice"] == [4, 5, 5, 4, 2])
-        self.failUnless(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
+        self.assertTrue(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
+        self.assertTrue(g.vs["name"] == ["Alice", "Bob", "Cecil", "David"])
+        self.assertTrue(g.vs["age"] == [48, 33, None, None])
+        self.assertTrue(g.vs["gender"] == ["F", "M", None, None])
+        self.assertTrue(g.es["friendship"] == [4, 5, 5, 2, 1])
+        self.assertTrue(g.es["advice"] == [4, 5, 5, 4, 2])
+        self.assertTrue(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
 
     def testGraphFromDictListAlternativeName(self):
         for vdata in self.vertices:
@@ -335,14 +335,14 @@ class GraphDictListTests(unittest.TestCase):
         self.checkIfOK(g, "name_alternative")
 
     def checkIfOK(self, g, name_attr, check_vertex_attrs=True):
-        self.failUnless(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
-        self.failUnless(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
-        self.failUnless(g.vs[name_attr] == ["Alice", "Bob", "Cecil", "David"])
+        self.assertTrue(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
+        self.assertTrue(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
+        self.assertTrue(g.vs[name_attr] == ["Alice", "Bob", "Cecil", "David"])
         if check_vertex_attrs:
-            self.failUnless(g.vs["age"] == [48, 33, 45, 34])
-            self.failUnless(g.vs["gender"] == ["F", "M", "F", "M"])
-        self.failUnless(g.es["friendship"] == [4, 5, 5, 2, 1])
-        self.failUnless(g.es["advice"] == [4, 5, 5, 4, 2])
+            self.assertTrue(g.vs["age"] == [48, 33, 45, 34])
+            self.assertTrue(g.vs["gender"] == ["F", "M", "F", "M"])
+        self.assertTrue(g.es["friendship"] == [4, 5, 5, 2, 1])
+        self.assertTrue(g.es["advice"] == [4, 5, 5, 4, 2])
 
 
 class GraphTupleListTests(unittest.TestCase):
@@ -386,20 +386,20 @@ class GraphTupleListTests(unittest.TestCase):
         self.checkIfOK(g, "name", ("friendship", "advice", "spam"))
 
     def checkIfOK(self, g, name_attr, edge_attrs):
-        self.failUnless(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
-        self.failUnless(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
-        self.failUnless(g.attributes() == [])
-        self.failUnless(g.vertex_attributes() == [name_attr])
-        self.failUnless(g.vs[name_attr] == ["Alice", "Bob", "Cecil", "David"])
+        self.assertTrue(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
+        self.assertTrue(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
+        self.assertTrue(g.attributes() == [])
+        self.assertTrue(g.vertex_attributes() == [name_attr])
+        self.assertTrue(g.vs[name_attr] == ["Alice", "Bob", "Cecil", "David"])
         if edge_attrs:
-            self.failUnless(sorted(g.edge_attributes()) == sorted(edge_attrs))
-            self.failUnless(g.es[edge_attrs[0]] == [4, 5, 5, 2, 1])
+            self.assertTrue(sorted(g.edge_attributes()) == sorted(edge_attrs))
+            self.assertTrue(g.es[edge_attrs[0]] == [4, 5, 5, 2, 1])
             if len(edge_attrs) > 1:
-                self.failUnless(g.es[edge_attrs[1]] == [4, 5, 5, 4, 2])
+                self.assertTrue(g.es[edge_attrs[1]] == [4, 5, 5, 4, 2])
             if len(edge_attrs) > 2:
-                self.failUnless(g.es[edge_attrs[2]] == [None] * 5)
+                self.assertTrue(g.es[edge_attrs[2]] == [None] * 5)
         else:
-            self.failUnless(g.edge_attributes() == [])
+            self.assertTrue(g.edge_attributes() == [])
 
 
 class DegreeSequenceTests(unittest.TestCase):

@@ -27,8 +27,8 @@ class RandomNumberGeneratorTests(unittest.TestCase):
     def testSetRandomNumberGenerator(self):
         set_random_number_generator(FakeRNG)
         graph = Graph.GRG(10, 0.2)
-        self.assertEquals(graph.vs["x"], [0.1] * 10)
-        self.assertEquals(graph.vs["y"], [0.1] * 10)
+        self.assertEqual(graph.vs["x"], [0.1] * 10)
+        self.assertEqual(graph.vs["y"], [0.1] * 10)
 
         self.assertRaises(AttributeError, set_random_number_generator,
                 InvalidRNG)
@@ -38,7 +38,7 @@ class RandomNumberGeneratorTests(unittest.TestCase):
         g1 = Graph.Erdos_Renyi(n=1000, m=5000)
         random.setstate(state)
         g2 = Graph.Erdos_Renyi(n=1000, m=5000)
-        self.failUnless(g1.get_edgelist() == g2.get_edgelist())
+        self.assertTrue(g1.get_edgelist() == g2.get_edgelist())
 
 
 def suite():

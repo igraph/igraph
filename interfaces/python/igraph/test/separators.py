@@ -12,23 +12,23 @@ def powerset(iterable):
 class IsSeparatorTests(unittest.TestCase):
     def testIsSeparator(self):
         g = Graph.Lattice([8, 4], circular=False)
-        self.failUnless(g.is_separator([3, 11, 19, 27]))
-        self.failIf(g.is_separator([10, 11, 18, 19]))
-        self.failUnless(g.is_separator([29, 20, 11, 2]))
-        self.failUnless(g.is_separator([16, 25, 17]))
+        self.assertTrue(g.is_separator([3, 11, 19, 27]))
+        self.assertFalse(g.is_separator([10, 11, 18, 19]))
+        self.assertTrue(g.is_separator([29, 20, 11, 2]))
+        self.assertTrue(g.is_separator([16, 25, 17]))
 
         g = Graph.Lattice([8, 4], circular=True)
-        self.failIf(g.is_separator([3, 11, 19, 27]))
-        self.failIf(g.is_separator([29, 20, 11, 2]))
+        self.assertFalse(g.is_separator([3, 11, 19, 27]))
+        self.assertFalse(g.is_separator([29, 20, 11, 2]))
 
         self.assertRaises(InternalError, g.is_separator, range(32))
 
     def testIsMinimalSeparator(self):
         g = Graph.Lattice([8, 4], circular=False)
-        self.failUnless(g.is_minimal_separator([3, 11, 19, 27]))
-        self.failIf(g.is_minimal_separator([3, 11, 19, 27, 28]))
-        self.failIf(g.is_minimal_separator([16, 25, 17]))
-        self.failUnless(g.is_minimal_separator([16, 25]))
+        self.assertTrue(g.is_minimal_separator([3, 11, 19, 27]))
+        self.assertFalse(g.is_minimal_separator([3, 11, 19, 27, 28]))
+        self.assertFalse(g.is_minimal_separator([16, 25, 17]))
+        self.assertTrue(g.is_minimal_separator([16, 25]))
 
         self.assertRaises(InternalError, g.is_minimal_separator, range(32))
 
@@ -37,20 +37,20 @@ class IsSeparatorTests(unittest.TestCase):
         min_st_seps = set(tuple(x) for x in g.all_minimal_st_separators())
         for vs in powerset(range(g.vcount())):
             if vs in min_st_seps:
-                self.failUnless(g.is_minimal_separator(vs))
+                self.assertTrue(g.is_minimal_separator(vs))
             else:
-                self.failIf(g.is_minimal_separator(vs))
+                self.assertFalse(g.is_minimal_separator(vs))
 
     def testMinimumSizeSeparators(self):
         g = Graph.Famous("zachary")
         min_st_seps = set(tuple(x) for x in g.all_minimal_st_separators())
         min_size_seps = [tuple(x) for x in g.minimum_size_separators()]
-        self.failUnless(set(min_size_seps).issubset(min_st_seps))
-        self.failUnless(len(set(min_size_seps)) == len(min_size_seps))
+        self.assertTrue(set(min_size_seps).issubset(min_st_seps))
+        self.assertTrue(len(set(min_size_seps)) == len(min_size_seps))
 
         size = len(min_size_seps[0])
-        self.failUnless(len(s) != size for s in min_size_seps)
-        self.failUnless(sum(1 for s in min_st_seps if len(s) == size) ==
+        self.assertTrue(len(s) != size for s in min_size_seps)
+        self.assertTrue(sum(1 for s in min_st_seps if len(s) == size) ==
                         len(min_size_seps))
 
 

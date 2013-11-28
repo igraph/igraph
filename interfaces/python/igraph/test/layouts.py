@@ -135,12 +135,12 @@ class LayoutAlgorithmTests(unittest.TestCase):
     def testAuto(self):
         def layout_test(graph, test_with_dims=(2, 3)):
             lo = graph.layout("auto")
-            self.failUnless(isinstance(lo, Layout))
-            self.assertEquals(len(lo[0]), 2)
+            self.assertTrue(isinstance(lo, Layout))
+            self.assertEqual(len(lo[0]), 2)
             for dim in test_with_dims:
                 lo = graph.layout("auto", dim=dim)
-                self.failUnless(isinstance(lo, Layout))
-                self.assertEquals(len(lo[0]), dim)
+                self.assertTrue(isinstance(lo, Layout))
+                self.assertEqual(len(lo[0]), dim)
             return lo
 
         g = Graph.Barabasi(10)
@@ -163,52 +163,52 @@ class LayoutAlgorithmTests(unittest.TestCase):
 
         del g["layout"]
         lo = layout_test(g, test_with_dims=(2,))
-        self.assertEquals([tuple(item) for item in lo],
+        self.assertEqual([tuple(item) for item in lo],
                           zip(range(20), range(20, 40)))
 
         g.vs["z"] = range(40, 60)
         lo = layout_test(g)
-        self.assertEquals([tuple(item) for item in lo],
+        self.assertEqual([tuple(item) for item in lo],
                           zip(range(20), range(20, 40), range(40, 60)))
 
     def testFruchtermanReingold(self):
         g = Graph.Barabasi(100)
         lo = g.layout("fr")
-        self.failUnless(isinstance(lo, Layout))
+        self.assertTrue(isinstance(lo, Layout))
         lo = g.layout("fr", miny=range(100))
-        self.failUnless(isinstance(lo, Layout))
+        self.assertTrue(isinstance(lo, Layout))
         lo = g.layout("fr", miny=range(100), maxy=range(100))
-        self.failUnless(isinstance(lo, Layout))
+        self.assertTrue(isinstance(lo, Layout))
         lo = g.layout("fr", miny=[2]*100, maxy=[3]*100, minx=[4]*100, maxx=[6]*100)
-        self.failUnless(isinstance(lo, Layout))
+        self.assertTrue(isinstance(lo, Layout))
         bbox = lo.bounding_box()
-        self.failUnless(bbox.top >= 2)
-        self.failUnless(bbox.bottom <= 3)
-        self.failUnless(bbox.left >= 4)
-        self.failUnless(bbox.right >= 6)
+        self.assertTrue(bbox.top >= 2)
+        self.assertTrue(bbox.bottom <= 3)
+        self.assertTrue(bbox.left >= 4)
+        self.assertTrue(bbox.right >= 6)
 
     def testKamadaKawai(self):
         g = Graph.Barabasi(100)
         lo = g.layout("kk", miny=[2]*100, maxy=[3]*100, minx=[4]*100, maxx=[6]*100)
-        self.failUnless(isinstance(lo, Layout))
+        self.assertTrue(isinstance(lo, Layout))
         bbox = lo.bounding_box()
-        self.failUnless(bbox.top >= 2)
-        self.failUnless(bbox.bottom <= 3)
-        self.failUnless(bbox.left >= 4)
-        self.failUnless(bbox.right >= 6)
+        self.assertTrue(bbox.top >= 2)
+        self.assertTrue(bbox.bottom <= 3)
+        self.assertTrue(bbox.left >= 4)
+        self.assertTrue(bbox.right >= 6)
 
     def testMDS(self):
         g = Graph.Tree(10, 2)
         lo = g.layout("mds")
-        self.failUnless(isinstance(lo, Layout))
+        self.assertTrue(isinstance(lo, Layout))
 
         dists = g.shortest_paths()
         lo = g.layout("mds", dists)
-        self.failUnless(isinstance(lo, Layout))
+        self.assertTrue(isinstance(lo, Layout))
 
         g += Graph.Tree(10, 2)
         lo = g.layout("mds")
-        self.failUnless(isinstance(lo, Layout))
+        self.assertTrue(isinstance(lo, Layout))
 
     def testReingoldTilford(self):
         g = Graph.Barabasi(100)
