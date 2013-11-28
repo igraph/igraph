@@ -49,6 +49,18 @@ def cleanup_tmpdir(dirname):
     if dirname is not None and os.path.exists(dirname):
         shutil.rmtree(dirname)
 
+def create_dir_unless_exists(*args):
+    """Creates a directory unless it exists already."""
+    path = os.path.join(*args)
+    if not os.path.isdir(path):
+        os.makedirs(path)
+
+def ensure_dir_does_not_exist(*args):
+    """Ensures that the given directory does not exist."""
+    path = os.path.join(*args)
+    if os.path.isdir(path):
+        shutil.rmtree(path)
+
 def find_static_library(library_name, library_path):
     """Given the raw name of a library in `library_name`, tries to find a
     static library with this name in the given `library_path`. `library_path`
@@ -233,7 +245,8 @@ class IgraphCCoreBuilder(object):
         try:
             print("Configuring igraph...")
             os.chdir(self.builddir)
-            retcode = subprocess.call("./configure", shell=True)
+            retcode = subprocess.call("./configure --disable-tls --disable-gmp",
+                    shell=True)
             if retcode:
                 return False
 
@@ -251,15 +264,22 @@ class IgraphCCoreBuilder(object):
                 # Educated guess
                 libraries = ["igraph"]
 
-            self.include_dirs = [os.path.join(self.builddir, "include")]
-            self.library_dirs = [os.path.join(self.builddir, "src", ".libs")]
-            self.libraries = libraries
-            return True
-
         finally:
             os.chdir(cwd)
 
-        return False
+        # Compilation succeeded; copy everything into igraphcore
+        create_dir_unless_exists("igraphcore")
+        ensure_dir_does_not_exist("igraphcore", "include")
+        ensure_dir_does_not_exist("igraphcore", "lib")
+        shutil.copytree(os.path.join(self.builddir, "include"),
+                os.path.join("igraphcore", "include"))
+        shutil.copytree(os.path.join(self.builddir, "src", ".libs"),
+                os.path.join("igraphcore", "lib"))
+        f = open(os.path.join("igraphcore", "build.cfg"), "w")
+        f.write(repr(libraries))
+        f.close()
+
+        return True
 
     def find_first_version(self):
         """Finds the first version of igraph that exists in the nightly build
@@ -325,11 +345,20 @@ class BuildConfiguration(object):
                 else:
                     detected = False
 
+                # Check whether we have already compiled igraph in a previous run.
+                # If so, it should be found in igraphcore/include and
+                # igraphcore/lib
+                if os.path.exists("igraphcore"):
+                    buildcfg.use_built_igraph()
+                    detected = True
+
                 # Download and compile igraph if the user did not disable it and
                 # we do not know the libraries from pkg-config yet
                 if not detected:
                     if buildcfg.download_igraph_if_needed and is_unix_like():
                         detected = buildcfg.download_and_compile_igraph()
+                        if detected:
+                            buildcfg.use_built_igraph()
 
                 # Fall back to an educated guess if everything else failed
                 if not detected:
@@ -391,16 +420,12 @@ class BuildConfiguration(object):
 
         igraph_builder = IgraphCCoreBuilder(self.c_core_versions, self.c_core_url,
                 show_progress_bar=self.show_progress_bar)
-        if igraph_builder.run():
-            self.include_dirs = igraph_builder.include_dirs
-            self.library_dirs = igraph_builder.library_dirs
-            self.libraries = igraph_builder.libraries
-            self.static_extension = True
-            return True
-        else:
+        if not igraph_builder.run():
             print("Could not download and compile the C core of igraph.")
             print("")
             return False
+        else:
+            return True
 
     def print_build_info(self):
         """Prints the include and library path being used for debugging purposes."""
@@ -460,15 +485,25 @@ class BuildConfiguration(object):
     def replace_static_libraries(self):
         """Replaces references to libraries with full paths to their static
         versions if the static version is to be found on the library path."""
-        if "-static" in self.extra_link_args:
-            return
+        if "stdc++" not in self.libraries:
+            self.libraries.append("stdc++")
 
-        self.extra_link_args.append("-static")
         for library_name in self.libraries[:]:
             static_lib = find_static_library(library_name, self.library_dirs)
             if static_lib:
                 self.libraries.remove(library_name)
                 self.extra_objects.append(static_lib)
+
+    def use_built_igraph(self):
+        """Assumes that igraph is built already in ``igraphcore`` and sets up
+        the include and library paths and the library names accordingly."""
+        buildcfg.include_dirs = [os.path.join("igraphcore", "include")]
+        buildcfg.library_dirs = [os.path.join("igraphcore", "lib")]
+        buildcfg.static_extension = True
+
+        buildcfg_file = os.path.join("igraphcore", "build.cfg")
+        if os.path.exists(buildcfg_file):
+            buildcfg.libraries = eval(open(buildcfg_file).read())
 
     def use_educated_guess(self):
         """Tries to guess the proper library names, include and library paths
@@ -514,7 +549,7 @@ class BuildConfiguration(object):
 
         self.libraries = LIBIGRAPH_FALLBACK_LIBRARIES[:]
         if self.static_extension:
-            self.libraries.extend(["xml2", "z", "m", "pthread"])
+            self.libraries.extend(["xml2", "z", "m", "stdc++"])
         self.include_dirs = LIBIGRAPH_FALLBACK_INCLUDE_DIRS[:]
         self.library_dirs = LIBIGRAPH_FALLBACK_LIBRARY_DIRS[:]
 
