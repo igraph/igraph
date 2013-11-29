@@ -24,6 +24,22 @@
 
 #include "py2compat.h"
 
+/* Common utility functions that are useful both in Python 2.x and 3.x */
+
+int PyFile_Close(PyObject* fileObj) {
+  PyObject *result;
+
+  result = PyObject_CallMethod(fileObj, "close", 0);
+  if (result) {
+    Py_DECREF(result);
+    return 0;
+  } else {
+    /* Exception raised already */
+    return 1;
+  }
+}
+
+
 #ifdef IGRAPH_PYTHON3
 
 /* Python 3.x functions */

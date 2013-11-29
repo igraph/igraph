@@ -32,6 +32,8 @@
  */
 int igraphmodule_filehandle_init(igraphmodule_filehandle_t* handle,
         PyObject* object, char* mode) {
+    handle->need_close = 0;
+
 #ifdef IGRAPH_PYTHON3
     int fp;
     if (object == 0 || PyLong_Check(object)) {
@@ -47,39 +49,53 @@ int igraphmodule_filehandle_init(igraphmodule_filehandle_t* handle,
 #endif
 
     if (PyBaseString_Check(object)) {
+        /* We have received a string; we need to open the file denoted by this
+         * string now and mark that we opened the file ourselves (so we need
+         * to close it when igraphmodule_filehandle_destroy is invoked). */
 #ifdef IGRAPH_PYTHON3
         handle->object = PyFile_FromObject(object, mode);
 #else
         handle->object = PyFile_FromString(PyString_AsString(object), mode);
 #endif
-        if (handle->object == 0)
+        if (handle->object == 0) {
+            /* Could not open the file; just return an error code because an
+             * exception was raised already */
             return 1;
+        }
+        /* Remember that we need to close the file ourselves */
+        handle->need_close = 1;
     } else {
+        /* This is probably a file-like object; store a reference for it and
+         * we will handle it later */
         handle->object = object;
         Py_INCREF(handle->object);
     }
 
     /* At this stage, handle->object is something we can handle.
-     * In Python 2, we get here only if object is a file object. In
-     * Python 3, object can be anything, and PyFile_FromObject will
-     * complain if the object cannot be converted to a file handle.
+     * In Python 2, we get here only if object is a file object so we
+     * can safely call PyFile_AsFile to get a FILE* object.
+     * In Python 3, we have to call PyObject_AsFileDescriptor instead
+     * and then fdopen() it to get the corresponding FILE* object.
      */
 #ifdef IGRAPH_PYTHON3
     fp = PyObject_AsFileDescriptor(handle->object);
     if (fp == -1) {
-        Py_DECREF(handle->object);
+        igraphmodule_filehandle_destroy(handle);
+        /* This already called Py_DECREF(handle->object), no need to call it */
         return 1;
     }
     handle->fp = fdopen(fp, mode);
     if (handle->fp == 0) {
-        Py_DECREF(handle->object);
+        igraphmodule_filehandle_destroy(handle);
+        /* This already called Py_DECREF(handle->object), no need to call it */
         PyErr_SetString(PyExc_RuntimeError, "fdopen() failed unexpectedly");
         return 1;
     }
 #else
     handle->fp = PyFile_AsFile(handle->object);
     if (handle->fp == 0) {
-        Py_DECREF(handle->object);
+        igraphmodule_filehandle_destroy(handle);
+        /* This already called Py_DECREF(handle->object), no need to call it */
         PyErr_SetString(PyExc_RuntimeError, "PyFile_AsFile() failed unexpectedly");
         return 1;
     }
@@ -97,9 +113,18 @@ void igraphmodule_filehandle_destroy(igraphmodule_filehandle_t* handle) {
 		fflush(handle->fp);
 	}
     handle->fp = 0;
+    
+    if (handle->object != 0) {
+        if (handle->need_close) {
+            if (PyFile_Close(handle->object)) {
+                PyErr_WriteUnraisable(0);
+            }
+        }
+        Py_DECREF(handle->object);
+    }
 
-    Py_XDECREF(handle->object);
     handle->object = 0;
+    handle->need_close = 0;
 }
 
 /**
