@@ -2,6 +2,7 @@
 
 import unittest
 from igraph import *
+from igraph.test.utils import skipIf
 
 try:
     import numpy as np
@@ -85,8 +86,11 @@ class VertexSeqTests(unittest.TestCase):
         self.assertRaises(IndexError, self.g.vs.__getitem__, -1)
         self.assertRaises(KeyError, self.g.vs.__getitem__, 1.5)
 
-    @unittest.skipIf(np is None, "test case depends on NumPy")
+    @skipIf(np is None, "test case depends on NumPy")
     def testNumPyIndexing(self):
+        if np is None:
+            return
+
         for i in xrange(self.g.vcount()):
             arr = np.array([i])
             self.assertEqual(i, self.g.vs[arr[0]].index)
