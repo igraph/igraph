@@ -47,7 +47,7 @@ class OperatorTests(unittest.TestCase):
         # Did we really use the original graph so far?
         # TODO: disjoint union should be modified so that this assertion
         # could be moved to the end
-        self.assert_(id(g) == id(orig))
+        self.assertTrue(id(g) == id(orig))
 
         # Adding another graph
         g += Graph.Full(3)
@@ -121,7 +121,7 @@ class OperatorTests(unittest.TestCase):
                         and g.clusters().membership == [0,0,1,1])
         
         # Did we really use the original graph so far?
-        self.assert_(id(g) == id(orig))
+        self.assertTrue(id(g) == id(orig))
 
         # Subtracting a graph
         g2 = Graph.Tree(3, 2)
