@@ -251,7 +251,7 @@ class IgraphCCoreBuilder(object):
         try:
             print("Configuring igraph...")
             os.chdir(self.builddir)
-            retcode = subprocess.call("./configure --disable-tls --disable-gmp",
+            retcode = subprocess.call("CFLAGS=-fPIC CXXFLAGS=-fPIC ./configure --disable-tls --disable-gmp",
                     shell=True)
             if retcode:
                 return False
