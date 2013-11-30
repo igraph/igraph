@@ -3054,6 +3054,19 @@ class Graph(GraphBase):
           - C{edge_arrow_width}: width of the arrowhead on the edge. The
             corresponding edge attribute is C{arrow_width}, the default
             is 1.
+
+          - C{edge_order}: drawing order of the edges. This must be
+            a list or tuple containing edge indices; edges are then
+            drawn according to this order.
+
+          - C{edge_order_by}: an alternative way to specify the drawing
+            order of the edges; this attribute is interpreted as the name
+            of an edge attribute, and edges are drawn such that those
+            with a smaller attribute value are drawn first. You may also
+            reverse the order by passing a tuple here; the first element of
+            the tuple should be the name of the attribute, the second element
+            specifies whether the order is reversed (C{True}, C{False},
+            C{"asc"} and C{"desc"} are accepted values).
         """
         drawer_factory = kwds.get("drawer_factory", DefaultGraphDrawer)
         if "drawer_factory" in kwds:
