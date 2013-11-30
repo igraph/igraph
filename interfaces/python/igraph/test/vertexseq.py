@@ -26,7 +26,14 @@ class VertexTests(unittest.TestCase):
         self.assertEqual(v.attributes(), dict(a=3, b=44, c=55, d=6))
 
     def testProxyMethods(self):
-        g = Graph.GRG(10, 0.5)
+        # We only test with connected graphs because disconnected graphs might
+        # print a warning when shortest_paths() is invoked on them and we want
+        # to avoid that in the test output.
+        while True:
+            g = Graph.GRG(10, 0.6)
+            if g.is_connected():
+                break
+
         v = g.vs[0]
 
         # - neighbors(), predecessors() and succesors() are ignored because they
