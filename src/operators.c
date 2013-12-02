@@ -933,7 +933,7 @@ int igraph_difference(igraph_t *res,
   igraph_bool_t directed=igraph_is_directed(orig);
   igraph_vector_t edges;
   igraph_vector_t edge_ids;
-  igraph_vector_t *nei1, *nei2;
+  igraph_vector_int_t *nei1, *nei2;
   igraph_inclist_t inc_orig, inc_sub;
   long int i;
   igraph_integer_t v1, v2;
@@ -958,8 +958,8 @@ int igraph_difference(igraph_t *res,
     IGRAPH_ALLOW_INTERRUPTION();
     nei1=igraph_inclist_get(&inc_orig, i);
     nei2=igraph_inclist_get(&inc_sub, i);
-    n1=igraph_vector_size(nei1)-1;
-    n2=igraph_vector_size(nei2)-1;
+    n1=igraph_vector_int_size(nei1)-1;
+    n2=igraph_vector_int_size(nei2)-1;
     while (n1>=0 && n2>=0) {
       e1=(long int) VECTOR(*nei1)[n1];
       e2=(long int) VECTOR(*nei2)[n2];
@@ -1000,7 +1000,7 @@ int igraph_difference(igraph_t *res,
   for (; i<no_of_nodes_orig; i++) {
     long int n1, e1;
     nei1=igraph_inclist_get(&inc_orig, i);
-    n1=igraph_vector_size(nei1)-1;
+    n1=igraph_vector_int_size(nei1)-1;
     while (n1>=0) {
       e1=(long int) VECTOR(*nei1)[n1];
       v1=IGRAPH_OTHER(orig, e1, i);

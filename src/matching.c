@@ -537,7 +537,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
   igraph_real_t dual;               /* solution of the dual problem */
   igraph_adjlist_t tight_phantom_edges; /* adjacency list to manage tight phantom edges */
   igraph_integer_t alternating_path_endpoint;
-  igraph_vector_t* neis;
+  igraph_vector_int_t* neis;
   igraph_vector_int_t *neis2;
   igraph_inclist_t inclist;         /* incidence list of the original graph */ 
 
@@ -593,7 +593,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
     }
 
     neis = igraph_inclist_get(&inclist, i);
-    n = igraph_vector_size(neis);
+    n = igraph_vector_int_size(neis);
     for (j = 0, k = 0; j < n; j++) {
       if (VECTOR(*weights)[(long int)VECTOR(*neis)[j]] > max_weight) {
         k = (long int) VECTOR(*neis)[j];
@@ -674,7 +674,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
        * (ab)use an adjacency list data structure that lists the
        * vertices connected to v by phantom edges only. */
       neis = igraph_inclist_get(&inclist, v);
-      n = igraph_vector_size(neis);
+      n = igraph_vector_int_size(neis);
       for (i = 0; i < n; i++) {
         j = (long int) VECTOR(*neis)[i];
         /* We only care about tight edges */
@@ -828,7 +828,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
        * when we determined the initial value for min_slack. */
       debug("Trying to expand along vertex %ld\n", (long int)u);
       neis = igraph_inclist_get(&inclist, u);
-      k = igraph_vector_size(neis);
+      k = igraph_vector_int_size(neis);
       for (j = 0; j < k; j++) {
         /* v is the vertex sitting at the other end of an edge incident
          * on u; check whether it was reached */
@@ -860,7 +860,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
         u = (igraph_integer_t) VECTOR(vec1)[i];
         VECTOR(labels)[u] -= min_slack;
         neis = igraph_inclist_get(&inclist, u);
-        k = igraph_vector_size(neis);
+        k = igraph_vector_int_size(neis);
         for (j = 0; j < k; j++) {
           debug("  Decreasing slack of edge %ld (%ld--%ld) by %.4f\n",
               (long)VECTOR(*neis)[j], (long)u,
@@ -877,7 +877,7 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
         u = (igraph_integer_t) VECTOR(vec2)[i];
         VECTOR(labels)[u] += min_slack;
         neis = igraph_inclist_get(&inclist, u);
-        k = igraph_vector_size(neis);
+        k = igraph_vector_int_size(neis);
         for (j = 0; j < k; j++) {
           debug("  Increasing slack of edge %ld (%ld--%ld) by %.4f\n",
               (long)VECTOR(*neis)[j], (long)u,

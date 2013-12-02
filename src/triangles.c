@@ -773,7 +773,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
   long int maxdegree;
   igraph_inclist_t incident;
   igraph_vector_long_t neis;
-  igraph_vector_t *adj1, *adj2;
+  igraph_vector_int_t *adj1, *adj2;
   igraph_vector_t actw;
   long int i, nn;
   
@@ -821,7 +821,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     adj1=igraph_inclist_get(&incident, node);
-    adjlen1=igraph_vector_size(adj1);
+    adjlen1=igraph_vector_int_size(adj1);
     triples = VECTOR(degree)[node] * (adjlen1-1) / 2.0;
     /* Mark the neighbors of the node */
     for (i=0; i<adjlen1; i++) {
@@ -838,7 +838,7 @@ int igraph_transitivity_barrat4(const igraph_t *graph,
       long int j;
       if (VECTOR(rank)[nei] > VECTOR(rank)[node]) {
 				adj2=igraph_inclist_get(&incident, nei);
-				adjlen2=igraph_vector_size(adj2);
+				adjlen2=igraph_vector_int_size(adj2);
 				for (j=0; j<adjlen2; j++) {
 					long int edge2=(long int) VECTOR(*adj2)[j];
 					igraph_real_t weight2=VECTOR(*weights)[edge2];

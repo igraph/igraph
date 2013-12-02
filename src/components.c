@@ -631,7 +631,7 @@ int igraph_biconnected_components(const igraph_t *graph,
   igraph_vector_long_t nextptr;
   igraph_vector_long_t num, low;
   igraph_vector_bool_t found;
-  igraph_vector_t *adjedges;
+  igraph_vector_int_t *adjedges;
   igraph_stack_t path;
   igraph_vector_t edgestack;
   igraph_inclist_t inclist;
@@ -697,7 +697,7 @@ int igraph_biconnected_components(const igraph_t *graph,
       long int actnext=VECTOR(nextptr)[act];
       
       adjedges=igraph_inclist_get(&inclist, act);
-      n=igraph_vector_size(adjedges);
+      n=igraph_vector_int_size(adjedges);
       if (actnext < n) {
 	/* Step down (maybe) */
 	long int edge=(long int) VECTOR(*adjedges)[actnext];
@@ -789,9 +789,9 @@ int igraph_biconnected_components(const igraph_t *graph,
 		IGRAPH_FINALLY(igraph_vector_destroy, vv);
 		for (ii=0; ii<no_vert; ii++) {
 		  long int vert=(long int) VECTOR(*nodes)[ii];
-		  igraph_vector_t *edges=igraph_inclist_get(&inclist, 
+		  igraph_vector_int_t *edges=igraph_inclist_get(&inclist, 
 								vert);
-		  long int j, nn=igraph_vector_size(edges);
+		  long int j, nn=igraph_vector_int_size(edges);
 		  for (j=0; j<nn; j++) {
 		    long int e=(long int) VECTOR(*edges)[j];
 		    long int nei=IGRAPH_OTHER(graph, e, vert);
