@@ -28,6 +28,7 @@
 #include "igraph_interrupt_internal.h"
 #include "igraph_arpack.h"
 #include "igraph_eigen.h"
+#include "igraph_centality.h"
 
 int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 			const igraph_vector_t *weights,
