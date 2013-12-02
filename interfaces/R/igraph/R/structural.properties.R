@@ -1162,7 +1162,7 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
     if (k == 0) {
       mode <- switch(mode, out = 1, `in` = 2, all = 3, total = 3)
       on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_scan0", graph.us,
+      .Call("R_igraph_local_scan_0", graph.us,
             if (weighted) as.numeric(E(graph.us)$weight) else NULL, mode,
             PACKAGE="igraph")
     } else {

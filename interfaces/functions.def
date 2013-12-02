@@ -1486,22 +1486,22 @@ igraph_adjacenct_triangles:
         DEPS: vids ON graph
         NAME-R: adjacent.triangles
 
-igraph_scan0:
+igraph_local_scan_0:
         PARAMS: GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
                 NEIMODE mode=OUT
         DEPS: weights ON graph
         IGNORE: RR, RNamespace
 
-igraph_scan1_ecount:
+igraph_local_scan_1_ecount:
         PARAMS: GRAPH graph, OUT VECTOR res
         NAME-R: local.scan1.ecount
 
-igraph_scan1_ecount_approximate:
+igraph_local_scan_1_ecount_approximate:
         PARAMS: GRAPH graph, OUT VECTOR res, INT noevals, \
                 INOUT ARPACKOPT options=igraph.arpack.default
         NAME-R: local.scan1.ecount.approx
 
-igraph_scan1_ecount_approximate_eigen:
+igraph_local_scan_1_ecount_approximate_eigen:
         PARAMS: GRAPH graph, OUT VECTOR res, VECTOR values, MATRIX vectors
         NAME-R: local.scan1.ecount.approx.eigen
 

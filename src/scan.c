@@ -29,8 +29,9 @@
 #include "igraph_arpack.h"
 #include "igraph_eigen.h"
 
-int igraph_scan0(const igraph_t *graph, igraph_vector_t *res,
-		 const igraph_vector_t *weights, igraph_neimode_t mode) {
+int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
+			const igraph_vector_t *weights,
+			igraph_neimode_t mode) {
   if (weights) {
     igraph_strength(graph, res, igraph_vss_all(), mode, /*loops=*/ 1,
 		    weights);
@@ -41,9 +42,9 @@ int igraph_scan0(const igraph_t *graph, igraph_vector_t *res,
 }
 
 int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
-																const igraph_vector_int_t *rank);
+				const igraph_vector_int_t *rank);
 
-int igraph_scan1_ecount(const igraph_t *graph, igraph_vector_t *res) {
+int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res) {
 
 #define TRIEDGES
 #include "triangles_template.h"
@@ -52,9 +53,9 @@ int igraph_scan1_ecount(const igraph_t *graph, igraph_vector_t *res) {
 	return 0;
 }
 
-int igraph_scan1_ecount_approximate(const igraph_t *graph,
-				    igraph_vector_t *res, int noevals,
-				    igraph_arpack_options_t *options) {
+int igraph_local_scan_1_ecount_approximate(const igraph_t *graph,
+					   igraph_vector_t *res, int noevals,
+					   igraph_arpack_options_t *options) {
   igraph_vector_t values;
   igraph_matrix_t vectors;
   igraph_eigen_which_t which;
@@ -109,10 +110,11 @@ int igraph_scan1_ecount_approximate(const igraph_t *graph,
   return 0;
 }
 
-int igraph_scan1_ecount_approximate_eigen(const igraph_t *graph,
-					  igraph_vector_t *res,
-					  const igraph_vector_t *values,
-					  const igraph_matrix_t *vectors) {
+int igraph_local_scan_1_ecount_approximate_eigen(
+				 const igraph_t *graph,
+				 igraph_vector_t *res,
+				 const igraph_vector_t *values,
+				 const igraph_matrix_t *vectors) {
 
   igraph_vector_t degree;
   int no_of_nodes=igraph_vcount(graph);
