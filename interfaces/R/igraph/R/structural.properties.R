@@ -1147,13 +1147,9 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   ## Check mode argument
   mode <- igraph.match.arg(mode)
 
-  if (is.null(FUN)) {
-    if (weighted) {
-      FUN <- function(g) sum(E(g)$weight)
-    } else {
-      FUN <- ecount
-    }
-  }
+  sumweights <- function(g) sum(E(g)$weight)
+
+  if (is.null(FUN)) { FUN <- if (weighted) "sumweights" else "ecount" }
   
   require(Matrix)
 
@@ -1164,6 +1160,12 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
       on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
       .Call("R_igraph_local_scan_0", graph.us,
             if (weighted) as.numeric(E(graph.us)$weight) else NULL, mode,
+            PACKAGE="igraph")
+    } else if ((k==1) &&
+               (mode %in% c("all", "total") || !is.directed(graph.us)) &&
+               FUN == "ecount") {
+      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+      .Call("R_igraph_local_scan_1_ecount", graph.us,
             PACKAGE="igraph")
     } else {
       sapply(graph.neighborhood(graph.us, order=k, V(graph.us), mode=mode),
@@ -1184,6 +1186,7 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
     } else {
       sapply(V(graph.us), function(x) {
         vei <- neighborhood(graph.us, order=k, nodes=x, mode=mode)[[1]]
+        if (!is.function(FUN)) { FUN <- getFunction(FUN, where=environment()) }
         FUN(induced.subgraph(graph.them, vei), ...)
       })
     }
