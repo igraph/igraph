@@ -1493,7 +1493,7 @@ igraph_local_scan_0:
         IGNORE: RR, RNamespace
 
 igraph_local_scan_1_ecount:
-        PARAMS: GRAPH graph, OUT VECTOR res
+        PARAMS: GRAPH graph, OUT VECTOR res, NEIMODE mode=OUT
         NAME-R: local.scan1.ecount
 
 igraph_local_scan_1_ecount_approximate:

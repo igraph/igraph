@@ -43,7 +43,8 @@ __BEGIN_DECLS
 int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 			const igraph_vector_t *weights, igraph_neimode_t mode);
 
-int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res);
+int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
+			       igraph_neimode_t mode);
 int igraph_local_scan_1_ecount_approximate(const igraph_t *graph,
 					   igraph_vector_t *res, int noevals,
 					   igraph_arpack_options_t *options);

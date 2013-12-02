@@ -89,3 +89,31 @@ test_that("General scan-stat works", {
   expect_that(digest(s1), equals("995d0b6a952834ff6e534efc2cfb917b"))
 
 })
+
+test_that("Directed scan-1 works (US)", {
+
+  library(igraph)
+  library(digest)
+
+  set.seed(42)
+  n <- 10^3
+  p <- 0.1
+  g <- erdos.renyi.game(n, p, directed=TRUE)
+  E(g)$weight = sample(ecount(g))
+  gp <- erdos.renyi.game(n, p)
+  E(gp)$weight = sample(ecount(gp))
+
+  ## US, scan-0, unweighted, directed
+  ## TODO
+
+  ## US, scan-1, unweighted, directed
+  s1o <- local.scan(g, k=1, weighted=FALSE, mode="out")
+  expect_that(digest(s1o), equals("ac463c21b2b6bc91abf82f0141a4a7d4"))
+
+  s1i <- local.scan(g, k=1, weighted=FALSE, mode="in")
+  expect_that(digest(s1i), equals("13fdaaeec54118e217821b56d8c3ff03"))
+
+  ## US, scan-2, unweighted, directed
+  ## TODO
+
+})

@@ -28,7 +28,7 @@
 #include "igraph_interrupt_internal.h"
 #include "igraph_arpack.h"
 #include "igraph_eigen.h"
-#include "igraph_centality.h"
+#include "igraph_centrality.h"
 
 int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 			const igraph_vector_t *weights,
@@ -45,13 +45,89 @@ int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
 				const igraph_vector_int_t *rank);
 
-int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res) {
+int igraph_i_local_scan_1_ecount_directed(const igraph_t *graph,
+					  igraph_vector_t *res,
+					  igraph_neimode_t mode) {
+
+  int no_of_nodes=igraph_vcount(graph);
+  igraph_adjlist_t allneis;
+  int maxdegree;
+  int i, nn;
+
+  igraph_vector_int_t order, neis;
+  igraph_vector_t degree;
+
+  igraph_vector_int_init(&order, no_of_nodes);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
+  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
+
+  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode,
+			     IGRAPH_LOOPS));
+  maxdegree=(long int) igraph_vector_max(&degree)+1;
+  igraph_vector_order1_int(&degree, &order, maxdegree);
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
+
+  igraph_vector_int_init(&neis, no_of_nodes);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
+
+  igraph_vector_resize(res, no_of_nodes);
+  igraph_vector_null(res);
+
+  for (nn=no_of_nodes-1; nn >= 0; nn--) {
+    int node=VECTOR(order)[nn];
+    igraph_vector_int_t *neis1=igraph_adjlist_get(&allneis, node);
+    int neilen1=igraph_vector_int_size(neis1);
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    /* Mark neighbors and self*/
+    VECTOR(neis)[node] = node+1;
+    for (i=0; i<neilen1; i++) {
+      VECTOR(neis)[ VECTOR(*neis1)[i] ] = node+1;
+      VECTOR(*res)[node] += 1;
+    }
+
+    /* Crawl neighbors */
+    for (i=0; i<neilen1; i++) {
+      int nei=VECTOR(*neis1)[i];
+      igraph_vector_int_t *neis2=igraph_adjlist_get(&allneis, nei);
+      int j, neilen2=igraph_vector_int_size(neis2);
+      for (j=0; j<neilen2; j++) {
+	int nei2=VECTOR(*neis2)[j];
+	if (VECTOR(neis)[nei2] == node+1) {
+	  VECTOR(*res)[node] += 1;
+	}
+      }
+    }
+
+  } /* nn >= 0 */
+
+  igraph_vector_int_destroy(&neis);
+  igraph_adjlist_destroy(&allneis);
+  igraph_vector_destroy(&degree);
+  igraph_vector_int_destroy(&order);
+  IGRAPH_FINALLY_CLEAN(5);
+
+  return 0;
+}
+
+int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
+			       igraph_neimode_t mode) {
+
+  if ( (mode == IGRAPH_OUT || mode == IGRAPH_IN) &&
+       igraph_is_directed(graph)) {
+    return igraph_i_local_scan_1_ecount_directed(graph, res, mode);
+  } else {
 
 #define TRIEDGES
 #include "triangles_template.h"
 #undef TRIEDGES
 
-	return 0;
+  }
+
+  return 0;
 }
 
 int igraph_local_scan_1_ecount_approximate(const igraph_t *graph,

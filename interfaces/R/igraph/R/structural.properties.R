@@ -1164,8 +1164,15 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
     } else if ((k==1) &&
                (mode %in% c("all", "total") || !is.directed(graph.us)) &&
                FUN == "ecount") {
+      mode <- switch(mode, out = 1, `in` = 2, all = 3, total = 3)
       on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_1_ecount", graph.us,
+      .Call("R_igraph_local_scan_1_ecount", graph.us, mode,
+            PACKAGE="igraph")
+    } else if (k==1 && is.directed(graph.us) && mode %in% c("in", "out") &&
+               FUN == "ecount") {
+      mode <- switch(mode, out = 1, `in` = 2, all = 3, total = 3)
+      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+      .Call("R_igraph_local_scan_1_ecount", graph.us, mode,
             PACKAGE="igraph")
     } else {
       sapply(graph.neighborhood(graph.us, order=k, V(graph.us), mode=mode),
