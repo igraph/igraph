@@ -95,6 +95,15 @@ test_that("General scan-stat works, US, scan-1, unweighted, directed", {
 
 })
 
+test_that("General scan-stat works, US, scan-1, weighted, directed", {
+
+  s1o <- local.scan(g, k=1, weighted=TRUE, mode="out")
+  expect_that(digest(s1o), equals("da8e14f2ba63efc74b5fd7b9d8f79bbc"))
+
+  s1i <- local.scan(g, k=1, weighted=TRUE, mode="in")
+  expect_that(digest(s1i), equals("f5f07eebb907ae0a244195a20971be11"))
+
+})
 
 ## US, scan-2, unweighted, directed
 ## TODO

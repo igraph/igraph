@@ -1156,42 +1156,21 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
 
   res <- if (is.null(graph.them)) {
 
-    ## Special cases:
-    ## 1. scan-0
+    ## scan-0
     if (k == 0) {
       on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
       .Call("R_igraph_local_scan_0", graph.us,
             if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
             PACKAGE="igraph")
 
-    ## 2. scan-1, undirected, ecount
-    } else if ((k==1) &&
-               (mode %in% c("all", "total") || !is.directed(graph.us)) &&
-               FUN == "ecount") {
-      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_1_ecount", graph.us, NULL, cmode,
-            PACKAGE="igraph")
-
-    ## 3. scan-1, directed, ecount
-    } else if (k==1 && is.directed(graph.us) && mode %in% c("in", "out") &&
-               FUN == "ecount") {
-      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_1_ecount", graph.us, NULL, cmode,
-            PACKAGE="igraph")
-
-    ## 4. scan-1,  undirected, sumweights
-    } else if (k==1 &&
-               (!is.directed(graph.us) || mode %in% c("all", "total")) &&
-               FUN == "sumweights") {
+    ## scan-1, ecount
+    } else if (k==1 && FUN %in% c("ecount", "sumweights")) {
       on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
       .Call("R_igraph_local_scan_1_ecount", graph.us,
-            as.numeric(E(graph.us)$weight), cmode,
+            if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
             PACKAGE="igraph")
 
-    ## 5. scan-1, directed, sumweights
-    ## TODO
-
-    ## General case
+    ## General k > 1
     } else {
       sapply(graph.neighborhood(graph.us, order=k, V(graph.us), mode=mode),
              FUN, ...)
