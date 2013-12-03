@@ -95,20 +95,9 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
 
   int no_of_nodes=igraph_vcount(graph);
   igraph_inclist_t incs;
-  int maxdegree;
-  int i, nn;
+  int i, node;
 
-  igraph_vector_int_t order, neis;
-  igraph_vector_t degree;
-
-  igraph_vector_int_init(&order, no_of_nodes);
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
-  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-
-  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode,
-			     IGRAPH_LOOPS));
-  maxdegree=(long int) igraph_vector_max(&degree)+1;
-  igraph_vector_order1_int(&degree, &order, maxdegree);
+  igraph_vector_int_t neis;
 
   IGRAPH_CHECK(igraph_inclist_init(graph, &incs, mode));
   IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
@@ -119,8 +108,7 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
   igraph_vector_resize(res, no_of_nodes);
   igraph_vector_null(res);
 
-  for (nn=no_of_nodes-1; nn >= 0; nn--) {
-    int node=VECTOR(order)[nn];
+  for (node=0; node < no_of_nodes; node++) {
     igraph_vector_int_t *edges1=igraph_inclist_get(&incs, node);
     int edgeslen1=igraph_vector_int_size(edges1);
 
@@ -152,13 +140,11 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
       }
     }
 
-  } /* nn >= 0 */
+  } /* node < no_of_nodes */
 
   igraph_vector_int_destroy(&neis);
   igraph_inclist_destroy(&incs);
-  igraph_vector_destroy(&degree);
-  igraph_vector_int_destroy(&order);
-  IGRAPH_FINALLY_CLEAN(5);
+  IGRAPH_FINALLY_CLEAN(2);
 
   return 0;
 }
