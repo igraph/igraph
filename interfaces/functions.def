@@ -1493,7 +1493,10 @@ igraph_local_scan_0:
         IGNORE: RR, RNamespace
 
 igraph_local_scan_0_them:
-        PARAMS: GRAPH us, GRAPH them, OUT VECTOR res, NEIMODE mode=OUT
+        PARAMS: GRAPH us, GRAPH them, OUT VECTOR res, \
+                EDGEWEIGHTS weights_us=NULL, \
+                EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
+        DEPS: weights_us ON us, weights_them ON them
         IGNORE: RR, RNamespace
 
 igraph_local_scan_1_ecount:

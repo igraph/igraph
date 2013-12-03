@@ -1179,15 +1179,11 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   } else {
     
     if (k == 0) {
-      if (! weighted) {
-        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-        .Call("R_igraph_local_scan_0_them", graph.us, graph.them, cmode,
-              PACKAGE="igraph")
-      } else {
-        gi <- graph.intersection(graph.us, graph.them, byname=FALSE)
-        E(gi)$weight <- E(gi)$weight_2
-        graph.strength(gi, mode=mode)
-      }
+      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+      .Call("R_igraph_local_scan_0_them", graph.us, graph.them,
+            if (weighted) as.numeric(E(graph.us)$weight) else NULL,
+            if (weighted) as.numeric(E(graph.them)$weight) else NULL,
+            cmode, PACKAGE="igraph")
     } else {
       sapply(V(graph.us), function(x) {
         vei <- neighborhood(graph.us, order=k, nodes=x, mode=mode)[[1]]

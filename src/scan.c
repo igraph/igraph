@@ -379,8 +379,52 @@ int igraph_local_scan_1_ecount_approximate_eigen(
   return 0;
 }
 
+int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
+			     igraph_vector_t *res,
+			     const igraph_vector_t *weights_us,
+			     const igraph_vector_t *weights_them,
+			     igraph_neimode_t mode) {
+
+  igraph_t is;
+  igraph_vector_t map2;
+  int i, m;
+
+  if (!weights_us || !weights_them) {
+    IGRAPH_ERROR("Edge weights not given for weighted scan-0",
+		 IGRAPH_EINVAL);
+  }
+  if (igraph_vector_size(weights_us) != igraph_ecount(us)) {
+    IGRAPH_ERROR("Invalid weights length (us) for scan-0", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_size(weights_them) != igraph_ecount(them)) {
+    IGRAPH_ERROR("Invalid weights length (them) for scan-0", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&map2, 0);
+  igraph_intersection(&is, us, them, /*map1=*/ 0, &map2);
+  IGRAPH_FINALLY(igraph_destroy, &is);
+
+  /* Rewrite the map as edge weights */
+  m=igraph_vector_size(&map2);
+  for (i=0; i<m; i++) {
+    VECTOR(map2)[i] = VECTOR(*weights_them)[ (int) VECTOR(map2)[i] ];
+  }
+
+  igraph_strength(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS,
+		  /*weights=*/ &map2);
+
+  igraph_destroy(&is);
+  igraph_vector_destroy(&map2);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
 int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
-			     igraph_vector_t *res, igraph_neimode_t mode) {
+			     igraph_vector_t *res,
+			     const igraph_vector_t *weights_us,
+			     const igraph_vector_t *weights_them,
+			     igraph_neimode_t mode) {
 
   igraph_t is;
 
@@ -389,6 +433,11 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
   }
   if (igraph_is_directed(us) != igraph_is_directed(them)) {
     IGRAPH_ERROR("Directedness don't match in scan-0", IGRAPH_EINVAL);
+  }
+
+  if (weights_us) {
+    return igraph_i_local_scan_0_them_w(us, them, res, weights_us,
+					weights_them, mode);
   }
 
   igraph_intersection(&is, us, them, /*edgemap1=*/ 0, /*edgemap2=*/ 0);
