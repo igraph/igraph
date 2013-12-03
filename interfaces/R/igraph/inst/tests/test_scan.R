@@ -85,7 +85,7 @@ E(gp)$weight = sample(ecount(gp))
 ## US, scan-0, unweighted, directed
 ## TODO
 
-test_that("General scan-stat works, US, scan-0, unweighted, directed", {
+test_that("General scan-stat works, US, scan-1, unweighted, directed", {
 
   s1o <- local.scan(g, k=1, weighted=FALSE, mode="out")
   expect_that(digest(s1o), equals("ac463c21b2b6bc91abf82f0141a4a7d4"))
