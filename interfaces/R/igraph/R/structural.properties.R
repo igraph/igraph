@@ -1180,8 +1180,9 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
     
     if (k == 0) {
       if (! weighted) {
-        gi <- graph.intersection(graph.us, graph.them, byname=FALSE)
-        degree(gi, mode=mode)
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_0_them", graph.us, graph.them, cmode,
+              PACKAGE="igraph")
       } else {
         gi <- graph.intersection(graph.us, graph.them, byname=FALSE)
         E(gi)$weight <- E(gi)$weight_2

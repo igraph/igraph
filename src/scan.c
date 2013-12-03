@@ -29,6 +29,7 @@
 #include "igraph_arpack.h"
 #include "igraph_eigen.h"
 #include "igraph_centrality.h"
+#include "igraph_operators.h"
 
 int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 			const igraph_vector_t *weights,
@@ -373,6 +374,29 @@ int igraph_local_scan_1_ecount_approximate_eigen(
   igraph_vector_add(res, &degree);
 
   igraph_vector_destroy(&degree);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
+			     igraph_vector_t *res, igraph_neimode_t mode) {
+
+  igraph_t is;
+
+  if (igraph_vcount(us) != igraph_vcount(them)) {
+    IGRAPH_ERROR("Number of vertices don't match in scan-0", IGRAPH_EINVAL);
+  }
+  if (igraph_is_directed(us) != igraph_is_directed(them)) {
+    IGRAPH_ERROR("Directedness don't match in scan-0", IGRAPH_EINVAL);
+  }
+
+  igraph_intersection(&is, us, them, /*edgemap1=*/ 0, /*edgemap2=*/ 0);
+  IGRAPH_FINALLY(igraph_destroy, &is);
+
+  igraph_degree(&is, res, igraph_vss_all(), mode, IGRAPH_LOOPS);
+
+  igraph_destroy(&is);
   IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
