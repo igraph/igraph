@@ -436,3 +436,82 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
 
   return 0;
 }
+
+int igraph_local_scan_1_them(const igraph_t *us, const igraph_t *them,
+			     igraph_vector_t *res, igraph_neimode_t mode) {
+
+  int no_of_nodes=igraph_vcount(us);
+  igraph_inclist_t incs_us, incs_them;
+  igraph_vector_int_t neis;
+  int node;
+
+  if (igraph_vcount(them) != no_of_nodes) {
+    IGRAPH_ERROR("Number of vertices must match in scan-1", IGRAPH_EINVAL);
+  }
+  if (igraph_is_directed(us) != igraph_is_directed(them)) {
+    IGRAPH_ERROR("Directedness must match in scan-1", IGRAPH_EINVAL);
+  }
+
+  igraph_inclist_init(us, &incs_us, mode);
+  IGRAPH_FINALLY(igraph_inclist_destroy, &incs_us);
+  igraph_inclist_init(them, &incs_them, mode);
+  IGRAPH_FINALLY(igraph_inclist_destroy, &incs_them);
+
+  igraph_vector_int_init(&neis, no_of_nodes);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
+
+  igraph_vector_resize(res, no_of_nodes);
+  igraph_vector_null(res);
+
+  for (node=0; node < no_of_nodes; node++) {
+    igraph_vector_int_t *edges1_us=igraph_inclist_get(&incs_us, node);
+    igraph_vector_int_t *edges1_them=igraph_inclist_get(&incs_them, node);
+    int len1_us=igraph_vector_int_size(edges1_us);
+    int len1_them=igraph_vector_int_size(edges1_them);
+    int i;
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    /* Mark neighbors and self in us */
+    VECTOR(neis)[node] = node+1;
+    for (i = 0; i < len1_us; i++) {
+      int e=VECTOR(*edges1_us)[i];
+      int nei=IGRAPH_OTHER(us, e, node);
+      VECTOR(neis)[nei] = node+1;
+    }
+
+    /* Crawl neighbors in them, first ego */
+    for (i = 0; i < len1_them; i++) {
+      int e=VECTOR(*edges1_them)[i];
+      int nei=IGRAPH_OTHER(them, e, node);
+      if (VECTOR(neis)[nei] == node+1) { VECTOR(*res)[node] += 1; }
+    }
+    /* Then the rest */
+    for (i = 0; i < len1_us; i++) {
+      int e=VECTOR(*edges1_us)[i];
+      int nei=IGRAPH_OTHER(us, e, node);
+      igraph_vector_int_t *edges2_them=igraph_inclist_get(&incs_them, nei);
+      int j, len2_them=igraph_vector_int_size(edges2_them);
+      for (j = 0; j < len2_them; j++) {
+	int e2=VECTOR(*edges2_them)[j];
+	int nei2=IGRAPH_OTHER(them, e2, nei);
+	if (VECTOR(neis)[nei2] == node+1) {
+	  VECTOR(*res)[node] += 1;
+	}
+      }
+    }
+
+    /* For undirected, it was double counted */
+    if (mode == IGRAPH_ALL || ! igraph_is_directed(us)) {
+      VECTOR(*res)[node] /= 2.0;
+    }
+
+  } /* node < no_of_nodes */
+
+  igraph_vector_int_destroy(&neis);
+  igraph_inclist_destroy(&incs_them);
+  igraph_inclist_destroy(&incs_us);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}

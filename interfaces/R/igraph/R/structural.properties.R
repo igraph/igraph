@@ -1177,13 +1177,22 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
     }
     
   } else {
-    
+
+    ## scan-0
     if (k == 0) {
       on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
       .Call("R_igraph_local_scan_0_them", graph.us, graph.them,
             if (weighted) as.numeric(E(graph.us)$weight) else NULL,
             if (weighted) as.numeric(E(graph.them)$weight) else NULL,
             cmode, PACKAGE="igraph")
+
+    ## scan-1, unweighted
+    } else if (k==1 && !weighted) {
+      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+      .Call("R_igraph_local_scan_1_them", graph.us, graph.them,
+            cmode, PACKAGE="igraph")
+
+    ## general case
     } else {
       sapply(V(graph.us), function(x) {
         vei <- neighborhood(graph.us, order=k, nodes=x, mode=mode)[[1]]

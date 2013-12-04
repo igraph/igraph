@@ -1514,6 +1514,10 @@ igraph_local_scan_1_ecount_approximate_eigen:
         PARAMS: GRAPH graph, OUT VECTOR res, VECTOR values, MATRIX vectors
         NAME-R: local.scan1.ecount.approx.eigen
 
+igraph_local_scan_1_them:
+        PARAMS: GRAPH us, GRAPH them, OUT VECTOR res, NEIMODE mode=OUT
+        IGNORE: RR, RNamespace
+
 #######################################
 # Graph operators
 #######################################
