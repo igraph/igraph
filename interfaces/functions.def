@@ -1521,8 +1521,14 @@ igraph_local_scan_1_ecount_them:
 
 igraph_local_scan_k_ecount:
         PARAMS: GRAPH graph, INT k, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
-                NEIMODE mode
+                NEIMODE mode=OUT
         DEPS: weights ON graph
+        IGNORE: RR, RNamespace
+
+igraph_local_scan_k_ecount_them:
+        PARAMS: GRAPH us, GRAPH them, INT k, OUT VECTOR res, \
+                EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
+        DEPS: weights_them ON them
         IGNORE: RR, RNamespace
 
 #######################################

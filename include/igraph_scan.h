@@ -71,7 +71,7 @@ int igraph_local_scan_k_ecount(const igraph_t *graph,int k,
 
 int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
 				    int k, igraph_vector_t *res,
-				    const igraph_vector_t *weights,
+				    const igraph_vector_t *weights_them,
 				    igraph_neimode_t mode);
 
 __END_DECLS

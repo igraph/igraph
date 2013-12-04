@@ -1197,6 +1197,14 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
             if (weighted) as.numeric(E(graph.them)$weight) else NULL,
             cmode, PACKAGE="igraph")
 
+    ## scan-k, ecount
+    } else if (FUN %in% c("ecount", "sumweights")) {
+      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+      .Call("R_igraph_local_scan_k_ecount_them", graph.us, graph.them,
+            as.integer(k),
+            if (weighted) as.numeric(E(graph.them)$weight) else NULL,
+            cmode, PACKAGE="igraph")
+
     ## general case
     } else {
       sapply(V(graph.us), function(x) {
