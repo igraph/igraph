@@ -438,7 +438,9 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
 }
 
 int igraph_local_scan_1_them(const igraph_t *us, const igraph_t *them,
-			     igraph_vector_t *res, igraph_neimode_t mode) {
+			     igraph_vector_t *res,
+			     const igraph_vector_t *weights_them,
+			     igraph_neimode_t mode) {
 
   int no_of_nodes=igraph_vcount(us);
   igraph_inclist_t incs_us, incs_them;
@@ -450,6 +452,11 @@ int igraph_local_scan_1_them(const igraph_t *us, const igraph_t *them,
   }
   if (igraph_is_directed(us) != igraph_is_directed(them)) {
     IGRAPH_ERROR("Directedness must match in scan-1", IGRAPH_EINVAL);
+  }
+  if (weights_them &&
+      igraph_vector_size(weights_them) != igraph_ecount(them)) {
+    IGRAPH_ERROR("Invalid weight vector length in scan-1 (them)",
+		 IGRAPH_EINVAL);
   }
 
   igraph_inclist_init(us, &incs_us, mode);
@@ -484,7 +491,10 @@ int igraph_local_scan_1_them(const igraph_t *us, const igraph_t *them,
     for (i = 0; i < len1_them; i++) {
       int e=VECTOR(*edges1_them)[i];
       int nei=IGRAPH_OTHER(them, e, node);
-      if (VECTOR(neis)[nei] == node+1) { VECTOR(*res)[node] += 1; }
+      if (VECTOR(neis)[nei] == node+1) {
+	igraph_real_t w=weights_them ? VECTOR(*weights_them)[e] : 1;
+	VECTOR(*res)[node] += w;
+      }
     }
     /* Then the rest */
     for (i = 0; i < len1_us; i++) {
@@ -496,7 +506,8 @@ int igraph_local_scan_1_them(const igraph_t *us, const igraph_t *them,
 	int e2=VECTOR(*edges2_them)[j];
 	int nei2=IGRAPH_OTHER(them, e2, nei);
 	if (VECTOR(neis)[nei2] == node+1) {
-	  VECTOR(*res)[node] += 1;
+	  igraph_real_t w=weights_them ? VECTOR(*weights_them)[e2] : 1;
+	  VECTOR(*res)[node] += w;
 	}
       }
     }

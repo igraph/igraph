@@ -61,7 +61,9 @@ int igraph_local_scan_1_ecount_approximate_eigen(const igraph_t *graph,
 				 const igraph_matrix_t *vectors);
 
 int igraph_local_scan_1_them(const igraph_t *us, const igraph_t *them,
-			     igraph_vector_t *res, igraph_neimode_t mode);
+			     igraph_vector_t *res,
+			     const igraph_vector_t *weights,
+			     igraph_neimode_t mode);
 
 __END_DECLS
 
