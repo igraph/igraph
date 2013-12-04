@@ -431,10 +431,10 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
   return 0;
 }
 
-int igraph_local_scan_1_them(const igraph_t *us, const igraph_t *them,
-			     igraph_vector_t *res,
-			     const igraph_vector_t *weights_them,
-			     igraph_neimode_t mode) {
+int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
+				    igraph_vector_t *res,
+				    const igraph_vector_t *weights_them,
+				    igraph_neimode_t mode) {
 
   int no_of_nodes=igraph_vcount(us);
   igraph_inclist_t incs_us, incs_them;

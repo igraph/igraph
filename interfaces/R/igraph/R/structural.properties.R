@@ -1188,7 +1188,7 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
     ## scan-1, ecount
     } else if (k==1 && FUN %in% c("ecount", "sumweights")) {
       on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_1_them", graph.us, graph.them,
+      .Call("R_igraph_local_scan_1_ecount_them", graph.us, graph.them,
             if (weighted) as.numeric(E(graph.them)$weight) else NULL,
             cmode, PACKAGE="igraph")
 
