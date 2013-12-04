@@ -7955,6 +7955,41 @@ PyObject *igraphmodule_Graph_write_leda(igraphmodule_GraphObject * self,
  * Routines related to graph isomorphism                              *
  **********************************************************************/
 
+/**
+ * \ingroup python_interface_graph
+ * \brief Calculates the canonical permutation of a graph using BLISS
+ * \sa igraph_canonical_permutation
+ */
+PyObject *igraphmodule_Graph_canonical_permutation(
+	igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds) {
+  static char *kwlist[] = { "sh", NULL };
+  PyObject *sh_o = Py_None;
+  PyObject *list;
+  igraph_bliss_sh_t sh = IGRAPH_BLISS_FM;
+  igraph_vector_t labeling;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|O", kwlist, &sh_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_bliss_sh_t(sh_o, &sh))
+	return NULL;
+
+  if (igraph_vector_init(&labeling, 0)) {
+	igraphmodule_handle_igraph_error();
+	return NULL;
+  }
+
+  if (igraph_canonical_permutation(&self->g, &labeling, sh, 0)) {
+	igraphmodule_handle_igraph_error();
+	igraph_vector_destroy(&labeling);
+	return NULL;
+  }
+
+  list = igraphmodule_vector_t_to_PyList(&labeling, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&labeling);
+  return list;
+}
+
 /** \ingroup python_interface_graph
  * \brief Calculates the isomorphy class of a graph or its subgraph
  * \sa igraph_isoclass, igraph_isoclass_subgraph
@@ -14128,9 +14163,35 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  name of the keyword argument), but you may also use a string attribute.\n"
    "  If you don't want to store any edge attributes, supply C{None} here.\n"},
 
-  /////////////////
-  // ISOMORPHISM //
-  /////////////////
+  /***************/
+  /* ISOMORPHISM */
+  /***************/
+
+  {"canonical_permutation",
+   (PyCFunction) igraphmodule_Graph_canonical_permutation,
+   METH_VARARGS | METH_KEYWORDS,
+   "canonical_permutation(sh=\"fm\")\n\n"
+   "Calculates the canonical permutation of a graph using the BLISS isomorphism\n"
+   "algorithm.\n\n"
+   "Passing the permutation returned here to L{Graph.permute_vertices()} will\n"
+   "transform the graph into its canonical form.\n\n"
+   "See U{http://www.tcs.hut.fi/Software/bliss/index.html} for more information\n"
+   "about the BLISS algorithm and canonical permutations.\n\n"
+   "@param sh: splitting heuristics for graph as a case-insensitive string,\n"
+   "  with the following possible values:\n\n"
+   "    - C{\"f\"}: first non-singleton cell\n\n"
+   "    - C{\"fl\"}: first largest non-singleton cell\n\n"
+   "    - C{\"fs\"}: first smallest non-singleton cell\n\n"
+   "    - C{\"fm\"}: first maximally non-trivially connected non-singleton\n"
+   "      cell\n\n"
+   "    - C{\"flm\"}: largest maximally non-trivially connected\n"
+   "      non-singleton cell\n\n"
+   "    - C{\"fsm\"}: smallest maximally non-trivially connected\n"
+   "      non-singleton cell\n\n"
+   "@return: a permutation vector containing vertex IDs. Vertex 0 in the original\n"
+   "  graph will be mapped to an ID contained in the first element of this\n"
+   "  vector; vertex 1 will be mapped to the second and so on.\n"
+  },
   {"isoclass", (PyCFunction) igraphmodule_Graph_isoclass,
    METH_VARARGS | METH_KEYWORDS,
    "isoclass(vertices)\n\n"
@@ -14164,6 +14225,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  sh1=\"fm\", sh2=\"fm\")\n\n"
    "Checks whether the graph is isomorphic to another graph, using the\n"
    "BLISS isomorphism algorithm.\n\n"
+   "See U{http://www.tcs.hut.fi/Software/bliss/index.html} for more information\n"
+   "about the BLISS algorithm.\n\n"
    "@param other: the other graph with which we want to compare the graph.\n"
    "@param return_mapping_12: if C{True}, calculates the mapping which maps\n"
    "  the vertices of the first graph to the second.\n"
