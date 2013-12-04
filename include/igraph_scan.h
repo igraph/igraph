@@ -45,7 +45,6 @@ int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 
 int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
 			     igraph_vector_t *res,
-			     const igraph_vector_t *weigths_us,
 			     const igraph_vector_t *weigths_them,
 			     igraph_neimode_t mode);
 

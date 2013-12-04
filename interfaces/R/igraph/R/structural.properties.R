@@ -1182,7 +1182,6 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
     if (k == 0) {
       on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
       .Call("R_igraph_local_scan_0_them", graph.us, graph.them,
-            if (weighted) as.numeric(E(graph.us)$weight) else NULL,
             if (weighted) as.numeric(E(graph.them)$weight) else NULL,
             cmode, PACKAGE="igraph")
 

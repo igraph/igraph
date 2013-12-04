@@ -367,7 +367,6 @@ int igraph_local_scan_1_ecount_approximate_eigen(
 
 int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
 			     igraph_vector_t *res,
-			     const igraph_vector_t *weights_us,
 			     const igraph_vector_t *weights_them,
 			     igraph_neimode_t mode) {
 
@@ -375,15 +374,12 @@ int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
   igraph_vector_t map2;
   int i, m;
 
-  if (!weights_us || !weights_them) {
+  if (!weights_them) {
     IGRAPH_ERROR("Edge weights not given for weighted scan-0",
 		 IGRAPH_EINVAL);
   }
-  if (igraph_vector_size(weights_us) != igraph_ecount(us)) {
-    IGRAPH_ERROR("Invalid weights length (us) for scan-0", IGRAPH_EINVAL);
-  }
   if (igraph_vector_size(weights_them) != igraph_ecount(them)) {
-    IGRAPH_ERROR("Invalid weights length (them) for scan-0", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid weights length for scan-0", IGRAPH_EINVAL);
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&map2, 0);
@@ -408,7 +404,6 @@ int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
 
 int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
 			     igraph_vector_t *res,
-			     const igraph_vector_t *weights_us,
 			     const igraph_vector_t *weights_them,
 			     igraph_neimode_t mode) {
 
@@ -421,9 +416,8 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
     IGRAPH_ERROR("Directedness don't match in scan-0", IGRAPH_EINVAL);
   }
 
-  if (weights_us) {
-    return igraph_i_local_scan_0_them_w(us, them, res, weights_us,
-					weights_them, mode);
+  if (weights_them) {
+    return igraph_i_local_scan_0_them_w(us, them, res, weights_them, mode);
   }
 
   igraph_intersection(&is, us, them, /*edgemap1=*/ 0, /*edgemap2=*/ 0);
