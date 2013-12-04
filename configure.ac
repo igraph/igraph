@@ -5,6 +5,12 @@ AC_CONFIG_HEADERS([config.h])
 
 m4_include(tools/autoconf/ax_tls.m4)
 
+# Define list of additional libraries that have to be linked to igraph when
+# another app tries to link to the static library of igraph. This is substituted
+# into igraph.pc later on.
+PKGCONFIG_LIBS_PRIVATE="-lxml2 -lz -lm"
+AC_SUBST(PKGCONFIG_LIBS_PRIVATE)
+
 # Test suite
 AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
@@ -161,7 +167,8 @@ if test "x$enable_gmp" != "xno"; then
     AC_CHECK_HEADER([gmp.h], [
       AC_DEFINE([HAVE_GMP], [1], [Define to 1 if you have the GMP library])
       gmp_support=yes
-      LDFLAGS="${LDFLAGS} -lgmp"      
+      LDFLAGS="${LDFLAGS} -lgmp"
+      PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -lgmp"
     ])
   ])
 fi
@@ -230,6 +237,7 @@ if test "$internal_blas" = "no"; then
            AC_CHECK_LIB([blas], [DAXPY], [],
 	      [AC_MSG_RESULT(not found, trying to use -lblas anyway.)]))))
   LDFLAGS="${LDFLAGS} -lblas"
+  PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -lblas"
 else
   AC_DEFINE([INTERNAL_BLAS], [1], [Define to 1 if you use the internal BLAS library])
 fi
@@ -241,6 +249,7 @@ if test "$internal_lapack" = "no"; then
            AC_CHECK_LIB([lapack], [DLARNV], [],
 	      [AC_MSG_RESULT(not found, trying to use -llapack anyway.)]))))
   LDFLAGS="${LDFLAGS} -llapack"
+  PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -llapack"
 else
   AC_DEFINE([INTERNAL_LAPACK], [1], [Define to 1 if you use the internal LAPACK library])
 fi
@@ -255,6 +264,7 @@ if test "$internal_arpack" = "no"; then
            AC_CHECK_LIB([arpack], [DSAUPD], [],
 	      [AC_MSG_RESULT(not found, trying to use -larpack anyway.)]))))
   LDFLAGS="${LDFLAGS} -larpack"
+  PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -larpack"
 else
   AC_DEFINE([INTERNAL_ARPACK], [1], [Define to 1 if you use the internal ARPACK library])
 fi
@@ -274,6 +284,7 @@ if test "x$enable_glpk" != "xno"; then
           AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
           glpk_support=yes
           LDFLAGS="${LDFLAGS} -lglpk"
+          PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -lglpk"
         ])
       ])
     ])

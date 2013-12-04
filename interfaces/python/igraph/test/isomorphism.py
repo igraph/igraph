@@ -1,6 +1,7 @@
 import unittest
 from igraph import *
 from itertools import permutations
+from random import shuffle
 
 def node_compat(g1, g2, v1, v2):
     """Node compatibility function for isomorphism tests"""
@@ -116,6 +117,7 @@ class IsomorphismTests(unittest.TestCase):
         expected_maps = [[0,1,2,3], [0,2,1,3], [3,1,2,0], [3,2,1,0]]
         self.assertTrue(sorted(g3.get_automorphisms_vf2(color="color")) == expected_maps)
 
+class SubisomorphismTests(unittest.TestCase):
     def testSubisomorphicLAD(self):
         g = Graph.Lattice([3,3], circular=False)
         g2 = Graph([(0,1), (1,2), (1,3)])
@@ -148,24 +150,24 @@ class IsomorphismTests(unittest.TestCase):
         6743 7436 7458 7634 7854 8547 8745"
         all_subiso = sorted([int(x) for x in item] for item in all_subiso.split())
 
-        self.assertEquals(all_subiso, sorted(g.get_subisomorphisms_lad(g2)))
-        self.assertEquals([], sorted(g2.get_subisomorphisms_lad(g)))
+        self.assertEqual(all_subiso, sorted(g.get_subisomorphisms_lad(g2)))
+        self.assertEqual([], sorted(g2.get_subisomorphisms_lad(g)))
 
         # Test 'induced'
         induced_subiso = "1375 1573 3751 5731 7513 7315 5137 3157"
         induced_subiso = sorted([int(x) for x in item] for item in induced_subiso.split())
         all_subiso_extra = sorted(all_subiso + induced_subiso)
-        self.assertEquals(induced_subiso,
+        self.assertEqual(induced_subiso,
                 sorted(g3.get_subisomorphisms_lad(g2, induced=True)))
-        self.assertEquals([], g3.get_subisomorphisms_lad(g, induced=True))
+        self.assertEqual([], g3.get_subisomorphisms_lad(g, induced=True))
         
         # Test with limited vertex matching
         limited_subiso = [iso for iso in all_subiso if iso[0] == 4]
         domains = [[4], [0,1,2,3,5,6,7,8], [0,1,2,3,5,6,7,8], [0,1,2,3,5,6,7,8]]
-        self.assertEquals(limited_subiso,
+        self.assertEqual(limited_subiso,
                 sorted(g.get_subisomorphisms_lad(g2, domains=domains)))
         domains = [[], [0,1,2,3,5,6,7,8], [0,1,2,3,5,6,7,8], [0,1,2,3,5,6,7,8]]
-        self.assertEquals([], sorted(g.get_subisomorphisms_lad(g2, domains=domains)))
+        self.assertEqual([], sorted(g.get_subisomorphisms_lad(g2, domains=domains)))
 
     def testSubisomorphicVF2(self):
         g = Graph.Lattice([3,3], circular=False)
@@ -205,6 +207,32 @@ class IsomorphismTests(unittest.TestCase):
         self.assertTrue(g.count_subisomorphisms_vf2(g2, edge_color1="color", edge_color2="color") == 2)
         self.assertTrue(g.count_subisomorphisms_vf2(g2, edge_compat_fn=edge_compat) == 2)
 
+class PermutationTests(unittest.TestCase):
+    def testCanonicalPermutation(self):
+        # Simple case: two ring graphs
+        g1 = Graph(4, [(0, 1), (1, 2), (2, 3), (3, 0)])
+        g2 = Graph(4, [(0, 1), (1, 3), (3, 2), (2, 0)])
+
+        cp = g1.canonical_permutation()
+        g3 = g1.permute_vertices(cp)
+
+        cp = g2.canonical_permutation()
+        g4 = g2.permute_vertices(cp)
+
+        self.assertTrue(g3.vcount() == g4.vcount())
+        self.assertTrue(sorted(g3.get_edgelist()) == sorted(g4.get_edgelist()))
+
+        # More complicated one: small GRG, random permutation
+        g = Graph.GRG(10, 0.5)
+        perm = range(10)
+        shuffle(perm)
+        g2 = g.permute_vertices(perm)
+        g3 = g.permute_vertices(g.canonical_permutation())
+        g4 = g2.permute_vertices(g2.canonical_permutation())
+
+        self.assertTrue(g3.vcount() == g4.vcount())
+        self.assertTrue(sorted(g3.get_edgelist()) == sorted(g4.get_edgelist()))
+
     def testPermuteVertices(self):
         g1 = Graph(8, [(0, 4), (0, 5), (0, 6), \
                        (1, 4), (1, 5), (1, 7), \
@@ -221,7 +249,10 @@ class IsomorphismTests(unittest.TestCase):
 
 def suite():
     isomorphism_suite = unittest.makeSuite(IsomorphismTests)
-    return unittest.TestSuite([isomorphism_suite])
+    subisomorphism_suite = unittest.makeSuite(SubisomorphismTests)
+    permutation_suite = unittest.makeSuite(PermutationTests)
+    return unittest.TestSuite([isomorphism_suite, subisomorphism_suite, \
+            permutation_suite])
 
 def test():
     runner = unittest.TextTestRunner()

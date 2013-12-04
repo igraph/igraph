@@ -317,7 +317,11 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
                PACKAGE="igraph")
   if (normalized) {
     vc <- vcount(graph)
-    res <- 2*res / ( vc*vc-3*vc+2)
+    if (is.directed(graph) && directed) {
+      res <- res / ( vc*vc-3*vc+2)
+    } else {
+      res <- 2*res / ( vc*vc-3*vc+2)
+    }
   }
   if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
     names(res) <- V(graph)$name[v]

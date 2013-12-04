@@ -74,8 +74,8 @@ export ARCHFLAGS="-arch i386 -arch x86_64"
 # For each Python version, build the .mpkg and the .dmg
 for PYVER in $PYTHON_VERSIONS; do
   PYTHON=/usr/bin/python$PYVER
-  $PYTHON setup.py build_ext --no-pkg-config -I ../../include:../../build/include -L `dirname $FATLIB` || exit 3
-  $PYTHON setup.py bdist_mpkg --no-pkg-config || exit 4
+  $PYTHON setup.py build_ext --no-download --no-pkg-config -I ../../include:../../build/include -L `dirname $FATLIB` || exit 3
+  $PYTHON setup.py bdist_mpkg --no-download --no-pkg-config || exit 4
 
   # Ensure that the built library is really universal
   LIB=build/lib.macosx-*-${PYVER}/igraph/_igraph.so

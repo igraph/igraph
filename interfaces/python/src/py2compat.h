@@ -27,6 +27,9 @@
 
 #include <Python.h>
 
+/* Common utility functions */
+int PyFile_Close(PyObject* fileObj);
+
 #if PY_MAJOR_VERSION >= 3
 
 /* Python 3.x-specific part follows here */
