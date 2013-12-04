@@ -30,6 +30,7 @@
 #include "igraph_eigen.h"
 #include "igraph_centrality.h"
 #include "igraph_operators.h"
+#include "igraph_dqueue.h"
 
 int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 			const igraph_vector_t *weights,
@@ -517,6 +518,87 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
   igraph_inclist_destroy(&incs_them);
   igraph_inclist_destroy(&incs_us);
   IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
+int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
+			       igraph_vector_t *res,
+			       const igraph_vector_t *weights,
+			       igraph_neimode_t mode) {
+
+  int no_of_nodes=igraph_vcount(graph);
+  int node;
+  igraph_dqueue_int_t Q;
+  igraph_vector_int_t marked;
+  igraph_inclist_t incs;
+
+  if (k < 0) {
+    IGRAPH_ERROR("k must be non-negative in k-scan", IGRAPH_EINVAL);
+  }
+  if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weight vector length in k-scan", IGRAPH_EINVAL);
+  }
+
+  if (k==0) { return igraph_local_scan_0(graph, res, weights, mode); }
+  if (k==1) { return igraph_local_scan_1_ecount(graph, res, weights, mode); }
+
+  /* We do a BFS form each node, and simply count the number
+     of edges on the way */
+
+  IGRAPH_CHECK(igraph_dqueue_int_init(&Q, 100));
+  IGRAPH_FINALLY(igraph_dqueue_int_destroy, &Q);
+  IGRAPH_CHECK(igraph_vector_int_init(&marked, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &marked);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &incs, mode));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+  igraph_vector_null(res);
+
+  for (node=0 ; node < no_of_nodes ; node++) {
+    igraph_dqueue_int_push(&Q, node);
+    igraph_dqueue_int_push(&Q, 0);
+    VECTOR(marked)[node] = node+1;
+    while (!igraph_dqueue_int_empty(&Q)) {
+      int act=igraph_dqueue_int_pop(&Q);
+      int dist=igraph_dqueue_int_pop(&Q) + 1;
+      igraph_vector_int_t *edges=igraph_inclist_get(&incs, act);
+      int i, edgeslen=igraph_vector_int_size(edges);
+      for (i=0; i<edgeslen; i++) {
+	int edge=VECTOR(*edges)[i];
+	int nei=IGRAPH_OTHER(graph, edge, act);
+	if (dist <= k || VECTOR(marked)[nei] == node+1) {
+	  VECTOR(*res)[node] += 1;
+	}
+	if (dist <= k && VECTOR(marked)[nei] != node+1) {
+	  igraph_dqueue_int_push(&Q, nei);
+	  igraph_dqueue_int_push(&Q, dist);
+	  VECTOR(marked)[nei] = node+1;
+	}
+      }
+    }
+
+    if (mode == IGRAPH_ALL || ! igraph_is_directed(graph)) {
+      VECTOR(*res)[node] /= 2.0;
+    }
+
+  } /* node < no_of_nodes */
+
+  igraph_inclist_destroy(&incs);
+  igraph_vector_int_destroy(&marked);
+  igraph_dqueue_int_destroy(&Q);
+  IGRAPH_FINALLY_CLEAN(3);
+
+  return 0;
+}
+
+int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
+				    int k, igraph_vector_t *res,
+				    const igraph_vector_t *weights,
+				    igraph_neimode_t mode) {
+
+  /* TODO */
 
   return 0;
 }

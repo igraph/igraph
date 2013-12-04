@@ -1152,8 +1152,6 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
 
   if (is.null(FUN)) { FUN <- if (weighted) "sumweights" else "ecount" }
   
-  require(Matrix)
-
   res <- if (is.null(graph.them)) {
 
     ## scan-0
@@ -1170,7 +1168,14 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
             if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
             PACKAGE="igraph")
 
-    ## General k > 1
+    ## scan-k, ecount
+    } else if (FUN=="ecount") {
+      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+      .Call("R_igraph_local_scan_k_ecount", graph.us, as.integer(k),
+            if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
+            PACKAGE="igraph")
+
+    ## General
     } else {
       sapply(graph.neighborhood(graph.us, order=k, V(graph.us), mode=mode),
              FUN, ...)

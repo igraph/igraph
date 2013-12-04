@@ -1519,6 +1519,12 @@ igraph_local_scan_1_ecount_them:
         DEPS: weigths_them ON them
         IGNORE: RR, RNamespace
 
+igraph_local_scan_k_ecount:
+        PARAMS: GRAPH graph, INT k, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
+                NEIMODE mode
+        DEPS: weights ON graph
+        IGNORE: RR, RNamespace
+
 #######################################
 # Graph operators
 #######################################
