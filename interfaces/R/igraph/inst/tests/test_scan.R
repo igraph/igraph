@@ -13,63 +13,63 @@ gp <- erdos.renyi.game(n,p)
 E(gp)$weight = sample(ecount(gp))
 
 test_that("General scan-stat works, US, scan-0, unweighted", {
-  system.time(s1 <- local.scan(g, k=0))
+  s1 <- local.scan(g, k=0)
   expect_that(digest(s1), equals("659ffaaf303742f0806a79b8ff3d88b3"))
 })
 
 test_that("General scan-stat works, US, scan-0, weighted", {
-  system.time(s1 <- local.scan(g, k=0, weighted=TRUE))
+  s1 <- local.scan(g, k=0, weighted=TRUE)
   expect_that(digest(s1), equals("0f8d7ac831389cea04e0bfc5e2510c73"))
 })
 
 
 test_that("General scan-stat works, US, scan-1, unweighted", {
-  system.time(s1 <- local.scan(g))
+  s1 <- local.scan(g)
   expect_that(digest(s1), equals("df0fd77489f70cc47f682dc31d9f52f5"))
 })
 
 test_that("General scan-stat works, US, scan-1, weighted", {
-  system.time(s1 <- local.scan(g, k=1, weighted=TRUE))
+  s1 <- local.scan(g, k=1, weighted=TRUE)
   expect_that(digest(s1), equals("af720916ae4b49881745d2dcdd614401"))
 })
 
 test_that("General scan-stat works, US, scan-2, unweighted", {
-  system.time(s1 <- local.scan(g, k=2))
+  s1 <- local.scan(g, k=2)
   expect_that(digest(s1), equals("6f47f47abde25d00d615dd56826cca5a"))
 })
 
 test_that("General scan-stat works, US, scan-2, weighted", {
-  system.time(s1 <- local.scan(g, k=2, weighted=TRUE))
+  s1 <- local.scan(g, k=2, weighted=TRUE)
   expect_that(digest(s1), equals("e02e9d58168ee5d53850497f6d4c76b0"))
 })
 
 test_that("General scan-stat works, THEM, scan-0, unweighted", {
-  system.time(s1 <- local.scan(g, gp, k=0))
+  s1 <- local.scan(g, gp, k=0)
   expect_that(digest(s1), equals("f584f7d287f8f89f5f7882165ca41b8c"))
 })
 
 test_that("General scan-stat works, THEM, scan-0, weighted", {
-  system.time(s1 <- local.scan(g, gp, k=0, weighted=TRUE))
+  s1 <- local.scan(g, gp, k=0, weighted=TRUE)
   expect_that(digest(s1), equals("213db8e7517d1e6406da3dbd55281ed1"))
 })
 
 test_that("General scan-stat works, THEM, scan-1, unweighted", {
-  system.time(s1 <- local.scan(g, gp, k=1))
+  s1 <- local.scan(g, gp, k=1)
   expect_that(digest(s1), equals("e9ca740ebba2fd1db4abe939954b2638"))
 })
 
 test_that("General scan-stat works, THEM, scan-1, weighted", {
-  system.time(s1 <- local.scan(g, gp, k=1, weighted=TRUE))
+  s1 <- local.scan(g, gp, k=1, weighted=TRUE)
   expect_that(digest(s1), equals("a98e9a03eda7feaae8524dc9348ad74b"))
 })
 
 test_that("General scan-stat works, THEM, scan-2, unweighted", {
-  system.time(s1 <- local.scan(g, gp, k=2))
+  s1 <- local.scan(g, gp, k=2)
   expect_that(digest(s1), equals("a3237a9a55e9d86ab471c81a291eb03b"))
 })
 
 test_that("General scan-stat works, THEM, scan-2, weighted", {
-  system.time(s1 <- local.scan(g, gp, k=2, weighted=TRUE))
+  s1 <- local.scan(g, gp, k=2, weighted=TRUE)
   expect_that(digest(s1), equals("995d0b6a952834ff6e534efc2cfb917b"))
 })
 
