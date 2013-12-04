@@ -569,7 +569,8 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
 	int edge=VECTOR(*edges)[i];
 	int nei=IGRAPH_OTHER(graph, edge, act);
 	if (dist <= k || VECTOR(marked)[nei] == node+1) {
-	  VECTOR(*res)[node] += 1;
+	  igraph_real_t w=weights ? VECTOR(*weights)[edge] : 1;
+	  VECTOR(*res)[node] += w;
 	}
 	if (dist <= k && VECTOR(marked)[nei] != node+1) {
 	  igraph_dqueue_int_push(&Q, nei);
