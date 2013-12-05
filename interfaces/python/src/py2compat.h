@@ -67,8 +67,9 @@ int PyString_IsEqualToUTF8String(PyObject* py_string,
 /* Python 2.x-specific part follows here */
 
 #define PyBaseString_Check(o) (PyString_Check(o) || PyUnicode_Check(o))
-#define PyString_IsEqualToASCIIString(pystr, cstr) \
-        (PyString_Check(pystr) && strcmp(PyString_AS_STRING(pystr), (cstr)) == 0)
+
+int PyString_IsEqualToASCIIString(PyObject* py_string,
+    const char* c_string);
 
 #ifndef Py_TYPE
 #  define Py_TYPE(o) ((o)->ob_type)
