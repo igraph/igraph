@@ -121,4 +121,26 @@ char* PyString_CopyAsString(PyObject* string) {
   return result;
 }
 
+int PyString_IsEqualToASCIIString(PyObject* py_string,
+		const char* c_string) {
+	PyObject* c_string_conv;
+	int result;
+
+  if (PyString_Check(py_string)) {
+    return strcmp(PyString_AS_STRING(py_string), c_string) == 0;
+  }
+
+	if (!PyUnicode_Check(py_string))
+		return 0;
+
+	c_string_conv = PyUnicode_DecodeASCII(c_string, strlen(c_string), "strict");
+	if (c_string_conv == 0)
+		return 0;
+
+	result = (PyUnicode_Compare(py_string, c_string_conv) == 0);
+	Py_DECREF(c_string_conv);
+
+	return result;
+}
+
 #endif
