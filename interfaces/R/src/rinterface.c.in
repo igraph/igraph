@@ -305,7 +305,21 @@ int R_igraph_attribute_add_vertices(igraph_t *graph, long int nv,
     REAL(VECTOR_ELT(newattr, 0))[0] = 0;
     REAL(VECTOR_ELT(newattr, 0))[1] = 1;
     if (R_igraph_attribute_protected) {
-      long int pos=REAL(VECTOR_ELT(attr, 0))[3];
+      long int pos, alen=LENGTH(VECTOR_ELT(attr, 0));
+      if (alen == 4) {
+	pos=REAL(VECTOR_ELT(attr, 0))[3];
+	SET_VECTOR_ELT(R_igraph_attribute_protected, pos, newattr);
+      } else {
+	SEXP tmp=NEW_NUMERIC(4);
+	PROTECT(tmp);
+	REAL(tmp)[0] = REAL(VECTOR_ELT(attr, 0))[0];
+	REAL(tmp)[1] = REAL(VECTOR_ELT(attr, 0))[1];
+	REAL(tmp)[2] = REAL(VECTOR_ELT(attr, 0))[2];
+	pos = REAL(tmp)[3] = R_igraph_attribute_protected_size;
+	R_igraph_attribute_protected_size += 1;
+	SET_VECTOR_ELT(newattr, 0, tmp);
+	UNPROTECT(1);
+      }
       SET_VECTOR_ELT(R_igraph_attribute_protected, pos, newattr);
     }
     attr=graph->attr=newattr;
@@ -518,7 +532,21 @@ int R_igraph_attribute_permute_vertices(const igraph_t *graph,
       REAL(VECTOR_ELT(newattr, 0))[0] = 0;
       REAL(VECTOR_ELT(newattr, 0))[1] = 1;
       if (R_igraph_attribute_protected) {
-	long int pos=REAL(VECTOR_ELT(attr, 0))[3];
+	long int pos, alen=LENGTH(VECTOR_ELT(attr, 0));
+	if (alen == 4) {
+	  pos=REAL(VECTOR_ELT(attr, 0))[3];
+	  SET_VECTOR_ELT(R_igraph_attribute_protected, pos, newattr);
+	} else {
+	  SEXP tmp=NEW_NUMERIC(4);
+	  PROTECT(tmp);
+	  REAL(tmp)[0] = REAL(VECTOR_ELT(attr, 0))[0];
+	  REAL(tmp)[1] = REAL(VECTOR_ELT(attr, 0))[1];
+	  REAL(tmp)[2] = REAL(VECTOR_ELT(attr, 0))[2];
+	  pos = REAL(tmp)[3] = R_igraph_attribute_protected_size;
+	  R_igraph_attribute_protected_size += 1;
+	  SET_VECTOR_ELT(newattr, 0, tmp);
+	  UNPROTECT(1);
+	}
 	SET_VECTOR_ELT(R_igraph_attribute_protected, pos, newattr);
       }
       attr=newgraph->attr=newattr;
@@ -612,8 +640,21 @@ int R_igraph_attribute_add_edges(igraph_t *graph,
     REAL(VECTOR_ELT(newattr, 0))[0] = 0;
     REAL(VECTOR_ELT(newattr, 0))[1] = 1;
     if (R_igraph_attribute_protected) {
-      long int pos=REAL(VECTOR_ELT(attr, 0))[3];
-      REAL(VECTOR_ELT(newattr, 0))[3] = pos;
+      long int pos, alen=LENGTH(VECTOR_ELT(attr, 0));
+      if (alen == 4) {
+	pos=REAL(VECTOR_ELT(attr, 0))[3];
+	SET_VECTOR_ELT(R_igraph_attribute_protected, pos, newattr);
+      } else {
+	SEXP tmp=NEW_NUMERIC(4);
+	PROTECT(tmp);
+	REAL(tmp)[0] = REAL(VECTOR_ELT(attr, 0))[0];
+	REAL(tmp)[1] = REAL(VECTOR_ELT(attr, 0))[1];
+	REAL(tmp)[2] = REAL(VECTOR_ELT(attr, 0))[2];
+	pos = REAL(tmp)[3] = R_igraph_attribute_protected_size;
+	R_igraph_attribute_protected_size += 1;
+	SET_VECTOR_ELT(newattr, 0, tmp);
+	UNPROTECT(1);
+      }
       SET_VECTOR_ELT(R_igraph_attribute_protected, pos, newattr);
     }
     attr=graph->attr=newattr;
@@ -801,7 +842,21 @@ int R_igraph_attribute_permute_edges(const igraph_t *graph,
       REAL(VECTOR_ELT(newattr, 0))[0] = 0;
       REAL(VECTOR_ELT(newattr, 0))[1] = 1;
       if (R_igraph_attribute_protected) {
-	long int pos=REAL(VECTOR_ELT(attr, 0))[3];
+	long int pos, alen=LENGTH(VECTOR_ELT(attr, 0));
+	if (alen == 4) {
+	  pos=REAL(VECTOR_ELT(attr, 0))[3];
+	  SET_VECTOR_ELT(R_igraph_attribute_protected, pos, newattr);
+	} else {
+	  SEXP tmp=NEW_NUMERIC(4);
+	  PROTECT(tmp);
+	  REAL(tmp)[0] = REAL(VECTOR_ELT(attr, 0))[0];
+	  REAL(tmp)[1] = REAL(VECTOR_ELT(attr, 0))[1];
+	  REAL(tmp)[2] = REAL(VECTOR_ELT(attr, 0))[2];
+	  pos = REAL(tmp)[3] = R_igraph_attribute_protected_size;
+	  R_igraph_attribute_protected_size += 1;
+	  SET_VECTOR_ELT(newattr, 0, tmp);
+	  UNPROTECT(1);
+	}
 	SET_VECTOR_ELT(R_igraph_attribute_protected, pos, newattr);
       }
       attr=newgraph->attr=newattr;
