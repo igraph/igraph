@@ -155,3 +155,13 @@ test_that("graph.adjacency 2 edge bug is fixed", {
   expect_that(g[], equals(A))
 
 })
+
+test_that("graph.adjacenct empty graph bug is fixed", {
+
+  library(Matrix)
+  library(igraph)
+  A <- Matrix(0, 10, 10, sparse=TRUE)
+  g <- graph.adjacency(A, mode="undirected")
+  expect_that(as.matrix(g[]), equals(as.matrix(A)))
+
+})
