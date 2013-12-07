@@ -221,7 +221,7 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     el <- el[,1:2]
     el <- cbind( pmin(el[,1],el[,2]), pmax(el[,1], el[,2]) )
     o <- order(el[,1], el[,2])
-    el <- el[o,]
+    el <- el[o,,drop=FALSE]
     w <- w[o]
     dd <- el[2:nrow(el),1] == el[1:(nrow(el)-1),1] &
           el[2:nrow(el),2] == el[1:(nrow(el)-1),2]
@@ -230,7 +230,7 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
       mw <- pmax(w[dd], w[dd+1])
       w[dd] <- mw
       w[dd+1] <- mw
-      el <- el[-dd,]
+      el <- el[-dd,,drop=FALSE]
       w <- w[-dd]
     }
     el <- cbind(el, w)
