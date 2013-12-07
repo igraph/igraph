@@ -223,18 +223,19 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     o <- order(el[,1], el[,2])
     el <- el[o,,drop=FALSE]
     w <- w[o]
-    dd <- el[2:nrow(el),1] == el[1:(nrow(el)-1),1] &
-          el[2:nrow(el),2] == el[1:(nrow(el)-1),2]
-    dd <- which(dd)
-    if (length(dd)>0) {
-      mw <- pmax(w[dd], w[dd+1])
-      w[dd] <- mw
-      w[dd+1] <- mw
-      el <- el[-dd,,drop=FALSE]
-      w <- w[-dd]
+    if (nrow(el) > 1) {
+      dd <- el[2:nrow(el),1] == el[1:(nrow(el)-1),1] &
+        el[2:nrow(el),2] == el[1:(nrow(el)-1),2]
+      dd <- which(dd)
+      if (length(dd)>0) {
+        mw <- pmax(w[dd], w[dd+1])
+        w[dd] <- mw
+        w[dd+1] <- mw
+        el <- el[-dd,,drop=FALSE]
+        w <- w[-dd]
+      }
     }
     el <- cbind(el, w)
-    rm(w,dd)
   } else if (mode=="upper") {
     ## UPPER
     if (diag) {
@@ -267,18 +268,19 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     o <- order(el[,1], el[,2])
     el <- el[o,]
     w <- w[o]
-    dd <- el[2:nrow(el),1] == el[1:(nrow(el)-1),1] &
-          el[2:nrow(el),2] == el[1:(nrow(el)-1),2]
-    dd <- which(dd)
-    if (length(dd)>0) {
-      mw <- pmin(w[dd], w[dd+1])
-      w[dd] <- mw
-      w[dd+1] <- mw
-      el <- el[-dd,]
-      w <- w[-dd]
+    if (nrow(el) > 1) {
+      dd <- el[2:nrow(el),1] == el[1:(nrow(el)-1),1] &
+        el[2:nrow(el),2] == el[1:(nrow(el)-1),2]
+      dd <- which(dd)
+      if (length(dd)>0) {
+        mw <- pmin(w[dd], w[dd+1])
+        w[dd] <- mw
+        w[dd+1] <- mw
+        el <- el[-dd,]
+        w <- w[-dd]
+      }
     }
     el <- cbind(el, w)
-    rm(w,dd)
   } else if (mode=="plus") {
     ## PLUS
     adjmatrix <- adjmatrix + Matrix::t(adjmatrix)
