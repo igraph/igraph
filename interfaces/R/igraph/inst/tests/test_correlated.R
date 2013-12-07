@@ -49,4 +49,31 @@ test_that("correlated.game corner cases work", {
   expect_that(ecount(g3), equals(0))
   expect_that(vcount(g3), equals(10))
 
+  gg <- erdos.renyi.game(10, .3, directed=TRUE)
+  gg2 <- correlated.game(gg, corr=0.000001, p=.99999999)
+  expect_that(is.full(gg2), is_true())
+
+  gg3 <- correlated.game(gg, corr=0.000001, p=0.0000001)
+  expect_that(ecount(gg3), equals(0))
+  expect_that(vcount(gg3), equals(10))
+
+})
+
+test_that("permutation works for correlated.game", {
+
+  library(igraph)
+  set.seed(42)
+
+  g <- erdos.renyi.game(10, .3)
+  perm <- sample(vcount(g))
+  g2 <- correlated.game(g, corr=.99999, p=.3, permutation=perm)
+  g <- permute.vertices(g, perm)
+  expect_that(g[], equals(g2[]))
+
+  g <- erdos.renyi.game(10, .3)
+  perm <- sample(vcount(g))
+  g2 <- correlated.game(g, corr=1, p=.3, permutation=perm)
+  g <- permute.vertices(g, perm)
+  expect_that(g[], equals(g2[]))
+
 })

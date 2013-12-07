@@ -536,32 +536,3 @@ hsbm.game <- function(n, m, rho, C, p) {
   }  
 }
 
-correlated.game <- function(graph, corr, p=graph$p, perm=NULL) {
-  q <- p + corr * (1 - p)
-  A <- get.adjacency(graph)
-  n <- nrow(A)
-  B <- A
-  for (i in 1:(n - 1)) {
-    for (j in (i + 1):n) {
-      if (A[i, j] == 1 && runif(1) > q) {
-        B[i, j] <- 0
-        B[j, i] <- 0
-      } else if (A[i, j] == 0 && runif(1) < ((1 - q) * (p/(1 - p)))) {
-        B[i, j] <- 1
-        B[j, i] <- 1
-      }
-    }
-  }
-  if (!is.null(perm)) {
-    P <- diag(n)
-    P <- P[perm, ]
-    B <- P %*% B %*% t(P)
-  }
-  graph.adjacency(B, mode="undirected")
-}
-
-correlated.pair.game <- function(n, corr, p, perm=NULL) {
-  g1 <- erdos.renyi.game(n, p)
-  g2 <- correlated.game(g1, corr=corr, p=p, perm=perm)
-  list(g1, g2)
-}

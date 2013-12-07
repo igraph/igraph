@@ -120,3 +120,8 @@ AT_SETUP([Watts-Strogatz graphs (igraph_watts_strogatz_game):])
 AT_KEYWORDS([small world small-world Watts Strogratz])
 AT_COMPILE_CHECK([simple/watts_strogatz_game.c])
 AT_CLEANUP
+
+AT_SETUP([Correlated random graphs (igraph_correlated_game):])
+AT_KEYWORDS([correlated random graph])
+AT_COMPILE_CHECK([simple/igraph_correlated_game.c])
+AT_CLEANUP

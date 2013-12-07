@@ -335,6 +335,20 @@ igraph_hsbm_list_game:
         GATTR-PARAM-R: p
         IGNORE: RNamespace
 
+igraph_correlated_game:
+        PARAMS: GRAPH old_graph, OUT GRAPH new_graph, \
+                REAL corr, REAL p=old.graph$p, VECTORM1_OR_0 permutation=NULL
+        NAME-R: correlated.game
+        GATTR-R: name IS Correlated random graph
+        GATTR-PARAM-R: corr, p
+        DEFAULT-R: p=old.graph$p
+
+igraph_correlated_pair_game:
+        PARAMS: OUT GRAPH graph1, OUT GRAPH graph2, INT n, REAL corr, \
+                REAL p, BOOLEAN directed=False, \
+                VECTORM1_OR_0 permutation=NULL
+        NAME-R: correlated.pair.game
+
 #######################################
 # Basic query functions
 #######################################
