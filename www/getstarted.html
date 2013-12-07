@@ -150,8 +150,76 @@ library(igraph)
             Start with Python igraph</h1>
         </div>
 
+        <h3><span id="pyreq" class="anchor">&nbsp;</span>Requirements</h3>
+        <p>On Linux (and other Unix-like systems), you will need a C and a C++
+          compiler, the tool <code>make</code> and the development header files
+          for your version of Python. On Debian and Ubuntu Linux the
+          <code>build-essential</code> and <code>python-dev</code> packages install
+          these. On Mac OS X, you can get a working C and C++ compiler as well as
+          <code>make</code> by installing XCode or the XCode Command Line Tools.
+        </p>
+        <p>See also the platform-specific installation instructions below.</p>
+
+        <h3><span id="pyinstall" class="anchor">&nbsp;</span>
+           Installation</h3>
         <p>
-          TODO
+          igraph is on the <a href="http://pypi.python.org/pypi/python-igraph">Python
+          Package Index</a> so it can be installed using <code>pip</code> or
+          <code>easy_install</code>:
+        </p>
+        <p>
+        {% highlight console %}
+$ pip install python-igraph
+{% endhighlight %}
+        </p>
+        <p>If the C core of igraph has already been installed to a
+        location that can be detected using <code>pkg-config</code>,
+        <code>pip</code> will compile and link the extension to the
+        C core that you have installed. If the C core is not installed
+        or is installed in a location that cannot be detected using
+        <code>pkg-config</code>, <code>pip</code> will attempt to
+        download a matching version of the C core and compile it together
+        with the Python interface. Note that this will not work on Windows;
+        you are advised to download and run one of the MSI installers that
+        we provide on the <a href="http://pypi.python.org/pypi/python-igraph">Python
+        Package Index</a>.
+        </p>
+
+        <h3><span id="pyinstallosx" class="anchor">&nbsp;</span>
+          Installation on Mac OS X</h3>
+        <p>
+        Instead of letting <code>pip</code> compile the C core for you,
+        you can install <a href="http://brew.sh/">Homebrew</a> and
+        the <code>homebrew/science/igraph</code> formula. This will ensure
+        that the C core is found by <code>pip</code> so running
+        <code>pip install python-igraph</code> will compile the Python interface
+        only and link it to the C core.
+        </p>
+
+        <h3><span id="pyinstallwin" class="anchor">&nbsp;</span>
+          Installation on Windows</h3>
+        <p>
+          The preferred way to install the Python interface on Windows is to
+          download one of the MSI installers from the
+          <a href="http://pypi.python.org/python-igraph">Python Package Index</a>.
+          If you do not find an installer that is suitable for your specific
+          version of Python, you can also try one of the unofficial installers built by
+          <a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/">Christoph Gohlke</a>.
+          (Thanks Christoph!). Note that the automatic compilation of the C core
+          when running <code>pip install python-igraph</code> will <em>not</em>
+          work on Windows!
+        </p>
+
+        <h3><span id="pydoc1" class="anchor">&nbsp;</span>Tutorials</h3>
+
+        <p>
+          <ul>
+            <li>A short tutorial is provided on <a href="http://igraph.org/doc/python/tutorial/tutorial.html">this page</a>.</li>
+            <li>The documentation of the <a href="http://igraph.org/doc/python/igraph.Graph-class.html">Graph</a> and
+            <a href="http://igraph.org/doc/python/igraph.GraphBase-class.html">GraphBase</a>
+            classes provide a good overview of most of the functionality in the
+            Python interface.</li>
+          </ul>
         </p>
 
         <div class="page-header">
