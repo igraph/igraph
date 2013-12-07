@@ -78,7 +78,8 @@ export(erdos.renyi.game, random.graph.game, degree.sequence.game,
        callaway.traits.game, establishment.game, grg.game,
        preference.game, asymmetric.preference.game, connect.neighborhood,
        rewire.edges, watts.strogatz.game, lastcit.game, cited.type.game,
-       citing.cited.type.game, bipartite.random.game, hsbm.game)
+       citing.cited.type.game, bipartite.random.game, hsbm.game,
+       correlated.game, correlated.pair.game)
 
 # community structure
 
