@@ -1,6 +1,8 @@
 
 all: nothing
 
+VERSION=$(shell ../tools/getversion.sh)
+
 HTML= index.html getstarted.html news.html \
       _layouts/default.html _layouts/newstemp.html _layouts/manual.html
 
@@ -49,6 +51,8 @@ doc/r/igraph.pdf: $(RMAN)
 	  ../interfaces/R/igraph
 
 ../interfaces/python/doc/api/pdf/api.pdf:
+	cd ../interfaces/python && python setup.py build \
+		--c-core-url=http://igraph.org/nightly/get/c/igraph-$(VERSION).tar.gz
 	cd ../interfaces/python && scripts/mkdoc.sh
 
 doc/python/python-igraph.pdf: ../interfaces/python/doc/api/pdf/api.pdf
