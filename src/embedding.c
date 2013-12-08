@@ -24,6 +24,7 @@
 #include "igraph_embedding.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
+#include "igraph_random.h"
 
 typedef struct {
   const igraph_vector_t *cvec;
@@ -136,5 +137,75 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   igraph_vector_destroy(&tmp);
   IGRAPH_FINALLY_CLEAN(1);
 	
+  return 0;
+}
+
+igraph_real_t igraph_i_vector_mean(const igraph_vector_t *v, int from,
+				   int to) {
+  igraph_real_t res=0.0;
+  int n=to-from+1;
+  for (; from <= to; from++) { res += VECTOR(*v)[from]; }
+  return res / n;
+}
+
+igraph_real_t igraph_i_vector_var(const igraph_vector_t *v, int from,
+				  int to, igraph_real_t mean) {
+
+  igraph_real_t res=0.0;
+  int n=to-from+1;
+  if (n==1) return 0.0;
+  for (; from <= to; from++) {
+    res += (mean-VECTOR(*v)[from]) * (mean-VECTOR(*v)[from]);
+  }
+  return res / (n-1);
+}
+
+igraph_real_t igraph_i_vector_log_dnorm(const igraph_vector_t *v, int from,
+					int to, igraph_real_t mean,
+					igraph_real_t sd) {
+  igraph_real_t res=0.0;
+  for (; from <= to; from++) {
+    res += igraph_dnorm(VECTOR(*v)[from], mean, sd, /*give_log=*/ 1);
+  }
+
+  return res;
+}
+
+int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim) {
+
+  int n=igraph_vector_size(sv);
+  int i;
+  igraph_real_t mean1, mean2, var1, var2, sd, profile;
+  igraph_real_t max=IGRAPH_NEGINFINITY;
+
+  if (n==0) {
+    IGRAPH_ERROR("Need at least one singular value for dimensionality "
+		 "selection", IGRAPH_EINVAL);
+  }
+  if (n==1) { *dim=1; return 0; }
+
+  for (i = 0; i < n-1; i++) {
+    mean1 = igraph_i_vector_mean(sv, 0, i);
+    mean2 = igraph_i_vector_mean(sv, i+1, n-1);
+    var1 = igraph_i_vector_var(sv, 0, i, mean1);
+    var2 = igraph_i_vector_var(sv, i+1, n-1, mean2);
+    sd = sqrt((i * var1 + (n-i-2) * var2) / (n-2));
+    profile =
+      igraph_i_vector_log_dnorm(sv, 0, i, mean1, sd) +
+      igraph_i_vector_log_dnorm(sv, i+1, n-1, mean2, sd);
+    if (profile > max) {
+      max=profile;
+      *dim=i+1;
+    }
+  }
+
+  mean1=igraph_i_vector_mean(sv, 0, n-1);
+  sd=sqrt(igraph_i_vector_var(sv, 0, n-1, mean1));
+  profile=igraph_i_vector_log_dnorm(sv, 0, n-1, mean1, sd);
+  if (profile > max) {
+    max=profile;
+    *dim=n;
+  }
+
   return 0;
 }

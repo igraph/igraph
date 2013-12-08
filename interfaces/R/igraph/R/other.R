@@ -64,28 +64,3 @@ igraph.i.spMatrix <- function(M) {
         factors=list(), i=M$i, p=M$p, x=M$x)
   }
 }
-
-dimSelect <- function(sv) {
-
-  n <- length(sv)
-  if (n == 1) return(1)
-
-  profile <- rep(0, n)
-  for (i in 1:(n-1)) {
-    sv.1 <- sv[1:i]
-    sv.2 <- sv[(i+1):n]
-    mean.1 <- mean(sv.1)
-    mean.2 <- mean(sv.2)
-    var.1 <- if (i == 1) 0 else var(sv.1)
-    var.2 <- if (i == n-1) 0 else var(sv.2)
-    sd <- sqrt(((i-1) * var.1 + (n-i-1) * var.2) / (n-2))
-
-    profile[i] <- sum(dnorm(sv.1, mean.1, sd, log=TRUE)) +
-      sum(dnorm(sv.2, mean.2, sd, log=TRUE))
-  }
-  mean <- mean(sv)
-  sd <- sd(sv)
-  profile[n] <- sum(dnorm(sv, mean, sd, log=TRUE))
-  p <- which.max(profile)
-  p
-}

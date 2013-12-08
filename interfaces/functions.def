@@ -1971,6 +1971,10 @@ igraph_convex_hull:
         PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
         NAME-R: convex.hull
 
+igraph_dim_select:
+        PARAMS: VECTOR sv, OUT INTEGERPTR dim
+        NAME-R: dimSelect
+
 #######################################
 # (R)evolver
 #######################################
