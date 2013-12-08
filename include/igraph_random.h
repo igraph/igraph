@@ -106,6 +106,9 @@ void PutRNGstate(void);
 #define RNG_BEGIN()    GetRNGstate()
 #define RNG_END()      PutRNGstate()
 
+double Rf_dnorm4(double x, double mu, double sigma, int give_log);
+#define igraph_dnorm Rf_dnorm4
+
 #else 
 
 #define RNG_BEGIN()      if (igraph_rng_default()->def==1) {	\
@@ -113,6 +116,8 @@ void PutRNGstate(void);
   igraph_rng_default()->def=2;					\
   }
 #define RNG_END()		/* do nothing */
+
+double igraph_dnorm(double x, double mu, double sigma, int give_log);
 
 #endif
 
