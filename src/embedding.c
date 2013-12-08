@@ -140,68 +140,62 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   return 0;
 }
 
-igraph_real_t igraph_i_vector_mean(const igraph_vector_t *v, int from,
-				   int to) {
-  igraph_real_t res=0.0;
-  int n=to-from+1;
-  for (; from <= to; from++) { res += VECTOR(*v)[from]; }
-  return res / n;
-}
-
-igraph_real_t igraph_i_vector_var(const igraph_vector_t *v, int from,
-				  int to, igraph_real_t mean) {
-
-  igraph_real_t res=0.0;
-  int n=to-from+1;
-  if (n==1) return 0.0;
-  for (; from <= to; from++) {
-    res += (mean-VECTOR(*v)[from]) * (mean-VECTOR(*v)[from]);
-  }
-  return res / (n-1);
-}
-
-igraph_real_t igraph_i_vector_log_dnorm(const igraph_vector_t *v, int from,
-					int to, igraph_real_t mean,
-					igraph_real_t sd) {
-  igraph_real_t res=0.0;
-  for (; from <= to; from++) {
-    res += igraph_dnorm(VECTOR(*v)[from], mean, sd, /*give_log=*/ 1);
-  }
-
-  return res;
-}
-
 int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim) {
 
-  int n=igraph_vector_size(sv);
-  int i;
-  igraph_real_t mean1, mean2, var1, var2, sd, profile;
-  igraph_real_t max=IGRAPH_NEGINFINITY;
+  int i, n=igraph_vector_size(sv);
+  igraph_real_t x, x2, sum1=0.0, sum2=igraph_vector_sum(sv);
+  igraph_real_t sumsq1=0.0, sumsq2=0.0; /* to be set */
+  igraph_real_t oldmean1, oldmean2, mean1=0.0, mean2=sum2/n;
+  igraph_real_t varsq1=0.0, varsq2=0.0; /* to be set */
+  igraph_real_t var1, var2, sd, profile, max=IGRAPH_NEGINFINITY;
 
   if (n==0) {
     IGRAPH_ERROR("Need at least one singular value for dimensionality "
 		 "selection", IGRAPH_EINVAL);
   }
+
   if (n==1) { *dim=1; return 0; }
 
+  for (i=0; i<n; i++) {
+    x=VECTOR(*sv)[i];
+    sumsq2 += x*x;
+    varsq2 += (mean2-x) * (mean2-x);
+  }
+
   for (i = 0; i < n-1; i++) {
-    mean1 = igraph_i_vector_mean(sv, 0, i);
-    mean2 = igraph_i_vector_mean(sv, i+1, n-1);
-    var1 = igraph_i_vector_var(sv, 0, i, mean1);
-    var2 = igraph_i_vector_var(sv, i+1, n-1, mean2);
-    sd = sqrt((i * var1 + (n-i-2) * var2) / (n-2));
-    profile =
-      igraph_i_vector_log_dnorm(sv, 0, i, mean1, sd) +
-      igraph_i_vector_log_dnorm(sv, i+1, n-1, mean2, sd);
+    int n1 = i+1, n2 = n-i-1, n1m1 = n1 - 1, n2m1 = n2-1;
+    x = VECTOR(*sv)[i]; x2 = x*x;
+    sum1 += x; sum2 -= x;
+    sumsq1 += x2; sumsq2 -= x2;
+    oldmean1 = mean1; oldmean2 = mean2;
+    mean1 = sum1 / n1; mean2 = sum2 / n2;
+    varsq1 += (x-oldmean1) * (x-mean1);
+    varsq2 -= (x-oldmean2) * (x-mean2);
+    var1 = i==0 ? 0 : varsq1 / n1m1;
+    var2 = i==n-2 ? 0 : varsq2 / n2m1;
+    sd = sqrt(( n1m1 * var1 + n2m1 * var2) / (n-2));
+    profile = /* - n * log(2.0*M_PI)/2.0 */ /* This is redundant */
+      - n * log(sd) -
+      ((sumsq1 - 2*mean1*sum1 + n1*mean1*mean1) +
+       (sumsq2 - 2*mean2*sum2 + n2*mean2*mean2)) / 2.0 / sd / sd;
     if (profile > max) {
       max=profile;
-      *dim=i+1;
+      *dim=n1;
     }
   }
 
-  mean1=igraph_i_vector_mean(sv, 0, n-1);
-  sd=sqrt(igraph_i_vector_var(sv, 0, n-1, mean1));
-  profile=igraph_i_vector_log_dnorm(sv, 0, n-1, mean1, sd);
+  /* Plus the last case, all elements in one group */
+  x = VECTOR(*sv)[n-1];
+  sum1 += x;
+  oldmean1 = mean1;
+  mean1 = sum1 / n;
+  sumsq1 += x * x;
+  varsq1 += (x-oldmean1) * (x-mean1);
+  var1 = varsq1 / (n-1);
+  sd=sqrt(var1);
+  profile= /* - n * log(2.0*M_PI)/2.0 */ /* This is redundant */
+    - n * log(sd) -
+    (sumsq1 - 2*mean1*sum1 + n*mean1*mean1) / 2.0 / sd / sd;
   if (profile > max) {
     max=profile;
     *dim=n;
