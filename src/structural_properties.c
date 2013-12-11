@@ -5225,12 +5225,19 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
   }
 
   igraph_vector_destroy(&dist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  if (!all_to) {
+    igraph_vit_destroy(&tovit);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
   igraph_vit_destroy(&fromvit);
   igraph_dqueue_destroy(&Q);
   igraph_vector_destroy(&clean_vertices);
   igraph_vector_destroy(&num_queued);
   igraph_lazy_inclist_destroy(&inclist);
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(5);
 
   return 0;
 }
