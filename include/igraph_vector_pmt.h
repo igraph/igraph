@@ -35,6 +35,8 @@ void FUNCTION(igraph_vector,destroy)(TYPE(igraph_vector)* v);
 
 long int FUNCTION(igraph_vector,capacity)(const TYPE(igraph_vector)*v);
 
+igraph_bool_t FUNCTION(igraph_vector,is_null)(const TYPE(igraph_vector)*v);
+int FUNCTION(igraph_vector,set_null)(TYPE(igraph_vector)*v);
 /*--------------------*/
 /* Accessing elements */
 /*--------------------*/

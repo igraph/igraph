@@ -38,6 +38,7 @@ int igraph_free(void *p);
 SEXP R_igraph_vector_to_SEXP(const igraph_vector_t *v);
 SEXP R_igraph_vector_int_to_SEXP(const igraph_vector_int_t *v);
 SEXP R_igraph_vector_int_to_SEXPp1(const igraph_vector_int_t *v);
+SEXP R_igraph_vector_int_to_SEXP_null(const igraph_vector_int_t *v);
 SEXP R_igraph_vector_bool_to_SEXP(const igraph_vector_bool_t *v);
 SEXP R_igraph_vector_long_to_SEXP(const igraph_vector_long_t *v);
 SEXP R_igraph_vector_complex_to_SEXP(const igraph_vector_complex_t* v);
@@ -83,6 +84,8 @@ int R_igraph_SEXP_to_vectorlist(SEXP vectorlist, igraph_vector_ptr_t *ptr);
 int R_SEXP_to_vector_bool(SEXP sv, igraph_vector_bool_t *v);
 int R_SEXP_to_vector_bool_copy(SEXP sv, igraph_vector_bool_t *v);
 int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v);
+int R_SEXP_to_vector_int_null(SEXP sv, igraph_vector_int_t *v);
+int R_SEXP_to_vector_int_copy_null(SEXP sv, igraph_vector_int_t *v);
 int R_SEXP_to_vector_long_copy(SEXP sv, igraph_vector_long_t *v);
 int R_SEXP_to_hrg(SEXP shrg, igraph_hrg_t *hrg);
 int R_SEXP_to_hrg_copy(SEXP shrg, igraph_hrg_t *hrg);
@@ -2183,6 +2186,20 @@ SEXP R_igraph_vector_int_to_SEXP(const igraph_vector_int_t *v) {
   return result;
 }
 
+SEXP R_igraph_vector_int_to_SEXP_null(const igraph_vector_int_t *v) {
+  SEXP result;
+
+  if (igraph_vector_int_is_null(v)) {
+    PROTECT(result=R_NilValue);
+  } else {
+    PROTECT(result=NEW_INTEGER(igraph_vector_int_size(v)));
+    igraph_vector_int_copy_to(v, INTEGER(result));
+  }
+
+  UNPROTECT(1);
+  return result;
+}
+
 SEXP R_igraph_vector_to_SEXPp1(const igraph_vector_t *v) {
   SEXP result;
   long int i, n=igraph_vector_size(v);
@@ -2426,11 +2443,11 @@ SEXP R_igraph_strvector_to_SEXP(const igraph_strvector_t *m) {
 
 SEXP R_igraph_to_SEXP(const igraph_t *graph) {
   
-  SEXP result;
+  SEXP result, time;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   
-  PROTECT(result=NEW_LIST(9));
+  PROTECT(result=NEW_LIST(10));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
   SET_VECTOR_ELT(result, 1, NEW_LOGICAL(1));
   SET_VECTOR_ELT(result, 2, NEW_NUMERIC(no_of_edges));
@@ -2460,8 +2477,16 @@ SEXP R_igraph_to_SEXP(const igraph_t *graph) {
   /* Attributes */
   SET_VECTOR_ELT(result, 8, graph->attr);
   REAL(VECTOR_ELT(graph->attr, 0))[0] += 1;
+
+  /* Time labels */
+  PROTECT(time=NEW_LIST(4));
+  SET_VECTOR_ELT(time, 0, R_igraph_vector_int_to_SEXP_null(&graph->vb));
+  SET_VECTOR_ELT(time, 1, R_igraph_vector_int_to_SEXP_null(&graph->eb));
+  SET_VECTOR_ELT(time, 2, R_igraph_vector_int_to_SEXP_null(&graph->vd));
+  SET_VECTOR_ELT(time, 3, R_igraph_vector_int_to_SEXP_null(&graph->ed));
+  SET_VECTOR_ELT(result, 9, time);
   
-  UNPROTECT(1);
+  UNPROTECT(2);
   return result;
 }
 
@@ -2925,6 +2950,31 @@ int R_SEXP_to_vector_int(SEXP sv, igraph_vector_int_t *v) {
   return 0;
 }
 
+int R_SEXP_to_vector_int_null(SEXP sv, igraph_vector_int_t *v) {
+  if (isNull(sv)) {
+    igraph_vector_int_set_null(v);
+  } else {
+    v->stor_begin=(int*) INTEGER(sv);
+    v->stor_end=v->stor_begin+GET_LENGTH(sv);
+    v->end=v->stor_end;
+  }
+  return 0;
+}
+
+int R_SEXP_to_vector_int_copy_null(SEXP sv, igraph_vector_int_t *v) {
+  if (isNull(sv)) {
+    igraph_vector_int_set_null(v);
+  } else {
+    long int i, n=GET_LENGTH(sv);
+    int *svv=INTEGER(sv);
+    igraph_vector_int_init(v, n);
+    for (i=0; i<n; i++) {
+      VECTOR(*v)[i] = (long int) svv[i];
+    }
+  }
+  return 0;
+}
+
 int R_SEXP_to_vector_long_copy(SEXP sv, igraph_vector_long_t *v) {
   long int i, n=GET_LENGTH(sv);
   double *svv=REAL(sv);
@@ -3001,6 +3051,8 @@ int R_igraph_SEXP_to_array3_copy(SEXP rval, igraph_array3_t *a) {
 }
 
 int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
+
+  SEXP time;
   
   res->n=(igraph_integer_t) REAL(VECTOR_ELT(graph, 0))[0];
   res->directed=LOGICAL(VECTOR_ELT(graph, 1))[0];
@@ -3015,12 +3067,21 @@ int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
   REAL(VECTOR_ELT(VECTOR_ELT(graph, 8), 0))[0] = 1; /* R objects refcount */
   REAL(VECTOR_ELT(VECTOR_ELT(graph, 8), 0))[1] = 0; /* igraph_t objects */
   res->attr=VECTOR_ELT(graph, 8);
-  
+
+  /* time labels */
+  time=VECTOR_ELT(graph, 9);
+  R_SEXP_to_vector_int_null(VECTOR_ELT(time, 0), &res->vb);
+  R_SEXP_to_vector_int_null(VECTOR_ELT(time, 1), &res->eb);
+  R_SEXP_to_vector_int_null(VECTOR_ELT(time, 2), &res->vd);
+  R_SEXP_to_vector_int_null(VECTOR_ELT(time, 3), &res->ed);
+
   return 0;
 }
 
 int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
-  
+
+  SEXP time;
+
   res->n=(igraph_integer_t) REAL(VECTOR_ELT(graph, 0))[0];
   res->directed=LOGICAL(VECTOR_ELT(graph, 1))[0];
   igraph_vector_init_copy(&res->from, REAL(VECTOR_ELT(graph, 2)), 
@@ -3040,6 +3101,13 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
   REAL(VECTOR_ELT(VECTOR_ELT(graph, 8), 0))[0] = 1; /* R objects */
   REAL(VECTOR_ELT(VECTOR_ELT(graph, 8), 0))[1] = 1; /* igraph_t objects */
   PROTECT(res->attr=VECTOR_ELT(graph, 8));  
+
+  /* time labels */
+  time=VECTOR_ELT(graph, 9);
+  R_SEXP_to_vector_int_copy_null(VECTOR_ELT(time, 0), &res->vb);
+  R_SEXP_to_vector_int_copy_null(VECTOR_ELT(time, 1), &res->eb);
+  R_SEXP_to_vector_int_copy_null(VECTOR_ELT(time, 2), &res->vd);
+  R_SEXP_to_vector_int_copy_null(VECTOR_ELT(time, 3), &res->ed);
 
   return 0;
 }

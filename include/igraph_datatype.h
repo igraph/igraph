@@ -84,6 +84,10 @@ typedef struct igraph_s {
   igraph_vector_t ii;
   igraph_vector_t os;
   igraph_vector_t is;
+  igraph_vector_int_t vb;
+  igraph_vector_int_t eb;
+  igraph_vector_int_t vd;
+  igraph_vector_int_t ed;
   void *attr;
 } igraph_t;
 

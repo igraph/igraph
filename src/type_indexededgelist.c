@@ -133,6 +133,12 @@ int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t direct
   VECTOR(graph->os)[0]=0;
   VECTOR(graph->is)[0]=0;
 
+  /* time labels */
+  igraph_vector_int_set_null(&graph->vb);
+  igraph_vector_int_set_null(&graph->eb);
+  igraph_vector_int_set_null(&graph->vd);
+  igraph_vector_int_set_null(&graph->ed);
+
   /* init attributes */
   graph->attr=0;
   IGRAPH_CHECK(igraph_i_attribute_init(graph, attr));
@@ -171,6 +177,12 @@ int igraph_destroy(igraph_t *graph) {
   igraph_vector_destroy(&graph->ii);
   igraph_vector_destroy(&graph->os);
   igraph_vector_destroy(&graph->is);
+
+  /* time labels */
+  igraph_vector_int_destroy(&graph->vb);
+  igraph_vector_int_destroy(&graph->eb);
+  igraph_vector_int_destroy(&graph->vd);
+  igraph_vector_int_destroy(&graph->ed);
   
   return 0;
 }
@@ -202,6 +214,7 @@ int igraph_destroy(igraph_t *graph) {
  */
 
 int igraph_copy(igraph_t *to, const igraph_t *from) {
+
   to->n=from->n;
   to->directed=from->directed;
   IGRAPH_CHECK(igraph_vector_copy(&to->from, &from->from));
@@ -219,7 +232,18 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
 
   IGRAPH_I_ATTRIBUTE_COPY(to, from, 1,1,1); /* does IGRAPH_CHECK */
 
-  IGRAPH_FINALLY_CLEAN(6);
+  /* time labels */
+
+  IGRAPH_CHECK(igraph_vector_int_copy(&to->vb, &from->vb));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &to->vb);
+  IGRAPH_CHECK(igraph_vector_int_copy(&to->eb, &from->eb));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &to->eb);
+  IGRAPH_CHECK(igraph_vector_int_copy(&to->vd, &from->vd));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &to->vd);
+  IGRAPH_CHECK(igraph_vector_int_copy(&to->ed, &from->ed));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &to->ed);
+
+  IGRAPH_FINALLY_CLEAN(10);
   return 0;
 }
 
@@ -328,6 +352,8 @@ int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
   igraph_i_create_start(&graph->os, &graph->from, &newoi, graph->n);
   igraph_i_create_start(&graph->is, &graph->to  , &newii, graph->n);
 
+  /* TODO: time labels */
+
   /* everything went fine  */
   igraph_vector_destroy(&graph->oi);
   igraph_vector_destroy(&graph->ii);
@@ -384,6 +410,8 @@ int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
   if (graph->attr) {
     IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv, attr));
   }
+
+  /* TODO: time labels */
 
   return 0;
 }
@@ -498,6 +526,8 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
   igraph_i_create_start(&graph->is, &graph->to,   &graph->ii, 
 			(igraph_integer_t) no_of_nodes);
   
+  /* TODO: time labels */
+
   /* Nothing to deallocate... */
   return 0;
 }
@@ -542,7 +572,7 @@ int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
   igraph_vector_t edge_recoding, vertex_recoding;
   igraph_vector_t *my_vertex_recoding=&vertex_recoding;
   igraph_vit_t vit;
-  igraph_t newgraph;
+  igraph_t newgraph = *graph;
   long int i, j;
   long int remaining_vertices, remaining_edges;
 
@@ -587,9 +617,8 @@ int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
     } 
   }
 
-  /* start creating the graph */
+  /* start creating the graph, directed was copied already */
   newgraph.n=(igraph_integer_t) remaining_vertices;
-  newgraph.directed=graph->directed;  
 
   /* allocate vectors */
   IGRAPH_VECTOR_INIT_FINALLY(&newgraph.from, remaining_edges);
@@ -669,6 +698,8 @@ int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices,
       }
     }
   }
+
+  /* TODO: time labels */
 
   if (!idx) {
     igraph_vector_destroy(my_vertex_recoding);

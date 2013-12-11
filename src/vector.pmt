@@ -399,6 +399,15 @@ long int FUNCTION(igraph_vector,capacity)(const TYPE(igraph_vector)*v) {
   return v->stor_end - v->stor_begin;
 }
 
+int FUNCTION(igraph_vector,set_null)(TYPE(igraph_vector)*v) {
+  v->stor_begin = v->stor_end = v->end = 0;
+  return 0;
+}
+
+igraph_bool_t FUNCTION(igraph_vector,is_null)(const TYPE(igraph_vector)*v) {
+  return v->stor_begin == 0;
+}
+
 /**
  * \ingroup vector
  * \function igraph_vector_reserve
@@ -1116,15 +1125,18 @@ void FUNCTION(igraph_vector,copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
 int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to, 
 				 const TYPE(igraph_vector) *from) {
   assert(from != NULL);
-  assert(from->stor_begin != NULL);
-  to->stor_begin=igraph_Calloc(FUNCTION(igraph_vector,size)(from), BASE);
-  if (to->stor_begin==0) {
-    IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
+  if (from->stor_begin != 0) {
+    to->stor_begin=igraph_Calloc(FUNCTION(igraph_vector,size)(from), BASE);
+    if (to->stor_begin==0) {
+      IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
+    }
+    to->stor_end=to->stor_begin+FUNCTION(igraph_vector,size)(from);
+    to->end=to->stor_end;
+    memcpy(to->stor_begin, from->stor_begin,
+	   (size_t) FUNCTION(igraph_vector,size)(from) * sizeof(BASE));
+  } else {
+    to->stor_begin = to->stor_end = to->end = 0;
   }
-  to->stor_end=to->stor_begin+FUNCTION(igraph_vector,size)(from);
-  to->end=to->stor_end;
-  memcpy(to->stor_begin, from->stor_begin, 
-	 (size_t) FUNCTION(igraph_vector,size)(from) * sizeof(BASE));
   
   return 0;
 }
