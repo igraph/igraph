@@ -201,8 +201,7 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
     if (!diag) { el <- el[ el[,1] != el[,2], ] }      
   } else if (mode == "undirected") {
     ## UNDIRECTED, must be symmetric if weighted
-    if (!is.null(weighted) &&
-        Matrix::isSymmetric(adjmatrix)) {
+    if (!is.null(weighted) && !Matrix::isSymmetric(adjmatrix)) {
       stop("Please supply a symmetric matrix if you want to create a weighted graph with mode=UNDIRECTED.")
     }
     if (diag) {
