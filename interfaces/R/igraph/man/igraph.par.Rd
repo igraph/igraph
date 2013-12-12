@@ -47,6 +47,10 @@ igraph.par(parid, parvalue = NULL)
     \item{add.vertex.names}{Logical scalar, whether to add
       vertex names to node level indices, like degree, betweenness
       scores, etc. By default it is \code{TRUE}.}
+    \item{annotate.plot}{Logical scalar, whether to annotate igraph
+      plots with the graph's name (\code{name} graph attribute, if
+      present) as \code{main}, and with the number of vertices and edges
+      as \code{xlab}. Defaults to \code{FALSE}.}
     \item{dend.plot.type}{The plotting function to use when plotting
       community structure dendrograms via
       \code{\link{dendPlot}}}. Possible values are \sQuote{auto} (the

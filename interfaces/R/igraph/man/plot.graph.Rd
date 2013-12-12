@@ -6,8 +6,8 @@
   device. It is the non-interactive companion of the \code{tkplot}
   function.}
 \usage{
-\S3method{plot}{igraph}(x, axes=FALSE, xlab="", ylab="", add=FALSE,
-      xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
+\S3method{plot}{igraph}(x, axes=FALSE, add=FALSE,
+      xlim=c(-1,1), ylim=c(-1,1),
       mark.groups=list(), mark.shape=1/2, 
       mark.col=rainbow(length(mark.groups), alpha=0.3),
       mark.border=rainbow(length(mark.groups), alpha=1),
@@ -16,17 +16,12 @@
 \arguments{
   \item{x}{The graph to plot.}
   \item{axes}{Logical, whether to plot axes, defaults to FALSE.}
-  \item{xlab}{The label of the horizontal axis. Defaults to the empty string.}
-  \item{ylab}{The label of the vertical axis. Defaults to the empty
-    string.}
   \item{add}{Logical scalar, whether to add the plot to the current
     device, or delete the device's current contents first.}
   \item{xlim}{The limits for the horizontal axis, it is unlikely that
     you want to modify this.}
   \item{ylim}{The limits for the vertical axis, it is unlikely that you
     want to modify this.}
-  \item{main}{Main title.}
-  \item{sub}{Subtitle.}
   \item{mark.groups}{A list of vertex id vectors. It is interpreted as a
     set of vertex groups. Each vertex group is highlighted, by plotting
     a colored smoothed polygon around and \dQuote{under} it. See the

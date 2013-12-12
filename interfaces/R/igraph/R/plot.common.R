@@ -163,6 +163,23 @@ i.get.arrow.mode <- function(graph, arrow.mode=NULL) {
   arrow.mode
 }
 
+i.get.main <- function(graph) {
+  if (getIgraphOpt("annotate.plot")) {
+    n <- graph$name[1]
+    n
+  } else {
+    ""
+  }
+}
+
+i.get.xlab <- function(graph) {
+  if (getIgraphOpt("annotate.plot")) {
+    paste(vcount(graph), "vertices,", ecount(graph), "edges")
+  } else {
+    ""
+  }
+}
+
 igraph.check.shapes <- function(x) {
   xx <- unique(x)
   bad.shapes <- ! xx %in% ls(.igraph.shapes)
@@ -926,7 +943,11 @@ i.plot.default <- list(layout=layout.auto,
                        margin=c(0,0,0,0),
                        rescale=TRUE,
                        asp=1,
-                       frame=FALSE)
+                       frame=FALSE,
+                       main=i.get.main,
+                       sub="",
+                       xlab=i.get.xlab,
+                       ylab="")
 
 i.default.values <- new.env()
 
