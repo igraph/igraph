@@ -79,6 +79,10 @@ int PyString_IsEqualToASCIIString(PyObject* py_string,
 #  define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
 #endif
 
+#ifndef Py_hash_t
+#  define Py_hash_t long
+#endif
+
 #endif
 
 char* PyString_CopyAsString(PyObject* string);

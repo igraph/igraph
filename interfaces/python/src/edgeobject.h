@@ -25,6 +25,7 @@
 
 #include <Python.h>
 #include "graphobject.h"
+#include "py2compat.h"
 
 /**
  * \ingroup python_interface_edge
@@ -34,6 +35,7 @@ typedef struct {
   PyObject_HEAD
   igraphmodule_GraphObject* gref;
   igraph_integer_t idx;
+  Py_hash_t hash;
 } igraphmodule_EdgeObject;
 
 int igraphmodule_Edge_clear(igraphmodule_EdgeObject *self);
