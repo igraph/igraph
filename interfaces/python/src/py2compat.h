@@ -30,6 +30,11 @@
 /* Common utility functions */
 int PyFile_Close(PyObject* fileObj);
 
+/* Compatibility hacks */
+#ifndef Py_hash_t
+#  define Py_hash_t long
+#endif
+
 #if PY_MAJOR_VERSION >= 3
 
 /* Python 3.x-specific part follows here */
@@ -77,10 +82,6 @@ int PyString_IsEqualToASCIIString(PyObject* py_string,
 
 #ifndef PyVarObject_HEAD_INIT
 #  define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
-#endif
-
-#ifndef Py_hash_t
-#  define Py_hash_t long
 #endif
 
 #endif
