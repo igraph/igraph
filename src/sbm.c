@@ -547,6 +547,8 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     }
   }
   
+  RNG_END();
+
   igraph_create(graph, &edges, n, /*directed=*/ 0);
 
   igraph_vector_destroy(&edges);
