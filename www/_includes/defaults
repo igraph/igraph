@@ -4,8 +4,10 @@
 {% assign title = page.title %}
 {% assign mainheader = page.mainheader %}
 {% assign lead = page.lead %}
+{% assign langname = 'igraph' %}
 
 {% if lang == "python" %}
+
   {% assign langname = 'python-igraph' %}
   {% if title == nil %}{% assign title = 'python-igraph' %}{% endif %}
   {% assign extramenu = '<li><a href="/python"><i class="icon-python"></i> Get started</a></li>' %}
@@ -15,9 +17,9 @@
   {% if lead == nil %}
     {% assign lead = 'Install and start using igraph from Python' %}
   {% endif %}
-{% endif %}
 
-{% if lang == "r" %}
+{% elsif lang == "r" %}
+
   {% assign langname = 'igraph R package' %}
   {% if title == nil %}{% assign title = 'igraph R package' %}{% endif %}
   {% assign extramenu = '<li><a href="/r"><i class="icon-rlogo"></i> Get started</a></li>' %}
@@ -27,9 +29,9 @@
   {% if lead == nil %}
     {% assign lead = 'Install and start using the igraph R package' %}
   {% endif %}
-{% endif %}
 
-{% if lang == "c" %}
+{% elsif lang == "c" %}
+
   {% assign bodyclass = "cc" %}
   {% assign langname = 'igraph library' %}
   {% if title == nil %}{% assign title = 'igraph library' %}{% endif %}
@@ -40,10 +42,14 @@
   {% if lead == nil %}
     {% assign lead = 'Install and start using the igraph C library' %}
   {% endif %}
-{% endif %}
 
-{% if lang == "index.html" %}
-  {% assign langname = "igraph" %}
+{% elsif lang == "index.html" %}
+
   {% assign bodyclass = "start-page" %}
-  {% assign title = page.title %}
+
+{% else %}
+  
+  {% assign lang = '' %}
+  {% assign bodyclass = "" %}
+
 {% endif %}

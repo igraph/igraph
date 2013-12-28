@@ -53,7 +53,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-left">
 	    {{ extramenu }}
-	    {% if lang != "index.html" %}
+	    {% if lang == "r" or lang == "python" or land == "c" %}
             <li>
               <a href="/{{ lang }}/news.html"><i class="icon-rss"></i>
 		News</a></li>
@@ -62,14 +62,14 @@
 	    <li><a href="https://github.com/igraph/igraph">
 		<i class="icon-github"></i> On github</a></li>
           </ul>
-          <form class="navbar-form navbar-right">
-            <div class="form-group">
-              <input type="text" placeholder="Search docs"
-		     class="form-control" size="15">
-            </div>
-            <button type="submit" class="btn btn-success">
-              <span class="glyphicon glyphicon-search"></span></button>
-          </form>
+          <!-- <form class="navbar-form navbar-right"> -->
+          <!--   <div class="form-group"> -->
+          <!--     <input type="text" placeholder="Search docs" -->
+	  <!-- 	     class="form-control" size="15"> -->
+          <!--   </div> -->
+          <!--   <button type="submit" class="btn btn-success"> -->
+          <!--     <span class="glyphicon glyphicon-search"></span></button> -->
+          <!-- </form> -->
         </div><!--/.navbar-collapse -->
       </div>
     </div>
@@ -93,8 +93,8 @@
       <div class="row">
         <div class="col-xs-12">
           <p class="text-muted credit">
-            Latest: igraph {% include igraph-version %}
-            &bull; &copy; 2003 &ndash; 2013 The igraph core team.
+            <!-- Latest: igraph {% include igraph-version %} &bull;  -->
+	    &copy; 2003 &ndash; 2013 The igraph core team.
             &bull; Code licensed under 
             <a href="http://www.gnu.org/licenses/gpl-2.0.html">
             GNU GPL 2</a> or later, documentation under 
