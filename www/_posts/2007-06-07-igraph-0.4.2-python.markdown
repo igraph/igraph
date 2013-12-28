@@ -1,0 +1,17 @@
+---
+layout: pynewstemp
+title: igraph 0.4.2
+date: June 7, 2007
+category: python
+---
+
+igraph 0.4.2
+=========
+
+June 7, 2007
+
+This is another bugfix release. Some other bits added:
+
+- circular Reingold-Tilford layout generator for trees
+- corrected a bug, Pajek files are written properly under MS Windows now.
+

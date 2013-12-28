@@ -1,0 +1,23 @@
+---
+layout: cnewstemp
+title: igraph 0.4.5
+date: January 1, 2008
+category: c
+---
+
+igraph 0.4.5
+=========
+
+January 1, 2008
+
+New:
+
+- Biconnected components and articulation points.
+
+New in the C library:
+
+- `igraph_vector_bool_t` data type.
+
+Bug fixed:
+
+- Erdos-Renyi random graph generators rewritten.

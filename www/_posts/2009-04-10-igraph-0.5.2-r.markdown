@@ -1,0 +1,127 @@
+---
+layout: rnewstemp
+title: igraph 0.5.2
+date: April 10, 2009
+category: r
+---
+
+igraph 0.5.2
+============
+
+April 10, 2009
+
+Release Notes
+-------------
+
+This is another bug fix release, with a couple of new features. Here
+are the important ones. See at the end for the complete list of changes.
+
+## Bipartite graphs
+
+Bipartite graphs have two kinds of vertices and edges are only allowed
+to connect opposite kinds. Think of the Hollywood movie graph with
+actors and movies. igraph 0.5.2 now contains some functions to deal
+with these kind of networks.
+
+<!--more-->
+
+## The label propagation community finding algorithm
+
+This is a simple and intuitive community finding algorithm, published
+by Raghavan et al. in 2007 (see docs for full citation). It works by
+assigning labels to the vertices and then updating the labels based on
+majority voting among the neighbors.
+
+## 3D version of the DrL layout generator
+
+The DrL layout generator was extended to generate three dimensional
+layouts. Albeit slower than the regular 2D version, this is a nice
+addition for those who do visualization in 3D.
+
+## R GUI (limited)
+
+A minimal, supported GUI is included now in the R package. It contains
+only a small fraction of igraph capabilities, but can be still useful,
+e.g. in teaching. You can start it by typing `tkigraph()`,
+after loading the igraph package of course.
+
+## Johnson's shortest path algorithm
+
+Johnson's algorithm is a good choice for finding all shortest paths in
+a network that has some negative edge weights, but no negative
+cycles.
+
+## Average nearest neighbor degree
+
+A new function was added to calculate the average degree of the
+neighbors of all or some vertices. It supports the edge weighted
+version of the measure as well.
+
+## Curved edges in R plots
+
+Both `plot()` and `tkplot()` supports curved
+edges. See `?igraph.plotting` for more details.
+
+## Several bugs and memory leaks corrected
+
+Apart from the bug fixes, some functions were rewritten to speed them up.
+
+New in the R interface
+----------------------
+
+- Added progress bar support to `beweenness()` and
+  `betweenness.estimate()`, `layout.drl()`
+- Speeded up betweenness estimation
+- Speeded up `are.connected()`
+- Johnson's shortest paths algorithm added
+- `shortest.paths()` has now an `algorithm` argument to choose from the
+  various implementations manually
+- Always quote symbolic vertex names when printing graphs or edges
+- Average nearest neighbor degree calculation, `graph.knn()`
+- Weighted degree (also called strength) calculation, `graph.strength()`
+- Some new functions to support bipartite graphs: `graph.bipartite()`,
+  `is.bipartite()`, `get.indicence()`, `graph.incidence()`,
+  `bipartite.projection()`, `bipartite.projection.size()`
+- Support for plotting curved edges with `plot.igraph()` and `tkplot()`
+- Added support for weighted graphs in `alpha.centrality()`
+- Added the label propagation community detection algorithm by
+  Raghavan et al., `label.propagation.community()`
+- `cohesive.blocks()` now has a `cutsetHeuristic` argument to choose
+  between two cutset algorithms
+- Added a function to "unfold" a tree, `unfold.tree()`
+- New `tkplot()` arguments to change the drawing area
+- Added a minimal GUI, invoke it with `tkigraph()`
+- The DrL layout generator, `layout.drl()` has a three dimensional mode
+  now.
+
+Bugs corrected in the R interface
+---------------------------------
+
+- Fixed a bug in VF2 graph isomorphism functions
+- Fixed a bug when a sparse adjacency matrix was requested in
+  `get.adjacency()` and the graph was named
+- VL graph generator in `degree.sequence.game()` checks now that
+  the sum of the degrees is even
+- Many fixes for supporting various compilers, e.g. GCC 4.4 and Sun's
+  C compiler
+- Fixed memory leaks in `graph.automorphisms()`, Bellman-Ford
+  `shortest.paths()`, `independent.vertex.sets()`
+- Fix a bug when a graph was imported from LGL and exported to NCOL
+  format (\#289596)
+- `cohesive.blocks()` creates its temporary file in the session
+  temporary directory
+- `write.graph()` and `read.graph()` now give error messages when unknown
+  arguments are given
+- The GraphML reader checks the name of the attributes to avoid adding
+  a duplicate `id` attribute
+- It is possible to change the `ncv` ARPACK parameter for
+  `leading.eigenvector.community()`
+- Fixed a bug in `path.length.hist()`, `unconnected` was wrong
+  for unconnected and undirected graphs
+- Better handling of attribute assingment via iterators, this is now
+  also clarified in the manual
+- Better error messages for unknown vertex shapes
+- Make R package unload cleanly if `unloadNamespace()` is used
+- Fixed a bug in plotting square shaped vertices (\#325244)
+- Fixed a bug in `graph.adjacency()` when the matrix is a sparse matrix
+  of class `dgTMatrix`

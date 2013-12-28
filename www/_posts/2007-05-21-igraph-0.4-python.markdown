@@ -1,0 +1,58 @@
+---
+layout: pynewstemp
+title: igraph 0.4
+date: May 21, 2007
+category: python
+---
+
+igraph 0.4
+=========
+
+May 21, 2007
+
+The major new additions in this release is a bunch of community
+detection algorithms and support for the GML file format. Here 
+is the complete list of changes:
+
+<!--more-->
+
+New in the C library
+--------------------
+
+- internal representation changed
+- `igraph_neighbors` always returns an ordered list
+- `igraph_is_loop` and `igraph_is_multiple` added
+
+- topological sorting
+- VF2 isomorphism algorithm
+- support for reading the file format of the Graph Database for isomorphism
+- `igraph_mincut` cat calculate the actual minimum cut
+- girth calculation added, thanks to Keith Briggs
+- support for reading and writing GML files
+
+- Walktrap community detection algorithm added, thanks to Matthieu Latapy 
+  and Pascal Pons
+- edge betweenness based community detection algorithm added
+- fast greedy algorithm for community detection by Clauset et al. added
+  thanks to Aaron Clauset for sharing his code
+- leading eigenvector community detection algorithm by Mark Newman added
+- `igraph_community_to_membership` supporting function added, creates 
+  a membership vector from a community structure merge tree
+- modularity calculation added
+
+Others
+------
+
+- proper support for Debian packages (re)added
+- many functions benefit from the new internal representation and are 
+  faster now: transitivity, reciprocity, graph operator functions like 
+  intersection and union, etc.
+- igraph compiles with Microsoft Visual C++ now
+- there were some internal changes to make igraph a real graph algorithm
+  platform in the near future, but these are undocumented now
+
+Bugs corrected
+--------------
+
+- corrected a bug when reading Pajek files: directed graphs were read as
+  undirected

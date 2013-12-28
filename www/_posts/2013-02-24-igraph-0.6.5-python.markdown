@@ -1,0 +1,122 @@
+---
+layout: pynewstemp
+title: igraph 0.6.5
+date: February 24, 2013
+category: python
+---
+
+igraph 0.6.5
+============
+
+February 24, 2013
+
+The version number is not a mistake, we jump to 0.6.5 from 0.6, 
+for technical reasons.
+
+Release Notes
+-------------
+
+igraph 0.6.5 is a minor release that contains only few big changes,
+and fixes a number of very annoying bugs. 
+
+See at the end for the complete list of changes. First let's see
+the most important new features and changes. 
+
+<!--more-->
+
+## Convert lists of tuples to graphs in Python
+
+The <a href="doc-0.6.5/python/igraph.Graph-class.html#TupleList">`Graph.TupleList()`</a>
+static method in Python now allows easy conversion of lists of tuples (such as
+database records or contents of CSV files) into graphs with named vertices and
+edge attributes.
+
+
+## Pajek reader supports bipartite graphs
+
+See more in the 
+<a href="doc-0.6.5/python/igraph.Graph-class.html#Read">
+documentation</a>.
+
+## Graphical degree sequences
+
+We added some new functions if a sequence of integers is graphial, i.e. it 
+can be the degree sequence of a simple graph. See more in the 
+<a href="doc-0.6.5/python/igraph._igraph-module.html#is_graphical_degree_sequence">
+documentation</a>.
+
+## k-regular random graphs
+
+It is possible now to generate regular random graphs, faster than 
+the general degree sequence based generator. See more in the
+<a href="doc-0.6.5/python/igraph.GraphBase-class.html#K_Regular">
+documentation</a>.
+
+## Fitting power law distributions
+
+This release includes the plfit library to maximum likelihood fit 
+power laws to discrete or contiouous data. See more in the
+<a href="doc-0.6.5/python/igraph.statistics-module.html#power_law_fit">
+documentation</a>.
+
+Python news and fixes
+---------------------
+
+- Added bipartite support to the Pajek reader and writer, closes bug
+  \#1042298.
+- `Graph.Degree_Sequence()` has a new method now: `no_multiple`.
+- Added the `is_degree_sequence()` and `is_graphical_degree_sequence()`
+  functions.
+- `rewire()` has a new mode: `loops`, that can create loop edges.
+- Walktrap community detection now handles isolates.
+- Added `Graph.K_Regular()`.
+- `power_law_fit()` now uses a C implementation.
+- Added support for setting the frame (stroke) width of vertices using the
+  `frame_width` attribute or the `vertex_frame_width` keyword argument
+  in `plot()`
+- Improved Inkscape-friendly SVG output from `Graph.write_svg()`,
+  thanks to drlog
+- Better handling of named vertices in `Graph.delete_vertices()`
+- Added experimental Gephi graph streaming support; see
+  `igraph.remote.gephi` and `igraph.drawing.graph.GephiGraphStreamingDrawer`
+- Nicer `__repr__` output for `Flow` and `Cut` instances
+- Arrows are now placed correctly around diamond-shaped nodes on plots
+- Added `Graph.TupleList`, a function that allows one to create graphs with
+  edge attributes quickly from a list of tuples.
+- `plot()` now also supports `.eps` as an extension, not only `.ps`
+
+- Fixed overflow issues in centralization calculations.
+- Fixed a bug that mishandled vertex colors in VF2 isomorphism
+  functions. Bug \#1032819.
+- Pajek exporter now always quotes strings, thanks to Elena Tea Russo.
+- Fixed a bug with handling small edge weights in shortest paths 
+  calculation in `Graph.shortest_paths()` (Dijkstra's algorithm.) Thanks to 
+  Martin J Reed.
+- Fixed a bug in the `NCV` setting for ARPACK functions. It cannot be
+  bigger than the matrix size.
+- Fixed a bug in `Graph.layout_mds()` that resulted vertices on top of each
+  other.
+- Motif finding functions return nan for isomorphism classes that are
+  not motifs (i.e. not connected). Fixes bug \#1050859. 
+- Fixed a bug when calculating the largest cliques of a directed
+  graph. Bug \#1073800.
+- Warn for negative weights when calculating PageRank.
+- Fixed a bug in `Graph.eccentricity()` and `Graph.radius()`,
+  the results were often simply wrong.
+- Fixed a bug in `Graph.get.all.shortest.paths()` when some edges
+  had zero weight.
+- Fixed some potential crashes in the DrL layout generator.
+- Fixed a bug in the Reingold-Tilford layout when the graph is
+  directed and `mode != ALL`.
+- Fixed a bug in `Graph.layout_sugiyama()` when the graph had no edges.
+- Fixed a bug in `Graph.community_label_propagation()` when initial labels
+  contained -1 entries. Issue \#1105460.
+- Repaired the `DescartesCoordinateSystem` class (which is not used
+  too frequently anyway)
+- Fixed a bug that caused segfaults when an igraph `Graph` was used in a
+  thread forked from the main Python interpreter thread
+- Fixed a bug that affected file handles created from Python strings in the
+  C layer
+- Fixed a bug in `has_multiple()` that resulted in false negatives
+  for some undirected graphs.
+- Fixed a crash in weighted betweenness calculation.

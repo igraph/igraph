@@ -1,0 +1,35 @@
+---
+layout: cnewstemp
+title: igraph 0.3.3
+date: February 28, 2007
+category: c
+---
+
+igraph 0.3.3
+===========
+
+New in the C library
+--------------------
+
+* `igraph_connect_neighborhood()`, nomen est omen
+* `igraph_watts_strogatz_game()` and `igraph_rewire_edges()`
+* K-core decomposition: `igraph_coreness()`
+* Clique and independent vertex set related functions:
+  `igraph_cliques()`, `igraph_independent_vertex_sets()`,
+  `igraph_maximal_cliques()`, `igraph_maximal_independent_vertex_sets()`,
+  `igraph_independence_number()`, `igraph_clique_number(),
+  Some of these function were ported from the very_nauty library
+  of Keith Briggs, thanks Keith!
+* The GraphML file format now supports graph attributes
+* Transitivity calculation speeded up
+* Correct transitivity calculation for multigraphs (ie. non-simple graphs)
+
+<!--more-->
+
+Bugs corrected
+--------------
+
+* `make install` installs the library correctly on Cygwin now
+* Pajek parser corrected to read files with MacOS newline characters correctly
+* overflow bug in transitivity calculation for large graphs corrected
+* an internal memcpy/memmove bug causing some segfaults removed
