@@ -519,6 +519,9 @@ graph.atlas <- function(n) {
 
 graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
 
+  d <- as.data.frame(d)
+  if (!is.null(vertices)) { vertices <- as.data.frame(vertices) }
+  
   if (ncol(d) < 2) {
     stop("the data frame should contain at least two columns")
   }
