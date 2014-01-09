@@ -131,3 +131,12 @@ test_that("Local scan-1 approximations work", {
   }
 
 })
+
+test_that("Issue 18 is resolved", {
+
+  library(igraph)
+  g <- graph(c(1,2,2,1, 1,3,3,1, 2,4, 3,4, 3,5,5,3, 4,5,5,4))
+  expect_that(local.scan(g, mode="all"), equals(c(4, 3, 7, 6, 5)))
+  expect_that(local.scan(g, mode="out"), equals(c(4, 3, 7, 2, 5)))
+  expect_that(local.scan(g, mode="in"), equals(c(4, 2, 4, 6, 5)))
+})

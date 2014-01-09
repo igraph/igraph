@@ -117,7 +117,7 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
 
     /* Mark neighbors and self*/
-    VECTOR(neis)[node] = node+1;
+    if (mode != IGRAPH_ALL) { VECTOR(neis)[node] = node+1; }
     for (i=0; i<edgeslen1; i++) {
       int e=VECTOR(*edges1)[i];
       int nei=IGRAPH_OTHER(graph, e, node);
@@ -132,6 +132,7 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
       int nei=IGRAPH_OTHER(graph, e2, node);
       igraph_vector_int_t *edges2=igraph_inclist_get(&incs, nei);
       int j, edgeslen2=igraph_vector_int_size(edges2);
+      if (mode == IGRAPH_ALL) { VECTOR(neis)[nei]=0; }
       for (j=0; j<edgeslen2; j++) {
 	int e2=VECTOR(*edges2)[j];
 	int nei2=IGRAPH_OTHER(graph, e2, nei);
@@ -247,8 +248,7 @@ int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
 			       const igraph_vector_t *weights,
 			       igraph_neimode_t mode) {
 
-  if ( (mode == IGRAPH_OUT || mode == IGRAPH_IN) &&
-       igraph_is_directed(graph) ) {
+  if (igraph_is_directed(graph)) {
     return igraph_i_local_scan_1_directed(graph, res, weights, mode);
   } else {
     if (weights) {
