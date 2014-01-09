@@ -73,6 +73,36 @@ test_that("General scan-stat works, THEM, scan-2, weighted", {
   expect_that(digest(s1), equals("995d0b6a952834ff6e534efc2cfb917b"))
 })
 
+test_that("Neighborhoods work for us", {
+  nei <- neighborhood(g, order=1)
+  s1 <- local.scan(g, neighborhoods=nei)
+  expect_that(digest(s1), equals("df0fd77489f70cc47f682dc31d9f52f5"))
+  s1 <- local.scan(g, k=1, weighted=TRUE, neighborhoods=nei)
+  expect_that(digest(s1), equals("af720916ae4b49881745d2dcdd614401"))
+
+  nei <- neighborhood(g, order=2)
+  s1 <- local.scan(g, k=2, neighborhoods=nei)
+  expect_that(digest(s1), equals("6f47f47abde25d00d615dd56826cca5a"))
+  s1 <- local.scan(g, k=2, weighted=TRUE, neighborhoods=nei)
+  expect_that(digest(s1), equals("e02e9d58168ee5d53850497f6d4c76b0"))
+
+})
+
+test_that("Neighborhoods work for them", {
+
+  nei <- neighborhood(g, order=1)
+  s1 <- local.scan(g, gp, k=1, neighborhoods=nei)
+  expect_that(digest(s1), equals("e9ca740ebba2fd1db4abe939954b2638"))
+  s1 <- local.scan(g, gp, k=1, weighted=TRUE, neighborhoods=nei)
+  expect_that(digest(s1), equals("a98e9a03eda7feaae8524dc9348ad74b"))
+
+  nei <- neighborhood(g, order=2)
+  s1 <- local.scan(g, gp, k=2, neighborhoods=nei)
+  expect_that(digest(s1), equals("a3237a9a55e9d86ab471c81a291eb03b"))
+  s1 <- local.scan(g, gp, k=2, weighted=TRUE, neighborhoods=nei)
+  expect_that(digest(s1), equals("995d0b6a952834ff6e534efc2cfb917b"))
+
+})
 
 set.seed(42)
 n <- 10^3

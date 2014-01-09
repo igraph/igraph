@@ -1124,7 +1124,8 @@ maximum.bipartite.matching <- function(graph, types=NULL, weights=NULL,
 }
 
 local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
-                       weighted=FALSE, mode=c("out", "in", "all"), ...) {
+                       weighted=FALSE, mode=c("out", "in", "all"),
+                       neighborhoods=NULL, ...) {
 
   ## Must be igraph object
   stopifnot(is.igraph(graph.us))
@@ -1148,6 +1149,16 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   stopifnot(!weighted || (is.weighted(graph.us) && (is.null(graph.them) ||
                                                     is.weighted(graph.them))))
 
+  ## Check if 'neighborhoods' makes sense
+  if (!is.null(neighborhoods)) {
+    stopifnot(is.list(neighborhoods))
+    stopifnot(length(neighborhoods) == vcount(graph.us))
+  }
+  if (!is.null(neighborhoods) && k==0) {
+    warning("`neighborhoods' ignored for k=0")
+    neighborhoods <- NULL
+  }
+
   ## Check mode argument
   mode <- igraph.match.arg(mode)
   cmode <- switch(mode, out = 1, `in` = 2, all = 3, total = 3)
@@ -1155,67 +1166,78 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   sumweights <- function(g) sum(E(g)$weight)
 
   if (is.null(FUN)) { FUN <- if (weighted) "sumweights" else "ecount" }
-  
+
   res <- if (is.null(graph.them)) {
 
-    ## scan-0
-    if (k == 0) {
-      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_0", graph.us,
-            if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
-            PACKAGE="igraph")
-
-    ## scan-1, ecount
-    } else if (k==1 && FUN %in% c("ecount", "sumweights")) {
-      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_1_ecount", graph.us,
-            if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
-            PACKAGE="igraph")
-
-    ## scan-k, ecount
-    } else if (FUN %in% c("ecount", "sumweights")) {
-      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_k_ecount", graph.us, as.integer(k),
-            if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
-            PACKAGE="igraph")
-
-    ## General
-    } else {
-      sapply(graph.neighborhood(graph.us, order=k, V(graph.us), mode=mode),
+    if (!is.null(neighborhoods)) {
+      sapply(lapply(neighborhoods, induced.subgraph, graph=graph.us),
              FUN, ...)
+    } else {
+      ## scan-0
+      if (k == 0) {
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_0", graph.us,
+              if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
+              PACKAGE="igraph")
+
+        ## scan-1, ecount
+      } else if (k==1 && FUN %in% c("ecount", "sumweights")) {
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_1_ecount", graph.us,
+              if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
+              PACKAGE="igraph")
+
+        ## scan-k, ecount
+      } else if (FUN %in% c("ecount", "sumweights")) {
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_k_ecount", graph.us, as.integer(k),
+              if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
+              PACKAGE="igraph")
+
+        ## General
+      } else {
+        sapply(graph.neighborhood(graph.us, order=k, V(graph.us), mode=mode),
+               FUN, ...)
+      }
     }
     
   } else {
 
-    ## scan-0
-    if (k == 0) {
-      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_0_them", graph.us, graph.them,
-            if (weighted) as.numeric(E(graph.them)$weight) else NULL,
-            cmode, PACKAGE="igraph")
-
-    ## scan-1, ecount
-    } else if (k==1 && FUN %in% c("ecount", "sumweights")) {
-      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_1_ecount_them", graph.us, graph.them,
-            if (weighted) as.numeric(E(graph.them)$weight) else NULL,
-            cmode, PACKAGE="igraph")
-
-    ## scan-k, ecount
-    } else if (FUN %in% c("ecount", "sumweights")) {
-      on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-      .Call("R_igraph_local_scan_k_ecount_them", graph.us, graph.them,
-            as.integer(k),
-            if (weighted) as.numeric(E(graph.them)$weight) else NULL,
-            cmode, PACKAGE="igraph")
-
-    ## general case
+    if (!is.null(neighborhoods)) {
+      sapply(lapply(neighborhoods, induced.subgraph, graph=graph.them),
+             FUN, ...)
     } else {
-      sapply(V(graph.us), function(x) {
-        vei <- neighborhood(graph.us, order=k, nodes=x, mode=mode)[[1]]
-        if (!is.function(FUN)) { FUN <- getFunction(FUN, where=environment()) }
-        FUN(induced.subgraph(graph.them, vei), ...)
-      })
+
+      ## scan-0
+      if (k == 0) {
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_0_them", graph.us, graph.them,
+              if (weighted) as.numeric(E(graph.them)$weight) else NULL,
+              cmode, PACKAGE="igraph")
+
+        ## scan-1, ecount
+      } else if (k==1 && FUN %in% c("ecount", "sumweights")) {
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_1_ecount_them", graph.us, graph.them,
+              if (weighted) as.numeric(E(graph.them)$weight) else NULL,
+              cmode, PACKAGE="igraph")
+
+        ## scan-k, ecount
+      } else if (FUN %in% c("ecount", "sumweights")) {
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_k_ecount_them", graph.us, graph.them,
+              as.integer(k),
+              if (weighted) as.numeric(E(graph.them)$weight) else NULL,
+              cmode, PACKAGE="igraph")
+
+        ## general case
+      } else {
+        sapply(V(graph.us), function(x) {
+          vei <- neighborhood(graph.us, order=k, nodes=x, mode=mode)[[1]]
+          if (!is.function(FUN)) { FUN <- getFunction(FUN, where=environment()) }
+          FUN(induced.subgraph(graph.them, vei), ...)
+        })
+      }
     }
   }
 
