@@ -31,3 +31,16 @@ test_that("Dot product rng works", {
   expect_that(ecount(g2), equals(4938))
   
 })
+
+test_that("Dot product rng gives warnings", {
+
+  library(igraph)
+  vecs <- cbind(c(1,1,1)/3, -c(1,1,1)/3)
+  expect_that(g <- dot.product.game(vecs),
+      gives_warning("Negative connection probability in dot-product graph"))
+
+  vecs <- cbind(c(1,1,1), c(1,1,1))
+  expect_that(g <- dot.product.game(vecs),
+      gives_warning(paste(sep="", "Greater than 1 connection probability ",
+                          "in dot-product graph")))
+})
