@@ -349,6 +349,10 @@ igraph_correlated_pair_game:
                 VECTORM1_OR_0 permutation=NULL
         NAME-R: correlated.pair.game
 
+igraph_dot_product_game:
+        PARAMS: OUT GRAPH graph, MATRIX vecs, BOOLEAN directed=False
+        NAME-R: dot.product.game
+
 #######################################
 # Basic query functions
 #######################################

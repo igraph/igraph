@@ -208,6 +208,10 @@ int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
 				int n, igraph_real_t corr, igraph_real_t p,
 				igraph_bool_t directed,
 				const igraph_vector_t *permutation);
+
+int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
+			    igraph_bool_t directed);
+
 __END_DECLS
 
 #endif
