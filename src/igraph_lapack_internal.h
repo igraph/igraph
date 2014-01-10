@@ -138,6 +138,7 @@
 #define igraph_dlamc3_  dlamc3_
 #define igraph_dlamc4_  dlamc4_
 #define igraph_dlamc5_  dlamc5_
+#define igraphddot_     ddot_
 #endif
 
 int igraphdgetrf_(int *m, int *n, igraph_real_t *a, int *lda, int *ipiv,
@@ -174,5 +175,8 @@ int igraphdgeevx_(char *balanc, char *jobvl, char *jobvr, char *sense,
 int igraphdgehrd_(int *n, int *ilo, int *ihi, igraph_real_t *A, int *lda,
 		  igraph_real_t *tau, igraph_real_t *work, int *lwork,
 		  int *info);
+
+igraph_real_t igraphddot_(int *n, igraph_real_t *dx, int *incx, 
+			  igraph_real_t *dy, int *incy);
 
 #endif
