@@ -1194,7 +1194,7 @@ int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
  */
 
 int igraph_i_mincut_undirected(const igraph_t *graph, 
-			       igraph_integer_t *res,
+			       igraph_real_t *res,
 			       igraph_vector_t *partition,
 			       igraph_vector_t *partition2,
 			       igraph_vector_t *cut,
@@ -1374,7 +1374,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     igraph_i_cutheap_reset_undefine(&heap, last);    
   }
 
-  *res=(igraph_integer_t) mincut;
+  *res=mincut;
 
   igraph_inclist_destroy(&inclist);
   igraph_adjlist_destroy(&adjlist);
@@ -1623,11 +1623,9 @@ int igraph_mincut(const igraph_t *graph,
       return igraph_mincut_value(graph, value, capacity);      
     }
   } else {
-	igraph_integer_t int_value;
-    IGRAPH_CHECK(igraph_i_mincut_undirected(graph, &int_value, partition, 
-				      partition2, cut, capacity));
-	*value = int_value;
-	return IGRAPH_SUCCESS;
+    IGRAPH_CHECK(igraph_i_mincut_undirected(graph, value, partition,
+					    partition2, cut, capacity));
+    return IGRAPH_SUCCESS;
   }
   
   return 0;
@@ -1635,7 +1633,7 @@ int igraph_mincut(const igraph_t *graph,
     
 
 int igraph_i_mincut_value_undirected(const igraph_t *graph, 
-				     igraph_integer_t *res,
+				     igraph_real_t *res,
 				     const igraph_vector_t *capacity) {
   return igraph_i_mincut_undirected(graph, res, 0, 0, 0, capacity);
 }
@@ -1686,9 +1684,7 @@ int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
   minmaxflow=IGRAPH_INFINITY;
 
   if (!igraph_is_directed(graph)) {
-    igraph_integer_t int_res;
-    IGRAPH_CHECK(igraph_i_mincut_value_undirected(graph, &int_res, capacity));
-	*res = int_res;
+    IGRAPH_CHECK(igraph_i_mincut_value_undirected(graph, res, capacity));
     return 0;
   }    
 
