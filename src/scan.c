@@ -439,7 +439,8 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
 				    igraph_neimode_t mode) {
 
   int no_of_nodes=igraph_vcount(us);
-  igraph_inclist_t incs_us, incs_them;
+  igraph_adjlist_t adj_us;
+  igraph_inclist_t incs_them;
   igraph_vector_int_t neis;
   int node;
 
@@ -455,8 +456,9 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
 		 IGRAPH_EINVAL);
   }
 
-  igraph_inclist_init(us, &incs_us, mode);
-  IGRAPH_FINALLY(igraph_inclist_destroy, &incs_us);
+  igraph_adjlist_init(us, &adj_us, mode);
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adj_us);
+  igraph_adjlist_simplify(&adj_us);
   igraph_inclist_init(them, &incs_them, mode);
   IGRAPH_FINALLY(igraph_inclist_destroy, &incs_them);
 
@@ -467,9 +469,9 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
   igraph_vector_null(res);
 
   for (node=0; node < no_of_nodes; node++) {
-    igraph_vector_int_t *edges1_us=igraph_inclist_get(&incs_us, node);
+    igraph_vector_int_t *neis_us=igraph_adjlist_get(&adj_us, node);
     igraph_vector_int_t *edges1_them=igraph_inclist_get(&incs_them, node);
-    int len1_us=igraph_vector_int_size(edges1_us);
+    int len1_us=igraph_vector_int_size(neis_us);
     int len1_them=igraph_vector_int_size(edges1_them);
     int i;
 
@@ -478,8 +480,7 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
     /* Mark neighbors and self in us */
     VECTOR(neis)[node] = node+1;
     for (i = 0; i < len1_us; i++) {
-      int e=VECTOR(*edges1_us)[i];
-      int nei=IGRAPH_OTHER(us, e, node);
+      int nei=VECTOR(*neis_us)[i];
       VECTOR(neis)[nei] = node+1;
     }
 
@@ -494,8 +495,7 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
     }
     /* Then the rest */
     for (i = 0; i < len1_us; i++) {
-      int e=VECTOR(*edges1_us)[i];
-      int nei=IGRAPH_OTHER(us, e, node);
+      int nei=VECTOR(*neis_us)[i];
       igraph_vector_int_t *edges2_them=igraph_inclist_get(&incs_them, nei);
       int j, len2_them=igraph_vector_int_size(edges2_them);
       for (j = 0; j < len2_them; j++) {
@@ -517,7 +517,7 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
 
   igraph_vector_int_destroy(&neis);
   igraph_inclist_destroy(&incs_them);
-  igraph_inclist_destroy(&incs_us);
+  igraph_adjlist_destroy(&adj_us);
   IGRAPH_FINALLY_CLEAN(3);
 
   return 0;
