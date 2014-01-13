@@ -13,7 +13,11 @@ EXTRA_DIST = igraph.pc VERSION $(top_srcdir)/include/* $(DOC_FILES) examples \
 	$(wildcard $(top_srcdir)/optional/glpk/amd/*.{c,h})      \
 	$(wildcard $(top_srcdir)/optional/glpk/amd/{README,COPYING}) \
 	$(wildcard $(top_srcdir)/optional/glpk/colamd/*.{c,h}) \
-	$(wildcard $(top_srcdir)/optional/glpk/colamd/{README,COPYING})
+	$(wildcard $(top_srcdir)/optional/glpk/colamd/{README,COPYING}) \
+	tests/testsuite
+
+tests/testsuite:
+	cd tests && make testsuite
 
 install-exec-hook:
 	if test -f $(top_builddir)/src/.libs/cygigraph-0.dll ; \
