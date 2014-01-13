@@ -16,54 +16,61 @@ TMP:=$(shell mktemp -d /tmp/.XXXXX)
 ../doc/jekyll/stamp: ../doc/html/stamp
 	cd ../doc && make jekyll
 
+../doc/html/stamp: $(wildcard ../src/*.c) ../doc/Makefile
+	cd ../doc && make html
+
+../doc/Makefile: ../doc/Makefile.am
+	cd .. && ./bootstrap.sh
+	cd .. && ./configure
+
 c/doc/stamp: ../doc/jekyll/stamp
-	rm -rf doc/c
-	mkdir -p doc
-	cp -r ../doc/jekyll doc/c
+	rm -rf c/doc
+	mkdir -p c
+	cp -r ../doc/jekyll c/doc
 
 ../doc/igraph-docs.pdf: ../doc/igraph-docs.xml
 	cd ../doc && make igraph-docs.pdf
 
-c/doc/igraph-docs.pdf: ../doc/igraph-docs.pdf
-	mkdir -p doc/c
+c/doc/igraph-docs.pdf: ../doc/igraph-docs.pdf c/doc/stamp
 	cp ../doc/igraph-docs.pdf c/doc/
 
-../doc/igraph.info: ../doc/igraph-docs.xml
+../doc/igraph.info: ../doc/igraph-docs.xml c/doc/stamp
 	cd ../doc && make igraph.info
 
-c/doc/igraph.info: ../doc/igraph.info
-	mkdir -p doc/c
+c/doc/igraph.info: ../doc/igraph.info c/doc/stamp
 	cp ../doc/igraph.info c/doc/
 
 r/doc/stamp: $(RMAN)
 	cd ../interfaces/R && make && \
 	R CMD INSTALL --html --no-R --no-configure --no-inst \
 	  --no-libs --no-exec --no-test-load -l $(TMP) igraph
-	rm -rf doc/r
-	mkdir -p doc/r
-	../tools/rhtml.sh $(TMP)/igraph/html doc/r
+	rm -rf r/doc
+	mkdir -p r/doc
+	../tools/rhtml.sh $(TMP)/igraph/html r/doc
 	ln -s 00Index.html r/doc/index.html
 	touch r/doc/stamp
 
 r/doc/igraph.pdf: $(RMAN)
-	mkdir -p doc/r
+	mkdir -p r/doc
 	cd ../interfaces/R/ && make
 	R CMD Rd2pdf --no-preview --force -o r/doc/igraph.pdf \
 	  ../interfaces/R/igraph
 
 ../interfaces/python/doc/api/pdf/api.pdf:
+	cd .. && make dist
 	cd ../interfaces/python && python setup.py build \
-		--c-core-url=http://igraph.org/nightly/get/c/igraph-$(VERSION).tar.gz
+		--no-pkg-config --no-progress-bar        \
+		--c-core-url=../../igraph-$(VERSION).tar.gz
 	cd ../interfaces/python && scripts/mkdoc.sh
 
 python/doc/python-igraph.pdf: ../interfaces/python/doc/api/pdf/api.pdf
-	mkdir -p doc/python
+	mkdir -p python/doc
 	cp $< $@
 
 python/doc/stamp: ../interfaces/python/doc/api/html/igraph-module.html
-	mkdir -p doc/python
-	cp -r ../interfaces/python/doc/api/html/ doc/python
-	../tools/pyhtml.sh doc/python
+	mkdir -p python/doc
+	cp -r ../interfaces/python/doc/api/html/ python/doc
+	../tools/pyhtml.sh python/doc
 	touch $@
 
 python/doc/tutorial/stamp: ../interfaces/python/doc/source/tutorial.rst
