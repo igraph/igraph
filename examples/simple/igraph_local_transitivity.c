@@ -28,7 +28,6 @@ int main() {
   igraph_t g;
   igraph_vs_t vertices;
   igraph_vector_t result1, result2;
-  long int i;
 
   igraph_rng_seed(igraph_rng_default(), 42);
   

@@ -52,7 +52,6 @@ int main() {
   igraph_vector_t modularity, membership, edges;
   igraph_matrix_t memberships;
   int i, j, k;
-  FILE *f;
 
   igraph_vector_init(&modularity,0);
   igraph_vector_init(&membership,0);

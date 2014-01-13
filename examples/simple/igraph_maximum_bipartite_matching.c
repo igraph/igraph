@@ -139,7 +139,6 @@ int test_weighted_graph_generated() {
   igraph_vector_t weights;
   igraph_integer_t matching_size;
   igraph_real_t matching_weight;
-  igraph_bool_t is_matching;
   igraph_real_t weight_array_1[] = { 8, 5, 9, 18, 20, 13 };
   igraph_real_t weight_array_2[] = { 20, 4, 20, 3, 13, 1 };
   int i;

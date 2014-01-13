@@ -30,7 +30,7 @@ int main() {
   igraph_matrix_t pmat;
   igraph_bool_t conn;
   igraph_vector_bool_t bs;
-  int i, ret;
+  int i;
   
   /* Symmetric preference game */
   igraph_vector_bool_init(&bs, 0);

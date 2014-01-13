@@ -94,8 +94,6 @@ void test_unweighted() {
 void test_weighted() {
   igraph_t g;
   igraph_vector_t edges, eb, weights;
-  long int i;
-  long int no_of_edges;
   igraph_real_t weights_array[] = { 4, 1, 3, 2, 5, 8, 6, 7 };
 
   igraph_real_t edges_array1[] = { 2, 3, 0, 1, 4, 7, 5, 6 };

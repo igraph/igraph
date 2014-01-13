@@ -39,7 +39,6 @@ int main() {
   igraph_t g;
   igraph_real_t flow;
   igraph_vector_t capacity;
-  long int i;
   igraph_integer_t source, target;
   FILE *infile;
   float t;

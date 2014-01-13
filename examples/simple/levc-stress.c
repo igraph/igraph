@@ -34,7 +34,6 @@ int main() {
     igraph_t g;
     igraph_matrix_t merges;
     igraph_vector_t membership;
-    long int i, j;
     igraph_arpack_options_t options;
     double modularity;
     igraph_vector_t history;

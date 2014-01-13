@@ -26,7 +26,7 @@
 int main() {
 
   igraph_t g;
-  int i, ret;
+  int i;
   igraph_bool_t simple;
   
   /* G(n,p) */

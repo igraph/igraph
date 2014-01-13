@@ -30,12 +30,11 @@
 int main() {
   
   igraph_t g;
-  long int i;
-  struct tms time;
-  clock_t current_time,start_time;
-  int tps;
-  long int runs=100, n=10000;
-  igraph_real_t r=0.01;
+  /* long int i; */
+  /* struct tms time; */
+  /* clock_t current_time,start_time; */
+  /* long int runs=100, n=10000; */
+  /* igraph_real_t r=0.01; */
   
   /* Empty graph */
   igraph_grg_game(&g, 100, 0, 0, 0, 0);

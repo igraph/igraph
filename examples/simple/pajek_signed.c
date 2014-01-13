@@ -29,10 +29,6 @@ int print_attributes(const igraph_t *g) {
   igraph_strvector_t gnames, vnames, enames;
   long int i;
 
-  igraph_vector_t vec;
-  igraph_strvector_t svec;
-  long int j;
-
   igraph_vector_init(&gtypes, 0);
   igraph_vector_init(&vtypes, 0);
   igraph_vector_init(&etypes, 0);

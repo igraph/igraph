@@ -25,10 +25,10 @@
 
 int main(int argc, char **argv) {
 
-  igraph_t g;
-  igraph_error_handler_t *oldhandler;
-  FILE *ofile;
-  int ret;
+  /* igraph_t g; */
+  /* igraph_error_handler_t *oldhandler; */
+  /* FILE *ofile; */
+  /* int ret; */
 
   /* This is not used right now, as we don't have attributes */
   

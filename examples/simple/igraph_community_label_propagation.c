@@ -28,9 +28,7 @@ int main() {
   igraph_t g;
   igraph_vector_t membership, weights, initial;
   igraph_vector_bool_t fixed;
-  igraph_bool_t ok;
-  long int i, j;
-  long int no_of_nodes;
+  long int i;
 
   /* Zachary Karate club -- this is just a quick smoke test */
   igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
