@@ -110,7 +110,9 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   igraph_vector_init(&tmp, vc);
   IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
   IGRAPH_CHECK(igraph_adjlist_init(graph, &outlist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &outlist);
   IGRAPH_CHECK(igraph_adjlist_init(graph, &inlist, IGRAPH_IN));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &inlist);
 
   options->n=vc;
   options->start=0;		/* random start vector */
@@ -133,9 +135,11 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   for (i=0; i<no; i++) {
     VECTOR(*D)[i] = sqrt(VECTOR(*D)[i]);
   }
-	
+
+  igraph_adjlist_destroy(&inlist);
+  igraph_adjlist_destroy(&outlist);
   igraph_vector_destroy(&tmp);
-  IGRAPH_FINALLY_CLEAN(1);
+  IGRAPH_FINALLY_CLEAN(3);
 	
   return 0;
 }
