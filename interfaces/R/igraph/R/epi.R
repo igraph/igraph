@@ -34,7 +34,7 @@
 #         NR   := vector of values N_R(t), at time points in tvec
 #
 # Notes: Requires igraph.
-simul.net.epi <- function(graph, beta, gamma, no_sim=100) {
+sir <- function(graph, beta, gamma, no_sim=100) {
   nv <- vcount(graph)
   sim.res <- vector("list", ns)
 
@@ -107,7 +107,9 @@ simul.net.epi <- function(graph, beta, gamma, no_sim=100) {
     names(SIRtmp) <- c("times", "NS", "NI", "NR")
     sim.res[[j]] <- SIRtmp
   }
-  return(sim.res)
+
+  class(sim.res) <- "sim"
+  sim.res
 }
 
 # R function to plot compartment total curves from simul.net.epi .
@@ -118,7 +120,7 @@ simul.net.epi <- function(graph, beta, gamma, no_sim=100) {
 # Outputs:  None.  Just produces the plot of all compartment curves, 
 #           with median and quantiles.
 
-plot.net.epi <- function(sim.res,comp,q,cols) {
+plot.sir <- function(sim.res, comp, q, cols) {
   
   if(missing(comp))
      comp <- "NI"
@@ -183,17 +185,12 @@ plot.net.epi <- function(sim.res,comp,q,cols) {
 function() {
   ## Code to illustrate epidemic processes, w/out and w/ networks.
   
-  library(igraph)
-  source("simul.net.epi.R")
-  source("plot.net.epi.R")
-  
-  my.g <- barabasi.game(100, directed=FALSE)
   my.g <- erdos.renyi.game(100, 100, type=c("gnm"), directed=FALSE)
   
   ## Simulate network-based SIR process.
   beta <- 5
   gamma <- 1
   ntrials <- 100
-  sim.res <- simul.net.epi(my.g, beta, gamma, ntrials)
-  plot.net.epi(sim.res)
+  sim.res <- sir(my.g, beta, gamma, ntrials)
+  plot(sim.res)
 }
