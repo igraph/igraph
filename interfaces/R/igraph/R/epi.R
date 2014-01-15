@@ -36,9 +36,9 @@
 # Notes: Requires igraph.
 sir <- function(graph, beta, gamma, no_sim=100) {
   nv <- vcount(graph)
-  sim.res <- vector("list", ns)
+  sim.res <- vector("list", no_sim)
 
-  for (j in (1:ns)) {
+  for (j in (1:no_sim)) {
     # Randomly place an infected and initialize status vector.
     initialinf <- sample(seq(1, nv), 1)
     status <- rep("S", nv)
