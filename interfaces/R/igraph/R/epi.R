@@ -38,11 +38,15 @@ sir <- function(graph, beta, gamma, no_sim=100) {
   nv <- vcount(graph)
   sim.res <- vector("list", no_sim)
 
+  S <- 1L
+  I <- 2L
+  R <- 3L
+
   for (j in (1:no_sim)) {
     # Randomly place an infected and initialize status vector.
     initialinf <- sample(seq(1, nv), 1)
-    status <- rep("S", nv)
-    status[initialinf] <- "I"
+    status <- rep(S, nv)
+    status[initialinf] <- I
     NSvec <- nv - 1
     NIvec <- 1
     NRvec <- 0
@@ -51,7 +55,7 @@ sir <- function(graph, beta, gamma, no_sim=100) {
     # Set up initial rate vector.
     lamvec <- numeric(nv)
     lamvec[initialinf] <- gamma
-    lamvec[V(graph)[nei(initialinf)]] <- beta
+    lamvec[neighbors(graph, initialinf)] <- beta
     lam <- sum(lamvec)
   
     # Simulate SIR process on graph.
@@ -64,18 +68,26 @@ sir <- function(graph, beta, gamma, no_sim=100) {
       tt <- rexp(1, lam)
       pvec <- lamvec/lam
       vchange <- sample(nv, 1, replace=TRUE, prob=pvec)
-      if(status[vchange] == "R") {
-        print("WHAT THE HECK? SHOULD NOT HAPPEN!")
-      }
-      if(status[vchange] == "I") {
-        status[vchange] <- "R"
+      neis <- neighbors(graph, vchange)
+      if (status[vchange] == I) {
+        status[vchange] <- R
         NI <- NI - 1
         NR <- NR + 1
+        lam <- lam - lamvec[vchange]
+        lamvec[vchange] <- 0
+        lam <- lam - sum(beta * (status[neis]==S))
+        lamvec[neis] <- ifelse(status[neis]==S, lamvec[neis] - beta,
+                               lamvec[neis])
       }
-      if(status[vchange]=="S") {
-        status[vchange] <- "I"
-        NS <- NS-1
-        NI <- NI+1
+      if (status[vchange] == S) {
+        status[vchange] <- I
+        NS <- NS - 1
+        NI <- NI + 1
+        lam <- lam - lamvec[vchange] + gamma
+        lamvec[vchange] <- gamma
+        lam <- lam + sum(beta * (status[neis]==S))
+        lamvec[neis] <- ifelse(status[neis]==S, lamvec[neis] + beta,
+                               lamvec[neis])
       }
       cumtt <- cumtt + tt
     
@@ -84,28 +96,8 @@ sir <- function(graph, beta, gamma, no_sim=100) {
       NIvec <- c(NIvec, NI)
       NRvec <- c(NRvec, NR)
       tvec <- c(tvec, cumtt)
-    
-      # Update vector of rates and total rate.
-      lamvec[status=="I"] <- gamma
-      lamvec[status=="R"] <- 0
-      susceps <- seq(1, nv)[status=="S"]
-      infec.ind <- as.numeric(status=="I")
-      if (length(susceps)>0) {
-        for (i in seq(1, length(susceps))) {
-          snbrs <- V(graph)[nei(susceps[i])]
-	  if (length(snbrs)>0) {
-            lamtmp <- beta*sum(infec.ind[snbrs])
-          } else {
-            lamtmp <- 0
-          }
-          lamvec[susceps[i]] <- lamtmp
-        }
-      }
-      lam <- sum(lamvec)  
     }
-    SIRtmp <- list(tvec, NSvec, NIvec, NRvec)
-    names(SIRtmp) <- c("times", "NS", "NI", "NR")
-    sim.res[[j]] <- SIRtmp
+    sim.res[[j]] <- list(times=tvec, NS=NSvec, NI=NIvec, NR=NRvec)
   }
 
   class(sim.res) <- "sim"
