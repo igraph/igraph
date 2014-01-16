@@ -28,77 +28,78 @@
 # Outputs:  None.  Just produces the plot of all compartment curves, 
 #           with median and quantiles.
 
-plot.sir <- function(sim.res, comp, q, cols) {
-  
-  if(missing(comp))
-     comp <- "NI"
-  if(missing(q))
-     q <- c(0.1, 0.9)
-  if((missing(cols)) & (comp=="NI"))
-     cols <- c("skyblue", "blue", "blue")
-  if((missing(cols)) & (comp=="NS"))
-     cols <- c("pink", "red", "red")
-  if((missing(cols)) & (comp=="NR"))
-     cols <- c("palegoldenrod", "gold", "gold")
+plot.sir <- function(sir, comp=c("NI", "NS", "NR"),
+                     median=TRUE, quantiles=c(0.1, 0.9), color=NULL,
+                     median_color=NULL, quantile_color=NULL,
+                     lwd.median=2, lwd.quantile=2, lty.quantile=3,
+                     xlim=NULL, ylim=NULL, xlab="Time", ylab=NULL, ...) {
 
-  ns <- length(sim.res)
-  max.x <- max(unlist(lapply(sim.res, function(x) { max(x$times) })))
-  max.y <- max(unlist(lapply(sim.res, function(x) { max(x[[comp]]) })))
+  if (!inherits(sir, "sir")) {
+    stop("This is not an SIR model output")
+  }
+  comp <- toupper(igraph.match.arg(comp))
+  if (!all(quantiles >= 0 & quantiles <= 1)) {
+    stop("Quantiles should be in [0,1]")
+  }
+  
+  if (is.null(color)) {
+    color <- c(NI="skyblue", NS="pink", NR="palegoldenrod")[comp]
+  }
+  if (is.null(median_color)) {
+    median_color <- c(NI="blue", NS="red", NR="gold")[comp]
+  }
+  if (is.null(quantile_color)) {
+    quantile_color <- c(NI="blue", NS="red", NR="gold")[comp]
+  }
+  quantile_color <- rep_len(quantile_color, length(quantiles))
+
+  ns <- length(sir)
+  if (is.null(xlim)) {
+    xlim <- c(0, max(sapply(sir, function(x) max(x$times))))
+  }
+  if (is.null(ylim)) {
+    ylim <- c(0, max(sapply(sir, function(x) max(x[[comp]]))))
+  }
 
   ## Work out median and quantile vectors.
   # Create single huge vector of times and compartment counts.
-  big.time <- unlist(sapply(sim.res, function(x) { x$times }))
-  big.N <- unlist(sapply(sim.res, function(x) { x[[comp]] }))
-  # Adhoc use of Freedman-Diaconis binwidth; rescale time accordingly.
-  w <- 1/(2*(quantile(big.time, 0.75)-quantile(big.time, 0.25))/(100^(1/3)))
-  time.bin <- floor(big.time*w)
-  
-  # Compute median and lower/upper quantiles.
-  my.m <- tapply(big.N, time.bin, median)
-  my.ql <- tapply(big.N, time.bin, function(x) { quantile(x, prob=q[1]) })
-  my.qu <- tapply(big.N, time.bin, function(x) { quantile(x, prob=q[2]) })
-
+  if (median || length(quantiles) > 0) {
+    big.time <- unlist(sapply(sir, function(x) { x$times }))
+    big.N <- unlist(sapply(sir, function(x) { x[[comp]] }))
+    ## Adhoc use of Freedman-Diaconis binwidth; rescale time accordingly.
+    w <- 1/(2*(quantile(big.time, 0.75)-quantile(big.time, 0.25))/(100^(1/3)))
+    time.bin <- floor(big.time*w)
+  }
   
   ## Generate the plot, first with individual curves, and then 
   ## adding median and quantile curves.
-  #Clean the frame, set up axes, and plots individual curves.
-  par(new=F)
-  par(oma=c(1, 1.2, 1, 1))
 
   bin.vals <- as.numeric(levels(as.factor(time.bin)))/w
 
-  if(comp=="NI") { my.ylab <- expression(N[I](t)) }
-  if(comp=="NR") { my.ylab <- expression(N[R](t)) }
-  if(comp=="NS") { my.ylab <- expression(N[S](t)) }
+  if (is.null(ylab)) {
+    if (comp == "NI") { ylab <- expression(N[I](t)) }
+    if (comp == "NR") { ylab <- expression(N[R](t)) }
+    if (comp == "NS") { ylab <- expression(N[S](t)) }
+  }
 
   # Plot the stochastic curves individually.
-  plot(0, 0, type="n", xlim=c(0, max.x), ylim=c(0, max.y),
-       xlab="Time", ylab=my.ylab)
-  lapply(seq_along(sim.res), 
-       function(i) lines(sim.res[[i]]$time, sim.res[[i]][[comp]], col=cols[1]))
+  plot(0, 0, type="n", xlim=xlim, ylim=ylim, xlab="Time", ylab=ylab, ...)
+  lapply(seq_along(sir), function(i) {
+    lines(sir[[i]]$time, sir[[i]][[comp]], col=color[1])
+  })
 
   # Plot the median and quantiles.
-  par(new=T)
-  plot(bin.vals, my.m, type="l", lwd=2, col=cols[2],
-       xlim=c(0, max.x), ylim=c(0, max.y), xlab="", ylab="")
-  par(new=T)
-  plot(bin.vals, my.ql, type="l", lty=3, lwd=2, col=cols[3],
-       xlim=c(0, max.x), ylim=c(0, max.y), xlab="", ylab="")
-  par(new=T)
-  plot(bin.vals, my.qu, type="l", lty=3, lwd=2, col=cols[3],
-       xlim=c(0, max.x), ylim=c(0, max.y), xlab="", ylab="")
+  if (median) {
+    my.m <- tapply(big.N, time.bin, median)
+    lines(bin.vals, my.m, type="l", lwd=lwd.median, col=median_color)
+  }
+  for (i in seq_along(quantiles)) {
+    my.ql <- tapply(big.N, time.bin, function(x) {
+      quantile(x, prob=quantiles[i])
+    })
+    lines(bin.vals, my.ql, type="l", lty=lty.quantile, lwd=lwd.quantile,
+          col=quantile_color[i])
+  }
 
-}
-
-function() {
-  ## Code to illustrate epidemic processes, w/out and w/ networks.
-  
-  my.g <- erdos.renyi.game(100, 100, type=c("gnm"), directed=FALSE)
-  
-  ## Simulate network-based SIR process.
-  beta <- 5
-  gamma <- 1
-  ntrials <- 100
-  sim.res <- sir(my.g, beta, gamma, ntrials)
-  plot(sim.res)
+  invisible()
 }
