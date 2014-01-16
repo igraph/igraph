@@ -8,6 +8,7 @@
 <title>Epidemic models on graphs</title>
 
 <!-- doxrox-include igraph_sir_t -->
+<!-- doxrox-include igraph_sir_destroy -->
 <!-- doxrox-include igraph_sir -->
 
 </chapter>

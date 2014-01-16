@@ -28,6 +28,42 @@
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
 
+int igraph_sir_init(igraph_sir_t *sir) {
+  igraph_vector_init(&sir->times, 1);
+  IGRAPH_FINALLY(igraph_vector_destroy, &sir->times);
+  igraph_vector_int_init(&sir->no_s, 1);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_s);
+  igraph_vector_int_init(&sir->no_i, 1);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_i);
+  igraph_vector_int_init(&sir->no_r, 1);
+  IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}
+
+/**
+ * \function igraph_sir_destroy
+ * Deallocate memory associated with a SIR simulation run
+ *
+ * \param sir The \ref igraph_sir_t object storing the simulation.
+ */
+
+void igraph_sir_destroy(igraph_sir_t *sir) {
+  igraph_vector_destroy(&sir->times);
+  igraph_vector_int_destroy(&sir->no_s);
+  igraph_vector_int_destroy(&sir->no_i);
+  igraph_vector_int_destroy(&sir->no_r);
+}
+
+void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
+  int i, n=igraph_vector_ptr_size(v);
+  for (i=0; i<n; i++) {
+    igraph_sir_t *s=VECTOR(*v)[i];
+    if (s) {
+      igraph_sir_destroy(s);
+    }
+  }
+}
+
 #define S_S 0
 #define S_I 1
 #define S_R 2
@@ -59,7 +95,9 @@
  *        distribution.
  * \param no_sim The number of simulation runs to perform.
  * \param result The result of the simulation is stored here,
- *        in a list of \ref igraph_sir_t objects.
+ *        in a list of \ref igraph_sir_t objects. To deallocate
+ *        memory, the user needs to call \ref igraph_sir_destroy on
+ *        each element, before destroying the pointer vector itself.
  * \return Error code.
  * 
  * Time complexity: O(no_sim * (|V| + |E| log(|V|))).
@@ -103,14 +141,13 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
   IGRAPH_FINALLY(igraph_psumtree_destroy, &tree);
   
   IGRAPH_CHECK(igraph_vector_ptr_resize(result, no_sim));
+  igraph_vector_ptr_null(result);
+  IGRAPH_FINALLY(igraph_i_sir_destroy, result);
   for (i=0; i<no_sim; i++) {
     igraph_sir_t *sir=igraph_Calloc(1, igraph_sir_t);
     if (!sir) { IGRAPH_ERROR("Cannot run SIR model", IGRAPH_ENOMEM); }
+    igraph_sir_init(sir);
     VECTOR(*result)[i]=sir;
-    igraph_vector_init(&sir->times, 1);
-    igraph_vector_int_init(&sir->no_s, 1);
-    igraph_vector_int_init(&sir->no_i, 1);
-    igraph_vector_int_init(&sir->no_r, 1);
   }
 
   RNG_BEGIN();
@@ -207,7 +244,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
   igraph_psumtree_destroy(&tree);
   igraph_adjlist_destroy(&adjlist);
   igraph_vector_int_destroy(&status);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(4);	/* + result */
 
   return 0;
 }
