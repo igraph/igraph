@@ -83,7 +83,7 @@ plot.sir <- function(sir, comp=c("NI", "NS", "NR"),
   }
 
   # Plot the stochastic curves individually.
-  plot(0, 0, type="n", xlim=xlim, ylim=ylim, xlab="Time", ylab=ylab, ...)
+  plot(0, 0, type="n", xlim=xlim, ylim=ylim, xlab=xlab, ylab=ylab, ...)
   lapply(seq_along(sir), function(i) {
     lines(sir[[i]]$time, sir[[i]][[comp]], col=color[1])
   })
