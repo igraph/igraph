@@ -15,7 +15,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
 	      separators.xml memory.xml sparsemat.xml hrg.xml \
 	      scg.xml spatialgames.xml threading.xml progress.xml status.xml \
-	      graphlets.xml
+	      graphlets.xml epi.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -195,6 +195,10 @@ status.xml: status.xxml $(INCLUDEDIR)/igraph_statusbar.h $(SRCDIR)/statusbar.c
 
 graphlets.xml: graphlets.xxml $(SRCDIR)/glet.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/glet.c
+
+epi.xml: epi.xxml $(SRCDIR)/sir.c $(INCLUDEDIR)/igraph_epidemics.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/sir.c \
+		$(INCLUDEDIR)/igraph_epidemics.h
 
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

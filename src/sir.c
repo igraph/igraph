@@ -32,6 +32,39 @@
 #define S_I 1
 #define S_R 2
 
+/** 
+ * \function igraph_sir
+ * Perform a number of SIR epidemics model runs on a graph
+ *
+ * The SIR model is a simple model from epidemiology. The individuals
+ * of the population might be in three states: susceptible, infected
+ * and recovered. Recovered people are assumed to be immune to the 
+ * disease. Susceptibles become infected with a rate that depends on
+ * their number of infected neigbors. Infected people become recovered
+ * with a constant rate. See these parameters below.
+ * 
+ * </para><para>
+ * This function runs multiple simulations, all starting with a 
+ * single uniformly randomly chosen infected individual.
+ * 
+ * \param graph The graph to perform the model on. For directed graphs 
+ *        edge directions are ignored and a warning is given.
+ * \param beta The rate of infection of an individual that is 
+ *        susceptible and has a single infected neighbor.
+ *        The infection rate of a susceptible individual with n 
+ *        infected neighbors is n times beta. Formally
+ *        this is the rate parameter of an exponential distribution.
+ * \param gamma The rate of recovery of an infected individual.
+ *        Formally, this is the rate parameter of an exponential
+ *        distribution.
+ * \param no_sim The number of simulation runs to perform.
+ * \param result The result of the simulation is stored here,
+ *        in a list of \ref igraph_sir_t objects.
+ * \return Error code.
+ * 
+ * Time complexity: O(no_sim * (|V| + |E| log(|V|))).
+ */
+
 int igraph_sir(const igraph_t *graph, igraph_real_t beta,
 	       igraph_real_t gamma, igraph_integer_t no_sim,
 	       igraph_vector_ptr_t *result) {
