@@ -61,6 +61,8 @@ SEXP R_igraph_plfit_result_to_SEXP(const igraph_plfit_result_t *plfit);
 SEXP R_igraph_sparsemat_to_SEXP(const igraph_sparsemat_t *sp);
 SEXP R_igraph_0orsparsemat_to_SEXP(const igraph_sparsemat_t *sp);
 SEXP R_igraph_maxflow_stats_to_SEXP(const igraph_maxflow_stats_t *st);
+SEXP R_igraph_sirlist_to_SEXP(const igraph_vector_ptr_t *sl);
+void R_igraph_sirlist_destroy(igraph_vector_ptr_t *sl);
 
 int R_igraph_SEXP_to_strvector(SEXP rval, igraph_strvector_t *sv);
 int R_igraph_SEXP_to_strvector_copy(SEXP rval, igraph_strvector_t *sv);
@@ -2600,6 +2602,47 @@ SEXP R_igraph_maxflow_stats_to_SEXP(const igraph_maxflow_stats_t *st) {
 
   UNPROTECT(2);
   return result;
+}
+
+SEXP R_igraph_sirlist_to_SEXP(const igraph_vector_ptr_t *sl) {
+  SEXP result, names;
+  int i, n=igraph_vector_ptr_size(sl);
+  PROTECT(result=NEW_LIST(n));
+
+  PROTECT(names=NEW_CHARACTER(4));
+  SET_STRING_ELT(names, 0, mkChar("times"));
+  SET_STRING_ELT(names, 1, mkChar("NS"));
+  SET_STRING_ELT(names, 2, mkChar("NI"));
+  SET_STRING_ELT(names, 3, mkChar("NR"));
+
+  for (i=0; i<n; i++) {
+    SEXP tmp;
+    const igraph_sir_t *sir=VECTOR(*sl)[i];
+    PROTECT(tmp=NEW_LIST(4));
+    SET_VECTOR_ELT(tmp, 0, R_igraph_vector_to_SEXP(&sir->times));
+    SET_VECTOR_ELT(tmp, 1, R_igraph_vector_int_to_SEXP(&sir->no_s));
+    SET_VECTOR_ELT(tmp, 2, R_igraph_vector_int_to_SEXP(&sir->no_i));
+    SET_VECTOR_ELT(tmp, 3, R_igraph_vector_int_to_SEXP(&sir->no_r));
+    SET_VECTOR_ELT(result, i, tmp);
+    SET_NAMES(tmp, names);
+    UNPROTECT(1);
+  }
+
+  UNPROTECT(2);
+  return result;
+}
+
+void R_igraph_sirlist_destroy(igraph_vector_ptr_t *sl) {
+  int i, n=igraph_vector_ptr_size(sl);
+  for (i=0; i<n; i++) {
+    igraph_sir_t *sir=VECTOR(*sl)[i];
+    igraph_vector_destroy(&sir->times);
+    igraph_vector_int_destroy(&sir->no_s);
+    igraph_vector_int_destroy(&sir->no_i);
+    igraph_vector_int_destroy(&sir->no_r);
+    igraph_free(sir);
+  }
+  igraph_vector_ptr_destroy(sl);
 }
 
 int R_SEXP_to_sparsemat(SEXP pakl, igraph_sparsemat_t *akl) {
