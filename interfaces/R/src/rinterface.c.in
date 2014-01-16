@@ -2476,6 +2476,17 @@ void R_igraph_vectorlist_int_destroy(igraph_vector_ptr_t *ptr) {
   for (i=0; i<n; i++) {
     igraph_vector_int_t *v=VECTOR(*ptr)[i];
     igraph_vector_int_destroy(v);
+    igraph_free(v);
+   }
+  igraph_vector_ptr_destroy(ptr);
+}
+
+void R_igraph_vectorlist_int_destroy2(igraph_vector_ptr_t *ptr) {
+  int i, n=igraph_vector_ptr_size(ptr);
+
+  for (i=0; i<n; i++) {
+    igraph_vector_int_t *v=VECTOR(*ptr)[i];
+    igraph_vector_int_destroy(v);
    }
   igraph_free(VECTOR(*ptr)[0]);
   igraph_vector_ptr_destroy(ptr);
@@ -10483,7 +10494,7 @@ SEXP R_igraph_subclique_next(SEXP pgraph, SEXP pweights, SEXP pids,
   SET_VECTOR_ELT(Rresult, 0, R_igraph_graphlist_to_SEXP(&result));
   R_igraph_graphlist_destroy(&result);
   SET_VECTOR_ELT(Rresult, 1, R_igraph_vectorlist_int_to_SEXP(&resultids));
-  R_igraph_vectorlist_int_destroy(&resultids);
+  R_igraph_vectorlist_int_destroy2(&resultids);
   SET_VECTOR_ELT(Rresult, 2, R_igraph_vectorlist_to_SEXP(&resultweights));
   R_igraph_vectorlist2_destroy(&resultweights);
   SET_VECTOR_ELT(Rresult, 3, R_igraph_vector_to_SEXP(&clique_thr));
