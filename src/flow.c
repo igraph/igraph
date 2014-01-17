@@ -1580,7 +1580,7 @@ int igraph_i_mincut_directed(const igraph_t *graph,
  * The first implementation of the actual cut calculation for
  * undirected graphs was made by Gregory Benison, thanks Greg.
  * \param graph The input graph.
- * \param value Pointer to an integer, the value of the cut will be
+ * \param value Pointer to a float, the value of the cut will be
  *    stored here.
  * \param partition Pointer to an initialized vector, the ids
  *    of the vertices in the first partition after separating the
