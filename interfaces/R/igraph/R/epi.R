@@ -28,11 +28,13 @@
 # Outputs:  None.  Just produces the plot of all compartment curves, 
 #           with median and quantiles.
 
-plot.sir <- function(sir, comp=c("NI", "NS", "NR"),
+plot.sir <- function(x, comp=c("NI", "NS", "NR"),
                      median=TRUE, quantiles=c(0.1, 0.9), color=NULL,
                      median_color=NULL, quantile_color=NULL,
                      lwd.median=2, lwd.quantile=2, lty.quantile=3,
                      xlim=NULL, ylim=NULL, xlab="Time", ylab=NULL, ...) {
+
+  sir <- x
 
   if (!inherits(sir, "sir")) {
     stop("This is not an SIR model output")

@@ -7,13 +7,14 @@
   simulations.
 }
 \usage{
-plot.sir (sir, comp = c("NI", "NS", "NR"), median = TRUE, quantiles = c(0.1, 
-    0.9), color = NULL, median_color = NULL, quantile_color = NULL, 
-    lwd.median = 2, lwd.quantile = 2, lty.quantile = 3, xlim = NULL, 
-    ylim = NULL, xlab = "Time", ylab = NULL, ...) 
+\S3method{plot}{sir}(x, comp = c("NI", "NS", "NR"), median = TRUE,
+    quantiles = c(0.1, 0.9), color = NULL, median_color = NULL,
+    quantile_color = NULL, lwd.median = 2, lwd.quantile = 2,
+    lty.quantile = 3, xlim = NULL, ylim = NULL,
+    xlab = "Time", ylab = NULL, \dots)
 }
 \arguments{
-  \item{sir}{The output of the SIR simulation, coming from the
+  \item{x}{The output of the SIR simulation, coming from the
     \code{\link{sir}} function.}
   \item{comp}{Character scalar, which component to plot. Either
     \sQuote{NI} (infected, default), \sQuote{NS} (susceptible) or
