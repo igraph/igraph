@@ -111,7 +111,7 @@ export(get.adjacency, get.edgelist, as.directed, as.undirected,
 
 # fitting, other
 
-export(power.law.fit, running.mean, igraph.sample)
+export(power.law.fit, running.mean, igraph.sample, srand)
 
 # foreign formats
 

@@ -64,3 +64,11 @@ igraph.i.spMatrix <- function(M) {
         factors=list(), i=M$i, p=M$p, x=M$x)
   }
 }
+
+srand <- function(seed) {
+  seed <- as.numeric(seed)
+  if (length(seed) != 1) { stop("Length of `seed' must be 1") }
+  if (seed < 0) { stop("Seed must be non-negative") }
+  res <- .Call("R_igraph_srand", seed, PACKAGE="igraph")
+  invisible(res)
+}

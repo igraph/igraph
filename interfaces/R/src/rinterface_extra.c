@@ -28,6 +28,8 @@
 #include <Rinternals.h>
 #include <Rdefines.h>
 
+#include <stdlib.h>
+
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++C */
 /*                                                               C */
 /*  Given a HIERARCHIC CLUSTERING, described as a sequence of    C */
@@ -201,4 +203,10 @@ SEXP R_igraph_psumtree_draw(SEXP plength, SEXP howmany, SEXP prob) {
   igraph_psumtree_destroy(&tree);
   UNPROTECT(1);
   return result;
+}
+
+SEXP R_igraph_srand(SEXP pseed) {
+  unsigned seed=INTEGER(AS_INTEGER(pseed))[0];
+  srand(seed);
+  return R_NilValue;
 }
