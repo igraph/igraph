@@ -18,8 +18,8 @@ GCC_VERSION_PATCHLEVEL="4.2.1"
 BUILD_PPC=0
 
 # Mac OS X SDK versions for 32-bit and 64-bit builds go here
-SDK_VERSION_32="10.7"
-SDK_VERSION_64="10.7"
+SDK_VERSION_32="10.8"
+SDK_VERSION_64="10.8"
 
 # Generic configure flags you always want go here.
 CONFIG_GENERIC="--disable-gmp"
@@ -86,9 +86,14 @@ CONFIG_X86="--build=`uname -p`-apple-darwin --host=i386-apple-darwin"
 # They changed this to "darwin11" in Xcode 3.2 (Snow Leopard).
 GCCUSRPATH_X86="${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_64}.sdk/usr/lib/gcc/i686-apple-darwin11/${GCC_VERSION_PATCHLEVEL}"
 if [ ! -d "$GCCUSRPATH_X86" ]; then
-    echo "Couldn't find any GCC usr path for x86"
+    echo "Warning: Couldn't find any GCC usr path for x86"
 	echo "Tried: $GCCUSRPATH_X86"
-    exit 1
+	echo "This is probably because we have Clang only. Proceeding with compilation..."
+	GCCUSRPATH_X86_INCLUDE_DIR=""
+	GCCUSRPATH_X86_LIB_DIR=""
+else
+	GCCUSRPATH_X86_INCLUDE_DIR="-I${GCCUSRPATH_X86}/include"
+	GCCUSRPATH_X86_LIB_DIR="-L${GCCUSRPATH_X86}"
 fi
 
 # Intel 32-bit compiler flags
@@ -97,13 +102,13 @@ CXX_X86="${GCXX_PATH} -arch i386"
 CFLAGS_X86="-mmacosx-version-min=10.4"
 CPPFLAGS_X86="-DMAC_OS_X_VERSION_MIN_REQUIRED=1040 \
 -F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
--I$GCCUSRPATH_X86/include \
+${GCCUSRPATH_X86_INCLUDE} \
 -isystem ${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/usr/include"
 
 # Intel 32-bit linker flags
 LFLAGS_X86="-arch i386 -Wl,-headerpad_max_install_names -mmacosx-version-min=10.4 \
 -F${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk/System/Library/Frameworks \
--L$GCCUSRPATH_X86 \
+${GCCUSRPATH_X86_LIB} \
 -Wl,-syslibroot,${DEV_PATH}/Developer/SDKs/MacOSX${SDK_VERSION_32}.sdk"
 
 # Intel 64-bit configure flags (${SDK_VERSION_64} runtime compatibility)
