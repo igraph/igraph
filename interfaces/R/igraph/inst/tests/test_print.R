@@ -18,7 +18,7 @@ test_that("print.igraph works", {
 
   set.seed(42)
   E(g)$weight <- sample(ecount(g))
-  expect_that(summary(g), prints_text("weight[ ]*[(]e/n[)]"))
+  expect_that(summary(g), prints_text("weight[\n ]*[(]e/n[)]"))
 
   g$name <- "A ring"
   expect_that(summary(g), prints_text("A ring"))
