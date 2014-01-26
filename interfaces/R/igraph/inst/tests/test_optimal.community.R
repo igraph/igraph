@@ -19,3 +19,14 @@ test_that("optimal.community works", {
               "3", "4")), .Names="Community sizes"), class="table") ))
 
 })
+
+test_that("weighted optimal.community works", {
+
+  library(igraph)
+  set.seed(42)
+  g <- graph.full(5) + graph.ring(5)
+  E(g)$weight <- sample(1:2, ecount(g), replace=TRUE)
+
+  oc <- optimal.community(g)
+  expect_that(modularity(oc), equals(0.4032))
+})
