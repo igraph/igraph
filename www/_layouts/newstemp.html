@@ -1,22 +1,22 @@
 ---
 layout: default
-title: igraph &ndash; Network analysis software
-mainheader: igraph news 
-lead: New releases and other major changes
 ---
 
 <div class="container bs-docs-container">
-
   <div class="row">
     <div class="col-md-3">
       <div class="bs-sidebar hidden-print" role="complementary" 
            data-spy="affix">
         <ul class="nav bs-sidenav">
           {% for post in site.posts %}
-          <li>
-            <a href="/news.html#{{ post.id }}">{{ post.title }}</a>
-          </li>
-          {% endfor %}
+  	    {% for cat in post.categories %}
+	      {% if cat == page.lang %}
+                <li>
+		  <a href="/{{page.lang}}/news.html#{{ post.id }}">{{ post.title }}</a>
+		</li>
+	      {% endif %}		
+	     {% endfor %}
+	  {% endfor %}
         </ul>
       </div>
     </div>

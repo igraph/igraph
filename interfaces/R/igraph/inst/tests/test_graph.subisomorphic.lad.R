@@ -40,3 +40,31 @@ test_that("graph.subisomorphic.lad works", {
               .Names = c("iso", "map", "maps")) ))
 
 })
+
+test_that("LAD stress test", {
+
+  library(igraph)
+  set.seed(42)
+  N <- 100
+  
+  for (i in 1:N) {
+    target <- erdos.renyi.game(20, .5)
+    pn <- sample(4:18, 1)
+    pattern <- induced.subgraph(target, sample(vcount(target), pn))
+    iso <- graph.subisomorphic.lad(pattern, target, induced=TRUE,
+                                   all.maps=FALSE)
+    expect_that(iso$iso, is_true())
+  }
+
+  set.seed(42)
+  
+  for (i in 1:N) {
+    target <- erdos.renyi.game(20, 1/20)
+    pn <- sample(5:18, 1)
+    pattern <- erdos.renyi.game(pn, .6)
+    iso <- graph.subisomorphic.lad(pattern, target, induced=TRUE,
+                                   all.maps=FALSE)
+    expect_that(iso$iso, is_false())
+  }
+
+})

@@ -237,6 +237,8 @@ MATRIXLIST:
   INCONV:
     IN: if (!all(sapply(%I%, is.matrix))) { stop("%I is not a list of matrices") }
 
+VECTORLIST_INT_OR_0:
+
 VERTEXSETLIST:
 
 VERTEXSETLIST_OR_0:
@@ -364,3 +366,5 @@ EIGENWHICH:
             %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
     DEFAULT: 
       Default: list()
+
+SIRLIST:

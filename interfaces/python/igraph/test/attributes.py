@@ -213,10 +213,20 @@ class AttributeCombinationTests(unittest.TestCase):
         g.simplify()
         self.assertTrue(sorted(g.edge_attributes()) == [])
 
+
+class UnicodeAttributeTests(unittest.TestCase):
+    def testUnicodeAttributeNameCombination(self):
+        g = Graph.Erdos_Renyi(n=9, m=20)
+        g.es[u"test"] = 1
+        g.contract_vertices([0,0,0,1,1,1,2,2,2])
+
+
 def suite():
     attribute_suite = unittest.makeSuite(AttributeTests)
     attribute_combination_suite = unittest.makeSuite(AttributeCombinationTests)
-    return unittest.TestSuite([attribute_suite, attribute_combination_suite])
+    unicode_attributes_suite = unittest.makeSuite(UnicodeAttributeTests)
+    return unittest.TestSuite([attribute_suite, attribute_combination_suite,
+        unicode_attributes_suite])
 
 def test():
     runner = unittest.TextTestRunner()

@@ -45,7 +45,6 @@ int main() {
   igraph_t g;
   igraph_vector_t modularity, weights;
   igraph_matrix_t merges;
-  FILE *f;
 
   igraph_vector_init(&modularity,0);
   igraph_matrix_init(&merges,0,0);

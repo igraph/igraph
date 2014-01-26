@@ -25,6 +25,7 @@
 
 #include <Python.h>
 #include "graphobject.h"
+#include "py2compat.h"
 
 /**
  * \ingroup python_interface_vertex
@@ -35,6 +36,7 @@ typedef struct
   PyObject_HEAD
   igraphmodule_GraphObject* gref;
   igraph_integer_t idx;
+  Py_hash_t hash;
 } igraphmodule_VertexObject;
 
 int igraphmodule_Vertex_clear(igraphmodule_VertexObject *self);

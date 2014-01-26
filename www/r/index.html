@@ -1,0 +1,270 @@
+---
+layout: default
+mainheader: Get started with R igraph
+lead: Install and start using the igraph R package
+---
+
+<div class="container bs-docs-container">
+
+  <div class="row">
+    <div class="col-md-3">
+      <div class="bs-sidebar hidden-print" role="complementary" 
+           data-spy="affix">
+        <ul class="nav bs-sidenav">
+
+          <li><a href="#startr"><i class="icon-fixed-width icon-rlogo"></i> 
+	      Get started</a>
+            <ul class="nav">
+              <li><a href="#rinstall">Installation</a></li>
+              <li><a href="#rreq">Requirements</a></li>
+              <li><a href="#rreqopt">Optional requirements</a></li>
+              <li><a href="#rdoc1">Tutorials</a></li>
+            </ul>
+          </li>
+          <li>
+            <a href="#docs"><i class="icon-fixed-width icon-book"></i> 
+	      Documentation</a>
+            <ul class="nav">
+              <li><a href="#rmanual">R manual pages</a></li>
+<!--               <li><a href="#screenshots">Screenshots and -->
+<!--                 examples</a></li>                        -->
+<!--               <li><a href="#wiki">Wiki</a></li>          -->
+            </ul>
+          </li>
+
+          <li><a href="#downloads">
+	      <i class="icon-fixed-width icon-download"></i> Downloads</a>
+            <ul class="nav">
+              <li><a href="#rdown">Current release</a></li>
+              <li><a href="#nightlydown">Nightly builds</a></li>
+              <li><a href="#devdown">Development version</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#help">
+	      <i class="icon-fixed-width icon-question-sign"></i> 
+	      Get help</a>
+            <ul class="nav">
+              <li><a href="#list">Mailing list</a></li>
+              <li><a href="#so">Stack Overflow</a></li>
+            </ul>
+          </li>
+
+          <li><a href="#contribute">
+	      <i class="icon-fixed-width icon-plus-sign-alt"></i> 
+	      Contribute</a>
+            <ul class="nav">
+              <li><a href="#contributebugs">Report bugs</a></li>
+              <!-- <li><a href="#contributewiki">Improve the Wiki</a></li> -->
+              <li><a href="#contributecode">Contribute code</a></li>
+            </ul>
+          </li>
+
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="bs-docs-section">
+
+        <div class="page-header">
+          <h1><span id="startr" class="anchor">&nbsp;</span>
+            Get started</h1>
+        </div>
+
+        <h3><span id="rinstall" class="anchor">&nbsp;</span>
+           Installation</h3>
+        <p>
+          igraph is on CRAN and can be installed from within R:
+        </p>
+        <p>
+        {% highlight r %}
+## Download and install the package
+install.packages("igraph")
+
+## Load package
+library(igraph)
+{% endhighlight %}
+        </p>
+
+        <h3><span id="rreq" class="anchor">&nbsp;</span>Requirements</h3>
+        <p>On Linux (and other Unix-like systems, but not on OSX),
+          a C and a C++ compiler is needed, and also the tool
+          <code>make</code>. On Debian and Ubuntu Linux the 
+          <code>build-essential</code> package installs these.</p>
+
+        <h3><span id="rreqopt" class="anchor">&nbsp;</span>
+          Optional requirements</h3>
+
+        <p>
+          <ul>
+            <li>On Linux (and other Unix-like systems, but not on OSX), 
+              the <code>libxml2</code> library, including header files,
+              is needed for the ability of reading GraphML files. On
+              Ubuntu and Debian Linux the <code>lixml2</code> and
+              <code>libxml2-dev</code> packages are needed.</li>
+            <li>The {% include rbasepkg p="tcltk" %} R package is needed for
+              {% include rfun f="tkplot" %} and 
+              {% include rfun f="tkigraph" %} to work.</li>
+            <li>The {% include rpkg p="rgl" %} R package is needed for
+              {% include rfun f="rglplot" %} to work.</li>
+            <li>The {% include rpkg p="ape" %} package is needed to
+              plot nice dendrograms with 
+              {% include rfun f="dendPlot" %}.</li>
+          </ul>
+        </p>
+
+        <h3><span id="rdoc1" class="anchor">&nbsp;</span>Tutorials</h3>
+
+        <p>
+          <ul>
+            <li>Manual pages <a href="/r/doc/aaa-igraph-package.html">
+              <code class="rman">igraph</code></a> and
+              {% include rman p="graph.structure" %} are good places
+              to start.</li>
+<!--             <li>Some screenshots and examples are -->
+<!--               <a href="">here.</a></li>           -->
+            <li>Type in <code>demo(package="igraph")</code> 
+              (or use {% include rfun f="igraphdemo" %} if you have
+              <span style="white-space:nowrap;">
+                {% include rbasepkg p="tcltk" %})</span> to get a list of
+              demos.</li>
+          </ul>
+        </p>
+
+        <div class="page-header">
+          <h1><span id="docs" class="anchor">&nbsp;</span>Documentation
+          <small>&ndash; for version {% include igraph-version %}</small></h1>
+        </div>
+
+        <h3><span id="rmanual" class="anchor">&nbsp;</span>R manual pages</h3>
+        <p>
+          <ul class="icons-ul list-unstyled">
+            <li><i class="icon-li icon-link"></i>
+            <a href="/r/doc/">Browse online</a></li>
+            <li><i class="icon-li icon-book"></i>
+            <a href="/r/doc/igraph.pdf">PDF file</a></li>
+          </ul>
+        </p>
+
+        <p>
+          Note that this documentation is included in the R
+          package. You can use <code>library(help="igraph")</code>
+          or <code>help("igraph")</code> as a starting point.
+        </p>
+
+        <!-- <h3><span id="screenshots" class="anchor">&nbsp;</span> -->
+        <!--   Screenshots and examples</h3> -->
+        <!-- <p> -->
+        <!--   TODO -->
+        <!-- </p> -->
+        <!-- <p> -->
+        <!--   See also the gallery in the -->
+        <!--   <a href="https://github.com/igraph/igraph/wiki"> -->
+        <!--       igraph wiki.</a> -->
+        <!-- </p> -->
+
+        <!-- <h3><span id="wiki" class="anchor">&nbsp;</span>Wiki</h3> -->
+        <!-- <p> -->
+        <!--   TODO -->
+        <!-- </p> -->
+
+        <div class="page-header">
+          <h1><span id="downloads" class="anchor">&nbsp;</span>Downloads</h1>
+        </div>
+
+        <h3><span id="rdown" class="anchor">&nbsp;</span>
+	  Latest stable version
+	  &ndash; {% include igraph-rversion %}
+	  (aka {% include igraph-version %})</h3>
+        <p>
+          <small> Note: the simplest way to install the igraph R
+            package is typing <code>install.packages("igraph")</code>
+            in your R session.</small>
+        </p>
+        <p>
+          <ul class="icons-ul list-unstyled">
+            <li><i class="icon-li icon-windows"></i>
+              <a href="/nightly/get/r-win/igraph_{% include igraph-rversion %}.zip">Windows binary package</a></li>
+            <li><i class="icon-li icon-apple"></i>
+              <a href="/nightly/get/r-osx/igraph_{% include igraph-rversion %}.tgz">Mac OS X universal binary package</a></li>
+            <li><i class="icon-li icon-file-text"></i>
+              <a href="/nightly/get/r/igraph_{% include igraph-rversion %}.tar.gz">Source package</a></li>
+          </ul>
+        </p>
+
+        <h3><span id="nightlydown" class="anchor">&nbsp;</span>
+          Nightly builds</h3>
+        <p>
+          Builds from our development branch(es) are available from
+          <a href="/nightly">our nightly build server</a>.
+        </p>
+
+        <h3><span id="devdown" class="anchor">&nbsp;</span>
+          Development version</h3>
+        <p>
+          Clone (or fork) the <code>develop</code> branch from the
+          <a href="https://github.com/igraph/igraph">igraph git
+            reposity on github.</a>
+        </p>
+
+        <div class="page-header">
+          <h1><span id="help" class="anchor">&nbsp;</span>Get help</h1>
+        </div>
+
+        <h3><span id="list" class="anchor">&nbsp;</span>Mailing list</h3>
+        <p>
+          Post a question on the
+          <a href="https://lists.nongnu.org/mailman/listinfo/igraph-help">
+            igraph-help mailing list</a>. To avoid spam
+          on the list, you need to sign up first. You can also 
+          <a href="http://lists.nongnu.org/archive/html/igraph-help/">
+          search the mailing list.</a>
+        </p>
+
+        <h3><span id="so" class="anchor">&nbsp;</span>Stack Overflow</h3>
+        <p>
+          Post specific igraph questions on
+          <a href="http://stackoverflow.com/questions/tagged/igraph">
+            Stack Overflow</a>. Make sure that you include the
+          <code>igraph</code> tag and that you include a reproducible
+          example, complete with code and data.
+        </p>
+
+        <div class="page-header">
+          <h1><span id="contribute" class="anchor">&nbsp;</span>Contribute</h1>
+        </div>
+
+        <p>
+          Your contribution is more than welcome!
+        </p>
+        
+        <h3><span id="contributebugs" class="anchor">&nbsp;</span>
+          Report bugs</h3>
+
+        <p>Report bugs or suggest new features or algorithms in the 
+          <a href="https://github.com/igraph/igraph/issues">
+          github issue tracker</a>.
+        </p>
+        
+        <!-- <h3><span id="contributewiki" class="anchor">&nbsp;</span> -->
+        <!--   Improve the wiki</h3> -->
+        
+        <!-- <p>Add your work to the gallery in the -->
+        <!--   <a href="https://github.com/igraph/igraph/wiki"> -->
+        <!--         igraph wiki</a>. -->
+        <!-- </p> -->
+
+        <h3><span id="contributecode" class="anchor">&nbsp;</span>
+          Contribute code</h3>
+          
+        <p>Send a pull request on <a href="https://github.com/igraph/igraph">
+                github.</a> Please note that igraph can contain only
+          code that is compatible with its GPL license.
+        </p>
+
+      </div>
+    </div>
+  </div>
+
+</div>

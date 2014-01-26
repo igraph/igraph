@@ -11,7 +11,7 @@ test_that("graph.mincut works", {
 
   expect_that(mc$value, equals(1))
   expect_that(mc$cut, equals(2))
-  expect_that(mc$partition1, equals(c(1,3:6)))
-  expect_that(mc$partition2, equals(2))
+  expect_that(mc$partition1, equals(2))
+  expect_that(mc$partition2, equals(c(1,3:6)))
 
 })

@@ -22,8 +22,8 @@
 
 plot.igraph <- function(x, 
                        # SPECIFIC: #####################################
-                       axes=FALSE, xlab="", ylab="", add=FALSE,
-                       xlim=c(-1,1), ylim=c(-1,1), main="", sub="",
+                       axes=FALSE, add=FALSE,
+                       xlim=c(-1,1), ylim=c(-1,1),
                        mark.groups=list(), mark.shape=1/2,
                        mark.col=rainbow(length(mark.groups), alpha=0.3),
                        mark.border=rainbow(length(mark.groups), alpha=1),
@@ -69,6 +69,10 @@ plot.igraph <- function(x,
   rescale            <- params("plot", "rescale")
   asp                <- params("plot", "asp")
   frame              <- params("plot", "frame")
+  main               <- params("plot", "main")
+  sub                <- params("plot", "sub")
+  xlab               <- params("plot", "xlab")
+  ylab               <- params("plot", "ylab")
 
   # the new style parameters can't do this yet
   arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)

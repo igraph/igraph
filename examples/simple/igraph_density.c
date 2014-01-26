@@ -42,11 +42,6 @@ int main() {
 
   igraph_t g;
   igraph_vector_t v;
-  igraph_real_t density;
-  int ret;
-  igraph_integer_t mdeg, nedges;
-  long int i;
-  long int ndeg;
 
   igraph_vector_init(&v, 0);
 

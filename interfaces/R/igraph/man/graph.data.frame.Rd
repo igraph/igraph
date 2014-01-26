@@ -13,10 +13,13 @@ get.data.frame(x, what=c("edges", "vertices", "both"))
 }
 \arguments{
   \item{d}{A data frame containing a symbolic edge list in the first two
-    columns. Additional columns are considered as edge attributes.}
+    columns. Additional columns are considered as edge attributes.
+    Since version 0.7 this argument is coerced to a data frame with
+    \code{as.data.frame}.}
   \item{directed}{Logical scalar, whether or not to create a directed graph.}
   \item{vertices}{A data frame with vertex metadata, or \code{NULL}. See
-    details below.}
+    details below. Since version 0.7 this argument is coerced to a data
+    frame with \code{as.data.frame}, if not \code{NULL}.}
   \item{x}{An igraph object.}
   \item{what}{Character constant, whether to return info about vertices,
     edges, or both. The default is \sQuote{edges}.}

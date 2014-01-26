@@ -436,11 +436,13 @@ void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
  * \param partition A null pointer or a pointer to an initialized
  *        vector. If not a null pointer, then the first partition of
  *        the minimum cut that corresponds to the maximum flow will be
- *        placed here.
+ *        placed here. The first partition is always the one that
+ *        contains the source vertex.
  * \param partition2 A null pointer or a pointer to an initialized
  *        vector. If not a null pointer, then the second partition of
  *        the minimum cut that corresponds to the maximum flow will be
- *        placed here.
+ *        placed here. The second partition is always the one that
+ *        contains the target vertex.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
  * \param capacity Vector containing the capacity of the edges. If NULL, then
@@ -701,23 +703,23 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
       }
     }
 
-    if (partition) {
+    if (partition2) {
       long int x=0;
-      IGRAPH_CHECK(igraph_vector_resize(partition, marked));
+      IGRAPH_CHECK(igraph_vector_resize(partition2, marked));
       for (i=0; i<no_of_nodes; i++) {
 	if (VECTOR(added)[i]) {
-	  VECTOR(*partition)[x++]=i;
+	  VECTOR(*partition2)[x++]=i;
 	}
       }
     }
 
-    if (partition2) {
+    if (partition) {
       long int x=0;
-      IGRAPH_CHECK(igraph_vector_resize(partition2,
+      IGRAPH_CHECK(igraph_vector_resize(partition,
 					no_of_nodes-marked));
       for (i=0; i<no_of_nodes; i++) {
 	if (!VECTOR(added)[i]) {
-	  VECTOR(*partition2)[x++]=i;
+	  VECTOR(*partition)[x++]=i;
 	}
       }
     }
@@ -1116,10 +1118,12 @@ int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
  *        is a null pointer.
  * \param partition Pointer to a real vector, the vertex ids of the
  *        vertices in the first partition of the cut are stored
- *        here. This argument is ignored if it is a null pointer.
+ *        here. The first partition is always the one that contains the
+ *        source vertex. This argument is ignored if it is a null pointer.
  * \param partition2 Pointer to a real vector, the vertex ids of the
  *        vertices in the second partition of the cut are stored here.
- *        This argument is ignored if it is a null pointer.
+ *        The second partition is always the one that contains the
+ *        target vertex. This argument is ignored if it is a null pointer.
  * \param source Integer, the id of the source vertex.
  * \param target Integer, the id of the target vertex.
  * \param capacity Vector containing the capacity of the edges. If a
@@ -1194,7 +1198,7 @@ int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
  */
 
 int igraph_i_mincut_undirected(const igraph_t *graph, 
-			       igraph_integer_t *res,
+			       igraph_real_t *res,
 			       igraph_vector_t *partition,
 			       igraph_vector_t *partition2,
 			       igraph_vector_t *cut,
@@ -1374,7 +1378,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     igraph_i_cutheap_reset_undefine(&heap, last);    
   }
 
-  *res=(igraph_integer_t) mincut;
+  *res=mincut;
 
   igraph_inclist_destroy(&inclist);
   igraph_adjlist_destroy(&adjlist);
@@ -1580,7 +1584,7 @@ int igraph_i_mincut_directed(const igraph_t *graph,
  * The first implementation of the actual cut calculation for
  * undirected graphs was made by Gregory Benison, thanks Greg.
  * \param graph The input graph.
- * \param value Pointer to an integer, the value of the cut will be
+ * \param value Pointer to a float, the value of the cut will be
  *    stored here.
  * \param partition Pointer to an initialized vector, the ids
  *    of the vertices in the first partition after separating the
@@ -1623,11 +1627,9 @@ int igraph_mincut(const igraph_t *graph,
       return igraph_mincut_value(graph, value, capacity);      
     }
   } else {
-	igraph_integer_t int_value;
-    IGRAPH_CHECK(igraph_i_mincut_undirected(graph, &int_value, partition, 
-				      partition2, cut, capacity));
-	*value = int_value;
-	return IGRAPH_SUCCESS;
+    IGRAPH_CHECK(igraph_i_mincut_undirected(graph, value, partition,
+					    partition2, cut, capacity));
+    return IGRAPH_SUCCESS;
   }
   
   return 0;
@@ -1635,7 +1637,7 @@ int igraph_mincut(const igraph_t *graph,
     
 
 int igraph_i_mincut_value_undirected(const igraph_t *graph, 
-				     igraph_integer_t *res,
+				     igraph_real_t *res,
 				     const igraph_vector_t *capacity) {
   return igraph_i_mincut_undirected(graph, res, 0, 0, 0, capacity);
 }
@@ -1686,9 +1688,7 @@ int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
   minmaxflow=IGRAPH_INFINITY;
 
   if (!igraph_is_directed(graph)) {
-    igraph_integer_t int_res;
-    IGRAPH_CHECK(igraph_i_mincut_value_undirected(graph, &int_res, capacity));
-	*res = int_res;
+    IGRAPH_CHECK(igraph_i_mincut_value_undirected(graph, res, capacity));
     return 0;
   }    
 
@@ -2395,7 +2395,6 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
   igraph_vector_t flow_values;
   igraph_vector_t partition;
   igraph_vector_t partition2;
-  igraph_vector_t *side_of_s;
   igraph_real_t flow_value;
 
   if (igraph_is_directed(graph)) {
@@ -2429,10 +2428,11 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
     VECTOR(flow_values)[(long int)source] = flow_value;
 
     /* Update the tree */
-    side_of_s = igraph_vector_contains(&partition, source) ? &partition : &partition2;
-    n = igraph_vector_size(side_of_s);
+    /* igraph_maxflow() guarantees that the source vertex will be in &partition
+     * and not in &partition2 */
+    n = igraph_vector_size(&partition);
     for (i = 0; i < n; i++) {
-      mid = VECTOR(*side_of_s)[i];
+      mid = VECTOR(partition)[i];
       if (mid > source && VECTOR(neighbors)[(long int)mid] == target) {
 	VECTOR(neighbors)[(long int)mid] = source;
       }

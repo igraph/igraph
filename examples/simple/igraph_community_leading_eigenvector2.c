@@ -50,10 +50,7 @@ int main() {
   igraph_t g;
   igraph_matrix_t merges;
   igraph_vector_t membership;
-  long int i, j;
-  igraph_bool_t split;
   igraph_vector_t x;
-  igraph_real_t val;
   igraph_arpack_options_t options;
   igraph_vector_t weights;
   

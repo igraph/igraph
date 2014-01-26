@@ -1960,6 +1960,16 @@ igraph_power_law_fit:
        IGNORE: RNamespace
 
 #######################################
+# Dynamics, on networks
+#######################################
+
+igraph_sir:
+       PARAMS: GRAPH graph, REAL beta, REAL gamma, INTEGER no_sim=100, \
+               OUT SIRLIST res
+       NAME-R: sir
+       CLASS-R: sir
+
+#######################################
 # Other, not graph related
 #######################################
 

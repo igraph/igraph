@@ -1,1 +1,1 @@
-<a href="/doc/r/{{ include.p }}.html"><code class="rman">{{ include.p }}</code></a>
+<a href="/r/doc/{{ include.p }}.html"><code class="rman">{{ include.p }}</code></a>

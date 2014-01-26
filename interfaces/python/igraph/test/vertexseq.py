@@ -13,6 +13,36 @@ class VertexTests(unittest.TestCase):
     def setUp(self):
         self.g = Graph.Full(10)
 
+    def testHash(self):
+        data = {}
+        n = self.g.vcount()
+        for i in xrange(n):
+            code1 = hash(self.g.vs[i])
+            code2 = hash(self.g.vs[i])
+            self.assertEqual(code1, code2)
+            data[self.g.vs[i]] = i
+
+        for i in xrange(n):
+            self.assertEqual(i, data[self.g.vs[i]])
+
+    def testRichCompare(self):
+        g2 = Graph.Full(10)
+        for i in xrange(self.g.vcount()):
+            for j in xrange(self.g.vcount()):
+                self.assertEqual(i == j, self.g.vs[i] == self.g.vs[j])
+                self.assertEqual(i != j, self.g.vs[i] != self.g.vs[j])
+                self.assertEqual(i <  j, self.g.vs[i] <  self.g.vs[j])
+                self.assertEqual(i >  j, self.g.vs[i] >  self.g.vs[j])
+                self.assertEqual(i <= j, self.g.vs[i] <= self.g.vs[j])
+                self.assertEqual(i >= j, self.g.vs[i] >= self.g.vs[j])
+                self.assertFalse(self.g.vs[i] == g2.vs[j])
+                self.assertFalse(self.g.vs[i] != g2.vs[j])
+                self.assertFalse(self.g.vs[i] <  g2.vs[j])
+                self.assertFalse(self.g.vs[i] >  g2.vs[j])
+                self.assertFalse(self.g.vs[i] <= g2.vs[j])
+                self.assertFalse(self.g.vs[i] >= g2.vs[j])
+                self.assertFalse(self.g.es[i] == self.g.vs[j])
+
     def testUpdateAttributes(self):
         v = self.g.vs[0]
 

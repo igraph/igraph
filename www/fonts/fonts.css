@@ -9,7 +9,7 @@
 	font-style: normal;
 }
 
-[class*="icon-rlogo-"] {
+[class*="icon-rlogo"], [class*="icon-rlogo-alt"] {
 	font-family: 'rlogo';
 	speak: none;
 	font-style: normal;
@@ -24,9 +24,9 @@
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.icon-rlogo-r:before {
+.icon-rlogo:before {
 	content: "\e600";
 }
-.icon-rlogo-r2:before {
+.icon-rlogo-alt:before {
 	content: "\e601";
 }

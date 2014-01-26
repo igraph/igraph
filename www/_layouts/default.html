@@ -1,3 +1,4 @@
+{% include defaults %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -5,9 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="shortcut icon" href="/img/igraph3.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="/img/igraph4.png" type="image/x-icon" />
 
-    <title>{{ page.title }}</title>
+    <title>{{ title }}</title>
 
     <!-- Bootstrap core CSS -->
     <link href="/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -33,13 +34,10 @@
 
   </head>
 
-  {% capture prefix %}{{ page.url | firstdir }}{% endcapture %}
-
-  <body {% if page.url == "/index.html" %} class="start-page" {% endif %}>
-
+  <body class="{{ bodyclass }}">
   <div id="wrap">
 
-    <div class="navbar navbar-default navbar-fixed-top">
+    <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="container">
         <div class="navbar-header">
           <button type="button" class="navbar-toggle"
@@ -48,38 +46,40 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="/">
-            <img src="/img/igraph2.svg" width=25> igraph
+          <a class="navbar-brand" href="/{{ lang }}">
+            <img src="/img/igraph4.svg" width=35> {{ langname }}
           </a>
         </div>
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav navbar-left">
-            <li {% if page.url == "/index.html" %} class="active" {% endif %}>
-              <a href="/">Overview</a></li>
-            <li {% if page.url == "/getstarted.html" or page.url == "/cgi-bin/main.html" or page.url == "cgi-bin/tests.html" or prefix == "/doc/" %} class="active" 
-                {% endif %}><a href="/getstarted.html">Documentation</a></li>
-            <li {% if page.url == "/news.html" or page.id %} class="active" {% endif %}>
-              <a href="/news.html">News</a></li>
-            <li><a href="https://github.com/igraph/igraph">On github</a></li>
+	    {{ extramenu }}
+	    {% if lang == "r" or lang == "python" or lang == "c" %}
+            <li>
+              <a href="/{{ lang }}/news.html"><i class="icon-rss"></i>
+		News</a></li>
+	    <li><a href="/"><i class="icon-share"></i> Other versions</a></li>
+	    {% endif %}
+	    <li><a href="https://github.com/igraph/igraph">
+		<i class="icon-github"></i> On github</a></li>
           </ul>
-          <form class="navbar-form navbar-right">
-            <div class="form-group">
-              <input type="text" placeholder="Search docs"
-                     class="form-control" size="15">
-            </div>
-            <button type="submit" class="btn btn-success">
-              <span class="glyphicon glyphicon-search"></span></button>
-          </form>
+          <!-- <form class="navbar-form navbar-right"> -->
+          <!--   <div class="form-group"> -->
+          <!--     <input type="text" placeholder="Search docs" -->
+	  <!-- 	     class="form-control" size="15"> -->
+          <!--   </div> -->
+          <!--   <button type="submit" class="btn btn-success"> -->
+          <!--     <span class="glyphicon glyphicon-search"></span></button> -->
+          <!-- </form> -->
         </div><!--/.navbar-collapse -->
       </div>
     </div>
     
-    {% if page.url != "/index.html" %}
+    {% if lang != "index.html" %}
     
     <div class="bs-header-outer"><div class="bs-header">
       <div class="container">
-        <h1>{{page.mainheader}}</h1>
-        <p class="lead">{{page.lead}}</p>        
+        <h1>{{mainheader}}</h1>
+        <p class="lead">{{lead}}</p>        
       </div>
     </div></div>
 
@@ -93,8 +93,8 @@
       <div class="row">
         <div class="col-xs-12">
           <p class="text-muted credit">
-            Latest: igraph {% include igraph-version %}
-            &bull; &copy; 2003 &ndash; 2013 The igraph core team.
+            <!-- Latest: igraph {% include igraph-version %} &bull;  -->
+	    &copy; 2003 &ndash; 2013 The igraph core team.
             &bull; Code licensed under 
             <a href="http://www.gnu.org/licenses/gpl-2.0.html">
             GNU GPL 2</a> or later, documentation under 

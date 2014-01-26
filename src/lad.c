@@ -895,10 +895,12 @@ void igraph_i_lad_DFS(int nbU, int nbV, int u, bool* marked, int* nbSucc,
   int i;
   int v=VECTOR(*matchedWithU)[u]; /* the only one predecessor of v is u */
   marked[u]=true;
-  for (i=0; i<nbSucc[v]; i++) {
-    if (!marked[succ[v*nbU + i]]) {
-      igraph_i_lad_DFS(nbU, nbV, succ[v*nbU + i], marked, nbSucc, succ, 
-		       matchedWithU, order, nb);
+  if (v >= 0) {
+    for (i=0; i<nbSucc[v]; i++) {
+      if (!marked[succ[v*nbU + i]]) {
+        igraph_i_lad_DFS(nbU, nbV, succ[v*nbU + i], marked, nbSucc, succ,
+			 matchedWithU, order, nb);
+      }
     }
   }
   /* we have finished with u => number it */
@@ -946,6 +948,9 @@ int igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU,
   for (i=0; i<nbU; i++) {
     u=order[i];
     v=VECTOR(*matchedWithU)[u];
+    if (v == -1) {
+      continue;
+    }
     if (numV[v]==-1) { /* v belongs to a new SCC */
       nbSCC++;
       k=1; fifo[0]=v;

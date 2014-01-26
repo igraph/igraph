@@ -54,6 +54,14 @@
 #define Py_RETURN_NONE { Py_INCREF(Py_None); return Py_None; }
 #endif
 
+#ifndef Py_RETURN_NOTIMPLEMENTED
+#define Py_RETURN_NOTIMPLEMENTED { Py_INCREF(Py_NotImplemented); return Py_NotImplemented; }
+#endif
+
+#ifndef Py_RETURN
+#define Py_RETURN(x) { if (x) { Py_RETURN_TRUE; } else { Py_RETURN_FALSE; } }
+#endif
+
 /* Compatibility stuff for Python 2.4 */
 #if (PY_MAJOR_VERSION <= 2) & (PY_MINOR_VERSION <= 4)
 #define lenfunc inquiry

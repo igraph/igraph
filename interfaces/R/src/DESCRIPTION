@@ -13,3 +13,4 @@ Suggests: igraphdata, stats4, rgl, tcltk, graph, ape
 License: GPL (>= 2)
 URL: http://igraph.org
 SystemRequirements: gmp, libxml2
+BugReports: https://github.com/igraph/igraph/issues

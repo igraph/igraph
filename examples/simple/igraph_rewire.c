@@ -26,9 +26,7 @@
 int main() {
   
   igraph_t g;
-  igraph_integer_t result;
-  igraph_vector_t edges, res;
-  igraph_vs_t vids;
+  igraph_vector_t res;
   long i, n;
   
   igraph_tree(&g, 10, 3, IGRAPH_TREE_OUT);

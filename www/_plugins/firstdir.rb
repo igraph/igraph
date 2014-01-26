@@ -2,7 +2,7 @@
 module Jekyll
   module FirstdirFilter
     def firstdir(input)
-      input.gsub(/(\/[^\/]*\/?).*$/, '\1')
+      input.gsub(/^\/([^\/]*)\/?.*$/, '\1')
     end
   end
 end

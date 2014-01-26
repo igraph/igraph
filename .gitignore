@@ -493,5 +493,7 @@
 /www/_site
 /www/_includes/igraph-rversion
 /www/_includes/igraph-version
-/www/doc/
+/www/r/doc/
+/www/c/doc/
+/www/python/doc/
 /www/stamp

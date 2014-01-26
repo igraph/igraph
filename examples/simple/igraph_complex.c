@@ -34,7 +34,6 @@ int main() {
   igraph_complex_t a = igraph_complex(ARE, AIM);
   igraph_complex_t b = igraph_complex(BRE, BIM);
   igraph_complex_t c, d, e;
-  igraph_real_t m;
 
   /* polar, mod, arg */
   c=igraph_complex_polar(igraph_complex_mod(a), igraph_complex_arg(a));

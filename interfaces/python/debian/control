@@ -5,7 +5,7 @@ Maintainer: Tamas Nepusz <ntamas@gmail.com>
 Build-Depends: debhelper (>= 7.0.50~), python-all-dev (>= 2.6.6-3~),
  python3-all-dev (>= 3.2), libxml2-dev, libigraph0-dev (>= 0.6~), python-epydoc,
  python-setuptools, python3-setuptools, pkg-config, python-docutils
-Standards-Version: 3.9.3
+Standards-Version: 3.9.4
 X-Python-Version: >= 2.5
 X-Python3-Version: >= 3.2
 Homepage: http://igraph.org

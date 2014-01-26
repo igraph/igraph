@@ -41,7 +41,6 @@ int main() {
 		    3,4,4,5,5,6,
 		    8,9,9,10 };
   igraph_vector_t v;
-  igraph_vector_t idvect;
 
   /* A ring, a single component */
   igraph_ring(&ring, 10, IGRAPH_UNDIRECTED, 0, 1);

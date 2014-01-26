@@ -13,6 +13,38 @@ class EdgeTests(unittest.TestCase):
     def setUp(self):
         self.g = Graph.Full(10)
 
+    def testHash(self):
+        data = {}
+        n = self.g.ecount()
+        for i in xrange(n):
+            code1 = hash(self.g.es[i])
+            code2 = hash(self.g.es[i])
+            self.assertEqual(code1, code2)
+            data[self.g.es[i]] = i
+
+        for i in xrange(n):
+            self.assertEqual(i, data[self.g.es[i]])
+
+    def testRichCompare(self):
+        idxs = [2,5,9,13,42]
+        g2 = Graph.Full(10)
+        for i in idxs:
+            for j in idxs:
+                self.assertEqual(i == j, self.g.es[i] == self.g.es[j])
+                self.assertEqual(i != j, self.g.es[i] != self.g.es[j])
+                self.assertEqual(i <  j, self.g.es[i] <  self.g.es[j])
+                self.assertEqual(i >  j, self.g.es[i] >  self.g.es[j])
+                self.assertEqual(i <= j, self.g.es[i] <= self.g.es[j])
+                self.assertEqual(i >= j, self.g.es[i] >= self.g.es[j])
+                self.assertFalse(self.g.es[i] == g2.es[j])
+                self.assertFalse(self.g.es[i] != g2.es[j])
+                self.assertFalse(self.g.es[i] <  g2.es[j])
+                self.assertFalse(self.g.es[i] >  g2.es[j])
+                self.assertFalse(self.g.es[i] <= g2.es[j])
+                self.assertFalse(self.g.es[i] >= g2.es[j])
+
+        self.assertFalse(self.g.es[2] == self.g.vs[2])
+
     def testRepr(self):
         output = repr(self.g.es[0])
         self.assertEqual(output, "igraph.Edge(%r, 0, {})" % self.g)

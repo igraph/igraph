@@ -85,7 +85,6 @@ int main() {
   igraph_t tree;
   igraph_vector_t flow;
   igraph_vector_t capacity;
-  int ret;
 
   /* initialize flow and capacity vectors */
   igraph_vector_init(&capacity, 0);

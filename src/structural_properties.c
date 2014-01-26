@@ -2566,7 +2566,7 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 
     /* add the indirect contributions, in-in, in-out, out-in, out-out */
     for (b=0; b<igraph_vector_size(&ineis_in); b++) {
-      edge=(igraph_integer_t) VECTOR(ineis_out)[b];VECTOR(ineis_in)[b];
+      edge=(igraph_integer_t) VECTOR(ineis_out)[b];
       igraph_edge(graph, edge, &from, &to);
       if (to==i) { to=from; }
       j=to;
@@ -5226,12 +5226,19 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
   }
 
   igraph_vector_destroy(&dist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  if (!all_to) {
+    igraph_vit_destroy(&tovit);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
   igraph_vit_destroy(&fromvit);
   igraph_dqueue_destroy(&Q);
   igraph_vector_destroy(&clean_vertices);
   igraph_vector_destroy(&num_queued);
   igraph_lazy_inclist_destroy(&inclist);
-  IGRAPH_FINALLY_CLEAN(6);
+  IGRAPH_FINALLY_CLEAN(5);
 
   return 0;
 }

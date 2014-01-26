@@ -40,10 +40,8 @@ int main() {
   
   igraph_t g;
   igraph_vector_ptr_t result;
-  igraph_es_t es;
   igraph_integer_t no;
-  long int i, j, n;
-  const int params[] = {4, -1, 2, 2, 0, 0, -1, -1};
+  long int i;
  
   igraph_set_warning_handler(warning_handler_ignore);
 

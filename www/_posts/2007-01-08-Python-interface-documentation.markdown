@@ -1,7 +1,8 @@
 ---
-layout: newstemp
+layout: pynewstemp
 title: Python interface documentation
 date: January 8, 2007
+category: python
 ---
 
 Python interface documentation

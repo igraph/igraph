@@ -1,17 +1,67 @@
 /* Sticky footer, http://getbootstrap.com/examples/sticky-footer-navbar/ */
 
+html {
+  min-height: 100%
+}
+
 html,
 body {
   height: 100%;
+}
+
+body.r {
+  background-color: #ccccdd;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ccccdd), to(#ffffff));
+  background-image: -webkit-linear-gradient(top, #ccccdd, #ffffff);
+  background-image:    -moz-linear-gradient(top, #ccccdd, #ffffff);
+  background-image:      -o-linear-gradient(top, #ccccdd, #ffffff);
+  background-image:         linear-gradient(to bottom, #ccccdd, #ffffff);
+  background-attachment: fixed;
+}
+
+body.python {
+  background-color: #ccdddd;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ccdddd), to(#ffffff));
+  background-image: -webkit-linear-gradient(top, #ccdddd, #ffffff);
+  background-image:    -moz-linear-gradient(top, #ccdddd, #ffffff);
+  background-image:      -o-linear-gradient(top, #ccdddd, #ffffff);
+  background-image:         linear-gradient(to bottom, #ccdddd, #ffffff);
+  background-attachment: fixed;
+}
+
+body.cc {
+  background-color: #bbbbbb;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#bbbbbb), to(#ffffff));
+  background-image: -webkit-linear-gradient(top, #bbbbbb, #ffffff);
+  background-image:    -moz-linear-gradient(top, #bbbbbb, #ffffff);
+  background-image:      -o-linear-gradient(top, #bbbbbb, #ffffff);
+  background-image:         linear-gradient(to bottom, #bbbbbb, #ffffff);
+  background-attachment: fixed;
+}
+
+body.start-page {
+  background: #3e648d;
+  background-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      color-stop(0, #3e648d),
+      color-stop(1, #405a6a)
+  );
+  background-image: -o-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -moz-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -webkit-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -ms-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: linear-gradient(to bottom, #3e648d 0%, #405a6a 100%);
 }
 
 #wrap {
   min-height: 100%;
   height: auto;
   /* Negative indent footer by its height */
-  margin: 0 auto -60px;
+  margin: 0 auto -30px;
   /* Pad bottom by footer height */
-  padding: 0 0 60px;
+  padding: 0 0 30px;
 }
 
 /* Set the fixed height of the footer here */
@@ -69,8 +119,21 @@ code.rfun:after {
   font-size: 16px;
   text-align: center;
   text-shadow: 0 1px 0 rgba(0,0,0,.15);
-  background: #eee;
+  color: white;
   margin-bottom: 10px;
+  background: #3e648d;
+  background-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      color-stop(0, #3e648d),
+      color-stop(1, #405a6a)
+  );
+  background-image: -o-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -moz-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -webkit-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -ms-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: linear-gradient(to bottom, #3e648d 0%, #405a6a 100%);
 }
 .bs-header p {
   font-weight: 300;
@@ -78,6 +141,14 @@ code.rfun:after {
 }
 .bs-header .container {
   position: relative;
+}
+.bs-header p, .bs-header h1 {
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 
 @media (min-width: 768px) {
@@ -105,8 +176,13 @@ code.rfun:after {
     border-top: 1px solid;
 }
 
-.start-page {
-    background: #eee;
+.start-page, .start-page h1, .start-page h1 small {
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
 }
 
 /* Masthead (headings and download button) */

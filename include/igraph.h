@@ -94,5 +94,6 @@
 #include "igraph_embedding.h"
 #include "igraph_scan.h"
 #include "igraph_graphlets.h"
+#include "igraph_epidemics.h"
 
 #endif

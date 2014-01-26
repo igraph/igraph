@@ -1,7 +1,10 @@
 
 all: nothing
 
-HTML= index.html getstarted.html news.html \
+VERSION=$(shell ../tools/getversion.sh)
+
+HTML= index.html r/news.html c/news.html python/news.html \
+      r/index.html c/index.html python/index.html         \
       _layouts/default.html _layouts/newstemp.html _layouts/manual.html
 
 CSS= css/affix.css css/manual.css css/other.css fonts/fonts.css
@@ -13,64 +16,73 @@ TMP:=$(shell mktemp -d /tmp/.XXXXX)
 ../doc/jekyll/stamp: ../doc/html/stamp
 	cd ../doc && make jekyll
 
-doc/c/stamp: ../doc/jekyll/stamp
-	rm -rf doc/c
-	mkdir -p doc
-	cp -r ../doc/jekyll doc/c
+../doc/html/stamp: $(wildcard ../src/*.c) ../doc/Makefile
+	cd ../doc && make html
+
+../doc/Makefile: ../doc/Makefile.am
+	cd .. && ./bootstrap.sh
+	cd .. && ./configure
+
+c/doc/stamp: ../doc/jekyll/stamp
+	rm -rf c/doc
+	mkdir -p c
+	cp -r ../doc/jekyll c/doc
 
 ../doc/igraph-docs.pdf: ../doc/igraph-docs.xml
 	cd ../doc && make igraph-docs.pdf
 
-doc/c/igraph-docs.pdf: ../doc/igraph-docs.pdf
-	mkdir -p doc/c
-	cp ../doc/igraph-docs.pdf doc/c/
+c/doc/igraph-docs.pdf: ../doc/igraph-docs.pdf c/doc/stamp
+	cp ../doc/igraph-docs.pdf c/doc/
 
-../doc/igraph.info: ../doc/igraph-docs.xml
+../doc/igraph.info: ../doc/igraph-docs.xml c/doc/stamp
 	cd ../doc && make igraph.info
 
-doc/c/igraph.info: ../doc/igraph.info
-	mkdir -p doc/c
-	cp ../doc/igraph.info doc/c/
+c/doc/igraph.info: ../doc/igraph.info c/doc/stamp
+	cp ../doc/igraph.info c/doc/
 
-doc/r/stamp: $(RMAN)
+r/doc/stamp: $(RMAN)
 	cd ../interfaces/R && make && \
 	R CMD INSTALL --html --no-R --no-configure --no-inst \
 	  --no-libs --no-exec --no-test-load -l $(TMP) igraph
-	rm -rf doc/r
-	mkdir -p doc/r
-	../tools/rhtml.sh $(TMP)/igraph/html doc/r
-	ln -s 00Index.html doc/r/index.html
-	touch doc/r/stamp
+	rm -rf r/doc
+	mkdir -p r/doc
+	../tools/rhtml.sh $(TMP)/igraph/html r/doc
+	ln -s 00Index.html r/doc/index.html
+	touch r/doc/stamp
 
-doc/r/igraph.pdf: $(RMAN)
-	mkdir -p doc/r
+r/doc/igraph.pdf: $(RMAN)
+	mkdir -p r/doc
 	cd ../interfaces/R/ && make
-	R CMD Rd2pdf --no-preview --force -o doc/r/igraph.pdf \
+	R CMD Rd2pdf --no-preview --force -o r/doc/igraph.pdf \
 	  ../interfaces/R/igraph
 
 ../interfaces/python/doc/api/pdf/api.pdf:
+	cd .. && make dist
+	cd ../interfaces/python && python setup.py build \
+		--no-pkg-config --no-progress-bar        \
+		--c-core-url=../../igraph-$(VERSION).tar.gz
 	cd ../interfaces/python && scripts/mkdoc.sh
 
-doc/python/python-igraph.pdf: ../interfaces/python/doc/api/pdf/api.pdf
-	mkdir -p doc/python
+python/doc/python-igraph.pdf: ../interfaces/python/doc/api/pdf/api.pdf
+	mkdir -p python/doc
 	cp $< $@
 
-doc/python/stamp: ../interfaces/python/doc/api/html/igraph-module.html
-	mkdir -p doc/python
-	cp -r ../interfaces/python/doc/api/html/ doc/python
-	../tools/pyhtml.sh doc/python
+python/doc/stamp: ../interfaces/python/doc/api/html/igraph-module.html
+	mkdir -p python/doc
+	cp -r ../interfaces/python/doc/api/html/ python/doc
+	../tools/pyhtml.sh python/doc
 	touch $@
 
-doc/python/tutorial/stamp: ../interfaces/python/doc/source/tutorial.rst
-	mkdir -p doc/python/tutorial
+python/doc/tutorial/stamp: ../interfaces/python/doc/source/tutorial.rst
+	mkdir -p python/doc/tutorial
 	cd ../interfaces/python/doc && sphinx-build source api/tutorial
-	cp -r ../interfaces/python/doc/api/tutorial/ doc/python/tutorial/
+	cp -r ../interfaces/python/doc/api/tutorial/ python/doc/tutorial/
 	touch $@
 
-stamp: $(HTML) $(CSS) doc/c/stamp doc/r/stamp doc/r/igraph.pdf \
-               doc/c/igraph.info doc/c/igraph-docs.pdf \
-	       doc/python/python-igraph.pdf doc/python/stamp \
-	       doc/python/tutorial/stamp
+stamp: $(HTML) $(CSS) c/doc/stamp r/doc/stamp r/doc/igraph.pdf \
+               c/doc/igraph.info c/doc/igraph-docs.pdf \
+	       python/doc/python-igraph.pdf python/doc/stamp \
+	       python/doc/tutorial/stamp
 	../tools/getversion.sh > _includes/igraph-version
 	../interfaces/R/tools/convertversion.sh > _includes/igraph-rversion
 	jekyll build

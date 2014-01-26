@@ -164,7 +164,6 @@ igraph_bool_t check_same(const igraph_sparsemat_t *A,
 int main() {
   
   igraph_sparsemat_t A, B, C, D;
-  igraph_t G, H;
   igraph_vector_t v, w, x, y;
   igraph_matrix_t M, N, O;
   long int i;

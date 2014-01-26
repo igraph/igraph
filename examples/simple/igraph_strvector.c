@@ -33,7 +33,7 @@ void strvector_print(const igraph_strvector_t *sv) {
 int main() {
 
   igraph_strvector_t sv1, sv2;
-  char *str1, *str2;
+  char *str1;
   int i;
 
   /* igraph_strvector_init, igraph_strvector_destroy */
