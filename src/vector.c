@@ -24,6 +24,7 @@
 #include "igraph_types.h"
 #include "igraph_types_internal.h"
 #include "igraph_complex.h"
+#include "bigint.h"
 #include "config.h"
 #include <float.h>
 
@@ -62,6 +63,12 @@
 #include "vector.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
+
+#define BASE_LIMB
+#include "igraph_pmt.h"
+#include "vector.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_LIMB
 
 #include "igraph_math.h"
 

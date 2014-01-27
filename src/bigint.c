@@ -25,12 +25,6 @@
 #include "igraph_error.h"
 #include "igraph_memory.h"
 
-#define BASE_LIMB
-#include "igraph_pmt.h"
-#include "vector.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_LIMB
-
 int igraph_biguint_init(igraph_biguint_t *b) {
   IGRAPH_CHECK(igraph_vector_limb_init(&b->v, IGRAPH_BIGUINT_DEFAULT_SIZE));
   igraph_vector_limb_clear(&b->v);
