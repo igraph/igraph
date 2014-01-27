@@ -71,3 +71,71 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
 
   return 0;
 }
+
+int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
+				 igraph_real_t radius, 
+				 igraph_bool_t positive, 
+				 igraph_matrix_t *res) {
+  igraph_integer_t i, j;
+
+  if (dim < 2) {
+    IGRAPH_ERROR("Sphere must be at least two dimensional to sample from "
+		 "surface", IGRAPH_EINVAL);
+  }
+  if (n < 0) {
+    IGRAPH_ERROR("Number of samples must be non-negative", IGRAPH_EINVAL);
+  }
+  if (radius <= 0) {
+    IGRAPH_ERROR("Sphere radius must be positive", IGRAPH_EINVAL);
+  }
+  
+  IGRAPH_CHECK(igraph_matrix_resize(res, dim, n));
+
+  RNG_BEGIN();
+
+  for (i = 0; i < n; i++) {
+    igraph_real_t *col=&MATRIX(*res, 0, i);
+    igraph_real_t sum=0.0;
+    for (j = 0; j < dim; j++) {
+      col[j] = RNG_NORMAL(0, 1);
+      sum += col[j] * col[j];
+    }
+    sum = sqrt(sum);
+    for (j = 0; j < dim; j++) {
+      col[j] = radius * col[j] / sum;
+    }
+    if (positive) {
+      for (j = 0; j < dim; j++) {
+	col[j] = fabs(col[j]);
+      }
+    }
+  }
+
+  RNG_END();
+
+  return 0;
+}
+
+int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
+				igraph_real_t radius,
+				igraph_bool_t positive,
+				igraph_matrix_t *res) {
+
+  igraph_integer_t i, j;
+
+  /* Arguments are checked by the following call */
+
+  IGRAPH_CHECK(igraph_sample_sphere_surface(dim, n, radius, positive, res));
+  
+  RNG_BEGIN();
+
+  for (i = 0; i < n; i++) {
+    igraph_real_t *col=&MATRIX(*res, 0, i);
+    igraph_real_t U=pow(RNG_UNIF01(), 1.0/dim);
+    for (j = 0; j < dim; j++) { col[j] *= U; }
+  }
+
+  RNG_END();
+  
+  return 0;
+}

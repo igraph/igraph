@@ -212,6 +212,21 @@ int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
 int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
 			    igraph_bool_t directed);
 
+int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
+				 igraph_real_t radius, 
+				 igraph_bool_t positive, 
+				 igraph_matrix_t *res);
+
+int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
+				igraph_real_t radius,
+				igraph_bool_t positive,
+				igraph_matrix_t *res);
+
+int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
+				igraph_real_t radius,
+				igraph_bool_t positive,
+				igraph_matrix_t *res);
+
 __END_DECLS
 
 #endif

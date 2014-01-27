@@ -353,6 +353,16 @@ igraph_dot_product_game:
         PARAMS: OUT GRAPH graph, MATRIX vecs, BOOLEAN directed=False
         NAME-R: dot.product.game
 
+igraph_sample_sphere_surface:
+        PARAMS: INTEGER dim, INTEGER n=1, REAL radius=1, \
+                BOOLEAN positive=True, OUT MATRIX res
+        NAME-R: sample.sphere.surface
+
+igraph_sample_sphere_volume:
+        PARAMS: INTEGER dim, INTEGER n, REAL radius=1, \
+                BOOLEAN positive=True, OUT MATRIX res
+        NAME-R: sample.sphere.volume
+
 #######################################
 # Basic query functions
 #######################################
