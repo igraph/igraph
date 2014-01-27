@@ -36,10 +36,11 @@
 
 __BEGIN_DECLS
 
-#include "igraph_types.h"
-
 #include <stdlib.h>
 #include <time.h>
+
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 /* The new RNG interface is (somewhat) modelled based on the GSL */
 
@@ -91,6 +92,9 @@ unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
 igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
 				   igraph_real_t scale);
+int igraph_rng_get_dirichlet(igraph_rng_t *rng,
+			     const igraph_vector_t *alpha,
+			     igraph_vector_t *result);
 
 /* --------------------------------- */
 

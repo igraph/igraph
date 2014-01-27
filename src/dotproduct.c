@@ -139,3 +139,37 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
   
   return 0;
 }
+
+int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
+			    igraph_matrix_t *res) {
+
+  igraph_integer_t len=igraph_vector_size(alpha);
+  igraph_integer_t i;
+  igraph_vector_t vec;
+
+  if (n < 0) {
+    IGRAPH_ERROR("Number of samples should be non-negative",
+		 IGRAPH_EINVAL);
+  }
+  if (len < 2) {
+    IGRAPH_ERROR("Dirichlet parameter vector too short, must "
+		 "have at least two entries", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_min(alpha) <= 0) {
+    IGRAPH_ERROR("Dirichlet concentration parameters must be positive",
+		 IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_matrix_resize(res, len, n));
+
+  RNG_BEGIN();
+
+  for (i = 0; i < n; i++) {
+    igraph_vector_view(&vec, &MATRIX(*res, 0, i), len);
+    igraph_rng_get_dirichlet(igraph_rng_default(), alpha, &vec);
+  }
+
+  RNG_END();
+
+  return 0;
+}

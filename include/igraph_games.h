@@ -227,6 +227,9 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
 				igraph_bool_t positive,
 				igraph_matrix_t *res);
 
+int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
+			    igraph_matrix_t *res);
+
 __END_DECLS
 
 #endif

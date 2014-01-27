@@ -32,6 +32,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_memory.h"
+#include "igraph_matrix.h"
 
 /** 
  * \section about_rngs 
@@ -2368,6 +2369,38 @@ double igraph_rgamma(igraph_rng_t *rng, double a, double scale)
 }
 
 #endif
+
+int igraph_rng_get_dirichlet(igraph_rng_t *rng,
+			     const igraph_vector_t *alpha,
+			     igraph_vector_t *result) {
+
+  igraph_integer_t len=igraph_vector_size(alpha);
+  igraph_integer_t j;
+  igraph_real_t sum=0.0;
+
+  if (len < 2) {
+    IGRAPH_ERROR("Dirichlet parameter vector too short, must "
+		 "have at least two entries", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_min(alpha) <= 0) {
+    IGRAPH_ERROR("Dirichlet concentration parameters must be positive",
+		 IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_vector_resize(result, len));
+
+  RNG_BEGIN();
+
+  for (j = 0; j < len; j++) {
+    VECTOR(*result)[j] = igraph_rng_get_gamma(rng, VECTOR(*alpha)[j], 1.0);
+    sum += VECTOR(*result)[j];
+  }
+  for (j = 0; j < len; j++) { VECTOR(*result)[j] /= sum; }
+
+  RNG_END();
+
+  return 0;
+}
 
 /**********************************************************
  * Testing purposes                                       *

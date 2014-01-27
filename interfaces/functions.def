@@ -363,6 +363,10 @@ igraph_sample_sphere_volume:
                 BOOLEAN positive=True, OUT MATRIX res
         NAME-R: sample.sphere.volume
 
+igraph_sample_dirichlet:
+        PARAMS: INTEGER n, VECTOR alpha, OUT MATRIX res
+        NAME-R: sample.dirichlet
+
 #######################################
 # Basic query functions
 #######################################
