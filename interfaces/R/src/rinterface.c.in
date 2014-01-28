@@ -117,6 +117,28 @@ SEXP R_igraph_getListElement(SEXP list, const char *str)
  * Attributes                                         *
  *****************************************************/
 
+SEXP R_igraph_get_attr_mode(SEXP graph, SEXP pwhich) {
+  int which=INTEGER(pwhich)[0]-1;
+  SEXP obj=VECTOR_ELT(VECTOR_ELT(graph, 8), which);
+  int i, len=GET_LENGTH(obj);
+  SEXP result;
+
+  PROTECT(result=NEW_CHARACTER(len));
+  for (i=0; i<len; i++) {
+    SEXP obji=VECTOR_ELT(obj, i);
+    if (IS_NUMERIC(obji) || IS_INTEGER(obji)) {
+      SET_STRING_ELT(result, i, mkChar("n"));
+    } else if (IS_CHARACTER(obji)) {
+      SET_STRING_ELT(result, i, mkChar("c"));
+    } else {
+      SET_STRING_ELT(result, i, mkChar("x"));
+    }
+  }
+
+  UNPROTECT(1);
+  return result;
+}
+
 int R_SEXP_to_attr_comb(SEXP input, igraph_attribute_combination_t *comb) {
   long int i, n=GET_LENGTH(input);
   SEXP names=GET_NAMES(input);
@@ -3212,6 +3234,14 @@ SEXP R_igraph_mybracket2(SEXP graph, SEXP pidx1, SEXP pidx2) {
   int idx1=INTEGER(pidx1)[0]-1;
   int idx2=INTEGER(pidx2)[0]-1;  
   return duplicate(VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2));
+}
+
+SEXP R_igraph_mybracket2_names(SEXP graph, SEXP pidx1, SEXP pidx2) {
+  SEXP result;
+  int idx1=INTEGER(pidx1)[0]-1;
+  int idx2=INTEGER(pidx2)[0]-1;
+  result=duplicate(GET_NAMES(VECTOR_ELT(VECTOR_ELT(graph, idx1), idx2)));
+  return result;
 }
 
 SEXP R_igraph_mybracket2_copy(SEXP graph, SEXP pidx1, SEXP pidx2) {

@@ -184,7 +184,7 @@ list.graph.attributes <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  res <- names(.Call("R_igraph_mybracket2", graph, 9L, 2L, PACKAGE="igraph"))
+  res <- .Call("R_igraph_mybracket2_names", graph, 9L, 2L, PACKAGE="igraph")
   if (is.null(res)) { res <- character() }
   res
 }
@@ -193,7 +193,7 @@ list.vertex.attributes <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  res <- names(.Call("R_igraph_mybracket2", graph, 9L, 3L, PACKAGE="igraph"))
+  res <- .Call("R_igraph_mybracket2_names", graph, 9L, 3L, PACKAGE="igraph")
                      
   if (is.null(res)) { res <- character() }
   res
@@ -203,7 +203,7 @@ list.edge.attributes <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  res <- names(.Call("R_igraph_mybracket2", graph, 9L, 4L, PACKAGE="igraph"))
+  res <- .Call("R_igraph_mybracket2_names", graph, 9L, 4L, PACKAGE="igraph")
   if (is.null(res)) { res <- character() }
   res
 }

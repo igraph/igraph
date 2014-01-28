@@ -24,6 +24,29 @@
 # Convert graphs to human readable forms
 ###################################################################
 
+.get.attr.codes <- function(object) {
+  ga <- va <- ea <- ""
+  gal <- list.graph.attributes(object)
+  if (length(gal) != 0) {
+    ga <- paste(sep="", gal, " (g/",
+                .Call("R_igraph_get_attr_mode", object, 2L, PACKAGE="igraph"),
+                ")")
+  }
+  val <- list.vertex.attributes(object)
+  if (length(val) != 0) {
+    va <- paste(sep="", val, " (v/",
+                .Call("R_igraph_get_attr_mode", object, 3L, PACKAGE="igraph"),
+                ")")
+  }
+  eal <- list.edge.attributes(object)
+  if (length(eal) != 0) {
+    ea <- paste(sep="", list.edge.attributes(object), " (e/",
+                .Call("R_igraph_get_attr_mode", object, 4L, PACKAGE="igraph"),
+                ")")
+  }
+  c(ga, va, ea)
+}
+
 .print.header <- function(object) {
 
   if (!is.igraph(object)) {
@@ -43,20 +66,7 @@
   }
   cat(title, "\n", sep="")
 
-  aa <- function(names, code, fun) {
-    if (length(names)==0) {
-      ""
-    } else {
-      type <- sapply(names, function(x) mode(fun(object, x)))
-      type <- sapply(type, switch, "numeric"="n", "character"="c",
-                     "logical"="l", "x")
-      paste(sep="", names, " (", code, "/", type, ")")
-    }
-  }
-  ga <- aa(list.graph.attributes(object), "g", get.graph.attribute)
-  va <- aa(list.vertex.attributes(object), "v", get.vertex.attribute)
-  ea <- aa(list.edge.attributes(object), "e", get.edge.attribute)
-  atxt <- c(ga, va, ea)
+  atxt <- .get.attr.codes(object)
   atxt <- paste(atxt[atxt!=""], collapse=", ")
   if (atxt != "") {
     atxt <- strwrap(paste(sep="", "+ attr: ", atxt), exdent=2)
@@ -296,20 +306,7 @@ summary.igraph <- function(object, ...) {
   }
   cat(title, "\n", sep="")
 
-  aa <- function(names, code, fun) {
-    if (length(names)==0) {
-      ""
-    } else {
-      type <- sapply(names, function(x) mode(fun(object, x)))
-      type <- sapply(type, switch, "numeric"="n", "character"="c",
-                     "logical"="l", "x")
-      paste(sep="", names, " (", code, "/", type, ")")
-    }
-  }
-  ga <- aa(list.graph.attributes(object), "g", get.graph.attribute)
-  va <- aa(list.vertex.attributes(object), "v", get.vertex.attribute)
-  ea <- aa(list.edge.attributes(object), "e", get.edge.attribute)
-  atxt <- c(ga, va, ea)
+  atxt <- .get.attr.codes(object)
   atxt <- paste(atxt[atxt!=""], collapse=", ")
   if (atxt != "") {
     atxt <- strwrap(paste(sep="", "attr: ", atxt), exdent=2)
