@@ -2059,12 +2059,14 @@ int R_igraph_progress_handler(const char *message, igraph_real_t percent,
 }
 
 int R_igraph_status_handler(const char *message, void *data) {
-  SEXP ec;
+  SEXP ec, rho;
   int ecint;
+  PROTECT(rho = EVAL(lang2(install("getNamespace"), 
+                           ScalarString(mkChar("igraph"))))); 
   PROTECT(ec=EVAL(lang2(install(".igraph.status"), 
 			ScalarString(mkChar(message)))));
   ecint=INTEGER(ec)[0];
-  UNPROTECT(1);
+  UNPROTECT(2);
   return 0;
 }
 
@@ -2099,8 +2101,8 @@ SEXP R_igraph_finalizer() {
 			   ScalarString(mkChar("igraph")))));
   eval(lang4(install(".igraph.progress"), ScalarReal(0.0), 
 	     ScalarString(mkChar("")), ScalarLogical(1)), rho);
-  UNPROTECT(1);
   IGRAPH_FINALLY_FREE();
+  UNPROTECT(1);
   return R_NilValue;
 }
 
