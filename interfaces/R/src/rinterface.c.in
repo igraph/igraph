@@ -1067,13 +1067,16 @@ int R_igraph_attribute_get_numeric_graph_attr(const igraph_t *graph,
   if (ga == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-
-  PROTECT(ga=AS_NUMERIC(ga));
+  if (!IS_NUMERIC(ga) && !IS_INTEGER(ga)) {
+    IGRAPH_ERROR("Attribute not numeric", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_vector_resize(value, 1));
-  VECTOR(*value)[0]=REAL(ga)[0];
-
-  UNPROTECT(1);
+  if (IS_NUMERIC(ga)) {
+    VECTOR(*value)[0]=REAL(ga)[0];
+  } else { /* INTEGER */
+    VECTOR(*value)[0]=INTEGER(ga)[0];
+  }
 
   return 0;
 }
@@ -1087,13 +1090,12 @@ int R_igraph_attribute_get_bool_graph_attr(const igraph_t *graph,
   if (ga == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-
-  PROTECT(ga=AS_LOGICAL(ga));
+  if (!IS_LOGICAL(ga)) {
+    IGRAPH_ERROR("Attribute not logical", IGRAPH_EINVAL);
+  }
   
   IGRAPH_CHECK(igraph_vector_bool_resize(value, 1));
   VECTOR(*value)[0]=LOGICAL(ga)[0];
-
-  UNPROTECT(1);
 
   return 0;
 }
@@ -1108,13 +1110,12 @@ int R_igraph_attribute_get_string_graph_attr(const igraph_t *graph,
   if (ga == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-
-  PROTECT(ga=AS_CHARACTER(ga));
+  if (!IS_CHARACTER(ga)) {
+    IGRAPH_ERROR("Attribute is not character", IGRAPH_EINVAL);
+  }
 
   IGRAPH_CHECK(igraph_strvector_resize(value, 1));
   IGRAPH_CHECK(igraph_strvector_set(value, 0, CHAR(STRING_ELT(ga, 0))));
-
-  UNPROTECT(1);
 
   return 0;
 }
@@ -1131,10 +1132,12 @@ int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph,
   if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-  PROTECT(va=AS_NUMERIC(va));
+  if (!IS_NUMERIC(va) && !IS_INTEGER(va)) {
+    IGRAPH_ERROR("Attribute not numeric", IGRAPH_EINVAL);
+  }
 
   if (igraph_vs_is_all(&vs)) {
-    R_SEXP_to_vector_copy(va, &newvalue);
+    R_SEXP_to_vector_copy(AS_NUMERIC(va), &newvalue);
     igraph_vector_destroy(value);
     *value=newvalue;
   } else {
@@ -1143,17 +1146,25 @@ int R_igraph_attribute_get_numeric_vertex_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
     IGRAPH_FINALLY(igraph_vit_destroy, &it);
     IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_VIT_SIZE(it)));
-    while (!IGRAPH_VIT_END(it)) {
-      long int v=IGRAPH_VIT_GET(it);
-      VECTOR(*value)[i]=REAL(va)[v];
-      IGRAPH_VIT_NEXT(it);
-      i++;
+    if (IS_NUMERIC(va)) {
+      while (!IGRAPH_VIT_END(it)) {
+	long int v=IGRAPH_VIT_GET(it);
+	VECTOR(*value)[i]=REAL(va)[v];
+	IGRAPH_VIT_NEXT(it);
+	i++;
+      }
+    } else if (IS_INTEGER(va)) {
+      while (!IGRAPH_VIT_END(it)) {
+	long int v=IGRAPH_VIT_GET(it);
+	VECTOR(*value)[i]=INTEGER(va)[v];
+	IGRAPH_VIT_NEXT(it);
+	i++;
+      }
     }
     igraph_vit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  UNPROTECT(1);
   return 0;
 }
 
@@ -1169,7 +1180,9 @@ int R_igraph_attribute_get_bool_vertex_attr(const igraph_t *graph,
   if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-  PROTECT(va=AS_LOGICAL(va));
+  if (!IS_LOGICAL(va)) {
+    IGRAPH_ERROR("Attribute not logical", IGRAPH_EINVAL);
+  }
 
   if (igraph_vs_is_all(&vs)) {
     R_SEXP_to_vector_bool_copy(va, &newvalue);
@@ -1191,7 +1204,6 @@ int R_igraph_attribute_get_bool_vertex_attr(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  UNPROTECT(1);
   return 0;
 }
 
@@ -1207,8 +1219,9 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
   if (va == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-
-  PROTECT(va=AS_CHARACTER(va));
+  if (!IS_CHARACTER(va)) {
+    IGRAPH_ERROR("Attribute is not character", IGRAPH_EINVAL);
+  }
   
   if (igraph_vs_is_all(&vs)) {
     R_igraph_SEXP_to_strvector_copy(va, value);
@@ -1229,8 +1242,6 @@ int R_igraph_attribute_get_string_vertex_attr(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  UNPROTECT(1);
-
   return 0;
 }
 
@@ -1246,7 +1257,9 @@ int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
   if (ea == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-  PROTECT(ea=AS_NUMERIC(ea));
+  if (!IS_NUMERIC(ea) && !IS_INTEGER(ea)) {
+    IGRAPH_ERROR("Attribute is not numeric", IGRAPH_EINVAL);
+  }
   
   if (igraph_es_is_all(&es)) {    
     R_SEXP_to_vector_copy(AS_NUMERIC(ea), &newvalue);
@@ -1258,17 +1271,25 @@ int R_igraph_attribute_get_numeric_edge_attr(const igraph_t *graph,
     IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
     IGRAPH_CHECK(igraph_vector_resize(value, IGRAPH_EIT_SIZE(it)));
-    while (!IGRAPH_EIT_END(it)) {
-      long int e=IGRAPH_EIT_GET(it);
-      VECTOR(*value)[i]=REAL(ea)[e];
-      IGRAPH_EIT_NEXT(it);
-      i++;
+    if (IS_NUMERIC(ea)) {
+      while (!IGRAPH_EIT_END(it)) {
+	long int e=IGRAPH_EIT_GET(it);
+	VECTOR(*value)[i]=REAL(ea)[e];
+	IGRAPH_EIT_NEXT(it);
+	i++;
+      }
+    } else { /* INTEGER */
+      while (!IGRAPH_EIT_END(it)) {
+	long int e=IGRAPH_EIT_GET(it);
+	VECTOR(*value)[i]=INTEGER(ea)[e];
+	IGRAPH_EIT_NEXT(it);
+	i++;
+      }
     }
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  UNPROTECT(1);
   return 0;
 }
 
@@ -1284,7 +1305,9 @@ int R_igraph_attribute_get_bool_edge_attr(const igraph_t *graph,
   if (ea == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-  PROTECT(ea=AS_LOGICAL(ea));
+  if (!IS_LOGICAL(ea)) {
+    IGRAPH_ERROR("Attribute not logical", IGRAPH_EINVAL);
+  }
   
   if (igraph_es_is_all(&es)) {    
     R_SEXP_to_vector_bool_copy(ea, &newvalue);
@@ -1306,7 +1329,6 @@ int R_igraph_attribute_get_bool_edge_attr(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  UNPROTECT(1);
   return 0;
 }
 
@@ -1321,8 +1343,9 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
   if (ea == R_NilValue) {
     IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
   }
-
-  PROTECT(ea=AS_CHARACTER(ea));
+  if (!IS_CHARACTER(ea)) {
+    IGRAPH_ERROR("Attribute is not character", IGRAPH_EINVAL);
+  }
   
   if (igraph_es_is_all(&es)) {
     R_igraph_SEXP_to_strvector_copy(ea, value);
@@ -1342,8 +1365,6 @@ int R_igraph_attribute_get_string_edge_attr(const igraph_t *graph,
     igraph_eit_destroy(&it);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  
-  UNPROTECT(1);
   
   return 0;
 }
