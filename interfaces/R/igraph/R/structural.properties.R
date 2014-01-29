@@ -869,8 +869,8 @@ graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
     root <- as.igraph.vs(graph, root)-1
     roots <- NULL    
   } else {
-    root <- as.igraph.vs(graph, 0)      # ignored anyway
-    roots <- as.igraph.vs(graph, root)
+    roots <- as.igraph.vs(graph, root)-1
+    root <- 0      # ignored anyway
   }
   neimode <- switch(igraph.match.arg(neimode),
                     "out"=1, "in"=2, "all"=3, "total"=3)
