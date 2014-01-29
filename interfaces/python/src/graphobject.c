@@ -4784,7 +4784,7 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
 {
   static char *kwlist[] =
     { "vertices", "directed", "damping", "reset", "reset_vertices", "weights",
-      "arpack_options", NULL };
+      "arpack_options", "implementation", "niter", "eps", NULL };
   PyObject *directed = Py_True;
   PyObject *vobj = Py_None, *wobj = Py_None, *robj = Py_None, *rvsobj = Py_None;
   PyObject *list;
@@ -4796,12 +4796,21 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
   igraph_vector_t weights;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs, reset_vs;
+  igraph_pagerank_algo_t algo=IGRAPH_PAGERANK_ALGO_PRPACK;
+  PyObject *algo_o = Py_None;
+  long niter=1000;
+  float eps=0.001f;
+  igraph_pagerank_power_options_t popts;
+  void *opts;
   int retval;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOOOO!", kwlist, &vobj,
-                                   &directed, &damping, &robj, &rvsobj, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOOOO!Oid", kwlist, &vobj,
+                                   &directed, &damping, &robj,
+				   &rvsobj, &wobj,
                                    &igraphmodule_ARPACKOptionsType,
-                                   &arpack_options_o))
+                                   &arpack_options_o, &algo_o, &niter, &eps))
+
+
     return NULL;
 
   if (robj != Py_None && rvsobj != Py_None) {
@@ -4814,6 +4823,7 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
     return NULL;
   }
 
+  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
   if (robj != Py_None) {
     if (igraphmodule_attrib_to_vector_t(robj, self, &reset, ATTRIBUTE_TYPE_VERTEX)) {
       igraph_vs_destroy(&vs);
@@ -4845,13 +4855,25 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
     return igraphmodule_handle_igraph_error();
   }
 
-  arpack_options = (igraphmodule_ARPACKOptionsObject*)arpack_options_o;
+  if (igraphmodule_PyObject_to_pagerank_algo_t(algo_o, &algo))
+    return NULL;
+
+  popts.niter = (igraph_integer_t) niter; popts.eps = eps;
+
+  if (algo == IGRAPH_PAGERANK_ALGO_POWER) {
+    opts = &popts;
+  } else if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
+    opts = igraphmodule_ARPACKOptions_get(arpack_options);
+  } else {
+    opts = 0;
+  }
+
   if (rvsobj != Py_None)
-    retval = igraph_personalized_pagerank_vs(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
-        damping, reset_vs, &weights, igraphmodule_ARPACKOptions_get(arpack_options));
+    retval = igraph_personalized_pagerank_vs(&self->g, algo, &res, 0, vs,
+	     PyObject_IsTrue(directed), damping, reset_vs, &weights, opts);
   else
-    retval = igraph_personalized_pagerank(&self->g, &res, 0, vs, PyObject_IsTrue(directed),
-        damping, reset, &weights, igraphmodule_ARPACKOptions_get(arpack_options));
+    retval = igraph_personalized_pagerank(&self->g, algo, &res, 0, vs,
+	     PyObject_IsTrue(directed), damping, reset, &weights, opts);
 
   if (retval) {
     igraphmodule_handle_igraph_error();
@@ -12892,8 +12914,10 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_personalized_pagerank */
   {"personalized_pagerank", (PyCFunction) igraphmodule_Graph_personalized_pagerank,
    METH_VARARGS | METH_KEYWORDS,
-   "personalized_pagerank(vertices=None, directed=True, damping=0.85, "
-   "reset=None, reset_vertices=None, weights=None, arpack_options=None)\n\n"
+   "personalized_pagerank(vertices=None, directed=True, damping=0.85,\n"
+   "        reset=None, reset_vertices=None, weights=None, \n"
+   "        arpack_options=None, implementation=\"prpack\", niter=1000,\n"
+   "        eps=0.001)\n\n"
    "Calculates the personalized PageRank values of a graph.\n\n"
    "The personalized PageRank calculation is similar to the PageRank\n"
    "calculation, but the random walk is reset to a non-uniform distribution\n"
@@ -12919,7 +12943,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  even an edge attribute name.\n"
    "@param arpack_options: an L{ARPACKOptions} object used to fine-tune\n"
    "  the ARPACK eigenvector calculation. If omitted, the module-level\n"
-   "  variable called C{arpack_options} is used.\n"
+   "  variable called C{arpack_options} is used. This argument is\n"
+   "  ignored if not the ARPACK implementation is used, see the \n"
+   "  I{implementation} argument.\n"
+   "@param implementation: which implementation to use to solve the \n"
+   "  PageRank eigenproblem. Possible values are:\n\n"
+   "    - C{\"prpack\"}: use the PRPACK library. This is a new \n"
+   "      implementation in igraph 0.7\n\n"
+   "    - C{\"arpack\"}: use the ARPACK library. This implementation\n"
+   "      was used from version 0.5, until version 0.7.\n\n"
+   "    - C{\"power\"}: use a simple power method. This is the\n"
+   "      implementation that was used before igraph version 0.5.\n\n"
+   "@param niter: The number of iterations to use in the power method\n"
+   "  implementation. It is ignored in the other implementations.\n"
+   "@param eps: The power method implementation will consider the\n"
+   "  calculation as complete if the difference of PageRank values between\n"
+   "  iterations change less than this value for every node. It is \n"
+   "  ignored by the other implementations.\n"
    "@return: a list with the personalized PageRank values of the specified\n"
    "  vertices.\n"},
 
