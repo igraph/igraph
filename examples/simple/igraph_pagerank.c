@@ -23,11 +23,12 @@
 
 #include <igraph.h>
 #include <unistd.h>
+#include <libgen.h>
 
 void warning_handler_stdout (const char *reason, const char *file,
 			     int line, int igraph_errno) {
   IGRAPH_UNUSED(igraph_errno);
-  printf("Warning: %s in file %s, line %i\n", reason, file, line);
+  printf("Warning: %s\n", reason);
 }
 
 void print_vector(igraph_vector_t *v, FILE *f) {
