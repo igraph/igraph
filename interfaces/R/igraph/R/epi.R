@@ -20,6 +20,53 @@
 #
 ###################################################################
 
+time_bins <- function(x, middle=TRUE)
+  UseMethod("time_bins")
+
+time_bins.sir <- function(x, middle=TRUE) {
+  sir <- x
+  if (!inherits(sir, "sir")) {
+    stop("This is not an SIR model output")
+  }
+
+  big.time <- unlist(sapply(sir, "[[", "times"))
+  medlen <- median(sapply(lapply(sir, "[[", "times"), length))
+  ## Adhoc use of Freedman-Diaconis binwidth; rescale time accordingly.
+  w <- 2 * IQR(big.time) / (medlen^(1/3))
+  minbt <- min(big.time) ; maxbt <- max(big.time)
+  res <- seq(minbt, maxbt, length.out=ceiling((maxbt - minbt)/w))
+  if (middle) { res <- (res[-1] + res[-length(res)]) / 2 }
+  res
+}
+
+median.sir <- function(x, na.rm=FALSE) {
+  sir <- x
+  if (!inherits(sir, "sir")) {
+    stop("This is not an SIR model output")
+  }
+  times <- unlist(sapply(sir, "[[", "times"))
+  big.N.NS <- unlist(sapply(sir, "[[", "NS"))
+  big.N.NI <- unlist(sapply(sir, "[[", "NI"))
+  big.N.NR <- unlist(sapply(sir, "[[", "NR"))
+  time.bin <- cut(times, time_bins(sir, middle=FALSE), include.lowest=TRUE)
+  NS <- tapply(big.N.NS, time.bin, median)
+  NI <- tapply(big.N.NI, time.bin, median)
+  NR <- tapply(big.N.NR, time.bin, median)
+  list(NS=NS, NI=NI, NR=NR)
+}
+
+quantile.sir <- function(x, comp=c("NI", "NS", "NR"), prob, ...) {
+  sir <- x
+  if (!inherits(sir, "sir")) {
+    stop("This is not an SIR model output")
+  }
+  comp <- toupper(igraph.match.arg(comp))
+  times <- unlist(sapply(sir, "[[", "times"))
+  big.N <- unlist(sapply(sir, function(x) { x[[comp]] }))
+  time.bin <- cut(times, time_bins(sir, middle=FALSE), include.lowest=TRUE)
+  tapply(big.N, time.bin, function(x) { quantile(x, prob=prob) })
+}
+
 # R function to plot compartment total curves from simul.net.epi .
 # Inputs:  sim.res :=  list of simulated network SIR processes
 #             comp := compartment (i.e., "NS", "NI", or "NR")
@@ -63,20 +110,8 @@ plot.sir <- function(x, comp=c("NI", "NS", "NR"),
     ylim <- c(0, max(sapply(sir, function(x) max(x[[comp]]))))
   }
 
-  ## Work out median and quantile vectors.
-  # Create single huge vector of times and compartment counts.
-  if (median || length(quantiles) > 0) {
-    big.time <- unlist(sapply(sir, function(x) { x$times }))
-    big.N <- unlist(sapply(sir, function(x) { x[[comp]] }))
-    ## Adhoc use of Freedman-Diaconis binwidth; rescale time accordingly.
-    w <- 1/(2*(quantile(big.time, 0.75)-quantile(big.time, 0.25))/(100^(1/3)))
-    time.bin <- floor(big.time*w)
-  }
-  
   ## Generate the plot, first with individual curves, and then 
   ## adding median and quantile curves.
-
-  bin.vals <- as.numeric(levels(as.factor(time.bin)))/w
 
   if (is.null(ylab)) {
     if (comp == "NI") { ylab <- expression(N[I](t)) }
@@ -91,16 +126,17 @@ plot.sir <- function(x, comp=c("NI", "NS", "NR"),
   })
 
   # Plot the median and quantiles.
+  if (median || length(quantiles) > 0) {
+    time.bin <- time_bins(sir, middle=TRUE)
+  }
   if (median) {
-    my.m <- tapply(big.N, time.bin, median)
-    lines(bin.vals, my.m, type="l", lwd=lwd.median, col=median_color)
+    lines(time.bin, median(sir)[[comp]], type="l",
+          lwd=lwd.median, col=median_color)
   }
   for (i in seq_along(quantiles)) {
-    my.ql <- tapply(big.N, time.bin, function(x) {
-      quantile(x, prob=quantiles[i])
-    })
-    lines(bin.vals, my.ql, type="l", lty=lty.quantile, lwd=lwd.quantile,
-          col=quantile_color[i])
+    my.ql <- quantile(sir, comp, quantiles[i])
+    lines(time.bin, my.ql, type="l", lty=lty.quantile,
+          lwd=lwd.quantile, col=quantile_color[i])
   }
 
   invisible()
