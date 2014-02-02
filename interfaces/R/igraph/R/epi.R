@@ -49,9 +49,9 @@ median.sir <- function(x, na.rm=FALSE) {
   big.N.NI <- unlist(sapply(sir, "[[", "NI"))
   big.N.NR <- unlist(sapply(sir, "[[", "NR"))
   time.bin <- cut(times, time_bins(sir, middle=FALSE), include.lowest=TRUE)
-  NS <- tapply(big.N.NS, time.bin, median)
-  NI <- tapply(big.N.NI, time.bin, median)
-  NR <- tapply(big.N.NR, time.bin, median)
+  NS <- tapply(big.N.NS, time.bin, median, na.rm=na.rm)
+  NI <- tapply(big.N.NI, time.bin, median, na.rm=na.rm)
+  NR <- tapply(big.N.NR, time.bin, median, na.rm=na.rm)
   list(NS=NS, NI=NI, NR=NR)
 }
 
@@ -64,7 +64,13 @@ quantile.sir <- function(x, comp=c("NI", "NS", "NR"), prob, ...) {
   times <- unlist(sapply(sir, "[[", "times"))
   big.N <- unlist(sapply(sir, function(x) { x[[comp]] }))
   time.bin <- cut(times, time_bins(sir, middle=FALSE), include.lowest=TRUE)
-  tapply(big.N, time.bin, function(x) { quantile(x, prob=prob) })
+  res <- lapply(prob, function(pp) {
+    tapply(big.N, time.bin, function(x) { quantile(x, prob=pp) })
+  })
+  if (length(res) == 1) {
+    res <- res[[1]]
+  }
+  res
 }
 
 # R function to plot compartment total curves from simul.net.epi .
