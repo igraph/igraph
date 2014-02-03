@@ -24,7 +24,8 @@ hsbm.game (n, m, rho, C, p)
     vertices that in different blocks.}
 }
 \details{
-  The function generates a random graph according to the hierarchical stochastic block model.
+  The function generates a random graph according to the hierarchical
+  stochastic block model.
 }
 \value{
   An igraph graph.
