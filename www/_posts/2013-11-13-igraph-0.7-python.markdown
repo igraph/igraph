@@ -98,6 +98,11 @@ Other news and fixes
 - Fixed a bug in `Graph.isomorphic_vf2()`, edge colors were ignored.
 - Added rudimentary support for drawing edge labels.
 - Generate graphs from a stochastic block model: `Graph.SBM()`.
-- Fix occasional `barabasi.game()` crashes.
-- Added `which` argument to `bipartite.projection()`, to be able
-  to calculate one projection. Fixes issue #307.
+- We use PRPACK to calculate PageRank scores
+  see https://github.com/dgleich/prpack
+- Implement the `start` argument in `igraph_hrg_fit` (#225).
+- Fixed a bug in graph density that resulted in incorrect values for
+  undirected graphs with loops.
+- Fixed a bug that made Bellman-Ford shortest paths calculations fail.
+- Fixed a minimum cut bug for weighted undirected graphs (#564).
+- Fixed argument ordering in minimum cut and related functions.

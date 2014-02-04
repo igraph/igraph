@@ -110,3 +110,12 @@ C library news and changes
   `igraph_maximal_cliques_count()`.
 - Data type `igraph_adjlist_t` uses integer vectors now.
 - Generate graphs from a stochastic block model: `igraph_sbm_game()`.
+- We use PRPACK to calculate PageRank scores
+  see https://github.com/dgleich/prpack
+- Add `normalized` argument to closeness functions, fixes issue #3.
+- Implement the `start` argument in `igraph_hrg_fit` (#225).
+- Fixed a bug in `igraph_density` that resulted in incorrect values for
+  undirected graphs with loops.
+- Fixed a bug that made Bellman-Ford shortest paths calculations fail.
+- Fixed a minimum cut bug for weighted undirected graphs (#564).
+- Fixed argument ordering in `igraph_st_mincut` and related functions.
