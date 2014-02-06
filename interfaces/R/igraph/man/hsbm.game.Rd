@@ -12,7 +12,7 @@ hsbm.game (n, m, rho, C, p)
   \item{m}{Integer scalar, the number of vertices per block. \code{n /
       m} must be integer. Alternatively, an integer vector of block
     sizes, if not all the blocks have equal sizes.}
-  \item{rho}{Numeric vector, the fraction of vretices per cluster,
+  \item{rho}{Numeric vector, the fraction of vertices per cluster,
     within a block. Must sum up to 1, and \code{rho * m} must be integer
     for all elements of rho. Alternatively a list of rho vectors, one
     for each block, if they are not the same for all blocks.}
