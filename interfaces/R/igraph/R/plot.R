@@ -58,6 +58,8 @@ plot.igraph <- function(x,
   edge.label.family  <- params("edge", "label.family")
   edge.label.cex     <- params("edge", "label.cex")
   edge.label.color   <- params("edge", "label.color")
+  elab.x             <- params("edge", "label.x")
+  elab.y             <- params("edge", "label.y")
   arrow.size         <- params("edge", "arrow.size")[1]
   arrow.width        <- params("edge", "arrow.width")[1]
   curved             <- params("edge", "curved")
@@ -120,12 +122,24 @@ plot.igraph <- function(x,
   ################################################################
   ## calculate position of arrow-heads
   el <- get.edgelist(graph, names=FALSE)
-  loops.v <- el[,1] [ el[,1] == el[,2] ]
   loops.e <- which(el[,1] == el[,2])
   nonloops.e <- which(el[,1] != el[,2])
-  loop.labels <- edge.labels[el[,1] == el[,2]]
-  edge.labels <- edge.labels[el[,1] != el[,2]]
-  el <- el[el[,1] != el[,2],,drop=FALSE]
+  loops.v <- el[,1] [loops.e]
+  loop.labels <- edge.labels[loops.e]
+  loop.labx <- if (is.null(elab.x)) {
+    rep(NA, length(loops.e))
+  } else {
+    elab.x[loops.e]
+  }
+  loop.laby <- if (is.null(elab.y)) {
+    rep(NA, length(loops.e))
+  } else {
+    elab.y[loops.e]
+  }
+  edge.labels <- edge.labels[nonloops.e]
+  elab.x <- if (is.null(elab.x)) NULL else elab.x[nonloops.e]
+  elab.y <- if (is.null(elab.y)) NULL else elab.y[nonloops.e]
+  el <- el[nonloops.e,,drop=FALSE]
 
   edge.coords <- matrix(0, nrow=nrow(el), ncol=4)
   edge.coords[,1] <- layout[,1][ el[,1] ]
@@ -193,7 +207,8 @@ plot.igraph <- function(x,
     }
     
     loop <- function(x0, y0, cx=x0, cy=y0, color, angle=0, label=NA,
-                     width=1, arr=2, lty=1, arrow.size=arrow.size, arr.w=arr.w) {
+                     width=1, arr=2, lty=1, arrow.size=arrow.size,
+                     arr.w=arr.w, lab.x, lab.y) {
 
       rad <- angle
       center <- c(cx,cy)
@@ -220,6 +235,9 @@ plot.igraph <- function(x,
         lx <- cx+r*cos(phi)
         ly <- cy+r*sin(phi)
 
+        if (!is.na(lab.x)) { lx <- lab.x }
+        if (!is.na(lab.y)) { ly <- lab.y }
+
         text(lx, ly, label, col=edge.label.color, font=edge.label.font,
              family=edge.label.family, cex=edge.label.cex)
       }
@@ -243,7 +261,8 @@ plot.igraph <- function(x,
     yy0 <- layout[loops.v,2] - sin(la) * vs
     mapply(loop, xx0, yy0,
            color=ec, angle=-la, label=loop.labels, lty=lty,
-           width=ew, arr=arr, arrow.size=asize, arr.w=arrow.width)
+           width=ew, arr=arr, arrow.size=asize, arr.w=arrow.width,
+           lab.x=loop.labx, lab.y=loop.laby)
   }
 
   ################################################################
@@ -281,6 +300,8 @@ plot.igraph <- function(x,
         lc.y[valid] <- lc$lab.y
       }
     }
+    if (!is.null(elab.x)) { lc.x <- ifelse(is.na(elab.x), lc.x, elab.x) }
+    if (!is.null(elab.y)) { lc.y <- ifelse(is.na(elab.y), lc.y, elab.y) }
     text(lc.x, lc.y, labels=edge.labels, col=edge.label.color,
          family=edge.label.family, font=edge.label.font, cex=edge.label.cex)
   }
