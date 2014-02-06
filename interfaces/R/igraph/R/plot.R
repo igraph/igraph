@@ -256,32 +256,33 @@ plot.igraph <- function(x,
     if (length(arrow.size)>1) { arrow.size <- arrow.size[nonloops.e] }
     if (length(curved)>1) { curved <- curved[nonloops.e] }
     if (length(unique(arrow.mode))==1) {
-      igraph.Arrows(x0, y0, x1, y1, h.col=edge.color, sh.col=edge.color,
+      lc <-igraph.Arrows(x0, y0, x1, y1, h.col=edge.color, sh.col=edge.color,
                     sh.lwd=edge.width, h.lwd=1, open=FALSE, code=arrow.mode[1],
                     sh.lty=edge.lty, h.lty=1, size=arrow.size,
                     width=arrow.width, curved=curved)
+      lc.x <- lc$lab.x
+      lc.y <- lc$lab.y
     } else {
       ## different kinds of arrows drawn separately as 'arrows' cannot
       ## handle a vector as the 'code' argument
       curved <- rep(curved, length=ecount(graph))[nonloops.e]
+      lc.x <- lc.y <- numeric(length(curved))
       for (code in 0:3) {
         valid <- arrow.mode==code
         if (!any(valid)) { next }
         ec <- edge.color ; if (length(ec)>1) { ec <- ec[valid] }
         ew <- edge.width ; if (length(ew)>1) { ew <- ew[valid] }
         el <- edge.lty   ; if (length(el)>1) { el <- el[valid] }
-        igraph.Arrows(x0[valid], y0[valid], x1[valid], y1[valid],
+        lc <- igraph.Arrows(x0[valid], y0[valid], x1[valid], y1[valid],
                       code=code, sh.col=ec, h.col=ec, sh.lwd=ew, h.lwd=1,
                       h.lty=1, sh.lty=el, open=FALSE, size=arrow.size,
                       width=arrow.width, curved=curved[valid])
+        lc.x[valid] <- lc$lab.x
+        lc.y[valid] <- lc$lab.y
       }
     }
-    phi <- atan2(y1-y0, x1-x0)
-    r <- sqrt( (x1-x0)^2 + (y1-y0)^2 )
-    x <- x0 + 2/3*r*cos(phi)
-    y <- y0 + 2/3*r*sin(phi)
-    text(x, y, labels=edge.labels, col=edge.label.color, family=edge.label.family,
-         font=edge.label.font, cex=edge.label.cex)
+    text(lc.x, lc.y, labels=edge.labels, col=edge.label.color,
+         family=edge.label.family, font=edge.label.font, cex=edge.label.cex)
   }
   
   rm(x0, y0, x1, y1)
@@ -637,6 +638,11 @@ function (x1, y1, x2, y2,
   }
   if (is.logical(curved) && all(!curved)) {
     segments(x1+x1d, y1+y1d, x2+x2d, y2+y2d, lwd=sh.lwd, col=sh.col, lty=sh.lty)
+    phi <- atan2(y1-y2, x1-x2)
+    r <- sqrt( (x1-x2)^2 + (y1-y2)^2 )
+    lc.x <- x2 + 2/3*r*cos(phi)
+    lc.y <- y2 + 2/3*r*sin(phi)
+
   } else {
     if (is.numeric(curved)) {
       lambda <- curved
@@ -655,6 +661,7 @@ function (x1, y1, x2, y2,
     sh.col <- rep(sh.col, length=length(c.x1))
     sh.lty <- rep(sh.lty, length=length(c.x1))
     sh.lwd <- rep(sh.lwd, length=length(c.x1))
+    lc.x <- lc.y <- numeric(length(c.x1))
     for (i in seq_len(length(c.x1))) {
       spl <- xspline(x=c(c.x1[i],spx[i],c.x2[i]),
                      y=c(c.y1[i],spy[i],c.y2[i]), shape=1, draw=FALSE)
@@ -667,6 +674,8 @@ function (x1, y1, x2, y2,
         x2[i] <- spl$x[length(spl$x)/4]
         y2[i] <- spl$y[length(spl$y)/4]
       }
+      lc.x[i] <- spl$x[2/3 * length(spl$x)]
+      lc.y[i] <- spl$y[2/3 * length(spl$y)]
     }
   }
 
@@ -706,6 +715,9 @@ function (x1, y1, x2, y2,
             col = h.col, lwd=h.lwd,
             border=h.col.bo, lty=h.lty)
   }
+
+  list(lab.x=lc.x, lab.y=lc.y)
+
 } # Arrows
 
 igraph.polygon <- function(points, vertex.size=15/200, expand.by=15/200,
