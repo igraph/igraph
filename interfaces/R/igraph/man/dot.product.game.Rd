@@ -20,13 +20,14 @@ dot.product.game (vecs, directed=FALSE)
 \value{
   An igraph graph which is the randomly generated dot product graph.
 }
-\references{Sussman, D.L., Tang, M., Fishkind, D.E., & Priebe, C.E.
+\references{Sussman, D.L., Tang, M., Fishkind, D.E., Priebe, C.E.
   A Consistent Adjacency Spectral Embedding for Stochastic Blockmodel
   Graphs,  \emph{Journal of the American Statistical Association},
   Vol. 107(499), 2012
 }
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
-\seealso{\code{\link{adjacency.spectral.embedding}}}
+\seealso{\code{\link{adjacency.spectral.embedding}},
+        \code{\link{correlated.game}}, \code{\link{correlated.game}}}
 \examples{
 ## A randomly generated  graph
 lpvs <- matrix(rnorm(200),20,10)
