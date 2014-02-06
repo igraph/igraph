@@ -297,6 +297,14 @@
       corresponding vertex parameter for details.}
     \item{label.color}{The color of the edge labels, see the
       \code{color} vertex parameters on how to specify colors. }
+    \item{label.x}{The horizontal coordinates of the edge labels might
+      be given here, explicitly. The \code{NA} elements will be
+      replaced by automatically calculated coordinates. If \code{NULL},
+      then all edge horizontal coordinates are calculated
+      automatically. This parameter is only supported by
+      \code{plot.igraph}.}
+    \item{label.y}{The same as \code{label.x}, but for vertical
+      coordinates.}
     \item{curved}{Specifies whether to draw curved edges, or not. This
       can be a logical or a numeric vector or scalar. 
 
