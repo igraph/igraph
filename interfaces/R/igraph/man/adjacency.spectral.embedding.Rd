@@ -18,7 +18,7 @@ adjacency.spectral.embedding (graph, no,
   \item{cvec}{A numeric vector}
   \item{options}{ A list containing the parameters for the SVD
     computation algorithm in ARPACK. By default, the list of values is
-    assigned the values given by \code{igraph.arpack.default }.}
+    assigned the values given by \code{igraph.arpack.default}.}
 }
 \details{
   This function computes a \code{no}-dimensional Euclidean
@@ -34,10 +34,10 @@ adjacency.spectral.embedding (graph, no,
   \item{D}{A vector of length \code{no}.}
   \item{U}{An \code{n} times \code{no} matrix, \code{n} is the number of
     vertices in the graph.}
-  \item{V}{An \code{n} time \code{no} matrix, \code{n} is the number of
+  \item{V}{An \code{n} times \code{no} matrix, \code{n} is the number of
     vertices in the graph.}
 }
-\references{Sussman, D.L., Tang, M., Fishkind, D.E., & Priebe, C.E.
+\references{Sussman, D.L., Tang, M., Fishkind, D.E., Priebe, C.E.
   A Consistent Adjacency Spectral Embedding for Stochastic Blockmodel
   Graphs,  \emph{Journal of the American Statistical Association},
   Vol. 107(499), 2012
