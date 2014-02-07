@@ -8,7 +8,8 @@
 \usage{
 bipartite.projection.size(graph, types = NULL)
 bipartite.projection (graph, types = NULL, multiplicity = TRUE,
-       probe1 = NULL, which=c("both", "true", "false"))
+       probe1 = NULL, which=c("both", "true", "false"),
+       remove.type = TRUE)
 }
 \arguments{
   \item{graph}{The input graph. It can be directed, but edge directions
@@ -29,6 +30,12 @@ bipartite.projection (graph, types = NULL, multiplicity = TRUE,
     argument \code{which}.}
   \item{which}{A character scalar to specify which projection(s) to
     calculate. The default is to calculate both.}
+  \item{remove.type}{Logical scalar, whether to remove the
+    \code{type} vertex attribute from the projections. This makes
+    sense because these graphs are not bipartite any more. However if
+    you want to combine them with each other (or other bipartite
+    graphs), then it is worth keeping this attribute. By default it
+    will be removed.}
 }
 \details{
   Bipartite graphs have a \code{type} vertex attribute in
