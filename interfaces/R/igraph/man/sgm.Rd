@@ -51,14 +51,15 @@ Fishkind, D. E., Adali, S., Priebe, C. E. (2012). Seeded Graph Matching
 Online:  \url{http://arxiv.org/abs/1209.0367}
 }
 \author{Vince Lyzinski \url{http://www.ams.jhu.edu/~lyzinski/}}
-\seealso{TODO}
+\seealso{\code{\link{correlated.game}},\code{\link{correlated.pair.game}}}
 \examples{
  #require(Matrix)
  g1 <- erdos.renyi.game(10, .1)
- randperm <- c(1:3,3+sample(7))
+ randperm <- c(1:3, 3+sample(7))
  g2 <- correlated.game(g1, corr=1, p=g1$p, perm=randperm)
- A <- as.matrix(get.adjacency(g1))
- B <- as.matrix(get.adjacency(g2))
- P<-sgm (A, B, m=3, start=diag(rep(1,nrow(A)-3)), 20)
- P}
+ A  <- as.matrix(get.adjacency(g1))
+ B  <- as.matrix(get.adjacency(g2))
+ P  <-sgm (A, B, m=3, start=diag(rep(1, nrow(A)-3)), 20)
+ P
+ }
 \keyword{graphs}
