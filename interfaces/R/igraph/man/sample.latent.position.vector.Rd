@@ -18,32 +18,38 @@ sample.sphere.volume  (dim, n, radius = 1, positive = TRUE)
   \item{dim}{integer, the dimension of the random vectors}
   \item{radius}{numeric, the radius of the sampled sphere. Determines 
   the magnitude of the random vectors}
-  \item{positive}{logical , TODO}
+  \item{positive}{logical, if TRUE, the elements of the vectors are constrained to be positive}
   
 }
 \details{
-  TODO
-}
+  \code{sample.dirichlet} generates samples from the Dirichlet distribution with given \eqn{\alpha}{alpha} parameter. The sample is drawn from  \code{length(alpha) - 1}-simplex.
+  
+  \code{sample.sphere.surface} generates samples from \eqn{S^{dim-1}} (the \code{(dim-1)}-sphere) with radius \code{radius}, i.e. the Euclidean norm of the samples equal \code{radius}.
+  
+  \code{sample.sphere.volume} generates samples from \eqn{S^{dim-1}} (the \code{(dim-1)}-sphere) 
+ i.e. the Euclidean norm of the samples is smaller or equal to  \code{radius}.
+ }
+ 
 \value{
-  TODO  
+  A \code{dim}  times \code{n} matrix, whose columns are the sample vectors 
 }
-\references{TODO}
+
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{sbm.game}}}
 \examples{
 
-lpvs.dir <- sample.dirichlet(n=20,rep(1,10))
-RDP.graph.2<- dot.product.game(lpvs.dir)
+lpvs.dir    <- sample.dirichlet(n=20, alpha=rep(1,10))
+RDP.graph.2 <- dot.product.game(lpvs.dir)
 colSums(lpvs.dir)
 
-lpvs.sph <- sample.sphere.surface(dim=10,n=20,radius=1)
-RDP.graph.3<- dot.product.game(lpvs.sph)
-vec.norm <-apply(lpvs.sph,2,function(x) {sum(x^2)})
+lpvs.sph    <- sample.sphere.surface(dim=10, n=20, radius=1)
+RDP.graph.3 <- dot.product.game(lpvs.sph)
+vec.norm    <-apply(lpvs.sph,2,function(x) {sum(x^2)})
 vec.norm
 
-lpvs.sph.vol <- sample.sphere.volume(dim=10,n=20,radius=1)
-RDP.graph.4<- dot.product.game(lpvs.sph.vol)
-vec.norm <- apply(lpvs.sph.vol,2,function(x) {sum(x^2)})
+lpvs.sph.vol <- sample.sphere.volume(dim=10, n=20, radius=1)
+RDP.graph.4  <- dot.product.game(lpvs.sph.vol)
+vec.norm     <- apply(lpvs.sph.vol, 2, function(x) {sum(x^2)})
 vec.norm
 }
 \keyword{graphs}
