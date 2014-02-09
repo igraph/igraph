@@ -18,7 +18,7 @@ dot.product.game (vecs, directed=FALSE)
   The dot product of the latent position vectors should be non-negative.
 }
 \value{
-  An igraph graph which is the randomly generated dot product graph.
+  An igraph graph object which is the  generated random dot product graph.
 }
 \references{Sussman, D.L., Tang, M., Fishkind, D.E., Priebe, C.E.
   A Consistent Adjacency Spectral Embedding for Stochastic Blockmodel
@@ -30,9 +30,9 @@ dot.product.game (vecs, directed=FALSE)
         \code{\link{correlated.game}}, \code{\link{correlated.game}}}
 \examples{
 ## A randomly generated  graph
-lpvs <- matrix(rnorm(200),20,10)
+lpvs <- matrix(rnorm(200), 20, 10)
 lpvs <- apply(lpvs, 2, function(x) { return (abs(x)/sqrt(sum(x^2))) })
 RDP.graph <- dot.product.game(lpvs)
 RDP.graph
 }
-\keyword{graphs}
+\keyword{graphs, random graphs}
