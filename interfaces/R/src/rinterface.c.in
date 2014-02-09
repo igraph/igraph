@@ -132,6 +132,8 @@ SEXP R_igraph_get_attr_mode(SEXP graph, SEXP pwhich) {
       SET_STRING_ELT(result, i, mkChar("n"));
     } else if (IS_CHARACTER(obji)) {
       SET_STRING_ELT(result, i, mkChar("c"));
+    } else if (IS_LOGICAL(obji)) {
+      SET_STRING_ELT(result, i, mkChar("l"));
     } else {
       SET_STRING_ELT(result, i, mkChar("x"));
     }
