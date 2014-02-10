@@ -3887,16 +3887,8 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
     IGRAPH_ERROR("Correlation must be in [-1,1] in correlated "
 		 "Erdos-Renyi game", IGRAPH_EINVAL);
   }
-  if (p < 0 || corr > 1) {
-    IGRAPH_ERROR("Edge probability must be in [0,1] in correlated "
-		 "Erdos-Renyi game", IGRAPH_EINVAL);
-  }
-  if (p == 0 && no_of_edges != 0) {
-    IGRAPH_ERROR("p=0, so graph should be empty in correlated "
-		 "Erdos-Renyi game", IGRAPH_EINVAL);
-  }
-  if (p == 1 && no_of_edges != no_of_all) {
-    IGRAPH_ERROR("p=1, so graph should be full in correlated "
+  if (p <= 0 || p >= 1) {
+    IGRAPH_ERROR("Edge probability must be in (0,1) in correlated "
 		 "Erdos-Renyi game", IGRAPH_EINVAL);
   }
   if (permutation) {
@@ -3908,12 +3900,6 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
 
   /* Special cases */
 
-  if (p == 0) {
-    return igraph_empty(new_graph, no_of_nodes, directed);
-  }
-  if (p == 1) {
-    return igraph_full(new_graph, no_of_nodes, directed, IGRAPH_NO_LOOPS);
-  }
   if (corr == 0) {
     return igraph_erdos_renyi_game(new_graph, IGRAPH_ERDOS_RENYI_GNP,
 				   no_of_nodes, p, directed,
