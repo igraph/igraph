@@ -26,6 +26,36 @@
 #include "igraph_constructors.h"
 #include "igraph_lapack.h"
 
+/**
+ * \function igraph_dot_product_game
+ * Generate a random dot product graph
+ * 
+ * In this model, each vertex is represented by a latent
+ * position vector. Probability of an edge between two vertices are given
+ * by the dot product of their latent position vectors.
+ * 
+ * </para><para>
+ * See also Christine Leigh Myers Nickel: Random dot product graphs, a
+ * model for social networks. Dissertation, Johns Hopkins University,
+ * Maryland, USA, 2006.
+ * 
+ * \param graph The output graph is stored here.
+ * \param vecs A matrix in which each latent position vector is a 
+ *    column. The dot product of the latent position vectors should be
+ *    in the [0,1] interval, otherwise a warning is given. For
+ *    negative dot products, no edges are added; dot products that are
+ *    larger than one always add an edge.
+ * \param directed Should the generated graph be directed?
+ * \return Error code.
+ * 
+ * Time complexity: O(n*n*m), where n is the number of vertices, 
+ * and m is the length of the latent vectors.
+ *
+ * \sa \ref igraph_sample_dirichlet(), \ref
+ * igraph_sample_sphere_volume(), \ref igraph_sample_sphere_surface()
+ * for functions to generate the latent vectors.
+ */ 
+
 int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
 			    igraph_bool_t directed) {
 
@@ -75,6 +105,29 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
   return 0;
 }
 
+/**
+ * \function igraph_sample_sphere_surface
+ * Sample points uniformly from the surface of a sphere
+ * 
+ * The center of the sphere is at the origin.
+ * 
+ * \param dim The dimension of the random vectors.
+ * \param n The number of vectors to sample.
+ * \param radius Radius of the sphere, it must be positive.
+ * \param positive Whether to restrict sampling to the positive 
+ *    orthant.}
+ * \param res Pointer to an initialized matrix, the result is 
+ *    stored here, each column will be a sampled vector. The matrix is
+ *    resized, as needed.}
+ * \return Error code.
+ * 
+ * Time complexity: O(n*dim*g), where g is the time complexity of 
+ * generating a standard normal random number.
+ * 
+ * \sa \ref igraph_sample_sphere_volume(), \ref
+ * igraph_sample_dirichlet() for other similar samplers.
+ */
+
 int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
 				 igraph_real_t radius, 
 				 igraph_bool_t positive, 
@@ -119,6 +172,30 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
   return 0;
 }
 
+/**
+ * \function igraph_sample_sphere_volume
+ * Sample points uniformly from the volume of a sphere
+ * 
+ * The center of the sphere is at the origin.
+ * 
+ * \param dim The dimension of the random vectors.
+ * \param n The number of vectors to sample.
+ * \param radius Radius of the sphere, it must be positive.
+ * \param positive Whether to restrict sampling to the positive 
+ *    orthant.}
+ * \param res Pointer to an initialized matrix, the result is 
+ *    stored here, each column will be a sampled vector. The matrix is
+ *    resized, as needed.}
+ * \return Error code.
+ *
+ * Time complexity: O(n*dim*g), where g is the time complexity of 
+ * generating a standard normal random number.
+ * 
+ * \sa \ref igraph_sample_sphere_surface(), \ref
+ * igraph_sample_dirichlet() for other similar samplers. 
+ */
+
+
 int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
 				igraph_real_t radius,
 				igraph_bool_t positive,
@@ -142,6 +219,27 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
   
   return 0;
 }
+
+/**
+ * \function igraph_sample_dirichlet
+ * Sample points from a Dirichlet distribution
+ *
+ * \param n The number of vectors to sample.
+ * \param alpha The parameters of the Dirichlet distribution. They
+ *    must be positive. The length of this vector gives the dimension
+ *    of the generated samples.
+ * \param res Pointer to an initialized matrix, the result is stored
+ *    here, one sample in each column. It will be resized, as needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(n * dim * g), where dim is the dimension of the
+ * sample vectors, set by the length of alpha, and g is the time
+ * complexity of sampling from a Gamma distribution.
+ * 
+ * \sa \ref igraph_sample_sphere_surface() and 
+ * \ref igraph_sample_sphere_volume() for other methods to sample
+ * latent vectors.
+ */
 
 int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
 			    igraph_matrix_t *res) {
