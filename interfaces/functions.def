@@ -359,7 +359,7 @@ igraph_sample_sphere_surface:
         NAME-R: sample.sphere.surface
 
 igraph_sample_sphere_volume:
-        PARAMS: INTEGER dim, INTEGER n, REAL radius=1, \
+        PARAMS: INTEGER dim, INTEGER n=1, REAL radius=1, \
                 BOOLEAN positive=True, OUT MATRIX res
         NAME-R: sample.sphere.volume
 
