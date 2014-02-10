@@ -1945,11 +1945,12 @@ igraph_maximum_bipartite_matching:
 #######################################
 
 igraph_adjacency_spectral_embedding:
-       PARAMS: GRAPH graph, INTEGER no, OUT VECTOR D, OUT MATRIX U, \
-               OUT MATRIX V, VECTOR cvec=AsmDefaultCvec, \
+       PARAMS: GRAPH graph, INTEGER no, OUT MATRIX X, \
+               OUT MATRIX_OR_0 Y, VECTOR cvec=AsmDefaultCvec, \
                INOUT ARPACKOPT options=igraph.arpack.default
        NAME-R: adjacency.spectral.embedding
        DEPS: cvec ON graph
+       IGNORE: RC
 
 #######################################
 # Eigensolvers

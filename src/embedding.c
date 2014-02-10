@@ -69,19 +69,19 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
-int igraph_adjacency_spectral_embedding(const igraph_t *graph, 
+int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 					igraph_integer_t no,
-					igraph_vector_t *D,
-					igraph_matrix_t *U, 
-					igraph_matrix_t *V,
+					igraph_matrix_t *X,
+					igraph_matrix_t *Y,
 					const igraph_vector_t *cvec,
 					igraph_arpack_options_t *options) {
 
   igraph_integer_t vc=igraph_vcount(graph);
   igraph_vector_t tmp;
   igraph_adjlist_t outlist, inlist;
-  int i, cveclen=igraph_vector_size(cvec);
+  int i, j, cveclen=igraph_vector_size(cvec);
   igraph_i_asembedding_data_t data={ cvec, &outlist, &inlist, &tmp };
+  igraph_vector_t D;
 	
   if (no > vc) { 
     IGRAPH_ERROR("Too many singular values requested", IGRAPH_EINVAL);
@@ -95,15 +95,13 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 		 "the number of vertices or scalar", IGRAPH_EINVAL);
   }
 
-  IGRAPH_CHECK(igraph_vector_resize(D, no));
-  IGRAPH_CHECK(igraph_matrix_resize(U, vc, no));
-  IGRAPH_CHECK(igraph_matrix_resize(V, vc, no));
+  IGRAPH_CHECK(igraph_matrix_resize(X, vc, no));
+  if (Y) { IGRAPH_CHECK(igraph_matrix_resize(Y, vc, no)); }
 
   /* empty graph */
-  if (vc == 1 && igraph_ecount(graph) == 0) {
-    igraph_vector_null(D);
-    igraph_matrix_null(U);
-    igraph_matrix_null(V);
+  if (igraph_ecount(graph) == 0) {
+    igraph_matrix_null(X);
+    if (Y) { igraph_matrix_null(Y); }
     return 0;
   }
 
@@ -113,6 +111,7 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_adjlist_destroy, &outlist);
   IGRAPH_CHECK(igraph_adjlist_init(graph, &inlist, IGRAPH_IN));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &inlist);
+  IGRAPH_VECTOR_INIT_FINALLY(&D, no);
 
   options->n=vc;
   options->start=0;		/* random start vector */
@@ -121,25 +120,40 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   if (options->ncv <= options->nev) { options->ncv = 0; }
 	
   IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_asembedding,
-				     &data, options, 0, D, U));
+				     &data, options, 0, &D, X));
 
   if (igraph_is_directed(graph)) {
     data.outlist = &inlist;
     data.inlist  = &outlist;
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_asembedding,
-				       &data, options, 0, D, V));
-  } else {
-    IGRAPH_CHECK(igraph_matrix_update(V, U));
-  }
-	
-  for (i=0; i<no; i++) {
-    VECTOR(*D)[i] = sqrt(VECTOR(*D)[i]);
+				       &data, options, 0, &D, Y));
+  } else if (Y) {
+    IGRAPH_CHECK(igraph_matrix_update(Y, X));
   }
 
+  for (i=0; i<no; i++) {
+    VECTOR(D)[i] = sqrt(VECTOR(D)[i]);
+  }
+
+  for (j=0; j<vc; j++) {
+    for (i=0; i<no; i++) {
+      MATRIX(*X, j, i) *= VECTOR(D)[i];
+    }
+  }
+
+  if (Y) {
+    for (j=0; j<vc; j++) {
+      for (i=0; i<no; i++) {
+	MATRIX(*Y, j, i) *= VECTOR(D)[i];
+      }
+    }
+  }
+
+  igraph_vector_destroy(&D);
   igraph_adjlist_destroy(&inlist);
   igraph_adjlist_destroy(&outlist);
   igraph_vector_destroy(&tmp);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(4);
 	
   return 0;
 }

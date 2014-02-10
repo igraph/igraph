@@ -40,12 +40,11 @@
 __BEGIN_DECLS
 
 int igraph_adjacency_spectral_embedding(const igraph_t *graph,
-																				igraph_integer_t no,
-																				igraph_vector_t *D,
-																				igraph_matrix_t *U,
-																				igraph_matrix_t *V,
-																				const igraph_vector_t *cvec,
-																				igraph_arpack_options_t *options);
+					igraph_integer_t no,
+					igraph_matrix_t *X,
+					igraph_matrix_t *Y,
+					const igraph_vector_t *cvec,
+					igraph_arpack_options_t *options);
 
 int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim);
 
