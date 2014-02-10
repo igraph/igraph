@@ -33,7 +33,7 @@ local.scan (graph.us, graph.them = NULL, k = 1, FUN = NULL,
   \item{weighted}{Logical scalar, TRUE if the edge weights should be
     used for computation of the scan statistic. If TRUE, the graph
     should be weighted. Note that this argument is ignored if \code{FUN}
-    is not \code{NULL}, \code{"ecount"} and \code{"sumweights"}.
+    is not \code{NULL}, \code{"ecount"} and \code{"sumweights"}.}
   \item{mode}{Character scalar, the kind of neighborhoods to use for the
     calculation. One of \sQuote{\code{out}}, \sQuote{\code{in}},
     \sQuote{\code{all}} or \sQuote{\code{total}}. This argument is
