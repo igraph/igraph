@@ -181,3 +181,14 @@ test_that("Issue 20 is resolved", {
   correct <- c(4, 1, 2, 1, 1, 8, 1, 2, 0, 5, 2, 3, 3, 4, 5, 3, 5, 4, 2, 1)
   expect_that(ls, equals(correct))
 })
+
+test_that("FUN argument works, #32", {
+  library(igraph)
+  r1 <- local.scan(graph.ring(10), k=1, FUN="ecount")
+  r2 <- local.scan(graph.ring(10), k=1, FUN=ecount)
+  expect_that(r1, equals(rep(2, 10)))
+  expect_that(r2, equals(rep(2, 10)))
+})
+
+
+  

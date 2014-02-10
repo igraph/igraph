@@ -1140,7 +1140,8 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   stopifnot(length(k)==1, k >= 0, as.integer(k) == k)
 
   ## Must be NULL or a function
-  stopifnot(is.null(FUN) || is.function(FUN))
+  stopifnot(is.null(FUN) || is.function(FUN) ||
+            (is.character(FUN) && length(FUN) == 1))
 
   ## Logical scalar
   stopifnot(is.logical(weighted), length(weighted )== 1)
@@ -1181,14 +1182,15 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
               PACKAGE="igraph")
 
         ## scan-1, ecount
-      } else if (k==1 && FUN %in% c("ecount", "sumweights")) {
+      } else if (k==1 && is.character(FUN) &&
+                 FUN %in% c("ecount", "sumweights")) {
         on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
         .Call("R_igraph_local_scan_1_ecount", graph.us,
               if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
               PACKAGE="igraph")
 
         ## scan-k, ecount
-      } else if (FUN %in% c("ecount", "sumweights")) {
+      } else if (is.character(FUN) && FUN %in% c("ecount", "sumweights")) {
         on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
         .Call("R_igraph_local_scan_k_ecount", graph.us, as.integer(k),
               if (weighted) as.numeric(E(graph.us)$weight) else NULL, cmode,
@@ -1216,14 +1218,15 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
               cmode, PACKAGE="igraph")
 
         ## scan-1, ecount
-      } else if (k==1 && FUN %in% c("ecount", "sumweights")) {
+      } else if (k==1 && is.character(FUN) &&
+                 FUN %in% c("ecount", "sumweights")) {
         on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
         .Call("R_igraph_local_scan_1_ecount_them", graph.us, graph.them,
               if (weighted) as.numeric(E(graph.them)$weight) else NULL,
               cmode, PACKAGE="igraph")
 
         ## scan-k, ecount
-      } else if (FUN %in% c("ecount", "sumweights")) {
+      } else if (is.character(FUN) && FUN %in% c("ecount", "sumweights")) {
         on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
         .Call("R_igraph_local_scan_k_ecount_them", graph.us, graph.them,
               as.integer(k),
