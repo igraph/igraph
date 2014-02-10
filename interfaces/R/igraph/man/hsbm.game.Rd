@@ -2,8 +2,9 @@
 \alias{hsbm.game}
 \concept{Stochastic block model}
 \concept{Random graph model}
-\title{Sample hierarchical stochastic block model}
-\description{Sampling from a hierarchical stochastic block model of networks}
+\title{Sample the hierarchical stochastic block model}
+\description{Sampling from a hierarchical stochastic block model of
+  networks.}
 \usage{
 hsbm.game (n, m, rho, C, p)
 }
@@ -21,7 +22,7 @@ hsbm.game (n, m, rho, C, p)
     \code{rho} vector. Alternatively, a list of square matrices, if
     the Bernoulli rates differ in different blocks.}
   \item{p}{Numeric scalar, the Bernoulli rate of connections between
-    vertices that in different blocks.}
+    vertices in different blocks.}
 }
 \details{
   The function generates a random graph according to the hierarchical
@@ -30,7 +31,7 @@ hsbm.game (n, m, rho, C, p)
 \value{
   An igraph graph.
 }
-\references{TODO}
+% \references{TODO}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{sbm.game}}}
 \examples{
@@ -38,10 +39,8 @@ hsbm.game (n, m, rho, C, p)
 C <- matrix(c(1  , 3/4,   0,
               3/4,   0, 3/4,
               0  , 3/4, 3/4), nrow=3)
-g <- hsbm.game(100, 10, rho=c(3,3,4)/10, C=C, p=1/20)
+g <- hsbm.game(100, 10, rho=c(3, 3, 4)/10, C=C, p=1/20)
 g
-if (require(Matrix)) {
-  image(g[])
-}
+if (require(Matrix)) { image(g[]) }
 }
 \keyword{graphs, random graphs}
