@@ -33,6 +33,7 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
   igraph_integer_t ncol=igraph_matrix_ncol(vecs);
   int i, j;
   igraph_vector_t edges;
+  igraph_bool_t warned_neg=0, warned_big=0;
   
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     
@@ -48,10 +49,12 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
       igraph_vector_t v2;
       igraph_vector_view(&v2, &MATRIX(*vecs, 0, j), nrow);
       igraph_lapack_ddot(&v1, &v2, &prob);
-      if (prob < 0) { 
+      if (prob < 0 && ! warned_neg) {
+	warned_neg=1;
 	IGRAPH_WARNING("Negative connection probability in "
 		       "dot-product graph");
-      } else if (prob > 1) {
+      } else if (prob > 1 && ! warned_big) {
+	warned_big=1;
 	IGRAPH_WARNING("Greater than 1 connection probability in "
 		       "dot-product graph");
 	IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
