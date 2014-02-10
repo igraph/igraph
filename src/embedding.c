@@ -71,6 +71,7 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
 
 int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 					igraph_integer_t no,
+					igraph_bool_t scaled,
 					igraph_matrix_t *X,
 					igraph_matrix_t *Y,
 					const igraph_vector_t *cvec,
@@ -131,20 +132,22 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
     IGRAPH_CHECK(igraph_matrix_update(Y, X));
   }
 
-  for (i=0; i<no; i++) {
-    VECTOR(D)[i] = sqrt(VECTOR(D)[i]);
-  }
-
-  for (j=0; j<vc; j++) {
+  if (scaled) {
     for (i=0; i<no; i++) {
-      MATRIX(*X, j, i) *= VECTOR(D)[i];
+      VECTOR(D)[i] = sqrt(VECTOR(D)[i]);
     }
-  }
 
-  if (Y) {
     for (j=0; j<vc; j++) {
       for (i=0; i<no; i++) {
-	MATRIX(*Y, j, i) *= VECTOR(D)[i];
+	MATRIX(*X, j, i) *= VECTOR(D)[i];
+      }
+    }
+
+    if (Y) {
+      for (j=0; j<vc; j++) {
+	for (i=0; i<no; i++) {
+	  MATRIX(*Y, j, i) *= VECTOR(D)[i];
+	}
       }
     }
   }
