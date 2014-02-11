@@ -51,3 +51,22 @@ test_that("community detection functions work", {
                            FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
                            FALSE, FALSE, FALSE, FALSE) ))
 })
+
+test_that("creating communities objects works", {
+  library(igraph)
+  set.seed(42)
+
+  karate <- graph.famous("Zachary")
+
+  membership <- sample(1:2, vcount(karate), replace=TRUE)
+  mod <- modularity(karate, membership)
+  comm <- create.communities(algorithm="random", membership=membership,
+                             mod=mod, foo="bar")
+  print(comm)
+
+  expect_that(membership(comm), equals(membership))
+  expect_that(modularity(comm), equals(mod))
+  expect_that(algorithm(comm), equals("random"))
+  expect_that(comm$foo, equals("bar"))
+
+})

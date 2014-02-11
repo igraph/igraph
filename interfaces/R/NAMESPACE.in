@@ -91,7 +91,8 @@ export(edge.betweenness.community,
 
 export(membership, modularity, sizes, algorithm, is.hierarchical, merges,
        cutat, communities, crossing, plot.communities, compare,
-       compare.communities, showtrace, code.length, asPhylo, dendPlot)
+       compare.communities, showtrace, code.length, asPhylo, dendPlot,
+       create.communities)
 
 S3method("print", communities)
 S3method("modularity", communities)

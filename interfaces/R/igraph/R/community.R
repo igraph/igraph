@@ -81,8 +81,37 @@ print.communities <- function(x, ...) {
     }
     cat("Membership vector:\n")
     print(membership(x))
+  } else {
+    cat("Number of communities:", max(membership(x)), "\n")
+    if (!is.null(x$modularity)) {
+      cat("Modularity:", modularity(x), "\n")
+    }
+    cat("Membership vector:\n")
+    print(membership(x))
   }
   invisible(x)
+}
+
+create.communities <- function(membership, algorithm=NULL, merges=NULL,
+                               modularity=NULL, ...) {
+
+  stopifnot(is.numeric(membership))
+  stopifnot(is.null(algorithm) ||
+            (is.character(algorithm) && length(algorithm)==1))
+  stopifnot(is.null(merges) ||
+            (is.matrix(merges) && is.numeric(merges) && ncol(merges)==2))
+  stopifnot(is.null(modularity) ||
+            (is.numeric(modularity) &&
+             length(modularity) %in% c(1, length(membership))))
+
+  res <- list(membership=membership,
+              algorithm=if (is.null(algorithm)) "unknown" else algorithm,
+              modularity=modularity, ...)
+  if (!is.null(merges)) {
+    res$merges <- merges
+  }
+  class(res) <- "communities"
+  res
 }
 
 modularity <- function(x, ...)
