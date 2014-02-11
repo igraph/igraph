@@ -241,6 +241,10 @@ VECTORLIST_INT_OR_0:
 
 VERTEXSETLIST:
 
+VERTEXSETLIST_INT:
+  INCONV:
+    IN: %I% <- lapply(%I%, function(x) as.integer(x)-1L)
+
 VERTEXSETLIST_OR_0:
 
 EDGESETLIST:

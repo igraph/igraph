@@ -306,6 +306,12 @@ VERTEXSETLIST:
          R_igraph_vectorlist_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+VERTEXSETLIST_INT:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    IN:  if (!isNull(%I%)) { R_igraph_SEXP_to_vectorlist_int(%I%, &%C%); }
+
 EDGESETLIST:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%
