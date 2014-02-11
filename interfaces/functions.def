@@ -1563,6 +1563,12 @@ igraph_local_scan_k_ecount_them:
         DEPS: weights_them ON them
         IGNORE: RR, RNamespace
 
+igraph_local_scan_neighborhood_ecount:
+       PARAMS: GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
+               VERTEXSETLIST_INT neighborhoods
+       DEPS: weights ON graph
+       IGNORE: RR, RNamespace
+
 #######################################
 # Graph operators
 #######################################

@@ -700,3 +700,65 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
 
   return 0;
 }
+
+int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+			  igraph_vector_t *res,
+			  const igraph_vector_t *weights,
+			  const igraph_vector_ptr_t *neighborhoods) {
+
+  int node, no_of_nodes=igraph_vcount(graph);
+  igraph_inclist_t incs;
+  igraph_vector_int_t marked;
+  igraph_bool_t directed=igraph_is_directed(graph);
+
+  if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weight vector length in local scan", IGRAPH_EINVAL);
+  }
+  if (igraph_vector_ptr_size(neighborhoods) != no_of_nodes) {
+    IGRAPH_ERROR("Invalid neighborhood list length in local scan",
+		 IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_vector_int_init(&marked, no_of_nodes));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &marked);
+  IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
+
+  IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+  igraph_vector_null(res);
+
+  for (node=0; node < no_of_nodes; node++) {
+    igraph_vector_int_t *nei=VECTOR(*neighborhoods)[node];
+    int i, neilen=igraph_vector_int_size(nei);
+    VECTOR(marked)[node] = node + 1;
+    for (i=0; i<neilen; i++) {
+      int vertex=VECTOR(*nei)[i];
+      if (vertex < 0 || vertex >= no_of_nodes) {
+	IGRAPH_ERROR("Invalid vertex id in neighborhood list in local scan",
+		     IGRAPH_EINVAL);
+      }
+      VECTOR(marked)[vertex] = node + 1;
+    }
+
+    for (i=0; i<neilen; i++) {
+      int vertex=VECTOR(*nei)[i];
+      igraph_vector_int_t *edges=igraph_inclist_get(&incs, vertex);
+      int j, edgeslen=igraph_vector_int_size(edges);
+      for (j=0; j<edgeslen; j++) {
+	int edge=VECTOR(*edges)[j];
+	int nei2=IGRAPH_OTHER(graph, edge, vertex);
+	if (VECTOR(marked)[nei2] == node+1) {
+	  igraph_real_t w = weights ? VECTOR(*weights)[edge] : 1;
+	  VECTOR(*res)[node] += w;
+	}
+      }
+    }
+    if (!directed) { VECTOR(*res)[node] /= 2.0; }
+  }
+
+  igraph_inclist_destroy(&incs);
+  igraph_vector_int_destroy(&marked);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}

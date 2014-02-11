@@ -37,6 +37,7 @@
 #include "igraph_datatype.h"
 #include "igraph_arpack.h"
 #include "igraph_constants.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
@@ -73,6 +74,11 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
 				    int k, igraph_vector_t *res,
 				    const igraph_vector_t *weights_them,
 				    igraph_neimode_t mode);
+
+int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+			  igraph_vector_t *res,
+			  const igraph_vector_t *weights,
+			  const igraph_vector_ptr_t *neighborhoods);
 
 __END_DECLS
 

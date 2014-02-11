@@ -1171,8 +1171,18 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   res <- if (is.null(graph.them)) {
 
     if (!is.null(neighborhoods)) {
-      sapply(lapply(neighborhoods, induced.subgraph, graph=graph.us),
-             FUN, ...)
+      if (is.character(FUN) && FUN %in% c("ecount", "sumweights")) {
+        neighborhoods <- lapply(neighborhoods, function(x) {
+          as.integer(x)-1L
+        })
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_neighborhood_ecount", graph.us,
+              if (weighted) as.numeric(E(graph.us)$weight) else NULL,
+              neighborhoods, PACKAGE="igraph")
+      } else {
+        sapply(lapply(neighborhoods, induced.subgraph, graph=graph.us),
+               FUN, ...)
+      }
     } else {
       ## scan-0
       if (k == 0) {
@@ -1206,8 +1216,18 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   } else {
 
     if (!is.null(neighborhoods)) {
-      sapply(lapply(neighborhoods, induced.subgraph, graph=graph.them),
-             FUN, ...)
+      if (is.character(FUN) && FUN %in% c("ecount", "wumweights")) {
+        neighborhoods <- lapply(neighborhoods, function(x) {
+          as.integer(x)-1L
+        })
+        on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+        .Call("R_igraph_local_scan_neighborhood_ecount", graph.them,
+              if (weighted) as.numeric(E(graph.them)$weight) else NULL,
+              neighborhoods, PACKAGE="igraph")
+      } else {
+        sapply(lapply(neighborhoods, induced.subgraph, graph=graph.them),
+               FUN, ...)
+      }
     } else {
 
       ## scan-0
