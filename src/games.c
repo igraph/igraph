@@ -3863,6 +3863,29 @@ int igraph_k_regular_game(igraph_t *graph,
   return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_correlated_game
+ * Generate pairs of correlated random graphs
+ *
+ * Sample a new graph by perturbing the adjacency matrix of a
+ * given graph and shuffling its vertices.
+ *
+ * \param old_graph The original graph.
+ * \param new_graph The new graph will be stored here.
+ * \param corr A scalar in the unit interval, the target Pearson
+ *        correlation between the adjacency matrices of the original the
+ *        generated graph (the adjacency matrix being used as a vector).
+ * \param p A numeric scalar, the probability of an edge between two
+ *        vertices, it must in the open (0,1) interval.
+ * \param permutation A permutation to apply to the vertices of the
+ *        generated graph. It can also be a null pointer, in which case
+ *        the vertices will not be permuted.
+ * \return Error code
+ *
+ * \sa \ref igraph_correlated_pair_game() for generating a pair
+ * of correlated random graphs in one go.
+ */
+
 int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
 			   igraph_real_t corr, igraph_real_t p,
 			   const igraph_vector_t *permutation) {
@@ -4056,6 +4079,30 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
 #undef UPD_E
 #undef UPD_A
 #undef UPD_D
+
+/**
+ * \function igraph_correlated_pair_game
+ * Generate pairs of correlated random graphs
+ *
+ * Sample two random graphs, with given correlation.
+ *
+ * \param graph1 The first graph will be stored here.
+ * \param graph2 The second graph will be stored here.
+ * \param n The number of vertices in both graphs.
+ * \param corr A scalar in the unit interval, the target Pearson
+ *        correlation between the adjacency matrices of the original the
+ *        generated graph (the adjacency matrix being used as a vector).
+ * \param p A numeric scalar, the probability of an edge between two
+ *        vertices, it must in the open (0,1) interval.
+ * \param directed Whether to generate directed graphs.
+ * \param permutation A permutation to apply to the vertices of the
+ *        second graph. It can also be a null pointer, in which case
+ *        the vertices will not be permuted.
+ * \return Error code
+ *
+ * \sa \ref igraph_correlated_game() for generating a correlated pair
+ * to a given graph.
+ */
 
 int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
 				int n, igraph_real_t corr, igraph_real_t p,
