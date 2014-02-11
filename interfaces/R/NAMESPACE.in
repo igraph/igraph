@@ -86,8 +86,7 @@ export(erdos.renyi.game, random.graph.game, degree.sequence.game,
 
 export(edge.betweenness.community,
        spinglass.community, walktrap.community,
-       edge.betweenness.community.merges, fastgreedy.community,
-       community.to.membership)
+       edge.betweenness.community.merges, fastgreedy.community)
 
 export(membership, modularity, sizes, algorithm, is.hierarchical, merges,
        cutat, communities, crossing, plot.communities, compare,
