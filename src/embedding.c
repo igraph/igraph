@@ -69,6 +69,55 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
+/**
+ * \function igraph_adjacency_spectral_embedding
+ * Adjacency spectral embedding
+ *
+ * Spectral decomposition of the adjacency matrices of graphs.
+ * This function computes a \code{no}-dimensional Euclidean
+ * representation of the graph based on its adjacency
+ * matrix, A. This representation is computed via the singular value
+ * decomposition of the adjacency matrix, A=UDV^T. In the case,
+ * where the graph is a random dot product graph generated using latent
+ * position vectors in R^no for each vertex, the embedding will
+ * provide an estimate of these latent vectors.
+ *
+ * </para><para>
+ * For undirected graphs the latent positions are calculated as
+ * X=U^no D^(1/2) where U^no equals to the first no columns of U, and
+ * D^(1/2) is a diagonal matrix containing the square root of the top 
+ * no singular values on the diagonal.
+ *
+ * </para><para>
+ * For directed graphs the embedding is defined as the pair
+ * X=U^no D^(1/2), Y=V^no D^(1/2). (For undirected graphs U=V, 
+ * so it is enough to keep one of them.)
+ * 
+ * \param graph The input graph, can be directed or undirected.
+ * \param no An integer scalar. This value is the embedding dimension of
+ *        the spectral embedding. Should be smaller than the number of
+ *        vertices. The largest no-dimensional non-zero
+ *        singular values are used for the spectral embedding.
+ * \param scaled Whether to return X and Y (if scaled is non-zero), or 
+ *        U and V.
+ * \param X Initialized matrix, the estimated latent positions are
+ *        stored here.
+ * \param Y Initialized matrix or a null pointer. If not a null
+ *        pointer, then the second half of the latent positions are
+ *        stored here. (For undirected graphs, this always equals X.)
+ * \param cvec A numeric vector, its length is the number vertices in the
+ *        graph. This vector is added to the diagonal of the adjacency
+ *        matrix, before performing the SVD.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *        for details. Note that the function overwrites the
+ *        <code>n</code> (number of vertices), <code>nev</code> and 
+ *        <code>which</code> parameters and it always starts the
+ *        calculation from a random start vector.
+ * \return Error code.
+ * 
+ */
+
+
 int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 					igraph_integer_t no,
 					igraph_bool_t scaled,
@@ -160,6 +209,41 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 	
   return 0;
 }
+
+/**
+ * \function igraph_dim_select
+ * Dimensionality selection
+ * 
+ * Dimensionality selection for singular values using
+ * profile likelihood.
+ *
+ * </para><para>
+ * The input of the function is a numeric vector which contains
+ * the measure of "importance" for each dimension.
+ *
+ * </para><para>
+ * For spectral embedding, these are the singular values of the adjacency
+ * matrix. The singular values are assumed to be generated from a
+ * Gaussian mixture distribution with two components that have different
+ * means and same variance. The dimensionality d is chosen to
+ * maximize the likelihood when the d largest singular values are
+ * assigned to one component of the mixture and the rest of the singular
+ * values assigned to the other component.
+ *
+ * </para><para>
+ * This function can also be used for the general separation problem,
+ * where we assume that the left and the right of the vector are coming
+ * from two Normal distributions, with different means, and we want
+ * to know their border.
+ * 
+ * \param sv A numeric vector, the ordered singular values.
+ * \param dim The result is stored here.
+ * \return Error code.
+ * 
+ * Time complexity: O(n), n is the number of values in sv.
+ * 
+ * \sa \ref igraph_adjacency_spectral_embedding().
+ */
 
 int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim) {
 
