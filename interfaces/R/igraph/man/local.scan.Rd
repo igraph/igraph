@@ -1,6 +1,5 @@
 \name{local.scan}
 \alias{local.scan}
-\alias{local.scan1.ecount}
 \alias{local.scan1.ecount.approx}
 \alias{local.scan1.ecount.approx.eigen}
 \concept{Scan Statistics on Graphs}
@@ -12,11 +11,14 @@
 \usage{
 local.scan (graph.us, graph.them = NULL, k = 1, FUN = NULL,
     weighted = FALSE, mode = c("out", "in", "all"),
-    neighborhoods = NULL, ...) 
+    neighborhoods = NULL, ...)
+local.scan1.ecount.approx (graph, noevals, options =
+    igraph.arpack.default)
+local.scan1.ecount.approx.eigen (graph, values, vectors) 
 }
 \arguments{
-  \item{graph.us}{An igraph object, the graph for which the scan statistics
-    will be computed}
+  \item{graph.us,graph}{An igraph object, the graph for which the scan
+    statistics will be computed}
   \item{graph.them}{An igraph object or \code{NULL}, if not \code{NULL},
     then the \sQuote{them} statistics is computed, i.e. the
     neighborhoods calculated from \code{graph.us} are evaluated on
@@ -51,21 +53,49 @@ local.scan (graph.us, graph.them = NULL, k = 1, FUN = NULL,
   }
   \item{\dots}{Arguments passed to \code{FUN}, the function that computes 
     the local statistics.}
+  \item{noevals}{Positive integer scalar, number of eigenvalues and
+    eigenvectors to use in the approximation.}
+  \item{options}{A named list containing the parameters of the
+    eigendecomposition algorithm in ARPACK. By default, the list of
+    values is assigned the values given by
+    \code{\link{igraph.arpack.default}}.}
+  \item{values}{Numeric vector, the eigenvalues to use in the
+    approximation.}
+  \item{vectors}{Numeric matrix, the eigenvectors to use in the
+    approximation.}
 }
 \details{
   See the given reference below for the details on the local scan
   statistics.
 
+  \code{local.scan} calculates exact local scan statistics.
+  
   If \code{graph.them} is \code{NULL}, then \code{local.scan} computes
   the \sQuote{us} variant of the scan statistics.
   Otherwise, \code{graph.them} should be an igraph object and the
   \sQuote{them} variant is computed using \code{graph.us} to extract
   the neighborhood information, and applying \code{FUN} on these
   neighborhoods in \code{graph.them}.
+
+  \code{local.scan1.ecount.approx} calculates approximate edge counts
+  for 1-neighborhoods, using the eigen-decomposition of the adjancency
+  matrix.
+
+  \code{local.scan1.ecount.approx.eigen} is similar, but it input is the
+  eigenvalues and the eigenvectors themselves.
 }
-\value{Typically a numeric vector containing the computed local
-  statistics for each vertex. In general a list or vector of objects, as
-  returned by \code{FUN}.}
+\value{For \code{local.scan} typically a numeric vector containing the
+  computed local statistics for each vertex. In general a list or vector
+  of objects, as returned by \code{FUN}.
+
+  For \code{local.scan1.ecount.approx} a list with entries
+  \item{res}{Numeric vector, the approximate edge counts.}
+  \item{options}{A named list, information about the underlying ARPACK
+    computation. See \code{\link{arpack}} for the details.}
+
+  For \code{local.scan1.ecount.approx.eigen} a numeric vector of
+  approximate edge counts.
+}
 \references{Priebe, C. E., Conroy, J. M., Marchette, D. J., Park,
   Y. (2005). Scan Statistics on Enron Graphs. \emph{Computational and
   Mathematical Organization Theory}.
