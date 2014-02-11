@@ -17,6 +17,7 @@
 \alias{asPhylo.communities}
 \alias{showtrace}
 \alias{code.length}
+\alias{create.communities}
 \concept{Community structure}
 \title{Functions to deal with the result of network community detection}
 \description{igraph community detection functions return their results
@@ -50,6 +51,9 @@ code.length(communities)
    mark.groups=communities(x),
    edge.color=c("black", "red")[crossing(x,y)+1],
    \dots)
+
+create.communities(membership, algorithm = NULL, merges = NULL,
+                   modularity = NULL, \dots)
 }
 \arguments{
   \item{communities,x,object}{A \code{communities} object, the result of
@@ -90,8 +94,20 @@ code.length(communities)
  \item{use.modularity}{Logical scalar, whether to use the modularity
    values to define the height of the branches.}
  \item{\dots}{Additional arguments. \code{plot.communities} passes
-   these to \code{\link{plot.igraph}}. The other functions silently
-   ignore them.}
+   these to \code{\link{plot.igraph}}. \code{create.communities} adds
+   them to the \code{communtiies} object it creates. The other functions
+   silently ignore them.}
+ \item{membership}{Numeric vector, one value for each vertex, the
+   membership vector of the community structure.}
+ \item{algorithm}{If not \code{NULL} (meaning an unknown algorithm), then
+   a character scalar, the name of the algorithm that produced the
+   community structure.}
+ \item{merges}{If not \code{NULL}, then the merge matrix of the
+   hierarchical community structure. See \code{merges} below for more
+   information on its format.}
+ \item{modularity}{Numeric scalar or vector, the modularity value of the
+   community structure. It can also be \code{NULL}, if the modularity of
+   the (best) split is not available.}
 }
 \details{
   Community structure detection algorithms try to find dense subgraphs
@@ -180,6 +196,10 @@ code.length(communities)
   groups corresponding to the communities. It passes additional
   arguments to \code{\link{plot.igraph}}, please see that and also
   \code{\link{igraph.plotting}} on how to change the plot.
+
+  \code{create.communities} creates a \code{communities} object. This is
+  useful to integrate the results of community finding algorithms (that
+  are not included in igraph).
 }
 \value{
   \code{print} returns the \code{communities} object itself, invisibly.
@@ -214,6 +234,8 @@ code.length(communities)
   
   \code{plot} for \code{communities} objects returns \code{NULL},
   invisibly.
+
+  \code{create.communities} returns a \code{communities} object.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
