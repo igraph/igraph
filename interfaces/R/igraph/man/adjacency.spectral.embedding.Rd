@@ -1,7 +1,7 @@
 \name{adjacency.spectral.embedding}
 \alias{adjacency.spectral.embedding}
 \title{Spectral Embedding of Adjacency Matrices}
-\description{Using a spectral decomposition of the adjacency matrices of
+\description{Spectral decomposition of the adjacency matrices of
   graphs.}
 \usage{
 adjacency.spectral.embedding (graph, no, scaled = TRUE,
@@ -14,6 +14,8 @@ adjacency.spectral.embedding (graph, no, scaled = TRUE,
     the spectral embedding. Should be smaller than the number of
     vertices. The largest \code{no}-dimensional non-zero
     singular values are used for the spectral embedding.}
+  \item{scaled}{Logical scalar, if \code{FALSE}, then \eqn{U} and
+    \eqn{V} are returned instead of \eqn{X} and \eqn{Y}.}
   \item{cvec}{A numeric vector, its length is the number vertices in the
     graph. This vector is added to the diagonal of the adjacency
     matrix.}
