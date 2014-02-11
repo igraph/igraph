@@ -33,6 +33,24 @@
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
 
+/**
+ * \function igraph_local_scan_0
+ * Local scan-statistics, k=0
+ * 
+ * K=0 scan-statistics is arbitrarily defined as the vertex degree for
+ * unweighted, and the vertex strength for weighted graphs. See \ref
+ * igraph_degree() and \ref igraph_strength().
+ * 
+ * \param graph The input graph
+ * \param res An initialized vector, the results are stored here.
+ * \param weights Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param mode Type of the neighborhood, \c IGRAPH_OUT means outgoing,
+ *        \c IGRAPH_IN means incoming and \c IGRAPH_ALL means all edges.
+ * \return Error code.
+ * 
+ */
+
 int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 			const igraph_vector_t *weights,
 			igraph_neimode_t mode) {
@@ -244,6 +262,23 @@ int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_local_scan_1_ecount
+ * Local scan-statistics, k=1, edge count and sum of weights
+ * 
+ * Count the number of edges or the sum the edge weights in the
+ * 1-neighborhood of vertices.
+ * 
+ * \param graph The input graph
+ * \param res An initialized vector, the results are stored here.
+ * \param weights Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param mode Type of the neighborhood, \c IGRAPH_OUT means outgoing,
+ *        \c IGRAPH_IN means incoming and \c IGRAPH_ALL means all edges.
+ * \return Error code.
+ * 
+ */
+
 int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
 			       const igraph_vector_t *weights,
 			       igraph_neimode_t mode) {
@@ -264,6 +299,35 @@ int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
 
   return 0;
 }
+
+/**
+ * \function igraph_local_scan_1_ecount_approximate
+ * Approximate local scan-statistics, k=1, edge count
+ * 
+ * Approximate edge count in 1-neighborhoods, based on the 
+ * eigenstructure of the graph's adjacency matrix. See 
+ * Charalampos E. Tsourakakis: Fast Counting of Triangles in Large
+ * Real Networks without Counting: Algorithms and Laws, Eighth
+ * IEEE International Conference on Data Mining, 2008.
+ * 
+ * </para></para>
+ * This approximation might be faster on some large graphs with
+ * simple eigenstructure. In practice it is usually slower than
+ * the exact counting in \ref igraph_local_scan_1_ecount().
+ * 
+ * \param graph The input graph.
+ * \param res Initialized vector, the result is stored here.
+ * \param noevals Number of eigenvalues/vectors to use for the 
+ *        approximation.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *        for details. Note that the function overwrites the
+ *        <code>n</code> (number of vertices), <code>nev</code> and 
+ *        <code>which</code> parameters and it always starts the
+ *        calculation from a random start vector.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_local_scan_1_ecount() for the exact version.
+ */
 
 int igraph_local_scan_1_ecount_approximate(const igraph_t *graph,
 					   igraph_vector_t *res, int noevals,
@@ -321,6 +385,30 @@ int igraph_local_scan_1_ecount_approximate(const igraph_t *graph,
 
   return 0;
 }
+
+/**
+ * \function igraph_local_scan_1_ecount_approximate_eigen
+ * Approximate local scan-statistics, k=1, edge count, from eigenvectors
+ * 
+ * Approximate edge count in 1-neighborhoods, based on the 
+ * eigenstructure of the graph's adjacency matrix. See \ref
+ * igraph_local_scan_1_ecount_approximate() for details.
+ * 
+ * </para><para>
+ * This function's input is the pre-calculated eigenvectors and
+ * eigenvalues.
+ * 
+ * \param graph The input graph.
+ * \param res Initialized vector, the result is stored here.
+ * \param values Pre-calculated eigenvalues of the adjacency matrix.
+ * \param vectors Pre-calculated eigenvectors of the adjacency matrix,
+ *        one ineach column. Their order must match the values
+ *        argument.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_local_scan_1_ecount_approximate(), and \ref
+ * igraph_local_scan_1_ecount() for the exact version.
+ */
 
 int igraph_local_scan_1_ecount_approximate_eigen(
 				 const igraph_t *graph,
@@ -404,6 +492,25 @@ int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
   return 0;
 }
 
+/**
+ * \function igraph_local_scan_0_them
+ * Local THEM scan-statistics, k=0
+ * 
+ * K=0 scan-statistics is arbitrarily defined as the vertex degree for
+ * unweighted, and the vertex strength for weighted graphs. See \ref
+ * igraph_degree() and \ref igraph_strength().
+ * 
+ * \param us The input graph, to use to extract the neighborhoods.
+ * \param them The input graph to use for the actually counting.
+ * \param res An initialized vector, the results are stored here.
+ * \param weights_them Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param mode Type of the neighborhood, \c IGRAPH_OUT means outgoing,
+ *        \c IGRAPH_IN means incoming and \c IGRAPH_ALL means all edges.
+ * \return Error code.
+ * 
+ */
+
 int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
 			     igraph_vector_t *res,
 			     const igraph_vector_t *weights_them,
@@ -432,6 +539,24 @@ int igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
 
   return 0;
 }
+
+/**
+ * \function igraph_local_scan_1_ecount_them
+ * Local THEM scan-statistics, k=1, edge count and sum of weights
+ * 
+ * Count the number of edges or the sum the edge weights in the
+ * 1-neighborhood of vertices.
+ * 
+ * \param us The input graph to extract the neighborhoods.
+ * \param them The input graph to perform the counting.
+ * \param weights_them Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param mode Type of the neighborhood, \c IGRAPH_OUT means outgoing,
+ *        \c IGRAPH_IN means incoming and \c IGRAPH_ALL means all edges.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_local_scan_1_ecount() for the US statistics.
+ */
 
 int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
 				    igraph_vector_t *res,
@@ -523,6 +648,25 @@ int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
   return 0;
 }
 
+/**
+ * \function igraph_local_scan_k_ecount
+ * Local scan-statistics, general function, edge count and sum of weights
+ * 
+ * Count the number of edges or the sum the edge weights in the
+ * k-neighborhood of vertices.
+ * 
+ * \param graph The input graph
+ * \param k The size of the neighborhood, non-negative integer. 
+ *        The k=0 case is special, see \ref igraph_local_scan_0().
+ * \param res An initialized vector, the results are stored here.
+ * \param weights Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param mode Type of the neighborhood, \c IGRAPH_OUT means outgoing,
+ *        \c IGRAPH_IN means incoming and \c IGRAPH_ALL means all edges.
+ * \return Error code.
+ * 
+ */
+
 int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
 			       igraph_vector_t *res,
 			       const igraph_vector_t *weights,
@@ -594,6 +738,26 @@ int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
 
   return 0;
 }
+
+/**
+ * \function igraph_local_scan_k_ecount_them
+ * Local THEM scan-statistics, general function, edge count and sum of weights
+ *
+ * Count the number of edges or the sum the edge weights in the
+ * k-neighborhood of vertices.
+ * 
+ * \param us The input graph to extract the neighborhoods.
+ * \param them The input graph to perform the counting.
+ * \param k The size of the neighborhood, non-negative integer. 
+ *        The k=0 case is special, see \ref igraph_local_scan_0_them().
+ * \param weights_them Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param mode Type of the neighborhood, \c IGRAPH_OUT means outgoing,
+ *        \c IGRAPH_IN means incoming and \c IGRAPH_ALL means all edges.
+ * \return Error code.
+ * 
+ * \sa \ref igraph_local_scan_1_ecount() for the US statistics.
+ */
 
 int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
 				    int k, igraph_vector_t *res,
@@ -700,6 +864,23 @@ int igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
 
   return 0;
 }
+
+/**
+ * \function igraph_local_scan_neighborhood_ecount
+ * Local scan-statistics with pre-calculated neighborhoods
+ * 
+ * Count the number of edges, or sum the edge weigths in 
+ * neighborhoods given as a parameter.
+ * 
+ * \param graph The graph to perform the counting/summing in.
+ * \param res Initialized vector, the result is stored here.
+ * \param weights Weight vector for weighted graphs, null pointer for
+ *        unweighted graphs.
+ * \param neighborhoods List of <code>igraph_vector_int_t</code>
+ *        objects, the neighborhoods, one for each vertex in the
+ *        graph.
+ * \return Error code.
+ */
 
 int igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
 			  igraph_vector_t *res,

@@ -15,7 +15,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
 	      separators.xml memory.xml sparsemat.xml hrg.xml \
 	      scg.xml spatialgames.xml threading.xml progress.xml status.xml \
-	      graphlets.xml epi.xml embedding.xml
+	      graphlets.xml epi.xml embedding.xml scan.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -76,6 +76,9 @@ scg.xml: scg.xxml $(SRCDIR)/scg.c
 
 embedding.xml: embedding.xxml $(SRCDIR)/embedding.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/embedding.c
+
+scan.xml: scan.xxml $(SRCDIR)/scan.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/scan.c
 
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
