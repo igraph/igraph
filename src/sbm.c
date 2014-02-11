@@ -218,7 +218,26 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 
 /**
  * \function igraph_hsbm_game
+ * Hierarchical stochastic block model
  *
+ * The function generates a random graph according to the hierarchical
+ * stochastic block model.
+ *
+ * \param graph The generated graph is stored here.
+ * \param n The number of vertices in the graph.
+ * \param m The number of vertices per block. n/m must be integer.
+ * \param rho The fraction of vertices per cluster,
+ *        within a block. Must sum up to 1, and rho * m must be integer
+ *        for all elements of rho.
+ * \param C A square, symmetric numeric matrix, the Bernoulli rates for
+ *        the clusters within a block. Its size must mach the size of the
+ *        \code{rho} vector.
+ * \param p The Bernoulli rate of connections between
+ *        vertices in different blocks.
+ * \return Error code.
+ *
+ * \sa \ref igraph_sbm_game() for the classic stochastic block model,
+ * \ref igraph_hsbm_list_game() for a more general version.
  */
 
 int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n, 
@@ -371,6 +390,29 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
 
   return 0;
 }
+
+/**
+ * \function igraph_hsbm_list_game
+ * Hierarchical stochastic block model, more general version
+ *
+ * The function generates a random graph according to the hierarchical
+ * stochastic block model.
+ *
+ * \param graph The generated graph is stored here.
+ * \param n The number of vertices in the graph.
+ * \param mlist An integer vector of block sizes.
+ * \param rholist A list of rho vectors (\c igraph_vector_t objects), one
+ *        for each block.
+ * \param Clist A list of square matrices (\c igraph_matrix_t objects),
+ *        one for each block, giving the Bernoulli rates of connections
+ *        within the block.
+ * \param p The Bernoulli rate of connections between
+ *        vertices in different blocks.
+ * \return Error code.
+ *
+ * \sa \ref igraph_sbm_game() for the classic stochastic block model,
+ * \ref igraph_hsbm_game() for a simpler general version.
+ */
 
 int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
 			  const igraph_vector_int_t *mlist,
