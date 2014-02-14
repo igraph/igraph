@@ -12,6 +12,6 @@
 ## The oos algorithm itself is nothing more than a least square regression, i.e., 
 ## Yhat = \argmin \| A12 - Xhat Y^{\top} \|_{F}
 oos <- function(A12, Xhat){
-    Yhat <- t(solve(t(Xhat)%*%Xhat, t(Xhat) %*% A12))
+    Yhat <- t(Matrix::solve(t(Xhat)%*%Xhat, t(Xhat) %*% A12))
     return(Yhat)
 }

@@ -288,6 +288,9 @@ export(adjcorr, sgm)
 # OOS
 export(oos)
 
+# gclust
+export(gclust)
+
 # SIR
 
 export(plot.sir)

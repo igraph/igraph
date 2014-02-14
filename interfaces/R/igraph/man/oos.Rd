@@ -25,7 +25,6 @@ m <- 100
 X <- matrix(runif(2*(n+m), max = 1/sqrt(2)), nrow = 2)
 g <- dot.product.game(X)
 g.insample <- induced.subgraph(g, 1:n)
-Xhat.insample <- adjacency.spectral.embedding(g.insample, 2)
-Xhat.oos <- oos(g[1:n,(n+1):(n+m)], Xhat.insample)
-
+Xhat.insample <- adjacency.spectral.embedding(g.insample, 2)$X
+Xhat.oos <- oos(g[][1:n,(n+1):(n+m)], Xhat.insample)
 }
