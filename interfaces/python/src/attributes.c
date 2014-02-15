@@ -1857,6 +1857,7 @@ int igraphmodule_attribute_name_check(PyObject* obj) {
   if (type_str != 0) {
     PyErr_Format(PyExc_TypeError, "igraph supports string attribute names only, got %s",
         PyString_AS_STRING(type_str));
+    Py_DECREF(type_str);
   } else {
     PyErr_Format(PyExc_TypeError, "igraph supports string attribute names only");
   }
