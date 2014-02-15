@@ -121,7 +121,7 @@ class VertexSeqTests(unittest.TestCase):
         for i in xrange(self.g.vcount()):
             self.assertEqual(i, self.g.vs[i].index)
         self.assertRaises(IndexError, self.g.vs.__getitem__, -1)
-        self.assertRaises(KeyError, self.g.vs.__getitem__, 1.5)
+        self.assertRaises(TypeError, self.g.vs.__getitem__, 1.5)
 
     @skipIf(np is None, "test case depends on NumPy")
     def testNumPyIndexing(self):
@@ -136,7 +136,7 @@ class VertexSeqTests(unittest.TestCase):
         self.assertRaises(IndexError, self.g.vs.__getitem__, arr[0])
 
         arr = np.array([1.5])
-        self.assertRaises(KeyError, self.g.vs.__getitem__, arr[0])
+        self.assertRaises(TypeError, self.g.vs.__getitem__, arr[0])
 
     def testPartialAttributeAssignment(self):
         only_even = self.g.vs.select(lambda v: (v.index % 2 == 0))

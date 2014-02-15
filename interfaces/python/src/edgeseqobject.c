@@ -242,6 +242,9 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values(igraphmodule_EdgeSeqObject* 
   PyObject *result=0, *values, *item;
   long int i, n;
 
+  if (!igraphmodule_attribute_name_check(o))
+    return 0;
+
   PyErr_Clear();
   values=PyDict_GetItem(ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_EDGE], o);
   if (!values) {
@@ -338,11 +341,15 @@ PyObject* igraphmodule_EdgeSeq_get_attribute_values_mapping(igraphmodule_EdgeSeq
  */
 int igraphmodule_EdgeSeq_set_attribute_values_mapping(igraphmodule_EdgeSeqObject* self, PyObject* attrname, PyObject* values) {
   PyObject *dict, *list, *item;
-  igraphmodule_GraphObject *gr=self->gref;
+  igraphmodule_GraphObject *gr;
   igraph_vector_t es;
   long i, j, n, no_of_edges;
   
+  gr = self->gref;
   dict = ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_EDGE];
+
+  if (!igraphmodule_attribute_name_check(attrname))
+    return -1;
 
   if (values == 0) {
     if (igraph_es_type(&self->es) == IGRAPH_ES_ALL)

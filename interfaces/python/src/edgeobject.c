@@ -290,6 +290,9 @@ PyObject* igraphmodule_Edge_get_attribute(igraphmodule_EdgeObject* self,
   igraphmodule_GraphObject *o = self->gref;
   PyObject* result;
 
+  if (!igraphmodule_attribute_name_check(s))
+    return 0;
+
   result=PyDict_GetItem(((PyObject**)o->g.attr)[2], s);
   if (result) {
     /* result is a list, so get the element with index self->idx */
@@ -320,7 +323,11 @@ int igraphmodule_Edge_set_attribute(igraphmodule_EdgeObject* self, PyObject* k, 
   PyObject* result;
   int r;
   
-  if (o==0) return -1;
+  if (o==0)
+    return -1;
+
+  if (!igraphmodule_attribute_name_check(k))
+    return -1;
 
   if (v==NULL)
     // we are deleting attribute

@@ -75,6 +75,17 @@ class AttributeTests(unittest.TestCase):
         del g.vs["name"]
         self.assertRaises(ValueError, g.degree, [u"bar", u"thud", 0])
 
+    def testInvalidAttributeNames(self):
+        g = Graph.Famous("bull")
+        for attr_name in [None, 2.654, unittest, str]:
+            self.assertRaises(TypeError, g.vs.__setitem__, attr_name, "foo")
+            self.assertRaises(TypeError, g.vs.__getitem__, attr_name, "foo")
+            self.assertRaises(TypeError, g.vs[0].__setitem__, attr_name, "foo")
+            self.assertRaises(TypeError, g.vs[0].__getitem__, attr_name, "foo")
+            self.assertRaises(TypeError, g.es.__setitem__, attr_name, "foo")
+            self.assertRaises(TypeError, g.es.__getitem__, attr_name, "foo")
+            self.assertRaises(TypeError, g.es[0].__setitem__, attr_name, "foo")
+            self.assertRaises(TypeError, g.es[0].__getitem__, attr_name, "foo")
 
 class AttributeCombinationTests(unittest.TestCase):
     def setUp(self):

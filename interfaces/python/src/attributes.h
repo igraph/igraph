@@ -78,6 +78,7 @@ int igraphmodule_i_get_boolean_edge_attr(const igraph_t *graph,
 					 igraph_es_t es,
 					 igraph_vector_bool_t *value);
 
+int igraphmodule_attribute_name_check(PyObject* obj);
 void igraphmodule_initialize_attribute_handler(void);
 void igraphmodule_index_vertex_names(igraph_t *graph, igraph_bool_t force);
 void igraphmodule_invalidate_vertex_name_index(igraph_t *graph);

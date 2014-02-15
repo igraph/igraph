@@ -116,7 +116,7 @@ class EdgeSeqTests(unittest.TestCase):
         for i in xrange(self.g.ecount()):
             self.assertEqual(i, self.g.es[i].index)
         self.assertRaises(IndexError, self.g.es.__getitem__, -1)
-        self.assertRaises(KeyError, self.g.es.__getitem__, 1.5)
+        self.assertRaises(TypeError, self.g.es.__getitem__, 1.5)
 
     @skipIf(np is None, "test case depends on NumPy")
     def testNumPyIndexing(self):
@@ -128,7 +128,7 @@ class EdgeSeqTests(unittest.TestCase):
         self.assertRaises(IndexError, self.g.es.__getitem__, arr[0])
 
         arr = np.array([1.5])
-        self.assertRaises(KeyError, self.g.es.__getitem__, arr[0])
+        self.assertRaises(TypeError, self.g.es.__getitem__, arr[0])
 
     def testPartialAttributeAssignment(self):
         only_even = self.g.es.select(lambda e: (e.index % 2 == 0))
