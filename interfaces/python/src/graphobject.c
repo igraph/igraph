@@ -6428,7 +6428,7 @@ PyObject
                                                   PyObject * kwds)
 {
   static char *kwlist[] =
-    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad",
+    { "weights", "niter", "width", "height", "start_temp",
       "seed", "minx", "maxx", "miny", "maxy", "minz", "maxz", "dim", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
@@ -6438,7 +6438,7 @@ PyObject
   igraph_vector_t *minz=0, *maxz=0;
   int ret;
   long int niter = 500, dim = 2;
-  double maxdelta, area, coolexp, repulserad;
+  double width=IGRAPH_INFINITY, height=IGRAPH_INFINITY, start_temp;
   PyObject *result;
   PyObject *wobj=Py_None, *seed_o=Py_None;
   PyObject *minx_o=Py_None, *maxx_o=Py_None;
@@ -6455,30 +6455,13 @@ PyObject
   if (maxz)    { igraph_vector_destroy(maxz); free(maxz); } \
 }
 
-  maxdelta = igraph_vcount(&self->g);
-  coolexp = 1.5;
-  repulserad = -1;
-  area = -1;
+  start_temp = sqrt(igraph_vcount(&self->g)) / 10.0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlddddOOOOOOOl", kwlist, &wobj,
-                                   &niter, &maxdelta, &area, &coolexp,
-                                   &repulserad, &seed_o, &minx_o, &maxx_o,
-                                   &miny_o, &maxy_o, &minz_o, &maxz_o,
-                                   &dim))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OldddOOOOOOOl", kwlist, &wobj,
+                                   &niter, &width, &height, &start_temp,
+                                   &seed_o, &minx_o, &maxx_o,
+                                   &miny_o, &maxy_o, &minz_o, &maxz_o))
     return NULL;
-
-  if (area <= 0) {
-    area = maxdelta * maxdelta;
-    if (dim == 3)
-      area *= maxdelta;
-  }
-  if (repulserad <= 0)
-    repulserad = area * maxdelta;
-
-  if (dim != 2 && dim != 3) {
-    PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
-    return NULL;
-  }
 
   if (seed_o == 0 || seed_o == Py_None) {
     if (igraph_matrix_init(&m, 1, 1)) {
@@ -6489,7 +6472,6 @@ PyObject
     if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
 	use_seed=1;
   }
-
 
   /* Convert the weight parameter to a vector */
   if (igraphmodule_attrib_to_vector_t(wobj, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
@@ -6537,14 +6519,9 @@ PyObject
     }
   }
 
-  if (dim == 2)
-    ret = igraph_layout_fruchterman_reingold
-        (&self->g, &m, (igraph_integer_t) niter, maxdelta, area, coolexp, repulserad,
-         use_seed, weights, minx, maxx, miny, maxy);
-  else
-    ret = igraph_layout_fruchterman_reingold_3d
-      (&self->g, &m, (igraph_integer_t) niter, maxdelta, area, coolexp, repulserad,
-       use_seed, weights, minx, maxx, miny, maxy, minz, maxz);
+  ret = igraph_layout_fruchterman_reingold
+      (&self->g, &m, use_seed, width, height, (igraph_integer_t) niter,
+       start_temp, weights, minx, maxx, miny, maxy);
 
   DESTROY_VECTORS;
 
@@ -13659,28 +13636,30 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_fruchterman_reingold",
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_fruchterman_reingold(weights=None, maxiter=500, maxdelta=None, area=None,\n"
-   "  coolexp=1.5, repulserad=None, seed=None, minx=None, maxx=None, miny=None, \n"
-   "  maxy=None, minz=None, maxz=None, dim=2)\n\n"
-   "Places the vertices on a 2D plane or in the 3D space according to the\n"
+   "layout_fruchterman_reingold(weights=None, niter=500, seed=None, \n"
+   "  width=float(\"inf\"), height=float(\"inf\"), start_temp=None\n"
+   "  minx=None, maxx=None, miny=None, \n"
+   "  maxy=None, minz=None, maxz=None)\n\n"
+   "Places the vertices on a 2D plane according to the\n"
    "Fruchterman-Reingold algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
    "Graph Drawing by Force-directed Placement.\n"
    "Software -- Practice and Experience, 21/11, 1129--1164, 1991\n\n"
    "@param weights: edge weights to be used. Can be a sequence or iterable or\n"
    "  even an edge attribute name.\n"
-   "@param maxiter: the number of iterations to perform. The default\n"
+   "@param niter: the number of iterations to perform. The default\n"
    "  is 500.\n"
-   "@param maxdelta: the maximum distance to move a vertex in\n"
-   "  an iteration. The default is the number of vertices.\n"
-   "@param area: the area of the square on which the vertices\n"
-   "  will be placed. The default is the square of the number of\n"
-   "  vertices.\n"
-   "@param coolexp: the cooling exponent of the simulated annealing.\n"
-   "  The default is 1.5.\n"
-   "@param repulserad: determines the radius at which vertex-vertex\n"
-   "  repulsion cancels out attraction of adjacent vertices.\n"
-   "  The default is the number of vertices^3.\n"
+   "@param width: The width of the area to lay out to. If it is \n"
+   "  infinity, then the graph will take as much space (horizontally), \n"
+   "  as it needs to.\n"
+   "@param height: The height of the area to lay out to. If it is \n"
+   "  infinity, then the graph will take as much space (vertically), \n"
+   "  as it needs to.\n"
+   "@param start_temp: Real scalar, the start temperature. This is the \n"
+   "  maximum amount of movement alloved along one axis, within one step,\n"
+   "  for a vertex. Currently it is decreased linearly to zero during\n"
+   "  the iteration. The default is the square root of the number of \n"
+   "  vertices divided by 10.\n"
    "@param minx: if not C{None}, it must be a vector with exactly as many\n"
    "  elements as there are vertices in the graph. Each element is a\n"
    "  minimum constraint on the X value of the vertex in the layout.\n"
@@ -13694,8 +13673,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
-   "@param dim: the desired number of dimensions for the layout. dim=2\n"
-   "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the calculated layout."
   },
 
