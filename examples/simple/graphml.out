@@ -1,4 +1,4 @@
-Warning: unknown attribute key in GraphML file, ignoring attribute
+Warning: unknown attribute key 'd3' in a <data> tag, ignoring attribute
 The directed graph:
 Vertices: 6
 Edges: 7
@@ -10,7 +10,7 @@ Directed: 0
 2 4
 3 5
 4 5
-Warning: unknown attribute key in GraphML file, ignoring attribute
+Warning: unknown attribute key 'd3' in a <data> tag, ignoring attribute
 The undirected graph:
 Vertices: 6
 Edges: 7
