@@ -1023,3 +1023,7 @@ PAGERANKOPT:
            } else {                                                 \
              PROTECT(%I%);                                          \
            }
+
+DEPRECATED:
+  HEADER:
+  CALL:

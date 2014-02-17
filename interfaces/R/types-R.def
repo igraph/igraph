@@ -379,3 +379,7 @@ PAGERANKOPT:
                 %I% <- NULL                             \
               }                                         \
             }
+
+DEPRECATED:
+  INCONV: if (!missing(%I%)) { warning("Argument `%I%' is deprecated and has no effect") }
+  CALL:

@@ -694,7 +694,10 @@ class RCCodeGenerator(CodeGenerator):
         def docall(t, n):
             if type(t)==dict:
                 mode=params[n]['mode']
-                return t[mode]
+                if mode in t:
+                    return t[mode]
+                else:
+                    return ""
             else:
                 return t
         
@@ -705,6 +708,7 @@ class RCCodeGenerator(CodeGenerator):
                   call, params.keys() )
         retpars=[ n for n,p in params.items() if p['mode'] in 
                   ['OUT', 'INOUT'] ]
+        call=[ c for c in call if c != "" ]
         res="  " + function + "(" + ", ".join(call) + ");\n"
         if len(retpars)==0:
             res="  c_result=" + res
