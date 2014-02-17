@@ -33,6 +33,12 @@
 #include "igraph_pmt_off.h"
 #undef BASE_IGRAPH_REAL
 
+#define BASE_FLOAT
+#include "igraph_pmt.h"
+#include "vector.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_FLOAT
+
 #define BASE_LONG
 #include "igraph_pmt.h"
 #include "vector.pmt"
