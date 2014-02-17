@@ -69,15 +69,15 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
     
   RNG_BEGIN();
 
-  for (i = 0; i < ncol; i++) {
+  for (i = 0; i < nrow; i++) {
     int from=directed ? 0 : i+1;
     igraph_vector_t v1;
-    igraph_vector_view(&v1, &MATRIX(*vecs, 0, i), nrow);
-    for (j = from; j < ncol; j++) {
+    igraph_vector_view(&v1, &MATRIX(*vecs, i, 0), ncol);
+    for (j = from; j < nrow; j++) {
       if (i==j) { continue; }
       igraph_real_t prob;
       igraph_vector_t v2;
-      igraph_vector_view(&v2, &MATRIX(*vecs, 0, j), nrow);
+      igraph_vector_view(&v2, &MATRIX(*vecs, j, 0), ncol);
       igraph_lapack_ddot(&v1, &v2, &prob);
       if (prob < 0 && ! warned_neg) {
 	warned_neg=1;
