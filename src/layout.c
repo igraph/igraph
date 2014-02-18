@@ -354,6 +354,19 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
   return 0;
 }
 
+int print_matrix(const igraph_matrix_t *m) {
+  int nrow=igraph_matrix_nrow(m);
+  int ncol=igraph_matrix_ncol(m);
+  int i, j;
+  for (i=0; i<nrow; i++) {
+    for (j=0; j<ncol; j++) {
+      printf("%g ", MATRIX(*m, i, j));
+    }
+    printf("\n");
+  }
+  return 0;
+}
+
 /**
  * \ingroup layout
  * \function igraph_layout_fruchterman_reingold
@@ -364,26 +377,24 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
  * Reingold, E.M.: Graph Drawing by Force-directed Placement.
  * Software -- Practice and Experience, 21/11, 1129--1164,
  * 1991. 
- * This function was ported from the SNA R package.
  * \param graph Pointer to an initialized graph object.
  * \param res Pointer to an initialized matrix object. This will
  *        contain the result and will be resized as needed.
- * \param niter The number of iterations to do. A reasonable
- *        default value is 500.
- * \param maxdelta The maximum distance to move a vertex in an
- *        iteration. A reasonable default value is the number of
- *        vertices.
- * \param area The area parameter of the algorithm. A reasonable
- *        default is the square of the number of vertices.
- * \param coolexp The cooling exponent of the simulated annealing.
- *        A reasonable default is 1.5.
- * \param repulserad Determines the radius at which
- *        vertex-vertex repulsion cancels out attraction of
- *        adjacent vertices. A reasonable default is \p area
- *        times the number of vertices.
  * \param use_seed Logical, if true the supplied values in the
  *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
+ * \param width The width of the area the graph is placed at. It is
+ *        reasonable to give \c IGRAPH_INFINITY here, then the graph
+ *        will take as much space (horizontally) as it needs to.
+ * \param height The height of the area the graph is placed at. It is
+ *        reasonable to give \c IGRAPH_INFINITY here, then the graph
+ *        will take as much space (vertically) as it needs to.
+ * \param niter The number of iterations to do. A reasonable
+ *        default value is 500.
+ * \param start_temp Start temperature. This is the maximum amount
+ *        of movement alloved along one axis, within one step, for a
+ *        vertex. Currently it is decreased linearly to zero during
+ *        the iteration.
  * \param weight Pointer to a vector containing edge weights, 
  *        the attraction along the edges will be multiplied by these. 
  *        It will be ignored if it is a null-pointer.
@@ -404,148 +415,169 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
  * vertices in the graph. 
  */
 
-int igraph_layout_fruchterman_reingold(const igraph_t *graph, igraph_matrix_t *res,
-				       igraph_integer_t niter, igraph_real_t maxdelta,
-				       igraph_real_t area, igraph_real_t coolexp, 
-				       igraph_real_t repulserad, igraph_bool_t use_seed,
+int igraph_layout_fruchterman_reingold(const igraph_t *graph,
+				       igraph_matrix_t *res,
+				       igraph_bool_t use_seed,
+				       igraph_real_t width,
+				       igraph_real_t height,
+				       igraph_integer_t niter,
+				       igraph_real_t start_temp,
 				       const igraph_vector_t *weight, 
 				       const igraph_vector_t *minx,
 				       const igraph_vector_t *maxx,
 				       const igraph_vector_t *miny,
 				       const igraph_vector_t *maxy) {
-  igraph_real_t frk,t,ded,xd,yd;
-  igraph_real_t rf,af;
-  long int i,j,k;
-
-  long int no_of_nodes=igraph_vcount(graph);
-  igraph_matrix_t dxdy=IGRAPH_MATRIX_NULL;
-  igraph_eit_t edgeit;
-  igraph_integer_t from, to;
   
+  igraph_real_t area = width * height;
+  igraph_integer_t no_nodes=igraph_vcount(graph);
+  igraph_integer_t no_edges=igraph_ecount(graph);
+  float k = sqrt(area / no_nodes);
+  float k2 = k * k;
+  igraph_integer_t i;
+  igraph_vector_float_t dispx, dispy;
+  igraph_real_t temp=start_temp;
+  igraph_real_t difftemp=start_temp / niter;
+
+  if (!IGRAPH_FINITE(area)) {
+    area = no_nodes;
+    k = sqrt(area / no_nodes);
+    k2 = k * k;
+  }
+
+  if (width <= 0) {
+    IGRAPH_ERROR("Width must be positive in Fruchterman-Reingold layout",
+		 IGRAPH_EINVAL);
+  }
+  if (height <= 0) {
+    IGRAPH_ERROR("Height must be positive in Fruchterman-Reingold layout",
+		 IGRAPH_EINVAL);
+  }
+  if (niter < 0) {
+    IGRAPH_ERROR("Number of iterations must be non-negative in "
+		 "Fruchterman-Reingold layout", IGRAPH_EINVAL);
+  }
+
+  if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
+		   igraph_matrix_ncol(res) != 2)) {
+    IGRAPH_ERROR("Invalid start position matrix size in "
+		 "Fruchterman-Reingold layout", IGRAPH_EINVAL);
+  }
+
   if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
   }
 
-  if (minx && igraph_vector_size(minx) != no_of_nodes) {
+  if (minx && igraph_vector_size(minx) != no_nodes) {
     IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
   }
-  if (maxx && igraph_vector_size(maxx) != no_of_nodes) {
+  if (maxx && igraph_vector_size(maxx) != no_nodes) {
     IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
   }
   if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
     IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
   }
-  if (miny && igraph_vector_size(miny) != no_of_nodes) {
+  if (miny && igraph_vector_size(miny) != no_nodes) {
     IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
   }
-  if (maxy && igraph_vector_size(maxy) != no_of_nodes) {
+  if (maxy && igraph_vector_size(maxy) != no_nodes) {
     IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
   }
   if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
     IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
   }
-  
-  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
+
+  RNG_BEGIN();
+
   if (!use_seed) {
-    IGRAPH_CHECK(igraph_layout_random(graph, res));
-  }
-  IGRAPH_MATRIX_INIT_FINALLY(&dxdy, no_of_nodes, 2);
-
-  IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
-  IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
-  
-  frk=sqrt(area/no_of_nodes);
-
-  for(i=niter;i>0;i--) {
-    /* Report progress in approx. every 100th step */
-    if (i%10 == 0)
-      IGRAPH_PROGRESS("Fruchterman-Reingold layout: ",
-		      100.0-100.0*i/niter, NULL);
-    
-    /* Set the temperature (maximum move/iteration) */
-    t=maxdelta*pow(i/(double)niter,coolexp);
-    /* Clear the deltas */
-    igraph_matrix_null(&dxdy);
-    /* Increment deltas for each undirected pair */
-    for(j=0;j<no_of_nodes;j++) {
-      IGRAPH_ALLOW_INTERRUPTION();
-      for(k=j+1;k<no_of_nodes;k++){
-        /* Obtain difference vector */
-        xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
-        yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
-        ded=sqrt(xd*xd+yd*yd);  /* Get dyadic euclidean distance */
-        if (ded != 0) {
-          xd/=ded;                      /*Rescale differences to length 1*/
-          yd/=ded;
-          /*Calculate repulsive "force"*/
-          rf=frk*frk*(1.0/ded-ded*ded/repulserad);
-	      } else {
-          /* ded is exactly zero. Use some small random displacement. */
-          xd=RNG_NORMAL(0,0.1);
-          yd=RNG_NORMAL(0,0.1);
-          rf=RNG_NORMAL(0,0.1);
-        }
-        MATRIX(dxdy, j, 0)+=xd*rf; /* Add to the position change vector */
-        MATRIX(dxdy, k, 0)-=xd*rf;
-        MATRIX(dxdy, j, 1)+=yd*rf;
-        MATRIX(dxdy, k, 1)-=yd*rf;
-      }
-    }
-    /* Calculate the attractive "force" */
-    IGRAPH_EIT_RESET(edgeit);
-    while (!IGRAPH_EIT_END(edgeit)) {
-      long int edge=IGRAPH_EIT_GET(edgeit);
-      igraph_real_t w= weight ? VECTOR(*weight)[ edge ] : 1.0;
-      igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
-      j=from; 
-      k=to;
-      xd=MATRIX(*res, j, 0)-MATRIX(*res, k, 0);
-      yd=MATRIX(*res, j, 1)-MATRIX(*res, k, 1);
-      ded=sqrt(xd*xd+yd*yd);  /* Get dyadic euclidean distance */
-      if (ded != 0) {
-        xd/=ded;                /* Rescale differences to length 1 */
-        yd/=ded;
-        af=ded*ded/frk*w;
-      } else {
-        xd=RNG_NORMAL(0,0.1);
-        yd=RNG_NORMAL(0,0.1);
-        af=RNG_NORMAL(0,0.1);
-      }
-      MATRIX(dxdy, j, 0)-=xd*af; /* Add to the position change vector */
-      MATRIX(dxdy, k, 0)+=xd*af;
-      MATRIX(dxdy, j, 1)-=yd*af;
-      MATRIX(dxdy, k, 1)+=yd*af;
-      IGRAPH_EIT_NEXT(edgeit);
-    }
-    
-    /* Dampen motion, if needed, and move the points */   
-    for(j=0;j<no_of_nodes;j++){
-      ded=sqrt(MATRIX(dxdy, j, 0)*MATRIX(dxdy, j, 0)+
-	       MATRIX(dxdy, j, 1)*MATRIX(dxdy, j, 1));    
-      if(ded>t){		/* Dampen to t */
-        ded=t/ded;
-        MATRIX(dxdy, j, 0)*=ded;
-        MATRIX(dxdy, j, 1)*=ded;
-      }
-      MATRIX(*res, j, 0)+=MATRIX(dxdy, j, 0); /* Update positions */
-      MATRIX(*res, j, 1)+=MATRIX(dxdy, j, 1);
-      if (minx && MATRIX(*res, j, 0) < VECTOR(*minx)[j]) {
-        MATRIX(*res, j, 0) = VECTOR(*minx)[j];
-      } else if (maxx && MATRIX(*res, j, 0) > VECTOR(*maxx)[j]) {
-        MATRIX(*res, j, 0) = VECTOR(*maxx)[j];
-      }
-      if (miny && MATRIX(*res, j, 1) < VECTOR(*miny)[j]) {
-        MATRIX(*res, j, 1) = VECTOR(*miny)[j];
-      } else if (maxy && MATRIX(*res, j, 1) > VECTOR(*maxy)[j]) {
-        MATRIX(*res, j, 1) = VECTOR(*maxy)[j];
-      }
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
+    for (i=0; i<no_nodes; i++) {
+      igraph_real_t x1=minx ? VECTOR(*minx)[i] : -width/2;
+      igraph_real_t x2=maxx ? VECTOR(*maxx)[i] :  width/2;
+      igraph_real_t y1=miny ? VECTOR(*miny)[i] : -height/2;
+      igraph_real_t y2=maxy ? VECTOR(*maxy)[i] :  height/2;
+      if (!igraph_finite(x1)) { x1 = -sqrt(no_nodes)/2; }
+      if (!igraph_finite(x2)) { x2 =  sqrt(no_nodes)/2; }
+      if (!igraph_finite(y1)) { y1 = -sqrt(no_nodes)/2; }
+      if (!igraph_finite(y2)) { y2 =  sqrt(no_nodes)/2; }
+      MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
+      MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
     }
   }
 
-  IGRAPH_PROGRESS("Fruchterman-Reingold layout: ", 100.0, NULL);
-  
-  igraph_eit_destroy(&edgeit);
-  igraph_matrix_destroy(&dxdy);
+  IGRAPH_CHECK(igraph_vector_float_init(&dispx, no_nodes));
+  IGRAPH_FINALLY(igraph_vector_float_destroy, &dispx);
+  IGRAPH_CHECK(igraph_vector_float_init(&dispy, no_nodes));
+  IGRAPH_FINALLY(igraph_vector_float_destroy, &dispy);
+
+#define FAX(x) ((x)*(x)/(k))
+
+  for (i=0; i<niter; i++) {
+    igraph_integer_t v, u, e;
+    
+    /* calculate repulsive forces */
+    igraph_vector_float_null(&dispx);
+    igraph_vector_float_null(&dispy);
+    for (v=0; v<no_nodes; v++) {
+      for (u=v+1; u<no_nodes; u++) {
+	float dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+	float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+	float dlen=dx * dx + dy * dy;
+	if (IGRAPH_UNLIKELY(dlen == 0)) { continue; }
+	VECTOR(dispx)[v] += dx * k2 / dlen;
+	VECTOR(dispy)[v] += dy * k2 / dlen;
+	VECTOR(dispx)[u] -= dx * k2 / dlen;
+	VECTOR(dispy)[u] -= dy * k2 / dlen;
+      }
+    }
+
+    /* calculate attractive forces */
+    for (e=0; e<no_edges; e++) {
+      /* each edges is an ordered pair of vertices v and u */
+      igraph_integer_t v=IGRAPH_FROM(graph, e);
+      igraph_integer_t u=IGRAPH_TO(graph, e);
+      igraph_real_t dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+      igraph_real_t dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+      igraph_real_t dlen=sqrt(dx * dx + dy * dy);
+      if (IGRAPH_UNLIKELY(dx == 0 && dx == 0)) {
+	dx=RNG_NORMAL(0, 0.01);
+	dy=RNG_NORMAL(0, 0.01);
+	dlen=sqrt(dx * dx + dy * dy);
+      }
+      VECTOR(dispx)[v] -= (dx / dlen) * FAX(dlen);
+      VECTOR(dispy)[v] -= (dy / dlen) * FAX(dlen);
+      VECTOR(dispx)[u] += (dx / dlen) * FAX(dlen);
+      VECTOR(dispy)[u] += (dy / dlen) * FAX(dlen);
+    }
+    
+    /* limit max displacement to temperature t and prevent from
+       displacement outside frame */
+    for (v=0; v<no_nodes; v++) {
+      igraph_real_t dx=VECTOR(dispx)[v];
+      igraph_real_t dy=VECTOR(dispy)[v];
+      igraph_real_t displen=sqrt(dx * dx + dy * dy);
+      igraph_real_t mx=fabs(dx) < temp ? dx : temp;
+      igraph_real_t my=fabs(dy) < temp ? dy : temp;
+      igraph_real_t x1=minx ? VECTOR(*minx)[v] : -width/2;
+      igraph_real_t x2=maxx ? VECTOR(*maxx)[v] :  width/2;
+      igraph_real_t y1=miny ? VECTOR(*miny)[v] : -height/2;
+      igraph_real_t y2=maxy ? VECTOR(*maxy)[v] :  height/2;
+      MATRIX(*res, v, 0) += (dx / displen) * mx;
+      MATRIX(*res, v, 1) += (dy / displen) * my;
+      if (MATRIX(*res, v, 0) < x1) { MATRIX(*res, v, 0) = x1; }
+      if (MATRIX(*res, v, 0) > x2) { MATRIX(*res, v, 0) = x2; }
+      if (MATRIX(*res, v, 1) < y1) { MATRIX(*res, v, 1) = y1; }
+      if (MATRIX(*res, v, 1) > y2) { MATRIX(*res, v, 1) = y2; }
+    }
+
+    temp -= difftemp;
+  }
+
+  RNG_END();
+
+#undef FAX
+
+  igraph_vector_float_destroy(&dispx);
+  igraph_vector_float_destroy(&dispy);
   IGRAPH_FINALLY_CLEAN(2);
   
   return 0;

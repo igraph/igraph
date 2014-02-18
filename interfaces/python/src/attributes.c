@@ -1842,3 +1842,26 @@ void igraphmodule_initialize_attribute_handler(void) {
   igraph_i_set_attribute_table(&igraphmodule_attribute_table);
 }
 
+/**
+ * Checks whether the given Python object can be a valid attribute name or not.
+ * Returns 1 if the object could be used as an attribute name, 0 otherwise.
+ * Also raises a suitable Python exception if needed.
+ */
+int igraphmodule_attribute_name_check(PyObject* obj) {
+  PyObject* type_str;
+
+  if (obj != 0 && PyBaseString_Check(obj))
+    return 1;
+
+  type_str = obj ? PyObject_Str((PyObject*)obj->ob_type) : 0;
+  if (type_str != 0) {
+    PyErr_Format(PyExc_TypeError, "igraph supports string attribute names only, got %s",
+        PyString_AS_STRING(type_str));
+    Py_DECREF(type_str);
+  } else {
+    PyErr_Format(PyExc_TypeError, "igraph supports string attribute names only");
+  }
+
+  return 0;
+}
+

@@ -59,67 +59,6 @@ layout.sphere <- function(graph, params) {
         PACKAGE="igraph")
 }
 
-layout.fruchterman.reingold <- function(graph, ..., dim=2,
-                                        params=list()) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  if (length(params)==0) {
-    params <- list(...)
-  }
-
-  if (dim==2) {
-    fn <- "R_igraph_layout_fruchterman_reingold"
-  } else if (dim==3 ){
-    fn <- "R_igraph_layout_fruchterman_reingold_3d"
-  } else {
-    stop("Invalid `dim' argument");
-  }
-  
-  vc <- vcount(graph)
-  if (is.null(params$niter))     { params$niter      <- 500  }
-  if (is.null(params$maxdelta))  { params$maxdelta   <- vc   }
-  if (is.null(params$area))      { params$area       <- vc^2 }
-  if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
-  if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
-  if (is.null(params$weights))   {
-    params$weights <- NULL
-  } else {
-    params$weights <- as.numeric(params$weights)
-  }
-  if (!is.null(params$start)) {
-    params$start <- structure(as.numeric(params$start), dim=dim(params$start))
-  }
-  if (!is.null(params$minx)) {
-    params$minx <- as.double(params$minx)
-  }
-  if (!is.null(params$maxx)) {
-    params$maxx <- as.double(params$maxx)
-  }
-  if (!is.null(params$miny)) {
-    params$miny <- as.double(params$miny)
-  }
-  if (!is.null(params$maxy)) {
-    params$maxy <- as.double(params$maxy)
-  }
-  if (!is.null(params$minz)) {
-    params$minz <- as.double(params$minz)
-  }
-  if (!is.null(params$maxz)) {
-    params$maxz <- as.double(params$maxz)
-  }
-  
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call(fn, graph,
-        as.double(params$niter), as.double(params$maxdelta),
-        as.double(params$area), as.double(params$coolexp),
-        as.double(params$repulserad), params$weights, params$start,
-        params$minx, params$maxx, params$miny, params$maxy,
-        params$minz, params$maxz,
-        PACKAGE="igraph")
-}
-
 layout.fruchterman.reingold.grid <- function(graph, ...,
                                              params=list()) {
   if (!is.igraph(graph)) {

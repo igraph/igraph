@@ -627,7 +627,7 @@ class RCCodeGenerator(CodeGenerator):
                 else:
                     decl="  " + ctype + " " + cname + ";"
             else:
-                decl=""            
+                decl=""
             return decl.replace("%C%", cname).replace("%I%", pname)
 
         inout=[ do_par(n) for n in params.keys() ]
@@ -694,7 +694,10 @@ class RCCodeGenerator(CodeGenerator):
         def docall(t, n):
             if type(t)==dict:
                 mode=params[n]['mode']
-                return t[mode]
+                if mode in t:
+                    return t[mode]
+                else:
+                    return ""
             else:
                 return t
         
@@ -705,6 +708,7 @@ class RCCodeGenerator(CodeGenerator):
                   call, params.keys() )
         retpars=[ n for n,p in params.items() if p['mode'] in 
                   ['OUT', 'INOUT'] ]
+        call=[ c for c in call if c != "" ]
         res="  " + function + "(" + ", ".join(call) + ");\n"
         if len(retpars)==0:
             res="  c_result=" + res
@@ -741,6 +745,11 @@ class RCCodeGenerator(CodeGenerator):
                 outconv="  " + t['OUTCONV'][mode]
             else:
                 outconv=""
+
+            if pname in self.deps.keys():
+                deps = self.deps[pname]
+                for i in range(len(deps)):
+                    outconv=outconv.replace("%C"+str(i+1)+"%", "c_"+deps[i])
             return outconv.replace("%C%", cname).replace("%I%", pname)
 
         outconv=[ do_par(n) for n in params.keys() ]

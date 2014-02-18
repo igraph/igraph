@@ -28,6 +28,7 @@
 #include "igraph_error.h"
 #include "igraph_glpk_support.h"
 #include "igraph_interrupt_internal.h"
+#include "igraph_centrality.h"
 #include "config.h"
 
 #ifdef HAVE_GLPK

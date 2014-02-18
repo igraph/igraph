@@ -139,5 +139,40 @@ R: new features and bug fixes
 - The `+` operator on graphs now calls `graph.union()` if both 
   argument graphs are named, and calls `graph.disjoint.union()`
   otherwise.
-- Added function igraph.version().
+- Added function `igraph.version()`.
 - Generate graphs from a stochastic block model: `sbm.game()`.
+- Do not suggest the stats, XML, jpeg and png packages any more.
+- Fixed a `set.vertex/edge.attribute` bug that changed both
+  graph objects, after copying (#533)
+- Fixed a bug in `barabasi.game` that caused crashes.
+- We use PRPACK to calculate PageRank scores
+  see https://github.com/dgleich/prpack
+- Added`'which` argument to `bipartite.projection` (#307).
+- Add `normalized` argument to closeness functions, fixes issue #3.
+- R: better handling of complex attributes, `[[` on vertex/edge sets,
+  fixes #231.
+- Implement the `start` argument in `hrg.fit` (#225).
+- Set root vertex in Reingold-Tilford layout, solves #473.
+- Fix betweenness normalization for directed graphs.
+- Fixed a bug in `graph.density` that resulted in incorrect values for
+  undirected graphs with loops
+- Fixed a bug when many graphs were created in one C call
+  (e.g. by `graph.decompose`), causing #550.
+- Fixed sparse `graph.adjacency` bugs for graphs with one edge,
+  and graphs with zero edges.
+- Fixed a bug that made Bellman-Ford shortest paths calculations fail.
+- Fixed a `graph.adjacency` bug for undirected, weighted graphs and
+  sparse matrices.
+- `main`, `sub`, `xlab` and `ylab` are proper graphics parameters
+  now (#555).
+- `graph.data.frame` coerces arguments to data frame (#557).
+- Fixed a minimum cut bug for weighted undirected graphs (#564).
+- Functions for simulating epidemics (SIR model) on networks,
+  see the `sir` function.
+- Fixed argument ordering in `graph.mincut` and related functions.
+- Avoid copying attributes in query functions and print (#573),
+  these functions are much faster now for graphs with many
+  vertices/edges and attributes.
+- Speed up writing GML and GraphML files, if some attributes are
+  integer. It was really-really slow.
+- Fix multiple root vertices in `graph.bfs` (#575).

@@ -4,7 +4,6 @@
 \alias{layout.random}
 \alias{layout.circle}
 \alias{layout.sphere}
-\alias{layout.fruchterman.reingold}
 \alias{layout.fruchterman.reingold.grid}
 \alias{layout.kamada.kawai}
 \alias{layout.spring}
@@ -22,7 +21,6 @@ layout.auto(graph, dim=2, \dots)
 layout.random(graph, params, dim=2)
 layout.circle(graph, params)
 layout.sphere(graph, params)
-layout.fruchterman.reingold(graph, \dots, dim=2, params)
 layout.kamada.kawai(graph, \dots, dim=2, params)
 layout.spring(graph, \dots, params)
 layout.reingold.tilford(graph, \dots, params)
@@ -91,41 +89,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   the surface of a sphere, this is thus a 3d layout. It is not clear
   however what \dQuote{uniformly on a sphere} means.
   
-  \code{layout.fruchterman.reingold} uses a force-based algorithm
-  proposed by Fruchterman and Reingold, see references. Parameters and
-  their default values:
-  \describe{
-    \item{niter}{Numeric, the number of iterations to perform (500).}
-    \item{coolexp}{Numeric, the cooling exponent for the simulated
-      annealing (3).}
-    \item{maxdelta}{Maximum change (\code{vcount(graph)}).}
-    \item{area}{Area parameter (\code{vcount(graph)^2}).}
-    \item{repulserad}{Cancellation radius (\code{area}*vcount(graph)).}
-    \item{weights}{A vector giving edge weights or \code{NULL}. If not
-      \code{NULL} then the attraction along the edges will be multiplied
-      by the given edge weights (\code{NULL}).}
-    \item{minx}{If not \code{NULL}, then it must be a numeric vector
-      that gives lower boundaries for the \sQuote{x} coordinates of the
-      vertices. The length of the vector must match the number of
-      vertices in the graph.}
-    \item{maxx}{Similar to \code{minx}, but gives the upper boundaries.}
-    \item{miny}{Similar to \code{minx}, but gives the lower boundaries
-      of the \sQuote{y} coordinates.}
-    \item{maxy}{Similar to \code{minx}, but gives the upper boundaries
-      of the \sQuote{y} coordinates.}    
-    \item{minz}{Similar to \code{minx}, but gives the lower boundaries
-      of the \sQuote{z} coordinates, if the \code{dim} argument is
-      3. Otherwise it is ignored.}
-    \item{maxz}{Similar to \code{minx}, but gives the upper boundaries
-      of the \sQuote{z} coordinates, if the \code{dim} argument is
-      3. Otherwise it is ignored.}
-    \item{start}{If given, then it should be a matrix with two columns
-      and one line for each vertex. This matrix will be used as starting
-      positions for the algorithm. If not given, then a random starting
-      matrix is used.}
-  }
-  This function was ported from the SNA package.
-
   \code{layout.kamada.kawai} is another force based algorithm. 
   Parameters and default values:
   \describe{
@@ -304,21 +267,5 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
 g <- graph.ring(10)
 layout.random(g)
 layout.kamada.kawai(g)
-
-# Fixing ego
-g <- ba.game(20, m=2)
-minC <- rep(-Inf, vcount(g))
-maxC <- rep(Inf, vcount(g))
-minC[1] <- maxC[1] <- 0
-co <- layout.fruchterman.reingold(g, minx=minC, maxx=maxC,
-                                  miny=minC, maxy=maxC)
-co[1,]
-\dontrun{plot(g, layout=co, vertex.size=30, edge.arrow.size=0.2,
-     vertex.label=c("ego", rep("", vcount(g)-1)), rescale=FALSE,
-     xlim=range(co[,1]), ylim=range(co[,2]), vertex.label.dist=1,
-     vertex.label.color="red")
-axis(1)
-axis(2)
-}
 }
 \keyword{graphs}

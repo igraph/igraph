@@ -108,11 +108,18 @@ if INTERNAL_GLPK
   GLPK_LIB = libglpk.la
 endif
 
+include prpack/prpack.inc
+
+libprpack_la_SOURCES = $(PRPACK)
+libprpack_la_CFLAGS = -I$(top_srcdir)/include -DPRPACK_IGRAPH_SUPPORT
+libprpack_la_CPPFLAGS = -I$(top_srcdir)/include -DPRPACK_IGRAPH_SUPPORT
+PRPACK_LIB = libprpack.la
+
 libplfit_la_SOURCES = $(PLFIT)
 PLFIT_LIB = libplfit.la
 
 noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) \
-					 $(GLPK_LIB) $(PLFIT_LIB)
+					 $(GLPK_LIB) $(PLFIT_LIB) $(PRPACK_LIB)
 
 CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
@@ -168,7 +175,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
 		foreign-pajek-header.h igraph_interrupt_internal.h \
 		scg_headers.h igraph_hacks_internal.h triangles_template.h \
-		triangles_template1.h maximal_cliques_template.h
+		triangles_template1.h maximal_cliques_template.h prpack.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -262,19 +269,24 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
 			     qsort.c qsort_r.c types.c lad.c hacks.c \
 			     embedding.c scan.c triangles.c glet.c \
-			     maximal_cliques.c sbm.c dotproduct.c sir.c
+			     maximal_cliques.c sbm.c dotproduct.c sir.c \
+			     prpack.cpp
 
 libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
 libigraph_la_LIBADD        = -lm $(XML2_LIBS) $(F2C_LIB) $(BLAS_LIB) \
-				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB) $(PLFIT_LIB)
+				 $(LAPACK_LIB) $(ARPACK_LIB) $(GLPK_LIB) $(PRPACK_LIB) \
+				 $(PLFIT_LIB)
 
 if INTERNAL_GLPK
   libigraph_la_CFLAGS   += -I$(top_srcdir)/optional/glpk
   libigraph_la_CXXFLAGS += -I$(top_srcdir)/optional/glpk
 endif
+
+libigraph_la_CFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
+libigraph_la_CXXFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
 
 includedir = $(prefix)/include/igraph
 include_HEADERS = $(HEADERS_PUBLIC)

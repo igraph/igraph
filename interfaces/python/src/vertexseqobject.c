@@ -235,6 +235,9 @@ PyObject* igraphmodule_VertexSeq_get_attribute_values(igraphmodule_VertexSeqObje
   PyObject *result=0, *values, *item;
   long int i, n;
 
+  if (!igraphmodule_attribute_name_check(o))
+    return 0;
+
   PyErr_Clear();
   values=PyDict_GetItem(ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_VERTEX], o);
   if (!values) {
@@ -331,6 +334,9 @@ int igraphmodule_VertexSeq_set_attribute_values_mapping(igraphmodule_VertexSeqOb
 
   gr = self->gref;
   dict = ATTR_STRUCT_DICT(&gr->g)[ATTRHASH_IDX_VERTEX];
+
+  if (!igraphmodule_attribute_name_check(attrname))
+    return -1;
 
   if (PyString_IsEqualToASCIIString(attrname, "name"))
     igraphmodule_invalidate_vertex_name_index(&gr->g);
@@ -478,10 +484,10 @@ PyObject* igraphmodule_VertexSeq_set_attribute_values(igraphmodule_VertexSeqObje
 
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist,
            &attrname, &values))
-  return NULL;
+    return NULL;
 
   if (igraphmodule_VertexSeq_set_attribute_values_mapping(self, attrname, values))
-  return NULL;
+    return NULL;
 
   Py_RETURN_NONE;
 }

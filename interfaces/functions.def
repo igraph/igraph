@@ -515,23 +515,25 @@ igraph_pagerank_old:
         NAME-R: page.rank.old
 
 igraph_pagerank:
-        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
+        PARAMS: GRAPH graph, PAGERANKALGO algo=PRPACK, \
+                OUT VERTEXINDEX vector, OUT REALPTR value, \
                 VERTEXSET vids=ALL, BOOLEAN directed=True, \
                 REAL damping=0.85, EDGEWEIGHTS weights=NULL, \
-                INOUT ARPACKOPT options=igraph.arpack.default
-        DEPS: vids ON graph, weights ON graph, vector ON graph vids
-        DEFAULT-R: options=igraph.arpack.default
+                INOUT PAGERANKOPT options=NULL
+        DEPS: vids ON graph, weights ON graph, vector ON graph vids \
+              options ON algo
         NAME-R: page.rank
         IGNORE: RR, RC, RNamespace
 
 igraph_personalized_pagerank:
-        PARAMS: GRAPH graph, OUT VERTEXINDEX vector, OUT REALPTR value, \
+        PARAMS: GRAPH graph, PAGERANKALGO algo=PRPACK, \
+                OUT VERTEXINDEX vector, OUT REALPTR value, \
                 VERTEXSET vids=ALL, BOOLEAN directed=True, \
                 REAL damping=0.85, VECTOR_OR_0 personalized=NULL, \
                 EDGEWEIGHTS weights=NULL, \
-                INOUT ARPACKOPT options=igraph.arpack.default
-        DEPS: vids ON graph, weights ON graph, vector ON graph vids
-        DEFAULT-R: options=igraph.arpack.default
+                INOUT PAGERANKOPT options=NULL
+        DEPS: vids ON graph, weights ON graph, vector ON graph vids, \
+              options ON algo
         NAME-R: page.rank
 
 igraph_rewire:
@@ -1046,15 +1048,18 @@ igraph_layout_grid_3d:
         NAME-R: layout.grid.3d
 
 igraph_layout_fruchterman_reingold:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, \
-                REAL maxdelta=VCOUNT(graph), REAL area=VCOUNT(graph)^2, \
-                REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, \
-                NULL use_seed, VECTOR_OR_0 weight, \
-                VECTOR_OR_0 minx, VECTOR_OR_0 maxx, \
-                VECTOR_OR_0 miny, VECTOR_OR_0 maxy
+        PARAMS: GRAPH graph, INOUT MATRIX coords=NULL, \
+                BOOLEAN use_seed=False, \
+                REAL width=Inf, REAL height=Inf, INTEGER niter=500, \
+                REAL start_temp=sqrt(vcount(graph))/10, \
+		EDGEWEIGHTS weights=NULL, \
+                VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
+                VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL, \
+                DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area, \
+                DEPRECATED repulserad
         NAME-R: layout.fruchterman.reingold
+        DEPS: weights ON graph
         FLAGS: PROGRESS
-        IGNORE: RR, RC
 
 igraph_layout_grid_fruchterman_reingold:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \

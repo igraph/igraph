@@ -583,23 +583,25 @@ class Dendrogram(object):
         they should be drawn so that no edges cross each other.
 
         @return: the result of the inorder traversal in a list."""
-        stack = [self._merges[-1]]
         result = []
-        while len(stack)>0:
-            last = stack[-1]
-            if len(last) == 0:
-                stack.pop()
+        seen_nodes = set()
+
+        for node_index in reversed(xrange(self._nitems+self._nmerges)):
+            if node_index in seen_nodes:
                 continue
-            elif len(last) == 1:       # Right child
-                stack[-1] = ()
-                last = last[0]
-            else:                      # Left child
-                stack[-1] = (last[1],)
-                last = last[0]
-            if last < self._nitems: # This will be a regular node
-                result.append(last)
-            else:        # This is a merge node, proceed towards left
-                stack.append(self._merges[last-self._nitems])
+
+            stack = [node_index]
+            while stack:
+                last = stack.pop()
+                seen_nodes.add(last)
+                if last < self._nitems:
+                    # 'last' is a regular node so the traversal ends here, we
+                    # can append it to the results
+                    result.append(last)
+                else:
+                    # 'last' is a merge node, so let us proceed with the entry
+                    # where this merge node was created
+                    stack.extend(self._merges[last-self._nitems])
 
         return result
 

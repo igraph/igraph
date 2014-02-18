@@ -376,6 +376,9 @@ PyObject* igraphmodule_Vertex_get_attribute(igraphmodule_VertexObject* self,
   igraphmodule_GraphObject *o = self->gref;
   PyObject* result;
   
+  if (!igraphmodule_attribute_name_check(s))
+    return 0;
+
   result=PyDict_GetItem(((PyObject**)o->g.attr)[ATTRHASH_IDX_VERTEX], s);
   if (result) {
     /* result is a list, so get the element with index self->idx */
@@ -406,7 +409,11 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
   PyObject* result;
   int r;
   
-  if (o==0) return -1;
+  if (o==0)
+    return -1;
+
+  if (!igraphmodule_attribute_name_check(k))
+    return -1;
 
   if (PyString_IsEqualToASCIIString(k, "name"))
     igraphmodule_invalidate_vertex_name_index(&o->g);

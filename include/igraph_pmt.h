@@ -38,6 +38,14 @@
 #define ONE 1.0
 #define MULTIPLICITY 1
 
+#elif defined(BASE_FLOAT)
+#define BASE float
+#define SHORT float
+#define OUT_FORMAT "%f"
+#define ZERO 0.0F
+#define ONE 1.0F
+#define MULTIPLICITY 1
+
 #elif defined(BASE_LONG)
 #define BASE long
 #define SHORT long

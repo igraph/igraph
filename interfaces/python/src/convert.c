@@ -2979,3 +2979,19 @@ int igraphmodule_PyObject_to_attribute_combination_t(PyObject* object,
   return 0;
 }
 
+/**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_pagerank_algo_t
+ */
+int igraphmodule_PyObject_to_pagerank_algo_t(PyObject *o,
+					     igraph_pagerank_algo_t *result) {
+  static igraphmodule_enum_translation_table_entry_t pagerank_algo_tt[] = {
+        {"prpack", IGRAPH_PAGERANK_ALGO_PRPACK},
+        {"arpack", IGRAPH_PAGERANK_ALGO_ARPACK},
+        {"power",  IGRAPH_PAGERANK_ALGO_POWER},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, pagerank_algo_tt, (int*)result);
+}
+
