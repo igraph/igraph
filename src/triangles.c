@@ -505,25 +505,25 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
 }
 
 int igraph_adjacent_triangles1(const igraph_t *graph,
-															 igraph_vector_t *res,
-															 const igraph_vs_t vids) {
-	#include "triangles_template1.h"
-	return 0;
+			       igraph_vector_t *res,
+			       const igraph_vs_t vids) {
+# include "triangles_template1.h"
+  return 0;
 }
 
 int igraph_adjacent_triangles4(const igraph_t *graph,
-															 igraph_vector_t *res) {
-	#include "triangles_template.h"
-	return 0;
+			       igraph_vector_t *res) {
+# include "triangles_template.h"
+  return 0;
 }
 
-int igraph_adjacenct_triangles(const igraph_t *graph,
-															 igraph_vector_t *res,
-															 const igraph_vs_t vids) {
+int igraph_adjacent_triangles(const igraph_t *graph,
+			      igraph_vector_t *res,
+			      const igraph_vs_t vids) {
   if (igraph_vs_is_all(&vids)) {
     return igraph_adjacent_triangles4(graph, res);
   } else {
-		return igraph_adjacent_triangles1(graph, res, vids);
+    return igraph_adjacent_triangles1(graph, res, vids);
   }
   
   return 0;

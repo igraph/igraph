@@ -1470,7 +1470,7 @@ igraph_triad_census:
         NAME-R: triad.census
         RETURN: ERROR
 
-igraph_adjacenct_triangles:
+igraph_adjacent_triangles:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL
         DEPS: vids ON graph
         NAME-R: adjacent.triangles
