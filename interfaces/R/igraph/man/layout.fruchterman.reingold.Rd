@@ -5,16 +5,20 @@
 \description{Place vertices on the plane using the force-directed
   layout algorithm by Fruchterman and Reingold.}
 \usage{
-layout.fruchterman.reingold (graph, res = NULL, use.seed = FALSE,
-    niter = 500, start.temp = sqrt(vcount(graph))/10, weights = NULL, 
-    minx = NULL, maxx = NULL, miny = NULL, maxy = NULL, coolexp, 
-    maxdelta, area, repulserad) 
+layout.fruchterman.reingold (graph, coords = NULL, dim = 2,
+    niter = 500, start.temp = sqrt(vcount(graph)), weights = NULL, 
+    minx = NULL, maxx = NULL, miny = NULL, maxy = NULL, minz = NULL,
+    maxz = NULL, coolexp, maxdelta, area, repulserad) 
 }
 \arguments{
   \item{graph}{The graph to lay out. Edge directions are ignored.}
-  \item{res}{Optional starting positions for the vertices.}
-  \item{use.seed}{Logical scalar, whether to use the starting positions
-    given in \code{res}.}
+  \item{coords}{Optional starting positions for the vertices. If this
+    argument is not \code{NULL} then it should be an appropriate
+    matrix of starting coordinates.}
+  \item{dim}{Integer scalar, 2 or 3, the dimension of the layout.
+    Two dimensional layouts are places on a plane, three dimensional
+    ones in the 3d space.}
+  \item{niter}{Integer scalar, the number of iterations to perform.}
   \item{start.temp}{Real scalar, the start temperature. This is the
     maximum amount of movement alloved along one axis, within one step,
     for a vertex. Currently it is decreased linearly to zero during
@@ -31,7 +35,11 @@ layout.fruchterman.reingold (graph, res = NULL, use.seed = FALSE,
   \item{miny}{Similar to \code{minx}, but gives the lower boundaries
     of the \sQuote{y} coordinates.}
   \item{maxy}{Similar to \code{minx}, but gives the upper boundaries
-    of the \sQuote{y} coordinates.}    
+    of the \sQuote{y} coordinates.}
+  \item{minz}{Similar to \code{minx}, but gives the lower boundaries
+    of the \sQuote{z} coordinates.}
+  \item{maxz}{Similar to \code{minx}, but gives the upper boundaries
+    of the \sQuote{z} coordinates.}
   \item{coolexp,maxdelta,area,repulserad}{These arguments are not
     supported from igraph version 0.8.0 and are ignored (with a warning).}
 }
@@ -41,8 +49,8 @@ layout.fruchterman.reingold (graph, res = NULL, use.seed = FALSE,
   This function was rewritten from scratch in igraph version 0.8.0.
 }
 \value{
-  A two-column matrix, each row giving the coordinates of a vertex,
-  according to the ids of the vertex ids.
+  A two- or three-column matrix, each row giving the coordinates of a
+  vertex, according to the ids of the vertex ids.
 }
 \references{
   Fruchterman, T.M.J. and Reingold, E.M. (1991). Graph Drawing by

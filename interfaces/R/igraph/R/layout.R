@@ -807,3 +807,60 @@ layout.mds <- function(graph, dist=NULL, dim=2,
 
   res
 }
+
+layout.fruchterman.reingold <- function(graph, coords=NULL, dim=2,
+                            niter=500, start.temp=sqrt(vcount(graph)),
+                            weights=NULL, minx=NULL, maxx=NULL, miny=NULL,
+                            maxy=NULL, minz=NULL, maxz=NULL,
+                            coolexp, maxdelta, area, repulserad) {
+
+                                        # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is.null(coords)) {
+    coords <- as.matrix(structure(as.double(coords), dim=dim(coords)))
+  }
+  dim <- as.integer(dim)
+  if (dim != 2L && dim != 3L) {
+    stop("Dimension must be two or three")
+  }
+  niter <- as.integer(niter)
+  start.temp <- as.numeric(start.temp)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+    weights <- E(graph)$weight
+  }
+  if (!is.null(weights) && any(!is.na(weights))) {
+    weights <- as.numeric(weights)
+  } else {
+    weights <- NULL
+  }
+  if (!is.null(minx)) minx <- as.numeric(minx)
+  if (!is.null(maxx)) maxx <- as.numeric(maxx)
+  if (!is.null(miny)) miny <- as.numeric(miny)
+  if (!is.null(maxy)) maxy <- as.numeric(maxy)
+  if (!is.null(minz)) minz <- as.numeric(minz)
+  if (!is.null(maxz)) maxz <- as.numeric(maxz)
+  if (!missing(coolexp)) {
+    warning("Argument `coolexp' is deprecated and has no effect")
+  }
+  if (!missing(maxdelta)) {
+    warning("Argument `maxdelta' is deprecated and has no effect")
+  }
+  if (!missing(area)) {
+    warning("Argument `area' is deprecated and has no effect")
+  }
+  if (!missing(repulserad)) {
+    warning("Argument `repulserad' is deprecated and has no effect")
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  if (dim==2) {
+    res <- .Call("R_igraph_layout_fruchterman_reingold", graph, coords,
+                 niter, start.temp, weights, minx, maxx, miny, maxy,
+                 PACKAGE="igraph")
+  } else {
+    res <- .Call("R_igraph_layout_fruchterman_reingold_3d", graph, coords,
+                 niter, start.temp, weights, minx, maxx, miny, maxy,
+                 minz, maxz, PACKAGE="igraph")
+  }
+  res
+}

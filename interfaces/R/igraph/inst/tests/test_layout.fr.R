@@ -6,7 +6,12 @@ test_that("", {
   library(igraph)
   set.seed(42)
   g <- graph.ring(10)
-  l <- layout.fruchterman.reingold(g, niter=50)
+  l <- layout.fruchterman.reingold(g, niter=50, start.temp=sqrt(10)/10)
   expect_that(sum(l), equals(10.7943032688805))
+
+  set.seed(42)
+  g <- graph.star(30)
+  l <- layout.fruchterman.reingold(g, niter=500, dim=3, start.temp=20)
+  expect_that(sum(l), equals(941.472420651506))
 
 })

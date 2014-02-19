@@ -6463,6 +6463,11 @@ PyObject
                                    &miny_o, &maxy_o, &minz_o, &maxz_o))
     return NULL;
 
+  if (dim != 2 && dim != 3) {
+    PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
+    return NULL;
+  }
+
   if (seed_o == 0 || seed_o == Py_None) {
     if (igraph_matrix_init(&m, 1, 1)) {
       igraphmodule_handle_igraph_error();
@@ -6519,9 +6524,15 @@ PyObject
     }
   }
 
-  ret = igraph_layout_fruchterman_reingold
+  if (dim == 2)
+    ret = igraph_layout_fruchterman_reingold
       (&self->g, &m, use_seed, (igraph_integer_t) niter,
        start_temp, weights, minx, maxx, miny, maxy);
+  else 
+    ret = igraph_layout_fruchterman_reingold_3d
+      (&self->g, &m, use_seed, (igraph_integer_t) niter,
+       start_temp, weights, minx, maxx, miny, maxy, minz, maxz);
+    
 
   DESTROY_VECTORS;
 
