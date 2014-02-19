@@ -517,6 +517,21 @@ int igraph_adjacent_triangles4(const igraph_t *graph,
   return 0;
 }
 
+/**
+ * \function igraph_adjacent_triangles
+ * Count the number of triangles a vertex is part of
+ *
+ * \param graph The input graph. Edge directions are ignored.
+ * \param res Initiliazed vector, the results are stored here.
+ * \param vids The vertices to perform the calculation for.
+ * \return Error mode.
+ *
+ * \sa \ref igraph_list_triangles() to list them.
+ *
+ * Time complexity: O(d^2 n), d is the average vertex degree of the
+ * queried vertices, n is their number.
+ */
+
 int igraph_adjacent_triangles(const igraph_t *graph,
 			      igraph_vector_t *res,
 			      const igraph_vs_t vids) {
@@ -529,6 +544,25 @@ int igraph_adjacent_triangles(const igraph_t *graph,
   return 0;
 
 }
+
+/**
+ * \function igraph_list_triangles
+ * Find all triangles in a graph
+ *
+ * \param graph The input graph, edge directions are ignored.
+ * \param res Pointer to an initialized integer vector, the result
+ *        is stored here, in a long list of triples of vertex ids.
+ *        Each triple is a triangle in the graph. Each triangle is
+ *        listed exactly once.
+ * \return Error code.
+ *
+ * \sa \ref igraph_transitivity_undirected() to count the triangles,
+ * \ref igraph_adjacent_triangles() to count the triangles a vertex
+ * participates in.
+ *
+ * Time complexity: O(d^2 n), d is the average degree, n is the number
+ * of vertices.
+ */
 
 int igraph_list_triangles(const igraph_t *graph,
 			  igraph_vector_int_t *res) {
