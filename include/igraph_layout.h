@@ -56,8 +56,6 @@ int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int wid
 int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 				       igraph_matrix_t *res,
 				       igraph_bool_t use_seed,
-				       igraph_real_t width,
-				       igraph_real_t height,
 				       igraph_integer_t niter,
 				       igraph_real_t start_temp,
 				       const igraph_vector_t *weight,

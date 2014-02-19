@@ -1008,8 +1008,7 @@ igraph_layout_grid_3d:
 
 igraph_layout_fruchterman_reingold:
         PARAMS: GRAPH graph, INOUT MATRIX coords=NULL, \
-                BOOLEAN use_seed=False, \
-                REAL width=Inf, REAL height=Inf, INTEGER niter=500, \
+                BOOLEAN use_seed=False, INTEGER niter=500, \
                 REAL start_temp=sqrt(vcount(graph))/10, \
 		EDGEWEIGHTS weights=NULL, \
                 VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \

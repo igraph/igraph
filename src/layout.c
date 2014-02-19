@@ -370,12 +370,6 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
  * \param use_seed Logical, if true the supplied values in the
  *        \p res argument are used as an initial layout, if
  *        false a random initial layout is used.
- * \param width The width of the area the graph is placed at. It is
- *        reasonable to give \c IGRAPH_INFINITY here, then the graph
- *        will take as much space (horizontally) as it needs to.
- * \param height The height of the area the graph is placed at. It is
- *        reasonable to give \c IGRAPH_INFINITY here, then the graph
- *        will take as much space (vertically) as it needs to.
  * \param niter The number of iterations to do. A reasonable
  *        default value is 500.
  * \param start_temp Start temperature. This is the maximum amount
@@ -405,8 +399,6 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 				       igraph_matrix_t *res,
 				       igraph_bool_t use_seed,
-				       igraph_real_t width,
-				       igraph_real_t height,
 				       igraph_integer_t niter,
 				       igraph_real_t start_temp,
 				       const igraph_vector_t *weight, 
@@ -415,30 +407,14 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 				       const igraph_vector_t *miny,
 				       const igraph_vector_t *maxy) {
   
-  igraph_real_t area = width * height;
   igraph_integer_t no_nodes=igraph_vcount(graph);
   igraph_integer_t no_edges=igraph_ecount(graph);
-  float k = sqrt(area / no_nodes);
-  float k2 = k * k;
   igraph_integer_t i;
   igraph_vector_float_t dispx, dispy;
   igraph_real_t temp=start_temp;
   igraph_real_t difftemp=start_temp / niter;
+  float width=sqrtf(no_nodes), height=width;  
 
-  if (!IGRAPH_FINITE(area)) {
-    area = no_nodes;
-    k = sqrt(area / no_nodes);
-    k2 = k * k;
-  }
-
-  if (width <= 0) {
-    IGRAPH_ERROR("Width must be positive in Fruchterman-Reingold layout",
-		 IGRAPH_EINVAL);
-  }
-  if (height <= 0) {
-    IGRAPH_ERROR("Height must be positive in Fruchterman-Reingold layout",
-		 IGRAPH_EINVAL);
-  }
   if (niter < 0) {
     IGRAPH_ERROR("Number of iterations must be non-negative in "
 		 "Fruchterman-Reingold layout", IGRAPH_EINVAL);
@@ -496,8 +472,6 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_float_init(&dispy, no_nodes));
   IGRAPH_FINALLY(igraph_vector_float_destroy, &dispy);
 
-#define FAX(x) ((x)*(x)/(k))
-
   for (i=0; i<niter; i++) {
     igraph_integer_t v, u, e;
     
@@ -510,10 +484,10 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 	float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
 	float dlen=dx * dx + dy * dy;
 	if (IGRAPH_UNLIKELY(dlen == 0)) { continue; }
-	VECTOR(dispx)[v] += dx * k2 / dlen;
-	VECTOR(dispy)[v] += dy * k2 / dlen;
-	VECTOR(dispx)[u] -= dx * k2 / dlen;
-	VECTOR(dispy)[u] -= dy * k2 / dlen;
+	VECTOR(dispx)[v] += dx/dlen;
+	VECTOR(dispy)[v] += dy/dlen;
+	VECTOR(dispx)[u] -= dx/dlen;
+	VECTOR(dispy)[u] -= dy/dlen;
       }
     }
 
@@ -530,10 +504,10 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 	dy=RNG_NORMAL(0, 0.01);
 	dlen=sqrt(dx * dx + dy * dy);
       }
-      VECTOR(dispx)[v] -= (dx / dlen) * FAX(dlen);
-      VECTOR(dispy)[v] -= (dy / dlen) * FAX(dlen);
-      VECTOR(dispx)[u] += (dx / dlen) * FAX(dlen);
-      VECTOR(dispy)[u] += (dy / dlen) * FAX(dlen);
+      VECTOR(dispx)[v] -= (dx * dlen);
+      VECTOR(dispy)[v] -= (dy * dlen);
+      VECTOR(dispx)[u] += (dx * dlen);
+      VECTOR(dispy)[u] += (dy * dlen);
     }
     
     /* limit max displacement to temperature t and prevent from
@@ -544,16 +518,20 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
       igraph_real_t displen=sqrt(dx * dx + dy * dy);
       igraph_real_t mx=fabs(dx) < temp ? dx : temp;
       igraph_real_t my=fabs(dy) < temp ? dy : temp;
-      igraph_real_t x1=minx ? VECTOR(*minx)[v] : -width/2;
-      igraph_real_t x2=maxx ? VECTOR(*maxx)[v] :  width/2;
-      igraph_real_t y1=miny ? VECTOR(*miny)[v] : -height/2;
-      igraph_real_t y2=maxy ? VECTOR(*maxy)[v] :  height/2;
       MATRIX(*res, v, 0) += (dx / displen) * mx;
       MATRIX(*res, v, 1) += (dy / displen) * my;
-      if (MATRIX(*res, v, 0) < x1) { MATRIX(*res, v, 0) = x1; }
-      if (MATRIX(*res, v, 0) > x2) { MATRIX(*res, v, 0) = x2; }
-      if (MATRIX(*res, v, 1) < y1) { MATRIX(*res, v, 1) = y1; }
-      if (MATRIX(*res, v, 1) > y2) { MATRIX(*res, v, 1) = y2; }
+      if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) { 
+	MATRIX(*res, v, 0) = VECTOR(*minx)[v]; 
+      }
+      if (maxx && MATRIX(*res, v, 0) > VECTOR(*maxx)[v]) {
+	MATRIX(*res, v, 0) = VECTOR(*maxx)[v];
+      }
+      if (miny && MATRIX(*res, v, 1) < VECTOR(*miny)[v]) {
+	MATRIX(*res, v, 1) = VECTOR(*miny)[v];
+      }
+      if (maxy && MATRIX(*res, v, 1) > VECTOR(*maxy)[v]) {
+	MATRIX(*res, v, 1) = VECTOR(*maxy)[v];
+      }
     }
 
     temp -= difftemp;

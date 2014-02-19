@@ -6,8 +6,7 @@
   layout algorithm by Fruchterman and Reingold.}
 \usage{
 layout.fruchterman.reingold (graph, res = NULL, use.seed = FALSE,
-    width = Inf, height = Inf, niter = 500,
-    start.temp = sqrt(vcount(graph))/10, weights = NULL, 
+    niter = 500, start.temp = sqrt(vcount(graph))/10, weights = NULL, 
     minx = NULL, maxx = NULL, miny = NULL, maxy = NULL, coolexp, 
     maxdelta, area, repulserad) 
 }
@@ -16,10 +15,6 @@ layout.fruchterman.reingold (graph, res = NULL, use.seed = FALSE,
   \item{res}{Optional starting positions for the vertices.}
   \item{use.seed}{Logical scalar, whether to use the starting positions
     given in \code{res}.}
-  \item{width}{The width of the area to lay out to. If \code{Inf}, then
-    the graph will take as much space (horizontally), as it needs to.}
-  \item{height}{The height of the area to lay ouy to. If \code{Inf}, then
-    the graph will take as much space (vertically), as it needs to.}
   \item{start.temp}{Real scalar, the start temperature. This is the
     maximum amount of movement alloved along one axis, within one step,
     for a vertex. Currently it is decreased linearly to zero during

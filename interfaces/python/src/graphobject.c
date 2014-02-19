@@ -6428,7 +6428,7 @@ PyObject
                                                   PyObject * kwds)
 {
   static char *kwlist[] =
-    { "weights", "niter", "width", "height", "start_temp",
+    { "weights", "niter", "start_temp",
       "seed", "minx", "maxx", "miny", "maxy", "minz", "maxz", "dim", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
@@ -6438,7 +6438,7 @@ PyObject
   igraph_vector_t *minz=0, *maxz=0;
   int ret;
   long int niter = 500, dim = 2;
-  double width=IGRAPH_INFINITY, height=IGRAPH_INFINITY, start_temp;
+  double start_temp;
   PyObject *result;
   PyObject *wobj=Py_None, *seed_o=Py_None;
   PyObject *minx_o=Py_None, *maxx_o=Py_None;
@@ -6457,8 +6457,8 @@ PyObject
 
   start_temp = sqrt(igraph_vcount(&self->g)) / 10.0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OldddOOOOOOOl", kwlist, &wobj,
-                                   &niter, &width, &height, &start_temp,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OldOOOOOOOl", kwlist, &wobj,
+                                   &niter, &start_temp,
                                    &seed_o, &minx_o, &maxx_o,
                                    &miny_o, &maxy_o, &minz_o, &maxz_o))
     return NULL;
@@ -6520,7 +6520,7 @@ PyObject
   }
 
   ret = igraph_layout_fruchterman_reingold
-      (&self->g, &m, use_seed, width, height, (igraph_integer_t) niter,
+      (&self->g, &m, use_seed, (igraph_integer_t) niter,
        start_temp, weights, minx, maxx, miny, maxy);
 
   DESTROY_VECTORS;
@@ -13637,8 +13637,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    (PyCFunction) igraphmodule_Graph_layout_fruchterman_reingold,
    METH_VARARGS | METH_KEYWORDS,
    "layout_fruchterman_reingold(weights=None, niter=500, seed=None, \n"
-   "  width=float(\"inf\"), height=float(\"inf\"), start_temp=None\n"
-   "  minx=None, maxx=None, miny=None, \n"
+   "  start_temp=None, minx=None, maxx=None, miny=None, \n"
    "  maxy=None, minz=None, maxz=None)\n\n"
    "Places the vertices on a 2D plane according to the\n"
    "Fruchterman-Reingold algorithm.\n\n"
@@ -13649,12 +13648,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  even an edge attribute name.\n"
    "@param niter: the number of iterations to perform. The default\n"
    "  is 500.\n"
-   "@param width: The width of the area to lay out to. If it is \n"
-   "  infinity, then the graph will take as much space (horizontally), \n"
-   "  as it needs to.\n"
-   "@param height: The height of the area to lay out to. If it is \n"
-   "  infinity, then the graph will take as much space (vertically), \n"
-   "  as it needs to.\n"
    "@param start_temp: Real scalar, the start temperature. This is the \n"
    "  maximum amount of movement alloved along one axis, within one step,\n"
    "  for a vertex. Currently it is decreased linearly to zero during\n"
