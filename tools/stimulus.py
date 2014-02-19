@@ -527,6 +527,12 @@ class RRCodeGenerator(CodeGenerator):
         if 'CLASS-R' in self.func[function].keys():
             myclass=self.func[function]['CLASS-R']
             out.write("  class(res) <- \"" + myclass + "\"\n")
+
+        ## See if there is a postprocessor
+        if 'PP-R' in self.func[function].keys():
+            pp=self.func[function]['PP-R']
+            out.write("  res <- " + pp + "(res)\n")
+
         out.write("  res\n}\n\n")
 
 class RCCodeGenerator(CodeGenerator):
