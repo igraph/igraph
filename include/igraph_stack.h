@@ -54,6 +54,12 @@ __BEGIN_DECLS
 #include "igraph_pmt_off.h"
 #undef BASE_LONG
 
+#define BASE_INT
+#include "igraph_pmt.h"
+#include "igraph_stack_pmt.h"
+#include "igraph_pmt_off.h"
+#undef BASE_INT
+
 #define BASE_CHAR
 #include "igraph_pmt.h"
 #include "igraph_stack_pmt.h"
