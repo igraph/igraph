@@ -22,6 +22,7 @@
 */
 
 #include "igraph_interface.h"
+#include "igraph_interrupt_internal.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_iterators.h"
 #include "igraph_adjlist.h"
@@ -70,6 +71,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
   igraph_vector_int_t stack;
   igraph_vector_char_t added;
   igraph_vector_int_t nptr;
+  int iteration;
 
   if (from < 0 || from >= no_nodes) {
     IGRAPH_ERROR("Invalid starting vertex", IGRAPH_EINVAL);
@@ -108,6 +110,10 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     int n=igraph_vector_size(neis);
     int *ptr=igraph_vector_int_e_ptr(&nptr, act);
 
+    if (iteration == 0) {
+      IGRAPH_ALLOW_INTERRUPTION();
+    }
+
     /* Search for a neighbor that was not yet visited */
     igraph_bool_t any=0;
     int nei;
@@ -130,7 +136,12 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
       int up=igraph_vector_int_pop_back(&stack);
       VECTOR(added)[up] = 0;
       VECTOR(nptr)[up] = 0;
-    }    
+    }
+
+    iteration++;
+    if (iteration >= 10000) {
+      iteration = 0;
+    }
   }
 
   igraph_vector_int_destroy(&nptr);
