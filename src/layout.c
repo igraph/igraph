@@ -490,6 +490,13 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 	  float dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
 	  float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
 	  float dlen=dx * dx + dy * dy;
+
+          if (dlen == 0) {
+            dx = RNG_UNIF01() * 1e-9;
+            dy = RNG_UNIF01() * 1e-9;
+            dlen = dx * dx + dy * dy;
+          }
+
 	  VECTOR(dispx)[v] += dx/dlen;
 	  VECTOR(dispy)[v] += dy/dlen;
 	  VECTOR(dispx)[u] -= dx/dlen;
@@ -502,8 +509,16 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 	  float dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
 	  float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
 	  float dlen, rdlen;
+
 	  dlen=dx * dx + dy * dy;
+          if (dlen == 0) {
+            dx = RNG_UNIF(0, 1e-6);
+            dy = RNG_UNIF(0, 1e-6);
+            dlen = dx * dx + dy * dy;
+          }
+
 	  rdlen=sqrt(dlen);
+
 	  VECTOR(dispx)[v] += dx * (C-dlen * rdlen) / (dlen*C);
 	  VECTOR(dispy)[v] += dy * (C-dlen * rdlen) / (dlen*C);
 	  VECTOR(dispx)[u] -= dx * (C-dlen * rdlen) / (dlen*C);
@@ -534,8 +549,10 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
       igraph_real_t displen=sqrt(dx * dx + dy * dy);
       igraph_real_t mx=fabs(dx) < temp ? dx : temp;
       igraph_real_t my=fabs(dy) < temp ? dy : temp;
-      MATRIX(*res, v, 0) += (dx / displen) * mx;
-      MATRIX(*res, v, 1) += (dy / displen) * my;
+      if (displen > 0) {
+        MATRIX(*res, v, 0) += (dx / displen) * mx;
+        MATRIX(*res, v, 1) += (dy / displen) * my;
+      }
       if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) {
 	MATRIX(*res, v, 0) = VECTOR(*minx)[v];
       }
@@ -718,6 +735,14 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 	  float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
 	  float dz=MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
 	  float dlen=dx * dx + dy * dy + dz * dz;
+
+          if (dlen == 0) {
+            dx = RNG_UNIF01() * 1e-9;
+            dy = RNG_UNIF01() * 1e-9;
+            dz = RNG_UNIF01() * 1e-9;
+            dlen = dx * dx + dy * dy + dz * dz;
+          }
+
 	  VECTOR(dispx)[v] += dx/dlen;
 	  VECTOR(dispy)[v] += dy/dlen;
 	  VECTOR(dispz)[v] += dz/dlen;
@@ -733,8 +758,17 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 	  float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
 	  float dz=MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
 	  float dlen, rdlen;
+
 	  dlen=dx * dx + dy * dy + dz * dz;
+          if (dlen == 0) {
+            dx = RNG_UNIF01() * 1e-9;
+            dy = RNG_UNIF01() * 1e-9;
+            dz = RNG_UNIF01() * 1e-9;
+            dlen = dx * dx + dy * dy + dz * dz;
+          }
+
 	  rdlen=sqrt(dlen);
+
 	  VECTOR(dispx)[v] += dx * (C-dlen * rdlen) / (dlen*C);
 	  VECTOR(dispy)[v] += dy * (C-dlen * rdlen) / (dlen*C);
 	  VECTOR(dispy)[v] += dz * (C-dlen * rdlen) / (dlen*C);
@@ -772,9 +806,11 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
       igraph_real_t mx=fabs(dx) < temp ? dx : temp;
       igraph_real_t my=fabs(dy) < temp ? dy : temp;
       igraph_real_t mz=fabs(dz) < temp ? dz : temp;
-      MATRIX(*res, v, 0) += (dx / displen) * mx;
-      MATRIX(*res, v, 1) += (dy / displen) * my;
-      MATRIX(*res, v, 2) += (dz / displen) * mz;
+      if (displen > 0) {
+        MATRIX(*res, v, 0) += (dx / displen) * mx;
+        MATRIX(*res, v, 1) += (dy / displen) * my;
+        MATRIX(*res, v, 2) += (dz / displen) * mz;
+      }
       if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) { 
 	MATRIX(*res, v, 0) = VECTOR(*minx)[v]; 
       }

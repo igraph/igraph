@@ -6511,7 +6511,7 @@ PyObject
   if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OldOOOOOOOl", kwlist, &wobj,
                                    &niter, &start_temp,
                                    &seed_o, &minx_o, &maxx_o,
-                                   &miny_o, &maxy_o, &minz_o, &maxz_o))
+                                   &miny_o, &maxy_o, &minz_o, &maxz_o, &dim))
     return NULL;
 
   if (dim != 2 && dim != 3) {
