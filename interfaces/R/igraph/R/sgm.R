@@ -26,51 +26,52 @@ adjcorr <- function(A, P, corr, permutation) {
   B
 }
 
-sgm <- function(A, B, m, start, iteration) {
-    # seeds are assumed to be vertices 1:m in both graphs
-    totv <- ncol(A)
-    n <- totv - m
-    A12 <- A[1:m, (m + 1):(m + n)]
-    A21 <- as.matrix(A[(m + 1):(m + n), 1:m])
-    A22 <- A[(m + 1):(m + n), (m + 1):(m + n)]
-    B12 <- B[1:m, (m + 1):(m + n)]
-    B21 <- as.matrix(B[(m + 1):(m + n), 1:m])
-    B22 <- B[(m + 1):(m + n), (m + 1):(m + n)]
-
-    patience <- iteration
-    tol <- 0.99
-    P <- start
-    toggle <- 1
-    iter <- 0
-    while (toggle == 1 & iter < patience) {
-        iter <- iter + 1
-        Grad <- 2 * A22 %*% P %*% t(B22) + 2 * A21 %*% t(B21)
-        ind <- matrix(clue::solve_LSAP(Grad, maximum = TRUE))
-        T <- diag(n)
-        T <- T[ind, ]
-        c <- sum(diag(t(A22) %*% P %*% B22 %*% t(P)))
-        d <- sum(diag(t(A22) %*% T %*% B22 %*% t(P))) + sum(diag(t(A22) %*% 
-            P %*% B22 %*% t(T)))
-        e <- sum(diag(t(A22) %*% T %*% B22 %*% t(T)))
-        u <- 2 * sum(diag(t(P) %*% A21 %*% t(B21)))
-        v <- 2 * sum(diag(t(T) %*% A21 %*% t(B21)))
-        if (c - d + e == 0 && d - 2 * e + u - v == 0) {
-            alpha <- 0
-        } else {
-            alpha <- -(d - 2 * e + u - v)/(2 * (c - d + e))
-        }
-        f0 <- 0
-        f1 <- c - e + u - v
-        falpha <- (c - d + e) * alpha^2 + (d - 2 * e + u - v) * alpha
-        if (alpha < tol && alpha > 0 && falpha > f0 && falpha > f1) {
-            P <- alpha * P + (1 - alpha) * T
-        } else if (f0 > f1) {
-            P <- T
-        } else {
-            toggle <- 0
-        }
-    }
-    corr <- matrix(clue::solve_LSAP(P, maximum = TRUE))
-    corr <- cbind(matrix((m + 1):totv, n), matrix(m + corr, n))
-    return(corr)
-}
+sgm<-function(A,B,m,start,iteration){
+  #seeds are assumed to be vertices 1:m in both graphs
+  totv<-ncol(A)
+  n<-totv-m
+  A12<-A[1:m,(m+1):(m+n)]
+  A21<-as.matrix(A[(m+1):(m+n),1:m])
+  A22<-A[(m+1):(m+n),(m+1):(m+n)]
+  B12<-B[1:m,(m+1):(m+n)]
+  B21<-as.matrix(B[(m+1):(m+n),1:m])
+  B22<-B[(m+1):(m+n),(m+1):(m+n)]
+  patience<-iteration
+  tol<-.99
+  P<-start
+  toggle<-1
+  iter<-0
+  while (toggle==1 & iter<patience)
+  {
+    iter<-iter+1
+    OO<-A21%*%t(B21)
+    Grad<-2*A22%*%P%*%t(B22)+2*OO;
+    ind<-matrix(solve_LSAP(Grad, maximum =TRUE))
+    T<-diag(n)
+    T<-T[ind,]
+    AB<-t(A22)%*%T%*%B22
+    tAB<-t(A22)%*%P%*%B22
+    c<-sum(diag(tAB%*%t(P)))
+    d<-sum(diag(AB%*%t(P)))+sum(diag(tAB%*%t(T)))
+    e<-sum(diag(AB%*%t(T)))
+    u<-2*sum(diag(t(P)%*%OO))
+    v<-2*sum(diag(t(T)%*%OO))
+    if( c-d+e==0 && d-2*e+u-v==0){
+      alpha<-0
+    }else{
+      alpha<- -(d-2*e+u-v)/(2*(c-d+e))}
+    f0<-0
+    f1<- c-e+u-v
+    falpha<-(c-d+e)*alpha^2+(d-2*e+u-v)*alpha
+    if(alpha < tol && alpha > 0 && falpha > f0 && falpha > f1){
+      P<- alpha*P+(1-alpha)*T
+    }else if(f0 > f1){
+      P<-T
+    }else{
+      toggle<-0}
+  }
+  corr<-matrix(solve_LSAP(P, maximum = TRUE))
+  P=diag(n)
+  P=rbind(cbind(diag(m),matrix(0,m,n)),cbind(matrix(0,n,m),P[corr,]))
+  corr<-cbind(matrix((m+1):totv, n),matrix(m+corr,n))
+  return(list(corr=corr, P=P))}
