@@ -354,19 +354,6 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
   return 0;
 }
 
-int print_matrix(const igraph_matrix_t *m) {
-  int nrow=igraph_matrix_nrow(m);
-  int ncol=igraph_matrix_ncol(m);
-  int i, j;
-  for (i=0; i<nrow; i++) {
-    for (j=0; j<ncol; j++) {
-      printf("%g ", MATRIX(*m, i, j));
-    }
-    printf("\n");
-  }
-  return 0;
-}
-
 /**
  * \ingroup layout
  * \function igraph_layout_fruchterman_reingold
