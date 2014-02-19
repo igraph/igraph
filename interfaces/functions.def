@@ -1475,6 +1475,10 @@ igraph_adjacent_triangles:
         DEPS: vids ON graph
         NAME-R: adjacent.triangles
 
+igraph_list_triangles:
+        PARAMS: GRAPH graph, OUT VERTEXSET_INT res
+        NAME-R: triangles
+
 #######################################
 # Graph operators
 #######################################

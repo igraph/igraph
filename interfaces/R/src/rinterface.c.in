@@ -37,6 +37,7 @@ int igraph_free(void *p);
 
 SEXP R_igraph_vector_to_SEXP(const igraph_vector_t *v);
 SEXP R_igraph_vector_int_to_SEXP(const igraph_vector_int_t *v);
+SEXP R_igraph_vector_int_to_SEXPp1(const igraph_vector_int_t *v);
 SEXP R_igraph_vector_bool_to_SEXP(const igraph_vector_bool_t *v);
 SEXP R_igraph_vector_long_to_SEXP(const igraph_vector_long_t *v);
 SEXP R_igraph_vector_complex_to_SEXP(const igraph_vector_complex_t* v);
@@ -2182,6 +2183,18 @@ SEXP R_igraph_vector_to_SEXPp1(const igraph_vector_t *v) {
   PROTECT(result=NEW_NUMERIC(n));
   for (i=0; i<n; i++) {
     REAL(result)[i]=VECTOR(*v)[i]+1;
+  }
+  UNPROTECT(1);
+  return result;
+}  
+
+SEXP R_igraph_vector_int_to_SEXPp1(const igraph_vector_int_t *v) {
+  SEXP result;
+  long int i, n=igraph_vector_int_size(v);
+
+  PROTECT(result=NEW_INTEGER(n));
+  for (i=0; i<n; i++) {
+    INTEGER(result)[i]=VECTOR(*v)[i]+1;
   }
   UNPROTECT(1);
   return result;

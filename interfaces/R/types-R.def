@@ -126,6 +126,12 @@ VERTEXSET:
     DEFAULT:
        ALL: V(%I1%)
 
+VERTEXSET_INT:
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    CALL: %I%-1
+    DEFAULT:
+       ALL: V(%I1%)
+
 VERTEX:
     INCONV: %I% <- as.igraph.vs(%I1%, %I%)
     CALL: %I%-1

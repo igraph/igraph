@@ -98,6 +98,8 @@ int igraph_adjacent_triangles(const igraph_t *graph,
 			      igraph_vector_t *res,
 			      const igraph_vs_t vids);
 
+int igraph_list_triangles(const igraph_t *graph,
+			  igraph_vector_int_t *res);
 
 __END_DECLS
 

@@ -530,6 +530,14 @@ int igraph_adjacent_triangles(const igraph_t *graph,
 
 }
 
+int igraph_list_triangles(const igraph_t *graph,
+			  igraph_vector_int_t *res) {
+# define TRIANGLES
+# include "triangles_template.h"
+# undef TRIANGLES
+  return 0;
+}
+
 /**
  * \ingroup structural
  * \function igraph_transitivity_undirected

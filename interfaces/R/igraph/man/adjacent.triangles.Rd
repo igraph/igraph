@@ -1,8 +1,11 @@
-\name{adjacent.triangles}
+\name{triangles}
 \alias{adjacent.triangles}
-\title{Count adjacenct triangles}
-\description{Count how many triangles a vertex is part of, in a graph.}
+\alias{triangles}
+\title{Find triangles in graphs}
+\description{Count how many triangles a vertex is part of, in a graph,
+  or just list the triangles of a graph.}
 \usage{
+triangles (graph)
 adjacent.triangles (graph, vids = V(graph))
 }
 \arguments{
@@ -13,10 +16,19 @@ adjacent.triangles (graph, vids = V(graph))
     names for named graphs.}
 }
 \details{
-  Count how many triangles a vertex is part of.
+  \code{triangles} lists all triangles of a graph. For efficiency, all
+  triangles are returned in a single vector. The first three vertices
+  belong to the first triangle, etc.
+  
+  \code{adjacent.triangles} counts how many triangles a vertex is part
+  of.
 }
 \value{
-  A numeric vector, the number of triangles for all vertices queried.
+  For \code{triangles} a numeric vector of vertex ids, the first three
+  vertices belong to the first triangle found, etc.
+  
+  For \code{triangles} a numeric vector, the number of triangles for all
+  vertices queried.
 }
 % \references{}
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
@@ -24,8 +36,15 @@ adjacent.triangles (graph, vids = V(graph))
 \examples{
 ## A small graph
 kite <- graph.famous("Krackhardt_Kite")
+plot(kite)
+matrix(triangles(kite), nrow=3)
+
+## Adjacenct triangles
 atri <- adjacent.triangles(kite)
 plot(kite, vertex.label=atri)
+
+## Always true
+sum(adjacent.triangles(kite)) == length(triangles(kite))
 
 ## Should match, local transitivity is the
 ## number of adjacent triangles divided by the number
