@@ -413,7 +413,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
   igraph_vector_float_t dispx, dispy;
   igraph_real_t temp=start_temp;
   igraph_real_t difftemp=start_temp / niter;
-  float width=sqrtf(no_nodes), height=width;  
+  float width=sqrtf(no_nodes), height=width;
+  igraph_bool_t conn=1;
+  float C;
 
   if (niter < 0) {
     IGRAPH_ERROR("Number of iterations must be non-negative in "
@@ -449,6 +451,9 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
     IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
   }
 
+  igraph_is_connected(graph, &conn, IGRAPH_WEAK);
+  if (!conn) { C = no_nodes * sqrtf(no_nodes); }
+
   RNG_BEGIN();
 
   if (!use_seed) {
@@ -475,19 +480,37 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
   for (i=0; i<niter; i++) {
     igraph_integer_t v, u, e;
     
-    /* calculate repulsive forces */
+    /* calculate repulsive forces, we have a special version
+       for unconnected graphs */
     igraph_vector_float_null(&dispx);
     igraph_vector_float_null(&dispy);
-    for (v=0; v<no_nodes; v++) {
-      for (u=v+1; u<no_nodes; u++) {
-	float dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
-	float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
-	float dlen=dx * dx + dy * dy;
-	if (IGRAPH_UNLIKELY(dlen == 0)) { continue; }
-	VECTOR(dispx)[v] += dx/dlen;
-	VECTOR(dispy)[v] += dy/dlen;
-	VECTOR(dispx)[u] -= dx/dlen;
-	VECTOR(dispy)[u] -= dy/dlen;
+    if (conn) {
+      for (v=0; v<no_nodes; v++) {
+	for (u=v+1; u<no_nodes; u++) {
+	  float dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+	  float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+	  float dlen=dx * dx + dy * dy;
+	  if (IGRAPH_UNLIKELY(dlen == 0)) { continue; }
+	  VECTOR(dispx)[v] += dx/dlen;
+	  VECTOR(dispy)[v] += dy/dlen;
+	  VECTOR(dispx)[u] -= dx/dlen;
+	  VECTOR(dispy)[u] -= dy/dlen;
+	}
+      }
+    } else {
+      for (v=0; v<no_nodes; v++) {
+	for (u=v+1; u<no_nodes; u++) {
+	  float dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+	  float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+	  float dlen, rdlen;
+	  if (IGRAPH_UNLIKELY(dx == 0 && dy == 0)) { continue; }
+	  dlen=dx * dx + dy * dy;
+	  rdlen=sqrt(dlen);
+	  VECTOR(dispx)[v] += dx * (C-dlen * rdlen) / (dlen*C);
+	  VECTOR(dispy)[v] += dy * (C-dlen * rdlen) / (dlen*C);
+	  VECTOR(dispx)[u] -= dx * (C-dlen * rdlen) / (dlen*C);
+	  VECTOR(dispy)[u] -= dy * (C-dlen * rdlen) / (dlen*C);
+	}
       }
     }
 
@@ -499,11 +522,6 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
       igraph_real_t dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
       igraph_real_t dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
       igraph_real_t dlen=sqrt(dx * dx + dy * dy);
-      if (IGRAPH_UNLIKELY(dx == 0 && dx == 0)) {
-	dx=RNG_NORMAL(0, 0.01);
-	dy=RNG_NORMAL(0, 0.01);
-	dlen=sqrt(dx * dx + dy * dy);
-      }
       VECTOR(dispx)[v] -= (dx * dlen);
       VECTOR(dispy)[v] -= (dy * dlen);
       VECTOR(dispx)[u] += (dx * dlen);
@@ -513,8 +531,8 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
     /* limit max displacement to temperature t and prevent from
        displacement outside frame */
     for (v=0; v<no_nodes; v++) {
-      igraph_real_t dx=VECTOR(dispx)[v];
-      igraph_real_t dy=VECTOR(dispy)[v];
+      igraph_real_t dx=VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
+      igraph_real_t dy=VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
       igraph_real_t displen=sqrt(dx * dx + dy * dy);
       igraph_real_t mx=fabs(dx) < temp ? dx : temp;
       igraph_real_t my=fabs(dy) < temp ? dy : temp;

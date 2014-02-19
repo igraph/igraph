@@ -7,6 +7,6 @@ test_that("", {
   set.seed(42)
   g <- graph.ring(10)
   l <- layout.fruchterman.reingold(g, niter=50)
-  expect_that(sum(l), equals(10.7971975174041))
+  expect_that(sum(l), equals(10.7943032688805))
 
 })
