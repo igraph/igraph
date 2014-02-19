@@ -490,7 +490,6 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 	  float dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
 	  float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
 	  float dlen=dx * dx + dy * dy;
-	  if (IGRAPH_UNLIKELY(dlen == 0)) { continue; }
 	  VECTOR(dispx)[v] += dx/dlen;
 	  VECTOR(dispy)[v] += dy/dlen;
 	  VECTOR(dispx)[u] -= dx/dlen;
@@ -503,7 +502,6 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 	  float dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
 	  float dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
 	  float dlen, rdlen;
-	  if (IGRAPH_UNLIKELY(dx == 0 && dy == 0)) { continue; }
 	  dlen=dx * dx + dy * dy;
 	  rdlen=sqrt(dlen);
 	  VECTOR(dispx)[v] += dx * (C-dlen * rdlen) / (dlen*C);
