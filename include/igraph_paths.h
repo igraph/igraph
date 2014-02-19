@@ -130,6 +130,12 @@ int igraph_eccentricity(const igraph_t *graph,
 int igraph_radius(const igraph_t *graph, igraph_real_t *radius, 
 		  igraph_neimode_t mode);
 
+int igraph_get_all_simple_paths(const igraph_t *graph,
+				igraph_vector_int_t *res,
+				igraph_integer_t from,
+				const igraph_vs_t to,
+				igraph_neimode_t mode);
+
 __END_DECLS
 
 #endif

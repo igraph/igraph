@@ -268,7 +268,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
 			     qsort.c qsort_r.c types.c lad.c hacks.c \
 			     triangles.c glet.c maximal_cliques.c sbm.c \
-			     sir.c  prpack.cpp
+			     sir.c  prpack.cpp paths.c
 
 libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)

@@ -210,3 +210,24 @@ SEXP R_igraph_srand(SEXP pseed) {
   srand(seed);
   return R_NilValue;
 }
+
+SEXP R_igraph_get_all_simple_paths_pp(SEXP vector) {
+  SEXP result;
+  int i, no=0, n=GET_LENGTH(vector);
+  int *vec=INTEGER(vector), *p=vec, *pp=vec;
+  for (i=0; i<n; i++) {
+    if (vec[i] == 0) { no++; }
+  }
+
+  PROTECT(result=NEW_LIST(no));
+  for (i=0; i<no; i++) {
+    SEXP svec;
+    while (*p != 0) { p++; }
+    SET_VECTOR_ELT(result, i, svec=NEW_INTEGER(p-pp));
+    memcpy(INTEGER(svec), pp, (p-pp) * sizeof(int));
+    pp = ++p;
+  }
+
+  UNPROTECT(1);
+  return result;
+}

@@ -425,6 +425,13 @@ igraph_shortest_paths_johnson:
                 VERTEXSET to=ALL, EDGEWEIGHTS weights
         IGNORE: RR, RC, RNamespace
 
+igraph_get_all_simple_paths:
+        PARAMS: GRAPH graph, OUT VERTEXSET_INT res, VERTEX from, \
+                VERTEXSET to=ALL, NEIMODE mode=OUT
+        DEPS: from ON graph, to ON graph
+        NAME-R: get.all.simple.paths
+        PP-R: get.all.simple.paths.pp
+
 igraph_subcomponent: 
         PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace
