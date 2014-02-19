@@ -4598,6 +4598,57 @@ PyObject *igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *
 }
 
 /** \ingroup python_interface_graph
+ * \brief Calculates all the simple paths from a single source to other nodes
+ * in the graph.
+ *
+ * \return a list containing all simple paths from the given node to the given
+ *         nodes
+ * \sa igraph_get_all_simple_paths
+ */
+PyObject *igraphmodule_Graph_get_all_simple_paths(igraphmodule_GraphObject *
+                                                    self, PyObject * args,
+                                                    PyObject * kwds)
+{
+  static char *kwlist[] = { "v", "to", "mode", NULL };
+  igraph_vector_int_t res;
+  igraph_neimode_t mode = IGRAPH_OUT;
+  igraph_integer_t from;
+  igraph_vs_t to;
+  PyObject *list, *from_o, *mode_o=Py_None, *to_o=Py_None;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O|OO", kwlist, &from_o,
+        &to_o, &mode_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(from_o, &from, &self->g))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vs_t(to_o, &to, &self->g, 0, 0))
+    return NULL;
+
+  if (igraph_vector_int_init(&res, 0)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&to);
+    return NULL;
+  }
+
+  if (igraph_get_all_simple_paths(&self->g, &res, from, to, mode)) {
+    igraphmodule_handle_igraph_error();
+    igraph_vector_int_destroy(&res);
+    igraph_vs_destroy(&to);
+    return NULL;
+  }
+
+  igraph_vs_destroy(&to);
+
+  list = igraphmodule_vector_int_t_to_PyList(&res);
+  return list;
+}
+
+/** \ingroup python_interface_graph
  * \brief Calculates Kleinberg's hub scores of the vertices in the graph
  * \sa igraph_hub_score
  */
@@ -12685,23 +12736,35 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  edge IDs are returned instead of vertex IDs.\n"
    "@return: see the documentation of the C{output} parameter.\n"},
 
-  // interface to igraph_get_all_shortest_paths
+  /* interface to igraph_get_all_shortest_paths */
   {"get_all_shortest_paths",
    (PyCFunction) igraphmodule_Graph_get_all_shortest_paths,
    METH_VARARGS | METH_KEYWORDS,
-   "get_all_shortest_paths(v, to=None, mode=OUT)\n\n"
+   "get_all_shortest_paths(v, to=None, weights=None, mode=OUT)\n\n"
    "Calculates all of the shortest paths from/to a given node in a graph.\n\n"
-   "@param v: the source/destination for the calculated paths\n"
-   "@param to: a vertex selector describing the destination/source for\n"
+   "@param v: the source for the calculated paths\n"
+   "@param to: a vertex selector describing the destination for\n"
    "  the calculated paths. This can be a single vertex ID, a list of\n"
    "  vertex IDs, a single vertex name, a list of vertex names or a\n"
    "  L{VertexSeq} object. C{None} means all the vertices.\n"
-   "@param mode: the directionality of the paths. L{IN} means to calculate\n"
-   "  incoming paths, L{OUT} means to calculate outgoing paths,\n"
-   "  L{ALL} means to calculate both ones.\n"
+   "@param weights: edge weights in a list or the name of an edge attribute\n"
+   "  holding edge weights. If C{None}, all edges are assumed to have\n"
+   "  equal weight.\n"
+   "@param mode: the directionality of the paths. L{IN} means to\n"
+   "  calculate incoming paths, L{OUT} means to calculate outgoing\n"
+   "  paths, L{ALL} means to calculate both ones.\n"
    "@return: all of the shortest path from the given node to every other\n"
-   "reachable node in the graph in a list. Note that in case of mode=L{IN},\n"
-   "the vertices in a path are returned in reversed order!"},
+   "  reachable node in the graph in a list. Note that in case of mode=L{IN},\n"
+   "  the vertices in a path are returned in reversed order!"},
+
+  /* interface to igraph_get_all_simple_paths */
+  {"_get_all_simple_paths",
+   (PyCFunction) igraphmodule_Graph_get_all_simple_paths,
+   METH_VARARGS | METH_KEYWORDS,
+   "_get_all_simple_paths(v, to=None, mode=OUT)\n\n"
+   "Internal function, undocumented.\n\n"
+   "@see: Graph.get_all_simple_paths()\n\n"
+  },
 
   /* interface to igraph_girth */
   {"girth", (PyCFunction)igraphmodule_Graph_girth,
