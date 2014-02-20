@@ -76,3 +76,15 @@ test_that("bipartite.projection removes 'type' attribute if requested", {
   expect_that("type" %in% list.vertex.attributes(proj4), is_true())
   expect_that("type" %in% list.vertex.attributes(proj5), is_true())
 })
+
+test_that("bipartite.projection breaks for non-bipartite graphs (#543)", {
+
+  library(igraph)
+  g <- graph.formula(A-0, B-1, A-1, 0-1)
+  V(g)$type <- V(g)$name %in% LETTERS
+
+  expect_that(bipartite.projection.size(g),
+          throws_error("Non-bipartite edge found in bipartite projection"))
+  expect_that(bipartite.projection(g),
+          throws_error("Non-bipartite edge found in bipartite projection"))
+})
