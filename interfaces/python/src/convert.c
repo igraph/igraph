@@ -361,6 +361,28 @@ int igraphmodule_PyObject_to_fas_algorithm_t(PyObject *o,
 }
 
 /**
+ * \brief Converts a Python object to an igraph \c igraph_layout_grid_t
+ */
+int igraphmodule_PyObject_to_layout_grid_t(PyObject *o, igraph_layout_grid_t *result) {
+  static igraphmodule_enum_translation_table_entry_t layout_grid_tt[] = {
+    {"auto",   IGRAPH_LAYOUT_AUTOGRID},
+    {"grid",   IGRAPH_LAYOUT_GRID},
+    {"nogrid", IGRAPH_LAYOUT_NOGRID},
+    {0,0}
+  };
+
+  if (o == Py_True) {
+    *result = IGRAPH_LAYOUT_GRID;
+    return 0;
+  } else if (o == Py_False) {
+    *result = IGRAPH_LAYOUT_NOGRID;
+    return 0;
+  } else {
+    return igraphmodule_PyObject_to_enum(o, layout_grid_tt, (int*)result);
+  }
+}
+
+/**
  * \brief Converts a Python object to an igraph \c igraph_reciprocity_t
  */
 int igraphmodule_PyObject_to_reciprocity_t(PyObject *o, igraph_reciprocity_t *result) {

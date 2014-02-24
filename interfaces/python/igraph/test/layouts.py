@@ -173,12 +173,18 @@ class LayoutAlgorithmTests(unittest.TestCase):
 
     def testFruchtermanReingold(self):
         g = Graph.Barabasi(100)
+
         lo = g.layout("fr")
         self.assertTrue(isinstance(lo, Layout))
+
         lo = g.layout("fr", miny=range(100))
         self.assertTrue(isinstance(lo, Layout))
+        self.assertTrue(all(lo[i][1] >= i for i in xrange(100)))
+
         lo = g.layout("fr", miny=range(100), maxy=range(100))
         self.assertTrue(isinstance(lo, Layout))
+        self.assertTrue(all(lo[i][1] == i for i in xrange(100)))
+
         lo = g.layout("fr", miny=[2]*100, maxy=[3]*100, minx=[4]*100, maxx=[6]*100)
         self.assertTrue(isinstance(lo, Layout))
         bbox = lo.bounding_box()
@@ -186,6 +192,13 @@ class LayoutAlgorithmTests(unittest.TestCase):
         self.assertTrue(bbox.bottom <= 3)
         self.assertTrue(bbox.left >= 4)
         self.assertTrue(bbox.right >= 6)
+
+    def testFruchtermanReingoldGrid(self):
+        g = Graph.Barabasi(100)
+        for grid_opt in ["grid", "nogrid", "auto", True, False]:
+            lo = g.layout("fr", miny=range(100), grid=grid_opt)
+            self.assertTrue(isinstance(lo, Layout))
+            self.assertTrue(all(lo[i][1] >= i for i in xrange(100)))
 
     def testKamadaKawai(self):
         g = Graph.Barabasi(100)

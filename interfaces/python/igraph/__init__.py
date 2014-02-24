@@ -1378,10 +1378,6 @@ class Graph(GraphBase):
 
           - C{graphopt}: the graphopt algorithm (see L{Graph.layout_graphopt})
 
-          - C{gfr}, C{grid_fr}, C{grid_fruchterman_reingold}: grid-based
-            Fruchterman-Reingold layout
-            (see L{Graph.layout_grid_fruchterman_reingold})
-
           - C{kk}, C{kamada_kawai}: Kamada-Kawai layout
             (see L{Graph.layout_kamada_kawai})
 
@@ -1503,6 +1499,19 @@ class Graph(GraphBase):
         else:
             algo = "drl"
         return self.layout(algo, *args, **kwds)
+
+    def layout_grid_fruchterman_reingold(self, *args, **kwds):
+        """layout_grid_fruchterman_reingold(*args, **kwds)
+
+        Compatibility alias to the Fruchterman-Reingold layout with the grid
+        option turned on.
+
+        @see Graph.layout_fruchterman_reingold()
+        """
+        deprecated("Graph.layout_grid_fruchterman_reingold() is deprecated since "\
+            "igraph 0.8, please use Graph.layout_fruchterman_reingold(grid=True) instead")
+        kwds["grid"] = True
+        return self.layout_fruchterman_reingold(*args, **kwds)
 
     def layout_sugiyama(self, layers=None, weights=None, hgap=1, vgap=1,
             maxiter=100, return_extended_graph=False):
