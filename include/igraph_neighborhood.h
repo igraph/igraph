@@ -38,13 +38,14 @@ __BEGIN_DECLS
 
 int igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
 			     igraph_vs_t vids, igraph_integer_t order, 
-			     igraph_neimode_t mode);
+			     igraph_neimode_t mode, igraph_integer_t mindist);
 int igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
 			igraph_vs_t vids, igraph_integer_t order,
-			igraph_neimode_t mode);
+			igraph_neimode_t mode, igraph_integer_t mindist);
 int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
 			       igraph_vs_t vids, igraph_integer_t order,
-			       igraph_neimode_t mode);
+			       igraph_neimode_t mode,
+			       igraph_integer_t mindist);
 
 __END_DECLS
 

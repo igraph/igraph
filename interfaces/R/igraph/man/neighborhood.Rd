@@ -8,9 +8,12 @@
   limit from another fixed vertex, these are called the neighborhood of
   the vertex.}
 \usage{
-neighborhood.size(graph, order, nodes=V(graph), mode=c("all", "out", "in"))
-neighborhood(graph, order, nodes=V(graph), mode=c("all", "out", "in"))
-graph.neighborhood(graph, order, nodes=V(graph), mode=c("all", "out", "in"))
+neighborhood.size(graph, order, nodes=V(graph),
+   mode=c("all", "out", "in"), mindist=0)
+neighborhood(graph, order, nodes=V(graph), mode=c("all", "out", "in"),
+   mindist=0)
+graph.neighborhood(graph, order, nodes=V(graph),
+   mode=c("all", "out", "in"), mindist=0)
 connect.neighborhood(graph, order, mode=c("all", "out", "in", "total"))
 }
 \arguments{
@@ -24,7 +27,9 @@ connect.neighborhood(graph, order, mode=c("all", "out", "in", "total"))
     \sQuote{"in"} all vertices from which the source vertex is reachable
     in at most \code{order} steps are counted. \sQuote{"all"} ignores
     the direction of the edges. This argument is ignored for undirected
-    graphs.} 
+    graphs.}
+  \item{mindist}{The minimum distance to include the vertex in the
+    result.}
 }
 \details{
   The neighborhood of a given order \code{o} of a vertex \code{v}

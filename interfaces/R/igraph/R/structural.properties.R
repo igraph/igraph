@@ -736,50 +736,54 @@ graph.density <- function(graph, loops=FALSE) {
 }
 
 neighborhood.size <- function(graph, order, nodes=V(graph),
-                              mode=c("all", "out", "in")) {
+                              mode=c("all", "out", "in"), mindist=0) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  mindist <- as.integer(mindist)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_neighborhood_size", graph, 
         as.igraph.vs(graph, nodes)-1, as.numeric(order), as.numeric(mode),
-        PACKAGE="igraph")
+        mindist, PACKAGE="igraph")
 }
 
-neighborhood <- function(graph, order, nodes=V(graph), mode=c("all", "out", "in")) {
+neighborhood <- function(graph, order, nodes=V(graph),
+                         mode=c("all", "out", "in"), mindist=0) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  mindist <- as.integer(mindist)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_neighborhood", graph, 
                as.igraph.vs(graph, nodes)-1, as.numeric(order),
-               as.numeric(mode),
+               as.numeric(mode), mindist,
                PACKAGE="igraph")
   res <- lapply(res, function(x) x+1)
   res
 }
 
 graph.neighborhood <- function(graph, order, nodes=V(graph),
-                               mode=c("all", "out", "in")) {
+                               mode=c("all", "out", "in"), mindist=0) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)
   mode <- switch(mode, "out"=1, "in"=2, "all"=3)
+  mindist <- as.integer(mindist)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_neighborhood_graphs", graph, 
                as.igraph.vs(graph, nodes)-1, as.numeric(order),
-               as.numeric(mode),
+               as.numeric(mode), mindist,
                PACKAGE="igraph")
   res
 }

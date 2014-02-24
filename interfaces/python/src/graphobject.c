@@ -4755,7 +4755,8 @@ PyObject *igraphmodule_Graph_neighborhood(igraphmodule_GraphObject *self,
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_neighborhood(&self->g, &res, vs, (igraph_integer_t) order, mode)) {
+  if (igraph_neighborhood(&self->g, &res, vs, (igraph_integer_t) order, mode),
+      /*mindist=*/ 0) {
     igraph_vs_destroy(&vs);
     return igraphmodule_handle_igraph_error();
   }
@@ -4808,7 +4809,7 @@ PyObject *igraphmodule_Graph_neighborhood_size(igraphmodule_GraphObject *self,
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_neighborhood_size(&self->g, &res, vs, (igraph_integer_t) order, mode)) {
+  if (igraph_neighborhood_size(&self->g, &res, vs, (igraph_integer_t) order, mode), /*mindist=*/ 0) {
     igraph_vs_destroy(&vs);
     return igraphmodule_handle_igraph_error();
   }

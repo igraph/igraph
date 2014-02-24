@@ -567,21 +567,21 @@ igraph_density:
 
 igraph_neighborhood_size:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids, INTEGER order, \
-                NEIMODE mode=ALL
+                NEIMODE mode=ALL, INTEGER mindist=0
         DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_neighborhood:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST res, \
                 VERTEXSET vids, INTEGER order, \
-                NEIMODE mode=ALL
+                NEIMODE mode=ALL, INTEGER mindist=0
         DEPS res ON graph, vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_neighborhood_graphs:
         PARAMS: GRAPH graph, OUT GRAPHLIST res, VERTEXSET vids, \
                 INTEGER order, \
-                NEIMODE mode=ALL
+                NEIMODE mode=ALL, INTEGER mindist=0
         DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
