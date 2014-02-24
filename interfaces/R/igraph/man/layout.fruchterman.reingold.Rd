@@ -6,9 +6,10 @@
   layout algorithm by Fruchterman and Reingold.}
 \usage{
 layout.fruchterman.reingold (graph, coords = NULL, dim = 2,
-    niter = 500, start.temp = sqrt(vcount(graph)), weights = NULL, 
-    minx = NULL, maxx = NULL, miny = NULL, maxy = NULL, minz = NULL,
-    maxz = NULL, coolexp, maxdelta, area, repulserad) 
+    niter = 500, start.temp = sqrt(vcount(graph)), grid=c("auto",
+      "grid", "nogrid"), weights = NULL, minx = NULL, maxx = NULL,
+    miny = NULL, maxy = NULL, minz = NULL, maxz = NULL,
+    coolexp, maxdelta, area, repulserad)
 }
 \arguments{
   \item{graph}{The graph to lay out. Edge directions are ignored.}
@@ -23,6 +24,10 @@ layout.fruchterman.reingold (graph, coords = NULL, dim = 2,
     maximum amount of movement alloved along one axis, within one step,
     for a vertex. Currently it is decreased linearly to zero during
     the iteration.}
+  \item{grid}{Character scalar, whether to use the faster, but less
+    accurate grid based implementation of the algorithm. By default
+    (\dQuote{auto}), the grid-based implementation is used if the graph
+    has more than one thousand vertices.}
   \item{weights}{A vector giving edge weights. The \code{weight} edge
     attribute is used by default, if present. If weights are given, then
     the attraction along the edges will be multiplied

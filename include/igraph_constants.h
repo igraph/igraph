@@ -154,6 +154,10 @@ typedef void igraph_vector_function_t(const igraph_vector_t *var,
 				      const igraph_vector_t *par,
 				      igraph_vector_t* res, void* extra);
 
+typedef enum { IGRAPH_LAYOUT_GRID = 0,
+	       IGRAPH_LAYOUT_NOGRID,
+	       IGRAPH_LAYOUT_AUTOGRID } igraph_layout_grid_t;
+
 __END_DECLS
 
 #endif

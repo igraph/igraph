@@ -1010,7 +1010,7 @@ igraph_layout_fruchterman_reingold:
         PARAMS: GRAPH graph, INOUT MATRIX coords=NULL, \
                 BOOLEAN use_seed=False, INTEGER niter=500, \
                 REAL start_temp=sqrt(vcount(graph)), \
-		EDGEWEIGHTS weights=NULL, \
+                LAYOUT_GRID grid=AUTO, EDGEWEIGHTS weights=NULL, \
                 VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
                 VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL, \
                 DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area, \
@@ -1019,12 +1019,6 @@ igraph_layout_fruchterman_reingold:
         DEPS: weights ON graph
         FLAGS: PROGRESS
         IGNORE: RR, RC
-
-igraph_layout_grid_fruchterman_reingold:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
-                REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, REAL cellsize=VCOUNT(graph), \
-                NULL use_seed, VECTOR_OR_0 weight
-        IGNORE: RR, RC, RNamespace
 
 igraph_layout_kamada_kawai:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, \

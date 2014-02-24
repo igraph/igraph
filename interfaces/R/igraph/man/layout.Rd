@@ -4,7 +4,6 @@
 \alias{layout.random}
 \alias{layout.circle}
 \alias{layout.sphere}
-\alias{layout.fruchterman.reingold.grid}
 \alias{layout.kamada.kawai}
 \alias{layout.spring}
 \alias{layout.reingold.tilford}
@@ -24,7 +23,6 @@ layout.sphere(graph, params)
 layout.kamada.kawai(graph, \dots, dim=2, params)
 layout.spring(graph, \dots, params)
 layout.reingold.tilford(graph, \dots, params)
-layout.fruchterman.reingold.grid(graph, \dots, params)
 layout.lgl(graph, \dots, params)
 layout.graphopt(graph, ..., params=list())
 layout.svd(graph, d=shortest.paths(graph), ...)
@@ -149,30 +147,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     \item{flip.y}{Logical scalar, whether to flip the \sQuote{y}
       coordinates. The default is flipping because that puts the root
       vertex on the top.}
-  }
-  
-  \code{layout.fruchterman.reingold.grid} is similar to
-  \code{layout.fruchterman.reingold} but repelling force is calculated
-  only between vertices that are closer to each other than a limit, so
-  it is faster. Patameters and default values:
-  \describe{
-    \item{niter}{Numeric, the number of iterations to perform (500).}
-    \item{maxdelta}{Maximum change for one vertex in one iteration. (The
-      number of vertices in the graph.)}
-    \item{area}{The area of the surface on which the vertices are placed.
-      (The square of the number of vertices.)}
-    \item{coolexp}{The cooling exponent of the simulated annealing
-      (1.5).}
-    \item{repulserad}{Cancellation radius for the repulsion (the
-      \code{area} times the number of vertices).}
-    \item{cellsize}{The size of the cells for the grid. When calculating
-      the repulsion forces between vertices only vertices in the same or
-      neighboring grid cells are taken into account (the fourth root of
-      the number of \code{area}.}
-    \item{start}{If given, then it should be a matrix with two columns
-      and one line for each vertex. This matrix will be used as starting
-      positions for the algorithm. If not given, then a random starting
-      matrix is used.}
   }
   
   \code{layout.lgl} is for large connected graphs, it is similar to the

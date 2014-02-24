@@ -3892,7 +3892,7 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP coords,
 					  SEXP niter, SEXP start_temp,
 					  SEXP weights,
 					  SEXP minx, SEXP maxx,
-					  SEXP miny, SEXP maxy) {
+					  SEXP miny, SEXP maxy, SEXP grid) {
   /* Declarations */
   igraph_t c_graph;
   igraph_matrix_t c_coords;
@@ -3903,6 +3903,7 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP coords,
   igraph_vector_t c_maxx;
   igraph_vector_t c_miny;
   igraph_vector_t c_maxy;
+  igraph_layout_grid_t c_grid=INTEGER(grid)[0];
 
   SEXP result;
   /* Convert input */
@@ -3923,8 +3924,9 @@ SEXP R_igraph_layout_fruchterman_reingold(SEXP graph, SEXP coords,
   if (!isNull(miny)) { R_SEXP_to_vector(miny, &c_miny); }
   if (!isNull(maxy)) { R_SEXP_to_vector(maxy, &c_maxy); }
   /* Call igraph */
-  igraph_layout_fruchterman_reingold(&c_graph, &c_coords, !isNull(coords),
-				     c_niter, c_start_temp,
+  igraph_layout_fruchterman_reingold(&c_graph, &c_coords,
+				     !isNull(coords),
+				     c_niter, c_start_temp, c_grid,
 				     (isNull(weights) ? 0 : &c_weights),
 				     (isNull(minx) ? 0 : &c_minx),
 				     (isNull(maxx) ? 0 : &c_maxx),
@@ -4133,42 +4135,6 @@ SEXP R_igraph_layout_lgl(SEXP graph, SEXP pmaxiter, SEXP pmaxdelta,
   UNPROTECT(1);
   return result;
 }  
-
-SEXP R_igraph_layout_fruchterman_reingold_grid(SEXP graph,
-					       SEXP pniter,
-					       SEXP pmaxdelta, SEXP parea,
-					       SEXP pcoolexp, SEXP prepulserad,
-					       SEXP pcellsize, SEXP start, 
-					       SEXP pweights) {
-
-  igraph_t g;
-  igraph_matrix_t res;
-  igraph_integer_t niter=(igraph_integer_t) REAL(pniter)[0];
-  igraph_real_t maxdelta=REAL(pmaxdelta)[0];
-  igraph_real_t area=REAL(parea)[0];
-  igraph_real_t coolexp=REAL(pcoolexp)[0];
-  igraph_real_t repulserad=REAL(prepulserad)[0];
-  igraph_real_t cellsize=REAL(pcellsize)[0];
-  igraph_bool_t use_seed=!isNull(start);
-  igraph_vector_t weights, *ppweights=0;
-  SEXP result;
-  
-  R_SEXP_to_igraph(graph, &g);
-  if (!isNull(pweights)) { R_SEXP_to_vector(pweights, &weights);ppweights=&weights; }
-  if (use_seed) {
-    R_SEXP_to_igraph_matrix_copy(start, &res);
-  } else {
-    igraph_matrix_init(&res, 0, 0);
-  }
-  igraph_layout_grid_fruchterman_reingold(&g, &res, niter, maxdelta, area,
-					  coolexp, repulserad, cellsize, 
-					  use_seed, ppweights);
-  PROTECT(result=R_igraph_matrix_to_SEXP(&res));
-  igraph_matrix_destroy(&res);
-  
-  UNPROTECT(1);
-  return result;
-}
 
 SEXP R_igraph_minimum_spanning_tree_unweighted(SEXP graph) {
   

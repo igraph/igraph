@@ -810,8 +810,9 @@ layout.mds <- function(graph, dist=NULL, dim=2,
 
 layout.fruchterman.reingold <- function(graph, coords=NULL, dim=2,
                             niter=500, start.temp=sqrt(vcount(graph)),
-                            weights=NULL, minx=NULL, maxx=NULL, miny=NULL,
-                            maxy=NULL, minz=NULL, maxz=NULL,
+                            grid=c("auto", "grid", "nogrid"), weights=NULL,
+                            minx=NULL, maxx=NULL, miny=NULL, maxy=NULL,
+                            minz=NULL, maxz=NULL,
                             coolexp, maxdelta, area, repulserad) {
 
                                         # Argument checks
@@ -825,6 +826,10 @@ layout.fruchterman.reingold <- function(graph, coords=NULL, dim=2,
   }
   niter <- as.integer(niter)
   start.temp <- as.numeric(start.temp)
+
+  grid <- igraph.match.arg(grid)
+  grid <- switch(grid, "grid"=0L, "nogrid"=1L, "auto"=2L)
+
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
     weights <- E(graph)$weight
   }
@@ -855,7 +860,7 @@ layout.fruchterman.reingold <- function(graph, coords=NULL, dim=2,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   if (dim==2) {
     res <- .Call("R_igraph_layout_fruchterman_reingold", graph, coords,
-                 niter, start.temp, weights, minx, maxx, miny, maxy,
+                 niter, start.temp, weights, minx, maxx, miny, maxy, grid,
                  PACKAGE="igraph")
   } else {
     res <- .Call("R_igraph_layout_fruchterman_reingold_3d", graph, coords,

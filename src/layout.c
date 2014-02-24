@@ -354,59 +354,17 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
   return 0;
 }
 
-/**
- * \ingroup layout
- * \function igraph_layout_fruchterman_reingold
- * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
- *
- * </para><para>
- * This is a force-directed layout, see Fruchterman, T.M.J. and
- * Reingold, E.M.: Graph Drawing by Force-directed Placement.
- * Software -- Practice and Experience, 21/11, 1129--1164,
- * 1991. 
- * \param graph Pointer to an initialized graph object.
- * \param res Pointer to an initialized matrix object. This will
- *        contain the result and will be resized as needed.
- * \param use_seed Logical, if true the supplied values in the
- *        \p res argument are used as an initial layout, if
- *        false a random initial layout is used.
- * \param niter The number of iterations to do. A reasonable
- *        default value is 500.
- * \param start_temp Start temperature. This is the maximum amount
- *        of movement alloved along one axis, within one step, for a
- *        vertex. Currently it is decreased linearly to zero during
- *        the iteration.
- * \param weight Pointer to a vector containing edge weights, 
- *        the attraction along the edges will be multiplied by these. 
- *        It will be ignored if it is a null-pointer.
- * \param minx Pointer to a vector, or a \c NULL pointer. If not a 
- *        \c NULL pointer then the vector gives the minimum
- *        \quote x \endquote coordinate for every vertex.
- * \param maxx Same as \p minx, but the maximum \quote x \endquote 
- *        coordinates.
- * \param miny Pointer to a vector, or a \c NULL pointer. If not a 
- *        \c NULL pointer then the vector gives the minimum
- *        \quote y \endquote coordinate for every vertex.
- * \param maxy Same as \p miny, but the maximum \quote y \endquote 
- *        coordinates.
- * \return Error code.
- * 
- * Time complexity: O(|V|^2) in each
- * iteration, |V| is the number of
- * vertices in the graph. 
- */
+int igraph_layout_i_fr(const igraph_t *graph,
+		       igraph_matrix_t *res,
+		       igraph_bool_t use_seed,
+		       igraph_integer_t niter,
+		       igraph_real_t start_temp,
+		       const igraph_vector_t *weight,
+		       const igraph_vector_t *minx,
+		       const igraph_vector_t *maxx,
+		       const igraph_vector_t *miny,
+		       const igraph_vector_t *maxy) {
 
-int igraph_layout_fruchterman_reingold(const igraph_t *graph,
-				       igraph_matrix_t *res,
-				       igraph_bool_t use_seed,
-				       igraph_integer_t niter,
-				       igraph_real_t start_temp,
-				       const igraph_vector_t *weight, 
-				       const igraph_vector_t *minx,
-				       const igraph_vector_t *maxx,
-				       const igraph_vector_t *miny,
-				       const igraph_vector_t *maxy) {
-  
   igraph_integer_t no_nodes=igraph_vcount(graph);
   igraph_integer_t no_edges=igraph_ecount(graph);
   igraph_integer_t i;
@@ -416,40 +374,6 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
   float width=sqrtf(no_nodes), height=width;
   igraph_bool_t conn=1;
   float C;
-
-  if (niter < 0) {
-    IGRAPH_ERROR("Number of iterations must be non-negative in "
-		 "Fruchterman-Reingold layout", IGRAPH_EINVAL);
-  }
-
-  if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
-		   igraph_matrix_ncol(res) != 2)) {
-    IGRAPH_ERROR("Invalid start position matrix size in "
-		 "Fruchterman-Reingold layout", IGRAPH_EINVAL);
-  }
-
-  if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
-    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
-  }
-
-  if (minx && igraph_vector_size(minx) != no_nodes) {
-    IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
-  }
-  if (maxx && igraph_vector_size(maxx) != no_nodes) {
-    IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
-  }
-  if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
-    IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
-  }
-  if (miny && igraph_vector_size(miny) != no_nodes) {
-    IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
-  }
-  if (maxy && igraph_vector_size(maxy) != no_nodes) {
-    IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
-  }
-  if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
-    IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
-  }
 
   igraph_is_connected(graph, &conn, IGRAPH_WEAK);
   if (!conn) { C = no_nodes * sqrtf(no_nodes); }
@@ -577,6 +501,240 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(2);
   
   return 0;
+}
+
+int igraph_layout_i_grid_fr(const igraph_t *graph,
+            igraph_matrix_t *res, igraph_bool_t use_seed,
+	    igraph_integer_t niter, igraph_real_t start_temp,
+	    const igraph_vector_t *weight, const igraph_vector_t *minx,
+	    const igraph_vector_t *maxx, const igraph_vector_t *miny,
+	    const igraph_vector_t *maxy) {
+
+  igraph_integer_t no_nodes=igraph_vcount(graph);
+  igraph_integer_t no_edges=igraph_ecount(graph);
+  float width=sqrtf(no_nodes), height=width;
+  igraph_2dgrid_t grid;
+  igraph_vector_float_t dispx, dispy;
+  igraph_real_t temp=start_temp;
+  igraph_real_t difftemp=start_temp / niter;
+  igraph_2dgrid_iterator_t vidit;
+  igraph_integer_t i;
+  const float cellsize=2.0;
+
+  RNG_BEGIN();
+
+  if (!use_seed) {
+    IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
+    for (i=0; i<no_nodes; i++) {
+      igraph_real_t x1=minx ? VECTOR(*minx)[i] : -width/2;
+      igraph_real_t x2=maxx ? VECTOR(*maxx)[i] :  width/2;
+      igraph_real_t y1=miny ? VECTOR(*miny)[i] : -height/2;
+      igraph_real_t y2=maxy ? VECTOR(*maxy)[i] :  height/2;
+      if (!igraph_finite(x1)) { x1 = -sqrt(no_nodes)/2; }
+      if (!igraph_finite(x2)) { x2 =  sqrt(no_nodes)/2; }
+      if (!igraph_finite(y1)) { y1 = -sqrt(no_nodes)/2; }
+      if (!igraph_finite(y2)) { y2 =  sqrt(no_nodes)/2; }
+      MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
+      MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
+    }
+  }
+
+  /* make grid */
+  IGRAPH_CHECK(igraph_2dgrid_init(&grid, res, -width/2, width/2, cellsize,
+				  -height/2, height/2, cellsize));
+  IGRAPH_FINALLY(igraph_2dgrid_destroy, &grid);
+
+  /* place vertices on grid */
+  for (i=0; i<no_nodes; i++) {
+    igraph_2dgrid_add2(&grid, i);
+  }
+
+  IGRAPH_CHECK(igraph_vector_float_init(&dispx, no_nodes));
+  IGRAPH_FINALLY(igraph_vector_float_destroy, &dispx);
+  IGRAPH_CHECK(igraph_vector_float_init(&dispy, no_nodes));
+  IGRAPH_FINALLY(igraph_vector_float_destroy, &dispy);
+
+  for (i=0; i<niter; i++) {
+    igraph_integer_t v, u, e;
+
+    igraph_vector_float_null(&dispx);
+    igraph_vector_float_null(&dispy);
+
+    /* repulsion */
+    igraph_2dgrid_reset(&grid, &vidit);
+    while ( (v=igraph_2dgrid_next(&grid, &vidit)-1) != -1) {
+      while ( (u=igraph_2dgrid_next_nei(&grid, &vidit)-1) != -1) {
+	float dx=MATRIX(*res, v, 0)-MATRIX(*res, u, 0);
+	float dy=MATRIX(*res, v, 1)-MATRIX(*res, u, 1);
+	float dlen=dx * dx + dy * dy;
+	if (dlen < cellsize * cellsize) {
+	  VECTOR(dispx)[v] += dx/dlen;
+	  VECTOR(dispy)[v] += dy/dlen;
+	  VECTOR(dispx)[u] -= dx/dlen;
+	  VECTOR(dispy)[u] -= dy/dlen;
+	}
+      }
+    }
+
+    /* attraction */
+    for (e=0; e<no_edges; e++) {
+      igraph_integer_t v=IGRAPH_FROM(graph, e);
+      igraph_integer_t u=IGRAPH_TO(graph, e);
+      igraph_real_t dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
+      igraph_real_t dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
+      igraph_real_t dlen=sqrt(dx * dx + dy * dy);
+      VECTOR(dispx)[v] -= (dx * dlen);
+      VECTOR(dispy)[v] -= (dy * dlen);
+      VECTOR(dispx)[u] += (dx * dlen);
+      VECTOR(dispy)[u] += (dy * dlen);
+    }
+
+    /* update */
+    for (v=0; v<no_nodes; v++) {
+      igraph_real_t dx=VECTOR(dispx)[v] + RNG_UNIF01() * 1e-9;
+      igraph_real_t dy=VECTOR(dispy)[v] + RNG_UNIF01() * 1e-9;
+      igraph_real_t displen=sqrt(dx * dx + dy * dy);
+      igraph_real_t mx=fabs(dx) < temp ? dx : temp;
+      igraph_real_t my=fabs(dy) < temp ? dy : temp;
+      if (displen > 0) {
+        MATRIX(*res, v, 0) += (dx / displen) * mx;
+        MATRIX(*res, v, 1) += (dy / displen) * my;
+      }
+      if (minx && MATRIX(*res, v, 0) < VECTOR(*minx)[v]) {
+	MATRIX(*res, v, 0) = VECTOR(*minx)[v];
+      }
+      if (maxx && MATRIX(*res, v, 0) > VECTOR(*maxx)[v]) {
+	MATRIX(*res, v, 0) = VECTOR(*maxx)[v];
+      }
+      if (miny && MATRIX(*res, v, 1) < VECTOR(*miny)[v]) {
+	MATRIX(*res, v, 1) = VECTOR(*miny)[v];
+      }
+      if (maxy && MATRIX(*res, v, 1) > VECTOR(*maxy)[v]) {
+	MATRIX(*res, v, 1) = VECTOR(*maxy)[v];
+      }
+    }
+
+    temp -= difftemp;
+  }
+
+  igraph_vector_float_destroy(&dispx);
+  igraph_vector_float_destroy(&dispy);
+  igraph_2dgrid_destroy(&grid);
+  IGRAPH_FINALLY_CLEAN(3);
+  return 0;
+}
+
+/**
+ * \ingroup layout
+ * \function igraph_layout_fruchterman_reingold
+ * \brief Places the vertices on a plane according to the Fruchterman-Reingold algorithm.
+ *
+ * </para><para>
+ * This is a force-directed layout, see Fruchterman, T.M.J. and
+ * Reingold, E.M.: Graph Drawing by Force-directed Placement.
+ * Software -- Practice and Experience, 21/11, 1129--1164,
+ * 1991.
+ * \param graph Pointer to an initialized graph object.
+ * \param res Pointer to an initialized matrix object. This will
+ *        contain the result and will be resized as needed.
+ * \param use_seed Logical, if true the supplied values in the
+ *        \p res argument are used as an initial layout, if
+ *        false a random initial layout is used.
+ * \param niter The number of iterations to do. A reasonable
+ *        default value is 500.
+ * \param start_temp Start temperature. This is the maximum amount
+ *        of movement alloved along one axis, within one step, for a
+ *        vertex. Currently it is decreased linearly to zero during
+ *        the iteration.
+ * \param grid Whether to use the (fast but less accurate) grid based
+ *        version of the algorithm. Possible values: \c
+ *        IGRAPH_LAYOUT_GRID, \c IGRAPH_LAYOUT_NOGRID, \c
+ *        IGRAPH_LAYOUT_AUTOGRID. The last one uses the grid based
+ *        version only for large graphs, currently the ones with
+ *        more than 1000 vertices.
+ * \param weight Pointer to a vector containing edge weights,
+ *        the attraction along the edges will be multiplied by these.
+ *        It will be ignored if it is a null-pointer.
+ * \param minx Pointer to a vector, or a \c NULL pointer. If not a
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote x \endquote coordinate for every vertex.
+ * \param maxx Same as \p minx, but the maximum \quote x \endquote
+ *        coordinates.
+ * \param miny Pointer to a vector, or a \c NULL pointer. If not a
+ *        \c NULL pointer then the vector gives the minimum
+ *        \quote y \endquote coordinate for every vertex.
+ * \param maxy Same as \p miny, but the maximum \quote y \endquote
+ *        coordinates.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|^2) in each
+ * iteration, |V| is the number of
+ * vertices in the graph.
+ */
+
+int igraph_layout_fruchterman_reingold(const igraph_t *graph,
+				       igraph_matrix_t *res,
+				       igraph_bool_t use_seed,
+				       igraph_integer_t niter,
+				       igraph_real_t start_temp,
+				       igraph_layout_grid_t grid,
+				       const igraph_vector_t *weight,
+				       const igraph_vector_t *minx,
+				       const igraph_vector_t *maxx,
+				       const igraph_vector_t *miny,
+				       const igraph_vector_t *maxy) {
+
+  igraph_integer_t no_nodes=igraph_vcount(graph);
+
+  if (niter < 0) {
+    IGRAPH_ERROR("Number of iterations must be non-negative in "
+		 "Fruchterman-Reingold layout", IGRAPH_EINVAL);
+  }
+
+  if (use_seed && (igraph_matrix_nrow(res) != no_nodes ||
+		   igraph_matrix_ncol(res) != 2)) {
+    IGRAPH_ERROR("Invalid start position matrix size in "
+		 "Fruchterman-Reingold layout", IGRAPH_EINVAL);
+  }
+
+  if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+  }
+
+  if (minx && igraph_vector_size(minx) != no_nodes) {
+    IGRAPH_ERROR("Invalid minx vector length", IGRAPH_EINVAL);
+  }
+  if (maxx && igraph_vector_size(maxx) != no_nodes) {
+    IGRAPH_ERROR("Invalid maxx vector length", IGRAPH_EINVAL);
+  }
+  if (minx && maxx && !igraph_vector_all_le(minx, maxx)) {
+    IGRAPH_ERROR("minx must not be greater than maxx", IGRAPH_EINVAL);
+  }
+  if (miny && igraph_vector_size(miny) != no_nodes) {
+    IGRAPH_ERROR("Invalid miny vector length", IGRAPH_EINVAL);
+  }
+  if (maxy && igraph_vector_size(maxy) != no_nodes) {
+    IGRAPH_ERROR("Invalid maxy vector length", IGRAPH_EINVAL);
+  }
+  if (miny && maxy && !igraph_vector_all_le(miny, maxy)) {
+    IGRAPH_ERROR("miny must not be greater than maxy", IGRAPH_EINVAL);
+  }
+
+  if (grid == IGRAPH_LAYOUT_AUTOGRID) {
+    if (no_nodes > 1000) { 
+      grid = IGRAPH_LAYOUT_GRID;
+    } else {
+      grid = IGRAPH_LAYOUT_NOGRID;
+    }
+  }
+
+  if (grid == IGRAPH_LAYOUT_GRID) {
+    return igraph_layout_i_grid_fr(graph, res, use_seed, niter, start_temp,
+				   weight, minx, maxx, miny, maxy);
+  } else {
+    return igraph_layout_i_fr(graph, res, use_seed, niter, start_temp,
+			      weight, minx, maxx, miny, maxy);
+  }
 }
 
 /**
@@ -1528,173 +1686,6 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_FINALLY_CLEAN(9);
   return 0;
 
-}
-
-/**
- * \function igraph_layout_grid_fruchterman_reingold
- * \brief Force based layout generator for large graphs.
- * 
- * </para><para>
- * This algorithm is the same as the Fruchterman-Reingold layout
- * generator, but it partitions the 2d space to a grid and and vertex
- * repulsion is calculated only for vertices nearby.
- *
- * \param graph The graph object. 
- * \param res The result, the coordinates in a matrix. The parameter
- *   should point to an initialized matrix object and will be resized.
- * \param niter The number of iterations to do. A reasonable
- *        default value is 500.
- * \param maxdelta The maximum distance to move a vertex in an
- *        iteration. A reasonable default value is the number of
- *        vertices.
- * \param area The area parameter of the algorithm. A reasonable
- *        default is the square of the number of vertices.
- * \param coolexp The cooling exponent of the simulated annealing.
- *        A reasonable default is 1.5.
- * \param repulserad Determines the radius at which
- *        vertex-vertex repulsion cancels out attraction of
- *        adjacent vertices. A reasonable default is \p area
- *        times the number of vertices.
- * \param cellsize The size of the grid cells. A reasonable default is
- *        the fourth root of \p area (or the square root of the
- *        number of vertices if \p area is also left at its default
- *        value)
- * \param use_seed Logical, if true, the coordinates passed in \p res
- *   (should have the appropriate size) will be used for the first
- *   iteration.
- * \param weight Pointer to a vector containing edge weights, 
- *        the attraction along the edges will be multiplied by these. 
- *        It will be ignored if it is a null-pointer.
- * \return Error code.
- *
- * Added in version 0.2.</para><para>
- * 
- * Time complexity: ideally (constant number of vertices in each cell) 
- * O(niter*(|V|+|E|)), in the worst case O(niter*(|V|^2+|E|)).
- */
-
-int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
-               igraph_matrix_t *res,
-               igraph_integer_t niter, igraph_real_t maxdelta, 
-               igraph_real_t area, igraph_real_t coolexp,
-               igraph_real_t repulserad, 
-               igraph_real_t cellsize,
-               igraph_bool_t use_seed,
-               const igraph_vector_t *weight) {
-
-  long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
-  igraph_2dgrid_t grid;  
-  igraph_vector_t forcex;
-  igraph_vector_t forcey;
-  long int i, it=0;
-  igraph_2dgrid_iterator_t vidit;  
-
-  igraph_real_t frk=sqrt(area/no_of_nodes);
-
-  if (weight && igraph_vector_size(weight) != igraph_ecount(graph)) {
-    IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
-  }
-
-  IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
-  IGRAPH_VECTOR_INIT_FINALLY(&forcex, no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&forcey, no_of_nodes);
-  
-  /* initial layout */
-  if (!use_seed) {
-    IGRAPH_CHECK(igraph_layout_random(graph, res));
-    igraph_matrix_scale(res, sqrt(area/M_PI));
-  }
-  
-  /* make grid */
-  IGRAPH_CHECK(igraph_2dgrid_init(&grid, res, 
-				  -sqrt(area/M_PI),sqrt(area/M_PI), cellsize,
-				  -sqrt(area/M_PI),sqrt(area/M_PI), cellsize));
-  IGRAPH_FINALLY(igraph_2dgrid_destroy, &grid);
-  
-  /* place vertices on grid */
-  for (i=0; i<no_of_nodes; i++) {
-    igraph_2dgrid_add2(&grid, i);
-  }
-
-  while (it<niter) {
-    long int j;
-    igraph_real_t t=maxdelta*pow((niter-it)/(double)niter, coolexp);
-    long int vid, nei;
-
-    /* Report progress */
-    if (it%10 == 0) {
-      IGRAPH_PROGRESS("Grid based Fruchterman-Reingold layout: ", 
-		      (100.0*it)/niter, NULL);
-    }
-
-    igraph_vector_null(&forcex);
-    igraph_vector_null(&forcey);
-    
-    /* attraction */
-    for (j=0; j<no_of_edges; j++) {
-      igraph_integer_t from, to;
-      igraph_real_t xd, yd, dist, force;
-      igraph_real_t w = weight ? VECTOR(*weight)[j] : 1.0;
-      igraph_edge(graph, (igraph_integer_t) j, &from, &to);
-      xd=MATRIX(*res, (long int)from, 0)-MATRIX(*res, (long int)to, 0);
-      yd=MATRIX(*res, (long int)from, 1)-MATRIX(*res, (long int)to, 1);
-      dist=sqrt(xd*xd+yd*yd);
-      if (dist != 0) { xd/=dist; yd/=dist; }
-      force=dist*dist/frk*w;
-      VECTOR(forcex)[(long int)from] -= xd*force;
-      VECTOR(forcex)[(long int)to]   += xd*force;
-      VECTOR(forcey)[(long int)from] -= yd*force;
-      VECTOR(forcey)[(long int)to]   += yd*force;
-    }
-
-    /* repulsion */
-    igraph_2dgrid_reset(&grid, &vidit);
-    while ( (vid=igraph_2dgrid_next(&grid, &vidit)-1) != -1) {
-      IGRAPH_ALLOW_INTERRUPTION();
-      while ( (nei=igraph_2dgrid_next_nei(&grid, &vidit)-1) != -1) {
-	igraph_real_t xd=MATRIX(*res, (long int)vid, 0)-
-	  MATRIX(*res, (long int)nei, 0);
-	igraph_real_t yd=MATRIX(*res, (long int)vid, 1)-
-	  MATRIX(*res, (long int)nei, 1);
-	igraph_real_t dist=sqrt(xd*xd+yd*yd);
-	igraph_real_t force;
-	if (dist < cellsize) {
-	  if (dist==0) { dist=1e-6; };
-	  xd/=dist; yd/=dist;
-	  force=frk*frk*(1.0/dist-dist*dist/repulserad);
-	  VECTOR(forcex)[(long int)vid] += xd*force;
-	  VECTOR(forcex)[(long int)nei] -= xd*force;
-	  VECTOR(forcey)[(long int)vid] += yd*force;
-	  VECTOR(forcey)[(long int)nei] -= yd*force;	    
-	}
-      }
-    }
-
-    /* update */
-    for (j=0; j<no_of_nodes; j++) {
-      long int vvid=j;
-      igraph_real_t fx=VECTOR(forcex)[vvid];
-      igraph_real_t fy=VECTOR(forcey)[vvid];
-      igraph_real_t ded=sqrt(fx*fx+fy*fy);
-      if (ded > t) {
-	ded=t/ded;
-	fx*=ded; fy *=ded;
-      }
-      igraph_2dgrid_move(&grid, vvid, fx, fy);
-    }
-    it++;
-    
-  } /* it<niter */
-  
-  IGRAPH_PROGRESS("Grid based Fruchterman-Reingold layout: ", 
-		  100.0, NULL);
-
-  igraph_vector_destroy(&forcex);
-  igraph_vector_destroy(&forcey);
-  igraph_2dgrid_destroy(&grid);
-  IGRAPH_FINALLY_CLEAN(3);
-  return 0;
 }
 
 /* Internal structure for Reingold-Tilford layout */

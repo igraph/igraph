@@ -6578,7 +6578,7 @@ PyObject
   if (dim == 2)
     ret = igraph_layout_fruchterman_reingold
       (&self->g, &m, use_seed, (igraph_integer_t) niter,
-       start_temp, weights, minx, maxx, miny, maxy);
+       start_temp, IGRAPH_LAYOUT_NOGRID, weights, minx, maxx, miny, maxy);
   else 
     ret = igraph_layout_fruchterman_reingold_3d
       (&self->g, &m, use_seed, (igraph_integer_t) niter,
@@ -6643,74 +6643,6 @@ PyObject *igraphmodule_Graph_layout_graphopt(igraphmodule_GraphObject *self,
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();
     return NULL;
-  }
-
-  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
-  igraph_matrix_destroy(&m);
-  return (PyObject *) result;
-}
-
-/** \ingroup python_interface_graph
- * \brief Places the vertices on a plane according to the Fruchterman-Reingold grid layout algorithm.
- * \return the calculated coordinates as a Python list of lists
- * \sa igraph_layout_grid_fruchterman_reingold
- */
-PyObject
-  *igraphmodule_Graph_layout_grid_fruchterman_reingold
-  (igraphmodule_GraphObject * self, PyObject * args, PyObject * kwds)
-{
-  static char *kwlist[] =
-    { "weights", "maxiter", "maxdelta", "area", "coolexp", "repulserad", "cellsize",
-	  "seed", NULL };
-  igraph_matrix_t m;
-  long int niter = 500;
-  double maxdelta, area, coolexp, repulserad, cellsize;
-  PyObject *result, *seed_o = Py_None, *wobj = Py_None;
-  igraph_bool_t use_seed=0;
-  igraph_vector_t *weights;
-
-  maxdelta = igraph_vcount(&self->g);
-  area = maxdelta * maxdelta;
-  coolexp = 1.5;
-  repulserad = area * igraph_vcount(&self->g); 
-  cellsize = sqrt(sqrt(area));
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OldddddO", kwlist, &wobj,
-                                   &niter, &maxdelta, &area, &coolexp,
-                                   &repulserad, &cellsize, &seed_o))
-    return NULL;
-
-  /* Interpret the seed matrix */
-  if (seed_o == 0 || seed_o == Py_None) {
-    if (igraph_matrix_init(&m, 1, 1)) {
-      igraphmodule_handle_igraph_error();
-      return NULL;
-    }
-  } else {
-    use_seed=1;
-	if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) return NULL;
-  }
-
-  /* Convert the weight parameter to a vector */
-  if (igraphmodule_attrib_to_vector_t(wobj, self, &weights, ATTRIBUTE_TYPE_EDGE)) {
-    igraph_matrix_destroy(&m);
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  if (igraph_layout_grid_fruchterman_reingold
-      (&self->g, &m, (igraph_integer_t) niter, maxdelta, area, coolexp, repulserad,
-       cellsize, use_seed, weights)) {
-    igraph_matrix_destroy(&m);
-    if (weights) {
-      igraph_vector_destroy(weights); free(weights);
-    }
-    igraphmodule_handle_igraph_error();
-    return NULL;
-  }
-
-  if (weights) {
-    igraph_vector_destroy(weights); free(weights);
   }
 
   result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
@@ -13767,38 +13699,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  step along a single axis.\n"
    "@param seed: a matrix containing a seed layout from which the algorithm\n"
    "  will be started. If C{None}, a random layout will be used.\n"
-   "@return: the calculated layout."
-  },
-
-  /* interface to igraph_layout_grid_fruchterman_reingold */
-  {"layout_grid_fruchterman_reingold",
-   (PyCFunction) igraphmodule_Graph_layout_grid_fruchterman_reingold,
-   METH_VARARGS | METH_KEYWORDS,
-   "layout_grid_fruchterman_reingold(maxiter=500, maxdelta=None, area=None, coolexp=0.99, repulserad=maxiter*maxdelta, cellsize=None, seed=None)\n\n"
-   "Places the vertices on a 2D plane according to the Fruchterman-Reingold\n"
-   "grid algorithm.\n\n"
-   "This is a modified version of a force directed layout, see\n"
-   "Fruchterman, T. M. J. and Reingold, E. M.:\n"
-   "Graph Drawing by Force-directed Placement.\n"
-   "Software -- Practice and Experience, 21/11, 1129--1164, 1991.\n"
-   "The algorithm partitions the 2D space to a grid and vertex\n"
-   "repulsion is then calculated only for vertices nearby.\n\n"
-   "@param maxiter: the number of iterations to perform.\n"
-   "@param maxdelta: the maximum distance to move a vertex in\n"
-   "  an iteration. C{None} means the number of vertices.\n"
-   "@param area: the area of the square on which the vertices\n"
-   "  will be placed. C{None} means the square of M{maxdelta}.\n"
-   "@param coolexp: the cooling exponent of the simulated annealing.\n"
-   "@param repulserad: determines the radius at which vertex-vertex\n"
-   "  repulsion cancels out attraction of adjacent vertices.\n"
-   "  C{None} means M{maxiter*maxdelta}.\n"
-   "@param cellsize: the size of the grid cells. When calculating the\n"
-   "  repulsion forces, only vertices in the same or neighboring\n"
-   "  grid cells are taken into account. Defaults to the fourth\n"
-   "  root of M{area}.\n"
-   "@param seed: if C{None}, uses a random starting layout for the\n"
-   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
-   "  as the starting position.\n"
    "@return: the calculated layout."
   },
 
