@@ -614,7 +614,8 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
 igraph.i.levc.arp <- function(externalP, externalE) {
   f <- function(v) {
     v <- as.numeric(v)
-    .Call("R_igraph_i_levc_arp", externalP, externalE, v, PACKAGE="igraph");
+    base::.Call("R_igraph_i_levc_arp", externalP, externalE, v,
+                PACKAGE="igraph");
   }
   f
 }
