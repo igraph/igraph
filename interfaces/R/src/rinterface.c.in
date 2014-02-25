@@ -2154,6 +2154,13 @@ SEXP R_igraph_finalizer() {
   return R_NilValue;
 }
 
+SEXP R_igraph_check_finally_stack() {
+  if (!IGRAPH_FINALLY_STACK_EMPTY) {
+    error("igraph callbacks cannot call igraph functions");
+  }
+  return R_NilValue;
+}
+
 /******************************************************
  * functions to convert igraph objects to SEXP
  *****************************************************/
