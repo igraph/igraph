@@ -6481,13 +6481,15 @@ PyObject
 {
   static char *kwlist[] =
     { "weights", "niter", "start_temp",
-      "seed", "minx", "maxx", "miny", "maxy", "minz", "maxz", "dim", NULL };
+      "seed", "minx", "maxx", "miny", "maxy", "minz", "maxz", "dim",
+      "grid", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
   igraph_vector_t *weights=0;
   igraph_vector_t *minx=0, *maxx=0;
   igraph_vector_t *miny=0, *maxy=0;
   igraph_vector_t *minz=0, *maxz=0;
+  igraph_layout_grid_t grid = IGRAPH_LAYOUT_AUTOGRID;
   int ret;
   long int niter = 500, dim = 2;
   double start_temp;
@@ -6496,6 +6498,7 @@ PyObject
   PyObject *minx_o=Py_None, *maxx_o=Py_None;
   PyObject *miny_o=Py_None, *maxy_o=Py_None;
   PyObject *minz_o=Py_None, *maxz_o=Py_None;
+  PyObject *grid_o=Py_None;
 
 #define DESTROY_VECTORS { \
   if (weights) { igraph_vector_destroy(weights); free(weights); } \
@@ -6509,14 +6512,19 @@ PyObject
 
   start_temp = sqrt(igraph_vcount(&self->g)) / 10.0;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OldOOOOOOOl", kwlist, &wobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OldOOOOOOOlO", kwlist, &wobj,
                                    &niter, &start_temp,
                                    &seed_o, &minx_o, &maxx_o,
-                                   &miny_o, &maxy_o, &minz_o, &maxz_o, &dim))
+                                   &miny_o, &maxy_o, &minz_o, &maxz_o, &dim,
+                                   &grid_o))
     return NULL;
 
   if (dim != 2 && dim != 3) {
     PyErr_SetString(PyExc_ValueError, "number of dimensions must be either 2 or 3");
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_layout_grid_t(grid_o, &grid)) {
     return NULL;
   }
 
@@ -6576,15 +6584,15 @@ PyObject
     }
   }
 
-  if (dim == 2)
+  if (dim == 2) {
     ret = igraph_layout_fruchterman_reingold
       (&self->g, &m, use_seed, (igraph_integer_t) niter,
-       start_temp, IGRAPH_LAYOUT_NOGRID, weights, minx, maxx, miny, maxy);
-  else 
+       start_temp, grid, weights, minx, maxx, miny, maxy);
+  } else {
     ret = igraph_layout_fruchterman_reingold_3d
       (&self->g, &m, use_seed, (igraph_integer_t) niter,
        start_temp, weights, minx, maxx, miny, maxy, minz, maxz);
-    
+  }
 
   DESTROY_VECTORS;
 
@@ -13645,7 +13653,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "layout_fruchterman_reingold(weights=None, niter=500, seed=None, \n"
    "  start_temp=None, minx=None, maxx=None, miny=None, \n"
-   "  maxy=None, minz=None, maxz=None)\n\n"
+   "  maxy=None, minz=None, maxz=None, grid=\"auto\")\n\n"
    "Places the vertices on a 2D plane according to the\n"
    "Fruchterman-Reingold algorithm.\n\n"
    "This is a force directed layout, see Fruchterman, T. M. J. and Reingold, E. M.:\n"
@@ -13673,6 +13681,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "@param seed: if C{None}, uses a random starting layout for the\n"
    "  algorithm. If a matrix (list of lists), uses the given matrix\n"
    "  as the starting position.\n"
+   "@param grid: whether to use a faster, but less accurate grid-based\n"
+   "  implementation of the algorithm. C{\"auto\"} decides based on the number\n"
+   "  of vertices in the graph; a grid will be used if there are at least 1000\n"
+   "  vertices. C{\"grid\"} is equivalent to C{True}, C{\"nogrid\"} is equivalent\n"
+   "  to C{False}.\n"
    "@return: the calculated layout."
   },
 
