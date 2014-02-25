@@ -57,43 +57,7 @@ layout.sphere <- function(graph, params) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_layout_sphere", graph,
         PACKAGE="igraph")
-}
-
-layout.fruchterman.reingold.grid <- function(graph, ...,
-                                             params=list()) {
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  if (length(params)==0) {
-    params <- list(...)
-  }
-
-  vc <- vcount(graph)
-  if (is.null(params$niter))     { params$niter      <- 500  }
-  if (is.null(params$maxdelta))  { params$maxdelta   <- vc   }
-  if (is.null(params$area))      { params$area       <- vc^2 }
-  if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
-  if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
-  if (is.null(params$cellsize))  { params$cellsize   <-
-                                     (sqrt(sqrt(params$area))) }
-  if (is.null(params$weights))   {
-    params$weights <- NULL
-  } else {
-    params$weights <- as.numeric(params$weights)
-  }
-  if (!is.null(params$start)) {
-    params$start <- structure(as.numeric(params$start), dim=dim(params$start))
-  }
-  
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_layout_fruchterman_reingold_grid", graph,
-        as.double(params$niter), as.double(params$maxdelta),
-        as.double(params$area), as.double(params$coolexp),
-        as.double(params$repulserad), as.double(params$cellsize),
-        params$start, params$weights,
-        PACKAGE="igraph")
-}
-  
+}  
 
 # FROM SNA 0.5
 
