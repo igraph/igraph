@@ -337,11 +337,17 @@ class NeighborhoodTests(unittest.TestCase):
                 [[0,1,2,3], [0,1,2,3,4], [0,1,2,3,4,5], [0,1,2,3,4,5,6], \
                     [1,2,3,4,5,6,7], [2,3,4,5,6,7,8], [3,4,5,6,7,8,9], \
                     [4,5,6,7,8,9], [5,6,7,8,9], [6,7,8,9]])
+        self.assertTrue(map(sorted, g.neighborhood(order=3, mindist=2)) == \
+                [[2,3], [3,4], [0,4,5], [0,1,5,6], \
+                    [1,2,6,7], [2,3,7,8], [3,4,8,9], \
+                    [4,5,9], [5,6], [6,7]])
 
     def testNeighborhoodSize(self):
         g = Graph.Ring(10, circular=False)
         self.assertTrue(g.neighborhood_size() == [2,3,3,3,3,3,3,3,3,2])
         self.assertTrue(g.neighborhood_size(order=3) == [4,5,6,7,7,7,7,6,5,4])
+        self.assertTrue(g.neighborhood_size(order=3, mindist=2) == \
+                [2,2,3,4,4,4,4,3,2,2])
 
 
 class MiscTests(unittest.TestCase):

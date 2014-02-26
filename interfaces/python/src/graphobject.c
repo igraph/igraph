@@ -4729,18 +4729,19 @@ PyObject *igraphmodule_Graph_linegraph(igraphmodule_GraphObject * self) {
  */
 PyObject *igraphmodule_Graph_neighborhood(igraphmodule_GraphObject *self,
     PyObject *args, PyObject *kwds) {
-  static char *kwlist[] = { "vertices", "order", "mode", NULL };
+  static char *kwlist[] = { "vertices", "order", "mode", "mindist", NULL };
   PyObject *vobj = Py_None;
   PyObject *mode_o = 0;
   PyObject *result;
   long int order = 1;
+  int mindist = 0;
   igraph_neimode_t mode = IGRAPH_ALL;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
   igraph_vector_ptr_t res;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlO", kwlist,
-        &vobj, &order, &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlOi", kwlist,
+        &vobj, &order, &mode_o, &mindist))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
@@ -4756,7 +4757,7 @@ PyObject *igraphmodule_Graph_neighborhood(igraphmodule_GraphObject *self,
   }
 
   if (igraph_neighborhood(&self->g, &res, vs, (igraph_integer_t) order, mode,
-			  /*mindist=*/ 0)) {
+		mindist)) {
     igraph_vs_destroy(&vs);
     return igraphmodule_handle_igraph_error();
   }
@@ -4783,18 +4784,19 @@ PyObject *igraphmodule_Graph_neighborhood(igraphmodule_GraphObject *self,
  */
 PyObject *igraphmodule_Graph_neighborhood_size(igraphmodule_GraphObject *self,
     PyObject *args, PyObject *kwds) {
-  static char *kwlist[] = { "vertices", "order", "mode", NULL };
+  static char *kwlist[] = { "vertices", "order", "mode", "mindist", NULL };
   PyObject *vobj = Py_None;
   PyObject *mode_o = 0;
   PyObject *result;
   long int order = 1;
+  int mindist = 0;
   igraph_neimode_t mode = IGRAPH_ALL;
   igraph_bool_t return_single = 0;
   igraph_vs_t vs;
   igraph_vector_t res;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlO", kwlist,
-        &vobj, &order, &mode_o))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OlOi", kwlist,
+        &vobj, &order, &mode_o, &mindist))
     return NULL;
 
   if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
@@ -4809,7 +4811,8 @@ PyObject *igraphmodule_Graph_neighborhood_size(igraphmodule_GraphObject *self,
     return igraphmodule_handle_igraph_error();
   }
 
-  if (igraph_neighborhood_size(&self->g, &res, vs, (igraph_integer_t) order, mode, /*mindist=*/ 0)) {
+  if (igraph_neighborhood_size(&self->g, &res, vs, (igraph_integer_t) order, mode,
+		mindist)) {
     igraph_vs_destroy(&vs);
     return igraphmodule_handle_igraph_error();
   }
@@ -12864,11 +12867,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_neighborhood */
   {"neighborhood", (PyCFunction) igraphmodule_Graph_neighborhood,
    METH_VARARGS | METH_KEYWORDS,
-   "neighborhood(vertices=None, order=1, mode=ALL)\n\n"
+   "neighborhood(vertices=None, order=1, mode=ALL, mindist=0)\n\n"
    "For each vertex specified by I{vertices}, returns the\n"
-   "vertices reachable from that vertex in at most I{order} steps.\n\n"
+   "vertices reachable from that vertex in at most I{order} steps. If\n"
+   "I{mindist} is larger than zero, vertices that are reachable in less\n"
+   "than I{mindist] steps are excluded.\n\n"
    "@param vertices: a single vertex ID or a list of vertex IDs, or\n"
    "  C{None} meaning all the vertices in the graph.\n"
+   "@param order: the order of the neighborhood, i.e. the maximum number of\n"
+   "  steps to take from the seed vertex.\n"
    "@param mode: specifies how to take into account the direction of\n"
    "  the edges if a directed graph is analyzed. C{\"out\"} means that\n"
    "  only the outgoing edges are followed, so all vertices reachable\n"
@@ -12877,6 +12884,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  reverse direction of course), so all vertices from which the source\n"
    "  vertex is reachable in at most I{order} steps are counted. C{\"all\"}\n"
    "  treats directed edges as undirected.\n"
+   "@param mindist: the minimum distance required to include a vertex in the\n"
+   "  result. If this is one, the seed vertex is not included. If this is two,\n"
+   "  the direct neighbors of the seed vertex are not included either, and so on.\n"
    "@return: a single list specifying the neighborhood if I{vertices}\n"
    "  was an integer specifying a single vertex index, or a list of lists\n"
    "  if I{vertices} was a list or C{None}.\n"
@@ -12885,11 +12895,15 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_neighborhood_size */
   {"neighborhood_size", (PyCFunction) igraphmodule_Graph_neighborhood_size,
    METH_VARARGS | METH_KEYWORDS,
-   "neighborhood_size(vertices=None, order=1, mode=ALL)\n\n"
+   "neighborhood_size(vertices=None, order=1, mode=ALL, mindist=0)\n\n"
    "For each vertex specified by I{vertices}, returns the number of\n"
-   "vertices reachable from that vertex in at most I{order} steps.\n\n"
+   "vertices reachable from that vertex in at most I{order} steps. If\n"
+   "I{mindist} is larger than zero, vertices that are reachable in less\n"
+   "than I{mindist] steps are excluded.\n\n"
    "@param vertices: a single vertex ID or a list of vertex IDs, or\n"
    "  C{None} meaning all the vertices in the graph.\n"
+   "@param order: the order of the neighborhood, i.e. the maximum number of\n"
+   "  steps to take from the seed vertex.\n"
    "@param mode: specifies how to take into account the direction of\n"
    "  the edges if a directed graph is analyzed. C{\"out\"} means that\n"
    "  only the outgoing edges are followed, so all vertices reachable\n"
@@ -12898,6 +12912,9 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  reverse direction of course), so all vertices from which the source\n"
    "  vertex is reachable in at most I{order} steps are counted. C{\"all\"}\n"
    "  treats directed edges as undirected.\n"
+   "@param mindist: the minimum distance required to include a vertex in the\n"
+   "  result. If this is one, the seed vertex is not counted. If this is two,\n"
+   "  the direct neighbors of the seed vertex are not counted either, and so on.\n"
    "@return: a single number specifying the neighborhood size if I{vertices}\n"
    "  was an integer specifying a single vertex index, or a list of sizes\n"
    "  if I{vertices} was a list or C{None}.\n"
