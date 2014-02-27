@@ -1316,7 +1316,7 @@ PyObject *igraphmodule_Graph_are_connected(igraphmodule_GraphObject * self,
     return NULL;
 
   if (igraph_are_connected(&self->g, idx1, idx2, &res))
-    return NULL;
+    return igraphmodule_handle_igraph_error();
 
   if (res)
     Py_RETURN_TRUE;
@@ -1331,14 +1331,23 @@ PyObject *igraphmodule_Graph_get_eid(igraphmodule_GraphObject * self,
                                      PyObject * args, PyObject * kwds)
 {
   static char *kwlist[] = { "v1", "v2", "directed", "error", NULL };
-  long int v1, v2;
-  igraph_integer_t result;
+  PyObject *v1, *v2;
   PyObject *directed = Py_True;
   PyObject *error = Py_True;
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "ll|OO", kwlist, &v1, &v2,
+  igraph_integer_t idx1, idx2;
+  igraph_integer_t result;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO|OO", kwlist, &v1, &v2,
                                    &directed, &error))
     return NULL;
-  if (igraph_get_eid(&self->g, &result, (igraph_integer_t) v1, (igraph_integer_t) v2,
+
+  if (igraphmodule_PyObject_to_vid(v1, &idx1, &self->g))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(v2, &idx2, &self->g))
+    return NULL;
+
+  if (igraph_get_eid(&self->g, &result, idx1, idx2,
         PyObject_IsTrue(directed), PyObject_IsTrue(error)))
     return igraphmodule_handle_igraph_error();
 
@@ -11615,8 +11624,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "get_eid(v1, v2, directed=True, error=True)\n\n"
    "Returns the edge ID of an arbitrary edge between vertices v1 and v2\n\n"
-   "@param v1: the first vertex ID\n"
-   "@param v2: the second vertex ID\n"
+   "@param v1: the ID or name of the first vertex\n"
+   "@param v2: the ID or name of the second vertex\n"
    "@param directed: whether edge directions should be considered in\n"
    "  directed graphs. The default is C{True}. Ignored for undirected\n"
    "  graphs.\n"
@@ -12217,8 +12226,8 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    METH_VARARGS | METH_KEYWORDS,
    "are_connected(v1, v2)\n\n"
    "Decides whether two given vertices are directly connected.\n\n"
-   "@param v1: the first vertex\n"
-   "@param v2: the second vertex\n"
+   "@param v1: the ID or name of the first vertex\n"
+   "@param v2: the ID or name of the second vertex\n"
    "@return: C{True} if there exists an edge from v1 to v2, C{False}\n"
    "  otherwise.\n"},
 
