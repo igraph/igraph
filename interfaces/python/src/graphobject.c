@@ -6273,13 +6273,13 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
                                                  PyObject * kwds)
 {
   static char *kwlist[] =
-    { "maxiter", "sigma", "initemp", "coolexp", "kkconst", "seed", "minx", "maxx",
+    { "maxiter", "epsilon", "kkconst", "seed", "minx", "maxx",
       "miny", "maxy", "minz", "maxz", "dim", NULL };
   igraph_matrix_t m;
   igraph_bool_t use_seed=0;
   int ret;
   long int niter = 1000, dim = 2;
-  double sigma, initemp, coolexp, kkconst;
+  double epsilon = 0.0;
   PyObject *result, *seed_o=Py_None;
   PyObject *minx_o=Py_None, *maxx_o=Py_None;
   PyObject *miny_o=Py_None, *maxy_o=Py_None;
@@ -6297,14 +6297,10 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
   if (maxz)    { igraph_vector_destroy(maxz); free(maxz); } \
 }
 
-  sigma = igraph_vcount(&self->g);
-  kkconst = sigma * sigma;
-  sigma = sigma / 4.0;
-  initemp = 10.0;
-  coolexp = 0.99;
+  kkconst = igraph_vcount(&self->g);
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddddOOOOOOOl", kwlist,
-                                   &niter, &sigma, &initemp, &coolexp,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lddOOOOOOOl", kwlist,
+                                   &niter, &epsilon,
                                    &kkconst, &seed_o,
                                    &minx_o, &maxx_o,
                                    &miny_o, &maxy_o,
@@ -6367,12 +6363,12 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
   }
   if (dim == 2)
     ret = igraph_layout_kamada_kawai
-      (&self->g, &m, (igraph_integer_t) niter, sigma, initemp, coolexp, kkconst, use_seed,
-       /*bounds*/ minx, maxx, miny, maxy);
+      (&self->g, &m, use_seed, (igraph_integer_t) niter, epsilon, kkconst,
+       /*weights=*/ 0, /*bounds*/ minx, maxx, miny, maxy);
   else
     ret = igraph_layout_kamada_kawai_3d
-      (&self->g, &m, (igraph_integer_t) niter, sigma, initemp, coolexp, kkconst, use_seed, 0,
-       /*bounds*/ minx, maxx, miny, maxy, minz, maxz);
+      (&self->g, &m, use_seed, (igraph_integer_t) niter, epsilon, kkconst,
+       /*weights=*/ 0, /*bounds*/ minx, maxx, miny, maxy, minz, maxz);
 
   DESTROY_VECTORS;
 
@@ -13581,18 +13577,19 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   {"layout_kamada_kawai",
    (PyCFunction) igraphmodule_Graph_layout_kamada_kawai,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_kamada_kawai(maxiter=1000, sigma=None, initemp=10, coolexp=0.99,\n"
-   "  kkconst=None, seed=None, minx=None, maxx=None, miny=None, maxy=None, \n"
+   "layout_kamada_kawai(maxiter=1000, seed=None, maxiter=1000, epsilon=0, \n"
+   "  kkconst=None, minx=None, maxx=None, miny=None, maxy=None, \n"
    "  minz=None, maxz=None, dim=2)\n\n"
    "Places the vertices on a plane according to the Kamada-Kawai algorithm.\n\n"
    "This is a force directed layout, see Kamada, T. and Kawai, S.:\n"
    "An Algorithm for Drawing General Undirected Graphs.\n"
    "Information Processing Letters, 31/1, 7--15, 1989.\n\n"
-   "@param maxiter: the number of iterations to perform.\n"
-   "@param sigma: the standard base deviation of the position\n"
-   "  change proposals. C{None} means the number of vertices / 4\n"
-   "@param initemp: initial temperature of the simulated annealing.\n"
-   "@param coolexp: cooling exponent of the simulated annealing.\n"
+   "@param maxiter: the maximum number of iterations to perform.\n"
+   "@param seed: if C{None}, uses a random starting layout for the\n"
+   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
+   "  as the starting position.\n"
+   "@param epsilon: quit if the energy of the system changes less than\n"
+   "  epsilon. See the original paper for details.\n"
    "@param kkconst: the Kamada-Kawai vertex attraction constant.\n"
    "  C{None} means the square of the number of vertices.\n"
    "@param minx: if not C{None}, it must be a vector with exactly as many\n"
@@ -13605,9 +13602,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  for 3D layouts (C{dim}=3).\n"
    "@param maxz: similar to I{maxx}, but with the Z coordinates. Use only\n"
    "  for 3D layouts (C{dim}=3).\n"
-   "@param seed: if C{None}, uses a random starting layout for the\n"
-   "  algorithm. If a matrix (list of lists), uses the given matrix\n"
-   "  as the starting position.\n"
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
    "@return: the calculated layout."

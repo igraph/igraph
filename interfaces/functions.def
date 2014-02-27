@@ -1021,12 +1021,14 @@ igraph_layout_fruchterman_reingold:
         IGNORE: RR, RC
 
 igraph_layout_kamada_kawai:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, \
-                REAL sigma=VCOUNT(graph)/4, REAL initemp=10, \
-                REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2, \
-                VECTOR_OR_0 minx, VECTOR_OR_0 maxx, VECTOR_OR_0 miny, \
-                VECTOR_OR_0 maxy
-        IGNORE: RR, RC, RNamespace
+        PARAMS: GRAPH graph, INOUT MATRIX coords, BOOLEAN use_seed=False, \
+                INTEGER maxiter=500, REAL epsilon=0.0, \
+                REAL kkconst=vcount(graph), EDGEWEIGHTS weights=NULL, \
+                VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
+                VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL
+        NAME-R: layout.kamada.kawai
+        DEPS: weights ON graph
+        IGNORE: RR, RC
 
 igraph_layout_lgl:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER maxiter=150, REAL maxdelta=VCOUNT(graph), \
@@ -1065,12 +1067,13 @@ igraph_layout_fruchterman_reingold_3d:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_kamada_kawai_3d:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, \
-                REAL sigma=VCOUNT(graph)/4, REAL initemp=10, \
-                REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2, \
-                BOOLEAN fixz, VECTOR_OR_0 minx, VECTOR_OR_0 maxx, \
-                VECTOR_OR_0 miny, VECTOR_OR_0 maxy, VECTOR_OR_0 minz, \
-                VECTOR_OR_0 maxz
+        PARAMS: GRAPH graph, INOUT MATRIX coords, BOOLEAN use_seed=False, \
+                INTEGER maxiter=500, REAL epsilon=0.0, \
+                REAL kkconst=vcount(graph), EDGEWEIGHTS weights=NULL, \
+                VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
+                VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL, \
+                VECTOR_OR_0 minz=NULL, VECTOR_OR_0 maxz=NULL
+        DEPS: weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_graphopt:

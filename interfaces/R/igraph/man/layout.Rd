@@ -4,7 +4,6 @@
 \alias{layout.random}
 \alias{layout.circle}
 \alias{layout.sphere}
-\alias{layout.kamada.kawai}
 \alias{layout.spring}
 \alias{layout.reingold.tilford}
 \alias{layout.lgl}
@@ -20,7 +19,6 @@ layout.auto(graph, dim=2, \dots)
 layout.random(graph, params, dim=2)
 layout.circle(graph, params)
 layout.sphere(graph, params)
-layout.kamada.kawai(graph, \dots, dim=2, params)
 layout.spring(graph, \dots, params)
 layout.reingold.tilford(graph, \dots, params)
 layout.lgl(graph, \dots, params)
@@ -87,40 +85,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   the surface of a sphere, this is thus a 3d layout. It is not clear
   however what \dQuote{uniformly on a sphere} means.
   
-  \code{layout.kamada.kawai} is another force based algorithm. 
-  Parameters and default values:
-  \describe{
-    \item{niter}{Number of iterations to perform (1000).}
-    \item{sigma}{Sets the base standard deviation of position change
-      proposals (vcount(graph)/4).}
-    \item{initemp}{The initial temperature (10).}
-    \item{coolexp}{The cooling exponent (0.99).}
-    \item{kkconst}{Sets the Kamada-Kawai vertex attraction
-      constant (vcount(graph)**2).}
-    \item{minx}{If not \code{NULL}, then it must be a numeric vector
-      that gives lower boundaries for the \sQuote{x} coordinates of the
-      vertices. The length of the vector must match the number of
-      vertices in the graph.}
-    \item{maxx}{Similar to \code{minx}, but gives the upper boundaries.}
-    \item{miny}{Similar to \code{minx}, but gives the lower boundaries
-      of the \sQuote{y} coordinates.}
-    \item{maxy}{Similar to \code{minx}, but gives the upper boundaries
-      of the \sQuote{y} coordinates.}    
-    \item{minz}{Similar to \code{minx}, but gives the lower boundaries
-      of the \sQuote{z} coordinates, if the \code{dim} argument is
-      3. Otherwise it is ignored.}
-    \item{maxz}{Similar to \code{minx}, but gives the upper boundaries
-      of the \sQuote{z} coordinates, if the \code{dim} argument is
-      3. Otherwise it is ignored.}
-    \item{start}{If given, then it should be a matrix with two columns
-      and one line for each vertex. This matrix will be used as starting
-      positions for the algorithm. If not given, then a random starting
-      matrix is used.}
-  }
-  This function performs very well for connected graphs, but it gives
-  poor results for unconnected ones.
-  This function was ported from the SNA package.
-
   \code{layout.spring} is a spring embedder algorithm.
   Parameters and default values:
   \describe{
@@ -225,13 +189,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
 \value{All these functions return a numeric matrix with at least two
   columns and the same number of lines as the number of vertices.}
 \references{
-  Fruchterman, T.M.J. and Reingold, E.M. (1991). Graph Drawing by
-  Force-directed Placement. \emph{Software - Practice and Experience},
-  21(11):1129-1164. 
-
-  Kamada, T. and Kawai, S. (1989). An Algorithm for Drawing General
-  Undirected Graphs. \emph{Information Processing Letters}, 31(1):7-15. 
-
   Reingold, E and Tilford, J (1981). Tidier drawing of trees.
   \emph{IEEE Trans. on Softw. Eng.}, SE-7(2):223--228.
 }
@@ -240,6 +197,5 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
 \examples{
 g <- graph.ring(10)
 layout.random(g)
-layout.kamada.kawai(g)
 }
 \keyword{graphs}

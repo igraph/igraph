@@ -59,68 +59,6 @@ layout.sphere <- function(graph, params) {
         PACKAGE="igraph")
 }  
 
-# FROM SNA 0.5
-
-layout.kamada.kawai<-function(graph, ..., dim=2,
-                              params=list()) {
-
-  if (!is.igraph(graph)) {
-    stop("Not a graph object")
-  }
-  if (length(params)==0) {
-    params <- list(...)
-  }
-
-  if (dim==2) {
-    fn <- "R_igraph_layout_kamada_kawai"
-  } else if (dim==3) {
-    fn <- "R_igraph_layout_kamada_kawai_3d"
-  } else {
-    stop("Invalid `dim' parameter")
-  }
-  
-  vc <- vcount(graph)
-  if (is.null(params$niter))      { params$niter   <- 1000 }
-  if (is.null(params$sigma))      { params$sigma   <- vc/4 }
-  if (is.null(params$initemp))    { params$initemp <- 10   }
-  if (is.null(params$coolexp))    { params$coolexp <- 0.99 }
-  if (is.null(params$kkconst))    { params$kkconst <- vc^2 }
-  if (is.null(params$fixz))       { params$fixz    <- FALSE}
-  if (!is.null(params$start)) {
-    params$start <- structure(as.numeric(params$start), dim=dim(params$start))
-  }
-  if (!is.null(params$minx)) {
-    params$minx <- as.double(params$minx)
-  }
-  if (!is.null(params$maxx)) {
-    params$maxx <- as.double(params$maxx)
-  }
-  if (!is.null(params$miny)) {
-    params$miny <- as.double(params$miny)
-  }
-  if (!is.null(params$maxy)) {
-    params$maxy <- as.double(params$maxy)
-  }
-  if (!is.null(params$minz)) {
-    params$minz <- as.double(params$minz)
-  }
-  if (!is.null(params$maxz)) {
-    params$maxz <- as.double(params$maxz)
-  }
-  if (params$fixz && dim==2) {
-    warning("`fixz' works for 3D only, ignored.")
-  }
-  
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call(fn, graph,
-        as.double(params$niter), as.double(params$initemp),
-        as.double(params$coolexp), as.double(params$kkconst),
-        as.double(params$sigma), params$start, as.logical(params$fixz),
-        params$minx, params$maxx, params$miny, params$maxy,
-        params$minz, params$maxz,
-        PACKAGE="igraph")
-}
-
 layout.graphopt <- function(graph, ..., 
                             params=list()) {
   
@@ -831,5 +769,66 @@ layout.fruchterman.reingold <- function(graph, coords=NULL, dim=2,
                  niter, start.temp, weights, minx, maxx, miny, maxy,
                  minz, maxz, PACKAGE="igraph")
   }
+  res
+}
+
+layout.kamada.kawai <- function(graph, coords=NULL, dim=2, maxiter=500,
+                                epsilon=0.0, kkconst=vcount(graph),
+                                weights=NULL, minx=NULL, maxx=NULL,
+                                miny=NULL, maxy=NULL, minz=NULL, maxz=NULL,
+                                niter, sigma, initemp, coolexp) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is.null(coords)) {
+    coords <- as.matrix(structure(as.double(coords), dim=dim(coords)))
+  }
+  dim <- as.integer(dim)
+  if (dim != 2L && dim != 3L) {
+    stop("Dimension must be two or three")
+  }
+
+  maxiter <- as.integer(maxiter)
+  epsilon <- as.numeric(epsilon)
+  kkconst <- as.numeric(kkconst)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+    weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+    weights <- as.numeric(weights) 
+  } else { 
+    weights <- NULL 
+  }
+  if (!is.null(minx)) minx <- as.numeric(minx)
+  if (!is.null(maxx)) maxx <- as.numeric(maxx)
+  if (!is.null(miny)) miny <- as.numeric(miny)
+  if (!is.null(maxy)) maxy <- as.numeric(maxy)
+  if (!is.null(minz)) minz <- as.numeric(minz)
+  if (!is.null(maxz)) maxz <- as.numeric(maxz)
+  
+  if (!missing(niter)) {
+    warning("Argument `niter' is deprecated and has no effect")
+  }
+  if (!missing(sigma)) {
+    warning("Argument `sigma' is deprecated and has no effect")
+  }
+  if (!missing(initemp)) {
+    warning("Argument `initemp' is deprecated and has no effect")
+  }
+  if (!missing(coolexp)) {
+    warning("Argument `coolexp' is deprecated and has no effect")
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  if (dim == 2) {
+    res <- .Call("R_igraph_layout_kamada_kawai", graph, coords, maxiter,
+                 epsilon, kkconst, weights, minx, maxx, miny, maxy,
+                 PACKAGE="igraph")
+  } else {
+    res <- .Call("R_igraph_layout_kamada_kawai_3d", graph, coords, maxiter,
+                 epsilon, kkconst, weights, minx, maxx, miny, maxy, minz,
+                 maxz, PACKAGE="igraph")
+  }    
+
   res
 }
