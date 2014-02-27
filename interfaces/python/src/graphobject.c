@@ -6279,7 +6279,7 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
   igraph_bool_t use_seed=0;
   int ret;
   long int niter = 1000, dim = 2;
-  double epsilon = 0.0;
+  double kkconst, epsilon = 0.0;
   PyObject *result, *seed_o=Py_None;
   PyObject *minx_o=Py_None, *maxx_o=Py_None;
   PyObject *miny_o=Py_None, *maxy_o=Py_None;
