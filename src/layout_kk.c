@@ -25,6 +25,7 @@
 #include "igraph_layout.h"
 #include "igraph_interface.h"
 #include "igraph_paths.h"
+#include "igraph_random.h"
 
 /**
  * \ingroup layout
@@ -121,7 +122,26 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   }
 
   if (!use_seed) {
-    igraph_layout_circle(graph, res);
+    if (minx || maxx || miny || maxy) {
+      const igraph_real_t width=sqrt(no_nodes), height=width;
+      IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 2));
+      RNG_BEGIN();
+      for (i=0; i<no_nodes; i++) {
+	igraph_real_t x1=minx ? VECTOR(*minx)[i] : -width/2;
+	igraph_real_t x2=maxx ? VECTOR(*maxx)[i] :  width/2;
+	igraph_real_t y1=miny ? VECTOR(*miny)[i] : -height/2;
+	igraph_real_t y2=maxy ? VECTOR(*maxy)[i] :  height/2;
+	if (!igraph_finite(x1)) { x1 = -width/2; }
+	if (!igraph_finite(x2)) { x2 =  width/2; }
+	if (!igraph_finite(y1)) { y1 = -height/2; }
+	if (!igraph_finite(y2)) { y2 =  height/2; }
+	MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
+	MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
+      }
+      RNG_END();
+    } else {
+      igraph_layout_circle(graph, res);
+    }
   }
 
   IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
@@ -368,7 +388,31 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
   }
 
   if (!use_seed) {
-    igraph_layout_sphere(graph, res);
+    if (minx || maxx || miny || maxy || minz || maxz) {
+      const igraph_real_t width=sqrt(no_nodes), height=width, depth=width;
+      IGRAPH_CHECK(igraph_matrix_resize(res, no_nodes, 3));
+      RNG_BEGIN();
+      for (i=0; i<no_nodes; i++) {
+	igraph_real_t x1=minx ? VECTOR(*minx)[i] : -width/2;
+	igraph_real_t x2=maxx ? VECTOR(*maxx)[i] :  width/2;
+	igraph_real_t y1=miny ? VECTOR(*miny)[i] : -height/2;
+	igraph_real_t y2=maxy ? VECTOR(*maxy)[i] :  height/2;
+	igraph_real_t z1=minz ? VECTOR(*minz)[i] : -depth/2;
+	igraph_real_t z2=maxz ? VECTOR(*maxz)[i] :  depth/2;
+	if (!igraph_finite(x1)) { x1 = -width/2; }
+	if (!igraph_finite(x2)) { x2 =  width/2; }
+	if (!igraph_finite(y1)) { y1 = -height/2; }
+	if (!igraph_finite(y2)) { y2 =  height/2; }
+	if (!igraph_finite(z1)) { z1 = -depth/2; }
+	if (!igraph_finite(z2)) { z2 =  depth/2; }
+	MATRIX(*res, i, 0) = RNG_UNIF(x1, x2);
+	MATRIX(*res, i, 1) = RNG_UNIF(y1, y2);
+	MATRIX(*res, i, 2) = RNG_UNIF(z1, z2);
+      }
+      RNG_END();
+    } else {
+      igraph_layout_sphere(graph, res);
+    }
   }
 
   IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
