@@ -35,7 +35,7 @@
  * A path is simple, if its vertices are unique, no vertex
  * is visited more than once.
  *
- * </para></para>
+ * </para><para>
  * Note that potentially there are exponentially many
  * paths between two vertices of a graph, and you may
  * run out of memory when using this function, if your
