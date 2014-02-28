@@ -8,10 +8,11 @@
 }
 \usage{
 layout.graphopt (graph, start=NULL, niter=500, charge=0.001,
-                 mass=30, sprint.length=0, spring.constant=1,
+                 mass=30, spring.length=0, spring.constant=1,
                  max.sa.movement=5)
 }
 \arguments{
+  \item{graph}{The input graph.}
   \item{start}{If given, then it should be a matrix with two columns
     and one line for each vertex. This matrix will be used as starting
     positions for the algorithm. If not given, then a random starting

@@ -1,12 +1,12 @@
 \name{layout.reingold.tilford}
-\alias{layout.raingold.tilford}
+\alias{layout.reingold.tilford}
 \concept{Graph layout}
 \title{The Reingold-Tilford graph layout algorithm}
 \description{A tree-like layout, it is perfect for trees, acceptable for
   graphs with not too many cycles.
 }
 \usage{
-layout.reingold.tilford (graph, root=numeric(), circlular=FALSE,
+layout.reingold.tilford (graph, root=numeric(), circular=FALSE,
      rootlevel=numeric(), mode="out", flip.y=TRUE)
 }
 \arguments{
@@ -52,7 +52,8 @@ layout.reingold.tilford (graph, root=numeric(), circlular=FALSE,
   Reingold, E and Tilford, J (1981). Tidier drawing of trees.
   \emph{IEEE Trans. on Softw. Eng.}, SE-7(2):223--228.
 }
-\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
+\author{Tamas Nepusz \email{ntamas@gmail.com} and
+  Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
 tree <- graph.tree(20, 3)
@@ -63,6 +64,6 @@ plot(tree, layout=layout.reingold.tilford(tree, circular=TRUE))
 tree2 <- graph.tree(10, 3) + graph.tree(10, 2)
 plot(tree2, layout=layout.reingold.tilford)
 plot(tree2, layout=layout.reingold.tilford(tree2, root=c(1,11),
-                                           rootlevel=c(2,1))
+                                           rootlevel=c(2,1)))
 }
 \keyword{graphs}

@@ -60,7 +60,7 @@ layout.sphere <- function(graph) {
 }  
 
 layout.graphopt <- function(graph, start=NULL, niter=500, charge=0.001,
-                            mass=30, sprint.length=0, spring.constant=1,
+                            mass=30, spring.length=0, spring.constant=1,
                             max.sa.movement=5) {
   
   if (!is.igraph(graph)) {
