@@ -1,7 +1,6 @@
 \name{layout}
 \alias{layout}
 \alias{layout.lgl}
-\alias{layout.svd}
 \alias{layout.norm}
 \concept{Graph layout}
 \title{Generate coordinates for plotting graphs}
@@ -9,7 +8,6 @@
   placement of the vertices for drawing a graph.}
 \usage{
 layout.lgl(graph, \dots, params)
-layout.svd(graph, d=shortest.paths(graph), ...)
 layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       zmin = NULL, zmax = NULL)
 }
@@ -20,8 +18,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
     notation to the \code{params} argument. For \code{layout.auto} these
     extra parameters are simply passed to the real layout function, if
     one is called.}
-  \item{d}{The matrix used for singular value decomposition. By default it
-    is the distance matrix of the graph.}
   \item{layout}{A matrix with two or three columns, the layout to
     normalize.}
   \item{xmin,xmax}{The limits for the first coordinate, if one of them
@@ -60,12 +56,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
       is selected.}
   }
   
-  \code{layout.svd} is a currently \emph{experimental} layout function based on
-  singular value decomposition. It does not have the usual \code{params}
-  argument, but take a single argument, the distance matrix of the
-  graph. This function generates the layout separately for each graph
-  component and then merges them via \code{\link{layout.merge}}.
-
   \code{layout.norm} normalizes a layout, it linearly transforms each
   coordinate separately to fit into the given limits.
 

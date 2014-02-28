@@ -217,11 +217,6 @@ export(cliques, largest.cliques, maximal.cliques, clique.number,
        independent.vertex.sets, largest.independent.vertex.sets,
        maximal.independent.vertex.sets, independence.number)
 
-# cohesive blocking, this is what remains from the old implementation
-
-S3method(layout.svd, igraph)
-export(layout.svd)
-
 # cohesive blocking, new style 
 
 export(blocks, blockGraphs, cohesion, hierarchy, parent,
