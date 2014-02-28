@@ -428,10 +428,8 @@ layout.auto <- function(graph, dim=2, ...) {
   ## 1. If there is a 'layout' graph attribute, we just use that.
   ## 2. Otherwise, if there are vertex attributes called 'x' and 'y',
   ##    we use those (and the 'z' vertex attribute as well, if present).
-  ## 3. Otherwise, if the graph is connected and small (<100) we use
+  ## 3. Otherwise, if the graph is small (<1000) we use
   ##    the Kamada-Kawai layout.
-  ## 4. Otherwise if the graph is medium size (<1000) we use the
-  ##    Fruchterman-Reingold layout.
   ## 5. Otherwise we use the DrL layout generator.
   
   if ("layout" %in% list.graph.attributes(graph)) {
@@ -449,11 +447,8 @@ layout.auto <- function(graph, dim=2, ...) {
       cbind(V(graph)$x, V(graph)$y)
     }
 
-  } else if (is.connected(graph) && vcount(graph) < 100) {
-    layout.kamada.kawai(graph, dim=dim, ...)
-
   } else if (vcount(graph) < 1000) {
-    layout.fruchterman.reingold(graph, dim=dim, ...)
+    layout.kamada.kawai(graph, dim=dim, ...)
 
   } else {
     layout.drl(graph, dim=dim, ...)
