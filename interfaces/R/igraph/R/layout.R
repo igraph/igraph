@@ -82,34 +82,24 @@ layout.graphopt <- function(graph, start=NULL, niter=500, charge=0.001,
         PACKAGE="igraph")
 }
 
-layout.lgl <- function(graph, ..., params=list()) {
+layout.lgl <- function(graph, maxiter=150, maxdelta=vcount(graph),
+                       area=vcount(graph)^2, coolexp=1.5,
+                       repulserad=area * vcount(graph),
+                       cellsize=sqrt(sqrt(area)), root=NULL) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (length(params)==0) {
-    params <- list(...)
-  }
-
-  vc <- vcount(graph)
-  if (is.null(params$maxiter))   { params$maxiter    <- 150  }
-  if (is.null(params$maxdelta))  { params$maxdelta   <- vc   }
-  if (is.null(params$area))      { params$area       <- vc^2 }
-  if (is.null(params$coolexp))   { params$coolexp    <- 1.5  }
-  if (is.null(params$repulserad)){ params$repulserad <- params$area * vc }
-  if (is.null(params$cellsize))  { params$cellsize   <-
-                                     (sqrt(sqrt(params$area))) }
-  if (is.null(params$root))      {
-    params$root <- -1
+  if (is.null(root)) {
+    root <- -1
   } else {
-    params$root <- as.igraph.vs(graph, params$root)-1
+    root <- as.igraph.vs(graph, root)-1
   }
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_layout_lgl", graph, as.double(params$maxiter),
-        as.double(params$maxdelta), as.double(params$area),
-        as.double(params$coolexp), as.double(params$repulserad),
-        as.double(params$cellsize), params$root,
+  .Call("R_igraph_layout_lgl", graph, as.double(maxiter),
+        as.double(maxdelta), as.double(area), as.double(coolexp),
+        as.double(repulserad), as.double(cellsize), root,
         PACKAGE="igraph")
 }
 
@@ -150,8 +140,8 @@ layout.merge <- function(graphs, layouts, method="dla") {
   res
 }
 
-layout.norm <- function(layout, xmin=NULL, xmax=NULL, ymin=NULL, ymax=NULL,
-                          zmin=NULL, zmax=NULL) {
+layout.norm <- function(layout, xmin=-1, xmax=1, ymin=-1, ymax=1,
+                          zmin=-1, zmax=1) {
 
   if (!is.matrix(layout)) {
     stop("`layout' not a matrix")
