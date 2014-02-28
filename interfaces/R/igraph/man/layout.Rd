@@ -4,7 +4,6 @@
 \alias{layout.random}
 \alias{layout.circle}
 \alias{layout.sphere}
-\alias{layout.spring}
 \alias{layout.reingold.tilford}
 \alias{layout.lgl}
 \alias{layout.svd}
@@ -19,7 +18,6 @@ layout.auto(graph, dim=2, \dots)
 layout.random(graph, params, dim=2)
 layout.circle(graph, params)
 layout.sphere(graph, params)
-layout.spring(graph, \dots, params)
 layout.reingold.tilford(graph, \dots, params)
 layout.lgl(graph, \dots, params)
 layout.graphopt(graph, ..., params=list())
@@ -85,23 +83,6 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   the surface of a sphere, this is thus a 3d layout. It is not clear
   however what \dQuote{uniformly on a sphere} means.
   
-  \code{layout.spring} is a spring embedder algorithm.
-  Parameters and default values:
-  \describe{
-    \item{mass}{The vertex mass (in \sQuote{quasi-kilograms}). (Defaults to 0.1.)}
-    \item{equil}{The equilibrium spring extension (in
-      \sQuote{quasi-meters}). (Defaults to 1.)}
-    \item{k}{The spring coefficient (in \sQuote{quasi-Newtons per
-      quasi-meter}). (Defaults to 0.001.)}
-    \item{repeqdis}{The point at which repulsion (if employed) balances
-      out the spring extension force (in \sQuote{quasi-meters}). (Defaults to
-      0.1.)}
-    \item{kfr}{The base coefficient of kinetic friction (in
-      \sQuote{quasi-Newton quasi-kilograms}). (Defaults to 0.01.)}
-    \item{repulse}{Should repulsion be used? (Defaults to FALSE.)}
-  }
-  This function was ported from the SNA package.
-
   \code{layout.reingold.tilford} generates a tree-like layout, so it is
   mainly for trees. Parameters and default values:
   \describe{
