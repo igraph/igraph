@@ -24,7 +24,7 @@
 # Layouts
 ###################################################################
 
-layout.random <- function(graph, params, dim=2) {
+layout.random <- function(graph, dim=2) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -41,7 +41,7 @@ layout.random <- function(graph, params, dim=2) {
   }
 }
 
-layout.circle <- function(graph, params) {
+layout.circle <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -50,7 +50,7 @@ layout.circle <- function(graph, params) {
         PACKAGE="igraph")
 }
 
-layout.sphere <- function(graph, params) {
+layout.sphere <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
@@ -59,33 +59,26 @@ layout.sphere <- function(graph, params) {
         PACKAGE="igraph")
 }  
 
-layout.graphopt <- function(graph, ..., 
-                            params=list()) {
+layout.graphopt <- function(graph, start=NULL, niter=500, charge=0.001,
+                            mass=30, sprint.length=0, spring.constant=1,
+                            max.sa.movement=5) {
   
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (length(params)==0) {
-    params <- list(...)
+  if (!is.null(start)) {
+    start <- structure(as.numeric(start), dim=dim(start))
   }
-
-  vc <- vcount(graph)
-  if (is.null(params$niter))            { params$niter           <- 500   }
-  if (is.null(params$charge))           { params$charge          <- 0.001 }
-  if (is.null(params$mass))             { params$mass            <- 30    }
-  if (is.null(params$spring.length))    { params$spring.length   <- 0     }
-  if (is.null(params$spring.constant))  { params$spring.constant <- 1     }
-  if (is.null(params$max.sa.movement))  { params$max.sa.movement <- 5     }
-  if (!is.null(params$start)) {
-    params$start <- structure(as.numeric(params$start), dim=dim(params$start))
-  }
+  niter <- as.double(niter)
+  charge <- as.double(charge)
+  mass <- as.double(mass)
+  spring.length <- as.double(spring.length)
+  spring.constant <- as.double(spring.constant)
+  max.sa.movement <- as.double(max.sa.movement)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_layout_graphopt", graph,
-        as.double(params$niter), as.double(params$charge),
-        as.double(params$mass), as.double(params$spring.length),
-        as.double(params$spring.constant), params$max.sa.movement,
-        params$start,
+  .Call("R_igraph_layout_graphopt", graph, niter, charge, mass,
+        spring.length, spring.constant, max.sa.movement, start,
         PACKAGE="igraph")
 }
 
@@ -120,32 +113,24 @@ layout.lgl <- function(graph, ..., params=list()) {
         PACKAGE="igraph")
 }
 
-layout.reingold.tilford <- function(graph, ..., params=list()) {
+layout.reingold.tilford <- function(graph, root=numeric(), circular=FALSE,
+                                    rootlevel=numeric(), mode="out",
+                                    flip.y=TRUE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  if (length(params)==0) {
-    params <- list(...)
-  }
-
-  if (is.null(params$root))          { params$root       <- 1          }
-  if (is.null(params$circular))      { params$circular   <- FALSE      }
-  if (is.null(params$rootlevel))     { params$rootlevel  <- numeric()  }
-  if (is.null(params$mode))          { params$mode       <- "out"      }
-  if (is.null(params$flip.y))        { params$flip.y     <- TRUE       }
-  params$mode <- tolower(params$mode)
-  params$mode <- switch(params$mode, "out"=1, "in"=2, "all"=3, "total"=3)
-
+  root <- as.igraph.vs(graph, root)-1
+  circular <- as.logical(circular)
+  rootlevel <- as.double(rootlevel)
+  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3,
+                 "total"=3)
+  flip.y <- as.logical(flip.y)
+  
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  res <- .Call("R_igraph_layout_reingold_tilford", graph,
-               as.igraph.vs(graph, params$root)-1,
-               as.double(params$mode), as.double(params$rootlevel),
-               as.logical(params$circular),
-               PACKAGE="igraph")
-  if (params$flip.y) {
-    res[,2] <- max(res[,2])-res[,2]
-  }
+  res <- .Call("R_igraph_layout_reingold_tilford", graph, root, mode,
+               rootlevel, circular, PACKAGE="igraph")
+  if (flip.y) { res[,2] <- max(res[,2])-res[,2] }
   res
 }
 

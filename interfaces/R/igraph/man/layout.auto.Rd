@@ -36,6 +36,7 @@ layout.auto (graph, dim = 2, \dots)
   A numeric matrix with two or three columns.
 }
 % \references{}
+\author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{plot.igraph}}}
 % \examples{}
 \keyword{graphs}

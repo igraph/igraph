@@ -5733,11 +5733,13 @@ SEXP R_igraph_layout_reingold_tilford(SEXP graph, SEXP proot,
   R_SEXP_to_vector(prootlevel, &rootlevel);
   igraph_matrix_init(&res, 0, 0);
   if (!circ) {
-    igraph_layout_reingold_tilford(&g, &res, (igraph_neimode_t) mode, &root,
+    igraph_layout_reingold_tilford(&g, &res, (igraph_neimode_t) mode,
+				   LENGTH(proot)==0 ? 0 : &root,
 				   &rootlevel);
   } else {
     igraph_layout_reingold_tilford_circular(&g, &res, (igraph_neimode_t) mode,
-					    &root, &rootlevel);
+					    LENGTH(proot)==0 ? 0 : &root,
+					    &rootlevel);
   }
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
