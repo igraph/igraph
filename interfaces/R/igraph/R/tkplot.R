@@ -432,31 +432,6 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
                          )
                        )
                   )
-.tkplot.addlayout("spring",
-                  list(name="Spring Embedder",
-                       f=layout.spring,
-                       params=list(
-                         mass=list(names="The vertex mass",
-                           type="numeric",
-                           default=0.1),
-                         equil=list(names="The equilibrium spring extension",
-                           type="numeric",
-                           default=1),
-                         k=list(names="The spring coefficient",
-                           type="numeric",
-                           default=0.001),
-                         repeqdis=list(names="Repulsion balance point",
-                           type="numeric",
-                           default=0.1),
-                         kfr=list(names="Friction base coefficient",
-                           type="numeric",
-                           default=0.01),
-                         repulse=list(names="Use repulsion",
-                           type="logical",
-                           default=FALSE)
-                         )
-                       )
-                  )
 .tkplot.addlayout("reingold.tilford",
                   list(names="Reingold-Tilford",
                        f=layout.reingold.tilford,

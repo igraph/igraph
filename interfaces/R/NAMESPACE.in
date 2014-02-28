@@ -122,7 +122,7 @@ export(read.graph, write.graph, graph.graphdb)
 # layouts
 
 export(layout.auto, layout.random, layout.circle,
-       layout.spring, layout.lgl,
+       layout.lgl,
        layout.sphere, layout.merge,
        layout.reingold.tilford, layout.norm, piecewise.layout)
 export(igraph.drl.default, igraph.drl.coarsen, igraph.drl.coarsest,
