@@ -5,10 +5,10 @@
 \description{Place the vertices on the plane, or in the 3d space,
   based on a phyisical model of springs.}
 \usage{
-layout.kamada.kawai (graph, coords = NULL, dim = 2, maxiter = 500,
-    epsilon = 0, kkconst = vcount(graph), weights = NULL, minx = NULL,
-    maxx = NULL, miny = NULL, maxy = NULL, minz = NULL, maxz = NULL,
-    niter, sigma, initemp, coolexp)
+layout.kamada.kawai (graph, coords = NULL, dim = 2,
+    maxiter = 50 * vcount(graph), epsilon = 0, kkconst = vcount(graph),
+    weights = NULL, minx = NULL, maxx = NULL, miny = NULL, maxy = NULL,
+    minz = NULL, maxz = NULL, niter, sigma, initemp, coolexp)
 }
 \arguments{
   \item{graph}{The input graph. Edge directions are ignored.}

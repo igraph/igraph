@@ -645,7 +645,8 @@ layout.fruchterman.reingold <- function(graph, coords=NULL, dim=2,
   res
 }
 
-layout.kamada.kawai <- function(graph, coords=NULL, dim=2, maxiter=500,
+layout.kamada.kawai <- function(graph, coords=NULL, dim=2,
+                                maxiter=50*vcount(graph),
                                 epsilon=0.0, kkconst=vcount(graph),
                                 weights=NULL, minx=NULL, maxx=NULL,
                                 miny=NULL, maxy=NULL, minz=NULL, maxz=NULL,
