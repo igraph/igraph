@@ -144,6 +144,8 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     }
   }
 
+  if (no_nodes <= 1) { return 0; }
+
   IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
   IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
   IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
@@ -414,6 +416,8 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
       igraph_layout_sphere(graph, res);
     }
   }
+
+  if (no_nodes <= 1) { return 0; }
 
   IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
   IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
