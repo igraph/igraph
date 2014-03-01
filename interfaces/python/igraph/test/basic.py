@@ -158,8 +158,8 @@ class BasicTests(unittest.TestCase):
         edges_to_ids = dict((v, k) for k, v in enumerate(g.get_edgelist()))
         for (source, target), edge_id in edges_to_ids.iteritems():
             source_name, target_name = g.vs[(source, target)]["name"]
-            self.assertEquals(edge_id, g.get_eid(source, target))
-            self.assertEquals(edge_id, g.get_eid(source_name, target_name))
+            self.assertEqual(edge_id, g.get_eid(source, target))
+            self.assertEqual(edge_id, g.get_eid(source_name, target_name))
 
         self.assertRaises(InternalError, g.get_eid, 0, 11)
         self.assertRaises(ValueError, g.get_eid, "A", "K")
