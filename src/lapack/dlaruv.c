@@ -12,7 +12,101 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int igraphdlaruv_(integer *iseed, integer *n, doublereal *x)
+/* > \brief \b DLARUV returns a vector of n random real numbers from a uniform distribution.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLARUV + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlaruv.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlaruv.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlaruv.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLARUV( ISEED, N, X )   
+
+         INTEGER            N   
+         INTEGER            ISEED( 4 )   
+         DOUBLE PRECISION   X( N )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLARUV returns a vector of n random real numbers from a uniform (0,1)   
+   > distribution (n <= 128).   
+   >   
+   > This is an auxiliary routine called by DLARNV and ZLARNV.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in,out] ISEED   
+   > \verbatim   
+   >          ISEED is INTEGER array, dimension (4)   
+   >          On entry, the seed of the random number generator; the array   
+   >          elements must be between 0 and 4095, and ISEED(4) must be   
+   >          odd.   
+   >          On exit, the seed is updated.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The number of random numbers to be generated. N <= 128.   
+   > \endverbatim   
+   >   
+   > \param[out] X   
+   > \verbatim   
+   >          X is DOUBLE PRECISION array, dimension (N)   
+   >          The generated random numbers.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERauxiliary   
+
+   > \par Further Details:   
+    =====================   
+   >   
+   > \verbatim   
+   >   
+   >  This routine uses a multiplicative congruential method with modulus   
+   >  2**48 and multiplier 33952834046453 (see G.S.Fishman,   
+   >  'Multiplicative congruential random number generators with modulus   
+   >  2**b: an exhaustive analysis for b = 32 and a partial analysis for   
+   >  b = 48', Math. Comp. 189, pp 331-344, 1990).   
+   >   
+   >  48-bit integers are stored in 4 integer array elements with 12 bits   
+   >  per element. Hence the routine is portable across machines with   
+   >  integers of 32 bits or more.   
+   > \endverbatim   
+   >   
+    =====================================================================   
+   Subroutine */ int igraphdlaruv_(integer *iseed, integer *n, doublereal *x)
 {
     /* Initialized data */
 
@@ -63,47 +157,11 @@
     integer i__, i1, i2, i3, i4, it1, it2, it3, it4;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLARUV returns a vector of n random real numbers from a uniform (0,1)   
-    distribution (n <= 128).   
-
-    This is an auxiliary routine called by DLARNV and ZLARNV.   
-
-    Arguments   
-    =========   
-
-    ISEED   (input/output) INTEGER array, dimension (4)   
-            On entry, the seed of the random number generator; the array   
-            elements must be between 0 and 4095, and ISEED(4) must be   
-            odd.   
-            On exit, the seed is updated.   
-
-    N       (input) INTEGER   
-            The number of random numbers to be generated. N <= 128.   
-
-    X       (output) DOUBLE PRECISION array, dimension (N)   
-            The generated random numbers.   
-
-    Further Details   
-    ===============   
-
-    This routine uses a multiplicative congruential method with modulus   
-    2**48 and multiplier 33952834046453 (see G.S.Fishman,   
-    'Multiplicative congruential random number generators with modulus   
-    2**b: an exhaustive analysis for b = 32 and a partial analysis for   
-    b = 48', Math. Comp. 189, pp 331-344, 1990).   
-
-    48-bit integers are stored in 4 integer array elements with 12 bits   
-    per element. Hence the routine is portable across machines with   
-    integers of 32 bits or more.   
 
     =====================================================================   
 

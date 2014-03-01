@@ -389,11 +389,11 @@ static doublereal c_b71 = -1.;
 	    integer *, doublereal *, integer *), igraphdlaset_(char *, 
 	    integer *, integer *, doublereal *, doublereal *, doublereal *, 
 	    integer *);
-    integer logfil=0, ndigit;
+    integer logfil, ndigit;
     extern /* Subroutine */ int igraphdtrevc_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, integer *, doublereal *, integer *);
-    integer mneupd=0, bounds;
+    integer mneupd, bounds;
     extern /* Subroutine */ int igraphdtrsen_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,

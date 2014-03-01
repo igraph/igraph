@@ -237,7 +237,7 @@ static integer c__2 = 2;
 	    , logical *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    IGRAPH_F77_SAVE integer mnaup2=0;
+    IGRAPH_F77_SAVE integer mnaup2;
     IGRAPH_F77_SAVE real tnaup2;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdneigh_(doublereal *, integer *, doublereal *,
@@ -245,7 +245,7 @@ static integer c__2 = 2;
 	    , integer *, doublereal *, integer *);
     IGRAPH_F77_SAVE integer nevbef;
     extern /* Subroutine */ int igraphsecond_(real *);
-    IGRAPH_F77_SAVE integer logfil=0, ndigit;
+    IGRAPH_F77_SAVE integer logfil, ndigit;
     extern /* Subroutine */ int igraphdnaitr_(integer *, char *, integer *, integer 
 	    *, integer *, integer *, doublereal *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *, doublereal *, 

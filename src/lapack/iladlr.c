@@ -12,6 +12,83 @@
 
 #include "f2c.h"
 
+/* > \brief \b ILADLR scans a matrix for its last non-zero row.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download ILADLR + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/iladlr.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/iladlr.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/iladlr.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         INTEGER FUNCTION ILADLR( M, N, A, LDA )   
+
+         INTEGER            M, N, LDA   
+         DOUBLE PRECISION   A( LDA, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > ILADLR scans A for its last non-zero row.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >          The number of rows of the matrix A.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The number of columns of the matrix A.   
+   > \endverbatim   
+   >   
+   > \param[in] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension (LDA,N)   
+   >          The m by n matrix A.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The leading dimension of the array A. LDA >= max(1,M).   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERauxiliary   
+
+    ===================================================================== */
 integer igraphiladlr_(integer *m, integer *n, doublereal *a, integer *lda)
 {
     /* System generated locals */
@@ -21,31 +98,11 @@ integer igraphiladlr_(integer *m, integer *n, doublereal *a, integer *lda)
     integer i__, j;
 
 
-/*  -- LAPACK auxiliary routine (version 3.3.1)                        --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-    -- April 2011                                                      --   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    ILADLR scans A for its last non-zero row.   
-
-    Arguments   
-    =========   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix A.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix A.   
-
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The m by n matrix A.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= max(1,M).   
 
     =====================================================================   
 
@@ -67,7 +124,7 @@ integer igraphiladlr_(integer *m, integer *n, doublereal *a, integer *lda)
 	i__1 = *n;
 	for (j = 1; j <= i__1; ++j) {
 	    i__ = *m;
-	    while(a[i__ + j * a_dim1] != 0. && i__ >= 1) {
+	    while(a[max(i__,1) + j * a_dim1] == 0. && i__ >= 1) {
 		--i__;
 	    }
 	    ret_val = max(ret_val,i__);

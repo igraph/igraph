@@ -16,7 +16,166 @@
 
 static integer c__1 = 1;
 
-/* Subroutine */ int igraphdgebal_(char *job, integer *n, doublereal *a, integer *
+/* > \brief \b DGEBAL   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DGEBAL + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dgebal.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dgebal.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dgebal.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DGEBAL( JOB, N, A, LDA, ILO, IHI, SCALE, INFO )   
+
+         CHARACTER          JOB   
+         INTEGER            IHI, ILO, INFO, LDA, N   
+         DOUBLE PRECISION   A( LDA, * ), SCALE( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DGEBAL balances a general real matrix A.  This involves, first,   
+   > permuting A by a similarity transformation to isolate eigenvalues   
+   > in the first 1 to ILO-1 and last IHI+1 to N elements on the   
+   > diagonal; and second, applying a diagonal similarity transformation   
+   > to rows and columns ILO to IHI to make the rows and columns as   
+   > close in norm as possible.  Both steps are optional.   
+   >   
+   > Balancing may reduce the 1-norm of the matrix, and improve the   
+   > accuracy of the computed eigenvalues and/or eigenvectors.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] JOB   
+   > \verbatim   
+   >          JOB is CHARACTER*1   
+   >          Specifies the operations to be performed on A:   
+   >          = 'N':  none:  simply set ILO = 1, IHI = N, SCALE(I) = 1.0   
+   >                  for i = 1,...,N;   
+   >          = 'P':  permute only;   
+   >          = 'S':  scale only;   
+   >          = 'B':  both permute and scale.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix A.  N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in,out] A   
+   > \verbatim   
+   >          A is DOUBLE array, dimension (LDA,N)   
+   >          On entry, the input matrix A.   
+   >          On exit,  A is overwritten by the balanced matrix.   
+   >          If JOB = 'N', A is not referenced.   
+   >          See Further Details.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The leading dimension of the array A.  LDA >= max(1,N).   
+   > \endverbatim   
+   >   
+   > \param[out] ILO   
+   > \verbatim   
+   >          ILO is INTEGER   
+   > \endverbatim   
+   > \param[out] IHI   
+   > \verbatim   
+   >          IHI is INTEGER   
+   >          ILO and IHI are set to integers such that on exit   
+   >          A(i,j) = 0 if i > j and j = 1,...,ILO-1 or I = IHI+1,...,N.   
+   >          If JOB = 'N' or 'S', ILO = 1 and IHI = N.   
+   > \endverbatim   
+   >   
+   > \param[out] SCALE   
+   > \verbatim   
+   >          SCALE is DOUBLE array, dimension (N)   
+   >          Details of the permutations and scaling factors applied to   
+   >          A.  If P(j) is the index of the row and column interchanged   
+   >          with row and column j and D(j) is the scaling factor   
+   >          applied to row and column j, then   
+   >          SCALE(j) = P(j)    for j = 1,...,ILO-1   
+   >                   = D(j)    for j = ILO,...,IHI   
+   >                   = P(j)    for j = IHI+1,...,N.   
+   >          The order in which the interchanges are made is N to IHI+1,   
+   >          then 1 to ILO-1.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          = 0:  successful exit.   
+   >          < 0:  if INFO = -i, the i-th argument had an illegal value.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2013   
+
+   > \ingroup doubleGEcomputational   
+
+   > \par Further Details:   
+    =====================   
+   >   
+   > \verbatim   
+   >   
+   >  The permutations consist of row and column interchanges which put   
+   >  the matrix in the form   
+   >   
+   >             ( T1   X   Y  )   
+   >     P A P = (  0   B   Z  )   
+   >             (  0   0   T2 )   
+   >   
+   >  where T1 and T2 are upper triangular matrices whose eigenvalues lie   
+   >  along the diagonal.  The column indices ILO and IHI mark the starting   
+   >  and ending columns of the submatrix B. Balancing consists of applying   
+   >  a diagonal similarity transformation inv(D) * B * D to make the   
+   >  1-norms of each row of B and its corresponding column nearly equal.   
+   >  The output matrix is   
+   >   
+   >     ( T1     X*D          Y    )   
+   >     (  0  inv(D)*B*D  inv(D)*Z ).   
+   >     (  0      0           T2   )   
+   >   
+   >  Information about the permutations P and the diagonal matrix D is   
+   >  returned in the vector SCALE.   
+   >   
+   >  This subroutine is based on the EISPACK routine BALANC.   
+   >   
+   >  Modified by Tzu-Yi Chen, Computer Science Division, University of   
+   >    California at Berkeley, USA   
+   > \endverbatim   
+   >   
+    =====================================================================   
+   Subroutine */ int igraphdgebal_(char *job, integer *n, doublereal *a, integer *
 	lda, integer *ilo, integer *ihi, doublereal *scale, integer *info)
 {
     /* System generated locals */
@@ -28,6 +187,7 @@ static integer c__1 = 1;
     integer i__, j, k, l, m;
     doublereal r__, s, ca, ra;
     integer ica, ira, iexc;
+    extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *);
     extern logical igraphlsame_(char *, char *);
@@ -41,97 +201,11 @@ static integer c__1 = 1;
     logical noconv;
 
 
-/*  -- LAPACK routine (version 3.2.2) --   
+/*  -- LAPACK computational routine (version 3.5.0) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       June 2010   
+       November 2013   
 
-
-    Purpose   
-    =======   
-
-    DGEBAL balances a general real matrix A.  This involves, first,   
-    permuting A by a similarity transformation to isolate eigenvalues   
-    in the first 1 to ILO-1 and last IHI+1 to N elements on the   
-    diagonal; and second, applying a diagonal similarity transformation   
-    to rows and columns ILO to IHI to make the rows and columns as   
-    close in norm as possible.  Both steps are optional.   
-
-    Balancing may reduce the 1-norm of the matrix, and improve the   
-    accuracy of the computed eigenvalues and/or eigenvectors.   
-
-    Arguments   
-    =========   
-
-    JOB     (input) CHARACTER*1   
-            Specifies the operations to be performed on A:   
-            = 'N':  none:  simply set ILO = 1, IHI = N, SCALE(I) = 1.0   
-                    for i = 1,...,N;   
-            = 'P':  permute only;   
-            = 'S':  scale only;   
-            = 'B':  both permute and scale.   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.   
-
-    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the input matrix A.   
-            On exit,  A is overwritten by the balanced matrix.   
-            If JOB = 'N', A is not referenced.   
-            See Further Details.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,N).   
-
-    ILO     (output) INTEGER   
-    IHI     (output) INTEGER   
-            ILO and IHI are set to integers such that on exit   
-            A(i,j) = 0 if i > j and j = 1,...,ILO-1 or I = IHI+1,...,N.   
-            If JOB = 'N' or 'S', ILO = 1 and IHI = N.   
-
-    SCALE   (output) DOUBLE PRECISION array, dimension (N)   
-            Details of the permutations and scaling factors applied to   
-            A.  If P(j) is the index of the row and column interchanged   
-            with row and column j and D(j) is the scaling factor   
-            applied to row and column j, then   
-            SCALE(j) = P(j)    for j = 1,...,ILO-1   
-                     = D(j)    for j = ILO,...,IHI   
-                     = P(j)    for j = IHI+1,...,N.   
-            The order in which the interchanges are made is N to IHI+1,   
-            then 1 to ILO-1.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit.   
-            < 0:  if INFO = -i, the i-th argument had an illegal value.   
-
-    Further Details   
-    ===============   
-
-    The permutations consist of row and column interchanges which put   
-    the matrix in the form   
-
-               ( T1   X   Y  )   
-       P A P = (  0   B   Z  )   
-               (  0   0   T2 )   
-
-    where T1 and T2 are upper triangular matrices whose eigenvalues lie   
-    along the diagonal.  The column indices ILO and IHI mark the starting   
-    and ending columns of the submatrix B. Balancing consists of applying   
-    a diagonal similarity transformation inv(D) * B * D to make the   
-    1-norms of each row of B and its corresponding column nearly equal.   
-    The output matrix is   
-
-       ( T1     X*D          Y    )   
-       (  0  inv(D)*B*D  inv(D)*Z ).   
-       (  0      0           T2   )   
-
-    Information about the permutations P and the diagonal matrix D is   
-    returned in the vector SCALE.   
-
-    This subroutine is based on the EISPACK routine BALANC.   
-
-    Modified by Tzu-Yi Chen, Computer Science Division, University of   
-      California at Berkeley, USA   
 
     =====================================================================   
 
@@ -281,24 +355,17 @@ L120:
     sfmax1 = 1. / sfmin1;
     sfmin2 = sfmin1 * 2.;
     sfmax2 = 1. / sfmin2;
+
 L140:
     noconv = FALSE_;
 
     i__1 = l;
     for (i__ = k; i__ <= i__1; ++i__) {
-	c__ = 0.;
-	r__ = 0.;
 
-	i__2 = l;
-	for (j = k; j <= i__2; ++j) {
-	    if (j == i__) {
-		goto L150;
-	    }
-	    c__ += (d__1 = a[j + i__ * a_dim1], abs(d__1));
-	    r__ += (d__1 = a[i__ + j * a_dim1], abs(d__1));
-L150:
-	    ;
-	}
+	i__2 = l - k + 1;
+	c__ = igraphdnrm2_(&i__2, &a[k + i__ * a_dim1], &c__1);
+	i__2 = l - k + 1;
+	r__ = igraphdnrm2_(&i__2, &a[i__ + k * a_dim1], lda);
 	ica = igraphidamax_(&l, &a[i__ * a_dim1 + 1], &c__1);
 	ca = (d__1 = a[ica + i__ * a_dim1], abs(d__1));
 	i__2 = *n - k + 1;

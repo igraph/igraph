@@ -20,7 +20,263 @@ static integer c__3 = 3;
 static integer c__1 = 1;
 static integer c__2 = 2;
 
-/* Subroutine */ int igraphdlaqr5_(logical *wantt, logical *wantz, integer *kacc22, 
+/* > \brief \b DLAQR5 performs a single small-bulge multi-shift QR sweep.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLAQR5 + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlaqr5.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlaqr5.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlaqr5.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLAQR5( WANTT, WANTZ, KACC22, N, KTOP, KBOT, NSHFTS,   
+                            SR, SI, H, LDH, ILOZ, IHIZ, Z, LDZ, V, LDV, U,   
+                            LDU, NV, WV, LDWV, NH, WH, LDWH )   
+
+         INTEGER            IHIZ, ILOZ, KACC22, KBOT, KTOP, LDH, LDU, LDV,   
+        $                   LDWH, LDWV, LDZ, N, NH, NSHFTS, NV   
+         LOGICAL            WANTT, WANTZ   
+         DOUBLE PRECISION   H( LDH, * ), SI( * ), SR( * ), U( LDU, * ),   
+        $                   V( LDV, * ), WH( LDWH, * ), WV( LDWV, * ),   
+        $                   Z( LDZ, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   >    DLAQR5, called by DLAQR0, performs a   
+   >    single small-bulge multi-shift QR sweep.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] WANTT   
+   > \verbatim   
+   >          WANTT is logical scalar   
+   >             WANTT = .true. if the quasi-triangular Schur factor   
+   >             is being computed.  WANTT is set to .false. otherwise.   
+   > \endverbatim   
+   >   
+   > \param[in] WANTZ   
+   > \verbatim   
+   >          WANTZ is logical scalar   
+   >             WANTZ = .true. if the orthogonal Schur factor is being   
+   >             computed.  WANTZ is set to .false. otherwise.   
+   > \endverbatim   
+   >   
+   > \param[in] KACC22   
+   > \verbatim   
+   >          KACC22 is integer with value 0, 1, or 2.   
+   >             Specifies the computation mode of far-from-diagonal   
+   >             orthogonal updates.   
+   >        = 0: DLAQR5 does not accumulate reflections and does not   
+   >             use matrix-matrix multiply to update far-from-diagonal   
+   >             matrix entries.   
+   >        = 1: DLAQR5 accumulates reflections and uses matrix-matrix   
+   >             multiply to update the far-from-diagonal matrix entries.   
+   >        = 2: DLAQR5 accumulates reflections, uses matrix-matrix   
+   >             multiply to update the far-from-diagonal matrix entries,   
+   >             and takes advantage of 2-by-2 block structure during   
+   >             matrix multiplies.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is integer scalar   
+   >             N is the order of the Hessenberg matrix H upon which this   
+   >             subroutine operates.   
+   > \endverbatim   
+   >   
+   > \param[in] KTOP   
+   > \verbatim   
+   >          KTOP is integer scalar   
+   > \endverbatim   
+   >   
+   > \param[in] KBOT   
+   > \verbatim   
+   >          KBOT is integer scalar   
+   >             These are the first and last rows and columns of an   
+   >             isolated diagonal block upon which the QR sweep is to be   
+   >             applied. It is assumed without a check that   
+   >                       either KTOP = 1  or   H(KTOP,KTOP-1) = 0   
+   >             and   
+   >                       either KBOT = N  or   H(KBOT+1,KBOT) = 0.   
+   > \endverbatim   
+   >   
+   > \param[in] NSHFTS   
+   > \verbatim   
+   >          NSHFTS is integer scalar   
+   >             NSHFTS gives the number of simultaneous shifts.  NSHFTS   
+   >             must be positive and even.   
+   > \endverbatim   
+   >   
+   > \param[in,out] SR   
+   > \verbatim   
+   >          SR is DOUBLE PRECISION array of size (NSHFTS)   
+   > \endverbatim   
+   >   
+   > \param[in,out] SI   
+   > \verbatim   
+   >          SI is DOUBLE PRECISION array of size (NSHFTS)   
+   >             SR contains the real parts and SI contains the imaginary   
+   >             parts of the NSHFTS shifts of origin that define the   
+   >             multi-shift QR sweep.  On output SR and SI may be   
+   >             reordered.   
+   > \endverbatim   
+   >   
+   > \param[in,out] H   
+   > \verbatim   
+   >          H is DOUBLE PRECISION array of size (LDH,N)   
+   >             On input H contains a Hessenberg matrix.  On output a   
+   >             multi-shift QR sweep with shifts SR(J)+i*SI(J) is applied   
+   >             to the isolated diagonal block in rows and columns KTOP   
+   >             through KBOT.   
+   > \endverbatim   
+   >   
+   > \param[in] LDH   
+   > \verbatim   
+   >          LDH is integer scalar   
+   >             LDH is the leading dimension of H just as declared in the   
+   >             calling procedure.  LDH.GE.MAX(1,N).   
+   > \endverbatim   
+   >   
+   > \param[in] ILOZ   
+   > \verbatim   
+   >          ILOZ is INTEGER   
+   > \endverbatim   
+   >   
+   > \param[in] IHIZ   
+   > \verbatim   
+   >          IHIZ is INTEGER   
+   >             Specify the rows of Z to which transformations must be   
+   >             applied if WANTZ is .TRUE.. 1 .LE. ILOZ .LE. IHIZ .LE. N   
+   > \endverbatim   
+   >   
+   > \param[in,out] Z   
+   > \verbatim   
+   >          Z is DOUBLE PRECISION array of size (LDZ,IHI)   
+   >             If WANTZ = .TRUE., then the QR Sweep orthogonal   
+   >             similarity transformation is accumulated into   
+   >             Z(ILOZ:IHIZ,ILO:IHI) from the right.   
+   >             If WANTZ = .FALSE., then Z is unreferenced.   
+   > \endverbatim   
+   >   
+   > \param[in] LDZ   
+   > \verbatim   
+   >          LDZ is integer scalar   
+   >             LDA is the leading dimension of Z just as declared in   
+   >             the calling procedure. LDZ.GE.N.   
+   > \endverbatim   
+   >   
+   > \param[out] V   
+   > \verbatim   
+   >          V is DOUBLE PRECISION array of size (LDV,NSHFTS/2)   
+   > \endverbatim   
+   >   
+   > \param[in] LDV   
+   > \verbatim   
+   >          LDV is integer scalar   
+   >             LDV is the leading dimension of V as declared in the   
+   >             calling procedure.  LDV.GE.3.   
+   > \endverbatim   
+   >   
+   > \param[out] U   
+   > \verbatim   
+   >          U is DOUBLE PRECISION array of size   
+   >             (LDU,3*NSHFTS-3)   
+   > \endverbatim   
+   >   
+   > \param[in] LDU   
+   > \verbatim   
+   >          LDU is integer scalar   
+   >             LDU is the leading dimension of U just as declared in the   
+   >             in the calling subroutine.  LDU.GE.3*NSHFTS-3.   
+   > \endverbatim   
+   >   
+   > \param[in] NH   
+   > \verbatim   
+   >          NH is integer scalar   
+   >             NH is the number of columns in array WH available for   
+   >             workspace. NH.GE.1.   
+   > \endverbatim   
+   >   
+   > \param[out] WH   
+   > \verbatim   
+   >          WH is DOUBLE PRECISION array of size (LDWH,NH)   
+   > \endverbatim   
+   >   
+   > \param[in] LDWH   
+   > \verbatim   
+   >          LDWH is integer scalar   
+   >             Leading dimension of WH just as declared in the   
+   >             calling procedure.  LDWH.GE.3*NSHFTS-3.   
+   > \endverbatim   
+   >   
+   > \param[in] NV   
+   > \verbatim   
+   >          NV is integer scalar   
+   >             NV is the number of rows in WV agailable for workspace.   
+   >             NV.GE.1.   
+   > \endverbatim   
+   >   
+   > \param[out] WV   
+   > \verbatim   
+   >          WV is DOUBLE PRECISION array of size   
+   >             (LDWV,3*NSHFTS-3)   
+   > \endverbatim   
+   >   
+   > \param[in] LDWV   
+   > \verbatim   
+   >          LDWV is integer scalar   
+   >             LDWV is the leading dimension of WV as declared in the   
+   >             in the calling subroutine.  LDWV.GE.NV.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup doubleOTHERauxiliary   
+
+   > \par Contributors:   
+    ==================   
+   >   
+   >       Karen Braman and Ralph Byers, Department of Mathematics,   
+   >       University of Kansas, USA   
+
+   > \par References:   
+    ================   
+   >   
+   >       K. Braman, R. Byers and R. Mathias, The Multi-Shift QR   
+   >       Algorithm Part I: Maintaining Well Focused Shifts, and Level 3   
+   >       Performance, SIAM Journal of Matrix Analysis, volume 23, pages   
+   >       929--947, 2002.   
+   >   
+    =====================================================================   
+   Subroutine */ int igraphdlaqr5_(logical *wantt, logical *wantz, integer *kacc22, 
 	integer *n, integer *ktop, integer *kbot, integer *nshfts, doublereal 
 	*sr, doublereal *si, doublereal *h__, integer *ldh, integer *iloz, 
 	integer *ihiz, doublereal *z__, integer *ldz, doublereal *v, integer *
@@ -70,133 +326,13 @@ static integer c__2 = 2;
     doublereal smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.3.0) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2010   
+       September 2012   
 
 
-       This auxiliary subroutine called by DLAQR0 performs a   
-       single small-bulge multi-shift QR sweep.   
-
-        WANTT  (input) logical scalar   
-               WANTT = .true. if the quasi-triangular Schur factor   
-               is being computed.  WANTT is set to .false. otherwise.   
-
-        WANTZ  (input) logical scalar   
-               WANTZ = .true. if the orthogonal Schur factor is being   
-               computed.  WANTZ is set to .false. otherwise.   
-
-        KACC22 (input) integer with value 0, 1, or 2.   
-               Specifies the computation mode of far-from-diagonal   
-               orthogonal updates.   
-          = 0: DLAQR5 does not accumulate reflections and does not   
-               use matrix-matrix multiply to update far-from-diagonal   
-               matrix entries.   
-          = 1: DLAQR5 accumulates reflections and uses matrix-matrix   
-               multiply to update the far-from-diagonal matrix entries.   
-          = 2: DLAQR5 accumulates reflections, uses matrix-matrix   
-               multiply to update the far-from-diagonal matrix entries,   
-               and takes advantage of 2-by-2 block structure during   
-               matrix multiplies.   
-
-        N      (input) integer scalar   
-               N is the order of the Hessenberg matrix H upon which this   
-               subroutine operates.   
-
-        KTOP   (input) integer scalar   
-        KBOT   (input) integer scalar   
-               These are the first and last rows and columns of an   
-               isolated diagonal block upon which the QR sweep is to be   
-               applied. It is assumed without a check that   
-                         either KTOP = 1  or   H(KTOP,KTOP-1) = 0   
-               and   
-                         either KBOT = N  or   H(KBOT+1,KBOT) = 0.   
-
-        NSHFTS (input) integer scalar   
-               NSHFTS gives the number of simultaneous shifts.  NSHFTS   
-               must be positive and even.   
-
-        SR     (input/output) DOUBLE PRECISION array of size (NSHFTS)   
-        SI     (input/output) DOUBLE PRECISION array of size (NSHFTS)   
-               SR contains the real parts and SI contains the imaginary   
-               parts of the NSHFTS shifts of origin that define the   
-               multi-shift QR sweep.  On output SR and SI may be   
-               reordered.   
-
-        H      (input/output) DOUBLE PRECISION array of size (LDH,N)   
-               On input H contains a Hessenberg matrix.  On output a   
-               multi-shift QR sweep with shifts SR(J)+i*SI(J) is applied   
-               to the isolated diagonal block in rows and columns KTOP   
-               through KBOT.   
-
-        LDH    (input) integer scalar   
-               LDH is the leading dimension of H just as declared in the   
-               calling procedure.  LDH.GE.MAX(1,N).   
-
-        ILOZ   (input) INTEGER   
-        IHIZ   (input) INTEGER   
-               Specify the rows of Z to which transformations must be   
-               applied if WANTZ is .TRUE.. 1 .LE. ILOZ .LE. IHIZ .LE. N   
-
-        Z      (input/output) DOUBLE PRECISION array of size (LDZ,IHI)   
-               If WANTZ = .TRUE., then the QR Sweep orthogonal   
-               similarity transformation is accumulated into   
-               Z(ILOZ:IHIZ,ILO:IHI) from the right.   
-               If WANTZ = .FALSE., then Z is unreferenced.   
-
-        LDZ    (input) integer scalar   
-               LDA is the leading dimension of Z just as declared in   
-               the calling procedure. LDZ.GE.N.   
-
-        V      (workspace) DOUBLE PRECISION array of size (LDV,NSHFTS/2)   
-
-        LDV    (input) integer scalar   
-               LDV is the leading dimension of V as declared in the   
-               calling procedure.  LDV.GE.3.   
-
-        U      (workspace) DOUBLE PRECISION array of size   
-               (LDU,3*NSHFTS-3)   
-
-        LDU    (input) integer scalar   
-               LDU is the leading dimension of U just as declared in the   
-               in the calling subroutine.  LDU.GE.3*NSHFTS-3.   
-
-        NH     (input) integer scalar   
-               NH is the number of columns in array WH available for   
-               workspace. NH.GE.1.   
-
-        WH     (workspace) DOUBLE PRECISION array of size (LDWH,NH)   
-
-        LDWH   (input) integer scalar   
-               Leading dimension of WH just as declared in the   
-               calling procedure.  LDWH.GE.3*NSHFTS-3.   
-
-        NV     (input) integer scalar   
-               NV is the number of rows in WV agailable for workspace.   
-               NV.GE.1.   
-
-        WV     (workspace) DOUBLE PRECISION array of size   
-               (LDWV,3*NSHFTS-3)   
-
-        LDWV   (input) integer scalar   
-               LDWV is the leading dimension of WV as declared in the   
-               in the calling subroutine.  LDWV.GE.NV.   
-
-       ================================================================   
-       Based on contributions by   
-          Karen Braman and Ralph Byers, Department of Mathematics,   
-          University of Kansas, USA   
-
-       ================================================================   
-       Reference:   
-
-       K. Braman, R. Byers and R. Mathias, The Multi-Shift QR   
-       Algorithm Part I: Maintaining Well Focused Shifts, and   
-       Level 3 Performance, SIAM Journal of Matrix Analysis,   
-       volume 23, pages 929--947, 2002.   
-
-       ================================================================   
+    ================================================================   
 
 
        ==== If there are no shifts, then there is nothing to do. ====   

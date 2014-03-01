@@ -16,12 +16,134 @@
 
 static integer c__1 = 1;
 
+/* > \brief \b DLANSY returns the value of the 1-norm, or the Frobenius norm, or the infinity norm, or the ele
+ment of largest absolute value of a real symmetric matrix.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLANSY + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlansy.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlansy.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlansy.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         DOUBLE PRECISION FUNCTION DLANSY( NORM, UPLO, N, A, LDA, WORK )   
+
+         CHARACTER          NORM, UPLO   
+         INTEGER            LDA, N   
+         DOUBLE PRECISION   A( LDA, * ), WORK( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLANSY  returns the value of the one norm,  or the Frobenius norm, or   
+   > the  infinity norm,  or the  element of  largest absolute value  of a   
+   > real symmetric matrix A.   
+   > \endverbatim   
+   >   
+   > \return DLANSY   
+   > \verbatim   
+   >   
+   >    DLANSY = ( max(abs(A(i,j))), NORM = 'M' or 'm'   
+   >             (   
+   >             ( norm1(A),         NORM = '1', 'O' or 'o'   
+   >             (   
+   >             ( normI(A),         NORM = 'I' or 'i'   
+   >             (   
+   >             ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
+   >   
+   > where  norm1  denotes the  one norm of a matrix (maximum column sum),   
+   > normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
+   > normF  denotes the  Frobenius norm of a matrix (square root of sum of   
+   > squares).  Note that  max(abs(A(i,j)))  is not a consistent matrix norm.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] NORM   
+   > \verbatim   
+   >          NORM is CHARACTER*1   
+   >          Specifies the value to be returned in DLANSY as described   
+   >          above.   
+   > \endverbatim   
+   >   
+   > \param[in] UPLO   
+   > \verbatim   
+   >          UPLO is CHARACTER*1   
+   >          Specifies whether the upper or lower triangular part of the   
+   >          symmetric matrix A is to be referenced.   
+   >          = 'U':  Upper triangular part of A is referenced   
+   >          = 'L':  Lower triangular part of A is referenced   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix A.  N >= 0.  When N = 0, DLANSY is   
+   >          set to zero.   
+   > \endverbatim   
+   >   
+   > \param[in] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension (LDA,N)   
+   >          The symmetric matrix A.  If UPLO = 'U', the leading n by n   
+   >          upper triangular part of A contains the upper triangular part   
+   >          of the matrix A, and the strictly lower triangular part of A   
+   >          is not referenced.  If UPLO = 'L', the leading n by n lower   
+   >          triangular part of A contains the lower triangular part of   
+   >          the matrix A, and the strictly upper triangular part of A is   
+   >          not referenced.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The leading dimension of the array A.  LDA >= max(N,1).   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension (MAX(1,LWORK)),   
+   >          where LWORK >= N when NORM = 'I' or '1' or 'O'; otherwise,   
+   >          WORK is not referenced.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup doubleSYauxiliary   
+
+    ===================================================================== */
 doublereal igraphdlansy_(char *norm, char *uplo, integer *n, doublereal *a, integer 
 	*lda, doublereal *work)
 {
     /* System generated locals */
     integer a_dim1, a_offset, i__1, i__2;
-    doublereal ret_val, d__1, d__2, d__3;
+    doublereal ret_val, d__1;
 
     /* Builtin functions */
     double sqrt(doublereal);
@@ -31,73 +153,16 @@ doublereal igraphdlansy_(char *norm, char *uplo, integer *n, doublereal *a, inte
     doublereal sum, absa, scale;
     extern logical igraphlsame_(char *, char *);
     doublereal value;
+    extern logical igraphdisnan_(doublereal *);
     extern /* Subroutine */ int igraphdlassq_(integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLANSY  returns the value of the one norm,  or the Frobenius norm, or   
-    the  infinity norm,  or the  element of  largest absolute value  of a   
-    real symmetric matrix A.   
-
-    Description   
-    ===========   
-
-    DLANSY returns the value   
-
-       DLANSY = ( max(abs(A(i,j))), NORM = 'M' or 'm'   
-                (   
-                ( norm1(A),         NORM = '1', 'O' or 'o'   
-                (   
-                ( normI(A),         NORM = 'I' or 'i'   
-                (   
-                ( normF(A),         NORM = 'F', 'f', 'E' or 'e'   
-
-    where  norm1  denotes the  one norm of a matrix (maximum column sum),   
-    normI  denotes the  infinity norm  of a matrix  (maximum row sum) and   
-    normF  denotes the  Frobenius norm of a matrix (square root of sum of   
-    squares).  Note that  max(abs(A(i,j)))  is not a consistent matrix norm.   
-
-    Arguments   
-    =========   
-
-    NORM    (input) CHARACTER*1   
-            Specifies the value to be returned in DLANSY as described   
-            above.   
-
-    UPLO    (input) CHARACTER*1   
-            Specifies whether the upper or lower triangular part of the   
-            symmetric matrix A is to be referenced.   
-            = 'U':  Upper triangular part of A is referenced   
-            = 'L':  Lower triangular part of A is referenced   
-
-    N       (input) INTEGER   
-            The order of the matrix A.  N >= 0.  When N = 0, DLANSY is   
-            set to zero.   
-
-    A       (input) DOUBLE PRECISION array, dimension (LDA,N)   
-            The symmetric matrix A.  If UPLO = 'U', the leading n by n   
-            upper triangular part of A contains the upper triangular part   
-            of the matrix A, and the strictly lower triangular part of A   
-            is not referenced.  If UPLO = 'L', the leading n by n lower   
-            triangular part of A contains the lower triangular part of   
-            the matrix A, and the strictly upper triangular part of A is   
-            not referenced.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(N,1).   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (MAX(1,LWORK)),   
-            where LWORK >= N when NORM = 'I' or '1' or 'O'; otherwise,   
-            WORK is not referenced.   
 
    =====================================================================   
 
@@ -121,10 +186,10 @@ doublereal igraphdlansy_(char *norm, char *uplo, integer *n, doublereal *a, inte
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = j;
 		for (i__ = 1; i__ <= i__2; ++i__) {
-/* Computing MAX */
-		    d__2 = value, d__3 = (d__1 = a[i__ + j * a_dim1], abs(
-			    d__1));
-		    value = max(d__2,d__3);
+		    sum = (d__1 = a[i__ + j * a_dim1], abs(d__1));
+		    if (value < sum || igraphdisnan_(&sum)) {
+			value = sum;
+		    }
 /* L10: */
 		}
 /* L20: */
@@ -134,10 +199,10 @@ doublereal igraphdlansy_(char *norm, char *uplo, integer *n, doublereal *a, inte
 	    for (j = 1; j <= i__1; ++j) {
 		i__2 = *n;
 		for (i__ = j; i__ <= i__2; ++i__) {
-/* Computing MAX */
-		    d__2 = value, d__3 = (d__1 = a[i__ + j * a_dim1], abs(
-			    d__1));
-		    value = max(d__2,d__3);
+		    sum = (d__1 = a[i__ + j * a_dim1], abs(d__1));
+		    if (value < sum || igraphdisnan_(&sum)) {
+			value = sum;
+		    }
 /* L30: */
 		}
 /* L40: */
@@ -164,9 +229,10 @@ doublereal igraphdlansy_(char *norm, char *uplo, integer *n, doublereal *a, inte
 	    }
 	    i__1 = *n;
 	    for (i__ = 1; i__ <= i__1; ++i__) {
-/* Computing MAX */
-		d__1 = value, d__2 = work[i__];
-		value = max(d__1,d__2);
+		sum = work[i__];
+		if (value < sum || igraphdisnan_(&sum)) {
+		    value = sum;
+		}
 /* L70: */
 	    }
 	} else {
@@ -185,7 +251,9 @@ doublereal igraphdlansy_(char *norm, char *uplo, integer *n, doublereal *a, inte
 		    work[i__] += absa;
 /* L90: */
 		}
-		value = max(value,sum);
+		if (value < sum || igraphdisnan_(&sum)) {
+		    value = sum;
+		}
 /* L100: */
 	    }
 	}

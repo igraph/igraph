@@ -21,7 +21,119 @@ static integer c__3 = 3;
 static integer c__4 = 4;
 static integer c__11 = 11;
 
-/* Subroutine */ int igraphdlasq2_(integer *n, doublereal *z__, integer *info)
+/* > \brief \b DLASQ2 computes all the eigenvalues of the symmetric positive definite tridiagonal matrix assoc
+iated with the qd Array Z to high relative accuracy. Used by sbdsqr and sstegr.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLASQ2 + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlasq2.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlasq2.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlasq2.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLASQ2( N, Z, INFO )   
+
+         INTEGER            INFO, N   
+         DOUBLE PRECISION   Z( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLASQ2 computes all the eigenvalues of the symmetric positive   
+   > definite tridiagonal matrix associated with the qd array Z to high   
+   > relative accuracy are computed to high relative accuracy, in the   
+   > absence of denormalization, underflow and overflow.   
+   >   
+   > To see the relation of Z to the tridiagonal matrix, let L be a   
+   > unit lower bidiagonal matrix with subdiagonals Z(2,4,6,,..) and   
+   > let U be an upper bidiagonal matrix with 1's above and diagonal   
+   > Z(1,3,5,,..). The tridiagonal is L*U or, if you prefer, the   
+   > symmetric tridiagonal to which it is similar.   
+   >   
+   > Note : DLASQ2 defines a logical variable, IEEE, which is true   
+   > on machines which follow ieee-754 floating-point standard in their   
+   > handling of infinities and NaNs, and false otherwise. This variable   
+   > is passed to DLASQ3.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >        The number of rows and columns in the matrix. N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in,out] Z   
+   > \verbatim   
+   >          Z is DOUBLE PRECISION array, dimension ( 4*N )   
+   >        On entry Z holds the qd array. On exit, entries 1 to N hold   
+   >        the eigenvalues in decreasing order, Z( 2*N+1 ) holds the   
+   >        trace, and Z( 2*N+2 ) holds the sum of the eigenvalues. If   
+   >        N > 2, then Z( 2*N+3 ) holds the iteration count, Z( 2*N+4 )   
+   >        holds NDIVS/NIN^2, and Z( 2*N+5 ) holds the percentage of   
+   >        shifts that failed.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >        = 0: successful exit   
+   >        < 0: if the i-th argument is a scalar and had an illegal   
+   >             value, then INFO = -i, if the i-th argument is an   
+   >             array and the j-entry had an illegal value, then   
+   >             INFO = -(i*100+j)   
+   >        > 0: the algorithm failed   
+   >              = 1, a split was marked by a positive value in E   
+   >              = 2, current block of Z not diagonalized after 100*N   
+   >                   iterations (in inner while loop).  On exit Z holds   
+   >                   a qd array with the same eigenvalues as the given Z.   
+   >              = 3, termination criterion of outer while loop not met   
+   >                   (program created more than N unreduced blocks)   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERcomputational   
+
+   > \par Further Details:   
+    =====================   
+   >   
+   > \verbatim   
+   >   
+   >  Local Variables: I0:N0 defines a current unreduced segment of Z.   
+   >  The shifts are accumulated in SIGMA. Iteration count is in ITER.   
+   >  Ping-pong is controlled by PP (alternates between 0 and 1).   
+   > \endverbatim   
+   >   
+    =====================================================================   
+   Subroutine */ int igraphdlasq2_(integer *n, doublereal *z__, integer *info)
 {
     /* System generated locals */
     integer i__1, i__2, i__3;
@@ -34,7 +146,7 @@ static integer c__11 = 11;
     doublereal d__, e, g;
     integer k;
     doublereal s, t;
-    integer i0, i4, n0;
+    integer i0, i1, i4, n0, n1;
     doublereal dn;
     integer pp;
     doublereal dn1, dn2, dee, eps, tau, tol;
@@ -49,7 +161,9 @@ static integer c__11 = 11;
     doublereal dmin1, dmin2;
     integer nfail;
     doublereal desig, trace, sigma;
-    integer iinfo, ttype;
+    integer iinfo;
+    doublereal tempe, tempq;
+    integer ttype;
     extern /* Subroutine */ int igraphdlasq3_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
 	     integer *, integer *, integer *, logical *, integer *, 
@@ -66,68 +180,11 @@ static integer c__11 = 11;
 	    integer *);
 
 
-/*  -- LAPACK routine (version 3.2)                                    --   
-
-    -- Contributed by Osni Marques of the Lawrence Berkeley National   --   
-    -- Laboratory and Beresford Parlett of the Univ. of California at  --   
-    -- Berkeley                                                        --   
-    -- November 2008                                                   --   
-
+/*  -- LAPACK computational routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLASQ2 computes all the eigenvalues of the symmetric positive   
-    definite tridiagonal matrix associated with the qd array Z to high   
-    relative accuracy are computed to high relative accuracy, in the   
-    absence of denormalization, underflow and overflow.   
-
-    To see the relation of Z to the tridiagonal matrix, let L be a   
-    unit lower bidiagonal matrix with subdiagonals Z(2,4,6,,..) and   
-    let U be an upper bidiagonal matrix with 1's above and diagonal   
-    Z(1,3,5,,..). The tridiagonal is L*U or, if you prefer, the   
-    symmetric tridiagonal to which it is similar.   
-
-    Note : DLASQ2 defines a logical variable, IEEE, which is true   
-    on machines which follow ieee-754 floating-point standard in their   
-    handling of infinities and NaNs, and false otherwise. This variable   
-    is passed to DLASQ3.   
-
-    Arguments   
-    =========   
-
-    N     (input) INTEGER   
-          The number of rows and columns in the matrix. N >= 0.   
-
-    Z     (input/output) DOUBLE PRECISION array, dimension ( 4*N )   
-          On entry Z holds the qd array. On exit, entries 1 to N hold   
-          the eigenvalues in decreasing order, Z( 2*N+1 ) holds the   
-          trace, and Z( 2*N+2 ) holds the sum of the eigenvalues. If   
-          N > 2, then Z( 2*N+3 ) holds the iteration count, Z( 2*N+4 )   
-          holds NDIVS/NIN^2, and Z( 2*N+5 ) holds the percentage of   
-          shifts that failed.   
-
-    INFO  (output) INTEGER   
-          = 0: successful exit   
-          < 0: if the i-th argument is a scalar and had an illegal   
-               value, then INFO = -i, if the i-th argument is an   
-               array and the j-entry had an illegal value, then   
-               INFO = -(i*100+j)   
-          > 0: the algorithm failed   
-                = 1, a split was marked by a positive value in E   
-                = 2, current block of Z not diagonalized after 30*N   
-                     iterations (in inner while loop)   
-                = 3, termination criterion of outer while loop not met   
-                     (program created more than N unreduced blocks)   
-
-    Further Details   
-    ===============   
-    Local Variables: I0:N0 defines a current unreduced segment of Z.   
-    The shifts are accumulated in SIGMA. Iteration count is in ITER.   
-    Ping-pong is controlled by PP (alternates between 0 and 1).   
 
     =====================================================================   
 
@@ -480,7 +537,7 @@ L100:
                  and that the tests for deflation upon entry in DLASQ3   
                  should not be performed. */
 
-	nbig = (n0 - i0 + 1) * 30;
+	nbig = (n0 - i0 + 1) * 100;
 	i__2 = nbig;
 	for (iwhilb = 1; iwhilb <= i__2; ++iwhilb) {
 	    if (i0 > n0) {
@@ -536,6 +593,49 @@ L100:
 	}
 
 	*info = 2;
+
+/*        Maximum number of iterations exceeded, restore the shift   
+          SIGMA and place the new d's and e's in a qd array.   
+          This might need to be done for several blocks */
+
+	i1 = i0;
+	n1 = n0;
+L145:
+	tempq = z__[(i0 << 2) - 3];
+	z__[(i0 << 2) - 3] += sigma;
+	i__2 = n0;
+	for (k = i0 + 1; k <= i__2; ++k) {
+	    tempe = z__[(k << 2) - 5];
+	    z__[(k << 2) - 5] *= tempq / z__[(k << 2) - 7];
+	    tempq = z__[(k << 2) - 3];
+	    z__[(k << 2) - 3] = z__[(k << 2) - 3] + sigma + tempe - z__[(k << 
+		    2) - 5];
+	}
+
+/*        Prepare to do this on the previous block if there is one */
+
+	if (i1 > 1) {
+	    n1 = i1 - 1;
+	    while(i1 >= 2 && z__[(i1 << 2) - 5] >= 0.) {
+		--i1;
+	    }
+	    sigma = -z__[(n1 << 2) - 1];
+	    goto L145;
+	}
+	i__2 = *n;
+	for (k = 1; k <= i__2; ++k) {
+	    z__[(k << 1) - 1] = z__[(k << 2) - 3];
+
+/*        Only the block 1..N0 is unfinished.  The rest of the e's   
+          must be essentially zero, although sometimes other data   
+          has been stored in them. */
+
+	    if (k < n0) {
+		z__[k * 2] = z__[(k << 2) - 1];
+	    } else {
+		z__[k * 2] = 0.;
+	    }
+	}
 	return 0;
 
 /*        end IWHILB */

@@ -12,7 +12,186 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int igraphdlasq3_(integer *i0, integer *n0, doublereal *z__, 
+/* > \brief \b DLASQ3 checks for deflation, computes a shift and calls dqds. Used by sbdsqr.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLASQ3 + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlasq3.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlasq3.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlasq3.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLASQ3( I0, N0, Z, PP, DMIN, SIGMA, DESIG, QMAX, NFAIL,   
+                            ITER, NDIV, IEEE, TTYPE, DMIN1, DMIN2, DN, DN1,   
+                            DN2, G, TAU )   
+
+         LOGICAL            IEEE   
+         INTEGER            I0, ITER, N0, NDIV, NFAIL, PP   
+         DOUBLE PRECISION   DESIG, DMIN, DMIN1, DMIN2, DN, DN1, DN2, G,   
+        $                   QMAX, SIGMA, TAU   
+         DOUBLE PRECISION   Z( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLASQ3 checks for deflation, computes a shift (TAU) and calls dqds.   
+   > In case of failure it changes shifts, and tries again until output   
+   > is positive.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] I0   
+   > \verbatim   
+   >          I0 is INTEGER   
+   >         First index.   
+   > \endverbatim   
+   >   
+   > \param[in,out] N0   
+   > \verbatim   
+   >          N0 is INTEGER   
+   >         Last index.   
+   > \endverbatim   
+   >   
+   > \param[in] Z   
+   > \verbatim   
+   >          Z is DOUBLE PRECISION array, dimension ( 4*N )   
+   >         Z holds the qd array.   
+   > \endverbatim   
+   >   
+   > \param[in,out] PP   
+   > \verbatim   
+   >          PP is INTEGER   
+   >         PP=0 for ping, PP=1 for pong.   
+   >         PP=2 indicates that flipping was applied to the Z array   
+   >         and that the initial tests for deflation should not be   
+   >         performed.   
+   > \endverbatim   
+   >   
+   > \param[out] DMIN   
+   > \verbatim   
+   >          DMIN is DOUBLE PRECISION   
+   >         Minimum value of d.   
+   > \endverbatim   
+   >   
+   > \param[out] SIGMA   
+   > \verbatim   
+   >          SIGMA is DOUBLE PRECISION   
+   >         Sum of shifts used in current segment.   
+   > \endverbatim   
+   >   
+   > \param[in,out] DESIG   
+   > \verbatim   
+   >          DESIG is DOUBLE PRECISION   
+   >         Lower order part of SIGMA   
+   > \endverbatim   
+   >   
+   > \param[in] QMAX   
+   > \verbatim   
+   >          QMAX is DOUBLE PRECISION   
+   >         Maximum value of q.   
+   > \endverbatim   
+   >   
+   > \param[out] NFAIL   
+   > \verbatim   
+   >          NFAIL is INTEGER   
+   >         Number of times shift was too big.   
+   > \endverbatim   
+   >   
+   > \param[out] ITER   
+   > \verbatim   
+   >          ITER is INTEGER   
+   >         Number of iterations.   
+   > \endverbatim   
+   >   
+   > \param[out] NDIV   
+   > \verbatim   
+   >          NDIV is INTEGER   
+   >         Number of divisions.   
+   > \endverbatim   
+   >   
+   > \param[in] IEEE   
+   > \verbatim   
+   >          IEEE is LOGICAL   
+   >         Flag for IEEE or non IEEE arithmetic (passed to DLASQ5).   
+   > \endverbatim   
+   >   
+   > \param[in,out] TTYPE   
+   > \verbatim   
+   >          TTYPE is INTEGER   
+   >         Shift type.   
+   > \endverbatim   
+   >   
+   > \param[in,out] DMIN1   
+   > \verbatim   
+   >          DMIN1 is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in,out] DMIN2   
+   > \verbatim   
+   >          DMIN2 is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in,out] DN   
+   > \verbatim   
+   >          DN is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in,out] DN1   
+   > \verbatim   
+   >          DN1 is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in,out] DN2   
+   > \verbatim   
+   >          DN2 is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in,out] G   
+   > \verbatim   
+   >          G is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in,out] TAU   
+   > \verbatim   
+   >          TAU is DOUBLE PRECISION   
+   >   
+   >         These are passed as arguments in order to save their values   
+   >         between calls to DLASQ3.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERcomputational   
+
+    =====================================================================   
+   Subroutine */ int igraphdlasq3_(integer *i0, integer *n0, doublereal *z__, 
 	integer *pp, doublereal *dmin__, doublereal *sigma, doublereal *desig,
 	 doublereal *qmax, integer *nfail, integer *iter, integer *ndiv, 
 	logical *ieee, integer *ttype, doublereal *dmin1, doublereal *dmin2, 
@@ -37,93 +216,19 @@
 	    doublereal *, doublereal *, doublereal *, doublereal *, integer *,
 	     doublereal *), igraphdlasq5_(integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
-	     doublereal *, doublereal *, doublereal *, logical *), igraphdlasq6_(
-	    integer *, integer *, doublereal *, integer *, doublereal *, 
-	    doublereal *, doublereal *, doublereal *, doublereal *, 
-	    doublereal *);
+	     doublereal *, doublereal *, doublereal *, doublereal *, logical *
+	    , doublereal *), igraphdlasq6_(integer *, integer *, doublereal *, 
+	    integer *, doublereal *, doublereal *, doublereal *, doublereal *,
+	     doublereal *, doublereal *);
     extern doublereal igraphdlamch_(char *);
     extern logical igraphdisnan_(doublereal *);
 
 
-/*  -- LAPACK routine (version 3.2.2)                                    --   
-
-    -- Contributed by Osni Marques of the Lawrence Berkeley National   --   
-    -- Laboratory and Beresford Parlett of the Univ. of California at  --   
-    -- Berkeley                                                        --   
-    -- June 2010                                                       --   
-
+/*  -- LAPACK computational routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLASQ3 checks for deflation, computes a shift (TAU) and calls dqds.   
-    In case of failure it changes shifts, and tries again until output   
-    is positive.   
-
-    Arguments   
-    =========   
-
-    I0     (input) INTEGER   
-           First index.   
-
-    N0     (input/output) INTEGER   
-           Last index.   
-
-    Z      (input) DOUBLE PRECISION array, dimension ( 4*N )   
-           Z holds the qd array.   
-
-    PP     (input/output) INTEGER   
-           PP=0 for ping, PP=1 for pong.   
-           PP=2 indicates that flipping was applied to the Z array   
-           and that the initial tests for deflation should not be   
-           performed.   
-
-    DMIN   (output) DOUBLE PRECISION   
-           Minimum value of d.   
-
-    SIGMA  (output) DOUBLE PRECISION   
-           Sum of shifts used in current segment.   
-
-    DESIG  (input/output) DOUBLE PRECISION   
-           Lower order part of SIGMA   
-
-    QMAX   (input) DOUBLE PRECISION   
-           Maximum value of q.   
-
-    NFAIL  (output) INTEGER   
-           Number of times shift was too big.   
-
-    ITER   (output) INTEGER   
-           Number of iterations.   
-
-    NDIV   (output) INTEGER   
-           Number of divisions.   
-
-    IEEE   (input) LOGICAL   
-           Flag for IEEE or non IEEE arithmetic (passed to DLASQ5).   
-
-    TTYPE  (input/output) INTEGER   
-           Shift type.   
-
-    DMIN1  (input/output) DOUBLE PRECISION   
-
-    DMIN2  (input/output) DOUBLE PRECISION   
-
-    DN     (input/output) DOUBLE PRECISION   
-
-    DN1    (input/output) DOUBLE PRECISION   
-
-    DN2    (input/output) DOUBLE PRECISION   
-
-    G      (input/output) DOUBLE PRECISION   
-
-    TAU    (input/output) DOUBLE PRECISION   
-
-           These are passed as arguments in order to save their values   
-           between calls to DLASQ3.   
 
     =====================================================================   
 
@@ -183,8 +288,8 @@ L40:
 	z__[nn - 3] = z__[nn - 7];
 	z__[nn - 7] = s;
     }
-    if (z__[nn - 5] > z__[nn - 3] * tol2) {
-	t = (z__[nn - 7] - z__[nn - 3] + z__[nn - 5]) * .5;
+    t = (z__[nn - 7] - z__[nn - 3] + z__[nn - 5]) * .5;
+    if (z__[nn - 5] > z__[nn - 3] * tol2 && t != 0.) {
 	s = z__[nn - 3] * (z__[nn - 5] / t);
 	if (s <= t) {
 	    s = z__[nn - 3] * (z__[nn - 5] / (t * (sqrt(s / t + 1.) + 1.)));
@@ -258,15 +363,15 @@ L50:
 
 L70:
 
-    igraphdlasq5_(i0, n0, &z__[1], pp, tau, dmin__, dmin1, dmin2, dn, dn1, dn2, 
-	    ieee);
+    igraphdlasq5_(i0, n0, &z__[1], pp, tau, sigma, dmin__, dmin1, dmin2, dn, dn1, 
+	    dn2, ieee, &eps);
 
     *ndiv += *n0 - *i0 + 2;
     ++(*iter);
 
 /*     Check status. */
 
-    if (*dmin__ >= 0. && *dmin1 > 0.) {
+    if (*dmin__ >= 0. && *dmin1 >= 0.) {
 
 /*        Success. */
 

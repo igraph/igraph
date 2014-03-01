@@ -21,7 +21,169 @@ static doublereal c_b26 = 1.;
 static doublereal c_b30 = 0.;
 static logical c_true = TRUE_;
 
-/* Subroutine */ int igraphdtrsyl_(char *trana, char *tranb, integer *isgn, integer 
+/* > \brief \b DTRSYL   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DTRSYL + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dtrsyl.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dtrsyl.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dtrsyl.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DTRSYL( TRANA, TRANB, ISGN, M, N, A, LDA, B, LDB, C,   
+                            LDC, SCALE, INFO )   
+
+         CHARACTER          TRANA, TRANB   
+         INTEGER            INFO, ISGN, LDA, LDB, LDC, M, N   
+         DOUBLE PRECISION   SCALE   
+         DOUBLE PRECISION   A( LDA, * ), B( LDB, * ), C( LDC, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DTRSYL solves the real Sylvester matrix equation:   
+   >   
+   >    op(A)*X + X*op(B) = scale*C or   
+   >    op(A)*X - X*op(B) = scale*C,   
+   >   
+   > where op(A) = A or A**T, and  A and B are both upper quasi-   
+   > triangular. A is M-by-M and B is N-by-N; the right hand side C and   
+   > the solution X are M-by-N; and scale is an output scale factor, set   
+   > <= 1 to avoid overflow in X.   
+   >   
+   > A and B must be in Schur canonical form (as returned by DHSEQR), that   
+   > is, block upper triangular with 1-by-1 and 2-by-2 diagonal blocks;   
+   > each 2-by-2 diagonal block has its diagonal elements equal and its   
+   > off-diagonal elements of opposite sign.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] TRANA   
+   > \verbatim   
+   >          TRANA is CHARACTER*1   
+   >          Specifies the option op(A):   
+   >          = 'N': op(A) = A    (No transpose)   
+   >          = 'T': op(A) = A**T (Transpose)   
+   >          = 'C': op(A) = A**H (Conjugate transpose = Transpose)   
+   > \endverbatim   
+   >   
+   > \param[in] TRANB   
+   > \verbatim   
+   >          TRANB is CHARACTER*1   
+   >          Specifies the option op(B):   
+   >          = 'N': op(B) = B    (No transpose)   
+   >          = 'T': op(B) = B**T (Transpose)   
+   >          = 'C': op(B) = B**H (Conjugate transpose = Transpose)   
+   > \endverbatim   
+   >   
+   > \param[in] ISGN   
+   > \verbatim   
+   >          ISGN is INTEGER   
+   >          Specifies the sign in the equation:   
+   >          = +1: solve op(A)*X + X*op(B) = scale*C   
+   >          = -1: solve op(A)*X - X*op(B) = scale*C   
+   > \endverbatim   
+   >   
+   > \param[in] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >          The order of the matrix A, and the number of rows in the   
+   >          matrices X and C. M >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix B, and the number of columns in the   
+   >          matrices X and C. N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension (LDA,M)   
+   >          The upper quasi-triangular matrix A, in Schur canonical form.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The leading dimension of the array A. LDA >= max(1,M).   
+   > \endverbatim   
+   >   
+   > \param[in] B   
+   > \verbatim   
+   >          B is DOUBLE PRECISION array, dimension (LDB,N)   
+   >          The upper quasi-triangular matrix B, in Schur canonical form.   
+   > \endverbatim   
+   >   
+   > \param[in] LDB   
+   > \verbatim   
+   >          LDB is INTEGER   
+   >          The leading dimension of the array B. LDB >= max(1,N).   
+   > \endverbatim   
+   >   
+   > \param[in,out] C   
+   > \verbatim   
+   >          C is DOUBLE PRECISION array, dimension (LDC,N)   
+   >          On entry, the M-by-N right hand side matrix C.   
+   >          On exit, C is overwritten by the solution matrix X.   
+   > \endverbatim   
+   >   
+   > \param[in] LDC   
+   > \verbatim   
+   >          LDC is INTEGER   
+   >          The leading dimension of the array C. LDC >= max(1,M)   
+   > \endverbatim   
+   >   
+   > \param[out] SCALE   
+   > \verbatim   
+   >          SCALE is DOUBLE PRECISION   
+   >          The scale factor, scale, set <= 1 to avoid overflow in X.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          = 0: successful exit   
+   >          < 0: if INFO = -i, the i-th argument had an illegal value   
+   >          = 1: A and B have common or very close eigenvalues; perturbed   
+   >               values were used to solve the equation (but the matrices   
+   >               A and B are unchanged).   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2011   
+
+   > \ingroup doubleSYcomputational   
+
+    =====================================================================   
+   Subroutine */ int igraphdtrsyl_(char *trana, char *tranb, integer *isgn, integer 
 	*m, integer *n, doublereal *a, integer *lda, doublereal *b, integer *
 	ldb, doublereal *c__, integer *ldc, doublereal *scale, integer *info)
 {
@@ -61,86 +223,11 @@ static logical c_true = TRUE_;
     doublereal smlnum;
 
 
-/*  -- LAPACK routine (version 3.3.1) --   
+/*  -- LAPACK computational routine (version 3.4.0) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-    -- April 2011                                                      --   
+       November 2011   
 
-
-    Purpose   
-    =======   
-
-    DTRSYL solves the real Sylvester matrix equation:   
-
-       op(A)*X + X*op(B) = scale*C or   
-       op(A)*X - X*op(B) = scale*C,   
-
-    where op(A) = A or A**T, and  A and B are both upper quasi-   
-    triangular. A is M-by-M and B is N-by-N; the right hand side C and   
-    the solution X are M-by-N; and scale is an output scale factor, set   
-    <= 1 to avoid overflow in X.   
-
-    A and B must be in Schur canonical form (as returned by DHSEQR), that   
-    is, block upper triangular with 1-by-1 and 2-by-2 diagonal blocks;   
-    each 2-by-2 diagonal block has its diagonal elements equal and its   
-    off-diagonal elements of opposite sign.   
-
-    Arguments   
-    =========   
-
-    TRANA   (input) CHARACTER*1   
-            Specifies the option op(A):   
-            = 'N': op(A) = A    (No transpose)   
-            = 'T': op(A) = A**T (Transpose)   
-            = 'C': op(A) = A**H (Conjugate transpose = Transpose)   
-
-    TRANB   (input) CHARACTER*1   
-            Specifies the option op(B):   
-            = 'N': op(B) = B    (No transpose)   
-            = 'T': op(B) = B**T (Transpose)   
-            = 'C': op(B) = B**H (Conjugate transpose = Transpose)   
-
-    ISGN    (input) INTEGER   
-            Specifies the sign in the equation:   
-            = +1: solve op(A)*X + X*op(B) = scale*C   
-            = -1: solve op(A)*X - X*op(B) = scale*C   
-
-    M       (input) INTEGER   
-            The order of the matrix A, and the number of rows in the   
-            matrices X and C. M >= 0.   
-
-    N       (input) INTEGER   
-            The order of the matrix B, and the number of columns in the   
-            matrices X and C. N >= 0.   
-
-    A       (input) DOUBLE PRECISION array, dimension (LDA,M)   
-            The upper quasi-triangular matrix A, in Schur canonical form.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A. LDA >= max(1,M).   
-
-    B       (input) DOUBLE PRECISION array, dimension (LDB,N)   
-            The upper quasi-triangular matrix B, in Schur canonical form.   
-
-    LDB     (input) INTEGER   
-            The leading dimension of the array B. LDB >= max(1,N).   
-
-    C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
-            On entry, the M-by-N right hand side matrix C.   
-            On exit, C is overwritten by the solution matrix X.   
-
-    LDC     (input) INTEGER   
-            The leading dimension of the array C. LDC >= max(1,M)   
-
-    SCALE   (output) DOUBLE PRECISION   
-            The scale factor, scale, set <= 1 to avoid overflow in X.   
-
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
-            = 1: A and B have common or very close eigenvalues; perturbed   
-                 values were used to solve the equation (but the matrices   
-                 A and B are unchanged).   
 
     =====================================================================   
 
@@ -492,7 +579,7 @@ L60:
             A(K,K)**T*X(K,L) + ISGN*X(K,L)*B(L,L) = C(K,L) - R(K,L)   
 
           Where   
-                     K-1                          L-1   
+                     K-1        T                    L-1   
             R(K,L) = SUM [A(I,K)**T*X(I,L)] +ISGN*SUM [X(K,J)*B(J,L)]   
                      I=1                          J=1   
 

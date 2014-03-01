@@ -247,12 +247,12 @@ static integer c__2 = 2;
 	    , integer *, char *, ftnlen), igraphdgetv0_(integer *, char *, integer *
 	    , logical *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    integer msaup2=0;
+    integer msaup2;
     real tsaup2;
     extern doublereal igraphdlamch_(char *);
     integer nevbef;
     extern /* Subroutine */ int igraphsecond_(real *);
-    integer logfil=0, ndigit;
+    integer logfil, ndigit;
     extern /* Subroutine */ int igraphdseigt_(doublereal *, integer *, doublereal *,
 	     integer *, doublereal *, doublereal *, doublereal *, integer *);
     IGRAPH_F77_SAVE logical update;

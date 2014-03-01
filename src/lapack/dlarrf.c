@@ -16,7 +16,197 @@
 
 static integer c__1 = 1;
 
-/* Subroutine */ int igraphdlarrf_(integer *n, doublereal *d__, doublereal *l, 
+/* > \brief \b DLARRF finds a new relatively robust representation such that at least one of the eigenvalues i
+s relatively isolated.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLARRF + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlarrf.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlarrf.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlarrf.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLARRF( N, D, L, LD, CLSTRT, CLEND,   
+                            W, WGAP, WERR,   
+                            SPDIAM, CLGAPL, CLGAPR, PIVMIN, SIGMA,   
+                            DPLUS, LPLUS, WORK, INFO )   
+
+         INTEGER            CLSTRT, CLEND, INFO, N   
+         DOUBLE PRECISION   CLGAPL, CLGAPR, PIVMIN, SIGMA, SPDIAM   
+         DOUBLE PRECISION   D( * ), DPLUS( * ), L( * ), LD( * ),   
+        $          LPLUS( * ), W( * ), WGAP( * ), WERR( * ), WORK( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > Given the initial representation L D L^T and its cluster of close   
+   > eigenvalues (in a relative measure), W( CLSTRT ), W( CLSTRT+1 ), ...   
+   > W( CLEND ), DLARRF finds a new relatively robust representation   
+   > L D L^T - SIGMA I = L(+) D(+) L(+)^T such that at least one of the   
+   > eigenvalues of L(+) D(+) L(+)^T is relatively isolated.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix (subblock, if the matrix splitted).   
+   > \endverbatim   
+   >   
+   > \param[in] D   
+   > \verbatim   
+   >          D is DOUBLE PRECISION array, dimension (N)   
+   >          The N diagonal elements of the diagonal matrix D.   
+   > \endverbatim   
+   >   
+   > \param[in] L   
+   > \verbatim   
+   >          L is DOUBLE PRECISION array, dimension (N-1)   
+   >          The (N-1) subdiagonal elements of the unit bidiagonal   
+   >          matrix L.   
+   > \endverbatim   
+   >   
+   > \param[in] LD   
+   > \verbatim   
+   >          LD is DOUBLE PRECISION array, dimension (N-1)   
+   >          The (N-1) elements L(i)*D(i).   
+   > \endverbatim   
+   >   
+   > \param[in] CLSTRT   
+   > \verbatim   
+   >          CLSTRT is INTEGER   
+   >          The index of the first eigenvalue in the cluster.   
+   > \endverbatim   
+   >   
+   > \param[in] CLEND   
+   > \verbatim   
+   >          CLEND is INTEGER   
+   >          The index of the last eigenvalue in the cluster.   
+   > \endverbatim   
+   >   
+   > \param[in] W   
+   > \verbatim   
+   >          W is DOUBLE PRECISION array, dimension   
+   >          dimension is >=  (CLEND-CLSTRT+1)   
+   >          The eigenvalue APPROXIMATIONS of L D L^T in ascending order.   
+   >          W( CLSTRT ) through W( CLEND ) form the cluster of relatively   
+   >          close eigenalues.   
+   > \endverbatim   
+   >   
+   > \param[in,out] WGAP   
+   > \verbatim   
+   >          WGAP is DOUBLE PRECISION array, dimension   
+   >          dimension is >=  (CLEND-CLSTRT+1)   
+   >          The separation from the right neighbor eigenvalue in W.   
+   > \endverbatim   
+   >   
+   > \param[in] WERR   
+   > \verbatim   
+   >          WERR is DOUBLE PRECISION array, dimension   
+   >          dimension is  >=  (CLEND-CLSTRT+1)   
+   >          WERR contain the semiwidth of the uncertainty   
+   >          interval of the corresponding eigenvalue APPROXIMATION in W   
+   > \endverbatim   
+   >   
+   > \param[in] SPDIAM   
+   > \verbatim   
+   >          SPDIAM is DOUBLE PRECISION   
+   >          estimate of the spectral diameter obtained from the   
+   >          Gerschgorin intervals   
+   > \endverbatim   
+   >   
+   > \param[in] CLGAPL   
+   > \verbatim   
+   >          CLGAPL is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in] CLGAPR   
+   > \verbatim   
+   >          CLGAPR is DOUBLE PRECISION   
+   >          absolute gap on each end of the cluster.   
+   >          Set by the calling routine to protect against shifts too close   
+   >          to eigenvalues outside the cluster.   
+   > \endverbatim   
+   >   
+   > \param[in] PIVMIN   
+   > \verbatim   
+   >          PIVMIN is DOUBLE PRECISION   
+   >          The minimum pivot allowed in the Sturm sequence.   
+   > \endverbatim   
+   >   
+   > \param[out] SIGMA   
+   > \verbatim   
+   >          SIGMA is DOUBLE PRECISION   
+   >          The shift used to form L(+) D(+) L(+)^T.   
+   > \endverbatim   
+   >   
+   > \param[out] DPLUS   
+   > \verbatim   
+   >          DPLUS is DOUBLE PRECISION array, dimension (N)   
+   >          The N diagonal elements of the diagonal matrix D(+).   
+   > \endverbatim   
+   >   
+   > \param[out] LPLUS   
+   > \verbatim   
+   >          LPLUS is DOUBLE PRECISION array, dimension (N-1)   
+   >          The first (N-1) elements of LPLUS contain the subdiagonal   
+   >          elements of the unit bidiagonal matrix L(+).   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension (2*N)   
+   >          Workspace.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          Signals processing OK (=0) or failure (=1)   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERauxiliary   
+
+   > \par Contributors:   
+    ==================   
+   >   
+   > Beresford Parlett, University of California, Berkeley, USA \n   
+   > Jim Demmel, University of California, Berkeley, USA \n   
+   > Inderjit Dhillon, University of Texas, Austin, USA \n   
+   > Osni Marques, LBNL/NERSC, USA \n   
+   > Christof Voemel, University of California, Berkeley, USA   
+
+    =====================================================================   
+   Subroutine */ int igraphdlarrf_(integer *n, doublereal *d__, doublereal *l, 
 	doublereal *ld, integer *clstrt, integer *clend, doublereal *w, 
 	doublereal *wgap, doublereal *werr, doublereal *spdiam, doublereal *
 	clgapl, doublereal *clgapr, doublereal *pivmin, doublereal *sigma, 
@@ -51,97 +241,11 @@ static integer c__1 = 1;
     logical sawnan1, sawnan2, tryrrr1;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.2) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       June 2010   
-   *   
+       September 2012   
 
-    Purpose   
-    =======   
-
-    Given the initial representation L D L^T and its cluster of close   
-    eigenvalues (in a relative measure), W( CLSTRT ), W( CLSTRT+1 ), ...   
-    W( CLEND ), DLARRF finds a new relatively robust representation   
-    L D L^T - SIGMA I = L(+) D(+) L(+)^T such that at least one of the   
-    eigenvalues of L(+) D(+) L(+)^T is relatively isolated.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the matrix (subblock, if the matrix splitted).   
-
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The N diagonal elements of the diagonal matrix D.   
-
-    L       (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (N-1) subdiagonal elements of the unit bidiagonal   
-            matrix L.   
-
-    LD      (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (N-1) elements L(i)*D(i).   
-
-    CLSTRT  (input) INTEGER   
-            The index of the first eigenvalue in the cluster.   
-
-    CLEND   (input) INTEGER   
-            The index of the last eigenvalue in the cluster.   
-
-    W       (input) DOUBLE PRECISION array, dimension   
-            dimension is >=  (CLEND-CLSTRT+1)   
-            The eigenvalue APPROXIMATIONS of L D L^T in ascending order.   
-            W( CLSTRT ) through W( CLEND ) form the cluster of relatively   
-            close eigenalues.   
-
-    WGAP    (input/output) DOUBLE PRECISION array, dimension   
-            dimension is >=  (CLEND-CLSTRT+1)   
-            The separation from the right neighbor eigenvalue in W.   
-
-    WERR    (input) DOUBLE PRECISION array, dimension   
-            dimension is  >=  (CLEND-CLSTRT+1)   
-            WERR contain the semiwidth of the uncertainty   
-            interval of the corresponding eigenvalue APPROXIMATION in W   
-
-    SPDIAM  (input) DOUBLE PRECISION   
-            estimate of the spectral diameter obtained from the   
-            Gerschgorin intervals   
-
-    CLGAPL  (input) DOUBLE PRECISION   
-
-    CLGAPR  (input) DOUBLE PRECISION   
-            absolute gap on each end of the cluster.   
-            Set by the calling routine to protect against shifts too close   
-            to eigenvalues outside the cluster.   
-
-    PIVMIN  (input) DOUBLE PRECISION   
-            The minimum pivot allowed in the Sturm sequence.   
-
-    SIGMA   (output) DOUBLE PRECISION   
-            The shift used to form L(+) D(+) L(+)^T.   
-
-    DPLUS   (output) DOUBLE PRECISION array, dimension (N)   
-            The N diagonal elements of the diagonal matrix D(+).   
-
-    LPLUS   (output) DOUBLE PRECISION array, dimension (N-1)   
-            The first (N-1) elements of LPLUS contain the subdiagonal   
-            elements of the unit bidiagonal matrix L(+).   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (2*N)   
-            Workspace.   
-
-    INFO    (output) INTEGER   
-            Signals processing OK (=0) or failure (=1)   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-       Beresford Parlett, University of California, Berkeley, USA   
-       Jim Demmel, University of California, Berkeley, USA   
-       Inderjit Dhillon, University of Texas, Austin, USA   
-       Osni Marques, LBNL/NERSC, USA   
-       Christof Voemel, University of California, Berkeley, USA   
 
     =====================================================================   
 

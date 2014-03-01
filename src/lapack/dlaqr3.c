@@ -21,7 +21,281 @@ static doublereal c_b17 = 0.;
 static doublereal c_b18 = 1.;
 static integer c__12 = 12;
 
-/* Subroutine */ int igraphdlaqr3_(logical *wantt, logical *wantz, integer *n, 
+/* > \brief \b DLAQR3 performs the orthogonal similarity transformation of a Hessenberg matrix to detect and d
+eflate fully converged eigenvalues from a trailing principal submatrix (aggressive early deflation). 
+  
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLAQR3 + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlaqr3.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlaqr3.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlaqr3.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLAQR3( WANTT, WANTZ, N, KTOP, KBOT, NW, H, LDH, ILOZ,   
+                            IHIZ, Z, LDZ, NS, ND, SR, SI, V, LDV, NH, T,   
+                            LDT, NV, WV, LDWV, WORK, LWORK )   
+
+         INTEGER            IHIZ, ILOZ, KBOT, KTOP, LDH, LDT, LDV, LDWV,   
+        $                   LDZ, LWORK, N, ND, NH, NS, NV, NW   
+         LOGICAL            WANTT, WANTZ   
+         DOUBLE PRECISION   H( LDH, * ), SI( * ), SR( * ), T( LDT, * ),   
+        $                   V( LDV, * ), WORK( * ), WV( LDWV, * ),   
+        $                   Z( LDZ, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   >    Aggressive early deflation:   
+   >   
+   >    DLAQR3 accepts as input an upper Hessenberg matrix   
+   >    H and performs an orthogonal similarity transformation   
+   >    designed to detect and deflate fully converged eigenvalues from   
+   >    a trailing principal submatrix.  On output H has been over-   
+   >    written by a new Hessenberg matrix that is a perturbation of   
+   >    an orthogonal similarity transformation of H.  It is to be   
+   >    hoped that the final version of H has many zero subdiagonal   
+   >    entries.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] WANTT   
+   > \verbatim   
+   >          WANTT is LOGICAL   
+   >          If .TRUE., then the Hessenberg matrix H is fully updated   
+   >          so that the quasi-triangular Schur factor may be   
+   >          computed (in cooperation with the calling subroutine).   
+   >          If .FALSE., then only enough of H is updated to preserve   
+   >          the eigenvalues.   
+   > \endverbatim   
+   >   
+   > \param[in] WANTZ   
+   > \verbatim   
+   >          WANTZ is LOGICAL   
+   >          If .TRUE., then the orthogonal matrix Z is updated so   
+   >          so that the orthogonal Schur factor may be computed   
+   >          (in cooperation with the calling subroutine).   
+   >          If .FALSE., then Z is not referenced.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix H and (if WANTZ is .TRUE.) the   
+   >          order of the orthogonal matrix Z.   
+   > \endverbatim   
+   >   
+   > \param[in] KTOP   
+   > \verbatim   
+   >          KTOP is INTEGER   
+   >          It is assumed that either KTOP = 1 or H(KTOP,KTOP-1)=0.   
+   >          KBOT and KTOP together determine an isolated block   
+   >          along the diagonal of the Hessenberg matrix.   
+   > \endverbatim   
+   >   
+   > \param[in] KBOT   
+   > \verbatim   
+   >          KBOT is INTEGER   
+   >          It is assumed without a check that either   
+   >          KBOT = N or H(KBOT+1,KBOT)=0.  KBOT and KTOP together   
+   >          determine an isolated block along the diagonal of the   
+   >          Hessenberg matrix.   
+   > \endverbatim   
+   >   
+   > \param[in] NW   
+   > \verbatim   
+   >          NW is INTEGER   
+   >          Deflation window size.  1 .LE. NW .LE. (KBOT-KTOP+1).   
+   > \endverbatim   
+   >   
+   > \param[in,out] H   
+   > \verbatim   
+   >          H is DOUBLE PRECISION array, dimension (LDH,N)   
+   >          On input the initial N-by-N section of H stores the   
+   >          Hessenberg matrix undergoing aggressive early deflation.   
+   >          On output H has been transformed by an orthogonal   
+   >          similarity transformation, perturbed, and the returned   
+   >          to Hessenberg form that (it is to be hoped) has some   
+   >          zero subdiagonal entries.   
+   > \endverbatim   
+   >   
+   > \param[in] LDH   
+   > \verbatim   
+   >          LDH is integer   
+   >          Leading dimension of H just as declared in the calling   
+   >          subroutine.  N .LE. LDH   
+   > \endverbatim   
+   >   
+   > \param[in] ILOZ   
+   > \verbatim   
+   >          ILOZ is INTEGER   
+   > \endverbatim   
+   >   
+   > \param[in] IHIZ   
+   > \verbatim   
+   >          IHIZ is INTEGER   
+   >          Specify the rows of Z to which transformations must be   
+   >          applied if WANTZ is .TRUE.. 1 .LE. ILOZ .LE. IHIZ .LE. N.   
+   > \endverbatim   
+   >   
+   > \param[in,out] Z   
+   > \verbatim   
+   >          Z is DOUBLE PRECISION array, dimension (LDZ,N)   
+   >          IF WANTZ is .TRUE., then on output, the orthogonal   
+   >          similarity transformation mentioned above has been   
+   >          accumulated into Z(ILOZ:IHIZ,ILO:IHI) from the right.   
+   >          If WANTZ is .FALSE., then Z is unreferenced.   
+   > \endverbatim   
+   >   
+   > \param[in] LDZ   
+   > \verbatim   
+   >          LDZ is integer   
+   >          The leading dimension of Z just as declared in the   
+   >          calling subroutine.  1 .LE. LDZ.   
+   > \endverbatim   
+   >   
+   > \param[out] NS   
+   > \verbatim   
+   >          NS is integer   
+   >          The number of unconverged (ie approximate) eigenvalues   
+   >          returned in SR and SI that may be used as shifts by the   
+   >          calling subroutine.   
+   > \endverbatim   
+   >   
+   > \param[out] ND   
+   > \verbatim   
+   >          ND is integer   
+   >          The number of converged eigenvalues uncovered by this   
+   >          subroutine.   
+   > \endverbatim   
+   >   
+   > \param[out] SR   
+   > \verbatim   
+   >          SR is DOUBLE PRECISION array, dimension (KBOT)   
+   > \endverbatim   
+   >   
+   > \param[out] SI   
+   > \verbatim   
+   >          SI is DOUBLE PRECISION array, dimension (KBOT)   
+   >          On output, the real and imaginary parts of approximate   
+   >          eigenvalues that may be used for shifts are stored in   
+   >          SR(KBOT-ND-NS+1) through SR(KBOT-ND) and   
+   >          SI(KBOT-ND-NS+1) through SI(KBOT-ND), respectively.   
+   >          The real and imaginary parts of converged eigenvalues   
+   >          are stored in SR(KBOT-ND+1) through SR(KBOT) and   
+   >          SI(KBOT-ND+1) through SI(KBOT), respectively.   
+   > \endverbatim   
+   >   
+   > \param[out] V   
+   > \verbatim   
+   >          V is DOUBLE PRECISION array, dimension (LDV,NW)   
+   >          An NW-by-NW work array.   
+   > \endverbatim   
+   >   
+   > \param[in] LDV   
+   > \verbatim   
+   >          LDV is integer scalar   
+   >          The leading dimension of V just as declared in the   
+   >          calling subroutine.  NW .LE. LDV   
+   > \endverbatim   
+   >   
+   > \param[in] NH   
+   > \verbatim   
+   >          NH is integer scalar   
+   >          The number of columns of T.  NH.GE.NW.   
+   > \endverbatim   
+   >   
+   > \param[out] T   
+   > \verbatim   
+   >          T is DOUBLE PRECISION array, dimension (LDT,NW)   
+   > \endverbatim   
+   >   
+   > \param[in] LDT   
+   > \verbatim   
+   >          LDT is integer   
+   >          The leading dimension of T just as declared in the   
+   >          calling subroutine.  NW .LE. LDT   
+   > \endverbatim   
+   >   
+   > \param[in] NV   
+   > \verbatim   
+   >          NV is integer   
+   >          The number of rows of work array WV available for   
+   >          workspace.  NV.GE.NW.   
+   > \endverbatim   
+   >   
+   > \param[out] WV   
+   > \verbatim   
+   >          WV is DOUBLE PRECISION array, dimension (LDWV,NW)   
+   > \endverbatim   
+   >   
+   > \param[in] LDWV   
+   > \verbatim   
+   >          LDWV is integer   
+   >          The leading dimension of W just as declared in the   
+   >          calling subroutine.  NW .LE. LDV   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension (LWORK)   
+   >          On exit, WORK(1) is set to an estimate of the optimal value   
+   >          of LWORK for the given values of N, NW, KTOP and KBOT.   
+   > \endverbatim   
+   >   
+   > \param[in] LWORK   
+   > \verbatim   
+   >          LWORK is integer   
+   >          The dimension of the work array WORK.  LWORK = 2*NW   
+   >          suffices, but greater efficiency may result from larger   
+   >          values of LWORK.   
+   >   
+   >          If LWORK = -1, then a workspace query is assumed; DLAQR3   
+   >          only estimates the optimal workspace size for the given   
+   >          values of N, NW, KTOP and KBOT.  The estimate is returned   
+   >          in WORK(1).  No error message related to LWORK is issued   
+   >          by XERBLA.  Neither H nor Z are accessed.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup doubleOTHERauxiliary   
+
+   > \par Contributors:   
+    ==================   
+   >   
+   >       Karen Braman and Ralph Byers, Department of Mathematics,   
+   >       University of Kansas, USA   
+   >   
+    =====================================================================   
+   Subroutine */ int igraphdlaqr3_(logical *wantt, logical *wantz, integer *n, 
 	integer *ktop, integer *kbot, integer *nw, doublereal *h__, integer *
 	ldh, integer *iloz, integer *ihiz, doublereal *z__, integer *ldz, 
 	integer *ns, integer *nd, doublereal *sr, doublereal *si, doublereal *
@@ -87,148 +361,13 @@ static integer c__12 = 12;
     integer lwkopt;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.2)                        --   
-       Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..   
-    -- June 2010                                                       --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       September 2012   
 
 
-       ******************************************************************   
-       Aggressive early deflation:   
-
-       This subroutine accepts as input an upper Hessenberg matrix   
-       H and performs an orthogonal similarity transformation   
-       designed to detect and deflate fully converged eigenvalues from   
-       a trailing principal submatrix.  On output H has been over-   
-       written by a new Hessenberg matrix that is a perturbation of   
-       an orthogonal similarity transformation of H.  It is to be   
-       hoped that the final version of H has many zero subdiagonal   
-       entries.   
-
-       ******************************************************************   
-       WANTT   (input) LOGICAL   
-            If .TRUE., then the Hessenberg matrix H is fully updated   
-            so that the quasi-triangular Schur factor may be   
-            computed (in cooperation with the calling subroutine).   
-            If .FALSE., then only enough of H is updated to preserve   
-            the eigenvalues.   
-
-       WANTZ   (input) LOGICAL   
-            If .TRUE., then the orthogonal matrix Z is updated so   
-            so that the orthogonal Schur factor may be computed   
-            (in cooperation with the calling subroutine).   
-            If .FALSE., then Z is not referenced.   
-
-       N       (input) INTEGER   
-            The order of the matrix H and (if WANTZ is .TRUE.) the   
-            order of the orthogonal matrix Z.   
-
-       KTOP    (input) INTEGER   
-            It is assumed that either KTOP = 1 or H(KTOP,KTOP-1)=0.   
-            KBOT and KTOP together determine an isolated block   
-            along the diagonal of the Hessenberg matrix.   
-
-       KBOT    (input) INTEGER   
-            It is assumed without a check that either   
-            KBOT = N or H(KBOT+1,KBOT)=0.  KBOT and KTOP together   
-            determine an isolated block along the diagonal of the   
-            Hessenberg matrix.   
-
-       NW      (input) INTEGER   
-            Deflation window size.  1 .LE. NW .LE. (KBOT-KTOP+1).   
-
-       H       (input/output) DOUBLE PRECISION array, dimension (LDH,N)   
-            On input the initial N-by-N section of H stores the   
-            Hessenberg matrix undergoing aggressive early deflation.   
-            On output H has been transformed by an orthogonal   
-            similarity transformation, perturbed, and the returned   
-            to Hessenberg form that (it is to be hoped) has some   
-            zero subdiagonal entries.   
-
-       LDH     (input) integer   
-            Leading dimension of H just as declared in the calling   
-            subroutine.  N .LE. LDH   
-
-       ILOZ    (input) INTEGER   
-       IHIZ    (input) INTEGER   
-            Specify the rows of Z to which transformations must be   
-            applied if WANTZ is .TRUE.. 1 .LE. ILOZ .LE. IHIZ .LE. N.   
-
-       Z       (input/output) DOUBLE PRECISION array, dimension (LDZ,N)   
-            IF WANTZ is .TRUE., then on output, the orthogonal   
-            similarity transformation mentioned above has been   
-            accumulated into Z(ILOZ:IHIZ,ILO:IHI) from the right.   
-            If WANTZ is .FALSE., then Z is unreferenced.   
-
-       LDZ     (input) integer   
-            The leading dimension of Z just as declared in the   
-            calling subroutine.  1 .LE. LDZ.   
-
-       NS      (output) integer   
-            The number of unconverged (ie approximate) eigenvalues   
-            returned in SR and SI that may be used as shifts by the   
-            calling subroutine.   
-
-       ND      (output) integer   
-            The number of converged eigenvalues uncovered by this   
-            subroutine.   
-
-       SR      (output) DOUBLE PRECISION array, dimension (KBOT)   
-       SI      (output) DOUBLE PRECISION array, dimension (KBOT)   
-            On output, the real and imaginary parts of approximate   
-            eigenvalues that may be used for shifts are stored in   
-            SR(KBOT-ND-NS+1) through SR(KBOT-ND) and   
-            SI(KBOT-ND-NS+1) through SI(KBOT-ND), respectively.   
-            The real and imaginary parts of converged eigenvalues   
-            are stored in SR(KBOT-ND+1) through SR(KBOT) and   
-            SI(KBOT-ND+1) through SI(KBOT), respectively.   
-
-       V       (workspace) DOUBLE PRECISION array, dimension (LDV,NW)   
-            An NW-by-NW work array.   
-
-       LDV     (input) integer scalar   
-            The leading dimension of V just as declared in the   
-            calling subroutine.  NW .LE. LDV   
-
-       NH      (input) integer scalar   
-            The number of columns of T.  NH.GE.NW.   
-
-       T       (workspace) DOUBLE PRECISION array, dimension (LDT,NW)   
-
-       LDT     (input) integer   
-            The leading dimension of T just as declared in the   
-            calling subroutine.  NW .LE. LDT   
-
-       NV      (input) integer   
-            The number of rows of work array WV available for   
-            workspace.  NV.GE.NW.   
-
-       WV      (workspace) DOUBLE PRECISION array, dimension (LDWV,NW)   
-
-       LDWV    (input) integer   
-            The leading dimension of W just as declared in the   
-            calling subroutine.  NW .LE. LDV   
-
-       WORK    (workspace) DOUBLE PRECISION array, dimension (LWORK)   
-            On exit, WORK(1) is set to an estimate of the optimal value   
-            of LWORK for the given values of N, NW, KTOP and KBOT.   
-
-       LWORK   (input) integer   
-            The dimension of the work array WORK.  LWORK = 2*NW   
-            suffices, but greater efficiency may result from larger   
-            values of LWORK.   
-
-            If LWORK = -1, then a workspace query is assumed; DLAQR3   
-            only estimates the optimal workspace size for the given   
-            values of N, NW, KTOP and KBOT.  The estimate is returned   
-            in WORK(1).  No error message related to LWORK is issued   
-            by XERBLA.  Neither H nor Z are accessed.   
-
-       ================================================================   
-       Based on contributions by   
-          Karen Braman and Ralph Byers, Department of Mathematics,   
-          University of Kansas, USA   
-
-       ================================================================   
+    ================================================================   
 
        ==== Estimate optimal workspace. ====   
 

@@ -12,6 +12,123 @@
 
 #include "f2c.h"
 
+/* > \brief \b DLANEG computes the Sturm count.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLANEG + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlaneg.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlaneg.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlaneg.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         INTEGER FUNCTION DLANEG( N, D, LLD, SIGMA, PIVMIN, R )   
+
+         INTEGER            N, R   
+         DOUBLE PRECISION   PIVMIN, SIGMA   
+         DOUBLE PRECISION   D( * ), LLD( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLANEG computes the Sturm count, the number of negative pivots   
+   > encountered while factoring tridiagonal T - sigma I = L D L^T.   
+   > This implementation works directly on the factors without forming   
+   > the tridiagonal matrix T.  The Sturm count is also the number of   
+   > eigenvalues of T less than sigma.   
+   >   
+   > This routine is called from DLARRB.   
+   >   
+   > The current routine does not use the PIVMIN parameter but rather   
+   > requires IEEE-754 propagation of Infinities and NaNs.  This   
+   > routine also has no input range restrictions but does require   
+   > default exception handling such that x/0 produces Inf when x is   
+   > non-zero, and Inf/Inf produces NaN.  For more information, see:   
+   >   
+   >   Marques, Riedy, and Voemel, "Benefits of IEEE-754 Features in   
+   >   Modern Symmetric Tridiagonal Eigensolvers," SIAM Journal on   
+   >   Scientific Computing, v28, n5, 2006.  DOI 10.1137/050641624   
+   >   (Tech report version in LAWN 172 with the same title.)   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix.   
+   > \endverbatim   
+   >   
+   > \param[in] D   
+   > \verbatim   
+   >          D is DOUBLE PRECISION array, dimension (N)   
+   >          The N diagonal elements of the diagonal matrix D.   
+   > \endverbatim   
+   >   
+   > \param[in] LLD   
+   > \verbatim   
+   >          LLD is DOUBLE PRECISION array, dimension (N-1)   
+   >          The (N-1) elements L(i)*L(i)*D(i).   
+   > \endverbatim   
+   >   
+   > \param[in] SIGMA   
+   > \verbatim   
+   >          SIGMA is DOUBLE PRECISION   
+   >          Shift amount in T - sigma I = L D L^T.   
+   > \endverbatim   
+   >   
+   > \param[in] PIVMIN   
+   > \verbatim   
+   >          PIVMIN is DOUBLE PRECISION   
+   >          The minimum pivot in the Sturm sequence.  May be used   
+   >          when zero pivots are encountered on non-IEEE-754   
+   >          architectures.   
+   > \endverbatim   
+   >   
+   > \param[in] R   
+   > \verbatim   
+   >          R is INTEGER   
+   >          The twist index for the twisted factorization that is used   
+   >          for the negcount.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERauxiliary   
+
+   > \par Contributors:   
+    ==================   
+   >   
+   >     Osni Marques, LBNL/NERSC, USA \n   
+   >     Christof Voemel, University of California, Berkeley, USA \n   
+   >     Jason Riedy, University of California, Berkeley, USA \n   
+   >   
+    ===================================================================== */
 integer igraphdlaneg_(integer *n, doublereal *d__, doublereal *lld, doublereal *
 	sigma, doublereal *pivmin, integer *r__)
 {
@@ -31,65 +148,11 @@ integer igraphdlaneg_(integer *n, doublereal *d__, doublereal *lld, doublereal *
     doublereal dminus;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2.2) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       June 2010   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLANEG computes the Sturm count, the number of negative pivots   
-    encountered while factoring tridiagonal T - sigma I = L D L^T.   
-    This implementation works directly on the factors without forming   
-    the tridiagonal matrix T.  The Sturm count is also the number of   
-    eigenvalues of T less than sigma.   
-
-    This routine is called from DLARRB.   
-
-    The current routine does not use the PIVMIN parameter but rather   
-    requires IEEE-754 propagation of Infinities and NaNs.  This   
-    routine also has no input range restrictions but does require   
-    default exception handling such that x/0 produces Inf when x is   
-    non-zero, and Inf/Inf produces NaN.  For more information, see:   
-
-      Marques, Riedy, and Voemel, "Benefits of IEEE-754 Features in   
-      Modern Symmetric Tridiagonal Eigensolvers," SIAM Journal on   
-      Scientific Computing, v28, n5, 2006.  DOI 10.1137/050641624   
-      (Tech report version in LAWN 172 with the same title.)   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the matrix.   
-
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The N diagonal elements of the diagonal matrix D.   
-
-    LLD     (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (N-1) elements L(i)*L(i)*D(i).   
-
-    SIGMA   (input) DOUBLE PRECISION   
-            Shift amount in T - sigma I = L D L^T.   
-
-    PIVMIN  (input) DOUBLE PRECISION   
-            The minimum pivot in the Sturm sequence.  May be used   
-            when zero pivots are encountered on non-IEEE-754   
-            architectures.   
-
-    R       (input) INTEGER   
-            The twist index for the twisted factorization that is used   
-            for the negcount.   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-       Osni Marques, LBNL/NERSC, USA   
-       Christof Voemel, University of California, Berkeley, USA   
-       Jason Riedy, University of California, Berkeley, USA   
 
     =====================================================================   
 

@@ -280,7 +280,7 @@ static doublereal c_b119 = 1.;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdlacpy_(char *, integer *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *);
-    integer logfil=0, ndigit, bounds, mseupd=0;
+    integer logfil, ndigit, bounds, mseupd;
     extern /* Subroutine */ int igraphdsteqr_(char *, integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
     integer msglvl, ktrord;

@@ -12,7 +12,145 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int igraphdlascl_(char *type__, integer *kl, integer *ku, 
+/* > \brief \b DLASCL multiplies a general rectangular matrix by a real scalar defined as cto/cfrom.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLASCL + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlascl.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlascl.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlascl.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLASCL( TYPE, KL, KU, CFROM, CTO, M, N, A, LDA, INFO )   
+
+         CHARACTER          TYPE   
+         INTEGER            INFO, KL, KU, LDA, M, N   
+         DOUBLE PRECISION   CFROM, CTO   
+         DOUBLE PRECISION   A( LDA, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLASCL multiplies the M by N real matrix A by the real scalar   
+   > CTO/CFROM.  This is done without over/underflow as long as the final   
+   > result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that   
+   > A may be full, upper triangular, lower triangular, upper Hessenberg,   
+   > or banded.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] TYPE   
+   > \verbatim   
+   >          TYPE is CHARACTER*1   
+   >          TYPE indices the storage type of the input matrix.   
+   >          = 'G':  A is a full matrix.   
+   >          = 'L':  A is a lower triangular matrix.   
+   >          = 'U':  A is an upper triangular matrix.   
+   >          = 'H':  A is an upper Hessenberg matrix.   
+   >          = 'B':  A is a symmetric band matrix with lower bandwidth KL   
+   >                  and upper bandwidth KU and with the only the lower   
+   >                  half stored.   
+   >          = 'Q':  A is a symmetric band matrix with lower bandwidth KL   
+   >                  and upper bandwidth KU and with the only the upper   
+   >                  half stored.   
+   >          = 'Z':  A is a band matrix with lower bandwidth KL and upper   
+   >                  bandwidth KU. See DGBTRF for storage details.   
+   > \endverbatim   
+   >   
+   > \param[in] KL   
+   > \verbatim   
+   >          KL is INTEGER   
+   >          The lower bandwidth of A.  Referenced only if TYPE = 'B',   
+   >          'Q' or 'Z'.   
+   > \endverbatim   
+   >   
+   > \param[in] KU   
+   > \verbatim   
+   >          KU is INTEGER   
+   >          The upper bandwidth of A.  Referenced only if TYPE = 'B',   
+   >          'Q' or 'Z'.   
+   > \endverbatim   
+   >   
+   > \param[in] CFROM   
+   > \verbatim   
+   >          CFROM is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in] CTO   
+   > \verbatim   
+   >          CTO is DOUBLE PRECISION   
+   >   
+   >          The matrix A is multiplied by CTO/CFROM. A(I,J) is computed   
+   >          without over/underflow if the final result CTO*A(I,J)/CFROM   
+   >          can be represented without over/underflow.  CFROM must be   
+   >          nonzero.   
+   > \endverbatim   
+   >   
+   > \param[in] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >          The number of rows of the matrix A.  M >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The number of columns of the matrix A.  N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in,out] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension (LDA,N)   
+   >          The matrix to be multiplied by CTO/CFROM.  See TYPE for the   
+   >          storage type.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The leading dimension of the array A.  LDA >= max(1,M).   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          0  - successful exit   
+   >          <0 - if INFO = -i, the i-th argument had an illegal value.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERauxiliary   
+
+    =====================================================================   
+   Subroutine */ int igraphdlascl_(char *type__, integer *kl, integer *ku, 
 	doublereal *cfrom, doublereal *cto, integer *m, integer *n, 
 	doublereal *a, integer *lda, integer *info)
 {
@@ -34,70 +172,11 @@
     doublereal bignum, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.3.0) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2010   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLASCL multiplies the M by N real matrix A by the real scalar   
-    CTO/CFROM.  This is done without over/underflow as long as the final   
-    result CTO*A(I,J)/CFROM does not over/underflow. TYPE specifies that   
-    A may be full, upper triangular, lower triangular, upper Hessenberg,   
-    or banded.   
-
-    Arguments   
-    =========   
-
-    TYPE    (input) CHARACTER*1   
-            TYPE indices the storage type of the input matrix.   
-            = 'G':  A is a full matrix.   
-            = 'L':  A is a lower triangular matrix.   
-            = 'U':  A is an upper triangular matrix.   
-            = 'H':  A is an upper Hessenberg matrix.   
-            = 'B':  A is a symmetric band matrix with lower bandwidth KL   
-                    and upper bandwidth KU and with the only the lower   
-                    half stored.   
-            = 'Q':  A is a symmetric band matrix with lower bandwidth KL   
-                    and upper bandwidth KU and with the only the upper   
-                    half stored.   
-            = 'Z':  A is a band matrix with lower bandwidth KL and upper   
-                    bandwidth KU. See DGBTRF for storage details.   
-
-    KL      (input) INTEGER   
-            The lower bandwidth of A.  Referenced only if TYPE = 'B',   
-            'Q' or 'Z'.   
-
-    KU      (input) INTEGER   
-            The upper bandwidth of A.  Referenced only if TYPE = 'B',   
-            'Q' or 'Z'.   
-
-    CFROM   (input) DOUBLE PRECISION   
-    CTO     (input) DOUBLE PRECISION   
-            The matrix A is multiplied by CTO/CFROM. A(I,J) is computed   
-            without over/underflow if the final result CTO*A(I,J)/CFROM   
-            can be represented without over/underflow.  CFROM must be   
-            nonzero.   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
-
-    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            The matrix to be multiplied by CTO/CFROM.  See TYPE for the   
-            storage type.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,M).   
-
-    INFO    (output) INTEGER   
-            0  - successful exit   
-            <0 - if INFO = -i, the i-th argument had an illegal value.   
 
     =====================================================================   
 

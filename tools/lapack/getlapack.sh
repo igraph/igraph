@@ -1,7 +1,7 @@
 #! /bin/sh
 # 
 # ./getlapack.sh dgeev dsyevr dnaupd dneupd dsaupd dseupd dgemv dgeevx \
-#                dgetrf dgetrs dgesv dlapy2
+#                dgetrf dgetrs dgesv dlapy2 dpotrf dsyrk dtrsv
 #
 
 make

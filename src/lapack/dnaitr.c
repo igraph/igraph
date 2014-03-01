@@ -292,7 +292,7 @@ static integer c__2 = 2;
     extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
 	    doublereal *);
     extern /* Subroutine */ int igraphsecond_(real *);
-    integer logfil=0, ndigit, nitref, mnaitr=0;
+    integer logfil, ndigit, nitref, mnaitr;
     real titref, tnaitr;
     IGRAPH_F77_SAVE integer msglvl;
     IGRAPH_F77_SAVE doublereal smlnum;

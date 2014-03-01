@@ -12,7 +12,117 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int igraphdlaset_(char *uplo, integer *m, integer *n, doublereal *
+/* > \brief \b DLASET initializes the off-diagonal elements and the diagonal elements of a matrix to given val
+ues.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLASET + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlaset.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlaset.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlaset.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLASET( UPLO, M, N, ALPHA, BETA, A, LDA )   
+
+         CHARACTER          UPLO   
+         INTEGER            LDA, M, N   
+         DOUBLE PRECISION   ALPHA, BETA   
+         DOUBLE PRECISION   A( LDA, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLASET initializes an m-by-n matrix A to BETA on the diagonal and   
+   > ALPHA on the offdiagonals.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] UPLO   
+   > \verbatim   
+   >          UPLO is CHARACTER*1   
+   >          Specifies the part of the matrix A to be set.   
+   >          = 'U':      Upper triangular part is set; the strictly lower   
+   >                      triangular part of A is not changed.   
+   >          = 'L':      Lower triangular part is set; the strictly upper   
+   >                      triangular part of A is not changed.   
+   >          Otherwise:  All of the matrix A is set.   
+   > \endverbatim   
+   >   
+   > \param[in] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >          The number of rows of the matrix A.  M >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The number of columns of the matrix A.  N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] ALPHA   
+   > \verbatim   
+   >          ALPHA is DOUBLE PRECISION   
+   >          The constant to which the offdiagonal elements are to be set.   
+   > \endverbatim   
+   >   
+   > \param[in] BETA   
+   > \verbatim   
+   >          BETA is DOUBLE PRECISION   
+   >          The constant to which the diagonal elements are to be set.   
+   > \endverbatim   
+   >   
+   > \param[in,out] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension (LDA,N)   
+   >          On exit, the leading m-by-n submatrix of A is set as follows:   
+   >   
+   >          if UPLO = 'U', A(i,j) = ALPHA, 1<=i<=j-1, 1<=j<=n,   
+   >          if UPLO = 'L', A(i,j) = ALPHA, j+1<=i<=m, 1<=j<=n,   
+   >          otherwise,     A(i,j) = ALPHA, 1<=i<=m, 1<=j<=n, i.ne.j,   
+   >   
+   >          and, for all UPLO, A(i,i) = BETA, 1<=i<=min(m,n).   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The leading dimension of the array A.  LDA >= max(1,M).   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERauxiliary   
+
+    =====================================================================   
+   Subroutine */ int igraphdlaset_(char *uplo, integer *m, integer *n, doublereal *
 	alpha, doublereal *beta, doublereal *a, integer *lda)
 {
     /* System generated locals */
@@ -23,52 +133,11 @@
     extern logical igraphlsame_(char *, char *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLASET initializes an m-by-n matrix A to BETA on the diagonal and   
-    ALPHA on the offdiagonals.   
-
-    Arguments   
-    =========   
-
-    UPLO    (input) CHARACTER*1   
-            Specifies the part of the matrix A to be set.   
-            = 'U':      Upper triangular part is set; the strictly lower   
-                        triangular part of A is not changed.   
-            = 'L':      Lower triangular part is set; the strictly upper   
-                        triangular part of A is not changed.   
-            Otherwise:  All of the matrix A is set.   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix A.  M >= 0.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix A.  N >= 0.   
-
-    ALPHA   (input) DOUBLE PRECISION   
-            The constant to which the offdiagonal elements are to be set.   
-
-    BETA    (input) DOUBLE PRECISION   
-            The constant to which the diagonal elements are to be set.   
-
-    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On exit, the leading m-by-n submatrix of A is set as follows:   
-
-            if UPLO = 'U', A(i,j) = ALPHA, 1<=i<=j-1, 1<=j<=n,   
-            if UPLO = 'L', A(i,j) = ALPHA, j+1<=i<=m, 1<=j<=n,   
-            otherwise,     A(i,j) = ALPHA, 1<=i<=m, 1<=j<=n, i.ne.j,   
-
-            and, for all UPLO, A(i,i) = BETA, 1<=i<=min(m,n).   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.  LDA >= max(1,M).   
 
    =====================================================================   
 

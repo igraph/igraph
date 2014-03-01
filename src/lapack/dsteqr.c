@@ -20,7 +20,137 @@ static integer c__0 = 0;
 static integer c__1 = 1;
 static integer c__2 = 2;
 
-/* Subroutine */ int igraphdsteqr_(char *compz, integer *n, doublereal *d__, 
+/* > \brief \b DSTEQR   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DSTEQR + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsteqr.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsteqr.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsteqr.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DSTEQR( COMPZ, N, D, E, Z, LDZ, WORK, INFO )   
+
+         CHARACTER          COMPZ   
+         INTEGER            INFO, LDZ, N   
+         DOUBLE PRECISION   D( * ), E( * ), WORK( * ), Z( LDZ, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DSTEQR computes all eigenvalues and, optionally, eigenvectors of a   
+   > symmetric tridiagonal matrix using the implicit QL or QR method.   
+   > The eigenvectors of a full or band symmetric matrix can also be found   
+   > if DSYTRD or DSPTRD or DSBTRD has been used to reduce this matrix to   
+   > tridiagonal form.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] COMPZ   
+   > \verbatim   
+   >          COMPZ is CHARACTER*1   
+   >          = 'N':  Compute eigenvalues only.   
+   >          = 'V':  Compute eigenvalues and eigenvectors of the original   
+   >                  symmetric matrix.  On entry, Z must contain the   
+   >                  orthogonal matrix used to reduce the original matrix   
+   >                  to tridiagonal form.   
+   >          = 'I':  Compute eigenvalues and eigenvectors of the   
+   >                  tridiagonal matrix.  Z is initialized to the identity   
+   >                  matrix.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix.  N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in,out] D   
+   > \verbatim   
+   >          D is DOUBLE PRECISION array, dimension (N)   
+   >          On entry, the diagonal elements of the tridiagonal matrix.   
+   >          On exit, if INFO = 0, the eigenvalues in ascending order.   
+   > \endverbatim   
+   >   
+   > \param[in,out] E   
+   > \verbatim   
+   >          E is DOUBLE PRECISION array, dimension (N-1)   
+   >          On entry, the (n-1) subdiagonal elements of the tridiagonal   
+   >          matrix.   
+   >          On exit, E has been destroyed.   
+   > \endverbatim   
+   >   
+   > \param[in,out] Z   
+   > \verbatim   
+   >          Z is DOUBLE PRECISION array, dimension (LDZ, N)   
+   >          On entry, if  COMPZ = 'V', then Z contains the orthogonal   
+   >          matrix used in the reduction to tridiagonal form.   
+   >          On exit, if INFO = 0, then if  COMPZ = 'V', Z contains the   
+   >          orthonormal eigenvectors of the original symmetric matrix,   
+   >          and if COMPZ = 'I', Z contains the orthonormal eigenvectors   
+   >          of the symmetric tridiagonal matrix.   
+   >          If COMPZ = 'N', then Z is not referenced.   
+   > \endverbatim   
+   >   
+   > \param[in] LDZ   
+   > \verbatim   
+   >          LDZ is INTEGER   
+   >          The leading dimension of the array Z.  LDZ >= 1, and if   
+   >          eigenvectors are desired, then  LDZ >= max(1,N).   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension (max(1,2*N-2))   
+   >          If COMPZ = 'N', then WORK is not referenced.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          = 0:  successful exit   
+   >          < 0:  if INFO = -i, the i-th argument had an illegal value   
+   >          > 0:  the algorithm has failed to find all the eigenvalues in   
+   >                a total of 30*N iterations; if INFO = i, then i   
+   >                elements of E have not converged to zero; on exit, D   
+   >                and E contain the elements of a symmetric tridiagonal   
+   >                matrix which is orthogonally similar to the original   
+   >                matrix.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2011   
+
+   > \ingroup auxOTHERcomputational   
+
+    =====================================================================   
+   Subroutine */ int igraphdsteqr_(char *compz, integer *n, doublereal *d__, 
 	doublereal *e, doublereal *z__, integer *ldz, doublereal *work, 
 	integer *info)
 {
@@ -71,71 +201,11 @@ static integer c__2 = 2;
     doublereal ssfmax;
 
 
-/*  -- LAPACK routine (version 3.3.1) --   
+/*  -- LAPACK computational routine (version 3.4.0) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-    -- April 2011                                                      --   
+       November 2011   
 
-
-    Purpose   
-    =======   
-
-    DSTEQR computes all eigenvalues and, optionally, eigenvectors of a   
-    symmetric tridiagonal matrix using the implicit QL or QR method.   
-    The eigenvectors of a full or band symmetric matrix can also be found   
-    if DSYTRD or DSPTRD or DSBTRD has been used to reduce this matrix to   
-    tridiagonal form.   
-
-    Arguments   
-    =========   
-
-    COMPZ   (input) CHARACTER*1   
-            = 'N':  Compute eigenvalues only.   
-            = 'V':  Compute eigenvalues and eigenvectors of the original   
-                    symmetric matrix.  On entry, Z must contain the   
-                    orthogonal matrix used to reduce the original matrix   
-                    to tridiagonal form.   
-            = 'I':  Compute eigenvalues and eigenvectors of the   
-                    tridiagonal matrix.  Z is initialized to the identity   
-                    matrix.   
-
-    N       (input) INTEGER   
-            The order of the matrix.  N >= 0.   
-
-    D       (input/output) DOUBLE PRECISION array, dimension (N)   
-            On entry, the diagonal elements of the tridiagonal matrix.   
-            On exit, if INFO = 0, the eigenvalues in ascending order.   
-
-    E       (input/output) DOUBLE PRECISION array, dimension (N-1)   
-            On entry, the (n-1) subdiagonal elements of the tridiagonal   
-            matrix.   
-            On exit, E has been destroyed.   
-
-    Z       (input/output) DOUBLE PRECISION array, dimension (LDZ, N)   
-            On entry, if  COMPZ = 'V', then Z contains the orthogonal   
-            matrix used in the reduction to tridiagonal form.   
-            On exit, if INFO = 0, then if  COMPZ = 'V', Z contains the   
-            orthonormal eigenvectors of the original symmetric matrix,   
-            and if COMPZ = 'I', Z contains the orthonormal eigenvectors   
-            of the symmetric tridiagonal matrix.   
-            If COMPZ = 'N', then Z is not referenced.   
-
-    LDZ     (input) INTEGER   
-            The leading dimension of the array Z.  LDZ >= 1, and if   
-            eigenvectors are desired, then  LDZ >= max(1,N).   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (max(1,2*N-2))   
-            If COMPZ = 'N', then WORK is not referenced.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  the algorithm has failed to find all the eigenvalues in   
-                  a total of 30*N iterations; if INFO = i, then i   
-                  elements of E have not converged to zero; on exit, D   
-                  and E contain the elements of a symmetric tridiagonal   
-                  matrix which is orthogonally similar to the original   
-                  matrix.   
 
     =====================================================================   
 
