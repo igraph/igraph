@@ -19,6 +19,7 @@
 
 #include "cholmod_internal.h"
 #include "cholmod_supernodal.h"
+#include "igraph_blas_internal.h"
 
 /* ========================================================================== */
 /* === TEMPLATE ============================================================= */

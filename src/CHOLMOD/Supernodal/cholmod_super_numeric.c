@@ -60,6 +60,8 @@
 
 #include "cholmod_internal.h"
 #include "cholmod_supernodal.h"
+#include "igraph_blas_internal.h"
+#include "igraph_lapack_internal.h"
 
 /* ========================================================================== */
 /* === TEMPLATE codes for GPU and regular numeric factorization ============= */

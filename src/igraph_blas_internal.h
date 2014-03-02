@@ -38,6 +38,7 @@
 #define igraphdcopy_	dcopy_
 #define igraphdscal_	dscal_
 #define igraphdswap_	dswap_
+#define igraphdgemm_	dgemm_
 #define igraphdgemv_	dgemv_
 #define igraphddot_	ddot_
 #define igraphdnrm2_	dnrm2_
@@ -46,10 +47,16 @@
 #define igraphidamax_   idamax_
 #define igraphdtrmm_    dtrmm_
 #define igraphdasum_    dasum_
+#define igraphdtrsm_    dtrsm_
+#define igraphdtrsv_    dtrsv_
 #endif
 
 int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
     igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
     igraph_real_t *beta, igraph_real_t *y, int *incy);
+
+int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
+    double *alpha, double *a, int *lda, double *b, int *ldb,
+    double *beta, double *c__, int *ldc);
 
 #endif
