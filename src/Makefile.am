@@ -226,6 +226,9 @@ COLAMD =        COLAMD/Source/colamd.c	\
 		COLAMD/Source/colamd_global.c	\
 		COLAMD/Include/colamd.h
 
+SPCONFIG =      SuiteSparse_config/SuiteSparse_config.c \
+                SuiteSparse_config/SuiteSparse_config.h
+
 HEADERS_PRIVATE = atlas-edges.h \
 		bliss_bignum.hh		bliss_defs.hh \
 		bliss_eqrefhash.hh	bliss_graph.hh \
@@ -355,7 +358,8 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     qsort.c qsort_r.c types.c lad.c hacks.c \
 			     triangles.c glet.c maximal_cliques.c sbm.c \
 			     sir.c  prpack.cpp paths.c layout_fr.c \
-			     layout_kk.c $(CHOLMOD) $(AMD) $(COLAMD)
+			     layout_kk.c $(CHOLMOD) $(AMD) $(COLAMD) \
+			     $(SPCONFIG)
 
 libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include \
@@ -366,6 +370,8 @@ libigraph_la_CFLAGS        = -I$(top_srcdir)/include \
                              -I$(top_builddir)/src/AMD/Include \
 			     -I$(top_srcdir)/src/COLAMD/Include \
                              -I$(top_builddir)/src/COLAMD/Include \
+                             -I$(top_srcdir)/src/SuiteSparse_config \
+                             -I$(top_builddir)/src/SuiteSparse_config \
                              -DNPARTITION -DNTIMER -DNCAMD $(WARNING_CFLAGS)
 libigraph_la_CXXFLAGS	   = -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
 libigraph_la_LDFLAGS       = -no-undefined
