@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
+#include "igraph_structural.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {
   igraph_vector_init(&sir->times, 1);
