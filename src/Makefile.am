@@ -206,6 +206,22 @@ CHOLMOD = 	CHOLMOD/Check/cholmod_check.c	\
 		CHOLMOD/Include/cholmod_supernodal.h	\
 		CHOLMOD/Include/cholmod_template.h
 
+EXTRA_DIST += 	CHOLMOD/Cholesky/t_cholmod_lsolve.c		\
+		CHOLMOD/Cholesky/t_cholmod_ltsolve.c		\
+		CHOLMOD/Cholesky/t_cholmod_rowfac.c		\
+		CHOLMOD/Cholesky/t_cholmod_solve.c		\
+		CHOLMOD/Core/t_cholmod_change_factor.c		\
+		CHOLMOD/Core/t_cholmod_dense.c			\
+		CHOLMOD/Core/t_cholmod_transpose.c		\
+		CHOLMOD/Core/t_cholmod_triplet.c		\
+		CHOLMOD/MatrixOps/t_cholmod_sdmult.c		\
+		CHOLMOD/Modify/t_cholmod_updown.c		\
+		CHOLMOD/Modify/t_cholmod_updown_numkr.c		\
+		CHOLMOD/Supernodal/t_cholmod_gpu.c		\
+		CHOLMOD/Supernodal/t_cholmod_super_numeric.c	\
+		CHOLMOD/Supernodal/t_cholmod_super_solve.c
+
+
 AMD = 		AMD/Source/amd_1.c	\
 		AMD/Source/amd_2.c	\
 		AMD/Source/amd_aat.c	\
