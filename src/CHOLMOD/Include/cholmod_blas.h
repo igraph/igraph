@@ -172,7 +172,7 @@
 /* === BLAS and LAPACK prototypes and macros ================================ */
 /* ========================================================================== */
 
-void BLAS_DGEMV (char *trans, BLAS_INT *m, BLAS_INT *n, double *alpha,
+int BLAS_DGEMV (char *trans, BLAS_INT *m, BLAS_INT *n, double *alpha,
 	double *A, BLAS_INT *lda, double *X, BLAS_INT *incx, double *beta,
 	double *Y, BLAS_INT *incy) ;
 
@@ -276,7 +276,7 @@ void BLAS_ZTRSM (char *side, char *uplo, char *transa, char *diag, BLAS_INT *m,
     } \
 }
 
-void BLAS_DGEMM (char *transa, char *transb, BLAS_INT *m, BLAS_INT *n,
+int BLAS_DGEMM (char *transa, char *transb, BLAS_INT *m, BLAS_INT *n,
 	BLAS_INT *k, double *alpha, double *A, BLAS_INT *lda, double *B,
 	BLAS_INT *ldb, double *beta, double *C, BLAS_INT *ldc) ;
 
