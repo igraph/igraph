@@ -659,10 +659,10 @@ int igraphmodule_PyObject_to_real_t(PyObject *object, igraph_real_t *v) {
  * \return 0 if everything was OK, 1 otherwise
  */
 int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph_bool_t need_non_negative) {
-  PyObject *item;
-  Py_ssize_t i, j, k;
+  PyObject *item, *it;
+  Py_ssize_t size_hint;
   int ok;
-  long int idx=0;
+  igraph_integer_t number;
 
   if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
@@ -671,94 +671,80 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
     return 1;
   }
 
-  if (PyInt_Check(list)) {
-    /* a single integer was given instead of a list */
-    /* Let's assume that the user meant a list consisting of this single item */
-    igraph_vector_init(v, 1);
-    VECTOR(*v)[0]=(igraph_real_t)PyInt_AsLong(list);
-    return 0;
-  } else if (PyLong_Check(list)) {
-    /* a single long was given instead of a list */
-    /* Let's assume that the user meant a list consisting of this single item */
-    igraph_vector_init(v, 1);
-    VECTOR(*v)[0]=(igraph_real_t)PyLong_AsDouble(list);
-    return 0;
+  /* if the list is a sequence, we can pre-allocate the vector to its length */
+  if (PySequence_Check(list)) {
+    size_hint = PySequence_Size(list);
+    if (size_hint < 0) {
+      /* should not happen but let's try to recover */
+      size_hint = 0;
+    }
+  } else {
+    size_hint = 0;
   }
 
-  if (!PySequence_Check(list)) {
-    /* try to use an iterator */
-    PyObject *it = PyObject_GetIter(list);
-    if (it) {
-      PyObject *item;
-      igraph_vector_init(v, 0);
-      while ((item = PyIter_Next(it)) != 0) {
-        ok = 1;
-        if (!PyInt_Check(item)) {
-          PyErr_SetString(PyExc_ValueError, "iterable must return integers");
-          ok=0;
-        } else {
-          idx=PyInt_AsLong(item);
-          if (need_non_negative && idx<0) {
-            PyErr_SetString(PyExc_ValueError, "iterable must return non-negative integers");
-            ok=0;
-          }
-        }
-       
-        if (ok == 0) {
-          igraph_vector_destroy(v);
-          Py_DECREF(item);
-          Py_DECREF(it);
-          return 1;
-        }
-        if (igraph_vector_push_back(v, idx)) {
-          igraphmodule_handle_igraph_error();
-          igraph_vector_destroy(v);
-          Py_DECREF(item);
-          Py_DECREF(it);
-          return 1;
-        }
-        Py_DECREF(item);
-      }
-      Py_DECREF(it);
-      return 0;
-    } else {
-      PyErr_SetString(PyExc_TypeError, "sequence or iterable expected");
-      return 1;
-    }
-    return 0;
+  /* initialize the result vector */
+  if (igraph_vector_init(v, 0)) {
+    igraphmodule_handle_igraph_error();
+    return 1;
   }
 
-  j=PySequence_Size(list);
-  igraph_vector_init(v, j);
-  for (i=0, k=0; i<j; i++) {
-    item=PySequence_GetItem(list, i);
-    if (item) {
-      ok=1;
-      if (PyInt_Check(item)) {
-        idx=PyInt_AsLong(item);
-        if (need_non_negative && idx<0) {
-          PyErr_SetString(PyExc_TypeError, "sequence elements must be non-negative integers");
-          ok=0;
-        }
-      } else {
-        PyErr_SetString(PyExc_TypeError, "sequence elements must be integers");
-        ok=0;
-      }
-      Py_XDECREF(item);
-    } else {
-      ok = 0;
-    }
-         
-    if (!ok) {
+  /* if we have a size hint, allocate the required space */
+  if (size_hint > 0) {
+    if (igraph_vector_reserve(v, size_hint)) {
+      igraphmodule_handle_igraph_error();
       igraph_vector_destroy(v);
       return 1;
     }
-          
-    /* add idx into index vector */
-    VECTOR(*v)[k]=(igraph_real_t)idx;
-    k++;
   }
-   
+
+  /* try to use an iterator first */
+  it = PyObject_GetIter(list);
+  if (it) {
+    while ((item = PyIter_Next(it)) != 0) {
+      ok = 1;
+
+      if (igraphmodule_PyObject_to_integer_t(item, &number)) {
+        PyErr_SetString(PyExc_ValueError, "iterable must yield integers");
+        ok=0;
+      } else {
+        if (need_non_negative && number < 0) {
+          PyErr_SetString(PyExc_ValueError, "iterable must yield non-negative integers");
+          ok=0;
+        }
+      }
+
+      Py_DECREF(item);
+     
+      if (!ok) {
+        igraph_vector_destroy(v);
+        Py_DECREF(it);
+        return 1;
+      }
+
+      if (igraph_vector_push_back(v, number)) {
+        igraphmodule_handle_igraph_error();
+        igraph_vector_destroy(v);
+        Py_DECREF(it);
+        return 1;
+      }
+    }
+    Py_DECREF(it);
+  } else {
+    /* list is not iterable; maybe it's a single number? */
+    if (igraphmodule_PyObject_to_integer_t(list, &number)) {
+      PyErr_SetString(PyExc_TypeError, "sequence or iterable expected");
+      igraph_vector_destroy(v);
+      return 1;
+    } else {
+      if (need_non_negative && number < 0) {
+        PyErr_SetString(PyExc_ValueError, "non-negative integers expected");
+        igraph_vector_destroy(v);
+        return 1;
+      }
+      igraph_vector_push_back(v, number);
+    }
+  }
+
   return 0;
 }
 
@@ -774,98 +760,82 @@ int igraphmodule_PyObject_to_vector_t(PyObject *list, igraph_vector_t *v, igraph
  * \return 0 if everything was OK, 1 otherwise
  */
 int igraphmodule_PyObject_float_to_vector_t(PyObject *list, igraph_vector_t *v) {
-  PyObject *item;
-  igraph_real_t value=0;
-  Py_ssize_t i, j, k;
+  PyObject *item, *it;
+  Py_ssize_t size_hint;
   int ok;
+  igraph_real_t number;
 
   if (PyBaseString_Check(list)) {
     /* It is highly unlikely that a string (although it is a sequence) will
-     * provide us with integers or integer pairs */
-    PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable containing floats");
+     * provide us with numbers */
+    PyErr_SetString(PyExc_TypeError, "expected a sequence or an iterable containing numbers");
     return 1;
   }
 
-  if (!PySequence_Check(list)) {
-    /* try to use an iterator */
-    PyObject *it = PyObject_GetIter(list);
-    if (it) {
-      PyObject *item;
-      igraph_vector_init(v, 0);
-      while ((item = PyIter_Next(it)) != 0) {
-        ok = 1;
-        if (!PyNumber_Check(item)) {
-          PyErr_SetString(PyExc_TypeError, "iterable must return numbers");
-          ok=0;
-        } else {
-          PyObject *item2 = PyNumber_Float(item);
-          if (item2 == 0) {
-            PyErr_SetString(PyExc_TypeError, "can't convert a list item to float");
-            ok = 0;
-          } else {
-            value=(igraph_real_t)PyFloat_AsDouble(item);
-            Py_DECREF(item2);
-          }
-        }
-       
-        if (ok == 0) {
-          igraph_vector_destroy(v);
-          Py_DECREF(item);
-          Py_DECREF(it);
-          return 1;
-        }
-        if (igraph_vector_push_back(v, value)) {
-          igraphmodule_handle_igraph_error();
-          igraph_vector_destroy(v);
-          Py_DECREF(item);
-          Py_DECREF(it);
-          return 1;
-        }
-        Py_DECREF(item);
-      }
-      Py_DECREF(it);
-      return 0;
-    } else {
-      PyErr_SetString(PyExc_TypeError, "sequence or iterable expected");
-      return 1;
+  /* if the list is a sequence, we can pre-allocate the vector to its length */
+  if (PySequence_Check(list)) {
+    size_hint = PySequence_Size(list);
+    if (size_hint < 0) {
+      /* should not happen but let's try to recover */
+      size_hint = 0;
     }
-    return 0;
+  } else {
+    size_hint = 0;
   }
 
-  j=PySequence_Size(list);
-  igraph_vector_init(v, j);
-  for (i=0, k=0; i<j; i++) {
-    item=PySequence_GetItem(list, i);
-    if (item) {
-      ok=1;
-      if (!PyNumber_Check(item)) {
-        PyErr_SetString(PyExc_TypeError, "sequence elements must be integers");
-        ok=0;
-      } else {
-        PyObject *item2 = PyNumber_Float(item);
-        if (item2 == 0) {
-          PyErr_SetString(PyExc_TypeError, "can't convert sequence element to float");
-          ok=0;
-        } else {
-          value=(igraph_real_t)PyFloat_AsDouble(item2);
-          Py_DECREF(item2);
-        }
-      }
-      Py_XDECREF(item);
-      if (!ok) {
-        igraph_vector_destroy(v);
-        return 1;
-      }
-      VECTOR(*v)[k]=value;
-      k++;
-    } else {
-      /* this should not happen, but we return anyway.
-       * an IndexError exception was set by PyList_GetItem
-       * at this point */
+  /* initialize the result vector */
+  if (igraph_vector_init(v, 0)) {
+    igraphmodule_handle_igraph_error();
+    return 1;
+  }
+
+  /* if we have a size hint, allocate the required space */
+  if (size_hint > 0) {
+    if (igraph_vector_reserve(v, size_hint)) {
+      igraphmodule_handle_igraph_error();
       igraph_vector_destroy(v);
       return 1;
     }
   }
+
+  /* try to use an iterator first */
+  it = PyObject_GetIter(list);
+  if (it) {
+    while ((item = PyIter_Next(it)) != 0) {
+      ok = 1;
+
+      if (igraphmodule_PyObject_to_real_t(item, &number)) {
+        PyErr_SetString(PyExc_ValueError, "iterable must yield numbers");
+        ok=0;
+      }
+
+      Py_DECREF(item);
+     
+      if (!ok) {
+        igraph_vector_destroy(v);
+        Py_DECREF(it);
+        return 1;
+      }
+
+      if (igraph_vector_push_back(v, number)) {
+        igraphmodule_handle_igraph_error();
+        igraph_vector_destroy(v);
+        Py_DECREF(it);
+        return 1;
+      }
+    }
+    Py_DECREF(it);
+  } else {
+    /* list is not iterable; maybe it's a single number? */
+    if (igraphmodule_PyObject_to_real_t(list, &number)) {
+      PyErr_SetString(PyExc_TypeError, "sequence or iterable expected");
+      igraph_vector_destroy(v);
+      return 1;
+    } else {
+      igraph_vector_push_back(v, number);
+    }
+  }
+
   return 0;
 }
 
