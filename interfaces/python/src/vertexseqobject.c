@@ -125,7 +125,7 @@ int igraphmodule_VertexSeq_init(igraphmodule_VertexSeqObject *self,
   } else {
     igraph_vector_t v;
     igraph_integer_t n = igraph_vcount(&((igraphmodule_GraphObject*)g)->g);
-    if (igraphmodule_PyObject_to_vector_t(vsobj, &v, 1, 0))
+    if (igraphmodule_PyObject_to_vector_t(vsobj, &v, 1))
       return -1;
     if (!igraph_vector_isininterval(&v, 0, n-1)) {
       igraph_vector_destroy(&v);
