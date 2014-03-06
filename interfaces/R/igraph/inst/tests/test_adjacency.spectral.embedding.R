@@ -24,8 +24,8 @@ test_that("adjacency.spectral.embedding works", {
   expect_that(std(asmu$X), equals(std(asm2$u[,1:no])))
   expect_that(std(asmu$Y), equals(std(asm2$v[,1:no])))
   
-  X <- asm2$u[,1:no] %*% diag(asm2$d[1:no])
-  Y <- asm2$v[,1:no] %*% diag(asm2$d[1:no])
+  X <- asm2$u[,1:no] %*% sqrt(diag(asm2$d[1:no]))
+  Y <- asm2$v[,1:no] %*% sqrt(diag(asm2$d[1:no]))
   
   expect_that(std(asm$X), equals(std(X)))
   expect_that(std(asm$Y), equals(std(Y)))

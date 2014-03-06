@@ -183,7 +183,7 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 
   if (scaled) {
     for (i=0; i<no; i++) {
-      VECTOR(D)[i] = sqrt(VECTOR(D)[i]);
+      VECTOR(D)[i] = sqrt(sqrt(VECTOR(D)[i]));
     }
 
     for (j=0; j<vc; j++) {
