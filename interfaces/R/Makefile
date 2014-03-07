@@ -29,10 +29,10 @@ version_number: force
 
 # Source files from the C library, we don't need BLAS/LAPACK
 # because they are included in R and ARPACK, because 
-# we use the Fortran files for that
+# we use the Fortran files for that. We don't need F2C, either.
 
 CSRC := $(shell git ls-tree -r --name-only --full-tree HEAD src | \
-	 grep -v "^src/lapack/" | grep -v Makefile.am)
+	 grep -v "^src/lapack/" | grep -v "^src/f2c" | grep -v Makefile.am)
 CSRC2 := $(patsubst src/%, igraph/src/%, $(CSRC))
 
 $(CSRC2): igraph/src/%: $(top_srcdir)/src/%
