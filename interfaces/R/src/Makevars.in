@@ -1,6 +1,7 @@
 
 PKG_CFLAGS=-DUSING_R -I. -Iinclude -Ics -Iglpk -Iplfit \
         -ICHOLMOD/Include -IAMD/Include -ICOLAMD/Include \
+	-ISuiteSparse_config \
 	@CPPFLAGS@ @CFLAGS@ -DNDEBUG -DNPARTITION -DNTIMER -DNCAMD \
 	-DPACKAGE_VERSION=\"@PACKAGE_VERSION@\" -DINTERNAL_ARPACK \
 	-DIGRAPH_THREAD_LOCAL=/**/

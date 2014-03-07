@@ -174,7 +174,7 @@ OBJECTS := $(shell echo $(CSRC) $(ARPACK) $(GLPK) $(RAY) | tr ' ' '\n' | \
 		grep -F -v f2c/arithchk.c | grep -F -v f2c_dummy.c |	 \
 		sed 's/\.[^\.][^\.]*$$/.o/' | 			 	 \
 		sed 's/^src\///' | sed 's/^arpack\///' |		 \
-		sed 's/^optional\///') rinterface.c rinterface_extra.c
+		sed 's/^optional\///') rinterface.o rinterface_extra.o
 
 object_files: force
 	@echo '$(OBJECTS)' | cmp -s - $@ || echo '$(OBJECTS)' > $@
@@ -184,7 +184,6 @@ igraph/src/Makevars.win igraph/src/Makevars.in: igraph/src/%: src/% \
 	sed 's/@VERSION@/'$(VERSION)'/g' $< >$@
 	printf "%s" "OBJECTS=" >> $@
 	cat object_files >> $@
-	echo "OBJECTS += rinterface.o rinterface_extra.o" >> $@
 
 # We have everything, here we go
 
