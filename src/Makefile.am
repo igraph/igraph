@@ -375,7 +375,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     triangles.c glet.c maximal_cliques.c sbm.c \
 			     sir.c  prpack.cpp paths.c layout_fr.c \
 			     layout_kk.c $(CHOLMOD) $(AMD) $(COLAMD) \
-			     $(SPCONFIG)
+			     $(SPCONFIG) layout_gem.c
 
 libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include \

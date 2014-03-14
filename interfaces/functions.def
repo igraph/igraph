@@ -1127,6 +1127,15 @@ igraph_layout_bipartite:
         DEPS: types ON graph
         NAME-R: layout.bipartite
 
+igraph_layout_gem:
+        PARAMS: GRAPH graph, INOUT MATRIX res=matrix(), \
+                BOOLEAN use_seed=False, \
+                INTEGER maxiter=40*vcount(graph)^2, \
+                REAL temp_max=vcount(graph), \
+                REAL temp_min=1/10, REAL temp_init=sqrt(vcount(graph))
+        NAME-R: layout.gem
+        IGNORE: RR
+
 #######################################
 # Cocitation and other similarity measures
 #######################################

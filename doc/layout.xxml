@@ -25,6 +25,7 @@
 </section>
 <!-- doxrox-include igraph_layout_fruchterman_reingold -->
 <!-- doxrox-include igraph_layout_kamada_kawai -->
+<!-- doxrox-include igraph_layout_gem -->
 <!-- doxrox-include igraph_layout_mds -->
 <!-- doxrox-include igraph_layout_lgl -->
 <!-- doxrox-include igraph_layout_reingold_tilford -->

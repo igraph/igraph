@@ -238,6 +238,11 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
 			    igraph_vector_ptr_t *coords, 
 			    igraph_matrix_t *res);
 
+int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
+		      igraph_bool_t use_seed, igraph_integer_t maxiter,
+		      igraph_real_t temp_max, igraph_real_t temp_min,
+		      igraph_real_t temp_init);
+
 __END_DECLS
 
 #endif

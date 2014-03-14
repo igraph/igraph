@@ -635,3 +635,31 @@ layout.kamada.kawai <- function(graph, coords=NULL, dim=2,
 
   res
 }
+
+layout.gem <- function(graph, coords=NULL, maxiter=40*vcount(graph)^2,
+                       temp.max=vcount(graph), temp.min=1/10,
+                       temp.init=sqrt(vcount(graph))) {
+  
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is.null(coords)) {
+    coords <- as.matrix(structure(as.double(coords), dim=dim(coords)))
+    use.seed <- TRUE
+  } else {
+    coords <- matrix(ncol=2, nrow=0)
+    use.seed <- FALSE
+  }
+
+  maxiter <- as.integer(maxiter)
+  temp.max <- as.numeric(temp.max)
+  temp.min <- as.numeric(temp.min)
+  temp.init <- as.numeric(temp.init)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_layout_gem", graph, coords, use.seed, maxiter,
+               temp.max, temp.min, temp.init,
+               PACKAGE="igraph")
+
+  res
+}
