@@ -663,3 +663,39 @@ layout.gem <- function(graph, coords=NULL, maxiter=40*vcount(graph)^2,
 
   res
 }
+
+layout.davidson.harel <- function(graph, coords=NULL, maxiter=10,
+           fineiter=max(10, log2(vcount(graph))), cool.fact=0.75,
+           weight.node.dist=1.0, weight.border=0.0,
+           weight.edge.lengths=graph.density(graph) / 10,
+           weight.edge.crossings=1.0 - sqrt(graph.density(graph)),
+           weight.node.edge.dist=0.2 * (1-graph.density(graph))) {
+  
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is.null(coords)) {
+    coords <- as.matrix(structure(as.double(coords), dim=dim(coords)))
+    use.seed <- TRUE
+  } else {
+    coords <- matrix(ncol=2, nrow=0)
+    use.seed <- FALSE
+  }
+  maxiter <- as.integer(maxiter)
+  fineiter <- as.integer(fineiter)
+  cool.fact <- as.numeric(cool.fact)
+  weight.node.dist <- as.numeric(weight.node.dist)
+  weight.border <- as.numeric(weight.border)
+  weight.edge.lengths <- as.numeric(weight.edge.lengths)
+  weight.edge.crossings <- as.numeric(weight.edge.crossings)
+  weight.node.edge.dist <- as.numeric(weight.node.edge.dist)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_layout_davidson_harel", graph, coords, use.seed,
+               maxiter, fineiter, cool.fact, weight.node.dist,
+               weight.border, weight.edge.lengths, weight.edge.crossings,
+               weight.node.edge.dist, PACKAGE="igraph")
+
+  res
+}
+

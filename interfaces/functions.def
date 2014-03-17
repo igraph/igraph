@@ -1136,6 +1136,17 @@ igraph_layout_gem:
         NAME-R: layout.gem
         IGNORE: RR
 
+igraph_layout_davidson_harel:
+        PARAMS: GRAPH graph, INOUT MATRIX res=matrix(), \
+                BOOLEAN use_seed=False, INTEGER maxiter=10, \
+                INTEGER fineiter=FINEITER, REAL cool_fact=0.75, \
+                REAL weight_node_dist=1.0, REAL weight_border=0.0, \
+                REAL weight_edge_lengths=ELENW, \
+                REAL weight_edge_crossings=ECROSSW, \
+                REAL weight_node_edge_dist=NEDISTW
+        NAME-R: layout.davidson.harel
+        IGNORE: RR
+
 #######################################
 # Cocitation and other similarity measures
 #######################################
