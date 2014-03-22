@@ -50,6 +50,10 @@ LIBIGRAPH_FALLBACK_LIBRARY_DIRS = []
 
 ###########################################################################
 
+SCRIPT_ROOT = os.path.abspath(os.path.dirname(sys.modules[__name__].__file__))
+
+###########################################################################
+
 def cleanup_tmpdir(dirname):
     """Removes the given temporary directory if it exists."""
     if dirname is not None and os.path.exists(dirname):
@@ -177,17 +181,23 @@ class IgraphCCoreBuilder(object):
     if it is not installed yet."""
 
     def __init__(self, versions_to_try, remote_url=None,
-            show_progress_bar=True):
+            show_progress_bar=True, tmproot=None):
         self.versions_to_try = versions_to_try
         self.remote_url = remote_url
         self.show_progress_bar = show_progress_bar
+        self.tmproot = tmproot
         self._tmpdir = None
+
+        if self.tmproot is None:
+            global SCRIPT_ROOT
+            self.tmproot = os.path.join(SCRIPT_ROOT, "tmp")
 
     @property
     def tmpdir(self):
         """The temporary directory in which igraph is downloaded and extracted."""
         if self._tmpdir is None:
-            self._tmpdir = tempfile.mkdtemp(prefix="igraph.")
+            create_dir_unless_exists(self.tmproot)
+            self._tmpdir = tempfile.mkdtemp(prefix="igraph.", dir=self.tmproot)
             atexit.register(cleanup_tmpdir, self._tmpdir)
         return self._tmpdir
 
@@ -216,6 +226,8 @@ class IgraphCCoreBuilder(object):
         else:
             remote_url = self.remote_url
             local_file = remote_url.rsplit("/", 1)[1]
+
+        print("Using temporary directory: %s" % self.tmpdir)
 
         # Now determine the full path where the C core will be downloaded
         local_file_full_path = os.path.join(self.tmpdir, local_file)
@@ -371,9 +383,11 @@ class BuildConfiguration(object):
                     buildcfg.use_educated_guess()
 
                 # Replaces library names with full paths to static libraries
-                # where possible
+                # where possible. libm.a is excluded because it caused problems
+                # on Sabayon Linux where libm.a is probably not compiled with
+                # -fPIC
                 if buildcfg.static_extension:
-                    buildcfg.replace_static_libraries()
+                    buildcfg.replace_static_libraries(exclusions=["m"])
 
                 # Prints basic build information
                 buildcfg.print_build_info()
@@ -488,13 +502,16 @@ class BuildConfiguration(object):
         for idx in reversed(opts_to_remove):
             sys.argv[idx:(idx+1)] = []
 
-    def replace_static_libraries(self):
+    def replace_static_libraries(self, exclusions=None):
         """Replaces references to libraries with full paths to their static
         versions if the static version is to be found on the library path."""
         if "stdc++" not in self.libraries:
             self.libraries.append("stdc++")
 
-        for library_name in self.libraries[:]:
+        if exclusions is None:
+            exclusions = []
+
+        for library_name in set(self.libraries) - set(exclusions):
             static_lib = find_static_library(library_name, self.library_dirs)
             if static_lib:
                 self.libraries.remove(library_name)
