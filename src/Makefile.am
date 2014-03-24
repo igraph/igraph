@@ -377,6 +377,11 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     layout_kk.c $(CHOLMOD) $(AMD) $(COLAMD) \
 			     $(SPCONFIG) layout_gem.c layout_dh.c
 
+if INTERNAL_F2C
+else
+  SOURCES += f2c/dummy.c
+endif
+
 libigraph_la_SOURCES       = $(SOURCES) $(HEADERS_PRIVATE)
 libigraph_la_CFLAGS        = -I$(top_srcdir)/include \
 			     -I$(top_builddir)/include \
