@@ -235,6 +235,8 @@ if test "$needs_f2c" = "yes"; then
   else
     AC_DEFINE([INTERNAL_F2C], [1], [Define to 1 if you use the internal F2C library])
   fi
+else
+  internal_f2c=no
 fi
 
 if test "$internal_blas" = "no"; then
