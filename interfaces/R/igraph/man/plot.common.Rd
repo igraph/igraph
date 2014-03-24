@@ -47,7 +47,7 @@
   gives the layout of the graphs.
 
   The second way is to assign vertex, edge and graph attributes to the
-  graph. These attributes have now prefix, ie. the color of the vertices
+  graph. These attributes have no prefix, ie. the color of the vertices
   is taken from the \code{color} vertex attribute and the color of the
   edges from the \code{color} edge attribute. The layout of the graph is
   given by the \code{layout} graph attribute. (Always assuming that the
