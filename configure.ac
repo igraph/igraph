@@ -219,15 +219,22 @@ AC_ARG_WITH([external-glpk], [AS_HELP_STRING([--with-external-glpk],
             [internal_glpk=no],
             [internal_glpk=yes])
 
-if test "$internal_f2c" = "no"; then
-  AC_CHECK_LIB([f2c], [f77_alloc_], [],
-     AC_CHECK_LIB([f2c], [f77_alloc], [],
+needs_f2c="no"
+if test "$internal_blas" = "yes" -o "$internal_lapack" = "yes" -o "$internal_arpack" = "yes"; then
+  needs_f2c="yes"
+fi
+
+if test "$needs_f2c" = "yes"; then
+  if test "$internal_f2c" = "no"; then
+    AC_CHECK_LIB([f2c], [f77_alloc_], [],
+      AC_CHECK_LIB([f2c], [f77_alloc], [],
         AC_CHECK_LIB([f2c], [F77_ALLOC_], [],
            AC_CHECK_LIB([f2c], [F77_ALLOC], [],
 	      [AC_MSG_RESULT(not found, trying to use -lf2c anyway.)]))))
-  LDFLAGS="${LDFLAGS}"
-else
-  AC_DEFINE([INTERNAL_F2C], [1], [Define to 1 if you use the internal F2C library])
+    LDFLAGS="${LDFLAGS} -lf2c"
+  else
+    AC_DEFINE([INTERNAL_F2C], [1], [Define to 1 if you use the internal F2C library])
+  fi
 fi
 
 if test "$internal_blas" = "no"; then
@@ -326,7 +333,11 @@ AC_MSG_RESULT([  Thread-local storage   -- $tls_support])
 AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
 AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
 AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])
-AC_MSG_RESULT([  Use internal F2C       -- $internal_f2c])
+if test "$needs_f2c" != "yes"; then
+  AC_MSG_RESULT([  Use internal F2C       -- f2c not needed])
+else
+  AC_MSG_RESULT([  Use internal F2C       -- $internal_f2c])
+fi
 if test "$glpk_support" != "no"; then
   AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
 fi
