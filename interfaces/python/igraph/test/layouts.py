@@ -171,6 +171,12 @@ class LayoutAlgorithmTests(unittest.TestCase):
         self.assertEqual([tuple(item) for item in lo],
                           zip(range(20), range(20, 40), range(40, 60)))
 
+    def testDavidsonHarel(self):
+        # Quick smoke testing only
+        g = Graph.Barabasi(100)
+        lo = g.layout("dh")
+        self.assertTrue(isinstance(lo, Layout))
+
     def testFruchtermanReingold(self):
         g = Graph.Barabasi(100)
 

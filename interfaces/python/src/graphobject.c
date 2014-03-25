@@ -6387,6 +6387,97 @@ PyObject *igraphmodule_Graph_layout_kamada_kawai(igraphmodule_GraphObject *
 }
 
 /** \ingroup python_interface_graph
+ * \brief Places the vertices on a plane according to the Davidson-Harel algorithm.
+ * \return the calculated coordinates as a Python list of lists
+ * \sa igraph_layout_davidson_harel
+ */
+PyObject* igraphmodule_Graph_layout_davidson_harel(igraphmodule_GraphObject *self,
+          PyObject *args, PyObject *kwds)
+{
+  static char *kwlist[] =
+    { "seed", "maxiter", "fineiter", "cool_fact", "weight_node_dist",
+      "weight_border", "weight_edge_lengths", "weight_edge_crossings",
+      "weight_node_edge_dist", NULL };
+  igraph_matrix_t m;
+  igraph_bool_t use_seed=0;
+  long int maxiter=10;
+  long int fineiter=-1;
+  double cool_fact=0.75;
+  double weight_node_dist=1.0;
+  double weight_border=0.0;
+  double weight_edge_lengths=-1;
+  double weight_edge_crossings=-1;
+  double weight_node_edge_dist=-1;
+  igraph_real_t density;
+  PyObject *result;
+  PyObject *seed_o=Py_None;
+  int retval;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|Olldddddd", kwlist,
+                                   &seed_o, &maxiter, &fineiter, &cool_fact,
+                                   &weight_node_dist, &weight_border,
+                                   &weight_edge_lengths, &weight_edge_crossings,
+                                   &weight_node_edge_dist))
+	  return NULL;
+
+  /* Provide default parameters based on the properties of the graph */
+  if (fineiter < 0) {
+    fineiter = log(igraph_vcount(&self->g)) / log(2);
+    if (fineiter > 10) {
+      fineiter = 10;
+    }
+  }
+  if (weight_edge_lengths < 0 || weight_edge_crossings < 0 ||
+      weight_node_edge_dist < 0) {
+    if (igraph_density(&self->g, &density, 0)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+    if (weight_edge_lengths < 0) {
+      weight_edge_lengths = density / 10.0;
+    }
+    if (weight_edge_crossings < 0) {
+      weight_edge_crossings = 1.0 - sqrt(density);
+      if (weight_edge_crossings < 0) {
+        weight_edge_crossings = 0;
+      }
+    }
+    if (weight_node_edge_dist < 0) {
+      weight_node_edge_dist = 0.2 * (1 - density);
+      if (weight_node_edge_dist < 0) {
+        weight_node_edge_dist = 0;
+      }
+    }
+  }
+
+  /* Allocate result matrix if needed */
+  if (seed_o == 0 || seed_o == Py_None) {
+    if (igraph_matrix_init(&m, 1, 1)) {
+      igraphmodule_handle_igraph_error();
+      return NULL;
+    }
+  } else {
+    if (igraphmodule_PyList_to_matrix_t(seed_o, &m)) {
+	  return NULL;
+	}
+	use_seed=1;
+  }
+
+  retval = igraph_layout_davidson_harel(&self->g, &m, use_seed,
+      maxiter, fineiter, cool_fact, weight_node_dist, weight_border,
+      weight_edge_lengths, weight_edge_crossings, weight_node_edge_dist);
+  if (retval) {
+    igraph_matrix_destroy(&m);
+    igraphmodule_handle_igraph_error();
+    return NULL;
+  }
+
+  result = igraphmodule_matrix_t_to_PyList(&m, IGRAPHMODULE_TYPE_FLOAT);
+  igraph_matrix_destroy(&m);
+  return (PyObject *) result;
+}
+
+/** \ingroup python_interface_graph
  * \brief Places the vertices on a plane according to the DrL algorithm.
  * \return the calculated coordinates as a Python list of lists
  * \sa igraph_layout_drl
@@ -13607,6 +13698,46 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  for 3D layouts (C{dim}=3).\n"
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
+   "@return: the calculated layout."
+  },
+
+  /* interface to igraph_layout_davidson_harel */
+  {"layout_davidson_harel",
+   (PyCFunction) igraphmodule_Graph_layout_davidson_harel,
+   METH_VARARGS | METH_KEYWORDS,
+   "layout_davidson_harel(seed=None, maxiter=10, fineiter=-1, cool_fact=0.75,\n"
+   "  weight_node_dist=1.0, weight_border=0.0, weight_edge_lengths=-1,\n"
+   "  weight_edge_crossings=-1, weight_node_edge_dist=-1)\n\n"
+   "Places the vertices on a 2D plane according to the Davidson-Harel layout\n"
+   "algorithm.\n\n"
+   "The algorithm uses simulated annealing and a sophisticated energy function,\n"
+   "which is unfortunately hard to parameterize for different graphs. The\n"
+   "original publication did not disclose any parameter values, and the ones\n"
+   "below were determined by experimentation.\n\n"
+   "The algorithm consists of two phases: an annealing phase and a fine-tuning\n"
+   "phase. There is no simulated annealing in the second phase.\n\n"
+   "@param seed: if C{None}, uses a random starting layout for the algorithm.\n"
+   "  If a matrix (list of lists), uses the given matrix as the starting\n"
+   "  position.\n"
+   "@param maxiter: Number of iterations to perform in the annealing phase.\n"
+   "@param fineiter: Number of iterations to perform in the fine-tuning phase.\n"
+   "  Negative numbers set up a reasonable default from the base-2 logarithm\n"
+   "  of the vertex count, bounded by 10 from above.\n"
+   "@param cool_fact: Cooling factor of the simulated annealing phase.\n"
+   "@param weight_node_dist: Weight for the node-node distances in the energy\n"
+   "  function.\n"
+   "@param weight_border: Weight for the distance from the border component of\n"
+   "  the energy function. Zero means that vertices are allowed to sit on the\n"
+   "  border of the area designated for the layout.\n"
+   "@param weight_edge_lengths: Weight for the edge length component of the\n"
+   "  energy function. Negative numbers are replaced by the density of the\n"
+   "  graph divided by 10.\n"
+   "@param weight_edge_crossings: Weight for the edge crossing component of the\n"
+   "  energy function. Negative numbers are replaced by one minus the square\n"
+   "  root of the density of the graph.\n"
+   "@param weight_node_edge_dist: Weight for the node-edge distance component\n"
+   "  of the energy function. Negative numbers are replaced by 0.2 minus\n"
+   "  0.2 times the density of the graph.\n"
    "@return: the calculated layout."
   },
 

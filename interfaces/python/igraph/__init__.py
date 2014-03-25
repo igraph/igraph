@@ -1361,6 +1361,9 @@ class Graph(GraphBase):
           - C{circle}, C{circular}: circular layout
             (see L{Graph.layout_circle})
 
+          - C{dh}, C{davidson_harel}: Davidson-Harel layout (see
+            L{Graph.davidson_harel})
+
           - C{drl}: DrL layout for large graphs (see L{Graph.layout_drl})
 
           - C{drl_3d}: 3D DrL layout for large graphs
@@ -3205,6 +3208,8 @@ class Graph(GraphBase):
         "bipartite": "layout_bipartite",
         "circle": "layout_circle",
         "circular": "layout_circle",
+        "davidson_harel": "layout_davidson_harel",
+        "dh": "layout_davidson_harel",
         "drl": "layout_drl",
         "fr": "layout_fruchterman_reingold",
         "fruchterman_reingold": "layout_fruchterman_reingold",
