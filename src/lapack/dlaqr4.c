@@ -24,7 +24,269 @@ static logical c_false = FALSE_;
 static integer c__1 = 1;
 static integer c__3 = 3;
 
-/* Subroutine */ int igraphdlaqr4_(logical *wantt, logical *wantz, integer *n, 
+/* > \brief \b DLAQR4 computes the eigenvalues of a Hessenberg matrix, and optionally the matrices from the Sc
+hur decomposition.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLAQR4 + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlaqr4.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlaqr4.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlaqr4.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLAQR4( WANTT, WANTZ, N, ILO, IHI, H, LDH, WR, WI,   
+                            ILOZ, IHIZ, Z, LDZ, WORK, LWORK, INFO )   
+
+         INTEGER            IHI, IHIZ, ILO, ILOZ, INFO, LDH, LDZ, LWORK, N   
+         LOGICAL            WANTT, WANTZ   
+         DOUBLE PRECISION   H( LDH, * ), WI( * ), WORK( * ), WR( * ),   
+        $                   Z( LDZ, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   >    DLAQR4 implements one level of recursion for DLAQR0.   
+   >    It is a complete implementation of the small bulge multi-shift   
+   >    QR algorithm.  It may be called by DLAQR0 and, for large enough   
+   >    deflation window size, it may be called by DLAQR3.  This   
+   >    subroutine is identical to DLAQR0 except that it calls DLAQR2   
+   >    instead of DLAQR3.   
+   >   
+   >    DLAQR4 computes the eigenvalues of a Hessenberg matrix H   
+   >    and, optionally, the matrices T and Z from the Schur decomposition   
+   >    H = Z T Z**T, where T is an upper quasi-triangular matrix (the   
+   >    Schur form), and Z is the orthogonal matrix of Schur vectors.   
+   >   
+   >    Optionally Z may be postmultiplied into an input orthogonal   
+   >    matrix Q so that this routine can give the Schur factorization   
+   >    of a matrix A which has been reduced to the Hessenberg form H   
+   >    by the orthogonal matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] WANTT   
+   > \verbatim   
+   >          WANTT is LOGICAL   
+   >          = .TRUE. : the full Schur form T is required;   
+   >          = .FALSE.: only eigenvalues are required.   
+   > \endverbatim   
+   >   
+   > \param[in] WANTZ   
+   > \verbatim   
+   >          WANTZ is LOGICAL   
+   >          = .TRUE. : the matrix of Schur vectors Z is required;   
+   >          = .FALSE.: Schur vectors are not required.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >           The order of the matrix H.  N .GE. 0.   
+   > \endverbatim   
+   >   
+   > \param[in] ILO   
+   > \verbatim   
+   >          ILO is INTEGER   
+   > \endverbatim   
+   >   
+   > \param[in] IHI   
+   > \verbatim   
+   >          IHI is INTEGER   
+   >           It is assumed that H is already upper triangular in rows   
+   >           and columns 1:ILO-1 and IHI+1:N and, if ILO.GT.1,   
+   >           H(ILO,ILO-1) is zero. ILO and IHI are normally set by a   
+   >           previous call to DGEBAL, and then passed to DGEHRD when the   
+   >           matrix output by DGEBAL is reduced to Hessenberg form.   
+   >           Otherwise, ILO and IHI should be set to 1 and N,   
+   >           respectively.  If N.GT.0, then 1.LE.ILO.LE.IHI.LE.N.   
+   >           If N = 0, then ILO = 1 and IHI = 0.   
+   > \endverbatim   
+   >   
+   > \param[in,out] H   
+   > \verbatim   
+   >          H is DOUBLE PRECISION array, dimension (LDH,N)   
+   >           On entry, the upper Hessenberg matrix H.   
+   >           On exit, if INFO = 0 and WANTT is .TRUE., then H contains   
+   >           the upper quasi-triangular matrix T from the Schur   
+   >           decomposition (the Schur form); 2-by-2 diagonal blocks   
+   >           (corresponding to complex conjugate pairs of eigenvalues)   
+   >           are returned in standard form, with H(i,i) = H(i+1,i+1)   
+   >           and H(i+1,i)*H(i,i+1).LT.0. If INFO = 0 and WANTT is   
+   >           .FALSE., then the contents of H are unspecified on exit.   
+   >           (The output value of H when INFO.GT.0 is given under the   
+   >           description of INFO below.)   
+   >   
+   >           This subroutine may explicitly set H(i,j) = 0 for i.GT.j and   
+   >           j = 1, 2, ... ILO-1 or j = IHI+1, IHI+2, ... N.   
+   > \endverbatim   
+   >   
+   > \param[in] LDH   
+   > \verbatim   
+   >          LDH is INTEGER   
+   >           The leading dimension of the array H. LDH .GE. max(1,N).   
+   > \endverbatim   
+   >   
+   > \param[out] WR   
+   > \verbatim   
+   >          WR is DOUBLE PRECISION array, dimension (IHI)   
+   > \endverbatim   
+   >   
+   > \param[out] WI   
+   > \verbatim   
+   >          WI is DOUBLE PRECISION array, dimension (IHI)   
+   >           The real and imaginary parts, respectively, of the computed   
+   >           eigenvalues of H(ILO:IHI,ILO:IHI) are stored in WR(ILO:IHI)   
+   >           and WI(ILO:IHI). If two eigenvalues are computed as a   
+   >           complex conjugate pair, they are stored in consecutive   
+   >           elements of WR and WI, say the i-th and (i+1)th, with   
+   >           WI(i) .GT. 0 and WI(i+1) .LT. 0. If WANTT is .TRUE., then   
+   >           the eigenvalues are stored in the same order as on the   
+   >           diagonal of the Schur form returned in H, with   
+   >           WR(i) = H(i,i) and, if H(i:i+1,i:i+1) is a 2-by-2 diagonal   
+   >           block, WI(i) = sqrt(-H(i+1,i)*H(i,i+1)) and   
+   >           WI(i+1) = -WI(i).   
+   > \endverbatim   
+   >   
+   > \param[in] ILOZ   
+   > \verbatim   
+   >          ILOZ is INTEGER   
+   > \endverbatim   
+   >   
+   > \param[in] IHIZ   
+   > \verbatim   
+   >          IHIZ is INTEGER   
+   >           Specify the rows of Z to which transformations must be   
+   >           applied if WANTZ is .TRUE..   
+   >           1 .LE. ILOZ .LE. ILO; IHI .LE. IHIZ .LE. N.   
+   > \endverbatim   
+   >   
+   > \param[in,out] Z   
+   > \verbatim   
+   >          Z is DOUBLE PRECISION array, dimension (LDZ,IHI)   
+   >           If WANTZ is .FALSE., then Z is not referenced.   
+   >           If WANTZ is .TRUE., then Z(ILO:IHI,ILOZ:IHIZ) is   
+   >           replaced by Z(ILO:IHI,ILOZ:IHIZ)*U where U is the   
+   >           orthogonal Schur factor of H(ILO:IHI,ILO:IHI).   
+   >           (The output value of Z when INFO.GT.0 is given under   
+   >           the description of INFO below.)   
+   > \endverbatim   
+   >   
+   > \param[in] LDZ   
+   > \verbatim   
+   >          LDZ is INTEGER   
+   >           The leading dimension of the array Z.  if WANTZ is .TRUE.   
+   >           then LDZ.GE.MAX(1,IHIZ).  Otherwize, LDZ.GE.1.   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension LWORK   
+   >           On exit, if LWORK = -1, WORK(1) returns an estimate of   
+   >           the optimal value for LWORK.   
+   > \endverbatim   
+   >   
+   > \param[in] LWORK   
+   > \verbatim   
+   >          LWORK is INTEGER   
+   >           The dimension of the array WORK.  LWORK .GE. max(1,N)   
+   >           is sufficient, but LWORK typically as large as 6*N may   
+   >           be required for optimal performance.  A workspace query   
+   >           to determine the optimal workspace size is recommended.   
+   >   
+   >           If LWORK = -1, then DLAQR4 does a workspace query.   
+   >           In this case, DLAQR4 checks the input parameters and   
+   >           estimates the optimal workspace size for the given   
+   >           values of N, ILO and IHI.  The estimate is returned   
+   >           in WORK(1).  No error message related to LWORK is   
+   >           issued by XERBLA.  Neither H nor Z are accessed.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >             =  0:  successful exit   
+   >           .GT. 0:  if INFO = i, DLAQR4 failed to compute all of   
+   >                the eigenvalues.  Elements 1:ilo-1 and i+1:n of WR   
+   >                and WI contain those eigenvalues which have been   
+   >                successfully computed.  (Failures are rare.)   
+   >   
+   >                If INFO .GT. 0 and WANT is .FALSE., then on exit,   
+   >                the remaining unconverged eigenvalues are the eigen-   
+   >                values of the upper Hessenberg matrix rows and   
+   >                columns ILO through INFO of the final, output   
+   >                value of H.   
+   >   
+   >                If INFO .GT. 0 and WANTT is .TRUE., then on exit   
+   >   
+   >           (*)  (initial value of H)*U  = U*(final value of H)   
+   >   
+   >                where U is a orthogonal matrix.  The final   
+   >                value of  H is upper Hessenberg and triangular in   
+   >                rows and columns INFO+1 through IHI.   
+   >   
+   >                If INFO .GT. 0 and WANTZ is .TRUE., then on exit   
+   >   
+   >                  (final value of Z(ILO:IHI,ILOZ:IHIZ)   
+   >                   =  (initial value of Z(ILO:IHI,ILOZ:IHIZ)*U   
+   >   
+   >                where U is the orthogonal matrix in (*) (regard-   
+   >                less of the value of WANTT.)   
+   >   
+   >                If INFO .GT. 0 and WANTZ is .FALSE., then Z is not   
+   >                accessed.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup doubleOTHERauxiliary   
+
+   > \par Contributors:   
+    ==================   
+   >   
+   >       Karen Braman and Ralph Byers, Department of Mathematics,   
+   >       University of Kansas, USA   
+
+   > \par References:   
+    ================   
+   >   
+   >       K. Braman, R. Byers and R. Mathias, The Multi-Shift QR   
+   >       Algorithm Part I: Maintaining Well Focused Shifts, and Level 3   
+   >       Performance, SIAM Journal of Matrix Analysis, volume 23, pages   
+   >       929--947, 2002.   
+   > \n   
+   >       K. Braman, R. Byers and R. Mathias, The Multi-Shift QR   
+   >       Algorithm Part II: Aggressive Early Deflation, SIAM Journal   
+   >       of Matrix Analysis, volume 23, pages 948--973, 2002.   
+   >   
+    =====================================================================   
+   Subroutine */ int igraphdlaqr4_(logical *wantt, logical *wantz, integer *n, 
 	integer *ilo, integer *ihi, doublereal *h__, integer *ldh, doublereal 
 	*wr, doublereal *wi, integer *iloz, integer *ihiz, doublereal *z__, 
 	integer *ldz, doublereal *work, integer *lwork, integer *info)
@@ -75,173 +337,13 @@ static integer c__3 = 3;
     integer lwkopt;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
-       Univ. of Tennessee, Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..   
-       November 2006   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
+    -- LAPACK is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       September 2012   
 
 
-       This subroutine implements one level of recursion for DLAQR0.   
-       It is a complete implementation of the small bulge multi-shift   
-       QR algorithm.  It may be called by DLAQR0 and, for large enough   
-       deflation window size, it may be called by DLAQR3.  This   
-       subroutine is identical to DLAQR0 except that it calls DLAQR2   
-       instead of DLAQR3.   
-
-       Purpose   
-       =======   
-
-       DLAQR4 computes the eigenvalues of a Hessenberg matrix H   
-       and, optionally, the matrices T and Z from the Schur decomposition   
-       H = Z T Z**T, where T is an upper quasi-triangular matrix (the   
-       Schur form), and Z is the orthogonal matrix of Schur vectors.   
-
-       Optionally Z may be postmultiplied into an input orthogonal   
-       matrix Q so that this routine can give the Schur factorization   
-       of a matrix A which has been reduced to the Hessenberg form H   
-       by the orthogonal matrix Q:  A = Q*H*Q**T = (QZ)*T*(QZ)**T.   
-
-       Arguments   
-       =========   
-
-       WANTT   (input) LOGICAL   
-            = .TRUE. : the full Schur form T is required;   
-            = .FALSE.: only eigenvalues are required.   
-
-       WANTZ   (input) LOGICAL   
-            = .TRUE. : the matrix of Schur vectors Z is required;   
-            = .FALSE.: Schur vectors are not required.   
-
-       N     (input) INTEGER   
-             The order of the matrix H.  N .GE. 0.   
-
-       ILO   (input) INTEGER   
-       IHI   (input) INTEGER   
-             It is assumed that H is already upper triangular in rows   
-             and columns 1:ILO-1 and IHI+1:N and, if ILO.GT.1,   
-             H(ILO,ILO-1) is zero. ILO and IHI are normally set by a   
-             previous call to DGEBAL, and then passed to DGEHRD when the   
-             matrix output by DGEBAL is reduced to Hessenberg form.   
-             Otherwise, ILO and IHI should be set to 1 and N,   
-             respectively.  If N.GT.0, then 1.LE.ILO.LE.IHI.LE.N.   
-             If N = 0, then ILO = 1 and IHI = 0.   
-
-       H     (input/output) DOUBLE PRECISION array, dimension (LDH,N)   
-             On entry, the upper Hessenberg matrix H.   
-             On exit, if INFO = 0 and WANTT is .TRUE., then H contains   
-             the upper quasi-triangular matrix T from the Schur   
-             decomposition (the Schur form); 2-by-2 diagonal blocks   
-             (corresponding to complex conjugate pairs of eigenvalues)   
-             are returned in standard form, with H(i,i) = H(i+1,i+1)   
-             and H(i+1,i)*H(i,i+1).LT.0. If INFO = 0 and WANTT is   
-             .FALSE., then the contents of H are unspecified on exit.   
-             (The output value of H when INFO.GT.0 is given under the   
-             description of INFO below.)   
-
-             This subroutine may explicitly set H(i,j) = 0 for i.GT.j and   
-             j = 1, 2, ... ILO-1 or j = IHI+1, IHI+2, ... N.   
-
-       LDH   (input) INTEGER   
-             The leading dimension of the array H. LDH .GE. max(1,N).   
-
-       WR    (output) DOUBLE PRECISION array, dimension (IHI)   
-       WI    (output) DOUBLE PRECISION array, dimension (IHI)   
-             The real and imaginary parts, respectively, of the computed   
-             eigenvalues of H(ILO:IHI,ILO:IHI) are stored in WR(ILO:IHI)   
-             and WI(ILO:IHI). If two eigenvalues are computed as a   
-             complex conjugate pair, they are stored in consecutive   
-             elements of WR and WI, say the i-th and (i+1)th, with   
-             WI(i) .GT. 0 and WI(i+1) .LT. 0. If WANTT is .TRUE., then   
-             the eigenvalues are stored in the same order as on the   
-             diagonal of the Schur form returned in H, with   
-             WR(i) = H(i,i) and, if H(i:i+1,i:i+1) is a 2-by-2 diagonal   
-             block, WI(i) = sqrt(-H(i+1,i)*H(i,i+1)) and   
-             WI(i+1) = -WI(i).   
-
-       ILOZ     (input) INTEGER   
-       IHIZ     (input) INTEGER   
-             Specify the rows of Z to which transformations must be   
-             applied if WANTZ is .TRUE..   
-             1 .LE. ILOZ .LE. ILO; IHI .LE. IHIZ .LE. N.   
-
-       Z     (input/output) DOUBLE PRECISION array, dimension (LDZ,IHI)   
-             If WANTZ is .FALSE., then Z is not referenced.   
-             If WANTZ is .TRUE., then Z(ILO:IHI,ILOZ:IHIZ) is   
-             replaced by Z(ILO:IHI,ILOZ:IHIZ)*U where U is the   
-             orthogonal Schur factor of H(ILO:IHI,ILO:IHI).   
-             (The output value of Z when INFO.GT.0 is given under   
-             the description of INFO below.)   
-
-       LDZ   (input) INTEGER   
-             The leading dimension of the array Z.  if WANTZ is .TRUE.   
-             then LDZ.GE.MAX(1,IHIZ).  Otherwize, LDZ.GE.1.   
-
-       WORK  (workspace/output) DOUBLE PRECISION array, dimension LWORK   
-             On exit, if LWORK = -1, WORK(1) returns an estimate of   
-             the optimal value for LWORK.   
-
-       LWORK (input) INTEGER   
-             The dimension of the array WORK.  LWORK .GE. max(1,N)   
-             is sufficient, but LWORK typically as large as 6*N may   
-             be required for optimal performance.  A workspace query   
-             to determine the optimal workspace size is recommended.   
-
-             If LWORK = -1, then DLAQR4 does a workspace query.   
-             In this case, DLAQR4 checks the input parameters and   
-             estimates the optimal workspace size for the given   
-             values of N, ILO and IHI.  The estimate is returned   
-             in WORK(1).  No error message related to LWORK is   
-             issued by XERBLA.  Neither H nor Z are accessed.   
-
-
-       INFO  (output) INTEGER   
-               =  0:  successful exit   
-             .GT. 0:  if INFO = i, DLAQR4 failed to compute all of   
-                  the eigenvalues.  Elements 1:ilo-1 and i+1:n of WR   
-                  and WI contain those eigenvalues which have been   
-                  successfully computed.  (Failures are rare.)   
-
-                  If INFO .GT. 0 and WANT is .FALSE., then on exit,   
-                  the remaining unconverged eigenvalues are the eigen-   
-                  values of the upper Hessenberg matrix rows and   
-                  columns ILO through INFO of the final, output   
-                  value of H.   
-
-                  If INFO .GT. 0 and WANTT is .TRUE., then on exit   
-
-             (*)  (initial value of H)*U  = U*(final value of H)   
-
-                  where U is an orthogonal matrix.  The final   
-                  value of H is upper Hessenberg and quasi-triangular   
-                  in rows and columns INFO+1 through IHI.   
-
-                  If INFO .GT. 0 and WANTZ is .TRUE., then on exit   
-
-                    (final value of Z(ILO:IHI,ILOZ:IHIZ)   
-                     =  (initial value of Z(ILO:IHI,ILOZ:IHIZ)*U   
-
-                  where U is the orthogonal matrix in (*) (regard-   
-                  less of the value of WANTT.)   
-
-                  If INFO .GT. 0 and WANTZ is .FALSE., then Z is not   
-                  accessed.   
-
-       ================================================================   
-       Based on contributions by   
-          Karen Braman and Ralph Byers, Department of Mathematics,   
-          University of Kansas, USA   
-
-       ================================================================   
-       References:   
-         K. Braman, R. Byers and R. Mathias, The Multi-Shift QR   
-         Algorithm Part I: Maintaining Well Focused Shifts, and Level 3   
-         Performance, SIAM Journal of Matrix Analysis, volume 23, pages   
-         929--947, 2002.   
-
-         K. Braman, R. Byers and R. Mathias, The Multi-Shift QR   
-         Algorithm Part II: Aggressive Early Deflation, SIAM Journal   
-         of Matrix Analysis, volume 23, pages 948--973, 2002.   
-
-       ================================================================   
+    ================================================================   
 
        ==== Matrices of order NTINY or smaller must be processed by   
        .    DLAHQR because of insufficient subdiagonal scratch space.   

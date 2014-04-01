@@ -152,6 +152,18 @@ class BasicTests(unittest.TestCase):
         self.assertRaises(ValueError, g.delete_edges, [("A", "C")])
         self.assertRaises(ValueError, g.delete_edges, [(0,15)])
 
+    def testGraphGetEid(self):
+        g = Graph.Famous("petersen")
+        g.vs["name"] = list("ABCDEFGHIJ")
+        edges_to_ids = dict((v, k) for k, v in enumerate(g.get_edgelist()))
+        for (source, target), edge_id in edges_to_ids.iteritems():
+            source_name, target_name = g.vs[(source, target)]["name"]
+            self.assertEqual(edge_id, g.get_eid(source, target))
+            self.assertEqual(edge_id, g.get_eid(source_name, target_name))
+
+        self.assertRaises(InternalError, g.get_eid, 0, 11)
+        self.assertRaises(ValueError, g.get_eid, "A", "K")
+
     def testGraphGetEids(self):
         g = Graph.Famous("petersen")
         eids = g.get_eids(pairs=[(0,1), (0,5), (1, 6), (4, 9), (8, 6)])

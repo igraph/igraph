@@ -337,11 +337,17 @@ class NeighborhoodTests(unittest.TestCase):
                 [[0,1,2,3], [0,1,2,3,4], [0,1,2,3,4,5], [0,1,2,3,4,5,6], \
                     [1,2,3,4,5,6,7], [2,3,4,5,6,7,8], [3,4,5,6,7,8,9], \
                     [4,5,6,7,8,9], [5,6,7,8,9], [6,7,8,9]])
+        self.assertTrue(map(sorted, g.neighborhood(order=3, mindist=2)) == \
+                [[2,3], [3,4], [0,4,5], [0,1,5,6], \
+                    [1,2,6,7], [2,3,7,8], [3,4,8,9], \
+                    [4,5,9], [5,6], [6,7]])
 
     def testNeighborhoodSize(self):
         g = Graph.Ring(10, circular=False)
         self.assertTrue(g.neighborhood_size() == [2,3,3,3,3,3,3,3,3,2])
         self.assertTrue(g.neighborhood_size(order=3) == [4,5,6,7,7,7,7,6,5,4])
+        self.assertTrue(g.neighborhood_size(order=3, mindist=2) == \
+                [2,2,3,4,4,4,4,3,2,2])
 
 
 class MiscTests(unittest.TestCase):
@@ -464,6 +470,36 @@ class PathTests(unittest.TestCase):
         self.assertEqual(4, sum(1 for path in sps if path[-1] == 12))
         self.assertEqual(12, sum(1 for path in sps if path[-1] == 15))
 
+    def testGetAllSimplePaths(self):
+        g = Graph.Ring(20)
+        sps = sorted(g.get_all_simple_paths(0, 10))
+        self.assertEqual([
+            [0,1,2,3,4,5,6,7,8,9,10],
+            [0,19,18,17,16,15,14,13,12,11,10]
+        ], sps)
+
+        g = Graph.Ring(20, directed=True)
+        sps = sorted(g.get_all_simple_paths(0, 10))
+        self.assertEqual([ [0,1,2,3,4,5,6,7,8,9,10] ], sps)
+        sps = sorted(g.get_all_simple_paths(0, 10, mode="in"))
+        self.assertEqual([ [0,19,18,17,16,15,14,13,12,11,10] ], sps)
+        sps = sorted(g.get_all_simple_paths(0, 10, mode="all"))
+        self.assertEqual([
+            [0,1,2,3,4,5,6,7,8,9,10],
+            [0,19,18,17,16,15,14,13,12,11,10]
+        ], sps)
+
+        g = Graph.Lattice([4, 4], circular=False)
+        g = Graph([(min(u, v), max(u, v)) for u, v in g.get_edgelist()], directed=True)
+        sps = sorted(g.get_all_simple_paths(0, 15))
+        self.assertEqual(20, len(sps))
+        for path in sps:
+            self.assertEqual(0, path[0])
+            self.assertEqual(15, path[-1])
+            curr = path[0]
+            for next in path[1:]:
+                self.assertTrue(g.are_connected(curr, next))
+                curr = next
 
     def testPathLengthHist(self):
         g = Graph.Tree(15, 2)

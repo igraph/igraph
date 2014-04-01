@@ -56,31 +56,22 @@ int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int wid
 int igraph_layout_fruchterman_reingold(const igraph_t *graph,
 				       igraph_matrix_t *res,
 				       igraph_bool_t use_seed,
-				       igraph_real_t width,
-				       igraph_real_t height,
 				       igraph_integer_t niter,
 				       igraph_real_t start_temp,
+				       igraph_layout_grid_t grid,
 				       const igraph_vector_t *weight,
 				       const igraph_vector_t *minx,
 				       const igraph_vector_t *maxx,
 				       const igraph_vector_t *miny,
 				       const igraph_vector_t *maxy);
 
-int igraph_layout_grid_fruchterman_reingold(const igraph_t *graph, 
-					    igraph_matrix_t *res,
-					    igraph_integer_t niter, igraph_real_t maxdelta, 
-					    igraph_real_t area, igraph_real_t coolexp,
-					    igraph_real_t repulserad, 
-					    igraph_real_t cellsize, igraph_bool_t use_seed,
-                        const igraph_vector_t *weight);
 int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
-			       igraph_integer_t niter, igraph_real_t sigma, 
-			       igraph_real_t initemp, igraph_real_t coolexp,
-			       igraph_real_t kkconst, igraph_bool_t use_seed,
-			       const igraph_vector_t *minx,
-			       const igraph_vector_t *maxx,
-			       const igraph_vector_t *miny,
-			       const igraph_vector_t *maxy);
+	       igraph_bool_t use_seed, igraph_integer_t maxiter,
+	       igraph_real_t epsilon, igraph_real_t kkconst, 
+	       const igraph_vector_t *weights,
+	       const igraph_vector_t *minx, const igraph_vector_t *maxx,
+	       const igraph_vector_t *miny, const igraph_vector_t *maxy);
+
 int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
 			  igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
 			  igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse);
@@ -108,10 +99,9 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
         long int width, long int height);
 int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
 					  igraph_matrix_t *res,
-					  igraph_integer_t niter, igraph_real_t maxdelta,
-					  igraph_real_t volume, igraph_real_t coolexp,
-					  igraph_real_t repulserad,
 					  igraph_bool_t use_seed,
+					  igraph_integer_t niter,
+					  igraph_real_t start_temp,
 					  const igraph_vector_t *weight, 
 					  const igraph_vector_t *minx,
 					  const igraph_vector_t *maxx,
@@ -121,16 +111,12 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
 					  const igraph_vector_t *maxz);
 
 int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
-				  igraph_integer_t niter, igraph_real_t sigma, 
-				  igraph_real_t initemp, igraph_real_t coolexp, 
-				  igraph_real_t kkconst, igraph_bool_t use_seed,
-				  igraph_bool_t fixz, 
-				  const igraph_vector_t *minx,
-				  const igraph_vector_t *maxx,
-				  const igraph_vector_t *miny,
-				  const igraph_vector_t *maxy,
-				  const igraph_vector_t *minz,
-				  const igraph_vector_t *maxz);
+	       igraph_bool_t use_seed, igraph_integer_t maxiter,
+	       igraph_real_t epsilon, igraph_real_t kkconst, 
+	       const igraph_vector_t *weights,
+	       const igraph_vector_t *minx, const igraph_vector_t *maxx,
+	       const igraph_vector_t *miny, const igraph_vector_t *maxy,
+	       const igraph_vector_t *minz, const igraph_vector_t *maxz);
 
 int igraph_layout_graphopt(const igraph_t *graph, 
 			   igraph_matrix_t *res, igraph_integer_t niter,
@@ -251,6 +237,19 @@ int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
 int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
 			    igraph_vector_ptr_t *coords, 
 			    igraph_matrix_t *res);
+
+int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
+		      igraph_bool_t use_seed, igraph_integer_t maxiter,
+		      igraph_real_t temp_max, igraph_real_t temp_min,
+		      igraph_real_t temp_init);
+
+int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
+		 igraph_bool_t use_seed, igraph_integer_t maxiter,
+		 igraph_integer_t fineiter, igraph_real_t cool_fact,
+		 igraph_real_t weight_node_dist, igraph_real_t weight_border, 
+		 igraph_real_t weight_edge_lengths, 
+		 igraph_real_t weight_edge_crossings,
+		 igraph_real_t weight_node_edge_dist);
 
 __END_DECLS
 

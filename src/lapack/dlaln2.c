@@ -12,7 +12,223 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int igraphdlaln2_(logical *ltrans, integer *na, integer *nw, 
+/* > \brief \b DLALN2 solves a 1-by-1 or 2-by-2 linear system of equations of the specified form.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLALN2 + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlaln2.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlaln2.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlaln2.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLALN2( LTRANS, NA, NW, SMIN, CA, A, LDA, D1, D2, B,   
+                            LDB, WR, WI, X, LDX, SCALE, XNORM, INFO )   
+
+         LOGICAL            LTRANS   
+         INTEGER            INFO, LDA, LDB, LDX, NA, NW   
+         DOUBLE PRECISION   CA, D1, D2, SCALE, SMIN, WI, WR, XNORM   
+         DOUBLE PRECISION   A( LDA, * ), B( LDB, * ), X( LDX, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLALN2 solves a system of the form  (ca A - w D ) X = s B   
+   > or (ca A**T - w D) X = s B   with possible scaling ("s") and   
+   > perturbation of A.  (A**T means A-transpose.)   
+   >   
+   > A is an NA x NA real matrix, ca is a real scalar, D is an NA x NA   
+   > real diagonal matrix, w is a real or complex value, and X and B are   
+   > NA x 1 matrices -- real if w is real, complex if w is complex.  NA   
+   > may be 1 or 2.   
+   >   
+   > If w is complex, X and B are represented as NA x 2 matrices,   
+   > the first column of each being the real part and the second   
+   > being the imaginary part.   
+   >   
+   > "s" is a scaling factor (.LE. 1), computed by DLALN2, which is   
+   > so chosen that X can be computed without overflow.  X is further   
+   > scaled if necessary to assure that norm(ca A - w D)*norm(X) is less   
+   > than overflow.   
+   >   
+   > If both singular values of (ca A - w D) are less than SMIN,   
+   > SMIN*identity will be used instead of (ca A - w D).  If only one   
+   > singular value is less than SMIN, one element of (ca A - w D) will be   
+   > perturbed enough to make the smallest singular value roughly SMIN.   
+   > If both singular values are at least SMIN, (ca A - w D) will not be   
+   > perturbed.  In any case, the perturbation will be at most some small   
+   > multiple of max( SMIN, ulp*norm(ca A - w D) ).  The singular values   
+   > are computed by infinity-norm approximations, and thus will only be   
+   > correct to a factor of 2 or so.   
+   >   
+   > Note: all input quantities are assumed to be smaller than overflow   
+   > by a reasonable factor.  (See BIGNUM.)   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] LTRANS   
+   > \verbatim   
+   >          LTRANS is LOGICAL   
+   >          =.TRUE.:  A-transpose will be used.   
+   >          =.FALSE.: A will be used (not transposed.)   
+   > \endverbatim   
+   >   
+   > \param[in] NA   
+   > \verbatim   
+   >          NA is INTEGER   
+   >          The size of the matrix A.  It may (only) be 1 or 2.   
+   > \endverbatim   
+   >   
+   > \param[in] NW   
+   > \verbatim   
+   >          NW is INTEGER   
+   >          1 if "w" is real, 2 if "w" is complex.  It may only be 1   
+   >          or 2.   
+   > \endverbatim   
+   >   
+   > \param[in] SMIN   
+   > \verbatim   
+   >          SMIN is DOUBLE PRECISION   
+   >          The desired lower bound on the singular values of A.  This   
+   >          should be a safe distance away from underflow or overflow,   
+   >          say, between (underflow/machine precision) and  (machine   
+   >          precision * overflow ).  (See BIGNUM and ULP.)   
+   > \endverbatim   
+   >   
+   > \param[in] CA   
+   > \verbatim   
+   >          CA is DOUBLE PRECISION   
+   >          The coefficient c, which A is multiplied by.   
+   > \endverbatim   
+   >   
+   > \param[in] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension (LDA,NA)   
+   >          The NA x NA matrix A.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The leading dimension of A.  It must be at least NA.   
+   > \endverbatim   
+   >   
+   > \param[in] D1   
+   > \verbatim   
+   >          D1 is DOUBLE PRECISION   
+   >          The 1,1 element in the diagonal matrix D.   
+   > \endverbatim   
+   >   
+   > \param[in] D2   
+   > \verbatim   
+   >          D2 is DOUBLE PRECISION   
+   >          The 2,2 element in the diagonal matrix D.  Not used if NW=1.   
+   > \endverbatim   
+   >   
+   > \param[in] B   
+   > \verbatim   
+   >          B is DOUBLE PRECISION array, dimension (LDB,NW)   
+   >          The NA x NW matrix B (right-hand side).  If NW=2 ("w" is   
+   >          complex), column 1 contains the real part of B and column 2   
+   >          contains the imaginary part.   
+   > \endverbatim   
+   >   
+   > \param[in] LDB   
+   > \verbatim   
+   >          LDB is INTEGER   
+   >          The leading dimension of B.  It must be at least NA.   
+   > \endverbatim   
+   >   
+   > \param[in] WR   
+   > \verbatim   
+   >          WR is DOUBLE PRECISION   
+   >          The real part of the scalar "w".   
+   > \endverbatim   
+   >   
+   > \param[in] WI   
+   > \verbatim   
+   >          WI is DOUBLE PRECISION   
+   >          The imaginary part of the scalar "w".  Not used if NW=1.   
+   > \endverbatim   
+   >   
+   > \param[out] X   
+   > \verbatim   
+   >          X is DOUBLE PRECISION array, dimension (LDX,NW)   
+   >          The NA x NW matrix X (unknowns), as computed by DLALN2.   
+   >          If NW=2 ("w" is complex), on exit, column 1 will contain   
+   >          the real part of X and column 2 will contain the imaginary   
+   >          part.   
+   > \endverbatim   
+   >   
+   > \param[in] LDX   
+   > \verbatim   
+   >          LDX is INTEGER   
+   >          The leading dimension of X.  It must be at least NA.   
+   > \endverbatim   
+   >   
+   > \param[out] SCALE   
+   > \verbatim   
+   >          SCALE is DOUBLE PRECISION   
+   >          The scale factor that B must be multiplied by to insure   
+   >          that overflow does not occur when computing X.  Thus,   
+   >          (ca A - w D) X  will be SCALE*B, not B (ignoring   
+   >          perturbations of A.)  It will be at most 1.   
+   > \endverbatim   
+   >   
+   > \param[out] XNORM   
+   > \verbatim   
+   >          XNORM is DOUBLE PRECISION   
+   >          The infinity-norm of X, when X is regarded as an NA x NW   
+   >          real matrix.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          An error flag.  It will be set to zero if no error occurs,   
+   >          a negative number if an argument is in error, or a positive   
+   >          number if  ca A - w D  had to be perturbed.   
+   >          The possible values are:   
+   >          = 0: No error occurred, and (ca A - w D) did not have to be   
+   >                 perturbed.   
+   >          = 1: (ca A - w D) had to be perturbed to make its smallest   
+   >               (or only) singular value greater than SMIN.   
+   >          NOTE: In the interests of speed, this routine does not   
+   >                check the inputs for errors.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup doubleOTHERauxiliary   
+
+    =====================================================================   
+   Subroutine */ int igraphdlaln2_(logical *ltrans, integer *na, integer *nw, 
 	doublereal *smin, doublereal *ca, doublereal *a, integer *lda, 
 	doublereal *d1, doublereal *d2, doublereal *b, integer *ldb, 
 	doublereal *wr, doublereal *wi, doublereal *x, integer *ldx, 
@@ -48,125 +264,11 @@
     doublereal bignum, smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLALN2 solves a system of the form  (ca A - w D ) X = s B   
-    or (ca A**T - w D) X = s B   with possible scaling ("s") and   
-    perturbation of A.  (A**T means A-transpose.)   
-
-    A is an NA x NA real matrix, ca is a real scalar, D is an NA x NA   
-    real diagonal matrix, w is a real or complex value, and X and B are   
-    NA x 1 matrices -- real if w is real, complex if w is complex.  NA   
-    may be 1 or 2.   
-
-    If w is complex, X and B are represented as NA x 2 matrices,   
-    the first column of each being the real part and the second   
-    being the imaginary part.   
-
-    "s" is a scaling factor (.LE. 1), computed by DLALN2, which is   
-    so chosen that X can be computed without overflow.  X is further   
-    scaled if necessary to assure that norm(ca A - w D)*norm(X) is less   
-    than overflow.   
-
-    If both singular values of (ca A - w D) are less than SMIN,   
-    SMIN*identity will be used instead of (ca A - w D).  If only one   
-    singular value is less than SMIN, one element of (ca A - w D) will be   
-    perturbed enough to make the smallest singular value roughly SMIN.   
-    If both singular values are at least SMIN, (ca A - w D) will not be   
-    perturbed.  In any case, the perturbation will be at most some small   
-    multiple of max( SMIN, ulp*norm(ca A - w D) ).  The singular values   
-    are computed by infinity-norm approximations, and thus will only be   
-    correct to a factor of 2 or so.   
-
-    Note: all input quantities are assumed to be smaller than overflow   
-    by a reasonable factor.  (See BIGNUM.)   
-
-    Arguments   
-    ==========   
-
-    LTRANS  (input) LOGICAL   
-            =.TRUE.:  A-transpose will be used.   
-            =.FALSE.: A will be used (not transposed.)   
-
-    NA      (input) INTEGER   
-            The size of the matrix A.  It may (only) be 1 or 2.   
-
-    NW      (input) INTEGER   
-            1 if "w" is real, 2 if "w" is complex.  It may only be 1   
-            or 2.   
-
-    SMIN    (input) DOUBLE PRECISION   
-            The desired lower bound on the singular values of A.  This   
-            should be a safe distance away from underflow or overflow,   
-            say, between (underflow/machine precision) and  (machine   
-            precision * overflow ).  (See BIGNUM and ULP.)   
-
-    CA      (input) DOUBLE PRECISION   
-            The coefficient c, which A is multiplied by.   
-
-    A       (input) DOUBLE PRECISION array, dimension (LDA,NA)   
-            The NA x NA matrix A.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of A.  It must be at least NA.   
-
-    D1      (input) DOUBLE PRECISION   
-            The 1,1 element in the diagonal matrix D.   
-
-    D2      (input) DOUBLE PRECISION   
-            The 2,2 element in the diagonal matrix D.  Not used if NW=1.   
-
-    B       (input) DOUBLE PRECISION array, dimension (LDB,NW)   
-            The NA x NW matrix B (right-hand side).  If NW=2 ("w" is   
-            complex), column 1 contains the real part of B and column 2   
-            contains the imaginary part.   
-
-    LDB     (input) INTEGER   
-            The leading dimension of B.  It must be at least NA.   
-
-    WR      (input) DOUBLE PRECISION   
-            The real part of the scalar "w".   
-
-    WI      (input) DOUBLE PRECISION   
-            The imaginary part of the scalar "w".  Not used if NW=1.   
-
-    X       (output) DOUBLE PRECISION array, dimension (LDX,NW)   
-            The NA x NW matrix X (unknowns), as computed by DLALN2.   
-            If NW=2 ("w" is complex), on exit, column 1 will contain   
-            the real part of X and column 2 will contain the imaginary   
-            part.   
-
-    LDX     (input) INTEGER   
-            The leading dimension of X.  It must be at least NA.   
-
-    SCALE   (output) DOUBLE PRECISION   
-            The scale factor that B must be multiplied by to insure   
-            that overflow does not occur when computing X.  Thus,   
-            (ca A - w D) X  will be SCALE*B, not B (ignoring   
-            perturbations of A.)  It will be at most 1.   
-
-    XNORM   (output) DOUBLE PRECISION   
-            The infinity-norm of X, when X is regarded as an NA x NW   
-            real matrix.   
-
-    INFO    (output) INTEGER   
-            An error flag.  It will be set to zero if no error occurs,   
-            a negative number if an argument is in error, or a positive   
-            number if  ca A - w D  had to be perturbed.   
-            The possible values are:   
-            = 0: No error occurred, and (ca A - w D) did not have to be   
-                   perturbed.   
-            = 1: (ca A - w D) had to be perturbed to make its smallest   
-                 (or only) singular value greater than SMIN.   
-            NOTE: In the interests of speed, this routine does not   
-                  check the inputs for errors.   
 
    =====================================================================   
 

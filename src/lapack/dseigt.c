@@ -116,7 +116,7 @@ static integer c__1 = 1;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdvout_(integer *, integer *, doublereal 
 	    *, integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil=0, ndigit, mseigt=0;
+    integer logfil, ndigit, mseigt;
     extern /* Subroutine */ int igraphdstqrb_(integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *);
     real tseigt;

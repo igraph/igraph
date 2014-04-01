@@ -16,7 +16,165 @@
 
 static integer c__1 = 1;
 
-/* Subroutine */ int igraphdorm2l_(char *side, char *trans, integer *m, integer *n, 
+/* > \brief \b DORM2L multiplies a general matrix by the orthogonal matrix from a QL factorization determined 
+by sgeqlf (unblocked algorithm).   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DORM2L + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dorm2l.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dorm2l.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dorm2l.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DORM2L( SIDE, TRANS, M, N, K, A, LDA, TAU, C, LDC,   
+                            WORK, INFO )   
+
+         CHARACTER          SIDE, TRANS   
+         INTEGER            INFO, K, LDA, LDC, M, N   
+         DOUBLE PRECISION   A( LDA, * ), C( LDC, * ), TAU( * ), WORK( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DORM2L overwrites the general real m by n matrix C with   
+   >   
+   >       Q * C  if SIDE = 'L' and TRANS = 'N', or   
+   >   
+   >       Q**T * C  if SIDE = 'L' and TRANS = 'T', or   
+   >   
+   >       C * Q  if SIDE = 'R' and TRANS = 'N', or   
+   >   
+   >       C * Q**T if SIDE = 'R' and TRANS = 'T',   
+   >   
+   > where Q is a real orthogonal matrix defined as the product of k   
+   > elementary reflectors   
+   >   
+   >       Q = H(k) . . . H(2) H(1)   
+   >   
+   > as returned by DGEQLF. Q is of order m if SIDE = 'L' and of order n   
+   > if SIDE = 'R'.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] SIDE   
+   > \verbatim   
+   >          SIDE is CHARACTER*1   
+   >          = 'L': apply Q or Q**T from the Left   
+   >          = 'R': apply Q or Q**T from the Right   
+   > \endverbatim   
+   >   
+   > \param[in] TRANS   
+   > \verbatim   
+   >          TRANS is CHARACTER*1   
+   >          = 'N': apply Q  (No transpose)   
+   >          = 'T': apply Q**T (Transpose)   
+   > \endverbatim   
+   >   
+   > \param[in] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >          The number of rows of the matrix C. M >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The number of columns of the matrix C. N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] K   
+   > \verbatim   
+   >          K is INTEGER   
+   >          The number of elementary reflectors whose product defines   
+   >          the matrix Q.   
+   >          If SIDE = 'L', M >= K >= 0;   
+   >          if SIDE = 'R', N >= K >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension (LDA,K)   
+   >          The i-th column must contain the vector which defines the   
+   >          elementary reflector H(i), for i = 1,2,...,k, as returned by   
+   >          DGEQLF in the last k columns of its array argument A.   
+   >          A is modified by the routine but restored on exit.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The leading dimension of the array A.   
+   >          If SIDE = 'L', LDA >= max(1,M);   
+   >          if SIDE = 'R', LDA >= max(1,N).   
+   > \endverbatim   
+   >   
+   > \param[in] TAU   
+   > \verbatim   
+   >          TAU is DOUBLE PRECISION array, dimension (K)   
+   >          TAU(i) must contain the scalar factor of the elementary   
+   >          reflector H(i), as returned by DGEQLF.   
+   > \endverbatim   
+   >   
+   > \param[in,out] C   
+   > \verbatim   
+   >          C is DOUBLE PRECISION array, dimension (LDC,N)   
+   >          On entry, the m by n matrix C.   
+   >          On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q.   
+   > \endverbatim   
+   >   
+   > \param[in] LDC   
+   > \verbatim   
+   >          LDC is INTEGER   
+   >          The leading dimension of the array C. LDC >= max(1,M).   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension   
+   >                                   (N) if SIDE = 'L',   
+   >                                   (M) if SIDE = 'R'   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          = 0: successful exit   
+   >          < 0: if INFO = -i, the i-th argument had an illegal value   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup doubleOTHERcomputational   
+
+    =====================================================================   
+   Subroutine */ int igraphdorm2l_(char *side, char *trans, integer *m, integer *n, 
 	integer *k, doublereal *a, integer *lda, doublereal *tau, doublereal *
 	c__, integer *ldc, doublereal *work, integer *info)
 {
@@ -35,85 +193,11 @@ static integer c__1 = 1;
     logical notran;
 
 
-/*  -- LAPACK routine (version 3.3.1) --   
+/*  -- LAPACK computational routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-    -- April 2011                                                      --   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DORM2L overwrites the general real m by n matrix C with   
-
-          Q * C  if SIDE = 'L' and TRANS = 'N', or   
-
-          Q**T * C  if SIDE = 'L' and TRANS = 'T', or   
-
-          C * Q  if SIDE = 'R' and TRANS = 'N', or   
-
-          C * Q**T if SIDE = 'R' and TRANS = 'T',   
-
-    where Q is a real orthogonal matrix defined as the product of k   
-    elementary reflectors   
-
-          Q = H(k) . . . H(2) H(1)   
-
-    as returned by DGEQLF. Q is of order m if SIDE = 'L' and of order n   
-    if SIDE = 'R'.   
-
-    Arguments   
-    =========   
-
-    SIDE    (input) CHARACTER*1   
-            = 'L': apply Q or Q**T from the Left   
-            = 'R': apply Q or Q**T from the Right   
-
-    TRANS   (input) CHARACTER*1   
-            = 'N': apply Q  (No transpose)   
-            = 'T': apply Q**T (Transpose)   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix C. M >= 0.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix C. N >= 0.   
-
-    K       (input) INTEGER   
-            The number of elementary reflectors whose product defines   
-            the matrix Q.   
-            If SIDE = 'L', M >= K >= 0;   
-            if SIDE = 'R', N >= K >= 0.   
-
-    A       (input) DOUBLE PRECISION array, dimension (LDA,K)   
-            The i-th column must contain the vector which defines the   
-            elementary reflector H(i), for i = 1,2,...,k, as returned by   
-            DGEQLF in the last k columns of its array argument A.   
-            A is modified by the routine but restored on exit.   
-
-    LDA     (input) INTEGER   
-            The leading dimension of the array A.   
-            If SIDE = 'L', LDA >= max(1,M);   
-            if SIDE = 'R', LDA >= max(1,N).   
-
-    TAU     (input) DOUBLE PRECISION array, dimension (K)   
-            TAU(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by DGEQLF.   
-
-    C       (input/output) DOUBLE PRECISION array, dimension (LDC,N)   
-            On entry, the m by n matrix C.   
-            On exit, C is overwritten by Q*C or Q**T*C or C*Q**T or C*Q.   
-
-    LDC     (input) INTEGER   
-            The leading dimension of the array C. LDC >= max(1,M).   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension   
-                                     (N) if SIDE = 'L',   
-                                     (M) if SIDE = 'R'   
-
-    INFO    (output) INTEGER   
-            = 0: successful exit   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
 
     =====================================================================   
 

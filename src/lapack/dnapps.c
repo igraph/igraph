@@ -213,9 +213,9 @@ static doublereal c_b43 = -1.;
 	    doublereal *, doublereal *, integer *), igraphdlartg_(
 	    doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *);
-    integer logfil=0, ndigit;
+    integer logfil, ndigit;
     doublereal sigmar;
-    integer mnapps=0, msglvl;
+    integer mnapps, msglvl;
     real tnapps;
     integer istart;
     IGRAPH_F77_SAVE doublereal smlnum;

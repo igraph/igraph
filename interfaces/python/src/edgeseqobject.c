@@ -127,7 +127,7 @@ int igraphmodule_EdgeSeq_init(igraphmodule_EdgeSeqObject *self,
 	/* We selected multiple edges */
     igraph_vector_t v;
     igraph_integer_t n = igraph_ecount(&((igraphmodule_GraphObject*)g)->g);
-    if (igraphmodule_PyObject_to_vector_t(esobj, &v, 1, 0))
+    if (igraphmodule_PyObject_to_vector_t(esobj, &v, 1))
       return -1;
     if (!igraph_vector_isininterval(&v, 0, n-1)) {
       igraph_vector_destroy(&v);

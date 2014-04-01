@@ -16,6 +16,69 @@
 
 static doublereal c_b2 = 0.;
 
+/* > \brief \b DLAMCH   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+    Definition:   
+    ===========   
+
+        DOUBLE PRECISION FUNCTION DLAMCH( CMACH )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLAMCH determines double precision machine parameters.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] CMACH   
+   > \verbatim   
+   >          Specifies the value to be returned by DLAMCH:   
+   >          = 'E' or 'e',   DLAMCH := eps   
+   >          = 'S' or 's ,   DLAMCH := sfmin   
+   >          = 'B' or 'b',   DLAMCH := base   
+   >          = 'P' or 'p',   DLAMCH := eps*base   
+   >          = 'N' or 'n',   DLAMCH := t   
+   >          = 'R' or 'r',   DLAMCH := rnd   
+   >          = 'M' or 'm',   DLAMCH := emin   
+   >          = 'U' or 'u',   DLAMCH := rmin   
+   >          = 'L' or 'l',   DLAMCH := emax   
+   >          = 'O' or 'o',   DLAMCH := rmax   
+   >          where   
+   >          eps   = relative machine precision   
+   >          sfmin = safe minimum, such that 1/sfmin does not overflow   
+   >          base  = base of the machine   
+   >          prec  = eps*base   
+   >          t     = number of (base) digits in the mantissa   
+   >          rnd   = 1.0 when rounding occurs in addition, 0.0 otherwise   
+   >          emin  = minimum exponent before (gradual) underflow   
+   >          rmin  = underflow threshold - base**(emin-1)   
+   >          emax  = largest exponent before overflow   
+   >          rmax  = overflow threshold  - (base**emax)*(1-eps)   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2011   
+
+   > \ingroup auxOTHERauxiliary   
+
+    ===================================================================== */
 doublereal igraphdlamch_(char *cmach)
 {
     /* System generated locals */
@@ -32,48 +95,12 @@ doublereal igraphdlamch_(char *cmach)
     extern doublereal hugedbl_(doublereal *), tinydbl_(doublereal *);
 
 
-/*  -- LAPACK auxiliary routine (version 3.3.0) --   
+/*  -- LAPACK auxiliary routine (version 3.4.0) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       Based on LAPACK DLAMCH but with Fortran 95 query functions   
-       See: http://www.cs.utk.edu/~luszczek/lapack/lamch.html   
-       and  http://www.netlib.org/lapack-dev/lapack-coding/program-style.html#id2537289   
-       July 2010   
+       November 2011   
 
 
-    Purpose   
-    =======   
-
-    DLAMCH determines double precision machine parameters.   
-
-    Arguments   
-    =========   
-
-    CMACH   (input) CHARACTER*1   
-            Specifies the value to be returned by DLAMCH:   
-            = 'E' or 'e',   DLAMCH := eps   
-            = 'S' or 's ,   DLAMCH := sfmin   
-            = 'B' or 'b',   DLAMCH := base   
-            = 'P' or 'p',   DLAMCH := eps*base   
-            = 'N' or 'n',   DLAMCH := t   
-            = 'R' or 'r',   DLAMCH := rnd   
-            = 'M' or 'm',   DLAMCH := emin   
-            = 'U' or 'u',   DLAMCH := rmin   
-            = 'L' or 'l',   DLAMCH := emax   
-            = 'O' or 'o',   DLAMCH := rmax   
-
-            where   
-
-            eps   = relative machine precision   
-            sfmin = safe minimum, such that 1/sfmin does not overflow   
-            base  = base of the machine   
-            prec  = eps*base   
-            t     = number of (base) digits in the mantissa   
-            rnd   = 1.0 when rounding occurs in addition, 0.0 otherwise   
-            emin  = minimum exponent before (gradual) underflow   
-            rmin  = underflow threshold - base**(emin-1)   
-            emax  = largest exponent before overflow   
-            rmax  = overflow threshold  - (base**emax)*(1-eps)   
 
    =====================================================================   
 
@@ -129,32 +156,40 @@ doublereal igraphdlamch_(char *cmach)
 
 } /* igraphdlamch_   
 
-   *********************************************************************** */
-
+   ***********************************************************************   
+   > \brief \b DLAMC3   
+   > \details   
+   > \b Purpose:   
+   > \verbatim   
+   > DLAMC3  is intended to force  A  and  B  to be stored prior to doing   
+   > the addition of  A  and  B ,  for use in situations where optimizers   
+   > might hold one of these in a register.   
+   > \endverbatim   
+   > \author LAPACK is a software package provided by Univ. of Tennessee, Univ. of California Berkeley, Univ. 
+of Colorado Denver and NAG Ltd..   
+   > \date November 2011   
+   > \ingroup auxOTHERauxiliary   
+   >   
+   > \param[in] A   
+   > \verbatim   
+   >          A is a DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in] B   
+   > \verbatim   
+   >          B is a DOUBLE PRECISION   
+   >          The values A and B.   
+   > \endverbatim   
+   > */
 doublereal igraphdlamc3_(doublereal *a, doublereal *b)
 {
     /* System generated locals */
     doublereal ret_val;
 
 
-/*  -- LAPACK auxiliary routine (version 3.3.0) --   
+/*  -- LAPACK auxiliary routine (version 3.4.0) --   
        Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd..   
        November 2010   
-
-
-    Purpose   
-    =======   
-
-    DLAMC3  is intended to force  A  and  B  to be stored prior to doing   
-    the addition of  A  and  B ,  for use in situations where optimizers   
-    might hold one of these in a register.   
-
-    Arguments   
-    =========   
-
-    A       (input) DOUBLE PRECISION   
-    B       (input) DOUBLE PRECISION   
-            The values A and B.   
 
    ===================================================================== */
 

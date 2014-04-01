@@ -4,6 +4,9 @@
 *.so
 *.lo
 *.la
+.dirstamp
+.libs
+.deps
 
 /INSTALL
 /VERSION
@@ -50,22 +53,29 @@
 /interfaces/Makefile.in
 /interfaces/R/Makefile
 /interfaces/R/Makefile.in
+/interfaces/R/object_files
+/interfaces/R/version_number
 /interfaces/shell/Makefile
 /interfaces/shell/Makefile.in
 
 /src/*.o
+/src/AMD/Source/*.o
+/src/COLAMD/Source/*.o
+/src/CHOLMOD/*/*.o
+/src/SuiteSparse_config/*.o
+/src/cs/*.o
+/src/f2c/*.o
+/src/lapack/*.o
+/src/plfit/*.o
+/src/prpack/*.o
+/optional/glpk/*.o
+/optional/glpk/amd/*.o
+/optional/glpk/colamd/*.o
+
+
 /src/foreign-*-lexer.c
 /src/foreign-*-parser.c
 /src/foreign-*-parser.h
-/src/.deps
-/src/.libs
-/src/cs/.deps
-/src/f2c/.deps
-/src/lapack/.deps
-/src/plfit/.deps
-/optional/glpk/.deps
-/optional/glpk/amd/.deps
-/optional/glpk/colamd/.deps
 /include/igraph_version.h
 /include/igraph_threading.h
 

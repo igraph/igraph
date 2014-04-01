@@ -392,9 +392,9 @@ PyObject* igraphmodule_compare_communities(PyObject *self,
   if (igraphmodule_PyObject_to_community_comparison_t(method_o, &method))
     return NULL;
 
-  if (igraphmodule_PyObject_to_vector_t(comm1_o, &comm1, 0, 0))
+  if (igraphmodule_PyObject_to_vector_t(comm1_o, &comm1, 0))
     return NULL;
-  if (igraphmodule_PyObject_to_vector_t(comm2_o, &comm2, 0, 0)) {
+  if (igraphmodule_PyObject_to_vector_t(comm2_o, &comm2, 0)) {
     igraph_vector_destroy(&comm1);
     return NULL;
   }
@@ -425,10 +425,10 @@ PyObject* igraphmodule_is_degree_sequence(PyObject *self,
 
   is_directed = (in_deg_o != 0 && in_deg_o != Py_None);
 
-  if (igraphmodule_PyObject_to_vector_t(out_deg_o, &out_deg, 0, 0))
+  if (igraphmodule_PyObject_to_vector_t(out_deg_o, &out_deg, 0))
     return NULL;
 
-  if (is_directed && igraphmodule_PyObject_to_vector_t(in_deg_o, &in_deg, 0, 0)) {
+  if (is_directed && igraphmodule_PyObject_to_vector_t(in_deg_o, &in_deg, 0)) {
     igraph_vector_destroy(&out_deg);
     return NULL;
   }
@@ -465,10 +465,10 @@ PyObject* igraphmodule_is_graphical_degree_sequence(PyObject *self,
 
   is_directed = (in_deg_o != 0 && in_deg_o != Py_None);
 
-  if (igraphmodule_PyObject_to_vector_t(out_deg_o, &out_deg, 0, 0))
+  if (igraphmodule_PyObject_to_vector_t(out_deg_o, &out_deg, 0))
     return NULL;
 
-  if (is_directed && igraphmodule_PyObject_to_vector_t(in_deg_o, &in_deg, 0, 0)) {
+  if (is_directed && igraphmodule_PyObject_to_vector_t(in_deg_o, &in_deg, 0)) {
     igraph_vector_destroy(&out_deg);
     return NULL;
   }
@@ -529,9 +529,9 @@ PyObject* igraphmodule_split_join_distance(PyObject *self,
       &comm1_o, &comm2_o))
     return NULL;
 
-  if (igraphmodule_PyObject_to_vector_t(comm1_o, &comm1, 0, 0))
+  if (igraphmodule_PyObject_to_vector_t(comm1_o, &comm1, 0))
     return NULL;
-  if (igraphmodule_PyObject_to_vector_t(comm2_o, &comm2, 0, 0)) {
+  if (igraphmodule_PyObject_to_vector_t(comm2_o, &comm2, 0)) {
     igraph_vector_destroy(&comm1);
     return NULL;
   }

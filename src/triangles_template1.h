@@ -70,10 +70,10 @@
       neis2=igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) v);
       neilen2=igraph_vector_size(neis2);
       for (k=0; k<neilen2; k++) {
-				long int v2=(long int) VECTOR(*neis2)[k];
-				if (neis[v2] == i+1) {
-					triangles += 1.0;
-				}
+	long int v2=(long int) VECTOR(*neis2)[k];
+	if (neis[v2] == i+1) {
+	  triangles += 1.0;
+	}
       }
     }
 
@@ -82,8 +82,8 @@
       VECTOR(*res)[i] = 0.0;
     else
       VECTOR(*res)[i] = triangles/triples;
-#else 
-		VECTOR(*res)[i] = triangles/2;
+#else
+    VECTOR(*res)[i] = triangles/2;
 #endif
   }
 

@@ -19,7 +19,134 @@ static integer c_n1 = -1;
 static integer c__3 = 3;
 static integer c__2 = 2;
 
-/* Subroutine */ int igraphdorgqr_(integer *m, integer *n, integer *k, doublereal *
+/* > \brief \b DORGQR   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DORGQR + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dorgqr.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dorgqr.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dorgqr.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DORGQR( M, N, K, A, LDA, TAU, WORK, LWORK, INFO )   
+
+         INTEGER            INFO, K, LDA, LWORK, M, N   
+         DOUBLE PRECISION   A( LDA, * ), TAU( * ), WORK( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DORGQR generates an M-by-N real matrix Q with orthonormal columns,   
+   > which is defined as the first N columns of a product of K elementary   
+   > reflectors of order M   
+   >   
+   >       Q  =  H(1) H(2) . . . H(k)   
+   >   
+   > as returned by DGEQRF.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >          The number of rows of the matrix Q. M >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The number of columns of the matrix Q. M >= N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] K   
+   > \verbatim   
+   >          K is INTEGER   
+   >          The number of elementary reflectors whose product defines the   
+   >          matrix Q. N >= K >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in,out] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension (LDA,N)   
+   >          On entry, the i-th column must contain the vector which   
+   >          defines the elementary reflector H(i), for i = 1,2,...,k, as   
+   >          returned by DGEQRF in the first k columns of its array   
+   >          argument A.   
+   >          On exit, the M-by-N matrix Q.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >          The first dimension of the array A. LDA >= max(1,M).   
+   > \endverbatim   
+   >   
+   > \param[in] TAU   
+   > \verbatim   
+   >          TAU is DOUBLE PRECISION array, dimension (K)   
+   >          TAU(i) must contain the scalar factor of the elementary   
+   >          reflector H(i), as returned by DGEQRF.   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension (MAX(1,LWORK))   
+   >          On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
+   > \endverbatim   
+   >   
+   > \param[in] LWORK   
+   > \verbatim   
+   >          LWORK is INTEGER   
+   >          The dimension of the array WORK. LWORK >= max(1,N).   
+   >          For optimum performance LWORK >= N*NB, where NB is the   
+   >          optimal blocksize.   
+   >   
+   >          If LWORK = -1, then a workspace query is assumed; the routine   
+   >          only calculates the optimal size of the WORK array, returns   
+   >          this value as the first entry of the WORK array, and no error   
+   >          message related to LWORK is issued by XERBLA.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          = 0:  successful exit   
+   >          < 0:  if INFO = -i, the i-th argument has an illegal value   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2011   
+
+   > \ingroup doubleOTHERcomputational   
+
+    =====================================================================   
+   Subroutine */ int igraphdorgqr_(integer *m, integer *n, integer *k, doublereal *
 	a, integer *lda, doublereal *tau, doublereal *work, integer *lwork, 
 	integer *info)
 {
@@ -40,66 +167,11 @@ static integer c__2 = 2;
     logical lquery;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK computational routine (version 3.4.0) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       November 2011   
 
-
-    Purpose   
-    =======   
-
-    DORGQR generates an M-by-N real matrix Q with orthonormal columns,   
-    which is defined as the first N columns of a product of K elementary   
-    reflectors of order M   
-
-          Q  =  H(1) H(2) . . . H(k)   
-
-    as returned by DGEQRF.   
-
-    Arguments   
-    =========   
-
-    M       (input) INTEGER   
-            The number of rows of the matrix Q. M >= 0.   
-
-    N       (input) INTEGER   
-            The number of columns of the matrix Q. M >= N >= 0.   
-
-    K       (input) INTEGER   
-            The number of elementary reflectors whose product defines the   
-            matrix Q. N >= K >= 0.   
-
-    A       (input/output) DOUBLE PRECISION array, dimension (LDA,N)   
-            On entry, the i-th column must contain the vector which   
-            defines the elementary reflector H(i), for i = 1,2,...,k, as   
-            returned by DGEQRF in the first k columns of its array   
-            argument A.   
-            On exit, the M-by-N matrix Q.   
-
-    LDA     (input) INTEGER   
-            The first dimension of the array A. LDA >= max(1,M).   
-
-    TAU     (input) DOUBLE PRECISION array, dimension (K)   
-            TAU(i) must contain the scalar factor of the elementary   
-            reflector H(i), as returned by DGEQRF.   
-
-    WORK    (workspace/output) DOUBLE PRECISION array, dimension (MAX(1,LWORK))   
-            On exit, if INFO = 0, WORK(1) returns the optimal LWORK.   
-
-    LWORK   (input) INTEGER   
-            The dimension of the array WORK. LWORK >= max(1,N).   
-            For optimum performance LWORK >= N*NB, where NB is the   
-            optimal blocksize.   
-
-            If LWORK = -1, then a workspace query is assumed; the routine   
-            only calculates the optimal size of the WORK array, returns   
-            this value as the first entry of the WORK array, and no error   
-            message related to LWORK is issued by XERBLA.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument has an illegal value   
 
     =====================================================================   
 

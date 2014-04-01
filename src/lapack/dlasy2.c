@@ -19,7 +19,179 @@ static integer c__1 = 1;
 static integer c__16 = 16;
 static integer c__0 = 0;
 
-/* Subroutine */ int igraphdlasy2_(logical *ltranl, logical *ltranr, integer *isgn, 
+/* > \brief \b DLASY2 solves the Sylvester matrix equation where the matrices are of order 1 or 2.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLASY2 + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlasy2.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlasy2.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlasy2.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLASY2( LTRANL, LTRANR, ISGN, N1, N2, TL, LDTL, TR,   
+                            LDTR, B, LDB, SCALE, X, LDX, XNORM, INFO )   
+
+         LOGICAL            LTRANL, LTRANR   
+         INTEGER            INFO, ISGN, LDB, LDTL, LDTR, LDX, N1, N2   
+         DOUBLE PRECISION   SCALE, XNORM   
+         DOUBLE PRECISION   B( LDB, * ), TL( LDTL, * ), TR( LDTR, * ),   
+        $                   X( LDX, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLASY2 solves for the N1 by N2 matrix X, 1 <= N1,N2 <= 2, in   
+   >   
+   >        op(TL)*X + ISGN*X*op(TR) = SCALE*B,   
+   >   
+   > where TL is N1 by N1, TR is N2 by N2, B is N1 by N2, and ISGN = 1 or   
+   > -1.  op(T) = T or T**T, where T**T denotes the transpose of T.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] LTRANL   
+   > \verbatim   
+   >          LTRANL is LOGICAL   
+   >          On entry, LTRANL specifies the op(TL):   
+   >             = .FALSE., op(TL) = TL,   
+   >             = .TRUE., op(TL) = TL**T.   
+   > \endverbatim   
+   >   
+   > \param[in] LTRANR   
+   > \verbatim   
+   >          LTRANR is LOGICAL   
+   >          On entry, LTRANR specifies the op(TR):   
+   >            = .FALSE., op(TR) = TR,   
+   >            = .TRUE., op(TR) = TR**T.   
+   > \endverbatim   
+   >   
+   > \param[in] ISGN   
+   > \verbatim   
+   >          ISGN is INTEGER   
+   >          On entry, ISGN specifies the sign of the equation   
+   >          as described before. ISGN may only be 1 or -1.   
+   > \endverbatim   
+   >   
+   > \param[in] N1   
+   > \verbatim   
+   >          N1 is INTEGER   
+   >          On entry, N1 specifies the order of matrix TL.   
+   >          N1 may only be 0, 1 or 2.   
+   > \endverbatim   
+   >   
+   > \param[in] N2   
+   > \verbatim   
+   >          N2 is INTEGER   
+   >          On entry, N2 specifies the order of matrix TR.   
+   >          N2 may only be 0, 1 or 2.   
+   > \endverbatim   
+   >   
+   > \param[in] TL   
+   > \verbatim   
+   >          TL is DOUBLE PRECISION array, dimension (LDTL,2)   
+   >          On entry, TL contains an N1 by N1 matrix.   
+   > \endverbatim   
+   >   
+   > \param[in] LDTL   
+   > \verbatim   
+   >          LDTL is INTEGER   
+   >          The leading dimension of the matrix TL. LDTL >= max(1,N1).   
+   > \endverbatim   
+   >   
+   > \param[in] TR   
+   > \verbatim   
+   >          TR is DOUBLE PRECISION array, dimension (LDTR,2)   
+   >          On entry, TR contains an N2 by N2 matrix.   
+   > \endverbatim   
+   >   
+   > \param[in] LDTR   
+   > \verbatim   
+   >          LDTR is INTEGER   
+   >          The leading dimension of the matrix TR. LDTR >= max(1,N2).   
+   > \endverbatim   
+   >   
+   > \param[in] B   
+   > \verbatim   
+   >          B is DOUBLE PRECISION array, dimension (LDB,2)   
+   >          On entry, the N1 by N2 matrix B contains the right-hand   
+   >          side of the equation.   
+   > \endverbatim   
+   >   
+   > \param[in] LDB   
+   > \verbatim   
+   >          LDB is INTEGER   
+   >          The leading dimension of the matrix B. LDB >= max(1,N1).   
+   > \endverbatim   
+   >   
+   > \param[out] SCALE   
+   > \verbatim   
+   >          SCALE is DOUBLE PRECISION   
+   >          On exit, SCALE contains the scale factor. SCALE is chosen   
+   >          less than or equal to 1 to prevent the solution overflowing.   
+   > \endverbatim   
+   >   
+   > \param[out] X   
+   > \verbatim   
+   >          X is DOUBLE PRECISION array, dimension (LDX,2)   
+   >          On exit, X contains the N1 by N2 solution.   
+   > \endverbatim   
+   >   
+   > \param[in] LDX   
+   > \verbatim   
+   >          LDX is INTEGER   
+   >          The leading dimension of the matrix X. LDX >= max(1,N1).   
+   > \endverbatim   
+   >   
+   > \param[out] XNORM   
+   > \verbatim   
+   >          XNORM is DOUBLE PRECISION   
+   >          On exit, XNORM is the infinity-norm of the solution.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          On exit, INFO is set to   
+   >             0: successful exit.   
+   >             1: TL and TR have too close eigenvalues, so TL or   
+   >                TR is perturbed to get a nonsingular equation.   
+   >          NOTE: In the interests of speed, this routine does not   
+   >                check the inputs for errors.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup doubleSYauxiliary   
+
+    =====================================================================   
+   Subroutine */ int igraphdlasy2_(logical *ltranl, logical *ltranr, integer *isgn, 
 	integer *n1, integer *n2, doublereal *tl, integer *ldtl, doublereal *
 	tr, integer *ldtr, doublereal *b, integer *ldb, doublereal *scale, 
 	doublereal *x, integer *ldx, doublereal *xnorm, integer *info)
@@ -58,86 +230,11 @@ static integer c__0 = 0;
     doublereal smlnum;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLASY2 solves for the N1 by N2 matrix X, 1 <= N1,N2 <= 2, in   
-
-           op(TL)*X + ISGN*X*op(TR) = SCALE*B,   
-
-    where TL is N1 by N1, TR is N2 by N2, B is N1 by N2, and ISGN = 1 or   
-    -1.  op(T) = T or T**T, where T**T denotes the transpose of T.   
-
-    Arguments   
-    =========   
-
-    LTRANL  (input) LOGICAL   
-            On entry, LTRANL specifies the op(TL):   
-               = .FALSE., op(TL) = TL,   
-               = .TRUE., op(TL) = TL**T.   
-
-    LTRANR  (input) LOGICAL   
-            On entry, LTRANR specifies the op(TR):   
-              = .FALSE., op(TR) = TR,   
-              = .TRUE., op(TR) = TR**T.   
-
-    ISGN    (input) INTEGER   
-            On entry, ISGN specifies the sign of the equation   
-            as described before. ISGN may only be 1 or -1.   
-
-    N1      (input) INTEGER   
-            On entry, N1 specifies the order of matrix TL.   
-            N1 may only be 0, 1 or 2.   
-
-    N2      (input) INTEGER   
-            On entry, N2 specifies the order of matrix TR.   
-            N2 may only be 0, 1 or 2.   
-
-    TL      (input) DOUBLE PRECISION array, dimension (LDTL,2)   
-            On entry, TL contains an N1 by N1 matrix.   
-
-    LDTL    (input) INTEGER   
-            The leading dimension of the matrix TL. LDTL >= max(1,N1).   
-
-    TR      (input) DOUBLE PRECISION array, dimension (LDTR,2)   
-            On entry, TR contains an N2 by N2 matrix.   
-
-    LDTR    (input) INTEGER   
-            The leading dimension of the matrix TR. LDTR >= max(1,N2).   
-
-    B       (input) DOUBLE PRECISION array, dimension (LDB,2)   
-            On entry, the N1 by N2 matrix B contains the right-hand   
-            side of the equation.   
-
-    LDB     (input) INTEGER   
-            The leading dimension of the matrix B. LDB >= max(1,N1).   
-
-    SCALE   (output) DOUBLE PRECISION   
-            On exit, SCALE contains the scale factor. SCALE is chosen   
-            less than or equal to 1 to prevent the solution overflowing.   
-
-    X       (output) DOUBLE PRECISION array, dimension (LDX,2)   
-            On exit, X contains the N1 by N2 solution.   
-
-    LDX     (input) INTEGER   
-            The leading dimension of the matrix X. LDX >= max(1,N1).   
-
-    XNORM   (output) DOUBLE PRECISION   
-            On exit, XNORM is the infinity-norm of the solution.   
-
-    INFO    (output) INTEGER   
-            On exit, INFO is set to   
-               0: successful exit.   
-               1: TL and TR have too close eigenvalues, so TL or   
-                  TR is perturbed to get a nonsingular equation.   
-            NOTE: In the interests of speed, this routine does not   
-                  check the inputs for errors.   
 
    =====================================================================   
 

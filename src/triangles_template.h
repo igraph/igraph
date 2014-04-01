@@ -36,7 +36,7 @@
   igraph_vector_int_t order;
   igraph_vector_int_t rank;
   igraph_vector_t degree;
-  
+
 	igraph_vector_int_init(&order, no_of_nodes);
 	IGRAPH_FINALLY(igraph_vector_int_destroy, &order);
   IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
@@ -61,9 +61,13 @@
   }
   IGRAPH_FINALLY(igraph_free, neis);
 
+#ifndef TRIANGLES
   IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
   igraph_vector_null(res);
-  
+#else
+  igraph_vector_int_clear(res);
+#endif
+
   for (nn=no_of_nodes-1; nn>=0; nn--) {
     node=VECTOR(order)[nn];
     
@@ -87,9 +91,15 @@
       for (j=0; j<neilen2; j++) {
 	long int nei2=(long int) VECTOR(*neis2)[j];
 	if (neis[nei2] == node+1) {
+#ifndef TRIANGLES
 	  VECTOR(*res)[nei2] += 1;
 	  VECTOR(*res)[nei] += 1;
 	  VECTOR(*res)[node] += 1;
+#else
+	  IGRAPH_CHECK(igraph_vector_int_push_back(res, node));
+	  IGRAPH_CHECK(igraph_vector_int_push_back(res, nei));
+	  IGRAPH_CHECK(igraph_vector_int_push_back(res, nei2));
+#endif
 	}
       }
     }

@@ -276,11 +276,11 @@ static integer c__2 = 2;
     extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *, integer *), igraphsecond_(real *);
-    integer logfil=0;
+    integer logfil;
     IGRAPH_F77_SAVE doublereal safmin;
     integer ndigit, nitref;
     real titref;
-    integer msaitr=0;
+    integer msaitr;
     IGRAPH_F77_SAVE integer msglvl;
     real tsaitr;
     integer nrorth;

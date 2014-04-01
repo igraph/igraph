@@ -473,6 +473,13 @@ igraph_shortest_paths_johnson:
                 VERTEXSET to=ALL, EDGEWEIGHTS weights
         IGNORE: RR, RC, RNamespace
 
+igraph_get_all_simple_paths:
+        PARAMS: GRAPH graph, OUT VERTEXSET_INT res, VERTEX from, \
+                VERTEXSET to=ALL, NEIMODE mode=OUT
+        DEPS: from ON graph, to ON graph
+        NAME-R: get.all.simple.paths
+        PP-R: get.all.simple.paths.pp
+
 igraph_subcomponent: 
         PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace
@@ -608,21 +615,21 @@ igraph_density:
 
 igraph_neighborhood_size:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids, INTEGER order, \
-                NEIMODE mode=ALL
+                NEIMODE mode=ALL, INTEGER mindist=0
         DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_neighborhood:
         PARAMS: GRAPH graph, OUT VERTEXSETLIST res, \
                 VERTEXSET vids, INTEGER order, \
-                NEIMODE mode=ALL
+                NEIMODE mode=ALL, INTEGER mindist=0
         DEPS res ON graph, vids ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_neighborhood_graphs:
         PARAMS: GRAPH graph, OUT GRAPHLIST res, VERTEXSET vids, \
                 INTEGER order, \
-                NEIMODE mode=ALL
+                NEIMODE mode=ALL, INTEGER mindist=0
         DEPS: vids ON graph
         IGNORE: RR, RC, RNamespace
 
@@ -1049,10 +1056,9 @@ igraph_layout_grid_3d:
 
 igraph_layout_fruchterman_reingold:
         PARAMS: GRAPH graph, INOUT MATRIX coords=NULL, \
-                BOOLEAN use_seed=False, \
-                REAL width=Inf, REAL height=Inf, INTEGER niter=500, \
-                REAL start_temp=sqrt(vcount(graph))/10, \
-		EDGEWEIGHTS weights=NULL, \
+                BOOLEAN use_seed=False, INTEGER niter=500, \
+                REAL start_temp=sqrt(vcount(graph)), \
+                LAYOUT_GRID grid=AUTO, EDGEWEIGHTS weights=NULL, \
                 VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
                 VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL, \
                 DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area, \
@@ -1060,20 +1066,17 @@ igraph_layout_fruchterman_reingold:
         NAME-R: layout.fruchterman.reingold
         DEPS: weights ON graph
         FLAGS: PROGRESS
-
-igraph_layout_grid_fruchterman_reingold:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, REAL maxdelta=VCOUNT(graph), \
-                REAL area=VCOUNT(graph)^2, REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, REAL cellsize=VCOUNT(graph), \
-                NULL use_seed, VECTOR_OR_0 weight
-        IGNORE: RR, RC, RNamespace
+        IGNORE: RR, RC
 
 igraph_layout_kamada_kawai:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, \
-                REAL sigma=VCOUNT(graph)/4, REAL initemp=10, \
-                REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2, \
-                VECTOR_OR_0 minx, VECTOR_OR_0 maxx, VECTOR_OR_0 miny, \
-                VECTOR_OR_0 maxy
-        IGNORE: RR, RC, RNamespace
+        PARAMS: GRAPH graph, INOUT MATRIX coords, BOOLEAN use_seed=False, \
+                INTEGER maxiter=500, REAL epsilon=0.0, \
+                REAL kkconst=vcount(graph), EDGEWEIGHTS weights=NULL, \
+                VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
+                VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL
+        NAME-R: layout.kamada.kawai
+        DEPS: weights ON graph
+        IGNORE: RR, RC
 
 igraph_layout_lgl:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER maxiter=150, REAL maxdelta=VCOUNT(graph), \
@@ -1098,21 +1101,27 @@ igraph_layout_sphere:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_fruchterman_reingold_3d:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=500, \
-                REAL maxdelta=VCOUNT(graph), REAL volume=VCOUNT(graph)^2, \
-                REAL coolexp=1.5, REAL repulserad=VCOUNT(graph)^3, \
-                NULL use_seed, VECTOR_OR_0 weight, VECTOR_OR_0 minx, \
-                VECTOR_OR_0 maxx, VECTOR_OR_0 miny, VECTOR_OR_0 maxy, \
-                VECTOR_OR_0 minz, VECTOR_OR_0 maxz
+        PARAMS: GRAPH graph, INOUT MATRIX coords=NULL, \
+                BOOLEAN use_seed=False, INTEGER niter=500, \
+                REAL start_temp=sqrt(vcount(graph)), \
+		EDGEWEIGHTS weights=NULL, \
+                VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
+                VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL, \
+                VECTOR_OR_0 minz=NULL, VECTOR_OR_0 maxz=NULL, \
+                DEPRECATED coolexp, DEPRECATED maxdelta, DEPRECATED area, \
+                DEPRECATED repulserad
+        DEPS: weights ON graph
+        FLAGS: PROGRESS
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_kamada_kawai_3d:
-        PARAMS: GRAPH graph, OUT MATRIX res, INTEGER niter=1000, \
-                REAL sigma=VCOUNT(graph)/4, REAL initemp=10, \
-                REAL coolexp=0.99, REAL kkconst=VCOUNT(graph)^2, \
-                BOOLEAN fixz, VECTOR_OR_0 minx, VECTOR_OR_0 maxx, \
-                VECTOR_OR_0 miny, VECTOR_OR_0 maxy, VECTOR_OR_0 minz, \
-                VECTOR_OR_0 maxz
+        PARAMS: GRAPH graph, INOUT MATRIX coords, BOOLEAN use_seed=False, \
+                INTEGER maxiter=500, REAL epsilon=0.0, \
+                REAL kkconst=vcount(graph), EDGEWEIGHTS weights=NULL, \
+                VECTOR_OR_0 minx=NULL, VECTOR_OR_0 maxx=NULL, \
+                VECTOR_OR_0 miny=NULL, VECTOR_OR_0 maxy=NULL, \
+                VECTOR_OR_0 minz=NULL, VECTOR_OR_0 maxz=NULL
+        DEPS: weights ON graph
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_graphopt:
@@ -1165,6 +1174,26 @@ igraph_layout_bipartite:
                 REAL hgap=1, REAL vgap=1, INTEGER maxiter=100
         DEPS: types ON graph
         NAME-R: layout.bipartite
+
+igraph_layout_gem:
+        PARAMS: GRAPH graph, INOUT MATRIX res=matrix(), \
+                BOOLEAN use_seed=False, \
+                INTEGER maxiter=40*vcount(graph)^2, \
+                REAL temp_max=vcount(graph), \
+                REAL temp_min=1/10, REAL temp_init=sqrt(vcount(graph))
+        NAME-R: layout.gem
+        IGNORE: RR
+
+igraph_layout_davidson_harel:
+        PARAMS: GRAPH graph, INOUT MATRIX res=matrix(), \
+                BOOLEAN use_seed=False, INTEGER maxiter=10, \
+                INTEGER fineiter=FINEITER, REAL cool_fact=0.75, \
+                REAL weight_node_dist=1.0, REAL weight_border=0.0, \
+                REAL weight_edge_lengths=ELENW, \
+                REAL weight_edge_crossings=ECROSSW, \
+                REAL weight_node_edge_dist=NEDISTW
+        NAME-R: layout.davidson.harel
+        IGNORE: RR
 
 #######################################
 # Cocitation and other similarity measures
@@ -1518,7 +1547,7 @@ igraph_triad_census:
         NAME-R: triad.census
         RETURN: ERROR
 
-igraph_adjacenct_triangles:
+igraph_adjacent_triangles:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL
         DEPS: vids ON graph
         NAME-R: adjacent.triangles
@@ -1574,6 +1603,10 @@ igraph_local_scan_neighborhood_ecount:
                VERTEXSETLIST_INT neighborhoods
        DEPS: weights ON graph
        IGNORE: RR, RNamespace
+
+igraph_list_triangles:
+        PARAMS: GRAPH graph, OUT VERTEXSET_INT res
+        NAME-R: triangles
 
 #######################################
 # Graph operators

@@ -20,7 +20,325 @@ static integer c__3 = 3;
 static integer c__2 = 2;
 static integer c__0 = 0;
 
-/* Subroutine */ int igraphdlarrd_(char *range, char *order, integer *n, doublereal 
+/* > \brief \b DLARRD computes the eigenvalues of a symmetric tridiagonal matrix to suitable accuracy.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLARRD + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlarrd.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlarrd.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlarrd.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLARRD( RANGE, ORDER, N, VL, VU, IL, IU, GERS,   
+                             RELTOL, D, E, E2, PIVMIN, NSPLIT, ISPLIT,   
+                             M, W, WERR, WL, WU, IBLOCK, INDEXW,   
+                             WORK, IWORK, INFO )   
+
+         CHARACTER          ORDER, RANGE   
+         INTEGER            IL, INFO, IU, M, N, NSPLIT   
+         DOUBLE PRECISION    PIVMIN, RELTOL, VL, VU, WL, WU   
+         INTEGER            IBLOCK( * ), INDEXW( * ),   
+        $                   ISPLIT( * ), IWORK( * )   
+         DOUBLE PRECISION   D( * ), E( * ), E2( * ),   
+        $                   GERS( * ), W( * ), WERR( * ), WORK( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLARRD computes the eigenvalues of a symmetric tridiagonal   
+   > matrix T to suitable accuracy. This is an auxiliary code to be   
+   > called from DSTEMR.   
+   > The user may ask for all eigenvalues, all eigenvalues   
+   > in the half-open interval (VL, VU], or the IL-th through IU-th   
+   > eigenvalues.   
+   >   
+   > To avoid overflow, the matrix must be scaled so that its   
+   > largest element is no greater than overflow**(1/2) * underflow**(1/4) in absolute value, and for greatest
+   
+   > accuracy, it should not be much smaller than that.   
+   >   
+   > See W. Kahan "Accurate Eigenvalues of a Symmetric Tridiagonal   
+   > Matrix", Report CS41, Computer Science Dept., Stanford   
+   > University, July 21, 1966.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] RANGE   
+   > \verbatim   
+   >          RANGE is CHARACTER*1   
+   >          = 'A': ("All")   all eigenvalues will be found.   
+   >          = 'V': ("Value") all eigenvalues in the half-open interval   
+   >                           (VL, VU] will be found.   
+   >          = 'I': ("Index") the IL-th through IU-th eigenvalues (of the   
+   >                           entire matrix) will be found.   
+   > \endverbatim   
+   >   
+   > \param[in] ORDER   
+   > \verbatim   
+   >          ORDER is CHARACTER*1   
+   >          = 'B': ("By Block") the eigenvalues will be grouped by   
+   >                              split-off block (see IBLOCK, ISPLIT) and   
+   >                              ordered from smallest to largest within   
+   >                              the block.   
+   >          = 'E': ("Entire matrix")   
+   >                              the eigenvalues for the entire matrix   
+   >                              will be ordered from smallest to   
+   >                              largest.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the tridiagonal matrix T.  N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] VL   
+   > \verbatim   
+   >          VL is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in] VU   
+   > \verbatim   
+   >          VU is DOUBLE PRECISION   
+   >          If RANGE='V', the lower and upper bounds of the interval to   
+   >          be searched for eigenvalues.  Eigenvalues less than or equal   
+   >          to VL, or greater than VU, will not be returned.  VL < VU.   
+   >          Not referenced if RANGE = 'A' or 'I'.   
+   > \endverbatim   
+   >   
+   > \param[in] IL   
+   > \verbatim   
+   >          IL is INTEGER   
+   > \endverbatim   
+   >   
+   > \param[in] IU   
+   > \verbatim   
+   >          IU is INTEGER   
+   >          If RANGE='I', the indices (in ascending order) of the   
+   >          smallest and largest eigenvalues to be returned.   
+   >          1 <= IL <= IU <= N, if N > 0; IL = 1 and IU = 0 if N = 0.   
+   >          Not referenced if RANGE = 'A' or 'V'.   
+   > \endverbatim   
+   >   
+   > \param[in] GERS   
+   > \verbatim   
+   >          GERS is DOUBLE PRECISION array, dimension (2*N)   
+   >          The N Gerschgorin intervals (the i-th Gerschgorin interval   
+   >          is (GERS(2*i-1), GERS(2*i)).   
+   > \endverbatim   
+   >   
+   > \param[in] RELTOL   
+   > \verbatim   
+   >          RELTOL is DOUBLE PRECISION   
+   >          The minimum relative width of an interval.  When an interval   
+   >          is narrower than RELTOL times the larger (in   
+   >          magnitude) endpoint, then it is considered to be   
+   >          sufficiently small, i.e., converged.  Note: this should   
+   >          always be at least radix*machine epsilon.   
+   > \endverbatim   
+   >   
+   > \param[in] D   
+   > \verbatim   
+   >          D is DOUBLE PRECISION array, dimension (N)   
+   >          The n diagonal elements of the tridiagonal matrix T.   
+   > \endverbatim   
+   >   
+   > \param[in] E   
+   > \verbatim   
+   >          E is DOUBLE PRECISION array, dimension (N-1)   
+   >          The (n-1) off-diagonal elements of the tridiagonal matrix T.   
+   > \endverbatim   
+   >   
+   > \param[in] E2   
+   > \verbatim   
+   >          E2 is DOUBLE PRECISION array, dimension (N-1)   
+   >          The (n-1) squared off-diagonal elements of the tridiagonal matrix T.   
+   > \endverbatim   
+   >   
+   > \param[in] PIVMIN   
+   > \verbatim   
+   >          PIVMIN is DOUBLE PRECISION   
+   >          The minimum pivot allowed in the Sturm sequence for T.   
+   > \endverbatim   
+   >   
+   > \param[in] NSPLIT   
+   > \verbatim   
+   >          NSPLIT is INTEGER   
+   >          The number of diagonal blocks in the matrix T.   
+   >          1 <= NSPLIT <= N.   
+   > \endverbatim   
+   >   
+   > \param[in] ISPLIT   
+   > \verbatim   
+   >          ISPLIT is INTEGER array, dimension (N)   
+   >          The splitting points, at which T breaks up into submatrices.   
+   >          The first submatrix consists of rows/columns 1 to ISPLIT(1),   
+   >          the second of rows/columns ISPLIT(1)+1 through ISPLIT(2),   
+   >          etc., and the NSPLIT-th consists of rows/columns   
+   >          ISPLIT(NSPLIT-1)+1 through ISPLIT(NSPLIT)=N.   
+   >          (Only the first NSPLIT elements will actually be used, but   
+   >          since the user cannot know a priori what value NSPLIT will   
+   >          have, N words must be reserved for ISPLIT.)   
+   > \endverbatim   
+   >   
+   > \param[out] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >          The actual number of eigenvalues found. 0 <= M <= N.   
+   >          (See also the description of INFO=2,3.)   
+   > \endverbatim   
+   >   
+   > \param[out] W   
+   > \verbatim   
+   >          W is DOUBLE PRECISION array, dimension (N)   
+   >          On exit, the first M elements of W will contain the   
+   >          eigenvalue approximations. DLARRD computes an interval   
+   >          I_j = (a_j, b_j] that includes eigenvalue j. The eigenvalue   
+   >          approximation is given as the interval midpoint   
+   >          W(j)= ( a_j + b_j)/2. The corresponding error is bounded by   
+   >          WERR(j) = abs( a_j - b_j)/2   
+   > \endverbatim   
+   >   
+   > \param[out] WERR   
+   > \verbatim   
+   >          WERR is DOUBLE PRECISION array, dimension (N)   
+   >          The error bound on the corresponding eigenvalue approximation   
+   >          in W.   
+   > \endverbatim   
+   >   
+   > \param[out] WL   
+   > \verbatim   
+   >          WL is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[out] WU   
+   > \verbatim   
+   >          WU is DOUBLE PRECISION   
+   >          The interval (WL, WU] contains all the wanted eigenvalues.   
+   >          If RANGE='V', then WL=VL and WU=VU.   
+   >          If RANGE='A', then WL and WU are the global Gerschgorin bounds   
+   >                        on the spectrum.   
+   >          If RANGE='I', then WL and WU are computed by DLAEBZ from the   
+   >                        index range specified.   
+   > \endverbatim   
+   >   
+   > \param[out] IBLOCK   
+   > \verbatim   
+   >          IBLOCK is INTEGER array, dimension (N)   
+   >          At each row/column j where E(j) is zero or small, the   
+   >          matrix T is considered to split into a block diagonal   
+   >          matrix.  On exit, if INFO = 0, IBLOCK(i) specifies to which   
+   >          block (from 1 to the number of blocks) the eigenvalue W(i)   
+   >          belongs.  (DLARRD may use the remaining N-M elements as   
+   >          workspace.)   
+   > \endverbatim   
+   >   
+   > \param[out] INDEXW   
+   > \verbatim   
+   >          INDEXW is INTEGER array, dimension (N)   
+   >          The indices of the eigenvalues within each block (submatrix);   
+   >          for example, INDEXW(i)= j and IBLOCK(i)=k imply that the   
+   >          i-th eigenvalue W(i) is the j-th eigenvalue in block k.   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension (4*N)   
+   > \endverbatim   
+   >   
+   > \param[out] IWORK   
+   > \verbatim   
+   >          IWORK is INTEGER array, dimension (3*N)   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          = 0:  successful exit   
+   >          < 0:  if INFO = -i, the i-th argument had an illegal value   
+   >          > 0:  some or all of the eigenvalues failed to converge or   
+   >                were not computed:   
+   >                =1 or 3: Bisection failed to converge for some   
+   >                        eigenvalues; these eigenvalues are flagged by a   
+   >                        negative block number.  The effect is that the   
+   >                        eigenvalues may not be as accurate as the   
+   >                        absolute and relative tolerances.  This is   
+   >                        generally caused by unexpectedly inaccurate   
+   >                        arithmetic.   
+   >                =2 or 3: RANGE='I' only: Not all of the eigenvalues   
+   >                        IL:IU were found.   
+   >                        Effect: M < IU+1-IL   
+   >                        Cause:  non-monotonic arithmetic, causing the   
+   >                                Sturm sequence to be non-monotonic.   
+   >                        Cure:   recalculate, using RANGE='A', and pick   
+   >                                out eigenvalues IL:IU.  In some cases,   
+   >                                increasing the PARAMETER "FUDGE" may   
+   >                                make things work.   
+   >                = 4:    RANGE='I', and the Gershgorin interval   
+   >                        initially used was too small.  No eigenvalues   
+   >                        were computed.   
+   >                        Probable cause: your machine has sloppy   
+   >                                        floating-point arithmetic.   
+   >                        Cure: Increase the PARAMETER "FUDGE",   
+   >                              recompile, and try again.   
+   > \endverbatim   
+
+   > \par Internal Parameters:   
+    =========================   
+   >   
+   > \verbatim   
+   >  FUDGE   DOUBLE PRECISION, default = 2   
+   >          A "fudge factor" to widen the Gershgorin intervals.  Ideally,   
+   >          a value of 1 should work, but on machines with sloppy   
+   >          arithmetic, this needs to be larger.  The default for   
+   >          publicly released versions should be large enough to handle   
+   >          the worst machine around.  Note that this has no effect   
+   >          on accuracy of the solution.   
+   > \endverbatim   
+   >   
+   > \par Contributors:   
+    ==================   
+   >   
+   >     W. Kahan, University of California, Berkeley, USA \n   
+   >     Beresford Parlett, University of California, Berkeley, USA \n   
+   >     Jim Demmel, University of California, Berkeley, USA \n   
+   >     Inderjit Dhillon, University of Texas, Austin, USA \n   
+   >     Osni Marques, LBNL/NERSC, USA \n   
+   >     Christof Voemel, University of California, Berkeley, USA \n   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERauxiliary   
+
+    =====================================================================   
+   Subroutine */ int igraphdlarrd_(char *range, char *order, integer *n, doublereal 
 	*vl, doublereal *vu, integer *il, integer *iu, doublereal *gers, 
 	doublereal *reltol, doublereal *d__, doublereal *e, doublereal *e2, 
 	doublereal *pivmin, integer *nsplit, integer *isplit, integer *m, 
@@ -66,194 +384,11 @@ static integer c__0 = 0;
     logical ncnvrg, toofew;
 
 
-/*  -- LAPACK auxiliary routine (version 3.3.0)                        --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2010   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLARRD computes the eigenvalues of a symmetric tridiagonal   
-    matrix T to suitable accuracy. This is an auxiliary code to be   
-    called from DSTEMR.   
-    The user may ask for all eigenvalues, all eigenvalues   
-    in the half-open interval (VL, VU], or the IL-th through IU-th   
-    eigenvalues.   
-
-    To avoid overflow, the matrix must be scaled so that its   
-    largest element is no greater than overflow**(1/2) *   
-    underflow**(1/4) in absolute value, and for greatest   
-    accuracy, it should not be much smaller than that.   
-
-    See W. Kahan "Accurate Eigenvalues of a Symmetric Tridiagonal   
-    Matrix", Report CS41, Computer Science Dept., Stanford   
-    University, July 21, 1966.   
-
-    Arguments   
-    =========   
-
-    RANGE   (input) CHARACTER*1   
-            = 'A': ("All")   all eigenvalues will be found.   
-            = 'V': ("Value") all eigenvalues in the half-open interval   
-                             (VL, VU] will be found.   
-            = 'I': ("Index") the IL-th through IU-th eigenvalues (of the   
-                             entire matrix) will be found.   
-
-    ORDER   (input) CHARACTER*1   
-            = 'B': ("By Block") the eigenvalues will be grouped by   
-                                split-off block (see IBLOCK, ISPLIT) and   
-                                ordered from smallest to largest within   
-                                the block.   
-            = 'E': ("Entire matrix")   
-                                the eigenvalues for the entire matrix   
-                                will be ordered from smallest to   
-                                largest.   
-
-    N       (input) INTEGER   
-            The order of the tridiagonal matrix T.  N >= 0.   
-
-    VL      (input) DOUBLE PRECISION   
-    VU      (input) DOUBLE PRECISION   
-            If RANGE='V', the lower and upper bounds of the interval to   
-            be searched for eigenvalues.  Eigenvalues less than or equal   
-            to VL, or greater than VU, will not be returned.  VL < VU.   
-            Not referenced if RANGE = 'A' or 'I'.   
-
-    IL      (input) INTEGER   
-    IU      (input) INTEGER   
-            If RANGE='I', the indices (in ascending order) of the   
-            smallest and largest eigenvalues to be returned.   
-            1 <= IL <= IU <= N, if N > 0; IL = 1 and IU = 0 if N = 0.   
-            Not referenced if RANGE = 'A' or 'V'.   
-
-    GERS    (input) DOUBLE PRECISION array, dimension (2*N)   
-            The N Gerschgorin intervals (the i-th Gerschgorin interval   
-            is (GERS(2*i-1), GERS(2*i)).   
-
-    RELTOL  (input) DOUBLE PRECISION   
-            The minimum relative width of an interval.  When an interval   
-            is narrower than RELTOL times the larger (in   
-            magnitude) endpoint, then it is considered to be   
-            sufficiently small, i.e., converged.  Note: this should   
-            always be at least radix*machine epsilon.   
-
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The n diagonal elements of the tridiagonal matrix T.   
-
-    E       (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (n-1) off-diagonal elements of the tridiagonal matrix T.   
-
-    E2      (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (n-1) squared off-diagonal elements of the tridiagonal matrix T.   
-
-    PIVMIN  (input) DOUBLE PRECISION   
-            The minimum pivot allowed in the Sturm sequence for T.   
-
-    NSPLIT  (input) INTEGER   
-            The number of diagonal blocks in the matrix T.   
-            1 <= NSPLIT <= N.   
-
-    ISPLIT  (input) INTEGER array, dimension (N)   
-            The splitting points, at which T breaks up into submatrices.   
-            The first submatrix consists of rows/columns 1 to ISPLIT(1),   
-            the second of rows/columns ISPLIT(1)+1 through ISPLIT(2),   
-            etc., and the NSPLIT-th consists of rows/columns   
-            ISPLIT(NSPLIT-1)+1 through ISPLIT(NSPLIT)=N.   
-            (Only the first NSPLIT elements will actually be used, but   
-            since the user cannot know a priori what value NSPLIT will   
-            have, N words must be reserved for ISPLIT.)   
-
-    M       (output) INTEGER   
-            The actual number of eigenvalues found. 0 <= M <= N.   
-            (See also the description of INFO=2,3.)   
-
-    W       (output) DOUBLE PRECISION array, dimension (N)   
-            On exit, the first M elements of W will contain the   
-            eigenvalue approximations. DLARRD computes an interval   
-            I_j = (a_j, b_j] that includes eigenvalue j. The eigenvalue   
-            approximation is given as the interval midpoint   
-            W(j)= ( a_j + b_j)/2. The corresponding error is bounded by   
-            WERR(j) = abs( a_j - b_j)/2   
-
-    WERR    (output) DOUBLE PRECISION array, dimension (N)   
-            The error bound on the corresponding eigenvalue approximation   
-            in W.   
-
-    WL      (output) DOUBLE PRECISION   
-    WU      (output) DOUBLE PRECISION   
-            The interval (WL, WU] contains all the wanted eigenvalues.   
-            If RANGE='V', then WL=VL and WU=VU.   
-            If RANGE='A', then WL and WU are the global Gerschgorin bounds   
-                          on the spectrum.   
-            If RANGE='I', then WL and WU are computed by DLAEBZ from the   
-                          index range specified.   
-
-    IBLOCK  (output) INTEGER array, dimension (N)   
-            At each row/column j where E(j) is zero or small, the   
-            matrix T is considered to split into a block diagonal   
-            matrix.  On exit, if INFO = 0, IBLOCK(i) specifies to which   
-            block (from 1 to the number of blocks) the eigenvalue W(i)   
-            belongs.  (DLARRD may use the remaining N-M elements as   
-            workspace.)   
-
-    INDEXW  (output) INTEGER array, dimension (N)   
-            The indices of the eigenvalues within each block (submatrix);   
-            for example, INDEXW(i)= j and IBLOCK(i)=k imply that the   
-            i-th eigenvalue W(i) is the j-th eigenvalue in block k.   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (4*N)   
-
-    IWORK   (workspace) INTEGER array, dimension (3*N)   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  some or all of the eigenvalues failed to converge or   
-                  were not computed:   
-                  =1 or 3: Bisection failed to converge for some   
-                          eigenvalues; these eigenvalues are flagged by a   
-                          negative block number.  The effect is that the   
-                          eigenvalues may not be as accurate as the   
-                          absolute and relative tolerances.  This is   
-                          generally caused by unexpectedly inaccurate   
-                          arithmetic.   
-                  =2 or 3: RANGE='I' only: Not all of the eigenvalues   
-                          IL:IU were found.   
-                          Effect: M < IU+1-IL   
-                          Cause:  non-monotonic arithmetic, causing the   
-                                  Sturm sequence to be non-monotonic.   
-                          Cure:   recalculate, using RANGE='A', and pick   
-                                  out eigenvalues IL:IU.  In some cases,   
-                                  increasing the PARAMETER "FUDGE" may   
-                                  make things work.   
-                  = 4:    RANGE='I', and the Gershgorin interval   
-                          initially used was too small.  No eigenvalues   
-                          were computed.   
-                          Probable cause: your machine has sloppy   
-                                          floating-point arithmetic.   
-                          Cure: Increase the PARAMETER "FUDGE",   
-                                recompile, and try again.   
-
-    Internal Parameters   
-    ===================   
-
-    FUDGE   DOUBLE PRECISION, default = 2   
-            A "fudge factor" to widen the Gershgorin intervals.  Ideally,   
-            a value of 1 should work, but on machines with sloppy   
-            arithmetic, this needs to be larger.  The default for   
-            publicly released versions should be large enough to handle   
-            the worst machine around.  Note that this has no effect   
-            on accuracy of the solution.   
-
-    Based on contributions by   
-       W. Kahan, University of California, Berkeley, USA   
-       Beresford Parlett, University of California, Berkeley, USA   
-       Jim Demmel, University of California, Berkeley, USA   
-       Inderjit Dhillon, University of Texas, Austin, USA   
-       Osni Marques, LBNL/NERSC, USA   
-       Christof Voemel, University of California, Berkeley, USA   
 
     =====================================================================   
 

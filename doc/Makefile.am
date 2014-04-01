@@ -109,7 +109,7 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/mixing.c $(INCLUDEDIR)/igraph_arpack.h \
 		$(SRCDIR)/distances.c $(SRCDIR)/feedback_arc_set.c \
 		$(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
-		$(INCLUDEDIR)/igraph_centrality.h
+		$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structural_properties.c $(SRCDIR)/spanning_trees.c \
 	$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c \
@@ -117,7 +117,7 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c $(SRCDIR)/mixing.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
 	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
-	$(INCLUDEDIR)/igraph_centrality.h
+	$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h
 
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
@@ -128,8 +128,8 @@ attributes.xml: attributes.xxml $(SRCDIR)/attributes.c $(INCLUDEDIR)/igraph_attr
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/attributes.c \
 	$(INCLUDEDIR)/igraph_attributes.h $(SRCDIR)/cattributes.c
 
-layout.xml: layout.xxml $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp $(SRCDIR)/sugiyama.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp $(SRCDIR)/sugiyama.c
+layout.xml: layout.xxml $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp $(SRCDIR)/sugiyama.c $(SRCDIR)/layout_fr.c $(SRCDIR)/layout_kk.c $(SRCDIR)/layout_gem.c $(SRCDIR)/layout_dh.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/layout.c $(INCLUDEDIR)/igraph_layout.h $(SRCDIR)/drl_layout.cpp $(SRCDIR)/drl_layout_3d.cpp $(SRCDIR)/sugiyama.c $(SRCDIR)/layout_fr.c $(SRCDIR)/layout_kk.c $(SRCDIR)/layout_gem.c $(SRCDIR)/layout_dh.c
 
 foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/foreign.c \
@@ -141,8 +141,10 @@ nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/versi
 isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
 
-motifs.xml: motifs.xxml $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c
+motifs.xml: motifs.xxml $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c \
+		$(SRCDIR)/triangles.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_motifs.h \
+		$(SRCDIR)/motifs.c $(SRCDIR)/triangles.c
 
 operators.xml: operators.xxml $(SRCDIR)/operators.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/operators.c

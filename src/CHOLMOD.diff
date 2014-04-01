@@ -1,0 +1,89 @@
+diff -r -x '*.o' -x '*.lo' -x .deps -x .dirstamp -x .libs CHOLMOD-orig/Include/cholmod_blas.h CHOLMOD/Include/cholmod_blas.h
+108,115c108,115
+< #define BLAS_DTRSV dtrsv
+< #define BLAS_DGEMV dgemv
+< #define BLAS_DTRSM dtrsm
+< #define BLAS_DGEMM dgemm
+< #define BLAS_DSYRK dsyrk
+< #define BLAS_DGER  dger
+< #define BLAS_DSCAL dscal
+< #define LAPACK_DPOTRF dpotrf
+---
+> #define BLAS_DTRSV igraphdtrsv
+> #define BLAS_DGEMV igraphdgemv
+> #define BLAS_DTRSM igraphdtrsm
+> #define BLAS_DGEMM igraphdgemm
+> #define BLAS_DSYRK igraphdsyrk
+> #define BLAS_DGER  igraphdger
+> #define BLAS_DSCAL igraphdscal
+> #define LAPACK_DPOTRF igraphdpotrf
+128,135c128,135
+< #define BLAS_DTRSV dtrsv_
+< #define BLAS_DGEMV dgemv_
+< #define BLAS_DTRSM dtrsm_
+< #define BLAS_DGEMM dgemm_
+< #define BLAS_DSYRK dsyrk_
+< #define BLAS_DGER  dger_
+< #define BLAS_DSCAL dscal_
+< #define LAPACK_DPOTRF dpotrf_
+---
+> #define BLAS_DTRSV igraphdtrsv_
+> #define BLAS_DGEMV igraphdgemv_
+> #define BLAS_DTRSM igraphdtrsm_
+> #define BLAS_DGEMM igraphdgemm_
+> #define BLAS_DSYRK igraphdsyrk_
+> #define BLAS_DGER  igraphdger_
+> #define BLAS_DSCAL igraphdscal_
+> #define LAPACK_DPOTRF igraphdpotrf_
+diff -r -x '*.o' -x '*.lo' -x .deps -x .dirstamp -x .libs CHOLMOD-orig/Supernodal/cholmod_super_numeric.c CHOLMOD/Supernodal/cholmod_super_numeric.c
+79,82c79,82
+< #define COMPLEX
+< #include "t_cholmod_super_numeric.c"
+< #define ZOMPLEX
+< #include "t_cholmod_super_numeric.c"
+---
+> /* #define COMPLEX */
+> /* #include "t_cholmod_super_numeric.c" */
+> /* #define ZOMPLEX */
+> /* #include "t_cholmod_super_numeric.c" */
+283,290c283,290
+< 	case CHOLMOD_COMPLEX:
+< 	    ok = c_cholmod_super_numeric (A, F, beta, L, C, Common) ;
+< 	    break ;
+< 
+< 	case CHOLMOD_ZOMPLEX:
+< 	    /* This operates on complex L, not zomplex */
+< 	    ok = z_cholmod_super_numeric (A, F, beta, L, C, Common) ;
+< 	    break ;
+---
+> 	/* case CHOLMOD_COMPLEX: */
+> 	/*     ok = c_cholmod_super_numeric (A, F, beta, L, C, Common) ; */
+> 	/*     break ; */
+> 
+> 	/* case CHOLMOD_ZOMPLEX: */
+> 	/*     /\* This operates on complex L, not zomplex *\/ */
+> 	/*     ok = z_cholmod_super_numeric (A, F, beta, L, C, Common) ; */
+> 	/*     break ; */
+diff -r -x '*.o' -x '*.lo' -x .deps -x .dirstamp -x .libs CHOLMOD-orig/Supernodal/cholmod_super_solve.c CHOLMOD/Supernodal/cholmod_super_solve.c
+29,30c29,30
+< #define COMPLEX
+< #include "t_cholmod_super_solve.c"
+---
+> /* #define COMPLEX */
+> /* #include "t_cholmod_super_solve.c" */
+112,114c112,114
+< 	case CHOLMOD_COMPLEX:
+< 	    c_cholmod_super_lsolve (L, X, E, Common) ;
+< 	    break ;
+---
+> 	/* case CHOLMOD_COMPLEX: */
+> 	/*     c_cholmod_super_lsolve (L, X, E, Common) ; */
+> 	/*     break ; */
+205,207c205,207
+< 	case CHOLMOD_COMPLEX:
+< 	    c_cholmod_super_ltsolve (L, X, E, Common) ;
+< 	    break ;
+---
+> 	/* case CHOLMOD_COMPLEX: */
+> 	/*     c_cholmod_super_ltsolve (L, X, E, Common) ; */
+> 	/*     break ; */

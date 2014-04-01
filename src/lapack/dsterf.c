@@ -18,7 +18,92 @@ static integer c__0 = 0;
 static integer c__1 = 1;
 static doublereal c_b33 = 1.;
 
-/* Subroutine */ int igraphdsterf_(integer *n, doublereal *d__, doublereal *e, 
+/* > \brief \b DSTERF   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DSTERF + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dsterf.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dsterf.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dsterf.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DSTERF( N, D, E, INFO )   
+
+         INTEGER            INFO, N   
+         DOUBLE PRECISION   D( * ), E( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DSTERF computes all eigenvalues of a symmetric tridiagonal matrix   
+   > using the Pal-Walker-Kahan variant of the QL or QR algorithm.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix.  N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in,out] D   
+   > \verbatim   
+   >          D is DOUBLE PRECISION array, dimension (N)   
+   >          On entry, the n diagonal elements of the tridiagonal matrix.   
+   >          On exit, if INFO = 0, the eigenvalues in ascending order.   
+   > \endverbatim   
+   >   
+   > \param[in,out] E   
+   > \verbatim   
+   >          E is DOUBLE PRECISION array, dimension (N-1)   
+   >          On entry, the (n-1) subdiagonal elements of the tridiagonal   
+   >          matrix.   
+   >          On exit, E has been destroyed.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          = 0:  successful exit   
+   >          < 0:  if INFO = -i, the i-th argument had an illegal value   
+   >          > 0:  the algorithm failed to find all of the eigenvalues in   
+   >                a total of 30*N iterations; if INFO = i, then i   
+   >                elements of E have not converged to zero.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2011   
+
+   > \ingroup auxOTHERcomputational   
+
+    =====================================================================   
+   Subroutine */ int igraphdsterf_(integer *n, doublereal *d__, doublereal *e, 
 	integer *info)
 {
     /* System generated locals */
@@ -59,39 +144,11 @@ static doublereal c_b33 = 1.;
     doublereal ssfmax;
 
 
-/*  -- LAPACK routine (version 3.3.1) --   
+/*  -- LAPACK computational routine (version 3.4.0) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-    -- April 2011                                                      --   
+       November 2011   
 
-
-    Purpose   
-    =======   
-
-    DSTERF computes all eigenvalues of a symmetric tridiagonal matrix   
-    using the Pal-Walker-Kahan variant of the QL or QR algorithm.   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the matrix.  N >= 0.   
-
-    D       (input/output) DOUBLE PRECISION array, dimension (N)   
-            On entry, the n diagonal elements of the tridiagonal matrix.   
-            On exit, if INFO = 0, the eigenvalues in ascending order.   
-
-    E       (input/output) DOUBLE PRECISION array, dimension (N-1)   
-            On entry, the (n-1) subdiagonal elements of the tridiagonal   
-            matrix.   
-            On exit, E has been destroyed.   
-
-    INFO    (output) INTEGER   
-            = 0:  successful exit   
-            < 0:  if INFO = -i, the i-th argument had an illegal value   
-            > 0:  the algorithm failed to find all of the eigenvalues in   
-                  a total of 30*N iterations; if INFO = i, then i   
-                  elements of E have not converged to zero.   
 
     =====================================================================   
 

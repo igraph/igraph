@@ -580,6 +580,40 @@ class Graph(GraphBase):
                    "please use Graph.get_inclist() instead")
         return self.get_inclist(*args, **kwds)
 
+    def get_all_simple_paths(self, v, to=None, mode=OUT):
+        """get_all_simple_paths(v, to=None, mode=OUT)
+        
+        Calculates all the simple paths from a given node to some other nodes
+        (or all of them) in a graph.
+        
+        A path is simple if its vertices are unique, i.e. no vertex is visited
+        more than once.
+        
+        Note that potentially there are exponentially many paths between two
+        vertices of a graph, especially if your graph is lattice-like. In this
+        case, you may run out of memory when using this function.
+        
+        @param v: the source for the calculated paths
+        @param to: a vertex selector describing the destination for the calculated
+          paths. This can be a single vertex ID, a list of vertex IDs, a single
+          vertex name, a list of vertex names or a L{VertexSeq} object. C{None}
+          means all the vertices.
+        @param mode: the directionality of the paths. L{IN} means to calculate
+          incoming paths, L{OUT} means to calculate outgoing paths, L{ALL} means
+          to calculate both ones.
+        @return: all of the simple paths from the given node to every other
+          reachable node in the graph in a list. Note that in case of mode=L{IN},
+          the vertices in a path are returned in reversed order!
+        """
+        paths = self._get_all_simple_paths(v, to, mode)
+        prev = 0
+        result = []
+        for index, item in enumerate(paths):
+            if item < 0:
+                result.append(paths[prev:index])
+                prev = index+1
+        return result
+
     def get_inclist(self, mode=OUT):
         """get_inclist(mode=OUT)
 
@@ -1327,6 +1361,9 @@ class Graph(GraphBase):
           - C{circle}, C{circular}: circular layout
             (see L{Graph.layout_circle})
 
+          - C{dh}, C{davidson_harel}: Davidson-Harel layout (see
+            L{Graph.davidson_harel})
+
           - C{drl}: DrL layout for large graphs (see L{Graph.layout_drl})
 
           - C{drl_3d}: 3D DrL layout for large graphs
@@ -1343,10 +1380,6 @@ class Graph(GraphBase):
           - C{grid_3d}: regular grid layout in 3D (see L{Graph.layout_grid_3d})
 
           - C{graphopt}: the graphopt algorithm (see L{Graph.layout_graphopt})
-
-          - C{gfr}, C{grid_fr}, C{grid_fruchterman_reingold}: grid-based
-            Fruchterman-Reingold layout
-            (see L{Graph.layout_grid_fruchterman_reingold})
 
           - C{kk}, C{kamada_kawai}: Kamada-Kawai layout
             (see L{Graph.layout_kamada_kawai})
@@ -1469,6 +1502,19 @@ class Graph(GraphBase):
         else:
             algo = "drl"
         return self.layout(algo, *args, **kwds)
+
+    def layout_grid_fruchterman_reingold(self, *args, **kwds):
+        """layout_grid_fruchterman_reingold(*args, **kwds)
+
+        Compatibility alias to the Fruchterman-Reingold layout with the grid
+        option turned on.
+
+        @see Graph.layout_fruchterman_reingold()
+        """
+        deprecated("Graph.layout_grid_fruchterman_reingold() is deprecated since "\
+            "igraph 0.8, please use Graph.layout_fruchterman_reingold(grid=True) instead")
+        kwds["grid"] = True
+        return self.layout_fruchterman_reingold(*args, **kwds)
 
     def layout_sugiyama(self, layers=None, weights=None, hgap=1, vgap=1,
             maxiter=100, return_extended_graph=False):
@@ -3162,6 +3208,8 @@ class Graph(GraphBase):
         "bipartite": "layout_bipartite",
         "circle": "layout_circle",
         "circular": "layout_circle",
+        "davidson_harel": "layout_davidson_harel",
+        "dh": "layout_davidson_harel",
         "drl": "layout_drl",
         "fr": "layout_fruchterman_reingold",
         "fruchterman_reingold": "layout_fruchterman_reingold",

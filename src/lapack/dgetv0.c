@@ -172,11 +172,11 @@ static doublereal c_b29 = -1.;
     real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
-    integer mgetv0=0;
+    integer mgetv0;
     real tgetv0;
     IGRAPH_F77_SAVE doublereal rnorm0;
     extern /* Subroutine */ int igraphsecond_(real *);
-    integer logfil=0, ndigit;
+    integer logfil, ndigit;
     extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
 	    doublereal *);
     IGRAPH_F77_SAVE integer msglvl;

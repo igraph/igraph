@@ -1,5 +1,11 @@
 import unittest
 from igraph import *
+from igraph.test.utils import skipIf
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
 
 class OperatorTests(unittest.TestCase):
     def testMultiplication(self):
@@ -181,6 +187,17 @@ class OperatorTests(unittest.TestCase):
         g2.contract_vertices([0, 0, 1, 1, 2, 2, 3, 3, 4, 4])
         self.assertEqual(g2.vcount(), 5)
         self.assertEqual(g2.ecount(), 0)
+
+    @skipIf(np is None, "test case depends on NumPy")
+    def testContractVerticesWithNumPyIntegers(self):
+        g = Graph.Full(4) + Graph.Full(4) + [(0, 5), (1, 4)]
+        g2 = g.copy()
+        g2.contract_vertices([np.int32(x) for x in [0, 1, 2, 3, 1, 0, 6, 7]])
+        self.assertEqual(g2.vcount(), 8)
+        self.assertEqual(g2.ecount(), g.ecount())
+        self.assertEqual(sorted(g2.get_edgelist()),
+                [(0, 0), (0, 1), (0, 1), (0, 2), (0, 3), (0, 6), (0, 7),
+                 (1, 1), (1, 2), (1, 3), (1, 6), (1, 7), (2, 3), (6, 7)])
 
 
 def suite():

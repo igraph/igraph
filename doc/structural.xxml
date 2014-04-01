@@ -13,7 +13,7 @@
 <!-- doxrox-include igraph_are_connected -->
 </section>
 
-<section><title>Shortest Path Related Functions</title>
+<section><title>(Shortest) Path Related Functions</title>
 <!-- doxrox-include igraph_shortest_paths -->
 <!-- doxrox-include igraph_shortest_paths_dijkstra -->
 <!-- doxrox-include igraph_shortest_paths_bellman_ford -->
@@ -24,6 +24,7 @@
 <!-- doxrox-include igraph_get_shortest_path_dijkstra -->
 <!-- doxrox-include igraph_get_all_shortest_paths -->
 <!-- doxrox-include igraph_get_all_shortest_paths_dijkstra -->
+<!-- doxrox-include igraph_get_all_simple_paths -->
 <!-- doxrox-include igraph_average_path_length -->
 <!-- doxrox-include igraph_path_length_hist -->
 <!-- doxrox-include igraph_diameter -->

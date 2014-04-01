@@ -83,6 +83,7 @@
 #define igraphdlaln2_	dlaln2_
 #define igraphdladiv_	dladiv_
 #define igraphdsyevr_	dsyevr_
+#define igraphdsyrk_    dsyrk_
 #define igraphdlansy_	dlansy_
 #define igraphdormtr_	dormtr_
 #define igraphdormql_	dormql_
@@ -116,6 +117,7 @@
 #define igraphdlarrv_	dlarrv_
 #define igraphdlar1v_	dlar1v_
 #define igraphdlarrf_	dlarrf_
+#define igraphdpotrf_   dpotrf_
 #define igraphdsterf_	dsterf_
 #define igraphdsytrd_	dsytrd_
 #define igraphdlatrd_	dlatrd_

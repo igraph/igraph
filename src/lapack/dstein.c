@@ -18,7 +18,179 @@ static integer c__2 = 2;
 static integer c__1 = 1;
 static integer c_n1 = -1;
 
-/* Subroutine */ int igraphdstein_(integer *n, doublereal *d__, doublereal *e, 
+/* > \brief \b DSTEIN   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DSTEIN + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dstein.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dstein.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dstein.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DSTEIN( N, D, E, M, W, IBLOCK, ISPLIT, Z, LDZ, WORK,   
+                            IWORK, IFAIL, INFO )   
+
+         INTEGER            INFO, LDZ, M, N   
+         INTEGER            IBLOCK( * ), IFAIL( * ), ISPLIT( * ),   
+        $                   IWORK( * )   
+         DOUBLE PRECISION   D( * ), E( * ), W( * ), WORK( * ), Z( LDZ, * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DSTEIN computes the eigenvectors of a real symmetric tridiagonal   
+   > matrix T corresponding to specified eigenvalues, using inverse   
+   > iteration.   
+   >   
+   > The maximum number of iterations allowed for each eigenvector is   
+   > specified by an internal parameter MAXITS (currently set to 5).   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix.  N >= 0.   
+   > \endverbatim   
+   >   
+   > \param[in] D   
+   > \verbatim   
+   >          D is DOUBLE PRECISION array, dimension (N)   
+   >          The n diagonal elements of the tridiagonal matrix T.   
+   > \endverbatim   
+   >   
+   > \param[in] E   
+   > \verbatim   
+   >          E is DOUBLE PRECISION array, dimension (N-1)   
+   >          The (n-1) subdiagonal elements of the tridiagonal matrix   
+   >          T, in elements 1 to N-1.   
+   > \endverbatim   
+   >   
+   > \param[in] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >          The number of eigenvectors to be found.  0 <= M <= N.   
+   > \endverbatim   
+   >   
+   > \param[in] W   
+   > \verbatim   
+   >          W is DOUBLE PRECISION array, dimension (N)   
+   >          The first M elements of W contain the eigenvalues for   
+   >          which eigenvectors are to be computed.  The eigenvalues   
+   >          should be grouped by split-off block and ordered from   
+   >          smallest to largest within the block.  ( The output array   
+   >          W from DSTEBZ with ORDER = 'B' is expected here. )   
+   > \endverbatim   
+   >   
+   > \param[in] IBLOCK   
+   > \verbatim   
+   >          IBLOCK is INTEGER array, dimension (N)   
+   >          The submatrix indices associated with the corresponding   
+   >          eigenvalues in W; IBLOCK(i)=1 if eigenvalue W(i) belongs to   
+   >          the first submatrix from the top, =2 if W(i) belongs to   
+   >          the second submatrix, etc.  ( The output array IBLOCK   
+   >          from DSTEBZ is expected here. )   
+   > \endverbatim   
+   >   
+   > \param[in] ISPLIT   
+   > \verbatim   
+   >          ISPLIT is INTEGER array, dimension (N)   
+   >          The splitting points, at which T breaks up into submatrices.   
+   >          The first submatrix consists of rows/columns 1 to   
+   >          ISPLIT( 1 ), the second of rows/columns ISPLIT( 1 )+1   
+   >          through ISPLIT( 2 ), etc.   
+   >          ( The output array ISPLIT from DSTEBZ is expected here. )   
+   > \endverbatim   
+   >   
+   > \param[out] Z   
+   > \verbatim   
+   >          Z is DOUBLE PRECISION array, dimension (LDZ, M)   
+   >          The computed eigenvectors.  The eigenvector associated   
+   >          with the eigenvalue W(i) is stored in the i-th column of   
+   >          Z.  Any vector which fails to converge is set to its current   
+   >          iterate after MAXITS iterations.   
+   > \endverbatim   
+   >   
+   > \param[in] LDZ   
+   > \verbatim   
+   >          LDZ is INTEGER   
+   >          The leading dimension of the array Z.  LDZ >= max(1,N).   
+   > \endverbatim   
+   >   
+   > \param[out] WORK   
+   > \verbatim   
+   >          WORK is DOUBLE PRECISION array, dimension (5*N)   
+   > \endverbatim   
+   >   
+   > \param[out] IWORK   
+   > \verbatim   
+   >          IWORK is INTEGER array, dimension (N)   
+   > \endverbatim   
+   >   
+   > \param[out] IFAIL   
+   > \verbatim   
+   >          IFAIL is INTEGER array, dimension (M)   
+   >          On normal exit, all elements of IFAIL are zero.   
+   >          If one or more eigenvectors fail to converge after   
+   >          MAXITS iterations, then their indices are stored in   
+   >          array IFAIL.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   >          = 0: successful exit.   
+   >          < 0: if INFO = -i, the i-th argument had an illegal value   
+   >          > 0: if INFO = i, then i eigenvectors failed to converge   
+   >               in MAXITS iterations.  Their indices are stored in   
+   >               array IFAIL.   
+   > \endverbatim   
+
+   > \par Internal Parameters:   
+    =========================   
+   >   
+   > \verbatim   
+   >  MAXITS  INTEGER, default = 5   
+   >          The maximum number of iterations performed.   
+   >   
+   >  EXTRA   INTEGER, default = 2   
+   >          The number of iterations performed after norm growth   
+   >          criterion is satisfied, should be at least 1.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2011   
+
+   > \ingroup doubleOTHERcomputational   
+
+    =====================================================================   
+   Subroutine */ int igraphdstein_(integer *n, doublereal *d__, doublereal *e, 
 	integer *m, doublereal *w, integer *iblock, integer *isplit, 
 	doublereal *z__, integer *ldz, doublereal *work, integer *iwork, 
 	integer *ifail, integer *info)
@@ -64,94 +236,11 @@ static integer c_n1 = -1;
     doublereal onenrm, dtpcrt, pertol;
 
 
-/*  -- LAPACK routine (version 3.2) --   
+/*  -- LAPACK computational routine (version 3.4.0) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       November 2011   
 
-
-    Purpose   
-    =======   
-
-    DSTEIN computes the eigenvectors of a real symmetric tridiagonal   
-    matrix T corresponding to specified eigenvalues, using inverse   
-    iteration.   
-
-    The maximum number of iterations allowed for each eigenvector is   
-    specified by an internal parameter MAXITS (currently set to 5).   
-
-    Arguments   
-    =========   
-
-    N       (input) INTEGER   
-            The order of the matrix.  N >= 0.   
-
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            The n diagonal elements of the tridiagonal matrix T.   
-
-    E       (input) DOUBLE PRECISION array, dimension (N-1)   
-            The (n-1) subdiagonal elements of the tridiagonal matrix   
-            T, in elements 1 to N-1.   
-
-    M       (input) INTEGER   
-            The number of eigenvectors to be found.  0 <= M <= N.   
-
-    W       (input) DOUBLE PRECISION array, dimension (N)   
-            The first M elements of W contain the eigenvalues for   
-            which eigenvectors are to be computed.  The eigenvalues   
-            should be grouped by split-off block and ordered from   
-            smallest to largest within the block.  ( The output array   
-            W from DSTEBZ with ORDER = 'B' is expected here. )   
-
-    IBLOCK  (input) INTEGER array, dimension (N)   
-            The submatrix indices associated with the corresponding   
-            eigenvalues in W; IBLOCK(i)=1 if eigenvalue W(i) belongs to   
-            the first submatrix from the top, =2 if W(i) belongs to   
-            the second submatrix, etc.  ( The output array IBLOCK   
-            from DSTEBZ is expected here. )   
-
-    ISPLIT  (input) INTEGER array, dimension (N)   
-            The splitting points, at which T breaks up into submatrices.   
-            The first submatrix consists of rows/columns 1 to   
-            ISPLIT( 1 ), the second of rows/columns ISPLIT( 1 )+1   
-            through ISPLIT( 2 ), etc.   
-            ( The output array ISPLIT from DSTEBZ is expected here. )   
-
-    Z       (output) DOUBLE PRECISION array, dimension (LDZ, M)   
-            The computed eigenvectors.  The eigenvector associated   
-            with the eigenvalue W(i) is stored in the i-th column of   
-            Z.  Any vector which fails to converge is set to its current   
-            iterate after MAXITS iterations.   
-
-    LDZ     (input) INTEGER   
-            The leading dimension of the array Z.  LDZ >= max(1,N).   
-
-    WORK    (workspace) DOUBLE PRECISION array, dimension (5*N)   
-
-    IWORK   (workspace) INTEGER array, dimension (N)   
-
-    IFAIL   (output) INTEGER array, dimension (M)   
-            On normal exit, all elements of IFAIL are zero.   
-            If one or more eigenvectors fail to converge after   
-            MAXITS iterations, then their indices are stored in   
-            array IFAIL.   
-
-    INFO    (output) INTEGER   
-            = 0: successful exit.   
-            < 0: if INFO = -i, the i-th argument had an illegal value   
-            > 0: if INFO = i, then i eigenvectors failed to converge   
-                 in MAXITS iterations.  Their indices are stored in   
-                 array IFAIL.   
-
-    Internal Parameters   
-    ===================   
-
-    MAXITS  INTEGER, default = 5   
-            The maximum number of iterations performed.   
-
-    EXTRA   INTEGER, default = 2   
-            The number of iterations performed after norm growth   
-            criterion is satisfied, should be at least 1.   
 
     =====================================================================   
 

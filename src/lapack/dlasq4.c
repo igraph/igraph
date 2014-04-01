@@ -12,7 +12,157 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int igraphdlasq4_(integer *i0, integer *n0, doublereal *z__, 
+/* > \brief \b DLASQ4 computes an approximation to the smallest eigenvalue using values of d from the previous
+ transform. Used by sbdsqr.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLASQ4 + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlasq4.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlasq4.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlasq4.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLASQ4( I0, N0, Z, PP, N0IN, DMIN, DMIN1, DMIN2, DN,   
+                            DN1, DN2, TAU, TTYPE, G )   
+
+         INTEGER            I0, N0, N0IN, PP, TTYPE   
+         DOUBLE PRECISION   DMIN, DMIN1, DMIN2, DN, DN1, DN2, G, TAU   
+         DOUBLE PRECISION   Z( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DLASQ4 computes an approximation TAU to the smallest eigenvalue   
+   > using values of d from the previous transform.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] I0   
+   > \verbatim   
+   >          I0 is INTEGER   
+   >        First index.   
+   > \endverbatim   
+   >   
+   > \param[in] N0   
+   > \verbatim   
+   >          N0 is INTEGER   
+   >        Last index.   
+   > \endverbatim   
+   >   
+   > \param[in] Z   
+   > \verbatim   
+   >          Z is DOUBLE PRECISION array, dimension ( 4*N )   
+   >        Z holds the qd array.   
+   > \endverbatim   
+   >   
+   > \param[in] PP   
+   > \verbatim   
+   >          PP is INTEGER   
+   >        PP=0 for ping, PP=1 for pong.   
+   > \endverbatim   
+   >   
+   > \param[in] N0IN   
+   > \verbatim   
+   >          N0IN is INTEGER   
+   >        The value of N0 at start of EIGTEST.   
+   > \endverbatim   
+   >   
+   > \param[in] DMIN   
+   > \verbatim   
+   >          DMIN is DOUBLE PRECISION   
+   >        Minimum value of d.   
+   > \endverbatim   
+   >   
+   > \param[in] DMIN1   
+   > \verbatim   
+   >          DMIN1 is DOUBLE PRECISION   
+   >        Minimum value of d, excluding D( N0 ).   
+   > \endverbatim   
+   >   
+   > \param[in] DMIN2   
+   > \verbatim   
+   >          DMIN2 is DOUBLE PRECISION   
+   >        Minimum value of d, excluding D( N0 ) and D( N0-1 ).   
+   > \endverbatim   
+   >   
+   > \param[in] DN   
+   > \verbatim   
+   >          DN is DOUBLE PRECISION   
+   >        d(N)   
+   > \endverbatim   
+   >   
+   > \param[in] DN1   
+   > \verbatim   
+   >          DN1 is DOUBLE PRECISION   
+   >        d(N-1)   
+   > \endverbatim   
+   >   
+   > \param[in] DN2   
+   > \verbatim   
+   >          DN2 is DOUBLE PRECISION   
+   >        d(N-2)   
+   > \endverbatim   
+   >   
+   > \param[out] TAU   
+   > \verbatim   
+   >          TAU is DOUBLE PRECISION   
+   >        This is the shift.   
+   > \endverbatim   
+   >   
+   > \param[out] TTYPE   
+   > \verbatim   
+   >          TTYPE is INTEGER   
+   >        Shift type.   
+   > \endverbatim   
+   >   
+   > \param[in,out] G   
+   > \verbatim   
+   >          G is REAL   
+   >        G is passed as an argument in order to save its value between   
+   >        calls to DLASQ4.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERcomputational   
+
+   > \par Further Details:   
+    =====================   
+   >   
+   > \verbatim   
+   >   
+   >  CNST1 = 9/16   
+   > \endverbatim   
+   >   
+    =====================================================================   
+   Subroutine */ int igraphdlasq4_(integer *i0, integer *n0, doublereal *z__, 
 	integer *pp, integer *n0in, doublereal *dmin__, doublereal *dmin1, 
 	doublereal *dmin2, doublereal *dn, doublereal *dn1, doublereal *dn2, 
 	doublereal *tau, integer *ttype, doublereal *g)
@@ -30,72 +180,11 @@
     doublereal gam, gap1, gap2;
 
 
-/*  -- LAPACK routine (version 3.3.1)                                    --   
-
-    -- Contributed by Osni Marques of the Lawrence Berkeley National   --   
-    -- Laboratory and Beresford Parlett of the Univ. of California at  --   
-    -- Berkeley                                                        --   
-    -- November 2008                                                   --   
-
+/*  -- LAPACK computational routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    DLASQ4 computes an approximation TAU to the smallest eigenvalue   
-    using values of d from the previous transform.   
-
-    Arguments   
-    =========   
-
-    I0    (input) INTEGER   
-          First index.   
-
-    N0    (input) INTEGER   
-          Last index.   
-
-    Z     (input) DOUBLE PRECISION array, dimension ( 4*N )   
-          Z holds the qd array.   
-
-    PP    (input) INTEGER   
-          PP=0 for ping, PP=1 for pong.   
-
-    NOIN  (input) INTEGER   
-          The value of N0 at start of EIGTEST.   
-
-    DMIN  (input) DOUBLE PRECISION   
-          Minimum value of d.   
-
-    DMIN1 (input) DOUBLE PRECISION   
-          Minimum value of d, excluding D( N0 ).   
-
-    DMIN2 (input) DOUBLE PRECISION   
-          Minimum value of d, excluding D( N0 ) and D( N0-1 ).   
-
-    DN    (input) DOUBLE PRECISION   
-          d(N)   
-
-    DN1   (input) DOUBLE PRECISION   
-          d(N-1)   
-
-    DN2   (input) DOUBLE PRECISION   
-          d(N-2)   
-
-    TAU   (output) DOUBLE PRECISION   
-          This is the shift.   
-
-    TTYPE (output) INTEGER   
-          Shift type.   
-
-    G     (input/output) REAL   
-          G is passed as an argument in order to save its value between   
-          calls to DLASQ4.   
-
-    Further Details   
-    ===============   
-    CNST1 = 9/16   
 
     =====================================================================   
 

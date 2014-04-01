@@ -169,7 +169,13 @@ merges <- function(communities) {
 crossing <- function(communities, graph) {
   m <- membership(communities)
   el <- get.edgelist(graph, names=FALSE)
-  m[el[,1]] != m[el[,2]]
+  m1 <- m[el[,1]]
+  m2 <- m[el[,2]]
+  res <- m1 != m2
+  if (!is.null(names(m1))) {
+    names(res) <- paste(names(m1), names(m2), sep="|")
+  }
+  res
 }
 
 code.length <- function(communities) {
@@ -593,7 +599,8 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
 igraph.i.levc.arp <- function(externalP, externalE) {
   f <- function(v) {
     v <- as.numeric(v)
-    .Call("R_igraph_i_levc_arp", externalP, externalE, v, PACKAGE="igraph");
+    base::.Call("R_igraph_i_levc_arp", externalP, externalE, v,
+                PACKAGE="igraph");
   }
   f
 }

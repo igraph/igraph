@@ -12,7 +12,141 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int igraphdlarrc_(char *jobt, integer *n, doublereal *vl, 
+/* > \brief \b DLARRC computes the number of eigenvalues of the symmetric tridiagonal matrix.   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+   > \htmlonly   
+   > Download DLARRC + dependencies   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.tgz?format=tgz&filename=/lapack/lapack_routine/dlarrc.
+f">   
+   > [TGZ]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.zip?format=zip&filename=/lapack/lapack_routine/dlarrc.
+f">   
+   > [ZIP]</a>   
+   > <a href="http://www.netlib.org/cgi-bin/netlibfiles.txt?format=txt&filename=/lapack/lapack_routine/dlarrc.
+f">   
+   > [TXT]</a>   
+   > \endhtmlonly   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DLARRC( JOBT, N, VL, VU, D, E, PIVMIN,   
+                                     EIGCNT, LCNT, RCNT, INFO )   
+
+         CHARACTER          JOBT   
+         INTEGER            EIGCNT, INFO, LCNT, N, RCNT   
+         DOUBLE PRECISION   PIVMIN, VL, VU   
+         DOUBLE PRECISION   D( * ), E( * )   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > Find the number of eigenvalues of the symmetric tridiagonal matrix T   
+   > that are in the interval (VL,VU] if JOBT = 'T', and of L D L^T   
+   > if JOBT = 'L'.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] JOBT   
+   > \verbatim   
+   >          JOBT is CHARACTER*1   
+   >          = 'T':  Compute Sturm count for matrix T.   
+   >          = 'L':  Compute Sturm count for matrix L D L^T.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >          The order of the matrix. N > 0.   
+   > \endverbatim   
+   >   
+   > \param[in] VL   
+   > \verbatim   
+   >          VL is DOUBLE PRECISION   
+   > \endverbatim   
+   >   
+   > \param[in] VU   
+   > \verbatim   
+   >          VU is DOUBLE PRECISION   
+   >          The lower and upper bounds for the eigenvalues.   
+   > \endverbatim   
+   >   
+   > \param[in] D   
+   > \verbatim   
+   >          D is DOUBLE PRECISION array, dimension (N)   
+   >          JOBT = 'T': The N diagonal elements of the tridiagonal matrix T.   
+   >          JOBT = 'L': The N diagonal elements of the diagonal matrix D.   
+   > \endverbatim   
+   >   
+   > \param[in] E   
+   > \verbatim   
+   >          E is DOUBLE PRECISION array, dimension (N)   
+   >          JOBT = 'T': The N-1 offdiagonal elements of the matrix T.   
+   >          JOBT = 'L': The N-1 offdiagonal elements of the matrix L.   
+   > \endverbatim   
+   >   
+   > \param[in] PIVMIN   
+   > \verbatim   
+   >          PIVMIN is DOUBLE PRECISION   
+   >          The minimum pivot in the Sturm sequence for T.   
+   > \endverbatim   
+   >   
+   > \param[out] EIGCNT   
+   > \verbatim   
+   >          EIGCNT is INTEGER   
+   >          The number of eigenvalues of the symmetric tridiagonal matrix T   
+   >          that are in the interval (VL,VU]   
+   > \endverbatim   
+   >   
+   > \param[out] LCNT   
+   > \verbatim   
+   >          LCNT is INTEGER   
+   > \endverbatim   
+   >   
+   > \param[out] RCNT   
+   > \verbatim   
+   >          RCNT is INTEGER   
+   >          The left and right negcounts of the interval.   
+   > \endverbatim   
+   >   
+   > \param[out] INFO   
+   > \verbatim   
+   >          INFO is INTEGER   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date September 2012   
+
+   > \ingroup auxOTHERauxiliary   
+
+   > \par Contributors:   
+    ==================   
+   >   
+   > Beresford Parlett, University of California, Berkeley, USA \n   
+   > Jim Demmel, University of California, Berkeley, USA \n   
+   > Inderjit Dhillon, University of Texas, Austin, USA \n   
+   > Osni Marques, LBNL/NERSC, USA \n   
+   > Christof Voemel, University of California, Berkeley, USA   
+
+    =====================================================================   
+   Subroutine */ int igraphdlarrc_(char *jobt, integer *n, doublereal *vl, 
 	doublereal *vu, doublereal *d__, doublereal *e, doublereal *pivmin, 
 	integer *eigcnt, integer *lcnt, integer *rcnt, integer *info)
 {
@@ -28,63 +162,11 @@
     doublereal lpivot, rpivot;
 
 
-/*  -- LAPACK auxiliary routine (version 3.2) --   
+/*  -- LAPACK auxiliary routine (version 3.4.2) --   
     -- LAPACK is a software package provided by Univ. of Tennessee,    --   
     -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
-       November 2006   
+       September 2012   
 
-
-    Purpose   
-    =======   
-
-    Find the number of eigenvalues of the symmetric tridiagonal matrix T   
-    that are in the interval (VL,VU] if JOBT = 'T', and of L D L^T   
-    if JOBT = 'L'.   
-
-    Arguments   
-    =========   
-
-    JOBT    (input) CHARACTER*1   
-            = 'T':  Compute Sturm count for matrix T.   
-            = 'L':  Compute Sturm count for matrix L D L^T.   
-
-    N       (input) INTEGER   
-            The order of the matrix. N > 0.   
-
-    VL      (input) DOUBLE PRECISION   
-    VU      (input) DOUBLE PRECISION   
-            The lower and upper bounds for the eigenvalues.   
-
-    D       (input) DOUBLE PRECISION array, dimension (N)   
-            JOBT = 'T': The N diagonal elements of the tridiagonal matrix T.   
-            JOBT = 'L': The N diagonal elements of the diagonal matrix D.   
-
-    E       (input) DOUBLE PRECISION array, dimension (N)   
-            JOBT = 'T': The N-1 offdiagonal elements of the matrix T.   
-            JOBT = 'L': The N-1 offdiagonal elements of the matrix L.   
-
-    PIVMIN  (input) DOUBLE PRECISION   
-            The minimum pivot in the Sturm sequence for T.   
-
-    EIGCNT  (output) INTEGER   
-            The number of eigenvalues of the symmetric tridiagonal matrix T   
-            that are in the interval (VL,VU]   
-
-    LCNT    (output) INTEGER   
-    RCNT    (output) INTEGER   
-            The left and right negcounts of the interval.   
-
-    INFO    (output) INTEGER   
-
-    Further Details   
-    ===============   
-
-    Based on contributions by   
-       Beresford Parlett, University of California, Berkeley, USA   
-       Jim Demmel, University of California, Berkeley, USA   
-       Inderjit Dhillon, University of Texas, Austin, USA   
-       Osni Marques, LBNL/NERSC, USA   
-       Christof Voemel, University of California, Berkeley, USA   
 
     =====================================================================   
 

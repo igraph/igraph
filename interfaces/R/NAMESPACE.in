@@ -122,8 +122,8 @@ export(read.graph, write.graph, graph.graphdb)
 # layouts
 
 export(layout.auto, layout.random, layout.circle,
-       layout.spring, layout.kamada.kawai, layout.lgl,
-       layout.fruchterman.reingold.grid, layout.sphere, layout.merge,
+       layout.lgl,
+       layout.sphere, layout.merge,
        layout.reingold.tilford, layout.norm, piecewise.layout)
 export(igraph.drl.default, igraph.drl.coarsen, igraph.drl.coarsest,
        igraph.drl.refine, igraph.drl.final)
@@ -216,11 +216,6 @@ export(graph.mincut, vertex.connectivity, edge.connectivity,
 export(cliques, largest.cliques, maximal.cliques, clique.number,
        independent.vertex.sets, largest.independent.vertex.sets,
        maximal.independent.vertex.sets, independence.number)
-
-# cohesive blocking, this is what remains from the old implementation
-
-S3method(layout.svd, igraph)
-export(layout.svd)
 
 # cohesive blocking, new style 
 
