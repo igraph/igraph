@@ -54,12 +54,6 @@
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
 
-#define BASE_INT
-#include "igraph_pmt.h"
-#include "stack.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_INT
-
 #define BASE_PTR
 #include "igraph_pmt.h"
 #include "stack.pmt"
