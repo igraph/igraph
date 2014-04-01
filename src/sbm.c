@@ -282,7 +282,7 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
   }
   for (i=0; i<k; i++) {
     igraph_real_t s=VECTOR(*rho)[i] * m;
-    if (fabs(floor(s)-s) > sq_dbl_epsilon) {
+    if (fabs(round(s)-s) > sq_dbl_epsilon) {
       IGRAPH_ERROR("`rho' * `m' is not integer in HSBM", IGRAPH_EINVAL);
     }
   }
@@ -485,7 +485,7 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     int j, k=igraph_vector_size(rho);
     for (j=0; j<k; j++) {
       igraph_real_t s=VECTOR(*rho)[j] * m;
-      if (fabs(floor(s)-s) > sq_dbl_epsilon) {
+      if (fabs(round(s)-s) > sq_dbl_epsilon) {
 	IGRAPH_ERROR("`rho' * `m' is not integer in HSBM", IGRAPH_EINVAL);
       }
     }
