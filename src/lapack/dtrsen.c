@@ -349,7 +349,7 @@ f">
     logical swap;
     doublereal scale;
     extern logical igraphlsame_(char *, char *);
-    integer isave[3], lwmin;
+    integer isave[3], lwmin = 0;
     logical wantq, wants;
     doublereal rnorm;
     extern /* Subroutine */ int igraphdlacn2_(integer *, doublereal *, doublereal *,

@@ -154,12 +154,12 @@ static doublereal c_b29 = -1.;
 
     /* Local variables */
     real t0, t1, t2, t3;
-    integer jj, nbx;
+    integer jj, nbx = 0;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     IGRAPH_F77_SAVE integer iter;
     IGRAPH_F77_SAVE logical orth;
-    integer nopx;
+    integer nopx = 0;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     IGRAPH_F77_SAVE integer iseed[4];
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
@@ -169,18 +169,18 @@ static doublereal c_b29 = -1.;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     IGRAPH_F77_SAVE logical first;
-    real tmvbx;
+    real tmvbx = 0;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
-    integer mgetv0;
-    real tgetv0;
+    integer mgetv0 = 0;
+    real tgetv0 = 0;
     IGRAPH_F77_SAVE doublereal rnorm0;
     extern /* Subroutine */ int igraphsecond_(real *);
     integer logfil, ndigit;
     extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
 	    doublereal *);
     IGRAPH_F77_SAVE integer msglvl;
-    real tmvopx;
+    real tmvopx = 0;
 
 
 /*     %----------------------------------------------------%   

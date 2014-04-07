@@ -466,9 +466,9 @@ static integer c__1 = 1;
     integer j;
     real t0, t1;
     IGRAPH_F77_SAVE integer nb, ih, iq, np, iw, ldh, ldq;
-    integer nbx;
+    integer nbx = 0;
     IGRAPH_F77_SAVE integer nev0, mode, ierr, iupd, next;
-    integer nopx;
+    integer nopx = 0;
     IGRAPH_F77_SAVE integer ritz;
     real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
@@ -484,18 +484,18 @@ static integer c__1 = 1;
     extern /* Subroutine */ int igraphsecond_(real *);
     integer logfil, ndigit;
     IGRAPH_F77_SAVE integer ishift;
-    integer nitref, msaupd;
+    integer nitref, msaupd = 0;
     IGRAPH_F77_SAVE integer bounds;
     real titref, tseigt, tsaupd;
     extern /* Subroutine */ int igraphdstats_(void);
     IGRAPH_F77_SAVE integer msglvl;
-    real tsaitr;
+    real tsaitr = 0.0;
     IGRAPH_F77_SAVE integer mxiter;
     real tsgets, tsapps;
-    integer nrorth;
-    real tsconv;
-    integer nrstrt;
-    real tmvopx;
+    integer nrorth = 0;
+    real tsconv = 0.0;
+    integer nrstrt = 0;
+    real tmvopx = 0.0;
 
     /* Fortran I/O blocks */
     static cilist io___28 = { 0, 6, 0, fmt_1000, 0 };

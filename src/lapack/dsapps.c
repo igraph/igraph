@@ -186,8 +186,8 @@ static doublereal c_b20 = -1.;
 	    doublereal *, doublereal *), igraphdlaset_(char *, integer *, integer *,
 	     doublereal *, doublereal *, doublereal *, integer *);
     IGRAPH_F77_SAVE doublereal epsmch;
-    integer logfil, ndigit, msapps, msglvl, istart;
-    real tsapps;
+    integer logfil, ndigit, msapps = 0, msglvl, istart;
+    real tsapps = 0;
     integer kplusp;
 
 

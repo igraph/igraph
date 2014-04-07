@@ -175,7 +175,7 @@ f">
     double sqrt(doublereal);
 
     /* Local variables */
-    doublereal s, a2, b1, b2;
+    doublereal s = 0., a2, b1, b2;
     integer i4, nn, np;
     doublereal gam, gap1, gap2;
 

@@ -96,7 +96,7 @@ static doublereal c_b3 = .66666666666666663;
     doublereal eps23, temp;
     extern doublereal igraphdlapy2_(doublereal *, doublereal *), igraphdlamch_(char *);
     extern /* Subroutine */ int igraphsecond_(real *);
-    real tnconv;
+    real tnconv = 0.;
 
 
 /*     %----------------------------------------------------%   
