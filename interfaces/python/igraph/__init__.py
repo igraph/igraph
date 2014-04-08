@@ -1895,13 +1895,14 @@ class Graph(GraphBase):
     def write_svg(self, fname, layout="auto", width=None, height=None, \
                   labels="label", colors="color", shapes="shape", \
                   vertex_size=10, edge_colors="color", \
+                  edge_stroke_widths="width", \
                   font_size=16, *args, **kwds):
         """Saves the graph as an SVG (Scalable Vector Graphics) file
         
         The file will be Inkscape (http://inkscape.org) compatible.
         In Inkscape, as nodes are rearranged, the edges auto-update.
         
-        @param fname: the name of the file
+        @param fname: the name of the file or a Python file handle
         @param layout: the layout of the graph. Can be either an
           explicitly specified layout (using a list of coordinate
           pairs) or the name of a layout algorithm (which should
@@ -1926,6 +1927,10 @@ class Graph(GraphBase):
           of an edge attribute to use, or a list explicitly specifying
           the colors. A color can be anything acceptable in an SVG
           file.
+        @param edge_stroke_widths: the stroke widths of the edges. Either
+          it is the name of an edge attribute to use, or a list explicitly
+          specifying the stroke widths. The stroke width can be anything
+          acceptable in an SVG file.
         @param font_size: font size. If it is a string, it is written into
           the SVG file as-is (so you can specify anything which is valid
           as the value of the C{font-size} style). If it is a number, it
@@ -1958,7 +1963,7 @@ class Graph(GraphBase):
             try:
                 colors = self.vs.get_attribute_values(colors)
             except KeyError:
-                colors = ["red" for x in xrange(self.vcount())]
+                colors = ["red"] * self.vcount()
 
         if isinstance(shapes, str):
             try:
@@ -1970,7 +1975,13 @@ class Graph(GraphBase):
             try:
                 edge_colors = self.es.get_attribute_values(edge_colors)
             except KeyError:
-                edge_colors = ["black" for x in xrange(self.ecount())]
+                edge_colors = ["black"] * self.ecount()
+
+        if isinstance(edge_stroke_widths, str):
+            try:
+                edge_stroke_widths = self.es.get_attribute_values(edge_stroke_widths)
+            except KeyError:
+                edge_stroke_widths = [2] * self.ecount()
 
         if not isinstance(font_size, str):
             font_size = "%spx" % str(font_size)
@@ -1982,7 +1993,12 @@ class Graph(GraphBase):
         labels.extend(str(i+1) for i in xrange(len(labels), vcount))
         colors.extend(["red"] * (vcount - len(colors)))
 
-        f = open(fname, "w")
+        if isinstance(fname, basestring):
+            f = open(fname, "w")
+            our_file = True
+        else:
+            f = fname
+            our_file = False
 
         bbox = BoundingBox(layout.bounding_box())
 
@@ -2050,10 +2066,10 @@ class Graph(GraphBase):
             y2 = y2 - vertex_size * math.sin(angle)
             
             print >> f, '<path'
-            print >> f, '    style="fill:none;stroke:{0};stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none{1}"'\
+            print >> f, '    style="fill:none;stroke:{0};stroke-width:{2};stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none{1}"'\
                         .format(edge_colors[eidx], ";marker-end:url(#{0})".\
                                 format(edge_color_dict[edge_colors[eidx]]) \
-                                if directed else "")
+                                if directed else "", edge_stroke_widths[eidx])
             print >> f, '    d="M {0},{1} {2},{3}"'.format(x1, y1, x2, y2)
             print >> f, '    id="path{0}"'.format(eidx)
             print >> f, '    inkscape:connector-type="polyline"'
@@ -2111,8 +2127,9 @@ class Graph(GraphBase):
         print >> f, '</g>'
         print >> f
         print >> f, '</svg>'
-                
-        f.close()
+        
+        if our_file:
+            f.close()
 
 
     @classmethod
