@@ -55,6 +55,17 @@ class VertexTests(unittest.TestCase):
         v.update_attributes(dict(b=44, c=55))
         self.assertEqual(v.attributes(), dict(a=3, b=44, c=55, d=6))
 
+    def testPhantomVertex(self):
+        v = self.g.vs[9]
+        v.delete()
+
+        # v is now a phantom vertex; try to freak igraph out now :)
+        self.assertRaises(ValueError, v.update_attributes, a=2)
+        self.assertRaises(ValueError, v.__getitem__, "a")
+        self.assertRaises(ValueError, v.__setitem__, "a", 4)
+        self.assertRaises(ValueError, v.__delitem__, "a")
+        self.assertRaises(ValueError, v.attributes)
+
     def testProxyMethods(self):
         # We only test with connected graphs because disconnected graphs might
         # print a warning when shortest_paths() is invoked on them and we want

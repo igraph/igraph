@@ -41,6 +41,9 @@ typedef struct {
 int igraphmodule_Edge_clear(igraphmodule_EdgeObject *self);
 void igraphmodule_Edge_dealloc(igraphmodule_EdgeObject* self);
 
+int igraphmodule_Edge_Check(PyObject *obj);
+int igraphmodule_Edge_Validate(PyObject *obj);
+
 PyObject* igraphmodule_Edge_New(igraphmodule_GraphObject *gref, igraph_integer_t idx);
 PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self);
 PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self);

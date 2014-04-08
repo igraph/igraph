@@ -42,6 +42,9 @@ typedef struct
 int igraphmodule_Vertex_clear(igraphmodule_VertexObject *self);
 void igraphmodule_Vertex_dealloc(igraphmodule_VertexObject* self);
 
+int igraphmodule_Vertex_Check(PyObject *obj);
+int igraphmodule_Vertex_Validate(PyObject *obj);
+
 PyObject* igraphmodule_Vertex_New(igraphmodule_GraphObject *gref, igraph_integer_t idx);
 PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self);
 PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self);
