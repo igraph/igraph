@@ -197,7 +197,7 @@ class LayoutAlgorithmTests(unittest.TestCase):
         self.assertTrue(bbox.top >= 2)
         self.assertTrue(bbox.bottom <= 3)
         self.assertTrue(bbox.left >= 4)
-        self.assertTrue(bbox.right >= 6)
+        self.assertTrue(bbox.right <= 6)
 
     def testFruchtermanReingoldGrid(self):
         g = Graph.Barabasi(100)
@@ -214,7 +214,7 @@ class LayoutAlgorithmTests(unittest.TestCase):
         self.assertTrue(bbox.top >= 2)
         self.assertTrue(bbox.bottom <= 3)
         self.assertTrue(bbox.left >= 4)
-        self.assertTrue(bbox.right >= 6)
+        self.assertTrue(bbox.right <= 6)
 
     def testMDS(self):
         g = Graph.Tree(10, 2)
