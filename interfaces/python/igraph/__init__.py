@@ -141,16 +141,18 @@ class Graph(GraphBase):
     subgraph = GraphBase.induced_subgraph
 
     def __init__(self, *args, **kwds):
-        """__init__(n=None, edges=None, directed=None, graph_attrs=None,
+        """__init__(n=0, edges=None, directed=False, graph_attrs=None,
         vertex_attrs=None, edge_attrs=None)
         
         Constructs a graph from scratch.
 
         @keyword n: the number of vertices. Can be omitted, the default is
-          zero.
+          zero. Note that if the edge list contains vertices with indexes
+          larger than or equal to M{m}, then the number of vertices will
+          be adjusted accordingly.
         @keyword edges: the edge list where every list item is a pair of
           integers. If any of the integers is larger than M{n-1}, the number
-          of vertices is adjusted accordingly.
+          of vertices is adjusted accordingly. C{None} means no edges.
         @keyword directed: whether the graph should be directed
         @keyword graph_attrs: the attributes of the graph as a dictionary.
         @keyword vertex_attrs: the attributes of the vertices as a dictionary.
@@ -164,23 +166,45 @@ class Graph(GraphBase):
         kwd_order = ["n", "edges", "directed", "graph_attrs", "vertex_attrs", \
                 "edge_attrs"]
         params = [0, [], False, {}, {}, {}]
+
+        # Is there any keyword argument in kwds that we don't know? If so,
+        # freak out.
+        unknown_kwds = set(kwds.keys())
+        unknown_kwds.difference_update(kwd_order)
+        if unknown_kwds:
+            raise TypeError("{0}.__init__ got an unexpected keyword argument {1!r}".format(
+                self.__class__.__name__, unknown_kwds.pop()
+            ))
+
         # If the first argument is a list, assume that the number of vertices
         # were omitted
         args = list(args)
         if len(args) > 0:
             if isinstance(args[0], list) or isinstance(args[0], tuple):
                 args.insert(0, params[0])
+
         # Override default parameters from args
         params[:len(args)] = args
+
         # Override default parameters from keywords
         for idx, k in enumerate(kwd_order):
             if k in kwds:
                 params[idx] = kwds[k]
+
         # Now, translate the params list to argument names
         nverts, edges, directed, graph_attrs, vertex_attrs, edge_attrs = params
 
+        # When the number of vertices is None, assume that the user meant zero
+        if nverts is None:
+            nverts = 0
+
+        # When 'edges' is None, assume that the user meant an empty list
+        if edges is None:
+            edges = []
+
         # Initialize the graph
         GraphBase.__init__(self, nverts, edges, directed)
+
         # Set the graph attributes
         for key, value in graph_attrs.iteritems():
             if isinstance(key, (int, long)):
