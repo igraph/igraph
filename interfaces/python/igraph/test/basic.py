@@ -17,13 +17,13 @@ class BasicTests(unittest.TestCase):
         self.assertTrue(g.vcount() == 3 and g.ecount() == 3 and g.is_directed() == False and g.is_simple() == False)
 
         g=Graph(8, None)
-        self.assertEquals(8, g.vcount())
-        self.assertEquals(0, g.ecount())
+        self.assertEqual(8, g.vcount())
+        self.assertEqual(0, g.ecount())
         self.assertFalse(g.is_directed())
 
         g=Graph(edges=None)
-        self.assertEquals(0, g.vcount())
-        self.assertEquals(0, g.ecount())
+        self.assertEqual(0, g.vcount())
+        self.assertEqual(0, g.ecount())
         self.assertFalse(g.is_directed())
 
         self.assertRaises(TypeError, Graph, edgelist=[(1,2)])
