@@ -1,14 +1,14 @@
 ---
 layout: pynewstemp
-title: igraph 0.7
-date: 3013-11-13
+title: igraph 0.7.0
+date: 2014-02-04
 category: python
 ---
 
-igraph 0.7
-==========
+igraph 0.7.0
+============
 
-November XX, 2013
+February 4, 2014
 
 Release Notes
 -------------
