@@ -1,7 +1,7 @@
 ---
 layout: cnewstemp
-title: igraph 0.7
-date: 3013-11-13
+title: igraph 0.7.1
+date: 2014-04-21
 category: c
 ---
 
