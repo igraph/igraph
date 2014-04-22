@@ -66,5 +66,8 @@ stamp: $(HTML) $(CSS) c/doc/stamp r/doc/stamp r/doc/igraph.pdf \
 deploy: stamp
 	rsync -avz --delete --exclude python _site/ igraph.org:www2/www-test/
 
-.PHONY: all deploy
+realdeploy: stamp
+	rsync -avz --delete --exclude python _site/ igraph.org:www/
+
+.PHONY: all deploy realdeploy
 
