@@ -3,8 +3,8 @@ all: nothing
 
 VERSION=$(shell ../tools/getversion.sh)
 
-HTML= index.html r/news.html c/news.html python/news.html \
-      r/index.html c/index.html python/index.html         \
+HTML= index.html r/news.html c/news.html \
+      r/index.html c/index.html \
       _layouts/default.html _layouts/newstemp.html _layouts/manual.html
 
 CSS= css/affix.css css/manual.css css/other.css fonts/fonts.css
@@ -56,40 +56,15 @@ r/doc/igraph.pdf: $(RMAN)
 	R CMD Rd2pdf --no-preview --force -o r/doc/igraph.pdf \
 	  ../interfaces/R/igraph
 
-../interfaces/python/doc/api/pdf/api.pdf:
-	cd .. && make dist
-	cd ../interfaces/python && python setup.py build \
-		--no-pkg-config --no-progress-bar        \
-		--c-core-url=../../igraph-$(VERSION).tar.gz
-	cd ../interfaces/python && scripts/mkdoc.sh
-
-python/doc/python-igraph.pdf: ../interfaces/python/doc/api/pdf/api.pdf
-	mkdir -p python/doc
-	cp $< $@
-
-python/doc/stamp: ../interfaces/python/doc/api/html/igraph-module.html
-	mkdir -p python/doc
-	cp -r ../interfaces/python/doc/api/html/ python/doc
-	../tools/pyhtml.sh python/doc
-	touch $@
-
-python/doc/tutorial/stamp: ../interfaces/python/doc/source/tutorial.rst
-	mkdir -p python/doc/tutorial
-	cd ../interfaces/python/doc && sphinx-build source api/tutorial
-	cp -r ../interfaces/python/doc/api/tutorial/ python/doc/tutorial/
-	touch $@
-
 stamp: $(HTML) $(CSS) c/doc/stamp r/doc/stamp r/doc/igraph.pdf \
-               c/doc/igraph.info c/doc/igraph-docs.pdf \
-	       python/doc/python-igraph.pdf python/doc/stamp \
-	       python/doc/tutorial/stamp
+               c/doc/igraph.info c/doc/igraph-docs.pdf
 	../tools/getversion.sh > _includes/igraph-version
 	../interfaces/R/tools/convertversion.sh > _includes/igraph-rversion
 	jekyll build
 	touch stamp
 
 deploy: stamp
-	rsync -avz --delete _site/ igraph.org:www/
+	rsync -avz --delete --exclude python _site/ igraph.org:www2/www-test/
 
 .PHONY: all deploy
 
