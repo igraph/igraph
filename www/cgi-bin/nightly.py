@@ -22,9 +22,13 @@ plugin = bottle_sqlite.Plugin(dbfile=dbfile)
 nightly=bottle.Bottle()
 nightly.install(plugin)
 
-urlmap={ 'c': 'C library', 'r': 'R package', 'python': 'Python extension',
-         'msvc': 'C library for MSVC', 'r-osx': 'R binary OSX package',
-         'r-win': 'R binary Windows package' }
+urlmap={ 'c': 'C library source code', 
+         'r': 'R package source code', 
+         'python': 'Python extension source code',
+         'msvc': 'C library source for MSVC', 
+         'r-osx': 'R binary OSX package',
+         'r-win': 'R binary Windows package', 
+         'python-osx': 'Python extension OSX installer' }
 
 def human_size(num):
     num=long(num)
@@ -77,7 +81,7 @@ def list_latest_files(db, dtype="all", version="all", branch="all"):
     files = db.execute("SELECT *, MAX(date) AS tmp FROM files    \
                         WHERE type LIKE ? AND version LIKE ? AND branch LIKE ? \
                         GROUP BY type, version, branch \
-                        ORDER BY version DESC, date DESC",
+                        ORDER BY version DESC, type",
                        ("%" if dtype=="all" else dtype,
                         "%" if version=="all" else version,
                         "%" if branch=="all" else branch)).fetchall()

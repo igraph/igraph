@@ -840,7 +840,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * The modularity of a graph with respect to some division (or vertex
  * types) measures how good the division is, or how separated are the 
  * different vertex types from each other. It is defined as 
- * Q=1/(2m) * sum(Aij-ki*kj/(2m)delta(ci,cj),i,j), here `m' is the
+ * Q=1/(2m) * sum((Aij - ki*kj / (2m)) delta(ci,cj), i, j), here `m' is the
  * number of edges, `Aij' is the element of the `A' adjacency matrix
  * in row `i' and column `j', `ki' is the degree of `i', `kj' is the
  * degree of `j', `ci' is the type (or component) of `i', `cj' that of
@@ -855,8 +855,9 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * on vertex `j' and `m' is the total weight of all edges.
  * 
  * </para><para>
- * See also MEJ Newman and M Girvan: Finding and evaluating community
- * structure in networks. Physical Review E 69 026113, 2004.
+ * See also Clauset, A.; Newman, M. E. J.; Moore, C. Finding
+ * community structure in very large networks, Physical Review E,
+ * 2004, 70, 066111.
  * \param graph The input graph.
  * \param membership Numeric vector which gives the type of each
  *     vertex, ie. the component to which it belongs.

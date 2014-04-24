@@ -405,15 +405,6 @@ Input/output and file formats
 Major changes in the Python interface
 -------------------------------------
 
-Graph generators
-----------------
-- New graph generators: Graph.Static_Fitness(), Graph.Static_Power_Law().
-- Graph.Barabasi() was rewritten and it supports three algorithms now,
-  the default algorithm does not generate multiple or loop edges.
-  The graph generation process can now start from a supplied graph.
-- The Watts-Strogatz graph generator, Graph.Watts_Strogatz() can 
-  now create graphs without loop edges.
-
 Others
 ------
 - Vertex and edge attributes are handled much better now. They 

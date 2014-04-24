@@ -81,8 +81,37 @@ print.communities <- function(x, ...) {
     }
     cat("Membership vector:\n")
     print(membership(x))
+  } else {
+    cat("Number of communities:", max(membership(x)), "\n")
+    if (!is.null(x$modularity)) {
+      cat("Modularity:", modularity(x), "\n")
+    }
+    cat("Membership vector:\n")
+    print(membership(x))
   }
   invisible(x)
+}
+
+create.communities <- function(membership, algorithm=NULL, merges=NULL,
+                               modularity=NULL, ...) {
+
+  stopifnot(is.numeric(membership))
+  stopifnot(is.null(algorithm) ||
+            (is.character(algorithm) && length(algorithm)==1))
+  stopifnot(is.null(merges) ||
+            (is.matrix(merges) && is.numeric(merges) && ncol(merges)==2))
+  stopifnot(is.null(modularity) ||
+            (is.numeric(modularity) &&
+             length(modularity) %in% c(1, length(membership))))
+
+  res <- list(membership=membership,
+              algorithm=if (is.null(algorithm)) "unknown" else algorithm,
+              modularity=modularity, ...)
+  if (!is.null(merges)) {
+    res$merges <- merges
+  }
+  class(res) <- "communities"
+  res
 }
 
 modularity <- function(x, ...)
@@ -140,7 +169,13 @@ merges <- function(communities) {
 crossing <- function(communities, graph) {
   m <- membership(communities)
   el <- get.edgelist(graph, names=FALSE)
-  m[el[,1]] != m[el[,2]]
+  m1 <- m[el[,1]]
+  m2 <- m[el[,2]]
+  res <- m1 != m2
+  if (!is.null(names(m1))) {
+    names(res) <- paste(names(m1), names(m2), sep="|")
+  }
+  res
 }
 
 code.length <- function(communities) {
@@ -579,7 +614,8 @@ community.to.membership <- function(graph, merges, steps, membership=TRUE,
 igraph.i.levc.arp <- function(externalP, externalE) {
   f <- function(v) {
     v <- as.numeric(v)
-    .Call("R_igraph_i_levc_arp", externalP, externalE, v, PACKAGE="igraph");
+    base::.Call("R_igraph_i_levc_arp", externalP, externalE, v,
+                PACKAGE="igraph");
   }
   f
 }

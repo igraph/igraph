@@ -54,3 +54,37 @@ test_that("bipartite.projection can calculate only one projection", {
 
 })
 
+test_that("bipartite.projection removes 'type' attribute if requested", {
+
+  library(igraph)
+  g <- graph.full.bipartite(10,5)
+  proj <- bipartite.projection(g)
+  proj1 <- bipartite.projection(g, which="true")
+  proj2 <- bipartite.projection(g, which="false")
+
+  proj3 <- bipartite.projection(g, remove.type=FALSE)
+  proj4 <- bipartite.projection(g, which="true", remove.type=FALSE)
+  proj5 <- bipartite.projection(g, which="false", remove.type=FALSE)
+
+  expect_that("type" %in% list.vertex.attributes(proj[[1]]), is_false())
+  expect_that("type" %in% list.vertex.attributes(proj[[2]]), is_false())
+  expect_that("type" %in% list.vertex.attributes(proj1), is_false())
+  expect_that("type" %in% list.vertex.attributes(proj2), is_false())
+
+  expect_that("type" %in% list.vertex.attributes(proj3[[1]]), is_true())
+  expect_that("type" %in% list.vertex.attributes(proj3[[2]]), is_true())
+  expect_that("type" %in% list.vertex.attributes(proj4), is_true())
+  expect_that("type" %in% list.vertex.attributes(proj5), is_true())
+})
+
+test_that("bipartite.projection breaks for non-bipartite graphs (#543)", {
+
+  library(igraph)
+  g <- graph.formula(A-0, B-1, A-1, 0-1)
+  V(g)$type <- V(g)$name %in% LETTERS
+
+  expect_that(bipartite.projection.size(g),
+          throws_error("Non-bipartite edge found in bipartite projection"))
+  expect_that(bipartite.projection(g),
+          throws_error("Non-bipartite edge found in bipartite projection"))
+})

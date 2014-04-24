@@ -47,7 +47,7 @@
   gives the layout of the graphs.
 
   The second way is to assign vertex, edge and graph attributes to the
-  graph. These attributes have now prefix, ie. the color of the vertices
+  graph. These attributes have no prefix, ie. the color of the vertices
   is taken from the \code{color} vertex attribute and the color of the
   edges from the \code{color} edge attribute. The layout of the graph is
   given by the \code{layout} graph attribute. (Always assuming that the
@@ -297,6 +297,14 @@
       corresponding vertex parameter for details.}
     \item{label.color}{The color of the edge labels, see the
       \code{color} vertex parameters on how to specify colors. }
+    \item{label.x}{The horizontal coordinates of the edge labels might
+      be given here, explicitly. The \code{NA} elements will be
+      replaced by automatically calculated coordinates. If \code{NULL},
+      then all edge horizontal coordinates are calculated
+      automatically. This parameter is only supported by
+      \code{plot.igraph}.}
+    \item{label.y}{The same as \code{label.x}, but for vertical
+      coordinates.}
     \item{curved}{Specifies whether to draw curved edges, or not. This
       can be a logical or a numeric vector or scalar. 
 

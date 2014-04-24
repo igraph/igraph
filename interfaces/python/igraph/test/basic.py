@@ -88,44 +88,6 @@ class BasicTests(unittest.TestCase):
         self.assertRaises(ValueError, g.delete_vertices, "no-such-vertex")
         self.assertRaises(InternalError, g.delete_vertices, 2)
 
-    def testDeleteVertices(self):
-        g = Graph([(0,1), (1,2), (2,3), (0,2), (3,4), (4,5)])
-        self.assertEquals(6, g.vcount())
-        self.assertEquals(6, g.ecount())
-
-        # Delete a single vertex
-        g.delete_vertices(4)
-        self.assertEquals(5, g.vcount())
-        self.assertEquals(4, g.ecount())
-
-        # Delete multiple vertices
-        g.delete_vertices([1,3])
-        self.assertEquals(3, g.vcount())
-        self.assertEquals(1, g.ecount())
-
-        # Delete a vertex sequence
-        g.delete_vertices(g.vs[:2])
-        self.assertEquals(1, g.vcount())
-        self.assertEquals(0, g.ecount())
-
-        # Delete a single vertex object
-        g.vs[0].delete()
-        self.assertEquals(0, g.vcount())
-        self.assertEquals(0, g.ecount())
-
-        # Delete vertices by name
-        g = Graph.Full(4)
-        g.vs["name"] = ["spam", "bacon", "eggs", "ham"]
-        self.assertEquals(4, g.vcount())
-        g.delete_vertices("spam")
-        self.assertEquals(3, g.vcount())
-        g.delete_vertices(["bacon", "ham"])
-        self.assertEquals(1, g.vcount())
-
-        # Deleting a nonexistent vertex
-        self.assertRaises(ValueError, g.delete_vertices, "no-such-vertex")
-        self.assertRaises(InternalError, g.delete_vertices, 2)
-
     def testAddEdges(self):
         g = Graph()
         g.add_vertices(["spam", "bacon", "eggs", "ham"])
@@ -184,54 +146,6 @@ class BasicTests(unittest.TestCase):
         el[3:4] = []; el[1:2] = []
         self.assertEqual(3, g.ecount())
         self.assertEqual(el, g.get_edgelist())
-
-        # Deleting nonexistent edges
-        self.assertRaises(ValueError, g.delete_edges, [(0,2)])
-        self.assertRaises(ValueError, g.delete_edges, [("A", "C")])
-        self.assertRaises(ValueError, g.delete_edges, [(0,15)])
-
-    def testDeleteEdges(self):
-        g = Graph.Famous("petersen")
-        g.vs["name"] = list("ABCDEFGHIJ")
-        el = g.get_edgelist()
-
-        self.assertEquals(15, g.ecount())
-
-        # Deleting single edge
-        g.delete_edges(14)
-        el[14:] = []
-        self.assertEquals(14, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
-
-        # Deleting multiple edges
-        g.delete_edges([2,5,7])
-        el[7:8] = []; el[5:6] = []; el[2:3] = []
-        self.assertEquals(11, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
-
-        # Deleting edge object
-        g.es[6].delete()
-        el[6:7] = []
-        self.assertEquals(10, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
-
-        # Deleting edge sequence object
-        g.es[1:4].delete()
-        el[1:4] = []
-        self.assertEquals(7, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
-
-        # Deleting edges by IDs
-        g.delete_edges([(2,7), (5,8)])
-        el[4:5] = []; el[1:2] = []
-        self.assertEquals(5, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
-
-        # Deleting edges by names
-        g.delete_edges([("D", "I"), ("G", "I")])
-        el[3:4] = []; el[1:2] = []
-        self.assertEquals(3, g.ecount())
-        self.assertEquals(el, g.get_edgelist())
 
         # Deleting nonexistent edges
         self.assertRaises(ValueError, g.delete_edges, [(0,2)])
@@ -486,102 +400,6 @@ class GraphTupleListTests(unittest.TestCase):
                 self.assertTrue(g.es[edge_attrs[2]] == [None] * 5)
         else:
             self.assertTrue(g.edge_attributes() == [])
-
-
-class DegreeSequenceTests(unittest.TestCase):
-    def testIsDegreeSequence(self):
-        self.assertTrue(is_degree_sequence([]))
-        self.assertTrue(is_degree_sequence([], []))
-        self.assertTrue(is_degree_sequence([0]))
-        self.assertTrue(is_degree_sequence([0], [0]))
-        self.assertFalse(is_degree_sequence([1]))
-        self.assertTrue(is_degree_sequence([1], [1]))
-        self.assertTrue(is_degree_sequence([2]))
-        self.assertFalse(is_degree_sequence([2, 1, 1, 1]))
-        self.assertTrue(is_degree_sequence([2, 1, 1, 1], [1, 1, 1, 2]))
-        self.assertFalse(is_degree_sequence([2, 1, -2]))
-        self.assertFalse(is_degree_sequence([2, 1, 1, 1], [1, 1, 1, -2]))
-        self.assertTrue(is_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3]))
-        self.assertTrue(is_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3], None))
-        self.assertFalse(is_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]))
-        self.assertTrue(is_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-            [4, 3, 2, 3, 4, 4, 2, 2, 4, 2]))
-
-    def testIsGraphicalSequence(self):
-        self.assertTrue(is_graphical_degree_sequence([]))
-        self.assertTrue(is_graphical_degree_sequence([], []))
-        self.assertTrue(is_graphical_degree_sequence([0]))
-        self.assertTrue(is_graphical_degree_sequence([0], [0]))
-        self.assertFalse(is_graphical_degree_sequence([1]))
-        self.assertTrue(is_graphical_degree_sequence([1], [1]))
-        self.assertFalse(is_graphical_degree_sequence([2]))
-        self.assertFalse(is_graphical_degree_sequence([2, 1, 1, 1]))
-        self.assertTrue(is_graphical_degree_sequence([2, 1, 1, 1], [1, 1, 1, 2]))
-        self.assertFalse(is_graphical_degree_sequence([2, 1, -2]))
-        self.assertFalse(is_graphical_degree_sequence([2, 1, 1, 1], [1, 1, 1, -2]))
-        self.assertTrue(is_graphical_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3]))
-        self.assertTrue(is_graphical_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3], None))
-        self.assertFalse(is_graphical_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3]))
-        self.assertTrue(is_graphical_degree_sequence([3, 3, 3, 3, 3, 3, 3, 3, 3, 3],
-            [4, 3, 2, 3, 4, 4, 2, 2, 4, 2]))
-        self.assertTrue(is_graphical_degree_sequence([3, 3, 3, 3, 4]))
-
-
-class GraphTupleListTests(unittest.TestCase):
-    def setUp(self):
-        self.edges = [ \
-                ("Alice", "Bob", 4, 4),
-                ("Cecil", "Bob", 5, 5),
-                ("Cecil", "Alice", 5, 5),
-                ("David", "Alice", 2, 4),
-                ("David", "Bob", 1, 2)
-        ]
-
-    def testGraphFromTupleList(self):
-        g = Graph.TupleList(self.edges)
-        self.checkIfOK(g, "name", ())
-
-    def testGraphFromTupleListWithEdgeAttributes(self):
-        g = Graph.TupleList(self.edges, edge_attrs=("friendship", "advice"))
-        self.checkIfOK(g, "name", ("friendship", "advice"))
-        g = Graph.TupleList(self.edges, edge_attrs=("friendship", ))
-        self.checkIfOK(g, "name", ("friendship", ))
-        g = Graph.TupleList(self.edges, edge_attrs="friendship")
-        self.checkIfOK(g, "name", ("friendship", ))
-
-    def testGraphFromTupleListWithDifferentNameAttribute(self):
-        g = Graph.TupleList(self.edges, vertex_name_attr="spam")
-        self.checkIfOK(g, "spam", ())
-
-    def testGraphFromTupleListWithWeights(self):
-        g = Graph.TupleList(self.edges, weights=True)
-        self.checkIfOK(g, "name", ("weight", ))
-        g = Graph.TupleList(self.edges, weights="friendship")
-        self.checkIfOK(g, "name", ("friendship", ))
-        g = Graph.TupleList(self.edges, weights=False)
-        self.checkIfOK(g, "name", ())
-        self.assertRaises(ValueError, Graph.TupleList,
-                [self.edges], weights=True, edge_attrs="friendship")
-
-    def testNoneForMissingAttributes(self):
-        g = Graph.TupleList(self.edges, edge_attrs=("friendship", "advice", "spam"))
-        self.checkIfOK(g, "name", ("friendship", "advice", "spam"))
-
-    def checkIfOK(self, g, name_attr, edge_attrs):
-        self.failUnless(g.vcount() == 4 and g.ecount() == 5 and g.is_directed() == False)
-        self.failUnless(g.get_edgelist() == [(0, 1), (1, 2), (0, 2), (0, 3), (1, 3)])
-        self.failUnless(g.attributes() == [])
-        self.failUnless(g.vertex_attributes() == [name_attr])
-        self.failUnless(g.vs[name_attr] == ["Alice", "Bob", "Cecil", "David"])
-        if edge_attrs:
-            self.failUnless(sorted(g.edge_attributes()) == sorted(edge_attrs))
-            self.failUnless(g.es[edge_attrs[0]] == [4, 5, 5, 2, 1])
-            if len(edge_attrs) > 1:
-                self.failUnless(g.es[edge_attrs[1]] == [4, 5, 5, 4, 2])
-            if len(edge_attrs) > 2:
-                self.failUnless(g.es[edge_attrs[2]] == [None] * 5)
-        else:
-            self.failUnless(g.edge_attributes() == [])
 
 
 class DegreeSequenceTests(unittest.TestCase):

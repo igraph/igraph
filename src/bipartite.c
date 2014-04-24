@@ -119,6 +119,10 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
     for (j=0; j<neilen1; j++) {
       long int k, neilen2, nei=(long int) VECTOR(*neis1)[j];
       igraph_vector_int_t *neis2=igraph_adjlist_get(&adjlist, nei);
+      if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
+	IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
+		     IGRAPH_EINVAL);
+      }
       neilen2=igraph_vector_int_size(neis2);
       for (k=0; k<neilen2; k++) {
 	long int nei2=(long int) VECTOR(*neis2)[k];
@@ -189,6 +193,10 @@ int igraph_i_bipartite_projection(const igraph_t *graph,
       neilen1=igraph_vector_int_size(neis1);
       for (j=0; j<neilen1; j++) {
 	long int nei=(long int) VECTOR(*neis1)[j];
+	if (IGRAPH_UNLIKELY(VECTOR(*types)[i] == VECTOR(*types)[nei])) {
+	  IGRAPH_ERROR("Non-bipartite edge found in bipartite projection",
+		       IGRAPH_EINVAL);
+	}
 	neis2=igraph_adjlist_get(&adjlist, nei);
 	neilen2=igraph_vector_int_size(neis2);
 	for (k=0; k<neilen2; k++) {

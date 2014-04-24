@@ -27,6 +27,7 @@
 #include "igraph_interface.h"
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
+#include "igraph_structural.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {
   igraph_vector_init(&sir->times, 1);
@@ -116,6 +117,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
   igraph_psumtree_t tree;
   igraph_real_t psum;
   int neilen;
+  igraph_bool_t simple;
 
   if (no_of_nodes==0) {
     IGRAPH_ERROR("Cannot run SIR model on empty graph", IGRAPH_EINVAL);
@@ -132,7 +134,12 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
   if (no_sim <= 0) {
     IGRAPH_ERROR("Number of SIR simulations must be positive", IGRAPH_EINVAL);
   }
-
+  
+  igraph_is_simple(graph, &simple);
+  if (!simple) {
+    IGRAPH_ERROR("SIR model only works with simple graphs", IGRAPH_EINVAL);
+  }
+  
   IGRAPH_CHECK(igraph_vector_int_init(&status, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &status);
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));

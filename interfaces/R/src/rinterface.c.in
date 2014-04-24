@@ -132,6 +132,8 @@ SEXP R_igraph_get_attr_mode(SEXP graph, SEXP pwhich) {
       SET_STRING_ELT(result, i, mkChar("n"));
     } else if (IS_CHARACTER(obji)) {
       SET_STRING_ELT(result, i, mkChar("c"));
+    } else if (IS_LOGICAL(obji)) {
+      SET_STRING_ELT(result, i, mkChar("l"));
     } else {
       SET_STRING_ELT(result, i, mkChar("x"));
     }
@@ -2148,6 +2150,13 @@ SEXP R_igraph_finalizer() {
 	     ScalarString(mkChar("")), ScalarLogical(1)), rho);
   IGRAPH_FINALLY_FREE();
   UNPROTECT(1);
+  return R_NilValue;
+}
+
+SEXP R_igraph_check_finally_stack() {
+  if (!IGRAPH_FINALLY_STACK_EMPTY) {
+    error("igraph callbacks cannot call igraph functions");
+  }
   return R_NilValue;
 }
 

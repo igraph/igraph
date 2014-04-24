@@ -30,6 +30,13 @@ graph <- function( edges, n=max(edges), directed=TRUE ) {
 graph.formula <- function(..., simplify=TRUE) {
   mf <- as.list(match.call())[-1]
 
+  ## In case 'simplify' is given
+  if ('simplify' %in% names(mf)) {
+    w <- which(names(mf)=='simplify')
+    if (length(w) > 1) { stop("'simplify' specified multiple times") }
+    mf <- mf[-w]
+  }
+
   ## Operators first
   f <- function(x) {
     if (is.call(x)) {
