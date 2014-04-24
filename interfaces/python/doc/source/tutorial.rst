@@ -259,7 +259,7 @@ Setting and retrieving attributes
 |igraph| uses vertex and edge IDs in its core. These IDs are integers, starting from zero,
 and they are always continuous at any given time instance during the lifetime of the graph.
 This means that whenever vertices and edges are deleted, a large set of edge and possibly
-vertex IDs will be renumbered to ensure the continuiuty. Now, let us assume that our graph
+vertex IDs will be renumbered to ensure the continuity. Now, let us assume that our graph
 is a social network where vertices represent people and edges represent social connections
 between them. One way to maintain the association between vertex IDs and say, the corresponding
 names is to have an additional Python list that maps from vertex IDs to names. The drawback
@@ -702,7 +702,6 @@ Method name                          Short name      Algorithm description
 ------------------------------------ --------------- ---------------------------------------------
 ``layout_sphere``                    ``sphere``,     Deterministic layout that places the vertices
                                      ``spherical``,  evenly on the surface of a sphere
-                                     ``circular``,
                                      ``circular_3d``
 ==================================== =============== =============================================
 
@@ -910,7 +909,10 @@ color (e.g., edge, vertex or label colors in the respective attributes):
 
 X11 color names
     See the `list of X11 color names <http://en.wikipedia.org/wiki/X11_color_names>`_
-    in Wikipedia for the complete list.
+    in Wikipedia for the complete list. The color names must not include
+    any spaces, you must write "darkblue" instead of "dark blue" or
+    "yellow3" instead of "yellow 3". Color names are case insensitive so
+    "DarkBlue" is equal to "darkblue".
 
 Color specification in CSS syntax
     This is a string according to one of the following formats (where *R*, *G* and
