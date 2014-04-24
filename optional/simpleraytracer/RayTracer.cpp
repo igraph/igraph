@@ -21,10 +21,21 @@ RayTracer::RayTracer() : mBackgroundColor(0,0,0,0), mAmbientColor(0,0,0), mEyePo
 
 RayTracer::~RayTracer()
 {
-	// should step through mpShapes list and delete what the data points to
+	ShapeListIterator iter1 = mpShapes->begin();
+	while ( iter1 != mpShapes->end() )
+	{
+	  delete *iter1;
+	  iter1++;
+	}
 	delete mpShapes;
 
-	// should step through mpLights list and delete what the data points to
+	LightListIterator iter2 = mpLights->begin();
+	while ( iter2 != mpLights->end() )
+	{
+	  delete *iter2;
+	  iter2++;
+	}
+
 	delete mpLights;
 
 }

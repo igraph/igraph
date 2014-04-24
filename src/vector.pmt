@@ -160,7 +160,7 @@ const TYPE(igraph_vector)*FUNCTION(igraph_vector,view) (const TYPE(igraph_vector
   TYPE(igraph_vector) *v2=(TYPE(igraph_vector)*)v;
   v2->stor_begin=(BASE*)data;
   v2->stor_end=(BASE*)data+length;
-  v2->end=v->stor_end;
+  v2->end=v2->stor_end;
   return v;
 }
 
@@ -242,7 +242,7 @@ int FUNCTION(igraph_vector,init_real_end)(TYPE(igraph_vector) *v,
 
   va_start(ap, endmark);
   while (1) {
-    BASE num = va_arg(ap, double);
+    BASE num = (BASE) va_arg(ap, double);
     if (num == endmark) {
       break;
     }
@@ -434,7 +434,7 @@ int FUNCTION(igraph_vector,reserve)   (TYPE(igraph_vector)* v, long int size) {
 	assert(v->stor_begin != NULL);
 	if (size <= FUNCTION(igraph_vector,size)(v)) { return 0; }
 
-	tmp=igraph_Realloc(v->stor_begin, size, BASE);
+	tmp=igraph_Realloc(v->stor_begin, (size_t) size, BASE);
 	if (tmp==0) {
 	  IGRAPH_ERROR("cannot reserve space for vector", IGRAPH_ENOMEM);
 	}
@@ -451,8 +451,8 @@ int FUNCTION(igraph_vector,reserve)   (TYPE(igraph_vector)* v, long int size) {
  * \brief Decides whether the size of the vector is zero.
  *
  * \param v The vector object.
- * \return Non-zero number if the size of the vector is not zero and
- *         zero otherwise.
+ * \return Non-zero number (true) if the size of the vector is zero and
+ *         zero (false) otherwise.
  * 
  * Time complexity: O(1).
  */
@@ -558,11 +558,11 @@ int FUNCTION(igraph_vector,push_back) (TYPE(igraph_vector)* v, BASE e) {
  */
 int FUNCTION(igraph_vector,insert)(TYPE(igraph_vector) *v, long int pos,
 				   BASE value) {
-  long int size = FUNCTION(igraph_vector,size)(v);
-  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(v, size+1));
+  size_t size = (size_t) FUNCTION(igraph_vector,size)(v);
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(v, (long) size+1));
   if (pos<size) {
     memmove(v->stor_begin+pos+1, v->stor_begin+pos, 
-	    sizeof(BASE)*(size-pos));
+	    sizeof(BASE)*(size - (size_t) pos));
   }
   v->stor_begin[pos] = value;
   return 0;
@@ -660,7 +660,7 @@ void FUNCTION(igraph_vector,null)      (TYPE(igraph_vector)* v) {
 	assert(v->stor_begin != NULL);
 	if (FUNCTION(igraph_vector,size)(v)>0) {
 		memset(v->stor_begin, 0, 
-		       sizeof(BASE)*FUNCTION(igraph_vector,size)(v));
+		       sizeof(BASE)*(size_t) FUNCTION(igraph_vector,size)(v));
 	}
 }
 
@@ -761,7 +761,7 @@ int FUNCTION(igraph_vector,sort_cmp)(const void *a, const void *b) {
 void FUNCTION(igraph_vector,sort)(TYPE(igraph_vector) *v) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
-  igraph_qsort(v->stor_begin, FUNCTION(igraph_vector,size)(v), 
+  igraph_qsort(v->stor_begin, (size_t) FUNCTION(igraph_vector,size)(v), 
     sizeof(BASE), FUNCTION(igraph_vector,sort_cmp));
 }
 
@@ -819,8 +819,9 @@ long int FUNCTION(igraph_vector,qsort_ind)(TYPE(igraph_vector) *v,
 					   igraph_vector_t *inds, igraph_bool_t descending) {
   long int i;
   BASE **vind, *first;
-  long int n = FUNCTION(igraph_vector,size)(v);
-  IGRAPH_CHECK(igraph_vector_resize(inds, n));
+  size_t n = (size_t) FUNCTION(igraph_vector,size)(v);
+  IGRAPH_CHECK(igraph_vector_resize(inds, (long) n));
+  if (n==0) { return 0; }
   vind = igraph_Calloc(n, BASE*);
   if (vind == 0) {
     IGRAPH_ERROR("igraph_vector_qsort_ind failed", IGRAPH_ENOMEM);
@@ -895,11 +896,11 @@ int FUNCTION(igraph_vector,resize)(TYPE(igraph_vector)* v, long int newsize) {
  */
 
 int FUNCTION(igraph_vector,resize_min)(TYPE(igraph_vector)*v) {
-  long int size;
+  size_t size;
   BASE *tmp;
   if (v->stor_end == v->end) { return 0; }
   
-  size = v->end - v->stor_begin;
+  size = (size_t) (v->end - v->stor_begin);
   tmp=igraph_Realloc(v->stor_begin, size, BASE);
   if (tmp==0) {
     IGRAPH_ERROR("cannot resize vector", IGRAPH_ENOMEM);
@@ -1066,7 +1067,7 @@ int FUNCTION(igraph_vector,init_copy)(TYPE(igraph_vector) *v,
   }
   v->stor_end=v->stor_begin+length;
   v->end=v->stor_end;
-  memcpy(v->stor_begin, data, length*sizeof(BASE));
+  memcpy(v->stor_begin, data, (size_t) length * sizeof(BASE));
   
   return 0;
 }
@@ -1090,7 +1091,7 @@ void FUNCTION(igraph_vector,copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   if (v->end != v->stor_begin) {
-    memcpy(to, v->stor_begin, sizeof(BASE) * (v->end - v->stor_begin));
+    memcpy(to, v->stor_begin, sizeof(BASE) * (size_t) (v->end - v->stor_begin));
   }
 }
 
@@ -1123,7 +1124,7 @@ int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to,
   to->stor_end=to->stor_begin+FUNCTION(igraph_vector,size)(from);
   to->end=to->stor_end;
   memcpy(to->stor_begin, from->stor_begin, 
-	 FUNCTION(igraph_vector,size)(from)*sizeof(BASE));
+	 (size_t) FUNCTION(igraph_vector,size)(from) * sizeof(BASE));
   
   return 0;
 }
@@ -1263,7 +1264,7 @@ int FUNCTION(igraph_vector,cumsum)(TYPE(igraph_vector) *to,
 int FUNCTION(igraph_vector,init_seq)(TYPE(igraph_vector) *v, 
 				     BASE from, BASE to) {
   BASE *p;
-  IGRAPH_CHECK(FUNCTION(igraph_vector,init)(v, to-from+1));
+  IGRAPH_CHECK(FUNCTION(igraph_vector,init)(v, (long int) (to-from+1)));
 
   for (p=v->stor_begin; p<v->end; p++) {
     *p = from++;
@@ -1298,7 +1299,7 @@ void FUNCTION(igraph_vector,remove_section)(TYPE(igraph_vector) *v,
   /* Not removing from the end? */
   if (to < FUNCTION(igraph_vector,size)(v)) {
     memmove(v->stor_begin+from, v->stor_begin+to,
-	    sizeof(BASE)*(v->end-v->stor_begin-to));
+	    sizeof(BASE) * (size_t) (v->end-v->stor_begin-to));
   }
   v->end -= (to-from);
 }
@@ -1347,7 +1348,7 @@ int FUNCTION(igraph_vector,move_interval)(TYPE(igraph_vector) *v,
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   memcpy(v->stor_begin+to, v->stor_begin+begin, 
-	 sizeof(BASE)*(end-begin));
+	 sizeof(BASE) * (size_t) (end-begin));
 
   return 0;
 }
@@ -1358,7 +1359,7 @@ int FUNCTION(igraph_vector,move_interval2)(TYPE(igraph_vector) *v,
   assert(v != NULL);
   assert(v->stor_begin != NULL);
   memmove(v->stor_begin+to, v->stor_begin+begin, 
-	 sizeof(BASE)*(end-begin));
+	  sizeof(BASE) * (size_t) (end-begin));
 
   return 0;
 }
@@ -1379,23 +1380,6 @@ void FUNCTION(igraph_vector,permdelete)(TYPE(igraph_vector) *v,
     if (VECTOR(*index)[i] != 0) {
       VECTOR(*v)[ (long int)VECTOR(*index)[i]-1 ] = VECTOR(*v)[i];
     }
-  }
-  v->end -= nremove;
-}
-
-/**
- * \ingroup vector
- * \function igraph_vector_remove_negidx
- * \brief Remove elements of a vector (for internal use).
- */
-
-void FUNCTION(igraph_vector,remove_negidx)(TYPE(igraph_vector) *v, 
-					   const igraph_vector_t *neg, long int nremove) {
-  long int i, idx=0;
-  assert(v != NULL);
-  assert(v->stor_begin != NULL);
-  for (i=0; i<FUNCTION(igraph_vector,size)(v); i++) {
-    VECTOR(*v)[idx++] = VECTOR(*v)[i];
   }
   v->end -= nremove;
 }
@@ -1930,13 +1914,13 @@ int FUNCTION(igraph_vector,filter_smaller)(TYPE(igraph_vector) *v,
 
 int FUNCTION(igraph_vector,append)(TYPE(igraph_vector) *to, 
 				   const TYPE(igraph_vector) *from) {
-  long int tosize, fromsize;
+  long tosize, fromsize;
   
   tosize=FUNCTION(igraph_vector,size)(to);
   fromsize=FUNCTION(igraph_vector,size)(from);
   IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(to, tosize+fromsize));
   memcpy(to->stor_begin+tosize, from->stor_begin, 
-	 sizeof(BASE)*fromsize);
+	 sizeof(BASE) * (size_t) fromsize);
   to->end=to->stor_begin+tosize+fromsize;
   
   return 0;
@@ -1950,7 +1934,8 @@ int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v,
 					 TYPE(igraph_vector) *res,
 					 long int from, long int to) {
   IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(res, to-from));
-  memcpy(res->stor_begin, v->stor_begin+from, (to-from)*sizeof(BASE));
+  memcpy(res->stor_begin, v->stor_begin+from, 
+	 (size_t) (to-from) * sizeof(BASE));
   return 0;
 }
 
@@ -1980,7 +1965,7 @@ BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
   BASE diff=ZERO;
   
   for (i=0; i<n; i++) {
-    BASE d=fabs(VECTOR(*m1)[i]-VECTOR(*m2)[i]);
+    BASE d=(BASE) fabs(VECTOR(*m1)[i]-VECTOR(*m2)[i]);
     if (d > diff) {
       diff=d;
     }
@@ -2007,8 +1992,8 @@ BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
 
 int FUNCTION(igraph_vector,update)(TYPE(igraph_vector) *to, 
 				   const TYPE(igraph_vector) *from) {
-  long int n=FUNCTION(igraph_vector,size)(from);
-  FUNCTION(igraph_vector,resize)(to, n);
+  size_t n=(size_t) FUNCTION(igraph_vector,size)(from);
+  FUNCTION(igraph_vector,resize)(to, (long) n);
   memcpy(to->stor_begin, from->stor_begin, sizeof(BASE)*n);
   return 0;
 }
@@ -2289,10 +2274,14 @@ int FUNCTION(igraph_vector,div)(TYPE(igraph_vector) *v1,
 #ifndef NOABS
 
 int FUNCTION(igraph_vector,abs)(TYPE(igraph_vector) *v) {
+#ifdef UNSIGNED
+  /* Nothing do to, unsigned type */
+#else
   long int i, n=FUNCTION(igraph_vector,size)(v);
   for (i=0; i<n; i++) {
     VECTOR(*v)[i]= VECTOR(*v)[i] >= 0 ? VECTOR(*v)[i] : -VECTOR(*v)[i];
   }
+#endif
   
   return 0;
 }
@@ -2525,7 +2514,7 @@ int FUNCTION(igraph_vector,difference_sorted)(const TYPE(igraph_vector) *v1,
   if (j0 == 0) {
     /* v2 is empty, this is easy */
     IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(result, i0));
-    memcpy(result->stor_begin, v1->stor_begin, sizeof(BASE) * i0);
+    memcpy(result->stor_begin, v1->stor_begin, sizeof(BASE) * (size_t) i0);
     return IGRAPH_SUCCESS;
   }
 
@@ -2535,7 +2524,7 @@ int FUNCTION(igraph_vector,difference_sorted)(const TYPE(igraph_vector) *v1,
   while (i < i0 && VECTOR(*v1)[i] < VECTOR(*v2)[j]) { i++; }
   if (i > 0) {
     IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(result, i));
-    memcpy(result->stor_begin, v1->stor_begin, sizeof(BASE) * i);
+    memcpy(result->stor_begin, v1->stor_begin, sizeof(BASE) * (size_t) i);
   }
 
   while (i < i0 && j < j0) {
@@ -2551,9 +2540,10 @@ int FUNCTION(igraph_vector,difference_sorted)(const TYPE(igraph_vector) *v1,
     else j++;
   }
   if (i < i0) {
-    int oldsize = FUNCTION(igraph_vector,size)(result);
+    long int oldsize = FUNCTION(igraph_vector,size)(result);
     IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(result, oldsize+i0-i));
-    memcpy(result->stor_begin+oldsize, v1->stor_begin+i, sizeof(BASE)*(i0-i));
+    memcpy(result->stor_begin+oldsize, v1->stor_begin+i, 
+	   sizeof(BASE)* (size_t) (i0-i));
   }
 
   return 0;
@@ -2583,6 +2573,20 @@ int FUNCTION(igraph_vector,print)(const TYPE(igraph_vector) *v) {
   printf("\n");
   return 0;
 }
+
+int FUNCTION(igraph_vector,printf)(const TYPE(igraph_vector) *v,
+																	 const char *format) {
+  long int i, n=FUNCTION(igraph_vector,size)(v);
+  if (n!=0) {
+    printf(format, VECTOR(*v)[0]);
+  }
+  for (i=1; i<n; i++) {
+    putchar(' '); printf(format, VECTOR(*v)[i]);
+  }
+  printf("\n");
+  return 0;
+}
+
 #endif
 
 int FUNCTION(igraph_vector,fprint)(const TYPE(igraph_vector) *v, FILE *file) {
@@ -2615,9 +2619,26 @@ int FUNCTION(igraph_vector,index)(const TYPE(igraph_vector) *v,
   IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(newv, newlen));
   
   for (i=0; i<newlen; i++) {
-    long int j=VECTOR(*idx)[i];
+    long int j=(long int) VECTOR(*idx)[i];
     VECTOR(*newv)[i] = VECTOR(*v)[j];
   }
   
+  return 0;
+}
+
+int FUNCTION(igraph_vector,index_int)(TYPE(igraph_vector) *v,
+				      const igraph_vector_int_t *idx) {
+  BASE *tmp;
+  int i, n=igraph_vector_int_size(idx);
+
+  tmp=igraph_Calloc(n, BASE);
+  if (!tmp) { IGRAPH_ERROR("Cannot index vector", IGRAPH_ENOMEM); }
+
+  for (i=0; i<n; i++) { tmp[i] = VECTOR(*v)[ VECTOR(*idx)[i] ]; }
+
+  igraph_Free(v->stor_begin);
+  v->stor_begin = tmp;
+  v->stor_end = v->end = tmp + n;
+
   return 0;
 }

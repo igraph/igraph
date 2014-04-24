@@ -144,3 +144,36 @@ test_that("graph.adjacency works", {
                                  2), .Dim = c(4L, 3L))))
 
 })
+
+test_that("graph.adjacency 2 edge bug is fixed", {
+
+  library(Matrix)
+  library(igraph)
+  A <- Matrix(0, 10, 10, sparse=TRUE)
+  A[3,5] <- A[5,3] <- 1
+  g <- graph.adjacency(A, mode="undirected")
+  expect_that(g[], equals(A))
+
+})
+
+test_that("graph.adjacenct empty graph bug is fixed", {
+
+  library(Matrix)
+  library(igraph)
+  A <- Matrix(0, 10, 10, sparse=TRUE)
+  g <- graph.adjacency(A, mode="undirected")
+  expect_that(as.matrix(g[]), equals(as.matrix(A)))
+
+})
+
+test_that("bug #554 is fixed", {
+
+  library(igraph)
+  library(Matrix)
+
+  M <- Matrix(0, 5, 5)
+  M[1,2] <- M[2,1] <- M[3,4] <- M[4,3] <- 1
+  g <- graph.adjacency(M, mode="undirected", weighted=TRUE)
+  expect_that(g[], equals(M))
+
+})

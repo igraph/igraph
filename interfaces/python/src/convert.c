@@ -1746,30 +1746,96 @@ int igraphmodule_attrib_to_vector_bool_t(PyObject *o, igraphmodule_GraphObject *
   *vptr = 0;
   if (attr_type != ATTRIBUTE_TYPE_EDGE && attr_type != ATTRIBUTE_TYPE_VERTEX)
     return 1;
-  if (o == Py_None) return 0;
+
+  if (o == Py_None)
+    return 0;
+
   if (PyString_Check(o)) {
-    igraph_vector_t *dummy = 0;
     long int i, n;
 
-    if (igraphmodule_attrib_to_vector_t(o, self, &dummy, attr_type))
-      return 1;
+    /* First, check if the attribute is a "real" boolean */
+    igraph_attribute_type_t at;
+    igraph_attribute_elemtype_t et;
+    char *name = PyString_CopyAsString(o);
 
-    if (dummy == 0)
-      return 0;
+    if (attr_type == ATTRIBUTE_TYPE_VERTEX) {
+      et = IGRAPH_ATTRIBUTE_VERTEX;
+      n = igraph_vcount(&self->g);
+    } else {
+      et = IGRAPH_ATTRIBUTE_EDGE;
+      n = igraph_ecount(&self->g);
+    }
 
-    n = igraph_vector_size(dummy);
-
-    result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
-    igraph_vector_bool_init(result, n);
-    if (result==0) {
-      igraph_vector_destroy(dummy); free(dummy);
-      PyErr_NoMemory();
+    if (igraphmodule_i_attribute_get_type(&self->g, &at, et, name)) {
+      /* exception was set by igraphmodule_i_attribute_get_type */
+      free(name);
       return 1;
     }
-    for (i=0; i<n; i++)
-      VECTOR(*result)[i] = (VECTOR(*dummy)[i] != 0);
-    igraph_vector_destroy(dummy); free(dummy);
-    *vptr = result;
+
+    if (at == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      /* The attribute is a real Boolean attribute. Allocate the target
+       * vector */
+      result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
+      if (result==0) {
+        PyErr_NoMemory();
+        free(name);
+        return 1;
+      }
+      igraph_vector_bool_init(result, n);
+      if (attr_type == ATTRIBUTE_TYPE_VERTEX) {
+        if (igraphmodule_i_get_boolean_vertex_attr(&self->g, name,
+            igraph_vss_all(), result)) {
+          /* exception has already been set, so return */
+          igraph_vector_bool_destroy(result);
+          free(name);
+          free(result);
+          return 1;
+        }
+      } else {
+        if (igraphmodule_i_get_boolean_edge_attr(&self->g, name,
+            igraph_ess_all(IGRAPH_EDGEORDER_ID), result)) {
+          /* exception has already been set, so return */
+          igraph_vector_bool_destroy(result);
+          free(name);
+          free(result);
+          return 1;
+        }
+      }
+      free(name);
+      *vptr = result;
+    } else if (at == IGRAPH_ATTRIBUTE_NUMERIC) {
+      /* The attribute is a numeric attribute, so we fall back to
+       * attrib_to_vector_t and then convert the result */
+      igraph_vector_t *dummy = 0;
+      free(name);
+      if (igraphmodule_attrib_to_vector_t(o, self, &dummy, attr_type)) {
+        return 1;
+      }
+      if (dummy == 0) {
+        return 0;
+      }
+
+      n = igraph_vector_size(dummy);
+      result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
+      igraph_vector_bool_init(result, n);
+      if (result==0) {
+        igraph_vector_destroy(dummy); free(dummy);
+        PyErr_NoMemory();
+        return 1;
+      }
+      for (i=0; i<n; i++) {
+        VECTOR(*result)[i] = (VECTOR(*dummy)[i] != 0 &&
+            VECTOR(*dummy)[i] == VECTOR(*dummy)[i]);
+      }
+      igraph_vector_destroy(dummy); free(dummy);
+      *vptr = result;
+    } else {
+      /* The attribute is not numeric and not Boolean. Throw an exception. */
+      PyErr_SetString(PyExc_ValueError, "attribute values must be Boolean or numeric");
+      free(name);
+      return 1;
+    }
+
   } else if (PySequence_Check(o)) {
     result = (igraph_vector_bool_t*)calloc(1, sizeof(igraph_vector_bool_t));
     if (result==0) {
@@ -1965,6 +2031,75 @@ int igraphmodule_PyList_to_matrix_t(PyObject* o, igraph_matrix_t *m) {
 
 /**
  * \ingroup python_interface_conversion
+ * \brief Converts a Python list of lists to an \c igraph_vector_ptr_t
+ *        containing \c igraph_vector_t items.
+ * 
+ * The returned vector will have an item destructor that destroys the
+ * contained vectors, so it is important to call \c igraph_vector_ptr_destroy_all
+ * on it instead of \c igraph_vector_ptr_destroy when the vector is no longer
+ * needed.
+ *
+ * \param o the Python object representing the list of lists
+ * \param m the address of an uninitialized \c igraph_vector_ptr_t
+ * \return 0 if everything was OK, 1 otherwise. Sets appropriate exceptions.
+ */
+int igraphmodule_PyObject_to_vector_ptr_t(PyObject* list, igraph_vector_ptr_t* vec,
+    igraph_bool_t need_non_negative) {
+  PyObject *it, *item;
+  igraph_vector_t *subvec;
+
+  if (PyString_Check(list)) {
+    PyErr_SetString(PyExc_TypeError, "expected iterable (but not string)");
+    return 1;
+  }
+
+  it = PyObject_GetIter(list);
+  if (!it) {
+    return 1;
+  }
+
+  if (igraph_vector_ptr_init(vec, 0)) {
+    igraphmodule_handle_igraph_error();
+    Py_DECREF(it);
+    return 1;
+  }
+
+  IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(vec, igraph_vector_destroy);
+  while ((item = PyIter_Next(it)) != 0) {
+    subvec = igraph_Calloc(1, igraph_vector_t);
+    if (subvec == 0) {
+      Py_DECREF(item);
+      Py_DECREF(it);
+      PyErr_NoMemory();
+      return 1;
+    }
+
+    if (igraphmodule_PyObject_to_vector_t(item, subvec, need_non_negative, 0)) {
+      Py_DECREF(item);
+      Py_DECREF(it);
+      igraph_vector_destroy(subvec);
+      igraph_vector_ptr_destroy_all(vec);
+      return 1;
+    }
+
+    Py_DECREF(item);
+
+    if (igraph_vector_ptr_push_back(vec, subvec)) {
+      Py_DECREF(it);
+      igraph_vector_destroy(subvec);
+      igraph_vector_ptr_destroy_all(vec);
+      return 1;
+    }
+    
+    /* ownership of 'subvec' taken by 'vec' here */
+  }
+
+  Py_DECREF(it);
+  return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
  * \brief Converts an \c igraph_strvector_t to a Python string list
  * 
  * \param v the \c igraph_strvector_t containing the vector to be converted
@@ -2076,7 +2211,8 @@ int igraphmodule_PyList_to_strvector_t(PyObject* v, igraph_strvector_t *result) 
  * \param v the \c igraph_vector_ptr_t which will contain the result
  * \return 0 if everything was OK, 1 otherwise
  */
-int igraphmodule_append_PyIter_to_vector_ptr_t(PyObject *it, igraph_vector_ptr_t *v) {
+int igraphmodule_append_PyIter_of_graphs_to_vector_ptr_t(PyObject *it,
+    igraph_vector_ptr_t *v) {
   PyObject *t;
   
   while ((t=PyIter_Next(it))) {
@@ -2742,5 +2878,21 @@ int igraphmodule_PyObject_to_attribute_combination_t(PyObject* object,
   }
 
   return 0;
+}
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_pagerank_algo_t
+ */
+int igraphmodule_PyObject_to_pagerank_algo_t(PyObject *o,
+					     igraph_pagerank_algo_t *result) {
+  static igraphmodule_enum_translation_table_entry_t pagerank_algo_tt[] = {
+        {"prpack", IGRAPH_PAGERANK_ALGO_PRPACK},
+        {"arpack", IGRAPH_PAGERANK_ALGO_ARPACK},
+        {"power",  IGRAPH_PAGERANK_ALGO_POWER},
+        {0,0}
+    };
+
+  return igraphmodule_PyObject_to_enum(o, pagerank_algo_tt, (int*)result);
 }
 

@@ -28,7 +28,7 @@ test_that("get.shortest.paths works", {
   s1 <- get.shortest.paths(g, "s", "t", weights=NA)
   s2 <- get.shortest.paths(g, "s", "t")
 
-  expect_that(s1 %in% all1, is_true()) 
-  expect_that(s2 %in% all2, is_true())
+  expect_that(s1$vpath %in% all1, is_true()) 
+  expect_that(s2$vpath %in% all2, is_true())
 
 })

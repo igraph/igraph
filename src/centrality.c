@@ -40,6 +40,15 @@
 #include "config.h"
 
 #include "bigint.h"
+#include "prpack.h"
+
+int igraph_personalized_pagerank_arpack(const igraph_t *graph, 
+		    igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping, 
+		    igraph_vector_t *reset,
+		    const igraph_vector_t *weights,
+		    igraph_arpack_options_t *options);
 
 igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
   /* Many of the centrality measures correspond to the eigenvector of some
@@ -78,15 +87,15 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
 int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
 				    int n, void *extra) {
   igraph_adjlist_t *adjlist=extra;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   long int i, j, nlen;
   
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int nei=VECTOR(*neis)[j];
+      long int nei=(long int) VECTOR(*neis)[j];
       to[i] += from[nei];
     }
   }				      
@@ -116,7 +125,7 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
     nlen=igraph_vector_size(edges);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int edge=VECTOR(*edges)[j];
+      long int edge=(long int) VECTOR(*edges)[j];
       long int nei=IGRAPH_OTHER(graph, edge, i);
       igraph_real_t w=VECTOR(*weights)[edge];
       to[i] += w * from[nei];
@@ -129,16 +138,16 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
 int igraph_i_eigenvector_centrality_loop(igraph_adjlist_t *adjlist) {
   
   long int i, j, k, nlen, n=igraph_adjlist_size(adjlist);
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
 
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
-    nlen=igraph_vector_size(neis);    
+    nlen=igraph_vector_int_size(neis);    
     for (j=0; j<nlen && VECTOR(*neis)[j]<i; j++) ;
     for (k=j; k<nlen && VECTOR(*neis)[k]==i; k++) ;
     if (k!=j) {
       /* First loop edge is 'j', first non-loop edge is 'k' */
-      igraph_vector_remove_section(neis, j+(k-j)/2, k);
+      igraph_vector_int_remove_section(neis, j+(k-j)/2, k);
     }
   }
 
@@ -571,25 +580,25 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
   igraph_adjlist_t *in = data->in;
   igraph_adjlist_t *out = data->out;
   igraph_vector_t *tmp = data->tmp;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   long int i, j, nlen;
   
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(in, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     VECTOR(*tmp)[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int nei=VECTOR(*neis)[j];
+      long int nei=(long int) VECTOR(*neis)[j];
       VECTOR(*tmp)[i] += from[nei];
     }
   }
   
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(out, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int nei=VECTOR(*neis)[j];
+      long int nei=(long int) VECTOR(*neis)[j];
       to[i] += VECTOR(*tmp)[nei];
     }
   }      
@@ -616,7 +625,7 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
     nlen=igraph_vector_size(neis);
     VECTOR(*tmp)[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int nei_edge = VECTOR(*neis)[j];
+      long int nei_edge = (long int) VECTOR(*neis)[j];
       long int nei=IGRAPH_OTHER(g, nei_edge, i);
       VECTOR(*tmp)[i] += from[nei] * VECTOR(*weights)[nei_edge];
     }
@@ -627,7 +636,7 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
     nlen=igraph_vector_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int nei_edge=VECTOR(*neis)[j];
+      long int nei_edge=(long int) VECTOR(*neis)[j];
       long int nei=IGRAPH_OTHER(g, nei_edge, i);
       to[i] += VECTOR(*tmp)[nei] * VECTOR(*weights)[nei_edge];
     }
@@ -909,7 +918,7 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
   igraph_vector_t *outdegree=data->outdegree;
   igraph_vector_t *tmp=data->tmp;
   igraph_vector_t *reset=data->reset;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   long int i, j, nlen;
   igraph_real_t sumfrom=0.0;
   igraph_real_t fact=1-data->damping;
@@ -933,10 +942,10 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
    * moving along links (and not from teleportation) */
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int nei=VECTOR(*neis)[j];
+      long int nei=(long int) VECTOR(*neis)[j];
       to[i] += VECTOR(*tmp)[nei];
     }
     to[i] *= data->damping;
@@ -994,7 +1003,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
     nlen=igraph_vector_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int edge=VECTOR(*neis)[j];
+      long int edge=(long int) VECTOR(*neis)[j];
       long int nei=IGRAPH_OTHER(graph, edge, i);
       to[i] += VECTOR(*weights)[edge] * VECTOR(*tmp)[nei];
     }
@@ -1028,11 +1037,18 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
 /**
  * \function igraph_pagerank
  * \brief Calculates the Google PageRank for the specified vertices.
- * 
- * This is the new PageRank implementation, based on the ARPACK
- * library. The old, power-method based implementation can be used as
- * well, it is kept under the name \ref igraph_pagerank_old().
- * 
+ *
+ * Starting from version 0.7, igraph has three PageRank implementations,
+ * and the user can choose between them. The first implementation is
+ * \c IGRAPH_PAGERANK_ALGO_POWER, also available as the (now
+ * deprecated) function \ref igraph_pagerank_old(). The second
+ * implementation is based on the ARPACK library, this was the default
+ * before igraph version 0.7: \c IGRAPH_PAGERANK_ALGO_ARPACK.
+ *
+ * The third and recommmended implementation is \c
+ * IGRAPH_PAGERANK_ALGO_PRPACK. This is using the the PRPACK package,
+ * see https://github.com/dgleich/prpack .
+ *
  * </para><para>
  * Please note that the PageRank of a given vertex depends on the PageRank
  * of all other vertices, so even if you want to calculate the PageRank for
@@ -1044,7 +1060,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * <para>
  * For the explanation of the PageRank algorithm, see the following
  * webpage:
- * http://www-db.stanford.edu/~backrub/google.html, or the
+ * http://infolab.stanford.edu/~backrub/google.html , or the
  * following reference:
  * </para>
  * 
@@ -1055,6 +1071,9 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * </para>
  * <para>
  * \param graph The graph object.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_POWER, \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable, the eigenvalue
@@ -1067,7 +1086,11 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
  *    as the number of edges.
- * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ * \param options Options to the power method or ARPACK. For the power
+ *    method, \c IGRAPH_PAGERANK_ALGO_POWER it must be a pointer to
+ *    a \ref igraph_pagerank_power_options_t object.
+ *    For \c IGRAPH_PAGERANK_ALGO_ARPACK it must be a pointer to an
+ *    \ref igraph_arpack_options_t object. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices), <code>nev</code> (1),
  *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and
@@ -1090,13 +1113,14 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \example examples/simple/igraph_pagerank.c
  */
 
-int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
+		    igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
-		    const igraph_vector_t *weights,
-		    igraph_arpack_options_t *options) {
-	return igraph_personalized_pagerank(graph, vector, value, vids, directed,
-			damping, 0, weights, options);
+		    const igraph_vector_t *weights, void *options) {
+  return igraph_personalized_pagerank(graph, algo, vector, value, vids, 
+				      directed, damping, 0, weights, 
+				      options);
 }
 
 /**
@@ -1124,6 +1148,9 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
  * 
  * <para>
  * \param graph The graph object.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_POWER, \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable, the eigenvalue
@@ -1137,7 +1164,11 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
  *    as the number of edges.
- * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ * \param options Options to the power method or ARPACK. For the power
+ *    method, \c IGRAPH_PAGERANK_ALGO_POWER it must be a pointer to
+ *    a \ref igraph_pagerank_power_options_t object.
+ *    For \c IGRAPH_PAGERANK_ALGO_ARPACK it must be a pointer to an
+ *    \ref igraph_arpack_options_t object. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices), <code>nev</code> (1),
  *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and
@@ -1158,12 +1189,13 @@ int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
  * the underlying machinery.
  */
 
-int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vector,
+int igraph_personalized_pagerank_vs(const igraph_t *graph, 
+		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vs_t reset_vids,
 		    const igraph_vector_t *weights,
-		    igraph_arpack_options_t *options) {
+		    void *options) {
 	igraph_vector_t reset;
 	igraph_vit_t vit;
 
@@ -1178,8 +1210,10 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vect
 	igraph_vit_destroy(&vit);
 	IGRAPH_FINALLY_CLEAN(1);
 	
-	IGRAPH_CHECK(igraph_personalized_pagerank(graph, vector, value, vids, directed, damping,
-				&reset, weights, options));
+	IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, vector, 
+						  value, vids, directed, 
+						  damping, &reset, weights,
+						  options));
 
 	igraph_vector_destroy(&reset);
 	IGRAPH_FINALLY_CLEAN(1);
@@ -1205,6 +1239,9 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vect
  * 
  * <para>
  * \param graph The graph object.
+ * \param algo The PageRank implementation to use. Possible values:
+ *    \c IGRAPH_PAGERANK_ALGO_POWER, \c IGRAPH_PAGERANK_ALGO_ARPACK,
+ *    \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable, the eigenvalue
@@ -1221,7 +1258,11 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vect
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
  *    as the number of edges.
- * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ * \param options Options to the power method or ARPACK. For the power
+ *    method, \c IGRAPH_PAGERANK_ALGO_POWER it must be a pointer to
+ *    a \ref igraph_pagerank_power_options_t object.
+ *    For \c IGRAPH_PAGERANK_ALGO_ARPACK it must be a pointer to an
+ *    \ref igraph_arpack_options_t object. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
  *    <code>n</code> (number of vertices), <code>nev</code> (1),
  *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and
@@ -1240,17 +1281,54 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vect
  * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
  * the underlying machinery.
  */
+int igraph_personalized_pagerank(const igraph_t *graph, 
+		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
+		    igraph_real_t *value, const igraph_vs_t vids,
+		    igraph_bool_t directed, igraph_real_t damping, 
+		    igraph_vector_t *reset,
+		    const igraph_vector_t *weights,
+		    void *options) {
 
-int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+  if (algo == IGRAPH_PAGERANK_ALGO_POWER) {
+    igraph_pagerank_power_options_t *o = 
+      (igraph_pagerank_power_options_t *) options;
+    if (reset) { 
+      IGRAPH_WARNING("Cannot use weights with power method, "
+		     "weights will be ignored");
+    }
+    return igraph_pagerank_old(graph, vector, vids, directed, 
+			       o->niter, o->eps, damping, 
+			       /*old=*/ 0);
+  } else if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
+    igraph_arpack_options_t *o= (igraph_arpack_options_t*) options;
+    return igraph_personalized_pagerank_arpack(graph, vector, value, vids,
+					       directed, damping, reset, 
+					       weights, o);
+  } else if (algo == IGRAPH_PAGERANK_ALGO_PRPACK) {
+    return igraph_personalized_pagerank_prpack(graph, vector, value, vids,
+					       directed, damping, reset, 
+					       weights);
+  } else {
+    IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);
+  }
+
+  return 0;
+}
+
+/*
+ * ARPACK-based implementation of \c igraph_personalized_pagerank.
+ *
+ * See \c igraph_personalized_pagerank for the documentation of the parameters.
+ */
+int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vector_t *reset,
 		    const igraph_vector_t *weights,
 		    igraph_arpack_options_t *options) {
-
   igraph_matrix_t values;
   igraph_matrix_t vectors;
-  igraph_integer_t dirmode;
+  igraph_neimode_t dirmode;
   igraph_vector_t outdegree;
   igraph_vector_t indegree;
   igraph_vector_t tmp;
@@ -1270,7 +1348,7 @@ int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
 	return IGRAPH_SUCCESS;
   }
 
-  options->n = no_of_nodes;
+  options->n = (int) no_of_nodes;
   options->nev = 1;
   options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
   options->which[0]='L'; options->which[1]='M';
@@ -1503,18 +1581,20 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 					 const igraph_vector_t *weights, 
 					 igraph_bool_t nobigint) {
 
-  long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  igraph_integer_t no_of_nodes=(igraph_integer_t) igraph_vcount(graph);
+  igraph_integer_t no_of_edges=(igraph_integer_t) igraph_ecount(graph);
   igraph_2wheap_t Q;
   igraph_inclist_t inclist;
   igraph_adjlist_t fathers;
   long int source, j;
   igraph_stack_t S;
-  igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
+  igraph_neimode_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
   igraph_vector_t dist, nrgeo, tmpscore;
   igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
   igraph_vit_t vit;
-  
+
+  IGRAPH_UNUSED(nobigint);
+
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }
@@ -1565,14 +1645,14 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       neis=igraph_inclist_get(&inclist, minnei);
       nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
-	long int edge=VECTOR(*neis)[j];
+	long int edge=(long int) VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
 	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
 	igraph_real_t curdist=VECTOR(dist)[to];
 	if (curdist==0) {
 	  /* This is the first non-infinite distance */
-	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
-	  igraph_vector_resize(v,1);
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_resize(v,1);
 	  VECTOR(*v)[0]=minnei;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
@@ -1580,16 +1660,16 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (altdist < curdist-1) {
 	  /* This is a shorter path */
-	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
-	  igraph_vector_resize(v,1);
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_resize(v,1);
 	  VECTOR(*v)[0]=minnei;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
 	  VECTOR(dist)[to]=altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	} else if (altdist == curdist-1) {
-	  igraph_vector_t *v=igraph_adjlist_get(&fathers, to);
-	  igraph_vector_push_back(v, minnei);
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_push_back(v, minnei);
 	  VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
 	}
       }
@@ -1597,11 +1677,11 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
     } /* !igraph_2wheap_empty(&Q) */
 
     while (!igraph_stack_empty(&S)) {
-      long int w=igraph_stack_pop(&S);
-      igraph_vector_t *fatv=igraph_adjlist_get(&fathers, w);
-      long int fatv_len=igraph_vector_size(fatv);
+      long int w=(long int) igraph_stack_pop(&S);
+      igraph_vector_int_t *fatv=igraph_adjlist_get(&fathers, w);
+      long int fatv_len=igraph_vector_int_size(fatv);
       for (j=0; j<fatv_len; j++) {
-	long int f=VECTOR(*fatv)[j];
+	long int f=(long int) VECTOR(*fatv)[j];
 	VECTOR(tmpscore)[f] += VECTOR(nrgeo)[f]/VECTOR(nrgeo)[w] * (1+VECTOR(tmpscore)[w]);
       }
       if (w!=source) { VECTOR(*tmpres)[w] += VECTOR(tmpscore)[w]; }
@@ -1609,7 +1689,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(tmpscore)[w]=0;
       VECTOR(dist)[w]=0;
       VECTOR(nrgeo)[w]=0;
-      igraph_vector_clear(igraph_adjlist_get(&fathers, w));
+      igraph_vector_int_clear(igraph_adjlist_get(&fathers, w));
     }
     
   } /* source < no_of_nodes */
@@ -1625,7 +1705,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(*res)[j] = VECTOR(*tmpres)[node];
     }
     
-    no_of_nodes = j;
+    no_of_nodes = (igraph_integer_t) j;
     
     igraph_vit_destroy(&vit);
     igraph_vector_destroy(tmpres);
@@ -1725,7 +1805,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_stack_t stack=IGRAPH_STACK_NULL;
   long int source;
   long int j, k, nneis;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_vector_t v_tmpres, *tmpres=&v_tmpres;
   igraph_vit_t vit;
 
@@ -1766,7 +1846,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     adjlist_in_p=&adjlist_in;
   }
   for (j=0; j<no_of_nodes; j++) {
-    igraph_vector_clear(igraph_adjlist_get(adjlist_in_p, j));
+    igraph_vector_int_clear(igraph_adjlist_get(adjlist_in_p, j));
   }
   
   distance=igraph_Calloc(no_of_nodes, long int);
@@ -1823,22 +1903,23 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     distance[source]=1;
     
     while (!igraph_dqueue_empty(&q)) {
-      long int actnode=igraph_dqueue_pop(&q);
+      long int actnode=(long int) igraph_dqueue_pop(&q);
       IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
 
       if (cutoff >= 0 && distance[actnode] >= cutoff+1) { continue; }
       
       neis = igraph_adjlist_get(adjlist_out_p, actnode);
-      nneis = igraph_vector_size(neis);
+      nneis = igraph_vector_int_size(neis);
       for (j=0; j<nneis; j++) {
-        long int neighbor=VECTOR(*neis)[j];
+        long int neighbor=(long int) VECTOR(*neis)[j];
         if (distance[neighbor]==0) {
 	  distance[neighbor]=distance[actnode]+1;
 	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	} 
 	if (distance[neighbor]==distance[actnode]+1) {
-	  igraph_vector_t *v=igraph_adjlist_get(adjlist_in_p, neighbor);
-	  igraph_vector_push_back(v, actnode);
+	  igraph_vector_int_t *v=igraph_adjlist_get(adjlist_in_p, 
+						    neighbor);
+	  igraph_vector_int_push_back(v, actnode);
 	  if (nobigint) { 
 	    nrgeo[neighbor]+=nrgeo[actnode];
 	  } else {
@@ -1854,11 +1935,11 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
        shortest paths to them. Now we do an inverse search, starting
        with the farthest nodes. */
     while (!igraph_stack_empty(&stack)) {
-      long int actnode=igraph_stack_pop(&stack);
+      long int actnode=(long int) igraph_stack_pop(&stack);
       neis = igraph_adjlist_get(adjlist_in_p, actnode);
-      nneis = igraph_vector_size(neis);
+      nneis = igraph_vector_int_size(neis);
       for (j=0; j<nneis; j++) {
-        long int neighbor=VECTOR(*neis)[j];
+        long int neighbor=(long int) VECTOR(*neis)[j];
 	if (nobigint) {
 	  tmpscore[neighbor] +=  (tmpscore[actnode]+1)*
 	    ((double)(nrgeo[neighbor]))/nrgeo[actnode];
@@ -1867,7 +1948,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 	    tmpscore[neighbor] = IGRAPH_INFINITY;
 	  } else {
 	    double div;
-	    int shift=1000000000L;
+	    limb_t shift=1000000000L;
 	    IGRAPH_CHECK(igraph_biguint_mul_limb(&T, &big_nrgeo[neighbor], 
 						 shift));	  
 	    igraph_biguint_div(&D, &R, &T, &big_nrgeo[actnode]);
@@ -1886,7 +1967,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 	igraph_biguint_set_limb(&big_nrgeo[actnode], 0);
       }
       tmpscore[actnode]=0;
-      igraph_vector_clear(igraph_adjlist_get(adjlist_in_p, actnode));      
+      igraph_vector_int_clear(igraph_adjlist_get(adjlist_in_p, actnode));
     }
 
   } /* for source < no_of_nodes */
@@ -1947,12 +2028,12 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 					      igraph_bool_t directed, 
 					      igraph_real_t cutoff,
 					      const igraph_vector_t *weights) {
-  long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  igraph_integer_t no_of_nodes=(igraph_integer_t) igraph_vcount(graph);
+  igraph_integer_t no_of_edges=(igraph_integer_t) igraph_ecount(graph);
   igraph_2wheap_t Q;
   igraph_inclist_t inclist;
   igraph_inclist_t fathers;
-  igraph_integer_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
+  igraph_neimode_t mode= directed ? IGRAPH_OUT : IGRAPH_ALL;
   igraph_vector_t distance, tmpscore;
   igraph_vector_long_t nrgeo;
   long int source, j;
@@ -2013,7 +2094,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
       neis=igraph_inclist_get(&inclist, minnei);
       nlen=igraph_vector_size(neis);
       for (j=0; j<nlen; j++) {
-	long int edge=VECTOR(*neis)[j];
+	long int edge=(long int) VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
 	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
 	igraph_real_t curdist=VECTOR(distance)[to];
@@ -2047,12 +2128,12 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
     } /* igraph_2wheap_empty(&Q) */
 
     while (!igraph_stack_empty(&S)) {
-      long int w=igraph_stack_pop(&S);
+      long int w=(long int) igraph_stack_pop(&S);
       igraph_vector_t *fatv=igraph_inclist_get(&fathers, w);
       long int fatv_len=igraph_vector_size(fatv);
 /*       printf("Popping %li.\n", w); */
       for (j=0; j<fatv_len; j++) {
-	long int fedge=VECTOR(*fatv)[j];
+	long int fedge=(long int) VECTOR(*fatv)[j];
 	long int neighbor=IGRAPH_OTHER(graph, fedge, w);
 	VECTOR(tmpscore)[neighbor] += ((double)VECTOR(nrgeo)[neighbor]) /
 	  VECTOR(nrgeo)[w] * (1.0+VECTOR(tmpscore)[w]);
@@ -2238,9 +2319,9 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
 
-    memset(distance, 0, no_of_nodes*sizeof(long int));
-    memset(nrgeo, 0, no_of_nodes*sizeof(unsigned long long int));
-    memset(tmpscore, 0, no_of_nodes*sizeof(double));
+    memset(distance, 0, (size_t) no_of_nodes * sizeof(long int));
+    memset(nrgeo, 0, (size_t) no_of_nodes*sizeof(unsigned long long int));
+    memset(tmpscore, 0, (size_t) no_of_nodes*sizeof(double));
     igraph_stack_clear(&stack); /* it should be empty anyway... */
     
     IGRAPH_CHECK(igraph_dqueue_push(&q, source));
@@ -2249,7 +2330,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     distance[source]=0;
     
     while (!igraph_dqueue_empty(&q)) {
-      long int actnode=igraph_dqueue_pop(&q);
+      long int actnode=(long int) igraph_dqueue_pop(&q);
 
       /* TODO: we could just as well 'break' here, no? */
       if (cutoff > 0 && distance[actnode] >= cutoff ) continue;
@@ -2257,7 +2338,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
       neip=igraph_inclist_get(elist_out_p, actnode);
       neino=igraph_vector_size(neip);
       for (i=0; i<neino; i++) {
-	igraph_integer_t edge=VECTOR(*neip)[i], from, to;
+	igraph_integer_t edge=(igraph_integer_t) VECTOR(*neip)[i], from, to;
 	long int neighbor;
 	igraph_edge(graph, edge, &from, &to);
 	neighbor = actnode!=from ? from : to;
@@ -2280,7 +2361,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
        shortest paths to them. Now we do an inverse search, starting
        with the farthest nodes. */
     while (!igraph_stack_empty(&stack)) {
-      long int actnode=igraph_stack_pop(&stack);
+      long int actnode=(long int) igraph_stack_pop(&stack);
       if (distance[actnode]<1) { continue; } /* skip source node */
       
       /* set the temporary score of the friends */
@@ -2289,7 +2370,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
       for (i=0; i<neino; i++) {
 	igraph_integer_t from, to;
 	long int neighbor;
-	long int edgeno=VECTOR(*neip)[i];
+	igraph_integer_t edgeno=(igraph_integer_t) VECTOR(*neip)[i];
 	igraph_edge(graph, edgeno, &from, &to);
 	neighbor= actnode != from ? from : to;
 	if (distance[neighbor]==distance[actnode]-1 &&
@@ -2368,6 +2449,8 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  * \param weights An optional vector containing edge weights for
  *        weighted closeness. Supply a null pointer here for
  *        traditional, unweighted closeness.
+ * \param normalized Boolean, whether to normalize results by multiplying
+ *        by the number of vertices minus one.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -2389,8 +2472,10 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  */
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
                      const igraph_vs_t vids, igraph_neimode_t mode, 
-		     const igraph_vector_t *weights) {
-  return igraph_closeness_estimate(graph, res, vids, mode, -1, weights);
+		     const igraph_vector_t *weights,
+		     igraph_bool_t normalized) {
+  return igraph_closeness_estimate(graph, res, vids, mode, -1, weights,
+				   normalized);
 }
 
 int igraph_i_closeness_estimate_weighted(const igraph_t *graph, 
@@ -2398,7 +2483,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 				       const igraph_vs_t vids, 
 				       igraph_neimode_t mode,
 				       igraph_real_t cutoff,
-				       const igraph_vector_t *weights) {
+				       const igraph_vector_t *weights,
+				       igraph_bool_t normalized) {
 
   /* See igraph_shortest_paths_dijkstra() for the implementation 
      details and the dirty tricks. */
@@ -2452,7 +2538,7 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
     nodes_reached=0;
     
     while (!igraph_2wheap_empty(&Q)) {
-      long int minnei=igraph_2wheap_max_index(&Q);
+      igraph_integer_t minnei=(igraph_integer_t) igraph_2wheap_max_index(&Q);
       igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
       
       /* Now check all neighbors of minnei for a shorter path */
@@ -2465,7 +2551,7 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
       if (cutoff>0 && mindist>=cutoff) continue;    /* NOT break!!! */
       
       for (j=0; j<nlen; j++) {
-	long int edge=VECTOR(*neis)[j];
+	long int edge=(long int) VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
 	igraph_real_t altdist=mindist+VECTOR(*weights)[edge];
 	igraph_real_t curdist=VECTOR(dist)[to];
@@ -2483,10 +2569,17 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 
     } /* !igraph_2wheap_empty(&Q) */
 
-    VECTOR(*res)[i] += ((igraph_integer_t)no_of_nodes * (no_of_nodes-nodes_reached));
+    /* using igraph_real_t here instead of igraph_integer_t to avoid overflow */
+    VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
 
   } /* !IGRAPH_VIT_END(vit) */
+
+  if (!normalized) {
+    for (i=0; i<nodes_to_calc; i++) {
+      VECTOR(*res)[i] /= (no_of_nodes-1);
+    }
+  }
 
   igraph_vector_long_destroy(&which);
   igraph_vector_destroy(&dist);
@@ -2544,6 +2637,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  * \param weights An optional vector containing edge weights for
  *        weighted closeness. Supply a null pointer here for
  *        traditional, unweighted closeness.
+ * \param normalized Boolean, whether to normalize results by multiplying
+ *        by the number of vertices minus one.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -2565,9 +2660,12 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
                               igraph_real_t cutoff,
-			      const igraph_vector_t *weights) {
+			      const igraph_vector_t *weights,
+			      igraph_bool_t normalized) {
+
   long int no_of_nodes=igraph_vcount(graph);
-  igraph_vector_t already_counted, *neis;
+  igraph_vector_t already_counted;
+  igraph_vector_int_t *neis;
   long int i, j;
   long int nodes_reached;
   igraph_adjlist_t allneis;
@@ -2579,7 +2677,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   if (weights) { 
     return igraph_i_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
-					      weights);
+						weights, normalized);
   }
 
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -2614,16 +2712,16 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_ALLOW_INTERRUPTION();
     
     while (!igraph_dqueue_empty(&q)) {
-      long int act=igraph_dqueue_pop(&q);
-      long int actdist=igraph_dqueue_pop(&q);
+      long int act=(long int) igraph_dqueue_pop(&q);
+      long int actdist=(long int) igraph_dqueue_pop(&q);
       
       VECTOR(*res)[i] += actdist;
 
       if (cutoff>0 && actdist>=cutoff) continue;   /* NOT break!!! */
 
       neis=igraph_adjlist_get(&allneis, act);
-      for (j=0; j<igraph_vector_size(neis); j++) {
-        long int neighbor=VECTOR(*neis)[j];
+      for (j=0; j<igraph_vector_int_size(neis); j++) {
+        long int neighbor=(long int) VECTOR(*neis)[j];
         if (VECTOR(already_counted)[neighbor] == i+1) { continue; }
         VECTOR(already_counted)[neighbor] = i+1;
         nodes_reached++;
@@ -2631,8 +2729,15 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
       }
     }
-    VECTOR(*res)[i] += ((igraph_integer_t)no_of_nodes * (no_of_nodes-nodes_reached));
+    /* using igraph_real_t here instead of igraph_integer_t to avoid overflow */
+    VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
+  }
+
+  if (!normalized) {
+    for (i=0; i<nodes_to_calc; i++) {
+      VECTOR(*res)[i] /= (no_of_nodes-1);
+    }
   }
 
   IGRAPH_PROGRESS("Closeness: ", 100.0, NULL);
@@ -3048,7 +3153,7 @@ int igraph_centralization_closeness(const igraph_t *graph,
   }
   
   IGRAPH_CHECK(igraph_closeness(graph, scores, igraph_vss_all(), mode, 
-				/*weights=*/ 0));
+				/*weights=*/ 0, /*normalize=*/ 1));
 
   IGRAPH_CHECK(igraph_centralization_closeness_tmax(graph, 0, mode, 
 						    tmax));

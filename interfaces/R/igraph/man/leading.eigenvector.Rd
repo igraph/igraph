@@ -8,9 +8,9 @@
   a graph by calculating the leading non-negative eigenvector of the
   modularity matrix of the graph.}
 \usage{
-leading.eigenvector.community(graph, steps = -1, start = NULL,
-       options = igraph.arpack.default, callback = NULL, extra = NULL,
-       env = parent.frame())
+leading.eigenvector.community(graph, steps = -1, weights = NULL,
+       start = NULL, options = igraph.arpack.default,
+       callback = NULL, extra = NULL, env = parent.frame())
 community.le.to.membership(merges, steps, membership) 
 }
 \arguments{
@@ -22,6 +22,9 @@ community.le.to.membership(merges, steps, membership)
     For \code{community.le.to.membership} the number of merges to
     produce from the supplied \code{membership} vector.
   }
+  \item{weights}{An optional weight vector. The \sQuote{weight} edge
+    attribute is used if present. Supply \sQuote{\code{NA}} here if you
+    want to ignore the \sQuote{weight} edge attribute.}
   \item{start}{\code{NULL}, or a numeric membership vector, giving the
     start configuration of the algorithm.}
   \item{membership}{The starting community

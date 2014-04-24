@@ -57,11 +57,18 @@ igraph.match.arg <- function(arg, choices, several.ok=FALSE) {
 }
 
 igraph.i.spMatrix <- function(M) {
-  require(Matrix)
   if (M$type == "triplet") {
-    sparseMatrix(dims=M$dim, i=M$i+1L, j=M$p+1L, x=M$x)
+    Matrix::sparseMatrix(dims=M$dim, i=M$i+1L, j=M$p+1L, x=M$x)
   } else {
     new("dgCMatrix", Dim=M$dim, Dimnames=list(NULL, NULL),
         factors=list(), i=M$i, p=M$p, x=M$x)
   }
+}
+
+srand <- function(seed) {
+  seed <- as.numeric(seed)
+  if (length(seed) != 1) { stop("Length of `seed' must be 1") }
+  if (seed < 0) { stop("Seed must be non-negative") }
+  res <- .Call("R_igraph_srand", seed, PACKAGE="igraph")
+  invisible(res)
 }

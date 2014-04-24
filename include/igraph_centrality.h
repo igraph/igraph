@@ -48,11 +48,12 @@ __BEGIN_DECLS
 
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res, 
 		     const igraph_vs_t vids, igraph_neimode_t mode,
-		     const igraph_vector_t *weights);
+		     const igraph_vector_t *weights, igraph_bool_t normalized);
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
                               igraph_real_t cutoff,
-			      const igraph_vector_t *weights);
+			      const igraph_vector_t *weights,
+			      igraph_bool_t normalized);
 
 int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res, 
                        const igraph_vs_t vids, igraph_bool_t directed,
@@ -72,23 +73,60 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
 			const igraph_vs_t vids, igraph_bool_t directed,
 			igraph_integer_t niter, igraph_real_t eps, 
 			igraph_real_t damping, igraph_bool_t old);
-int igraph_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+
+/**
+ * \typedef igraph_pagerank_algo_t
+ * \brief PageRank algorithm implementation
+ *
+ * Algorithms to calculate PageRank.
+ * \enumval IGRAPH_PAGERANK_ALGO_POWER Use a simple power iteration,
+ *   as it was implemented before igraph version 0.5.
+ * \enumval IGRAPH_PAGERANK_ALGO_ARPACK Use the ARPACK library, this
+ *   was the PageRank implementation in igraph from version 0.5, until
+ *   version 0.7.
+ * \enumval IGRAPH_PAGERANK_ALGO_PRPACK Use the PRPACK
+ *   library. Currently this implementation is recommended.
+ */
+
+typedef enum {
+  IGRAPH_PAGERANK_ALGO_POWER=0,
+  IGRAPH_PAGERANK_ALGO_ARPACK=1,
+  IGRAPH_PAGERANK_ALGO_PRPACK=2
+} igraph_pagerank_algo_t;
+
+/**
+ * \struct igraph_pagerank_power_options_t
+ * \brief Options for the power method
+ *
+ * \member niter The number of iterations to perform, integer.
+ * \member eps  The algorithm will consider the calculation as complete
+ *        if the difference of values between iterations change
+ *        less than this value for every vertex.
+ */
+
+typedef struct igraph_pagerank_power_options_t {
+  igraph_integer_t niter;
+  igraph_real_t eps;
+} igraph_pagerank_power_options_t;
+
+int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
+		    igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
-		    const igraph_vector_t *weights,
-		    igraph_arpack_options_t *options);
-int igraph_personalized_pagerank(const igraph_t *graph, igraph_vector_t *vector,
+		    const igraph_vector_t *weights, void *options);
+int igraph_personalized_pagerank(const igraph_t *graph, 
+		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vector_t *reset,
-		    const igraph_vector_t *weights,
-		    igraph_arpack_options_t *options);
-int igraph_personalized_pagerank_vs(const igraph_t *graph, igraph_vector_t *vector,
+		    const igraph_vector_t *weights, void *options);
+int igraph_personalized_pagerank_vs(const igraph_t *graph, 
+		    igraph_pagerank_algo_t algo,
+		    igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping,
 			igraph_vs_t reset_vids,
-		    const igraph_vector_t *weights,
-		    igraph_arpack_options_t *options);
+		    const igraph_vector_t *weights, void *options);
 
 int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
 				  igraph_real_t *value,

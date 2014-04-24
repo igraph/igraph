@@ -1,0 +1,33 @@
+---
+layout: default
+---
+
+<div class="container bs-docs-container">
+  <div class="row">
+    <div class="col-md-3">
+      <div class="bs-sidebar hidden-print" role="complementary" 
+           data-spy="affix">
+        <ul class="nav bs-sidenav">
+          {% for post in site.posts %}
+  	    {% for cat in post.categories %}
+	      {% if cat == page.lang %}
+                <li>
+		  <a href="/{{page.lang}}/news.html#{{ post.id }}">{{ post.title }}</a>
+		</li>
+	      {% endif %}		
+	     {% endfor %}
+	  {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="bs-docs-section">
+                
+        {{ content | biggerh1 | redir_docs }}
+
+      </div>
+    </div>
+  </div>
+
+</div>

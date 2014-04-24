@@ -98,10 +98,11 @@ int igraph_i_cattributes_copy_attribute_record(igraph_attribute_record_t **newre
 int igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   igraph_attribute_record_t *attr_rec;
   long int i, n;
+  igraph_i_cattributes_t *nattr;
 
   n = attr ? igraph_vector_ptr_size(attr) : 0;
 
-  igraph_i_cattributes_t *nattr=igraph_Calloc(1, igraph_i_cattributes_t);
+  nattr=igraph_Calloc(1, igraph_i_cattributes_t);
   if (!nattr) {
     IGRAPH_ERROR("Can't init attributes", IGRAPH_ENOMEM);
   }
@@ -110,7 +111,7 @@ int igraph_i_cattribute_init(igraph_t *graph, igraph_vector_ptr_t *attr) {
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->gal, n));
   IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->val, 0));
-  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->gal);
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy, &nattr->val);
   IGRAPH_CHECK(igraph_vector_ptr_init(&nattr->eal, 0));
   IGRAPH_FINALLY_CLEAN(3);
 
@@ -131,6 +132,7 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
   long int i, n, a;
   igraph_vector_t *num;
   igraph_strvector_t *str;
+  igraph_vector_bool_t *boolvec;
   igraph_attribute_record_t *rec;
   for (a=0; a<3; a++) {
     n=igraph_vector_ptr_size(als[a]);
@@ -145,6 +147,10 @@ void igraph_i_cattribute_destroy(igraph_t *graph) {
 	  str=(igraph_strvector_t*)rec->value;
 	  igraph_strvector_destroy(str);
 	  igraph_free(str);
+	} else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+	  boolvec=(igraph_vector_bool_t*)rec->value;
+	  igraph_vector_bool_destroy(boolvec);
+	  igraph_free(boolvec);
 	}
 	igraph_free((char*)rec->name);
 	igraph_free(rec);
@@ -516,7 +522,7 @@ int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec,
     igraph_vector_t *idx=VECTOR(*merges)[i];
     long int j, n=igraph_vector_size(idx);
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s += VECTOR(*oldv)[x];
     }
     VECTOR(*newv)[i]=s;
@@ -547,7 +553,7 @@ int igraph_i_cattributes_cn_prod(const igraph_attribute_record_t *oldrec,
     igraph_vector_t *idx=VECTOR(*merges)[i];
     long int j, n=igraph_vector_size(idx);
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s *= VECTOR(*oldv)[x];
     }
     VECTOR(*newv)[i]=s;
@@ -579,7 +585,7 @@ int igraph_i_cattributes_cn_min(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t m= n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
     for (j=1; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       igraph_real_t val=VECTOR(*oldv)[x];
       if (val < m) { m=val; }
     }
@@ -612,7 +618,7 @@ int igraph_i_cattributes_cn_max(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t m= n > 0 ? VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ] : nan;
     for (j=1; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       igraph_real_t val=VECTOR(*oldv)[x];
       if (val > m) { m=val; }
     }
@@ -748,7 +754,7 @@ int igraph_i_cattributes_cn_mean(const igraph_attribute_record_t *oldrec,
     long int j, n=igraph_vector_size(idx);
     igraph_real_t s= n > 0 ? 0.0 : nan;
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];      
+      long int x=(long int) VECTOR(*idx)[j];      
       s += VECTOR(*oldv)[x];
     }
     if (n>0) { s=s/n; }
@@ -792,7 +798,7 @@ int igraph_i_cattributes_cn_func(const igraph_attribute_record_t *oldrec,
     igraph_real_t res;
     IGRAPH_CHECK(igraph_vector_resize(&values, n));
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];
+      long int x=(long int) VECTOR(*idx)[j];
       VECTOR(values)[j] = VECTOR(*oldv)[x];
     }
     IGRAPH_CHECK(func(&values, &res));
@@ -988,7 +994,7 @@ int igraph_i_cattributes_sn_func(const igraph_attribute_record_t *oldrec,
     char *res;
     IGRAPH_CHECK(igraph_strvector_resize(&values, n));
     for (j=0; j<n; j++) {
-      long int x=VECTOR(*idx)[j];
+      long int x=(long int) VECTOR(*idx)[j];
       char *elem;
       igraph_strvector_get(oldv, x, &elem);
       IGRAPH_CHECK(igraph_strvector_set(newv, j, elem));
@@ -1054,9 +1060,13 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
   for (i=0, j=0; i<valno; i++) {
     igraph_attribute_record_t *newrec, *oldrec=VECTOR(*val)[i];
     const char *name=oldrec->name;
-    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_combination_type_t todo=
+      (igraph_attribute_combination_type_t) (TODO[i]);
     igraph_attribute_type_t type=oldrec->type;
-    void *voidfunc=funcs[i];
+    igraph_cattributes_combine_num_t *numfunc=
+      (igraph_cattributes_combine_num_t*) funcs[i];
+    igraph_cattributes_combine_str_t *strfunc=
+      (igraph_cattributes_combine_str_t*) funcs[i];
     
     if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
 	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
@@ -1076,7 +1086,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  numfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
@@ -1119,7 +1129,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_sn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  strfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
@@ -1566,9 +1576,13 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
   for (i=0, j=0; i<ealno; i++) {
     igraph_attribute_record_t *newrec, *oldrec=VECTOR(*eal)[i];
     const char *name=oldrec->name;
-    igraph_attribute_combination_type_t todo=TODO[i];
+    igraph_attribute_combination_type_t todo=
+      (igraph_attribute_combination_type_t) (TODO[i]);
     igraph_attribute_type_t type=oldrec->type;
-    void *voidfunc=funcs[i];
+    igraph_cattributes_combine_num_t *numfunc=
+      (igraph_cattributes_combine_num_t*) funcs[i];
+    igraph_cattributes_combine_str_t *strfunc=
+      (igraph_cattributes_combine_str_t*) funcs[i];
     
     if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
 	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
@@ -1588,7 +1602,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_func(oldrec, newrec, merges,
-						  voidfunc));
+						  numfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_CHECK(igraph_i_cattributes_cn_sum(oldrec, newrec, merges));
@@ -1631,7 +1645,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
       switch (todo) {
       case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
 	IGRAPH_CHECK(igraph_i_cattributes_sn_func(oldrec, newrec, merges, 
-						  voidfunc));
+						  strfunc));
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_SUM:
 	IGRAPH_ERROR("Cannot sum strings", IGRAPH_EATTRCOMBINE);
@@ -1815,6 +1829,28 @@ int igraph_i_cattribute_get_numeric_graph_attr(const igraph_t *graph,
   return 0;
 }
 
+int igraph_i_cattribute_get_bool_graph_attr(const igraph_t *graph,
+					    const char *name,
+					    igraph_vector_bool_t *value) {
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *gal=&attr->gal;
+  long int j;
+  igraph_attribute_record_t *rec;
+  igraph_vector_bool_t *log;
+  igraph_bool_t l=igraph_i_cattribute_find(gal, name, &j);
+  
+  if (!l) {
+    IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+  }
+
+  rec=VECTOR(*gal)[j];
+  log=(igraph_vector_bool_t*)rec->value;
+  IGRAPH_CHECK(igraph_vector_bool_resize(value, 1));
+  VECTOR(*value)[0]=VECTOR(*log)[0];
+  
+  return 0;
+}
+
 int igraph_i_cattribute_get_string_graph_attr(const igraph_t *graph,
 					     const char *name,
 					     igraph_strvector_t *value) {
@@ -1871,6 +1907,43 @@ int igraph_i_cattribute_get_numeric_vertex_attr(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
   
+  return 0;
+}
+
+int igraph_i_cattribute_get_bool_vertex_attr(const igraph_t *graph,
+					     const char *name,
+					     igraph_vs_t vs,
+					     igraph_vector_bool_t *value) {
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *val=&attr->val;
+  long int j;
+  igraph_attribute_record_t *rec;
+  igraph_vector_bool_t *log;
+  igraph_bool_t l=igraph_i_cattribute_find(val, name, &j);
+  
+  if (!l) {
+    IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+  }
+
+  rec=VECTOR(*val)[j];
+  log=(igraph_vector_bool_t*)rec->value;
+  if (igraph_vs_is_all(&vs)) {
+    igraph_vector_bool_clear(value);
+    IGRAPH_CHECK(igraph_vector_bool_append(value, log));
+  } else {
+    igraph_vit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
+    IGRAPH_FINALLY(igraph_vit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_VIT_SIZE(it)));
+    for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
+      long int v=IGRAPH_VIT_GET(it);
+      VECTOR(*value)[i]=VECTOR(*log)[v];
+    }
+    igraph_vit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
   return 0;
 }
 
@@ -1989,6 +2062,43 @@ int igraph_i_cattribute_get_string_edge_attr(const igraph_t *graph,
   return 0;
 }
 
+int igraph_i_cattribute_get_bool_edge_attr(const igraph_t *graph,
+					   const char *name,
+					   igraph_es_t es,
+					   igraph_vector_bool_t *value) {
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *eal=&attr->eal;
+  long int j;
+  igraph_attribute_record_t *rec;
+  igraph_vector_bool_t *log;
+  igraph_bool_t l=igraph_i_cattribute_find(eal, name, &j);
+  
+  if (!l) {
+    IGRAPH_ERROR("Unknown attribute", IGRAPH_EINVAL);
+  }
+
+  rec=VECTOR(*eal)[j];
+  log=(igraph_vector_bool_t*)rec->value;
+  if (igraph_es_is_all(&es)) {
+    igraph_vector_bool_clear(value);
+    IGRAPH_CHECK(igraph_vector_bool_append(value, log));
+  } else {
+    igraph_eit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
+    IGRAPH_FINALLY(igraph_eit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_EIT_SIZE(it)));
+    for (; !IGRAPH_EIT_END(it); IGRAPH_EIT_NEXT(it), i++) {
+      long int e=IGRAPH_EIT_GET(it);
+      VECTOR(*value)[i]=VECTOR(*log)[e];
+    }
+    igraph_eit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  return 0;
+}
+
 /* -------------------------------------- */
 
 const igraph_attribute_table_t igraph_cattribute_table={
@@ -2002,10 +2112,13 @@ const igraph_attribute_table_t igraph_cattribute_table={
   &igraph_i_cattribute_has_attr, &igraph_i_cattribute_gettype,
   &igraph_i_cattribute_get_numeric_graph_attr,
   &igraph_i_cattribute_get_string_graph_attr,
+  &igraph_i_cattribute_get_bool_graph_attr,
   &igraph_i_cattribute_get_numeric_vertex_attr,
   &igraph_i_cattribute_get_string_vertex_attr,
+  &igraph_i_cattribute_get_bool_vertex_attr,
   &igraph_i_cattribute_get_numeric_edge_attr,
-  &igraph_i_cattribute_get_string_edge_attr
+  &igraph_i_cattribute_get_string_edge_attr,
+  &igraph_i_cattribute_get_bool_edge_attr
 };
 
 /* -------------------------------------- */
@@ -2080,6 +2193,39 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
 }
 
 /**
+ * \function igraph_cattribute_GAB
+ * Query a boolean graph attribute.
+ * 
+ * Returns the value of the given numeric graph attribute.
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute to query.
+ * \return The value of the attribute.
+ *
+ * \sa \ref GAB for a simpler interface.
+ * 
+ * Time complexity: O(Ag), the number of graph attributes.
+ */
+igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
+
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *gal=&attr->gal;
+  long int j;
+  igraph_attribute_record_t *rec;
+  igraph_vector_bool_t *log;
+  igraph_bool_t l=igraph_i_cattribute_find(gal, name, &j);
+  
+  if (!l) {
+    igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+    return 0;
+  }
+
+  rec=VECTOR(*gal)[j];
+  log=(igraph_vector_bool_t*)rec->value;
+  return VECTOR(*log)[0];
+}
+
+/**
  * \function igraph_cattribute_GAS
  * Query a string graph attribute.
  * 
@@ -2144,6 +2290,39 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
   rec=VECTOR(*val)[j];
   num=(igraph_vector_t*)rec->value;
   return VECTOR(*num)[(long int)vid];
+}
+
+/**
+ * \function igraph_cattribute_VAB
+ * Query a boolean vertex attribute.
+ * 
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param vid The id of the queried vertex.
+ * \return The value of the attribute.
+ * 
+ * \sa \ref VAB macro for a simpler interface.
+ * 
+ * Time complexity: O(Av), the number of vertex attributes.
+ */
+igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
+				    igraph_integer_t vid) {
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *val=&attr->val;
+  long int j;
+  igraph_attribute_record_t *rec;
+  igraph_vector_bool_t *log;
+  igraph_bool_t l=igraph_i_cattribute_find(val, name, &j);
+  
+  if (!l) {
+    igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+    return 0;
+  }
+
+  rec=VECTOR(*val)[j];
+  log=(igraph_vector_bool_t*)rec->value;
+  return VECTOR(*log)[(long int)vid];
 }
 
 /**
@@ -2213,6 +2392,39 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
 }
 
 /**
+ * \function igraph_cattribute_EAB
+ * Query a boolean edge attribute.
+ * 
+ * The attribute must exist, otherwise an error is triggered.
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param eid The id of the queried edge.
+ * \return The value of the attribute.
+ * 
+ * \sa \ref EAB for an easier interface.
+ *
+ * Time complexity: O(Ae), the number of edge attributes.
+ */
+igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
+				    igraph_integer_t eid) {  
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *eal=&attr->eal;
+  long int j;
+  igraph_attribute_record_t *rec;
+  igraph_vector_bool_t *log;
+  igraph_bool_t l=igraph_i_cattribute_find(eal, name, &j);
+  
+  if (!l) {
+    igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+    return 0;
+  }
+
+  rec=VECTOR(*eal)[j];
+  log=(igraph_vector_bool_t*)rec->value;
+  return VECTOR(*log)[(long int)eid];
+}
+
+/**
  * \function igraph_cattribute_EAS
  * Query a string edge attribute.
  * 
@@ -2267,6 +2479,27 @@ int igraph_cattribute_VANV(const igraph_t *graph, const char *name,
 }
 
 /**
+ * \function igraph_cattribute_VABV
+ * Query a boolean vertex attribute for many vertices
+ *
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param vids The vertices to query.
+ * \param result Pointer to an initialized boolean vector, the result is
+ *    stored here. It will be resized, if needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(v), where v is the number of vertices in 'vids'.
+ */
+
+int igraph_cattribute_VABV(const igraph_t *graph, const char *name, 
+			   igraph_vs_t vids, igraph_vector_bool_t *result) {
+
+  return igraph_i_cattribute_get_bool_vertex_attr(graph, name, vids, 
+						  result);
+}
+
+/**
  * \function igraph_cattribute_EANV
  * Query a numeric edge attribute for many edges
  *
@@ -2285,6 +2518,27 @@ int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
 
   return igraph_i_cattribute_get_numeric_edge_attr(graph, name, eids, 
 						   result);
+}
+
+/**
+ * \function igraph_cattribute_EABV
+ * Query a boolean edge attribute for many edges
+ *
+ * \param graph The input graph.
+ * \param name The name of the attribute.
+ * \param eids The edges to query.
+ * \param result Pointer to an initialized boolean vector, the result is 
+ *    stored here. It will be resized, if needed.
+ * \return Error code.
+ * 
+ * Time complexity: O(e), where e is the number of edges in 'eids'.
+ */
+
+int igraph_cattribute_EABV(const igraph_t *graph, const char *name,
+			   igraph_es_t eids, igraph_vector_bool_t *result) {
+
+  return igraph_i_cattribute_get_bool_edge_attr(graph, name, eids, 
+						result);
 }
 
 /**
@@ -2437,6 +2691,65 @@ int igraph_cattribute_GAN_set(igraph_t *graph, const char *name,
 }
 
 /**
+ * \function igraph_cattribute_GAB_set
+ * Set a boolean graph attribute
+ * 
+ * \param graph The graph.
+ * \param name Name of the graph attribute. If there is no such
+ *   attribute yet, then it will be added.
+ * \param value The (new) value of the graph attribute.
+ * \return Error code.
+ * 
+ * \se \ref SETGAN if you want to type less.
+ * 
+ * Time complexity: O(1).
+ */
+int igraph_cattribute_GAB_set(igraph_t *graph, const char *name, 
+			      igraph_bool_t value) {
+
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *gal=&attr->gal;
+  long int j;
+  igraph_bool_t l=igraph_i_cattribute_find(gal, name, &j);
+  
+  if (l) {
+    igraph_attribute_record_t *rec=VECTOR(*gal)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_BOOLEAN) {
+      IGRAPH_ERROR("Invalid attribute type", IGRAPH_EINVAL);
+    } else {
+      igraph_vector_bool_t *log=(igraph_vector_bool_t *)rec->value;
+      VECTOR(*log)[0]=value;
+    }
+  } else {
+    igraph_attribute_record_t *rec=igraph_Calloc(1, igraph_attribute_record_t);
+    igraph_vector_bool_t *log;
+    if (!rec) {
+      IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, rec);
+    rec->name=strdup(name);
+    if (!rec->name) {
+      IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, (char*)rec->name);
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
+    log=igraph_Calloc(1, igraph_vector_bool_t);
+    if (!log) { 
+      IGRAPH_ERROR("Cannot add graph attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, log);
+    IGRAPH_CHECK(igraph_vector_bool_init(log, 1));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
+    VECTOR(*log)[0]=value;
+    rec->value=log;
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(gal, rec));
+    IGRAPH_FINALLY_CLEAN(4);
+  }
+
+  return 0;
+}
+
+/**
  * \function igraph_cattribute_GAS_set
  * Set a string graph attribute.
  * 
@@ -2551,6 +2864,70 @@ int igraph_cattribute_VAN_set(igraph_t *graph, const char *name,
     igraph_vector_fill(num, IGRAPH_NAN);
     VECTOR(*num)[(long int)vid]=value;
     rec->value=num;
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
+    IGRAPH_FINALLY_CLEAN(4);
+  }
+  
+  return 0;
+}
+
+/**
+ * \function igraph_cattribute_VAB_set
+ * Set a boolean vertex attribute
+ * 
+ * The attribute will be added if not present already. If present it
+ * will be overwritten. The same \p value is set for all vertices
+ * included in \p vid.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param vid Vertices for which to set the attribute.
+ * \param value The (new) value of the attribute.
+ * \return Error code.
+ * 
+ * \sa \ref SETVAB for a simpler way.
+ * 
+ * Time complexity: O(n), the number of vertices if the attribute is
+ * new, O(|vid|) otherwise.
+ */
+int igraph_cattribute_VAB_set(igraph_t *graph, const char *name, 
+			      igraph_integer_t vid, igraph_bool_t value) {
+  
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *val=&attr->val;
+  long int j;
+  igraph_bool_t l=igraph_i_cattribute_find(val, name, &j);
+  
+  if (l) {
+    igraph_attribute_record_t *rec=VECTOR(*val)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_BOOLEAN) {
+      IGRAPH_ERROR("Invalid attribute type", IGRAPH_EINVAL);
+    } else {
+      igraph_vector_bool_t *log=(igraph_vector_bool_t*)rec->value;
+      VECTOR(*log)[(long int)vid]=value;
+    }
+  } else {
+    igraph_attribute_record_t *rec=igraph_Calloc(1, igraph_attribute_record_t);
+    igraph_vector_bool_t *log;
+    if (!rec) {
+      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, rec);
+    rec->name=strdup(name);
+    if (!rec->name) {
+      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, (char*)rec->name);
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
+    log=igraph_Calloc(1, igraph_vector_bool_t);
+    if (!log) {
+      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, log);
+    IGRAPH_CHECK(igraph_vector_bool_init(log, igraph_vcount(graph)));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
+    igraph_vector_bool_fill(log, 0);
+    VECTOR(*log)[(long int)vid]=value;
+    rec->value=log;
     IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
     IGRAPH_FINALLY_CLEAN(4);
   }
@@ -2677,6 +3054,70 @@ int igraph_cattribute_EAN_set(igraph_t *graph, const char *name,
     igraph_vector_fill(num, IGRAPH_NAN);
     VECTOR(*num)[(long int)eid]=value;
     rec->value=num;
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
+    IGRAPH_FINALLY_CLEAN(4);
+  }
+  
+  return 0;
+}
+
+/**
+ * \function igraph_cattribute_EAB_set
+ * Set a boolean edge attribute
+ * 
+ * The attribute will be added if not present already. If present it
+ * will be overwritten. The same \p value is set for all edges
+ * included in \p vid.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param eid Edges for which to set the attribute.
+ * \param value The (new) value of the attribute.
+ * \return Error code.
+ * 
+ * \sa \ref SETEAB for a simpler way.
+ * 
+ * Time complexity: O(e), the number of edges if the attribute is
+ * new, O(|eid|) otherwise.
+ */
+int igraph_cattribute_EAB_set(igraph_t *graph, const char *name, 
+			      igraph_integer_t eid, igraph_bool_t value) {
+  
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *eal=&attr->eal;
+  long int j;
+  igraph_bool_t l=igraph_i_cattribute_find(eal, name, &j);
+  
+  if (l) {
+    igraph_attribute_record_t *rec=VECTOR(*eal)[j];
+    if (rec->type != IGRAPH_ATTRIBUTE_BOOLEAN) {
+      IGRAPH_ERROR("Invalid attribute type", IGRAPH_EINVAL);
+    } else {
+      igraph_vector_bool_t *log=(igraph_vector_bool_t*)rec->value;
+      VECTOR(*log)[(long int)eid]=value;
+    }
+  } else {
+    igraph_attribute_record_t *rec=igraph_Calloc(1, igraph_attribute_record_t);
+    igraph_vector_bool_t *log;
+    if (!rec) {
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, rec);
+    rec->name=strdup(name);
+    if (!rec->name) {
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, (char*)rec->name);
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
+    log=igraph_Calloc(1, igraph_vector_bool_t);
+    if (!log) {
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, log);
+    IGRAPH_CHECK(igraph_vector_bool_init(log, igraph_ecount(graph)));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
+    igraph_vector_bool_fill(log, 0);
+    VECTOR(*log)[(long int)eid]=value;
+    rec->value=log;
     IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
     IGRAPH_FINALLY_CLEAN(4);
   }
@@ -2812,6 +3253,71 @@ int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name,
 
   return 0;
 }
+/**
+ * \function igraph_cattribute_VAB_setv
+ * Set a boolean vertex attribute for all vertices.
+ * 
+ * The attribute will be added if not present yet.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param v The new attribute values. The length of this boolean vector must
+ *   match the number of vertices.
+ * \return Error code.
+ * 
+ * \sa \ref SETVANV for a simpler way.
+ * 
+ * Time complexity: O(n), the number of vertices.
+ */
+
+int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name, 
+			       const igraph_vector_bool_t *v) {
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *val=&attr->val;
+  long int j;
+  igraph_bool_t l=igraph_i_cattribute_find(val, name, &j);
+
+  /* Check length first */
+  if (igraph_vector_bool_size(v) != igraph_vcount(graph)) {
+    IGRAPH_ERROR("Invalid vertex attribute vector length", IGRAPH_EINVAL);
+  }
+  
+  if (l) {
+    /* Already present, check type */
+    igraph_attribute_record_t *rec=VECTOR(*val)[j];
+    igraph_vector_bool_t *log=(igraph_vector_bool_t *)rec->value;
+    if (rec->type != IGRAPH_ATTRIBUTE_BOOLEAN) {
+      IGRAPH_ERROR("Attribute type mismatch", IGRAPH_EINVAL);
+    }
+    igraph_vector_bool_clear(log);
+    IGRAPH_CHECK(igraph_vector_bool_append(log, v));
+  } else {
+    /* Add it */
+    igraph_attribute_record_t *rec=igraph_Calloc(1, igraph_attribute_record_t);
+    igraph_vector_bool_t *log;
+    if (!rec) {
+      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, rec);
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
+    rec->name=strdup(name);
+    if (!rec->name) {
+      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, (char*)rec->name);
+    log=igraph_Calloc(1, igraph_vector_bool_t);
+    if (!log) {
+      IGRAPH_ERROR("Cannot add vertex attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, log);
+    rec->value=log;
+    IGRAPH_CHECK(igraph_vector_bool_copy(log, v));
+    IGRAPH_FINALLY(igraph_vector_destroy, log);
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
+    IGRAPH_FINALLY_CLEAN(4);
+  }
+
+  return 0;
+}
 
 /**
  * \function igraph_cattribute_VAS_setv
@@ -2939,6 +3445,72 @@ int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
     rec->value=num;
     IGRAPH_CHECK(igraph_vector_copy(num, v));
     IGRAPH_FINALLY(igraph_vector_destroy, num);
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
+    IGRAPH_FINALLY_CLEAN(4);
+  }
+
+  return 0;
+}
+
+/**
+ * \function igraph_cattribute_EAB_setv
+ * Set a boolean edge attribute for all vertices.
+ * 
+ * The attribute will be added if not present yet.
+ * \param graph The graph.
+ * \param name Name of the attribute.
+ * \param v The new attribute values. The length of this vector must
+ *   match the number of edges.
+ * \return Error code.
+ * 
+ * \sa \ref SETEABV for a simpler way.
+ * 
+ * Time complexity: O(e), the number of edges.
+ */
+int igraph_cattribute_EAB_setv(igraph_t *graph, const char *name, 
+			       const igraph_vector_bool_t *v) {
+
+  igraph_i_cattributes_t *attr=graph->attr;
+  igraph_vector_ptr_t *eal=&attr->eal;
+  long int j;
+  igraph_bool_t l=igraph_i_cattribute_find(eal, name, &j);
+
+  /* Check length first */
+  if (igraph_vector_bool_size(v) != igraph_ecount(graph)) {
+    IGRAPH_ERROR("Invalid edge attribute vector length", IGRAPH_EINVAL);
+  }
+  
+  if (l) {
+    /* Already present, check type */
+    igraph_attribute_record_t *rec=VECTOR(*eal)[j];
+    igraph_vector_bool_t *log=(igraph_vector_bool_t *)rec->value;
+    if (rec->type != IGRAPH_ATTRIBUTE_BOOLEAN) {
+      IGRAPH_ERROR("Attribute type mismatch", IGRAPH_EINVAL);
+    }
+    igraph_vector_bool_clear(log);
+    IGRAPH_CHECK(igraph_vector_bool_append(log, v));
+  } else {
+    /* Add it */
+    igraph_attribute_record_t *rec=igraph_Calloc(1, igraph_attribute_record_t);
+    igraph_vector_bool_t *log;
+    if (!rec) {
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, rec);
+    rec->type=IGRAPH_ATTRIBUTE_BOOLEAN;
+    rec->name=strdup(name);
+    if (!rec->name) {
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, (char*)rec->name);
+    log=igraph_Calloc(1, igraph_vector_bool_t);
+    if (!log) {
+      IGRAPH_ERROR("Cannot add edge attribute", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, log);
+    rec->value=log;
+    IGRAPH_CHECK(igraph_vector_bool_copy(log, v));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
     IGRAPH_CHECK(igraph_vector_ptr_push_back(eal, rec));
     IGRAPH_FINALLY_CLEAN(4);
   }

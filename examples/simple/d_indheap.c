@@ -27,7 +27,6 @@
 int main() {
   
   igraph_d_indheap_t h;
-  int i;
   long int idx1, idx2;
 
   /* igraph_d_indheap_init, igraph_d_indheap_destroy */

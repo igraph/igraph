@@ -36,15 +36,17 @@ __BEGIN_DECLS
 
 #ifdef _MSC_VER
 #define snprintf sprintf_s
+#define inline  __inline
 #define isnan(x) _isnan(x)
+#define isfinite(x) _finite(x)
+#endif
+
 #ifndef INFINITY
-#  define INFINITY (DBL_MAX+DBL_MAX)
+#  define INFINITY (1.0/0.0)
 #endif
 
 #ifndef NAN
 #  define NAN (INFINITY-INFINITY)
-#endif
-
 #endif
 
 __END_DECLS

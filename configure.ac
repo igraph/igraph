@@ -1,10 +1,15 @@
 AC_INIT(igraph, esyscmd([tr -d '\n' < VERSION]), csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/games.c)
-AM_INIT_AUTOMAKE
-AM_EXTRA_RECURSIVE_TARGETS([parsersources])
+AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 
 m4_include(tools/autoconf/ax_tls.m4)
+
+# Define list of additional libraries that have to be linked to igraph when
+# another app tries to link to the static library of igraph. This is substituted
+# into igraph.pc later on.
+PKGCONFIG_LIBS_PRIVATE="-lxml2 -lz -lm"
+AC_SUBST(PKGCONFIG_LIBS_PRIVATE)
 
 # Test suite
 AC_CONFIG_TESTDIR(tests)
@@ -41,7 +46,9 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([stdarg.h stdlib.h string.h time.h unistd.h stdint.h sys/int_types.h])
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([expm1 rint rintf finite log2 logbl snprintf log1p round fabsl fmin strcasecmp isnan strdup _strdup ftruncate stpcpy])
+AC_CHECK_FUNCS([expm1 rint rintf finite log2 snprintf log1p round fabsl fmin strcasecmp isnan strdup _strdup ftruncate stpcpy])
+AC_CHECK_DECL([stpcpy],
+	[AC_DEFINE([HAVE_STPCPY_SIGNATURE], [1], [Define to 1 if the stpcpy function has a signature])])
 LIBS=$LIBS_SAVE
 
 AC_DEFUN([IGRAPH_WARNING],
@@ -166,7 +173,8 @@ if test "x$enable_gmp" != "xno"; then
     AC_CHECK_HEADER([gmp.h], [
       AC_DEFINE([HAVE_GMP], [1], [Define to 1 if you have the GMP library])
       gmp_support=yes
-      LDFLAGS="${LDFLAGS} -lgmp"      
+      LDFLAGS="${LDFLAGS} -lgmp"
+      PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -lgmp"
     ])
   ])
 fi
@@ -235,6 +243,7 @@ if test "$internal_blas" = "no"; then
            AC_CHECK_LIB([blas], [DAXPY], [],
 	      [AC_MSG_RESULT(not found, trying to use -lblas anyway.)]))))
   LDFLAGS="${LDFLAGS} -lblas"
+  PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -lblas"
 else
   AC_DEFINE([INTERNAL_BLAS], [1], [Define to 1 if you use the internal BLAS library])
 fi
@@ -246,6 +255,7 @@ if test "$internal_lapack" = "no"; then
            AC_CHECK_LIB([lapack], [DLARNV], [],
 	      [AC_MSG_RESULT(not found, trying to use -llapack anyway.)]))))
   LDFLAGS="${LDFLAGS} -llapack"
+  PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -llapack"
 else
   AC_DEFINE([INTERNAL_LAPACK], [1], [Define to 1 if you use the internal LAPACK library])
 fi
@@ -260,30 +270,37 @@ if test "$internal_arpack" = "no"; then
            AC_CHECK_LIB([arpack], [DSAUPD], [],
 	      [AC_MSG_RESULT(not found, trying to use -larpack anyway.)]))))
   LDFLAGS="${LDFLAGS} -larpack"
+  PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -larpack"
 else
   AC_DEFINE([INTERNAL_ARPACK], [1], [Define to 1 if you use the internal ARPACK library])
 fi
 
 glpk_support=no
-if test "$internal_glpk" = "no"; then
-  AC_CHECK_LIB([glpk], [glp_read_mps], [
-    AC_CHECK_HEADER([glpk.h], [
-      AC_EGREP_CPP(yes, [
-        #include <glpk.h>
-        #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
-          yes
-        #endif
-      ], [
-        AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-        glpk_support=yes
-        LDFLAGS="${LDFLAGS} -lglpk"
+AC_ARG_ENABLE(glpk, AC_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
+if test "x$enable_glpk" != "xno"; then
+  if test "$internal_glpk" = "no"; then
+    AC_CHECK_LIB([glpk], [glp_read_mps], [
+      AC_CHECK_HEADER([glpk.h], [
+        AC_EGREP_CPP(yes, [
+          #include <glpk.h>
+          #if GLP_MAJOR_VERSION > 4 || (GLP_MAJOR_VERSION == 4 && GLP_MINOR_VERSION >= 38)
+            yes
+          #endif
+        ], [
+          AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+          glpk_support=yes
+          LDFLAGS="${LDFLAGS} -lglpk"
+          PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -lglpk"
+        ])
       ])
     ])
-  ])
+  else
+    AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
+    AC_DEFINE([INTERNAL_GLPK], [1], [Define to 1 if you use the internal GLPK library])
+    glpk_support=yes
+  fi
 else
-  AC_DEFINE([HAVE_GLPK], [1], [Define to 1 if you have the GLPK library])
-  AC_DEFINE([INTERNAL_GLPK], [1], [Define to 1 if you use the internal GLPK library])
-  glpk_support=yes
+  internal_glpk=no
 fi
 
 AM_CONDITIONAL(INTERNAL_GLPK, test x$internal_glpk = xyes)
@@ -316,6 +333,8 @@ AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
 AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
 AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])
 AC_MSG_RESULT([  Use internal F2C       -- $internal_f2c])
-AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
+if test "$glpk_support" != "no"; then
+  AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
+fi
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])

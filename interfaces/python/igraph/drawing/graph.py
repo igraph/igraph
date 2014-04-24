@@ -25,11 +25,11 @@ from igraph.drawing.baseclasses import AbstractDrawer, AbstractCairoDrawer, \
                                        AbstractXMLRPCDrawer
 from igraph.drawing.colors import color_to_html_format, color_name_to_rgb
 from igraph.drawing.edge import ArrowEdgeDrawer
-from igraph.drawing.text import TextDrawer
-from igraph.drawing.metamagic import AttributeCollectorBase, \
-                                     AttributeSpecification
-from igraph.drawing.shapes import ShapeDrawerDirectory, PolygonDrawer
+from igraph.drawing.text import TextAlignment, TextDrawer
+from igraph.drawing.metamagic import AttributeCollectorBase
+from igraph.drawing.shapes import PolygonDrawer
 from igraph.drawing.utils import Point
+from igraph.drawing.vertex import DefaultVertexDrawer
 from igraph.layout import Layout
 
 __all__ = ["DefaultGraphDrawer", "UbiGraphDrawer", "CytoscapeGraphDrawer"]
@@ -123,6 +123,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
     this drawer."""
 
     def __init__(self, context, bbox, \
+                 vertex_drawer_factory = DefaultVertexDrawer,
                  edge_drawer_factory = ArrowEdgeDrawer,
                  label_drawer_factory = TextDrawer):
         """Constructs the graph drawer and associates it to the given
@@ -133,20 +134,88 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                         Can be anything accepted by the constructor
                         of L{BoundingBox} (i.e., a 2-tuple, a 4-tuple
                         or a L{BoundingBox} object).
+        @param vertex_drawer_factory: a factory method that returns an
+                        L{AbstractCairoVertexDrawer} instance bound to a
+                        given Cairo context. The factory method must take
+                        three parameters: the Cairo context, the bounding
+                        box of the drawing area and the palette to be
+                        used for drawing colored vertices. The default
+                        vertex drawer is L{DefaultVertexDrawer}.
         @param edge_drawer_factory: a factory method that returns an
                         L{AbstractEdgeDrawer} instance bound to a
-                        given Cairo context. You can use any of the
-                        actual L{AbstractEdgeDrawer} implementations
-                        here to control the style of edges drawn by
-                        igraph. The default edge drawer is
+                        given Cairo context. The factory method must take
+                        two parameters: the Cairo context and the palette
+                        to be used for drawing colored edges. You can use
+                        any of the actual L{AbstractEdgeDrawer}
+                        implementations here to control the style of
+                        edges drawn by igraph. The default edge drawer is
                         L{ArrowEdgeDrawer}.
         @param label_drawer_factory: a factory method that returns a
                         L{TextDrawer} instance bound to a given Cairo
-                        context. The default label drawer is L{TextDrawer}.
+                        context. The method must take one parameter: the
+                        Cairo context. The default label drawer is
+                        L{TextDrawer}.
         """
         AbstractCairoGraphDrawer.__init__(self, context, bbox)
+        self.vertex_drawer_factory = vertex_drawer_factory
         self.edge_drawer_factory = edge_drawer_factory
         self.label_drawer_factory = label_drawer_factory
+
+    def _determine_edge_order(self, graph, kwds):
+        """Returns the order in which the edge of the given graph have to be
+        drawn, assuming that the relevant keyword arguments (C{edge_order} and
+        C{edge_order_by}) are given in C{kwds} as a dictionary. If neither
+        C{edge_order} nor C{edge_order_by} is present in C{kwds}, this
+        function returns C{None} to indicate that the graph drawer is free to
+        choose the most convenient edge ordering."""
+        if "edge_order" in kwds:
+            # Edge order specified explicitly
+            return kwds["edge_order"]
+
+        if kwds.get("edge_order_by") is None:
+            # No edge order specified
+            return None
+
+        # Order edges by the value of some attribute
+        edge_order_by = kwds["edge_order_by"]
+        reverse = False
+        if isinstance(edge_order_by, tuple):
+            edge_order_by, reverse = edge_order_by
+            if isinstance(reverse, basestring):
+                reverse = reverse.lower().startswith("desc")
+        attrs = graph.es[edge_order_by]
+        edge_order = sorted(range(len(attrs)), key=attrs.__getitem__,
+                reverse=bool(reverse))
+
+        return edge_order
+
+    def _determine_vertex_order(self, graph, kwds):
+        """Returns the order in which the vertices of the given graph have to be
+        drawn, assuming that the relevant keyword arguments (C{vertex_order} and
+        C{vertex_order_by}) are given in C{kwds} as a dictionary. If neither
+        C{vertex_order} nor C{vertex_order_by} is present in C{kwds}, this
+        function returns C{None} to indicate that the graph drawer is free to
+        choose the most convenient vertex ordering."""
+        if "vertex_order" in kwds:
+            # Vertex order specified explicitly
+            return kwds["vertex_order"]
+
+        if kwds.get("vertex_order_by") is None:
+            # No vertex order specified
+            return None
+
+        # Order vertices by the value of some attribute
+        vertex_order_by = kwds["vertex_order_by"]
+        reverse = False
+        if isinstance(vertex_order_by, tuple):
+            vertex_order_by, reverse = vertex_order_by
+            if isinstance(reverse, basestring):
+                reverse = reverse.lower().startswith("desc")
+        attrs = graph.vs[vertex_order_by]
+        vertex_order = sorted(range(len(attrs)), key=attrs.__getitem__,
+                reverse=bool(reverse))
+
+        return vertex_order
 
     # pylint: disable-msg=W0142,W0221,E1101
     # W0142: Used * or ** magic
@@ -168,11 +237,10 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             margin = [margin]
         while len(margin)<4:
             margin.extend(margin)
-        # margin = [x + 20. for x in margin[:4]]
 
         # Contract the drawing area by the margin and fit the layout
         bbox = self.bbox.contract(margin)
-        layout.fit_into(bbox, keep_aspect_ratio=False)
+        layout.fit_into(bbox, keep_aspect_ratio=kwds.get("keep_aspect_ratio", False))
 
         # Decide whether we need to calculate the curvature of edges
         # automatically -- and calculate them if needed.
@@ -187,33 +255,19 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             default = float(default)
             kwds["edge_curved"] = autocurve(graph, attribute=None, default=default)
 
-        # Construct the visual vertex/edge builders
-        class VisualVertexBuilder(AttributeCollectorBase):
-            """Collects some visual properties of a vertex for drawing"""
-            _kwds_prefix = "vertex_"
-            color = ("red", palette.get)
-            frame_color = ("black", palette.get)
-            frame_width = 1.0
-            label = None
-            label_angle = -pi/2
-            label_dist  = 0.0
-            label_color = ("black", palette.get)
-            label_size  = 14.0
-            position = dict(func=layout.__getitem__)
-            shape = ("circle", ShapeDrawerDirectory.resolve_default)
-            size  = 20.0
+        # Construct the vertex, edge and label drawers
+        vertex_drawer = self.vertex_drawer_factory(context, bbox, palette, layout)
+        edge_drawer = self.edge_drawer_factory(context, palette)
+        label_drawer = self.label_drawer_factory(context)
 
-        class VisualEdgeBuilder(AttributeCollectorBase):
-            """Collects some visual properties of an edge for drawing"""
-            _kwds_prefix = "edge_"
-            arrow_size  = 1.0
-            arrow_width = 1.0
-            color       = ("#444", palette.get)
-            curved      = (0.0, ArrowEdgeDrawer._curvature_to_float)
-            width       = 1.0
+        # Construct the visual vertex/edge builders based on the specifications
+        # provided by the vertex_drawer and the edge_drawer
+        vertex_builder = vertex_drawer.VisualVertexBuilder(graph.vs, kwds)
+        edge_builder = edge_drawer.VisualEdgeBuilder(graph.es, kwds)
 
-        vertex_builder = VisualVertexBuilder(graph.vs, kwds)
-        edge_builder = VisualEdgeBuilder(graph.es, kwds)
+        # Determine the order in which we will draw the vertices and edges
+        vertex_order = self._determine_vertex_order(graph, kwds)
+        edge_order   = self._determine_edge_order(graph, kwds)
 
         # Draw the highlighted groups (if any)
         if "mark_groups" in kwds:
@@ -275,69 +329,52 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 context.set_source_rgba(*color)
                 context.stroke()
 
+        # Construct the iterator that we will use to draw the edges
+        es = graph.es
+        if edge_order is None:
+            # Default edge order
+            edge_coord_iter = izip(es, edge_builder)
+        else:
+            # Specified edge order
+            edge_coord_iter = ((es[i], edge_builder[i]) for i in edge_order)
+
         # Draw the edges
-        edge_drawer = self.edge_drawer_factory(context)
         if directed:
             drawer_method = edge_drawer.draw_directed_edge
         else:
             drawer_method = edge_drawer.draw_undirected_edge
-        for edge, visual_edge in izip(graph.es, edge_builder):
+        for edge, visual_edge in edge_coord_iter:
             src, dest = edge.tuple
             src_vertex, dest_vertex = vertex_builder[src], vertex_builder[dest]
             drawer_method(visual_edge, src_vertex, dest_vertex)
 
-        # Calculate the desired vertex order
-        if "vertex_order" in kwds:
-            # Vertex order specified explicitly
-            vertex_order = kwds["vertex_order"]
-        elif kwds.get("vertex_order_by") is not None:
-            # Vertex order by another attribute
-            vertex_order_by = kwds["vertex_order_by"]
-            if isinstance(vertex_order_by, tuple):
-                vertex_order_by, reverse = vertex_order_by
-                if isinstance(reverse, basestring) and reverse.lower().startswith("asc"):
-                    reverse = False
-                else:
-                    reverse = bool(reversed)
-            else:
-                reverse = False
-            attrs = graph.vs[vertex_order_by]
-            vertex_order = sorted(range(graph.vcount()), key=attrs.__getitem__,
-                    reverse=reverse)
-            del attrs
-        else:
-            # Default vertex order
-            vertex_order = None
-
+        # Construct the iterator that we will use to draw the vertices
+        vs = graph.vs
         if vertex_order is None:
             # Default vertex order
-            vertex_coord_iter = izip(vertex_builder, layout)
+            vertex_coord_iter = izip(vs, vertex_builder, layout)
         else:
             # Specified vertex order
-            vertex_coord_iter = ((vertex_builder[i], layout[i])
+            vertex_coord_iter = ((vs[i], vertex_builder[i], layout[i])
                     for i in vertex_order)
 
         # Draw the vertices
+        drawer_method = vertex_drawer.draw
         context.set_line_width(1)
-        for vertex, coords in vertex_coord_iter:
-            vertex.shape.draw_path(context, \
-                    coords[0], coords[1], vertex.size)
-            context.set_source_rgba(*vertex.color)
-            context.fill_preserve()
-            context.set_source_rgba(*vertex.frame_color)
-            context.set_line_width(vertex.frame_width)
-            context.stroke()
+        for vertex, visual_vertex, coords in vertex_coord_iter:
+            drawer_method(visual_vertex, vertex, coords)
 
-        # Draw the vertex labels
+        # Set the font we will use to draw the labels
         context.select_font_face("sans-serif", cairo.FONT_SLANT_NORMAL, \
             cairo.FONT_WEIGHT_NORMAL)
 
-        wrap = kwds.get("wrap_labels", None)
+        # Decide whether the labels have to be wrapped
+        wrap = kwds.get("wrap_labels")
         if wrap is None:
             wrap = Configuration.instance()["plotting.wrap_labels"]
-        else:
-            wrap = bool(wrap)
+        wrap = bool(wrap)
 
+        # Construct the iterator that we will use to draw the vertex labels
         if vertex_order is None:
             # Default vertex order
             vertex_coord_iter = izip(vertex_builder, layout)
@@ -346,7 +383,7 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
             vertex_coord_iter = ((vertex_builder[i], layout[i])
                     for i in vertex_order)
 
-        label_drawer = self.label_drawer_factory(context)
+        # Draw the vertex labels
         for vertex, coords in vertex_coord_iter:
             if vertex.label is None:
                 continue
@@ -408,6 +445,53 @@ class DefaultGraphDrawer(AbstractCairoGraphDrawer):
                 label_drawer.bbox = (cx - half_size, cy - half_size,
                                      cx + half_size, cy + half_size)
                 label_drawer.draw(wrap=wrap)
+
+        # Construct the iterator that we will use to draw the edge labels
+        es = graph.es
+        if edge_order is None:
+            # Default edge order
+            edge_coord_iter = izip(es, edge_builder)
+        else:
+            # Specified edge order
+            edge_coord_iter = ((es[i], edge_builder[i]) for i in edge_order)
+
+        # Draw the edge labels
+        for edge, visual_edge in edge_coord_iter:
+            if visual_edge.label is None:
+                continue
+
+            # Set the font size, color and text
+            context.set_font_size(visual_edge.label_size)
+            context.set_source_rgba(*visual_edge.label_color)
+            label_drawer.text = visual_edge.label
+
+            # Ask the edge drawer to propose an anchor point for the label
+            src, dest = edge.tuple
+            src_vertex, dest_vertex = vertex_builder[src], vertex_builder[dest]
+            (x, y), (halign, valign) = \
+                    edge_drawer.get_label_position(edge, src_vertex, dest_vertex)
+
+            # Measure the text
+            _, yb, w, h, _, _ = label_drawer.text_extents()
+            w /= 2.0
+            h /= 2.0
+
+            # Place the text relative to the edge
+            if halign == TextAlignment.RIGHT:
+                x -= w
+            elif halign == TextAlignment.LEFT:
+                x += w
+            if valign == TextAlignment.BOTTOM:
+                y -= h - yb / 2.0
+            elif valign == TextAlignment.TOP:
+                y += h
+
+            # Draw the edge label
+            label_drawer.halign = halign
+            label_drawer.valign = valign
+            label_drawer.bbox = (x-w, y-h, x+w, y+h)
+            label_drawer.draw(wrap=wrap)
+
 
 #####################################################################
 

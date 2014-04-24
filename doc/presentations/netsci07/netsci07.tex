@@ -4,16 +4,12 @@
 \usepackage{multicol}
 \usepackage{url}
 \usepackage{ragged2e}
-\usepackage{psfrag}
 \usepackage{watermark}
 \usepackage{fancyvrb}
 \usepackage{amstext}
 
 \newcommand{\figfigure}[2]{%
-  \begin{psfrags}
-  \input #2.eps_t
   \includegraphics[width=#1]{#2}
-  \end{psfrags}
 }
 
 \setlength{\columnseprule}{.5pt}

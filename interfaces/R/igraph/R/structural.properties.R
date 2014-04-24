@@ -188,7 +188,8 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
 get.shortest.paths <- function(graph, from, to=V(graph),
                                mode=c("out", "all", "in"),
                                weights=NULL,
-                               output=c("vpath", "epath", "both")) {
+                               output=c("vpath", "epath", "both"),
+                               predecessors=FALSE, inbound.edges=FALSE) {
 
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -213,15 +214,24 @@ get.shortest.paths <- function(graph, from, to=V(graph),
   to <- as.igraph.vs(graph, to)-1
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_shortest_paths", graph,
-               as.igraph.vs(graph, from)-1, to, as.numeric(mode), as.numeric(length(to)),
-               weights, as.numeric(output), PACKAGE="igraph")
+               as.igraph.vs(graph, from)-1, to, as.numeric(mode),
+               as.numeric(length(to)), weights, as.numeric(output),
+               as.logical(predecessors), as.logical(inbound.edges), 
+               PACKAGE="igraph")
 
-  if (output !=2 ) {
-    res <- lapply(res, function(x) x+1)
-  } else {
-    res <- list(vpath=lapply(res$vpath, function(x) x+1),
-                epath=lapply(res$epath, function(x) x+1))
+  if (!is.null(res$vpath)) {
+    res$vpath <- lapply(res$vpath, function(x) x+1)
   }
+  if (!is.null(res$epath)) {
+    res$epath <- lapply(res$epath, function(x) x+1)
+  }
+  if (!is.null(res$predecessors)) {
+    res$predecessors <- res$predecessors + 1
+  }
+  if (!is.null(res$inbound_edges)) {
+    res$inbound_edges <- res$inbound_edges + 1
+  }
+
   res
 }
 
@@ -307,7 +317,11 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
                PACKAGE="igraph")
   if (normalized) {
     vc <- vcount(graph)
-    res <- 2*res / ( vc*vc-3*vc+2)
+    if (is.directed(graph) && directed) {
+      res <- res / ( vc*vc-3*vc+2)
+    } else {
+      res <- 2*res / ( vc*vc-3*vc+2)
+    }
   }
   if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
     names(res) <- V(graph)$name[v]
@@ -575,10 +589,10 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
   d <- get.adjacency(graph, sparse=TRUE)
 
   ## sparse identity matrix
-  id <- Diagonal(vg)
+  id <- Matrix::Diagonal(vg)
 
   ## solve it
-  ev <- solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
+  ev <- Matrix::solve(id - exponent * d, degree(graph, mode="out"), tol=tol)
 
   if (rescale) {
     ev <- ev/sum(ev)
@@ -678,11 +692,11 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
   } 
   
   el <- get.edgelist(graph, names=FALSE)
-  M <- sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
+  M <- Matrix::sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
   M <- as(M, "dgCMatrix")
   
   ## Create an identity matrix
-  M2 <- sparseMatrix(dims=c(vc, vc), i=1:vc, j=1:vc, x=rep(1, vc))
+  M2 <- Matrix::sparseMatrix(dims=c(vc, vc), i=1:vc, j=1:vc, x=rep(1, vc))
   M2 <- as(M2, "dgCMatrix")
 
   ## exo
@@ -690,7 +704,7 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
 
   ## Solve the equation
   M3 <- M2-alpha*M
-  r <- solve(M3, tol=tol, exo)
+  r <- Matrix::solve(M3, tol=tol, exo)
   
   r[ as.numeric(nodes)]
 }
@@ -859,8 +873,8 @@ graph.bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
     root <- as.igraph.vs(graph, root)-1
     roots <- NULL    
   } else {
-    root <- as.igraph.vs(graph, 0)      # ignored anyway
-    roots <- as.igraph.vs(graph, root)
+    roots <- as.igraph.vs(graph, root)-1
+    root <- 0      # ignored anyway
   }
   neimode <- switch(igraph.match.arg(neimode),
                     "out"=1, "in"=2, "all"=3, "total"=3)
@@ -999,12 +1013,12 @@ closeness <- function(graph, vids=V(graph),
   } else { 
   weights <- NULL 
   }
+  normalized <- as.logical(normalized)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
   res <- .Call("R_igraph_closeness", graph, vids-1, mode, weights,
-               PACKAGE="igraph")
-  if (!normalized) { res <- res / (vcount(graph)-1) }
+               normalized, PACKAGE="igraph")
   if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
     names(res) <- V(graph)$name[vids]
   }

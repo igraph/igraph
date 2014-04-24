@@ -47,7 +47,7 @@ karate
 
   Graph attributes: \sQuote{name}, \sQuote{Citation}, \sQuote{Author}.
 
-  Vertex attribute: \sQuote{Faction}.
+  Vertex attributes: \sQuote{name}, \sQuote{Faction}.
 
   Edge attribute: \sQuote{weight}.
 }

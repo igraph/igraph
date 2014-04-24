@@ -58,11 +58,12 @@ if [ ! -f ${FATLIB} ]; then
 fi
 
 # Ensure that we are really linking to a fat binary and that it refers
-# to libxml2
+# to libxml2 and libz
 check_universal ${FATLIB}
 LIBS=$(get_dependent_libraries ${FATLIB})
 check_library_paths ${FATLIB} "${LIBS}"
 check_mandatory_library_linkage ${FATLIB} "${LIBS}" /usr/lib/libxml2.2.dylib
+check_mandatory_library_linkage ${FATLIB} "${LIBS}" /usr/lib/libz.1.dylib
 
 # Clean up the previous build directory
 rm -rf build/
@@ -72,8 +73,9 @@ export ARCHFLAGS="-arch i386 -arch x86_64"
 
 # For each Python version, build the .mpkg and the .dmg
 for PYVER in $PYTHON_VERSIONS; do
-  python$PYVER setup.py build_ext --no-pkg-config -I ../../include:../../build/include -L `dirname $FATLIB` || exit 3
-  python$PYVER setup.py bdist_mpkg --no-pkg-config || exit 4
+  PYTHON=/usr/bin/python$PYVER
+  $PYTHON setup.py build_ext --no-download --no-pkg-config -I ../../include:../../build/include -L `dirname $FATLIB` || exit 3
+  $PYTHON setup.py bdist_mpkg --no-download --no-pkg-config || exit 4
 
   # Ensure that the built library is really universal
   LIB=build/lib.macosx-*-${PYVER}/igraph/_igraph.so
@@ -82,13 +84,13 @@ for PYVER in $PYTHON_VERSIONS; do
   check_library_paths ${LIB} "${DEPS}"
   check_mandatory_library_linkage ${LIB} "${DEPS}" /usr/local/lib/libigraph.0.dylib
 
-  MPKG="dist/python_igraph-${VERSION}-py${PYVER}-macosx10.5.mpkg"
-  if [ ! -f $MPKG ]; then
-    MPKG="dist/python_igraph-${VERSION}-py${PYVER}-macosx10.6.mpkg"
-    if [ ! -f $MPKG ]; then
-      MPKG="dist/python_igraph-${VERSION}-py${PYVER}-macosx10.7.mpkg"
+  for MACVER in 10.5 10.6 10.7 10.8; do
+    MPKG="dist/python_igraph-${VERSION}-py${PYVER}-macosx${MACVER}.mpkg"
+    if [ -f $MPKG ]; then
+	  break
     fi
-  fi
+  done
+
   DMG=dist/`basename $MPKG .mpkg`.dmg
   rm -f ${DMG}
   hdiutil create -volname "python-igraph ${VERSION}" -layout NONE -srcfolder $MPKG $DMG

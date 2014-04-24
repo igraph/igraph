@@ -7,7 +7,9 @@
 
 /* AMD will be exceedingly slow when running in debug mode. */
 #if 1
+#ifndef NDEBUG
 #define NDEBUG
+#endif
 #endif
 
 #include "amd.h"
@@ -18,7 +20,9 @@
 #define ID "%d"
 #define Int_MAX INT_MAX
 
+#ifndef SIZE_T_MAX
 #define SIZE_T_MAX ((size_t)(-1))
+#endif
 
 #define EMPTY (-1)
 #define FLIP(i) (-(i)-2)

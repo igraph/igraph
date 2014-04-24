@@ -138,19 +138,19 @@ CONNECTEDNESS:
     IN: %C%=REAL(%I%)[0];
 
 NEIMODE:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_neimode_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_neimode_t) REAL(%I%)[0];
 
 INOUTMODE:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_neimode_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_neimode_t) REAL(%I%)[0];
 
 TOUNDIRECTED:
-  CTYPE: igraph_integer_t 
+  CTYPE: igraph_to_undirected_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_to_undirected_t) REAL(%I%)[0];
 
 BLISSSH:
   CTYPE: igraph_bliss_sh_t
@@ -243,6 +243,20 @@ VECTOR_LONG:
          igraph_vector_long_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
+VECTOR_INT:
+  CTYPE: igraph_vector_int_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_vector_int(%I%, &%C%);
+    OUT: if (0 != igraph_vector_int_init(&%C%, 0)) { \
+             igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(igraph_vector_int_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vector_int_to_SEXP(&%C%)); \
+         igraph_vector_int_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
 VECTOR_LONG_M1:
   CTYPE: igraph_vector_long_t
   CALL: &%C%
@@ -275,6 +289,7 @@ VERTEXSETLIST:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%
   INCONV:
+    IN:  if (!isNull(%I%)) { R_igraph_SEXP_to_vectorlist(%I%, &%C%); }
     OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
          } \
@@ -299,15 +314,32 @@ EDGESETLIST:
 
 VECTORLIST_OR_0:
   CTYPE: igraph_vector_ptr_t
-  CALL: &%C%
+  CALL: (isNull(%I%) ? 0 : &%C%)
   INCONV:
-    OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+    IN:  if (!isNull(%I%)) { R_SEXP_to_vectorlist(%I%, &%C%); }
+    OUT: %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */ \
+         if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
          } \
          IGRAPH_FINALLY(R_igraph_vectorlist_destroy, &%C%);
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP(&%C%)); \
          R_igraph_vectorlist_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+VECTORLIST_INT_OR_0:
+  CTYPE: igraph_vector_ptr_t
+  CALL: (isNull(%I%) ? 0 : &%C%)
+  INCONV:
+    IN:  if (!isNull(%I%)) { R_SEXP_to_vectorlist_int(%I%, &%C%); }
+    OUT: %I%=NEW_NUMERIC(0); /* hack to have a non-NULL value */ \
+         if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(R_igraph_vectorlist_int_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_vectorlist_int_to_SEXP(&%C%)); \
+         R_igraph_vectorlist_int_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
 
 VERTEXSETLIST_OR_0:
@@ -581,7 +613,7 @@ ARRAY3_OR_0:
 VERTEX:
   CTYPE: igraph_integer_t
   INCONV: 
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_integer_t) REAL(%I%)[0];
 
 ##################################
 # Some vertices/edges of a graph
@@ -697,17 +729,17 @@ EDGE_COLOR:
 # Community comparison methods
 
 COMMCMP:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_community_comparison_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_community_comparison_t) REAL(%I%)[0];
 
 ##################################
 # Subgraph implementations
 
 SUBGRAPH_IMPL:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_subgraph_implementation_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_subgraph_implementation_t) REAL(%I%)[0];
 
 ##################################
 # Specification on what to do with the attributes
@@ -717,12 +749,16 @@ VERTEX_ATTRIBUTE_COMBINATION:
   CALL: &%C%
   INCONV:
     IN: R_SEXP_to_attr_comb(%I%, &%C%);
+  OUTCONV:
+    IN: igraph_attribute_combination_destroy(&%C%);
 
 EDGE_ATTRIBUTE_COMBINATION:
   CTYPE: igraph_attribute_combination_t
   CALL: &%C%
   INCONV:
     IN: R_SEXP_to_attr_comb(%I%, &%C%);
+  OUTCONV:
+    IN: igraph_attribute_combination_destroy(&%C%);
 
 HRG:
   CTYPE: igraph_hrg_t
@@ -751,19 +787,19 @@ RECIP:
     IN: %C%=REAL(%I%)[0];
 
 SCGMAT:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_scg_matrix_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_matrix_t) REAL(%I%)[0];
 
 SCGALGO:
-  CTYPE: igraph_integer_t
+  CTYPE: igraph_scg_algorithm_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_algorithm_t) REAL(%I%)[0];
 
 SCGNORM:
-  CTYPE: igraph_integer_t 
+  CTYPE: igraph_scg_norm_t
   INCONV:
-    IN: %C%=REAL(%I%)[0];
+    IN: %C%=(igraph_scg_norm_t) REAL(%I%)[0];
 
 SCGDIR:
   CTYPE: igraph_integer_t
@@ -779,6 +815,17 @@ SPARSEMAT:
            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
          } \
          IGRAPH_FINALLY(igraph_sparsemat_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_sparsemat_to_SEXP(&%C%)); \
+         igraph_sparsemat_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+SPARSEMATPTR:
+  CTYPE: igraph_sparsemat_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_sparsemat(%I%, &%C%);
+    OUT: /* Don't need to init. */
   OUTCONV:
     OUT: PROTECT(%I%=R_igraph_sparsemat_to_SEXP(&%C%)); \
          igraph_sparsemat_destroy(&%C%); \
@@ -917,3 +964,62 @@ PLFIT:
   CALL: &%C%
   OUTCONV: 
     OUT: PROTECT(%I%=R_igraph_plfit_result_to_SEXP(&%C%));
+
+MAXFLOW_STATS:
+  HEADER:
+  CTYPE: igraph_maxflow_stats_t
+  CALL: &%C%
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_maxflow_stats_to_SEXP(&%C%));
+
+EIGENALGO:
+  CTYPE: igraph_integer_t
+  INCONV:
+    IN: %C%=REAL(%I%)[0];
+
+EIGENWHICH:
+  CTYPE: igraph_eigen_which_t
+  CALL: &%C%
+  INCONV:
+    IN: R_SEXP_to_igraph_eigen_which(%I%, &%C%);
+
+SIRLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
+           igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
+         } \
+         IGRAPH_FINALLY(R_igraph_sirlist_destroy, &%C%);
+  OUTCONV:
+    OUT: PROTECT(%I%=R_igraph_sirlist_to_SEXP(&%C%)); \
+         R_igraph_sirlist_destroy(&%C%); \
+         IGRAPH_FINALLY_CLEAN(1);
+
+PAGERANKALGO:
+  CTYPE: igraph_pagerank_algo_t
+  INCONV:
+    IN: %C%=(igraph_pagerank_algo_t) INTEGER(%I%)[0];
+
+PAGERANKOPT:
+  CTYPE: igraph_pagerank_power_options_t %C%1; \
+         igraph_arpack_options_t %C%2; \
+         void*
+  INCONV:
+    INOUT: if (%C1% == IGRAPH_PAGERANK_ALGO_POWER) {          \
+             R_SEXP_to_pagerank_power_options(%I%, &%C%1);    \
+             %C% = &%C%1;                                     \
+           } else if (%C1% == IGRAPH_PAGERANK_ALGO_ARPACK) {  \
+             R_SEXP_to_igraph_arpack_options(%I%, &%C%2);     \
+             %C% = &%C%2;	                              \
+           } else {                                           \
+             %C% = 0;                                         \
+           }
+  OUTCONV:
+    INOUT: if (%C1% == IGRAPH_PAGERANK_ALGO_POWER) {                \
+             PROTECT(%I%);                                          \
+           } else if (%C1% == IGRAPH_PAGERANK_ALGO_ARPACK) {        \
+             PROTECT(%I% = R_igraph_arpack_options_to_SEXP(&%C%2)); \
+           } else {                                                 \
+             PROTECT(%I%);                                          \
+           }

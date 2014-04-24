@@ -1,0 +1,108 @@
+---
+layout: pynewstemp
+title: igraph 0.7
+date: 3013-11-13
+category: python
+---
+
+igraph 0.7
+==========
+
+November XX, 2013
+
+Release Notes
+-------------
+
+There are a bunch of new features in the library itself, and 
+other important changes in the life of the project. Thanks everyone
+for sending code and reporting bugs!
+
+### igraph @ github
+
+igraph's development has moved from Launchpad to github. 
+This has actually happened several month ago, but never 
+announced officially. The place for reporting bugs is 
+at https://github.com/igraph/igraph/issues.
+
+### New homepage
+
+igraph's homepage is now hosted at http://igraph.org, and it is 
+brand new. We wanted to make it easier to use and modern.
+
+<!--more-->
+
+### Better nightly downloads
+
+You can download nightly builds from igraph at 
+http://igraph.org/nightly. Source and binary R packages (for windows
+and OSX), C library bundles, and Python source packages are 
+built currently. We are planning to add binary Python packages
+soon.
+
+Other news and fixes
+--------------------
+
+- Support edge weights in leading eigenvector community detection.
+- Added the LAD library for checking (sub)graph isomorphism, version 1.
+- Support incidence matrices in bipartite Pajek files.
+- Added `Graph.layout_bipartite()` function, a simple two-column layout
+  for bipartite graphs.
+- Pajek files in matrix format are now directed by default, unless they
+  are bipartite.
+- Support weighted (and signed) networks in Pajek when file is in
+  matrix format.
+- Fixed a bug in `Barabasi()`, algorithm psumtree-multiple 
+  just froze.
+- Added support for Boolean attributes in the GraphML and GML readers
+  and writer.
+- Added support for Boolean attributes
+- Change MDS layout coordinates, first dim is according to first
+  eigenvalue, etc.
+- Add `Graph.st_mincut()` method, to find a minimal s-t cut in a graph.
+- Added support for the source= and target= parameters in `Graph.mincut()`.
+- `Graph.rewire()`: now supports the generation and destruction of loops.
+- Erdos-Renyi type bipartite random graphs: `Graph.Random_Bipartite()`.
+- Python: moved igraph.nexus to igraph.remote.nexus
+- Fix modularity values of multilevel community if there are no merges
+  at all.
+- Added keep_aspect_ratio option to `Graph.__plot__()`.
+- Fixed a potential crash in `igraph_edge_connectivity()`, because of an
+  un-initialized variable in the C code.
+- VertexSeq and EdgeSeq can now be indexed with NumPy integers
+- Avoiding overflow in `Graph.closeness()` and related functions.
+- Show plots inline in IPython.
+- Fixed an invalid memory read (and a potential crash) in the infomap
+  community detection.
+- Fix a bug in triad census that set the first element of the result
+  to NaN.
+- Fixed a bug in weighted mudularity calculation, sum of the weights
+  was truncated to an integer.
+- Fixed a bug in weighted multilevel communtiies, the maximum weight
+  was rounded to an integer.
+- Reimplement push-relabel maximum flow with gap heuristics.
+- Fixed invalid return value of `RunningMean.__length__()`.
+- Fixed missing whitespace in Pajek writer when the ID attribute was
+  numeric.
+- Fixed a bug that caused the GML reader to crash when the ID
+  attribute was non-numeric.
+- Added Vertex.graph and Edge.graph attributes.
+- Fix dyad census instability, sometimes incorrect results were
+  reported.
+- Dyad census detects integer overflow now and gives a warning.
+- Added a Gomory-Hu tree implementation: `Graph.gomory_hu_tree()`.
+- sorted out return type inconsistency for `Vertex.constraint()`,
+  closes #259.
+- Added weights support for `Graph.community_optimal_modularity()`,
+  closes #511.
+- Faster maximal clique finding.
+- Fixed a bug in `Graph.isomorphic_vf2()`, edge colors were ignored.
+- Added rudimentary support for drawing edge labels.
+- Generate graphs from a stochastic block model: `Graph.SBM()`.
+- We use PRPACK to calculate PageRank scores
+  see https://github.com/dgleich/prpack
+- Implement the `start` argument in `igraph_hrg_fit` (#225).
+- Fixed a bug in graph density that resulted in incorrect values for
+  undirected graphs with loops.
+- Fixed a bug that made Bellman-Ford shortest paths calculations fail.
+- Fixed a minimum cut bug for weighted undirected graphs (#564).
+- Fixed argument ordering in minimum cut and related functions.

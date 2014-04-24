@@ -18,7 +18,8 @@ shortest.paths(graph, v=V(graph), to=V(graph),
                                     "dijkstra", "bellman-ford",
                                     "johnson"))
 get.shortest.paths(graph, from, to=V(graph), mode = c("out", "all",
-      "in"), weights = NULL, output=c("vpath", "epath", "both"))
+      "in"), weights = NULL, output=c("vpath", "epath", "both"),
+      predecessors = FALSE, inbound.edges = FALSE)
 get.all.shortest.paths(graph, from, to = V(graph), mode = c("out", 
       "all", "in"), weights=NULL) 
 average.path.length(graph, directed=TRUE, unconnected=TRUE)
@@ -64,6 +65,20 @@ path.length.hist (graph, directed = TRUE)
     0.6. \dQuote{epath} means that the edges along the paths are
     reported. \dQuote{both} means that both forms are returned, in a
     named list with components \dQuote{vpath} and \dQuote{epath}.}
+  \item{predecessors}{Logical scalar, whether to return the predecessor
+    vertex for each vertex. The predecessor of vertex \code{i} in the
+    tree is the vertex from which vertex \code{i} was reached. The
+    predecessor of the start vertex (in the \code{from} argument) is
+    itself by definition. If the predecessor is zero, it means that the
+    given vertex was not reached from the source during the search. Note
+    that the search terminates if all the vertices in \code{to} are
+    reached.}
+  \item{inbound.edges}{Logical scalar, whether to return the inbound
+    edge for each vertex. The inbound edge of vertex \code{i} in the tree
+    is the edge via which vertex \code{i} was reached. The start vertex
+    and vertices that were not reached during the search will have zero
+    in the corresponding entry of the vector. Note that the search
+    terminates if all the vertices in \code{to} are reached.}
   \item{directed}{Whether to consider directed paths in directed graphs,
     this argument is ignored for undirected graphs.}
   \item{unconnected}{What to do if the graph is unconnected (not
@@ -125,23 +140,26 @@ path.length.hist (graph, directed = TRUE)
   columns and \code{length(v)} rows. The shortest path length from a vertex to
   itself is always zero. For unreachable vertices \code{Inf} is included.
 
-  For \code{get.shortest.paths} the return value depends on the
-  \code{output} parameter. If this is \dQuote{vpath}, then a list of length
-  \code{vcount(graph)} is returned.
-  List element \code{i} contains the vertex ids on
-  the path from vertex \code{from} to vertex \code{i} (or the other way
-  for directed graphs depending on the \code{mode} argument). The vector
-  also contains \code{from} and \code{i} as the first and last
-  elements. If \code{from} is the same as \code{i} then it is only
-  included once. If there is no path between two vertices then a
-  numeric vector of length zero is returned as the list element.
-
-  If \code{output} is \dQuote{epath}, then a similar list is returned,
-  but the vectors in the list contain the edge ids along the shortest
-  paths, instead of the vertex ids.
-
-  If \code{output} is \dQuote{both}, then both lists are returned, in a
-  named list with entries named as \dQuote{vpath} and \dQuote{epath}.
+  For \code{get.shortest.paths} a named list with four entries is
+  returned:
+  \item{vpath}{This itself is a list, of length \code{length(to)};
+    list element \code{i} contains the vertex ids on
+    the path from vertex \code{from} to vertex \code{to[i]} (or the other way
+    for directed graphs depending on the \code{mode} argument). The vector
+    also contains \code{from} and \code{i} as the first and last
+    elements. If \code{from} is the same as \code{i} then it is only
+    included once. If there is no path between two vertices then a
+    numeric vector of length zero is returned as the list element. If
+    this output is not requested in the \code{output} argument, then it
+    will be \code{NULL}.}
+  \item{epath}{This is a list similar to \code{vpath}, but the vectors
+    of the list contain the edge ids along the shortest paths, instead
+    of the vertex ids. This entry is set to \code{NULL} if it is not
+    requested in the \code{output} argument.}
+  \item{predecessors}{Numeric vector, the predecessor of each vertex in the
+  \code{to} argument, or \code{NULL} if it was not requested.}
+  \item{inbound_edges}{Numeric vector, the inbound edge for each vertex,
+    or \code{NULL}, if it was not requested.}
   
   For \code{get.all.shortest.paths} a list is returned, each list
   element contains a shortest path from \code{from} to a vertex in

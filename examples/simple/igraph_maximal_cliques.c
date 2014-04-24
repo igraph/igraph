@@ -39,8 +39,31 @@ int permutation(igraph_vector_t *vec) {
   return 0;
 }
 
+int sort_cmp(const void *a, const void *b) {
+  const igraph_vector_t **da = (const igraph_vector_t **) a;
+  const igraph_vector_t **db = (const igraph_vector_t **) b;
+  int i, alen=igraph_vector_size(*da), blen=igraph_vector_size(*db);
+  if (alen != blen) { return (alen < blen) - (alen > blen); }
+  for (i=0; i<alen; i++) {
+    int ea=VECTOR(**da)[i], eb=VECTOR(**db)[i];
+    if (ea != eb) { return (ea > eb) - (ea < eb); }
+  }
+  return 0;
+}
+
+void sort_cliques(igraph_vector_ptr_t *cliques) {
+  int i, n=igraph_vector_ptr_size(cliques);
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(*cliques)[i];
+    igraph_vector_sort(v);
+  }
+  igraph_qsort(VECTOR(*cliques), (size_t) n,
+	       sizeof(igraph_vector_t *), sort_cmp);
+}
+
 void print_and_destroy_cliques(igraph_vector_ptr_t *cliques) {
   int i;
+  sort_cliques(cliques);
   for (i=0; i<igraph_vector_ptr_size(cliques); i++) {
     igraph_vector_t *v=VECTOR(*cliques)[i];
     igraph_vector_print(v);
@@ -54,6 +77,7 @@ int main() {
   igraph_t g, g2, cli;
   igraph_vector_t perm;
   igraph_vector_ptr_t cliques;
+  igraph_integer_t no;
   int i;
 
   igraph_rng_seed(igraph_rng_default(), 42);
@@ -74,7 +98,7 @@ int main() {
     g=g2;
     
     /* Add a clique */
-    igraph_union(&g2, &g, &cli);
+    igraph_union(&g2, &g, &cli, /*edge_map1=*/ 0, /*edge_map2=*/ 0);
     igraph_destroy(&g);
     g=g2;
   }
@@ -88,6 +112,10 @@ int main() {
   igraph_vector_ptr_init(&cliques, 0);
   igraph_maximal_cliques(&g, &cliques, /*min_size=*/ 3,
        /*max_size=*/ 0 /*no limit*/);
+  igraph_maximal_cliques_count(&g, &no, /*min_size=*/ 3, 
+       /*max_size=*/ 0 /*no limit*/);
+
+  if (no != igraph_vector_ptr_size(&cliques)) { return 1; }
   
   /* Print and destroy them */
 
@@ -107,6 +135,10 @@ int main() {
   igraph_vector_ptr_init(&cliques, 0);
   igraph_maximal_cliques(&g, &cliques, /*min_size=*/ 3,
     /*max_size=*/ 0 /*no limit*/);
+  igraph_maximal_cliques_count(&g, &no, /*min_size=*/ 3, 
+       /*max_size=*/ 0 /*no limit*/);
+
+  if (no != igraph_vector_ptr_size(&cliques)) { return 2; }
 
   /* Print and destroy them */
 

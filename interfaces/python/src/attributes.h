@@ -67,6 +67,16 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
 					const char *name,
 					igraph_es_t es,
 					igraph_strvector_t *value);
+int igraphmodule_i_get_boolean_graph_attr(const igraph_t *graph,
+					  const char *name, igraph_vector_bool_t *value);
+int igraphmodule_i_get_boolean_vertex_attr(const igraph_t *graph,
+					   const char *name,
+					   igraph_vs_t vs,
+					   igraph_vector_bool_t *value);
+int igraphmodule_i_get_boolean_edge_attr(const igraph_t *graph,
+					 const char *name,
+					 igraph_es_t es,
+					 igraph_vector_bool_t *value);
 
 void igraphmodule_initialize_attribute_handler(void);
 void igraphmodule_index_vertex_names(igraph_t *graph, igraph_bool_t force);

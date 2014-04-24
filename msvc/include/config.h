@@ -52,9 +52,6 @@
 /* Define to 1 if you have the `log2' function. */
 /* #undef HAVE_LOG2 */
 
-/* Define to 1 if you have the `logbl' function. */
-/* #undef HAVE_LOGBL */
-
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 

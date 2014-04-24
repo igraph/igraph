@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Graphlets">
+<title>Graphlets</title>
+
+<section>
+<!-- doxrox-include graphlets_intro -->
+</section>
+
+<section><title>Performing graphlet decomposition</title>
+<!-- doxrox-include igraph_graphlets -->
+<!-- doxrox-include igraph_graphlets_candidate_basis -->
+<!-- doxrox-include igraph_graphlets_project -->
+</section>
+
+</chapter>

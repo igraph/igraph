@@ -1,0 +1,20 @@
+python-igraph (0.6-3) unstable; urgency=low
+
+  * Added python-docutils to build dependencies.
+  * Removed PDF documentation from python-igraph-doc.
+  * Not running unittests during build because some stochastic test
+    cases fail on i386.
+
+ -- Tamas Nepusz <ntamas@gmail.com>  Wed, 27 Jun 2012 22:33:00 +0200
+
+python-igraph (0.6-2) unstable; urgency=low
+
+  * Added pkg-config to build dependencies.
+
+ -- Tamas Nepusz <ntamas@gmail.com>  Wed, 27 Jun 2012 22:21:00 +0200
+
+python-igraph (0.6-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Tamas Nepusz <ntamas@gmail.com>  Tue, 26 Jun 2012 19:17:00 +0200

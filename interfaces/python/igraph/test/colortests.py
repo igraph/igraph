@@ -4,7 +4,7 @@ from itertools import izip
 from igraph import *
 
 class ColorTests(unittest.TestCase):
-    def assertAlmostEqualsMany(self, items1, items2, eps):
+    def assertAlmostEqualMany(self, items1, items2, eps):
         for idx, (item1, item2) in enumerate(izip(items1, items2)):
             self.assertAlmostEqual(item1, item2, places=eps,
                     msg="mismatch at index %d, %r != %r with %d digits"
@@ -36,7 +36,7 @@ class ColorTests(unittest.TestCase):
         for data in self.data:
             vals1 = [data.get(arg, 0.0) for arg in args1]
             vals2 = [data.get(arg, 0.0) for arg in args2]
-            self.assertAlmostEqualsMany(method(*vals1), vals2, 2)
+            self.assertAlmostEqualMany(method(*vals1), vals2, 2)
 
     def testHSVtoRGB(self):
         self._testGeneric(hsv_to_rgb, "h s_hsv v".split())
@@ -66,22 +66,22 @@ class ColorTests(unittest.TestCase):
 class PaletteTests(unittest.TestCase):
     def testGradientPalette(self):
         gp = GradientPalette("red", "blue", 3)
-        self.failUnless(gp.get(0) == (1., 0., 0., 1.))
-        self.failUnless(gp.get(1) == (0.5, 0., 0.5, 1.))
-        self.failUnless(gp.get(2) == (0., 0., 1., 1.))
+        self.assertTrue(gp.get(0) == (1., 0., 0., 1.))
+        self.assertTrue(gp.get(1) == (0.5, 0., 0.5, 1.))
+        self.assertTrue(gp.get(2) == (0., 0., 1., 1.))
 
     def testAdvancedGradientPalette(self):
         agp = AdvancedGradientPalette(["red", "black", "blue"], n=9)
-        self.failUnless(agp.get(0) == (1., 0., 0., 1.))
-        self.failUnless(agp.get(2) == (0.5, 0., 0., 1.))
-        self.failUnless(agp.get(4) == (0., 0., 0., 1.))
-        self.failUnless(agp.get(5) == (0., 0., 0.25, 1.))
-        self.failUnless(agp.get(8) == (0., 0., 1., 1.))
+        self.assertTrue(agp.get(0) == (1., 0., 0., 1.))
+        self.assertTrue(agp.get(2) == (0.5, 0., 0., 1.))
+        self.assertTrue(agp.get(4) == (0., 0., 0., 1.))
+        self.assertTrue(agp.get(5) == (0., 0., 0.25, 1.))
+        self.assertTrue(agp.get(8) == (0., 0., 1., 1.))
 
         agp = AdvancedGradientPalette(["red", "black", "blue"], [0, 8, 2], 9)
-        self.failUnless(agp.get(0) == (1., 0., 0., 1.))
-        self.failUnless(agp.get(1) == (0.5, 0., 0.5, 1.))
-        self.failUnless(agp.get(5) == (0., 0., 0.5, 1.))
+        self.assertTrue(agp.get(0) == (1., 0., 0., 1.))
+        self.assertTrue(agp.get(1) == (0.5, 0., 0.5, 1.))
+        self.assertTrue(agp.get(5) == (0., 0., 0.5, 1.))
 
 
 def suite():

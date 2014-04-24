@@ -26,7 +26,6 @@
 #include "convert.h"
 #include "error.h"
 #include "graphobject.h"
-#include "py2compat.h"
 #include "vertexobject.h"
 
 /**
@@ -35,6 +34,17 @@
  */
 
 PyTypeObject igraphmodule_VertexType;
+
+/**
+ * \ingroup python_interface_vertex
+ * \brief Checks whether the given Python object is a vertex
+ */
+int igraphmodule_Vertex_Check(PyObject* obj) {
+  if (!obj)
+    return 0;
+  
+  return PyObject_IsInstance(obj, (PyObject*)(&igraphmodule_VertexType));
+}
 
 /**
  * \ingroup python_interface_vertex
@@ -56,6 +66,7 @@ PyObject* igraphmodule_Vertex_New(igraphmodule_GraphObject *gref, igraph_integer
     Py_INCREF(gref);
     self->gref=gref;
     self->idx=idx;
+    self->hash=-1;
   }
   return (PyObject*)self;
 }
@@ -121,6 +132,82 @@ PyObject* igraphmodule_Vertex_repr(igraphmodule_VertexObject *self) {
   Py_DECREF(drepr);
 #endif
   return s;
+}
+
+/** \ingroup python_interface_vertex
+ * \brief Returns the hash code of the vertex
+ */
+Py_hash_t igraphmodule_Vertex_hash(igraphmodule_VertexObject* self) {
+  Py_hash_t hash_graph;
+  Py_hash_t hash_index;
+  Py_hash_t result;
+  PyObject* index_o;
+
+  if (self->hash != -1)
+    return self->hash;
+
+  index_o = PyInt_FromLong((long int)self->idx);
+  if (index_o == 0)
+    return -1;
+
+  hash_index = PyObject_Hash(index_o);
+  Py_DECREF(index_o);
+
+  if (hash_index == -1)
+    return -1;
+
+  hash_graph = PyObject_Hash((PyObject*)self->gref);
+  if (hash_graph == -1)
+    return -1;
+
+  result = hash_graph ^ hash_index;
+  if (result == -1)
+    result = 590923713U;
+
+  self->hash = result;
+
+  return result;
+}
+
+/** \ingroup python_interface_vertex
+ * \brief Rich comparison of a vertex with another
+ */
+PyObject* igraphmodule_Vertex_richcompare(igraphmodule_VertexObject *a,
+    PyObject *b, int op) {
+
+  igraphmodule_VertexObject* self = a;
+  igraphmodule_VertexObject* other;
+
+  if (!igraphmodule_Vertex_Check(b))
+    Py_RETURN_NOTIMPLEMENTED;
+
+  other = (igraphmodule_VertexObject*)b;
+
+  if (self->gref != other->gref)
+    Py_RETURN_FALSE;
+
+  switch (op) {
+    case Py_EQ:
+      Py_RETURN(self->idx == other->idx);
+
+    case Py_NE:
+      Py_RETURN(self->idx != other->idx);
+
+    case Py_LE:
+      Py_RETURN(self->idx <= other->idx);
+
+    case Py_LT:
+      Py_RETURN(self->idx <  other->idx);
+
+    case Py_GE:
+      Py_RETURN(self->idx >= other->idx);
+
+    case Py_GT:
+      Py_RETURN(self->idx >  other->idx);
+
+    default:
+      Py_RETURN_NOTIMPLEMENTED;
+  }
 }
 
 /** \ingroup python_interface_vertex
@@ -623,7 +710,7 @@ PyTypeObject igraphmodule_VertexType =
   0,                                          /* tp_as_number */
   0,                                          /* tp_as_sequence */
   &igraphmodule_Vertex_as_mapping,            /* tp_as_mapping */
-  0,                                          /* tp_hash */
+  (hashfunc)igraphmodule_Vertex_hash,         /* tp_hash */
   0,                                          /* tp_call */
   0,                                          /* tp_str */
   0,                                          /* tp_getattro */
@@ -641,7 +728,7 @@ PyTypeObject igraphmodule_VertexType =
   "  red\n", /* tp_doc */
   0,                                          /* tp_traverse */
   0,                                          /* tp_clear */
-  0,                                          /* tp_richcompare */
+  (richcmpfunc)igraphmodule_Vertex_richcompare, /* tp_richcompare */
   0,                                          /* tp_weaklistoffset */
   0,                                          /* tp_iter */
   0,                                          /* tp_iternext */

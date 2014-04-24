@@ -89,7 +89,7 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
   if (igraph_vector_size(edges)>0) {
     igraph_integer_t vc=igraph_vcount(graph);
     if (vc < max) {
-      IGRAPH_CHECK(igraph_add_vertices(graph, max-vc, 0));
+      IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) (max-vc), 0));
     }
     IGRAPH_CHECK(igraph_add_edges(graph, edges, 0));
   }
@@ -98,6 +98,17 @@ int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
   return 0;
 }
 
+int igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, 
+				igraph_vector_t *edges);
+int igraph_i_adjacency_max(igraph_matrix_t *adjmatrix, 
+			   igraph_vector_t *edges);
+int igraph_i_adjacency_upper(igraph_matrix_t *adjmatrix, 
+			     igraph_vector_t *edges);
+int igraph_i_adjacency_lower(igraph_matrix_t *adjmatrix, 
+			     igraph_vector_t *edges);
+int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, 
+			   igraph_vector_t *edges);
+
 int igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
   
   long int no_of_nodes=igraph_matrix_nrow(adjmatrix);
@@ -105,7 +116,7 @@ int igraph_i_adjacency_directed(igraph_matrix_t *adjmatrix, igraph_vector_t *edg
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=0; j<no_of_nodes; j++) {
-      long int M=MATRIX(*adjmatrix, i, j);
+      long int M=(long int) MATRIX(*adjmatrix, i, j);
       for (k=0; k<M; k++) {
 	IGRAPH_CHECK(igraph_vector_push_back(edges, i));
 	IGRAPH_CHECK(igraph_vector_push_back(edges, j));
@@ -123,8 +134,8 @@ int igraph_i_adjacency_max(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=i; j<no_of_nodes; j++) {
-      long int M1=MATRIX(*adjmatrix, i, j);
-      long int M2=MATRIX(*adjmatrix, j, i);
+      long int M1=(long int) MATRIX(*adjmatrix, i, j);
+      long int M2=(long int) MATRIX(*adjmatrix, j, i);
       if (M1<M2) { M1=M2; }
       for (k=0; k<M1; k++) {
 	IGRAPH_CHECK(igraph_vector_push_back(edges, i));
@@ -143,7 +154,7 @@ int igraph_i_adjacency_upper(igraph_matrix_t *adjmatrix, igraph_vector_t *edges)
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=i; j<no_of_nodes; j++) {
-      long int M=MATRIX(*adjmatrix, i, j);
+      long int M=(long int) MATRIX(*adjmatrix, i, j);
       for (k=0; k<M; k++) {
 	IGRAPH_CHECK(igraph_vector_push_back(edges, i));
 	IGRAPH_CHECK(igraph_vector_push_back(edges, j));
@@ -160,7 +171,7 @@ int igraph_i_adjacency_lower(igraph_matrix_t *adjmatrix, igraph_vector_t *edges)
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=0; j<=i; j++) {
-      long int M=MATRIX(*adjmatrix, i, j);
+      long int M=(long int) MATRIX(*adjmatrix, i, j);
       for (k=0; k<M; k++) {
 	IGRAPH_CHECK(igraph_vector_push_back(edges, i));
 	IGRAPH_CHECK(igraph_vector_push_back(edges, j));
@@ -177,8 +188,8 @@ int igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_vector_t *edges) {
   
   for (i=0; i<no_of_nodes; i++) {
     for (j=i; j<no_of_nodes; j++) {
-      long int M1=MATRIX(*adjmatrix, i, j);
-      long int M2=MATRIX(*adjmatrix, j, i);
+      long int M1=(long int) MATRIX(*adjmatrix, i, j);
+      long int M2=(long int) MATRIX(*adjmatrix, j, i);
       if (M1>M2) { M1=M2; }
       for (k=0; k<M1; k++) {
 	IGRAPH_CHECK(igraph_vector_push_back(edges, i));
@@ -286,13 +297,38 @@ int igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
     break;
   }
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 
+  IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes, 
 			     (mode == IGRAPH_ADJ_DIRECTED))); 
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
 }
+
+int igraph_i_weighted_adjacency_directed(const igraph_matrix_t *adjmatrix,
+					 igraph_vector_t *edges, 
+					 igraph_vector_t *weights, 
+					 igraph_bool_t loops);
+int igraph_i_weighted_adjacency_plus(const igraph_matrix_t *adjmatrix,
+				     igraph_vector_t *edges,
+				     igraph_vector_t *weights, 
+				     igraph_bool_t loops);
+int igraph_i_weighted_adjacency_max(const igraph_matrix_t *adjmatrix,
+				    igraph_vector_t *edges, 
+				    igraph_vector_t *weights, 
+				    igraph_bool_t loops);
+int igraph_i_weighted_adjacency_upper(const igraph_matrix_t *adjmatrix,
+				      igraph_vector_t *edges, 
+				      igraph_vector_t *weights,
+				      igraph_bool_t loops);
+int igraph_i_weighted_adjacency_lower(const igraph_matrix_t *adjmatrix,
+				      igraph_vector_t *edges, 
+				      igraph_vector_t *weights, 
+				      igraph_bool_t loops);
+int igraph_i_weighted_adjacency_min(const igraph_matrix_t *adjmatrix,
+				    igraph_vector_t *edges,
+				    igraph_vector_t *weights, 
+				    igraph_bool_t loops);
 
 int igraph_i_weighted_adjacency_directed(const igraph_matrix_t *adjmatrix,
 					 igraph_vector_t *edges, 
@@ -550,7 +586,8 @@ int igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
   VECTOR(attr_vec)[0] = &attr_rec;
 
   /* Create graph */
-  IGRAPH_CHECK(igraph_empty(graph, no_of_nodes, (mode == IGRAPH_ADJ_DIRECTED)));
+  IGRAPH_CHECK(igraph_empty(graph, (igraph_integer_t) no_of_nodes, 
+			    (mode == IGRAPH_ADJ_DIRECTED)));
   IGRAPH_FINALLY(igraph_destroy, graph);
   if (igraph_vector_size(&edges)>0) {
     IGRAPH_CHECK(igraph_add_edges(graph, &edges, &attr_vec));
@@ -707,7 +744,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
 		igraph_bool_t circular) {
 
   long int dims=igraph_vector_size(dimvector);
-  long int no_of_nodes=igraph_vector_prod(dimvector);
+  long int no_of_nodes=(long int) igraph_vector_prod(dimvector);
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
   long int *coords, *weights;
   long int i, j;
@@ -732,7 +769,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
   if (dims > 0) {
     weights[0]=1;
     for (i=1; i<dims; i++) {
-      weights[i]=weights[i-1]*VECTOR(*dimvector)[i-1];
+      weights[i]=weights[i-1] * (long int) VECTOR(*dimvector)[i-1];
     }
   }
   
@@ -748,7 +785,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
 	if (coords[j] != VECTOR(*dimvector)[j]-1) {
 	  new_nei = i + weights[j] + 1;
 	} else {
-	  new_nei = i - (VECTOR(*dimvector)[j]-1) * weights[j] + 1;
+	  new_nei = i - (long int) (VECTOR(*dimvector)[j]-1) * weights[j] + 1;
 	}
 	if (new_nei != i+1 && 
 	    (VECTOR(*dimvector)[j] != 2 || coords[j] != 1 || directed)) {
@@ -761,7 +798,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
 	if (coords[j]!=0) {
 	  new_nei=i-weights[j]+1;
 	} else {
-	  new_nei=i+(VECTOR(*dimvector)[j]-1) * weights[j]+1;
+	  new_nei=i + (long int) (VECTOR(*dimvector)[j]-1) * weights[j]+1;
 	}
 	if (new_nei != i+1 && 
 	    (VECTOR(*dimvector)[j] != 2 || !circular)) {
@@ -787,7 +824,8 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
     
   } /* for i<no_of_nodes */
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes, 
+			     directed));
   if (nei >= 2) {
     IGRAPH_CHECK(igraph_connect_neighborhood(graph, nei, IGRAPH_ALL));
   }
@@ -1176,7 +1214,7 @@ int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
   if (degree > 2) {
     for (i=0; i<nodes; i++) {
       for (j=0; j<degree-2; j++) {
-	long int offset=MATRIX(*W, j, mpos);
+	long int offset=(long int) MATRIX(*W, j, mpos);
 	if (i+offset < nodes) {
 	  VECTOR(edges)[epos++] = i;
 	  VECTOR(edges)[epos++] = i+offset;
@@ -1259,11 +1297,11 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
   
   for (i=0; i<no_of_nodes; i++) {
     added[i]=i+1;
-    igraph_neighbors(graph, &neis, i, mode);
+    igraph_neighbors(graph, &neis, (igraph_integer_t) i, mode);
     in=igraph_vector_size(&neis);
     if (order > 1) {
       for (j=0; j<in; j++) {
-	long int nei=VECTOR(neis)[j];
+	long int nei=(long int) VECTOR(neis)[j];
 	added[nei]=i+1;
 	igraph_dqueue_push(&q, nei);
 	igraph_dqueue_push(&q, 1);
@@ -1271,15 +1309,15 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
     }
     
     while (!igraph_dqueue_empty(&q)) {
-      long int actnode=igraph_dqueue_pop(&q);
-      long int actdist=igraph_dqueue_pop(&q);
+      long int actnode=(long int) igraph_dqueue_pop(&q);
+      long int actdist=(long int) igraph_dqueue_pop(&q);
       long int n;
-      igraph_neighbors(graph, &neis, actnode, mode);
+      igraph_neighbors(graph, &neis, (igraph_integer_t) actnode, mode);
       n=igraph_vector_size(&neis);
       
       if (actdist<order-1) {
 	for (j=0; j<n; j++) {
-	  long int nei=VECTOR(neis)[j];
+	  long int nei=(long int) VECTOR(neis)[j];
 	  if (added[nei] != i+1) {
 	    added[nei]=i+1;
 	    IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
@@ -1297,7 +1335,7 @@ int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
 	}
       } else { 
 	for (j=0; j<n; j++) {
-	  long int nei=VECTOR(neis)[j];
+	  long int nei=(long int) VECTOR(neis)[j];
 	  if (added[nei] != i+1) {
 	    added[nei]=i+1;
 	    if (mode != IGRAPH_ALL || i < nei) {
@@ -1381,7 +1419,7 @@ int igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
     return igraph_empty(graph, 0, IGRAPH_DIRECTED);
   }
   
-  no_of_nodes=pow(m, n);
+  no_of_nodes=(long int) pow(m, n);
   no_of_edges=no_of_nodes*m;
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -1395,7 +1433,8 @@ int igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
     }
   }
   
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
+  IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+			     IGRAPH_DIRECTED));
   
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
@@ -1446,7 +1485,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
   long int i, j, idx=0;
   igraph_vector_t edges;
   igraph_vector_long_t digits, table;
-  igraph_vector_long_t index, index2;
+  igraph_vector_long_t index1, index2;
   long int actb=0;
   long int actvalue=0;
   
@@ -1462,9 +1501,9 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
     return igraph_empty(graph, 0, IGRAPH_DIRECTED);
   }
   
-  no_of_nodes=(m+1)*pow(m, n);
+  no_of_nodes=(long int) ((m+1)*pow(m, n));
   no_of_edges=no_of_nodes*m;
-  allstrings=pow(m+1, n+1);
+  allstrings=(long int) pow(m+1, n+1);
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
   
@@ -1478,8 +1517,8 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
 
   IGRAPH_CHECK(igraph_vector_long_init(&digits, n+1));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &digits);
-  IGRAPH_CHECK(igraph_vector_long_init(&index, pow(m+1, n+1)));
-  IGRAPH_FINALLY(igraph_vector_long_destroy, &index);
+  IGRAPH_CHECK(igraph_vector_long_init(&index1, (long int) pow(m+1, n+1)));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &index1);
   IGRAPH_CHECK(igraph_vector_long_init(&index2, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &index2);  
 
@@ -1497,7 +1536,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
     actb=n;
 
     /* ok, we have a valid string now */
-    VECTOR(index)[actvalue]=idx+1;
+    VECTOR(index1)[actvalue]=idx+1;
     VECTOR(index2)[idx]=actvalue;
     idx++;
     
@@ -1533,7 +1572,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
       long int tovalue, to;
       if (j==lastdigit) { continue; }
       tovalue=basis+j;
-      to=VECTOR(index)[tovalue]-1;
+      to=VECTOR(index1)[tovalue]-1;
       if (to<0) { continue; }
       igraph_vector_push_back(&edges, i);
       igraph_vector_push_back(&edges, to);
@@ -1541,12 +1580,13 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
   }
 
   igraph_vector_long_destroy(&index2);
-  igraph_vector_long_destroy(&index);
+  igraph_vector_long_destroy(&index1);
   igraph_vector_long_destroy(&digits);
   igraph_vector_long_destroy(&table);
   IGRAPH_FINALLY_CLEAN(4);
 
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_DIRECTED));
+  IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes, 
+			     IGRAPH_DIRECTED));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
@@ -1595,7 +1635,7 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
   
   /* Then add the rest */
   while (ptr<2*no_of_edges) {
-    long int sh=VECTOR(*shifts)[sptr % no_of_shifts];
+    long int sh=(long int) VECTOR(*shifts)[sptr % no_of_shifts];
     long int from=sptr % no_of_nodes;
     long int to=(no_of_nodes+sptr+sh) % no_of_nodes;
     if (from < to) {
@@ -1605,7 +1645,8 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
     sptr++;
   }
   
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
+  IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes, 
+			     IGRAPH_UNDIRECTED));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
@@ -1657,7 +1698,7 @@ int igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
   if (igraph_vector_size(&shifts)==0) {
     repeats=0;
   } else {
-    repeats=igraph_vector_pop_back(&shifts);
+    repeats=(igraph_integer_t) igraph_vector_pop_back(&shifts);
   }
   
   IGRAPH_CHECK(igraph_lcf_vector(graph, n, &shifts, repeats));
@@ -1893,14 +1934,17 @@ const igraph_real_t igraph_i_famous_zachary[] = {
   32,33
 };
 
+int igraph_i_famous(igraph_t *graph, const igraph_real_t *data);
+
 int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
-  long int no_of_nodes=data[0];
-  long int no_of_edges=data[1];
-  igraph_bool_t directed=data[2];
+  long int no_of_nodes=(long int) data[0];
+  long int no_of_edges=(long int) data[1];
+  igraph_bool_t directed=(igraph_bool_t) data[2];
   igraph_vector_t edges;
   
   igraph_vector_view(&edges, data+3, 2*no_of_edges);
-  IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, directed));
+  IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+			     directed));
   return 0;  
 }
 
@@ -2184,7 +2228,7 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   duplicate = duplicate && (mode == IGRAPH_ALL); /* only duplicate if undirected */
   
   for (i=0; i<no_of_nodes; i++) {
-    no_of_edges += igraph_vector_size(igraph_adjlist_get(adjlist, i));
+    no_of_edges += igraph_vector_int_size(igraph_adjlist_get(adjlist, i));
   }
   
   if (duplicate) {
@@ -2194,12 +2238,12 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
   
   for (i=0; i<no_of_nodes; i++) {
-    igraph_vector_t *neis=igraph_adjlist_get(adjlist, i);
-    long int j, n=igraph_vector_size(neis);
+    igraph_vector_int_t *neis=igraph_adjlist_get(adjlist, i);
+    long int j, n=igraph_vector_int_size(neis);
     long int loops=0;
 
     for (j=0; j<n; j++) {
-      long int nei=VECTOR(*neis)[j];
+      long int nei=(long int) VECTOR(*neis)[j];
       if (nei==i) {
         loops++; 
       } else {
@@ -2231,9 +2275,11 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   }
 
   if (mode == IGRAPH_ALL)
-    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 0));
+    IGRAPH_CHECK(igraph_create(graph, &edges, 
+			       (igraph_integer_t) no_of_nodes, 0));
   else
-    IGRAPH_CHECK(igraph_create(graph, &edges, no_of_nodes, 1));
+    IGRAPH_CHECK(igraph_create(graph, &edges, 
+			       (igraph_integer_t) no_of_nodes, 1));
 
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);

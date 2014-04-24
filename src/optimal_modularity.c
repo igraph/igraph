@@ -28,6 +28,7 @@
 #include "igraph_error.h"
 #include "igraph_glpk_support.h"
 #include "igraph_interrupt_internal.h"
+#include "igraph_centrality.h"
 #include "config.h"
 
 #ifdef HAVE_GLPK
@@ -62,6 +63,8 @@
  * \param membership Pointer to a vector, or a null pointer. If not a
  *        null pointer, then the membership vector of the optimal
  *        community structure is stored here.
+ * \param weights Vector giving the weights of the edges. If it is
+ *        \c NULL then each edge is supposed to have the same weight.
  * \return Error code.
  * 
  * \sa \ref igraph_modularity(), \ref igraph_community_fastgreedy()
@@ -75,27 +78,47 @@
 int igraph_community_optimal_modularity(const igraph_t *graph,
 					igraph_real_t *modularity,
 					igraph_vector_t *membership,
-					igraph_bool_t verbose) {
+					const igraph_vector_t *weights) {
+
 #ifndef HAVE_GLPK
   IGRAPH_ERROR("GLPK is not available", 
 	       IGRAPH_UNIMPLEMENTED);    
 #else
 
-  long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  igraph_integer_t no_of_nodes=(igraph_integer_t) igraph_vcount(graph);
+  igraph_integer_t no_of_edges=(igraph_integer_t) igraph_ecount(graph);
   igraph_bool_t directed=igraph_is_directed(graph);
-  long int no_of_variables=no_of_nodes * (no_of_nodes+1)/2;
-  long int i, j, k, st;
+  int no_of_variables=no_of_nodes * (no_of_nodes+1)/2;
+  int i, j, k, l, st;
   int idx[] = { 0, 0, 0, 0 };
   double coef[] = { 0.0, 1.0, 1.0, -2.0 };
-
-  igraph_vector_t degree;
+  igraph_real_t total_weight;
+  igraph_vector_t indegree;
+  igraph_vector_t outdegree;
 
   glp_prob *ip;
   glp_iocp parm;
 
+  if (weights != 0) {
+    if (igraph_vector_size(weights) != no_of_edges) {
+      IGRAPH_ERROR("Invalid length of weight vector", IGRAPH_EINVAL);
+    }
+    if (igraph_vector_min(weights) < 0) {
+      IGRAPH_ERROR("Negative weights are not allowed in weight vector", IGRAPH_EINVAL);
+    }
+  }
+
+  if (weights) {
+    total_weight = igraph_vector_sum(weights);
+  } else {
+    total_weight = no_of_edges;
+  }
+  if (!directed) {
+    total_weight *= 2;
+  }
+
   /* Special case */
-  if (no_of_edges == 0) {
+  if (no_of_edges == 0 || total_weight == 0) {
     if (modularity) {
       *modularity=IGRAPH_NAN;
     }
@@ -105,9 +128,12 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     }
   }
   
-  IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
-  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
-			     IGRAPH_ALL, IGRAPH_LOOPS));
+  IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&outdegree, no_of_nodes);
+  IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(), 
+			     IGRAPH_IN, IGRAPH_LOOPS, weights));
+  IGRAPH_CHECK(igraph_strength(graph, &outdegree, igraph_vss_all(), 
+			     IGRAPH_OUT, IGRAPH_LOOPS, weights));
 
   glp_term_out(GLP_OFF);
   ip = glp_create_prob();
@@ -118,14 +144,14 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
 
   /* variables are binary */
   for (i=0; i<no_of_variables; i++) {
-    glp_set_col_kind(ip, st+i, GLP_BV);
+    glp_set_col_kind(ip, (st+i), GLP_BV);
   }
 
 #define IDX(a,b) ((b)*((b)+1)/2+(a))
 
   /* reflexivity */
   for (i=0; i<no_of_nodes; i++) {
-    glp_set_col_bnds(ip, st+IDX(i,i), GLP_FX, 1.0, 1.0);
+    glp_set_col_bnds(ip, (st+IDX(i,i)), GLP_FX, 1.0, 1.0);
   }
   
   /* transitivity */
@@ -135,10 +161,11 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
       IGRAPH_ALLOW_INTERRUPTION();
 
       for (k=j+1; k<no_of_nodes; k++) {
-	long int newrow=glp_add_rows(ip, 3);
+	int newrow=glp_add_rows(ip, 3);
 
 	glp_set_row_bnds(ip, newrow, GLP_UP, 0.0, 1.0);
-	idx[1]  = st+IDX(i,j); idx[2] = st+IDX(j,k); idx[3] = st+IDX(i,k);
+	idx[1] = (st+IDX(i,j)); idx[2] = (st+IDX(j,k)); 
+	idx[3] = (st+IDX(i,k));
 	glp_set_mat_row(ip, newrow, 3, idx, coef);
 
 	glp_set_row_bnds(ip, newrow+1, GLP_UP, 0.0, 1.0);
@@ -154,18 +181,33 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   }
 
   /* objective function */
-  for (i=0; i<no_of_nodes; i++) {
-    for (j=i; j<no_of_nodes; j++) {
-      igraph_real_t c=1.0/2.0/no_of_edges;
-      igraph_bool_t con;
-      igraph_real_t e;
-      igraph_are_connected(graph, i, j, &con);
-      if (!con && directed) { igraph_are_connected(graph, j, i, &con); }
-      e= con ? 1.0 : 0.0;
-			if (i == j) e *= 2;
-      c *= e-VECTOR(degree)[i]*VECTOR(degree)[j] / 2.0 / no_of_edges;
-      if (i != j) { c *= 2.0; }
-      glp_set_obj_coef(ip, st+IDX(i,j), c);
+  {
+    igraph_real_t c;
+
+    /* first part: -strength(i)*strength(j)/total_weight for every node pair */
+    for (i=0; i<no_of_nodes; i++) {
+      for (j=i+1; j<no_of_nodes; j++) {
+	c = -VECTOR(indegree)[i]*VECTOR(outdegree)[j] / total_weight \
+	    -VECTOR(outdegree)[i]*VECTOR(indegree)[j] / total_weight;
+	glp_set_obj_coef(ip, st+IDX(i,j), c);
+      }
+      /* special case for (i,i) */
+      c = -VECTOR(indegree)[i]*VECTOR(outdegree)[i] / total_weight;
+      glp_set_obj_coef(ip, st+IDX(i,i), c);
+    }
+
+    /* second part: add the weighted adjacency matrix to the coefficient matrix */
+    for (k=0; k<no_of_edges; k++) {
+      i = IGRAPH_FROM(graph, k);
+      j = IGRAPH_TO(graph, k);
+      if (i > j) {
+	l = i; i = j; j = l;
+      }
+      c = weights ? VECTOR(*weights)[k] : 1.0;
+      if (!directed || i == j) {
+	c *= 2.0;
+      }
+      glp_set_obj_coef(ip, st+IDX(i,j), c + glp_get_obj_coef(ip, st+IDX(i,j)));
     }
   }
 
@@ -180,7 +222,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   
   /* store the results */
   if (modularity) {
-    *modularity=glp_mip_obj_val(ip);
+    *modularity = glp_mip_obj_val(ip) / total_weight;
   }
   
   if (membership) {
@@ -191,7 +233,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
       IGRAPH_ALLOW_INTERRUPTION();
       
       for (j=0; j<i; j++) {
-	int val=glp_mip_col_val(ip, st+IDX(j,i));
+	int val=(int) glp_mip_col_val(ip, st+IDX(j,i));
 	if (val==1) {
 	  VECTOR(*membership)[i]=VECTOR(*membership)[j];
 	  break;
@@ -205,9 +247,10 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
   
 #undef IDX
 
-  igraph_vector_destroy(&degree);
+  igraph_vector_destroy(&indegree);
+  igraph_vector_destroy(&outdegree);
   glp_delete_prob(ip);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(3);
 
   return 0;
   

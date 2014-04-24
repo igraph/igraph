@@ -282,7 +282,7 @@ int* graph_molloy_opt::components(int *comp) {
   for(i=nb_comp-1; i>=0; i--) buff[i] = --box[buff[i]-offset];
   delete[] box;
   // reassign component indexes
-  for(int *c=comp+n; comp!=c--; *c=buff[*c-1]);
+  for(int *c=comp+n; comp!=c--; *c=buff[*c-1]) { }
   // clean.. at last!
   delete[] buff;
   return comp;
@@ -387,7 +387,7 @@ bool graph_molloy_opt::havelhakimi() {
 
 bool graph_molloy_opt::is_connected() {
   bool *visited = new bool[n];
-  for(int i=n; i>0; visited[--i]=false);
+  for(int i=n; i>0; visited[--i]=false) { }
   int *to_visit = new int[n];
   int *stop = to_visit;
   int left = n-1;
@@ -425,7 +425,7 @@ bool graph_molloy_opt::make_connected() {
   unsigned char * dist  = new unsigned char[n];
 #define NOT_VISITED 255
 #define FORBIDDEN   254
-  for(i=n; i>0; dist[--i]=NOT_VISITED);
+  for(i=n; i>0; dist[--i]=NOT_VISITED) { }
 
 // Data struct to store components : either surplus trees or surplus edges are stored at buff[]'s end
 // - A Tree is coded by one of its vertices
@@ -867,7 +867,7 @@ void graph_molloy_opt::add_traceroute_edge(int v, int k, int *newdeg, double **e
   }
   // if edge redudancy is asked, look for dual edge
   else if(edge_redudancy!=NULL)
-    for(int *ww = neigh[w]; *(ww++)!=v; k2++);
+    for(int *ww = neigh[w]; *(ww++)!=v; k2++) { }
   // add edge redudancy
   if(edge_redudancy!=NULL) {
     edge_redudancy[v][k]  += red;
@@ -927,7 +927,7 @@ void graph_molloy_opt::explore_usp(double *target, int nb_vertices, int *buff, d
       double f = 0.0;
       int father = -1;
       while(f<father_index) {
-        while(dist[father=ww[k++]]!=pd);
+        while(dist[father=ww[k++]]!=pd) { }
         f+=paths[father];
       }
       // increase target[] of father
@@ -1014,8 +1014,8 @@ double *graph_molloy_opt::vertex_betweenness(int mode, bool trivial_paths) {
   // init all
   int progress = 0;
   memset(dist,0,sizeof(unsigned char)*n); 
-  for(double *yo = target+n; (yo--)!=target; *yo=1.0);
-  for(double *yo = b+n; (yo--)!=b; *yo=0.0);
+  for(double *yo = target+n; (yo--)!=target; *yo=1.0) { }
+  for(double *yo = b+n; (yo--)!=b; *yo=0.0) { }
   
   int progress_steps = max(1000,n/10);
   // Main loop
@@ -1048,19 +1048,19 @@ double *graph_molloy_opt::vertex_betweenness(int mode, bool trivial_paths) {
       // cache optimization if all vertices are in component
       double *bb=b;
       double *tt_end=target+n;
-      if(trivial_paths) for(double *yo=target; yo!=tt_end; *(bb++)+=*(yo++));
+      if(trivial_paths) for(double *yo=target; yo!=tt_end; *(bb++)+=*(yo++)){}
       else { 
-	for(double *yo=target; yo!=tt_end; *(bb++)+=(*(yo++)-1.0));
+	for(double *yo=target; yo!=tt_end; *(bb++)+=(*(yo++)-1.0)) { }
 	b[*buff]-=(target[*buff]-1.0);
       }
-      for(double *yo = target; yo!=tt_end; *(yo++)=1.0);
+      for(double *yo = target; yo!=tt_end; *(yo++)=1.0) { }
     }
     else {
       if(trivial_paths) 
-        for(int *yo = buff+nb_vertices; (yo--)!=buff; b[*yo]+=target[*yo]);
+        for(int *yo = buff+nb_vertices; (yo--)!=buff; b[*yo]+=target[*yo]) { }
       else
-        for(int *yo = buff+nb_vertices; (--yo)!=buff; b[*yo]+=(target[*yo]-1.0));
-      for(int *yo = buff+nb_vertices; (yo--)!=buff; target[*yo]=1.0);
+        for(int *yo = buff+nb_vertices; (--yo)!=buff; b[*yo]+=(target[*yo]-1.0)) { }
+      for(int *yo = buff+nb_vertices; (yo--)!=buff; target[*yo]=1.0) { }
     }
   }
   // Clean all & return
@@ -1097,9 +1097,9 @@ double graph_molloy_opt::traceroute_sample(int mode, int nb_src, int *src, int n
   int i;
   memset(dist,0,sizeof(unsigned char)*n); 
   memset(newdeg,0,sizeof(int)*n); 
-  for(double *yo = target+n; (yo--)!=target; *yo=0.0);
+  for(double *yo = target+n; (yo--)!=target; *yo=0.0) { }
   if(redudancy!=NULL)
-    for(double *yo = redudancy+n; (yo--)!=redudancy; *yo=0.0);
+    for(double *yo = redudancy+n; (yo--)!=redudancy; *yo=0.0) { } 
 
   // src_0 counts the number of sources having degree 0
   int src_0 = 0;
@@ -1152,7 +1152,7 @@ double graph_molloy_opt::traceroute_sample(int mode, int nb_src, int *src, int n
     // add target[] to redudancy[] if needed
     if(redudancy!=NULL) for(i=1; i<nb_vertices; i++) redudancy[buff[i]]+=(target[buff[i]]);
     // clear target[]
-    for(int *yo = buff+nb_vertices; yo-- != buff; target[*yo]=0.0);
+    for(int *yo = buff+nb_vertices; yo-- != buff; target[*yo]=0.0) { }
   }
   // update degrees
   for(i=0; i<n; i++) deg[i]=newdeg[i];
@@ -1408,7 +1408,7 @@ int graph_molloy_opt::core() {
 
 int graph_molloy_opt::try_disconnect(int K, int max_tries) {
   bool *visited = new bool[n];
-  for(bool *p = visited+n; p!=visited; *(--p)=false);
+  for(bool *p = visited+n; p!=visited; *(--p)=false) { }
   int *Kbuff = new int[K];
   int tries = 0;
   int next_step = -1;
@@ -1490,7 +1490,7 @@ double graph_molloy_opt::rho(int mode, int nb_src, int *src, int nb_dst, int *ds
   int i;
   memset(dist,0,sizeof(unsigned char)*n); 
   memset(times_seen,0,sizeof(int)*n); 
-  for(double *yo = target+n; (yo--)!=target; *yo=0.0);
+  for(double *yo = target+n; (yo--)!=target; *yo=0.0) { }
 
   // src_0 counts the number of sources having degree 0
   int src_0 = 0;

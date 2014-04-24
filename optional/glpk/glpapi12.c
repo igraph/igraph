@@ -22,6 +22,11 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wlogical-op-parentheses"
+#pragma clang diagnostic ignored "-Wsometimes-uninitialized"
+#endif
+
 #include "glpapi.h"
 
 /***********************************************************************

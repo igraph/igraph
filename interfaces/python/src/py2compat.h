@@ -27,6 +27,14 @@
 
 #include <Python.h>
 
+/* Common utility functions */
+int PyFile_Close(PyObject* fileObj);
+
+/* Compatibility hacks */
+#ifndef Py_hash_t
+#  define Py_hash_t long
+#endif
+
 #if PY_MAJOR_VERSION >= 3
 
 /* Python 3.x-specific part follows here */
@@ -64,8 +72,9 @@ int PyString_IsEqualToUTF8String(PyObject* py_string,
 /* Python 2.x-specific part follows here */
 
 #define PyBaseString_Check(o) (PyString_Check(o) || PyUnicode_Check(o))
-#define PyString_IsEqualToASCIIString(pystr, cstr) \
-        (PyString_Check(pystr) && strcmp(PyString_AS_STRING(pystr), (cstr)) == 0)
+
+int PyString_IsEqualToASCIIString(PyObject* py_string,
+    const char* c_string);
 
 #ifndef Py_TYPE
 #  define Py_TYPE(o) ((o)->ob_type)

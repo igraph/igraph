@@ -207,7 +207,6 @@ int main() {
   int res;
   int i;
   igraph_vector_t weights;
-  igraph_integer_t is_weighted;
 
   igraph_vector_init_real(&weights, 5, 1.0, 2.0, 3.0, 4.0, 5.0);
 

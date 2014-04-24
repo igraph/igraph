@@ -34,7 +34,6 @@ int main() {
     igraph_t g;
     igraph_matrix_t merges;
     igraph_vector_t membership;
-    long int i, j;
     igraph_arpack_options_t options;
     double modularity;
     igraph_vector_t history;
@@ -48,8 +47,8 @@ int main() {
     igraph_vector_init(&history, 0);
     igraph_arpack_options_init(&options);
 
-    igraph_community_leading_eigenvector(&g, &merges, &membership,
-					 igraph_vcount(&g), 
+    igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges, 
+					 &membership, igraph_vcount(&g), 
 					 &options, &modularity,
 					 /*start=*/ 0, /*eigenvalues=*/ 0, 
 					 /*eigenvectors=*/ 0, &history,

@@ -214,7 +214,7 @@ layout.norm(layout, xmin = NULL, xmax = NULL, ymin = NULL, ymax = NULL,
   
   \code{layout.lgl} is for large connected graphs, it is similar to the
   layout generator of the Large Graph Layout software
-  (\url{http://bioinformatics.icmb.utexas.edu/lgl}). Parameters and
+  (\url{http://lgl.sourceforge.net/}). Parameters and
   default values:
   \describe{
     \item{maxiter}{The maximum number of iterations to perform (150).}

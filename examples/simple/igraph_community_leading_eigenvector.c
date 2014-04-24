@@ -50,10 +50,7 @@ int main() {
   igraph_t g;
   igraph_matrix_t merges;
   igraph_vector_t membership;
-  long int i, j;
-  igraph_bool_t split;
   igraph_vector_t x;
-  igraph_real_t val;
   igraph_arpack_options_t options;
   
   /* Zachary Karate club */
@@ -81,7 +78,8 @@ int main() {
   igraph_vector_init(&x, 0);
   igraph_arpack_options_init(&options);
 
-  igraph_community_leading_eigenvector(&g, &merges, &membership, 1, 
+  igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges, 
+				       &membership, 1, 
 				       &options, /*modularity=*/ 0, 
 				       /*start=*/ 0, /*eigenvalues=*/ 0, 
 				       /*eigenvectors=*/ 0, /*history=*/ 0,
@@ -94,8 +92,8 @@ int main() {
   printf("\n");
 
   /* Make all the steps */
-  igraph_community_leading_eigenvector(&g, &merges, &membership, 
-				       igraph_vcount(&g),
+  igraph_community_leading_eigenvector(&g, /*weights=*/ 0, &merges, 
+				       &membership, igraph_vcount(&g),
 				       &options, /*modularity=*/ 0, 
 				       /*start=*/ 0, /*eigenvalues=*/ 0,
 				       /*eigenvectors=*/ 0, /*history=*/ 0,

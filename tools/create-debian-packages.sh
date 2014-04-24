@@ -1,8 +1,9 @@
 #!/bin/bash
 
-DEST_DIR_ROOT=$HOME/packages
+PKG_BUILD_ROOT=$HOME/pkgbuild
+DEST_DIR_ROOT=${PKG_BUILD_ROOT}/packages
 CURR_DIR=`pwd`
-BZR_IGRAPH_ROOT=$HOME/bzr/igraph
+GIT_IGRAPH_ROOT=${PKG_BUILD_ROOT}/git/igraph
 
 SIGN=yes
 SIGNING_GPG_KEY=D6360653
@@ -11,11 +12,12 @@ SIGNING_GPG_KEY=D6360653
 
 
 if [ $# -ne 3 ]; then
-    echo "Usage: $0 igraph_version debian_revision series"
+    echo "Usage: $0 igraph_version debian_revision series git_branch"
 	echo "where igraph_version is the version number of igraph,"
-	echo "debian_revision is the Debian package revision number"
-	echo "and series is the distribution series (e.g., unstable,"
-	echo "karmic, jaunty etc)."
+	echo "debian_revision is the Debian package revision number,"
+	echo "series is the distribution series (e.g., unstable,"
+	echo "karmic, jaunty etc) and git_branch is the name of the git"
+	echo "branch from which the package will be built."
 	echo ""
 	echo "For the Launchpad PPA, you have to prepare a package"
 	echo "for the two most recent Ubuntu series"
@@ -25,6 +27,7 @@ fi
 IGRAPH_VERSION=$1
 DEBIAN_REVISION=$2
 SERIES=$3
+GIT_BRANCH=$4
 
 DEST_DIR=${DEST_DIR_ROOT}/${SERIES}
 
@@ -34,11 +37,9 @@ else
   SIGN_OPTIONS="-us -uc"
 fi
 
-BAZAAR_BRANCH=`echo $IGRAPH_VERSION | awk 'BEGIN { FS="."; OFS="." } ; { printf "%s.%s-main", $1, $2 }'`
-
 function prechecks {
-  if [ ! -d ${BZR_IGRAPH_ROOT} ]; then
-    echo ${BZR_IGRAPH_ROOT} does not exist or is not a directory!
+  if [ ! -d ${GIT_IGRAPH_ROOT} ]; then
+    echo ${GIT_IGRAPH_ROOT} does not exist or is not a directory!
     exit 1
   fi
 
@@ -62,9 +63,10 @@ function make_destdir {
   mkdir -p ${DEST_DIR}
 }
 
-function bazaar_update {
-  pushd ${BZR_IGRAPH_ROOT}/${BAZAAR_BRANCH}
-  bzr update
+function git_pull {
+  pushd ${GIT_IGRAPH_ROOT}/${GIT_BRANCH}
+  git pull
+  git checkout ${GIT_BRANCH}
   popd
 }
 
@@ -72,11 +74,11 @@ function create_igraph_debian_pkg {
   if [ -f ${CURR_DIR}/igraph_$1.orig.tar.gz ]; then
     cp ${CURR_DIR}/igraph_$1.orig.tar.gz .
   else
-    wget -O igraph_$1.orig.tar.gz http://switch.dl.sourceforge.net/sourceforge/igraph/igraph-$1.tar.gz
+    wget -O igraph_$1.orig.tar.gz http://files.igraph.org/c/igraph-$1.tar.gz
   fi
   tar -xvvzf igraph_$1.orig.tar.gz
   cd igraph-$1
-  cp -r ${BZR_IGRAPH_ROOT}/${BAZAAR_BRANCH}/debian .
+  cp -r ${GIT_IGRAPH_ROOT}/${GIT_BRANCH}/debian .
   cat debian/changelog | sed -e "s/unstable/${SERIES}/g" >debian/changelog.new
   mv debian/changelog.new debian/changelog
   debuild -S -sa ${SIGN_OPTIONS}
@@ -140,7 +142,7 @@ else
   SUDO=
 fi
 make_destdir
-bazaar_update
+git_pull
 create_igraph_debian_pkg ${IGRAPH_VERSION} ${DEBIAN_REVISION}
 install_igraph_debian_pkg ${IGRAPH_VERSION} ${DEBIAN_REVISION}
 compile_python_interface ${IGRAPH_VERSION} ${DEBIAN_REVISION}

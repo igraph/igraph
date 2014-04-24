@@ -200,8 +200,8 @@ inline int *pre_boxsort(int *mem, int n, int &offset) {
   // box
   int c = mx-mn+1;
   int *box = new int[c];
-  for(yo=box+c; yo!=box; *(--yo)=0);
-  for(yo=mem+n; yo!=mem; box[*(--yo)-mn]++);
+  for(yo=box+c; yo!=box; *(--yo)=0) { }
+  for(yo=mem+n; yo!=mem; box[*(--yo)-mn]++) { }
   // cumul sum
   int sum=0;
   for(yo=box+c; yo!=box; ) {

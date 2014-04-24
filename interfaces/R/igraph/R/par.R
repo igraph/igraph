@@ -32,7 +32,8 @@
                      "add.params"=TRUE,
                      "add.vertex.names"=TRUE,
                      "dend.plot.type"="auto",
-                     "print.full"=FALSE
+                     "print.full"=FALSE,
+                     "annotate.plot"=FALSE
                     )
 
 igraph.pars.set.verbose <- function(verbose) {

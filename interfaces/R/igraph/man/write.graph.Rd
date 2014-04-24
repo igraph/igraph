@@ -30,12 +30,24 @@ write.graph(graph, file, format=c("edgelist", "pajek", "ncol",
   The Pajek format is a text file, see \code{\link{read.graph}} for
   details. Appropriate vertex and edge attributes are also written to
   the file. This format has no additional arguments.
+
+  From version 0.6.1 igraph handles bipartite graphs when writing to
+  Pajek files. As Pajek is less flexible for bipartite graphs (the
+  numeric ids of the vertices must be sorted according to vertex type),
+  igraph might need to reorder the vertices when writing a bipartite
+  Pajek file. This effectively means that numeric vertex ids usually
+  change when a bipartite graph is written to a Pajek file, and then
+  read back into igraph.
 }
 \section{GraphML format}{
   The GraphML format is a flexible XML based format. See
   \code{\link{read.graph}} for GraphML details. Vertex and edge
-  attributes are also written to the file. This format has no additional
-  arguments.
+  attributes are also written to the file. Additional argument:
+  \describe{
+    \item{prefixAttr}{Logical scalar, whether you want to add a prefix
+      to the graph, vertex and edge attribute names, to ensure their
+      uniqueness. Defaults to \code{TRUE}.}
+  }
 }
 \section{Dot format}{
   The dot format is used by the popular GraphViz program. Vertex and

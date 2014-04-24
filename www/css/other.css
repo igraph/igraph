@@ -1,0 +1,274 @@
+/* Sticky footer, http://getbootstrap.com/examples/sticky-footer-navbar/ */
+
+html {
+  min-height: 100%
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body.r {
+  background-color: #ccccdd;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ccccdd), to(#ffffff));
+  background-image: -webkit-linear-gradient(top, #ccccdd, #ffffff);
+  background-image:    -moz-linear-gradient(top, #ccccdd, #ffffff);
+  background-image:      -o-linear-gradient(top, #ccccdd, #ffffff);
+  background-image:         linear-gradient(to bottom, #ccccdd, #ffffff);
+  background-attachment: fixed;
+}
+
+body.python {
+  background-color: #ccdddd;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#ccdddd), to(#ffffff));
+  background-image: -webkit-linear-gradient(top, #ccdddd, #ffffff);
+  background-image:    -moz-linear-gradient(top, #ccdddd, #ffffff);
+  background-image:      -o-linear-gradient(top, #ccdddd, #ffffff);
+  background-image:         linear-gradient(to bottom, #ccdddd, #ffffff);
+  background-attachment: fixed;
+}
+
+body.cc {
+  background-color: #bbbbbb;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#bbbbbb), to(#ffffff));
+  background-image: -webkit-linear-gradient(top, #bbbbbb, #ffffff);
+  background-image:    -moz-linear-gradient(top, #bbbbbb, #ffffff);
+  background-image:      -o-linear-gradient(top, #bbbbbb, #ffffff);
+  background-image:         linear-gradient(to bottom, #bbbbbb, #ffffff);
+  background-attachment: fixed;
+}
+
+body.start-page {
+  background: #3e648d;
+  background-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      color-stop(0, #3e648d),
+      color-stop(1, #405a6a)
+  );
+  background-image: -o-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -moz-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -webkit-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -ms-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: linear-gradient(to bottom, #3e648d 0%, #405a6a 100%);
+}
+
+#wrap {
+  min-height: 100%;
+  height: auto;
+  /* Negative indent footer by its height */
+  margin: 0 auto -30px;
+  /* Pad bottom by footer height */
+  padding: 0 0 30px;
+}
+
+/* Set the fixed height of the footer here */
+#footer {
+  padding-top: 5px;
+/*  background-color: #f5f5f5; */
+}
+
+#wrap > .bs-header-outer {
+  padding: 50px 0px 0;
+}
+
+.navbar-brand
+{
+    margin-right: 40px;
+}
+
+.navbar-brand img
+{
+    margin-right: 5px;
+}
+
+.gist {
+    line-height: 1.2;
+}
+
+@media(min-width:768px) {
+    .bs-docs-section {
+	font-size: 140%;
+    }
+    .bs-sidebar {
+	font-size: 120%;
+    }
+    .gist .gist-file .gist-data {
+	font-size: 80% !important;
+    }
+}
+
+code {
+    color: #87556e;
+}
+
+code.rpkg,
+code.rfun {
+    color: navy;
+}
+
+code.rfun:after {
+    content: "()";
+}
+
+/* Page headers */
+.bs-header {
+  padding: 20px 15px 20px; /* side padding builds on .container 15px, so 30px */
+  font-size: 16px;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0,0,0,.15);
+  color: white;
+  margin-bottom: 10px;
+  background: #3e648d;
+  background-image: -webkit-gradient(
+      linear,
+      left top,
+      left bottom,
+      color-stop(0, #3e648d),
+      color-stop(1, #405a6a)
+  );
+  background-image: -o-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -moz-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -webkit-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: -ms-linear-gradient(bottom, #3e648d 0%, #405a6a 100%);
+  background-image: linear-gradient(to bottom, #3e648d 0%, #405a6a 100%);
+}
+.bs-header p {
+  font-weight: 300;
+  line-height: 1.5;
+}
+.bs-header .container {
+  position: relative;
+}
+.bs-header p, .bs-header h1 {
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+@media (min-width: 768px) {
+  .bs-header {
+    font-size: 21px;
+    text-align: left;
+  }
+  .bs-header h1 {
+    font-size: 60px;
+    line-height: 1;
+  }
+}
+
+@media (min-width: 992px) {
+  .bs-header p {
+    margin-right: 380px;
+  }
+}
+
+.tooltip-inner {
+    font-size: medium;
+}
+
+#footer {
+    border-top: 1px solid;
+}
+
+.start-page, .start-page h1, .start-page h1 small {
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;
+}
+
+/* Masthead (headings and download button) */
+.bs-masthead {
+  position: relative;
+  padding: 80px 15px;
+  text-align: center;
+  text-shadow: 0 1px 0 rgba(0,0,0,.15);
+}
+.bs-masthead h1 {
+  font-size: 50px;
+  line-height: 1;
+}
+
+.bs-masthead .btn {
+  margin-bottom: 5px;
+  border: 1px solid;
+}
+
+.bs-masthead .btn:hover {
+  background: darkblue;
+  color: white;
+}
+
+@media (min-width: 768px) {
+  .bs-masthead {
+    text-align: left;
+    padding-top:    110px;
+    padding-bottom: 80px;
+  }
+  .bs-masthead h1 {
+    font-size: 70px;
+  }
+  .bs-masthead .lead {
+    margin-right: 25%;
+    font-size: 20px;
+  }
+  .bs-masthead .btn {
+    width: auto;
+    margin: 20px 5px 20px 0px;
+    padding: 18px 24px;
+    font-size: 21px;
+  }
+}
+
+@media (min-width: 992px) {
+  .bs-masthead {
+    text-align: left;
+    padding-top:    130px;
+    padding-bottom: 80px;
+  }
+  .bs-masthead h1 {
+    font-size: 100px;
+  }
+  .bs-masthead .lead {
+    margin-right: 25%;
+    font-size: 30px;
+  }
+  .bs-masthead .btn {
+    width: auto;
+    margin: 20px 5px 20px 0;
+    padding: 18px 24px;
+    font-size: 21px;
+  }
+}
+
+.bs-docs-container {
+    margin-bottom: 200px;
+}
+
+span.anchor { 
+  margin-top: -70px;        /* Size of fixed header */
+  padding-bottom: 70px;
+  height: 0px;
+  display: block;
+}
+
+.tr-first-in-group {
+    border-top: 2px solid;
+    border-color: lightgray;
+    padding-top: 10px;
+}
+
+/* To hide the empty python index */
+
+#indices-and-tables {
+    visibility: hidden;
+    display: none;
+}

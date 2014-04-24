@@ -170,7 +170,10 @@ unsigned long PottsModel::assign_initial_conf(int spin)
 //If I ever manage to write a decent LookUp function, it will be here
 //#####################################################################
 unsigned long PottsModel::initialize_lookup(double kT, double gamma)
-{ /*
+{
+  IGRAPH_UNUSED(kT); 
+  IGRAPH_UNUSED(gamma);
+  /*
   double beta;
   // the look-up table contains all entries of exp(-beta(-neighbours+gamma*h))
   // as needed in the HeatBath algorithm
@@ -930,6 +933,8 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
   long community_marker=5;
   long to_do_marker=10;
   double inner_links=0, outer_links=0, aff_r, aff_s;
+
+  IGRAPH_UNUSED(prob);
 
   to_do=new DLList<NNode*>;
   community=new DLList<NNode*>;
@@ -2041,6 +2046,8 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 				double gamma,
 				double lambda)
 {
+        IGRAPH_UNUSED(gamma);
+	IGRAPH_UNUSED(lambda);
 	#ifdef DEBUG
 	printf("Start writing clusters.\n");
 	#endif

@@ -14,6 +14,7 @@
 <section><title>Create two-mode networks</title>
 <!-- doxrox-include igraph_create_bipartite -->
 <!-- doxrox-include igraph_full_bipartite -->
+<!-- doxrox-include igraph_bipartite_game -->
 </section>
 
 <section><title>Incidence matrices</title>

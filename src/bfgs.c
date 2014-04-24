@@ -48,7 +48,7 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
 	    igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
 	    igraph_integer_t *fncount, igraph_integer_t *grcount)
 {
-  int n=igraph_vector_size(b);
+  int n=(int) igraph_vector_size(b);
   igraph_bool_t accpoint, enough;
   igraph_vector_t g, t, X, c;
   igraph_matrix_t B;		/* Lmatrix really */

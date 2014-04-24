@@ -44,6 +44,11 @@
 
 */
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wconversion"
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include "igraph_hacks_internal.h"
@@ -466,7 +471,10 @@ edgelistto: longint {
 
 adjmatrix: matrixline NEWLINE adjmatrixlines;
 
-matrixline: MATRIXLINE { context->actfrom=0; context->actto=0; };
+matrixline: MATRIXLINE { context->actfrom=0; 
+                         context->actto=0; 
+                         context->directed=(context->vcount2==0);
+                       };
 
 adjmatrixlines: /* empty */ | adjmatrixlines adjmatrixline;
 
@@ -474,10 +482,20 @@ adjmatrixline: adjmatrixnumbers NEWLINE { context->actfrom++; context->actto=0; 
 
 adjmatrixnumbers: /* empty */ | adjmatrixentry adjmatrixnumbers;
 
-adjmatrixentry: longint {
-  if ($1>0) { 
-    igraph_vector_push_back(context->vector, context->actfrom);
-    igraph_vector_push_back(context->vector, context->actto);
+adjmatrixentry: number {
+  if ($1 != 0) {
+    if (context->vcount2==0) {
+      context->actedge++;
+      igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);    
+      igraph_vector_push_back(context->vector, context->actfrom);
+      igraph_vector_push_back(context->vector, context->actto);
+    } else if (context->vcount2 + context->actto < context->vcount) {
+      context->actedge++;
+      igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);    
+      igraph_vector_push_back(context->vector, context->actfrom);
+      igraph_vector_push_back(context->vector, 
+			      context->vcount2+context->actto);
+    }
   }
   context->actto++;
 };

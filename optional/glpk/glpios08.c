@@ -22,6 +22,11 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wsometimes-uninitialized"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#endif
+
 #include "glpios.h"
 
 static double get_row_lb(LPX *lp, int i)

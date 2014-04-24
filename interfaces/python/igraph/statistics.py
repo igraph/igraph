@@ -35,7 +35,7 @@ class FittedPowerLaw(object):
 
     Example:
 
-        >>> result = power_law_fit([1, 2, 3, 4, 5, 6], return_alpha_only=False)
+        >>> result = power_law_fit([1, 2, 3, 4, 5, 6])
         >>> result                   # doctest:+ELLIPSIS
         FittedPowerLaw(continuous=False, alpha=2.425828..., xmin=3.0, L=-7.54633..., D=0.2138..., p=0.99311...)
         >>> print result             # doctest:+ELLIPSIS
@@ -522,7 +522,7 @@ def percentile(xs, p=(25, 50, 75), sort=True):
         return quantile(xs, (x/100.0 for x in p), sort)
     return quantile(xs, p/100.0, sort)
 
-def power_law_fit(data, xmin=None, method="auto", return_alpha_only=True):
+def power_law_fit(data, xmin=None, method="auto", return_alpha_only=False):
     """Fitting a power-law distribution to empirical data
 
     @param data: the data to fit, a list containing integer values
@@ -551,15 +551,9 @@ def power_law_fit(data, xmin=None, method="auto", return_alpha_only=True):
           value and the discrete method is used if the input vector contains
           integers only.
 
-    @param return_alpha_only: whether to return the fitted exponent only.
-      When this argument is C{True}, the function will return the fitted power-law
-      exponent only. When C{False}, the function will return a L{FittedPowerLaw}
-      object with much more details. The default value is C{True} for the time
-      being for sake of compatibility with earlier releases, but it will be changed
-      to C{False} from igraph 0.7 onwards.
-
-    @return: the fitted exponent or a L{FittedPowerLaw} object, depending on the
-      value of C{return_alpha_only}.
+    @return: a L{FittedPowerLaw} object. The fitted C{xmin} value and the
+      power-law exponent can be queried from the C{xmin} and C{alpha}
+      properties of the returned object.
     
     @newfield ref: Reference
     @ref: MEJ Newman: Power laws, Pareto distributions and Zipf's law.
@@ -578,11 +572,9 @@ def power_law_fit(data, xmin=None, method="auto", return_alpha_only=True):
     force_continuous = method in ("continuous", "hill")
     fit = FittedPowerLaw(*_power_law_fit(data, xmin, force_continuous))
     if return_alpha_only:
-        from warnings import warn
-        warn("power_law_fit will return a FittedPowerLaw object from igraph "\
-                "0.7 onwards. Better prepare for that by setting return_alpha_only "\
-                "to False when calling power_law_fit()", PendingDeprecationWarning,
-                stacklevel=3)
+        from igraph import deprecated
+        deprecated("The return_alpha_only keyword argument of power_law_fit is "\
+                "deprecated from igraph 0.7 and will be removed in igraph 0.8")
         return fit.alpha
     else:
         return fit

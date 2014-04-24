@@ -135,6 +135,9 @@ int igraph_revolver_mes_d(const igraph_t *graph,
   long int node;
   long int i;
   long int edges=0;
+
+  IGRAPH_UNUSED(debug);
+  IGRAPH_UNUSED(debugres);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&ntk, classes);
@@ -173,10 +176,11 @@ int igraph_revolver_mes_d(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       double xk=VECTOR(*st)[node]/VECTOR(ntk)[xidx];
       double oldm=VECTOR(*kernel)[xidx];
@@ -194,8 +198,8 @@ int igraph_revolver_mes_d(const igraph_t *graph,
     /* Update ntk & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       VECTOR(indegree)[to] += 1;
       VECTOR(ntk)[xidx] -= 1;
@@ -273,14 +277,15 @@ int igraph_revolver_st_d(const igraph_t *graph,
     VECTOR(*st)[node]=VECTOR(*st)[node-1]+VECTOR(*kernel)[0];
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       VECTOR(*st)[node] += -VECTOR(*kernel)[xidx]+VECTOR(*kernel)[xidx+1];
     }
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to]+=1;
     }
   }
@@ -337,12 +342,13 @@ int igraph_revolver_exp_d(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     
     /* update degree and ntk, and result when needed */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       VECTOR(indegree)[to]++;
       
       VECTOR(ntk)[xidx]--;
@@ -394,6 +400,8 @@ int igraph_revolver_error_d(const igraph_t *graph,
   long int i;
 
   igraph_real_t rlogprob, rlognull, *mylogprob=logprob, *mylognull=lognull;
+
+  IGRAPH_UNUSED(maxind);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -408,10 +416,11 @@ int igraph_revolver_error_d(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       igraph_real_t prob=VECTOR(*kernel)[xidx]/VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1.0);
@@ -422,7 +431,7 @@ int igraph_revolver_error_d(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
   }
@@ -441,7 +450,7 @@ int igraph_revolver_error2_d(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t maxdegree=igraph_vector_size(kernel)-1;
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_vector_size(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -566,6 +575,9 @@ int igraph_revolver_mes_ad(const igraph_t *graph,
   long int node, i, j, k;
   long int edges=0;
 
+  IGRAPH_UNUSED(debug);
+  IGRAPH_UNUSED(debugres);
+
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_MATRIX_INIT_FINALLY(&ntkl, maxind+1, agebins+1);
   IGRAPH_MATRIX_INIT_FINALLY(&ch, maxind+1, agebins+1);
@@ -608,10 +620,11 @@ int igraph_revolver_mes_ad(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       double xk=VECTOR(*st)[node]/MATRIX(ntkl, xidx, yidx);
@@ -630,8 +643,8 @@ int igraph_revolver_mes_ad(const igraph_t *graph,
     /* Update ntkl & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       VECTOR(indegree)[to] += 1;
@@ -652,7 +665,7 @@ int igraph_revolver_mes_ad(const igraph_t *graph,
     /* aging */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       MATRIX(ntkl, deg, k-1)--;
       if (MATRIX(ntkl, deg, k-1)==0) {
 	MATRIX(*normfact, deg, k-1) += (edges-MATRIX(ch, deg, k-1));
@@ -732,10 +745,11 @@ int igraph_revolver_st_ad(const igraph_t *graph,
     VECTOR(*st)[node]=VECTOR(*st)[node-1] + MATRIX(*kernel, 0, 0);
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node-to)/binwidth;
       VECTOR(indegree)[to] += 1;
       VECTOR(*st)[node] +=
@@ -745,7 +759,7 @@ int igraph_revolver_st_ad(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       VECTOR(*st)[node] += -MATRIX(*kernel, deg, k-1)+MATRIX(*kernel, deg, k);
     }    
     
@@ -806,10 +820,11 @@ int igraph_revolver_exp_ad(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* update degree and ntk, and result when needed */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node-to)/binwidth;
       
       VECTOR(indegree)[to] += 1;
@@ -832,7 +847,7 @@ int igraph_revolver_exp_ad(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1>=0; k++) {
       long int shnode=node-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       MATRIX(ntkl, deg, k-1) -= 1;
       MATRIX(*expected, deg, k-1) += (MATRIX(ntkl, deg, k-1)+1) *
 	(VECTOR(cumst)[node]-VECTOR(cumst)[(long int)MATRIX(ch, deg, k-1)]);
@@ -884,6 +899,8 @@ int igraph_revolver_error_ad(const igraph_t *graph,
 
   igraph_real_t rlogprob, rlognull, *mylogprob=logprob, *mylognull=lognull;
   
+  IGRAPH_UNUSED(pmaxind);
+
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
 						    
@@ -897,10 +914,11 @@ int igraph_revolver_error_ad(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       igraph_real_t prob=MATRIX(*kernel, xidx, yidx) / VECTOR(*st)[node];
@@ -912,7 +930,7 @@ int igraph_revolver_error_ad(const igraph_t *graph,
 
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
     
@@ -932,8 +950,8 @@ int igraph_revolver_error2_ad(const igraph_t *graph,
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t maxdegree=igraph_matrix_nrow(kernel)-1;
-  igraph_integer_t agebins=igraph_matrix_ncol(kernel);
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_matrix_nrow(kernel)-1;
+  igraph_integer_t agebins=(igraph_integer_t) igraph_matrix_ncol(kernel);
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -983,7 +1001,7 @@ int igraph_revolver_ade(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
   
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
@@ -1065,6 +1083,9 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
   
   long int node, j, i, k;
   long int edges=0;
+
+  IGRAPH_UNUSED(debug);
+  IGRAPH_UNUSED(debugres);
   
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, no_of_nodes);
   IGRAPH_ARRAY3_INIT_FINALLY(&ntkl, nocats, maxind+1, agebins+1);
@@ -1110,11 +1131,12 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       double xk=VECTOR(*st)[node]/ARRAY3(ntkl, cidx, xidx, yidx);
@@ -1135,9 +1157,9 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
     /* Update ntkl & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       VECTOR(indegree)[to] += 1;
@@ -1151,7 +1173,7 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
       }
     }
     /* new node */
-    cidx=VECTOR(*cats)[node+1];
+    cidx=(long int) VECTOR(*cats)[node+1];
     ARRAY3(ntkl, cidx, 0, 0) += 1;
     if (ARRAY3(ntkl, cidx, 0, 0)==1) {
       ARRAY3(ch, cidx, 0, 0)=edges;
@@ -1159,8 +1181,8 @@ int igraph_revolver_mes_ade(const igraph_t *graph,
     /* aging */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      long int cidx=VECTOR(*cats)[shnode];
-      long int deg=VECTOR(indegree)[shnode];
+      long int cidx=(long int) VECTOR(*cats)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       ARRAY3(ntkl, cidx, deg, k-1) -= 1;
       if (ARRAY3(ntkl, cidx, deg, k-1)==0) {
 	ARRAY3(*normfact, cidx, deg, k-1) += (edges-ARRAY3(ch, cidx, deg, k-1));
@@ -1245,11 +1267,12 @@ int igraph_revolver_st_ade(const igraph_t *graph,
       VECTOR(*st)[node-1]+ARRAY3(*kernel, (long int)VECTOR(*cats)[node], 0, 0);
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node-to)/binwidth;
       VECTOR(indegree)[to] += 1;
       VECTOR(*st)[node] += 
@@ -1259,8 +1282,8 @@ int igraph_revolver_st_ade(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      long int cidx=VECTOR(*cats)[shnode];
-      long int deg=VECTOR(indegree)[shnode];
+      long int cidx=(long int) VECTOR(*cats)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       VECTOR(*st)[node] += 
 	-ARRAY3(*kernel, cidx, deg, k-1) + ARRAY3(*kernel, cidx, deg, k);
     }
@@ -1320,11 +1343,12 @@ int igraph_revolver_error_ade(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       igraph_real_t prob=ARRAY3(*kernel, cidx, xidx, yidx) / VECTOR(*st)[node];
@@ -1336,7 +1360,7 @@ int igraph_revolver_error_ade(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
     
@@ -1357,9 +1381,9 @@ int igraph_revolver_error2_ade(const igraph_t *graph,
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_array3_n(kernel, 1);
-  igraph_integer_t maxdegree=igraph_array3_n(kernel, 2)-1;
-  igraph_integer_t agebins=igraph_array3_n(kernel, 3);
+  igraph_integer_t nocats=(igraph_integer_t) igraph_array3_n(kernel, 1);
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_array3_n(kernel, 2)-1;
+  igraph_integer_t agebins=(igraph_integer_t) igraph_array3_n(kernel, 3);
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -1414,7 +1438,7 @@ int igraph_revolver_e(const igraph_t *graph,
     VECTOR(*myst)[i]=1;
   }
   
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
 
   IGRAPH_PROGRESS("Revolver e", 0, NULL);
   for (i=0; i<niter; i++) {
@@ -1528,10 +1552,11 @@ int igraph_revolver_mes_e(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int idx=VECTOR(*cats)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int idx=(long int) VECTOR(*cats)[to];
       
       double xk=VECTOR(*st)[node]/VECTOR(ntk)[idx];
       double oldm=VECTOR(*kernel)[idx];
@@ -1546,7 +1571,7 @@ int igraph_revolver_mes_e(const igraph_t *graph,
     
     /* Update ntk & co */
     edges += igraph_vector_size(&neis);
-    cidx=VECTOR(*cats)[node+1];
+    cidx=(long int) VECTOR(*cats)[node+1];
     VECTOR(ntk)[cidx] += 1;
     if (VECTOR(ntk)[cidx]==1) {
       VECTOR(ch)[cidx]=edges;
@@ -1651,10 +1676,11 @@ int igraph_revolver_error_e(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
       
       igraph_real_t prob=VECTOR(*kernel)[cidx]/VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);
@@ -1679,7 +1705,7 @@ int igraph_revolver_error2_e(const igraph_t *graph,
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_vector_size(kernel);
+  igraph_integer_t nocats=(igraph_integer_t) igraph_vector_size(kernel);
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -1727,7 +1753,7 @@ int igraph_revolver_de(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
   
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
@@ -1846,11 +1872,12 @@ int igraph_revolver_mes_de(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
 
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       double xk=VECTOR(*st)[node]/MATRIX(ntkl, cidx, xidx);
       double oldm=MATRIX(*kernel, cidx, xidx);
@@ -1868,9 +1895,9 @@ int igraph_revolver_mes_de(const igraph_t *graph,
     /* Update ntkl & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       VECTOR(indegree)[to] += 1;
       MATRIX(ntkl, cidx, xidx) -= 1;
@@ -1883,7 +1910,7 @@ int igraph_revolver_mes_de(const igraph_t *graph,
       }
     }
     /* new node */
-    cidx=VECTOR(*cats)[node+1];
+    cidx=(long int) VECTOR(*cats)[node+1];
     MATRIX(ntkl, cidx, 0) += 1;
     if (MATRIX(ntkl, cidx, 0)==1) {
       MATRIX(ch, cidx, 0)=edges;
@@ -1958,11 +1985,12 @@ int igraph_revolver_st_de(const igraph_t *graph,
       VECTOR(*st)[node-1]+MATRIX(*kernel, (long int)VECTOR(*cats)[node], 0);
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
+      long int xidx=(long int) VECTOR(indegree)[to];
       VECTOR(indegree)[to] += 1;
       VECTOR(*st)[node] += 
 	-MATRIX(*kernel, cidx, xidx) + MATRIX(*kernel, cidx, xidx+1);           
@@ -2016,11 +2044,12 @@ int igraph_revolver_error_de(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int cidx=VECTOR(*cats)[to];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int cidx=(long int) VECTOR(*cats)[to];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       igraph_real_t prob=MATRIX(*kernel, cidx, xidx) / VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);
@@ -2031,7 +2060,7 @@ int igraph_revolver_error_de(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
     
@@ -2052,8 +2081,8 @@ int igraph_revolver_error2_de(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
-  igraph_integer_t maxdegree=igraph_matrix_ncol(kernel)-1;
+  igraph_integer_t nocats=(igraph_integer_t) igraph_matrix_nrow(kernel);
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_matrix_ncol(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -2208,9 +2237,10 @@ int igraph_revolver_mes_l(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ? 
 	(node+2-(long int)VECTOR(lastcit)[to])/binwidth :	agebins;      
       
@@ -2228,9 +2258,9 @@ int igraph_revolver_mes_l(const igraph_t *graph,
     /* Update ntkl & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ? 
-	(node+2-VECTOR(lastcit)[to])/binwidth :	agebins;
+	(long int) ((node+2.0-VECTOR(lastcit)[to])/binwidth) : agebins;
       
       VECTOR(lastcit)[to]=node+2;
       VECTOR(ntl)[xidx] -= 1; 
@@ -2250,9 +2280,10 @@ int igraph_revolver_mes_l(const igraph_t *graph,
     /* should we move some citations to an older bin? */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) shnode,
+				    IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int cnode=VECTOR(neis)[i];
+	long int cnode=(long int) VECTOR(neis)[i];
 	if (VECTOR(lastcit)[cnode]==shnode+1) {
 	  VECTOR(ntl)[k-1] -= 1;
 	  if (VECTOR(ntl)[k-1]==0) {
@@ -2329,9 +2360,10 @@ int igraph_revolver_st_l(const igraph_t *graph,
     VECTOR(*st)[node]=VECTOR(*st)[node-1]+VECTOR(*kernel)[agebins];
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ?
 	(node+1-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       VECTOR(lastcit)[to]=node+1;
@@ -2341,9 +2373,10 @@ int igraph_revolver_st_l(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) shnode,
+				    IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int cnode=VECTOR(neis)[i];
+	long int cnode=(long int) VECTOR(neis)[i];
 	if (VECTOR(lastcit)[cnode]==shnode+1) {
 	  VECTOR(*st)[node] += -VECTOR(*kernel)[k-1]+VECTOR(*kernel)[k];
 	}
@@ -2398,9 +2431,10 @@ int igraph_revolver_error_l(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ?
 	(node+2-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       
@@ -2413,7 +2447,7 @@ int igraph_revolver_error_l(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(lastcit)[to]=node+2;
     }
 
@@ -2433,7 +2467,7 @@ int igraph_revolver_error2_l(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t agebins=igraph_vector_size(kernel)-1;
+  igraph_integer_t agebins=(igraph_integer_t) igraph_vector_size(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
 
@@ -2594,12 +2628,13 @@ int igraph_revolver_mes_dl(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ? 
-	(node+2-VECTOR(lastcit)[to])/binwidth :	agebins;      
+	(long int) ((node+2.0-VECTOR(lastcit)[to])/binwidth) : agebins;      
       
       double xk=VECTOR(*st)[node]/MATRIX(ntkl, xidx, yidx);
       double oldm=MATRIX(*kernel, xidx, yidx);
@@ -2615,8 +2650,8 @@ int igraph_revolver_mes_dl(const igraph_t *graph,
     /* Update ntkl & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ? 
 	(node+2-(long int)VECTOR(lastcit)[to])/binwidth :	agebins;
 
@@ -2640,10 +2675,11 @@ int igraph_revolver_mes_dl(const igraph_t *graph,
     /* should we move some citations to an older bin? */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) shnode,
+				    IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int cnode=VECTOR(neis)[i];
-	long int deg=VECTOR(indegree)[cnode];
+	long int cnode=(long int) VECTOR(neis)[i];
+	long int deg=(long int) VECTOR(indegree)[cnode];
 	if (VECTOR(lastcit)[cnode]==shnode+1) {
 	  MATRIX(ntkl, deg, k-1) -= 1;
 	  if (MATRIX(ntkl, deg, k-1)==0) {
@@ -2724,10 +2760,11 @@ int igraph_revolver_st_dl(const igraph_t *graph,
     VECTOR(*st)[node]=VECTOR(*st)[node-1]+MATRIX(*kernel, 0, agebins);
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ?
 	(node+1-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       VECTOR(indegree)[to] += 1;
@@ -2739,10 +2776,11 @@ int igraph_revolver_st_dl(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) shnode,
+				    IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int cnode=VECTOR(neis)[i];
-	long int deg=VECTOR(indegree)[cnode];
+	long int cnode=(long int) VECTOR(neis)[i];
+	long int deg=(long int) VECTOR(indegree)[cnode];
 	if (VECTOR(lastcit)[cnode]==shnode+1) {
 	  VECTOR(*st)[node] += 
 	    -MATRIX(*kernel, deg, k-1)+MATRIX(*kernel, deg, k);
@@ -2801,10 +2839,11 @@ int igraph_revolver_error_dl(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ?
 	(node+2-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       
@@ -2817,7 +2856,7 @@ int igraph_revolver_error_dl(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
       VECTOR(lastcit)[to]=node+2;
     }
@@ -2839,8 +2878,8 @@ int igraph_revolver_error2_dl(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t maxdegree=igraph_matrix_nrow(kernel)-1;
-  igraph_integer_t agebins=igraph_matrix_ncol(kernel)-1;
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_matrix_nrow(kernel)-1;
+  igraph_integer_t agebins=(igraph_integer_t) igraph_matrix_ncol(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -2884,7 +2923,7 @@ int igraph_revolver_el(const igraph_t *graph,
   igraph_integer_t maxdegree;
   igraph_integer_t nocats;
 
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
   
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));  
@@ -3007,12 +3046,13 @@ int igraph_revolver_mes_el(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(*cats)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(*cats)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ? 
-	(node+2-VECTOR(lastcit)[to])/binwidth :	agebins;      
+	(long int) ((node+2.0-VECTOR(lastcit)[to])/binwidth) : agebins;      
       
       double xk=VECTOR(*st)[node]/MATRIX(ntkl, xidx, yidx);
       double oldm=MATRIX(*kernel, xidx, yidx);
@@ -3028,10 +3068,10 @@ int igraph_revolver_mes_el(const igraph_t *graph,
     /* Update ntkl & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(*cats)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(*cats)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ? 
-	(node+2-VECTOR(lastcit)[to])/binwidth :	agebins;
+	(long int) ((node+2.0-VECTOR(lastcit)[to])/binwidth) : agebins;
 
       VECTOR(lastcit)[to]=node+2;
       MATRIX(ntkl, xidx, yidx) -= 1; 
@@ -3044,7 +3084,7 @@ int igraph_revolver_mes_el(const igraph_t *graph,
       }
     }
     /* new node */
-    cidx=VECTOR(*cats)[node+1];
+    cidx=(long int) VECTOR(*cats)[node+1];
     MATRIX(ntkl, cidx, agebins) += 1;
     if (MATRIX(ntkl, cidx, agebins)==1) {
       MATRIX(ch, cidx, agebins)=edges;
@@ -3053,10 +3093,11 @@ int igraph_revolver_mes_el(const igraph_t *graph,
     /* should we move some citations to an older bin? */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) shnode,
+				    IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int cnode=VECTOR(neis)[i];
-	long int cat=VECTOR(*cats)[cnode];
+	long int cnode=(long int) VECTOR(neis)[i];
+	long int cat=(long int) VECTOR(*cats)[cnode];
 	if (VECTOR(lastcit)[cnode]==shnode+1) {
 	  MATRIX(ntkl, cat, k-1) -= 1;
 	  if (MATRIX(ntkl, cat, k-1)==0) {
@@ -3137,12 +3178,13 @@ int igraph_revolver_st_el(const igraph_t *graph,
     VECTOR(*st)[node]=VECTOR(*st)[node-1]+MATRIX(*kernel, 0, agebins);
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(*cats)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(*cats)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ?
-	(node+1-VECTOR(lastcit)[to])/binwidth : agebins;
+	(long int) ((node+1.0-VECTOR(lastcit)[to])/binwidth) : agebins;
       VECTOR(lastcit)[to]=node+1;
       VECTOR(*st)[node] += 
 	-MATRIX(*kernel, xidx, yidx)+MATRIX(*kernel, xidx, 0);
@@ -3151,10 +3193,11 @@ int igraph_revolver_st_el(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) shnode,
+				    IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int cnode=VECTOR(neis)[i];
-	long int cat=VECTOR(*cats)[cnode];
+	long int cnode=(long int) VECTOR(neis)[i];
+	long int cat=(long int) VECTOR(*cats)[cnode];
 	if (VECTOR(lastcit)[cnode]==shnode+1) {
 	  VECTOR(*st)[node] += 
 	    -MATRIX(*kernel, cat, k-1)+MATRIX(*kernel, cat, k);
@@ -3213,12 +3256,13 @@ int igraph_revolver_error_el(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(*cats)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(*cats)[to];
       long int yidx=VECTOR(lastcit)[to]!=0 ?
-	(node+2-VECTOR(lastcit)[to])/binwidth : agebins;
+	(long int) ((node+2.0-VECTOR(lastcit)[to])/binwidth) : agebins;
       
       igraph_real_t prob=MATRIX(*kernel, xidx, yidx) / VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);
@@ -3229,7 +3273,7 @@ int igraph_revolver_error_el(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(lastcit)[to]=node+2;
     }
 
@@ -3250,8 +3294,8 @@ int igraph_revolver_error2_el(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
-  igraph_integer_t agebins=igraph_matrix_ncol(kernel)-1;
+  igraph_integer_t nocats=(igraph_integer_t) igraph_matrix_nrow(kernel);
+  igraph_integer_t agebins=(igraph_integer_t) igraph_matrix_ncol(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -3300,18 +3344,20 @@ int igraph_revolver_r(const igraph_t *graph,
   /* determine maximum recent degree, we use st temporarily */
   for (i=0; i<no_of_nodes; i++) {
     if (i-window>=0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t)(i-window),
+				    IGRAPH_OUT));
       for (j=0; j<igraph_vector_size(&neis); j++) {
-	long int to=VECTOR(neis)[j];
+	long int to=(long int) VECTOR(neis)[j];
 	VECTOR(st)[to] -= 1;
       }
     }
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i, 
+				  IGRAPH_OUT));
     for (j=0; j<igraph_vector_size(&neis); j++) {
-      long int to=VECTOR(neis)[j];
+      long int to=(long int) VECTOR(neis)[j];
       VECTOR(st)[to] += 1;
       if (VECTOR(st)[to] > maxdegree) {
-	maxdegree=VECTOR(st)[to];
+	maxdegree=(igraph_integer_t) VECTOR(st)[to];
       }
     }
   }
@@ -3433,10 +3479,11 @@ int igraph_revolver_mes_r(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       double xk=VECTOR(*st)[node]/VECTOR(ntk)[xidx];
       double oldm=VECTOR(*kernel)[xidx];
@@ -3452,8 +3499,8 @@ int igraph_revolver_mes_r(const igraph_t *graph,
     /* Update ntk & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       VECTOR(indegree)[to] += 1;
       VECTOR(ntk)[xidx] -= 1;
@@ -3472,10 +3519,11 @@ int igraph_revolver_mes_r(const igraph_t *graph,
 
     /* Time window updates */
     if (node+1-window >= 0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node+1-window), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
-	long int xidx=VECTOR(indegree)[to];
+	long int to=(long int) VECTOR(neis)[i];
+	long int xidx=(long int) VECTOR(indegree)[to];
 	VECTOR(indegree)[to] -= 1;
 	VECTOR(ntk)[xidx] -= 1;
 	if (VECTOR(ntk)[xidx]==0) {
@@ -3551,20 +3599,22 @@ int igraph_revolver_st_r(const igraph_t *graph,
     VECTOR(*st)[node]=VECTOR(*st)[node-1]+VECTOR(*kernel)[0];
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       VECTOR(indegree)[to]+=1;
       VECTOR(*st)[node] += -VECTOR(*kernel)[xidx]+VECTOR(*kernel)[xidx+1];
     }
     
     /* time window update */
     if (node-window >=0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node-window), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
-	long int xidx=VECTOR(indegree)[to];
+	long int to=(long int) VECTOR(neis)[i];
+	long int xidx=(long int) VECTOR(indegree)[to];
 	VECTOR(indegree)[to] -= 1;
 	VECTOR(*st)[node] += -VECTOR(*kernel)[xidx]+VECTOR(*kernel)[xidx-1];
       }
@@ -3619,10 +3669,11 @@ int igraph_revolver_error_r(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       igraph_real_t prob=VECTOR(*kernel)[xidx]/VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);
@@ -3633,15 +3684,16 @@ int igraph_revolver_error_r(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
 
     /* time window updates */
     if (node-window+1 >= 0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node-window+1, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node-window+1), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
+	long int to=(long int) VECTOR(neis)[i];
 	VECTOR(indegree)[to] -= 1;
       }
     }
@@ -3662,7 +3714,7 @@ int igraph_revolver_error2_r(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t maxdegree=igraph_vector_size(kernel)-1;
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_vector_size(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -3713,18 +3765,20 @@ int igraph_revolver_ar(const igraph_t *graph,
   /* determine maximum recent degree, we use st temporarily */
   for (i=0; i<no_of_nodes; i++) {
     if (i-window>=0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) (i-window),
+				    IGRAPH_OUT));
       for (j=0; j<igraph_vector_size(&neis); j++) {
-	long int to=VECTOR(neis)[j];
+	long int to=(long int) VECTOR(neis)[j];
 	VECTOR(st)[to] -= 1;
       }
     }
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i, 
+				  IGRAPH_OUT));
     for (j=0; j<igraph_vector_size(&neis); j++) {
-      long int to=VECTOR(neis)[j];
+      long int to=(long int) VECTOR(neis)[j];
       VECTOR(st)[to] += 1;
       if (VECTOR(st)[to] > maxdegree) {
-	maxdegree=VECTOR(st)[to];
+	maxdegree=(igraph_integer_t) VECTOR(st)[to];
       }
     }
   }
@@ -3853,11 +3907,12 @@ int igraph_revolver_mes_ar(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) (node+1),
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=(node+1-to)/binwidth;
-      long int yidx=VECTOR(indegree)[to];
+      long int yidx=(long int) VECTOR(indegree)[to];
       
       double xk=VECTOR(*st)[node]/MATRIX(ntk, xidx, yidx);
       double oldm=MATRIX(*kernel, xidx, yidx);
@@ -3873,9 +3928,9 @@ int igraph_revolver_mes_ar(const igraph_t *graph,
     /* Update ntk & co */
     edges += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=(node+1-to)/binwidth;
-      long int yidx=VECTOR(indegree)[to];
+      long int yidx=(long int) VECTOR(indegree)[to];
       
       VECTOR(indegree)[to] += 1;
       MATRIX(ntk, xidx, yidx) -= 1;
@@ -3894,11 +3949,12 @@ int igraph_revolver_mes_ar(const igraph_t *graph,
     
     /* Time window updates */
     if (node+1-window >= 0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node+1-window), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
+	long int to=(long int) VECTOR(neis)[i];
 	long int xidx=(node+1-to)/binwidth;
-	long int yidx=VECTOR(indegree)[to];
+	long int yidx=(long int) VECTOR(indegree)[to];
 	VECTOR(indegree)[to] -= 1;
 	MATRIX(ntk, xidx, yidx) -= 1;
 	if (MATRIX(ntk, xidx, yidx)==0) {
@@ -3914,7 +3970,7 @@ int igraph_revolver_mes_ar(const igraph_t *graph,
     /* Aging */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       MATRIX(ntk, k-1, deg)--;
       if (MATRIX(ntk, k-1, deg)==0) {
 	MATRIX(*normfact, k-1, deg) += (edges-MATRIX(ch, k-1, deg));
@@ -3993,11 +4049,12 @@ int igraph_revolver_st_ar(const igraph_t *graph,
     VECTOR(*st)[node]=VECTOR(*st)[node-1]+MATRIX(*kernel, 0, 0);
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=(node-to)/binwidth;
-      long int yidx=VECTOR(indegree)[to];
+      long int yidx=(long int) VECTOR(indegree)[to];
       VECTOR(indegree)[to]+=1;
       VECTOR(*st)[node] += 
 	-MATRIX(*kernel, xidx, yidx)+MATRIX(*kernel, xidx, yidx+1);
@@ -4005,11 +4062,12 @@ int igraph_revolver_st_ar(const igraph_t *graph,
     
     /* time window update */
     if (node-window >=0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node-window), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
+	long int to=(long int) VECTOR(neis)[i];
 	long int xidx=(node-to)/binwidth;
-	long int yidx=VECTOR(indegree)[to];
+	long int yidx=(long int) VECTOR(indegree)[to];
 	VECTOR(indegree)[to] -= 1;
 	VECTOR(*st)[node] += 
 	  -MATRIX(*kernel, xidx, yidx)+MATRIX(*kernel, xidx, yidx-1);
@@ -4019,7 +4077,7 @@ int igraph_revolver_st_ar(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       VECTOR(*st)[node] += -MATRIX(*kernel, k-1, deg)+MATRIX(*kernel, k, deg);
     }    
   }
@@ -4076,11 +4134,12 @@ int igraph_revolver_error_ar(const igraph_t *graph,
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=(node+1-to)/binwidth;
-      long int yidx=VECTOR(indegree)[to];
+      long int yidx=(long int) VECTOR(indegree)[to];
       
       igraph_real_t prob=MATRIX(*kernel, xidx, yidx)/VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);
@@ -4091,15 +4150,16 @@ int igraph_revolver_error_ar(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
 
     /* time window updates */
     if (node-window+1 >= 0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node-window+1, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node-window+1), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
+	long int to=(long int) VECTOR(neis)[i];
 	VECTOR(indegree)[to] -= 1;
       }
     }
@@ -4122,8 +4182,8 @@ int igraph_revolver_error2_ar(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t agebins=igraph_matrix_nrow(kernel)-1;
-  igraph_integer_t maxdegree=igraph_matrix_ncol(kernel)-1;
+  igraph_integer_t agebins=(igraph_integer_t) igraph_matrix_nrow(kernel)-1;
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_matrix_ncol(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -4173,7 +4233,7 @@ int igraph_revolver_di(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
   
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
@@ -4288,15 +4348,16 @@ int igraph_revolver_mes_di(const igraph_t *graph,
   if (logmax) { *logmax=0.0; }
 
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
 
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       double xk=VECTOR(*st)[node]/VECTOR(ntkl)[xidx];
       double oldm=MATRIX(*kernel, cidx, xidx);
@@ -4314,8 +4375,8 @@ int igraph_revolver_mes_di(const igraph_t *graph,
     /* Update ntkl & co */
     VECTOR(edges)[cidx] += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       VECTOR(indegree)[to] += 1;
       VECTOR(ntkl)[xidx] -= 1;
@@ -4416,10 +4477,11 @@ int igraph_revolver_st_di(const igraph_t *graph,
     }
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       VECTOR(indegree)[to] += 1;
       for (j=0; j<nocats; j++) {
 	MATRIX(allst, j, node) += 
@@ -4475,14 +4537,15 @@ int igraph_revolver_error_di(const igraph_t *graph,
   *mylognull=0;
   
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       igraph_real_t prob=MATRIX(*kernel, cidx, xidx) / VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);
@@ -4493,7 +4556,7 @@ int igraph_revolver_error_di(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
     
@@ -4514,8 +4577,8 @@ int igraph_revolver_error2_di(const igraph_t *graph,
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
-  igraph_integer_t maxdegree=igraph_matrix_ncol(kernel)-1;
+  igraph_integer_t nocats=(igraph_integer_t) igraph_matrix_nrow(kernel);
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_matrix_ncol(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -4565,7 +4628,7 @@ int igraph_revolver_adi(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
   
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdegree, igraph_vss_all(),
 				IGRAPH_IN, IGRAPH_LOOPS));
@@ -4684,15 +4747,16 @@ int igraph_revolver_mes_adi(const igraph_t *graph,
   if (logmax) { *logmax=0.0; }
 
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
 
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       double xk=VECTOR(*st)[node]/MATRIX(ntkl, xidx, yidx);
@@ -4711,8 +4775,8 @@ int igraph_revolver_mes_adi(const igraph_t *graph,
     /* Update ntkl & co */
     VECTOR(edges)[cidx] += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       VECTOR(indegree)[to] += 1;
@@ -4740,7 +4804,7 @@ int igraph_revolver_mes_adi(const igraph_t *graph,
     /* aging */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       MATRIX(ntkl, deg, k-1) -= 1;
       if (MATRIX(ntkl, deg, k-1)==0) {
 	for (j=0; j<nocats; j++) {
@@ -4838,10 +4902,11 @@ int igraph_revolver_st_adi(const igraph_t *graph,
     }
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       VECTOR(indegree)[to] += 1;
       for (j=0; j<nocats; j++) {
@@ -4853,7 +4918,7 @@ int igraph_revolver_st_adi(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       for (j=0; j<nocats; j++) {
 	MATRIX(allst, j, node) += 
 	  -ARRAY3(*kernel, j, deg, k-1) + ARRAY3(*kernel, j, deg, k);
@@ -4912,14 +4977,15 @@ int igraph_revolver_error_adi(const igraph_t *graph,
   *mylognull=0;
   
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       igraph_real_t prob=ARRAY3(*kernel, cidx, xidx, yidx) / VECTOR(*st)[node];
@@ -4931,7 +4997,7 @@ int igraph_revolver_error_adi(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
     
@@ -4952,9 +5018,9 @@ int igraph_revolver_error2_adi(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_array3_n(kernel, 1);
-  igraph_integer_t maxdegree=igraph_array3_n(kernel, 2)-1;
-  igraph_integer_t agebins=igraph_array3_n(kernel, 3);
+  igraph_integer_t nocats=(igraph_integer_t) igraph_array3_n(kernel, 1);
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_array3_n(kernel, 2)-1;
+  igraph_integer_t agebins=(igraph_integer_t) igraph_array3_n(kernel, 3);
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -5003,7 +5069,7 @@ int igraph_revolver_il(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
 
   IGRAPH_PROGRESS("Revolver il", 0, NULL);
   for (i=0; i<niter; i++) {
@@ -5117,14 +5183,15 @@ int igraph_revolver_mes_il(const igraph_t *graph,
   if (logmax) { *logmax=0.0; }
 
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
     
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ? 
 	(node+2-(long int)VECTOR(lastcit)[to])/binwidth :	agebins;      
       
@@ -5142,9 +5209,9 @@ int igraph_revolver_mes_il(const igraph_t *graph,
     /* Update ntkl & co */
     VECTOR(edges)[cidx] += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ? 
-	(node+2-VECTOR(lastcit)[to])/binwidth :	agebins;
+	(long int) ((node+2.0-VECTOR(lastcit)[to])/binwidth) : agebins;
       
       VECTOR(lastcit)[to]=node+2;
       VECTOR(ntl)[xidx] -= 1; 
@@ -5171,9 +5238,10 @@ int igraph_revolver_mes_il(const igraph_t *graph,
     /* should we move some citations to an older bin? */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) shnode, 
+				    IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int cnode=VECTOR(neis)[i];
+	long int cnode=(long int) VECTOR(neis)[i];
 	if (VECTOR(lastcit)[cnode]==shnode+1) {
 	  VECTOR(ntl)[k-1] -= 1;
 	  if (VECTOR(ntl)[k-1]==0) {
@@ -5269,9 +5337,10 @@ int igraph_revolver_st_il(const igraph_t *graph,
     }
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ?
 	(node+1-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       VECTOR(lastcit)[to]=node+1;
@@ -5284,9 +5353,10 @@ int igraph_revolver_st_il(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, shnode, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) shnode,
+				    IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int cnode=VECTOR(neis)[i];
+	long int cnode=(long int) VECTOR(neis)[i];
 	if (VECTOR(lastcit)[cnode]==shnode+1) {
 	  for (j=0; j<nocats; j++) {
 	    MATRIX(allst, j, node) +=
@@ -5347,13 +5417,14 @@ int igraph_revolver_error_il(const igraph_t *graph,
   *mylognull=0;
   
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       long int xidx=VECTOR(lastcit)[to]!=0 ?
 	(node+2-(long int)VECTOR(lastcit)[to])/binwidth : agebins;
       
@@ -5366,7 +5437,7 @@ int igraph_revolver_error_il(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(lastcit)[to]=node+2;
     }
 
@@ -5387,8 +5458,8 @@ int igraph_revolver_error2_il(const igraph_t *graph,
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
-  igraph_integer_t agebins=igraph_matrix_ncol(kernel)-1;
+  igraph_integer_t nocats=(igraph_integer_t) igraph_matrix_nrow(kernel);
+  igraph_integer_t agebins=(igraph_integer_t) igraph_matrix_ncol(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -5438,24 +5509,26 @@ int igraph_revolver_ir(const igraph_t *graph,
     VECTOR(st)[i]=1;
   }
   
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
 
   /* determine maximum recent degree, we use st temporarily */
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   for (i=0; i<no_of_nodes; i++) {
     if (i-window>=0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) (i-window),
+				    IGRAPH_OUT));
       for (j=0; j<igraph_vector_size(&neis); j++) {
-	long int to=VECTOR(neis)[j];
+	long int to=(long int) VECTOR(neis)[j];
 	VECTOR(st)[to] -= 1;
       }
     }
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i, 
+				  IGRAPH_OUT));
     for (j=0; j<igraph_vector_size(&neis); j++) {
-      long int to=VECTOR(neis)[j];
+      long int to=(long int)VECTOR(neis)[j];
       VECTOR(st)[to] += 1;
       if (VECTOR(st)[to] > maxdegree) {
-	maxdegree=VECTOR(st)[to];
+	maxdegree=(igraph_integer_t) VECTOR(st)[to];
       }
     }
   }
@@ -5576,15 +5649,16 @@ int igraph_revolver_mes_ir(const igraph_t *graph,
   if (logmax) { *logmax=0.0; }
 
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
 
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       double xk=VECTOR(*st)[node]/VECTOR(ntkl)[xidx];
       double oldm=MATRIX(*kernel, cidx, xidx);
@@ -5602,8 +5676,8 @@ int igraph_revolver_mes_ir(const igraph_t *graph,
     /* Update ntkl & co */
     VECTOR(edges)[cidx] += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       VECTOR(indegree)[to] += 1;
       VECTOR(ntkl)[xidx] -= 1;
@@ -5629,10 +5703,11 @@ int igraph_revolver_mes_ir(const igraph_t *graph,
 
     /* Time window updates */
     if (node+1-window >= 0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node+1-window), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
-	long int xidx=VECTOR(indegree)[to];
+	long int to=(long int) VECTOR(neis)[i];
+	long int xidx=(long int) VECTOR(indegree)[to];
 	VECTOR(indegree)[to] -= 1;
 	VECTOR(ntkl)[xidx] -= 1;
 	if (VECTOR(ntkl)[xidx]==0) {
@@ -5728,10 +5803,11 @@ int igraph_revolver_st_ir(const igraph_t *graph,
     }
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       VECTOR(indegree)[to] += 1;
       for (j=0; j<nocats; j++) {
 	MATRIX(allst, j, node) += 
@@ -5741,10 +5817,11 @@ int igraph_revolver_st_ir(const igraph_t *graph,
     
     /* time window update */
     if (node-window >=0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node-window), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
-	long int xidx=VECTOR(indegree)[to];
+	long int to=(long int) VECTOR(neis)[i];
+	long int xidx=(long int) VECTOR(indegree)[to];
 	VECTOR(indegree)[to] -= 1;
 	for (j=0; j<nocats; j++) {
 	  MATRIX(allst, j, node) += 
@@ -5804,14 +5881,15 @@ int igraph_revolver_error_ir(const igraph_t *graph,
   *mylognull=0;
   
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       
       igraph_real_t prob=MATRIX(*kernel, cidx, xidx) / VECTOR(*st)[node];
       igraph_real_t nullprob=1.0/(node+1);
@@ -5822,15 +5900,16 @@ int igraph_revolver_error_ir(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
     
     /* time window updates */
     if (node-window+1 >= 0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node-window+1, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node-window+1), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
+	long int to=(long int) VECTOR(neis)[i];
 	VECTOR(indegree)[to] -= 1;
       }
     }
@@ -5853,8 +5932,8 @@ int igraph_revolver_error2_ir(const igraph_t *graph,
 
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_matrix_nrow(kernel);
-  igraph_integer_t maxdegree=igraph_matrix_ncol(kernel)-1;
+  igraph_integer_t nocats=(igraph_integer_t) igraph_matrix_nrow(kernel);
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_matrix_ncol(kernel)-1;
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   
@@ -5902,25 +5981,27 @@ int igraph_revolver_air(const igraph_t *graph,
     
   IGRAPH_PROGRESS("Revolver air", 0, NULL);
 
-  nocats=igraph_vector_max(cats)+1;
+  nocats=(igraph_integer_t) igraph_vector_max(cats)+1;
 
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   /* determine maximum recent degree, we use st temporarily */
   for (i=0; i<no_of_nodes; i++) {
     if (i-window>=0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, i-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) (i-window),
+				    IGRAPH_OUT));
       for (j=0; j<igraph_vector_size(&neis); j++) {
-	long int to=VECTOR(neis)[j];
+	long int to=(long int) VECTOR(neis)[j];
 	VECTOR(st)[to] -= 1;
       }
     }
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, i, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
+				  IGRAPH_OUT));
     for (j=0; j<igraph_vector_size(&neis); j++) {
-      long int to=VECTOR(neis)[j];
+      long int to=(long int) VECTOR(neis)[j];
       VECTOR(st)[to] += 1;
       if (VECTOR(st)[to] > maxdegree) {
-	maxdegree=VECTOR(st)[to];
+	maxdegree=(igraph_integer_t) VECTOR(st)[to];
       }
     }
   }
@@ -6049,15 +6130,16 @@ int igraph_revolver_mes_air(const igraph_t *graph,
   if (logmax) { *logmax=0.0; }
   
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
 
     /* Estimate A() */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       double xk=VECTOR(*st)[node]/MATRIX(ntkl, xidx, yidx);
@@ -6076,8 +6158,8 @@ int igraph_revolver_mes_air(const igraph_t *graph,
     /* Update ntkl & co */
     VECTOR(edges)[cidx] += igraph_vector_size(&neis);
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       VECTOR(indegree)[to] += 1;
@@ -6104,10 +6186,11 @@ int igraph_revolver_mes_air(const igraph_t *graph,
     }
     /* Time window updates */
     if (node+1-window >= 0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node+1-window), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
-	long int xidx=VECTOR(indegree)[to];
+	long int to=(long int) VECTOR(neis)[i];
+	long int xidx=(long int) VECTOR(indegree)[to];
 	long int yidx=(node+1-to)/binwidth;
 	VECTOR(indegree)[to] -= 1;
 	MATRIX(ntkl, xidx, yidx) -= 1;
@@ -6129,7 +6212,7 @@ int igraph_revolver_mes_air(const igraph_t *graph,
     /* aging */
     for (k=1; node+1-binwidth*k+1>=0; k++) {
       long int shnode=node+1-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       MATRIX(ntkl, deg, k-1) -= 1;
       if (MATRIX(ntkl, deg, k-1)==0) {
 	for (j=0; j<nocats; j++) {
@@ -6229,10 +6312,11 @@ int igraph_revolver_st_air(const igraph_t *graph,
     }
     
     /* outgoing edges */
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node,
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       VECTOR(indegree)[to] += 1;
       for (j=0; j<nocats; j++) {
@@ -6243,10 +6327,11 @@ int igraph_revolver_st_air(const igraph_t *graph,
 
     /* time window update */
     if (node-window >=0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node-window, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node-window), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
-	long int xidx=VECTOR(indegree)[to];
+	long int to=(long int) VECTOR(neis)[i];
+	long int xidx=(long int) VECTOR(indegree)[to];
 	long int yidx=(node-to)/binwidth;
 	VECTOR(indegree)[to] -= 1;
 	for (j=0; j<nocats; j++) {
@@ -6259,7 +6344,7 @@ int igraph_revolver_st_air(const igraph_t *graph,
     /* aging */
     for (k=1; node-binwidth*k+1 >= 0; k++) {
       long int shnode=node-binwidth*k+1;
-      long int deg=VECTOR(indegree)[shnode];
+      long int deg=(long int) VECTOR(indegree)[shnode];
       for (j=0; j<nocats; j++) {
 	MATRIX(allst, j, node) += 
 	  -ARRAY3(*kernel, j, deg, k-1) + ARRAY3(*kernel, j, deg, k);
@@ -6320,14 +6405,15 @@ int igraph_revolver_error_air(const igraph_t *graph,
   *mylognull=0;
   
   for (node=0; node<no_of_nodes-1; node++) {
-    long int cidx=VECTOR(*cats)[node+1];
+    long int cidx=(long int) VECTOR(*cats)[node+1];
     
     IGRAPH_ALLOW_INTERRUPTION();
     
-    IGRAPH_CHECK(igraph_neighbors(graph, &neis, node+1, IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node+1, 
+				  IGRAPH_OUT));
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
-      long int xidx=VECTOR(indegree)[to];
+      long int to=(long int) VECTOR(neis)[i];
+      long int xidx=(long int) VECTOR(indegree)[to];
       long int yidx=(node+1-to)/binwidth;
       
       igraph_real_t prob=ARRAY3(*kernel, cidx, xidx, yidx) / VECTOR(*st)[node];
@@ -6339,15 +6425,16 @@ int igraph_revolver_error_air(const igraph_t *graph,
     
     /* update */
     for (i=0; i<igraph_vector_size(&neis); i++) {
-      long int to=VECTOR(neis)[i];
+      long int to=(long int) VECTOR(neis)[i];
       VECTOR(indegree)[to] += 1;
     }
     
     /* time window updates */
     if (node-window+1 >= 0) {
-      IGRAPH_CHECK(igraph_neighbors(graph, &neis, node-window+1, IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) 
+				    (node-window+1), IGRAPH_OUT));
       for (i=0; i<igraph_vector_size(&neis); i++) {
-	long int to=VECTOR(neis)[i];
+	long int to=(long int) VECTOR(neis)[i];
 	VECTOR(indegree)[to] -= 1;
       }
     }
@@ -6369,9 +6456,9 @@ int igraph_revolver_error2_air(const igraph_t *graph,
   
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t st;
-  igraph_integer_t nocats=igraph_array3_n(kernel, 1);
-  igraph_integer_t maxdegree=igraph_array3_n(kernel, 2)-1;
-  igraph_integer_t agebins=igraph_array3_n(kernel, 3);
+  igraph_integer_t nocats=(igraph_integer_t) igraph_array3_n(kernel, 1);
+  igraph_integer_t maxdegree=(igraph_integer_t) igraph_array3_n(kernel, 2)-1;
+  igraph_integer_t agebins=(igraph_integer_t) igraph_array3_n(kernel, 3);
   
   IGRAPH_VECTOR_INIT_FINALLY(&st, no_of_nodes);
   

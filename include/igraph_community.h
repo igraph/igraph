@@ -60,7 +60,7 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
 int igraph_community_optimal_modularity(const igraph_t *graph,
 					igraph_real_t *modularity,
 					igraph_vector_t *membership,
-					igraph_bool_t verbose);
+					const igraph_vector_t *weights);
 
 int igraph_community_spinglass(const igraph_t *graph,
 			       const igraph_vector_t *weights,
@@ -146,6 +146,11 @@ int igraph_modularity(const igraph_t *graph,
 		      igraph_real_t *modularity,
               const igraph_vector_t *weights);
 
+int igraph_modularity_matrix(const igraph_t *graph, 
+			     const igraph_vector_t *membership,
+			     igraph_matrix_t *modmat, 
+			     const igraph_vector_t *weights);
+
 int igraph_reindex_membership(igraph_vector_t *membership,
                               igraph_vector_t *new_to_old);
 
@@ -193,6 +198,7 @@ typedef int igraph_community_leading_eigenvector_callback_t(
         void *extra);
 
 int igraph_community_leading_eigenvector(const igraph_t *graph,
+	const igraph_vector_t *weights,
 	igraph_matrix_t *merges,
 	igraph_vector_t *membership,
 	igraph_integer_t steps,

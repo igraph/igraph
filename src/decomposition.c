@@ -116,7 +116,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
 
   while (i>=1) {
     long int x, k, len;
-    igraph_vector_t *neis;
+    igraph_vector_int_t *neis;
 
     /********************************/
     /* v :=  delete any from set(j) */
@@ -144,9 +144,9 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     /********************************************/
     
     neis=igraph_adjlist_get(&adjlist, v);
-    len=igraph_vector_size(neis);
+    len=igraph_vector_int_size(neis);
     for (k=0; k<len; k++) {
-      long int w=VECTOR(*neis)[k];
+      long int w=(long int) VECTOR(*neis)[k];
       long int ws=VECTOR(size)[w];
       if (ws >= 0) {
 
@@ -290,7 +290,7 @@ int igraph_is_chordal(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&v_alpham1, no_of_nodes);
     my_alpham1=&v_alpham1;
     for (v=0; v<no_of_nodes; v++) {
-      long int i=VECTOR(*my_alpha)[v];
+      long int i=(long int) VECTOR(*my_alpha)[v];
       VECTOR(*my_alpham1)[i]=v;
     }
   } else if (!alpha && alpham1) { 
@@ -298,7 +298,7 @@ int igraph_is_chordal(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&v_alpha, no_of_nodes);
     my_alpha=&v_alpha;
     for (i=0; i<no_of_nodes; i++) {
-      long int v=VECTOR(*my_alpham1)[i];
+      long int v=(long int) VECTOR(*my_alpham1)[i];
       VECTOR(*my_alpha)[v]=i;
     }
   }
@@ -325,14 +325,14 @@ int igraph_is_chordal(const igraph_t *graph,
   /*********************/
 
   for (i=0; i<no_of_nodes; i++) {
-    igraph_vector_t *neis;
+    igraph_vector_int_t *neis;
     long int j, len;
     
     /**********************************************/
     /* w := alpham1(i); f(w) := w; index(w) := i; */
     /**********************************************/
     
-    w=VECTOR(*my_alpham1)[i]; 
+    w=(long int) VECTOR(*my_alpham1)[i]; 
     VECTOR(f)[w]=w;
     VECTOR(index)[w]=i;
    
@@ -341,14 +341,14 @@ int igraph_is_chordal(const igraph_t *graph,
     /******************************************/
 
     neis=igraph_adjlist_get(&adjlist, w);
-    len=igraph_vector_size(neis);
+    len=igraph_vector_int_size(neis);
     for (j=0; j<len; j++) {
-      v=VECTOR(*neis)[j];
+      v=(long int) VECTOR(*neis)[j];
       VECTOR(mark)[v] = w+1;
     }
     
     for (j=0; j<len; j++) {
-      v=VECTOR(*neis)[j];
+      v=(long int) VECTOR(*neis)[j];
       if (VECTOR(*my_alpha)[v] >= i) { continue; }
       
       /**********/

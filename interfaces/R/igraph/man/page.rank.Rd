@@ -6,14 +6,24 @@
 \description{ Calculates the Google PageRank for the specified
   vertices.}
 \usage{
-page.rank (graph, vids = V(graph), directed = TRUE, damping = 0.85, 
-    personalized = NULL, weights = NULL,
-    options = igraph.arpack.default) 
+page.rank (graph, algo = c("prpack", "arpack", "power"),
+    vids = V(graph), directed = TRUE, damping = 0.85,
+    personalized = NULL, weights = NULL, options = NULL) 
 page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000, 
     eps = 0.001, damping = 0.85, old = FALSE) 
 }
 \arguments{
   \item{graph}{The graph object. }
+  \item{algo}{Character scalar, which implementation to use to carry out
+    the calculation. The default is \code{"prpack"}, which uses the
+    PRPACK library (https://github.com/dgleich/prpack). This is a
+    new implementation in igraph version 0.7, and the suggested one, as
+    it is the most stable and the fastest for all but small graphs.
+    \code{"arpack"} uses the ARPACK library, the default implementation
+    from igraph version 0.5 until version 0.7. \code{power} uses a
+    simple implementation of the power method, this was the default in
+    igraph before version 0.5 and is the same as calling
+    \code{page.rank.old}.}
   \item{vids}{The vertices of interest.}
   \item{directed}{Logical, if true directed paths will be considered for
     directed graphs. It is ignored for undirected graphs.}
@@ -31,8 +41,12 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
     vector then it used, even if the graph has a \code{weights} edge
     attribute. If this is \code{NA}, then no edge weights are used (even
     if the graph has a \code{weight} edge attribute.}
-  \item{options}{A named list, to override some ARPACK options. See
-    \code{\link{arpack}} for details.}
+  \item{options}{Either a named list, to override some ARPACK options. See
+    \code{\link{arpack}} for details; or a named list to override the
+    default options for the power method (if \code{algo="power"}).
+    The default options for the power method are \code{niter=1000} and
+    \code{eps=0.001}. This argument is ignored if the PRPACK
+    implementation is used.}
   \item{niter}{The maximum number of iterations to perform.} 
   \item{eps}{The algorithm will consider the calculation as complete if
     the difference of PageRank values between iterations change less
@@ -42,7 +56,7 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
 }
 \details{
   For the explanation of the PageRank algorithm, see the following
-  webpage: \url{http://www-db.stanford.edu/~backrub/google.html}, or the
+  webpage: \url{http://infolab.stanford.edu/~backrub/google.html}, or the
   following reference: 
 
   Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
@@ -86,7 +100,8 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
   \item{value}{The eigenvalue corresponding to the eigenvector with
     the page rank scores. It should be always exactly one.}
   \item{options}{Some information about the underlying ARPACK
-    calculation. See \code{\link{arpack}} for details.}
+    calculation. See \code{\link{arpack}} for details. This entry is
+    \code{NULL} if not the ARPACK implementation was used.}
   
   For \code{page.rank.old} a numeric vector of Page Rank scores.
 }

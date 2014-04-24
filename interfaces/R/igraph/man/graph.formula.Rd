@@ -54,8 +54,8 @@ graph.formula(..., simplify = TRUE)
   }
 
   The \sQuote{\code{:}} operator can be used to define vertex sets. If
-  an edge operator connects two vertex sets then every edge from the
-  first set will be connected to every edge in the second set. The
+  an edge operator connects two vertex sets then every vertex from the
+  first set will be connected to every vertex in the second set. The
   following form creates a full graph, including loop edges:
   \preformatted{
     graph.formula( A:B:C:D -- A:B:C:D )

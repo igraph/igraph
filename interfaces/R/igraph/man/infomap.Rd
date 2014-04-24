@@ -46,10 +46,10 @@ infomap.community (graph, e.weights = NULL, v.weights = NULL,
   \url{http://arxiv.org/abs/0906.1405}.
 }
 \author{
-  Martin Rosvall \email{martin.rosvall at physics dot umu dot se} wrote
+  Martin Rosvall (\url{http://www.tp.umu.se/~rosvall/}) wrote
   the original C++ code. This was ported to be more igraph-like by
-  Emmanuel Navarro \email{navarro at irit dot fr}. The R interface and
-  some cosmetics was done by Gabor Csardi
+  Emmanuel Navarro (\url{http://www.irit.fr/~Emmanuel.Navarro/}).
+  The R interface and some cosmetics was done by Gabor Csardi
   \email{csardi.gabor@gmail.com}.
 }
 \seealso{Other community finding methods and \code{\link{communities}}.}

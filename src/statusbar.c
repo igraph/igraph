@@ -22,6 +22,7 @@
 */
 
 #include "config.h"
+#include "igraph_types.h"
 #include "igraph_statusbar.h"
 #include "igraph_error.h"
 #include <stdio.h>
@@ -102,6 +103,7 @@ int igraph_statusf(const char *message, void *data, ...) {
  */
 
 int igraph_status_handler_stderr(const char *message, void *data) {
+  IGRAPH_UNUSED(data);
   fputs(message, stderr);
   return 0;
 }

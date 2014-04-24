@@ -1,0 +1,93 @@
+%%
+%% This is file `foil20.clo',
+%% generated with the docstrip utility.
+%%
+%% The original source files were:
+%%
+%% foiltex.dtx  (with options: `20pt')
+%% ********************************************************************
+%% Copyright (C) 1995,1997,1998,2002,2008 IBM Corporation
+%% This file is part of the FoilTeX package.   Use of this is governed
+%% by explicit restrictions.  These can be found in the header of the
+%% foiltex.ins file.
+%% 
+%% Questions, comments or suggestions concerning this program can be
+%% sent to
+%%     James (Jim) Hafner
+%%     IBM Research Division
+%%     Almaden Research Center, K56-B2
+%%     650 Harry Road
+%%     San Jose, CA 95120-6099
+%%     email: hafner@almaden.ibm.com
+%% ********************************************************************
+%%
+%% These files are updated versions of the FoilTeX package for use with
+%% the new LaTeX2e.  There are many enhancements and a few bugs
+%% have been fixed.  Undoubtedly there are many more.  Contact
+%% the author if you find any bugs or have suggestions for improvement
+%% of this suite of files.
+%% ********************************************************************
+\def\foiltexdate{2008/01/28}
+\def\foiltexversion{2.1.4b}
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesFile{foil20.clo}
+       [\foiltexdate\space v\foiltexversion\space
+        FoilTeX file (size option), Copyright IBM 1995,1997,1998,2002,2008]
+%% \CharacterTable
+%%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%%   Digits        \0\1\2\3\4\5\6\7\8\9
+%%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%%   Dollar        \$     Percent       \%     Ampersand     \&
+%%   Acute accent  \'     Left paren    \(     Right paren   \)
+%%   Asterisk      \*     Plus          \+     Comma         \,
+%%   Minus         \-     Point         \.     Solidus       \/
+%%   Colon         \:     Semicolon     \;     Less than     \<
+%%   Equals        \=     Greater than  \>     Question mark \?
+%%   Commercial at \@     Left bracket  \[     Backslash     \\
+%%   Right bracket \]     Circumflex    \^     Underscore    \_
+%%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%%   Right brace   \}     Tilde         \~}
+%%
+\def\normalsize{\@setfontsize\normalsize\@xxpt\@xxvpt
+\abovedisplayskip 30\p@ \@plus 3\p@ \@minus 9\p@
+\belowdisplayskip \abovedisplayskip
+\abovedisplayshortskip \z@ \@plus 3\p@
+\belowdisplayshortskip 7\p@ \@plus 3\p@ \@minus 4\p@
+\let\@listi\@listIa}
+\normalsize
+
+\def\small{\@setfontsize\small\@xviipt{22}%
+\abovedisplayskip 20\p@ \@plus 3\p@ \@minus 4\p@
+\belowdisplayskip \abovedisplayskip
+\abovedisplayshortskip \z@ \@plus 2\p@
+\belowdisplayshortskip 4\p@ \@plus 2\p@ \@minus 2\p@
+\let\@listi\@listIb}
+
+\def\footnotesize{\@setfontsize\footnotesize\@xivpt{18}%
+\abovedisplayskip 16\p@ \@plus 2\p@ \@minus 4\p@
+\belowdisplayskip \abovedisplayskip
+\abovedisplayshortskip \z@ \@plus 1\p@
+\belowdisplayshortskip 3\p@ \@plus 1\p@ \@minus 2\p@
+\let\@listi\@listIc}
+
+\def\scriptsize{\@setfontsize\scriptsize\@xiipt{15}%
+ \if@compatibility\else\let\@listi\@listId\fi}
+\let\tiny=\scriptsize
+\def\large{\@setfontsize\large\@xxvpt{32}}
+\def\Large{\@setfontsize\Large\@xxxpt{38}}
+\def\LARGE{\@setfontsize\LARGE\@xxxvipt{45}}
+\def\huge{\@setfontsize\huge\@xliiipt{54}}
+\if@compatibility
+  \let\Huge=\huge
+\else
+  \def\Huge{\@setfontsize\huge\@lipt{62}}
+\fi
+
+\def\big#1{{\hbox{$\left#1\vbox to17\p@{}\right.\n@space$}}}
+\def\Big#1{{\hbox{$\left#1\vbox to23\p@{}\right.\n@space$}}}
+\def\bigg#1{{\hbox{$\left#1\vbox to27\p@{}\right.\n@space$}}}
+\def\Bigg#1{{\hbox{$\left#1\vbox to35\p@{}\right.\n@space$}}}
+\endinput
+%%
+%% End of file `foil20.clo'.

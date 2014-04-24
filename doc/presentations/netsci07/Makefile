@@ -11,23 +11,29 @@ netsci07.ps: netsci07.dvi
 netsci07.pdf: netsci07.ps
 	ps2pdf netsci07.ps
 
-IMAGES=karate3d.eps arch.eps arch.eps_t RMKI-BME.eps CCSS.eps python3d.eps \
+IMAGES=karate3d.eps arch.eps RMKI-BME.eps CCSS.eps python3d.eps \
 	sna_screenshot.eps tkplot.eps diameter.eps degreedist.eps python3d-2.eps
+
+%.png:: ../images/%.png
+	cp $< $@
+
+%.svg.gz:: ../images/%.svg.gz
+	cp $< $@
 
 karate3d.eps: karate3d.png
 	convert karate3d.png karate3d.eps
 
-arch.eps arch.eps_t: arch.svg.gz
+arch.eps: arch.svg.gz
 	gzip -dc arch.svg.gz >arch.svg && \
-	svgtex arch.svg
+	inkscape -E arch.eps -y 0.0 arch.svg
 
 RMKI-BME.eps: RMKI-BME.svg.gz
 	gzip -dc RMKI-BME.svg.gz >RMKI-BME.svg && \
-	inkscape -E RMKI-BME.eps -B RMKI-BME.svg
+	inkscape -E RMKI-BME.eps -y 0.0 RMKI-BME.svg
 
 CCSS.eps: CCSS.svg.gz
 	gzip -dc CCSS.svg.gz >CCSS.svg && \
-	inkscape -E CCSS.eps -B CCSS.svg
+	inkscape -E CCSS.eps -y 0.0 CCSS.svg
 
 python3d.eps: python3d.png
 	convert python3d.png python3d.eps
@@ -55,7 +61,8 @@ clean:
 	RMKI-BME.eps CCSS.eps netsci07.pdf netsci07.ps \
 	python3d-2.eps sna_screenshot.eps \
 	netsci07.aux netsci07.dvi netsci07.log \
-	screenshots.svg arch.svg RMKI-BME.svg CCSS.svg
+	screenshots.svg arch.svg RMKI-BME.svg CCSS.svg \
+	degreedist.eps diameter.eps python3d.eps tkplot.eps
 
 
 .PHONY: all ps pdf clean

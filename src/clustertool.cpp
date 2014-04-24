@@ -101,12 +101,12 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  * This function implements the community structure detection
  * algorithm proposed by Joerg Reichardt and Stefan Bornholdt. 
  * The algorithm is described in their paper: Statistical Mechanics of 
- * Community Detection, http://arxiv.org/abs/cond-mat/0603718.
+ * Community Detection, http://arxiv.org/abs/cond-mat/0603718 .
  * 
  * </para><para> From version 0.6 igraph also supports an extension to
  * the algorithm that allows negative edge weights. This is described
  * in  V.A. Traag and Jeroen Bruggeman: Community detection in networks 
- * with positive and negative links, http://arxiv.org/abs/0811.2329.
+ * with positive and negative links, http://arxiv.org/abs/0811.2329 .
  * \param graph The input graph, it may be directed but the direction
  *     of the edge is not used in the algorithm.
  * \param weights The vector giving the edge weights, it may be \c NULL, 
@@ -135,7 +135,8 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
  *     result might small.
  * \param parupdate A logical constant, whether to update all spins in
  *     parallel. The default for this argument was \c FALSE (ie. 0) in
- *     the original code.
+ *     the original code. It is not implemented in the \c
+ *     IGRAPH_SPINCOMM_INP_NEG implementation.
  * \param starttemp Real number, the temperature at the start. The
  *     value of this argument was 1.0 in the original code.
  * \param stoptemp Real number, the algorithm stops at this
@@ -292,7 +293,7 @@ int igraph_i_community_spinglass_orig(const igraph_t *graph,
 
   /* Transform the igraph_t */
   IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-				     net, 0.0, use_weights, 0));
+				     net, use_weights, 0));
 
   prob=2.0*net->sum_weights/double(net->node_list->Size())
     /double(net->node_list->Size()-1);
@@ -370,7 +371,7 @@ int igraph_i_community_spinglass_orig(const igraph_t *graph,
  * This function implements the community structure detection
  * algorithm proposed by Joerg Reichardt and Stefan Bornholdt. It is
  * described in their paper: Statistical Mechanics of 
- * Community Detection, http://arxiv.org/abs/cond-mat/0603718.
+ * Community Detection, http://arxiv.org/abs/cond-mat/0603718 .
  * 
  * </para><para>
  * This function calculates the community of a single vertex without
@@ -478,7 +479,7 @@ int igraph_community_spinglass_single(const igraph_t *graph,
 
   /* Transform the igraph_t */
   IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-				     net, 0.0, use_weights, 0));
+				     net, use_weights, 0));
 
   prob=2.0*net->sum_weights/double(net->node_list->Size())
     /double(net->node_list->Size()-1);
@@ -546,6 +547,11 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 
   /* Check arguments */
 
+  if (parupdate) {
+    IGRAPH_ERROR("Parallel spin update not implemented with "
+		 "negative gamma", IGRAPH_UNIMPLEMENTED);
+  }
+
   if (spins < 2 || spins > 500) {
     IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
   }
@@ -589,7 +595,7 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
 
   /* Transform the igraph_t */
   IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-				     net, 0.0, use_weights, 0));
+				     net, use_weights, 0));
 	
   bool directed = igraph_is_directed(graph);
   

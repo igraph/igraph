@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site
-    base_url="http://igraph.sourceforge.net/"
+    base_url="http://igraph.org/
     store_into="sitemap.xml"
     verbose="1"
     sitemap_type="web">
-  <directory path="homepage" url="http://igraph.sourceforge.net/" />
-  <directory path="html" url="http://igraph.sourceforge.net/doc/" />
-  <directory path="book/html" url="http://igraph.sourceforge.net/igraphbook/" />
+  <directory path="homepage" url="http://igraph.org/" />
+  <directory path="html" url="http://igraph.org/doc/" />
+  <directory path="book/html" url="http://igraph.org/igraphbook/" />
   <filter action="drop" type="wildcard" pattern="*~" />
   <filter action="drop" type="wildcard" pattern="*.html.in" />
   <filter action="drop" type="wildcard" pattern="*.py" />

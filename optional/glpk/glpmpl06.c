@@ -22,6 +22,12 @@
 *  along with GLPK. If not, see <http://www.gnu.org/licenses/>.
 ***********************************************************************/
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#pragma clang diagnostic ignored "-Wsometimes-uninitialized"
+#pragma clang diagnostic ignored "-Wself-assign"
+#endif
+
 #define _GLPSTD_ERRNO
 #define _GLPSTD_STDIO
 #include "glpmpl.h"

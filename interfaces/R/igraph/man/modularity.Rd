@@ -1,5 +1,6 @@
 \name{modularity}
 \alias{modularity}
+\alias{mod.matrix}
 \alias{modularity.igraph}
 \concept{Modularity}
 \title{Modularity of a community structure of a graph}
@@ -8,9 +9,10 @@
 }
 \usage{
 \method{modularity}{igraph}(x, membership, weights = NULL, \dots)
+mod.matrix (graph, membership, weights = NULL) 
 }
 \arguments{
-  \item{x}{The input graph.}
+  \item{x,graph}{The input graph.}
   \item{membership}{Numeric vector, for each vertex it gives its
     community. The communities are numbered from one.
   }
@@ -19,6 +21,9 @@
   \item{\dots}{Additional arguments, none currently.}
 }
 \details{
+  \code{modularity} calculates the modularity of a graph with respect to
+  the given \code{membership} vector.
+  
   The modularity of a graph with respect to some division (or vertex
   types) measures how good the division is, or how separated are the 
   different vertex types from each other. It defined as 
@@ -34,9 +39,23 @@
   If edge weights are given, then these are considered as the element of
   the \eqn{A} adjacency matrix, and \eqn{k_i}{ki} is the sum of weights
   of adjacent edges for vertex \eqn{i}.
+
+  \code{mod.matrix} calculates the modularity matrix. This is a dense
+  matrix, and it is defined as the difference of the adjacency matrix
+  and the configuration model null model matrix. In other words element
+  \eqn{M_{ij}}{M[i,j]} is given as
+  \eqn{A_{ij}-d_i d_j/(2m)}{A[i,j]-d[i]d[j]/(2m)}, where
+  \eqn{A_{ij}}{A[i,j]} is the (possibly weighted) adjacency matrix,
+  \eqn{d_i}{d[i]} is the degree of vertex \eqn{i}, and \eqn{m} is the
+  number of edges (or the total weights in the graph, if it is
+  weighed).
 }
 \value{
-  A numeric scalar, the modularity score of the given configuration.
+  For \code{modularity} a numeric scalar, the modularity score of the
+  given configuration.
+
+  For \code{mod.matrix} a numeic square matrix, its order is the number
+  of vertices in the graph.
 }
 \references{
   MEJ Newman and M Girvan: Finding and evaluating community

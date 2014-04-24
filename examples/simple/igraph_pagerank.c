@@ -23,6 +23,13 @@
 
 #include <igraph.h>
 #include <unistd.h>
+#include <libgen.h>
+
+void warning_handler_stdout (const char *reason, const char *file,
+			     int line, int igraph_errno) {
+  IGRAPH_UNUSED(igraph_errno);
+  printf("Warning: %s\n", reason);
+}
 
 void print_vector(igraph_vector_t *v, FILE *f) {
   long int i;
@@ -32,6 +39,8 @@ void print_vector(igraph_vector_t *v, FILE *f) {
   fprintf(f, "\n");
 }
 
+igraph_warning_handler_t *oldwarn;
+
 int main() {
 
   igraph_t g;
@@ -39,6 +48,7 @@ int main() {
   igraph_arpack_options_t arpack_options;
   igraph_real_t value;
   int ret;
+  igraph_pagerank_power_options_t power_options;
 
   /* Test graphs taken from http://www.iprcom.com/papers/pagerank/ */
   igraph_vector_init(&v, 10);
@@ -50,6 +60,7 @@ int main() {
   igraph_create(&g, &v, 0, 1);
 
   igraph_vector_init(&res, 0);
+  oldwarn=igraph_set_warning_handler(warning_handler_stdout);
   igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 1000, 0.001, 0.85, 0);
   print_vector(&res, stdout);
   igraph_vector_destroy(&res);
@@ -80,49 +91,94 @@ int main() {
   igraph_vector_destroy(&res);
   igraph_vector_destroy(&v);
   igraph_destroy(&g);
-   
+
+  igraph_set_warning_handler(oldwarn);
+
   /* New PageRank */
   igraph_star(&g, 11, IGRAPH_STAR_UNDIRECTED, 0);
   igraph_vector_init(&res, 0);
   igraph_arpack_options_init(&arpack_options);
-  igraph_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+		  igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+  print_vector(&res, stdout);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+		  igraph_vss_all(), 0, 0.85, 0, 0);
   print_vector(&res, stdout);
   /* Check twice more for consistency */
-  igraph_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+		  igraph_vss_all(), 0, 0.85, 0, &arpack_options);
   print_vector(&res, stdout);
-  igraph_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+		  igraph_vss_all(), 0, 0.85, 0, 0);
+  print_vector(&res, stdout);
+
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+		  igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+  print_vector(&res, stdout);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+		  igraph_vss_all(), 0, 0.85, 0, 0);
   print_vector(&res, stdout);
 
   /* Check personalized PageRank */
-  igraph_personalized_pagerank_vs(&g, &res, 0, igraph_vss_all(), 0, 0.5, igraph_vss_1(1), 0,
-		  &arpack_options);
+  igraph_personalized_pagerank_vs(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+				  igraph_vss_all(), 0, 0.5,
+				  igraph_vss_1(1), 0, &arpack_options);
+  print_vector(&res, stdout);
+  igraph_personalized_pagerank_vs(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+				  igraph_vss_all(), 0, 0.5,
+				  igraph_vss_1(1), 0, 0);
   print_vector(&res, stdout);
 
   /* Errors */
+  power_options.niter = -1; power_options.eps=0.0001;
   igraph_set_error_handler(igraph_error_handler_ignore);
-  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, -1, 0.0001, 0.85, 0);
+  igraph_set_warning_handler(igraph_warning_handler_ignore);
+  ret=igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_POWER, &res,
+		      /*value=*/ 0, igraph_vss_all(), 1, 0.85,
+		      /*weights=*/ 0, &power_options);
   if (ret != IGRAPH_EINVAL) {
     return 1;
   }
   
-  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, -1, 0.85, 0);
+  power_options.niter=10000; power_options.eps=-1;
+  ret=igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_POWER, &res,
+		      /*value=*/ 0, igraph_vss_all(), 1, 0.85,
+		      /*weights=*/ 0, &power_options);
   if (ret != IGRAPH_EINVAL) {
     return 2;
   }
-  
-  ret=igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, 0.0001, 1.2, 0);
+
+  power_options.niter=10000; power_options.eps=0.0001;
+  ret=igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_POWER, &res,
+		      /*value=*/ 0, igraph_vss_all(), 1, 1.2,
+		      /*weights=*/ 0, &power_options);
   if (ret != IGRAPH_EINVAL) {
     return 3;
   }
 
   igraph_vector_init(&reset, 2);
-  ret=igraph_personalized_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, &reset, 0, &arpack_options);
+  ret=igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+				   igraph_vss_all(), 0, 0.85, &reset, 0,
+				   &arpack_options);
+  if (ret != IGRAPH_EINVAL) {
+    return 4;
+  }
+  ret=igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+				   igraph_vss_all(), 0, 0.85, &reset, 0, 0);
   if (ret != IGRAPH_EINVAL) {
     return 4;
   }
   igraph_vector_resize(&reset, 10);
   igraph_vector_fill(&reset, 0);
-  ret=igraph_personalized_pagerank(&g, &res, 0, igraph_vss_all(), 0, 0.85, &reset, 0, &arpack_options);
+  ret=igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK,
+				   &res, 0, igraph_vss_all(), 0, 0.85,
+				   &reset, 0, &arpack_options);
+  if (ret != IGRAPH_EINVAL) {
+    return 5;
+  }
+  ret=igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK,
+				   &res, 0, igraph_vss_all(), 0, 0.85,
+				   &reset, 0, 0);
   if (ret != IGRAPH_EINVAL) {
     return 5;
   }
@@ -132,7 +188,13 @@ int main() {
 
   /* Special cases: check for empty graph */
   igraph_empty(&g, 10, 0);
-  igraph_pagerank(&g, &res, &value, igraph_vss_all(), 1, 0.85, 0, &arpack_options);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
+		  igraph_vss_all(), 1, 0.85, 0, &arpack_options);
+  if (value != 1.0) {
+    return 6;
+  }
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
+		  igraph_vss_all(), 1, 0.85, 0, 0);
   if (value != 1.0) {
     return 6;
   }
@@ -143,11 +205,17 @@ int main() {
   igraph_full(&g, 10, 0, 0);
   igraph_vector_init(&v, 45);
   igraph_vector_fill(&v, 0);
-  igraph_pagerank(&g, &res, &value, igraph_vss_all(), 1, 0.85, &v, &arpack_options);
-  igraph_vector_destroy(&v);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, &value,
+		  igraph_vss_all(), 1, 0.85, &v, &arpack_options);
   if (value != 1.0) {
     return 7;
   }
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, &value,
+		  igraph_vss_all(), 1, 0.85, &v, 0);
+  if (value != 1.0) {
+    return 7;
+  }
+  igraph_vector_destroy(&v);
   print_vector(&res, stdout);
   igraph_destroy(&g);
 
@@ -157,7 +225,11 @@ int main() {
   VECTOR(weights)[0] = 4; VECTOR(weights)[1] = 5; VECTOR(weights)[2] = 5;
   VECTOR(weights)[3] = 4; VECTOR(weights)[4] = 4; VECTOR(weights)[5] = 4;
   VECTOR(weights)[6] = 3; VECTOR(weights)[7] = 4; VECTOR(weights)[8] = 4;
-  igraph_pagerank(&g, &res, 0, igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+		  igraph_vss_all(), 1, 0.85, &weights, &arpack_options);
+  print_vector(&res, stdout);
+  igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+		  igraph_vss_all(), 1, 0.85, &weights, 0);
   print_vector(&res, stdout);
   igraph_vector_destroy(&weights);
   igraph_destroy(&g);

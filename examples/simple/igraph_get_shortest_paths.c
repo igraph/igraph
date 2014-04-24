@@ -74,6 +74,7 @@ int main() {
 
   igraph_t g;
   igraph_vector_ptr_t vecs, evecs;
+  igraph_vector_long_t pred, inbound;
   long int i;
   igraph_vs_t vs;
 
@@ -81,6 +82,9 @@ int main() {
   
   igraph_vector_ptr_init(&vecs, 5);
   igraph_vector_ptr_init(&evecs, 5);
+  igraph_vector_long_init(&pred, 0);
+  igraph_vector_long_init(&inbound, 0);
+
   for (i=0; i<igraph_vector_ptr_size(&vecs); i++) {
     VECTOR(vecs)[i] = calloc(1, sizeof(igraph_vector_t));
     igraph_vector_init(VECTOR(vecs)[i], 0);
@@ -89,7 +93,7 @@ int main() {
   }
   igraph_vs_vector_small(&vs, 1, 3, 5, 2, 1,  -1);
   
-  igraph_get_shortest_paths(&g, &vecs, &evecs, 0, vs, IGRAPH_OUT);
+  igraph_get_shortest_paths(&g, &vecs, &evecs, 0, vs, IGRAPH_OUT, &pred, &inbound);
 
   check_evecs(&g, &vecs, &evecs, 10);
   
@@ -100,8 +104,14 @@ int main() {
     igraph_vector_destroy(VECTOR(evecs)[i]);
     free(VECTOR(evecs)[i]);
   }
+
+  igraph_vector_long_print(&pred);
+  igraph_vector_long_print(&inbound);
+
   igraph_vector_ptr_destroy(&vecs);
   igraph_vector_ptr_destroy(&evecs);
+  igraph_vector_long_destroy(&pred);
+  igraph_vector_long_destroy(&inbound);
   igraph_vs_destroy(&vs);
   igraph_destroy(&g);
 

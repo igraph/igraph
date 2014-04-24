@@ -31,6 +31,11 @@
  * SUCH DAMAGE.
  */
 
+#ifdef __clang__
+#pragma clang diagnostic ignored "-Wsign-conversion"
+#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+#endif
+
 #ifdef _MSC_VER
 /* MSVC does not have inline when compiling C source files */
 #define inline __inline
@@ -188,15 +193,15 @@ loop:	SWAPINIT(a, es);
 	pn = (char *)a + n * es;
 	r = igraph_min(pa - (char *)a, pb - pa);
 	vecswap(a, pb - r, r);
-	r = igraph_min(pd - pc, pn - pd - es);
+	r = igraph_min((size_t)(pd - pc), (size_t)(pn - pd - es));
 	vecswap(pb, pn - r, r);
-	if ((r = pb - pa) > es)
+	if ((size_t)(r = pb - pa) > es)
 #ifdef I_AM_QSORT_R
 		igraph_qsort_r(a, r / es, es, thunk, cmp);
 #else
 		igraph_qsort(a, r / es, es, cmp);
 #endif
-	if ((r = pd - pc) > es) {
+		if ((size_t)(r = pd - pc) > es) {
 		/* Iterate rather than recurse to save stack space */
 		a = pn - r;
 		n = r / es;

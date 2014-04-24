@@ -42,7 +42,7 @@ __BEGIN_DECLS
 
 typedef struct igraph_adjlist_t { 
   igraph_integer_t length;
-  igraph_vector_t *adjs;
+  igraph_vector_int_t *adjs;
 } igraph_adjlist_t;
 
 int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al, 
@@ -59,19 +59,20 @@ void igraph_adjlist_sort(igraph_adjlist_t *al);
 int igraph_adjlist_simplify(igraph_adjlist_t *al);
 int igraph_adjlist_remove_duplicate(const igraph_t *graph, 
 				    igraph_adjlist_t *al);
-int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile);
-/* igraph_vector_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
+int igraph_adjlist_print(const igraph_adjlist_t *al);
+int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
+/* igraph_vector_int_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
 /* 			       igraph_integer_t no); */
 /**
  * \define igraph_adjlist_get
  * Query a vector in an adjlist
  * 
- * Returns a pointer to an <type>igraph_vector_t</type> object from an
+ * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
  * adjacency list. The vector can be modified as desired. 
  * \param al The adjacency list object.
  * \param no The vertex of which the vertex of adjacent vertices are
  *   returned.
- * \return Pointer to the <type>igraph_vector_t</type> object.
+ * \return Pointer to the <type>igraph_vector_int_t</type> object.
  * 
  * Time complexity: O(1).
  */
@@ -93,7 +94,8 @@ void igraph_inclist_destroy(igraph_inclist_t *il);
 void igraph_inclist_clear(igraph_inclist_t *il);
 int igraph_inclist_remove_duplicate(const igraph_t *graph,
 					igraph_inclist_t *il);
-int igraph_inclist_print(const igraph_inclist_t *il, FILE *outfile);
+int igraph_inclist_print(const igraph_inclist_t *il);
+int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 
 /**
  * \define igraph_inclist_get

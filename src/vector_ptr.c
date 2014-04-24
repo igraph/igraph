@@ -221,7 +221,7 @@ int igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size) {
 	
 	if (size <= igraph_vector_ptr_size(v)) { return 0; }
 
-	tmp=igraph_Realloc(v->stor_begin, size, void*);
+	tmp=igraph_Realloc(v->stor_begin, (size_t) size, void*);
 	if (tmp==0) {
 	  IGRAPH_ERROR("vector ptr reserve failed", IGRAPH_ENOMEM);
 	}
@@ -350,7 +350,7 @@ int igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
   IGRAPH_CHECK(igraph_vector_ptr_resize(v, size+1));
   if (pos<size) {
     memmove(v->stor_begin+pos+1, v->stor_begin+pos, 
-	    sizeof(void*)*(size-pos));
+	    sizeof(void*) * (size_t) (size-pos));
   }
   v->stor_begin[pos] = e;
   return 0;
@@ -401,7 +401,8 @@ void igraph_vector_ptr_null      (igraph_vector_ptr_t* v) {
 	assert(v != NULL);
 	assert(v->stor_begin != NULL);		
 	if (igraph_vector_ptr_size(v)>0) {
-		memset(v->stor_begin, 0, sizeof(void*)*igraph_vector_ptr_size(v));
+	  memset(v->stor_begin, 0, sizeof(void*) * 
+		 (size_t) igraph_vector_ptr_size(v));
 	}
 }
 
@@ -446,7 +447,7 @@ int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void* *data, long int le
   v->stor_end=v->stor_begin+length;
   v->end=v->stor_end;
   v->item_destructor=0;
-  memcpy(v->stor_begin, data, length*sizeof(void*));
+  memcpy(v->stor_begin, data, (size_t) length * sizeof(void*));
   
   return 0;
 }
@@ -460,7 +461,8 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
   assert(v != NULL);
   assert(v->stor_begin != NULL);		
   if (v->end != v->stor_begin) {
-    memcpy(to, v->stor_begin, sizeof(void*) * (v->end - v->stor_begin));
+    memcpy(to, v->stor_begin, sizeof(void*) * 
+	   (size_t) (v->end - v->stor_begin));
   }
 }
 
@@ -500,7 +502,8 @@ int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *f
   to->stor_end=to->stor_begin+igraph_vector_ptr_size(from);
   to->end=to->stor_end;
   to->item_destructor=from->item_destructor;
-  memcpy(to->stor_begin, from->stor_begin, igraph_vector_ptr_size(from)*sizeof(void*));
+  memcpy(to->stor_begin, from->stor_begin, 
+	 (size_t) igraph_vector_ptr_size(from)*sizeof(void*));
   
   return 0;
 }
@@ -515,7 +518,7 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
   assert(v->stor_begin != NULL);
   if (pos+1<igraph_vector_ptr_size(v)) { /* TOOD: why is this needed */
     memmove(v->stor_begin+pos, v->stor_begin+pos+1,
-	    sizeof(void*)*(igraph_vector_ptr_size(v)-pos-1));
+	    sizeof(void*) * (size_t) (igraph_vector_ptr_size(v)-pos-1));
   }
   v->end--;
 }
@@ -535,7 +538,25 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
  * to the underlying object the address of which is stored in \c v .
  */
 void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, const void*)) {
-  qsort(v->stor_begin, igraph_vector_ptr_size(v), sizeof(void*), compar);
+  qsort(v->stor_begin, (size_t) igraph_vector_ptr_size(v), sizeof(void*), 
+	compar);
+}
+
+int igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
+				const igraph_vector_int_t *idx) {
+  void **tmp;
+  int i, n=igraph_vector_int_size(idx);
+
+  tmp=igraph_Calloc(n, void*);
+  if (!tmp) { IGRAPH_ERROR("Cannot index pointer vector", IGRAPH_ENOMEM); }
+
+  for (i=0; i<n; i++) { tmp[i] = VECTOR(*v)[ VECTOR(*idx)[i] ]; }
+
+  igraph_Free(v->stor_begin);
+  v->stor_begin = tmp;
+  v->stor_end = v->end = tmp + n;
+
+  return 0;
 }
 
 int igraph_vector_ptr_append    (igraph_vector_ptr_t *to, 

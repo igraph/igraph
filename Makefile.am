@@ -7,13 +7,17 @@ DOC_FILES = $(top_srcdir)/doc/Makefile.in \
 pkgconfigdir = @libdir@/pkgconfig
 pkgconfig_DATA = igraph.pc
 
-EXTRA_DIST = igraph.pc $(top_srcdir)/include/* $(DOC_FILES) examples \
+EXTRA_DIST = igraph.pc VERSION $(top_srcdir)/include/* $(DOC_FILES) examples \
 	$(wildcard $(top_srcdir)/optional/glpk/*.{inc,c,h})      \
 	$(wildcard $(top_srcdir)/optional/glpk/{README,COPYING}) \
 	$(wildcard $(top_srcdir)/optional/glpk/amd/*.{c,h})      \
 	$(wildcard $(top_srcdir)/optional/glpk/amd/{README,COPYING}) \
 	$(wildcard $(top_srcdir)/optional/glpk/colamd/*.{c,h}) \
-	$(wildcard $(top_srcdir)/optional/glpk/colamd/{README,COPYING})
+	$(wildcard $(top_srcdir)/optional/glpk/colamd/{README,COPYING}) \
+	tests/testsuite
+
+tests/testsuite:
+	cd tests && make testsuite
 
 install-exec-hook:
 	if test -f $(top_builddir)/src/.libs/cygigraph-0.dll ; \
@@ -35,7 +39,7 @@ dist-hook:
 MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make deb will generate Debian packages
-.PHONY: framework msvc
+.PHONY: framework msvc parsersources
 
 framework: all
 	rm -rf $(top_builddir)/igraph.framework
@@ -56,6 +60,9 @@ test: all
 		  $$i/test.sh; \
 	 	fi; \
 	done
+
+parsersources:
+	cd src; make parsersources
 
 msvc: parsersources
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
@@ -80,4 +87,7 @@ msvc: parsersources
 	rm -rf igraph-$(VERSION)-msvc.zip
 	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest
 
+python-msvc: msvc
+	cmd /c "tools\build_python_msvc.cmd"
+    
 CLEANFILES=

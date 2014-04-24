@@ -192,9 +192,9 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
 			       igraph_bool_t symm) {
   
   /* TODO: check arguments */
-  s->maxn=maxn;
-  s->maxncv=maxncv;
-  s->maxldv=maxldv;
+  s->maxn=(int) maxn;
+  s->maxncv=(int) maxncv;
+  s->maxldv=(int) maxldv;
 
 #define CHECKMEM(x) \
     if (!x) { \
@@ -580,10 +580,10 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
   igraph_vector_t order;
   char sort[2];
   int apply=1;
-  int n=options->n;
+  unsigned int n=(unsigned int) options->n;
   int nconv=options->nconv;
   int nev=options->nev;
-  int nans= nconv < nev ? nconv : nev;
+  unsigned int nans= (unsigned int) (nconv < nev ? nconv : nev);
 
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
@@ -643,7 +643,7 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
     int i;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, n, nans));
     for (i=0; i<nans; i++) { 
-      int idx=VECTOR(order)[i];
+      unsigned int idx=(unsigned int) VECTOR(order)[i];
       const igraph_real_t *ptr=v + n * idx;
       memcpy(&MATRIX(*vectors, 0, i), ptr, sizeof(igraph_real_t) * n);
     }
@@ -663,10 +663,10 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
   igraph_vector_t order;
   char sort[2];
   int apply=1;
-  int n=options->n;
+  unsigned int n=(unsigned int) options->n;
   int nconv=options->nconv;
   int nev=options->nev;
-  int nans=nconv < nev ? nconv : nev;
+  unsigned int nans=(unsigned int) (nconv < nev ? nconv : nev);
 
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
@@ -708,7 +708,7 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
     ncol=(nc/2)*2 + (nc%2)*2 + nr;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, n, ncol));
     for (i=0; i<nans; i++) {
-      int idx=VECTOR(order)[i];
+      unsigned int idx=(unsigned int) VECTOR(order)[i];
       igraph_real_t *ptr=v + n * idx;
       if (di[i]==0) {
 	memcpy(&MATRIX(*vectors, 0, vx), ptr, sizeof(igraph_real_t) * n);
@@ -761,6 +761,19 @@ void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
   if (options->ncv > options->n) {
     options->ncv = options->n;
   }
+}
+
+/**
+ * \function igraph_i_arpack_report_no_convergence
+ * \brief Prints a warning that informs the user that the ARPACK solver
+ *        did not converge.
+ */
+void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t* options) {
+  char buf[1024];
+  snprintf(buf, sizeof(buf), "ARPACK solver failed to converge (%d iterations, "
+      "%d/%d eigenvectors converged)", options->iparam[2],
+      options->iparam[4], options->nev);
+  IGRAPH_WARNING(buf);
 }
 
 /**
@@ -924,6 +937,9 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     }
   }
   
+  if (options->info == 1) {
+    igraph_i_arpack_report_no_convergence(options);
+  }
   if (options->info != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
   }
@@ -946,7 +962,6 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   		&options->ierr);
 #endif
 
-  
   if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dseupd(options->ierr));
   }
@@ -1152,7 +1167,10 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     }
   }
 
-  if (options->info != 0 && options->info != 1) {
+  if (options->info == 1) {
+    igraph_i_arpack_report_no_convergence(options);
+  }
+  if (options->info != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dnaupd(options->info));
   }
 
@@ -1255,7 +1273,7 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
   long int nodes=igraph_matrix_nrow(vectors);
   long int no_evs=igraph_matrix_nrow(values);
   long int i, j, k, wh;
-  size_t colsize=nodes * sizeof(igraph_real_t);
+  size_t colsize=(unsigned) nodes * sizeof(igraph_real_t);
 
   /* Error checks */
   if (nev < 0) {

@@ -27,31 +27,31 @@ int main() {
   
   igraph_t g;
   igraph_vs_t vertices;
-  igraph_vector_t result;
-  long int i;
+  igraph_vector_t result1, result2;
+
+  igraph_rng_seed(igraph_rng_default(), 42);
   
-  igraph_vs_seq(&vertices, 1, 101);
-  igraph_barabasi_game(&g, 100000, /*power=*/ 1, 3, 0, 0, /*A=*/ 1,
-		       IGRAPH_DIRECTED, IGRAPH_BARABASI_BAG, 
-		       /*start_from=*/ 0);
-  igraph_vector_init(&result, 0);
+  igraph_vector_init(&result1, 0);
+  igraph_vector_init(&result2, 0);
+
+  igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 100, .1,
+			  IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+
+  igraph_vs_seq(&vertices, 0, 99);
+
+  igraph_transitivity_local_undirected(&g, &result1, igraph_vss_all(),
+				       IGRAPH_TRANSITIVITY_NAN);
+  igraph_transitivity_local_undirected(&g, &result2, vertices,
+				       IGRAPH_TRANSITIVITY_NAN);
   
-  for (i=0; i<1; i++) {
-    igraph_transitivity_local_undirected2(&g, &result, igraph_vss_all(),
-			IGRAPH_TRANSITIVITY_NAN);
+  if (!igraph_vector_all_e(&result1, &result2)) {
+    igraph_vector_print(&result1);
+    igraph_vector_print(&result2);
+    return 1;
   }
 
-  for (i=0; i<1; i++) {
-    igraph_transitivity_local_undirected4(&g, &result, igraph_vss_all(),
-			IGRAPH_TRANSITIVITY_NAN);
-  }
-  
-/*   for (i=0; i<igraph_vector_size(&result); i++) { */
-/*     printf("%f ", VECTOR(result)[i]); */
-/*   } */
-/*   printf("\n"); */
-  
-  igraph_vector_destroy(&result);
+  igraph_vector_destroy(&result1);
+  igraph_vector_destroy(&result2);
   igraph_vs_destroy(&vertices);
   igraph_destroy(&g);
   

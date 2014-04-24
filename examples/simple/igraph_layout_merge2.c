@@ -70,5 +70,9 @@ int main() {
   igraph_destroy(&small);
   igraph_destroy(&big);
   
+#ifdef __APPLE__
   return 0;
+#else
+  return 77;
+#endif
 }

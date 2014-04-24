@@ -84,7 +84,7 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
   if (directed) {
     while (!IGRAPH_EIT_END(edgeit)) {
       long int edge=IGRAPH_EIT_GET(edgeit);
-      igraph_edge(graph, edge, &ffrom, &fto);
+      igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
       from=ffrom;
       to=fto;
       if (eids) { 
@@ -97,7 +97,7 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
   } else if (type==IGRAPH_GET_ADJACENCY_UPPER) {
     while (!IGRAPH_EIT_END(edgeit)) {  
       long int edge=IGRAPH_EIT_GET(edgeit);
-      igraph_edge(graph, edge, &ffrom, &fto);
+      igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
       from=ffrom;
       to=fto;
       if (to < from) {
@@ -118,7 +118,7 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
   } else if (type==IGRAPH_GET_ADJACENCY_LOWER) {
     while (!IGRAPH_EIT_END(edgeit)) {
       long int edge=IGRAPH_EIT_GET(edgeit);
-      igraph_edge(graph, edge, &ffrom, &fto);
+      igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
       from=ffrom;
       to=fto;
       if (to < from) {
@@ -139,7 +139,7 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
   } else if (type==IGRAPH_GET_ADJACENCY_BOTH) {
     while (!IGRAPH_EIT_END(edgeit)) {
       long int edge=IGRAPH_EIT_GET(edgeit);
-      igraph_edge(graph, edge, &ffrom, &fto);
+      igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
       from=ffrom;
       to=fto;
       if (eids) { 
@@ -360,7 +360,8 @@ int igraph_to_directed(igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, size);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
 
-    IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes,
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges,
+			       (igraph_integer_t) no_of_nodes,
 			       IGRAPH_DIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     igraph_vector_destroy(&edges);
@@ -390,7 +391,8 @@ int igraph_to_directed(igraph_t *graph,
       VECTOR(index)[i] = VECTOR(index)[no_of_edges+i] = i;
     }
 
-    IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes,
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges, 
+			       (igraph_integer_t) no_of_nodes,
 			       IGRAPH_DIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
@@ -471,7 +473,7 @@ int igraph_to_undirected(igraph_t *graph,
     while (!IGRAPH_EIT_END(eit)) {
       long int edge=IGRAPH_EIT_GET(eit);
       igraph_integer_t from, to;
-      igraph_edge(graph, edge, &from, &to);
+      igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
       IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
       IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
       IGRAPH_EIT_NEXT(eit);
@@ -481,7 +483,9 @@ int igraph_to_undirected(igraph_t *graph,
     igraph_es_destroy(&es);
     IGRAPH_FINALLY_CLEAN(2);
     
-    IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges, 
+			       (igraph_integer_t) no_of_nodes, 
+			       IGRAPH_UNDIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     igraph_vector_destroy(&edges);
     IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
@@ -508,17 +512,19 @@ int igraph_to_undirected(igraph_t *graph,
       long int n_out, n_in;
       long int p1=-1, p2=-1;
       long int e1=0, e2=0, n1=0, n2=0;
-      IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT));
-      IGRAPH_CHECK(igraph_incident(graph, &inadj, i, IGRAPH_IN));
+      IGRAPH_CHECK(igraph_incident(graph, &outadj, (igraph_integer_t) i, 
+				   IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_incident(graph, &inadj, (igraph_integer_t) i, 
+				   IGRAPH_IN));
       n_out=igraph_vector_size(&outadj);
       n_in=igraph_vector_size(&inadj);
 
 #define STEPOUT() if ( (++p1) < n_out) {	\
-	e1 = VECTOR(outadj)[p1];		\
+	e1 = (long int) VECTOR(outadj)[p1];	\
 	n1 = IGRAPH_TO(graph, e1);		\
       }
 #define STEPIN()  if ( (++p2) < n_in) {	        \
-        e2 = VECTOR(inadj )[p2];		\
+        e2 = (long int) VECTOR(inadj )[p2];	\
 	n2 = IGRAPH_FROM(graph, e2);		\
       }
 
@@ -585,7 +591,9 @@ int igraph_to_undirected(igraph_t *graph,
     igraph_vector_destroy(&inadj);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, IGRAPH_UNDIRECTED));
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges,
+			       (igraph_integer_t) no_of_nodes,
+			       IGRAPH_UNDIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     igraph_vector_destroy(&edges);
     IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
@@ -631,17 +639,19 @@ int igraph_to_undirected(igraph_t *graph,
       long int n_out, n_in; 
       long int p1=-1, p2=-1;
       long int e1=0, e2=0, n1=0, n2=0;
-      IGRAPH_CHECK(igraph_incident(graph, &outadj, i, IGRAPH_OUT));
-      IGRAPH_CHECK(igraph_incident(graph, &inadj,  i, IGRAPH_IN));
+      IGRAPH_CHECK(igraph_incident(graph, &outadj, (igraph_integer_t) i, 
+				   IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_incident(graph, &inadj,  (igraph_integer_t) i, 
+				   IGRAPH_IN));
       n_out=igraph_vector_size(&outadj);
       n_in=igraph_vector_size(&inadj);
 
 #define STEPOUT() if ( (++p1) < n_out) {	\
-	e1 = VECTOR(outadj)[p1];		\
+	e1 = (long int) VECTOR(outadj)[p1];	\
 	n1 = IGRAPH_TO(graph, e1);		\
       }
 #define STEPIN()  if ( (++p2) < n_in) {	        \
-        e2 = VECTOR(inadj )[p2];		\
+        e2 = (long int) VECTOR(inadj )[p2];	\
 	n2 = IGRAPH_FROM(graph, e2);		\
       }
 
@@ -674,7 +684,8 @@ int igraph_to_undirected(igraph_t *graph,
     igraph_vector_destroy(&inadj);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(&newgraph, &edges, no_of_nodes, 
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges,
+			       (igraph_integer_t) no_of_nodes, 
 			       IGRAPH_UNDIRECTED));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     igraph_vector_destroy(&edges);
@@ -764,9 +775,13 @@ int igraph_get_stochastic(const igraph_t *graph,
 }
 
 int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
+				 igraph_bool_t column_wise);
+
+
+int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
 				 igraph_bool_t column_wise) {
   igraph_vector_t sum;
-  int no_of_nodes=igraph_sparsemat_nrow(sparsemat);
+  int no_of_nodes=(int) igraph_sparsemat_nrow(sparsemat);
   int i;
   
   IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);

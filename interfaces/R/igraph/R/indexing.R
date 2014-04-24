@@ -178,7 +178,7 @@
 
   if (!missing(from)) {    
     if (is.null(value) ||
-        (is.null(attr) && is.logical(value) && !value) ||
+        (is.logical(value) && !value) ||
         (is.null(attr) && is.numeric(value) && value==0)) {
       ## Delete edges
       todel <- x[from=from, to=to, ..., edges=TRUE]
@@ -195,7 +195,7 @@
       }
     }
   } else if (is.null(value) ||
-      (is.null(attr) && is.logical(value) && !value) ||
+      (is.logical(value) && !value) ||
       (is.null(attr) && is.numeric(value) && value==0)) {
     ## Delete edges
     if (missing(i) && missing(j)) {

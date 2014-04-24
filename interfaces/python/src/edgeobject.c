@@ -38,6 +38,17 @@ PyTypeObject igraphmodule_EdgeType;
 
 /**
  * \ingroup python_interface_edge
+ * \brief Checks whether the given Python object is an edge
+ */
+int igraphmodule_Edge_Check(PyObject* obj) {
+  if (!obj)
+    return 0;
+  
+  return PyObject_IsInstance(obj, (PyObject*)(&igraphmodule_EdgeType));
+}
+
+/**
+ * \ingroup python_interface_edge
  * \brief Allocates a new Python edge object
  * \param gref weak reference of the \c igraph.Graph being referenced by the edge
  * \param idx the index of the edge
@@ -56,6 +67,7 @@ PyObject* igraphmodule_Edge_New(igraphmodule_GraphObject *gref, igraph_integer_t
     Py_INCREF(gref);
     self->gref=gref;
     self->idx=idx;
+    self->hash=-1;
   }
   return (PyObject*)self;
 }
@@ -121,6 +133,82 @@ PyObject* igraphmodule_Edge_repr(igraphmodule_EdgeObject *self) {
   Py_DECREF(drepr);
 #endif
   return s;
+}
+
+/** \ingroup python_interface_edge
+ * \brief Returns the hash code of the edge
+ */
+Py_hash_t igraphmodule_Edge_hash(igraphmodule_EdgeObject* self) {
+  Py_hash_t hash_graph;
+  Py_hash_t hash_index;
+  Py_hash_t result;
+  PyObject* index_o;
+
+  if (self->hash != -1)
+    return self->hash;
+
+  index_o = PyInt_FromLong((long int)self->idx);
+  if (index_o == 0)
+    return -1;
+
+  hash_index = PyObject_Hash(index_o);
+  Py_DECREF(index_o);
+
+  if (hash_index == -1)
+    return -1;
+
+  hash_graph = PyObject_Hash((PyObject*)self->gref);
+  if (hash_graph == -1)
+    return -1;
+
+  result = hash_graph ^ hash_index;
+  if (result == -1)
+    result = 590923713U;
+
+  self->hash = result;
+
+  return result;
+}
+
+/** \ingroup python_interface_edge
+ * \brief Rich comparison of an edge with another
+ */
+PyObject* igraphmodule_Edge_richcompare(igraphmodule_EdgeObject *a,
+    PyObject *b, int op) {
+
+  igraphmodule_EdgeObject* self = a;
+  igraphmodule_EdgeObject* other;
+
+  if (!igraphmodule_Edge_Check(b))
+    Py_RETURN_NOTIMPLEMENTED;
+
+  other = (igraphmodule_EdgeObject*)b;
+
+  if (self->gref != other->gref)
+    Py_RETURN_FALSE;
+
+  switch (op) {
+    case Py_EQ:
+      Py_RETURN(self->idx == other->idx);
+
+    case Py_NE:
+      Py_RETURN(self->idx != other->idx);
+
+    case Py_LE:
+      Py_RETURN(self->idx <= other->idx);
+
+    case Py_LT:
+      Py_RETURN(self->idx <  other->idx);
+
+    case Py_GE:
+      Py_RETURN(self->idx >= other->idx);
+
+    case Py_GT:
+      Py_RETURN(self->idx >  other->idx);
+
+    default:
+      Py_RETURN_NOTIMPLEMENTED;
+  }
 }
 
 /** \ingroup python_interface_edge
@@ -496,7 +584,7 @@ PyTypeObject igraphmodule_EdgeType =
   0,                                          // tp_as_number
   0,                                          // tp_as_sequence
   &igraphmodule_Edge_as_mapping,              // tp_as_mapping
-  0,                                          // tp_hash
+  (hashfunc)igraphmodule_Edge_hash,           /* tp_hash */
   0,                                          // tp_call
   0,                                          // tp_str
   0,                                          // tp_getattro
@@ -514,7 +602,7 @@ PyTypeObject igraphmodule_EdgeType =
   "  2\n", // tp_doc
   0,                                          // tp_traverse
   0,                                          // tp_clear
-  0,                                          // tp_richcompare
+  (richcmpfunc)igraphmodule_Edge_richcompare, /* tp_richcompare */
   0,                                          // tp_weaklistoffset
   0,                                          // tp_iter
   0,                                          // tp_iternext

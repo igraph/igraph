@@ -127,7 +127,7 @@ typedef struct {
 
 unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, 
 					  long int *x) {
-  long int k;
+  unsigned long int k;
 
   x[*i] += x[*j];
   k = (x[*i] >> 1) & 0x7FFFFFFF;
@@ -163,17 +163,17 @@ void igraph_i_rng_glibc2_init(long int *x, int n,
   
   if (s==0) { s=1; }
   
-  x[0] = s;
+  x[0] = (long) s;
   for (i=1 ; i<n ; i++) {
     const long int h = s / 127773;
-    const long int t = 16807 * (s - h * 127773) - h * 2836;
+    const long int t = 16807 * ((long) s - h * 127773) - h * 2836;
     if (t < 0) {
-      s = t + 2147483647 ;
+      s = (unsigned long) t + 2147483647 ;
     } else { 
-      s = t ;
+      s = (unsigned long) t ;
     }
     
-    x[i] = s ;
+    x[i] = (long int) s ;
   }
 }
 
@@ -395,7 +395,8 @@ int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     /* See Knuth's "Art of Computer Programming" Vol. 2, 3rd
        Ed. p.106 for multiplier. */
     state->mt[i] =
-      (1812433253UL * (state->mt[i-1] ^ (state->mt[i-1] >> 30)) + i);
+      (1812433253UL * (state->mt[i-1] ^ (state->mt[i-1] >> 30)) + 
+       (unsigned long) i);
     state->mt[i] &= 0xffffffffUL;
   }
   
@@ -548,7 +549,7 @@ int igraph_rng_R_seed(void *state, unsigned long int seed) {
 }
 
 unsigned long int igraph_rng_R_get(void *state) {
-  return unif_rand() * 0x7FFFFFFFUL;
+  return (unsigned long) (unif_rand() * 0x7FFFFFFFUL);
 }
 
 igraph_real_t igraph_rng_R_get_real(void *state) {
@@ -746,8 +747,7 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
     return (long int)(type->get_real(rng->state)*(h-l+1)+l);
   } else if (type->get) {
     unsigned long int max=type->max;
-    return (long int)(type->get(rng->state))/
-      ((double)max+1)*(h-l+1)+l;
+    return (long int)(type->get(rng->state) / ((double)max+1)*(h-l+1)+l);
   }
   IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
   return 0;
@@ -877,9 +877,9 @@ unsigned long int igraph_rng_get_int31(igraph_rng_t *rng) {
   if (type->get && max==0x7FFFFFFFUL) {
     return type->get(rng->state);
   } else if (type->get_real) {
-    return type->get_real(rng->state)*0x7FFFFFFFUL;
+    return (unsigned long int) (type->get_real(rng->state)*0x7FFFFFFFUL);
   } else { 
-    return igraph_rng_get_unif01(rng)*0x7FFFFFFFUL;
+    return (unsigned long int) (igraph_rng_get_unif01(rng)*0x7FFFFFFFUL);
   }
 }
 
@@ -896,7 +896,7 @@ igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate) {
 #ifndef HAVE_EXPM1
 #ifndef USING_R			/* R provides a replacement */
 /* expm1 replacement */
-static double expm1 (double x)
+double expm1 (double x)
 {
     if (fabs(x) < M_LN2)
     {
@@ -924,7 +924,7 @@ static double expm1 (double x)
 #ifndef HAVE_RINT
 #ifndef USING_R			/* R provides a replacement */
 /* rint replacement */
-static double rint (double x)
+double rint (double x)
 {
    return ( (x<0.) ? -floor(-x+.5) : floor(x+.5) );
 }
@@ -1123,7 +1123,9 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
   }
   
   if (n>1) {
-    retval=igraph_i_random_sample_alga(res, l+1, h, n);
+    retval=igraph_i_random_sample_alga(res, (igraph_integer_t) l+1, 
+				       (igraph_integer_t) h, 
+				       (igraph_integer_t) n);
   } else {
     retval=0;
     S=floor(N*Vprime);

@@ -1,14 +1,14 @@
 Package: igraphdata
-Version: 0.1-1
-Date: 2013-01-05
+Version: 0.2
+Date: 2014-02-04
 Title: A collection of network data sets for the igraph package
 Author: Gabor Csardi <csardi.gabor@gmail.com>
 Maintainer: Gabor Csardi <csardi.gabor@gmail.com>
 Depends: R (>= 2.10)
-Suggests: igraph0, igraph
+Suggests: igraph
 Description: A small collection of various network data sets, 
   to use with the igraph package. They also work with the igraph0 
   package.
 License: CC BY-SA 2.0 + file LICENSE
-URL: http://igraph.sourceforge.net
-BugReports: http://bugs.launchpad.net/igraph
+URL: http://igraph.org
+BugReports: https://github.com/igraph/igraph/issues

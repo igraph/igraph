@@ -29,8 +29,8 @@ int main() {
   igraph_t full, tree;
   igraph_hrg_t hrg;
   igraph_t dendrogram;
-  int i, j;
-  igraph_vector_t neis;
+  // int i, j;
+  // igraph_vector_t neis;
 
   igraph_rng_seed(igraph_rng_default(), 42);
 

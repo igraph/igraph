@@ -405,6 +405,18 @@
 
       Defaults to \code{FALSE}.
     }
+    \item{main}{Overall title for the main plot. The default is empty if
+      the \code{annotate.plot} igraph option is \code{FALSE}, and the
+      graph's \code{name} attribute otherwise. See the same argument of
+      the base \code{plot} function. Only supported by \code{plot}.}
+    \item{sub}{Subtitle of the main plot, the default is empty. Only
+      supported by \code{plot}.}
+    \item{xlab}{Title for the x axis, the default is empty if the
+      \code{annotate.plot} igraph option is \code{FALSE}, and the number
+      of vertices and edges, if it is \code{TRUE}. Only supported by
+      \code{plot}.}
+    \item{ylab}{Title for the y axis, the default is empty. Only
+      supported by \code{plot}.}
   }
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}

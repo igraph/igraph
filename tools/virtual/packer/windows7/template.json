@@ -1,0 +1,35 @@
+{
+  "builders": [
+    {
+      "vm_name": "win7x64-enterprise",
+      "type": "virtualbox",
+      "guest_os_type": "Windows7_64",
+      "iso_url": "file:///Users/csardi/ISO/7600.16385.090713-1255_x64fre_enterprise_en-us_EVAL_Eval_Enterprise-GRMCENXEVAL_EN_DVD.iso",
+      "iso_checksum": "1d0d239a252cb53e466d39e752b17c28",
+      "iso_checksum_type": "md5",
+      "guest_additions_path": "/cygdrive/c/Users/vagrant/VBoxGuestAdditions.iso",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_wait_timeout": "10000s",
+      "disk_size": 40960,
+      "floppy_files": ["../floppy/Autounattend.xml", 
+                       "../floppy/set-power-config.bat", 
+                       "../floppy/install-cygwin-sshd.bat",
+		       "../floppy/oracle-cert.cer"],
+      "shutdown_command": "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\"",
+      "vboxmanage": [
+        ["modifyvm", "{{.Name}}", "--memory", "2048"],
+        ["modifyvm", "{{.Name}}", "--cpus", "1"],
+	["modifyvm", "{{.Name}}", "--natpf1", "guestssh,tcp,,3333,,22"]
+      ],
+      "headless": true
+    }
+  ],
+  "provisioners": [{
+    "type": "shell",
+    "scripts": [
+      "../scripts/win-change-home-dirs.sh",
+      "../scripts/win-postinstall64.sh"
+    ]
+  }]
+}

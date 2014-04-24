@@ -46,8 +46,8 @@
 // 02110-1301 USA
 //-----------------------------------------------------------------------------
 // Author   : Pascal Pons 
-// Email    : pons@liafa.jussieu.fr
-// Web page : http://www.liafa.jussieu.fr/~pons/
+// Email    : pascal.pons@gmail.com
+// Web page : http://www-rp.lip6.fr/~latapy/PP/walktrap.html
 // Location : Paris, France
 // Time	    : June 2005
 //-----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ using namespace igraph::walktrap;
  * 
  * </para><para>
  * Currently the original C++ implementation is used in igraph, 
- * see http://www.liafa.jussieu.fr/~pons/index.php?item=prog&amp;item2=walktrap&amp;lang=en
+ * see http://www-rp.lip6.fr/~latapy/PP/walktrap.html
  * I'm grateful to Matthieu Latapy and Pascal Pons for providing this 
  * source code.
  *

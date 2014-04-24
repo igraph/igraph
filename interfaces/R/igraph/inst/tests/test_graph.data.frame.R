@@ -24,3 +24,15 @@ test_that("graph.data.frame works", {
   expect_that(df$edges, equals(relations))
 
 })
+
+test_that("graph.data.frame works on matrices", {
+
+  library(igraph)
+
+  el <- cbind(1:5,5:1,weight=1:5)
+  g <- graph.data.frame(el)
+  g <- remove.vertex.attribute(g, "name")
+  el2 <- get.data.frame(g)
+  expect_that(as.data.frame(el), is_equivalent_to(el2))
+
+})

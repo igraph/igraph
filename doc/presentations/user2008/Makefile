@@ -18,12 +18,12 @@ ALLPNG = jgplot.png rglplot.png source_c.png source_cpp.png \
 	 matrix.jpg tkplot.png
 
 csardi.pdf: csardi.tex $(ALLSVG) $(ALLPNG) $(OTHER)
-	pdflatex csardi.tex
+	TEXINPUTS=.:../tex: pdflatex csardi.tex
 
 csardi-final.pdf: csardi.pdf
 	ppower4 csardi.pdf csardi-final.pdf
 
-igraph.pdf : igraph.svg
+igraph.pdf : ../images/igraph.svg
 	inkscape $< -A $@
 
 %.pdf : %.svg.gz

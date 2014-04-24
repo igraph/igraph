@@ -1,0 +1,48 @@
+Source: python-igraph
+Section: python
+Priority: optional
+Maintainer: Tamas Nepusz <ntamas@gmail.com>
+Build-Depends: debhelper (>= 7.0.50~), python-all-dev (>= 2.6.6-3~),
+ python3-all-dev (>= 3.2), libxml2-dev, libigraph0-dev (>= 0.6~), python-epydoc,
+ python-setuptools, python3-setuptools, pkg-config, python-docutils
+Standards-Version: 3.9.4
+X-Python-Version: >= 2.5
+X-Python3-Version: >= 3.2
+Homepage: http://igraph.org
+
+Package: python-igraph
+Architecture: any
+Depends: ${shlibs:Depends}, ${python:Depends}, ${misc:Depends}, libigraph0 (>= 0.6~)
+Suggests: python-igraph-doc, python-cairo
+Provides: ${python:Provides}
+Description: Python interface for the igraph library (Python 2)
+ igraph is a library for creating and manipulating graphs.
+ It is intended to be as powerful (ie. fast) as possible to enable the
+ analysis of large graphs.
+ .
+ This package contains the Python 2 interface of igraph.
+
+Package: python3-igraph
+Architecture: any
+Depends: ${shlibs:Depends}, ${python3:Depends}, ${misc:Depends}, libigraph0 (>= 0.6~)
+Suggests: python-igraph-doc, python3-cairo
+Provides: ${python3:Provides}
+Description: Python interface for the igraph library (Python 3)
+ igraph is a library for creating and manipulating graphs.
+ It is intended to be as powerful (ie. fast) as possible to enable the
+ analysis of large graphs.
+ .
+ This package contains the Python 3 interface of igraph.
+
+Package: python-igraph-doc
+Architecture: all
+Section: doc
+Depends: ${misc:Depends}
+Suggests: python-igraph, python-doc
+Description: Documentation of the Python interface of the igraph library
+ igraph is a library for creating and manipulating graphs.
+ It is intended to be as powerful (ie. fast) as possible to enable the
+ analysis of large graphs.
+ .
+ This package contains the API documentation of the Python interface of
+ the igraph library.

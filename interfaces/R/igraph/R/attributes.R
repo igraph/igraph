@@ -51,6 +51,27 @@ set.graph.attribute <- function(graph, name, value) {
         PACKAGE="igraph")
 }
 
+graph.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_mybracket2_copy", graph, 9L, 2L,
+        PACKAGE="igraph")
+} 
+
+"graph.attributes<-" <- function(graph, value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (!is.list(value) || (length(value) > 0 && is.null(names(value))) ||
+      any(names(value) == "") || any(duplicated(names(value)))) {
+    stop("Value must be a named list with unique names")
+  }
+            
+  .Call("R_igraph_mybracket2_set", graph, 9L, 2L, value,
+        PACKAGE="igraph")
+}
+
 get.vertex.attribute <- function(graph, name, index=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -58,26 +79,50 @@ get.vertex.attribute <- function(graph, name, index=V(graph)) {
   index <- as.igraph.vs(graph, index)  
   myattr <- .Call("R_igraph_mybracket2", graph, 9L, 3L,
                   PACKAGE="igraph")[[as.character(name)]]
-  if (is.list(myattr) && length(index)==1) {
-    myattr[[index]]
-  } else {
-    myattr[index]
-  }
+  myattr[index]
 }
 
 set.vertex.attribute <- function(graph, name, index=V(graph), value) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  single <- "single" %in% names(attributes(index)) && attr(index, "single")
   if (!missing(index)) { index <- as.igraph.vs(graph, index) }
   name <- as.character(name)
   vc <- vcount(graph)
 
   vattrs <- .Call("R_igraph_mybracket2", graph, 9L, 3L, PACKAGE="igraph")
-  vattrs[[name]][index] <- value
+  if (single) {
+    vattrs[[name]][[index]] <- value
+  } else {
+    vattrs[[name]][index] <- value
+  }
   length(vattrs[[name]]) <- vc
   
   .Call("R_igraph_mybracket2_set", graph, 9L, 3L, vattrs, PACKAGE="igraph")
+}
+
+vertex.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_mybracket2_copy", graph, 9L, 3L, PACKAGE="igraph")  
+}
+
+"vertex.attributes<-" <- function(graph, value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  if (!is.list(value) || (length(value) > 0 && is.null(names(value))) ||
+      any(names(value) == "") || any(duplicated(names(value)))) {
+    stop("Value must be a named list with unique names")
+  }
+  if ( any(sapply(value, length) != vcount(graph)) ) {
+    stop("Invalid attribute value length, must match number of vertices")
+  }
+  
+  .Call("R_igraph_mybracket2_set", graph, 9L, 3L, value,
+        PACKAGE="igraph")
 }
 
 get.edge.attribute <- function(graph, name, index=E(graph)) {
@@ -88,33 +133,58 @@ get.edge.attribute <- function(graph, name, index=E(graph)) {
   index <- as.igraph.es(graph, index)
   myattr <- .Call("R_igraph_mybracket2", graph, 9L, 4L,
                   PACKAGE="igraph")[[name]]
-  if (is.list(myattr) && length(index)==1) {
-    myattr[[index]]
-  } else {
-    myattr[index]
-  }
+  myattr[index]
 }
 
 set.edge.attribute <- function(graph, name, index=E(graph), value) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  single <- "single" %in% names(attributes(index)) && attr(index, "single")
   name <- as.character(name)
   index <- as.igraph.es(graph, index)
   ec <- ecount(graph)
 
   eattrs <- .Call("R_igraph_mybracket2", graph, 9L, 4L, PACKAGE="igraph")
-  eattrs[[name]][index] <- value
+  if (single) {
+    eattrs[[name]][[index]] <- value
+  } else {
+    eattrs[[name]][index] <- value
+  }
   length(eattrs[[name]]) <- ec
 
   .Call("R_igraph_mybracket2_set", graph, 9L, 4L, eattrs, PACKAGE="igraph")
+}
+
+edge.attributes <- function(graph) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+  .Call("R_igraph_mybracket2_copy", graph, 9L, 4L, PACKAGE="igraph")  
+}
+
+"edge.attributes<-" <- function(graph, value) {
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  if (!is.list(value) || (length(value) > 0 && is.null(names(value))) ||
+      any(names(value) == "") || any(duplicated(names(value)))) {
+    stop("Value must be a named list with unique names")
+  }
+  if ( any(sapply(value, length) != ecount(graph)) ) {
+    stop("Invalid attribute value length, must match number of edges")
+  }
+  
+  .Call("R_igraph_mybracket2_set", graph, 9L, 4L, value,
+        PACKAGE="igraph")
 }
 
 list.graph.attributes <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  res <- names(.Call("R_igraph_mybracket2", graph, 9L, 2L, PACKAGE="igraph"))
+  res <- .Call("R_igraph_mybracket2_names", graph, 9L, 2L, PACKAGE="igraph")
   if (is.null(res)) { res <- character() }
   res
 }
@@ -123,7 +193,7 @@ list.vertex.attributes <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  res <- names(.Call("R_igraph_mybracket2", graph, 9L, 3L, PACKAGE="igraph"))
+  res <- .Call("R_igraph_mybracket2_names", graph, 9L, 3L, PACKAGE="igraph")
                      
   if (is.null(res)) { res <- character() }
   res
@@ -133,7 +203,7 @@ list.edge.attributes <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
-  res <- names(.Call("R_igraph_mybracket2", graph, 9L, 4L, PACKAGE="igraph"))
+  res <- .Call("R_igraph_mybracket2_names", graph, 9L, 4L, PACKAGE="igraph")
   if (is.null(res)) { res <- character() }
   res
 }

@@ -354,14 +354,22 @@ int igraph_hrg_fit(const igraph_t *graph,
   int no_of_nodes=igraph_vcount(graph);
   dendro *d;
 
-  IGRAPH_CHECK(igraph_hrg_resize(hrg, no_of_nodes));
-
   RNG_BEGIN();
 
   d = new dendro;  
 
   // Convert the igraph graph
   IGRAPH_CHECK(igraph_i_hrg_getgraph(graph, d));
+
+  // If we want to start from HRG
+  if (start) {
+    if (igraph_hrg_size(hrg) != no_of_nodes) {
+      IGRAPH_ERROR("Invalid HRG to start from", IGRAPH_EINVAL);
+    }
+    d->importDendrogramStructure(hrg);
+  } else {
+    IGRAPH_CHECK(igraph_hrg_resize(hrg, no_of_nodes));
+  }
 
   // Run fixed number of steps, or until convergence
   if (steps > 0) {
@@ -760,7 +768,7 @@ int rankCandidatesByProbability(simpleGraph *sg, dendro *d,
   return 0;
 }
 
-int recordPredictions(dendro *d, pblock *br_list, igraph_vector_t *edges, 
+int recordPredictions(pblock *br_list, igraph_vector_t *edges, 
 		      igraph_vector_t *prob, int mk) {
     
   IGRAPH_CHECK(igraph_vector_resize(edges, mk*2));
@@ -838,7 +846,7 @@ int igraph_hrg_predict(const igraph_t *graph,
 
   IGRAPH_CHECK(MCMCEquilibrium_Sample(d, num_samples));
   IGRAPH_CHECK(rankCandidatesByProbability(sg, d, br_list, mk));
-  IGRAPH_CHECK(recordPredictions(d, br_list, edges, prob, mk));
+  IGRAPH_CHECK(recordPredictions(br_list, edges, prob, mk));
 
   delete d;
   delete sg;

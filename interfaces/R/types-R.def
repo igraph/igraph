@@ -35,6 +35,9 @@ VERTEXINDEX_OR_0:
 VECTOR_LONG:
     INCONV: %I% <- as.numeric(%I%)
 
+VECTOR_INT:
+    INCONV: %I% <- as.integer(%I%)
+
 VECTORM1:
     INCONV: %I% <- as.numeric(%I%)-1
 
@@ -167,9 +170,15 @@ EDGECAPACITY:
 BIPARTITE_TYPES:
     INCONV: if (is.null(%I%) && "type" %in% list.vertex.attributes(%I1%)) { \
                %I% <- V(%I1%)$type \
-	    } \
+            } \
             if (!is.null(%I%)) { \
-               %I% <- as.logical(%I%) \
+              if (!is.logical(%I%)) { \
+                warning("vertex types converted to logical") \
+              } \
+              %I% <- as.logical(%I%) \
+              if (any(is.na(%I%))) { \
+                stop("`NA' is not allowed in vertex types") \
+               } \
             } else { \
                stop("Not a bipartite graph, supply `types' argument") \
             }
@@ -177,9 +186,17 @@ BIPARTITE_TYPES:
 BIPARTITE_TYPES_OR_0:
     INCONV: if (is.null(%I%) && "type" %in% list.vertex.attributes(%I1%)) { \
                %I% <- V(%I1%)$type \
-	    } \
+            } \
             if (!is.null(%I%)) { \
-               %I% <- as.logical(%I%) \
+              if (!is.logical(%I%)) { \
+                warning("vertex types converted to logical") \
+              } \
+              %I% <- as.logical(%I%) \
+              if (any(is.na(%I%))) { \
+                stop("`NA' is not allowed in vertex types") \
+               } \
+            } else { \
+               stop("Not a bipartite graph, supply `types' argument") \
             }
 
 VERTEX_COLOR:
@@ -214,6 +231,8 @@ VECTORLIST:
 
 VECTORLIST_OR_0:
 
+VECTORLIST_INT_OR_0:
+
 VERTEXSETLIST:
 
 VERTEXSETLIST_OR_0:
@@ -238,7 +257,7 @@ BLISSSH:
 BLISSINFO:
 
 ADJLIST:
-    INCONV: %I% <- lapply(%I%, function(x) as.numeric(x)-1)
+    INCONV: %I% <- lapply(%I%, function(x) as.integer(x)-1L)
 
 COMMCMP:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "vi"=0, "nmi"=1, \
@@ -324,3 +343,39 @@ CMATRIX_OR_0:
     }
 
 PLFIT:
+
+MAXFLOW_STATS:
+  CALL:
+  HEADER:
+
+EIGENALGO:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "auto"=0, "lapack"=1, \
+                          "arpack"=2, "comp_auto"=3, "comp_lapack"=4, \
+                          "comp_arpack"=5)
+    DEFAULT: 
+      ARPACK: c("arpack", "auto", "lapack", "comp_auto", "comp_lapack", "comp_arpack")
+
+EIGENWHICH:
+    INCONV: %I%.tmp <- igraph.eigen.default; \
+            %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
+    DEFAULT: 
+      Default: list()
+
+SIRLIST:
+
+PAGERANKALGO:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "power"=0L, "arpack"=1L, \
+                          "prpack"=2L)
+    DEFAULT:
+      PRPACK: c("prpack", "arpack", "power")
+
+PAGERANKOPT:
+    INCONV: if (is.null(%I%)) {                         \
+              if (%I1% == 0L) {                         \
+                %I% <- list(niter=1000, eps=0.001)      \
+              } else if (%I1% == 1L) {                  \
+                %I% <- igraph.arpack.default            \
+              } else {                                  \
+                %I% <- NULL                             \
+              }                                         \
+            }

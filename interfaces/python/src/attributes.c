@@ -304,8 +304,12 @@ static int igraphmodule_i_attribute_init(igraph_t *graph, igraph_vector_ptr_t *a
         else
           value=PyString_FromString(s);
         break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+        value=VECTOR(*(igraph_vector_bool_t*)attr_rec->value)[0] ? Py_True : Py_False;
+        Py_INCREF(value);
+        break;
       default:
-        IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+        IGRAPH_WARNING("unsupported attribute type (not string, numeric or Boolean)");
         value=0;
         break;
       }
@@ -448,8 +452,12 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
           igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
           o=PyString_FromString(s);
           break;
+        case IGRAPH_ATTRIBUTE_BOOLEAN:
+          o=VECTOR(*(igraph_vector_bool_t*)attr_rec->value)[i] ? Py_True : Py_False;
+          Py_INCREF(o);
+          break;
         default:
-          IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+          IGRAPH_WARNING("unsupported attribute type (not string, numeric or Boolean)");
           o=0;
           break;
         }
@@ -503,8 +511,12 @@ static int igraphmodule_i_attribute_add_vertices(igraph_t *graph, long int nv, i
           igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
           o=PyString_FromString(s);
           break;
+        case IGRAPH_ATTRIBUTE_BOOLEAN:
+          o=VECTOR(*(igraph_vector_bool_t*)attr_rec->value)[i] ? Py_True : Py_False;
+          Py_INCREF(o);
+          break;
         default:
-          IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+          IGRAPH_WARNING("unsupported attribute type (not string, numeric or Boolean)");
           o=0;
           break;
         }
@@ -623,8 +635,12 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
           igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
           o=PyString_FromString(s);
           break;
+        case IGRAPH_ATTRIBUTE_BOOLEAN:
+          o=VECTOR(*(igraph_vector_bool_t*)attr_rec->value)[i] ? Py_True : Py_False;
+          Py_INCREF(o);
+          break;
         default:
-          IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+          IGRAPH_WARNING("unsupported attribute type (not string, numeric or Boolean)");
           o=0;
           break;
         }
@@ -680,8 +696,12 @@ static int igraphmodule_i_attribute_add_edges(igraph_t *graph, const igraph_vect
           igraph_strvector_get((igraph_strvector_t*)attr_rec->value, i, &s);
           o=PyString_FromString(s);
           break;
+        case IGRAPH_ATTRIBUTE_BOOLEAN:
+          o=VECTOR(*(igraph_vector_bool_t*)attr_rec->value)[i] ? Py_True : Py_False;
+          Py_INCREF(o);
+          break;
         default:
-          IGRAPH_WARNING("unsupported attribute type (not string and not numeric)");
+          IGRAPH_WARNING("unsupported attribute type (not string, numeric or Boolean)");
           o=0;
           break;
         }
@@ -1316,6 +1336,7 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
       for (j=0; j<k; j++) {
         int is_numeric = 1;
         int is_string = 1;
+        int is_boolean = 1;
         values=PyDict_GetItem(dict, PyList_GetItem(keys, j));
         if (PyList_Check(values)) {
           m=PyList_Size(values);
@@ -1329,13 +1350,22 @@ static int igraphmodule_i_attribute_get_info(const igraph_t *graph,
             if (o != Py_None && !PyBaseString_Check(o))
               is_string=0;
           }
+          for (l=0; l<m && is_boolean; l++) {
+            o=PyList_GetItem(values, l);
+            if (o != Py_None && o != Py_False && o != Py_True)
+              is_boolean=0;
+          }
         } else {
           if (values != Py_None && !PyNumber_Check(values))
             is_numeric=0;
           if (values != Py_None && !PyBaseString_Check(values))
             is_string=0;
+          if (values != Py_None && values != Py_False && values != Py_True)
+            is_boolean=0;
         }
-        if (is_numeric)
+        if (is_boolean)
+          VECTOR(*t)[j] = IGRAPH_ATTRIBUTE_BOOLEAN;
+        else if (is_numeric)
           VECTOR(*t)[j] = IGRAPH_ATTRIBUTE_NUMERIC;
         else if (is_string)
           VECTOR(*t)[j] = IGRAPH_ATTRIBUTE_STRING;
@@ -1372,7 +1402,7 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
 				      igraph_attribute_elemtype_t elemtype,
 				      const char *name) {
   long int attrnum, i, j;
-  int is_numeric, is_string;
+  int is_numeric, is_string, is_boolean;
   PyObject *o, *dict;
 
   switch (elemtype) {
@@ -1398,7 +1428,7 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
   }
 
   /* Go on with the checks */
-  is_numeric = is_string = 1;
+  is_numeric = is_string = is_boolean = 1;
   if (attrnum>0) {
 
     for (i=0; i<j && is_numeric; i++) {
@@ -1410,17 +1440,42 @@ int igraphmodule_i_attribute_get_type(const igraph_t *graph,
       if (item != Py_None && !PyBaseString_Check(item))
         is_string=0;
     }
+    for (i=0; i<j && is_boolean; i++) {
+      PyObject *item = PyList_GET_ITEM(o, i);
+      if (item != Py_None && item != Py_True && item != Py_False)
+        is_boolean=0;
+    }
   } else {
-    if (o != Py_None && !PyNumber_Check(o)) is_numeric=0;
+    if (o != Py_None && !PyNumber_Check(o))
+      is_numeric=0;
     if (o != Py_None && !PyBaseString_Check(o))
       is_string=0;
+    if (o != Py_None && o != Py_True && o != Py_False)
+      is_boolean=0;
   }
-  if (is_numeric)
+  if (is_boolean)
+    *type = IGRAPH_ATTRIBUTE_BOOLEAN;
+  else if (is_numeric)
     *type = IGRAPH_ATTRIBUTE_NUMERIC;
   else if (is_string)
     *type = IGRAPH_ATTRIBUTE_STRING;
   else
     *type = IGRAPH_ATTRIBUTE_PY_OBJECT;
+  return 0;
+}
+
+/* Getting Boolean graph attributes */
+int igraphmodule_i_get_boolean_graph_attr(const igraph_t *graph,
+					  const char *name, igraph_vector_bool_t *value) {
+  PyObject *dict, *o;
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_GRAPH];
+  /* No error checking, if we get here, the type has already been checked by previous
+     attribute handler calls... hopefully :) Same applies for the other handlers. */
+  o = PyDict_GetItemString(dict, name);
+  if (!o)
+    IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+  IGRAPH_CHECK(igraph_vector_bool_resize(value, 1));
+  VECTOR(*value)[0] = PyObject_IsTrue(o);
   return 0;
 }
 
@@ -1595,6 +1650,42 @@ int igraphmodule_i_get_string_vertex_attr(const igraph_t *graph,
   return 0;
 }
 
+/* Getting boolean vertex attributes */
+int igraphmodule_i_get_boolean_vertex_attr(const igraph_t *graph,
+					   const char *name,
+					   igraph_vs_t vs,
+					   igraph_vector_bool_t *value) {
+  PyObject *dict, *list, *o;
+  igraph_vector_bool_t newvalue;
+
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_VERTEX];
+  list = PyDict_GetItemString(dict, name);
+  if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+
+  if (igraph_vs_is_all(&vs)) {
+    if (igraphmodule_PyObject_to_vector_bool_t(list, &newvalue))
+      IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
+    igraph_vector_bool_update(value, &newvalue);
+    igraph_vector_bool_destroy(&newvalue);
+  } else {
+    igraph_vit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
+    IGRAPH_FINALLY(igraph_vit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_VIT_SIZE(it)));
+    while (!IGRAPH_VIT_END(it)) {
+      o = PyList_GetItem(list, (Py_ssize_t)IGRAPH_VIT_GET(it));
+      VECTOR(*value)[i] = PyObject_IsTrue(o);
+      IGRAPH_VIT_NEXT(it);
+      i++;
+    }
+    igraph_vit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  return 0;
+}
+
 /* Getting numeric edge attributes */
 int igraphmodule_i_get_numeric_edge_attr(const igraph_t *graph,
 					 const char *name,
@@ -1687,6 +1778,42 @@ int igraphmodule_i_get_string_edge_attr(const igraph_t *graph,
   return 0;
 }
 
+/* Getting boolean edge attributes */
+int igraphmodule_i_get_boolean_edge_attr(const igraph_t *graph,
+					 const char *name,
+					 igraph_es_t es,
+					 igraph_vector_bool_t *value) {
+  PyObject *dict, *list, *o;
+  igraph_vector_bool_t newvalue;
+
+  dict = ATTR_STRUCT_DICT(graph)[ATTRHASH_IDX_EDGE];
+  list = PyDict_GetItemString(dict, name);
+  if (!list) IGRAPH_ERROR("No such attribute", IGRAPH_EINVAL);
+
+  if (igraph_es_is_all(&es)) {
+    if (igraphmodule_PyObject_to_vector_bool_t(list, &newvalue))
+      IGRAPH_ERROR("Internal error", IGRAPH_EINVAL);
+    igraph_vector_bool_update(value, &newvalue);
+    igraph_vector_bool_destroy(&newvalue);
+  } else {
+    igraph_eit_t it;
+    long int i=0;
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &it));
+    IGRAPH_FINALLY(igraph_eit_destroy, &it);
+    IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_EIT_SIZE(it)));
+    while (!IGRAPH_EIT_END(it)) {
+      o = PyList_GetItem(list, (Py_ssize_t)IGRAPH_EIT_GET(it));
+      VECTOR(*value)[i] = PyObject_IsTrue(o);
+      IGRAPH_EIT_NEXT(it);
+      i++;
+    }
+    igraph_eit_destroy(&it);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+
+  return 0;
+}
+
 static igraph_attribute_table_t igraphmodule_attribute_table = {
   igraphmodule_i_attribute_init,
   igraphmodule_i_attribute_destroy,
@@ -1702,10 +1829,13 @@ static igraph_attribute_table_t igraphmodule_attribute_table = {
   igraphmodule_i_attribute_get_type,
   igraphmodule_i_get_numeric_graph_attr,
   igraphmodule_i_get_string_graph_attr,
+  igraphmodule_i_get_boolean_graph_attr,
   igraphmodule_i_get_numeric_vertex_attr,
   igraphmodule_i_get_string_vertex_attr,
+  igraphmodule_i_get_boolean_vertex_attr,
   igraphmodule_i_get_numeric_edge_attr,
   igraphmodule_i_get_string_edge_attr,
+  igraphmodule_i_get_boolean_edge_attr,
 };
 
 void igraphmodule_initialize_attribute_handler(void) {

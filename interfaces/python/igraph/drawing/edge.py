@@ -16,18 +16,24 @@ except ImportError:
     pass
 
 from igraph.drawing.colors import clamp
+from igraph.drawing.metamagic import AttributeCollectorBase
+from igraph.drawing.text import TextAlignment
 from math import atan2, cos, pi, sin
 
 class AbstractEdgeDrawer(object):
     """Abstract edge drawer object from which all concrete edge drawer
     implementations are derived."""
 
-    def __init__(self, context):
+    def __init__(self, context, palette):
         """Constructs the edge drawer.
 
         @param context: a Cairo context on which the edges will be drawn.
+        @param palette: the palette that can be used to map integer
+                        color indices to colors when drawing edges
         """
         self.context = context
+        self.palette = palette
+        self.VisualEdgeBuilder = self._construct_visual_edge_builder()
 
     @staticmethod
     def _curvature_to_float(value):
@@ -38,6 +44,23 @@ class AbstractEdgeDrawer(object):
         if value is True:
             return 0.5
         return float(value)
+
+    def _construct_visual_edge_builder(self):
+        """Construct the visual edge builder that will collect the visual
+        attributes of an edge when it is being drawn."""
+        class VisualEdgeBuilder(AttributeCollectorBase):
+            """Builder that collects some visual properties of an edge for
+            drawing"""
+            _kwds_prefix = "edge_"
+            arrow_size  = 1.0
+            arrow_width = 1.0
+            color       = ("#444", self.palette.get)
+            curved      = (0.0, self._curvature_to_float)
+            label       = None
+            label_color = ("black", self.palette.get)
+            label_size  = 12.0
+            width       = 1.0
+        return VisualEdgeBuilder
 
     def draw_directed_edge(self, edge, src_vertex, dest_vertex):
         """Draws a directed edge.
@@ -102,6 +125,53 @@ class AbstractEdgeDrawer(object):
             ctx.line_to(*dest_vertex.position)
 
         ctx.stroke()
+
+    def get_label_position(self, edge, src_vertex, dest_vertex):
+        """Returns the position where the label of an edge should be drawn. The
+        default implementation returns the midpoint of the edge and an alignment
+        that tries to avoid overlapping the label with the edge.
+        
+        @param edge: the edge to be drawn. Visual properties of the edge
+          are defined by the attributes of this object.
+        @param src_vertex: the source vertex. Visual properties are given
+          again as attributes.
+        @param dest_vertex: the target vertex. Visual properties are given
+          again as attributes.
+        @return: a tuple containing two more tuples: the desired position of the
+          label and the desired alignment of the label, where the position is
+          given as C{(x, y)} and the alignment is given as C{(horizontal, vertical)}.
+          Members of the alignment tuple are taken from constants in the
+          L{TextAlignment} class.
+        """
+        # Determine the angle of the line
+        dx = dest_vertex.position[0] - src_vertex.position[0]
+        dy = dest_vertex.position[1] - src_vertex.position[1]
+        if dx != 0 or dy != 0:
+            # Note that we use -dy because the Y axis points downwards
+            angle = atan2(-dy, dx) % (2*pi)
+        else:
+            angle = None
+
+        # Determine the midpoint
+        pos = ((src_vertex.position[0] + dest_vertex.position[0]) / 2., \
+                (src_vertex.position[1] + dest_vertex.position[1]) / 2)
+
+        # Determine the alignment based on the angle
+        pi4 = pi / 4
+        if angle is None:
+            halign, valign = TextAlignment.CENTER, TextAlignment.CENTER
+        else:
+            index = int((angle / pi4) % 8)
+            halign = [TextAlignment.RIGHT, TextAlignment.RIGHT,
+                    TextAlignment.RIGHT, TextAlignment.RIGHT,
+                    TextAlignment.LEFT, TextAlignment.LEFT,
+                    TextAlignment.LEFT, TextAlignment.LEFT][index]
+            valign = [TextAlignment.BOTTOM, TextAlignment.CENTER,
+                    TextAlignment.CENTER, TextAlignment.TOP,
+                    TextAlignment.TOP, TextAlignment.CENTER,
+                    TextAlignment.CENTER, TextAlignment.BOTTOM][index]
+
+        return pos, (halign, valign)
 
 
 class ArrowEdgeDrawer(AbstractEdgeDrawer):

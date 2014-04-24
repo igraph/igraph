@@ -14,7 +14,8 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
 	      separators.xml memory.xml sparsemat.xml hrg.xml \
-	      scg.xml spatialgames.xml threading.xml progress.xml status.xml
+	      scg.xml spatialgames.xml threading.xml progress.xml status.xml \
+	      graphlets.xml epi.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -24,6 +25,8 @@ DOCFIX2 = $(patsubst %,$(top_srcdir)/doc/%,$(DOCFIX))
 all: doctemplate
 
 html: html/stamp
+
+jekyll: jekyll/stamp
 
 info: igraph.info
 
@@ -79,13 +82,15 @@ generators.xml: generators.xxml \
 		$(SRCDIR)/forestfire.c \
 		$(SRCDIR)/games.c \
 		$(SRCDIR)/structure_generators.c \
-		$(SRCDIR)/structural_properties.c
+		$(SRCDIR)/structural_properties.c \
+		$(SRCDIR)/sbm.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/atlas.c \
 	$(SRCDIR)/forestfire.c \
 	$(SRCDIR)/games.c \
 	$(SRCDIR)/structure_generators.c \
-	$(SRCDIR)/structural_properties.c
+	$(SRCDIR)/structural_properties.c \
+	$(SRCDIR)/sbm.c
 
 structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/spanning_trees.c \
@@ -95,15 +100,17 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c \
 		$(SRCDIR)/mixing.c $(INCLUDEDIR)/igraph_arpack.h \
 		$(SRCDIR)/distances.c $(SRCDIR)/feedback_arc_set.c \
-		$(SRCDIR)/matching.c
-
+		$(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
+		$(INCLUDEDIR)/igraph_centrality.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/structural_properties.c $(SRCDIR)/spanning_trees.c \
 	$(SRCDIR)/conversion.c $(SRCDIR)/basic_query.c $(SRCDIR)/cocitation.c \
 	$(SRCDIR)/components.c $(SRCDIR)/spectral_properties.c $(SRCDIR)/cores.c \
 	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c $(SRCDIR)/mixing.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
-	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c
+	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
+	$(INCLUDEDIR)/igraph_centrality.h
+
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \
@@ -123,8 +130,8 @@ foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c $(INCLUDEDIR)/igraph_nongraph.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_nongraph.h $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c
 
-isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc
-	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc
+isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
+	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
 
 motifs.xml: motifs.xxml $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c
@@ -132,14 +139,14 @@ motifs.xml: motifs.xxml $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c
 operators.xml: operators.xxml $(SRCDIR)/operators.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/operators.c
 
-flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c
+flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c $(INCLUDEDIR)/igraph_flow.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c $(INCLUDEDIR)/igraph_flow.h
 
 community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
 
-cliques.xml: cliques.xxml $(SRCDIR)/cliques.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/cliques.c
+cliques.xml: cliques.xxml $(SRCDIR)/cliques.c $(SRCDIR)/maximal_cliques.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/cliques.c $(SRCDIR)/maximal_cliques.c
 
 stack.xml: stack.xxml $(SRCDIR)/stack.pmt
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/stack.pmt
@@ -189,10 +196,26 @@ progress.xml: progress.xxml $(INCLUDEDIR)/igraph_progress.h $(SRCDIR)/progress.c
 status.xml: status.xxml $(INCLUDEDIR)/igraph_statusbar.h $(SRCDIR)/statusbar.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_statusbar.h $(SRCDIR)/statusbar.c
 
+graphlets.xml: graphlets.xxml $(SRCDIR)/glet.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/glet.c
+
+epi.xml: epi.xxml $(SRCDIR)/sir.c $(INCLUDEDIR)/igraph_epidemics.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/sir.c \
+		$(INCLUDEDIR)/igraph_epidemics.h
+
 html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
 	&& touch html/stamp
+
+jekyll/stamp: html/stamp
+	rm -rf jekyll && mkdir jekyll && cp html/* jekyll/ && rm jekyll/stamp
+	cd html && for i in *.html; do                        \
+	  cat $$i | ../../tools/extract_body.sh               \
+		  | ../../tools/protect_braces.sh             \
+		  | ../../tools/jekyll_header.sh              \
+                  > ../jekyll/$$i; done
+	touch jekyll/stamp
 
 igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
@@ -234,8 +257,9 @@ igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
 	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
 	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
 	&& cat igraph-docs3.xml >> igraph-docs4.xml \
-	&& env < /dev/null hash_extra=650000 docbook2pdf igraph-docs4.xml \
-	&& mv igraph-docs4.pdf igraph-docs.pdf
+	&& xsltproc http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl \
+	   igraph-docs4.xml > igraph-docs.fo \
+	&& fop -fo igraph-docs.fo -pdf igraph-docs.pdf
 
 CLEANFILES=$(DOCINCLUDES) html/*.html html/stamp \
 	igraph-docs.{dvi,info,pdf,ps,texi,txml} igraph-docs2.xml 

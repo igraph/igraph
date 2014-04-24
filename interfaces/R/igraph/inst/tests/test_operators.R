@@ -28,6 +28,10 @@ test_that("operators work", {
 
   expect_that(graph.isomorphic(graph.intersection(gu, g2), g2), is_true())
 
+  expect_that(graph.isomorphic(graph.intersection(gu, g1,
+                                                  keep.all.vertices=FALSE),
+                               g1),is_true())
+
 ####
 
   expect_that(graph.complementer(graph.complementer(g2)),

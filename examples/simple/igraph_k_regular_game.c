@@ -27,7 +27,6 @@ int main() {
   igraph_t g;
   igraph_vector_t deg;
   igraph_bool_t is_simple;
-  igraph_bool_t is_directed;
 
   igraph_set_error_handler(&igraph_error_handler_ignore);
 

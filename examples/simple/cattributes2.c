@@ -52,7 +52,7 @@ int main() {
   SETEAS(&g, "name", 1, "FOOBAR");
 
   igraph_write_graph_gml(&g, stdout, 0, "");
-  igraph_write_graph_graphml(&g, stdout);
+  igraph_write_graph_graphml(&g, stdout, /*prefixattr=*/ 1);
    
   igraph_destroy(&g);
   

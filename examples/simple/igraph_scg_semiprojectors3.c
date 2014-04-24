@@ -31,7 +31,7 @@ int main() {
   igraph_sparsemat_t Lsparse, Rsparse;
   igraph_matrix_t V;
   igraph_matrix_complex_t V2;
-  igraph_sparsemat_t laplacian, laplacianT;
+  igraph_sparsemat_t laplacian;
   igraph_vector_t groups;
   igraph_eigen_which_t which;
 

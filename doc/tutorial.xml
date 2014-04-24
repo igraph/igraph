@@ -20,6 +20,7 @@ int main(void)
 {
      igraph_integer_t diameter;
      igraph_t graph;
+     igraph_rng_seed(igraph_rng_default(), 42);
      igraph_erdos_renyi_game(&graph, IGRAPH_ERDOS_RENYI_GNP, 1000, 5.0/1000,
                              IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
      igraph_diameter(&graph, &diameter, 0, 0, 0, IGRAPH_UNDIRECTED, 1);
@@ -147,7 +148,7 @@ int main(void) {
   VECTOR(dimvector)[1]=30;
   igraph_lattice(&graph, &dimvector, 0, IGRAPH_UNDIRECTED, 0, 1);
 
-  srand(100);
+  igraph_rng_seed(igraph_rng_default(), 42);
   igraph_vector_init(&edges, 20);
   for (i=0; i<igraph_vector_size(&edges); i++) {
     VECTOR(edges)[i] = rand() % (int)igraph_vcount(&graph);
@@ -262,12 +263,13 @@ int main(void) {
      printf("Maximum degree is      %10i, vertex %2i.\n",
             (int)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
 
-     igraph_closeness(&graph, &result, igraph_vss_all(), IGRAPH_ALL);
+     igraph_closeness(&graph, &result, igraph_vss_all(), IGRAPH_ALL,
+                      /*weights=*/ 0);
      printf("Maximum closeness is   %10f, vertex %2i.\n",
              (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
 
      igraph_betweenness(&graph, &result, igraph_vss_all(),
-                             IGRAPH_UNDIRECTED);
+                        IGRAPH_UNDIRECTED, /*weights=*/ 0, /*nobigint=*/ 1);
      printf("Maximum betweenness is %10f, vertex %2i.\n",
              (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
 

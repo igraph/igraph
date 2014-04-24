@@ -36,6 +36,10 @@
 <!-- doxrox-include igraph_subisomorphic_function_vf2 -->
 </section>
 
+<section><title>The LAD algorithm</title>
+<!-- doxrox-include igraph_subisomorphic_lad -->
+</section>
+
 <section><title>Functions for graphs with 3 or 4 vertices</title>
 <!-- doxrox-include igraph_isomorphic_34 -->
 <!-- doxrox-include igraph_isoclass -->

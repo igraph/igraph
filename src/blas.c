@@ -57,8 +57,8 @@ void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
   int m, n;
   int inc = 1;
 
-  m = igraph_matrix_nrow(a);
-  n = igraph_matrix_ncol(a);
+  m = (int) igraph_matrix_nrow(a);
+  n = (int) igraph_matrix_ncol(a);
 
   assert(igraph_vector_size(x) == transpose ? m : n);
   assert(igraph_vector_size(y) == transpose ? n : m);
@@ -96,8 +96,8 @@ void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
   int m, n;
   int inc = 1;
 
-  m = igraph_matrix_nrow(a);
-  n = igraph_matrix_ncol(a);
+  m = (int) igraph_matrix_nrow(a);
+  n = (int) igraph_matrix_ncol(a);
 
   igraphdgemv_(&trans, &m, &n, &alpha, VECTOR(a->data), &m,
                (igraph_real_t*)x, &inc, &beta, y, &inc);

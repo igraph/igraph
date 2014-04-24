@@ -81,8 +81,9 @@ a non-ad hoc basis.
   Bonacich, P.  (1987).  ``Power and Centrality: A Family of Measures.''
   \emph{American Journal of Sociology}, 92, 1170-1182. 
  }
-\author{ Carter T. Butts \email{buttsc@uci.edu}, ported to igraph by
-  Gabor Csardi \email{csardi.gabor@gmail.com}}
+ \author{ Carter T. Butts
+  (\url{http://www.faculty.uci.edu/profile.cfm?faculty_id=5057}), 
+   ported to igraph by Gabor Csardi \email{csardi.gabor@gmail.com}}
 \section{Warning }{Singular adjacency matrices cause no end of headaches
   for this algorithm; thus, the routine may fail in certain cases.  This
   will be fixed when I get a better algorithm.  \code{bonpow} will not

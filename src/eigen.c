@@ -24,6 +24,8 @@
 #include "igraph_eigen.h"
 #include "igraph_qsort.h"
 #include "igraph_blas.h"
+#include "igraph_interface.h"
+#include "igraph_adjlist.h"
 #include <string.h>
 #include <math.h>
 #include <float.h>
@@ -60,7 +62,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
 
   igraph_matrix_t vec1, vec2;
   igraph_vector_t val1, val2;
-  int n=igraph_matrix_nrow(A);
+  int n=(int) igraph_matrix_nrow(A);
   int p1=0, p2=which->howmany-1, pr=0;
   
   IGRAPH_VECTOR_INIT_FINALLY(&val1, 0);
@@ -99,7 +101,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
       }
       if (vectors) {
 	memcpy(&MATRIX(*vectors,0,pr), &MATRIX(vec1,0,p1), 
-	       sizeof(igraph_real_t) * n);
+	       sizeof(igraph_real_t) * (size_t) n);
       }
       p1++;
       pr++;
@@ -109,7 +111,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
       }
       if (vectors) {
 	memcpy(&MATRIX(*vectors,0,pr), &MATRIX(vec2,0,p2), 
-	       sizeof(igraph_real_t) * n);
+	       sizeof(igraph_real_t) * (size_t) n);
       }
       p2--;
       pr++;
@@ -136,7 +138,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
   
   igraph_vector_t val;
   igraph_matrix_t vec;
-  int i, w=0, n=igraph_matrix_nrow(A);
+  int i, w=0, n=(int) igraph_matrix_nrow(A);
   igraph_real_t small;
   int p1, p2, pr=0;
 
@@ -176,7 +178,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
       }
       if (vectors) {
 	memcpy(&MATRIX(*vectors,0,pr), &MATRIX(vec,0,p1), 
-	       sizeof(igraph_real_t) * n);
+	       sizeof(igraph_real_t) * (size_t) n);
       }
       p1--;
       pr++;
@@ -186,7 +188,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
       }
       if (vectors) {
 	memcpy(&MATRIX(*vectors,0,pr), &MATRIX(vec,0,p2), 
-	       sizeof(igraph_real_t) * n);
+	       sizeof(igraph_real_t) * (size_t) n);
       }
       p2++;
       pr++;
@@ -210,7 +212,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_matrix_t *A,
 
   /* TODO: ordering? */
   
-  int n=igraph_matrix_nrow(A);
+  int n=(int) igraph_matrix_nrow(A);
   int il=n-which->howmany+1;
   IGRAPH_CHECK(igraph_lapack_dsyevr(A, IGRAPH_LAPACK_DSYEV_SELECT,
 				    /*vl=*/ 0, /*vu=*/ 0, /*vestimate=*/ 0,
@@ -245,7 +247,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
 
   igraph_matrix_t vec1, vec2;
   igraph_vector_t val1, val2;
-  int n=igraph_matrix_nrow(A);
+  int n=(int) igraph_matrix_nrow(A);
   int p1=0, p2=which->howmany/2, pr=0;
   
   IGRAPH_VECTOR_INIT_FINALLY(&val1, 0);
@@ -284,7 +286,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
       }
       if (vectors) {
 	memcpy(&MATRIX(*vectors,0,pr), &MATRIX(vec1,0,p1), 
-	       sizeof(igraph_real_t) * n);
+	       sizeof(igraph_real_t) * (size_t) n);
       }
       p1++;
       pr++;
@@ -294,7 +296,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
       }
       if (vectors) {
 	memcpy(&MATRIX(*vectors,0,pr), &MATRIX(vec2,0,p2), 
-	       sizeof(igraph_real_t) * n);
+	       sizeof(igraph_real_t) * (size_t) n);
       }
       p2--;
       pr++;
@@ -314,7 +316,6 @@ int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
 }
 
 int igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_matrix_t *A,
-			      const igraph_eigen_which_t *which,
 			      igraph_vector_t *values,
 			      igraph_matrix_t *vectors) {
 
@@ -370,9 +371,9 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
   /* First we need to create a dense square matrix */
 
   if (A) {
-    n=igraph_matrix_nrow(A);
+    n=(int) igraph_matrix_nrow(A);
   } else if (sA) {
-    n=igraph_sparsemat_nrow(sA);
+    n=(int) igraph_sparsemat_nrow(sA);
     IGRAPH_CHECK(igraph_matrix_init(&mA, 0, 0));
     IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
     IGRAPH_CHECK(igraph_sparsemat_as_matrix(&mA, sA));
@@ -405,7 +406,7 @@ int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
 							   values, vectors));
     break;
   case IGRAPH_EIGEN_ALL:
-    IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_lapack_all(myA, which,
+    IGRAPH_CHECK(igraph_i_eigen_matrix_symmetric_lapack_all(myA,
 							    values,
 							    vectors));
     break;
@@ -470,7 +471,7 @@ int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
   igraph_vector_t tmpvalues, tmpvalues2;
   igraph_matrix_t tmpvectors, tmpvectors2;
   igraph_i_eigen_matrix_sym_arpack_data_t myextra = { A, sA };  
-  int low=floor(which->howmany/2.0), high=ceil(which->howmany/2.0);
+  int low=(int) floor(which->howmany/2.0), high=(int) ceil(which->howmany/2.0);
   int l1, l2, w;
 
   if (low + high >= n) {
@@ -509,12 +510,12 @@ int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
   while (w < which->howmany) {
     VECTOR(*values)[w] = VECTOR(tmpvalues)[l1];
     memcpy(&MATRIX(*vectors, 0, w), &MATRIX(tmpvectors, 0, l1), 
-	   n * sizeof(igraph_real_t));
+	   (size_t) n * sizeof(igraph_real_t));
     w++; l1++;
     if (w < which->howmany) {
       VECTOR(*values)[w] = VECTOR(tmpvalues2)[l2];
       memcpy(&MATRIX(*vectors, 0, w), &MATRIX(tmpvectors2, 0, l2), 
-	     n * sizeof(igraph_real_t));
+	     (size_t) n * sizeof(igraph_real_t));
       w++; l2++;
     }
   }
@@ -834,7 +835,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
   igraph_vector_int_t idx;
   igraph_vector_t mag;
   igraph_bool_t hasmag=0;
-  int nev=igraph_vector_size(real);
+  int nev=(int) igraph_vector_size(real);
   int howmany=0, start=0;
   int i;  
   igraph_i_eigen_matrix_lapack_cmp_t cmpfunc=0;
@@ -893,7 +894,8 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
     VECTOR(idx)[i] = i;
   }
 
-  igraph_qsort_r(VECTOR(idx), nev, sizeof(VECTOR(idx)[0]), extra, cmpfunc);
+  igraph_qsort_r(VECTOR(idx), (size_t) nev, sizeof(VECTOR(idx)[0]), extra, 
+		 cmpfunc);
 
   if (hasmag) {
     igraph_vector_destroy(&mag);
@@ -910,7 +912,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
   }
 
   if (vectors) {
-    int n=igraph_matrix_nrow(compressed);
+    int n=(int) igraph_matrix_nrow(compressed);
     IGRAPH_CHECK(igraph_matrix_complex_resize(vectors, n, howmany));
     for (i=0; i<howmany; i++) {
       int j, x=VECTOR(idx)[start+i];
@@ -946,7 +948,7 @@ int igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t *A,
 
   igraph_vector_t valuesreal, valuesimag;
   igraph_matrix_t vectorsright, *myvectors= vectors ? &vectorsright : 0;
-  int n=igraph_matrix_nrow(A);
+  int n=(int) igraph_matrix_nrow(A);
   int info=1;
 
   IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
@@ -1044,9 +1046,9 @@ int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
   /* We need to create a dense square matrix first */
   
   if (A) {
-    n=igraph_matrix_nrow(A);
+    n=(int) igraph_matrix_nrow(A);
   } else if (sA) {
-    n=igraph_sparsemat_nrow(sA);
+    n=(int) igraph_sparsemat_nrow(sA);
     IGRAPH_CHECK(igraph_matrix_init(&mA, 0, 0));
     IGRAPH_FINALLY(igraph_matrix_destroy, &mA);
     IGRAPH_CHECK(igraph_sparsemat_as_matrix(&mA, sA));
@@ -1253,6 +1255,117 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
   return 0;
 }
 
+int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
+					   const igraph_real_t *from,
+					   int n, void *extra) {
+  igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
+  igraph_vector_int_t *neis;
+  int i, j, nlen;
+
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(adjlist, i);
+    nlen=igraph_vector_int_size(neis);
+    to[i] = 0.0;
+    for (j=0; j<nlen; j++) {
+      int nei = VECTOR(*neis)[j];
+      to[i] += from[nei];
+    }
+  }
+
+  return 0;
+}
+
+int igraph_i_eigen_adjacency_arpack(const igraph_t *graph, 
+				    const igraph_eigen_which_t *which,
+				    igraph_arpack_options_t *options,
+				    igraph_arpack_storage_t* storage,
+				    igraph_vector_t *values,
+				    igraph_matrix_t *vectors,
+				    igraph_vector_complex_t *cmplxvalues,
+				    igraph_matrix_complex_t *cmplxvectors){
+
+	igraph_adjlist_t adjlist;
+	void *extra=(void*) &adjlist;
+	int n=igraph_vcount(graph);
+
+  if (!options) { 
+    IGRAPH_ERROR("`options' must be given for ARPACK algorithm",
+		 IGRAPH_EINVAL);
+  }
+	
+  if (igraph_is_directed(graph)) {
+    IGRAPH_ERROR("ARPACK adjacency eigensolver not implemented for "
+		 "directed graphs", IGRAPH_UNIMPLEMENTED);
+  }
+  if (which->pos == IGRAPH_EIGEN_INTERVAL) {
+    IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+		 "`INTERNAL' eigenvalues", IGRAPH_UNIMPLEMENTED);
+  }
+  if (which->pos == IGRAPH_EIGEN_SELECT) {
+    IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+		 "`SELECT' eigenvalues", IGRAPH_UNIMPLEMENTED);
+  }
+  if (which->pos == IGRAPH_EIGEN_ALL) {
+    IGRAPH_ERROR("ARPACK adjacency eigensolver does not implement "
+		 "`ALL' eigenvalues", IGRAPH_UNIMPLEMENTED);
+  }
+
+  switch (which->pos) {
+  case IGRAPH_EIGEN_LM:
+    options->which[0]='L'; options->which[1]='M';
+    options->nev=which->howmany;
+    break;
+  case IGRAPH_EIGEN_SM:
+    options->which[0]='S'; options->which[1]='M';
+    options->nev=which->howmany;
+    break;
+  case IGRAPH_EIGEN_LA:
+    options->which[0]='L'; options->which[1]='A';
+    options->nev=which->howmany;
+    break;
+  case IGRAPH_EIGEN_SA:
+    options->which[0]='S'; options->which[1]='A';
+    options->nev=which->howmany;
+    break;
+  case IGRAPH_EIGEN_ALL:
+    options->which[0]='L'; options->which[1]='M';
+    options->nev=n;
+    break;
+  case IGRAPH_EIGEN_BE:
+    IGRAPH_ERROR("Eigenvectors from both ends with ARPACK",
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_INTERVAL:
+    IGRAPH_ERROR("Interval of eigenvectors with ARPACK",
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_SELECT:
+    IGRAPH_ERROR("Selected eigenvalues with ARPACK",
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  default:
+    /* This cannot happen */
+    break;
+  }
+
+  options->n=n;
+  options->ncv= 2*options->nev < n ? 2*options->nev : n;
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+  IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigen_adjacency_arpack_sym_cb,
+				     extra, options, storage, values, vectors));
+
+  igraph_adjlist_destroy(&adjlist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
 /** 
  * \function igraph_eigen_adjacency
  *
@@ -1268,8 +1381,54 @@ int igraph_eigen_adjacency(const igraph_t *graph,
 			   igraph_vector_complex_t *cmplxvalues,
 			   igraph_matrix_complex_t *cmplxvectors) {
 
-  IGRAPH_ERROR("'igraph_eigen_adjacency'", IGRAPH_UNIMPLEMENTED);
-  /* TODO */
+  if (which->pos != IGRAPH_EIGEN_LM && 
+      which->pos != IGRAPH_EIGEN_SM && 
+      which->pos != IGRAPH_EIGEN_LA && 
+      which->pos != IGRAPH_EIGEN_SA && 
+      which->pos != IGRAPH_EIGEN_BE && 
+      which->pos != IGRAPH_EIGEN_SELECT &&
+      which->pos != IGRAPH_EIGEN_INTERVAL &&
+      which->pos != IGRAPH_EIGEN_ALL) {
+    IGRAPH_ERROR("Invalid 'pos' position in 'which'", IGRAPH_EINVAL);
+  }
+
+  switch (algorithm) {
+  case IGRAPH_EIGEN_AUTO:
+    IGRAPH_ERROR("'AUTO' algorithm not implemented yet", 
+								 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_LAPACK:
+    IGRAPH_ERROR("'LAPACK' algorithm not implemented yet",  
+								 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_ARPACK:
+		IGRAPH_CHECK(igraph_i_eigen_adjacency_arpack(graph, which, options,
+																								 storage, values, vectors,
+																								 cmplxvalues,
+																								 cmplxvectors));
+    break;
+  case IGRAPH_EIGEN_COMP_AUTO:
+    IGRAPH_ERROR("'COMP_AUTO' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_COMP_LAPACK:
+    IGRAPH_ERROR("'COMP_LAPACK' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  case IGRAPH_EIGEN_COMP_ARPACK:
+    IGRAPH_ERROR("'COMP_ARPACK' algorithm not implemented yet", 
+		 IGRAPH_UNIMPLEMENTED);
+    /* TODO */
+    break;
+  default:
+    IGRAPH_ERROR("Unknown `algorithm'", IGRAPH_EINVAL);
+  }
+	
+	
   return 0;
 }
 

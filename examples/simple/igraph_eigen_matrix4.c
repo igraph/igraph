@@ -30,7 +30,7 @@
 
 int main() {
   
-  const int nodes=10, skip=3;
+  const int nodes=10;
   igraph_matrix_t mat2;
   igraph_vector_complex_t values, values2;
   igraph_matrix_complex_t vectors, vectors2;

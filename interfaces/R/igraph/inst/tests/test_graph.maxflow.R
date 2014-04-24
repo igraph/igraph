@@ -10,6 +10,6 @@ test_that("graph.maxflow works", {
   expect_that(fl$value, equals(2))
   expect_that(fl$flow, equals(rep(1, 6)))
   expect_that(sort(fl$cut), equals(c(2,4)))
-  expect_that(sort(fl$partition1), equals(3:6))
-  expect_that(sort(fl$partition2), equals(1:2))
+  expect_that(sort(fl$partition1), equals(1:2))
+  expect_that(sort(fl$partition2), equals(3:6))
 })

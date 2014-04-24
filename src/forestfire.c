@@ -88,7 +88,7 @@ void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  * Note however, that the version of the model in the published paper is incorrect
  * in the sense that it cannot generate the kind of graphs the authors
  * claim. A corrected version is available from
- * http://www.cs.cmu.edu/~jure/pubs/powergrowth-tkdd.pdf, our
+ * http://cs.stanford.edu/people/jure/pubs/powergrowth-tkdd.pdf , our
  * implementation is based on this.
  * 
  * \param graph Pointer to an uninitialized graph object.
@@ -191,24 +191,24 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     }
     
     while (!igraph_dqueue_empty(&neiq)) {
-      long int actamb=igraph_dqueue_pop(&neiq);
+      long int actamb=(long int) igraph_dqueue_pop(&neiq);
       igraph_vector_t *outv=outneis+actamb;
       igraph_vector_t *inv=inneis+actamb;
       long int no_in=igraph_vector_size(inv);
       long int no_out=igraph_vector_size(outv);
-      long int neis_out=RNG_GEOM(param_geom_out);
-      long int neis_in=RNG_GEOM(param_geom_in);
+      long int neis_out=(long int) RNG_GEOM(param_geom_out);
+      long int neis_in=(long int) RNG_GEOM(param_geom_in);
       /* outgoing neighbors */
       if (neis_out >= no_out) {
 	for (i=0; i<no_out; i++) {
-	  long int nei=VECTOR(*outv)[i];
+	  long int nei=(long int) VECTOR(*outv)[i];
 	  ADD_EDGE_TO(nei);
 	}
       } else {
 	long int oleft=no_out;
 	for (i=0; i<neis_out && oleft > 0; ) {
 	  long int which=RNG_INTEGER(0, oleft-1);
-	  long int nei=VECTOR(*outv)[which];
+	  long int nei=(long int) VECTOR(*outv)[which];
 	  VECTOR(*outv)[which] = VECTOR(*outv)[oleft-1];
 	  VECTOR(*outv)[oleft-1] = nei;
 	  if (VECTOR(visited)[nei] != actnode+1) {
@@ -221,14 +221,14 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
       /* incoming neighbors */
       if (neis_in >= no_in) {
 	for (i=0; i<no_in; i++) {
-	  long int nei=VECTOR(*inv)[i];
+	  long int nei=(long int) VECTOR(*inv)[i];
 	  ADD_EDGE_TO(nei);
 	}
       } else {
 	long int ileft=no_in;
 	for (i=0; i<neis_in && ileft > 0; ) {
 	  long int which=RNG_INTEGER(0, ileft-1);
-	  long int nei=VECTOR(*inv)[which];
+	  long int nei=(long int) VECTOR(*inv)[which];
 	  VECTOR(*inv)[which] = VECTOR(*inv)[ileft-1];
 	  VECTOR(*inv)[ileft-1] = nei;
 	  if (VECTOR(visited)[nei] != actnode+1) {

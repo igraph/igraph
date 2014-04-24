@@ -94,28 +94,38 @@
 
 int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al, 
 			  igraph_neimode_t mode) {
-  long int i;
+  igraph_integer_t i;
+  igraph_vector_t tmp;  
 
   if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
     IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_EINVMODE);
   }
 
+  igraph_vector_init(&tmp, 0);
+  IGRAPH_FINALLY(igraph_vector_destroy, &tmp);
+
   if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
 
   al->length=igraph_vcount(graph);
-  al->adjs=igraph_Calloc(al->length, igraph_vector_t);
+  al->adjs=igraph_Calloc(al->length, igraph_vector_int_t);
   if (al->adjs == 0) {
     IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
   }
 
   IGRAPH_FINALLY(igraph_adjlist_destroy, al);
   for (i=0; i<al->length; i++) {
+    int j, n;
     IGRAPH_ALLOW_INTERRUPTION();
-    IGRAPH_CHECK(igraph_vector_init(&al->adjs[i], 0));
-    IGRAPH_CHECK(igraph_neighbors(graph, &al->adjs[i], i, mode));
+    IGRAPH_CHECK(igraph_neighbors(graph, &tmp, i, mode));
+    n=igraph_vector_size(&tmp);
+    IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
+    for (j=0; j<n; j++) {
+      VECTOR(al->adjs[i])[j] = VECTOR(tmp)[j];
+    }
   }
 
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_vector_destroy(&tmp);
+  IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
 
@@ -137,14 +147,14 @@ int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes
   long int i;
 
   al->length=no_of_nodes;
-  al->adjs=igraph_Calloc(al->length, igraph_vector_t);
+  al->adjs=igraph_Calloc(al->length, igraph_vector_int_t);
   if (al->adjs == 0) {
     IGRAPH_ERROR("Cannot create adjlist view", IGRAPH_ENOMEM);
   }
 
   IGRAPH_FINALLY(igraph_adjlist_destroy, al);
   for (i=0; i<al->length; i++) {
-    IGRAPH_CHECK(igraph_vector_init(&al->adjs[i], 0));
+    IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], 0));
   }
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -176,7 +186,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 				       igraph_adjlist_t *al, 
 				       igraph_neimode_t mode,
 				       igraph_bool_t loops) {
-  long int i, j, k, n;
+  igraph_integer_t i, j, k, n;
   igraph_bool_t* seen;
   igraph_vector_t vec;
 
@@ -187,7 +197,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
   if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
 
   al->length=igraph_vcount(graph);
-  al->adjs=igraph_Calloc(al->length, igraph_vector_t);
+  al->adjs=igraph_Calloc(al->length, igraph_vector_int_t);
   if (al->adjs == 0) {
     IGRAPH_ERROR("Cannot create complementer adjlist view", IGRAPH_ENOMEM);
   }
@@ -206,7 +216,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
   for (i=0; i<al->length; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
     igraph_neighbors(graph, &vec, i, mode);
-    memset(seen, 0, sizeof(igraph_bool_t)*al->length);
+    memset(seen, 0, sizeof(igraph_bool_t)*(unsigned) al->length);
     n=al->length;
     if (!loops) { seen[i] = 1; n--; }
     for (j=0; j<igraph_vector_size(&vec); j++) {
@@ -215,7 +225,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 	seen[ (long int) VECTOR(vec)[j] ] = 1;
       }
     }
-    IGRAPH_CHECK(igraph_vector_init(&al->adjs[i], n));
+    IGRAPH_CHECK(igraph_vector_int_init(&al->adjs[i], n));
     for (j=0, k=0; k<n; j++) {
       if (!seen[j]) {
 	VECTOR(al->adjs[i])[k++] = j;
@@ -242,7 +252,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 void igraph_adjlist_destroy(igraph_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++) {
-    if (&al->adjs[i]) { igraph_vector_destroy(&al->adjs[i]); }
+    if (&al->adjs[i]) { igraph_vector_int_destroy(&al->adjs[i]); }
   }
   igraph_Free(al->adjs);
 }
@@ -258,7 +268,7 @@ void igraph_adjlist_destroy(igraph_adjlist_t *al) {
 void igraph_adjlist_clear(igraph_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++) {
-    igraph_vector_clear(&al->adjs[i]);
+    igraph_vector_int_clear(&al->adjs[i]);
   }
 }
 
@@ -276,7 +286,7 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
   return al->length;
 }
 
-/* igraph_vector_t *igraph_adjlist_get(igraph_adjlist_t *al, igraph_integer_t no) { */
+/* igraph_vector_int_t *igraph_adjlist_get(igraph_adjlist_t *al, igraph_integer_t no) { */
 /*   return &al->adjs[(long int)no]; */
 /* } */
 
@@ -294,7 +304,7 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
 void igraph_adjlist_sort(igraph_adjlist_t *al) {
   long int i;
   for (i=0; i<al->length; i++)
-    igraph_vector_sort(&al->adjs[i]);
+    igraph_vector_int_sort(&al->adjs[i]);
 }
 
 /**
@@ -312,26 +322,27 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
 int igraph_adjlist_simplify(igraph_adjlist_t *al) {
   long int i;
   long int n=al->length;
-  igraph_vector_t mark;
-  IGRAPH_VECTOR_INIT_FINALLY(&mark, n);
+  igraph_vector_int_t mark;
+  igraph_vector_int_init(&mark, n);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
   for (i=0; i<n; i++) {
-    igraph_vector_t *v=&al->adjs[i];
-    long int j, l=igraph_vector_size(v);
+    igraph_vector_int_t *v=&al->adjs[i];
+    long int j, l=igraph_vector_int_size(v);
     VECTOR(mark)[i] = i+1;
     for (j=0; j<l; /* nothing */) {
-      long int e=VECTOR(*v)[j];
+      long int e=(long int) VECTOR(*v)[j];
       if (VECTOR(mark)[e] != i+1) {
 	VECTOR(mark)[e]=i+1;
 	j++;
       } else {
-	VECTOR(*v)[j] = igraph_vector_tail(v);
-	igraph_vector_pop_back(v);
+	VECTOR(*v)[j] = igraph_vector_int_tail(v);
+	igraph_vector_int_pop_back(v);
 	l--;
       }
     }
   }
   
-  igraph_vector_destroy(&mark);
+  igraph_vector_int_destroy(&mark);
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
@@ -340,34 +351,45 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
 				    igraph_adjlist_t *al) {
   long int i;
   long int n=al->length;
+  IGRAPH_UNUSED(graph);
   for (i=0; i<n; i++) {
-    igraph_vector_t *v=&al->adjs[i];
-    long int j, p=1, l=igraph_vector_size(v);
+    igraph_vector_int_t *v=&al->adjs[i];
+    long int j, p=1, l=igraph_vector_int_size(v);
     for (j=1; j<l; j++) {
-      long int e=VECTOR(*v)[j];
+      long int e=(long int) VECTOR(*v)[j];
       /* Non-loop edges, and one end of loop edges are fine. */
       /* We use here, that the vector is sorted and we also keep it sorted */
       if (e != i || VECTOR(*v)[j-1] != e) {
 	VECTOR(*v)[p++] = e;
       }
     }
-    igraph_vector_resize(v, p);
+    igraph_vector_int_resize(v, p);
   }
   
   return 0;
 }
 
 #ifndef USING_R
-int igraph_adjlist_print(const igraph_adjlist_t *al, FILE *outfile) {
+int igraph_adjlist_print(const igraph_adjlist_t *al) {
   long int i;
   long int n=al->length;
   for (i=0; i<n; i++) {
-    igraph_vector_t *v=&al->adjs[i];
-    igraph_vector_print(v);
+    igraph_vector_int_t *v=&al->adjs[i];
+    igraph_vector_int_print(v);
   }
   return 0;
 }
 #endif
+
+int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
+  long int i;
+  long int n=al->length;
+  for (i=0; i<n; i++) {
+    igraph_vector_int_t *v=&al->adjs[i];
+    igraph_vector_int_fprint(v, outfile);
+  }
+  return 0;
+}
 
 int igraph_adjedgelist_remove_duplicate(const igraph_t *graph, 
 					igraph_inclist_t *al) {
@@ -380,7 +402,7 @@ int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
 int igraph_adjedgelist_print(const igraph_inclist_t *al, FILE *outfile) {
     IGRAPH_WARNING("igraph_adjedgelist_print() is deprecated, use "
                    "igraph_inclist_print() instead");
-    return igraph_inclist_print(al, outfile);
+    return igraph_inclist_fprint(al, outfile);
 }
 #endif
 
@@ -426,7 +448,7 @@ int igraph_inclist_remove_duplicate(const igraph_t *graph,
     igraph_vector_t *v=&al->incs[i];
     long int j, p=1, l=igraph_vector_size(v);
     for (j=1; j<l; j++) {
-      long int e=VECTOR(*v)[j];
+      long int e=(long int) VECTOR(*v)[j];
       /* Non-loop edges and one end of loop edges are fine. */
       /* We use here, that the vector is sorted and we also keep it sorted */
       if (IGRAPH_FROM(graph, e) != IGRAPH_TO(graph, e) ||
@@ -441,7 +463,7 @@ int igraph_inclist_remove_duplicate(const igraph_t *graph,
 }
 
 #ifndef USING_R
-int igraph_inclist_print(const igraph_inclist_t *al, FILE *outfile) {
+int igraph_inclist_print(const igraph_inclist_t *al) {
   long int i;
   long int n=al->length;
   for (i=0; i<n; i++) {
@@ -451,6 +473,16 @@ int igraph_inclist_print(const igraph_inclist_t *al, FILE *outfile) {
   return 0;
 }
 #endif
+
+int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
+  long int i;
+  long int n=al->length;
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=&al->incs[i];
+    igraph_vector_fprint(v, outfile);
+  }
+  return 0;
+}
 
 /**
  * \function igraph_inclist_init
@@ -476,7 +508,7 @@ int igraph_inclist_print(const igraph_inclist_t *al, FILE *outfile) {
 int igraph_inclist_init(const igraph_t *graph, 
 			      igraph_inclist_t *il, 
 			      igraph_neimode_t mode) {
-  long int i;
+  igraph_integer_t i;
 
   if (mode != IGRAPH_IN && mode != IGRAPH_OUT && mode != IGRAPH_ALL) {
     IGRAPH_ERROR("Cannot create incidence list view", IGRAPH_EINVMODE);
@@ -649,7 +681,7 @@ void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al) {
 
 igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 						igraph_integer_t pno) {
-  long int no=pno;
+  igraph_integer_t no=pno;
   int ret;
   if (al->adjs[no] == 0) {
     al->adjs[no] = igraph_Calloc(1, igraph_vector_t);
@@ -803,7 +835,7 @@ void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il) {
 
 igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
 						    igraph_integer_t pno) {
-  long int no=pno;
+  igraph_integer_t no=pno;
   int ret;
   if (il->incs[no] == 0) {
     il->incs[no] = igraph_Calloc(1, igraph_vector_t);

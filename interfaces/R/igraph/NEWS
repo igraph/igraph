@@ -91,7 +91,7 @@ New features and bug fixes
 - Added the get.data.frame() function, opposite of graph.data.frame().
 - Added bipartite support to the Pajek reader and writer, closes bug
   #1042298.
-- degree.sequence.game() has a new method now: "simple.no.multiple".
+- degree.sequence.game() has a new method now: "simple_no_multiple".
 - Added the is.degree.sequence() and is.graphical.degree.sequence()
   functions.
 - rewire() has a new method: "loops", that can create loop edges.
@@ -161,10 +161,6 @@ New features and bug fixes
 - Fixed a potential crash in the DrL layout generator.
 - Fixed a bug in the Reingold-Tilford layout when the graph is
   directed and mode != ALL.
-- Fixed a bug in get.shortest.paths() when output="epath".
-- Fixed a bug in layout.sugiyama() when the graph had no edges.
-- Fixed a bug in label.propagation.community() when initial labels
-  contained -1 entries. Issue #1105460.
 
 ==========
 igraph 0.6

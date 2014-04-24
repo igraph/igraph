@@ -25,3 +25,14 @@ igraphtest <- function() {
   tdir <- system.file("tests", package="igraph")
   do.call("test_dir", list(tdir))
 }
+
+igraph.version <- function() {
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  .Call("R_igraph_version", PACKAGE="igraph")
+}
+
+checkpkg <- function(package_file, args=character()) {
+  package_file <- as.character(package_file)
+  args <- as.character(args)
+  do.call(":::", list("tools", ".check_packages"))(c(package_file, args))
+}

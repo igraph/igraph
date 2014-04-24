@@ -214,8 +214,6 @@ bool Greedy::optimize() {
       flowNtoM[randPos].second.first = tmp_outFlow;
       flowNtoM[randPos].second.second = tmp_inFlow;
     }
-
-    RNG_END();
     
     int bestM = oldM;
     double best_outFlow = 0.0;
@@ -309,6 +307,9 @@ bool Greedy::optimize() {
     }
     offset += Nnode;
   }
+
+  RNG_END();
+
   return moved;
 }
 
@@ -604,3 +605,5 @@ void Greedy::setMove(int *moveTo) {
     
   }
 }
+
+

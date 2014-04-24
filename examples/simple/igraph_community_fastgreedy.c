@@ -45,7 +45,6 @@ int main() {
   igraph_t g;
   igraph_vector_t modularity, weights;
   igraph_matrix_t merges;
-  FILE *f;
 
   igraph_vector_init(&modularity,0);
   igraph_matrix_init(&merges,0,0);
@@ -130,6 +129,12 @@ int main() {
   /* Ring graph with loop edges */
   igraph_small(&g, 6, IGRAPH_UNDIRECTED,
           0,1,1,2,2,3,3,4,4,5,5,0,0,0,2,2,-1);
+  igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
+  show_results(&g, &modularity, &merges, stdout);
+  igraph_destroy(&g);
+
+  /* Regression test -- graph with two vertices and two edges */
+  igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,0,1,1,-1);
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
   show_results(&g, &modularity, &merges, stdout);
   igraph_destroy(&g);

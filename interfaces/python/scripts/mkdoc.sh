@@ -58,7 +58,7 @@ fi
 if [ $SYNC -eq 1 ]; then
   echo "Syncing documentation to web"
   cp ${DOC_API_FOLDER}/pdf/igraph.pdf ${DOC_API_FOLDER}/html
-  rsync --delete -avz ${DOC_API_FOLDER}/html/ ntamas,igraph@web.sourceforge.net:/home/groups/i/ig/igraph/htdocs/doc/python/
+  rsync --delete -avz ${DOC_API_FOLDER}/html/ csardi@igraph.org:2222:www/doc/python/
   rm ${DOC_API_FOLDER}/html/igraph.pdf
 fi
 

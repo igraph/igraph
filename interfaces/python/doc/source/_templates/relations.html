@@ -1,0 +1,18 @@
+{%- if prev %}
+    <a accesskey="p" class="btn btn-default" href="{{ prev.link|e }}"
+     title="{{ _('Previous Chapter: ') + prev.title|striptags }}">
+        <i class="icon-chevron-left"></i>
+        {{ prev.title|striptags }}
+    </a>
+{%- endif %}
+    <a accesskey="h" class="btn btn-default" href="{{ pathto(master_doc) }}">
+        <i class="icon-home"></i>
+    </a>
+{%- if next %}
+    <a accesskey="n" class="btn btn-default" href="{{ next.link|e }}"
+     title="{{ _('Next Chapter: ') + next.title|striptags }}">
+        <i class="icon-chevron-right"></i>
+        {{ next.title|striptags }}
+    </a>
+{%- endif %}
+

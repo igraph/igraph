@@ -57,12 +57,14 @@ independence.number(graph)
   6:505--517, 1977.
 }
 \author{Tamas Nepusz \email{ntamas@gmail.com} ported it from the Very
-  Nauty Graph Library by Keith Briggs \email{google@for.it} and Gabor Csardi
-  \email{csardi.gabor@gmail.com} wrote the R interface and this manual page. }
+  Nauty Graph Library by Keith Briggs (\url{http://keithbriggs.info/})
+  and Gabor Csardi \email{csardi.gabor@gmail.com} wrote the R interface
+  and this manual page. }
 \seealso{\code{\link{cliques}}}
 \examples{
 # A quite dense graph
-g <- erdos.renyi.game(100, 0.8)
+set.seed(42)
+g <- erdos.renyi.game(100, 0.9)
 independence.number(g)
 independent.vertex.sets(g, min=independence.number(g))
 largest.independent.vertex.sets(g)

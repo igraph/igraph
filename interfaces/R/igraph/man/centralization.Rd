@@ -29,7 +29,7 @@ centralization.evcent (graph, directed = FALSE, scale = TRUE,
 centralization.degree.tmax (graph = NULL, nodes = 0,
     mode = c("all", "out", "in", "total"), loops = FALSE)
 centralization.closeness.tmax (graph = NULL, nodes = 0,
-    directed = TRUE)
+    mode = c("out", "in", "all", "total"))
 centralization.betweenness.tmax (graph = NULL, nodes = 0,
     directed = TRUE)
 centralization.evcent.tmax (graph = NULL, nodes = 0,

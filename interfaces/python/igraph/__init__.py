@@ -42,8 +42,7 @@ from igraph.datatypes import *
 from igraph.formula import *
 from igraph.layout import *
 from igraph.matching import *
-from igraph.nexus import *
-from igraph.remote import *
+from igraph.remote.nexus import *
 from igraph.statistics import *
 from igraph.summary import *
 from igraph.utils import *
@@ -226,20 +225,8 @@ class Graph(GraphBase):
 
         @param es: the list of edges to be added. Every edge is represented
           with a tuple containing the vertex IDs or names of the two
-          endpoints. Vertices are enumerated from zero. It is allowed to
-          use a single tuple containing two vertex IDs here instead of a
-          list, but this is deprecated from igraph 0.6 and will be removed
-          from 0.7.
-
-        @deprecated: this method will not accept a single pair of vertex IDs
-          as an argument from igraph 0.7. Use L{add_edge()} instead to add
-          a single edge.
+          endpoints. Vertices are enumerated from zero.
         """
-        if isinstance(es, tuple) and len(es) == 2:
-            deprecated("Graph.add_edges() will not accept a single integer pair "
-                    "from igraph 0.7. Use Graph.add_edge() instead.")
-
-            return GraphBase.add_edges(self, [es])
         return GraphBase.add_edges(self, es)
 
     def add_vertex(self, name=None, **kwds):
@@ -610,6 +597,31 @@ class Graph(GraphBase):
         """
         return [self.incident(idx, mode) for idx in xrange(self.vcount())]
 
+    def gomory_hu_tree(self, capacity=None, flow="flow"):
+        """gomory_hu_tree(capacity=None, flow="flow")
+
+        Calculates the Gomory-Hu tree of an undirected graph with optional
+        edge capacities.
+
+        The Gomory-Hu tree is a concise representation of the value of all the
+        maximum flows (or minimum cuts) in a graph. The vertices of the tree
+        correspond exactly to the vertices of the original graph in the same order.
+        Edges of the Gomory-Hu tree are annotated by flow values.  The value of
+        the maximum flow (or minimum cut) between an arbitrary (u,v) vertex
+        pair in the original graph is then given by the minimum flow value (i.e.
+        edge annotation) along the shortest path between u and v in the
+        Gomory-Hu tree.
+
+        @param capacity: the edge capacities (weights). If C{None}, all
+          edges have equal weight. May also be an attribute name.
+        @param flow: the name of the edge attribute in the returned graph
+          in which the flow values will be stored.
+        @return: the Gomory-Hu tree as a L{Graph} object.
+        """
+        graph, flow_values = GraphBase.gomory_hu_tree(self, capacity)
+        graph.es[flow] = flow_values
+        return graph
+
     def is_named(self):
         """is_named()
 
@@ -653,16 +665,50 @@ class Graph(GraphBase):
         """
         return Flow(self, *GraphBase.maxflow(self, source, target, capacity))
 
-    def mincut(self, capacity=None):
-        """mincut(capacity=None)
+    def mincut(self, source=None, target=None, capacity=None):
+        """mincut(source=None, target=None, capacity=None)
 
-        Returns a minimum cut in a graph.
+        Calculates the minimum cut between the given source and target vertices
+        or within the whole graph.
 
+        The minimum cut is the minimum set of edges that needs to be removed to
+        separate the source and the target (if they are given) or to disconnect the
+        graph (if neither the source nor the target are given). The minimum is
+        calculated using the weights (capacities) of the edges, so the cut with
+        the minimum total capacity is calculated.
+
+        For undirected graphs and no source and target, the method uses the
+        Stoer-Wagner algorithm. For a given source and target, the method uses the
+        push-relabel algorithm; see the references below.
+
+        @param source: the source vertex ID. If C{None}, the target must also be
+          C{None} and the calculation will be done for the entire graph (i.e.
+          all possible vertex pairs).
+        @param target: the target vertex ID. If C{None}, the source must also be
+          C{None} and the calculation will be done for the entire graph (i.e.
+          all possible vertex pairs).
         @param capacity: the edge capacities (weights). If C{None}, all
           edges have equal weight. May also be an attribute name.
         @return: a L{Cut} object describing the minimum cut
         """
-        return Cut(self, *GraphBase.mincut(self, capacity))
+        return Cut(self, *GraphBase.mincut(self, source, target, capacity))
+
+    def st_mincut(self, source, target, capacity=None):
+        """st_mincut(source, target, capacity=None)
+
+        Calculates the minimum cut between the source and target vertices in a
+        graph.
+
+        @param source: the source vertex ID
+        @param target: the target vertex ID
+        @param capacity: the capacity of the edges. It must be a list or a valid
+          attribute name or C{None}. In the latter case, every edge will have the
+          same capacity.
+        @return: the value of the minimum cut, the IDs of vertices in the
+          first and second partition, and the IDs of edges in the cut,
+          packed in a 4-tuple
+        """
+        return Cut(self, *GraphBase.st_mincut(self, source, target, capacity))
 
     def modularity(self, membership, weights=None):
         """modularity(membership, weights=None)
@@ -722,7 +768,8 @@ class Graph(GraphBase):
         return hist
 
     def pagerank(self, vertices=None, directed=True, damping=0.85,
-            weights=None, arpack_options=None):
+                 weights=None, arpack_options=None, implementation="prpack",
+                 niter=1000, eps=0.001):
         """Calculates the Google PageRank values of a graph.
         
         @param vertices: the indices of the vertices being queried.
@@ -735,13 +782,30 @@ class Graph(GraphBase):
           or even an edge attribute name.
         @param arpack_options: an L{ARPACKOptions} object used to fine-tune
           the ARPACK eigenvector calculation. If omitted, the module-level
-          variable called C{arpack_options} is used.
+          variable called C{arpack_options} is used. This argument is
+          ignored if not the ARPACK implementation is used, see the
+          I{implementation} argument.
+        @param implementation: which implementation to use to solve the
+          PageRank eigenproblem. Possible values are:
+            - C{"prpack"}: use the PRPACK library. This is a new
+              implementation in igraph 0.7
+            - C{"arpack"}: use the ARPACK library. This implementation
+              was used from version 0.5, until version 0.7.
+            - C{"power"}: use a simple power method. This is the
+              implementation that was used before igraph version 0.5.
+        @param niter: The number of iterations to use in the power method
+          implementation. It is ignored in the other implementations
+        @param eps: The power method implementation will consider the
+          calculation as complete if the difference of PageRank values between
+          iterations change less than this value for every node. It is
+          ignored by the other implementations.
         @return: a list with the Google PageRank values of the specified
           vertices."""
         if arpack_options is None:
             arpack_options = _igraph.arpack_options
-        return self.personalized_pagerank(vertices, directed, damping, None, \
-                None, weights, arpack_options)
+        return self.personalized_pagerank(vertices, directed, damping, None,\
+                                          None, weights, arpack_options, \
+                                          implementation, niter, eps)
 
     def spanning_tree(self, weights=None, return_tree=True):
         """Calculates a minimum spanning tree for a graph.
@@ -948,8 +1012,10 @@ class Graph(GraphBase):
             return VertexDendrogram(self, merges, safemax(cl)+1)
 
 
-    def community_leading_eigenvector(self, clusters=None):
-        """community_leading_eigenvector(clusters=None)
+    def community_leading_eigenvector(self, clusters=None, weights=None, \
+            arpack_options=None):
+        """community_leading_eigenvector(clusters=None, weights=None,
+          arpack_options=None)
         
         Newman's leading eigenvector method for detecting community structure.
         This is the proper implementation of the recursive, divisive algorithm:
@@ -961,6 +1027,11 @@ class Graph(GraphBase):
           algorithm won't split a community further if the signs of the leading
           eigenvector are all the same, so the actual number of discovered
           communities can be less than the desired one.
+        @param weights: name of an edge attribute or a list containing
+          edge weights.
+        @param arpack_options: an L{ARPACKOptions} object used to fine-tune
+          the ARPACK eigenvector calculation. If omitted, the module-level
+          variable called C{arpack_options} is used.
         @return: an appropriate L{VertexClustering} object.
         
         @newfield ref: Reference
@@ -968,7 +1039,12 @@ class Graph(GraphBase):
         eigenvectors of matrices, arXiv:physics/0605087"""
         if clusters is None:
             clusters = -1
-        membership, _, q = GraphBase.community_leading_eigenvector(self, clusters)
+
+        kwds = dict(weights=weights)
+        if arpack_options is not None:
+            kwds["arpack_options"] = arpack_options
+
+        membership, _, q = GraphBase.community_leading_eigenvector(self, clusters, **kwds)
         return VertexClustering(self, membership, modularity = q)
 
 
@@ -1245,6 +1321,8 @@ class Graph(GraphBase):
 
           - C{auto}, C{automatic}: automatic layout
             (see L{Graph.layout_auto})
+
+          - C{bipartite}: bipartite layout (see L{Graph.layout_bipartite})
 
           - C{circle}, C{circular}: circular layout
             (see L{Graph.layout_circle})
@@ -1882,7 +1960,7 @@ class Graph(GraphBase):
         directed = self.is_directed()
 
         print >> f, '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-        print >> f, '<!-- Created by igraph (http://igraph.sourceforge.net/) for use in Inkscape (http://www.inkscape.org/) -->'
+        print >> f, '<!-- Created by igraph (http://igraph.org/) for use in Inkscape (http://www.inkscape.org/) -->'
         print >> f
         print >> f, '<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"'
         print >> f, 'width="{0}px" height="{1}px">'.format(width, height),
@@ -1980,7 +2058,7 @@ class Graph(GraphBase):
                 print >> f, '      <rect ry="5" rx="5" x="-{0}" y="-{1}" width="{2}" height="{3}" id="rect{4}" style="fill:{5};fill-opacity:1" />'.\
                     format(vertex_width / 2., vertex_height / 2., vertex_width, vertex_height, vidx, colors[vidx])
             
-            print >> f, '      <text sodipodi:linespacing="125%" y="{0}" x="0" id="text{1}" style="font-size:{2};font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans">'.format(vertex_size / 2.,vidx, font_size)
+            print >> f, '      <text sodipodi:linespacing="125%" y="{0}" x="0" id="text{1}" style="font-size:{2}px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans">'.format(vertex_size / 2.,vidx, font_size)
             print >> f, '<tspan y="{0}" x="0" id="tspan{1}" sodipodi:role="line">{2}</tspan></text>'.format(vertex_size / 2.,vidx, str(labels[vidx]))
             print >> f, '    </g>'
 
@@ -2376,6 +2454,7 @@ class Graph(GraphBase):
 
     #############################################
     # Friendlier interface for bipartite methods
+    
     @classmethod
     def Bipartite(klass, types, *args, **kwds):
         """Bipartite(types, edges, directed=False)
@@ -2437,7 +2516,35 @@ class Graph(GraphBase):
         return result
 
     @classmethod
-    def GRG(klass, n, radius, torus=False, return_coordinates=False):
+    def Random_Bipartite(klass, *args, **kwds):
+        """Generates a random bipartite graph with the given number of vertices and
+        edges (if m is given), or with the given number of vertices and the given
+        connection probability (if p is given).
+
+        If m is given but p is not, the generated graph will have n1 vertices of
+        type 1, n2 vertices of type 2 and m randomly selected edges between them. If
+        p is given but m is not, the generated graph will have n1 vertices of type 1
+        and n2 vertices of type 2, and each edge will exist between them with
+        probability p.
+
+        @param n1: the number of vertices of type 1.
+        @param n2: the number of vertices of type 2.
+        @param p: the probability of edges. If given, C{m} must be missing.
+        @param m: the number of edges. If given, C{p} must be missing.
+        @param directed: whether to generate a directed graph.
+        @param neimode: if the graph is directed, specifies how the edges will be
+          generated. If it is C{"all"}, edges will be generated in both directions
+          (from type 1 to type 2 and vice versa) independently. If it is C{"out"}
+          edges will always point from type 1 to type 2. If it is C{"in"}, edges
+          will always point from type 2 to type 1. This argument is ignored for
+          undirected graphs.
+        """
+        result, types = klass._Random_Bipartite(*args, **kwds)
+        result.vs["type"] = types
+        return result
+
+    @classmethod
+    def GRG(klass, n, radius, torus=False):
         """GRG(n, radius, torus=False, return_coordinates=False)
 
         Generates a random geometric graph.
@@ -2451,18 +2558,10 @@ class Graph(GraphBase):
         @param radius: The given radius
         @param torus: This should be C{True} if we want to use a torus instead of a
           square.
-        @param return_coordinates: whether the X and Y coordinates of the
-          vertices should be returned. If C{True}, a list for each dimension
-          will be returned along with the graph, packed in a tuple. This keyword
-          argument is deprecated and will be removed in igraph 0.7.
         """
         result, xs, ys = klass._GRG(n, radius, torus)
         result.vs["x"] = xs
         result.vs["y"] = ys
-        if return_coordinates:
-            deprecated("The return_coordinates=... keyword argument of Graph.GRG() is "
-                       "deprecated. It will be removed in igraph 0.7.")
-            return result, xs, ys
         return result
 
     @classmethod
@@ -2496,11 +2595,9 @@ class Graph(GraphBase):
         result.vs["type"] = types
         return result
 
-    def bipartite_projection(self, types="type", multiplicity=True, \
-            *args, **kwds):
-        """bipartite_projection(types="type", multiplicity=True, probe1=-1)
-
-        Projects a bipartite graph into two one-mode graphs. Edge directions
+    def bipartite_projection(self, types="type", multiplicity=True, probe1=-1,
+            which="both"):
+        """Projects a bipartite graph into two one-mode graphs. Edge directions
         are ignored while projecting.
 
         Examples:
@@ -2525,16 +2622,48 @@ class Graph(GraphBase):
           projections in the resulting list. If given and non-negative, then
           it is considered as a vertex ID; the projection containing the
           vertex will be the first one in the result.
-        @return: a tuple containing the two projected one-mode graphs.
+        @param which: this argument can be used to specify which of the two
+          projections should be returned if only one of them is needed. Passing
+          0 here means that only the first projection is returned, while 1 means
+          that only the second projection is returned. (Note that we use 0 and 1
+          because Python indexing is zero-based). C{False} is equivalent to 0 and
+          C{True} is equivalent to 1. Any other value means that both projections
+          will be returned in a tuple.
+        @return: a tuple containing the two projected one-mode graphs if C{which}
+          is not 1 or 2, or the projected one-mode graph specified by the
+          C{which} argument if its value is 0, 1, C{False} or C{True}.
         """
         superclass_meth = super(Graph, self).bipartite_projection
+
+        if which == False:
+            which = 0
+        elif which == True:
+            which = 1
+        if which != 0 and which != 1:
+            which = -1
+
         if multiplicity:
-            g1, g2, w1, w2 = superclass_meth(types, True, *args, **kwds)
-            g1.es["weight"] = w1
-            g2.es["weight"] = w2
-            return g1, g2
+            if which == 0:
+                g1, w1 = superclass_meth(types, True, probe1, which)
+                g2, w2 = None, None
+            elif which == 1:
+                g1, w1 = None, None
+                g2, w2 = superclass_meth(types, True, probe1, which)
+            else:
+                g1, g2, w1, w2 = superclass_meth(types, True, probe1, which)
+
+            if g1 is not None:
+                g1.es["weight"] = w1
+                if g2 is not None:
+                    g2.es["weight"] = w2
+                    return g1, g2
+                else:
+                    return g1
+            else:
+                g2.es["weight"] = w2
+                return g2
         else:
-            return superclass_meth(types, False, *args, **kwds)
+            return superclass_meth(types, False, probe1, which)
 
     def bipartite_projection_size(self, types="type", *args, **kwds):
         """bipartite_projection(types="type")
@@ -2816,6 +2945,15 @@ class Graph(GraphBase):
             It is safe to omit this keyword argument unless you need to use
             a specific graph drawer.
 
+          - C{keep_aspect_ratio}: whether to keep the aspect ratio of the layout
+            that igraph calculates to place the nodes. C{True} means that the
+            layout will be scaled proportionally to fit into the bounding box
+            where the graph is to be drawn but the aspect ratio will be kept
+            the same (potentially leaving empty space next to, below or above
+            the graph). C{False} means that the layout will be scaled independently
+            along the X and Y axis in order to fill the entire bounding box.
+            The default is C{False}.
+
           - C{layout}: the layout to be used. If not an instance of
             L{Layout}, it will be passed to L{Graph.layout} to calculate
             the layout. Note that if you want a deterministic layout that
@@ -2934,6 +3072,19 @@ class Graph(GraphBase):
           - C{edge_arrow_width}: width of the arrowhead on the edge. The
             corresponding edge attribute is C{arrow_width}, the default
             is 1.
+
+          - C{edge_order}: drawing order of the edges. This must be
+            a list or tuple containing edge indices; edges are then
+            drawn according to this order.
+
+          - C{edge_order_by}: an alternative way to specify the drawing
+            order of the edges; this attribute is interpreted as the name
+            of an edge attribute, and edges are drawn such that those
+            with a smaller attribute value are drawn first. You may also
+            reverse the order by passing a tuple here; the first element of
+            the tuple should be the name of the attribute, the second element
+            specifies whether the order is reversed (C{True}, C{False},
+            C{"asc"} and C{"desc"} are accepted values).
         """
         drawer_factory = kwds.get("drawer_factory", DefaultGraphDrawer)
         if "drawer_factory" in kwds:
@@ -3008,6 +3159,7 @@ class Graph(GraphBase):
     _layout_mapping = {
         "auto": "layout_auto",
         "automatic": "layout_auto",
+        "bipartite": "layout_bipartite",
         "circle": "layout_circle",
         "circular": "layout_circle",
         "drl": "layout_drl",
