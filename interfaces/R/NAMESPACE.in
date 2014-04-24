@@ -1,6 +1,7 @@
 
 importFrom(stats, as.dendrogram)
 importFrom(stats, as.hclust)
+import(methods)
 
 # The igraph interface
 
@@ -192,7 +193,7 @@ export(graph.intersection.by.name, graph.union.by.name,
 
 # parameters, config
 
-export(igraph.par, igraph.options, getIgraphOpt)
+export(igraph.par, igraph.options, getIgraphOpt, igraphtest)
 
 # console
 

@@ -839,20 +839,60 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
 int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 		       igraph_integer_t *asym, igraph_integer_t *null) {
   
+  igraph_integer_t nonrec=0, rec=0;
+  igraph_vector_t inneis, outneis;
   igraph_integer_t vc=igraph_vcount(graph);
-  igraph_integer_t ec=igraph_ecount(graph);
-  igraph_real_t rec;
+	long int i;
 
   if (!igraph_is_directed(graph)) {
     IGRAPH_WARNING("Dyad census called on undirected graph");
   }
 
-  IGRAPH_CHECK(igraph_reciprocity(graph, &rec, /*loops=*/1, 
-				  IGRAPH_RECIPROCITY_RATIO));
-  *mut = rec*ec/(rec+1);
-  *asym = ec-2*(*mut);
-  *null = vc*(vc-1)/2-(*mut)-(*asym);
-  
+  IGRAPH_VECTOR_INIT_FINALLY(&inneis, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&outneis, 0);
+
+  for (i=0; i<vc; i++) {
+    long int ip, op;
+    igraph_neighbors(graph, &inneis, i, IGRAPH_IN);
+    igraph_neighbors(graph, &outneis, i, IGRAPH_OUT);
+
+    ip=op=0;
+    while (ip < igraph_vector_size(&inneis) &&
+					 op < igraph_vector_size(&outneis)) {
+      if (VECTOR(inneis)[ip] < VECTOR(outneis)[op]) {
+				nonrec += 1;
+				ip++;
+      } else if (VECTOR(inneis)[ip] > VECTOR(outneis)[op]) {
+				nonrec += 1;
+				op++;
+      } else {
+				rec += 1;
+				ip++;
+				op++;
+      }
+    }
+    nonrec += (igraph_vector_size(&inneis)-ip) +
+      (igraph_vector_size(&outneis)-op);
+  }
+
+  igraph_vector_destroy(&inneis);
+  igraph_vector_destroy(&outneis);
+  IGRAPH_FINALLY_CLEAN(2);
+
+	*mut = rec / 2;
+	*asym = nonrec / 2;
+	if (vc % 2) { 
+		*null = vc * ((vc-1)/2);
+	} else {
+		*null = (vc/2) * (vc-1);
+	}
+	if (*null < vc) {
+		IGRAPH_WARNING("Integer overflow, returning zero");
+		*null = IGRAPH_NAN;
+	} else {
+		*null = *null-(*mut)-(*asym);
+	}
+
   return 0;
 }
 

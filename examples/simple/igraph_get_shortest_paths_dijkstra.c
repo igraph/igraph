@@ -62,7 +62,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
 	long int max1= from < to ? to : from;
 	long int min2= from2 < to2 ? from2 : to2;
 	long int max2= from2 < to2 ? to2 : from2;
-	if (min1 != min2 || max2 != max2) { exit(error_code+3); }
+	if (min1 != min2 || max1 != max2) { exit(error_code+3); }
       }
     }
   }

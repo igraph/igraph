@@ -1,6 +1,8 @@
 #include "Light.h"
 #include "unit_limiter.h"
 
+namespace igraph {
+
 Light::Light() : mLightPoint(0,0,0)
 {
 	mIntensity = 0.1;
@@ -41,3 +43,4 @@ void Light::LightColor(const Color& rLightColor)
 	mLightColor = rLightColor;
 }
 
+} // namespace igraph

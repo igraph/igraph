@@ -82,6 +82,13 @@ D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios, Shrinking
 \seealso{\link{SCG} for a detailed introduction. \code{\link{scg}},
   \code{\link{scgNormEps}}}
 \examples{
+
+## We are not running these examples any more, because they
+## take a long time to run and this is against the CRAN repository
+## policy. Copy and paste them by hand to your R prompt if
+## you want to run them.
+
+\dontrun{
 # eigenvectors of a random symmetric matrix
 M <- matrix(rexp(10^6), 10^3, 10^3)
 M <- (M + t(M))/2
@@ -115,5 +122,6 @@ gr.true <- scgGrouping(cbind(x), 100)
 gr.km <- kmeans(x, 100, 100, 300)$cluster
 scgNormEps(cbind(x), gr.true)
 scgNormEps(cbind(x), gr.km)
+}
 }
 \keyword{graphs}

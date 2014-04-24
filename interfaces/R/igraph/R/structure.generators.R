@@ -169,10 +169,10 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
                                                 "min", "upper", "lower", "plus"),
                                    weighted=NULL, diag=TRUE) {
 
-  require(Matrix)
-  
   mode <- igraph.match.arg(mode)
 
+  require(Matrix)
+  
   if (!is.null(weighted)) {
     if (is.logical(weighted) && weighted) {
       weighted <- "weight"
@@ -722,8 +722,6 @@ graph.bipartite <- function(types, edges, directed=FALSE) {
 
 graph.incidence.sparse <- function(incidence, directed, mode, multiple,
                                    weighted) {
-  require(Matrix)
-
   n1 <- nrow(incidence)
   n2 <- ncol(incidence)
   el <- selectMethod("summary", signature=c(object="sparseMatrix"))(incidence)

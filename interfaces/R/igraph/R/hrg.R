@@ -238,12 +238,11 @@ as.hclust.igraphHRG <- function(x, ...) {
     map2[i] <- -mr[1]
   }
   n <- nrow(merge)+1
-  hcass <- .Fortran(stats:::C_hcass2, n=as.integer(n),
-                    ia=as.integer(mergeInto[,1]),
-                    ib=as.integer(mergeInto[,2]),
-                    order=integer(n), iia=integer(n), iib=integer(n),
-                    PACKAGE="stats")
-                    
+  hcass <- .C("igraphhcass2", n=as.integer(n),
+              ia=as.integer(mergeInto[,1]),
+              ib=as.integer(mergeInto[,2]),
+              order=integer(n), iia=integer(n), iib=integer(n),
+              PACKAGE="igraph")
 
   mynames <- if (is.null(x$names)) 1:n else x$names
   res <- list(merge=merge, height=1:nrow(merge), order=hcass$order,

@@ -91,7 +91,6 @@ scgSemiProjectors <- function(groups,
   if (!is.null(p)) p <- as.numeric(p)
   norm <- switch(igraph.match.arg(norm), "row"=1, "col"=2)
   sparse <- as.logical(sparse)
-  if (sparse && !require(Matrix)) { sparse <- FALSE }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call

@@ -603,6 +603,4 @@ void Greedy::setMove(int *moveTo) {
     }
     
   }
-};
-
-
+}

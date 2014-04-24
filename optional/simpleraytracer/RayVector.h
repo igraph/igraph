@@ -6,6 +6,8 @@
 
 #include "Point.h"
 
+namespace igraph {
+
 class Vector
 {
 public:
@@ -41,5 +43,7 @@ private:
 
 	double mI, mJ, mK;
 };
+
+} // namespace igraph
 
 #endif

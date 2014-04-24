@@ -130,7 +130,7 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
     stop("Not a graph object")
   }
   cs <- degree(graph, ...)
-  hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities
+  hi <- hist(cs, -1:max(cs), plot=FALSE)$density
   if (!cumulative) {
     res <- hi
   } else {
@@ -567,6 +567,8 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
     graph <- simplify(graph, remove.multiple=FALSE, remove.loops=TRUE)
   }
 
+  require(Matrix)
+  
   vg <- vcount(graph)
   
   ## sparse adjacency matrix
@@ -592,7 +594,7 @@ bonpow <- function(graph, nodes=V(graph),
                    rescale=FALSE, tol=1e-7, sparse=TRUE){
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse && require(Matrix)) {
+  if (sparse) {
     res <- bonpow.sparse(graph, nodes, loops, exponent, rescale, tol)
   }  else {
     res <- bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
@@ -652,6 +654,8 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
     stop("Not a graph object")
   }
 
+  require(Matrix)
+  
   vc <- vcount(graph)
 
   if (!loops) {
@@ -696,7 +700,7 @@ alpha.centrality <- function(graph, nodes=V(graph), alpha=1,
                              tol=1e-7, sparse=TRUE) {
 
   nodes <- as.igraph.vs(graph, nodes)
-  if (sparse && require(Matrix)) {
+  if (sparse) {
     res <- alpha.centrality.sparse(graph, nodes, alpha, loops,
                                    exo, weights, tol)
   } else {

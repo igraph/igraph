@@ -225,6 +225,8 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_w
   igraph_vector_long_destroy(&matching);
   igraph_vector_bool_destroy(&types);
   igraph_destroy(&graph);
+  
+  return 0;
 }
 
 int main() {

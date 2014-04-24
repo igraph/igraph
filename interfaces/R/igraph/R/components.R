@@ -43,7 +43,7 @@ cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
   }
   
   cs <- clusters(graph, ...)$csize;
-  hi <- hist(cs, -1:max(cs), plot=FALSE)$intensities;
+  hi <- hist(cs, -1:max(cs), plot=FALSE)$density
   if (mul.size) {
     hi <- hi*1:max(cs)
     hi <- hi/sum(hi)

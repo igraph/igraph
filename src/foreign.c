@@ -976,12 +976,16 @@ void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
       igraph_attribute_record_t *atrec=VECTOR(*vec)[j];
       if (atrec->type == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_vector_t *value=(igraph_vector_t*)atrec->value;
-	igraph_vector_destroy(value);
-	igraph_Free(value);
+	if (value != 0) {
+	  igraph_vector_destroy(value);
+	  igraph_Free(value);
+	}
       } else {
 	igraph_strvector_t *value=(igraph_strvector_t*)atrec->value;
-	igraph_strvector_destroy(value);
-	igraph_Free(value);
+	if (value != 0) {
+	  igraph_strvector_destroy(value);
+	  igraph_Free(value);
+	}
       }
       igraph_Free(atrec->name);
       igraph_Free(atrec);
@@ -2127,7 +2131,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
       if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_NUMERIC) {
 	igraph_i_attribute_get_numeric_vertex_attr(graph, vnames[V_ID], 
 						   igraph_vss_1(i), &numv);
-	fputc('"', outstream);
+	fputs(" \"", outstream);
 	igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
 	fputc('"', outstream);
       } else if (vtypes[V_ID] == IGRAPH_ATTRIBUTE_STRING) {

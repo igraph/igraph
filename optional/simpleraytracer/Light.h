@@ -4,6 +4,11 @@
 #include "Point.h"
 #include "Color.h"
 
+#include <list>
+using namespace std;
+
+namespace igraph {
+
 class Light
 {
 public:
@@ -26,9 +31,9 @@ private:
 	Color mLightColor;
 };
 
-#include <list>
-using namespace std;
 typedef list<Light*> LightList;
 typedef list<Light*>::iterator LightListIterator;
+
+} // namespace igraph
 
 #endif

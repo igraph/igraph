@@ -405,8 +405,9 @@ get.incidence.sparse <- function(graph, types, names, attr) {
   if (length(types) != vc) {
     stop("Invalid types vector")
   }
-  
+
   require(Matrix)
+  
   el <- get.edgelist(graph, names=FALSE)
   if (any(types[el[,1]] == types[el[,2]])) {
     stop("Invalid types vector, not a bipartite graph")

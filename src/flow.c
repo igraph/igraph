@@ -223,6 +223,175 @@ int igraph_i_maxflow_undirected(const igraph_t *graph,
   return 0;
 }
 
+#define FIRST(i)       (VECTOR(*first)[(i)])
+#define LAST(i)        (VECTOR(*first)[(i)+1])
+#define CURRENT(i)     (VECTOR(*current)[(i)])
+#define RESCAP(i)      (VECTOR(*rescap)[(i)])
+#define REV(i)         (VECTOR(*rev)[(i)])
+#define HEAD(i)        (VECTOR(*to)[(i)])
+#define EXCESS(i)      (VECTOR(*excess)[(i)])
+#define DIST(i)        (VECTOR(*distance)[(i)])
+#define DISCHARGE(v)   (igraph_i_mf_discharge((v), &current, &first, &rescap, \
+					      &to, &distance, &excess,	      \
+					      no_of_nodes, source, target,    \
+					      &buckets, &ibuckets,	      \
+					      &rev, &npush, &nrelabel, &ngap, \
+					      &ngapnodes, &npushsince,	      \
+					      &nrelabelsince))
+#define PUSH(v,e,n)    (igraph_i_mf_push((v), (e), (n), current, rescap,      \
+					 excess, target, source, buckets,     \
+					 ibuckets, distance, rev, npush,      \
+					 npushsince))
+#define RELABEL(v)     (igraph_i_mf_relabel((v), no_of_nodes, distance,	      \
+					    first, rescap, to, current,       \
+					    nrelabel, nrelabelsince))
+#define GAP(b)         (igraph_i_mf_gap((b), ngap, ngapnodes, buckets,	      \
+					ibuckets, no_of_nodes, distance))
+#define BFS()          (igraph_i_mf_bfs(&bfsq, source, target, no_of_nodes,   \
+					&buckets, &ibuckets, &distance,       \
+					&first,	&current, &to, &excess,       \
+					&rescap, &rev))
+
+void igraph_i_mf_gap(long int b, int *ngap, int *ngapnodes,
+		     igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
+		     long int no_of_nodes,
+		     igraph_vector_long_t *distance) {
+
+  long int bo;
+  (*ngap)++;
+  for (bo=b+1; bo <= no_of_nodes; bo++) {
+    while (!igraph_dbuckets_empty_bucket(ibuckets, bo)) {
+      long int n=igraph_dbuckets_pop(ibuckets, bo);
+      (*ngapnodes)++;
+      DIST(n)=no_of_nodes;
+    }
+  }
+}
+
+void igraph_i_mf_relabel(long int v, long int no_of_nodes,
+			 igraph_vector_long_t *distance,
+			 igraph_vector_long_t *first,
+			 igraph_vector_t *rescap, igraph_vector_long_t *to,
+			 igraph_vector_long_t *current,
+			 int *nrelabel, int *nrelabelsince) {
+
+    long int min=no_of_nodes;
+    long int k, l, min_edge=0;
+    (*nrelabel)++; (*nrelabelsince)++;
+    DIST(v)=no_of_nodes;
+    for (k=FIRST(v), l=LAST(v); k<l; k++) {
+      if (RESCAP(k) > 0 && DIST(HEAD(k)) < min) {
+	min=DIST(HEAD(k));
+	min_edge=k;
+      }
+    }
+    min++;
+    if (min < no_of_nodes) {
+      DIST(v) = min;
+      CURRENT(v) = min_edge;
+    }
+}
+
+void igraph_i_mf_push(long int v, long int e, long int n,
+		      igraph_vector_long_t *current,
+		      igraph_vector_t *rescap, igraph_vector_t *excess,
+		      long int target, long int source,
+		      igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
+		      igraph_vector_long_t *distance,
+		      igraph_vector_long_t *rev, int *npush, int *npushsince) {
+  igraph_real_t delta=
+    RESCAP(e) < EXCESS(v) ? RESCAP(e) : EXCESS(v);
+  (*npush)++; (*npushsince)++;
+  if (EXCESS(n) == 0 && n != target) {
+    igraph_dbuckets_delete(ibuckets, DIST(n), n);
+    igraph_buckets_add(buckets, (long int) DIST(n), n);
+  }
+  RESCAP(e) -= delta;
+  RESCAP(REV(e)) += delta;
+  EXCESS(n) += delta;
+  EXCESS(v) -= delta;
+}
+
+void igraph_i_mf_discharge(long int v,
+			   igraph_vector_long_t *current,
+			   igraph_vector_long_t *first,
+			   igraph_vector_t *rescap,
+			   igraph_vector_long_t *to,
+			   igraph_vector_long_t *distance,
+			   igraph_vector_t *excess,
+			   long int no_of_nodes, long int source,
+			   long int target, igraph_buckets_t *buckets,
+			   igraph_dbuckets_t *ibuckets,
+			   igraph_vector_long_t *rev, int *npush,
+			   int *nrelabel, int *ngap, int *ngapnodes,
+			   int *npushsince, int *nrelabelsince) {
+  do {
+    long int i;
+    long int start=(long int) CURRENT(v);
+    long int stop =(long int) LAST(v);
+    for (i = start; i < stop; i++) {
+      if (RESCAP(i) > 0) {
+	long int nei=HEAD(i);
+	if (DIST(v) == DIST(nei)+1) {
+	  PUSH((v), i, nei);
+	  if (EXCESS(v) == 0) { break; }
+	}
+      }
+    }
+    if (i == stop) {
+      long int origdist=DIST(v);
+      RELABEL(v);
+      if (igraph_buckets_empty_bucket(buckets, origdist) &&
+	  igraph_dbuckets_empty_bucket(ibuckets, origdist)) {
+	GAP(origdist);
+      }
+      if (DIST(v) == no_of_nodes) { break; }
+    } else {
+      CURRENT(v) = i;
+      igraph_dbuckets_add(ibuckets, DIST(v), v);
+      break;
+    }
+  } while (1);
+}
+
+void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
+		     long int source, long int target,
+		     long int no_of_nodes, igraph_buckets_t *buckets,
+		     igraph_dbuckets_t *ibuckets,
+		     igraph_vector_long_t *distance,
+		     igraph_vector_long_t *first, igraph_vector_long_t *current,
+		     igraph_vector_long_t *to, igraph_vector_t *excess,
+		     igraph_vector_t *rescap, igraph_vector_long_t *rev) {
+
+  long int k, l;
+
+  igraph_buckets_clear(buckets);
+  igraph_dbuckets_clear(ibuckets);
+  igraph_vector_long_fill(distance, no_of_nodes);
+  DIST(target) = 0;
+
+  igraph_dqueue_long_push(bfsq, target);
+  while (!igraph_dqueue_long_empty(bfsq)) {
+    long int node=igraph_dqueue_long_pop(bfsq);
+    long int ndist=DIST(node)+1;
+    for (k=FIRST(node), l=LAST(node); k<l; k++) {
+      if (RESCAP(REV(k)) > 0) {
+	long int nei=HEAD(k);
+	if (DIST(nei) == no_of_nodes) {
+	  DIST(nei) = ndist;
+	  CURRENT(nei) = FIRST(nei);
+	  if (EXCESS(nei) > 0) {
+	    igraph_buckets_add(buckets, ndist, nei);
+	  } else {
+	    igraph_dbuckets_add(ibuckets, ndist, nei);
+	  }
+	  igraph_dqueue_long_push(bfsq, nei);
+	}
+      }
+    }
+  }
+}
+
 /**
  * \function igraph_maxflow
  * Maximum network flow between a pair of vertices
@@ -302,12 +471,18 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
   long int no_of_orig_edges=igraph_ecount(graph);
   long int no_of_edges=2*no_of_orig_edges;
 
-  igraph_vector_t from, to, rev, rescap, excess, distance;
+  igraph_vector_t rescap, excess;
+  igraph_vector_long_t from, to, rev, distance;
   igraph_vector_t edges, rank;
-  igraph_vector_t current, first;
+  igraph_vector_long_t current, first;
   igraph_buckets_t buckets;
+  igraph_dbuckets_t ibuckets;
 
-  long int i, j, k, l, idx;
+  igraph_dqueue_long_t bfsq;
+
+  long int i, j, idx;
+  int npush=0, nrelabel=0, ngap=0, ngapnodes=0, nbfs=0, npushsince=0,
+    nrelabelsince=0;
 
   if (!igraph_is_directed(graph)) {
     IGRAPH_CHECK(igraph_i_maxflow_undirected(graph, value, flow, cut,
@@ -351,17 +526,35 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
    *   This always contains the vertices that have a positive excess
    *   flow.
    */
-  
-  IGRAPH_VECTOR_INIT_FINALLY(&to,       no_of_edges);
-  IGRAPH_VECTOR_INIT_FINALLY(&rev,      no_of_edges);
-  IGRAPH_VECTOR_INIT_FINALLY(&rescap,   no_of_edges);
-  IGRAPH_VECTOR_INIT_FINALLY(&excess,   no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
-  IGRAPH_VECTOR_INIT_FINALLY(&first,    no_of_nodes+1);
+#undef FIRST
+#undef LAST
+#undef CURRENT
+#undef RESCAP
+#undef REV
+#undef HEAD
+#undef EXCESS
+#undef DIST
+#define FIRST(i)       (VECTOR(first)[(i)])
+#define LAST(i)        (VECTOR(first)[(i)+1])
+#define CURRENT(i)     (VECTOR(current)[(i)])
+#define RESCAP(i)      (VECTOR(rescap)[(i)])
+#define REV(i)         (VECTOR(rev)[(i)])
+#define HEAD(i)        (VECTOR(to)[(i)])
+#define EXCESS(i)      (VECTOR(excess)[(i)])
+#define DIST(i)        (VECTOR(distance)[(i)])
 
-  IGRAPH_VECTOR_INIT_FINALLY(&rank,     no_of_edges);
-  IGRAPH_VECTOR_INIT_FINALLY(&from,     no_of_edges);
-  IGRAPH_VECTOR_INIT_FINALLY(&edges,    no_of_edges);
+  igraph_dqueue_long_init(&bfsq,             no_of_nodes);
+  IGRAPH_FINALLY(igraph_dqueue_long_destroy, &bfsq);
+  IGRAPH_VECTOR_LONG_INIT_FINALLY(&to,       no_of_edges);
+  IGRAPH_VECTOR_LONG_INIT_FINALLY(&rev,      no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&rescap,        no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&excess,        no_of_nodes);
+  IGRAPH_VECTOR_LONG_INIT_FINALLY(&distance, no_of_nodes);
+  IGRAPH_VECTOR_LONG_INIT_FINALLY(&first,    no_of_nodes+1);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&rank,          no_of_edges);
+  IGRAPH_VECTOR_LONG_INIT_FINALLY(&from,     no_of_edges);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges,         no_of_edges);
   
   /* Create the basic data structure */
   IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
@@ -398,7 +591,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     VECTOR(first)[idx++] = no_of_edges;
   }
 
-  igraph_vector_destroy(&from);
+  igraph_vector_long_destroy(&from);
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(2);
 
@@ -408,119 +601,45 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
   }
 
   /* And the current pointers, initially the same as the first */
-  IGRAPH_VECTOR_INIT_FINALLY(&current, no_of_nodes);
+  IGRAPH_VECTOR_LONG_INIT_FINALLY(&current, no_of_nodes);
   for (i=0; i<no_of_nodes; i++) {
     VECTOR(current)[i] = VECTOR(first)[i];
   }
-
-  /* Some useful macros */
-  
-#define FIRST(i)       ((long int)VECTOR(first)[(long int)(i)])
-#define LAST(i)        ((long int)VECTOR(first)[(long int)(i)+1])
-#define CURRENT(i)     (VECTOR(current)[(i)])
-#define RESCAP(i)      (VECTOR(rescap)[(i)])
-#define REV(i)         ((long int)VECTOR(rev)[(i)])
-#define HEAD(i)        ((long int)VECTOR(to)[(i)])
-#define EXCESS(i)      (VECTOR(excess)[(long int)(i)])
-#define DIST(i)        (VECTOR(distance)[(long int)(i)])
 
   /* OK, the graph is set up, initialization */
 
   IGRAPH_CHECK(igraph_buckets_init(&buckets, no_of_nodes+1, no_of_nodes));
   IGRAPH_FINALLY(igraph_buckets_destroy, &buckets);
+  IGRAPH_CHECK(igraph_dbuckets_init(&ibuckets, no_of_nodes+1, no_of_nodes));
+  IGRAPH_FINALLY(igraph_dbuckets_destroy, &ibuckets);
 
   /* Send as much flow as possible from the source to its neighbors */
   for (i=FIRST(source), j=LAST(source); i<j; i++) {
     if (HEAD(i) != source) {
       igraph_real_t delta=RESCAP(i);
-      RESCAP(i) -= delta;
+      RESCAP(i) = 0;
       RESCAP(REV(i)) += delta;
       EXCESS(HEAD(i)) += delta;
     }
   }
 
-  for (i=0; i<no_of_nodes; i++) {
-    DIST(i) = 1;
-  }
-  DIST(source)=no_of_nodes;
-  DIST(target)=0;
+  BFS();
+  nbfs++;
 
-  /* It would be enough to do this for the neighbors of the source,
-     the rest have EXCESS(i) == 0.0 by definition. */
-  for (i=0; i<no_of_nodes; i++) {
-    if (EXCESS(i) > 0.0 && i != target) {
-      igraph_buckets_add(&buckets, DIST(i), i);
-    }
-  }
-
-  /* The main part comes here */
   while (!igraph_buckets_empty(&buckets)) {
     long int vertex=igraph_buckets_popmax(&buckets);
-    /* DISCHARGE(vertex) comes here */
-    do {
-      for (i=CURRENT(vertex), j=LAST(vertex); i<j; i++) {
-	if (RESCAP(i) > 0) {
-	  long int nei=HEAD(i);
-	  
-	  if (DIST(vertex) == DIST(nei)+1) {
-	    igraph_real_t delta=
-	      RESCAP(i) < EXCESS(vertex) ? RESCAP(i) : EXCESS(vertex);
-	    RESCAP(i) -= delta;
-	    RESCAP(REV(i)) += delta;
-	    
-	    if (nei != target && EXCESS(nei) == 0.0 &&
-		DIST(nei) != no_of_nodes) {
-	      igraph_buckets_add(&buckets, DIST(nei), nei);
-	    }
-	    
-	    EXCESS(nei) += delta;
-	    EXCESS(vertex) -= delta;
-	    
-	    if (EXCESS(vertex) == 0) break;
-	    
-	  }
-	}
-      }
-      
-      if (i==j) {
-	
-	/* RELABEL(vertex) comes here */	
-	igraph_real_t min;
-	long int min_edge=0;
-	DIST(vertex)=min=no_of_nodes;
-	for (k=FIRST(vertex), l=LAST(vertex); k<l; k++) {
-	  if (RESCAP(k) > 0) {
-	    if (DIST(HEAD(k)) < min) {
-	      min=DIST(HEAD(k));
-	      min_edge=k;
-	    }
-	  }
-	}
-	
-	min++;
-
-	if (min < no_of_nodes) {
-	  DIST(vertex)=min;
-	  CURRENT(vertex)=min_edge;
-	  /* Vertex is still active */
-	  igraph_buckets_add(&buckets, DIST(vertex), vertex);
-	}
-	
-	/* TODO: gap heuristics here ??? */
-
-      } else {
-	CURRENT(vertex) = FIRST(vertex);
-      }
-
-      break;
-
-    } while (1);
+    DISCHARGE(vertex);
+    if (npushsince > no_of_nodes / 2 && nrelabelsince > no_of_nodes) {
+      nbfs++;
+      BFS();
+      npushsince = nrelabelsince = 0;
+    }
   }
 
   /* Store the result */
   if (value) {
     *value=EXCESS(target);
-  }
+  }  
 
   /* If we also need the minimum cut */
   if (cut || partition || partition2) {
@@ -598,7 +717,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
        from the source */ 
     igraph_dqueue_t Q;
     igraph_vector_int_t added;
-    long int j;
+    long int j, k, l;
     igraph_t flow_graph;
     igraph_vector_t flow_edges;
     igraph_bool_t dag;
@@ -760,7 +879,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
       }
       
       do { 
-	igraph_vector_null(&current);
+	igraph_vector_long_null(&current);
 	igraph_vector_long_clear(&stack);
 	igraph_vector_int_null(&added);
 	
@@ -849,16 +968,18 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     igraph_vector_destroy(&rank);
     IGRAPH_FINALLY_CLEAN(1);
   }
-  
+
+  igraph_dbuckets_destroy(&ibuckets);
   igraph_buckets_destroy(&buckets);
-  igraph_vector_destroy(&current);
-  igraph_vector_destroy(&first);
-  igraph_vector_destroy(&distance);
+  igraph_vector_long_destroy(&current);
+  igraph_vector_long_destroy(&first);
+  igraph_vector_long_destroy(&distance);
   igraph_vector_destroy(&excess);
   igraph_vector_destroy(&rescap);
-  igraph_vector_destroy(&rev);
-  igraph_vector_destroy(&to);
-  IGRAPH_FINALLY_CLEAN(8);
+  igraph_vector_long_destroy(&rev);
+  igraph_vector_long_destroy(&to);
+  igraph_dqueue_long_destroy(&bfsq);
+  IGRAPH_FINALLY_CLEAN(10);
 
   return 0;
 }

@@ -44,7 +44,7 @@ int main(int argc, char **argv) {
   
   oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
   oldwarnhandler=igraph_set_warning_handler(custom_warning_handler);
-  if (result=igraph_read_graph_graphml(&g, ifile, 0)) {
+  if ((result=igraph_read_graph_graphml(&g, ifile, 0))) {
     // maybe it is simply disabled at compile-time
     if (result == IGRAPH_UNIMPLEMENTED) return 77;
     return 1;
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
   ofile=fopen("test2.gxl", "w");
   /* If we can't create the test file, just skip the test */
   if (ofile) {
-    if (result=igraph_write_graph_graphml(&g, ofile)) {
+    if ((result=igraph_write_graph_graphml(&g, ofile))) {
       return 1;
     }
     fclose(ofile);
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
  
   /* The same with undirected graph */
   ifile=fopen("test.gxl", "r");
-  if (result=igraph_read_graph_graphml(&g, ifile, 0)) {
+  if ((result=igraph_read_graph_graphml(&g, ifile, 0))) {
     return 1;
   }
   fclose(ifile);

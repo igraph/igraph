@@ -253,7 +253,7 @@ if (require(Matrix)) {
   g <- erdos.renyi.game(1000, 5/1000)
   M <- get.adjacency(g, sparse=TRUE)
   f2 <- function(x, extra=NULL) { cat("."); as.vector(M \%*\% x) }
-  baev <- arpack(f2, options=list(n=vcount(g), nev=3, ncv=8, sym=TRUE,
+  baev <- arpack(f2, sym=TRUE, options=list(n=vcount(g), nev=3, ncv=8,
                                   which="LM", maxiter=200))
 }
 }

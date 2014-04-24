@@ -1,6 +1,7 @@
-AC_INIT(igraph, 0.6.5, csardi.gabor@gmail.com)
+AC_INIT(igraph, esyscmd([tr -d '\n' < VERSION]), csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE
+AM_EXTRA_RECURSIVE_TARGETS([parsersources])
 AC_CONFIG_HEADERS([config.h])
 
 m4_include(tools/autoconf/ax_tls.m4)
@@ -176,6 +177,11 @@ HAVE_TLS=0
 THREAD_LOCAL=
 AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
 if test "x$enable_tls" != "xno"; then
+  keywords="__thread __declspec(thread)"
+  for kw in $keywords ; do
+      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw)
+      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw ; break ;)
+  done
   AX_TLS([
     AC_DEFINE([HAVE_TLS], [1], [Define to 1 if you want to use thread-local storage for global igraph structures])
     tls_support=yes
@@ -298,7 +304,7 @@ if test "$use_gprof" = "yes"; then
   CXXFLAGS="${CFLAGS} -pg"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile doc/book/Makefile interfaces/R/configure.in interfaces/R/Makefile interfaces/R/src/Makevars.win interfaces/R/DESCRIPTION interfaces/Makefile include/igraph_version.h include/igraph_threading.h])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])

@@ -2783,7 +2783,8 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  *   graph. See \ref igraph_bliss_sh_t.
  * \param info1 If not \c NULL, information about the canonization of
  *    the first input graph is stored here. See \ref igraph_bliss_info_t
- *    for details.
+ *    for details. Note that if the two graphs have different number
+ *    of vertices or edges, then this is not filled.
  * \param info2 Same as \p info1, but for the second graph.
  * \return Error code.
  * 
@@ -2803,8 +2804,19 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
   igraph_vector_t from, to, index;
   igraph_vector_t from2, to2, index2;
   long int i, j;
-  
+
   *iso=0;
+	if (info1) {
+		info1->nof_nodes = info1->nof_leaf_nodes = info1->nof_bad_nodes = 
+			info1->nof_canupdates = info1->max_level = -1;
+		info1->group_size = 0;
+	}
+	if (info2) {
+		info2->nof_nodes = info2->nof_leaf_nodes = info2->nof_bad_nodes = 
+			info2->nof_canupdates = info2->max_level = -1;
+		info2->group_size = 0;
+	}
+
   if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
     IGRAPH_ERROR("Cannot compare directed and undirected graphs",
 		 IGRAPH_EINVAL);
