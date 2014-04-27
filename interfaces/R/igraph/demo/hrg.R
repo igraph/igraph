@@ -1,7 +1,9 @@
 
 pause <- function() {
-  cat("Press ENTER/RETURN/NEWLINE to continue.")
-  readLines(n=1)
+  if (interactive()) {
+    cat("Press ENTER/RETURN/NEWLINE to continue.")
+    readLines(n=1)
+  }
   invisible()
 }
 
