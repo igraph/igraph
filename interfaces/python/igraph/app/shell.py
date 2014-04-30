@@ -350,8 +350,23 @@ class ConsoleProgressBarMixin(object):
             self.__class__.progress_bar = ProgressBar(TerminalController())
         except ValueError:
             # Terminal is not capable enough, disable progress handler
+            self._disable_handlers()
+        except TypeError:
+            # Probably running in Python 3.x and we hit a str/bytes issue;
+            # as a temporary solution, disable the progress handler
+            self._disable_handlers()
+
+    def _disable_handlers(self):
+        """Disables the status and progress handlers if the terminal is not
+        capable enough."""
+        try:
             del self.__class__._progress_handler
+        except AttributeError:
+            pass
+        try:
             del self.__class__._status_handler
+        except AttributeError:
+            pass
 
     @classmethod
     def _progress_handler(cls, message, percentage):
@@ -429,13 +444,8 @@ class ClassicPythonShell(Shell, ConsoleProgressBarMixin):
 
         Imports Python's classic shell"""
         Shell.__init__(self)
+        ConsoleProgressBarMixin.__init__(self)
         self._shell = None
-
-        try:
-            self.__class__.progress_bar = ProgressBar(TerminalController())
-        except ValueError:
-            # Terminal is not capable enough, disable progress handler
-            del self.__class__._progress_handler
 
     def __call__(self):
         """Starts the embedded shell."""
@@ -484,6 +494,8 @@ def main():
             break
         except StandardError:
             # Try the next one
+            if "Classic" in str(shell_class):
+                raise
             pass
 
     if isinstance(shell, Shell):
