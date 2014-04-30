@@ -55,6 +55,7 @@ import operator
 
 from collections import defaultdict
 from itertools import izip
+from shutil import copyfileobj
 from tempfile import mkstemp
 from warnings import warn
 
@@ -1735,11 +1736,10 @@ class Graph(GraphBase):
           produces the least compression, and 9 is slowest and produces
           the most compression."""
         from igraph.utils import named_temporary_file
-        with named_temporary_file(text=True) as tmpfile:
+        with named_temporary_file() as tmpfile:
             self.write_graphml(tmpfile)
             outf = gzip.GzipFile(f, "wb", compresslevel)
-            for line in open(tmpfile):
-                outf.write(line)
+            copyfileobj(open(tmpfile, "rb"), outf)
             outf.close()
 
     @classmethod
@@ -1788,10 +1788,9 @@ class Graph(GraphBase):
           specify 0 here.
         @return: the loaded graph object"""
         from igraph.utils import named_temporary_file
-        with named_temporary_file(text=True) as tmpfile:
-            outf = open(tmpfile, "wt")
-            for line in gzip.GzipFile(f, "rb"):
-                outf.write(line)
+        with named_temporary_file() as tmpfile:
+            outf = open(tmpfile, "wb")
+            copyfileobj(gzip.GzipFile(f, "rb"), outf)
             outf.close()
             return cls.Read_GraphML(tmpfile)
 
