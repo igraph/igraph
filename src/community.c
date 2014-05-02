@@ -855,7 +855,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * on vertex `j' and `m' is the total weight of all edges.
  * 
  * </para><para>
- * See also Clauset, A.; Newman, M. E. J. & Moore, C. Finding
+ * See also Clauset, A.; Newman, M. E. J.; Moore, C. Finding
  * community structure in very large networks, Physical Review E,
  * 2004, 70, 066111.
  * \param graph The input graph.

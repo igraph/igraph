@@ -65,6 +65,20 @@ class EdgeTests(unittest.TestCase):
         e.update_attributes(dict(b=44, c=55))
         self.assertEqual(e.attributes(), dict(a=3, b=44, c=55, d=6))
 
+    def testPhantomEdge(self):
+        e = self.g.es[self.g.ecount()-1]
+        e.delete()
+
+        # v is now a phantom edge; try to freak igraph out now :)
+        self.assertRaises(ValueError, e.update_attributes, a=2)
+        self.assertRaises(ValueError, e.__getitem__, "a")
+        self.assertRaises(ValueError, e.__setitem__, "a", 4)
+        self.assertRaises(ValueError, e.__delitem__, "a")
+        self.assertRaises(ValueError, e.attributes)
+        self.assertRaises(ValueError, getattr, e, "source")
+        self.assertRaises(ValueError, getattr, e, "target")
+        self.assertRaises(ValueError, getattr, e, "tuple")
+
     def testProxyMethods(self):
         g = Graph.GRG(10, 0.5)
         e = g.es[0]

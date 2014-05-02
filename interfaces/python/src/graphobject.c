@@ -6700,8 +6700,9 @@ PyObject* igraphmodule_Graph_layout_davidson_harel(igraphmodule_GraphObject *sel
   }
 
   retval = igraph_layout_davidson_harel(&self->g, &m, use_seed,
-      maxiter, fineiter, cool_fact, weight_node_dist, weight_border,
-      weight_edge_lengths, weight_edge_crossings, weight_node_edge_dist);
+      (igraph_integer_t) maxiter, (igraph_integer_t) fineiter, cool_fact,
+      weight_node_dist, weight_border, weight_edge_lengths, weight_edge_crossings,
+      weight_node_edge_dist);
   if (retval) {
     igraph_matrix_destroy(&m);
     igraphmodule_handle_igraph_error();

@@ -55,6 +55,7 @@ import operator
 
 from collections import defaultdict
 from itertools import izip
+from shutil import copyfileobj
 from tempfile import mkstemp
 from warnings import warn
 
@@ -141,16 +142,18 @@ class Graph(GraphBase):
     subgraph = GraphBase.induced_subgraph
 
     def __init__(self, *args, **kwds):
-        """__init__(n=None, edges=None, directed=None, graph_attrs=None,
+        """__init__(n=0, edges=None, directed=False, graph_attrs=None,
         vertex_attrs=None, edge_attrs=None)
         
         Constructs a graph from scratch.
 
         @keyword n: the number of vertices. Can be omitted, the default is
-          zero.
+          zero. Note that if the edge list contains vertices with indexes
+          larger than or equal to M{m}, then the number of vertices will
+          be adjusted accordingly.
         @keyword edges: the edge list where every list item is a pair of
           integers. If any of the integers is larger than M{n-1}, the number
-          of vertices is adjusted accordingly.
+          of vertices is adjusted accordingly. C{None} means no edges.
         @keyword directed: whether the graph should be directed
         @keyword graph_attrs: the attributes of the graph as a dictionary.
         @keyword vertex_attrs: the attributes of the vertices as a dictionary.
@@ -164,23 +167,45 @@ class Graph(GraphBase):
         kwd_order = ["n", "edges", "directed", "graph_attrs", "vertex_attrs", \
                 "edge_attrs"]
         params = [0, [], False, {}, {}, {}]
+
+        # Is there any keyword argument in kwds that we don't know? If so,
+        # freak out.
+        unknown_kwds = set(kwds.keys())
+        unknown_kwds.difference_update(kwd_order)
+        if unknown_kwds:
+            raise TypeError("{0}.__init__ got an unexpected keyword argument {1!r}".format(
+                self.__class__.__name__, unknown_kwds.pop()
+            ))
+
         # If the first argument is a list, assume that the number of vertices
         # were omitted
         args = list(args)
         if len(args) > 0:
             if isinstance(args[0], list) or isinstance(args[0], tuple):
                 args.insert(0, params[0])
+
         # Override default parameters from args
         params[:len(args)] = args
+
         # Override default parameters from keywords
         for idx, k in enumerate(kwd_order):
             if k in kwds:
                 params[idx] = kwds[k]
+
         # Now, translate the params list to argument names
         nverts, edges, directed, graph_attrs, vertex_attrs, edge_attrs = params
 
+        # When the number of vertices is None, assume that the user meant zero
+        if nverts is None:
+            nverts = 0
+
+        # When 'edges' is None, assume that the user meant an empty list
+        if edges is None:
+            edges = []
+
         # Initialize the graph
         GraphBase.__init__(self, nverts, edges, directed)
+
         # Set the graph attributes
         for key, value in graph_attrs.iteritems():
             if isinstance(key, (int, long)):
@@ -1711,11 +1736,10 @@ class Graph(GraphBase):
           produces the least compression, and 9 is slowest and produces
           the most compression."""
         from igraph.utils import named_temporary_file
-        with named_temporary_file(text=True) as tmpfile:
+        with named_temporary_file() as tmpfile:
             self.write_graphml(tmpfile)
             outf = gzip.GzipFile(f, "wb", compresslevel)
-            for line in open(tmpfile):
-                outf.write(line)
+            copyfileobj(open(tmpfile, "rb"), outf)
             outf.close()
 
     @classmethod
@@ -1764,10 +1788,9 @@ class Graph(GraphBase):
           specify 0 here.
         @return: the loaded graph object"""
         from igraph.utils import named_temporary_file
-        with named_temporary_file(text=True) as tmpfile:
-            outf = open(tmpfile, "wt")
-            for line in gzip.GzipFile(f, "rb"):
-                outf.write(line)
+        with named_temporary_file() as tmpfile:
+            outf = open(tmpfile, "wb")
+            copyfileobj(gzip.GzipFile(f, "rb"), outf)
             outf.close()
             return cls.Read_GraphML(tmpfile)
 
@@ -1895,13 +1918,14 @@ class Graph(GraphBase):
     def write_svg(self, fname, layout="auto", width=None, height=None, \
                   labels="label", colors="color", shapes="shape", \
                   vertex_size=10, edge_colors="color", \
+                  edge_stroke_widths="width", \
                   font_size=16, *args, **kwds):
         """Saves the graph as an SVG (Scalable Vector Graphics) file
         
         The file will be Inkscape (http://inkscape.org) compatible.
         In Inkscape, as nodes are rearranged, the edges auto-update.
         
-        @param fname: the name of the file
+        @param fname: the name of the file or a Python file handle
         @param layout: the layout of the graph. Can be either an
           explicitly specified layout (using a list of coordinate
           pairs) or the name of a layout algorithm (which should
@@ -1926,6 +1950,10 @@ class Graph(GraphBase):
           of an edge attribute to use, or a list explicitly specifying
           the colors. A color can be anything acceptable in an SVG
           file.
+        @param edge_stroke_widths: the stroke widths of the edges. Either
+          it is the name of an edge attribute to use, or a list explicitly
+          specifying the stroke widths. The stroke width can be anything
+          acceptable in an SVG file.
         @param font_size: font size. If it is a string, it is written into
           the SVG file as-is (so you can specify anything which is valid
           as the value of the C{font-size} style). If it is a number, it
@@ -1958,7 +1986,7 @@ class Graph(GraphBase):
             try:
                 colors = self.vs.get_attribute_values(colors)
             except KeyError:
-                colors = ["red" for x in xrange(self.vcount())]
+                colors = ["red"] * self.vcount()
 
         if isinstance(shapes, str):
             try:
@@ -1970,7 +1998,13 @@ class Graph(GraphBase):
             try:
                 edge_colors = self.es.get_attribute_values(edge_colors)
             except KeyError:
-                edge_colors = ["black" for x in xrange(self.ecount())]
+                edge_colors = ["black"] * self.ecount()
+
+        if isinstance(edge_stroke_widths, str):
+            try:
+                edge_stroke_widths = self.es.get_attribute_values(edge_stroke_widths)
+            except KeyError:
+                edge_stroke_widths = [2] * self.ecount()
 
         if not isinstance(font_size, str):
             font_size = "%spx" % str(font_size)
@@ -1982,7 +2016,12 @@ class Graph(GraphBase):
         labels.extend(str(i+1) for i in xrange(len(labels), vcount))
         colors.extend(["red"] * (vcount - len(colors)))
 
-        f = open(fname, "w")
+        if isinstance(fname, basestring):
+            f = open(fname, "w")
+            our_file = True
+        else:
+            f = fname
+            our_file = False
 
         bbox = BoundingBox(layout.bounding_box())
 
@@ -2050,10 +2089,10 @@ class Graph(GraphBase):
             y2 = y2 - vertex_size * math.sin(angle)
             
             print >> f, '<path'
-            print >> f, '    style="fill:none;stroke:{0};stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none{1}"'\
+            print >> f, '    style="fill:none;stroke:{0};stroke-width:{2};stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none{1}"'\
                         .format(edge_colors[eidx], ";marker-end:url(#{0})".\
                                 format(edge_color_dict[edge_colors[eidx]]) \
-                                if directed else "")
+                                if directed else "", edge_stroke_widths[eidx])
             print >> f, '    d="M {0},{1} {2},{3}"'.format(x1, y1, x2, y2)
             print >> f, '    id="path{0}"'.format(eidx)
             print >> f, '    inkscape:connector-type="polyline"'
@@ -2111,8 +2150,9 @@ class Graph(GraphBase):
         print >> f, '</g>'
         print >> f
         print >> f, '</svg>'
-                
-        f.close()
+        
+        if our_file:
+            f.close()
 
 
     @classmethod

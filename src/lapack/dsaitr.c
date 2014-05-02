@@ -242,15 +242,15 @@ static integer c__2 = 2;
     /* Local variables */
     integer i__;
     IGRAPH_F77_SAVE integer j;
-    real t0, t1, t2, t3, t4, t5;
+    real t0, t1, t2 = 0.0, t3, t4, t5;
     integer jj;
     IGRAPH_F77_SAVE integer ipj, irj;
-    integer nbx;
+    integer nbx = 0;
     IGRAPH_F77_SAVE integer ivj;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
     IGRAPH_F77_SAVE integer ierr, iter;
-    integer nopx;
+    integer nopx = 0;
     IGRAPH_F77_SAVE integer itry;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     doublereal temp1;
@@ -263,7 +263,7 @@ static integer c__2 = 2;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
     doublereal xtemp[2];
-    real tmvbx;
+    real tmvbx = 0;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
     IGRAPH_F77_SAVE doublereal wnorm;
@@ -278,15 +278,15 @@ static integer c__2 = 2;
 	    integer *, integer *), igraphsecond_(real *);
     integer logfil;
     IGRAPH_F77_SAVE doublereal safmin;
-    integer ndigit, nitref;
-    real titref;
-    integer msaitr;
+    integer ndigit = 0, nitref = 0;
+    real titref = 0;
+    integer msaitr = 0;
     IGRAPH_F77_SAVE integer msglvl;
-    real tsaitr;
-    integer nrorth;
+    real tsaitr = 0;
+    integer nrorth = 0;
     IGRAPH_F77_SAVE logical rstart;
-    integer nrstrt;
-    real tmvopx;
+    integer nrstrt = 0;
+    real tmvopx = 0;
 
 
 /*     %----------------------------------------------------%   

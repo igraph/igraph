@@ -129,7 +129,7 @@ doublereal igraphdlanst_(char *norm, integer *n, doublereal *d__, doublereal *e)
     integer i__;
     doublereal sum, scale;
     extern logical igraphlsame_(char *, char *);
-    doublereal anorm;
+    doublereal anorm = 0.;
     extern logical igraphdisnan_(doublereal *);
     extern /* Subroutine */ int igraphdlassq_(integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *);

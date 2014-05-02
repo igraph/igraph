@@ -1,4 +1,215 @@
 ============
+igraph 0.7.1
+============
+
+April 21, 2014
+
+Release Notes
+-------------
+
+Some bug fixes, to make sure that the code included in
+'Statistical Analysis of Network Data with R' works. See
+https://github.com/kolaczyk/sand
+
+Detailed changes:
+-----------------
+
+- Graph drawing: fix labels of curved edges, issue #181.
+- Graph drawing: allow fixing edge labels at given positions,
+  issue #181.
+- Drop the 'type' vertex attribute after bipartite projection,
+  the projections are not bipartite any more, issue #255.
+- Print logical attributes in header properly (i.e. encoded by `l`,
+  not `x`,  which is for complex attributes. Issue #578.
+- Add a constructor for `communities` objects, see `create.communities()`.
+  Issue #547.
+- Better error handling in the GraphML parser.
+- GraphML reader is a bit more lenient now; makes it possible to read
+  GraphML files saved from yWorks apps.
+- Fixed a bug in `constaint()`, issue #580.
+- Bipartite projection now detects invalid edges instead of giving
+  a cryptic error, issue #543.
+- Fixed the `simplify` argument of `graph.formula()`, which was
+  broken, issue #586.
+- The function `crossing()` adds better names to the result,
+  fixes issue #587.
+- The `sir()` function gives an error if the input graph is
+  not simple, fixes issue #582.
+- Calling igraph functions from igraph callbacks is not allowed now,
+  fixes issue #571.
+
+============
+igraph 0.7.0
+============
+
+February 4, 2014
+
+Release Notes
+-------------
+
+There are a bunch of new features in the library itself, and 
+other important changes in the life of the project. Thanks everyone
+for sending code and reporting bugs!
+
+### igraph @ github
+
+igraph's development has moved from Launchpad to github. 
+This has actually happened several month ago, but never 
+announced officially. The place for reporting bugs is 
+at https://github.com/igraph/igraph/issues.
+
+### New homepage
+
+igraph's homepage is now hosted at http://igraph.org, and it is 
+brand new. We wanted to make it easier to use and modern.
+
+### Better nightly downloads
+
+You can download nightly builds from igraph at 
+http://igraph.org/nightly. Source and binary R packages (for windows
+and OSX), are all built.
+
+New features and bug fixes
+-----------------------------
+
+- Added a demo for hierarchical random graphs, invoke it via
+  `demo(hrg)`.
+- Make attribute prefixes optional when writing a GraphML file.
+- Added function `mod.matrix()`.
+- Support edge weights in leading eigenvector community detection.
+- Added the LAD library for checking (sub)graph isomorphism, version 1.
+- Logical attributes.
+- Added `layout.bipartite()` function, a simple two-column layout
+  for bipartite graphs.
+- Support incidence matrices in bipartite Pajek files.
+- Pajek files in matrix format are now directed by default, unless they
+  are bipartite.
+- Support weighted (and signed) networks in Pajek when file is in
+  matrix format.
+- Fixed a bug in `barabasi.game()`, algorithm psumtree-multiple 
+  just froze.
+- Function `layout.mds()` by default returns a layout matrix now.
+- Added support for Boolean attributes in the GraphML and GML readers
+  and writer.
+- Change MDS layout coordinates, first dim is according to first
+  eigenvalue, etc.
+- `plot.communities()` (`plot.igraph()`, really) draws a border
+  around the marked groups by default.
+- printing graphs now converts the `name` graph attribute to character
+- Convenience functions to query and set all attributes at once:
+  `vertex.attriubutes()`, `graph.attributes()` and `edge.attributes()`.
+- Function `graph.disjoint.union()` handles attributes now.
+- Rewrite `graph.union()` to handle attributes properly.
+- `rewire()`: now supports the generation and destruction of loops.
+- Erdos-Renyi type bipartite random graphs: `bipartite.random.game()`.
+- Support the new options (predecessors and inbound_edges) of
+  `get_shortest_paths()`, reorganized the output of
+  `get.shortest.paths()` completely. 
+- Added `graphlets()` and related functions.
+- Fix modularity values of multilevel community if there are no merges
+  at all.
+- Fixed bug when deleting edges with FALSE in the matrix notation.
+- Fix `bonpow()` and `alpha.centrality()` and make sure that the
+  sparse solver is called.
+- `tkplot()` news: enable setting coordinates from the command line
+  via `tkplot.setcoords()` and access to the canvas via 
+  `tkplot.canvas()`.
+- Fixed a potential crash in `igraph_edge_connectivity()`, because of an
+  un-initialized variable in the C code.
+- Avoiding overflow in `closeness()` and related functions.
+- Check for NAs after converting 'type' to logical in 
+  `bipartite.projection()`.
+- `graphNEL` conversion functions only load the 'graph' package if it was 
+  not loaded before and they load it at the end of the search path, 
+  to minimize conflicts.
+- Fixed a bug when creating graphs from adjacency matrices, we now convert
+  them to double, in case they are integers.
+- Fixed an invalid memory read (and a potential crash) in the infomap
+  community detection.
+- Fixed a memory leak in the functions with attribute combinations.
+- Removed some memory leaks from the SCG functions.
+- Fixed some memory leaks in the ray tracer.
+- Fixed memory leak in `graph.bfs()` and `graph.dfs()`.
+- Fix a bug in triad census that set the first element of the result
+  to NaN.
+- Fixed a crash in `is.chordal()`.
+- Fixed a bug in weighted mudularity calculation, sum of the weights
+  was truncated to an integer.
+- Fixed a bug in weighted multilevel communtiies, the maximum weight
+  was rounded to an integer.
+- Fixed a bug in `centralization.closeness.tmax()`.
+- Reimplement push-relabel maximum flow with gap heuristics.
+- Maximum flow functions now return some statistics about the push
+  relabel algorithm steps.
+- Function `arpack()` now gives error message if unknown options are
+  given.
+- Fixed missing whitespace in Pajek writer when the ID attribute was
+  numeric.
+- Fixed a bug that caused the GML reader to crash when the ID
+  attribute was non-numeric.
+- Fixed issue #500, potential segfault if the two graphs in BLISS
+  differ in the number of vertices or edges.
+- Added `igraphtest()` function.
+- Fix dyad census instability, sometimes incorrect results were
+  reported.
+- Dyad census detects integer overflow now and gives a warning.
+- Function `add.edges()` does not allow now zeros in the vertex set.
+- Added a function to count the number of adjacent triangles:
+  `adjacenct.triangles()`.
+- Added `graph.eigen()` function, eigenproblems on adjacency matrices.
+- Added some workarounds for functions that create a lot of
+  graphs, `decompose.graph()` and `graph.neighborhood()` use it. 
+  Fixes issue #508.
+- Added weights support for `optimal.community()`, closes #511.
+- Faster maximal clique finding.
+- Added a function to count maximum cliques.
+- Set operations: union, intersection, disjoint, union, difference,
+  compose now work based on vertex names (if they are present) and
+  keep attributes, closes #20.
+- Removed functions `graph.intersection.by.name()`,
+  `graph.union.by.name()`, `graph.difference.by.name()`.
+- The `+` operator on graphs now calls `graph.union()` if both 
+  argument graphs are named, and calls `graph.disjoint.union()`
+  otherwise.
+- Added function `igraph.version()`.
+- Generate graphs from a stochastic block model: `sbm.game()`.
+- Do not suggest the stats, XML, jpeg and png packages any more.
+- Fixed a `set.vertex/edge.attribute` bug that changed both
+  graph objects, after copying (#533)
+- Fixed a bug in `barabasi.game` that caused crashes.
+- We use PRPACK to calculate PageRank scores
+  see https://github.com/dgleich/prpack
+- Added`'which` argument to `bipartite.projection` (#307).
+- Add `normalized` argument to closeness functions, fixes issue #3.
+- R: better handling of complex attributes, `[[` on vertex/edge sets,
+  fixes #231.
+- Implement the `start` argument in `hrg.fit` (#225).
+- Set root vertex in Reingold-Tilford layout, solves #473.
+- Fix betweenness normalization for directed graphs.
+- Fixed a bug in `graph.density` that resulted in incorrect values for
+  undirected graphs with loops
+- Fixed a bug when many graphs were created in one C call
+  (e.g. by `graph.decompose`), causing #550.
+- Fixed sparse `graph.adjacency` bugs for graphs with one edge,
+  and graphs with zero edges.
+- Fixed a bug that made Bellman-Ford shortest paths calculations fail.
+- Fixed a `graph.adjacency` bug for undirected, weighted graphs and
+  sparse matrices.
+- `main`, `sub`, `xlab` and `ylab` are proper graphics parameters
+  now (#555).
+- `graph.data.frame` coerces arguments to data frame (#557).
+- Fixed a minimum cut bug for weighted undirected graphs (#564).
+- Functions for simulating epidemics (SIR model) on networks,
+  see the `sir` function.
+- Fixed argument ordering in `graph.mincut` and related functions.
+- Avoid copying attributes in query functions and print (#573),
+  these functions are much faster now for graphs with many
+  vertices/edges and attributes.
+- Speed up writing GML and GraphML files, if some attributes are
+  integer. It was really-really slow.
+- Fix multiple root vertices in `graph.bfs` (#575).
+
+============
 igraph 0.6.6
 ============
 

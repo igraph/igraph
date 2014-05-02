@@ -48,6 +48,45 @@ int igraphmodule_Vertex_Check(PyObject* obj) {
 
 /**
  * \ingroup python_interface_vertex
+ * \brief Checks whether the index in the given vertex object is a valid one.
+ * \return nonzero if the vertex object is valid. Raises an appropriate Python
+ *   exception and returns zero if the vertex object is invalid.
+ */
+int igraphmodule_Vertex_Validate(PyObject* obj) {
+  igraph_integer_t n;
+  igraphmodule_VertexObject *self;
+  igraphmodule_GraphObject *graph;
+
+  if (!igraphmodule_Vertex_Check(obj)) {
+    PyErr_SetString(PyExc_TypeError, "object is not a Vertex");
+    return 0;
+  }
+
+  self = (igraphmodule_VertexObject*)obj;
+  graph = self->gref;
+
+  if (graph == 0) {
+    PyErr_SetString(PyExc_ValueError, "Vertex object refers to a null graph");
+    return 0;
+  }
+
+  if (self->idx < 0) {
+    PyErr_SetString(PyExc_ValueError, "Vertex object refers to a negative vertex index");
+    return 0;
+  }
+
+  n = igraph_vcount(&graph->g);
+
+  if (self->idx >= n) {
+    PyErr_SetString(PyExc_ValueError, "Vertex object refers to a nonexistent vertex");
+    return 0;
+  }
+
+  return 1;
+}
+
+/**
+ * \ingroup python_interface_vertex
  * \brief Allocates a new Python vertex object
  * \param gref the \c igraph.Graph being referenced by the vertex
  * \param idx the index of the vertex
@@ -237,6 +276,9 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
   PyObject *names, *dict;
   long i, n;
 
+  if (!igraphmodule_Vertex_Validate((PyObject*)self))
+    return 0;
+
   dict=PyDict_New();
   if (!dict) return NULL;
 
@@ -375,7 +417,10 @@ PyObject* igraphmodule_Vertex_get_attribute(igraphmodule_VertexObject* self,
                        PyObject* s) {
   igraphmodule_GraphObject *o = self->gref;
   PyObject* result;
-  
+
+  if (!igraphmodule_Vertex_Validate((PyObject*)self))
+    return 0;
+
   if (!igraphmodule_attribute_name_check(s))
     return 0;
 
@@ -409,7 +454,7 @@ int igraphmodule_Vertex_set_attribute(igraphmodule_VertexObject* self, PyObject*
   PyObject* result;
   int r;
   
-  if (o==0)
+  if (!igraphmodule_Vertex_Validate((PyObject*)self))
     return -1;
 
   if (!igraphmodule_attribute_name_check(k))

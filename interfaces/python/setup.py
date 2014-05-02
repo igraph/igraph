@@ -1,14 +1,4 @@
 #!/usr/bin/env python
-try:
-    from setuptools import setup
-    from setuptools.command.build_ext import build_ext
-    build_py = None
-except ImportError:
-    from distutils.core import setup
-    try:
-        from distutils.command.build_py import build_py_2to3 as build_py
-    except ImportError:
-        from distutils.command.build_py import build_py
 
 import atexit
 import distutils.ccompiler
@@ -20,6 +10,8 @@ import sys
 import tarfile
 import tempfile
 
+from select import select
+
 try:
     from urllib import urlretrieve
     from urllib2 import Request, urlopen, URLError
@@ -28,11 +20,7 @@ except:
     from urllib.request import Request, urlopen, urlretrieve
     from urllib.error import URLError
 
-from distutils.core import Extension
-from distutils.util import get_platform
-from select import select
-from subprocess import Popen, PIPE
-from textwrap import dedent
+###########################################################################
 
 # Global version number. Keep the format of the next line intact.
 VERSION = '0.7'
@@ -41,6 +29,82 @@ VERSION = '0.7'
 if sys.version_info < (2, 5):
     print("This module requires Python >= 2.5")
     sys.exit(0)
+
+###########################################################################
+## Here be ugly workarounds. These must be run before setuptools
+## is imported.
+
+class Workaround(object):
+    """Base class for platform-specific workarounds and hacks that are
+    needed to get the Python interface compile with as little user
+    intervention as possible."""
+
+    def required(self):
+        """Returns ``True`` if the workaround is required on the platform
+        of the user and ``False`` otherwise."""
+        raise NotImplementedError
+
+    def hack(self):
+        """Installs the workaround. This method will get called if and only
+        if the ``required()`` method returns ``True``.
+        """
+        raise NotImplementedError
+
+class OSXClangAndSystemPythonWorkaround(Workaround):
+    """Removes ``-mno-fused-madd`` from the arguments used to compile
+    Python extensions if the user is running OS X."""
+
+    def customize_compiler(self, compiler):
+        self._saved_customize_compiler(compiler)
+        while "-mno-fused-madd" in compiler.compiler:
+            compiler.compiler.remove("-mno-fused-madd")
+        while "-mno-fused-madd" in compiler.compiler_so:
+            compiler.compiler_so.remove("-mno-fused-madd")
+        while "-mno-fused-madd" in compiler.linker_so:
+            compiler.linker_so.remove("-mno-fused-madd")
+
+    def required(self):
+        return sys.platform == "darwin"
+
+    def hack(self):
+        self.hack_for_distutils()
+        self.hack_for_setuptools()
+
+    def hack_for_distutils(self):
+        from distutils import sysconfig, ccompiler
+        self._saved_customize_compiler = sysconfig.customize_compiler
+        sysconfig.customize_compiler = self.customize_compiler
+        ccompiler.customize_compiler = self.customize_compiler
+
+    def hack_for_setuptools(self):
+        if "setuptools.command.build_ext" in sys.modules:
+            sys.modules["setuptools.command.build_ext"].customize_compiler = \
+                self.customize_compiler
+
+WORKAROUNDS = [
+        OSXClangAndSystemPythonWorkaround
+]
+
+for workaround_cls in WORKAROUNDS:
+    workaround = workaround_cls()
+    if workaround.required():
+        workaround.hack()
+
+###########################################################################
+
+try:
+    from setuptools import setup
+    from setuptools.command.build_ext import build_ext
+    build_py = None
+except ImportError:
+    from distutils.core import setup
+    try:
+        from distutils.command.build_py import build_py_2to3 as build_py
+    except ImportError:
+        from distutils.command.build_py import build_py
+
+from distutils.core import Extension
+from distutils.util import get_platform
 
 ###########################################################################
 
@@ -102,7 +166,8 @@ def first(iterable):
 
 def get_output(command):
     """Returns the output of a command returning a single line of output."""
-    p = Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+    PIPE = subprocess.PIPE
+    p = subprocess.Popen(command, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
     p.stdin.close()
     p.stderr.close()
     line=p.stdout.readline().strip()
@@ -575,7 +640,6 @@ class BuildConfiguration(object):
             self.libraries.extend(["xml2", "z", "m", "stdc++"])
         self.include_dirs = LIBIGRAPH_FALLBACK_INCLUDE_DIRS[:]
         self.library_dirs = LIBIGRAPH_FALLBACK_LIBRARY_DIRS[:]
-
 
 ###########################################################################
 

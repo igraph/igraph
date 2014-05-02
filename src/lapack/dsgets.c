@@ -126,8 +126,8 @@ static integer c__1 = 1;
 	    *, doublereal *, integer *), igraphdvout_(integer *, integer *, 
 	    doublereal *, integer *, char *, ftnlen), igraphivout_(integer *, 
 	    integer *, integer *, integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil, ndigit, msgets, msglvl;
-    real tsgets;
+    integer logfil, ndigit, msgets = 0, msglvl;
+    real tsgets = 0.0;
     extern /* Subroutine */ int igraphdsortr_(char *, logical *, integer *, 
 	    doublereal *, doublereal *);
 

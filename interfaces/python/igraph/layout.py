@@ -411,7 +411,7 @@ class Layout(object):
         elif len(bbox) == self._dim:
             corner, target_sizes = [0.] * self._dim, list(bbox)
         elif len(bbox) == 2 * self._dim:
-            corner, opposite_corner = bbox[0:self._dim], bbox[self._dim:]
+            corner, opposite_corner = list(bbox[0:self._dim]), list(bbox[self._dim:])
             for i in xrange(self._dim):
                 if corner[i] > opposite_corner[i]:
                     corner[i], opposite_corner[i] = opposite_corner[i], corner[i]
