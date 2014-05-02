@@ -1,61 +1,44 @@
-
-adjcorr <- function(A, P, corr, permutation) {
-  ## input is A modelled from a random binomial graph with A_{i,j}
-  ## distributed Bin(P_{i,j}) for example, if P=.5*matrix(1,n,n) then
-  ## A is ER(n,0.5) output is B which is adjacency matrix with
-  ## correlation corr element-wise to A the labels of B are then
-  ## permuted via permutation
-  Q <- P + corr * (1 - P)
-  n <- nrow(A)
-  B <- A
-  for (i in 1:(n - 1)) {
-    for (j in (i + 1):n) {
-      if (A[i, j] == 1 && runif(1) > Q[i, j]) {
-        B[i, j] <- 0
-        B[j, i] <- 0
-      } else if (A[i, j] == 0 && runif(1) < ((1 - Q[i, j]) * (P[i, j]/(1 - 
-                    P[i, j])))) {
-        B[i, j] <- 1
-        B[j, i] <- 1
-      }
-    }
-  }
-  P <- diag(n)
-  P <- P[permutation, ]
-  B <- P %*% B %*% t(P)
-  B
-}
-
 sgm<-function(A,B,m,start,iteration){
   #seeds are assumed to be vertices 1:m in both graphs
+  require('clue')
   totv<-ncol(A)
   n<-totv-m
-  A12<-A[1:m,(m+1):(m+n)]
-  A21<-as.matrix(A[(m+1):(m+n),1:m])
+  if (m != 0){
+  A12<-rbind(A[1:m,(m+1):(m+n)])
+  A21<-cbind(A[(m+1):(m+n),1:m])
+  B12<-rbind(B[1:m,(m+1):(m+n)])
+  B21<-cbind(B[(m+1):(m+n),1:m])
+  }
+  if (m==0){
+  A12<-matrix(0,n,n)
+  A21<-matrix(0,n,n)
+  B12<-matrix(0,n,n)
+  B21<-matrix(0,n,n)}
   A22<-A[(m+1):(m+n),(m+1):(m+n)]
-  B12<-B[1:m,(m+1):(m+n)]
-  B21<-as.matrix(B[(m+1):(m+n),1:m])
   B22<-B[(m+1):(m+n),(m+1):(m+n)]
   patience<-iteration
-  tol<-.99
+  tol<-1
   P<-start
   toggle<-1
   iter<-0
   while (toggle==1 & iter<patience)
   {
     iter<-iter+1
-    OO<-A21%*%t(B21)
-    Grad<-2*A22%*%P%*%t(B22)+2*OO;
-    ind<-matrix(solve_LSAP(Grad, maximum =TRUE))
+    x<- A21%*%t(B21)
+    y<- t(A12)%*%B12
+    z<- A22%*%P%*%t(B22)
+    w<- t(A22)%*%P%*%B22
+    Grad<-x+y+z+w;
+    mm=max(abs(Grad))
+    ind<-matrix(solve_LSAP(Grad+matrix(mm,totv-m,totv-m), maximum =TRUE))
     T<-diag(n)
     T<-T[ind,]
-    AB<-t(A22)%*%T%*%B22
-    tAB<-t(A22)%*%P%*%B22
-    c<-sum(diag(tAB%*%t(P)))
-    d<-sum(diag(AB%*%t(P)))+sum(diag(tAB%*%t(T)))
-    e<-sum(diag(AB%*%t(T)))
-    u<-2*sum(diag(t(P)%*%OO))
-    v<-2*sum(diag(t(T)%*%OO))
+    wt<-t(A22)%*%T%*%B22
+    c<-sum(diag(w%*%t(P)))
+    d<-sum(diag(wt%*%t(P)))+sum(diag(w%*%t(T)))
+    e<-sum(diag(wt%*%t(T)))
+    u<-sum(diag(t(P)%*%x+t(P)%*%y))
+    v<-sum(diag(t(T)%*%x+t(T)%*%y))
     if( c-d+e==0 && d-2*e+u-v==0){
       alpha<-0
     }else{
@@ -70,8 +53,9 @@ sgm<-function(A,B,m,start,iteration){
     }else{
       toggle<-0}
   }
+  D<-P
   corr<-matrix(solve_LSAP(P, maximum = TRUE))
   P=diag(n)
   P=rbind(cbind(diag(m),matrix(0,m,n)),cbind(matrix(0,n,m),P[corr,]))
   corr<-cbind(matrix((m+1):totv, n),matrix(m+corr,n))
-  return(list(corr=corr, P=P))}
+  return(list(corr=corr, P=P, D=D))}
