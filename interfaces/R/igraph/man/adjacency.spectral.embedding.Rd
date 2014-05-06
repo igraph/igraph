@@ -4,12 +4,15 @@
 \description{Spectral decomposition of the adjacency matrices of
   graphs.}
 \usage{
-adjacency.spectral.embedding (graph, no, scaled = TRUE,
-    cvec=degree(graph)/(vcount(graph) - 1),
+adjacency.spectral.embedding (graph, which=c("lm", "la", "sm"), no,
+    scaled = TRUE, cvec=degree(graph)/(vcount(graph) - 1),
     options = igraph.arpack.default)
 }
 \arguments{
   \item{graph}{The input graph, directed or undirected.}
+  \item{which}{Which eigenvalue to use. \sQuote{lm} means the one with
+    the largest magnitude, \sQuote{la} is the one (algebraic) largest,
+    and \sQuote{sa} is the (algebraic) smallest eigenvalue.}
   \item{no}{An integer scalar. This value is the embedding dimension of
     the spectral embedding. Should be smaller than the number of
     vertices. The largest \code{no}-dimensional non-zero

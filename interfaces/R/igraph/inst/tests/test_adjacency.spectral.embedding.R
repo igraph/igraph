@@ -6,8 +6,8 @@ test_that("adjacency.spectral.embedding works", {
 
   no <- 3
   g <- graph.tree(10, 3, mode="out")
-  asm <- adjacency.spectral.embedding(g, no=no, cvec=degree(g)/2)
-  asmu <- adjacency.spectral.embedding(g, no=no, cvec=degree(g)/2,
+  asm <- adjacency.spectral.embedding(g, no=no, which="la", cvec=degree(g)/2)
+  asmu <- adjacency.spectral.embedding(g, no=no, which="la", cvec=degree(g)/2,
                                        scaled=FALSE)
 
   A <- get.adjacency(g)

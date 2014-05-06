@@ -98,6 +98,10 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
  *        the spectral embedding. Should be smaller than the number of
  *        vertices. The largest no-dimensional non-zero
  *        singular values are used for the spectral embedding.
+ * \param which Which eigenvalue to use, possible values:
+ *        <code>IGRAPH_EIGEN_LM</code>: the one with the largest magnitude,
+ *        <code>IGRAPH_EIGEN_LA</code>: the (algebraic) largest one, or
+ *        <code>IGRAPH_EIGEN_SA</code>: the (algebraic) smallest one.
  * \param scaled Whether to return X and Y (if scaled is non-zero), or 
  *        U and V.
  * \param X Initialized matrix, the estimated latent positions are
@@ -120,6 +124,7 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
 
 int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 					igraph_integer_t no,
+					igraph_eigen_which_position_t which,
 					igraph_bool_t scaled,
 					igraph_matrix_t *X,
 					igraph_matrix_t *Y,
@@ -132,6 +137,14 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   int i, j, cveclen=igraph_vector_size(cvec);
   igraph_i_asembedding_data_t data={ cvec, &outlist, &inlist, &tmp };
   igraph_vector_t D;
+
+  if (which != IGRAPH_EIGEN_LM &&
+      which != IGRAPH_EIGEN_LA &&
+      which != IGRAPH_EIGEN_SA) {
+    IGRAPH_ERROR("Invalid eigenvalue chosen, must be one of "
+		 "`largest magnitude', `largest algebraic' or "
+		 "`smallest algebraic'", IGRAPH_EINVAL);
+  }
 	
   if (no > vc) { 
     IGRAPH_ERROR("Too many singular values requested", IGRAPH_EINVAL);
@@ -166,7 +179,16 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   options->n=vc;
   options->start=0;		/* random start vector */
   options->nev=no;
-  options->which[0]='L'; options->which[1]='A';
+  switch (which) {
+  case IGRAPH_EIGEN_LM:
+    options->which[0]='L'; options->which[1]='M';
+    break;
+  case IGRAPH_EIGEN_LA:
+    options->which[0]='L'; options->which[1]='A';
+    break;
+  case IGRAPH_EIGEN_SA:
+    options->which[0]='A'; options->which[1]='A';
+  }
   if (options->ncv <= options->nev) { options->ncv = 0; }
 	
   IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_asembedding,

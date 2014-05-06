@@ -36,11 +36,13 @@
 
 #include "igraph_datatype.h"
 #include "igraph_arpack.h"
+#include "igraph_eigen.h"
 
 __BEGIN_DECLS
 
 int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 					igraph_integer_t no,
+					igraph_eigen_which_position_t which,
 					igraph_bool_t scaled,
 					igraph_matrix_t *X,
 					igraph_matrix_t *Y,

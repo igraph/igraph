@@ -1015,6 +1015,12 @@ EIGENWHICH:
   INCONV:
     IN: R_SEXP_to_igraph_eigen_which(%I%, &%C%);
 
+EIGENWHICHPOS:
+  CTYPE: igraph_eigen_which_position_t;
+  CALL: &%C%
+  INCONV:
+    IN: %C%=INTEGER(%I%)[0];
+
 SIRLIST:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%

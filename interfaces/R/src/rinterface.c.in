@@ -9130,12 +9130,13 @@ SEXP R_igraph_graphlets_project(SEXP graph, SEXP weights, SEXP cliques,
 }
 
 
-SEXP R_igraph_adjacency_spectral_embedding(SEXP graph, SEXP no,
+SEXP R_igraph_adjacency_spectral_embedding(SEXP graph, SEXP no, SEXP pwhich,
 					   SEXP scaled, SEXP cvec,
 					   SEXP options) {
 
                                         /* Declarations */
   igraph_t c_graph;
+  igraph_eigen_which_position_t c_which;
   igraph_integer_t c_no;
   igraph_bool_t c_scaled;
   igraph_matrix_t c_X;
@@ -9150,6 +9151,7 @@ SEXP R_igraph_adjacency_spectral_embedding(SEXP graph, SEXP no,
                                         /* Convert input */
   R_SEXP_to_igraph(graph, &c_graph);
   directed=igraph_is_directed(&c_graph);
+  c_which=INTEGER(pwhich)[0];
   c_no=INTEGER(no)[0];
   c_scaled=LOGICAL(scaled)[0];
   if (0 != igraph_matrix_init(&c_X, 0, 0)) {
@@ -9166,7 +9168,7 @@ SEXP R_igraph_adjacency_spectral_embedding(SEXP graph, SEXP no,
   R_SEXP_to_igraph_arpack_options(options, &c_options);
 
 /* Call igraph */
-  igraph_adjacency_spectral_embedding(&c_graph, c_no, c_scaled, &c_X,
+  igraph_adjacency_spectral_embedding(&c_graph, c_no, c_which, c_scaled, &c_X,
 				      directed ? &c_Y : 0,
 				      &c_cvec, &c_options);
 
