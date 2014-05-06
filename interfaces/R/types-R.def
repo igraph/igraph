@@ -410,3 +410,9 @@ PAGERANKOPT:
 DEPRECATED:
   INCONV: if (!missing(%I%)) { warning("Argument `%I%' is deprecated and has no effect") }
   CALL:
+
+LSETYPE:
+  INCONV: %I% <- switch(igraph.match.arg(%I%), "da"=0L, "d-a"=1L, \
+                        "idad"=1L, "i-dad"=1L, "dad"=2L)
+  DEFAULT:
+    DI: c("D-A", "DAD", "I-DAD")

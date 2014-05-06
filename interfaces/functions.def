@@ -1998,6 +1998,15 @@ igraph_adjacency_spectral_embedding:
        DEPS: weights ON graph, cvec ON graph
        IGNORE: RC
 
+igraph_laplacian_spectral_embedding:
+       PARAMS: GRAPH graph, INTEGER no, EDGEWEIGHTS weights=NULL, \
+               EIGENWHICHPOS which=ASE, NEIMODE degmode=OUT, \
+               LSETYPE type=DI, BOOLEAN scaled=True, OUT MATRIX X, \
+               OUT MATRIX_OR_0 Y, \
+               INOUT ARPACKOPT options=igraph.arpack.default
+       NAME-R: laplacian.spectral.embedding
+       DEPS: weights ON graph
+
 #######################################
 # Eigensolvers
 #######################################

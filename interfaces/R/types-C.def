@@ -1064,3 +1064,8 @@ PAGERANKOPT:
 DEPRECATED:
   HEADER:
   CALL:
+
+LSETYPE:
+  CTYPE: igraph_laplacian_spectral_embedding_type_t
+  INCONV:
+    IN: %C%=(igraph_laplacian_spectral_embedding_type_t) INTEGER(%I%)[0];
