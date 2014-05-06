@@ -115,70 +115,16 @@ int igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
-/**
- * \function igraph_adjacency_spectral_embedding
- * Adjacency spectral embedding
- *
- * Spectral decomposition of the adjacency matrices of graphs.
- * This function computes a \code{no}-dimensional Euclidean
- * representation of the graph based on its adjacency
- * matrix, A. This representation is computed via the singular value
- * decomposition of the adjacency matrix, A=UDV^T. In the case,
- * where the graph is a random dot product graph generated using latent
- * position vectors in R^no for each vertex, the embedding will
- * provide an estimate of these latent vectors.
- *
- * </para><para>
- * For undirected graphs the latent positions are calculated as
- * X=U^no D^(1/2) where U^no equals to the first no columns of U, and
- * D^(1/2) is a diagonal matrix containing the square root of the top 
- * no singular values on the diagonal.
- *
- * </para><para>
- * For directed graphs the embedding is defined as the pair
- * X=U^no D^(1/2), Y=V^no D^(1/2). (For undirected graphs U=V, 
- * so it is enough to keep one of them.)
- * 
- * \param graph The input graph, can be directed or undirected.
- * \param no An integer scalar. This value is the embedding dimension of
- *        the spectral embedding. Should be smaller than the number of
- *        vertices. The largest no-dimensional non-zero
- *        singular values are used for the spectral embedding.
- * \param weights Optional edge weights. Supply a null pointer for
- *        unweighted graphs.
- * \param which Which eigenvalues to use, possible values:
- *        <code>IGRAPH_EIGEN_LM</code>: the one with the largest magnitude,
- *        <code>IGRAPH_EIGEN_LA</code>: the (algebraic) largest one, or
- *        <code>IGRAPH_EIGEN_SA</code>: the (algebraic) smallest one.
- * \param scaled Whether to return X and Y (if scaled is non-zero), or 
- *        U and V.
- * \param X Initialized matrix, the estimated latent positions are
- *        stored here.
- * \param Y Initialized matrix or a null pointer. If not a null
- *        pointer, then the second half of the latent positions are
- *        stored here. (For undirected graphs, this always equals X.)
- * \param cvec A numeric vector, its length is the number vertices in the
- *        graph. This vector is added to the diagonal of the adjacency
- *        matrix, before performing the SVD.
- * \param options Options to ARPACK. See \ref igraph_arpack_options_t
- *        for details. Note that the function overwrites the
- *        <code>n</code> (number of vertices), <code>nev</code> and 
- *        <code>which</code> parameters and it always starts the
- *        calculation from a random start vector.
- * \return Error code.
- * 
- */
-
-
-int igraph_adjacency_spectral_embedding(const igraph_t *graph,
-					igraph_integer_t no,
-					const igraph_vector_t *weights,
-					igraph_eigen_which_position_t which,
-					igraph_bool_t scaled,
-					igraph_matrix_t *X,
-					igraph_matrix_t *Y,
-					const igraph_vector_t *cvec,
-					igraph_arpack_options_t *options) {
+int igraph_i_spectral_embedding(const igraph_t *graph,
+				igraph_integer_t no,
+				const igraph_vector_t *weights,
+				igraph_eigen_which_position_t which,
+				igraph_bool_t scaled,
+				igraph_matrix_t *X,
+				igraph_matrix_t *Y,
+				const igraph_vector_t *cvec,
+				igraph_arpack_options_t *options,
+				igraph_arpack_function_t *callback) {
 
   igraph_integer_t vc=igraph_vcount(graph);
   igraph_vector_t tmp;
@@ -255,19 +201,15 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
     break;
   }
   if (options->ncv <= options->nev) { options->ncv = 0; }
-	
-  IGRAPH_CHECK(igraph_arpack_rssolve
-	       (weights ? igraph_i_asembeddingw : igraph_i_asembedding,
-		&data, options, 0, &D, X));
+
+  IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &D, X));
 
   if (igraph_is_directed(graph)) {
     data.outlist = &inlist;
     data.inlist  = &outlist;
     data.eoutlist = &einlist;
     data.einlist = &eoutlist;
-    IGRAPH_CHECK(igraph_arpack_rssolve
-		 (weights ? igraph_i_asembeddingw : igraph_i_asembedding,
-		  &data, options, 0, &D, Y));
+    IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &D, Y));
   } else if (Y) {
     IGRAPH_CHECK(igraph_matrix_update(Y, X));
   }
@@ -304,6 +246,77 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(4);
 	
   return 0;
+}
+
+/**
+ * \function igraph_adjacency_spectral_embedding
+ * Adjacency spectral embedding
+ *
+ * Spectral decomposition of the adjacency matrices of graphs.
+ * This function computes a \code{no}-dimensional Euclidean
+ * representation of the graph based on its adjacency
+ * matrix, A. This representation is computed via the singular value
+ * decomposition of the adjacency matrix, A=UDV^T. In the case,
+ * where the graph is a random dot product graph generated using latent
+ * position vectors in R^no for each vertex, the embedding will
+ * provide an estimate of these latent vectors.
+ *
+ * </para><para>
+ * For undirected graphs the latent positions are calculated as
+ * X=U^no D^(1/2) where U^no equals to the first no columns of U, and
+ * D^(1/2) is a diagonal matrix containing the square root of the top
+ * no singular values on the diagonal.
+ *
+ * </para><para>
+ * For directed graphs the embedding is defined as the pair
+ * X=U^no D^(1/2), Y=V^no D^(1/2). (For undirected graphs U=V,
+ * so it is enough to keep one of them.)
+ *
+ * \param graph The input graph, can be directed or undirected.
+ * \param no An integer scalar. This value is the embedding dimension of
+ *        the spectral embedding. Should be smaller than the number of
+ *        vertices. The largest no-dimensional non-zero
+ *        singular values are used for the spectral embedding.
+ * \param weights Optional edge weights. Supply a null pointer for
+ *        unweighted graphs.
+ * \param which Which eigenvalues to use, possible values:
+ *        <code>IGRAPH_EIGEN_LM</code>: the one with the largest magnitude,
+ *        <code>IGRAPH_EIGEN_LA</code>: the (algebraic) largest one, or
+ *        <code>IGRAPH_EIGEN_SA</code>: the (algebraic) smallest one.
+ * \param scaled Whether to return X and Y (if scaled is non-zero), or
+ *        U and V.
+ * \param X Initialized matrix, the estimated latent positions are
+ *        stored here.
+ * \param Y Initialized matrix or a null pointer. If not a null
+ *        pointer, then the second half of the latent positions are
+ *        stored here. (For undirected graphs, this always equals X.)
+ * \param cvec A numeric vector, its length is the number vertices in the
+ *        graph. This vector is added to the diagonal of the adjacency
+ *        matrix, before performing the SVD.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *        for details. Note that the function overwrites the
+ *        <code>n</code> (number of vertices), <code>nev</code> and
+ *        <code>which</code> parameters and it always starts the
+ *        calculation from a random start vector.
+ * \return Error code.
+ *
+ */
+
+int igraph_adjacency_spectral_embedding(const igraph_t *graph,
+				igraph_integer_t no,
+				const igraph_vector_t *weights,
+				igraph_eigen_which_position_t which,
+				igraph_bool_t scaled,
+				igraph_matrix_t *X,
+				igraph_matrix_t *Y,
+				const igraph_vector_t *cvec,
+				igraph_arpack_options_t *options) {
+
+  igraph_arpack_function_t *callback= 
+    weights ? igraph_i_asembeddingw : igraph_i_asembedding;
+
+  return igraph_i_spectral_embedding(graph, no, weights, which, scaled,
+				     X, Y, cvec, options, callback);
 }
 
 /**
