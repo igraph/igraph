@@ -51,7 +51,8 @@ int main() {
 		      IGRAPH_LOOPS);
 	igraph_vector_scale(&cvec, .5);
 
-	igraph_adjacency_spectral_embedding(&graph, 4, IGRAPH_EIGEN_LA,
+	igraph_adjacency_spectral_embedding(&graph, 4, /*weights=*/ 0,
+					    IGRAPH_EIGEN_LA,
 					    /*scaled=*/ 0, &U, &V,
 					    &cvec, &options);
 	

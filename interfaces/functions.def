@@ -1990,12 +1990,12 @@ igraph_maximum_bipartite_matching:
 #######################################
 
 igraph_adjacency_spectral_embedding:
-       PARAMS: GRAPH graph, INTEGER no, EIGENWHICHPOS which=ASE, \
-               BOOLEAN scaled=True, OUT MATRIX X, \
+       PARAMS: GRAPH graph, INTEGER no, EDGEWEIGHTS weights=NULL, \
+               EIGENWHICHPOS which=ASE, BOOLEAN scaled=True, OUT MATRIX X, \
                OUT MATRIX_OR_0 Y, VECTOR cvec=AsmDefaultCvec, \
                INOUT ARPACKOPT options=igraph.arpack.default
        NAME-R: adjacency.spectral.embedding
-       DEPS: cvec ON graph
+       DEPS: weights ON graph, cvec ON graph
        IGNORE: RC
 
 #######################################
