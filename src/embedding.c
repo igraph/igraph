@@ -188,6 +188,9 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
     break;
   case IGRAPH_EIGEN_SA:
     options->which[0]='S'; options->which[1]='A';
+    break;
+  default:
+    break;
   }
   if (options->ncv <= options->nev) { options->ncv = 0; }
 	
