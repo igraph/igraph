@@ -98,7 +98,7 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
  *        the spectral embedding. Should be smaller than the number of
  *        vertices. The largest no-dimensional non-zero
  *        singular values are used for the spectral embedding.
- * \param which Which eigenvalue to use, possible values:
+ * \param which Which eigenvalues to use, possible values:
  *        <code>IGRAPH_EIGEN_LM</code>: the one with the largest magnitude,
  *        <code>IGRAPH_EIGEN_LA</code>: the (algebraic) largest one, or
  *        <code>IGRAPH_EIGEN_SA</code>: the (algebraic) smallest one.
