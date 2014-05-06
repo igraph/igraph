@@ -116,7 +116,7 @@ int igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
-int igraph_i_lsembedding_di(igraph_real_t *to, const igraph_real_t *from,
+int igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
 			    int n, void *extra) {
   igraph_i_asembedding_data_t *data=extra;
   igraph_adjlist_t *outlist=data->outlist;
@@ -153,7 +153,7 @@ int igraph_i_lsembedding_di(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
-int igraph_i_lsembedding_diw(igraph_real_t *to, const igraph_real_t *from,
+int igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_real_t *from,
 			     int n, void *extra) {
   igraph_i_asembedding_data_t *data=extra;
   igraph_inclist_t *outlist=data->eoutlist;
@@ -544,8 +544,8 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
   igraph_vector_t deg;
 
   switch (type) {
-  case IGRAPH_EMBEDDING_D_I:
-    callback = weights ? igraph_i_lsembedding_diw : igraph_i_lsembedding_di;
+  case IGRAPH_EMBEDDING_D_A:
+    callback = weights ? igraph_i_lsembedding_daw : igraph_i_lsembedding_da;
     break;
   case IGRAPH_EMBEDDING_DAD:
     callback = weights ? igraph_i_lsembedding_dadw : igraph_i_lsembedding_dad;
@@ -565,7 +565,7 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
 		  weights);
 
   switch (type) {
-  case IGRAPH_EMBEDDING_D_I:
+  case IGRAPH_EMBEDDING_D_A:
     break;
   case IGRAPH_EMBEDDING_DAD:
   case IGRAPH_EMBEDDING_I_DAD:

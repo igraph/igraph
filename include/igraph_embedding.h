@@ -52,7 +52,7 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 					igraph_arpack_options_t *options);
 
 typedef enum {
-  IGRAPH_EMBEDDING_D_I,
+  IGRAPH_EMBEDDING_D_A=0,
   IGRAPH_EMBEDDING_I_DAD,
   IGRAPH_EMBEDDING_DAD } igraph_laplacian_spectral_embedding_type_t;
 
