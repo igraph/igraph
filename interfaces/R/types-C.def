@@ -1016,8 +1016,7 @@ EIGENWHICH:
     IN: R_SEXP_to_igraph_eigen_which(%I%, &%C%);
 
 EIGENWHICHPOS:
-  CTYPE: igraph_eigen_which_position_t;
-  CALL: &%C%
+  CTYPE: igraph_eigen_which_position_t
   INCONV:
     IN: %C%=INTEGER(%I%)[0];
 
