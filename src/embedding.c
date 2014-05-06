@@ -25,6 +25,7 @@
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 #include "igraph_random.h"
+#include "igraph_centrality.h"
 
 typedef struct {
   const igraph_t *graph;
@@ -112,6 +113,215 @@ int igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
     to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
   }
 	
+  return 0;
+}
+
+int igraph_i_lsembedding_di(igraph_real_t *to, const igraph_real_t *from,
+			    int n, void *extra) {
+  igraph_i_asembedding_data_t *data=extra;
+  igraph_adjlist_t *outlist=data->outlist;
+  igraph_adjlist_t *inlist=data->inlist;
+  const igraph_vector_t *cvec=data->cvec;
+  igraph_vector_t *tmp=data->tmp;
+  igraph_vector_int_t *neis;
+  int i, j, nlen;
+
+  /* tmp = (D-A)' from */
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(inlist, i);
+    nlen=igraph_vector_int_size(neis);
+    VECTOR(*tmp)[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int nei=(long int) VECTOR(*neis)[j];
+      VECTOR(*tmp)[i] -= from[nei];
+    }
+    VECTOR(*tmp)[i] += VECTOR(*cvec)[i] * from[i];
+  }
+	
+  /* to = (D-A) tmp */
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(outlist, i);
+    nlen=igraph_vector_int_size(neis);
+    to[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int nei=(long int) VECTOR(*neis)[j];
+      to[i] += VECTOR(*tmp)[nei];
+    }
+    to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
+  }
+	
+  return 0;
+}
+
+int igraph_i_lsembedding_diw(igraph_real_t *to, const igraph_real_t *from,
+			     int n, void *extra) {
+  igraph_i_asembedding_data_t *data=extra;
+  igraph_inclist_t *outlist=data->eoutlist;
+  igraph_inclist_t *inlist=data->einlist;
+  const igraph_vector_t *cvec=data->cvec;
+  const igraph_vector_t *weights=data->weights;
+  const igraph_t *graph=data->graph;
+  igraph_vector_t *tmp=data->tmp;
+  igraph_vector_int_t *incs;
+  int i, j, nlen;
+
+  /* tmp = (D-A)' from */
+  for (i=0; i<n; i++) {
+    incs=igraph_inclist_get(inlist, i);
+    nlen=igraph_vector_int_size(incs);
+    VECTOR(*tmp)[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int edge=VECTOR(*incs)[j];
+      long int nei=IGRAPH_OTHER(graph, edge, i);
+      igraph_real_t w=VECTOR(*weights)[edge];
+      VECTOR(*tmp)[i] -= w * from[nei];
+    }
+    VECTOR(*tmp)[i] += VECTOR(*cvec)[i] * from[i];
+  }
+	
+  /* to = (D-A) tmp */
+  for (i=0; i<n; i++) {
+    incs=igraph_inclist_get(outlist, i);
+    nlen=igraph_vector_int_size(incs);
+    to[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int edge=VECTOR(*incs)[j];
+      long int nei=IGRAPH_OTHER(graph, edge, i);
+      igraph_real_t w=VECTOR(*weights)[edge];
+      to[i] -= w * VECTOR(*tmp)[nei];
+    }
+    to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
+  }
+	
+  return 0;
+}
+
+int igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from,
+			     int n, void *extra) {
+
+  igraph_i_asembedding_data_t *data=extra;
+  igraph_adjlist_t *outlist=data->outlist;
+  igraph_adjlist_t *inlist=data->inlist;
+  const igraph_vector_t *cvec=data->cvec;
+  igraph_vector_t *tmp=data->tmp;
+  igraph_vector_int_t *neis;
+  int i, j, nlen;
+
+  /* to = D^1/2 from */
+  for (i=0; i<n; i++) {
+    to[i] = VECTOR(*cvec)[i] * from[i];
+  }
+
+  /* tmp = A' to */
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(inlist, i);
+    nlen=igraph_vector_int_size(neis);
+    VECTOR(*tmp)[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int nei=(long int) VECTOR(*neis)[j];
+      VECTOR(*tmp)[i] += to[nei];
+    }
+  }
+
+  /* to = D tmp */
+  for (i=0; i<n; i++) {
+    to[i] = VECTOR(*cvec)[i] * VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
+  }
+  
+  /* tmp = A to */
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(outlist, i);
+    nlen=igraph_vector_int_size(neis);
+    VECTOR(*tmp)[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int nei=(long int) VECTOR(*neis)[j];
+      VECTOR(*tmp)[i] += to[nei];
+    }
+  }
+
+  /* to = D^1/2 tmp */
+  for (i=0; i<n; i++) {
+    to[i] = VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
+  }
+	
+  return 0;
+}
+
+int igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *from,
+			      int n, void *extra) {
+
+  igraph_i_asembedding_data_t *data=extra;
+  igraph_inclist_t *outlist=data->eoutlist;
+  igraph_inclist_t *inlist=data->einlist;
+  const igraph_vector_t *cvec=data->cvec;
+  const igraph_vector_t *weights=data->weights;
+  const igraph_t *graph=data->graph;
+  igraph_vector_t *tmp=data->tmp;
+  igraph_vector_int_t *incs;
+  int i, j, nlen;
+
+  /* to = D^-1/2 from */
+  for (i=0; i<n; i++) {
+    to[i] = VECTOR(*cvec)[i] * from[i];
+  }
+
+  /* tmp = A' to */
+  for (i=0; i<n; i++) {
+    incs=igraph_inclist_get(inlist, i);
+    nlen=igraph_vector_int_size(incs);
+    VECTOR(*tmp)[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int edge=VECTOR(*incs)[j];
+      long int nei=IGRAPH_OTHER(graph, edge, i);
+      igraph_real_t w=VECTOR(*weights)[edge];
+      VECTOR(*tmp)[i] += w * to[nei];
+    }
+  }
+
+  /* to = D tmp */
+  for (i=0; i<n; i++) {
+    to[i] = VECTOR(*cvec)[i] * VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
+  }
+  
+  /* tmp = A to */
+  for (i=0; i<n; i++) {
+    incs=igraph_inclist_get(outlist, i);
+    nlen=igraph_vector_int_size(incs);
+    VECTOR(*tmp)[i]=0.0;
+    for (j=0; j<nlen; j++) {
+      long int edge=VECTOR(*incs)[j];
+      long int nei=IGRAPH_OTHER(graph, edge, i);
+      igraph_real_t w=VECTOR(*weights)[edge];
+      VECTOR(*tmp)[i] += w * to[nei];
+    }
+  }
+
+  /* to = D^-1/2 tmp */
+  for (i=0; i<n; i++) {
+    to[i] = VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
+  }
+	
+  return 0;
+}
+
+int igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *from,
+			      int n, void *extra) {
+
+  int i;
+
+  igraph_i_lsembedding_dad(to, from, n, extra);
+  for (i=0; i<n; i++) { to[i] = from[i] - to[i]; }
+  
+  return 0;
+}
+
+int igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
+			       int n, void *extra) {
+  int i;
+
+  igraph_i_lsembedding_dadw(to, from, n, extra);
+  for (i=0; i<n; i++) { to[i] = from[i] - to[i]; }
+  
   return 0;
 }
 
@@ -317,6 +527,67 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 
   return igraph_i_spectral_embedding(graph, no, weights, which, scaled,
 				     X, Y, cvec, options, callback);
+}
+
+int igraph_laplacian_spectral_embedding(const igraph_t *graph,
+			igraph_integer_t no,
+			const igraph_vector_t *weights,
+			igraph_eigen_which_position_t which,
+			igraph_neimode_t degmode,
+			igraph_laplacian_spectral_embedding_type_t type,
+			igraph_bool_t scaled,
+			igraph_matrix_t *X,
+			igraph_matrix_t *Y,
+			igraph_arpack_options_t *options) {
+
+  igraph_arpack_function_t *callback;
+  igraph_vector_t deg;
+
+  switch (type) {
+  case IGRAPH_EMBEDDING_D_I:
+    callback = weights ? igraph_i_lsembedding_diw : igraph_i_lsembedding_di;
+    break;
+  case IGRAPH_EMBEDDING_DAD:
+    callback = weights ? igraph_i_lsembedding_dadw : igraph_i_lsembedding_dad;
+    break;
+  case IGRAPH_EMBEDDING_I_DAD:
+    callback = (weights ? igraph_i_lsembedding_idadw : 
+		igraph_i_lsembedding_idad);
+    break;
+  default:
+    IGRAPH_ERROR("Invalid Laplacian spectral embedding type",
+		 IGRAPH_EINVAL);
+    break;
+  }
+  
+  IGRAPH_VECTOR_INIT_FINALLY(&deg, 0);
+  igraph_strength(graph, &deg, igraph_vss_all(), degmode, /*loops=*/ 1, 
+		  weights);
+
+  switch (type) {
+  case IGRAPH_EMBEDDING_D_I:
+    break;
+  case IGRAPH_EMBEDDING_DAD:
+  case IGRAPH_EMBEDDING_I_DAD:
+    {
+      int i, n=igraph_vector_size(&deg);
+      for (i=0; i<n; i++) {
+	VECTOR(deg)[i] = 1.0/sqrt(VECTOR(deg)[i]);
+      }
+    }
+    break;
+  default:
+    break;
+  }
+
+  IGRAPH_CHECK(igraph_i_spectral_embedding(graph, no, weights, which, scaled,
+					   X, Y, /*cvec=*/ &deg, options, 
+					   callback));
+  
+  igraph_vector_destroy(&deg);
+  IGRAPH_FINALLY_CLEAN(1);
+  
+  return 0;
 }
 
 /**

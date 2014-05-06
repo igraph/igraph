@@ -37,6 +37,7 @@
 #include "igraph_datatype.h"
 #include "igraph_arpack.h"
 #include "igraph_eigen.h"
+#include "igraph_constants.h"
 
 __BEGIN_DECLS
 
@@ -49,6 +50,22 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 					igraph_matrix_t *Y,
 					const igraph_vector_t *cvec,
 					igraph_arpack_options_t *options);
+
+typedef enum {
+  IGRAPH_EMBEDDING_D_I,
+  IGRAPH_EMBEDDING_I_DAD,
+  IGRAPH_EMBEDDING_DAD } igraph_laplacian_spectral_embedding_type_t;
+
+int igraph_laplacian_spectral_embedding(const igraph_t *graph,
+			igraph_integer_t no,
+			const igraph_vector_t *weights,
+			igraph_eigen_which_position_t which,
+			igraph_neimode_t degmode,
+			igraph_laplacian_spectral_embedding_type_t type,
+			igraph_bool_t scaled,
+			igraph_matrix_t *X,
+			igraph_matrix_t *Y,
+			igraph_arpack_options_t *options);
 
 int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim);
 
