@@ -4,7 +4,7 @@
 \description{Spectral decomposition of the adjacency matrices of
   graphs.}
 \usage{
-adjacency.spectral.embedding (graph, which=c("lm", "la", "sm"), no,
+adjacency.spectral.embedding (graph, no, which=c("lm", "la", "sm"),
     scaled = TRUE, cvec=degree(graph)/(vcount(graph) - 1),
     options = igraph.arpack.default)
 }
