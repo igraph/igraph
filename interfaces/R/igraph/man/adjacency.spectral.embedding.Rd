@@ -5,7 +5,7 @@
   graphs.}
 \usage{
 adjacency.spectral.embedding (graph, no, weights=NULL,
-    which=c("la", "lm", "sm"), scaled = TRUE,
+    which=c("lm", "la", "sm"), scaled = TRUE,
     cvec=graph.strength(graph)/(vcount(graph) - 1),
     options = igraph.arpack.default)
 }
@@ -22,7 +22,7 @@ adjacency.spectral.embedding (graph, no, weights=NULL,
     graphs) to use. \sQuote{lm} means the ones with
     the largest magnitude, \sQuote{la} is the ones (algebraic) largest,
     and \sQuote{sa} is the (algebraic) smallest eigenvalues. The default
-    is \sQuote{la}. Note that for directed graphs \sQuote{la} and
+    is \sQuote{lm}. Note that for directed graphs \sQuote{la} and
     \sQuote{lm} are the equivalent, because the singular values are used
     for the ordering.}
   \item{scaled}{Logical scalar, if \code{FALSE}, then \eqn{U} and
