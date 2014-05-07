@@ -61,6 +61,8 @@ adjacency.spectral.embedding (graph, no, weights=NULL,
   \item{Y}{\code{NULL} for undirected graphs, the second half of the
   latent positions for directed graphs, an \code{n} times \code{no}
     matrix, \code{n} is the number of vertices.}
+  \item{D}{The eigenvalues (for undirected graphs) or the singular
+    values (for directed graphs) calculated by the algorithm.}
   \item{options}{A named list, information about the underlying ARPACK
     computation. See \code{\link{arpack}} for the details.}
 }

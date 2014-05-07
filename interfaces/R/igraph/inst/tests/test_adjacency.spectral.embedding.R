@@ -8,12 +8,20 @@ std <- function(x) {
   })
 }
 
+mag_order <- function(x) {
+  order(abs(x), sign(x), decreasing=TRUE)
+}
+
+mag_sort <- function(x) {
+  x[mag_order(x)]
+}
+
 test_that("Undirected, unweighted case works", {
   library(igraph)
   set.seed(42)
-  g <- random.graph.game(10, 20, type="gnm", directed=FALSE)
+  g <- random.graph.game(10, 15, type="gnm", directed=FALSE)
 
-  no <- 3
+  no <- 7
   A <- g[]
   A <- A + 1/2 * diag(degree(g))
   ss <- eigen(A)
@@ -26,6 +34,8 @@ test_that("Undirected, unweighted case works", {
   as_la <- adjacency.spectral.embedding(g, no=no, which="la",
                                         cvec=degree(g)/2, scaled=FALSE)
 
+  expect_that(as_la$D, equals(ss$values[1:no]))
+  expect_that(au_la$D, equals(ss$values[1:no]))
   expect_that(std(as_la$X), equals(std(U[,1:no])))
   expect_that(std(au_la$X), equals(X[,1:no]))
 
@@ -34,14 +44,18 @@ test_that("Undirected, unweighted case works", {
   as_lm <- adjacency.spectral.embedding(g, no=no, which="lm",
                                         cvec=degree(g)/2, scaled=FALSE)
 
-  expect_that(std(as_lm$X), equals(std(U[,1:no])))
-  expect_that(std(au_lm$X), equals(X[,1:no]))
+  expect_that(as_lm$D, equals(mag_sort(ss$values)[1:no]))
+  expect_that(au_lm$D, equals(mag_sort(ss$values)[1:no]))
+  expect_that(std(as_lm$X), equals(std(U[,mag_order(ss$values)][,1:no])))
+  expect_that(std(au_lm$X), equals(X[,mag_order(ss$values)][,1:no]))
 
   au_sa <- adjacency.spectral.embedding(g, no=no, which="sa",
                                         cvec=degree(g)/2, scaled=TRUE)
   as_sa <- adjacency.spectral.embedding(g, no=no, which="sa",
                                         cvec=degree(g)/2, scaled=FALSE)
 
+  expect_that(as_sa$D, equals(ss$values[vcount(g)-1:no+1]))
+  expect_that(au_sa$D, equals(ss$values[vcount(g)-1:no+1]))
   expect_that(std(as_sa$X), equals(std(U[,vcount(g)-1:no+1])))
   expect_that(std(au_sa$X), equals(X[,vcount(g)-1:no+1]))
 })
@@ -65,7 +79,9 @@ test_that("Undirected, weighted case works", {
   as_la <- adjacency.spectral.embedding(g, no=no, which="la",
                                         cvec=degree(g)/2, scaled=FALSE)
 
+  expect_that(as_la$D, equals(ss$values[1:no]))
   expect_that(std(as_la$X), equals(std(U[,1:no])))
+  expect_that(au_la$D, equals(ss$values[1:no]))
   expect_that(std(au_la$X), equals(X[,1:no]))
   
   au_lm <- adjacency.spectral.embedding(g, no=no, which="lm",
@@ -73,8 +89,10 @@ test_that("Undirected, weighted case works", {
   as_lm <- adjacency.spectral.embedding(g, no=no, which="lm",
                                         cvec=degree(g)/2, scaled=FALSE)
 
-  expect_that(std(as_lm$X), equals(std(U[,1:no])))
-  expect_that(std(au_lm$X), equals(X[,1:no]))
+  expect_that(as_lm$D, equals(mag_sort(ss$values)[1:no]))
+  expect_that(au_lm$D, equals(mag_sort(ss$values)[1:no]))
+  expect_that(std(as_lm$X), equals(std(U[,mag_order(ss$values)][,1:no])))
+  expect_that(std(au_lm$X), equals(X[,mag_order(ss$values)][,1:no]))
 
   au_sa <- adjacency.spectral.embedding(g, no=no, which="sa",
                                         cvec=degree(g)/2, scaled=TRUE)
@@ -105,6 +123,8 @@ test_that("Directed, unweighted case works", {
   as_la <- adjacency.spectral.embedding(g, no=no, which="la",
                                         cvec=degree(g)/2, scaled=FALSE)
 
+  expect_that(as_la$D, equals(ss$d[1:no]))
+  expect_that(au_la$D, equals(ss$d[1:no]))
   expect_that(std(as_la$X), equals(std(U[,1:no])))
   expect_that(std(as_la$Y), equals(std(V[,1:no])))
   expect_that(std(au_la$X), equals(X[,1:no]))
@@ -115,6 +135,8 @@ test_that("Directed, unweighted case works", {
   as_lm <- adjacency.spectral.embedding(g, no=no, which="lm",
                                         cvec=degree(g)/2, scaled=FALSE)
 
+  expect_that(as_lm$D, equals(ss$d[1:no]))
+  expect_that(au_lm$D, equals(ss$d[1:no]))
   expect_that(std(as_lm$X), equals(std(U[,1:no])))
   expect_that(std(as_lm$Y), equals(std(V[,1:no])))
   expect_that(std(au_lm$X), equals(X[,1:no]))
@@ -125,6 +147,8 @@ test_that("Directed, unweighted case works", {
   as_sa <- adjacency.spectral.embedding(g, no=no, which="sa",
                                         cvec=degree(g)/2, scaled=FALSE)
 
+  expect_that(as_sa$D, equals(ss$d[vcount(g)-1:no+1]))
+  expect_that(au_sa$D, equals(ss$d[vcount(g)-1:no+1]))
   expect_that(std(as_sa$X), equals(std(U[,vcount(g)-1:no+1])))
   expect_that(std(as_sa$Y), equals(std(V[,vcount(g)-1:no+1])))
   expect_that(std(au_sa$X), equals(X[,vcount(g)-1:no+1]))

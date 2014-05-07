@@ -48,6 +48,7 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 					igraph_bool_t scaled,
 					igraph_matrix_t *X,
 					igraph_matrix_t *Y,
+					igraph_vector_t *D,
 					const igraph_vector_t *cvec,
 					igraph_arpack_options_t *options);
 
@@ -65,6 +66,7 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
 			igraph_bool_t scaled,
 			igraph_matrix_t *X,
 			igraph_matrix_t *Y,
+			igraph_vector_t *D,
 			igraph_arpack_options_t *options);
 
 int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim);

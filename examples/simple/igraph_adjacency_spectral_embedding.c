@@ -53,7 +53,7 @@ int main() {
 
 	igraph_adjacency_spectral_embedding(&graph, 4, /*weights=*/ 0,
 					    IGRAPH_EIGEN_LA,
-					    /*scaled=*/ 0, &U, &V,
+					    /*scaled=*/ 0, &U, &V, /*D=*/ 0,
 					    &cvec, &options);
 	
 	igraph_matrix_printf(&U, "%8.4f"); printf("--\n");

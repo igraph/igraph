@@ -384,6 +384,7 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
 				igraph_bool_t scaled,
 				igraph_matrix_t *X,
 				igraph_matrix_t *Y,
+				igraph_vector_t *D,
 				const igraph_vector_t *cvec,
 				igraph_arpack_options_t *options,
 				igraph_arpack_function_t *callback,
@@ -397,7 +398,7 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
   int i, j, cveclen=igraph_vector_size(cvec);
   igraph_i_asembedding_data_t data={ graph, cvec, &outlist, &inlist, 
 				     &eoutlist, &einlist, &tmp, weights };
-  igraph_vector_t D;
+  igraph_vector_t tmpD;
 
   if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
@@ -450,7 +451,7 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
       IGRAPH_FINALLY(igraph_inclist_destroy, &einlist);
     }
   }
-  IGRAPH_VECTOR_INIT_FINALLY(&D, no);
+  IGRAPH_VECTOR_INIT_FINALLY(&tmpD, no);
 
   options->n=vc;
   options->start=0;		/* random start vector */
@@ -470,47 +471,57 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
   }
   if (options->ncv <= options->nev) { options->ncv = 0; }
 
-  IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &D, X));
+  IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &tmpD, X));
 
   if (!symmetric) {
     data.outlist = &inlist;
     data.inlist  = &outlist;
     data.eoutlist = &einlist;
     data.einlist = &eoutlist;
-    IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &D, Y));
+    IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0,
+				       &tmpD, Y));
   } else if (Y) {
     IGRAPH_CHECK(igraph_matrix_update(Y, X));
+  }
+
+  if (D) {
+    igraph_vector_update(D, &tmpD);
+    if (!eigen) {
+      for (i=0; i<no; i++) {
+	VECTOR(*D)[i] = sqrt(VECTOR(*D)[i]);
+      }
+    }
   }
 
   if (scaled) {
     if (eigen) {
       /* eigenvalues were calculated */
       for (i=0; i<no; i++) {
-	VECTOR(D)[i] = sqrt(fabs(VECTOR(D)[i]));
+	VECTOR(tmpD)[i] = sqrt(fabs(VECTOR(tmpD)[i]));
       }
     } else {
       /* singular values were calculated */
       for (i=0; i<no; i++) {
-	VECTOR(D)[i] = sqrt(sqrt(VECTOR(D)[i]));
+	VECTOR(tmpD)[i] = sqrt(sqrt(VECTOR(tmpD)[i]));
       }
     }
 
     for (j=0; j<vc; j++) {
       for (i=0; i<no; i++) {
-	MATRIX(*X, j, i) *= VECTOR(D)[i];
+	MATRIX(*X, j, i) *= VECTOR(tmpD)[i];
       }
     }
 
     if (Y) {
       for (j=0; j<vc; j++) {
 	for (i=0; i<no; i++) {
-	  MATRIX(*Y, j, i) *= VECTOR(D)[i];
+	  MATRIX(*Y, j, i) *= VECTOR(tmpD)[i];
 	}
       }
     }
   }
 
-  igraph_vector_destroy(&D);
+  igraph_vector_destroy(&tmpD);
   if (!weights) {
     if (!symmetric) {
       igraph_adjlist_destroy(&inlist);
@@ -576,6 +587,9 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
  * \param Y Initialized matrix or a null pointer. If not a null
  *        pointer, then the second half of the latent positions are
  *        stored here. (For undirected graphs, this always equals X.)
+ * \param D Initialized vector or a null pointer. If not a null
+ *        pointer, then the eigenvalues (for undirected graphs) or the
+ *        singular values (for directed graphs) are stored here.
  * \param cvec A numeric vector, its length is the number vertices in the
  *        graph. This vector is added to the diagonal of the adjacency
  *        matrix, before performing the SVD.
@@ -595,6 +609,7 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 				igraph_bool_t scaled,
 				igraph_matrix_t *X,
 				igraph_matrix_t *Y,
+				igraph_vector_t *D,
 				const igraph_vector_t *cvec,
 				igraph_arpack_options_t *options) {
 
@@ -608,7 +623,7 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   }
 
   return igraph_i_spectral_embedding(graph, no, weights, which, scaled,
-				     X, Y, cvec, options, callback,
+				     X, Y, D, cvec, options, callback,
 				     /*symmetric=*/ !directed,
 				     /*eigen=*/ !directed);
 }
@@ -622,6 +637,7 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
 			igraph_bool_t scaled,
 			igraph_matrix_t *X,
 			igraph_matrix_t *Y,
+			igraph_vector_t *D,
 			igraph_arpack_options_t *options) {
 
   igraph_arpack_function_t *callback;
@@ -671,8 +687,8 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
   }
 
   IGRAPH_CHECK(igraph_i_spectral_embedding(graph, no, weights, which, scaled,
-				   X, Y, /*cvec=*/ &deg, options, callback,
-				   /*symmetric=*/ !directed,
+				   X, Y, D, /*cvec=*/ &deg, options,
+				   callback, /*symmetric=*/ !directed,
 				   /*eigen=*/ !directed));
   
   igraph_vector_destroy(&deg);
