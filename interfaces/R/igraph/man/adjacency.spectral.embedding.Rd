@@ -18,10 +18,13 @@ adjacency.spectral.embedding (graph, no, weights=NULL,
   \item{weights}{Optional positive weight vector for calculating
     weighted closeness. If the graph has a \code{weight} edge
     attribute, then this is used by default.}
-  \item{which}{Which eigenvalue to use. \sQuote{lm} means the one with
-    the largest magnitude, \sQuote{la} is the one (algebraic) largest,
-    and \sQuote{sa} is the (algebraic) smallest eigenvalue. The default
-    is \sQuote{la}.}
+  \item{which}{Which eigenvalues (or singular values, for directed
+    graphs) to use. \sQuote{lm} means the ones with
+    the largest magnitude, \sQuote{la} is the ones (algebraic) largest,
+    and \sQuote{sa} is the (algebraic) smallest eigenvalues. The default
+    is \sQuote{la}. Note that for directed graphs \sQuote{la} and
+    \sQuote{lm} are the equivalent, because the singular values are used
+    for the ordering.}
   \item{scaled}{Logical scalar, if \code{FALSE}, then \eqn{U} and
     \eqn{V} are returned instead of \eqn{X} and \eqn{Y}.}
   \item{cvec}{A numeric vector, its length is the number vertices in the
