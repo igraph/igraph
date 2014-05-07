@@ -543,6 +543,11 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
   igraph_arpack_function_t *callback;
   igraph_vector_t deg;
 
+  if (igraph_is_directed(graph)) {
+    IGRAPH_ERROR("Laplacian embedding is not implemented for "
+		 "directed graphs", IGRAPH_UNIMPLEMENTED);
+  }
+
   switch (type) {
   case IGRAPH_EMBEDDING_D_A:
     callback = weights ? igraph_i_lsembedding_daw : igraph_i_lsembedding_da;
