@@ -135,7 +135,7 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
 
     /* Mark neighbors and self*/
-    if (mode != IGRAPH_ALL) { VECTOR(neis)[node] = node+1; }
+    VECTOR(neis)[node] = node+1;
     for (i=0; i<edgeslen1; i++) {
       int e=VECTOR(*edges1)[i];
       int nei=IGRAPH_OTHER(graph, e, node);
@@ -150,7 +150,6 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
       int nei=IGRAPH_OTHER(graph, e2, node);
       igraph_vector_int_t *edges2=igraph_inclist_get(&incs, nei);
       int j, edgeslen2=igraph_vector_int_size(edges2);
-      if (mode == IGRAPH_ALL) { VECTOR(neis)[nei]=0; }
       for (j=0; j<edgeslen2; j++) {
 	int e2=VECTOR(*edges2)[j];
 	int nei2=IGRAPH_OTHER(graph, e2, nei);
@@ -159,6 +158,72 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
 	  VECTOR(*res)[node] += w2;
 	}
       }
+    }
+
+  } /* node < no_of_nodes */
+
+  igraph_vector_int_destroy(&neis);
+  igraph_inclist_destroy(&incs);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
+}
+
+int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
+				       igraph_vector_t *res,
+				       const igraph_vector_t *weights) {
+
+  int no_of_nodes=igraph_vcount(graph);
+  igraph_inclist_t incs;
+  int i, node;
+
+  igraph_vector_int_t neis;
+
+  IGRAPH_CHECK(igraph_inclist_init(graph, &incs, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_inclist_destroy, &incs);
+
+  igraph_vector_int_init(&neis, no_of_nodes);
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &neis);
+
+  igraph_vector_resize(res, no_of_nodes);
+  igraph_vector_null(res);
+
+  for (node=0; node < no_of_nodes; node++) {
+    igraph_vector_int_t *edges1=igraph_inclist_get(&incs, node);
+    int edgeslen1=igraph_vector_int_size(edges1);
+
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    /* Mark neighbors. We also count the edges that are incident to ego.
+       Note that this time we do not mark ego, because we don't want to
+       double count its incident edges later, when we are going over the
+       incident edges of ego's neighbors. */
+    for (i=0; i<edgeslen1; i++) {
+      int e=VECTOR(*edges1)[i];
+      int nei=IGRAPH_OTHER(graph, e, node);
+      igraph_real_t w= weights ? VECTOR(*weights)[e] : 1;
+      VECTOR(neis)[nei] = node+1;
+      VECTOR(*res)[node] += w;
+    }
+
+    /* Crawl neighbors. We make sure that each neighbor of 'node' is
+       only crawed once. We count all qualifying edges of ego, and
+       then unmark ego to avoid double counting. */
+    for (i=0; i<edgeslen1; i++) {
+      int e2=VECTOR(*edges1)[i];
+      int nei=IGRAPH_OTHER(graph, e2, node);
+      if (VECTOR(neis)[nei] != node+1) { continue; }
+      igraph_vector_int_t *edges2=igraph_inclist_get(&incs, nei);
+      int j, edgeslen2=igraph_vector_int_size(edges2);
+      for (j=0; j<edgeslen2; j++) {
+	int e2=VECTOR(*edges2)[j];
+	int nei2=IGRAPH_OTHER(graph, e2, nei);
+	igraph_real_t w2= weights ? VECTOR(*weights)[e2] : 1;
+	if (VECTOR(neis)[nei2] == node+1) {
+	  VECTOR(*res)[node] += w2;
+	}
+      }
+      VECTOR(neis)[nei] = 0;
     }
 
   } /* node < no_of_nodes */
@@ -284,7 +349,11 @@ int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
 			       igraph_neimode_t mode) {
 
   if (igraph_is_directed(graph)) {
-    return igraph_i_local_scan_1_directed(graph, res, weights, mode);
+    if (mode != IGRAPH_ALL) {
+      return igraph_i_local_scan_1_directed(graph, res, weights, mode);
+    } else {
+      return igraph_i_local_scan_1_directed_all(graph, res, weights);
+    }
   } else {
     if (weights) {
       return igraph_i_local_scan_1_sumweights(graph, res, weights);

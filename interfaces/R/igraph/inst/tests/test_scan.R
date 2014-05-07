@@ -171,6 +171,26 @@ test_that("Issue 18 is resolved", {
   expect_that(local.scan(g, mode="in"), equals(c(4, 2, 4, 6, 5)))
 })
 
+test_that("Issue 18 is really resolved", {
+  library(igraph)
+  el <- c(1, 5, 1, 7, 2, 5, 2, 7, 2, 10, 2, 13, 2, 18, 3, 5, 3, 10, 3, 
+          13, 4, 5, 4, 10, 5, 7, 5, 10, 5, 13, 5, 18, 6, 3, 6, 5, 6, 7, 
+          6, 13, 7, 5, 8, 5, 8, 10, 8, 18, 9, 3, 9, 5, 9, 7, 9, 10, 11, 
+          5, 12, 5, 12, 7, 14, 5, 14, 7, 14, 13, 14, 18, 15, 5, 15, 13, 
+          15, 18, 16, 5, 16, 10, 16, 13, 16, 18, 17, 5)
+  
+  g <- graph(el)
+
+  sc1 <- sapply(graph.neighborhood(g, order=1, mode="all"), ecount)
+  sc2 <- local.scan(graph.us=g, mode="all", k=1)
+  expect_that(sc1, equals(sc2))
+
+  g2 <- induced.subgraph(g, 5:8)
+  sc21 <- sapply(graph.neighborhood(g2, order=1, mode="all"), ecount)
+  sc22 <- local.scan(graph.us=g2, mode="all", k=1)
+  expect_that(sc21, equals(sc22))
+})
+
 test_that("Issue 20 is resolved", {
 
   library(igraph)
@@ -190,5 +210,3 @@ test_that("FUN argument works, #32", {
   expect_that(r2, equals(rep(2, 10)))
 })
 
-
-  
