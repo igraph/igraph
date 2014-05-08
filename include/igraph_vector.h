@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -170,15 +170,17 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
 				  const igraph_vector_t *rhs,
 				  igraph_real_t tol);
 
+int igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol);
+
 /* These are for internal use only */
 int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
 			igraph_vector_t* res, igraph_real_t maxval);
-int igraph_vector_order1(const igraph_vector_t* v, 
+int igraph_vector_order1(const igraph_vector_t* v,
 			 igraph_vector_t* res, igraph_real_t maxval);
 int igraph_vector_order1_int(const igraph_vector_t* v,
 			 igraph_vector_int_t* res, igraph_real_t maxval);
 int igraph_vector_order2(igraph_vector_t *v);
-int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res, 
+int igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
 		       long int nodes);
 
 __END_DECLS
