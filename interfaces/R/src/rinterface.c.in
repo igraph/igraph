@@ -9217,6 +9217,91 @@ SEXP R_igraph_adjacency_spectral_embedding(SEXP graph, SEXP no,
   return(result);
 }
 
+SEXP R_igraph_laplacian_spectral_embedding(SEXP graph, SEXP no,
+					   SEXP weights, SEXP which,
+					   SEXP degmode, SEXP type,
+					   SEXP scaled, SEXP options) {
+  /* Declarations */
+  igraph_t c_graph;
+  igraph_integer_t c_no;
+  igraph_vector_t c_weights;
+  igraph_eigen_which_position_t c_which;
+  igraph_neimode_t c_degmode;
+  igraph_laplacian_spectral_embedding_type_t c_type;
+  igraph_bool_t c_scaled;
+  igraph_matrix_t c_X;
+  igraph_matrix_t c_Y;
+  igraph_vector_t c_D;
+  igraph_arpack_options_t c_options;
+  SEXP X;
+  SEXP Y;
+  SEXP D;
+  igraph_bool_t directed;
+
+  SEXP result, names;
+  /* Convert input */
+  R_SEXP_to_igraph(graph, &c_graph);
+  directed=igraph_is_directed(&c_graph);
+  c_no=INTEGER(no)[0];
+  if (!isNull(weights)) { R_SEXP_to_vector(weights, &c_weights); }
+  c_which=INTEGER(which)[0];
+  c_degmode=(igraph_neimode_t) REAL(degmode)[0];
+  c_type=(igraph_laplacian_spectral_embedding_type_t) INTEGER(type)[0];
+  c_scaled=LOGICAL(scaled)[0];
+  if (0 != igraph_matrix_init(&c_X, 0, 0)) {
+    igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_matrix_destroy, &c_X);
+  if (directed) {
+    if (0 != igraph_matrix_init(&c_Y, 0, 0)) {
+      igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_matrix_destroy, &c_Y);
+  }
+  if (0 != igraph_vector_init(&c_D, 0)) {
+    igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_vector_destroy, &c_D);
+  R_SEXP_to_igraph_arpack_options(options, &c_options);
+  /* Call igraph */
+  igraph_laplacian_spectral_embedding(&c_graph, c_no,
+				      (isNull(weights) ? 0 : &c_weights),
+				      c_which, c_degmode, c_type, c_scaled,
+				      &c_X, directed ? &c_Y : 0,
+				      &c_D, &c_options);
+
+  /* Convert output */
+  PROTECT(result=NEW_LIST(4));
+  PROTECT(names=NEW_CHARACTER(4));
+  PROTECT(X=R_igraph_matrix_to_SEXP(&c_X));
+  igraph_matrix_destroy(&c_X);
+  IGRAPH_FINALLY_CLEAN(1);
+  if (directed) {
+    PROTECT(Y=R_igraph_matrix_to_SEXP(&c_Y));
+    igraph_matrix_destroy(&c_Y);
+    IGRAPH_FINALLY_CLEAN(1);
+  } else {
+    PROTECT(Y=R_NilValue);
+  }
+  PROTECT(D=R_igraph_0orvector_to_SEXP(&c_D));
+  igraph_vector_destroy(&c_D);
+  IGRAPH_FINALLY_CLEAN(1);
+  PROTECT(options=R_igraph_arpack_options_to_SEXP(&c_options));
+  SET_VECTOR_ELT(result, 0, X);
+  SET_VECTOR_ELT(result, 1, Y);
+  SET_VECTOR_ELT(result, 2, D);
+  SET_VECTOR_ELT(result, 3, options);
+  SET_STRING_ELT(names, 0, CREATE_STRING_VECTOR("X"));
+  SET_STRING_ELT(names, 1, CREATE_STRING_VECTOR("Y"));
+  SET_STRING_ELT(names, 2, CREATE_STRING_VECTOR("D"));
+  SET_STRING_ELT(names, 3, CREATE_STRING_VECTOR("options"));
+  SET_NAMES(result, names);
+  UNPROTECT(5);
+
+  UNPROTECT(1);
+  return(result);
+}
+
 SEXP R_igraph_revolver_d(SEXP graph, SEXP pniter, SEXP psd, SEXP pnorm,
 			 SEXP pcites, SEXP pexpected, SEXP perror, 
 			 SEXP pdebug) {

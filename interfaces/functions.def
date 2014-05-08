@@ -2007,6 +2007,7 @@ igraph_laplacian_spectral_embedding:
                INOUT ARPACKOPT options=igraph.arpack.default
        NAME-R: laplacian.spectral.embedding
        DEPS: weights ON graph
+       IGNORE: RC
 
 #######################################
 # Eigensolvers
