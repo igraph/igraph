@@ -2002,11 +2002,11 @@ igraph_adjacency_spectral_embedding:
 igraph_laplacian_spectral_embedding:
        PARAMS: GRAPH graph, INTEGER no, EDGEWEIGHTS weights=NULL, \
                EIGENWHICHPOS which=ASE, NEIMODE degmode=OUT, \
-               LSETYPE type=DI, BOOLEAN scaled=True, OUT MATRIX X, \
+               LSETYPE type=Default, BOOLEAN scaled=True, OUT MATRIX X, \
                OUT MATRIX_OR_0 Y, OUT VECTOR_OR_0 D, \
                INOUT ARPACKOPT options=igraph.arpack.default
        NAME-R: laplacian.spectral.embedding
-       DEPS: weights ON graph
+       DEPS: weights ON graph, type ON graph
        IGNORE: RC
 
 #######################################

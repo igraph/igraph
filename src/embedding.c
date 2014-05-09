@@ -30,6 +30,7 @@
 typedef struct {
   const igraph_t *graph;
   const igraph_vector_t *cvec;
+  const igraph_vector_t *cvec2;
   igraph_adjlist_t *outlist, *inlist;
   igraph_inclist_t *eoutlist, *einlist;
   igraph_vector_t *tmp;
@@ -337,6 +338,112 @@ int igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
   return 0;
 }
 
+/* Laplacian OAP, unweighted, directed. SVD. */
+int igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_real_t *from,
+                              int n, void *extra) {
+
+  igraph_i_asembedding_data_t *data=extra;
+  igraph_adjlist_t *outlist=data->outlist;
+  igraph_adjlist_t *inlist=data->inlist;
+  const igraph_vector_t *deg_in=data->cvec;
+  const igraph_vector_t *deg_out=data->cvec2;
+  igraph_vector_t *tmp=data->tmp;
+  igraph_vector_int_t *neis;
+  int i, j, nlen;
+
+  /* tmp = O' from */
+  for (i=0; i<n; i++) { VECTOR(*tmp)[i] = VECTOR(*deg_out)[i] * from[i]; }
+
+  /* to = A' tmp */
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(inlist, i);
+    nlen=igraph_vector_int_size(neis);
+    to[i] = 0.0;
+    for (j=0; j<nlen; j++) {
+      int nei=VECTOR(*neis)[j];
+      to[i] += VECTOR(*tmp)[nei];
+    }
+  }
+
+  /* tmp = P' to */
+  for (i=0; i<n; i++) { VECTOR(*tmp)[i] = VECTOR(*deg_in)[i] * to[i]; }
+
+  /* to = P tmp */
+  for (i=0; i<n; i++) { to[i] = VECTOR(*deg_in)[i] * VECTOR(*tmp)[i]; }
+
+  /* tmp = A to */
+  for (i=0; i<n; i++) {
+    neis=igraph_adjlist_get(outlist, i);
+    nlen=igraph_vector_int_size(neis);
+    VECTOR(*tmp)[i] = 0.0;
+    for (j=0; j<nlen; j++) {
+      int nei=VECTOR(*neis)[j];
+      VECTOR(*tmp)[i] += to[nei];
+    }
+  }
+
+  /* to = O tmp */
+  for (i=0; i<n; i++) { to[i] = VECTOR(*deg_out)[i] * VECTOR(*tmp)[i]; }
+
+  return 0;
+}
+
+/* Laplacian OAP, weighted, directed. SVD. */
+int igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph_real_t *from,
+                               int n, void *extra) {
+
+  igraph_i_asembedding_data_t *data=extra;
+  igraph_inclist_t *outlist=data->eoutlist;
+  igraph_inclist_t *inlist=data->einlist;
+  const igraph_vector_t *deg_in=data->cvec;
+  const igraph_vector_t *deg_out=data->cvec2;
+  const igraph_vector_t *weights=data->weights;
+  const igraph_t *graph=data->graph;
+  igraph_vector_t *tmp=data->tmp;
+  igraph_vector_int_t *neis;
+  int i, j, nlen;
+
+  /* tmp = O' from */
+  for (i=0; i<n; i++) { VECTOR(*tmp)[i] = VECTOR(*deg_out)[i] * from[i]; }
+
+  /* to = A' tmp */
+  for (i=0; i<n; i++) {
+    neis=igraph_inclist_get(inlist, i);
+    nlen=igraph_vector_int_size(neis);
+    to[i] = 0.0;
+    for (j=0; j<nlen; j++) {
+      int edge=VECTOR(*neis)[j];
+      int nei=IGRAPH_OTHER(graph, edge, i);
+      igraph_real_t w=VECTOR(*weights)[edge];
+      to[i] += w * VECTOR(*tmp)[nei];
+    }
+  }
+
+  /* tmp = P' to */
+  for (i=0; i<n; i++) { VECTOR(*tmp)[i] = VECTOR(*deg_in)[i] * to[i]; }
+
+  /* to = P tmp */
+  for (i=0; i<n; i++) { to[i] = VECTOR(*deg_in)[i] * VECTOR(*tmp)[i]; }
+
+  /* tmp = A to */
+  for (i=0; i<n; i++) {
+    neis=igraph_inclist_get(outlist, i);
+    nlen=igraph_vector_int_size(neis);
+    VECTOR(*tmp)[i] = 0.0;
+    for (j=0; j<nlen; j++) {
+      int edge=VECTOR(*neis)[j];
+      int nei=IGRAPH_OTHER(graph, edge, i);
+      igraph_real_t w=VECTOR(*weights)[edge];
+      VECTOR(*tmp)[i] += w * to[nei];
+    }
+  }
+
+  /* to = O tmp */
+  for (i=0; i<n; i++) { to[i] = VECTOR(*deg_out)[i] * VECTOR(*tmp)[i]; }
+
+  return 0;
+}
+
 int igraph_i_spectral_embedding(const igraph_t *graph,
 				igraph_integer_t no,
 				const igraph_vector_t *weights,
@@ -346,6 +453,7 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
 				igraph_matrix_t *Y,
 				igraph_vector_t *D,
 				const igraph_vector_t *cvec,
+                                const igraph_vector_t *cvec2,
 				igraph_arpack_options_t *options,
 				igraph_arpack_function_t *callback,
 				igraph_bool_t symmetric,
@@ -357,7 +465,7 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
   igraph_adjlist_t outlist, inlist;
   igraph_inclist_t eoutlist, einlist;
   int i, j, cveclen=igraph_vector_size(cvec);
-  igraph_i_asembedding_data_t data={ graph, cvec, &outlist, &inlist,
+  igraph_i_asembedding_data_t data={ graph, cvec, cvec2, &outlist, &inlist,
 				     &eoutlist, &einlist, &tmp, weights };
   igraph_vector_t tmpD;
 
@@ -439,6 +547,10 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
     data.inlist  = &outlist;
     data.eoutlist = &einlist;
     data.einlist = &eoutlist;
+    if (cvec2) {
+      data.cvec = cvec2;
+      data.cvec2 = cvec;
+    }
     IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0,
 				       &tmpD, Y));
   } else if (Y) {
@@ -590,9 +702,118 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
   }
 
   return igraph_i_spectral_embedding(graph, no, weights, which, scaled,
-				     X, Y, D, cvec, options, callback,
+				     X, Y, D, cvec, /* deg2=*/ 0,
+                                     options, callback,
 				     /*symmetric=*/ !directed,
 				     /*eigen=*/ !directed, /*zapsmall=*/ 1);
+}
+
+int igraph_i_lse_und(const igraph_t *graph,
+                     igraph_integer_t no,
+                     const igraph_vector_t *weights,
+                     igraph_eigen_which_position_t which,
+                     igraph_neimode_t degmode,
+                     igraph_laplacian_spectral_embedding_type_t type,
+                     igraph_bool_t scaled,
+                     igraph_matrix_t *X,
+                     igraph_matrix_t *Y,
+                     igraph_vector_t *D,
+                     igraph_arpack_options_t *options) {
+
+  igraph_arpack_function_t *callback;
+  igraph_vector_t deg;
+
+  switch (type) {
+  case IGRAPH_EMBEDDING_D_A:
+    callback = weights ? igraph_i_lsembedding_daw : igraph_i_lsembedding_da;
+    break;
+  case IGRAPH_EMBEDDING_DAD:
+    callback = weights ? igraph_i_lsembedding_dadw : igraph_i_lsembedding_dad;
+    break;
+  case IGRAPH_EMBEDDING_I_DAD:
+    callback = (weights ? igraph_i_lsembedding_idadw :
+                igraph_i_lsembedding_idad);
+    break;
+  default:
+    IGRAPH_ERROR("Invalid Laplacian spectral embedding type",
+                 IGRAPH_EINVAL);
+    break;
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&deg, 0);
+  igraph_strength(graph, &deg, igraph_vss_all(), IGRAPH_ALL, /*loops=*/ 1,
+                  weights);
+
+  switch (type) {
+  case IGRAPH_EMBEDDING_D_A:
+    break;
+  case IGRAPH_EMBEDDING_DAD:
+  case IGRAPH_EMBEDDING_I_DAD:
+    {
+      int i, n=igraph_vector_size(&deg);
+      for (i=0; i<n; i++) {
+        VECTOR(deg)[i] = 1.0/sqrt(VECTOR(deg)[i]);
+      }
+    }
+    break;
+  default:
+    break;
+  }
+
+  IGRAPH_CHECK(igraph_i_spectral_embedding(graph, no, weights, which,
+                        scaled, X, Y, D, /*cvec=*/ &deg, /*deg2=*/ 0,
+                        options, callback, /*symmetric=*/ 1,
+                        /*eigen=*/ 1, /*zapsmall=*/ 1));
+
+  igraph_vector_destroy(&deg);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return 0;
+}
+
+int igraph_i_lse_dir(const igraph_t *graph,
+                     igraph_integer_t no,
+                     const igraph_vector_t *weights,
+                     igraph_eigen_which_position_t which,
+                     igraph_neimode_t degmode,
+                     igraph_laplacian_spectral_embedding_type_t type,
+                     igraph_bool_t scaled,
+                     igraph_matrix_t *X,
+                     igraph_matrix_t *Y,
+                     igraph_vector_t *D,
+                     igraph_arpack_options_t *options) {
+
+  igraph_arpack_function_t *callback =
+    weights ? igraph_i_lseembedding_oapw : igraph_i_lseembedding_oap;
+  igraph_vector_t deg_in, deg_out;
+  int i, n=igraph_vcount(graph);
+
+  if (type != IGRAPH_EMBEDDING_OAP) {
+    IGRAPH_ERROR("Invalid Laplacian spectral embedding type", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&deg_in, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&deg_out, n);
+  igraph_strength(graph, &deg_in, igraph_vss_all(), IGRAPH_IN, /*loops=*/ 1,
+                  weights);
+  igraph_strength(graph, &deg_out, igraph_vss_all(), IGRAPH_OUT, /*loops=*/ 1,
+                  weights);
+
+  for (i=0; i<n; i++) {
+    VECTOR(deg_in)[i] = 1.0 / sqrt(VECTOR(deg_in)[i]);
+    VECTOR(deg_out)[i] = 1.0 / sqrt(VECTOR(deg_out)[i]);
+  }
+
+  IGRAPH_CHECK(igraph_i_spectral_embedding(graph, no, weights, which,
+                        scaled, X, Y, D, /*cvec=*/ &deg_in,
+                        /*deg2=*/ &deg_out, options, callback,
+                        /*symmetric=*/ 0, /*eigen=*/ 0, /*zapsmall=*/ 1));
+
+  igraph_vector_destroy(&deg_in);
+  igraph_vector_destroy(&deg_out);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return 0;
 }
 
 /**
@@ -615,7 +836,6 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
  *        For directed graphs, <code>IGRAPH_EIGEN_LM</code> and
  *        <code>IGRAPH_EIGEN_LA</code> are the same, because singular
  *        values are used for the ordering instead of eigenvalues.
- * \param degmode TODO
  * \param type The type of the Laplacian to use. Various definitions
  *        exist for the Laplacian of a graph, and one can choose
  *        between them with this argument. Possible values:
@@ -658,61 +878,13 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
 			igraph_vector_t *D,
 			igraph_arpack_options_t *options) {
 
-  igraph_arpack_function_t *callback;
-  igraph_vector_t deg;
-  igraph_bool_t directed=igraph_is_directed(graph);
-
   if (igraph_is_directed(graph)) {
-    IGRAPH_ERROR("Laplacian embedding is not implemented for "
-		 "directed graphs", IGRAPH_UNIMPLEMENTED);
+    return igraph_i_lse_dir(graph, no, weights, which, degmode, type, scaled,
+                            X, Y, D, options);
+  } else {
+    return igraph_i_lse_und(graph, no, weights, which, degmode, type, scaled,
+                            X, Y, D, options);
   }
-
-  switch (type) {
-  case IGRAPH_EMBEDDING_D_A:
-    callback = weights ? igraph_i_lsembedding_daw : igraph_i_lsembedding_da;
-    break;
-  case IGRAPH_EMBEDDING_DAD:
-    callback = weights ? igraph_i_lsembedding_dadw : igraph_i_lsembedding_dad;
-    break;
-  case IGRAPH_EMBEDDING_I_DAD:
-    callback = (weights ? igraph_i_lsembedding_idadw :
-		igraph_i_lsembedding_idad);
-    break;
-  default:
-    IGRAPH_ERROR("Invalid Laplacian spectral embedding type",
-		 IGRAPH_EINVAL);
-    break;
-  }
-
-  IGRAPH_VECTOR_INIT_FINALLY(&deg, 0);
-  igraph_strength(graph, &deg, igraph_vss_all(), degmode, /*loops=*/ 1,
-		  weights);
-
-  switch (type) {
-  case IGRAPH_EMBEDDING_D_A:
-    break;
-  case IGRAPH_EMBEDDING_DAD:
-  case IGRAPH_EMBEDDING_I_DAD:
-    {
-      int i, n=igraph_vector_size(&deg);
-      for (i=0; i<n; i++) {
-	VECTOR(deg)[i] = 1.0/sqrt(VECTOR(deg)[i]);
-      }
-    }
-    break;
-  default:
-    break;
-  }
-
-  IGRAPH_CHECK(igraph_i_spectral_embedding(graph, no, weights, which, scaled,
-				   X, Y, D, /*cvec=*/ &deg, options,
-				   callback, /*symmetric=*/ !directed,
-				   /*eigen=*/ !directed, /*zapsmall=*/ 1));
-
-  igraph_vector_destroy(&deg);
-  IGRAPH_FINALLY_CLEAN(1);
-
-  return 0;
 }
 
 /**

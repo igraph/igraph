@@ -330,20 +330,113 @@ test_that("Undirected, unweighted, I-DAD case works", {
   expect_that(std(as_sa$X), equals(std(U[,vcount(g)-1:no+1])))
 })
 
-test_that("Directed, unweighted case works", {
+test_that("Directed, unweighted, OAP case works", {
   library(igraph)
-  g <- graph.ring(10, directed=TRUE)
+  set.seed(42*42)
+  g <- random.graph.game(10, 30, type="gnm", directed=TRUE)
 
-  expect_that(laplacian.spectral.embedding(g, no=3),
-              throws_error("not implemented for directed"))
+  no <- 3
+  O12 <- diag(1/sqrt(degree(g, mode="out")))
+  P12 <- diag(1/sqrt(degree(g, mode="in")))
+  A <- O12 %*% g[] %*% P12
+  ss <- svd(A)
+
+  D <- ss$d
+  U <- ss$u
+  V <- ss$v
+  X <- std(ss$u %*% sqrt(diag(ss$d)))
+  Y <- std(ss$v %*% sqrt(diag(ss$d)))
+
+  au_la <- laplacian.spectral.embedding(g, no=no, which="la", type="OAP",
+                                        scaled=TRUE)
+  as_la <- laplacian.spectral.embedding(g, no=no, which="la", type="OAP",
+                                        scaled=FALSE)
+
+  expect_that(au_la$D, equals(D[1:no]))
+  expect_that(std(au_la$X), equals(std(X[,1:no])))
+  expect_that(std(au_la$Y), equals(std(Y[,1:no])))
+  expect_that(as_la$D, equals(D[1:no]))
+  expect_that(std(as_la$X), equals(std(U[,1:no])))
+  expect_that(std(as_la$Y), equals(std(V[,1:no])))
+
+  au_lm <- laplacian.spectral.embedding(g, no=no, which="lm", type="OAP",
+                                        scaled=TRUE)
+  as_lm <- laplacian.spectral.embedding(g, no=no, which="lm", type="OAP",
+                                        scaled=FALSE)
+
+  expect_that(au_lm$D, equals(D[1:no]))
+  expect_that(std(au_lm$X), equals(std(X[,1:no])))
+  expect_that(std(au_lm$Y), equals(std(Y[,1:no])))
+  expect_that(as_lm$D, equals(D[1:no]))
+  expect_that(std(as_lm$X), equals(std(U[,1:no])))
+  expect_that(std(as_lm$Y), equals(std(V[,1:no])))
+
+  au_sa <- laplacian.spectral.embedding(g, no=no, which="sa", type="OAP",
+                                        scaled=TRUE)
+  as_sa <- laplacian.spectral.embedding(g, no=no, which="sa", type="OAP",
+                                        scaled=FALSE)
+
+  expect_that(au_sa$D, equals(D[vcount(g)-1:no+1]))
+  expect_that(std(au_sa$X), equals(std(X[,vcount(g)-1:no+1])))
+  expect_that(std(au_sa$Y), equals(std(Y[,vcount(g)-1:no+1]),
+                            tolerance=sqrt(sqrt(.Machine$double.eps))))
+  expect_that(as_sa$D, equals(D[vcount(g)-1:no+1]))
+  expect_that(std(as_sa$X), equals(std(U[,vcount(g)-1:no+1])))
+  expect_that(std(as_sa$Y), equals(std(V[,vcount(g)-1:no+1])))
 })
 
 test_that("Directed, weighted case works", {
   library(igraph)
-  g <- graph.ring(10, directed=TRUE)
-  E(g)$weight <- seq_len(ecount(g))
+  set.seed(42*42)
+  g <- random.graph.game(10, 30, type="gnm", directed=TRUE)
+  E(g)$weight <- sample(1:5, ecount(g), replace=TRUE)
 
-  expect_that(laplacian.spectral.embedding(g, no=3),
-              throws_error("not implemented for directed"))
+  no <- 3
+  O12 <- diag(1/sqrt(graph.strength(g, mode="out")))
+  P12 <- diag(1/sqrt(graph.strength(g, mode="in")))
+  A <- O12 %*% g[] %*% P12
+  ss <- svd(A)
 
+  D <- ss$d
+  U <- ss$u
+  V <- ss$v
+  X <- std(ss$u %*% sqrt(diag(ss$d)))
+  Y <- std(ss$v %*% sqrt(diag(ss$d)))
+
+  au_la <- laplacian.spectral.embedding(g, no=no, which="la", type="OAP",
+                                        scaled=TRUE)
+  as_la <- laplacian.spectral.embedding(g, no=no, which="la", type="OAP",
+                                        scaled=FALSE)
+
+  expect_that(au_la$D, equals(D[1:no]))
+  expect_that(std(au_la$X), equals(std(X[,1:no])))
+  expect_that(std(au_la$Y), equals(std(Y[,1:no])))
+  expect_that(as_la$D, equals(D[1:no]))
+  expect_that(std(as_la$X), equals(std(U[,1:no])))
+  expect_that(std(as_la$Y), equals(std(V[,1:no])))
+
+  au_lm <- laplacian.spectral.embedding(g, no=no, which="lm", type="OAP",
+                                        scaled=TRUE)
+  as_lm <- laplacian.spectral.embedding(g, no=no, which="lm", type="OAP",
+                                        scaled=FALSE)
+
+  expect_that(au_lm$D, equals(D[1:no]))
+  expect_that(std(au_lm$X), equals(std(X[,1:no])))
+  expect_that(std(au_lm$Y), equals(std(Y[,1:no])))
+  expect_that(as_lm$D, equals(D[1:no]))
+  expect_that(std(as_lm$X), equals(std(U[,1:no])))
+  expect_that(std(as_lm$Y), equals(std(V[,1:no])))
+
+  au_sa <- laplacian.spectral.embedding(g, no=no, which="sa", type="OAP",
+                                        scaled=TRUE)
+  as_sa <- laplacian.spectral.embedding(g, no=no, which="sa", type="OAP",
+                                        scaled=FALSE)
+
+  expect_that(au_sa$D, equals(D[vcount(g)-1:no+1]))
+  expect_that(std(au_sa$X), equals(std(X[,vcount(g)-1:no+1])))
+  expect_that(std(au_sa$Y), equals(std(Y[,vcount(g)-1:no+1]),
+                            tolerance=sqrt(sqrt(.Machine$double.eps))))
+  expect_that(as_sa$D, equals(D[vcount(g)-1:no+1]))
+  expect_that(std(as_sa$X), equals(std(U[,vcount(g)-1:no+1])))
+  expect_that(std(as_sa$Y), equals(std(V[,vcount(g)-1:no+1])))
 })

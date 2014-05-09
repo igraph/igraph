@@ -6,7 +6,7 @@
 \usage{
 laplacian.spectral.embedding (graph, no, weights = NULL,
     which = c("lm", "la", "sa"), degmode = c("out", "in", "all", "total"),
-    type = c("D-A", "DAD", "I-DAD"), scaled = TRUE,
+    type = c("default", "D-A", "DAD", "I-DAD", "OAP"), scaled = TRUE,
     options = igraph.arpack.default)
 }
 \arguments{
@@ -28,13 +28,25 @@ laplacian.spectral.embedding (graph, no, weights = NULL,
   \item{degmode}{TODO}
   \item{type}{The type of the Laplacian to use. Various definitions
     exist for the Laplacian of a graph, and one can choose
-    between them with this argument. Possible values:
+    between them with this argument.
+
+    Possible values:
     \code{D-A} means \eqn{D-A} where \eqn{D} is the
     degree matrix and \eqn{A} is the adjacency matrix;
     \code{DAD} means \eqn{D^{1/2}}{D^1/2} times \eqn{A}
     times \eqn{D^{1/2}{D^1/2}}, \eqn{D^{1/2}}{D^1/2} is the inverse of the
     square root of the degree matrix; \code{I-DAD} means
-    \eqn{I-D^{1/2}}{I-D^1/2}, where \eqn{I} is the identity matrix.}
+    \eqn{I-D^{1/2}}{I-D^1/2}, where \eqn{I} is the identity matrix.
+    \code{OAP} is \eqn{O^{1/2}AP^{1/2}}{O^1/2 A P^1/2}, where
+    \eqn{O^{1/2}}{O^1/2} is the inverse of the square root of the
+    out-degree matrix and \eqn{P^{1/2}}{P^1/2} is the same for the in-degree
+    matrix.
+
+    \code{OAP} is not defined for undireted graphs, and is the only defined
+    type for directed graphs.
+
+    The default (i.e. type \code{default}) is to use \code{D-A} for undirected
+    graphs and \code{OAP} for directed graphs.}
   \item{scaled}{Logical scalar, if \code{FALSE}, then \eqn{U} and
     \eqn{V} are returned instead of \eqn{X} and \eqn{Y}.}
   \item{options}{A named list containing the parameters for the SVD

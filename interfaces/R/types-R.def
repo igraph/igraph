@@ -412,7 +412,9 @@ DEPRECATED:
   CALL:
 
 LSETYPE:
-  INCONV: %I% <- switch(igraph.match.arg(%I%), "da"=0L, "d-a"=0L, \
-                        "idad"=1L, "i-dad"=1L, "dad"=2L)
+  INCONV: %I% <- switch(igraph.match.arg(%I%), \
+                        "default"=if (is.directed(%I1%)) 3L else 0L, \
+                        "da"=0L, "d-a"=0L, "idad"=1L, "i-dad"=1L, "dad"=2L, \
+                        "oap"=3L)
   DEFAULT:
-    DI: c("D-A", "DAD", "I-DAD")
+    Default: c("default", "D-A", "DAD", "I-DAD", "OAP")
