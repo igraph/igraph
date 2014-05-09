@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -112,7 +112,7 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
     }
     VECTOR(*tmp)[i] += VECTOR(*cvec)[i] * from[i];
   }
-	
+
   /* to = (A+cD) tmp */
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(outlist, i);
@@ -124,7 +124,7 @@ int igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
     }
     to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
   }
-	
+
   return 0;
 }
 
@@ -154,7 +154,7 @@ int igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
     }
     VECTOR(*tmp)[i] += VECTOR(*cvec)[i] * from[i];
   }
-	
+
   /* to = (A+cD) tmp */
   for (i=0; i<n; i++) {
     incs=igraph_inclist_get(outlist, i);
@@ -168,7 +168,7 @@ int igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
     }
     to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
   }
-	
+
   return 0;
 }
 
@@ -192,7 +192,7 @@ int igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
     }
     to[i] += VECTOR(*cvec)[i] * from[i];
   }
-	
+
   return 0;
 }
 
@@ -220,7 +220,7 @@ int igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_real_t *from,
     }
     to[i] += VECTOR(*cvec)[i] * from[i];
   }
-	
+
   return 0;
 }
 
@@ -255,7 +255,7 @@ int igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from,
   for (i=0; i<n; i++) {
     to[i] = VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
   }
-	
+
   return 0;
 }
 
@@ -293,7 +293,7 @@ int igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *from,
   for (i=0; i<n; i++) {
     to[i] = VECTOR(*cvec)[i] * VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
   }
-  
+
   /* tmp = A to */
   for (i=0; i<n; i++) {
     incs=igraph_inclist_get(outlist, i);
@@ -311,7 +311,7 @@ int igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *from,
   for (i=0; i<n; i++) {
     to[i] = VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
   }
-	
+
   return 0;
 }
 
@@ -323,7 +323,7 @@ int igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *from,
 
   igraph_i_lsembedding_dad(to, from, n, extra);
   for (i=0; i<n; i++) { to[i] = from[i] - to[i]; }
-  
+
   return 0;
 }
 
@@ -333,7 +333,7 @@ int igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
 
   igraph_i_lsembedding_dadw(to, from, n, extra);
   for (i=0; i<n; i++) { to[i] = from[i] - to[i]; }
-  
+
   return 0;
 }
 
@@ -357,7 +357,7 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
   igraph_adjlist_t outlist, inlist;
   igraph_inclist_t eoutlist, einlist;
   int i, j, cveclen=igraph_vector_size(cvec);
-  igraph_i_asembedding_data_t data={ graph, cvec, &outlist, &inlist, 
+  igraph_i_asembedding_data_t data={ graph, cvec, &outlist, &inlist,
 				     &eoutlist, &einlist, &tmp, weights };
   igraph_vector_t tmpD;
 
@@ -372,8 +372,8 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
 		 "`largest magnitude', `largest algebraic' or "
 		 "`smallest algebraic'", IGRAPH_EINVAL);
   }
-	
-  if (no > vc) { 
+
+  if (no > vc) {
     IGRAPH_ERROR("Too many singular values requested", IGRAPH_EINVAL);
   }
   if (no <= 0) {
@@ -504,7 +504,7 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
   }
   igraph_vector_destroy(&tmp);
   IGRAPH_FINALLY_CLEAN(3);
-	
+
   return 0;
 }
 
@@ -545,7 +545,7 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
  *        <code>IGRAPH_EIGEN_LA</code>: the (algebraic) largest ones, or
  *        <code>IGRAPH_EIGEN_SA</code>: the (algebraic) smallest ones.
  *        For directed graphs, <code>IGRAPH_EIGEN_LM</code> and
- *        <code>IGRAPH_EIGEN_LA</code> are the same, because singular 
+ *        <code>IGRAPH_EIGEN_LA</code> are the same, because singular
  *        values are used for the orderinf instead of eigenvalues.
  * \param scaled Whether to return X and Y (if scaled is non-zero), or
  *        U and V.
@@ -595,6 +595,57 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
 				     /*eigen=*/ !directed, /*zapsmall=*/ 1);
 }
 
+/**
+ * \function igraph_laplacian_spectral_embedding
+ * Spectral embedding of the Laplacian of a graph
+ *
+ * This function essentially does the same as
+ * \ref igraph_adjacency_spectral_embedding, but works on the Laplacian
+ * of the graph, instead of the adjacncy matrix.
+ * \param graph The input graph.
+ * \param no The number of eigenvectors (or singular vectors if the graph
+ *        is directed) to use for the embedding.
+ * \param weights Optional edge weights. Supply a null pointer for
+ *        unweighted graphs.
+ * \param which Which eigenvalues (or singular values, for directed
+ *        graphs) to use, possible values:
+ *        <code>IGRAPH_EIGEN_LM</code>: the ones with the largest magnitude,
+ *        <code>IGRAPH_EIGEN_LA</code>: the (algebraic) largest ones, or
+ *        <code>IGRAPH_EIGEN_SA</code>: the (algebraic) smallest ones.
+ *        For directed graphs, <code>IGRAPH_EIGEN_LM</code> and
+ *        <code>IGRAPH_EIGEN_LA</code> are the same, because singular
+ *        values are used for the ordering instead of eigenvalues.
+ * \param degmode TODO
+ * \param type The type of the Laplacian to use. Various definitions
+ *        exist for the Laplacian of a graph, and one can choose
+ *        between them with this argument. Possible values:
+ *        <code>IGRAPH_EMBEDDING_D_A</code> means D - A where D is the
+ *        degree matrix and A is the adjacency matrix;
+ *        <code>IGRAPH_EMBEDDING_DAD<code> means Di times A times Di,
+ *        where Di is the inverse of the square root of the degree matrix;
+ *        <code>IGRAPH_EMBEDDING_I_DAD</code> means I - Di A Di, where I
+ *        is the identity matrix.
+ * \param scaled Whether to return X and Y (if scaled is non-zero), or
+ *        U and V.
+ * \param X Initialized matrix, the estimated latent positions are
+ *        stored here.
+ * \param Y Initialized matrix or a null pointer. If not a null
+ *        pointer, then the second half of the latent positions are
+ *        stored here. (For undirected graphs, this always equals X.)
+ * \param D Initialized vector or a null pointer. If not a null
+ *        pointer, then the eigenvalues (for undirected graphs) or the
+ *        singular values (for directed graphs) are stored here.
+ * \param options Options to ARPACK. See \ref igraph_arpack_options_t
+ *        for details. Note that the function overwrites the
+ *        <code>n</code> (number of vertices), <code>nev</code> and
+ *        <code>which</code> parameters and it always starts the
+ *        calculation from a random start vector.
+ * \return Error code.
+ *
+ * \sa \ref igraph_adjacency_spectral_embedding to embed the adjacency
+ * matrix.
+ */
+
 int igraph_laplacian_spectral_embedding(const igraph_t *graph,
 			igraph_integer_t no,
 			const igraph_vector_t *weights,
@@ -624,7 +675,7 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
     callback = weights ? igraph_i_lsembedding_dadw : igraph_i_lsembedding_dad;
     break;
   case IGRAPH_EMBEDDING_I_DAD:
-    callback = (weights ? igraph_i_lsembedding_idadw : 
+    callback = (weights ? igraph_i_lsembedding_idadw :
 		igraph_i_lsembedding_idad);
     break;
   default:
@@ -632,9 +683,9 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
 		 IGRAPH_EINVAL);
     break;
   }
-  
+
   IGRAPH_VECTOR_INIT_FINALLY(&deg, 0);
-  igraph_strength(graph, &deg, igraph_vss_all(), degmode, /*loops=*/ 1, 
+  igraph_strength(graph, &deg, igraph_vss_all(), degmode, /*loops=*/ 1,
 		  weights);
 
   switch (type) {
@@ -657,17 +708,17 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
 				   X, Y, D, /*cvec=*/ &deg, options,
 				   callback, /*symmetric=*/ !directed,
 				   /*eigen=*/ !directed, /*zapsmall=*/ 1));
-  
+
   igraph_vector_destroy(&deg);
   IGRAPH_FINALLY_CLEAN(1);
-  
+
   return 0;
 }
 
 /**
  * \function igraph_dim_select
  * Dimensionality selection
- * 
+ *
  * Dimensionality selection for singular values using
  * profile likelihood.
  *
@@ -689,13 +740,13 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
  * where we assume that the left and the right of the vector are coming
  * from two Normal distributions, with different means, and we want
  * to know their border.
- * 
+ *
  * \param sv A numeric vector, the ordered singular values.
  * \param dim The result is stored here.
  * \return Error code.
- * 
+ *
  * Time complexity: O(n), n is the number of values in sv.
- * 
+ *
  * \sa \ref igraph_adjacency_spectral_embedding().
  */
 
