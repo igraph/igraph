@@ -5,7 +5,7 @@
   graphs.}
 \usage{
 adjacency.spectral.embedding (graph, no, weights=NULL,
-    which=c("lm", "la", "sm"), scaled = TRUE,
+    which=c("lm", "la", "sa"), scaled = TRUE,
     cvec=graph.strength(graph)/(vcount(graph) - 1),
     options = igraph.arpack.default)
 }
