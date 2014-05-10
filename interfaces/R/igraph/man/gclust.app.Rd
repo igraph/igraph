@@ -5,7 +5,7 @@
 \description{Performs Clustering of Graphs using Non-negative Factorization.}
 
 \usage{
-    gclust.app(glist, r=1,nmfout=FALSE,maxit=10000, nmfmethod='lee') 
+    gclust.app(glist, r=1,maxsvt=10,nmfout=FALSE,maxit=10000, nmfmethod='lee') 
 }
 
 \arguments{

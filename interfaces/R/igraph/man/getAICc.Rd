@@ -6,9 +6,9 @@
     Compute and Extract information Criteria Value from \code{gclust} using a Poisson
     approximation, where the penality term is adjusted for small sample cases.  
 }
-\usage{ getAICc(x) }
+\usage{ getAICc(gfit) }
 \arguments{
-    \item{x}{The output from a call to \code{gclust.rsvt} or \code{gclust.app}}
+    \item{gfit}{The output from a call to \code{gclust.rsvt} or \code{gclust.app}}
 }
 
 \value{
