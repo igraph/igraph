@@ -5,7 +5,7 @@
 \description{Performs Clustering of Graphs using Singular Value Thresholding and Non-negative Factorization.}
 
 \usage{
-    gclust.rsvt(glist, r=1) 
+    gclust.rsvt(glist, r=1,,nmfout=FALSE,maxit=10000, nmfmethod='lee') 
 }
 
 \arguments{
