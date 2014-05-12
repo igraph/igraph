@@ -4,6 +4,9 @@ importFrom(stats, as.hclust)
 importFrom(stats, median)
 importFrom(stats, quantile)
 importFrom(clue, solve_LSAP)
+importFrom(NMF, nmf)
+importFrom(NMF, basis)
+importFrom(irbla, irbla)
 import(methods)
 
 # The igraph interface

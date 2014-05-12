@@ -25,8 +25,5 @@
 
 \author{Nam Lee \email{nhlee@jhu.edu}}
 
-\examples{ 
-require(NMF)
-require(irlba)
-require(igraph)
-}
+% \examples{
+% }
