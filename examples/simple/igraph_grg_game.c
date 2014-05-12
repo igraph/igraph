@@ -22,9 +22,6 @@
 */
 
 #include <igraph.h>
-
-#include <unistd.h>
-#include <sys/times.h>
 #include <math.h>
 
 int main() {
