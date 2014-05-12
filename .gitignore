@@ -8,6 +8,7 @@
 .libs
 .deps
 
+/tags
 /INSTALL
 /VERSION
 /aclocal.m4
