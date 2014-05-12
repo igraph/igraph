@@ -33,7 +33,7 @@ int igraph_time_next(igraph_t *graph) {
 }
 
 int igraph_time_prev(igraph_t *graph) {
-  if (graph->now != 0) { graph->now -= 1; }
+  if (graph->now != IGRAPH_BEGINNING) { graph->now -= 1; }
   return 0;
 }
 
