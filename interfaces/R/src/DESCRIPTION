@@ -8,7 +8,7 @@ Description: Routines for simple graphs and network analysis. igraph can
   handle large graphs very well and provides functions for generating random
   and regular graphs, graph visualization, centrality indices and much more.
 Depends: methods
-Imports: Matrix, clue, NMF, irbla
+Imports: Matrix, clue, NMF, irlba
 Suggests: igraphdata, stats4, rgl, tcltk, graph, ape
 License: GPL (>= 2)
 URL: http://igraph.org

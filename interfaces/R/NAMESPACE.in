@@ -6,7 +6,7 @@ importFrom(stats, quantile)
 importFrom(clue, solve_LSAP)
 importFrom(NMF, nmf)
 importFrom(NMF, basis)
-importFrom(irbla, irbla)
+importFrom(irlba, irlba)
 import(methods)
 
 # The igraph interface
