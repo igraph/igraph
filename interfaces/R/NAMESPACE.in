@@ -3,6 +3,7 @@ importFrom(stats, as.dendrogram)
 importFrom(stats, as.hclust)
 importFrom(stats, median)
 importFrom(stats, quantile)
+importFrom(clue, solve_LSAP)
 import(methods)
 
 # The igraph interface

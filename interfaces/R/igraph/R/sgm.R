@@ -1,6 +1,5 @@
 sgm<-function(A,B,m,start,iteration){
   #seeds are assumed to be vertices 1:m in both graphs
-  require('clue')
   totv<-ncol(A)
   n<-totv-m
   if (m != 0){
