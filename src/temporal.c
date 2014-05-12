@@ -21,7 +21,23 @@
 
 */
 
-#include "igraph_datatype.h"
+#include "igraph_temporal.h"
+
+/* -------------------------------------------------- */
+/* Interface, temporal functions                      */
+/* -------------------------------------------------- */
+
+int igraph_add_edges_at(igraph_t *graph, const igraph_vector_t *edges,
+                const igraph_vector_int_t *e_active,
+                const igraph_vector_int_t *e_inactive, void *attr) {
+  /* TODO */
+}
+
+int igraph_add_vertices_at(igraph_t *graph, igraph_integer_t nv, 
+		const igraph_vector_int_t *v_active,
+                const igraph_vector_int_t *v_inacive, void *attr) {
+  /* TODO */
+}
 
 int igraph_create_temporal(igraph_t *graph,
                            const igraph_vector_t *edges,

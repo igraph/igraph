@@ -109,7 +109,7 @@ typedef struct igraph_s {
   igraph_vector_time_t eb;
   igraph_vector_time_t vd;
   igraph_vector_time_t ed;
-  igraph_integer_t now;
+  igraph_time_t now;
   void *attr;
 } igraph_t;
 

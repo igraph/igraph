@@ -51,7 +51,26 @@ __BEGIN_DECLS
 typedef int    igraph_integer_t;
 typedef double igraph_real_t;
 typedef int    igraph_bool_t;
+
+/**
+ * \typedef igraph_time_t
+ */
+
 typedef int    igraph_time_t;
+
+/**
+ * \define IGRAPH_BEGINNING
+ * The beginning of time
+ */
+ 
+#define IGRAPH_BEGINNING (0)
+
+/**
+ * \define IGRAPH_END
+ * The end of time
+ */
+
+#define IGRAPH_END (-1)
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */

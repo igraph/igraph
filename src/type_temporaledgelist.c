@@ -1217,78 +1217,8 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
 }
                     
 /* -------------------------------------------------- */
-/* Interface, temporal functions                      */
+/* Internal functions                                 */
 /* -------------------------------------------------- */
-
-int igraph_empty_at(igraph_t *graph, igraph_integer_t n,
-                igraph_bool_t directed,
-                const igraph_vector_time_t *v_active,
-                const igraph_vector_time_t *v_inactive,
-                void *attrs) {
-  /* TODO */
-}
-
-igraph_integer_t igraph_vcount_at(const igraph_t *graph,
-                igraph_time_t at) {
-  /* TODO */
-}
-
-igraph_integer_t igraph_ecount_at(const igraph_t *graph,
-                igraph_time_t at) {
-  /* TODO */
-}
-
-int igraph_neighbors_at(const igraph_t *graph, igraph_vector_t *neis,
-                igraph_integer_t vid, igraph_neimode_t mode,
-                igraph_time_t at) {
-  /* TODO */
-}
-
-int igraph_incident_at(const igraph_t *graph, igraph_vector_t *eids,
-                igraph_integer_t vid, igraph_neimode_t mode,
-                igraph_time_t at) {
-  /* TODO */
-}
-                      
-int igraph_degree_at(const igraph_t *graph, igraph_vector_t *res, 
-		const igraph_vs_t vids, igraph_neimode_t mode, 
-		igraph_bool_t loops, igraph_time_t at) {
-  /* TODO */
-}
-
-int igraph_get_eid_at(const igraph_t *graph, igraph_integer_t *eid,
-		igraph_integer_t from, igraph_integer_t to,
-		igraph_bool_t directed, igraph_bool_t error,
-                igraph_time_t at) {
-  /* TODO */
-}
-
-int igraph_get_eids_at(const igraph_t *graph, igraph_vector_t *eids,
-                const igraph_vector_t *pairs,
-		const igraph_vector_t *path,
-		igraph_bool_t directed, igraph_bool_t error,
-                igraph_time_t at) {
-  /* TODO */
-}
-
-int igraph_get_eids_multi_at(const igraph_t *graph,
-                igraph_vector_t *eids, const igraph_vector_t *pairs, 
-	        const igraph_vector_t *path, igraph_bool_t directed,
-                igraph_bool_t error, igraph_time_t at) {
-  /* TODO */
-}
-
-int igraph_add_edges_at(igraph_t *graph, const igraph_vector_t *edges,
-                const igraph_vector_int_t *e_active,
-                const igraph_vector_int_t *e_inactive, void *attr) {
-  /* TODO */
-}
-
-int igraph_add_vertices_at(igraph_t *graph, igraph_integer_t nv, 
-		const igraph_vector_int_t *v_active,
-                const igraph_vector_int_t *v_inacive, void *attr) {
-  /* TODO */
-}
 
 int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el,
                           igraph_vector_t *iindex, 
