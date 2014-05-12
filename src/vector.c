@@ -63,6 +63,12 @@
 #include "igraph_pmt_off.h"
 #undef BASE_INT
 
+#define BASE_TIME
+#include "igraph_pmt.h"
+#include "vector.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_TIME
+
 #define BASE_COMPLEX
 #include "igraph_pmt.h"
 #include "vector.pmt"

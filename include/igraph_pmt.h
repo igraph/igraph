@@ -78,6 +78,14 @@
 #define ONE 1
 #define MULTIPLICITY 1
 
+#elif defined(BASE_TIME)
+#define BASE igraph_time_t
+#define SHORT time
+#define OUT_FORMAT "%d"
+#define ZERO 0
+#define ONE 1
+#define MULTIPLICITY 1
+
 #elif defined(BASE_LIMB)
 #define BASE limb_t
 #define SHORT limb

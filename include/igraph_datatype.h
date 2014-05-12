@@ -36,8 +36,14 @@
 
 #include "igraph_types.h"
 #include "igraph_vector.h"
+#include "igraph_temporal.h"
 
 __BEGIN_DECLS
+
+/* #define IGRAPH_DATA_TYPE_INDEXED_EDGE_LIST 1 */
+#define IGRAPH_DATA_TYPE_TEMPORAL_EDGE_LIST 1
+
+#ifdef IGRPAPH_DATA_TYPE_INDEXED_EDGE_LIST
 
 /**
  * \ingroup internal
@@ -84,12 +90,30 @@ typedef struct igraph_s {
   igraph_vector_t ii;
   igraph_vector_t os;
   igraph_vector_t is;
-  igraph_vector_int_t vb;
-  igraph_vector_int_t eb;
-  igraph_vector_int_t vd;
-  igraph_vector_int_t ed;
   void *attr;
 } igraph_t;
+
+#endif
+#ifdef IGRAPH_DATA_TYPE_TEMPORAL_EDGE_LIST
+
+typedef struct igraph_s {
+  igraph_integer_t n;
+  igraph_bool_t directed;
+  igraph_vector_t from;
+  igraph_vector_t to;
+  igraph_vector_t oi;
+  igraph_vector_t ii;
+  igraph_vector_t os;
+  igraph_vector_t is;
+  igraph_vector_time_t vb;
+  igraph_vector_time_t eb;
+  igraph_vector_time_t vd;
+  igraph_vector_time_t ed;
+  igraph_integer_t now;
+  void *attr;
+} igraph_t;
+
+#endif /* IGRAPH_DATA_TYPE */
 
 __END_DECLS
 
