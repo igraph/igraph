@@ -74,6 +74,42 @@ __BEGIN_DECLS
 /* ---------------------------------------------------------------- */
 
 /**
+ * \function igraph_time_next
+ * Slide the time cursor to the next time step
+ * 
+ * TODO
+ */
+
+int igraph_time_next(igraph_t *graph);
+
+/**
+ * \function igraph_time_prev
+ * Slide the time cursor to the previous time step
+ *
+ * TODO
+ */
+
+int igraph_time_prev(igraph_t *graph);
+
+/**
+ * \function igraph_time_goto
+ * Set the time cursor to the given time step
+ *
+ * TODO
+ */
+
+int igraph_time_goto(igraph_t *graph, igraph_time_t at);
+
+/**
+ * \function igraph_time_reset
+ * Set the time cursor to the beginning of time
+ * 
+ * TODO
+ */
+
+int igraph_time_reset(igraph_t *graph);
+
+/**
  * \function igraph_add_edges_at
  * Add edges to a temporal graph
  *

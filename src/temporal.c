@@ -27,6 +27,29 @@
 /* Interface, temporal functions                      */
 /* -------------------------------------------------- */
 
+int igraph_time_next(igraph_t *graph) {
+  graph->now += 1;
+  return 0;
+}
+
+int igraph_time_prev(igraph_t *graph) {
+  if (graph->now != 0) { graph->now -= 1; }
+  return 0;
+}
+
+int igraph_time_goto(igraph_t *graph, igraph_time_t at) {
+  if (at != IGRAPH_END && at < IGRAPH_BEGINNING) {
+    IGRAPH_ERROR("Invalid time step, cannot set time cursor",
+                  IGRAPH_EINVAL);
+  }
+  graph->now = at;
+  return 0;
+}
+
+int igraph_time_reset(igraph_t *graph) {
+  graph->now = IGRAPH_BEGINNING;
+}
+
 int igraph_add_edges_at(igraph_t *graph, const igraph_vector_t *edges,
                 const igraph_vector_int_t *e_active,
                 const igraph_vector_int_t *e_inactive, void *attr) {
