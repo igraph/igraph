@@ -36,14 +36,19 @@
 
 #include "igraph_types.h"
 #include "igraph_vector.h"
-#include "igraph_temporal.h"
 
 __BEGIN_DECLS
 
 /* #define IGRAPH_DATA_TYPE_INDEXED_EDGE_LIST 1 */
 #define IGRAPH_DATA_TYPE_TEMPORAL_EDGE_LIST 1
 
-#ifdef IGRPAPH_DATA_TYPE_INDEXED_EDGE_LIST
+#ifdef IGRAPH_DATA_TYPE_INDEXED_EDGE_LIST
+#  define igraph_data_type_ie_t igraph_t
+#endif
+
+#ifdef IGRAPH_DATA_TYPE_TEMPORAL_EDGE_LIST
+#  define igraph_data_type_temp_t igraph_t
+#endif
 
 /**
  * \ingroup internal
@@ -81,7 +86,7 @@ __BEGIN_DECLS
  * The storage requirements for a graph with \c |V| vertices
  * and \c |E| edges is \c O(|E|+|V|).
  */
-typedef struct igraph_s {
+typedef struct {
   igraph_integer_t n;
   igraph_bool_t directed;
   igraph_vector_t from;
@@ -91,12 +96,9 @@ typedef struct igraph_s {
   igraph_vector_t os;
   igraph_vector_t is;
   void *attr;
-} igraph_t;
+} igraph_data_type_ie_t;
 
-#endif
-#ifdef IGRAPH_DATA_TYPE_TEMPORAL_EDGE_LIST
-
-typedef struct igraph_s {
+typedef struct {
   igraph_integer_t n;
   igraph_bool_t directed;
   igraph_vector_t from;
@@ -105,15 +107,13 @@ typedef struct igraph_s {
   igraph_vector_t ii;
   igraph_vector_t os;
   igraph_vector_t is;
+  void *attr;
   igraph_vector_time_t vb;
   igraph_vector_time_t eb;
   igraph_vector_time_t vd;
   igraph_vector_time_t ed;
   igraph_time_t now;
-  void *attr;
-} igraph_t;
-
-#endif /* IGRAPH_DATA_TYPE */
+} igraph_data_type_temp_t;
 
 __END_DECLS
 

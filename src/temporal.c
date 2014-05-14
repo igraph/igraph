@@ -22,52 +22,43 @@
 */
 
 #include "igraph_temporal.h"
-
-/* -------------------------------------------------- */
-/* Interface, temporal functions                      */
-/* -------------------------------------------------- */
-
-int igraph_time_next(igraph_t *graph) {
-  graph->now += 1;
-  return 0;
-}
-
-int igraph_time_prev(igraph_t *graph) {
-  if (graph->now != IGRAPH_BEGINNING) { graph->now -= 1; }
-  return 0;
-}
-
-int igraph_time_goto(igraph_t *graph, igraph_time_t at) {
-  if (at != IGRAPH_END && at < IGRAPH_BEGINNING) {
-    IGRAPH_ERROR("Invalid time step, cannot set time cursor",
-                  IGRAPH_EINVAL);
-  }
-  graph->now = at;
-  return 0;
-}
-
-int igraph_time_reset(igraph_t *graph) {
-  graph->now = IGRAPH_BEGINNING;
-}
-
-int igraph_add_edges_at(igraph_t *graph, const igraph_vector_t *edges,
-                const igraph_vector_int_t *e_active,
-                const igraph_vector_int_t *e_inactive, void *attr) {
-  /* TODO */
-}
-
-int igraph_add_vertices_at(igraph_t *graph, igraph_integer_t nv, 
-		const igraph_vector_int_t *v_active,
-                const igraph_vector_int_t *v_inacive, void *attr) {
-  /* TODO */
-}
+#include "igraph_interface.h"
 
 int igraph_create_temporal(igraph_t *graph,
                            const igraph_vector_t *edges,
                            igraph_integer_t n, igraph_bool_t directed,
-                           const igraph_vector_time_t e_active,
-                           const igraph_vector_time_t e_inactive,
-                           const igraph_vector_time_t v_active,
-                           const igraph_vector_time_t v_inactive) {
-  /* TODO */
+                           const igraph_vector_time_t *e_active,
+                           const igraph_vector_time_t *e_inactive,
+                           const igraph_vector_time_t *v_active,
+                           const igraph_vector_time_t *v_inactive) {
+
+  igraph_real_t rmin, rmax;
+  igraph_integer_t min, max;
+  igraph_integer_t no_verts=n;
+  
+  igraph_vector_minmax(edges, &rmin, &rmax);
+  min=(int) rmax;
+  max=(int) rmin;
+  
+  if (igraph_vector_size(edges) % 2 != 0) {
+    IGRAPH_ERROR("Invalid (odd) edges vector length",
+                 IGRAPH_EINVEVECTOR);
+  }
+
+  if (min < 0) {
+    IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
+  }
+  
+  if (max > no_verts) { no_verts = max; }
+  
+  IGRAPH_CHECK(igraph_empty(graph, 0, directed));
+  IGRAPH_FINALLY(igraph_destroy, graph);
+  
+  IGRAPH_CHECK(igraph_add_vertices_at(graph, no_verts, v_active,
+                                      v_inactive, /*attr=*/ 0));
+  IGRAPH_CHECK(igraph_add_edges_at(graph, edges, e_active,
+                                   e_inactive, /*attr=*/ 0));
+
+  IGRAPH_FINALLY_CLEAN(1);
+  return 0;
 }

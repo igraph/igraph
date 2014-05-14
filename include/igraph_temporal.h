@@ -40,8 +40,6 @@
 
 __BEGIN_DECLS
 
-#ifdef IGRAPH_DATA_TYPE_TEMPORAL_EDGE_LIST
-
 /**
  * \section temporal_graphs Temporal graphs
  * 
@@ -109,26 +107,6 @@ int igraph_time_goto(igraph_t *graph, igraph_time_t at);
 
 int igraph_time_reset(igraph_t *graph);
 
-/**
- * \function igraph_add_edges_at
- * Add edges to a temporal graph
- *
- * TODO
- */
-
-int igraph_add_edges_at(igraph_t *graph, const igraph_vector_t *edges,
-                const igraph_vector_int_t *e_active,
-                const igraph_vector_int_t *e_inactive, void *attr);
-
-/**
- * \function igraph_add_vertices_at
- * Add vertices to a temporal graph
- */
-                
-int igraph_add_vertices_at(igraph_t *graph, igraph_integer_t nv, 
-		const igraph_vector_int_t *v_active,
-                const igraph_vector_int_t *v_inacive, void *attr);
-
 /* ---------------------------------------------------------------- */
 
 /**
@@ -171,12 +149,11 @@ int igraph_add_vertices_at(igraph_t *graph, igraph_integer_t nv,
 int igraph_create_temporal(igraph_t *graph,
                            const igraph_vector_t *edges,
                            igraph_integer_t n, igraph_bool_t directed,
-                           const igraph_vector_time_t e_active,
-                           const igraph_vector_time_t e_inactive,
-                           const igraph_vector_time_t v_active,
-                           const igraph_vector_time_t v_inactive);
+                           const igraph_vector_time_t *e_active,
+                           const igraph_vector_time_t *e_inactive,
+                           const igraph_vector_time_t *v_active,
+                           const igraph_vector_time_t *v_inactive);
 
-#endif
 
 __END_DECLS
 

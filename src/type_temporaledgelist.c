@@ -22,9 +22,6 @@
 */
 
 #include "igraph_datatype.h"
-
-#ifdef IGRAPH_DATA_TYPE_TEMPORAL_EDGE_LIST
-
 #include "igraph_interface.h"
 #include "igraph_attributes.h"
 #include "igraph_memory.h"
@@ -33,21 +30,23 @@
 
 /* Internal functions */
 
-int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el,
-                          igraph_vector_t *index, 
-			  igraph_integer_t nodes);
+int igraph_i_create_start_temp(igraph_vector_t *res,
+                               igraph_vector_t *el,
+                               igraph_vector_t *index, 
+			       igraph_integer_t nodes);
 
 /* -------------------------------------------------- */
 /* Interface                                          */
 /* -------------------------------------------------- */
 
-int igraph_empty(igraph_t *graph, igraph_integer_t n,
-                 igraph_bool_t directed) {
-  return igraph_empty_attrs(graph, n, directed, 0);
+int igraph_empty_temp(igraph_data_type_temp_t *graph, igraph_integer_t n,
+                      igraph_bool_t directed) {
+  return igraph_empty_attrs_temp(graph, n, directed, 0);
 }
 
-int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n,
-                       igraph_bool_t directed, void *attr) {
+int igraph_empty_attrs_temp(igraph_data_type_temp_t *graph,
+			    igraph_integer_t n, igraph_bool_t directed,
+			    void *attr) {
   if (n<0) {
     IGRAPH_ERROR("cannot create empty graph with negative "
                  "number of vertices", IGRAPH_EINVAL);
@@ -70,26 +69,29 @@ int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n,
   VECTOR(graph->os)[0]=0;
   VECTOR(graph->is)[0]=0;
 
+  /* set time cursor to the end of time */
+  graph->now = IGRAPH_END;
+
   /* time labels */
-  igraph_vector_int_set_null(&graph->vb);
-  igraph_vector_int_set_null(&graph->eb);
-  igraph_vector_int_set_null(&graph->vd);
-  igraph_vector_int_set_null(&graph->ed);
+  igraph_vector_time_set_null(&graph->vb);
+  igraph_vector_time_set_null(&graph->eb);
+  igraph_vector_time_set_null(&graph->vd);
+  igraph_vector_time_set_null(&graph->ed);
 
   /* init attributes */
   graph->attr=0;
-  IGRAPH_CHECK(igraph_i_attribute_init(graph, attr));
+  IGRAPH_CHECK(igraph_i_attribute_init((igraph_t *)graph, attr));
 
   /* add the vertices */
-  IGRAPH_CHECK(igraph_add_vertices(graph, n, 0));
+  IGRAPH_CHECK(igraph_add_vertices_temp(graph, n, 0));
   
   IGRAPH_FINALLY_CLEAN(6);
   return 0;
 }
 
-int igraph_destroy(igraph_t *graph) {
+int igraph_destroy_temp(igraph_data_type_temp_t *graph) {
 
-  IGRAPH_I_ATTRIBUTE_DESTROY(graph);
+  IGRAPH_I_ATTRIBUTE_DESTROY((igraph_t *) graph);
 
   igraph_vector_destroy(&graph->from);
   igraph_vector_destroy(&graph->to);
@@ -99,16 +101,16 @@ int igraph_destroy(igraph_t *graph) {
   igraph_vector_destroy(&graph->is);
 
   /* time labels */
-  igraph_vector_int_destroy(&graph->vb);
-  igraph_vector_int_destroy(&graph->eb);
-  igraph_vector_int_destroy(&graph->vd);
-  igraph_vector_int_destroy(&graph->ed);
-  
+  igraph_vector_time_destroy(&graph->vb);
+  igraph_vector_time_destroy(&graph->eb);
+  igraph_vector_time_destroy(&graph->vd);
+  igraph_vector_time_destroy(&graph->ed);
 
   return 0;
 }
 
-int igraph_copy(igraph_t *to, const igraph_t *from) {
+int igraph_copy_temp(igraph_data_type_temp_t *to,
+		     const igraph_data_type_temp_t *from) {
   
   to->n=from->n;
   to->directed=from->directed;
@@ -125,150 +127,41 @@ int igraph_copy(igraph_t *to, const igraph_t *from) {
   IGRAPH_CHECK(igraph_vector_copy(&to->is, &from->is));
   IGRAPH_FINALLY(igraph_vector_destroy, &to->is);
 
-  IGRAPH_I_ATTRIBUTE_COPY(to, from, 1,1,1); /* does IGRAPH_CHECK */
+  IGRAPH_I_ATTRIBUTE_COPY((igraph_t *) to, (igraph_t *) from, 1,1,1);
+  /* does IGRAPH_CHECK */
 
   /* time labels */
-
-  IGRAPH_CHECK(igraph_vector_int_copy(&to->vb, &from->vb));
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &to->vb);
-  IGRAPH_CHECK(igraph_vector_int_copy(&to->eb, &from->eb));
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &to->eb);
-  IGRAPH_CHECK(igraph_vector_int_copy(&to->vd, &from->vd));
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &to->vd);
-  IGRAPH_CHECK(igraph_vector_int_copy(&to->ed, &from->ed));
-  IGRAPH_FINALLY(igraph_vector_int_destroy, &to->ed);
+  to->now = from->now;
+  IGRAPH_CHECK(igraph_vector_time_copy(&to->vb, &from->vb));
+  IGRAPH_FINALLY(igraph_vector_time_destroy, &to->vb);
+  IGRAPH_CHECK(igraph_vector_time_copy(&to->eb, &from->eb));
+  IGRAPH_FINALLY(igraph_vector_time_destroy, &to->eb);
+  IGRAPH_CHECK(igraph_vector_time_copy(&to->vd, &from->vd));
+  IGRAPH_FINALLY(igraph_vector_time_destroy, &to->vd);
+  IGRAPH_CHECK(igraph_vector_time_copy(&to->ed, &from->ed));
+  IGRAPH_FINALLY(igraph_vector_time_destroy, &to->ed);
 
   IGRAPH_FINALLY_CLEAN(10);
   return 0;
 }
 
-int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges,
-		     void *attr) {
-    long int no_of_edges=igraph_vector_size(&graph->from);
-  long int edges_to_add=igraph_vector_size(edges)/2;
-  long int i=0;
-  igraph_error_handler_t *oldhandler;
-  int ret1, ret2;
-  igraph_vector_t newoi, newii;
-  igraph_bool_t directed=igraph_is_directed(graph);
-
-  if (igraph_vector_size(edges) % 2 != 0) {
-    IGRAPH_ERROR("invalid (odd) length of edges vector",
-                 IGRAPH_EINVEVECTOR);
-  }
-  if (!igraph_vector_isininterval(edges, 0, igraph_vcount(graph)-1)) {
-    IGRAPH_ERROR("cannot add edges", IGRAPH_EINVVID);
-  }
-
-  /* from & to */
-  IGRAPH_CHECK(igraph_vector_reserve(&graph->from,
-                                     no_of_edges+edges_to_add));
-  IGRAPH_CHECK(igraph_vector_reserve(&graph->to,
-                                     no_of_edges+edges_to_add));
-
-  while (i<edges_to_add*2) {
-    if (directed || VECTOR(*edges)[i] > VECTOR(*edges)[i+1]) {
-      igraph_vector_push_back(&graph->from,
-                              VECTOR(*edges)[i++]); /* reserved */
-      igraph_vector_push_back(&graph->to,
-                              VECTOR(*edges)[i++]); /* reserved */
-    } else {
-      igraph_vector_push_back(&graph->to,
-                              VECTOR(*edges)[i++]); /* reserved */
-      igraph_vector_push_back(&graph->from,
-                              VECTOR(*edges)[i++]); /* reserved */
-    }      
-  }
-
-  /* disable the error handler temporarily */
-  oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
-    
-  /* oi & ii */
-  ret1=igraph_vector_init(&newoi, no_of_edges);
-  ret2=igraph_vector_init(&newii, no_of_edges);
-  if (ret1 != 0 || ret2 != 0) {
-    igraph_vector_resize(&graph->from, no_of_edges); /* gets smaller */
-    igraph_vector_resize(&graph->to, no_of_edges);   /* gets smaller */
-    igraph_set_error_handler(oldhandler);
-    IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
-  }  
-  ret1=igraph_vector_order(&graph->from, &graph->to, &newoi, graph->n);
-  ret2=igraph_vector_order(&graph->to  , &graph->from, &newii,
-                           graph->n);
-  if (ret1 != 0 || ret2 != 0) {
-    igraph_vector_resize(&graph->from, no_of_edges);
-    igraph_vector_resize(&graph->to, no_of_edges);
-    igraph_vector_destroy(&newoi);
-    igraph_vector_destroy(&newii);
-    igraph_set_error_handler(oldhandler);
-    IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
-  }  
-
-  /* Attributes */
-  if (graph->attr) { 
-    igraph_set_error_handler(oldhandler);
-    ret1=igraph_i_attribute_add_edges(graph, edges, attr);
-    igraph_set_error_handler(igraph_error_handler_ignore);
-    if (ret1 != 0) {
-      igraph_vector_resize(&graph->from, no_of_edges);
-      igraph_vector_resize(&graph->to, no_of_edges);
-      igraph_vector_destroy(&newoi);
-      igraph_vector_destroy(&newii);
-      igraph_set_error_handler(oldhandler);
-      IGRAPH_ERROR("cannot add edges", ret1);
-    }  
-  }
-  
-  /* os & is, its length does not change, error safe */
-  igraph_i_create_start(&graph->os, &graph->from, &newoi, graph->n);
-  igraph_i_create_start(&graph->is, &graph->to  , &newii, graph->n);
-
-  /* TODO: time labels */
-
-  /* everything went fine  */
-  igraph_vector_destroy(&graph->oi);
-  igraph_vector_destroy(&graph->ii);
-  graph->oi=newoi;
-  graph->ii=newii;
-  igraph_set_error_handler(oldhandler);
-  
-  return 0;
+int igraph_add_edges_temp(igraph_data_type_temp_t *graph,
+			  const igraph_vector_t *edges, void *attr) {
+                             
+  return igraph_add_edges_at((igraph_t *) graph, edges, /*e_active=*/ 0,
+			     /*v_active=*/ 0, attr);  
 }
 
-int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, 
-			void *attr) {
-  long int ec=igraph_ecount(graph);
-  long int i;
-
-  if (nv < 0) {
-    IGRAPH_ERROR("cannot add negative number of vertices",
-                 IGRAPH_EINVAL);
-  }
-
-  IGRAPH_CHECK(igraph_vector_reserve(&graph->os, graph->n+nv+1));
-  IGRAPH_CHECK(igraph_vector_reserve(&graph->is, graph->n+nv+1));
-  
-  igraph_vector_resize(&graph->os, graph->n+nv+1); /* reserved */
-  igraph_vector_resize(&graph->is, graph->n+nv+1); /* reserved */
-  for (i=graph->n+1; i<graph->n+nv+1; i++) {
-    VECTOR(graph->os)[i]=ec;
-    VECTOR(graph->is)[i]=ec;
-  }
-  
-  graph->n += nv;   
-  
-  if (graph->attr) {
-    IGRAPH_CHECK(igraph_i_attribute_add_vertices(graph, nv, attr));
-  }
-
-  /* TODO: time labels */
-
-  return 0;
+int igraph_add_vertices_temp(igraph_data_type_temp_t *graph,
+			     igraph_integer_t nv, void *attr) {
+  return igraph_add_vertices_at((igraph_t *) graph, nv, /*v_active=*/ 0,
+				/*v_inactive=*/ 0, attr);
 }
 
-int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
-  long int no_of_edges=igraph_ecount(graph);
-  long int no_of_nodes=igraph_vcount(graph);
+int igraph_delete_edges_temp(igraph_data_type_temp_t *graph,
+			     igraph_es_t edges) {
+  long int no_of_edges=igraph_ecount_temp(graph);
+  long int no_of_nodes=igraph_vcount_temp(graph);
   long int edges_to_remove=0;
   long int remaining_edges;
   igraph_eit_t eit;
@@ -284,7 +177,7 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
   }
   IGRAPH_FINALLY(igraph_free, mark);
 
-  IGRAPH_CHECK(igraph_eit_create(graph, edges, &eit));
+  IGRAPH_CHECK(igraph_eit_create((igraph_t *) graph, edges, &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
   for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit);
@@ -332,7 +225,9 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
 	VECTOR(idx)[j++] = i;
       }
     }
-    IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, graph, &idx));
+    IGRAPH_CHECK(igraph_i_attribute_permute_edges((igraph_t *) graph,
+						  (igraph_t *) graph,
+						  &idx));
     igraph_vector_destroy(&idx);
     IGRAPH_FINALLY_CLEAN(1);
   }
@@ -350,10 +245,10 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
   IGRAPH_FINALLY_CLEAN(1);
   
   /* Create start vectors, no memory is needed for this */
-  igraph_i_create_start(&graph->os, &graph->from, &graph->oi, 
-			(igraph_integer_t) no_of_nodes);
-  igraph_i_create_start(&graph->is, &graph->to,   &graph->ii, 
-			(igraph_integer_t) no_of_nodes);
+  igraph_i_create_start_temp(&graph->os, &graph->from, &graph->oi, 
+			     (igraph_integer_t) no_of_nodes);
+  igraph_i_create_start_temp(&graph->is, &graph->to,   &graph->ii, 
+			     (igraph_integer_t) no_of_nodes);
   
   /* TODO: time labels */
 
@@ -361,22 +256,22 @@ int igraph_delete_edges(igraph_t *graph, igraph_es_t edges) {
   return 0;
 }
 
-int igraph_delete_vertices(igraph_t *graph,
-                           const igraph_vs_t vertices) {
-  return igraph_delete_vertices_idx(graph, vertices, /* idx= */ 0, 
-				    /* invidx= */ 0);
+int igraph_delete_vertices_temp(igraph_data_type_temp_t *graph,
+				const igraph_vs_t vertices) {
+  return igraph_delete_vertices_idx_temp(graph, vertices, /* idx= */ 0, 
+					 /* invidx= */ 0);
 }
 
-int igraph_delete_vertices_idx(igraph_t *graph,
-                               const igraph_vs_t vertices, 
-			       igraph_vector_t *idx, 
-			       igraph_vector_t *invidx) {
-  long int no_of_edges=igraph_ecount(graph);
-  long int no_of_nodes=igraph_vcount(graph);
+int igraph_delete_vertices_idx_temp(igraph_data_type_temp_t *graph,
+				    const igraph_vs_t vertices, 
+				    igraph_vector_t *idx, 
+				    igraph_vector_t *invidx) {
+  long int no_of_edges=igraph_ecount_temp(graph);
+  long int no_of_nodes=igraph_vcount_temp(graph);
   igraph_vector_t edge_recoding, vertex_recoding;
   igraph_vector_t *my_vertex_recoding=&vertex_recoding;
   igraph_vit_t vit;
-  igraph_t newgraph = *graph;
+  igraph_data_type_temp_t newgraph = *graph;
   long int i, j;
   long int remaining_vertices, remaining_edges;
 
@@ -390,7 +285,7 @@ int igraph_delete_vertices_idx(igraph_t *graph,
 
   IGRAPH_VECTOR_INIT_FINALLY(&edge_recoding, no_of_edges);
  
-  IGRAPH_CHECK(igraph_vit_create(graph, vertices, &vit));
+  IGRAPH_CHECK(igraph_vit_create((igraph_t *) graph, vertices, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
   
   /* mark the vertices to delete */
@@ -450,15 +345,15 @@ int igraph_delete_vertices_idx(igraph_t *graph,
                                    &newgraph.ii, 
 				   remaining_vertices));  
 
-  IGRAPH_CHECK(igraph_i_create_start(&newgraph.os, &newgraph.from, 
-				     &newgraph.oi, (igraph_integer_t) 
-				     remaining_vertices));
-  IGRAPH_CHECK(igraph_i_create_start(&newgraph.is, &newgraph.to,
-				     &newgraph.ii, (igraph_integer_t) 
-				     remaining_vertices));
+  IGRAPH_CHECK(igraph_i_create_start_temp(&newgraph.os, &newgraph.from, 
+					  &newgraph.oi, (igraph_integer_t) 
+					  remaining_vertices));
+  IGRAPH_CHECK(igraph_i_create_start_temp(&newgraph.is, &newgraph.to,
+					  &newgraph.ii, (igraph_integer_t) 
+					  remaining_vertices));
   
   /* attributes */
-  IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 
+  IGRAPH_I_ATTRIBUTE_COPY((igraph_t *) &newgraph, (igraph_t *) graph, 
 			  /*graph=*/ 1, /*vertex=*/0, /*edge=*/0);
   IGRAPH_FINALLY_CLEAN(6);
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
@@ -472,8 +367,8 @@ int igraph_delete_vertices_idx(igraph_t *graph,
 	VECTOR(iidx)[ jj-1 ] = i;
       }
     }
-    IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph,
-						     &newgraph,
+    IGRAPH_CHECK(igraph_i_attribute_permute_vertices((igraph_t *) graph,
+						     (igraph_t *) &newgraph,
 						     &iidx));
     IGRAPH_CHECK(igraph_vector_resize(&iidx, remaining_edges));
     for (i=0; i<no_of_edges; i++) {
@@ -482,7 +377,8 @@ int igraph_delete_vertices_idx(igraph_t *graph,
 	VECTOR(iidx)[ jj-1 ] = i;
       }
     }
-    IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, &newgraph,
+    IGRAPH_CHECK(igraph_i_attribute_permute_edges((igraph_t *) graph,
+						  (igraph_t *) &newgraph,
                                                   &iidx));
     igraph_vector_destroy(&iidx);
     IGRAPH_FINALLY_CLEAN(1);
@@ -490,7 +386,7 @@ int igraph_delete_vertices_idx(igraph_t *graph,
 	       
   igraph_vit_destroy(&vit);
   igraph_vector_destroy(&edge_recoding);
-  igraph_destroy(graph);
+  igraph_destroy((igraph_t *) graph);
   *graph=newgraph;
 
   IGRAPH_FINALLY_CLEAN(3);  
@@ -516,23 +412,28 @@ int igraph_delete_vertices_idx(igraph_t *graph,
   return 0;
 }
 
-igraph_integer_t igraph_vcount(const igraph_t *graph) {
+igraph_integer_t igraph_vcount_temp(const igraph_data_type_temp_t *graph) {
+  /* TODO: time labels */
   return graph->n;
 }
 
-igraph_integer_t igraph_ecount(const igraph_t *graph) {
+igraph_integer_t igraph_ecount_temp(const igraph_data_type_temp_t *graph) {
+  /* TODO: time labels */
   return (igraph_integer_t) igraph_vector_size(&graph->from);
 }
 
-int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis,
-                     igraph_integer_t pnode, 
-		     igraph_neimode_t mode) {
+int igraph_neighbors_temp(const igraph_data_type_temp_t *graph,
+			  igraph_vector_t *neis, igraph_integer_t pnode, 
+			  igraph_neimode_t mode) {
+
+  /* TODO: time labels */
+
   long int length=0, idx=0;   
   long int i, j;
 
   long int node=pnode;
 
-  if (node<0 || node>igraph_vcount(graph)-1) {
+  if (node<0 || node>igraph_vcount_temp(graph)-1) {
     IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
@@ -555,7 +456,7 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis,
   
   IGRAPH_CHECK(igraph_vector_resize(neis, length));
   
-  if (!igraph_is_directed(graph) || mode != IGRAPH_ALL) {
+  if (!igraph_is_directed_temp(graph) || mode != IGRAPH_ALL) {
 
     if (mode & IGRAPH_OUT) {
       j=(long int) VECTOR(graph->os)[node+1];
@@ -613,18 +514,20 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis,
   return 0;
 }
 
-igraph_bool_t igraph_is_directed(const igraph_t *graph) {
+igraph_bool_t 
+igraph_is_directed_temp(const igraph_data_type_temp_t *graph) {
   return graph->directed;
 }
 
-int igraph_degree(const igraph_t *graph, igraph_vector_t *res, 
-		  const igraph_vs_t vids, igraph_neimode_t mode, 
-		  igraph_bool_t loops)  {
+int igraph_degree_temp(const igraph_data_type_temp_t *graph,
+		       igraph_vector_t *res, const igraph_vs_t vids,
+		       igraph_neimode_t mode, igraph_bool_t loops)  {
+  /* TODO: time labels */
   long int nodes_to_calc;
   long int i, j;
   igraph_vit_t vit;
 
-  IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+  IGRAPH_CHECK(igraph_vit_create((igraph_t *) graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
@@ -632,7 +535,7 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
   }
   
   nodes_to_calc=IGRAPH_VIT_SIZE(vit);
-  if (!igraph_is_directed(graph)) {
+  if (!igraph_is_directed_temp(graph)) {
     mode=IGRAPH_ALL;
   }
 
@@ -699,12 +602,16 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
-int igraph_edge(const igraph_t *graph, igraph_integer_t eid, 
-		igraph_integer_t *from, igraph_integer_t *to) {
+int igraph_edge_temp(const igraph_data_type_temp_t *graph,
+		     igraph_integer_t eid, igraph_integer_t *from,
+		     igraph_integer_t *to) {
+                        
   *from = (igraph_integer_t) VECTOR(graph->from)[(long int)eid];
   *to   = (igraph_integer_t) VECTOR(graph->to  )[(long int)eid];
   
-  if (! igraph_is_directed(graph) && *from > *to) {
+  /* TODO: time labels */
+  
+  if (! igraph_is_directed((igraph_t *) graph) && *from > *to) {
     igraph_integer_t tmp=*from;
     *from=*to;
     *to=tmp;
@@ -713,13 +620,15 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
   return 0;
 }
 
-int igraph_edges(const igraph_t *graph, igraph_es_t eids,
-		 igraph_vector_t *edges) {
+int igraph_edges_temp(const igraph_data_type_temp_t *graph,
+		      igraph_es_t eids, igraph_vector_t *edges) {
+
+  /* TODO: time labels */
     
   igraph_eit_t eit;
   long int n, ptr=0;
 
-  IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
+  IGRAPH_CHECK(igraph_eit_create((igraph_t *) graph, eids, &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
   n=IGRAPH_EIT_SIZE(eit);
   IGRAPH_CHECK(igraph_vector_resize(edges, n*2));
@@ -748,17 +657,17 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
   if ((start)<(N)) {                                        \
     long int e=(long int) VECTOR((iindex))[(start)];        \
     if (VECTOR((edgelist))[e] == (value)) {                 \
-      *(pos)=(igraph_integer_t) e;			  \
+      *(pos)=(igraph_integer_t) e;			    \
     }                                                       \
   } } while(0)
 
 #define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid)                     \
   do {                                                              \
-    long int start=(long int) VECTOR(graph->os)[xfrom];	     \
-    long int end=(long int) VECTOR(graph->os)[xfrom+1];	     \
+    long int start=(long int) VECTOR(graph->os)[xfrom];		    \
+    long int end=(long int) VECTOR(graph->os)[xfrom+1];		    \
     long int N=end;                                                 \
-    long int start2=(long int) VECTOR(graph->is)[xto];	      \
-    long int end2=(long int) VECTOR(graph->is)[xto+1];	      \
+    long int start2=(long int) VECTOR(graph->is)[xto];		    \
+    long int end2=(long int) VECTOR(graph->is)[xto+1];		    \
     long int N2=end2;                                               \
     if (end-start<end2-start2) {                                    \
       BINSEARCH(start,end,xto,graph->oi,graph->to,N,eid);           \
@@ -774,18 +683,21 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
     FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid);                      \
   } while (0)
 
-int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
-		   igraph_integer_t pfrom, igraph_integer_t pto,
-		   igraph_bool_t directed, igraph_bool_t error) {
+int igraph_get_eid_temp(const igraph_data_type_temp_t *graph,
+			igraph_integer_t *eid, igraph_integer_t pfrom,
+			igraph_integer_t pto, igraph_bool_t directed,
+			igraph_bool_t error) {
   long int from=pfrom, to=pto;
-  long int nov=igraph_vcount(graph);
+  long int nov=igraph_vcount_temp(graph);
+
+  /* TODO: time labels */
 
   if (from < 0 || to < 0 || from > nov-1 || to > nov-1) {
     IGRAPH_ERROR("cannot get edge id", IGRAPH_EINVVID);
   }
 
   *eid=-1;
-  if (igraph_is_directed(graph)) {
+  if (igraph_is_directed((igraph_t *) graph)) {
 
     /* Directed graph */
     FIND_DIRECTED_EDGE(graph,from,to,eid);
@@ -809,22 +721,30 @@ int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
   return IGRAPH_SUCCESS;  
 }
 
-int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
-			  const igraph_vector_t *pairs, 
-			  igraph_bool_t directed, igraph_bool_t error);
+int igraph_get_eids_pairs_temp(const igraph_data_type_temp_t *graph,
+			       igraph_vector_t *eids,
+			       const igraph_vector_t *pairs,
+			       igraph_bool_t directed,
+			       igraph_bool_t error);
 
-int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
-			 const igraph_vector_t *path, 
-			 igraph_bool_t directed, igraph_bool_t error);
+int igraph_get_eids_path_temp(const igraph_data_type_temp_t *graph,
+			      igraph_vector_t *eids,
+			      const igraph_vector_t *path,
+			      igraph_bool_t directed,
+			      igraph_bool_t error);
 
-int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
-			  const igraph_vector_t *pairs, 
-			  igraph_bool_t directed, igraph_bool_t error) {
+int igraph_get_eids_pairs_temp(const igraph_data_type_temp_t *graph,
+			       igraph_vector_t *eids,
+			       const igraph_vector_t *pairs, 
+			       igraph_bool_t directed,
+			       igraph_bool_t error) {
   long int n=igraph_vector_size(pairs);
-  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_nodes=igraph_vcount_temp(graph);
   long int i;
   igraph_integer_t eid=-1;
     
+  /* TODO: time labels */
+
   if (n % 2 != 0) {
     IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
 		 IGRAPH_EINVAL);
@@ -836,7 +756,7 @@ int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
 
   IGRAPH_CHECK(igraph_vector_resize(eids, n/2));
   
-  if (igraph_is_directed(graph)) {
+  if (igraph_is_directed((igraph_t *) graph)) {
     for (i=0; i<n/2; i++) {
       long int from=(long int) VECTOR(*pairs)[2*i];
       long int to=(long int) VECTOR(*pairs)[2*i+1];
@@ -869,12 +789,16 @@ int igraph_get_eids_pairs(const igraph_t *graph, igraph_vector_t *eids,
   return 0;
 }
 
-int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
-			 const igraph_vector_t *path, 
-			 igraph_bool_t directed, igraph_bool_t error) {
+int igraph_get_eids_path_temp(const igraph_data_type_temp_t *graph,
+			      igraph_vector_t *eids,
+			      const igraph_vector_t *path, 
+			      igraph_bool_t directed,
+			      igraph_bool_t error) {
+
+  /* TODO: time labels */
 
   long int n=igraph_vector_size(path);
-  long int no_of_nodes=igraph_vcount(graph);
+  long int no_of_nodes=igraph_vcount_temp(graph);
   long int i;
   igraph_integer_t eid=-1;
 
@@ -885,7 +809,7 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
   
   IGRAPH_CHECK(igraph_vector_resize(eids, n==0 ? 0 : n-1));
   
-  if (igraph_is_directed(graph)) {
+  if (igraph_is_directed((igraph_t *) graph)) {
     for (i=0; i<n-1; i++) {
       long int from=(long int) VECTOR(*path)[i];
       long int to=(long int) VECTOR(*path)[i+1];
@@ -918,26 +842,29 @@ int igraph_get_eids_path(const igraph_t *graph, igraph_vector_t *eids,
   return 0;
 }
 
-int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
-                    const igraph_vector_t *pairs,
-		    const igraph_vector_t *path,
-	    igraph_bool_t directed, igraph_bool_t error) {
+int igraph_get_eids_temp(const igraph_data_type_temp_t *graph,
+			 igraph_vector_t *eids,
+			 const igraph_vector_t *pairs,
+			 const igraph_vector_t *path,
+			 igraph_bool_t directed, igraph_bool_t error) {
+
+  /* TODO: time labels */
 
   if (!pairs && !path) {
     igraph_vector_clear(eids);
     return 0;
   } else if (pairs && !path) {
-    return igraph_get_eids_pairs(graph, eids, pairs, directed, error);
+    return igraph_get_eids_pairs_temp(graph, eids, pairs, directed, error);
   } else if (!pairs && path) { 
-    return igraph_get_eids_path(graph, eids, path, directed, error);
+    return igraph_get_eids_path_temp(graph, eids, path, directed, error);
   } else {
     /* both */
     igraph_vector_t tmp;
     IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
-    IGRAPH_CHECK(igraph_get_eids_pairs(graph, eids, pairs, directed,
-                                       error));
-    IGRAPH_CHECK(igraph_get_eids_path(graph, &tmp, path, directed,
-                                      error));
+    IGRAPH_CHECK(igraph_get_eids_pairs_temp(graph, eids, pairs, directed,
+					    error));
+    IGRAPH_CHECK(igraph_get_eids_path_temp(graph, &tmp, path, directed,
+					   error));
     IGRAPH_CHECK(igraph_vector_append(eids, &tmp));
     igraph_vector_destroy(&tmp);
     IGRAPH_FINALLY_CLEAN(1);
@@ -961,66 +888,68 @@ int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
     }                                                            \
   }                                                              \
   if ((start)<(N)) {                                             \
-    long int e=(long int) VECTOR((iindex))[(start)];	     \
+    long int e=(long int) VECTOR((iindex))[(start)];		 \
     while ((start)<(N) && seen[e] &&                             \
-           VECTOR(edgelist)[e] == (value)) {	             \
+           VECTOR(edgelist)[e] == (value)) {			 \
       (start)++;					         \
-      e=(long int) VECTOR(iindex)[(start)];		      \
-    }				                            \
+      e=(long int) VECTOR(iindex)[(start)];			 \
+    }								 \
     if ((start)<(N) && !(seen[e]) &&                             \
-        VECTOR(edgelist)[e] == (value)) {	                \
-      *(pos)=(igraph_integer_t) e;			       \
+        VECTOR(edgelist)[e] == (value)) {			 \
+      *(pos)=(igraph_integer_t) e;				 \
     }                                                            \
   } } while(0)
 
-#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid,seen)	          \
+#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid,seen)		      \
   do {                                                                \
     long int start=(long int) VECTOR(graph->os)[xfrom];               \
     long int end=(long int) VECTOR(graph->os)[xfrom+1];               \
     long int N=end;                                                   \
-    long int start2=(long int) VECTOR(graph->is)[xto];	        \
-    long int end2=(long int) VECTOR(graph->is)[xto+1];	        \
+    long int start2=(long int) VECTOR(graph->is)[xto];		      \
+    long int end2=(long int) VECTOR(graph->is)[xto+1];	              \
     long int N2=end2;                                                 \
     if (end-start<end2-start2) {                                      \
-      BINSEARCH(start,end,xto,graph->oi,graph->to,N,eid,seen);	\
+      BINSEARCH(start,end,xto,graph->oi,graph->to,N,eid,seen);	      \
     } else {                                                          \
       BINSEARCH(start2,end2,xfrom,graph->ii,graph->from,N2,eid,seen); \
     }                                                                 \
   } while (0)
 
-#define FIND_UNDIRECTED_EDGE(graph,from,to,eid,seen)		  \
+#define FIND_UNDIRECTED_EDGE(graph,from,to,eid,seen)		      \
   do {                                                                \
     long int xfrom1= from > to ? from : to;                           \
     long int xto1= from > to ? to : from;                             \
-    FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid,seen);		   \
+    FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid,seen);		      \
   } while (0)
 
 
-int igraph_get_eids_multipairs(const igraph_t *graph,
-                               igraph_vector_t *eids,
-			       const igraph_vector_t *pairs, 
-			       igraph_bool_t directed,
-                               igraph_bool_t error);
+int igraph_get_eids_multipairs_temp(const igraph_data_type_temp_t *graph,
+				    igraph_vector_t *eids,
+				    const igraph_vector_t *pairs, 
+				    igraph_bool_t directed,
+				    igraph_bool_t error);
 
-int igraph_get_eids_multipath(const igraph_t *graph,
-                              igraph_vector_t *eids,
-			      const igraph_vector_t *path, 
-			      igraph_bool_t directed,
-                              igraph_bool_t error);
+int igraph_get_eids_multipath_temp(const igraph_data_type_temp_t *graph,
+				   igraph_vector_t *eids,
+				   const igraph_vector_t *path, 
+				   igraph_bool_t directed,
+				   igraph_bool_t error);
 
-int igraph_get_eids_multipairs(const igraph_t *graph,
-                               igraph_vector_t *eids,
-			       const igraph_vector_t *pairs, 
-			       igraph_bool_t directed, 
-                               igraph_bool_t error) {
+int igraph_get_eids_multipairs_temp(const igraph_data_type_temp_t *graph,
+				    igraph_vector_t *eids,
+				    const igraph_vector_t *pairs, 
+				    igraph_bool_t directed, 
+				    igraph_bool_t error) {
 
   long int n=igraph_vector_size(pairs);
-  long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  long int no_of_nodes=igraph_vcount_temp(graph);
+  long int no_of_edges=igraph_ecount_temp(graph);
   igraph_bool_t *seen;
   long int i;
   igraph_integer_t eid=-1;
-    
+
+  /* TODO: time labels */
+
   if (n % 2 != 0) {
     IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
 		 IGRAPH_EINVAL);
@@ -1037,7 +966,7 @@ int igraph_get_eids_multipairs(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_free, seen);
   IGRAPH_CHECK(igraph_vector_resize(eids, n/2));
   
-  if (igraph_is_directed(graph)) {
+  if (igraph_is_directed((igraph_t *) graph)) {
     for (i=0; i<n/2; i++) {
       long int from=(long int) VECTOR(*pairs)[2*i];
       long int to=(long int) VECTOR(*pairs)[2*i+1];
@@ -1076,15 +1005,17 @@ int igraph_get_eids_multipairs(const igraph_t *graph,
   return 0;
 }
 
-int igraph_get_eids_multipath(const igraph_t *graph, 
-                              igraph_vector_t *eids,
-			      const igraph_vector_t *path, 
-			      igraph_bool_t directed,
-                              igraph_bool_t error) {
+int igraph_get_eids_multipath_temp(const igraph_data_type_temp_t *graph, 
+				   igraph_vector_t *eids,
+				   const igraph_vector_t *path, 
+				   igraph_bool_t directed,
+				   igraph_bool_t error) {
+
+  /* TODO: time labels */
   
   long int n=igraph_vector_size(path);
-  long int no_of_nodes=igraph_vcount(graph);
-  long int no_of_edges=igraph_ecount(graph);
+  long int no_of_nodes=igraph_vcount_temp(graph);
+  long int no_of_edges=igraph_ecount_temp(graph);
   igraph_bool_t *seen;
   long int i;
   igraph_integer_t eid=-1;
@@ -1101,7 +1032,7 @@ int igraph_get_eids_multipath(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_free, seen);
   IGRAPH_CHECK(igraph_vector_resize(eids, n==0 ? 0 : n-1));
   
-  if (igraph_is_directed(graph)) {
+  if (igraph_is_directed((igraph_t *) graph)) {
     for (i=0; i<n-1; i++) {
       long int from=(long int) VECTOR(*path)[i];
       long int to=(long int) VECTOR(*path)[i+1];
@@ -1144,40 +1075,47 @@ int igraph_get_eids_multipath(const igraph_t *graph,
 #undef FIND_DIRECTED_EDGE
 #undef FIND_UNDIRECTED_EDGE
 
-int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
-			  const igraph_vector_t *pairs, 
-			  const igraph_vector_t *path,
-			  igraph_bool_t directed, igraph_bool_t error) {
+int igraph_get_eids_multi_temp(const igraph_data_type_temp_t *graph,
+			       igraph_vector_t *eids,
+			       const igraph_vector_t *pairs, 
+			       const igraph_vector_t *path,
+			       igraph_bool_t directed,
+			       igraph_bool_t error) {
+
+  /* TODO: time labels */
+
   if (!pairs && !path) {
     igraph_vector_clear(eids);
     return 0;
   } else if (pairs && !path) {
-    return igraph_get_eids_multipairs(graph, eids, pairs, directed,
-                                      error);
+    return igraph_get_eids_multipairs_temp(graph, eids, pairs, directed,
+					   error);
   } else if (!pairs && path) {
-    return igraph_get_eids_multipath(graph, eids, path, directed,
-                                     error);
+    return igraph_get_eids_multipath_temp(graph, eids, path, directed,
+					  error);
   } else { /* both */
     IGRAPH_ERROR("Give `pairs' or `path' but not both", IGRAPH_EINVAL);
   }
 }
 
-int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids,
-                    igraph_integer_t pnode,
-		    igraph_neimode_t mode) {
+int igraph_adjacent_temp(const igraph_data_type_temp_t *graph,
+			 igraph_vector_t *eids, igraph_integer_t pnode,
+			 igraph_neimode_t mode) {
   IGRAPH_WARNING("igraph_adjacent is deprecated, use igraph_incident");
-  return igraph_incident(graph, eids, pnode, mode);  
+  return igraph_incident((igraph_t *) graph, eids, pnode, mode);  
 }
 
-int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
-                    igraph_integer_t pnode,
-		    igraph_neimode_t mode) {
+ int igraph_incident_temp(const igraph_data_type_temp_t *graph,
+			  igraph_vector_t *eids, igraph_integer_t pnode,
+			  igraph_neimode_t mode) {
   long int length=0, idx=0;   
   long int i, j;
 
   long int node=pnode;
 
-  if (node<0 || node>igraph_vcount(graph)-1) {
+  /* TODO: time labels */
+
+  if (node<0 || node>igraph_vcount_temp(graph)-1) {
     IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
@@ -1215,14 +1153,202 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
 
   return 0;
 }
-                    
+
+/* -------------------------------------------------- */
+/* Interface, temporal functions                      */
+/* -------------------------------------------------- */
+
+int igraph_data_type_temp_time_next(igraph_data_type_temp_t *graph) {
+  graph->now += 1;
+  return 0;
+}
+
+int igraph_data_type_temp_time_prev(igraph_data_type_temp_t *graph) {
+  if (graph->now != IGRAPH_BEGINNING) { graph->now -= 1; }
+  return 0;
+}
+
+int igraph_data_type_temp_time_goto(igraph_data_type_temp_t *graph,
+				    igraph_time_t at) {
+  if (at != IGRAPH_END && at < IGRAPH_BEGINNING) {
+    IGRAPH_ERROR("Invalid time step, cannot set time cursor",
+                  IGRAPH_EINVAL);
+  }
+  graph->now = at;
+  return 0;
+}
+
+int igraph_data_type_temp_time_reset(igraph_data_type_temp_t *graph) {
+  graph->now = IGRAPH_BEGINNING;
+  return 0;
+}
+
+int igraph_add_edges_temp_at(igraph_data_type_temp_t *graph,
+			     const igraph_vector_t *edges,
+			     const igraph_vector_time_t *e_active,
+			     const igraph_vector_time_t *e_inactive,
+			     void *attr) {
+  long int no_of_edges=igraph_vector_size(&graph->from);
+  long int edges_to_add=igraph_vector_size(edges)/2;
+  long int i=0;
+  igraph_error_handler_t *oldhandler;
+  int ret1, ret2;
+  igraph_vector_t newoi, newii;
+  igraph_bool_t directed=igraph_is_directed((igraph_t *) graph);
+
+  if (igraph_vector_size(edges) % 2 != 0) {
+    IGRAPH_ERROR("invalid (odd) length of edges vector",
+                 IGRAPH_EINVEVECTOR);
+  }
+  if (!igraph_vector_isininterval(edges, 0,
+				  igraph_vcount_temp(graph)-1)) {
+    IGRAPH_ERROR("cannot add edges", IGRAPH_EINVVID);
+  }
+
+  /* from & to */
+  IGRAPH_CHECK(igraph_vector_reserve(&graph->from,
+                                     no_of_edges+edges_to_add));
+  IGRAPH_CHECK(igraph_vector_reserve(&graph->to,
+                                     no_of_edges+edges_to_add));
+
+  while (i<edges_to_add*2) {
+    if (directed || VECTOR(*edges)[i] > VECTOR(*edges)[i+1]) {
+      igraph_vector_push_back(&graph->from,
+                              VECTOR(*edges)[i++]); /* reserved */
+      igraph_vector_push_back(&graph->to,
+                              VECTOR(*edges)[i++]); /* reserved */
+    } else {
+      igraph_vector_push_back(&graph->to,
+                              VECTOR(*edges)[i++]); /* reserved */
+      igraph_vector_push_back(&graph->from,
+                              VECTOR(*edges)[i++]); /* reserved */
+    }      
+  }
+
+  /* disable the error handler temporarily */
+  oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
+    
+  /* oi & ii */
+  ret1=igraph_vector_init(&newoi, no_of_edges);
+  ret2=igraph_vector_init(&newii, no_of_edges);
+  if (ret1 != 0 || ret2 != 0) {
+    igraph_vector_resize(&graph->from, no_of_edges); /* gets smaller */
+    igraph_vector_resize(&graph->to, no_of_edges);   /* gets smaller */
+    igraph_set_error_handler(oldhandler);
+    IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
+  }  
+  ret1=igraph_vector_order(&graph->from, &graph->to, &newoi, graph->n);
+  ret2=igraph_vector_order(&graph->to  , &graph->from, &newii,
+                           graph->n);
+  if (ret1 != 0 || ret2 != 0) {
+    igraph_vector_resize(&graph->from, no_of_edges);
+    igraph_vector_resize(&graph->to, no_of_edges);
+    igraph_vector_destroy(&newoi);
+    igraph_vector_destroy(&newii);
+    igraph_set_error_handler(oldhandler);
+    IGRAPH_ERROR("cannot add edges", IGRAPH_ERROR_SELECT_2(ret1, ret2));
+  }  
+
+  /* Attributes */
+  if (graph->attr) { 
+    igraph_set_error_handler(oldhandler);
+    ret1=igraph_i_attribute_add_edges((igraph_t *) graph, edges, attr);
+    igraph_set_error_handler(igraph_error_handler_ignore);
+    if (ret1 != 0) {
+      igraph_vector_resize(&graph->from, no_of_edges);
+      igraph_vector_resize(&graph->to, no_of_edges);
+      igraph_vector_destroy(&newoi);
+      igraph_vector_destroy(&newii);
+      igraph_set_error_handler(oldhandler);
+      IGRAPH_ERROR("cannot add edges", ret1);
+    }  
+  }
+  
+  /* os & is, its length does not change, error safe */
+  igraph_i_create_start_temp(&graph->os, &graph->from, &newoi, graph->n);
+  igraph_i_create_start_temp(&graph->is, &graph->to  , &newii, graph->n);
+
+  /* TODO: time labels */
+
+  /* everything went fine  */
+  igraph_vector_destroy(&graph->oi);
+  igraph_vector_destroy(&graph->ii);
+  graph->oi=newoi;
+  graph->ii=newii;
+  igraph_set_error_handler(oldhandler);
+
+  return 0;
+}
+
+int igraph_add_vertices_temp_at(igraph_data_type_temp_t *graph,
+				igraph_integer_t nv, 
+				const igraph_vector_time_t *v_active,
+				const igraph_vector_time_t *v_inactive,
+				void *attr) {
+
+  long int ec=igraph_ecount_temp(graph);
+  long int i;
+
+  if (nv < 0) {
+    IGRAPH_ERROR("cannot add negative number of vertices",
+                 IGRAPH_EINVAL);
+  }
+  if (v_active && nv != igraph_vector_time_size(v_active)) {
+    IGRAPH_ERROR("cannot add vertices, invalid activation vector size",
+                 IGRAPH_EINVAL);
+  }
+  if (v_inactive && nv != igraph_vector_time_size(v_inactive)) {
+    IGRAPH_ERROR("cannot add vertices, invalid inactivation "
+                 "vector size", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_vector_reserve(&graph->os, graph->n+nv+1));
+  IGRAPH_CHECK(igraph_vector_reserve(&graph->is, graph->n+nv+1));
+  
+  igraph_vector_resize(&graph->os, graph->n+nv+1); /* reserved */
+  igraph_vector_resize(&graph->is, graph->n+nv+1); /* reserved */
+  for (i=graph->n+1; i<graph->n+nv+1; i++) {
+    VECTOR(graph->os)[i]=ec;
+    VECTOR(graph->is)[i]=ec;
+  }
+  
+  graph->n += nv;   
+  
+  if (graph->attr) {
+    IGRAPH_CHECK(igraph_i_attribute_add_vertices((igraph_t *) graph,
+						 nv, attr));
+  }
+
+  /* TODO: time labels */
+
+  return 0;
+}
+
+int igraph_add_edges_at(igraph_data_type_temp_t *graph,
+	const igraph_vector_t *edges,
+	const igraph_vector_time_t *e_active,
+	const igraph_vector_time_t *e_inactive, void *attr) {
+
+  /* TODO */
+  return igraph_add_edges_ie((igraph_data_type_ie_t*)graph, edges, attr);
+}
+
+                
+int igraph_add_vertices_at(igraph_data_type_temp_t *graph,
+	 igraph_integer_t nv, const igraph_vector_time_t *v_active,
+	 const igraph_vector_time_t *v_inacive, void *attr) {
+
+  /* TODO */
+  return igraph_add_vertices_ie((igraph_data_type_ie_t*) graph, nv, attr);
+}
+
 /* -------------------------------------------------- */
 /* Internal functions                                 */
 /* -------------------------------------------------- */
 
-int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el,
-                          igraph_vector_t *iindex, 
-                          igraph_integer_t nodes) {
+int igraph_i_create_start_temp(igraph_vector_t *res, igraph_vector_t *el,
+			       igraph_vector_t *iindex, 
+			       igraph_integer_t nodes) {
   
 # define EDGE(i) (VECTOR(*el)[ (long int) VECTOR(*iindex)[(i)] ])
   
@@ -1265,5 +1391,3 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el,
 # undef EDGE
   return 0;
 }
-
-#endif /* IGRAPH_TEMPORAL_EDGE_LIST */
