@@ -538,7 +538,8 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
   default:
     break;
   }
-  if (options->ncv <= options->nev) { options->ncv = 0; }
+  options->ncv = no + 3;
+  if (options->ncv > vc) { options->ncv = vc; }
 
   IGRAPH_CHECK(igraph_arpack_rssolve(callback, &data, options, 0, &tmpD, X));
 
