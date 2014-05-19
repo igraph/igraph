@@ -21,7 +21,7 @@
 ###################################################################
 
 igraph.arpack.default <- list(bmat="I", n=0, which="XX", nev=1, tol=0.0,
-                              ncv=3, ldv=0, ishift=1, maxiter=5000, nb=1,
+                              ncv=3, ldv=0, ishift=1, maxiter=1000, nb=1,
                               mode=1, start=0, sigma=0.0, sigmai=0.0)
 
 arpack <- function(func, extra=NULL, sym=FALSE, options=igraph.arpack.default,
