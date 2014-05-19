@@ -28,9 +28,7 @@ sgm <- function(A, B, m, start, iteration) {
     z <-  A22 %*% P %*% t(B22)
     w <-  t(A22) %*% P %*% B22
     Grad <- x + y + z + w
-    mm = max(abs(Grad))
-    ind <- matrix(solve_LSAP(Grad+matrix(mm, totv-m, totv-m),
-                             maximum = TRUE))
+    ind <- matrix(solve_LSAP(Grad, maximum = TRUE))
     T <- diag(n)
     T <- T[ind, ]
     wt <- t(A22) %*% T %*% B22
