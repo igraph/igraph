@@ -28,16 +28,16 @@ sgm <- function(A, B, m, start, iteration) {
     z <-  A22 %*% P %*% Matrix::t(B22)
     w <-  Matrix::t(A22) %*% P %*% B22
     Grad <- x + y + z + w
-    ind <- as.vector(solve_LSAP(as.matrix(Grad), maximum = TRUE))
+    ind <- unclass(solve_LSAP(as.matrix(Grad), maximum = TRUE))
+    ind2 <- cbind(1:n, ind)
     T <- Matrix::Diagonal(n)
     T <- T[ind, ]
-    wt <- Matrix::t(A22) %*% T %*% B22
-    c <- sum(Matrix::diag(w %*% Matrix::t(P)))
-    d <- sum(Matrix::diag(wt %*% Matrix::t(P))) +
-      sum(Matrix::diag(w %*% Matrix::t(T)))
-    e <- sum(Matrix::diag(wt %*% Matrix::t(T)))
-    u <- sum(Matrix::diag(Matrix::t(P) %*% x+Matrix::t(P) %*% y))
-    v <- sum(Matrix::diag(Matrix::t(T) %*% x+Matrix::t(T) %*% y))
+    wt <- Matrix::t(A22)[,order(ind)] %*% B22
+    c <- sum(w * P)
+    d <- sum(wt * P) + sum(w [ ind2 ])
+    e <- sum(wt[ind2])
+    u <- sum(P * (x + y))
+    v <- sum((x + y)[ind2])
     if ( c-d+e == 0 && d-2*e+u-v == 0) {
       alpha <- 0
     } else {
