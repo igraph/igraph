@@ -651,8 +651,6 @@ class Dendrogram(object):
           verbosity is larger than or equal to 1.
         @return: the summary of the dendrogram as a string.
         """
-        from array import array
-
         out = StringIO()
         print >>out, "Dendrogram, %d elements, %d merges" % \
                 (self._nitems, self._nmerges)
@@ -679,11 +677,11 @@ class Dendrogram(object):
         midx = 0
         max_community_idx = self._nitems
         while midx < self._nmerges:
-            char_array = array("c", " "*width)
+            char_array = [" "] * width
             for position in positions:
                 if position >= 0:
                     char_array[position] = "|"
-            char_str = char_array.tostring()
+            char_str = "".join(char_array)
             for _ in xrange(level_distance-1):
                 print >>out, char_str # Print the lines
             
@@ -696,16 +694,19 @@ class Dendrogram(object):
 
                 pos1, pos2 = positions[id1], positions[id2]
                 positions[id1], positions[id2] = -1, -1
-                positions.append((pos1+pos2)/2)
+
+                if pos1 > pos2:
+                    pos1, pos2 = pos2, pos1
+                positions.append((pos1+pos2) // 2)
 
                 dashes = "-" * (pos2 - pos1 - 1)
-                char_array[pos1:(pos2+1)] = array("c", "`%s'" % dashes)
+                char_array[pos1:(pos2+1)] = "`%s'" % dashes
 
                 cidx_incr += 1
             
             max_community_idx += cidx_incr
 
-            print >>out, char_array.tostring()
+            print >>out, "".join(char_array)
 
         return out.getvalue().strip()
 
