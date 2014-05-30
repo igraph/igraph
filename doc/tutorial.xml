@@ -264,7 +264,7 @@ int main(void) {
             (int)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
 
      igraph_closeness(&graph, &result, igraph_vss_all(), IGRAPH_ALL,
-                      /*weights=*/ 0);
+                      /*weights=*/ 0, /*normalized=*/ 0);
      printf("Maximum closeness is   %10f, vertex %2i.\n",
              (double)igraph_vector_max(&result), (int)igraph_vector_which_max(&result));
 
