@@ -2280,6 +2280,53 @@ int igraph_sparsemat_rowmins(igraph_sparsemat_t *A,
   }
 }
 
+
+int igraph_i_sparsemat_rowmaxs_triplet(const igraph_sparsemat_t *A,
+				       igraph_vector_t *res) {
+  int i;
+  int *pi=A->cs->i;
+  double *px=A->cs->x;
+  double inf=IGRAPH_NEGINFINITY;
+  
+  IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
+  igraph_vector_fill(res, inf);
+  
+  for (i=0; i<A->cs->nz; i++, pi++, px++) {
+    if (*px > VECTOR(*res)[ *pi ]) { VECTOR(*res)[ *pi ] = *px; }
+  }
+  
+  return 0;
+}
+
+int igraph_i_sparsemat_rowmaxs_cc(igraph_sparsemat_t *A,
+				  igraph_vector_t *res) {
+  int ne=A->cs->p[A->cs->n];
+  double *px=A->cs->x;
+  int *pi=A->cs->i;
+  double inf=IGRAPH_NEGINFINITY;
+
+  IGRAPH_CHECK(igraph_sparsemat_dupl(A));
+  
+
+  IGRAPH_CHECK(igraph_vector_resize(res, A->cs->m));
+  igraph_vector_fill(res, inf);
+  
+  for (; pi < A->cs->i+ne; pi++, px++) {
+    if (*px > VECTOR(*res)[ *pi ]) { VECTOR(*res)[ *pi ] = *px; }
+  }
+
+  return 0;
+}
+
+int igraph_sparsemat_rowmaxs(igraph_sparsemat_t *A, 
+			     igraph_vector_t *res) {
+  if (igraph_sparsemat_is_triplet(A)) {
+    return igraph_i_sparsemat_rowmaxs_triplet(A, res);
+  } else {
+    return igraph_i_sparsemat_rowmaxs_cc(A, res);
+  }
+}
+
 int igraph_i_sparsemat_colmins_triplet(const igraph_sparsemat_t *A,
 				       igraph_vector_t *res) {
   int i;
@@ -2326,6 +2373,55 @@ int igraph_sparsemat_colmins(igraph_sparsemat_t *A,
     return igraph_i_sparsemat_colmins_triplet(A, res);
   } else {
     return igraph_i_sparsemat_colmins_cc(A, res);
+  }
+}
+
+int igraph_i_sparsemat_colmaxs_triplet(const igraph_sparsemat_t *A,
+				       igraph_vector_t *res) {
+  int i;
+  int *pp=A->cs->p;
+  double *px=A->cs->x;
+  double inf=IGRAPH_NEGINFINITY;
+
+  IGRAPH_CHECK(igraph_vector_resize(res, A->cs->n));
+  igraph_vector_fill(res, inf);
+  
+  for (i=0; i<A->cs->nz; i++, pp++, px++) {
+    if (*px > VECTOR(*res)[ *pp ]) { VECTOR(*res)[ *pp ] = *px; }
+  }
+  
+  return 0;
+}
+
+int igraph_i_sparsemat_colmaxs_cc(igraph_sparsemat_t *A,
+				  igraph_vector_t *res) {
+  int n=A->cs->n;
+  double *px=A->cs->x;
+  int *pp=A->cs->p;
+  int *pi=A->cs->i;
+  double *pr;
+  double inf=IGRAPH_NEGINFINITY;
+
+  IGRAPH_CHECK(igraph_sparsemat_dupl(A));
+    
+  IGRAPH_CHECK(igraph_vector_resize(res, n));
+  igraph_vector_fill(res, inf);
+  pr=VECTOR(*res);
+  
+  for (; pp < A->cs->p + n; pp++, pr++) {
+    for (; pi < A->cs->i + *(pp+1); pi++, px++) {
+      if (*px > *pr) { *pr = *px; }
+    }
+  }
+  return 0;
+}
+
+int igraph_sparsemat_colmaxs(igraph_sparsemat_t *A, 
+			     igraph_vector_t *res) {
+  if (igraph_sparsemat_is_triplet(A)) {
+    return igraph_i_sparsemat_colmaxs_triplet(A, res);
+  } else {
+    return igraph_i_sparsemat_colmaxs_cc(A, res);
   }
 }
 

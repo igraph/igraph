@@ -28,11 +28,25 @@
 #define M  20
 #define NZ 50
 
-int main() {
+#define MIN 0
+#define MAX 10
+
+typedef int fun(igraph_sparsemat_t *A, igraph_vector_t *res);
+
+int doit(int which) {
   
   int i;
   igraph_sparsemat_t A, A2;
   igraph_vector_t vec;
+  fun *colfun, *rowfun;
+
+  if (which == MIN) {
+    colfun = igraph_sparsemat_colmins;
+    rowfun = igraph_sparsemat_rowmins;
+  } else {
+    colfun = igraph_sparsemat_colmaxs;
+    rowfun = igraph_sparsemat_rowmaxs;
+  }
 
   igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -44,13 +58,12 @@ int main() {
 			/*compress=*/ 0);
 
   igraph_vector_null(&vec);
-  igraph_sparsemat_rowmins(&A, &vec);
-  
-  for (i = 0; i < N; i++) { if (VECTOR(vec)[i] != i) return 1; }
+  rowfun(&A, &vec);
+  for (i = 0; i < N; i++) { if (VECTOR(vec)[i] != i) return which + 1; }
   
   igraph_vector_null(&vec);
-  igraph_sparsemat_colmins(&A, &vec);
-  for (i = 0; i < N; i++) { if (VECTOR(vec)[i] != i) return 2; }
+  colfun(&A, &vec);
+  for (i = 0; i < N; i++) { if (VECTOR(vec)[i] != i) return which + 2; }
 
   igraph_vector_destroy(&vec);
   igraph_sparsemat_destroy(&A);
@@ -63,12 +76,12 @@ int main() {
 			/*compress=*/ 1);
 
   igraph_vector_null(&vec);
-  igraph_sparsemat_rowmins(&A, &vec);
-  for (i = 0; i < N; i++) { if (VECTOR(vec)[i] != i) return 3; }
+  rowfun(&A, &vec);
+  for (i = 0; i < N; i++) { if (VECTOR(vec)[i] != i) return which + 3; }
   
   igraph_vector_null(&vec);
-  igraph_sparsemat_colmins(&A, &vec);
-  for (i = 0; i < N; i++) { if (VECTOR(vec)[i] != i) return 4; }
+  colfun(&A, &vec);
+  for (i = 0; i < N; i++) { if (VECTOR(vec)[i] != i) return which +4; }
 
   igraph_vector_destroy(&vec);
   igraph_sparsemat_destroy(&A);  
@@ -84,13 +97,14 @@ int main() {
 					     -10, 10);
     igraph_sparsemat_entry(&A, r, c, x);
   }
+  if (which == MAX) { igraph_sparsemat_scale(&A, -1.0); }
 
   igraph_vector_init(&vec, 0);
-  igraph_sparsemat_colmins(&A, &vec);
+  colfun(&A, &vec);
   igraph_vector_print(&vec);
   
   igraph_vector_null(&vec);
-  igraph_sparsemat_rowmins(&A, &vec);
+  rowfun(&A, &vec);
   igraph_vector_print(&vec);
 
   /* Random compresssed matrix */
@@ -98,11 +112,11 @@ int main() {
   igraph_sparsemat_compress(&A, &A2);
   
   igraph_vector_null(&vec);
-  igraph_sparsemat_colmins(&A2, &vec);
+  colfun(&A2, &vec);
   igraph_vector_print(&vec);
   
   igraph_vector_null(&vec);
-  igraph_sparsemat_rowmins(&A2, &vec);
+  rowfun(&A2, &vec);
   igraph_vector_print(&vec);
 
   igraph_vector_destroy(&vec);
@@ -112,13 +126,14 @@ int main() {
   /* Matrix with zero rows, triplet */
   
   igraph_sparsemat_init(&A, /*rows=*/ 0, /*cols=*/ M, /*nzmax=*/ NZ);
+  if (which == MAX) { igraph_sparsemat_scale(&A, -1.0); }
   
   igraph_vector_init(&vec, 5);
-  igraph_sparsemat_rowmins(&A, &vec);
-  if (igraph_vector_size(&vec) != 0) { return 5; }
+  rowfun(&A, &vec);
+  if (igraph_vector_size(&vec) != 0) { return which + 5; }
 
   igraph_vector_null(&vec);
-  igraph_sparsemat_colmins(&A, &vec);
+  colfun(&A, &vec);
   igraph_vector_print(&vec);
 
   /* Matrix with zero rows, compressed */
@@ -126,11 +141,11 @@ int main() {
   igraph_sparsemat_compress(&A, &A2);
   
   igraph_vector_null(&vec);
-  igraph_sparsemat_rowmins(&A, &vec);
-  if (igraph_vector_size(&vec) != 0) { return 6; }
+  rowfun(&A, &vec);
+  if (igraph_vector_size(&vec) != 0) { return which + 6; }
 
   igraph_vector_null(&vec);
-  igraph_sparsemat_colmins(&A, &vec);
+  colfun(&A, &vec);
   igraph_vector_print(&vec);
   
   igraph_vector_destroy(&vec);
@@ -140,13 +155,14 @@ int main() {
   /* Matrix with zero columns, triplet */
   
   igraph_sparsemat_init(&A, /*rows=*/ N, /*cols=*/ 0, /*nzmax=*/ NZ);
+  if (which == MAX) { igraph_sparsemat_scale(&A, -1.0); }
   
   igraph_vector_init(&vec, 5);
-  igraph_sparsemat_colmins(&A, &vec);
-  if (igraph_vector_size(&vec) != 0) { return 5; }
+  colfun(&A, &vec);
+  if (igraph_vector_size(&vec) != 0) { return which + 7; }
 
   igraph_vector_null(&vec);
-  igraph_sparsemat_rowmins(&A, &vec);
+  rowfun(&A, &vec);
   igraph_vector_print(&vec);
 
   /* Matrix with zero columns, compressed */
@@ -154,16 +170,28 @@ int main() {
   igraph_sparsemat_compress(&A, &A2);
   
   igraph_vector_null(&vec);
-  igraph_sparsemat_colmins(&A, &vec);
-  if (igraph_vector_size(&vec) != 0) { return 6; }
+  colfun(&A, &vec);
+  if (igraph_vector_size(&vec) != 0) { return which + 8; }
 
   igraph_vector_null(&vec);
-  igraph_sparsemat_rowmins(&A, &vec);
+  rowfun(&A, &vec);
   igraph_vector_print(&vec);
   
   igraph_vector_destroy(&vec);
   igraph_sparsemat_destroy(&A);
   igraph_sparsemat_destroy(&A2);
 
+  return 0;
+}
+
+int main() {
+  int res;
+
+  res = doit(/*which=*/ MIN);
+  if (res) { return res; }
+
+  res = doit(/*which=*/ MAX);
+  if (res) { return res; }
+ 
   return 0;
 }
