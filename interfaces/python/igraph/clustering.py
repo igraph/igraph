@@ -982,6 +982,7 @@ class VertexDendrogram(Dendrogram):
                 optimal_count = n-step
                 max_q = q
         self._optimal_count = optimal_count
+        return self._optimal_count
 
     @optimal_count.setter
     def optimal_count(self, value):
