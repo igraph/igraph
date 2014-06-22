@@ -1492,8 +1492,8 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
 
   if (time_limit<=0) { time_limit = INT_MAX; }
     
-  igraph_i_lad_createGraph(pattern, &Gp);
-  igraph_i_lad_createGraph(target, &Gt);
+  IGRAPH_CHECK(igraph_i_lad_createGraph(pattern, &Gp));
+  IGRAPH_CHECK(igraph_i_lad_createGraph(target, &Gt));
   
   if (iso)  { *iso = 0; }
   if (map)  { igraph_vector_clear(map); } 
