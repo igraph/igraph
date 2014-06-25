@@ -201,3 +201,19 @@ test_that("Directed, weighted case works", {
   expect_that(std(au_sa$X), equals(X[,vcount(g)-1:no+1]))
   expect_that(std(au_sa$Y), equals(Y[,vcount(g)-1:no+1]))
 })
+
+test_that("Issue #50 is resolved", {
+
+  library(igraph)
+  set.seed(12345)
+
+  g <- erdos.renyi.game(15, .4)
+  w <- -log(runif(ecount(g)))
+  X1 <- adjacency.spectral.embedding(g, 2, weights= w)
+
+  E(g)$weight <- w
+  X2 <- adjacency.spectral.embedding(g, 2)
+
+  expect_that(X1$D, equals(X2$D))
+
+})

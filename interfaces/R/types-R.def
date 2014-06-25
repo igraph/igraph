@@ -26,7 +26,7 @@ BOOLEAN:
 VECTOR:
     INCONV: %I% <- as.numeric(%I%)
     DEFAULT:
-       AsmDefaultCvec: graph.strength(%I1%)/(vcount(%I1%)-1)
+       AsmDefaultCvec: graph.strength(%I1%, weights=weights)/(vcount(%I1%)-1)
 
 VERTEXINDEX:
     OUTCONV: 
