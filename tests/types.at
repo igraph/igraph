@@ -36,6 +36,11 @@ AT_KEYWORDS([vector vector_t])
 AT_COMPILE_CHECK([simple/vector3.c])
 AT_CLEANUP
 
+AT_SETUP([Stable sorting of a vector (vector_t): ])
+AT_KEYWORDS([vector qsort igraph_vector_qsort_ind_stable])
+AT_COMPILE_CHECK([simple/igraph_vector_sort_stable.c])
+AT_CLEANUP
+
 AT_SETUP([Matrix (matrix_t): ])
 AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix.c], [simple/matrix.out])
