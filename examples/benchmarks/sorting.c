@@ -29,21 +29,24 @@
    latter (almost) happens when a couple of new edges are added
    to a graph. */
 
-#define N 1000000
+#define N 100000
+#define RUNS 100
 
 int main() {
 
   igraph_vector_t from, to, res;
   igraph_vector_init(&res, 0);
 
+#define INIT					\
+  igraph_vector_shuffle(&from);			\
+  igraph_vector_shuffle(&to);
+
   igraph_rng_seed(igraph_rng_default(), 42);
 
   igraph_vector_init_seq(&from, 0, N-1);
   igraph_vector_init_seq(&to,   0, N-1);
-  igraph_vector_shuffle(&from);
-  igraph_vector_shuffle(&to);
   
-  BENCH("1 Sorting, quick sort, random vector",
+  BENCH_WITH_INIT("1 Sorting, quick sort, random vector", RUNS, INIT,
 	igraph_vector_sort(&from); igraph_vector_sort(&to));
 
   igraph_vector_destroy(&from);
@@ -55,11 +58,10 @@ int main() {
   
   igraph_vector_init_seq(&from, 0, N-1);
   igraph_vector_init_seq(&to,   0, N-1);
-  igraph_vector_shuffle(&from);
-  igraph_vector_shuffle(&to);
   
-  BENCH("2 Sorting, radix sort, random vector",
-	igraph_vector_order(&from, &to, &res, N-1));
+  BENCH_WITH_INIT("2 Sorting, radix sort, random vector", RUNS, INIT,
+		  igraph_vector_order(&from, &to, &res, N-1);
+		  igraph_vector_order(&to, &from, &res, N-1));
   
   igraph_vector_destroy(&from);
   igraph_vector_destroy(&to);
@@ -69,7 +71,7 @@ int main() {
   igraph_vector_init_seq(&from, 0, N-1);
   igraph_vector_init_seq(&to,   0, N-1);
   
-  BENCH("3 Sorting, quick sort, sorted vector",
+  BENCH("3 Sorting, quick sort, sorted vector", RUNS,
 	igraph_vector_sort(&from); igraph_vector_sort(&to));
 
   igraph_vector_destroy(&from);
@@ -80,8 +82,9 @@ int main() {
   igraph_vector_init_seq(&from, 0, N-1);
   igraph_vector_init_seq(&to,   0, N-1);
   
-  BENCH("4 Sorting, radix sort, sorted vector",
-	igraph_vector_order(&from, &to, &res, N-1));
+  BENCH("4 Sorting, radix sort, sorted vector", RUNS,
+	igraph_vector_order(&from, &to, &res, N-1);
+	igraph_vector_order(&to, &from, &res, N-1));
   
   igraph_vector_destroy(&from);
   igraph_vector_destroy(&to);
