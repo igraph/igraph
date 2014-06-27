@@ -29,31 +29,35 @@
 #define M 2000000
 
 int main() {
-
-	igraph_t g;
-	igraph_vector_t trans;
-
-	igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, N, M,
-													IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-	igraph_vector_init(&trans, igraph_vcount(&g));	
-
-	BENCH("1 Transitivity GNM   ",
-				igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
-																						 IGRAPH_TRANSITIVITY_NAN);
-				);
-
-	igraph_destroy(&g);
-	igraph_barabasi_game(&g, N, /*power=*/ 1, M/N, /*outseq=*/ 0, 
-											 /*outpref=*/ 0, /*A=*/ 1, IGRAPH_UNDIRECTED, 
-											 IGRAPH_BARABASI_PSUMTREE, /*start_from=*/ 0);
-
-	BENCH("2 Transitivity Skewed",
-				igraph_transitivity_local_undirected(&g, &trans, igraph_vss_all(),
-																						 IGRAPH_TRANSITIVITY_NAN);
-				);
+  
+  igraph_t g;
+  igraph_vector_t trans;
+  
+#define INIT1								\
+  igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, N, M,		\
+			  IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+  
+  igraph_vector_init(&trans, igraph_vcount(&g));	
+  
+  BENCH_WITH_INIT("1 Transitivity GNM   ", 10, INIT1,
+		  igraph_transitivity_local_undirected(&g, &trans,
+		    igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
+		  );
 	
-	igraph_destroy(&g);
-	igraph_vector_destroy(&trans);
+  igraph_destroy(&g);
+	
+#define INIT2								\
+  igraph_barabasi_game(&g, N, /*power=*/ 1, M/N, /*outseq=*/ 0,		\
+		       /*outpref=*/ 0, /*A=*/ 1, IGRAPH_UNDIRECTED,	\
+		       IGRAPH_BARABASI_PSUMTREE, /*start_from=*/ 0);
 
-	return 0;
+  BENCH_WITH_INIT("2 Transitivity Skewed", 10, INIT2,
+		  igraph_transitivity_local_undirected(&g, &trans, 
+		    igraph_vss_all(), IGRAPH_TRANSITIVITY_NAN);
+		  );
+	
+  igraph_destroy(&g);
+  igraph_vector_destroy(&trans);
+
+  return 0;
 }

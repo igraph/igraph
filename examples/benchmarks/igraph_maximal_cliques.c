@@ -43,7 +43,7 @@ int main() {
 
   igraph_vector_ptr_init(&res, 0);
 
-  BENCH("1 Maximal cliques of almost complete graph", 
+  BENCH("1 Maximal cliques of almost complete graph", 5,
 	igraph_maximal_cliques(&g, &res, /* min_size= */ 0,
 			       /* max_size= */ 0);
 	);

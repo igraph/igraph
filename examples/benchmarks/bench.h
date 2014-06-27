@@ -39,15 +39,35 @@ inline void igraph_get_cpu_time(igraph_real_t *data) {
 		1e-3 * (children.ru_stime.tv_usec/1000);
 }
 
-#define BENCH(NAME, ...)	do {														 \
-	double start[4], stop[4];																 \
-	igraph_get_cpu_time(start);															 \
-	{ __VA_ARGS__; };																				 \
-	igraph_get_cpu_time(stop);															 \
-	printf("%s %.3gs\n", NAME,															 \
-				 stop[0]+stop[1]+stop[2]+stop[3] -								 \
-				 start[0]-start[1]-start[2]-start[3]);						 \
-	} while (0)
+#define BENCH(NAME, N, ...)  do {					\
+    int _i;								\
+    double _s=0.0;							\
+    for (_i = 0; _i < (N); _i++) {					\
+      double start[4], stop[4];						\
+      igraph_get_cpu_time(start);					\
+      { __VA_ARGS__; };							\
+      igraph_get_cpu_time(stop);					\
+      _s += stop[0] + stop[1] + stop[2] + stop[3] -			\
+	start[0] - start[1] - start[2] - start[3];			\
+    }									\
+    _s /= (N);								\
+    printf("%s %.3gs\n", NAME, _s);					\
+  } while (0)
+
+#define BENCH_WITH_INIT(NAME, N, INIT, ...) do {			\
+    int _i;								\
+    double _s=0.0;							\
+    for (_i = 0; _i < (N); _i++) {					\
+      double start[4], stop[4];						\
+      INIT;								\
+      igraph_get_cpu_time(start);					\
+      { __VA_ARGS__; };							\
+      igraph_get_cpu_time(stop);					\
+      _s += stop[0] + stop[1] + stop[2] + stop[3] -			\
+	start[0] - start[1] - start[2] - start[3];			\
+    }									\
+    _s /= (N);								\
+    printf("%s %.5gs\n", NAME, _s);					\
+  } while (0)
 
 #endif
-
