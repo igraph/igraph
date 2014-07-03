@@ -41,6 +41,11 @@ AT_KEYWORDS([vector qsort igraph_vector_qsort_ind_stable])
 AT_COMPILE_CHECK([simple/igraph_vector_sort_stable.c])
 AT_CLEANUP
 
+AT_SETUP([Vector constants (IGRAPH_VECTOR_CONSTANT): ])
+AT_KEYWORDS([constant vector])
+AT_COMPILE_CHECK([simple/vector_constants.c], [simple/vector_constants.out])
+AT_CLEANUP
+
 AT_SETUP([Matrix (matrix_t): ])
 AT_KEYWORDS([matrix matrix_t])
 AT_COMPILE_CHECK([simple/matrix.c], [simple/matrix.out])

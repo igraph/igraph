@@ -170,6 +170,68 @@ __BEGIN_DECLS
   do { IGRAPH_CHECK(igraph_vector_long_init(v, size)); \
   IGRAPH_FINALLY(igraph_vector_long_destroy, v); } while (0)
 #endif
+#ifndef IGRAPH_VECTOR_INT_INIT_FINALLY
+#define IGRAPH_VECTOR_INT_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_int_init(v, size));		\
+  IGRAPH_FINALLY(igraph_vector_int_destroy, v); } while (0)
+#endif
+#ifndef IGRAPH_VECTOR_TIME_INIT_FINALLY
+#define IGRAPH_VECTOR_TIME_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_time_init(v, size));		\
+  IGRAPH_FINALLY(igraph_vector_time_destroy, v); } while (0)
+#endif
+
+#define IGRAPH_VECTOR_CONSTANT(name, ...)				\
+  igraph_real_t IGRAPH_UNIQUE(name,1)[] = { __VA_ARGS__ };		\
+  igraph_vector_t (name);						\
+  const igraph_vector_t *IGRAPH_UNIQUE(name,2) =			\
+    igraph_vector_view(&(name), IGRAPH_UNIQUE(name,1),			\
+		       sizeof(IGRAPH_UNIQUE(name,1))/			\
+		       sizeof(igraph_real_t))
+
+#define IGRAPH_VECTOR_FLOAT_CONSTANT(name, ...)				\
+  float IGRAPH_UNIQUE(name,1)[] = { __VA_ARGS__ };			\
+  igraph_vector_float_t (name);						\
+  const igraph_vector_float_t *IGRAPH_UNIQUE(name,2) =			\
+    igraph_vector_float_view(&(name), IGRAPH_UNIQUE(name,1),		\
+			     sizeof(IGRAPH_UNIQUE(name,1))/sizeof(float))
+
+#define IGRAPH_VECTOR_LONG_CONSTANT(name, ...)				\
+  long IGRAPH_UNIQUE(name,1)[] = { __VA_ARGS__ };			\
+  igraph_vector_long_t (name);						\
+  const igraph_vector_long_t *IGRAPH_UNIQUE(name,2) =			\
+    igraph_vector_long_view(&(name), IGRAPH_UNIQUE(name,1),		\
+			    sizeof(IGRAPH_UNIQUE(name,1))/sizeof(long))
+
+#define IGRAPH_VECTOR_CHAR_CONSTANT(name, ...)				\
+  char IGRAPH_UNIQUE(name,1)[] = { __VA_ARGS__ };			\
+  igraph_vector_char_t (name);						\
+  const igraph_vector_char_t *IGRAPH_UNIQUE(name,2) =			\
+    igraph_vector_char_view(&(name), IGRAPH_UNIQUE(name,1),		\
+			    sizeof(IGRAPH_UNIQUE(name,1))/sizeof(char))
+
+#define IGRAPH_VECTOR_BOOL_CONSTANT(name, ...)				\
+  igraph_bool_t IGRAPH_UNIQUE(name,1)[] = { __VA_ARGS__ };		\
+  igraph_vector_bool_t (name);						\
+  const igraph_vector_bool_t *IGRAPH_UNIQUE(name,2) =			\
+    igraph_vector_bool_view(&(name), IGRAPH_UNIQUE(name,1),		\
+			    sizeof(IGRAPH_UNIQUE(name,1))/		\
+			    sizeof(igraph_bool_t))
+
+#define IGRAPH_VECTOR_INT_CONSTANT(name, ...)				\
+  int IGRAPH_UNIQUE(name,1)[] = { __VA_ARGS__ };			\
+  igraph_vector_int_t (name);						\
+  const igraph_vector_int_t *IGRAPH_UNIQUE(name,2) =			\
+    igraph_vector_int_view(&(name), IGRAPH_UNIQUE(name,1),		\
+			   sizeof(IGRAPH_UNIQUE(name,1))/sizeof(int))
+
+#define IGRAPH_VECTOR_TIME_CONSTANT(name, ...)				\
+  igraph_time_t IGRAPH_UNIQUE(name,1)[] = { __VA_ARGS__ };		\
+  igraph_vector_time_t (name);						\
+  const igraph_vector_time_t *IGRAPH_UNIQUE(name,2) =			\
+    igraph_vector_time_view(&(name), IGRAPH_UNIQUE(name,1),		\
+			    sizeof(IGRAPH_UNIQUE(name,1))/		\
+			    sizeof(igraph_time_t))
 
 /* -------------------------------------------------- */
 /* Type-specific vector functions                     */

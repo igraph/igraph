@@ -45,6 +45,11 @@ __BEGIN_DECLS
 #include <math.h>
 #include <stdio.h>
 
+#define IGRAPH_CONCAT4x(a,b,c,d) a ## _ ## b ## _ ## c ## _ ## d
+#define IGRAPH_CONCAT4(a,b,c,d) IGRAPH_CONCAT4x(a,b,c,d)
+#define IGRAPH_UNIQUE(name, i) \
+  IGRAPH_CONCAT4(igraph_i_unique, name, __LINE__, i)
+
 /* This is to eliminate gcc warnings about unused parameters */
 #define IGRAPH_UNUSED(x) (void)(x)
 
