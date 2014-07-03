@@ -41,6 +41,18 @@
 
 __BEGIN_DECLS
 
+#define IGRAPH(name, directed, ...)					\
+  IGRAPH_VECTOR_CONSTANT(IGRAPH_UNIQUE(name,1), __VA_ARGS__);		\
+  igraph_t (name);							\
+  int IGRAPH_UNIQUE(name,2) =						\
+    igraph_create(&name, &IGRAPH_UNIQUE(name,1), 0, directed)
+
+#define IGRAPH_N(name, n, directed, ...)				\
+  IGRAPH_VECTOR_CONSTANT(IGRAPH_UNIQUE(name,1), __VA_ARGS__);		\
+  igraph_t (name);							\
+  int IGRAPH_UNIQUE(name,2) =						\
+    igraph_create(&name, &IGRAPH_UNIQUE(name,1), n, directed)
+
 /* -------------------------------------------------- */
 /* Constructors, deterministic                        */
 /* -------------------------------------------------- */
