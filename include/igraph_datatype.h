@@ -108,8 +108,8 @@ typedef struct {
   igraph_vector_t os;
   igraph_vector_t is;
   void *attr;
-  igraph_vector_time_t vb;
-  igraph_vector_time_t eb;
+  igraph_vector_int_t vb;
+  igraph_vector_int_t eb;
   igraph_vector_time_t vd;
   igraph_vector_time_t ed;
   igraph_time_t now;

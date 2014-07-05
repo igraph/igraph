@@ -36,9 +36,13 @@ int igraph_create_temporal(igraph_t *graph,
   igraph_integer_t min, max;
   igraph_integer_t no_verts=n;
   
-  igraph_vector_minmax(edges, &rmin, &rmax);
-  min=(int) rmax;
-  max=(int) rmin;
+  if (igraph_vector_size(edges) > 0) {
+    igraph_vector_minmax(edges, &rmin, &rmax);
+    min = (int) rmin;
+    max = (int) rmax + 1;
+  } else {
+    min = max = 0;
+  }
   
   if (igraph_vector_size(edges) % 2 != 0) {
     IGRAPH_ERROR("Invalid (odd) edges vector length",

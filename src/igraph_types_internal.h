@@ -390,6 +390,27 @@ int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
 				    const igraph_vector_t *from,
 				    long int size);
 
+#define V(...) __VA_ARGS__
+
+#define IGRAPH_I_STR(name, n, directed, from, to, oi, ii, os, is, attr,	\
+		     vb, eb, vd, ed, now)				\
+  IGRAPH_VECTOR_CONSTANT(IGRAPH_UNIQUE(name,1), from);			\
+  IGRAPH_VECTOR_CONSTANT(IGRAPH_UNIQUE(name,2), to);			\
+  IGRAPH_VECTOR_CONSTANT(IGRAPH_UNIQUE(name,3), oi);			\
+  IGRAPH_VECTOR_CONSTANT(IGRAPH_UNIQUE(name,4), ii);			\
+  IGRAPH_VECTOR_CONSTANT(IGRAPH_UNIQUE(name,5), os);			\
+  IGRAPH_VECTOR_CONSTANT(IGRAPH_UNIQUE(name,6), is);			\
+  IGRAPH_VECTOR_INT_CONSTANT(IGRAPH_UNIQUE(name,7), vb);		\
+  IGRAPH_VECTOR_INT_CONSTANT(IGRAPH_UNIQUE(name,8), eb);		\
+  IGRAPH_VECTOR_TIME_CONSTANT(IGRAPH_UNIQUE(name,9), vd);		\
+  IGRAPH_VECTOR_TIME_CONSTANT(IGRAPH_UNIQUE(name,10), ed);		\
+  igraph_t name = { n, directed,					\
+		    IGRAPH_UNIQUE(name,1), IGRAPH_UNIQUE(name,2),	\
+		    IGRAPH_UNIQUE(name,3), IGRAPH_UNIQUE(name,4),	\
+		    IGRAPH_UNIQUE(name,5), IGRAPH_UNIQUE(name,6), attr,	\
+		    IGRAPH_UNIQUE(name,7), IGRAPH_UNIQUE(name,8),	\
+		    IGRAPH_UNIQUE(name,9), IGRAPH_UNIQUE(name,10), now }
+
 __END_DECLS
 
 #endif

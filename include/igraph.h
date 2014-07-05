@@ -93,5 +93,6 @@
 #include "igraph_matching.h"
 #include "igraph_graphlets.h"
 #include "igraph_epidemics.h"
+#include "igraph_temporal.h"
 
 #endif

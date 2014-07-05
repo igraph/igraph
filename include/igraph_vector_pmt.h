@@ -268,3 +268,11 @@ int FUNCTION(igraph_vector,index)(const TYPE(igraph_vector) *v,
 
 int FUNCTION(igraph_vector,index_int)(TYPE(igraph_vector) *v,
 				      const igraph_vector_int_t *idx);
+
+int FUNCTION(igraph_vector,i_index)(const TYPE(igraph_vector) *v,
+				    igraph_vector_int_t *idx,
+				    BASE max_value);
+int FUNCTION(igraph_vector,i_index_through)(const TYPE(igraph_vector) *v,
+					    const TYPE(igraph_vector) *th,
+					    TYPE(igraph_vector) *idx,
+					    BASE max_value);

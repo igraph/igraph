@@ -325,7 +325,7 @@ int FUNCTION(igraph_vector,init_int)(TYPE(igraph_vector) *v, int no, ...) {
  * complexity of the memory allocation.
  */
 
-int FUNCTION(igraph_vector_init,int_end)(TYPE(igraph_vector) *v, int endmark, ...) {
+int FUNCTION(igraph_vector,init_int_end)(TYPE(igraph_vector) *v, int endmark, ...) {
   int i=0, n=0;
   va_list ap;
 
@@ -2707,3 +2707,51 @@ int FUNCTION(igraph_vector,index_int)(TYPE(igraph_vector) *v,
 
   return 0;
 }
+
+#ifndef BASE_COMPLEX
+
+/* Should be really only defined for integer types.... */
+
+int FUNCTION(igraph_vector,i_index)(const TYPE(igraph_vector) *v,
+				    igraph_vector_int_t *idx,
+				    BASE max_value) {
+
+  int i, j, jlen = (int) (max_value + 2),
+    n = FUNCTION(igraph_vector,size)(v);
+  IGRAPH_CHECK(igraph_vector_int_resize(idx, max_value + 2));
+
+  for (i = 0, j = 0; j < jlen;) {
+    while (j < jlen && (i >= n || VECTOR(*v)[i] >= j)) {
+      VECTOR(*idx)[j++] = i;
+    }
+    while (i < n && VECTOR(*v)[i] <  j) {
+      i++;
+    }
+  }
+
+  return 0;
+}
+
+int FUNCTION(igraph_vector,i_index_through)(const TYPE(igraph_vector) *v,
+					    const TYPE(igraph_vector) *th,
+					    TYPE(igraph_vector) *idx,
+                                            BASE max_value) {
+#define TH(x) (VECTOR(*v)[ (long int) VECTOR(*th)[x] ])
+
+  int i, j, jlen = (int) (max_value + 2),
+    n = FUNCTION(igraph_vector,size)(v);
+  IGRAPH_CHECK(FUNCTION(igraph_vector,resize)(idx, max_value + 2));
+
+  for (i = 0, j = 0; j < jlen;) {
+    while (j < jlen && (i >= n || TH(i) >= j)) {
+      VECTOR(*idx)[j++] = i;
+    }
+    while (i < n && TH(i) <  j) {
+      i++;
+    }
+  }
+
+  return 0;
+}
+
+#endif
