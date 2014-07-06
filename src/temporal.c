@@ -24,6 +24,26 @@
 #include "igraph_temporal.h"
 #include "igraph_interface.h"
 
+int igraph_time_next(igraph_t *graph) {
+  if (graph->now != IGRAPH_END) { graph->now += 1; }
+  return 0;
+}
+
+int igraph_time_prev(igraph_t *graph) {
+  if (graph->now > IGRAPH_BEGINNING) { graph->now -= 1; }
+  return 0;
+}
+
+int igraph_time_goto(igraph_t *graph, igraph_time_t at) {
+  graph->now = at;
+  return 0;
+}
+
+int igraph_time_reset(igraph_t *graph) {
+  graph->now = IGRAPH_BEGINNING;
+  return 0;
+}
+
 int igraph_create_temporal(igraph_t *graph,
                            const igraph_vector_t *edges,
                            igraph_integer_t n, igraph_bool_t directed,
