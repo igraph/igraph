@@ -1320,7 +1320,7 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
   int no_nodes_new = no_nodes_old + nv;
   int no_edges = igraph_ecount(graph);
   igraph_vector_t order;
-  igraph_vector_time_t birth;
+  igraph_vector_time_t birth, obirth;
   igraph_bool_t has_vb = ! igraph_vector_int_is_null(&graph->vb);
   igraph_time_t last_time_step_old = has_vb ?
     igraph_vector_int_size(&graph->vb) - 2 : 0;
@@ -1338,6 +1338,7 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
   IGRAPH_VECTOR_INIT_FINALLY(&order, no_nodes_new);
   IGRAPH_VECTOR_TIME_INIT_FINALLY(&birth, no_nodes_new);
   igraph_vector_time_resize(&birth, no_nodes_old);
+  IGRAPH_VECTOR_TIME_INIT_FINALLY(&obirth, no_nodes_new);
 
   IGRAPH_CHECK(igraph_vector_reserve(&graph->os, no_nodes_new + 1));
   IGRAPH_CHECK(igraph_vector_reserve(&graph->is, no_nodes_new + 1));
@@ -1369,12 +1370,14 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
   }
   igraph_vector_time_append(&birth, v_active);
 
+  /* TODO: sort and order in one go */
   igraph_vector_time_qsort_ind_stable(&birth, &order, /*descending=*/ 0);
+  igraph_vector_time_index(&birth, &obirth, &order);
 
   /* ---------------------------------------------------------------- */
   /* 2. Create new vb based on the sorted birth times. */
 
-  igraph_vector_time_i_index(&birth, &graph->vb, last_time_step_new);
+  igraph_vector_time_i_index(&obirth, &graph->vb, last_time_step_new);
 
   /* ---------------------------------------------------------------- */
   /* 3. Rewrite the edge list using the new vertex ids. */
@@ -1386,8 +1389,9 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
 
   if (!has_vb) { IGRAPH_FINALLY_CLEAN(1); }
   igraph_vector_destroy(&order);
+  igraph_vector_time_destroy(&obirth);
   igraph_vector_time_destroy(&birth);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(3);
 
   /* ---------------------------------------------------------------- */
   /* 5. Need to recreate the os and is vectors. */
