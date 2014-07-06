@@ -25,3 +25,13 @@ AT_SETUP([Creating (igraph_create_temporal): ])
 AT_KEYWORDS([create temporal])
 AT_COMPILE_CHECK([simple/temporal.c], [], [], [internal])
 AT_CLEANUP
+
+AT_SETUP([Temporal vcount (igraph_vcount): ])
+AT_KEYWORDS([temporal vcount])
+AT_COMPILE_CHECK([simple/temporal_vcount.c], [simple/temporal_vcount.out])
+AT_CLEANUP
+
+AT_SETUP([Temporal ecount (igraph_ecount): ])
+AT_KEYWORDS([temporal ecount])
+AT_COMPILE_CHECK([simple/temporal_ecount.c], [simple/temporal_ecount.out])
+AT_CLEANUP

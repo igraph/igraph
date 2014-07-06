@@ -422,13 +422,25 @@ int igraph_delete_vertices_idx_temp(igraph_data_type_temp_t *graph,
 }
 
 igraph_integer_t igraph_vcount_temp(const igraph_data_type_temp_t *graph) {
-  /* TODO: time labels */
-  return graph->n;
+  igraph_time_t last, now = graph->now;
+  if (now == IGRAPH_END || igraph_vector_int_is_null(&graph->vb)) {
+    /* we are at the end of time or all vertices live forever */
+    return graph->n;
+  }
+  last = igraph_vector_int_size(&graph->vb) - 2;
+  if (now > last) { now = last; }
+  return VECTOR(graph->vb)[now + 1];
 }
 
 igraph_integer_t igraph_ecount_temp(const igraph_data_type_temp_t *graph) {
-  /* TODO: time labels */
-  return (igraph_integer_t) igraph_vector_size(&graph->from);
+  igraph_time_t last, now = graph->now;
+  if (now == IGRAPH_END || igraph_vector_int_is_null(&graph->eb)) {
+    /* we are at the end of time or all vertices live forever */
+    return (igraph_integer_t) igraph_vector_size(&graph->from);
+  }
+  last = igraph_vector_int_size(&graph->eb) - 2;
+  if (now > last) { now = last; }
+  return VECTOR(graph->eb)[now + 1];
 }
 
 int igraph_neighbors_temp(const igraph_data_type_temp_t *graph,
