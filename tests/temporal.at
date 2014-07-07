@@ -35,3 +35,23 @@ AT_SETUP([Temporal ecount (igraph_ecount): ])
 AT_KEYWORDS([temporal ecount])
 AT_COMPILE_CHECK([simple/temporal_ecount.c], [simple/temporal_ecount.out])
 AT_CLEANUP
+
+AT_SETUP([Temporal cursor: ])
+AT_KEYWORDS([temporal cursor])
+AT_COMPILE_CHECK([simple/temporal_now.c])
+AT_CLEANUP
+
+AT_SETUP([Temporal graphs, last time point (igraph_time_last): ])
+AT_KEYWORDS([temporal last igraph_time_last])
+AT_COMPILE_CHECK([simple/temporal_last.c])
+AT_CLEANUP
+
+AT_SETUP([Temporal graphs, range (igraph_time_range): ])
+AT_KEYWORDS([temporal range igraph_time_range])
+AT_COMPILE_CHECK([simple/temporal_range.c])
+AT_CLEANUP
+
+AT_SETUP([Temporal graphs, slicing (igraph_time_slice): ])
+AT_KEYWORDS([temporal slicing igraph_time_slice])
+AT_COMPILE_CHECK([simple/temporal_slice.c], [simple/temporal_slice.out])
+AT_CLEANUP

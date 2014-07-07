@@ -37,6 +37,7 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_datatype.h"
+#include "igraph_iterators.h"
 
 __BEGIN_DECLS
 
@@ -154,6 +155,41 @@ int igraph_create_temporal(igraph_t *graph,
                            const igraph_vector_time_t *v_active,
                            const igraph_vector_time_t *v_inactive);
 
+/**
+ * \function igraph_now
+ */
+
+igraph_time_t igraph_now(const igraph_t *graph);
+
+/**
+ * \function igraph_time_last
+ */
+
+int igraph_time_last(const igraph_t *graph, igraph_time_t *vertex,
+                     igraph_time_t *edge,
+                     igraph_time_t *vertex_or_edge);
+
+/**
+ * \function igraph_vertices_range
+ */
+
+int igraph_vertices_range(const igraph_t *graph, igraph_vs_t vs,
+			  igraph_vector_time_t *active,
+			  igraph_vector_time_t *inactive);
+
+/**
+ * \function igraph_edges_range
+ */
+
+int igraph_edges_range(const igraph_t *graph, igraph_es_t es,
+		       igraph_vector_time_t *active,
+		       igraph_vector_time_t *inactive);
+
+/**
+ */
+
+int igraph_time_slice(const igraph_t *graph, igraph_t *result,
+                      igraph_time_t from, igraph_time_t to);
 
 __END_DECLS
 

@@ -212,6 +212,15 @@ int igraph_incident_temp(const igraph_data_type_temp_t *graph, igraph_vector_t *
         ((igraph_integer_t)(IGRAPH_TO(g,(e))==(v) ? \
           IGRAPH_FROM((g),(e)) : IGRAPH_TO((g),(e))))
 
+
+int igraph_data_type_temp_time_next(igraph_data_type_temp_t *graph);
+int igraph_data_type_temp_time_prev(igraph_data_type_temp_t *graph);
+int igraph_data_type_temp_time_goto(igraph_data_type_temp_t *graph,
+				    igraph_time_t at);
+int igraph_data_type_temp_time_reset(igraph_data_type_temp_t *graph);
+igraph_time_t igraph_data_type_temp_now(igraph_data_type_temp_t *graph);
+
+
 /**
  * \function igraph_add_edges_at
  * Add edges to a temporal graph

@@ -1180,7 +1180,7 @@ int igraph_adjacent_temp(const igraph_data_type_temp_t *graph,
 /* -------------------------------------------------- */
 
 int igraph_data_type_temp_time_next(igraph_data_type_temp_t *graph) {
-  graph->now += 1;
+  if (graph->now != IGRAPH_END) { graph->now += 1; }
   return 0;
 }
 
@@ -1202,6 +1202,10 @@ int igraph_data_type_temp_time_goto(igraph_data_type_temp_t *graph,
 int igraph_data_type_temp_time_reset(igraph_data_type_temp_t *graph) {
   graph->now = IGRAPH_BEGINNING;
   return 0;
+}
+
+igraph_time_t igraph_data_type_temp_now(igraph_data_type_temp_t *graph) {
+  return graph->now;
 }
 
 int igraph_add_edges_at(igraph_data_type_temp_t *graph,
