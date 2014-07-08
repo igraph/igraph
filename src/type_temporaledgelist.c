@@ -250,6 +250,19 @@ int igraph_delete_edges_temp(igraph_data_type_temp_t *graph,
   graph->oi=newoi;
   IGRAPH_FINALLY_CLEAN(3);
 
+  /* Time information */
+  if (!igraph_vector_int_is_null(&graph->eb)) {
+    int sub = 0, nt = igraph_vector_int_size(&graph->eb) - 1;
+    for (i = 0; i < nt; i++) {
+      int f = VECTOR(graph->eb)[i], t = VECTOR(graph->eb)[i + 1];
+      VECTOR(graph->eb)[i] -= sub;
+      for (; f < t; f++) {
+	if (mark[f]) { sub++; }
+      }
+    }
+    VECTOR(graph->eb)[i] = remaining_edges;
+  }
+
   igraph_Free(mark);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -258,8 +271,6 @@ int igraph_delete_edges_temp(igraph_data_type_temp_t *graph,
 			     (igraph_integer_t) no_of_nodes);
   igraph_i_create_start_temp(&graph->is, &graph->to,   &graph->ii,
 			     (igraph_integer_t) no_of_nodes);
-
-  /* TODO: time labels */
 
   /* Nothing to deallocate... */
   return 0;

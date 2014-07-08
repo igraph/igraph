@@ -55,3 +55,9 @@ AT_SETUP([Temporal graphs, slicing (igraph_time_slice): ])
 AT_KEYWORDS([temporal slicing igraph_time_slice])
 AT_COMPILE_CHECK([simple/temporal_slice.c], [simple/temporal_slice.out])
 AT_CLEANUP
+
+AT_SETUP([Delete edges from temporal graph (igraph_delete_edges): ])
+AT_KEYWORDS([delete edges temporal igraph_delete_edges])
+AT_COMPILE_CHECK([simple/temporal_delete_edges.c],
+		 [simple/temporal_delete_edges.out])
+AT_CLEANUP

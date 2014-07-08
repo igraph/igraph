@@ -31,26 +31,15 @@ int main() {
   IGRAPH_VECTOR_CONSTANT(edges, 0,1,0,2,0,3,0,4,0,5,0,6,0,7,0,8,0,9);
   IGRAPH_VECTOR_TIME_CONSTANT(v_active, 0,0, 1,1, 2,2, 3,3, 4,4);
   IGRAPH_VECTOR_TIME_CONSTANT(e_active, 0, 1, 2, 3, 4, 5, 6, 7, 8);
+  IGRAPH_VECTOR_CONSTANT(todelete, 0, 5, 6, 8);
 
   igraph_create_temporal(&graph, &edges, 0, IGRAPH_DIRECTED, &e_active, 0,
 			 &v_active, 0);
 
-  /* igraph_time_slice(&graph, &slice, IGRAPH_BEGINNING, IGRAPH_BEGINNING); */
-  /* printf("%i\n", (int) igraph_vcount(&slice)); */
-  /* igraph_write_graph_edgelist(&slice, stdout); */
-  /* igraph_destroy(&slice); */
-  /* printf("--\n"); */
-
-  igraph_time_slice(&graph, &slice, IGRAPH_BEGINNING, IGRAPH_END);
-  printf("%i\n", (int) igraph_vcount(&slice));
-  igraph_write_graph_edgelist(&slice, stdout);
-  igraph_destroy(&slice);
-  printf("--\n");
-
-  igraph_time_slice(&graph, &slice, IGRAPH_BEGINNING, 4);
-  printf("%i\n", (int) igraph_vcount(&slice));
-  igraph_write_graph_edgelist(&slice, stdout);
-  igraph_destroy(&slice);
+  igraph_vector_int_print(&graph.eb);
+  igraph_delete_edges(&graph, igraph_ess_vector(&todelete));
+  igraph_write_graph_edgelist(&graph, stdout);
+  igraph_vector_int_print(&graph.eb);
   printf("--\n");
 
   igraph_destroy(&graph);
