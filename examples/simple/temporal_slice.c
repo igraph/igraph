@@ -35,11 +35,11 @@ int main() {
   igraph_create_temporal(&graph, &edges, 0, IGRAPH_DIRECTED, &e_active, 0,
 			 &v_active, 0);
 
-  /* igraph_time_slice(&graph, &slice, IGRAPH_BEGINNING, IGRAPH_BEGINNING); */
-  /* printf("%i\n", (int) igraph_vcount(&slice)); */
-  /* igraph_write_graph_edgelist(&slice, stdout); */
-  /* igraph_destroy(&slice); */
-  /* printf("--\n"); */
+  igraph_time_slice(&graph, &slice, IGRAPH_BEGINNING, IGRAPH_BEGINNING);
+  printf("%i\n", (int) igraph_vcount(&slice));
+  igraph_write_graph_edgelist(&slice, stdout);
+  igraph_destroy(&slice);
+  printf("--\n");
 
   igraph_time_slice(&graph, &slice, IGRAPH_BEGINNING, IGRAPH_END);
   printf("%i\n", (int) igraph_vcount(&slice));
