@@ -169,8 +169,8 @@ int igraph_add_vertices_temp(igraph_data_type_temp_t *graph,
 
 int igraph_delete_edges_temp(igraph_data_type_temp_t *graph,
 			     igraph_es_t edges) {
-  long int no_of_edges=igraph_ecount_temp(graph);
-  long int no_of_nodes=igraph_vcount_temp(graph);
+  long int no_of_edges=igraph_vector_size(&graph->from);
+  long int no_of_nodes=graph->n;
   long int edges_to_remove=0;
   long int remaining_edges;
   igraph_eit_t eit;
@@ -286,8 +286,9 @@ int igraph_delete_vertices_idx_temp(igraph_data_type_temp_t *graph,
 				    const igraph_vs_t vertices,
 				    igraph_vector_t *idx,
 				    igraph_vector_t *invidx) {
-  long int no_of_edges=igraph_ecount_temp(graph);
-  long int no_of_nodes=igraph_vcount_temp(graph);
+
+  long int no_of_edges=igraph_vector_size(&graph->from);
+  long int no_of_nodes=graph->n;
   igraph_vector_t edge_recoding, vertex_recoding;
   igraph_vector_t *my_vertex_recoding=&vertex_recoding;
   igraph_vit_t vit;
@@ -1343,9 +1344,9 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
      6. The eb vector does not change, either. (TODO: really?)
   */
 
-  int no_nodes_old = igraph_vcount(graph);
+  int no_nodes_old = graph->n;
   int no_nodes_new = no_nodes_old + nv;
-  int no_edges = igraph_ecount(graph);
+  int no_edges = igraph_vector_size(&graph->from);
   igraph_vector_t order;
   igraph_vector_time_t birth, obirth;
   igraph_bool_t has_vb = ! igraph_vector_int_is_null(&graph->vb);
@@ -1452,8 +1453,8 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
      6. The vb vector does not change. (TODO: really?)
    */
 
-  int no_nodes = igraph_vcount(graph);
-  int no_edges_old = igraph_ecount(graph);
+  int no_nodes = graph->n;
+  int no_edges_old = igraph_vector_size(&graph->from);
   int edges_length = igraph_vector_size(edges);
   int no_edges_new = no_edges_old + edges_length / 2;
   igraph_bool_t has_eb = ! igraph_vector_int_is_null(&graph->eb);
