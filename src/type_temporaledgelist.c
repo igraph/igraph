@@ -348,6 +348,20 @@ int igraph_delete_vertices_idx_temp(igraph_data_type_temp_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&newgraph.os, remaining_vertices+1);
   IGRAPH_VECTOR_INIT_FINALLY(&newgraph.is, remaining_vertices+1);
 
+  /* Time */
+  if (!igraph_vector_int_is_null(&graph->vb)) {
+    IGRAPH_CHECK(igraph_vector_int_copy(&newgraph.vb, &graph->vb));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &newgraph.vb);
+  } else {
+    igraph_vector_int_set_null(&newgraph.vb);
+  }
+  if (!igraph_vector_int_is_null(&graph->eb)) {
+    IGRAPH_CHECK(igraph_vector_int_copy(&newgraph.eb, &graph->eb));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &newgraph.eb);
+  } else {
+    igraph_vector_int_set_null(&newgraph.eb);
+  }
+
   /* Add the edges */
   for (i=0, j=0; j<remaining_edges; i++) {
     if (VECTOR(edge_recoding)[i]>0) {
@@ -376,6 +390,12 @@ int igraph_delete_vertices_idx_temp(igraph_data_type_temp_t *graph,
   /* attributes */
   IGRAPH_I_ATTRIBUTE_COPY((igraph_t *) &newgraph, (igraph_t *) graph,
 			  /*graph=*/ 1, /*vertex=*/0, /*edge=*/0);
+  if (!igraph_vector_int_is_null(&graph->eb)) {
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  if (!igraph_vector_int_is_null(&graph->vb)) {
+    IGRAPH_FINALLY_CLEAN(1);
+  }
   IGRAPH_FINALLY_CLEAN(6);
   IGRAPH_FINALLY(igraph_destroy, &newgraph);
 
@@ -405,6 +425,31 @@ int igraph_delete_vertices_idx_temp(igraph_data_type_temp_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
+  /* Time information */
+  if (!igraph_vector_int_is_null(&graph->vb)) {
+    int sub = 0, nt = igraph_vector_int_size(&graph->vb) - 1;
+    for (i = 0; i < nt; i++) {
+      int f = VECTOR(graph->vb)[i], t = VECTOR(graph->vb)[i + 1];
+      VECTOR(graph->vb)[i] -= sub;
+      for (; f < t; f++) {
+	if (VECTOR(*my_vertex_recoding)[f] == 0) { sub++; }
+      }
+    }
+    VECTOR(graph->vb)[i] = remaining_vertices;
+  }
+
+  if (!igraph_vector_int_is_null(&graph->eb)) {
+    int sub = 0, nt = igraph_vector_int_size(&graph->eb) - 1;
+    for (i = 0; i < nt; i++) {
+      int f = VECTOR(graph->eb)[i], t = VECTOR(graph->eb)[i + 1];
+      VECTOR(graph->eb)[i] -= sub;
+      for (; f < t; f++) {
+	if (VECTOR(edge_recoding)[f] == 0) { sub++; }
+      }
+    }
+    VECTOR(graph->eb)[i] = remaining_edges;
+  }
+
   igraph_vit_destroy(&vit);
   igraph_vector_destroy(&edge_recoding);
   igraph_destroy((igraph_t *) graph);
@@ -422,8 +467,6 @@ int igraph_delete_vertices_idx_temp(igraph_data_type_temp_t *graph,
       }
     }
   }
-
-  /* TODO: time labels */
 
   if (!idx) {
     igraph_vector_destroy(my_vertex_recoding);
