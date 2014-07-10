@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<!-- Created by igraph -->
+  <key id="g_name" for="graph" attr.name="name" attr.type="string"/>
+  <key id="g_type" for="graph" attr.name="type" attr.type="string"/>
+  <key id="g_loops" for="graph" attr.name="loops" attr.type="boolean"/>
+  <key id="g_p" for="graph" attr.name="p" attr.type="double"/>
+  <key id="v_id" for="node" attr.name="name" attr.type="string"/>
+  <key id="e_weight" for="edge" attr.name="weight" attr.type="double"/>
+  <graph id="G" edgedefault="undirected">
+    <data key="g_name">Erdos renyi (gnp) graph</data>
+    <data key="g_type">gnp</data>
+    <data key="g_loops">false</data>
+    <data key="g_p">0.2</data>
+    <node id="n0">
+      <data key="v_id">n0</data>
+    </node>
+    <node id="n1">
+      <data key="v_id">n1</data>
+    </node>
+    <node id="n2">
+      <data key="v_id">n2</data>
+    </node>
+    <node id="n3">
+      <data key="v_id">n3</data>
+    </node>
+    <node id="n4">
+      <data key="v_id">n4</data>
+    </node>
+    <node id="n5">
+      <data key="v_id">n5</data>
+    </node>
+    <node id="n6">
+      <data key="v_id">n6</data>
+    </node>
+    <node id="n7">
+      <data key="v_id">n7</data>
+    </node>
+    <node id="n8">
+      <data key="v_id">n8</data>
+    </node>
+    <node id="n9">
+      <data key="v_id">n9</data>
+    </node>
+    <edge source="n0" target="n1">
+      <data key="e_weight">10</data>
+    </edge>
+    <edge source="n0" target="n3">
+      <data key="e_weight">11</data>
+    </edge>
+    <edge source="n4" target="n5">
+      <data key="e_weight">12</data>
+    </edge>
+    <edge source="n0" target="n6">
+      <data key="e_weight">13</data>
+    </edge>
+    <edge source="n5" target="n6">
+      <data key="e_weight">14</data>
+    </edge>
+    <edge source="n4" target="n7">
+      <data key="e_weight">15</data>
+    </edge>
+    <edge source="n5" target="n7">
+      <data key="e_weight">16</data>
+    </edge>
+    <edge source="n5" target="n9">
+      <data key="e_weight">17</data>
+    </edge>
+    <edge source="n7" target="n9">
+      <data key="e_weight">18</data>
+    </edge>
+  </graph>
+</graphml>
