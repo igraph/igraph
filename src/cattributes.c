@@ -88,6 +88,14 @@ int igraph_i_cattributes_copy_attribute_record(igraph_attribute_record_t **newre
     IGRAPH_CHECK(igraph_strvector_copy(newstr, str));
     IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
     (*newrec)->value=newstr;
+  } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+    igraph_vector_bool_t *log = (igraph_vector_bool_t*) rec->value;
+    igraph_vector_bool_t *newlog = igraph_Calloc(1, igraph_vector_bool_t);
+    if (!newlog) { IGRAPH_ERROR("Cannot copy attributes", IGRAPH_ENOMEM); }
+    IGRAPH_FINALLY(igraph_free, newlog);
+    IGRAPH_CHECK(igraph_vector_bool_copy(newlog, log));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, newlog);
+    (*newrec)->value = newlog;
   }
 
   IGRAPH_FINALLY_CLEAN(4);
