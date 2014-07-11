@@ -41,6 +41,7 @@
 #include "igraph_matrix.h"
 #include "igraph_datatype.h"
 #include "igraph_arpack.h"
+#include "igraph_iterators.h"
 
 __BEGIN_DECLS
 
@@ -49,7 +50,8 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res);
-int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res);
+int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
+			 igraph_vs_t order);
 int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
 		       igraph_integer_t center, const igraph_vector_t *order);
 int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width);

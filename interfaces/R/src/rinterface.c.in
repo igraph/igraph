@@ -4550,15 +4550,18 @@ SEXP R_igraph_layout_random(SEXP graph) {
   return result;
 }
 
-SEXP R_igraph_layout_circle(SEXP graph) {
+SEXP R_igraph_layout_circle(SEXP graph, SEXP porder) {
   
   igraph_t g;
   igraph_matrix_t res;
+  igraph_vs_t order;
   SEXP result=R_NilValue;
   
   R_SEXP_to_igraph(graph, &g);
   igraph_matrix_init(&res, 0, 0);
-  igraph_layout_circle(&g, &res);
+  R_SEXP_to_igraph_vs(porder, &g, &order);
+  igraph_layout_circle(&g, &res, order);
+  igraph_vs_destroy(&order);
   PROTECT(result=R_igraph_matrix_to_SEXP(&res));
   igraph_matrix_destroy(&res);
   

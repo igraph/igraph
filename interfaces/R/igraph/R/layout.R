@@ -41,12 +41,13 @@ layout.random <- function(graph, dim=2) {
   }
 }
 
-layout.circle <- function(graph) {
+layout.circle <- function(graph, order=V(graph)) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+  order <- as.igraph.vs(graph, order) - 1L
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_layout_circle", graph,
+  .Call("R_igraph_layout_circle", graph, order,
         PACKAGE="igraph")
 }
 

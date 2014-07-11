@@ -1037,7 +1037,7 @@ igraph_layout_random:
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_circle:
-        PARAMS: GRAPH graph, OUT MATRIX res
+        PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET order=ALL
         IGNORE: RR, RC, RNamespace
 
 igraph_layout_star:

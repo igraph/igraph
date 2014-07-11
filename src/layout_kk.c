@@ -140,7 +140,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
       }
       RNG_END();
     } else {
-      igraph_layout_circle(graph, res);
+      igraph_layout_circle(graph, res, /* order= */ igraph_vss_all());
     }
   }
 
