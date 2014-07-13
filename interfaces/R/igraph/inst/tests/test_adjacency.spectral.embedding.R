@@ -217,3 +217,18 @@ test_that("Issue #50 is resolved", {
   expect_that(X1$D, equals(X2$D))
 
 })
+
+test_that("Issue #51 is resolved", {
+  library(igraph)
+  set.seed(12345)
+
+  pref.matrix <- diag(0.2, 2) + 0.2
+  block.sizes <- c(800, 800)
+  n <- sum(block.sizes)
+  g <- sbm.game(n, pref.matrix, block.sizes, directed=TRUE)
+
+  for (i in 1:25) {
+    ase <-  adjacency.spectral.embedding(g, 2)
+    expect_that(mean(ase$X %*% t(ase$Y)), equals(0.299981018354173))
+  }
+})
