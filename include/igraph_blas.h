@@ -67,6 +67,8 @@ void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
         const igraph_matrix_t* a, const igraph_real_t* x,
         igraph_real_t beta, igraph_real_t* y);
 
+igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v);
+
 __END_DECLS
 
 #endif

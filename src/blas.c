@@ -102,3 +102,9 @@ void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
   igraphdgemv_(&trans, &m, &n, &alpha, VECTOR(a->data), &m,
                (igraph_real_t*)x, &inc, &beta, y, &inc);
 }
+
+igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v) {
+  int n =igraph_vector_size(v);
+  int one = 1;
+  return igraphdnrm2_(&n, VECTOR(*v), &one);
+}
