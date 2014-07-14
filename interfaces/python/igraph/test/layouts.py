@@ -1,6 +1,7 @@
 import unittest
 from igraph import Graph, Layout, BoundingBox
 
+
 class LayoutTests(unittest.TestCase):
     def testConstructor(self):
         layout = Layout([(0,0,1), (0,1,0), (1,0,0)])
@@ -14,7 +15,7 @@ class LayoutTests(unittest.TestCase):
         self.assertEqual(len(layout), 4)
         self.assertEqual(layout[1], [0, 1, 0])
         self.assertEqual(layout[3], [2, 1, 3])
-        
+
         row = layout[2]
         row[2] = 1
         self.assertEqual(layout[2], [1, 0, 1])
@@ -37,7 +38,6 @@ class LayoutTests(unittest.TestCase):
                                          [1, 0, 0], \
                                          [2, 1, 9]])
 
-
         layout = Layout([(0,0,1), (0,1,0), (1,0,0), (2,1,3)])
         layout.scale((2, 2, 1))
         self.assertEqual(layout.coords, [[0, 0, 1], \
@@ -47,22 +47,21 @@ class LayoutTests(unittest.TestCase):
 
         self.assertRaises(ValueError, layout.scale, 2, 3)
 
-
     def testTranslation(self):
         layout = Layout([(0,0,1), (0,1,0), (1,0,0), (2,1,3)])
         layout2 = layout.copy()
-        
+
         layout.translate(1,3,2)
         self.assertEqual(layout.coords, [[1, 3, 3], \
                                          [1, 4, 2], \
                                          [2, 3, 2], \
                                          [3, 4, 5]])
-        
+
         layout.translate((-1,-3,-2))
         self.assertEqual(layout.coords, layout2.coords)
 
         self.assertRaises(ValueError, layout.translate, v=[3])
-        
+
     def testCentroid(self):
         layout = Layout([(0,0,1), (0,1,0), (1,0,0), (2,1,3)])
         centroid = layout.centroid()
@@ -116,9 +115,8 @@ class LayoutTests(unittest.TestCase):
         self.assertEqual(layout.coords, [])
 
     def testToPolar(self):
-        import math
         layout = Layout([(0, 0), (-1, 1), (0, 1), (1, 1)])
-        layout.to_radial(min_angle = 180, max_angle = 0, max_radius = 2)
+        layout.to_radial(min_angle=180, max_angle=0, max_radius=2)
         exp = [[0., 0.], [-2., 0.], [0., 2.], [2, 0.]]
         for idx in xrange(4):
             self.assertAlmostEqual(layout.coords[idx][0], exp[idx][0], places=3)
@@ -164,12 +162,34 @@ class LayoutAlgorithmTests(unittest.TestCase):
         del g["layout"]
         lo = layout_test(g, test_with_dims=(2,))
         self.assertEqual([tuple(item) for item in lo],
-                          zip(range(20), range(20, 40)))
+                         zip(range(20), range(20, 40)))
 
         g.vs["z"] = range(40, 60)
         lo = layout_test(g)
         self.assertEqual([tuple(item) for item in lo],
-                          zip(range(20), range(20, 40), range(40, 60)))
+                         zip(range(20), range(20, 40), range(40, 60)))
+
+    def testCircle(self):
+        def test_is_proper_circular_layout(graph, layout):
+            xs, ys = zip(*layout)
+            n = graph.vcount()
+            self.assertEquals(n, len(xs))
+            self.assertEquals(n, len(ys))
+            self.assertAlmostEquals(0, sum(xs))
+            self.assertAlmostEquals(0, sum(ys))
+            for x, y in zip(xs, ys):
+                self.assertAlmostEquals(1, x**2+y**2)
+
+        g = Graph.Ring(8)
+        layout = g.layout("circle")
+        test_is_proper_circular_layout(g, g.layout("circle"))
+
+        order = [0, 2, 4, 6, 1, 3, 5, 7]
+        ordered_layout = g.layout("circle", order=order)
+        test_is_proper_circular_layout(g, g.layout("circle"))
+        for v, w in enumerate(order):
+            self.assertAlmostEquals(layout[v][0], ordered_layout[w][0])
+            self.assertAlmostEquals(layout[v][1], ordered_layout[w][1])
 
     def testDavidsonHarel(self):
         # Quick smoke testing only
@@ -238,7 +258,7 @@ class LayoutAlgorithmTests(unittest.TestCase):
         g = Graph.Barabasi(100) + Graph.Barabasi(50)
         lo = g.layout("rt", root=[0, 100])
         self.assertEqual(lo[100][1]-lo[0][1], 0)
-        lo = g.layout("rt", root=[0, 100], rootlevel = [2, 10])
+        lo = g.layout("rt", root=[0, 100], rootlevel=[2, 10])
         self.assertEqual(lo[100][1]-lo[0][1], 8)
 
     def testBipartite(self):
@@ -260,6 +280,7 @@ class LayoutAlgorithmTests(unittest.TestCase):
         # Regression test for bug #1091891
         g = Graph.Ring(10, circular=False) + 1
         lo = g.layout("drl")
+        self.assertTrue(isinstance(lo, Layout))
 
 
 def suite():
@@ -267,10 +288,11 @@ def suite():
     layout_algorithm_suite = unittest.makeSuite(LayoutAlgorithmTests)
     return unittest.TestSuite([layout_suite, layout_algorithm_suite])
 
+
 def test():
     runner = unittest.TextTestRunner()
     runner.run(suite())
-    
+
+
 if __name__ == "__main__":
     test()
-

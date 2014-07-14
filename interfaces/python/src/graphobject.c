@@ -6084,9 +6084,11 @@ PyObject *igraphmodule_Graph_layout_circle(igraphmodule_GraphObject * self,
   int ret;
   long dim = 2;
   PyObject *result;
-  static char *kwlist[] = { "dim", NULL };
+  PyObject *order_o = Py_None;
+  igraph_vs_t order;
+  static char *kwlist[] = { "dim", "order", NULL };
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|l", kwlist, &dim))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|lO", kwlist, &dim, &order_o))
     return NULL;
 
   if (dim != 2 && dim != 3) {
@@ -6094,15 +6096,28 @@ PyObject *igraphmodule_Graph_layout_circle(igraphmodule_GraphObject * self,
     return NULL;
   }
 
+  if (dim != 2 && order_o != Py_None) {
+    PyErr_SetString(PyExc_NotImplementedError, "vertex ordering is supported "\
+        "for 2 dimensions only");
+    return NULL;
+  }
+
+  if (igraphmodule_PyObject_to_vs_t(order_o, &order, &self->g, 0, 0)) {
+    return NULL;
+  }
+
   if (igraph_matrix_init(&m, 1, 1)) {
     igraphmodule_handle_igraph_error();
+    igraph_vs_destroy(&order);
     return NULL;
   }
 
   if (dim == 2)
-    ret = igraph_layout_circle(&self->g, &m);
+    ret = igraph_layout_circle(&self->g, &m, order);
   else
     ret = igraph_layout_sphere(&self->g, &m);
+
+  igraph_vs_destroy(&order);
 
   if (ret) {
     igraph_matrix_destroy(&m);
@@ -13635,10 +13650,12 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
   /* interface to igraph_layout_circle */
   {"layout_circle", (PyCFunction) igraphmodule_Graph_layout_circle,
    METH_VARARGS | METH_KEYWORDS,
-   "layout_circle(dim=2)\n\n"
+   "layout_circle(dim=2, order=None)\n\n"
    "Places the vertices of the graph uniformly on a circle or a sphere.\n\n"
    "@param dim: the desired number of dimensions for the layout. dim=2\n"
    "  means a 2D layout, dim=3 means a 3D layout.\n"
+   "@param order: the order in which the vertices are placed along the\n"
+   "  circle. Not supported when I{dim} is not equal to 2.\n"
    "@return: the calculated layout."},
 
   /* interface to igraph_layout_grid */

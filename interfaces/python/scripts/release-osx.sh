@@ -2,7 +2,7 @@
 # Creates the OS X installer package and puts it in a disk image
 
 FATLIB=../../fatbuild/libigraph.dylib
-PYTHON_VERSIONS="2.5 2.6 2.7"
+PYTHON_VERSIONS="2.6 2.7"
 
 function check_universal {
 	if [ `file $1 | grep -c "binary with 2 architectures"` -lt 1 ]; then
@@ -46,7 +46,7 @@ CWD=`pwd`
 while [ ! -f setup.py ]; do cd ..; done
 
 # Extract the version number from setup.py
-VERSION=`cat setup.py | grep "version =" | cut -d '=' -f 2 | tr -d "', "`
+VERSION=`cat setup.py | grep "VERSION =" | cut -d '=' -f 2 | tr -d "' "`
 
 # Ensure that the igraph library we are linking to is a fat binary
 if [ ! -f ${FATLIB} ]; then
@@ -63,7 +63,7 @@ check_universal ${FATLIB}
 LIBS=$(get_dependent_libraries ${FATLIB})
 check_library_paths ${FATLIB} "${LIBS}"
 check_mandatory_library_linkage ${FATLIB} "${LIBS}" /usr/lib/libxml2.2.dylib
-check_mandatory_library_linkage ${FATLIB} "${LIBS}" /usr/lib/libz.1.dylib
+# check_mandatory_library_linkage ${FATLIB} "${LIBS}" /usr/lib/libz.1.dylib
 
 # Clean up the previous build directory
 rm -rf build/
@@ -84,7 +84,7 @@ for PYVER in $PYTHON_VERSIONS; do
   check_library_paths ${LIB} "${DEPS}"
   check_mandatory_library_linkage ${LIB} "${DEPS}" /usr/local/lib/libigraph.0.dylib
 
-  for MACVER in 10.5 10.6 10.7 10.8; do
+  for MACVER in 10.5 10.6 10.7 10.8 10.9; do
     MPKG="dist/python_igraph-${VERSION}-py${PYVER}-macosx${MACVER}.mpkg"
     if [ -f $MPKG ]; then
 	  break
