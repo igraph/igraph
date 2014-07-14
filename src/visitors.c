@@ -460,12 +460,12 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
     if (terminate) { FREE_ALL(); return 0; }
   }
 
-  for (actroot=0; actroot<no_of_nodes; actroot++) {
+  for (actroot=0; actroot<no_of_nodes; ) {
 
     /* 'root' first, then all other vertices */
     if (igraph_stack_empty(&stack)) {
       if (!unreachable) { break; }
-      if (VECTOR(added)[actroot]) { continue; }
+      if (VECTOR(added)[actroot]) { actroot++; continue; }
       IGRAPH_CHECK(igraph_stack_push(&stack, actroot));
       VECTOR(added)[actroot] = 1;
       if (father) { VECTOR(*father)[actroot] = -1; }
@@ -477,6 +477,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 					    0, extra);
 	if (terminate) { FREE_ALL(); return 0; }
       }
+      actroot++;
     }
     
     while (!igraph_stack_empty(&stack)) {
