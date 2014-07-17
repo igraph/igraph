@@ -61,3 +61,8 @@ AT_KEYWORDS([delete edges temporal igraph_delete_edges])
 AT_COMPILE_CHECK([simple/temporal_delete_edges.c],
 		 [simple/temporal_delete_edges.out])
 AT_CLEANUP
+
+AT_SETUP([neighbors in temporal graph (igraph_neighbors): ])
+AT_KEYWORDS([neighbors temporal igraph_neighbors])
+AT_COMPILE_CHECK([simple/temporal_neighbors.c], [simple/temporal_neighbors.out])
+AT_CLEANUP

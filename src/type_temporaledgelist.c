@@ -502,12 +502,13 @@ int igraph_neighbors_temp(const igraph_data_type_temp_t *graph,
 			  igraph_vector_t *neis, igraph_integer_t pnode,
 			  igraph_neimode_t mode) {
 
-  /* TODO: time labels */
-
   long int length=0, idx=0;
   long int i, j;
-
   long int node=pnode;
+  int no_all_edges = igraph_vector_size(&graph->from);
+  int last_edge = (graph->now == IGRAPH_END ? no_all_edges :
+		   VECTOR(graph->eb)[graph->now + 1]);
+  int lo = 0, li = 0;
 
   if (node<0 || node>igraph_vcount_temp(graph)-1) {
     IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVVID);
@@ -524,30 +525,41 @@ int igraph_neighbors_temp(const igraph_data_type_temp_t *graph,
   /* Calculate needed space first & allocate it*/
 
   if (mode & IGRAPH_OUT) {
-    length += (VECTOR(graph->os)[node+1] - VECTOR(graph->os)[node]);
+    for (i = VECTOR(graph->os)[node], j = VECTOR(graph->os)[node + 1];
+	 i < j; i++, length++) {
+      if (VECTOR(graph->oi)[ i ] >= last_edge) { break; }
+    }
+    lo = i;
   }
   if (mode & IGRAPH_IN) {
-    length += (VECTOR(graph->is)[node+1] - VECTOR(graph->is)[node]);
+    for (i = VECTOR(graph->is)[node], j = VECTOR(graph->is)[node + 1];
+	 i < j; i++, length++) {
+      if (VECTOR(graph->ii)[ i ] >= last_edge) { break; }
+    }
+    li = i;
   }
 
   IGRAPH_CHECK(igraph_vector_resize(neis, length));
 
   if (mode & IGRAPH_OUT) {
     j=(long int) VECTOR(graph->os)[node+1];
-    for (i=(long int) VECTOR(graph->os)[node]; i<j; i++) {
+    for (i=(long int) VECTOR(graph->os)[node]; i < lo; i++) {
       VECTOR(*neis)[idx++] =
 	VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
     }
   }
   if (mode & IGRAPH_IN) {
     j=(long int) VECTOR(graph->is)[node+1];
-    for (i=(long int) VECTOR(graph->is)[node]; i<j; i++) {
+    for (i=(long int) VECTOR(graph->is)[node]; i < li; i++) {
       VECTOR(*neis)[idx++] =
 	VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
     }
   }
 
-  if (igraph_is_directed_temp(graph) && mode == IGRAPH_ALL) {
+  /* If it is a temporal graph, or a directed graph with IGRAPH_ALL,
+     then neis might not be sorted and we need to sort it */
+  if (!igraph_vector_int_is_null(&graph->eb) ||
+      (igraph_is_directed_temp(graph) && mode == IGRAPH_ALL)) {
     igraph_vector_sort(neis);
   }
   return 0;
