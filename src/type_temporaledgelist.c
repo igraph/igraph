@@ -532,61 +532,24 @@ int igraph_neighbors_temp(const igraph_data_type_temp_t *graph,
 
   IGRAPH_CHECK(igraph_vector_resize(neis, length));
 
-  if (!igraph_is_directed_temp(graph) || mode != IGRAPH_ALL) {
-
-    if (mode & IGRAPH_OUT) {
-      j=(long int) VECTOR(graph->os)[node+1];
-      for (i=(long int) VECTOR(graph->os)[node]; i<j; i++) {
-	VECTOR(*neis)[idx++] =
-	  VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
-      }
+  if (mode & IGRAPH_OUT) {
+    j=(long int) VECTOR(graph->os)[node+1];
+    for (i=(long int) VECTOR(graph->os)[node]; i<j; i++) {
+      VECTOR(*neis)[idx++] =
+	VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
     }
-    if (mode & IGRAPH_IN) {
-      j=(long int) VECTOR(graph->is)[node+1];
-      for (i=(long int) VECTOR(graph->is)[node]; i<j; i++) {
-	VECTOR(*neis)[idx++] =
-	  VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
-      }
-    }
-  } else {
-    /* both in- and out- neighbors in a directed graph,
-       we need to merge the two 'vectors' */
-    long int jj1=(long int) VECTOR(graph->os)[node+1];
-    long int j2=(long int) VECTOR(graph->is)[node+1];
-    long int i1=(long int) VECTOR(graph->os)[node];
-    long int i2=(long int) VECTOR(graph->is)[node];
-    while (i1 < jj1 && i2 < j2) {
-      long int n1=(long int) VECTOR(graph->to)[
-		       (long int)VECTOR(graph->oi)[i1] ];
-      long int n2=(long int) VECTOR(graph->from)[
-		       (long int)VECTOR(graph->ii)[i2] ];
-      if (n1<n2) {
-	VECTOR(*neis)[idx++]=n1;
-	i1++;
-      } else if (n1>n2) {
-	VECTOR(*neis)[idx++]=n2;
-	i2++;
-      } else {
-	VECTOR(*neis)[idx++]=n1;
-	VECTOR(*neis)[idx++]=n2;
-	i1++;
-	i2++;
-      }
-    }
-    while (i1 < jj1) {
-      long int n1=(long int) VECTOR(graph->to)[
-		       (long int)VECTOR(graph->oi)[i1] ];
-      VECTOR(*neis)[idx++]=n1;
-      i1++;
-    }
-    while (i2 < j2) {
-      long int n2=(long int) VECTOR(graph->from)[
-		       (long int)VECTOR(graph->ii)[i2] ];
-      VECTOR(*neis)[idx++]=n2;
-      i2++;
+  }
+  if (mode & IGRAPH_IN) {
+    j=(long int) VECTOR(graph->is)[node+1];
+    for (i=(long int) VECTOR(graph->is)[node]; i<j; i++) {
+      VECTOR(*neis)[idx++] =
+	VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
     }
   }
 
+  if (igraph_is_directed_temp(graph) && mode == IGRAPH_ALL) {
+    igraph_vector_sort(neis);
+  }
   return 0;
 }
 
