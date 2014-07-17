@@ -28,6 +28,8 @@ int main() {
   igraph_t graph;
   igraph_integer_t from, to;
   int ret;
+  igraph_vector_t edges2;
+  igraph_error_handler_t *oldhandler;
 
   IGRAPH_VECTOR_CONSTANT(edges, 0,1, 0,2, 0,3, 0,4, 0,5,
 			 1,6, 1,7, 1,8, 1,9);
@@ -36,7 +38,7 @@ int main() {
   igraph_create_temporal(&graph, &edges, 0, IGRAPH_DIRECTED, &e_active, 0,
 			 0, 0);
 
-  igraph_set_error_handler(igraph_error_handler_ignore);
+  oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
 
   igraph_time_goto(&graph, 0);
   ret = igraph_edge(&graph, 0, &from, &to);
@@ -49,6 +51,36 @@ int main() {
   ret = igraph_edge(&graph, 1, &from, &to);
   if (ret != IGRAPH_EINVAL) { return 3; }
 
+  /* ----------------------------------------------------------- */
+
+  igraph_set_error_handler(oldhandler);
+  igraph_vector_init(&edges2, 0);
+
+  igraph_time_goto(&graph, IGRAPH_END);
+  igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &edges2);
+  igraph_vector_print(&edges2);
+
+  igraph_time_goto(&graph, 5);
+  igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &edges2);
+  igraph_vector_print(&edges2);
+
+  igraph_time_goto(&graph, IGRAPH_END);
+  igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &edges2);
+  igraph_vector_print(&edges2);
+
+  igraph_time_goto(&graph, 5);
+  igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &edges2);
+  igraph_vector_print(&edges2);
+
+  igraph_time_goto(&graph, IGRAPH_END);
+  igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_TO), &edges2);
+  igraph_vector_print(&edges2);
+
+  igraph_time_goto(&graph, 5);
+  igraph_edges(&graph, igraph_ess_all(IGRAPH_EDGEORDER_TO), &edges2);
+  igraph_vector_print(&edges2);
+
+  igraph_vector_destroy(&edges2);
   igraph_destroy(&graph);
 
   return 0;

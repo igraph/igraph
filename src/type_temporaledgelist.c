@@ -659,10 +659,11 @@ int igraph_edge_temp(const igraph_data_type_temp_t *graph,
 int igraph_edges_temp(const igraph_data_type_temp_t *graph,
 		      igraph_es_t eids, igraph_vector_t *edges) {
 
-  /* TODO: time labels */
-
   igraph_eit_t eit;
   long int n, ptr=0;
+  int last_edge = (graph->now == IGRAPH_END ?
+		   igraph_vector_size(&graph->from) :
+		   VECTOR(graph->eb)[graph->now + 1]);
 
   IGRAPH_CHECK(igraph_eit_create((igraph_t *) graph, eids, &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
@@ -670,6 +671,10 @@ int igraph_edges_temp(const igraph_data_type_temp_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(edges, n*2));
   for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
     long int e=IGRAPH_EIT_GET(eit);
+    if (e >= last_edge) {
+      IGRAPH_ERROR("Edge does not exist at this time point",
+		   IGRAPH_EINVAL);
+    }
     VECTOR(*edges)[ptr++]=IGRAPH_FROM(graph, e);
     VECTOR(*edges)[ptr++]=IGRAPH_TO(graph, e);
   }

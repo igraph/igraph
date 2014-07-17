@@ -74,7 +74,7 @@ AT_CLEANUP
 
 AT_SETUP([Edge queries in temporal graph (igraph_edge): ])
 AT_KEYWORDS([edge temporal igraph_edge])
-AT_COMPILE_CHECK([simple/temporal_edge.c])
+AT_COMPILE_CHECK([simple/temporal_edge.c], [simple/temporal_edge.out])
 AT_CLEANUP
 
 AT_SETUP([Incident edges in temporal graph (igraph_incident): ])
