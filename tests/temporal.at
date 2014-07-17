@@ -66,3 +66,8 @@ AT_SETUP([neighbors in temporal graph (igraph_neighbors): ])
 AT_KEYWORDS([neighbors temporal igraph_neighbors])
 AT_COMPILE_CHECK([simple/temporal_neighbors.c], [simple/temporal_neighbors.out])
 AT_CLEANUP
+
+AT_SETUP([degree in temporal graph (igraph_degree): ])
+AT_KEYWORDS([degree temporal igraph_degree])
+AT_COMPILE_CHECK([simple/temporal_degree.c], [simple/temporal_degree.out])
+AT_CLEANUP

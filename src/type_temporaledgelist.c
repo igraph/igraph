@@ -573,10 +573,13 @@ igraph_is_directed_temp(const igraph_data_type_temp_t *graph) {
 int igraph_degree_temp(const igraph_data_type_temp_t *graph,
 		       igraph_vector_t *res, const igraph_vs_t vids,
 		       igraph_neimode_t mode, igraph_bool_t loops)  {
-  /* TODO: time labels */
+
   long int nodes_to_calc;
-  long int i, j;
+  long int i, j, k;
   igraph_vit_t vit;
+  int no_all_edges = igraph_vector_size(&graph->from);
+  int last_edge = (graph->now == IGRAPH_END ? no_all_edges :
+		   VECTOR(graph->eb)[graph->now + 1]);
 
   IGRAPH_CHECK(igraph_vit_create((igraph_t *) graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -593,59 +596,37 @@ int igraph_degree_temp(const igraph_data_type_temp_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
   igraph_vector_null(res);
 
-  if (loops) {
-    if (mode & IGRAPH_OUT) {
-      for (IGRAPH_VIT_RESET(vit), i=0;
-	   !IGRAPH_VIT_END(vit);
-	   IGRAPH_VIT_NEXT(vit), i++) {
-	long int vid=IGRAPH_VIT_GET(vit);
-	VECTOR(*res)[i] +=
-          (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
-      }
-    }
-    if (mode & IGRAPH_IN) {
-      for (IGRAPH_VIT_RESET(vit), i=0;
-	   !IGRAPH_VIT_END(vit);
-	   IGRAPH_VIT_NEXT(vit), i++) {
-	long int vid=IGRAPH_VIT_GET(vit);
-	VECTOR(*res)[i] +=
-          (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
-      }
-    }
-  } else { /* no loops */
-    if (mode & IGRAPH_OUT) {
-      for (IGRAPH_VIT_RESET(vit), i=0;
-	   !IGRAPH_VIT_END(vit);
-	   IGRAPH_VIT_NEXT(vit), i++) {
-	long int vid=IGRAPH_VIT_GET(vit);
-	VECTOR(*res)[i] +=
-          (VECTOR(graph->os)[vid+1]-VECTOR(graph->os)[vid]);
-	for (j=(long int) VECTOR(graph->os)[vid];
-	     j<VECTOR(graph->os)[vid+1]; j++) {
-	  if (VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[j] ] ==
-              vid) {
-	    VECTOR(*res)[i] -= 1;
-	  }
+  if (mode & IGRAPH_OUT) {
+    for (IGRAPH_VIT_RESET(vit), k=0;
+	 !IGRAPH_VIT_END(vit);
+	 IGRAPH_VIT_NEXT(vit), k++) {
+      int node = IGRAPH_VIT_GET(vit);
+      for (i = VECTOR(graph->os)[node], j = VECTOR(graph->os)[node + 1];
+	   i < j; i++) {
+	if (VECTOR(graph->oi)[i] >= last_edge) { break; }
+	if (loops ||
+	    VECTOR(graph->to)[ (int) VECTOR(graph->oi)[i] ] != node) {
+	  VECTOR(*res)[k] += 1;
 	}
       }
     }
-    if (mode & IGRAPH_IN) {
-      for (IGRAPH_VIT_RESET(vit), i=0;
-	   !IGRAPH_VIT_END(vit);
-	   IGRAPH_VIT_NEXT(vit), i++) {
-	long int vid=IGRAPH_VIT_GET(vit);
-	VECTOR(*res)[i] +=
-          (VECTOR(graph->is)[vid+1]-VECTOR(graph->is)[vid]);
-	for (j=(long int) VECTOR(graph->is)[vid];
-	     j<VECTOR(graph->is)[vid+1]; j++) {
-	  if (VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[j] ] ==
-              vid) {
-	    VECTOR(*res)[i] -= 1;
-	  }
+  }
+
+  if (mode & IGRAPH_IN) {
+    for (IGRAPH_VIT_RESET(vit), k=0;
+	 !IGRAPH_VIT_END(vit);
+	 IGRAPH_VIT_NEXT(vit), k++) {
+      int node = IGRAPH_VIT_GET(vit);
+      for (i = VECTOR(graph->is)[node], j = VECTOR(graph->is)[node + 1];
+	   i < j; i++) {
+	if (VECTOR(graph->ii)[i] >= last_edge) { break; }
+	if (loops ||
+	    VECTOR(graph->from)[ (int) VECTOR(graph->ii)[i] ] != node) {
+	  VECTOR(*res)[k] += 1;
 	}
       }
     }
-  }  /* loops */
+  }
 
   igraph_vit_destroy(&vit);
   IGRAPH_FINALLY_CLEAN(1);
