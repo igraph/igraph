@@ -71,3 +71,8 @@ AT_SETUP([degree in temporal graph (igraph_degree): ])
 AT_KEYWORDS([degree temporal igraph_degree])
 AT_COMPILE_CHECK([simple/temporal_degree.c], [simple/temporal_degree.out])
 AT_CLEANUP
+
+AT_SETUP([Edge queries in temporal graph (igraph_edge): ])
+AT_KEYWORDS([edge temporal igraph_edge])
+AT_COMPILE_CHECK([simple/temporal_edge.c])
+AT_CLEANUP

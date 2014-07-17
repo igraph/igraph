@@ -638,10 +638,16 @@ int igraph_edge_temp(const igraph_data_type_temp_t *graph,
 		     igraph_integer_t eid, igraph_integer_t *from,
 		     igraph_integer_t *to) {
 
+  int last_edge = (graph->now == IGRAPH_END ?
+		   igraph_vector_size(&graph->from) :
+		   VECTOR(graph->eb)[graph->now + 1]);
+
+  if (eid >= last_edge) {
+    IGRAPH_ERROR("Edge does not exist at this time point", IGRAPH_EINVAL);
+  }
+
   *from = (igraph_integer_t) VECTOR(graph->from)[(long int)eid];
   *to   = (igraph_integer_t) VECTOR(graph->to  )[(long int)eid];
-
-  /* TODO: time labels */
 
   if (! igraph_is_directed((igraph_t *) graph) && *from > *to) {
     igraph_integer_t tmp=*from;
