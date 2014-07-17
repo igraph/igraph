@@ -542,14 +542,12 @@ int igraph_neighbors_temp(const igraph_data_type_temp_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(neis, length));
 
   if (mode & IGRAPH_OUT) {
-    j=(long int) VECTOR(graph->os)[node+1];
     for (i=(long int) VECTOR(graph->os)[node]; i < lo; i++) {
       VECTOR(*neis)[idx++] =
 	VECTOR(graph->to)[ (long int)VECTOR(graph->oi)[i] ];
     }
   }
   if (mode & IGRAPH_IN) {
-    j=(long int) VECTOR(graph->is)[node+1];
     for (i=(long int) VECTOR(graph->is)[node]; i < li; i++) {
       VECTOR(*neis)[idx++] =
 	VECTOR(graph->from)[ (long int)VECTOR(graph->ii)[i] ];
