@@ -1146,17 +1146,18 @@ int igraph_adjacent_temp(const igraph_data_type_temp_t *graph,
 			  igraph_neimode_t mode) {
   long int length=0, idx=0;
   long int i, j;
-
   long int node=pnode;
-
-  /* TODO: time labels */
+  int last_edge = (graph->now == IGRAPH_END ?
+		   igraph_vector_size(&graph->from) :
+		   VECTOR(graph->eb)[graph->now + 1]);
+  int lo = 0, li = 0;
 
   if (node<0 || node>igraph_vcount_temp(graph)-1) {
-    IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVVID);
+    IGRAPH_ERROR("cannot get incident edges", IGRAPH_EINVVID);
   }
   if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
       mode != IGRAPH_ALL) {
-    IGRAPH_ERROR("cannot get neighbors", IGRAPH_EINVMODE);
+    IGRAPH_ERROR("cannot get incident edges", IGRAPH_EINVMODE);
   }
 
   if (! graph->directed) {
@@ -1166,23 +1167,29 @@ int igraph_adjacent_temp(const igraph_data_type_temp_t *graph,
   /* Calculate needed space first & allocate it*/
 
   if (mode & IGRAPH_OUT) {
-    length += (VECTOR(graph->os)[node+1] - VECTOR(graph->os)[node]);
+    for (i = VECTOR(graph->os)[node], j = VECTOR(graph->os)[node + 1];
+	 i < j; i++, length++) {
+      if (VECTOR(graph->oi)[ i ] >= last_edge) { break; }
+    }
+    lo = i;
   }
   if (mode & IGRAPH_IN) {
-    length += (VECTOR(graph->is)[node+1] - VECTOR(graph->is)[node]);
+    for (i = VECTOR(graph->is)[node], j = VECTOR(graph->is)[node + 1];
+	 i < j; i++, length++) {
+      if (VECTOR(graph->ii)[ i ] >= last_edge) { break; }
+    }
+    li = i;
   }
 
   IGRAPH_CHECK(igraph_vector_resize(eids, length));
 
   if (mode & IGRAPH_OUT) {
-    j=(long int) VECTOR(graph->os)[node+1];
-    for (i=(long int) VECTOR(graph->os)[node]; i<j; i++) {
+    for (i=(long int) VECTOR(graph->os)[node]; i < lo; i++) {
       VECTOR(*eids)[idx++] = VECTOR(graph->oi)[i];
     }
   }
   if (mode & IGRAPH_IN) {
-    j=(long int) VECTOR(graph->is)[node+1];
-    for (i=(long int) VECTOR(graph->is)[node]; i<j; i++) {
+    for (i=(long int) VECTOR(graph->is)[node]; i < li; i++) {
       VECTOR(*eids)[idx++] = VECTOR(graph->ii)[i];
     }
   }
