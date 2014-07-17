@@ -199,6 +199,37 @@ int check_ring() {
   return 0;
 }
 
+int check_birth_indexing() {
+
+  igraph_t graph;
+  IGRAPH_VECTOR_CONSTANT(edges, 0,1, 0,2, 0,3, 0,4, 0,5,
+			 1,6, 1,7, 1,8, 1,9);
+  IGRAPH_VECTOR_TIME_CONSTANT(e_active, 2, 5, 9, 1, 4, 3, 6, 8, 7);
+
+  IGRAPH_I_STR(correct, 10, IGRAPH_DIRECTED,
+	       /* from= */ V(0,0,1,0,0,1,1,1,0),
+	       /* to=   */ V(4,1,6,5,2,7,9,8,3),
+	       /* oi=   */ V(0,1,3,4,8,2,5,6,7),
+	       /* ii=   */ V(1,4,8,0,3,2,5,7,6),
+	       /* os=   */ V(0,5,9,9,9,9,9,9,9,9,9),
+	       /* is=   */ V(0,0,1,2,3,4,5,6,7,8,9),
+	       /* attr= */ 0,
+	       /* vb=   */ 0,
+	       /* eb=   */ V(0,0,1,2,3,4,5,6,7,8,9),
+	       /* vd=   */ V(),
+	       /* ed=   */ V(),
+	       /* now=  */ -1);
+
+  igraph_create_temporal(&graph, &edges, 0, IGRAPH_DIRECTED, &e_active, 0,
+			 0, 0);
+
+  are_equal(&correct, &graph);
+
+  igraph_destroy(&graph);
+
+  return 0;
+}
+
 int main() {
   check_empty();
   check_empty5();
@@ -206,5 +237,6 @@ int main() {
   check_edge();
   check_edge_2();
   check_ring();
+  check_birth_indexing();
   return 0;
 }

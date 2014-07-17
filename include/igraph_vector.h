@@ -247,6 +247,11 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
 /* These are for internal use only */
 int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
 			igraph_vector_t* res, igraph_real_t maxval);
+int igraph_vector_order3(const igraph_vector_t* v,
+			 const igraph_vector_time_t *vt,
+			 const igraph_vector_t *v2,
+			 igraph_vector_t* res, igraph_real_t nodes,
+			 igraph_time_t time_steps);
 int igraph_vector_order1(const igraph_vector_t* v, 
 			 igraph_vector_t* res, igraph_real_t maxval);
 int igraph_vector_order1_int(const igraph_vector_t* v,

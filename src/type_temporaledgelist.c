@@ -1581,8 +1581,10 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
   /* 4. Create the oi and ii indices. */
 
   /* TODO: rewrite not to allocate memory */
-  igraph_vector_order(&graph->from, &graph->to, &graph->oi, no_nodes);
-  igraph_vector_order(&graph->to, &graph->from, &graph->ii, no_nodes);
+  igraph_vector_order3(&graph->from, &obirth, &graph->to, &graph->oi,
+		       no_nodes, last_time_step_new);
+  igraph_vector_order3(&graph->to, &obirth, &graph->from, &graph->ii,
+		       no_nodes, last_time_step_new);
 
   if (!has_eb) { IGRAPH_FINALLY_CLEAN(1); }
   igraph_vector_destroy(&tmp);
