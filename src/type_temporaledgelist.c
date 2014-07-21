@@ -684,72 +684,73 @@ int igraph_edges_temp(const igraph_data_type_temp_t *graph,
   return 0;
 }
 
-#define BINSEARCH(start,end,value,iindex,edgelist,N,pos)    \
-  do {                                                      \
-  while ((start) < (end)) {                                 \
-    long int mid=(start)+((end)-(start))/2;                 \
-    long int e=(long int) VECTOR((iindex))[mid];	    \
-    if (VECTOR((edgelist))[e] < (value)) {                  \
-      (start)=mid+1;                                        \
-    } else {                                                \
-      (end)=mid;                                            \
-    }                                                       \
-  }                                                         \
-  if ((start)<(N)) {                                        \
-    long int e=(long int) VECTOR((iindex))[(start)];        \
-    if (VECTOR((edgelist))[e] == (value)) {                 \
-      *(pos)=(igraph_integer_t) e;			    \
-    }                                                       \
-  } } while(0)
+#define LINSEARCH(start,end,value,iindex,edgelist,pos,iend)	    \
+  do {								    \
+    igraph_bool_t found = 0;					    \
+    int e;							    \
+    while (! found && (start) < (end) &&			    \
+	   (e = VECTOR(iindex)[start]) < (iend)) {		    \
+      found = VECTOR(edgelist)[e] == (value);			    \
+      (start) += 1;						    \
+    }								    \
+    if (found) { *(pos) = (igraph_integer_t) e; }		    \
+  } while (0)
 
-#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid)                     \
+#define FIND_DIRECTED_EDGE(graph,xfrom,xto,eid,iend)		    \
   do {                                                              \
     long int start=(long int) VECTOR(graph->os)[xfrom];		    \
     long int end=(long int) VECTOR(graph->os)[xfrom+1];		    \
-    long int N=end;                                                 \
     long int start2=(long int) VECTOR(graph->is)[xto];		    \
     long int end2=(long int) VECTOR(graph->is)[xto+1];		    \
-    long int N2=end2;                                               \
     if (end-start<end2-start2) {                                    \
-      BINSEARCH(start,end,xto,graph->oi,graph->to,N,eid);           \
+      LINSEARCH(start,end,xto,graph->oi,graph->to,eid,iend);	    \
     } else {                                                        \
-      BINSEARCH(start2,end2,xfrom,graph->ii,graph->from,N2,eid);    \
+      LINSEARCH(start2,end2,xfrom,graph->ii,graph->from,eid,iend);  \
     }                                                               \
   } while (0)
 
-#define FIND_UNDIRECTED_EDGE(graph,from,to,eid)                     \
+#define FIND_UNDIRECTED_EDGE(graph,from,to,eid,iend)		    \
   do {                                                              \
     long int xfrom1= from > to ? from : to;                         \
     long int xto1= from > to ? to : from;                           \
-    FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid);                      \
+    FIND_DIRECTED_EDGE(graph,xfrom1,xto1,eid,iend);			    \
   } while (0)
 
 int igraph_get_eid_temp(const igraph_data_type_temp_t *graph,
 			igraph_integer_t *eid, igraph_integer_t pfrom,
 			igraph_integer_t pto, igraph_bool_t directed,
 			igraph_bool_t error) {
-  long int from=pfrom, to=pto;
-  long int nov=igraph_vcount_temp(graph);
 
-  /* TODO: time labels */
+  long int from=pfrom, to=pto;
+  long int nov;
+  int iend;
+
+  if (igraph_vector_int_is_null(&graph->eb)) {
+    return igraph_get_eid_ie((igraph_data_type_ie_t*) graph, eid,
+			     pfrom, pto, directed, error);
+  }
+
+  nov = igraph_vcount_temp(graph);
 
   if (from < 0 || to < 0 || from > nov-1 || to > nov-1) {
     IGRAPH_ERROR("cannot get edge id", IGRAPH_EINVVID);
   }
 
+  iend = igraph_ecount_temp(graph);
+
   *eid=-1;
   if (igraph_is_directed((igraph_t *) graph)) {
 
     /* Directed graph */
-    FIND_DIRECTED_EDGE(graph,from,to,eid);
+    FIND_DIRECTED_EDGE(graph,from,to,eid,iend);
     if (!directed && *eid < 0) {
-      FIND_DIRECTED_EDGE(graph,to,from,eid);
+      FIND_DIRECTED_EDGE(graph,to,from,eid,iend);
     }
 
   } else {
 
     /* Undirected graph, they only have one mode */
-    FIND_UNDIRECTED_EDGE(graph,from,to,eid);
+    FIND_UNDIRECTED_EDGE(graph,from,to,eid,iend);
 
   }
 
@@ -783,8 +784,7 @@ int igraph_get_eids_pairs_temp(const igraph_data_type_temp_t *graph,
   long int no_of_nodes=igraph_vcount_temp(graph);
   long int i;
   igraph_integer_t eid=-1;
-
-  /* TODO: time labels */
+  int iend = igraph_ecount_temp(graph);
 
   if (n % 2 != 0) {
     IGRAPH_ERROR("Cannot get edge ids, invalid length of edge ids",
@@ -803,9 +803,9 @@ int igraph_get_eids_pairs_temp(const igraph_data_type_temp_t *graph,
       long int to=(long int) VECTOR(*pairs)[2*i+1];
 
       eid=-1;
-      FIND_DIRECTED_EDGE(graph,from,to,&eid);
+      FIND_DIRECTED_EDGE(graph,from,to,&eid,iend);
       if (!directed && eid < 0) {
-	FIND_DIRECTED_EDGE(graph,to,from,&eid);
+	FIND_DIRECTED_EDGE(graph,to,from,&eid,iend);
       }
 
       VECTOR(*eids)[i]=eid;
@@ -819,7 +819,7 @@ int igraph_get_eids_pairs_temp(const igraph_data_type_temp_t *graph,
       long int to=(long int) VECTOR(*pairs)[2*i+1];
 
       eid=-1;
-      FIND_UNDIRECTED_EDGE(graph,from,to,&eid);
+      FIND_UNDIRECTED_EDGE(graph,from,to,&eid,iend);
       VECTOR(*eids)[i]=eid;
       if (eid < 0 && error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
@@ -836,12 +836,11 @@ int igraph_get_eids_path_temp(const igraph_data_type_temp_t *graph,
 			      igraph_bool_t directed,
 			      igraph_bool_t error) {
 
-  /* TODO: time labels */
-
   long int n=igraph_vector_size(path);
   long int no_of_nodes=igraph_vcount_temp(graph);
   long int i;
   igraph_integer_t eid=-1;
+  int iend = igraph_ecount_temp(graph);
 
   if (!igraph_vector_isininterval(path, 0, no_of_nodes-1)) {
     IGRAPH_ERROR("Cannot get edge ids, invalid vertex id",
@@ -856,9 +855,9 @@ int igraph_get_eids_path_temp(const igraph_data_type_temp_t *graph,
       long int to=(long int) VECTOR(*path)[i+1];
 
       eid=-1;
-      FIND_DIRECTED_EDGE(graph, from, to, &eid);
+      FIND_DIRECTED_EDGE(graph, from, to, &eid, iend);
       if (!directed && eid < 0) {
-	FIND_DIRECTED_EDGE(graph, to, from, &eid);
+	FIND_DIRECTED_EDGE(graph, to, from, &eid, iend);
       }
 
       VECTOR(*eids)[i]=eid;
@@ -872,7 +871,7 @@ int igraph_get_eids_path_temp(const igraph_data_type_temp_t *graph,
       long int to=(long int) VECTOR(*path)[i+1];
 
       eid=-1;
-      FIND_UNDIRECTED_EDGE(graph, from, to, &eid);
+      FIND_UNDIRECTED_EDGE(graph, from, to, &eid, iend);
       VECTOR(*eids)[i]=eid;
       if (eid < 0 && error) {
 	IGRAPH_ERROR("Cannot get edge id, no such edge", IGRAPH_EINVAL);
@@ -888,8 +887,6 @@ int igraph_get_eids_temp(const igraph_data_type_temp_t *graph,
 			 const igraph_vector_t *pairs,
 			 const igraph_vector_t *path,
 			 igraph_bool_t directed, igraph_bool_t error) {
-
-  /* TODO: time labels */
 
   if (!pairs && !path) {
     igraph_vector_clear(eids);
@@ -913,7 +910,7 @@ int igraph_get_eids_temp(const igraph_data_type_temp_t *graph,
   }
 }
 
-#undef BINSEARCH
+#undef LINSEARCH
 #undef FIND_DIRECTED_EDGE
 #undef FIND_UNDIRECTED_EDGE
 
