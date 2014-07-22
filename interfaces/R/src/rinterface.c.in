@@ -2479,11 +2479,12 @@ SEXP R_igraph_to_SEXP(const igraph_t *graph) {
   REAL(VECTOR_ELT(graph->attr, 0))[0] += 1;
 
   /* Time labels */
-  PROTECT(time=NEW_LIST(4));
+  PROTECT(time=NEW_LIST(5));
   SET_VECTOR_ELT(time, 0, R_igraph_vector_int_to_SEXP_null(&graph->vb));
   SET_VECTOR_ELT(time, 1, R_igraph_vector_int_to_SEXP_null(&graph->eb));
   SET_VECTOR_ELT(time, 2, R_igraph_vector_int_to_SEXP_null(&graph->vd));
   SET_VECTOR_ELT(time, 3, R_igraph_vector_int_to_SEXP_null(&graph->ed));
+  SET_VECTOR_ELT(time, 4, ScalarInteger(graph->now));
   SET_VECTOR_ELT(result, 9, time);
   
   UNPROTECT(2);
@@ -3074,6 +3075,7 @@ int R_SEXP_to_igraph(SEXP graph, igraph_t *res) {
   R_SEXP_to_vector_int_null(VECTOR_ELT(time, 1), &res->eb);
   R_SEXP_to_vector_int_null(VECTOR_ELT(time, 2), &res->vd);
   R_SEXP_to_vector_int_null(VECTOR_ELT(time, 3), &res->ed);
+  res->now = INTEGER(AS_INTEGER(VECTOR_ELT(time, 4)))[0];
 
   return 0;
 }
@@ -3108,6 +3110,7 @@ int R_SEXP_to_igraph_copy(SEXP graph, igraph_t *res) {
   R_SEXP_to_vector_int_copy_null(VECTOR_ELT(time, 1), &res->eb);
   R_SEXP_to_vector_int_copy_null(VECTOR_ELT(time, 2), &res->vd);
   R_SEXP_to_vector_int_copy_null(VECTOR_ELT(time, 3), &res->ed);
+  res->now = INTEGER(AS_INTEGER(VECTOR_ELT(time, 4)))[0];
 
   return 0;
 }
