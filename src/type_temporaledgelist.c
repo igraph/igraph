@@ -1453,11 +1453,12 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
     VECTOR(graph->to)[i] = VECTOR(order)[ (int) VECTOR(graph->to)[i] ];
   }
 
+  IGRAPH_FINALLY_CLEAN(1); 	/* nowdata */
   if (!has_vb) { IGRAPH_FINALLY_CLEAN(1); }
   igraph_vector_destroy(&order);
   igraph_vector_time_destroy(&obirth);
   igraph_vector_time_destroy(&birth);
-  IGRAPH_FINALLY_CLEAN(4);
+  IGRAPH_FINALLY_CLEAN(3);
 
   /* ---------------------------------------------------------------- */
   /* 6. Need to recreate the os and is vectors. */
@@ -1596,6 +1597,7 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
   igraph_vector_order3(&graph->to, &obirth, &graph->from, &graph->ii,
 		       no_nodes, last_time_step_new);
 
+  IGRAPH_FINALLY_CLEAN(1);	/* nowdata */
   if (!has_eb) { IGRAPH_FINALLY_CLEAN(1); }
   igraph_vector_destroy(&tmp);
   igraph_vector_destroy(&order);
