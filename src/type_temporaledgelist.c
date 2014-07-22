@@ -1334,26 +1334,37 @@ int igraph_i_create_start_temp(igraph_vector_t *res, igraph_vector_t *el,
   return 0;
 }
 
-/* TODO: attributes */
+typedef struct {
+  igraph_t *graph;
+  igraph_time_t now;
+  int vcount;
+} igraph_i_nowdata_t;
+
+static void igraph_i_nowdata_reset(igraph_i_nowdata_t *data) {
+  data->graph->now = data->now;
+  data->graph->n = data->vcount;
+}
 
 int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
 				   const igraph_vector_time_t *v_active,
 				   void *attr) {
 
   /*
-     1. First orders the vertices in the graph and the new vertices
+     1. Add attributes of the new vertices. This is needed, so
+        that we can reorder them later.
+     2. First orders the vertices in the graph and the new vertices
         together. This will give the new ids of the nodes.
-     2. Create new vb based on the sorted birth times.
-     3. Rewrite the edge list using the new vertex ids (from, to).
-     4. The edge indices (oi and ii) do not change, assuming a
+     3. Create new vb based on the sorted birth times.
+     4. Rewrite the edge list using the new vertex ids (from, to).
+     5. The edge indices (oi and ii) do not change, assuming a
         stable sorting of vertex birth times. This is because the
 	new vertices do not have any incident edges, and the
 	(relative) order of the old vertices is the same as before,
 	so if the edge list is sorted according to vertex ids,
 	then nothing changes.
-     5. Need to recreate the os and is vectors, because we might
+     6. Need to recreate the os and is vectors, because we might
         have some new vertices.
-     6. The eb vector does not change, either. (TODO: really?)
+     7. The eb vector does not change, either. (TODO: really?)
   */
 
   int no_nodes_old = graph->n;
@@ -1366,6 +1377,7 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
     igraph_vector_int_size(&graph->vb) - 2 : 0;
   igraph_time_t last_time_step_add, last_time_step_new;
   int i;
+  igraph_i_nowdata_t nowdata = { graph, graph->now, no_nodes_old };
 
   last_time_step_add = no_nodes_new == 0 ? 0 :
     igraph_vector_time_max(v_active);
@@ -1390,10 +1402,20 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
 					  last_time_step_new + 2));
   }
 
+  /* ---------------------------------------------------------------- */
+  /* 1. Add vertex attributes for the new vertices */
+
   graph->n = no_nodes_new;
+  graph->now = IGRAPH_END;
+  IGRAPH_FINALLY(igraph_i_nowdata_reset, &nowdata);
+  if (graph->attr) {
+    IGRAPH_CHECK(igraph_i_attribute_add_vertices((igraph_t*) graph,
+						 nv, attr));
+  }
+  graph->now = nowdata.now;
 
   /* ---------------------------------------------------------------- */
-  /* 1. Order vertices according to their birth time */
+  /* 2. Order vertices according to their birth time */
 
   if (!has_vb) {
     for (i = 0; i < no_nodes_old; i++) { VECTOR(birth)[i] = 0; }
@@ -1414,13 +1436,17 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
   igraph_vector_time_qsort_ind_stable(&birth, &order, /*descending=*/ 0);
   igraph_vector_time_index(&birth, &obirth, &order);
 
+  if (graph->attr) {
+    IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, graph, &order));
+  }
+
   /* ---------------------------------------------------------------- */
-  /* 2. Create new vb based on the sorted birth times. */
+  /* 3. Create new vb based on the sorted birth times. */
 
   igraph_vector_time_i_index(&obirth, &graph->vb, last_time_step_new);
 
   /* ---------------------------------------------------------------- */
-  /* 3. Rewrite the edge list using the new vertex ids. */
+  /* 4. Rewrite the edge list using the new vertex ids. */
 
   for (i = 0; i < no_edges; i++) {
     VECTOR(graph->from)[i] = VECTOR(order)[ (int) VECTOR(graph->from)[i] ];
@@ -1431,10 +1457,10 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
   igraph_vector_destroy(&order);
   igraph_vector_time_destroy(&obirth);
   igraph_vector_time_destroy(&birth);
-  IGRAPH_FINALLY_CLEAN(3);
+  IGRAPH_FINALLY_CLEAN(4);
 
   /* ---------------------------------------------------------------- */
-  /* 5. Need to recreate the os and is vectors. */
+  /* 6. Need to recreate the os and is vectors. */
 
   igraph_vector_i_index_through(/* index_this= */ &graph->from,
 				/* ordered_by= */ &graph->oi,

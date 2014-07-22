@@ -86,3 +86,8 @@ AT_SETUP([Search for edge id in a temporal graph (igraph_get_eid): ])
 AT_KEYWORDS([edge id igraph_get_eid temporal])
 AT_COMPILE_CHECK([simple/temporal_get_eid.c], [simple/temporal_get_eid.out])
 AT_CLEANUP
+
+AT_SETUP([Attributes in temporal graphs: ])
+AT_KEYWORDS([attributes temporal])
+AT_COMPILE_CHECK([simple/temporal_attributes.c], [simple/temporal_attributes.out])
+AT_CLEANUP
