@@ -67,3 +67,18 @@ test_that("weighted sparse alpha.centrality works", {
     expect_that(ac3, equals(c(vcount(star), 1, 1, 1, 1, 1, 1, 1, 1, 1)))
   }
 })
+
+test_that("undirected, alpha centrality works, #653", {
+  if (require("Matrix", quietly = TRUE)) {
+    library(igraph)
+    g <- graph.ring(10)
+
+    ac1 <- alpha.centrality(g, sparse = TRUE)
+    ac2 <- alpha.centrality(g, sparse = FALSE)
+    expect_that(ac1, equals(ac2))
+
+    g2 <- as.directed(g, mode="mutual")
+    ac3 <- alpha.centrality(g, sparse = FALSE)
+    expect_that(ac1, equals(ac3))
+  }
+})

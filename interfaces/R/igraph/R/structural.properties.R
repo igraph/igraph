@@ -674,21 +674,23 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
 
   if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
     ## weights == NULL and there is a "weight" edge attribute
-    weights <- E(graph)$weight
+    attr <- "weight"
   } else if (is.null(weights)) {
     ## weights == NULL, but there is no "weight" edge attribute
-    weights <- rep(1, ecount(graph))
+    attr <- NULL
   } else if (is.character(weights) && length(weights)==1) {
-    weights <- get.edge.attribute(graph, weights)
+    ## name of an edge attribute, nothing to do
+    attr <- "weight"
   } else if (any(!is.na(weights))) {
-    weights <- as.numeric(weights)
+    ## weights != NULL and weights != rep(NA, x)
+    graph <- set.edge.attribute(graph, "weight", value=as.numeric(weights))
+    attr <- "weight"
   } else {
     ## weights != NULL, but weights == rep(NA, x)
-    weights <- rep(1, ecount(graph))
-  } 
-  
-  el <- get.edgelist(graph, names=FALSE)
-  M <- Matrix::sparseMatrix(dims=c(vc, vc), i=el[,2], j=el[,1], x=weights)
+    attr <- NULL
+  }
+
+  M <- Matrix::t(get.adjacency(graph, attr = attr, sparse = TRUE))
   M <- as(M, "dgCMatrix")
   
   ## Create an identity matrix
