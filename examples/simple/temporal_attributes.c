@@ -33,7 +33,10 @@ int main() {
   IGRAPH_VECTOR_TIME_CONSTANT(v_active, 0, 2, 5, 9, 0, 1, 0, 0, 8, 7);
   IGRAPH_VECTOR_TIME_CONSTANT(e_active, 2, 5, 9, 1, 4, 3, 6, 8, 7);
   IGRAPH_VECTOR_CONSTANT(birth, 0, 0, 0, 0, 1, 2, 5, 7, 8, 9);
+  IGRAPH_VECTOR_CONSTANT(ebirth, 1, 2, 3, 4, 5, 6, 7, 8, 9);
   IGRAPH_VECTOR_TIME_CONSTANT(v2_active, 0, 5, 10);
+  IGRAPH_VECTOR_CONSTANT(newedges, 1,0, 10,11, 1, 10);
+  IGRAPH_VECTOR_TIME_CONSTANT(e2_active, 2, 5, 8);
 
   igraph_i_set_attribute_table(&igraph_cattribute_table);
 
@@ -44,15 +47,28 @@ int main() {
   SETGAS(&graph, "name", "foobar");
   SETVANV(&graph, "name", &birth);
 
+  SETEANV(&graph, "weight", &ebirth);
+
   igraph_time_goto(&graph, 3);
 
   igraph_add_vertices_at(&graph, 3, &v2_active, /* v_inactive= */ 0,
 			 /* attr= */ 0);
 
+  if (igraph_now(&graph) != 3) { return 1; }
+
   igraph_vector_init(&vec, 0);
   VANV(&graph, "name", &vec);
   igraph_vector_print(&vec);
 
+  igraph_add_edges_at(&graph, &newedges, &e2_active, /* inactive= */ 0,
+		      /* attr= */ 0);
+
+  if (igraph_now(&graph) != 3) { return 2; }
+
+  EANV(&graph, "weight", &vec);
+  igraph_vector_print(&vec);
+
+  igraph_vector_destroy(&vec);
   igraph_destroy(&graph);
 
   return 0;

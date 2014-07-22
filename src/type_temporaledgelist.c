@@ -1475,8 +1475,6 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
   return 0;
 }
 
-/* TODO: attributes */
-
 int igraph_i_temp_reindex_edges(igraph_t *graph,
 				const igraph_vector_t *edges,
 				const igraph_vector_time_t *e_active,
@@ -1484,11 +1482,12 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
 
   /*
      1. Add edges to the from and to vectors.
-     2. Order the edges according to their birth time.
-     3. Create new eb vector.
-     4. Create the oi and ii indices.
-     5. Create the os and is indices.
-     6. The vb vector does not change. (TODO: really?)
+     2. Add the attributes of the new edges
+     3. Order the edges according to their birth time.
+     4. Create new eb vector.
+     5. Create the oi and ii indices.
+     6. Create the os and is indices.
+     7. The vb vector does not change. (TODO: really?)
    */
 
   int no_nodes = graph->n;
@@ -1502,6 +1501,7 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
   igraph_vector_time_t birth, obirth;
   igraph_vector_t order, tmp;
   int i, j;
+  igraph_i_nowdata_t nowdata = { graph, graph->now, no_nodes };
 
   last_time_step_add = no_edges_new == 0 ? 0 :
     igraph_vector_time_max(e_active);
@@ -1541,7 +1541,18 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
   }
 
   /* ---------------------------------------------------------------- */
-  /* 2. Order the edges according to their birth time, update eb. */
+  /* 2. Add the attributes of the new edges */
+
+  graph->now = IGRAPH_END;
+  IGRAPH_FINALLY(igraph_i_nowdata_reset, &nowdata);
+  if (graph->attr) {
+    IGRAPH_CHECK(igraph_i_attribute_add_edges((igraph_t*) graph, edges,
+					      attr));
+  }
+  graph->now = nowdata.now;
+
+  /* ---------------------------------------------------------------- */
+  /* 3. Order the edges according to their birth time, update eb. */
 
   if (!has_eb) {
     for (i = 0; i < no_edges_old; i++) { VECTOR(birth)[i] = 0; }
@@ -1567,13 +1578,17 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
   igraph_vector_update(&tmp, &graph->to);
   igraph_vector_index(&tmp, &graph->to, &order);
 
+  if (graph->attr) {
+    IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, graph, &order));
+  }
+
   /* ---------------------------------------------------------------- */
-  /* 3. Create new eb vector. */
+  /* 4. Create new eb vector. */
 
   igraph_vector_time_i_index(&obirth, &graph->eb, last_time_step_new);
 
   /* ---------------------------------------------------------------- */
-  /* 4. Create the oi and ii indices. */
+  /* 5. Create the oi and ii indices. */
 
   /* TODO: rewrite not to allocate memory */
   igraph_vector_order3(&graph->from, &obirth, &graph->to, &graph->oi,
@@ -1589,7 +1604,7 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(4);
 
   /* ---------------------------------------------------------------- */
-  /* 5. Create the os and is indices. */
+  /* 6. Create the os and is indices. */
 
   igraph_vector_i_index_through(/* index_this= */ &graph->from,
 				/* ordered_by= */ &graph->oi,
