@@ -291,31 +291,7 @@ print.igraph <- function(x, full=getIgraphOpt("print.full"),
 }
 
 summary.igraph <- function(object, ...) {
-
-  if (!is.igraph(object)) {
-    stop("Not a graph object")
-  }
-
-  title <- paste(sep="", "IGRAPH ",
-                 c("U","D")[is.directed(object)+1],
-                 c("-","N")[is.named(object)+1],
-                 c("-","W")[is.weighted(object)+1],
-                 c("-","B")[is.bipartite(object)+1], " ",
-                 vcount(object), " ", ecount(object), " -- ")
-  w <- getOption("width")
-  if (nchar(title) < w && "name" %in% list.graph.attributes(object)) {
-    title <- substring(paste(sep="", title,
-                             as.character(object$name)[1]), 1, w-1)
-  }
-  cat(title, "\n", sep="")
-
-  atxt <- .get.attr.codes(object)
-  atxt <- paste(atxt[atxt!=""], collapse=", ")
-  if (atxt != "") {
-    atxt <- strwrap(paste(sep="", "attr: ", atxt), exdent=2)
-    cat(atxt, sep="\n")
-  }
-
+  .print.header(object)
   invisible(object)
 }
 
