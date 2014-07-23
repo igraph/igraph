@@ -1918,6 +1918,28 @@ igraph_sir:
        CLASS-R: sir
 
 #######################################
+# Temporal graphs
+#######################################
+
+igraph_now:
+       PARAMS: GRAPH graph
+       RETURN: TIME
+       NAME-R: now
+       IGNORE: RR, RNamespace
+
+igraph_time_goto:
+       PARAMS: INOUT GRAPH graph, TIME at
+       IGNORE: RR, RNamespace, RC
+
+igraph_create_temporal:
+       PARAMS: OUT GRAPH graph, VECTOR edges, INTEGER n=max(edges), \
+               BOOLEAN directed=True, \
+               VECTOR_TIME_OR_0 e_active=0, VECTOR_TIME_OR_0 e_inactive=NULL, \
+               VECTOR_TIME_OR_0 v_active=0, VECTOR_TIME_OR_0 v_inactive=NULL
+       NAME-R: graph.temporal
+       IGNORE: RR
+
+#######################################
 # Other, not graph related
 #######################################
 

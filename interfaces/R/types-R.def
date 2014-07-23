@@ -23,6 +23,9 @@ BOOLEAN:
        True: TRUE
        False: FALSE
 
+TIME:
+    INCONV: %I% <- as.integer(%I%)
+
 VECTOR:
     INCONV: %I% <- as.numeric(%I%)
 
@@ -64,6 +67,9 @@ VECTOR_BOOL:
 
 VECTOR_BOOL_OR_0:
     INCONV: if (!is.null(%I%)) %I% <- as.logical(%I%)
+
+VECTOR_TIME_OR_0:
+    INCONV: if (!is.null(%I%)) %I% <- as.integer(%I%)
 
 MATRIX:
     INCONV: %I% <- as.matrix(structure(as.double(%I%), dim=dim(%I%)))

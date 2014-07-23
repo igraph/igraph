@@ -38,6 +38,7 @@ get.graph.attribute <- function(graph, name) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
   }
+
   .Call("R_igraph_mybracket2", graph, 9L, 2L,
         PACKAGE="igraph")[[as.character(name)]]
 }
@@ -47,8 +48,14 @@ set.graph.attribute <- function(graph, name, value) {
     stop("Not a graph object")
   }
 
-  .Call("R_igraph_mybracket3_set", graph, 9L, 2L, name, value,
-        PACKAGE="igraph")
+  if (name == "now" && is.temporal(graph)) {
+    c_value <- as.time(graph, value)
+    on.exit(.Call("R_igraph_finalizer", PACKAGE="igraph"))
+    .Call("R_igraph_time_goto", graph, value, c_value, PACKAGE="igraph")
+  } else {
+    .Call("R_igraph_mybracket3_set", graph, 9L, 2L, name, value,
+          PACKAGE="igraph")
+  }
 }
 
 graph.attributes <- function(graph) {
@@ -67,7 +74,9 @@ graph.attributes <- function(graph) {
       any(names(value) == "") || any(duplicated(names(value)))) {
     stop("Value must be a named list with unique names")
   }
-            
+
+  ## TODO: handle 'now' for temporal graphs
+
   .Call("R_igraph_mybracket2_set", graph, 9L, 2L, value,
         PACKAGE="igraph")
 }
