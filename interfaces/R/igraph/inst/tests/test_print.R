@@ -13,7 +13,7 @@ test_that("print.igraph works", {
   expect_that(g, prints_text("1--2"))
 
   V(g)$name <- letters[1:vcount(g)]
-  expect_that(summary(g), prints_text("name[ ]*[(]v/c[)]"))
+  expect_that(summary(g), prints_text("name[\n ]*[(]v/c[)]"))
   expect_that(g, prints_text("a--b"))
 
   set.seed(42)
