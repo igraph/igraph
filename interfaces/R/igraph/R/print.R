@@ -53,13 +53,15 @@
     stop("Not a graph object")
   }
 
+  temp <- if (! is.temporal(object)) "" else paste(" @", object$now)
+
   title <- paste(sep="", "IGRAPH ",
                  c("U","D")[is.directed(object)+1],
                  c("-","N")[is.named(object)+1],
                  c("-","W")[is.weighted(object)+1],
                  c("-","B")[is.bipartite(object)+1],
                  c("-","T")[is.temporal(object)+1], " ",
-                 vcount(object), " ", ecount(object), " -- ")
+                 vcount(object), " ", ecount(object), temp, " -- ")
   w <- getOption("width")
   if (nchar(title) < w && "name" %in% list.graph.attributes(object)) {
     title <- substring(paste(sep="", title,
