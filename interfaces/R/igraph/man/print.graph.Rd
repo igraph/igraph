@@ -10,7 +10,7 @@
   graph.attributes=getIgraphOpt("print.graph.attributes"),
   vertex.attributes=getIgraphOpt("print.vertex.attributes"),
   edge.attributes=getIgraphOpt("print.edge.attributes"),
-  names=TRUE, \dots)
+  names=TRUE, mode=c("auto", "edgelist", "compressed", "adjlist"),\dots)
 \method{summary}{igraph}(object, \dots)
 \method{str}{igraph}(object, \dots)
 }
@@ -25,7 +25,11 @@
   \item{names}{Logical constant, whether to print symbolic vertex names
     (ie. the \code{name} vertex attribute) or vertex ids.}
   \item{object}{The graph of which the summary will be printed.}
-  \item{\dots}{Additional agruments.}
+  \item{mode}{Character constant, how to print the edges, when printing
+    the full graph. Possible values: \dQuote{auto}, to select the format
+    automatically, based on the graph, \dQuote{edgelist},
+    \dQuote{compressed}, \dQuote{adjlist}.}
+  \item{\dots}{Additional arguments.}
 }
 \details{
   \code{summary.igraph} prints the number of vertices, edges and whether the

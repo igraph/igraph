@@ -264,23 +264,37 @@ print.igraph <- function(x, full=getIgraphOpt("print.full"),
                 graph.attributes=getIgraphOpt("print.graph.attributes"),
                 vertex.attributes=getIgraphOpt("print.vertex.attributes"),
                 edge.attributes=getIgraphOpt("print.edge.attributes"),
-                names=TRUE, ...) {
+                names=TRUE, mode=c("auto", "edgelist", "compressed",
+                              "adjlist"), ...) {
   
   if (!is.igraph(x)) {
     stop("Not a graph object")
   }
 
+  mode <- match.arg(mode)
+
   .print.header(x)
   if (full) { 
     if (graph.attributes)  .print.graph.attributes(x)
     if (vertex.attributes) .print.vertex.attributes(x)
+
+    if (mode == "auto") {
+      if (edge.attributes && length(list.edge.attributes(x)) !=0 ) {
+        mode <- "edgelist"
+      } else if (median(degree(x, mode="out")) < 3) {
+        mode <- "compressed"
+      } else {
+        mode <- "adjlist"
+      }
+    }
+
     if (ecount(x)==0) {
       ## Do nothing
-    } else if (edge.attributes && length(list.edge.attributes(x)) !=0 ) {
+    } else if (mode == "edgelist") {
       .print.edges.edgelist(x, names)
-    } else if (median(degree(x, mode="out")) < 3) {
+    } else if (mode == "compressed") {
       .print.edges.compressed(x, names)
-    } else if (is.named(x)) {
+    } else if (is.named(x) && names) {
       .print.edges.adjlist.named(x)
     } else {
       .print.edges.adjlist(x)
