@@ -89,3 +89,73 @@ graph.temporal <- function(edges, n = max(edges), directed = TRUE,
 
   res
 }
+
+on <- function(set) {
+  isvs <- inherits(set, "igraph.vs")
+  ises <- inherits(set, "igraph.es")
+  if (!isvs && !ises) {
+    stop("Not a set of vertices or a set of edges")
+  }
+
+  graph <- attr(set, "env")$graph
+
+  res <- if (isvs) {
+    graph.vertices.range(graph, set, on=TRUE, off=FALSE)
+  } else {
+    graph.edges.range(graph, set, on=TRUE, off=FALSE)
+  }
+
+  res[ res == -1L ] <- NA
+  ifelse(is.na(res), Inf, graph$calendar[res])
+}
+
+off <- function(set) {
+  isvs <- inherits(set, "igraph.vs")
+  ises <- inherits(set, "igraph.es")
+  if (!isvs && !ises) {
+    stop("Not a set of vertices or a set of edges")
+  }
+
+  graph <- attr(set, "env")$graph
+
+  res <- if (isvs) {
+    graph.vertices.range(graph, set, on=FALSE, off=TRUE)
+  } else {
+    graph.edges.range(graph, set, on=FALSE, off=TRUE)
+  }
+
+  res[ res == -1L ] <- NA
+  ifelse(is.na(res), Inf, graph$calendar[res])
+}
+
+graph.vertices.range <- function(graph, vids=V(graph), on=TRUE, off=TRUE) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  vids <- as.igraph.vs(graph, vids)
+  if (!on && !off) {
+    stop("At least on of 'on' and 'off' must be TRUE")
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_vertices_range", graph, vids-1, as.logical(on),
+              as.logical(off), PACKAGE="igraph")
+
+  res
+}
+
+graph.edges.range <- function(graph, eids=E(graph), on=TRUE, off=TRUE) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  eids <- as.igraph.es(graph, eids)
+  if (!on && !off) {
+    stop("At least on of 'on' and 'off' must be TRUE")
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_edges_range", graph, eids-1, as.logical(on),
+              as.logical(off), PACKAGE="igraph")
+
+  res
+}

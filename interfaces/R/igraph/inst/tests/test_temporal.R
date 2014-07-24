@@ -38,3 +38,22 @@ test_that("We can create temporal graphs", {
   expect_that(g3$calendar, equals(0))
 
 })
+
+test_that("on() and off() works", {
+
+  library(igraph)
+  g <- graph.temporal(1:10, v_on = 1, e_on = 1:5, calendar = 1:20)
+
+  expect_that(on(V(g)), equals(rep(1, 10)))
+  expect_that(on(E(g)), equals(1:5))
+  expect_that(off(V(g)), equals(rep(Inf, 10)))
+  expect_that(off(E(g)), equals(rep(Inf, 5)))
+
+  g$now <- 2
+
+  expect_that(on(V(g)), equals(rep(1, 10)))
+  expect_that(on(E(g)), equals(1:2))
+  expect_that(off(V(g)), equals(rep(Inf, 10)))
+  expect_that(off(E(g)), equals(rep(Inf, 2)))
+
+})
