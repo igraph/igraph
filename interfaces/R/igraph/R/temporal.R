@@ -21,7 +21,7 @@
 ###################################################################
 
 as.time <- function(graph, time, calendar=graph$calendar, NA.OK=FALSE) {
-  res <- ifelse(time == Inf, -1L, match(time, calendar))
+  res <- ifelse(time == Inf, -1L, match(time, calendar) - 1L)
   if (!NA.OK && any(is.na(res))) {
     stop("Unknown time point")
   }
@@ -50,7 +50,7 @@ is.temporal <- function(graph) {
   "calendar" %in% list.graph.attributes(graph)
 }
 
-as.temporal <- function(graph, calendar = 0L) {
+as.temporal <- function(graph, calendar = 1L) {
   calendar <- check_calendar(calendar)
   stopifnot(is.igraph(graph))
   graph$calendar <- calendar
@@ -58,7 +58,7 @@ as.temporal <- function(graph, calendar = 0L) {
 }
 
 graph.temporal <- function(edges, n = max(edges), directed = TRUE,
-                          e_on = 0, e_off = NULL, v_on = 0, v_off = NULL,
+                          e_on = 1L, e_off = NULL, v_on = 1L, v_off = NULL,
                           calendar = unique(sort(c(e_on, e_off, v_on,
                             v_off)))) {
 
@@ -74,7 +74,7 @@ graph.temporal <- function(edges, n = max(edges), directed = TRUE,
 
   check <- function(v, len) {
     if (!is.null(v)) {
-      v <- match(v, calendar)
+      v <- match(v, calendar) - 1L
       if (any(is.na(v))) { stop("Unknown time label") }
       v <- rep(v, length.out=len)
     }
