@@ -1936,12 +1936,14 @@ igraph_vertices_range:
                OUT VECTOR_TIME_OR_0 inactive
        DEPS: vids ON graph
        IGNORE: RR, RC
+       NAME-R: vertex_range
 
 igraph_edges_range:
        PARAMS: GRAPH graph, EDGESET eids=ALL, OUT VECTOR_TIME_OR_0 active, \
                OUT VECTOR_TIME_OR_0 inactive
        DEPS: eids ON graph
        IGNORE: RR, RC
+       NAME-R: edge_range
 
 igraph_create_temporal:
        PARAMS: OUT GRAPH graph, VECTOR edges, INTEGER n=max(edges), \

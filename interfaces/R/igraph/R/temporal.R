@@ -28,6 +28,11 @@ as.time <- function(graph, time, calendar=graph$calendar, NA.OK=FALSE) {
   res
 }
 
+from.time <- function(graph, time) {
+  time[ time == -1L ] <- NA
+  ifelse(is.na(time), Inf, graph$calendar[time + 1L])
+}
+
 check_calendar <- function(calendar) {
   if (any(duplicated(calendar))) {
     warning("Making calendar unique")
@@ -99,14 +104,11 @@ on <- function(set) {
 
   graph <- attr(set, "env")$graph
 
-  res <- if (isvs) {
-    graph.vertices.range(graph, set, on=TRUE, off=FALSE)
+  if (isvs) {
+    vertex_range(graph, set, on=TRUE, off=FALSE)
   } else {
-    graph.edges.range(graph, set, on=TRUE, off=FALSE)
+    edge_range(graph, set, on=TRUE, off=FALSE)
   }
-
-  res[ res == -1L ] <- NA
-  ifelse(is.na(res), Inf, graph$calendar[res])
 }
 
 off <- function(set) {
@@ -118,44 +120,49 @@ off <- function(set) {
 
   graph <- attr(set, "env")$graph
 
-  res <- if (isvs) {
-    graph.vertices.range(graph, set, on=FALSE, off=TRUE)
+  if (isvs) {
+    vertex_range(graph, set, on=FALSE, off=TRUE)
   } else {
-    graph.edges.range(graph, set, on=FALSE, off=TRUE)
+    edge_range(graph, set, on=FALSE, off=TRUE)
   }
-
-  res[ res == -1L ] <- NA
-  ifelse(is.na(res), Inf, graph$calendar[res])
 }
 
-graph.vertices.range <- function(graph, vids=V(graph), on=TRUE, off=TRUE) {
+vertex_range <- function(graph, vids=NULL, on=TRUE, off=TRUE) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  vids <- as.igraph.vs(graph, vids)
+  if (!is.null(vids)) { vids <- as.igraph.vs(graph, vids) - 1 }
   if (!on && !off) {
     stop("At least on of 'on' and 'off' must be TRUE")
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_vertices_range", graph, vids-1, as.logical(on),
+  res <- .Call("R_igraph_vertices_range", graph, vids, as.logical(on),
               as.logical(off), PACKAGE="igraph")
 
-  res
+  if (is.list(res)) {
+    lapply(res, from.time, graph=graph)
+  } else {
+    from.time(res, graph=graph)
+  }
 }
 
-graph.edges.range <- function(graph, eids=E(graph), on=TRUE, off=TRUE) {
+edge_range <- function(graph, eids=NULL, on=TRUE, off=TRUE) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  eids <- as.igraph.es(graph, eids)
+  if (!is.null(eids)) { eids <- as.igraph.es(graph, eids) - 1 }
   if (!on && !off) {
     stop("At least on of 'on' and 'off' must be TRUE")
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
-  res <- .Call("R_igraph_edges_range", graph, eids-1, as.logical(on),
+  res <- .Call("R_igraph_edges_range", graph, eids, as.logical(on),
               as.logical(off), PACKAGE="igraph")
 
-  res
+  if (is.list(res)) {
+    lapply(res, from.time, graph=graph)
+  } else {
+    from.time(res, graph=graph)
+  }
 }

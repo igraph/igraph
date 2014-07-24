@@ -9240,7 +9240,7 @@ SEXP R_igraph_vertices_range(SEXP graph, SEXP vids, SEXP pon, SEXP poff) {
   SEXP result, names;
                                         /* Convert input */
   R_SEXP_to_igraph(graph, &c_graph);
-  R_SEXP_to_igraph_vs(vids, &c_graph, &c_vids);
+  if (!isNull(vids)) { R_SEXP_to_igraph_vs(vids, &c_graph, &c_vids); }
   if (on) {
     if (0 != igraph_vector_time_init(&c_active, 0)) {
       igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM);
@@ -9255,14 +9255,13 @@ SEXP R_igraph_vertices_range(SEXP graph, SEXP vids, SEXP pon, SEXP poff) {
     IGRAPH_FINALLY(igraph_vector_time_destroy, &c_inactive);
   }
                                         /* Call igraph */
-  igraph_vertices_range(&c_graph, c_vids, on ? &c_active : 0,
-			off ? &c_inactive : 0);
+  igraph_vertices_range(&c_graph, isNull(vids) ? igraph_vss_all() : c_vids,
+			on ? &c_active : 0, off ? &c_inactive : 0);
 
                                         /* Convert output */
   if (on && off) {
     PROTECT(result=NEW_LIST(2));
     PROTECT(names=NEW_CHARACTER(2));
-    igraph_vs_destroy(&c_vids);
     PROTECT(active=R_igraph_vector_time_to_SEXP(&c_active));
     igraph_vector_time_destroy(&c_active);
     IGRAPH_FINALLY_CLEAN(1);
@@ -9284,6 +9283,7 @@ SEXP R_igraph_vertices_range(SEXP graph, SEXP vids, SEXP pon, SEXP poff) {
     igraph_vector_time_destroy(&c_inactive);
     IGRAPH_FINALLY_CLEAN(1);
   }
+  igraph_vs_destroy(&c_vids);
 
   UNPROTECT(1);
   return(result);
@@ -9303,7 +9303,7 @@ SEXP R_igraph_edges_range(SEXP graph, SEXP eids, SEXP pon, SEXP poff) {
   SEXP result, names;
                                         /* Convert input */
   R_SEXP_to_igraph(graph, &c_graph);
-  R_SEXP_to_igraph_es(eids, &c_graph, &c_eids);
+  if (!isNull(eids)) { R_SEXP_to_igraph_es(eids, &c_graph, &c_eids); }
 
   if (on) {
     if (0 != igraph_vector_time_init(&c_active, 0)) {
@@ -9319,14 +9319,15 @@ SEXP R_igraph_edges_range(SEXP graph, SEXP eids, SEXP pon, SEXP poff) {
     IGRAPH_FINALLY(igraph_vector_time_destroy, &c_inactive);
   }
                                         /* Call igraph */
-  igraph_edges_range(&c_graph, c_eids, on ? &c_active : 0,
+  igraph_edges_range(&c_graph, (isNull(eids) ?
+				igraph_ess_all(IGRAPH_EDGEORDER_ID) :
+				c_eids), on ? &c_active : 0,
 		     off ? &c_inactive : 0);
 
                                         /* Convert output */
   if (on && off) {
     PROTECT(result=NEW_LIST(2));
     PROTECT(names=NEW_CHARACTER(2));
-    igraph_es_destroy(&c_eids);
     PROTECT(active=R_igraph_vector_time_to_SEXP(&c_active));
     igraph_vector_time_destroy(&c_active);
     IGRAPH_FINALLY_CLEAN(1);
@@ -9348,6 +9349,7 @@ SEXP R_igraph_edges_range(SEXP graph, SEXP eids, SEXP pon, SEXP poff) {
     igraph_vector_time_destroy(&c_inactive);
     IGRAPH_FINALLY_CLEAN(1);
   }
+  igraph_es_destroy(&c_eids);
 
   UNPROTECT(1);
   return(result);
