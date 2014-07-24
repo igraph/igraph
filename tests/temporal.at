@@ -91,3 +91,15 @@ AT_SETUP([Attributes in temporal graphs: ])
 AT_KEYWORDS([attributes temporal])
 AT_COMPILE_CHECK([simple/temporal_attributes.c], [simple/temporal_attributes.out])
 AT_CLEANUP
+
+AT_SETUP([Adding vertices to temporal graphs: ])
+AT_KEYWORDS([temporal add vertices igraph_add_vertices igraph_add_vertices_at])
+AT_COMPILE_CHECK([simple/temporal_add_vertices.c],
+	         [simple/temporal_add_vertices.out])
+AT_CLEANUP
+
+AT_SETUP([Adding edges to temporal graphs: ])
+AT_KEYWORDS([temporal add edges igraph_add_edges igraph_add_edges_at])
+AT_COMPILE_CHECK([simple/temporal_add_edges.c],
+		 [simple/temporal_add_edges.out])
+AT_CLEANUP

@@ -1379,8 +1379,18 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
   int i;
   igraph_i_nowdata_t nowdata = { graph, graph->now, no_nodes_old };
 
-  last_time_step_add = no_nodes_new == 0 ? 0 :
-    igraph_vector_time_max(v_active);
+  /* Last time step of the vertices added, if v_active is not supplied,
+     then we assume that the vertices are added at the current time
+     step, i.e. at 'now'. If 'now' is IGRAPH_END, then they are added
+     at the last known time step. */
+  if (v_active && no_nodes_new != 0) {
+    last_time_step_add = igraph_vector_time_max(v_active);
+  } else if (!v_active) {
+    last_time_step_add = last_time_step_old;
+  } else {
+    last_time_step_add = 0;
+  }
+
   last_time_step_new = (last_time_step_add > last_time_step_old ?
 			last_time_step_add : last_time_step_old);
 
@@ -1430,7 +1440,17 @@ int igraph_i_temp_reindex_vertices(igraph_t *graph, igraph_integer_t nv,
       }
     }
   }
-  igraph_vector_time_append(&birth, v_active);
+
+  /* Birth times of the new nodes */
+  if (v_active) {
+    igraph_vector_time_append(&birth, v_active);
+  } else {
+    igraph_time_t t = (graph->now == IGRAPH_END ? last_time_step_old :
+		       graph->now);
+    for (i = 0; i < nv; i++) {
+      igraph_vector_time_push_back(&birth, t);
+    }
+  }
 
   /* TODO: sort and order in one go */
   igraph_vector_time_qsort_ind_stable(&birth, &order, /*descending=*/ 0);
@@ -1504,8 +1524,14 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
   int i, j;
   igraph_i_nowdata_t nowdata = { graph, graph->now, no_nodes };
 
-  last_time_step_add = no_edges_new == 0 ? 0 :
-    igraph_vector_time_max(e_active);
+  if (e_active && edges_length != 0) {
+    last_time_step_add = igraph_vector_time_max(e_active);
+  } else if (!e_active) {
+    last_time_step_add = last_time_step_old;
+  } else {
+    last_time_step_add = 0;
+  }
+
   last_time_step_new = (last_time_step_add > last_time_step_old ?
 			last_time_step_add : last_time_step_old);
 
@@ -1568,7 +1594,17 @@ int igraph_i_temp_reindex_edges(igraph_t *graph,
       }
     }
   }
-  igraph_vector_time_append(&birth, e_active);
+
+  /* Birth times of the new edges */
+  if (e_active) {
+    igraph_vector_time_append(&birth, e_active);
+  } else {
+    igraph_time_t t = (graph->now == IGRAPH_END ? last_time_step_old :
+		       graph->now);
+    for (i = no_edges_old; i < no_edges_new; i++) {
+      igraph_vector_time_push_back(&birth, t);
+    }
+  }
 
   /* TODO: sort and order in one go */
   igraph_vector_time_qsort_ind_stable(&birth, &order, /*descending=*/ 0);
