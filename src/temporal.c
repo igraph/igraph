@@ -79,12 +79,26 @@ int igraph_time_last(const igraph_t *graph, igraph_time_t *vertex,
   return 0;
 }
 
+typedef struct {
+  igraph_t *graph;
+  igraph_time_t now;
+} igraph_i_vertices_range_data_t;
+
+void igraph_i_vertices_range_reset_now
+  (igraph_i_vertices_range_data_t *data) {
+  data->graph->now = data->now;
+}
+
 int igraph_vertices_range(const igraph_t *graph, igraph_vs_t vs,
 			  igraph_vector_time_t *active,
 			  igraph_vector_time_t *inactive) {
 
-  /* Cannot do vcount here... */
   igraph_integer_t vs_nodes;
+  igraph_i_vertices_range_data_t reset_data =
+    { (igraph_t *) graph, graph->now };
+
+  reset_data.graph->now = IGRAPH_END;
+  IGRAPH_FINALLY(igraph_i_vertices_range_reset_now, &reset_data);
   igraph_vs_size(graph, &vs, &vs_nodes);
 
   if (active) {
@@ -137,6 +151,9 @@ int igraph_vertices_range(const igraph_t *graph, igraph_vs_t vs,
     }
   }
 
+  reset_data.graph->now = reset_data.now;
+  IGRAPH_FINALLY_CLEAN(1);
+
   return 0;
 }
 
@@ -144,8 +161,12 @@ int igraph_edges_range(const igraph_t *graph, igraph_es_t es,
 		       igraph_vector_time_t *active,
 		       igraph_vector_time_t *inactive) {
 
-  /* Cannot do ecount here... */
   igraph_integer_t es_edges;
+  igraph_i_vertices_range_data_t reset_data =
+    { (igraph_t *) graph, graph->now };
+
+  reset_data.graph->now = IGRAPH_END;
+  IGRAPH_FINALLY(igraph_i_vertices_range_reset_now, &reset_data);
   igraph_es_size(graph, &es, &es_edges);
 
   if (active) {
@@ -197,6 +218,9 @@ int igraph_edges_range(const igraph_t *graph, igraph_es_t es,
       }
     }
   }
+
+  reset_data.graph->now = reset_data.now;
+  IGRAPH_FINALLY_CLEAN(1);
 
   return 0;
 }
