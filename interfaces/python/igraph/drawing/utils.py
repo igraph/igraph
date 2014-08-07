@@ -49,7 +49,7 @@ class Rectangle(object):
     @property
     def coords(self):
         """The coordinates of the corners.
-        
+
         The coordinates are returned as a 4-tuple in the following order:
         left edge, top edge, right edge, bottom edge.
         """
@@ -195,9 +195,9 @@ class Rectangle(object):
 
     def isdisjoint(self, other):
         """Returns ``True`` if the two rectangles have no intersection.
-        
+
         Example::
-            
+
             >>> r1 = Rectangle(10, 10, 30, 30)
             >>> r2 = Rectangle(20, 20, 50, 50)
             >>> r3 = Rectangle(70, 70, 90, 90)
@@ -232,9 +232,9 @@ class Rectangle(object):
 
     def intersection(self, other):
         """Returns the intersection of this rectangle with another.
-        
+
         Example::
-            
+
             >>> r1 = Rectangle(10, 10, 30, 30)
             >>> r2 = Rectangle(20, 20, 50, 50)
             >>> r3 = Rectangle(70, 70, 90, 90)
@@ -275,7 +275,7 @@ class Rectangle(object):
 
     def union(self, other):
         """Returns the union of this rectangle with another.
-        
+
         The resulting rectangle is the smallest rectangle that contains both
         rectangles.
 
@@ -351,7 +351,7 @@ class BoundingBox(Rectangle):
         another.
 
         Example::
-            
+
             >>> box1 = BoundingBox(10, 20, 50, 60)
             >>> box2 = BoundingBox(70, 40, 100, 90)
             >>> box1 |= box2
@@ -369,9 +369,9 @@ class BoundingBox(Rectangle):
 
         The result is a bounding box which encloses both bounding
         boxes.
-        
+
         Example::
-            
+
             >>> box1 = BoundingBox(10, 20, 50, 60)
             >>> box2 = BoundingBox(70, 40, 100, 90)
             >>> box1 | box2
@@ -398,6 +398,23 @@ class FakeModule(object):
         raise TypeError("plotting not available")
     def __setattr__(self, key, value):
         raise TypeError("plotting not available")
+
+#####################################################################
+
+def find_cairo():
+    """Tries to import the ``cairo`` Python module if it is installed,
+    also trying ``cairocffi`` (a drop-in replacement of ``cairo``).
+    Returns a fake module if everything fails.
+    """
+    module_names = ["cairo", "cairocffi"]
+    module = FakeModule()
+    for module_name in module_names:
+        try:
+            module = __import__(module_name)
+            break
+        except ImportError:
+            pass
+    return module
 
 #####################################################################
 
@@ -471,9 +488,9 @@ class Point(tuple):
 
     def distance(self, other):
         """Returns the distance of the point from another one.
-        
+
         Example:
-            
+
             >>> p1 = Point(5, 7)
             >>> p2 = Point(8, 3)
             >>> p1.distance(p2)
@@ -481,7 +498,7 @@ class Point(tuple):
         """
         dx, dy = self.x - other.x, self.y - other.y
         return (dx * dx + dy * dy) ** 0.5
-    
+
     def interpolate(self, other, ratio = 0.5):
         """Linearly interpolates between the coordinates of this point and
         another one.

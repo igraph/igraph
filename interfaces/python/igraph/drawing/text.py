@@ -13,7 +13,7 @@ from warnings import warn
 __all__ = ["TextAlignment", "TextDrawer"]
 __license__ = "GPL"
 
-__docformat__ = "restructuredtext en" 
+__docformat__ = "restructuredtext en"
 
 #####################################################################
 
@@ -27,7 +27,7 @@ class TextAlignment(object):
 
 class TextDrawer(AbstractCairoDrawer):
     """Class that draws text on a Cairo context.
-    
+
     This class supports multi-line text unlike the original Cairo text
     drawing methods."""
 
@@ -44,11 +44,11 @@ class TextDrawer(AbstractCairoDrawer):
 
     def draw(self, wrap=False):
         """Draws the text in the current bounding box of the drawer.
-        
+
         Since the class itself is an instance of `AbstractCairoDrawer`, it
         has an attribute named ``bbox`` which will be used as a bounding
         box.
-        
+
         :Parameters:
           wrap : boolean
             whether to allow re-wrapping of the text if it does not fit
@@ -87,7 +87,7 @@ class TextDrawer(AbstractCairoDrawer):
 
         Vertical alignment settings are not taken into account in this method
         as the text is not drawn within a box.
-        
+
         :Parameters:
           x : float or ``None``
             The X coordinate of the reference point where the layout should
@@ -156,10 +156,10 @@ class TextDrawer(AbstractCairoDrawer):
         context and filling it. `x` and `y` denote the coordinates where the
         drawing should start. If they are both ``None``, the current position
         of the context will be used.
-        
+
         Vertical alignment settings are not taken into account in this method
         as the text is not drawn within a box.
-        
+
         :Parameters:
           x : float or ``None``
             The X coordinate of the reference point where the drawing should
@@ -194,7 +194,7 @@ class TextDrawer(AbstractCairoDrawer):
         """Iterates over the label line by line and returns a tuple containing
         the folloing for each line: the line itself, the width of the line and
         the X-bearing of the line.
-        
+
         The difference between this method and `_iterlines()` is that this
         method is allowed to re-wrap the line if necessary.
 
@@ -233,7 +233,7 @@ class TextDrawer(AbstractCairoDrawer):
                         current_line.append(sep)
                 last_sep_width = sep_width
             if current_line:
-                yield ("".join(current_line), current_width, 0) 
+                yield ("".join(current_line), current_width, 0)
 
     @property
     def text(self):
@@ -243,7 +243,7 @@ class TextDrawer(AbstractCairoDrawer):
     @text.setter
     def text(self, text):
         """Sets the text that will be drawn.
-        
+
         If `text` is ``None``, it will be mapped to an empty string; otherwise,
         it will be converted to a string."""
         if text is None:
@@ -254,7 +254,7 @@ class TextDrawer(AbstractCairoDrawer):
     def text_extents(self):
         """Returns the X-bearing, Y-bearing, width, height, X-advance and
         Y-advance of the text.
-        
+
         For multi-line text, the X-bearing and Y-bearing correspond to the
         first line, while the X-advance is extracted from the last line.
         and the Y-advance is the sum of all the Y-advances. The width and
@@ -277,8 +277,9 @@ class TextDrawer(AbstractCairoDrawer):
 
 def test():
     """Testing routine for L{TextDrawer}"""
-    import cairo
     import math
+    from igraph.drawing.utils import find_cairo
+    cairo = find_cairo()
 
     text = "The quick brown fox\njumps over a\nlazy dog"
     width, height = (600, 1000)

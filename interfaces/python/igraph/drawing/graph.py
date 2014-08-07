@@ -28,20 +28,14 @@ from igraph.drawing.edge import ArrowEdgeDrawer
 from igraph.drawing.text import TextAlignment, TextDrawer
 from igraph.drawing.metamagic import AttributeCollectorBase
 from igraph.drawing.shapes import PolygonDrawer
-from igraph.drawing.utils import Point
+from igraph.drawing.utils import find_cairo, Point
 from igraph.drawing.vertex import DefaultVertexDrawer
 from igraph.layout import Layout
 
 __all__ = ["DefaultGraphDrawer", "UbiGraphDrawer", "CytoscapeGraphDrawer"]
 __license__ = "GPL"
 
-try:
-    import cairo
-except ImportError:
-    # No cairo support is installed. Create a fake module
-    # pylint: disable-msg=C0103
-    from igraph.drawing.utils import FakeModule
-    cairo = FakeModule()
+cairo = find_cairo()
 
 #####################################################################
 
@@ -531,7 +525,7 @@ class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
 
     def draw(self, graph, *args, **kwds):
         """Draws the given graph on an UbiGraph display.
-        
+
         @keyword clear: whether to clear the current UbiGraph display before
                         plotting. Default: C{True}."""
         display = self.service
@@ -611,7 +605,7 @@ class UbiGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
 class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
     """Graph drawer that sends/receives graphs to/from Cytoscape using
     CytoscapeRPC.
-    
+
     This graph drawer cooperates with U{Cytoscape<http://www.cytoscape.org>}
     using U{CytoscapeRPC<http://wiki.nbic.nl/index.php/CytoscapeRPC>}.
     You need to install the CytoscapeRPC plugin first and start the
@@ -641,7 +635,7 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
     def draw(self, graph, name="Network from igraph", create_view=True,
             *args, **kwds):
         """Sends the given graph to Cytoscape as a new network.
-        
+
         @param name: the name of the network in Cytoscape.
         @param create_view: whether to create a view for the network
           in Cytoscape.The default is C{True}.
@@ -749,7 +743,7 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
 
     def fetch(self, name = None, directed = False, keep_canonical_names = False):
         """Fetches the network with the given name from Cytoscape.
-        
+
         When fetching networks from Cytoscape, the C{canonicalName} attributes
         of vertices and edges are not converted by default. Use the
         C{keep_canonical_names} parameter to retrieve these attributes as well.
@@ -846,7 +840,7 @@ class CytoscapeGraphDrawer(AbstractXMLRPCDrawer, AbstractGraphDrawer):
         is suitable for an XML-RPC call.  Note that the string type in
         Cytoscape is used as a catch-all type; if no other type fits, attribute
         values will be converted to string and then posted to Cytoscape.
-        
+
         ``None`` entries are allowed in `values`, they will be ignored on the
         Cytoscape side.
         """
@@ -914,9 +908,9 @@ class GephiGraphStreamingDrawer(AbstractGraphDrawer):
     def draw(self, graph, *args, **kwds):
         """Draws (i.e. sends) the given graph to the destination of the drawer using
         the Gephi graph streaming API.
-        
+
         The following keyword arguments are allowed:
-            
+
             - ``encoder`` lets one specify an instance of ``json.JSONEncoder`` that
               will be used to encode the JSON objects.
         """

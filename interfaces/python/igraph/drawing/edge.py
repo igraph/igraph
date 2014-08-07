@@ -8,17 +8,13 @@ __all__ = ["AbstractEdgeDrawer", "AlphaVaryingEdgeDrawer",
 
 __license__ = "GPL"
 
-try:
-    from cairo import LinearGradient
-except ImportError:
-    # No cairo support is installed. Don't worry, there will
-    # be a fake Cairo module in igraph.drawing
-    pass
-
 from igraph.drawing.colors import clamp
 from igraph.drawing.metamagic import AttributeCollectorBase
 from igraph.drawing.text import TextAlignment
+from igraph.drawing.utils import find_cairo
 from math import atan2, cos, pi, sin
+
+cairo = find_cairo()
 
 class AbstractEdgeDrawer(object):
     """Abstract edge drawer object from which all concrete edge drawer
@@ -130,7 +126,7 @@ class AbstractEdgeDrawer(object):
         """Returns the position where the label of an edge should be drawn. The
         default implementation returns the midpoint of the edge and an alignment
         that tries to avoid overlapping the label with the edge.
-        
+
         @param edge: the edge to be drawn. Visual properties of the edge
           are defined by the attributes of this object.
         @param src_vertex: the source vertex. Visual properties are given
@@ -285,7 +281,7 @@ class AlphaVaryingEdgeDrawer(AbstractEdgeDrawer):
         ctx = self.context
 
         # Set up the gradient
-        lg = LinearGradient(src_pos[0], src_pos[1], dest_pos[0], dest_pos[1])
+        lg = cairo.LinearGradient(src_pos[0], src_pos[1], dest_pos[0], dest_pos[1])
         edge_color = edge.color[:3] + self.alpha_at_src
         edge_color_end = edge_color[:3] + self.alpha_at_dest
         lg.add_color_stop_rgba(0, *edge_color)

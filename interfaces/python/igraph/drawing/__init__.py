@@ -25,20 +25,14 @@ from igraph.compat import property
 from igraph.configuration import Configuration
 from igraph.drawing.colors import Palette, palettes
 from igraph.drawing.graph import DefaultGraphDrawer
-from igraph.drawing.utils import BoundingBox, Point, Rectangle
+from igraph.drawing.utils import BoundingBox, Point, Rectangle, find_cairo
 from igraph.utils import named_temporary_file
 
 __all__ = ["BoundingBox", "DefaultGraphDrawer", "Plot", "Point", "Rectangle", "plot"]
 
 __license__ = "GPL"
 
-try:
-    import cairo
-except ImportError:
-    # No cairo support is installed. Create a fake module
-    # pylint: disable-msg=C0103
-    from igraph.drawing.utils import FakeModule
-    cairo = FakeModule()
+cairo = find_cairo()
 
 IN_IPYTHON = False
 try:
@@ -401,7 +395,7 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     @param obj: the object to be plotted
     @param target: the target where the object should be plotted. It can be one
       of the following types:
-      
+
         - C{None} -- an appropriate surface will be created and the object will
           be plotted there.
 
@@ -412,7 +406,7 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
         - C{string} -- a file with the given name will be created and an
           appropriate Cairo surface will be attached to it. The supported image
           formats are: PNG, PDF, SVG and PostScript.
-          
+
     @param bbox: the bounding box of the plot. It must be a tuple with either
       two or four integers, or a L{BoundingBox} object. If this is a tuple
       with two integers, it is interpreted as the width and height of the plot
