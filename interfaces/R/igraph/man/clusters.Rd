@@ -65,9 +65,10 @@ cluster.distribution(graph, cumulative = FALSE, mul.size = FALSE, \dots)
 }
 % \references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{subcomponent}}}
+\seealso{\code{\link{subcomponent}}, \code{\link{groups}}}
 \examples{
 g <- erdos.renyi.game(20, 1/20)
-clusters(g)
+clu <- clusters(g)
+groups(clu)
 }
 \keyword{graphs}

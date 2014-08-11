@@ -154,7 +154,10 @@ S3method(rglplot, igraph)
 # components
 
 export(cluster.distribution, is.connected, decompose.graph,
-       no.clusters)
+       no.clusters, groups)
+
+S3method(groups, default)
+S3method(groups, communities)
 
 # centrality
 

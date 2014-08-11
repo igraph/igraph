@@ -34,7 +34,7 @@ membership <- function(communities) {
   } else {
     stop("Cannot calculate community membership")
   }
-  if (!is.null(communities$names)) {
+  if (getIgraphOpt("add.vertex.names") && !is.null(communities$names)) {
     names(res) <- communities$names
   }
   res
@@ -146,12 +146,6 @@ length.communities <- function(x) {
 sizes <- function(communities) {
   m <- membership(communities)
   table(`Community sizes`=m)
-}
-
-communities <- function(communities) {
-  m <- membership(communities)
-  tapply(seq_along(m), m, simplify=FALSE,
-         function(x) x)
 }
 
 algorithm <- function(communities) {
@@ -900,3 +894,18 @@ compare.default <- function(comm1, comm2, method=c("vi", "nmi",
   compare.numeric(as.numeric(comm1), as.numeric(comm2), method)
 }
 
+groups <- function(x)
+  UseMethod("groups")
+
+groups.default <- function(x) {
+  vids <- names(x$membership)
+  if (is.null(vids)) vids <- seq_along(x$membership)
+  tapply(vids, x$membership, simplify=FALSE, function(x) x)
+}
+
+groups.communities <- function(x) {
+  m <- membership(x)
+  groups.default(list(membership = m))
+}
+
+communities <- groups.communities

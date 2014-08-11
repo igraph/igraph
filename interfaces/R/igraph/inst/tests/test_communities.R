@@ -70,3 +70,25 @@ test_that("creating communities objects works", {
   expect_that(comm$foo, equals("bar"))
 
 })
+
+test_that("communities function works", {
+  library(igraph)
+  g <- graph.famous("Zachary")
+  oc <- optimal.community(g)
+  gr <- communities(oc)
+  expect_that(gr, equals
+    (structure(list(`1` = c(1L, 2L, 3L, 4L, 8L, 12L, 13L, 14L, 18L,
+     20L, 22L), `2` = c(5L, 6L, 7L, 11L, 17L), `3` = c(9L, 10L, 15L,
+     16L, 19L, 21L, 23L, 27L, 30L, 31L, 33L, 34L), `4` = c(24L, 25L,
+     26L, 28L, 29L, 32L)), .Dim = 4L, .Dimnames = list(c("1", "2",
+     "3", "4")))))
+
+  g <- graph.ring(5) + graph.ring(5)
+  V(g)$name <- letters[1:10]
+  oc <- optimal.community(g)
+  gr <- communities(oc)
+  expect_that(gr, equals(structure(list(`1` = letters[1:5],
+                                        `2` = letters[6:10]),
+                                        .Dim = 2L,
+                                        .Dimnames = list(c("1", "2")))))
+})

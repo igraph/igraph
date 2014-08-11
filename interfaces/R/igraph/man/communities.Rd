@@ -29,6 +29,7 @@
 \method{length}{communities}(x)
 sizes(communities)
 membership(communities)
+communities(x)
 \method{modularity}{communities}(x, \dots)
 algorithm(communities)
 crossing(communities, graph)
@@ -138,6 +139,12 @@ create.communities(membership, algorithm = NULL, merges = NULL,
   partitioning. For these algorithms typically the membership for the
   highest modularity value is returned, but see also the manual pages of
   the individual algorithms.
+
+  \code{communities} is also the name of a function, that returns
+  a list of communities, each identified by their vertices. The vertices
+  will have symbolic names if the \code{add.vertex.names} igraph option
+  is set, and the graph itself was named. Otherwise numeric vertex ids
+  are used.
   
   \code{modularity} gives the modularity score of the partitioning. (See
   \code{\link{modularity.igraph}} for details. For algorithms that do

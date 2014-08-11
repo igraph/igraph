@@ -984,6 +984,9 @@ clusters <- function(graph, mode=c("weak", "strong")) {
   res <- .Call("R_igraph_clusters", graph, mode,
         PACKAGE="igraph")
   res$membership <- res$membership + 1
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+    names(res$membership) <- V(graph)$name
+  }
   res
 }
 
