@@ -89,3 +89,9 @@ AT_COMPILE_CHECK([simple/igraph_community_infomap.c],
                  [simple/igraph_community_infomap.out],
                  [simple/wikti_en_V_syn.elist])
 AT_CLEANUP
+
+AT_SETUP([Bipartite stochastic block model (igraph_community_bipartite_sbm) :])
+AT_KEYWORDS([community structure bipartite stochastic Block Model Larremore Clauset Jacobs])
+AT_COMPILE_CHECK([simple/igraph_community_bipartite_sbm.c],
+                 [simple/igraph_community_bipartite_sbm.out])
+AT_CLEANUP

@@ -344,6 +344,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
 			     spmatrix.c community.c fast_community.c \
+			     bisbm_communities.c \
 			     evolver_cit.c gml_tree.c \
 			     bliss_orbit.cc bliss_eqrefhash.cc \
 			     bliss_partition.cc bliss_graph.cc bliss_timer.cc \

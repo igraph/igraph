@@ -62,6 +62,16 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
 					igraph_vector_t *membership,
 					const igraph_vector_t *weights);
 
+
+
+int igraph_community_bipartite_sbm(igraph_t *graph,
+                    igraph_vector_t *membership,
+                    igraph_integer_t k_a,
+                    igraph_integer_t k_b,
+                    igraph_integer_t max_iters);
+
+
+
 int igraph_community_spinglass(const igraph_t *graph,
 			       const igraph_vector_t *weights,
 			       igraph_real_t *modularity,
