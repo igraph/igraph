@@ -153,14 +153,16 @@ static igraph_real_t score_partition(Housekeeping *hk) {
  */
 static void make_swap(Housekeeping *hk, int v, int to) {
   int from = hk->partition[v];
+  int c_1 = from;
+  igraph_vector_int_t *neighbors;
+  int degree;
+  int neigh;
   if (to == from) return;
   hk->partition[v] = to;
-  igraph_vector_int_t *neighbors = igraph_adjlist_get(hk->adj_list, v);
-  int degree = igraph_vector_int_size(neighbors);
+  neighbors = igraph_adjlist_get(hk->adj_list, v);
+  degree = igraph_vector_int_size(neighbors);
   hk->comm_tot_degree[from] -= degree;
   hk->comm_tot_degree[to] += degree;
-  int c_1 = from;
-  int neigh;
   for (neigh = 0; neigh < degree; neigh++) {
     int neighbor_comm = hk->partition[(int) VECTOR(*neighbors)[neigh]];
     int c_2 = neighbor_comm;
@@ -191,8 +193,9 @@ static void make_swap(Housekeeping *hk, int v, int to) {
  */
 static double score_swap(Housekeeping *hk, int v, int to) {
   int tmp = hk->partition[v];
+  double score;
   make_swap(hk, v, to);
-  double score = score_partition(hk);
+  score = score_partition(hk);
   make_swap(hk, v, tmp);
   return score;
 }
@@ -218,14 +221,16 @@ static double score_swaps(Housekeeping *hk, int v, int *dest) {
   int begin = 0;
   int end = hk->a;
   int to;
+  double best_score;
   if (from >= hk->a) {
     begin = hk->a; 
     end = hk->a + hk->b;
   }
-  double best_score = IGRAPH_NEGINFINITY;
+  best_score = IGRAPH_NEGINFINITY;
   for (to = begin; to < end; to++) {
+    double new_score;
     if (to == from) continue;
-    double new_score = score_swap(hk, v, to);
+    new_score = score_swap(hk, v, to);
     if (new_score > best_score) {
       best_score = new_score;
       *dest = to;
@@ -261,9 +266,10 @@ static double make_best_swap(Housekeeping *hk, igraph_bool_t *used, Swaprecord *
   int max_swap = -1;
   int v;
   for (v = 0; v < hk->size; v++) {
-    if (used[v]) continue;
     int dest;
-    double score = score_swaps(hk, v, &dest);
+    double score;
+    if (used[v]) continue;
+    score = score_swaps(hk, v, &dest);
     if (score > max_score) {      
       max_score = score;
       max_swap = dest;
@@ -309,10 +315,16 @@ static void rewind_swaps(Housekeeping *hk, Swaprecord *swaprecord, int best_swap
  * return false, otherwise return true.
  */
 static igraph_bool_t run_iteration(Housekeeping *hk, double init_score) {
-  igraph_bool_t used[hk->size];
-  Swaprecord swaprecord[hk->size];
   int best_swap = -1;
   int i;
+  igraph_bool_t *used = igraph_Calloc(hk->size, igraph_bool_t);
+  Swaprecord *swaprecord;
+  /* Have to malloc for c89 compatibility. Otherwise, would just be:
+  igraph_bool_t used[hk->size];
+  Swaprecord swaprecord[hk->size]; */
+  IGRAPH_FINALLY(igraph_free, used);
+  swaprecord = igraph_Calloc(hk->size, Swaprecord);
+  IGRAPH_FINALLY(igraph_free, swaprecord);
   for (i = 0; i < hk->size; i++) used[i] = false;
   for (i = 0; i < hk->size; i++) { 
     double new_score = make_best_swap(hk, used, swaprecord, i);
@@ -322,6 +334,9 @@ static igraph_bool_t run_iteration(Housekeeping *hk, double init_score) {
     }
   }
   rewind_swaps(hk, swaprecord, best_swap);
+  igraph_Free(used);
+  igraph_Free(swaprecord);
+  IGRAPH_FINALLY_CLEAN(2);
   if (best_swap == -1)
     return true;
   return false;
@@ -338,9 +353,9 @@ static double run_algorithm(Housekeeping *hk, int max_iters) {
   int i;
   if (!max_iters) max_iters = INT_MAX;
   for (i = 0; i < max_iters; i++) {
+    igraph_bool_t is_last_iteration = run_iteration(hk, score);
     /* TODO: check that this statusf is doing something. */
     igraph_statusf("Beginning iteration %d. Current score: %f.\n", 0, i + 1, score);
-    igraph_bool_t is_last_iteration = run_iteration(hk, score);
     score = score_partition(hk);
     if (is_last_iteration) {
       igraph_statusf("Score has not improved. Final score: %f\n", 0, score);
@@ -358,8 +373,8 @@ static double run_algorithm(Housekeeping *hk, int max_iters) {
  * a mapping (if it exists) into hk->types. 
  */
 static int initialize_types(Housekeeping *hk, igraph_t *graph) {
-  IGRAPH_VECTOR_BOOL_INIT_FINALLY(hk->types, hk->size);
   igraph_bool_t is_bipartite;
+  IGRAPH_VECTOR_BOOL_INIT_FINALLY(hk->types, hk->size);
   IGRAPH_CHECK(igraph_is_bipartite(graph, &is_bipartite, hk->types));
   if (!is_bipartite) {
     IGRAPH_ERROR("Input graph is not bipartite", IGRAPH_EINVAL);
@@ -417,12 +432,12 @@ static int initialize_neighbors(Housekeeping *hk, igraph_t *graph) {
  */
 static int initialize_inter_comm(Housekeeping *hk, igraph_t *graph) {
   igraph_matrix_t mat;
+  int row;
+  int col;
   IGRAPH_MATRIX_INIT_FINALLY(&mat, hk->size, hk->size);
   IGRAPH_CHECK(igraph_get_adjacency(graph, &mat, IGRAPH_GET_ADJACENCY_UPPER, false));
   IGRAPH_MATRIX_INIT_FINALLY(hk->inter_comm_edges, hk->a, hk->b);
   igraph_matrix_null(hk->inter_comm_edges);
-  int row;
-  int col;
   for (row = 0; row < hk->size; row++) {
     for (col = row + 1; col < hk->size; col++) {
       if (MATRIX(mat, row, col)) {
@@ -449,8 +464,8 @@ static int initialize_inter_comm(Housekeeping *hk, igraph_t *graph) {
  */
 static int initialize_degree_sums(Housekeeping *hk) {
   igraph_real_t *comm_degree = igraph_Calloc(hk->a + hk->b, igraph_real_t);
-  IGRAPH_FINALLY(igraph_free, comm_degree);
   int v;
+  IGRAPH_FINALLY(igraph_free, comm_degree);
   if (comm_degree==NULL) {
     IGRAPH_ERROR("Unable to allocate space for biSBM context.", IGRAPH_ENOMEM);
   }
@@ -548,10 +563,10 @@ int igraph_community_bipartite_sbm(igraph_t *graph, igraph_vector_t *membership,
   int i;
   Housekeeping hk;
   igraph_vector_bool_t types;
-  hk.types = &types;
   igraph_matrix_t inter_comm_edges;
-  hk.inter_comm_edges = &inter_comm_edges;
   igraph_adjlist_t adjlist;
+  hk.types = &types;
+  hk.inter_comm_edges = &inter_comm_edges;
   hk.adj_list = &adjlist;
   IGRAPH_CHECK(initialize_housekeeping(&hk, graph, k_a, k_b));
   *score = run_algorithm(&hk, max_iters);
@@ -562,3 +577,4 @@ int igraph_community_bipartite_sbm(igraph_t *graph, igraph_vector_t *membership,
   free_housekeeping(&hk);
   return 0;
 }
+
