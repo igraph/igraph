@@ -46,7 +46,7 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph,
 		    igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
-		    igraph_vector_t *reset,
+		    igraph_vector_t *reset, 
 		    const igraph_vector_t *weights,
 		    igraph_arpack_options_t *options);
 
@@ -1119,7 +1119,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
 		    igraph_bool_t directed, igraph_real_t damping, 
 		    const igraph_vector_t *weights, void *options) {
   return igraph_personalized_pagerank(graph, algo, vector, value, vids, 
-				      directed, damping, 0, weights, 
+				      directed, damping, 0, 0, weights, 
 				      options);
 }
 
@@ -1199,6 +1199,8 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
 	igraph_vector_t reset;
 	igraph_vit_t vit;
 
+	igraph_vector_t *reset_dangling = 0;
+
 	IGRAPH_VECTOR_INIT_FINALLY(&reset, igraph_vcount(graph));
 	IGRAPH_CHECK(igraph_vit_create(graph, reset_vids, &vit));
 	IGRAPH_FINALLY(igraph_vit_destroy, &vit);
@@ -1212,7 +1214,7 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
 	
 	IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, vector, 
 						  value, vids, directed, 
-						  damping, &reset, weights,
+						  damping, &reset, reset_dangling, weights,
 						  options));
 
 	igraph_vector_destroy(&reset);
@@ -1285,7 +1287,7 @@ int igraph_personalized_pagerank(const igraph_t *graph,
 		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
-		    igraph_vector_t *reset,
+		    igraph_vector_t *reset, igraph_vector_t *reset_dangling,
 		    const igraph_vector_t *weights,
 		    void *options) {
 
@@ -1306,7 +1308,7 @@ int igraph_personalized_pagerank(const igraph_t *graph,
 					       weights, o);
   } else if (algo == IGRAPH_PAGERANK_ALGO_PRPACK) {
     return igraph_personalized_pagerank_prpack(graph, vector, value, vids,
-					       directed, damping, reset, 
+					       directed, damping, reset, reset_dangling,
 					       weights);
   } else {
     IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);

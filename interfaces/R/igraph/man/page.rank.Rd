@@ -8,7 +8,7 @@
 \usage{
 page.rank (graph, algo = c("prpack", "arpack", "power"),
     vids = V(graph), directed = TRUE, damping = 0.85,
-    personalized = NULL, weights = NULL, options = NULL) 
+    personalized = NULL, personalizeddangling=personalized, weights = NULL, options = NULL) 
 page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000, 
     eps = 0.001, damping = 0.85, old = FALSE) 
 }
@@ -34,6 +34,12 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
     not uniform, but it is given by this vector. The vector should
     contains an entry for each vertex and it will be rescaled to sum up
     to one.}
+  \item{personalizeddangling}{Optional vector giving a probability distribution
+    for dangling nodes to calculate personalized PageRank. The vector should
+    contains an entry for each vertex and it will be rescaled to sum up
+    to one. Default is to use the same distribution as the version
+    used for non-dangling nodes. Dangling nodes become self connected
+    for numerical stability.}
   \item{weights}{A numerical vector or \code{NULL}. This argument can be
     used to give edge weights for calculating the weighted PageRank of
     vertices. If this is \code{NULL} and the graph has a \code{weight}

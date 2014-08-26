@@ -118,7 +118,7 @@ int igraph_personalized_pagerank(const igraph_t *graph,
 		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
 		    igraph_bool_t directed, igraph_real_t damping, 
-		    igraph_vector_t *reset,
+		    igraph_vector_t *reset, igraph_vector_t *reset_dangling,
 		    const igraph_vector_t *weights, void *options);
 int igraph_personalized_pagerank_vs(const igraph_t *graph, 
 		    igraph_pagerank_algo_t algo,

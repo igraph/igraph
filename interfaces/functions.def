@@ -482,6 +482,7 @@ igraph_personalized_pagerank:
                 OUT VERTEXINDEX vector, OUT REALPTR value, \
                 VERTEXSET vids=ALL, BOOLEAN directed=True, \
                 REAL damping=0.85, VECTOR_OR_0 personalized=NULL, \
+		VECTOR_OR_0 personalizeddangling=personalized, \
                 EDGEWEIGHTS weights=NULL, \
                 INOUT PAGERANKOPT options=NULL
         DEPS: vids ON graph, weights ON graph, vector ON graph vids, \

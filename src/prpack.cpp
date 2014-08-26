@@ -37,7 +37,7 @@ using namespace std;
 int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
             igraph_real_t *value, const igraph_vs_t vids,
             igraph_bool_t directed, igraph_real_t damping, 
-            igraph_vector_t *reset,
+	    igraph_vector_t *reset, igraph_vector_t *resetdangling,
             const igraph_vector_t *weights) {
     long int i, no_of_nodes = igraph_vcount(graph), nodes_to_calc;
     igraph_vit_t vit;
@@ -59,6 +59,31 @@ int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *
         v = new double[no_of_nodes];
         for (i = 0; i < no_of_nodes; i++) {
             v[i] = VECTOR(*reset)[i] / reset_sum;
+        }
+#if 0
+	if (!resetdangling) {
+	  // create a default u - should this be done in R instead?
+	  u = new double[no_of_nodes];
+	  for (i = 0; i < no_of_nodes; i++) {
+            u[i] = v[i];
+	  }
+	}
+#endif
+    }
+    if (resetdangling) {
+        /* Normalize reset vector so the sum is 1 */
+        double reset_sum = igraph_vector_sum(resetdangling);
+        if (igraph_vector_min(resetdangling) < 0) {
+            IGRAPH_ERROR("the reset vector for dangling nodes must not contain negative elements", IGRAPH_EINVAL);
+        }
+        if (reset_sum == 0) {
+            IGRAPH_ERROR("the sum of the elements in the reset vector for dangling nodes must not be zero", IGRAPH_EINVAL);
+        }
+
+        // Construct the personalization vector
+        u = new double[no_of_nodes];
+        for (i = 0; i < no_of_nodes; i++) {
+            u[i] = VECTOR(*resetdangling)[i] / reset_sum;
         }
     }
 
