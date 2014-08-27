@@ -417,7 +417,7 @@ int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
     options->simmer_damping_mult = 0;
     
   default:
-    IGRAPH_ERROR("Unkown DrL template", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Unknown DrL template", IGRAPH_EINVAL);
     break;
   }
 
