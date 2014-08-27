@@ -54,13 +54,6 @@ framework: all
 	ln -s Versions/Current/igraph $(top_builddir)/igraph.framework/igraph
 	cp $(top_builddir)/igraph_Info.plist $(top_builddir)/igraph.framework/Versions/Current/Resources/Info.plist
 
-test: all
-	for i in interfaces/*; do \
-		if [ -x $$i/test.sh ]; then \
-		  $$i/test.sh; \
-	 	fi; \
-	done
-
 parsersources:
 	cd src; make parsersources
 
