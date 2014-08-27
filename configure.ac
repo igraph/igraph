@@ -138,21 +138,21 @@ if test $graphml_support = yes; then
     XML2_CFLAGS=`$XML2CONFIG --cflags`
   fi
   AC_CHECK_LIB([xml2], [xmlSAXUserParseFile], [
-    OLDCFLAGS=${CFLAGS}
-    OLDCPPFLAGS=${CPPFLAGS}
+    ac_save_CFLAGS="$CFLAGS"
+    ac_save_CPPFLAGS="$CPPFLAGS"
     CFLAGS=${XML2_CFLAGS}
     CPPFLAGS=${XML2_CFLAGS}
     AC_CHECK_HEADER([libxml/parser.h], [
       HAVE_LIBXML=1
       AC_DEFINE([HAVE_LIBXML], [1], [Define to 1 if you have the libxml2 libraries installed])
-	  CFLAGS="${OLDCFLAGS} ${XML2_CFLAGS}"
-      CPPFLAGS="${OLDCFLAGS} ${XML2_CFLAGS}"
+	  CFLAGS="$ac_save_CFLAGS ${XML2_CFLAGS}"
+      CPPFLAGS="$ac_save_CPPFLAGS"
       AC_SUBST(XML2_LIBS)
       AC_SUBST(XML2_CFLAGS)
     ], [
       graphml_support=no
-      CFLAGS=${OLDCFLAGS}
-	  CPPFLAGS=${OLDCPPFLAGS}
+      CFLAGS="$ac_save_CFLAGS"
+	  CPPFLAGS="$ac_save_CPPFLAGS"
     ])
   ], [
     graphml_support=no
@@ -313,15 +313,14 @@ AM_CONDITIONAL(INTERNAL_BLAS, test x$internal_blas = xyes)
 AM_CONDITIONAL(INTERNAL_F2C, test x$internal_f2c = xyes)
 
 if test "$debug" = "yes"; then
-  CFLAGS="${CFLAGS} -ggdb -DRC_DEBUG -O0"
-  CPPFLAGS="${CFLAGS} -ggdb -DRC_DEBUG"
-  CXXFLAGS="${CFLAGS} -ggdb -DRC_DEBUG -O0"
+  CFLAGS="${CFLAGS} -ggdb -O0"
+  CPPFLAGS="${CPPFLAGS} -DRC_DEBUG"
+  CXXFLAGS="${CXXFLAGS} -ggdb -O0"
 fi
 
 if test "$use_gprof" = "yes"; then
   CFLAGS="${CFLAGS} -pg"
-  CPPFLAGS="${CFLAGS} -pg"
-  CXXFLAGS="${CFLAGS} -pg"
+  CXXFLAGS="${CXXFLAGS} -pg"
 fi
 
 AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
