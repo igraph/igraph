@@ -172,7 +172,7 @@ if test "x$enable_gmp" != "xno"; then
     ])
   ])
 fi
-AC_LANG_PUSH([C++])
+AC_LANG_POP([C++])
 
 tls_support=no
 HAVE_TLS=0
