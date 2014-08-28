@@ -105,10 +105,12 @@ void *thread_function(void *arg) {
   }
   
   while (1) {
+#if IGRAPH_THREAD_SAFE
     igraphdsaupd_(&ido, options.bmat, &options.n, options.which,
 		  &options.nev, &options.tol, resid, &options.ncv, v, 
 		  &options.ldv, options.iparam, options.ipntr, workd,
 		  workl, &options.lworkl, &options.info);
+#endif
     
     if (ido == -1 || ido == 1) {
       
@@ -142,12 +144,14 @@ void *thread_function(void *arg) {
     return 0;
   }
 
+#if IGRAPH_THREAD_SAFE
   igraphdseupd_(&rvec, all, select, d, v, &options.ldv,
 		&options.sigma, options.bmat, &options.n,
 		options.which, &options.nev, &options.tol,
 		resid, &options.ncv, v, &options.ldv, options.iparam,
 		options.ipntr, workd, workl, &options.lworkl,
 		&options.ierr);
+#endif
   
   if (options.ierr != 0) {
     printf("ARPACK error\n");
