@@ -32,8 +32,6 @@
  */
 int igraphmodule_filehandle_init(igraphmodule_filehandle_t* handle,
         PyObject* object, char* mode) {
-    handle->need_close = 0;
-
 #ifdef IGRAPH_PYTHON3
     int fp;
     if (object == 0 || PyLong_Check(object)) {
@@ -47,6 +45,8 @@ int igraphmodule_filehandle_init(igraphmodule_filehandle_t* handle,
         return 1;
     }
 #endif
+
+    handle->need_close = 0;
 
     if (PyBaseString_Check(object)) {
         /* We have received a string; we need to open the file denoted by this
