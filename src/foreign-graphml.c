@@ -439,8 +439,6 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
       VECTOR(vattr)[i]=&idrec;
     } else {
       igraph_vector_ptr_pop_back(&vattr);
-      IGRAPH_WARNING("Could not add vertex ids, "
-		     "there is already an 'id' vertex attribute");
     }
 
     for (i=0; i<igraph_vector_ptr_size(&state->e_attrs); i++) {
