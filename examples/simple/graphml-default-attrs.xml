@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="type" for="node" attr.name="type" attr.type="boolean">
+    <default>TRUE</default>
+  </key>
+  <key id="gender" for="node" attr.name="gender" attr.type="string">
+    <default>male</default>
+  </key>
+  <key id="age" for="node" attr.name="age" attr.type="int">
+    <default>20</default>
+  </key>
+  <key id="retired" for="node" attr.name="retired" attr.type="boolean">
+    <default>FALSE</default>
+  </key>
+  <graph id="G" edgedefault="directed">
+    <node id='p1'><data key='type'>FALSE</data><data key='age'>30</data></node>
+    <node id='o1'><data key='gender'>female</data></node>
+    <node id='o2'></node>
+    <edge id='e1' source='p1' target='o1'></edge>
+    <edge id='e2' source='p1' target='o2'></edge>
+  </graph>
+</graphml>

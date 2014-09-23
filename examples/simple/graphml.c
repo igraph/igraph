@@ -29,6 +29,44 @@ void custom_warning_handler (const char *reason, const char *file,
   printf("Warning: %s\n", reason);
 }
 
+void dump_graph(const char* header, const igraph_t* g) {
+  fputs(header, stdout);
+  printf("Vertices: %li\n", (long int) igraph_vcount(g));
+  printf("Edges: %li\n", (long int) igraph_ecount(g));
+  printf("Directed: %i\n", (int) igraph_is_directed(g));
+  igraph_write_graph_edgelist(g, stdout);
+}
+
+void dump_vertex_attribute_bool(const char* name, const igraph_t* g) {
+  long int i, n = igraph_vcount(g);
+
+  printf("Vertex attribute '%s':", name);
+  for (i = 0; i < n; i++) {
+    printf(" %s", VAB(g, name, i) ? "true" : "false");
+  }
+  printf("\n");
+}
+
+void dump_vertex_attribute_numeric(const char* name, const igraph_t* g) {
+  long int i, n = igraph_vcount(g);
+
+  printf("Vertex attribute '%s':", name);
+  for (i = 0; i < n; i++) {
+    printf(" %g", (float)VAN(g, name, i));
+  }
+  printf("\n");
+}
+
+void dump_vertex_attribute_string(const char* name, const igraph_t* g) {
+  long int i, n = igraph_vcount(g);
+
+  printf("Vertex attribute '%s':", name);
+  for (i = 0; i < n; i++) {
+    printf(" %s", VAS(g, name, i));
+  }
+  printf("\n");
+}
+
 int main(int argc, char **argv) {
   igraph_t g;
   igraph_error_handler_t* oldhandler;
@@ -45,7 +83,7 @@ int main(int argc, char **argv) {
   oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
   oldwarnhandler=igraph_set_warning_handler(custom_warning_handler);
   if ((result=igraph_read_graph_graphml(&g, ifile, 0))) {
-    // maybe it is simply disabled at compile-time
+    /* maybe it is simply disabled at compile-time */
     if (result == IGRAPH_UNIMPLEMENTED) return 77;
     return 1;
   }
@@ -63,12 +101,7 @@ int main(int argc, char **argv) {
     fclose(ofile);
     unlink("test2.gxl");
   }
-  
-  printf("The directed graph:\n");
-  printf("Vertices: %li\n", (long int) igraph_vcount(&g));
-  printf("Edges: %li\n", (long int) igraph_ecount(&g));
-  printf("Directed: %i\n", (int) igraph_is_directed(&g));
-  igraph_write_graph_edgelist(&g, stdout);
+  dump_graph("The directed graph:\n", &g);
   igraph_destroy(&g);
  
   /* The same with undirected graph */
@@ -77,11 +110,21 @@ int main(int argc, char **argv) {
     return 1;
   }
   fclose(ifile);
-  printf("The undirected graph:\n");
-  printf("Vertices: %li\n", (long int) igraph_vcount(&g));
-  printf("Edges: %li\n", (long int) igraph_ecount(&g));
-  printf("Directed: %i\n", (int) igraph_is_directed(&g));
-  igraph_write_graph_edgelist(&g, stdout);
+  dump_graph("The undirected graph:\n", &g);
+  igraph_destroy(&g);
+
+  /* Test a GraphML file with default attributes */
+  igraph_i_set_attribute_table(&igraph_cattribute_table);
+  ifile=fopen("graphml-default-attrs.xml", "r");
+  if ((result=igraph_read_graph_graphml(&g, ifile, 0))) {
+    return 1;
+  }
+  fclose(ifile);
+  dump_graph("The directed graph:\n", &g);
+  dump_vertex_attribute_bool("type", &g);
+  dump_vertex_attribute_string("gender", &g);
+  dump_vertex_attribute_numeric("age", &g);
+  dump_vertex_attribute_bool("retired", &g);
   igraph_destroy(&g);
   igraph_set_warning_handler(oldwarnhandler);
 
