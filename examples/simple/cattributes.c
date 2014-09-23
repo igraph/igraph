@@ -157,6 +157,7 @@ int main() {
   long int i;
   igraph_vector_t y;
   igraph_strvector_t id;
+  igraph_vector_bool_t type;
   char str[20];
 
   /* turn on attribute handling */
@@ -232,10 +233,15 @@ int main() {
   if (strcmp(GAS(&g, "name"), "toy")) {
     return 12;
   }
+  SETGAB(&g, "is_regular", 0);
+  if (GAB(&g, "is_regular") != 0) {
+    return 13;
+  }
   
   /* Delete graph attributes */
   DELGA(&g, "id");
   DELGA(&g, "name");
+  DELGA(&g, "is_regular");
   igraph_cattribute_list(&g, &gnames, 0,0,0,0,0);
   if (igraph_strvector_size(&gnames) != 0) {
     return 14;
@@ -275,6 +281,11 @@ int main() {
       strcmp(VAS(&g, "id", 1), "bar")) {
     return 18;
   }
+  SETVAB(&g, "type", 0, 1);
+  SETVAB(&g, "type", 1, 0);
+  if (!VAB(&g, "type", 0) || VAB(&g, "type", 1)) {
+    return 26;
+  }
 
   /* Set edge attributes */
   SETEAN(&g, "weight", 2, 100.0);
@@ -289,8 +300,13 @@ int main() {
       strcmp(EAS(&g, "color", 0), "Blue")) {
     return 20;
   }      
+  SETEAB(&g, "type", 0, 1);
+  SETEAB(&g, "type", 2, 0);
+  if (!EAB(&g, "type", 0) || EAB(&g, "type", 2)) {
+    return 27;
+  }
 
-  /* Set vector attributes as vector */
+  /* Set vertex attributes as vector */
   igraph_vector_init(&y, igraph_vcount(&g));
   igraph_vector_fill(&y, 1.23);
   SETVANV(&g, "y", &y);
@@ -307,7 +323,19 @@ int main() {
     if (VAN(&g, "foobar", i) != i) {
       return 22;
     }
-  }  
+  }
+
+  igraph_vector_bool_init(&type, igraph_vcount(&g));
+  for (i=0; i<igraph_vcount(&g); i++) {
+    VECTOR(type)[i] = (i % 2 == 1);
+  }
+  SETVABV(&g, "type", &type);
+  igraph_vector_bool_destroy(&type);
+  for (i=0; i<igraph_vcount(&g); i++) {
+    if (VAB(&g, "type", i) != (i % 2 == 1)) {
+      return 28;
+    }
+  }
   
   igraph_strvector_init(&id, igraph_vcount(&g));
   for (i=0; i<igraph_vcount(&g); i++) {
@@ -350,6 +378,18 @@ int main() {
       return 24;
     }
   }  
+  
+  igraph_vector_bool_init(&type, igraph_ecount(&g));
+  for (i=0; i<igraph_ecount(&g); i++) {
+    VECTOR(type)[i] = (i % 2 == 1);
+  }
+  SETEABV(&g, "type", &type);
+  igraph_vector_bool_destroy(&type);
+  for (i=0; i<igraph_ecount(&g); i++) {
+    if (EAB(&g, "type", i) != (i % 2 == 1)) {
+      return 29;
+    }
+  }
   
   igraph_strvector_init(&id, igraph_ecount(&g));
   for (i=0; i<igraph_ecount(&g); i++) {

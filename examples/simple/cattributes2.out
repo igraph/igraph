@@ -6,55 +6,66 @@ graph
   name "Petersen's graph"
   vertices 10
   edges 15
+  famous 1
   node
   [
     id 1
     name "foo"
+    isfirst 1
   ]
   node
   [
     id 2
     name "foobar"
+    isfirst 0
   ]
   node
   [
     id 3
     name ""
+    isfirst 0
   ]
   node
   [
     id 4
     name ""
+    isfirst 0
   ]
   node
   [
     id 5
     name ""
+    isfirst 0
   ]
   node
   [
     id 6
     name ""
+    isfirst 0
   ]
   node
   [
     id 7
     name ""
+    isfirst 0
   ]
   node
   [
     id 8
     name ""
+    isfirst 0
   ]
   node
   [
     id 9
     name ""
+    isfirst 0
   ]
   node
   [
     id 10
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -62,6 +73,7 @@ graph
     target 1
     id 1
     name "FOO"
+    isfirst 1
   ]
   edge
   [
@@ -69,6 +81,7 @@ graph
     target 1
     id 2
     name "FOOBAR"
+    isfirst 0
   ]
   edge
   [
@@ -76,6 +89,7 @@ graph
     target 1
     id 3
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -83,6 +97,7 @@ graph
     target 2
     id 4
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -90,6 +105,7 @@ graph
     target 2
     id 5
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -97,6 +113,7 @@ graph
     target 3
     id 6
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -104,6 +121,7 @@ graph
     target 3
     id 7
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -111,6 +129,7 @@ graph
     target 4
     id 8
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -118,6 +137,7 @@ graph
     target 4
     id 9
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -125,6 +145,7 @@ graph
     target 5
     id 10
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -132,6 +153,7 @@ graph
     target 6
     id 11
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -139,6 +161,7 @@ graph
     target 6
     id 12
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -146,6 +169,7 @@ graph
     target 7
     id 13
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -153,6 +177,7 @@ graph
     target 7
     id 14
     name ""
+    isfirst 0
   ]
   edge
   [
@@ -160,6 +185,7 @@ graph
     target 8
     id 15
     name ""
+    isfirst 0
   ]
 ]
 <?xml version="1.0" encoding="UTF-8"?>
@@ -171,113 +197,142 @@ graph
   <key id="g_name" for="graph" attr.name="name" attr.type="string"/>
   <key id="g_vertices" for="graph" attr.name="vertices" attr.type="double"/>
   <key id="g_edges" for="graph" attr.name="edges" attr.type="double"/>
+  <key id="g_famous" for="graph" attr.name="famous" attr.type="boolean"/>
   <key id="v_id" for="node" attr.name="id" attr.type="double"/>
   <key id="v_name" for="node" attr.name="name" attr.type="string"/>
+  <key id="v_is_first" for="node" attr.name="is_first" attr.type="boolean"/>
   <key id="e_id" for="edge" attr.name="id" attr.type="double"/>
   <key id="e_name" for="edge" attr.name="name" attr.type="string"/>
+  <key id="e_is_first" for="edge" attr.name="is_first" attr.type="boolean"/>
   <graph id="G" edgedefault="undirected">
     <data key="g_name">Petersen&apos;s graph</data>
     <data key="g_vertices">10</data>
     <data key="g_edges">15</data>
+    <data key="g_famous">true</data>
     <node id="n0">
       <data key="v_id">1</data>
       <data key="v_name">foo</data>
+      <data key="v_is_first">true</data>
     </node>
     <node id="n1">
       <data key="v_id">2</data>
       <data key="v_name">foobar</data>
+      <data key="v_is_first">false</data>
     </node>
     <node id="n2">
       <data key="v_id">3</data>
       <data key="v_name"></data>
+      <data key="v_is_first">false</data>
     </node>
     <node id="n3">
       <data key="v_id">4</data>
       <data key="v_name"></data>
+      <data key="v_is_first">false</data>
     </node>
     <node id="n4">
       <data key="v_id">5</data>
       <data key="v_name"></data>
+      <data key="v_is_first">false</data>
     </node>
     <node id="n5">
       <data key="v_id">6</data>
       <data key="v_name"></data>
+      <data key="v_is_first">false</data>
     </node>
     <node id="n6">
       <data key="v_id">7</data>
       <data key="v_name"></data>
+      <data key="v_is_first">false</data>
     </node>
     <node id="n7">
       <data key="v_id">8</data>
       <data key="v_name"></data>
+      <data key="v_is_first">false</data>
     </node>
     <node id="n8">
       <data key="v_id">9</data>
       <data key="v_name"></data>
+      <data key="v_is_first">false</data>
     </node>
     <node id="n9">
       <data key="v_id">10</data>
       <data key="v_name"></data>
+      <data key="v_is_first">false</data>
     </node>
     <edge source="n0" target="n1">
       <data key="e_id">1</data>
       <data key="e_name">FOO</data>
+      <data key="e_is_first">true</data>
     </edge>
     <edge source="n0" target="n4">
       <data key="e_id">2</data>
       <data key="e_name">FOOBAR</data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n0" target="n5">
       <data key="e_id">3</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n1" target="n2">
       <data key="e_id">4</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n1" target="n6">
       <data key="e_id">5</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n2" target="n3">
       <data key="e_id">6</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n2" target="n7">
       <data key="e_id">7</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n3" target="n4">
       <data key="e_id">8</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n3" target="n8">
       <data key="e_id">9</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n4" target="n9">
       <data key="e_id">10</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n5" target="n7">
       <data key="e_id">11</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n5" target="n8">
       <data key="e_id">12</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n6" target="n8">
       <data key="e_id">13</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n6" target="n9">
       <data key="e_id">14</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
     <edge source="n7" target="n9">
       <data key="e_id">15</data>
       <data key="e_name"></data>
+      <data key="e_is_first">false</data>
     </edge>
   </graph>
 </graphml>

@@ -179,6 +179,7 @@ void igraph_i_cattribute_copy_free(igraph_i_cattributes_t *attr) {
   long int i, n, a;
   igraph_vector_t *num;
   igraph_strvector_t *str;
+  igraph_vector_bool_t *boolvec;
   igraph_attribute_record_t *rec;
   for (a=0; a<3; a++) {
     n=igraph_vector_ptr_size(als[a]);
@@ -189,6 +190,10 @@ void igraph_i_cattribute_copy_free(igraph_i_cattributes_t *attr) {
 	num=(igraph_vector_t*)rec->value;
 	igraph_vector_destroy(num);
 	igraph_free(num);
+      } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+	boolvec=(igraph_vector_bool_t*)rec->value;
+	igraph_vector_bool_destroy(boolvec);
+	igraph_free(boolvec);
       } else if (rec->type == IGRAPH_ATTRIBUTE_STRING) {
 	str=(igraph_strvector_t*)rec->value;
 	igraph_strvector_destroy(str);
@@ -304,6 +309,16 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
 	IGRAPH_FINALLY(igraph_free, newstr);
 	IGRAPH_STRVECTOR_INIT_FINALLY(newstr, origlen);
 	newrec->value=newstr;
+      } else if (type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+	igraph_vector_bool_t *newbool=igraph_Calloc(1, igraph_vector_bool_t);
+	if (!newbool) {
+	  IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+	}
+	IGRAPH_FINALLY(igraph_free, newbool);
+	IGRAPH_CHECK(igraph_vector_bool_init(newbool, origlen));
+	IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
+	newrec->value=newbool;
+	igraph_vector_bool_fill(newbool, 0);
       }
       IGRAPH_CHECK(igraph_vector_ptr_push_back(val, newrec));
       IGRAPH_FINALLY_CLEAN(4);
@@ -323,11 +338,14 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
       /* This attribute is present in nattr */
       igraph_vector_t *oldnum, *newnum;
       igraph_strvector_t *oldstr, *newstr;
+      igraph_vector_bool_t *oldbool, *newbool;
       newrec=VECTOR(*nattr)[j];
       oldnum=(igraph_vector_t*)oldrec->value;
       newnum=(igraph_vector_t*)newrec->value;
       oldstr=(igraph_strvector_t*)oldrec->value;
       newstr=(igraph_strvector_t*)newrec->value;
+      oldbool=(igraph_vector_bool_t*)oldrec->value;
+      newbool=(igraph_vector_bool_t*)newrec->value;
       if (oldrec->type != newrec->type) {
 	IGRAPH_ERROR("Attribute types do not match", IGRAPH_EINVAL);
       }
@@ -344,6 +362,12 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
 	}
 	IGRAPH_CHECK(igraph_strvector_append(oldstr, newstr));
 	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	if (nv != igraph_vector_bool_size(newbool)) {
+	  IGRAPH_ERROR("Invalid Boolean attribute length", IGRAPH_EINVAL);
+	}
+	IGRAPH_CHECK(igraph_vector_bool_append(oldbool, newbool));
+	break;
       default:
 	IGRAPH_WARNING("Invalid attribute type");	
 	break;
@@ -352,6 +376,7 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
       /* No such attribute, append NA's */
       igraph_vector_t *oldnum=(igraph_vector_t *)oldrec->value;
       igraph_strvector_t *oldstr=(igraph_strvector_t*)oldrec->value;
+      igraph_vector_bool_t *oldbool=(igraph_vector_bool_t*)oldrec->value;
       switch (oldrec->type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
 	IGRAPH_CHECK(igraph_vector_resize(oldnum, origlen+nv));
@@ -361,6 +386,12 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
 	break;
       case IGRAPH_ATTRIBUTE_STRING:
 	IGRAPH_CHECK(igraph_strvector_resize(oldstr, origlen+nv));
+	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	IGRAPH_CHECK(igraph_vector_bool_resize(oldbool, origlen+nv));
+	for (j=origlen; j<origlen+nv; j++) {
+	  VECTOR(*oldbool)[j]=0;
+	}
 	break;
       default:
 	IGRAPH_WARNING("Invalid attribute type");
@@ -388,6 +419,10 @@ void igraph_i_cattribute_permute_free(igraph_vector_ptr_t *v) {
       igraph_strvector_t *strv= (igraph_strvector_t*) rec->value;
       igraph_strvector_destroy(strv);
       igraph_Free(strv);
+    } else if (rec->type == IGRAPH_ATTRIBUTE_BOOLEAN) {
+      igraph_vector_bool_t *boolv= (igraph_vector_bool_t*) rec->value;
+      igraph_vector_bool_destroy(boolv);
+      igraph_Free(boolv);
     }
     igraph_Free(rec);
   }
@@ -410,6 +445,7 @@ int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
       igraph_attribute_type_t type=oldrec->type;
       igraph_vector_t *num, *newnum;
       igraph_strvector_t *str, *newstr;
+      igraph_vector_bool_t *oldbool, *newbool;
       switch (type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
 	num=(igraph_vector_t*) oldrec->value;
@@ -422,6 +458,20 @@ int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
 	oldrec->value=newnum;
 	igraph_vector_destroy(num);
 	igraph_Free(num);
+	IGRAPH_FINALLY_CLEAN(1);
+	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	oldbool=(igraph_vector_bool_t*) oldrec->value;
+	newbool=igraph_Calloc(1, igraph_vector_bool_t);
+	if (!newbool) {
+	  IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+	}
+	IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
+	IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
+	igraph_vector_bool_index(oldbool, newbool, idx);
+	oldrec->value=newbool;
+	igraph_vector_bool_destroy(oldbool);
+	igraph_Free(oldbool);
 	IGRAPH_FINALLY_CLEAN(1);
 	break;
       case IGRAPH_ATTRIBUTE_STRING:
@@ -465,6 +515,7 @@ int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
       igraph_attribute_type_t type=oldrec->type;
       igraph_vector_t *num, *newnum;
       igraph_strvector_t *str, *newstr;
+      igraph_vector_bool_t *oldbool, *newbool;
       
       /* The record itself */
       igraph_attribute_record_t *new_rec=
@@ -489,6 +540,18 @@ int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
 	new_rec->value=newnum;
 	IGRAPH_FINALLY_CLEAN(1);
 	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	oldbool=(igraph_vector_bool_t*)oldrec->value;
+	newbool=igraph_Calloc(1, igraph_vector_bool_t);
+	if (!newbool) {
+	  IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+	}
+	IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
+	IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
+	igraph_vector_bool_index(oldbool, newbool, idx);
+	new_rec->value=newbool;
+	IGRAPH_FINALLY_CLEAN(1);
+	break;
       case IGRAPH_ATTRIBUTE_STRING:
 	str=(igraph_strvector_t*)oldrec->value;
 	newstr=igraph_Calloc(1, igraph_strvector_t);
@@ -510,6 +573,15 @@ int igraph_i_cattribute_permute_vertices(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
   return 0;
 }
+
+typedef int igraph_cattributes_combine_num_t(const igraph_vector_t *input, 
+					     igraph_real_t *output);
+
+typedef int igraph_cattributes_combine_str_t(const igraph_strvector_t *input,
+					     char **output);
+
+typedef int igraph_cattributes_combine_bool_t(const igraph_vector_bool_t *input,
+					      igraph_bool_t *output);
 
 int igraph_i_cattributes_cn_sum(const igraph_attribute_record_t *oldrec, 
 				igraph_attribute_record_t * newrec, 
@@ -775,12 +847,6 @@ int igraph_i_cattributes_cn_mean(const igraph_attribute_record_t *oldrec,
   return 0;
 }
 
-typedef int igraph_cattributes_combine_num_t(const igraph_vector_t *input, 
-					     igraph_real_t *output);
-
-typedef int igraph_cattributes_combine_str_t(const igraph_strvector_t *input,
-					     char **output);
-
 int igraph_i_cattributes_cn_func(const igraph_attribute_record_t *oldrec,
 				 igraph_attribute_record_t *newrec,
 				 const igraph_vector_ptr_t *merges, 
@@ -814,6 +880,272 @@ int igraph_i_cattributes_cn_func(const igraph_attribute_record_t *oldrec,
   }
   
   igraph_vector_destroy(&values);
+  IGRAPH_FINALLY_CLEAN(3);
+  newrec->value = newv;
+  
+  return 0;
+}
+
+int igraph_i_cattributes_cb_random(const igraph_attribute_record_t *oldrec, 
+				   igraph_attribute_record_t * newrec, 
+				   const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_bool_t *oldv=oldrec->value;
+  igraph_vector_bool_t *newv=igraph_Calloc(1, igraph_vector_bool_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, newv);
+
+  RNG_BEGIN();
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int n=igraph_vector_size(idx);
+    if (n==0) {
+      VECTOR(*newv)[i]=0;
+    } else if (n==1) {
+      VECTOR(*newv)[i]=VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ];
+    } else {
+      long int r=RNG_INTEGER(0, n-1);
+      VECTOR(*newv)[i]=VECTOR(*oldv)[ (long int) VECTOR(*idx)[r] ];
+    }
+  }
+
+  RNG_END();
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cb_first(const igraph_attribute_record_t *oldrec, 
+				  igraph_attribute_record_t * newrec, 
+				  const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_bool_t *oldv=oldrec->value;
+  igraph_vector_bool_t *newv=igraph_Calloc(1, igraph_vector_bool_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, newv);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int n=igraph_vector_size(idx);
+    if (n==0) {
+      VECTOR(*newv)[i]=0;
+    } else {
+      VECTOR(*newv)[i]=VECTOR(*oldv)[ (long int) VECTOR(*idx)[0] ];
+    }
+  }
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cb_last(const igraph_attribute_record_t *oldrec, 
+				 igraph_attribute_record_t * newrec, 
+				 const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_bool_t *oldv=oldrec->value;
+  igraph_vector_bool_t *newv=igraph_Calloc(1, igraph_vector_bool_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, newv);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int n=igraph_vector_size(idx);
+    if (n==0) {
+      VECTOR(*newv)[i]=0;
+    } else {
+      VECTOR(*newv)[i]=VECTOR(*oldv)[ (long int) VECTOR(*idx)[n-1] ];
+    }
+  }
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cb_all_is_true(const igraph_attribute_record_t *oldrec, 
+				        igraph_attribute_record_t * newrec, 
+				        const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_bool_t *oldv=oldrec->value;
+  igraph_vector_bool_t *newv=igraph_Calloc(1, igraph_vector_bool_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i, j, n, x;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, newv);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    n=igraph_vector_size(idx);
+    VECTOR(*newv)[i]=1;
+    for (j=0; j<n; j++) {
+      x=(long int) VECTOR(*idx)[j];
+      if (!VECTOR(*oldv)[x]) {
+	VECTOR(*newv)[i]=0;
+	break;
+      }
+    }
+  }
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cb_any_is_true(const igraph_attribute_record_t *oldrec, 
+				        igraph_attribute_record_t * newrec, 
+				        const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_bool_t *oldv=oldrec->value;
+  igraph_vector_bool_t *newv=igraph_Calloc(1, igraph_vector_bool_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i, j, n, x;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, newv);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    n=igraph_vector_size(idx);
+    VECTOR(*newv)[i]=0;
+    for (j=0; j<n; j++) {
+      x=(long int) VECTOR(*idx)[j];
+      if (VECTOR(*oldv)[x]) {
+	VECTOR(*newv)[i]=1;
+	break;
+      }
+    }
+  }
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cb_majority(const igraph_attribute_record_t *oldrec, 
+				     igraph_attribute_record_t * newrec, 
+				     const igraph_vector_ptr_t *merges) {
+
+  const igraph_vector_bool_t *oldv=oldrec->value;
+  igraph_vector_bool_t *newv=igraph_Calloc(1, igraph_vector_bool_t);
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i, j, n, x, num_trues;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, newv);
+
+  RNG_BEGIN();
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    
+    n=igraph_vector_size(idx);
+
+    num_trues = 0;
+    for (j=0; j<n; j++) {
+      x=(long int) VECTOR(*idx)[j];
+      if (VECTOR(*oldv)[x]) {
+	num_trues++;
+      }
+    }
+
+    if (n % 2 != 0) {
+      VECTOR(*newv)[i] = (num_trues > n/2);
+    } else {
+      if (num_trues == n/2) {
+	VECTOR(*newv)[i] = (RNG_UNIF01() < 0.5);
+      } else {
+	VECTOR(*newv)[i] = (num_trues > n/2);
+      }
+    }
+  }
+
+  RNG_END();
+
+  IGRAPH_FINALLY_CLEAN(2);
+  newrec->value = newv;  
+
+  return 0;
+}
+
+int igraph_i_cattributes_cb_func(const igraph_attribute_record_t *oldrec,
+				 igraph_attribute_record_t *newrec,
+				 const igraph_vector_ptr_t *merges, 
+				 igraph_cattributes_combine_bool_t *func) {
+  
+  const igraph_vector_bool_t *oldv=oldrec->value;
+  long int newlen=igraph_vector_ptr_size(merges);
+  long int i;
+  igraph_vector_bool_t *newv=igraph_Calloc(1, igraph_vector_bool_t);
+  igraph_vector_bool_t values;
+
+  if (!newv) {
+    IGRAPH_ERROR("Cannot combine attributes", IGRAPH_ENOMEM);
+  }
+  IGRAPH_FINALLY(igraph_free, newv);
+  IGRAPH_CHECK(igraph_vector_bool_init(newv, newlen));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, newv);
+
+  IGRAPH_CHECK(igraph_vector_bool_init(&values, 0));
+  IGRAPH_FINALLY(igraph_vector_bool_destroy, newv);
+
+  for (i=0; i<newlen; i++) {
+    igraph_vector_t *idx=VECTOR(*merges)[i];
+    long int j, n=igraph_vector_size(idx);
+    igraph_bool_t res;
+
+    IGRAPH_CHECK(igraph_vector_bool_resize(&values, n));
+    for (j=0; j<n; j++) {
+      long int x=(long int) VECTOR(*idx)[j];
+      VECTOR(values)[j] = VECTOR(*oldv)[x];
+    }
+
+    IGRAPH_CHECK(func(&values, &res));
+    VECTOR(*newv)[i] = res;
+  }
+  
+  igraph_vector_bool_destroy(&values);
   IGRAPH_FINALLY_CLEAN(3);
   newrec->value = newv;
   
@@ -1075,6 +1407,8 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
       (igraph_cattributes_combine_num_t*) funcs[i];
     igraph_cattributes_combine_str_t *strfunc=
       (igraph_cattributes_combine_str_t*) funcs[i];
+    igraph_cattributes_combine_bool_t *boolfunc=
+      (igraph_cattributes_combine_bool_t*) funcs[i];
     
     if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
 	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
@@ -1126,6 +1460,42 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
 	IGRAPH_ERROR("Cannot concatenate numeric attributes", 
+		     IGRAPH_EATTRCOMBINE);
+	break;
+      default:
+	IGRAPH_ERROR("Unknown attribute_combination",
+		     IGRAPH_UNIMPLEMENTED);
+	break;
+      }
+    } else if (type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+      switch (todo) {
+      case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_func(oldrec, newrec, merges,
+						  boolfunc));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_SUM:
+      case IGRAPH_ATTRIBUTE_COMBINE_MAX:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_any_is_true(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_PROD:
+      case IGRAPH_ATTRIBUTE_COMBINE_MIN:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_all_is_true(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
+      case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_majority(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_random(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_first(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_LAST:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_last(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
+	IGRAPH_ERROR("Cannot calculate concatenation of Booleans", 
 		     IGRAPH_EATTRCOMBINE);
 	break;
       default:
@@ -1313,6 +1683,16 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
 	IGRAPH_VECTOR_INIT_FINALLY(newnum, origlen);
 	newrec->value=newnum;
 	igraph_vector_fill(newnum, IGRAPH_NAN);
+      } else if (type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+	igraph_vector_bool_t *newbool=igraph_Calloc(1, igraph_vector_bool_t);
+	if (!newbool) {
+	  IGRAPH_ERROR("Cannot add attributes", IGRAPH_ENOMEM);
+	}
+	IGRAPH_FINALLY(igraph_free, newbool);
+	IGRAPH_CHECK(igraph_vector_bool_init(newbool, origlen));
+	IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
+	newrec->value=newbool;
+	igraph_vector_bool_fill(newbool, 0);
       } else if (type==IGRAPH_ATTRIBUTE_STRING) {
 	igraph_strvector_t *newstr=igraph_Calloc(1, igraph_strvector_t);
 	if (!newstr) {
@@ -1340,11 +1720,14 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
       /* This attribute is present in nattr */
       igraph_vector_t *oldnum, *newnum;
       igraph_strvector_t *oldstr, *newstr;
+      igraph_vector_bool_t *oldbool, *newbool;
       newrec=VECTOR(*nattr)[j];
       oldnum=(igraph_vector_t*)oldrec->value;
       newnum=(igraph_vector_t*)newrec->value;
       oldstr=(igraph_strvector_t*)oldrec->value;
       newstr=(igraph_strvector_t*)newrec->value;
+      oldbool=(igraph_vector_bool_t*)oldrec->value;
+      newbool=(igraph_vector_bool_t*)newrec->value;
       if (oldrec->type != newrec->type) {
 	IGRAPH_ERROR("Attribute types do not match", IGRAPH_EINVAL);
       }
@@ -1361,6 +1744,12 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
 	}
 	IGRAPH_CHECK(igraph_strvector_append(oldstr, newstr));
 	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	if (ne != igraph_vector_bool_size(newbool)) {
+	  IGRAPH_ERROR("Invalid Boolean attribute length", IGRAPH_EINVAL);
+	}
+	IGRAPH_CHECK(igraph_vector_bool_append(oldbool, newbool));
+	break;
       default:
 	IGRAPH_WARNING("Invalid attribute type");	
 	break;
@@ -1369,6 +1758,7 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
       /* No such attribute, append NA's */
       igraph_vector_t *oldnum=(igraph_vector_t *)oldrec->value;
       igraph_strvector_t *oldstr=(igraph_strvector_t*)oldrec->value;
+      igraph_vector_bool_t *oldbool=(igraph_vector_bool_t *)oldrec->value;
       switch (oldrec->type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
 	IGRAPH_CHECK(igraph_vector_resize(oldnum, origlen+ne));
@@ -1378,6 +1768,12 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
 	break;
       case IGRAPH_ATTRIBUTE_STRING:
 	IGRAPH_CHECK(igraph_strvector_resize(oldstr, origlen+ne));
+	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	IGRAPH_CHECK(igraph_vector_bool_resize(oldbool, origlen+ne));
+	for (j=origlen; j<origlen+ne; j++) {
+	  VECTOR(*oldbool)[j]=0;
+	}
 	break;
       default:
 	IGRAPH_WARNING("Invalid attribute type");
@@ -1441,12 +1837,13 @@ int igraph_i_cattribute_permute_edges(const igraph_t *graph,
       igraph_attribute_type_t type=oldrec->type;
       igraph_vector_t *num, *newnum;
       igraph_strvector_t *str, *newstr;
+      igraph_vector_bool_t *oldbool, *newbool;
       switch (type) {
       case IGRAPH_ATTRIBUTE_NUMERIC:
 	num=(igraph_vector_t*) oldrec->value;
 	newnum=igraph_Calloc(1, igraph_vector_t);
 	if (!newnum) {
-	  IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
 	}
 	IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
 	igraph_vector_index(num, newnum, idx);
@@ -1455,11 +1852,25 @@ int igraph_i_cattribute_permute_edges(const igraph_t *graph,
 	igraph_Free(num);
 	IGRAPH_FINALLY_CLEAN(1);
 	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	oldbool=(igraph_vector_bool_t*) oldrec->value;
+	newbool=igraph_Calloc(1, igraph_vector_bool_t);
+	if (!newbool) {
+	  IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
+	}
+	IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
+	IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
+	igraph_vector_bool_index(oldbool, newbool, idx);
+	oldrec->value=newbool;
+	igraph_vector_bool_destroy(oldbool);
+	igraph_Free(oldbool);
+	IGRAPH_FINALLY_CLEAN(1);
+	break;
       case IGRAPH_ATTRIBUTE_STRING:
 	str=(igraph_strvector_t*)oldrec->value;
 	newstr=igraph_Calloc(1, igraph_strvector_t);
 	if (!newstr) {
-	  IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
 	}
 	IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
 	IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
@@ -1493,6 +1904,7 @@ int igraph_i_cattribute_permute_edges(const igraph_t *graph,
       igraph_attribute_type_t type=oldrec->type;
       igraph_vector_t *num, *newnum;
       igraph_strvector_t *str, *newstr;
+      igraph_vector_bool_t *oldbool, *newbool;
       
       /* The record itself */
       igraph_attribute_record_t *new_rec=
@@ -1509,7 +1921,7 @@ int igraph_i_cattribute_permute_edges(const igraph_t *graph,
 	num=(igraph_vector_t*) oldrec->value;
 	newnum=igraph_Calloc(1, igraph_vector_t);
 	if (!newnum) {
-	  IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
 	}
 	IGRAPH_VECTOR_INIT_FINALLY(newnum, 0);
 	igraph_vector_index(num, newnum, idx);
@@ -1520,12 +1932,24 @@ int igraph_i_cattribute_permute_edges(const igraph_t *graph,
 	str=(igraph_strvector_t*)oldrec->value;
 	newstr=igraph_Calloc(1, igraph_strvector_t);
 	if (!newstr) {
-	  IGRAPH_ERROR("Cannot permute vertex attributes", IGRAPH_ENOMEM);
+	  IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
 	}
 	IGRAPH_CHECK(igraph_strvector_init(newstr, 0));
 	IGRAPH_FINALLY(igraph_strvector_destroy, newstr);
 	igraph_strvector_index(str, newstr, idx);
 	new_rec->value=newstr;
+	IGRAPH_FINALLY_CLEAN(1);
+	break;
+      case IGRAPH_ATTRIBUTE_BOOLEAN:
+	oldbool=(igraph_vector_bool_t*) oldrec->value;
+	newbool=igraph_Calloc(1, igraph_vector_bool_t);
+	if (!newbool) {
+	  IGRAPH_ERROR("Cannot permute edge attributes", IGRAPH_ENOMEM);
+	}
+	IGRAPH_CHECK(igraph_vector_bool_init(newbool, 0));
+	IGRAPH_FINALLY(igraph_vector_bool_destroy, newbool);
+	igraph_vector_bool_index(oldbool, newbool, idx);
+	new_rec->value=newbool;
 	IGRAPH_FINALLY_CLEAN(1);
 	break;
       default:
@@ -1591,6 +2015,8 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
       (igraph_cattributes_combine_num_t*) funcs[i];
     igraph_cattributes_combine_str_t *strfunc=
       (igraph_cattributes_combine_str_t*) funcs[i];
+    igraph_cattributes_combine_bool_t *boolfunc=
+      (igraph_cattributes_combine_bool_t*) funcs[i];
     
     if (todo==IGRAPH_ATTRIBUTE_COMBINE_DEFAULT || 
 	todo==IGRAPH_ATTRIBUTE_COMBINE_IGNORE) {
@@ -1642,6 +2068,42 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
 	break;
       case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
 	IGRAPH_ERROR("Cannot concatenate numeric attributes", 
+		     IGRAPH_EATTRCOMBINE);
+	break;
+      default:
+	IGRAPH_ERROR("Unknown attribute_combination",
+		     IGRAPH_UNIMPLEMENTED);
+	break;
+      }
+    } else if (type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+      switch (todo) {
+      case IGRAPH_ATTRIBUTE_COMBINE_FUNCTION:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_func(oldrec, newrec, merges,
+						  boolfunc));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_SUM:
+      case IGRAPH_ATTRIBUTE_COMBINE_MAX:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_any_is_true(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_PROD:
+      case IGRAPH_ATTRIBUTE_COMBINE_MIN:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_all_is_true(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_MEAN:
+      case IGRAPH_ATTRIBUTE_COMBINE_MEDIAN:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_majority(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_RANDOM:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_random(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_FIRST:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_first(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_LAST:
+	IGRAPH_CHECK(igraph_i_cattributes_cb_last(oldrec, newrec, merges));
+	break;
+      case IGRAPH_ATTRIBUTE_COMBINE_CONCAT:
+	IGRAPH_ERROR("Cannot calculate concatenation of Booleans", 
 		     IGRAPH_EATTRCOMBINE);
 	break;
       default:
@@ -1924,7 +2386,8 @@ int igraph_i_cattribute_get_bool_vertex_attr(const igraph_t *graph,
 					     igraph_vector_bool_t *value) {
   igraph_i_cattributes_t *attr=graph->attr;
   igraph_vector_ptr_t *val=&attr->val;
-  long int j;
+  igraph_vit_t it;
+  long int i, j, v;
   igraph_attribute_record_t *rec;
   igraph_vector_bool_t *log;
   igraph_bool_t l=igraph_i_cattribute_find(val, name, &j);
@@ -1939,13 +2402,11 @@ int igraph_i_cattribute_get_bool_vertex_attr(const igraph_t *graph,
     igraph_vector_bool_clear(value);
     IGRAPH_CHECK(igraph_vector_bool_append(value, log));
   } else {
-    igraph_vit_t it;
-    long int i=0;
     IGRAPH_CHECK(igraph_vit_create(graph, vs, &it));
     IGRAPH_FINALLY(igraph_vit_destroy, &it);
     IGRAPH_CHECK(igraph_vector_bool_resize(value, IGRAPH_VIT_SIZE(it)));
-    for (; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
-      long int v=IGRAPH_VIT_GET(it);
+    for (i = 0; !IGRAPH_VIT_END(it); IGRAPH_VIT_NEXT(it), i++) {
+      v=IGRAPH_VIT_GET(it);
       VECTOR(*value)[i]=VECTOR(*log)[v];
     }
     igraph_vit_destroy(&it);
@@ -3601,6 +4062,9 @@ void igraph_i_cattribute_free_rec(igraph_attribute_record_t *rec) {
   } else if (rec->type==IGRAPH_ATTRIBUTE_STRING) {
     igraph_strvector_t *str=(igraph_strvector_t*)rec->value;
     igraph_strvector_destroy(str);
+  } else if (rec->type==IGRAPH_ATTRIBUTE_BOOLEAN) {
+    igraph_vector_bool_t *boolvec=(igraph_vector_bool_t*)rec->value;
+    igraph_vector_bool_destroy(boolvec);
   }
   igraph_Free(rec->name);
   igraph_Free(rec->value);

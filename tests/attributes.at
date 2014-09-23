@@ -42,6 +42,11 @@ AT_KEYWORDS([attributes combination combining])
 AT_COMPILE_CHECK([simple/cattributes4.c], [simple/cattributes4.out])
 AT_CLEANUP
 
+AT_SETUP([Combining Boolean attributes:])
+AT_KEYWORDS([attributes combination combining])
+AT_COMPILE_CHECK([simple/cattributes5.c], [simple/cattributes5.out])
+AT_CLEANUP
+
 AT_SETUP([Boolean graph attribute bug:])
 AT_KEYWORDS([attributes bool boolean logical bug])
 AT_COMPILE_CHECK([simple/cattr_bool_bug.c], [], [simple/cattr_bool_bug.graphml])

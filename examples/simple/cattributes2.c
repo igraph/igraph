@@ -23,10 +23,15 @@
 
 #include <igraph.h>
 
+void null_warning_handler (const char *reason, const char *file,
+			     int line, int igraph_errno) {
+}
+
 int main() {
   
   igraph_t g;
   igraph_vector_t y;  
+  igraph_warning_handler_t* oldwarnhandler;
 
   /* turn on attribute handling */
   igraph_i_set_attribute_table(&igraph_cattribute_table);
@@ -36,6 +41,7 @@ int main() {
   SETGAS(&g, "name", "Petersen's graph");
   SETGAN(&g, "vertices", igraph_vcount(&g));
   SETGAN(&g, "edges", igraph_ecount(&g));
+  SETGAB(&g, "famous", 1);
 
   igraph_vector_init_seq(&y, 1, igraph_vcount(&g));
   SETVANV(&g, "id", &y);
@@ -43,6 +49,8 @@ int main() {
 
   SETVAS(&g, "name", 0, "foo");
   SETVAS(&g, "name", 1, "foobar");
+
+  SETVAB(&g, "is_first", 0, 1);
   
   igraph_vector_init_seq(&y, 1, igraph_ecount(&g));
   SETEANV(&g, "id", &y);
@@ -51,7 +59,16 @@ int main() {
   SETEAS(&g, "name", 0, "FOO");
   SETEAS(&g, "name", 1, "FOOBAR");
 
+  SETEAB(&g, "is_first", 0, 1);
+
+  /* Turn off the warning handler temporarily because the GML writer will
+   * print warnings about boolean attributes being converted to numbers, and
+   * we don't care about these */
+  oldwarnhandler=igraph_set_warning_handler(null_warning_handler);
   igraph_write_graph_gml(&g, stdout, 0, "");
+  igraph_set_warning_handler(oldwarnhandler);
+
+  /* Back to business */
   igraph_write_graph_graphml(&g, stdout, /*prefixattr=*/ 1);
    
   igraph_destroy(&g);
