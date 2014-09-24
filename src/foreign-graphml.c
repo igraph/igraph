@@ -38,6 +38,7 @@
 #include <libxml/encoding.h>
 #include <libxml/parser.h>
 
+#define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 
 xmlEntity blankEntityStruct = {
 #ifndef XML_WITHOUT_CORBA
@@ -70,7 +71,7 @@ xmlEntityPtr blankEntity = &blankEntityStruct;
     igraph_error(msg, __FILE__, __LINE__, code);              \
     igraph_i_graphml_sax_handler_error(state, msg);           \
   }                                                           \
-} while (1)
+} while (0)
 #define GRAPHML_PARSE_ERROR(state, msg) \
   GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, IGRAPH_PARSEERROR)
 #define RETURN_GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code) do {  \
@@ -525,14 +526,23 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 #define toXmlChar(a)   (BAD_CAST(a))
 #define fromXmlChar(a) ((char *)(a)) /* not the most elegant way... */
 
+#define XML_ATTR_LOCALNAME(it) (*(it))
+#define XML_ATTR_PREFIX(it) (*(it+1))
+#define XML_ATTR_URI(it) (*(it+2))
+#define XML_ATTR_VALUE_START(it) (*(it+3))
+#define XML_ATTR_VALUE_END(it) (*(it+4))
+#define XML_ATTR_VALUE(it) *(it+3), (*(it+4))-(*(it+3))
+
 igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
-    const xmlChar** attrs, struct igraph_i_graphml_parser_state *state) {
+    const xmlChar** attrs, int nb_attrs,
+    struct igraph_i_graphml_parser_state *state) {
   xmlChar **it;
+  xmlChar *localname;
   igraph_trie_t *trie=0;
   igraph_vector_ptr_t *ptrvector=0;
   long int id;
   unsigned short int skip=0;
-  int ret;
+  int i, ret;
   igraph_i_graphml_attribute_record_t *rec;
 
   if (!state->successful)
@@ -547,35 +557,39 @@ igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
 
   rec->type = I_GRAPHML_UNKNOWN_TYPE;
 
-  for (it=(xmlChar**)attrs; *it; it+=2) {
-    if (xmlStrEqual(*it, toXmlChar("id"))) {
-      const char *id=(const char*)(*(it+1));
-      rec->id=strdup(id);
-    } else if (xmlStrEqual(*it, toXmlChar("attr.name"))) {
-      const char *name=fromXmlChar(*(it+1));
-      rec->record.name=strdup(name);
-    } else if (xmlStrEqual(*it, toXmlChar("attr.type"))) {
-      if (xmlStrEqual(*(it+1), (xmlChar*)"boolean")) { 
+  for (i=0, it=(xmlChar**)attrs; i < nb_attrs; i++, it+=5) {
+    if (XML_ATTR_URI(it) != 0 &&
+	!xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), XML_ATTR_URI(it)))
+      continue;
+
+    localname = XML_ATTR_LOCALNAME(it);
+
+    if (xmlStrEqual(localname, toXmlChar("id"))) {
+      rec->id=fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
+    } else if (xmlStrEqual(localname, toXmlChar("attr.name"))) {
+      rec->record.name=fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
+    } else if (xmlStrEqual(localname, toXmlChar("attr.type"))) {
+      if (!xmlStrncmp(toXmlChar("boolean"), XML_ATTR_VALUE(it))) {
 	rec->type=I_GRAPHML_BOOLEAN;
 	rec->record.type=IGRAPH_ATTRIBUTE_BOOLEAN;
 	rec->default_value.as_boolean=0;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("string"))) {
+      } else if (!xmlStrncmp(toXmlChar("string"), XML_ATTR_VALUE(it))) {
 	rec->type=I_GRAPHML_STRING;
 	rec->record.type=IGRAPH_ATTRIBUTE_STRING;
 	rec->default_value.as_string=strdup("");
-      } else if (xmlStrEqual(*(it+1), toXmlChar("float"))) { 
+      } else if (!xmlStrncmp(toXmlChar("float"), XML_ATTR_VALUE(it))) {
 	rec->type=I_GRAPHML_FLOAT;
 	rec->record.type=IGRAPH_ATTRIBUTE_NUMERIC;
 	rec->default_value.as_numeric=IGRAPH_NAN;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("double"))) { 
+      } else if (!xmlStrncmp(toXmlChar("double"), XML_ATTR_VALUE(it))) {
 	rec->type=I_GRAPHML_DOUBLE;
 	rec->record.type=IGRAPH_ATTRIBUTE_NUMERIC;
 	rec->default_value.as_numeric=IGRAPH_NAN;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("int"))) {
+      } else if (!xmlStrncmp(toXmlChar("int"), XML_ATTR_VALUE(it))) {
 	rec->type=I_GRAPHML_INTEGER;
 	rec->record.type=IGRAPH_ATTRIBUTE_NUMERIC;
 	rec->default_value.as_numeric=IGRAPH_NAN;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("long"))) {
+      } else if (!xmlStrncmp(toXmlChar("long"), XML_ATTR_VALUE(it))) {
 	rec->type=I_GRAPHML_LONG;
 	rec->record.type=IGRAPH_ATTRIBUTE_NUMERIC;
 	rec->default_value.as_numeric=IGRAPH_NAN;
@@ -586,28 +600,28 @@ igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
       }
     } else if (xmlStrEqual(*it, toXmlChar("for"))) {
       /* graph, vertex or edge attribute? */
-      if (xmlStrEqual(*(it+1), toXmlChar("graph"))) { 
+      if (!xmlStrncmp(toXmlChar("graph"), XML_ATTR_VALUE(it))) {
 	trie=&state->g_names;
 	ptrvector=&state->g_attrs;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("node"))) {
+      } else if (!xmlStrncmp(toXmlChar("node"), XML_ATTR_VALUE(it))) {
 	trie=&state->v_names;
 	ptrvector=&state->v_attrs;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("edge"))) {
+      } else if (!xmlStrncmp(toXmlChar("edge"), XML_ATTR_VALUE(it))) {
 	trie=&state->e_names;
 	ptrvector=&state->e_attrs;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("graphml"))) {
+      } else if (!xmlStrncmp(toXmlChar("graphml"), XML_ATTR_VALUE(it))) {
         igraph_i_report_unhandled_attribute_target("graphml", __FILE__, __LINE__);
         skip=1;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("hyperedge"))) {
+      } else if (!xmlStrncmp(toXmlChar("hyperedge"), XML_ATTR_VALUE(it))) {
         igraph_i_report_unhandled_attribute_target("hyperedge", __FILE__, __LINE__);
         skip=1;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("port"))) {
+      } else if (!xmlStrncmp(toXmlChar("port"), XML_ATTR_VALUE(it))) {
         igraph_i_report_unhandled_attribute_target("port", __FILE__, __LINE__);
         skip=1;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("endpoint"))) {
+      } else if (!xmlStrncmp(toXmlChar("endpoint"), XML_ATTR_VALUE(it))) {
         igraph_i_report_unhandled_attribute_target("endpoint", __FILE__, __LINE__);
         skip=1;
-      } else if (xmlStrEqual(*(it+1), toXmlChar("all"))) {
+      } else if (!xmlStrncmp(toXmlChar("all"), XML_ATTR_VALUE(it))) {
         /* TODO: we should handle this */
         igraph_i_report_unhandled_attribute_target("all", __FILE__, __LINE__);
         skip=1;
@@ -709,18 +723,24 @@ igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
 
 void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser_state *state,
 					   const xmlChar **attrs,
+					   int nb_attrs,
 					   igraph_attribute_elemtype_t type) {
   xmlChar **it;
+  int i;
 
   if (!state->successful)
     return;
 
-  for (it=(xmlChar**)attrs; *it; it+=2) {
+  for (i=0, it=(xmlChar**)attrs; i < nb_attrs; i++, it+=5) {
+    if (XML_ATTR_URI(it) != 0 &&
+	!xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), XML_ATTR_URI(it)))
+      continue;
+
     if (xmlStrEqual(*it, toXmlChar("key"))) {
       if (state->data_key) {
 	free(state->data_key);
       }
-      state->data_key=xmlStrdup(*(it+1));
+      state->data_key=xmlStrndup(XML_ATTR_VALUE(it));
       if (state->data_char) {
         free(state->data_char);
       }
@@ -907,22 +927,33 @@ void igraph_i_graphml_attribute_default_value_finish(
   }
 }
 
-void igraph_i_graphml_sax_handler_start_element(void *state0,
-						const xmlChar* name,
-						const xmlChar** attrs) {
+void igraph_i_graphml_sax_handler_start_element_ns(
+    void *state0, const xmlChar* localname, const xmlChar* prefix,
+    const xmlChar* uri, int nb_namespaces, const xmlChar** namespaces,
+    int nb_attributes, int nb_defaulted, const xmlChar** attributes) {
   struct igraph_i_graphml_parser_state *state=
     (struct igraph_i_graphml_parser_state*)state0;
   xmlChar** it;
+  char* attr_value;
   long int id1, id2;
+  int i;
 
   if (!state->successful)
     return;
+
+  if (!xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), uri)) {
+    /* Tag is in a different namespace, so treat it as an unknown start
+     * tag irrespectively of our state */
+    igraph_i_graphml_handle_unknown_start_tag(state);
+    return;
+  }
+
 
   switch (state->st) {
   case START:
     /* If we are in the START state and received a graphml tag,
      * change to INSIDE_GRAPHML state. Otherwise, change to UNKNOWN. */
-    if (xmlStrEqual(name, toXmlChar("graphml")))
+    if (xmlStrEqual(localname, toXmlChar("graphml")))
       state->st=INSIDE_GRAPHML;
     else
       igraph_i_graphml_handle_unknown_start_tag(state);
@@ -933,20 +964,28 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
      * change to INSIDE_GRAPH state if the state->index counter reached
      * zero (this is to handle multiple graphs in the same file).
      * Otherwise, change to UNKNOWN. */
-    if (xmlStrEqual(name, toXmlChar("graph"))) {
+    if (xmlStrEqual(localname, toXmlChar("graph"))) {
       if (state->index==0) {
 	state->st=INSIDE_GRAPH;
-	for (it=(xmlChar**)attrs; *it; it+=2) {
+	for (i=0, it=(xmlChar**)attributes; i < nb_attributes; i++, it+=5) {
+	  if (XML_ATTR_URI(it) != 0 &&
+	      !xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), XML_ATTR_URI(it))) {
+	    /* Attribute is from a different namespace, so skip it */
+	    continue;
+	  }
 	  if (xmlStrEqual(*it, toXmlChar("edgedefault"))) {
-	    if (xmlStrEqual(*(it+1), toXmlChar("directed"))) state->edges_directed=1;
-	    else if (xmlStrEqual(*(it+1), toXmlChar("undirected"))) state->edges_directed=0;
+            if (!xmlStrncmp(toXmlChar("directed"), XML_ATTR_VALUE(it))) {
+	      state->edges_directed=1;
+	    } else if (!xmlStrncmp(toXmlChar("undirected"), XML_ATTR_VALUE(it))) {
+	      state->edges_directed=0;
+	    }
 	  }
 	}
       }
       state->index--;
-    } else if (xmlStrEqual(name, toXmlChar("key"))) {
+    } else if (xmlStrEqual(localname, toXmlChar("key"))) {
       state->current_attr_record =
-	igraph_i_graphml_add_attribute_key(attrs, state);
+	igraph_i_graphml_add_attribute_key(attributes, nb_attributes, state);
       state->st=INSIDE_KEY;
     } else {
       igraph_i_graphml_handle_unknown_start_tag(state);
@@ -955,7 +994,7 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
 
   case INSIDE_KEY:
     /* If we are in the INSIDE_KEY state, check for default tag */
-    if (xmlStrEqual(name, toXmlChar("default"))) state->st=INSIDE_DEFAULT;
+    if (xmlStrEqual(localname, toXmlChar("default"))) state->st=INSIDE_DEFAULT;
     else igraph_i_graphml_handle_unknown_start_tag(state);
     break;
 
@@ -966,23 +1005,32 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
     
   case INSIDE_GRAPH:
     /* If we are in the INSIDE_GRAPH state, check for node and edge tags */
-    if (xmlStrEqual(name, toXmlChar("edge"))) {
+    if (xmlStrEqual(localname, toXmlChar("edge"))) {
       id1=-1; id2=-1; 
-      for (it=(xmlChar**)attrs; *it; it+=2) {
+      for (i=0, it=(xmlChar**)attributes; i < nb_attributes; i++, it+=5) {
+	if (XML_ATTR_URI(it) != 0 &&
+	    !xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), XML_ATTR_URI(it))) {
+	  /* Attribute is from a different namespace, so skip it */
+	  continue;
+	}
 	if (xmlStrEqual(*it, toXmlChar("source"))) {
-	  igraph_trie_get(&state->node_trie, fromXmlChar(*(it+1)), &id1);
-	}
-	if (xmlStrEqual(*it, toXmlChar("target"))) {
-	  igraph_trie_get(&state->node_trie, fromXmlChar(*(it+1)), &id2);
-	}
-	if (xmlStrEqual(*it, toXmlChar("id"))) {
+	  attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
+	  igraph_trie_get(&state->node_trie, attr_value, &id1);
+	  free(attr_value);
+	} else if (xmlStrEqual(*it, toXmlChar("target"))) {
+	  attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
+	  igraph_trie_get(&state->node_trie, attr_value, &id2);
+	  free(attr_value);
+	} else if (xmlStrEqual(*it, toXmlChar("id"))) {
 	  long int edges=igraph_vector_size(&state->edgelist)/2+1;
 	  long int origsize=igraph_strvector_size(&state->edgeids);
+	  attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
 	  igraph_strvector_resize(&state->edgeids, edges);
 	  for (;origsize < edges-1; origsize++) {
 	    igraph_strvector_set(&state->edgeids, origsize, "");
 	  }
-	  igraph_strvector_set(&state->edgeids, edges-1, fromXmlChar(*(it+1)));
+	  igraph_strvector_set(&state->edgeids, edges-1, attr_value);
+	  free(attr_value);
 	}
       }
       if (id1>=0 && id2>=0) {
@@ -993,17 +1041,24 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
 	return;
       }
       state->st=INSIDE_EDGE;
-    } else if (xmlStrEqual(name, toXmlChar("node"))) {
-      for (it=(xmlChar**)attrs; *it; it+=2) {
-	if (xmlStrEqual(*it, toXmlChar("id"))) {
-	  it++;
-	  igraph_trie_get(&state->node_trie, fromXmlChar(*it), &id1);
+    } else if (xmlStrEqual(localname, toXmlChar("node"))) {
+      for (i=0, it=(xmlChar**)attributes; i < nb_attributes; i++, it+=5) {
+	if (XML_ATTR_URI(it) != 0 &&
+	    !xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), XML_ATTR_URI(it))) {
+	  /* Attribute is from a different namespace, so skip it */
+	  continue;
+	}
+	if (xmlStrEqual(XML_ATTR_LOCALNAME(it), toXmlChar("id"))) {
+	  attr_value = fromXmlChar(xmlStrndup(XML_ATTR_VALUE(it)));
+	  igraph_trie_get(&state->node_trie, attr_value, &id1);
+	  free(attr_value);
 	  break;
 	}
       }
       state->st=INSIDE_NODE;
-    } else if (xmlStrEqual(name, toXmlChar("data"))) {
-      igraph_i_graphml_attribute_data_setup(state, attrs, IGRAPH_ATTRIBUTE_GRAPH);
+    } else if (xmlStrEqual(localname, toXmlChar("data"))) {
+      igraph_i_graphml_attribute_data_setup(state, attributes, nb_attributes,
+	  IGRAPH_ATTRIBUTE_GRAPH);
       igraph_vector_int_push_back(&state->prev_state_stack, state->st);
       state->st=INSIDE_DATA;
     } else
@@ -1011,8 +1066,8 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
     break;
     
   case INSIDE_NODE:
-    if (xmlStrEqual(name, toXmlChar("data"))) {
-      igraph_i_graphml_attribute_data_setup(state, attrs,
+    if (xmlStrEqual(localname, toXmlChar("data"))) {
+      igraph_i_graphml_attribute_data_setup(state, attributes, nb_attributes,
 					    IGRAPH_ATTRIBUTE_VERTEX);
       igraph_vector_int_push_back(&state->prev_state_stack, state->st);
       state->st=INSIDE_DATA;
@@ -1020,8 +1075,8 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
     break;
     
   case INSIDE_EDGE:
-    if (xmlStrEqual(name, toXmlChar("data"))) {
-      igraph_i_graphml_attribute_data_setup(state, attrs, 
+    if (xmlStrEqual(localname, toXmlChar("data"))) {
+      igraph_i_graphml_attribute_data_setup(state, attributes, nb_attributes,
 					    IGRAPH_ATTRIBUTE_EDGE);
       igraph_vector_int_push_back(&state->prev_state_stack, state->st);
       state->st=INSIDE_DATA;
@@ -1042,15 +1097,18 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
   }
 }
 
-void igraph_i_graphml_sax_handler_end_element(void *state0,
-						const xmlChar* name) {
+void igraph_i_graphml_sax_handler_end_element_ns(void *state0,
+    const xmlChar* localname, const xmlChar* prefix,
+    const xmlChar* uri) {
   struct igraph_i_graphml_parser_state *state=
     (struct igraph_i_graphml_parser_state*)state0;
 
   if (!state->successful)
     return;
 
-  IGRAPH_UNUSED(name);
+  IGRAPH_UNUSED(localname);
+  IGRAPH_UNUSED(prefix);
+  IGRAPH_UNUSED(uri);
 
   switch (state->st) {
   case INSIDE_GRAPHML:
@@ -1119,20 +1177,38 @@ void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len
 }
 
 static xmlSAXHandler igraph_i_graphml_sax_handler={
-  NULL, NULL, NULL, NULL, NULL,
-    igraph_i_graphml_sax_handler_get_entity,
-    NULL, NULL, NULL, NULL, NULL, NULL,
-    igraph_i_graphml_sax_handler_start_document,
-    igraph_i_graphml_sax_handler_end_document,
-    igraph_i_graphml_sax_handler_start_element,
-    igraph_i_graphml_sax_handler_end_element,
-    NULL,
-    igraph_i_graphml_sax_handler_chars,
-    NULL, NULL, NULL,
-    igraph_i_graphml_sax_handler_error,
-    igraph_i_graphml_sax_handler_error,
-    igraph_i_graphml_sax_handler_error,
-    NULL, NULL, NULL, 0, NULL, NULL, NULL, NULL
+  /* internalSubset = */ 0,
+  /* isStandalone = */ 0,
+  /* hasInternalSubset = */ 0,
+  /* hasExternalSubset = */ 0,
+  /* resolveEntity = */ 0,
+  /* getEntity = */ igraph_i_graphml_sax_handler_get_entity,
+  /* entityDecl = */ 0,
+  /* notationDecl = */ 0,
+  /* attributeDecl = */ 0,
+  /* elementDecl = */ 0,
+  /* unparsedEntityDecl = */ 0,
+  /* setDocumentLocator = */ 0,
+  /* startDocument = */ igraph_i_graphml_sax_handler_start_document,
+  /* endDocument = */ igraph_i_graphml_sax_handler_end_document,
+  /* startElement = */ 0,
+  /* endElement = */ 0,
+  /* reference = */ 0,
+  /* characters = */ igraph_i_graphml_sax_handler_chars,
+  /* ignorableWhitespaceFunc = */ 0,
+  /* processingInstruction = */ 0,
+  /* comment = */ 0,
+  /* warning = */ igraph_i_graphml_sax_handler_error,
+  /* error = */ igraph_i_graphml_sax_handler_error,
+  /* fatalError = */ igraph_i_graphml_sax_handler_error,
+  /* getParameterEntity = */ 0,
+  /* cdataBlock = */ 0,
+  /* externalSubset = */ 0,
+  /* initialized = */ XML_SAX2_MAGIC,
+  /* _private = */ 0,
+  /* startElementNs = */ igraph_i_graphml_sax_handler_start_element_ns,
+  /* endElementNs = */ igraph_i_graphml_sax_handler_end_element_ns,
+  /* serror = */ 0
 };
 
 #endif
@@ -1232,6 +1308,14 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
 /* 			     instream, XML_CHAR_ENCODING_NONE); */
   if (ctxt==NULL)
     IGRAPH_ERROR("Can't create progressive parser context", IGRAPH_PARSEERROR);
+
+  /* Set parsing options */
+  if (xmlCtxtUseOptions(ctxt,
+	XML_PARSE_NOENT | XML_PARSE_NOBLANKS |
+	XML_PARSE_NONET | XML_PARSE_NSCLEAN |
+	XML_PARSE_NOCDATA | XML_PARSE_HUGE
+	))
+    IGRAPH_ERROR("Cannot set options for the parser context", IGRAPH_EINVAL);
 
   /* Parse the file */
   while ((res=(int) fread(buffer, 1, 4096, instream))>0) {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?> 
+<ns3:graphml xmlns:ns2="http://www.w3.org/1999/xlink" 
+	xmlns:ns3="http://graphml.graphdrawing.org/xmlns"> 
+	<ns3:graph id="Barabasi-Albert-73751112" edgedefault="undirected"> 
+		<ns3:node id="0"/> 
+		<ns3:node id="1"/> 
+		<ns3:node id="2"/> 
+		<ns3:edge id="0" source="1" target="0" /> 
+		<ns3:edge id="1" source="2" target="1" /> 
+	</ns3:graph> 
+</ns3:graphml> 

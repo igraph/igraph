@@ -32,3 +32,9 @@ Vertex attribute 'type': false true true
 Vertex attribute 'gender': male female male
 Vertex attribute 'age': 30 20 20
 Vertex attribute 'retired': false false false
+The undirected graph:
+Vertices: 3
+Edges: 2
+Directed: 0
+0 1
+1 2

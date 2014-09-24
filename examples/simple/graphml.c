@@ -74,6 +74,8 @@ int main(int argc, char **argv) {
   int result;
   FILE *ifile, *ofile;
 
+  igraph_i_set_attribute_table(&igraph_cattribute_table);
+
   /* GraphML */
   ifile=fopen("test.gxl", "r");
   if (ifile==0) {
@@ -114,7 +116,6 @@ int main(int argc, char **argv) {
   igraph_destroy(&g);
 
   /* Test a GraphML file with default attributes */
-  igraph_i_set_attribute_table(&igraph_cattribute_table);
   ifile=fopen("graphml-default-attrs.xml", "r");
   if ((result=igraph_read_graph_graphml(&g, ifile, 0))) {
     return 1;
@@ -126,6 +127,17 @@ int main(int argc, char **argv) {
   dump_vertex_attribute_numeric("age", &g);
   dump_vertex_attribute_bool("retired", &g);
   igraph_destroy(&g);
+
+  /* Test a GraphML file with namespaces */
+  ifile=fopen("graphml-namespace.xml", "r");
+  if ((result=igraph_read_graph_graphml(&g, ifile, 0))) {
+    return 1;
+  }
+  fclose(ifile);
+  dump_graph("The undirected graph:\n", &g);
+  igraph_destroy(&g);
+
+  /* Restore the old warning handler */
   igraph_set_warning_handler(oldwarnhandler);
 
   /* There were sometimes problems with this file */
