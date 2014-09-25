@@ -5,6 +5,7 @@
 
 igraph_empty:
         PARAMS: OUT GRAPH graph, INTEGER n=0, BOOLEAN directed=True
+        IGNORE: RR
 
 igraph_add_edges:
         PARAMS: INOUT GRAPH graph, VECTOR edges, ATTRIBUTES attr
@@ -123,6 +124,7 @@ igraph_full:
 igraph_full_citation:
         PARAMS: OUT GRAPH graph, INTEGER n, BOOLEAN directed=True
         GATTR-R: name IS Full citation graph
+        IGNORE: RR
 
 igraph_atlas:
         PARAMS: OUT GRAPH graph, INT number=0
