@@ -1,4 +1,6 @@
 
+useDynLib("igraph")
+
 importFrom(stats, as.dendrogram)
 importFrom(stats, as.hclust)
 importFrom(stats, median)

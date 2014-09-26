@@ -28,7 +28,6 @@
 }
 
 .onLoad <- function(libname, pkgname) {
-  library.dynam("igraph", pkgname, libname);
   .Call("R_igraph_init", FALSE, FALSE, PACKAGE="igraph")
 }
 
