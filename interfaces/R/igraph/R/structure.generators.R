@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -468,6 +467,131 @@ graph.adjacency.sparse <- function(adjmatrix, mode=c("directed", "undirected", "
   res
 }
 
+
+
+#' Create graphs from adjacency matrices
+#' 
+#' \code{graph.adjacency} is a flexible function for creating \code{igraph}
+#' graphs from adjacency matrices.
+#' 
+#' \code{graph.adjacency} creates a graph from an adjacency matrix.
+#' 
+#' The order of the vertices are preserved, i.e. the vertex corresponding to
+#' the first row will be vertex 0 in the graph, etc.
+#' 
+#' \code{graph.adjacency} operates in two main modes, depending on the
+#' \code{weighted} argument.
+#' 
+#' If this argument is \code{NULL} then an unweighted graph is created and an
+#' element of the adjacency matrix gives the number of edges to create between
+#' the two corresponding vertices.  The details depend on the value of the
+#' \code{mode} argument: \describe{ \item{list("directed")}{The graph will be
+#' directed and a matrix element gives the number of edges between two
+#' vertices.} \item{list("undirected")}{This is exactly the same as \code{max},
+#' for convenience. Note that it is \emph{not} checked whether the matrix is
+#' symmetric.} \item{list("max")}{An undirected graph will be created and
+#' \code{max(A(i,j), A(j,i))} gives the number of edges.}
+#' \item{list("upper")}{An undirected graph will be created, only the upper
+#' right triangle (including the diagonal) is used for the number of edges.}
+#' \item{list("lower")}{An undirected graph will be created, only the lower
+#' left triangle (including the diagonal) is used for creating the edges.}
+#' \item{list("min")}{undirected graph will be created with \code{min(A(i,j),
+#' A(j,i))} edges between vertex \code{i} and \code{j}.} \item{list("plus")}{
+#' undirected graph will be created with \code{A(i,j)+A(j,i)} edges between
+#' vertex \code{i} and \code{j}.} }
+#' 
+#' If the \code{weighted} argument is not \code{NULL} then the elements of the
+#' matrix give the weights of the edges (if they are not zero).  The details
+#' depend on the value of the \code{mode} argument: \describe{
+#' \item{list("directed")}{The graph will be directed and a matrix element
+#' gives the edge weights.} \item{list("undirected")}{First we check that the
+#' matrix is symmetric. It is an error if not. Then only the upper triangle is
+#' used to create a weighted undirected graph.} \item{list("max")}{An
+#' undirected graph will be created and \code{max(A(i,j), A(j,i))} gives the
+#' edge weights.} \item{list("upper")}{An undirected graph will be created,
+#' only the upper right triangle (including the diagonal) is used (for the edge
+#' weights).} \item{list("lower")}{An undirected graph will be created, only
+#' the lower left triangle (including the diagonal) is used for creating the
+#' edges.} \item{list("min")}{An undirected graph will be created,
+#' \code{min(A(i,j), A(j,i))} gives the edge weights.} \item{list("plus")}{An
+#' undirected graph will be created, \code{A(i,j)+A(j,i)} gives the edge
+#' weights.} }
+#' 
+#' @param adjmatrix A square adjacency matrix. From igraph version 0.5.1 this
+#' can be a sparse matrix created with the \code{Matrix} package.
+#' @param mode Character scalar, specifies how igraph should interpret the
+#' supplied matrix. See also the \code{weighted} argument, the interpretation
+#' depends on that too. Possible values are: \code{directed},
+#' \code{undirected}, \code{upper}, \code{lower}, \code{max}, \code{min},
+#' \code{plus}. See details below.
+#' @param weighted This argument specifies whether to create a weighted graph
+#' from an adjacency matrix. If it is \code{NULL} then an unweighted graph is
+#' created and the elements of the adjacency matrix gives the number of edges
+#' between the vertices. If it is a character constant then for every non-zero
+#' matrix entry an edge is created and the value of the entry is added as an
+#' edge attribute named by the \code{weighted} argument. If it is \code{TRUE}
+#' then a weighted graph is created and the name of the edge attribute will be
+#' \code{weight}. See also details below.
+#' @param diag Logical scalar, whether to include the diagonal of the matrix in
+#' the calculation. If this is \code{FALSE} then the diagonal is zerod out
+#' first.
+#' @param add.colnames Character scalar, whether to add the column names as
+#' vertex attributes. If it is \sQuote{\code{NULL}} (the default) then, if
+#' present, column names are added as vertex attribute \sQuote{name}. If
+#' \sQuote{\code{NA}} then they will not be added.  If a character constant,
+#' then it gives the name of the vertex attribute to add.
+#' @param add.rownames Character scalar, whether to add the row names as vertex
+#' attributes. Possible values the same as the previous argument. By default
+#' row names are not added. If \sQuote{\code{add.rownames}} and
+#' \sQuote{\code{add.colnames}} specify the same vertex attribute, then the
+#' former is ignored.
+#' @return An igraph graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \link{graph} and \code{\link{graph.formula}} for other ways to
+#' create graphs.
+#' @keywords graphs
+#' @examples
+#' 
+#' adjm <- matrix(sample(0:1, 100, replace=TRUE, prob=c(0.9,0.1)), nc=10)
+#' g1 <- graph.adjacency( adjm )
+#' adjm <- matrix(sample(0:5, 100, replace=TRUE,
+#'                       prob=c(0.9,0.02,0.02,0.02,0.02,0.02)), nc=10)
+#' g2 <- graph.adjacency(adjm, weighted=TRUE)
+#' E(g2)$weight
+#' 
+#' ## various modes for weighted graphs, with some tests
+#' nzs <- function(x) sort(x [x!=0])
+#' adjm <- matrix(runif(100), 10)
+#' adjm[ adjm<0.5 ] <- 0
+#' g3 <- graph.adjacency((adjm + t(adjm))/2, weighted=TRUE,
+#'                       mode="undirected") 
+#' 
+#' g4 <- graph.adjacency(adjm, weighted=TRUE, mode="max")
+#' all(nzs(pmax(adjm, t(adjm))[upper.tri(adjm)]) == sort(E(g4)$weight))
+#' 
+#' g5 <- graph.adjacency(adjm, weighted=TRUE, mode="min")
+#' all(nzs(pmin(adjm, t(adjm))[upper.tri(adjm)]) == sort(E(g5)$weight))
+#' 
+#' g6 <- graph.adjacency(adjm, weighted=TRUE, mode="upper")
+#' all(nzs(adjm[upper.tri(adjm)]) == sort(E(g6)$weight))
+#' 
+#' g7 <- graph.adjacency(adjm, weighted=TRUE, mode="lower")
+#' all(nzs(adjm[lower.tri(adjm)]) == sort(E(g7)$weight))
+#' 
+#' g8 <- graph.adjacency(adjm, weighted=TRUE, mode="plus")
+#' d2 <- function(x) { diag(x) <- diag(x)/2; x }
+#' all(nzs((d2(adjm+t(adjm)))[lower.tri(adjm)]) == sort(E(g8)$weight))
+#' 
+#' g9 <- graph.adjacency(adjm, weighted=TRUE, mode="plus", diag=FALSE)
+#' d0 <- function(x) { diag(x) <- 0 }
+#' all(nzs((d0(adjm+t(adjm)))[lower.tri(adjm)]) == sort(E(g9)$weight))
+#' 
+#' ## row/column names
+#' rownames(adjm) <- sample(letters, nrow(adjm))
+#' colnames(adjm) <- seq(ncol(adjm))
+#' g10 <- graph.adjacency(adjm, weighted=TRUE, add.rownames="code")
+#' summary(g10)
+#' 
 graph.adjacency <- function(adjmatrix, mode=c("directed", "undirected", "max",
                                          "min", "upper", "lower", "plus"),
                             weighted=NULL, diag=TRUE,
@@ -811,6 +935,101 @@ graph.atlas <- function(n) {
 # Create a graph from a data frame
 ###################################################################
 
+
+
+#' Creating igraph graphs from data frames or vice-versa
+#' 
+#' This function creates an igraph graph from one or two data frames containing
+#' the (symbolic) edge list and edge/vertex attributes.
+#' 
+#' \code{graph.data.frame} creates igraph graphs from one or two data frames.
+#' It has two modes of operatation, depending whether the \code{vertices}
+#' argument is \code{NULL} or not.
+#' 
+#' If \code{vertices} is \code{NULL}, then the first two columns of \code{d}
+#' are used as a symbolic edge list and additional columns as edge attributes.
+#' The names of the attributes are taken from the names of the columns.
+#' 
+#' If \code{vertices} is not \code{NULL}, then it must be a data frame giving
+#' vertex metadata. The first column of \code{vertices} is assumed to contain
+#' symbolic vertex names, this will be added to the graphs as the
+#' \sQuote{\code{name}} vertex attribute. Other columns will be added as
+#' additional vertex attributes. If \code{vertices} is not \code{NULL} then the
+#' symbolic edge list given in \code{d} is checked to contain only vertex names
+#' listed in \code{vertices}.
+#' 
+#' Typically, the data frames are exported from some speadsheat software like
+#' Excel and are imported into R via \code{\link{read.table}},
+#' \code{\link{read.delim}} or \code{\link{read.csv}}.
+#' 
+#' \code{get.data.frame} converts the igraph graph into one or more data
+#' frames, depending on the \code{what} argument.
+#' 
+#' If the \code{what} argument is \code{edges} (the default), then the edges of
+#' the graph and also the edge attributes are returned. The edges will be in
+#' the first two columns, named \code{from} and \code{to}. (This also denotes
+#' edge direction for directed graphs.)  For named graphs, the vertex names
+#' will be included in these columns, for other graphs, the numeric vertex ids.
+#' The edge attributes will be in the other columns. It is not a good idea to
+#' have an edge attribute named \code{from} or \code{to}, because then the
+#' column named in the data frame will not be unique. The edges are listed in
+#' the order of their numeric ids.
+#' 
+#' If the \code{what} argument is \code{vertices}, then vertex attributes are
+#' returned. Vertices are listed in the order of their numeric vertex ids.
+#' 
+#' If the \code{what} argument is \code{both}, then both vertex and edge data
+#' is returned, in a list with named entries \code{vertices} and \code{edges}.
+#' 
+#' @aliases graph.data.frame get.data.frame
+#' @param d A data frame containing a symbolic edge list in the first two
+#' columns. Additional columns are considered as edge attributes.  Since
+#' version 0.7 this argument is coerced to a data frame with
+#' \code{as.data.frame}.
+#' @param directed Logical scalar, whether or not to create a directed graph.
+#' @param vertices A data frame with vertex metadata, or \code{NULL}. See
+#' details below. Since version 0.7 this argument is coerced to a data frame
+#' with \code{as.data.frame}, if not \code{NULL}.
+#' @param x An igraph object.
+#' @param what Character constant, whether to return info about vertices,
+#' edges, or both. The default is \sQuote{edges}.
+#' @return An igraph graph object for \code{graph.data.frame}, and either a
+#' data frame or a list of two data frames named \code{edges} and
+#' \code{vertices} for \code{as.data.frame}.
+#' @note For \code{graph.data.frame} \code{NA} elements in the first two
+#' columns \sQuote{d} are replaced by the string \dQuote{NA} before creating
+#' the graph. This means that all \code{NA}s will correspond to a single
+#' vertex.
+#' 
+#' \code{NA} elements in the first column of \sQuote{vertices} are also
+#' replaced by the string \dQuote{NA}, but the rest of \sQuote{vertices} is not
+#' touched. In other words, vertex names (=the first column) cannot be
+#' \code{NA}, but other vertex attributes can.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{graph.formula}}
+#' for another way to create graphs, \code{\link{read.table}} to read in tables
+#' from files.
+#' @keywords graphs
+#' @examples
+#' 
+#' ## A simple example with a couple of actors
+#' ## The typical case is that these tables are read in from files....
+#' actors <- data.frame(name=c("Alice", "Bob", "Cecil", "David",
+#'                             "Esmeralda"),
+#'                      age=c(48,33,45,34,21),
+#'                      gender=c("F","M","F","M","F"))
+#' relations <- data.frame(from=c("Bob", "Cecil", "Cecil", "David",
+#'                                "David", "Esmeralda"),
+#'                         to=c("Alice", "Bob", "Alice", "Alice", "Bob", "Alice"),
+#'                         same.dept=c(FALSE,FALSE,TRUE,FALSE,FALSE,TRUE),
+#'                         friendship=c(4,5,5,2,1,1), advice=c(4,5,5,4,2,3))
+#' g <- graph.data.frame(relations, directed=TRUE, vertices=actors)
+#' print(g, e=TRUE, v=TRUE)
+#' 
+#' ## The opposite operation
+#' get.data.frame(g, what="vertices")
+#' get.data.frame(g, what="edges")
+#' 
 graph.data.frame <- function(d, directed=TRUE, vertices=NULL) {
 
   d <- as.data.frame(d)
@@ -975,6 +1194,36 @@ graph.extended.chordal.ring <- function(n, w) {
   res
 }
 
+
+
+#' Line graph of a graph
+#' 
+#' This function calculates the line graph of another graph.
+#' 
+#' The line graph \code{L(G)} of a \code{G} undirected graph is defined as
+#' follows. \code{L(G)} has one vertex for each edge in \code{G} and two
+#' vertices in \code{L(G)} are connected by an edge if their corresponding
+#' edges share an end point.
+#' 
+#' The line graph \code{L(G)} of a \code{G} directed graph is slightly
+#' different, \code{L(G)} has one vertex for each edge in \code{G} and two
+#' vertices in \code{L(G)} are connected by a directed edge if the target of
+#' the first vertex's corresponding edge is the same as the source of the
+#' second vertex's corresponding edge.
+#' 
+#' @param graph The input graph, it can be directed or undirected.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}, the first version of
+#' the C code was written by Vincent Matossian.
+#' @keywords graphs
+#' @examples
+#' 
+#' # generate the first De-Bruijn graphs
+#' g <- graph.full(2, directed=TRUE, loops=TRUE)
+#' line.graph(g)
+#' line.graph(line.graph(g))
+#' line.graph(line.graph(line.graph(g)))
+#' 
 line.graph <- function(graph) {
 
   if (!is.igraph(graph)) {
@@ -991,6 +1240,39 @@ line.graph <- function(graph) {
 }
 
 
+
+
+#' De Bruijn graphs.
+#' 
+#' De Bruijn graphs are labeled graphs representing the overlap of strings.
+#' 
+#' A de Bruijn graph represents relationships between strings. An alphabet of
+#' \code{m} letters are used and strings of length \code{n} are considered.  A
+#' vertex corresponds to every possible string and there is a directed edge
+#' from vertex \code{v} to vertex \code{w} if the string of \code{v} can be
+#' transformed into the string of \code{w} by removing its first letter and
+#' appending a letter to it.
+#' 
+#' Please note that the graph will have \code{m} to the power \code{n} vertices
+#' and even more edges, so probably you don't want to supply too big numbers
+#' for \code{m} and \code{n}.
+#' 
+#' De Bruijn graphs have some interesting properties, please see another
+#' source, eg. Wikipedia for details.
+#' 
+#' @param m Integer scalar, the size of the alphabet. See details below.
+#' @param n Integer scalar, the length of the labels. See details below.
+#' @return A graph object.
+#' @author Gabor Csardi <csardi.gabor@@gmail.com>
+#' @seealso \code{\link{graph.kautz}}, \code{\link{line.graph}}
+#' @keywords graphs
+#' @examples
+#' 
+#' # de Bruijn graphs can be created recursively by line graphs as well 
+#' g <- graph.de.bruijn(2,1)
+#' graph.de.bruijn(2,2)
+#' line.graph(g)
+#' 
 graph.de.bruijn <- function(m, n) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -1004,6 +1286,34 @@ graph.de.bruijn <- function(m, n) {
   res
 }
 
+
+
+#' Kautz graphs
+#' 
+#' Kautz graphs are labeled graphs representing the overlap of strings.
+#' 
+#' A Kautz graph is a labeled graph, vertices are labeled by strings of length
+#' \code{n+1} above an alphabet with \code{m+1} letters, with the restriction
+#' that every two consecutive letters in the string must be different. There is
+#' a directed edge from a vertex \code{v} to another vertex \code{w} if it is
+#' possible to transform the string of \code{v} into the string of \code{w} by
+#' removing the first letter and appending a letter to it.
+#' 
+#' Kautz graphs have some interesting properties, see eg. Wikipedia for
+#' details.
+#' 
+#' @param m Integer scalar, the size of the alphabet. See details below.
+#' @param n Integer scalar, the length of the labels. See details below.
+#' @return A graph object.
+#' @author Gabor Csardi <csardi.gabor@@gmail.com>, the first version in R was
+#' written by Vincent Matossian.
+#' @seealso \code{\link{graph.de.bruijn}}, \code{\link{line.graph}}
+#' @keywords graphs
+#' @examples
+#' 
+#' line.graph(graph.kautz(2,1))
+#' graph.kautz(2,2)
+#' 
 graph.kautz <- function(m, n) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -1017,6 +1327,100 @@ graph.kautz <- function(m, n) {
   res
 }
 
+
+
+#' Creating named graphs
+#' 
+#' There are some famous, named graphs, sometimes counterexamples to some
+#' conjecture or unique graphs with given features. These can be created with
+#' this function
+#' 
+#' \code{graph.famous} knows the following graphs: \describe{ \item{Bull}{The
+#' bull graph, 5 vertices, 5 edges, resembles to the head of a bull if drawn
+#' properly.} \item{Chvatal}{This is the smallest triangle-free graph that is
+#' both 4-chromatic and 4-regular. According to the Grunbaum conjecture there
+#' exists an m-regular, m-chromatic graph with n vertices for every m>1 and
+#' n>2. The Chvatal graph is an example for m=4 and n=12. It has 24 edges.}
+#' \item{Coxeter}{A non-Hamiltonian cubic symmetric graph with 28 vertices and
+#' 42 edges.} \item{Cubical}{The Platonic graph of the cube. A convex regular
+#' polyhedron with 8 vertices and 12 edges.} \item{Diamond}{A graph with 4
+#' vertices and 5 edges, resembles to a schematic diamond if drawn properly.}
+#' \item{Dodecahedral, Dodecahedron}{Another Platonic solid with 20 vertices
+#' and 30 edges.} \item{Folkman}{The semisymmetric graph with minimum number of
+#' vertices, 20 and 40 edges. A semisymmetric graph is regular, edge transitive
+#' and not vertex transitive.} \item{Franklin}{This is a graph whose embedding
+#' to the Klein bottle can be colored with six colors, it is a counterexample
+#' to the neccessity of the Heawood conjecture on a Klein bottle. It has 12
+#' vertices and 18 edges.} \item{Frucht}{The Frucht Graph is the smallest
+#' cubical graph whose automorphism group consists only of the identity
+#' element. It has 12 vertices and 18 edges.} \item{Grotzsch}{The Grötzsch
+#' graph is a triangle-free graph with 11 vertices, 20 edges, and chromatic
+#' number 4. It is named after German mathematician Herbert Grötzsch, and its
+#' existence demonstrates that the assumption of planarity is necessary in
+#' Grötzsch's theorem that every triangle-free planar graph is 3-colorable.}
+#' \item{Heawood}{The Heawood graph is an undirected graph with 14 vertices and
+#' 21 edges. The graph is cubic, and all cycles in the graph have six or more
+#' edges. Every smaller cubic graph has shorter cycles, so this graph is the
+#' 6-cage, the smallest cubic graph of girth 6.} \item{Herschel}{The Herschel
+#' graph is the smallest nonhamiltonian polyhedral graph. It is the unique such
+#' graph on 11 nodes, and has 18 edges.} \item{House}{The house graph is a
+#' 5-vertex, 6-edge graph, the schematic draw of a house if drawn properly,
+#' basicly a triangle of the top of a square.} \item{HouseX}{The same as the
+#' house graph with an X in the square. 5 vertices and 8 edges.}
+#' \item{Icosahedral, Icosahedron}{A Platonic solid with 12 vertices and 30
+#' edges.} \item{Krackhardt\_Kite}{A social network with 10 vertices and 18
+#' edges.  Krackhardt, D. Assessing the Political Landscape: Structure,
+#' Cognition, and Power in Organizations.  Admin. Sci. Quart. 35, 342-369,
+#' 1990.} \item{Levi}{The graph is a 4-arc transitive cubic graph, it has 30
+#' vertices and 45 edges.} \item{McGee}{The McGee graph is the unique 3-regular
+#' 7-cage graph, it has 24 vertices and 36 edges.} \item{Meredith}{The Meredith
+#' graph is a quartic graph on 70 nodes and 140 edges that is a counterexample
+#' to the conjecture that every 4-regular 4-connected graph is Hamiltonian.}
+#' \item{Noperfectmatching}{A connected graph with 16 vertices and 27 edges
+#' containing no perfect matching. A matching in a graph is a set of pairwise
+#' non-adjacent edges; that is, no two edges share a common vertex. A perfect
+#' matching is a matching which covers all vertices of the graph.}
+#' \item{Nonline}{A graph whose connected components are the 9 graphs whose
+#' presence as a vertex-induced subgraph in a graph makes a nonline graph. It
+#' has 50 vertices and 72 edges.} \item{Octahedral, Octahedron}{Platonic solid
+#' with 6 vertices and 12 edges.} \item{Petersen}{A 3-regular graph with 10
+#' vertices and 15 edges. It is the smallest hypohamiltonian graph, ie. it is
+#' non-hamiltonian but removing any single vertex from it makes it
+#' Hamiltonian.} \item{Robertson}{The unique (4,5)-cage graph, ie. a 4-regular
+#' graph of girth 5. It has 19 vertices and 38 edges.}
+#' \item{Smallestcyclicgroup}{A smallest nontrivial graph whose automorphism
+#' group is cyclic. It has 9 vertices and 15 edges.} \item{Tetrahedral,
+#' Tetrahedron}{Platonic solid with 4 vertices and 6 edges.}
+#' \item{Thomassen}{The smallest hypotraceable graph, on 34 vertices and 52
+#' edges. A hypotracable graph does not contain a Hamiltonian path but after
+#' removing any single vertex from it the remainder always contains a
+#' Hamiltonian path. A graph containing a Hamiltonian path is called tracable.}
+#' \item{Tutte}{Tait's Hamiltonian graph conjecture states that every
+#' 3-connected 3-regular planar graph is Hamiltonian.  This graph is a
+#' counterexample. It has 46 vertices and 69 edges.}
+#' \item{Uniquely3colorable}{Returns a 12-vertex, triangle-free graph with
+#' chromatic number 3 that is uniquely 3-colorable.} \item{Walther}{An identity
+#' graph with 25 vertices and 31 edges. An identity graph has a single graph
+#' automorphism, the trivial one.} \item{Zachary}{Social network of friendships
+#' between 34 members of a karate club at a US university in the 1970s. See W.
+#' W. Zachary, An information flow model for conflict and fission in small
+#' groups, Journal of Anthropological Research 33, 452-473 (1977).  } }
+#' 
+#' @param name Character constant giving the name of the graph. It is case
+#' insensitive.
+#' @return A graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{graph}} can create arbitrary graphs, see also the other
+#' functions on the its manual page for creating special graphs.
+#' @keywords graphs
+#' @examples
+#' 
+#' solids <- list(graph.famous("Tetrahedron"),
+#'                graph.famous("Cubical"),
+#'                graph.famous("Octahedron"),
+#'                graph.famous("Dodecahedron"),
+#'                graph.famous("Icosahedron"))
+#' 
 graph.famous <- function(name) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -1028,6 +1432,36 @@ graph.famous <- function(name) {
   res
 }
 
+
+
+#' Create a full bipartite graph
+#' 
+#' Bipartite graphs are also called two-mode by some. This function creates a
+#' bipartite graph in which every possible edge is present.
+#' 
+#' Bipartite graphs have a \sQuote{\code{type}} vertex attribute in igraph,
+#' this is boolean and \code{FALSE} for the vertices of the first kind and
+#' \code{TRUE} for vertices of the second kind.
+#' 
+#' @param n1 The number of vertices of the first kind.
+#' @param n2 The number of vertices of the second kind.
+#' @param directed Logical scalar, whether the graphs is directed.
+#' @param mode Scalar giving the kind of edges to create for directed graphs.
+#' If this is \sQuote{\code{out}} then all vertices of the first kind are
+#' connected to the others; \sQuote{\code{in}} specifies the opposite
+#' direction; \sQuote{\code{all}} creates mutual edges. This argument is
+#' ignored for undirected graphs.x
+#' @return An igraph graph, with the \sQuote{\code{type}} vertex attribute set.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{graph.full}} for creating one-mode full graphs
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.full.bipartite(2, 3)
+#' g2 <- graph.full.bipartite(2, 3, dir=TRUE)
+#' g3 <- graph.full.bipartite(2, 3, dir=TRUE, mode="in")
+#' g4 <- graph.full.bipartite(2, 3, dir=TRUE, mode="all")
+#' 
 graph.full.bipartite <- function(n1, n2, directed=FALSE,
                                  mode=c("all", "out", "in")) {
 
@@ -1048,6 +1482,48 @@ graph.full.bipartite <- function(n1, n2, directed=FALSE,
   set.vertex.attribute(res$graph, "type", value=res$types)
 }
 
+
+
+#' Create a bipartite graph
+#' 
+#' A bipartite graph has two kinds of vertices and connections are only allowed
+#' between different kinds.
+#' 
+#' Bipartite graphs have a \code{type} vertex attribute in igraph, this is
+#' boolean and \code{FALSE} for the vertices of the first kind and \code{TRUE}
+#' for vertices of the second kind.
+#' 
+#' \code{graph.bipartite} basically does three things. First it checks tha
+#' \code{edges} vector against the vertex \code{types}. Then it creates a graph
+#' using the \code{edges} vector and finally it adds the \code{types} vector as
+#' a vertex attribute called \code{type}.
+#' 
+#' \code{is.bipartite} checks whether the graph is bipartite or not. It just
+#' checks whether the graph has a vertex attribute called \code{type}.
+#' 
+#' @aliases graph.bipartite is.bipartite
+#' @param types A vector giving the vertex types. It will be coerced into
+#' boolean. The length of the vector gives the number of vertices in the graph.
+#' @param edges A vector giving the edges of the graph, the same way as for the
+#' regular \code{\link{graph}} function. It is checked that the edges indeed
+#' connect vertices of different kind, accoding to the supplied \code{types}
+#' vector.
+#' @param directed Whether to create a directed graph, boolean constant. Note
+#' that by default undirected graphs are created, as this is more common for
+#' bipartite graphs.
+#' @param graph The input graph.
+#' @return \code{graph.bipartite} returns a bipartite igraph graph. In other
+#' words, an igraph graph that has a vertex attribute named \code{type}.
+#' 
+#' \code{is.bipartite} returns a logical scalar.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{graph}} to create one-mode networks
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.bipartite( rep(0:1,length=10), c(1:10))
+#' print(g, v=TRUE)
+#' 
 graph.bipartite <- function(types, edges, directed=FALSE) {
 
   types <- as.logical(types)
@@ -1177,6 +1653,64 @@ graph.incidence.dense <- function(incidence, directed, mode, multiple,
   res
 }
 
+
+
+#' Create graphs from an incidence matrix
+#' 
+#' \code{graph.incidence} creates a bipartite igraph graph from an incidence
+#' matrix.
+#' 
+#' Bipartite graphs have a \sQuote{\code{type}} vertex attribute in igraph,
+#' this is boolean and \code{FALSE} for the vertices of the first kind and
+#' \code{TRUE} for vertices of the second kind.
+#' 
+#' \code{graph.incidence} can operate in two modes, depending on the
+#' \code{multiple} argument. If it is \code{FALSE} then a single edge is
+#' created for every non-zero element in the incidence matrix. If
+#' \code{multiple} is \code{TRUE}, then the matrix elements are rounded up to
+#' the closest non-negative integer to get the number of edges to create
+#' between a pair of vertices.
+#' 
+#' @param incidence The input incidence matrix. It can also be a sparse matrix
+#' from the \code{Matrix} package.
+#' @param directed Logical scalar, whether to create a directed graph.
+#' @param mode A character constant, defines the direction of the edges in
+#' directed graphs, ignored for undirected graphs. If \sQuote{\code{out}}, then
+#' edges go from vertices of the first kind (corresponding to rows in the
+#' incidence matrix) to vertices of the second kind (columns in the incidence
+#' matrix). If \sQuote{\code{in}}, then the opposite direction is used. If
+#' \sQuote{\code{all}} or \sQuote{\code{total}}, then mutual edges are created.
+#' @param multiple Logical scalar, specifies how to interpret the matrix
+#' elements. See details below.
+#' @param weighted This argument specifies whether to create a weighted graph
+#' from the incidence matrix. If it is \code{NULL} then an unweighted graph is
+#' created and the \code{multiple} argument is used to determine the edges of
+#' the graph. If it is a character constant then for every non-zero matrix
+#' entry an edge is created and the value of the entry is added as an edge
+#' attribute named by the \code{weighted} argument. If it is \code{TRUE} then a
+#' weighted graph is created and the name of the edge attribute will be
+#' \sQuote{\code{weight}}.
+#' @param add.names A character constant, \code{NA} or \code{NULL}.
+#' \code{graph.incidence} can add the row and column names of the incidence
+#' matrix as vertex attributes. If this argument is \code{NULL} (the default)
+#' and the incidence matrix has both row and column names, then these are added
+#' as the \sQuote{\code{name}} vertex attribute. If you want a different vertex
+#' attribute for this, then give the name of the attributes as a character
+#' string. If this argument is \code{NA}, then no vertex attributes (other than
+#' type) will be added.
+#' @return A bipartite igraph graph. In other words, an igraph graph that has a
+#' vertex attribute \code{type}.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{graph.bipartite}} for another way to create bipartite
+#' graphs
+#' @keywords graphs
+#' @examples
+#' 
+#' inc <- matrix(sample(0:1, 15, repl=TRUE), 3, 5)
+#' colnames(inc) <- letters[1:5]
+#' rownames(inc) <- LETTERS[1:3]
+#' graph.incidence(inc)
+#' 
 graph.incidence <- function(incidence, directed=FALSE,
                             mode=c("all", "out", "in", "total"),
                             multiple=FALSE, weighted=NULL,

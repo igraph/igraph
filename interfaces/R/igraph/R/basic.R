@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -20,6 +19,25 @@
 #
 ###################################################################
 
+
+
+#' Is this object a graph?
+#' 
+#' \code{is.graph} makes its decision based on the class attribute of the
+#' object.
+#' 
+#' 
+#' @param graph An R object.
+#' @return A logical constant, \code{TRUE} if argument \code{graph} is a graph
+#' object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.ring(10)
+#' is.igraph(g)
+#' is.igraph(numeric(10))
+#' 
 is.igraph <- function(graph){
   "igraph" %in% class(graph)
 }

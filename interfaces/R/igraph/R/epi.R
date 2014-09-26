@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -81,6 +80,51 @@ quantile.sir <- function(x, comp=c("NI", "NS", "NR"), prob, ...) {
 # Outputs:  None.  Just produces the plot of all compartment curves, 
 #           with median and quantiles.
 
+
+
+#' Plotting the results on multiple SIR model runs
+#' 
+#' This function can conveniently plot the results of multiple SIR model
+#' simulations.
+#' 
+#' The number of susceptible/infected/recovered individuals is plotted over
+#' time, for multiple simulations.
+#' 
+#' @param x The output of the SIR simulation, coming from the \code{\link{sir}}
+#' function.
+#' @param comp Character scalar, which component to plot. Either \sQuote{NI}
+#' (infected, default), \sQuote{NS} (susceptible) or \sQuote{NR} (recovered).
+#' @param median Logical scalar, whether to plot the (binned) median.
+#' @param quantiles A vector of (binned) quantiles to plot.
+#' @param color Color of the individual simulation curves.
+#' @param median_color Color of the median curve.
+#' @param quantile_color Color(s) of the quantile curves. (It is recycled if
+#' needed and non-needed entries are ignored if too long.)
+#' @param lwd.median Line width of the median.
+#' @param lwd.quantile Line width of the quantile curves.
+#' @param lty.quantile Line type of the quantile curves.
+#' @param xlim The x limits, a two-element numeric vector. If \code{NULL}, then
+#' it is calculated from the data.
+#' @param ylim The y limits, a two-element numeric vector. If \code{NULL}, then
+#' it is calculated from the data.
+#' @param xlab The x label.
+#' @param ylab The y label. If \code{NULL} then it is automatically added based
+#' on the \code{comp} argument.
+#' @param \dots Additional arguments are passed to \code{plot}, that is run
+#' before any of the curves are added, to create the figure.
+#' @return Nothing.
+#' @author Eric Kolaczyk (\url{http://math.bu.edu/people/kolaczyk/}) and Gabor
+#' Csardi \email{csardi.gabor@@gmail.com}.
+#' @seealso \code{\link{sir}} for running the actual simulation.
+#' @references Bailey, Norman T. J. (1975). The mathematical theory of
+#' infectious diseases and its applications (2nd ed.). London: Griffin.
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- erdos.renyi.game(100, 100, type="gnm")
+#' sm <- sir(g, beta=5, gamma=1)
+#' plot(sm)
+#' 
 plot.sir <- function(x, comp=c("NI", "NS", "NR"),
                      median=TRUE, quantiles=c(0.1, 0.9), color=NULL,
                      median_color=NULL, quantile_color=NULL,

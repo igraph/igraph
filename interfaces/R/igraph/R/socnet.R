@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -30,6 +29,20 @@
 
 .tkigraph.env <- new.env()
 
+
+
+#' Experimental basic igraph GUI
+#' 
+#' This functions starts an experimental GUI to some igraph functions. The GUI
+#' was written in Tcl/Tk, so it is cross platform.
+#' 
+#' \code{tkigraph} has its own online help system, please see that for the
+#' details about how to use it.
+#' 
+#' @return Returns \code{NULL}, invisibly.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{tkplot}} for interactive plotting of graphs.
+#' @keywords graphs
 tkigraph <- function() {
 
   require(tcltk) || stop("tcl/tk library not available")

@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -255,6 +254,37 @@ remove.edge.attribute <- function(graph, name) {
 
 #############
 
+
+
+#' Named graphs
+#' 
+#' An igraph graph is named, if there is a symbolic name associated with its
+#' vertices.
+#' 
+#' In igraph vertices can always be identified and specified via their numeric
+#' vertex ids. This is, however, not always convenient, and in many cases there
+#' exist symbolic ids that correspond to the vertices. To allow this more
+#' flexible identification of vertices, one can assign a vertex attribute
+#' called \sQuote{name} to an igraph graph. After doing this, the symbolic
+#' vertex names can be used in all igraph functions, instead of the numeric
+#' ids.
+#' 
+#' Note that the uniqueness of vertex names are currently not enforced in
+#' igraph, you have to check that for yourself, when assigning the vertex
+#' names.
+#' 
+#' @param graph The input graph.
+#' @return A logical scalar.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.ring(10)
+#' is.named(g)
+#' V(g)$name <- letters[1:10]
+#' is.named(g)
+#' neighbors(g, "a")
+#' 
 is.named <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -262,6 +292,35 @@ is.named <- function(graph) {
   "name" %in% list.vertex.attributes(graph)
 }
 
+
+
+#' Weighted graphs
+#' 
+#' In weighted graphs, a real number is assigned to each (directed or
+#' undirected) edge.
+#' 
+#' In igraph edge weights are represented via an edge attribute, called
+#' \sQuote{weight}. The \code{is.weighted} function only checks that such an
+#' attribute exists. (It does not even checks that it is a numeric edge
+#' attribute.)
+#' 
+#' Edge weights are used for different purposes by the different functions.
+#' E.g. shortest path functions use it as the cost of the path; community
+#' finding methods use it as the strength of the relationship between two
+#' vertices, etc. Check the manual pages of the functions working with weighted
+#' graphs for details.
+#' 
+#' @param graph The input graph.
+#' @return A logical scalar.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.ring(10)
+#' get.shortest.paths(g, 8, 2)
+#' E(g)$weight <- seq_len(ecount(g))
+#' get.shortest.paths(g, 8, 2)
+#' 
 is.weighted <- function(graph) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")

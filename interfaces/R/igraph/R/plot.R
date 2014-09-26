@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -20,6 +19,59 @@
 #
 ###################################################################
 
+
+
+#' Plotting of graphs
+#' 
+#' \code{plot.graph} is able to plot graphs to any R device. It is the
+#' non-interactive companion of the \code{tkplot} function.
+#' 
+#' One convenient way to plot graphs is to plot with \code{\link{tkplot}}
+#' first, handtune the placement of the vertices, query the coordinates by the
+#' \code{\link{tkplot.getcoords}} function and use them with \code{plot} to
+#' plot the graph to any R device.
+#' 
+#' @param x The graph to plot.
+#' @param axes Logical, whether to plot axes, defaults to FALSE.
+#' @param add Logical scalar, whether to add the plot to the current device, or
+#' delete the device's current contents first.
+#' @param xlim The limits for the horizontal axis, it is unlikely that you want
+#' to modify this.
+#' @param ylim The limits for the vertical axis, it is unlikely that you want
+#' to modify this.
+#' @param mark.groups A list of vertex id vectors. It is interpreted as a set
+#' of vertex groups. Each vertex group is highlighted, by plotting a colored
+#' smoothed polygon around and \dQuote{under} it. See the arguments below to
+#' control the look of the polygons.
+#' @param mark.shape A numeric scalar or vector. Controls the smoothness of the
+#' vertex group marking polygons. This is basically the \sQuote{shape}
+#' parameter of the \code{\link[graphics]{xspline}} function, its possible
+#' values are between -1 and 1. If it is a vector, then a different value is
+#' used for the different vertex groups.
+#' @param mark.col A scalar or vector giving the colors of marking the
+#' polygons, in any format accepted by \code{\link[graphics]{xspline}}; e.g.
+#' numeric color ids, symbolic color names, or colors in RGB.
+#' @param mark.border A scalar or vector giving the colors of the borders of
+#' the vertex group marking polygons. If it is \code{NA}, then no border is
+#' drawn.
+#' @param mark.expand A numeric scalar or vector, the size of the border around
+#' the marked vertex groups. It is in the same units as the vertex sizes. If a
+#' vector is given, then different values are used for the different vertex
+#' groups.
+#' @param \dots Additional plotting parameters. See \link{igraph.plotting} for
+#' the complete list.
+#' @return Returns \code{NULL}, invisibly.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{layout}} for different layouts,
+#' \code{\link{igraph.plotting}} for the detailed description of the plotting
+#' parameters and \code{\link{tkplot}} and \code{\link{rglplot}} for other
+#' graph plotting functions.
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.ring(10)
+#' \dontrun{plot(g, layout=layout.kamada.kawai, vertex.color="green")}
+#' 
 plot.igraph <- function(x, 
                        # SPECIFIC: #####################################
                        axes=FALSE, add=FALSE,
@@ -341,6 +393,35 @@ plot.igraph <- function(x,
   invisible(NULL)
 }
 
+
+
+#' 3D plotting of graphs with OpenGL
+#' 
+#' Using the \code{rgl} package, \code{rglplot} plots a graph in 3D. The plot
+#' can be zoomed, rotated, shifted, etc. but the coordinates of the vertices is
+#' fixed.
+#' 
+#' Note that \code{rglplot} is considered to be highly experimental. It is not
+#' very useful either. See \code{\link{igraph.plotting}} for the possible
+#' arguments.
+#' 
+#' @aliases rglplot rglplot.igraph
+#' @param x The graph to plot.
+#' @param \dots Additional arguments, see \code{\link{igraph.plotting}} for the
+#' details
+#' @return \code{NULL}, invisibly.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{igraph.plotting}}, \code{\link{plot.igraph}} for the 2D
+#' version, \code{\link{tkplot}} for interactive graph drawing in 2D.
+#' @keywords graphs
+#' @examples
+#' 
+#' \dontrun{
+#' g <- graph.lattice( c(5,5,5) )
+#' coords <- layout.fruchterman.reingold(g, dim=3)
+#' rglplot(g, layout=coords)
+#' }
+#' 
 rglplot        <- function(x, ...)
   UseMethod("rglplot", x)
 

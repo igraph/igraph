@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -20,6 +19,28 @@
 #
 ###################################################################
 
+
+
+#' Running mean of a time series
+#' 
+#' \code{running.mean} calculates the running mean in a vector with the given
+#' bin width.
+#' 
+#' The running mean of \code{v} is a \code{w} vector of length
+#' \code{length(v)-binwidth+1}. The first element of \code{w} id the average of
+#' the first \code{binwidth} elements of \code{v}, the second element of
+#' \code{w} is the average of elements \code{2:(binwidth+1)}, etc.
+#' 
+#' @param v The numeric vector.
+#' @param binwidth Numeric constant, the size of the bin, should be meaningful,
+#' ie. smaller than the length of \code{v}.
+#' @return A numeric vector of length \code{length(v)-binwidth+1}
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords manip
+#' @examples
+#' 
+#' running.mean(1:100, 10)
+#' 
 running.mean <- function(v, binwidth) {
 
   v <- as.numeric(v)
@@ -33,6 +54,31 @@ running.mean <- function(v, binwidth) {
        PACKAGE="igraph");
 }
 
+
+
+#' Sampling a random integer sequence
+#' 
+#' This function provides a very efficient way to pull an integer random sample
+#' sequence from an integer interval.
+#' 
+#' The algorithm runs in \code{O(length)} expected time, even if
+#' \code{high-low} is big. It is much faster (but of course less general) than
+#' the builtin \code{sample} function of R.
+#' 
+#' @param low The lower limit of the interval (inclusive).
+#' @param high The higher limit of the interval (inclusive).
+#' @param length The length of the sample.
+#' @return An increasing numeric vector containing integers, the sample.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @references Jeffrey Scott Vitter: An Efficient Algorithm for Sequential
+#' Random Sampling, \emph{ACM Transactions on Mathematical Software}, 13/1,
+#' 58--67.
+#' @keywords datagen
+#' @examples
+#' 
+#' rs <- igraph.sample(1, 100000000, 10)
+#' rs
+#' 
 igraph.sample <- function(low, high, length) {
   if (length>high-low+1) {
     stop("length too big for this interval")
@@ -65,6 +111,31 @@ igraph.i.spMatrix <- function(M) {
   }
 }
 
+
+
+#' Set random seed of the C library's RNG
+#' 
+#' Set the random seed of the C library's RNG, for a new sequence of
+#' pseudo-random numbers.
+#' 
+#' Note that this function has nothing to do with R's random number generator,
+#' see \code{set.seed} for that.
+#' 
+#' Some package (e.g. ngspatial) use internal C code and generate random
+#' numbers using the standard C library's built-in random number generator
+#' instead of using R's RNGs. The \code{srand} function is provided to set the
+#' random seed for these packages. It simply calls the standard C function
+#' \code{srand}, with the supplied integer seed value.
+#' 
+#' Note that the standard C library's RNGs are typically of very bad quality,
+#' and also slower than R's RNGs. It is not worth using them, really, other
+#' than taking over some legacy C code that already uses them, and that would
+#' be difficult to rewrite to use R's RNGs.
+#' 
+#' @param seed Numeric scalar, the new random seed. It must be non-negative and
+#' will be converted to an integer.
+#' @return \code{NULL}, invisibly.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 srand <- function(seed) {
   seed <- as.numeric(seed)
   if (length(seed) != 1) { stop("Length of `seed' must be 1") }

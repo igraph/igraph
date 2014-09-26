@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -69,6 +68,37 @@ is.connected <- function(graph, mode=c("weak", "strong")) {
         PACKAGE="igraph")
 }
 
+
+
+#' Decompose a graph into components
+#' 
+#' Creates a separate graph for each component of a graph.
+#' 
+#' 
+#' @param graph The original graph.
+#' @param mode Character constant giving the type of the components, wither
+#' \code{weak} for weakly connected components or \code{strong} for strongly
+#' connected components.
+#' @param max.comps The maximum number of components to return. The first
+#' \code{max.comps} components will be returned (which hold at least
+#' \code{min.vertices} vertices, see the next parameter), the others will be
+#' ignored. Supply \code{NA} here if you don't want to limit the number of
+#' components.
+#' @param min.vertices The minimum number of vertices a component should
+#' contain in order to place it in the result list. Eg. supply 2 here to ignore
+#' isolate vertices.
+#' @return A list of graph objects.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{is.connected}} to decide whether a graph is connected,
+#' \code{\link{clusters}} to calculate the connected components of a graph.
+#' @keywords graphs
+#' @examples
+#' 
+#' # the diameter of each component in a random graph
+#' g <- erdos.renyi.game(1000, 1/1000)
+#' comps <- decompose.graph(g, min.vertices=2)
+#' sapply(comps, diameter)
+#' 
 decompose.graph <- function(graph, mode=c("weak", "strong"), max.comps=NA,
                       min.vertices=0) {
   if (!is.igraph(graph)) {

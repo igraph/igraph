@@ -193,6 +193,7 @@ igraph_$(VERSION).tar.gz: $(CSRC2) $(CINC2) $(PARSER2) $(RSRC) $(RGEN) \
 	rm -f igraph/src/config.h
 	rm -f igraph/src/Makevars
 	touch igraph/src/config.h
+	mkdir -p igraph/man
 	cd igraph && Rscript -e 'library(roxygen2) ; roxygenize(roclets = "rd")'
 	R CMD build igraph
 

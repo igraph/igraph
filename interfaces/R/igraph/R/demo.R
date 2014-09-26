@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -20,6 +19,33 @@
 #
 ###################################################################
 
+
+
+#' Run igraph demos, step by step
+#' 
+#' Run one of the accompanying igraph demos, somewhat interactively, using a Tk
+#' window.
+#' 
+#' This function provides a somewhat nicer interface to igraph demos that come
+#' with the package, than the standard \code{\link{demo}} function. Igraph
+#' demos are divided into chunks and \code{igraphdemo} runs them chunk by
+#' chunk, with the possibility of inspecting the workspace between two chunks.
+#' 
+#' The \code{tcltk} package is needed for \code{igraphdemo}.
+#' 
+#' @param which If not given, then the names of the available demos are listed.
+#' Otherwise it should be either a filename or the name of an igraph demo.
+#' @return Returns \code{NULL}, invisibly.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{demo}}
+#' @keywords graphs
+#' @examples
+#' 
+#' igraphdemo()
+#' if (interactive()) {
+#'   igraphdemo("centrality")
+#' }
+#' 
 igraphdemo <- function(which) {
   require(igraph)
   require(tcltk)

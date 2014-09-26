@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -62,6 +61,46 @@ rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
   attr
 }
 
+
+
+#' Disjoint union of graphs
+#' 
+#' The union of two or more graphs are created. The graphs are assumed to have
+#' disjoint vertex sets.
+#' 
+#' \code{graph.disjoint.union} creates a union of two or more disjoint graphs.
+#' Thus first the vertices in the second, third, etc. graphs are relabeled to
+#' have completely disjoint graphs. Then a simple union is created. This
+#' function can also be used via the \%du\% operator.
+#' 
+#' \code{graph.disjont.union} handles graph, vertex and edge attributes.  In
+#' particular, it merges vertex and edge attributes using the basic \code{c()}
+#' function. For graphs that lack some vertex/edge attribute, the corresponding
+#' values in the new graph are set to \code{NA}. Graph attributes are simply
+#' copied to the result. If this would result a name clash, then they are
+#' renamed by adding suffixes: _1, _2, etc.
+#' 
+#' Note that if both graphs have vertex names (ie. a \code{name} vertex
+#' attribute), then the concatenated vertex names might be non-unique in the
+#' result. A warning is given if this happens.
+#' 
+#' An error is generated if some input graphs are directed and others are
+#' undirected.
+#' 
+#' @aliases graph.disjoint.union %du%
+#' @param \dots Graph objects or lists of graph objects.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' ## A star and a ring
+#' g1 <- graph.star(10, mode="undirected")
+#' V(g1)$name <- letters[1:10]
+#' g2 <- graph.ring(10)
+#' V(g2)$name <- letters[11:20]
+#' str(g1 %du% g2)
+#' 
 graph.disjoint.union <- function(...) {
   
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
@@ -223,6 +262,51 @@ graph.disjoint.union <- function(...) {
   res
 }
 
+
+
+#' Union of graphs
+#' 
+#' The union of two or more graphs are created. The graphs may have identical
+#' or overlapping vertex sets.
+#' 
+#' \code{graph.union} creates the union of two or more graphs.  Edges which are
+#' included in at least one graph will be part of the new graph. This function
+#' can be also used via the \%u\% operator.
+#' 
+#' If the \code{byname} argument is \code{TRUE} (or \code{auto} and all graphs
+#' are named), then the operation is performed on symbolic vertex names instead
+#' of the internal numeric vertex ids.
+#' 
+#' \code{graph.union} keeps the attributes of all graphs. All graph, vertex and
+#' edge attributes are copied to the result. If an attribute is present in
+#' multiple graphs and would result a name clash, then this attribute is
+#' renamed by adding suffixes: _1, _2, etc.
+#' 
+#' The \code{name} vertex attribute is treated specially if the operation is
+#' performed based on symbolic vertex names. In this case \code{name} must be
+#' present in all graphs, and it is not renamed in the result graph.
+#' 
+#' An error is generated if some input graphs are directed and others are
+#' undirected.
+#' 
+#' @aliases graph.union %u%
+#' @param \dots Graph objects or lists of graph objects.
+#' @param byname A logical scalar, or the character scalar \code{auto}. Whether
+#' to perform the operation based on symbolic vertex names. If it is
+#' \code{auto}, that means \code{TRUE} if all graphs are named and \code{FALSE}
+#' otherwise. A warning is generated if \code{auto} and some (but not all)
+#' graphs are named.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' ## Union of two social networks with overlapping sets of actors
+#' net1 <- graph.formula(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
+#'                       H-F:G, H-I-J)
+#' net2 <- graph.formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
+#' str(net1 %u% net2)
+#' 
 graph.union <- function(..., byname="auto") {
   .igraph.graph.union.or.intersection("R_igraph_union", ..., byname=byname,
                                       keep.all.vertices=TRUE)
@@ -232,6 +316,53 @@ graph.union <- function(..., byname="auto") {
   graph.union(x,y)
 }
 
+
+
+#' Intersection of graphs
+#' 
+#' The intersection of two or more graphs are created.  The graphs may have
+#' identical or overlapping vertex sets.
+#' 
+#' \code{graph.intersection} creates the intersection of two or more graphs:
+#' only edges present in all graphs will be included.  The corresponding
+#' operator is \%s\%.
+#' 
+#' If the \code{byname} argument is \code{TRUE} (or \code{auto} and all graphs
+#' are named), then the operation is performed on symbolic vertex names instead
+#' of the internal numeric vertex ids.
+#' 
+#' \code{graph.intersection} keeps the attributes of all graphs. All graph,
+#' vertex and edge attributes are copied to the result. If an attribute is
+#' present in multiple graphs and would result a name clash, then this
+#' attribute is renamed by adding suffixes: _1, _2, etc.
+#' 
+#' The \code{name} vertex attribute is treated specially if the operation is
+#' performed based on symbolic vertex names. In this case \code{name} must be
+#' present in all graphs, and it is not renamed in the result graph.
+#' 
+#' An error is generated if some input graphs are directed and others are
+#' undirected.
+#' 
+#' @aliases graph.intersection %s%
+#' @param \dots Graph objects or lists of graph objects.
+#' @param byname A logical scalar, or the character scalar \code{auto}. Whether
+#' to perform the operation based on symbolic vertex names. If it is
+#' \code{auto}, that means \code{TRUE} if all graphs are named and \code{FALSE}
+#' otherwise. A warning is generated if \code{auto} and some (but not all)
+#' graphs are named.
+#' @param keep.all.vertices Logical scalar, whether to keep vertices that only
+#' appear in a subset of the input graphs.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' ## Common part of two social networks
+#' net1 <- graph.formula(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
+#'                       H-F:G, H-I-J)
+#' net2 <- graph.formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
+#' str(net1 %s% net2)
+#' 
 graph.intersection <- function(..., byname="auto",
                                keep.all.vertices=TRUE) {
   .igraph.graph.union.or.intersection("R_igraph_intersection", ...,
@@ -243,6 +374,53 @@ graph.intersection <- function(..., byname="auto",
   graph.intersection(x,y)
 }
 
+
+
+#' Difference of graphs
+#' 
+#' The difference of two graphs are created.
+#' 
+#' \code{graph.difference} creates the difference of two graphs. Only edges
+#' present in the first graph but not in the second will be be included in the
+#' new graph. The corresponding operator is \%m\%.
+#' 
+#' If the \code{byname} argument is \code{TRUE} (or \code{auto} and the graphs
+#' are all named), then the operation is performed based on symbolic vertex
+#' names. Otherwise numeric vertex ids are used.
+#' 
+#' \code{graph.difference} keeps all attributes (graph, vertex and edge) of the
+#' first graph.
+#' 
+#' Note that \code{big} and \code{small} must both be directed or both be
+#' undirected, otherwise an error message is given.
+#' 
+#' @aliases graph.difference %m%
+#' @param big The left hand side argument of the minus operator. A directed or
+#' undirected graph.
+#' @param small The right hand side argument of the minus operator. A directed
+#' ot undirected graph.
+#' @param byname A logical scalar, or the character scalar \code{auto}. Whether
+#' to perform the operation based on symbolic vertex names. If it is
+#' \code{auto}, that means \code{TRUE} if both graphs are named and
+#' \code{FALSE} otherwise. A warning is generated if \code{auto} and one graph,
+#' but not both graphs are named.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' ## Create a wheel graph
+#' wheel <- graph.union(graph.ring(10),
+#'                      graph.star(11, center=11, mode="undirected"))
+#' V(wheel)$name <- letters[seq_len(vcount(wheel))]
+#' 
+#' ## Subtract a star graph from it
+#' sstar <- graph.star(6, center=6, mode="undirected")
+#' V(sstar)$name <- letters[c(1,3,5,7,9,11)]
+#' G <- wheel %m% sstar
+#' str(G)
+#' plot(G, layout=layout.auto(wheel))
+#' 
 graph.difference <- function(big, small, byname="auto") {
 
   if (!is.igraph(big) || !is.igraph(small)) {
@@ -290,6 +468,38 @@ graph.difference <- function(big, small, byname="auto") {
   graph.difference(x,y)
 }
 
+
+
+#' Complementer of a graph
+#' 
+#' A complementer graph contains all edges that were not present in the input
+#' graph.
+#' 
+#' \code{graph.complementer} creates the complementer of a graph. Only edges
+#' which are \emph{not} present in the original graph will be included in the
+#' new graph.
+#' 
+#' \code{graph.complementer} keeps graph and vertex attriubutes, edge
+#' attributes are lost.
+#' 
+#' @param graph The input graph, can be directed or undirected.
+#' @param loops Logical constant, whether to generate loop edges.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' ## Complementer of a ring
+#' g <- graph.ring(10)
+#' graph.complementer(g)
+#' 
+#' ## A graph and its complementer give together the full graph
+#' g <- graph.ring(10)
+#' gc <- graph.complementer(g)
+#' gu <- graph.union(g, gc)
+#' gu
+#' graph.isomorphic(gu, graph.full(vcount(g)))
+#' 
 graph.complementer <- function(graph, loops=FALSE) {
 
   if (!is.igraph(graph)) {
@@ -300,6 +510,67 @@ graph.complementer <- function(graph, loops=FALSE) {
         PACKAGE="igraph")
 }
 
+
+
+#' Compose two graphs as binary relations
+#' 
+#' Relational composition of two graph.
+#' 
+#' \code{graph.compose} creates the relational composition of two graphs. The
+#' new graph will contain an (a,b) edge only if there is a vertex c, such that
+#' edge (a,c) is included in the first graph and (c,b) is included in the
+#' second graph. The corresponding operator is \%c\%.
+#' 
+#' The function gives an error if one of the input graphs is directed and the
+#' other is undirected.
+#' 
+#' If the \code{byname} argument is \code{TRUE} (or \code{auto} and the graphs
+#' are all named), then the operation is performed based on symbolic vertex
+#' names. Otherwise numeric vertex ids are used.
+#' 
+#' \code{graph.compose} keeps the attributes of both graphs. All graph, vertex
+#' and edge attributes are copied to the result. If an attribute is present in
+#' multiple graphs and would result a name clash, then this attribute is
+#' renamed by adding suffixes: _1, _2, etc.
+#' 
+#' The \code{name} vertex attribute is treated specially if the operation is
+#' performed based on symbolic vertex names. In this case \code{name} must be
+#' present in both graphs, and it is not renamed in the result graph.
+#' 
+#' Note that an edge in the result graph corresponds to two edges in the input,
+#' one in the first graph, one in the second. This mapping is not injective and
+#' several edges in the result might correspond to the same edge in the first
+#' (and/or the second) graph. The edge attributes in the result graph are
+#' updated accordingly.
+#' 
+#' Also note that the function may generate multigraphs, if there are more than
+#' one way to find edges (a,b) in g1 and (b,c) in g2 for an edge (a,c) in the
+#' result. See \code{\link{simplify}} if you want to get rid of the multiple
+#' edges.
+#' 
+#' The function may create loop edges, if edges (a,b) and (b,a) are present in
+#' g1 and g2, respectively, then (a,a) is included in the result. See
+#' \code{\link{simplify}} if you want to get rid of the self-loops.
+#' 
+#' @aliases graph.compose %c%
+#' @param g1 The first input graph.
+#' @param g2 The second input graph.
+#' @param byname A logical scalar, or the character scalar \code{auto}. Whether
+#' to perform the operation based on symbolic vertex names. If it is
+#' \code{auto}, that means \code{TRUE} if both graphs are named and
+#' \code{FALSE} otherwise. A warning is generated if \code{auto} and one graph,
+#' but not both graphs are named.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' g1 <- graph.ring(10)
+#' g2 <- graph.star(10, mode="undirected")
+#' gc <- graph.compose(g1, g2)
+#' str(gc)
+#' str(simplify(gc))
+#' 
 graph.compose <- function(g1, g2, byname="auto") {
 
   if (!is.igraph(g1) || !is.igraph(g2)) {

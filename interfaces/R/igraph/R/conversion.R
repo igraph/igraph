@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -171,6 +170,73 @@ get.edgelist <- function(graph, names=TRUE) {
   res
 }
 
+
+
+#' Convert between directed and undirected graphs
+#' 
+#' \code{as.directed} converts an undirected graph to directed,
+#' \code{as.undirected} does the opposite, it converts a directed graph to
+#' undirected.
+#' 
+#' Conversion algorithms for \code{as.directed}: \describe{
+#' \item{list("arbitrary")}{The number of edges in the graph stays the same, an
+#' arbitrarily directed edge is created for each undirected edge.}
+#' \item{list("mutual")}{Two directed edges are created for each undirected
+#' edge, one in each direction.} }
+#' 
+#' Conversion algorithms for \code{as.undirected}: \describe{
+#' \item{list("each")}{The number of edges remains constant, an undirected edge
+#' is created for each directed one, this version might create graphs with
+#' multiple edges.} \item{list("collapse")}{One undirected edge will be created
+#' for each pair of vertices which are connected with at least one directed
+#' edge, no multiple edges will be created.} \item{list("mutual")}{One
+#' undirected edge will be created for each pair of mutual edges. Non-mutual
+#' edges are ignored. This mode might create multiple edges if there are more
+#' than one mutual edge pairs between the same pair of vertices.  } }
+#' 
+#' @aliases as.directed as.undirected
+#' @param graph The graph to convert.
+#' @param mode Character constant, defines the conversion algorithm. For
+#' \code{as.directed} it can be \code{mutual} or \code{arbitrary}. For
+#' \code{as.undirected} it can be \code{each}, \code{collapse} or
+#' \code{mutual}. See details below.
+#' @param edge.attr.comb Specifies what to do with edge attributes, if
+#' \code{mode="collapse"} or \code{mode="mutual"}.  In these cases many edges
+#' might be mapped to a single one in the new graph, and their attributes are
+#' combined. Please see \code{\link{attribute.combination}} for details on
+#' this.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{simplify}} for removing multiple and/or loop edges from
+#' a graph.
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.ring(10)
+#' as.directed(g, "mutual")
+#' g2 <- graph.star(10)
+#' as.undirected(g)
+#' 
+#' # Combining edge attributes
+#' g3 <- graph.ring(10, directed=TRUE, mutual=TRUE)
+#' E(g3)$weight <- seq_len(ecount(g3))
+#' ug3 <- as.undirected(g3)
+#' print(ug3, e=TRUE)
+#' \dontrun{
+#'   x11(width=10, height=5)
+#'   layout(rbind(1:2))
+#'   plot( g3, layout=layout.circle, edge.label=E(g3)$weight)
+#'   plot(ug3, layout=layout.circle, edge.label=E(ug3)$weight)
+#' }
+#' 
+#' g4 <- graph(c(1,2, 3,2,3,4,3,4, 5,4,5,4,
+#'               6,7, 7,6,7,8,7,8, 8,7,8,9,8,9,
+#'               9,8,9,8,9,9, 10,10,10,10))
+#' E(g4)$weight <- seq_len(ecount(g4))
+#' ug4 <- as.undirected(g4, mode="mutual",
+#'               edge.attr.comb=list(weight=length))
+#' print(ug4, e=TRUE)
+#' 
 as.directed <- function(graph, mode=c("mutual", "arbitrary")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -184,6 +250,37 @@ as.directed <- function(graph, mode=c("mutual", "arbitrary")) {
         PACKAGE="igraph")
 }
 
+
+
+#' Adjacency lists
+#' 
+#' Create adjacency lists from a graph, either for adjacent edges or for
+#' neighboring vertices
+#' 
+#' \code{get.adjlist} returns a list of numeric vectors, which include the ids
+#' of neighbor vertices (according to the \code{mode} argument) of all
+#' vertices.
+#' 
+#' \code{get.adjedgelist} returns a list of numeric vectors, which include the
+#' ids of adjacent edgs (according to the \code{mode} argument) of all
+#' vertices.
+#' 
+#' @aliases get.adjlist get.adjedgelist
+#' @param graph The input graph.
+#' @param mode Character scalar, it gives what kind of adjacent edges/vertices
+#' to include in the lists. \sQuote{\code{out}} is for outgoing edges/vertices,
+#' \sQuote{\code{in}} is for incoming edges/vertices, \sQuote{\code{all}} is
+#' for both. This argument is ignored for undirected graphs.
+#' @return A list of numeric vectors.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{get.edgelist}}, \code{\link{get.adjacency}}
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.ring(10)
+#' get.adjlist(g)
+#' get.adjedgelist(g)
+#' 
 get.adjlist <- function(graph, mode=c("all", "out", "in", "total")) {
   if (!is.igraph(graph)) {
     stop("Not a graph object")
@@ -449,6 +546,44 @@ get.incidence.sparse <- function(graph, types, names, attr) {
   res
 }
 
+
+
+#' Incidence matrix of a bipartite graph
+#' 
+#' This function can return a sparse or dense incidence matrix of a bipartite
+#' network. The incidence matrix is an \eqn{n} times \eqn{m} matrix, \eqn{n}
+#' and \eqn{m} are the number of vertices of the two kinds.
+#' 
+#' Bipartite graphs have a \code{type} vertex attribute in igraph, this is
+#' boolean and \code{FALSE} for the vertices of the first kind and \code{TRUE}
+#' for vertices of the second kind.
+#' 
+#' @param graph The input graph. The direction of the edges is ignored in
+#' directed graphs.
+#' @param types An optional vertex type vector to use instead of the
+#' \code{type} vertex attribute. You must supply this argument if the graph has
+#' no \code{type} vertex attribute.
+#' @param attr Either \code{NULL} or a character string giving an edge
+#' attribute name. If \code{NULL}, then a traditional incidence matrix is
+#' returned. If not \code{NULL} then the values of the given edge attribute are
+#' included in the incidence matrix. If the graph has multiple edges, the edge
+#' attribute of an arbitrarily chosen edge (for the multiple edges) is
+#' included.
+#' @param names Logical scalar, if \code{TRUE} and the vertices in the graph
+#' are named (i.e. the graph has a vertex attribute called \code{name}), then
+#' vertex names will be added to the result as row and column names. Otherwise
+#' the ids of the vertices are used as row and column names.
+#' @param sparse Logical scalar, if it is \code{TRUE} then a sparse matrix is
+#' created, you will need the \code{Matrix} package for this.
+#' @return A sparse or dense matrix.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{graph.incidence}} for the opposite operation.
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.bipartite( c(0,1,0,1,0,0), c(1,2,2,3,3,4) )
+#' get.incidence(g)
+#' 
 get.incidence <- function(graph, types=NULL, attr=NULL,
                           names=TRUE, sparse=FALSE) {
   # Argument checks

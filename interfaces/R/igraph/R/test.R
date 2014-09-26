@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2005-2013  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -20,12 +19,53 @@
 #
 ###################################################################
 
+
+
+#' Run package tests
+#' 
+#' Runs all package tests.
+#' 
+#' The \code{testthat} package is needed to run all tests. The location tests
+#' themselves can be extracted from the package via \code{system.file("tests",
+#' package="igraph")}.
+#' 
+#' This function simply calls the \code{test_dir} function from the
+#' \code{testthat} package on the test directory.
+#' 
+#' @return Whatever is returned by \code{test_dir} from the \code{testthat}
+#' package.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
 igraphtest <- function() {
   do.call(require, list("testthat"))
   tdir <- system.file("tests", package="igraph")
   do.call("test_dir", list(tdir))
 }
 
+
+
+#' Query igraph's version string
+#' 
+#' Queries igraph's original version string. See details below.
+#' 
+#' The igraph version string is the same as the version of the R package for
+#' all realeased igraph versions. For development versions and nightly builds,
+#' they might differ however.
+#' 
+#' The reason for this is, that R package version numbers are not flexible
+#' enough to cover in-between releases versions, e.g. alpha and beta versions,
+#' release candidates, etc.
+#' 
+#' @return A character scalar, the igraph version string.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
+#' @examples
+#' 
+#' ## Compare to the package version
+#' packageDescription("igraph")$Version
+#' igraph.version()
+#' 
+#' 
 igraph.version <- function() {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_version", PACKAGE="igraph")

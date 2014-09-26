@@ -1,4 +1,3 @@
-
 #   IGraph R package
 #   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
 #   334 Harvard street, Cambridge, MA 02139 USA
@@ -32,6 +31,141 @@ assign(".next", 1, .tkplot.env)
 # Main function
 ###################################################################
 
+
+
+#' Interactive plotting of graphs
+#' 
+#' \code{tkplot} and its companion functions serve as an interactive graph
+#' drawing facility. Not all parameters of the plot can be changed
+#' interactively right now though, eg. the colors of vertices, edges, and also
+#' others have to be pre-defined.
+#' 
+#' \code{tkplot} is an interactive graph drawing facility. It is not very well
+#' developed at this stage, but it should be still useful.
+#' 
+#' It's handling should be quite straightforward most of the time, here are
+#' some remarks and hints.
+#' 
+#' There are different popup menus, activated by the right mouse button, for
+#' vertices and edges. Both operate on the current selection if the vertex/edge
+#' under the cursor is part of the selection and operate on the vertex/edge
+#' under the cursor if it is not.
+#' 
+#' One selection can be active at a time, either a vertex or an edge selection.
+#' A vertex/edge can be added to a selection by holding the \code{control} key
+#' while clicking on it with the left mouse button. Doing this again deselect
+#' the vertex/edge.
+#' 
+#' Selections can be made also from the \code{Select} menu. The `Select some
+#' vertices' dialog allows to give an expression for the vertices to be
+#' selected: this can be a list of numeric R expessions separated by commas,
+#' like `\code{1,2:10,12,14,15}' for example. Similarly in the `Select some
+#' edges' dialog two such lists can be given and all edges connecting a vertex
+#' in the first list to one in the second list will be selected.
+#' 
+#' In the color dialog a color name like 'orange' or RGB notation can also be
+#' used.
+#' 
+#' The \code{tkplot} command creates a new Tk window with the graphical
+#' representation of \code{graph}. The command returns an integer number, the
+#' tkplot id. The other commands utilize this id to be able to query or
+#' manipulate the plot.
+#' 
+#' \code{tkplot.close} closes the Tk plot with id \code{tkp.id}.
+#' 
+#' \code{tkplot.off} closes all Tk plots.
+#' 
+#' \code{tkplot.fit.to.screen} fits the plot to the given rectange
+#' (\code{width} and \code{height}), if some of these are \code{NULL} the
+#' actual phisical width od height of the plot window is used.
+#' 
+#' \code{tkplot.reshape} applies a new layout to the plot, its optional
+#' parameters will be collected to a list analogous to \code{layout.par}.
+#' 
+#' \code{tkplot.export.postscript} creates a dialog window for saving the plot
+#' in postscript format.
+#' 
+#' \code{tkplot.canvas} returns the Tk canvas object that belongs to a graph
+#' plot. The canvas can be directly manipulated then, eg. labels can be added,
+#' it could be saved to a file programatically, etc. See an example below.
+#' 
+#' \code{tkplot.getcoords} returns the coordinates of the vertices in a matrix.
+#' Each row corresponds to one vertex.
+#' 
+#' \code{tkplot.setcoords} sets the coordinates of the vertices. A two-column
+#' matrix specifies the new positions, with each row corresponding to a single
+#' vertex.
+#' 
+#' \code{tkplot.center} shifts the figure to the center of its plot window.
+#' 
+#' \code{tkplot.rotate} rotates the figure, its parameter can be given either
+#' in degrees or in radians.
+#' 
+#' @aliases tkplot tkplot.close tkplot.off tkplot.fit.to.screen tkplot.reshape
+#' tkplot.export.postscript tkplot.canvas tkplot.getcoords tkplot.setcoords
+#' tkplot.center tkplot.rotate
+#' @param graph The \code{graph} to plot.
+#' @param canvas.width,canvas.height The size of the tkplot drawing area.
+#' @param tkp.id The id of the tkplot window to close/reshape/etc.
+#' @param window.close Leave this on the default value.
+#' @param width The width of the rectangle for generating new coordinates.
+#' @param height The height of the rectangle for generating new coordinates.
+#' @param newlayout The new layout, see the \code{layout} parameter of tkplot.
+#' @param norm Logical, should we norm the coordinates.
+#' @param coords Two-column numeric matrix, the new coordinates of the
+#' vertices, in absolute coordinates.
+#' @param degree The degree to rotate the plot.
+#' @param rad The degree to rotate the plot, in radian.
+#' @param \dots Additional plotting parameters. See \link{igraph.plotting} for
+#' the complete list.
+#' @return \code{tkplot} returns an integer, the id of the plot, this can be
+#' used to manipulate it from the command line.
+#' 
+#' \code{tkplot.canvas} retuns \code{tkwin} object, the Tk canvas.
+#' 
+#' \code{tkplot.getcoords} returns a matrix with the coordinates.
+#' 
+#' \code{tkplot.close}, \code{tkplot.off}, \code{tkplot.fit.to.screen},
+#' \code{tkplot.reshape}, \code{tkplot.export.postscript}, \code{tkplot.center}
+#' and \code{tkplot.rotate} return \code{NULL} invisibly.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{plot.igraph}}, \code{\link{layout}}
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- graph.ring(10)
+#' \dontrun{tkplot(g)}
+#' 
+#' \dontrun{
+#' ## Saving a tkplot() to a file programatically
+#' g <- graph.star(10, center=10) %u% graph.ring(9, directed=TRUE)
+#' E(g)$width <- sample(1:10, ecount(g), replace=TRUE)
+#' lay <- layout.auto(g)
+#' 
+#' id <- tkplot(g, layout=lay)
+#' canvas <- tkplot.canvas(id)
+#' tkpostscript(canvas, file="/tmp/output.eps")
+#' tkplot.close(id)
+#' }
+#' 
+#' \dontrun{
+#' ## Setting the coordinates and adding a title label
+#' g <- graph.ring(10)
+#' id <- tkplot(graph.ring(10), canvas.width=450, canvas.height=500)
+#' 
+#' canvas <- tkplot.canvas(id)
+#' padding <- 20
+#' coords <- layout.norm(layout.circle(g), 0+padding, 450-padding,
+#'                       50+padding, 500-padding)
+#' tkplot.setcoords(id, coords)
+#' 
+#' width <- as.numeric(tkcget(canvas, "-width"))
+#' height <- as.numeric(tkcget(canvas, "-height"))
+#' tkcreate(canvas, "text", width/2, 25, text="My title",
+#'          justify="center", font=tkfont.create(family="helvetica"
+#'                              ,size=20,weight="bold"))
+#' }
+#' 
 tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
 
   if (!is.igraph(graph)) {
