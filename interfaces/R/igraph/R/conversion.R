@@ -200,11 +200,6 @@ get.edgelist <- function(graph, names=TRUE) {
 #' \code{as.directed} it can be \code{mutual} or \code{arbitrary}. For
 #' \code{as.undirected} it can be \code{each}, \code{collapse} or
 #' \code{mutual}. See details below.
-#' @param edge.attr.comb Specifies what to do with edge attributes, if
-#' \code{mode="collapse"} or \code{mode="mutual"}.  In these cases many edges
-#' might be mapped to a single one in the new graph, and their attributes are
-#' combined. Please see \code{\link{attribute.combination}} for details on
-#' this.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{simplify}} for removing multiple and/or loop edges from
@@ -250,6 +245,26 @@ as.directed <- function(graph, mode=c("mutual", "arbitrary")) {
         PACKAGE="igraph")
 }
 
+#' @rdname as.directed
+#' @param edge.attr.comb Specifies what to do with edge attributes, if
+#' \code{mode="collapse"} or \code{mode="mutual"}.  In these cases many edges
+#' might be mapped to a single one in the new graph, and their attributes are
+#' combined. Please see \code{\link{attribute.combination}} for details on
+#' this.
+
+as.undirected <- function(graph, mode=c("collapse", "each", "mutual"), edge.attr.comb=getIgraphOpt("edge.attr.comb")) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  mode <- switch(igraph.match.arg(mode), "collapse"=1, "each"=0, "mutual"=2)
+  edge.attr.comb <- igraph.i.attribute.combination(edge.attr.comb)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_to_undirected", graph, mode, edge.attr.comb,
+        PACKAGE="igraph")
+
+  res
+}
 
 
 #' Adjacency lists
@@ -606,6 +621,11 @@ get.incidence <- function(graph, types=NULL, attr=NULL,
     get.incidence.dense(graph, types=types, names=names, attr=attr)
   }
 }
+
+#' @rdname graph.data.frame
+#' @param x An igraph object.
+#' @param what Character constant, whether to return info about vertices,
+#' edges, or both. The default is \sQuote{edges}.
 
 get.data.frame <- function(x, what=c("edges", "vertices", "both")) {
 

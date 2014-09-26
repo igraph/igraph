@@ -508,3 +508,4 @@
 /www/c/doc/
 /www/python/doc/
 /www/stamp
+/interfaces/R/igraph/man/*.Rd

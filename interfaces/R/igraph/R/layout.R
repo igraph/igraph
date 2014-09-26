@@ -343,7 +343,6 @@ layout.reingold.tilford <- function(graph, root=numeric(), circular=FALSE,
 #' @param layouts A list of two-column matrices.
 #' @param method Character constant giving the method to use. Right now only
 #' \code{dla} is implemented.
-#' @param graph The input graph.
 #' @param layout A function object, the layout function to use.
 #' @param \dots Additional arguments to pass to the \code{layout} layout
 #' function.
@@ -435,6 +434,9 @@ layout.norm <- function(layout, xmin=-1, xmax=1, ymin=-1, ymax=1,
 
   (v-vr[1]) * fac + min
 }
+
+#' @rdname layout.merge
+#' @param graph The input graph.
 
 piecewise.layout <- function(graph, layout=layout.kamada.kawai, ...) {
 

@@ -169,8 +169,6 @@ average.path.length <- function(graph, directed=TRUE, unconnected=TRUE) {
 #' @param normalized Logical scalar, whether to normalize the degree.  If
 #' \code{TRUE} then the result is divided by \eqn{n-1}, where \eqn{n} is the
 #' number of vertices in the graph.
-#' @param cumulative Logical; whether the cumulative degree distribution is to
-#' be calculated.
 #' @param \dots Additional arguments to pass to \code{degree}, eg. \code{mode}
 #' is useful but also \code{v} and \code{loops} make sense.
 #' @return For \code{degree} a numeric vector of the same length as argument
@@ -208,7 +206,11 @@ degree <- function(graph, v=V(graph),
   }
   res
 }
-  
+
+#' @rdname degree
+#' @param cumulative Logical; whether the cumulative degree distribution is to
+#' be calculated.
+
 degree.distribution <- function(graph, cumulative=FALSE, ...) {
   
   if (!is.igraph(graph)) {
@@ -306,34 +308,6 @@ degree.distribution <- function(graph, cumulative=FALSE, ...) {
 #' that the igraph C core might still override your choice in obvious cases,
 #' i.e. if there are no edge weights, then the unweighted algorithm will be
 #' used, regardless of this argument.
-#' @param from Numeric constant, the vertex from or to the shortest paths will
-#' be calculated. Note that right now this is not a vector of vertex ids, but
-#' only a single vertex.
-#' @param output Character scalar, defines how to report the shortest paths.
-#' \dQuote{vpath} means that the vertices along the paths are reported, this
-#' form was used prior to igraph version 0.6. \dQuote{epath} means that the
-#' edges along the paths are reported. \dQuote{both} means that both forms are
-#' returned, in a named list with components \dQuote{vpath} and \dQuote{epath}.
-#' @param predecessors Logical scalar, whether to return the predecessor vertex
-#' for each vertex. The predecessor of vertex \code{i} in the tree is the
-#' vertex from which vertex \code{i} was reached. The predecessor of the start
-#' vertex (in the \code{from} argument) is itself by definition. If the
-#' predecessor is zero, it means that the given vertex was not reached from the
-#' source during the search. Note that the search terminates if all the
-#' vertices in \code{to} are reached.
-#' @param inbound.edges Logical scalar, whether to return the inbound edge for
-#' each vertex. The inbound edge of vertex \code{i} in the tree is the edge via
-#' which vertex \code{i} was reached. The start vertex and vertices that were
-#' not reached during the search will have zero in the corresponding entry of
-#' the vector. Note that the search terminates if all the vertices in \code{to}
-#' are reached.
-#' @param directed Whether to consider directed paths in directed graphs, this
-#' argument is ignored for undirected graphs.
-#' @param unconnected What to do if the graph is unconnected (not strongly
-#' connected if directed paths are considered). If TRUE only the lengths of the
-#' existing paths are considered and averaged; if FALSE the length of the
-#' missing paths are counted having length \code{vcount(graph)}, one longer
-#' than the longest possible geodesic in the network.
 #' @return For \code{shortest.paths} a numeric matrix with \code{length(to)}
 #' columns and \code{length(v)} rows. The shortest path length from a vertex to
 #' itself is always zero. For unreachable vertices \code{Inf} is included.
@@ -430,6 +404,29 @@ shortest.paths <- function(graph, v=V(graph), to=V(graph),
   }
   res
 }
+
+#' @rdname shortest.paths
+#' @param from Numeric constant, the vertex from or to the shortest paths will
+#' be calculated. Note that right now this is not a vector of vertex ids, but
+#' only a single vertex.
+#' @param output Character scalar, defines how to report the shortest paths.
+#' \dQuote{vpath} means that the vertices along the paths are reported, this
+#' form was used prior to igraph version 0.6. \dQuote{epath} means that the
+#' edges along the paths are reported. \dQuote{both} means that both forms are
+#' returned, in a named list with components \dQuote{vpath} and \dQuote{epath}.
+#' @param predecessors Logical scalar, whether to return the predecessor vertex
+#' for each vertex. The predecessor of vertex \code{i} in the tree is the
+#' vertex from which vertex \code{i} was reached. The predecessor of the start
+#' vertex (in the \code{from} argument) is itself by definition. If the
+#' predecessor is zero, it means that the given vertex was not reached from the
+#' source during the search. Note that the search terminates if all the
+#' vertices in \code{to} are reached.
+#' @param inbound.edges Logical scalar, whether to return the inbound edge for
+#' each vertex. The inbound edge of vertex \code{i} in the tree is the edge via
+#' which vertex \code{i} was reached. The start vertex and vertices that were
+#' not reached during the search will have zero in the corresponding entry of
+#' the vector. Note that the search terminates if all the vertices in \code{to}
+#' are reached.
 
 get.shortest.paths <- function(graph, from, to=V(graph),
                                mode=c("out", "all", "in"),
@@ -580,19 +577,8 @@ subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
 #' 
 #' @aliases subgraph induced.subgraph subgraph.edges
 #' @param graph The original graph.
-#' @param vids,v Numeric vector, the vertices of the original graph which will
+#' @param v Numeric vector, the vertices of the original graph which will
 #' form the subgraph.
-#' @param impl Character scalar, to choose between two implementation of the
-#' subgraph calculation. \sQuote{\code{copy_and_delete}} copies the graph
-#' first, and then deletes the vertices and edges that are not included in the
-#' result graph. \sQuote{\code{create_from_scratch}} searches for all vertices
-#' and edges that must be kept and then uses them to create the graph from
-#' scratch. \sQuote{\code{auto}} chooses between the two implementations
-#' automatically, using heuristics based on the size of the original and the
-#' result graph.
-#' @param eids The edge ids of the edges that will be kept in the result graph.
-#' @param delete.vertices Logical scalar, whether to remove vertices that do
-#' not have any adjacent edges in \code{eids}.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
@@ -610,6 +596,83 @@ subgraph <- function(graph, v) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_subgraph", graph, as.igraph.vs(graph, v)-1,
         PACKAGE="igraph")
+}
+
+#' @rdname subgraph
+#' @param vids Numeric vector, the vertices of the original graph which will
+#' form the subgraph.
+#' @param impl Character scalar, to choose between two implementation of the
+#' subgraph calculation. \sQuote{\code{copy_and_delete}} copies the graph
+#' first, and then deletes the vertices and edges that are not included in the
+#' result graph. \sQuote{\code{create_from_scratch}} searches for all vertices
+#' and edges that must be kept and then uses them to create the graph from
+#' scratch. \sQuote{\code{auto}} chooses between the two implementations
+#' automatically, using heuristics based on the size of the original and the
+#' result graph.
+
+induced.subgraph <- function(graph, vids, impl=c("auto", "copy_and_delete", "create_from_scratch")) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  vids <- as.igraph.vs(graph, vids)
+  impl <- switch(igraph.match.arg(impl), "auto"=0, "copy_and_delete"=1, "create_from_scratch"=2)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_induced_subgraph", graph, vids-1, impl,
+        PACKAGE="igraph")
+
+  res
+}
+
+#' @rdname subgraph
+#' @param eids The edge ids of the edges that will be kept in the result graph.
+#' @param delete.vertices Logical scalar, whether to remove vertices that do
+#' not have any adjacent edges in \code{eids}.
+
+subgraph.edges <- function(graph, eids, delete.vertices=TRUE) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  eids <- as.igraph.es(graph, eids)
+  delete.vertices <- as.logical(delete.vertices)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_subgraph_edges", graph, eids-1, delete.vertices,
+        PACKAGE="igraph")
+
+  res
+}
+
+#' @rdname betweenness
+#' @param vids The vertices for which the vertex betweenness estimation will be
+#' calculated.
+#' @param cutoff The maximum path length to consider when calculating the
+#' betweenness. If zero or negative then there is no such limit.
+
+betweenness.estimate <- function(graph, vids=V(graph), directed=TRUE, cutoff, weights=NULL, nobigint=TRUE) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  vids <- as.igraph.vs(graph, vids)
+  directed <- as.logical(directed)
+  cutoff <- as.numeric(cutoff)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+  weights <- as.numeric(weights) 
+  } else { 
+  weights <- NULL 
+  }
+  nobigint <- as.logical(nobigint)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_betweenness_estimate", graph, vids-1, directed, cutoff, weights, nobigint,
+        PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) { 
+  names(res) <- get.vertex.attribute(graph, "name", vids) 
+  }
+  res
 }
 
 
@@ -645,7 +708,6 @@ subgraph <- function(graph, v) {
 #' edge.betweenness.estimate
 #' @param graph The graph to analyze.
 #' @param v The vertices for which the vertex betweenness will be calculated.
-#' @param e The edges for which the edge betweenness will be calculated.
 #' @param directed Logical, whether directed paths should be considered while
 #' determining the shortest paths.
 #' @param weights Optional positive weight vector for calculating weighted
@@ -660,10 +722,6 @@ subgraph <- function(graph, v) {
 #' \deqn{B^n=\frac{2B}{n^2-3n+2}}{Bnorm=2*B/(n*n-3*n+2)}, where
 #' \eqn{B^n}{Bnorm} is the normalized, \eqn{B} the raw betweenness, and \eqn{n}
 #' is the number of vertices in the graph.
-#' @param vids The vertices for which the vertex betweenness estimation will be
-#' calculated.
-#' @param cutoff The maximum path length to consider when calculating the
-#' betweenness. If zero or negative then there is no such limit.
 #' @return A numeric vector with the betweenness score for each vertex in
 #' \code{v} for \code{betweenness}.
 #' 
@@ -991,20 +1049,23 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
 #' 
 #' Given a graph, \code{constraint} calculates Burt's constraint for each
 #' vertex.
-#' 
-#' Burt's constraint is higher if ego has less, or mutually stronger related
-#' (i.e. more redundant) contacts. Burt's measure of constraint,
-#' \eqn{C_i}{C[i]}, of vertex \eqn{i}'s ego network \eqn{V_i}{V[i]}, is defined
-#' for directed and valued graphs, \deqn{C_i=\sum_{j \in V_i \setminus \{i\}}
-#' (p_{ij}+\sum_{q \in V_i }{% C[i] = sum( [sum( p[i,j] + p[i,q] p[q,j], q in
-#' V[i], q != i,j )]^2, j in V[i], j != i).  }\deqn{ \setminus \{i,j\}} p_{iq}
-#' p_{qj})^2}{% C[i] = sum( [sum( p[i,j] + p[i,q] p[q,j], q in V[i], q != i,j
-#' )]^2, j in V[i], j != i).  } for a graph of order (ie. number of vertices)
-#' \eqn{N}, where proportional tie strengths are defined as \deqn{p_{ij} =
-#' \frac{a_{ij}+a_{ji}}{\sum_{k \in V_i \setminus \{i\}}(a_{ik}+a_{ki})},}{%
-#' p[i,j]=(a[i,j]+a[j,i]) / sum(a[i,k]+a[k,i], k in V[i], k != i), }
-#' \eqn{a_{ij}}{a[i,j]} are elements of \eqn{A} and the latter being the graph
-#' adjacency matrix. For isolated vertices, constraint is undefined.
+#'
+#' Burt's constraint is higher if ego has less, or mutually
+#' stronger related (i.e. more redundant) contacts. Burt's measure of
+#' constraint, \eqn{C_i}{C[i]}, of vertex \eqn{i}'s ego network
+#' \eqn{V_i}{V[i]}, is defined for directed and valued graphs,
+#' \deqn{C_i=\sum_{j \in V_i \setminus \{i\}} (p_{ij}+\sum_{q \in V_i
+#'     \setminus \{i,j\}} p_{iq} p_{qj})^2}{
+#'   C[i] = sum( [sum( p[i,j] + p[i,q] p[q,j], q in V[i], q != i,j )]^2, j in
+#'   V[i], j != i).
+#' }
+#' for a graph of order (ie. number of vertices) \eqn{N}, where
+#' proportional tie strengths are defined as 
+#' \deqn{p_{ij} = \frac{a_{ij}+a_{ji}}{\sum_{k \in V_i \setminus \{i\}}(a_{ik}+a_{ki})},}{
+#'   p[i,j]=(a[i,j]+a[j,i]) / sum(a[i,k]+a[k,i], k in V[i], k != i),
+#' }
+#' \eqn{a_{ij}}{a[i,j]} are elements of \eqn{A} and the latter being the
+#' graph adjacency matrix. For isolated vertices, constraint is undefined.
 #' 
 #' @param graph A graph object, the input graph.
 #' @param nodes The vertices for which the constraint will be calculated.
@@ -1675,7 +1736,7 @@ graph.neighborhood <- function(graph, order, nodes=V(graph),
 #' 
 #' g <- graph.ring(10)
 #' g <- add.edges(g, c(1,2, 2,3, 1,3))
-#' graph.coreness(g) 		% small core triangle in a ring
+#' graph.coreness(g) 		# small core triangle in a ring
 #' 
 graph.coreness <- function(graph, mode=c("all", "out", "in")) {
 
@@ -2113,6 +2174,9 @@ graph.dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   res
 }
 
+#' @rdname betweenness
+#' @param e The edges for which the edge betweenness will be calculated.
+
 edge.betweenness <- function(graph, e=E(graph),
                              directed=TRUE, weights=NULL) {
   # Argument checks
@@ -2185,10 +2249,6 @@ edge.betweenness.estimate <- function(graph, e=E(graph),
 #' @param mode Character string, either \dQuote{weak} or \dQuote{strong}.  For
 #' directed graphs \dQuote{weak} implies weakly, \dQuote{strong} strongly
 #' connected components to search. It is ignored for undirected graphs.
-#' @param cumulative Logical, if TRUE the cumulative distirubution (relative
-#' frequency) is calculated.
-#' @param mul.size Logical. If TRUE the relative frequencies will be multiplied
-#' by the cluster sizes.
 #' @param \dots Additional attributes to pass to \code{cluster}, right now only
 #' \code{mode} makes sense.
 #' @return For \code{is.connected} a logical constant.
@@ -2308,8 +2368,6 @@ unfold.tree <- function(graph, mode=c("all", "out", "in", "total"), roots) {
 #' @param normalized Logical scalar, whether to calculate the normalized
 #' closeness. Normalization is performed by multiplying the raw closeness by
 #' \eqn{n-1}, where \eqn{n} is the number of vertices in the graph.
-#' @param cutoff The maximum path length to consider when calculating the
-#' betweenness. If zero or negative then there is no such limit.
 #' @param weights Optional positive weight vector for calculating weighted
 #' closeness. If the graph has a \code{weight} edge attribute, then this is
 #' used by default.
@@ -2356,6 +2414,35 @@ closeness <- function(graph, vids=V(graph),
   res
 }
 
+#' @rdname closeness
+#' @param cutoff The maximum path length to consider when calculating the
+#' betweenness. If zero or negative then there is no such limit.
+
+closeness.estimate <- function(graph, vids=V(graph), mode=c("out", "in", "all", "total"), cutoff, weights=NULL, normalized=FALSE) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  vids <- as.igraph.vs(graph, vids)
+  mode <- switch(igraph.match.arg(mode), "out"=1, "in"=2, "all"=3, "total"=3)
+  cutoff <- as.numeric(cutoff)
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+  weights <- as.numeric(weights) 
+  } else { 
+  weights <- NULL 
+  }
+  normalized <- as.logical(normalized)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_closeness_estimate", graph, vids-1, mode, cutoff, weights, normalized,
+        PACKAGE="igraph")
+  if (getIgraphOpt("add.vertex.names") && is.named(graph)) { 
+  names(res) <- get.vertex.attribute(graph, "name", vids) 
+  }
+  res
+}
 
 
 #' Graph Laplacian

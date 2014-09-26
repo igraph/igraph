@@ -735,6 +735,8 @@ preference.game <- function(nodes, types, type.dist=rep(1, types),
   res[[1]]
 }
 
+#' @rdname preference.game
+
 asymmetric.preference.game <- function(nodes, types,
                                   type.dist.matrix=matrix(1, types,types),
                                   pref.matrix=matrix(1, types, types),

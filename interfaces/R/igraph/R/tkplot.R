@@ -581,6 +581,8 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
 # Other public functions, misc.
 ###################################################################
 
+#' @rdname tkplot
+
 tkplot.close <- function(tkp.id, window.close=TRUE) {
   if (window.close) {
     cmd <- paste(sep="", "tkp.", tkp.id, "$top")
@@ -593,11 +595,15 @@ tkplot.close <- function(tkp.id, window.close=TRUE) {
   invisible(NULL)
 }
 
+#' @rdname tkplot
+
 tkplot.off <- function() {
   eapply(.tkplot.env, function(tkp) { tkdestroy(tkp$top) })
   rm(list=ls(.tkplot.env), envir=.tkplot.env)
   invisible(NULL)
 }
+
+#' @rdname tkplot
 
 tkplot.fit.to.screen <- function(tkp.id, width=NULL, height=NULL) {
   tkp <- .tkplot.get(tkp.id)
@@ -626,6 +632,8 @@ tkplot.fit.to.screen <- function(tkp.id, width=NULL, height=NULL) {
   invisible(NULL)
 }
 
+#' @rdname tkplot
+
 tkplot.center <- function(tkp.id) {
   tkp <- .tkplot.get(tkp.id)
   width  <- as.numeric(tkwinfo("width", tkp$canvas))
@@ -648,6 +656,8 @@ tkplot.center <- function(tkp.id) {
   invisible(NULL)
 }
   
+#' @rdname tkplot
+
 tkplot.reshape <- function(tkp.id, newlayout, ...) {
   tkp <- .tkplot.get(tkp.id)
   .tkplot.set(tkp.id, "coords", newlayout(tkp$graph, ...))
@@ -655,6 +665,8 @@ tkplot.reshape <- function(tkp.id, newlayout, ...) {
   .tkplot.update.vertices(tkp.id)
   invisible(NULL)
 }
+
+#' @rdname tkplot
 
 tkplot.export.postscript <- function(tkp.id) {
 
@@ -666,6 +678,8 @@ tkplot.export.postscript <- function(tkp.id) {
   tkpostscript(tkp$canvas, file=filename)
   invisible(NULL)
 }
+
+#' @rdname tkplot
 
 tkplot.getcoords <- function(tkp.id, norm=FALSE) {
   coords <- .tkplot.get(tkp.id, "coords")
@@ -681,12 +695,16 @@ tkplot.getcoords <- function(tkp.id, norm=FALSE) {
   coords
 }
 
+#' @rdname tkplot
+
 tkplot.setcoords <- function(tkp.id, coords) {
   stopifnot(is.matrix(coords), ncol(coords)==2)
   .tkplot.set(tkp.id, "coords", coords)
   .tkplot.update.vertices(tkp.id)
   invisible(NULL)
 }
+
+#' @rdname tkplot
 
 tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   coords <- .tkplot.get(tkp.id, "coords")
@@ -710,6 +728,8 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   tkplot.center(tkp.id)
   invisible(NULL)
 }
+
+#' @rdname tkplot
 
 tkplot.canvas <- function(tkp.id) {
   .tkplot.get(tkp.id)$canvas

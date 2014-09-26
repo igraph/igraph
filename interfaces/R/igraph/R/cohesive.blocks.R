@@ -252,29 +252,44 @@ cohesive.blocks <- function(graph, labels=TRUE) {
   res
 }
 
+#' @rdname cohesive.blocks
+
 length.cohesiveBlocks <- function(x) {
   length(x$blocks)
 }
+
+#' @rdname cohesive.blocks
 
 blocks <- function(blocks) {
   blocks$blocks
 }
 
+#' @rdname cohesive.blocks
+
 blockGraphs <- function(blocks, graph) {
   lapply(blocks(blocks), induced.subgraph, graph=graph)
 }
+
+#' @rdname cohesive.blocks
 
 cohesion <- function(blocks) {
   blocks$cohesion
 }
 
+#' @rdname cohesive.blocks
+
 hierarchy <- function(blocks) {
   blocks$blockTree
 }
 
+#' @rdname cohesive.blocks
+
 parent <- function(blocks) {
   blocks$parent
 }
+
+#' @rdname cohesive.blocks
+#' @method print cohesiveBlocks
 
 print.cohesiveBlocks <- function(x, ...) {
   cat("Cohesive block structure:\n")
@@ -318,11 +333,16 @@ print.cohesiveBlocks <- function(x, ...) {
   invisible(x)
 }
 
+#' @rdname cohesive.blocks
+#' @method summary cohesiveBlocks
+
 summary.cohesiveBlocks <- function(object, ...) {
   cat("Structurally cohesive block structure, with",
       length(blocks(object)), "blocks.\n")
   invisible(object)
 }
+
+#' @rdname cohesive.blocks
 
 plot.cohesiveBlocks <- function(x, y,
                                 colbar=rainbow(max(cohesion(x))+1),
@@ -332,6 +352,8 @@ plot.cohesiveBlocks <- function(x, y,
   plot(y, mark.groups=mark.groups,
        vertex.color=col, ...)
 }
+
+#' @rdname cohesive.blocks
 
 plotHierarchy <- function(blocks,
                           layout=layout.reingold.tilford(hierarchy(blocks),
@@ -396,6 +418,8 @@ exportPajek.cohesiveblocks.nopf <- function(blocks, graph, file) {
   invisible(NULL)
 }
 
+#' @rdname cohesive.blocks
+
 exportPajek <- function(blocks, graph, file,
                         project.file=TRUE) {
   
@@ -410,6 +434,8 @@ exportPajek <- function(blocks, graph, file,
     return(exportPajek.cohesiveblocks.nopf(blocks, graph, file))
   }
 }
+
+#' @rdname cohesive.blocks
 
 maxcohesion <- function(blocks) {
   res <- numeric(blocks$vcount)

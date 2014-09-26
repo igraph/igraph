@@ -316,6 +316,7 @@ str.igraph <- function(object, ...) {
 #' @return All these functions return the graph invisibly.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
+#' @method print igraph
 #' @examples
 #' 
 #' g <- graph.ring(10)
@@ -351,6 +352,9 @@ print.igraph <- function(x, full=getIgraphOpt("print.full"),
   
   invisible(x)
 }
+
+#' @rdname print.igraph
+#' @method summary igraph
 
 summary.igraph <- function(object, ...) {
 

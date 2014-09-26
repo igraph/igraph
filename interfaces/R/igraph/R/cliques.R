@@ -53,16 +53,6 @@
 #' \code{NULL} means no limit, ie. it is the same as 0.
 #' @param max Numeric constant, upper limit on the size of the cliques to find.
 #' \code{NULL} means no limit.
-#' @param subset If not \code{NULL}, then it must be a vector of vertex ids,
-#' numeric or symbolic if the graph is named. The algorithm is run from these
-#' vertices only, so only a subset of all maximal cliques is returned. See the
-#' Eppstein paper for details. This argument makes it possible to easily
-#' parallelize the finding of maximal cliques.
-#' @param file If not \code{NULL}, then it must be a file name, i.e. a
-#' character scalar. The output of the algorithm is written to this file. (If
-#' it exists, then it will be overwritten.) Each clique will be a separate line
-#' in the file, given with the numeric ids of its vertices, separated by
-#' whitespace.
 #' @return \code{cliques}, \code{largest.cliques} and \code{clique.number}
 #' return a list containing numeric vectors of vertex ids. Each list element is
 #' a clique.
@@ -121,6 +111,18 @@ largest.cliques <- function(graph) {
                PACKAGE="igraph")
   lapply(res, function(x) x+1)  
 }
+
+#' @rdname cliques
+#' @param subset If not \code{NULL}, then it must be a vector of vertex ids,
+#' numeric or symbolic if the graph is named. The algorithm is run from these
+#' vertices only, so only a subset of all maximal cliques is returned. See the
+#' Eppstein paper for details. This argument makes it possible to easily
+#' parallelize the finding of maximal cliques.
+#' @param file If not \code{NULL}, then it must be a file name, i.e. a
+#' character scalar. The output of the algorithm is written to this file. (If
+#' it exists, then it will be overwritten.) Each clique will be a separate line
+#' in the file, given with the numeric ids of its vertices, separated by
+#' whitespace.
 
 maximal.cliques <- function(graph, min=NULL, max=NULL,
                             subset=NULL, file=NULL) {

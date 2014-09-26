@@ -23,6 +23,214 @@
 # Community structure
 ###################################################################
 
+
+
+#' Functions to deal with the result of network community detection
+#'
+#' igraph community detection functions return their results as an object from
+#' the \code{communities} class. This manual page describes the operations of
+#' this class.
+#' 
+#' Community structure detection algorithms try to find dense subgraphs in
+#' directed or undirected graphs, by optimizing some criteria, and usually
+#' using heuristics.
+#' 
+#' igraph implements a number of commmunity detection methods (see them below),
+#' all of which return an object of the class \code{communities}. Because the
+#' community structure detection algorithms are different, \code{communities}
+#' objects do not always have the same structure. Nevertheless, they have some
+#' common operations, these are documented here.
+#' 
+#' The \code{print} generic function is defined for \code{communities}, it
+#' prints a short summary.
+#' 
+#' The \code{length} generic function call be called on \code{communities} and
+#' returns the number of communities.
+#' 
+#' The \code{sizes} function returns the community sizes, in the order of their
+#' ids.
+#' 
+#' \code{membership} gives the division of the vertices, into communities. It
+#' returns a numeric vector, one value for each vertex, the id of its
+#' community. Community ids start from one. Note that some algorithms calculate
+#' the complete (or incomplete) hierarchical structure of the communities, and
+#' not just a single partitioning. For these algorithms typically the
+#' membership for the highest modularity value is returned, but see also the
+#' manual pages of the individual algorithms.
+#' 
+#' \code{communities} is also the name of a function, that returns a list of
+#' communities, each identified by their vertices. The vertices will have
+#' symbolic names if the \code{add.vertex.names} igraph option is set, and the
+#' graph itself was named. Otherwise numeric vertex ids are used.
+#' 
+#' \code{modularity} gives the modularity score of the partitioning. (See
+#' \code{\link{modularity.igraph}} for details. For algorithms that do not
+#' result a single partitioning, the highest modularity value is returned.
+#' 
+#' \code{algorithm} gives the name of the algorithm that was used to calculate
+#' the community structure.
+#' 
+#' \code{crossing} returns a logical vector, with one value for each edge,
+#' ordered according to the edge ids. The value is \code{TRUE} iff the edge
+#' connects two different communities, according to the (best) membership
+#' vector, as returned by \code{membership()}.
+#' 
+#' \code{is.hierarchical} checks whether a hierarchical algorithm was used to
+#' find the community structure. Some functions only make sense for
+#' hierarchical methods (e.g. \code{merges}, \code{cutat} and
+#' \code{as.dendrogram}).
+#' 
+#' \code{merges} returns the merge matrix for hierarchical methods. An error
+#' message is given, if a non-hierarchical method was used to find the
+#' community structure. You can check this by calling \code{is.hierarchical} on
+#' the \code{communities} object.
+#' 
+#' \code{cutat} cuts the merge tree of a hierarchical community finding method,
+#' at the desired place and returns a membership vector. The desired place can
+#' be expressed as the desired number of communities or as the number of merge
+#' steps to make. The function gives an error message, if called with a
+#' non-hierarchical method.
+#' 
+#' \code{as.dendrogram} converts a hierarchical community structure to a
+#' \code{dendrogram} object. It only works for hierarchical methods, and gives
+#' an error message to others. See \code{\link[stats]{dendrogram}} for details.
+#' 
+#' \code{as.hclust} is similar to \code{as.dendrogram}, but converts a
+#' hierarchical community structure to a \code{hclust} object.
+#' 
+#' \code{asPhylo} converts a hierarchical community structure to a \code{phylo}
+#' object, you will need the \code{ape} package for this.
+#' 
+#' \code{showtrace} works (currently) only for communities found by the leading
+#' eigenvector method (\code{\link{leading.eigenvector.community}}), and
+#' returns a character vector that gives the steps performed by the algorithm
+#' while finding the communities.
+#' 
+#' \code{code.length} is defined for the InfoMAP method
+#' (\code{\link{infomap.community}} and returns the code length of the
+#' partition.
+#' 
+#' It is possibly to call the \code{plot} function on \code{communities}
+#' objects. This will plot the graph (and uses \code{\link{plot.igraph}}
+#' internally), with the communities shown. By default it colores the vertices
+#' according to their communities, and also marks the vertex groups
+#' corresponding to the communities. It passes additional arguments to
+#' \code{\link{plot.igraph}}, please see that and also
+#' \code{\link{igraph.plotting}} on how to change the plot.
+#' 
+#' \code{create.communities} creates a \code{communities} object. This is
+#' useful to integrate the results of community finding algorithms (that are
+#' not included in igraph).
+#'
+#' @rdname communities
+#' @aliases communities membership algorithm crossing cutat merges sizes
+#' is.hierarchical print.communities plot.communities length.communities
+#' as.dendrogram.communities as.hclust.communities
+#' asPhylo asPhylo.communities showtrace code.length create.communities
+#' @param communities,x,object A \code{communities} object, the result of an
+#' igraph community detection function.
+#' @param graph An igraph graph object, corresponding to \code{communities}.
+#' @param full Logical scalar, if \code{TRUE}, then \code{is.hierarchical} only
+#' returns \code{TRUE} for fully hierarchical algorithms. The \sQuote{leading
+#' eigenvector} algorithm is hierarchical, it gives a hierarchy of groups, but
+#' not a full dendrogram with all vertices, so it is not fully hierarchical.
+#' @param y An igraph graph object, corresponding to the communities in
+#' \code{x}.
+#' @param no Integer scalar, the desired number of communities. If too low or
+#' two high, then an error message is given. Exactly one of \code{no} and
+#' \code{steps} must be supplied.
+#' @param steps The number of merge operations to perform to produce the
+#' communities. Exactly one of \code{no} and \code{steps} must be supplied.
+#' @param colbar A vector of colors, in any format that is accepted by the
+#' regular R plotting methods. E.g. it may be an integer vector, a character
+#' vector of color names, a character vector of RGB colors. This vector gives
+#' the color bar for the vertices. The length of the vector should be the same
+#' as the number of communities.
+#' @param col A vector of colors, in any format that is accepted by the regular
+#' R plotting methods. This vector gives the colors of the vertices explicitly.
+#' @param mark.groups A list of numeric vectors. The communities can be
+#' highlighted using colored polygons. The groups for which the polygons are
+#' drawn are given here. The default is to use the groups given by the
+#' communities. Supply \code{NULL} here if you do not want to highlight any
+#' groups.
+#' @param edge.color The colors of the edges. By default the edges within
+#' communities are colored green and other edges are red.
+#' @param hang Numeric scalar indicating how the height of leaves should be
+#' computed from the heights of their parents; see \code{\link{plot.hclust}}.
+#' @param use.modularity Logical scalar, whether to use the modularity values
+#' to define the height of the branches.
+#' @param \dots Additional arguments. \code{plot.communities} passes these to
+#' \code{\link{plot.igraph}}. \code{create.communities} adds them to the
+#' \code{communtiies} object it creates. The other functions silently ignore
+#' them.
+#' @param membership Numeric vector, one value for each vertex, the membership
+#' vector of the community structure.
+#' @param algorithm If not \code{NULL} (meaning an unknown algorithm), then a
+#' character scalar, the name of the algorithm that produced the community
+#' structure.
+#' @param merges If not \code{NULL}, then the merge matrix of the hierarchical
+#' community structure. See \code{merges} below for more information on its
+#' format.
+#' @param modularity Numeric scalar or vector, the modularity value of the
+#' community structure. It can also be \code{NULL}, if the modularity of the
+#' (best) split is not available.
+#' @return \code{print} returns the \code{communities} object itself,
+#' invisibly.
+#' 
+#' \code{length} returns an integer scalar.
+#' 
+#' \code{sizes} returns a numeric vector.
+#' 
+#' \code{membership} returns a numeric vector, one number for each vertex in
+#' the graph that was the input of the community detection.
+#' 
+#' \code{modularity} returns a numeric scalar.
+#' 
+#' \code{algorithm} returns a character scalar.
+#' 
+#' \code{crossing} returns a logical vector.
+#' 
+#' \code{is.hierarchical} returns a logical scalar.
+#' 
+#' \code{merges} returns a two-column numeric matrix.
+#' 
+#' \code{cutat} returns a numeric vector, the membership vector of the
+#' vertices.
+#' 
+#' \code{as.dendrogram} returns a \code{\link[stats]{dendrogram}} object.
+#' 
+#' \code{showtrace} returns a character vector.
+#' 
+#' \code{code.length} returns a numeric scalar for communities found with the
+#' InfoMAP method and \code{NULL} for other methods.
+#' 
+#' \code{plot} for \code{communities} objects returns \code{NULL}, invisibly.
+#' 
+#' \code{create.communities} returns a \code{communities} object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso See \code{\link{dendPlot}} for plotting community structure
+#' dendrograms.
+#' 
+#' See \code{\link{compare.communities}} for comparing two community structures
+#' on the same graph.
+#' 
+#' The different methods for finding communities, they all return a
+#' \code{communities} object: \code{\link{edge.betweenness.community}},
+#' \code{\link{fastgreedy.community}},
+#' \code{\link{label.propagation.community}},
+#' \code{\link{leading.eigenvector.community}},
+#' \code{\link{multilevel.community}}, \code{\link{optimal.community}},
+#' \code{\link{spinglass.community}}, \code{\link{walktrap.community}}.
+#' @keywords graphs
+#' @examples
+#' 
+#' karate <- graph.famous("Zachary")
+#' wc <- walktrap.community(karate)
+#' modularity(wc)
+#' membership(wc)
+#' plot(wc, karate)
+#' 
+
 membership <- function(communities) {
   if (!is.null(communities$membership)) {
     res <- communities$membership
@@ -38,6 +246,9 @@ membership <- function(communities) {
   }
   res
 }
+
+#' @rdname communities
+#' @method print communities
 
 print.communities <- function(x, ...) {
   cat("Graph community structure calculated with the",
@@ -91,8 +302,32 @@ print.communities <- function(x, ...) {
   invisible(x)
 }
 
-create.communities <- function(membership, algorithm=NULL, merges=NULL,
+#' @rdname communities
 
+create.communities <- function(membership, algorithm=NULL, merges=NULL,
+                               modularity=NULL, ...) {
+
+  stopifnot(is.numeric(membership))
+  stopifnot(is.null(algorithm) ||
+            (is.character(algorithm) && length(algorithm)==1))
+  stopifnot(is.null(merges) ||
+            (is.matrix(merges) && is.numeric(merges) && ncol(merges)==2))
+  stopifnot(is.null(modularity) ||
+            (is.numeric(modularity) &&
+             length(modularity) %in% c(1, length(membership))))
+
+  res <- list(membership=membership,
+              algorithm=if (is.null(algorithm)) "unknown" else algorithm,
+              modularity=modularity, ...)
+  if (!is.null(merges)) {
+    res$merges <- merges
+  }
+  class(res) <- "communities"
+  res
+}
+
+modularity <- function(x, ...)
+  UseMethod("modularity")
 
 #' Modularity of a community structure of a graph
 #' 
@@ -126,8 +361,9 @@ create.communities <- function(membership, algorithm=NULL, merges=NULL,
 #' weighted) adjacency matrix, \eqn{d_i}{d[i]} is the degree of vertex \eqn{i},
 #' and \eqn{m} is the number of edges (or the total weights in the graph, if it
 #' is weighed).
-#' 
-#' @aliases modularity mod.matrix modularity.igraph
+#'
+#' @method modularity igraph
+#' @aliases modularity
 #' @param x,graph The input graph.
 #' @param membership Numeric vector, for each vertex it gives its community.
 #' The communities are numbered from one.
@@ -154,29 +390,6 @@ create.communities <- function(membership, algorithm=NULL, merges=NULL,
 #' modularity(wtc)
 #' modularity(g, membership(wtc))
 #' 
-                               modularity=NULL, ...) {
-
-  stopifnot(is.numeric(membership))
-  stopifnot(is.null(algorithm) ||
-            (is.character(algorithm) && length(algorithm)==1))
-  stopifnot(is.null(merges) ||
-            (is.matrix(merges) && is.numeric(merges) && ncol(merges)==2))
-  stopifnot(is.null(modularity) ||
-            (is.numeric(modularity) &&
-             length(modularity) %in% c(1, length(membership))))
-
-  res <- list(membership=membership,
-              algorithm=if (is.null(algorithm)) "unknown" else algorithm,
-              modularity=modularity, ...)
-  if (!is.null(merges)) {
-    res$merges <- merges
-  }
-  class(res) <- "communities"
-  res
-}
-
-modularity <- function(x, ...)
-  UseMethod("modularity")
 
 modularity.igraph <- function(x, membership, weights=NULL, ...) {
   # Argument checks
@@ -191,6 +404,9 @@ modularity.igraph <- function(x, membership, weights=NULL, ...) {
   res
 }
 
+#' @rdname communities
+#' @method modularity communities
+
 modularity.communities <- function(x, ...) {
   if (!is.null(x$modularity)) {
     max(x$modularity)
@@ -199,19 +415,50 @@ modularity.communities <- function(x, ...) {
   }
 }
 
+#' @rdname modularity.igraph
+
+mod.matrix <- function(graph, membership, weights=NULL) {
+  # Argument checks
+  if (!is.igraph(graph)) { stop("Not a graph object") }
+  membership <- as.numeric(membership)-1
+  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  weights <- E(graph)$weight 
+  } 
+  if (!is.null(weights) && any(!is.na(weights))) { 
+  weights <- as.numeric(weights) 
+  } else { 
+  weights <- NULL 
+  }
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_modularity_matrix", graph, membership, weights,
+        PACKAGE="igraph")
+
+  res
+}
+
+#' @rdname communities
+
 length.communities <- function(x) {
   m <- membership(x)
   max(m)
 }
+
+#' @rdname communities
 
 sizes <- function(communities) {
   m <- membership(communities)
   table(`Community sizes`=m)
 }
 
+#' @rdname communities
+
 algorithm <- function(communities) {
   communities$algorithm
 }
+
+#' @rdname communities
 
 merges <- function(communities) {
   if (!is.null(communities$merges)) {
@@ -220,6 +467,8 @@ merges <- function(communities) {
     stop("Not a hierarchical community structure")
   }
 }
+
+#' @rdname communities
 
 crossing <- function(communities, graph) {
   m <- membership(communities)
@@ -233,9 +482,13 @@ crossing <- function(communities, graph) {
   res
 }
 
+#' @rdname communities
+
 code.length <- function(communities) {
   communities$codelength
 }
+
+#' @rdname communities
 
 is.hierarchical <- function(communities, full=FALSE) {
   alg <- algorithm(communities)
@@ -269,6 +522,8 @@ complete.dend <- function(comm, use.modularity) {
 }
 
 # The following functions were adapted from the stats R package
+
+#' @rdname communities
 
 as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
                                       ...) {
@@ -355,13 +610,19 @@ as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
   z
 }
 
+#' @rdname communities
+
 as.hclust.communities <- function(x, hang=-1, use.modularity=FALSE,
                                   ...) {
   as.hclust(as.dendrogram(x, hang=hang, use.modularity=use.modularity))
 }
 
+#' @rdname communities
+
 asPhylo <- function(x, ...)
   UseMethod("asPhylo")
+
+#' @rdname communities
 
 asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
 
@@ -417,6 +678,8 @@ asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
   reorder(obj)
 }
 
+#' @rdname communities
+
 cutat <- function(communities, no, steps) {
 
   if (!inherits(communities, "communities")) {
@@ -449,6 +712,8 @@ cutat <- function(communities, no, steps) {
     community.to.membership2(mm, communities$vcount, steps)    
   }
 }
+
+#' @rdname communities
 
 showtrace <- function(communities) {
 
@@ -986,16 +1251,12 @@ igraph.i.levc.arp <- function(externalP, externalE) {
 #' \sQuote{weight} edge attribute.
 #' @param start \code{NULL}, or a numeric membership vector, giving the start
 #' configuration of the algorithm.
-#' @param membership The starting community structure on which \code{steps}
-#' merges are performed.
 #' @param options A named list to override some ARPACK options.
 #' @param callback If not \code{NULL}, then it must be callback function. This
 #' is called after each iteration, after calculating the leading eigenvector of
 #' the modularity matrix. See details below.
 #' @param extra Additional argument to supply to the callback function.
 #' @param env The environment in which the callback function is evaluated.
-#' @param merges The merge matrix, possible from the result of
-#' \code{leading.eigenvector.community}.
 #' @return \code{leading.eigenvector.community} returns a named list with the
 #' following members: \item{membership}{The membership vector at the end of the
 #' algorithm, when no more splits are possible.} \item{merges}{The merges
@@ -1078,7 +1339,25 @@ leading.eigenvector.community <- function(graph, steps=-1, weights=NULL,
   res
 }
 
+#' @rdname leading.eigenvector.community
+#' @param membership The starting community structure on which \code{steps}
+#' merges are performed.
+#' @param merges The merge matrix, possible from the result of
+#' \code{leading.eigenvector.community}.
 
+community.le.to.membership <- function(merges, steps, membership) {
+  # Argument checks
+  merges <- as.matrix(structure(as.double(merges), dim=dim(merges)))
+  steps <- as.integer(steps)
+  membership <- as.numeric(membership)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_le_community_to_membership", merges, steps, membership,
+        PACKAGE="igraph")
+
+  res
+}
 
 #' Finding communities based on propagating labels
 #' 
@@ -1411,6 +1690,8 @@ infomap.community <- function(graph, e.weights=NULL, v.weights=NULL,
   res
 }
 
+#' @rdname communities
+
 plot.communities <- function(x, y,
                              colbar=rainbow(length(x)),
                              col=colbar[membership(x)],
@@ -1425,22 +1706,8 @@ plot.communities <- function(x, y,
 
 
 
-#' Plot dendrograms
-#' 
-#' This is generic function that can plot various objects as dendrograms.
-#' 
-#' Currently the function is defined for \code{communities} (see
-#' \code{\link{dendPlot.communities}}) and \code{igraphHRG} (see
-#' \code{\link{dendPlot.igraphHRG}}) objects.
-#' 
-#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @keywords graphs
-#' @examples
-#' 
-#' karate <- graph.famous("Zachary")
-#' fc <- fastgreedy.community(karate)
-#' dendPlot(fc)
-#' 
+#' @rdname dendPlot.communities
+
 dendPlot <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
   UseMethod("dendPlot")
 
@@ -1698,210 +1965,4 @@ groups.communities <- function(x) {
   groups.default(list(membership = m))
 }
 
-
-
-#' Functions to deal with the result of network community detection
-#' 
-#' igraph community detection functions return their results as an object from
-#' the \code{communities} class. This manual page describes the operations of
-#' this class.
-#' 
-#' Community structure detection algorithms try to find dense subgraphs in
-#' directed or undirected graphs, by optimizing some criteria, and usually
-#' using heuristics.
-#' 
-#' igraph implements a number of commmunity detection methods (see them below),
-#' all of which return an object of the class \code{communities}. Because the
-#' community structure detection algorithms are different, \code{communities}
-#' objects do not always have the same structure. Nevertheless, they have some
-#' common operations, these are documented here.
-#' 
-#' The \code{print} generic function is defined for \code{communities}, it
-#' prints a short summary.
-#' 
-#' The \code{length} generic function call be called on \code{communities} and
-#' returns the number of communities.
-#' 
-#' The \code{sizes} function returns the community sizes, in the order of their
-#' ids.
-#' 
-#' \code{membership} gives the division of the vertices, into communities. It
-#' returns a numeric vector, one value for each vertex, the id of its
-#' community. Community ids start from one. Note that some algorithms calculate
-#' the complete (or incomplete) hierarchical structure of the communities, and
-#' not just a single partitioning. For these algorithms typically the
-#' membership for the highest modularity value is returned, but see also the
-#' manual pages of the individual algorithms.
-#' 
-#' \code{communities} is also the name of a function, that returns a list of
-#' communities, each identified by their vertices. The vertices will have
-#' symbolic names if the \code{add.vertex.names} igraph option is set, and the
-#' graph itself was named. Otherwise numeric vertex ids are used.
-#' 
-#' \code{modularity} gives the modularity score of the partitioning. (See
-#' \code{\link{modularity.igraph}} for details. For algorithms that do not
-#' result a single partitioning, the highest modularity value is returned.
-#' 
-#' \code{algorithm} gives the name of the algorithm that was used to calculate
-#' the community structure.
-#' 
-#' \code{crossing} returns a logical vector, with one value for each edge,
-#' ordered according to the edge ids. The value is \code{TRUE} iff the edge
-#' connects two different communities, according to the (best) membership
-#' vector, as returned by \code{membership()}.
-#' 
-#' \code{is.hierarchical} checks whether a hierarchical algorithm was used to
-#' find the community structure. Some functions only make sense for
-#' hierarchical methods (e.g. \code{merges}, \code{cutat} and
-#' \code{as.dendrogram}).
-#' 
-#' \code{merges} returns the merge matrix for hierarchical methods. An error
-#' message is given, if a non-hierarchical method was used to find the
-#' community structure. You can check this by calling \code{is.hierarchical} on
-#' the \code{communities} object.
-#' 
-#' \code{cutat} cuts the merge tree of a hierarchical community finding method,
-#' at the desired place and returns a membership vector. The desired place can
-#' be expressed as the desired number of communities or as the number of merge
-#' steps to make. The function gives an error message, if called with a
-#' non-hierarchical method.
-#' 
-#' \code{as.dendrogram} converts a hierarchical community structure to a
-#' \code{dendrogram} object. It only works for hierarchical methods, and gives
-#' an error message to others. See \code{\link[stats]{dendrogram}} for details.
-#' 
-#' \code{as.hclust} is similar to \code{as.dendrogram}, but converts a
-#' hierarchical community structure to a \code{hclust} object.
-#' 
-#' \code{asPhylo} converts a hierarchical community structure to a \code{phylo}
-#' object, you will need the \code{ape} package for this.
-#' 
-#' \code{showtrace} works (currently) only for communities found by the leading
-#' eigenvector method (\code{\link{leading.eigenvector.community}}), and
-#' returns a character vector that gives the steps performed by the algorithm
-#' while finding the communities.
-#' 
-#' \code{code.length} is defined for the InfoMAP method
-#' (\code{\link{infomap.community}} and returns the code length of the
-#' partition.
-#' 
-#' It is possibly to call the \code{plot} function on \code{communities}
-#' objects. This will plot the graph (and uses \code{\link{plot.igraph}}
-#' internally), with the communities shown. By default it colores the vertices
-#' according to their communities, and also marks the vertex groups
-#' corresponding to the communities. It passes additional arguments to
-#' \code{\link{plot.igraph}}, please see that and also
-#' \code{\link{igraph.plotting}} on how to change the plot.
-#' 
-#' \code{create.communities} creates a \code{communities} object. This is
-#' useful to integrate the results of community finding algorithms (that are
-#' not included in igraph).
-#' 
-#' @aliases communities membership algorithm crossing cutat merges sizes
-#' is.hierarchical print.communities plot.communities length.communities
-#' modularity.communities as.dendrogram.communities as.hclust.communities
-#' asPhylo asPhylo.communities showtrace code.length create.communities
-#' @param communities,x,object A \code{communities} object, the result of an
-#' igraph community detection function.
-#' @param graph An igraph graph object, corresponding to \code{communities}.
-#' @param full Logical scalar, if \code{TRUE}, then \code{is.hierarchical} only
-#' returns \code{TRUE} for fully hierarchical algorithms. The \sQuote{leading
-#' eigenvector} algorithm is hierarchical, it gives a hierarchy of groups, but
-#' not a full dendrogram with all vertices, so it is not fully hierarchical.
-#' @param y An igraph graph object, corresponding to the communities in
-#' \code{x}.
-#' @param no Integer scalar, the desired number of communities. If too low or
-#' two high, then an error message is given. Exactly one of \code{no} and
-#' \code{steps} must be supplied.
-#' @param steps The number of merge operations to perform to produce the
-#' communities. Exactly one of \code{no} and \code{steps} must be supplied.
-#' @param colbar A vector of colors, in any format that is accepted by the
-#' regular R plotting methods. E.g. it may be an integer vector, a character
-#' vector of color names, a character vector of RGB colors. This vector gives
-#' the color bar for the vertices. The length of the vector should be the same
-#' as the number of communities.
-#' @param col A vector of colors, in any format that is accepted by the regular
-#' R plotting methods. This vector gives the colors of the vertices explicitly.
-#' @param mark.groups A list of numeric vectors. The communities can be
-#' highlighted using colored polygons. The groups for which the polygons are
-#' drawn are given here. The default is to use the groups given by the
-#' communities. Supply \code{NULL} here if you do not want to highlight any
-#' groups.
-#' @param edge.color The colors of the edges. By default the edges within
-#' communities are colored green and other edges are red.
-#' @param hang Numeric scalar indicating how the height of leaves should be
-#' computed from the heights of their parents; see \code{\link{plot.hclust}}.
-#' @param use.modularity Logical scalar, whether to use the modularity values
-#' to define the height of the branches.
-#' @param \dots Additional arguments. \code{plot.communities} passes these to
-#' \code{\link{plot.igraph}}. \code{create.communities} adds them to the
-#' \code{communtiies} object it creates. The other functions silently ignore
-#' them.
-#' @param membership Numeric vector, one value for each vertex, the membership
-#' vector of the community structure.
-#' @param algorithm If not \code{NULL} (meaning an unknown algorithm), then a
-#' character scalar, the name of the algorithm that produced the community
-#' structure.
-#' @param merges If not \code{NULL}, then the merge matrix of the hierarchical
-#' community structure. See \code{merges} below for more information on its
-#' format.
-#' @param modularity Numeric scalar or vector, the modularity value of the
-#' community structure. It can also be \code{NULL}, if the modularity of the
-#' (best) split is not available.
-#' @return \code{print} returns the \code{communities} object itself,
-#' invisibly.
-#' 
-#' \code{length} returns an integer scalar.
-#' 
-#' \code{sizes} returns a numeric vector.
-#' 
-#' \code{membership} returns a numeric vector, one number for each vertex in
-#' the graph that was the input of the community detection.
-#' 
-#' \code{modularity} returns a numeric scalar.
-#' 
-#' \code{algorithm} returns a character scalar.
-#' 
-#' \code{crossing} returns a logical vector.
-#' 
-#' \code{is.hierarchical} returns a logical scalar.
-#' 
-#' \code{merges} returns a two-column numeric matrix.
-#' 
-#' \code{cutat} returns a numeric vector, the membership vector of the
-#' vertices.
-#' 
-#' \code{as.dendrogram} returns a \code{\link[stats]{dendrogram}} object.
-#' 
-#' \code{showtrace} returns a character vector.
-#' 
-#' \code{code.length} returns a numeric scalar for communities found with the
-#' InfoMAP method and \code{NULL} for other methods.
-#' 
-#' \code{plot} for \code{communities} objects returns \code{NULL}, invisibly.
-#' 
-#' \code{create.communities} returns a \code{communities} object.
-#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso See \code{\link{dendPlot}} for plotting community structure
-#' dendrograms.
-#' 
-#' See \code{\link{compare.communities}} for comparing two community structures
-#' on the same graph.
-#' 
-#' The different methods for finding communities, they all return a
-#' \code{communities} object: \code{\link{edge.betweenness.community}},
-#' \code{\link{fastgreedy.community}},
-#' \code{\link{label.propagation.community}},
-#' \code{\link{leading.eigenvector.community}},
-#' \code{\link{multilevel.community}}, \code{\link{optimal.community}},
-#' \code{\link{spinglass.community}}, \code{\link{walktrap.community}}.
-#' @keywords graphs
-#' @examples
-#' 
-#' karate <- graph.famous("Zachary")
-#' wc <- walktrap.community(karate)
-#' modularity(wc)
-#' membership(wc)
-#' plot(wc, karate)
-#' 
 communities <- groups.communities

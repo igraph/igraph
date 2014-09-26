@@ -35,6 +35,12 @@ no.clusters <- function(graph, mode=c("weak", "strong")) {
         PACKAGE="igraph")
 }
 
+#' @rdname clusters
+#' @param cumulative Logical, if TRUE the cumulative distirubution (relative
+#' frequency) is calculated.
+#' @param mul.size Logical. If TRUE the relative frequencies will be multiplied
+#' by the cluster sizes.
+
 cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
                                  ...) {
   if (!is.igraph(graph)) {

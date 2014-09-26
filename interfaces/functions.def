@@ -374,6 +374,7 @@ igraph_closeness_estimate:
                 BOOLEAN normalized=False
         DEPS: vids ON graph, weights ON graph, res ON graph vids
         NAME-R: closeness.estimate
+        IGNORE: RR
 
 igraph_shortest_paths:
         PARAMS: GRAPH graph, OUT MATRIX res, VERTEXSET from=ALL, \
@@ -453,6 +454,7 @@ igraph_betweenness_estimate:
         DEPS: vids ON graph, weights ON graph, res ON graph vids
         NAME-R: betweenness.estimate
         FLAGS: PROGRESS
+        IGNORE: RR
 
 igraph_edge_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True, \
@@ -505,6 +507,7 @@ igraph_induced_subgraph:
         PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids, SUBGRAPH_IMPL impl=AUTO
         DEPS: vids ON graph
         NAME-R: induced.subgraph
+        IGNORE: RR
 
 igraph_subgraph:
         PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids
@@ -514,6 +517,7 @@ igraph_subgraph_edges:
         PARAMS: GRAPH graph, OUT GRAPH res, EDGESET eids, BOOLEAN delete_vertices=True
         DEPS: eids ON graph
         NAME-R: subgraph.edges
+        IGNORE: RR
 
 igraph_average_path_length:
         PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True, BOOLEAN unconn=True
@@ -1234,6 +1238,7 @@ igraph_le_community_to_membership:
         PARAMS: MATRIX merges, INTEGER steps, INOUT VECTOR membership, \
                 OUT VECTOR_OR_0 csize
         NAME-R: community.le.to.membership
+        IGNORE: RR
 
 igraph_modularity:
         PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity, \
@@ -1245,7 +1250,8 @@ igraph_modularity_matrix:
         PARAMS: GRAPH graph, VECTORM1 membership, OUT MATRIX modmat, \
                 EDGEWEIGHTS weights=NULL
         DEPS: weights ON graph
-        NAME-R: mod.matrix        
+        NAME-R: mod.matrix
+        IGNORE: RR
 
 igraph_reindex_membership:
         PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
@@ -1382,6 +1388,7 @@ igraph_to_undirected:
         PARAMS: INOUT GRAPH graph, TOUNDIRECTED mode=COLLAPSE, \
                 EDGE_ATTRIBUTE_COMBINATION edge_attr_comb=Default
         NAME-R: as.undirected
+        IGNORE: RR
 
 igraph_get_stochastic:
         PARAMS: GRAPH graph, OUT MATRIX res, BOOLEAN column_wise=False
