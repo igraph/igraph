@@ -4868,7 +4868,7 @@ PyObject *igraphmodule_Graph_personalized_pagerank(igraphmodule_GraphObject *sel
   void *opts;
   int retval;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOOOO!Oid", kwlist, &vobj,
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OOdOOOO!Olf", kwlist, &vobj,
                                    &directed, &damping, &robj,
 				   &rvsobj, &wobj,
                                    &igraphmodule_ARPACKOptionsType,
