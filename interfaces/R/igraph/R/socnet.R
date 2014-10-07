@@ -106,8 +106,8 @@ tkigraph <- function() {
   })
   tkadd(create.menu, "separator")
   tkadd(create.menu, "command", label="Moody-White network", command=function() {
-    g <- graph.adjacency(.tkigraph.net.moody.white, mode="undirected")
-    g <- set.graph.attribute(g, "name", "Moody-White network")
+    g <- graph_from_adjacency_matrix(.tkigraph.net.moody.white, mode="undirected")
+    g <- set_graph_attr(g, "name", "Moody-White network")
     .tkigraph.add.graph(g)
   })
   
@@ -411,10 +411,10 @@ tkigraph <- function() {
   topframe <- get("topframe", .tkigraph.env)
 
   ## add 'name' attribute if not present
-  if (!"name" %in% list.vertex.attributes(g)) {
+  if (!"name" %in% vertex_attr_names(g)) {
     V(g)$name <- as.integer(seq(vcount(g)))
   }
-  if (!"name" %in% list.edge.attributes(g)) {
+  if (!"name" %in% edge_attr_names(g)) {
     E(g)$name <- as.integer(seq(ecount(g)))
   }
   
@@ -426,7 +426,7 @@ tkigraph <- function() {
   selected[[no]] <- tclVar("FALSE")
   assign("selected", selected, .tkigraph.env)
 
-  name <- get.graph.attribute(g, "name")
+  name <- graph_attr(g, "name")
   tmpvar <- tclVar(as.character(name))
   but <- tkcheckbutton(top, onvalue="TRUE", offvalue="FALSE",
                        variable=selected[[no]])
@@ -436,7 +436,7 @@ tkigraph <- function() {
                   justify="right", padx=2)
   lab3 <- tklabel(top, text=as.character(ecount(g)), justify="right",
                   padx=2)
-  lab4 <- tklabel(top, text=if (is.directed(g)) "YES" else "NO")
+  lab4 <- tklabel(top, text=if (is_directed(g)) "YES" else "NO")
   tkgrid(but, lab, ent, lab2, lab3, lab4, "in"=topframe, sticky="nsew")
 
   tklines <- get("tklines", .tkigraph.env)
@@ -499,7 +499,7 @@ tkigraph <- function() {
   for (i in seq(graphs)) {
     if (is.na(graphs)[i]) { next }
     entry <- tkgrid.slaves(topframe, row=i, col=2)
-    graphs[[i]] <- set.graph.attribute(graphs[[i]], "name",
+    graphs[[i]] <- set_graph_attr(graphs[[i]], "name",
                                        as.character(tcl(entry, "get")))
   }
   graphs <- graphs[ !is.na(graphs) ]
@@ -527,19 +527,19 @@ tkigraph <- function() {
     weighted <- "weight"
   }
   g <- .tkigraph.graph.adjacency(tab, mode=dir, weighted=weighted)
-  g <- set.graph.attribute(g, "name", "Imported adjacency matrix")
+  g <- set_graph_attr(g, "name", "Imported adjacency matrix")
   .tkigraph.add.graph(g)
 }
 
 .tkigraph.graph.adjacency <- function(adjmatrix, mode, weighted) {
   if (is.null(weighted)) {
-    g <- graph.adjacency(adjmatrix, mode=mode)
+    g <- graph_from_adjacency_matrix(adjmatrix, mode=mode)
   } else {
     ## there is bug in the currect igraph version, this is a workaround
     if (mode=="undirected") {
       adjmatrix[ lower.tri(adjmatrix) ] <- 0
     }
-    g <- graph.adjacency(adjmatrix, mode=mode, weighted=weighted)
+    g <- graph_from_adjacency_matrix(adjmatrix, mode=mode, weighted=weighted)
   }
   g
 }
@@ -557,8 +557,8 @@ tkigraph <- function() {
   read <- .tkigraph.dialogbox(TITLE="Importing an edge list",
                               directed=list(name="Directed", type="boolean",
                                 default="FALSE"))
-  g <- graph.data.frame(tab, directed=read$directed)
-  g <- set.graph.attribute(g, "name", "Imported edge list")
+  g <- graph_from_data_frame(tab, directed=read$directed)
+  g <- set_graph_attr(g, "name", "Imported edge list")
   .tkigraph.add.graph(g)
 }
 
@@ -567,11 +567,11 @@ tkigraph <- function() {
                             title="Import Pajek file")
   filename <- paste(as.character(filename), collapse=" ")
   if (filename=="") { return() }
-  g <- read.graph(file=filename, format="pajek")
+  g <- read_graph(file=filename, format="pajek")
   color <- NULL # To eliminate a check NOTE
-  if ("color" %in% list.vertex.attributes(g)) { V(g)[ color=="" ]$color <- "black" }
-  if ("color" %in% list.edge.attributes(g)) { E(g)[ color=="" ]$color <- "black" }
-  g <- set.graph.attribute(g, "name", "Imported Pajek fie")
+  if ("color" %in% vertex_attr_names(g)) { V(g)[ color=="" ]$color <- "black" }
+  if ("color" %in% edge_attr_names(g)) { E(g)[ color=="" ]$color <- "black" }
+  g <- set_graph_attr(g, "name", "Imported Pajek fie")
   .tkigraph.add.graph(g)
 }
 
@@ -582,10 +582,10 @@ tkigraph <- function() {
     return()
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
-  if ("weight" %in% list.graph.attributes(graph)) {
-    tab <- get.adjacency(graph, attr="weight", names=FALSE, sparse=FALSE)
+  if ("weight" %in% graph_attr_names(graph)) {
+    tab <- as_adj(graph, attr="weight", names=FALSE, sparse=FALSE)
   } else {
-    tab <- get.adjacency(graph, names=FALSE, sparse=FALSE)
+    tab <- as_adj(graph, names=FALSE, sparse=FALSE)
   }
   filename <- tkgetSaveFile(initialfile="graph.adj",
                             defaultextension="adj",
@@ -602,8 +602,8 @@ tkigraph <- function() {
     return()
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
-  el <- get.edgelist(graph)
-  if ("weight" %in% list.edge.attributes(graph)) {
+  el <- as_edgelist(graph)
+  if ("weight" %in% edge_attr_names(graph)) {
     el <- cbind(el, E(graph)$weight)
   }
   filename <- tkgetSaveFile(initialfile="graph.el",
@@ -627,7 +627,7 @@ tkigraph <- function() {
                             title="Export Pajek file")
   filename <- paste(as.character(filename), collapse=" ")
   if (filename=="") { return() }
-  write.graph(graph, file=filename, format="pajek")
+  write_graph(graph, file=filename, format="pajek")
 }
 
 .tkigraph.show <- function() {
@@ -637,13 +637,13 @@ tkigraph <- function() {
     return()
   }
   graphs <- get("graphs", .tkigraph.env)
-  el <- get.edgelist(graphs[[gnos]])
+  el <- as_edgelist(graphs[[gnos]])
   el <- data.frame(from=el[,1], to=el[,2])
 #  if (any(V(graphs[[gnos]])$name != seq(length=vcount(graphs[[gnos]])))) {
-#    el2 <- get.edgelist(graphs[[gnos]], names=FALSE)
+#    el2 <- as_edgelist(graphs[[gnos]], names=FALSE)
 #    el <- cbind(el, el2)
 #  }
-  if ("weight" %in% list.edge.attributes(graphs[[gnos]])) {
+  if ("weight" %in% edge_attr_names(graphs[[gnos]])) {
     el <- cbind(el, value=E(graphs[[gnos]])$weight)
   }
 
@@ -703,7 +703,7 @@ tkigraph <- function() {
       recip[i] <- reciprocity( graphs[[ i ]] )
     }
     if (read$dens) {
-      dens[i] <- graph.density( graphs[[ i ]] )
+      dens[i] <- density( graphs[[ i ]] )
     }
     if (read$trans) {
       trans[i] <- transitivity( graphs[[ i ]], type="global")
@@ -847,28 +847,28 @@ tkigraph <- function() {
   }
   
   layout.default <- function(graph, layout.par) {
-    if ("x" %in% list.vertex.attributes(graph) &&
-        "y" %in% list.vertex.attributes(graph)) {
+    if ("x" %in% vertex_attr_names(graph) &&
+        "y" %in% vertex_attr_names(graph)) {
       cbind( V(graph)$x , V(graph)$y )
-    } else if ("layout" %in% list.graph.attributes(graph)) {
-      l <- get.graph.attribute(graph, "layout")
+    } else if ("layout" %in% graph_attr_names(graph)) {
+      l <- graph_attr(graph, "layout")
       if (is.function(l)) {
         l(graph)
       } else {
         l
       }
-    } else if (vcount(graph) < 300 && is.connected(graph)) {
-      layout.kamada.kawai(graph)
+    } else if (vcount(graph) < 300 && is_connected(graph)) {
+      layout_with_kk(graph)
     } else if (vcount(graph) < 1000) {
-      layout.fruchterman.reingold(graph)
+      layout_with_fr(graph)
     } else {
-      layout.circle(graph)
+      layout_in_circle(graph)
     }
   }
   
-  layouts <- list(layout.default, layout.kamada.kawai,
-                  layout.fruchterman.reingold,
-                  layout.reingold.tilford, layout.circle, layout.random)
+  layouts <- list(layout.default, layout_with_kk,
+                  layout_with_fr,
+                  layout_as_tree, layout_in_circle, layout_randomly)
 
   if (read$vertex.size < 10) {
     label.dist <- 0.4
@@ -885,7 +885,7 @@ tkigraph <- function() {
     } else if (read$labels == "2") {
       labels <- V(graphs[[i]])$name
     } else if (read$labels == "3") {
-      if ("label" %in% list.vertex.attributes(graphs[[i]])) {
+      if ("label" %in% vertex_attr_names(graphs[[i]])) {
         labels <- V(graphs[[i]])$label
       } else {
         labels <- V(graphs[[i]])$name
@@ -899,7 +899,7 @@ tkigraph <- function() {
     } else if (read$labels == "2") {
       elabels <- E(graphs[[i]])$name
     } else if (read$labels == "3") {
-      if ("weight" %in% list.edge.attributes(graphs[[i]])) {
+      if ("weight" %in% edge_attr_names(graphs[[i]])) {
         elabels <- E(graphs[[i]])$weight
       } else {
         .tkigraph.warning("No edge weights, not a valued graph");
@@ -914,7 +914,7 @@ tkigraph <- function() {
     }
     
     g <- graphs[[i]]
-    g <- remove.vertex.attribute(g, "name")
+    g <- delete_vertex_attr(g, "name")
     fun(g, layout=layouts[[ read$layout+1 ]],
         vertex.size=read$vertex.size, ## vertex.color=read$vertex.color,
         vertex.label=labels, vertex.label.dist=label.dist,
@@ -938,14 +938,14 @@ tkigraph <- function() {
     read <- .tkigraph.dialogbox(TITLE="Creating a graph by hand",
                                 directed=list(name="Directed", type="boolean",
                                   default="FALSE"))
-    g <- graph.data.frame(newdf, directed=read$directed)
-    g <- set.graph.attribute(g, "name", "New graph")
+    g <- graph_from_data_frame(newdf, directed=read$directed)
+    g <- set_graph_attr(g, "name", "New graph")
     .tkigraph.add.graph(g)
   } else {
     graphs <- get("graphs", .tkigraph.env)
-    df <- get.edgelist(graphs[[gnos]])
+    df <- as_edgelist(graphs[[gnos]])
     colnames <- c("from", "to")    
-    if ("weight" %in% list.edge.attributes(graphs[[gnos]])) {
+    if ("weight" %in% edge_attr_names(graphs[[gnos]])) {
       df <- cbind(df, E(g)$weight)
       colnames <- c("from", "to", "weight")
     }
@@ -956,8 +956,7 @@ tkigraph <- function() {
     if (ncol(df) > 2) {
       colnames(df) <- c("from", "to", "weight")
     }
-    graphs[[gnos]] <- graph.data.frame(df,
-                                       directed=is.directed(graphs[[gnos]]))
+    graphs[[gnos]] <- graph_from_data_frame(df, directed=is_directed(graphs[[gnos]]))
     assign("graphs", graphs, .tkigraph.env)
   }
   invisible(NULL)
@@ -973,10 +972,10 @@ tkigraph <- function() {
                                 values=c("Directed (out)", "Directed (in)",
                                   "Undirected"), default="2"))
   read$mode <- c("out", "in", "undirected")[read$mode+1]
-  g <- graph.tree(n=read$n, children=read$b, mode=read$mode)
-  lay <- layout.reingold.tilford(g, root=1, mode="all")
-  g <- set.graph.attribute(g, "layout", lay)
-  g <- set.graph.attribute(g, "name", "Regular tree")
+  g <- tree(n=read$n, children=read$b, mode=read$mode)
+  lay <- layout_as_tree(g, root=1, mode="all")
+  g <- set_graph_attr(g, "layout", lay)
+  g <- set_graph_attr(g, "name", "Regular tree")
   .tkigraph.add.graph(g)
 }
 
@@ -984,9 +983,9 @@ tkigraph <- function() {
   read <- .tkigraph.dialogbox(TITLE="Regular ring",
                               n=list(name="Vertices", type="numeric",
                                 default=100, min=0))
-  g <- graph.ring(n=read$n)
-  g <- set.graph.attribute(g, "layout", layout.circle)
-  g <- set.graph.attribute(g, "name", "Regular ring")
+  g <- ring(n=read$n)
+  g <- set_graph_attr(g, "layout", layout_in_circle)
+  g <- set_graph_attr(g, "name", "Regular ring")
   .tkigraph.add.graph(g)
 }
 
@@ -1006,8 +1005,8 @@ tkigraph <- function() {
                                 default=10, min=1))
   if (read$dim > 5) { read$dim <- 5 }
   dimv <- c(read$s1, read$s2, read$s3, read$s4, read$s5)[1:read$dim]
-  g <- graph.lattice(dimvector=dimv)
-  g <- set.graph.attribute(g, "name", "Regular Lattice")
+  g <- lattice(dimvector=dimv)
+  g <- set_graph_attr(g, "name", "Regular Lattice")
   .tkigraph.add.graph(g)
 }
 
@@ -1019,8 +1018,8 @@ tkigraph <- function() {
                                 values=c("Directed (out)", "Directed (in)",
                                   "Undirected"), default="2"))
   read$mode <- c("out", "in", "undirected")[read$mode+1]
-  g <- graph.star(read$n, mode=read$mode)
-  g <- set.graph.attribute(g, "name", "Star graph")
+  g <- star(read$n, mode=read$mode)
+  g <- set_graph_attr(g, "name", "Star graph")
   .tkigraph.add.graph(g)
 }
 
@@ -1032,8 +1031,8 @@ tkigraph <- function() {
                                 default="FALSE"),
                               loops=list(name="Loops", type="boolean",
                                 default="FALSE"))
-  g <- graph.full(read$n, read$directed, read$loops)
-  g <- set.graph.attribute(g, "name", "Full graph")
+  g <- full_graph(read$n, read$directed, read$loops)
+  g <- set_graph_attr(g, "name", "Full graph")
   .tkigraph.add.graph(g)
 }                             
 
@@ -1042,7 +1041,7 @@ tkigraph <- function() {
                               n=list(name="Number", type="numeric",
                                 default=sample(0:1252, 1), min=0, max=1252))
   g <- graph.atlas(read$n)
-  g <- set.graph.attribute(g, "name",
+  g <- set_graph_attr(g, "name",
                            paste("Graph Atlas #", read$n))
   .tkigraph.add.graph(g)
 }
@@ -1056,8 +1055,8 @@ tkigraph <- function() {
                               directed=list(name="Directed",
                                 type="boolean", default="FALSE"))
   
-  g <- erdos.renyi.game(read$n,read$p,directed=read$directed)
-  g <- set.graph.attribute(g, "name", "Random graph (Erdos-Renyi G(n,p))")
+  g <- sample_gnp(read$n,read$p,directed=read$directed)
+  g <- set_graph_attr(g, "name", "Random graph (Erdos-Renyi G(n,p))")
   .tkigraph.add.graph(g)
 }
 
@@ -1070,8 +1069,8 @@ tkigraph <- function() {
                               directed=list(name="Directed",
                                 type="boolean", default="FALSE"))
 
-  g <- erdos.renyi.game(read$n, read$m, type="gnm", directed=read$directed)
-  g <- set.graph.attribute(g, "name", "Random graph (Erdos-Renyi G(n,m))")
+  g <- sample_gnm(read$n, read$m, directed=read$directed)
+  g <- set_graph_attr(g, "name", "Random graph (Erdos-Renyi G(n,m))")
   .tkigraph.add.graph(g)
 }
 
@@ -1084,7 +1083,7 @@ tkigraph <- function() {
                               directed=list(name="Directed",
                                 type="boolean", default="TRUE"))
   g <- barabasi.game(n=read$n, m=read$m, directed=read$directed)
-  g <- set.graph.attribute(g, "name", "Scale-free random graph")
+  g <- set_graph_attr(g, "name", "Scale-free random graph")
   .tkigraph.add.graph(g)
 }
 
@@ -1097,15 +1096,15 @@ tkigraph <- function() {
   graphs <- get("graphs", .tkigraph.env)
 
   for (i in gnos) {
-    if (is.directed(graphs[[i]])) {
+    if (is_directed(graphs[[i]])) {
       indeg <- degree(graphs[[i]], mode="in")
       outdeg <- degree(graphs[[i]], mode="out")
-      g <- degree.sequence.game(out.deg=outdeg, in.deg=indeg)
+      g <- sample_degseq(out.deg=outdeg, in.deg=indeg)
     } else {
       deg <- degree(graphs[[i]])
-      g <- degree.sequence.game(deg)
+      g <- sample_degseq(deg)
     }
-    g <- set.graph.attribute(g, "name",
+    g <- set_graph_attr(g, "name",
                              paste(sep="", "Configuration model (#", i,")"))
     .tkigraph.add.graph(g)
   }
@@ -1121,11 +1120,11 @@ tkigraph <- function() {
                                 default=5, min=1),
                               p=list(name="Rewiring probability",
                                 type="numeric", default=0.01, min=0, max=1))
-  g <- watts.strogatz.game(dim=read$dim, size=read$size, nei=read$nei,
+  g <- sample_smallworld(dim=read$dim, size=read$size, nei=read$nei,
                            p=read$p)
-  g <- set.graph.attribute(g, "name", "Watts-Strogatz small-world graph")
+  g <- set_graph_attr(g, "name", "Watts-Strogatz small-world graph")
   if (read$dim == 1) { 
-    g <- set.graph.attribute(g, "layout", layout.circle)
+    g <- set_graph_attr(g, "layout", layout_in_circle)
   }
   .tkigraph.add.graph(g)
 }
@@ -1136,7 +1135,7 @@ tkigraph <- function() {
 
   for (i in gnos) {
     g <- simplify(graphs[[i]])
-    g <- set.graph.attribute(g, "name",
+    g <- set_graph_attr(g, "name",
                              paste(sep="", "Simplification of #", i))
     .tkigraph.add.graph(g)
   }
@@ -1208,7 +1207,7 @@ tkigraph <- function() {
       .tkigraph.error("Degrees are too small for a power-law fit")
       return()
     }
-    fit <- power.law.fit(deg, xmin=10)
+    fit <- fit_power_law(deg, xmin=10)
     lines(0:max(deg), (0:max(deg))^(-coef(fit)), col="red")
     legend("topright", c(paste("exponent:", round(coef(fit), 2)),
                          paste("standard error:", round(sqrt(vcov(fit)), 2))),
@@ -1276,7 +1275,7 @@ tkigraph <- function() {
     return()
   }
   graphs <- get("graphs", .tkigraph.env)
-  bp <- bonpow(graphs[[gnos]])
+  bp <- power_centrality(graphs[[gnos]])
   value <- data.frame(V(graphs[[gnos]])$name, bp)
   colnames(value) <- c("Vertex", "Power centrality")
   value <- value[ order(value[,2], decreasing=TRUE), ]
@@ -1293,7 +1292,7 @@ tkigraph <- function() {
     return()
   }
   graphs <- get("graphs", .tkigraph.env)
-  bp <- page.rank(graphs[[gnos]])$vector
+  bp <- page_rank(graphs[[gnos]])$vector
   value <- data.frame(V(graphs[[gnos]])$name, bp)
   colnames(value) <- c("Vertex", "Page rank")
   value <- value[ order(value[,2], decreasing=TRUE), ]
@@ -1310,8 +1309,8 @@ tkigraph <- function() {
     return()
   }
   graphs <- get("graphs", .tkigraph.env)
-  ebtw <- edge.betweenness(graphs[[gnos]])
-  el <- get.edgelist(graphs[[gnos]])
+  ebtw <- edge_betweenness(graphs[[gnos]])
+  el <- as_edgelist(graphs[[gnos]])
   value <- data.frame(E(graphs[[gnos]])$name, el[,1], el[,2], ebtw)
   colnames(value) <- c("Edge", "From", "To", "Betweenness")
   value <- value[ order(value[,4], decreasing=TRUE), ]
@@ -1336,7 +1335,7 @@ tkigraph <- function() {
     return()
   }
 
-  value <- shortest.paths(graph, mode="out")
+  value <- distances(graph, mode="out")
   rownames(value) <- colnames(value) <- V(graph)$name
   .tkigraph.showData(value, sort.button=FALSE, 
                      title=paste(sep="", "Distance matrix for graph #", gnos))
@@ -1358,7 +1357,7 @@ tkigraph <- function() {
     return()
   }
 
-  value <- shortest.paths(graph, read$v, mode="out")
+  value <- distances(graph, read$v, mode="out")
   dim(value) <- NULL
   value <- data.frame( V(graph)$name, value)
   colnames(value) <- c("Vertex", "Distance")
@@ -1382,9 +1381,9 @@ tkigraph <- function() {
     if (mode=="dia") {
       dia[i] <- diameter(graphs[[ gnos[i] ]], directed=FALSE)
     } else if (mode=="path") {
-      dia[i] <- average.path.length(graphs[[ gnos[i] ]], directed=FALSE)
+      dia[i] <- mean_distance(graphs[[ gnos[i] ]], directed=FALSE)
     }
-    isconn[i] <- is.connected(graphs[[ gnos[i] ]])
+    isconn[i] <- is_connected(graphs[[ gnos[i] ]])
   }
 
   value <- data.frame( gnos, isconn, dia)
@@ -1425,7 +1424,7 @@ tkigraph <- function() {
     return()
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
-  comm <- clusters(graph)
+  comm <- components(graph)
   members <- sapply(sapply(seq(along=comm$csize),
                            function(i) which(comm$membership==i)),
                     paste, collapse=", ")
@@ -1441,7 +1440,7 @@ tkigraph <- function() {
     return()
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
-  comm <- clusters(graph)
+  comm <- components(graph)
   value <- data.frame("Vertex"=seq(along=comm$membership),
                  "Component"=comm$membership)
   .tkigraph.showData(value, title=paste("Components of graph #", gnos))
@@ -1454,7 +1453,7 @@ tkigraph <- function() {
     return()
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
-  cs <- clusters(graph)$csize
+  cs <- components(graph)$csize
   value <- data.frame(seq(along=cs), cs)
   colnames(value) <- c("Cluster #", "Size")
 
@@ -1496,7 +1495,7 @@ tkigraph <- function() {
     return()
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
-  clu <- clusters(graph)
+  clu <- components(graph)
   colbar <- rainbow(length(clu$csize)*2)
   vertex.color <- colbar[ clu$membership ]
   .tkigraph.plot(gnos=gnos, simple=simple, vertex.color=vertex.color)
@@ -1509,9 +1508,9 @@ tkigraph <- function() {
     return()
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
-  clu <- clusters(graph)
+  clu <- components(graph)
   v <- which(clu$membership == which.max(clu$csize))
-  g <- induced.subgraph(graph, v)
+  g <- induced_subgraph(graph, v)
   .tkigraph.add.graph(g)
 }
 
@@ -1530,7 +1529,7 @@ tkigraph <- function() {
     return()
   }
 
-  g <- induced.subgraph(graph, subcomponent(graph, read$vertex))
+  g <- induced_subgraph(graph, subcomponent(graph, read$vertex))
   .tkigraph.add.graph(g)
 }
 
@@ -1544,14 +1543,14 @@ tkigraph <- function() {
   read <- .tkigraph.dialogbox(TITLE="Graph from component",
                               comp=list(name="Component id", type="numeric",
                                 default=1, min=1))
-  clu <- clusters(graph)
+  clu <- components(graph)
   if (read$comp<1 || read$comp > length(clu$csize)) {
     .tkigraph.error("Invalid component id")
     return()
   }
   
   v <- which(clu$membership==read$comp)
-  g <- induced.subgraph(graph, v)
+  g <- induced_subgraph(graph, v)
   .tkigraph.add.graph(g)  
 }
 
@@ -1592,7 +1591,7 @@ tkigraph <- function() {
   layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)) {
-    g <- graph.isocreate(read$size, i-1, directed=read$dir)
+    g <- graph_from_iso_class(read$size, i-1, directed=read$dir)
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
@@ -1619,7 +1618,7 @@ tkigraph <- function() {
   }
   
   graphs <- get("graphs", .tkigraph.env)
-  motifs <- graph.motifs(graphs[[gnos]], size=read$size)
+  motifs <- motifs(graphs[[gnos]], size=read$size)
 
   if (read$size == 3) {
     co <- matrix( c(1,1, 0,0, 2,0), ncol=2, byrow=TRUE)
@@ -1627,16 +1626,16 @@ tkigraph <- function() {
     co <- matrix( c(0,1, 1,1, 0,0, 1,0), ncol=2, byrow=TRUE)
   }
 
-  if (read$size == 3 && is.directed(graphs[[gnos]])) {
+  if (read$size == 3 && is_directed(graphs[[gnos]])) {
     no <- 16
     rows <- cols <- 4
-  } else if (read$size == 3 && !is.directed(graphs[[gnos]])) {
+  } else if (read$size == 3 && !is_directed(graphs[[gnos]])) {
     no <- 4
     rows <- cols <- 2
-  } else if (read$size == 4 && is.directed(graphs[[gnos]])) {
+  } else if (read$size == 4 && is_directed(graphs[[gnos]])) {
     no <- 216
     rows <- cols <- 15
-  } else if (read$size == 4 && !is.directed(graphs[[gnos]])) {
+  } else if (read$size == 4 && !is_directed(graphs[[gnos]])) {
     no <- 11
     rows <- 4
     cols <- 3
@@ -1650,8 +1649,8 @@ tkigraph <- function() {
   layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)) {
-    g <- graph.isocreate(read$size, i-1,
-                         directed=is.directed(graphs[[gnos]]))
+    g <- graph_from_iso_class(read$size, i-1,
+                         directed=is_directed(graphs[[gnos]]))
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
@@ -1669,12 +1668,12 @@ tkigraph <- function() {
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
 
-  if (!is.connected(graph)) {
+  if (!is_connected(graph)) {
     .tkigraph.error("Graph is not connected")
     return()
   }
 
-  weights <- if ("weight" %in% list.edge.attributes(graph)) "TRUE" else "FALSE"
+  weights <- if ("weight" %in% edge_attr_names(graph)) "TRUE" else "FALSE"
   read <- .tkigraph.dialogbox(TITLE="Spinglass community structure",
                               gamma=list(name="Gamma parameter",
                                 type="numeric", default=1),
@@ -1696,7 +1695,7 @@ tkigraph <- function() {
 
   read$update.rule <- c("simple", "config")[read$update.rule+1]
   if (read$weights) {
-    if (!"weight" %in% list.edge.attributes(graph)) {
+    if (!"weight" %in% edge_attr_names(graph)) {
       .tkigraph.warning("This graphs is not weighted")
       read$weights <- NULL
     } else {
@@ -1705,7 +1704,7 @@ tkigraph <- function() {
   } else {
     read$weights <- NULL
   }
-  comm <- spinglass.community(graph, weights=read$weights, spins=read$spins,
+  comm <- cluster_spinglass(graph, weights=read$weights, spins=read$spins,
                               parupdate=read$parupdate, start.temp=read$start.temp,
                               stop.temp=read$stop.temp, cool.fact=read$cool.fact,
                               update.rule=read$update.rule, gamma=read$gamma)
@@ -1801,12 +1800,12 @@ tkigraph <- function() {
   }
   graph <- get("graphs", .tkigraph.env)[[gnos]]
 
-  if (!is.connected(graph)) {
+  if (!is_connected(graph)) {
     .tkigraph.error("Graph is not connected")
     return()
   }
 
-  weights <- if ("weight" %in% list.edge.attributes(graph)) "TRUE" else "FALSE"
+  weights <- if ("weight" %in% edge_attr_names(graph)) "TRUE" else "FALSE"
   read <- .tkigraph.dialogbox(TITLE="Spinglass community of a vertex",
                               vertex=list(name="Vertex", type="numeric",
                                 default=1, min=1, max=vcount(graph)),
@@ -1827,7 +1826,7 @@ tkigraph <- function() {
   
   read$update.rule <- c("simple", "config")[read$update.rule+1]
   if (read$weights) {
-    if (!"weight" %in% list.edge.attributes(graph)) {
+    if (!"weight" %in% edge_attr_names(graph)) {
       .tkigraph.warning("This graphs is not weighted")
       read$weights <- NULL
     } else {
@@ -1836,7 +1835,7 @@ tkigraph <- function() {
   } else {
     read$weights <- NULL
   }
-  comm <- spinglass.community(graph, vertex=read$vertex,
+  comm <- cluster_spinglass(graph, vertex=read$vertex,
                               weights=read$weights, spins=read$spins,
                               update.rule=read$update.rule, gamma=read$gamma)
   .tkigraph.spinglass.mycommunity.dialog(comm, read, gnos)
@@ -1891,7 +1890,7 @@ tkigraph <- function() {
   
   create.graph <- function() {
     graph <- get("graphs", .tkigraph.env)[[gnos]]
-    g <- induced.subgraph(graph, comm$community)
+    g <- induced_subgraph(graph, comm$community)
     .tkigraph.add.graph(g)
   }
   
@@ -1912,8 +1911,8 @@ tkigraph <- function() {
     .tkigraph.error("Please select exactly one graph")
     return()
   }
-  graphs <- decompose.graph(get("graphs", .tkigraph.env)[[gnos]])
-  coh <- sapply(graphs, graph.cohesion)
+  graphs <- decompose(get("graphs", .tkigraph.env)[[gnos]])
+  coh <- sapply(graphs, cohesion)
   value <- data.frame("Component"=seq(length=length(graphs)), "Cohesion"=coh)
   .tkigraph.showData(value, title=paste("Cohesion of components in graph #",
                               gnos), right=FALSE)

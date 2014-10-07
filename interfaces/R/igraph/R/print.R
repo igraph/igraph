@@ -25,21 +25,21 @@
 
 .get.attr.codes <- function(object) {
   ga <- va <- ea <- ""
-  gal <- list.graph.attributes(object)
+  gal <- graph_attr_names(object)
   if (length(gal) != 0) {
     ga <- paste(sep="", gal, " (g/",
                 .Call("R_igraph_get_attr_mode", object, 2L, PACKAGE="igraph"),
                 ")")
   }
-  val <- list.vertex.attributes(object)
+  val <- vertex_attr_names(object)
   if (length(val) != 0) {
     va <- paste(sep="", val, " (v/",
                 .Call("R_igraph_get_attr_mode", object, 3L, PACKAGE="igraph"),
                 ")")
   }
-  eal <- list.edge.attributes(object)
+  eal <- edge_attr_names(object)
   if (length(eal) != 0) {
-    ea <- paste(sep="", list.edge.attributes(object), " (e/",
+    ea <- paste(sep="", edge_attr_names(object), " (e/",
                 .Call("R_igraph_get_attr_mode", object, 4L, PACKAGE="igraph"),
                 ")")
   }
@@ -48,18 +48,18 @@
 
 .print.header <- function(object) {
 
-  if (!is.igraph(object)) {
+  if (!is_igraph(object)) {
     stop("Not a graph object")
   }
 
   title <- paste(sep="", "IGRAPH ",
-                 c("U","D")[is.directed(object)+1],
-                 c("-","N")[is.named(object)+1],
-                 c("-","W")[is.weighted(object)+1],
-                 c("-","B")[is.bipartite(object)+1], " ",
+                 c("U","D")[is_directed(object)+1],
+                 c("-","N")[is_named(object)+1],
+                 c("-","W")[is_weighted(object)+1],
+                 c("-","B")[is_bipartite(object)+1], " ",
                  vcount(object), " ", ecount(object), " -- ")
   w <- getOption("width")
-  if (nchar(title) < w && "name" %in% list.graph.attributes(object)) {
+  if (nchar(title) < w && "name" %in% graph_attr_names(object)) {
     title <- substring(paste(sep="", title,
                              as.character(object$name)[1]), 1, w-1)
   }
@@ -74,19 +74,19 @@
 }
 
 .print.graph.attributes <- function(x) {
-  list <- list.graph.attributes(x)
+  list <- graph_attr_names(x)
   if (length(list)!=0) {
     cat("+ graph attributes:\n")
     lapply(list, function(n) {
       cat(sep="", "[[", n, "]]\n")
-      print(get.graph.attribute(x, n))
+      print(graph_attr(x, n))
     })
   }
 }
 
 .print.vertex.attributes <- function(x) {
   vc <- vcount(x)
-  list <- list.vertex.attributes(x)
+  list <- vertex_attr_names(x)
   if (length(list) != 0) {
     cat("+ vertex attributes:\n")
     mp <- getOption("max.print")
@@ -100,13 +100,13 @@
     }
     if (vc==0 ||
         all(sapply(list, function(v)
-                   is.numeric(get.vertex.attribute(x, v)) ||
-                   is.character(get.vertex.attribute(x, v)) ||
-                   is.logical(get.vertex.attribute(x, v))))) {
+                   is.numeric(vertex_attr(x, v)) ||
+                   is.character(vertex_attr(x, v)) ||
+                   is.logical(vertex_attr(x, v))))) {
       ## create a table
       tab <- data.frame(v=paste(sep="", "[", ind, "]"), row.names="v")
       for (i in list) {
-        tab[i] <- get.vertex.attribute(x, i, ind)
+        tab[i] <- vertex_attr(x, i, ind)
       }
       print(tab)
     } else {
@@ -114,7 +114,7 @@
         cat(sep="", "[[", i, "]]\n")
         lapply(list, function(n) {
           cat(sep="", "[[", i, "]][[", n, "]]\n")
-          print(get.vertex.attribute(x, n, i))})
+          print(vertex_attr(x, n, i))})
       }
     }
     options(max.print=mp)
@@ -127,21 +127,21 @@
 
 .print.edges.edgelist <- function(x, names) {
   ec <- ecount(x)
-  list <- list.edge.attributes(x)
+  list <- edge_attr_names(x)
   list <- list[list!="name"]
-  arrow <- ifelse(is.directed(x), "->", "--")
-  if (is.named(x)) {
+  arrow <- ifelse(is_directed(x), "->", "--")
+  if (is_named(x)) {
     cat("+ edges (vertex names) and their attributes:\n")
   } else {
     cat("+ edges and their attributes:\n")
   }
-  if (names && ! "name" %in% list.vertex.attributes(x)) {
+  if (names && ! "name" %in% vertex_attr_names(x)) {
     names <- FALSE
   }
-  if (names && "name" %in% list.vertex.attributes(x) &&
-      !is.numeric(get.vertex.attribute(x, "name")) &&
-      !is.character(get.vertex.attribute(x, "name")) &&
-      !is.logical(get.vertex.attribute(x, "name"))) {
+  if (names && "name" %in% vertex_attr_names(x) &&
+      !is.numeric(vertex_attr(x, "name")) &&
+      !is.character(vertex_attr(x, "name")) &&
+      !is.logical(vertex_attr(x, "name"))) {
     warning("Can't print vertex names, complex `name' vertex attribute")
     names <- FALSE
   }
@@ -149,28 +149,28 @@
   mp <- getOption("max.print")
   if (mp >= ec) {
     omitted.edges <- 0
-    el <- get.edgelist(x, names=names)
+    el <- as_edgelist(x, names=names)
   } else {
     omitted.edges <- ec-mp
     el <- get.edges(x, seq_len(mp))
     if (names) { el[] <- V(x)$name[el] }
   }
-  ename <- if ("name" %in% list.edge.attributes(x)) {
+  ename <- if ("name" %in% edge_attr_names(x)) {
     paste(sep="", "'", E(x)$name, "'")
   } else {
     seq(length=nrow(el))
   }
   if (ec==0 || 
-      all(sapply(list, function(v) is.numeric(get.edge.attribute(x, v)) |
-                 is.character(get.edge.attribute(x,v)) |
-                 is.logical(get.edge.attribute(x, v))))) {
+      all(sapply(list, function(v) is.numeric(edge_attr(x, v)) |
+                 is.character(edge_attr(x,v)) |
+                 is.logical(edge_attr(x, v))))) {
     ## create a table
     tab <- data.frame(row.names=paste(sep="", "[", ename, "]"))
     if (is.numeric(el)) { w <- nchar(max(el)) } else { w <- max(nchar(el)) }
     tab["edge"] <- paste(sep="", format(el[,1], width=w),
                          arrow, format(el[,2], width=w))
     for (i in list) {
-      tab[i] <- get.edge.attribute(x, i)
+      tab[i] <- edge_attr(x, i)
     }
     print(tab)
   } else {
@@ -179,7 +179,7 @@
       cat(sep="", "[", ename[i], "] ", v[1], " ", arrow, " ", v[2]);
       lapply(list, function(n) {
         cat(sep="", "\n[[", i, "]][[", n, "]]\n")
-        print(get.edge.attribute(x, n, i))})
+        print(edge_attr(x, n, i))})
       cat("\n")
       i <<- i+1
     })
@@ -192,9 +192,9 @@
 
 .print.edges.compressed <- function(x, names) {
   ## TODO: getOption("max.print")
-  if (is.named(x)) cat("+ edges (vertex names):\n") else cat("+ edges:\n")
-  el <- get.edgelist(x, names=names)
-  arrow <- c("--", "->")[is.directed(x)+1]
+  if (is_named(x)) cat("+ edges (vertex names):\n") else cat("+ edges:\n")
+  el <- as_edgelist(x, names=names)
+  arrow <- c("--", "->")[is_directed(x)+1]
   edges <- paste(sep="", format(el[,1]), arrow, format(el[,2]))
   print(edges, quote=FALSE)
 }
@@ -203,8 +203,8 @@
   ## TODO: getOption("max.print")
   cat("+ edges:\n")
   vc <- vcount(x)
-  arrow <- c(" -- ", " -> ")[is.directed(x)+1]
-  al <- get.adjlist(x, mode="out")
+  arrow <- c(" -- ", " -> ")[is_directed(x)+1]
+  al <- as_adj_list(x, mode="out")
   w <- nchar(max(which(degree(x, mode="in") != 0)))
   mpl <- trunc((getOption("width")-nchar(arrow)-nchar(vc)) / (w+1))
   if (any(sapply(al, length) > mpl)) {
@@ -242,10 +242,10 @@
   ## TODO getOption("max.print")
   cat("+ edges (vertex names):\n")
 
-  arrow <- c(" -- ", " -> ")[is.directed(x)+1]
+  arrow <- c(" -- ", " -> ")[is_directed(x)+1]
   vn <- V(x)$name
 
-  al <- get.adjlist(x, mode="out")
+  al <- as_adj_list(x, mode="out")
   alstr <- sapply(al, function(x) { paste(collapse=", ", vn[x]) })
   alstr <- paste(sep="", format(vn), arrow, alstr)
   alstr <- strwrap(alstr, exdent=max(nchar(vn))+nchar(arrow))
@@ -319,7 +319,7 @@ str.igraph <- function(object, ...) {
 #' @method print igraph
 #' @examples
 #' 
-#' g <- graph.ring(10)
+#' g <- ring(10)
 #' g
 #' summary(g)
 #' 
@@ -329,7 +329,7 @@ print.igraph <- function(x, full=getIgraphOpt("print.full"),
                 edge.attributes=getIgraphOpt("print.edge.attributes"),
                 names=TRUE, ...) {
   
-  if (!is.igraph(x)) {
+  if (!is_igraph(x)) {
     stop("Not a graph object")
   }
 
@@ -339,11 +339,11 @@ print.igraph <- function(x, full=getIgraphOpt("print.full"),
     if (vertex.attributes) .print.vertex.attributes(x)
     if (ecount(x)==0) {
       ## Do nothing
-    } else if (edge.attributes && length(list.edge.attributes(x)) !=0 ) {
+    } else if (edge.attributes && length(edge_attr_names(x)) !=0 ) {
       .print.edges.edgelist(x, names)
     } else if (median(degree(x, mode="out")) < 3) {
       .print.edges.compressed(x, names)
-    } else if (is.named(x)) {
+    } else if (is_named(x)) {
       .print.edges.adjlist.named(x)
     } else {
       .print.edges.adjlist(x)
@@ -358,18 +358,18 @@ print.igraph <- function(x, full=getIgraphOpt("print.full"),
 
 summary.igraph <- function(object, ...) {
 
-  if (!is.igraph(object)) {
+  if (!is_igraph(object)) {
     stop("Not a graph object")
   }
 
   title <- paste(sep="", "IGRAPH ",
-                 c("U","D")[is.directed(object)+1],
-                 c("-","N")[is.named(object)+1],
-                 c("-","W")[is.weighted(object)+1],
-                 c("-","B")[is.bipartite(object)+1], " ",
+                 c("U","D")[is_directed(object)+1],
+                 c("-","N")[is_named(object)+1],
+                 c("-","W")[is_weighted(object)+1],
+                 c("-","B")[is_bipartite(object)+1], " ",
                  vcount(object), " ", ecount(object), " -- ")
   w <- getOption("width")
-  if (nchar(title) < w && "name" %in% list.graph.attributes(object)) {
+  if (nchar(title) < w && "name" %in% graph_attr_names(object)) {
     title <- substring(paste(sep="", title,
                              as.character(object$name)[1]), 1, w-1)
   }

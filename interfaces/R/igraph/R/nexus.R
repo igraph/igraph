@@ -194,7 +194,7 @@ nexus.format.result <- function(l, name="") {
   res
 }
 
-nexus.list <- function(tags=NULL, offset=0, limit=10,
+nexus_list <- function(tags=NULL, offset=0, limit=10,
                        operator=c("or", "and"),
                        order=c("date", "name", "popularity"),
                        nexus.url=getIgraphOpt("nexus.url")) {
@@ -220,13 +220,13 @@ nexus.list <- function(tags=NULL, offset=0, limit=10,
   nexus.format.result(l, name)
 }
 
-nexus.info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
+nexus_info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
 
   if (inherits(id, "nexusDatasetInfo")) {
     id <- id$id
   } else if (inherits(id, "nexusDatasetInfoList")) {
     rid <- sapply(id, "[[", "id")
-    res <- lapply(rid, nexus.info, nexus.url=nexus.url)
+    res <- lapply(rid, nexus_info, nexus.url=nexus.url)
     class(res) <- class(id)
     attributes(res) <- attributes(id)
     return(res)
@@ -252,7 +252,7 @@ nexus.info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
   return(res)
 }  
 
-nexus.get <- function(id, offset=0,
+nexus_get <- function(id, offset=0,
                       order=c("date", "name", "popularity"),
                       nexus.url=getIgraphOpt("nexus.url")) {
 
@@ -262,7 +262,7 @@ nexus.get <- function(id, offset=0,
     id <- id$id
   } else if (inherits(id, "nexusDatasetInfoList")) {
     id <- sapply(id, "[[", "id")
-    return(lapply(id, nexus.get, nexus.url=nexus.url))
+    return(lapply(id, nexus_get, nexus.url=nexus.url))
   }
   
   u <- paste(sep="", nexus.url, "/api/dataset?id=", id, "&format=R-igraph")
@@ -273,7 +273,7 @@ nexus.get <- function(id, offset=0,
   return(get(ls(env)[1], env))
 }
 
-nexus.search <- function(q, offset=0, limit=10,
+nexus_search <- function(q, offset=0, limit=10,
                          order=c("date", "name", "popularity"),
                          nexus.url=getIgraphOpt("nexus.url")) {
 

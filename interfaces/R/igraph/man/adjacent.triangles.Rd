@@ -1,4 +1,5 @@
 \name{triangles}
+\alias{count_triangles}
 \alias{adjacent.triangles}
 \alias{triangles}
 \title{Find triangles in graphs}
@@ -6,7 +7,7 @@
   or just list the triangles of a graph.}
 \usage{
 triangles (graph)
-adjacent.triangles (graph, vids = V(graph))
+count_triangles (graph, vids = V(graph))
 }
 \arguments{
   \item{graph}{The input graph. It might be directed, but edge
@@ -20,7 +21,7 @@ adjacent.triangles (graph, vids = V(graph))
   triangles are returned in a single vector. The first three vertices
   belong to the first triangle, etc.
   
-  \code{adjacent.triangles} counts how many triangles a vertex is part
+  \code{count_triangles} counts how many triangles a vertex is part
   of.
 }
 \value{
@@ -40,16 +41,16 @@ plot(kite)
 matrix(triangles(kite), nrow=3)
 
 ## Adjacenct triangles
-atri <- adjacent.triangles(kite)
+atri <- count_triangles(kite)
 plot(kite, vertex.label=atri)
 
 ## Always true
-sum(adjacent.triangles(kite)) == length(triangles(kite))
+sum(count_triangles(kite)) == length(triangles(kite))
 
 ## Should match, local transitivity is the
 ## number of adjacent triangles divided by the number
 ## of adjacency triples
 transitivity(kite, type="local")
-adjacent.triangles(kite) / (degree(kite) * (degree(kite)-1)/2)
+count_triangles(kite) / (degree(kite) * (degree(kite)-1)/2)
 }
 \keyword{graphs}

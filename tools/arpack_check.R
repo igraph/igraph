@@ -65,7 +65,7 @@ for (i in 1:10000) {
 
 ## Hard one:
 
-M <- get.adjacency(graph.formula(a-b-c, d-e-f, g-h-i))
+M <- adj(graph.formula(a-b-c, d-e-f, g-h-i))
 res <- arp(M, nev=2, ncv=5)
 w <- which.max(abs(res$values))
 residual(M, res$vectors[,w], res$values[w])
@@ -132,13 +132,13 @@ arp(M, nev=3, ncv=7, sym=FALSE)$values
 ## Components
 
 cc <- function(x) {
-  g1 <- erdos.renyi.game(10, 2/10, directed=TRUE)
-  g2 <- erdos.renyi.game(10, 2/10, directed=TRUE)
+  g1 <- g_np(10, 2/10, directed=TRUE)
+  g2 <- g_np(10, 2/10, directed=TRUE)
   g <- g1 %du% g2
   
-  e1 <- eigen(get.adjacency(g1))$values
-  e2 <- eigen(get.adjacency(g2))$values
-  ee <- eigen(get.adjacency(g))$values
+  e1 <- eigen(adj(g1))$values
+  e2 <- eigen(adj(g2))$values
+  ee <- eigen(adj(g))$values
 
   max(abs(sort(Re(c(e1,e2))) - sort(Re(ee))),
       abs(sort(Im(c(e1,e2))) - sort(Im(ee))))

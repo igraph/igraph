@@ -23,8 +23,8 @@
 # Structure building
 ###################################################################
 
-add.edges <- function(graph, edges, ..., attr=list()) {
-  if (!is.igraph(graph)) {
+add_edges <- function(graph, edges, ..., attr=list()) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -53,8 +53,8 @@ add.edges <- function(graph, edges, ..., attr=list()) {
   .Call("R_igraph_mybracket2_set", graph, 9L, 4L, eattrs, PACKAGE="igraph")
 }
 
-add.vertices <- function(graph, nv, ..., attr=list()) {
-  if (!is.igraph(graph)) {
+add_vertices <- function(graph, nv, ..., attr=list()) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -83,8 +83,8 @@ add.vertices <- function(graph, nv, ..., attr=list()) {
   .Call("R_igraph_mybracket2_set", graph, 9L, 3L, vattrs, PACKAGE="igraph")
 }
 
-delete.edges <- function(graph, edges) {
-  if (!is.igraph(graph)) {
+delete_edges <- function(graph, edges) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -92,8 +92,8 @@ delete.edges <- function(graph, edges) {
         PACKAGE="igraph")
 }
 
-delete.vertices <- function(graph, v) {
-  if (!is.igraph(graph)) {
+delete_vertices <- function(graph, v) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -105,8 +105,8 @@ delete.vertices <- function(graph, v) {
 # Structure query
 ###################################################################
   
-ecount <- function(graph) {
-  if (!is.igraph(graph)) {
+gsize <- function(graph) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -115,7 +115,7 @@ ecount <- function(graph) {
 }
  
 neighbors <- function(graph, v, mode=1) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   if (is.character(mode)) {
@@ -129,10 +129,10 @@ neighbors <- function(graph, v, mode=1) {
 }
 
 incident <- function(graph, v, mode=c("all", "out", "in", "total")) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
-  if (is.directed(graph)) {
+  if (is_directed(graph)) {
     mode <- igraph.match.arg(mode)
     mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
   } else {
@@ -145,8 +145,8 @@ incident <- function(graph, v, mode=c("all", "out", "in", "total")) {
   res+1
 }  
 
-is.directed <- function(graph) {
-  if (!is.igraph(graph)) {
+is_directed <- function(graph) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -155,7 +155,7 @@ is.directed <- function(graph) {
 }
 
 get.edges <- function(graph, es) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -199,7 +199,7 @@ get.edges <- function(graph, es) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.ring(10)
+#' g <- ring(10)
 #' ei <- get.edge.ids(g, c(1,2, 4,5))
 #' E(g)[ei]
 #' 
@@ -207,7 +207,7 @@ get.edges <- function(graph, es) {
 #' get.edge.ids(g, c(2,1, 1,4, 5,4))
 #' 
 get.edge.ids <- function(graph, vp, directed=TRUE, error=FALSE, multi=FALSE) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )

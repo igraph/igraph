@@ -12,7 +12,7 @@
   The functions that support the combination of attributes have one or
   two extra arguments called \code{vertex.attr.comb} and/or
   \code{edge.attr.comb} that specify how to perform the mapping of the
-  attributes. E.g. \code{\link{contract.vertices}} contracts many
+  attributes. E.g. \code{\link{contract}} contracts many
   vertices into a single one, the attributes of the vertices can be
   combined and stores as the vertex attributes of the new graph.
 

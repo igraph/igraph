@@ -1,12 +1,13 @@
-\name{canonical.permutation}
+\name{canonical_permutation}
 \alias{canonical.permutation}
+\alias{canonical_permutation}
 \concept{Canonical permutation}
 \concept{BLISS}
 \title{Canonical permutation of a graph}
 \description{The canonical permutation brings every isomorphic graphs
   into the same (labeled) graph.}
 \usage{
-canonical.permutation(graph, sh="fm")
+canonical_permutation(graph, sh="fm")
 }
 \arguments{
   \item{graph}{The input graph, treated as undirected.}
@@ -14,7 +15,7 @@ canonical.permutation(graph, sh="fm")
     algorithm. See details for possible values.}
 }
 \details{
-  \code{canonical.permutation} computes a permutation which brings the
+  \code{canonical_permutation} computes a permutation which brings the
   graph into canonical form, as defined by the BLISS algorithm.
   All isomorphic graphs have the same canonical form.
 
@@ -64,23 +65,23 @@ canonical.permutation(graph, sh="fm")
 }
 \author{Tommi Junttila for BLISS, Gabor Csardi
   \email{csardi.gabor@gmail.com} for the igraph and R interfaces.}
-\seealso{\code{\link{permute.vertices}} to apply a permutation to a
+\seealso{\code{\link{permute}} to apply a permutation to a
   graph, \code{\link{graph.isomorphic}} for deciding graph isomorphism,
   possibly based on canonical labels.}
 \examples{
 ## Calculate the canonical form of a random graph
-g1 <- erdos.renyi.game(10, 20, type="gnm")
-cp1 <- canonical.permutation(g1)
-cf1 <- permute.vertices(g1, cp1$labeling)
+g1 <- sample_gnm(10, 20)
+cp1 <- canonical_permutation(g1)
+cf1 <- permute(g1, cp1$labeling)
 
 ## Do the same with a random permutation of it
-g2 <- permute.vertices(g1, sample(vcount(g1)))
-cp2 <- canonical.permutation(g2)
-cf2 <- permute.vertices(g2, cp2$labeling)
+g2 <- permute(g1, sample(vcount(g1)))
+cp2 <- canonical_permutation(g2)
+cf2 <- permute(g2, cp2$labeling)
 
 ## Check that they are the same
-el1 <- get.edgelist(cf1)
-el2 <- get.edgelist(cf2)
+el1 <- as_edgelist(cf1)
+el2 <- as_edgelist(cf2)
 el1 <- el1[ order(el1[,1], el1[,2]), ]
 el2 <- el2[ order(el2[,1], el2[,2]), ]
 all(el1 == el2)

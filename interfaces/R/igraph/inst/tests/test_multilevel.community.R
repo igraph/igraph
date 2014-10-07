@@ -1,12 +1,12 @@
 
-context("multilevel.community")
+context("cluster_louvain")
 
-test_that("multilevel.community works", {
+test_that("cluster_louvain works", {
 
   library(igraph)
 
   g <- graph.famous("Zachary")
-  mc <- multilevel.community(g)
+  mc <- cluster_louvain(g)
   
   expect_that(membership(mc),
               equals(c(2, 2, 2, 2, 1, 1, 1, 2, 4, 2, 1, 2, 2, 2, 4, 4,

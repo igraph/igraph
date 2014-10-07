@@ -22,7 +22,7 @@ nullna <- function(x) {
 dofile <- function(mfile) {
   u <- sub("[0-9]+\\.mat", "", mfile)
   M <- readMat(paste(sep="", tmp, "/facebook100/", mfile))
-  g <- graph.adjacency(M[[1]], mode="undirected")
+  g <- g_adj_matrix(M[[1]], mode="undirected")
   V(g)$SFStatus   <- nullna(M[[2]][,1])
   V(g)$Gender     <- nullna(M[[2]][,2])
   V(g)$Major      <- nullna(M[[2]][,3])

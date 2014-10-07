@@ -1,4 +1,5 @@
-\name{static.power.law.game}
+\name{sample_fitness_pl}
+\alias{sample_fitness_pl}
 \alias{static.power.law.game}
 \concept{Random graph model}
 \title{Scale-free random graphs, from vertex fitness scores}
@@ -7,7 +8,7 @@
   power-law degree distributions.
 }
 \usage{
-static.power.law.game (no.of.nodes, no.of.edges, exponent.out,
+sample_fitness_pl (no.of.nodes, no.of.edges, exponent.out,
                        exponent.in = -1, loops = FALSE,
                        multiple = FALSE, finite.size.correction = TRUE) 
 }
@@ -37,14 +38,14 @@ static.power.law.game (no.of.nodes, no.of.edges, exponent.out,
  exponents. For directed graphs, the exponents of the in- and out-degree
  distributions may be specified separately.
 
- The game simply uses \code{\link{static.fitness.game}} with appropriately
+ The game simply uses \code{\link{sample_fitness}} with appropriately
  constructed fitness vectors. In particular, the fitness of vertex
  \eqn{i} is \eqn{i^{-alpha}}{i^(-alpha)}, where \eqn{alpha = 1/(gamma-1)}
  and gamma is the exponent given in the arguments.
 
  To remove correlations between in- and out-degrees in case of directed
  graphs, the in-fitness vector will be shuffled after it has been set up
- and before \code{\link{static.fitness.game}} is called.
+ and before \code{\link{sample_fitness}} is called.
 
  Note that significant finite size effects may be observed for exponents
  smaller than 3 in the original formulation of the game. This function
@@ -70,8 +71,8 @@ static.power.law.game (no.of.nodes, no.of.edges, exponent.out,
 }
 \author{Tamas Nepusz \email{ntamas@gmail.com}}
 \examples{
-g <- static.power.law.game(10000, 30000, 2.2, 2.3)
-\dontrun{plot(degree.distribution(g, cumulative=TRUE, mode="out"), log="xy")}
+g <- sample_fitness_pl(10000, 30000, 2.2, 2.3)
+\dontrun{plot(degree_distribution(g, cumulative=TRUE, mode="out"), log="xy")}
 }
 \keyword{graphs}
  

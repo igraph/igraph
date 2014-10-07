@@ -18,8 +18,8 @@ mat1 <- matrix(mat1, sqrt(length(mat1)), byrow=TRUE)
 mat2 <- matrix(mat2, sqrt(length(mat2)), byrow=TRUE)
 
 library(igraph)
-g1 <- graph.adjacency(mat1, weighted=TRUE, mode="undirected")
-g2 <- graph.adjacency(mat1, weighted=TRUE, mode="directed")
+g1 <- g_adj_matrix(mat1, weighted=TRUE, mode="undirected")
+g2 <- g_adj_matrix(mat1, weighted=TRUE, mode="directed")
 
 g1$name <- "Bernard & Killworth fraternity, BKFRAB"
 g2$name <- "Bernard & Killworth fraternity, BKFRAC"

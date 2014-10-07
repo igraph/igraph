@@ -1,15 +1,17 @@
-\name{page.rank}
+\name{page_rank}
 \alias{page.rank}
+\alias{page_rank}
 \alias{page.rank.old}
+\alias{page_rank_old}
 \concept{Page rank}
 \title{The Page Rank algorithm}
 \description{ Calculates the Google PageRank for the specified
   vertices.}
 \usage{
-page.rank (graph, algo = c("prpack", "arpack", "power"),
+page_rank (graph, algo = c("prpack", "arpack", "power"),
     vids = V(graph), directed = TRUE, damping = 0.85,
     personalized = NULL, weights = NULL, options = NULL) 
-page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000, 
+page_rank_old (graph, vids = V(graph), directed = TRUE, niter = 1000, 
     eps = 0.001, damping = 0.85, old = FALSE) 
 }
 \arguments{
@@ -23,7 +25,7 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
     from igraph version 0.5 until version 0.7. \code{power} uses a
     simple implementation of the power method, this was the default in
     igraph before version 0.5 and is the same as calling
-    \code{page.rank.old}.}
+    \code{page_rank_old}.}
   \item{vids}{The vertices of interest.}
   \item{directed}{Logical, if true directed paths will be considered for
     directed graphs. It is ignored for undirected graphs.}
@@ -64,13 +66,13 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
   Brisbane, Australia, April 1998.  
 
   igraph 0.5 (and later) contains two PageRank calculation
-  implementations. The \code{page.rank} function uses ARPACK to perform
+  implementations. The \code{page_rank} function uses ARPACK to perform
   the calculation, see also \code{\link{arpack}}.
 
-  The \code{page.rank.old} function performs a simple power method, this
+  The \code{page_rank_old} function performs a simple power method, this
   is the implementation that was available under the name
-  \code{page.rank} in pre 0.5 igraph versions. Note that
-  \code{page.rank.old} has an argument called \code{old}. If this
+  \code{page_rank} in pre 0.5 igraph versions. Note that
+  \code{page_rank_old} has an argument called \code{old}. If this
   argument is \code{FALSE} (the default), then the proper PageRank
   algorithm is used, i.e. \eqn{(1-d)/n} is added to the weighted
   PageRank of vertices to calculate the next iteration. If this
@@ -95,7 +97,7 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
   differences between iterations are less than a predefined value. 
 }
 \value{
-  For \code{page.rank} a named list with entries:
+  For \code{page_rank} a named list with entries:
   \item{vector}{A numeric vector with the PageRank scores.}
   \item{value}{The eigenvalue corresponding to the eigenvector with
     the page rank scores. It should be always exactly one.}
@@ -103,7 +105,7 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
     calculation. See \code{\link{arpack}} for details. This entry is
     \code{NULL} if not the ARPACK implementation was used.}
   
-  For \code{page.rank.old} a numeric vector of Page Rank scores.
+  For \code{page_rank_old} a numeric vector of Page Rank scores.
 }
 \references{
   Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
@@ -115,16 +117,16 @@ page.rank.old (graph, vids = V(graph), directed = TRUE, niter = 1000,
 \seealso{Other centrality scores: \code{\link{closeness}},
   \code{\link{betweenness}}, \code{\link{degree}}}
 \examples{
-g <- random.graph.game(20, 5/20, directed=TRUE)
-page.rank(g)$vector
+g <- sample_gnp(20, 5/20, directed=TRUE)
+page_rank(g)$vector
 
-g2 <- graph.star(10)
-page.rank(g2)$vector
+g2 <- star(10)
+page_rank(g2)$vector
 
 # Personalized PageRank
-g3 <- graph.ring(10)
-page.rank(g3)$vector
+g3 <- ring(10)
+page_rank(g3)$vector
 reset <- seq(vcount(g3))
-page.rank(g3, personalized=reset)$vector
+page_rank(g3, personalized=reset)$vector
 }
 \keyword{graphs}

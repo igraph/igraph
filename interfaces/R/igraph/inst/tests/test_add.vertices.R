@@ -1,19 +1,19 @@
 
-context("add.vertices")
+context("add_vertices")
 
-test_that("add.vertices works", {
+test_that("add_vertices works", {
   library(igraph)
-  g <- graph.formula(A-B-C-D-E)
-  g2 <- add.vertices(g, (nv <- 4))
+  g <- graph_from_formula(A-B-C-D-E)
+  g2 <- add_vertices(g, (nv <- 4))
   expect_that(vcount(g2), equals(vcount(g) + nv))
   expect_that(ecount(g2), equals(ecount(g)))
-  expect_that(get.edgelist(g2), equals(get.edgelist(g)))
+  expect_that(as_edgelist(g2), equals(as_edgelist(g)))
 })
 
-test_that("add.vertices handles attributes properly", {
+test_that("add_vertices handles attributes properly", {
   library(igraph)
-  g <- graph.formula(A-B-C-D-E)
-  g3 <- add.vertices(g, (nv <- 3),
+  g <- graph_from_formula(A-B-C-D-E)
+  g3 <- add_vertices(g, (nv <- 3),
                      attr=list(name=(names <- c("F","G","H")),
                        weight=weights <- 1:3))
   expect_that(V(g3)$name, equals(c(V(g)$name, names)))

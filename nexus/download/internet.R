@@ -10,10 +10,10 @@ txt <- readLines(paste(sep="", tmp, "/as-22july06.txt"))
 gml <- paste(sep="", tmp, "/as-22july06.gml")
 
 library(igraph)
-g <- read.graph(gml, format="gml")
+g <- read_graph(gml, format="gml")
 
-g <- remove.vertex.attribute(g, "id")
-g <- remove.vertex.attribute(g, "label")
+g <- delete_vertex_attr(g, "id")
+g <- delete_vertex_attr(g, "label")
 
 g$name <- "Internet at the AS level, July 22, 2006"
 g$Author <- "Mark E. J. Newman"

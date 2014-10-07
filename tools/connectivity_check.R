@@ -6,12 +6,12 @@ library(igraph)
 # Create the graph
 
 g <- simplify(barabasi.game(10, m=5, directed=F))
-g <- simplify(erdos.renyi.game(20, p=6/20, directed=F))
-g <- simplify(graph.union(graph.star(20, mode="undirected"),
-                          erdos.renyi.game(20, p=1/20)))
+g <- simplify(g_np(20, p=6/20, directed=F))
+g <- simplify(union(g_star(20, mode="undirected"),
+                          g_np(20, p=1/20)))
 g <- graph( c(0,1, 0,1, 0,2, 0,2, 1,2, 1,2, 2,3, 2,3, 2,4, 2,4, 3,4),
            direc=FALSE)
-el <- get.edgelist(g)+1
+el <- edgelist(g)+1
 write(t(el), "edgelist.txt", ncol=2)
 
 math.command <- ' <<DiscreteMath`Combinatorica`;
@@ -26,20 +26,20 @@ output <- output[ grep("^Out", output) ]
 output <- sub("^.* ", "", output)
 output <- as.numeric(output)
 
-igraph.output <- c(vertex.connectivity(g), edge.connectivity(g))
+igraph.output <- c(vertex_conn(g), edge_conn(g))
 
 print(output)
 print(igraph.output)
 
 #######################################
 
-g <- erdos.renyi.game(50, p=15/50)
+g <- g_np(50, p=15/50)
 date()
-vertex.connectivity(g)
-edge.connectivity(g)
+vertex_conn(g)
+edge_conn(g)
 date()
 
-el <- get.edgelist(g)+1
+el <- edgelist(g)+1
 write(t(el), "edgelist.txt", ncol=2)
 
 math.command <- ' <<DiscreteMath`Combinatorica`;

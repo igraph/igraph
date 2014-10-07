@@ -56,20 +56,20 @@
 ## vertex.shapes()         - lists all vertex shapes
 ## vertex.shapes(shape)    - returns the clipping and plotting functions
 ##                           for a given vertex shape
-## add.vertex.shape()      - adds a new vertex shape, the clipping and
+## add_shape()             - adds a new vertex shape, the clipping and
 ##                           plotting functions must be given, and
 ##                           optionally the newly introduced plotting
 ##                           parameters. This function can also be used
 ##                           to overwrite a given vertex shape.
 ##
 ## Examples:
-## add.vertex.shapes("image", clip=image.clip, plot=image.plot,
+## add_shape("image", clip=image.clip, plot=image.plot,
 ##                   parameters=list(filename=NA))
 ##
-## add.vertex.shapes("triangle", clip=vertex.shapes("circle")$clip,
+## add_shape("triangle", clip=vertex.shapes("circle")$clip,
 ##                   plot=triangle.plot)
 ##
-## add.vertex.shapes("polygon", clip=vertex.shapes("circle")$clip,
+## add_shape("polygon", clip=vertex.shapes("circle")$clip,
 ##                   plot=polygon.plot)
 ##
 ###################################################################
@@ -100,9 +100,9 @@ igraph.shape.noplot <- function(coords, v=NULL, params) {
   invisible(NULL)
 }
 
-add.vertex.shape <- function(shape, clip=igraph.shape.noclip,
-                             plot=igraph.shape.noplot,
-                             parameters=list()) {
+add_shape <- function(shape, clip=igraph.shape.noclip,
+                      plot=igraph.shape.noplot,
+                      parameters=list()) {
 
   ## TODO
   ## checkScalarString(shape)

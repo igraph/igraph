@@ -19,13 +19,101 @@
 #
 ###################################################################
 
-ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
+#' Generate scale-free graphs according to the Barabasi-Albert model
+#' 
+#' The BA-model is a very simple stochastic algorithm for building a graph.
+#' 
+#' This is a simple stochastic algorithm to generate a graph. It is a discrete
+#' time step model and in each time step a single vertex is added.
+#' 
+#' We start with a single vertex and no edges in the first time step. Then we
+#' add one vertex in each time step and the new vertex initiates some edges to
+#' old vertices. The probability that an old vertex is chosen is given by
+#' \deqn{P[i] \sim k_i^\alpha+a}{P[i] ~ k[i]^alpha + a} where \eqn{k_i}{k[i]}
+#' is the in-degree of vertex \eqn{i} in the current time step (more precisely
+#' the number of adjacent edges of \eqn{i} which were not initiated by \eqn{i}
+#' itself) and \eqn{\alpha}{alpha} and \eqn{a} are parameters given by the
+#' \code{power} and \code{zero.appeal} arguments.
+#' 
+#' The number of edges initiated in a time step is given by the \code{m},
+#' \code{out.dist} and \code{out.seq} arguments. If \code{out.seq} is given and
+#' not NULL then it gives the number of edges to add in a vector, the first
+#' element is ignored, the second is the number of edges to add in the second
+#' time step and so on. If \code{out.seq} is not given or null and
+#' \code{out.dist} is given and not NULL then it is used as a discrete
+#' distribution to generate the number of edges in each time step. Its first
+#' element is the probability that no edges will be added, the second is the
+#' probability that one edge is added, etc. (\code{out.dist} does not need to
+#' sum up to one, it normalized automatically.) \code{out.dist} should contain
+#' non-negative numbers and at east one element should be positive.
+#' 
+#' If both \code{out.seq} and \code{out.dist} are omitted or NULL then \code{m}
+#' will be used, it should be a positive integer constant and \code{m} edges
+#' will be added in each time step.
+#' 
+#' \code{sample_pa} generates a directed graph by default, set
+#' \code{directed} to \code{FALSE} to generate an undirected graph. Note that
+#' even if an undirected graph is generated \eqn{k_i}{k[i]} denotes the number
+#' of adjacent edges not initiated by the vertex itself and not the total (in-
+#' + out-) degree of the vertex, unless the \code{out.pref} argument is set to
+#' \code{TRUE}.
+#' 
+#' @aliases sample_pa barabasi.game ba.game
+#' @param n Number of vertices.
+#' @param power The power of the preferential attachment, the default is one,
+#' ie. linear preferential attachment.
+#' @param m Numeric constant, the number of edges to add in each time step This
+#' argument is only used if both \code{out.dist} and \code{out.seq} are omitted
+#' or NULL.
+#' @param out.dist Numeric vector, the distribution of the number of edges to
+#' add in each time step. This argument is only used if the \code{out.seq}
+#' argument is omitted or NULL.
+#' @param out.seq Numeric vector giving the number of edges to add in each time
+#' step. Its first element is ignored as no edges are added in the first time
+#' step.
+#' @param out.pref Logical, if true the total degree is used for calculating
+#' the citation probability, otherwise the in-degree is used.
+#' @param zero.appeal The \sQuote{attractiveness} of the vertices with no
+#' adjacent edges. See details below.
+#' @param directed Whether to create a directed graph.
+#' @param algorithm The algorithm to use for the graph generation.
+#' \code{psumtree} uses a partial prefix-sum tree to generate the graph, this
+#' algorithm can handle any \code{power} and \code{zero.appeal} values and
+#' never generates multiple edges.  \code{psumtree-multiple} also uses a
+#' partial prefix-sum tree, but the generation of multiple edges is allowed.
+#' Before the 0.6 version igraph used this algorithm if \code{power} was not
+#' one, or \code{zero.appeal} was not one.  \code{bag} is the algorithm that
+#' was previously (before version 0.6) used if \code{power} was one and
+#' \code{zero.appeal} was one as well. It works by putting the ids of the
+#' vertices into a bag (mutliset, really), exactly as many times as their
+#' (in-)degree, plus once more. Then the required number of cited vertices are
+#' drawn from the bag, with replacement. This method might generate multiple
+#' edges. It only works if \code{power} and \code{zero.appeal} are equal one.
+#' @param start.graph \code{NULL} or an igraph graph. If a graph, then the
+#' supplied graph is used as a starting graph for the preferential attachment
+#' algorithm. The graph should have at least one vertex. If a graph is supplied
+#' here and the \code{out.seq} argument is not \code{NULL}, then it should
+#' contain the out degrees of the new vertices only, not the ones in the
+#' \code{start.graph}.
+#' @return A graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{sample_gnp}}
+#' @references Barabasi, A.-L. and Albert R. 1999. Emergence of scaling in
+#' random networks \emph{Science}, 286 509--512.
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- sample_pa(10000)
+#' degree_distribution(g)
+#' 
+
+sample_pa <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
                     out.pref=FALSE, zero.appeal=1,
                     directed=TRUE, algorithm=c("psumtree",
                                      "psumtree-multiple", "bag"),
                     start.graph=NULL) {
 
-  if (!is.null(start.graph) && !is.igraph(start.graph)) {
+  if (!is.null(start.graph) && !is_igraph(start.graph)) {
     stop("`start.graph' not an `igraph' object")
   }
   
@@ -87,97 +175,95 @@ ba.game <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
   res
 }
 
-
-
-#' Generate scale-free graphs according to the Barabasi-Albert model
+#' Generate random graphs according to the G(n,p) Erdos-Renyi model
 #' 
-#' The BA-model is a very simple stochastic algorithm for building a graph.
+#' This model is very simple, every possible edge is created with the same
+#' constant probability.
 #' 
-#' This is a simple stochastic algorithm to generate a graph. It is a discrete
-#' time step model and in each time step a single vertex is added.
+#'
+#' The graph has \sQuote{n} vertices and for each edge the
+#' probability that it is present in the graph is \sQuote{p}.
 #' 
-#' We start with a single vertex and no edges in the first time step. Then we
-#' add one vertex in each time step and the new vertex initiates some edges to
-#' old vertices. The probability that an old vertex is chosen is given by
-#' \deqn{P[i] \sim k_i^\alpha+a}{P[i] ~ k[i]^alpha + a} where \eqn{k_i}{k[i]}
-#' is the in-degree of vertex \eqn{i} in the current time step (more precisely
-#' the number of adjacent edges of \eqn{i} which were not initiated by \eqn{i}
-#' itself) and \eqn{\alpha}{alpha} and \eqn{a} are parameters given by the
-#' \code{power} and \code{zero.appeal} arguments.
-#' 
-#' The number of edges initiated in a time step is given by the \code{m},
-#' \code{out.dist} and \code{out.seq} arguments. If \code{out.seq} is given and
-#' not NULL then it gives the number of edges to add in a vector, the first
-#' element is ignored, the second is the number of edges to add in the second
-#' time step and so on. If \code{out.seq} is not given or null and
-#' \code{out.dist} is given and not NULL then it is used as a discrete
-#' distribution to generate the number of edges in each time step. Its first
-#' element is the probability that no edges will be added, the second is the
-#' probability that one edge is added, etc. (\code{out.dist} does not need to
-#' sum up to one, it normalized automatically.) \code{out.dist} should contain
-#' non-negative numbers and at east one element should be positive.
-#' 
-#' If both \code{out.seq} and \code{out.dist} are omitted or NULL then \code{m}
-#' will be used, it should be a positive integer constant and \code{m} edges
-#' will be added in each time step.
-#' 
-#' \code{barabasi.game} generates a directed graph by default, set
-#' \code{directed} to \code{FALSE} to generate an undirected graph. Note that
-#' even if an undirected graph is generated \eqn{k_i}{k[i]} denotes the number
-#' of adjacent edges not initiated by the vertex itself and not the total (in-
-#' + out-) degree of the vertex, unless the \code{out.pref} argument is set to
-#' \code{TRUE}.
-#' 
-#' @aliases barabasi.game ba.game
-#' @param n Number of vertices.
-#' @param power The power of the preferential attachment, the default is one,
-#' ie. linear preferential attachment.
-#' @param m Numeric constant, the number of edges to add in each time step This
-#' argument is only used if both \code{out.dist} and \code{out.seq} are omitted
-#' or NULL.
-#' @param out.dist Numeric vector, the distribution of the number of edges to
-#' add in each time step. This argument is only used if the \code{out.seq}
-#' argument is omitted or NULL.
-#' @param out.seq Numeric vector giving the number of edges to add in each time
-#' step. Its first element is ignored as no edges are added in the first time
-#' step.
-#' @param out.pref Logical, if true the total degree is used for calculating
-#' the citation probability, otherwise the in-degree is used.
-#' @param zero.appeal The \sQuote{attractiveness} of the vertices with no
-#' adjacent edges. See details below.
-#' @param directed Whether to create a directed graph.
-#' @param algorithm The algorithm to use for the graph generation.
-#' \code{psumtree} uses a partial prefix-sum tree to generate the graph, this
-#' algorithm can handle any \code{power} and \code{zero.appeal} values and
-#' never generates multiple edges.  \code{psumtree-multiple} also uses a
-#' partial prefix-sum tree, but the generation of multiple edges is allowed.
-#' Before the 0.6 version igraph used this algorithm if \code{power} was not
-#' one, or \code{zero.appeal} was not one.  \code{bag} is the algorithm that
-#' was previously (before version 0.6) used if \code{power} was one and
-#' \code{zero.appeal} was one as well. It works by putting the ids of the
-#' vertices into a bag (mutliset, really), exactly as many times as their
-#' (in-)degree, plus once more. Then the required number of cited vertices are
-#' drawn from the bag, with replacement. This method might generate multiple
-#' edges. It only works if \code{power} and \code{zero.appeal} are equal one.
-#' @param start.graph \code{NULL} or an igraph graph. If a graph, then the
-#' supplied graph is used as a starting graph for the preferential attachment
-#' algorithm. The graph should have at least one vertex. If a graph is supplied
-#' here and the \code{out.seq} argument is not \code{NULL}, then it should
-#' contain the out degrees of the new vertices only, not the ones in the
-#' \code{start.graph}.
+#' @param n The number of vertices in the graph.
+#' @param p The probability for drawing an edge between two
+#'   arbitrary vertices (G(n,p) graph).
+#' @param directed Logical, whether the graph will be directed, defaults to
+#'   FALSE.
+#' @param loops Logical, whether to add loop edges, defaults to FALSE.
 #' @return A graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{random.graph.game}}
-#' @references Barabasi, A.-L. and Albert R. 1999. Emergence of scaling in
-#' random networks \emph{Science}, 286 509--512.
+#' @seealso \code{\link{sample_gnm}}, \code{\link{sample_pa}}
+#' @references Erdos, P. and Renyi, A., On random graphs, \emph{Publicationes
+#' Mathematicae} 6, 290--297 (1959).
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- barabasi.game(10000)
-#' degree.distribution(g)
-#' 
-barabasi.game <- ba.game
+#' g <- sample_gnp(1000, 1/1000)
+#' degree_distribution(g)
 
+sample_gnp <- function(n, p, directed = FALSE, loops = FALSE) {
+
+  type <- "gnp"
+  type1 <- switch(type, "gnp"=0, "gnm"=1)
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  res <- .Call("R_igraph_erdos_renyi_game", as.numeric(n), as.numeric(type1),
+               as.numeric(p), as.logical(directed), as.logical(loops),
+               PACKAGE="igraph")
+
+  if (getIgraphOpt("add.params")) {
+    res$name <- sprintf("Erdos renyi (%s) graph", type)
+    res$type <- type
+    res$loops <- loops
+    res$p <- p
+  }
+  res
+}
+
+#' Generate random graphs according to the G(n,m) Erdos-Renyi model
+#' 
+#' This model is very simple, every possible edge is created with the same
+#' constant probability.
+#' 
+#' The graph has \sQuote{n} vertices and \sQuote{m} edges,
+#' and the \sQuote{m} edges are chosen uniformly randomly from the set of all
+#' possible edges. This set includes loop edges as well if the \code{loops}
+#' parameter is TRUE.
+#' 
+#' @param n The number of vertices in the graph.
+#' @param m The number of edges in the graph.
+#' @param directed Logical, whether the graph will be directed, defaults to
+#' FALSE.
+#' @param loops Logical, whether to add loop edges, defaults to FALSE.
+#' @return A graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{sample_gnp}}, \code{\link{sample_pa}}
+#' @references Erdos, P. and Renyi, A., On random graphs, \emph{Publicationes
+#' Mathematicae} 6, 290--297 (1959).
+#' @keywords graphs
+#' @examples
+#' 
+#' g <- sample_gnm(1000, 1000)
+#' degree_distribution(g)
+
+sample_gnm <- function(n, m, directed = FALSE, loops = FALSE) {
+
+  type <- "gnm"
+  type1 <- switch(type, "gnp"=0, "gnm"=1)
+  
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  res <- .Call("R_igraph_erdos_renyi_game", as.numeric(n), as.numeric(type1),
+               as.numeric(m), as.logical(directed), as.logical(loops),
+               PACKAGE="igraph")
+
+  if (getIgraphOpt("add.params")) {
+    res$name <- sprintf("Erdos renyi (%s) graph", type)
+    res$type <- type
+    res$loops <- loops
+    res$m <- m
+  }
+  res
+}
 
 
 #' Generate random graphs according to the Erdos-Renyi model
@@ -194,6 +280,12 @@ barabasi.game <- ba.game
 #' parameter is TRUE.
 #' 
 #' \code{random.graph.game} is an alias to this function.
+#'
+#' @section Deprecated:
+#'
+#' Since igraph version 0.8.0, both \code{erdos.renyi.game} and
+#' \code{random.graph.game} are deprecated, and \code{\link{sample_gnp}} and
+#' \code{\link{sample_gnm}} should be used instead.
 #' 
 #' @aliases erdos.renyi.game random.graph.game
 #' @param n The number of vertices in the graph.
@@ -208,18 +300,18 @@ barabasi.game <- ba.game
 #' @param \dots Additional arguments, ignored.
 #' @return A graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{barabasi.game}}
+#' @seealso \code{\link{sample_pa}}
 #' @references Erdos, P. and Renyi, A., On random graphs, \emph{Publicationes
 #' Mathematicae} 6, 290--297 (1959).
 #' @keywords graphs
 #' @examples
 #' 
 #' g <- erdos.renyi.game(1000, 1/1000)
-#' degree.distribution(g)
+#' degree_distribution(g)
 #' 
 erdos.renyi.game <- function(n, p.or.m, type=c("gnp", "gnm"),
                              directed=FALSE, loops=FALSE, ...) {
-  
+
   type <- igraph.match.arg(type)
   type1 <- switch(type, "gnp"=0, "gnm"=1)
 
@@ -245,7 +337,7 @@ random.graph.game <- erdos.renyi.game
 #' Generate random graphs with a given degree sequence
 #' 
 #' It is often useful to create a graph with given vertex degrees. This is
-#' exactly what \code{degree.sequence.game} does.
+#' exactly what \code{sample_degseq} does.
 #' 
 #' The \dQuote{simple} method connects the out-stubs of the edges (undirected
 #' graphs) or the out-stubs and in-stubs (directed graphs) together. This way
@@ -272,7 +364,8 @@ random.graph.game <- erdos.renyi.game
 #' algorithm is used to randomize the graph. The \dQuote{vl} samples from the
 #' undirected, connected simple graphs unformly. See
 #' \url{http://www-rp.lip6.fr/~latapy/FV/generation.html} for details.
-#' 
+#'
+#' @aliases degree.sequence.game
 #' @param out.deg Numeric vector, the sequence of degrees (for undirected
 #' graphs) or out-degrees (for directed graphs). For undirected graphs its sum
 #' should be even. For directed graphs its sum should be the same as the sum of
@@ -285,39 +378,39 @@ random.graph.game <- erdos.renyi.game
 #' @param \dots Additional arguments, these are used as graph attributes.
 #' @return The new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{erdos.renyi.game}}, \code{\link{barabasi.game}},
+#' @seealso \code{\link{sample_gnp}}, \code{\link{sample_pa}},
 #' \code{\link{simplify}} to get rid of the multiple and/or loops edges.
 #' @keywords graphs
 #' @examples
 #' 
 #' ## The simple generator
-#' g <- degree.sequence.game(rep(2,100))
+#' g <- sample_degseq(rep(2,100))
 #' degree(g)
-#' is.simple(g)   # sometimes TRUE, but can be FALSE
-#' g2 <- degree.sequence.game(1:10, 10:1)
+#' is_simple(g)   # sometimes TRUE, but can be FALSE
+#' g2 <- sample_degseq(1:10, 10:1)
 #' degree(g2, mode="out")
 #' degree(g2, mode="in")
 #' 
 #' ## The vl generator
-#' g3 <- degree.sequence.game(rep(2,100), method="vl")
+#' g3 <- sample_degseq(rep(2,100), method="vl")
 #' degree(g3)
-#' is.simple(g3)  # always TRUE
+#' is_simple(g3)  # always TRUE
 #' 
 #' ## Exponential degree distribution
 #' ## Note, that we correct the degree sequence if its sum is odd
 #' degs <- sample(1:100, 100, replace=TRUE, prob=exp(-0.5*(1:100)))
 #' if (sum(degs) %% 2 != 0) { degs[1] <- degs[1] + 1 }
-#' g4 <- degree.sequence.game(degs, method="vl")
+#' g4 <- sample_degseq(degs, method="vl")
 #' all(degree(g4) == degs)
 #' 
 #' ## Power-law degree distribution
 #' ## Note, that we correct the degree sequence if its sum is odd
 #' degs <- sample(1:100, 100, replace=TRUE, prob=(1:100)^-2)
 #' if (sum(degs) %% 2 != 0) { degs[1] <- degs[1] + 1 }
-#' g5 <- degree.sequence.game(degs, method="vl")
+#' g5 <- sample_degseq(degs, method="vl")
 #' all(degree(g5) == degs)
 #' 
-degree.sequence.game <- function(out.deg, in.deg=NULL,
+sample_degseq <- function(out.deg, in.deg=NULL,
                                  method=c("simple", "vl",
                                    "simple.no.multiple"),
                                  ...) {
@@ -337,8 +430,6 @@ degree.sequence.game <- function(out.deg, in.deg=NULL,
   res
 }
 
-
-
 #' Growing random graph generation
 #' 
 #' This function creates a random graph by simulating its stochastic evolution.
@@ -348,7 +439,8 @@ degree.sequence.game <- function(out.deg, in.deg=NULL,
 #' \code{FALSE} these edges are connecting two uniformly randomly chosen
 #' vertices, otherwise the edges are connecting new vertex to uniformly
 #' randomly chosen old vertices.
-#' 
+#'
+#' @aliases growing.random.game
 #' @param n Numeric constant, number of vertices in the graph.
 #' @param m Numeric constant, number of edges added in each time step.
 #' @param directed Logical, whether to create a directed graph.
@@ -356,14 +448,14 @@ degree.sequence.game <- function(out.deg, in.deg=NULL,
 #' each time step the added edges are originating from the new vertex.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{barabasi.game}}, \code{\link{erdos.renyi.game}}
+#' @seealso \code{\link{sample_pa}}, \code{\link{sample_gnp}}
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- growing.random.game(500, citation=FALSE)
-#' g2 <- growing.random.game(500, citation=TRUE)
+#' g <- sample_growing(500, citation=FALSE)
+#' g2 <- sample_growing(500, citation=TRUE)
 #' 
-growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
+sample_growing <- function(n, m=1, directed=TRUE, citation=FALSE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_growing_random_game", as.numeric(n), as.numeric(m),
                as.logical(directed), as.logical(citation),
@@ -430,7 +522,7 @@ growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
 #' 
 #' This function might generate graphs with multiple edges.
 #' 
-#' @aliases aging.prefatt.game aging.barabasi.game aging.ba.game
+#' @aliases sample_pa_age aging.prefatt.game aging.barabasi.game aging.ba.game
 #' @param n The number of vertices in the graph.
 #' @param pa.exp The preferantial attachment exponent, see the details below.
 #' @param aging.exp The exponent of the aging, usually a non-positive number,
@@ -462,19 +554,19 @@ growing.random.game <- function(n, m=1, directed=TRUE, citation=FALSE) {
 #' attachment. See also details below.
 #' @return A new graph.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{barabasi.game}}, \code{\link{erdos.renyi.game}}
+#' @seealso \code{\link{sample_pa}}, \code{\link{sample_gnp}}
 #' @keywords graphs
 #' @examples
 #' 
 #' # The maximum degree for graph with different aging exponents
-#' g1 <- aging.prefatt.game(10000, pa.exp=1, aging.exp=0, aging.bin=1000)
-#' g2 <- aging.prefatt.game(10000, pa.exp=1, aging.exp=-1,   aging.bin=1000)
-#' g3 <- aging.prefatt.game(10000, pa.exp=1, aging.exp=-3,   aging.bin=1000)
+#' g1 <- sample_pa_age(10000, pa.exp=1, aging.exp=0, aging.bin=1000)
+#' g2 <- sample_pa_age(10000, pa.exp=1, aging.exp=-1,   aging.bin=1000)
+#' g3 <- sample_pa_age(10000, pa.exp=1, aging.exp=-3,   aging.bin=1000)
 #' max(degree(g1))
 #' max(degree(g2))
 #' max(degree(g3))
-#' 
-aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
+
+sample_pa_age <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
                                out.dist=NULL, out.seq=NULL,
                                out.pref=FALSE, directed=TRUE,
                                zero.deg.appeal=1, zero.age.appeal=0,
@@ -565,9 +657,7 @@ aging.prefatt.game <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
   res
 }
 
-aging.barabasi.game <- aging.ba.game <- aging.prefatt.game
-
-callaway.traits.game <- function(nodes, types, edge.per.step=1,
+sample_traits_callaway <- function(nodes, types, edge.per.step=1,
                                  type.dist=rep(1, types),
                                  pref.matrix=matrix(1, types, types),
                                  directed=FALSE) {
@@ -589,7 +679,7 @@ callaway.traits.game <- function(nodes, types, edge.per.step=1,
   res
 }
 
-establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
+sample_traits <- function(nodes, types, k=1, type.dist=rep(1, types),
                                pref.matrix=matrix(1, types, types),
                                directed=FALSE) {
 
@@ -609,8 +699,6 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
   res
 }
 
-
-
 #' Geometric random graphs
 #' 
 #' Generate a random graph based on the distance of random point on a unit
@@ -621,7 +709,8 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
 #' connected with an undirected edge if they are closer to each other in
 #' Euclidean norm than a given radius. If the \code{torus} argument is
 #' \code{TRUE} then a unit area torus is used instead of a square.
-#' 
+#'
+#' @aliases grg.game
 #' @param nodes The number of vertices in the graph.
 #' @param radius The radius within which the vertices will be connected by an
 #' edge.
@@ -632,14 +721,14 @@ establishment.game <- function(nodes, types, k=1, type.dist=rep(1, types),
 #' attributes \sQuote{\code{x}} and \sQuote{\code{y}}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}, first version was
 #' written by Keith Briggs (\url{http://keithbriggs.info/}).
-#' @seealso \code{\link{random.graph.game}}
+#' @seealso \code{\link{sample_gnp}}
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- grg.game(1000, 0.05, torus=FALSE)
-#' g2 <- grg.game(1000, 0.05, torus=TRUE)
+#' g <- sample_grg(1000, 0.05, torus=FALSE)
+#' g2 <- sample_grg(1000, 0.05, torus=TRUE)
 #' 
-grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE) {
+sample_grg <- function(nodes, radius, torus=FALSE, coords=FALSE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_grg_game", as.double(nodes), as.double(radius),
                as.logical(torus), as.logical(coords),
@@ -663,20 +752,20 @@ grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE) {
 #' Generation of random graphs based on different vertex types.
 #' 
 #' Both models generate random graphs with given vertex types. For
-#' \code{preference.game} the probability that two vertices will be connected
+#' \code{sample_pref} the probability that two vertices will be connected
 #' depends on their type and is given by the \sQuote{pref.matrix} argument.
 #' This matrix should be symmetric to make sense but this is not checked. The
 #' distribution of the different vertes types is given by the
 #' \sQuote{type.dist} vector.
 #' 
-#' For \code{asymmetric.preference.game} each vertex has an in-type and an
+#' For \code{sample_asym_pref} each vertex has an in-type and an
 #' out-type and a directed graph is created. The probability that a directed
 #' edge is realized from a vertex with a given out-type to a vertex with a
 #' given in-type is given in the \sQuote{pref.matrix} argument, which can be
 #' asymmetric. The joint distribution for the in- and out-types is given in the
 #' \sQuote{type.dist.matrix} argument.
 #' 
-#' @aliases preference.game asymmetric.preference.game
+#' @aliases sample_pref sample_asym_pref preference.game asymmetric.preference.game
 #' @param nodes The number of vertices in the graphs.
 #' @param types The number of different vertex types.
 #' @param type.dist The distribution of the vertex types, a numeric vector of
@@ -694,20 +783,20 @@ grg.game <- function(nodes, radius, torus=FALSE, coords=FALSE) {
 #' @return An igraph graph.
 #' @author Tamas Nepusz \email{ntamas@@gmail.com} and Gabor Csardi
 #' \email{csardi.gabor@@gmail.com} for the R interface
-#' @seealso \code{\link{establishment.game}}.
-#' \code{\link{callaway.traits.game}}
+#' @seealso \code{\link{sample_traits}}.
+#' \code{\link{sample_traits_callaway}}
 #' @keywords graphs
 #' @examples
 #' 
 #' pf <- matrix( c(1, 0, 0, 1), nr=2)
-#' g <- preference.game(20, 2, pref.matrix=pf)
-#' \dontrun{tkplot(g, layout=layout.fruchterman.reingold)}
+#' g <- sample_pref(20, 2, pref.matrix=pf)
+#' \dontrun{tkplot(g, layout=layout_with_fr)}
 #' 
 #' pf <- matrix( c(0, 1, 0, 0), nr=2)
-#' g <- asymmetric.preference.game(20, 2, pref.matrix=pf)
-#' \dontrun{tkplot(g, layout=layout.circle)}
+#' g <- sample_asym_pref(20, 2, pref.matrix=pf)
+#' \dontrun{tkplot(g, layout=layout_in_circle)}
 #' 
-preference.game <- function(nodes, types, type.dist=rep(1, types),
+sample_pref <- function(nodes, types, type.dist=rep(1, types),
                             fixed.sizes=FALSE,
                             pref.matrix=matrix(1, types, types),
                             directed=FALSE, loops=FALSE) {
@@ -735,12 +824,12 @@ preference.game <- function(nodes, types, type.dist=rep(1, types),
   res[[1]]
 }
 
-#' @rdname preference.game
+#' @rdname sample_pref
 
-asymmetric.preference.game <- function(nodes, types,
-                                  type.dist.matrix=matrix(1, types,types),
-                                  pref.matrix=matrix(1, types, types),
-                                  loops=FALSE) {
+sample_asym_pref <- function(nodes, types,
+                        type.dist.matrix=matrix(1, types,types),
+                        pref.matrix=matrix(1, types, types),
+                        loops=FALSE) {
   
   if (nrow(pref.matrix) != types || ncol(pref.matrix) != types) {
     stop("Invalid size for preference matrix")
@@ -765,8 +854,8 @@ asymmetric.preference.game <- function(nodes, types,
   }
 }
 
-connect.neighborhood <- function(graph, order, mode=c("all", "out", "in", "total")) {
-  if (!is.igraph(graph)) {
+connect <- function(graph, order, mode=c("all", "out", "in", "total")) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)
@@ -799,13 +888,13 @@ connect.neighborhood <- function(graph, order, mode=c("all", "out", "in", "total
 #' @examples
 #' 
 #' # Some random shortcuts shorten the distances on a lattice
-#' g <- graph.lattice( length=100, dim=1, nei=5 )
-#' average.path.length(g)
+#' g <- lattice( length=100, dim=1, nei=5 )
+#' mean_distance(g)
 #' g <- rewire.edges( g, prob=0.05 )
-#' average.path.length(g)
+#' mean_distance(g)
 #' 
 rewire.edges <- function(graph, prob, loops=FALSE, multiple=FALSE) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -826,7 +915,8 @@ rewire.edges <- function(graph, prob, loops=FALSE, multiple=FALSE) {
 #' 
 #' Note that this function might create graphs with loops and/or multiple
 #' edges. You can use \code{\link{simplify}} to get rid of these.
-#' 
+#'
+#' @aliases watts.strogatz.game
 #' @param dim Integer constant, the dimension of the starting lattice.
 #' @param size Integer constant, the size of the lattice along each dimension.
 #' @param nei Integer constant, the neighborhood within which the vertices of
@@ -838,17 +928,17 @@ rewire.edges <- function(graph, prob, loops=FALSE, multiple=FALSE) {
 #' generated graph.
 #' @return A graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{graph.lattice}}, \code{\link{rewire.edges}}
+#' @seealso \code{\link{lattice}}, \code{\link{rewire.edges}}
 #' @references Duncan J Watts and Steven H Strogatz: Collective dynamics of
 #' \sQuote{small world} networks, Nature 393, 440-442, 1998.
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- watts.strogatz.game(1, 100, 5, 0.05)
-#' average.path.length(g)
+#' g <- sample_smallworld(1, 100, 5, 0.05)
+#' mean_distance(g)
 #' transitivity(g, type="average")
 #' 
-watts.strogatz.game <- function(dim, size, nei, p, loops=FALSE,
+sample_smallworld <- function(dim, size, nei, p, loops=FALSE,
                                 multiple=FALSE) {
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -868,8 +958,8 @@ watts.strogatz.game <- function(dim, size, nei, p, loops=FALSE,
   res
 }
 
-lastcit.game <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
-                         directed=TRUE) {
+sample_last_cit <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
+                       directed=TRUE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_lastcit_game", as.numeric(n), as.numeric(edges),
                as.numeric(agebins),
@@ -883,7 +973,7 @@ lastcit.game <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
   res
 }
 
-cited.type.game <- function(n, edges=1, types=rep(0, n),
+sample_cit_types <- function(n, edges=1, types=rep(0, n),
                             pref=rep(1, length(types)),
                             directed=TRUE, attr=TRUE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -900,7 +990,7 @@ cited.type.game <- function(n, edges=1, types=rep(0, n),
   res
 }
 
-citing.cited.type.game <- function(n, edges=1, types=rep(0, n),
+sample_cit_cit_types <- function(n, edges=1, types=rep(0, n),
                                    pref=matrix(1, nrow=length(types),
                                      ncol=length(types)),
                                    directed=TRUE, attr=TRUE) {
@@ -921,21 +1011,6 @@ citing.cited.type.game <- function(n, edges=1, types=rep(0, n),
 }
 
 
-simple.interconnected.islands.game <- function(islands.n, islands.size, islands.pin, n.inter) {
-  
-
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call(	"R_igraph_simple_interconnected_islands_game", 
-		as.numeric(islands.n), 
-		as.numeric(islands.size),
-        	as.numeric(islands.pin), 
-		as.numeric(n.inter),
-        	PACKAGE="igraph")
-}
-
-
-
-
 #' Bipartite random graphs
 #' 
 #' Generate bipartite graphs using the Erdos-Renyi model
@@ -945,7 +1020,8 @@ simple.interconnected.islands.game <- function(islands.n, islands.size, islands.
 #' In $G(n,p)$ every possible edge between top and bottom vertices is realized
 #' with probablity $p$, independently of the rest of the edges. In $G(n,m)$, we
 #' uniformly choose $m$ edges to realize.
-#' 
+#'
+#' @aliases bipartite.random.game
 #' @param n1 Integer scalar, the number of bottom vertices.
 #' @param n2 Integer scalar, the number of top vertices.
 #' @param type Character scalar, the type of the graph, \sQuote{gnp} creates a
@@ -965,25 +1041,24 @@ simple.interconnected.islands.game <- function(islands.n, islands.size, islands.
 #' is ignored for undirected graphs.
 #' @return A bipartite igraph graph.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{erdos.renyi.game}} for the unipartite version.
+#' @seealso \code{\link{sample_gnp}} for the unipartite version.
 #' @keywords graphs
 #' @examples
 #' 
 #' ## empty graph
-#' bipartite.random.game(10, 5, p=0)
+#' sample_bipartite(10, 5, p=0)
 #' 
 #' ## full graph
-#' bipartite.random.game(10, 5, p=1)
+#' sample_bipartite(10, 5, p=1)
 #' 
 #' ## random bipartite graph
-#' bipartite.random.game(10, 5, p=.1)
+#' sample_bipartite(10, 5, p=.1)
 #' 
 #' ## directed bipartite graph, G(n,m)
-#' bipartite.random.game(10, 5, type="Gnm", m=20, directed=TRUE, mode="all")
+#' sample_bipartite(10, 5, type="Gnm", m=20, directed=TRUE, mode="all")
 #' 
-bipartite.random.game <- function(n1, n2, type=c("gnp", "gnm"), p, m,
-                                  directed=FALSE, mode=c("out", "in",
-                                                    "all")) {
+sample_bipartite <- function(n1, n2, type=c("gnp", "gnm"), p, m,
+                     directed=FALSE, mode=c("out", "in", "all")) {
   
   n1 <- as.integer(n1)
   n2 <- as.integer(n2)
@@ -1010,13 +1085,13 @@ bipartite.random.game <- function(n1, n2, type=c("gnp", "gnm"), p, m,
   if (type=="gnp") {      
     res <- .Call("R_igraph_bipartite_game_gnp", n1, n2, p, directed, mode,
                  PACKAGE="igraph")
-    res <- set.vertex.attribute(res$graph, "type", value=res$types)
+    res <- set_vertex_attr(res$graph, "type", value=res$types)
     res$name <- "Bipartite Gnp random graph"
     res$p <- p
   } else if (type=="gnm") {
     res <- .Call("R_igraph_bipartite_game_gnm", n1, n2, m, directed, mode,
                  PACKAGE="igraph")
-    res <- set.vertex.attribute(res$graph, "type", value=res$types)
+    res <- set_vertex_attr(res$graph, "type", value=res$types)
     res$name <- "Bipartite Gnm random graph"
     res$m <- m
   }

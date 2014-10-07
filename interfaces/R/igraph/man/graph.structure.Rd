@@ -1,8 +1,12 @@
 \name{graph.structure}
+\alias{add_edges}
 \alias{add.edges}
+\alias{add_vertices}
 \alias{add.vertices}
 \alias{delete.edges}
+\alias{delete_edges}
 \alias{delete.vertices}
+\alias{delete_vertices}
 \alias{[.igraph}
 \alias{[[.igraph}
 \alias{[<-.igraph}
@@ -20,10 +24,10 @@
 \method{[}{igraph}(x, i, j, \dots, from, to,
                    sparse=getIgraphOpt("sparsematrices"),
                    edges=FALSE, drop=TRUE,
-                   attr=if (is.weighted(x)) "weight" else NULL)
+                   attr=if (is_weighted(x)) "weight" else NULL)
 \method{[[}{igraph}(x, i, j, \dots, directed=TRUE, edges=FALSE, exact=TRUE)
 \method{[}{igraph}(x, i, j, \dots, from, to,
-                   attr=if (is.weighted(x)) "weight" else NULL) <- value 
+                   attr=if (is_weighted(x)) "weight" else NULL) <- value 
 
 \method{+}{igraph}(e1, e2)
 \method{-}{igraph}(e1, e2)
@@ -33,10 +37,10 @@ edge(\dots)
 edges(\dots)
 path(\dots)
 
-add.edges(graph, edges, \dots, attr=list())
-add.vertices(graph, nv, \dots, attr=list())
-delete.edges(graph, edges)
-delete.vertices(graph, v)
+add_edges(graph, edges, \dots, attr=list())
+add_vertices(graph, nv, \dots, attr=list())
+delete_edges(graph, edges)
+delete_vertices(graph, v)
 }
 \arguments{
   \item{x,graph,e1}{The graph to work on.}
@@ -44,7 +48,7 @@ delete.vertices(graph, v)
   \item{\dots}{These are currently ignored for the indexing operators.
     For \code{vertex}, \code{vertices}, \code{edge}, \code{edges} and
     \code{path} see details below.
-    For \code{add.edges} and \code{add.vertices} these additional
+    For \code{add_edges} and \code{add_vertices} these additional
     parameters will be added as edge/vertex attributes. Note that these
     arguments have to be named.}
   \item{from}{A numeric or character vector giving vertex ids or names.
@@ -73,8 +77,8 @@ delete.vertices(graph, v)
   \item{e2}{See details below.}
   \item{attr}{For the indexing operators: if not \code{NULL}, then it
      should be the name of an edge attribute. This attribute is queried,
-     or updated to the given value. For \code{add.edges} and
-     \code{add.vertices}: additional edge/vertex attributes to add. This
+     or updated to the given value. For \code{add_edges} and
+     \code{add_vertices}: additional edge/vertex attributes to add. This
      will be concatenated to the other supplied attributes.}
   \item{nv}{Numeric constant, the number of vertices to add.}
   \item{v}{Vector sequence, the vertices to remove.}
@@ -96,8 +100,8 @@ delete.vertices(graph, v)
   also wants to add attributes, together with the new vertices/edges.
   Please see the details below.
 
-  In addition, the four functions, \code{add.vertices}, \code{add.edges},
-  \code{delete.vertices} and \code{delete.edges} can also be used
+  In addition, the four functions, \code{add_vertices}, \code{add_edges},
+  \code{delete_vertices} and \code{delete_edges} can also be used
   to manipulate the structure.
 }
 \section{The indexing operators}{
@@ -180,7 +184,7 @@ delete.vertices(graph, v)
   logical indices and negative indices as well, with the usual R
   semantics. E.g. \preformatted{  graph[degree(graph)==0, 1] <- 1}
   adds an edge from every isolate vertex to vertex one,
-  and \preformatted{  G <- graph.empty(10)
+  and \preformatted{  G <- empty_graph(10)
   G[-1,1] <- TRUE}
   creates a star graph.
 
@@ -195,10 +199,10 @@ delete.vertices(graph, v)
   \itemize{
   \item If is is another igraph graph object and they are both
     named graphs, then the union of the two graphs are calculated,
-    see \code{\link{graph.union}}.
+    see \code{\link{union}}.
   \item If it is another igraph graph object, but either of the two
     are not named, then the disjoint union of
-    the two graphs is calculated, see \code{\link{graph.disjoint.union}}.
+    the two graphs is calculated, see \code{\link{disjoint_union}}.
   \item If it is a numeric scalar, then the specified number of vertices
     are added to the graph.
   \item If it is a character scalar or vector, then it is interpreted as
@@ -232,7 +236,7 @@ delete.vertices(graph, v)
     as vertex ids of the end points of the new edges. The named
     arguments will be added as edge attributes.
 
-    Examples: \preformatted{  g <- graph.empty() + vertices(letters[1:10]) +
+    Examples: \preformatted{  g <- empty_graph() + vertices(letters[1:10]) +
   vertices("foo", "bar", "bar2", "foobar2")
   g <- g + edge("a", "b")
   g <- g + edges("foo", "bar", "bar2", "foobar2")
@@ -250,18 +254,18 @@ delete.vertices(graph, v)
     as the vertex ids along the path. The remaining arguments are added
     as edge attributes.
 
-    Examples: \preformatted{  g <- graph.empty() + vertices(letters[1:10])
+    Examples: \preformatted{  g <- empty_graph() + vertices(letters[1:10])
   g <- g + path("a", "b", "c", "d")
   g <- g + path("e", "f", "g", weight=1:2, color="red")
   g <- g + path(c("f", "c", "j", "d"), width=1:3, color="green")}
   }
 
   It is important to note that, although the plus operator is
-  commutative, i.e. is possible to write \preformatted{  graph <- "foo" + graph.empty()}
-  it is not associative, e.g. \preformatted{  graph <- "foo" + "bar" + graph.empty()}
-  results a syntax error, unless parentheses are used: \preformatted{  graph <- "foo" + ( "bar" + graph.empty() )}
+  commutative, i.e. is possible to write \preformatted{  graph <- "foo" + empty_graph()}
+  it is not associative, e.g. \preformatted{  graph <- "foo" + "bar" + empty_graph()}
+  results a syntax error, unless parentheses are used: \preformatted{  graph <- "foo" + ( "bar" + empty_graph() )}
   For clarity, we suggest to always put the graph object on the left
-  hand side of the operator: \preformatted{  graph <- graph.empty() + "foo" + "bar"}  
+  hand side of the operator: \preformatted{  graph <- empty_graph() + "foo" + "bar"}  
 }
 \section{The minus operator for deleting vertices and edges}{
   The minus operator (\sQuote{\code{-}}) can be used to remove vertices
@@ -269,10 +273,10 @@ delete.vertices(graph, v)
   the type of the right hand side argument:
   \itemize{
   \item If it is an igraph graph object, then the difference of the
-    two graphs is calculated, see \code{\link{graph.difference}}.
+    two graphs is calculated, see \code{\link{difference}}.
   \item If it is a numeric or character vector, then it is interpreted
     as a vector of vertex ids and the specified vertices will be
-    deleted from the graph. Example: \preformatted{  g <- graph.ring(10)
+    deleted from the graph. Example: \preformatted{  g <- ring(10)
   V(g)$name <- letters[1:10]
   g <- g - c("a", "b")}
   \item If \code{e2} is a vertex sequence (e.g. created by the
@@ -288,7 +292,7 @@ delete.vertices(graph, v)
     \code{edges}) function, then all arguments of \code{edges} are
     concatenated and then interpreted as edges to be removed from the
     graph.
-    Example: \preformatted{  g <- graph.ring(10)
+    Example: \preformatted{  g <- ring(10)
   V(g)$name <- letters[1:10]
   E(g)$name <- LETTERS[1:10]
   g <- g - edge("e|f")
@@ -296,30 +300,30 @@ delete.vertices(graph, v)
   \item If it is an object created with the \code{path} function,
     then all \code{path} arguments are concatenated and then interpreted
     as a path along which edges will be removed from the graph.
-    Example: \preformatted{  g <- graph.ring(10)
+    Example: \preformatted{  g <- ring(10)
   V(g)$name <- letters[1:10]
   g <- g - path("a", "b", "c", "d")}
   }
 }
 \section{More functions to manipulate graph structure}{
-  \code{add.edges} adds the specified edges to the graph. The ids of the
+  \code{add_edges} adds the specified edges to the graph. The ids of the
   vertices are preserved. The additionally supplied named arguments will
   be added as edge attributes for the new edges. If an attribute was not
   present in the original graph, its value for the original edges will
   be \code{NA}.
 
-  \code{add.vertices} adds the specified number of isolate vertices to
+  \code{add_vertices} adds the specified number of isolate vertices to
   the graph. The ids of the old vertices are preserved. The additionally
   supplied named arguments will be added as vertex attributes for the
   new vertices. If an attribute was not present in the original graph,
   its value is set to \code{NA} for the original vertices.
 
-  \code{delete.edges} removes the specified edges from the graph. If a
+  \code{delete_edges} removes the specified edges from the graph. If a
   specified edge is not present, the function gives an error message,
   and the original graph remains unchanged.
   The ids of the vertices are preserved.
 
-  \code{delete.vertices} removes the specified vertices from the graph
+  \code{delete_vertices} removes the specified vertices from the graph
   together with their adjacent edges. The ids of the vertices are
   \emph{not} preserved.
 }
@@ -330,22 +334,22 @@ delete.vertices(graph, v)
 % \seealso{}
 \examples{
 # 10 vertices named a,b,c,... and no edges
-g <- graph.empty() + vertices(letters[1:10])
+g <- empty_graph() + vertices(letters[1:10])
 
 # Add edges to make it a ring
 g <- g + path(letters[1:10], letters[1], color="grey")
 
 # Add some extra random edges
 g <- g + edges(sample(V(g), 10, replace=TRUE), color="red")
-g$layout <- layout.circle
+g$layout <- layout_in_circle
 if (interactive()) {
   plot(g)
 }
 
 # The old-style operations
-g <- graph.ring(10)
-add.edges(g, c(2,6,3,7) )
-delete.edges(g, E(g, P=c(1,10, 2,3)) )
-delete.vertices(g, c(2,7,8) )
+g <- ring(10)
+add_edges(g, c(2,6,3,7) )
+delete_edges(g, E(g, P=c(1,10, 2,3)) )
+delete_vertices(g, c(2,7,8) )
 }
 \keyword{graphs}

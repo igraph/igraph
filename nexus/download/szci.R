@@ -21,7 +21,7 @@ getnet <- function(l) {
   tc <- textConnection(data)
   mat <- matrix(scan(tc), nc=n, byrow=TRUE)
   colnames(mat) <- rownames(mat) <- rl
-  graph.adjacency(mat, mode="undirected", weighted=TRUE)
+  g_adj_matrix(mat, mode="undirected", weighted=TRUE)
 }
 
 library(igraph)

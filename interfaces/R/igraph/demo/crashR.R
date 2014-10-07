@@ -188,8 +188,8 @@ g2
 pause()
 
 ### Is this object an igraph graph?
-is.igraph(g)
-is.igraph(1:10)
+is_igraph(g)
+is_igraph(1:10)
 
 pause()
 
@@ -201,8 +201,8 @@ ecount(g)
 pause()
 
 ### Is the graph directed?
-is.directed(g)
-is.directed(g2)
+is_directed(g)
+is_directed(g2)
 
 pause()
 
@@ -220,14 +220,14 @@ pause()
 g <- graph( c(1,2,1,2, 1,3, 2,3, 4,5), n=5 )
 g
 
-is.simple(g)
-is.multiple(g)
+is_simple(g)
+which_multiple(g)
 
 pause()
 
 ### Remove multiple edges
 g <- simplify(g)
-is.simple(g)
+is_simple(g)
 
 pause()
 
@@ -235,14 +235,14 @@ pause()
 g <- graph( c(1,1,1,2, 1,3, 2,3, 4,5), n=5 )
 g
 
-is.simple(g)
-is.loop(g)
+is_simple(g)
+which_loop(g)
 
 pause()
 
 ### Remove loop edges
 g <- simplify(g)
-is.simple(g)
+is_simple(g)
 
 pause()
 
@@ -256,44 +256,44 @@ print(g, v=T)
 pause()
 
 ### Create undirected example graph
-g2 <- graph.formula(Alice-Bob:Cecil:Daniel, 
-                    Cecil:Daniel-Eugene:Gordon )
+g2 <- graph_from_formula(Alice-Bob:Cecil:Daniel, 
+                Cecil:Daniel-Eugene:Gordon )
 print(g2, v=T)
 
 pause()
 
 ### Remove Alice
-g3 <- delete.vertices(g2, match("Alice", V(g2)$name))
+g3 <- delete_vertices(g2, match("Alice", V(g2)$name))
 
 pause()
 
 ### Add three new vertices
-g4 <- add.vertices(g3, 3)
+g4 <- add_vertices(g3, 3)
 print(g4, v=T)
 igraph.options(print.vertex.attributes=TRUE, 
-               plot.layout=layout.fruchterman.reingold)
+               plot.layout=layout_with_fr)
 g4
 plot(g4)                      
 
 pause()
 
 ### Add three new vertices, with names this time
-g4 <- add.vertices(g3, 3, attr=list(name=c("Helen", "Ike", "Jane")))
+g4 <- add_vertices(g3, 3, attr=list(name=c("Helen", "Ike", "Jane")))
 g4
 
 pause()
 
 ### Add some edges as well
-g4 <- add.edges(g4, match(c("Helen", "Jane", "Ike", "Jane"), V(g4)$name ))
+g4 <- add_edges(g4, match(c("Helen", "Jane", "Ike", "Jane"), V(g4)$name ))
 g4
 
 pause()
 
 ### Edge sequences, first create a directed example graph
-g2 <- graph.formula(Alice -+ Bob:Cecil:Daniel, 
-                    Cecil:Daniel +-+ Eugene:Gordon )
+g2 <- graph_from_formula(Alice -+ Bob:Cecil:Daniel, 
+                Cecil:Daniel +-+ Eugene:Gordon )
 print(g2, v=T)
-plot(g2, layout=layout.kamada.kawai, vertex.label=V(g2)$name)
+plot(g2, layout=layout_with_kk, vertex.label=V(g2)$name)
 
 pause()
 
@@ -308,7 +308,7 @@ E(g2, P=c(1,2))
 pause()
 
 ### Delete this edge
-g3 <- delete.edges(g2, E(g2, P=c(1,2)))
+g3 <- delete_edges(g2, E(g2, P=c(1,2)))
 g3
 
 pause()

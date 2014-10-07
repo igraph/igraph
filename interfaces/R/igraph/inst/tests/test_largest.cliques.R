@@ -1,16 +1,16 @@
 
-context("largest.cliques")
+context("largest_cliques")
 
-test_that("largest.cliques works", {
+test_that("largest_cliques works", {
 
   library(igraph)
 
-  g <- erdos.renyi.game(50,20/50)
-  lc <- largest.cliques(g)
+  g <- sample_gnp(50,20/50)
+  lc <- largest_cliques(g)
 
   ## TODO: this only checks that these are cliques
   expect_that(unique(sapply(lc, function(x)
-                            graph.density(induced.subgraph(g, x)))),
+                            density(induced_subgraph(g, x)))),
               equals(1))
 
 })

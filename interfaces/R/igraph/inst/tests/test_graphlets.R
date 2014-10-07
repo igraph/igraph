@@ -4,11 +4,11 @@ context("Graphlets")
 test_that("Getting subcliques works", {
   library(igraph)
   set.seed(42*42)
-  g <- erdos.renyi.game(10, 4/10)
+  g <- sample_gnp(10, 4/10)
   E(g)$weight <- as.double(sample(1:10, ecount(g), replace=TRUE))
   ids <- 1:vcount(g)
 
-  cl <- maximal.cliques(g)
+  cl <- max_cliques(g)
   cl <- lapply(cl, "-", 1)[c(9, 2, 3, 10, 5, 7, 6, 1, 4, 8)]
 
   res <- .Call("R_igraph_subclique_next", g, E(g)$weight, ids, cl,
@@ -43,19 +43,19 @@ sortgl <- function(x) {
 test_that("Graphlets work for some simple graphs", {
   library(igraph)
 
-  g <- graph.full(5)
+  g <- full_graph(5)
   E(g)$weight <- 1
-  gl <- graphlets.candidate.basis(g)
+  gl <- graphlet_basis(g)
 
   expect_that(names(gl), equals(c("cliques", "thresholds")))
   expect_that(length(gl$cliques), equals(1))
   expect_that(sort(gl$cliques[[1]]), equals(1:vcount(g)))
   expect_that(gl$thresholds, equals(1))
 
-  g2 <- graph.full(5)
+  g2 <- full_graph(5)
   E(g2)$weight <- 1
   E(g2)[1%--%2]$weight <- 2
-  gl2 <- sortgl(graphlets.candidate.basis(g2))
+  gl2 <- sortgl(graphlet_basis(g2))
 
   expect_that(gl2, equals(list(cliques=list(1:2, 1:5), thresholds=c(2,1))))
 })
@@ -66,8 +66,8 @@ test_that("Graphlets filtering works", {
                    to    =c("B", "C", "C", "D", "E", "D", "E", "E"),
                    weight=c( 8 ,  8 ,  8 ,  5 ,  5 ,  5 ,  5 ,  5 ))
 
-  g <- graph.data.frame(gt, directed=FALSE, vertices=data.frame(LETTERS[1:5]))
-  gl <- sortgl(graphlets.candidate.basis(g))
+  g <- graph_from_data_frame(gt, directed=FALSE, vertices=data.frame(LETTERS[1:5]))
+  gl <- sortgl(graphlet_basis(g))
 
   expect_that(gl$cliques, equals(list(1:3, 2:5)))
   expect_that(gl$thresholds, equals(c(8, 5)))
@@ -77,16 +77,16 @@ test_that("Graphlets filtering works", {
 
 threshold.net <- function(graph, level) {
   N <- vcount(graph)
-  graph.t <- delete.edges(graph, which(E(graph)$weight < level))
+  graph.t <- delete_edges(graph, which(E(graph)$weight < level))
 
-  clqt <- maximal.cliques(graph.t)
+  clqt <- max_cliques(graph.t)
   clqt <- lapply(clqt, sort)
   clqt[order(sapply(clqt, length), decreasing=TRUE)]
 }
 
 graphlets.old <- function(graph) {
 
-  if (!is.weighted(graph)) { stop("Graph not weighted") }
+  if (!is_weighted(graph)) { stop("Graph not weighted") }
   if (min(E(graph)$weight) <= 0 || !is.finite(E(graph)$weight)) {
     stop("Edge weights must be non-negative and finite")
   }
@@ -117,7 +117,7 @@ test_that("Graphlets work for a bigger graph", {
   g <- graph.famous("zachary")
   E(g)$weight <- sample(1:5, ecount(g), replace=TRUE)
 
-  gl <- graphlets.candidate.basis(g)
+  gl <- graphlet_basis(g)
   gl2 <- graphlets.old(g)
 
   glo <- sort(sapply(gl$cliques, paste, collapse="-"))
@@ -128,7 +128,7 @@ test_that("Graphlets work for a bigger graph", {
 
 graphlets.project.old <- function(graph, cliques, iter, Mu=NULL) {
 
-  if (!is.weighted(graph)) { stop("Graph not weighted") }
+  if (!is_weighted(graph)) { stop("Graph not weighted") }
   if (min(E(graph)$weight) <= 0 || !is.finite(E(graph)$weight)) {
     stop("Edge weights must be non-negative and finite")
   }
@@ -149,7 +149,7 @@ graphlets.project.old <- function(graph, cliques, iter, Mu=NULL) {
 
   ## Create edge-clique list from this, it is useful to have the edge list
   ## of the graph at hand
-  el <- get.edgelist(graph, names=FALSE)
+  el <- as_edgelist(graph, names=FALSE)
   ecl <- vector(length=ecount(graph), mode="list")
   for (i in 1:ecount(graph)) {
     edge <- el[i,]
@@ -194,10 +194,10 @@ test_that("Graphlet projection works", {
   D1[1:3, 1:3] <- 2
   D2[3:5, 3:5] <- 3
   D3[2:5, 2:5] <- 1
-  g <- graph.adjacency(D1 + D2 + D3, mode="undirected", weighted=TRUE)
+  g <- graph_from_adjacency_matrix(D1 + D2 + D3, mode="undirected", weighted=TRUE)
   g <- simplify(g)
 
-  gl <- graphlets.candidate.basis(g)
+  gl <- graphlet_basis(g)
   glp <- graphlets(g)
   glp2 <- graphlets.project.old(g, cliques=gl$cliques, iter=1000)
 

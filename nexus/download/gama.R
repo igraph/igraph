@@ -21,7 +21,7 @@ mat <- mat[1:16,] - mat[17:32,]
 rownames(mat) <- colnames(mat) <- rowlab
 
 library(igraph)
-gama <- graph.adjacency(mat, weighted=TRUE, mode="undirected")
+gama <- g_adj_matrix(mat, weighted=TRUE, mode="undirected")
 
 gama$name <- "Read highland tribes"
 gama$Author <- "K. Read"

@@ -31,12 +31,13 @@
 #' 
 #' This function simply calls the \code{test_dir} function from the
 #' \code{testthat} package on the test directory.
-#' 
+#'
+#' @aliases igraphtest
 #' @return Whatever is returned by \code{test_dir} from the \code{testthat}
 #' package.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
-igraphtest <- function() {
+igraph_test <- function() {
   do.call(require, list("testthat"))
   tdir <- system.file("tests", package="igraph")
   do.call("test_dir", list(tdir))
@@ -55,7 +56,8 @@ igraphtest <- function() {
 #' The reason for this is, that R package version numbers are not flexible
 #' enough to cover in-between releases versions, e.g. alpha and beta versions,
 #' release candidates, etc.
-#' 
+#'
+#' @aliases igraph.version
 #' @return A character scalar, the igraph version string.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
@@ -63,10 +65,10 @@ igraphtest <- function() {
 #' 
 #' ## Compare to the package version
 #' packageDescription("igraph")$Version
-#' igraph.version()
+#' igraph_version()
 #' 
 #' 
-igraph.version <- function() {
+igraph_version <- function() {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_version", PACKAGE="igraph")
 }

@@ -1,9 +1,9 @@
 
 GRAPH:
-    INCONV: if (!is.igraph(%I%)) { stop("Not a graph object") }
+    INCONV: if (!is_igraph(%I%)) { stop("Not a graph object") }
 
 GRAPH_OR_0:    
-    INCONV: if (!is.null(graph) && !is.igraph(%I%)) { stop("Not a graph object") }
+    INCONV: if (!is.null(graph) && !is_igraph(%I%)) { stop("Not a graph object") }
 
 INTEGER:
     INCONV: %I% <- as.integer(%I%)
@@ -13,9 +13,9 @@ INTEGER:
 REAL:
     INCONV: %I% <- as.numeric(%I%)
     DEFAULT:
-      ECROSSW: 1.0 - sqrt(graph.density(graph))
-      NEDISTW: 0.2 * (1-graph.density(graph))
-      ELENW: graph.density(graph) / 10
+      ECROSSW: 1.0 - sqrt(density(graph))
+      NEDISTW: 0.2 * (1-density(graph))
+      ELENW: density(graph) / 10
 
 BOOLEAN:
     INCONV: %I% <- as.logical(%I%)
@@ -28,14 +28,14 @@ VECTOR:
 
 VERTEXINDEX:
     OUTCONV: 
-        OUT:  if (getIgraphOpt("add.vertex.names") && is.named(%I1%)) { \
-                names(%I%) <- get.vertex.attribute(%I1%, "name", %I2%) \
+        OUT:  if (getIgraphOpt("add.vertex.names") && is_named(%I1%)) { \
+                names(%I%) <- vertex_attr(%I1%, "name", %I2%) \
               }
 
 VERTEXINDEX_OR_0:
     OUTCONV: 
-        OUT:  if (getIgraphOpt("add.vertex.names") && is.named(%I1%)) { \
-                names(%I%) <- get.vertex.attribute(%I1%, "name", %I2%) \
+        OUT:  if (getIgraphOpt("add.vertex.names") && is_named(%I1%)) { \
+                names(%I%) <- vertex_attr(%I1%, "name", %I2%) \
               }
 
 VECTOR_LONG:
@@ -149,7 +149,7 @@ EDGESET:
        ALL: E(%I1%)
 
 EDGEWEIGHTS:
-    INCONV: if (is.null(%I%) && "weight" %in% list.edge.attributes(%I1%)) { \
+    INCONV: if (is.null(%I%) && "weight" %in% edge_attr_names(%I1%)) { \
                %I% <- E(%I1%)$weight \
             } \
             if (!is.null(%I%) && any(!is.na(%I%))) { \
@@ -159,7 +159,7 @@ EDGEWEIGHTS:
             }
 
 VERTEXWEIGHTS:
-    INCONV: if (is.null(%I%) && "weight" %in% list.vertex.attributes(%I1%)) { \
+    INCONV: if (is.null(%I%) && "weight" %in% vertex_attr_names(%I1%)) { \
                %I% <- V(%I1%)$weight \
             } \
             if (!is.null(%I%) && any(!is.na(%I%))) { \
@@ -169,7 +169,7 @@ VERTEXWEIGHTS:
             }
 
 EDGECAPACITY:
-    INCONV: if (is.null(%I%) && "capacity" %in% list.edge.attributes(%I1%)) { \
+    INCONV: if (is.null(%I%) && "capacity" %in% edge_attr_names(%I1%)) { \
                %I% <- E(%I1%)$capacity \
             } \
             if (!is.null(%I%) && any(!is.na(%I%))) { \
@@ -180,7 +180,7 @@ EDGECAPACITY:
 
 
 BIPARTITE_TYPES:
-    INCONV: if (is.null(%I%) && "type" %in% list.vertex.attributes(%I1%)) { \
+    INCONV: if (is.null(%I%) && "type" %in% vertex_attr_names(%I1%)) { \
                %I% <- V(%I1%)$type \
             } \
             if (!is.null(%I%)) { \
@@ -196,7 +196,7 @@ BIPARTITE_TYPES:
             }
 
 BIPARTITE_TYPES_OR_0:
-    INCONV: if (is.null(%I%) && "type" %in% list.vertex.attributes(%I1%)) { \
+    INCONV: if (is.null(%I%) && "type" %in% vertex_attr_names(%I1%)) { \
                %I% <- V(%I1%)$type \
             } \
             if (!is.null(%I%)) { \
@@ -213,7 +213,7 @@ BIPARTITE_TYPES_OR_0:
 
 VERTEX_COLOR:
     INCONV: if (missing(%I%)) { \
-               if ("color" %in% list.vertex.attributes(%I1%)) { \
+               if ("color" %in% vertex_attr_names(%I1%)) { \
                  %I% <- V(%I1%)$color \
                } else { \
                  %I% <- NULL \
@@ -225,7 +225,7 @@ VERTEX_COLOR:
 
 EDGE_COLOR:
     INCONV: if (missing(%I%)) { \
-               if ("color" %in% list.edge.attributes(%I1%)) { \
+               if ("color" %in% edge_attr_names(%I1%)) { \
                  %I% <- E(%I1%)$color \
                } else { \
                  %I% <- NULL \
@@ -255,11 +255,11 @@ EDGESETLIST_OR_0:
 
 ARPACKOPT:
     INCONV:
-      INOUT: %I%.tmp <- igraph.arpack.default; %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
+      INOUT: %I%.tmp <- arpack_defaults; %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
 
 DRL_OPTIONS:
     INCONV:
-      IN: %I%.tmp <- igraph.drl.default; %I%.tmp [names(%I%)] <- %I%; %I% <- %I%.tmp
+      IN: %I%.tmp <- drl_defaults$default; %I%.tmp [names(%I%)] <- %I%; %I% <- %I%.tmp
 
 STRVECTOR:
 
@@ -368,7 +368,7 @@ EIGENALGO:
       ARPACK: c("arpack", "auto", "lapack", "comp_auto", "comp_lapack", "comp_arpack")
 
 EIGENWHICH:
-    INCONV: %I%.tmp <- igraph.eigen.default; \
+    INCONV: %I%.tmp <- eigen_defaults; \
             %I%.tmp[ names(%I%) ] <- %I% ; %I% <- %I%.tmp
     DEFAULT: 
       Default: list()
@@ -386,7 +386,7 @@ PAGERANKOPT:
               if (%I1% == 0L) {                         \
                 %I% <- list(niter=1000, eps=0.001)      \
               } else if (%I1% == 1L) {                  \
-                %I% <- igraph.arpack.default            \
+                %I% <- arpack_defaults                  \
               } else {                                  \
                 %I% <- NULL                             \
               }                                         \

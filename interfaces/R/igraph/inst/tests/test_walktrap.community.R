@@ -1,13 +1,13 @@
 
-context("walktrap.community")
+context("cluster_walktrap")
 
-test_that("walktrap.community works", {
+test_that("cluster_walktrap works", {
 
   library(igraph)
 
   g <- graph.famous("Zachary")
   set.seed(42)
-  wc <- walktrap.community(g)
+  wc <- cluster_walktrap(g)
 
   expect_that(modularity(g, membership(wc)), equals(modularity(wc)))
   expect_that(membership(wc), equals(c(1, 1, 2, 1, 5, 5, 5, 1, 2, 2,
@@ -25,7 +25,7 @@ test_that("walktrap.community works", {
               prints_text("2 branches.*20 members.*height 31"))
   expect_that(print(d[[2]]),
               prints_text("2 branches.*14 members.*height 32"))
-  m2 <- cutat(wc, no=3)
+  m2 <- cut_at(wc, no=3)
   expect_that(modularity(g, m2),
               equals(wc$modularity[length(wc$modularity)-2],
                      tolerance=1e-7))

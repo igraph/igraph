@@ -1,14 +1,16 @@
-\name{graph.maxflow}
+\name{max_flow}
 \alias{graph.maxflow}
+\alias{max_flow}
 \alias{graph.mincut}
+\alias{min_cut}
 \concept{Maximum flow}
 \concept{Minimum cut}
 \title{Maximum flow in a network}
 \description{In a graph where each edge has a given flow capacity the
   maximal flow between two vertices is calculated.}
 \usage{
-graph.maxflow(graph, source, target, capacity=NULL)
-graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
+max_flow(graph, source, target, capacity=NULL)
+min_cut(graph, source=NULL, target=NULL, capacity=NULL,
        value.only = TRUE)
 }
 \arguments{
@@ -24,7 +26,7 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   }
 }
 \details{
-  \code{graph.maxflow} calculates the maximum flow between two vertices
+  \code{max_flow} calculates the maximum flow between two vertices
   in a weighted (ie. valued) graph. A flow from \code{source} to
   \code{target} is an assignment of non-negative real numbers to the
   edges of the graph, satisfying two properties: (1) for each edge the
@@ -35,7 +37,7 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   the \code{target} vertex. The maximum flow is the flow of maximum
   value.
 
-  \code{graph.mincut} calculates the minimum st-cut between two vertices
+  \code{min_cut} calculates the minimum st-cut between two vertices
   in a graph (if the \code{source} and \code{target} arguments are
   given) or the minimum cut of the graph (if both \code{source} and
   \code{target} are \code{NULL}).
@@ -50,9 +52,9 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   in the directed case.)
   
   The maximum flow between two vertices in a graph is the same as the minimum
-  st-cut, so \code{graph.maxflow} and \code{graph.mincut} essentially
+  st-cut, so \code{max_flow} and \code{min_cut} essentially
   calculate the same quantity, the only difference is that
-  \code{graph.mincut} can be invoked without giving the \code{source}
+  \code{min_cut} can be invoked without giving the \code{source}
   and \code{target} arguments and then minimum of all possible minimum
   cuts is calculated.
 
@@ -60,7 +62,7 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   is used to calculate the minimum cut.
 }
 \value{
-  For \code{graph.maxflow} a named list with components:
+  For \code{max_flow} a named list with components:
   \item{value}{A numeric scalar, the value of the maximum flow.}
   \item{flow}{A numeric vector, the flow itself, one entry for each
     edge. For undirected graphs this entry is bit trickier,
@@ -87,7 +89,7 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
     times a global breadth-first-search update was performed to assign
     better height (=distance) values to the vertices.}
   
-  For \code{graph.mincut} a numeric constant, the value of the minimum
+  For \code{min_cut} a numeric constant, the value of the minimum
   cut, except if \code{value.only=FALSE}. In this case a named list with
   components:
   \item{value}{Numeric scalar, the cut value.}
@@ -109,20 +111,20 @@ graph.mincut(graph, source=NULL, target=NULL, capacity=NULL,
   the ACM}, 44 585-591, 1997.
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{shortest.paths}}, \code{\link{edge.connectivity}},
-  \code{\link{vertex.connectivity}}}
+\seealso{\code{\link{distances}}, \code{\link{edge_connectivity}},
+  \code{\link{vertex_connectivity}}}
 \examples{
 E <- rbind( c(1,3,3), c(3,4,1), c(4,2,2), c(1,5,1), c(5,6,2), c(6,2,10))
 colnames(E) <- c("from", "to", "capacity")
-g1 <- graph.data.frame(as.data.frame(E))
-graph.maxflow(g1, source=V(g1)["1"], target=V(g1)["2"])
+g1 <- graph_from_data_frame(as.data.frame(E))
+max_flow(g1, source=V(g1)["1"], target=V(g1)["2"])
 
-g <- graph.ring(100)
-graph.mincut(g, capacity=rep(1,vcount(g)))
-graph.mincut(g, value.only=FALSE, capacity=rep(1,vcount(g)))
+g <- ring(100)
+min_cut(g, capacity=rep(1,vcount(g)))
+min_cut(g, value.only=FALSE, capacity=rep(1,vcount(g)))
 
 g2 <- graph( c(1,2,2,3,3,4, 1,6,6,5,5,4, 4,1) )
 E(g2)$capacity <- c(3,1,2, 10,1,3, 2)
-graph.mincut(g2, value.only=FALSE)
+min_cut(g2, value.only=FALSE)
 }
 \keyword{graphs}

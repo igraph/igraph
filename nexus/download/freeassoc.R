@@ -130,7 +130,7 @@ dupids <- vertices$id[duplicated(vertices$id)]
 if (length(dupids) != 0) { stop("GEBASZ") }
 
 library(igraph)
-freeassoc <- graph.data.frame(edges, vertices=vertices, directed=TRUE)
+freeassoc <- g_df(edges, vertices=vertices, directed=TRUE)
 
 freeassoc$name <- "University of South Florida Free Association Norms"
 freeassoc$Author <- "Douglas L. Nelson and Cathy L. McEvoy"

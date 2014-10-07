@@ -10,9 +10,9 @@ txt <- readLines(paste(sep="", tmp, "/power.txt"))
 gml <- paste(sep="", tmp, "/power.gml")
 
 library(igraph)
-g <- read.graph(gml, format="gml")
+g <- read_graph(gml, format="gml")
 
-g <- remove.vertex.attribute(g, "id")
+g <- delete_vertex_attr(g, "id")
 
 g$name <- "Western states power grid"
 g$Author <- "Duncan Watts and Steven Strogatz"

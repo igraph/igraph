@@ -19,6 +19,8 @@
 #
 ###################################################################
 
+#' @include layout.R
+
 ###################################################################
 # Internal variables
 ###################################################################
@@ -71,39 +73,40 @@ assign(".next", 1, .tkplot.env)
 #' tkplot id. The other commands utilize this id to be able to query or
 #' manipulate the plot.
 #' 
-#' \code{tkplot.close} closes the Tk plot with id \code{tkp.id}.
+#' \code{tk_close} closes the Tk plot with id \code{tkp.id}.
 #' 
-#' \code{tkplot.off} closes all Tk plots.
+#' \code{tk_off} closes all Tk plots.
 #' 
-#' \code{tkplot.fit.to.screen} fits the plot to the given rectange
+#' \code{tk_fit} fits the plot to the given rectange
 #' (\code{width} and \code{height}), if some of these are \code{NULL} the
 #' actual phisical width od height of the plot window is used.
 #' 
-#' \code{tkplot.reshape} applies a new layout to the plot, its optional
+#' \code{tk_reshape} applies a new layout to the plot, its optional
 #' parameters will be collected to a list analogous to \code{layout.par}.
 #' 
-#' \code{tkplot.export.postscript} creates a dialog window for saving the plot
+#' \code{tk_postscript} creates a dialog window for saving the plot
 #' in postscript format.
 #' 
-#' \code{tkplot.canvas} returns the Tk canvas object that belongs to a graph
+#' \code{tk_canvas} returns the Tk canvas object that belongs to a graph
 #' plot. The canvas can be directly manipulated then, eg. labels can be added,
 #' it could be saved to a file programatically, etc. See an example below.
 #' 
-#' \code{tkplot.getcoords} returns the coordinates of the vertices in a matrix.
+#' \code{tk_coords} returns the coordinates of the vertices in a matrix.
 #' Each row corresponds to one vertex.
 #' 
-#' \code{tkplot.setcoords} sets the coordinates of the vertices. A two-column
+#' \code{tk_set_coords} sets the coordinates of the vertices. A two-column
 #' matrix specifies the new positions, with each row corresponding to a single
 #' vertex.
 #' 
-#' \code{tkplot.center} shifts the figure to the center of its plot window.
+#' \code{tk_center} shifts the figure to the center of its plot window.
 #' 
-#' \code{tkplot.rotate} rotates the figure, its parameter can be given either
+#' \code{tk_rotate} rotates the figure, its parameter can be given either
 #' in degrees or in radians.
 #' 
 #' @aliases tkplot tkplot.close tkplot.off tkplot.fit.to.screen tkplot.reshape
 #' tkplot.export.postscript tkplot.canvas tkplot.getcoords tkplot.setcoords
-#' tkplot.center tkplot.rotate
+#' tkplot.center tkplot.rotate tk_canvas tk_center tk_close tk_postscript
+#' tk_fit tk_coords tk_off tk_reshape tk_rotate tk_set_coords
 #' @param graph The \code{graph} to plot.
 #' @param canvas.width,canvas.height The size of the tkplot drawing area.
 #' @param tkp.id The id of the tkplot window to close/reshape/etc.
@@ -121,43 +124,43 @@ assign(".next", 1, .tkplot.env)
 #' @return \code{tkplot} returns an integer, the id of the plot, this can be
 #' used to manipulate it from the command line.
 #' 
-#' \code{tkplot.canvas} retuns \code{tkwin} object, the Tk canvas.
+#' \code{tk_canvas} retuns \code{tkwin} object, the Tk canvas.
 #' 
-#' \code{tkplot.getcoords} returns a matrix with the coordinates.
+#' \code{tk_coords} returns a matrix with the coordinates.
 #' 
-#' \code{tkplot.close}, \code{tkplot.off}, \code{tkplot.fit.to.screen},
-#' \code{tkplot.reshape}, \code{tkplot.export.postscript}, \code{tkplot.center}
-#' and \code{tkplot.rotate} return \code{NULL} invisibly.
+#' \code{tk_close}, \code{tk_off}, \code{tk_fit},
+#' \code{tk_reshape}, \code{tk_postscript}, \code{tk_center}
+#' and \code{tk_rotate} return \code{NULL} invisibly.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{plot.igraph}}, \code{\link{layout}}
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.ring(10)
+#' g <- ring(10)
 #' \dontrun{tkplot(g)}
 #' 
 #' \dontrun{
 #' ## Saving a tkplot() to a file programatically
-#' g <- graph.star(10, center=10) %u% graph.ring(9, directed=TRUE)
+#' g <- star(10, center=10) %u% ring(9, directed=TRUE)
 #' E(g)$width <- sample(1:10, ecount(g), replace=TRUE)
-#' lay <- layout.auto(g)
+#' lay <- layout_nicely(g)
 #' 
 #' id <- tkplot(g, layout=lay)
-#' canvas <- tkplot.canvas(id)
+#' canvas <- tk_canvas(id)
 #' tkpostscript(canvas, file="/tmp/output.eps")
-#' tkplot.close(id)
+#' tk_close(id)
 #' }
 #' 
 #' \dontrun{
 #' ## Setting the coordinates and adding a title label
-#' g <- graph.ring(10)
-#' id <- tkplot(graph.ring(10), canvas.width=450, canvas.height=500)
+#' g <- ring(10)
+#' id <- tkplot(ring(10), canvas.width=450, canvas.height=500)
 #' 
-#' canvas <- tkplot.canvas(id)
+#' canvas <- tk_canvas(id)
 #' padding <- 20
-#' coords <- layout.norm(layout.circle(g), 0+padding, 450-padding,
+#' coords <- norm_coords(layout_in_circle(g), 0+padding, 450-padding,
 #'                       50+padding, 500-padding)
-#' tkplot.setcoords(id, coords)
+#' tk_set_coords(id, coords)
 #' 
 #' width <- as.numeric(tkcget(canvas, "-width"))
 #' height <- as.numeric(tkcget(canvas, "-height"))
@@ -168,7 +171,7 @@ assign(".next", 1, .tkplot.env)
 #' 
 tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   
@@ -241,7 +244,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
   # The popup menu
   popup.menu <- tkmenu(canvas)
   tkadd(popup.menu, "command", label="Fit to screen", command=function() {
-    tkplot.fit.to.screen(tkp.id)})  
+    tk_fit(tkp.id)})  
 
   # Different popup menu for vertices
   vertex.popup.menu <- tkmenu(canvas)
@@ -313,7 +316,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
   # The main pull-down menu
   main.menu <- tkmenu(top)
   tkadd(main.menu, "command", label="Close", command=function() {
-    tkplot.close(tkp.id, TRUE)})
+    tk_close(tkp.id, TRUE)})
   select.menu <- .tkplot.select.menu(tkp.id, main.menu)
   tkadd(main.menu, "cascade", label="Select", menu=select.menu)  
   layout.menu <- .tkplot.layout.menu(tkp.id, main.menu)
@@ -321,9 +324,9 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
   view.menu <- tkmenu(main.menu)
   tkadd(main.menu, "cascade", label="View", menu=view.menu)
   tkadd(view.menu, "command", label="Fit to screen", command=function() {
-    tkplot.fit.to.screen(tkp.id)})
+    tk_fit(tkp.id)})
   tkadd(view.menu, "command", label="Center on screen", command=function() {
-    tkplot.center(tkp.id)})
+    tk_center(tkp.id)})
   tkadd(view.menu, "separator")
   view.menu.labels <- tclVar(1)
   view.menu.grid <- tclVar(0)
@@ -341,23 +344,23 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
          function(deg) {
            tkadd(rotate.menu, "command",
                  label=paste(deg, "degree"), command=function() {
-                   tkplot.rotate(tkp.id, degree=deg)
+                   tk_rotate(tkp.id, degree=deg)
                  })
          })
   export.menu <- tkmenu(main.menu)
   tkadd(main.menu, "cascade", label="Export", menu=export.menu)
   tkadd(export.menu, "command", label="Postscript", command=function() {
-    tkplot.export.postscript(tkp.id)})
+    tk_postscript(tkp.id)})
   tkconfigure(top, "-menu", main.menu)
   
   # plot it
   .tkplot.create.edges(tkp.id)
   .tkplot.create.vertices(tkp.id)
   # we would need an update here
-  tkplot.fit.to.screen(tkp.id, canvas.width, canvas.height)
+  tk_fit(tkp.id, canvas.width, canvas.height)
 
   # Kill myself if window was closed
-  tkbind(top, "<Destroy>", function() tkplot.close(tkp.id, FALSE))
+  tkbind(top, "<Destroy>", function() tk_close(tkp.id, FALSE))
 
 ###################################################################
 # The callbacks for interactive editing
@@ -523,12 +526,12 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
 }
 
 .tkplot.addlayout("random",
-                  list(name="Random", f=layout.random, params=list()))
+                  list(name="Random", f=layout_randomly, params=list()))
 .tkplot.addlayout("circle",
-                  list(name="Circle", f=layout.circle, params=list()))
+                  list(name="Circle", f=layout_in_circle, params=list()))
 .tkplot.addlayout("fruchterman.reingold",
                   list(name="Fruchterman-Reingold",
-                       f=layout.fruchterman.reingold,
+                       f=layout_with_fr,
                        params=list(
                          niter=list(name="Number of iterations",
                            type="numeric",
@@ -552,7 +555,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
                   )
 .tkplot.addlayout("kamada.kawai",
                   list(name="Kamada-Kawai",
-                       f=layout.kamada.kawai,
+                       f=layout_with_kk,
                        params=list(
                          niter=list(name="Number of iterations",
                            type="numeric",
@@ -568,7 +571,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
                   )
 .tkplot.addlayout("reingold.tilford",
                   list(names="Reingold-Tilford",
-                       f=layout.reingold.tilford,
+                       f=layout_as_tree,
                        params=list(
                          root=list(name="Root vertex",
                            type="numeric",
@@ -583,7 +586,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
 
 #' @rdname tkplot
 
-tkplot.close <- function(tkp.id, window.close=TRUE) {
+tk_close <- function(tkp.id, window.close=TRUE) {
   if (window.close) {
     cmd <- paste(sep="", "tkp.", tkp.id, "$top")
     top <- eval(parse(text=cmd), .tkplot.env)
@@ -597,7 +600,7 @@ tkplot.close <- function(tkp.id, window.close=TRUE) {
 
 #' @rdname tkplot
 
-tkplot.off <- function() {
+tk_off <- function() {
   eapply(.tkplot.env, function(tkp) { tkdestroy(tkp$top) })
   rm(list=ls(.tkplot.env), envir=.tkplot.env)
   invisible(NULL)
@@ -605,7 +608,7 @@ tkplot.off <- function() {
 
 #' @rdname tkplot
 
-tkplot.fit.to.screen <- function(tkp.id, width=NULL, height=NULL) {
+tk_fit <- function(tkp.id, width=NULL, height=NULL) {
   tkp <- .tkplot.get(tkp.id)
   if (is.null(width)) {
     width  <- as.numeric(tkwinfo("width", tkp$canvas))
@@ -634,7 +637,7 @@ tkplot.fit.to.screen <- function(tkp.id, width=NULL, height=NULL) {
 
 #' @rdname tkplot
 
-tkplot.center <- function(tkp.id) {
+tk_center <- function(tkp.id) {
   tkp <- .tkplot.get(tkp.id)
   width  <- as.numeric(tkwinfo("width", tkp$canvas))
   height <- as.numeric(tkwinfo("height", tkp$canvas))
@@ -658,17 +661,17 @@ tkplot.center <- function(tkp.id) {
   
 #' @rdname tkplot
 
-tkplot.reshape <- function(tkp.id, newlayout, ...) {
+tk_reshape <- function(tkp.id, newlayout, ...) {
   tkp <- .tkplot.get(tkp.id)
   .tkplot.set(tkp.id, "coords", newlayout(tkp$graph, ...))
-  tkplot.fit.to.screen(tkp.id)
+  tk_fit(tkp.id)
   .tkplot.update.vertices(tkp.id)
   invisible(NULL)
 }
 
 #' @rdname tkplot
 
-tkplot.export.postscript <- function(tkp.id) {
+tk_postscript <- function(tkp.id) {
 
   tkp <- .tkplot.get(tkp.id)
 
@@ -681,7 +684,7 @@ tkplot.export.postscript <- function(tkp.id) {
 
 #' @rdname tkplot
 
-tkplot.getcoords <- function(tkp.id, norm=FALSE) {
+tk_coords <- function(tkp.id, norm=FALSE) {
   coords <- .tkplot.get(tkp.id, "coords")
   coords[,2] <- max(coords[,2]) - coords[,2]
   if (norm) {
@@ -697,7 +700,7 @@ tkplot.getcoords <- function(tkp.id, norm=FALSE) {
 
 #' @rdname tkplot
 
-tkplot.setcoords <- function(tkp.id, coords) {
+tk_set_coords <- function(tkp.id, coords) {
   stopifnot(is.matrix(coords), ncol(coords)==2)
   .tkplot.set(tkp.id, "coords", coords)
   .tkplot.update.vertices(tkp.id)
@@ -706,7 +709,7 @@ tkplot.setcoords <- function(tkp.id, coords) {
 
 #' @rdname tkplot
 
-tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
+tk_rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   coords <- .tkplot.get(tkp.id, "coords")
 
   if (is.null(degree) && is.null(rad)) {
@@ -725,13 +728,13 @@ tkplot.rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   coords[,2] <- r * sin(phi)
   
   .tkplot.set(tkp.id, "coords", coords)
-  tkplot.center(tkp.id)
+  tk_center(tkp.id)
   invisible(NULL)
 }
 
 #' @rdname tkplot
 
-tkplot.canvas <- function(tkp.id) {
+tk_canvas <- function(tkp.id) {
   .tkplot.get(tkp.id)$canvas
 }
 
@@ -982,7 +985,7 @@ tkplot.canvas <- function(tkp.id) {
 .tkplot.create.edges <- function(tkp.id) {
   tkp <- .tkplot.get(tkp.id)
   n <- ecount(tkp$graph)
-  edgematrix <- get.edgelist(tkp$graph, names=FALSE)
+  edgematrix <- as_edgelist(tkp$graph, names=FALSE)
   mapply(function(from, to, id) .tkplot.create.edge(tkp.id, from, to, id),
          edgematrix[,1],
          edgematrix[,2], 1:nrow(edgematrix))
@@ -1428,7 +1431,7 @@ tkplot.canvas <- function(tkp.id) {
 
   # No parameters
   if (length(layout$params)==0) {
-    return(tkplot.reshape(tkp.id, layout$f, params=list()))
+    return(tk_reshape(tkp.id, layout$f, params=list()))
   }
   
   submit <- function() {
@@ -1445,14 +1448,14 @@ tkplot.canvas <- function(tkp.id) {
                               )
       if (layout$params[[i]]$type=="initial" &&
           params[[i]]) {
-        realparams[[i]] <- tkplot.getcoords(tkp.id, norm=TRUE)
+        realparams[[i]] <- tk_coords(tkp.id, norm=TRUE)
       }
     }
     if (as.logical(tclvalue(save.default))) {
       .tkplot.layouts.newdefaults(layout.name, params)
     }
     tkdestroy(dialog)
-    tkplot.reshape(tkp.id, layout$f, params=realparams)
+    tk_reshape(tkp.id, layout$f, params=realparams)
   }
   
   dialog <- tktoplevel(.tkplot.get(tkp.id, "top"))

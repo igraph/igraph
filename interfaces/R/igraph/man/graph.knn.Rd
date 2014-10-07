@@ -1,10 +1,11 @@
-\name{graph.knn}
+\name{knn}
+\alias{knn}
 \alias{graph.knn}
 \title{Average nearest neighbor degree}
 \description{Calculate the average nearest neighbor degree of the given
   vertices and the same quantity in the function of vertex degree}
 \usage{
-graph.knn(graph, vids=V(graph), weights=NULL)
+knn(graph, vids=V(graph), weights=NULL)
 }
 \arguments{
   \item{graph}{The input graph. It can be directed, but it will be
@@ -16,7 +17,7 @@ graph.knn(graph, vids=V(graph), weights=NULL)
     only.}
   \item{weights}{Weight vector. If the graph has a \code{weight} edge
     attribute, then this is used by default. If this argument is given,
-    then vertex strength (see \code{\link{graph.strength}}) is used
+    then vertex strength (see \code{\link{strength}}) is used
     instead of vertex degree. But note that \code{knnk} is still given
     in the function of the normal vertex degree. }
 }
@@ -42,22 +43,22 @@ graph.knn(graph, vids=V(graph), weights=NULL)
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \examples{
 # Some trivial ones
-g <- graph.ring(10)
-graph.knn(g)
-g2 <- graph.star(10)
-graph.knn(g2)
+g <- ring(10)
+knn(g)
+g2 <- star(10)
+knn(g2)
 
 # A scale-free one, try to plot 'knnk'
-g3 <- ba.game(1000, m=5)
-graph.knn(g3)
+g3 <- sample_pa(1000, m=5)
+knn(g3)
 
 # A random graph
-g4 <- random.graph.game(1000, p=5/1000)
-graph.knn(g4)
+g4 <- sample_gnp(1000, p=5/1000)
+knn(g4)
 
 # A weighted graph
-g5 <- graph.star(10)
+g5 <- star(10)
 E(g5)$weight <- seq(ecount(g5))
-graph.knn(g5)
+knn(g5)
 }
 \keyword{graphs}

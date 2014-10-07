@@ -1,11 +1,12 @@
-\name{articulation.points}
+\name{articulation_points}
 \alias{articulation.points}
+\alias{articulation_points}
 \concept{Articulation point}
 \title{Articulation points of a graph}
 \description{Articuation points or cut vertices are vertices whose
   removal increases the number of connected components in a graph.}
 \usage{
-articulation.points(graph)
+articulation_points(graph)
 }
 \arguments{
   \item{graph}{The input graph. It is treated as an undirected graph,
@@ -22,12 +23,12 @@ articulation.points(graph)
   of the input graph.}
 %\references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{biconnected.components}}, \code{\link{clusters}},
-  \code{\link{is.connected}}, \code{\link{vertex.connectivity}}}
+\seealso{\code{\link{biconnected_components}}, \code{\link{components}},
+  \code{\link{is_connected}}, \code{\link{vertex_connectivity}}}
 \examples{
-g <- graph.disjoint.union( graph.full(5), graph.full(5) )
-clu <- clusters(g)$membership
-g <- add.edges(g, c(match(1, clu), match(2, clu)) )
-articulation.points(g)
+g <- disjoint_union( full_graph(5), full_graph(5) )
+clu <- components(g)$membership
+g <- add_edges(g, c(match(1, clu), match(2, clu)) )
+articulation_points(g)
 }
 \keyword{graphs}

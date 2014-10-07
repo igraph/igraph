@@ -1,16 +1,19 @@
 \name{conversion}
 \alias{get.adjacency}
+\alias{as_adj}
+\alias{as_adjacency_matrix}
 \alias{get.edgelist}
+\alias{as_edgelist}
 \concept{Edge list}
 \concept{Adjacency list}
 \title{Convert a graph to an adjacency matrix or an edge list}
 \description{Sometimes it is useful to have a standard representation of
   a graph, like an adjacency matrix or an edge list.}
 \usage{
-get.adjacency(graph, type=c("both", "upper", "lower"),
+as_adj(graph, type=c("both", "upper", "lower"),
        attr=NULL, edges=FALSE, names=TRUE,
        sparse=getIgraphOpt("sparsematrices"))
-get.edgelist(graph, names=TRUE)
+as_edgelist(graph, names=TRUE)
 }
 \arguments{
   \item{graph}{The graph to convert.}
@@ -43,7 +46,7 @@ get.edgelist(graph, names=TRUE)
     to the matrix. These are only assigned if the \code{name} vertex
     attribute is present in the graph.
 
-    for \code{get.edgelist} it gives whether to return a character
+    for \code{as_edgelist} it gives whether to return a character
     matrix containing vertex names (ie. the \code{name} vertex
     attribute) if they exist or numeric vertex ids.
   }
@@ -52,31 +55,31 @@ get.edgelist(graph, names=TRUE)
     matrices.}
 }
 \details{
-  \code{get.adjacency} returns the adjacency matrix of a graph, a
+  \code{as_adj} returns the adjacency matrix of a graph, a
   regular \R matrix if \code{sparse} is \code{FALSE}, or a sparse
   matrix, as defined in the \sQuote{\code{Matrix}} package, if
   \code{sparse} if \code{TRUE}.
   
-  \code{get.edgelist} returns the list of edges in a graph.  
+  \code{as_edgelist} returns the list of edges in a graph.  
 }
 \value{
   A \code{vcount(graph)} by \code{vcount(graph)} (usually) numeric
-  matrix for \code{get.adjacency}. (This can be huge!) Note that a
+  matrix for \code{as_adj}. (This can be huge!) Note that a
   non-numeric matrix might be returned if \code{attr} is a non-numeric
   edge attribute.
 
-  A \code{ecount(graph)} by 2 numeric matrix for \code{get.edgelist}.
+  A \code{ecount(graph)} by 2 numeric matrix for \code{as_edgelist}.
 }
 % \references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{graph.adjacency}}, \code{\link{read.graph}}}
+\seealso{\code{\link{graph_from_adjacency_matrix}}, \code{\link{read_graph}}}
 \examples{
-g <- erdos.renyi.game(10, 2/10)
-get.edgelist(g)
-get.adjacency(g)
+g <- sample_gnp(10, 2/10)
+as_edgelist(g)
+as_adj(g)
 V(g)$name <- letters[1:vcount(g)]
-get.adjacency(g)
+as_adj(g)
 E(g)$weight <- runif(ecount(g))
-get.adjacency(g, attr="weight")
+as_adj(g, attr="weight")
 }
 \keyword{graphs}

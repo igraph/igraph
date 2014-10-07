@@ -6,7 +6,7 @@ test_that("iterators work", {
   library(igraph)
 
   ## Create a small ring graph, assign attributes
-  ring <- graph.formula( A-B-C-D-E-F-G-A )
+  ring <- graph_from_formula( A-B-C-D-E-F-G-A )
   E(ring)$weight <- seq_len(ecount(ring))
 
   ## Selection based on attributes
@@ -20,7 +20,7 @@ test_that("iterators work", {
 test_that("complex attributes work", {
   library(igraph)
 
-  g <- graph.ring(10)
+  g <- ring(10)
   foo <- lapply(1:vcount(g), seq, from=1)
   V(g)$foo <- foo
 

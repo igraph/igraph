@@ -1,11 +1,12 @@
-\name{is.mutual}
+\name{which_mutual}
 \alias{is.mutual}
+\alias{which_mutual}
 \concept{Mutual edges}
 \concept{Reciprocity}
 \title{Find mutual edges in a directed graph}
 \description{This function checks the reciproc pair of the supplied edges.}
 \usage{
-is.mutual(graph, es = E(graph))
+which_mutual(graph, es = E(graph))
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -27,13 +28,13 @@ is.mutual(graph, es = E(graph))
 }
 %\references{}
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{ \code{\link{reciprocity}}, \code{\link{dyad.census}} if you
+\seealso{ \code{\link{reciprocity}}, \code{\link{dyad_census}} if you
   just want some statistics about mutual edges.}
 \examples{
-g <- erdos.renyi.game(10,50,type="gnm",directed=TRUE)
+g <- sample_gnm(10, 50, directed=TRUE)
 reciprocity(g)
-dyad.census(g)
-is.mutual(g)
-sum(is.mutual(g))/2 == dyad.census(g)$mut
+dyad_census(g)
+which_mutual(g)
+sum(which_mutual(g))/2 == dyad_census(g)$mut
 }
 \keyword{graphs}

@@ -67,11 +67,11 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   for which the number is less than 50. We set the color of these
   vertices to red.
   \preformatted{
-    g <- graph.ring(10)
+    g <- ring(10)
     V(g)$number <- sample(1:100, vcount(g), replace=TRUE)
     V(g)$color <- "grey"
     V(g)[ number < 50 ]$color <- "red"
-    plot(g, layout=layout.circle, vertex.color=V(g)$color,
+    plot(g, layout=layout_in_circle, vertex.color=V(g)$color,
          vertex.label=V(g)$number)
   }
 
@@ -79,11 +79,11 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   from the \sQuote{\code{g}} graph. Edge sequences can be also indexed
   with logical expressions containing edge attributes:
   \preformatted{
-    g <- graph.ring(10)
+    g <- ring(10)
     E(g)$weight <- runif(ecount(g))
     E(g)$width <- 1
     E(g)[ weight >= 0.5 ]$width <- 3
-    plot(g, layout=layout.circle, edge.width=E(g)$width, edge.color="black")
+    plot(g, layout=layout_in_circle, edge.width=E(g)$width, edge.color="black")
   }
 
   It is important to note that, whenever we use iterators to assign new
@@ -91,9 +91,9 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   example half of the vertices will be black, the other half red, in an
   alternated way.
   \preformatted{
-    g <- graph.ring(10)
+    g <- ring(10)
     V(g)$color <- c("black", "red")
-    plot(g, layout=layout.circle)
+    plot(g, layout=layout_in_circle)
   }
 
   For the recycling, the standard R rules apply and a warning is given
@@ -101,7 +101,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
   length. E.g. the following code gives a warning, because we set the
   attribute for three vertices, but supply only two values:
   \preformatted{
-    g <- graph.tree(10)
+    g <- tree(10)
     V(g)$color <- "grey"
     V(g)[1:3]$color <- c("green", "blue")
   }
@@ -189,7 +189,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
 \examples{
 # mean degree of vertices in the largest cluster in a random graph
 g <- erdos.renyi.game(100, 2/100)
-c <- clusters(g)
+c <- components(g)
 vsl <- which(which.max(c$csize)==c$membership)
 mean(degree(g, vsl))
 
@@ -197,7 +197,7 @@ mean(degree(g, vsl))
 V(g)$color <- "green"
 V(g)[vsl]$color <- "red"
 \dontrun{plot(g, vertex.size=3, labels=NA, vertex.color="a:color",
-              layout=layout.fruchterman.reingold)}
+              layout=layout_with_fr)}
 
 # the longest geodesic within the largest cluster
 long <- numeric()
@@ -227,7 +227,7 @@ d <- get.diameter(g)
 E(g, path=d)
 
 # performance for large graphs is bad
-largeg <- graph.lattice(c(1000, 100))
+largeg <- lattice(c(1000, 100))
 system.time(E(largeg)[inc(1)])
 system.time(incident(largeg, 1))
 }

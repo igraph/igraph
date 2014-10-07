@@ -1,4 +1,5 @@
-\name{layout.bipartite}
+\name{layout_as_bipartite}
+\alias{layout_as_bipartite}
 \alias{layout.bipartite}
 \concept{Graph layout}
 \concept{Bipartite graph}
@@ -7,7 +8,7 @@
 \description{Minimize edge-crossings in a simple two-row (or column)
   layout for bipartite graphs.}
 \usage{
-layout.bipartite (graph, types = NULL, hgap = 1, vgap = 1, maxiter = 100) 
+layout_as_bipartite (graph, types = NULL, hgap = 1, vgap = 1, maxiter = 100) 
 }
 \arguments{
   \item{graph}{The bipartite input graph. It should have a logical
@@ -27,22 +28,22 @@ layout.bipartite (graph, types = NULL, hgap = 1, vgap = 1, maxiter = 100)
   The layout is created by first placing the vertices in two rows,
   according to their types. Then the positions within the rows are
   optimized to minimize edge crossings, using the Sugiyama algorithm
-  (see \code{\link{layout.sugiyama}}).
+  (see \code{\link{layout_with_sugiyama}}).
 }
 \value{A matrix with two columns and as many rows as the number of
   vertices in the input graph.}
 %\references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{layout.sugiyama}}}
+\seealso{\code{\link{layout_with_sugiyama}}}
 \examples{
 # Random bipartite graph
 inc <- matrix(sample(0:1, 50, replace=TRUE, prob=c(2,1)), 10, 5)
-g <- graph.incidence(inc)
-plot(g, layout=layout.bipartite,
+g <- graph_from_incidence_matrix(inc)
+plot(g, layout=layout_as_bipartite,
      vertex.color=c("green","cyan")[V(g)$type+1])
 
 # Two columns
-lay <- layout.bipartite(g)
+lay <- layout_as_bipartite(g)
 plot(g, layout=lay[,2:1])
 }
 \keyword{graphs}

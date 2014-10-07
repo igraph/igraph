@@ -1,14 +1,14 @@
 
-context("graph.kautz")
+context("kautz_graph")
 
-test_that("graph.kautz works", {
+test_that("kautz_graph works", {
   library(igraph)
-  g <- graph.kautz(2,3)
+  g <- kautz_graph(2,3)
   expect_that(g$name, equals("Kautz graph 2-3"))
   expect_that(g$m, equals(2))
   expect_that(g$n, equals(3))
 
-  el <- get.edgelist(g)
+  el <- as_edgelist(g)
   el <- el[order(el[,1], el[,2]),]
   expect_that(el, equals(
     structure(c(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 

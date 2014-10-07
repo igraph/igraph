@@ -1,12 +1,13 @@
-\name{graph.diversity}
+\name{diversity}
 \alias{graph.diversity}
+\alias{diversity}
 \concept{Entropy}
 \title{Graph diversity}
 \description{
   Calculates a measure of diversity for all vertices.
 }
 \usage{
-graph.diversity(graph, weights = NULL, vids = V(graph))
+diversity(graph, weights = NULL, vids = V(graph))
 }
 \arguments{
   \item{graph}{The input graph. Edge directions are ignored.}
@@ -43,15 +44,15 @@ graph.diversity(graph, weights = NULL, vids = V(graph))
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
-g1 <- erdos.renyi.game(20, 2/20)
-g2 <- erdos.renyi.game(20, 2/20)
-g3 <- erdos.renyi.game(20, 5/20)
+g1 <- sample_gnp(20, 2/20)
+g2 <- sample_gnp(20, 2/20)
+g3 <- sample_gnp(20, 5/20)
 E(g1)$weight <- 1
 E(g2)$weight <- runif(ecount(g2))
 E(g3)$weight <- runif(ecount(g3))
-graph.diversity(g1)
-graph.diversity(g2)
-graph.diversity(g3)
+diversity(g1)
+diversity(g2)
+diversity(g3)
 }
 \keyword{graphs}
 

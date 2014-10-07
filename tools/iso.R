@@ -13,7 +13,7 @@ perms <- permn( 1:n )
 to.number <- function(el) {
 
   g <- graph( t(el), n=n )
-  A <- get.adjacency(g)
+  A <- adj(g)
   diag(A) <- -1
   A <- as.numeric(A)
   A <- A [ A != -1 ]
@@ -39,8 +39,8 @@ to.edgelist <- function(num, nodes=n) {
   }
   
   A [ A != -1 ] <- rev(v)
-  g <- graph.adjacency(A)
-  get.edgelist(g)
+  g <- g_adj_matrix(A)
+  edgelist(g)
 }
   
 
@@ -116,8 +116,8 @@ to.edgelist <- function(num, nodes=n) {
   }
   
   A [ A != -1 ] <- rev(v)
-  g <- graph.adjacency(A)
-  get.edgelist(g)
+  g <- g_adj_matrix(A)
+  edgelist(g)
 }
 
 coo <- matrix( c( 0,1, 1,.5, 0,0 ), nc=2, byrow=TRUE)
@@ -128,7 +128,7 @@ for (i in 0:63) {
   
   g <- graph( t(to.edgelist(i)), n=3 )
   par(mar=c(0,0,0,0), mai=c(1,1,1,1)/5)
-  class <- graph.isoclass(g)
+  class <- iso_class(g)
   col=if (FALSE) "red" else "lightblue"
   plot(g, layout=coo, vertex.size=20, vertex.color=col, labels=NA)
   text(-.9,0,substitute(i %<=>% j, list(i=i, j=class)),
@@ -165,7 +165,7 @@ perms <- permn( 1:n )
 to.number <- function(el) {
 
   g <- graph( t(el), n=n, directed=FALSE )
-  A <- get.adjacency(g,type="upper")
+  A <- adj(g,type="upper")
   A [ lower.tri(A, diag=TRUE) ] <- -1
   A <- as.numeric(A)
   A <- A [ A != -1 ]
@@ -191,8 +191,8 @@ to.edgelist <- function(num, nodes=n) {
   }
   
   A [ A != -1 ] <- rev(v)
-  g <- graph.adjacency(A, mode="upper")
-  get.edgelist(g)
+  g <- g_adj_matrix(A, mode="upper")
+  edgelist(g)
 }
   
 

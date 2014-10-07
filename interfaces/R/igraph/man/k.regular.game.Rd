@@ -1,4 +1,5 @@
-\name{k.regular.game}
+\name{sample_k_regular}
+\alias{sample_k_regular}
 \alias{k.regular.game}
 \concept{Random graph model}
 \concept{Regular graph}
@@ -6,7 +7,7 @@
 \description{Generate a random graph where each vertex has the same
   degree.}
 \usage{
-k.regular.game (no.of.nodes, k, directed = FALSE, multiple = FALSE) 
+sample_k_regular (no.of.nodes, k, directed = FALSE, multiple = FALSE) 
 }
 \arguments{
   \item{no.of.nodes}{Integer scalar, the number of vertices in the
@@ -21,7 +22,7 @@ k.regular.game (no.of.nodes, k, directed = FALSE, multiple = FALSE)
   degrees of vertices are equal to a predefined constant k. For undirected
   graphs, at least one of k and the number of vertices must be even.
 
-  The game simply uses \code{\link{degree.sequence.game}} with
+  The game simply uses \code{\link{sample_degseq}} with
   appropriately constructed degree sequences.
 }
 \value{
@@ -32,16 +33,16 @@ k.regular.game (no.of.nodes, k, directed = FALSE, multiple = FALSE)
   Tamas Nepusz \email{ntamas@gmail.com}
 }
 \seealso{
-  \code{\link{degree.sequence.game}} for a generator with prescribed
+  \code{\link{sample_degseq}} for a generator with prescribed
   degree sequence.
 }
 \examples{
 ## A simple ring
-ring <- k.regular.game(10, 2)
+ring <- sample_k_regular(10, 2)
 plot(ring)
 
 ## k-regular graphs on 10 vertices, with k=1:9
-k10 <- lapply(1:9, k.regular.game, no.of.nodes=10)
+k10 <- lapply(1:9, sample_k_regular, no.of.nodes=10)
 
 layout(matrix(1:9, nrow=3, byrow=TRUE))
 sapply(k10, plot, vertex.label=NA)

@@ -20,9 +20,9 @@
 #
 ###################################################################
 
-graph.motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
+motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   cut.prob <- as.numeric(cut.prob)
@@ -39,9 +39,9 @@ graph.motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
   res
 }
 
-graph.motifs.no <- function(graph, size=3, cut.prob=rep(0, size)) {
+count_motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   cut.prob <- as.numeric(cut.prob)
@@ -56,10 +56,10 @@ graph.motifs.no <- function(graph, size=3, cut.prob=rep(0, size)) {
         PACKAGE="igraph")
 }
 
-graph.motifs.est <- function(graph, size=3, cut.prob=rep(0, size),
+sample_motifs <- function(graph, size=3, cut.prob=rep(0, size),
                              sample.size=vcount(graph)/10, sample=NULL) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   cut.prob <- as.numeric(cut.prob)

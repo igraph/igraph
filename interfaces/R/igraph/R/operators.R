@@ -21,11 +21,11 @@
 
 rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
                                   maps2=NULL, ignore=character()) {
-  listfun <- switch(type, "g"=list.graph.attributes,
-                    "v"=list.vertex.attributes, "e"=list.edge.attributes,
+  listfun <- switch(type, "g"=graph_attr_names,
+                    "v"=vertex_attr_names, "e"=edge_attr_names,
                     stop("Internal igraph error"))
-  getfun <- switch(type, "g"=get.graph.attribute, "v"=get.vertex.attribute,
-                   "e"=get.edge.attribute, stop("Internal igraph error"))
+  getfun <- switch(type, "g"=graph_attr, "v"=vertex_attr,
+                   "e"=edge_attr, stop("Internal igraph error"))
   alist <- lapply(graphs, listfun)
   an <- unique(unlist(alist))
   an <- setdiff(an, ignore)
@@ -68,7 +68,7 @@ rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
 #' The union of two or more graphs are created. The graphs are assumed to have
 #' disjoint vertex sets.
 #' 
-#' \code{graph.disjoint.union} creates a union of two or more disjoint graphs.
+#' \code{disjoint_union} creates a union of two or more disjoint graphs.
 #' Thus first the vertices in the second, third, etc. graphs are relabeled to
 #' have completely disjoint graphs. Then a simple union is created. This
 #' function can also be used via the \%du\% operator.
@@ -95,18 +95,18 @@ rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
 #' @examples
 #' 
 #' ## A star and a ring
-#' g1 <- graph.star(10, mode="undirected")
+#' g1 <- star(10, mode="undirected")
 #' V(g1)$name <- letters[1:10]
-#' g2 <- graph.ring(10)
+#' g2 <- ring(10)
 #' V(g2)$name <- letters[11:20]
 #' str(g1 %du% g2)
 #' 
-graph.disjoint.union <- function(...) {
+disjoint_union <- function(...) {
   
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
-    if (is.igraph(l)) list(l) else l
+    if (is_igraph(l)) list(l) else l
   } ))
-  if (!all(sapply(graphs, is.igraph))) {
+  if (!all(sapply(graphs, is_igraph))) {
     stop("Not a graph object")
   }
   
@@ -167,24 +167,24 @@ graph.disjoint.union <- function(...) {
 }
 
 "%du%" <- function(x,y) {
-  graph.disjoint.union(x,y)
+  disjoint_union(x,y)
 }
 
 .igraph.graph.union.or.intersection <- function(call, ..., byname,
                                                 keep.all.vertices) {
 
   graphs <- unlist(recursive=FALSE, lapply(list(...), function(l) {
-    if (is.igraph(l)) list(l) else l
+    if (is_igraph(l)) list(l) else l
   } ))
-  if (!all(sapply(graphs, is.igraph))) {
+  if (!all(sapply(graphs, is_igraph))) {
     stop("Not a graph object")
   }
   if (byname != "auto" && !is.logical(byname)) {
     stop("`bynam' must be \"auto\", or logical")
   }
-  nonamed <- sum(sapply(graphs, is.named))
+  nonamed <- sum(sapply(graphs, is_named))
   if (byname == "auto") {
-    byname <- all(sapply(graphs, is.named))
+    byname <- all(sapply(graphs, is_named))
     if (nonamed != 0 && nonamed != length(graphs)) {
       warning("Some, but not all graphs are named, not using vertex names")
     }
@@ -192,21 +192,21 @@ graph.disjoint.union <- function(...) {
     stop("Some graphs are not named")
   }
 
-  edgemaps <- length(unlist(lapply(graphs, list.edge.attributes))) != 0
+  edgemaps <- length(unlist(lapply(graphs, edge_attr_names))) != 0
   
   if (byname) {
-    allnames <- lapply(graphs, get.vertex.attribute, "name")
+    allnames <- lapply(graphs, vertex_attr, "name")
     if (keep.all.vertices) {
       uninames <- unique(unlist(allnames))
       newgraphs <- lapply(graphs, function(g) {
         g <- g + setdiff(uninames, V(g)$name)
-        permute.vertices(g, match(V(g)$name, uninames))
+        permute(g, match(V(g)$name, uninames))
       })
     } else {
       uninames <- Reduce(intersect, allnames)
       newgraphs <- lapply(graphs, function(g) {
         g <- g - setdiff(V(g)$name, uninames)
-        permute.vertices(g, match(V(g)$name, uninames))
+        permute(g, match(V(g)$name, uninames))
       })
     }
     
@@ -269,7 +269,7 @@ graph.disjoint.union <- function(...) {
 #' The union of two or more graphs are created. The graphs may have identical
 #' or overlapping vertex sets.
 #' 
-#' \code{graph.union} creates the union of two or more graphs.  Edges which are
+#' \code{union} creates the union of two or more graphs.  Edges which are
 #' included in at least one graph will be part of the new graph. This function
 #' can be also used via the \%u\% operator.
 #' 
@@ -277,7 +277,7 @@ graph.disjoint.union <- function(...) {
 #' are named), then the operation is performed on symbolic vertex names instead
 #' of the internal numeric vertex ids.
 #' 
-#' \code{graph.union} keeps the attributes of all graphs. All graph, vertex and
+#' \code{union} keeps the attributes of all graphs. All graph, vertex and
 #' edge attributes are copied to the result. If an attribute is present in
 #' multiple graphs and would result a name clash, then this attribute is
 #' renamed by adding suffixes: _1, _2, etc.
@@ -302,18 +302,18 @@ graph.disjoint.union <- function(...) {
 #' @examples
 #' 
 #' ## Union of two social networks with overlapping sets of actors
-#' net1 <- graph.formula(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
-#'                       H-F:G, H-I-J)
-#' net2 <- graph.formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
+#' net1 <- graph_from_formula(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
+#'                   H-F:G, H-I-J)
+#' net2 <- graph_from_formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
 #' str(net1 %u% net2)
 #' 
-graph.union <- function(..., byname="auto") {
+union <- function(..., byname="auto") {
   .igraph.graph.union.or.intersection("R_igraph_union", ..., byname=byname,
                                       keep.all.vertices=TRUE)
 }
 
 "%u%" <- function(x,y) {
-  graph.union(x,y)
+  union(x,y)
 }
 
 
@@ -358,9 +358,9 @@ graph.union <- function(..., byname="auto") {
 #' @examples
 #' 
 #' ## Common part of two social networks
-#' net1 <- graph.formula(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
-#'                       H-F:G, H-I-J)
-#' net2 <- graph.formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
+#' net1 <- graph_from_formula(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
+#'                   H-F:G, H-I-J)
+#' net2 <- graph_from_formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
 #' str(net1 %s% net2)
 #' 
 graph.intersection <- function(..., byname="auto",
@@ -380,7 +380,7 @@ graph.intersection <- function(..., byname="auto",
 #' 
 #' The difference of two graphs are created.
 #' 
-#' \code{graph.difference} creates the difference of two graphs. Only edges
+#' \code{difference} creates the difference of two graphs. Only edges
 #' present in the first graph but not in the second will be be included in the
 #' new graph. The corresponding operator is \%m\%.
 #' 
@@ -388,7 +388,7 @@ graph.intersection <- function(..., byname="auto",
 #' are all named), then the operation is performed based on symbolic vertex
 #' names. Otherwise numeric vertex ids are used.
 #' 
-#' \code{graph.difference} keeps all attributes (graph, vertex and edge) of the
+#' \code{difference} keeps all attributes (graph, vertex and edge) of the
 #' first graph.
 #' 
 #' Note that \code{big} and \code{small} must both be directed or both be
@@ -410,26 +410,26 @@ graph.intersection <- function(..., byname="auto",
 #' @examples
 #' 
 #' ## Create a wheel graph
-#' wheel <- graph.union(graph.ring(10),
-#'                      graph.star(11, center=11, mode="undirected"))
+#' wheel <- union(ring(10),
+#'                      star(11, center=11, mode="undirected"))
 #' V(wheel)$name <- letters[seq_len(vcount(wheel))]
 #' 
 #' ## Subtract a star graph from it
-#' sstar <- graph.star(6, center=6, mode="undirected")
+#' sstar <- star(6, center=6, mode="undirected")
 #' V(sstar)$name <- letters[c(1,3,5,7,9,11)]
 #' G <- wheel %m% sstar
 #' str(G)
-#' plot(G, layout=layout.auto(wheel))
+#' plot(G, layout=layout_nicely(wheel))
 #' 
-graph.difference <- function(big, small, byname="auto") {
+difference <- function(big, small, byname="auto") {
 
-  if (!is.igraph(big) || !is.igraph(small)) {
+  if (!is_igraph(big) || !is_igraph(small)) {
     stop("argument is not a graph")
   }
   if (byname != "auto" && !is.logical(byname)) {
     stop("`bynam' must be \"auto\", or logical")
   }
-  nonamed <- is.named(big) + is.named(small)
+  nonamed <- is_named(big) + is_named(small)
   if (byname == "auto") {
     byname <- nonamed == 2
     if (nonamed == 1) {
@@ -450,12 +450,12 @@ graph.difference <- function(big, small, byname="auto") {
     if (any(is.na(perm))) {
       perm[is.na(perm)] <- seq(from=vcount(small)+1, to=vcount(big))
     }
-    big <- permute.vertices(big, perm)
+    big <- permute(big, perm)
 
     on.exit(.Call("R_igraph_finalizer", PACKAGE="igraph"))
     res <- .Call("R_igraph_difference", big, small,
                  PACKAGE="igraph")
-    permute.vertices(res, match(V(res)$name, bnames))
+    permute(res, match(V(res)$name, bnames))
 
   } else {
     on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -465,7 +465,7 @@ graph.difference <- function(big, small, byname="auto") {
 }
     
 "%m%" <- function(x,y) {
-  graph.difference(x,y)
+  difference(x,y)
 }
 
 
@@ -475,13 +475,14 @@ graph.difference <- function(big, small, byname="auto") {
 #' A complementer graph contains all edges that were not present in the input
 #' graph.
 #' 
-#' \code{graph.complementer} creates the complementer of a graph. Only edges
+#' \code{complementer} creates the complementer of a graph. Only edges
 #' which are \emph{not} present in the original graph will be included in the
 #' new graph.
 #' 
-#' \code{graph.complementer} keeps graph and vertex attriubutes, edge
+#' \code{complementer} keeps graph and vertex attriubutes, edge
 #' attributes are lost.
-#' 
+#'
+#' @aliases graph.complementer
 #' @param graph The input graph, can be directed or undirected.
 #' @param loops Logical constant, whether to generate loop edges.
 #' @return A new graph object.
@@ -490,19 +491,19 @@ graph.difference <- function(big, small, byname="auto") {
 #' @examples
 #' 
 #' ## Complementer of a ring
-#' g <- graph.ring(10)
-#' graph.complementer(g)
+#' g <- ring(10)
+#' complementer(g)
 #' 
 #' ## A graph and its complementer give together the full graph
-#' g <- graph.ring(10)
-#' gc <- graph.complementer(g)
-#' gu <- graph.union(g, gc)
+#' g <- ring(10)
+#' gc <- complementer(g)
+#' gu <- union(g, gc)
 #' gu
-#' graph.isomorphic(gu, graph.full(vcount(g)))
+#' graph.isomorphic(gu, full_graph(vcount(g)))
 #' 
-graph.complementer <- function(graph, loops=FALSE) {
+complementer <- function(graph, loops=FALSE) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -516,7 +517,7 @@ graph.complementer <- function(graph, loops=FALSE) {
 #' 
 #' Relational composition of two graph.
 #' 
-#' \code{graph.compose} creates the relational composition of two graphs. The
+#' \code{compose} creates the relational composition of two graphs. The
 #' new graph will contain an (a,b) edge only if there is a vertex c, such that
 #' edge (a,c) is included in the first graph and (c,b) is included in the
 #' second graph. The corresponding operator is \%c\%.
@@ -528,7 +529,7 @@ graph.complementer <- function(graph, loops=FALSE) {
 #' are all named), then the operation is performed based on symbolic vertex
 #' names. Otherwise numeric vertex ids are used.
 #' 
-#' \code{graph.compose} keeps the attributes of both graphs. All graph, vertex
+#' \code{compose} keeps the attributes of both graphs. All graph, vertex
 #' and edge attributes are copied to the result. If an attribute is present in
 #' multiple graphs and would result a name clash, then this attribute is
 #' renamed by adding suffixes: _1, _2, etc.
@@ -565,22 +566,22 @@ graph.complementer <- function(graph, loops=FALSE) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g1 <- graph.ring(10)
-#' g2 <- graph.star(10, mode="undirected")
-#' gc <- graph.compose(g1, g2)
+#' g1 <- ring(10)
+#' g2 <- star(10, mode="undirected")
+#' gc <- compose(g1, g2)
 #' str(gc)
 #' str(simplify(gc))
 #' 
-graph.compose <- function(g1, g2, byname="auto") {
+compose <- function(g1, g2, byname="auto") {
 
-  if (!is.igraph(g1) || !is.igraph(g2)) {
+  if (!is_igraph(g1) || !is_igraph(g2)) {
     stop("Not a graph object")
   }
 
   if (byname != "auto" && !is.logical(byname)) {
     stop("`byname' must be \"auto\", or logical")
   }
-  nonamed <- is.named(g1) + is.named(g2)
+  nonamed <- is_named(g1) + is_named(g2)
   if (byname == "auto") {
     byname <- nonamed == 2
     if (nonamed == 1) {
@@ -599,15 +600,15 @@ graph.compose <- function(g1, g2, byname="auto") {
       g2 <- g2 + setdiff(uninames, V(g2)$name)
     }
     if (any(uninames != V(g1)$name)) {
-      g1 <- permute.vertices(g1, match(V(g1)$name, uninames))
+      g1 <- permute(g1, match(V(g1)$name, uninames))
     }
     if (any(uninames != V(g2)$name)) {
-      g2 <- permute.vertices(g2, match(V(g2)$name, uninames))
+      g2 <- permute(g2, match(V(g2)$name, uninames))
     }
   }
 
-  edgemaps <- (length(list.edge.attributes(g1)) != 0 ||
-               length(list.edge.attributes(g2)) != 0)
+  edgemaps <- (length(edge_attr_names(g1)) != 0 ||
+               length(edge_attr_names(g2)) != 0)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_compose", g1, g2, edgemaps,
@@ -637,7 +638,7 @@ graph.compose <- function(g1, g2, byname="auto") {
 }
 
 "%c%" <- function(x,y) {
-  graph.compose(x,y)
+  compose(x,y)
 }
 
 edge <- function(...) {
@@ -657,17 +658,17 @@ path <- function(...) {
 }
 
 `+.igraph` <- function(e1, e2) {
-  if (!is.igraph(e1) && is.igraph(e2)) {
+  if (!is_igraph(e1) && is_igraph(e2)) {
     tmp <- e1
     e1 <- e2
     e2 <- tmp
   }
-  if (is.igraph(e2) && is.named(e1) && is.named(e2)) {
+  if (is_igraph(e2) && is_named(e1) && is_named(e2)) {
     ## Union of graphs
-    res <- graph.union(e1, e2)
-  } else if (is.igraph(e2)) {
+    res <- union(e1, e2)
+  } else if (is_igraph(e2)) {
     ## Disjoint union of graphs
-    res <- graph.disjoint.union(e1,e2)
+    res <- disjoint_union(e1,e2)
 
   } else if ("igraph.edge" %in% class(e2)) {
     ## Adding edges, possibly with attributes
@@ -679,7 +680,7 @@ path <- function(...) {
       toadd <- unlist(e2[names(e2)==""])
       attr <- e2[names(e2)!=""]
     }
-    res <- add.edges(e1, as.igraph.vs(e1, toadd), attr=attr)
+    res <- add_edges(e1, as.igraph.vs(e1, toadd), attr=attr)
 
   } else if ("igraph.vertex" %in% class(e2)) {
     ## Adding vertices, possibly with attributes
@@ -699,7 +700,7 @@ path <- function(...) {
       e2 <- c(list(name=nn), e2[names(e2)!=""])
     }
     la <- unique(sapply(e2, length))
-    res <- add.vertices(e1, la, attr=e2)
+    res <- add_vertices(e1, la, attr=e2)
 
   } else if ("igraph.path" %in% class(e2)) {
     ## Adding edges along a path, possibly with attributes
@@ -715,18 +716,18 @@ path <- function(...) {
     lt <- length(toadd)
     if (lt >= 2) {
       toadd <- c(toadd[1], rep(toadd[2:(lt-1)], each=2), toadd[lt])
-      res <- add.edges(e1, toadd, attr=attr)
+      res <- add_edges(e1, toadd, attr=attr)
     } else {
       res <- e1
     }
     
   } else if (is.numeric(e2) && length(e2)==1) {
     ## Adding some isolate vertices
-    res <- add.vertices(e1, e2)
+    res <- add_vertices(e1, e2)
 
   } else if (is.character(e2)) {
     ## Adding named vertices
-    res <- add.vertices(e1, length(e2), name=e2)
+    res <- add_vertices(e1, length(e2), name=e2)
     
   } else {
     stop("Cannot add unknown type to igraph graph")
@@ -738,27 +739,27 @@ path <- function(...) {
   if (missing(e2)) {
     stop("Non-numeric argument to negation operator")
   }
-  if (is.igraph(e2)) {
-    res <- graph.difference(e1, e2)
+  if (is_igraph(e2)) {
+    res <- difference(e1, e2)
   } else if ("igraph.vertex" %in% class(e2)) {
-    res <- delete.vertices(e1, unlist(e2, recursive=FALSE))
+    res <- delete_vertices(e1, unlist(e2, recursive=FALSE))
   } else if ("igraph.edge" %in% class(e2)) {
-    res <- delete.edges(e1, unlist(e2, recursive=FALSE))
+    res <- delete_edges(e1, unlist(e2, recursive=FALSE))
   } else if ("igraph.path" %in% class(e2)) {
     todel <- unlist(e2, recursive=FALSE)
     lt <- length(todel)
     if (lt >= 2) {
       todel <- paste(todel[-lt], todel[-1], sep="|")
-      res <- delete.edges(e1, todel)
+      res <- delete_edges(e1, todel)
     } else {
       res <- e1
     }
   } else if ("igraph.vs" %in% class(e2)) {
-    res <- delete.vertices(e1, e2)
+    res <- delete_vertices(e1, e2)
   } else if ("igraph.es" %in% class(e2)) {
-    res <- delete.edges(e1, e2)
+    res <- delete_edges(e1, e2)
   } else if (is.numeric(e2) || is.character(e2)) {
-    res <- delete.vertices(e1, e2)
+    res <- delete_vertices(e1, e2)
   } else {
     stop("Cannot substract unknown type from igraph graph")
   }

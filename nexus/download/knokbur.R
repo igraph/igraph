@@ -28,8 +28,8 @@ mat2 <- matrix(mat2, sqrt(length(mat2)), byrow=TRUE)
 colnames(mat1) <- rownames(mat1) <- colnames(mat2) <- rownames(mat2) <- names
 
 library(igraph)
-g1 <- graph.adjacency(mat1)
-g2 <- graph.adjacency(mat2)
+g1 <- g_adj_matrix(mat1)
+g2 <- g_adj_matrix(mat2)
 V(g1)$Sector <- V(g2)$Sector <- as.character(met$Sector)
 V(g1)$Rating <- V(g2)$Rating <- met$Rating
 

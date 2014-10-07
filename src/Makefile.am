@@ -298,7 +298,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_community.h	../include/igraph_operators.h \
 		../include/igraph_components.h	../include/igraph_paths.h     \
 		../include/igraph_constructors.h ../include/igraph_progress.h \
-		../include/igraph_conversion.h	../include/igraph_revolver.h  \
+		../include/igraph_conversion.h	\
 		../include/igraph_datatype.h	../include/igraph_structural.h\
 		../include/igraph_flow.h	../include/igraph_topology.h  \
 		../include/igraph_foreign.h	../include/igraph_transitivity.h \
@@ -339,16 +339,16 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     foreign-graphml.c flow.c igraph_buckets.c \
 			     NetDataTypes.cpp NetRoutines.cpp clustertool.cpp \
 			     pottsmodel_2.cpp spectral_properties.c cores.c \
-			     igraph_set.c cliques.c revolver_cit.c revolver_grow.c\
+			     igraph_set.c cliques.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
 			     spmatrix.c community.c fast_community.c \
-			     evolver_cit.c gml_tree.c \
+			     gml_tree.c \
 			     bliss_orbit.cc bliss_eqrefhash.cc \
 			     bliss_partition.cc bliss_graph.cc bliss_timer.cc \
 			     bliss_heap.cc bliss_utils.cc bliss.cc \
-			     cattributes.c revolver_ml_cit.c zeroin.c bfgs.c math.c \
+			     cattributes.c zeroin.c bfgs.c math.c \
 			     forestfire.c microscopic_update.c \
 			     blas.c arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
 			     drl_graph.cpp DensityGrid.cpp \

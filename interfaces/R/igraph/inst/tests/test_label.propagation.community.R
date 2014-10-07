@@ -1,5 +1,5 @@
 
-context("label.propagation.community")
+context("cluster_label_prop")
 
 test_that("label.probagation.community works", {
 
@@ -7,7 +7,7 @@ test_that("label.probagation.community works", {
 
   g <- graph.famous("Zachary")
   set.seed(42)
-  lpc <- label.propagation.community(g)
+  lpc <- cluster_label_prop(g)
   expect_that(lpc$modularity, equals(modularity(g, lpc$membership)))
   expect_that(membership(lpc),
               equals(c(1, 1, 2, 1, 3, 3, 3, 1, 2, 2, 3, 1, 1, 1, 2, 2,

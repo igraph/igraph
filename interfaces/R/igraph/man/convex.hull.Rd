@@ -1,5 +1,6 @@
-\name{convex.hull}
+\name{convex_hull}
 \alias{convex.hull}
+\alias{convex_hull}
 \concept{Convex hull}
 \title{Convex hull of a set of vertices}
 \description{
@@ -7,7 +8,7 @@
   polygon that has the smallest area.
 }
 \usage{
-convex.hull(data)
+convex_hull(data)
 }
 \arguments{
   \item{data}{The data points, a numeric matrix with two columns.}
@@ -29,6 +30,6 @@ convex.hull(data)
 % \seealso
 \examples{
 M <- cbind( runif(100), runif(100) )
-convex.hull(M)
+convex_hull(M)
 }
 \keyword{graphs}

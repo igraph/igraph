@@ -1,16 +1,16 @@
 
-context("layout.merge")
+context("merge_coords")
 
-test_that("layout.merge works", {
+test_that("merge_coords works", {
 
   library(igraph)
   set.seed(42)
 
-  g <- list(graph.ring(10), graph.ring(5))
-  l <- lapply(g, layout.mds)
+  g <- list(ring(10), ring(5))
+  l <- lapply(g, layout_with_mds)
   l
 
-  lm <- layout.merge(g, l)
+  lm <- merge_coords(g, l)
   expect_that(is.matrix(lm), is_true())
   expect_that(ncol(lm), equals(2))
   expect_that(nrow(lm), equals(sum(sapply(g, vcount))))
@@ -19,8 +19,8 @@ test_that("layout.merge works", {
 
   ## Stress test
   for (i in 1:10) {
-    g <- erdos.renyi.game(100, 2/100)
-    l <- layout.mds(g)
+    g <- sample_gnp(100, 2/100)
+    l <- layout_with_mds(g)
     expect_that(dim(l), equals(c(vcount(g), 2)))
   }
 

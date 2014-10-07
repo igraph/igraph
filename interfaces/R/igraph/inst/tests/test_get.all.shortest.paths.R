@@ -20,7 +20,7 @@ test_that("get.all.shortest.paths works", {
   edges <- as.data.frame(edges)
   edges[[3]] <- as.numeric(as.character(edges[[3]]))
 
-  g <- graph.data.frame(as.data.frame(edges))
+  g <- graph_from_data_frame(as.data.frame(edges))
 
   sortlist <- function(list) {
     list <- lapply(list, sort)

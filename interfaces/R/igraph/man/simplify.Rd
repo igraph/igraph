@@ -1,6 +1,7 @@
 \name{simplify}
 \alias{simplify}
 \alias{is.simple}
+\alias{is_simple}
 \concept{Simple graph}
 \title{Simple graphs}
 \description{Simple graphs are graphs which do not contain loop and
@@ -8,7 +9,7 @@
 \usage{
 simplify(graph, remove.multiple = TRUE, remove.loops = TRUE,
          edge.attr.comb = getIgraphOpt("edge.attr.comb"))
-is.simple(graph)
+is_simple(graph)
 }
 \arguments{
   \item{graph}{The graph to work on.}
@@ -28,7 +29,7 @@ is.simple(graph)
   endpoints (for directed graphs order does matter). A graph is simple
   is it does not contain loop edges and multiple edges.
 
-  \code{is.simple} checks whether a graph is simple.
+  \code{is_simple} checks whether a graph is simple.
 
   \code{simplify} removes the loop and/or multiple edges from a graph.
   If both \code{remove.loops} and \code{remove.multiple} are \code{TRUE}
@@ -37,14 +38,14 @@ is.simple(graph)
 \value{A new graph object with the edges deleted. }
 % \references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{is.loop}}, \code{\link{is.multiple}} and
-  \code{\link{count.multiple}}, \code{\link{delete.edges}},
-  \code{\link{delete.vertices}}}
+\seealso{\code{\link{which_loop}}, \code{\link{which_multiple}} and
+  \code{\link{count_multiple}}, \code{\link{delete_edges}},
+  \code{\link{delete_vertices}}}
 \examples{
 g <- graph( c(1,2,1,2,3,3) )
-is.simple(g)
-is.simple(simplify(g, remove.loops=FALSE))
-is.simple(simplify(g, remove.multiple=FALSE))
-is.simple(simplify(g))
+is_simple(g)
+is_simple(simplify(g, remove.loops=FALSE))
+is_simple(simplify(g, remove.multiple=FALSE))
+is_simple(simplify(g))
 }
 \keyword{graphs}

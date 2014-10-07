@@ -221,7 +221,7 @@ close.igraphconsole <- function(con, ...) {
 #' The igraph console is a GUI windows that shows what the currently running
 #' igraph function is doing.
 #' 
-#' The console can be started by calling the \code{igraph.console} function.
+#' The console can be started by calling the \code{console} function.
 #' Then it stays open, until the user closes it.
 #' 
 #' Another way to start it to set the \code{verbose} igraph option to
@@ -237,7 +237,7 @@ close.igraphconsole <- function(con, ...) {
 #' @seealso \code{\link{igraph.options}} and the \code{verbose} option.
 #' @keywords graphs
 
-igraph.console <- function() {
+console <- function() {
   oldverb <- getIgraphOpt("verbose")
   igraph.options(verbose="tkconsole")
   pb <- .igraph.progress.tkconsole.create(oldverb)

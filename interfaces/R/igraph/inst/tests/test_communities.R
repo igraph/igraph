@@ -5,10 +5,10 @@ test_that("community detection functions work", {
   library(igraph)
   set.seed(42)
 
-  F <- list("edge.betweenness.community", "fastgreedy.community",
-            "label.propagation.community", "leading.eigenvector.community",
-            "multilevel.community", "optimal.community",
-            "spinglass.community", "walktrap.community")
+  F <- list("cluster_edge_betweenness", "cluster_fast_greedy",
+            "cluster_label_prop", "cluster_leading_eigen",
+            "cluster_louvain", "cluster_optimal",
+            "cluster_spinglass", "cluster_walktrap")
 
   karate <- graph.famous("Zachary")
 
@@ -26,11 +26,11 @@ test_that("community detection functions work", {
     expect_that(length(comm), equals(max(membership(comm))))
   }
 
-  fc <- fastgreedy.community(karate)
-  m1 <- modularity(karate, cutat(fc, no=1))
-  m2 <- modularity(karate, cutat(fc, no=2))
-  m3 <- modularity(karate, cutat(fc, no=3))
-  m4 <- modularity(karate, cutat(fc, no=4))
+  fc <- cluster_fast_greedy(karate)
+  m1 <- modularity(karate, cut_at(fc, no=1))
+  m2 <- modularity(karate, cut_at(fc, no=2))
+  m3 <- modularity(karate, cut_at(fc, no=3))
+  m4 <- modularity(karate, cut_at(fc, no=4))
   expect_that(m1, equals(0))
   expect_that(m2, equals(0.3717948718))
   expect_that(m3, equals(0.3806706114))
@@ -74,7 +74,7 @@ test_that("creating communities objects works", {
 test_that("communities function works", {
   library(igraph)
   g <- graph.famous("Zachary")
-  oc <- optimal.community(g)
+  oc <- cluster_optimal(g)
   gr <- communities(oc)
   expect_that(gr, equals
     (structure(list(`1` = c(1L, 2L, 3L, 4L, 8L, 12L, 13L, 14L, 18L,
@@ -83,9 +83,9 @@ test_that("communities function works", {
      26L, 28L, 29L, 32L)), .Dim = 4L, .Dimnames = list(c("1", "2",
      "3", "4")))))
 
-  g <- graph.ring(5) + graph.ring(5)
+  g <- ring(5) + ring(5)
   V(g)$name <- letters[1:10]
-  oc <- optimal.community(g)
+  oc <- cluster_optimal(g)
   gr <- communities(oc)
   expect_that(gr, equals(structure(list(`1` = letters[1:5],
                                         `2` = letters[6:10]),

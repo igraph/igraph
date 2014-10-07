@@ -23,14 +23,15 @@
 
 #' Running mean of a time series
 #' 
-#' \code{running.mean} calculates the running mean in a vector with the given
+#' \code{running_mean} calculates the running mean in a vector with the given
 #' bin width.
 #' 
 #' The running mean of \code{v} is a \code{w} vector of length
 #' \code{length(v)-binwidth+1}. The first element of \code{w} id the average of
 #' the first \code{binwidth} elements of \code{v}, the second element of
 #' \code{w} is the average of elements \code{2:(binwidth+1)}, etc.
-#' 
+#'
+#' @aliases running.mean
 #' @param v The numeric vector.
 #' @param binwidth Numeric constant, the size of the bin, should be meaningful,
 #' ie. smaller than the length of \code{v}.
@@ -39,9 +40,9 @@
 #' @keywords manip
 #' @examples
 #' 
-#' running.mean(1:100, 10)
+#' running_mean(1:100, 10)
 #' 
-running.mean <- function(v, binwidth) {
+running_mean <- function(v, binwidth) {
 
   v <- as.numeric(v)
   binwidth <- as.numeric(binwidth)
@@ -64,7 +65,8 @@ running.mean <- function(v, binwidth) {
 #' The algorithm runs in \code{O(length)} expected time, even if
 #' \code{high-low} is big. It is much faster (but of course less general) than
 #' the builtin \code{sample} function of R.
-#' 
+#'
+#' @aliases igraph.sample
 #' @param low The lower limit of the interval (inclusive).
 #' @param high The higher limit of the interval (inclusive).
 #' @param length The length of the sample.
@@ -76,10 +78,10 @@ running.mean <- function(v, binwidth) {
 #' @keywords datagen
 #' @examples
 #' 
-#' rs <- igraph.sample(1, 100000000, 10)
+#' rs <- sample_seq(1, 100000000, 10)
 #' rs
 #' 
-igraph.sample <- function(low, high, length) {
+sample_seq <- function(low, high, length) {
   if (length>high-low+1) {
     stop("length too big for this interval")
   }

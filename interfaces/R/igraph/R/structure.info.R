@@ -20,8 +20,8 @@
 #
 ###################################################################
 
-are.connected <- function(graph, v1, v2) {
-  if (!is.igraph(graph)) {
+is_connected_to <- function(graph, v1, v2) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )

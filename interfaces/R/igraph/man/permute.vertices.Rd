@@ -1,10 +1,11 @@
-\name{permute.vertices}
+\name{permute}
 \alias{permute.vertices}
+\alias{permute}
 \concept{Permutation}
 \title{Permute the vertices of a graph}
 \description{Create a new graph, by permuting vertex ids.}
 \usage{
-permute.vertices(graph, permutation)
+permute(graph, permutation)
 }
 \arguments{
   \item{graph}{The input graph, it can directed or undirected.}
@@ -16,27 +17,27 @@ permute.vertices(graph, permutation)
 \details{
   This function creates a new graph from the input graph by permuting
   its vertices according to the specified mapping. Call this function
-  with the output of \code{\link{canonical.permutation}} to create
+  with the output of \code{\link{canonical_permutation}} to create
   the canonical form of a graph.
 
-  \code{permute.vertices} keeps all graph, vertex and edge attributes of
+  \code{permute} keeps all graph, vertex and edge attributes of
   the graph.
 }
 \value{A new graph object.}
 %\references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{canonical.permutation}}}
+\seealso{\code{\link{canonical_permutation}}}
 \examples{
 # Random permutation of a random graph
-g <- random.graph.game(20, 50, type="gnm")
-g2 <- permute.vertices(g, sample(vcount(g)))
+g <- sample_gnm(20, 50)
+g2 <- permute(g, sample(vcount(g)))
 graph.isomorphic(g, g2)
 
 # Permutation keeps all attributes
 g$name <- "Random graph, Gnm, 20, 50"
 V(g)$name <- letters[1:vcount(g)]
 E(g)$weight <- sample(1:5, ecount(g), replace=TRUE)
-g2 <- permute.vertices(g, sample(vcount(g)))
+g2 <- permute(g, sample(vcount(g)))
 graph.isomorphic(g, g2)
 g2$name
 V(g2)$name

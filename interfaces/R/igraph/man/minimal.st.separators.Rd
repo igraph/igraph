@@ -1,12 +1,13 @@
-\name{minimal.st.separators}
+\name{min_st_separators}
 \alias{minimal.st.separators}
+\alias{min_st_separators}
 \concept{Minimal (s,t) separators}
 \concept{Vertex separator}
 \title{Minimum size vertex separators}
 \description{List all vertex sets that are minimal (s,t) separators for
   some s and t, in an undirected graph.}
 \usage{
-minimal.st.separators(graph)
+min_st_separators(graph)
 }
 \arguments{
   \item{graph}{The input graph. It may be directed, but edge directions
@@ -34,10 +35,10 @@ minimal.st.separators(graph)
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 %\seealso{}
 \examples{
-ring <- graph.ring(4)
-minimal.st.separators(ring)
+ring <- ring(4)
+min_st_separators(ring)
 
 chvatal <- graph.famous("chvatal")
-minimal.st.separators(chvatal)
+min_st_separators(chvatal)
 }
 \keyword{graphs}

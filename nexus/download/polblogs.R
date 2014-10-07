@@ -10,18 +10,18 @@ txt <- readLines(paste(sep="", tmp, "/polblogs.txt"))
 gml <- paste(sep="", tmp, "/polblogs.gml")
 
 library(igraph)
-g <- read.graph(gml, format="gml")
+g <- read_graph(gml, format="gml")
 
-g <- remove.vertex.attribute(g, "id")
+g <- delete_vertex_attr(g, "id")
 
 V(g)$name <- V(g)$label
-g <- remove.vertex.attribute(g, "label")
+g <- delete_vertex_attr(g, "label")
 
 V(g)$LeftRight <- V(g)$value
-g <- remove.vertex.attribute(g, "value")
+g <- delete_vertex_attr(g, "value")
 
 V(g)$Source <- V(g)$source
-g <- remove.vertex.attribute(g, "source")
+g <- delete_vertex_attr(g, "source")
 
 g$name <- "US politics blog network"
 g$Author <- "L. A. Adamic and N. Glance"

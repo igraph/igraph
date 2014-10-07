@@ -1,17 +1,17 @@
 
-context("largest.independent.vertex.sets")
+context("largest_ivs")
 
-test_that("largest.independent.vertex.sets works", {
+test_that("largest_ivs works", {
 
   library(igraph)
 
-  g <- erdos.renyi.game(50, 0.8)
-  livs <- largest.independent.vertex.sets(g)
+  g <- sample_gnp(50, 0.8)
+  livs <- largest_ivs(g)
   expect_that(unique(sapply(livs, length)),
-              equals(independence.number(g)))
+              equals(ivs_size(g)))
 
   ec <- sapply(seq_along(livs), function(x)
-               ecount(induced.subgraph(g, livs[[x]])))
+               ecount(induced_subgraph(g, livs[[x]])))
   expect_that(unique(ec), equals(0))
 
   ## TODO: check that they are largest

@@ -26,7 +26,7 @@ is.principal <- function(M, lambda, eps=1e-4) {
 
 for (i in 1:10000) {
   cat(".")
-  g <- erdos.renyi.game(30, 1/30, directed=TRUE)
+  g <- g_np(30, 1/30, directed=TRUE)
   M <- get.adjacency(g)
   clu <- clusters(g, mode="strong")$membership
   ae <- numeric()

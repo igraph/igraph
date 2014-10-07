@@ -7,7 +7,7 @@ test_that("SIR works", {
   library(digest)
   library(igraph)
 
-  g <- erdos.renyi.game(50, 50, type="gnm")
+  g <- sample_gnm(50, 50)
   res <- sir(g, beta=5, gamma=1, no.sim=10)
   if (.Machine$sizeof.pointer == 4) {
     expect_that(digest(res), equals("b73a8ad03b832b3543f2f03d07330398"))

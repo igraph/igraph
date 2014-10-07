@@ -6,20 +6,20 @@ test_that("motif finding works", {
   library(igraph)
   set.seed(123)
 
-  b <- erdos.renyi.game(10000, 4/10000, directed=TRUE)
+  b <- sample_gnp(10000, 4/10000, directed=TRUE)
 
-  mno <- graph.motifs.no(b)
+  mno <- count_motifs(b)
 
-  mno0 <- graph.motifs.no(b, cut.prob=c(1/3, 0, 0))
-  mno1 <- graph.motifs.no(b, cut.prob=c(0, 0, 1/3))
-  mno2 <- graph.motifs.no(b, cut.prob=c(0, 1/3, 0))
+  mno0 <- count_motifs(b, cut.prob=c(1/3, 0, 0))
+  mno1 <- count_motifs(b, cut.prob=c(0, 0, 1/3))
+  mno2 <- count_motifs(b, cut.prob=c(0, 1/3, 0))
   expect_that(c(mno0/mno, mno1/mno, mno2/mno),
               equals(c(0.654821903845065, 0.666289144345659,
                        0.668393831285275)))
 
-  mno3 <- graph.motifs.no(b, cut.prob=c(0, 1/3, 1/3))
-  mno4 <- graph.motifs.no(b, cut.prob=c(1/3, 0, 1/3))
-  mno5 <- graph.motifs.no(b, cut.prob=c(1/3, 1/3, 0))
+  mno3 <- count_motifs(b, cut.prob=c(0, 1/3, 1/3))
+  mno4 <- count_motifs(b, cut.prob=c(1/3, 0, 1/3))
+  mno5 <- count_motifs(b, cut.prob=c(1/3, 1/3, 0))
   expect_that(c(mno3/mno, mno4/mno, mno5/mno),
               equals(c(0.443959957465819, 0.441952797125797,
                        0.446004870037941) ))
@@ -27,13 +27,13 @@ test_that("motif finding works", {
 ######################
 
   set.seed(123)
-  b <- erdos.renyi.game(10000, 4/10000, directed=TRUE)
+  b <- sample_gnp(10000, 4/10000, directed=TRUE)
 
-  m <- graph.motifs(b)
+  m <- motifs(b)
 
-  m0 <- graph.motifs(b, cut.prob=c(1/3, 0, 0))
-  m1 <- graph.motifs(b, cut.prob=c(0, 1/3, 0))
-  m2 <- graph.motifs(b, cut.prob=c(0, 0, 1/3))
+  m0 <- motifs(b, cut.prob=c(1/3, 0, 0))
+  m1 <- motifs(b, cut.prob=c(0, 1/3, 0))
+  m2 <- motifs(b, cut.prob=c(0, 0, 1/3))
   expect_that(m0/m, equals(c(NA, NA, 0.653972107372707, NA,
                              0.653993015279859, 0.612244897959184,
                              0.657514670174019, 0.63013698630137, NaN,
@@ -50,9 +50,9 @@ test_that("motif finding works", {
                              NaN, 0.753846153846154, NaN,
                              0.565217391304348, NaN, NaN, NaN, NaN) ))
 
-  m3 <- graph.motifs(b, cut.prob=c(0, 1/3, 1/3))
-  m4 <- graph.motifs(b, cut.prob=c(1/3, 1/3, 0))
-  m5 <- graph.motifs(b, cut.prob=c(1/3, 1/3, 0))
+  m3 <- motifs(b, cut.prob=c(0, 1/3, 1/3))
+  m4 <- motifs(b, cut.prob=c(1/3, 1/3, 0))
+  m5 <- motifs(b, cut.prob=c(1/3, 1/3, 0))
   expect_that(m3/m, equals(c(NA, NA, 0.445611905574732, NA,
                              0.442789875290769, 0.448979591836735,
                              0.444695973290166, 0.424657534246575,

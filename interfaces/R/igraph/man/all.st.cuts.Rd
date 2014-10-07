@@ -1,5 +1,6 @@
-\name{stCuts}
+\name{st_cuts}
 \alias{stCuts}
+\alias{st_cuts}
 \concept{Edge cuts}
 \concept{(s,t)-cuts}
 \title{List all (s,t)-cuts of a graph}
@@ -7,7 +8,7 @@
   List all (s,t)-cuts in a directed graph.
 }
 \usage{
-stCuts(graph, source, target)
+st_cuts(graph, source, target)
 }
 \arguments{
   \item{graph}{The input graph. It must be directed.}
@@ -36,16 +37,16 @@ stCuts(graph, source, target)
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{
-  \code{\link{stMincuts}} to list all minimum cuts.
+  \code{\link{st_min_cuts}} to list all minimum cuts.
 }
 \examples{
 # A very simple graph
-g <- graph.formula(a -+ b -+ c -+ d -+ e)
-stCuts(g, source="a", target="e")
+g <- graph_from_formula(a -+ b -+ c -+ d -+ e)
+st_cuts(g, source="a", target="e")
 
 # A somewhat more difficult graph
-g2 <- graph.formula(s --+ a:b, a:b --+ t,
+g2 <- graph_from_formula(s --+ a:b, a:b --+ t,
                    a --+ 1:2:3, 1:2:3 --+ b)
-stCuts(g2, source="s", target="t")
+st_cuts(g2, source="s", target="t")
 }
 \keyword{graphs}

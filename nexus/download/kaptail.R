@@ -25,10 +25,10 @@ mat3 <- matrix(mat3, sqrt(length(mat3)), byrow=TRUE)
 mat4 <- matrix(mat4, sqrt(length(mat4)), byrow=TRUE)
 
 library(igraph)
-kaptail <- list(graph.adjacency(mat1, mode="undirected"),
-                graph.adjacency(mat2, mode="undirected"),
-                graph.adjacency(mat3, mode="directed"),
-                graph.adjacency(mat4, mode="directed"))
+kaptail <- list(g_adj_matrix(mat1, mode="undirected"),
+                g_adj_matrix(mat2, mode="undirected"),
+                g_adj_matrix(mat3, mode="directed"),
+                g_adj_matrix(mat4, mode="directed"))
 names(kaptail) <- netlabs
 for (i in seq_along(kaptail)) V(kaptail[[i]])$name <- labs
 for (i in seq_along(kaptail)) {

@@ -57,7 +57,7 @@ similarity.invlogweighted(graph, vids = V(graph),
   \email{csardi.gabor@gmail.com} for the manual page.}
 \seealso{\code{\link{cocitation}} and \code{\link{bibcoupling}}}
 \examples{
-g <- graph.ring(5)
+g <- ring(5)
 similarity.dice(g)
 similarity.jaccard(g)
 }

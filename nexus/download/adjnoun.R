@@ -10,15 +10,15 @@ txt <- readLines(paste(sep="", tmp, "/adjnoun.txt"))
 gml <- paste(sep="", tmp, "/adjnoun.gml")
 
 library(igraph)
-g <- read.graph(gml, format="gml")
+g <- read_graph(gml, format="gml")
 
-g <- remove.vertex.attribute(g, "id")
+g <- delete_vertex_attr(g, "id")
 
 V(g)$Adjnoun <- V(g)$value
-g <- remove.vertex.attribute(g, "value")
+g <- delete_vertex_attr(g, "value")
 
 V(g)$name <- V(g)$label
-g <- remove.vertex.attribute(g, "label")
+g <- delete_vertex_attr(g, "label")
 
 g$name <- "Word adjacencies from David Copperfield"
 g$Author <- "Mark E. J. Newman"

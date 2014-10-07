@@ -22,7 +22,7 @@ names(vertices) <- c("id", "Internal")
 vertices$Internal <- vertices$Internal == "s"
 
 library(igraph)
-g <- graph.data.frame(edges, vertices=vertices)
+g <- g_df(edges, vertices=vertices)
 E(g)$weight <- 1
 g <- simplify(g, edge.attr.comb=list(weight="sum"), remove.loops=FALSE)
 

@@ -1,4 +1,5 @@
-\name{forest.fire.game}
+\name{sample_forestfire}
+\alias{sample_forestfire}
 \alias{forest.fire.game}
 \concept{Random graph model}
 \concept{Forest fire model}
@@ -6,7 +7,7 @@
 \description{This is a growing network model, which resembles of how the
   forest fire spreads by igniting trees close by.}
 \usage{
-forest.fire.game (nodes, fw.prob, bw.factor = 1, ambs = 1, directed = TRUE)
+sample_forestfire (nodes, fw.prob, bw.factor = 1, ambs = 1, directed = TRUE)
 }
 \arguments{
   \item{nodes}{The number of vertices in the graph.}
@@ -68,9 +69,9 @@ forest.fire.game (nodes, fw.prob, bw.factor = 1, ambs = 1, directed = TRUE)
   model.
 }
 \examples{
-g <- forest.fire.game(10000, fw.prob=0.37, bw.factor=0.32/0.37)
-dd1 <- degree.distribution(g, mode="in")
-dd2 <- degree.distribution(g, mode="out")
+g <- sample_forestfire(10000, fw.prob=0.37, bw.factor=0.32/0.37)
+dd1 <- degree_distribution(g, mode="in")
+dd2 <- degree_distribution(g, mode="out")
 if (interactive()) {
   plot(seq(along=dd1)-1, dd1, log="xy")
   points(seq(along=dd2)-1, dd2, col=2, pch=2)

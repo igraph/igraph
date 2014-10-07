@@ -40,10 +40,10 @@ radius(graph, mode=c("all", "out", "in", "total"))
   Harary, F. Graph Theory. Reading, MA: Addison-Wesley, p. 35, 1994.
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{shortest.paths}} for general shortest path
+\seealso{\code{\link{distances}} for general shortest path
   calculations.}
 \examples{
-g <- graph.star(10, mode="undirected")
+g <- star(10, mode="undirected")
 eccentricity(g)
 radius(g)
 }

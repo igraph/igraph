@@ -1,11 +1,11 @@
 
-context("graph.formula")
+context("graph_from_formula")
 
 test_that("simplify argument works", {
 
   library(igraph)
-  g1 <- graph.formula(1-1, 1-2, 1-2)
-  g2 <- graph.formula(1-1, 1-2, 1-2, simplify=FALSE)
+  g1 <- graph_from_formula(1-1, 1-2, 1-2)
+  g2 <- graph_from_formula(1-1, 1-2, 1-2, simplify=FALSE)
 
   expect_that(vcount(g1), equals(2))
   expect_that(ecount(g1), equals(1))

@@ -16,7 +16,7 @@ mat <- matrix(scan(tc), nc=22, byrow=TRUE)
 close(tc)
 
 library(igraph)
-taro <- graph.adjacency(mat, mode="undirected")
+taro <- g_adj_matrix(mat, mode="undirected")
 
 taro$name <- "Schwimmer taro exchange"
 taro$Author <- "E. Schwimmer"

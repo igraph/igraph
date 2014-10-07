@@ -4,12 +4,12 @@ context("assortativity")
 test_that("assortativity works", {
   library(igraph)
   
-  g <- read.graph(f <- gzfile("celegansneural.gml.gz"), format="gml")
+  g <- read_graph(f <- gzfile("celegansneural.gml.gz"), format="gml")
 
   assR <- function(graph) { 
     indeg <- degree(graph, mode="in")
     outdeg <- degree(graph, mode="out")
-    el <- get.edgelist(graph, names=FALSE)
+    el <- as_edgelist(graph, names=FALSE)
     J <- outdeg[el[,1]]-1
     K <- indeg[el[,2]]-1
     num <- sum(J*K) - sum(J)*sum(K)/ecount(graph)
@@ -18,18 +18,18 @@ test_that("assortativity works", {
     num / sqrt(den1) / sqrt(den2)
   }
 
-  asd <- assortativity.degree(g)
+  asd <- assortativity_degree(g)
   as <- assortativity(g, degree(g, mode="out"), degree(g, mode="in"))
   as2 <- assR(g)
 
   expect_that(asd, equals(as))
   expect_that(asd, equals(as2))
 
-  asu <- assortativity.degree(simplify(as.undirected(g, mode="collapse")))
+  asu <- assortativity_degree(simplify(as.undirected(g, mode="collapse")))
   expect_that(asu, equals(-0.16319921031570466807))
 
-  p <- read.graph(f <- gzfile("power.gml.gz"), format="gml")
-  p.asd <- assortativity.degree(p)
+  p <- read_graph(f <- gzfile("power.gml.gz"), format="gml")
+  p.asd <- assortativity_degree(p)
   p.as <- assortativity(p, degree(p))
   p.as2 <- assR(as.directed(p, mode="mutual"))
 
@@ -40,11 +40,11 @@ test_that("assortativity works", {
 test_that("nominal assortativity works", {
   library(igraph)
   
-  o <- read.graph(f <- gzfile("football.gml.gz"), format="gml")
+  o <- read_graph(f <- gzfile("football.gml.gz"), format="gml")
   o <- simplify(o)
-  an <- assortativity.nominal(o, V(o)$value+1)
+  an <- assortativity_nominal(o, V(o)$value+1)
 
-  el <- get.edgelist(o, names=FALSE)
+  el <- as_edgelist(o, names=FALSE)
   etm <- matrix(0, nr=max(V(o)$value)+1, nc=max(V(o)$value)+1)
   for (e in 1:nrow(el)) {
     t1 <- V(o)$value[ el[e,1] ]+1

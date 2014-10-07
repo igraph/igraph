@@ -11,14 +11,14 @@ txt <- readLines(paste(sep="", tmp, "/football.txt"))
 gml <- paste(sep="", tmp, "/football.gml")
 
 library(igraph)
-g <- read.graph(gml, format="gml")
-g <- remove.vertex.attribute(g, "id")
+g <- read_graph(gml, format="gml")
+g <- delete_vertex_attr(g, "id")
 
 V(g)$name <- V(g)$label
-g <- remove.vertex.attribute(g, "label")
+g <- delete_vertex_attr(g, "label")
 
 V(g)$Conference <- V(g)$value
-g <- remove.vertex.attribute(g, "value")
+g <- delete_vertex_attr(g, "value")
 
 g$name <- "Network of American college football games"
 g$Author <- "Michelle Girvan and Mark EJ Newman"

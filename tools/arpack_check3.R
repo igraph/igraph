@@ -4,9 +4,9 @@
 library(igraph)
 
 arpack2 <- function (func, extra = NULL, sym = FALSE,
-                    options = igraph.arpack.default, 
+                    options = arpack_defaults, 
                     env = parent.frame(), complex = !sym) {
-  options.tmp <- igraph.arpack.default
+  options.tmp <- arpack_defaults
   options.tmp[names(options)] <- options
   options <- options.tmp
   if (sym && complex) {

@@ -29,7 +29,7 @@
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
 \seealso{ \code{\link{igraph.plotting}}, \code{\link{plot.igraph}} }
 \examples{
-g <- graph.ring(10)
+g <- ring(10)
 values <- lapply(1:10, function(x) sample(1:10,3))
 if (interactive()) {
   plot(g, vertex.shape="pie", vertex.pie=values,

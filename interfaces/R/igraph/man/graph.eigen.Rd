@@ -1,6 +1,8 @@
-\name{graph.eigen}
+\name{spectrum}
 \alias{graph.eigen}
+\alias{spectrum}
 \alias{igraph.eigen.default}
+\alias{eigen_defaults}
 \concept{Eigenvalues}
 \concept{Eigenvectors}
 \title{Eigenvalues and eigenvectors of the adjacency matrix of a graph}
@@ -9,10 +11,10 @@
   sparse) graph.
 }
 \usage{
-graph.eigen (graph, algorithm = c("arpack", "auto", "lapack", "comp_auto", 
+spectrum (graph, algorithm = c("arpack", "auto", "lapack", "comp_auto", 
     "comp_lapack", "comp_arpack"), which = list(),
-    options = igraph.arpack.default)
-igraph.eigen.default
+    options = arpack_defaults)
+eigen_defaults
 }
 \arguments{
   \item{graph}{The input graph, can be directed or undirected.}
@@ -23,7 +25,7 @@ igraph.eigen.default
     calculate. By default the leading (i.e. largest magnitude)
     eigenvalue and the corresponding eigenvector is calculated.}
   \item{options}{Options for the ARPACK solver. See
-    \code{\link{igraph.arpack.default}}.}
+    \code{\link{arpack_defaults}}.}
 }
 \details{
   The \code{which} argument is a list and it specifies which eigenvalues
@@ -62,20 +64,20 @@ igraph.eigen.default
 }
 % \references{}
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
-\seealso{\code{\link{get.adjacency}} to create a (sparse) adjacency
+\seealso{\code{\link{as_adj}} to create a (sparse) adjacency
   matrix.}
 \examples{
 ## Small example graph, leading eigenvector by default
 kite <- graph.famous("Krackhardt_kite")
-graph.eigen(kite)[c("values", "vectors")]
+spectrum(kite)[c("values", "vectors")]
 
 ## Double check
-eigen(get.adjacency(kite, sparse=FALSE))$vectors[,1]
+eigen(as_adj(kite, sparse=FALSE))$vectors[,1]
 
-## Should be the same as 'evcent' (but rescaled)
-cor(evcent(kite)$vector, graph.eigen(kite)$vectors)
+## Should be the same as 'eigen_centrality' (but rescaled)
+cor(eigen_centrality(kite)$vector, spectrum(kite)$vectors)
 
 ## Smallest eigenvalues
-graph.eigen(kite, which=list(pos="SM", howmany=2))$values
+spectrum(kite, which=list(pos="SM", howmany=2))$values
 }
 \keyword{graphs}

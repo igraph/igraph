@@ -1,14 +1,15 @@
-\name{evcent}
+\name{eigen_centrality}
 \alias{evcent}
+\alias{eigen_centrality}
 \concept{Eigenvector centrality}
 \title{Find Eigenvector Centrality Scores of Network Positions}
 \description{
-  \code{evcent} takes a graph (\code{graph}) and returns the
+  \code{eigen_centrality} takes a graph (\code{graph}) and returns the
   eigenvector centralities of positions \code{v} within it
 }
 \usage{
-evcent (graph, directed = FALSE, scale = TRUE, weights = NULL,
-     options = igraph.arpack.default) 
+eigen_centrality (graph, directed = FALSE, scale = TRUE, weights = NULL,
+     options = arpack_defaults) 
 }
 \arguments{
   \item{graph}{Graph to be analyzed.}
@@ -63,14 +64,14 @@ Measures. \emph{American Journal of Sociology}, 92, 1170-1182. }
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com} and Carter T. Butts
   (\url{http://www.faculty.uci.edu/profile.cfm?faculty_id=5057})
   for the manual page.}
-\section{WARNING }{\code{evcent} will not symmetrize your data before
+\section{WARNING }{\code{eigen_centrality} will not symmetrize your data before
 extracting eigenvectors; don't send this routine asymmetric matrices
 unless you really mean to do so.}
 % \seealso{}
 \examples{
 #Generate some test data
-g <- graph.ring(10, directed=FALSE)
+g <- ring(10, directed=FALSE)
 #Compute eigenvector centrality scores
-evcent(g)
+eigen_centrality(g)
 }
 \keyword{graphs}

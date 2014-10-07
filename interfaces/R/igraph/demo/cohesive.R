@@ -16,14 +16,14 @@ pause()
 
 ### Create a layout that is used from now on
 
-karate$layout <- layout.auto(karate)
+karate$layout <- layout_nicely(karate)
 plot(karate)
 
 pause()
 
 ### Run cohesive blocking on it
 
-cbKarate <- cohesive.blocks(karate)
+cbKarate <- cohesive_blocks(karate)
 cbKarate
 
 pause()
@@ -38,7 +38,7 @@ pause()
 ### See the hierarchy tree first
 
 hierarchy(cbKarate)
-plotHierarchy(cbKarate)
+plot_hierarchy(cbKarate)
 
 ## Plot the first level, blocks 1 & 2
 

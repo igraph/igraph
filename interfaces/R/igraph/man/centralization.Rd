@@ -1,38 +1,47 @@
 \name{centralization}
 \alias{centralization}
 \alias{centralize.scores}
+\alias{centralize}
 \alias{centralization.degree}
+\alias{centr_degree}
 \alias{centralization.closeness}
+\alias{centr_clo}
 \alias{centralization.betweenness}
+\alias{centr_betw}
 \alias{centralization.evcent}
+\alias{centr_eigen}
 \alias{centralization.degree.tmax}
+\alias{centr_degree_tmax}
 \alias{centralization.closeness.tmax}
+\alias{centr_clo_tmax}
 \alias{centralization.betweenness.tmax}
+\alias{centr_betw_tmax}
 \alias{centralization.evcent.tmax}
+\alias{centr_eigen_tmax}
 \title{Centralization of a graph.tmax}
 \description{
   Centralization is a method for creating a graph level centralization
   measure from the centrality scores of the vertices.
 }
 \usage{
-centralize.scores (scores, theoretical.max, normalized = TRUE)
+centralize (scores, theoretical.max, normalized = TRUE)
 
-centralization.degree (graph, mode = c("all", "out", "in", "total"),
+centr_degree (graph, mode = c("all", "out", "in", "total"),
     loops = TRUE, normalized = TRUE) 
-centralization.closeness (graph, mode = c("out", "in", "all", "total"),
+centr_clo (graph, mode = c("out", "in", "all", "total"),
     normalized = TRUE)
-centralization.betweenness (graph, directed = TRUE, nobigint = TRUE,
+centr_betw (graph, directed = TRUE, nobigint = TRUE,
     normalized = TRUE)
-centralization.evcent (graph, directed = FALSE, scale = TRUE,
-    options = igraph.arpack.default, normalized = TRUE)
+centr_eigen (graph, directed = FALSE, scale = TRUE,
+    options = arpack_defaults, normalized = TRUE)
 
-centralization.degree.tmax (graph = NULL, nodes = 0,
+centr_degree_tmax (graph = NULL, nodes = 0,
     mode = c("all", "out", "in", "total"), loops = FALSE)
-centralization.closeness.tmax (graph = NULL, nodes = 0,
+centr_clo_tmax (graph = NULL, nodes = 0,
     mode = c("out", "in", "all", "total"))
-centralization.betweenness.tmax (graph = NULL, nodes = 0,
+centr_betw_tmax (graph = NULL, nodes = 0,
     directed = TRUE)
-centralization.evcent.tmax (graph = NULL, nodes = 0,
+centr_eigen_tmax (graph = NULL, nodes = 0,
     directed = FALSE, scale = TRUE)
 }
 \arguments{
@@ -58,7 +67,7 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
     such that the maximum score is one.}
   \item{nodes}{The number of vertices. This is ignored if the graph is
     given.}
-  \item{options}{This is passed to \code{\link{evcent}}, the options for
+  \item{options}{This is passed to \code{\link{eigen_centrality}}, the options for
     the ARPACK eigensolver.}
 }
 \details{
@@ -83,17 +92,17 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
   For eigenvector centrality the most centralized structure is the graph
   with a single edge (and potentially many isolates).
 
-  \code{centralize.scores} using the general centralization formula to
+  \code{centralize} using the general centralization formula to
   calculate a graph-level score from vertex-level scores.
 
-  \code{centralization.degree}, \code{centralization.closeness},
-  \code{centralization.betweenness} calculate both the vertex-level and
+  \code{centr_degree}, \code{centr_clo},
+  \code{centr_betw} calculate both the vertex-level and
   the graph-level indices.
 
-  \code{centralization.degree.tmax},
-  \code{centralization.closeness.tmax},
-  \code{centralization.betweenness.tmax} and
-  \code{centralization.evcent.tmax} return the theoretical maximum
+  \code{centr_degree_tmax},
+  \code{centr_clo_tmax},
+  \code{centr_betw_tmax} and
+  \code{centr_eigen_tmax} return the theoretical maximum
   scores. They operate in two modes. In the first mode, a graph is given
   and the maximum score is calculated based on that. E.g. the number of
   vertices and directedness is taken from this graph.
@@ -103,10 +112,10 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
   arguments.
 }
 \value{
-  For \code{centralize.scores} a real scalar.
+  For \code{centralize} a real scalar.
 
-  For \code{centralization.degree}, \code{centralization.closeness} and
-  \code{centralization.betweenness} a named list with the following
+  For \code{centr_degree}, \code{centr_clo} and
+  \code{centr_betw} a named list with the following
   components:
   \item{res}{The node-level centrality scores.}
   \item{centralization}{The graph level centrality index.}
@@ -115,20 +124,20 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
     using the same parameters. If the \code{normalized} argument was
     \code{TRUE}, then the result was divided by this number.}
 
-  For \code{centralization.evcent} a named list with the following
+  For \code{centr_eigen} a named list with the following
   components:
   \item{vector}{The node-level centrality scores.}
   \item{value}{The corresponding eigenvalue.}
   \item{options}{ARPACK options, see the return value of
-  \code{\link{evcent}} for details.} 
+  \code{\link{eigen_centrality}} for details.} 
   \item{centralization}{The graph level centrality index.}
   \item{theoretical_max}{The same as above, the theoretical maximum
     centralization score for a graph with the same number of vertices.}
 
-  For \code{centralization.degree.tmax},
-  \code{centralization.closeness.tmax},
-  \code{centralization.betweenness.tmax} and
-  \code{centralization.evcent.tmax} a real scalar.
+  For \code{centr_degree_tmax},
+  \code{centr_clo_tmax},
+  \code{centr_betw_tmax} and
+  \code{centr_eigen_tmax} a real scalar.
 }
 \references{
   Freeman, L.C.  (1979).  Centrality in Social Networks I:
@@ -141,16 +150,16 @@ centralization.evcent.tmax (graph = NULL, nodes = 0,
 %\seealso{}
 \examples{
 # A BA graph is quite centralized
-g <- ba.game(1000, m=4)
-centralization.degree(g)$centralization
-centralization.closeness(g, mode="all")$centralization
-centralization.evcent(g, directed=FALSE)$centralization
+g <- sample_pa(1000, m=4)
+centr_degree(g)$centralization
+centr_clo(g, mode="all")$centralization
+centr_eigen(g, directed=FALSE)$centralization
 
 # The most centralized graph according to eigenvector centrality
 g0 <- graph( c(2,1), n=10, dir=FALSE )
-g1 <- graph.star(10, mode="undirected")
-centralization.evcent(g0)$centralization
-centralization.evcent(g1)$centralization
+g1 <- star(10, mode="undirected")
+centr_eigen(g0)$centralization
+centr_eigen(g1)$centralization
 }
 \keyword{graphs}
 

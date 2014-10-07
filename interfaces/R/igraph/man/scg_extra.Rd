@@ -1,4 +1,5 @@
 \name{scgExtra}
+\alias{scg_eps}
 \alias{scgNormEps}
 \title{SCG Extra Functions}
 \description{
@@ -6,7 +7,7 @@
   Graining (SCG).
 }
 \usage{
-scgNormEps(V, groups, mtype = c("symmetric", "laplacian",
+scg_eps(V, groups, mtype = c("symmetric", "laplacian",
           "stochastic"), p = NULL, norm = c("row", "col"))
 }
 \arguments{
@@ -25,7 +26,7 @@ scgNormEps(V, groups, mtype = c("symmetric", "laplacian",
     stochastic matrix sum to one; otherwise it is the columns.}
 }
 \details{
- \code{scgNormEps} computes \eqn{\Vert v_i-Pv_i\Vert}{|v[i]-Pv[i]|},
+ \code{scg_eps} computes \eqn{\Vert v_i-Pv_i\Vert}{|v[i]-Pv[i]|},
    where \eqn{v_i}{v[i]} is the \eqn{i}th eigenvector in \code{V} and
    \eqn{P} is the projector corresponding to the \code{mtype} argument.
 }
@@ -46,6 +47,6 @@ scgNormEps(V, groups, mtype = c("symmetric", "laplacian",
 v <- rexp(20)
 km <- kmeans(v,5)
 sum(km$withinss)
-scgNormEps(cbind(v), km$cluster)^2
+scg_eps(cbind(v), km$cluster)^2
 }
 \keyword{graphs}

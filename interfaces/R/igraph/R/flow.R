@@ -19,14 +19,14 @@
 #
 ###################################################################
 
-graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
+min_cut <- function(graph, source=NULL, target=NULL, capacity=NULL,
                          value.only=TRUE) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   if (is.null(capacity)) {
-    if ("capacity" %in% list.edge.attributes(graph)) {
+    if ("capacity" %in% edge_attr_names(graph)) {
       capacity <- E(graph)$capacity
     }
   }
@@ -75,7 +75,7 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
 #' The vertex connectivity of two vertices (\code{source} and \code{target}) in
 #' a directed graph is the minimum number of vertices needed to remove from the
 #' graph to eliminate all (directed) paths from \code{source} to \code{target}.
-#' \code{vertex.connectivity} calculates this quantity if both the
+#' \code{vertex_connectivity} calculates this quantity if both the
 #' \code{source} and \code{target} arguments are given and they're not
 #' \code{NULL}.
 #' 
@@ -83,7 +83,7 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
 #' (ordered) pairs of vertices in the graph. In other words this is the minimum
 #' number of vertices needed to remove to make the graph not strongly
 #' connected. (If the graph is not strongly connected then this is zero.)
-#' \code{vertex.connectivity} calculates this quantitty if neither the
+#' \code{vertex_connectivity} calculates this quantitty if neither the
 #' \code{source} nor \code{target} arguments are given. (Ie. they are both
 #' \code{NULL}.)
 #' 
@@ -96,17 +96,18 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
 #' 
 #' The cohesion of a graph (as defined by White and Harary, see references), is
 #' the vertex connectivity of the graph. This is calculated by
-#' \code{graph.cohesion}.
+#' \code{cohesion}.
 #' 
 #' These three functions essentially calculate the same measure(s), more
-#' precisely \code{vertex.connectivity} is the most general, the other two are
+#' precisely \code{vertex_connectivity} is the most general, the other two are
 #' included only for the ease of using more descriptive function names.
 #' 
-#' @aliases vertex.connectivity vertex.disjoint.paths graph.cohesion
-#' @param graph The input graph.
-#' @param source The id of the source vertex, for \code{vertex.connectivity} it
+#' @aliases vertex.connectivity vertex.disjoint.paths cohesion vertex_connectivity
+#'   vertex_disjoint_paths graph.cohesion
+#' @param graph,x The input graph.
+#' @param source The id of the source vertex, for \code{vertex_connectivity} it
 #' can be \code{NULL}, see details below.
-#' @param target The id of the target vertex, for \code{vertex.connectivity} it
+#' @param target The id of the target vertex, for \code{vertex_connectivity} it
 #' can be \code{NULL}, see details below.
 #' @param checks Logical constant. Whether to check that the graph is connected
 #' and also the degree of the vertices. If the graph is not (strongly)
@@ -115,10 +116,11 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
 #' perform these checks, as they can be done quickly compared to the
 #' connectivity calculation itself.  They were suggested by Peter McMahan,
 #' thanks Peter.
+#' @param ... Ignored.
 #' @return A scalar real value.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{graph.maxflow}}, \code{\link{edge.connectivity}},
-#' \code{\link{edge.disjoint.paths}}, \code{\link{graph.adhesion}}
+#' @seealso \code{\link{max_flow}}, \code{\link{edge_connectivity}},
+#' \code{\link{edge_disjoint_paths}}, \code{\link{adhesion}}
 #' @references White, Douglas R and Frank Harary 2001. The Cohesiveness of
 #' Blocks In Social Networks: Node Connectivity and Conditional Density.
 #' \emph{Sociological Methodology} 31 (1) : 305-359.
@@ -126,21 +128,21 @@ graph.mincut <- function(graph, source=NULL, target=NULL, capacity=NULL,
 #' @examples
 #' 
 #' g <- barabasi.game(100, m=1)
-#' g <- delete.edges(g, E(g)[ 100 %--% 1 ])
+#' g <- delete_edges(g, E(g)[ 100 %--% 1 ])
 #' g2 <- barabasi.game(100, m=5)
-#' g2 <- delete.edges(g2, E(g2)[ 100 %--% 1])
-#' vertex.connectivity(g, 100, 1)
-#' vertex.connectivity(g2, 100, 1)
-#' vertex.disjoint.paths(g2, 100, 1)
+#' g2 <- delete_edges(g2, E(g2)[ 100 %--% 1])
+#' vertex_connectivity(g, 100, 1)
+#' vertex_connectivity(g2, 100, 1)
+#' vertex_disjoint_paths(g2, 100, 1)
 #' 
-#' g <- erdos.renyi.game(50, 5/50)
+#' g <- sample_gnp(50, 5/50)
 #' g <- as.directed(g)
-#' g <- induced.subgraph(g, subcomponent(g, 1))
-#' graph.cohesion(g)
+#' g <- induced_subgraph(g, subcomponent(g, 1))
+#' cohesion(g)
 #' 
-vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
+vertex_connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -168,11 +170,11 @@ vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 #' The edge connectivity of a pair of vertices (\code{source} and
 #' \code{target}) is the minimum number of edges needed to remove to eliminate
 #' all (directed) paths from \code{source} to \code{target}.
-#' \code{edge.connectivity} calculates this quantity if both the \code{source}
+#' \code{edge_connectivity} calculates this quantity if both the \code{source}
 #' and \code{target} arguments are given (and not \code{NULL}).
 #' 
 #' The edge connectivity of a graph is the minimum of the edge connectivity of
-#' every (ordered) pair of vertices in the graph.  \code{edge.connectivity}
+#' every (ordered) pair of vertices in the graph.  \code{edge_connectivity}
 #' calculates this quantity if neither the \code{source} nor the \code{target}
 #' arguments are given (ie. they are both \code{NULL}).
 #' 
@@ -185,14 +187,15 @@ vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 #' connectivity of the graph.
 #' 
 #' The three functions documented on this page calculate similar properties,
-#' more precisely the most general is \code{edge.connectivity}, the others are
+#' more precisely the most general is \code{edge_connectivity}, the others are
 #' included only for having more descriptive function names.
 #' 
-#' @aliases edge.connectivity edge.disjoint.paths graph.adhesion
+#' @aliases edge.connectivity edge_disjoint_paths graph.adhesion adhesion
+#'   edge_connectivity edge.disjoint.paths
 #' @param graph The input graph.
-#' @param source The id of the source vertex, for \code{edge.connectivity} it
+#' @param source The id of the source vertex, for \code{edge_connectivity} it
 #' can be \code{NULL}, see details below.
-#' @param target The id of the target vertex, for \code{edge.connectivity} it
+#' @param target The id of the target vertex, for \code{edge_connectivity} it
 #' can be \code{NULL}, see details below.
 #' @param checks Logical constant. Whether to check that the graph is connected
 #' and also the degree of the vertices. If the graph is not (strongly)
@@ -203,8 +206,8 @@ vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 #' thanks Peter.
 #' @return A scalar real value.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{graph.maxflow}}, \code{\link{vertex.connectivity}},
-#' \code{\link{vertex.disjoint.paths}}, \code{\link{graph.cohesion}}
+#' @seealso \code{\link{max_flow}}, \code{\link{vertex_connectivity}},
+#' \code{\link{vertex_disjoint_paths}}, \code{\link{cohesion}}
 #' @references Douglas R. White and Frank Harary: The cohesiveness of blocks in
 #' social networks: node connectivity and conditional density, TODO: citation
 #' @keywords graphs
@@ -212,18 +215,18 @@ vertex.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 #' 
 #' g <- barabasi.game(100, m=1)
 #' g2 <- barabasi.game(100, m=5)
-#' edge.connectivity(g, 100, 1)
-#' edge.connectivity(g2, 100, 1)
-#' edge.disjoint.paths(g2, 100, 1)
+#' edge_connectivity(g, 100, 1)
+#' edge_connectivity(g2, 100, 1)
+#' edge_disjoint_paths(g2, 100, 1)
 #' 
-#' g <- erdos.renyi.game(50, 5/50)
+#' g <- sample_gnp(50, 5/50)
 #' g <- as.directed(g)
-#' g <- induced.subgraph(g, subcomponent(g, 1))
-#' graph.adhesion(g)
+#' g <- induced_subgraph(g, subcomponent(g, 1))
+#' adhesion(g)
 #' 
-edge.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
+edge_connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -241,9 +244,9 @@ edge.connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
   }
 }
 
-edge.disjoint.paths <- function(graph, source, target) {
+edge_disjoint_paths <- function(graph, source, target) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -253,9 +256,9 @@ edge.disjoint.paths <- function(graph, source, target) {
         PACKAGE="igraph")
 }
 
-vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
+vertex_disjoint_paths <- function(graph, source=NULL, target=NULL) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -265,9 +268,9 @@ vertex.disjoint.paths <- function(graph, source=NULL, target=NULL) {
         PACKAGE="igraph")
 }
 
-graph.adhesion <- function(graph, checks=TRUE) {
+adhesion <- function(graph, checks=TRUE) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   
@@ -276,14 +279,17 @@ graph.adhesion <- function(graph, checks=TRUE) {
         PACKAGE="igraph")
 }
 
-graph.cohesion <- function(graph, checks=TRUE) {
+#' @rdname vertex_connectivity
+#' @method cohesion igraph
 
-  if (!is.igraph(graph)) {
+cohesion.igraph <- function(x, checks=TRUE, ...) {
+
+  if (!is_igraph(x)) {
     stop("Not a graph object")
   }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_cohesion", graph, as.logical(checks),
+  .Call("R_igraph_cohesion", x, as.logical(checks),
         PACKAGE="igraph")
 }
 

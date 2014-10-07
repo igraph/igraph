@@ -1,7 +1,7 @@
 
 library(igraph)
 
-g <- graph.star(5, mode="undirected")
+g <- g_star(5, mode="undirected")
 g$layout <- rbind( c(0,0), c(-1,1), c(1,1), c(1,-1), c(-1,-1) )
 V(g)$size <- 80
 E(g)$width <- 30

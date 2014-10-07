@@ -35,7 +35,7 @@
 #' hiearchy of vertex subsets is found, whith the entire graph \eqn{G} at its
 #' root.
 #' 
-#' The function \code{cohesive.blocks} implements cohesive blocking.  It
+#' The function \code{cohesive_blocks} implements cohesive blocking.  It
 #' returns a \code{cohesiveBlocks} object. \code{cohesiveBlocks} should be
 #' handled as an opaque class, i.e. its internal structure should not be
 #' accessed directly, but through the functions listed here.
@@ -47,23 +47,23 @@
 #' \code{cohesiveBlocks} object. They are returned in a list of numeric
 #' vectors, each containing vertex ids.
 #' 
-#' The function \code{blockGraphs} is similar, but returns the blocks as
+#' The function \code{graphs_from_cohesive_blocks} is similar, but returns the blocks as
 #' (induced) subgraphs of the input graph. The various (graph, vertex and edge)
 #' attributes are kept in the subgraph.
 #' 
 #' The function \code{cohesion} returns a numeric vector, the cohesion of the
 #' different blocks. The order of the blocks is the same as for the
-#' \code{blocks} and \code{blockGraphs} functions.
+#' \code{blocks} and \code{graphs_from_cohesive_blocks} functions.
 #' 
 #' The block hierarchy can be queried using the \code{hierarchy} function. It
 #' returns an igraph graph, its vertex ids are ordered according the order of
-#' the blocks in the \code{blocks} and \code{blockGraphs}, \code{cohesion},
+#' the blocks in the \code{blocks} and \code{graphs_from_cohesive_blocks}, \code{cohesion},
 #' etc. functions.
 #' 
 #' \code{parent} gives the parent vertex of each block, in the block hierarchy,
 #' for the root vertex it gives 0.
 #' 
-#' \code{plotHierarchy} plots the hierarchy tree of the cohesive blocks on the
+#' \code{plot_hierarchy} plots the hierarchy tree of the cohesive blocks on the
 #' active graphics device, by calling \code{igraph.plot}.
 #' 
 #' The \code{exportPajek} function can be used to export the graph and its
@@ -72,7 +72,7 @@
 #' \code{project.file} argument. If \code{project.file} is \code{TRUE}, then
 #' the following information is written to the file (or connection) given in
 #' the \code{file} argument: (1) the input graph, together with its attributes,
-#' see \code{\link{write.graph}} for details; (2) the hierarchy graph; and (3)
+#' see \code{\link{write_graph}} for details; (2) the hierarchy graph; and (3)
 #' one binary partition for each cohesive block. If \code{project.file} is
 #' \code{FALSE}, then the \code{file} argument must be a character scalar and
 #' it is used as the base name for the generated files. If \code{file} is
@@ -82,7 +82,7 @@
 #' \sQuote{basename_block_x.net} for each cohesive block, where \sQuote{x} is
 #' the number of the block, starting with one.
 #' 
-#' \code{maxcohesion} returns the maximal cohesion of each vertex, i.e. the
+#' \code{max_cohesion} returns the maximal cohesion of each vertex, i.e. the
 #' cohesion of the most cohesive block of the vertex.
 #' 
 #' The generic function \code{summary} works on \code{cohesiveBlocks} objects
@@ -105,21 +105,22 @@
 #' The generic function \code{plot} plots the graph, showing one or more
 #' cohesive blocks in it.
 #' 
-#' @aliases cohesive.blocks cohesiveBlocks blocks blockGraphs cohesion
+#' @aliases cohesive.blocks cohesiveBlocks blocks graphs_from_cohesive_blocks blockGraphs
 #' hierarchy parent plotHierarchy exportPajek maxcohesion plot.cohesiveBlocks
 #' summary.cohesiveBlocks length.cohesiveBlocks print.cohesiveBlocks
-#' @param graph For \code{cohesive.blocks} a graph object of class
+#' plot_hierarchy max_cohesion
+#' @param graph For \code{cohesive_blocks} a graph object of class
 #' \code{igraph}. It must be undirected and simple. (See
-#' \code{\link{is.simple}}.)
+#' \code{\link{is_simple}}.)
 #' 
-#' For \code{blockGraphs} and \code{exportPajek} the same graph must be
+#' For \code{graphs_from_cohesive_blocks} and \code{exportPajek} the same graph must be
 #' supplied whose cohesive block structure is given in the \code{blocks}
 #' argument.
 #' @param labels Logical scalar, whether to add the vertex labels to the result
 #' object. These labels can be then used when reporting and plotting the
 #' cohesive blocks.
 #' @param blocks,x,object A \code{cohesiveBlocks} object, created with the
-#' \code{cohesive.blocks} function.
+#' \code{cohesive_blocks} function.
 #' @param file Defines the file (or connection) the Pajek file is written to.
 #' 
 #' If the \code{project.file} argument is \code{TRUE}, then it can be a
@@ -151,13 +152,13 @@
 #' @param layout The layout of a plot, it is simply passed on to
 #' \code{plot.igraph}, see the possible formats there. By default the
 #' Reingold-Tilford layout generator is used.
-#' @param \dots Additional arguments. \code{plotHierarchy} and \code{plot} pass
+#' @param \dots Additional arguments. \code{plot_hierarchy} and \code{plot} pass
 #' them to \code{plot.igraph}.  \code{print} and \code{summary} ignore them.
-#' @return \code{cohesive.blocks} returns a \code{cohesiveBlocks} object.
+#' @return \code{cohesive_blocks} returns a \code{cohesiveBlocks} object.
 #' 
 #' \code{blocks} returns a list of numeric vectors, containing vertex ids.
 #' 
-#' \code{blockGraphs} returns a list of igraph graphs, corresponding to the
+#' \code{graphs_from_cohesive_blocks} returns a list of igraph graphs, corresponding to the
 #' cohesive blocks.
 #' 
 #' \code{cohesion} returns a numeric vector, the cohesion of each block.
@@ -169,10 +170,10 @@
 #' cohesive block, in the block hierarchy. The block at the root of the
 #' hierarchy has no parent and \code{0} is returned for it.
 #' 
-#' \code{plotHierarchy}, \code{plot} and \code{exportPajek} return \code{NULL},
+#' \code{plot_hierarchy}, \code{plot} and \code{exportPajek} return \code{NULL},
 #' invisibly.
 #' 
-#' \code{maxcohesion} returns a numeric vector with one entry for each vertex,
+#' \code{max_cohesion} returns a numeric vector with one entry for each vertex,
 #' giving the cohesion of its most cohesive block.
 #' 
 #' \code{print} and \code{summary} return the \code{cohesiveBlocks} object
@@ -182,7 +183,7 @@
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com} for the current
 #' implementation, Peter McMahan (\url{http://home.uchicago.edu/~mcmahan/})
 #' wrote the first version in R.
-#' @seealso \code{\link{graph.cohesion}}
+#' @seealso \code{\link{cohesion}}
 #' @references J. Moody and D. R. White. Structural cohesion and embeddedness:
 #' A hierarchical concept of social groups. \emph{American Sociological
 #' Review}, 68(1):103--127, Feb 2003.
@@ -190,13 +191,13 @@
 #' @examples
 #' 
 #' ## The graph from the Moody-White paper
-#' mw <- graph.formula(1-2:3:4:5:6, 2-3:4:5:7, 3-4:6:7, 4-5:6:7,
-#'                     5-6:7:21, 6-7, 7-8:11:14:19, 8-9:11:14, 9-10,
-#'                     10-12:13, 11-12:14, 12-16, 13-16, 14-15, 15-16,
-#'                     17-18:19:20, 18-20:21, 19-20:22:23, 20-21,
-#'                     21-22:23, 22-23)
+#' mw <- graph_from_formula(1-2:3:4:5:6, 2-3:4:5:7, 3-4:6:7, 4-5:6:7,
+#'                 5-6:7:21, 6-7, 7-8:11:14:19, 8-9:11:14, 9-10,
+#'                 10-12:13, 11-12:14, 12-16, 13-16, 14-15, 15-16,
+#'                 17-18:19:20, 18-20:21, 19-20:22:23, 20-21,
+#'                 21-22:23, 22-23)
 #' 
-#' mwBlocks <- cohesive.blocks(mw)
+#' mwBlocks <- cohesive_blocks(mw)
 #' 
 #' # Inspect block membership and cohesion
 #' mwBlocks
@@ -214,19 +215,19 @@
 #' }
 #' 
 #' ## The science camp network
-#' camp <- graph.formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
-#'                       Pam:Brazey:Carol:Pat - Pam:Brazey:Carol:Pat,
-#'                       Holly   - Carol:Pat:Pam:Jennie:Bill,
-#'                       Bill    - Pauline:Michael:Lee:Holly,
-#'                       Pauline - Bill:Jennie:Ann,
-#'                       Jennie  - Holly:Michael:Lee:Ann:Pauline,
-#'                       Michael - Bill:Jennie:Ann:Lee:John,
-#'                       Ann     - Michael:Jennie:Pauline,
-#'                       Lee     - Michael:Bill:Jennie,
-#'                       Gery    - Pat:Steve:Russ:John,
-#'                       Russ    - Steve:Bert:Gery:John,
-#'                       John    - Gery:Russ:Michael)
-#' campBlocks <- cohesive.blocks(camp)
+#' camp <- graph_from_formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
+#'                   Pam:Brazey:Carol:Pat - Pam:Brazey:Carol:Pat,
+#'                   Holly   - Carol:Pat:Pam:Jennie:Bill,
+#'                   Bill    - Pauline:Michael:Lee:Holly,
+#'                   Pauline - Bill:Jennie:Ann,
+#'                   Jennie  - Holly:Michael:Lee:Ann:Pauline,
+#'                   Michael - Bill:Jennie:Ann:Lee:John,
+#'                   Ann     - Michael:Jennie:Pauline,
+#'                   Lee     - Michael:Bill:Jennie,
+#'                   Gery    - Pat:Steve:Russ:John,
+#'                   Russ    - Steve:Bert:Gery:John,
+#'                   John    - Gery:Russ:Michael)
+#' campBlocks <- cohesive_blocks(camp)
 #' campBlocks
 #' 
 #' if (interactive()) {
@@ -235,60 +236,64 @@
 #'        mark.border=1, colbar=c(NA, NA,"cyan","orange") )
 #' }
 #' 
-cohesive.blocks <- function(graph, labels=TRUE) {
+cohesive_blocks <- function(graph, labels=TRUE) {
 
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is_igraph(graph)) { stop("Not a graph object") }
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
   res <- .Call("R_igraph_cohesive_blocks", graph,
         PACKAGE="igraph")
   class(res) <- "cohesiveBlocks"
-  if (labels && "name" %in% list.vertex.attributes(graph)) {
+  if (labels && "name" %in% vertex_attr_names(graph)) {
     res$labels <- V(graph)$name
   }
   res$vcount <- vcount(graph)
   res
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
 length.cohesiveBlocks <- function(x) {
   length(x$blocks)
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
 blocks <- function(blocks) {
   blocks$blocks
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
-blockGraphs <- function(blocks, graph) {
-  lapply(blocks(blocks), induced.subgraph, graph=graph)
+graphs_from_cohesive_blocks <- function(blocks, graph) {
+  lapply(blocks(blocks), induced_subgraph, graph=graph)
 }
 
-#' @rdname cohesive.blocks
+cohesion <- function(x, ...)
+  UseMethod("cohesion")
 
-cohesion <- function(blocks) {
-  blocks$cohesion
+#' @rdname cohesive_blocks
+#' @method cohesion cohesiveBlocks
+
+cohesion.cohesiveBlocks <- function(x, ...) {
+  x$cohesion
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
 hierarchy <- function(blocks) {
   blocks$blockTree
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
 parent <- function(blocks) {
   blocks$parent
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 #' @method print cohesiveBlocks
 
 print.cohesiveBlocks <- function(x, ...) {
@@ -299,7 +304,7 @@ print.cohesiveBlocks <- function(x, ...) {
   si <- sapply(myb, length)
 
   cs <- 3 + 2 + nchar(length(x)) +
-    max(shortest.paths(hierarchy(x), mode="out", v=1)) * 3
+    max(distances(hierarchy(x), mode="out", v=1)) * 3
   
   .plot <- function(b, ind="") {
     if (b!=1) {
@@ -333,7 +338,7 @@ print.cohesiveBlocks <- function(x, ...) {
   invisible(x)
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 #' @method summary cohesiveBlocks
 
 summary.cohesiveBlocks <- function(object, ...) {
@@ -342,21 +347,21 @@ summary.cohesiveBlocks <- function(object, ...) {
   invisible(object)
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
 plot.cohesiveBlocks <- function(x, y,
                                 colbar=rainbow(max(cohesion(x))+1),
-                                col=colbar[maxcohesion(x)+1],
+                                col=colbar[max_cohesion(x)+1],
                                 mark.groups=blocks(x)[-1],
                                 ...) {
   plot(y, mark.groups=mark.groups,
        vertex.color=col, ...)
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
-plotHierarchy <- function(blocks,
-                          layout=layout.reingold.tilford(hierarchy(blocks),
+plot_hierarchy <- function(blocks,
+                          layout=layout_as_tree(hierarchy(blocks),
                             root=1), ...) {
   plot(hierarchy(blocks), layout=layout, ...)
 }
@@ -375,11 +380,11 @@ exportPajek.cohesiveblocks.pf <- function(blocks, graph, file) {
 
   ## The original graph
   cat(file=file, sep="", "*Network cohesive_blocks_input.net\r\n")
-  write.graph(graph, file=file, format="pajek")
+  write_graph(graph, file=file, format="pajek")
 
   ## The hierarchy graph
   cat(file=file, sep="", "\r\n*Network hierarchy.net\r\n")
-  write.graph(hierarchy(blocks), file=file, format="pajek")
+  write_graph(hierarchy(blocks), file=file, format="pajek")
 
   ## The blocks
   myb <- blocks(blocks)
@@ -400,10 +405,10 @@ exportPajek.cohesiveblocks.pf <- function(blocks, graph, file) {
 exportPajek.cohesiveblocks.nopf <- function(blocks, graph, file) {
 
   ## The original graph
-  write.graph(graph, file=paste(sep="", file, ".net"), format="pajek")
+  write_graph(graph, file=paste(sep="", file, ".net"), format="pajek")
 
   ## The hierarchy graph
-  write.graph(hierarchy(blocks), file=paste(sep="", file, "_hierarchy.net"),
+  write_graph(hierarchy(blocks), file=paste(sep="", file, "_hierarchy.net"),
               format="pajek")
 
   ## The blocks
@@ -418,7 +423,7 @@ exportPajek.cohesiveblocks.nopf <- function(blocks, graph, file) {
   invisible(NULL)
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
 exportPajek <- function(blocks, graph, file,
                         project.file=TRUE) {
@@ -435,9 +440,9 @@ exportPajek <- function(blocks, graph, file,
   }
 }
 
-#' @rdname cohesive.blocks
+#' @rdname cohesive_blocks
 
-maxcohesion <- function(blocks) {
+max_cohesion <- function(blocks) {
   res <- numeric(blocks$vcount)
   myb <- blocks(blocks)
   coh <- cohesion(blocks)

@@ -1,12 +1,13 @@
-\name{dyad.census}
+\name{dyad_census}
 \alias{dyad.census}
+\alias{dyad_census}
 \concept{Dyad census}
 \title{Dyad census of a graph}
 \description{Classify dyads in a directed graphs. The relationship
   between each pair of vertices is measured. It can be in three states:
   mutual, asymmetric or non-existent.}
 \usage{
-dyad.census(graph)
+dyad_census(graph)
 }
 \arguments{
   \item{graph}{The input graph. A warning is given if it is not directed.}
@@ -29,10 +30,10 @@ dyad.census(graph)
   Gabor Csardi \email{csardi.gabor@gmail.com}
 }
 \seealso{
-  \code{\link{triad.census}} for the same classification, but with triples.
+  \code{\link{triad_census}} for the same classification, but with triples.
 }
 \examples{
-g <- ba.game(100)
-dyad.census(g)
+g <- sample_pa(100)
+dyad_census(g)
 }
 \keyword{graphs}

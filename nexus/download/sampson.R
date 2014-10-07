@@ -28,7 +28,7 @@ for (i in seq_along(mat)) {
 }
 
 library(igraph)
-mat <- lapply(mat, graph.adjacency, weighted=TRUE)
+mat <- lapply(mat, g_adj_matrix, weighted=TRUE)
 names(mat) <- llab
 
 for (i in seq_along(mat)) {

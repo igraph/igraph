@@ -26,8 +26,8 @@ mat2 <- mat[17:32,]
 colnames(mat1) <- rownames(mat1) <- colnames(mat2) <- rownames(mat2) <- rowlab
 
 library(igraph)
-g1 <- graph.adjacency(mat1, mode="undirected")
-g2 <- graph.adjacency(mat2, mode="undirected")
+g1 <- g_adj_matrix(mat1, mode="undirected")
+g2 <- g_adj_matrix(mat2, mode="undirected")
 
 mlabs <- l2[ (grep("^COLUMN LABELS:", l2)+1):(grep("^DATA", l2)-1) ]
 alabs <- l2[ (grep("^ROW LABELS:", l2)+1):(grep("^COLUMN LABELS", l2)-1) ]

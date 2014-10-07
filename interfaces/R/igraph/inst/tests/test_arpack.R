@@ -20,7 +20,7 @@ test_that("arpack works on the Laplacian of a star", {
   }
   
   r1 <- arpack(f, options=list(n=10, nev=1, ncv=3), sym=TRUE)
-  r2 <- eigen(graph.laplacian(graph.star(10, mode="undirected")))
+  r2 <- eigen(laplacian_matrix(star(10, mode="undirected")))
   
   correctSign <- function(x) { if (x[1]<0) { -x } else { x } }
   expect_that(r1$values, equals(r2$values[1]))

@@ -1,12 +1,12 @@
 
-context("average.path.length")
+context("mean_distance")
 
-test_that("average.path.length works", {
+test_that("mean_distance works", {
   library(igraph)
 
   apl <- function(graph) {
-    sp <- shortest.paths(graph, mode="out")
-    if (is.directed(graph)) {
+    sp <- distances(graph, mode="out")
+    if (is_directed(graph)) {
       diag(sp) <- NA
     } else {
       sp[lower.tri(sp, diag=TRUE)] <- NA
@@ -16,19 +16,19 @@ test_that("average.path.length works", {
   }
 
   giant.component <- function(graph, mode="weak") {
-    clu <- clusters(graph, mode=mode)
-    induced.subgraph(graph, which(clu$membership==which.max(clu$csize)))
+    clu <- components(graph, mode=mode)
+    induced_subgraph(graph, which(clu$membership==which.max(clu$csize)))
   }
   
-  g <- giant.component(erdos.renyi.game(100, 3/100))
-  expect_that(apl(g), equals(average.path.length(g)))
+  g <- giant.component(sample_gnp(100, 3/100))
+  expect_that(apl(g), equals(mean_distance(g)))
 
-  g <- giant.component(erdos.renyi.game(100, 6/100, dir=TRUE), mode="strong")
-  expect_that(apl(g), equals(average.path.length(g)))
+  g <- giant.component(sample_gnp(100, 6/100, dir=TRUE), mode="strong")
+  expect_that(apl(g), equals(mean_distance(g)))
 
-  g <- erdos.renyi.game(100, 2/100)
-  expect_that(apl(g), equals(average.path.length(g)))
+  g <- sample_gnp(100, 2/100)
+  expect_that(apl(g), equals(mean_distance(g)))
   
-  g <- erdos.renyi.game(100, 4/100, dir=TRUE)
-  expect_that(apl(g), equals(average.path.length(g)))
+  g <- sample_gnp(100, 4/100, dir=TRUE)
+  expect_that(apl(g), equals(mean_distance(g)))
 })

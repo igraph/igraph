@@ -5,11 +5,11 @@ test_that("writing Pajek files works", {
 
   library(igraph)
 
-  g <- graph.ring(9)
+  g <- ring(9)
   V(g)$color <- c("red", "green", "yellow")
 
   tc <- rawConnection(raw(0), "w")
-  write.graph(g, format="pajek", file=tc)
+  write_graph(g, format="pajek", file=tc)
   out <- rawToChar(rawConnectionValue(tc))
   close(tc)
 

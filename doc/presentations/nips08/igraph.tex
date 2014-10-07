@@ -619,7 +619,8 @@ You might also need\vspace*{-1cm}
   for (i in 1:100) \{ 
     g2 <- delete.edges(g, sample(ecount(g), 2)-1)
     g2 <- g2 %u% 
-       random.graph.game(vcount(g), 2, type="gnm")
+  \item
+    g\_nm(vcount(g), 2)
     cl <- cbind(cl, betweenness(g2))
   \}
   cl <- as.data.frame(t(cl))

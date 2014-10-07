@@ -20,7 +20,7 @@ rownames(mat) <- rowlab
 colnames(mat) <- collab
 
 library(igraph)
-g <- graph.incidence(mat)
+g <- g_incidence(mat)
 
 g$name <- "Davis's Southern club women"
 g$Author <- "Allison Davis"

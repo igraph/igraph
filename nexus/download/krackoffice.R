@@ -33,8 +33,8 @@ mat1 <- lapply(mat1, matrix, nc=21, byrow=TRUE)
 mat2 <- lapply(mat2, matrix, nc=21, byrow=TRUE)
 
 library(igraph)
-KRACKAD <- lapply(mat1, graph.adjacency, mode="directed")
-KRACKFR <- lapply(mat2, graph.adjacency, mode="directed")
+KRACKAD <- lapply(mat1, g_adj_matrix, mode="directed")
+KRACKFR <- lapply(mat2, g_adj_matrix, mode="directed")
 
 for (i in seq_along(KRACKAD)) {
   KRACKAD[[i]]$name <- paste(sep="", "Krackhardt office CSS, advice, #", i)

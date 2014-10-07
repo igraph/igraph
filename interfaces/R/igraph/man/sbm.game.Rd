@@ -1,11 +1,12 @@
-\name{sbm.game}
+\name{sample_sbm}
+\alias{sample_sbm}
 \alias{sbm.game}
 \concept{Stochastic block model}
 \concept{Random graph model}
 \title{Sample stochastic block model}
 \description{Sampling from the stochastic block model of networks}
 \usage{
-sbm.game (n, pref.matrix, block.sizes, directed = FALSE, loops = FALSE) 
+sample_sbm (n, pref.matrix, block.sizes, directed = FALSE, loops = FALSE) 
 }
 \arguments{
   \item{n}{Number of vertices in the graph.}
@@ -33,11 +34,11 @@ sbm.game (n, pref.matrix, block.sizes, directed = FALSE, loops = FALSE)
   Interpretation and evaluation. \emph{Social Networks}, 14, 5--61.
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{random.graph.game}}}
+\seealso{\code{\link{sample_gnp}}, \code{\link{sample_gnm}}}
 \examples{
 ## Two groups with not only few connection between groups
 pm <- cbind( c(.1, .001), c(.001, .05) )
-g <- sbm.game(1000, pref.matrix=pm, block.sizes=c(300,700))
+g <- sample_sbm(1000, pref.matrix=pm, block.sizes=c(300,700))
 g
 }
 \keyword{graphs}

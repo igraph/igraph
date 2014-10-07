@@ -1,12 +1,14 @@
 \name{kleinberg}
 \alias{authority.score}
+\alias{authority_score}
 \alias{hub.score}
+\alias{hub_score}
 \concept{Hub and authority score}
 \title{Kleinberg's centrality scores.}
 \description{Kleinberg's hub and authority scores.}
 \usage{
-authority.score (graph, scale = TRUE, weights=NULL, options = igraph.arpack.default) 
-hub.score (graph, scale = TRUE, weights=NULL, options = igraph.arpack.default) 
+authority_score (graph, scale = TRUE, weights=NULL, options = arpack_defaults) 
+hub_score (graph, scale = TRUE, weights=NULL, options = arpack_defaults) 
 }
 \arguments{
   \item{graph}{The input graph.}
@@ -47,19 +49,19 @@ hub.score (graph, scale = TRUE, weights=NULL, options = igraph.arpack.default)
   appears as IBM Research Report RJ 10076, May 1997.
 }
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
-\seealso{\code{\link{evcent}} for eigenvector centrality,
-  \code{\link{page.rank}} for the Page Rank scores. \code{\link{arpack}}
+\seealso{\code{\link{eigen_centrality}} for eigenvector centrality,
+  \code{\link{page_rank}} for the Page Rank scores. \code{\link{arpack}}
   for the underlining machinery of the computation.
 }
 \examples{
 ## An in-star
-g <- graph.star(10)
-hub.score(g)$vector
-authority.score(g)$vector
+g <- star(10)
+hub_score(g)$vector
+authority_score(g)$vector
 
 ## A ring
-g2 <- graph.ring(10)
-hub.score(g2)$vector
-authority.score(g2)$vector
+g2 <- ring(10)
+hub_score(g2)$vector
+authority_score(g2)$vector
 }
 \keyword{graphs}

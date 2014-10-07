@@ -1,6 +1,8 @@
 \name{graph-isomorphism}
 \alias{graph.isoclass}
+\alias{iso_class}
 \alias{graph.isocreate}
+\alias{graph_from_iso_class}
 \alias{graph.isomorphic}
 \alias{graph.isomorphic.vf2}
 \alias{graph.count.isomorphisms.vf2}
@@ -46,9 +48,9 @@ graph.subisomorphic.lad (pattern, target, domains = NULL,
                          induced = FALSE, map = TRUE, all.maps = FALSE,
                          time.limit = Inf)
 
-graph.isoclass(graph)
+iso_class(graph)
 graph.isoclass.subgraph(graph, vids)
-graph.isocreate(size, number, directed=TRUE)
+graph_from_iso_class(size, number, directed=TRUE)
 }
 \arguments{
   \item{graph}{A graph object.}
@@ -72,10 +74,10 @@ graph.isocreate(size, number, directed=TRUE)
   \item{directed}{Whether to create a directed graph.}
   \item{sh1}{Character constant, the heuristics to use in the BLISS
     algorithm, for \code{graph1}. See the \code{sh} argument of
-    \code{\link{canonical.permutation}} for possible values.}
+    \code{\link{canonical_permutation}} for possible values.}
   \item{sh2}{Character constant, the heuristics to use in the BLISS
     algorithm, for \code{graph2}. See the \code{sh} argument of
-    \code{\link{canonical.permutation}} for possible values.}
+    \code{\link{canonical_permutation}} for possible values.}
   \item{vids}{Numeric vector, the vertex ids of vertices to form the
     induced subgraph for determining the isomorphism class.}
   \item{pattern}{The smaller graph, it might be directed or
@@ -120,8 +122,8 @@ graph.isocreate(size, number, directed=TRUE)
 
   \code{igraph.isomorphic.bliss} uses the BLISS algorithm by Junttila
   and Kaski, and it works for undirected graphs. For both graphs the
-  \code{\link{canonical.permutation}} and then the
-  \code{\link{permute.vertices}} function is called to transfer them
+  \code{\link{canonical_permutation}} and then the
+  \code{\link{permute}} function is called to transfer them
   into canonical form; finally the canonical forms are compared.
 
   \code{graph.isomorphic.vf2} decides whethe two graphs are isomorphic,
@@ -131,7 +133,7 @@ graph.isocreate(size, number, directed=TRUE)
   \code{graph.count.isomorphisms.vf2} counts the different isomorphic
   mappings between \code{graph1} and \code{graph2}. (To count
   automorphisms you can supply the same graph twice, but it is better to
-  call \code{\link{graph.automorphisms}}.) It uses the VF2 algorithm.
+  call \code{\link{automorphisms}}.) It uses the VF2 algorithm.
 
   \code{graph.get.isomorphisms.vf2} calculates all isomorphic mappings
   between \code{graph1} and \code{graph2}. It uses the VF2 algorithm.
@@ -154,7 +156,7 @@ graph.isocreate(size, number, directed=TRUE)
   restrict the matching to a subset of allowed vertices, individually
   for each vertex in \code{pattern}.
   
-  \code{graph.isoclass} returns the isomorphism class of a graph, a
+  \code{iso_class} returns the isomorphism class of a graph, a
   non-negative integer number. Graphs (with the same number of vertices)
   having the same isomorphism class are isomorphic and isomorphic graphs
   always have the same isomorphism class. Currently it can handle only
@@ -164,12 +166,12 @@ graph.isocreate(size, number, directed=TRUE)
   subgraph of the input graph. Currently it only works for subgraphs
   with 3 or 4 vertices.
   
-  \code{graph.isocreate} create a graph from the given isomorphic
+  \code{graph_from_iso_class} create a graph from the given isomorphic
   class. Currently it can handle only graphs with 3 or 4 vertices.
 }
 \note{
-  Functions \code{graph.isoclass}, \code{graph.isoclass.subgraph} and
-  \code{graph.isocreate} are considered experimental and might be
+  Functions \code{iso_class}, \code{graph.isoclass.subgraph} and
+  \code{graph_from_iso_class} are considered experimental and might be
   reorganized/rewritten later.
 }
 \value{
@@ -187,13 +189,13 @@ graph.isocreate(size, number, directed=TRUE)
     vector otherwise.}
   \item{info1}{Some information about the canonical form calculation
     for \code{graph1}. A named list, see the return value of
-    \code{\link{canonical.permutation}} for details. Note that if the
+    \code{\link{canonical_permutation}} for details. Note that if the
 		two graphs have different number of vertices or edges, then the
 		BLISS algorithm is not run at all, and the contents of \code{info1}
 		is incorrect.}
   \item{info2}{Some information about the canonical form calculation
     for \code{graph2}. A named list, see the return value of
-    \code{\link{canonical.permutation}} for details. Note that if the
+    \code{\link{canonical_permutation}} for details. Note that if the
 		two graphs have different number of vertices or edges, then the
 		BLISS algorithm is not run at all, and the contents of \code{info2}
 		is incorrect.}
@@ -247,10 +249,10 @@ graph.isocreate(size, number, directed=TRUE)
     \code{target}, in a list of vectors, where each vector is in the
     same format as \code{map} just above.}
   
-  \code{graph.isoclass} and \code{graph.isoclass.subgraph} return a
+  \code{iso_class} and \code{graph.isoclass.subgraph} return a
   non-negative integer number. 
 
-  \code{graph.isocreate} returns a graph object.
+  \code{graph_from_iso_class} returns a graph object.
 }
 \references{
   Tommi Junttila and Petteri Kaski: Engineering an Efficient Canonical
@@ -267,27 +269,27 @@ graph.isocreate(size, number, directed=TRUE)
   \emph{Artificial Intelligence} 174(12-13):850--864, 2010.
 }
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{\link{graph.motifs}}}
+\seealso{\code{\link{motifs}}}
 \examples{
 # create some non-isomorphic graphs
-g1 <- graph.isocreate(3, 10)
-g2 <- graph.isocreate(3, 11)
-graph.isoclass(g1)
-graph.isoclass(g2)
+g1 <- graph_from_iso_class(3, 10)
+g2 <- graph_from_iso_class(3, 11)
+iso_class(g1)
+iso_class(g2)
 graph.isomorphic(g1, g2)
 
 # create two isomorphic graphs, by
 # permuting the vertices of the first 
 g1 <- barabasi.game(30, m=2, directed=FALSE)
-g2 <- permute.vertices(g1, sample(vcount(g1)))
+g2 <- permute(g1, sample(vcount(g1)))
 # should be TRUE
 graph.isomorphic(g1, g2)
 graph.isomorphic.bliss(g1, g2)
 graph.isomorphic.vf2(g1, g2)
 
 # colored graph isomorphism
-g1 <- graph.ring(10)
-g2 <- graph.ring(10)
+g1 <- ring(10)
+g2 <- ring(10)
 graph.isomorphic.vf2(g1, g2)
 
 V(g1)$color <- rep(1:2, length=vcount(g1))
@@ -307,12 +309,12 @@ graph.isomorphic.vf2(g2, g2, vertex.color1=NULL,
     vertex.color2=NULL)
 
 # The LAD example
-pattern <- graph.formula(1:2:3:4:5,
-                         1 - 2:5, 2 - 1:5:3, 3 - 2:4, 4 - 3:5, 5 - 4:2:1)
-target <- graph.formula(1:2:3:4:5:6:7:8:9,
-                        1 - 2:5:7, 2 - 1:5:3, 3 - 2:4, 4 - 3:5:6:8:9,
-                        5 - 1:2:4:6:7, 6 - 7:5:4:9, 7 - 1:5:6,
-                        8 - 4:9, 9 - 6:4:8)
+pattern <- graph_from_formula(1:2:3:4:5,
+                     1 - 2:5, 2 - 1:5:3, 3 - 2:4, 4 - 3:5, 5 - 4:2:1)
+target <- graph_from_formula(1:2:3:4:5:6:7:8:9,
+                    1 - 2:5:7, 2 - 1:5:3, 3 - 2:4, 4 - 3:5:6:8:9,
+                    5 - 1:2:4:6:7, 6 - 7:5:4:9, 7 - 1:5:6,
+                    8 - 4:9, 9 - 6:4:8)
 domains <- list(`1` = c(1,3,9), `2` = c(5,6,7,8), `3` = c(2,4,6,7,8,9),
                 `4` = c(1,3,9), `5` = c(2,4,8,9))
 graph.subisomorphic.lad(pattern, target, all.maps=TRUE)
@@ -320,9 +322,9 @@ graph.subisomorphic.lad(pattern, target, induced=TRUE, all.maps=TRUE)
 graph.subisomorphic.lad(pattern, target, domains=domains, all.maps=TRUE)
 
 # Directed LAD example
-pattern <- graph.formula(1:2:3, 1 -+ 2:3)
-uring <- graph.ring(10)
-dring <- graph.ring(10, directed=TRUE)
+pattern <- graph_from_formula(1:2:3, 1 -+ 2:3)
+uring <- ring(10)
+dring <- ring(10, directed=TRUE)
 graph.subisomorphic.lad(pattern, uring)
 graph.subisomorphic.lad(pattern, dring)
 }

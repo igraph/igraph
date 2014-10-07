@@ -1,19 +1,19 @@
 
-context("graph.adjlist")
+context("graph_from_adj_list")
 
-test_that("graph.adjlist works", {
+test_that("graph_from_adj_list works", {
 
   library(igraph)
   
-  g <- erdos.renyi.game(100, 3/100)
-  al <- get.adjlist(g)
-  g2 <- graph.adjlist(al, mode="all")
+  g <- sample_gnp(100, 3/100)
+  al <- as_adj_list(g)
+  g2 <- graph_from_adj_list(al, mode="all")
   expect_that(graph.isomorphic(g, g2), is_true())
 
   ##
   
-  g <- erdos.renyi.game(100, 3/100, dir=TRUE)
-  al <- get.adjlist(g, mode="out")
-  g2 <- graph.adjlist(al, mode="out")
+  g <- sample_gnp(100, 3/100, dir=TRUE)
+  al <- as_adj_list(g, mode="out")
+  g2 <- graph_from_adj_list(al, mode="out")
   expect_that(graph.isomorphic(g, g2), is_true())
 })

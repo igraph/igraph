@@ -1,5 +1,5 @@
 
-context("authority.score")
+context("authority_score")
 
 test_that("authority score works", {
   library(igraph)
@@ -10,34 +10,34 @@ test_that("authority score works", {
       if (x[1] < 0) { x <- -x       }
       x
     }
-    A <- get.adjacency(graph, sparse=FALSE)
+    A <- as_adj(graph, sparse=FALSE)
     if (as) { 
       s1 <- eigen(t(A) %*% A)$vectors[,1]
-      s2 <- authority.score(graph)$vector
+      s2 <- authority_score(graph)$vector
     } else {
       s1 <- eigen(A %*% t(A))$vectors[,1]
-      s2 <- hub.score(graph)$vector
+      s2 <- hub_score(graph)$vector
     }
     expect_that(mscale(s1), is_equivalent_to(mscale(s2)))
   }
 
-  g1 <- ba.game(100, m=10)
+  g1 <- sample_pa(100, m=10)
   ashs(g1)
   ashs(g1, as=FALSE)
 
-  g2 <- erdos.renyi.game(100, 2/100)
+  g2 <- sample_gnp(100, 2/100)
   ashs(g2)
   ashs(g2, as=FALSE)
 })
 
 test_that("authority scores of a ring are all one", {
   library(igraph)
-  g3 <- graph.ring(100)
-  expect_that(authority.score(g3)$vector, equals(rep(1, vcount(g3))))
-  expect_that(hub.score(g3)$vector, equals(rep(1, vcount(g3))))
+  g3 <- ring(100)
+  expect_that(authority_score(g3)$vector, equals(rep(1, vcount(g3))))
+  expect_that(hub_score(g3)$vector, equals(rep(1, vcount(g3))))
 })
 
-test_that("authority.score survives stress test", {
+test_that("authority_score survives stress test", {
   library(igraph)
   library(Matrix)
   set.seed(42)
@@ -56,16 +56,16 @@ test_that("authority.score survives stress test", {
   }
 
   for (i in 1:100) {
-    G <- erdos.renyi.game(10, sample(1:20, 1), type="gnm")
-    as <- authority.score(G)
-    M <- get.adjacency(G)
+    G <- sample_gnm(10, sample(1:20, 1))
+    as <- authority_score(G)
+    M <- as_adj(G)
     is.good(t(M) %*% M, as$vector, as$value)
   }
 
   for (i in 1:100) {
-    G <- erdos.renyi.game(10, sample(1:20, 1), type="gnm")
-    hs <- hub.score(G)
-    M <- get.adjacency(G)
+    G <- sample_gnm(10, sample(1:20, 1))
+    hs <- hub_score(G)
+    M <- as_adj(G)
     is.good(M %*% t(M), hs$vector, hs$value)
   }
 })

@@ -8,14 +8,14 @@ pause <- function() {
 }
 
 ### A modular graph has dense subgraphs
-mod <- graph.full(10) %du% graph.full(10) %du% graph.full(10)
+mod <- full_graph(10) %du% full_graph(10) %du% full_graph(10)
 perfect <- c(rep(1,10), rep(2,10), rep(3,10))
 perfect
 
 pause()
 
 ### Plot it with community (=component) colors
-plot(mod, vertex.color=perfect, layout=layout.fruchterman.reingold)
+plot(mod, vertex.color=perfect, layout=layout_with_fr)
 
 pause()
 
@@ -36,12 +36,12 @@ pause()
 
 ### A real little network, Zachary's karate club data
 karate <- graph.famous("Zachary")
-karate$layout <- layout.kamada.kawai(karate, niter=1000)
+karate$layout <- layout_with_kk(karate, niter=1000)
 
 pause()
 
 ### Greedy algorithm
-fc <- fastgreedy.community(karate)
+fc <- cluster_fast_greedy(karate)
 memb <- membership(fc)
 plot(karate, vertex.color=memb)
   
@@ -62,13 +62,13 @@ diag(pref.mat) <- diag(pref.mat) + 10/31
 pause()
 
 ### Create the network with the given vertex preferences
-G <- preference.game(128*4, types=16, pref.matrix=pref.mat)
+G <- sample_pref(128*4, types=16, pref.matrix=pref.mat)
 
 pause()
 
 ### Run spinglass community detection with two gamma parameters
-sc1 <- spinglass.community(G, spins=4, gamma=1.0)
-sc2.2 <- spinglass.community(G, spins=16, gamma=2.2)
+sc1 <- cluster_spinglass(G, spins=4, gamma=1.0)
+sc2.2 <- cluster_spinglass(G, spins=16, gamma=2.2)
 
 pause()
 
@@ -78,7 +78,7 @@ if (require(Matrix)) {
 } else {
   myimage <- image
 }
-A <- get.adjacency(G)
+A <- as_adj(G)
 myimage(A)
 
 pause()
@@ -106,45 +106,45 @@ communities <- list()
 
 pause()
 
-### edge.betweenness.community
-ebc <- edge.betweenness.community(karate)
+### cluster_edge_betweenness
+ebc <- cluster_edge_betweenness(karate)
 communities$`Edge betweenness` <- ebc
 
 pause()
 
-### fastgreedy.community
-fc <- fastgreedy.community(karate)
+### cluster_fast_greedy
+fc <- cluster_fast_greedy(karate)
 communities$`Fast greedy` <- fc
 
 pause()
 
-### leading.eigenvector.community
-lec <- leading.eigenvector.community(karate)
+### cluster_leading_eigen
+lec <- cluster_leading_eigen(karate)
 communities$`Leading eigenvector` <- lec
 
 pause()
 
-### spinglass.community
-sc <- spinglass.community(karate, spins=10)
+### cluster_spinglass
+sc <- cluster_spinglass(karate, spins=10)
 communities$`Spinglass` <- sc
 
 pause()
 
-### walktrap.community
-wt <- walktrap.community(karate)
+### cluster_walktrap
+wt <- cluster_walktrap(karate)
 communities$`Walktrap` <- wt
 
 pause()
 
-### label.propagation.community
-labprop <- label.propagation.community(karate)
+### cluster_label_prop
+labprop <- cluster_label_prop(karate)
 communities$`Label propagation` <- labprop
 
 pause()
 
 ### Plot everything
 layout(rbind(1:3, 4:6))
-coords <- layout.kamada.kawai(karate)
+coords <- layout_with_kk(karate)
 lapply(seq_along(communities), function(x) {
   m <- modularity(communities[[x]])
   par(mar=c(1,1,3,1))
@@ -170,7 +170,7 @@ clique.community <- function(graph, k) {
   clq.graph <- simplify(graph(edges))
   V(clq.graph)$name <- 
     seq(length=vcount(clq.graph))
-  comps <- decompose.graph(clq.graph)
+  comps <- decompose(clq.graph)
   
   lapply(comps, function(x) {
     unique(unlist(clq[ V(x)$name ]))
@@ -181,13 +181,13 @@ pause()
 
 ### Apply it to a graph, this is the example graph from
 ##  the original publication
-g <- graph.formula(A-B:F:C:E:D, B-A:D:C:E:F:G, C-A:B:F:E:D, D-A:B:C:F:E,
-                   E-D:A:C:B:F:V:W:U, F-H:B:A:C:D:E, G-B:J:K:L:H,
-                   H-F:G:I:J:K:L, I-J:L:H, J-I:G:H:L, K-G:H:L:M,
-                   L-H:G:I:J:K:M, M-K:L:Q:R:S:P:O:N, N-M:Q:R:P:S:O,
-                   O-N:M:P, P-Q:M:N:O:S, Q-M:N:P:V:U:W:R, R-M:N:V:W:Q,
-                   S-N:P:M:U:W:T, T-S:V:W:U, U-E:V:Q:S:W:T,
-                   V-E:U:W:T:R:Q, W-U:E:V:Q:R:S:T)
+g <- graph_from_formula(A-B:F:C:E:D, B-A:D:C:E:F:G, C-A:B:F:E:D, D-A:B:C:F:E,
+               E-D:A:C:B:F:V:W:U, F-H:B:A:C:D:E, G-B:J:K:L:H,
+               H-F:G:I:J:K:L, I-J:L:H, J-I:G:H:L, K-G:H:L:M,
+               L-H:G:I:J:K:M, M-K:L:Q:R:S:P:O:N, N-M:Q:R:P:S:O,
+               O-N:M:P, P-Q:M:N:O:S, Q-M:N:P:V:U:W:R, R-M:N:V:W:Q,
+               S-N:P:M:U:W:T, T-S:V:W:U, U-E:V:Q:S:W:T,
+               V-E:U:W:T:R:Q, W-U:E:V:Q:R:S:T)
 
 pause()
 

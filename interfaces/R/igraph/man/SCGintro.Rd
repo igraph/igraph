@@ -125,14 +125,14 @@
   useful information. 
  
   These steps can also be carried out independently: (1) Use
-  \code{\link{get.adjacency}}, \code{\link{graph.laplacian}} or
-  \code{\link{get.stochastic}} to compute a matrix \eqn{M}. (2) Work
+  \code{\link{as_adj}}, \code{\link{laplacian_matrix}} or
+  \code{\link{stochastic_matrix}} to compute a matrix \eqn{M}. (2) Work
   out some prescribed eigenpairs of \eqn{M} e.g. by 
   means of \code{eigen} or \code{arpack}. (3) Invoke one the four
-  algorithms of the function \code{\link{scgGrouping}} to get a
+  algorithms of the function \code{\link{scg_group}} to get a
   partition that will preserve the eigenpairs in the coarse-grained
   matrix. (4) Compute the semi-projectors \eqn{L} and \eqn{R} using
-  \code{\link{scgSemiProjectors}} and from there the coarse-grained
+  \code{\link{scg_semi_proj}} and from there the coarse-grained
   matrix \eqn{\widetilde{M}=LMR^*}{M'=LMR*}. If necessary, construct a
   coarse-grained graph from \eqn{\widetilde{M}}{M'} (e.g. as in [1]). 
 }

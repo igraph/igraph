@@ -1,5 +1,6 @@
-\name{contract.vertices}
+\name{contract}
 \alias{contract.vertices}
+\alias{contract}
 \title{Contract several vertices into a single one}
 \description{
   This function creates a new graph, by merging several 
@@ -7,7 +8,7 @@
   to sets of vertices in the input graph.
 }
 \usage{
-contract.vertices(graph, mapping,
+contract(graph, mapping,
                   vertex.attr.comb=getIgraphOpt("vertex.attr.comb"))
 }
 \arguments{
@@ -32,12 +33,12 @@ contract.vertices(graph, mapping,
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
-g <- graph.ring(10)
+g <- ring(10)
 g$name <- "Ring"
 V(g)$name <- letters[1:vcount(g)]
 E(g)$weight <- runif(ecount(g))
 
-g2 <- contract.vertices(g, rep(1:5, each=2),
+g2 <- contract(g, rep(1:5, each=2),
                         vertex.attr.comb=toString)
 
 ## graph and edge attributes are kept, vertex attributes are

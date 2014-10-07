@@ -14,7 +14,7 @@ close(tc)
 mat <- matrix(mat, sqrt(length(mat)), byrow=TRUE)
 
 library(igraph)
-g <- graph.adjacency(mat)
+g <- g_adj_matrix(mat)
 
 g$name <- "Gagnon & MacRae prison"
 g$Author <- "John Gagnon"

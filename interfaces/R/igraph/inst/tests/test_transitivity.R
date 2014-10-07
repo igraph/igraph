@@ -4,7 +4,7 @@ context("transitivity")
 test_that("transitivity works", {
   library(igraph)
   set.seed(42)
-  g <- erdos.renyi.game(100, p=10/100)
+  g <- sample_gnp(100, p=10/100)
 
   t1 <- transitivity(g, type="global")
   expect_that(t1, equals(0.10483870967741935887))

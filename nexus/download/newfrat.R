@@ -18,7 +18,7 @@ mat <- lapply(mat, "[[", 1)
 mat <- lapply(mat, matrix, nc=17, byrow=TRUE)
 
 library(igraph)
-newfrat <- lapply(mat, graph.adjacency, mode="directed", weighted=TRUE)
+newfrat <- lapply(mat, g_adj_matrix, mode="directed", weighted=TRUE)
 names(newfrat) <- lab
 
 for (i in seq_along(newfrat)) {

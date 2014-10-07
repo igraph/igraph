@@ -2,7 +2,7 @@
 \alias{arpack}
 \alias{arpack-options}
 \alias{igraph.arpack.default}
-\alias{arpack.unpack.complex}
+\alias{arpack_defaults}
 \concept{Eigenvalues}
 \concept{Eigenvectors}
 \concept{ARPACK}
@@ -10,9 +10,8 @@
 \description{Interface to the ARPACK library for calculating
   eigenvectors of sparse matrices}
 \usage{
-arpack(func, extra = NULL, sym = FALSE, options = igraph.arpack.default, 
+arpack(func, extra = NULL, sym = FALSE, options = arpack_defaults, 
     env = parent.frame(), complex=!sym)
-arpack.unpack.complex(vectors, values, nev)
 }
 \arguments{
   \item{func}{The function to perform the matrix-vector
@@ -33,7 +32,6 @@ arpack.unpack.complex(vectors, values, nev)
     problems (these only have real eigenvectors/values), but only
     non-symmetric ones. If you have a non-symmetric problem, but you're
     sure that the results will be real, then supply \code{FALSE} here.
-    The conversion is done by calling \code{arpack.unpack.complex}.
   }
   \item{vectors}{Eigenvectors, as returned by ARPACK.}
   \item{values}{Eigenvalues, as returned by ARPACK}
@@ -75,8 +73,8 @@ arpack.unpack.complex(vectors, values, nev)
       \sQuote{\code{I}} is supported.}
     \item{n}{Numeric scalar. The dimension of the eigenproblem. You only
       need to set this if you call \code{\link{arpack}}
-      directly. (I.e. not needed for \code{\link{evcent}},
-      \code{\link{page.rank}}, etc.)}
+      directly. (I.e. not needed for \code{\link{eigen_centrality}},
+      \code{\link{page_rank}}, etc.)}
     \item{which}{Specify which eigenvalues/vectors to compute, character
       constant with exactly two characters.
 
@@ -112,7 +110,7 @@ arpack.unpack.complex(vectors, values, nev)
       }	
 
       This parameter is sometimes overwritten by the various functions,
-      e.g. \code{\link{page.rank}} always sets \sQuote{\code{LM}}.
+      e.g. \code{\link{page_rank}} always sets \sQuote{\code{LM}}.
     }
     \item{nev}{Numeric scalar. The number of eigenvalues to be computed.}
     \item{tol}{Numeric scalar. Stopping criterion: the relative accuracy
@@ -189,11 +187,6 @@ arpack.unpack.complex(vectors, values, nev)
     }
   }
   Please see the ARPACK documentation for additional details.
-
-  \code{arpack.unpack.complex} is a (semi-)internal function that
-  converts the output of the non-symmetric ARPACK solver to a more
-  readable format. It is called internally by \code{arpack}.
-  
 }
 \value{
   A named list with the following members:
@@ -221,8 +214,8 @@ arpack.unpack.complex(vectors, values, nev)
 }
 \author{Rich Lehoucq, Kristi Maschhoff, Danny Sorensen, Chao Yang for
   ARPACK, Gabor Csardi \email{csardi.gabor@gmail.com} for the R interface.}
-\seealso{\code{\link{evcent}}, \code{\link{page.rank}},
-  \code{\link{hub.score}}, \code{\link{leading.eigenvector.community}}
+\seealso{\code{\link{eigen_centrality}}, \code{\link{page_rank}},
+  \code{\link{hub_score}}, \code{\link{cluster_leading_eigen}}
   are some of the functions in igraph which use ARPACK. The ARPACK
   homepage is at \url{http://www.caam.rice.edu/software/ARPACK/}.
 }
@@ -245,13 +238,13 @@ f <- function(x, extra=NULL) {
 arpack(f, options=list(n=10, nev=1, ncv=3), sym=TRUE)
 
 # double check
-eigen(graph.laplacian(graph.star(10, mode="undirected")))
+eigen(laplacian_matrix(star(10, mode="undirected")))
 
 ## First three eigenvalues of the adjacency matrix of a graph
 ## We need the 'Matrix' package for this
 if (require(Matrix)) {
-  g <- erdos.renyi.game(1000, 5/1000)
-  M <- get.adjacency(g, sparse=TRUE)
+  g <- sample_gnp(1000, 5/1000)
+  M <- as_adj(g, sparse=TRUE)
   f2 <- function(x, extra=NULL) { cat("."); as.vector(M \%*\% x) }
   baev <- arpack(f2, sym=TRUE, options=list(n=vcount(g), nev=3, ncv=8,
                                   which="LM", maxiter=200))

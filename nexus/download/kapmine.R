@@ -20,8 +20,8 @@ mat2 <- matrix(mat2, sqrt(length(mat2)), byrow=TRUE)
 colnames(mat1) <- rownames(mat1) <- colnames(mat2) <- rownames(mat2) <- adata
 
 library(igraph)
-g1 <- graph.adjacency(mat1, mode="undirected")
-g2 <- graph.adjacency(mat2, mode="undirected")
+g1 <- g_adj_matrix(mat1, mode="undirected")
+g2 <- g_adj_matrix(mat2, mode="undirected")
 
 g1$name <- "Kapferer mine, KAPFMM"
 g2$name <- "Kapferer mine, KAPFMU"

@@ -19,9 +19,9 @@
 #
 ###################################################################
 
-hrg.fit <- function(graph, hrg=NULL, start=FALSE, steps=0) {
+fit_hrg <- function(graph, hrg=NULL, start=FALSE, steps=0) {
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is_igraph(graph)) { stop("Not a graph object") }
   if (is.null(hrg)) { 
     hrg <- list(left=c(), right=c(), prob=c(), edges=c(), 
                 vertices=c()) 
@@ -36,7 +36,7 @@ hrg.fit <- function(graph, hrg=NULL, start=FALSE, steps=0) {
   res <- .Call("R_igraph_hrg_fit", graph, hrg, start, steps,
                PACKAGE="igraph")
   
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
 
@@ -44,10 +44,10 @@ hrg.fit <- function(graph, hrg=NULL, start=FALSE, steps=0) {
   res
 }
 
-hrg.consensus <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
+consensus_tree <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
   
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is_igraph(graph)) { stop("Not a graph object") }
 
   if (is.null(hrg)) {
     hrg <- list(left=c(), right=c(), prob=c(), edges=c(), vertices=c())
@@ -66,7 +66,7 @@ hrg.consensus <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
   class(res$consensus) <- "igraphHRGConsensus"
   class(res$hrg) <- "igraphHRG"
 
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$hrg$names <- V(graph)$name
     res$consensus$names <- V(graph)$name
   }
@@ -74,11 +74,11 @@ hrg.consensus <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
   res
 }
 
-hrg.predict <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
+predict_edges <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
                         num.bins=25) {
   
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is_igraph(graph)) { stop("Not a graph object") }
   if (is.null(hrg)) { 
     hrg <- list(left=c(), right=c(), prob=c(), edges=c(), 
                 vertices=c()) 
@@ -106,8 +106,8 @@ hrg.predict <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
 #' 
 #' You can use \code{as.igraph} to convert various objects to igraph graphs.
 #' Right now the following objects are supported: \itemize{ \item codeigraphHRG
-#' These objects are created by the \code{\link{hrg.fit}} and
-#' \code{\link{hrg.consensus}} functions.  }
+#' These objects are created by the \code{\link{fit_hrg}} and
+#' \code{\link{consensus_tree}} functions.  }
 #' 
 #' @aliases as.igraph as.igraph.igraphHRG
 #' @param x The object to convert.
@@ -117,8 +117,8 @@ hrg.predict <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.full(5) + graph.full(5)
-#' hrg <- hrg.fit(g)
+#' g <- full_graph(5) + full_graph(5)
+#' hrg <- fit_hrg(g)
 #' as.igraph(hrg)
 #' 
 as.igraph <- function(x, ...)
@@ -274,7 +274,7 @@ as.hclust.igraphHRG <- function(x, ...) {
   res  
 }
 
-asPhylo.igraphHRG <- function(x, ...) {
+as_phylo.igraphHRG <- function(x, ...) {
   require(ape, quietly=TRUE)
 
   ovc <- length(x$left)+1L
@@ -298,7 +298,7 @@ asPhylo.igraphHRG <- function(x, ...) {
 #' 
 #' Plot a hierarchical random graph as a dendrogram.
 #' 
-#' \code{dendPlot} supports three different plotting functions, selected via
+#' \code{plot_dendrogram} supports three different plotting functions, selected via
 #' the \code{mode} argument. By default the plotting function is taken from the
 #' \code{dend.plot.type} igraph option, and it has for possible values:
 #' \itemize{ \item \code{auto} Choose automatically between the plotting
@@ -311,7 +311,7 @@ asPhylo.igraphHRG <- function(x, ...) {
 #' 
 #' The different plotting functions take different sets of arguments. When
 #' using \code{plot.phylo} (\code{mode="phylo"}), we have the following syntax:
-#' \preformatted{ dendPlot(x, mode="phylo", colbar = rainbow(11, start=0.7,
+#' \preformatted{ plot_dendrogram(x, mode="phylo", colbar = rainbow(11, start=0.7,
 #' end=0.1), edge.color = NULL, use.edge.length = FALSE, \dots) } The extra
 #' arguments not documented above: \itemize{ \item \code{colbar} Color bar for
 #' the edges.  \item \code{edge.color} Edge colors. If \code{NULL}, then the
@@ -320,7 +320,7 @@ asPhylo.igraphHRG <- function(x, ...) {
 #' \code{plot.phylo}.  }
 #' 
 #' The syntax for \code{plot.hclust} (\code{mode="hclust"}): \preformatted{
-#' dendPlot(x, mode="hclust", rect = 0, colbar = rainbow(rect), hang = 0.01,
+#' plot_dendrogram(x, mode="hclust", rect = 0, colbar = rainbow(rect), hang = 0.01,
 #' ann = FALSE, main = "", sub = "", xlab = "", ylab = "", \dots) } The extra
 #' arguments not documented above: \itemize{ \item \code{rect} A numeric
 #' scalar, the number of groups to mark on the dendrogram. The dendrogram is
@@ -339,11 +339,11 @@ asPhylo.igraphHRG <- function(x, ...) {
 #' to pass to \code{plot.hclust}.  }
 #' 
 #' The syntax for \code{plot.dendrogram} (\code{mode="dendrogram"}):
-#' \preformatted{ dendPlot(x, \dots) } The extra arguments are simply passed to
+#' \preformatted{ plot_dendrogram(x, \dots) } The extra arguments are simply passed to
 #' \code{as.dendrogram}.
 #' 
 #' @param x An \code{igraphHRG}, a hierarchical random graph, as returned by
-#' the \code{\link{hrg.fit}} function.
+#' the \code{\link{fit_hrg}} function.
 #' @param mode Which dendrogram plotting function to use. See details below.
 #' @param \dots Additional arguments to supply to the dendrogram plotting
 #' function.
@@ -353,11 +353,11 @@ asPhylo.igraphHRG <- function(x, ...) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.full(5) + graph.full(5)
-#' hrg <- hrg.fit(g)
-#' dendPlot(hrg)
+#' g <- full_graph(5) + full_graph(5)
+#' hrg <- fit_hrg(g)
+#' plot_dendrogram(hrg)
 #' 
-dendPlot.igraphHRG <- function(x, mode=getIgraphOpt("dend.plot.type"), ...) {
+plot_dendrogram.igraphHRG <- function(x, mode=getIgraphOpt("dend.plot.type"), ...) {
 
   if (mode=="auto") {
     value <- tryCatch(suppressWarnings(library("ape", character.only=TRUE,
@@ -397,7 +397,7 @@ hrgPlotDendrogram <- function(x, ...) {
 hrgPlotPhylo <- function(x, colbar=rainbow(11, start=.7, end=.1),
                          edge.color=NULL, use.edge.length=FALSE, ...) {
   vc <- length(x$left)+1
-  phy <- asPhylo(x)
+  phy <- as_phylo(x)
   br <- seq(0,1,length=length(colbar)) ; br[1] <- -1
   cc <- as.integer(cut(x$prob[phy$edge[,1] - vc], breaks=br))
   if (is.null(edge.color)) { edge.color <- colbar[cc] }

@@ -25,12 +25,12 @@ for (i in seq_along(wiring)) {
 }
 
 library(igraph)
-wiring <- list(graph.adjacency(wiring[[1]], mode="undirected"),
-               graph.adjacency(wiring[[2]], mode="undirected"),
-               graph.adjacency(wiring[[3]], mode="undirected"),
-               graph.adjacency(wiring[[4]], mode="undirected"),
-               graph.adjacency(wiring[[5]], mode="directed"),
-               graph.adjacency(wiring[[3]], mode="directed", weighted=TRUE))
+wiring <- list(g_adj_matrix(wiring[[1]], mode="undirected"),
+               g_adj_matrix(wiring[[2]], mode="undirected"),
+               g_adj_matrix(wiring[[3]], mode="undirected"),
+               g_adj_matrix(wiring[[4]], mode="undirected"),
+               g_adj_matrix(wiring[[5]], mode="directed"),
+               g_adj_matrix(wiring[[3]], mode="directed", weighted=TRUE))
 names(wiring) <- llab
 
 for (i in seq_along(wiring)) {

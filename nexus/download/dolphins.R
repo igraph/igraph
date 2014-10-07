@@ -10,12 +10,12 @@ txt <- readLines(paste(sep="", tmp, "/dolphins.txt"))
 gml <- paste(sep="", tmp, "/dolphins.gml")
 
 library(igraph)
-g <- read.graph(gml, format="gml")
+g <- read_graph(gml, format="gml")
 
-g <- remove.vertex.attribute(g, "id")
+g <- delete_vertex_attr(g, "id")
 
 V(g)$name <- V(g)$label
-g <- remove.vertex.attribute(g, "label")
+g <- delete_vertex_attr(g, "label")
 
 g$name <- "Dophin social network"
 g$Author <- "D. Lusseau et al."

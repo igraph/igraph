@@ -32,7 +32,8 @@
 #' The (row) stochastic matrix is defined as \deqn{W = D^{-1}M,}{W = inv(D) M,}
 #' where it is assumed that \eqn{D} is non-singular.  Column stochastic
 #' matrices are defined in a symmetric way.
-#' 
+#'
+#' @aliases get.stochastic
 #' @param graph The input graph. Must be of class \code{igraph}.
 #' @param column.wise If \code{FALSE}, then the rows of the stochastic matrix
 #' sum up to one; otherwise it is the columns.
@@ -41,14 +42,14 @@
 #' @return A regular matrix or a matrix of class \code{Matrix} if a
 #' \code{sparse} argument was \code{TRUE}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{get.adjacency}}
+#' @seealso \code{\link{as_adj}}
 #' @keywords graphs
 #' @examples
 #' 
 #' library(Matrix)
 #' ## g is a large sparse graph
 #' g <- barabasi.game(n = 10^5, power = 2, directed = FALSE)
-#' W <- get.stochastic(g, sparse=TRUE)
+#' W <- stochastic_matrix(g, sparse=TRUE)
 #' 
 #' ## a dense matrix here would probably not fit in the memory
 #' class(W)
@@ -56,9 +57,9 @@
 #' ## may not be exactly 1, due to numerical errors
 #' max(abs(rowSums(W))-1)
 #' 
-get.stochastic <- function(graph, column.wise=FALSE,
+stochastic_matrix <- function(graph, column.wise=FALSE,
                            sparse=getIgraphOpt("sparsematrices")) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
  
@@ -82,7 +83,7 @@ get.stochastic <- function(graph, column.wise=FALSE,
                  PACKAGE="igraph")
   }
 
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     rownames(res) <- colnames(res) <- V(graph)$name
   }
 
@@ -120,7 +121,8 @@ get.stochastic <- function(graph, column.wise=FALSE,
 #' Finally, the algorithm \dQuote{exact\_scg} groups the vertices with equal
 #' components in each eigenvector. The last three algorithms essentially have
 #' linear running time and memory load.
-#' 
+#'
+#' @aliases scgGrouping
 #' @param V A numeric matrix of (eigen)vectors to be preserved by the coarse
 #' graining (the vectors are to be stored column-wise in \code{V}).
 #' @param nt A vector of positive integers of length one or equal to
@@ -148,7 +150,7 @@ get.stochastic <- function(graph, column.wise=FALSE,
 #' @author David Morton de Lachapelle \email{david.morton@@epfl.ch},
 #' \email{david.mortondelachapelle@@swissquote.ch}
 #' @seealso \link{SCG} for a detailed introduction. \code{\link{scg}},
-#' \code{\link{scgNormEps}}
+#' \code{\link{scg_eps}}
 #' @references D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios,
 #' Shrinking Matrices while Preserving their Eigenpairs with Application to the
 #' Spectral Coarse Graining of Graphs. Submitted to \emph{SIAM Journal on
@@ -170,7 +172,7 @@ get.stochastic <- function(graph, column.wise=FALSE,
 #' V <- eigen(M, symmetric=TRUE)$vectors[,c(1,2)]
 #' 
 #' # displays size of the groups in the final partition
-#' gr <- scgGrouping(V, nt=c(2,3))
+#' gr <- scg_group(V, nt=c(2,3))
 #' col <- rainbow(max(gr))
 #' plot(table(gr), col=col, main="Group size", xlab="group", ylab="size")
 #' 
@@ -193,13 +195,13 @@ get.stochastic <- function(graph, column.wise=FALSE,
 #' ### comparing optimal and k-means solutions
 #' ### in the one-dimensional case.
 #' x <- rexp(2000, 2)
-#' gr.true <- scgGrouping(cbind(x), 100)
+#' gr.true <- scg_group(cbind(x), 100)
 #' gr.km <- kmeans(x, 100, 100, 300)$cluster
-#' scgNormEps(cbind(x), gr.true)
-#' scgNormEps(cbind(x), gr.km)
+#' scg_eps(cbind(x), gr.true)
+#' scg_eps(cbind(x), gr.km)
 #' }
 #' 
-scgGrouping <- function(V, nt,
+scg_group <- function(V, nt,
                          mtype=c("symmetric", "laplacian",
                            "stochastic"),
                          algo=c("optimum", "interv_km", "interv",
@@ -257,7 +259,8 @@ scgGrouping <- function(V, nt,
 #' associated with the one-eigenvalue of the stochastic matrix. \eqn{L} and
 #' \eqn{R} are defined in a symmetric way when \code{norm = col}. All these
 #' semi-projectors verify various properties described in the reference.
-#' 
+#'
+#' @aliases scgSemiProjectors
 #' @param groups A vector of \code{nrow(X)} or \code{vcount(X)} integers giving
 #' the group label of every vertex in the partition.
 #' @param mtype The type of semi-projectors. For now \dQuote{symmetric},
@@ -274,7 +277,7 @@ scgGrouping <- function(V, nt,
 #' @author David Morton de Lachapelle,
 #' \url{http://people.epfl.ch/david.morton}.
 #' @seealso \link{SCG} for a detailed introduction. \code{\link{scg}},
-#' \code{\link{scgNormEps}}, \code{\link{scgGrouping}}
+#' \code{\link{scg_eps}}, \code{\link{scg_group}}
 #' @references D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios,
 #' Shrinking Matrices while Preserving their Eigenpairs with Application to the
 #' Spectral Coarse Graining of Graphs. Submitted to \emph{SIAM Journal on
@@ -287,9 +290,9 @@ scgGrouping <- function(V, nt,
 #' # compute the semi-projectors and projector for the partition
 #' # provided by a community detection method
 #' g <- barabasi.game(20, m=1.5)
-#' eb <- edge.betweenness.community(g)
+#' eb <- cluster_edge_betweenness(g)
 #' memb <- membership(eb)
-#' lr <- scgSemiProjectors(memb)
+#' lr <- scg_semi_proj(memb)
 #' #In the symmetric case L = R
 #' tcrossprod(lr$R)  # same as lr$R %*% t(lr$R)
 #' P <- crossprod(lr$R)  # same as t(lr$R) %*% lr$R
@@ -298,13 +301,13 @@ scgGrouping <- function(V, nt,
 #' sum( (P %*% P-P)^2 )
 #' 
 #' ## use L and R to coarse-grain the graph Laplacian
-#' lr <- scgSemiProjectors(memb, mtype="laplacian")
-#' L <- graph.laplacian(g)
+#' lr <- scg_semi_proj(memb, mtype="laplacian")
+#' L <- laplacian_matrix(g)
 #' Lt <- lr$L %*% L %*% t(lr$R)
 #' ## or better lr$L %*% tcrossprod(L,lr$R)
 #' rowSums(Lt)
 #' 
-scgSemiProjectors <- function(groups,
+scg_semi_proj <- function(groups,
                                mtype=c("symmetric", "laplacian",
                                  "stochastic"), p=NULL,
                                norm=c("row", "col"),
@@ -438,8 +441,8 @@ scgSemiProjectors <- function(groups,
 #' For other matrix types this is missing.}
 #' @author David Morton de Lachapelle,
 #' \url{http://people.epfl.ch/david.morton}.
-#' @seealso \link{SCG} for an introduction.  \code{\link{scgNormEps}},
-#' \code{\link{scgGrouping}} and \code{\link{scgSemiProjectors}}.
+#' @seealso \link{SCG} for an introduction.  \code{\link{scg_eps}},
+#' \code{\link{scg_group}} and \code{\link{scg_semi_proj}}.
 #' @references D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios,
 #' Shrinking Matrices while Preserving their Eigenpairs with Application to the
 #' Spectral Coarse Graining of Graphs. Submitted to \emph{SIAM Journal on
@@ -456,12 +459,12 @@ scgSemiProjectors <- function(groups,
 #' 
 #' \dontrun{
 #' # SCG of a toy network
-#' g <- graph.full(5) %du% graph.full(5) %du% graph.full(5)
-#' g <- add.edges(g, c(1,6, 1,11, 6, 11))
+#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- add_edges(g, c(1,6, 1,11, 6, 11))
 #' cg <- scg(g, 1, 3, algo="exact_scg")
 #' 
 #' #plot the result
-#' layout <- layout.kamada.kawai(g)
+#' layout <- layout_with_kk(g)
 #' nt <- vcount(cg$Xt)
 #' col <- rainbow(nt)
 #' vsize <- table(cg$groups)
@@ -472,7 +475,7 @@ scgSemiProjectors <- function(groups,
 #' 		vertex.label = NA, layout = layout)
 #' plot(cg$Xt, edge.width = ewidth, edge.label = ewidth, 
 #' 	vertex.color = col, vertex.size = 20*vsize/max(vsize),
-#' 	vertex.label=NA, layout = layout.kamada.kawai)
+#' 	vertex.label=NA, layout = layout_with_kk)
 #' par(op)
 #' 
 #' ## SCG of real-world network
@@ -487,7 +490,7 @@ scgSemiProjectors <- function(groups,
 #' ## are the eigenvalues well-preserved?
 #' gt <- cg$Xt
 #' nt <- vcount(gt)
-#' Lt <- graph.laplacian(gt)
+#' Lt <- laplacian_matrix(gt)
 #' evalt <- eigen(Lt, only.values=TRUE)$values[nt-(1:9)]
 #' res <- cbind(interv, cg$values, evalt)
 #' res <- round(res,5)
@@ -496,17 +499,17 @@ scgSemiProjectors <- function(groups,
 #' print(res)
 #' 
 #' ## use SCG to get the communities
-#' com <- scg(graph.laplacian(immuno), ev=n-c(1,2), nt=2)$groups
+#' com <- scg(laplacian_matrix(immuno), ev=n-c(1,2), nt=2)$groups
 #' col <- rainbow(max(com))
-#' layout <- layout.auto(immuno)
+#' layout <- layout_nicely(immuno)
 #' 
 #' plot(immuno, layout=layout, vertex.size=3, vertex.color=col[com],
 #'                 vertex.label=NA)
 #' 
 #' ## display the coarse-grained graph
 #' gt <- simplify(as.undirected(gt))
-#' layout.cg <- layout.kamada.kawai(gt)
-#' com.cg <- scg(graph.laplacian(gt), nt-c(1,2), 2)$groups
+#' layout.cg <- layout_with_kk(gt)
+#' com.cg <- scg(laplacian_matrix(gt), nt-c(1,2), 2)$groups
 #' vsize <- sqrt(as.vector(table(cg$groups)))
 #' 
 #' op <- par(mfrow=c(1,2))
@@ -594,7 +597,7 @@ myscg <- function(graph, matrix, sparsemat, ev, nt, groups=NULL,
                   epairs=FALSE, stat.prob=FALSE) {
 
   ## Argument checks
-  if (!is.null(graph))  { stopifnot(is.igraph(graph)) }
+  if (!is.null(graph))  { stopifnot(is_igraph(graph)) }
   if (!is.null(matrix)) { stopifnot(is.matrix(matrix)) }
   if (!is.null(sparsemat)) { stopifnot(inherits(sparsemat, "Matrix")) }
 

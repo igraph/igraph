@@ -16,7 +16,7 @@ pause()
 
 ### Optimalize modularity
 
-optcom <- optimal.community(karate)
+optcom <- cluster_optimal(karate)
 V(karate)$comm <- membership(optcom)
 plot(optcom, karate)
 
@@ -24,7 +24,7 @@ pause()
 
 ### Fit a HRG model to the network
 
-hrg <- hrg.fit(karate)
+hrg <- fit_hrg(karate)
 hrg
 
 pause()
@@ -58,13 +58,13 @@ pause()
 
 ### Plot it as a dendrogram, looks better if the 'ape' package is installed
 
-dendPlot(hrg)
+plot_dendrogram(hrg)
 
 pause()
 
 ### Make a very hierarchical graph
 
-g1 <- graph.full(5)
+g1 <- full_graph(5)
 g2 <- graph.ring(5)
 
 g <- g1 + g2
@@ -76,21 +76,21 @@ pause()
 
 ### Fit HRG
 
-ghrg <- hrg.fit(g)
-dendPlot(ghrg)
+ghrg <- fit_hrg(g)
+plot_dendrogram(ghrg)
 
 pause()
 
 ### Create a consensus dendrogram from multiple samples, takes longer...
 
-hcons <- hrg.consensus(g)
+hcons <- consensus_tree(g)
 hcons$consensus
 
 pause()
 
 ### Predict missing edges
 
-pred <- hrg.predict(g)
+pred <- predict_edges(g)
 pred
 
 pause()
@@ -98,14 +98,14 @@ pause()
 ### Add some the top 5 predicted edges to the graph, colored red
 
 E(g)$color <- "grey"
-lay <- layout.auto(g)
-g2 <- add.edges(g, t(pred$edges[1:5,]), color="red")
+lay <- layout_nicely(g)
+g2 <- add_edges(g, t(pred$edges[1:5,]), color="red")
 plot(g2, layout=lay)
 
 pause()
 
 ### Add four more predicted edges, colored orange
 
-g3 <- add.edges(g2, t(pred$edges[6:9,]), color="orange")
+g3 <- add_edges(g2, t(pred$edges[6:9,]), color="orange")
 plot(g3, layout=lay)
 

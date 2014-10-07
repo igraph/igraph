@@ -58,7 +58,7 @@
 `[.igraph` <- function(x, i, j, ..., from, to,
                        sparse=getIgraphOpt("sparsematrices"),
                        edges=FALSE, drop=TRUE,
-                       attr=if (is.weighted(x)) "weight" else NULL) {
+                       attr=if (is_weighted(x)) "weight" else NULL) {
   ## TODO: make it faster, don't need the whole matrix usually
 
   ################################################################
@@ -91,27 +91,27 @@
       ## nop
     } else if (!is.null(attr)) {
       if (any(res!=0)) {
-        res[res!=0] <- get.edge.attribute(x, attr, res[res!=0])
+        res[res!=0] <- edge_attr(x, attr, res[res!=0])
       }
     } else {
       res <- as.logical(res)+0
     }
     res
   } else if (missing(i) && missing(j)) {
-    get.adjacency(x, sparse=sparse, attr=attr, edges=edges)
+    as_adj(x, sparse=sparse, attr=attr, edges=edges)
   } else if (missing(j)) {
-    get.adjacency(x, sparse=sparse, attr=attr, edges=edges)[i,,drop=drop]
+    as_adj(x, sparse=sparse, attr=attr, edges=edges)[i,,drop=drop]
   } else if (missing(i)) {
-    get.adjacency(x, sparse=sparse, attr=attr, edges=edges)[,j,drop=drop]
+    as_adj(x, sparse=sparse, attr=attr, edges=edges)[,j,drop=drop]
   } else {
-    get.adjacency(x, sparse=sparse, attr=attr, edges=edges)[i,j,drop=drop]
+    as_adj(x, sparse=sparse, attr=attr, edges=edges)[i,j,drop=drop]
   }
 }
 
 `[[.igraph` <- function(x, i, j, ..., directed=TRUE,
                         edges=FALSE, exact=TRUE) {
   ## TODO: make it faster, don't need the whole list usually
-  getfun <- if (edges) get.adjedgelist else get.adjlist
+  getfun <- if (edges) as_adj_edge_list else as_adj_list
   if (missing(i) && missing(j)) {
     mode <- if (directed) "out" else "all"
     getfun(x, mode=mode)
@@ -128,7 +128,7 @@
     if (!edges) {
       lapply(getfun(x, mode=mode)[i], intersect, j)
     } else {
-      ee <- get.adjedgelist(x, mode=mode)[i]
+      ee <- as_adj_edge_list(x, mode=mode)[i]
       lapply(seq_along(i), function(yy) {
         from <- i[yy]
         el <- get.edges(x, ee[[yy]])
@@ -141,7 +141,7 @@
 }
 
 `[<-.igraph` <- function(x, i, j, ..., from, to,
-                         attr=if (is.weighted(x)) "weight" else NULL,
+                         attr=if (is_weighted(x)) "weight" else NULL,
                          value) {
   ## TODO: rewrite this in C to make it faster
 
@@ -182,16 +182,16 @@
         (is.null(attr) && is.numeric(value) && value==0)) {
       ## Delete edges
       todel <- x[from=from, to=to, ..., edges=TRUE]
-      x <- delete.edges(x, todel)
+      x <- delete_edges(x, todel)
     } else {
       ## Addition or update of an attribute (or both)
       ids <- x[from=from, to=to, ..., edges=TRUE]
       if (any(ids==0)) {
-        x <- add.edges(x, rbind(from[ids==0], to[ids==0]))
+        x <- add_edges(x, rbind(from[ids==0], to[ids==0]))
       }
       if (!is.null(attr)) {
         ids <- x[from=from, to=to, ..., edges=TRUE]
-        x <- set.edge.attribute(x, attr, ids, value=value)
+        x <- set_edge_attr(x, attr, ids, value=value)
       }
     }
   } else if (is.null(value) ||
@@ -207,7 +207,7 @@
     } else {
       todel <- unlist(x[[i, j, ..., edges=TRUE]])
     }
-    x <- delete.edges(x, todel)
+    x <- delete_edges(x, todel)
   } else {
     ## Addition or update of an attribute (or both)
     i <- if (missing(i)) as.numeric(V(x)) else as.igraph.vs(x, i)
@@ -226,11 +226,11 @@
       }))
       ## Do the changes
       if (is.null(attr)) {
-        x <- add.edges(x, toadd)
+        x <- add_edges(x, toadd)
       } else {
-        x <- add.edges(x, toadd, attr=structure(list(value), names=attr))
+        x <- add_edges(x, toadd, attr=structure(list(value), names=attr))
         toupdate <- unlist(x[[i, j, ..., edges=TRUE]])
-        x <- set.edge.attribute(x, attr, toupdate, value)
+        x <- set_edge_attr(x, attr, toupdate, value)
       }
     }    
   }

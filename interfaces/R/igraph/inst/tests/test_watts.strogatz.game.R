@@ -1,7 +1,7 @@
 
-context("watts.strogatz.game")
+context("sample_smallworld")
 
-test_that("watts.strogatz.game works", {
+test_that("sample_smallworld works", {
 
   library(igraph)
 
@@ -9,8 +9,8 @@ test_that("watts.strogatz.game works", {
     p <- runif(1)
     d <- sample(1:3, 1)
     nei <- sample(2:5, 1)
-    g <- watts.strogatz.game(d, 10, nei, p, loops=FALSE)
-    expect_that(any(is.loop(g)), is_false())
+    g <- sample_smallworld(d, 10, nei, p, loops=FALSE)
+    expect_that(any(which_loop(g)), is_false())
   }
 
 })

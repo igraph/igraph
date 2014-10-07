@@ -39,16 +39,17 @@
 #' The set of fill-in edges is empty if and only if the graph is chordal.
 #' 
 #' It is also true that adding the fill-in edges to the graph makes it chordal.
-#' 
+#'
+#' @aliases is.chordal
 #' @param graph The input graph. It may be directed, but edge directions are
 #' ignored, as the algorithm is defined for undirected graphs.
 #' @param alpha Numeric vector, the maximal chardinality ordering of the
 #' vertices. If it is \code{NULL}, then it is automatically calculated by
-#' calling \code{\link{maximum.cardinality.search}}, or from \code{alpham1} if
+#' calling \code{\link{max_cardinality}}, or from \code{alpham1} if
 #' that is given..
 #' @param alpham1 Numeric vector, the inverse of \code{alpha}. If it is
 #' \code{NULL}, then it is automatically calculated by calling
-#' \code{\link{maximum.cardinality.search}}, or from \code{alpha}.
+#' \code{\link{max_cardinality}}, or from \code{alpha}.
 #' @param fillin Logical scalar, whether to calculate the fill-in edges.
 #' @param newgraph Logical scalar, whether to calculate the triangulated graph.
 #' @return A list with three members: \item{chordal}{Logical scalar, it is
@@ -57,7 +58,7 @@
 #' \item{newgraph}{If requested, then the triangulated graph, an \code{igraph}
 #' object. \code{NULL} otherwise.}
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{maximum.cardinality.search}}
+#' @seealso \code{\link{max_cardinality}}
 #' @references Robert E Tarjan and Mihalis Yannakakis. (1984). Simple
 #' linear-time algorithms to test chordality of graphs, test acyclicity of
 #' hypergraphs, and selectively reduce acyclic hypergraphs.  \emph{SIAM Journal
@@ -66,21 +67,21 @@
 #' @examples
 #' 
 #' ## The examples from the Tarjan-Yannakakis paper
-#' g1 <- graph.formula(A-B:C:I, B-A:C:D, C-A:B:E:H, D-B:E:F,
-#'                     E-C:D:F:H, F-D:E:G, G-F:H, H-C:E:G:I,
-#'                     I-A:H)
-#' maximum.cardinality.search(g1)
-#' is.chordal(g1, fillin=TRUE)
+#' g1 <- graph_from_formula(A-B:C:I, B-A:C:D, C-A:B:E:H, D-B:E:F,
+#'                 E-C:D:F:H, F-D:E:G, G-F:H, H-C:E:G:I,
+#'                 I-A:H)
+#' max_cardinality(g1)
+#' is_chordal(g1, fillin=TRUE)
 #' 
-#' g2 <- graph.formula(A-B:E, B-A:E:F:D, C-E:D:G, D-B:F:E:C:G,
-#'                     E-A:B:C:D:F, F-B:D:E, G-C:D:H:I, H-G:I:J,
-#'                     I-G:H:J, J-H:I)
-#' maximum.cardinality.search(g2)
-#' is.chordal(g2, fillin=TRUE)
+#' g2 <- graph_from_formula(A-B:E, B-A:E:F:D, C-E:D:G, D-B:F:E:C:G,
+#'                 E-A:B:C:D:F, F-B:D:E, G-C:D:H:I, H-G:I:J,
+#'                 I-G:H:J, J-H:I)
+#' max_cardinality(g2)
+#' is_chordal(g2, fillin=TRUE)
 #' 
-is.chordal <- function(graph, alpha = NULL, alpham1 = NULL,
+is_chordal <- function(graph, alpha = NULL, alpham1 = NULL,
                        fillin = FALSE, newgraph = FALSE) {
-    if (!is.igraph(graph)) {
+    if (!is_igraph(graph)) {
         stop("Not a graph object")
     }
     if (!is.null(alpha)) 

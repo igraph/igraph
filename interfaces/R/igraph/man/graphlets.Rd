@@ -1,6 +1,8 @@
 \name{Graphlets}
 \alias{graphlets}
 \alias{graphlets.project}
+\alias{graphlet_proj}
+\alias{graphlet_basis}
 \alias{graphlets.candidate.basis}
 \concept{Graphlets}
 \title{Graphlet decomposition of a graph}
@@ -15,8 +17,8 @@
 }
 \usage{
 graphlets (graph, weights = NULL, niter = 1000)
-graphlets.candidate.basis (graph, weights = NULL)
-graphlets.project (graph, weights = NULL, cliques, niter = 1000,
+graphlet_basis (graph, weights = NULL)
+graphlet_proj (graph, weights = NULL, cliques, niter = 1000,
      Mu = rep(1, length(cliques))) 
 }
 \arguments{
@@ -38,8 +40,8 @@ graphlets.project (graph, weights = NULL, cliques, niter = 1000,
  with their corresponding weights. The second and third functions 
  correspond to the first and second steps of the algorithm, and they are 
  useful if the user wishes to perform them individually: 
- \code{graphlets.candidate.basis} and 
- \code{graphlets.project}.
+ \code{graphlet_basis} and 
+ \code{graphlet_proj}.
 }
 \value{
   \code{graphlets} returns a list with two members:
@@ -47,13 +49,13 @@ graphlets.project (graph, weights = NULL, cliques, niter = 1000,
     basis. Each subgraph is give by a vector of vertex ids.}
   \item{Mu}{The weights of the subgraphs in graphlet basis.}
 
-  \code{graphlets.candidate.basis} returns a list of two elements:
+  \code{graphlet_basis} returns a list of two elements:
   \item{cliques}{A list of subgraphs, the candidate graphlet
     basis. Each subgraph is give by a vector of vertex ids.}
   \item{thresholds}{The weight thresholds used for finding the
     subgraphs.}
 
-  \code{graphlets.project} return a numeric vector, the weights
+  \code{graphlet_proj} return a numeric vector, the weights
   of the graphlet basis subgraphs.
 }
 % \references{}
@@ -70,13 +72,13 @@ D1[1:3, 1:3] <- 2
 D2[3:5, 3:5] <- 3
 D3[2:5, 2:5] <- 1
   
-g <- simplify(graph.adjacency(D1 + D2 + D3, mode="undirected", weighted=TRUE))
+g <- simplify(graph_from_adjacency_matrix(D1 + D2 + D3, mode="undirected", weighted=TRUE))
 V(g)$color <- "white"
 E(g)$label <- E(g)$weight
 E(g)$label.cex <- 2
 E(g)$color <- "black"
 layout(matrix(1:6, nrow=2, byrow=TRUE))
-co <- layout.kamada.kawai(g)
+co <- layout_with_kk(g)
 par(mar=c(1,1,1,1))
 plot(g, layout=co)
 

@@ -1,32 +1,32 @@
 
-context("get.adjacency")
+context("as_adj")
 
-test_that("get.adjacency works", {
+test_that("as_adj works", {
 
   library(igraph)
 
-  g <- erdos.renyi.game(50, 1/50)
-  A <- get.adjacency(g, sparse=FALSE)
-  g2 <- graph.adjacency(A, mode="undirected")
+  g <- sample_gnp(50, 1/50)
+  A <- as_adj(g, sparse=FALSE)
+  g2 <- graph_from_adjacency_matrix(A, mode="undirected")
   expect_that(graph.isomorphic(g, g2), is_true())
 
 ###
 
-  A <- get.adjacency(g, sparse=TRUE)
-  g2 <- graph.adjacency(A, mode="undirected")
+  A <- as_adj(g, sparse=TRUE)
+  g2 <- graph_from_adjacency_matrix(A, mode="undirected")
   expect_that(graph.isomorphic(g, g2), is_true())
 
 ###
 
-  g <- erdos.renyi.game(50, 2/50, directed=TRUE)
-  A <- get.adjacency(g, sparse=FALSE)
-  g2 <- graph.adjacency(A)
+  g <- sample_gnp(50, 2/50, directed=TRUE)
+  A <- as_adj(g, sparse=FALSE)
+  g2 <- graph_from_adjacency_matrix(A)
   expect_that(graph.isomorphic(g, g2), is_true())
 
 ###
 
-  A <- get.adjacency(g, sparse=TRUE)
-  g2 <- graph.adjacency(A)
+  A <- as_adj(g, sparse=TRUE)
+  g2 <- graph_from_adjacency_matrix(A)
   expect_that(graph.isomorphic(g, g2), is_true())
 
 })

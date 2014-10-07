@@ -35,7 +35,7 @@
 #' directed or undirected graphs, by optimizing some criteria, and usually
 #' using heuristics.
 #' 
-#' igraph implements a number of commmunity detection methods (see them below),
+#' igraph implements a number of community detection methods (see them below),
 #' all of which return an object of the class \code{communities}. Because the
 #' community structure detection algorithms are different, \code{communities}
 #' objects do not always have the same structure. Nevertheless, they have some
@@ -75,17 +75,17 @@
 #' connects two different communities, according to the (best) membership
 #' vector, as returned by \code{membership()}.
 #' 
-#' \code{is.hierarchical} checks whether a hierarchical algorithm was used to
+#' \code{is_hierarchical} checks whether a hierarchical algorithm was used to
 #' find the community structure. Some functions only make sense for
-#' hierarchical methods (e.g. \code{merges}, \code{cutat} and
+#' hierarchical methods (e.g. \code{merges}, \code{cut_at} and
 #' \code{as.dendrogram}).
 #' 
 #' \code{merges} returns the merge matrix for hierarchical methods. An error
 #' message is given, if a non-hierarchical method was used to find the
-#' community structure. You can check this by calling \code{is.hierarchical} on
+#' community structure. You can check this by calling \code{is_hierarchical} on
 #' the \code{communities} object.
 #' 
-#' \code{cutat} cuts the merge tree of a hierarchical community finding method,
+#' \code{cut_at} cuts the merge tree of a hierarchical community finding method,
 #' at the desired place and returns a membership vector. The desired place can
 #' be expressed as the desired number of communities or as the number of merge
 #' steps to make. The function gives an error message, if called with a
@@ -98,16 +98,16 @@
 #' \code{as.hclust} is similar to \code{as.dendrogram}, but converts a
 #' hierarchical community structure to a \code{hclust} object.
 #' 
-#' \code{asPhylo} converts a hierarchical community structure to a \code{phylo}
+#' \code{as_phylo} converts a hierarchical community structure to a \code{phylo}
 #' object, you will need the \code{ape} package for this.
 #' 
-#' \code{showtrace} works (currently) only for communities found by the leading
-#' eigenvector method (\code{\link{leading.eigenvector.community}}), and
+#' \code{show_trace} works (currently) only for communities found by the leading
+#' eigenvector method (\code{\link{cluster_leading_eigen}}), and
 #' returns a character vector that gives the steps performed by the algorithm
 #' while finding the communities.
 #' 
-#' \code{code.length} is defined for the InfoMAP method
-#' (\code{\link{infomap.community}} and returns the code length of the
+#' \code{code_len} is defined for the InfoMAP method
+#' (\code{\link{cluster_infomap}} and returns the code length of the
 #' partition.
 #' 
 #' It is possibly to call the \code{plot} function on \code{communities}
@@ -123,14 +123,15 @@
 #' not included in igraph).
 #'
 #' @rdname communities
-#' @aliases communities membership algorithm crossing cutat merges sizes
+#' @aliases communities membership algorithm crossing cutat merges sizes cut_at
 #' is.hierarchical print.communities plot.communities length.communities
-#' as.dendrogram.communities as.hclust.communities
+#' as.dendrogram.communities as.hclust.communities code_len
 #' asPhylo asPhylo.communities showtrace code.length create.communities
+#' as_phylo as_phylo.communities show_trace is_hierarchical
 #' @param communities,x,object A \code{communities} object, the result of an
 #' igraph community detection function.
 #' @param graph An igraph graph object, corresponding to \code{communities}.
-#' @param full Logical scalar, if \code{TRUE}, then \code{is.hierarchical} only
+#' @param full Logical scalar, if \code{TRUE}, then \code{is_hierarchical} only
 #' returns \code{TRUE} for fully hierarchical algorithms. The \sQuote{leading
 #' eigenvector} algorithm is hierarchical, it gives a hierarchy of groups, but
 #' not a full dendrogram with all vertices, so it is not fully hierarchical.
@@ -190,42 +191,42 @@
 #' 
 #' \code{crossing} returns a logical vector.
 #' 
-#' \code{is.hierarchical} returns a logical scalar.
+#' \code{is_hierarchical} returns a logical scalar.
 #' 
 #' \code{merges} returns a two-column numeric matrix.
 #' 
-#' \code{cutat} returns a numeric vector, the membership vector of the
+#' \code{cut_at} returns a numeric vector, the membership vector of the
 #' vertices.
 #' 
 #' \code{as.dendrogram} returns a \code{\link[stats]{dendrogram}} object.
 #' 
-#' \code{showtrace} returns a character vector.
+#' \code{show_trace} returns a character vector.
 #' 
-#' \code{code.length} returns a numeric scalar for communities found with the
+#' \code{code_len} returns a numeric scalar for communities found with the
 #' InfoMAP method and \code{NULL} for other methods.
 #' 
 #' \code{plot} for \code{communities} objects returns \code{NULL}, invisibly.
 #' 
 #' \code{create.communities} returns a \code{communities} object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso See \code{\link{dendPlot}} for plotting community structure
+#' @seealso See \code{\link{plot_dendrogram}} for plotting community structure
 #' dendrograms.
 #' 
-#' See \code{\link{compare.communities}} for comparing two community structures
+#' See \code{\link{compare}} for comparing two community structures
 #' on the same graph.
 #' 
 #' The different methods for finding communities, they all return a
-#' \code{communities} object: \code{\link{edge.betweenness.community}},
-#' \code{\link{fastgreedy.community}},
-#' \code{\link{label.propagation.community}},
-#' \code{\link{leading.eigenvector.community}},
-#' \code{\link{multilevel.community}}, \code{\link{optimal.community}},
-#' \code{\link{spinglass.community}}, \code{\link{walktrap.community}}.
+#' \code{communities} object: \code{\link{cluster_edge_betweenness}},
+#' \code{\link{cluster_fast_greedy}},
+#' \code{\link{cluster_label_prop}},
+#' \code{\link{cluster_leading_eigen}},
+#' \code{\link{cluster_louvain}}, \code{\link{cluster_optimal}},
+#' \code{\link{cluster_spinglass}}, \code{\link{cluster_walktrap}}.
 #' @keywords graphs
 #' @examples
 #' 
 #' karate <- graph.famous("Zachary")
-#' wc <- walktrap.community(karate)
+#' wc <- cluster_walktrap(karate)
 #' modularity(wc)
 #' membership(wc)
 #' plot(wc, karate)
@@ -353,7 +354,7 @@ modularity <- function(x, ...)
 #' \eqn{A} adjacency matrix, and \eqn{k_i}{ki} is the sum of weights of
 #' adjacent edges for vertex \eqn{i}.
 #' 
-#' \code{mod.matrix} calculates the modularity matrix. This is a dense matrix,
+#' \code{modularity_matrix} calculates the modularity matrix. This is a dense matrix,
 #' and it is defined as the difference of the adjacency matrix and the
 #' configuration model null model matrix. In other words element
 #' \eqn{M_{ij}}{M[i,j]} is given as \eqn{A_{ij}-d_i
@@ -372,28 +373,28 @@ modularity <- function(x, ...)
 #' @return For \code{modularity} a numeric scalar, the modularity score of the
 #' given configuration.
 #' 
-#' For \code{mod.matrix} a numeic square matrix, its order is the number of
+#' For \code{modularity_matrix} a numeic square matrix, its order is the number of
 #' vertices in the graph.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{walktrap.community}},
-#' \code{\link{edge.betweenness.community}},
-#' \code{\link{fastgreedy.community}}, \code{\link{spinglass.community}} for
+#' @seealso \code{\link{cluster_walktrap}},
+#' \code{\link{cluster_edge_betweenness}},
+#' \code{\link{cluster_fast_greedy}}, \code{\link{cluster_spinglass}} for
 #' various community detection methods.
 #' @references Clauset, A.; Newman, M. E. J. & Moore, C. Finding community
 #' structure in very large networks, \emph{Phyisical Review E} 2004, 70, 066111
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.full(5) %du% graph.full(5) %du% graph.full(5)
-#' g <- add.edges(g, c(1,6, 1,11, 6, 11))
-#' wtc <- walktrap.community(g)
+#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- add_edges(g, c(1,6, 1,11, 6, 11))
+#' wtc <- cluster_walktrap(g)
 #' modularity(wtc)
 #' modularity(g, membership(wtc))
 #' 
 
 modularity.igraph <- function(x, membership, weights=NULL, ...) {
   # Argument checks
-  if (!is.igraph(x)) { stop("Not a graph object") }
+  if (!is_igraph(x)) { stop("Not a graph object") }
   membership <- as.numeric(membership)
   if (!is.null(weights)) weights <- as.numeric(weights)
 
@@ -416,12 +417,13 @@ modularity.communities <- function(x, ...) {
 }
 
 #' @rdname modularity.igraph
+#' @aliases mod.matrix
 
-mod.matrix <- function(graph, membership, weights=NULL) {
+modularity_matrix <- function(graph, membership, weights=NULL) {
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is_igraph(graph)) { stop("Not a graph object") }
   membership <- as.numeric(membership)-1
-  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  if (is.null(weights) && "weight" %in% edge_attr_names(graph)) { 
   weights <- E(graph)$weight 
   } 
   if (!is.null(weights) && any(!is.na(weights))) { 
@@ -472,7 +474,7 @@ merges <- function(communities) {
 
 crossing <- function(communities, graph) {
   m <- membership(communities)
-  el <- get.edgelist(graph, names=FALSE)
+  el <- as_edgelist(graph, names=FALSE)
   m1 <- m[el[,1]]
   m2 <- m[el[,2]]
   res <- m1 != m2
@@ -484,13 +486,13 @@ crossing <- function(communities, graph) {
 
 #' @rdname communities
 
-code.length <- function(communities) {
+code_len <- function(communities) {
   communities$codelength
 }
 
 #' @rdname communities
 
-is.hierarchical <- function(communities, full=FALSE) {
+is_hierarchical <- function(communities, full=FALSE) {
   alg <- algorithm(communities)
   if (alg %in% c("walktrap", "edge betweenness","fast greedy") ||
       (alg == "leading eigenvector" && !full)) {
@@ -527,7 +529,7 @@ complete.dend <- function(comm, use.modularity) {
 
 as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
                                       ...) {
-  if (!is.hierarchical(object, full=TRUE)) {
+  if (!is_hierarchical(object, full=TRUE)) {
     stop("Not a fully hierarchical community structure")
   }
 
@@ -619,14 +621,14 @@ as.hclust.communities <- function(x, hang=-1, use.modularity=FALSE,
 
 #' @rdname communities
 
-asPhylo <- function(x, ...)
-  UseMethod("asPhylo")
+as_phylo <- function(x, ...)
+  UseMethod("as_phylo")
 
 #' @rdname communities
 
-asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
+as_phylo.communities <- function(x, use.modularity=FALSE, ...) {
 
-  if (!is.hierarchical(x, full=TRUE)) {
+  if (!is_hierarchical(x, full=TRUE)) {
     stop("Not a fully hierarchical community structure")
   }
 
@@ -680,12 +682,12 @@ asPhylo.communities <- function(x, use.modularity=FALSE, ...) {
 
 #' @rdname communities
 
-cutat <- function(communities, no, steps) {
+cut_at <- function(communities, no, steps) {
 
   if (!inherits(communities, "communities")) {
     stop("Not a community structure")
   }
-  if (!is.hierarchical(communities, full=TRUE)) {
+  if (!is_hierarchical(communities)) {
     stop("Not a fully hierarchical communitity structure")
   }
 
@@ -715,7 +717,7 @@ cutat <- function(communities, no, steps) {
 
 #' @rdname communities
 
-showtrace <- function(communities) {
+show_trace <- function(communities) {
 
   if (!inherits(communities, "communities")) {
     stop("Not a community structure")
@@ -787,7 +789,8 @@ community.to.membership2 <- function(merges, vcount, steps) {
 #' If the \code{vertex} argument is given and it is not \code{NULL}, then it
 #' must be a vertex id, and the same energy function is used to find the
 #' community of the the given vertex. See also the examples below.
-#' 
+#'
+#' @aliases spinglass.community
 #' @param graph The input graph, can be directed but the direction of the edges
 #' is neglected.
 #' @param weights The weights of the edges. Either a numeric vector or
@@ -841,7 +844,7 @@ community.to.membership2 <- function(merges, vcount, steps) {
 #' algorithm, using the number of spins as the number of colors. This argument
 #' is ignored if the \sQuote{orig} implementation is chosen.
 #' @return If the \code{vertex} argument is not given, ie. the first form is
-#' used then a \code{\link{spinglass.community}} returns a
+#' used then a \code{\link{cluster_spinglass}} returns a
 #' \code{\link{communities}} object.
 #' 
 #' If the \code{vertex} argument is present, ie. the second form is used then a
@@ -859,7 +862,7 @@ community.to.membership2 <- function(merges, vcount, steps) {
 #' 
 #' Changes to the original function for including the possibility of negative
 #' ties were implemented by Vincent Traag (\url{http://www.traag.net/}).
-#' @seealso \code{\link{communities}}, \code{\link{clusters}}
+#' @seealso \code{\link{communities}}, \code{\link{components}}
 #' @references J. Reichardt and S. Bornholdt: Statistical Mechanics of
 #' Community Detection, \emph{Phys. Rev. E}, 74, 016110 (2006),
 #' \url{http://arxiv.org/abs/cond-mat/0603718}
@@ -872,24 +875,24 @@ community.to.membership2 <- function(merges, vcount, steps) {
 #' @keywords graphs
 #' @examples
 #' 
-#'   g <- erdos.renyi.game(10, 5/10) %du% erdos.renyi.game(9, 5/9)
-#'   g <- add.edges(g, c(1, 12))
-#'   g <- induced.subgraph(g, subcomponent(g, 1))
-#'   spinglass.community(g, spins=2)
-#'   spinglass.community(g, vertex=1)
+#'   g <- sample_gnp(10, 5/10) %du% sample_gnp(9, 5/9)
+#'   g <- add_edges(g, c(1, 12))
+#'   g <- induced_subgraph(g, subcomponent(g, 1))
+#'   cluster_spinglass(g, spins=2)
+#'   cluster_spinglass(g, vertex=1)
 #' 
-spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
+cluster_spinglass <- function(graph, weights=NULL, vertex=NULL, spins=25,
                                 parupdate=FALSE, start.temp=1,
                                 stop.temp=0.01, cool.fact=0.99,
                                 update.rule=c("config", "random", "simple"),
                                 gamma=1.0, implementation=c("orig", "neg"),
                                 gamma.minus=1.0) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
-  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+  if (is.null(weights) && "weight" %in% edge_attr_names(graph)) {
     weights <- E(graph)$weight
   }
   if (!is.null(weights) && any(!is.na(weights))) {
@@ -915,8 +918,8 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
     res$algorithm  <- "spinglass"
     res$vcount     <- vcount(graph)
     res$membership <- res$membership + 1
-    if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
-      res$names <- get.vertex.attribute(graph, "name")
+    if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+      res$names <- vertex_attr(graph, "name")
     }
     class(res) <- "communities"
   } else {
@@ -940,7 +943,8 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
 #' This function is the implementation of the Walktrap community finding
 #' algorithm, see Pascal Pons, Matthieu Latapy: Computing communities in large
 #' networks using random walks, http://arxiv.org/abs/physics/0512106
-#' 
+#'
+#' @aliases walktrap.community
 #' @param graph The input graph, edge directions are ignored in directed
 #' graphs.
 #' @param weights The edge weights.
@@ -952,31 +956,31 @@ spinglass.community <- function(graph, weights=NULL, vertex=NULL, spins=25,
 #' then it will be always calculated.
 #' @param membership Logical scalar, whether to calculate the membership vector
 #' for the split corresponding to the highest modularity value.
-#' @return \code{walktrap.community} returns a \code{\link{communities}}
+#' @return \code{cluster_walktrap} returns a \code{\link{communities}}
 #' object, please see the \code{\link{communities}} manual page for details.
 #' @author Pascal Pons (\url{http://psl.pons.free.fr/}) and Gabor Csardi
 #' \email{csardi.gabor@@gmail.com} for the R and igraph interface
 #' @seealso See \code{\link{communities}} on getting the actual membership
 #' vector, merge matrix, modularity score, etc.
 #' 
-#' \code{\link{modularity}} and \code{\link{fastgreedy.community}},
-#' \code{\link{spinglass.community}},
-#' \code{\link{leading.eigenvector.community}},
-#' \code{\link{edge.betweenness.community}} for other community detection
+#' \code{\link{modularity}} and \code{\link{cluster_fast_greedy}},
+#' \code{\link{cluster_spinglass}},
+#' \code{\link{cluster_leading_eigen}},
+#' \code{\link{cluster_edge_betweenness}} for other community detection
 #' methods.
 #' @references Pascal Pons, Matthieu Latapy: Computing communities in large
 #' networks using random walks, http://arxiv.org/abs/physics/0512106
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.full(5) %du% graph.full(5) %du% graph.full(5)
-#' g <- add.edges(g, c(1,6, 1,11, 6, 11))
-#' walktrap.community(g)
+#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- add_edges(g, c(1,6, 1,11, 6, 11))
+#' cluster_walktrap(g)
 #' 
-walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
+cluster_walktrap <- function(graph, weights=E(graph)$weight, steps=4,
                                merges=TRUE, modularity=TRUE,
                                membership=TRUE) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object!")
   }
 
@@ -992,7 +996,7 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
   res <- .Call("R_igraph_walktrap_community", graph, weights, as.numeric(steps),
         as.logical(merges), as.logical(modularity), as.logical(membership),
         PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
 
@@ -1012,7 +1016,7 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
 #' sparsely connected to other modules.
 #' 
 #' The edge betweenness score of an edge measures the number of shortest paths
-#' through it, see \code{\link{edge.betweenness}} for details. The idea of the
+#' through it, see \code{\link{edge_betweenness}} for details. The idea of the
 #' edge betweenness based community structure detection is that it is likely
 #' that edges connecting separate modules have high edge betweenness as all the
 #' shortest paths from one module to another must traverse through them. So if
@@ -1021,7 +1025,7 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
 #' leafs of the tree are the individual vertices and the root of the tree
 #' represents the whole graph.
 #' 
-#' \code{edge.betweenness.community} performs this algorithm by calculating the
+#' \code{cluster_edge_betweenness} performs this algorithm by calculating the
 #' edge betweenness of the graph, removing the edge with the highest edge
 #' betweenness score, then recalculating edge betweenness of the edges and
 #' again removing the one with the highest score, etc.
@@ -1029,7 +1033,7 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
 #' \code{edge.betweeness.community} returns various information collected
 #' throught the run of the algorithm. See the return value down here.
 #' 
-#' @aliases edge.betweenness.community edge.betweenness.community.merges
+#' @aliases edge.betweenness.community cluster_edge_betweenness
 #' @param graph The graph to analyze.
 #' @param weights The edge weights. Supply \code{NULL} to omit edge weights. By
 #' default the \sQuote{\code{weight}} edge attribute is used, if it is present.
@@ -1056,14 +1060,14 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
 #' edge-betweenness based edge removals.
 #' @param membership Logical constant, whether to calculate the membership
 #' vector corresponding to the highest possible modularity score.
-#' @return \code{edge.betweenness.community} returns a
+#' @return \code{cluster_edge_betweenness} returns a
 #' \code{\link{communities}} object, please see the \code{\link{communities}}
 #' manual page for details.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{edge.betweenness}} for the definition and calculation
-#' of the edge betweenness, \code{\link{walktrap.community}},
-#' \code{\link{fastgreedy.community}},
-#' \code{\link{leading.eigenvector.community}} for other community detection
+#' @seealso \code{\link{edge_betweenness}} for the definition and calculation
+#' of the edge betweenness, \code{\link{cluster_walktrap}},
+#' \code{\link{cluster_fast_greedy}},
+#' \code{\link{cluster_leading_eigen}} for other community detection
 #' methods.
 #' 
 #' See \code{\link{communities}} for extracting the results of the community
@@ -1074,20 +1078,20 @@ walktrap.community <- function(graph, weights=E(graph)$weight, steps=4,
 #' @examples
 #' 
 #' g <- barabasi.game(100,m=2)
-#' eb <- edge.betweenness.community(g)
+#' eb <- cluster_edge_betweenness(g)
 #' 
-#' g <- graph.full(10) %du% graph.full(10)
-#' g <- add.edges(g, c(1,11))
-#' eb <- edge.betweenness.community(g)
+#' g <- full_graph(10) %du% full_graph(10)
+#' g <- add_edges(g, c(1,11))
+#' eb <- cluster_edge_betweenness(g)
 #' eb
 #' 
-edge.betweenness.community <- function(graph, weights=E(graph)$weight,
+cluster_edge_betweenness <- function(graph, weights=E(graph)$weight,
                                        directed=TRUE,
                                        edge.betweenness=TRUE,
                                        merges=TRUE, bridges=TRUE,
                                        modularity=TRUE,
                                        membership=TRUE) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object!")
   }
 
@@ -1102,7 +1106,7 @@ edge.betweenness.community <- function(graph, weights=E(graph)$weight,
                as.logical(merges), as.logical(bridges),
                as.logical(modularity), as.logical(membership),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1115,19 +1119,6 @@ edge.betweenness.community <- function(graph, weights=E(graph)$weight,
   res
 }
 
-edge.betweenness.community.merges <- function(graph, edges) {
-  
-  if (!is.igraph(graph)) {
-    stop("Not a graph object!")
-  }
-
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_community_eb_get_merges", graph, as.numeric(edges),
-        PACKAGE="igraph")
-}
-
-
-
 #' Community structure via greedy optimization of modularity
 #' 
 #' This function tries to find dense subgraph, also called communities in
@@ -1137,7 +1128,8 @@ edge.betweenness.community.merges <- function(graph, edges) {
 #' for finding community structure, see A Clauset, MEJ Newman, C Moore: Finding
 #' community structure in very large networks,
 #' http://www.arxiv.org/abs/cond-mat/0408187 for the details.
-#' 
+#'
+#' @aliases fastgreedy.community
 #' @param graph The input graph
 #' @param merges Logical scalar, whether to return the merge matrix.
 #' @param modularity Logical scalar, whether to return a vector containing the
@@ -1149,31 +1141,31 @@ edge.betweenness.community.merges <- function(graph, edges) {
 #' The length must match the number of edges in the graph.  By default the
 #' \sQuote{\code{weight}} edge attribute is used as weights. If it is not
 #' present, then all edges are considered to have the same weight.
-#' @return \code{fastgreedy.community} returns a \code{\link{communities}}
+#' @return \code{cluster_fast_greedy} returns a \code{\link{communities}}
 #' object, please see the \code{\link{communities}} manual page for details.
 #' @author Tamas Nepusz \email{ntamas@@gmail.com} and Gabor Csardi
 #' \email{csardi.gabor@@gmail.com} for the R interface.
 #' @seealso \code{\link{communities}} for extracting the results.
 #' 
-#' See also \code{\link{walktrap.community}},
-#' \code{\link{spinglass.community}},
-#' \code{\link{leading.eigenvector.community}} and
-#' \code{\link{edge.betweenness.community}} for other methods.
+#' See also \code{\link{cluster_walktrap}},
+#' \code{\link{cluster_spinglass}},
+#' \code{\link{cluster_leading_eigen}} and
+#' \code{\link{cluster_edge_betweenness}} for other methods.
 #' @references A Clauset, MEJ Newman, C Moore: Finding community structure in
 #' very large networks, http://www.arxiv.org/abs/cond-mat/0408187
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.full(5) %du% graph.full(5) %du% graph.full(5)
-#' g <- add.edges(g, c(1,6, 1,11, 6, 11))
-#' fc <- fastgreedy.community(g)
+#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- add_edges(g, c(1,6, 1,11, 6, 11))
+#' fc <- cluster_fast_greedy(g)
 #' membership(fc)
 #' sizes(fc)
 #' 
-fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
+cluster_fast_greedy <- function(graph, merges=TRUE, modularity=TRUE,
                                  membership=TRUE,
                                  weights=E(graph)$weight) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -1185,7 +1177,7 @@ fastgreedy.community <- function(graph, merges=TRUE, modularity=TRUE,
   res <- .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
                as.logical(modularity), as.logical(membership), weights,
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$algorithm <- "fast greedy"
@@ -1233,20 +1225,12 @@ igraph.i.levc.arp <- function(externalP, externalE) {
 #' Newman's paper to understand why this is a good method for detecting
 #' community structure.
 #' 
-#' \code{community.le.to.memberhip} creates a membership vector from the result
-#' of \code{leading.eigenvector.community}. It takes \code{membership} and
-#' permformes \code{steps} merges, according to the supplied \code{merges}
-#' matrix.
-#' 
-#' @aliases leading.eigenvector.community community.le.to.membership
+#' @aliases leading.eigenvector.community
 #' @param graph The input graph. Should be undirected as the method needs a
 #' symmetric matrix.
 #' @param steps The number of steps to take, this is actually the number of
 #' tries to make a step. It is not a particularly useful parameter.
-#' 
-#' For \code{community.le.to.membership} the number of merges to produce from
-#' the supplied \code{membership} vector.
-#' @param weights An optional weight vector. The \sQuote{weight} edge attribute
+#' #' @param weights An optional weight vector. The \sQuote{weight} edge attribute
 #' is used if present. Supply \sQuote{\code{NA}} here if you want to ignore the
 #' \sQuote{weight} edge attribute.
 #' @param start \code{NULL}, or a numeric membership vector, giving the start
@@ -1257,7 +1241,7 @@ igraph.i.levc.arp <- function(externalP, externalE) {
 #' the modularity matrix. See details below.
 #' @param extra Additional argument to supply to the callback function.
 #' @param env The environment in which the callback function is evaluated.
-#' @return \code{leading.eigenvector.community} returns a named list with the
+#' @return \code{cluster_leading_eigen} returns a named list with the
 #' following members: \item{membership}{The membership vector at the end of the
 #' algorithm, when no more splits are possible.} \item{merges}{The merges
 #' matrix starting from the state described by the \code{membership} member.
@@ -1267,11 +1251,6 @@ igraph.i.levc.arp <- function(externalP, externalE) {
 #' graph, the second line creates community \code{N+1}, etc.  }
 #' \item{options}{Information about the underlying ARPACK computation, see
 #' \code{\link{arpack}} for details.  }
-#' 
-#' \code{community.le.to.membership} returns a named list with two components:
-#' \item{membership}{A membership vector, a numerical vector indication which
-#' vertex belongs to which community. The communities are always numbered from
-#' one.} \item{csize}{A numeric vector giving the sizes of the communities.}
 #' @section Callback functions: The \code{callback} argument can be used to
 #' supply a function that is called after each eigenvector calculation. The
 #' following arguments are supplied to this function: \describe{
@@ -1284,33 +1263,33 @@ igraph.i.levc.arp <- function(externalP, externalE) {
 #' modularity matrix with an arbitrary vector. Supply the vector as an argument
 #' to perform this multiplication. This function can be used with ARPACK.}
 #' \item{extra}{The \code{extra} argument that was passed to
-#' \code{leading.eigenvector.community}. } }
+#' \code{cluster_leading_eigen}. } }
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{modularity}}, \code{\link{walktrap.community}},
-#' \code{\link{edge.betweenness.community}},
-#' \code{\link{fastgreedy.community}}, \code{\link[stats]{as.dendrogram}}
+#' @seealso \code{\link{modularity}}, \code{\link{cluster_walktrap}},
+#' \code{\link{cluster_edge_betweenness}},
+#' \code{\link{cluster_fast_greedy}}, \code{\link[stats]{as.dendrogram}}
 #' @references MEJ Newman: Finding community structure using the eigenvectors
 #' of matrices, Physical Review E 74 036104, 2006.
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.full(5) %du% graph.full(5) %du% graph.full(5)
-#' g <- add.edges(g, c(1,6, 1,11, 6, 11))
-#' lec <- leading.eigenvector.community(g)
+#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- add_edges(g, c(1,6, 1,11, 6, 11))
+#' lec <- cluster_leading_eigen(g)
 #' lec
 #' 
-#' leading.eigenvector.community(g, start=membership(lec))
+#' cluster_leading_eigen(g, start=membership(lec))
 #' 
-leading.eigenvector.community <- function(graph, steps=-1, weights=NULL,
+cluster_leading_eigen <- function(graph, steps=-1, weights=NULL,
                                           start=NULL,
-                                          options=igraph.arpack.default,
+                                          options=arpack_defaults,
                                           callback=NULL, extra=NULL,
                                           env=parent.frame()){
 
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is_igraph(graph)) { stop("Not a graph object") }
   steps <- as.integer(steps)
-  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  if (is.null(weights) && "weight" %in% edge_attr_names(graph)) { 
     weights <- E(graph)$weight 
   } 
   if (!is.null(weights) && any(!is.na(weights))) { 
@@ -1319,7 +1298,7 @@ leading.eigenvector.community <- function(graph, steps=-1, weights=NULL,
     weights <- NULL 
   }
   if (!is.null(start)) { start <- as.numeric(start)-1 }
-  options.tmp <- igraph.arpack.default; options.tmp[ names(options) ] <- options ; options <- options.tmp
+  options.tmp <- arpack_defaults; options.tmp[ names(options) ] <- options ; options <- options.tmp
   
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
@@ -1327,7 +1306,7 @@ leading.eigenvector.community <- function(graph, steps=-1, weights=NULL,
                weights, options, start, callback, extra, env,
                environment(igraph.i.levc.arp),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$algorithm <- "leading eigenvector"
@@ -1336,26 +1315,6 @@ leading.eigenvector.community <- function(graph, steps=-1, weights=NULL,
   res$merges <- res$merges + 1
   res$history <- res$history + 1
   class(res) <- "communities"
-  res
-}
-
-#' @rdname leading.eigenvector.community
-#' @param membership The starting community structure on which \code{steps}
-#' merges are performed.
-#' @param merges The merge matrix, possible from the result of
-#' \code{leading.eigenvector.community}.
-
-community.le.to.membership <- function(merges, steps, membership) {
-  # Argument checks
-  merges <- as.matrix(structure(as.double(merges), dim=dim(merges)))
-  steps <- as.integer(steps)
-  membership <- as.numeric(membership)
-
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  # Function call
-  res <- .Call("R_igraph_le_community_to_membership", merges, steps, membership,
-        PACKAGE="igraph")
-
   res
 }
 
@@ -1377,7 +1336,8 @@ community.le.to.membership <- function(merges, steps, membership) {
 #' that most of its neighbors currently have. In this iterative process densely
 #' connected groups of nodes form a consensus on a unique label to form
 #' communities.}
-#' 
+#'
+#' @aliases label.propagation.community
 #' @param graph The input graph, should be undirected to make sense.
 #' @param weights An optional weight vector. It should contain a positive
 #' weight for all the edges. The \sQuote{weight} edge attribute is used if
@@ -1390,30 +1350,30 @@ community.le.to.membership <- function(merges, steps, membership) {
 #' @param fixed Logical vector denoting which labels are fixed. Of course this
 #' makes sense only if you provided an initial state, otherwise this element
 #' will be ignored. Also note that vertices without labels cannot be fixed.
-#' @return \code{label.propagation.community} returns a
+#' @return \code{cluster_label_prop} returns a
 #' \code{\link{communities}} object, please see the \code{\link{communities}}
 #' manual page for details.
 #' @author Tamas Nepusz \email{ntamas@@gmail.com} for the C implementation,
 #' Gabor Csardi \email{csardi.gabor@@gmail.com} for this manual page.
 #' @seealso \code{\link{communities}} for extracting the actual results.
 #' 
-#' \code{\link{fastgreedy.community}}, \code{\link{walktrap.community}} and
-#' \code{\link{spinglass.community}} for other community detection methods.
+#' \code{\link{cluster_fast_greedy}}, \code{\link{cluster_walktrap}} and
+#' \code{\link{cluster_spinglass}} for other community detection methods.
 #' @references Raghavan, U.N. and Albert, R. and Kumara, S.: Near linear time
 #' algorithm to detect community structures in large-scale networks. \emph{Phys
 #' Rev E} 76, 036106. (2007)
 #' @keywords graphs
 #' @examples
 #' 
-#'   g <- erdos.renyi.game(10, 5/10) %du% erdos.renyi.game(9, 5/9)
-#'   g <- add.edges(g, c(1, 12))
-#'   label.propagation.community(g)
+#'   g <- sample_gnp(10, 5/10) %du% sample_gnp(9, 5/9)
+#'   g <- add_edges(g, c(1, 12))
+#'   cluster_label_prop(g)
 #' 
-label.propagation.community <- function(graph, weights=NULL, initial=NULL,
+cluster_label_prop <- function(graph, weights=NULL, initial=NULL,
                                         fixed=NULL) {
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
-  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  if (!is_igraph(graph)) { stop("Not a graph object") }
+  if (is.null(weights) && "weight" %in% edge_attr_names(graph)) { 
   weights <- E(graph)$weight 
   } 
   if (!is.null(weights) && any(!is.na(weights))) { 
@@ -1428,7 +1388,7 @@ label.propagation.community <- function(graph, weights=NULL, initial=NULL,
   # Function call
   res <- .Call("R_igraph_community_label_propagation", graph, weights, initial, fixed,
         PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1461,24 +1421,25 @@ label.propagation.community <- function(graph, weights=NULL, initial=NULL,
 #' when the modularity cannot be increased any more in a step.
 #' 
 #' This function was contributed by Tom Gregorovic.
-#' 
+#'
+#' @aliases cluster_louvain
 #' @param graph The input graph.
 #' @param weights Optional positive weight vector.  If the graph has a
 #' \code{weight} edge attribute, then this is used by default. Supply \code{NA}
 #' here if the graph has a \code{weight} edge attribute, but you want to ignore
 #' it.
-#' @return \code{multilevel.community} returns a \code{\link{communities}}
+#' @return \code{cluster_louvain} returns a \code{\link{communities}}
 #' object, please see the \code{\link{communities}} manual page for details.
 #' @author Tom Gregorovic, Tamas Nepusz \email{ntamas@@gmail.com}
 #' @seealso See \code{\link{communities}} for extracting the membership,
 #' modularity scores, etc. from the results.
 #' 
-#' Other community detection algorithms: \code{\link{walktrap.community}},
-#' \code{\link{spinglass.community}},
-#' \code{\link{leading.eigenvector.community}},
-#' \code{\link{edge.betweenness.community}},
-#' \code{\link{fastgreedy.community}},
-#' \code{\link{label.propagation.community}}
+#' Other community detection algorithms: \code{\link{cluster_walktrap}},
+#' \code{\link{cluster_spinglass}},
+#' \code{\link{cluster_leading_eigen}},
+#' \code{\link{cluster_edge_betweenness}},
+#' \code{\link{cluster_fast_greedy}},
+#' \code{\link{cluster_label_prop}}
 #' @references Vincent D. Blondel, Jean-Loup Guillaume, Renaud Lambiotte,
 #' Etienne Lefebvre: Fast unfolding of communities in large networks. J. Stat.
 #' Mech. (2008) P10008
@@ -1486,14 +1447,14 @@ label.propagation.community <- function(graph, weights=NULL, initial=NULL,
 #' @examples
 #' 
 #' # This is so simple that we will have only one level
-#' g <- graph.full(5) %du% graph.full(5) %du% graph.full(5)
-#' g <- add.edges(g, c(1,6, 1,11, 6, 11))
-#' multilevel.community(g)
+#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- add_edges(g, c(1,6, 1,11, 6, 11))
+#' cluster_louvain(g)
 #' 
-multilevel.community <- function(graph, weights=NULL) {
+cluster_louvain <- function(graph, weights=NULL) {
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
-  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) { 
+  if (!is_igraph(graph)) { stop("Not a graph object") }
+  if (is.null(weights) && "weight" %in% edge_attr_names(graph)) { 
   weights <- E(graph)$weight 
   } 
   if (!is.null(weights) && any(!is.na(weights))) { 
@@ -1506,7 +1467,7 @@ multilevel.community <- function(graph, weights=NULL) {
   # Function call
   res <- .Call("R_igraph_community_multilevel", graph, weights,
         PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1536,17 +1497,18 @@ multilevel.community <- function(graph, weights=NULL) {
 #' probably don't want to run this function on larger graphs. Graphs with up to
 #' fifty vertices should be fine, graphs with a couple of hundred vertices
 #' might be possible.
-#' 
+#'
+#' @aliases cluster_optimal
 #' @param graph The input graph. Edge directions are ignored for directed
 #' graphs.
 #' @param weights Optional positive weight vector for optimizing weighted
 #' modularity. If the graph has a \code{weight} edge attribute, then this is
 #' used by default. Supply \code{NA} to ignore the weights of a weighted graph.
-#' @return \code{optimal.community} returns a \code{\link{communities}} object,
+#' @return \code{cluster_optimal} returns a \code{\link{communities}} object,
 #' please see the \code{\link{communities}} manual page for details.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{communities}} for the documentation of the result,
-#' \code{\link{modularity}}. See also \code{\link{fastgreedy.community}} for a
+#' \code{\link{modularity}}. See also \code{\link{cluster_fast_greedy}} for a
 #' fast greedy optimizer.
 #' @references Ulrik Brandes, Daniel Delling, Marco Gaertler, Robert Gorke,
 #' Martin Hoefer, Zoran Nikoloski, Dorothea Wagner: On Modularity Clustering,
@@ -1563,21 +1525,21 @@ multilevel.community <- function(graph, weights=NULL) {
 #' 
 #' try({
 #'   ## The calculation only takes a couple of seconds
-#'   oc <- optimal.community(g)
+#'   oc <- cluster_optimal(g)
 #' 
 #'   ## Double check the result
 #'   print(modularity(oc))
 #'   print(modularity(g, membership(oc)))
 #' 
 #'   ## Compare to the greedy optimizer
-#'   fc <- fastgreedy.community(g)
+#'   fc <- cluster_fast_greedy(g)
 #'   print(modularity(fc))
 #' }, silent=TRUE)
 #' 
-optimal.community <- function(graph, weights=NULL) {
+cluster_optimal <- function(graph, weights=NULL) {
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
-  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+  if (!is_igraph(graph)) { stop("Not a graph object") }
+  if (is.null(weights) && "weight" %in% edge_attr_names(graph)) {
     weights <- E(graph)$weight
   }
   if (!is.null(weights) && any(!is.na(weights))) {
@@ -1590,7 +1552,7 @@ optimal.community <- function(graph, weights=NULL) {
   # Function call
   res <- .Call("R_igraph_community_optimal_modularity", graph, weights,
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1622,7 +1584,7 @@ optimal.community <- function(graph, weights=NULL) {
 #' integer value equal or larger than 1).
 #' @param modularity Logical scalar, whether to calculate the modularity score
 #' of the detected community structure.
-#' @return \code{infomap.community} returns a \code{\link{communities}} object,
+#' @return \code{cluster_infomap} returns a \code{\link{communities}} object,
 #' please see the \code{\link{communities}} manual page for details.
 #' @author Martin Rosvall (\url{http://www.tp.umu.se/~rosvall/}) wrote the
 #' original C++ code. This was ported to be more igraph-like by Emmanuel
@@ -1644,16 +1606,16 @@ optimal.community <- function(graph, weights=NULL) {
 #' ## Zachary's karate club
 #' g <- graph.famous("Zachary")
 #' 
-#' imc <- infomap.community(g)
+#' imc <- cluster_infomap(g)
 #' membership(imc)
 #' communities(imc)
 #' 
-infomap.community <- function(graph, e.weights=NULL, v.weights=NULL,
+cluster_infomap <- function(graph, e.weights=NULL, v.weights=NULL,
                               nb.trials=10, modularity=TRUE) {
   
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
-  if (is.null(e.weights) && "weight" %in% list.edge.attributes(graph)) { 
+  if (!is_igraph(graph)) { stop("Not a graph object") }
+  if (is.null(e.weights) && "weight" %in% edge_attr_names(graph)) { 
     e.weights <- E(graph)$weight 
   } 
   if (!is.null(e.weights) && any(!is.na(e.weights))) { 
@@ -1661,7 +1623,7 @@ infomap.community <- function(graph, e.weights=NULL, v.weights=NULL,
   } else { 
     e.weights <- NULL 
   }
-  if (is.null(v.weights) && "weight" %in% list.vertex.attributes(graph)) { 
+  if (is.null(v.weights) && "weight" %in% vertex_attr_names(graph)) { 
     v.weights <- V(graph)$weight 
   } 
   if (!is.null(v.weights) && any(!is.na(v.weights))) { 
@@ -1677,7 +1639,7 @@ infomap.community <- function(graph, e.weights=NULL, v.weights=NULL,
                v.weights, nb.trials,
                PACKAGE="igraph")
 
-  if (getIgraphOpt("add.vertex.names") && is.named(graph)) {
+  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1706,10 +1668,11 @@ plot.communities <- function(x, y,
 
 
 
-#' @rdname dendPlot.communities
+#' @rdname plot_dendrogram.communities
+#' @aliases dendPlot
 
-dendPlot <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
-  UseMethod("dendPlot")
+plot_dendrogram <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
+  UseMethod("plot_dendrogram")
 
 
 
@@ -1717,7 +1680,7 @@ dendPlot <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
 #' 
 #' Plot a hierarchical community structure as a dendrogram.
 #' 
-#' \code{dendPlot} supports three different plotting functions, selected via
+#' \code{plot_dendrogram} supports three different plotting functions, selected via
 #' the \code{mode} argument. By default the plotting function is taken from the
 #' \code{dend.plot.type} igraph option, and it has for possible values:
 #' \itemize{ \item \code{auto} Choose automatically between the plotting
@@ -1730,7 +1693,7 @@ dendPlot <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
 #' 
 #' The different plotting functions take different sets of arguments. When
 #' using \code{plot.phylo} (\code{mode="phylo"}), we have the following syntax:
-#' \preformatted{ dendPlot(x, mode="phylo", colbar = rainbow(11, start=0.7,
+#' \preformatted{ plot_dendrogram(x, mode="phylo", colbar = rainbow(11, start=0.7,
 #' end=0.1), edge.color = NULL, use.edge.length = FALSE, \dots) } The extra
 #' arguments not documented above: \itemize{ \item \code{colbar} Color bar for
 #' the edges.  \item \code{edge.color} Edge colors. If \code{NULL}, then the
@@ -1739,7 +1702,7 @@ dendPlot <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
 #' \code{plot.phylo}.  }
 #' 
 #' The syntax for \code{plot.hclust} (\code{mode="hclust"}): \preformatted{
-#' dendPlot(x, mode="hclust", rect = 0, colbar = rainbow(rect), hang = 0.01,
+#' plot_dendrogram(x, mode="hclust", rect = 0, colbar = rainbow(rect), hang = 0.01,
 #' ann = FALSE, main = "", sub = "", xlab = "", ylab = "", \dots) } The extra
 #' arguments not documented above: \itemize{ \item \code{rect} A numeric
 #' scalar, the number of groups to mark on the dendrogram. The dendrogram is
@@ -1758,7 +1721,7 @@ dendPlot <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
 #' to pass to \code{plot.hclust}.  }
 #' 
 #' The syntax for \code{plot.dendrogram} (\code{mode="dendrogram"}):
-#' \preformatted{ dendPlot(x, \dots) } The extra arguments are simply passed to
+#' \preformatted{ plot_dendrogram(x, \dots) } The extra arguments are simply passed to
 #' \code{as.dendrogram}.
 #' 
 #' @param x An object containing the community structure of a graph. See
@@ -1775,10 +1738,10 @@ dendPlot <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
 #' @examples
 #' 
 #' karate <- graph.famous("Zachary")
-#' fc <- fastgreedy.community(karate)
-#' dendPlot(fc)
+#' fc <- cluster_fast_greedy(karate)
+#' plot_dendrogram(fc)
 #' 
-dendPlot.communities <- function(x, 
+plot_dendrogram.communities <- function(x, 
                                  mode=getIgraphOpt("dend.plot.type"), ...,
                                  use.modularity=FALSE) {  
   mode <- igraph.match.arg(mode, c("auto", "phylo", "hclust", "dendrogram"))
@@ -1828,7 +1791,7 @@ dendPlotPhylo <- function(communities, colbar=rainbow(length(communities)),
                           edge.color="#AAAAAAFF",
                           edge.lty=c(1,2), ...) {
   
-  phy <- asPhylo(communities, use.modularity=use.modularity)
+  phy <- as_phylo(communities, use.modularity=use.modularity)
 
   getedges <- function(tip) {
     repeat {      
@@ -1887,9 +1850,9 @@ compare <- function(comm1, comm2, method=c("vi", "nmi",
 #' (1985).
 #' @return A real number.
 #' @author Tamas Nepusz \email{ntamas@@gmail.com}
-#' @seealso \code{\link{walktrap.community}},
-#' \code{\link{edge.betweenness.community}},
-#' \code{\link{fastgreedy.community}}, \code{\link{spinglass.community}} for
+#' @seealso \code{\link{cluster_walktrap}},
+#' \code{\link{cluster_edge_betweenness}},
+#' \code{\link{cluster_fast_greedy}}, \code{\link{cluster_spinglass}} for
 #' various community detection methods.
 #' @references Meila M: Comparing clusterings by the variation of information.
 #' In: Scholkopf B, Warmuth MK (eds.). \emph{Learning Theory and Kernel
@@ -1913,12 +1876,12 @@ compare <- function(comm1, comm2, method=c("vi", "nmi",
 #' @examples
 #' 
 #' g <- graph.famous("Zachary")
-#' sg <- spinglass.community(g)
-#' le <- leading.eigenvector.community(g)
+#' sg <- cluster_spinglass(g)
+#' le <- cluster_leading_eigen(g)
 #' compare(sg, le, method="rand")
 #' compare(membership(sg), membership(le))
 #' 
-compare.communities <- function(comm1, comm2, method=c("vi", "nmi",
+compare <- function(comm1, comm2, method=c("vi", "nmi",
                                                 "split.join", "rand",
                                                 "adjusted.rand")) {
   compare.numeric(comm1, comm2, method)

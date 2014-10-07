@@ -29,43 +29,43 @@
 #' \code{cliques} find all complete subgraphs in the input graph, obeying the
 #' size limitations given in the \code{min} and \code{max} arguments.
 #' 
-#' \code{largest.cliques} finds all largest cliques in the input graph. A
+#' \code{largest_cliques} finds all largest cliques in the input graph. A
 #' clique is largest if there is no other clique including more vertices.
 #' 
-#' \code{maximal.cliques} finds all maximal cliques in the input graph.  A
+#' \code{max_cliques} finds all maximal cliques in the input graph.  A
 #' clique in maximal if it cannot be extended to a larger clique. The largest
 #' cliques are always maximal, but a maximal clique is not neccessarily the
 #' largest.
 #' 
-#' \code{maximal.cliques.count} counts the maximal cliques.
+#' \code{count_max_cliques} counts the maximal cliques.
 #' 
-#' \code{clique.number} calculates the size of the largest clique(s).
+#' \code{clique_num} calculates the size of the largest clique(s).
 #' 
 #' The current implementation of these functions searches for maximal
-#' independent vertex sets (see \code{\link{independent.vertex.sets}}) in the
+#' independent vertex sets (see \code{\link{ivs}}) in the
 #' complementer graph.
 #' 
-#' @aliases cliques largest.cliques maximal.cliques maximal.cliques.count
-#' clique.number
+#' @aliases cliques largest_cliques maximal.cliques maximal.cliques.count
+#' clique.number clique_num largest.cliques count_max_cliques max_cliques
 #' @param graph The input graph, directed graphs will be considered as
 #' undirected ones, multiple edges and loops are ignored.
 #' @param min Numeric constant, lower limit on the size of the cliques to find.
 #' \code{NULL} means no limit, ie. it is the same as 0.
 #' @param max Numeric constant, upper limit on the size of the cliques to find.
 #' \code{NULL} means no limit.
-#' @return \code{cliques}, \code{largest.cliques} and \code{clique.number}
+#' @return \code{cliques}, \code{largest_cliques} and \code{clique_num}
 #' return a list containing numeric vectors of vertex ids. Each list element is
 #' a clique.
 #' 
-#' \code{maximal.cliques} returns \code{NULL}, invisibly, if its \code{file}
+#' \code{max_cliques} returns \code{NULL}, invisibly, if its \code{file}
 #' argument is not \code{NULL}. The output is written to the specified file in
 #' this case.
 #' 
-#' \code{clique.number} and \code{maximal.cliques.count} return an integer
+#' \code{clique_num} and \code{count_max_cliques} return an integer
 #' scalar.
 #' @author Tamas Nepusz \email{ntamas@@gmail.com} and Gabor Csardi
 #' \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{independent.vertex.sets}}
+#' @seealso \code{\link{ivs}}
 #' @references For maximal cliques the following algorithm is implemented:
 #' David Eppstein, Maarten Loffler, Darren Strash: Listing All Maximal Cliques
 #' in Sparse Graphs in Near-optimal Time.  \url{http://arxiv.org/abs/1006.5440}
@@ -73,18 +73,18 @@
 #' @examples
 #' 
 #' # this usually contains cliques of size six
-#' g <- erdos.renyi.game(100, 0.3)
-#' clique.number(g)
+#' g <- sample_gnp(100, 0.3)
+#' clique_num(g)
 #' cliques(g, min=6)
-#' largest.cliques(g)
+#' largest_cliques(g)
 #' 
 #' # To have a bit less maximal cliques, about 100-200 usually
-#' g <- erdos.renyi.game(100, 0.03)
-#' maximal.cliques(g)
+#' g <- sample_gnp(100, 0.03)
+#' max_cliques(g)
 #' 
 #' 
 cliques <- function(graph, min=NULL, max=NULL) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -101,8 +101,8 @@ cliques <- function(graph, min=NULL, max=NULL) {
   lapply(res, function(x) x+1)
 }
 
-largest.cliques <- function(graph) {
-  if (!is.igraph(graph)) {
+largest_cliques <- function(graph) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -124,9 +124,9 @@ largest.cliques <- function(graph) {
 #' in the file, given with the numeric ids of its vertices, separated by
 #' whitespace.
 
-maximal.cliques <- function(graph, min=NULL, max=NULL,
+max_cliques <- function(graph, min=NULL, max=NULL,
                             subset=NULL, file=NULL) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object");
   }
 
@@ -164,10 +164,10 @@ maximal.cliques <- function(graph, min=NULL, max=NULL,
   }
 }
 
-maximal.cliques.count <- function(graph, min=NULL, max=NULL,
+count_max_cliques <- function(graph, min=NULL, max=NULL,
                                   subset=NULL) {
   # Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
+  if (!is_igraph(graph)) { stop("Not a graph object") }
 
   if (is.null(min)) { min <- 0 }
   if (is.null(max)) { max <- 0 }
@@ -186,8 +186,8 @@ maximal.cliques.count <- function(graph, min=NULL, max=NULL,
   res
 }
 
-clique.number <- function(graph) {
-  if (!is.igraph(graph)) {
+clique_num <- function(graph) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object");
   }
   
@@ -204,15 +204,15 @@ clique.number <- function(graph) {
 #' vertices in it. These functions find independent vertex sets in undirected
 #' graphs
 #' 
-#' \code{independent.vertex.sets} finds all independent vertex sets in the
+#' \code{ivs} finds all independent vertex sets in the
 #' network, obeying the size limitations given in the \code{min} and \code{max}
 #' arguments.
 #' 
-#' \code{largest.independent.vertex.sets} finds the largest independent vertex
+#' \code{largest_ivs} finds the largest independent vertex
 #' sets in the graph. An independent vertex set is largest if there is no
 #' independent vertex set with more vertices.
 #' 
-#' \code{maximal.independent.vertex.sets} finds the maximal independent vertex
+#' \code{maximal_ivs} finds the maximal independent vertex
 #' sets in the graph. An independent vertex set is maximal if it cannot be
 #' extended to a larger independent vertex set. The largest independent vertex
 #' sets are maximal, but the opposite is not always true.
@@ -224,19 +224,20 @@ clique.number <- function(graph) {
 #' reference below.
 #' 
 #' @aliases independent.vertex.sets largest.independent.vertex.sets
-#' maximal.independent.vertex.sets independence.number
+#' maximal.independent.vertex.sets independence.number ivs_size ivs
+#' largest_ivs maximal_ivs
 #' @param graph The input graph, directed graphs are considered as undirected,
 #' loop edges and multiple edges are ignored.
 #' @param min Numeric constant, limit for the minimum size of the independent
 #' vertex sets to find. \code{NULL} means no limit.
 #' @param max Numeric constant, limit for the maximum size of the independent
 #' vertex sets to find. \code{NULL} means no limit.
-#' @return \code{independent.vertex.sets},
-#' \code{largest.independent.vertex.sets} and
-#' \code{maximal.independent.vertex.sets} return a list containing numeric
+#' @return \code{ivs},
+#' \code{largest_ivs} and
+#' \code{maximal_ivs} return a list containing numeric
 #' vertex ids, each list element is an independent vertex set.
 #' 
-#' \code{independence.number} returns an integer constant.
+#' \code{ivs_size} returns an integer constant.
 #' @author Tamas Nepusz \email{ntamas@@gmail.com} ported it from the Very Nauty
 #' Graph Library by Keith Briggs (\url{http://keithbriggs.info/}) and Gabor
 #' Csardi \email{csardi.gabor@@gmail.com} wrote the R interface and this manual
@@ -250,17 +251,17 @@ clique.number <- function(graph) {
 #' 
 #' # A quite dense graph
 #' set.seed(42)
-#' g <- erdos.renyi.game(100, 0.9)
-#' independence.number(g)
-#' independent.vertex.sets(g, min=independence.number(g))
-#' largest.independent.vertex.sets(g)
+#' g <- sample_gnp(100, 0.9)
+#' ivs_size(g)
+#' ivs(g, min=ivs_size(g))
+#' largest_ivs(g)
 #' # Empty graph
-#' induced.subgraph(g, largest.independent.vertex.sets(g)[[1]])
+#' induced_subgraph(g, largest_ivs(g)[[1]])
 #' 
-#' length(maximal.independent.vertex.sets(g))
+#' length(maximal_ivs(g))
 #' 
-independent.vertex.sets <- function(graph, min=NULL, max=NULL) {
-  if (!is.igraph(graph)) {
+ivs <- function(graph, min=NULL, max=NULL) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object");
   }
 
@@ -279,8 +280,8 @@ independent.vertex.sets <- function(graph, min=NULL, max=NULL) {
   lapply(res, function(x) x+1)
 }
 
-largest.independent.vertex.sets <- function(graph) {
-  if (!is.igraph(graph)) {
+largest_ivs <- function(graph) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object");
   }
 
@@ -290,8 +291,8 @@ largest.independent.vertex.sets <- function(graph) {
   lapply(res, function(x) x+1)
 }
 
-maximal.independent.vertex.sets <- function(graph) {
-  if (!is.igraph(graph)) {
+maximal_ivs <- function(graph) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object");
   }
 
@@ -301,8 +302,8 @@ maximal.independent.vertex.sets <- function(graph) {
   lapply(res, function(x) x+1)
 }
 
-independence.number <- function(graph) {
-  if (!is.igraph(graph)) {
+ivs_size <- function(graph) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object");
   }
 

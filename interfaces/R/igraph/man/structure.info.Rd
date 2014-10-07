@@ -1,9 +1,13 @@
 \name{structure.info}
+\alias{gorder}
 \alias{vcount}
+\alias{gsize}
 \alias{ecount}
 \alias{neighbors}
 \alias{incident}
 \alias{is.directed}
+\alias{is_directed}
+\alias{is_connected_to}
 \alias{are.connected}
 \alias{get.edge}
 \alias{get.edges}
@@ -13,12 +17,14 @@
   two vertices are connected by an edge.
 }
 \usage{
+gorder(graph)
 vcount(graph)
+gsize(graph)
 ecount(graph)
 neighbors(graph, v, mode = 1)
 incident(graph, v, mode=c("all", "out", "in", "total"))
-is.directed(graph)
-are.connected(graph, v1, v2)
+is_directed(graph)
+is_connected_to(graph, v1, v2)
 get.edge(graph, id)
 get.edges(graph, es)
 }
@@ -42,9 +48,13 @@ get.edges(graph, es)
 \details{
   These functions provide the basic structural information of a graph.
 
-  \code{vcount} gives the number of vertices in the graph.
+  \code{gorder} gives the order of the graph, the number of vertices.
+  \code{vcount} is an alias of this function. \code{gorder} is available
+  from igraph version 0.8.0.
 
-  \code{ecount} gives the number of edges in the graph.
+  \code{gsize} gives the size of the graph, its number of edges.
+  \code{ecount} is an alias of \code{gsize}, and is available from
+  igraph version 0.8.0.
 
   \code{neighbors} gives the neighbors of a vertex. The vertices
   connected by multiple edges are listed as many times as the number of
@@ -52,10 +62,10 @@ get.edges(graph, es)
 
   \code{incident} gives the incident edges of a vertex.
   
-  \code{is.directed} gives whether the graph is directed or not. It just
+  \code{is_directed} gives whether the graph is directed or not. It just
   gives its \code{directed} attribute.
   
-  \code{are.connected} decides whether there is an edge from \code{v1}
+  \code{is_connected_to} decides whether there is an edge from \code{v1}
   to \code{v2}. 
 
   \code{get.edge} returns the end points of the edge with the supplied
@@ -66,9 +76,9 @@ get.edges(graph, es)
   the edge sequence argument. 
 }
 \value{
-  \code{vcount} and \code{ecount} return integer
+  \code{gorder} and \code{gsize} return integer
   constants. \code{neighbors} returns an integer
-  vector. \code{is.directed} and \code{are.connected} return boolean
+  vector. \code{is_directed} and \code{is_connected_to} return boolean
   constants. \code{get.edge} returns a numeric vector of length two.
   \code{get.edges} returns a two-column matrix.
 }
@@ -76,13 +86,15 @@ get.edges(graph, es)
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph}}}
 \examples{
-g <- graph.ring(10)
+g <- ring(10)
+gorder(g)
 vcount(g)
+gsize(g)
 ecount(g)
 neighbors(g, 5)
 incident(g, 5)
-are.connected(g, 1, 2)
-are.connected(g, 2, 4)
+is_connected_to(g, 1, 2)
+is_connected_to(g, 2, 4)
 get.edges(g, 1:6)
 }
 \keyword{graphs}

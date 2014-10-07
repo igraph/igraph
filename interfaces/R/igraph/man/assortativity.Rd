@@ -1,7 +1,9 @@
 \name{assortativity}
 \alias{assortativity}
 \alias{assortativity.degree}
+\alias{assortativity_degree}
 \alias{assortativity.nominal}
+\alias{assortativity_nominal}
 \concept{Assortativity coefficient}
 \title{Assortativity coefficient}
 \description{
@@ -11,8 +13,8 @@
 }
 \usage{
 assortativity (graph, types1, types2 = NULL, directed = TRUE) 
-assortativity.nominal (graph, types, directed = TRUE) 
-assortativity.degree (graph, directed = TRUE) 
+assortativity_nominal (graph, types, directed = TRUE) 
+assortativity_degree (graph, directed = TRUE) 
 }
 \arguments{
   \item{graph}{The input graph, it can be directed or undirected.}
@@ -41,7 +43,7 @@ assortativity.degree (graph, directed = TRUE)
   
   M.E.J. Newman defined two kinds of assortativity coefficients, the
   first one is for categorical labels of
-  vertices. \code{assortativity.nominal} calculates this measure. It is
+  vertices. \code{assortativity_nominal} calculates this measure. It is
   defines as
 
   \deqn{r=\frac{\sum_i e_{ii}-\sum_i a_i b_i}{1-\sum_i a_i b_i}}{
@@ -79,7 +81,7 @@ assortativity.degree (graph, directed = TRUE)
   assign different values to the outgoing and the incoming end of the
   edges.
 
-  \code{assortativity.degree} uses vertex degree (minus one) as vertex
+  \code{assortativity_degree} uses vertex degree (minus one) as vertex
   values and calls \code{assortativity}.
 }
 \value{
@@ -99,9 +101,9 @@ assortativity.degree (graph, directed = TRUE)
 % \seealso{}
 \examples{
 # random network, close to zero
-assortativity.degree(erdos.renyi.game(10000,3/10000))
+assortativity_degree(sample_gnp(10000, 3/10000))
 
 # BA model, tends to be dissortative
-assortativity.degree(ba.game(10000, m=4))
+assortativity_degree(sample_pa(10000, m=4))
 }
 \keyword{graphs}

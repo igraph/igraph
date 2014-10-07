@@ -1,8 +1,8 @@
 
-graphlets.candidate.basis <- function(graph, weights=NULL) {
+graphlet_basis <- function(graph, weights=NULL) {
   ## Argument checks
-  if (!is.igraph(graph)) { stop("Not a graph object") }
-  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+  if (!is_igraph(graph)) { stop("Not a graph object") }
+  if (is.null(weights) && "weight" %in% edge_attr_names(graph)) {
     weights <- E(graph)$weight
   }
   if (!is.null(weights) && any(!is.na(weights))) {
@@ -23,11 +23,11 @@ graphlets.candidate.basis <- function(graph, weights=NULL) {
   res
 }
 
-graphlets.project <- function(graph, weights=NULL, cliques, niter=1000,
+graphlet_proj <- function(graph, weights=NULL, cliques, niter=1000,
                               Mu=rep(1, length(cliques))) {
   # Argument checks
   if (!is.igraph(graph)) { stop("Not a graph object") }
-  if (is.null(weights) && "weight" %in% list.edge.attributes(graph)) {
+  if (is.null(weights) && "weight" %in% edge_attr_names(graph)) {
     weights <- E(graph)$weight
   }
   if (!is.null(weights) && any(!is.na(weights))) {
@@ -60,7 +60,7 @@ function() {
     E(g)$color <- "black"
     plot.new()
     layout(matrix(1:6, nrow=2, byrow=TRUE))
-    co <- layout.kamada.kawai(g)
+    co <- layout_with_kk(g)
     par(mar=c(1,1,1,1))
     plot(g, layout=co)
     for (i in 1:length(gl$Bc)) {
@@ -84,15 +84,15 @@ function() {
   D2[3:5, 3:5] <- 3
   D3[2:5, 2:5] <- 1
   
-  g <- graph.adjacency(D1 + D2 + D3, mode="undirected", weighted=TRUE)
+  g <- graph_from_adjacency_matrix(D1 + D2 + D3, mode="undirected", weighted=TRUE)
   gl <- graphlets(g, iter=1000)
 
   fitandplot(g, gl)
 
   ## Project another graph on the graphlets
   set.seed(42)
-  g2 <- set.edge.attribute(g, "weight", value=sample(E(g)$weight))
-  gl2 <- graphlets.project(g2, gl$Bc, 1000)
+  g2 <- set_edge_attr(g, "weight", value=sample(E(g)$weight))
+  gl2 <- graphlet_proj(g2, gl$Bc, 1000)
   fitandplot(g2, gl2)
   
 }

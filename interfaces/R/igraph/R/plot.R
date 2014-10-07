@@ -28,7 +28,7 @@
 #' 
 #' One convenient way to plot graphs is to plot with \code{\link{tkplot}}
 #' first, handtune the placement of the vertices, query the coordinates by the
-#' \code{\link{tkplot.getcoords}} function and use them with \code{plot} to
+#' \code{\link{tk_coords}} function and use them with \code{plot} to
 #' plot the graph to any R device.
 #' 
 #' @param x The graph to plot.
@@ -69,8 +69,8 @@
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.ring(10)
-#' \dontrun{plot(g, layout=layout.kamada.kawai, vertex.color="green")}
+#' g <- ring(10)
+#' \dontrun{plot(g, layout=layout_with_kk, vertex.color="green")}
 #' 
 plot.igraph <- function(x, 
                        # SPECIFIC: #####################################
@@ -83,7 +83,7 @@ plot.igraph <- function(x,
                        ...) {
 
   graph <- x
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -136,7 +136,7 @@ plot.igraph <- function(x,
   maxv <- max(vertex.size)
   if (rescale) {
     # norm layout to (-1, 1)
-    layout <- layout.norm(layout, -1, 1, -1, 1)
+    layout <- norm_coords(layout, -1, 1, -1, 1)
     xlim <- c(xlim[1]-margin[2]-maxv, xlim[2]+margin[4]+maxv)
     ylim <- c(ylim[1]-margin[1]-maxv, ylim[2]+margin[3]+maxv)
   }
@@ -173,7 +173,7 @@ plot.igraph <- function(x,
 
   ################################################################
   ## calculate position of arrow-heads
-  el <- get.edgelist(graph, names=FALSE)
+  el <- as_edgelist(graph, names=FALSE)
   loops.e <- which(el[,1] == el[,2])
   nonloops.e <- which(el[,1] != el[,2])
   loops.v <- el[,1] [loops.e]
@@ -417,8 +417,8 @@ plot.igraph <- function(x,
 #' @examples
 #' 
 #' \dontrun{
-#' g <- graph.lattice( c(5,5,5) )
-#' coords <- layout.fruchterman.reingold(g, dim=3)
+#' g <- lattice( c(5,5,5) )
+#' coords <- layout_with_fr(g, dim=3)
 #' rglplot(g, layout=coords)
 #' }
 #' 
@@ -430,7 +430,7 @@ rglplot.igraph <- function(x, ...) {
   require(rgl)
   
   graph <- x
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 
@@ -618,11 +618,11 @@ rglplot.igraph <- function(x, ...) {
   # norm layout to (-1, 1)
   if (ncol(layout)==2) { layout <- cbind(layout, 0) }
   if (rescale) {
-    layout <- layout.norm(layout, -1, 1, -1, 1, -1, 1)
+    layout <- norm_coords(layout, -1, 1, -1, 1, -1, 1)
   }
   
   # add the edges, the loops are handled separately
-  el <- get.edgelist(graph, names=FALSE)
+  el <- as_edgelist(graph, names=FALSE)
   
   # It is faster this way
   par3d(skipRedraw=TRUE)
@@ -832,7 +832,7 @@ igraph.polygon <- function(points, vertex.size=15/200, expand.by=15/200,
               cbind(points[,1], points[,2]-vertex.size-by),
               cbind(points[,1], points[,2]+vertex.size+by))
 
-  cl <- convex.hull(pp)
+  cl <- convex_hull(pp)
   xspline(cl$rescoords, shape=shape, open=FALSE, col=col, border=border)
 }
 

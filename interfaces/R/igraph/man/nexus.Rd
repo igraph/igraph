@@ -4,6 +4,10 @@
 \alias{nexus.info}
 \alias{nexus.get}
 \alias{nexus.search}
+\alias{nexus_list}
+\alias{nexus_info}
+\alias{nexus_get}
+\alias{nexus_search}
 \alias{nexusDatasetInfo}
 \alias{print.nexusDatasetInfo}
 \alias{print.nexusDatasetInfoList}
@@ -14,14 +18,14 @@
   network data sets. These functions can be used to query it and
   download data from it, directly as an igraph graph.}
 \usage{
-nexus.list(tags=NULL, offset=0, limit=10,
+nexus_list(tags=NULL, offset=0, limit=10,
            operator=c("or", "and"),
            order=c("date", "name", "popularity"),
            nexus.url=getIgraphOpt("nexus.url"))
-nexus.info(id, nexus.url=getIgraphOpt("nexus.url"))
-nexus.get(id, offset=0, order=c("date", "name", "popularity"),
+nexus_info(id, nexus.url=getIgraphOpt("nexus.url"))
+nexus_get(id, offset=0, order=c("date", "name", "popularity"),
           nexus.url=getIgraphOpt("nexus.url"))
-nexus.search(q, offset=0, limit=10,
+nexus_search(q, offset=0, limit=10,
              order=c("date", "name", "popularity"),
              nexus.url=getIgraphOpt("nexus.url"))
 
@@ -59,21 +63,21 @@ nexus.search(q, offset=0, limit=10,
   programatic queries against it, and programatic data download as
   well.
 
-  The \code{nexus.list} and \code{nexus.info} functions query the
+  The \code{nexus_list} and \code{nexus_info} functions query the
   online database. They both return \code{nexusDatasetInfo} objects.
-  \code{nexus.info} returns more information than \code{nexus.list}.
+  \code{nexus_info} returns more information than \code{nexus_list}.
 
-  \code{nexus.search} searches Nexus, and returns a list of data sets,
+  \code{nexus_search} searches Nexus, and returns a list of data sets,
   as \code{nexusDatasetInfo} objects. See below for some search
   examples.
 
-  \code{nexus.get} downloads a data set from Nexus, based on its numeric
+  \code{nexus_get} downloads a data set from Nexus, based on its numeric
   id, or based on a Nexus search string. For search strings, only the
   first search hit is downloaded, but see also the \code{offset}
   argument. (If there are not data sets found, then the function returns
   an error.)
   
-  The \code{nexusDatasetInfo} objects returned by \code{nexus.list} have
+  The \code{nexusDatasetInfo} objects returned by \code{nexus_list} have
   the following fields:
   \describe{
     \item{id}{The numeric id of the dataset.}
@@ -93,7 +97,7 @@ nexus.search(q, offset=0, limit=10,
       multiple networks are separated by spaces.}
   }
 
-  \code{nexusDatasetInfo} objects returned by \code{nexus.info} have the
+  \code{nexusDatasetInfo} objects returned by \code{nexus_info} have the
   following additional fields:
   \describe{
     \item{date}{Character scalar, e.g. \sQuote{2011-01-09}, the date
@@ -127,8 +131,8 @@ nexus.search(q, offset=0, limit=10,
 
   The results of the Nexus queries are printed to the screen in a
   consise format, similar to the format of igraph graphs. A data set
-  list (typically the result of \code{nexus.list} and
-  \code{nexus.search}) looks like this: \preformatted{NEXUS 1-5/18 -- data set list
+  list (typically the result of \code{nexus_list} and
+  \code{nexus_search}) looks like this: \preformatted{NEXUS 1-5/18 -- data set list
 [1] kaptail.4         39/109-223   #18 Kapferer tailor shop
 [2] condmatcollab2003 31163/120029 #17 Condensed matter collaborations+
 [3] condmatcollab     16726/47594  #16 Condensed matter collaborations+
@@ -166,7 +170,7 @@ nexus.search(q, offset=0, limit=10,
   more fields.
 }
 \value{
-  \code{nexus.list} and \code{nexus.search} return a list of
+  \code{nexus_list} and \code{nexus_search} return a list of
   \code{nexusDatasetInfo} objects. The list also has these attributes:
   \describe{
     \item{size}{The number of data sets returned by the query.}
@@ -175,29 +179,29 @@ nexus.search(q, offset=0, limit=10,
     \item{limit}{The limit parameter of the query.}
   }
   
-  \code{nexus.info} returns a single \code{nexusDatasetInfo} object.
+  \code{nexus_info} returns a single \code{nexusDatasetInfo} object.
 
-  \code{nexus.get} returns an igraph graph object, or a list of graph
+  \code{nexus_get} returns an igraph graph object, or a list of graph
   objects, if the data set consists of multiple networks.
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{ \url{http://nexus.igraph.org} }
 \examples{
-\dontrun{nexus.list(tag="weighted")
-nexus.list(limit=3, order="name")
-nexus.list(limit=3, order="name")[[1]]
-nexus.info(2)
-g <- nexus.get(2)
+\dontrun{nexus_list(tag="weighted")
+nexus_list(limit=3, order="name")
+nexus_list(limit=3, order="name")[[1]]
+nexus_info(2)
+g <- nexus_get(2)
 summary(g)
 
 ## Data sets related to 'US':
-nexus.search("US")
+nexus_search("US")
 
 ## Search for data sets that have 'network' in their name:
-nexus.search("name:network")
+nexus_search("name:network")
 
 ## Any word can match
-nexus.search("blog or US or karate")
+nexus_search("blog or US or karate")
 }
 }
 \keyword{graphs}

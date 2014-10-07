@@ -7,9 +7,9 @@ test_that("SCG functions work", {
 
   library(igraph)
 
-  tree <- graph.tree(10, 3, "undirected")
-  treeM <- get.adjacency(tree, sparse=TRUE)
-  treeM2 <- get.adjacency(tree, sparse=FALSE)
+  tree <- tree(10, 3, "undirected")
+  treeM <- as_adj(tree, sparse=TRUE)
+  treeM2 <- as_adj(tree, sparse=FALSE)
 
   args <- list(ev=1, nt=3, mtype="symmetric", algo="exact_scg",
                semproj=TRUE, epairs=TRUE)

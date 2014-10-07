@@ -26,7 +26,7 @@
 #' \code{is.graph} makes its decision based on the class attribute of the
 #' object.
 #' 
-#' 
+#' @aliases is.igraph
 #' @param graph An R object.
 #' @return A logical constant, \code{TRUE} if argument \code{graph} is a graph
 #' object.
@@ -34,17 +34,17 @@
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.ring(10)
-#' is.igraph(g)
-#' is.igraph(numeric(10))
+#' g <- ring(10)
+#' is_igraph(g)
+#' is_igraph(numeric(10))
 #' 
-is.igraph <- function(graph){
+is_igraph <- function(graph){
   "igraph" %in% class(graph)
 }
 
-is.directed <- function(graph) {
+is_directed <- function(graph) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -54,7 +54,7 @@ is.directed <- function(graph) {
 
 get.edge <- function(graph, id) {
 
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
 

@@ -22,8 +22,8 @@ mat2 <- mat[16:30,]
 colnames(mat1) <- rownames(mat1) <- colnames(mat2) <- rownames(mat2) <- rowlab
 
 library(igraph)
-g1 <- graph.adjacency(mat1, mode="directed")
-g2 <- graph.adjacency(mat2, mode="undirected")
+g1 <- g_adj_matrix(mat1, mode="directed")
+g2 <- g_adj_matrix(mat2, mode="undirected")
 
 g1$name <- "Thurman office, organizational chart"
 g2$name <- "Thurman office, multiplex ties"

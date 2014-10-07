@@ -1,21 +1,21 @@
 
-context("evcent")
+context("eigen_centrality")
 
-test_that("evcent works", {
+test_that("eigen_centrality works", {
 
   library(igraph)
 
-  kite <- graph.formula(Andre    - Beverly:Carol:Diane:Fernando,
-                        Beverly  - Andre:Diane:Ed:Garth,
-                        Carol    - Andre:Diane:Fernando,
-                        Diane    - Andre:Beverly:Carol:Ed:Fernando:Garth,
-                        Ed       - Beverly:Diane:Garth,
-                        Fernando - Andre:Carol:Diane:Garth:Heather,
-                        Garth    - Beverly:Diane:Ed:Fernando:Heather,
-                        Heather  - Fernando:Garth:Ike,
-                        Ike      - Heather:Jane,
-                        Jane     - Ike)
-  evc <- round(evcent(kite)$vector, 3)
+  kite <- graph_from_formula(Andre    - Beverly:Carol:Diane:Fernando,
+                    Beverly  - Andre:Diane:Ed:Garth,
+                    Carol    - Andre:Diane:Fernando,
+                    Diane    - Andre:Beverly:Carol:Ed:Fernando:Garth,
+                    Ed       - Beverly:Diane:Garth,
+                    Fernando - Andre:Carol:Diane:Garth:Heather,
+                    Garth    - Beverly:Diane:Ed:Fernando:Heather,
+                    Heather  - Fernando:Garth:Ike,
+                    Ike      - Heather:Jane,
+                    Jane     - Ike)
+  evc <- round(eigen_centrality(kite)$vector, 3)
   expect_that(evc, equals(structure(c(0.732, 0.732, 0.594, 1, 0.827,
                         0.594, 0.827, 0.407, 0.1, 0.023), .Names =
                         c("Andre", "Beverly", "Carol", "Diane",
@@ -38,9 +38,9 @@ test_that("evcent works", {
   }
 
   for (i in 1:1000) {
-    G <- erdos.renyi.game(10, sample(1:20, 1), type="gnm")
-    ev <- evcent(G)
-    expect_that(is.good(get.adjacency(G, sparse=FALSE), ev$vector,
+    G <- sample_gnm(10, sample(1:20, 1))
+    ev <- eigen_centrality(G)
+    expect_that(is.good(as_adj(G, sparse=FALSE), ev$vector,
                         ev$value), is_true())
   }
 })

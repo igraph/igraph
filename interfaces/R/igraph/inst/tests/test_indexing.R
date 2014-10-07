@@ -14,7 +14,7 @@ am <- function(x) {
 library(igraph)
 library(Matrix, quietly=TRUE, warn.conflicts=FALSE)
 
-g <- graph.tree(20)
+g <- tree(20)
 
 test_that("[ indexing works", {
   
@@ -68,7 +68,7 @@ test_that("[ indexing works with negative indices", {
   expect_that(as.matrix(g[2:3,-1]), equals(nres))
 })
 
-el <- get.edgelist(g, names=FALSE)
+el <- as_edgelist(g, names=FALSE)
 E(g)$weight <- el[,1] * el[,2]
 
 test_that("[ indexing works with weighted graphs", {
@@ -208,7 +208,7 @@ test_that("[[ queries edges with vertex names", {
 test_that("[ handles from and to properly", {
   
   ## from & to
-  g <- graph.tree(20)
+  g <- tree(20)
   expect_that(g[from=c(1,2,2,3), to=c(3,4,8,7)], equals(c(1,1,0,1)))
 
   V(g)$name <- letters[1:20]

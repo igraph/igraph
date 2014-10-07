@@ -10,13 +10,13 @@ pause <- function() {
 pause()
 
 ### Create a star-like graph
-t1 <- graph.formula(A-B:C:D:E)
+t1 <- graph_from_formula(A-B:C:D:E)
 t1
 
 pause()
 
 ### Define its plotting properties
-t1$layout <- layout.circle
+t1$layout <- layout_in_circle
 V(t1)$color <- "white"
 V(t1)[name=="A"]$color <- "orange"
 V(t1)$size <- 40
@@ -34,7 +34,7 @@ plot(t1, main=paste("Transitivity of 'A':", tr))
 pause()
 
 ### Add an edge and recalculate transitivity
-t2 <- add.edges(t1, V(t1)[name %in% c("C","D")], color="red", width=3)
+t2 <- add_edges(t1, V(t1)[name %in% c("C","D")], color="red", width=3)
 tr <- transitivity(t2, type="local")[1]
 plot(t2, main=paste("Transitivity of 'A':", round(tr,4)))
 
@@ -42,7 +42,7 @@ pause()
 
 ### Add two more edges
 newe <- match(c("B", "C", "B", "E"), V(t2)$name)-1
-t3 <- add.edges(t2, newe, color="red", width=3)
+t3 <- add_edges(t2, newe, color="red", width=3)
 tr <- transitivity(t3, type="local")[1]
 plot(t3, main=paste("Transitivity of 'A':", round(tr,4)))
 
@@ -50,15 +50,15 @@ pause()
 
 ### A one dimensional, circular lattice
 ring <- graph.ring(50)
-ring$layout <- layout.circle
+ring$layout <- layout_in_circle
 V(ring)$size <- 3
 plot(ring, vertex.label=NA, main="Ring graph")
 
 pause()
 
 ### Watts-Strogatz model
-ws1 <- watts.strogatz.game(1, 50, 3, p=0)
-ws1$layout <- layout.circle
+ws1 <- sample_smallworld(1, 50, 3, p=0)
+ws1$layout <- layout_in_circle
 V(ws1)$size <- 3
 E(ws1)$curved <- 1
 plot(ws1, vertex.label=NA, main="regular graph")
@@ -84,14 +84,14 @@ transitivity(ws1)
 pause()
 
 ### Path lengths, regular graph
-average.path.length(ws1)
+mean_distance(ws1)
 
 pause()
 
 ### Function to test regular graph with given size
 try.ring.pl <- function(n) {
-  g <- watts.strogatz.game(1, n, 3, p=0)
-  average.path.length(g)
+  g <- sample_smallworld(1, n, 3, p=0)
+  mean_distance(g)
 }
 try.ring.pl(10)
 try.ring.pl(100)
@@ -106,18 +106,18 @@ plot(ring.size, ring.pl, type="b")
 pause()
 
 ### Path lengths, random graph
-rg <- erdos.renyi.game(50, 50*3, type="gnm")
-rg$layout <- layout.circle
+rg <- sample_gnm(50, 50 * 3)
+rg$layout <- layout_in_circle
 V(rg)$size <- 3
 plot(rg, vertex.label=NA, main="Random graph")
-average.path.length(rg)
+mean_distance(rg)
 
 pause()
 
 ### Path length of random graphs
 try.random.pl <- function(n) {
-  g <- erdos.renyi.game(n, n*3, type="gnm")
-  average.path.length(g)
+  g <- sample_gnm(n, n*3)
+  mean_distance(g)
 }
 try.random.pl(100)
 
@@ -141,18 +141,18 @@ transitivity(rg, type="localaverage")
 pause()
 
 ### Rewiring
-ws2 <- watts.strogatz.game(1, 50, 3, p=0.1)
-ws2$layout <- layout.circle
+ws2 <- sample_smallworld(1, 50, 3, p=0.1)
+ws2$layout <- layout_in_circle
 V(ws2)$size <- 3
 plot(ws2, vertex.label=NA)
-average.path.length(ws2)
+mean_distance(ws2)
 
 pause()
 
 ### Path lengths in randomized lattices
 try.rr.pl <- function(n, p) {
-  g <- watts.strogatz.game(1, n, 3, p=p)
-  average.path.length(g)
+  g <- sample_smallworld(1, n, 3, p=p)
+  mean_distance(g)
 }
 rr.pl.0.1 <- sapply(ring.size, try.rr.pl, p=0.1)
 plot(ring.size, rr.pl.0.1, type="b")
@@ -166,9 +166,9 @@ pause()
 
 ### Create the graph in the Watts-Strogatz paper
 ws.paper <- function(p, n=1000) {
-  g <- watts.strogatz.game(1, n, 10, p=p)
+  g <- sample_smallworld(1, n, 10, p=p)
   tr <- transitivity(g, type="localaverage")
-  pl <- average.path.length(g)
+  pl <- mean_distance(g)
   c(tr, pl)
 }
 

@@ -1,26 +1,32 @@
 \name{Hierarchical random graphs}
 \alias{HRG}
 \alias{hrg.consensus}
+\alias{consensus_tree}
 \alias{hrg.game}
+\alias{sample_hrg}
 \alias{hrg.create}
+\alias{hrg}
 \alias{hrg.predict}
+\alias{predict_edges}
 \alias{hrg.dendrogram}
+\alias{hrg_tree}
 \alias{hrg.fit}
+\alias{fit_hrg}
 \alias{print.igraphHRG}
 \alias{print.igraphHRGConsensus}
 \concept{Hierarchical random graphs}
 \title{Hierarchical random graphs}
 \description{Fitting and sampling hierarchical random graph models.}
 \usage{
-hrg.fit (graph, hrg = NULL, start = FALSE, steps = 0)
-hrg.consensus (graph, hrg = NULL, start = FALSE, num.samples = 10000)
+fit_hrg (graph, hrg = NULL, start = FALSE, steps = 0)
+consensus_tree (graph, hrg = NULL, start = FALSE, num.samples = 10000)
 
-hrg.create (graph, prob)
-hrg.dendrogram (hrg)
+hrg (graph, prob)
+hrg_tree (hrg)
 
-hrg.game (hrg)
+sample_hrg (hrg)
 
-hrg.predict (graph, hrg = NULL, start = FALSE, num.samples = 10000,
+predict_edges (graph, hrg = NULL, start = FALSE, num.samples = 10000,
              num.bins = 25)
 
 \method{print}{igraphHRG}(x, type=c("auto", "tree", "plain"),
@@ -31,9 +37,9 @@ hrg.predict (graph, hrg = NULL, start = FALSE, num.samples = 10000,
   \item{graph}{The graph to fit the model to. Edge directions are
     ignored in directed graphs.}
   \item{hrg}{A hierarchical random graph model, in the form of an
-    \code{igraphHRG} object. \code{hrg.fit} allows this to be
+    \code{igraphHRG} object. \code{fit_hrg} allows this to be
     \code{NULL}, in which case a random starting point is used for the
-    fitting. \code{hrg.consensus} and \code{hrg.predict} allow this to
+    fitting. \code{consensus_tree} and \code{predict_edges} allow this to
     be \code{NULL} as well, then a HRG is fitted to the graph first,
     from a random starting point.}
   \item{start}{Logical, whether to start the fitting/sampling from the
@@ -64,41 +70,41 @@ hrg.predict (graph, hrg = NULL, start = FALSE, num.samples = 10000,
  Please see references below for more about hierarchical random graphs. 
  
  igraph contains functions for fitting HRG models to a given network
- (\code{hrg.fit}, for generating networks from a given HRG
- ensemble (\code{hrg.game}), converting an igraph graph to a
- HRG and back (\code{hrg.create}, \code{hrg.dendrogram}),
+ (\code{fit_hrg}, for generating networks from a given HRG
+ ensemble (\code{sample_hrg}), converting an igraph graph to a
+ HRG and back (\code{hrg}, \code{hrg_tree}),
  for calculating a consensus tree from a set of sampled HRGs
- (\code{hrg.consensus}) and for predicting missing edges in a
- network based on its HRG models (\code{hrg.predict}). 
+ (\code{consensus_tree}) and for predicting missing edges in a
+ network based on its HRG models (\code{predict_edges}). 
  
  The igraph HRG implementation is heavily based on the code
  published by Aaron Clauset, at his website,
  \url{http://tuvalu.santafe.edu/~aaronc/hierarchy/}.
 
- \code{hrg.fit} fits a HRG to a given graph. It takes the specified
+ \code{fit_hrg} fits a HRG to a given graph. It takes the specified
  \code{steps} number of MCMC steps to perform the fitting, or a
  convergence criteria if the specified number of steps is
- zero. \code{hrg.fit} can start from a given HRG, if this is given in
+ zero. \code{fit_hrg} can start from a given HRG, if this is given in
  the \code{hrg} argument and the \code{start} argument is \code{TRUE}.
 
- \code{hrg.consensus} creates a consensus tree from several fitted
+ \code{consensus_tree} creates a consensus tree from several fitted
  hierarchical random graph models, using phylogeny methods. If the
  \code{hrg} argument is given and \code{start} is set to \code{TRUE},
  then it starts sampling from the given HRG. Otherwise it optimizes the
  HRG log-likelihood first, and then samples starting from the optimum.
 
- \code{hrg.create} creates a HRG from an igraph graph. The igraph graph
+ \code{hrg} creates a HRG from an igraph graph. The igraph graph
  must be a directed binary tree, with \eqn{n-1} internal and \eqn{n}
  leaf vertices. The \code{prob} argument contains the HRG probability
  labels for each vertex; these are ignored for leaf vertices.
 
- \code{hrg.dendrogram} creates the corresponsing igraph tree of a
+ \code{hrg_tree} creates the corresponsing igraph tree of a
  hierarchical random graph model.
 
- \code{hrg.game} samples a graph from a given hierarchical random graph
+ \code{sample_hrg} samples a graph from a given hierarchical random graph
  model.
 
- \code{hrg.predict} uses a hierarchical random graph model to predict
+ \code{predict_edges} uses a hierarchical random graph model to predict
  missing edges from a network. This is done by sampling hierarchical
  models around the optimum model, proportionally to their
  likelihood. The MCMC sampling is stated from \code{hrg}, if it is given
@@ -150,7 +156,7 @@ g3 -> g1 g2}
   edges), and it has two subgroups, \code{g1} and \code{g2}.
 }
 \value{
-  \code{hrg.fit} returns an \code{igraphHRG} object. This is a list with
+  \code{fit_hrg} returns an \code{igraphHRG} object. This is a list with
   the following members:
   \item{left}{Vector that contains the left children of the internal
     tree vertices. The first vertex is always the root vertex, so
@@ -170,7 +176,7 @@ g3 -> g1 g2}
   \item{vertices}{The number of vertices in the subtree below the
     given internal vertex, including itself.}
 
-  \code{hrg.consensus} returns a list of two objects. The first is an
+  \code{consensus_tree} returns a list of two objects. The first is an
   \code{igraphHRGConsensus} object, the second is an \code{igraphHRG}
   object. The \code{igraphHRGConsensus} object has the following
   members:
@@ -183,11 +189,11 @@ g3 -> g1 g2}
     internal vertices. The order is the same as in the \code{parents}
     vector.}
 
-  \code{hrg.create} returns an \code{igraphHRG} object.
+  \code{hrg} returns an \code{igraphHRG} object.
 
-  \code{hrg.dendrogram} returns an igraph graph.
+  \code{hrg_tree} returns an igraph graph.
 
-  \code{hrg.game} returns an igraph graph.
+  \code{sample_hrg} returns an igraph graph.
 }
 \references{
   A. Clauset, C. Moore, and M.E.J. Newman. Hierarchical structure and the
@@ -213,16 +219,16 @@ g3 -> g1 g2}
 
 \dontrun{
 ## A graph with two dense groups
-g <- erdos.renyi.game(10, p=1/2) + erdos.renyi.game(10, p=1/2)
-hrg <- hrg.fit(g)
+g <- sample_gnp(10, p=1/2) + sample_gnp(10, p=1/2)
+hrg <- fit_hrg(g)
 hrg
 
 ## The consensus tree for it
-hrg.consensus(g, hrg=hrg, start=TRUE)
+consensus_tree(g, hrg=hrg, start=TRUE)
 
 ## Prediction of missing edges
-g2 <- graph.full(4) + (graph.full(4) - path(1,2))
-hrg.predict(g2)
+g2 <- full_graph(4) + (full_graph(4) - path(1,2))
+predict_edges(g2)
 }
 }
 \keyword{graphs}

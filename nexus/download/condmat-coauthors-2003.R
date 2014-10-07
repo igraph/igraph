@@ -10,15 +10,15 @@ txt <- readLines(paste(sep="", tmp, "/cond-mat-2003.txt"))
 gml <- paste(sep="", tmp, "/cond-mat-2003.gml")
 
 library(igraph)
-g <- read.graph(gml, format="gml")
+g <- read_graph(gml, format="gml")
 
-g <- remove.vertex.attribute(g, "id")
+g <- delete_vertex_attr(g, "id")
 
 V(g)$name <- V(g)$label
-g <- remove.vertex.attribute(g, "label")
+g <- delete_vertex_attr(g, "label")
 
 E(g)$weight <- E(g)$value
-g <- remove.edge.attribute(g, "value")
+g <- delete_edge_attr(g, "value")
 
 g$name <- "Condensed matter collaborations, 2003"
 g$Author <- "Mark E. J. Newman"

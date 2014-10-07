@@ -8,16 +8,16 @@ pause <- function() {
 }
 
 ### Traditional approaches: degree, closeness, betweenness
-g <- graph.formula(Andre----Beverly:Diane:Fernando:Carol,
-                   Beverly--Andre:Diane:Garth:Ed,
-                   Carol----Andre:Diane:Fernando,
-                   Diane----Andre:Carol:Fernando:Garth:Ed:Beverly,
-                   Ed-------Beverly:Diane:Garth,
-                   Fernando-Carol:Andre:Diane:Garth:Heather,
-                   Garth----Ed:Beverly:Diane:Fernando:Heather,
-                   Heather--Fernando:Garth:Ike,
-                   Ike------Heather:Jane,
-                   Jane-----Ike )
+g <- graph_from_formula(Andre----Beverly:Diane:Fernando:Carol,
+               Beverly--Andre:Diane:Garth:Ed,
+               Carol----Andre:Diane:Fernando,
+               Diane----Andre:Carol:Fernando:Garth:Ed:Beverly,
+               Ed-------Beverly:Diane:Garth,
+               Fernando-Carol:Andre:Diane:Garth:Heather,
+               Garth----Ed:Beverly:Diane:Fernando:Heather,
+               Heather--Fernando:Garth:Ike,
+               Ike------Heather:Jane,
+               Jane-----Ike )
 
 pause()
 
@@ -67,13 +67,13 @@ plotG(g)
 pause()
 
 ### Eigenvector centrality
-V(g)$label <- paste(sep="\n", V(g)$name, round(evcent(g)$vector, 2))
+V(g)$label <- paste(sep="\n", V(g)$name, round(eigen_centrality(g)$vector, 2))
 plotG(g)
 
 pause()
 
 ### PageRank
-V(g)$label <- paste(sep="\n", V(g)$name, round(page.rank(g)$vector, 2))
+V(g)$label <- paste(sep="\n", V(g)$name, round(page_rank(g)$vector, 2))
 plotG(g)
 
 pause()
@@ -83,8 +83,8 @@ karate <- graph.famous("Zachary")
 cent <- list(`Degree`=degree(g),
              `Closeness`=closeness(g),
              `Betweenness`=betweenness(g),
-             `Eigenvector`=evcent(g)$vector,
-             `PageRank`=page.rank(g)$vector)
+             `Eigenvector`=eigen_centrality(g)$vector,
+             `PageRank`=page_rank(g)$vector)
 
 pause()
 
@@ -110,32 +110,32 @@ pause()
 ## pause()
 
 ## ### Is it a simple graph?
-## is.simple(jg)
+## is_simple(jg)
 
 ## pause()
 
 ## ### Is it connected?
-## is.connected(jg)
+## is_connected(jg)
 
 ## pause()
 
 ## ### How many components?
-## no.clusters(jg)
+## count_components(jg)
 
 ## pause()
 
 ## ### How big are these?
-## table(clusters(jg)$csize)
+## table(components(jg)$csize)
 
 ## pause()
 
 ## ### In-degree distribution
-## plot(degree.distribution(jg, mode="in"), log="xy")
+## plot(degree_distribution(jg, mode="in"), log="xy")
 
 ## pause()
 
 ## ### Out-degree distribution
-## plot(degree.distribution(jg, mode="out"), log="xy")
+## plot(degree_distribution(jg, mode="out"), log="xy")
 
 ## pause()
 
@@ -147,7 +147,7 @@ pause()
 ## pause()
 
 ## ### Density
-## graph.density(jg)
+## density(jg)
 
 ## pause()
 
@@ -157,26 +157,26 @@ pause()
 ## pause()
 
 ## ### Transitivity of a random graph of the same size
-## g <- erdos.renyi.game(vcount(jg), ecount(jg), type="gnm")
+## g <- sample_gnm(vcount(jg), ecount(jg))
 ## transitivity(g)
 
 ## pause()
 
 ## ### Transitivity of a random graph with the same degree distribution
-## g <- degree.sequence.game(degree(jg, mode="out"), degree(jg, mode="in"),
+## g <- sample_degseq(degree(jg, mode="out"), degree(jg, mode="in"),
 ##                           method="simple")
 ## transitivity(g)
 
 ## pause()
 
 ## ### Authority and Hub scores
-## AS <- authority.score(jg)$vector
-## HS <- hub.score(jg)$vector
+## AS <- authority_score(jg)$vector
+## HS <- hub_score(jg)$vector
 
 ## pause()
 
 ## ### Time evolution of authority scores
-## AS <- authority.score(jg)$vector
+## AS <- authority_score(jg)$vector
 ## center <- which.max(AS)
 ## startyear <- V(jg)[center]$year
 
@@ -187,7 +187,7 @@ pause()
 ##   print(y)
 ##   keep <- which(V(jg)$year <= y)
 ##   g2 <- subgraph(jg, keep)
-##   as <- abs(authority.score(g2, scale=FALSE)$vector)
+##   as <- abs(authority_score(g2, scale=FALSE)$vector)
 ##   w <- match(V(jg)[center]$usid, V(g2)$usid)
 ##   as[w]
 ## }

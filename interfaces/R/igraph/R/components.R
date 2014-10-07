@@ -23,8 +23,8 @@
 # Connected components, subgraphs, kinda
 ###################################################################
 
-no.clusters <- function(graph, mode=c("weak", "strong")) {
-  if (!is.igraph(graph)) {
+count_components <- function(graph, mode=c("weak", "strong")) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)
@@ -35,19 +35,19 @@ no.clusters <- function(graph, mode=c("weak", "strong")) {
         PACKAGE="igraph")
 }
 
-#' @rdname clusters
+#' @rdname components
 #' @param cumulative Logical, if TRUE the cumulative distirubution (relative
 #' frequency) is calculated.
 #' @param mul.size Logical. If TRUE the relative frequencies will be multiplied
 #' by the cluster sizes.
 
-cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
+component_distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
                                  ...) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   
-  cs <- clusters(graph, ...)$csize;
+  cs <- components(graph, ...)$csize;
   hi <- hist(cs, -1:max(cs), plot=FALSE)$density
   if (mul.size) {
     hi <- hi*1:max(cs)
@@ -62,8 +62,8 @@ cluster.distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
   res
 }
 
-is.connected <- function(graph, mode=c("weak", "strong")) {
-  if (!is.igraph(graph)) {
+is_connected <- function(graph, mode=c("weak", "strong")) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)
@@ -80,7 +80,7 @@ is.connected <- function(graph, mode=c("weak", "strong")) {
 #' 
 #' Creates a separate graph for each component of a graph.
 #' 
-#' 
+#' @aliases decompose.graph
 #' @param graph The original graph.
 #' @param mode Character constant giving the type of the components, wither
 #' \code{weak} for weakly connected components or \code{strong} for strongly
@@ -95,19 +95,19 @@ is.connected <- function(graph, mode=c("weak", "strong")) {
 #' isolate vertices.
 #' @return A list of graph objects.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{is.connected}} to decide whether a graph is connected,
-#' \code{\link{clusters}} to calculate the connected components of a graph.
+#' @seealso \code{\link{is_connected}} to decide whether a graph is connected,
+#' \code{\link{components}} to calculate the connected components of a graph.
 #' @keywords graphs
 #' @examples
 #' 
 #' # the diameter of each component in a random graph
-#' g <- erdos.renyi.game(1000, 1/1000)
-#' comps <- decompose.graph(g, min.vertices=2)
-#' sapply(comps, diameter)
+#' g <- sample_gnp(1000, 1/1000)
+#' components <- decompose(g, min.vertices=2)
+#' sapply(components, diameter)
 #' 
-decompose.graph <- function(graph, mode=c("weak", "strong"), max.comps=NA,
+decompose <- function(graph, mode=c("weak", "strong"), max.comps=NA,
                       min.vertices=0) {
-  if (!is.igraph(graph)) {
+  if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   mode <- igraph.match.arg(mode)

@@ -1,5 +1,6 @@
-\name{maximum.cardinality.search}
+\name{max_cardinality}
 \alias{maximum.cardinality.search}
+\alias{max_cardinality}
 \concept{maximum cardinality search}
 \concept{graph decomposition}
 \concept{chordal graph}
@@ -7,7 +8,7 @@
 \description{Maximum cardinality search is a simple ordering a vertices
   that is useful in determining the chordality of a graph.}
 \usage{
-maximum.cardinality.search(graph)
+max_cardinality(graph)
 }
 \arguments{
   \item{graph}{The input graph. It may be directed, but edge directions
@@ -19,7 +20,7 @@ maximum.cardinality.search(graph)
   visited. Ties are broken randomly.
 
   The algorithm provides a simple basis for deciding whether a graph is
-  chordal, see References below, and also \code{\link{is.chordal}}.
+  chordal, see References below, and also \code{\link{is_chordal}}.
 }
 \value{A list with two components:
   \item{alpha}{Numeric vector. The vertices ordered according to the maximum cardinality
@@ -31,19 +32,19 @@ maximum.cardinality.search(graph)
   of hypergraphs, and selectively reduce acyclic hypergraphs.
   \emph{SIAM Journal of Computation} 13, 566--579.}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{ \code{\link{is.chordal}} }
+\seealso{ \code{\link{is_chordal}} }
 \examples{
 ## The examples from the Tarjan-Yannakakis paper
-g1 <- graph.formula(A-B:C:I, B-A:C:D, C-A:B:E:H, D-B:E:F,
-                    E-C:D:F:H, F-D:E:G, G-F:H, H-C:E:G:I,
-                    I-A:H)
-maximum.cardinality.search(g1)
-is.chordal(g1, fillin=TRUE)
+g1 <- graph_from_formula(A-B:C:I, B-A:C:D, C-A:B:E:H, D-B:E:F,
+                E-C:D:F:H, F-D:E:G, G-F:H, H-C:E:G:I,
+                I-A:H)
+max_cardinality(g1)
+is_chordal(g1, fillin=TRUE)
 
-g2 <- graph.formula(A-B:E, B-A:E:F:D, C-E:D:G, D-B:F:E:C:G,
-                    E-A:B:C:D:F, F-B:D:E, G-C:D:H:I, H-G:I:J,
-                    I-G:H:J, J-H:I)
-maximum.cardinality.search(g2)
-is.chordal(g2, fillin=TRUE)
+g2 <- graph_from_formula(A-B:E, B-A:E:F:D, C-E:D:G, D-B:F:E:C:G,
+                E-A:B:C:D:F, F-B:D:E, G-C:D:H:I, H-G:I:J,
+                I-G:H:J, J-H:I)
+max_cardinality(g2)
+is_chordal(g2, fillin=TRUE)
 }
 \keyword{graphs}

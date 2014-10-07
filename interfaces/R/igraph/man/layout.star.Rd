@@ -1,4 +1,5 @@
-\name{layout.star}
+\name{layout_as_star}
+\alias{layout_as_star}
 \alias{layout.star}
 \concept{Graph layout}
 \title{Generate coordinates to place the vertices of a graph in a
@@ -8,7 +9,7 @@
   circle and the rest of the vertices equidistantly on the perimeter.
 }
 \usage{
-layout.star(graph, center = V(graph)[1], order = NULL)
+layout_as_star(graph, center = V(graph)[1], order = NULL)
 }
 \arguments{
   \item{graph}{The graph to layout.}
@@ -27,10 +28,10 @@ layout.star(graph, center = V(graph)[1], order = NULL)
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{layout}} and \code{\link{layout.drl}} for other
   layout algorithms, \code{\link{plot.igraph}} and \code{\link{tkplot}}
-  on how to plot graphs and \code{\link{graph.star}} on how to create
+  on how to plot graphs and \code{\link{star}} on how to create
   ring graphs.}
 \examples{
-g <- graph.star(10)
-layout.star(g)
+g <- star(10)
+layout_as_star(g)
 }
 \keyword{graphs}

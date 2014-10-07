@@ -1,11 +1,12 @@
-\name{graph.automorphisms}
+\name{automorphisms}
 \alias{graph.automorphisms}
+\alias{automorphisms}
 \concept{Graph automorphism}
 \title{Number of automorphisms}
 \description{Calculate the number of automorphisms of a graph,
   i.e. the number of isomorphisms to itself.}
 \usage{
-graph.automorphisms(graph, sh="fm")
+automorphisms(graph, sh="fm")
 }
 \arguments{
   \item{graph}{The input graph, it is treated as undirected.}
@@ -48,11 +49,11 @@ graph.automorphisms(graph, sh="fm")
 \author{ Tommi Juntilla (\url{http://users.ics.aalto.fi/tjunttil/)}
   for BLISS and Gabor Csardi \email{csardi.gabor@gmail.com} for the
   igraph glue code and this manual page.} 
-\seealso{\code{\link{canonical.permutation}}, \code{\link{permute.vertices}}}
+\seealso{\code{\link{canonical_permutation}}, \code{\link{permute}}}
 \examples{
 ## A ring has n*2 automorphisms, you can "turn" it by 0-9 vertices
 ## and each of these graphs can be "flipped"
-g <- graph.ring(10)
-graph.automorphisms(g)
+g <- ring(10)
+automorphisms(g)
 }
 \keyword{graphs}

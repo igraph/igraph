@@ -10,15 +10,15 @@ txt <- readLines(paste(sep="", tmp, "/celegansneural.txt"))
 gml <- paste(sep="", tmp, "/celegansneural.gml")
 
 library(igraph)
-g <- read.graph(gml, format="gml")
+g <- read_graph(gml, format="gml")
 
-g <- remove.vertex.attribute(g, "id")
+g <- delete_vertex_attr(g, "id")
 
 V(g)$name <- V(g)$label
-g <- remove.vertex.attribute(g, "label")
+g <- delete_vertex_attr(g, "label")
 
 E(g)$weight <- E(g)$value
-g <- remove.edge.attribute(g, "value")
+g <- delete_edge_attr(g, "value")
 
 g$name <- "C. Elegans neural network"
 g$Author <- "Duncan Watts and Steven Strogatz from original experimental

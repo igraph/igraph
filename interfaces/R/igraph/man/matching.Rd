@@ -1,7 +1,10 @@
 \name{graph.matching}
 \alias{is.matching}
+\alias{is_matching}
 \alias{is.maximal.matching}
+\alias{is_max_matching}
 \alias{maximum.bipartite.matching}
+\alias{max_bipartite_match}
 \concept{Matching}
 \concept{Maximal matching}
 \concept{Maximum bipartite matching}
@@ -11,9 +14,9 @@
   vertices. A matching is maximal if it is not a proper subset of any
   other matching.}
 \usage{
-is.matching(graph, matching, types = NULL)
-is.maximal.matching(graph, matching, types = NULL)
-maximum.bipartite.matching(graph, types = NULL, weights = NULL,
+is_matching(graph, matching, types = NULL)
+is_max_matching(graph, matching, types = NULL)
+max_bipartite_match(graph, types = NULL, weights = NULL,
        eps = .Machine$double.eps)
 }
 \arguments{
@@ -37,18 +40,18 @@ maximum.bipartite.matching(graph, types = NULL, weights = NULL,
     with no  weights, this argument is ignored.}
 }
 \details{
-  \code{is.matching} checks a matching vector and verifies whether its
+  \code{is_matching} checks a matching vector and verifies whether its
   length matches the number of vertices in the given graph, its values
   are between zero (inclusive) and the number of vertices (inclusive),
   and whether there exists a corresponding edge in the graph for every
   matched vertex pair. For bipartite graphs, it also verifies whether
   the matched vertices are in different parts of the graph.
 
-  \code{is.maximal.matching} checks whether a matching is maximal.
+  \code{is_max_matching} checks whether a matching is maximal.
   A matching is maximal if and only if there exists no unmatched vertex
   in a graph such that one of its neighbors is also unmatched.
 
-  \code{maximum.bipartite.matching} calculates a maximum matching in a
+  \code{max_bipartite_match} calculates a maximum matching in a
   bipartite graph. A matching in a bipartite graph is a partial
   assignment of vertices of the first kind to vertices of the second
   kind such that each vertex of the first kind is matched to at most one
@@ -65,10 +68,10 @@ maximum.bipartite.matching(graph, types = NULL, weights = NULL,
   graph.
 }
 \value{
-  \code{is.matching} and \code{is.maximal.matching} return a logical
+  \code{is_matching} and \code{is_max_matching} return a logical
   scalar.
 
-  \code{maximum.bipartite.matching} returns a list with components:
+  \code{max_bipartite_match} returns a list with components:
   \item{matching_size}{The size of the matching, i.e. the number of
     edges connecting the matched vertices.}
   \item{matching_weight}{The weights of the matching, if the graph was
@@ -81,24 +84,24 @@ maximum.bipartite.matching(graph, types = NULL, weights = NULL,
 % \references{}
 \author{Tamas Nepusz \email{ntamas@gmail.com}}
 \examples{
-g <- graph.formula( a-b-c-d-e-f )
+g <- graph_from_formula( a-b-c-d-e-f )
 m1 <- c("b", "a", "d", "c", "f", "e")   # maximal matching
 m2 <- c("b", "a", "d", "c", NA, NA)     # non-maximal matching
 m3 <- c("b", "c", "d", "c", NA, NA)     # not a matching
-is.matching(g, m1)
-is.matching(g, m2)
-is.matching(g, m3)
-is.maximal.matching(g, m1)
-is.maximal.matching(g, m2)
-is.maximal.matching(g, m3)
+is_matching(g, m1)
+is_matching(g, m2)
+is_matching(g, m3)
+is_max_matching(g, m1)
+is_max_matching(g, m2)
+is_max_matching(g, m3)
 
 V(g)$type <- c(FALSE,TRUE)
 str(g, v=TRUE)
-maximum.bipartite.matching(g)
+max_bipartite_match(g)
 
-g2 <- graph.formula( a-b-c-d-e-f-g )
+g2 <- graph_from_formula( a-b-c-d-e-f-g )
 V(g2)$type <- rep(c(FALSE,TRUE), length=vcount(g2))
 str(g2, v=TRUE)
-maximum.bipartite.matching(g2)
+max_bipartite_match(g2)
 }
 \keyword{graphs}

@@ -20,8 +20,8 @@ mat2 <- matrix(mat2, sqrt(length(mat2)), byrow=TRUE)
 diag(mat2) <- 0
 
 library(igraph)
-g1 <- graph.adjacency(mat1, mode="undirected", weighted=TRUE)
-g2 <- graph.adjacency(mat2, mode="directed", weighted=TRUE)
+g1 <- g_adj_matrix(mat1, mode="undirected", weighted=TRUE)
+g2 <- g_adj_matrix(mat2, mode="directed", weighted=TRUE)
 
 g1$name <- "Bernard & Killworth technical research group, BKTECB"
 g2$name <- "Bernard & Killworth technical research group, BKTECC"
