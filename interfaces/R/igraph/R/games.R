@@ -100,6 +100,7 @@
 #' @seealso \code{\link{sample_gnp}}
 #' @references Barabasi, A.-L. and Albert R. 1999. Emergence of scaling in
 #' random networks \emph{Science}, 286 509--512.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -195,6 +196,7 @@ sample_pa <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
 #' @seealso \code{\link{sample_gnm}}, \code{\link{sample_pa}}
 #' @references Erdos, P. and Renyi, A., On random graphs, \emph{Publicationes
 #' Mathematicae} 6, 290--297 (1959).
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -240,6 +242,7 @@ sample_gnp <- function(n, p, directed = FALSE, loops = FALSE) {
 #' @seealso \code{\link{sample_gnp}}, \code{\link{sample_pa}}
 #' @references Erdos, P. and Renyi, A., On random graphs, \emph{Publicationes
 #' Mathematicae} 6, 290--297 (1959).
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -303,6 +306,7 @@ sample_gnm <- function(n, m, directed = FALSE, loops = FALSE) {
 #' @seealso \code{\link{sample_pa}}
 #' @references Erdos, P. and Renyi, A., On random graphs, \emph{Publicationes
 #' Mathematicae} 6, 290--297 (1959).
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -329,6 +333,8 @@ erdos.renyi.game <- function(n, p.or.m, type=c("gnp", "gnm"),
   }
   res
 }
+
+#' @export
 
 random.graph.game <- erdos.renyi.game
 
@@ -380,6 +386,7 @@ random.graph.game <- erdos.renyi.game
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{sample_gnp}}, \code{\link{sample_pa}},
 #' \code{\link{simplify}} to get rid of the multiple and/or loops edges.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -449,6 +456,7 @@ sample_degseq <- function(out.deg, in.deg=NULL,
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{sample_pa}}, \code{\link{sample_gnp}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -555,6 +563,7 @@ sample_growing <- function(n, m=1, directed=TRUE, citation=FALSE) {
 #' @return A new graph.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{sample_pa}}, \code{\link{sample_gnp}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -657,6 +666,8 @@ sample_pa_age <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
   res
 }
 
+#' @export
+
 sample_traits_callaway <- function(nodes, types, edge.per.step=1,
                                  type.dist=rep(1, types),
                                  pref.matrix=matrix(1, types, types),
@@ -678,6 +689,8 @@ sample_traits_callaway <- function(nodes, types, edge.per.step=1,
   }
   res
 }
+
+#' @export
 
 sample_traits <- function(nodes, types, k=1, type.dist=rep(1, types),
                                pref.matrix=matrix(1, types, types),
@@ -722,6 +735,7 @@ sample_traits <- function(nodes, types, k=1, type.dist=rep(1, types),
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}, first version was
 #' written by Keith Briggs (\url{http://keithbriggs.info/}).
 #' @seealso \code{\link{sample_gnp}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -785,6 +799,7 @@ sample_grg <- function(nodes, radius, torus=FALSE, coords=FALSE) {
 #' \email{csardi.gabor@@gmail.com} for the R interface
 #' @seealso \code{\link{sample_traits}}.
 #' \code{\link{sample_traits_callaway}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -884,6 +899,7 @@ connect <- function(graph, order, mode=c("all", "out", "in", "total")) {
 #' generated graph.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -931,6 +947,7 @@ rewire.edges <- function(graph, prob, loops=FALSE, multiple=FALSE) {
 #' @seealso \code{\link{lattice}}, \code{\link{rewire.edges}}
 #' @references Duncan J Watts and Steven H Strogatz: Collective dynamics of
 #' \sQuote{small world} networks, Nature 393, 440-442, 1998.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -958,6 +975,8 @@ sample_smallworld <- function(dim, size, nei, p, loops=FALSE,
   res
 }
 
+#' @export
+
 sample_last_cit <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
                        directed=TRUE) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
@@ -972,6 +991,8 @@ sample_last_cit <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
   }
   res
 }
+
+#' @export
 
 sample_cit_types <- function(n, edges=1, types=rep(0, n),
                             pref=rep(1, length(types)),
@@ -989,6 +1010,8 @@ sample_cit_types <- function(n, edges=1, types=rep(0, n),
   }
   res
 }
+
+#' @export
 
 sample_cit_cit_types <- function(n, edges=1, types=rep(0, n),
                                    pref=matrix(1, nrow=length(types),
@@ -1042,6 +1065,7 @@ sample_cit_cit_types <- function(n, edges=1, types=rep(0, n),
 #' @return A bipartite igraph graph.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{sample_gnp}} for the unipartite version.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

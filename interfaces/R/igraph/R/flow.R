@@ -19,6 +19,8 @@
 #
 ###################################################################
 
+#' @export
+
 min_cut <- function(graph, source=NULL, target=NULL, capacity=NULL,
                          value.only=TRUE) {
 
@@ -124,6 +126,7 @@ min_cut <- function(graph, source=NULL, target=NULL, capacity=NULL,
 #' @references White, Douglas R and Frank Harary 2001. The Cohesiveness of
 #' Blocks In Social Networks: Node Connectivity and Conditional Density.
 #' \emph{Sociological Methodology} 31 (1) : 305-359.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -210,6 +213,7 @@ vertex_connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
 #' \code{\link{vertex_disjoint_paths}}, \code{\link{cohesion}}
 #' @references Douglas R. White and Frank Harary: The cohesiveness of blocks in
 #' social networks: node connectivity and conditional density, TODO: citation
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -244,6 +248,8 @@ edge_connectivity <- function(graph, source=NULL, target=NULL, checks=TRUE) {
   }
 }
 
+#' @export
+
 edge_disjoint_paths <- function(graph, source, target) {
 
   if (!is_igraph(graph)) {
@@ -256,6 +262,8 @@ edge_disjoint_paths <- function(graph, source, target) {
         PACKAGE="igraph")
 }
 
+#' @export
+
 vertex_disjoint_paths <- function(graph, source=NULL, target=NULL) {
 
   if (!is_igraph(graph)) {
@@ -267,6 +275,8 @@ vertex_disjoint_paths <- function(graph, source=NULL, target=NULL) {
         as.igraph.vs(graph, target)-1,
         PACKAGE="igraph")
 }
+
+#' @export
 
 adhesion <- function(graph, checks=TRUE) {
 
@@ -281,6 +291,7 @@ adhesion <- function(graph, checks=TRUE) {
 
 #' @rdname vertex_connectivity
 #' @method cohesion igraph
+#' @export
 
 cohesion.igraph <- function(x, checks=TRUE, ...) {
 

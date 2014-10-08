@@ -107,6 +107,7 @@
 #' 
 #' Aaron Clauset, Cosma R .Shalizi and Mark E.J. Newman: Power-law
 #' distributions in empirical data. SIAM Review 51(4):661-703, 2009.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -133,6 +134,8 @@ fit_power_law <- function(x, xmin=NULL, start=2, force.continuous=FALSE,
     power.law.fit.new(x, xmin=xmin, force.continuous=force.continuous)
   }
 }
+
+#' @export
 
 power.law.fit.old <- function(x, xmin=NULL, start=2, ...) {
 

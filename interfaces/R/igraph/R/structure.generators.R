@@ -1445,6 +1445,7 @@ kautz_graph <- function(m, n) {
 #' @seealso \code{\link{graph}} can create arbitrary graphs, see also the other
 #' functions on the its manual page for creating special graphs.
 #' @keywords graphs
+#' @export
 #' @examples
 #' 
 #' solids <- list(graph.famous("Tetrahedron"),

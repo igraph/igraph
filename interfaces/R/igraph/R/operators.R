@@ -91,6 +91,7 @@ rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
 #' @param \dots Graph objects or lists of graph objects.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -165,6 +166,8 @@ disjoint_union <- function(...) {
   
   res
 }
+
+#' @export
 
 "%du%" <- function(x,y) {
   disjoint_union(x,y)
@@ -298,6 +301,7 @@ disjoint_union <- function(...) {
 #' graphs are named.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -311,6 +315,8 @@ union <- function(..., byname="auto") {
   .igraph.graph.union.or.intersection("R_igraph_union", ..., byname=byname,
                                       keep.all.vertices=TRUE)
 }
+
+#' @export
 
 "%u%" <- function(x,y) {
   union(x,y)
@@ -354,6 +360,7 @@ union <- function(..., byname="auto") {
 #' appear in a subset of the input graphs.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -369,6 +376,8 @@ graph.intersection <- function(..., byname="auto",
                                       byname=byname,
                                       keep.all.vertices=keep.all.vertices)
 }
+
+#' @export
 
 "%s%" <- function(x,y) {
   graph.intersection(x,y)
@@ -406,6 +415,7 @@ graph.intersection <- function(..., byname="auto",
 #' but not both graphs are named.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -463,7 +473,9 @@ difference <- function(big, small, byname="auto") {
           PACKAGE="igraph")
   }
 }
-    
+
+#' @export
+
 "%m%" <- function(x,y) {
   difference(x,y)
 }
@@ -487,6 +499,7 @@ difference <- function(big, small, byname="auto") {
 #' @param loops Logical constant, whether to generate loop edges.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -563,6 +576,7 @@ complementer <- function(graph, loops=FALSE) {
 #' but not both graphs are named.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -637,25 +651,40 @@ compose <- function(g1, g2, byname="auto") {
   res
 }
 
+#' @export
+
 "%c%" <- function(x,y) {
   compose(x,y)
 }
+
+#' @export
 
 edge <- function(...) {
   structure(list(...), class="igraph.edge")
 }
 
+#' @export
+
 edges <- edge
+
+#' @export
 
 vertex <- function(...) {
   structure(list(...), class="igraph.vertex")
 }
 
+#' @export
+
 vertices <- vertex
+
+#' @export
 
 path <- function(...) {
   structure(list(...), class="igraph.path")
 }
+
+#' @method "+" igraph
+#' @export "+.igraph"
 
 `+.igraph` <- function(e1, e2) {
   if (!is_igraph(e1) && is_igraph(e2)) {
@@ -735,6 +764,9 @@ path <- function(...) {
   res
 }
 
+#' @method "-" igraph
+#' @export "-.igraph"
+ 
 `-.igraph` <- function(e1, e2) {
   if (missing(e2)) {
     stop("Non-numeric argument to negation operator")

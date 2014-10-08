@@ -33,6 +33,8 @@
 ## e(graph)$weight[1:10]           # get edge attribute
 ##
 
+#' @export
+
 graph_attr <- function(graph, name) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -45,6 +47,8 @@ graph_attr <- function(graph, name) {
   }
 }
 
+#' @export
+
 `graph_attr<-` <- function(graph, name, value) {
   if (missing(name)) {
     `graph.attributes<-`(graph, value)
@@ -52,6 +56,8 @@ graph_attr <- function(graph, name) {
     set_graph_attr(graph, name, value)
   }
 }
+
+#' @export
 
 set_graph_attr <- function(graph, name, value) {
   if (!is_igraph(graph)) {
@@ -62,6 +68,8 @@ set_graph_attr <- function(graph, name, value) {
         PACKAGE="igraph")
 }
 
+#' @export
+
 graph.attributes <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -69,6 +77,8 @@ graph.attributes <- function(graph) {
   .Call("R_igraph_mybracket2_copy", graph, 9L, 2L,
         PACKAGE="igraph")
 } 
+
+#' @export
 
 "graph.attributes<-" <- function(graph, value) {
   if (!is_igraph(graph)) {
@@ -82,6 +92,8 @@ graph.attributes <- function(graph) {
   .Call("R_igraph_mybracket2_set", graph, 9L, 2L, value,
         PACKAGE="igraph")
 }
+
+#' @export
 
 vertex_attr <- function(graph, name, index=V(graph)) {
   if (!is_igraph(graph)) {
@@ -97,6 +109,8 @@ vertex_attr <- function(graph, name, index=V(graph)) {
   }
 }
 
+#' @export
+
 `vertex_attr<-` <- function(graph, name, index = V(graph), value) {
   if (missing(name)) {
     `vertex.attributes<-`(graph, index = index, value = value)
@@ -104,6 +118,8 @@ vertex_attr <- function(graph, name, index=V(graph)) {
     set_vertex_attr(graph, name = name, index = index, value = value)
   }
 }
+
+#' @export
 
 set_vertex_attr <- function(graph, name, index=V(graph), value) {
   if (!is_igraph(graph)) {
@@ -125,6 +141,8 @@ set_vertex_attr <- function(graph, name, index=V(graph), value) {
   .Call("R_igraph_mybracket2_set", graph, 9L, 3L, vattrs, PACKAGE="igraph")
 }
 
+#' @export
+
 vertex.attributes <- function(graph, index = V(graph)) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -144,6 +162,8 @@ vertex.attributes <- function(graph, index = V(graph)) {
   }
   res
 }
+
+#' @export
 
 "vertex.attributes<-" <- function(graph, index = V(graph), value) {
   if (!is_igraph(graph)) {
@@ -180,6 +200,8 @@ vertex.attributes <- function(graph, index = V(graph)) {
         PACKAGE="igraph")
 }
 
+#' @export
+
 edge_attr <- function(graph, name, index=E(graph)) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -195,6 +217,8 @@ edge_attr <- function(graph, name, index=E(graph)) {
   }
 }
 
+#' @export
+
 `edge_attr<-` <- function(graph, name, index = E(graph), value) {
   if (missing(name)) {
     `edge.attributes<-`(graph, index = index, value = value)
@@ -202,6 +226,8 @@ edge_attr <- function(graph, name, index=E(graph)) {
     set_edge_attr(graph, name = name, index = index, value = value)
   }
 }
+
+#' @export
 
 set_edge_attr <- function(graph, name, index=E(graph), value) {
   if (!is_igraph(graph)) {
@@ -223,6 +249,8 @@ set_edge_attr <- function(graph, name, index=E(graph), value) {
   .Call("R_igraph_mybracket2_set", graph, 9L, 4L, eattrs, PACKAGE="igraph")
 }
 
+#' @export
+
 edge.attributes <- function(graph, index = E(graph)) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -242,6 +270,8 @@ edge.attributes <- function(graph, index = E(graph)) {
   }
   res
 }
+
+#' @export
 
 "edge.attributes<-" <- function(graph, index = E(graph), value) {
   if (!is_igraph(graph)) {
@@ -279,6 +309,8 @@ edge.attributes <- function(graph, index = E(graph)) {
         PACKAGE="igraph")
 }
 
+#' @export
+
 graph_attr_names <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -287,6 +319,8 @@ graph_attr_names <- function(graph) {
   if (is.null(res)) { res <- character() }
   res
 }
+
+#' @export
 
 vertex_attr_names <- function(graph) {
   if (!is_igraph(graph)) {
@@ -298,6 +332,8 @@ vertex_attr_names <- function(graph) {
   res
 }
 
+#' @export
+
 edge_attr_names <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -306,6 +342,8 @@ edge_attr_names <- function(graph) {
   if (is.null(res)) { res <- character() }
   res
 }
+
+#' @export
 
 delete_graph_attr <- function(graph, name) {
   if (!is_igraph(graph)) {
@@ -322,6 +360,8 @@ delete_graph_attr <- function(graph, name) {
   .Call("R_igraph_mybracket2_set", graph, 9L, 2L, gattr, PACKAGE="igraph")
 }
 
+#' @export
+
 delete_vertex_attr <- function(graph, name) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -336,6 +376,8 @@ delete_vertex_attr <- function(graph, name) {
   
   .Call("R_igraph_mybracket2_set", graph, 9L, 3L, vattr, PACKAGE="igraph")
 }
+
+#' @export
 
 delete_edge_attr <- function(graph, name) {
   if (!is_igraph(graph)) {
@@ -377,6 +419,7 @@ delete_edge_attr <- function(graph, name) {
 #' @param graph The input graph.
 #' @return A logical scalar.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -415,6 +458,7 @@ is_named <- function(graph) {
 #' @param graph The input graph.
 #' @return A logical scalar.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -431,6 +475,7 @@ is_weighted <- function(graph) {
 }
 
 #' @rdname bipartite_graph
+#' @export
 
 is_bipartite <- function(graph) {
   if (!is_igraph(graph)) {

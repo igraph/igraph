@@ -66,6 +66,8 @@
 #' \code{\link{igraph.plotting}} for the detailed description of the plotting
 #' parameters and \code{\link{tkplot}} and \code{\link{rglplot}} for other
 #' graph plotting functions.
+#' @method plot igraph
+#' @export plot.igraph
 #' @keywords graphs
 #' @examples
 #' 
@@ -413,7 +415,9 @@ plot.igraph <- function(x,
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{igraph.plotting}}, \code{\link{plot.igraph}} for the 2D
 #' version, \code{\link{tkplot}} for interactive graph drawing in 2D.
+#' @export
 #' @keywords graphs
+#' @export
 #' @examples
 #' 
 #' \dontrun{
@@ -424,6 +428,9 @@ plot.igraph <- function(x,
 #' 
 rglplot        <- function(x, ...)
   UseMethod("rglplot", x)
+
+#' @method rglplot igraph
+#' @export rglplot.igraph
 
 rglplot.igraph <- function(x, ...) {
 

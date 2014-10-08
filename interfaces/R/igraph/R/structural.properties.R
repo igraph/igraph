@@ -55,6 +55,7 @@
 #' \code{farthest_vertices}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{distances}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -93,6 +94,8 @@ diameter <- function(graph, directed=TRUE, unconnected=TRUE, weights=NULL) {
         PACKAGE="igraph")
 }
 
+#' @export
+
 get.diameter <- function(graph, directed=TRUE, unconnected=TRUE,
                          weights=NULL) {
 
@@ -115,6 +118,8 @@ get.diameter <- function(graph, directed=TRUE, unconnected=TRUE,
                PACKAGE="igraph")
   res + 1
 }
+
+#' @export
 
 farthest_vertices <- function(graph, directed=TRUE, unconnected=TRUE,
                            weights=NULL) {
@@ -139,6 +144,8 @@ farthest_vertices <- function(graph, directed=TRUE, unconnected=TRUE,
   res[1:2] <- res[1:2] + 1
   res
 }       
+
+#' @export
 
 mean_distance <- function(graph, directed=TRUE, unconnected=TRUE) {
 
@@ -179,6 +186,7 @@ mean_distance <- function(graph, directed=TRUE, unconnected=TRUE) {
 #' degree vertices, the second vertices with degree one, etc.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
+#' @export
 #' @examples
 #' 
 #' g <- ring(10)
@@ -210,6 +218,7 @@ degree <- function(graph, v=V(graph),
 #' @rdname degree
 #' @param cumulative Logical; whether the cumulative degree distribution is to
 #' be calculated.
+#' @export
 
 degree_distribution <- function(graph, cumulative=FALSE, ...) {
   
@@ -344,6 +353,7 @@ degree_distribution <- function(graph, cumulative=FALSE, ...) {
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @references West, D.B. (1996). \emph{Introduction to Graph Theory.} Upper
 #' Saddle River, N.J.: Prentice Hall.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -427,6 +437,7 @@ distances <- function(graph, v=V(graph), to=V(graph),
 #' not reached during the search will have zero in the corresponding entry of
 #' the vector. Note that the search terminates if all the vertices in \code{to}
 #' are reached.
+#' @export
 
 get.shortest.paths <- function(graph, from, to=V(graph),
                                mode=c("out", "all", "in"),
@@ -477,6 +488,8 @@ get.shortest.paths <- function(graph, from, to=V(graph),
 
   res
 }
+
+#' @export
 
 get.all.shortest.paths <- function(graph, from,
                                    to=V(graph),
@@ -533,6 +546,7 @@ get.all.shortest.paths <- function(graph, from,
 #' \code{v}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{components}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -581,6 +595,7 @@ subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
 #' form the subgraph.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -609,6 +624,7 @@ subgraph <- function(graph, v) {
 #' scratch. \sQuote{\code{auto}} chooses between the two implementations
 #' automatically, using heuristics based on the size of the original and the
 #' result graph.
+#' @export
 
 induced_subgraph <- function(graph, vids, impl=c("auto", "copy_and_delete", "create_from_scratch")) {
   # Argument checks
@@ -628,6 +644,7 @@ induced_subgraph <- function(graph, vids, impl=c("auto", "copy_and_delete", "cre
 #' @param eids The edge ids of the edges that will be kept in the result graph.
 #' @param delete.vertices Logical scalar, whether to remove vertices that do
 #' not have any adjacent edges in \code{eids}.
+#' @export
 
 subgraph.edges <- function(graph, eids, delete.vertices=TRUE) {
   # Argument checks
@@ -648,6 +665,7 @@ subgraph.edges <- function(graph, eids, delete.vertices=TRUE) {
 #' calculated.
 #' @param cutoff The maximum path length to consider when calculating the
 #' betweenness. If zero or negative then there is no such limit.
+#' @export
 
 estimate_betweenness <- function(graph, vids=V(graph), directed=TRUE, cutoff, weights=NULL, nobigint=TRUE) {
   # Argument checks
@@ -741,6 +759,7 @@ estimate_betweenness <- function(graph, vids=V(graph), directed=TRUE, cutoff, we
 #' 
 #' Ulrik Brandes, A Faster Algorithm for Betweenness Centrality. \emph{Journal
 #' of Mathematical Sociology} 25(2):163-177, 2001.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -852,6 +871,7 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
 #' Alain Barrat, Marc Barthelemy, Romualdo Pastor-Satorras, Alessandro
 #' Vespignani: The architecture of complex weighted networks, Proc. Natl. Acad.
 #' Sci. USA 101, 3747 (2004)
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1080,6 +1100,7 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
 #' and Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @references Burt, R.S. (2004). Structural holes and good ideas.
 #' \emph{American Journal of Sociology} 110, 349-399.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1136,6 +1157,7 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
 #' @return A numeric scalar between zero and one.
 #' @author Tamas Nepusz \email{ntamas@@gmail.com} and Gabor Csardi
 #' \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1176,6 +1198,7 @@ reciprocity <- function(graph, ignore.loops=TRUE,
 #' @author Tamas Nepusz \email{ntamas@@gmail.com} and Gabor Csardi
 #' \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{sample_degseq}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1330,6 +1353,7 @@ bonpow.sparse <- function(graph, nodes=V(graph), loops=FALSE,
 #' Bonacich, P.  (1987).  ``Power and Centrality: A Family of Measures.''
 #' \emph{American Journal of Sociology}, 92, 1170-1182.
 #' @keywords graphs
+#' @export
 #' @examples
 #' 
 #' # Generate some test data from Bonacich, 1987:
@@ -1511,6 +1535,7 @@ alpha.centrality.sparse <- function(graph, nodes=V(graph), alpha=1,
 #' @references Bonacich, P. and Paulette, L. (2001). ``Eigenvector-like
 #' measures of centrality for asymmetric relations'' \emph{Social Networks},
 #' 23, 191-201.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1564,6 +1589,7 @@ alpha_centrality <- function(graph, nodes=V(graph), alpha=1,
 #' to get rid of the multiple and/or loop edges.
 #' @references Wasserman, S., and Faust, K.  (1994).  Social Network Analysis:
 #' Methods and Applications.  Cambridge: Cambridge University Press.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1587,6 +1613,8 @@ density <- function(graph, loops=FALSE) {
   .Call("R_igraph_density", graph, as.logical(loops),
         PACKAGE="igraph")
 }
+
+#' @export
 
 ego_size <- function(graph, order, nodes=V(graph),
                               mode=c("all", "out", "in"), mindist=0) {
@@ -1651,6 +1679,7 @@ ego_size <- function(graph, order, nodes=V(graph),
 #' \code{connect} returns with a new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}, the first version was
 #' done by Vincent Matossian
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1690,6 +1719,7 @@ ego <- function(graph, order, nodes=V(graph),
 }
 
 #' @rdname ego
+#' @export
 
 ego_graph <- function(graph, order, nodes=V(graph),
                   mode=c("all", "out", "in"), mindist=0) {
@@ -1738,6 +1768,7 @@ ego_graph <- function(graph, order, nodes=V(graph),
 #' 
 #' Seidman S. B. (1983) Network structure and minimum degree, \emph{Social
 #' Networks}, 5, 269--287.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1786,6 +1817,7 @@ coreness <- function(graph, mode=c("all", "out", "in")) {
 #' @author Tamas Nepusz \email{ntamas@@gmail.com} and Gabor Csardi
 #' \email{csardi.gabor@@gmail.com} for the R interface
 #' @keywords graphs
+#' @export
 #' @examples
 #' 
 #' g <- barabasi.game(100)
@@ -1830,6 +1862,7 @@ topo_sort <- function(graph, mode=c("out", "all", "in")) {
 #' @references Alon Itai and Michael Rodeh: Finding a minimum circuit in a
 #' graph \emph{Proceedings of the ninth annual ACM symposium on Theory of
 #' computing}, 1-10, 1977
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1854,6 +1887,8 @@ girth <- function(graph, circle=TRUE) {
   .Call("R_igraph_girth", graph, as.logical(circle),
         PACKAGE="igraph")
 }
+
+#' @export
 
 which_loop <- function(graph, eids=E(graph)) {
 
@@ -1901,6 +1936,7 @@ which_loop <- function(graph, eids=E(graph)) {
 #' numeric vector.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{simplify}} to eliminate loop and multiple edges.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1936,6 +1972,8 @@ which_multiple <- function(graph, eids=E(graph)) {
   .Call("R_igraph_is_multiple", graph, as.igraph.es(graph, eids)-1,
         PACKAGE="igraph")
 }
+
+#' @export
 
 count_multiple <- function(graph, eids=E(graph)) {
 
@@ -2011,6 +2049,7 @@ count_multiple <- function(graph, eids=E(graph)) {
 #' \code{FALSE}, i.e. if their calculation is not requested.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{dfs}} for depth-first search.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -2129,6 +2168,7 @@ bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
 #' if their calculation is not requested.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{bfs}} for breadth-first search.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -2187,6 +2227,7 @@ dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
 
 #' @rdname betweenness
 #' @param e The edges for which the edge betweenness will be calculated.
+#' @export
 
 edge_betweenness <- function(graph, e=E(graph),
                              directed=TRUE, weights=NULL) {
@@ -2209,6 +2250,8 @@ edge_betweenness <- function(graph, e=E(graph),
         PACKAGE="igraph")
   res[as.numeric(e)]
 }
+
+#' @export
 
 estimate_edge_betweenness <- function(graph, e=E(graph),
                                       directed=TRUE, cutoff, weights=NULL) {
@@ -2278,6 +2321,7 @@ estimate_edge_betweenness <- function(graph, e=E(graph),
 #' vector is the number of clusters of size zero, so this is always zero.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{subcomponent}}, \code{\link{groups}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -2326,6 +2370,7 @@ components <- function(graph, mode=c("weak", "strong")) {
 #' a mapping from the vertices of the new graph to the vertices of the old
 #' graph.}
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -2390,6 +2435,7 @@ unfold_tree <- function(graph, mode=c("all", "out", "in", "total"), roots) {
 #' @seealso \code{\link{betweenness}}, \code{\link{degree}}
 #' @references Freeman, L.C. (1979). Centrality in Social Networks I:
 #' Conceptual Clarification. \emph{Social Networks}, 1, 215-239.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -2430,6 +2476,7 @@ closeness <- function(graph, vids=V(graph),
 #' @rdname closeness
 #' @param cutoff The maximum path length to consider when calculating the
 #' betweenness. If zero or negative then there is no such limit.
+#' @export
 
 estimate_closeness <- function(graph, vids=V(graph), mode=c("out", "in", "all", "total"), cutoff, weights=NULL, normalized=FALSE) {
   # Argument checks
@@ -2489,6 +2536,7 @@ estimate_closeness <- function(graph, vids=V(graph), mode=c("out", "in", "all", 
 #' matrix. The \code{Matrix} package is required for sparse matrices.
 #' @return A numeric matrix.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -2525,6 +2573,8 @@ laplacian_matrix <- function(graph, normalized=FALSE, weights=NULL,
   res
 }
 
+#' @keywords graphs
+ 
 is_matching <- function(graph, matching, types=NULL) {
   # Argument checks
   if (!is_igraph(graph)) { stop("Not a graph object") }
@@ -2545,6 +2595,8 @@ is_matching <- function(graph, matching, types=NULL) {
   res
 }
 
+#' @keywords graphs
+ 
 is_max_matching <- function(graph, matching, types=NULL) {
   # Argument checks
   if (!is_igraph(graph)) { stop("Not a graph object") }
@@ -2565,6 +2617,8 @@ is_max_matching <- function(graph, matching, types=NULL) {
   res
 }
 
+#' @keywords graphs
+ 
 max_bipartite_match <- function(graph, types=NULL, weights=NULL,
                                        eps=.Machine$double.eps) {
   # Argument checks

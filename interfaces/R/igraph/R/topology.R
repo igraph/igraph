@@ -20,6 +20,8 @@
 #
 ###################################################################
 
+#' @export
+
 graph.get.isomorphisms.vf2 <- function(graph1, graph2, vertex.color1,
                                        vertex.color2, edge.color1,
                                        edge.color2) {
@@ -82,6 +84,8 @@ graph.get.isomorphisms.vf2 <- function(graph1, graph2, vertex.color1,
   }
   res
 }
+
+#' @export
 
 graph.get.subisomorphisms.vf2 <- function(graph1, graph2, vertex.color1,
                                           vertex.color2, edge.color1,
@@ -146,6 +150,8 @@ graph.get.subisomorphisms.vf2 <- function(graph1, graph2, vertex.color1,
   res
 }
 
+#' @export
+
 graph.isoclass.subgraph <- function(graph, vids) {
   # Argument checks
   if (!is_igraph(graph)) { stop("Not a graph object") }
@@ -157,6 +163,8 @@ graph.isoclass.subgraph <- function(graph, vids) {
         PACKAGE="igraph")
   res
 }
+
+#' @export
 
 graph.subisomorphic.lad <- function(pattern, target, domains=NULL,
                                     induced=FALSE, map=TRUE, all.maps=FALSE,

@@ -43,6 +43,8 @@
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{tkplot}} for interactive plotting of graphs.
 #' @keywords graphs
+#' @export
+
 tkigraph <- function() {
 
   require(tcltk) || stop("tcl/tk library not available")

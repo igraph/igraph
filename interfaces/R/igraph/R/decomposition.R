@@ -63,6 +63,7 @@
 #' linear-time algorithms to test chordality of graphs, test acyclicity of
 #' hypergraphs, and selectively reduce acyclic hypergraphs.  \emph{SIAM Journal
 #' of Computation} 13, 566--579.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

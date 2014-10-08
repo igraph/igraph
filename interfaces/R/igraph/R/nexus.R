@@ -48,6 +48,8 @@ makeNexusDatasetInfo <- function(entries) {
   dsi
 }
 
+#' @method print nexusDatasetInfo
+
 print.nexusDatasetInfo <- function(x, ...) {
   ve <- strsplit(parseVE(x$`vertices/edges`), "/")[[1]]
   nc <- c("U", "-", "-", "-")
@@ -116,6 +118,8 @@ print.nexusDatasetInfo <- function(x, ...) {
   invisible(x)
 }
 
+#' @method summary nexusDatasetInfoList
+
 summary.nexusDatasetInfoList <- function(object, ...) {
   o <- as.numeric(attr(object, "offset"))
   s <- as.numeric(attr(object, "size"))
@@ -143,6 +147,8 @@ parseVE <- function(ve) {
   paste(v, sep="/", e)
 }
 
+#' @method print nexusDatasetInfoList
+#' 
 print.nexusDatasetInfoList <- function(x, ...) {
   summary(x)
   
@@ -194,6 +200,8 @@ nexus.format.result <- function(l, name="") {
   res
 }
 
+#' @export
+
 nexus_list <- function(tags=NULL, offset=0, limit=10,
                        operator=c("or", "and"),
                        order=c("date", "name", "popularity"),
@@ -220,6 +228,8 @@ nexus_list <- function(tags=NULL, offset=0, limit=10,
   nexus.format.result(l, name)
 }
 
+#' @export
+ 
 nexus_info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
 
   if (inherits(id, "nexusDatasetInfo")) {
@@ -252,6 +262,8 @@ nexus_info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
   return(res)
 }  
 
+#' @export
+
 nexus_get <- function(id, offset=0,
                       order=c("date", "name", "popularity"),
                       nexus.url=getIgraphOpt("nexus.url")) {
@@ -272,6 +284,8 @@ nexus_get <- function(id, offset=0,
   close(rdata)
   return(get(ls(env)[1], env))
 }
+
+#' @export
 
 nexus_search <- function(q, offset=0, limit=10,
                          order=c("date", "name", "popularity"),
@@ -294,6 +308,8 @@ nexus_search <- function(q, offset=0, limit=10,
 
   nexus.format.result(l, name=paste("q:", q))
 }
+
+#' @method "[" nexusDatasetInfoList
 
 `[.nexusDatasetInfoList` <- function(x, i) {
   res <- unclass(x)[i]

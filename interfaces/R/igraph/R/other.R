@@ -37,6 +37,7 @@
 #' ie. smaller than the length of \code{v}.
 #' @return A numeric vector of length \code{length(v)-binwidth+1}
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords manip
 #' @examples
 #' 
@@ -75,6 +76,7 @@ running_mean <- function(v, binwidth) {
 #' @references Jeffrey Scott Vitter: An Efficient Algorithm for Sequential
 #' Random Sampling, \emph{ACM Transactions on Mathematical Software}, 13/1,
 #' 58--67.
+#' @export
 #' @keywords datagen
 #' @examples
 #' 
@@ -138,6 +140,8 @@ igraph.i.spMatrix <- function(M) {
 #' will be converted to an integer.
 #' @return \code{NULL}, invisibly.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
+
 srand <- function(seed) {
   seed <- as.numeric(seed)
   if (length(seed) != 1) { stop("Length of `seed' must be 1") }

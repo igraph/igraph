@@ -23,6 +23,8 @@
 # Structure building
 ###################################################################
 
+#' @export
+
 add_edges <- function(graph, edges, ..., attr=list()) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -52,6 +54,8 @@ add_edges <- function(graph, edges, ..., attr=list()) {
 
   .Call("R_igraph_mybracket2_set", graph, 9L, 4L, eattrs, PACKAGE="igraph")
 }
+
+#' @export
 
 add_vertices <- function(graph, nv, ..., attr=list()) {
   if (!is_igraph(graph)) {
@@ -83,6 +87,8 @@ add_vertices <- function(graph, nv, ..., attr=list()) {
   .Call("R_igraph_mybracket2_set", graph, 9L, 3L, vattrs, PACKAGE="igraph")
 }
 
+#' @export
+
 delete_edges <- function(graph, edges) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -91,6 +97,8 @@ delete_edges <- function(graph, edges) {
   .Call("R_igraph_delete_edges", graph, as.igraph.es(graph, edges)-1,
         PACKAGE="igraph")
 }
+
+#' @export
 
 delete_vertices <- function(graph, v) {
   if (!is_igraph(graph)) {
@@ -104,7 +112,9 @@ delete_vertices <- function(graph, v) {
 ###################################################################
 # Structure query
 ###################################################################
-  
+
+#' @export
+
 gsize <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -113,7 +123,9 @@ gsize <- function(graph) {
   .Call("R_igraph_ecount", graph,
         PACKAGE="igraph")
 }
- 
+
+#' @export
+
 neighbors <- function(graph, v, mode=1) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -127,6 +139,8 @@ neighbors <- function(graph, v, mode=1) {
                PACKAGE="igraph")
   res+1
 }
+
+#' @export
 
 incident <- function(graph, v, mode=c("all", "out", "in", "total")) {
   if (!is_igraph(graph)) {
@@ -145,6 +159,8 @@ incident <- function(graph, v, mode=c("all", "out", "in", "total")) {
   res+1
 }  
 
+#' @export
+
 is_directed <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -153,6 +169,8 @@ is_directed <- function(graph) {
   .Call("R_igraph_is_directed", graph,
         PACKAGE="igraph")
 }
+
+#' @export
 
 get.edges <- function(graph, es) {
   if (!is_igraph(graph)) {
@@ -196,6 +214,7 @@ get.edges <- function(graph, es) {
 #' If there is no edge in the input graph for a given pair of vertices, then
 #' zero is reported. (If the \code{error} argument is \code{FALSE}.)
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

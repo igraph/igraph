@@ -1,4 +1,6 @@
 
+#' @export
+
 graphlet_basis <- function(graph, weights=NULL) {
   ## Argument checks
   if (!is_igraph(graph)) { stop("Not a graph object") }
@@ -22,6 +24,8 @@ graphlet_basis <- function(graph, weights=NULL) {
 
   res
 }
+
+#' @export
 
 graphlet_proj <- function(graph, weights=NULL, cliques, niter=1000,
                               Mu=rep(1, length(cliques))) {

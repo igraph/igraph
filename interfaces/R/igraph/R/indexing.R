@@ -54,6 +54,8 @@
 # - G[1:3,2,eid=TRUE]
 #               create an edge sequence
 
+#' @method "[" igraph
+#' @export "[.igraph"
 
 `[.igraph` <- function(x, i, j, ..., from, to,
                        sparse=getIgraphOpt("sparsematrices"),
@@ -108,6 +110,9 @@
   }
 }
 
+#' @method "[[" igraph
+#' @export "[[.igraph"
+
 `[[.igraph` <- function(x, i, j, ..., directed=TRUE,
                         edges=FALSE, exact=TRUE) {
   ## TODO: make it faster, don't need the whole list usually
@@ -139,6 +144,9 @@
     }
   }
 }
+
+#' @method "[<-" igraph
+#' @export "[<-.igraph"
 
 `[<-.igraph` <- function(x, i, j, ..., from, to,
                          attr=if (is_weighted(x)) "weight" else NULL,

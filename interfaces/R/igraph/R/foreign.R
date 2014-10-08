@@ -99,6 +99,8 @@ write.graph.fromraw <- function(buffer, file) {
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{write_graph}}
 #' @keywords graphs
+#' @export
+
 read_graph <- function(file, format=c("edgelist", "pajek", "ncol", "lgl",
                                "graphml", "dimacs", "graphdb", "gml", "dl"),
                        ...) {
@@ -152,6 +154,7 @@ read_graph <- function(file, format=c("edgelist", "pajek", "ncol", "lgl",
 #' @references Adai AT, Date SV, Wieland S, Marcotte EM. LGL: creating a map of
 #' protein function with an algorithm for visualizing very large biological
 #' networks. \emph{J Mol Biol.} 2004 Jun 25;340(1):179-90.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -491,6 +494,7 @@ write.graph.dot <- function(graph, file, ...) {
 #' @references M. De Santo, P. Foggia, C. Sansone, M. Vento: A large database
 #' of graphs and its use for benchmarking graph isomorphism algorithms,
 #' \emph{Pattern Recognition Letters}, Volume 24, Issue 8 (May 2003)
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

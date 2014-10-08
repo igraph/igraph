@@ -47,6 +47,7 @@
 #' \code{vcount(graph)} columns. Element \code{(i,j)} contains the cocitation
 #' or bibliographic coupling for vertices \code{v[i]} and \code{j}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -69,6 +70,8 @@ cocitation <- function(graph, v=V(graph)) {
   }
   res
 }
+
+#' @export
 
 bibcoupling <- function(graph, v=V(graph)) {
   if (!is_igraph(graph)) {

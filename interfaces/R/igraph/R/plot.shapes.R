@@ -74,6 +74,8 @@
 ##
 ###################################################################
 
+#' @export
+
 vertex.shapes <- function(shape=NULL) {
   if (is.null(shape)) {
     ls(.igraph.shapes)
@@ -82,6 +84,8 @@ vertex.shapes <- function(shape=NULL) {
     .igraph.shapes[[shape]]
   }
 }
+
+#' @export
 
 igraph.shape.noclip <- function(coords, el, params,
                                 end=c("both", "from", "to")) {
@@ -96,9 +100,13 @@ igraph.shape.noclip <- function(coords, el, params,
   }
 }
 
+#' @export
+
 igraph.shape.noplot <- function(coords, v=NULL, params) {
   invisible(NULL)
 }
+
+#' @export
 
 add_shape <- function(shape, clip=igraph.shape.noclip,
                       plot=igraph.shape.noplot,

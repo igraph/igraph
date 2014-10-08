@@ -141,6 +141,8 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
   res
 }
 
+#' @export
+
 as_adj <- function(graph, type=c("both", "upper", "lower"),
                           attr=NULL, edges=FALSE, names=TRUE, 
                           sparse=getIgraphOpt("sparsematrices")) {
@@ -154,7 +156,12 @@ as_adj <- function(graph, type=c("both", "upper", "lower"),
     get.adjacency.sparse(graph, type=type, attr=attr, edges=edges, names=names)
   }  
 }
+
+#' @export
+
 as_adjacency_matrix <- as_adj
+
+#' @export
 
 as_edgelist <- function(graph, names=TRUE) {
   if (!is_igraph(graph)) {
@@ -205,6 +212,7 @@ as_edgelist <- function(graph, names=TRUE) {
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{simplify}} for removing multiple and/or loop edges from
 #' a graph.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -252,6 +260,7 @@ as.directed <- function(graph, mode=c("mutual", "arbitrary")) {
 #' might be mapped to a single one in the new graph, and their attributes are
 #' combined. Please see \code{\link{attribute.combination}} for details on
 #' this.
+#' @export
 
 as.undirected <- function(graph, mode=c("collapse", "each", "mutual"), edge.attr.comb=getIgraphOpt("edge.attr.comb")) {
   # Argument checks
@@ -290,6 +299,7 @@ as.undirected <- function(graph, mode=c("collapse", "each", "mutual"), edge.attr
 #' @return A list of numeric vectors.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{as_edgelist}}, \code{\link{as_adj}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -314,6 +324,7 @@ as_adj_list <- function(graph, mode=c("all", "out", "in", "total")) {
 
 #' @rdname as_adj_list
 #' @aliases get.adjlist
+#' @export
 
 as_adj_edge_list <- function(graph, mode=c("all", "out", "in", "total")) {
   if (!is_igraph(graph)) {
@@ -329,6 +340,8 @@ as_adj_edge_list <- function(graph, mode=c("all", "out", "in", "total")) {
   if (is_named(graph)) names(res) <- V(graph)$name
   res
 }
+
+#' @export
 
 igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
                                  unlist.attrs=TRUE) {
@@ -383,6 +396,8 @@ igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
   
   g 
 }
+
+#' @export
 
 igraph.to.graphNEL <- function(graph) {
 
@@ -597,6 +612,7 @@ get.incidence.sparse <- function(graph, types, names, attr) {
 #' @return A sparse or dense matrix.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{graph_from_incidence_matrix}} for the opposite operation.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -630,6 +646,7 @@ as_incidence_matrix <- function(graph, types=NULL, attr=NULL,
 #' @param x An igraph object.
 #' @param what Character constant, whether to return info about vertices,
 #' edges, or both. The default is \sQuote{edges}.
+#' @export
 
 as_data_frame <- function(x, what=c("edges", "vertices", "both")) {
 

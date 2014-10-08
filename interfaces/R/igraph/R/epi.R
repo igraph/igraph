@@ -19,8 +19,13 @@
 #
 ###################################################################
 
+#' @export
+
 time_bins <- function(x, middle=TRUE)
   UseMethod("time_bins")
+
+#' @method time_bins sir
+#' @export time_bins.sir
 
 time_bins.sir <- function(x, middle=TRUE) {
   sir <- x
@@ -38,6 +43,10 @@ time_bins.sir <- function(x, middle=TRUE) {
   res
 }
 
+#' @importFrom stats median
+#' @method median sir
+#' @export median.sir
+
 median.sir <- function(x, na.rm=FALSE) {
   sir <- x
   if (!inherits(sir, "sir")) {
@@ -53,6 +62,10 @@ median.sir <- function(x, na.rm=FALSE) {
   NR <- tapply(big.N.NR, time.bin, median, na.rm=na.rm)
   list(NS=NS, NI=NI, NR=NR)
 }
+
+#' @importFrom stats quantile
+#' @method quantile sir
+#' @export quantile.sir
 
 quantile.sir <- function(x, comp=c("NI", "NS", "NR"), prob, ...) {
   sir <- x
@@ -118,6 +131,8 @@ quantile.sir <- function(x, comp=c("NI", "NS", "NR"), prob, ...) {
 #' @seealso \code{\link{sir}} for running the actual simulation.
 #' @references Bailey, Norman T. J. (1975). The mathematical theory of
 #' infectious diseases and its applications (2nd ed.). London: Griffin.
+#' @method plot sir
+#' @export plot.sir
 #' @keywords graphs
 #' @examples
 #' 

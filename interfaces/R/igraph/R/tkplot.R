@@ -133,6 +133,7 @@ assign(".next", 1, .tkplot.env)
 #' and \code{tk_rotate} return \code{NULL} invisibly.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{plot.igraph}}, \code{\link{layout}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -585,6 +586,7 @@ tkplot <- function(graph, canvas.width=450, canvas.height=450, ...) {
 ###################################################################
 
 #' @rdname tkplot
+#' @export
 
 tk_close <- function(tkp.id, window.close=TRUE) {
   if (window.close) {
@@ -599,6 +601,7 @@ tk_close <- function(tkp.id, window.close=TRUE) {
 }
 
 #' @rdname tkplot
+#' @export
 
 tk_off <- function() {
   eapply(.tkplot.env, function(tkp) { tkdestroy(tkp$top) })
@@ -607,6 +610,7 @@ tk_off <- function() {
 }
 
 #' @rdname tkplot
+#' @export
 
 tk_fit <- function(tkp.id, width=NULL, height=NULL) {
   tkp <- .tkplot.get(tkp.id)
@@ -636,6 +640,7 @@ tk_fit <- function(tkp.id, width=NULL, height=NULL) {
 }
 
 #' @rdname tkplot
+#' @export
 
 tk_center <- function(tkp.id) {
   tkp <- .tkplot.get(tkp.id)
@@ -660,6 +665,7 @@ tk_center <- function(tkp.id) {
 }
   
 #' @rdname tkplot
+#' @export
 
 tk_reshape <- function(tkp.id, newlayout, ...) {
   tkp <- .tkplot.get(tkp.id)
@@ -670,6 +676,7 @@ tk_reshape <- function(tkp.id, newlayout, ...) {
 }
 
 #' @rdname tkplot
+#' @export
 
 tk_postscript <- function(tkp.id) {
 
@@ -683,6 +690,7 @@ tk_postscript <- function(tkp.id) {
 }
 
 #' @rdname tkplot
+#' @export
 
 tk_coords <- function(tkp.id, norm=FALSE) {
   coords <- .tkplot.get(tkp.id, "coords")
@@ -699,6 +707,7 @@ tk_coords <- function(tkp.id, norm=FALSE) {
 }
 
 #' @rdname tkplot
+#' @export
 
 tk_set_coords <- function(tkp.id, coords) {
   stopifnot(is.matrix(coords), ncol(coords)==2)
@@ -708,6 +717,7 @@ tk_set_coords <- function(tkp.id, coords) {
 }
 
 #' @rdname tkplot
+#' @export
 
 tk_rotate <- function(tkp.id, degree=NULL, rad=NULL) {
   coords <- .tkplot.get(tkp.id, "coords")
@@ -733,6 +743,7 @@ tk_rotate <- function(tkp.id, degree=NULL, rad=NULL) {
 }
 
 #' @rdname tkplot
+#' @export
 
 tk_canvas <- function(tkp.id) {
   .tkplot.get(tkp.id)$canvas

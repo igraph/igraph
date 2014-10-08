@@ -19,9 +19,13 @@
 #
 ###################################################################
 
+#' @export
+
 arpack_defaults <- list(bmat="I", n=0, which="XX", nev=1, tol=0.0,
                               ncv=3, ldv=0, ishift=1, maxiter=3000, nb=1,
                               mode=1, start=0, sigma=0.0, sigmai=0.0)
+
+#' @export
 
 arpack <- function(func, extra=NULL, sym=FALSE, options=arpack_defaults,
                    env=parent.frame(), complex=!sym) {
@@ -104,6 +108,7 @@ arpack <- function(func, extra=NULL, sym=FALSE, options=arpack_defaults,
 #' @seealso \code{\link{eigen_centrality}}, \code{\link{page_rank}}
 #' @references Ernesto Estrada, Juan A. Rodriguez-Velazquez: Subgraph
 #' centrality in Complex Networks. \emph{Physical Review E} 71, 056103 (2005).
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -121,6 +126,8 @@ subgraph_centrality <- function(graph, diag=FALSE) {
   }
   res
 }
+
+#' @export
 
 eigen_defaults <- list(pos="LM", howmany=1L, il=-1L, iu=-1L,
                              vl=-Inf, vu=Inf, vestimate=0L,

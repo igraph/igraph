@@ -43,6 +43,7 @@
 #' \code{sparse} argument was \code{TRUE}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{as_adj}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -156,6 +157,7 @@ stochastic_matrix <- function(graph, column.wise=FALSE,
 #' Spectral Coarse Graining of Graphs. Submitted to \emph{SIAM Journal on
 #' Matrix Analysis and Applications}, 2008.
 #' \url{http://people.epfl.ch/david.morton}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -283,7 +285,7 @@ scg_group <- function(V, nt,
 #' Spectral Coarse Graining of Graphs. Submitted to \emph{SIAM Journal on
 #' Matrix Analysis and Applications}, 2008.
 #' \url{http://people.epfl.ch/david.morton}
-#' @keywords array graphs
+#' @export
 #' @examples
 #' 
 #' library(Matrix)
@@ -448,6 +450,7 @@ scg_semi_proj <- function(groups,
 #' Spectral Coarse Graining of Graphs. Submitted to \emph{SIAM Journal on
 #' Matrix Analysis and Applications}, 2008.
 #' \url{http://people.epfl.ch/david.morton}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -532,6 +535,8 @@ scg <- function(X, ev, nt, groups=NULL,
                 epairs=FALSE, stat.prob=FALSE)
   UseMethod("scg")
 
+#' @method scg igraph
+
 scg.igraph <- function(X, ev, nt, groups=NULL,
                        mtype=c("symmetric", "laplacian", "stochastic"),
                        algo=c("optimum", "interv_km", "interv",
@@ -550,6 +555,8 @@ scg.igraph <- function(X, ev, nt, groups=NULL,
         stat.prob=stat.prob)
 }
 
+#' @method scg matrix
+
 scg.matrix <- function(X, ev, nt, groups=NULL,
                        mtype=c("symmetric", "laplacian", "stochastic"),
                        algo=c("optimum", "interv_km", "interv",
@@ -567,6 +574,8 @@ scg.matrix <- function(X, ev, nt, groups=NULL,
         output=output, semproj=semproj, epairs=epairs,
         stat.prob=stat.prob)
 }
+
+#' @method scg.Matrix
 
 scg.Matrix <- function(X, ev, nt, groups=NULL,
                        mtype=c("symmetric", "laplacian", "stochastic"),

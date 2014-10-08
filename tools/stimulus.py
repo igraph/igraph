@@ -352,6 +352,9 @@ class RRCodeGenerator(CodeGenerator):
                 sys.exit(7)
             params[p].setdefault('mode', 'IN')
 
+        ## Roxygen to export the function
+        out.write("#' @export\n")
+
         ## Header
         ## do_par handles the translation of a single argument in the
         ## header. Pretty simple, the only difficulty is that we

@@ -4,8 +4,11 @@ context("add_edges")
 test_that("add_edges keeps edge id order", {
   library(igraph)
   g <- empty_graph(10)
-  g2 <- add_edges(g, (edges <- c(1,2, 2,3, 3,4, 1,6, 1,7, 9,10)) )
-  expect_equal(ecount(g2), length(edges)/2)
+  edges <- c(1,2, 2,3, 3,4, 1,6, 1,7, 9,10)
+  g2 <- add_edges(g, edges)
+  ec <- ecount(g2)
+  ec2 <- length(edges)/2
+  expect_equal(ec, ec2)
   expect_equal(get.edge.ids(g2, edges), seq_len(length(edges)/2))
 })
 

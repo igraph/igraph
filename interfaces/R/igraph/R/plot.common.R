@@ -210,6 +210,7 @@ igraph.check.shapes <- function(x) {
 #' @seealso \code{\link{igraph.plotting}} for all plotting parameters,
 #' \code{\link{plot.igraph}}, \code{\link{tkplot}} and \code{\link{rglplot}}
 #' for plotting functions.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

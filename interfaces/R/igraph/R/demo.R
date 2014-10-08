@@ -39,6 +39,7 @@
 #' @return Returns \code{NULL}, invisibly.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{demo}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

@@ -22,6 +22,8 @@
 
 .igraph.pb <- NULL
 
+#' @export
+
 .igraph.progress <- function(percent, message, clean=FALSE) {
   if (clean) {
     if (!is.null(.igraph.pb)) { close(.igraph.pb) }
@@ -37,6 +39,8 @@
             stop("Cannot interpret 'verbose' option, this should not happen"))
   }
 }
+
+#' @export
 
 .igraph.status <- function(message) {
   type <- getIgraphOpt("verbose")
@@ -236,6 +240,7 @@ close.igraphconsole <- function(con, ...) {
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{igraph.options}} and the \code{verbose} option.
 #' @keywords graphs
+#' @export
 
 console <- function() {
   oldverb <- getIgraphOpt("verbose")

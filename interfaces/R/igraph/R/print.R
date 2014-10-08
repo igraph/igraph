@@ -252,6 +252,9 @@
   cat(alstr, sep="\n")
 }
 
+#' @method str igraph
+#' @export str.igraph
+
 str.igraph <- function(object, ...) {
   print.igraph(object, full=TRUE, ...)
 }
@@ -315,8 +318,9 @@ str.igraph <- function(object, ...) {
 #' @param \dots Additional agruments.
 #' @return All these functions return the graph invisibly.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @keywords graphs
 #' @method print igraph
+#' @export print.igraph
+#' @keywords graphs
 #' @examples
 #' 
 #' g <- ring(10)
@@ -355,6 +359,7 @@ print.igraph <- function(x, full=getIgraphOpt("print.full"),
 
 #' @rdname print.igraph
 #' @method summary igraph
+#' @export summary.igraph
 
 summary.igraph <- function(object, ...) {
 

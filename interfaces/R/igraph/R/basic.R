@@ -31,6 +31,7 @@
 #' @return A logical constant, \code{TRUE} if argument \code{graph} is a graph
 #' object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -42,6 +43,8 @@ is_igraph <- function(graph){
   "igraph" %in% class(graph)
 }
 
+#' @export
+
 is_directed <- function(graph) {
 
   if (!is_igraph(graph)) {
@@ -51,6 +54,8 @@ is_directed <- function(graph) {
   .Call("R_igraph_is_directed", graph,
         PACKAGE="igraph")
 }
+
+#' @export
 
 get.edge <- function(graph, id) {
 

@@ -41,6 +41,7 @@
 #' @return A numeric matrix with two or three columns.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
+#' @export
 
 layout_randomly <- function(graph, dim=2) {
   if (!is_igraph(graph)) {
@@ -76,6 +77,7 @@ layout_randomly <- function(graph, dim=2) {
 #' @return A numeric matrix with two columns, and one row for each vertex.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
+#' @export
 #' @examples
 #' 
 #' ## Place vertices on a circle, order them according to their
@@ -119,6 +121,7 @@ layout_in_circle <- function(graph, order=V(graph)) {
 #' @return A numeric matrix with three columns, and one row for each vertex.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
+#' @export
 
 layout_on_sphere <- function(graph) {
   if (!is_igraph(graph)) {
@@ -172,6 +175,7 @@ layout_on_sphere <- function(graph) {
 #' @author Michael Schmuhl for the original graphopt code, rewritten and
 #' wrapped by Gabor Csardi \email{csardi.gabor@@gmail.com}.
 #' @keywords graphs
+#' @export
 
 layout_with_graphopt <- function(graph, start=NULL, niter=500, charge=0.001,
                             mass=30, spring.length=0, spring.constant=1,
@@ -225,6 +229,8 @@ layout_with_graphopt <- function(graph, start=NULL, niter=500, charge=0.001,
 #' @return A numeric matrix with two columns and as many rows as vertices.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
+#' @export
+
 layout_with_lgl <- function(graph, maxiter=150, maxdelta=vcount(graph),
                        area=vcount(graph)^2, coolexp=1.5,
                        repulserad=area * vcount(graph),
@@ -290,6 +296,7 @@ layout_with_lgl <- function(graph, maxiter=150, maxdelta=vcount(graph),
 #' @references Reingold, E and Tilford, J (1981). Tidier drawing of trees.
 #' \emph{IEEE Trans. on Softw. Eng.}, SE-7(2):223--228.
 #' @keywords graphs
+#' @export
 #' @examples
 #' 
 #' tree <- tree(20, 3)
@@ -360,6 +367,7 @@ layout_as_tree <- function(graph, root=numeric(), circular=FALSE,
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{plot.igraph}}, \code{\link{tkplot}},
 #' \code{\link{layout}}, \code{\link{disjoint_union}}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -407,6 +415,7 @@ merge_coords <- function(graphs, layouts, method="dla") {
 #' are \code{NULL} then no normalization is performed along this direction.
 #' @return A numeric matrix with at the same dimension as \code{layout}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 
 norm_coords <- function(layout, xmin=-1, xmax=1, ymin=-1, ymax=1,
@@ -449,6 +458,7 @@ norm_coords <- function(layout, xmin=-1, xmax=1, ymin=-1, ymax=1,
 #' @rdname merge_coords
 #' @aliases piecewise.layout
 #' @param graph The input graph.
+#' @export
 
 layout_components <- function(graph, layout=layout_with_kk, ...) {
 
@@ -537,6 +547,7 @@ layout_components <- function(graph, layout=layout_with_kk, ...) {
 #' @references See the following technical report: Martin, S., Brown, W.M.,
 #' Klavans, R., Boyack, K.W., DrL: Distributed Recursive (Graph) Layout. SAND
 #' Reports, 2008. 2936: p. 1-10.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -581,6 +592,8 @@ layout_with_drl <- function(graph, use.seed = FALSE,
     res
 }
 
+#' @export
+
 igraph.drl.default <- list(edge.cut=32/40,
                            init.iterations=0,
                            init.temperature=2000,
@@ -606,6 +619,8 @@ igraph.drl.default <- list(edge.cut=32/40,
                            simmer.temperature=250,
                            simmer.attraction=.5,
                            simmer.damping.mult=0)
+
+#' @export
 
 igraph.drl.coarsen <- list(edge.cut=32/40,
                            init.iterations=0,
@@ -633,6 +648,8 @@ igraph.drl.coarsen <- list(edge.cut=32/40,
                            simmer.attraction=.5,
                            simmer.damping.mult=0)
 
+#' @export
+
 igraph.drl.coarsest <- list(edge.cut=32/40,
                             init.iterations=0,
                             init.temperature=2000,
@@ -658,6 +675,8 @@ igraph.drl.coarsest <- list(edge.cut=32/40,
                             simmer.temperature=250,
                             simmer.attraction=.5,
                             simmer.damping.mult=0)
+
+#' @export
 
 igraph.drl.refine <- list(edge.cut=32/40,
                           init.iterations=0,
@@ -685,6 +704,8 @@ igraph.drl.refine <- list(edge.cut=32/40,
                           simmer.attraction=.5,
                           simmer.damping.mult=0)
 
+#' @export
+
 igraph.drl.final <- list(edge.cut=32/40,
                          init.iterations=0,
                          init.temperature=50,
@@ -710,6 +731,8 @@ igraph.drl.final <- list(edge.cut=32/40,
                          simmer.temperature=250,
                          simmer.attraction=.5,
                          simmer.damping.mult=0)
+
+#' @export
 
 drl_defaults <- list(
   coarsen = igraph.drl.coarsen,
@@ -744,6 +767,7 @@ drl_defaults <- list(
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{plot.igraph}}
 #' @keywords graphs
+#' @export
 
 layout_nicely <- function(graph, dim=2, ...) {
 
@@ -836,6 +860,7 @@ layout_nicely <- function(graph, dim=2, ...) {
 #' @references K. Sugiyama, S. Tagawa and M. Toda, "Methods for Visual
 #' Understanding of Hierarchical Systems". IEEE Transactions on Systems, Man
 #' and Cybernetics 11(2):109-125, 1981.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1097,6 +1122,7 @@ layout_nicely <- function(graph, dim=2, ...) {
 #' @seealso \code{\link{layout}}, \code{\link{plot.igraph}}
 #' @references Cox, T. F. and Cox, M. A. A. (2001) \emph{Multidimensional
 #' Scaling}.  Second edition. Chapman and Hall.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1172,6 +1198,7 @@ layout_with_mds <- function(graph, dist=NULL, dim=2,
 #' @references Fruchterman, T.M.J. and Reingold, E.M. (1991). Graph Drawing by
 #' Force-directed Placement. \emph{Software - Practice and Experience},
 #' 21(11):1129-1164.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1303,6 +1330,7 @@ layout_with_fr <- function(graph, coords=NULL, dim=2,
 #' \code{\link{tkplot}}
 #' @references Kamada, T. and Kawai, S.: An Algorithm for Drawing General
 #' Undirected Graphs. \emph{Information Processing Letters}, 31/1, 7--15, 1989.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1404,6 +1432,7 @@ layout_with_kk <- function(graph, coords=NULL, dim=2,
 #' @references Arne Frick, Andreas Ludwig, Heiko Mehldau: A Fast Adaptive
 #' Layout Algorithm for Undirected Graphs, \emph{Proc. Graph Drawing 1994},
 #' LNCS 894, pp. 388-403, 1995.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1488,6 +1517,7 @@ layout_with_gem <- function(graph, coords=NULL, maxiter=40*vcount(graph)^2,
 #' \code{\link{layout_with_kk}} for other layout algorithms.
 #' @references Ron Davidson, David Harel: Drawing Graphs Nicely Using Simulated
 #' Annealing. \emph{ACM Transactions on Graphics} 15(4), pp. 301-331, 1996.
+#' @export
 #' @examples
 #' 
 #' set.seed(42)
@@ -1576,6 +1606,8 @@ layout_with_dh <- function(graph, coords=NULL, maxiter=10,
   res
 }
 
+#' @export
+
 layout_on_grid <- function(graph, width = 0, height = 0, dim = 2) {
   # Argument checks
   if (!is_igraph(graph)) { stop("Not a graph object") }
@@ -1596,6 +1628,8 @@ layout_on_grid <- function(graph, width = 0, height = 0, dim = 2) {
 
   res
 }
+
+#' @export
 
 layout.grid.3d <- function(graph, width=0, height=0) {
   .Deprecated("layout_on_grid", msg = paste0("layout.grid.3d is deprecated from\n",

@@ -20,6 +20,8 @@
 #
 ###################################################################
 
+#' @export
+
 motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
 
   if (!is_igraph(graph)) {
@@ -39,6 +41,8 @@ motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
   res
 }
 
+#' @export
+
 count_motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
 
   if (!is_igraph(graph)) {
@@ -55,6 +59,8 @@ count_motifs <- function(graph, size=3, cut.prob=rep(0, size)) {
         as.numeric(cut.prob),
         PACKAGE="igraph")
 }
+
+#' @export
 
 sample_motifs <- function(graph, size=3, cut.prob=rep(0, size),
                              sample.size=vcount(graph)/10, sample=NULL) {

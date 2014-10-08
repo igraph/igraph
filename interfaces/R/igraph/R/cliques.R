@@ -69,6 +69,7 @@
 #' @references For maximal cliques the following algorithm is implemented:
 #' David Eppstein, Maarten Loffler, Darren Strash: Listing All Maximal Cliques
 #' in Sparse Graphs in Near-optimal Time.  \url{http://arxiv.org/abs/1006.5440}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -101,6 +102,8 @@ cliques <- function(graph, min=NULL, max=NULL) {
   lapply(res, function(x) x+1)
 }
 
+#' @export
+
 largest_cliques <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -123,6 +126,7 @@ largest_cliques <- function(graph) {
 #' it exists, then it will be overwritten.) Each clique will be a separate line
 #' in the file, given with the numeric ids of its vertices, separated by
 #' whitespace.
+#' @export
 
 max_cliques <- function(graph, min=NULL, max=NULL,
                             subset=NULL, file=NULL) {
@@ -164,6 +168,8 @@ max_cliques <- function(graph, min=NULL, max=NULL,
   }
 }
 
+#' @export
+
 count_max_cliques <- function(graph, min=NULL, max=NULL,
                                   subset=NULL) {
   # Argument checks
@@ -185,6 +191,8 @@ count_max_cliques <- function(graph, min=NULL, max=NULL,
 
   res
 }
+
+#' @export
 
 clique_num <- function(graph) {
   if (!is_igraph(graph)) {
@@ -246,6 +254,7 @@ clique_num <- function(graph) {
 #' @references S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new
 #' algorithm for generating all the maximal independent sets. \emph{SIAM J
 #' Computing}, 6:505--517, 1977.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -280,6 +289,8 @@ ivs <- function(graph, min=NULL, max=NULL) {
   lapply(res, function(x) x+1)
 }
 
+#' @export
+
 largest_ivs <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object");
@@ -291,6 +302,8 @@ largest_ivs <- function(graph) {
   lapply(res, function(x) x+1)
 }
 
+#' @export
+
 maximal_ivs <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object");
@@ -301,6 +314,8 @@ maximal_ivs <- function(graph) {
                PACKAGE="igraph")
   lapply(res, function(x) x+1)
 }
+
+#' @export
 
 ivs_size <- function(graph) {
   if (!is_igraph(graph)) {

@@ -37,6 +37,8 @@
 #' package.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
+#' @export
+
 igraph_test <- function() {
   do.call(require, list("testthat"))
   tdir <- system.file("tests", package="igraph")
@@ -61,13 +63,13 @@ igraph_test <- function() {
 #' @return A character scalar, the igraph version string.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
+#' @export
 #' @examples
 #' 
 #' ## Compare to the package version
 #' packageDescription("igraph")$Version
 #' igraph_version()
-#' 
-#' 
+
 igraph_version <- function() {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_version", PACKAGE="igraph")

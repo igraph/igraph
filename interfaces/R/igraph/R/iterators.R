@@ -24,6 +24,8 @@
 # Constructors
 ###################################################################
 
+#' @export
+
 V <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -36,6 +38,8 @@ V <- function(graph) {
   attr(res, "env") <- ne
   res
 }
+
+#' @export
 
 E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   if (!is_igraph(graph)) {
@@ -68,6 +72,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   res
 }
 
+#' @method "[[" igraph.vs
+#' @export "[[.igraph.vs"
+
 "[[.igraph.vs" <- function(x, i) {
   if (length(i) != 1) {
     stop("Invalid `[[` indexing, need single vertex")
@@ -84,6 +91,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   attr(res, "single") <- TRUE
   res
 }
+
+#' @method "[" igraph.vs
+#' @export "[.igraph.vs"
 
 "[.igraph.vs" <- function(x, i) {
   i <- substitute(i)
@@ -178,6 +188,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   res
 }
 
+#' @method "[[" igraph.es
+#' @export "[[.igraph.es"
+
 "[[.igraph.es" <- function(x, i) {
   if (length(i) != 1) {
     stop("Invalid `[[` indexing, need single edge")
@@ -194,6 +207,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   attr(res, "single") <- TRUE
   res
 }
+
+#' @method "[" igraph.es
+#' @export "[.igraph.es"
 
 "[.igraph.es" <- function(x, i) {
   i <- substitute(i)
@@ -261,6 +277,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   res
 } 
 
+#' @export
+
 "%--%" <- function(f, t) {  
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
@@ -269,6 +287,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   t <- as.igraph.vs(graph, t)-1
   (from %in% f & to %in% t) | (to %in% f & from %in% t)
 }
+
+#' @export
 
 "%->%" <- function(f, t) {
   from <- get(".igraph.from", parent.frame())
@@ -283,6 +303,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   }
 }
 
+#' @export
+
 "%<-%" <- function(t, value) {
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
@@ -296,7 +318,10 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   }
 }
 
-"[<-.igraph.vs" <- "[[<-.igraph.vs" <- function(x, i, value) {
+#' @method "[[<-" igraph.vs
+#' @export "[[<-.igraph.vs"
+
+"[[<-.igraph.vs" <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
@@ -304,7 +329,15 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   value
 }
 
-"[<-.igraph.es" <- "[[<-.igraph.es" <- function(x, i, value) {
+#' @method "[<-" igraph.vs
+#' @export "[<-.igraph.vs"
+
+"[<-.igraph.vs" <-  `[[<-.igraph.vs`
+
+#' @method "[[<-" igraph.es
+#' @export "[[<-.igraph.es"
+
+"[[<-.igraph.es" <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
@@ -312,14 +345,28 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   value
 }  
 
+#' @method "[<-" igraph.es
+#' @export "[<-.igraph.es"
+
+"[<-.igraph.es" <-  `[[<-.igraph.es`
+
+#' @method "$" igraph
+#' @export "$.igraph"
+
 "$.igraph" <- function(x, name) {
   graph_attr(x, name)
 }
 
+#' @method "$<-" igraph
+#' @export "$<-.igraph"
+
 "$<-.igraph" <- function(x, name, value) {
   set_graph_attr(x, name, value)
 }
-  
+
+#' @method "$" igraph.vs
+#' @export "$.igraph.vs"
+
 "$.igraph.vs" <- function(x, name) {
   res <- vertex_attr(get("graph", attr(x, "env")), name, x)
   if ("single" %in% names(attributes(x)) && attr(x, "single")) {
@@ -328,6 +375,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     res
   }
 }
+#' @method "$" igraph.es
+#' @export "$.igraph.es"
 
 "$.igraph.es" <- function(x, name) {
   res <- edge_attr(get("graph", attr(x, "env")), name, x)
@@ -338,17 +387,25 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   }
 }
 
+#' @method "$<-" igraph.vs
+#' @export "$<-.igraph.vs"
+
 "$<-.igraph.vs" <- function(x, name, value) {
   attr(x, "name") <- name
   attr(x, "value") <- value
   x
 }
 
+#' @method "$<-" igraph.es
+#' @export "$<-.igraph.es"
+
 "$<-.igraph.es" <- function(x, name, value) {
   attr(x, "name") <- name
   attr(x, "value") <- value
   x
 }
+
+#' @export
 
 "V<-" <- function(x, value) {
   if (!is_igraph(x)) {
@@ -362,6 +419,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                        value=attr(value, "value"))
 }
 
+#' @export
+
 "E<-" <- function(x, path=NULL, P=NULL, directed=NULL, value) {
   if (!is_igraph(x)) {
     stop("Not a graph object")
@@ -374,6 +433,9 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                      value=attr(value, "value"))
 }
 
+#' @method print igraph.vs
+#' @export print.igraph.vs
+
 print.igraph.vs <- function(x, ...) {
   cat("Vertex sequence:\n")
   graph <- get("graph", attr(x, "env"))
@@ -383,6 +445,9 @@ print.igraph.vs <- function(x, ...) {
   }
   print(x)
 }
+
+#' @method print igraph.es
+#' @export print.igraph.es
 
 print.igraph.es <- function(x, ...) {
   cat("Edge sequence:\n")

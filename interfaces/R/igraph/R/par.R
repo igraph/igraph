@@ -58,6 +58,8 @@ igraph.pars.callbacks <- list("verbose"=igraph.pars.set.verbose)
 
 ## This is based on 'sm.options' in the 'sm' package
 
+#' @export
+
 igraph.options <- function(...) {
   if (nargs() == 0) return(.igraph.pars)
   current <- .igraph.pars
@@ -83,6 +85,8 @@ igraph.options <- function(...) {
   invisible(current)
 }
 
+#' @export
+
 getIgraphOpt <- function(x, default=NULL) {
   if (missing(default)) 
     return(igraph.options(x)[[1L]])
@@ -92,6 +96,7 @@ getIgraphOpt <- function(x, default=NULL) {
 }
 
 ## This is deprecated from 0.6
+#' @export
 
 igraph.par <- function(parid, parvalue=NULL) {
 

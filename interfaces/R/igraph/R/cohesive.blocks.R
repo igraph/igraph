@@ -187,6 +187,7 @@
 #' @references J. Moody and D. R. White. Structural cohesion and embeddedness:
 #' A hierarchical concept of social groups. \emph{American Sociological
 #' Review}, 68(1):103--127, Feb 2003.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -254,40 +255,49 @@ cohesive_blocks <- function(graph, labels=TRUE) {
 }
 
 #' @rdname cohesive_blocks
-
+#' @method length cohesiveBlocks
+#' @export
+ 
 length.cohesiveBlocks <- function(x) {
   length(x$blocks)
 }
 
 #' @rdname cohesive_blocks
+#' @export
 
 blocks <- function(blocks) {
   blocks$blocks
 }
 
 #' @rdname cohesive_blocks
+#' @export
 
 graphs_from_cohesive_blocks <- function(blocks, graph) {
   lapply(blocks(blocks), induced_subgraph, graph=graph)
 }
+
+#' @export
 
 cohesion <- function(x, ...)
   UseMethod("cohesion")
 
 #' @rdname cohesive_blocks
 #' @method cohesion cohesiveBlocks
+#' @export
 
 cohesion.cohesiveBlocks <- function(x, ...) {
   x$cohesion
 }
 
 #' @rdname cohesive_blocks
+#' @export
 
 hierarchy <- function(blocks) {
   blocks$blockTree
 }
 
 #' @rdname cohesive_blocks
+#' @export
 
 parent <- function(blocks) {
   blocks$parent
@@ -348,7 +358,8 @@ summary.cohesiveBlocks <- function(object, ...) {
 }
 
 #' @rdname cohesive_blocks
-
+#' @method plot cohesiveBlocks
+ 
 plot.cohesiveBlocks <- function(x, y,
                                 colbar=rainbow(max(cohesion(x))+1),
                                 col=colbar[max_cohesion(x)+1],
@@ -359,6 +370,7 @@ plot.cohesiveBlocks <- function(x, y,
 }
 
 #' @rdname cohesive_blocks
+#' @export
 
 plot_hierarchy <- function(blocks,
                           layout=layout_as_tree(hierarchy(blocks),
@@ -424,6 +436,7 @@ exportPajek.cohesiveblocks.nopf <- function(blocks, graph, file) {
 }
 
 #' @rdname cohesive_blocks
+#' @export
 
 exportPajek <- function(blocks, graph, file,
                         project.file=TRUE) {
@@ -441,6 +454,7 @@ exportPajek <- function(blocks, graph, file,
 }
 
 #' @rdname cohesive_blocks
+#' @export
 
 max_cohesion <- function(blocks) {
   res <- numeric(blocks$vcount)

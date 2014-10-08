@@ -23,6 +23,8 @@
 # Connected components, subgraphs, kinda
 ###################################################################
 
+#' @export
+
 count_components <- function(graph, mode=c("weak", "strong")) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -40,6 +42,7 @@ count_components <- function(graph, mode=c("weak", "strong")) {
 #' frequency) is calculated.
 #' @param mul.size Logical. If TRUE the relative frequencies will be multiplied
 #' by the cluster sizes.
+#' @export
 
 component_distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
                                  ...) {
@@ -61,6 +64,8 @@ component_distribution <- function(graph, cumulative=FALSE, mul.size=FALSE,
   
   res
 }
+
+#' @export
 
 is_connected <- function(graph, mode=c("weak", "strong")) {
   if (!is_igraph(graph)) {
@@ -97,6 +102,7 @@ is_connected <- function(graph, mode=c("weak", "strong")) {
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{is_connected}} to decide whether a graph is connected,
 #' \code{\link{components}} to calculate the connected components of a graph.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

@@ -19,6 +19,8 @@
 #
 ###################################################################
 
+#' @export
+
 fit_hrg <- function(graph, hrg=NULL, start=FALSE, steps=0) {
   # Argument checks
   if (!is_igraph(graph)) { stop("Not a graph object") }
@@ -43,6 +45,8 @@ fit_hrg <- function(graph, hrg=NULL, start=FALSE, steps=0) {
   class(res) <- "igraphHRG"
   res
 }
+
+#' @export
 
 consensus_tree <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
   
@@ -73,6 +77,8 @@ consensus_tree <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
   
   res
 }
+
+#' @export
 
 predict_edges <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
                         num.bins=25) {
@@ -114,6 +120,7 @@ predict_edges <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
 #' @param \dots Additional arguments. None currently.
 #' @return All these functions return an igraph graph.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}.
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -123,6 +130,8 @@ predict_edges <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
 #' 
 as.igraph <- function(x, ...)
   UseMethod("as.igraph")
+
+#' @method as.igraph igraphHRG
 
 as.igraph.igraphHRG <- function(x, ...) {
   ovc <- length(x$left)+1L
@@ -173,6 +182,8 @@ buildMerges <- function(object) {
   }
   merges
 } 
+
+#' @method as.dendrogram igraphHRG
 
 as.dendrogram.igraphHRG <- function(object, hang=0.01, ...) {
 
@@ -236,6 +247,9 @@ as.dendrogram.igraphHRG <- function(object, hang=0.01, ...) {
   z
 }
 
+#' @importFrom stats as.hclust
+#' @method as.hclust igraphHRG
+
 as.hclust.igraphHRG <- function(x, ...) {
   merge3 <- buildMerges(x)
 
@@ -273,6 +287,8 @@ as.hclust.igraphHRG <- function(x, ...) {
   class(res) <- "hclust"
   res  
 }
+
+#' @method as_phylo igraphHRG
 
 as_phylo.igraphHRG <- function(x, ...) {
   require(ape, quietly=TRUE)
@@ -350,6 +366,7 @@ as_phylo.igraphHRG <- function(x, ...) {
 #' @return Returns whatever the return value was from the plotting function,
 #' \code{plot.phylo}, \code{plot.dendrogram} or \code{plot.hclust}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @method plot_dendrogram igraphHRG
 #' @keywords graphs
 #' @examples
 #' 
@@ -403,6 +420,8 @@ hrgPlotPhylo <- function(x, colbar=rainbow(11, start=.7, end=.1),
   if (is.null(edge.color)) { edge.color <- colbar[cc] }
   plot(phy, edge.color=edge.color, use.edge.length=use.edge.length, ...)
 }
+
+#' @method print igraphHRG
 
 print.igraphHRG <- function(x, type=c("auto", "tree", "plain"),
                             level=3, ...) {
@@ -540,7 +559,8 @@ print2.igraphHRG <- function(x, ...) {
 }
 
 # TODO: print as a tree
-
+#' @method print igraphHRGConsensus
+ 
 print.igraphHRGConsensus <- function(x, ...) {
   cat("HRG consensus tree:\n")
   n <- length(x$parents) - length(x$weights)

@@ -11,9 +11,7 @@ cp -r igraph/* ${tempdir}/
 )
 
 # cp ${tempdir}/DESCRIPTION igraph/
-# cp ${tempdir}/NAMESPACE igraph/
+cp ${tempdir}/NAMESPACE igraph/
 cp ${tempdir}/man/* igraph/man/
 
 rm -rf ${tempdir}
-
-R CMD build igraph

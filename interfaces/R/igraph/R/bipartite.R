@@ -65,6 +65,7 @@
 #' default it will be removed.
 #' @return A list of two undirected graphs. See details above.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

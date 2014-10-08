@@ -151,8 +151,7 @@ igraph/configure igraph/src/config.h.in: igraph/configure.in
 # changes or $< changes
 
 igraph/DESCRIPTION: src/DESCRIPTION version_number
-	sed 's/^Version: .*$$/Version: '$(VERSION)'/' $<     | \
-        sed 's/^Date: .*$$/Date: '`date "+%Y-%m-%d"`'/' > $@
+	sed 's/^Version: .*$$/Version: '$(VERSION)'/' $< > $@
 
 igraph/src/rinterface.h: src/rinterface.h
 	mkdir -p igraph/src
@@ -194,8 +193,8 @@ igraph_$(VERSION).tar.gz: $(CSRC2) $(CINC2) $(PARSER2) $(RSRC) $(RGEN) \
 	rm -f igraph/src/Makevars
 	touch igraph/src/config.h
 	mkdir -p igraph/man
-	tools/build.sh
-
+	tools/builddocs.sh
+	R CMD build igraph
 #############
 
 .PHONY: all igraph igraphdata force
