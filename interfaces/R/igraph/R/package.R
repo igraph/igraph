@@ -27,10 +27,6 @@
     invisible()
 }
 
-.onLoad <- function(libname, pkgname) {
-  .Call("R_igraph_init", FALSE, FALSE, PACKAGE="igraph")
-}
-
 .Call <- function(.NAME, ...) {
   if (.NAME != "R_igraph_finalizer") {
     base::.Call("R_igraph_check_finally_stack", PACKAGE="igraph")

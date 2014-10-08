@@ -2118,17 +2118,11 @@ int R_igraph_status_handler(const char *message, void *data) {
   return 0;
 }
 
-SEXP R_igraph_init(SEXP progress, SEXP status) {
+SEXP R_init_igraph() {
   igraph_set_error_handler(R_igraph_myhandler);
   igraph_set_warning_handler(R_igraph_warning_handler);
   igraph_set_interruption_handler(R_igraph_interrupt_handler);
   igraph_i_set_attribute_table(&R_igraph_attribute_table);
-  if (LOGICAL(status)[0]) { 
-    igraph_set_status_handler(R_igraph_status_handler);
-  }
-  if (LOGICAL(progress)[0]) {
-    igraph_set_progress_handler(R_igraph_progress_handler);
-  }
   return R_NilValue;
 }
 
