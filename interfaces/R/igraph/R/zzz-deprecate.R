@@ -301,7 +301,7 @@ deprecated("spinglass.community", cluster_spinglass)
 deprecated("stCuts", st_cuts)
 deprecated("stMincuts", st_min_cuts)
 deprecated("static.fitness.game", sample_fitness)
-deprecated("statis.power.law.game", sample_fitness_pl)
+deprecated("static.power.law.game", sample_fitness_pl)
 deprecated("subgraph.centrality", subgraph_centrality)
 
 deprecated("tkplot.canvas", tk_canvas)
