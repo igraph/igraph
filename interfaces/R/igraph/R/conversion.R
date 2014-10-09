@@ -343,7 +343,7 @@ as_adj_edge_list <- function(graph, mode=c("all", "out", "in", "total")) {
 
 #' @export
 
-igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
+graph_from_graphnel <- function(graphNEL, name=TRUE, weight=TRUE,
                                  unlist.attrs=TRUE) {
 
   if (! "graph" %in% .packages()) {
@@ -399,7 +399,7 @@ igraph.from.graphNEL <- function(graphNEL, name=TRUE, weight=TRUE,
 
 #' @export
 
-igraph.to.graphNEL <- function(graph) {
+as_graphnel <- function(graph) {
 
   if (!is_igraph(graph)) {
     stop("Not an igraph graph")
