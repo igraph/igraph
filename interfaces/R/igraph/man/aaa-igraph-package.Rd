@@ -55,7 +55,7 @@
   interface, its manual page contains many examples. Another option is
   \code{\link{graph}}, which takes numeric vertex ids directly.
   \code{\link{graph.atlas}} creates graph from the Graph Atlas,
-  \code{\link{graph.famous}} can create some special graphs.
+  \code{\link{make_graph}} can create some special graphs.
 
   To create graphs from field data, \code{\link{graph_from_edgelist}},
   \code{\link{graph_from_data_frame}} and \code{\link{graph_from_adjacency_matrix}} are

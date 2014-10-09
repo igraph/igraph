@@ -36,7 +36,7 @@ count_triangles (graph, vids = V(graph))
 \seealso{\code{\link{transitivity}}}
 \examples{
 ## A small graph
-kite <- graph.famous("Krackhardt_Kite")
+kite <- make_graph("Krackhardt_Kite")
 plot(kite)
 matrix(triangles(kite), nrow=3)
 

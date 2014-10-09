@@ -31,7 +31,7 @@ test_that("constraint works", {
     ci2[nodes]
   }
 
-  karate <- graph.famous("Zachary")
+  karate <- make_graph("Zachary")
 
   c1 <- constraint(karate)
   c2 <- constraint.orig(karate)

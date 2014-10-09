@@ -38,7 +38,7 @@ min_st_separators(graph)
 ring <- ring(4)
 min_st_separators(ring)
 
-chvatal <- graph.famous("chvatal")
+chvatal <- make_graph("chvatal")
 min_st_separators(chvatal)
 }
 \keyword{graphs}

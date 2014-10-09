@@ -226,7 +226,7 @@
 #' @export
 #' @examples
 #' 
-#' karate <- graph.famous("Zachary")
+#' karate <- make_graph("Zachary")
 #' wc <- cluster_walktrap(karate)
 #' modularity(wc)
 #' membership(wc)
@@ -1553,7 +1553,7 @@ cluster_louvain <- function(graph, weights=NULL) {
 #' @examples
 #' 
 #' ## Zachary's karate club
-#' g <- graph.famous("Zachary")
+#' g <- make_graph("Zachary")
 #' 
 #' ## We put everything into a big 'try' block, in case 
 #' ## igraph was compiled without GLPK support
@@ -1640,7 +1640,7 @@ cluster_optimal <- function(graph, weights=NULL) {
 #' @examples
 #' 
 #' ## Zachary's karate club
-#' g <- graph.famous("Zachary")
+#' g <- make_graph("Zachary")
 #' 
 #' imc <- cluster_infomap(g)
 #' membership(imc)
@@ -1778,7 +1778,7 @@ plot_dendrogram <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
 #' @keywords graphs
 #' @examples
 #' 
-#' karate <- graph.famous("Zachary")
+#' karate <- make_graph("Zachary")
 #' fc <- cluster_fast_greedy(karate)
 #' plot_dendrogram(fc)
 #' 
@@ -1910,7 +1910,7 @@ dendPlotPhylo <- function(communities, colbar=rainbow(length(communities)),
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- graph.famous("Zachary")
+#' g <- make_graph("Zachary")
 #' sg <- cluster_spinglass(g)
 #' le <- cluster_leading_eigen(g)
 #' compare(sg, le, method="rand")

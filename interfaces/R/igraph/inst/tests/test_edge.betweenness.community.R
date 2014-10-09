@@ -4,7 +4,7 @@ context("cluster_edge_betweenness")
 test_that("cluster_edge_betweenness works", {
   library(igraph)
 
-  g <- graph.famous("Zachary")
+  g <- make_graph("Zachary")
   ebc <- cluster_edge_betweenness(g)
 
   expect_that(max(ebc$modularity), equals(modularity(g, ebc$membership)))

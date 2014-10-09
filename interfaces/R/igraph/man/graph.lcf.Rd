@@ -26,7 +26,7 @@ graph_from_lcf(n, shifts, repeats)
 \examples{
 # This is the Franklin graph:
 g1 <- graph_from_lcf(12, c(5,-5), 6)
-g2 <- graph.famous("Franklin")
+g2 <- make_graph("Franklin")
 graph.isomorphic.vf2(g1, g2)
 }
 \keyword{graphs}

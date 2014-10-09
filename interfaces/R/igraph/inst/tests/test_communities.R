@@ -10,7 +10,7 @@ test_that("community detection functions work", {
             "cluster_louvain", "cluster_optimal",
             "cluster_spinglass", "cluster_walktrap")
 
-  karate <- graph.famous("Zachary")
+  karate <- make_graph("Zachary")
 
   for (f in F) {
     f <- get(f)
@@ -56,7 +56,7 @@ test_that("creating communities objects works", {
   library(igraph)
   set.seed(42)
 
-  karate <- graph.famous("Zachary")
+  karate <- make_graph("Zachary")
 
   membership <- sample(1:2, vcount(karate), replace=TRUE)
   mod <- modularity(karate, membership)
@@ -73,7 +73,7 @@ test_that("creating communities objects works", {
 
 test_that("communities function works", {
   library(igraph)
-  g <- graph.famous("Zachary")
+  g <- make_graph("Zachary")
   oc <- cluster_optimal(g)
   gr <- communities(oc)
   expect_that(gr, equals

@@ -79,7 +79,7 @@ plotG(g)
 pause()
 
 ### Correlation between centrality measures
-karate <- graph.famous("Zachary")
+karate <- make_graph("Zachary")
 cent <- list(`Degree`=degree(g),
              `Closeness`=closeness(g),
              `Betweenness`=betweenness(g),

@@ -35,7 +35,7 @@ modularity(mod, c(rep(1, 10), rep(2,20)))
 pause()
 
 ### A real little network, Zachary's karate club data
-karate <- graph.famous("Zachary")
+karate <- make_graph("Zachary")
 karate$layout <- layout_with_kk(karate, niter=1000)
 
 pause()

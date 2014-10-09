@@ -5,7 +5,7 @@ test_that("modularity_matrix works", {
 
   library(igraph)
 
-  kar <- graph.famous("zachary")
+  kar <- make_graph("zachary")
 
   fc <- cluster_fast_greedy(kar)
 

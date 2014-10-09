@@ -5,7 +5,7 @@ test_that("cluster_louvain works", {
 
   library(igraph)
 
-  g <- graph.famous("Zachary")
+  g <- make_graph("Zachary")
   mc <- cluster_louvain(g)
   
   expect_that(membership(mc),

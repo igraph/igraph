@@ -596,3 +596,5 @@ deprecated("walktrap.community", cluster_walktrap)
 deprecated("watts.strogatz.game", sample_smallworld)
 #' @export write.graph
 deprecated("write.graph", write_graph)
+#' @export graph.famous
+deprecated("graph.famous", make_graph)

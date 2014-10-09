@@ -9,7 +9,7 @@ pause <- function() {
 
 ### The Zachary Karate club network
 
-karate <- graph.famous("Zachary")
+karate <- make_graph("Zachary")
 summary(karate)
 
 pause()

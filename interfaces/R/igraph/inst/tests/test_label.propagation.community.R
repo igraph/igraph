@@ -5,7 +5,7 @@ test_that("label.probagation.community works", {
 
   library(igraph)
 
-  g <- graph.famous("Zachary")
+  g <- make_graph("Zachary")
   set.seed(42)
   lpc <- cluster_label_prop(g)
   expect_that(lpc$modularity, equals(modularity(g, lpc$membership)))

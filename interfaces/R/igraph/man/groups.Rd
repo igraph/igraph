@@ -34,7 +34,7 @@ groups(x)
   \code{\link{components}} and the various community finding functions.
 }
 \examples{
-g <- graph.famous("Zachary")
+g <- make_graph("Zachary")
 fgc <- cluster_fast_greedy(g)
 groups(fgc)
 

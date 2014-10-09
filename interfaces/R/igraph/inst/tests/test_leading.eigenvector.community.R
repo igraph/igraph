@@ -22,7 +22,7 @@ test_that("cluster_leading_eigen works", {
     expect_that(ev$vectors[,1], equals(vector))
   }
 
-  g <- graph.famous("Zachary")
+  g <- make_graph("Zachary")
   lc <- cluster_leading_eigen(g, callback=f)
   
   expect_that(lc$modularity, equals(modularity(g, lc$membership)))
@@ -53,7 +53,7 @@ test_that("cluster_leading_eigen works", {
     expect_that(M, equals(BG))
   }
 
-  g <- graph.famous("Zachary")
+  g <- make_graph("Zachary")
   A <- as_adj(g, sparse=FALSE)
   ec <- ecount(g)
   deg <- degree(g)

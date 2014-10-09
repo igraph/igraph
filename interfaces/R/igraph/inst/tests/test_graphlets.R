@@ -114,7 +114,7 @@ graphlets.old <- function(graph) {
 test_that("Graphlets work for a bigger graph", {
   library(igraph)
   set.seed(42)
-  g <- graph.famous("zachary")
+  g <- make_graph("zachary")
   E(g)$weight <- sample(1:5, ecount(g), replace=TRUE)
 
   gl <- graphlet_basis(g)

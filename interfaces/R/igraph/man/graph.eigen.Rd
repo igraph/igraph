@@ -68,7 +68,7 @@ eigen_defaults
   matrix.}
 \examples{
 ## Small example graph, leading eigenvector by default
-kite <- graph.famous("Krackhardt_kite")
+kite <- make_graph("Krackhardt_kite")
 spectrum(kite)[c("values", "vectors")]
 
 ## Double check

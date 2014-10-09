@@ -29,7 +29,7 @@
 #' conjecture or unique graphs with given features. These can be created with
 #' this function
 #' 
-#' \code{graph.famous} knows the following graphs: \describe{
+#' \code{make_graph} knows the following graphs: \describe{
 #'   \item{Bull}{The bull graph, 5 vertices, 5 edges, resembles to the head
 #'     of a bull if drawn properly.}
 #'   \item{Chvatal}{This is the smallest triangle-free graph that is
@@ -121,6 +121,7 @@
 #'     groups, Journal of Anthropological Research 33, 452-473 (1977).  } }
 #'
 #' @encoding UTF-8
+#' @aliases graph.famous
 #' @param name Character constant giving the name of the graph. It is case
 #' insensitive.
 #' @return A graph object.
@@ -131,13 +132,13 @@
 #' @export
 #' @examples
 #' 
-#' solids <- list(graph.famous("Tetrahedron"),
-#'                graph.famous("Cubical"),
-#'                graph.famous("Octahedron"),
-#'                graph.famous("Dodecahedron"),
-#'                graph.famous("Icosahedron"))
+#' solids <- list(make_graph("Tetrahedron"),
+#'                make_graph("Cubical"),
+#'                make_graph("Octahedron"),
+#'                make_graph("Dodecahedron"),
+#'                make_graph("Icosahedron"))
 
-graph.famous <- function(name) {
+make_graph <- function(name) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_famous", as.character(name),

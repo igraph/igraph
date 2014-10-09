@@ -4,7 +4,7 @@ context("cluster_optimal")
 test_that("cluster_optimal works", {
 
   library(igraph)
-  g <- graph.famous("Zachary")
+  g <- make_graph("Zachary")
   oc <- cluster_optimal(g)
 
   expect_that(membership(oc),

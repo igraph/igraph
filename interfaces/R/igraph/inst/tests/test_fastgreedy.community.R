@@ -6,7 +6,7 @@ test_that("cluster_fast_greedy works", {
   library(igraph)
   set.seed(42)
 
-  g <- graph.famous("Zachary")
+  g <- make_graph("Zachary")
   fc <- cluster_fast_greedy(g)
 
   expect_that(modularity(g, fc$membership), equals(max(fc$modularity)))
