@@ -606,3 +606,5 @@ deprecated("igraph.to.graphNEL", as_graphnel)
 deprecated("getIgraphOpt", igraph_opt)
 #' @export igraph.options
 deprecated("igraph.options", igraph_options)
+#' @export graph.intersection
+deprecated("graph.intersection", intersection)
