@@ -60,7 +60,7 @@ igraph.pars.callbacks <- list("verbose"=igraph.pars.set.verbose)
 
 #' @export
 
-igraph.options <- function(...) {
+igraph_options <- function(...) {
   if (nargs() == 0) return(.igraph.pars)
   current <- .igraph.pars
   temp <- list(...)
@@ -87,26 +87,10 @@ igraph.options <- function(...) {
 
 #' @export
 
-getIgraphOpt <- function(x, default=NULL) {
+igraph_opt <- function(x, default=NULL) {
   if (missing(default)) 
-    return(igraph.options(x)[[1L]])
-  if (x %in% names(igraph.options())) 
-    igraph.options(x)[[1L]]
+    return(igraph_options(x)[[1L]])
+  if (x %in% names(igraph_options())) 
+    igraph_options(x)[[1L]]
   else default
-}
-
-## This is deprecated from 0.6
-#' @export
-
-igraph.par <- function(parid, parvalue=NULL) {
-
-  .Deprecated("igraph.options", package="igraph")
-  
-  if (is.null(parvalue)) {
-    res <- .igraph.pars[[parid]]
-    res
-  } else {
-    .igraph.pars[[parid]] <- parvalue
-    invisible(parvalue)
-  }
 }

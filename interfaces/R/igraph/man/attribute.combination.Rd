@@ -87,12 +87,12 @@
 
   E.g. if you want to drop all vertex attributes when combining
   vertices, you can specify
-  \preformatted{igraph.options(vertex.attr.comb="ignore")}
+  \preformatted{igraph_options(vertex.attr.comb="ignore")}
 
   As another example, if -- when combining edges -- you want to keep the
   mean weight of the edges, concatenate their names into a single
   character scalar, and drop everything else, then use
-  \preformatted{igraph.options(edge.attr.comb=list(weight="mean",
+  \preformatted{igraph_options(edge.attr.comb=list(weight="mean",
     name=toString, "ignore")}
 }
 \section{Simple and complex attributes}{
@@ -110,16 +110,16 @@
 }
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link[igraph]{attributes}} on how to use
-  graph/vertex/edges attributes in general. \code{\link{igraph.options}} on
+  graph/vertex/edges attributes in general. \code{\link{igraph_options}} on
   igraph parameters.}
 \examples{
 g <- graph( c(1,2, 1,2, 1,2, 2,3, 3,4) )
 E(g)$weight <- 1:5
 
 ## print attribute values with the graph
-igraph.options(print.graph.attributes=TRUE)
-igraph.options(print.vertex.attributes=TRUE)
-igraph.options(print.edge.attributes=TRUE)
+igraph_options(print.graph.attributes=TRUE)
+igraph_options(print.vertex.attributes=TRUE)
+igraph_options(print.edge.attributes=TRUE)
 
 ## new attribute is the sum of the old ones
 simplify(g, edge.attr.comb="sum")

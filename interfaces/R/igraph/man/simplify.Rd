@@ -8,7 +8,7 @@
   multiple edges.}
 \usage{
 simplify(graph, remove.multiple = TRUE, remove.loops = TRUE,
-         edge.attr.comb = getIgraphOpt("edge.attr.comb"))
+         edge.attr.comb = igraph_opt("edge.attr.comb"))
 is_simple(graph)
 }
 \arguments{

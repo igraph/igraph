@@ -1,16 +1,16 @@
 \name{igraph options}
 \alias{igraph.options}
+\alias{igraph_options}
 \alias{getIgraphOpt}
-\alias{igraph.par}
+\alias{igraph_opt}
 \title{Parameters for the igraph package}
 \description{igraph has some parameters which (usually) affect the
   behavior of many functions. These can be set for the whole session via
-  \code{igraph.options}.
+  \code{igraph_options}.
 }
 \usage{
-igraph.options(\dots)
-getIgraphOpt(x, default = NULL)
-igraph.par(parid, parvalue = NULL)
+igraph_options(\dots)
+igraph_opt(x, default = NULL)
 }
 \arguments{
   \item{\dots}{A list may be given as the only argument, or any number
@@ -26,18 +26,14 @@ igraph.par(parid, parvalue = NULL)
     the current value of the parameter is listed.}
 }
 \details{
-  From igraph version 0.6, \code{igraph.par} is deprecated. Please use
-  the more flexible \code{igraph.options} and \code{getIgraphOpt}
-  functions instead.
-
-  The parameter values set via a call to the \code{igraph.options}
+  The parameter values set via a call to the \code{igraph_options}
   function will remain in effect for the rest of the session, affecting
   the subsequent behaviour of the other functions of the \code{igraph}
   package for which the given parameters are relevant.
 
   This offers the possibility of customizing the functioning of the
   \code{igraph} package, for instance by insertions of appropriate calls
-  to \code{igraph.options} in a load hook for package \pkg{igraph}.
+  to \code{igraph_options} in a load hook for package \pkg{igraph}.
   
   The currently used parameters in alphabetical order:
   \describe{
@@ -84,25 +80,21 @@ igraph.par(parid, parvalue = NULL)
   }
 }
 \value{
-  \code{igraph.options} returns a list with  the updated values of the
+  \code{igraph_options} returns a list with  the updated values of the
   parameters. If the argument list is not empty, the returned list is
   invisible.
 
-  For \code{getIgraphOpt}, the current value set for option \code{x}, or
+  For \code{igraph_opt}, the current value set for option \code{x}, or
   \code{NULL} if the option is unset.
-  
-  If \code{parvalue} is \code{NULL} then \code{igraph.par} returns the
-  current value of the parameter. Otherwise the new value of the
-  parameter is returned invisibly.
 }
 % \references{}
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com}}
-\seealso{\code{igraph.options} is similar to \code{\link{options}} and
-  \code{getIgraphOpt} is similar to \code{\link{getOption}}.}
+\seealso{\code{igraph_options} is similar to \code{\link{options}} and
+  \code{igraph_opt} is similar to \code{\link{getOption}}.}
 \examples{
-oldval <- getIgraphOpt("verbose")
-igraph.options(verbose=TRUE)
+oldval <- igraph_opt("verbose")
+igraph_options(verbose=TRUE)
 layout_with_kk(ring(10))
-igraph.options(verbose=oldval)
+igraph_options(verbose=oldval)
 }
 \keyword{graphs}

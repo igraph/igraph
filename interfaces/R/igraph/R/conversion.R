@@ -145,7 +145,7 @@ get.adjacency.sparse <- function(graph, type=c("both", "upper", "lower"),
 
 as_adj <- function(graph, type=c("both", "upper", "lower"),
                           attr=NULL, edges=FALSE, names=TRUE, 
-                          sparse=getIgraphOpt("sparsematrices")) {
+                          sparse=igraph_opt("sparsematrices")) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
@@ -262,7 +262,7 @@ as.directed <- function(graph, mode=c("mutual", "arbitrary")) {
 #' this.
 #' @export
 
-as.undirected <- function(graph, mode=c("collapse", "each", "mutual"), edge.attr.comb=getIgraphOpt("edge.attr.comb")) {
+as.undirected <- function(graph, mode=c("collapse", "each", "mutual"), edge.attr.comb=igraph_opt("edge.attr.comb")) {
   # Argument checks
   if (!is_igraph(graph)) { stop("Not a graph object") }
   mode <- switch(igraph.match.arg(mode), "collapse"=1, "each"=0, "mutual"=2)

@@ -9,7 +9,7 @@
 }
 \usage{
 contract(graph, mapping,
-                  vertex.attr.comb=getIgraphOpt("vertex.attr.comb"))
+                  vertex.attr.comb=igraph_opt("vertex.attr.comb"))
 }
 \arguments{
   \item{graph}{The input graph, it can be directed or undirected.}

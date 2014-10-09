@@ -143,7 +143,7 @@ make_graph <- function(name) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_famous", as.character(name),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- name
   }
   res

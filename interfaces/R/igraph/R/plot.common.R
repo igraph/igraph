@@ -43,21 +43,21 @@ i.parse.plot.params <- function(graph, params) {
 
   mis <- ! names(p[["vertex"]]) %in% names(i.default.values$vertex) &
          ! paste("vertex.", sep="", names(p[["vertex"]])) %in%
-           names(igraph.options())
+           names(igraph_options())
   if (any(mis)) {
     stop("Unknown vertex parameters: ",
          paste(sep=", ", collapse=", ", names(p[["vertex"]])[mis]))
   }
   mis <- ! names(p[["edge"]]) %in% names(i.default.values$edge) &
          ! paste("edge.", sep="", names(p[["edge"]])) %in%
-           names(igraph.options())
+           names(igraph_options())
   if (any(mis)) {
     stop("Unknown edge parameters: ",
          paste(sep=", ", collapse=", ", names(p[["edge"]])[mis]))
   }
   mis <- ! names(p[["plot"]]) %in% names(i.default.values$plot) &
          ! paste("plot.", sep="", names(p[["plot"]])) %in%
-           names(igraph.options())
+           names(igraph_options())
   if (any(mis)) {
     stop("Unknown plot parameters: ",
          paste(sep=", ", collapse=", ", names(p[["plot"]]) [ mis ]))
@@ -99,7 +99,7 @@ i.parse.plot.params <- function(graph, params) {
       } else {
         ## no attributes either, check igraph parameters
         n <- paste(sep="", type, ".", name)
-        v <- getIgraphOpt(n)
+        v <- igraph_opt(n)
         if (!is.null(v)) {
           p[[type]][[name]] <- v
           return(ret())
@@ -163,7 +163,7 @@ i.get.arrow.mode <- function(graph, arrow.mode=NULL) {
 }
 
 i.get.main <- function(graph) {
-  if (getIgraphOpt("annotate.plot")) {
+  if (igraph_opt("annotate.plot")) {
     n <- graph$name[1]
     n
   } else {
@@ -172,7 +172,7 @@ i.get.main <- function(graph) {
 }
 
 i.get.xlab <- function(graph) {
-  if (getIgraphOpt("annotate.plot")) {
+  if (igraph_opt("annotate.plot")) {
     paste(vcount(graph), "vertices,", ecount(graph), "edges")
   } else {
     ""

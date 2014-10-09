@@ -12,7 +12,7 @@
 \usage{
 as_adj(graph, type=c("both", "upper", "lower"),
        attr=NULL, edges=FALSE, names=TRUE,
-       sparse=getIgraphOpt("sparsematrices"))
+       sparse=igraph_opt("sparsematrices"))
 as_edgelist(graph, names=TRUE)
 }
 \arguments{

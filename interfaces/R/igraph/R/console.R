@@ -29,7 +29,7 @@
     if (!is.null(.igraph.pb)) { close(.igraph.pb) }
     return(invisible())
   }
-  type <- getIgraphOpt("verbose")
+  type <- igraph_opt("verbose")
   if (is.logical(type) && type) {
     .igraph.progress.txt(percent, message)
   } else {
@@ -43,7 +43,7 @@
 #' @export
 
 .igraph.status <- function(message) {
-  type <- getIgraphOpt("verbose")
+  type <- igraph_opt("verbose")
   if (is.logical(type) && type) {
     message(message, appendLF=FALSE)
   } else {
@@ -132,8 +132,8 @@
   })
   bstop  <- tkbutton(lfr, text="Stop",  command=function() {})
   bclose <- tkbutton(lfr, text="Close", command=function() {
-    if (!is.na(oldverb) && getIgraphOpt("verbose") == "tkconsole") {
-      igraph.options(verbose=oldverb)
+    if (!is.na(oldverb) && igraph_opt("verbose") == "tkconsole") {
+      igraph_options(verbose=oldverb)
     }
     tkdestroy(console) })
 
@@ -149,8 +149,8 @@
   tkpack(txt, side="left", fill="both", expand=1)
 
   tkbind(console, "<Destroy>", function() {
-    if (!is.na(oldverb) && getIgraphOpt("verbose") == "tkconsole") {
-      igraph.options(verbose=oldverb)
+    if (!is.na(oldverb) && igraph_opt("verbose") == "tkconsole") {
+      igraph_options(verbose=oldverb)
     }
     assign(".igraph.pb", NULL, envir=asNamespace("igraph"))
   })
@@ -229,7 +229,7 @@ close.igraphconsole <- function(con, ...) {
 #' Then it stays open, until the user closes it.
 #' 
 #' Another way to start it to set the \code{verbose} igraph option to
-#' \dQuote{tkconsole} via \code{igraph.options}. Then the console (re)opens
+#' \dQuote{tkconsole} via \code{igraph_options}. Then the console (re)opens
 #' each time an igraph function supporting it starts; to close it, set the
 #' \code{verbose} option to another value.
 #' 
@@ -238,13 +238,13 @@ close.igraphconsole <- function(con, ...) {
 #' @aliases igraph.console
 #' @return \code{NULL}, invisibly.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{igraph.options}} and the \code{verbose} option.
+#' @seealso \code{\link{igraph_options}} and the \code{verbose} option.
 #' @keywords graphs
 #' @export
 
 console <- function() {
-  oldverb <- getIgraphOpt("verbose")
-  igraph.options(verbose="tkconsole")
+  oldverb <- igraph_opt("verbose")
+  igraph_options(verbose="tkconsole")
   pb <- .igraph.progress.tkconsole.create(oldverb)
   assign(".igraph.pb", pb, envir=asNamespace("igraph"))  
   .igraph.progress.tkconsole.message("Console started.\n")

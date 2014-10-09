@@ -4,7 +4,7 @@ context("print.igraph")
 test_that("print.igraph works", {
 
   library(igraph)
-  igraph.options(print.full=TRUE)
+  igraph_options(print.full=TRUE)
   options(width=76)
 
   g <- ring(5)
@@ -48,5 +48,5 @@ test_that("print.igraph works", {
                        'F','G','F','H', 'G','H', 'H','I','I','J')
   expect_that(kite, prints_text("A -- "))
               
-  igraph.options(print.full=FALSE)
+  igraph_options(print.full=FALSE)
 })

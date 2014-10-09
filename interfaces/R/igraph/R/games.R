@@ -165,7 +165,7 @@ sample_pa <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
                zero.appeal, directed, algorithm1, start.graph,
                PACKAGE="igraph")
   
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Barabasi graph"
     res$power <- power
     res$m <- m
@@ -213,7 +213,7 @@ sample_gnp <- function(n, p, directed = FALSE, loops = FALSE) {
                as.numeric(p), as.logical(directed), as.logical(loops),
                PACKAGE="igraph")
 
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- sprintf("Erdos renyi (%s) graph", type)
     res$type <- type
     res$loops <- loops
@@ -259,7 +259,7 @@ sample_gnm <- function(n, m, directed = FALSE, loops = FALSE) {
                as.numeric(m), as.logical(directed), as.logical(loops),
                PACKAGE="igraph")
 
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- sprintf("Erdos renyi (%s) graph", type)
     res$type <- type
     res$loops <- loops
@@ -324,7 +324,7 @@ erdos.renyi.game <- function(n, p.or.m, type=c("gnp", "gnm"),
                as.numeric(p.or.m), as.logical(directed), as.logical(loops),
                PACKAGE="igraph")
 
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- sprintf("Erdos renyi (%s) graph", type)
     res$type <- type
     res$loops <- loops
@@ -430,7 +430,7 @@ sample_degseq <- function(out.deg, in.deg=NULL,
   res <- .Call("R_igraph_degree_sequence_game", as.numeric(out.deg),
                in.deg, as.numeric(method1),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Degree sequence random graph"
     res$method <- method
   }
@@ -468,7 +468,7 @@ sample_growing <- function(n, m=1, directed=TRUE, citation=FALSE) {
   res <- .Call("R_igraph_growing_random_game", as.numeric(n), as.numeric(m),
                as.logical(directed), as.logical(citation),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Growing random graph"
     res$m <- m
     res$citation <- citation
@@ -650,7 +650,7 @@ sample_pa_age <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
           time.window,
           PACKAGE="igraph")
   }
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Aging Barabasi graph"
     res$pa.exp <- pa.exp
     res$aging.exp <- aging.exp
@@ -680,7 +680,7 @@ sample_traits_callaway <- function(nodes, types, edge.per.step=1,
                                             types),
                as.logical(directed),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Trait-based Callaway graph"
     res$types <- types
     res$edge.per.step <- edge.per.step
@@ -702,7 +702,7 @@ sample_traits <- function(nodes, types, k=1, type.dist=rep(1, types),
                matrix(as.double(pref.matrix), types, types),
                as.logical(directed),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Trait-based growing graph"
     res$types <- types
     res$k <- k
@@ -751,7 +751,7 @@ sample_grg <- function(nodes, radius, torus=FALSE, coords=FALSE) {
     V(res[[1]])$x <- res[[2]]
     V(res[[1]])$y <- res[[3]]
   }
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res[[1]]$name <- "Geometric random graph"
     res[[1]]$radius <- radius
     res[[1]]$torus <- torus
@@ -828,7 +828,7 @@ sample_pref <- function(nodes, types, type.dist=rep(1, types),
                as.logical(directed), as.logical(loops),
                PACKAGE="igraph")
   V(res[[1]])$type <- res[[2]]+1
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res[[1]]$name <- "Preference random graph"
     res[[1]]$types <- types
     res[[1]]$type.dist <- type.dist
@@ -860,7 +860,7 @@ sample_asym_pref <- function(nodes, types,
                matrix(as.double(pref.matrix), types, types),
                as.logical(loops),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Asymmetric preference random graph"
     res$types <- types
     res$type.dist.matrix <- type.dist.matrix
@@ -963,7 +963,7 @@ sample_smallworld <- function(dim, size, nei, p, loops=FALSE,
                as.numeric(size), as.numeric(nei), as.numeric(p),
                as.logical(loops), as.logical(multiple),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Watts-Strogatz random graph"
     res$dim <- dim
     res$size <- size
@@ -984,7 +984,7 @@ sample_last_cit <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
                as.numeric(agebins),
                as.numeric(pref), as.logical(directed),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Random citation graph based on last citation"
     res$edges <- edges
     res$agebins <- agebins
@@ -1004,7 +1004,7 @@ sample_cit_types <- function(n, edges=1, types=rep(0, n),
   if (attr) {
     V(res)$type <- types
   }
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Random citation graph (cited type)"
     res$edges <- edges
   }
@@ -1026,7 +1026,7 @@ sample_cit_cit_types <- function(n, edges=1, types=rep(0, n),
   if (attr) {
     V(res)$type <- types
   }
-  if (getIgraphOpt("add.params")) {
+  if (igraph_opt("add.params")) {
     res$name <- "Random citation graph (citing & cited type)"
     res$edges <- edges
   }

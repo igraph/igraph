@@ -28,13 +28,13 @@ VECTOR:
 
 VERTEXINDEX:
     OUTCONV: 
-        OUT:  if (getIgraphOpt("add.vertex.names") && is_named(%I1%)) { \
+        OUT:  if (igraph_opt("add.vertex.names") && is_named(%I1%)) { \
                 names(%I%) <- vertex_attr(%I1%, "name", %I2%) \
               }
 
 VERTEXINDEX_OR_0:
     OUTCONV: 
-        OUT:  if (getIgraphOpt("add.vertex.names") && is_named(%I1%)) { \
+        OUT:  if (igraph_opt("add.vertex.names") && is_named(%I1%)) { \
                 names(%I%) <- vertex_attr(%I1%, "name", %I2%) \
               }
 
@@ -285,12 +285,12 @@ SUBGRAPH_IMPL:
 EDGE_ATTRIBUTE_COMBINATION:
     INCONV: %I% <- igraph.i.attribute.combination(%I%)
     DEFAULT: 
-       Default: getIgraphOpt("edge.attr.comb")
+       Default: igraph_opt("edge.attr.comb")
 
 VERTEX_ATTRIBUTE_COMBINATION:
     INCONV: %I% <- igraph.i.attribute.combination(%I%)
     DEFAULT: 
-       Default: getIgraphOpt("vertex.attr.comb")
+       Default: igraph_opt("vertex.attr.comb")
 
 ADD_WEIGHTS:
     INCONV: %I% <- switch(igraph.match.arg(%I%), "no"=0, "yes"=1, "auto"=2)

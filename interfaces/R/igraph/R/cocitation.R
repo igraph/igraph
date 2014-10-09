@@ -64,7 +64,7 @@ cocitation <- function(graph, v=V(graph)) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_cocitation", graph, v-1,
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     rownames(res) <- vertex_attr(graph, "name", v)
     colnames(res) <- vertex_attr(graph, "name")
   }
@@ -81,7 +81,7 @@ bibcoupling <- function(graph, v=V(graph)) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_bibcoupling", graph, v-1,
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     rownames(res) <- vertex_attr(graph, "name", v)
     colnames(res) <- vertex_attr(graph, "name")
   }

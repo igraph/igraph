@@ -22,7 +22,7 @@
   adding and deleting edges and vertices.}
 \usage{
 \method{[}{igraph}(x, i, j, \dots, from, to,
-                   sparse=getIgraphOpt("sparsematrices"),
+                   sparse=igraph_opt("sparsematrices"),
                    edges=FALSE, drop=TRUE,
                    attr=if (is_weighted(x)) "weight" else NULL)
 \method{[[}{igraph}(x, i, j, \dots, directed=TRUE, edges=FALSE, exact=TRUE)

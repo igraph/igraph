@@ -38,7 +38,7 @@ fit_hrg <- function(graph, hrg=NULL, start=FALSE, steps=0) {
   res <- .Call("R_igraph_hrg_fit", graph, hrg, start, steps,
                PACKAGE="igraph")
   
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
 
@@ -70,7 +70,7 @@ consensus_tree <- function(graph, hrg=NULL, start=FALSE, num.samples=10000) {
   class(res$consensus) <- "igraphHRGConsensus"
   class(res$hrg) <- "igraphHRG"
 
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$hrg$names <- V(graph)$name
     res$consensus$names <- V(graph)$name
   }
@@ -374,7 +374,7 @@ as_phylo.igraphHRG <- function(x, ...) {
 #' hrg <- fit_hrg(g)
 #' plot_dendrogram(hrg)
 #' 
-plot_dendrogram.igraphHRG <- function(x, mode=getIgraphOpt("dend.plot.type"), ...) {
+plot_dendrogram.igraphHRG <- function(x, mode=igraph_opt("dend.plot.type"), ...) {
 
   if (mode=="auto") {
     value <- tryCatch(suppressWarnings(library("ape", character.only=TRUE,

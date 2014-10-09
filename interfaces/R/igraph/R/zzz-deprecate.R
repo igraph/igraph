@@ -602,3 +602,5 @@ deprecated("graph.famous", make_graph)
 deprecated("igraph.from.graphNEL", graph_from_graphnel)
 #' @export igraph.to.graphNEL
 deprecated("igraph.to.graphNEL", as_graphnel)
+#' @export getIgraphOpt
+deprecated("getIgraphOpt", igraph_opt)

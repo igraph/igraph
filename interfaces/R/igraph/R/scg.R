@@ -59,7 +59,7 @@
 #' max(abs(rowSums(W))-1)
 #' 
 stochastic_matrix <- function(graph, column.wise=FALSE,
-                           sparse=getIgraphOpt("sparsematrices")) {
+                           sparse=igraph_opt("sparsematrices")) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
@@ -84,7 +84,7 @@ stochastic_matrix <- function(graph, column.wise=FALSE,
                  PACKAGE="igraph")
   }
 
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     rownames(res) <- colnames(res) <- V(graph)$name
   }
 
@@ -313,7 +313,7 @@ scg_semi_proj <- function(groups,
                                mtype=c("symmetric", "laplacian",
                                  "stochastic"), p=NULL,
                                norm=c("row", "col"),
-                               sparse=getIgraphOpt("sparsematrices")) {
+                               sparse=igraph_opt("sparsematrices")) {
   # Argument checks
   groups <- as.numeric(groups)-1
   mtype <- switch(igraph.match.arg(mtype), "symmetric"=1, 
@@ -530,7 +530,7 @@ scg <- function(X, ev, nt, groups=NULL,
                   "exact_scg"), norm=c("row", "col"),
                 direction=c("default", "left", "right"),
                 evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300,
-                sparse=getIgraphOpt("sparsematrices"),
+                sparse=igraph_opt("sparsematrices"),
                 output=c("default", "matrix", "graph"), semproj=FALSE,
                 epairs=FALSE, stat.prob=FALSE)
   UseMethod("scg")
@@ -544,7 +544,7 @@ scg.igraph <- function(X, ev, nt, groups=NULL,
                          "exact_scg"), norm=c("row", "col"),
                        direction=c("default", "left", "right"),
                        evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300,
-                       sparse=getIgraphOpt("sparsematrices"),
+                       sparse=igraph_opt("sparsematrices"),
                        output=c("default", "matrix", "graph"), semproj=FALSE,
                        epairs=FALSE, stat.prob=FALSE) {
   
@@ -565,7 +565,7 @@ scg.matrix <- function(X, ev, nt, groups=NULL,
                          "exact_scg"), norm=c("row", "col"),
                        direction=c("default", "left", "right"),
                        evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300,
-                       sparse=getIgraphOpt("sparsematrices"),
+                       sparse=igraph_opt("sparsematrices"),
                        output=c("default", "matrix", "graph"), semproj=FALSE,
                        epairs=FALSE, stat.prob=FALSE) {
   
@@ -586,7 +586,7 @@ scg.Matrix <- function(X, ev, nt, groups=NULL,
                          "exact_scg"), norm=c("row", "col"),
                        direction=c("default", "left", "right"),
                        evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300,
-                       sparse=getIgraphOpt("sparsematrices"),
+                       sparse=igraph_opt("sparsematrices"),
                        output=c("default", "matrix", "graph"), semproj=FALSE,
                        epairs=FALSE, stat.prob=FALSE) {
 
@@ -604,7 +604,7 @@ myscg <- function(graph, matrix, sparsemat, ev, nt, groups=NULL,
                     "exact_scg"), norm=c("row", "col"),
                   direction=c("default", "left", "right"),
                   evec=NULL, p=NULL, use.arpack=FALSE, maxiter=300,
-                  sparse=getIgraphOpt("sparsematrices"),
+                  sparse=igraph_opt("sparsematrices"),
                   output=c("default", "matrix", "graph"), semproj=FALSE,
                   epairs=FALSE, stat.prob=FALSE) {
 

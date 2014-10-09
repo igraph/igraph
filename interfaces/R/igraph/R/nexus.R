@@ -205,7 +205,7 @@ nexus.format.result <- function(l, name="") {
 nexus_list <- function(tags=NULL, offset=0, limit=10,
                        operator=c("or", "and"),
                        order=c("date", "name", "popularity"),
-                       nexus.url=getIgraphOpt("nexus.url")) {
+                       nexus.url=igraph_opt("nexus.url")) {
 
   operator=igraph.match.arg(operator)
   order=igraph.match.arg(order)
@@ -230,7 +230,7 @@ nexus_list <- function(tags=NULL, offset=0, limit=10,
 
 #' @export
  
-nexus_info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
+nexus_info <- function(id, nexus.url=igraph_opt("nexus.url")) {
 
   if (inherits(id, "nexusDatasetInfo")) {
     id <- id$id
@@ -266,7 +266,7 @@ nexus_info <- function(id, nexus.url=getIgraphOpt("nexus.url")) {
 
 nexus_get <- function(id, offset=0,
                       order=c("date", "name", "popularity"),
-                      nexus.url=getIgraphOpt("nexus.url")) {
+                      nexus.url=igraph_opt("nexus.url")) {
 
   order=igraph.match.arg(order)
 
@@ -289,7 +289,7 @@ nexus_get <- function(id, offset=0,
 
 nexus_search <- function(q, offset=0, limit=10,
                          order=c("date", "name", "popularity"),
-                         nexus.url=getIgraphOpt("nexus.url")) {
+                         nexus.url=igraph_opt("nexus.url")) {
 
   order=igraph.match.arg(order)
 

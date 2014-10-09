@@ -21,13 +21,13 @@
 nexus_list(tags=NULL, offset=0, limit=10,
            operator=c("or", "and"),
            order=c("date", "name", "popularity"),
-           nexus.url=getIgraphOpt("nexus.url"))
-nexus_info(id, nexus.url=getIgraphOpt("nexus.url"))
+           nexus.url=igraph_opt("nexus.url"))
+nexus_info(id, nexus.url=igraph_opt("nexus.url"))
 nexus_get(id, offset=0, order=c("date", "name", "popularity"),
-          nexus.url=getIgraphOpt("nexus.url"))
+          nexus.url=igraph_opt("nexus.url"))
 nexus_search(q, offset=0, limit=10,
              order=c("date", "name", "popularity"),
-             nexus.url=getIgraphOpt("nexus.url"))
+             nexus.url=igraph_opt("nexus.url"))
 
 \method{print}{nexusDatasetInfo}(x, \dots)
 \method{summary}{nexusDatasetInfoList}(object, \dots)

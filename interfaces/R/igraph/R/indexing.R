@@ -58,7 +58,7 @@
 #' @export
 
 `[.igraph` <- function(x, i, j, ..., from, to,
-                       sparse=getIgraphOpt("sparsematrices"),
+                       sparse=igraph_opt("sparsematrices"),
                        edges=FALSE, drop=TRUE,
                        attr=if (is_weighted(x)) "weight" else NULL) {
   ## TODO: make it faster, don't need the whole matrix usually

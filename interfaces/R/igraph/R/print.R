@@ -274,7 +274,7 @@ str.igraph <- function(object, ...) {
 #' 
 #' \code{print.igraph} behaves either as \code{summary.igraph} or
 #' \code{str.igraph} depending on the \code{full} argument. See also the
-#' \sQuote{print.full} igraph option and \code{\link{getIgraphOpt}}.
+#' \sQuote{print.full} igraph option and \code{\link{igraph_opt}}.
 #' 
 #' The graph summary printed by \code{summary.igraph} (and \code{print.igraph}
 #' and \code{str.igraph}) consists one or more lines. The first line contains
@@ -327,10 +327,10 @@ str.igraph <- function(object, ...) {
 #' g
 #' summary(g)
 #' 
-print.igraph <- function(x, full=getIgraphOpt("print.full"),
-                graph.attributes=getIgraphOpt("print.graph.attributes"),
-                vertex.attributes=getIgraphOpt("print.vertex.attributes"),
-                edge.attributes=getIgraphOpt("print.edge.attributes"),
+print.igraph <- function(x, full=igraph_opt("print.full"),
+                graph.attributes=igraph_opt("print.graph.attributes"),
+                vertex.attributes=igraph_opt("print.vertex.attributes"),
+                edge.attributes=igraph_opt("print.edge.attributes"),
                 names=TRUE, ...) {
   
   if (!is_igraph(x)) {

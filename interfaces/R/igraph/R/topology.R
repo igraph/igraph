@@ -77,7 +77,7 @@ graph.get.isomorphisms.vf2 <- function(graph1, graph2, vertex.color1,
   
   res <- lapply(res, "+", 1)
 
-  if (getIgraphOpt("add.vertex.names") && is_named(graph2)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph2)) {
     for (i in seq_along(res)) {
       names(res[[i]]) <- V(graph2)$name[ res[[i]] ]
     }
@@ -142,7 +142,7 @@ graph.get.subisomorphisms.vf2 <- function(graph1, graph2, vertex.color1,
 
   res <- lapply(res, "+", 1)
 
-  if (getIgraphOpt("add.vertex.names") && is_named(graph2)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph2)) {
     for (i in seq_along(res)) {
       names(res[[i]]) <- V(graph2)$name[ res[[i]] ]
     }
@@ -198,13 +198,13 @@ graph.subisomorphic.lad <- function(pattern, target, domains=NULL,
 
   if (map) {
     res$map <- res$map + 1
-    if (getIgraphOpt("add.vertex.names") && is_named(target)) {
+    if (igraph_opt("add.vertex.names") && is_named(target)) {
       names(res$map) <- V(target)$name[res$map]
     }
   }
   if (all.maps) {
     res$maps <- lapply(res$maps, function(x) x + 1)
-    if (getIgraphOpt("add.vertex.names") && is_named(target)) {
+    if (igraph_opt("add.vertex.names") && is_named(target)) {
       for (i in seq_along(res$maps)) {
         names(res$maps[[i]]) <- V(target)$name[ res$maps[[i]] ]
       }

@@ -243,7 +243,7 @@ membership <- function(communities) {
   } else {
     stop("Cannot calculate community membership")
   }
-  if (getIgraphOpt("add.vertex.names") && !is.null(communities$names)) {
+  if (igraph_opt("add.vertex.names") && !is.null(communities$names)) {
     names(res) <- communities$names
   }
   res
@@ -946,7 +946,7 @@ cluster_spinglass <- function(graph, weights=NULL, vertex=NULL, spins=25,
     res$algorithm  <- "spinglass"
     res$vcount     <- vcount(graph)
     res$membership <- res$membership + 1
-    if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+    if (igraph_opt("add.vertex.names") && is_named(graph)) {
       res$names <- vertex_attr(graph, "name")
     }
     class(res) <- "communities"
@@ -1025,7 +1025,7 @@ cluster_walktrap <- function(graph, weights=E(graph)$weight, steps=4,
   res <- .Call("R_igraph_walktrap_community", graph, weights, as.numeric(steps),
         as.logical(merges), as.logical(modularity), as.logical(membership),
         PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
 
@@ -1136,7 +1136,7 @@ cluster_edge_betweenness <- function(graph, weights=E(graph)$weight,
                as.logical(merges), as.logical(bridges),
                as.logical(modularity), as.logical(membership),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1208,7 +1208,7 @@ cluster_fast_greedy <- function(graph, merges=TRUE, modularity=TRUE,
   res <- .Call("R_igraph_community_fastgreedy", graph, as.logical(merges),
                as.logical(modularity), as.logical(membership), weights,
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$algorithm <- "fast greedy"
@@ -1338,7 +1338,7 @@ cluster_leading_eigen <- function(graph, steps=-1, weights=NULL,
                weights, options, start, callback, extra, env,
                environment(igraph.i.levc.arp),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$algorithm <- "leading eigenvector"
@@ -1421,7 +1421,7 @@ cluster_label_prop <- function(graph, weights=NULL, initial=NULL,
   # Function call
   res <- .Call("R_igraph_community_label_propagation", graph, weights, initial, fixed,
         PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1501,7 +1501,7 @@ cluster_louvain <- function(graph, weights=NULL) {
   # Function call
   res <- .Call("R_igraph_community_multilevel", graph, weights,
         PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1587,7 +1587,7 @@ cluster_optimal <- function(graph, weights=NULL) {
   # Function call
   res <- .Call("R_igraph_community_optimal_modularity", graph, weights,
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1675,7 +1675,7 @@ cluster_infomap <- function(graph, e.weights=NULL, v.weights=NULL,
                v.weights, nb.trials,
                PACKAGE="igraph")
 
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$names <- V(graph)$name
   }
   res$vcount <- vcount(graph)
@@ -1710,7 +1710,7 @@ plot.communities <- function(x, y,
 #' @aliases dendPlot
 #' @export
 
-plot_dendrogram <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
+plot_dendrogram <- function(x, mode=igraph_opt("dend.plot.type"), ...)
   UseMethod("plot_dendrogram")
 
 
@@ -1783,7 +1783,7 @@ plot_dendrogram <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
 #' plot_dendrogram(fc)
 #' 
 plot_dendrogram.communities <- function(x, 
-                                 mode=getIgraphOpt("dend.plot.type"), ...,
+                                 mode=igraph_opt("dend.plot.type"), ...,
                                  use.modularity=FALSE) {  
   mode <- igraph.match.arg(mode, c("auto", "phylo", "hclust", "dendrogram"))
 

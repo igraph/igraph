@@ -270,7 +270,7 @@ pause()
 ### Add three new vertices
 g4 <- add_vertices(g3, 3)
 print(g4, v=T)
-igraph.options(print.vertex.attributes=TRUE, 
+igraph_options(print.vertex.attributes=TRUE, 
                plot.layout=layout_with_fr)
 g4
 plot(g4)                      

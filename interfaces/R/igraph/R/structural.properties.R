@@ -209,7 +209,7 @@ degree <- function(graph, v=V(graph),
   res <- .Call("R_igraph_degree", graph, v-1,
                as.numeric(mode), as.logical(loops), PACKAGE="igraph")
   if (normalized) { res <- res / (vcount(graph)-1) }
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res) <- V(graph)$name[v]
   }
   res
@@ -408,7 +408,7 @@ distances <- function(graph, v=V(graph), to=V(graph),
   res <- .Call("R_igraph_shortest_paths", graph, v-1, to-1,
                as.numeric(mode), weights, as.numeric(algorithm),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     rownames(res) <- V(graph)$name[v]
     colnames(res) <- V(graph)$name[to]
   }
@@ -687,7 +687,7 @@ estimate_betweenness <- function(graph, vids=V(graph), directed=TRUE, cutoff, we
   # Function call
   res <- .Call("R_igraph_betweenness_estimate", graph, vids-1, directed, cutoff, weights, nobigint,
         PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) { 
+  if (igraph_opt("add.vertex.names") && is_named(graph)) { 
   names(res) <- vertex_attr(graph, "name", vids) 
   }
   res
@@ -794,7 +794,7 @@ betweenness <- function(graph, v=V(graph), directed=TRUE, weights=NULL,
       res <- 2*res / ( vc*vc-3*vc+2)
     }
   }
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res) <- V(graph)$name[v]
   }
   res
@@ -1123,7 +1123,7 @@ constraint <- function(graph, nodes=V(graph), weights=NULL) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_constraint", graph, nodes-1, as.numeric(weights),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res) <- V(graph)$name[nodes]
   }
   res
@@ -1389,7 +1389,7 @@ power_centrality <- function(graph, nodes=V(graph),
     res <- bonpow.dense(graph, nodes, loops, exponent, rescale, tol)
   }
 
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res) <- vertex_attr(graph, "name", nodes)
   }
   
@@ -1559,7 +1559,7 @@ alpha_centrality <- function(graph, nodes=V(graph), alpha=1,
     res <- alpha.centrality.dense(graph, nodes, alpha, loops,
                                   exo, weights, tol)
   }
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res) <- vertex_attr(graph, "name", nodes)
   }
   res
@@ -1787,7 +1787,7 @@ coreness <- function(graph, mode=c("all", "out", "in")) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_coreness", graph, as.numeric(mode),
                PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res) <- vertex_attr(graph, "name")
   }
   res
@@ -2339,7 +2339,7 @@ components <- function(graph, mode=c("weak", "strong")) {
   res <- .Call("R_igraph_clusters", graph, mode,
         PACKAGE="igraph")
   res$membership <- res$membership + 1
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res$membership) <- V(graph)$name
   }
   res
@@ -2467,7 +2467,7 @@ closeness <- function(graph, vids=V(graph),
   # Function call
   res <- .Call("R_igraph_closeness", graph, vids-1, mode, weights,
                normalized, PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res) <- V(graph)$name[vids]
   }
   res
@@ -2498,7 +2498,7 @@ estimate_closeness <- function(graph, vids=V(graph), mode=c("out", "in", "all", 
   # Function call
   res <- .Call("R_igraph_closeness_estimate", graph, vids-1, mode, cutoff, weights, normalized,
         PACKAGE="igraph")
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) { 
+  if (igraph_opt("add.vertex.names") && is_named(graph)) { 
   names(res) <- vertex_attr(graph, "name", vids) 
   }
   res
@@ -2546,7 +2546,7 @@ estimate_closeness <- function(graph, vids=V(graph), mode=c("out", "in", "all", 
 #' laplacian_matrix(g, norm=TRUE, sparse=FALSE)
 #' 
 laplacian_matrix <- function(graph, normalized=FALSE, weights=NULL,
-                            sparse=getIgraphOpt("sparsematrices")) {
+                            sparse=igraph_opt("sparsematrices")) {
   # Argument checks
   if (!is_igraph(graph)) { stop("Not a graph object") }
   normalized <- as.logical(normalized)
@@ -2567,7 +2567,7 @@ laplacian_matrix <- function(graph, normalized=FALSE, weights=NULL,
   if (sparse) {
     res <- igraph.i.spMatrix(res)
   }
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     rownames(res) <- colnames(res) <- V(graph)$name
   }
   res
@@ -2646,7 +2646,7 @@ max_bipartite_match <- function(graph, types=NULL, weights=NULL,
                PACKAGE="igraph")
 
   res$matching[ res$matching==0 ] <- NA
-  if (getIgraphOpt("add.vertex.names") && is_named(graph)) {
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
     res$matching <- V(graph)$name[res$matching]
     names(res$matching) <- V(graph)$name
   }

@@ -3,7 +3,7 @@ context("graph_from_data_frame")
 
 test_that("graph_from_data_frame works", {
 
-  library(igraph) ; igraph.options(print.full=TRUE)
+  library(igraph) ; igraph_options(print.full=TRUE)
 
   actors <- data.frame(name=c("Alice", "Bob", "Cecil", "David",
                          "Esmeralda"),
