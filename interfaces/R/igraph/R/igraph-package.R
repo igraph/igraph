@@ -1,6 +1,7 @@
 
 #' @useDynLib igraph
 #' @import methods
+#' @importFrom magrittr %>%
 #' @export bipartite_graph
 #' @export connect
 #' @export de_bruijn_graph
