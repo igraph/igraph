@@ -10,7 +10,7 @@ cp -r igraph/* ${tempdir}/
     Rscript -e 'library(devtools) ; document()'
 )
 
-# cp ${tempdir}/DESCRIPTION igraph/
+cp ${tempdir}/DESCRIPTION igraph/
 cp ${tempdir}/NAMESPACE igraph/
 cp ${tempdir}/man/* igraph/man/
 
