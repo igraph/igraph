@@ -25,7 +25,7 @@ time_bins <- function(x, middle=TRUE)
   UseMethod("time_bins")
 
 #' @method time_bins sir
-#' @export time_bins.sir
+#' @export
 
 time_bins.sir <- function(x, middle=TRUE) {
   sir <- x
@@ -45,7 +45,7 @@ time_bins.sir <- function(x, middle=TRUE) {
 
 #' @importFrom stats median
 #' @method median sir
-#' @export median.sir
+#' @export
 
 median.sir <- function(x, na.rm=FALSE) {
   sir <- x
@@ -65,7 +65,7 @@ median.sir <- function(x, na.rm=FALSE) {
 
 #' @importFrom stats quantile
 #' @method quantile sir
-#' @export quantile.sir
+#' @export
 
 quantile.sir <- function(x, comp=c("NI", "NS", "NR"), prob, ...) {
   sir <- x
@@ -132,7 +132,7 @@ quantile.sir <- function(x, comp=c("NI", "NS", "NR"), prob, ...) {
 #' @references Bailey, Norman T. J. (1975). The mathematical theory of
 #' infectious diseases and its applications (2nd ed.). London: Griffin.
 #' @method plot sir
-#' @export plot.sir
+#' @export
 #' @keywords graphs
 #' @examples
 #' 

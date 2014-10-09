@@ -305,6 +305,7 @@ parent <- function(blocks) {
 
 #' @rdname cohesive_blocks
 #' @method print cohesiveBlocks
+#' @export
 
 print.cohesiveBlocks <- function(x, ...) {
   cat("Cohesive block structure:\n")
@@ -350,6 +351,7 @@ print.cohesiveBlocks <- function(x, ...) {
 
 #' @rdname cohesive_blocks
 #' @method summary cohesiveBlocks
+#' @export
 
 summary.cohesiveBlocks <- function(object, ...) {
   cat("Structurally cohesive block structure, with",
@@ -359,6 +361,7 @@ summary.cohesiveBlocks <- function(object, ...) {
 
 #' @rdname cohesive_blocks
 #' @method plot cohesiveBlocks
+#' @export
  
 plot.cohesiveBlocks <- function(x, y,
                                 colbar=rainbow(max(cohesion(x))+1),

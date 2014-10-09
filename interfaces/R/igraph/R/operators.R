@@ -684,7 +684,7 @@ path <- function(...) {
 }
 
 #' @method "+" igraph
-#' @export "+.igraph"
+#' @export
 
 `+.igraph` <- function(e1, e2) {
   if (!is_igraph(e1) && is_igraph(e2)) {
@@ -765,7 +765,7 @@ path <- function(...) {
 }
 
 #' @method "-" igraph
-#' @export "-.igraph"
+#' @export
  
 `-.igraph` <- function(e1, e2) {
   if (missing(e2)) {

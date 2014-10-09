@@ -5,7 +5,12 @@ test_that("sdf works", {
 
   library(igraph)
 
-  sdf <- igraph:::sdf(id=1:10, color="black")
+  sdf <- igraph:::sdf
+  `[.igraphSDF` <- igraph:::`[.igraphSDF`
+  `[<-.igraphSDF` <- igraph:::`[<-.igraphSDF`
+  as.data.frame.igraphSDF <- igraph:::as.data.frame.igraphSDF
+  
+  sdf <- sdf(id=1:10, color="black")
   expect_that(as.data.frame(sdf),
               equals(data.frame(id=1:10, color="black")))
 

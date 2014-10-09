@@ -536,6 +536,7 @@ scg <- function(X, ev, nt, groups=NULL,
   UseMethod("scg")
 
 #' @method scg igraph
+#' @export
 
 scg.igraph <- function(X, ev, nt, groups=NULL,
                        mtype=c("symmetric", "laplacian", "stochastic"),
@@ -556,6 +557,7 @@ scg.igraph <- function(X, ev, nt, groups=NULL,
 }
 
 #' @method scg matrix
+#' @export
 
 scg.matrix <- function(X, ev, nt, groups=NULL,
                        mtype=c("symmetric", "laplacian", "stochastic"),
@@ -575,7 +577,8 @@ scg.matrix <- function(X, ev, nt, groups=NULL,
         stat.prob=stat.prob)
 }
 
-#' @method scg.Matrix
+#' @method scg Matrix
+#' @export
 
 scg.Matrix <- function(X, ev, nt, groups=NULL,
                        mtype=c("symmetric", "laplacian", "stochastic"),

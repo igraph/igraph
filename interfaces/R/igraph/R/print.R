@@ -253,7 +253,7 @@
 }
 
 #' @method str igraph
-#' @export str.igraph
+#' @export
 
 str.igraph <- function(object, ...) {
   print.igraph(object, full=TRUE, ...)
@@ -319,7 +319,7 @@ str.igraph <- function(object, ...) {
 #' @return All these functions return the graph invisibly.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @method print igraph
-#' @export print.igraph
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -359,7 +359,7 @@ print.igraph <- function(x, full=getIgraphOpt("print.full"),
 
 #' @rdname print.igraph
 #' @method summary igraph
-#' @export summary.igraph
+#' @export
 
 summary.igraph <- function(object, ...) {
 

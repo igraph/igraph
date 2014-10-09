@@ -73,7 +73,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method "[[" igraph.vs
-#' @export "[[.igraph.vs"
+#' @export
 
 "[[.igraph.vs" <- function(x, i) {
   if (length(i) != 1) {
@@ -93,7 +93,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method "[" igraph.vs
-#' @export "[.igraph.vs"
+#' @export
 
 "[.igraph.vs" <- function(x, i) {
   i <- substitute(i)
@@ -189,7 +189,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method "[[" igraph.es
-#' @export "[[.igraph.es"
+#' @export
 
 "[[.igraph.es" <- function(x, i) {
   if (length(i) != 1) {
@@ -209,7 +209,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method "[" igraph.es
-#' @export "[.igraph.es"
+#' @export
 
 "[.igraph.es" <- function(x, i) {
   i <- substitute(i)
@@ -319,7 +319,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method "[[<-" igraph.vs
-#' @export "[[<-.igraph.vs"
+#' @export
 
 "[[<-.igraph.vs" <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
@@ -330,12 +330,12 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method "[<-" igraph.vs
-#' @export "[<-.igraph.vs"
+#' @export
 
 "[<-.igraph.vs" <-  `[[<-.igraph.vs`
 
 #' @method "[[<-" igraph.es
-#' @export "[[<-.igraph.es"
+#' @export
 
 "[[<-.igraph.es" <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
@@ -346,26 +346,26 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }  
 
 #' @method "[<-" igraph.es
-#' @export "[<-.igraph.es"
+#' @export
 
 "[<-.igraph.es" <-  `[[<-.igraph.es`
 
 #' @method "$" igraph
-#' @export "$.igraph"
+#' @export
 
 "$.igraph" <- function(x, name) {
   graph_attr(x, name)
 }
 
 #' @method "$<-" igraph
-#' @export "$<-.igraph"
+#' @export
 
 "$<-.igraph" <- function(x, name, value) {
   set_graph_attr(x, name, value)
 }
 
 #' @method "$" igraph.vs
-#' @export "$.igraph.vs"
+#' @export
 
 "$.igraph.vs" <- function(x, name) {
   res <- vertex_attr(get("graph", attr(x, "env")), name, x)
@@ -376,7 +376,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   }
 }
 #' @method "$" igraph.es
-#' @export "$.igraph.es"
+#' @export
 
 "$.igraph.es" <- function(x, name) {
   res <- edge_attr(get("graph", attr(x, "env")), name, x)
@@ -388,7 +388,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method "$<-" igraph.vs
-#' @export "$<-.igraph.vs"
+#' @export
 
 "$<-.igraph.vs" <- function(x, name, value) {
   attr(x, "name") <- name
@@ -397,7 +397,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method "$<-" igraph.es
-#' @export "$<-.igraph.es"
+#' @export
 
 "$<-.igraph.es" <- function(x, name, value) {
   attr(x, "name") <- name
@@ -434,7 +434,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 }
 
 #' @method print igraph.vs
-#' @export print.igraph.vs
+#' @export
 
 print.igraph.vs <- function(x, ...) {
   cat("Vertex sequence:\n")
@@ -447,7 +447,7 @@ print.igraph.vs <- function(x, ...) {
 }
 
 #' @method print igraph.es
-#' @export print.igraph.es
+#' @export
 
 print.igraph.es <- function(x, ...) {
   cat("Edge sequence:\n")

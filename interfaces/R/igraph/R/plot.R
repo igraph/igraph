@@ -67,7 +67,7 @@
 #' parameters and \code{\link{tkplot}} and \code{\link{rglplot}} for other
 #' graph plotting functions.
 #' @method plot igraph
-#' @export plot.igraph
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -430,7 +430,7 @@ rglplot        <- function(x, ...)
   UseMethod("rglplot", x)
 
 #' @method rglplot igraph
-#' @export rglplot.igraph
+#' @export
 
 rglplot.igraph <- function(x, ...) {
 

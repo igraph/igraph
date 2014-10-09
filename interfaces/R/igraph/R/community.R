@@ -251,6 +251,7 @@ membership <- function(communities) {
 
 #' @rdname communities
 #' @method print communities
+#' @export
 
 print.communities <- function(x, ...) {
   cat("Graph community structure calculated with the",
@@ -367,7 +368,6 @@ modularity <- function(x, ...)
 #' and \eqn{m} is the number of edges (or the total weights in the graph, if it
 #' is weighed).
 #'
-#' @method modularity igraph
 #' @aliases modularity
 #' @param x,graph The input graph.
 #' @param membership Numeric vector, for each vertex it gives its community.
@@ -387,6 +387,7 @@ modularity <- function(x, ...)
 #' @references Clauset, A.; Newman, M. E. J. & Moore, C. Finding community
 #' structure in very large networks, \emph{Phyisical Review E} 2004, 70, 066111
 #' @method modularity igraph
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -412,6 +413,7 @@ modularity.igraph <- function(x, membership, weights=NULL, ...) {
 
 #' @rdname communities
 #' @method modularity communities
+#' @export
 
 modularity.communities <- function(x, ...) {
   if (!is.null(x$modularity)) {
@@ -448,6 +450,7 @@ modularity_matrix <- function(graph, membership, weights=NULL) {
 
 #' @rdname communities
 #' @method length communities
+#' @export
 
 length.communities <- function(x) {
   m <- membership(x)
@@ -541,6 +544,7 @@ complete.dend <- function(comm, use.modularity) {
 #' @rdname communities
 #' @importFrom stats as.dendrogram
 #' @method as.dendrogram communities
+#' @export
  
 as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
                                       ...) {
@@ -630,6 +634,7 @@ as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
 #' @rdname communities
 #' @importFrom stats as.hclust
 #' @method as.hclust communities
+#' @export
  
 as.hclust.communities <- function(x, hang=-1, use.modularity=FALSE,
                                   ...) {
@@ -644,6 +649,7 @@ as_phylo <- function(x, ...)
 
 #' @rdname communities
 #' @method as_phylo communities
+#' @export
 
 as_phylo.communities <- function(x, use.modularity=FALSE, ...) {
 
@@ -1684,7 +1690,7 @@ cluster_infomap <- function(graph, e.weights=NULL, v.weights=NULL,
 
 #' @rdname communities
 #' @method plot communities
-#' @export plot.communities
+#' @export
 
 plot.communities <- function(x, y,
                              colbar=rainbow(length(x)),
@@ -1768,7 +1774,7 @@ plot_dendrogram <- function(x, mode=getIgraphOpt("dend.plot.type"), ...)
 #' \code{plot.phylo}, \code{plot.dendrogram} or \code{plot.hclust}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @method plot_dendrogram communities
-#' @export plot_dendrogram.communities
+#' @export
 #' @keywords graphs
 #' @examples
 #' 
@@ -1917,7 +1923,7 @@ compare <- function(comm1, comm2, method=c("vi", "nmi",
 }
 
 #' @method compare numeric
-#' @export compare.numeric
+#' @export
 
 compare.numeric <- function(comm1, comm2, method=c("vi", "nmi",
                                             "split.join", "rand",
@@ -1941,7 +1947,7 @@ compare.numeric <- function(comm1, comm2, method=c("vi", "nmi",
 }
 
 #' @method compare default
-#' @export compare.default
+#' @export
 
 compare.default <- function(comm1, comm2, method=c("vi", "nmi",
                                             "split.join", "rand",
@@ -1955,7 +1961,7 @@ groups <- function(x)
   UseMethod("groups")
 
 #' @method groups default
-#' @export groups.default
+#' @export
 
 groups.default <- function(x) {
   vids <- names(x$membership)
@@ -1964,7 +1970,7 @@ groups.default <- function(x) {
 }
 
 #' @method groups communities
-#' @export groups.communities
+#' @export
 
 groups.communities <- function(x) {
   m <- membership(x)
