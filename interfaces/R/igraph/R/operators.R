@@ -329,7 +329,7 @@ union <- function(..., byname="auto") {
 #' The intersection of two or more graphs are created.  The graphs may have
 #' identical or overlapping vertex sets.
 #' 
-#' \code{graph.intersection} creates the intersection of two or more graphs:
+#' \code{intersection} creates the intersection of two or more graphs:
 #' only edges present in all graphs will be included.  The corresponding
 #' operator is \%s\%.
 #' 
@@ -337,7 +337,7 @@ union <- function(..., byname="auto") {
 #' are named), then the operation is performed on symbolic vertex names instead
 #' of the internal numeric vertex ids.
 #' 
-#' \code{graph.intersection} keeps the attributes of all graphs. All graph,
+#' \code{intersection} keeps the attributes of all graphs. All graph,
 #' vertex and edge attributes are copied to the result. If an attribute is
 #' present in multiple graphs and would result a name clash, then this
 #' attribute is renamed by adding suffixes: _1, _2, etc.
@@ -370,7 +370,7 @@ union <- function(..., byname="auto") {
 #' net2 <- graph_from_formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
 #' str(net1 %s% net2)
 #' 
-graph.intersection <- function(..., byname="auto",
+intersection <- function(..., byname="auto",
                                keep.all.vertices=TRUE) {
   .igraph.graph.union.or.intersection("R_igraph_intersection", ...,
                                       byname=byname,
@@ -380,7 +380,7 @@ graph.intersection <- function(..., byname="auto",
 #' @export
 
 "%s%" <- function(x,y) {
-  graph.intersection(x,y)
+  intersection(x,y)
 }
 
 

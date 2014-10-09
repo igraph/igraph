@@ -177,7 +177,7 @@ test_that("intersection of named graphs works", {
   E(g1)$b1 <- letters[1:10]
   E(g2)$b2 <- letters[11:23]
 
-  g <- graph.intersection(g1, g2, keep.all.vertices=FALSE)
+  g <- intersection(g1, g2, keep.all.vertices=FALSE)
 
   expect_that(sort(graph_attr_names(g)),
               equals(c("circular_1", "circular_2", "foo", "mutual_1",
@@ -219,7 +219,7 @@ j 10 20    j
 "))
   expect_that(df1$vertices, equals(g.v))
 
-  gg <- graph.intersection(g1, g2, keep.all.vertices=TRUE)
+  gg <- intersection(g1, g2, keep.all.vertices=TRUE)
 
   df2 <- as_data_frame(gg, what="both")
 
@@ -356,7 +356,7 @@ test_that("intersection of non-named graphs keeps attributes properly", {
   E(g)$weight <- sample(ecount(g))
   E(g2)$weight <- sample(ecount(g2))
 
-  gi <- graph.intersection(g, g2)
+  gi <- intersection(g, g2)
 
   rn <- function(D) {
     rownames(D) <- paste(D[,1], D[,2], sep="-")
