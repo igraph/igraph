@@ -610,3 +610,5 @@ deprecated("igraph.options", igraph_options)
 deprecated("graph.intersection", intersection)
 #' @export exportPajek
 deprecated("exportPajek", export_pajek)
+#' @export get.diameter
+deprecated("get.diameter", get_diameter)

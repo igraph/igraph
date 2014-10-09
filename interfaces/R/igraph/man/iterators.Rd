@@ -223,7 +223,7 @@ E(g) [ 1:3 \%<-\% 2:6 ]
 
 # the edges along the diameter
 g <- barabasi.game(100, directed=FALSE)
-d <- get.diameter(g)
+d <- get_diameter(g)
 E(g, path=d)
 
 # performance for large graphs is bad

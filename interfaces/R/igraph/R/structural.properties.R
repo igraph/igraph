@@ -31,14 +31,14 @@
 #' 
 #' The diameter is calculated by using a breadth-first search like method.
 #' 
-#' \code{get.diameter} returns a path with the actual diameter. If there are
+#' \code{get_diameter} returns a path with the actual diameter. If there are
 #' many shortest paths of the length of the diameter, then it returns the first
 #' one found.
 #' 
 #' \code{farthest.points} returns two vertex ids, the vertices which are
 #' connected by the diameter path.
 #' 
-#' @aliases diameter get.diameter farthest.nodes farthest_vertices
+#' @aliases diameter get.diameter farthest.nodes farthest_vertices get_diameter
 #' @param graph The graph to analyze.
 #' @param directed Logical, whether directed or undirected paths are to be
 #' considered. This is ignored for undirected graphs.
@@ -51,7 +51,7 @@
 #' distances. If the graph has a \code{weight} edge attribute, then this is
 #' used by default.
 #' @return A numeric constant for \code{diameter}, a numeric vector for
-#' \code{get.diameter} and a numeric vector of length two for
+#' \code{get_diameter} and a numeric vector of length two for
 #' \code{farthest_vertices}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{distances}}
@@ -69,9 +69,9 @@
 #' g <- ring(10)
 #' E(g)$weight <- sample(seq_len(ecount(g)))
 #' diameter(g)
-#' get.diameter(g)
+#' get_diameter(g)
 #' diameter(g, weights=NA)
-#' get.diameter(g, weights=NA)
+#' get_diameter(g, weights=NA)
 #' 
 diameter <- function(graph, directed=TRUE, unconnected=TRUE, weights=NULL) {
   
@@ -96,7 +96,7 @@ diameter <- function(graph, directed=TRUE, unconnected=TRUE, weights=NULL) {
 
 #' @export
 
-get.diameter <- function(graph, directed=TRUE, unconnected=TRUE,
+get_diameter <- function(graph, directed=TRUE, unconnected=TRUE,
                          weights=NULL) {
 
   if (!is_igraph(graph)) {

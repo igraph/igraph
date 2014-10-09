@@ -1411,7 +1411,7 @@ tkigraph <- function() {
   }
 
   graph <- get("graphs", .tkigraph.env)[[gnos]]
-  edges <- E(graph, path=get.diameter(graph, directed=FALSE), directed=FALSE)
+  edges <- E(graph, path=get_diameter(graph, directed=FALSE), directed=FALSE)
   color <- rep("black", ecount(graph))
   color[edges] <- "red"
   width <- rep(1, ecount(graph))
