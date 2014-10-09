@@ -50,7 +50,7 @@
 #' similarity(g, method = "dice")
 #' similarity(g, methof = "jaccard")
 
-similarity <- function(graph, vids = V(graph), mode = c("all", "out". "in",
+similarity <- function(graph, vids = V(graph), mode = c("all", "out", "in",
                           "total"), loops = FALSE, method = c("jaccard",
                           "dice", "invlogweighted")) {
 
