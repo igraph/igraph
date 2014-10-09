@@ -883,44 +883,6 @@ connect <- function(graph, order, mode=c("all", "out", "in", "total")) {
 }
 
 
-
-#' Rewires the endpoints of the edges of a graph randomly
-#' 
-#' This function rewires the endpoints of the edges with a constant probability
-#' uniformly randomly to a new vertex in a graph.
-#' 
-#' Note that this function might create graphs with multiple and/or loop edges.
-#' 
-#' @param graph The input graph
-#' @param prob The rewiring probability, a real number between zero and one.
-#' @param loops Logical scalar, whether loop edges are allowed in the rewired
-#' graph.
-#' @param multiple Logical scalar, whether multiple edges are allowed int the
-#' generated graph.
-#' @return A new graph object.
-#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @export
-#' @keywords graphs
-#' @examples
-#' 
-#' # Some random shortcuts shorten the distances on a lattice
-#' g <- lattice( length=100, dim=1, nei=5 )
-#' mean_distance(g)
-#' g <- rewire.edges( g, prob=0.05 )
-#' mean_distance(g)
-#' 
-rewire.edges <- function(graph, prob, loops=FALSE, multiple=FALSE) {
-  if (!is_igraph(graph)) {
-    stop("Not a graph object")
-  }
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_rewire_edges", graph, as.numeric(prob), as.logical(loops),
-        as.logical(multiple),
-        PACKAGE="igraph")
-}
-
-
-
 #' The Watts-Strogatz small-world model
 #' 
 #' Generate a graph according to the Watts-Strogatz network model.
@@ -944,7 +906,7 @@ rewire.edges <- function(graph, prob, loops=FALSE, multiple=FALSE) {
 #' generated graph.
 #' @return A graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{lattice}}, \code{\link{rewire.edges}}
+#' @seealso \code{\link{lattice}}, \code{\link{rewire}}
 #' @references Duncan J Watts and Steven H Strogatz: Collective dynamics of
 #' \sQuote{small world} networks, Nature 393, 440-442, 1998.
 #' @export
