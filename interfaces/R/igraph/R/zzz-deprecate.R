@@ -612,3 +612,7 @@ deprecated("graph.intersection", intersection)
 deprecated("exportPajek", export_pajek)
 #' @export get.diameter
 deprecated("get.diameter", get_diameter)
+#' @export get.all.shortest.paths
+deprecated("get.all.shortest.paths", all_shortest_paths)
+#' @export get.shortest.paths
+deprecated("get.shortest.paths", shortest_paths)

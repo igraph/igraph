@@ -1,7 +1,7 @@
 
-context("get.all.shortest.paths")
+context("all_shortest_paths")
 
-test_that("get.all.shortest.paths works", {
+test_that("all_shortest_paths works", {
 
   library(igraph)
 
@@ -27,14 +27,14 @@ test_that("get.all.shortest.paths works", {
     list[order(sapply(list, paste, collapse="!"))]
   }
 
-  sp1 <- get.all.shortest.paths(g, "s", "t", weights=NA)
+  sp1 <- all_shortest_paths(g, "s", "t", weights=NA)
 
   expect_that(sortlist(sp1$res),
               equals(list(c(1, 2, 7), c(1, 3, 7))))
   expect_that(sp1$nrgeo,
               equals(c(1,1,1,1,1,1,2)))
 
-  sp2 <- get.all.shortest.paths(g, "s", "t")
+  sp2 <- all_shortest_paths(g, "s", "t")
 
   expect_that(sortlist(sp2$res),
               equals(list(c(1, 2, 3, 4, 7), c(1, 2, 7), c(1, 3, 7))))
@@ -43,6 +43,6 @@ test_that("get.all.shortest.paths works", {
   ## TODO
 
   ## E(g)$weight <- E(g)$weight - 1
-  ## get.all.shortest.paths(g, "s", "t")
+  ## all_shortest_paths(g, "s", "t")
 
 })

@@ -241,7 +241,7 @@ degree_distribution <- function(graph, cumulative=FALSE, ...) {
 #' Shortest (directed or undirected) paths between vertices
 #' 
 #' \code{distances} calculates the length of all the shortest paths from
-#' or to the vertices in the network. \code{get.shortest.paths} calculates one
+#' or to the vertices in the network. \code{shortest_paths} calculates one
 #' shortest path (the path itself, and not just its length) from or to the
 #' given vertex.
 #' 
@@ -266,13 +266,13 @@ degree_distribution <- function(graph, cumulative=FALSE, ...) {
 #' automatic algorithm selection, supply \sQuote{\code{automatic}} as the
 #' \code{algorithm} argument. (This is also the default.)
 #' 
-#' \code{get.shortest.paths} calculates a single shortest path (i.e. the path
+#' \code{shortest_paths} calculates a single shortest path (i.e. the path
 #' itself, not just its length) between the source vertex given in \code{from},
-#' to the target vertices given in \code{to}. \code{get.shortest.paths} uses
+#' to the target vertices given in \code{to}. \code{shortest_paths} uses
 #' breadth-first search for unweighted graphs and Dijkstra's algorithm for
 #' weighted graphs. The latter only works if the edge weights are non-negative.
 #' 
-#' \code{get.all.shortest.paths} calculates \emph{all} shortest paths between
+#' \code{all_shortest_paths} calculates \emph{all} shortest paths between
 #' pairs of vertices. More precisely, between the \code{from} vertex to the
 #' vertices given in \code{to}. It uses a breadth-first search for unweighted
 #' graphs and Dijkstra's algorithm for weighted ones. The latter only supports
@@ -290,13 +290,14 @@ degree_distribution <- function(graph, cumulative=FALSE, ...) {
 #' 
 #' @aliases shortest.paths get.shortest.paths get.all.shortest.paths distances
 #' mean_distance distance_table average.path.length path.length.hist
+#' all_shortest_paths shortest_paths
 #' @param graph The graph to work on.
 #' @param v Numeric vector, the vertices from which the shortest paths will be
 #' calculated.
 #' @param to Numeric vector, the vertices to which the shortest paths will be
 #' calculated. By default it includes all vertices. Note that for
 #' \code{distances} every vertex must be included here at most once. (This
-#' is not required for \code{get.shortest.paths}.
+#' is not required for \code{shortest_paths}.
 #' @param mode Character constant, gives whether the shortest paths to or from
 #' the given vertices should be calculated for directed graphs. If \code{out}
 #' then the shortest paths \emph{from} the vertex, if \code{in} then \emph{to}
@@ -321,7 +322,7 @@ degree_distribution <- function(graph, cumulative=FALSE, ...) {
 #' columns and \code{length(v)} rows. The shortest path length from a vertex to
 #' itself is always zero. For unreachable vertices \code{Inf} is included.
 #' 
-#' For \code{get.shortest.paths} a named list with four entries is returned:
+#' For \code{shortest_paths} a named list with four entries is returned:
 #' \item{vpath}{This itself is a list, of length \code{length(to)}; list
 #' element \code{i} contains the vertex ids on the path from vertex \code{from}
 #' to vertex \code{to[i]} (or the other way for directed graphs depending on
@@ -338,7 +339,7 @@ degree_distribution <- function(graph, cumulative=FALSE, ...) {
 #' was not requested.} \item{inbound_edges}{Numeric vector, the inbound edge
 #' for each vertex, or \code{NULL}, if it was not requested.}
 #' 
-#' For \code{get.all.shortest.paths} a list is returned, each list element
+#' For \code{all_shortest_paths} a list is returned, each list element
 #' contains a shortest path from \code{from} to a vertex in \code{to}. The
 #' shortest paths to the same vertex are collected into consecutive elements of
 #' the list.
@@ -359,8 +360,8 @@ degree_distribution <- function(graph, cumulative=FALSE, ...) {
 #' 
 #' g <- ring(10)
 #' distances(g)
-#' get.shortest.paths(g, 5)
-#' get.all.shortest.paths(g, 1, 6:8)
+#' shortest_paths(g, 5)
+#' all_shortest_paths(g, 1, 6:8)
 #' mean_distance(g)
 #' ## Weighted shortest paths
 #' el <- matrix(nc=3, byrow=TRUE,
@@ -439,7 +440,7 @@ distances <- function(graph, v=V(graph), to=V(graph),
 #' are reached.
 #' @export
 
-get.shortest.paths <- function(graph, from, to=V(graph),
+shortest_paths <- function(graph, from, to=V(graph),
                                mode=c("out", "all", "in"),
                                weights=NULL,
                                output=c("vpath", "epath", "both"),
@@ -491,7 +492,7 @@ get.shortest.paths <- function(graph, from, to=V(graph),
 
 #' @export
 
-get.all.shortest.paths <- function(graph, from,
+all_shortest_paths <- function(graph, from,
                                    to=V(graph),
                                    mode=c("out", "all", "in"),
 				   weights=NULL) {

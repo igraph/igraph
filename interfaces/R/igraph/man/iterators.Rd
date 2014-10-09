@@ -202,7 +202,7 @@ V(g)[vsl]$color <- "red"
 # the longest geodesic within the largest cluster
 long <- numeric()
 for (v in vsl) {
-  paths <- get.shortest.paths(g, from=v, to=vsl)
+  paths <- shortest_paths(g, from=v, to=vsl)
   fl <- paths[[ which.max(sapply(paths, length)) ]]
   if (length(fl) > length(long)) {
     long <- fl

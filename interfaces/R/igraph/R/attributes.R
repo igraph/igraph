@@ -463,9 +463,9 @@ is_named <- function(graph) {
 #' @examples
 #' 
 #' g <- ring(10)
-#' get.shortest.paths(g, 8, 2)
+#' shortest_paths(g, 8, 2)
 #' E(g)$weight <- seq_len(ecount(g))
-#' get.shortest.paths(g, 8, 2)
+#' shortest_paths(g, 8, 2)
 #' 
 is_weighted <- function(graph) {
   if (!is_igraph(graph)) {

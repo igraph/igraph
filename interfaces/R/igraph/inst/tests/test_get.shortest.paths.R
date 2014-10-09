@@ -1,7 +1,7 @@
 
-context("get.shortest.paths")
+context("shortest_paths")
 
-test_that("get.shortest.paths works", {
+test_that("shortest_paths works", {
 
   library(igraph)
 
@@ -22,10 +22,10 @@ test_that("get.shortest.paths works", {
 
   g <- graph_from_data_frame(as.data.frame(edges))
 
-  all1 <- get.all.shortest.paths(g, "s", "t", weights=NA)$res
-  all2 <- get.all.shortest.paths(g, "s", "t")$res
+  all1 <- all_shortest_paths(g, "s", "t", weights=NA)$res
+  all2 <- all_shortest_paths(g, "s", "t")$res
 
-  s1 <- get.shortest.paths(g, "s", "t", weights=NA)
+  s1 <- shortest_paths(g, "s", "t", weights=NA)
   s2 <- get.shortest.paths(g, "s", "t")
 
   expect_that(s1$vpath %in% all1, is_true()) 
