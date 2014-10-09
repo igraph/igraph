@@ -91,10 +91,13 @@
 #' The generic function \code{print} is also defined on \code{cohesiveBlocks}
 #' objects and it is invoked automatically if the name of the
 #' \code{cohesiveBlocks} object is typed in. It produces an output like this:
-#' \preformatted{ Cohesive block structure: B-1 c 1, n 23 '- B-2 c 2, n 14
-#' oooooooo.. .o......oo ooo '- B-4 c 5, n 7 ooooooo... .......... ...  '- B-3
-#' c 2, n 10 ......o.oo o.oooooo.. ...  '- B-5 c 3, n 4 ......o.oo o.........
-#' ...  } The left part shows the block structure, in this case for five
+#' \preformatted{ Cohesive block structure:
+#' B-1 c 1, n 23
+#' '- B-2 c 2, n 14 oooooooo.. .o......oo ooo
+#' '- B-4 c 5, n  7 ooooooo... .......... ...
+#' '- B-3 c 2, n 10 ......o.oo o.oooooo.. ...
+#' '- B-5 c 3, n  4 ......o.oo o......... ...  }
+#' The left part shows the block structure, in this case for five
 #' blocks. The first block always corresponds to the whole graph, even if its
 #' cohesion is zero. Then cohesion of the block and the number of vertices in
 #' the block are shown. The last part is only printed if the display is wide

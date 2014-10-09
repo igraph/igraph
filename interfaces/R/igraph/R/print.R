@@ -280,8 +280,10 @@ str.igraph <- function(object, ...) {
 #' and \code{str.igraph}) consists one or more lines. The first line contains
 #' the basic properties of the graph, and the rest contains its attributes.
 #' Here is an example, a small star graph with weighed directed edges and named
-#' vertices: \preformatted{ IGRAPH DNW- 10 9 -- In-star + attr: name (g/c),
-#' mode (g/c), center (g/n), name (v/c), weight (e/n) } The first line always
+#' vertices: \preformatted{    IGRAPH DNW- 10 9 -- In-star
+#'     + attr: name (g/c), mode (g/c), center (g/n), name (v/c),
+#'       weight (e/n) }
+#' The first line always
 #' starts with \code{IGRAPH}, showing you that the object is an igraph graph.
 #' Then a four letter long code string is printed. The first letter
 #' distinguishes between directed (\sQuote{\code{D}}) and undirected
