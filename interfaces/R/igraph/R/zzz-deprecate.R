@@ -608,3 +608,5 @@ deprecated("getIgraphOpt", igraph_opt)
 deprecated("igraph.options", igraph_options)
 #' @export graph.intersection
 deprecated("graph.intersection", intersection)
+#' @export exportPajek
+deprecated("exportPajek", export_pajek)

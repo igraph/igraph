@@ -66,7 +66,7 @@
 #' \code{plot_hierarchy} plots the hierarchy tree of the cohesive blocks on the
 #' active graphics device, by calling \code{igraph.plot}.
 #' 
-#' The \code{exportPajek} function can be used to export the graph and its
+#' The \code{export_pajek} function can be used to export the graph and its
 #' cohesive blocks in Pajek format. It can either export a single Pajek project
 #' file with all the information, or a set of files, depending on its
 #' \code{project.file} argument. If \code{project.file} is \code{TRUE}, then
@@ -109,14 +109,14 @@
 #' cohesive blocks in it.
 #' 
 #' @aliases cohesive.blocks cohesiveBlocks blocks graphs_from_cohesive_blocks blockGraphs
-#' hierarchy parent plotHierarchy exportPajek maxcohesion plot.cohesiveBlocks
+#' hierarchy parent plotHierarchy export_pajek maxcohesion plot.cohesiveBlocks
 #' summary.cohesiveBlocks length.cohesiveBlocks print.cohesiveBlocks
-#' plot_hierarchy max_cohesion
+#' plot_hierarchy max_cohesion exportPajek
 #' @param graph For \code{cohesive_blocks} a graph object of class
 #' \code{igraph}. It must be undirected and simple. (See
 #' \code{\link{is_simple}}.)
 #' 
-#' For \code{graphs_from_cohesive_blocks} and \code{exportPajek} the same graph must be
+#' For \code{graphs_from_cohesive_blocks} and \code{export_pajek} the same graph must be
 #' supplied whose cohesive block structure is given in the \code{blocks}
 #' argument.
 #' @param labels Logical scalar, whether to add the vertex labels to the result
@@ -173,7 +173,7 @@
 #' cohesive block, in the block hierarchy. The block at the root of the
 #' hierarchy has no parent and \code{0} is returned for it.
 #' 
-#' \code{plot_hierarchy}, \code{plot} and \code{exportPajek} return \code{NULL},
+#' \code{plot_hierarchy}, \code{plot} and \code{export_pajek} return \code{NULL},
 #' invisibly.
 #' 
 #' \code{max_cohesion} returns a numeric vector with one entry for each vertex,
@@ -210,7 +210,7 @@
 #' 
 #' # Save results in a Pajek file
 #' \dontrun{
-#' exportPajek(mwBlocks, mw, file="/tmp/mwBlocks.paj")
+#' export_pajek(mwBlocks, mw, file="/tmp/mwBlocks.paj")
 #' }
 #' 
 #' # Plot the results
@@ -444,7 +444,7 @@ exportPajek.cohesiveblocks.nopf <- function(blocks, graph, file) {
 #' @rdname cohesive_blocks
 #' @export
 
-exportPajek <- function(blocks, graph, file,
+export_pajek <- function(blocks, graph, file,
                         project.file=TRUE) {
   
   if (!project.file && !is.character(file)) {
