@@ -1006,6 +1006,7 @@ igraph_layout_star:
                 VECTORM1_OR_0 order=NULL
         DEPS: center ON graph
         NAME-R: layout_as_star
+        IGNORE: RR
 
 igraph_layout_grid:
         PARAMS: GRAPH graph, OUT MATRIX res, INTEGER width=0
@@ -1137,6 +1138,7 @@ igraph_layout_bipartite:
                 REAL hgap=1, REAL vgap=1, INTEGER maxiter=100
         DEPS: types ON graph
         NAME-R: layout_as_bipartite
+        IGNORE: RR
 
 igraph_layout_gem:
         PARAMS: GRAPH graph, INOUT MATRIX res=matrix(), \

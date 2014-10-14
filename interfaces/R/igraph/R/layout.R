@@ -1,29 +1,327 @@
-#   IGraph R package
-#   Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
-#   334 Harvard street, Cambridge, MA 02139 USA
-#   
-#   This program is free software; you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation; either version 2 of the License, or
-#   (at your option) any later version.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#   
-#   You should have received a copy of the GNU General Public License
-#   along with this program; if not, write to the Free Software
-#   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-#   02110-1301 USA
-#
-###################################################################
 
-###################################################################
-# Layouts
-###################################################################
+## ----------------------------------------------------------------
+##
+##   IGraph R package
+##   Copyright (C) 2003-2014  Gabor Csardi <csardi.gabor@gmail.com>
+##   334 Harvard street, Cambridge, MA 02139 USA
+##
+##   This program is free software; you can redistribute it and/or modify
+##   it under the terms of the GNU General Public License as published by
+##   the Free Software Foundation; either version 2 of the License, or
+##   (at your option) any later version.
+##
+##   This program is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY; without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License
+##   along with this program; if not, write to the Free Software
+##   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+##   02110-1301 USA
+##
+## ----------------------------------------------------------------
 
 
+## ----------------------------------------------------------------
+## This is the new layout API
+## ----------------------------------------------------------------
+
+#' Graph layouts
+#'
+#' This is a generic function to apply a layout function to
+#' a graph.
+#'
+#' There are two ways to calculate graph layouts in igraph.
+#' The first way is to call a layout function (they all have
+#' prefix \code{layout_} on a graph, to get the vertex coordinates.
+#'
+#' The second way (new in igraph 0.8.0), has two steps, and it
+#' is more flexible. First you call a layout specification
+#' function (the one without the \code{layout_} prefix, and
+#' then \code{lay_out} (or \code{\link{add_layout}}) to
+#' perform the layouting.
+#'
+#' The second way is preferred, as it is more flexible. It allows
+#' operations before and after the layouting. E.g. using the
+#' \code{comp_wise} argument, the layout can be calculated
+#' separately for each component, and then merged to get the
+#' final results.
+#'
+#' @section Modifiers:
+#' Modifiers modify how a layout calculation is performed.
+#' Currently implemented modifyers: \itemize{
+#'   \item \code{comp_wise} calculates the layout separately
+#'     for each component of the graph, and then merges
+#'     them.
+#'   \item \code{normalize} scales the layout to a square.
+#' }
+#'
+#' @param graph The input graph.
+#' @param layout The layout specification. It must be a call
+#'   to a layout specification function.
+#' @param ... Further modifiers, see a complete list below.
+#' @return The return value of the layout function, usually a
+#'   two column matrix. For 3D layouts a three column matrix.
+#'
+#' @seealso \code{\link{add_layout}} to add the layout to the
+#'   graph as an attribute.
+#' @export
+#' @examples
+#' g <- ring(10) + full_graph(5)
+#' coords <- lay_out(g, as_star())
+#' plot(g, layout = coords)
+#'
+#' g %>%
+#'   add_layout(as_star(), comp_wise()) %>%
+#'   plot()
+
+lay_out <- function(graph, layout) {
+  do_call(layout$fun, list(graph = graph), layout$args)
+}
+
+#' Add layout to graph
+#'
+#' @param graph The input graph.
+#' @param ... Additional arguments are passed to \code{\link{lay_out}}.
+#' @return The input graph, with the layout added.
+#'
+#' @seealso \code{\link{lay_out}} for a description of the layout API.
+#' @export
+#' @examples
+
+add_layout <- function(graph, ...) {
+  graph$layout <- lay_out(graph, ...)
+  graph
+}
+
+layout_spec <- function(fun, ...) {
+  my_call <- match.call(sys.function(1), sys.call(1))
+  my_call[[1]] <- substitute(fun)
+  structure(
+    list(
+      fun = fun,
+      call_str = sub("(", "(<graph>, ", deparse(my_call), fixed = TRUE),
+      args = list(...)
+    ),
+    class = "igraph_layout_spec"
+  )
+}
+
+#' @rdname lay_out
+#' @method print igraph_layout_spec
+#' @export
+
+print.igraph_layout_spec <- function(x, ...) {
+  cat(paste(
+    sep = "",
+    "Igraph layout specification, see ?lay_out:\n",
+    x$call_str, "\n"
+  ))
+}
+
+## ----------------------------------------------------------------
+## Layout definitions for the new API
+## ----------------------------------------------------------------
+
+
+#' Simple two-row layout for bipartite graphs
+#'
+#' Minimize edge-crossings in a simple two-row (or column) layout for bipartite
+#' graphs.
+#'
+#' The layout is created by first placing the vertices in two rows, according
+#' to their types. Then the positions within the rows are optimized to minimize
+#' edge crossings, using the Sugiyama algorithm (see
+#' \code{\link{layout_with_sugiyama}}).
+#'
+#' @aliases layout_as_bipartite layout.bipartite
+#' @param graph The bipartite input graph. It should have a logical
+#' \sQuote{\code{type}} vertex attribute, or the \code{types} argument must be
+#' given.
+#' @param types A logical vector, the vertex types. If this argument is
+#' \code{NULL} (the default), then the \sQuote{\code{type}} vertex attribute is
+#' used.
+#' @param hgap Real scalar, the minimum horizontal gap between vertices in the
+#' same layer.
+#' @param vgap Real scalar, the distance between the two layers.
+#' @param maxiter Integer scalar, the maximum number of iterations in the
+#' crossing minimization stage. 100 is a reasonable default; if you feel that
+#' you have too many edge crossings, increase this.
+#' @return A matrix with two columns and as many rows as the number of vertices
+#' in the input graph.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{layout_with_sugiyama}}
+#' @keywords graphs
+#' @export
+#' @examples
+#' # Random bipartite graph
+#' inc <- matrix(sample(0:1, 50, replace = TRUE, prob=c(2,1)), 10, 5)
+#' g <- graph_from_incidence_matrix(inc)
+#' plot(g, layout = layout_as_bipartite,
+#'      vertex.color=c("green","cyan")[V(g)$type+1])
+#'
+#' # Two columns
+#' g %>%
+#'   add_layout(as_bipartite()) %>%
+#'   plot()
+
+layout_as_bipartite <- function(graph, types = NULL, hgap = 1, vgap = 1,
+                                maxiter = 100) {
+
+  ## Argument checks
+  if (!is_igraph(graph)) { stop("Not a graph object") }
+  if (is.null(types) && "type" %in% vertex_attr_names(graph)) {
+    types <- V(graph)$type
+  }
+  if (!is.null(types)) {
+    if (!is.logical(types)) {
+      warning("vertex types converted to logical")
+    }
+    types <- as.logical(types)
+    if (any(is.na(types))) {
+      stop("`NA' is not allowed in vertex types")
+    }
+  } else {
+    stop("Not a bipartite graph, supply `types' argument")
+  }
+  hgap <- as.numeric(hgap)
+  vgap <- as.numeric(vgap)
+  maxiter <- as.integer(maxiter)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+
+  ## Function call
+  res <- .Call("R_igraph_layout_bipartite", graph, types, hgap, vgap, maxiter,
+               PACKAGE="igraph")
+
+  res
+}
+
+
+#' @rdname layout_as_bipartite
+#' @param ... Arguments to pass to \code{layout_as_bipartite}.
+#' @export
+
+as_bipartite <- function(...) layout_spec(layout_as_bipartite, ...)
+
+
+## ----------------------------------------------------------------
+
+
+#' Generate coordinates to place the vertices of a graph in a star-shape
+#'
+#' A simple layout generator, that places one vertex in the center of a circle
+#' and the rest of the vertices equidistantly on the perimeter.
+#'
+#' It is possible to choose the vertex that will be in the center, and the
+#' order of the vertices can be also given.
+#'
+#' @aliases layout_as_star layout.star
+#' @param graph The graph to layout.
+#' @param center The id of the vertex to put in the center. By default it is
+#' the first vertex.
+#' @param order Numeric vector, the order of the vertices along the perimeter.
+#' The default ordering is given by the vertex ids.
+#' @return A matrix with two columns and as many rows as the number of vertices
+#' in the input graph.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @seealso \code{\link{layout}} and \code{\link{layout.drl}} for other layout
+#' algorithms, \code{\link{plot.igraph}} and \code{\link{tkplot}} on how to
+#' plot graphs and \code{\link{star}} on how to create ring graphs.
+#' @keywords graphs
+#' @export
+#' @examples
+#'
+#' g <- star(10)
+#' layout_as_star(g)
+#'
+#' ## Alternative form
+#' layout(as_star(g))
+
+layout_as_star <- function(graph, center=V(graph)[1], order=NULL) {
+  # Argument checks
+  if (!is_igraph(graph)) { stop("Not a graph object") }
+  center <- as.igraph.vs(graph, center)
+  if (!is.null(order)) order <- as.numeric(order)-1
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_layout_star", graph, center-1, order,
+        PACKAGE="igraph")
+
+  res
+}
+
+
+#' @rdname layout_as_star
+#' @param ... Arguments to pass to \code{layout_as_star}.
+#' @export
+
+as_star <- function(...) layout_spec(layout_as_star, ...)
+
+
+## ----------------------------------------------------------------
+
+as_tree <- function() {
+
+}
+
+in_circle <- function() {
+
+}
+
+neatly <- function() {
+
+}
+
+on_grid <- function() {
+
+}
+
+on_sphere <- function() {
+
+}
+
+randomly <- function() {
+
+}
+
+with_dh <- function() {
+
+}
+
+with_drl <- function() {
+
+}
+
+with_fr <- function() {
+
+}
+
+with_gem <- function() {
+
+}
+
+with_graphopt <- function() {
+
+}
+
+with_kk <- function() {
+
+}
+
+with_lgl <- function() {
+
+}
+
+with_mds <- function() {
+
+}
+
+with_sugiyama <- function() {
+
+}
 
 #' Randomly place vertices on a plane or in 3d space
 #' 
