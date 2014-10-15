@@ -40,7 +40,7 @@
 #' The second way (new in igraph 0.8.0), has two steps, and it
 #' is more flexible. First you call a layout specification
 #' function (the one without the \code{layout_} prefix, and
-#' then \code{lay_out} (or \code{\link{add_layout}}) to
+#' then \code{layout_} (or \code{\link{add_layout_}}) to
 #' perform the layouting.
 #'
 #' The second way is preferred, as it is more flexible. It allows
@@ -65,15 +65,15 @@
 #' @return The return value of the layout function, usually a
 #'   two column matrix. For 3D layouts a three column matrix.
 #'
-#' @seealso \code{\link{add_layout}} to add the layout to the
+#' @seealso \code{\link{add_layout_}} to add the layout to the
 #'   graph as an attribute.
 #' @export
 #' @examples
 #' g <- ring(10) + full_graph(5)
-#' coords <- lay_out(g, as_star())
+#' coords <- layout_(g, as_star())
 #' plot(g, layout = coords)
 
-lay_out <- function(graph, layout, ...) {
+layout_ <- function(graph, layout, ...) {
 
   modifiers <- list(...)
   stopifnot(all(sapply(modifiers, inherits,
@@ -115,18 +115,18 @@ lay_out <- function(graph, layout, ...) {
 #' Add layout to graph
 #'
 #' @param graph The input graph.
-#' @param ... Additional arguments are passed to \code{\link{lay_out}}.
+#' @param ... Additional arguments are passed to \code{\link{layout_}}.
 #' @return The input graph, with the layout added.
 #'
-#' @seealso \code{\link{lay_out}} for a description of the layout API.
+#' @seealso \code{\link{layout_}} for a description of the layout API.
 #' @export
 #' @examples
 #' g %>%
-#'   add_layout(as_star(), component_wise()) %>%
+#'   add_layout_(as_star(), component_wise()) %>%
 #'   plot()
 
-add_layout <- function(graph, ...) {
-  graph$layout <- lay_out(graph, ...)
+add_layout_ <- function(graph, ...) {
+  graph$layout <- layout_(graph, ...)
   graph
 }
 
@@ -145,14 +145,14 @@ layout_spec <- function(fun, ...) {
 }
 
 
-#' @rdname lay_out
+#' @rdname layout_
 #' @method print igraph_layout_spec
 #' @export
 
 print.igraph_layout_spec <- function(x, ...) {
   cat(paste(
     sep = "",
-    "igraph layout specification, see ?lay_out:\n",
+    "igraph layout specification, see ?layout_:\n",
     x$call_str, "\n"
   ))
 }
@@ -166,7 +166,7 @@ layout_modifier <- function(...) {
 }
 
 
-#' @rdname lay_out
+#' @rdname layout_
 #' @method print igraph_layout_modifier
 #' @export
 
@@ -184,12 +184,12 @@ print.igraph_layout_modifier <- function(x, ...) {
 #'   argument of \code{\link{merge_coords}}.
 #'
 #' @family layout modifiers
-#' @seealso \code{\link{merge_coords}}, \code{\link{lay_out}}.
+#' @seealso \code{\link{merge_coords}}, \code{\link{layout_}}.
 #' @export
 #' @examples
 #' g <- ring(10) + ring(10)
 #' g %>%
-#'   add_layout(in_circle, component_wise()) %>%
+#'   add_layout_(in_circle, component_wise()) %>%
 #'   plot()
 
 component_wise <- function(merge_method = "dla") {
@@ -211,10 +211,10 @@ component_wise <- function(merge_method = "dla") {
 #' @param zmin,zmax Minimum and maximum for z coordinates.
 #'
 #' @family layout modifiers
-#' @seealso \code{\link{merge_coords}}, \code{\link{lay_out}}.
+#' @seealso \code{\link{merge_coords}}, \code{\link{layout_}}.
 #' @export
 #' @example
-#' lay_out(ring(10), with_fr(), normalize())
+#' layout_(ring(10), with_fr(), normalize())
 
 normalize <- function(xmin = -1, xmax = 1, ymin = xmin, ymax = xmax,
                       zmin = xmin, zmax = xmax) {
@@ -270,7 +270,7 @@ normalize <- function(xmin = -1, xmax = 1, ymin = xmin, ymax = xmax,
 #'
 #' # Two columns
 #' g %>%
-#'   add_layout(as_bipartite()) %>%
+#'   add_layout_(as_bipartite()) %>%
 #'   plot()
 
 layout_as_bipartite <- function(graph, types = NULL, hgap = 1, vgap = 1,
