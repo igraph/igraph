@@ -45,14 +45,14 @@
 #'
 #' The second way is preferred, as it is more flexible. It allows
 #' operations before and after the layouting. E.g. using the
-#' \code{comp_wise} argument, the layout can be calculated
+#' \code{component_wise} argument, the layout can be calculated
 #' separately for each component, and then merged to get the
 #' final results.
 #'
 #' @section Modifiers:
 #' Modifiers modify how a layout calculation is performed.
 #' Currently implemented modifyers: \itemize{
-#'   \item \code{comp_wise} calculates the layout separately
+#'   \item \code{component_wise} calculates the layout separately
 #'     for each component of the graph, and then merges
 #'     them.
 #'   \item \code{normalize} scales the layout to a square.
@@ -73,8 +73,42 @@
 #' coords <- lay_out(g, as_star())
 #' plot(g, layout = coords)
 
-lay_out <- function(graph, layout) {
-  do_call(layout$fun, list(graph = graph), layout$args)
+lay_out <- function(graph, layout, ...) {
+
+  modifiers <- list(...)
+  stopifnot(all(sapply(modifiers, inherits,
+                       what = "igraph_layout_modifier")))
+
+  ids <- sapply(modifiers, "[[", "id")
+  stopifnot(all(ids %in% c("component_wise", "normalize")))
+  if (anyDuplicated(ids)) stop("Duplicate modifiers")
+  names(modifiers) <- ids
+
+  ## TODO: better, generic mechanism for modifiers
+  if ("component_wise" %in% ids) {
+    graph$id <- seq(vcount(graph))
+    comps <- decompose(graph)
+    coords <- lapply(comps, function(comp) {
+      do_call(layout$fun, list(graph = comp), layout$args)
+    })
+    all_coords <- merge_coords(
+      comps,
+      coords,
+      method = modifiers[["component_wise"]]$args$merge_method
+    )
+    all_coords[ unlist(sapply(comps, vertex_attr, "id")), ] <- all_coords[]
+    result <- all_coords
+
+  } else {
+    result <- do_call(layout$fun, list(graph = graph), layout$args)
+  }
+
+  if ("normalize" %in% ids) {
+    result <- do_call(norm_coords, list(result),
+                      modifiers[["normalize"]]$args)
+  }
+
+  result
 }
 
 
@@ -88,7 +122,7 @@ lay_out <- function(graph, layout) {
 #' @export
 #' @examples
 #' g %>%
-#'   add_layout(as_star(), comp_wise()) %>%
+#'   add_layout(as_star(), component_wise()) %>%
 #'   plot()
 
 add_layout <- function(graph, ...) {
@@ -118,11 +152,80 @@ layout_spec <- function(fun, ...) {
 print.igraph_layout_spec <- function(x, ...) {
   cat(paste(
     sep = "",
-    "Igraph layout specification, see ?lay_out:\n",
+    "igraph layout specification, see ?lay_out:\n",
     x$call_str, "\n"
   ))
 }
 
+
+layout_modifier <- function(...) {
+  structure(
+    list(...),
+    class = "igraph_layout_modifier"
+  )
+}
+
+
+#' @rdname lay_out
+#' @method print igraph_layout_modifier
+#' @export
+
+print.igraph_layout_modifier <- function(x, ...) {
+  cat(sep = "", "igraph layout modifier: ", x$id, ".\n")
+}
+
+#' Component-wise layout
+#'
+#' This is a layout modifier function, and it can be used
+#' to calculate the layout separately for each component
+#' of the graph.
+#'
+#' @param merge_method Merging algorithm, the \code{method}
+#'   argument of \code{\link{merge_coords}}.
+#'
+#' @family layout modifiers
+#' @seealso \code{\link{merge_coords}}, \code{\link{lay_out}}.
+#' @export
+#' @examples
+#' g <- ring(10) + ring(10)
+#' g %>%
+#'   add_layout(in_circle, component_wise()) %>%
+#'   plot()
+
+component_wise <- function(merge_method = "dla") {
+
+  args <- grab_args()
+
+  layout_modifier(
+    id = "component_wise",
+    args = args
+  )
+}
+
+#' Normalize layout
+#'
+#' Scale coordinates of a layout.
+#'
+#' @param xmin,xmin Minimum and maximum for x coordinates.
+#' @param ymin,ymax Minimum and maximum for y coordinates.
+#' @param zmin,zmax Minimum and maximum for z coordinates.
+#'
+#' @family layout modifiers
+#' @seealso \code{\link{merge_coords}}, \code{\link{lay_out}}.
+#' @export
+#' @example
+#' lay_out(ring(10), with_fr(), normalize())
+
+normalize <- function(xmin = -1, xmax = 1, ymin = xmin, ymax = xmax,
+                      zmin = xmin, zmax = xmax) {
+
+  args <- grab_args()
+
+  layout_modifier(
+    id = "normalize",
+    args = args
+  )
+}
 
 ## ----------------------------------------------------------------
 ## Layout definitions for the new API
