@@ -4,7 +4,7 @@ context("Kamada-Kawai layouts")
 test_that("Kamada-Kawai layout generator works", {
 
   library(igraph)
-  g <- ring(10)
+  g <- make_ring(10)
   l <- layout_with_kk(g, maxiter=50)
   if (Sys.info()["sysname"] == "Darwin") {
     expect_that(sum(l), equals(-1.13071769106689))
@@ -16,7 +16,7 @@ test_that("Kamada-Kawai layout generator works", {
     expect_that(sum(l), equals(0.914809637353466))
   }
 
-  g <- star(30)
+  g <- make_star(30)
   l <- layout_with_kk(g, maxiter=500)
   if (Sys.info()["sysname"] == "Darwin") {
     expect_that(sum(l), equals(-85.6883999492408))
@@ -28,7 +28,7 @@ test_that("Kamada-Kawai layout generator works", {
     expect_that(sum(l), equals(-85.142223229617))
   }
 
-  g <- ring(10)
+  g <- make_ring(10)
   E(g)$weight <- rep(1:2, length.out=ecount(g))
   l <- layout_with_kk(g, maxiter=500)
   if (Sys.info()["sysname"] == "Darwin") {
@@ -46,7 +46,7 @@ test_that("Kamada-Kawai layout generator works", {
 test_that("3D Kamada-Kawai layout generator works", {
 
   library(igraph)
-  g <- star(30)
+  g <- make_star(30)
   l <- layout_with_kk(g, maxiter=5000, dim=3)
   expect_that(sum(l), equals(61.0559727551764))
 

@@ -70,10 +70,10 @@
 #' @examples
 #' 
 #' ## Projection of a full bipartite graph is a full graph
-#' g <- full_bipartite_graph(10,5)
+#' g <- make_full_bipartite_graph(10,5)
 #' proj <- bipartite_projection(g)
-#' graph.isomorphic(proj[[1]], full_graph(10))
-#' graph.isomorphic(proj[[2]], full_graph(5))
+#' graph.isomorphic(proj[[1]], make_full_graph(10))
+#' graph.isomorphic(proj[[2]], make_full_graph(5))
 #' 
 #' ## The projection keeps the vertex attributes
 #' M <- matrix(0, nr=5, nc=3)

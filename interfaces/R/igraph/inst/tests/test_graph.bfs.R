@@ -4,7 +4,7 @@ context("BFS")
 test_that("BFS works from multiple root vertices", {
 
   library(igraph)
-  g <- ring(10) %du% ring(10)
+  g <- make_ring(10) %du% make_ring(10)
 
   expect_that(bfs(g, 1)$order,
               equals(c(1,2,10,3,9,4,8,5,7,6,11,12,20,13,19,14,18,15,17,16)))

@@ -184,7 +184,7 @@ delete_vertices(graph, v)
   logical indices and negative indices as well, with the usual R
   semantics. E.g. \preformatted{  graph[degree(graph)==0, 1] <- 1}
   adds an edge from every isolate vertex to vertex one,
-  and \preformatted{  G <- empty_graph(10)
+  and \preformatted{  G <- make_empty_graph(10)
   G[-1,1] <- TRUE}
   creates a star graph.
 
@@ -236,7 +236,7 @@ delete_vertices(graph, v)
     as vertex ids of the end points of the new edges. The named
     arguments will be added as edge attributes.
 
-    Examples: \preformatted{  g <- empty_graph() + vertices(letters[1:10]) +
+    Examples: \preformatted{  g <- make_empty_graph() + vertices(letters[1:10]) +
   vertices("foo", "bar", "bar2", "foobar2")
   g <- g + edge("a", "b")
   g <- g + edges("foo", "bar", "bar2", "foobar2")
@@ -254,18 +254,18 @@ delete_vertices(graph, v)
     as the vertex ids along the path. The remaining arguments are added
     as edge attributes.
 
-    Examples: \preformatted{  g <- empty_graph() + vertices(letters[1:10])
+    Examples: \preformatted{  g <- make_empty_graph() + vertices(letters[1:10])
   g <- g + path("a", "b", "c", "d")
   g <- g + path("e", "f", "g", weight=1:2, color="red")
   g <- g + path(c("f", "c", "j", "d"), width=1:3, color="green")}
   }
 
   It is important to note that, although the plus operator is
-  commutative, i.e. is possible to write \preformatted{  graph <- "foo" + empty_graph()}
-  it is not associative, e.g. \preformatted{  graph <- "foo" + "bar" + empty_graph()}
-  results a syntax error, unless parentheses are used: \preformatted{  graph <- "foo" + ( "bar" + empty_graph() )}
+  commutative, i.e. is possible to write \preformatted{  graph <- "foo" + make_empty_graph()}
+  it is not associative, e.g. \preformatted{  graph <- "foo" + "bar" + make_empty_graph()}
+  results a syntax error, unless parentheses are used: \preformatted{  graph <- "foo" + ( "bar" + make_empty_graph() )}
   For clarity, we suggest to always put the graph object on the left
-  hand side of the operator: \preformatted{  graph <- empty_graph() + "foo" + "bar"}  
+  hand side of the operator: \preformatted{  graph <- make_empty_graph() + "foo" + "bar"}  
 }
 \section{The minus operator for deleting vertices and edges}{
   The minus operator (\sQuote{\code{-}}) can be used to remove vertices
@@ -276,7 +276,7 @@ delete_vertices(graph, v)
     two graphs is calculated, see \code{\link{difference}}.
   \item If it is a numeric or character vector, then it is interpreted
     as a vector of vertex ids and the specified vertices will be
-    deleted from the graph. Example: \preformatted{  g <- ring(10)
+    deleted from the graph. Example: \preformatted{  g <- make_ring(10)
   V(g)$name <- letters[1:10]
   g <- g - c("a", "b")}
   \item If \code{e2} is a vertex sequence (e.g. created by the
@@ -292,7 +292,7 @@ delete_vertices(graph, v)
     \code{edges}) function, then all arguments of \code{edges} are
     concatenated and then interpreted as edges to be removed from the
     graph.
-    Example: \preformatted{  g <- ring(10)
+    Example: \preformatted{  g <- make_ring(10)
   V(g)$name <- letters[1:10]
   E(g)$name <- LETTERS[1:10]
   g <- g - edge("e|f")
@@ -300,7 +300,7 @@ delete_vertices(graph, v)
   \item If it is an object created with the \code{path} function,
     then all \code{path} arguments are concatenated and then interpreted
     as a path along which edges will be removed from the graph.
-    Example: \preformatted{  g <- ring(10)
+    Example: \preformatted{  g <- make_ring(10)
   V(g)$name <- letters[1:10]
   g <- g - path("a", "b", "c", "d")}
   }
@@ -334,7 +334,7 @@ delete_vertices(graph, v)
 % \seealso{}
 \examples{
 # 10 vertices named a,b,c,... and no edges
-g <- empty_graph() + vertices(letters[1:10])
+g <- make_empty_graph() + vertices(letters[1:10])
 
 # Add edges to make it a ring
 g <- g + path(letters[1:10], letters[1], color="grey")
@@ -347,7 +347,7 @@ if (interactive()) {
 }
 
 # The old-style operations
-g <- ring(10)
+g <- make_ring(10)
 add_edges(g, c(2,6,3,7) )
 delete_edges(g, E(g, P=c(1,10, 2,3)) )
 delete_vertices(g, c(2,7,8) )

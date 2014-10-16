@@ -227,7 +227,7 @@ hrg
 consensus_tree(g, hrg=hrg, start=TRUE)
 
 ## Prediction of missing edges
-g2 <- full_graph(4) + (full_graph(4) - path(1,2))
+g2 <- make_full_graph(4) + (make_full_graph(4) - path(1,2))
 predict_edges(g2)
 }
 }

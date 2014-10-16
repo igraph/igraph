@@ -462,7 +462,7 @@ scg_semi_proj <- function(groups,
 #' 
 #' \dontrun{
 #' # SCG of a toy network
-#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- make_full_graph(5) %du% make_full_graph(5) %du% make_full_graph(5)
 #' g <- add_edges(g, c(1,6, 1,11, 6, 11))
 #' cg <- scg(g, 1, 3, algo="exact_scg")
 #' 

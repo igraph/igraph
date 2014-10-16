@@ -288,8 +288,8 @@ graph.isomorphic.bliss(g1, g2)
 graph.isomorphic.vf2(g1, g2)
 
 # colored graph isomorphism
-g1 <- ring(10)
-g2 <- ring(10)
+g1 <- make_ring(10)
+g2 <- make_ring(10)
 graph.isomorphic.vf2(g1, g2)
 
 V(g1)$color <- rep(1:2, length=vcount(g1))
@@ -309,9 +309,9 @@ graph.isomorphic.vf2(g2, g2, vertex.color1=NULL,
     vertex.color2=NULL)
 
 # The LAD example
-pattern <- graph_from_formula(1:2:3:4:5,
+pattern <- graph_from_literal(1:2:3:4:5,
                      1 - 2:5, 2 - 1:5:3, 3 - 2:4, 4 - 3:5, 5 - 4:2:1)
-target <- graph_from_formula(1:2:3:4:5:6:7:8:9,
+target <- graph_from_literal(1:2:3:4:5:6:7:8:9,
                     1 - 2:5:7, 2 - 1:5:3, 3 - 2:4, 4 - 3:5:6:8:9,
                     5 - 1:2:4:6:7, 6 - 7:5:4:9, 7 - 1:5:6,
                     8 - 4:9, 9 - 6:4:8)
@@ -322,9 +322,9 @@ graph.subisomorphic.lad(pattern, target, induced=TRUE, all.maps=TRUE)
 graph.subisomorphic.lad(pattern, target, domains=domains, all.maps=TRUE)
 
 # Directed LAD example
-pattern <- graph_from_formula(1:2:3, 1 -+ 2:3)
-uring <- ring(10)
-dring <- ring(10, directed=TRUE)
+pattern <- graph_from_literal(1:2:3, 1 -+ 2:3)
+uring <- make_ring(10)
+dring <- make_ring(10, directed=TRUE)
 graph.subisomorphic.lad(pattern, uring)
 graph.subisomorphic.lad(pattern, dring)
 }

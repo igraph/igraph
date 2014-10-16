@@ -421,7 +421,7 @@ plot.igraph <- function(x,
 #' @examples
 #' 
 #' \dontrun{
-#' g <- lattice( c(5,5,5) )
+#' g <- make_lattice( c(5,5,5) )
 #' coords <- layout_with_fr(g, dim=3)
 #' rglplot(g, layout=coords)
 #' }

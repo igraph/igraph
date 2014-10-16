@@ -11,7 +11,7 @@ am <- function(x) {
 
 test_that("[ can add and delete edges", {
 
-  g <- empty_graph(10) ;  A <- matrix(0, 10, 10)
+  g <- make_empty_graph(10) ;  A <- matrix(0, 10, 10)
 
   A[1,2] <- g[1,2] <- TRUE
   expect_that(am(g[]), equals(A))
@@ -25,14 +25,14 @@ test_that("[ can add and delete edges", {
   A[1,2] <- g[1,2] <- FALSE
   expect_that(am(g[]), equals(A))
 
-  g <- empty_graph(10) ; A <- matrix(0, 10, 10)
+  g <- make_empty_graph(10) ; A <- matrix(0, 10, 10)
   A[-1,1] <- g[-1,1] <- 1
   expect_that(am(g[]), equals(A))
 })
 
 test_that("[ can set weights and delete weighted edges", {
 
-  g <- empty_graph(10) ; A <- matrix(0, 10, 10)
+  g <- make_empty_graph(10) ; A <- matrix(0, 10, 10)
   g <- set_edge_attr(g, "weight", c(), 1)
   A[1,2] <- g[1,2] <- 1
   expect_that(am(g[]), equals(A))
@@ -52,7 +52,7 @@ test_that("[ can set weights and delete weighted edges", {
 
 test_that("[ can add edges and ste weights via vertex names", {
 
-  g <- empty_graph(10) ; A <- matrix(0, 10, 10)
+  g <- make_empty_graph(10) ; A <- matrix(0, 10, 10)
   V(g)$name <- letters[1:vcount(g)]
   rownames(A) <- colnames(A) <- letters[1:vcount(g)]
 
@@ -71,7 +71,7 @@ test_that("[ can add edges and ste weights via vertex names", {
 
 test_that("[ and the from-to notation", {
 
-  g <- empty_graph(10) ; A <- matrix(0, 10, 10)
+  g <- make_empty_graph(10) ; A <- matrix(0, 10, 10)
   V(g)$name <- letters[1:vcount(g)]
   rownames(A) <- colnames(A) <- letters[1:vcount(g)]
 
@@ -90,7 +90,7 @@ test_that("[ and the from-to notation", {
 
 test_that("[ and from-to with multiple values", {
 
-  g <- empty_graph(10) ; A <- matrix(0, 10, 10)
+  g <- make_empty_graph(10) ; A <- matrix(0, 10, 10)
   V(g)$name <- letters[1:vcount(g)]
   rownames(A) <- colnames(A) <- letters[1:vcount(g)]
 

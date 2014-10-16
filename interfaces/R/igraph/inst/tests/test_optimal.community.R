@@ -24,7 +24,7 @@ test_that("weighted cluster_optimal works", {
 
   library(igraph)
   set.seed(42)
-  g <- full_graph(5) + ring(5)
+  g <- make_full_graph(5) + make_ring(5)
   E(g)$weight <- sample(1:2, ecount(g), replace=TRUE)
 
   oc <- cluster_optimal(g)

@@ -3,7 +3,7 @@ context("betweenness")
 
 test_that("betweenness works for kite graph", {
   library(igraph)
-  kite <- graph_from_formula(Andre    - Beverly:Carol:Diane:Fernando,
+  kite <- graph_from_literal(Andre    - Beverly:Carol:Diane:Fernando,
                         Beverly  - Andre:Diane:Ed:Garth,
                         Carol    - Andre:Diane:Fernando,
                         Diane    - Andre:Beverly:Carol:Ed:Fernando:Garth,
@@ -52,7 +52,7 @@ test_that("weighted betweenness works", {
 test_that("normalization works well", {
   library(igraph)
 
-  g1 <- graph_from_formula( 0 +-+ 1 +-+ 2 )
+  g1 <- graph_from_literal( 0 +-+ 1 +-+ 2 )
 
   b11 <- betweenness(g1, normalized=TRUE, directed=FALSE)
   expect_that(b11, equals(c('0'=0, '1'=1, '2'=0)))
@@ -60,7 +60,7 @@ test_that("normalization works well", {
   b12 <- betweenness(g1, normalized=TRUE, directed=TRUE)
   expect_that(b12, equals(c('0'=0, '1'=1, '2'=0)))
 
-  g2 <- graph_from_formula( 0 --- 1 --- 2 )
+  g2 <- graph_from_literal( 0 --- 1 --- 2 )
 
   b2  <- betweenness(g2, normalized=TRUE)
   expect_that(b2, equals(c('0'=0, '1'=1, '2'=0)))

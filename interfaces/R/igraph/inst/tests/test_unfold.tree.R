@@ -5,7 +5,7 @@ test_that("unfold_tree works", {
   
   library(igraph)
   
-  g <- tree(7, 2)
+  g <- make_tree(7, 2)
   g <- add_edges(g, c(2,7, 1,4))
   g2 <- unfold_tree(g, roots=1)
   expect_that(graph.isomorphic(g2$tree, graph(c(1,2, 1,3, 2,8, 2,5, 3,6,

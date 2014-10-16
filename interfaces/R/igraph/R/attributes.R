@@ -423,7 +423,7 @@ delete_edge_attr <- function(graph, name) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' is_named(g)
 #' V(g)$name <- letters[1:10]
 #' is_named(g)
@@ -462,7 +462,7 @@ is_named <- function(graph) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' shortest_paths(g, 8, 2)
 #' E(g)$weight <- seq_len(ecount(g))
 #' shortest_paths(g, 8, 2)
@@ -474,7 +474,7 @@ is_weighted <- function(graph) {
   "weight" %in% edge_attr_names(graph)
 }
 
-#' @rdname bipartite_graph
+#' @rdname make_bipartite_graph
 #' @export
 
 is_bipartite <- function(graph) {

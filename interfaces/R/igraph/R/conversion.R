@@ -216,13 +216,13 @@ as_edgelist <- function(graph, names=TRUE) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' as.directed(g, "mutual")
-#' g2 <- star(10)
+#' g2 <- make_star(10)
 #' as.undirected(g)
 #' 
 #' # Combining edge attributes
-#' g3 <- ring(10, directed=TRUE, mutual=TRUE)
+#' g3 <- make_ring(10, directed=TRUE, mutual=TRUE)
 #' E(g3)$weight <- seq_len(ecount(g3))
 #' ug3 <- as.undirected(g3)
 #' print(ug3, e=TRUE)
@@ -303,7 +303,7 @@ as.undirected <- function(graph, mode=c("collapse", "each", "mutual"), edge.attr
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' as_adj_list(g)
 #' as_adj_edge_list(g)
 #' 
@@ -616,7 +616,7 @@ get.incidence.sparse <- function(graph, types, names, attr) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- bipartite_graph( c(0,1,0,1,0,0), c(1,2,2,3,3,4) )
+#' g <- make_bipartite_graph( c(0,1,0,1,0,0), c(1,2,2,3,3,4) )
 #' as_incidence_matrix(g)
 #' 
 as_incidence_matrix <- function(graph, types=NULL, attr=NULL,

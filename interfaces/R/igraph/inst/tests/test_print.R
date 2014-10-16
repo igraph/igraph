@@ -7,7 +7,7 @@ test_that("print.igraph works", {
   igraph_options(print.full=TRUE)
   options(width=76)
 
-  g <- ring(5)
+  g <- make_ring(5)
   expect_that(summary(g), prints_text("attr:.* name[ ]*[(]g/c[)]"))
   expect_that(g, prints_text("attr:.* name[ ]*[(]g/c[)]"))
   expect_that(g, prints_text("1--2"))
@@ -32,16 +32,16 @@ test_that("print.igraph works", {
   g3 <- sample_gnp(20, p=0.8)
   expect_that(g3, prints_text("1 --"))
 
-  g4 <- star(100)
+  g4 <- make_star(100)
   expect_that(g4, prints_text("2->1"))
 
-  g5 <- star(100, mode="out")
+  g5 <- make_star(100, mode="out")
   expect_that(g5, prints_text("1->"))
 
   g6 <- sample_pa(100, m=6, directed=FALSE)
   expect_that(g6, prints_text("     "))
 
-  kite <- empty_graph(directed=FALSE) + LETTERS[1:10]
+  kite <- make_empty_graph(directed=FALSE) + LETTERS[1:10]
   kite <- kite + edges('A','B','A','C','A','D','A','F',
                        'B','D','B','E','B','G', 'C','D','C','F', 
                        'D','E','D','F','D','G', 'E','G', 

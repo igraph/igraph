@@ -10,7 +10,7 @@ pause <- function() {
 pause()
 
 ### Create a star-like graph
-t1 <- graph_from_formula(A-B:C:D:E)
+t1 <- graph_from_literal(A-B:C:D:E)
 t1
 
 pause()
@@ -49,7 +49,7 @@ plot(t3, main=paste("Transitivity of 'A':", round(tr,4)))
 pause()
 
 ### A one dimensional, circular lattice
-ring <- graph.ring(50)
+ring <- make_ring(50)
 ring$layout <- layout_in_circle
 V(ring)$size <- 3
 plot(ring, vertex.label=NA, main="Ring graph")

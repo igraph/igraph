@@ -195,7 +195,7 @@
 #' @examples
 #' 
 #' ## The graph from the Moody-White paper
-#' mw <- graph_from_formula(1-2:3:4:5:6, 2-3:4:5:7, 3-4:6:7, 4-5:6:7,
+#' mw <- graph_from_literal(1-2:3:4:5:6, 2-3:4:5:7, 3-4:6:7, 4-5:6:7,
 #'                 5-6:7:21, 6-7, 7-8:11:14:19, 8-9:11:14, 9-10,
 #'                 10-12:13, 11-12:14, 12-16, 13-16, 14-15, 15-16,
 #'                 17-18:19:20, 18-20:21, 19-20:22:23, 20-21,
@@ -219,7 +219,7 @@
 #' }
 #' 
 #' ## The science camp network
-#' camp <- graph_from_formula(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
+#' camp <- graph_from_literal(Harry:Steve:Don:Bert - Harry:Steve:Don:Bert,
 #'                   Pam:Brazey:Carol:Pat - Pam:Brazey:Carol:Pat,
 #'                   Holly   - Carol:Pat:Pam:Jennie:Bill,
 #'                   Bill    - Pauline:Michael:Lee:Holly,

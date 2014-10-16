@@ -86,7 +86,7 @@ get.edges(graph, es)
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \seealso{\code{\link{graph}}}
 \examples{
-g <- ring(10)
+g <- make_ring(10)
 gorder(g)
 vcount(g)
 gsize(g)

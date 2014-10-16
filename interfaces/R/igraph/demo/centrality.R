@@ -8,7 +8,7 @@ pause <- function() {
 }
 
 ### Traditional approaches: degree, closeness, betweenness
-g <- graph_from_formula(Andre----Beverly:Diane:Fernando:Carol,
+g <- graph_from_literal(Andre----Beverly:Diane:Fernando:Carol,
                Beverly--Andre:Diane:Garth:Ed,
                Carol----Andre:Diane:Fernando,
                Diane----Andre:Carol:Fernando:Garth:Ed:Beverly,

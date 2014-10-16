@@ -94,7 +94,7 @@ igraph_opt(x, default = NULL)
 \examples{
 oldval <- igraph_opt("verbose")
 igraph_options(verbose=TRUE)
-layout_with_kk(ring(10))
+layout_with_kk(make_ring(10))
 igraph_options(verbose=oldval)
 }
 \keyword{graphs}

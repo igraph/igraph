@@ -33,7 +33,7 @@ contract(graph, mapping,
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 % \seealso{}
 \examples{
-g <- ring(10)
+g <- make_ring(10)
 g$name <- "Ring"
 V(g)$name <- letters[1:vcount(g)]
 E(g)$weight <- runif(ecount(g))

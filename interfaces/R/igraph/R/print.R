@@ -325,7 +325,7 @@ str.igraph <- function(object, ...) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' g
 #' summary(g)
 #' 

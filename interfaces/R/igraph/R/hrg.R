@@ -124,7 +124,7 @@ predict_edges <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- full_graph(5) + full_graph(5)
+#' g <- make_full_graph(5) + make_full_graph(5)
 #' hrg <- fit_hrg(g)
 #' as.igraph(hrg)
 #' 
@@ -381,7 +381,7 @@ as_phylo.igraphHRG <- function(x, ...) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- full_graph(5) + full_graph(5)
+#' g <- make_full_graph(5) + make_full_graph(5)
 #' hrg <- fit_hrg(g)
 #' plot_dendrogram(hrg)
 #' 

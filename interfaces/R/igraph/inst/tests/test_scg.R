@@ -7,7 +7,7 @@ test_that("SCG functions work", {
 
   library(igraph)
 
-  tree <- tree(10, 3, "undirected")
+  tree <- make_tree(10, 3, "undirected")
   treeM <- as_adj(tree, sparse=TRUE)
   treeM2 <- as_adj(tree, sparse=FALSE)
 

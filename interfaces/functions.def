@@ -855,7 +855,7 @@ igraph_bipartite_projection:
 igraph_create_bipartite:
         PARAMS: OUT GRAPH graph, IN VECTOR_BOOL types, \
                 VECTORM1 edges, BOOLEAN directed=False
-        NAME-R: bipartite_graph
+        NAME-R: make_bipartite_graph
         IGNORE: RR
 
 igraph_incidence:

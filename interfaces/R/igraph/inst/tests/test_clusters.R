@@ -28,7 +28,7 @@ test_that("components works", {
 test_that("components names results", {
   library(igraph)
 
-  g <- ring(10) + full_graph(5)
+  g <- make_ring(10) + make_full_graph(5)
   V(g)$name <- letters[1:15]
 
   clu <- components(g)
@@ -38,7 +38,7 @@ test_that("components names results", {
 test_that("groups works", {
   library(igraph)
 
-  g <- ring(10) + full_graph(5)
+  g <- make_ring(10) + make_full_graph(5)
   gr <- groups(components(g))
 
   expect_that(gr, equals(structure(list(`1` = 1:10, `2` = 11:15), .Dim = 2L,

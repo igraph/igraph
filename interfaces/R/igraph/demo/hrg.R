@@ -64,8 +64,8 @@ pause()
 
 ### Make a very hierarchical graph
 
-g1 <- full_graph(5)
-g2 <- graph.ring(5)
+g1 <- make_full_graph(5)
+g2 <- make_ring(5)
 
 g <- g1 + g2
 g <- g + edge(1, vcount(g1)+1)

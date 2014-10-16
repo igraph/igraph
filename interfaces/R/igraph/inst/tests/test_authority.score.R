@@ -32,7 +32,7 @@ test_that("authority score works", {
 
 test_that("authority scores of a ring are all one", {
   library(igraph)
-  g3 <- ring(100)
+  g3 <- make_ring(100)
   expect_that(authority_score(g3)$vector, equals(rep(1, vcount(g3))))
   expect_that(hub_score(g3)$vector, equals(rep(1, vcount(g3))))
 })

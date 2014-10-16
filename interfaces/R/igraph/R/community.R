@@ -391,7 +391,7 @@ modularity <- function(x, ...)
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- make_full_graph(5) %du% make_full_graph(5) %du% make_full_graph(5)
 #' g <- add_edges(g, c(1,6, 1,11, 6, 11))
 #' wtc <- cluster_walktrap(g)
 #' modularity(wtc)
@@ -1002,7 +1002,7 @@ cluster_spinglass <- function(graph, weights=NULL, vertex=NULL, spins=25,
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- make_full_graph(5) %du% make_full_graph(5) %du% make_full_graph(5)
 #' g <- add_edges(g, c(1,6, 1,11, 6, 11))
 #' cluster_walktrap(g)
 #' 
@@ -1110,7 +1110,7 @@ cluster_walktrap <- function(graph, weights=E(graph)$weight, steps=4,
 #' g <- barabasi.game(100,m=2)
 #' eb <- cluster_edge_betweenness(g)
 #' 
-#' g <- full_graph(10) %du% full_graph(10)
+#' g <- make_full_graph(10) %du% make_full_graph(10)
 #' g <- add_edges(g, c(1,11))
 #' eb <- cluster_edge_betweenness(g)
 #' eb
@@ -1187,7 +1187,7 @@ cluster_edge_betweenness <- function(graph, weights=E(graph)$weight,
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- make_full_graph(5) %du% make_full_graph(5) %du% make_full_graph(5)
 #' g <- add_edges(g, c(1,6, 1,11, 6, 11))
 #' fc <- cluster_fast_greedy(g)
 #' membership(fc)
@@ -1305,7 +1305,7 @@ igraph.i.levc.arp <- function(externalP, externalE) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- make_full_graph(5) %du% make_full_graph(5) %du% make_full_graph(5)
 #' g <- add_edges(g, c(1,6, 1,11, 6, 11))
 #' lec <- cluster_leading_eigen(g)
 #' lec
@@ -1481,7 +1481,7 @@ cluster_label_prop <- function(graph, weights=NULL, initial=NULL,
 #' @examples
 #' 
 #' # This is so simple that we will have only one level
-#' g <- full_graph(5) %du% full_graph(5) %du% full_graph(5)
+#' g <- make_full_graph(5) %du% make_full_graph(5) %du% make_full_graph(5)
 #' g <- add_edges(g, c(1,6, 1,11, 6, 11))
 #' cluster_louvain(g)
 #' 

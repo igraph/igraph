@@ -14,7 +14,7 @@ am <- function(x) {
 library(igraph)
 library(Matrix, quietly=TRUE, warn.conflicts=FALSE)
 
-g <- tree(20)
+g <- make_tree(20)
 
 test_that("[ indexing works", {
   
@@ -208,7 +208,7 @@ test_that("[[ queries edges with vertex names", {
 test_that("[ handles from and to properly", {
   
   ## from & to
-  g <- tree(20)
+  g <- make_tree(20)
   expect_that(g[from=c(1,2,2,3), to=c(3,4,8,7)], equals(c(1,1,0,1)))
 
   V(g)$name <- letters[1:20]

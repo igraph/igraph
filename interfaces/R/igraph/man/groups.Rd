@@ -38,7 +38,7 @@ g <- make_graph("Zachary")
 fgc <- cluster_fast_greedy(g)
 groups(fgc)
 
-g2 <- ring(10) + full_graph(5)
+g2 <- make_ring(10) + make_full_graph(5)
 groups(components(g2))
 }
 \keyword{graphs}

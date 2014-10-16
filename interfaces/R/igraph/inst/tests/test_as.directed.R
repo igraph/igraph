@@ -17,7 +17,7 @@ test_that("as.directed works", {
 
 test_that("as.directed keeps attributes", {
   library(igraph)
-  g <- graph_from_formula( A-B-C, D-A, E )
+  g <- graph_from_literal( A-B-C, D-A, E )
   g$name <- "Small graph"
   g2 <- as.directed(g, mode="mutual")
   g3 <- as.directed(g, mode="arbitrary")

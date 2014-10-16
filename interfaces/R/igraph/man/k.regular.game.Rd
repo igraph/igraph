@@ -38,7 +38,7 @@ sample_k_regular (no.of.nodes, k, directed = FALSE, multiple = FALSE)
 }
 \examples{
 ## A simple ring
-ring <- sample_k_regular(10, 2)
+make_ring <- sample_k_regular(10, 2)
 plot(ring)
 
 ## k-regular graphs on 10 vertices, with k=1:9
