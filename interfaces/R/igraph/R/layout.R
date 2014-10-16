@@ -213,7 +213,7 @@ component_wise <- function(merge_method = "dla") {
 #' @family layout modifiers
 #' @seealso \code{\link{merge_coords}}, \code{\link{layout_}}.
 #' @export
-#' @example
+#' @examples
 #' layout_(ring(10), with_fr(), normalize())
 
 normalize <- function(xmin = -1, xmax = 1, ymin = xmin, ymax = xmax,
