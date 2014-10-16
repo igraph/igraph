@@ -43,7 +43,7 @@ sortgl <- function(x) {
 test_that("Graphlets work for some simple graphs", {
   library(igraph)
 
-  g <- full_graph(5)
+  g <- make_full_graph(5)
   E(g)$weight <- 1
   gl <- graphlet_basis(g)
 
@@ -52,7 +52,7 @@ test_that("Graphlets work for some simple graphs", {
   expect_that(sort(gl$cliques[[1]]), equals(1:vcount(g)))
   expect_that(gl$thresholds, equals(1))
 
-  g2 <- full_graph(5)
+  g2 <- make_full_graph(5)
   E(g2)$weight <- 1
   E(g2)[1%--%2]$weight <- 2
   gl2 <- sortgl(graphlet_basis(g2))

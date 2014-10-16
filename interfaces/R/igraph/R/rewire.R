@@ -35,7 +35,7 @@
 #' @family rewiring functions
 #' @export rewire
 #' @examples
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' g %>%
 #'   rewire(each_edge(p = .1, loops = FALSE)) %>%
 #'   plot(layout=layout_in_circle)
@@ -69,7 +69,7 @@ rewire <- function(graph, with) {
 #' @export
 #' @keywords graphs
 #' @examples
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' g %>%
 #'   rewire(keeping_degseq(niter = 20)) %>%
 #'   degree()
@@ -118,7 +118,7 @@ rewire_keeping_degseq <- function(graph, loops, niter) {
 #' @examples
 #'
 #' # Some random shortcuts shorten the distances on a lattice
-#' g <- lattice(length = 100, dim = 1, nei = 5)
+#' g <- make_lattice(length = 100, dim = 1, nei = 5)
 #' mean_distance(g)
 #' g <- rewire(g, each_edge(prob = 0.05))
 #' mean_distance(g)

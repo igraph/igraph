@@ -119,7 +119,7 @@ colnames(E) <- c("from", "to", "capacity")
 g1 <- graph_from_data_frame(as.data.frame(E))
 max_flow(g1, source=V(g1)["1"], target=V(g1)["2"])
 
-g <- ring(100)
+g <- make_ring(100)
 min_cut(g, capacity=rep(1,vcount(g)))
 min_cut(g, value.only=FALSE, capacity=rep(1,vcount(g)))
 

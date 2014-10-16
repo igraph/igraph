@@ -4,7 +4,7 @@ context("edge_betweenness")
 test_that("edge_betweenness works", {
   library(igraph)
 
-  kite <- graph_from_formula(Andre    - Beverly:Carol:Diane:Fernando,
+  kite <- graph_from_literal(Andre    - Beverly:Carol:Diane:Fernando,
                     Beverly  - Andre:Diane:Ed:Garth,
                     Carol    - Andre:Diane:Fernando,
                     Diane    - Andre:Beverly:Carol:Ed:Fernando:Garth,

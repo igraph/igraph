@@ -14,7 +14,7 @@
 \section{Igraph graphs}{
   Igraph graphs have a class \sQuote{\code{igraph}}. They are printed to
   the screen in a special format, here is an example, a ring graph
-  created using \code{\link{ring}}: \preformatted{    IGRAPH U--- 10 10 -- Ring graph
+  created using \code{\link{make_ring}}: \preformatted{    IGRAPH U--- 10 10 -- Ring graph
     + attr: name (g/c), mutual (g/x), circular (g/x)  }
   The \sQuote{\code{IGRAPH}} denotes that this is an igraph graph. Then
   come four bits that denote the kind of the graph: the first is
@@ -51,7 +51,7 @@
   \sQuote{games}.
 
   To create small graphs with a given structure probably the
-  \code{\link{graph_from_formula}} function is easiest. It uses R's formula
+  \code{\link{graph_from_literal}} function is easiest. It uses R's formula
   interface, its manual page contains many examples. Another option is
   \code{\link{graph}}, which takes numeric vertex ids directly.
   \code{\link{graph.atlas}} creates graph from the Graph Atlas,

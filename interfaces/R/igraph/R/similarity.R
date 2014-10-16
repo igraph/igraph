@@ -46,7 +46,7 @@
 #' @export
 #' @examples
 #'
-#' g <- ring(5)
+#' g <- make_ring(5)
 #' similarity(g, method = "dice")
 #' similarity(g, methof = "jaccard")
 

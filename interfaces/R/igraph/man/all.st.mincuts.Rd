@@ -57,7 +57,7 @@ st_min_cuts(graph, source, target, capacity = NULL)
 }
 \examples{
 # A difficult graph, from the Provan-Shier paper
-g <- graph_from_formula(s --+ a:b, a:b --+ t,
+g <- graph_from_literal(s --+ a:b, a:b --+ t,
                a --+ 1:2:3:4:5, 1:2:3:4:5 --+ b)
 st_min_cuts(g, source="s", target="t")
 }

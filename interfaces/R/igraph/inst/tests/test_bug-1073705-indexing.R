@@ -4,7 +4,7 @@ context("Bug 1073705")
 test_that("Weighted indexing does not remove edges", {
   library(igraph)
 
-  g <- ring(10)
+  g <- make_ring(10)
   g[1, 2, attr="weight"] <- 0
   expect_that("weight" %in% edge_attr_names(g), is_true())
   expect_that(E(g)$weight, equals(c(0, rep(NA, 9))))

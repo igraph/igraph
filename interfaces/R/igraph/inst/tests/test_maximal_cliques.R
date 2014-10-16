@@ -84,7 +84,7 @@ test_that("Maximal cliques work", {
   library(igraph)
   set.seed(42)
   G <- sample_gnm(1000, 1000)
-  cli <- full_graph(10)
+  cli <- make_full_graph(10)
   for (i in 1:10) {
     G <- permute(G, sample(vcount(G)))
     G <- G %u% cli

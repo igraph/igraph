@@ -55,12 +55,12 @@ hub_score (graph, scale = TRUE, weights=NULL, options = arpack_defaults)
 }
 \examples{
 ## An in-star
-g <- star(10)
+g <- make_star(10)
 hub_score(g)$vector
 authority_score(g)$vector
 
 ## A ring
-g2 <- ring(10)
+g2 <- make_ring(10)
 hub_score(g2)$vector
 authority_score(g2)$vector
 }

@@ -8,7 +8,7 @@ pause <- function() {
 }
 
 ### A modular graph has dense subgraphs
-mod <- full_graph(10) %du% full_graph(10) %du% full_graph(10)
+mod <- make_full_graph(10) %du% make_full_graph(10) %du% make_full_graph(10)
 perfect <- c(rep(1,10), rep(2,10), rep(3,10))
 perfect
 
@@ -181,7 +181,7 @@ pause()
 
 ### Apply it to a graph, this is the example graph from
 ##  the original publication
-g <- graph_from_formula(A-B:F:C:E:D, B-A:D:C:E:F:G, C-A:B:F:E:D, D-A:B:C:F:E,
+g <- graph_from_literal(A-B:F:C:E:D, B-A:D:C:E:F:G, C-A:B:F:E:D, D-A:B:C:F:E,
                E-D:A:C:B:F:V:W:U, F-H:B:A:C:D:E, G-B:J:K:L:H,
                H-F:G:I:J:K:L, I-J:L:H, J-I:G:H:L, K-G:H:L:M,
                L-H:G:I:J:K:M, M-K:L:Q:R:S:P:O:N, N-M:Q:R:P:S:O,

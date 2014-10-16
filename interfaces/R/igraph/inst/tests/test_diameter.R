@@ -37,7 +37,7 @@ test_that("diameter works", {
 
 #### Bug #680538
 
-  g <- tree(30, mode="undirected")
+  g <- make_tree(30, mode="undirected")
   E(g)$weight <- 2
   expect_that(diameter(g, unconnected=FALSE), equals(16))
 })

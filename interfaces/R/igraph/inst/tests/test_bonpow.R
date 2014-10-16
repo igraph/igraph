@@ -5,7 +5,7 @@ test_that("Power centrality works", {
   library(igraph)
 
   ## Generate some test data from Bonacich, 1987:
-  fig1 <- graph_from_formula( A -+ B -+ C:D )
+  fig1 <- graph_from_literal( A -+ B -+ C:D )
   fig1.bp <- lapply(seq(0, 0.8, by=0.2), function(x)
                     round(power_centrality(fig1, exponent=x), 2))
   expect_that(fig1.bp, equals(list(c(A=0.89, B=1.79, C=0, D=0),

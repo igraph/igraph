@@ -974,7 +974,7 @@ tkigraph <- function() {
                                 values=c("Directed (out)", "Directed (in)",
                                   "Undirected"), default="2"))
   read$mode <- c("out", "in", "undirected")[read$mode+1]
-  g <- tree(n=read$n, children=read$b, mode=read$mode)
+  g <- make_tree(n=read$n, children=read$b, mode=read$mode)
   lay <- layout_as_tree(g, root=1, mode="all")
   g <- set_graph_attr(g, "layout", lay)
   g <- set_graph_attr(g, "name", "Regular tree")
@@ -985,7 +985,7 @@ tkigraph <- function() {
   read <- .tkigraph.dialogbox(TITLE="Regular ring",
                               n=list(name="Vertices", type="numeric",
                                 default=100, min=0))
-  g <- ring(n=read$n)
+  g <- make_ring(n=read$n)
   g <- set_graph_attr(g, "layout", layout_in_circle)
   g <- set_graph_attr(g, "name", "Regular ring")
   .tkigraph.add.graph(g)
@@ -1007,7 +1007,7 @@ tkigraph <- function() {
                                 default=10, min=1))
   if (read$dim > 5) { read$dim <- 5 }
   dimv <- c(read$s1, read$s2, read$s3, read$s4, read$s5)[1:read$dim]
-  g <- lattice(dimvector=dimv)
+  g <- make_lattice(dimvector=dimv)
   g <- set_graph_attr(g, "name", "Regular Lattice")
   .tkigraph.add.graph(g)
 }
@@ -1020,7 +1020,7 @@ tkigraph <- function() {
                                 values=c("Directed (out)", "Directed (in)",
                                   "Undirected"), default="2"))
   read$mode <- c("out", "in", "undirected")[read$mode+1]
-  g <- star(read$n, mode=read$mode)
+  g <- make_star(read$n, mode=read$mode)
   g <- set_graph_attr(g, "name", "Star graph")
   .tkigraph.add.graph(g)
 }
@@ -1033,7 +1033,7 @@ tkigraph <- function() {
                                 default="FALSE"),
                               loops=list(name="Loops", type="boolean",
                                 default="FALSE"))
-  g <- full_graph(read$n, read$directed, read$loops)
+  g <- make_full_graph(read$n, read$directed, read$loops)
   g <- set_graph_attr(g, "name", "Full graph")
   .tkigraph.add.graph(g)
 }                             

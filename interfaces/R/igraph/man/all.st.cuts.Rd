@@ -41,11 +41,11 @@ st_cuts(graph, source, target)
 }
 \examples{
 # A very simple graph
-g <- graph_from_formula(a -+ b -+ c -+ d -+ e)
+g <- graph_from_literal(a -+ b -+ c -+ d -+ e)
 st_cuts(g, source="a", target="e")
 
 # A somewhat more difficult graph
-g2 <- graph_from_formula(s --+ a:b, a:b --+ t,
+g2 <- graph_from_literal(s --+ a:b, a:b --+ t,
                    a --+ 1:2:3, 1:2:3 --+ b)
 st_cuts(g2, source="s", target="t")
 }

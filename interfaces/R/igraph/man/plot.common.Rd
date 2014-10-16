@@ -434,7 +434,7 @@
 \dontrun{
 
 # plotting a simple ring graph, all default parameters, except the layout
-g <- ring(10)
+g <- make_ring(10)
 g$layout <- layout_in_circle
 plot(g)
 tkplot(g)
@@ -453,7 +453,7 @@ V(g)$color <- colbar[comps+1]
 plot(g, layout=layout_with_fr, vertex.size=5, vertex.label=NA)
 
 # plot communities in a graph
-g <- full_graph(5) \%du\% full_graph(5) \%du\% full_graph(5)
+g <- make_full_graph(5) \%du\% make_full_graph(5) \%du\% make_full_graph(5)
 g <- add_edges(g, c(1,6, 1,11, 6,11))
 com <- cluster_spinglass(g, spins=5)
 V(g)$color <- com$membership+1
@@ -462,9 +462,9 @@ plot(g, vertex.label.dist=1.5)
 
 # draw a bunch of trees, fix layout
 igraph_options(plot.layout=layout_as_tree)
-plot(tree(20, 2))
-plot(tree(50, 3), vertex.size=3, vertex.label=NA)
-tkplot(tree(50, 2, mode="undirected"), vertex.size=10,
+plot(make_tree(20, 2))
+plot(make_tree(50, 3), vertex.size=3, vertex.label=NA)
+tkplot(make_tree(50, 2, mode="undirected"), vertex.size=10,
 vertex.color="green")
 }
 }

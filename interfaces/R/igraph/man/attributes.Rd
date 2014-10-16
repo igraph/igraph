@@ -160,7 +160,7 @@ edge.attributes(graph)
   \code{\link{attribute.combination}} for details on how igraph combines
   attributes if several vertices or edges are mapped into one.}
 \examples{
-g <- ring(10)
+g <- make_ring(10)
 g <- set_graph_attr(g, "name", "RING")
 # It is the same as
 g$name <- "RING"
@@ -173,7 +173,7 @@ g <- set_edge_attr(g, "weight", value=runif(ecount(g)))
 edge_attr(g, "weight")
 
 # The following notation is more convenient
-g <- star(10)
+g <- make_star(10)
 
 V(g)$color <- c("red", "green")
 V(g)$color
@@ -184,7 +184,7 @@ E(g)$weight
 str(g, g=TRUE, v=TRUE, e=TRUE)
 
 # Setting all attributes at once
-g2 <- empty_graph(10)
+g2 <- make_empty_graph(10)
 g2
 
 graph_attr(g2) <- graph_attr(g)

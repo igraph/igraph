@@ -27,7 +27,7 @@
 #' @include interface.R iterators.R layout.R minimum.spanning.tree.R
 #' @include motifs.R nexus.R operators.R other.R package.R par.R plot.R
 #' @include plot.common.R plot.shapes.R pp.R print.R scg.R socnet.R
-#' @include sparsedf.R structural.properties.R structure.generators.R
+#' @include sparsedf.R structural.properties.R
 #' @include structure.info.R test.R tkplot.R topology.R layout_drl.R
 NULL
 
@@ -220,13 +220,13 @@ deprecated("graph.adjacency", graph_from_adjacency_matrix)
 #' @export graph.adjlist
 deprecated("graph.adjlist", graph_from_adj_list)
 #' @export graph.atlas
-deprecated("graph.atlas", graph_atlas)
+deprecated("graph.atlas", graph_from_atlas)
 #' @export graph.automorphisms
 deprecated("graph.automorphisms", automorphisms)
 #' @export graph.bfs
 deprecated("graph.bfs", bfs)
 #' @export graph.bipartite
-deprecated("graph.bipartite", bipartite_graph)
+deprecated("graph.bipartite", make_bipartite_graph)
 #' @export graph.cohesion
 deprecated("graph.cohesion", cohesion)
 #' @export graph.complementer
@@ -238,7 +238,7 @@ deprecated("graph.coreness", coreness)
 #' @export graph.data.frame
 deprecated("graph.data.frame", graph_from_data_frame)
 #' @export graph.de.bruijn
-deprecated("graph.de.bruijn", de_bruijn_graph)
+deprecated("graph.de.bruijn", make_de_bruijn_graph)
 #' @export graph.density
 deprecated("graph.density", density)
 #' @export graph.disjoint.union
@@ -256,15 +256,15 @@ deprecated("graph.eigen", spectrum)
 #' @export graph.empty
 deprecated("graph.empty", empty_graph)
 #' @export graph.extended.chordal.ring
-deprecated("graph.extended.chordal.ring", chordal_ring)
+deprecated("graph.extended.chordal.ring", make_chordal_ring)
 #' @export graph.formula
-deprecated("graph.formula", graph_from_formula)
+deprecated("graph.formula", graph_from_literal)
 #' @export graph.full
-deprecated("graph.full", full_graph)
+deprecated("graph.full", make_full_graph)
 #' @export graph.full.bipartite
-deprecated("graph.full.bipartite", full_bipartite_graph)
+deprecated("graph.full.bipartite", make_full_bipartite_graph)
 #' @export graph.full.citation
-deprecated("graph.full.citation", full_citation_graph)
+deprecated("graph.full.citation", make_full_citation_graph)
 #' @export graph.graphdb
 deprecated("graph.graphdb", graph_from_graphdb)
 #' @export graph.incidence
@@ -274,13 +274,13 @@ deprecated("graph.isoclass", iso_class)
 #' @export graph.isocreate
 deprecated("graph.isocreate", graph_from_iso_class)
 #' @export graph.kautz
-deprecated("graph.kautz", kautz_graph)
+deprecated("graph.kautz", make_kautz_graph)
 #' @export graph.knn
 deprecated("graph.knn", knn)
 #' @export graph.laplacian
 deprecated("graph.laplacian", laplacian_matrix)
 #' @export graph.lattice
-deprecated("graph.lattice", lattice)
+deprecated("graph.lattice", make_lattice)
 #' @export graph.lcf
 deprecated("graph.lcf", graph_from_lcf)
 #' @export graph.maxflow
@@ -294,17 +294,17 @@ deprecated("graph.motifs.est", sample_motifs)
 #' @export graph.motifs.no
 deprecated("graph.motifs.no", count_motifs)
 #' @export graph.neighborhood
-deprecated("graph.neighborhood", ego_graph)
+deprecated("graph.neighborhood", make_ego_graph)
 #' @export graph.star
-deprecated("graph.star", star)
+deprecated("graph.star", make_star)
 #' @export graph.strength
 deprecated("graph.strength", strength)
 #' @export graph.tree
-deprecated("graph.tree", tree)
+deprecated("graph.tree", make_tree)
 #' @export graph.union
 deprecated("graph.union", union)
 #' @export graph.ring
-deprecated("graph.ring", ring)
+deprecated("graph.ring", make_ring)
 #' @export graphlets.candidate.basis
 deprecated("graphlets.candidate.basis", graphlet_basis)
 #' @export graphlets.project
@@ -446,7 +446,7 @@ deprecated("layout.sugiyama", layout_with_sugiyama)
 #' @export leading.eigenvector.community
 deprecated("leading.eigenvector.community", cluster_leading_eigen)
 #' @export line.graph
-deprecated("line.graph", line_graph)
+deprecated("line.graph", make_line_graph)
 #' @export list.edge.attributes
 deprecated("list.edge.attributes", edge_attr_names)
 #' @export list.graph.attributes

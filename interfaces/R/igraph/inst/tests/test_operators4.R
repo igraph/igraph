@@ -6,7 +6,7 @@ test_that("disjoint union works for named graphs", {
 
   library(igraph)
 
-  g1 <- g2 <- ring(10)
+  g1 <- g2 <- make_ring(10)
   g1$foo <- "bar"
   V(g1)$name <- letters[ 1:10]
   V(g2)$name <- letters[11:20]
@@ -43,8 +43,8 @@ test_that("disjoint union gives warning for non-unique vertex names", {
 
   library(igraph)
 
-  g1 <- ring(5); V(g1)$name <- letters[1:5]
-  g2 <- ring(5); V(g2)$name <- letters[5:9]
+  g1 <- make_ring(5); V(g1)$name <- letters[1:5]
+  g2 <- make_ring(5); V(g2)$name <- letters[5:9]
   
   expect_that(disjoint_union(g1, g2),
               gives_warning("Duplicate vertex names in disjoint union"))
@@ -55,8 +55,8 @@ test_that("union of unnamed graphs works", {
 
   library(igraph)
 
-  g1 <- ring(10)
-  g2 <- ring(13)
+  g1 <- make_ring(10)
+  g2 <- make_ring(13)
   g1$foo <- "bar"
   E(g1)$weight <- 1:10
   E(g2)$weight <- 13:1
@@ -91,8 +91,8 @@ test_that("union of named graphs works", {
 
   library(igraph)
 
-  g1 <- ring(10)
-  g2 <- ring(13)
+  g1 <- make_ring(10)
+  g2 <- make_ring(13)
   V(g1)$name <- letters[seq_len(vcount(g1))]
   V(g2)$name <- letters[seq_len(vcount(g2))]
 
@@ -162,8 +162,8 @@ test_that("intersection of named graphs works", {
 
   library(igraph)
 
-  g1 <- ring(10)
-  g2 <- ring(13)
+  g1 <- make_ring(10)
+  g2 <- make_ring(13)
   V(g1)$name <- letters[V(g1)]
   V(g2)$name <- letters[V(g2)]
 
@@ -249,13 +249,13 @@ test_that("difference of named graphs works", {
 
   library(igraph)
 
-  g1 <- ring(10)
-  g2 <- star(11, center=11, mode="undirected")
+  g1 <- make_ring(10)
+  g2 <- make_star(11, center=11, mode="undirected")
   V(g1)$name <- letters[1:10]
   V(g2)$name <- letters[1:11]
   g <- g1 %u% g2
 
-  sg <- ring(4)
+  sg <- make_ring(4)
   V(sg)$name <- letters[c(1,2,3,11)]
 
   df1 <- as_data_frame(g - sg, what="both")
@@ -297,8 +297,8 @@ test_that("compose works for named graphs", {
 
   library(igraph)
 
-  g1 <- graph_from_formula( A-B:D:E, B-C:D, C-D, D-E )
-  g2 <- graph_from_formula( A-B-E-A )
+  g1 <- graph_from_literal( A-B:D:E, B-C:D, C-D, D-E )
+  g2 <- graph_from_literal( A-B-E-A )
 
   V(g1)$bar1 <- seq_len(vcount(g1))
   V(g2)$bar2 <- seq_len(vcount(g2))

@@ -6,7 +6,7 @@ test_that("is_chordal works", {
   library(igraph)
 
   ## The examples from the Tarjan-Yannakakis paper
-  g1 <- graph_from_formula(A-B:C:I, B-A:C:D, C-A:B:E:H, D-B:E:F,
+  g1 <- graph_from_literal(A-B:C:I, B-A:C:D, C-A:B:E:H, D-B:E:F,
                   E-C:D:F:H, F-D:E:G, G-F:H, H-C:E:G:I,
                   I-A:H)
 
@@ -19,7 +19,7 @@ test_that("is_chordal works", {
   expect_that(unique(sort(ic$fillin)), equals(c(1,2,5,6,7,8)))
   expect_that(ic$newgraph, equals(NULL))
 
-  g2 <- graph_from_formula(A-B:E, B-A:E:F:D, C-E:D:G, D-B:F:E:C:G,
+  g2 <- graph_from_literal(A-B:E, B-A:E:F:D, C-E:D:G, D-B:F:E:C:G,
                   E-A:B:C:D:F, F-B:D:E, G-C:D:H:I, H-G:I:J,
                   I-G:H:J, J-H:I)
 

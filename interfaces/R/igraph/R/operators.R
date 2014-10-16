@@ -96,9 +96,9 @@ rename.attr.if.needed <- function(type, graphs, newsize=NULL, maps=NULL,
 #' @examples
 #' 
 #' ## A star and a ring
-#' g1 <- star(10, mode="undirected")
+#' g1 <- make_star(10, mode="undirected")
 #' V(g1)$name <- letters[1:10]
-#' g2 <- ring(10)
+#' g2 <- make_ring(10)
 #' V(g2)$name <- letters[11:20]
 #' str(g1 %du% g2)
 #' 
@@ -306,9 +306,9 @@ disjoint_union <- function(...) {
 #' @examples
 #' 
 #' ## Union of two social networks with overlapping sets of actors
-#' net1 <- graph_from_formula(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
+#' net1 <- graph_from_literal(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
 #'                   H-F:G, H-I-J)
-#' net2 <- graph_from_formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
+#' net2 <- graph_from_literal(D-A:F:Y, B-A-X-F-H-Z, F-Y)
 #' str(net1 %u% net2)
 #' 
 union <- function(..., byname="auto") {
@@ -365,9 +365,9 @@ union <- function(..., byname="auto") {
 #' @examples
 #' 
 #' ## Common part of two social networks
-#' net1 <- graph_from_formula(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
+#' net1 <- graph_from_literal(D-A:B:F:G, A-C-F-A, B-E-G-B, A-B, F-G,
 #'                   H-F:G, H-I-J)
-#' net2 <- graph_from_formula(D-A:F:Y, B-A-X-F-H-Z, F-Y)
+#' net2 <- graph_from_literal(D-A:F:Y, B-A-X-F-H-Z, F-Y)
 #' str(net1 %s% net2)
 #' 
 intersection <- function(..., byname="auto",
@@ -420,12 +420,12 @@ intersection <- function(..., byname="auto",
 #' @examples
 #' 
 #' ## Create a wheel graph
-#' wheel <- union(ring(10),
-#'                      star(11, center=11, mode="undirected"))
+#' wheel <- union(make_ring(10),
+#'                      make_star(11, center=11, mode="undirected"))
 #' V(wheel)$name <- letters[seq_len(vcount(wheel))]
 #' 
 #' ## Subtract a star graph from it
-#' sstar <- star(6, center=6, mode="undirected")
+#' sstar <- make_star(6, center=6, mode="undirected")
 #' V(sstar)$name <- letters[c(1,3,5,7,9,11)]
 #' G <- wheel %m% sstar
 #' str(G)
@@ -504,15 +504,15 @@ difference <- function(big, small, byname="auto") {
 #' @examples
 #' 
 #' ## Complementer of a ring
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' complementer(g)
 #' 
 #' ## A graph and its complementer give together the full graph
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' gc <- complementer(g)
 #' gu <- union(g, gc)
 #' gu
-#' graph.isomorphic(gu, full_graph(vcount(g)))
+#' graph.isomorphic(gu, make_full_graph(vcount(g)))
 #' 
 complementer <- function(graph, loops=FALSE) {
 
@@ -580,8 +580,8 @@ complementer <- function(graph, loops=FALSE) {
 #' @keywords graphs
 #' @examples
 #' 
-#' g1 <- ring(10)
-#' g2 <- star(10, mode="undirected")
+#' g1 <- make_ring(10)
+#' g2 <- make_star(10, mode="undirected")
 #' gc <- compose(g1, g2)
 #' str(gc)
 #' str(simplify(gc))

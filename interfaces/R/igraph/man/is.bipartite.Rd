@@ -42,15 +42,15 @@ bipartite_mapping(graph)
 % \seealso{}
 \examples{
 ## A ring has just one loop, so it is fine
-g <- ring(10)
+g <- make_ring(10)
 bipartite_mapping(g)
 
 ## A star is fine, too
-g2 <- star(10)
+g2 <- make_star(10)
 bipartite_mapping(g2)
 
 ## A graph containing a triangle is not fine
-g3 <- ring(10)
+g3 <- make_ring(10)
 g3 <- add_edges(g3, c(1,3))
 bipartite_mapping(g3)
 }

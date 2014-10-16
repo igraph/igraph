@@ -5,7 +5,7 @@ test_that("contract works", {
   library(igraph)
   set.seed(42)
 
-  g <- ring(10)
+  g <- make_ring(10)
   g$name <- "Ring"
   V(g)$name <- letters[1:vcount(g)]
   E(g)$weight <- sample(ecount(g))

@@ -38,7 +38,7 @@ get.all.simple.paths (graph, from, to = V(graph),
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 %\seealso{}
 \examples{
-g <- ring(10)
+g <- make_ring(10)
 get.all.simple.paths(g, 1, 5)
 get.all.simple.paths(g, 1, c(3,5))
 }

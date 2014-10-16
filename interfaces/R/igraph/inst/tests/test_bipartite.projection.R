@@ -5,10 +5,10 @@ test_that("bipartite_projection works", {
   library(igraph)
   set.seed(42)
 
-  g <- full_bipartite_graph(10,5)
+  g <- make_full_bipartite_graph(10,5)
   proj <- bipartite_projection(g)
-  expect_that(graph.isomorphic(proj[[1]], full_graph(10)), is_true())
-  expect_that(graph.isomorphic(proj[[2]], full_graph(5)), is_true())
+  expect_that(graph.isomorphic(proj[[1]], make_full_graph(10)), is_true())
+  expect_that(graph.isomorphic(proj[[2]], make_full_graph(5)), is_true())
 
   M <- matrix(0, nr=5, nc=3)
   rownames(M) <- c("Alice", "Bob", "Cecil", "Dan", "Ethel")
@@ -57,7 +57,7 @@ test_that("bipartite_projection can calculate only one projection", {
 test_that("bipartite_projection removes 'type' attribute if requested", {
 
   library(igraph)
-  g <- full_bipartite_graph(10,5)
+  g <- make_full_bipartite_graph(10,5)
   proj <- bipartite_projection(g)
   proj1 <- bipartite_projection(g, which="true")
   proj2 <- bipartite_projection(g, which="false")
@@ -80,7 +80,7 @@ test_that("bipartite_projection removes 'type' attribute if requested", {
 test_that("bipartite_projection breaks for non-bipartite graphs (#543)", {
 
   library(igraph)
-  g <- graph_from_formula(A-0, B-1, A-1, 0-1)
+  g <- graph_from_literal(A-0, B-1, A-1, 0-1)
   V(g)$type <- V(g)$name %in% LETTERS
 
   expect_that(bipartite_projection_size(g),

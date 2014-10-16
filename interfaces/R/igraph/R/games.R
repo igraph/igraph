@@ -1,23 +1,25 @@
-#   IGraph R package
-#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
-#   334 Harvard street, Cambridge, MA 02139 USA
-#   
-#   This program is free software; you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation; either version 2 of the License, or
-#   (at your option) any later version.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#   
-#   You should have received a copy of the GNU General Public License
-#   along with this program; if not, write to the Free Software
-#   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-#   02110-1301 USA
-#
-###################################################################
+
+## -----------------------------------------------------------------
+##   IGraph R package
+##   Copyright (C) 2005-2014  Gabor Csardi <csardi.gabor@gmail.com>
+##   334 Harvard street, Cambridge, MA 02139 USA
+##   
+##   This program is free software; you can redistribute it and/or modify
+##   it under the terms of the GNU General Public License as published by
+##   the Free Software Foundation; either version 2 of the License, or
+##   (at your option) any later version.
+##
+##   This program is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY; without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##   
+##   You should have received a copy of the GNU General Public License
+##   along with this program; if not, write to the Free Software
+##   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+##   02110-1301 USA
+##
+## -----------------------------------------------------------------
 
 #' Generate scale-free graphs according to the Barabasi-Albert model
 #' 
@@ -176,6 +178,16 @@ sample_pa <- function(n, power=1, m=NULL, out.dist=NULL, out.seq=NULL,
   res
 }
 
+#' @rdname sample_pa
+#' @param ... Passed to \code{sample_pa}.
+#' @export
+
+pa <- function(...) constructor_spec(sample_pa, ...)
+
+
+## -----------------------------------------------------------------
+
+
 #' Generate random graphs according to the G(n,p) Erdos-Renyi model
 #' 
 #' This model is very simple, every possible edge is created with the same
@@ -221,6 +233,16 @@ sample_gnp <- function(n, p, directed = FALSE, loops = FALSE) {
   }
   res
 }
+
+#' @rdname sample_gnp
+#' @param ... Passed to \code{sample_app}.
+#' @export
+
+gnp <- function(...) constructor_spec(sample_gnp, ...)
+
+## -----------------------------------------------------------------
+
+
 
 #' Generate random graphs according to the G(n,m) Erdos-Renyi model
 #' 
@@ -268,6 +290,13 @@ sample_gnm <- function(n, m, directed = FALSE, loops = FALSE) {
   res
 }
 
+#' @rdname sample_gnm
+#' @param ... Passed to \code{sample_app}.
+#' @export
+
+gnm <- function(...) constructor_spec(sample_gnm, ...)
+
+## -----------------------------------------------------------------
 
 #' Generate random graphs according to the Erdos-Renyi model
 #' 
@@ -338,7 +367,7 @@ erdos.renyi.game <- function(n, p.or.m, type=c("gnp", "gnm"),
 
 random.graph.game <- erdos.renyi.game
 
-
+## -----------------------------------------------------------------
 
 #' Generate random graphs with a given degree sequence
 #' 
@@ -416,7 +445,7 @@ random.graph.game <- erdos.renyi.game
 #' if (sum(degs) %% 2 != 0) { degs[1] <- degs[1] + 1 }
 #' g5 <- sample_degseq(degs, method="vl")
 #' all(degree(g5) == degs)
-#' 
+
 sample_degseq <- function(out.deg, in.deg=NULL,
                                  method=c("simple", "vl",
                                    "simple.no.multiple"),
@@ -436,6 +465,15 @@ sample_degseq <- function(out.deg, in.deg=NULL,
   }
   res
 }
+
+#' @rdname sample_degseq
+#' @param ... Passed to \code{sample_degree}.
+#' @export
+
+degseq <- function(...) constructor_spec(sample_degseq, ...)
+
+
+## -----------------------------------------------------------------
 
 #' Growing random graph generation
 #' 
@@ -476,6 +514,13 @@ sample_growing <- function(n, m=1, directed=TRUE, citation=FALSE) {
   res
 }
 
+#' @rdname sample_growing
+#' @param ... Passed to \code{sample_app}.
+#' @export
+
+growing <- function(...) constructor_spec(sample_growing, ...)
+
+## -----------------------------------------------------------------
 
 
 #' Generate an evolving random graph with preferential attachment and aging
@@ -666,7 +711,53 @@ sample_pa_age <- function(n, pa.exp, aging.exp, m=NULL, aging.bin=300,
   res
 }
 
+#' @rdname sample_pa_age
+#' @param ... Passed to \code{sample_app}.
 #' @export
+
+pa_age <- function(...) constructor_spec(sample_pa_age, ...)
+
+## -----------------------------------------------------------------
+
+#' Graph generation based on different vertex types
+#' 
+#' These functions implement evolving network models based on different vertex
+#' types.
+#' 
+#' For \code{sample_traits_callaway} the simulation goes like this: in each
+#' discrete time step a new vertex is added to the graph. The type of this
+#' vertex is generated based on \code{type.dist}. Then two vertices are
+#' selected uniformly randomly from the graph. The probability that they will
+#' be connected depends on the types of these vertices and is taken from
+#' \code{pref.matrix}. Then another two vertices are selected and this is
+#' repeated \code{edges.per.step} times in each time step.
+#' 
+#' For \code{sample_traits} the simulation goes like this: a single vertex is
+#' added at each time step. This new vertex tries to connect to \code{k}
+#' vertices in the graph. The probability that such a connection is realized
+#' depends on the types of the vertices involved and is taken from
+#' \code{pref.matrix}.
+#' 
+#' @aliases sample_traits_callaway sample_traits callaway.traits.game
+#' establishment.game
+#' @param nodes The number of vertices in the graph.
+#' @param types The number of different vertex types.
+#' @param edge.per.step The number of edges to add to the graph per time step.
+#' @param type.dist The distribution of the vertex types. This is assumed to be
+#' stationary in time.
+#' @param pref.matrix A matrix giving the preferences of the given vertex
+#' types. These should be probabilities, ie. numbers between zero and one.
+#' @param directed Logical constant, whether to generate directed graphs.
+#' @param k The number of trials per time step, see details below.
+#' @return A new graph object.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @export
+#' @keywords graphs
+#' @examples
+#' 
+#' # two types of vertices, they like only themselves
+#' g1 <- sample_traits_callaway(1000, 2, pref.matrix=matrix( c(1,0,0,1), nc=2))
+#' g2 <- sample_traits(1000, 2, k=2, pref.matrix=matrix( c(1,0,0,1), nc=2))
 
 sample_traits_callaway <- function(nodes, types, edge.per.step=1,
                                  type.dist=rep(1, types),
@@ -690,6 +781,13 @@ sample_traits_callaway <- function(nodes, types, edge.per.step=1,
   res
 }
 
+#' @rdname sample_traits_callaway
+#' @param ... Passed to \code{sample_traits_callaway}.
+#' @export
+
+traits_callaway <- function(...) constructor_spec(sample_traits_callaway, ...)
+
+#' @rdname sample_traits_callaway
 #' @export
 
 sample_traits <- function(nodes, types, k=1, type.dist=rep(1, types),
@@ -711,6 +809,14 @@ sample_traits <- function(nodes, types, k=1, type.dist=rep(1, types),
   }
   res
 }
+
+#' @rdname sample_traits_callaway
+#' @param ... Passed to \code{sample_traits}.
+#' @export
+
+traits <- function(...) constructor_spec(sample_traits, ...)
+
+## -----------------------------------------------------------------
 
 #' Geometric random graphs
 #' 
@@ -759,6 +865,13 @@ sample_grg <- function(nodes, radius, torus=FALSE, coords=FALSE) {
   res[[1]]
 }
 
+#' @rdname sample_grg
+#' @param ... Passed to \code{sample_grg}.
+#' @export
+
+grg <- function(...) constructor_spec(sample_grg, ...)
+
+## -----------------------------------------------------------------
 
 
 #' Trait-based random generation
@@ -840,6 +953,13 @@ sample_pref <- function(nodes, types, type.dist=rep(1, types),
 }
 
 #' @rdname sample_pref
+#' @param ... Passed to \code{sample_pref}.
+#' @export
+
+pref <- function(...) constructor_spec(sample_pref, ...)
+
+#' @rdname sample_pref
+#' @export
 
 sample_asym_pref <- function(nodes, types,
                         type.dist.matrix=matrix(1, types,types),
@@ -868,6 +988,15 @@ sample_asym_pref <- function(nodes, types,
     res$loops <- loops
   }
 }
+
+#' @rdname sample_pref
+#' @param ... Passed to \code{sample_pref}.
+#' @export
+
+asym_pref <- function(...) constructor_spec(sample_asym_pref, ...)
+
+## -----------------------------------------------------------------
+
 
 connect <- function(graph, order, mode=c("all", "out", "in", "total")) {
   if (!is_igraph(graph)) {
@@ -906,7 +1035,7 @@ connect <- function(graph, order, mode=c("all", "out", "in", "total")) {
 #' generated graph.
 #' @return A graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
-#' @seealso \code{\link{lattice}}, \code{\link{rewire}}
+#' @seealso \code{\link{make_lattice}}, \code{\link{rewire}}
 #' @references Duncan J Watts and Steven H Strogatz: Collective dynamics of
 #' \sQuote{small world} networks, Nature 393, 440-442, 1998.
 #' @export
@@ -937,6 +1066,43 @@ sample_smallworld <- function(dim, size, nei, p, loops=FALSE,
   res
 }
 
+#' @rdname sample_smallworld
+#' @param ... Passed to \code{sample_smallworld}.
+#' @export
+
+smallworld <- function(...) constructor_spec(sample_smallworld, ...)
+
+## -----------------------------------------------------------------
+
+#' Random citation graphs
+#' 
+#' \code{sample_last_cit} creates a graph, where vertices age, and
+#' gain new connections based on how long ago their last citation
+#' happened.
+#'
+#' \code{sample_cit_cit_types} is a stochastic block model where the
+#' graph is growing.
+#'
+#' \code{sample_cit_types} is similarly a growing stochastic block model,
+#' but the probability of an edge depends on the (potentiall) cited
+#' vertex only.
+#' 
+#' @aliases cited.type.game sample_cit_types citing.cited.type.game
+#' sample_cit_cit_types sample_last_cit lastcit.game
+#' @param n Number of vertices.
+#' @param edges Number of edges per step.
+#' @param agebins Number of aging bins.
+#' @param pref Vector (\code{sample_last_cit} and \code{sample_cit_types} or
+#' matrix (\code{sample_cit_cit_types}) giving the (unnormalized) citation
+#' probabilities for the different vertex types.
+#' @param directed Logical scalar, whether to generate directed networks.
+#' @param types Vector of length \sQuote{\code{n}}, the types of the vertices.
+#' Types are numbered from zero.
+#' @param attr Logical scalar, whether to add the vertex types to the generated
+#' graph as a vertex attribute called \sQuote{\code{type}}.
+#' @return A new graph.
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @keywords graphs
 #' @export
 
 sample_last_cit <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
@@ -954,6 +1120,13 @@ sample_last_cit <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
   res
 }
 
+#' @rdname sample_last_cit
+#' @param ... Passed to \code{sample_last_cit}.
+#' @export
+
+last_cit <- function(...) constructor_spec(sample_last_cit, ...)
+
+#' @rdname sample_last_cit
 #' @export
 
 sample_cit_types <- function(n, edges=1, types=rep(0, n),
@@ -973,6 +1146,13 @@ sample_cit_types <- function(n, edges=1, types=rep(0, n),
   res
 }
 
+#' @rdname sample_last_cit
+#' @param ... Passed to \code{sample_cit_types}.
+#' @export
+
+cit_types <- function(...) constructor_spec(sample_cit_types, ...)
+
+#' @rdname sample_last_cit
 #' @export
 
 sample_cit_cit_types <- function(n, edges=1, types=rep(0, n),
@@ -994,6 +1174,14 @@ sample_cit_cit_types <- function(n, edges=1, types=rep(0, n),
   }
   res
 }
+
+#' @rdname sample_last_cit
+#' @param ... Passed to \code{sample_cit_cit_types}.
+#' @export
+
+cit_cit_types <- function(...) constructor_spec(sample_cit_cit_types, ...)
+
+## -----------------------------------------------------------------
 
 
 #' Bipartite random graphs
@@ -1084,3 +1272,11 @@ sample_bipartite <- function(n1, n2, type=c("gnp", "gnm"), p, m,
 
   res
 }
+
+#' @rdname sample_bipartite
+#' @param ... Passed to \code{sample_bipartite}.
+#' @export
+
+bipartite <- function(...) constructor_spec(sample_biaprtite, ...)
+
+## -----------------------------------------------------------------

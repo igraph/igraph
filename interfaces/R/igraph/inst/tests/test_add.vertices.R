@@ -3,7 +3,7 @@ context("add_vertices")
 
 test_that("add_vertices works", {
   library(igraph)
-  g <- graph_from_formula(A-B-C-D-E)
+  g <- graph_from_literal(A-B-C-D-E)
   g2 <- add_vertices(g, (nv <- 4))
   expect_that(vcount(g2), equals(vcount(g) + nv))
   expect_that(ecount(g2), equals(ecount(g)))
@@ -12,7 +12,7 @@ test_that("add_vertices works", {
 
 test_that("add_vertices handles attributes properly", {
   library(igraph)
-  g <- graph_from_formula(A-B-C-D-E)
+  g <- graph_from_literal(A-B-C-D-E)
   g3 <- add_vertices(g, (nv <- 3),
                      attr=list(name=(names <- c("F","G","H")),
                        weight=weights <- 1:3))

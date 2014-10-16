@@ -84,7 +84,7 @@ max_bipartite_match(graph, types = NULL, weights = NULL,
 % \references{}
 \author{Tamas Nepusz \email{ntamas@gmail.com}}
 \examples{
-g <- graph_from_formula( a-b-c-d-e-f )
+g <- graph_from_literal( a-b-c-d-e-f )
 m1 <- c("b", "a", "d", "c", "f", "e")   # maximal matching
 m2 <- c("b", "a", "d", "c", NA, NA)     # non-maximal matching
 m3 <- c("b", "c", "d", "c", NA, NA)     # not a matching
@@ -99,7 +99,7 @@ V(g)$type <- c(FALSE,TRUE)
 str(g, v=TRUE)
 max_bipartite_match(g)
 
-g2 <- graph_from_formula( a-b-c-d-e-f-g )
+g2 <- graph_from_literal( a-b-c-d-e-f-g )
 V(g2)$type <- rep(c(FALSE,TRUE), length=vcount(g2))
 str(g2, v=TRUE)
 max_bipartite_match(g2)

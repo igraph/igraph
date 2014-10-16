@@ -120,11 +120,11 @@ page_rank_old (graph, vids = V(graph), directed = TRUE, niter = 1000,
 g <- sample_gnp(20, 5/20, directed=TRUE)
 page_rank(g)$vector
 
-g2 <- star(10)
+g2 <- make_star(10)
 page_rank(g2)$vector
 
 # Personalized PageRank
-g3 <- ring(10)
+g3 <- make_ring(10)
 page_rank(g3)$vector
 reset <- seq(vcount(g3))
 page_rank(g3, personalized=reset)$vector

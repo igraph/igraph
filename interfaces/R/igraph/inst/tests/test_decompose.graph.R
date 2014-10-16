@@ -12,14 +12,14 @@ test_that("decompose works", {
 
 test_that("decompose works for many components", {
   library(igraph)
-  g <- empty_graph(50001)
+  g <- make_empty_graph(50001)
   tmp <- decompose(g)
   expect_that(1, equals(1))
 })
 
 test_that("decompose works for many components and attributes", {
   library(igraph)
-  g <- empty_graph(50001)
+  g <- make_empty_graph(50001)
   V(g)$name <- 1:vcount(g)
   tmp <- decompose(g)
   expect_that(1, equals(1))
@@ -27,7 +27,7 @@ test_that("decompose works for many components and attributes", {
 
 test_that("decompose keeps attributes", {
   library(igraph)
-  g <- ring(10) + ring(5)
+  g <- make_ring(10) + make_ring(5)
   V(g)$name <- letters[1:(10+5)]
   E(g)$name <- apply(as_edgelist(g), 1, paste, collapse="-")
   d <- decompose(g)

@@ -69,7 +69,7 @@
 #'   graph as an attribute.
 #' @export
 #' @examples
-#' g <- ring(10) + full_graph(5)
+#' g <- make_ring(10) + make_full_graph(5)
 #' coords <- layout_(g, as_star())
 #' plot(g, layout = coords)
 
@@ -187,7 +187,7 @@ print.igraph_layout_modifier <- function(x, ...) {
 #' @seealso \code{\link{merge_coords}}, \code{\link{layout_}}.
 #' @export
 #' @examples
-#' g <- ring(10) + ring(10)
+#' g <- make_ring(10) + make_ring(10)
 #' g %>%
 #'   add_layout_(in_circle, component_wise()) %>%
 #'   plot()
@@ -214,7 +214,7 @@ component_wise <- function(merge_method = "dla") {
 #' @seealso \code{\link{merge_coords}}, \code{\link{layout_}}.
 #' @export
 #' @examples
-#' layout_(ring(10), with_fr(), normalize())
+#' layout_(make_ring(10), with_fr(), normalize())
 
 normalize <- function(xmin = -1, xmax = 1, ymin = xmin, ymax = xmax,
                       zmin = xmin, zmax = xmax) {
@@ -340,7 +340,7 @@ as_bipartite <- function(...) layout_spec(layout_as_bipartite, ...)
 #' @export
 #' @examples
 #'
-#' g <- star(10)
+#' g <- make_star(10)
 #' layout_as_star(g)
 #'
 #' ## Alternative form
@@ -416,12 +416,12 @@ as_star <- function(...) layout_spec(layout_as_star, ...)
 #' @export
 #' @examples
 #'
-#' tree <- tree(20, 3)
+#' tree <- make_tree(20, 3)
 #' plot(tree, layout=layout_as_tree)
 #' plot(tree, layout=layout_as_tree(tree, flip.y=FALSE))
 #' plot(tree, layout=layout_as_tree(tree, circular=TRUE))
 #'
-#' tree2 <- tree(10, 3) + tree(10, 2)
+#' tree2 <- make_tree(10, 3) + make_tree(10, 2)
 #' plot(tree2, layout=layout_as_tree)
 #' plot(tree2, layout=layout_as_tree(tree2, root=c(1,11),
 #'                                            rootlevel=c(2,1)))
@@ -605,10 +605,10 @@ nicely <- function(...) layout_spec(layout_nicely, ...)
 #' @export
 #' @examples
 #'
-#' g <- lattice( c(3,3) )
+#' g <- make_lattice( c(3,3) )
 #' layout_on_grid(g)
 #'
-#' g2 <- lattice( c(3,3,3) )
+#' g2 <- make_lattice( c(3,3,3) )
 #' layout_on_grid(g2, dim = 3)
 #'
 #' \dontrun{
@@ -805,49 +805,49 @@ randomly <- function(...) layout_spec(layout_randomly, ...)
 #'
 #' set.seed(42)
 #' ## Figures from the paper
-#' g_1b <- star(19, mode="undirected") + path(c(2:19, 2)) +
+#' g_1b <- make_star(19, mode="undirected") + path(c(2:19, 2)) +
 #'   path(c(seq(2, 18, by=2), 2))
 #' plot(g_1b, layout=layout_with_dh)
 #'
-#' g_2 <- lattice(c(8, 3)) + edges(1,8, 9,16, 17,24)
+#' g_2 <- make_lattice(c(8, 3)) + edges(1,8, 9,16, 17,24)
 #' plot(g_2, layout=layout_with_dh)
 #'
-#' g_3 <- empty_graph(n=70)
+#' g_3 <- make_empty_graph(n=70)
 #' plot(g_3, layout=layout_with_dh)
 #'
-#' g_4 <- empty_graph(n=70, directed=FALSE) + edges(1:70)
+#' g_4 <- make_empty_graph(n=70, directed=FALSE) + edges(1:70)
 #' plot(g_4, layout=layout_with_dh, vertex.size=5, vertex.label=NA)
 #'
-#' g_5a <- ring(24)
+#' g_5a <- make_ring(24)
 #' plot(g_5a, layout=layout_with_dh, vertex.size=5, vertex.label=NA)
 #'
-#' g_5b <- ring(40)
+#' g_5b <- make_ring(40)
 #' plot(g_5b, layout=layout_with_dh, vertex.size=5, vertex.label=NA)
 #'
-#' g_6 <- lattice(c(2,2,2))
+#' g_6 <- make_lattice(c(2,2,2))
 #' plot(g_6, layout=layout_with_dh)
 #'
-#' g_7 <- graph_from_formula(1:3:5 -- 2:4:6)
+#' g_7 <- graph_from_literal(1:3:5 -- 2:4:6)
 #' plot(g_7, layout=layout_with_dh, vertex.label=V(g_7)$name)
 #'
-#' g_8 <- ring(5) + ring(10) + ring(5) +
+#' g_8 <- make_ring(5) + make_ring(10) + make_ring(5) +
 #'   edges(1,6, 2,8, 3, 10, 4,12, 5,14,
 #'         7,16, 9,17, 11,18, 13,19, 15,20)
 #' plot(g_8, layout=layout_with_dh, vertex.size=5, vertex.label=NA)
 #'
-#' g_9 <- lattice(c(3,2,2))
+#' g_9 <- make_lattice(c(3,2,2))
 #' plot(g_9, layout=layout_with_dh, vertex.size=5, vertex.label=NA)
 #'
-#' g_10 <- lattice(c(6,6))
+#' g_10 <- make_lattice(c(6,6))
 #' plot(g_10, layout=layout_with_dh, vertex.size=5, vertex.label=NA)
 #'
-#' g_11a <- tree(31, 2, mode="undirected")
+#' g_11a <- make_tree(31, 2, mode="undirected")
 #' plot(g_11a, layout=layout_with_dh, vertex.size=5, vertex.label=NA)
 #'
-#' g_11b <- tree(21, 4, mode="undirected")
+#' g_11b <- make_tree(21, 4, mode="undirected")
 #' plot(g_11b, layout=layout_with_dh, vertex.size=5, vertex.label=NA)
 #'
-#' g_12 <- empty_graph(n=37, directed=FALSE) +
+#' g_12 <- make_empty_graph(n=37, directed=FALSE) +
 #'   path(1:5,10,22,31,37:33,27,16,6,1) + path(6,7,11,9,10) + path(16:22) +
 #'   path(27:31) + path(2,7,18,28,34) + path(3,8,11,19,29,32,35) +
 #'   path(4,9,20,30,36) + path(1,7,12,14,19,24,26,30,37) +
@@ -1078,7 +1078,7 @@ with_fr <- function(...) layout_spec(layout_with_fr, ...)
 #' @examples
 #'
 #' set.seed(42)
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' plot(g, layout=layout_with_gem)
 #'
 layout_with_gem <- function(graph, coords=NULL, maxiter=40*vcount(graph)^2,
@@ -1250,7 +1250,7 @@ with_graphopt <- function(...) layout_spec(layout_with_graphopt, ...)
 #' @keywords graphs
 #' @examples
 #'
-#' g <- ring(10)
+#' g <- make_ring(10)
 #' E(g)$weight <- rep(1:2, length.out=ecount(g))
 #' plot(g, layout=layout_with_kk, edge.label=E(g)$weight)
 #'
@@ -1517,7 +1517,7 @@ with_mds <- function(...) layout_spec(layout_with_mds, ...)
 #' @examples
 #'
 #' ## Data taken from http://tehnick-8.narod.ru/dc_clients/
-#' DC <- graph_from_formula("DC++" -+
+#' DC <- graph_from_literal("DC++" -+
 #'                 "LinuxDC++":"BCDC++":"EiskaltDC++":"StrongDC++":"DiCe!++",
 #'                 "LinuxDC++" -+ "FreeDC++", "BCDC++" -+ "StrongDC++",
 #'                 "FreeDC++" -+ "BMDC++":"EiskaltDC++",
@@ -1586,7 +1586,7 @@ with_mds <- function(...) layout_spec(layout_with_mds, ...)
 #' ## Layered Graph Drawing, Journal of Graph Algorithms and
 #' ## Applications 9, 305--325 (2005).
 #'
-#' ex <- graph_from_formula( 0 -+ 29: 6: 5:20: 4,
+#' ex <- graph_from_literal( 0 -+ 29: 6: 5:20: 4,
 #'                  1 -+ 12,
 #'                  2 -+ 23: 8,
 #'                  3 -+  4,

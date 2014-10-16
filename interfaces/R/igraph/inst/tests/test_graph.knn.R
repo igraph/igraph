@@ -6,10 +6,10 @@ test_that("knn works", {
   set.seed(42)
 
   ## Some trivial ones
-  g <- ring(10)
+  g <- make_ring(10)
   expect_that(knn(g), equals(list(knn=rep(2,10), knnk=c(NaN, 2))))
 
-  g2 <- star(10)
+  g2 <- make_star(10)
   expect_that(knn(g2), equals(list(knn=c(1, rep(9,9)),
                                          knnk=c(9, rep(NaN, 7), 1))))
 
@@ -29,7 +29,7 @@ test_that("knn works", {
   expect_that(r4$knnk[12], equals(19/3))
 
   ## A weighted graph
-  g5 <- star(10)
+  g5 <- make_star(10)
   E(g5)$weight <- seq(ecount(g5))
   r5 <- knn(g5)
   expect_that(r5, equals(structure(list(knn = c(1, 45, 22.5, 15,
