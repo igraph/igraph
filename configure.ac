@@ -4,6 +4,9 @@ AM_INIT_AUTOMAKE([subdir-objects])
 AC_CONFIG_HEADERS([config.h])
 
 m4_include(tools/autoconf/ax_tls.m4)
+m4_include(tools/autoconf/as-version.m4)
+
+AS_VERSION
 
 # Define list of additional libraries that have to be linked to igraph when
 # another app tries to link to the static library of igraph. This is substituted
