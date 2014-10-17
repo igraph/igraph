@@ -616,3 +616,5 @@ deprecated("get.diameter", get_diameter)
 deprecated("get.all.shortest.paths", all_shortest_paths)
 #' @export get.shortest.paths
 deprecated("get.shortest.paths", shortest_paths)
+#' @export graph
+deprecated("graph", make_graph)
