@@ -254,7 +254,7 @@ deprecated("graph.edgelist", graph_from_edgelist)
 #' @export graph.eigen
 deprecated("graph.eigen", spectrum)
 #' @export graph.empty
-deprecated("graph.empty", empty_graph)
+deprecated("graph.empty", make_empty_graph)
 #' @export graph.extended.chordal.ring
 deprecated("graph.extended.chordal.ring", make_chordal_ring)
 #' @export graph.formula
