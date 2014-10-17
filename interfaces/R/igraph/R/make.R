@@ -98,13 +98,18 @@ constructor_spec <- function(fun, ...) {
 
 #' Create an igraph graph from a list of edges
 #'
-#' @param edges Numeric vector defining the edges, the first edge points
+#' @param edges A vector defining the edges, the first edge points
 #'   from the first element to the second, the second edge from the third
-#'   to the fourth, etc.
-#' @param n The number of vertices in the graph. This parameter is ignored
-#'   if there is a bigger vertex id in \code{edges}. This means that for
-#'   this function it is safe to supply zero here if the vertex with the
-#'   largest id is not an isolate.
+#'   to the fourth, etc. For a numeric vector, these are interpreted
+#'   as internal vertex ids. For character vectors, they are interpreted
+#'   as vertex names.
+#' @param n The number of vertices in the graph. This argument is
+#'   ignored (with a warning) if \code{edges} are symbolic vertex names. It
+#'   is also ignored if there is a bigger vertex id in \code{edges}. This
+#'   means that for this function it is safe to supply zero here if the
+#'   vertex with the largest id is not an isolate.
+#' @param isolates Character vector, names of isolate vertices,
+#'   for symbolic edge lists. It is ignored for numeric edge lists.
 #' @param directed Whether to create a directed graph.
 #' @return An igraph graph.
 #'
@@ -113,11 +118,32 @@ constructor_spec <- function(fun, ...) {
 #' @examples
 #' graph(c(1, 2, 2, 3, 3, 4, 5, 6), directed = FALSE)
 
-make_graph <- function(edges, n=max(edges), directed=TRUE ) {
-  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_create", as.numeric(edges)-1, as.numeric(n),
-        as.logical(directed),
-        PACKAGE="igraph")
+make_graph <- function(edges, n=max(edges), isolates = NULL, directed=TRUE) {
+
+  if (is.numeric(edges)) {
+    if (!is.null(isolates)) {
+      warning("'isolates' ignored for numeric edge list")
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    .Call("R_igraph_create", as.numeric(edges)-1, as.numeric(n),
+          as.logical(directed),
+          PACKAGE="igraph")
+
+  } else if (is.character(edges)) {
+    if (!missing(n)) {
+      warning("'n' is ignored for edge list with vertex names")
+    }
+    el <- matrix(edges, ncol = 2, byrow = TRUE)
+    res <- graph_from_edgelist(el, directed = directed)
+    if (!is.null(isolates)) {
+      isolates <- as.character(isolates)
+      res <- res + vertices(isolates)
+    }
+    res
+
+  } else {
+    stop("'edges' must be numeric of character")
+  }
 }
 
 #' @rdname make_graph
