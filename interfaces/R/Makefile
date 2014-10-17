@@ -73,7 +73,7 @@ igraph/src/igraph_threading.h: $(top_srcdir)/include/igraph_threading.h.in
 	sed 's/@HAVE_TLS@/0/g' $< >$@
 
 igraph/src/igraph_version.h: $(top_srcdir)/include/igraph_version.h.in
-	sed 's/@VERSION@/'$(REALVERSION)'/g' $< >$@
+	sed 's/@PACKAGE_VERSION@/'$(REALVERSION)'/g' $< >$@
 
 # R source and doc files
 
