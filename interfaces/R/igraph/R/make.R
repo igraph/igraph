@@ -96,13 +96,117 @@ constructor_spec <- function(fun, ...) {
 
 ## -----------------------------------------------------------------
 
-#' Create an igraph graph from a list of edges
+#' Create an igraph graph from a list of edges, or a notable graph
 #'
+#' @section Notable graphs:
+#'
+#' \code{make_graph} can create some notable graphs. The name of the
+#' graph (case insensitive), a character scalar must be suppliced as
+#' the \code{edges} argument, and other arguments are ignored. (A warning
+#' is given is they are specified.)
+#'
+#' \code{make_graph} knows the following graphs: \describe{
+#'   \item{Bull}{The bull graph, 5 vertices, 5 edges, resembles to the head
+#'     of a bull if drawn properly.}
+#'   \item{Chvatal}{This is the smallest triangle-free graph that is
+#'     both 4-chromatic and 4-regular. According to the Grunbaum conjecture there
+#'     exists an m-regular, m-chromatic graph with n vertices for every m>1 and
+#'     n>2. The Chvatal graph is an example for m=4 and n=12. It has 24 edges.}
+#'   \item{Coxeter}{A non-Hamiltonian cubic symmetric graph with 28 vertices and
+#'     42 edges.}
+#'   \item{Cubical}{The Platonic graph of the cube. A convex regular
+#'     polyhedron with 8 vertices and 12 edges.}
+#'   \item{Diamond}{A graph with 4 vertices and 5 edges, resembles to a
+#'     schematic diamond if drawn properly.}
+#'   \item{Dodecahedral, Dodecahedron}{Another Platonic solid with 20 vertices
+#'     and 30 edges.}
+#'   \item{Folkman}{The semisymmetric graph with minimum number of
+#'     vertices, 20 and 40 edges. A semisymmetric graph is regular, edge transitive
+#'     and not vertex transitive.}
+#'   \item{Franklin}{This is a graph whose embedding
+#'     to the Klein bottle can be colored with six colors, it is a counterexample
+#'     to the neccessity of the Heawood conjecture on a Klein bottle. It has 12
+#'     vertices and 18 edges.}
+#'   \item{Frucht}{The Frucht Graph is the smallest
+#'     cubical graph whose automorphism group consists only of the identity
+#'     element. It has 12 vertices and 18 edges.}
+#'   \item{Grotzsch}{The Grötzsch
+#'     graph is a triangle-free graph with 11 vertices, 20 edges, and chromatic
+#'     number 4. It is named after German mathematician Herbert Grötzsch, and its
+#'     existence demonstrates that the assumption of planarity is necessary in
+#'     Grötzsch's theorem that every triangle-free planar graph is 3-colorable.}
+#'   \item{Heawood}{The Heawood graph is an undirected graph with 14 vertices and
+#'     21 edges. The graph is cubic, and all cycles in the graph have six or more
+#'     edges. Every smaller cubic graph has shorter cycles, so this graph is the
+#'     6-cage, the smallest cubic graph of girth 6.}
+#'   \item{Herschel}{The Herschel
+#'     graph is the smallest nonhamiltonian polyhedral graph. It is the unique such
+#'     graph on 11 nodes, and has 18 edges.}
+#'   \item{House}{The house graph is a
+#'     5-vertex, 6-edge graph, the schematic draw of a house if drawn properly,
+#'     basicly a triangle of the top of a square.}
+#'   \item{HouseX}{The same as the
+#'     house graph with an X in the square. 5 vertices and 8 edges.}
+#'   \item{Icosahedral, Icosahedron}{A Platonic solid with 12 vertices and 30
+#'     edges.}
+#'   \item{Krackhardt kite}{A social network with 10 vertices and 18
+#'     edges.  Krackhardt, D. Assessing the Political Landscape: Structure,
+#'     Cognition, and Power in Organizations.  Admin. Sci. Quart. 35, 342-369,
+#'     1990.}
+#'   \item{Levi}{The graph is a 4-arc transitive cubic graph, it has 30
+#'     vertices and 45 edges.}
+#'   \item{McGee}{The McGee graph is the unique 3-regular
+#'     7-cage graph, it has 24 vertices and 36 edges.}
+#'   \item{Meredith}{The Meredith
+#'     graph is a quartic graph on 70 nodes and 140 edges that is a counterexample
+#'     to the conjecture that every 4-regular 4-connected graph is Hamiltonian.}
+#'   \item{Noperfectmatching}{A connected graph with 16 vertices and 27 edges
+#'     containing no perfect matching. A matching in a graph is a set of pairwise
+#'     non-adjacent edges; that is, no two edges share a common vertex. A perfect
+#'     matching is a matching which covers all vertices of the graph.}
+#'   \item{Nonline}{A graph whose connected components are the 9 graphs whose
+#'     presence as a vertex-induced subgraph in a graph makes a nonline graph. It
+#'     has 50 vertices and 72 edges.}
+#'   \item{Octahedral, Octahedron}{Platonic solid
+#'     with 6 vertices and 12 edges.}
+#'   \item{Petersen}{A 3-regular graph with 10
+#'     vertices and 15 edges. It is the smallest hypohamiltonian graph, ie. it is
+#'     non-hamiltonian but removing any single vertex from it makes it
+#'     Hamiltonian.}
+#'   \item{Robertson}{The unique (4,5)-cage graph, ie. a 4-regular
+#'    graph of girth 5. It has 19 vertices and 38 edges.}
+#'   \item{Smallestcyclicgroup}{A smallest nontrivial graph whose automorphism
+#'     group is cyclic. It has 9 vertices and 15 edges.}
+#'   \item{Tetrahedral,
+#'     Tetrahedron}{Platonic solid with 4 vertices and 6 edges.}
+#'   \item{Thomassen}{The smallest hypotraceable graph, on 34 vertices and 52
+#'     edges. A hypotracable graph does not contain a Hamiltonian path but after
+#'     removing any single vertex from it the remainder always contains a
+#'     Hamiltonian path. A graph containing a Hamiltonian path is called tracable.}
+#'   \item{Tutte}{Tait's Hamiltonian graph conjecture states that every
+#'     3-connected 3-regular planar graph is Hamiltonian.  This graph is a
+#'     counterexample. It has 46 vertices and 69 edges.}
+#'   \item{Uniquely3colorable}{Returns a 12-vertex, triangle-free graph with
+#'     chromatic number 3 that is uniquely 3-colorable.}
+#'   \item{Walther}{An identity
+#'     graph with 25 vertices and 31 edges. An identity graph has a single graph
+#'     automorphism, the trivial one.}
+#'   \item{Zachary}{Social network of friendships
+#'     between 34 members of a karate club at a US university in the 1970s. See W.
+#'     W. Zachary, An information flow model for conflict and fission in small
+#'     groups, Journal of Anthropological Research 33, 452-473 (1977).  } }
+#'
+#' @encoding UTF-8
+#' @aliases graph.famous
 #' @param edges A vector defining the edges, the first edge points
 #'   from the first element to the second, the second edge from the third
 #'   to the fourth, etc. For a numeric vector, these are interpreted
 #'   as internal vertex ids. For character vectors, they are interpreted
 #'   as vertex names.
+#'
+#'   Alternatively, this can be a character scalar, the name of a
+#'   notable graph. See Notable graphs below. The name is case
+#'   insensitive.
 #' @param n The number of vertices in the graph. This argument is
 #'   ignored (with a warning) if \code{edges} are symbolic vertex names. It
 #'   is also ignored if there is a bigger vertex id in \code{edges}. This
@@ -117,10 +221,27 @@ constructor_spec <- function(fun, ...) {
 #' @export
 #' @examples
 #' graph(c(1, 2, 2, 3, 3, 4, 5, 6), directed = FALSE)
+#' graph(c("A", "B", "B", "C", "C", "D"), directed = FALSE)
+#'
+#' solids <- list(make_graph("Tetrahedron"),
+#'                make_graph("Cubical"),
+#'                make_graph("Octahedron"),
+#'                make_graph("Dodecahedron"),
+#'                make_graph("Icosahedron"))
 
 make_graph <- function(edges, n=max(edges), isolates = NULL, directed=TRUE) {
 
-  if (is.numeric(edges)) {
+  if (is.character(edges) && length(edges) == 1) {
+    if (!missing(n)) warning("'n' is ignored for the '", edges, "' graph")
+    if (!missing(isolates)) {
+      warning("'isolates' is ignored for the '", edges, "' graph")
+    }
+    if (!missing(directed)) {
+      warning("'directed' is ignored for the '", edges, "' graph")
+    }
+    make_famous_graph(edges)
+
+  } else if (is.numeric(edges)) {
     if (!is.null(isolates)) {
       warning("'isolates' ignored for numeric edge list")
     }
@@ -146,6 +267,19 @@ make_graph <- function(edges, n=max(edges), isolates = NULL, directed=TRUE) {
   }
 }
 
+make_famous_graph <- function(name) {
+
+  name <- gsub("\\s", "_", name)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  res <- .Call("R_igraph_famous", as.character(name),
+               PACKAGE="igraph")
+  if (igraph_opt("add.params")) {
+    res$name <- capitalize(name)
+  }
+  res
+}
+
 #' @rdname make_graph
 #' @export
 
@@ -161,13 +295,13 @@ make_undirected_graph <- function(edges, n = max(edges)) {
 }
 
 #' @rdname make_graph
-#' @param ... Passed to \code{make_directed_graph}.
+#' @param ... Passed to \code{make_directed_graph} or
+#'   \code{make_undirected_graph}.
 #' @export
 
 directed_graph <- function(...) constructor_spec(make_directed_graph, ...)
 
 #' @rdname make_graph
-#' @param ... Passed to \code{make_undirected_graph}.
 #' @export
 
 undirected_graph <- function(...) constructor_spec(make_undirected_graph, ...)

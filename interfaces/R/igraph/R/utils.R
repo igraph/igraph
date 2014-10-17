@@ -63,3 +63,9 @@ grab_args <- function() {
   dots <- match.call(func, call, expand.dots=FALSE)$...
   c(as.list(envir), dots)
 }
+
+capitalize <- function(x) {
+  x <- tolower(x)
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
+}
