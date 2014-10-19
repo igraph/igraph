@@ -1,5 +1,5 @@
 
-library(margittr)
+`%>%` <- magrittr::`%>%`
 
 context("New layout API")
 
