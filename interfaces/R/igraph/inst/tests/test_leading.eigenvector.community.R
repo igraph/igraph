@@ -20,6 +20,7 @@ test_that("cluster_leading_eigen works", {
       ev$vectors <- -ev$vectors
     }
     expect_that(ev$vectors[,1], equals(vector))
+    0
   }
 
   g <- make_graph("Zachary")
