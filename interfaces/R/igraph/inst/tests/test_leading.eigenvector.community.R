@@ -26,7 +26,7 @@ test_that("cluster_leading_eigen works", {
   lc <- cluster_leading_eigen(g, callback=f)
   
   expect_that(lc$modularity, equals(modularity(g, lc$membership)))
-  expect_that(membership(lc),
+  expect_that(as.vector(membership(lc)),
               equals(c(1, 3, 3, 3, 1, 1, 1, 3, 2, 2, 1, 1, 3, 3, 2, 2,
                        1, 3, 2, 3, 2, 3, 2, 4, 4, 4, 2, 4, 4, 2, 2, 4,
                        2, 2)))

@@ -246,8 +246,35 @@ membership <- function(communities) {
   if (igraph_opt("add.vertex.names") && !is.null(communities$names)) {
     names(res) <- communities$names
   }
+  class(res) <- "membership"
   res
 }
+
+#' @method print membership
+#' @export
+
+print.membership <- function(x, ...) print(unclass(x), ...)
+
+#' Declare a numeric vector as a membership vector
+#'
+#' This is useful if you want to use functions defined on
+#' membership vectors, but your membership vector does not
+#' come from an igraph clustering method.
+#'
+#' @param x The input vector.
+#' @return The input vector, with the \code{membership} class added.
+#' @export
+#' @examples
+#' ## Compare to the correct clustering
+#' g <- (make_full_graph(10) + make_full_graph(10)) %>%
+#'   rewire_each_edge(p = 0.2)
+#' correct <- rep(1:2, each = 10) %>% as_membership
+#' fc <- cluster_fast_greedy(g)
+#' compare(correct, fc)
+#' compare(correct, membership(fc))
+
+as_membership <- function(x) add_class(x, "membership")
+
 
 #' @rdname communities
 #' @method print communities
@@ -1879,7 +1906,7 @@ dendPlotPhylo <- function(communities, colbar=rainbow(length(communities)),
 #' This function assesses the distance between two community structures.
 #' 
 #' 
-#' @aliases compare.communities compare.numeric compare
+#' @aliases compare.communities compare.membership compare
 #' @param comm1 A \code{\link{communities}} object containing a community
 #' structure; or a numeric vector, the membership vector of the first community
 #' structure. The membership vector should contain the community id of each
@@ -1929,17 +1956,33 @@ dendPlotPhylo <- function(communities, colbar=rainbow(length(communities)),
 #' compare(membership(sg), membership(le))
 #' 
 compare <- function(comm1, comm2, method=c("vi", "nmi",
-                                                "split.join", "rand",
-                                                "adjusted.rand")) {
-  compare.numeric(comm1, comm2, method)
-}
+                                    "split.join", "rand",
+                                    "adjusted.rand"))
+  UseMethod("compare")
 
-#' @method compare numeric
+#' @method compare communities
 #' @export
 
-compare.numeric <- function(comm1, comm2, method=c("vi", "nmi",
-                                            "split.join", "rand",
-                                            "adjusted.rand")) {
+compare.communities <- function(comm1, comm2,
+                                method=c("vi", "nmi", "split.join", "rand",
+                                  "adjusted.rand")) {
+
+  i_compare(comm1, comm2, method)
+}
+
+#' @method compare membership
+#' @export
+
+compare.membership <- function(comm1, comm2,
+                                method=c("vi", "nmi", "split.join", "rand",
+                                  "adjusted.rand")) {
+
+  i_compare(comm1, comm2, method)
+}
+
+i_compare <- function (comm1, comm2, method=c("vi", "nmi", "split.join",
+                                       "rand", "adjusted.rand")) {
+
   comm1 <- if (inherits(comm1, "communities")) {
     membership(comm1)
   } else {
@@ -1956,15 +1999,6 @@ compare.numeric <- function(comm1, comm2, method=c("vi", "nmi",
   res <- .Call("R_igraph_compare_communities", comm1, comm2, 
                method, PACKAGE = "igraph")
   res  
-}
-
-#' @method compare default
-#' @export
-
-compare.default <- function(comm1, comm2, method=c("vi", "nmi",
-                                            "split.join", "rand",
-                                            "adjusted.rand")) {
-  compare.numeric(as.numeric(comm1), as.numeric(comm2), method)
 }
 
 #' @export

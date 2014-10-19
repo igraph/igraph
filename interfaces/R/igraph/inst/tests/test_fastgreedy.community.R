@@ -10,10 +10,11 @@ test_that("cluster_fast_greedy works", {
   fc <- cluster_fast_greedy(g)
 
   expect_that(modularity(g, fc$membership), equals(max(fc$modularity)))
-  expect_that(membership(fc), equals(c(1, 3, 3, 3, 1, 1, 1, 3, 2, 3,
-                                       1, 1, 3, 3, 2, 2, 1, 3, 2, 1,
-                                       2, 3, 2, 2, 2, 2, 2, 2, 2, 2,
-                                       2, 2, 2, 2)))
+  expect_that(as.vector(membership(fc)),
+              equals(c(1, 3, 3, 3, 1, 1, 1, 3, 2, 3,
+                       1, 1, 3, 3, 2, 2, 1, 3, 2, 1,
+                       2, 3, 2, 2, 2, 2, 2, 2, 2, 2,
+                       2, 2, 2, 2)))
   expect_that(length(fc), equals(3))
   expect_that(as.numeric(sizes(fc)), equals(c(8, 17, 9)))
 

@@ -10,10 +10,11 @@ test_that("cluster_walktrap works", {
   wc <- cluster_walktrap(g)
 
   expect_that(modularity(g, membership(wc)), equals(modularity(wc)))
-  expect_that(membership(wc), equals(c(1, 1, 2, 1, 5, 5, 5, 1, 2, 2,
-                                       5, 1, 1, 2, 3, 3, 5, 1, 3, 1,
-                                       3, 1, 3, 4, 4, 4, 3, 4, 2, 3,
-                                       2, 2, 3, 3)))
+  expect_that(as.vector(membership(wc)),
+              equals(c(1, 1, 2, 1, 5, 5, 5, 1, 2, 2,
+                       5, 1, 1, 2, 3, 3, 5, 1, 3, 1,
+                       3, 1, 3, 4, 4, 4, 3, 4, 2, 3,
+                       2, 2, 3, 3)))
   expect_that(length(wc), equals(5))
   expect_that(sizes(wc), equals(structure(c(9L, 7L, 9L, 4L, 5L), .Dim=5L,
     .Dimnames = structure(list(`Community sizes` = c("1", "2", "3", "4",

@@ -8,10 +8,11 @@ test_that("cluster_edge_betweenness works", {
   ebc <- cluster_edge_betweenness(g)
 
   expect_that(max(ebc$modularity), equals(modularity(g, ebc$membership)))
-  expect_that(membership(ebc), equals(c(1, 1, 2, 1, 3, 3, 3, 1, 4, 5,
-                                        3, 1, 1, 1, 4, 4, 3, 1, 4, 1,
-                                        4, 1, 4, 4, 2, 2, 4, 2, 2, 4,
-                                        4, 2, 4, 4)))
+  expect_that(as.vector(membership(ebc)),
+              equals(c(1, 1, 2, 1, 3, 3, 3, 1, 4, 5,
+                       3, 1, 1, 1, 4, 4, 3, 1, 4, 1,
+                       4, 1, 4, 4, 2, 2, 4, 2, 2, 4,
+                       4, 2, 4, 4)))
   expect_that(length(ebc), equals(5))
   expect_that(as.numeric(sizes(ebc)), equals(c(10, 6, 5, 12, 1)))
 
