@@ -1030,15 +1030,14 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
 
 int igraph_edge(const igraph_t *graph, igraph_integer_t eid, 
 		igraph_integer_t *from, igraph_integer_t *to) {
-  
-  *from = (igraph_integer_t) VECTOR(graph->from)[(long int)eid];
-  *to   = (igraph_integer_t) VECTOR(graph->to  )[(long int)eid];
-  
-  if (! igraph_is_directed(graph) && *from > *to) {
-    igraph_integer_t tmp=*from;
-    *from=*to;
-    *to=tmp;
-  }
+
+  if (igraph_is_directed(graph)) {
+    *from = (igraph_integer_t) VECTOR(graph->from)[(long int)eid];
+    *to   = (igraph_integer_t) VECTOR(graph->to  )[(long int)eid];
+  } else {
+    *from = (igraph_integer_t) VECTOR(graph->to  )[(long int)eid];
+    *to   = (igraph_integer_t) VECTOR(graph->from)[(long int)eid];
+  }    
 
   return 0;
 }
@@ -1053,10 +1052,18 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
   n=IGRAPH_EIT_SIZE(eit);
   IGRAPH_CHECK(igraph_vector_resize(edges, n*2));
-  for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
-    long int e=IGRAPH_EIT_GET(eit);
-    VECTOR(*edges)[ptr++]=IGRAPH_FROM(graph, e);
-    VECTOR(*edges)[ptr++]=IGRAPH_TO(graph, e);
+  if (igraph_is_directed(graph)) {
+    for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+      long int e=IGRAPH_EIT_GET(eit);
+      VECTOR(*edges)[ptr++]=IGRAPH_FROM(graph, e);
+      VECTOR(*edges)[ptr++]=IGRAPH_TO(graph, e);
+    }
+  } else {
+    for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+      long int e=IGRAPH_EIT_GET(eit);
+      VECTOR(*edges)[ptr++]=IGRAPH_TO(graph, e);
+      VECTOR(*edges)[ptr++]=IGRAPH_FROM(graph, e);
+    }
   }
   
   igraph_eit_destroy(&eit);
