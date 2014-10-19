@@ -54,6 +54,6 @@ test_that("print.igraph works", {
 test_that("print.igraph.es uses vertex names", {
 
   g <- make_directed_graph(c("A", "B"))
-  expect_output(print(E(g)), "A\\s->\\sB")
+  expect_output(print(E(g)), "A\\s*->\\s*B")
 
 })

@@ -125,8 +125,8 @@
   }
 }
 
-.print.edges.edgelist <- function(x, names) {
-  ec <- ecount(x)
+.print.edges.edgelist <- function(x, edges = E(x), names) {
+  ec <- length(edges)
   list <- edge_attr_names(x)
   list <- list[list!="name"]
   arrow <- ifelse(is_directed(x), "->", "--")
@@ -149,10 +149,10 @@
   mp <- getOption("max.print")
   if (mp >= ec) {
     omitted.edges <- 0
-    el <- as_edgelist(x, names=names)
+    el <- ends(x, edges, names=names)
   } else {
     omitted.edges <- ec-mp
-    el <- ends(x, seq_len(mp))
+    el <- ends(x, ends[seq_len(mp)])
     if (names) { el[] <- V(x)$name[el] }
   }
   ename <- if ("name" %in% edge_attr_names(x)) {
@@ -190,13 +190,13 @@
   }    
 } 
 
-.print.edges.compressed <- function(x, names) {
+.print.edges.compressed <- function(x, edges = E(x), names) {
   ## TODO: getOption("max.print")
   if (is_named(x)) cat("+ edges (vertex names):\n") else cat("+ edges:\n")
-  el <- as_edgelist(x, names=names)
+  el <- ends(x, edges, names=names)
   arrow <- c("--", "->")[is_directed(x)+1]
-  edges <- paste(sep="", format(el[,1]), arrow, format(el[,2]))
-  print(edges, quote=FALSE)
+  pr <- paste(sep="", format(el[,1]), arrow, format(el[,2]))
+  print(pr, quote=FALSE)
 }
 
 .print.edges.adjlist <- function(x) {
@@ -238,7 +238,7 @@
   }
 }
 
-.print.edges.adjlist.named <- function(x) {
+.print.edges.adjlist.named <- function(x, edges = E(x)) {
   ## TODO getOption("max.print")
   cat("+ edges (vertex names):\n")
 
@@ -346,9 +346,9 @@ print.igraph <- function(x, full=igraph_opt("print.full"),
     if (ecount(x)==0) {
       ## Do nothing
     } else if (edge.attributes && length(edge_attr_names(x)) !=0 ) {
-      .print.edges.edgelist(x, names)
+      .print.edges.edgelist(x, names = names)
     } else if (median(degree(x, mode="out")) < 3) {
-      .print.edges.compressed(x, names)
+      .print.edges.compressed(x, names = names)
     } else if (is_named(x)) {
       .print.edges.adjlist.named(x)
     } else {

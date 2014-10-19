@@ -437,35 +437,23 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 #' @export
 
 print.igraph.vs <- function(x, ...) {
-  cat("Vertex sequence:\n")
   graph <- get("graph", attr(x, "env"))
+  cat("+ vertices", if (is_named(graph)) ", named" else "", ":\n", sep = "")
   x <- as.numeric(x)
   if ("name" %in% vertex_attr_names(graph)) {
     x <- V(graph)$name[x]
   }
-  print(x)
+  print(x, quote = FALSE)
+  invisible(x)
 }
 
 #' @method print igraph.es
 #' @export
 
 print.igraph.es <- function(x, ...) {
-  cat("Edge sequence:\n")
   graph <- get("graph", attr(x, "env"))
-  if (is_directed(graph)) {
-    arrow <- "->"
-  } else {
-    arrow <- "--"
-  }
-  x <- as.numeric(x)
-  el <- ends(graph, x, names = FALSE)
-  if ("name" %in% vertex_attr_names(graph)) {
-    el <- matrix(V(graph)$name[el], ncol=2)
-  }
-  tab <- data.frame(e=paste(sep="", "[", x, "]"), row.names="e")
-  if (is.numeric(el)) { w <- nchar(max(el)) } else { w <- max(nchar(el)) }
-  tab[" "] <- paste(format(el[,1], width=w), arrow, format(el[,2], width=w))
-  print(tab)
+  .print.edges.compressed(graph, x, names = TRUE)
+  invisible(x)
 }
 
 # these are internal
