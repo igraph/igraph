@@ -185,3 +185,14 @@ test_that("we can set all attributes some vertices/edges", {
     NA_integer_, 3L), label = list("A", NULL, "B", NULL, "C")))
 
 })
+
+test_that("cannot use vs/es from another graph", {
+
+  g <- graph.ring(10)
+  g2 <- g + 1
+  v <- V(g)[1:4]
+  expect_error(g2 - v, "Cannot use a vertex sequence from another graph")
+
+  e <- E(g)[1:2]
+  expect_error(g2 - e, "Cannot use an edge sequence from another graph")
+})

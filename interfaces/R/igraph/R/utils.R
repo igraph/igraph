@@ -69,3 +69,7 @@ capitalize <- function(x) {
   substr(x, 1, 1) <- toupper(substr(x, 1, 1))
   x
 }
+
+address <- function(x) {
+  .Call("R_igraph_address", x, PACKAGE = "igraph")
+}

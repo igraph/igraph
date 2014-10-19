@@ -121,12 +121,18 @@ vertex_attr <- function(graph, name, index=V(graph)) {
 
 #' @export
 
-set_vertex_attr <- function(graph, name, index=V(graph), value) {
+set_vertex_attr <- function(graph, name, index = V(graph), value) {
+  i_set_vertex_attr(graph = graph, name = name, index = index,
+                    value = value)
+}
+
+i_set_vertex_attr <- function(graph, name, index=V(graph), value,
+                              check = TRUE) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   single <- "single" %in% names(attributes(index)) && attr(index, "single")
-  if (!missing(index)) { index <- as.igraph.vs(graph, index) }
+  if (!missing(index) && check) { index <- as.igraph.vs(graph, index) }
   name <- as.character(name)
   vc <- vcount(graph)
 
@@ -229,13 +235,18 @@ edge_attr <- function(graph, name, index=E(graph)) {
 
 #' @export
 
-set_edge_attr <- function(graph, name, index=E(graph), value) {
+set_edge_attr <- function(graph, name, index = E(graph), value) {
+  i_set_edge_attr(graph = graph, name = name, index = index, value = value)
+}
+
+i_set_edge_attr <- function(graph, name, index=E(graph), value,
+                              check = TRUE) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
   single <- "single" %in% names(attributes(index)) && attr(index, "single")
   name <- as.character(name)
-  index <- as.igraph.es(graph, index)
+  if (!missing(index) && check) index <- as.igraph.es(graph, index)
   ec <- ecount(graph)
 
   eattrs <- .Call("R_igraph_mybracket2", graph, 9L, 4L, PACKAGE="igraph")

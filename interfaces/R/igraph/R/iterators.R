@@ -415,8 +415,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
   }
-  set_vertex_attr(x, attr(value, "name"), index=value,
-                       value=attr(value, "value"))
+  i_set_vertex_attr(x, attr(value, "name"), index=value,
+                    value=attr(value, "value"), check = FALSE)
 }
 
 #' @export
@@ -429,8 +429,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
   }
-  set_edge_attr(x, attr(value, "name"), index=value,
-                     value=attr(value, "value"))
+  i_set_edge_attr(x, attr(value, "name"), index=value,
+                  value=attr(value, "value"), check = FALSE)
 }
 
 #' @method print igraph.vs
@@ -459,6 +459,12 @@ print.igraph.es <- function(x, ...) {
 # these are internal
 
 as.igraph.vs <- function(graph, v, na.ok=FALSE) {
+  if (inherits(v, "igraph.vs")) {
+    g2 <- get("graph", envir = attr(v, "env"))
+    if (address(graph) != address(g2)) {
+      stop("Cannot use a vertex sequence from another graph.")
+    }
+  }
   if (is.character(v) && "name" %in% vertex_attr_names(graph)) {
     v <- as.numeric(match(v, V(graph)$name))
     if (!na.ok && any(is.na(v))) {
@@ -481,6 +487,12 @@ as.igraph.vs <- function(graph, v, na.ok=FALSE) {
 }
 
 as.igraph.es <- function(graph, e) {
+  if (inherits(e, "igraph.es")) {
+    g2 <- get("graph", envir = attr(e, "env"))
+    if (address(graph) != address(g2)) {
+      stop("Cannot use an edge sequence from another graph.")
+    }
+  }
   if (is.character(e)) {
     Pairs <- grep("|", e, fixed=TRUE)
     Names <- if (length(Pairs)==0) seq_along(e) else -Pairs

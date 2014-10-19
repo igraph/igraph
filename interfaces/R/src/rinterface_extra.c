@@ -231,3 +231,9 @@ SEXP R_igraph_get_all_simple_paths_pp(SEXP vector) {
   UNPROTECT(1);
   return result;
 }
+
+SEXP R_igraph_address(SEXP object) {
+  char s[64];
+  snprintf(s, 64, "%p", object);
+  return ScalarString(mkChar(s));
+}
