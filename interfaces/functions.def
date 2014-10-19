@@ -62,7 +62,7 @@ igraph_edge:
 
 igraph_edges:
         PARAMS: GRAPH graph, EDGESET eids, OUT VECTOR edges
-        NAME-R: get.edges
+        NAME-R: ends
         DEPS: eids ON graph
         IGNORE: RR, RC, RNamespace
 

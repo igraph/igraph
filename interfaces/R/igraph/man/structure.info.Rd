@@ -11,6 +11,9 @@
 \alias{are.connected}
 \alias{get.edge}
 \alias{get.edges}
+\alias{ends}
+\alias{source}
+\alias{target}
 \title{Gaining information about graph structure}
 \description{Functions for exploring the basic structure of a network:
   number of vertices and edges, the neighbors of a node, test whether
@@ -26,7 +29,9 @@ incident(graph, v, mode=c("all", "out", "in", "total"))
 is_directed(graph)
 is_connected_to(graph, v1, v2)
 get.edge(graph, id)
-get.edges(graph, es)
+ends(graph, es)
+head_of(graph, es)
+tail_of(graph, es)
 }
 \arguments{
   \item{graph}{The graph.}
@@ -70,17 +75,26 @@ get.edges(graph, es)
 
   \code{get.edge} returns the end points of the edge with the supplied
   edge id. For directed graph the source vertex comes first, for
-  undirected graphs, the order is arbitrary.
+  undirected graphs, the order is arbitrary. Note that \code{get.edge}
+  is deprecated from igraph version 0.8.0 and will be eventually
+  removed from igraph. Please use \code{ends} instead.
 
-  \code{get.edges} returns a matrix with the endpoints of the edges in
-  the edge sequence argument. 
+  \code{ends} returns a matrix with the endpoints of the edges in
+  the edge sequence argument.
+
+  \code{head_of} returns the head vertices of directed edges,
+  \code{tail_of} returns their tail vertices. They return vertex
+  sequences. (For undirected graphs, they return an arbitrary incident
+  vertex for each edge, but together they return both incident vertices
+  for each edge.)
+
 }
 \value{
   \code{gorder} and \code{gsize} return integer
   constants. \code{neighbors} returns an integer
   vector. \code{is_directed} and \code{is_connected_to} return boolean
   constants. \code{get.edge} returns a numeric vector of length two.
-  \code{get.edges} returns a two-column matrix.
+  \code{ends} returns a two-column numeric matrix.
 }
 %\references{}
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
@@ -95,6 +109,10 @@ neighbors(g, 5)
 incident(g, 5)
 is_connected_to(g, 1, 2)
 is_connected_to(g, 2, 4)
-get.edges(g, 1:6)
+ends(g, 1:6)
+
+g2 <- make_directed_graph(c("A", "B"))
+head_of(g2, 1)
+tail_of(g2, 1)
 }
 \keyword{graphs}

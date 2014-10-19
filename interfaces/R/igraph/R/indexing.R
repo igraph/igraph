@@ -136,7 +136,7 @@
       ee <- as_adj_edge_list(x, mode=mode)[i]
       lapply(seq_along(i), function(yy) {
         from <- i[yy]
-        el <- get.edges(x, ee[[yy]])
+        el <- ends(x, ee[[yy]])
         other <- ifelse(el[,1]==from, el[,2], el[,1])
         ee[[yy]][other %in% j]
       })

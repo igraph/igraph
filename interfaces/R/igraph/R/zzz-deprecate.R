@@ -618,3 +618,5 @@ deprecated("get.all.shortest.paths", all_shortest_paths)
 deprecated("get.shortest.paths", shortest_paths)
 #' @export graph
 deprecated("graph", make_graph)
+#' @export get.edges
+deprecated("get.edges", ends)

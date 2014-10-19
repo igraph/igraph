@@ -59,6 +59,9 @@ is_directed <- function(graph) {
 
 get.edge <- function(graph, id) {
 
+  .Deprecated("ends", msg = paste("'get.edge' is deperecated, please use",
+                        "'ends' instead."))
+
   if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
@@ -76,4 +79,14 @@ get.edge <- function(graph, id) {
   res+1
 }
 
+#' @export
 
+head_of <- function(graph, es) {
+  ends(graph, es)[,1]
+}
+
+#' @export
+
+tail_of <- function(graph, es) {
+  ends(graph, es)[,2]
+}
