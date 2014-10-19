@@ -56,7 +56,7 @@ deprecated("aging.barabasi.game", sample_pa_age)
 #' @export alpha.centrality
 deprecated("alpha.centrality", alpha_centrality)
 #' @export are.connected
-deprecated("are.connected", is_connected_to)
+deprecated("are.connected", is_adjacenct_to)
 #' @export asPhylo
 deprecated("asPhylo", as_phylo)
 #' @export asPhylo.communities

@@ -1044,14 +1044,14 @@ transitivity <- function(graph, type=c("undirected", "global", "globalundirected
 ##       j <- first[b]
 
 ##       ## cj is the contribution of j
-##       cj <- is_connected_to(graph, i, j)      / deg[i+1]
-##       cj <- cj + is_connected_to(graph, j, i) / deg[i+1]
+##       cj <- is_adjacenct_to(graph, i, j)      / deg[i+1]
+##       cj <- cj + is_adjacenct_to(graph, j, i) / deg[i+1]
 
 ##       second <- not(i, not(j, neighbors(graph, j, mode="all")))
 ##       for (c in seq(along=second)) {
 ##         q <- second[c]
-##         cj <- cj + is_connected_to(graph, i, q) / deg[q+1] / deg[i+1]
-##         cj <- cj + is_connected_to(graph, q, i) / deg[q+1] / deg[i+1]
+##         cj <- cj + is_adjacenct_to(graph, i, q) / deg[q+1] / deg[i+1]
+##         cj <- cj + is_adjacenct_to(graph, q, i) / deg[q+1] / deg[i+1]
 ##       }
                             
 ##       ## Ok, we have the total contribution of j
