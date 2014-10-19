@@ -33,7 +33,8 @@
                      "add.vertex.names"=TRUE,
                      "dend.plot.type"="auto",
                      "print.full"=FALSE,
-                     "annotate.plot"=FALSE
+                     "annotate.plot"=FALSE,
+                     "max.print.lines" = 10
                     )
 
 igraph.pars.set.verbose <- function(verbose) {

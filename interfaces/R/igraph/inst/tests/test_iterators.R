@@ -42,3 +42,14 @@ test_that("complex attributes work", {
   expect_that(V(g)[5]$foo, equals(list(c(0,0,0,4,5))))
 
 })
+
+test_that("we got rid of confusing indexing by numbers", {
+
+  g <- make_ring(10)
+  V(g)$name <- letters[1:10]
+  E(g)$weight <- seq(ecount(g))
+
+  expect_equal(as.vector(V(g)[6:10][1:5]), 6:10)
+  expect_equal(as.vector(E(G)[6:10][1:5]), 6:10)
+
+})

@@ -80,7 +80,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     stop("Invalid `[[` indexing, need single vertex")
   }
   if (is.numeric(i) || is.integer(i)) {
-    res <- i [ i %in% x ]
+    res <- x[i]
     attributes(res) <- attributes(x)
   } else if (is.character(i)) {
     res <- as.igraph.vs(get("graph", attr(x, "env")), i)
@@ -99,7 +99,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   i <- substitute(i)
   if (is.numeric(i) || is.integer(i)) {
     # simple indexing by vertex ids
-    res <- i[ i %in% x ]
+    res <- as.vector(x)[i]
     attributes(res) <- attributes(x)
   } else if (is.logical(i)) {
     # simple indexing by logical vector
@@ -172,7 +172,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
               enclos=parent.frame())
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
-      res <- i[ i %in% x ]
+      res <- as.vector(x)[i]
       attributes(res) <- attributes(x)
     } else if (is.logical(i)) {
       res <- as.numeric(x) [ i ]
@@ -196,7 +196,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     stop("Invalid `[[` indexing, need single edge")
   }
   if (is.numeric(i) || is.integer(i)) {
-    res <- i [ i %in% x ]
+    res <- x[i]
     attributes(res) <- attributes(x)
   } else if (is.character(i)) {
     res <- as.igraph.es(get("graph", attr(x, "env")), i)
@@ -215,7 +215,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   i <- substitute(i)
   if (is.numeric(i) || is.integer(i)) {
     # simple indexing by vertex ids
-    res <- i[ i %in% x ]
+    res <- as.vector(x)[i]
     attributes(res) <- attributes(x)    
   } else if (is.logical(i)) {
     # simple indexing by a logical vector
@@ -264,7 +264,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
               enclos=parent.frame())
     if (is.numeric(i) || is.integer(i)) {
       i <- as.numeric(i)
-      res <- i[ i %in% x ]
+      res <- as.vector(x)[i]
       attributes(res) <- attributes(x)
     } else if (is.logical(i)) {
       res <- as.numeric(x) [ i ]
