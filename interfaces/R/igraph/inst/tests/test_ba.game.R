@@ -29,7 +29,7 @@ test_that("sample_pa can start from a graph", {
   expect_that(vcount(g4), equals(10))
   expect_that(degree(g4), equals(c(2,0,0,0,1,2,1,1,2,1)))
 
-  g6 <- sample_pa(10, m=1, algorithm="bag", start.graph=star(10))
+  g6 <- sample_pa(10, m=1, algorithm="bag", start.graph=make_star(10))
   expect_that(graph.isomorphic(g6, make_star(10)), is_true())
   
   g7 <- sample_pa(10, m=3, algorithm="psumtree-multiple",
@@ -54,6 +54,6 @@ test_that("sample_pa can start from a graph", {
   expect_that(graph.isomorphic(induced_subgraph(g11, 1:5), make_star(5)),
               is_true())
   
-  g12 <- sample_pa(10, m=3, start.graph=star(10))
+  g12 <- sample_pa(10, m=3, start.graph=make_star(10))
   expect_that(graph.isomorphic(g12, make_star(10)), is_true())
 })
