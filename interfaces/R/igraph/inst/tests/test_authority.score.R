@@ -56,14 +56,14 @@ test_that("authority_score survives stress test", {
   for (i in 1:100) {
     G <- sample_gnm(10, sample(1:20, 1))
     as <- authority_score(G)
-    M <- as_adj(G)
+    M <- as_adj(G, sparse = FALSE)
     is.good(t(M) %*% M, as$vector, as$value)
   }
 
   for (i in 1:100) {
     G <- sample_gnm(10, sample(1:20, 1))
     hs <- hub_score(G)
-    M <- as_adj(G)
+    M <- as_adj(G, sparse = FALSE)
     is.good(M %*% t(M), hs$vector, hs$value)
   }
 })
