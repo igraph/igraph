@@ -7,7 +7,7 @@
 \alias{incident}
 \alias{is.directed}
 \alias{is_directed}
-\alias{is_adjacenct_to}
+\alias{is_adjacent_to}
 \alias{are.connected}
 \alias{get.edge}
 \alias{get.edges}
@@ -27,7 +27,7 @@ ecount(graph)
 neighbors(graph, v, mode = 1)
 incident(graph, v, mode=c("all", "out", "in", "total"))
 is_directed(graph)
-is_adjacenct_to(graph, v1, v2)
+is_adjacent_to(graph, v1, v2)
 get.edge(graph, id)
 ends(graph, es)
 head_of(graph, es)
@@ -70,7 +70,7 @@ tail_of(graph, es)
   \code{is_directed} gives whether the graph is directed or not. It just
   gives its \code{directed} attribute.
   
-  \code{is_adjacenct_to} decides whether there is an edge from \code{v1}
+  \code{is_adjacent_to} decides whether there is an edge from \code{v1}
   to \code{v2}. 
 
   \code{get.edge} returns the end points of the edge with the supplied
@@ -92,7 +92,7 @@ tail_of(graph, es)
 \value{
   \code{gorder} and \code{gsize} return integer
   constants. \code{neighbors} returns an integer
-  vector. \code{is_directed} and \code{is_adjacenct_to} return boolean
+  vector. \code{is_directed} and \code{is_adjacent_to} return boolean
   constants. \code{get.edge} returns a numeric vector of length two.
   \code{ends} returns a two-column numeric matrix.
 }
@@ -107,8 +107,8 @@ gsize(g)
 ecount(g)
 neighbors(g, 5)
 incident(g, 5)
-is_adjacenct_to(g, 1, 2)
-is_adjacenct_to(g, 2, 4)
+is_adjacent_to(g, 1, 2)
+is_adjacent_to(g, 2, 4)
 ends(g, 1:6)
 
 g2 <- make_directed_graph(c("A", "B"))

@@ -22,7 +22,7 @@
 
 #' @export
  
-is_connected_to <- function(graph, v1, v2) {
+is_adjacent_to <- function(graph, v1, v2) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
