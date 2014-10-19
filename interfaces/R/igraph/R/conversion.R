@@ -51,26 +51,26 @@ get.adjacency.dense <- function(graph, type=c("both", "upper", "lower"),
     }
     if (is_directed(graph)) {
       for (i in seq(length=ecount(graph))) {
-        e <- ends(graph, i)
+        e <- ends(graph, i, names = FALSE)
         res[ e[1], e[2] ] <- edge_attr(graph, attr, i)
       }
     } else {
       if (type==0) {
         ## upper
         for (i in seq(length=ecount(graph))) {
-          e <- ends(graph, i)
+          e <- ends(graph, i, names = FALSE)
           res[ min(e), max(e) ] <- edge_attr(graph, attr, i)
         }        
       } else if (type==1) {
         ## lower
         for (i in seq(length=ecount(graph))) {
-          e <- ends(graph, i)
+          e <- ends(graph, i, names = FALSE)
           res[ max(e), min(e) ] <- edge_attr(graph, attr, i)
         }        
       } else if (type==2) {
         ## both
         for (i in seq(length=ecount(graph))) {
-          e <- ends(graph, i)
+          e <- ends(graph, i, names = FALSE)
           res[ e[1], e[2] ] <- edge_attr(graph, attr, i)
           if (e[1] != e[2]) {
             res[ e[2], e[1] ] <- edge_attr(graph, attr, i)
@@ -422,7 +422,7 @@ as_graphnel <- function(graph) {
       is.numeric(E(graph)$weight)) {
     al <- as_adj_edge_list(graph, "out")
     for (i in seq(along=al)) {
-      edges <- ends(graph, al[[i]])
+      edges <- ends(graph, al[[i]], names = FALSE)
       edges <- ifelse( edges[,2]==i, edges[,1], edges[,2])
       weights <- E(graph)$weight[al[[i]]]
       al[[i]] <- list(edges=edges, weights=weights)
@@ -511,7 +511,7 @@ get.incidence.dense <- function(graph, types, names, attr) {
     recode[types]  <- seq_len(n2)
     
     for (i in seq(length=ecount(graph))) {
-      eo <- ends(graph, i)
+      eo <- ends(graph, i, name = FALSE)
       e <- recode[eo]
       if (!types[eo[1]]) {
         res[ e[1], e[2] ] <- edge_attr(graph, attr, i)

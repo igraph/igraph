@@ -29,9 +29,9 @@ incident(graph, v, mode=c("all", "out", "in", "total"))
 is_directed(graph)
 is_adjacent_to(graph, v1, v2)
 get.edge(graph, id)
-ends(graph, es)
-head_of(graph, es)
-tail_of(graph, es)
+ends(graph, es, names = TRUE)
+head_of(graph, es, names = TRUE)
+tail_of(graph, es, names = TRUE)
 }
 \arguments{
   \item{graph}{The graph.}
@@ -49,6 +49,7 @@ tail_of(graph, es)
     pointing from \code{v1} to \code{v2} are searched.}
   \item{id}{A numeric edge id.}
   \item{es}{An edge sequence.}
+  \item{names}{Whether to return symbolic names for named graphs.}
 }
 \details{
   These functions provide the basic structural information of a graph.

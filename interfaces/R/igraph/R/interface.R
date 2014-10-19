@@ -172,7 +172,7 @@ is_directed <- function(graph) {
 
 #' @export
 
-ends <- function(graph, es) {
+ends <- function(graph, es, names = TRUE) {
 
   if (!is_igraph(graph)) {
     stop("Not a graph object")
@@ -184,14 +184,18 @@ ends <- function(graph, es) {
 
   if (length(es) == 1) {
     res <- .Call("R_igraph_get_edge", graph, es,
-                 PACKAGE="igraph")
+                 PACKAGE="igraph") + 1
 
   } else  {
     res <- .Call("R_igraph_edges", graph, es,
-                 PACKAGE="igraph")
+                 PACKAGE="igraph") + 1
   }
 
-  matrix(res, ncol=2, byrow=TRUE)+1
+  if (names && is_named(graph)) {
+    res <- vertex_attr(graph, "name")[res]
+  }
+
+  matrix(res, ncol = 2, byrow = TRUE)
 }
 
 

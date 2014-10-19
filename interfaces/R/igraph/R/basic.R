@@ -81,12 +81,12 @@ get.edge <- function(graph, id) {
 
 #' @export
 
-head_of <- function(graph, es) {
-  ends(graph, es)[,1]
+head_of <- function(graph, es, names = TRUE) {
+  ends(graph, es, names)[,1]
 }
 
 #' @export
 
-tail_of <- function(graph, es) {
-  ends(graph, es)[,2]
+tail_of <- function(graph, es, names = TRUE) {
+  ends(graph, es, names)[,2]
 }
