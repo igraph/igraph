@@ -33,7 +33,7 @@ test_that("make_graph hadles names and isolates", {
 
 })
 
-test_test("make_graph gives warning for ignored arguments", {
+test_that("make_graph gives warning for ignored arguments", {
 
   expect_warning(
     make_graph(letters[1:10], n = 10)
