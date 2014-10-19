@@ -50,6 +50,6 @@ test_that("we got rid of confusing indexing by numbers", {
   E(g)$weight <- seq(ecount(g))
 
   expect_equal(as.vector(V(g)[6:10][1:5]), 6:10)
-  expect_equal(as.vector(E(G)[6:10][1:5]), 6:10)
+  expect_equal(as.vector(E(g)[6:10][1:5]), 6:10)
 
 })
