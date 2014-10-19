@@ -1029,7 +1029,7 @@ make_kautz_graph <- function(m, n) {
   res <- .Call("R_igraph_kautz", as.numeric(m), as.numeric(n),
                PACKAGE="igraph")
   if (igraph_opt("add.params")) {
-    res$name <- sprintf("Kautz graph %i%i", m, n)
+    res$name <- sprintf("Kautz graph %i-%i", m, n)
     res$m <- m
     res$n <- n
   }
