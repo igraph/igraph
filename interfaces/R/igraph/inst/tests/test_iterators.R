@@ -53,3 +53,28 @@ test_that("we got rid of confusing indexing by numbers", {
   expect_equal(as.vector(E(g)[6:10][1:5]), 6:10)
 
 })
+
+test_that("selecting edges using vertex names works", {
+
+  g <- make_ring(10)
+  V(g)$name <- letters[1:10]
+
+  e1 <- E(g)[c('a|b', 'c|d')]
+  expect_equal(as.vector(e1), c(1,3))
+
+})
+
+test_that("indexing with characters work as expected", {
+
+  g <- make_ring(10)
+  V(g)$name <- letters[1:10]
+  E(g)$name <- LETTERS[1:10]
+
+  expect_equal(as.vector(V(g)[letters[3:6]]), 3:6)
+  expect_equal(as.vector(E(g)[LETTERS[4:7]]), 4:7)
+  expect_equal(as.vector(E(g)[c('a|b', 'c|d')]), c(1,3))
+
+  expect_error(V(g)[1:5]['h'], 'Cannot select vertices')
+  expect_error(E(g)[1:5]['H'], 'Cannot select edges')
+  expect_error(E(g)[6:9]['a|b'], 'Cannot select edges')
+})

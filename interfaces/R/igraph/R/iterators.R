@@ -107,6 +107,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     attributes(res) <- attributes(x)
   } else if (is.character(i)) {
     res <- as.igraph.vs(get("graph", attr(x, "env")), i)
+    if (any(! res %in% x)) { stop("Cannot select vertices") }
     attributes(res) <- attributes(x)
   } else {
     # language expression, we also do attribute based indexing
@@ -179,6 +180,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       attributes(res) <- attributes(x)
     } else if (is.character(i)) {
       res <- as.igraph.vs(get("graph", attr(x, "env")), i)
+      if (any(! res %in% x)) { stop("Cannot select vertices") }
       attributes(res) <- attributes(x)
     } else {
       stop("invalid indexing of vertex seq")
@@ -223,6 +225,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
     attributes(res) <- attributes(x)
   } else if (is.character(i)) {
     res <- as.igraph.es(get("graph", attr(x, "env")), i)
+    if (any(! res %in% x)) { stop("Cannot select edges") }
     attributes(res) <- attributes(x)
   } else {
     # language expression, we also do attribute based indexing
@@ -268,6 +271,10 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
       attributes(res) <- attributes(x)
     } else if (is.logical(i)) {
       res <- as.numeric(x) [ i ]
+      attributes(res) <- attributes(x)
+    } else if (is.character(i)) {
+      res <- as.igraph.es(get("graph", attr(x, "env")), i)
+      if (any(! res %in% x)) { stop("Cannot select edges") }
       attributes(res) <- attributes(x)
     } else {
       stop("invalid indexing of edge seq")
