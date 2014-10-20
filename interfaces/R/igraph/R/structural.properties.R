@@ -2070,6 +2070,15 @@ bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (father) res$father <- res$father+1
   if (pred)   res$pred   <- res$pred+1
   if (succ)   res$succ   <- res$succ+1
+
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
+    if (rank)   names(res$rank)   <- V(graph)$name
+    if (father) names(res$father) <- V(graph)$name
+    if (pred)   names(res$pred)   <- V(graph)$name
+    if (succ)   names(res$succ)   <- V(graph)$name
+    names(res$dist) <- V(graph)$name
+  }
+
   res
 }
 
@@ -2182,6 +2191,12 @@ dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (order)     res$order     <- res$order+1
   if (order.out) res$order.out <- res$order.out+1
   if (father)    res$father    <- res$father+1
+
+  if (igraph_opt("add.vertex.names") && is_named(graph)) {
+    if (father) names(res$father)  <- V(graph)$name
+    if (dist)   names(res$dist)    <- V(graph)$name
+  }
+
   res
 }
 
