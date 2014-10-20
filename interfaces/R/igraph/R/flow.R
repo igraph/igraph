@@ -52,6 +52,13 @@ min_cut <- function(graph, source=NULL, target=NULL, capacity=NULL,
       res$cut <- res$cut + 1
       res$partition1 <- res$partition1 + 1
       res$partition2 <- res$partition2 + 1
+
+      if (igraph_opt("return.vs.es")) {
+        res$cut <- create_es(graph, res$cut)
+        res$partition1 <- create_vs(graph, res$partition1)
+        res$partition2 <- create_vs(graph, res$partition2)
+      }
+
       res
     }
   } else {

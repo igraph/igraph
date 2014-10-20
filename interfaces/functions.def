@@ -685,7 +685,8 @@ igraph_is_mutual:
         NAME-R: which_mutual
 
 igraph_maximum_cardinality_search:
-        PARAMS: GRAPH graph, OUT VECTORM1 alpha, OUT VECTORM1_OR_0 alpham1
+        PARAMS: GRAPH graph, OUT VERTEXSET alpha, OUT VERTEXINDEX_OR_0 alpham1
+        DEPS: alpha ON graph, alpham1 ON graph
         NAME-R: max_cardinality
 
 igraph_is_chordal:
@@ -930,7 +931,7 @@ igraph_biconnected_components:
                 OUT VERTEXSETLIST_OR_0 components, \
                 OUT VERTEXSET articulation_points
         DEPS: tree_edges ON graph, component_edges ON graph, \
-              components ON graph
+              components ON graph, articulation_points ON graph
         NAME-R: biconnected_components
 
 #######################################
@@ -1356,7 +1357,7 @@ igraph_graphlets:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
                 OUT VERTEXSETLIST cliques, OUT VECTOR Mu, INT niter=1000
         NAME-R: graphlets
-        DEPS: weights ON graph
+        DEPS: weights ON graph, cliques ON graph
         IGNORE: RC
 
 igraph_graphlets_candidate_basis:
@@ -1522,6 +1523,7 @@ igraph_adjacent_triangles:
 
 igraph_list_triangles:
         PARAMS: GRAPH graph, OUT VERTEXSET_INT res
+        DEPS: res ON graph
         NAME-R: triangles
 
 #######################################
@@ -1572,10 +1574,12 @@ igraph_compose:
 
 igraph_maxflow:
         PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
-                OUT VECTORM1_OR_0 cut, OUT VECTORM1_OR_0 partition1, \
-                OUT VECTORM1_OR_0 partition2, VERTEX source, VERTEX target, \
+                OUT EDGESET_OR_0 cut, OUT VERTEXSET_OR_0 partition1, \
+                OUT VERTEXSET_OR_0 partition2, VERTEX source, VERTEX target, \
                 EDGECAPACITY capacity=NULL, OUT MAXFLOW_STATS stats
-        DEPS: capacity ON graph, source ON graph, target ON graph
+        DEPS: capacity ON graph, source ON graph, target ON graph, \
+	      partition1 ON graph, partition2 ON graph, flow ON graph, \
+              cut ON graph
         NAME-R: max_flow
 
 igraph_maxflow_value:
@@ -1644,7 +1648,7 @@ igraph_dominator_tree:
         PARAMS: GRAPH graph, VERTEX root, OUT VERTEXSET dom, \
                 OUT GRAPH_OR_0 domtree, OUT VERTEXSET leftout, \
                 INOUTMODE mode=OUT
-        DEPS: root ON graph
+        DEPS: root ON graph, dom ON graph, leftout ON graph
         NAME-R: dominator_tree
 
 igraph_all_st_cuts:

@@ -10,8 +10,8 @@ test_that("min_cut works", {
   mc <- min_cut(g2, value.only=FALSE)
 
   expect_that(mc$value, equals(1))
-  expect_that(mc$cut, equals(2))
-  expect_that(mc$partition1, equals(2))
-  expect_that(mc$partition2, equals(c(1,3:6)))
+  expect_that(as.vector(mc$cut), equals(2))
+  expect_that(as.vector(mc$partition1), equals(2))
+  expect_that(as.vector(mc$partition2), equals(c(1,3:6)))
 
 })

@@ -75,11 +75,13 @@ test_that("Graphlets filtering works", {
 
 ## Naive version of graphlets
 
+unvs <- function(x) lapply(x, as.vector)
+
 threshold.net <- function(graph, level) {
   N <- vcount(graph)
   graph.t <- delete_edges(graph, which(E(graph)$weight < level))
 
-  clqt <- max_cliques(graph.t)
+  clqt <- unvs(max_cliques(graph.t))
   clqt <- lapply(clqt, sort)
   clqt[order(sapply(clqt, length), decreasing=TRUE)]
 }
@@ -120,7 +122,7 @@ test_that("Graphlets work for a bigger graph", {
   gl <- graphlet_basis(g)
   gl2 <- graphlets.old(g)
 
-  glo <- sort(sapply(gl$cliques, paste, collapse="-"))
+  glo <- sort(sapply(unvs(gl$cliques), paste, collapse="-"))
   gl2o <- sort(sapply(gl2, paste, collapse="-"))
 
   expect_that(glo, equals(gl2o))
@@ -201,5 +203,6 @@ test_that("Graphlet projection works", {
   glp <- graphlets(g)
   glp2 <- graphlets.project.old(g, cliques=gl$cliques, iter=1000)
 
+  glp$cliques <- unvs(glp$cliques)
   expect_that(glp, equals(glp2))
 })

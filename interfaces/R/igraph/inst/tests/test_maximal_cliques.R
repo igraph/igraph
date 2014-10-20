@@ -8,6 +8,8 @@ mysort <- function(x) {
   x[order(xl, xc)]
 }
 
+unvs <- function(x) lapply(x, as.vector)
+
 bk4 <- function(graph, min=0, max=Inf) {
 
   Gamma <- function(v) { neighbors(graph, v) }
@@ -75,7 +77,7 @@ bk4 <- function(graph, min=0, max=Inf) {
                XS=length(P)+1, XE=length(P)+length(X))
     res <- c(res, bkpivot(PX, cord[v]))
   }
-  res    
+  lapply(res, as.integer)
 }
 
 #################################################################
@@ -92,7 +94,7 @@ test_that("Maximal cliques work", {
   G <- simplify(G)
 
   cl1 <- mysort(bk4(G, min=3))
-  cl2 <- mysort(max_cliques(G, min=3))
+  cl2 <- mysort(unvs(max_cliques(G, min=3)))
 
   expect_that(cl1, is_identical_to(cl2))
 })
@@ -102,10 +104,10 @@ test_that("Maximal cliques work for subsets", {
   set.seed(42)
   G <- sample_gnp(100, .5)
 
-  cl1  <- mysort(max_cliques(G, min=8))
+  cl1  <- mysort(unvs(max_cliques(G, min=8)))
 
-  c1 <- max_cliques(G, min=8, subset=1:13)
-  c2 <- max_cliques(G, min=8, subset=14:100)
+  c1 <- unvs(max_cliques(G, min=8, subset=1:13))
+  c2 <- unvs(max_cliques(G, min=8, subset=14:100))
   cl2 <- mysort(c(c1, c2))
   
   expect_that(cl1, is_identical_to(cl2))

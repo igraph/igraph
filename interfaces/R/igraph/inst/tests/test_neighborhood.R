@@ -32,7 +32,7 @@ test_that("ego works", {
 
   v1 <- ego(g, 2, v)[[1]]
   v2 <- nei(g, 2, v)
-  expect_that(sort(v1), equals(sort(v2))) 
+  expect_that(as.vector(sort(v1)), equals(sort(v2)))
 
 #########
 
@@ -49,9 +49,11 @@ test_that("mindist works", {
   expect_that(ego_size(g, order=2, mindist=1), equals(rep(4, 10)))
   expect_that(ego_size(g, order=2, mindist=2), equals(rep(2, 10)))
 
-  n0 <- ego(g, order=2, 5:6, mindist=0)
-  n1 <- ego(g, order=2, 5:6, mindist=1)
-  n2 <- ego(g, order=2, 5:6, mindist=2)
+  unvs <- function(x) lapply(x, as.vector)
+
+  n0 <- unvs(ego(g, order=2, 5:6, mindist=0))
+  n1 <- unvs(ego(g, order=2, 5:6, mindist=1))
+  n2 <- unvs(ego(g, order=2, 5:6, mindist=2))
 
   expect_that(lapply(n0, sort), equals(list(3:7, 4:8)))
   expect_that(lapply(n1, sort), equals(list(c(3,4,6,7), c(4,5,7,8))))

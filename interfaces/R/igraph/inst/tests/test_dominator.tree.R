@@ -8,7 +8,7 @@ test_that("dominator_tree works", {
                  K-+I:R, L-+H)
   dtree <- dominator_tree(g, root="R")
 
-  dtree$dom <- V(g)$name[ dtree$dom ]
+  dtree$dom <- V(g)$name[ as.vector(dtree$dom) ]
   dtree$leftout <- V(g)$name[ dtree$leftout ]
   expect_that(dtree$dom, equals(c("R", "R", "R", "R", "R", "C", "C",
                                   "D", "R", "R", "G", "R")))

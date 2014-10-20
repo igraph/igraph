@@ -24,6 +24,7 @@ test_that("all_shortest_paths works", {
 
   sortlist <- function(list) {
     list <- lapply(list, sort)
+    list <- lapply(list, as.vector)
     list[order(sapply(list, paste, collapse="!"))]
   }
 

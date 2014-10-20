@@ -10,6 +10,7 @@ test_that("biconnected_components works", {
 
   sortlist <- function(list) {
     list <- lapply(list, sort)
+    list <- lapply(list, as.vector)
     list[order(sapply(list, paste, collapse="x"))]
   }
     
@@ -19,5 +20,5 @@ test_that("biconnected_components works", {
                                                    c(1,5,8,10), 21)))
   expect_that(sortlist(bc$component_edges), equals(list(11:20, 1:10, 21)))
   expect_that(sortlist(bc$components), equals(list(1:5, c(1,6), 6:10)))
-  expect_that(sort(bc$articulation_points), equals(c(1,6)))
+  expect_that(sort(as.vector(bc$articulation_points)), equals(c(1,6)))
 })

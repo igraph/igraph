@@ -99,7 +99,13 @@ cliques <- function(graph, min=NULL, max=NULL) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_cliques", graph, as.numeric(min), as.numeric(max),
                PACKAGE="igraph")
-  lapply(res, function(x) x+1)
+  res <- lapply(res, function(x) x+1)
+
+  if (igraph_opt("return.vs.es")) {
+    res <- lapply(res, create_vs, graph = graph)
+  }
+
+  res
 }
 
 #' @export
@@ -112,7 +118,13 @@ largest_cliques <- function(graph) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_largest_cliques", graph,
                PACKAGE="igraph")
-  lapply(res, function(x) x+1)  
+  res <- lapply(res, function(x) x+1)
+
+  if (igraph_opt("return.vs.es")) {
+    res <- lapply(res, create_vs, graph = graph)
+  }
+
+  res
 }
 
 #' @rdname cliques
@@ -164,7 +176,13 @@ max_cliques <- function(graph, min=NULL, max=NULL,
     res <- .Call("R_igraph_maximal_cliques", graph, subset,
                  as.numeric(min), as.numeric(max),
                  PACKAGE="igraph")
-    lapply(res, function(x) x+1)
+    res <- lapply(res, function(x) x+1)
+
+    if (igraph_opt("return.vs.es")) {
+      res <- lapply(res, create_vs, graph = graph)
+    }
+
+    res
   }
 }
 
@@ -286,7 +304,13 @@ ivs <- function(graph, min=NULL, max=NULL) {
   res <- .Call("R_igraph_independent_vertex_sets", graph, as.numeric(min),
                as.numeric(max),
                PACKAGE="igraph")
-  lapply(res, function(x) x+1)
+  res <- lapply(res, function(x) x+1)
+
+  if (igraph_opt("return.vs.es")) {
+    res <- lapply(res, create_vs, graph = graph)
+  }
+
+  res
 }
 
 #' @export
@@ -299,7 +323,13 @@ largest_ivs <- function(graph) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_largest_independent_vertex_sets", graph,
                PACKAGE="igraph")
-  lapply(res, function(x) x+1)
+  res <- lapply(res, function(x) x+1)
+
+  if (igraph_opt("return.vs.es")) {
+    res <- lapply(res, create_vs, graph = graph)
+  }
+
+  res
 }
 
 #' @export
@@ -312,7 +342,13 @@ maximal_ivs <- function(graph) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_maximal_independent_vertex_sets", graph,
                PACKAGE="igraph")
-  lapply(res, function(x) x+1)
+  res <- lapply(res, function(x) x+1)
+
+  if (igraph_opt("return.vs.es")) {
+    res <- lapply(res, create_vs, graph = graph)
+  }
+
+  res
 }
 
 #' @export

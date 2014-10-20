@@ -178,16 +178,17 @@ ends <- function(graph, es, names = TRUE) {
     stop("Not a graph object")
   }
 
-  es <- as.igraph.es(graph, es) - 1
+  es2 <- as.igraph.es(graph, na.omit(es)) - 1
+  res <- matrix(NA_integer_, ncol = length(es), nrow = 2)
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
 
   if (length(es) == 1) {
-    res <- .Call("R_igraph_get_edge", graph, es,
+    res[, !is.na(es)] <- .Call("R_igraph_get_edge", graph, es2,
                  PACKAGE="igraph") + 1
 
   } else  {
-    res <- .Call("R_igraph_edges", graph, es,
+    res[, !is.na(es)] <- .Call("R_igraph_edges", graph, es2,
                  PACKAGE="igraph") + 1
   }
 

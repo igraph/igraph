@@ -3,7 +3,8 @@ context("Triangles")
 
 test_that("Listing triangles works", {
 
-  library(igraph)
+  triangles <- function(...) as.vector(igraph::triangles(...))
+
   g1 <- make_empty_graph(directed=TRUE)
   g2 <- make_empty_graph(directed=FALSE)
   expect_that(triangles(g1), equals(numeric()))
