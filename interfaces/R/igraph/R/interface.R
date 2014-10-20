@@ -155,8 +155,11 @@ incident <- function(graph, v, mode=c("all", "out", "in", "total")) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_incident", graph, as.igraph.vs(graph, v)-1,
                as.numeric(mode),
-               PACKAGE="igraph")
-  res+1
+               PACKAGE="igraph") + 1L
+
+  if (igraph_opt("return.vs.es")) res <- create_es(graph, res)
+
+  res
 }  
 
 #' @export
