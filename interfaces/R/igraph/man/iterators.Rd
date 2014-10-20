@@ -49,8 +49,7 @@ E(graph, P=NULL, path=NULL, directed=TRUE)
 
   A vertex sequence is created by \code{V(g)} this selects are vertices
   in increasing vertex id order. A vertex sequence can be indexed by a
-  numeric vector, and a subset of all vertices can be
-  selected.
+  numeric vector, just like a regular R vector.
 
   Vertex sequences provide powerful operations for dealing with vertex
   attributes. A vertex sequence can be indexed with the
