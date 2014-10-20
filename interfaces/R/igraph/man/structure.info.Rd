@@ -92,8 +92,8 @@ tail_of(graph, es, names = TRUE)
 }
 \value{
   \code{gorder} and \code{gsize} return integer
-  constants. \code{neighbors} returns an integer
-  vector. \code{is_directed} and \code{is_adjacent_to} return boolean
+  constants. \code{neighbors} returns a vertex sequence.
+  \code{is_directed} and \code{is_adjacent_to} return boolean
   constants. \code{get.edge} returns a numeric vector of length two.
   \code{ends} returns a two-column numeric matrix.
 }

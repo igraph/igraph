@@ -137,7 +137,7 @@ neighbors <- function(graph, v, mode=1) {
   res <- .Call("R_igraph_neighbors", graph, as.igraph.vs(graph, v)-1,
                as.numeric(mode),
                PACKAGE="igraph")
-  res+1
+  V(graph)[res + 1]
 }
 
 #' @export
