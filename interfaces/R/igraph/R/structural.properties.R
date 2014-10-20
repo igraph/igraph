@@ -51,8 +51,11 @@
 #' distances. If the graph has a \code{weight} edge attribute, then this is
 #' used by default.
 #' @return A numeric constant for \code{diameter}, a numeric vector for
-#' \code{get_diameter} and a numeric vector of length two for
-#' \code{farthest_vertices}.
+#' \code{get_diameter}. \code{farthest_vertices} returns a list with two
+#' entries: \itemize{
+#'   \item \code{vertices} The two vertices that are the farthest.
+#'   \item \code{distnace} Their distance.
+#' }
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{distances}}
 #' @export
@@ -146,7 +149,12 @@ farthest_vertices <- function(graph, directed=TRUE, unconnected=TRUE,
   res <- .Call("R_igraph_farthest_points", graph, as.logical(directed),
                as.logical(unconnected), weights,
                PACKAGE="igraph")
-  res[1:2] <- res[1:2] + 1
+  res <- list(vertices = res[1:2] + 1L, distance = res[3])
+
+  if (igraph_opt("return.vs.es")) {
+    res$vertices <- create_vs(graph, res$vertices)
+  }
+
   res
 }       
 

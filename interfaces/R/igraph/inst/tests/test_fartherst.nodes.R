@@ -17,9 +17,10 @@ test_that("farthest_vertices works", {
                     Jane     - Ike)
 
   fn <- farthest_vertices(kite)
-  expect_that(fn, equals(c(1,10,4)))
+  expect_that(fn, equals(list(vertices = V(kite)[c(1,10)], distance = 4)))
 
-  expect_that(distances(kite, v=fn[1], to=fn[2])[1], equals(fn[3]))
-  expect_that(diameter(kite), equals(fn[3]))
+  expect_that(distances(kite, v=fn$vertices[1], to=fn$vertices[2])[1],
+              equals(fn$distance))
+  expect_that(diameter(kite), equals(fn$distance))
 
 })
