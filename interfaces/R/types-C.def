@@ -682,6 +682,13 @@ EDGESET:
   OUTCONV:
     IN: igraph_es_destroy(&%C%);
 
+EDGESET_OR_0:
+  CTYPE: igraph_es_t
+  INCONV:
+    IN: R_SEXP_to_igraph_es(%I%, &%C1%, &%C%);
+  OUTCONV:
+    IN: igraph_es_destroy(&%C%);
+
 ##################################
 # NULL, this is supplied as an argument
 
