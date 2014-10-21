@@ -131,12 +131,30 @@ VERTEXSET:
     CALL: %I%-1
     DEFAULT:
        ALL: V(%I1%)
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                %I% <- create_vs(%I1%, %I%) \
+              }
+
+VERTEXSET_OR_0:
+    INCONV: %I% <- as.igraph.vs(%I1%, %I%)
+    CALL: %I%-1
+    DEFAULT:
+       ALL: V(%I1%)
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                %I% <- create_vs(%I1%, %I%) \
+              }
 
 VERTEXSET_INT:
     INCONV: %I% <- as.igraph.vs(%I1%, %I%)
     CALL: %I%-1
     DEFAULT:
        ALL: V(%I1%)
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                %I% <- create_vs(%I1%, %I%) \
+              }
 
 VERTEX:
     INCONV: %I% <- as.igraph.vs(%I1%, %I%)
@@ -147,6 +165,20 @@ EDGESET:
     CALL: %I%-1
     DEFAULT:
        ALL: E(%I1%)
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                %I% <- create_es(%I1%, %I%) \
+              }
+
+EDGESET_OR_0:
+    INCONV: %I% <- as.igraph.es(%I1%, %I%)
+    CALL: %I%-1
+    DEFAULT:
+       ALL: E(%I1%)
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                %I% <- create_es(%I1%, %I%) \
+              }
 
 EDGEWEIGHTS:
     INCONV: if (is.null(%I%) && "weight" %in% edge_attr_names(%I1%)) { \
@@ -246,12 +278,37 @@ VECTORLIST_OR_0:
 VECTORLIST_INT_OR_0:
 
 VERTEXSETLIST:
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                for (i_ in seq_along(%I%)) { \
+                  %I%[[i_]] <- create_vs(%I1%, %I%[[i_]]) \
+                } \
+              }
+
 
 VERTEXSETLIST_OR_0:
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                for (i_ in seq_along(%I%)) { \
+                  %I%[[i_]] <- create_vs(%I1%, %I%[[i_]]) \
+                } \
+              }
 
 EDGESETLIST:
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                for (i_ in seq_along(%I%)) { \
+                  %I%[[i_]] <- create_es(%I1%, %I%[[i_]]) \
+                } \
+              }
 
 EDGESETLIST_OR_0:
+    OUTCONV:
+        OUT:  if (igraph_opt("return.vs.es")) { \
+                for (i_ in seq_along(%I%)) { \
+                  %I%[[i_]] <- create_es(%I1%, %I%[[i_]]) \
+                } \
+              }
 
 ARPACKOPT:
     INCONV:

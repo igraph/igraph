@@ -11,6 +11,8 @@ test_that("is_chordal works", {
                   I-A:H)
 
   mc <- max_cardinality(g1)
+  mc$alpha <- as.vector(mc$alpha)
+  mc$alpham1 <- as.vector(mc$alpham1)
   expect_that(mc, equals(list(alpha=c(9,4,6,8,3,5,7,2,1),
                               alpham1=c(9,8,5,2,6,3,7,4,1))))
 
@@ -24,6 +26,8 @@ test_that("is_chordal works", {
                   I-G:H:J, J-H:I)
 
   mc2 <- max_cardinality(g2)
+  mc2$alpha <- as.vector(mc2$alpha)
+  mc2$alpham1 <- as.vector(mc2$alpham1)
   expect_that(mc2, equals(list(alpha=c(10,8,9,6,7,5,4,2,3,1),
                                alpham1=c(10,8,9,7,6,4,5,2,3,1))))
   

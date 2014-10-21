@@ -39,6 +39,11 @@ V <- function(graph) {
   res
 }
 
+create_vs <- function(graph, idx, na_ok = FALSE) {
+  if (na_ok) idx <- ifelse(idx < 1 | idx > gorder(graph), NA, idx)
+  V(graph)[idx]
+}
+
 #' @export
 
 E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
@@ -70,6 +75,11 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   assign("graph", graph, envir=ne)
   attr(res, "env") <- ne
   res
+}
+
+create_es <- function(graph, idx, na_ok = FALSE) {
+  if (na_ok) idx <- ifelse(idx < 1 | idx > gsize(graph), NA, idx)
+  E(graph)[idx]
 }
 
 #' @method "[[" igraph.vs
@@ -446,10 +456,12 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 print.igraph.vs <- function(x, ...) {
   graph <- get("graph", attr(x, "env"))
   cat("+ vertices", if (is_named(graph)) ", named" else "", ":\n", sep = "")
+  n <- names(x)
   x <- as.numeric(x)
   if ("name" %in% vertex_attr_names(graph)) {
     x <- V(graph)$name[x]
   }
+  names(x) <- n
   print(x, quote = FALSE)
   invisible(x)
 }

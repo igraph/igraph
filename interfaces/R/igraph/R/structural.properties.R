@@ -35,7 +35,7 @@
 #' many shortest paths of the length of the diameter, then it returns the first
 #' one found.
 #' 
-#' \code{farthest.points} returns two vertex ids, the vertices which are
+#' \code{farthest_vertices} returns two vertex ids, the vertices which are
 #' connected by the diameter path.
 #' 
 #' @aliases diameter get.diameter farthest.nodes farthest_vertices get_diameter
@@ -51,8 +51,11 @@
 #' distances. If the graph has a \code{weight} edge attribute, then this is
 #' used by default.
 #' @return A numeric constant for \code{diameter}, a numeric vector for
-#' \code{get_diameter} and a numeric vector of length two for
-#' \code{farthest_vertices}.
+#' \code{get_diameter}. \code{farthest_vertices} returns a list with two
+#' entries: \itemize{
+#'   \item \code{vertices} The two vertices that are the farthest.
+#'   \item \code{distnace} Their distance.
+#' }
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{distances}}
 #' @export
@@ -115,8 +118,13 @@ get_diameter <- function(graph, directed=TRUE, unconnected=TRUE,
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_diameter", graph, as.logical(directed),
                as.logical(unconnected), weights,
-               PACKAGE="igraph")
-  res + 1
+               PACKAGE="igraph") + 1L
+
+  if (igraph_opt("return.vs.es")) {
+    res <- create_vs(graph, res)
+  }
+
+  res
 }
 
 #' @export
@@ -141,7 +149,12 @@ farthest_vertices <- function(graph, directed=TRUE, unconnected=TRUE,
   res <- .Call("R_igraph_farthest_points", graph, as.logical(directed),
                as.logical(unconnected), weights,
                PACKAGE="igraph")
-  res[1:2] <- res[1:2] + 1
+  res <- list(vertices = res[1:2] + 1L, distance = res[3])
+
+  if (igraph_opt("return.vs.es")) {
+    res$vertices <- create_vs(graph, res$vertices)
+  }
+
   res
 }       
 
@@ -487,6 +500,23 @@ shortest_paths <- function(graph, from, to=V(graph),
     res$inbound_edges <- res$inbound_edges + 1
   }
 
+  if (igraph_opt("return.vs.es")) {
+    if (!is.null(res$vpath)) {
+      res$vpath <- lapply(res$vpath, create_vs, graph = graph)
+    }
+    if (!is.null(res$epath)) {
+      res$epath <- lapply(res$epath, create_es, graph = graph)
+    }
+    if (!is.null(res$predecessors)) {
+      res$predecessors <- create_vs(res$predecessors, graph = graph,
+                                    na_ok = TRUE)
+    }
+    if (!is.null(res$inbound_edges)) {
+      res$inbound_edges <- create_es(res$inbound_edges, graph = graph,
+                                     na_ok = TRUE)
+    }
+  }
+
   res
 }
 
@@ -525,6 +555,11 @@ all_shortest_paths <- function(graph, from,
                  as.igraph.vs(graph, from)-1, as.igraph.vs(graph, to)-1,
                  weights, as.numeric(mode), PACKAGE="igraph")
   }       
+
+  if (igraph_opt("return.vs.es")) {
+    res$res <- lapply(res$res, create_vs, graph = graph)
+  }
+
   res
 }
 
@@ -567,8 +602,11 @@ subcomponent <- function(graph, v, mode=c("all", "out", "in")) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_subcomponent", graph, as.igraph.vs(graph, v)-1,
                as.numeric(mode),
-               PACKAGE="igraph")
-  res+1
+               PACKAGE="igraph") + 1L
+
+  if (igraph_opt("return.vs.es")) res <- create_vs(graph, res)
+
+  res
 }
 
 
@@ -1675,6 +1713,11 @@ ego <- function(graph, order, nodes=V(graph),
                as.numeric(mode), mindist,
                PACKAGE="igraph")
   res <- lapply(res, function(x) x+1)
+
+  if (igraph_opt("return.vs.es")) {
+    res <- lapply(res, create_vs, graph = graph)
+  }
+
   res
 }
 
@@ -1793,8 +1836,11 @@ topo_sort <- function(graph, mode=c("out", "all", "in")) {
 
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_topological_sorting", graph, as.numeric(mode),
-               PACKAGE="igraph")
-  res+1
+               PACKAGE="igraph") + 1L
+
+  if (igraph_opt("return.vs.es")) res <- create_vs(graph, res)
+
+  res
 }
 
 
@@ -1844,8 +1890,12 @@ girth <- function(graph, circle=TRUE) {
     stop("Not a graph object")
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-  .Call("R_igraph_girth", graph, as.logical(circle),
-        PACKAGE="igraph")
+  res <- .Call("R_igraph_girth", graph, as.logical(circle),
+               PACKAGE="igraph")
+  if (igraph_opt("return.vs.es") && circle) {
+    res$circle <- create_vs(graph, res$circle)
+  }
+  res
 }
 
 #' @export
@@ -2071,12 +2121,19 @@ bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (pred)   res$pred   <- res$pred+1
   if (succ)   res$succ   <- res$succ+1
 
+  if (igraph_opt("return.vs.es")) {
+    if (order)  res$order  <- V(graph)[res$order]
+    if (father) res$father <- create_vs(graph, res$father, na_ok = TRUE)
+    if (pred)   res$pred   <- create_vs(graph, res$pred, na_ok = TRUE)
+    if (succ)   res$succ   <- create_vs(graph, res$succ, na_ok = TRUE)
+  }
+
   if (igraph_opt("add.vertex.names") && is_named(graph)) {
     if (rank)   names(res$rank)   <- V(graph)$name
     if (father) names(res$father) <- V(graph)$name
     if (pred)   names(res$pred)   <- V(graph)$name
     if (succ)   names(res$succ)   <- V(graph)$name
-    names(res$dist) <- V(graph)$name
+    if (dist)   names(res$dist)   <- V(graph)$name
   }
 
   res
@@ -2191,6 +2248,12 @@ dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (order)     res$order     <- res$order+1
   if (order.out) res$order.out <- res$order.out+1
   if (father)    res$father    <- res$father+1
+
+  if (igraph_opt("return.vs.es")) {
+    if (order)     res$order      <- V(graph)[res$order]
+    if (order.out) res$order.out  <- V(graph)[res$order.out]
+    if (father)    res$father     <- create_vs(graph, res$father, na_ok = TRUE)
+  }
 
   if (igraph_opt("add.vertex.names") && is_named(graph)) {
     if (father) names(res$father)  <- V(graph)$name
@@ -2317,6 +2380,7 @@ components <- function(graph, mode=c("weak", "strong")) {
   if (igraph_opt("add.vertex.names") && is_named(graph)) {
     names(res$membership) <- V(graph)$name
   }
+
   res
 }
 
@@ -2364,7 +2428,7 @@ unfold_tree <- function(graph, mode=c("all", "out", "in", "total"), roots) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   # Function call
   res <- .Call("R_igraph_unfold_tree", graph, mode, roots,
-        PACKAGE="igraph")
+                PACKAGE="igraph")
   res
 }
 

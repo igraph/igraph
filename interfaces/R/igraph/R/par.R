@@ -34,7 +34,8 @@
                      "dend.plot.type"="auto",
                      "print.full"=FALSE,
                      "annotate.plot"=FALSE,
-                     "max.print.lines" = 10
+                     "max.print.lines" = 10,
+                     "return.vs.es" = TRUE
                     )
 
 igraph.pars.set.verbose <- function(verbose) {
