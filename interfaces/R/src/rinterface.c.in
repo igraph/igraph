@@ -2424,7 +2424,7 @@ SEXP R_igraph_to_SEXP(const igraph_t *graph) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   
-  PROTECT(result=NEW_LIST(9));
+  PROTECT(result=NEW_LIST(10));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
   SET_VECTOR_ELT(result, 1, NEW_LOGICAL(1));
   SET_VECTOR_ELT(result, 2, NEW_NUMERIC(no_of_edges));
@@ -2454,6 +2454,9 @@ SEXP R_igraph_to_SEXP(const igraph_t *graph) {
   /* Attributes */
   SET_VECTOR_ELT(result, 8, graph->attr);
   REAL(VECTOR_ELT(graph->attr, 0))[0] += 1;
+
+  /* Environment for vertex/edge seqs */
+  SET_VECTOR_ELT(result, 9, allocSExp(ENVSXP));
   
   UNPROTECT(1);
   return result;

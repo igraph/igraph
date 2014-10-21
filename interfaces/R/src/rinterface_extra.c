@@ -254,3 +254,13 @@ SEXP R_igraph_weak_ref_run_finalizer(SEXP ref) {
   R_RunWeakRefFinalizer(ref);
   return R_NilValue;
 }
+
+SEXP R_igraph_identical_graphs(SEXP g1, SEXP g2) {
+  int i;
+  for (i = 0; i < 9 ; i++) {
+    if (!R_compute_identical(VECTOR_ELT(g1, i), VECTOR_ELT(g2, i), 0)) {
+      return ScalarLogical(0);
+    }
+  }
+  return ScalarLogical(1);
+}

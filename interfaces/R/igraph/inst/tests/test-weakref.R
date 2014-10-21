@@ -73,3 +73,34 @@ test_that("embed myself, and weak ref", {
   expect_equal(hello, "world")
 
 })
+
+test_that("embed myself, and weak ref as attribute", {
+
+  g <- list(yes = new.env())
+  assign("foo", g, envir = g[[1]])
+  value <- "foobar"
+  hello <- ""
+  fin <- function(env) hello <<- "world"
+  z <- "footoo"
+  attr(z, "env") <- make_weak_ref(key = g[[1]], value = value,
+                                  finalizer = fin)
+
+  rm(g)
+  gc()
+  expect_null(weak_ref_key(attr(z, "env")))
+  expect_null(weak_ref_value(attr(z, "env")))
+  expect_equal(hello, "world")
+
+})
+
+test_that("weak refs work for vs", {
+
+  g <- make_ring(10)
+  vs <- V(g)
+  expect_true(!is.null(get_vs_ref(g)))
+  expect_true(!is.null(weak_ref_key(attr(vs, "env"))))
+
+  rm(g)
+  gc()
+  expect_null(weak_ref_key(attr(vs, "env")))
+})
