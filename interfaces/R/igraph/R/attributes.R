@@ -100,12 +100,19 @@ vertex_attr <- function(graph, name, index=V(graph)) {
     stop("Not a graph object")
   }
   if (missing(name)) {
-    vertex.attributes(graph, index = index)
+    if (missing(index)) {
+      vertex.attributes(graph)
+    } else {
+      vertex.attributes(graph, index = index)
+    }
   } else {
-    index <- as.igraph.vs(graph, index)
     myattr <- .Call("R_igraph_mybracket2", graph, 9L, 3L,
                     PACKAGE="igraph")[[as.character(name)]]
-    myattr[index]
+    if (! missing(index)) {
+      index <- as.igraph.vs(graph, index)
+      myattr <- myattr[index]
+    }
+    myattr
   }
 }
 

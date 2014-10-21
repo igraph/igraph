@@ -24,18 +24,51 @@
 # Constructors
 ###################################################################
 
+update_es_ref <- update_vs_ref <- function(graph) {
+  env <- get_vs_ref(graph)
+  assign("me", graph, envir = env)
+}
+
+get_es_ref <- get_vs_ref <- function(graph) {
+  .Call("R_igraph_mybracket", graph, 10L, PACKAGE = "igraph")
+}
+
+get_es_graph <- get_vs_graph <- function(seq) {
+  weak_ref_key(attr(seq, "env"))$me
+}
+
+has_es_graph <- has_vs_graph <- function(seq) {
+  !is.null(weak_ref_key(attr(seq, "env")))
+}
+
+#' Decide if two graphs are identical
+#'
+#' This is similar to \code{identical} in the \code{base} package,
+#' but ignores the mutable piece of igraph objects, that might be
+#' different, even if the two graphs are identical.
+#'
+#' @param g1,g2 The two graphs
+#' @return Logical scalar
+#' @export
+
+identical_graphs <- function(g1, g2) {
+  stopifnot(is_igraph(g1), is_igraph(g2))
+  .Call("R_igraph_identical_graphs", g1, g2, PACKAGE = "igraph");
+}
+
 #' @export
 
 V <- function(graph) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
-  vc <- vcount(graph)
-  res <- seq_len(vc)
+
+  update_vs_ref(graph)
+
+  res <- seq_len(vcount(graph))
+  if (is_named(graph)) names(res) <- vertex_attr(graph)$name
   class(res) <- "igraph.vs"
-  ne <- new.env()
-  assign("graph", graph, envir=ne)
-  attr(res, "env") <- ne
+  attr(res, "env") <- make_weak_ref(get_vs_ref(graph), NULL)
   res
 }
 
@@ -50,6 +83,8 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   if (!is_igraph(graph)) {
     stop("Not a graph object")
   }
+
+  update_es_ref(graph)
 
   if (!is.null(P) && !is.null(path)) {
     stop("Cannot give both `P' and `path' at the same time")
@@ -69,11 +104,16 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
                  as.logical(directed),
                  PACKAGE="igraph")+1
   }
+
+  if ("name" %in% edge_attr_names(graph)) {
+    names(res) <- edge_attr(graph)$name[res]
+  } else if (is_named(graph)) {
+    el <- as_edgelist(graph)
+    names(res) <- paste(el[,1], el[,2], sep = "|")
+  }
   
   class(res) <- "igraph.es"
-  ne <- new.env()
-  assign("graph", graph, envir=ne)
-  attr(res, "env") <- ne
+  attr(res, "env") <- make_weak_ref(get_es_ref(graph), NULL)
   res
 }
 
@@ -82,6 +122,7 @@ create_es <- function(graph, idx, na_ok = FALSE) {
   E(graph)[idx]
 }
 
+## TODO: remove this? What is the point?
 #' @method "[[" igraph.vs
 #' @export
 
@@ -89,16 +130,14 @@ create_es <- function(graph, idx, na_ok = FALSE) {
   if (length(i) != 1) {
     stop("Invalid `[[` indexing, need single vertex")
   }
-  if (is.numeric(i) || is.integer(i)) {
-    res <- x[i]
-    attributes(res) <- attributes(x)
-  } else if (is.character(i)) {
-    res <- as.igraph.vs(get("graph", attr(x, "env")), i)
-    attributes(res) <- attributes(x)
-  } else {
-    stop("Invalid `[[` indexing, index must be numeric of character scalar")
-  }
+  res <- x[i]
   attr(res, "single") <- TRUE
+  res
+}
+
+simple_vs_index <- function(x, i) {
+  res <- unclass(x)[i]
+  if (anyNA(res)) stop('Unknown vertex selected')
   res
 }
 
@@ -106,22 +145,11 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 #' @export
 
 "[.igraph.vs" <- function(x, i) {
-  i <- substitute(i)
-  if (is.numeric(i) || is.integer(i)) {
-    # simple indexing by vertex ids
-    res <- as.vector(x)[i]
-    attributes(res) <- attributes(x)
-  } else if (is.logical(i)) {
-    # simple indexing by logical vector
-    res <- as.numeric(x) [ i ]
-    attributes(res) <- attributes(x)
-  } else if (is.character(i)) {
-    res <- as.igraph.vs(get("graph", attr(x, "env")), i)
-    if (any(! res %in% x)) { stop("Cannot select vertices") }
-    attributes(res) <- attributes(x)
+  graph <- get_vs_graph(x)
+  if (is.null(graph)) {
+    res <- simple_vs_index(x, i)
   } else {
-    # language expression, we also do attribute based indexing
-    graph <- get("graph", attr(x, "env"))
+    i <- substitute(i)
     nei <- function(v, mode=c("all", "in", "out", "total")) {
       ## TRUE iff the vertex is a neighbor (any type)
       ## of at least one vertex in v
@@ -181,25 +209,14 @@ create_es <- function(graph, idx, na_ok = FALSE) {
                    PACKAGE="igraph"), nei=nei, innei=innei,
                    outnei=outnei, adj=adj, inc=inc, from=from, to=to),
               enclos=parent.frame())
-    if (is.numeric(i) || is.integer(i)) {
-      i <- as.numeric(i)
-      res <- as.vector(x)[i]
-      attributes(res) <- attributes(x)
-    } else if (is.logical(i)) {
-      res <- as.numeric(x) [ i ]
-      attributes(res) <- attributes(x)
-    } else if (is.character(i)) {
-      res <- as.igraph.vs(get("graph", attr(x, "env")), i)
-      if (any(! res %in% x)) { stop("Cannot select vertices") }
-      attributes(res) <- attributes(x)
-    } else {
-      stop("invalid indexing of vertex seq")
-    }
+    res <- simple_vs_index(x, i)
   }
-
+  attr(res, "env") <- attr(x, "env")
+  class(res) <- class(x)
   res
 }
 
+## TODO: remove this? What is it for?
 #' @method "[[" igraph.es
 #' @export
 
@@ -207,16 +224,14 @@ create_es <- function(graph, idx, na_ok = FALSE) {
   if (length(i) != 1) {
     stop("Invalid `[[` indexing, need single edge")
   }
-  if (is.numeric(i) || is.integer(i)) {
-    res <- x[i]
-    attributes(res) <- attributes(x)
-  } else if (is.character(i)) {
-    res <- as.igraph.es(get("graph", attr(x, "env")), i)
-    attributes(res) <- attributes(x)
-  } else {
-    stop("Invalid `[[` indexing, index must be numeric of character scalar")
-  }
+  res <- x[i]
   attr(res, "single") <- TRUE
+  res
+}
+
+simple_es_index <- function(x, i) {
+  res <- unclass(x)[i]
+  if (anyNA(res)) stop('Unknown edge selected')
   res
 }
 
@@ -225,21 +240,11 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 
 "[.igraph.es" <- function(x, i) {
   i <- substitute(i)
-  if (is.numeric(i) || is.integer(i)) {
-    # simple indexing by vertex ids
-    res <- as.vector(x)[i]
-    attributes(res) <- attributes(x)    
-  } else if (is.logical(i)) {
-    # simple indexing by a logical vector
-    res <- as.numeric(x) [ i ]
-    attributes(res) <- attributes(x)
-  } else if (is.character(i)) {
-    res <- as.igraph.es(get("graph", attr(x, "env")), i)
-    if (any(! res %in% x)) { stop("Cannot select edges") }
-    attributes(res) <- attributes(x)
+  graph <- get_es_graph(x)
+  if (is.null(graph)) {
+    res <- simple_es_index(x, i)
   } else {
-    # language expression, we also do attribute based indexing
-    graph <- get("graph", attr(x, "env"))
+    ## language expression, we also do attribute based indexing
     i <- substitute(i)
     inc <- adj <- function(v) {
       ## TRUE iff the edge is incident to at least one vertex in v
@@ -275,22 +280,10 @@ create_es <- function(graph, idx, na_ok = FALSE) {
                    .igraph.graph=list(graph),
                    `%--%`=`%--%`, `%->%`=`%->%`, `%<-%`=`%<-%`),
               enclos=parent.frame())
-    if (is.numeric(i) || is.integer(i)) {
-      i <- as.numeric(i)
-      res <- as.vector(x)[i]
-      attributes(res) <- attributes(x)
-    } else if (is.logical(i)) {
-      res <- as.numeric(x) [ i ]
-      attributes(res) <- attributes(x)
-    } else if (is.character(i)) {
-      res <- as.igraph.es(get("graph", attr(x, "env")), i)
-      if (any(! res %in% x)) { stop("Cannot select edges") }
-      attributes(res) <- attributes(x)
-    } else {
-      stop("invalid indexing of edge seq")
-    }
+    res <- simple_es_index(x, i)
   }
-  
+  attr(res, "env") <- attr(x, "env")
+  class(res) <- class(x)
   res
 } 
 
@@ -385,7 +378,9 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 #' @export
 
 "$.igraph.vs" <- function(x, name) {
-  res <- vertex_attr(get("graph", attr(x, "env")), name, x)
+  graph <- get_vs_graph(x)
+  if (is.null(graph)) stop("Graph is unknown")
+  res <- vertex_attr(graph, name, x)
   if ("single" %in% names(attributes(x)) && attr(x, "single")) {
     res[[1]]
   } else {
@@ -396,7 +391,9 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 #' @export
 
 "$.igraph.es" <- function(x, name) {
-  res <- edge_attr(get("graph", attr(x, "env")), name, x)
+  graph <- get_es_graph(x)
+  if (is.null(graph)) stop("Graph is unknown")
+  res <- edge_attr(graph, name, x)
   if ("single" %in% names(attributes(x)) && attr(x, "single")) {
     res[[1]]
   } else {
@@ -454,7 +451,8 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 #' @export
 
 print.igraph.vs <- function(x, ...) {
-  graph <- get("graph", attr(x, "env"))
+  graph <- get_vs_graph(x)
+  if (is.null(graph)) stop("Graph is unknown")
   cat("+ vertices", if (is_named(graph)) ", named" else "", ":\n", sep = "")
   n <- names(x)
   x <- as.numeric(x)
@@ -470,7 +468,8 @@ print.igraph.vs <- function(x, ...) {
 #' @export
 
 print.igraph.es <- function(x, ...) {
-  graph <- get("graph", attr(x, "env"))
+  graph <- get_es_graph(x)
+  if (is.null(graph)) stop("Graph is unknown")
   .print.edges.compressed(graph, x, names = TRUE)
   invisible(x)
 }
@@ -478,9 +477,8 @@ print.igraph.es <- function(x, ...) {
 # these are internal
 
 as.igraph.vs <- function(graph, v, na.ok=FALSE) {
-  if (inherits(v, "igraph.vs")) {
-    g2 <- get("graph", envir = attr(v, "env"))
-    if (address(graph) != address(g2)) {
+  if (inherits(v, "igraph.vs") && has_vs_graph(v)) {
+    if (address(graph) != address(get_vs_graph(v))) {
       stop("Cannot use a vertex sequence from another graph.")
     }
   }
@@ -506,9 +504,8 @@ as.igraph.vs <- function(graph, v, na.ok=FALSE) {
 }
 
 as.igraph.es <- function(graph, e) {
-  if (inherits(e, "igraph.es")) {
-    g2 <- get("graph", envir = attr(e, "env"))
-    if (address(graph) != address(g2)) {
+  if (inherits(e, "igraph.es") && has_es_graph(e)) {
+    if (address(graph) != address(get_es_graph(e))) {
       stop("Cannot use an edge sequence from another graph.")
     }
   }
