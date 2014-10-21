@@ -237,3 +237,20 @@ SEXP R_igraph_address(SEXP object) {
   snprintf(s, 64, "%p", object);
   return ScalarString(mkChar(s));
 }
+
+SEXP R_igraph_make_weak_ref(SEXP key, SEXP value, SEXP finalizer) {
+  return R_MakeWeakRef(key, value, finalizer, isNull(finalizer) ? 0 : 1);
+}
+
+SEXP R_igraph_weak_ref_key(SEXP ref) {
+  return R_WeakRefKey(ref);
+}
+
+SEXP R_igraph_weak_ref_value(SEXP ref) {
+  return R_WeakRefValue(ref);
+}
+
+SEXP R_igraph_weak_ref_run_finalizer(SEXP ref) {
+  R_RunWeakRefFinalizer(ref);
+  return R_NilValue;
+}
