@@ -1574,7 +1574,7 @@ igraph_compose:
 
 igraph_maxflow:
         PARAMS: GRAPH graph, OUT REALPTR value, OUT VECTOR_OR_0 flow, \
-                OUT EDGESET_OR_0 cut, OUT VERTEXSET_OR_0 partition1, \
+                OUT VECTORM1_OR_0 cut, OUT VERTEXSET_OR_0 partition1, \
                 OUT VERTEXSET_OR_0 partition2, VERTEX source, VERTEX target, \
                 EDGECAPACITY capacity=NULL, OUT MAXFLOW_STATS stats
         DEPS: capacity ON graph, source ON graph, target ON graph, \
