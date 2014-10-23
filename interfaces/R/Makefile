@@ -136,7 +136,7 @@ igraph/R/auto.R: $(top_srcdir)/interfaces/functions.def auto.R.in \
 
 # configure files
 
-igraph/configure igraph/src/config.h.in: igraph/configure.in
+igraph/configure igraph/src/config.h.in: igraph/configure.ac
 	cd igraph; autoheader; autoconf
 
 # DESCRIPTION file, we re-generate it only if the VERSION number
