@@ -1,6 +1,6 @@
 #! /bin/bash
 
-tempdir=$(mktemp -dt igraph)
+tempdir=$(mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir')
 trap "rm -rf ${tempdir}" EXIT
 cp -r igraph/* ${tempdir}/
 
