@@ -28,7 +28,7 @@
   igraph_vector_int_t *neis1, *neis2;
   long int neilen1, neilen2, deg1;
 #ifdef TRIPLES
-  igraph_integer_t triples;
+  igraph_real_t triples;
 #endif
   long int *neis;
   long int maxdegree;
@@ -77,7 +77,7 @@
     neilen1=igraph_vector_int_size(neis1);
     deg1=(long int) VECTOR(degree)[node];
 #ifdef TRIPLES
-    triples=(igraph_integer_t) ((double)deg1*(deg1-1)/2);
+    triples= ((double)deg1*(deg1-1)/2);
 #endif
     /* Mark the neighbors of the node */
     for (i=0; i<neilen1; i++) {
