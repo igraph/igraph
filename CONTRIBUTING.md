@@ -21,7 +21,7 @@ the probability that we can successfully merge in your code.
 * Then look for the file you want to modify. C sources and docs are in `src`.
   Python sources and docs are in `interfaces/python`. R sources and docs are in
   `interfaces/R`. 
-* Clique on the edit symbol (pen) on the upper right corner of the file view.
+* Click on the edit symbol (pen) on the upper right corner of the file view.
 * Make your edits.
 * Write a short commit message, less than 65 characters. E.g.
   "Fix C docs typo" or "Fix degree bug for loops". If needed, elaborate
@@ -73,7 +73,14 @@ edit the sources on your computer, instead of online on Github.
   R CMD INSTALL igraph
   Rscript -e 'library(igraph); igraph_test()'
   ```
-  
+
+  For Python, you need to do:
+
+  ```sh
+  cd interfaces/python
+  python setup.py test
+  ```
+
   Note that if you modify C code that is used in R/Python (most C code is!), then
   you need to test these, too.
 * Submit your pull request.
@@ -88,7 +95,7 @@ case please tell us.)
 
 ### R vs Python vs C
 
-An enhancement that is specific to R or Python or C (or a subset) is prefectly
+An enhancement that is specific to R or Python or C (or a subset) is perfectly
 fine. You are not obliged to write wrappers in both R or Python. E.g. updating
 plotting code in R or Python is also fine.
 
