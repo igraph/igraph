@@ -685,7 +685,7 @@ igraph_is_mutual:
         NAME-R: which_mutual
 
 igraph_maximum_cardinality_search:
-        PARAMS: GRAPH graph, OUT VERTEXSET alpha, OUT VERTEXINDEX_OR_0 alpham1
+        PARAMS: GRAPH graph, OUT VERTEXSET alpha, OUT VECTORM1_OR_0 alpham1
         DEPS: alpha ON graph, alpham1 ON graph
         NAME-R: max_cardinality
 

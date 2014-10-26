@@ -12,7 +12,6 @@ test_that("is_chordal works", {
 
   mc <- max_cardinality(g1)
   mc$alpha <- as.vector(mc$alpha)
-  mc$alpham1 <- as.vector(mc$alpham1)
   expect_that(mc, equals(list(alpha=c(9,4,6,8,3,5,7,2,1),
                               alpham1=c(9,8,5,2,6,3,7,4,1))))
 
