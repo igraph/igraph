@@ -264,3 +264,27 @@ SEXP R_igraph_identical_graphs(SEXP g1, SEXP g2) {
   }
   return ScalarLogical(1);
 }
+
+SEXP R_igraph_graph_version(SEXP graph) {
+  if (GET_LENGTH(graph) == 10) {
+    return ScalarInteger(2);
+  } else {
+    return ScalarInteger(1);
+  }
+}
+
+SEXP R_igraph_add_env(SEXP graph) {
+  SEXP result;
+  int i;
+
+  PROTECT(result = NEW_LIST(10));
+  for (i = 0; i < 9; i++) {
+    SET_VECTOR_ELT(result, i, duplicate(VECTOR_ELT(graph, i)));
+  }
+  SET_VECTOR_ELT(result, 9, allocSExp(ENVSXP));
+  SET_ATTRIB(result, duplicate(ATTRIB(graph)));
+  SET_CLASS(result, duplicate(GET_CLASS(graph)));
+
+  UNPROTECT(1);
+  return result;
+}

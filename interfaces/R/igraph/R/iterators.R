@@ -26,6 +26,11 @@
 
 update_es_ref <- update_vs_ref <- function(graph) {
   env <- get_vs_ref(graph)
+  if (!is.environment(env)) {
+    stop("This graph was created by an old(er) igraph version.\n",
+         "  Call upgrade_graph() on it to use with the current igraph version")
+  }
+
   assign("me", graph, envir = env)
 }
 
