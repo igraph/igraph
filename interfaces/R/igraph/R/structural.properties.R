@@ -2122,7 +2122,7 @@ bfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (succ)   res$succ   <- res$succ+1
 
   if (igraph_opt("return.vs.es")) {
-    if (order)  res$order  <- V(graph)[res$order]
+    if (order)  res$order  <- create_vs(graph, res$order, na_ok = TRUE)
     if (father) res$father <- create_vs(graph, res$father, na_ok = TRUE)
     if (pred)   res$pred   <- create_vs(graph, res$pred, na_ok = TRUE)
     if (succ)   res$succ   <- create_vs(graph, res$succ, na_ok = TRUE)

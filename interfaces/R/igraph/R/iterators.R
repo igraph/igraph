@@ -79,7 +79,7 @@ V <- function(graph) {
 
 create_vs <- function(graph, idx, na_ok = FALSE) {
   if (na_ok) idx <- ifelse(idx < 1 | idx > gorder(graph), NA, idx)
-  V(graph)[idx]
+  V(graph)[idx, na_ok = na_ok]
 }
 
 #' @export
@@ -140,19 +140,19 @@ create_es <- function(graph, idx, na_ok = FALSE) {
   res
 }
 
-simple_vs_index <- function(x, i) {
+simple_vs_index <- function(x, i, na_ok = FALSE) {
   res <- unclass(x)[i]
-  if (anyNA(res)) stop('Unknown vertex selected')
+  if (!na_ok && anyNA(res)) stop('Unknown vertex selected')
   res
 }
 
 #' @method "[" igraph.vs
 #' @export
 
-"[.igraph.vs" <- function(x, i) {
+"[.igraph.vs" <- function(x, i, na_ok = FALSE) {
   graph <- get_vs_graph(x)
   if (is.null(graph)) {
-    res <- simple_vs_index(x, i)
+    res <- simple_vs_index(x, i, na_ok)
   } else {
     i <- substitute(i)
     nei <- function(v, mode=c("all", "in", "out", "total")) {
@@ -214,7 +214,7 @@ simple_vs_index <- function(x, i) {
                    PACKAGE="igraph"), nei=nei, innei=innei,
                    outnei=outnei, adj=adj, inc=inc, from=from, to=to),
               enclos=parent.frame())
-    res <- simple_vs_index(x, i)
+    res <- simple_vs_index(x, i, na_ok)
   }
   attr(res, "env") <- attr(x, "env")
   class(res) <- class(x)
