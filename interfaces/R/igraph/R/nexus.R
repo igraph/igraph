@@ -282,7 +282,17 @@ nexus_get <- function(id, offset=0,
   rdata <- url(URLencode(u))
   load(rdata, envir=env)
   close(rdata)
-  return(get(ls(env)[1], env))
+  res <- get(ls(env)[1], env)
+
+  upgrade_if_igraph <- function(x) if (is_igraph(x)) upgrade_graph(x) else x
+
+  if (is_igraph(res)) {
+    upgrade_if_igraph(res)
+  } else if (is.list(res)) {
+    res2 <- lapply(res, upgrade_if_igraph)
+    attributes(res2) <- attributes(res)
+    res2
+  }
 }
 
 #' @export
