@@ -35,7 +35,7 @@ update_es_ref <- update_vs_ref <- function(graph) {
 }
 
 get_es_ref <- get_vs_ref <- function(graph) {
-  .Call("R_igraph_mybracket", graph, 10L, PACKAGE = "igraph")
+  base::.Call("R_igraph_mybracket", graph, 10L, PACKAGE = "igraph")
 }
 
 get_es_graph <- get_vs_graph <- function(seq) {
@@ -58,7 +58,7 @@ has_es_graph <- has_vs_graph <- function(seq) {
 
 identical_graphs <- function(g1, g2) {
   stopifnot(is_igraph(g1), is_igraph(g2))
-  .Call("R_igraph_identical_graphs", g1, g2, PACKAGE = "igraph");
+  base::.Call("R_igraph_identical_graphs", g1, g2, PACKAGE = "igraph");
 }
 
 #' @export
