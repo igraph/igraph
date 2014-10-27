@@ -51,3 +51,11 @@ test_that("error messages are proper", {
                "Don't know how to sample_")
 
 })
+
+test_that("we pass arguments unevaluated", {
+
+  g0 <- graph_from_literal(A -+ B:C)
+  g1 <- graph_(from_literal(A -+ B:C))
+  expect_true(identical_graphs(g0, g1))
+
+})

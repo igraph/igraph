@@ -43,10 +43,10 @@ make_ <- function(...) {
   args <- list(...)
   cidx <- vapply(args, inherits, TRUE, what = "igraph_constructor_spec")
   if (sum(cidx) == 0) {
-    stop("Don't know how to ", me, " from, nothing given")
+    stop("Don't know how to ", me, ", nothing given")
   }
   if (sum(cidx) > 1) {
-    stop("Don't know how to ", me, " from, multiple constructors given")
+    stop("Don't know how to ", me, ", multiple constructors given")
   }
   cons <- args[ cidx][[1]]
   args <- args[!cidx]
@@ -106,7 +106,7 @@ constructor_spec <- function(fun, ...) {
   structure(
     list(
       fun = fun,
-      args = list(...)
+      args = substitute(...)
     ),
     class = "igraph_constructor_spec"
   )
