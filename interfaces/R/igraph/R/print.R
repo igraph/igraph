@@ -190,13 +190,30 @@
   }    
 } 
 
-.print.edges.compressed <- function(x, edges = E(x), names) {
-  ## TODO: getOption("max.print")
-  if (is_named(x)) cat("+ edges (vertex names):\n") else cat("+ edges:\n")
-  el <- ends(x, edges, names=names)
-  arrow <- c("--", "->")[is_directed(x)+1]
-  pr <- paste(sep="", format(el[,1]), arrow, format(el[,2]))
-  print(pr, quote=FALSE)
+.print.edges.compressed <- function(x, edges = E(x), names, num = FALSE) {
+  title <- "+" %+%
+    (if (num) " " %+% chr(length(edges)) %+% "/" %+%
+       (if (is.null(x)) "?" else chr(ecount(x))) else "") %+%
+    " edges" %+%
+    (if (is.null(x)) ", unknown graph" else "") %+%
+    (if (is.null(attr(edges, "vnames"))) "" else " (vertex names)") %+%
+    ":\n"
+  cat(title)
+
+  if (!is.null(x)) {
+    el <- ends(x, edges, names=names)
+    arrow <- c("--", "->")[is_directed(x)+1]
+    pr <- paste(sep="", format(el[,1]), arrow, format(el[,2]))
+    if (length(edges)) print(pr, quote=FALSE)
+  } else {
+    if (!is.null(attr(edges, "vnames"))) {
+      print(as.vector(attr(edges, "vnames")), quote = FALSE)
+    } else if (!is.null(names(edges))) {
+      print(names(edges), quote = FALSE)
+    } else {
+      print(as.vector(edges))
+    }
+  }
 }
 
 .print.edges.adjlist <- function(x) {

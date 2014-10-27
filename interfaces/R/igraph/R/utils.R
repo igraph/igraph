@@ -54,6 +54,19 @@ add_class <- function(x, class) {
   }
 }
 
+`%&&%` <- function(lhs, rhs) {
+  lres <- withVisible(eval(lhs, envir = parent.frame()))
+  if (!is.null(lres$value)) {
+    eval(rhs, envir = parent.frame())
+  } else {
+    if (lres$visible) {
+      lres$value
+    } else {
+      invisible(lres$value)
+    }
+  }
+}
+
 ## Grab all arguments of the parent call, in a list
 
 grab_args <- function() {
@@ -73,3 +86,10 @@ capitalize <- function(x) {
 address <- function(x) {
   .Call("R_igraph_address", x, PACKAGE = "igraph")
 }
+
+`%+%` <- function(x, y) {
+  stopifnot(is.character(x), is.character(y))
+  paste0(x, y)
+}
+
+chr <- as.character

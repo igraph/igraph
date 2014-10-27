@@ -112,9 +112,10 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
 
   if ("name" %in% edge_attr_names(graph)) {
     names(res) <- edge_attr(graph)$name[res]
-  } else if (is_named(graph)) {
+  }
+  if (is.named(graph)) {
     el <- ends(graph, es = res)
-    names(res) <- paste(el[,1], el[,2], sep = "|")
+    attr(res, "vnames") <- paste(el[,1], el[,2], sep = "|")
   }
   
   class(res) <- "igraph.es"
@@ -235,8 +236,19 @@ simple_vs_index <- function(x, i, na_ok = FALSE) {
 }
 
 simple_es_index <- function(x, i) {
-  res <- unclass(x)[i]
+  if (!is.null(attr(x, "vnames"))) {
+    wh1 <- structure(seq_along(x), names = names(x))[i]
+    wh2 <- structure(seq_along(x), names = attr(x, "vnames"))[i]
+    wh <- ifelse(is.na(wh1), wh2, wh1)
+    res <- unclass(x)[wh]
+    names(res) <- names(x)[wh]
+    attr(res, "vnames") <- attr(x, "vnames")[wh]
+  } else {
+    res <- unclass(x)[i]
+  }
   if (anyNA(res)) stop('Unknown edge selected')
+
+  attr(res, "env") <- attr(x, "env")
   res
 }
 
@@ -244,7 +256,6 @@ simple_es_index <- function(x, i) {
 #' @export
 
 `[.igraph.es` <- function(x, i) {
-  i <- substitute(i)
   graph <- get_es_graph(x)
   if (is.null(graph)) {
     res <- simple_es_index(x, i)
@@ -457,15 +468,15 @@ simple_es_index <- function(x, i) {
 
 print.igraph.vs <- function(x, ...) {
   graph <- get_vs_graph(x)
-  if (is.null(graph)) stop("Graph is unknown")
-  cat("+ vertices", if (is_named(graph)) ", named" else "", ":\n", sep = "")
-  n <- names(x)
-  x <- as.numeric(x)
-  if ("name" %in% vertex_attr_names(graph)) {
-    x <- V(graph)$name[x]
-  }
-  names(x) <- n
-  print(x, quote = FALSE)
+  title <- "+ " %+% chr(length(x)) %+% "/" %+%
+    (if (is.null(graph)) "?" else chr(vcount(graph))) %+%
+    " vertices" %+%
+    (if (!is.null(names(x))) ", named" else "") %+%
+    ":\n"
+  cat(title)
+
+  x2 <- if (!is.null(names(x))) names(x) else as.vector(x)
+  if (length(x2)) print(x2, quote = FALSE)
   invisible(x)
 }
 
@@ -474,15 +485,14 @@ print.igraph.vs <- function(x, ...) {
 
 print.igraph.es <- function(x, ...) {
   graph <- get_es_graph(x)
-  if (is.null(graph)) stop("Graph is unknown")
-  .print.edges.compressed(graph, x, names = TRUE)
+  .print.edges.compressed(x = graph, edges = x, names = TRUE, num = TRUE)
   invisible(x)
 }
 
 # these are internal
 
 as.igraph.vs <- function(graph, v, na.ok=FALSE) {
-  if (inherits(v, "igraph.vs") && has_vs_graph(v)) {
+  if (inherits(v, "igraph.vs")) {
     if (address(graph) != address(get_vs_graph(v))) {
       stop("Cannot use a vertex sequence from another graph.")
     }
@@ -509,7 +519,7 @@ as.igraph.vs <- function(graph, v, na.ok=FALSE) {
 }
 
 as.igraph.es <- function(graph, e) {
-  if (inherits(e, "igraph.es") && has_es_graph(e)) {
+  if (inherits(e, "igraph.es")) {
     if (address(graph) != address(get_es_graph(e))) {
       stop("Cannot use an edge sequence from another graph.")
     }
