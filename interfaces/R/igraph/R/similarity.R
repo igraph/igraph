@@ -48,7 +48,7 @@
 #'
 #' g <- make_ring(5)
 #' similarity(g, method = "dice")
-#' similarity(g, methof = "jaccard")
+#' similarity(g, method = "jaccard")
 
 similarity <- function(graph, vids = V(graph), mode = c("all", "out", "in",
                           "total"), loops = FALSE, method = c("jaccard",

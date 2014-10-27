@@ -42,7 +42,9 @@
 #' \code{drl_defaults$coarsest}, \code{drl_defaults$refine} and
 #' \code{drl_defaults$final}.  }
 #' 
-#' @aliases layout.drl drl_defaults
+#' @aliases layout.drl drl_defaults igraph.drl.coarsen
+#'  igraph.drl.coarsest igraph.drl.default igraph.drl.final
+#'  igraph.drl.refine
 #' @param graph The input graph, in can be directed or undirected.
 #' @param use.seed Logical scalar, whether to use the coordinates given in the
 #' \code{seed} argument as a starting point.
@@ -81,7 +83,7 @@
 #' 
 layout_with_drl <- function(graph, use.seed = FALSE,
                        seed=matrix(runif(vcount(graph)*2), ncol=2),
-                       options=drl_deaults$default,
+                       options=drl_defaults$default,
                        weights=E(graph)$weight,
                        fixed=NULL,
                        dim=2)

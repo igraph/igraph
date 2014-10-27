@@ -62,6 +62,7 @@
 #' @param layout The layout specification. It must be a call
 #'   to a layout specification function.
 #' @param ... Further modifiers, see a complete list below.
+#'   For the \code{print} methods, it is ignored.
 #' @return The return value of the layout function, usually a
 #'   two column matrix. For 3D layouts a three column matrix.
 #'
@@ -121,7 +122,7 @@ layout_ <- function(graph, layout, ...) {
 #' @seealso \code{\link{layout_}} for a description of the layout API.
 #' @export
 #' @examples
-#' g %>%
+#' (make_star(11) + make_star(11)) %>%
 #'   add_layout_(as_star(), component_wise()) %>%
 #'   plot()
 
@@ -146,6 +147,7 @@ layout_spec <- function(fun, ...) {
 
 
 #' @rdname layout_
+#' @param x The layout specification
 #' @method print igraph_layout_spec
 #' @export
 
@@ -189,7 +191,7 @@ print.igraph_layout_modifier <- function(x, ...) {
 #' @examples
 #' g <- make_ring(10) + make_ring(10)
 #' g %>%
-#'   add_layout_(in_circle, component_wise()) %>%
+#'   add_layout_(in_circle(), component_wise()) %>%
 #'   plot()
 
 component_wise <- function(merge_method = "dla") {
@@ -206,7 +208,7 @@ component_wise <- function(merge_method = "dla") {
 #'
 #' Scale coordinates of a layout.
 #'
-#' @param xmin,xmin Minimum and maximum for x coordinates.
+#' @param xmin,xmax Minimum and maximum for x coordinates.
 #' @param ymin,ymax Minimum and maximum for y coordinates.
 #' @param zmin,zmax Minimum and maximum for z coordinates.
 #'
@@ -344,7 +346,7 @@ as_bipartite <- function(...) layout_spec(layout_as_bipartite, ...)
 #' layout_as_star(g)
 #'
 #' ## Alternative form
-#' layout(as_star(g))
+#' layout_(g, as_star())
 
 layout_as_star <- function(graph, center=V(graph)[1], order=NULL) {
   # Argument checks
@@ -528,7 +530,9 @@ in_circle <- function(...) layout_spec(layout_in_circle, ...)
 #' @aliases layout.auto
 #' @param graph The input graph
 #' @param dim Dimensions, should be 2 or 3.
-#' @param \dots The extra arguments are passed to the real layout function.
+#' @param \dots For \code{layout_nicely} the extra arguments are passed to
+#'   the real layout function. For \code{nicely} all argument are passed to
+#'   \code{layout_nicely}.
 #' @return A numeric matrix with two or three columns.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{plot.igraph}}
@@ -570,7 +574,6 @@ layout_nicely <- function(graph, dim=2, ...) {
 
 
 #' @rdname layout_nicely
-#' @param ... Passed to \code{layout_nicely}.
 #' @export
 
 nicely <- function(...) layout_spec(layout_nicely, ...)
@@ -692,7 +695,7 @@ layout_on_sphere <- function(graph) {
   }
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   .Call("R_igraph_layout_sphere", graph,
-        PACKAGE="giraph")
+        PACKAGE="igraph")
 }
 
 

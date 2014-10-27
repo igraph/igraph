@@ -81,6 +81,20 @@ arpack <- function(func, extra=NULL, sym=FALSE, options=arpack_defaults,
   res
 }
 
+arpack.unpack.complex <- function(vectors, values, nev) {
+  # Argument checks
+  vectors <- as.matrix(structure(as.double(vectors), dim=dim(vectors)))
+  values <- as.matrix(structure(as.double(values), dim=dim(values)))
+  nev <- as.integer(nev)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_arpack_unpack_complex", vectors, values, nev,
+        PACKAGE="igraph")
+
+  res
+}
+
 
 
 #' Find subgraph centrality scores of network positions

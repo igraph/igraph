@@ -511,7 +511,7 @@ get.incidence.dense <- function(graph, types, names, attr) {
     recode[types]  <- seq_len(n2)
     
     for (i in seq(length=ecount(graph))) {
-      eo <- ends(graph, i, name = FALSE)
+      eo <- ends(graph, i, names = FALSE)
       e <- recode[eo]
       if (!types[eo[1]]) {
         res[ e[1], e[2] ] <- edge_attr(graph, attr, i)
@@ -591,7 +591,8 @@ get.incidence.sparse <- function(graph, types, names, attr) {
 #' Bipartite graphs have a \code{type} vertex attribute in igraph, this is
 #' boolean and \code{FALSE} for the vertices of the first kind and \code{TRUE}
 #' for vertices of the second kind.
-#' 
+#'
+#' @aliases get.incidence
 #' @param graph The input graph. The direction of the edges is ignored in
 #' directed graphs.
 #' @param types An optional vertex type vector to use instead of the

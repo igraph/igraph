@@ -119,8 +119,8 @@ predict_edges <- function(graph, hrg=NULL, start=FALSE, num.samples=10000,
 #' @param x The object to convert.
 #' @param \dots Additional arguments. None currently.
 #' @return All these functions return an igraph graph.
-#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}.
 #' @export
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}.
 #' @keywords graphs
 #' @examples
 #' 
@@ -132,6 +132,7 @@ as.igraph <- function(x, ...)
   UseMethod("as.igraph")
 
 #' @method as.igraph igraphHRG
+#' @export
 
 as.igraph.igraphHRG <- function(x, ...) {
   ovc <- length(x$left)+1L
@@ -376,8 +377,9 @@ as_phylo.igraphHRG <- function(x, ...) {
 #' function.
 #' @return Returns whatever the return value was from the plotting function,
 #' \code{plot.phylo}, \code{plot.dendrogram} or \code{plot.hclust}.
-#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @method plot_dendrogram igraphHRG
+#' @export
+#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @keywords graphs
 #' @examples
 #' 

@@ -2,6 +2,7 @@
 \alias{arpack}
 \alias{arpack-options}
 \alias{igraph.arpack.default}
+\alias{arpack.unpack.complex}
 \alias{arpack_defaults}
 \concept{Eigenvalues}
 \concept{Eigenvectors}
@@ -12,6 +13,7 @@
 \usage{
 arpack(func, extra = NULL, sym = FALSE, options = arpack_defaults, 
     env = parent.frame(), complex=!sym)
+arpack.unpack.complex(vectors, values, nev)
 }
 \arguments{
   \item{func}{The function to perform the matrix-vector
@@ -238,7 +240,7 @@ f <- function(x, extra=NULL) {
 arpack(f, options=list(n=10, nev=1, ncv=3), sym=TRUE)
 
 # double check
-eigen(laplacian_matrix(star(10, mode="undirected")))
+eigen(laplacian_matrix(make_star(10, mode="undirected")))
 
 ## First three eigenvalues of the adjacency matrix of a graph
 ## We need the 'Matrix' package for this

@@ -410,7 +410,6 @@ random.graph.game <- erdos.renyi.game
 #' @param method Character, the method for generating the graph. Right now the
 #' \dQuote{simple}, \dQuote{simple.no.multiple} and \dQuote{vl} methods are
 #' implemented.
-#' @param \dots Additional arguments, these are used as graph attributes.
 #' @return The new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso \code{\link{sample_gnp}}, \code{\link{sample_pa}},
@@ -448,8 +447,7 @@ random.graph.game <- erdos.renyi.game
 
 sample_degseq <- function(out.deg, in.deg=NULL,
                                  method=c("simple", "vl",
-                                   "simple.no.multiple"),
-                                 ...) {
+                                   "simple.no.multiple")) {
 
   method <- igraph.match.arg(method)
   method1 <- switch(method, "simple"=0, "vl"=1, "simple.no.multiple"=2)
@@ -782,7 +780,8 @@ sample_traits_callaway <- function(nodes, types, edge.per.step=1,
 }
 
 #' @rdname sample_traits_callaway
-#' @param ... Passed to \code{sample_traits_callaway}.
+#' @param ... Passed to the constructor, \code{sample_traits} or
+#'   \code{sample_traits_callaway}.
 #' @export
 
 traits_callaway <- function(...) constructor_spec(sample_traits_callaway, ...)
@@ -811,7 +810,6 @@ sample_traits <- function(nodes, types, k=1, type.dist=rep(1, types),
 }
 
 #' @rdname sample_traits_callaway
-#' @param ... Passed to \code{sample_traits}.
 #' @export
 
 traits <- function(...) constructor_spec(sample_traits, ...)
@@ -953,7 +951,8 @@ sample_pref <- function(nodes, types, type.dist=rep(1, types),
 }
 
 #' @rdname sample_pref
-#' @param ... Passed to \code{sample_pref}.
+#' @param ... Passed to the constructor, \code{sample_pref} or
+#'   \code{sample_asym_pref}.
 #' @export
 
 pref <- function(...) constructor_spec(sample_pref, ...)
@@ -990,7 +989,6 @@ sample_asym_pref <- function(nodes, types,
 }
 
 #' @rdname sample_pref
-#' @param ... Passed to \code{sample_pref}.
 #' @export
 
 asym_pref <- function(...) constructor_spec(sample_asym_pref, ...)
@@ -1121,7 +1119,7 @@ sample_last_cit <- function(n, edges=1, agebins=n/7100, pref=(1:(agebins+1))^-3,
 }
 
 #' @rdname sample_last_cit
-#' @param ... Passed to \code{sample_last_cit}.
+#' @param ... Passed to the actual constructor.
 #' @export
 
 last_cit <- function(...) constructor_spec(sample_last_cit, ...)
@@ -1147,7 +1145,6 @@ sample_cit_types <- function(n, edges=1, types=rep(0, n),
 }
 
 #' @rdname sample_last_cit
-#' @param ... Passed to \code{sample_cit_types}.
 #' @export
 
 cit_types <- function(...) constructor_spec(sample_cit_types, ...)
@@ -1176,7 +1173,6 @@ sample_cit_cit_types <- function(n, edges=1, types=rep(0, n),
 }
 
 #' @rdname sample_last_cit
-#' @param ... Passed to \code{sample_cit_cit_types}.
 #' @export
 
 cit_cit_types <- function(...) constructor_spec(sample_cit_cit_types, ...)
@@ -1277,6 +1273,10 @@ sample_bipartite <- function(n1, n2, type=c("gnp", "gnm"), p, m,
 #' @param ... Passed to \code{sample_bipartite}.
 #' @export
 
-bipartite <- function(...) constructor_spec(sample_biaprtite, ...)
+bipartite <- function(...) constructor_spec(sample_bipartite, ...)
+
+#' @export
+
+sbm <- function(...) constructor_spec(sample_sbm, ...)
 
 ## -----------------------------------------------------------------

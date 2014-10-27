@@ -20,8 +20,6 @@
 #
 ###################################################################
 
-#' @export
-
 get.all.simple.paths.pp <- function(vect) {
   .Call("R_igraph_get_all_simple_paths_pp", vect, PACKAGE="igraph")
 }

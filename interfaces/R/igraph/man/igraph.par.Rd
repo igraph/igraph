@@ -20,10 +20,6 @@ igraph_opt(x, default = NULL)
   \item{default}{If the specified option is not set in the options list,
     this value is returned. This facilitates retrieving an option and
     checking whether it is set and setting it separately if not.}
-  \item{parid}{The name of the parameter. See the currently used
-    parameters below.}
-  \item{parvalue}{The new value of the parameter. If \code{NULL} then
-    the current value of the parameter is listed.}
 }
 \details{
   The parameter values set via a call to the \code{igraph_options}

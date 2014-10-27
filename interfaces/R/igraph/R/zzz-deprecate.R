@@ -59,9 +59,9 @@ deprecated("alpha.centrality", alpha_centrality)
 deprecated("are.connected", is_adjacent_to)
 #' @export asPhylo
 deprecated("asPhylo", as_phylo)
-#' @export asPhylo.communities
+#' @method asPhylo communities
 deprecated("asPhylo.communities", as_phylo.communities)
-#' @export asPhylo.igraphHRG
+#' @method asPhylo igraphHRG
 deprecated("asPhylo.igraphHRG", as_phylo.igraphHRG)
 #' @export assortativity.degree
 deprecated("assortativity.degree", assortativity_degree)
@@ -135,8 +135,6 @@ deprecated("clusters", components)
 deprecated("code.length", code_len)
 #' @export cohesive.blocks
 deprecated("cohesive.blocks", cohesive_blocks)
-#' @export compare.communities
-deprecated("compare.communities", compare)
 #' @export connect.neighborhood
 deprecated("connect.neighborhood", connect)
 #' @export contract.vertices
@@ -160,9 +158,9 @@ deprecated("delete.edges", delete_edges)
 deprecated("delete.vertices", delete_vertices)
 #' @export dendPlot
 deprecated("dendPlot", plot_dendrogram)
-#' @export dendPlot.communities
+#' @method dendPlot communities
 deprecated("dendPlot.communities", plot_dendrogram.communities)
-#' @export dendPlot.igraphHRG
+#' @method dendPlot igraphHRG
 deprecated("dendPlot.igraphHRG", plot_dendrogram.igraphHRG)
 #' @export dominator.tree
 deprecated("dominator.tree", dominator_tree)

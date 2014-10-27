@@ -1,12 +1,14 @@
 \name{sample_sbm}
 \alias{sample_sbm}
 \alias{sbm.game}
+\alias{sbm}
 \concept{Stochastic block model}
 \concept{Random graph model}
 \title{Sample stochastic block model}
 \description{Sampling from the stochastic block model of networks}
 \usage{
 sample_sbm (n, pref.matrix, block.sizes, directed = FALSE, loops = FALSE) 
+sbm(\dots)
 }
 \arguments{
   \item{n}{Number of vertices in the graph.}
@@ -21,6 +23,7 @@ sample_sbm (n, pref.matrix, block.sizes, directed = FALSE, loops = FALSE)
     graph.}
   \item{loops}{Logical scalar, whether self-loops are allowed in the
     graph.}
+  \item{\dots}{Passed to \code{sample_sbm}.}
 }
 \details{
   This function samples graphs from a stochastic block

@@ -135,8 +135,6 @@ fit_power_law <- function(x, xmin=NULL, start=2, force.continuous=FALSE,
   }
 }
 
-#' @export
-
 power.law.fit.old <- function(x, xmin=NULL, start=2, ...) {
 
   if (length(x) == 0) {
@@ -173,4 +171,18 @@ power.law.fit.old <- function(x, xmin=NULL, start=2, ...) {
   alpha <- mle(mlogl, start=list(alpha=start), ...)
 
   alpha
+}
+
+power.law.fit.new <- function(data, xmin=-1, force.continuous=FALSE) {
+  # Argument checks
+  data <- as.numeric(data)
+  xmin <- as.numeric(xmin)
+  force.continuous <- as.logical(force.continuous)
+
+  on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+  # Function call
+  res <- .Call("R_igraph_power_law_fit", data, xmin, force.continuous,
+        PACKAGE="igraph")
+
+  res
 }

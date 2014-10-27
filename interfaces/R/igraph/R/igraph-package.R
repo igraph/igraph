@@ -16,3 +16,23 @@
 #' @export max_bipartite_match
 #' @export sample_asym_pref
 NULL
+
+#' Magrittr's pipes
+#'
+#' igraph re-exports the \code{\%>\%} operator of magrittr, because
+#' we find it very useful. Please see the documentation in the
+#' \code{magrittr} package.
+#'
+#' @param lhs Left hand side of the pipe.
+#' @param rhs Right hand side of the pipe.
+#' @return Result of applying the right hand side to the
+#'   result of the left hand side.
+#'
+#' @export
+#' @rdname pipe
+#' @examples
+#' make_ring(10) %>%
+#'   add_edges(c(1,6)) %>%
+#'   plot()
+
+`%>%` <- magrittr::`%>%`

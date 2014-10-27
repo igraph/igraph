@@ -2250,8 +2250,8 @@ dfs <- function(graph, root, neimode=c("out", "in", "all", "total"),
   if (father)    res$father    <- res$father+1
 
   if (igraph_opt("return.vs.es")) {
-    if (order)     res$order      <- V(graph)[res$order]
-    if (order.out) res$order.out  <- V(graph)[res$order.out]
+    if (order)     res$order      <- V(graph)[res$order, na_ok = TRUE]
+    if (order.out) res$order.out  <- V(graph)[res$order.out, na_ok = TRUE]
     if (father)    res$father     <- create_vs(graph, res$father, na_ok = TRUE)
   }
 
@@ -2562,7 +2562,8 @@ estimate_closeness <- function(graph, vids=V(graph), mode=c("out", "in", "all", 
 #' vertex i if if i==j, -w if i!=j and there is an edge between vertices i and
 #' j with weight w, and 0 otherwise. The weighted degree of a vertex is the sum
 #' of the weights of its adjacent edges.
-#' 
+#'
+#' @aliases graph.laplacian
 #' @param graph The input graph.
 #' @param normalized Whether to calculate the normalized Laplacian. See
 #' definitions below.

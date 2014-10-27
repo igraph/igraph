@@ -50,12 +50,12 @@ vertex_attr(graph, name, index=V(graph))
 set_vertex_attr(graph, name, index=V(graph), value)
 delete_vertex_attr(graph, name)
 vertex_attr_names(graph)
-vertex.attributes(graph)
+vertex.attributes(graph, index = V(graph))
 edge_attr(graph, name, index=E(graph))
 set_edge_attr(graph, name, index=E(graph), value)
 delete_edge_attr(graph, name)
 edge_attr_names(graph)
-edge.attributes(graph)
+edge.attributes(graph, index = E(graph))
 }
 \arguments{
   \item{graph}{The graph object to work on. Note that the original graph

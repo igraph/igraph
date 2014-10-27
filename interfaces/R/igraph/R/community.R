@@ -267,7 +267,7 @@ print.membership <- function(x, ...) print(unclass(x), ...)
 #' @examples
 #' ## Compare to the correct clustering
 #' g <- (make_full_graph(10) + make_full_graph(10)) %>%
-#'   rewire_each_edge(p = 0.2)
+#'   rewire(each_edge(p = 0.2))
 #' correct <- rep(1:2, each = 10) %>% as_membership
 #' fc <- cluster_fast_greedy(g)
 #' compare(correct, fc)
@@ -1487,7 +1487,7 @@ cluster_label_prop <- function(graph, weights=NULL, initial=NULL,
 #' 
 #' This function was contributed by Tom Gregorovic.
 #'
-#' @aliases cluster_louvain
+#' @aliases multilevel.community
 #' @param graph The input graph.
 #' @param weights Optional positive weight vector.  If the graph has a
 #' \code{weight} edge attribute, then this is used by default. Supply \code{NA}
@@ -1564,7 +1564,7 @@ cluster_louvain <- function(graph, weights=NULL) {
 #' fifty vertices should be fine, graphs with a couple of hundred vertices
 #' might be possible.
 #'
-#' @aliases cluster_optimal
+#' @aliases optimal.community
 #' @param graph The input graph. Edge directions are ignored for directed
 #' graphs.
 #' @param weights Optional positive weight vector for optimizing weighted
@@ -1637,7 +1637,8 @@ cluster_optimal <- function(graph, weights=NULL) {
 #' random walker trajectory
 #' 
 #' Please see the details of this method in the references given below.
-#' 
+#'
+#' @aliases infomap.community
 #' @param graph The input graph.
 #' @param e.weights If not \code{NULL}, then a numeric vector of edge weights.
 #' The length must match the number of edges in the graph.  By default the

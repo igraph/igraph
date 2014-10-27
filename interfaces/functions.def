@@ -430,7 +430,7 @@ igraph_shortest_paths_johnson:
 igraph_get_all_simple_paths:
         PARAMS: GRAPH graph, OUT VERTEXSET_INT res, VERTEX from, \
                 VERTEXSET to=ALL, NEIMODE mode=OUT
-        DEPS: from ON graph, to ON graph
+        DEPS: from ON graph, to ON graph, res ON graph
         NAME-R: get.all.simple.paths
         PP-R: get.all.simple.paths.pp
 
@@ -671,7 +671,7 @@ igraph_arpack_rnsolve:
 igraph_arpack_unpack_complex:
          PARAMS: INOUT MATRIX vectors, INOUT MATRIX values, INTEGER nev
          NAME-R: arpack.unpack.complex
-         IGNORE: RNamespace
+         IGNORE: RNamespace, RR
 
 igraph_unfold_tree:
         PARAMS: GRAPH graph, OUT GRAPH tree, NEIMODE mode=ALL, VECTOR roots,\
@@ -1264,7 +1264,7 @@ igraph_modularity_matrix:
 igraph_reindex_membership:
         PARAMS: INOUT VECTOR membership, OUT VECTOR_OR_0 new_to_old
         NAME-R: reindex.membership
-        IGNORE: RNamespace
+        IGNORE: RNamespace, RR, RC
 
 igraph_community_leading_eigenvector:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
@@ -1928,7 +1928,7 @@ igraph_power_law_fit:
        PARAMS: VECTOR data, OUT PLFIT res, REAL xmin=-1, \
                BOOLEAN force_continuous=False
        NAME-R: power.law.fit.new
-       IGNORE: RNamespace
+       IGNORE: RNamespace, RR
 
 #######################################
 # Dynamics, on networks

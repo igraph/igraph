@@ -24,6 +24,14 @@
 
 #' Make a new graph
 #'
+#' This is is generic function for creating graphs.
+#'
+#' @details
+#' TODO
+#'
+#'
+#' @param ... Parameters, see details below.
+#'
 #' @export
 #' @examples
 #' r <- make_(ring(10))
@@ -49,32 +57,42 @@ make_ <- function(...) {
 
 #' Sample from a random graph model
 #'
+#' Generic function for sampling from network models.
+#'
+#' @details
+#' TODO
+#'
+#' @param ... Parameters, see details below.
+#'
 #' @export
 #' @examples
 #' pref_matrix <- cbind(c(0.8, 0.1), c(0.1, 0.7))
-#' blocky <- sample_(sbm(n = 100, pref_matrix = pref_matrix,
-#'   block_sizes = c(10, 10)))
+#' blocky <- sample_(sbm(n = 20, pref.matrix = pref_matrix,
+#'   block.sizes = c(10, 10)))
 #'
 #' blocky2 <- pref_matrix %>%
-#'   sample_sbm(n = 100, block_sizes = c(10, 10))
+#'   sample_sbm(n = 20, block.sizes = c(10, 10))
 #'
 #' ## Arguments are passed on from sample_ to sample_sbm
 #' blocky3 <- pref_matrix %>%
-#'   sample_(sbm(), n = 100, block_sizes = c(10, 10))
+#'   sample_(sbm(), n = 20, block.sizes = c(10, 10))
 
 sample_ <- make_
 
-#' Convert to a graph
+#' Convert object to a graph
+#'
+#' This is a generic function to convert R objects to igraph graphs.
+#'
+#' @details
+#' TODO
+#'
+#' @param ... Parameters, see details below.
 #'
 #' @export
 #' @examples
 #' ## These are equivalent
-#' igraph_(1:10, from_edgelist(directed = FALSE))
-#' igraph_(1:10, from_edgelist(), directed = FALSE)
-#' igraph_(A -- B, C:D +- E:F:G, from_literal(), simplify = TRUE)
-#' 1:10 %>%
-#'   igraph_(from_edgelist(), directed = FALSE,
-#'           v_attr(name = letters[1:10]))
+#' graph_(cbind(1:5,2:6), from_edgelist(directed = FALSE))
+#' graph_(cbind(1:5,2:6), from_edgelist(), directed = FALSE)
 
 graph_ <- make_
 
@@ -197,7 +215,7 @@ constructor_spec <- function(fun, ...) {
 #'     groups, Journal of Anthropological Research 33, 452-473 (1977).  } }
 #'
 #' @encoding UTF-8
-#' @aliases graph.famous
+#' @aliases graph.famous graph
 #' @param edges A vector defining the edges, the first edge points
 #'   from the first element to the second, the second edge from the third
 #'   to the fourth, etc. For a numeric vector, these are interpreted
@@ -220,8 +238,8 @@ constructor_spec <- function(fun, ...) {
 #' @family determimistic constructors
 #' @export
 #' @examples
-#' graph(c(1, 2, 2, 3, 3, 4, 5, 6), directed = FALSE)
-#' graph(c("A", "B", "B", "C", "C", "D"), directed = FALSE)
+#' make_graph(c(1, 2, 2, 3, 3, 4, 5, 6), directed = FALSE)
+#' make_graph(c("A", "B", "B", "C", "C", "D"), directed = FALSE)
 #'
 #' solids <- list(make_graph("Tetrahedron"),
 #'                make_graph("Cubical"),
@@ -416,8 +434,9 @@ empty_graph <- function(...) constructor_spec(make_empty_graph, ...)
 #' See more examples below.
 #'
 #' @aliases graph.formula
-#' @param ... The formulae giving the structure of the graph, see
-#'   details below.
+#' @param ... For \code{graph_from_literal} the formulae giving the
+#'   structure of the graph, see details below. For \code{from_literal}
+#'   all arguments are passed to \code{graph_from_literal}.
 #' @param simplify Logical scalar, whether to call \code{\link{simplify}}
 #'   on the created graph. By default the graph is simplified, loop and
 #'   multiple edges are removed.
@@ -551,7 +570,6 @@ graph_from_literal <- function(..., simplify=TRUE) {
 }
 
 #' @rdname graph_from_literal
-#' @param ... Passed to \code{graph_from_literal}.
 #' @export
 
 from_literal <- function(...) constructor_spec(graph_from_literal, ...)
@@ -663,7 +681,6 @@ full_graph <- function(...) constructor_spec(make_full_graph, ...)
 #'   mutually connected.
 #' @param circular Logical, if \code{TRUE} the lattice or ring will be
 #'   circular.
-#' @param ... Currently ignored.
 #' @return An igraph graph.
 #'
 #' @family determimistic constructors
@@ -674,7 +691,7 @@ full_graph <- function(...) constructor_spec(make_full_graph, ...)
 
 make_lattice <- function(dimvector = NULL, length = NULL, dim = NULL,
                           nei = 1, directed = FALSE, mutual = FALSE,
-                          circular=FALSE, ...) {
+                          circular=FALSE) {
 
   if (is.null(dimvector)) {
     dimvector <- rep(length, dim)

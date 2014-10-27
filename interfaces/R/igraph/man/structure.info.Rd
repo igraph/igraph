@@ -12,8 +12,8 @@
 \alias{get.edge}
 \alias{get.edges}
 \alias{ends}
-\alias{source}
-\alias{target}
+\alias{head_of}
+\alias{tail_of}
 \title{Gaining information about graph structure}
 \description{Functions for exploring the basic structure of a network:
   number of vertices and edges, the neighbors of a node, test whether
