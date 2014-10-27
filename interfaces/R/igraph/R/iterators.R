@@ -131,7 +131,7 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 #' @method "[[" igraph.vs
 #' @export
 
-"[[.igraph.vs" <- function(x, i) {
+`[[.igraph.vs` <- function(x, i) {
   if (length(i) != 1) {
     stop("Invalid `[[` indexing, need single vertex")
   }
@@ -149,7 +149,7 @@ simple_vs_index <- function(x, i, na_ok = FALSE) {
 #' @method "[" igraph.vs
 #' @export
 
-"[.igraph.vs" <- function(x, i, na_ok = FALSE) {
+`[.igraph.vs` <- function(x, i, na_ok = FALSE) {
   graph <- get_vs_graph(x)
   if (is.null(graph)) {
     res <- simple_vs_index(x, i, na_ok)
@@ -225,7 +225,7 @@ simple_vs_index <- function(x, i, na_ok = FALSE) {
 #' @method "[[" igraph.es
 #' @export
 
-"[[.igraph.es" <- function(x, i) {
+`[[.igraph.es` <- function(x, i) {
   if (length(i) != 1) {
     stop("Invalid `[[` indexing, need single edge")
   }
@@ -243,7 +243,7 @@ simple_es_index <- function(x, i) {
 #' @method "[" igraph.es
 #' @export
 
-"[.igraph.es" <- function(x, i) {
+`[.igraph.es` <- function(x, i) {
   i <- substitute(i)
   graph <- get_es_graph(x)
   if (is.null(graph)) {
@@ -294,7 +294,7 @@ simple_es_index <- function(x, i) {
 
 #' @export
 
-"%--%" <- function(f, t) {  
+`%--%` <- function(f, t) {
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
   graph <- get(".igraph.graph", parent.frame())
@@ -305,7 +305,7 @@ simple_es_index <- function(x, i) {
 
 #' @export
 
-"%->%" <- function(f, t) {
+`%->%` <- function(f, t) {
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
   graph <- get(".igraph.graph", parent.frame())
@@ -320,7 +320,7 @@ simple_es_index <- function(x, i) {
 
 #' @export
 
-"%<-%" <- function(t, value) {
+`%<-%` <- function(t, value) {
   from <- get(".igraph.from", parent.frame())
   to <- get(".igraph.to", parent.frame())
   graph <- get(".igraph.graph", parent.frame())
@@ -336,7 +336,7 @@ simple_es_index <- function(x, i) {
 #' @method "[[<-" igraph.vs
 #' @export
 
-"[[<-.igraph.vs" <- function(x, i, value) {
+`[[<-.igraph.vs` <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
@@ -347,12 +347,12 @@ simple_es_index <- function(x, i) {
 #' @method "[<-" igraph.vs
 #' @export
 
-"[<-.igraph.vs" <-  `[[<-.igraph.vs`
+`[<-.igraph.vs` <-  `[[<-.igraph.vs`
 
 #' @method "[[<-" igraph.es
 #' @export
 
-"[[<-.igraph.es" <- function(x, i, value) {
+`[[<-.igraph.es` <- function(x, i, value) {
   if (! "name"  %in% names(attributes(value)) ||
       ! "value" %in% names(attributes(value))) {
     stop("invalid indexing")
@@ -363,26 +363,26 @@ simple_es_index <- function(x, i) {
 #' @method "[<-" igraph.es
 #' @export
 
-"[<-.igraph.es" <-  `[[<-.igraph.es`
+`[<-.igraph.es` <-  `[[<-.igraph.es`
 
 #' @method "$" igraph
 #' @export
 
-"$.igraph" <- function(x, name) {
+`$.igraph` <- function(x, name) {
   graph_attr(x, name)
 }
 
 #' @method "$<-" igraph
 #' @export
 
-"$<-.igraph" <- function(x, name, value) {
+`$<-.igraph` <- function(x, name, value) {
   set_graph_attr(x, name, value)
 }
 
 #' @method "$" igraph.vs
 #' @export
 
-"$.igraph.vs" <- function(x, name) {
+`$.igraph.vs` <- function(x, name) {
   graph <- get_vs_graph(x)
   if (is.null(graph)) stop("Graph is unknown")
   res <- vertex_attr(graph, name, x)
@@ -395,7 +395,7 @@ simple_es_index <- function(x, i) {
 #' @method "$" igraph.es
 #' @export
 
-"$.igraph.es" <- function(x, name) {
+`$.igraph.es` <- function(x, name) {
   graph <- get_es_graph(x)
   if (is.null(graph)) stop("Graph is unknown")
   res <- edge_attr(graph, name, x)
@@ -409,7 +409,7 @@ simple_es_index <- function(x, i) {
 #' @method "$<-" igraph.vs
 #' @export
 
-"$<-.igraph.vs" <- function(x, name, value) {
+`$<-.igraph.vs` <- function(x, name, value) {
   attr(x, "name") <- name
   attr(x, "value") <- value
   x
@@ -418,7 +418,7 @@ simple_es_index <- function(x, i) {
 #' @method "$<-" igraph.es
 #' @export
 
-"$<-.igraph.es" <- function(x, name, value) {
+`$<-.igraph.es` <- function(x, name, value) {
   attr(x, "name") <- name
   attr(x, "value") <- value
   x
@@ -426,7 +426,7 @@ simple_es_index <- function(x, i) {
 
 #' @export
 
-"V<-" <- function(x, value) {
+`V<-` <- function(x, value) {
   if (!is_igraph(x)) {
     stop("Not a graph object")
   }
@@ -440,7 +440,7 @@ simple_es_index <- function(x, i) {
 
 #' @export
 
-"E<-" <- function(x, path=NULL, P=NULL, directed=NULL, value) {
+`E<-` <- function(x, path=NULL, P=NULL, directed=NULL, value) {
   if (!is_igraph(x)) {
     stop("Not a graph object")
   }
