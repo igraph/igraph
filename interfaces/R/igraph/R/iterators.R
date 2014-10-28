@@ -143,7 +143,7 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 
 simple_vs_index <- function(x, i, na_ok = FALSE) {
   res <- unclass(x)[i]
-  if (!na_ok && anyNA(res)) stop('Unknown vertex selected')
+  if (!na_ok && any(is.na(res))) stop('Unknown vertex selected')
   res
 }
 

@@ -192,7 +192,7 @@ vertex.attributes <- function(graph, index = V(graph)) {
 
   if (!missing(index)) {
     index <- as.igraph.vs(graph, index)
-    if (any(duplicated(index)) || anyNA(index)) {
+    if (any(duplicated(index)) || any(is.na(index))) {
       stop("Invalid vertices in index")
     }
   }
@@ -306,7 +306,7 @@ edge.attributes <- function(graph, index = E(graph)) {
 
   if (!missing(index)) {
     index <- as.igraph.es(graph, index)
-    if (any(duplicated(index)) || anyNA(index)) {
+    if (any(duplicated(index)) || any(is.na(index))) {
       stop("Invalid edges in index")
     }
   }
