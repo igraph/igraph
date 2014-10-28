@@ -32,6 +32,7 @@
 #'
 #' @param ... Parameters, see details below.
 #'
+#' @importFrom lazyeval lazy_eval
 #' @export
 #' @examples
 #' r <- make_(ring(10))
@@ -51,7 +52,9 @@ make_ <- function(...) {
   cons <- args[ cidx][[1]]
   args <- args[!cidx]
 
-  do_call(cons$fun, cons$args, args)
+  args2 <- if (cons$lazy) lapply(cons$args, "[[", "expr") else lazy_eval(cons$args)
+
+  do_call(cons$fun, args2, args)
 
 }
 
@@ -88,6 +91,7 @@ sample_ <- make_
 #'
 #' @param ... Parameters, see details below.
 #'
+#' @importFrom lazyeval lazy_dots
 #' @export
 #' @examples
 #' ## These are equivalent
@@ -100,13 +104,12 @@ attr(make_, "name") <- "make_"
 attr(sample_, "name") <- "sample_"
 attr(graph_, "name") <- "graph_"
 
-constructor_spec <- function(fun, ...) {
-  my_call <- match.call(sys.function(1), sys.call(1))
-  my_call[[1]] <- substitute(fun)
+constructor_spec <- function(fun, ..., .lazy = FALSE) {
   structure(
     list(
       fun = fun,
-      args = substitute(...)
+      args = lazy_dots(...),
+      lazy = .lazy
     ),
     class = "igraph_constructor_spec"
   )
@@ -572,7 +575,8 @@ graph_from_literal <- function(..., simplify=TRUE) {
 #' @rdname graph_from_literal
 #' @export
 
-from_literal <- function(...) constructor_spec(graph_from_literal, ...)
+from_literal <- function(...)
+  constructor_spec(graph_from_literal, ..., .lazy = TRUE)
 
 ## -----------------------------------------------------------------
 

@@ -8,7 +8,8 @@ Description: Routines for simple graphs and network analysis. igraph can
   and regular graphs, graph visualization, centrality indices and much more.
 Depends: methods
 Imports: Matrix,
-    magrittr
+    magrittr,
+    lazyeval
 Suggests: igraphdata, stats4, rgl, tcltk, graph, ape
 License: GPL (>= 2)
 URL: http://igraph.org
