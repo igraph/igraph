@@ -788,6 +788,28 @@ graph.neighborhood <- function(graph, order, nodes=V(graph),
   res
 }
 
+#GRC is the global reaching centrality of the graph, which is a measure of hierarchy.
+#1 indicates a high degree of centrality, while 0 indicates a low degree of centrality.
+#The graph must be a directed for the measure to be valid.
+#It is as described in Mones, Enys, Lilla Vicsek, and Tamás Vicsek. "Hierarchy measure 
+#for complex networks." PloS one 7, no. 3 (2012): e33799.
+
+GRC <- function(graph) {  
+
+  if (!is.igraph(graph)) {
+    stop("Not a graph object")
+  }
+
+  nodes=length(graph)
+  #calculate local reaching centrality of each vertex
+  neighborhood = neighborhood.size(graph,order=nodes,mode="out")
+  LRC = (neighborhood - 1)/nodes
+  #calculate global reaching centrality
+  GRC = (sum(max(LRC)-LRC))/(nodes-1)
+  GRC 
+  
+}
+
 graph.coreness <- function(graph, mode=c("all", "out", "in")) {
 
   if (!is.igraph(graph)) {
