@@ -305,14 +305,22 @@ make_famous_graph <- function(name) {
 #' @export
 
 make_directed_graph <- function(edges, n = max(edges)) {
-  make_graph(edges, n = n, directed = TRUE)
+  if (missing(n)) {
+    make_graph(edges, directed = TRUE)
+  } else {
+    make_graph(edges, n = n, directed = TRUE)
+  }
 }
 
 #' @rdname make_graph
 #' @export
 
 make_undirected_graph <- function(edges, n = max(edges)) {
-  make_graph(edges, n = n, directed = FALSE)
+  if (missing(n)) {
+    make_graph(edges, directed = FALSE)
+  } else {
+    make_graph(edges, n = n, directed = FALSE)
+  }
 }
 
 #' @rdname make_graph
