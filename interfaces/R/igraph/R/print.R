@@ -1,23 +1,26 @@
-#   IGraph R package
-#   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
-#   334 Harvard street, Cambridge, MA 02139 USA
-#   
-#   This program is free software; you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation; either version 2 of the License, or
-#   (at your option) any later version.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#   
-#   You should have received a copy of the GNU General Public License
-#   along with this program; if not, write to the Free Software
-#   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-#   02110-1301 USA
-#
-###################################################################
+
+## ----------------------------------------------------------------------
+##
+##   IGraph R package
+##   Copyright (C) 2005-2014  Gabor Csardi <csardi.gabor@gmail.com>
+##   334 Harvard street, Cambridge, MA 02139 USA
+##
+##   This program is free software; you can redistribute it and/or modify
+##   it under the terms of the GNU General Public License as published by
+##   the Free Software Foundation; either version 2 of the License, or
+##   (at your option) any later version.
+##
+##   This program is distributed in the hope that it will be useful,
+##   but WITHOUT ANY WARRANTY; without even the implied warranty of
+##   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+##   GNU General Public License for more details.
+##
+##   You should have received a copy of the GNU General Public License
+##   along with this program; if not, write to the Free Software
+##   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
+##   02110-1301 USA
+##
+## ----------------------------------------------------------------------
 
 ###################################################################
 # Convert graphs to human readable forms
@@ -71,6 +74,7 @@
     atxt <- strwrap(paste(sep="", "+ attr: ", atxt), exdent=2)
     cat(atxt, sep="\n")
   }
+  1 + if (length(atxt) == 1 && atxt == "") 0 else length(atxt)
 }
 
 .print.graph.attributes <- function(x) {
@@ -188,9 +192,13 @@
     cat(paste('[ reached getOption("max.print") -- omitted', omitted.edges,
               'edges ]\n\n'))
   }    
-} 
+}
 
-.print.edges.compressed <- function(x, edges = E(x), names, num = FALSE) {
+#' @importFrom printr head_print printer_callback
+
+.print.edges.compressed <- function(x, edges = E(x), names, num = FALSE,
+                                      max.lines = igraph_opt("auto.print.lines")) {
+
   title <- "+" %+%
     (if (num) " " %+% chr(length(edges)) %+% "/" %+%
        (if (is.null(x)) "?" else chr(ecount(x))) else "") %+%
@@ -200,11 +208,21 @@
     ":\n"
   cat(title)
 
+  if (is.null(max.lines)) {
+    .print.edges.compressed.all(x, edges, names)
+  } else {
+    .print.edges.compressed.limit(x, edges, names, max.lines)
+  }
+}
+
+.print.edges.compressed.all <- function(x, edges, names) {
+
+  arrow <- c("--", "->")[is_directed(x)+1]
+
   if (!is.null(x)) {
     el <- ends(x, edges, names=names)
-    arrow <- c("--", "->")[is_directed(x)+1]
     pr <- paste(sep="", format(el[,1]), arrow, format(el[,2]))
-    if (length(edges)) print(pr, quote=FALSE)
+    print(pr, quote=FALSE)
   } else {
     if (!is.null(attr(edges, "vnames"))) {
       print(as.vector(attr(edges, "vnames")), quote = FALSE)
@@ -212,6 +230,51 @@
       print(names(edges), quote = FALSE)
     } else {
       print(as.vector(edges))
+    }
+  }
+
+}
+
+.print.edges.compressed.limit <- function(x, edges, names, max.lines) {
+
+  if (!is.null(x)) {
+
+    arrow <- c("--", "->")[is_directed(x)+1]
+
+    can_max <- NA
+    el <- NA
+
+    fun <- function(q, no) {
+      if (q == "length") {
+        length(edges)
+      } else if (q == "min_width") {
+        5
+      } else if (q == "width") {
+        el <<- ends(x, edges[seq_len(no)], names = names)
+        cummax(nchar(el[,1])) + nchar(arrow) + cummax(nchar(el[,2])) + 1
+      } else if (q == "print") {
+        el <<- el[seq_len(no), , drop = FALSE]
+        out <- paste(sep="", format(el[,1]), arrow, format(el[,2]))
+        print(out, quote = FALSE)
+      } else if (q == "max") {
+        can_max <<- no
+      } else if (q == "done") {
+        if (no["tried_items"] < length(edges) ||
+            no["printed_lines"] < no["tried_lines"]) {
+          cat("+ ... omitted several edges\n")
+        }
+      }
+    }
+
+    fun <- printer_callback(fun)
+    head_print(fun, max_lines = max.lines)
+  } else {
+    if (!is.null(attr(edges, "vnames"))) {
+      head_print(as.vector(attr(edges, "vnames")), quote = FALSE)
+    } else if (!is.null(names(edges))) {
+      head_print(names(edges), quote = FALSE)
+    } else {
+      head_print(as.vector(edges))
     }
   }
 }
@@ -350,14 +413,15 @@ print.igraph <- function(x, full=igraph_opt("print.full"),
                 graph.attributes=igraph_opt("print.graph.attributes"),
                 vertex.attributes=igraph_opt("print.vertex.attributes"),
                 edge.attributes=igraph_opt("print.edge.attributes"),
-                names=TRUE, ...) {
+                names=TRUE, max.lines = igraph_opt("auto.print.lines"), ...) {
   
   if (!is_igraph(x)) {
     stop("Not a graph object")
   }
 
-  .print.header(x)
-  if (full) { 
+  head_lines <- .print.header(x)
+  if ((is.logical(full) && full) ||
+      graph.attributes || vertex.attributes || edge.attributes) {
     if (graph.attributes)  .print.graph.attributes(x)
     if (vertex.attributes) .print.vertex.attributes(x)
     if (ecount(x)==0) {
@@ -371,6 +435,9 @@ print.igraph <- function(x, full=igraph_opt("print.full"),
     } else {
       .print.edges.adjlist(x)
     }
+  } else if (full == "auto") {
+    .print.edges.compressed(x, names = names, max.lines =
+                              max.lines - head_lines)
   }
   
   invisible(x)
@@ -381,31 +448,7 @@ print.igraph <- function(x, full=igraph_opt("print.full"),
 #' @export
 
 summary.igraph <- function(object, ...) {
-
-  if (!is_igraph(object)) {
-    stop("Not a graph object")
-  }
-
-  title <- paste(sep="", "IGRAPH ",
-                 c("U","D")[is_directed(object)+1],
-                 c("-","N")[is_named(object)+1],
-                 c("-","W")[is_weighted(object)+1],
-                 c("-","B")[is_bipartite(object)+1], " ",
-                 vcount(object), " ", ecount(object), " -- ")
-  w <- getOption("width")
-  if (nchar(title) < w && "name" %in% graph_attr_names(object)) {
-    title <- substring(paste(sep="", title,
-                             as.character(object$name)[1]), 1, w-1)
-  }
-  cat(title, "\n", sep="")
-
-  atxt <- .get.attr.codes(object)
-  atxt <- paste(atxt[atxt!=""], collapse=", ")
-  if (atxt != "") {
-    atxt <- strwrap(paste(sep="", "attr: ", atxt), exdent=2)
-    cat(atxt, sep="\n")
-  }
-
+  .print.header(object)
   invisible(object)
 }
 
