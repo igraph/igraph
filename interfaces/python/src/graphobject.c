@@ -4445,9 +4445,14 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   if (igraphmodule_attrib_to_vector_t(weights_o, self, &weights,
       ATTRIBUTE_TYPE_EDGE)) return NULL;
 
-  if (igraphmodule_PyObject_to_vs_t(to_o, &to, &self->g, 0, 0)) return NULL;
+  if (igraphmodule_PyObject_to_vs_t(to_o, &to, &self->g, 0, 0)) {
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    return NULL;
+  }
 
   if (igraph_vs_size(&self->g, &to, &no_of_target_nodes)) {
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vs_destroy(&to);
     igraphmodule_handle_igraph_error();
     return NULL;
   }
@@ -4455,14 +4460,16 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   ptrvec = (igraph_vector_ptr_t *) calloc(1, sizeof(igraph_vector_ptr_t));
   if (!ptrvec) {
     PyErr_SetString(PyExc_MemoryError, "");
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vs_destroy(&to);
     return NULL;
   }
 
   if (igraph_vector_ptr_init(ptrvec, no_of_target_nodes)) {
     PyErr_SetString(PyExc_MemoryError, "");
     free(ptrvec);
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vs_destroy(&to);
     return NULL;
   }
 
@@ -4470,7 +4477,8 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
   if (!res) {
     PyErr_SetString(PyExc_MemoryError, "");
     igraph_vector_ptr_destroy(ptrvec); free(ptrvec);
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vs_destroy(&to);
     return NULL;
   }
 
@@ -4484,15 +4492,15 @@ PyObject *igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *
     igraphmodule_handle_igraph_error();
     for (j = 0; j < no_of_target_nodes; j++) igraph_vector_destroy(&res[j]);
     free(res);
-	if (weights) { igraph_vector_destroy(weights); free(weights); }
-    igraph_vector_ptr_destroy(ptrvec);
-    free(ptrvec);
+    igraph_vector_ptr_destroy(ptrvec); free(ptrvec);
+    if (weights) { igraph_vector_destroy(weights); free(weights); }
+    igraph_vs_destroy(&to);
     return NULL;
   }
 
-  igraph_vector_ptr_destroy(ptrvec);
-  free(ptrvec);
+  igraph_vector_ptr_destroy(ptrvec); free(ptrvec);
   if (weights) { igraph_vector_destroy(weights); free(weights); }
+  igraph_vs_destroy(&to);
 
   list = PyList_New(no_of_target_nodes);
   if (!list) {
