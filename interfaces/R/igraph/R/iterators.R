@@ -479,7 +479,7 @@ print.igraph.vs <- function(x, ...) {
   x2 <- if (!is.null(names(x))) names(x) else as.vector(x)
   if (length(x2)) {
     head_print(x2, omitted_footer = "+ ... omitted several vertices\n",
-               quote = FALSE)
+               quote = FALSE, max_lines = igraph_opt("auto.print.lines"))
   }
   invisible(x)
 }
