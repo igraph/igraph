@@ -71,28 +71,70 @@
   atxt <- .get.attr.codes(object)
   atxt <- paste(atxt[atxt!=""], collapse=", ")
   if (atxt != "") {
-    atxt <- strwrap(paste(sep="", "+ attr: ", atxt), exdent=2)
+    atxt <- strwrap(paste(sep="", "+ attr: ", atxt), prefix = "| ",
+                    initial = "")
     cat(atxt, sep="\n")
   }
   1 + if (length(atxt) == 1 && atxt == "") 0 else length(atxt)
 }
 
-.print.graph.attributes <- function(x) {
+#' @importFrom printr indent_print
+
+.print.graph.attributes <- function(x, full, max.lines) {
   list <- graph_attr_names(x)
   if (length(list)!=0) {
     cat("+ graph attributes:\n")
-    lapply(list, function(n) {
-      cat(sep="", "[[", n, "]]\n")
-      print(graph_attr(x, n))
+    out <- capture.output({
+      lapply(list, function(n) {
+        cat(sep="", "+ ", n, ":\n")
+        indent_print(graph_attr(x, n), .indent = "  ")
+      })
+      invisible(NULL)
     })
+    indent_print(out, sep = "\n", .indent = "| ", .printer = cat)
+    length(out) + 1
+  } else {
+    0
   }
 }
 
-.print.vertex.attributes <- function(x) {
+## IGRAPH U--- 10 10 -- Ring graph
+## + attr: name (g/c), mutual (g/l), circular (g/l)
+## + graph attributes:
+## | + name:
+## |   [1] "Ring graph"
+## | + mutual:
+## |   [1] FALSE
+## | + circular=
+## |   [1] TRUE
+## | + layout =
+## |            [,1]          [,2]
+## |    [1,]  0.000000  0.000000e+00
+## |    [2,]  1.000000  0.000000e+00
+## |    [3,]  0.809017  5.877853e-01
+## |    [4,]  0.309017  9.510565e-01
+## |    [5,] -0.309017  9.510565e-01
+## |    [6,] -0.809017  5.877853e-01
+## |    [7,] -1.000000  1.224647e-16
+## |    [8,] -0.809017 -5.877853e-01
+## |    [9,] -0.309017 -9.510565e-01
+## |   [10,]  0.309017 -9.510565e-01
+## |   [11,]  0.809017 -5.877853e-01
+## + edges:
+##  [1] 1-- 2 2-- 3 3-- 4 4-- 5 5-- 6 6-- 7 7-- 8 8-- 9 9--10 1--10
+
+#' @importFrom printr indent_print
+
+.print.vertex.attributes <- function(x, full, max.lines) {
+  pf <- function(x) .print.vertex.attributes.old(x, full, max.lines)
+  if (length(vertex_attr_names(x))) cat("+ vertex attributes:\n")
+  indent_print(x, .indent = "| ", .printer = pf)
+}
+
+.print.vertex.attributes.old <- function(x, full, max.lines) {
   vc <- vcount(x)
   list <- vertex_attr_names(x)
   if (length(list) != 0) {
-    cat("+ vertex attributes:\n")
     mp <- getOption("max.print")
     options(max.print=1000000000)
     if (vc <= mp) {
@@ -255,7 +297,7 @@
       } else if (q == "print") {
         el <<- el[seq_len(no), , drop = FALSE]
         out <- paste(sep="", format(el[,1]), arrow, format(el[,2]))
-        print(out, quote = FALSE)
+        capture.output(print(out, quote = FALSE))
       } else if (q == "max") {
         can_max <<- no
       } else if (q == "done") {
@@ -420,13 +462,16 @@ print.igraph <- function(x, full=igraph_opt("print.full"),
   }
 
   head_lines <- .print.header(x)
-  if ((is.logical(full) && full) ||
-      graph.attributes || vertex.attributes || edge.attributes) {
-    if (graph.attributes)  .print.graph.attributes(x)
-    if (vertex.attributes) .print.vertex.attributes(x)
+  if (is.logical(full) && full) {
+    if (graph.attributes) {
+      head_lines <- head_lines + .print.graph.attributes(x, full, max.lines)
+    }
+    if (vertex.attributes) {
+      head_lines <- head_lines + .print.vertex.attributes(x, full, max.lines)
+    }
     if (ecount(x)==0) {
       ## Do nothing
-    } else if (edge.attributes && length(edge_attr_names(x)) !=0 ) {
+    } else if (edge.attributes && length(edge_attr_names(x)) != 0 ) {
       .print.edges.edgelist(x, names = names)
     } else if (median(degree(x, mode="out")) < 3) {
       .print.edges.compressed(x, names = names)

@@ -464,6 +464,7 @@ simple_es_index <- function(x, i) {
 }
 
 #' @method print igraph.vs
+#' @importFrom printr head_print
 #' @export
 
 print.igraph.vs <- function(x, ...) {
@@ -476,7 +477,10 @@ print.igraph.vs <- function(x, ...) {
   cat(title)
 
   x2 <- if (!is.null(names(x))) names(x) else as.vector(x)
-  if (length(x2)) print(x2, quote = FALSE)
+  if (length(x2)) {
+    head_print(x2, omitted_footer = "+ ... omitted several vertices\n",
+               quote = FALSE)
+  }
   invisible(x)
 }
 

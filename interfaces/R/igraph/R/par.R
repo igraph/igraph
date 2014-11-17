@@ -34,7 +34,7 @@
                      "dend.plot.type"="auto",
                      "print.full"="auto",
                      "annotate.plot"=FALSE,
-                     "auto.print.lines" = 20,
+                     "auto.print.lines" = 10,
                      "return.vs.es" = TRUE
                     )
 
