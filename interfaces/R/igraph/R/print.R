@@ -438,6 +438,8 @@ str.igraph <- function(object, ...) {
 #' @param edge.attributes Logical constant, whether to print edge attributes.
 #' @param names Logical constant, whether to print symbolic vertex names (ie.
 #' the \code{name} vertex attribute) or vertex ids.
+#' @param max.lines The maximum number of lines to use. The rest of the
+#' output will be truncated.
 #' @param object The graph of which the summary will be printed.
 #' @param \dots Additional agruments.
 #' @return All these functions return the graph invisibly.
