@@ -474,7 +474,7 @@ print.igraph <- function(x, full=igraph_opt("print.full"),
     } else if (edge.attributes && length(edge_attr_names(x)) != 0 ) {
       .print.edges.edgelist(x, names = names)
     } else if (median(degree(x, mode="out")) < 3) {
-      .print.edges.compressed(x, names = names)
+      .print.edges.compressed(x, names = names, max.lines = NULL)
     } else if (is_named(x)) {
       .print.edges.adjlist.named(x)
     } else {

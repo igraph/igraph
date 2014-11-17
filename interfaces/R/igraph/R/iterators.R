@@ -467,7 +467,7 @@ simple_es_index <- function(x, i) {
 #' @importFrom printr head_print
 #' @export
 
-print.igraph.vs <- function(x, ...) {
+print.igraph.vs <- function(x, full = igraph_opt("print.full"), ...) {
   graph <- get_vs_graph(x)
   title <- "+ " %+% chr(length(x)) %+% "/" %+%
     (if (is.null(graph)) "?" else chr(vcount(graph))) %+%
@@ -478,8 +478,12 @@ print.igraph.vs <- function(x, ...) {
 
   x2 <- if (!is.null(names(x))) names(x) else as.vector(x)
   if (length(x2)) {
-    head_print(x2, omitted_footer = "+ ... omitted several vertices\n",
-               quote = FALSE, max_lines = igraph_opt("auto.print.lines"))
+    if (is.logical(full) && full) {
+      print(x2, quote = FALSE)
+    }  else {
+      head_print(x2, omitted_footer = "+ ... omitted several vertices\n",
+                 quote = FALSE, max_lines = igraph_opt("auto.print.lines"))
+    }
   }
   invisible(x)
 }
@@ -487,9 +491,11 @@ print.igraph.vs <- function(x, ...) {
 #' @method print igraph.es
 #' @export
 
-print.igraph.es <- function(x, ...) {
+print.igraph.es <- function(x, full = igraph_opt("print.full"), ...) {
   graph <- get_es_graph(x)
-  .print.edges.compressed(x = graph, edges = x, names = TRUE, num = TRUE)
+  ml <- if (identical(full, TRUE)) NULL else igraph_opt("auto.print.lines")
+  .print.edges.compressed(x = graph, edges = x, max.lines = ml, names = TRUE,
+                          num = TRUE)
   invisible(x)
 }
 
