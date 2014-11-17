@@ -287,7 +287,7 @@ print.communities <- function(x, ...) {
   mod <- if (!is.null(x$modularity)) {
     modularity(x) %>% format(digits = 2)
   } else {
-    NA_real
+    NA_real_
   }
   alg <- x$algorithm %||% "unknown"
   grp <- groups(x)
