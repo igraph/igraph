@@ -305,3 +305,7 @@ SEXP R_igraph_add_env(SEXP graph) {
   if (result != graph) { UNPROTECT(1); }
   return result;
 }
+
+SEXP R_igraph_get_graph_id(SEXP graph) {
+  findVar(install("myid"), VECTOR_ELT(graph, 9));
+}

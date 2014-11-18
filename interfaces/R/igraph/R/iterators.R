@@ -25,12 +25,8 @@
 ###################################################################
 
 update_es_ref <- update_vs_ref <- function(graph) {
+  check_version(graph)
   env <- get_vs_ref(graph)
-  if (!is.environment(env)) {
-    stop("This graph was created by an old(er) igraph version.\n",
-         "  Call upgrade_graph() on it to use with the current igraph version")
-  }
-
   assign("me", graph, envir = env)
 }
 
@@ -74,6 +70,7 @@ V <- function(graph) {
   if (is_named(graph)) names(res) <- vertex_attr(graph)$name
   class(res) <- "igraph.vs"
   attr(res, "env") <- make_weak_ref(get_vs_ref(graph), NULL)
+  attr(res, "graph") <- get_graph_id(graph)
   res
 }
 
@@ -120,6 +117,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   
   class(res) <- "igraph.es"
   attr(res, "env") <- make_weak_ref(get_es_ref(graph), NULL)
+  attr(res, "graph") <- get_graph_id(graph)
   res
 }
 
@@ -218,6 +216,7 @@ simple_vs_index <- function(x, i, na_ok = FALSE) {
     res <- simple_vs_index(x, i, na_ok)
   }
   attr(res, "env") <- attr(x, "env")
+  attr(res, "graph") <- attr(x, "graph")
   class(res) <- class(x)
   res
 }
@@ -249,6 +248,7 @@ simple_es_index <- function(x, i) {
   if (anyNA(res)) stop('Unknown edge selected')
 
   attr(res, "env") <- attr(x, "env")
+  attr(res, "graph") <- attr(x, "graph")
   res
 }
 
@@ -299,6 +299,7 @@ simple_es_index <- function(x, i) {
     res <- simple_es_index(x, i)
   }
   attr(res, "env") <- attr(x, "env")
+  attr(res, "graph") <- attr(x, "graph")
   class(res) <- class(x)
   res
 } 

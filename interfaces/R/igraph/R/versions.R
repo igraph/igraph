@@ -95,3 +95,12 @@ upgrade_graph <- function(graph) {
     graph
   }
 }
+
+## Check that the version is the latest
+
+check_version <- function(graph) {
+  if (graph_version() != graph_version(graph)) {
+    stop("This graph was created by an old(er) igraph version.\n",
+         "  Call upgrade_graph() on it to use with the current igraph version")
+  }
+}
