@@ -30,6 +30,7 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
+#include "rinterface.h"
 
 #include <stdio.h>
 
@@ -2423,6 +2424,8 @@ SEXP R_igraph_to_SEXP(const igraph_t *graph) {
   SEXP result;
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
+  uuid_t my_id;
+  char my_id_chr[40];
   
   PROTECT(result=NEW_LIST(10));
   SET_VECTOR_ELT(result, 0, NEW_NUMERIC(1));
@@ -2457,6 +2460,10 @@ SEXP R_igraph_to_SEXP(const igraph_t *graph) {
 
   /* Environment for vertex/edge seqs */
   SET_VECTOR_ELT(result, 9, allocSExp(ENVSXP));
+
+  uuid_generate(my_id);
+  uuid_unparse_lower(my_id, my_id_chr);
+  defineVar(install("myid"), mkString(my_id_chr), VECTOR_ELT(result, 9));
   
   UNPROTECT(1);
   return result;

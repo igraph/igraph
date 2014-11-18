@@ -21,3 +21,4 @@
 
 */
 
+#include "uuid/uuid.h"
