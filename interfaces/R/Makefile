@@ -87,6 +87,14 @@ ARPACK2 := $(patsubst arpack/%, igraph/src/%, $(ARPACK))
 $(ARPACK2): igraph/src/%: arpack/%
 	mkdir -p $(@D) && cp $< $@
 
+# libuuid
+
+UUID := $(shell git ls-files uuid)
+UUID2 := $(patsubst uuid/%, igraph/src/uuid/%, $(UUID))
+
+$(UUID2): igraph/src/uuid/%: uuid/%
+	mkdir -p $(@D) && cp $< $@
+
 # R files that are generated/copied
 
 RGEN = igraph/R/auto.R igraph/src/rinterface.c igraph/src/rinterface.h \
@@ -158,7 +166,8 @@ igraph/src/rinterface_extra.c: src/rinterface_extra.c
 # Makevars.in and Makevars.win are only regenerated if 
 # the list of object files changes.
 
-OBJECTS := $(shell echo $(CSRC) $(ARPACK) $(GLPK) $(RAY) | tr ' ' '\n' | \
+OBJECTS := $(shell echo $(CSRC) $(ARPACK) $(GLPK) $(RAY) $(UUID)   |     \
+		tr ' ' '\n' |                                            \
 	        grep -E '\.(c|cpp|cc|f|l|y)$$' | 			 \
 		grep -F -v '/t_cholmod' | 				 \
 		grep -F -v f2c/arithchk.c | grep -F -v f2c_dummy.c |	 \
@@ -180,7 +189,7 @@ igraph/src/Makevars.win igraph/src/Makevars.in: igraph/src/%: src/% \
 igraph: igraph_$(VERSION).tar.gz
 
 igraph_$(VERSION).tar.gz: $(CSRC2) $(CINC2) $(PARSER2) $(RSRC) $(RGEN) \
-			  $(CGEN) $(GLPK2) $(RAY2) $(ARPACK2)
+			  $(CGEN) $(GLPK2) $(RAY2) $(ARPACK2) $(UUID2)
 	rm -f igraph/src/config.h
 	rm -f igraph/src/Makevars
 	touch igraph/src/config.h
