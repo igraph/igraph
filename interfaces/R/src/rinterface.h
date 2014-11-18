@@ -22,3 +22,5 @@
 */
 
 #include "uuid/uuid.h"
+
+#define R_IGRAPH_TYPE_VERSION "0.8.0"

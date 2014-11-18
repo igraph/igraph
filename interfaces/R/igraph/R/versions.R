@@ -48,8 +48,7 @@ graph_version <- function(graph) {
 
   } else {
     stopifnot(is_igraph(graph))
-    res <- .Call("R_igraph_graph_version", graph, PACKAGE = "igraph")
-    switch(res, "1" = "0.4.0", "2" = "0.8.0", "Unknown")
+    .Call("R_igraph_graph_version", graph, PACKAGE = "igraph")
   }
 }
 
