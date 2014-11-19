@@ -580,3 +580,166 @@ as.igraph.es <- function(graph, e) {
   }
   res
 }
+
+
+is_igraph_vs <- function(x) {
+  inherits(x, "igraph.vs")
+}
+
+
+is.igraph.es <- function(x) {
+  iherits(x, "igraph.es")
+}
+
+
+parse_op_args <- function(..., what, is_fun, as_fun, check_graph = TRUE) {
+
+  args <- list(...)
+
+  if (any(! sapply(args, is_fun))) stop("Not ", what, " sequence")
+
+  ## get the ids of all graphs
+  graph_id <- sapply(args, get_vs_graph_id) %>%
+    unique()
+
+  if (length(graph_id) != 1) {
+    stop("Cannot combine vertex/edge sequences from different graphs")
+  }
+
+  graphs <- args %>%
+    lapply(get_vs_graph) %>%
+    drop_null()
+
+  addresses <- graphs %>%
+    sapply(function(x) x %&&% address(x)) %>%
+    unique()
+
+  if (check_graph && length(addresses) >= 2) {
+    stop("Cannot combine vertex/edge sequences from different graphs")
+  }
+
+  graph <- if (length(graphs)) graphs[[1]] else NULL
+
+  args <- lapply(args, unclass)
+
+  list(graph = graph, args = args, id = graph_id)
+}
+
+
+parse_vs_op_args <- function(...) {
+  parse_op_args(..., what = "a vertex", is_fun = is_igraph_vs,
+                as_fun = as.igraph.vs)
+}
+
+
+parse_es_op_args <- function(...) {
+  parse_op_args(..., what = "an edge", is_fun = is_igraph_es,
+                as_fun = as.igraph.es)
+}
+
+
+create_op_result <- function(parsed, result, class) {
+  attr(result, "env") <- make_weak_ref(get_vs_ref(parsed$graph), NULL)
+  attr(result, "graph") <- parsed$id
+  class(result) <- class
+  result
+}
+
+
+#' @method unique igraph.vs
+#' @export
+
+unique.igraph.vs <- function(x, incomparables = FALSE, ...) {
+  x[!duplicated(x, incomparables = incomparables, ...)]
+}
+
+
+#' @method unique igraph.es
+#' @export
+
+unique.igraph.es <- function(x, incomparables = FALSE, ...) {
+  x[!duplicated(x, incomparables = incomparables, ...)]
+}
+
+
+#' @method c igraph.vs
+#' @export
+
+c.igraph.vs <- function(..., recursive = FALSE) {
+  parsed <- parse_vs_op_args(...)
+  res <- do_call(c, .args = parsed$args)
+  create_op_result(parsed, res, "igraph.vs")
+}
+
+
+#' @method c igraph.es
+#' @export
+
+c.igraph.es <- function(..., recursive = FALSE) {
+  parsed <- parse_es_op_args(...)
+  res <- do_call(c, .args = parsed$args)
+  create_op_result(parsed, res, "igraph.es")
+}
+
+
+#' @method union igraph.vs
+#' @export
+
+union.igraph.vs <- function(...) {
+  unique(c(...))
+}
+
+
+#' @method union igraph.es
+#' @export
+
+union.igraph.es <- union.igraph.vs
+
+
+#' @method intersection igraph.vs
+#' @export
+
+intersection.igraph.vs <- function(...) {
+  ifun <- function(x, y) {
+    unique(y[match(as.vector(x), y, 0L)])
+  }
+  Reduce(ifun, list(...))
+}
+
+
+#' @method intersection igraph.es
+#' @export
+
+intersection.igraph.es <- intersection.igraph.vs
+
+
+#' @method difference igraph.vs
+#' @export
+
+difference.igraph.vs <- function(big, small) {
+  if (!length(big)) {
+    big
+  } else {
+    big[ match(big, small, 0L) == 0L ]
+  }
+}
+
+
+#' @method difference igraph.es
+#' @export
+
+difference.igraph.es <- difference.igraph.vs
+
+
+#' @method rev igraph.vs
+#' @export
+
+rev.igraph.vs <- function(x) {
+  x[rev(seq_along(x))]
+}
+
+
+#' @method rev igraph.es
+#' @export
+
+rev.igraph.es <- rev.igraph.vs
