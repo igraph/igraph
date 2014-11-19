@@ -93,3 +93,7 @@ address <- function(x) {
 }
 
 chr <- as.character
+
+drop_null <- function(x) {
+  x [!sapply(x, is.null)]
+}
