@@ -81,8 +81,11 @@ upgrade_graph <- function(graph) {
 
   if (g_ver < p_ver) {
 
-    if (g_ver == "0.4.0" && p_ver == "0.8.0") {
+    if ((g_ver == "0.4.0" && p_ver == "0.8.0")) {
       .Call("R_igraph_add_env", graph, PACKAGE = "igraph")
+
+    } else if (g_ver == "0.7.999" && p_ver == "0.8.0") {
+      .Call("R_igraph_add_version_to_env", graph, PACKAGE = "igraph")
 
     } else {
       stop("Don't know how to upgrade graph from ", g_ver, " to ", p_ver)

@@ -268,16 +268,32 @@ SEXP R_igraph_identical_graphs(SEXP g1, SEXP g2) {
 }
 
 SEXP R_igraph_graph_version(SEXP graph) {
-  if (GET_LENGTH(graph) == 10) {
-    SEXP ver = findVar(install("version"), VECTOR_ELT(graph, 9));
-    if (isNull(ver)) {
-      return mkString("0.8.0");
-    } else {
+  if (GET_LENGTH(graph) == 10 && isEnvironment(VECTOR_ELT(graph, 9))) {
+    SEXP ver = findVar(install(R_IGRAPH_VERSION_VAR), VECTOR_ELT(graph, 9));
+    if (ver != R_UnboundValue) {
       return ver;
+    } else {
+      return mkString("0.7.999");
     }
   } else {
     return mkString("0.4.0");
   }
+}
+
+SEXP R_igraph_add_version_to_env(SEXP graph) {
+  uuid_t my_id;
+  char my_id_chr[40];
+
+  PROTECT(graph = duplicate(graph));
+
+  uuid_generate(my_id);
+  uuid_unparse_lower(my_id, my_id_chr);
+  defineVar(install("myid"), mkString(my_id_chr), VECTOR_ELT(graph, 9));
+  defineVar(install(R_IGRAPH_VERSION_VAR), mkString(R_IGRAPH_TYPE_VERSION),
+	    VECTOR_ELT(graph, 9));
+
+  UNPROTECT(1);
+  return graph;
 }
 
 SEXP R_igraph_add_env(SEXP graph) {
@@ -299,7 +315,7 @@ SEXP R_igraph_add_env(SEXP graph) {
   uuid_generate(my_id);
   uuid_unparse_lower(my_id, my_id_chr);
   defineVar(install("myid"), mkString(my_id_chr), VECTOR_ELT(result, 9));
-  defineVar(install("version"), mkString(R_IGRAPH_TYPE_VERSION),
+  defineVar(install(R_IGRAPH_VERSION_VAR), mkString(R_IGRAPH_TYPE_VERSION),
 	    VECTOR_ELT(result, 9));
 
   if (result != graph) { UNPROTECT(1); }
