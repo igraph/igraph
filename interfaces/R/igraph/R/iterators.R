@@ -642,6 +642,8 @@ create_op_result <- function(parsed, result, class) {
   attr(result, "env") <- make_weak_ref(get_vs_ref(parsed$graph), NULL)
   attr(result, "graph") <- parsed$id
   class(result) <- class
+  ## c() drops names for zero length vectors. Why???
+  if (! length(result)) names(result) <- character()
   result
 }
 
