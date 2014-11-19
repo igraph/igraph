@@ -31,7 +31,11 @@ update_es_ref <- update_vs_ref <- function(graph) {
 }
 
 get_es_ref <- get_vs_ref <- function(graph) {
-  base::.Call("R_igraph_mybracket", graph, 10L, PACKAGE = "igraph")
+  if (is_igraph(graph)) {
+    base::.Call("R_igraph_mybracket", graph, 10L, PACKAGE = "igraph")
+  } else {
+    NULL
+  }
 }
 
 get_es_graph <- get_vs_graph <- function(seq) {
