@@ -46,6 +46,11 @@ has_es_graph <- has_vs_graph <- function(seq) {
   !is.null(weak_ref_key(attr(seq, "env")))
 }
 
+get_es_graph_id <- get_vs_graph_id <- function(seq) {
+  attr(seq, "graph") %||%
+    stop("Invalid vertex/edge sequence, maybe from older igraph version?")
+}
+
 #' Decide if two graphs are identical
 #'
 #' This is similar to \code{identical} in the \code{base} package,
