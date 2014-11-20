@@ -457,7 +457,10 @@ def plot(obj, target=None, bbox=(0, 0, 600, 600), *args, **kwds):
     if not isinstance(bbox, BoundingBox):
         bbox = BoundingBox(bbox)
 
-    result = Plot(target, bbox, background="white")
+    if "background" in kwds:
+        result = Plot(target, bbox, background=kwds["background"])
+    else:
+        result = Plot(target, bbox, background="white")
 
     if "margin" in kwds:
         bbox = bbox.contract(kwds["margin"])
