@@ -811,3 +811,22 @@ rev.igraph.vs <- function(x) {
 #' @export
 
 rev.igraph.es <- rev.igraph.vs
+
+#' @export
+
+as_ids <- function(seq)
+  UseMethod("as_ids")
+
+#' @method as_ids igraph.vs
+#' @export
+
+as_ids.igraph.vs <- function(seq) {
+  names(seq) %||% as.vector(seq)
+}
+
+#' @method as_ids igraph.es
+#' @export
+
+as_ids.igraph.es <- function(seq) {
+  attr(seq, "vnames") %||% as.vector(seq)
+}
