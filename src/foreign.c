@@ -198,6 +198,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   
   igraph_vector_t edges, ws;
   igraph_trie_t trie=IGRAPH_TRIE_NULL;
+  igraph_integer_t no_of_nodes;
   long int no_predefined=0;
   igraph_vector_ptr_t name, weight;
   igraph_vector_ptr_t *pname=0, *pweight=0;
@@ -272,8 +273,13 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     VECTOR(weight)[0]=&weightrec;
   }
 
-  IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) 
-				   igraph_vector_max(&edges)+1, pname));
+  if (igraph_vector_empty(&edges)) {
+    no_of_nodes = 0;
+  } else {
+    no_of_nodes = igraph_vector_max(&edges)+1;
+  }
+
+  IGRAPH_CHECK(igraph_add_vertices(graph, no_of_nodes, pname));
   IGRAPH_CHECK(igraph_add_edges(graph, &edges, pweight));
 
   if (pname) {
@@ -3047,7 +3053,11 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
   }
 
   /* Check number of vertices */
-  n=(long int) igraph_vector_max(&context.edges);
+  if (n2 > 0) {
+    n = (long int) igraph_vector_max(&context.edges);
+  } else {
+    n = 0;
+  }
   if (n >= context.n) {
     IGRAPH_WARNING("More vertices than specified in `DL' file");
     context.n=n;
