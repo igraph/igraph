@@ -151,6 +151,7 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 simple_vs_index <- function(x, i, na_ok = FALSE) {
   res <- unclass(x)[i]
   if (!na_ok && any(is.na(res))) stop('Unknown vertex selected')
+  class(res) <- "igraph.vs"
   res
 }
 
@@ -290,6 +291,7 @@ simple_es_index <- function(x, i) {
 
   attr(res, "env") <- attr(x, "env")
   attr(res, "graph") <- attr(x, "graph")
+  class(res) <- "igraph.es"
   res
 }
 
