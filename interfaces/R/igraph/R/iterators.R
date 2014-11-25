@@ -573,8 +573,8 @@ print.igraph.es <- function(x, full = igraph_opt("print.full"), ...) {
 # these are internal
 
 as.igraph.vs <- function(graph, v, na.ok=FALSE) {
-  if (inherits(v, "igraph.vs")) {
-    if (address(graph) != address(get_vs_graph(v))) {
+  if (inherits(v, "igraph.vs") && !is.null(graph)) {
+    if (get_graph_id(graph) != get_vs_graph_id(v)) {
       stop("Cannot use a vertex sequence from another graph.")
     }
   }
@@ -600,8 +600,8 @@ as.igraph.vs <- function(graph, v, na.ok=FALSE) {
 }
 
 as.igraph.es <- function(graph, e) {
-  if (inherits(e, "igraph.es")) {
-    if (address(graph) != address(get_es_graph(e))) {
+  if (inherits(e, "igraph.es") && !is.null(graph)) {
+    if (get_graph_id(graph) != get_es_graph_id(e)) {
       stop("Cannot use an edge sequence from another graph.")
     }
   }

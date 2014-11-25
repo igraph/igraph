@@ -234,3 +234,22 @@ test_that("printing unconnected vs/es works", {
     "+ 10/? edges, unknown graph (vertex names):\n [1] a|b b|c c|d d|e e|f f|g g|h h|i i|j a|j")
   
 })
+
+test_that("unconnected vs/es can be reused with the same graph", {
+
+  g <- make_ring(10)
+  vs <- V(g)
+  es <- E(g)[1:5]
+
+  tmp <- tempfile()
+  on.exit(unlink(tmp))
+  save(g, es, vs, file = tmp)
+
+  rm(g, es, vs)
+  gc()
+
+  load(tmp)
+
+  expect_equal(degree(g, v = vs), rep(2, 10))
+  expect_equal(delete_edges(g, es), delete_edges(g, 1:5))
+})
