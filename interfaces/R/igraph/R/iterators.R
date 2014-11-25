@@ -670,12 +670,15 @@ parse_es_op_args <- function(...) {
 }
 
 
-create_op_result <- function(parsed, result, class) {
+create_op_result <- function(parsed, result, class, args) {
   attr(result, "env") <- make_weak_ref(get_vs_ref(parsed$graph), NULL)
   attr(result, "graph") <- parsed$id
   class(result) <- class
   ## c() drops names for zero length vectors. Why???
-  if (! length(result)) names(result) <- character()
+  if (! length(result) &&
+      any(sapply(args, function(x) !is.null(names(x))))) {
+    names(result) <- character()
+  }
   result
 }
 
@@ -702,7 +705,7 @@ unique.igraph.es <- function(x, incomparables = FALSE, ...) {
 c.igraph.vs <- function(..., recursive = FALSE) {
   parsed <- parse_vs_op_args(...)
   res <- do_call(c, .args = parsed$args)
-  create_op_result(parsed, res, "igraph.vs")
+  create_op_result(parsed, res, "igraph.vs", list(...))
 }
 
 
@@ -712,7 +715,7 @@ c.igraph.vs <- function(..., recursive = FALSE) {
 c.igraph.es <- function(..., recursive = FALSE) {
   parsed <- parse_es_op_args(...)
   res <- do_call(c, .args = parsed$args)
-  create_op_result(parsed, res, "igraph.es")
+  create_op_result(parsed, res, "igraph.es", list(...))
 }
 
 
