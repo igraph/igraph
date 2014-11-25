@@ -156,78 +156,110 @@ simple_vs_index <- function(x, i, na_ok = FALSE) {
 
 #' @method "[" igraph.vs
 #' @export
+#' @importFrom lazyeval lazy_dots
 
-`[.igraph.vs` <- function(x, i, na_ok = FALSE) {
-  graph <- get_vs_graph(x)
-  if (is.null(graph)) {
-    res <- simple_vs_index(x, i, na_ok)
+`[.igraph.vs` <- function(x, i, ..., na_ok = FALSE) {
+
+  if (missing(i)) {
+    args <- lazy_dots(..., .follow_symbols = TRUE)
   } else {
-    i <- substitute(i)
-    nei <- function(v, mode=c("all", "in", "out", "total")) {
-      ## TRUE iff the vertex is a neighbor (any type)
-      ## of at least one vertex in v
-      mode <- igraph.match.arg(mode)
-      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-
-      if (is.logical(v)) {
-        v <- which(v)
-      }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(graph, v)-1,
-                   as.numeric(mode),
-                   PACKAGE="igraph")
-      tmp[as.numeric(x)]
-    }
-    innei <- function(v, mode=c("in", "all", "out", "total")) {
-      nei(v, mode)
-    }
-    outnei <- function(v, mode=c("out", "all", "in", "total")) {
-      nei(v, mode)
-    }
-    inc <- adj <- function(e) {
-      ## TRUE iff the vertex (in the vs) is incident
-      ## to at least one edge in e
-      if (is.logical(e)) {
-        e <- which(e)
-      }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
-                   as.numeric(3),
-                   PACKAGE="igraph")
-      tmp[as.numeric(x)]
-    }
-    from <- function(e) {
-      ## TRUE iff the vertex is the source of at least one edge in e
-      if (is.logical(e)) {
-        e <- which(e)
-      }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
-                   as.numeric(1),
-                   PACKAGE="igraph")
-      tmp[as.numeric(x)]
-    }
-    to <- function(e) {
-      ## TRUE iff the vertex is the target of at least one edge in e
-      if (is.logical(e)) {
-        e <- which(e)
-      }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
-                   as.numeric(2),
-                   PACKAGE="igraph")
-      tmp[as.numeric(x)]
-    }
-    i <- eval(i, envir=c(.Call("R_igraph_mybracket2", graph, 9L, 3L,
-                   PACKAGE="igraph"), nei=nei, innei=innei,
-                   outnei=outnei, adj=adj, inc=inc, from=from, to=to),
-              enclos=parent.frame())
-    res <- simple_vs_index(x, i, na_ok)
+    args <- lazy_dots(i = i, ..., .follow_symbols = TRUE)
   }
-  attr(res, "env") <- attr(x, "env")
-  attr(res, "graph") <- attr(x, "graph")
-  class(res) <- class(x)
-  res
+
+  if (length(args) < 1) {
+    return(x)
+  }
+
+  nei <- function(v, mode=c("all", "in", "out", "total")) {
+    ## TRUE iff the vertex is a neighbor (any type)
+    ## of at least one vertex in v
+    mode <- igraph.match.arg(mode)
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+
+    if (is.logical(v)) {
+      v <- which(v)
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(graph, v)-1,
+                 as.numeric(mode),
+                 PACKAGE="igraph")
+    tmp[as.numeric(x)]
+  }
+  innei <- function(v, mode=c("in", "all", "out", "total")) {
+    nei(v, mode)
+  }
+  outnei <- function(v, mode=c("out", "all", "in", "total")) {
+    nei(v, mode)
+  }
+  inc <- adj <- function(e) {
+    ## TRUE iff the vertex (in the vs) is incident
+    ## to at least one edge in e
+    if (is.logical(e)) {
+      e <- which(e)
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
+                 as.numeric(3),
+                 PACKAGE="igraph")
+    tmp[as.numeric(x)]
+  }
+  from <- function(e) {
+    ## TRUE iff the vertex is the source of at least one edge in e
+    if (is.logical(e)) {
+      e <- which(e)
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
+                 as.numeric(1),
+                 PACKAGE="igraph")
+    tmp[as.numeric(x)]
+  }
+  to <- function(e) {
+    ## TRUE iff the vertex is the target of at least one edge in e
+    if (is.logical(e)) {
+      e <- which(e)
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
+                 as.numeric(2),
+                 PACKAGE="igraph")
+    tmp[as.numeric(x)]
+  }
+
+  graph <- get_vs_graph(x)
+
+  res <- replicate(length(args), NULL)
+
+  for (idx in seq_along(args)) {
+
+    if (is.null(graph)) {
+      res[[idx]] <- simple_vs_index(x, lazy_eval(args[[idx]]), na_ok)
+
+    } else {
+      ii <- lazy_eval(
+        args[[idx]],
+        data = c(.Call("R_igraph_mybracket2", graph, 9L, 3L,
+          PACKAGE = "igraph"), nei = nei, innei = innei,
+          outnei = outnei, adj = adj, inc = inc, from = from, to = to)
+      )
+      if (! is.null(ii)) {
+        res[[idx]] <- simple_vs_index(x, ii, na_ok)
+      }
+    }
+
+    if (!is.null(res[[idx]])) {
+      attr(res[[idx]], "env") <- attr(x, "env")
+      attr(res[[idx]], "graph") <- attr(x, "graph")
+      class(res[[idx]]) <- class(x)
+    }
+  }
+
+  res <- drop_null(res)
+  if (length(res)) {
+    do_call(c, res)
+  } else {
+    x[FALSE]
+  }
 }
 
 ## TODO: remove this? What is it for?
