@@ -621,8 +621,8 @@ is_igraph_vs <- function(x) {
 }
 
 
-is.igraph.es <- function(x) {
-  iherits(x, "igraph.es")
+is_igraph_es <- function(x) {
+  inherits(x, "igraph.es")
 }
 
 
