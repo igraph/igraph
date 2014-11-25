@@ -365,7 +365,9 @@ simple_es_index <- function(x, i) {
   }
 
   res <- drop_null(res)
-  if (length(res)) {
+  if (length(res) == 1) {
+    res[[1]]
+  } else if (length(res)) {
     do_call(c, res)
   } else {
     x[FALSE]
@@ -742,7 +744,9 @@ c.igraph.vs <- function(..., recursive = FALSE) {
 c.igraph.es <- function(..., recursive = FALSE) {
   parsed <- parse_es_op_args(...)
   res <- do_call(c, .args = parsed$args)
-  create_op_result(parsed, res, "igraph.es", list(...))
+  res <- create_op_result(parsed, res, "igraph.es", list(...))
+  attr(res, "vnames") <- do_call(c, .args = lapply(list(...), attr, "vnames"))
+  res
 }
 
 
