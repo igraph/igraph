@@ -30,6 +30,7 @@
 #include <R.h>
 #include <Rinternals.h>
 #include <Rdefines.h>
+#include "rinterface.h"
 
 #include <stdio.h>
 
@@ -2456,7 +2457,8 @@ SEXP R_igraph_to_SEXP(const igraph_t *graph) {
   REAL(VECTOR_ELT(graph->attr, 0))[0] += 1;
 
   /* Environment for vertex/edge seqs */
-  SET_VECTOR_ELT(result, 9, allocSExp(ENVSXP));
+  SET_VECTOR_ELT(result, 9, R_NilValue);
+  R_igraph_add_env(result);
   
   UNPROTECT(1);
   return result;

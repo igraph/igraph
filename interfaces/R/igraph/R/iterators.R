@@ -25,17 +25,17 @@
 ###################################################################
 
 update_es_ref <- update_vs_ref <- function(graph) {
+  check_version(graph)
   env <- get_vs_ref(graph)
-  if (!is.environment(env)) {
-    stop("This graph was created by an old(er) igraph version.\n",
-         "  Call upgrade_graph() on it to use with the current igraph version")
-  }
-
   assign("me", graph, envir = env)
 }
 
 get_es_ref <- get_vs_ref <- function(graph) {
-  base::.Call("R_igraph_mybracket", graph, 10L, PACKAGE = "igraph")
+  if (is_igraph(graph)) {
+    base::.Call("R_igraph_mybracket", graph, 10L, PACKAGE = "igraph")
+  } else {
+    NULL
+  }
 }
 
 get_es_graph <- get_vs_graph <- function(seq) {
@@ -44,6 +44,11 @@ get_es_graph <- get_vs_graph <- function(seq) {
 
 has_es_graph <- has_vs_graph <- function(seq) {
   !is.null(weak_ref_key(attr(seq, "env")))
+}
+
+get_es_graph_id <- get_vs_graph_id <- function(seq) {
+  attr(seq, "graph") %||%
+    stop("Invalid vertex/edge sequence, maybe from older igraph version?")
 }
 
 #' Decide if two graphs are identical
@@ -74,6 +79,7 @@ V <- function(graph) {
   if (is_named(graph)) names(res) <- vertex_attr(graph)$name
   class(res) <- "igraph.vs"
   attr(res, "env") <- make_weak_ref(get_vs_ref(graph), NULL)
+  attr(res, "graph") <- get_graph_id(graph)
   res
 }
 
@@ -120,6 +126,7 @@ E <- function(graph, P=NULL, path=NULL, directed=TRUE) {
   
   class(res) <- "igraph.es"
   attr(res, "env") <- make_weak_ref(get_es_ref(graph), NULL)
+  attr(res, "graph") <- get_graph_id(graph)
   res
 }
 
@@ -144,82 +151,116 @@ create_es <- function(graph, idx, na_ok = FALSE) {
 simple_vs_index <- function(x, i, na_ok = FALSE) {
   res <- unclass(x)[i]
   if (!na_ok && any(is.na(res))) stop('Unknown vertex selected')
+  class(res) <- "igraph.vs"
   res
 }
 
 #' @method "[" igraph.vs
 #' @export
+#' @importFrom lazyeval lazy_dots
 
-`[.igraph.vs` <- function(x, i, na_ok = FALSE) {
-  graph <- get_vs_graph(x)
-  if (is.null(graph)) {
-    res <- simple_vs_index(x, i, na_ok)
+`[.igraph.vs` <- function(x, i, ..., na_ok = FALSE) {
+
+  if (missing(i)) {
+    args <- lazy_dots(..., .follow_symbols = TRUE)
   } else {
-    i <- substitute(i)
-    nei <- function(v, mode=c("all", "in", "out", "total")) {
-      ## TRUE iff the vertex is a neighbor (any type)
-      ## of at least one vertex in v
-      mode <- igraph.match.arg(mode)
-      mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
-
-      if (is.logical(v)) {
-        v <- which(v)
-      }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(graph, v)-1,
-                   as.numeric(mode),
-                   PACKAGE="igraph")
-      tmp[as.numeric(x)]
-    }
-    innei <- function(v, mode=c("in", "all", "out", "total")) {
-      nei(v, mode)
-    }
-    outnei <- function(v, mode=c("out", "all", "in", "total")) {
-      nei(v, mode)
-    }
-    inc <- adj <- function(e) {
-      ## TRUE iff the vertex (in the vs) is incident
-      ## to at least one edge in e
-      if (is.logical(e)) {
-        e <- which(e)
-      }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
-                   as.numeric(3),
-                   PACKAGE="igraph")
-      tmp[as.numeric(x)]
-    }
-    from <- function(e) {
-      ## TRUE iff the vertex is the source of at least one edge in e
-      if (is.logical(e)) {
-        e <- which(e)
-      }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
-                   as.numeric(1),
-                   PACKAGE="igraph")
-      tmp[as.numeric(x)]
-    }
-    to <- function(e) {
-      ## TRUE iff the vertex is the target of at least one edge in e
-      if (is.logical(e)) {
-        e <- which(e)
-      }
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
-                   as.numeric(2),
-                   PACKAGE="igraph")
-      tmp[as.numeric(x)]
-    }
-    i <- eval(i, envir=c(.Call("R_igraph_mybracket2", graph, 9L, 3L,
-                   PACKAGE="igraph"), nei=nei, innei=innei,
-                   outnei=outnei, adj=adj, inc=inc, from=from, to=to),
-              enclos=parent.frame())
-    res <- simple_vs_index(x, i, na_ok)
+    args <- lazy_dots(i = i, ..., .follow_symbols = TRUE)
   }
-  attr(res, "env") <- attr(x, "env")
-  class(res) <- class(x)
-  res
+
+  if (length(args) < 1) {
+    return(x)
+  }
+
+  nei <- function(v, mode=c("all", "in", "out", "total")) {
+    ## TRUE iff the vertex is a neighbor (any type)
+    ## of at least one vertex in v
+    mode <- igraph.match.arg(mode)
+    mode <- switch(mode, "out"=1, "in"=2, "all"=3, "total"=3)
+
+    if (is.logical(v)) {
+      v <- which(v)
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_vs_nei", graph, x, as.igraph.vs(graph, v)-1,
+                 as.numeric(mode),
+                 PACKAGE="igraph")
+    tmp[as.numeric(x)]
+  }
+  innei <- function(v, mode=c("in", "all", "out", "total")) {
+    nei(v, mode)
+  }
+  outnei <- function(v, mode=c("out", "all", "in", "total")) {
+    nei(v, mode)
+  }
+  inc <- adj <- function(e) {
+    ## TRUE iff the vertex (in the vs) is incident
+    ## to at least one edge in e
+    if (is.logical(e)) {
+      e <- which(e)
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
+                 as.numeric(3),
+                 PACKAGE="igraph")
+    tmp[as.numeric(x)]
+  }
+  from <- function(e) {
+    ## TRUE iff the vertex is the source of at least one edge in e
+    if (is.logical(e)) {
+      e <- which(e)
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
+                 as.numeric(1),
+                 PACKAGE="igraph")
+    tmp[as.numeric(x)]
+  }
+  to <- function(e) {
+    ## TRUE iff the vertex is the target of at least one edge in e
+    if (is.logical(e)) {
+      e <- which(e)
+    }
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_vs_adj", graph, x, as.igraph.es(graph, e)-1,
+                 as.numeric(2),
+                 PACKAGE="igraph")
+    tmp[as.numeric(x)]
+  }
+
+  graph <- get_vs_graph(x)
+
+  res <- replicate(length(args), NULL)
+
+  for (idx in seq_along(args)) {
+
+    if (is.null(graph)) {
+      res[[idx]] <- simple_vs_index(x, lazy_eval(args[[idx]]), na_ok)
+
+    } else {
+      ii <- lazy_eval(
+        args[[idx]],
+        data = c(.Call("R_igraph_mybracket2", graph, 9L, 3L,
+          PACKAGE = "igraph"), nei = nei, innei = innei,
+          outnei = outnei, adj = adj, inc = inc, from = from, to = to)
+      )
+      if (! is.null(ii)) {
+        res[[idx]] <- simple_vs_index(x, ii, na_ok)
+      }
+    }
+
+    if (!is.null(res[[idx]])) {
+      attr(res[[idx]], "env") <- attr(x, "env")
+      attr(res[[idx]], "graph") <- attr(x, "graph")
+      class(res[[idx]]) <- class(x)
+    }
+  }
+
+  res <- drop_null(res)
+  if (length(res)) {
+    do_call(c, res)
+  } else {
+    x[FALSE]
+  }
 }
 
 ## TODO: remove this? What is it for?
@@ -249,58 +290,88 @@ simple_es_index <- function(x, i) {
   if (anyNA(res)) stop('Unknown edge selected')
 
   attr(res, "env") <- attr(x, "env")
+  attr(res, "graph") <- attr(x, "graph")
+  class(res) <- "igraph.es"
   res
 }
 
 #' @method "[" igraph.es
 #' @export
+#' @importFrom lazyeval lazy_dots
 
-`[.igraph.es` <- function(x, i) {
-  graph <- get_es_graph(x)
-  if (is.null(graph)) {
-    res <- simple_es_index(x, i)
+`[.igraph.es` <- function(x, i, ...) {
+
+  if (missing(i)) {
+    args <- lazy_dots(..., .follow_symbols = TRUE)
   } else {
-    ## language expression, we also do attribute based indexing
-    i <- substitute(i)
-    inc <- adj <- function(v) {
-      ## TRUE iff the edge is incident to at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
-                   as.numeric(3),
-                   PACKAGE="igraph")
-      tmp[ as.numeric(x) ]
-    }
-    from <- function(v) {
-      ## TRUE iff the edge originates from at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
-                   as.numeric(1),
-                   PACKAGE="igraph")
-      tmp[ as.numeric(x) ]      
-    }
-    to <- function(v) {
-      ## TRUE iff the edge points to at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
-                   as.numeric(2),
-                   PACKAGE="igraph")
-      tmp[ as.numeric(x) ]
-    }
-    i <- eval(i, envir=c(.Call("R_igraph_mybracket2", graph, 9L, 4L,
-                   PACKAGE="igraph"),
-                   inc=inc, adj=adj, from=from, to=to,
-                   .igraph.from=list(.Call("R_igraph_mybracket",
-                     graph, 3L, PACKAGE="igraph")[ as.numeric(x) ]),
-                   .igraph.to=list(.Call("R_igraph_mybracket",
-                     graph, 4L, PACKAGE="igraph")[as.numeric(x)]),
-                   .igraph.graph=list(graph),
-                   `%--%`=`%--%`, `%->%`=`%->%`, `%<-%`=`%<-%`),
-              enclos=parent.frame())
-    res <- simple_es_index(x, i)
+    args <- lazy_dots(i = i, ..., .follow_symbols = TRUE)
   }
-  attr(res, "env") <- attr(x, "env")
-  class(res) <- class(x)
-  res
+
+  if (length(args) < 1) {
+    return(x)
+  }
+
+  inc <- adj <- function(v) {
+    ## TRUE iff the edge is incident to at least one vertex in v
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                 as.numeric(3),
+                 PACKAGE="igraph")
+    tmp[ as.numeric(x) ]
+  }
+  from <- function(v) {
+    ## TRUE iff the edge originates from at least one vertex in v
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                 as.numeric(1),
+                 PACKAGE="igraph")
+    tmp[ as.numeric(x) ]
+  }
+  to <- function(v) {
+    ## TRUE iff the edge points to at least one vertex in v
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                 as.numeric(2),
+                 PACKAGE="igraph")
+    tmp[ as.numeric(x) ]
+  }
+
+  graph <- get_es_graph(x)
+
+  res <- replicate(length(args), NULL)
+
+  for (idx in seq_along(args)) {
+
+    if (is.null(graph)) {
+      res[[idx]] <- simple_es_index(x, lazy_eval(args[[idx]]))
+
+    } else {
+      ii <- lazy_eval(
+        args[[idx]],
+        data = c(.Call("R_igraph_mybracket2", graph, 9L, 4L,
+          PACKAGE="igraph"),
+          inc = inc, adj = adj, from = from, to = to,
+          .igraph.from = list(.Call("R_igraph_mybracket",
+            graph, 3L, PACKAGE = "igraph")[ as.numeric(x) ]),
+          .igraph.to = list(.Call("R_igraph_mybracket",
+            graph, 4L, PACKAGE = "igraph")[as.numeric(x)]),
+          .igraph.graph = list(graph),
+          `%--%`=`%--%`, `%->%`=`%->%`, `%<-%`=`%<-%`)
+      )
+      if (! is.null(ii)) {
+        res[[idx]] <- simple_es_index(x, ii)
+      }
+    }
+  }
+
+  res <- drop_null(res)
+  if (length(res) == 1) {
+    res[[1]]
+  } else if (length(res)) {
+    do_call(c, res)
+  } else {
+    x[FALSE]
+  }
 } 
 
 #' @export
@@ -464,9 +535,10 @@ simple_es_index <- function(x, i) {
 }
 
 #' @method print igraph.vs
+#' @importFrom printr head_print
 #' @export
 
-print.igraph.vs <- function(x, ...) {
+print.igraph.vs <- function(x, full = igraph_opt("print.full"), ...) {
   graph <- get_vs_graph(x)
   title <- "+ " %+% chr(length(x)) %+% "/" %+%
     (if (is.null(graph)) "?" else chr(vcount(graph))) %+%
@@ -476,24 +548,33 @@ print.igraph.vs <- function(x, ...) {
   cat(title)
 
   x2 <- if (!is.null(names(x))) names(x) else as.vector(x)
-  if (length(x2)) print(x2, quote = FALSE)
+  if (length(x2)) {
+    if (is.logical(full) && full) {
+      print(x2, quote = FALSE)
+    }  else {
+      head_print(x2, omitted_footer = "+ ... omitted several vertices\n",
+                 quote = FALSE, max_lines = igraph_opt("auto.print.lines"))
+    }
+  }
   invisible(x)
 }
 
 #' @method print igraph.es
 #' @export
 
-print.igraph.es <- function(x, ...) {
+print.igraph.es <- function(x, full = igraph_opt("print.full"), ...) {
   graph <- get_es_graph(x)
-  .print.edges.compressed(x = graph, edges = x, names = TRUE, num = TRUE)
+  ml <- if (identical(full, TRUE)) NULL else igraph_opt("auto.print.lines")
+  .print.edges.compressed(x = graph, edges = x, max.lines = ml, names = TRUE,
+                          num = TRUE)
   invisible(x)
 }
 
 # these are internal
 
 as.igraph.vs <- function(graph, v, na.ok=FALSE) {
-  if (inherits(v, "igraph.vs")) {
-    if (address(graph) != address(get_vs_graph(v))) {
+  if (inherits(v, "igraph.vs") && !is.null(graph)) {
+    if (get_graph_id(graph) != get_vs_graph_id(v)) {
       stop("Cannot use a vertex sequence from another graph.")
     }
   }
@@ -519,8 +600,8 @@ as.igraph.vs <- function(graph, v, na.ok=FALSE) {
 }
 
 as.igraph.es <- function(graph, e) {
-  if (inherits(e, "igraph.es")) {
-    if (address(graph) != address(get_es_graph(e))) {
+  if (inherits(e, "igraph.es") && !is.null(graph)) {
+    if (get_graph_id(graph) != get_es_graph_id(e)) {
       stop("Cannot use an edge sequence from another graph.")
     }
   }
@@ -559,4 +640,193 @@ as.igraph.es <- function(graph, e) {
     stop("Invalid edge names")
   }
   res
+}
+
+
+is_igraph_vs <- function(x) {
+  inherits(x, "igraph.vs")
+}
+
+
+is_igraph_es <- function(x) {
+  inherits(x, "igraph.es")
+}
+
+
+parse_op_args <- function(..., what, is_fun, as_fun, check_graph = TRUE) {
+
+  args <- list(...)
+
+  if (any(! sapply(args, is_fun))) stop("Not ", what, " sequence")
+
+  ## get the ids of all graphs
+  graph_id <- sapply(args, get_vs_graph_id) %>%
+    unique()
+
+  if (length(graph_id) != 1) {
+    stop("Cannot combine vertex/edge sequences from different graphs")
+  }
+
+  graphs <- args %>%
+    lapply(get_vs_graph) %>%
+    drop_null()
+
+  addresses <- graphs %>%
+    sapply(function(x) x %&&% address(x)) %>%
+    unique()
+
+  if (check_graph && length(addresses) >= 2) {
+    stop("Cannot combine vertex/edge sequences from different graphs")
+  }
+
+  graph <- if (length(graphs)) graphs[[1]] else NULL
+
+  args <- lapply(args, unclass)
+
+  list(graph = graph, args = args, id = graph_id)
+}
+
+
+parse_vs_op_args <- function(...) {
+  parse_op_args(..., what = "a vertex", is_fun = is_igraph_vs,
+                as_fun = as.igraph.vs)
+}
+
+
+parse_es_op_args <- function(...) {
+  parse_op_args(..., what = "an edge", is_fun = is_igraph_es,
+                as_fun = as.igraph.es)
+}
+
+
+create_op_result <- function(parsed, result, class, args) {
+  attr(result, "env") <- make_weak_ref(get_vs_ref(parsed$graph), NULL)
+  attr(result, "graph") <- parsed$id
+  class(result) <- class
+  ## c() drops names for zero length vectors. Why???
+  if (! length(result) &&
+      any(sapply(args, function(x) !is.null(names(x))))) {
+    names(result) <- character()
+  }
+  result
+}
+
+
+#' @method unique igraph.vs
+#' @export
+
+unique.igraph.vs <- function(x, incomparables = FALSE, ...) {
+  x[!duplicated(x, incomparables = incomparables, ...)]
+}
+
+
+#' @method unique igraph.es
+#' @export
+
+unique.igraph.es <- function(x, incomparables = FALSE, ...) {
+  x[!duplicated(x, incomparables = incomparables, ...)]
+}
+
+
+#' @method c igraph.vs
+#' @export
+
+c.igraph.vs <- function(..., recursive = FALSE) {
+  parsed <- parse_vs_op_args(...)
+  res <- do_call(c, .args = parsed$args)
+  create_op_result(parsed, res, "igraph.vs", list(...))
+}
+
+
+#' @method c igraph.es
+#' @export
+
+c.igraph.es <- function(..., recursive = FALSE) {
+  parsed <- parse_es_op_args(...)
+  res <- do_call(c, .args = parsed$args)
+  res <- create_op_result(parsed, res, "igraph.es", list(...))
+  attr(res, "vnames") <- do_call(c, .args = lapply(list(...), attr, "vnames"))
+  res
+}
+
+
+#' @method union igraph.vs
+#' @export
+
+union.igraph.vs <- function(...) {
+  unique(c(...))
+}
+
+
+#' @method union igraph.es
+#' @export
+
+union.igraph.es <- union.igraph.vs
+
+
+#' @method intersection igraph.vs
+#' @export
+
+intersection.igraph.vs <- function(...) {
+  ifun <- function(x, y) {
+    unique(y[match(as.vector(x), y, 0L)])
+  }
+  Reduce(ifun, list(...))
+}
+
+
+#' @method intersection igraph.es
+#' @export
+
+intersection.igraph.es <- intersection.igraph.vs
+
+
+#' @method difference igraph.vs
+#' @export
+
+difference.igraph.vs <- function(big, small) {
+  if (!length(big)) {
+    big
+  } else {
+    big[ match(big, small, 0L) == 0L ]
+  }
+}
+
+
+#' @method difference igraph.es
+#' @export
+
+difference.igraph.es <- difference.igraph.vs
+
+
+#' @method rev igraph.vs
+#' @export
+
+rev.igraph.vs <- function(x) {
+  x[rev(seq_along(x))]
+}
+
+
+#' @method rev igraph.es
+#' @export
+
+rev.igraph.es <- rev.igraph.vs
+
+#' @export
+
+as_ids <- function(seq)
+  UseMethod("as_ids")
+
+#' @method as_ids igraph.vs
+#' @export
+
+as_ids.igraph.vs <- function(seq) {
+  names(seq) %||% as.vector(seq)
+}
+
+#' @method as_ids igraph.es
+#' @export
+
+as_ids.igraph.es <- function(seq) {
+  attr(seq, "vnames") %||% as.vector(seq)
 }

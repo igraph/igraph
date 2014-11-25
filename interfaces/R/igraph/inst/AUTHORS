@@ -90,6 +90,7 @@ James Theiler		GSL random number generators (not used in R)
 Samuel Thiriot		Interconnected islands graph generator
 Vincent A. Traag	spinglass community detection
 Magnus Torfason		R operators that work by name
+Theodore Y. Ts'o        libuuid
 Minh Van Nguyen		Microscopic update rules
      	 		Various test cases
      	 		Many documentation and other fixes

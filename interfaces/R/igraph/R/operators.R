@@ -265,7 +265,17 @@ disjoint_union <- function(...) {
   res
 }
 
+#' @export
 
+union <- function(...)
+  UseMethod("union")
+
+#' @method union default
+#' @export
+
+union.default <- function(...) {
+  base::union(...)
+}
 
 #' Union of graphs
 #' 
@@ -301,6 +311,7 @@ disjoint_union <- function(...) {
 #' graphs are named.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @method union igraph
 #' @export
 #' @keywords graphs
 #' @examples
@@ -310,8 +321,8 @@ disjoint_union <- function(...) {
 #'                   H-F:G, H-I-J)
 #' net2 <- graph_from_literal(D-A:F:Y, B-A-X-F-H-Z, F-Y)
 #' str(net1 %u% net2)
-#' 
-union <- function(..., byname="auto") {
+
+union.igraph <- function(..., byname="auto") {
   .igraph.graph.union.or.intersection("R_igraph_union", ..., byname=byname,
                                       keep.all.vertices=TRUE)
 }
@@ -322,7 +333,10 @@ union <- function(..., byname="auto") {
   union(x,y)
 }
 
+#' @export
 
+intersection <- function(...)
+  UseMethod("intersection")
 
 #' Intersection of graphs
 #' 
@@ -360,6 +374,7 @@ union <- function(..., byname="auto") {
 #' appear in a subset of the input graphs.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @method intersection igraph
 #' @export
 #' @keywords graphs
 #' @examples
@@ -369,9 +384,9 @@ union <- function(..., byname="auto") {
 #'                   H-F:G, H-I-J)
 #' net2 <- graph_from_literal(D-A:F:Y, B-A-X-F-H-Z, F-Y)
 #' str(net1 %s% net2)
-#' 
-intersection <- function(..., byname="auto",
-                               keep.all.vertices=TRUE) {
+
+intersection.igraph <- function(..., byname="auto",
+                                keep.all.vertices=TRUE) {
   .igraph.graph.union.or.intersection("R_igraph_intersection", ...,
                                       byname=byname,
                                       keep.all.vertices=keep.all.vertices)
@@ -383,6 +398,10 @@ intersection <- function(..., byname="auto",
   intersection(x,y)
 }
 
+#' @export
+
+difference <- function(...)
+  UseMethod("difference")
 
 
 #' Difference of graphs
@@ -415,6 +434,7 @@ intersection <- function(..., byname="auto",
 #' but not both graphs are named.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' @method difference igraph
 #' @export
 #' @keywords graphs
 #' @examples
@@ -430,8 +450,8 @@ intersection <- function(..., byname="auto",
 #' G <- wheel %m% sstar
 #' str(G)
 #' plot(G, layout=layout_nicely(wheel))
-#' 
-difference <- function(big, small, byname="auto") {
+
+difference.igraph <- function(big, small, byname="auto") {
 
   if (!is_igraph(big) || !is_igraph(small)) {
     stop("argument is not a graph")

@@ -32,9 +32,9 @@
                      "add.params"=TRUE,
                      "add.vertex.names"=TRUE,
                      "dend.plot.type"="auto",
-                     "print.full"=FALSE,
+                     "print.full"="auto",
                      "annotate.plot"=FALSE,
-                     "max.print.lines" = 10,
+                     "auto.print.lines" = 10,
                      "return.vs.es" = TRUE
                     )
 

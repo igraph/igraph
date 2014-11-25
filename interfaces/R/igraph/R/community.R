@@ -279,56 +279,29 @@ as_membership <- function(x) add_class(x, "membership")
 #' @rdname communities
 #' @method print communities
 #' @export
+#' @importFrom printr head_print
 
 print.communities <- function(x, ...) {
-  cat("Graph community structure calculated with the",
-      algorithm(x), "algorithm\n")
-  if (algorithm(x)=="spinglass") {
-    cat("Number of communities:", max(membership(x)), "\n")
-    cat("Modularity:", modularity(x), "\n")
-    cat("Membership vector:\n")
-    print(membership(x))
-  } else if (algorithm(x) %in% c("walktrap", "edge betweenness",
-                                "fast greedy")) {
-    cat("Number of communities (best split):", max(membership(x)), "\n")
-    cat("Modularity (best split):", modularity(x), "\n")
-    cat("Membership vector:\n")
-    print(membership(x))
-  } else if (algorithm(x) %in% c("leading eigenvector")) {
-    cat("Number of communities (best split):", max(membership(x)), "\n")
-    cat("Modularity (best split):", modularity(x), "\n")
-    cat("Membership vector:\n")
-    print(membership(x))
-  } else if (algorithm(x) == "label propagation") {
-    cat("Number of communities:", max(membership(x)), "\n")
-    cat("Modularity:", modularity(x), "\n")
-    cat("Membership vector:\n")
-    print(membership(x))
-  } else if (algorithm(x) == "multi level") {
-    cat("Number of communities (best split):", max(membership(x)), "\n")
-    cat("Modularity (best split):", modularity(x), "\n")
-    cat("Membership vector:\n")
-    print(membership(x))
-  } else if (algorithm(x) == "optimal") {
-    cat("Number of communities:", max(membership(x)), "\n")
-    cat("Modularity:", modularity(x), "\n")
-    cat("Membership vector:\n")
-    print(membership(x))
-  } else if (algorithm(x) == "infomap") {
-    cat("Number of communities:", max(membership(x)), "\n")
-    if (!is.null(x$modularity)) {
-      cat("Modularity:", modularity(x), "\n")
-    }
-    cat("Membership vector:\n")
-    print(membership(x))
+
+  noc <- max(membership(x))
+  mod <- if (!is.null(x$modularity)) {
+    modularity(x) %>% format(digits = 2)
   } else {
-    cat("Number of communities:", max(membership(x)), "\n")
-    if (!is.null(x$modularity)) {
-      cat("Modularity:", modularity(x), "\n")
-    }
-    cat("Membership vector:\n")
-    print(membership(x))
+    NA_real_
   }
+  alg <- x$algorithm %||% "unknown"
+  grp <- groups(x)
+
+  cat("IGRAPH clustering ", alg, ", groups: ", noc, ", mod: ", mod, "\n", sep="")
+  cat("+ groups:\n")
+
+  hp <- function(o) {
+    head_print(o, max_lines = igraph_opt("auto.print.lines"),
+               omitted_footer = "+ ... omitted several groups/vertices\n",)
+  }
+
+  indent_print(grp, .printer = hp, .indent = "  ")
+
   invisible(x)
 }
 

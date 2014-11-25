@@ -48,8 +48,7 @@ graph_version <- function(graph) {
 
   } else {
     stopifnot(is_igraph(graph))
-    res <- .Call("R_igraph_graph_version", graph, PACKAGE = "igraph")
-    switch(res, "1" = "0.4.0", "2" = "0.8.0", "Unknown")
+    .Call("R_igraph_graph_version", graph, PACKAGE = "igraph")
   }
 }
 
@@ -82,8 +81,11 @@ upgrade_graph <- function(graph) {
 
   if (g_ver < p_ver) {
 
-    if (g_ver == "0.4.0" && p_ver == "0.8.0") {
+    if ((g_ver == "0.4.0" && p_ver == "0.8.0")) {
       .Call("R_igraph_add_env", graph, PACKAGE = "igraph")
+
+    } else if (g_ver == "0.7.999" && p_ver == "0.8.0") {
+      .Call("R_igraph_add_version_to_env", graph, PACKAGE = "igraph")
 
     } else {
       stop("Don't know how to upgrade graph from ", g_ver, " to ", p_ver)
@@ -94,5 +96,14 @@ upgrade_graph <- function(graph) {
 
   } else {
     graph
+  }
+}
+
+## Check that the version is the latest
+
+check_version <- function(graph) {
+  if (graph_version() != graph_version(graph)) {
+    stop("This graph was created by an old(er) igraph version.\n",
+         "  Call upgrade_graph() on it to use with the current igraph version")
   }
 }

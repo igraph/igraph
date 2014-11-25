@@ -28,6 +28,8 @@
 #include <Rinternals.h>
 #include <Rdefines.h>
 
+#include "rinterface.h"
+
 #include <stdlib.h>
 
 /* +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++C */
@@ -266,25 +268,60 @@ SEXP R_igraph_identical_graphs(SEXP g1, SEXP g2) {
 }
 
 SEXP R_igraph_graph_version(SEXP graph) {
-  if (GET_LENGTH(graph) == 10) {
-    return ScalarInteger(2);
+  if (GET_LENGTH(graph) == 10 && isEnvironment(VECTOR_ELT(graph, 9))) {
+    SEXP ver = findVar(install(R_IGRAPH_VERSION_VAR), VECTOR_ELT(graph, 9));
+    if (ver != R_UnboundValue) {
+      return ver;
+    } else {
+      return mkString("0.7.999");
+    }
   } else {
-    return ScalarInteger(1);
+    return mkString("0.4.0");
   }
 }
 
-SEXP R_igraph_add_env(SEXP graph) {
-  SEXP result;
-  int i;
+SEXP R_igraph_add_version_to_env(SEXP graph) {
+  uuid_t my_id;
+  char my_id_chr[40];
 
-  PROTECT(result = NEW_LIST(10));
-  for (i = 0; i < 9; i++) {
-    SET_VECTOR_ELT(result, i, duplicate(VECTOR_ELT(graph, i)));
-  }
-  SET_VECTOR_ELT(result, 9, allocSExp(ENVSXP));
-  SET_ATTRIB(result, duplicate(ATTRIB(graph)));
-  SET_CLASS(result, duplicate(GET_CLASS(graph)));
+  PROTECT(graph = duplicate(graph));
+
+  uuid_generate(my_id);
+  uuid_unparse_lower(my_id, my_id_chr);
+  defineVar(install("myid"), mkString(my_id_chr), VECTOR_ELT(graph, 9));
+  defineVar(install(R_IGRAPH_VERSION_VAR), mkString(R_IGRAPH_TYPE_VERSION),
+	    VECTOR_ELT(graph, 9));
 
   UNPROTECT(1);
+  return graph;
+}
+
+SEXP R_igraph_add_env(SEXP graph) {
+  SEXP result = graph;
+  int i;
+  uuid_t my_id;
+  char my_id_chr[40];
+
+  if (GET_LENGTH(result) != 10) {
+    PROTECT(result = NEW_LIST(10));
+    for (i = 0; i < 9; i++) {
+      SET_VECTOR_ELT(result, i, duplicate(VECTOR_ELT(graph, i)));
+    }
+    SET_ATTRIB(result, duplicate(ATTRIB(graph)));
+    SET_CLASS(result, duplicate(GET_CLASS(graph)));
+  }
+  SET_VECTOR_ELT(result, 9, allocSExp(ENVSXP));
+
+  uuid_generate(my_id);
+  uuid_unparse_lower(my_id, my_id_chr);
+  defineVar(install("myid"), mkString(my_id_chr), VECTOR_ELT(result, 9));
+  defineVar(install(R_IGRAPH_VERSION_VAR), mkString(R_IGRAPH_TYPE_VERSION),
+	    VECTOR_ELT(result, 9));
+
+  if (result != graph) { UNPROTECT(1); }
   return result;
+}
+
+SEXP R_igraph_get_graph_id(SEXP graph) {
+  findVar(install("myid"), VECTOR_ELT(graph, 9));
 }
