@@ -297,54 +297,79 @@ simple_es_index <- function(x, i) {
 
 #' @method "[" igraph.es
 #' @export
+#' @importFrom lazyeval lazy_dots
 
-`[.igraph.es` <- function(x, i) {
-  graph <- get_es_graph(x)
-  if (is.null(graph)) {
-    res <- simple_es_index(x, i)
+`[.igraph.es` <- function(x, i, ...) {
+
+  if (missing(i)) {
+    args <- lazy_dots(..., .follow_symbols = TRUE)
   } else {
-    ## language expression, we also do attribute based indexing
-    i <- substitute(i)
-    inc <- adj <- function(v) {
-      ## TRUE iff the edge is incident to at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
-                   as.numeric(3),
-                   PACKAGE="igraph")
-      tmp[ as.numeric(x) ]
-    }
-    from <- function(v) {
-      ## TRUE iff the edge originates from at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
-                   as.numeric(1),
-                   PACKAGE="igraph")
-      tmp[ as.numeric(x) ]      
-    }
-    to <- function(v) {
-      ## TRUE iff the edge points to at least one vertex in v
-      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-      tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
-                   as.numeric(2),
-                   PACKAGE="igraph")
-      tmp[ as.numeric(x) ]
-    }
-    i <- eval(i, envir=c(.Call("R_igraph_mybracket2", graph, 9L, 4L,
-                   PACKAGE="igraph"),
-                   inc=inc, adj=adj, from=from, to=to,
-                   .igraph.from=list(.Call("R_igraph_mybracket",
-                     graph, 3L, PACKAGE="igraph")[ as.numeric(x) ]),
-                   .igraph.to=list(.Call("R_igraph_mybracket",
-                     graph, 4L, PACKAGE="igraph")[as.numeric(x)]),
-                   .igraph.graph=list(graph),
-                   `%--%`=`%--%`, `%->%`=`%->%`, `%<-%`=`%<-%`),
-              enclos=parent.frame())
-    res <- simple_es_index(x, i)
+    args <- lazy_dots(i = i, ..., .follow_symbols = TRUE)
   }
-  attr(res, "env") <- attr(x, "env")
-  attr(res, "graph") <- attr(x, "graph")
-  class(res) <- class(x)
-  res
+
+  if (length(args) < 1) {
+    return(x)
+  }
+
+  inc <- adj <- function(v) {
+    ## TRUE iff the edge is incident to at least one vertex in v
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                 as.numeric(3),
+                 PACKAGE="igraph")
+    tmp[ as.numeric(x) ]
+  }
+  from <- function(v) {
+    ## TRUE iff the edge originates from at least one vertex in v
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                 as.numeric(1),
+                 PACKAGE="igraph")
+    tmp[ as.numeric(x) ]
+  }
+  to <- function(v) {
+    ## TRUE iff the edge points to at least one vertex in v
+    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+    tmp <- .Call("R_igraph_es_adj", graph, x, as.igraph.vs(graph, v)-1,
+                 as.numeric(2),
+                 PACKAGE="igraph")
+    tmp[ as.numeric(x) ]
+  }
+
+  graph <- get_es_graph(x)
+
+  res <- replicate(length(args), NULL)
+
+  for (idx in seq_along(args)) {
+
+    if (is.null(graph)) {
+      res[[idx]] <- simple_es_index(x, lazy_eval(args[[idx]]))
+
+    } else {
+      ii <- lazy_eval(
+        args[[idx]],
+        data = c(.Call("R_igraph_mybracket2", graph, 9L, 4L,
+          PACKAGE="igraph"),
+          inc = inc, adj = adj, from = from, to = to,
+          .igraph.from = list(.Call("R_igraph_mybracket",
+            graph, 3L, PACKAGE = "igraph")[ as.numeric(x) ]),
+          .igraph.to = list(.Call("R_igraph_mybracket",
+            graph, 4L, PACKAGE = "igraph")[as.numeric(x)]),
+          .igraph.graph = list(graph),
+          `%--%`=`%--%`, `%->%`=`%->%`, `%<-%`=`%<-%`)
+      )
+      if (! is.null(ii)) {
+        res[[idx]] <- simple_es_index(x, ii)
+      }
+    }
+  }
+
+  res <- drop_null(res)
+  if (length(res)) {
+    do_call(c, res)
+  } else {
+    x[FALSE]
+  }
 } 
 
 #' @export
