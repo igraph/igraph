@@ -23,7 +23,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
@@ -52,10 +52,18 @@ if sys.version_info < (2, 6):
                 if v == self:
                     propname = k
                     break
-            cls_ns[propname] = property(self.fget, fset, self.fdel,
-                    self.__doc__)
+            cls_ns[propname] = property(self.fget, fset, self.fdel, self.__doc__)
             return cls_ns[propname]
 else:
     property = __builtins__["property"]
 
+#############################################################################
+# Providing BytesIO for Python 2.5
 
+try:
+    from io import BytesIO
+except ImportError:
+    # We are on Python 2.5 or earlier because Python 2.6 has a BytesIO
+    # class already
+    from cStringIO import StringIO
+    BytesIO = StringIO

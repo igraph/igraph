@@ -11,7 +11,6 @@ network from Nexus, L{NexusConnection.list} to list networks having a given set 
 tags, L{NexusConnection.search} to search in the dataset descriptions, or
 L{NexusConnection.info} to show the info sheet of a dataset."""
 
-from cStringIO import StringIO
 from gzip import GzipFile
 from itertools import izip
 from textwrap import TextWrapper
@@ -19,7 +18,7 @@ from urllib import urlencode
 from urlparse import urlparse, urlunparse
 from textwrap import TextWrapper
 
-from igraph.compat import property
+from igraph.compat import property, BytesIO
 from igraph.configuration import Configuration
 from igraph.utils import multidict
 
@@ -44,7 +43,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
@@ -198,8 +197,7 @@ class NexusConnection(object):
             compressed = bool(re.match(r'attachment; *filename=.*\.gz\"?$',
                     content_disp))
         if compressed:
-            return GzipFile(fileobj=StringIO(response.read()), mode="rb")
-        print response.headers
+            return GzipFile(fileobj=BytesIO(response.read()), mode="rb")
         return response
 
     def _get_response(self, path, params={}, compressed=False):
@@ -240,7 +238,7 @@ class NexusConnection(object):
         whitespace.
 
         Examples:
-        
+
             >>> d = Nexus._parse_text_response("Id: 17\\nName: foo")
             >>> sorted(d.items())
             [('Id', '17'), ('Name', 'foo')]
@@ -297,7 +295,7 @@ class NexusConnection(object):
 
 class NexusDatasetInfo(object):
     """Information about a dataset in the Nexus repository.
-    
+
     @undocumented: _update_from_multidict, vertices_edges"""
 
     def __init__(self, id=None, sid=None, name=None, networks=None,

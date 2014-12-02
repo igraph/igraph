@@ -14,14 +14,13 @@ I'm not linking to it :)).
 
 from __future__ import with_statement
 
-from cStringIO import StringIO
 from warnings import warn
 
 import os
 import platform
 import time
 
-from igraph.compat import property
+from igraph.compat import property, BytesIO
 from igraph.configuration import Configuration
 from igraph.drawing.colors import Palette, palettes
 from igraph.drawing.graph import DefaultGraphDrawer
@@ -346,7 +345,7 @@ class Plot(object):
 
         This method is used by IPython to display this plot inline.
         """
-        io = StringIO()
+        io = BytesIO()
         # Create a new SVG surface and use that to get the SVG representation,
         # which will end up in io
         surface = cairo.SVGSurface(io, self.bbox.width, self.bbox.height)
@@ -357,7 +356,7 @@ class Plot(object):
         context.show_page()
         surface.finish()
         # Return the raw SVG representation
-        return io.getvalue()
+        return io.getvalue().encode("utf-8")
 
     @property
     def bounding_box(self):
