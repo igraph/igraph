@@ -49,6 +49,23 @@ LIBS=$LIBS_SAVE
 AC_CHECK_HEADER([sys/times.h], 
       [AC_DEFINE([HAVE_TIMES_H], [1], [Define to 1 if you have the sys/times.h header])])
 
+AC_CHECK_HEADERS([ \
+		   net/if.h \
+		   netinet/in.h \
+		   net/if_dl.h \
+		   sys/sockio.h \
+		   sys/un.h \
+		   sys/socket.h \
+		   sys/ioctl.h \
+		   sys/time.h \
+		   sys/file.h \
+		])
+
+AC_CHECK_MEMBER([struct sockaddr.sa_len],
+		AC_DEFINE_UNQUOTED([HAVE_SA_LEN], [1], [Define if struct sockaddr contains sa_len]), [],
+	[#include <sys/types.h>
+	 #include <sys/socket.h>])
+
 graphml_support=yes
 AC_ARG_ENABLE(graphml,
               AC_HELP_STRING([--disable-graphml], [Disable support for GraphML format]),
