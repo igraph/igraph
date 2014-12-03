@@ -784,7 +784,7 @@ intersection.igraph.es <- intersection.igraph.vs
 #' @method difference igraph.vs
 #' @export
 
-difference.igraph.vs <- function(big, small) {
+difference.igraph.vs <- function(big, small, ...) {
   if (!length(big)) {
     big
   } else {

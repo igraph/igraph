@@ -432,6 +432,7 @@ difference <- function(...)
 #' \code{auto}, that means \code{TRUE} if both graphs are named and
 #' \code{FALSE} otherwise. A warning is generated if \code{auto} and one graph,
 #' but not both graphs are named.
+#' @param ... Ignored, included for S3 compatibility.
 #' @return A new graph object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @method difference igraph
@@ -451,7 +452,7 @@ difference <- function(...)
 #' str(G)
 #' plot(G, layout=layout_nicely(wheel))
 
-difference.igraph <- function(big, small, byname="auto") {
+difference.igraph <- function(big, small, byname="auto", ...) {
 
   if (!is_igraph(big) || !is_igraph(small)) {
     stop("argument is not a graph")
