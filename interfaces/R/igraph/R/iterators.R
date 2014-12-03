@@ -750,6 +750,17 @@ c.igraph.es <- function(..., recursive = FALSE) {
 }
 
 
+#' Union of vertex sequences
+#'
+#' @details
+#' They must belong to the same graph. Note that this function has
+#' \sQuote{set} semantics and the multiplicity of vertices is lost in the
+#' result.
+#'
+#' @param ... The vertex sequences to take the union of.
+#' @return A vertex sequence that contains all vertices in the given
+#' sequences, exactly once.
+#'
 #' @method union igraph.vs
 #' @export
 
@@ -764,6 +775,17 @@ union.igraph.vs <- function(...) {
 union.igraph.es <- union.igraph.vs
 
 
+#' Intersection of vertex sequences
+#'
+#' @details
+#' They must belong to the same graph. Note that this function has
+#' \sQuote{set} semantics and the multiplicity of vertices is lost in the
+#' result.
+#'
+#' @param ... The vertex sequences to take the intersection of.
+#' @return A vertex sequence that contains vertices that appear in all
+#' given sequences, each vertex exactly once.
+#'
 #' @method intersection igraph.vs
 #' @export
 
@@ -781,6 +803,19 @@ intersection.igraph.vs <- function(...) {
 intersection.igraph.es <- intersection.igraph.vs
 
 
+#' Difference of vertex sequences
+#'
+#' @details
+#' They must belong to the same graph. Note that this function has
+#' \sQuote{set} semantics and the multiplicity of vertices is lost in the
+#' result.
+#'
+#' @param big The \sQuote{big} vertex sequence.
+#' @param small The \sQuote{small} vertex sequence.
+#' @param ... Ignored, included for S3 signature compatibility.
+#' @return A vertex sequence that contains only vertices that are part of
+#' \code{big}, but not part of \code{small}.
+#'
 #' @method difference igraph.vs
 #' @export
 
@@ -812,7 +847,31 @@ rev.igraph.vs <- function(x) {
 
 rev.igraph.es <- rev.igraph.vs
 
+#' Convert a vertex or edge sequence to an ordinary vector
+#'
+#' @details
+#' For graphs without names, a numeric vector is returned, containing the
+#' internal numeric vertex or edge ids.
+#'
+#' For graphs with names, and vertex sequences, the vertex names are
+#' returned in a character vector.
+#'
+#' For graphs with names and edge sequences, a character vector is
+#' returned, with the \sQuote{bar} notation: \code{a|b} means an edge from
+#' vertex \code{a} to vertex \code{b}.
+#'
+#' @param seq The vertex or edge sequence.
+#' @return A character or numeric vector, see details below.
+#'
 #' @export
+#' @examples
+#' g <- make_ring(10)
+#' as_ids(V(g))
+#' as_ids(E(g))
+#'
+#' V(g)$name <- letters[1:10]
+#' as_ids(V(g))
+#' as_ids(E(G))
 
 as_ids <- function(seq)
   UseMethod("as_ids")

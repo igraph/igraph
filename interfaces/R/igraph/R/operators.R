@@ -265,6 +265,19 @@ disjoint_union <- function(...) {
   res
 }
 
+#' Union of two or more sets
+#'
+#' This is an S3 generic function. See \code{methods("union")}
+#' for the actual implementations for various S3 classes. Initially
+#' it is implemented for igraph graphs and igraph vertex and edge
+#' sequences. See
+#' \code{\link{union.igraph}}, and
+#' \code{\link{union.igraph.vs}}.
+#'
+#' @param ... Arguments, their number and interpretation depends on
+#' the function that implements \code{union}.
+#' @return Depends on the function that implements this method.
+#'
 #' @export
 
 union <- function(...)
@@ -333,6 +346,19 @@ union.igraph <- function(..., byname="auto") {
   union(x,y)
 }
 
+#' Intersection of two or more sets
+#'
+#' This is an S3 generic function. See \code{methods("intersection")}
+#' for the actual implementations for various S3 classes. Initially
+#' it is implemented for igraph graphs and igraph vertex and edge
+#' sequences. See
+#' \code{\link{intersection.igraph}}, and
+#' \code{\link{intersection.igraph.vs}}.
+#'
+#' @param ... Arguments, their number and interpretation depends on
+#' the function that implements \code{intersection}.
+#' @return Depends on the function that implements this method.
+#'
 #' @export
 
 intersection <- function(...)
@@ -398,6 +424,19 @@ intersection.igraph <- function(..., byname="auto",
   intersection(x,y)
 }
 
+#' Difference of two sets
+#'
+#' This is an S3 generic function. See \code{methods("difference")}
+#' for the actual implementations for various S3 classes. Initially
+#' it is implemented for igraph graphs (difference of edges in two graphs),
+#' and igraph vertex and edge sequences. See
+#' \code{\link{difference.igraph}}, and
+#' \code{\link{difference.igraph.vs}}.
+#'
+#' @param ... Arguments, their number and interpretation depends on
+#' the function that implements \code{difference}.
+#' @return Depends on the function that implements this method.
+#'
 #' @export
 
 difference <- function(...)
