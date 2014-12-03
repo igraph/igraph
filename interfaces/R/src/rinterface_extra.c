@@ -323,5 +323,5 @@ SEXP R_igraph_add_env(SEXP graph) {
 }
 
 SEXP R_igraph_get_graph_id(SEXP graph) {
-  findVar(install("myid"), VECTOR_ELT(graph, 9));
+  return findVar(install("myid"), VECTOR_ELT(graph, 9));
 }
