@@ -112,6 +112,7 @@ struct igraph_i_graphml_parser_state {
   igraph_attribute_elemtype_t data_type;
   char *error_message;
   char *data_char;
+  long int act_node;
 };
 
 static void igraph_i_report_unhandled_attribute_target(const char* target,
@@ -772,7 +773,7 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
   case IGRAPH_ATTRIBUTE_VERTEX:
     trie=&state->v_names;
     ptrvector=&state->v_attrs;
-    id=igraph_trie_size(&state->node_trie)-1; /* hack */
+    id=state->act_node;
     break;
   case IGRAPH_ATTRIBUTE_EDGE:
     trie=&state->e_names;
@@ -959,6 +960,7 @@ void igraph_i_graphml_sax_handler_start_element(void *state0,
 	}
       }
       state->st=INSIDE_NODE;
+      state->act_node = id1;
     } else if (xmlStrEqual(name, toXmlChar("data"))) {
       igraph_i_graphml_attribute_data_setup(state, attrs, IGRAPH_ATTRIBUTE_GRAPH);
       igraph_vector_int_push_back(&state->prev_state_stack, state->st);
