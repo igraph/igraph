@@ -494,6 +494,7 @@ kite <- make_graph('krackhardt_kite')
 kite$layout <- matrix(nc = 2, byrow = TRUE,
                       c(1,4, 1,2, 2,5, 2,3, 2,1, 3,4, 3,2, 4,3, 5,3, 6,3))
 V(kite)$label <- LETTERS[1:10]   # $
+V(kite)$name <- V(kite)$label
 V(kite)$Firstname <- c("Andre", "Beverly", "Carol", "Diane", "Ed",
                        "Fernando", "Garth", "Heather", "Ike", "Jane")
 
