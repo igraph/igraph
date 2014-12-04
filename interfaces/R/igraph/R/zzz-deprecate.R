@@ -618,3 +618,9 @@ deprecated("get.shortest.paths", shortest_paths)
 deprecated("graph", make_graph)
 #' @export get.edges
 deprecated("get.edges", ends)
+#' @export vertex.shapes
+deprecated("vertex.shapes", shapes)
+#' @export igraph.shape.noclip
+deprecated("igraph.shape.noclip", shape_noclip)
+#' @export igraph.shape.noplot
+deprecated("igraph.shape.noplot", shape_noplot)
