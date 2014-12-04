@@ -487,3 +487,19 @@ V(USairports)$Position <- pos[match(V(USairports)$name, iata)]
 save(USairports, file="/tmp/USairports.rda")
 
 
+#####################################################################
+## Kite
+
+kite <- make_graph('krackhardt_kite')
+kite$layout <- matrix(nc = 2, byrow = TRUE,
+                      c(1,4, 1,2, 2,5, 2,3, 2,1, 3,4, 3,2, 4,3, 5,3, 6,3))
+V(kite)$label <- LETTERS[1:10]   # $
+V(kite)$Firstname <- c("Andre", "Beverly", "Carol", "Diane", "Ed",
+                       "Fernando", "Garth", "Heather", "Ike", "Jane")
+
+kite$name <- "Krackhardt's kite"
+kite$Citation <- "Assessing the Political Landscape: Structure, Cognition, and Power in Organizations. David Krackhardt. Admin. Sci. Quart. 35, 342-369, 1990."
+kite$Author <- "David Krackhardt"
+kite$URL <- "http://www.orgnet.com/sna.html"
+
+save(kite, file = "/tmp/kite.rda")
