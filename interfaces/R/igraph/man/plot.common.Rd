@@ -137,7 +137,7 @@
       and only by the \code{\link{plot.igraph}}
       command. \dQuote{\code{none}} does not draw the vertices at all,
       although vertex label are plotted (if given). See
-      \code{\link{igraph.vertex.shapes}} for details about vertex
+      \code{\link{shapes}} for details about vertex
       shapes and \code{\link{vertex.shape.pie}} for using pie charts as
       vertices.
 
