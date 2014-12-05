@@ -101,40 +101,49 @@ test_that("[ indexing works with weighted graphs and symbolic names",
 test_that("[[ indexing works", {
 
   ## Adjacent vertices
-  expect_that(g[[1, ]], equals(list(a=2:3)))
-  expect_that(g[[, 2]], equals(list(b=1)))
-  expect_that(g[[, 2, directed=FALSE]], equals(list(b=c(1,4,5))))
-  expect_that(g[[2, directed=FALSE]], equals(list(b=c(1,4,5))))
+  expect_that(g[[1, ]], is_equivalent_to(list(a=V(g)[2:3])))
+  expect_that(g[[, 2]], is_equivalent_to(list(b=V(g)[1])))
+  expect_that(g[[, 2, directed=FALSE]],
+              is_equivalent_to(list(b=V(g)[c(1,4,5)])))
+  expect_that(g[[2, directed=FALSE]],
+              is_equivalent_to(list(b=V(g)[c(1,4,5)])))
 
-  expect_that(g[[1:3, ]], equals(list(a=2:3, b=4:5, c=6:7)))
-  expect_that(g[[, 1:3]], equals(list(a=numeric(), b=1, c=1)))
+  expect_that(g[[1:3, ]], is_equivalent_to(list(a=V(g)[2:3], b=V(g)[4:5],
+                                                c=V(g)[6:7])))
+  expect_that(g[[, 1:3]], is_equivalent_to(list(a=V(g)[numeric()],
+                                                b=V(g)[1], c=V(g)[1])))
 })
 
 test_that("[[ indexing works with symbolic names", {
   
   ## Same with vertex names
-  expect_that(g[['a', ]], equals(list(a=2:3)))
-  expect_that(g[[, 'b']], equals(list(b=1)))
-  expect_that(g[[, 'b', directed=FALSE]], equals(list(b=c(1,4,5))))
-  expect_that(g[['b', directed=FALSE]], equals(list(b=c(1,4,5))))
+  expect_that(g[['a', ]], is_equivalent_to(list(a=V(g)[2:3])))
+  expect_that(g[[, 'b']], is_equivalent_to(list(b=V(g)[1])))
+  expect_that(g[[, 'b', directed=FALSE]],
+              is_equivalent_to(list(b=V(g)[c(1,4,5)])))
+  expect_that(g[['b', directed=FALSE]],
+              is_equivalent_to(list(b=V(g)[c(1,4,5)])))
 
-  expect_that(g[[letters[1:3],]], equals(list(a=2:3, b=4:5, c=6:7)))
-  expect_that(g[[, letters[1:3]]], equals(list(a=numeric(), b=1, c=1)))
+  expect_that(g[[letters[1:3],]],
+    is_equivalent_to(list(a=V(g)[2:3], b=V(g)[4:5], c=V(g)[6:7])))
+  expect_that(g[[, letters[1:3]]],
+    is_equivalent_to(list(a=V(g)[numeric()], b=V(g)[1], c=V(g)[1])))
 })
 
 test_that("[[ indexing works with logical vectors", {
 
   ## Logical vectors
-  expect_that(g[[degree(g,mode="in")==0,]], equals(list(a=2:3)))
+  expect_that(g[[degree(g,mode="in")==0,]],
+              is_equivalent_to(list(a=V(g)[2:3])))
 })
 
 test_that("[[ indexing works with filtering on both ends", {
 
   ## Filtering on both ends
-  expect_that(g[[1:10, 1:10]], equals(list(a=2:3, b=4:5, c=6:7, d=8:9,
-                                           e=10, f=numeric(),
-                                           g=numeric(), h=numeric(),
-                                           i=numeric(), j=numeric())))
+  expect_that(g[[1:10, 1:10]],
+    is_equivalent_to(list(a=V(g)[2:3], b=V(g)[4:5], c=V(g)[6:7], d=V(g)[8:9],
+      e=V(g)[10], f=V(g)[numeric()], g=V(g)[numeric()], h=V(g)[numeric()],
+                          i=V(g)[numeric()], j=V(g)[numeric()])))
 })
 
 ################################################################
@@ -172,35 +181,41 @@ test_that("[ can query edge ids with symbolic names", {
 test_that("[[ can query incident edges", {
   
   ## Incident edges of vertices
-  expect_that(g[[1, , edges=TRUE]], equals(list(a=1:2)))
-  expect_that(g[[, 2, edges=TRUE]], equals(list(b=1)))
+  expect_that(g[[1, , edges=TRUE]], is_equivalent_to(list(a=E(g)[1:2])))
+  expect_that(g[[, 2, edges=TRUE]], is_equivalent_to(list(b=E(g)[1])))
   expect_that(g[[, 2, directed=FALSE, edges=TRUE]],
-              equals(list(b=c(3,4,1))))
-  expect_that(g[[2, directed=FALSE, edges=TRUE]], equals(list(b=c(3,4,1))))
+              is_equivalent_to(list(b=E(g)[c(3,4,1)])))
+  expect_that(g[[2, directed=FALSE, edges=TRUE]],
+              is_equivalent_to(list(b=E(g)[c(3,4,1)])))
 
-  expect_that(g[[1:3, , edges=TRUE]], equals(list(a=1:2, b=3:4, c=5:6)))
-  expect_that(g[[, 1:3, edges=TRUE]], equals(list(a=numeric(), b=1, c=2)))
+  expect_that(g[[1:3, , edges=TRUE]],
+              is_equivalent_to(list(a=E(g)[1:2], b=E(g)[3:4], c=E(g)[5:6])))
+  expect_that(g[[, 1:3, edges=TRUE]],
+              is_equivalent_to(list(a=E(g)[numeric()], b=E(g)[1], c=E(g)[2])))
 })
 
 test_that("[[ queries edges with vertex names", {
   
   ## Same with vertex names
-  expect_that(g[['a', , edges=TRUE]], equals(list(a=1:2)))
-  expect_that(g[[, 'b', edges=TRUE]], equals(list(b=1)))
+  expect_that(g[['a', , edges=TRUE]],
+              is_equivalent_to(list(a=E(g)[1:2])))
+  expect_that(g[[, 'b', edges=TRUE]],
+              is_equivalent_to(list(b=E(g)[1])))
   expect_that(g[[, 'b', directed=FALSE, edges=TRUE]],
-              equals(list(b=c(3,4,1))))
+              is_equivalent_to(list(b=E(g)[c(3,4,1)])))
   expect_that(g[['b', directed=FALSE, edges=TRUE]],
-              equals(list(b=c(3,4,1))))
+              is_equivalent_to(list(b=E(g)[c(3,4,1)])))
 
   expect_that(g[[letters[1:3],, edges=TRUE]],
-              equals(list(a=1:2, b=3:4, c=5:6)))
+              is_equivalent_to(list(a=E(g)[1:2], b=E(g)[3:4], c=E(g)[5:6])))
   expect_that(g[[, letters[1:3], edges=TRUE]],
-              equals(list(a=numeric(), b=1, c=2)))
+              is_equivalent_to(list(a=E(g)[numeric()], b=E(g)[1], c=E(g)[2])))
 
   ## Filtering on both ends
   expect_that(g[[1:10, 1:10, edges=TRUE]],
-              equals(list(1:2, 3:4, 5:6, 7:8, 9, numeric(), numeric(),
-                          numeric(), numeric(), numeric())))
+    is_equivalent_to(list(E(g)[1:2], E(g)[3:4], E(g)[5:6], E(g)[7:8],
+                          E(g)[9], E(g)[numeric()], E(g)[numeric()],
+                          E(g)[numeric()], E(g)[numeric()], E(g)[numeric()])))
 })
 
 #################################################################
@@ -229,10 +244,20 @@ test_that("[[ works with from and to", {
 
   g <- make_tree(20)
 
-  expect_equal(g[[1, ]], g[[from = 1]])
-  expect_equal(g[[, 1]], g[[to = 1]])
-  expect_equal(g[[1:5, 4:10]], g[[from = 1:5, to = 4:10]])
+  expect_equivalent(g[[1, ]], g[[from = 1]])
+  expect_equivalent(g[[, 1]], g[[to = 1]])
+  expect_equivalent(g[[1:5, 4:10]], g[[from = 1:5, to = 4:10]])
 
   expect_error(g[[1, from = 1]], "Cannot give both")
   expect_error(g[[, 2, to = 10]], "Cannot give both")
+})
+
+test_that("[[ returns vertex and edges sequences", {
+
+  g <- make_tree(20)
+  expect_true(is_igraph_vs(g[[1]][[1]]))
+  expect_true(is_igraph_es(g[[1, edges = TRUE]][[1]]))
+  expect_true(is_igraph_vs(g[[1:3, 2:6]][[1]]))
+  expect_true(is_igraph_es(g[[1:3, 2:6, edges = TRUE]][[1]]))
+
 })

@@ -9,7 +9,7 @@ test_that("neighbors works", {
   al <- as_adj_list(g, mode="all")
   for (i in 1:length(al)) {
     n <- neighbors(g, i, mode="out")
-    expect_that(as.vector(sort(n)), equals(al[[i]]))
+    expect_that(sort(n), is_equivalent_to(al[[i]]))
   }
 
 })

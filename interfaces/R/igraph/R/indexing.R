@@ -134,10 +134,10 @@
     getfun(x, mode=mode)[j]
   } else {
     mode <- if (directed) "out" else "all"
-    i <- as.igraph.vs(x, i)
-    j <- as.igraph.vs(x, j)
+    i <- V(x)[i]
+    j <- V(x)[j]
     if (!edges) {
-      lapply(getfun(x, mode=mode)[i], intersect, j)
+      lapply(getfun(x, mode=mode)[i], intersection, j)
     } else {
       ee <- as_adj_edge_list(x, mode=mode)[i]
       lapply(seq_along(i), function(yy) {

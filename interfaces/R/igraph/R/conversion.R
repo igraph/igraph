@@ -317,7 +317,7 @@ as_adj_list <- function(graph, mode=c("all", "out", "in", "total")) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_adjlist", graph, mode,
                PACKAGE="igraph")
-  res <- lapply(res, function(x) x+1)
+  res <- lapply(res, function(x) V(graph)[x + 1])
   if (is_named(graph)) names(res) <- V(graph)$name
   res
 }
@@ -336,7 +336,7 @@ as_adj_edge_list <- function(graph, mode=c("all", "out", "in", "total")) {
   on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
   res <- .Call("R_igraph_get_adjedgelist", graph, mode,
                PACKAGE="igraph")
-  res <- lapply(res, function(x) x+1)
+  res <- lapply(res, function(x) E(graph)[x + 1])
   if (is_named(graph)) names(res) <- V(graph)$name
   res
 }
@@ -420,7 +420,7 @@ as_graphnel <- function(graph) {
 
   if ("weight" %in% edge_attr_names(graph) &&
       is.numeric(E(graph)$weight)) {
-    al <- as_adj_edge_list(graph, "out")
+    al <- lapply(as_adj_edge_list(graph, "out"), as.vector)
     for (i in seq(along=al)) {
       edges <- ends(graph, al[[i]], names = FALSE)
       edges <- ifelse( edges[,2]==i, edges[,1], edges[,2])
@@ -429,7 +429,7 @@ as_graphnel <- function(graph) {
     }
   } else {
     al <- as_adj_list(graph, "out")
-    al <- lapply(al, function(x) list(edges=x))
+    al <- lapply(al, function(x) list(edges=as.vector(x)))
   }  
   
   names(al) <- name
