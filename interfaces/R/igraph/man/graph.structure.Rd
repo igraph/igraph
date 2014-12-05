@@ -25,7 +25,7 @@
                    sparse=igraph_opt("sparsematrices"),
                    edges=FALSE, drop=TRUE,
                    attr=if (is_weighted(x)) "weight" else NULL)
-\method{[[}{igraph}(x, i, j, \dots, directed=TRUE, edges=FALSE, exact=TRUE)
+\method{[[}{igraph}(x, i, j, from, to, \dots, directed=TRUE, edges=FALSE, exact=TRUE)
 \method{[}{igraph}(x, i, j, \dots, from, to,
                    attr=if (is_weighted(x)) "weight" else NULL) <- value 
 
@@ -44,7 +44,7 @@ delete_vertices(graph, v)
 }
 \arguments{
   \item{x,graph,e1}{The graph to work on.}
-  \item{i,j}{Vertex ids or names or logical vectors. See details below.}
+  \item{i,j,from,to}{Vertex ids or names or logical vectors. See details below.}
   \item{\dots}{These are currently ignored for the indexing operators.
     For \code{vertex}, \code{vertices}, \code{edge}, \code{edges} and
     \code{path} see details below.
@@ -179,6 +179,11 @@ delete_vertices(graph, v)
       gives the edge ids of all the edges that exist from vertices
       \eqn{v} to vertices \eqn{w}.
   }
+
+  For the double bracket operator the alternative argument names
+  \code{from} and \code{to} can be used instead of the usual \code{i}
+  and \code{j}, to make the code more readable: \preformatted{  graph[[from = 1:3]]
+  graph[[from = v, to = w, edges = TRUE]]}
 
   Both the \sQuote{\code{[}} and \sQuote{\code{[[}} operators allow
   logical indices and negative indices as well, with the usual R

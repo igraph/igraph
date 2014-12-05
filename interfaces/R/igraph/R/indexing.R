@@ -113,10 +113,16 @@
 #' @method "[[" igraph
 #' @export
 
-`[[.igraph` <- function(x, i, j, ..., directed=TRUE,
+`[[.igraph` <- function(x, i, j, from, to, ..., directed=TRUE,
                         edges=FALSE, exact=TRUE) {
   ## TODO: make it faster, don't need the whole list usually
   getfun <- if (edges) as_adj_edge_list else as_adj_list
+
+  if (!missing(i) && !missing(from)) stop("Cannot give both 'i' and 'from'")
+  if (!missing(j) && !missing(to)) stop("Cannot give both 'j' and 'to'")
+  if (missing(i) && ! missing(from)) i <- from
+  if (missing(j) && ! missing(to)) j <- to
+
   if (missing(i) && missing(j)) {
     mode <- if (directed) "out" else "all"
     getfun(x, mode=mode)
