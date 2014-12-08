@@ -1593,7 +1593,7 @@ tkigraph <- function() {
   layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)) {
-    g <- graph_from_iso_class(read$size, i-1, directed=read$dir)
+    g <- graph_from_isomorphism_class(read$size, i-1, directed=read$dir)
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)
     plot(g, layout=co, vertex.color="red", vertex.label=NA, frame=TRUE,
@@ -1651,7 +1651,7 @@ tkigraph <- function() {
   layout( matrix(1:(rows*cols), nrow=rows, byrow=TRUE) )
   layout.show(rows*cols)
   for (i in seq(no)) {
-    g <- graph_from_iso_class(read$size, i-1,
+    g <- graph_from_isomorphism_class(read$size, i-1,
                          directed=is_directed(graphs[[gnos]]))
     par(mai=c(0,0,0,0), mar=c(0,0,0,0))
     par(cex=2)

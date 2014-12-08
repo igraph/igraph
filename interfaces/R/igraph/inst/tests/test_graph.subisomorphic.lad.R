@@ -1,7 +1,7 @@
 
-context("graph.subisomorphic.lad")
+context("graph.subisomorphic, lad")
 
-test_that("graph.subisomorphic.lad works", {
+test_that("graph.subisomorphic, method = 'lad' works", {
 
   library(igraph)
 
@@ -13,31 +13,14 @@ test_that("graph.subisomorphic.lad works", {
                       8 - 4:9, 9 - 6:4:8)
   domains <- list(`1` = c(1,3,9), `2` = c(5,6,7,8), `3` = c(2,4,6,7,8,9),
                   `4` = c(1,3,9), `5` = c(2,4,8,9))
-  i1 <- graph.subisomorphic.lad(pattern, target, all.maps=TRUE)
-  i2 <- graph.subisomorphic.lad(pattern, target, induced=TRUE,
-                                all.maps=TRUE)
-  i3 <- graph.subisomorphic.lad(pattern, target, domains=domains,
-                                all.maps=TRUE)
+  i1 <- subgraph_isomorphic(pattern, target, method = "lad")
+  i2 <- subgraph_isomorphic(pattern, target, induced=TRUE, method = "lad")
+  i3 <- subgraph_isomorphic(pattern, target, domains=domains,
+                            method = "lad")
 
-  expect_that(i1$iso, is_true())
-  expect_that(i2, equals(
-    structure(list(iso = TRUE, map = structure(c(1, 2, 3, 4, 5),
-                                 .Names = c("1", "2", "3", "4", "5")),
-                   maps = list(structure(c(1, 2, 3, 4, 5),
-                     .Names = c("1", "2", "3", "4", "5")),
-                     structure(c(6, 4, 3, 2, 5),
-                               .Names = c("6", "4", "3", "2", "5")),
-                     structure(c(6, 5, 2, 3, 4),
-                               .Names = c("6", "5", "2", "3", "4")),
-                     structure(c(1, 5, 4, 3, 2),
-                               .Names = c("1", "5", "4", "3", "2")))),
-              .Names = c("iso", "map", "maps")) ))
-  expect_that(i3, equals(
-    structure(list(iso = TRUE, map = structure(c(1, 5, 4, 3, 2),
-                                 .Names = c("1", "5", "4", "3", "2")),
-                   maps = list(structure(c(1, 5, 4, 3, 2),
-                     .Names = c("1", "5", "4", "3", "2")))),
-              .Names = c("iso", "map", "maps")) ))
+  expect_that(i1, is_true())
+  expect_that(i2, is_true())
+  expect_that(i3, is_true())
 
 })
 
@@ -51,8 +34,8 @@ test_that("LAD stress test", {
     target <- sample_gnp(20, .5)
     pn <- sample(4:18, 1)
     pattern <- induced_subgraph(target, sample(vcount(target), pn))
-    iso <- graph.subisomorphic.lad(pattern, target, induced=TRUE,
-                                   all.maps=FALSE)
+    iso <- subgraph_isomorphic(pattern, target, induced=TRUE,
+                               method = "lad")
     expect_that(iso$iso, is_true())
   }
 
@@ -62,8 +45,8 @@ test_that("LAD stress test", {
     target <- sample_gnp(20, 1/20)
     pn <- sample(5:18, 1)
     pattern <- sample_gnp(pn, .6)
-    iso <- graph.subisomorphic.lad(pattern, target, induced=TRUE,
-                                   all.maps=FALSE)
+    iso <- subgraph_isomorphic(pattern, target, induced=TRUE,
+                               method = "lad")
     expect_that(iso$iso, is_false())
   }
 

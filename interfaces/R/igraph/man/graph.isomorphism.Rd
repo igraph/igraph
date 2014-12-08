@@ -1,19 +1,26 @@
 \name{graph-isomorphism}
 \alias{graph.isoclass}
+\alias{isomorphism_class}
 \alias{iso_class}
 \alias{graph.isocreate}
 \alias{graph_from_iso_class}
+\alias{graph_from_isomorphism_class}
 \alias{graph.isomorphic}
 \alias{graph.isomorphic.vf2}
 \alias{graph.count.isomorphisms.vf2}
+\alias{count_isomorphisms}
 \alias{graph.count.subisomorphisms.vf2}
+\alias{count_subgraph_isomorphisms}
 \alias{graph.get.isomorphisms.vf2}
+\alias{isomorphisms}
 \alias{graph.get.subisomorphisms.vf2}
+\alias{subgraph_isomorphisms}
 \alias{graph.isoclass.subgraph}
 \alias{graph.isomorphic.34}
 \alias{graph.isomorphic.bliss}
 \alias{graph.subisomorphic.vf2}
 \alias{graph.subisomorphic.lad}
+\alias{subgraph_isomorphic}
 \concept{Graph isomorphism}
 \concept{Subgraph isomorphism}
 \concept{VF2 algorithm}
@@ -27,30 +34,30 @@ graph.isomorphic.bliss(graph1, graph2, sh1="fm", sh2="fm")
 graph.isomorphic.vf2(graph1, graph2, vertex.color1, vertex.color2,
      edge.color1, edge.color2)
 
-graph.count.isomorphisms.vf2(graph1, graph2,
+count_isomorphisms(graph1, graph2,
      vertex.color1, vertex.color2,
      edge.color1, edge.color2)
-graph.get.isomorphisms.vf2(graph1, graph2,
+isomorphisms(graph1, graph2,
      vertex.color1, vertex.color2,
      edge.color1, edge.color2)
 
 graph.subisomorphic.vf2(graph1, graph2,
      vertex.color1, vertex.color2,
      edge.color1, edge.color2)
-graph.count.subisomorphisms.vf2(graph1, graph2,
+count_subgraph_isomorphisms(graph1, graph2,
      vertex.color1, vertex.color2,
      edge.color1, edge.color2)
-graph.get.subisomorphisms.vf2(graph1, graph2,
+subgraph_isomorphisms(graph1, graph2,
      vertex.color1, vertex.color2,
      edge.color1, edge.color2)
 
-graph.subisomorphic.lad (pattern, target, domains = NULL, 
+subgraph_isomorphic (pattern, target, domains = NULL, 
                          induced = FALSE, map = TRUE, all.maps = FALSE,
                          time.limit = Inf)
 
 iso_class(graph)
 graph.isoclass.subgraph(graph, vids)
-graph_from_iso_class(size, number, directed=TRUE)
+graph_from_isomorphism_class(size, number, directed=TRUE)
 }
 \arguments{
   \item{graph}{A graph object.}
@@ -130,26 +137,26 @@ graph_from_iso_class(size, number, directed=TRUE)
   it implements the VF2 algorithm, by Cordella, Foggia et al., see
   references.
 
-  \code{graph.count.isomorphisms.vf2} counts the different isomorphic
+  \code{count_isomorphisms} counts the different isomorphic
   mappings between \code{graph1} and \code{graph2}. (To count
   automorphisms you can supply the same graph twice, but it is better to
   call \code{\link{automorphisms}}.) It uses the VF2 algorithm.
 
-  \code{graph.get.isomorphisms.vf2} calculates all isomorphic mappings
+  \code{isomorphisms} calculates all isomorphic mappings
   between \code{graph1} and \code{graph2}. It uses the VF2 algorithm.
 
   \code{graph.subisomorphic.vf2} decides whether \code{graph2} is
   isomorphic to some subgraph of \code{graph1}. It uses the VF2 algorithm.
 
-  \code{graph.count.subisomorphisms.vf2} counts the different isomorphic
+  \code{count_subgraph_isomorphisms} counts the different isomorphic
   mappings between \code{graph2} and the subgraphs of \code{graph1}. It
   uses the VF2 algorithm.
 
-  \code{graph.get.subisomorphisms.vf2} calculates all isomorphic
+  \code{subgraph_isomorphisms} calculates all isomorphic
   mappings between \code{graph2} and the subgraphs of \code{graph1}. It
   uses the VF2 algorithm.
 
-  \code{graph.subisomorphic.lad} checks whether \code{pattern} is
+  \code{subgraph_isomorphic} checks whether \code{pattern} is
   isomorphic to a subgraph or induced subgraph of \code{target}. It can
   also optionally return a mapping, or all possible mappings between the
   two graphs. Its \code{domains} argument allows for a flexible way to
@@ -166,12 +173,12 @@ graph_from_iso_class(size, number, directed=TRUE)
   subgraph of the input graph. Currently it only works for subgraphs
   with 3 or 4 vertices.
   
-  \code{graph_from_iso_class} create a graph from the given isomorphic
+  \code{graph_from_isomorphism_class} create a graph from the given isomorphic
   class. Currently it can handle only graphs with 3 or 4 vertices.
 }
 \note{
   Functions \code{iso_class}, \code{graph.isoclass.subgraph} and
-  \code{graph_from_iso_class} are considered experimental and might be
+  \code{graph_from_isomorphism_class} are considered experimental and might be
   reorganized/rewritten later.
 }
 \value{
@@ -209,11 +216,11 @@ graph_from_iso_class(size, number, directed=TRUE)
     \code{graph1} if \code{iso} is \code{TRUE}, an empty numeric
     vector otherwise.}
 
-  \code{graph.count.isomorphisms.vf2} returns a numeric scalar, an
+  \code{count_isomorphisms} returns a numeric scalar, an
   integer, the number of isomorphic mappings between the two input
   graphs.
 
-  \code{graph.get.isomorphisms.vf2} returns a list of numeric
+  \code{isomorphisms} returns a list of numeric
   vectors. Every numeric vector is a permutation which takes
   \code{graph2} into \code{graph1}.
 
@@ -229,14 +236,14 @@ graph_from_iso_class(size, number, directed=TRUE)
     \code{FALSE}. Otherwise a mapping from \code{graph2} into
     \code{graph1}.}
 
-  \code{graph.count.subisomorphisms.vf2} returns a numeric scalar, an
+  \code{count_subgraph_isomorphisms} returns a numeric scalar, an
   integer.
 
-  \code{graph.get.subisomorphisms.vf2} returns a list of numeric
+  \code{subgraph_isomorphisms} returns a list of numeric
   vectors, each numeric vector is an isomorphic mapping from
   \code{graph2} to a subgraph of \code{graph1}.
 
-  \code{graph.subisomorphic.lad} return a named list with three entries:
+  \code{subgraph_isomorphic} return a named list with three entries:
   \item{iso}{Logical scalar, whether the algorithm found a subgraph (or
     induced subgraph is the \code{induced} argument in \code{TRUE}) in
     \code{target} that is isomorphic to \code{pattern}.}
@@ -252,7 +259,7 @@ graph_from_iso_class(size, number, directed=TRUE)
   \code{iso_class} and \code{graph.isoclass.subgraph} return a
   non-negative integer number. 
 
-  \code{graph_from_iso_class} returns a graph object.
+  \code{graph_from_isomorphism_class} returns a graph object.
 }
 \references{
   Tommi Junttila and Petteri Kaski: Engineering an Efficient Canonical
@@ -272,8 +279,8 @@ graph_from_iso_class(size, number, directed=TRUE)
 \seealso{\code{\link{motifs}}}
 \examples{
 # create some non-isomorphic graphs
-g1 <- graph_from_iso_class(3, 10)
-g2 <- graph_from_iso_class(3, 11)
+g1 <- graph_from_isomorphism_class(3, 10)
+g2 <- graph_from_isomorphism_class(3, 11)
 iso_class(g1)
 iso_class(g2)
 graph.isomorphic(g1, g2)
@@ -294,13 +301,13 @@ graph.isomorphic.vf2(g1, g2)
 
 V(g1)$color <- rep(1:2, length=vcount(g1))
 V(g2)$color <- rep(2:1, length=vcount(g2))
-graph.count.isomorphisms.vf2(g1, g2)
-graph.count.isomorphisms.vf2(g1, g2, vertex.color1=NULL,
+count_isomorphisms(g1, g2)
+count_isomorphisms(g1, g2, vertex.color1=NULL,
     vertex.color2=NULL)
 
 V(g1)$name <- letters[1:vcount(g1)]
 V(g2)$name <- LETTERS[1:vcount(g2)]
-graph.get.isomorphisms.vf2(g1, g2)
+isomorphisms(g1, g2)
 
 V(g1)$color <- 1
 V(g2)$color <- 2
@@ -317,15 +324,15 @@ target <- graph_from_literal(1:2:3:4:5:6:7:8:9,
                     8 - 4:9, 9 - 6:4:8)
 domains <- list(`1` = c(1,3,9), `2` = c(5,6,7,8), `3` = c(2,4,6,7,8,9),
                 `4` = c(1,3,9), `5` = c(2,4,8,9))
-graph.subisomorphic.lad(pattern, target, all.maps=TRUE)
-graph.subisomorphic.lad(pattern, target, induced=TRUE, all.maps=TRUE)
-graph.subisomorphic.lad(pattern, target, domains=domains, all.maps=TRUE)
+subgraph_isomorphic(pattern, target, all.maps=TRUE)
+subgraph_isomorphic(pattern, target, induced=TRUE, all.maps=TRUE)
+subgraph_isomorphic(pattern, target, domains=domains, all.maps=TRUE)
 
 # Directed LAD example
 pattern <- graph_from_literal(1:2:3, 1 -+ 2:3)
 uring <- make_ring(10)
 dring <- make_ring(10, directed=TRUE)
-graph.subisomorphic.lad(pattern, uring)
-graph.subisomorphic.lad(pattern, dring)
+subgraph_isomorphic(pattern, uring)
+subgraph_isomorphic(pattern, dring)
 }
 \keyword{graphs}

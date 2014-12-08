@@ -1711,7 +1711,7 @@ igraph_coreness:
 
 igraph_isoclass:
         PARAMS: GRAPH graph, OUT INTEGERPTR isoclass
-        NAME-R: iso_class
+        NAME-R: graph.isoclass
 
 igraph_isomorphic:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
@@ -1723,7 +1723,7 @@ igraph_isoclass_subgraph:
 
 igraph_isoclass_create:
         PARAMS: OUT GRAPH graph, INTEGER size, INTEGER number, BOOLEAN directed=True
-        NAME-R: graph_from_iso_class
+        NAME-R: graph_from_isomorphism_class
 
 igraph_isomorphic_vf2:
         PARAMS: GRAPH graph1, GRAPH graph2, \

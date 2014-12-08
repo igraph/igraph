@@ -267,10 +267,8 @@ deprecated("graph.full.citation", make_full_citation_graph)
 deprecated("graph.graphdb", graph_from_graphdb)
 #' @export graph.incidence
 deprecated("graph.incidence", graph_from_incidence_matrix)
-#' @export graph.isoclass
-deprecated("graph.isoclass", iso_class)
 #' @export graph.isocreate
-deprecated("graph.isocreate", graph_from_iso_class)
+deprecated("graph.isocreate", graph_from_isomorphism_class)
 #' @export graph.kautz
 deprecated("graph.kautz", make_kautz_graph)
 #' @export graph.knn
