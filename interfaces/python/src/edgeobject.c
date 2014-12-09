@@ -306,6 +306,8 @@ PyObject* igraphmodule_Edge_attributes(igraphmodule_EdgeObject* self) {
     }
   }
 
+  Py_DECREF(names);
+
   return dict;
 }
 

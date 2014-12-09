@@ -283,7 +283,10 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
   if (!dict) return NULL;
 
   names=igraphmodule_Graph_vertex_attributes(o);
-  if (!names) { Py_DECREF(dict); return NULL; }
+  if (!names) {
+    Py_DECREF(dict);
+    return NULL;
+  }
 
   n=PyList_Size(names);
   for (i=0; i<n; i++) {
@@ -300,6 +303,8 @@ PyObject* igraphmodule_Vertex_attributes(igraphmodule_VertexObject* self) {
       }
     }
   }
+
+  Py_DECREF(names);
 
   return dict;
 }
