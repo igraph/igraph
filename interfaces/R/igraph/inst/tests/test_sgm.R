@@ -43,6 +43,6 @@ test_that("LSAP does not change input matrix", {
   x <- matrix(c(5, 1, 4, 3, 5, 2, 2, 4, 4), nrow = 3)
   solve_LSAP(x)
 
-  expect_equal(x, matrix(c(5, 1, 4, 3, 5, 2, 2, 4, 4), nrow = 3)
+  expect_equal(x, matrix(c(5, 1, 4, 3, 5, 2, 2, 4, 4), nrow = 3))
   
 })
