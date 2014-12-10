@@ -1,3 +1,19 @@
+
+solve_LSAP <- function (x, maximum = FALSE) {
+  if (!is.matrix(x) || any(x < 0)) {
+    stop("x must be a matrix with nonnegative entries.")
+  }
+  nr <- nrow(x)
+  nc <- ncol(x)
+  if (nr > nc) stop("x must not have more rows than columns.")
+  if (nc > nr)  x <- rbind(x, matrix(2 * sum(x), nc - nr, nc))
+  if (maximum)  x <- max(x) - x
+  storage.mode(x) <- "double"
+  out <- .Call("R_igraph_solve_lsap", x, as.integer(nc),
+               PACKAGE = "igraph") + 1L
+  out[seq_len(nr)]
+}
+
 sgm <- function(A, B, m, start, iteration) {
   ## Seeds are assumed to be vertices 1:m in both graphs
   totv <- ncol(A)
