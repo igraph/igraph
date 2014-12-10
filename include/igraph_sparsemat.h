@@ -212,6 +212,23 @@ int igraph_sparsemat_rowsums(const igraph_sparsemat_t *A,
 int igraph_sparsemat_colsums(const igraph_sparsemat_t *A, 
 			     igraph_vector_t *res);
 
+int igraph_sparsemat_rowmins(igraph_sparsemat_t *A,
+			     igraph_vector_t *res);
+int igraph_sparsemat_colmins(igraph_sparsemat_t *A,
+			     igraph_vector_t *res);
+
+int igraph_sparsemat_rowmaxs(igraph_sparsemat_t *A,
+			     igraph_vector_t *res);
+int igraph_sparsemat_colmaxs(igraph_sparsemat_t *A,
+			     igraph_vector_t *res);
+
+int igraph_sparsemat_which_min_rows(igraph_sparsemat_t *A,
+				    igraph_vector_t *res,
+				    igraph_vector_int_t *pos);
+int igraph_sparsemat_which_min_cols(igraph_sparsemat_t *A,
+				    igraph_vector_t *res,
+				    igraph_vector_int_t *pos);
+
 int igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by);
 			   
 

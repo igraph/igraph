@@ -7,6 +7,7 @@ Adelchi Azzalini	igraph.options based on the sm package
 Tamas Badics		GLPK
 Gregory Benison		Minimum cut calculation
 Adrian Bowman		igraph.options based on the sm package
+Walter Böhm		LSAP
 Keith Briggs		Parts from the Very Nauty Graph Library
       			Geometric random graphs
 			Girth
@@ -42,6 +43,7 @@ Tom Gregorovic		Multilevel community detection
 M.Grigoriadis		GLPK
 Oscar Gustafsson	GLPK
 Paul Hsieh		pstdint.h
+Kurt Hornik             LSAP
 Ross Ihaka		Some random number generators (not used in R)
 Tommi Junttila		BLISS graph isomorphism library
 Petteri Kaski		BLISS graph isomorphism library

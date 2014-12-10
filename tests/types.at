@@ -178,6 +178,18 @@ AT_KEYWORDS([sparse matrix igraph_sparsemat_t symmetric is_symmetric])
 AT_COMPILE_CHECK([simple/igraph_sparsemat_is_symmetric.c])
 AT_CLEANUP
 
+AT_SETUP([Sparse matrix col/row min/max (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t])
+AT_COMPILE_CHECK([simple/igraph_sparsemat_minmax.c],
+		 [simple/igraph_sparsemat_minmax.out])
+AT_CLEANUP
+
+AT_SETUP([Sparse matrix which col/row min/max (igraph_sparsemat_t): ])
+AT_KEYWORDS([sparse matrix igraph_sparsemat_t minimum maximum])
+AT_COMPILE_CHECK([simple/igraph_sparsemat_which_minmax.c],
+		 [simple/igraph_sparsemat_which_minmax.out])
+AT_CLEANUP
+
 AT_SETUP([Another sparse matrix (igraph_spmatrix_t): ])
 AT_KEYWORDS([sparse matrix igraph_spmatrix_t])
 AT_COMPILE_CHECK([simple/spmatrix.c], [simple/spmatrix.out])
