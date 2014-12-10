@@ -25,10 +25,10 @@ sgm <- function(A, B, m, start, iteration) {
     B21 <- B[(m+1):(m+n), 1:m, drop=FALSE]
   }
   if ( m==0 ) {
-    A12 <- Matrix(0, n, n)
-    A21 <- Matrix(0, n, n)
-    B12 <- Matrix(0, n, n)
-    B21 <- Matrix(0, n, n)
+    A12 <- Matrix::Matrix(0, n, n)
+    A21 <- Matrix::Matrix(0, n, n)
+    B12 <- Matrix::Matrix(0, n, n)
+    B21 <- Matrix::Matrix(0, n, n)
   }
   A22 <- A[(m+1):(m+n), (m+1):(m+n)]
   B22 <- B[(m+1):(m+n), (m+1):(m+n)]

@@ -31,7 +31,7 @@ gclust.rsvt <- function(glist,r=1,maxsvt=10,nmfout=FALSE,maxit=10000,nmfmethod='
 	for(itr in 1:maxsvt) {
 	    X = U %*% S %*% t(V)
 	    X[X<0]=0
-	    mysvd = tryCatch(irlbairlba(X,r,r,maxit=maxit), error=function(e) svd(X,r,r))
+	    mysvd = tryCatch(irlba::irlba(X,r,r,maxit=maxit), error=function(e) svd(X,r,r))
 	    UU = mysvd$u[,1:r,drop=FALSE]
 	    VV = mysvd$v[,1:r,drop=FALSE]
 	    if(r == 1) {
@@ -56,9 +56,9 @@ gclust.rsvt <- function(glist,r=1,maxsvt=10,nmfout=FALSE,maxit=10000,nmfmethod='
 	mynmf = NMF::nmf(XX,rank=r,method=nmfmethod)
 	WW = matrix(0,nrow=nrow(X),ncol=r)
 	if(length(stash)>0){
-	    WW[-stash,] = basis(mynmf)
+	    WW[-stash,] = NMF::basis(mynmf)
 	} else {
-	    WW = basis(mynmf)
+	    WW = NMF::basis(mynmf)
 	}
 	
 	HH = coef(mynmf)
