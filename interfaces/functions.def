@@ -2246,7 +2246,6 @@ igraph_revolver_probs_ADE_dpareto:
                 INT agebins, OUT VECTOR_OR_0 logprobs, \
                 OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
         NAME-R: revolver.probs.ADE.dpareto
->>>>>>> xigraph/develop
 
 #######################################
 # Other, (yet) undocumented functions
