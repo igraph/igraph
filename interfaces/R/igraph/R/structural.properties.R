@@ -2786,6 +2786,7 @@ local.scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
   } else {
 
     if (!is.null(neighborhoods)) {
+      neighborhoods <- lapply(neighborhoods, as.vector)
       if (is.character(FUN) && FUN %in% c("ecount", "wumweights")) {
         neighborhoods <- lapply(neighborhoods, function(x) {
           as.integer(x)-1L
