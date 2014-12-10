@@ -90,7 +90,10 @@
 #include "igraph_interrupt.h"
 #include "igraph_scg.h"
 #include "igraph_matching.h"
+#include "igraph_embedding.h"
+#include "igraph_scan.h"
 #include "igraph_graphlets.h"
 #include "igraph_epidemics.h"
+#include "igraph_lsap.h"
 
 #endif

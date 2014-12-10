@@ -75,6 +75,10 @@ double igraph_fmin(double a, double b);
 #ifndef M_SQRT2
 #  define M_SQRT2 1.4142135623730950488016887
 #endif
+#ifndef M_LN_SQRT_2PI
+#define M_LN_SQRT_2PI   0.918938533204672741780329736406 /* log(sqrt(2*pi))
+							    == log(2*pi)/2 */
+#endif
 
 __END_DECLS
 

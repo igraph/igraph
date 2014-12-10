@@ -110,6 +110,9 @@
     else
       VECTOR(*res)[node] /= triples;
 #endif
+#ifdef TRIEDGES
+		VECTOR(*res)[node] += deg1;
+#endif
   }
 
   igraph_free(neis);

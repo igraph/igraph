@@ -4014,7 +4014,8 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
   long int no_of_edges = igraph_ecount(graph);
   long int i, j, k, n;
   long int *geodist;
-  igraph_vector_t *eids, *ins_p, *outs_p, ins_v, outs_v;
+  igraph_vector_int_t *eids;
+  igraph_vector_t *ins_p, *outs_p, ins_v, outs_v;
   igraph_dqueue_t q;
   igraph_inclist_t inclist;
   igraph_bool_t directed = igraph_is_directed(graph);
@@ -4066,7 +4067,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
         long int actdist=(long int) igraph_dqueue_pop(&q);
         IGRAPH_ALLOW_INTERRUPTION();
         eids=igraph_inclist_get(&inclist, actnode);
-        n=igraph_vector_size(eids);
+        n=igraph_vector_int_size(eids);
         for (j=0; j<n; j++) {
           long int neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
           if (geodist[neighbor] != 0) {
@@ -6068,7 +6069,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     while (!igraph_indheap_empty(&Q)) {
       long int minnei=igraph_indheap_max_index(&Q);
       igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
-      igraph_vector_t *neis;
+      igraph_vector_int_t *neis;
       long int nlen, j;
       
       if (mindist > res) {
@@ -6077,7 +6078,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
       nodes_reached++;
 
       neis=igraph_inclist_get(&inclist, minnei);
-      nlen=igraph_vector_size(neis);
+      nlen=igraph_vector_int_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=(long int) VECTOR(*neis)[j];
 	long int tto=IGRAPH_OTHER(graph, edge, minnei);

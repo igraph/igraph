@@ -25,6 +25,8 @@ BOOLEAN:
 
 VECTOR:
     INCONV: %I% <- as.numeric(%I%)
+    DEFAULT:
+       AsmDefaultCvec: graph.strength(%I1%, weights=weights)/(vcount(%I1%)-1)
 
 VERTEXINDEX:
     OUTCONV: 
@@ -275,6 +277,10 @@ VECTORLIST:
 
 VECTORLIST_OR_0:
 
+MATRIXLIST:
+  INCONV:
+    IN: if (!all(sapply(%I%, is.matrix))) { stop("%I is not a list of matrices") }
+
 VECTORLIST_INT_OR_0:
 
 VERTEXSETLIST:
@@ -285,6 +291,10 @@ VERTEXSETLIST:
                 } \
               }
 
+
+VERTEXSETLIST_INT:
+  INCONV:
+    IN: %I% <- lapply(%I%, function(x) as.integer(x)-1L)
 
 VERTEXSETLIST_OR_0:
     OUTCONV:
@@ -430,6 +440,11 @@ EIGENWHICH:
     DEFAULT: 
       Default: list()
 
+EIGENWHICHPOS:
+    INCONV: %I% <- switch(igraph.match.arg(%I%), "lm"=0L, "la"=2L, "sa"=3L)
+    DEFAULT:
+      ASE: c("lm", "la", "sa")
+
 SIRLIST:
 
 PAGERANKALGO:
@@ -452,3 +467,11 @@ PAGERANKOPT:
 DEPRECATED:
   INCONV: if (!missing(%I%)) { warning("Argument `%I%' is deprecated and has no effect") }
   CALL:
+
+LSETYPE:
+  INCONV: %I% <- switch(igraph.match.arg(%I%), \
+                        "default"=if (is.directed(%I1%)) 3L else 0L, \
+                        "da"=0L, "d-a"=0L, "idad"=1L, "i-dad"=1L, "dad"=2L, \
+                        "oap"=3L)
+  DEFAULT:
+    Default: c("default", "D-A", "DAD", "I-DAD", "OAP")

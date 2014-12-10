@@ -320,6 +320,54 @@ igraph_sbm_game:
         GATTR-R: name IS Stochastic block-model
         GATTR-PARAM-R: loops
 
+igraph_hsbm_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, INTEGER m, \
+                VECTOR rho, MATRIX C, REAL p
+        NAME-R: hsbm.1.game
+        GATTR-R: name IS Hierarchical stochastic block model
+        GATTR-PARAM-R: m, rho, C, p
+        IGNORE: RNamespace
+
+igraph_hsbm_list_game:
+        PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT mlist, \
+                VECTORLIST rholist, MATRIXLIST Clist, REAL p
+        NAME-R: hsbm.list.game
+        GATTR-R: name IS Hierarchical stochastic block model
+        GATTR-PARAM-R: p
+        IGNORE: RNamespace
+
+igraph_correlated_game:
+        PARAMS: GRAPH old_graph, OUT GRAPH new_graph, \
+                REAL corr, REAL p=old.graph$p, VECTORM1_OR_0 permutation=NULL
+        NAME-R: correlated.game
+        GATTR-R: name IS Correlated random graph
+        GATTR-PARAM-R: corr, p
+        DEFAULT-R: p=old.graph$p
+
+igraph_correlated_pair_game:
+        PARAMS: OUT GRAPH graph1, OUT GRAPH graph2, INT n, REAL corr, \
+                REAL p, BOOLEAN directed=False, \
+                VECTORM1_OR_0 permutation=NULL
+        NAME-R: correlated.pair.game
+
+igraph_dot_product_game:
+        PARAMS: OUT GRAPH graph, MATRIX vecs, BOOLEAN directed=False
+        NAME-R: dot.product.game
+
+igraph_sample_sphere_surface:
+        PARAMS: INTEGER dim, INTEGER n=1, REAL radius=1, \
+                BOOLEAN positive=True, OUT MATRIX res
+        NAME-R: sample.sphere.surface
+
+igraph_sample_sphere_volume:
+        PARAMS: INTEGER dim, INTEGER n=1, REAL radius=1, \
+                BOOLEAN positive=True, OUT MATRIX res
+        NAME-R: sample.sphere.volume
+
+igraph_sample_dirichlet:
+        PARAMS: INTEGER n, VECTOR alpha, OUT MATRIX res
+        NAME-R: sample.dirichlet
+
 #######################################
 # Basic query functions
 #######################################
@@ -1521,6 +1569,58 @@ igraph_adjacent_triangles:
         DEPS: vids ON graph
         NAME-R: count_triangles
 
+igraph_local_scan_0:
+        PARAMS: GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
+                NEIMODE mode=OUT
+        DEPS: weights ON graph
+        IGNORE: RR, RNamespace
+
+igraph_local_scan_0_them:
+        PARAMS: GRAPH us, GRAPH them, OUT VECTOR res, \
+                EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
+        DEPS: weights_us ON us, weights_them ON them
+        IGNORE: RR, RNamespace
+
+igraph_local_scan_1_ecount:
+        PARAMS: GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
+                NEIMODE mode=OUT
+        DEPS: weights ON graph
+        NAME-R: local.scan1.ecount
+        IGNORE: RR, RNamespace
+
+igraph_local_scan_1_ecount_approximate:
+        PARAMS: GRAPH graph, OUT VECTOR res, INT noevals, \
+                INOUT ARPACKOPT options=igraph.arpack.default
+        NAME-R: local.scan1.ecount.approx
+
+igraph_local_scan_1_ecount_approximate_eigen:
+        PARAMS: GRAPH graph, OUT VECTOR res, VECTOR values, MATRIX vectors
+        NAME-R: local.scan1.ecount.approx.eigen
+
+igraph_local_scan_1_ecount_them:
+        PARAMS: GRAPH us, GRAPH them, OUT VECTOR res, \
+                EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
+        DEPS: weigths_them ON them
+        IGNORE: RR, RNamespace
+
+igraph_local_scan_k_ecount:
+        PARAMS: GRAPH graph, INT k, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
+                NEIMODE mode=OUT
+        DEPS: weights ON graph
+        IGNORE: RR, RNamespace
+
+igraph_local_scan_k_ecount_them:
+        PARAMS: GRAPH us, GRAPH them, INT k, OUT VECTOR res, \
+                EDGEWEIGHTS weights_them=NULL, NEIMODE mode=OUT
+        DEPS: weights_them ON them
+        IGNORE: RR, RNamespace
+
+igraph_local_scan_neighborhood_ecount:
+       PARAMS: GRAPH graph, OUT VECTOR res, EDGEWEIGHTS weights=NULL, \
+               VERTEXSETLIST_INT neighborhoods
+       DEPS: weights ON graph
+       IGNORE: RR, RNamespace
+
 igraph_list_triangles:
         PARAMS: GRAPH graph, OUT VERTEXSET_INT res
         DEPS: res ON graph
@@ -1909,6 +2009,30 @@ igraph_maximum_bipartite_matching:
        IGNORE: RR
 
 #######################################
+# Embedding
+#######################################
+
+igraph_adjacency_spectral_embedding:
+       PARAMS: GRAPH graph, INTEGER no, EDGEWEIGHTS weights=NULL, \
+               EIGENWHICHPOS which=ASE, BOOLEAN scaled=True, OUT MATRIX X, \
+               OUT MATRIX_OR_0 Y, OUT VECTOR_OR_0 D, \
+               VECTOR cvec=AsmDefaultCvec, \
+               INOUT ARPACKOPT options=igraph.arpack.default
+       NAME-R: adjacency.spectral.embedding
+       DEPS: weights ON graph, cvec ON graph
+       IGNORE: RC
+
+igraph_laplacian_spectral_embedding:
+       PARAMS: GRAPH graph, INTEGER no, EDGEWEIGHTS weights=NULL, \
+               EIGENWHICHPOS which=ASE, NEIMODE degmode=OUT, \
+               LSETYPE type=Default, BOOLEAN scaled=True, OUT MATRIX X, \
+               OUT MATRIX_OR_0 Y, OUT VECTOR_OR_0 D, \
+               INOUT ARPACKOPT options=igraph.arpack.default
+       NAME-R: laplacian.spectral.embedding
+       DEPS: weights ON graph, type ON graph
+       IGNORE: RC
+
+#######################################
 # Eigensolvers
 #######################################
 
@@ -1955,6 +2079,174 @@ igraph_random_sample:
 igraph_convex_hull:
         PARAMS: MATRIX data, OUT VECTOR resverts, OUT MATRIX rescoords
         NAME-R: convex_hull
+
+igraph_dim_select:
+        PARAMS: VECTOR sv, OUT INTEGERPTR dim
+        NAME-R: dimSelect
+
+#######################################
+# (R)evolver
+#######################################
+
+igraph_revolver_ml_d:
+        PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
+                OUT VECTOR_OR_0 cites, REAL delta=1e-10, VECTOR_OR_0 filter=NULL, \
+                OUT REALPTR logprob, OUT REALPTR logmax
+        NAME-R: revolver.ml.d
+        FLAGS: PROGRESS
+
+igraph_revolver_probs_d:
+        PARAMS: GRAPH graph, VECTOR kernel, OUT VECTOR_OR_0 probs, \
+                OUT VECTOR_OR_0 citedprobs, OUT VECTOR_OR_0 citingprobs, \
+                BOOLEAN ntk=False
+        NAME-R: revolver.probs.d
+
+igraph_revolver_ml_de:
+        PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
+                VECTOR cats, OUT MATRIX_OR_0 cites, REAL delta=1e-10, \
+                VECTOR_OR_0 filter=NULL, \
+                OUT REALPTR logprob, OUT REALPTR logmax
+        NAME-R: revolver.ml.de
+        FLAGS: PROGRESS
+
+igraph_revolver_probs_de:
+        PARAMS: GRAPH graph, MATRIX kernel, VECTOR cats, OUT VECTOR_OR_0 logprobs, \
+                OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
+        NAME-R: revolver.probs.de
+
+igraph_revolver_ml_ade:
+        PARAMS: GRAPH graph, INTEGER niter, OUT ARRAY3 kernel, \
+                VECTOR cats, OUT ARRAY3_OR_0 cites, INTEGER agebins=300, \
+                REAL delta=1e-10, VECTOR_OR_0 filter=NULL, \
+                OUT REALPTR logprob, OUT REALPTR logmax
+        NAME-R: revolver.ml.ade
+        FLAGS: PROGRESS
+
+igraph_revolver_probs_ade:
+        PARAMS: GRAPH graph, ARRAY3 kernel, VECTOR cats, OUT VECTOR_OR_0 logprobs, \
+                OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
+        NAME-R: revolver.probs.ade
+
+igraph_revolver_ml_f:
+        PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
+                OUT VECTOR_OR_0 cites, REAL delta=1e-10, OUT REALPTR logprob, \
+                OUT REALPTR logmax
+        NAME-R: revolver.ml.f
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_df:
+        PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
+                OUT MATRIX_OR_0 cites, REAL delta=1e-10, OUT REALPTR logprob, \
+                OUT REALPTR logmax
+        NAME-R: revolver.ml.df
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_l:
+        PARAMS: GRAPH graph, INTEGER niter, OUT VECTOR kernel, \
+                OUT VECTOR_OR_0 cites, INTEGER agebins=300, REAL delta=1e-10, \
+                OUT REALPTR logprob, OUT REALPTR logmax
+        NAME-R: revolver.ml.l
+
+igraph_revolver_ml_ad:
+        PARAMS: GRAPH graph, INTEGER niter, OUT MATRIX kernel, \
+                OUT MATRIX_OR_0 cites, INTEGER agebins=300, \
+                REAL delta=1e-10, VECTOR_OR_0 filter=NULL, \
+                OUT REALPTR logprob, OUT REALPTR logmax
+        NAME-R: revolver.ml.ad
+        FLAGS: PROGRESS
+
+igraph_revolver_probs_ad:
+        PARAMS: GRAPH graph, MATRIX kernel, OUT VECTOR_OR_0 probs, \
+                OUT VECTOR_OR_0 citedprobs, OUT VECTOR_OR_0 citingprobs, \
+                BOOLEAN ntk=False
+        NAME-R: revolver.probs.ad
+
+igraph_revolver_ml_D_alpha:
+        PARAMS: GRAPH graph, INOUT REALPTR alpha, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, \
+                VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.D.alpha
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_D_alpha_a:
+        PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
+                OUT REALPTR Fmin, REAL abstol=1e-8, REAL reltol=1e-8, \
+                INT maxit=1000, VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.D.alpha.a
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_DE_alpha_a:
+        PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
+                INOUT REALPTR a, INOUT VECTOR coeffs, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, \
+                VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.DE.alpha.a
+
+igraph_revolver_ml_AD_alpha_a_beta:
+        PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
+                INOUT REALPTR beta, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, INT agebins=300,\
+                VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.AD.alpha.a.beta
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_AD_dpareto:
+        PARAMS: GRAPH graph, INOUT REALPTR alpha, INOUT REALPTR a, \
+                INOUT REALPTR paralpha, INOUT REALPTR parbeta, \
+                INOUT REALPTR parscale, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, INT agebins=300,\
+                VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.AD.dpareto
+        FLAGS: PROGRESS
+
+igraph_revolver_ml_AD_dpareto_eval:
+        PARAMS: GRAPH graph, REAL alpha, REAL a, REAL paralpha, REAL parbeta, \
+                REAL parscale, OUT REALPTR value, OUT VECTOR deriv, \
+                INT agebins=300, VECTOR_OR_0 filter=NULL
+        NAME-R: revolver.ml.AD.dpareto.eval
+
+igraph_revolver_ml_ADE_alpha_a_beta:
+        PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
+                INOUT REALPTR a, INOUT REALPTR beta, INOUT VECTOR coeffs, \
+                OUT REALPTR Fmin, REAL abstol=1e-8, REAL reltol=1e-8, \
+                INT maxit=1000, INT agebins=300, \
+                VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.ADE.alpha.a.beta
+
+igraph_revolver_ml_ADE_dpareto:
+        PARAMS: GRAPH graph, VECTOR cats, INOUT REALPTR alpha, \
+                INOUT REALPTR a, INOUT REALPTR paralpha, \
+                INOUT REALPTR parbeta, INOUT REALPTR parscale, \
+                INOUT VECTOR coeffs, OUT REALPTR Fmin, \
+                REAL abstol=1e-8, REAL reltol=1e-8, INT maxit=1000, \
+                INT agebins=300, VECTOR_OR_0 filter=NULL, \
+                OUT INTEGERPTR fncount, OUT INTEGERPTR grcount
+        NAME-R: revolver.ml.ADE.dpareto
+
+igraph_revolver_ml_ADE_dpareto_eval:
+        PARAMS: GRAPH graph, VECTOR cats, REAL alpha, REAL a, REAL paralpha, \
+                REAL parbeta, REAL parscale, VECTOR coeffs, \
+                OUT REALPTR value, OUT VECTOR deriv, INT agebins=300, \
+                VECTOR_OR_0 filter=NULL
+        NAME-R: revolver.ml.ADE.dpareto.eval
+
+igraph_revolver_ml_ADE_dpareto_evalf:
+        PARAMS: GRAPH graph, VECTOR cats, MATRIX par, OUT VECTOR value, \
+                INT agebins, VECTOR_OR_0 filter=NULL
+        NAME-R: revolver.ml.ADE.dpareto.evalf
+
+igraph_revolver_probs_ADE_dpareto:
+        PARAMS: GRAPH graph, MATRIX par, VECTOR cats, VECTOR gcats, \
+                INT agebins, OUT VECTOR_OR_0 logprobs, \
+                OUT VECTOR_OR_0 logcited, OUT VECTOR_OR_0 logciting
+        NAME-R: revolver.probs.ADE.dpareto
+>>>>>>> xigraph/develop
 
 #######################################
 # Other, (yet) undocumented functions

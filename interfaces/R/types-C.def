@@ -276,6 +276,7 @@ VECTORLIST:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%
   INCONV:
+    IN: R_igraph_SEXP_to_vectorlist(%I%, &%C%);
     OUT: if (0 != igraph_vector_ptr_init(&%C%, 0)) { \
            igraph_error("", __FILE__, __LINE__, IGRAPH_ENOMEM); \
          } \
@@ -284,6 +285,12 @@ VECTORLIST:
     OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP(&%C%)); \
          R_igraph_vectorlist_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
+
+MATRIXLIST:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    IN: R_igraph_SEXP_to_matrixlist(%I%, &%C%);
 
 VERTEXSETLIST:
   CTYPE: igraph_vector_ptr_t
@@ -298,6 +305,12 @@ VERTEXSETLIST:
     OUT: PROTECT(%I%=R_igraph_vectorlist_to_SEXP_p1(&%C%)); \
          R_igraph_vectorlist_destroy(&%C%); \
          IGRAPH_FINALLY_CLEAN(1);
+
+VERTEXSETLIST_INT:
+  CTYPE: igraph_vector_ptr_t
+  CALL: &%C%
+  INCONV:
+    IN:  if (!isNull(%I%)) { R_igraph_SEXP_to_vectorlist_int(%I%, &%C%); }
 
 EDGESETLIST:
   CTYPE: igraph_vector_ptr_t
@@ -1028,6 +1041,11 @@ EIGENWHICH:
   INCONV:
     IN: R_SEXP_to_igraph_eigen_which(%I%, &%C%);
 
+EIGENWHICHPOS:
+  CTYPE: igraph_eigen_which_position_t
+  INCONV:
+    IN: %C%=INTEGER(%I%)[0];
+
 SIRLIST:
   CTYPE: igraph_vector_ptr_t
   CALL: &%C%
@@ -1072,3 +1090,8 @@ PAGERANKOPT:
 DEPRECATED:
   HEADER:
   CALL:
+
+LSETYPE:
+  CTYPE: igraph_laplacian_spectral_embedding_type_t
+  INCONV:
+    IN: %C%=(igraph_laplacian_spectral_embedding_type_t) INTEGER(%I%)[0];

@@ -388,7 +388,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
   
   igraph_inclist_t elist_out, elist_in, fathers;
   igraph_inclist_t *elist_out_p, *elist_in_p;
-  igraph_vector_t *neip;
+  igraph_vector_int_t *neip;
   long int neino;
   igraph_vector_t eb;
   long int maxedge, pos;
@@ -512,7 +512,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
           long int actnode=(long int) igraph_dqueue_pop(&q);
           
           neip=igraph_inclist_get(elist_out_p, actnode);
-          neino=igraph_vector_size(neip);
+          neino=igraph_vector_int_size(neip);
           for (i=0; i<neino; i++) {
             igraph_integer_t edge=(igraph_integer_t) VECTOR(*neip)[i], from, to;
             long int neighbor;
@@ -542,7 +542,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
           
           /* set the temporary score of the friends */
           neip=igraph_inclist_get(elist_in_p, actnode);
-          neino=igraph_vector_size(neip);
+          neino=igraph_vector_int_size(neip);
           for (i=0; i<neino; i++) {
             long int edge = (long int) VECTOR(*neip)[i];
             long int neighbor = IGRAPH_OTHER(graph, edge, actnode);
@@ -581,19 +581,19 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
           igraph_stack_push(&stack, minnei);
 
           neip=igraph_inclist_get(elist_out_p, minnei);
-          neino=igraph_vector_size(neip);
+          neino=igraph_vector_int_size(neip);
 
           for (i=0; i<neino; i++) {
-            long int edge=(long int) VECTOR(*neip)[i];
+            long int edge=VECTOR(*neip)[i];
             long int to=IGRAPH_OTHER(graph, edge, minnei);
             igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
             igraph_real_t curdist = distance[to];
-            igraph_vector_t *v;
+            igraph_vector_int_t *v;
 
             if (curdist == 0) {
               /* This is the first finite distance to 'to' */
               v = igraph_inclist_get(&fathers, to);
-              igraph_vector_resize(v, 1);
+              igraph_vector_int_resize(v, 1);
               VECTOR(*v)[0] = edge;
               nrgeo[to] = nrgeo[minnei];
               distance[to] = altdist + 1.0;
@@ -601,7 +601,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
             } else if (altdist < curdist-1) {
               /* This is a shorter path */
               v = igraph_inclist_get(&fathers, to);
-              igraph_vector_resize(v, 1);
+              igraph_vector_int_resize(v, 1);
               VECTOR(*v)[0] = edge;
               nrgeo[to] = nrgeo[minnei];
               distance[to] = altdist + 1.0;
@@ -609,7 +609,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
             } else if (altdist == curdist-1) {
               /* Another path with the same length */
               v = igraph_inclist_get(&fathers, to);
-              igraph_vector_push_back(v, edge);
+              igraph_vector_int_push_back(v, edge);
               nrgeo[to] += nrgeo[minnei];
             }
           }
@@ -617,8 +617,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
         while (!igraph_stack_empty(&stack)) {
           long int w = (long int) igraph_stack_pop(&stack);
-          igraph_vector_t *fatv = igraph_inclist_get(&fathers, w);
-          long int fatv_len = igraph_vector_size(fatv);
+          igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, w);
+          long int fatv_len = igraph_vector_int_size(fatv);
 
           for (i = 0; i < fatv_len; i++) {
             long int fedge = (long int) VECTOR(*fatv)[i];
@@ -630,7 +630,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
           tmpscore[w] = 0;
           distance[w] = 0;
           nrgeo[w] = 0;
-          igraph_vector_clear(fatv);
+          igraph_vector_int_clear(fatv);
         }
       } /* source < no_of_nodes */
     }
@@ -649,16 +649,16 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     igraph_edge(graph, (igraph_integer_t) maxedge, &from, &to);
 
     neip=igraph_inclist_get(elist_in_p, to);
-    neino=igraph_vector_size(neip);
-    igraph_vector_search(neip, 0, maxedge, &pos);
+    neino=igraph_vector_int_size(neip);
+    igraph_vector_int_search(neip, 0, maxedge, &pos);
     VECTOR(*neip)[pos]=VECTOR(*neip)[neino-1];
-    igraph_vector_pop_back(neip);
+    igraph_vector_int_pop_back(neip);
     
     neip=igraph_inclist_get(elist_out_p, from);
-    neino=igraph_vector_size(neip);
-    igraph_vector_search(neip, 0, maxedge, &pos);
+    neino=igraph_vector_int_size(neip);
+    igraph_vector_int_search(neip, 0, maxedge, &pos);
     VECTOR(*neip)[pos]=VECTOR(*neip)[neino-1];
-    igraph_vector_pop_back(neip);
+    igraph_vector_int_pop_back(neip);
   }
 
   IGRAPH_PROGRESS("Edge betweenness community detection: ", 100.0, NULL);
@@ -1273,8 +1273,8 @@ int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
   /* Ax */
   for (j=0; j<size; j++) {
     long int oldid=(long int) VECTOR(*idx)[j];
-    igraph_vector_t *inc=igraph_inclist_get(inclist, oldid);
-    nlen=igraph_vector_size(inc);
+    igraph_vector_int_t *inc=igraph_inclist_get(inclist, oldid);
+    nlen=igraph_vector_int_size(inc);
     to[j]=0.0;
     VECTOR(*tmp)[j]=0.0;
     for (k=0; k<nlen; k++) {
@@ -1337,8 +1337,8 @@ int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
   /* Ax */
   for (j=0; j<size; j++) {
     long int oldid=(long int) VECTOR(*idx)[j];
-    igraph_vector_t *inc=igraph_inclist_get(inclist, oldid);
-    nlen=igraph_vector_size(inc);
+    igraph_vector_int_t *inc=igraph_inclist_get(inclist, oldid);
+    nlen=igraph_vector_int_size(inc);
     to[j]=0.0;
     VECTOR(*tmp)[j]=0.0;
     for (k=0; k<nlen; k++) {
@@ -2236,7 +2236,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     long int v1, num_neis;
     igraph_real_t max_count;
     igraph_vector_int_t *neis;
-    igraph_vector_t *ineis;
+    igraph_vector_int_t *ineis;
     igraph_bool_t was_zero;
 
     running = 0;
@@ -2253,7 +2253,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
       max_count = 0.0;
       if (weights) {
         ineis = igraph_inclist_get(&il, v1);
-        num_neis = igraph_vector_size(ineis);
+        num_neis = igraph_vector_int_size(ineis);
         for (j=0; j<num_neis; j++) {
           k = (long int) VECTOR(*membership)[
 		     (long)IGRAPH_OTHER(graph, VECTOR(*ineis)[j], v1) ];

@@ -56,6 +56,14 @@
 <!-- doxrox-include igraph_cited_type_game -->
 <!-- doxrox-include igraph_citing_cited_type_game -->
 <!-- doxrox-include igraph_sbm_game -->
+<!-- doxrox-include igraph_hsbm_game -->
+<!-- doxrox-include igraph_hsbm_list_game -->
+<!-- doxrox-include igraph_dot_product_game -->
+<!-- doxrox-include igraph_sample_sphere_surface -->
+<!-- doxrox-include igraph_sample_sphere_volume -->
+<!-- doxrox-include igraph_sample_dirichlet -->
+<!-- doxrox-include igraph_correlated_game -->
+<!-- doxrox-include igraph_correlated_pair_game -->
 </section>
 
 </chapter>

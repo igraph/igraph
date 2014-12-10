@@ -83,7 +83,7 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
 
 typedef struct igraph_inclist_t {
   igraph_integer_t length;
-  igraph_vector_t *incs;
+  igraph_vector_int_t *incs;
 } igraph_inclist_t;
 
 int igraph_inclist_init(const igraph_t *graph, 
@@ -101,12 +101,12 @@ int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
  * \define igraph_inclist_get
  * Query a vector in an incidence list
  *
- * Returns a pointer to an <type>igraph_vector_t</type> object from an
+ * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
  * incidence list containing edge ids. The vector can be modified,
  * resized, etc. as desired. 
  * \param graph il The incidence list.
  * \param no The vertex for which the incident edges are returned.
- * \return Pointer to an <type>igraph_vector_t</type> object.
+ * \return Pointer to an <type>igraph_vector_int_t</type> object.
  * 
  * Time complexity: O(1).
  */

@@ -49,6 +49,7 @@
 #define igraphdasum_    dasum_
 #define igraphdtrsm_    dtrsm_
 #define igraphdtrsv_    dtrsv_
+#define igraphdnrm2_    dnrm2_
 #endif
 
 int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
@@ -58,5 +59,7 @@ int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
 int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
     double *alpha, double *a, int *lda, double *b, int *ldb,
     double *beta, double *c__, int *ldc);
+
+double igraphdnrm2_(int *n, double *x, int *incx);
 
 #endif

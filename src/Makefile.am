@@ -317,8 +317,10 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_hrg.h         ../include/igraph_microscopic_update.h \
 		../include/igraph_interrupt.h   ../include/igraph_threading.h \
 		../include/igraph_scg.h		../include/igraph_qsort.h \
-		../include/igraph_matching.h	../include/igraph_graphlets.h \
-		../include/igraph_vector_type.h ../include/igraph_epidemics.h
+		../include/igraph_matching.h	../include/igraph_embedding.h \
+	        ../include/igraph_scan.h        ../include/igraph_graphlets.h \
+		../include/igraph_vector_type.h ../include/igraph_epidemics.h \
+		../include/igraph_lsap.h
 
 SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
@@ -372,10 +374,10 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     scg.c scg_approximate_methods.c scg_exact_scg.c \
 			     scg_kmeans.c scg_utils.c scg_optimal_method.c \
 			     qsort.c qsort_r.c types.c lad.c hacks.c \
-			     triangles.c glet.c maximal_cliques.c sbm.c \
-			     sir.c  prpack.cpp paths.c layout_fr.c \
-			     layout_kk.c $(CHOLMOD) $(AMD) $(COLAMD) \
-			     $(SPCONFIG) layout_gem.c layout_dh.c
+			     embedding.c scan.c triangles.c glet.c \
+			     maximal_cliques.c sbm.c dotproduct.c sir.c \
+			     prpack.cpp $(CHOLMOD) $(AMD) $(COLAMD) \
+			     $(SPCONFIG) layout_gem.c layout_dh.c lsap.c
 
 if INTERNAL_F2C
 else

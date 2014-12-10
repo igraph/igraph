@@ -101,6 +101,7 @@ PyObject* igraphmodule_Graph_Watts_Strogatz(PyTypeObject *type, PyObject *args, 
 
 PyObject* igraphmodule_Graph_is_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_are_connected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_adjacency_spectral_embedding(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_articulation_points(igraphmodule_GraphObject *self);
 PyObject* igraphmodule_Graph_average_path_length(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -114,6 +115,7 @@ PyObject* igraphmodule_Graph_decompose(igraphmodule_GraphObject *self, PyObject 
 PyObject* igraphmodule_Graph_density(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_diameter(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_edge_betweenness(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_eigen_adjacency(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_get_all_shortest_paths(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_maxdegree(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
@@ -128,6 +130,10 @@ PyObject* igraphmodule_Graph_subcomponent(igraphmodule_GraphObject *self, PyObje
 PyObject* igraphmodule_Graph_subgraph(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_transitivity_undirected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_transitivity_local_undirected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+
+PyObject* igraphmodule_Graph_scan1(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_scan1_approx(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
+PyObject* igraphmodule_Graph_scan1_approx_eigen(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_layout_circle(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_layout_sphere(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);

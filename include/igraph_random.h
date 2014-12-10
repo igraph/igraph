@@ -36,10 +36,11 @@
 
 __BEGIN_DECLS
 
-#include "igraph_types.h"
-
 #include <stdlib.h>
 #include <time.h>
+
+#include "igraph_types.h"
+#include "igraph_vector.h"
 
 /* The new RNG interface is (somewhat) modelled based on the GSL */
 
@@ -56,6 +57,8 @@ typedef struct igraph_rng_type_t {
   igraph_real_t (*get_geom)(void *state, igraph_real_t p);
   igraph_real_t (*get_binom)(void *state, long int n, igraph_real_t p);
   igraph_real_t (*get_exp)(void *state, igraph_real_t rate);
+  igraph_real_t (*get_gamma)(void *state, igraph_real_t shape,
+			     igraph_real_t scale);
 } igraph_rng_type_t;
 
 typedef struct igraph_rng_t {
@@ -87,6 +90,11 @@ igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
 igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
 igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
+igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
+				   igraph_real_t scale);
+int igraph_rng_get_dirichlet(igraph_rng_t *rng,
+			     const igraph_vector_t *alpha,
+			     igraph_vector_t *result);
 
 /* --------------------------------- */
 
@@ -106,6 +114,9 @@ void PutRNGstate(void);
 #define RNG_BEGIN()    GetRNGstate()
 #define RNG_END()      PutRNGstate()
 
+double Rf_dnorm4(double x, double mu, double sigma, int give_log);
+#define igraph_dnorm Rf_dnorm4
+
 #else 
 
 #define RNG_BEGIN()      if (igraph_rng_default()->def==1) {	\
@@ -113,6 +124,8 @@ void PutRNGstate(void);
   igraph_rng_default()->def=2;					\
   }
 #define RNG_END()		/* do nothing */
+
+double igraph_dnorm(double x, double mu, double sigma, int give_log);
 
 #endif
 

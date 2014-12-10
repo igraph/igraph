@@ -1,0 +1,36 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+                  "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Scan">
+<title>Local scan statistics of graphs</title>
+
+<para>
+The scan statistic is a summary of the locality statistics
+that is computed from the local neighborhood of each vertex.
+</para>
+
+<section><title>US statistics</title>
+<!-- doxrox-include igraph_local_scan_0 -->
+<!-- doxrox-include igraph_local_scan_1_ecount -->
+<!-- doxrox-include igraph_local_scan_k_ecount -->
+</section>
+
+<section><title>THEM statistics</title>
+<!-- doxrox-include igraph_local_scan_0_them -->
+<!-- doxrox-include igraph_local_scan_1_ecount_them -->
+<!-- doxrox-include igraph_local_scan_k_ecount_them -->
+</section>
+
+<section><title>Pre-calculated neighborhoods</title>
+<!-- doxrox-include igraph_local_scan_neighborhood_ecount -->
+</section>
+
+<section><title>Estimating scan statistics</title>
+<!-- doxrox-include igraph_local_scan_1_ecount_approximate -->
+<!-- doxrox-include igraph_local_scan_1_ecount_approximate_eigen -->
+</section>
+
+</chapter>

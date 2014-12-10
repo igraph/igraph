@@ -117,15 +117,15 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
   const igraph_t *graph=data->graph;
   const igraph_inclist_t *inclist=data->inclist;
   const igraph_vector_t *weights=data->weights;
-  igraph_vector_t *edges;
+  igraph_vector_int_t *edges;
   long int i, j, nlen;
 
   for (i=0; i<n; i++) {
     edges=igraph_inclist_get(inclist, i);
-    nlen=igraph_vector_size(edges);
+    nlen=igraph_vector_int_size(edges);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
-      long int edge=(long int) VECTOR(*edges)[j];
+      long int edge=VECTOR(*edges)[j];
       long int nei=IGRAPH_OTHER(graph, edge, i);
       igraph_real_t w=VECTOR(*weights)[edge];
       to[i] += w * from[nei];
@@ -617,12 +617,12 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
   igraph_vector_t *tmp = data->tmp;
   const igraph_vector_t *weights = data->weights; 
   const igraph_t *g = data->graph;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   long int i, j, nlen;
   
   for (i=0; i<n; i++) {
     neis=igraph_inclist_get(in, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     VECTOR(*tmp)[i]=0.0;
     for (j=0; j<nlen; j++) {
       long int nei_edge = (long int) VECTOR(*neis)[j];
@@ -633,7 +633,7 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
   
   for (i=0; i<n; i++) {
     neis=igraph_inclist_get(out, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
       long int nei_edge=(long int) VECTOR(*neis)[j];
@@ -984,7 +984,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
   igraph_vector_t *reset=data->reset;
   long int i, j, nlen;
   igraph_real_t sumfrom=0.0;
-  igraph_vector_t *neis;
+  igraph_vector_int_t *neis;
   igraph_real_t fact=1-data->damping;
 
   /*
@@ -1000,7 +1000,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
   
   for (i=0; i<n; i++) {
     neis=igraph_inclist_get(inclist, i);
-    nlen=igraph_vector_size(neis);
+    nlen=igraph_vector_int_size(neis);
     to[i]=0.0;
     for (j=0; j<nlen; j++) {
       long int edge=(long int) VECTOR(*neis)[j];
@@ -1634,7 +1634,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
     while (!igraph_2wheap_empty(&Q)) {
       long int minnei=igraph_2wheap_max_index(&Q);
       igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
-      igraph_vector_t *neis;
+      igraph_vector_int_t *neis;
       long int nlen;
       
       igraph_stack_push(&S, minnei);
@@ -1643,7 +1643,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       
       /* Now check all neighbors of 'minnei' for a shorter path */
       neis=igraph_inclist_get(&inclist, minnei);
-      nlen=igraph_vector_size(neis);
+      nlen=igraph_vector_int_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=(long int) VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
@@ -2081,7 +2081,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
     while (!igraph_2wheap_empty(&Q)) {
       long int minnei=igraph_2wheap_max_index(&Q);
       igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
-      igraph_vector_t *neis;
+      igraph_vector_int_t *neis;
       long int nlen;
 
 /*       printf("SP to %li is final, dist: %g, nrgeo: %li\n", minnei, */
@@ -2092,7 +2092,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
       if (cutoff >=0 && VECTOR(distance)[minnei] >= cutoff+1.0) { continue; }
 
       neis=igraph_inclist_get(&inclist, minnei);
-      nlen=igraph_vector_size(neis);
+      nlen=igraph_vector_int_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=(long int) VECTOR(*neis)[j];
 	long int to=IGRAPH_OTHER(graph, edge, minnei);
@@ -2101,26 +2101,26 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	
 	if (curdist==0) {
 	  /* This is the first finite distance to 'to' */
-	  igraph_vector_t *v=igraph_inclist_get(&fathers, to);
+	  igraph_vector_int_t *v=igraph_inclist_get(&fathers, to);
 /* 	  printf("Found first path to %li (from %li)\n", to, minnei); */
-	  igraph_vector_resize(v,1);
+	  igraph_vector_int_resize(v,1);
 	  VECTOR(*v)[0]=edge;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 	  VECTOR(distance)[to]=altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (altdist < curdist-1) {
 	  /* This is a shorter path */
-	  igraph_vector_t *v =igraph_inclist_get(&fathers, to);
+	  igraph_vector_int_t *v =igraph_inclist_get(&fathers, to);
 /* 	  printf("Found a shorter path to %li (from %li)\n", to, minnei); */
-	  igraph_vector_resize(v,1);
+	  igraph_vector_int_resize(v,1);
 	  VECTOR(*v)[0]=edge;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 	  VECTOR(distance)[to] = altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	} else if (altdist == curdist-1) {
-	  igraph_vector_t *v=igraph_inclist_get(&fathers, to);
+	  igraph_vector_int_t *v=igraph_inclist_get(&fathers, to);
 /* 	  printf("Found a second SP to %li (from %li)\n", to, minnei); */
-	  igraph_vector_push_back(v, edge);
+	  igraph_vector_int_push_back(v, edge);
 	  VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
 	}
       }
@@ -2129,8 +2129,8 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 
     while (!igraph_stack_empty(&S)) {
       long int w=(long int) igraph_stack_pop(&S);
-      igraph_vector_t *fatv=igraph_inclist_get(&fathers, w);
-      long int fatv_len=igraph_vector_size(fatv);
+      igraph_vector_int_t *fatv=igraph_inclist_get(&fathers, w);
+      long int fatv_len=igraph_vector_int_size(fatv);
 /*       printf("Popping %li.\n", w); */
       for (j=0; j<fatv_len; j++) {
 	long int fedge=(long int) VECTOR(*fatv)[j];
@@ -2146,7 +2146,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(tmpscore)[w]=0;
       VECTOR(distance)[w]=0;
       VECTOR(nrgeo)[w]=0;
-      igraph_vector_clear(fatv);
+      igraph_vector_int_clear(fatv);
     }
     
   } /* source < no_of_nodes */
@@ -2266,7 +2266,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
 
   igraph_inclist_t elist_out, elist_in;
   igraph_inclist_t *elist_out_p, *elist_in_p;
-  igraph_vector_t *neip;
+  igraph_vector_int_t *neip;
   long int neino;
   long int i;
 
@@ -2336,7 +2336,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
       if (cutoff > 0 && distance[actnode] >= cutoff ) continue;
 
       neip=igraph_inclist_get(elist_out_p, actnode);
-      neino=igraph_vector_size(neip);
+      neino=igraph_vector_int_size(neip);
       for (i=0; i<neino; i++) {
 	igraph_integer_t edge=(igraph_integer_t) VECTOR(*neip)[i], from, to;
 	long int neighbor;
@@ -2366,7 +2366,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
       
       /* set the temporary score of the friends */
       neip=igraph_inclist_get(elist_in_p, actnode);
-      neino=igraph_vector_size(neip);
+      neino=igraph_vector_int_size(neip);
       for (i=0; i<neino; i++) {
 	igraph_integer_t from, to;
 	long int neighbor;

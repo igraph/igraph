@@ -10,7 +10,9 @@ Depends: methods
 Imports: Matrix,
     magrittr,
     lazyeval,
-    printr
+    printr,
+    NMF,
+    irlba
 Suggests: igraphdata, stats4, rgl, tcltk, graph, ape
 License: GPL (>= 2)
 URL: http://igraph.org

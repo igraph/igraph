@@ -56,6 +56,15 @@ void FUNCTION(igraph_matrix,set)(TYPE(igraph_matrix)* m, long int row, long int 
 void FUNCTION(igraph_matrix,null)(TYPE(igraph_matrix) *m);
 void FUNCTION(igraph_matrix,fill)(TYPE(igraph_matrix) *m, BASE e);
 
+/*-----------------------*/
+/* Matrix views          */
+/*-----------------------*/
+
+const TYPE(igraph_matrix) *FUNCTION(igraph_matrix,view)(const TYPE(igraph_matrix) *m,
+							const BASE *data,
+							long int nrow,
+							long int ncol);
+
 /*------------------*/
 /* Copying matrices */
 /*------------------*/

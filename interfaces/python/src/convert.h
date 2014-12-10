@@ -112,6 +112,10 @@ int igraphmodule_PyObject_to_drl_options_t(PyObject *obj,
                   igraph_layout_drl_options_t *options); 
 int igraphmodule_PyObject_to_attribute_combination_t(PyObject* object,
     igraph_attribute_combination_t *type);
+int igraphmodule_PyObject_to_eigen_algorithm_t(PyObject *object,
+																							 igraph_eigen_algorithm_t *a);
+int igraphmodule_PyObject_to_eigen_which_t(PyObject *object,
+																					 igraph_eigen_which_t *w);
 
 /* Conversion from attributes to igraph types */
 

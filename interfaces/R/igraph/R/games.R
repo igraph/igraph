@@ -1280,3 +1280,33 @@ bipartite <- function(...) constructor_spec(sample_bipartite, ...)
 sbm <- function(...) constructor_spec(sample_sbm, ...)
 
 ## -----------------------------------------------------------------
+
+hsbm.game <- function(n, m, rho, C, p) {
+
+  mlen <- length(m)
+  rholen <- if (is.list(rho)) length(rho) else 1
+  Clen <- if (is.list(C)) length(C) else 1
+
+  commonlen <- unique(c(mlen, rholen, Clen))
+
+  if (length(commonlen) == 1 && commonlen == 1) {
+    hsbm.1.game(n, m, rho, C, p)
+  } else {
+    commonlen <- setdiff(commonlen, 1)
+    if (length(commonlen) != 1) {
+      stop("Lengths of `m', `rho' and `C' must match")
+    }
+    m <- rep(m, length.out=commonlen)
+    rho <- if (is.list(rho)) {
+      rep(rho, length.out=commonlen)
+    } else {
+      rep(list(rho), length.out=commonlen)
+    }
+    C <- if (is.list(C)) {
+      rep(C, length.out=commonlen)
+    } else {
+      rep(list(C), length.out=commonlen)
+    }
+    hsbm.list.game(n, m, rho, C, p)
+  }  
+}

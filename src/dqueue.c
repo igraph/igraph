@@ -47,3 +47,9 @@
 #include "dqueue.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_BOOL
+
+#define BASE_INT
+#include "igraph_pmt.h"
+#include "dqueue.pmt"
+#include "igraph_pmt_off.h"
+#undef BASE_INT

@@ -1277,7 +1277,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     igraph_real_t acut;
     long int a, n;
 
-    igraph_vector_t *edges, *edges2;
+    igraph_vector_int_t *edges, *edges2;
     igraph_vector_int_t *neis, *neis2;
    
     do {
@@ -1286,7 +1286,7 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
       /* update the weights of the active vertices connected to a */
       edges=igraph_inclist_get(&inclist, a);
       neis=igraph_adjlist_get(&adjlist, a);
-      n=igraph_vector_size(edges);
+      n=igraph_vector_int_size(edges);
       for (i=0; i<n; i++) {
 	igraph_integer_t edge=(igraph_integer_t) VECTOR(*edges)[i];
 	igraph_integer_t to=(igraph_integer_t) VECTOR(*neis)[i];
@@ -1321,13 +1321,13 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
        last deactivated vertex */
     edges=igraph_inclist_get(&inclist, a);
     neis=igraph_adjlist_get(&adjlist, a);
-    n=igraph_vector_size(edges);
+    n=igraph_vector_int_size(edges);
     for (i=0; i<n; ) {
       if (VECTOR(*neis)[i]==last) {
 	VECTOR(*neis)[i] = VECTOR(*neis)[n-1];
 	VECTOR(*edges)[i] = VECTOR(*edges)[n-1];
 	igraph_vector_int_pop_back(neis);
-	igraph_vector_pop_back(edges);
+	igraph_vector_int_pop_back(edges);
 	n--;
       } else {
 	i++;
@@ -1336,13 +1336,13 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     
     edges=igraph_inclist_get(&inclist, last);
     neis=igraph_adjlist_get(&adjlist, last);
-    n=igraph_vector_size(edges);
+    n=igraph_vector_int_size(edges);
     for (i=0; i<n; ) {
       if (VECTOR(*neis)[i] == a) {
 	VECTOR(*neis)[i] = VECTOR(*neis)[n-1];
 	VECTOR(*edges)[i] = VECTOR(*edges)[n-1];
 	igraph_vector_int_pop_back(neis);
-	igraph_vector_pop_back(edges);
+	igraph_vector_int_pop_back(edges);
 	n--;
       } else {
 	i++;
@@ -1369,9 +1369,9 @@ int igraph_i_mincut_undirected(const igraph_t *graph,
     neis=igraph_adjlist_get(&adjlist, a);
     edges2=igraph_inclist_get(&inclist, last);
     neis2=igraph_adjlist_get(&adjlist, last);
-    IGRAPH_CHECK(igraph_vector_append(edges, edges2));
+    IGRAPH_CHECK(igraph_vector_int_append(edges, edges2));
     IGRAPH_CHECK(igraph_vector_int_append(neis, neis2));
-    igraph_vector_clear(edges2); /* TODO: free it */
+    igraph_vector_int_clear(edges2); /* TODO: free it */
     igraph_vector_int_clear(neis2);	 /* TODO: free it */
 
     /* Remove the deleted vertex from the heap entirely */

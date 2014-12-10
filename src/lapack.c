@@ -922,3 +922,20 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
   
   return 0;
 }
+
+int igraph_lapack_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
+		       igraph_real_t *res) {
+
+  int n=igraph_vector_size(v1);
+  int one=1;
+  
+  if (igraph_vector_size(v2) != n) { 
+    IGRAPH_ERROR("Dot product of vectors with different dimensions",
+		 IGRAPH_EINVAL);
+  }
+
+  *res = igraphddot_(&n, VECTOR(*v1), &one, VECTOR(*v2), &one);
+
+  return 0;
+}
+  
