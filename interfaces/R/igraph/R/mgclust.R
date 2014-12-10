@@ -18,7 +18,7 @@ gclust.rsvt <- function(glist,r=1,maxsvt=10,nmfout=FALSE,maxit=10000,nmfmethod='
 	Xraw = Xorigin 
 	Xorigin = Xorigin %*% solve(diag(colSums(Xorigin)))
 
-	mysvd = tryCatch(irlba(Xorigin,r,r,maxit=maxit), error=function(e) svd(Xorigin,r,r))
+	mysvd = tryCatch(irlba::irlba(Xorigin,r,r,maxit=maxit), error=function(e) svd(Xorigin,r,r))
 	U = mysvd$u[,1:r,drop=FALSE]
 	V = mysvd$v[,1:r,drop=FALSE]
 	if(r == 1) {
@@ -31,7 +31,7 @@ gclust.rsvt <- function(glist,r=1,maxsvt=10,nmfout=FALSE,maxit=10000,nmfmethod='
 	for(itr in 1:maxsvt) {
 	    X = U %*% S %*% t(V)
 	    X[X<0]=0
-	    mysvd = tryCatch(irlba(X,r,r,maxit=maxit), error=function(e) svd(X,r,r))
+	    mysvd = tryCatch(irlbairlba(X,r,r,maxit=maxit), error=function(e) svd(X,r,r))
 	    UU = mysvd$u[,1:r,drop=FALSE]
 	    VV = mysvd$v[,1:r,drop=FALSE]
 	    if(r == 1) {
@@ -53,7 +53,7 @@ gclust.rsvt <- function(glist,r=1,maxsvt=10,nmfout=FALSE,maxit=10000,nmfmethod='
 	    XX =  XX[-stash,]
 	}
 
-	mynmf = nmf(XX,rank=r,method=nmfmethod)
+	mynmf = NMF::nmf(XX,rank=r,method=nmfmethod)
 	WW = matrix(0,nrow=nrow(X),ncol=r)
 	if(length(stash)>0){
 	    WW[-stash,] = basis(mynmf)
@@ -103,7 +103,7 @@ gclust.app <- function(glist, r=1, nmfout=FALSE, maxit=10000, nmfmethod='lee')
 	    XX =  XX[-stash,]
 	}
 
-	mynmf = nmf(XX,rank=r,method=nmfmethod)
+	mynmf = NMF::nmf(XX,rank=r,method=nmfmethod)
 	WW = matrix(0,nrow=nrow(Xraw),ncol=r)
 	if(length(stash)>0){
 	    WW[-stash,] = cbind(basis(mynmf))
