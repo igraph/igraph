@@ -5679,88 +5679,6 @@ PyObject* igraphmodule_Graph_scan1(igraphmodule_GraphObject *self,
   return list;
 }
 
-PyObject* igraphmodule_Graph_scan1_approx(igraphmodule_GraphObject *self,
-                                          PyObject *args, PyObject *kwds) {
-  static char *kwlist[] = { "noevals", "arpack_options", NULL };
-  long int noevals=-1;
-  PyObject *arpack_options_o = igraphmodule_arpack_options_default;
-  PyObject *list = NULL;
-  igraphmodule_ARPACKOptionsObject *arpack_options;
-  igraph_vector_t result;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "l|O!", kwlist, &noevals,
-                                   &igraphmodule_ARPACKOptionsType,
-                                   &arpack_options)) {
-    return NULL;
-  }
-
-  if (igraph_vector_init(&result, 0)) {
-    return igraphmodule_handle_igraph_error();
-  }
-  arpack_options = (igraphmodule_ARPACKOptionsObject*) arpack_options_o;
-
-  if (igraph_scan1_approximate(&self->g, &result, noevals,
-                       igraphmodule_ARPACKOptions_get(arpack_options))) {
-    igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&result);
-    return NULL;
-  }
-
-  list=igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
-
-  igraph_vector_destroy(&result);
-
-  return list;
-}
-
-PyObject* igraphmodule_Graph_scan1_approx_eigen(
-                           igraphmodule_GraphObject *self,
-                           PyObject *args, PyObject *kwds) {
-
-  static char *kwlist[] = { "values", "vectors", NULL };
-  PyObject *values, *vectors;
-  PyObject *list = NULL;
-  igraph_vector_t values0;
-  igraph_matrix_t vectors0;
-  igraph_vector_t result;
-
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "O!O!", kwlist,
-                                   &PyList_Type, &values, &PyList_Type,
-                                   &vectors)) {
-    return NULL;
-  }
-  if (igraphmodule_PyObject_float_to_vector_t(values, &values0)) {
-    return NULL;
-  }
-  if (igraphmodule_PyList_to_matrix_t(vectors, &vectors0)) {
-    igraph_vector_destroy(&values0);
-    return NULL;
-  }
-  if (igraph_vector_init(&result, 0)) {
-    igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&values0);
-    igraph_matrix_destroy(&vectors0);
-  }
-
-  if (igraph_scan1_approximate_eigen(&self->g, &result, &values0,
-                                     &vectors0)) {
-    igraphmodule_handle_igraph_error();
-    igraph_vector_destroy(&values0);
-    igraph_matrix_destroy(&vectors0);
-    igraph_vector_destroy(&result);
-    return NULL;
-  }
-
-  igraph_vector_destroy(&values0);
-  igraph_matrix_destroy(&vectors0);
-
-  list=igraphmodule_vector_t_to_PyList(&result, IGRAPHMODULE_TYPE_FLOAT);
-
-  igraph_vector_destroy(&result);
-
-  return list;
-}
-
 /** \ingroup python_interface_graph
  * \brief Returns a subgraph of the graph based on the given edges
  * \return the subgraph as a new igraph object
@@ -13435,15 +13353,6 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  edges.\n"},
 
 	{"scan1", (PyCFunction) igraphmodule_Graph_scan1,
-	 METH_VARARGS | METH_KEYWORDS,
-	 "" },
-
-	{"scan1_approx", (PyCFunction) igraphmodule_Graph_scan1_approx,
-	 METH_VARARGS | METH_KEYWORDS,
-	 "" },
-
-	{"scan1_approx_eigen",
-	 (PyCFunction) igraphmodule_Graph_scan1_approx_eigen,
 	 METH_VARARGS | METH_KEYWORDS,
 	 "" },
 

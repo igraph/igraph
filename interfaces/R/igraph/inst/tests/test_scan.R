@@ -138,30 +138,6 @@ test_that("General scan-stat works, US, scan-1, weighted, directed", {
 ## US, scan-2, unweighted, directed
 ## TODO
 
-test_that("Local scan-1 approximations work", {
-  
-  set.seed(42)
-
-  for (i in 1:100) {
-
-    g <- erdos.renyi.game(100, 10/100)
-    
-    s1 <- local.scan(g)
-    s1a <- local.scan1.ecount.approx(g, 20)$res
-    expect_that(cor(s1, s1a) > 0.95, is_true())
-
-    E <- graph.eigen(g, which=list(howmany=20, pos="LM"))
-    s1aa <- local.scan1.ecount.approx.eigen(g, E$values, E$vectors)
-    expect_that(cor(s1, s1aa) > 0.95, is_true())
-
-    E2 <- eigen(get.adjacency(g, sparse=FALSE))
-    s1aaa <- colSums(E2$values ^3 * t(E2$vectors)^2 / 2) + degree(g)
-    expect_that(s1aaa, equals(s1))
-
-  }
-
-})
-
 test_that("Issue 18 is resolved", {
 
   library(igraph)

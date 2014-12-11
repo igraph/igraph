@@ -132,8 +132,6 @@ PyObject* igraphmodule_Graph_transitivity_undirected(igraphmodule_GraphObject *s
 PyObject* igraphmodule_Graph_transitivity_local_undirected(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_scan1(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_scan1_approx(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
-PyObject* igraphmodule_Graph_scan1_approx_eigen(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 
 PyObject* igraphmodule_Graph_layout_circle(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
 PyObject* igraphmodule_Graph_layout_sphere(igraphmodule_GraphObject *self, PyObject *args, PyObject *kwds);
