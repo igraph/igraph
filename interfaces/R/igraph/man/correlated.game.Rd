@@ -1,6 +1,6 @@
-\name{correlated.game}
-\alias{correlated.game}
-\alias{correlated.pair.game}
+\name{sample_correlated_gnp}
+\alias{sample_correlated_gnp}
+\alias{sample_correlated_gnp_pair}
 \concept{Correlated Graph Pair model}
 \concept{Random graph model}
 \title{Generate a new random graph from a given graph by randomly
@@ -8,8 +8,8 @@
 \description{Sample a new graph by perturbing the adjacency matrix of a
   given graph and shuffling its vertices.}
 \usage{
-correlated.game (old.graph, corr, p = old.graph$p, permutation = NULL) 
-correlated.pair.game (n, corr, p, directed = FALSE, permutation = NULL)
+sample_correlated_gnp (old.graph, corr, p = old.graph$p, permutation = NULL) 
+sample_correlated_gnp_pair (n, corr, p, directed = FALSE, permutation = NULL)
 }
 \arguments{
   \item{old.graph}{The original graph.}
@@ -29,13 +29,13 @@ correlated.pair.game (n, corr, p, directed = FALSE, permutation = NULL)
   Please see the reference given below.
 }
 \value{
-  \code{correlated.game} generates an unweighted graph  of the same size as 
+  \code{sample_correlated_gnp} generates an unweighted graph  of the same size as 
   \code{old.graph} such that the correlation coefficient between the entries
   of the two adjacency matrices is \code{corr}. 
   Note  each pair of corresponding matrix entries is a pair of  
   correlated Bernoulli random variables.
   
-  \code{correlated.pair.game} generates a list of two igraph objects, 
+  \code{sample_correlated_gnp_pair} generates a list of two igraph objects, 
   named \code{graph1} and \code{graph2}, which are two graphs 
   whose adjacency matrix entries are correlated with \code{corr}.
   
@@ -48,12 +48,12 @@ correlated.pair.game (n, corr, p, directed = FALSE, permutation = NULL)
 \seealso{\code{\link{erdos.renyi.game}}}
 \examples{
 g <- erdos.renyi.game(1000, .1)
-g2 <- correlated.game(g, corr=0.5)
+g2 <- sample_correlated_gnp(g, corr=0.5)
 cor(as.vector(g[]), as.vector(g2[]))
 g
 g2
 
-gg <- correlated.pair.game(n=10, corr=.8, p=.5, directed=FALSE)
+gg <- sample_correlated_gnp_pair(n=10, corr=.8, p=.5, directed=FALSE)
 gg
 }
 \keyword{graphs,random graphs}

@@ -14,7 +14,7 @@ solve_LSAP <- function (x, maximum = FALSE) {
   out[seq_len(nr)]
 }
 
-sgm <- function(A, B, m, start, iteration) {
+match_vertices <- function(A, B, m, start, iteration) {
   ## Seeds are assumed to be vertices 1:m in both graphs
   totv <- ncol(A)
   n <- totv - m

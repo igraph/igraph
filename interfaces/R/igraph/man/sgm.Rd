@@ -1,5 +1,5 @@
-\name{sgm}
-\alias{sgm}
+\name{match_vertices}
+\alias{match_vertices}
 \alias{seeded.graph.match}
 \concept{Seeded Graph Matching}
 \title{Match Graphs given a seeding of vertex correspondences}
@@ -8,7 +8,7 @@ match the two graphs with the help of \code{m} seed vertex pairs which correspon
 to the first \code{m} rows (and columns) of the adjacency matrices. }
 
 \usage{
-sgm(A, B, m, start, iteration)
+match_vertices(A, B, m, start, iteration)
 }
 \arguments{
   \item{A}{a numeric matrix, the adjacency matrix of the first graph}
@@ -33,7 +33,7 @@ both  of size \eqn{n\times n}{n*n}, the first \eqn{m} rows(and columns) of
 the \eqn{n \times n}{n*n} permutation matrix that defines the bijection 
 is \eqn{I_{m} \bigoplus  P} for a \eqn{(n-m)\times  (n-m)}{(n-m)*(n-m)} 
 permutation matrix \eqn{P} and \eqn{m} times \eqn{m} identity matrix \eqn{I_{m}}.
-The function  \code{sgm} estimates the permutation matrix \eqn{P} via 
+The function  \code{match_vertices} estimates the permutation matrix \eqn{P} via 
 an optimization algorithm  based on the Frank-Wolfe algorithm.
 
 See references for further details.
@@ -51,15 +51,15 @@ Fishkind, D. E., Adali, S., Priebe, C. E. (2012). Seeded Graph Matching
 Online:  \url{http://arxiv.org/abs/1209.0367}
 }
 \author{Vince Lyzinski \url{http://www.ams.jhu.edu/~lyzinski/}}
-\seealso{\code{\link{correlated.game}},\code{\link{correlated.pair.game}}}
+\seealso{\code{\link{sample_correlated_gnp}},\code{\link{sample_correlated_gnp_pair}}}
 \examples{
  #require(Matrix)
  g1 <- erdos.renyi.game(10, .1)
  randperm <- c(1:3, 3+sample(7))
- g2 <- correlated.game(g1, corr=1, p=g1$p, perm=randperm)
+ g2 <- sample_correlated_gnp(g1, corr=1, p=g1$p, perm=randperm)
  A  <- as.matrix(get.adjacency(g1))
  B  <- as.matrix(get.adjacency(g2))
- P  <-sgm (A, B, m=3, start=diag(rep(1, nrow(A)-3)), 20)
+ P  <-match_vertices (A, B, m=3, start=diag(rep(1, nrow(A)-3)), 20)
  P
  }
 \keyword{graphs}

@@ -1,10 +1,10 @@
-\name{laplacian.spectral.embedding}
-\alias{laplacian.spectral.embedding}
+\name{embed_laplacian_matrix}
+\alias{embed_laplacian_matrix}
 \title{Spectral Embedding of the Laplacian of a Graph}
 \description{Spectral decomposition of Laplacian matrices of
   graphs.}
 \usage{
-laplacian.spectral.embedding (graph, no, weights = NULL,
+embed_laplacian_matrix (graph, no, weights = NULL,
     which = c("lm", "la", "sa"), degmode = c("out", "in", "all", "total"),
     type = c("default", "D-A", "DAD", "I-DAD", "OAP"), scaled = TRUE,
     options = igraph.arpack.default)
@@ -60,7 +60,7 @@ laplacian.spectral.embedding (graph, no, weights = NULL,
   decomposition of the Laplacian matrix.
 
   They are essentially doing the same as
-  \code{\link{adjacency.spectral.embedding}}, but work on the Laplacian
+  \code{\link{embed_adjacency_matrix}}, but work on the Laplacian
   matrix, instead of the adjacency matrix.
 }
 \value{
@@ -81,13 +81,13 @@ laplacian.spectral.embedding (graph, no, weights = NULL,
   Vol. 107(499), 2012
 }
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
-\seealso{\code{\link{adjacency.spectral.embedding}},
-  \code{\link{dot.product.game}}}
+\seealso{\code{\link{embed_adjacency_matrix}},
+  \code{\link{sample_dot_product}}}
 \examples{
 ## A small graph
 lpvs <- matrix(rnorm(200), 20, 10)
 lpvs <- apply(lpvs, 2, function(x) { return (abs(x)/sqrt(sum(x^2))) })
-RDP <- dot.product.game(lpvs)
-embed <- laplacian.spectral.embedding(RDP, 5)
+RDP <- sample_dot_product(lpvs)
+embed <- embed_laplacian_matrix(RDP, 5)
 }
 \keyword{graphs}

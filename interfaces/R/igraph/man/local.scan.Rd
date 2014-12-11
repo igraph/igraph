@@ -103,7 +103,7 @@ local.scan1.ecount.approx.eigen (graph, values, vectors)
 \author{Gabor Csardi \email{csardi.gabor@gmail.com}}
 \examples{
 
-Graph.pair <- correlated.pair.game(n=10^3, corr=0.8, p=0.1)
+Graph.pair <- sample_correlated_gnp_pair(n=10^3, corr=0.8, p=0.1)
 local.0.us <- local.scan(graph.us=Graph.pair$graph1, k=0)
 local.1.us <- local.scan(graph.us=Graph.pair$graph1, k=1)
 

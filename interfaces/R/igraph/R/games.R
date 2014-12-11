@@ -1281,7 +1281,9 @@ sbm <- function(...) constructor_spec(sample_sbm, ...)
 
 ## -----------------------------------------------------------------
 
-hsbm.game <- function(n, m, rho, C, p) {
+#' @export
+
+sample_hierarchical_sbm <- function(n, m, rho, C, p) {
 
   mlen <- length(m)
   rholen <- if (is.list(rho)) length(rho) else 1
@@ -1310,3 +1312,14 @@ hsbm.game <- function(n, m, rho, C, p) {
     hsbm.list.game(n, m, rho, C, p)
   }  
 }
+
+#' @export
+
+hierarchical_sbm <- function(...)
+  constructor_spec(sample_hierarchical_sbm, ...)
+
+## -----------------------------------------------------------------
+
+#' @export
+
+dot_product <- function(...) constructor_spec(sample_dot_product, ...)

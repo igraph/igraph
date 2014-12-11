@@ -1,12 +1,14 @@
-\name{hsbm.game}
-\alias{hsbm.game}
+\name{sample_hierarchical_sbm}
+\alias{sample_hierarchical_sbm}
+\alias{hierarchical_sbm}
 \concept{Stochastic block model}
 \concept{Random graph model}
 \title{Sample the hierarchical stochastic block model}
 \description{Sampling from a hierarchical stochastic block model of
   networks.}
 \usage{
-hsbm.game (n, m, rho, C, p)
+sample_hierarchical_sbm (n, m, rho, C, p)
+hierarchical_sbm (...)
 }
 \arguments{
   \item{n}{Integer scalar, the number of vertices.}
@@ -23,6 +25,7 @@ hsbm.game (n, m, rho, C, p)
     the Bernoulli rates differ in different blocks.}
   \item{p}{Numeric scalar, the Bernoulli rate of connections between
     vertices in different blocks.}
+  \item{\dots}{Passed to \code{sample_hierarchical_sbm}.}
 }
 \details{
   The function generates a random graph according to the hierarchical
@@ -39,7 +42,7 @@ hsbm.game (n, m, rho, C, p)
 C <- matrix(c(1  , 3/4,   0,
               3/4,   0, 3/4,
               0  , 3/4, 3/4), nrow=3)
-g <- hsbm.game(100, 10, rho=c(3, 3, 4)/10, C=C, p=1/20)
+g <- sample_hierarchical_sbm(100, 10, rho=c(3, 3, 4)/10, C=C, p=1/20)
 g
 if (require(Matrix)) { image(g[]) }
 }

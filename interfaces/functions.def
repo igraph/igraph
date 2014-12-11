@@ -339,7 +339,7 @@ igraph_hsbm_list_game:
 igraph_correlated_game:
         PARAMS: GRAPH old_graph, OUT GRAPH new_graph, \
                 REAL corr, REAL p=old.graph$p, VECTORM1_OR_0 permutation=NULL
-        NAME-R: correlated.game
+        NAME-R: sample_correlated_gnp
         GATTR-R: name IS Correlated random graph
         GATTR-PARAM-R: corr, p
         DEFAULT-R: p=old.graph$p
@@ -348,25 +348,25 @@ igraph_correlated_pair_game:
         PARAMS: OUT GRAPH graph1, OUT GRAPH graph2, INT n, REAL corr, \
                 REAL p, BOOLEAN directed=False, \
                 VECTORM1_OR_0 permutation=NULL
-        NAME-R: correlated.pair.game
+        NAME-R: sample_correlated_gnp_pair
 
 igraph_dot_product_game:
         PARAMS: OUT GRAPH graph, MATRIX vecs, BOOLEAN directed=False
-        NAME-R: dot.product.game
+        NAME-R: sample_dot_product
 
 igraph_sample_sphere_surface:
         PARAMS: INTEGER dim, INTEGER n=1, REAL radius=1, \
                 BOOLEAN positive=True, OUT MATRIX res
-        NAME-R: sample.sphere.surface
+        NAME-R: sample_sphere_surface
 
 igraph_sample_sphere_volume:
         PARAMS: INTEGER dim, INTEGER n=1, REAL radius=1, \
                 BOOLEAN positive=True, OUT MATRIX res
-        NAME-R: sample.sphere.volume
+        NAME-R: sample_sphere_volume
 
 igraph_sample_dirichlet:
         PARAMS: INTEGER n, VECTOR alpha, OUT MATRIX res
-        NAME-R: sample.dirichlet
+        NAME-R: sample_dirichlet
 
 #######################################
 # Basic query functions
@@ -2018,7 +2018,7 @@ igraph_adjacency_spectral_embedding:
                OUT MATRIX_OR_0 Y, OUT VECTOR_OR_0 D, \
                VECTOR cvec=AsmDefaultCvec, \
                INOUT ARPACKOPT options=igraph.arpack.default
-       NAME-R: adjacency.spectral.embedding
+       NAME-R: embed_adjacency_matrix
        DEPS: weights ON graph, cvec ON graph
        IGNORE: RC
 
@@ -2028,7 +2028,7 @@ igraph_laplacian_spectral_embedding:
                LSETYPE type=Default, BOOLEAN scaled=True, OUT MATRIX X, \
                OUT MATRIX_OR_0 Y, OUT VECTOR_OR_0 D, \
                INOUT ARPACKOPT options=igraph.arpack.default
-       NAME-R: laplacian.spectral.embedding
+       NAME-R: embed_laplacian_matrix
        DEPS: weights ON graph, type ON graph
        IGNORE: RC
 
@@ -2082,7 +2082,7 @@ igraph_convex_hull:
 
 igraph_dim_select:
         PARAMS: VECTOR sv, OUT INTEGERPTR dim
-        NAME-R: dimSelect
+        NAME-R: dim_select
 
 #######################################
 # Other, (yet) undocumented functions

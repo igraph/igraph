@@ -1,10 +1,10 @@
-\name{adjacency.spectral.embedding}
-\alias{adjacency.spectral.embedding}
+\name{embed_adjacency_matrix}
+\alias{embed_adjacency_matrix}
 \title{Spectral Embedding of Adjacency Matrices}
 \description{Spectral decomposition of the adjacency matrices of
   graphs.}
 \usage{
-adjacency.spectral.embedding (graph, no, weights=NULL,
+embed_adjacency_matrix (graph, no, weights=NULL,
     which=c("lm", "la", "sa"), scaled = TRUE,
     cvec=graph.strength(graph)/(vcount(graph) - 1),
     options = igraph.arpack.default)
@@ -72,12 +72,12 @@ adjacency.spectral.embedding (graph, no, weights=NULL,
   Vol. 107(499), 2012
 }
 \author{ Gabor Csardi \email{csardi.gabor@gmail.com} }
-\seealso{\code{\link{dot.product.game}}}
+\seealso{\code{\link{sample_dot_product}}}
 \examples{
 ## A small graph
 lpvs <- matrix(rnorm(200), 20, 10)
 lpvs <- apply(lpvs, 2, function(x) { return (abs(x)/sqrt(sum(x^2))) })
-RDP <- dot.product.game(lpvs)
-embed <- adjacency.spectral.embedding(RDP, 5)
+RDP <- sample_dot_product(lpvs)
+embed <- embed_adjacency_matrix(RDP, 5)
 }
 \keyword{graphs}
