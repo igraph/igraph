@@ -1,13 +1,13 @@
-\name{local.scan}
-\alias{local.scan}
+\name{local_scan}
+\alias{local_scan}
 \concept{Scan Statistics on Graphs}
 \title{Compute local scan statistics on graphs}
 \description{The scan statistic is a summary of the locality statistics
   that is computed from the local neighborhood of each vertex. The
-  \code{local.scan} function computes the local statistics for each
+  \code{local_scan} function computes the local statistics for each
   vertex for a given neighborhood size and the statistic function.}
 \usage{
-local.scan (graph.us, graph.them = NULL, k = 1, FUN = NULL,
+local_scan (graph.us, graph.them = NULL, k = 1, FUN = NULL,
     weighted = FALSE, mode = c("out", "in", "all"),
     neighborhoods = NULL, ...)
 }
@@ -53,16 +53,16 @@ local.scan (graph.us, graph.them = NULL, k = 1, FUN = NULL,
   See the given reference below for the details on the local scan
   statistics.
 
-  \code{local.scan} calculates exact local scan statistics.
+  \code{local_scan} calculates exact local scan statistics.
   
-  If \code{graph.them} is \code{NULL}, then \code{local.scan} computes
+  If \code{graph.them} is \code{NULL}, then \code{local_scan} computes
   the \sQuote{us} variant of the scan statistics.
   Otherwise, \code{graph.them} should be an igraph object and the
   \sQuote{them} variant is computed using \code{graph.us} to extract
   the neighborhood information, and applying \code{FUN} on these
   neighborhoods in \code{graph.them}.
 }
-\value{For \code{local.scan} typically a numeric vector containing the
+\value{For \code{local_scan} typically a numeric vector containing the
   computed local statistics for each vertex. In general a list or vector
   of objects, as returned by \code{FUN}.
 }
@@ -74,16 +74,16 @@ local.scan (graph.us, graph.them = NULL, k = 1, FUN = NULL,
 \examples{
 
 Graph.pair <- sample_correlated_gnp_pair(n=10^3, corr=0.8, p=0.1)
-local.0.us <- local.scan(graph.us=Graph.pair$graph1, k=0)
-local.1.us <- local.scan(graph.us=Graph.pair$graph1, k=1)
+local.0.us <- local_scan(graph.us=Graph.pair$graph1, k=0)
+local.1.us <- local_scan(graph.us=Graph.pair$graph1, k=1)
 
-local.0.them <- local.scan(graph.us=Graph.pair$graph1,
+local.0.them <- local_scan(graph.us=Graph.pair$graph1,
                            graph.them=Graph.pair$graph2, k=0)
-local.1.them <- local.scan(graph.us=Graph.pair$graph1,
+local.1.them <- local_scan(graph.us=Graph.pair$graph1,
                            graph.them=Graph.pair$graph2, k=1)
 
 Neigh.1 <- neighborhood(Graph.pair$graph1, order=1)
-local.1.them.nhood <- local.scan(graph.us=Graph.pair$graph1,
+local.1.them.nhood <- local_scan(graph.us=Graph.pair$graph1,
                                  graph.them=Graph.pair$graph2,
                                  neighborhoods=Neigh.1)
 }
