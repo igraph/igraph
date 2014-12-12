@@ -117,6 +117,8 @@ layout_ <- function(graph, layout, ...) {
 #'
 #' @param graph The input graph.
 #' @param ... Additional arguments are passed to \code{\link{layout_}}.
+#' @param overwrite Whether to overwrite the layout of the graph,
+#'    if it already has one.
 #' @return The input graph, with the layout added.
 #'
 #' @seealso \code{\link{layout_}} for a description of the layout API.
@@ -126,7 +128,10 @@ layout_ <- function(graph, layout, ...) {
 #'   add_layout_(as_star(), component_wise()) %>%
 #'   plot()
 
-add_layout_ <- function(graph, ...) {
+add_layout_ <- function(graph, ..., overwrite = TRUE) {
+  if (overwrite && 'layout' %in% graph_attr_names(graph)) {
+    graph <- delete_graph_attr(graph, 'layout')
+  }
   graph$layout <- layout_(graph, ...)
   graph
 }
