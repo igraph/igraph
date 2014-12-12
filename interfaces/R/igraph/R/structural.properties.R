@@ -2693,6 +2693,8 @@ max_bipartite_match <- function(graph, types=NULL, weights=NULL,
   res
 }
 
+#' @export
+
 local_scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
                        weighted=FALSE, mode=c("out", "in", "all"),
                        neighborhoods=NULL, ...) {
