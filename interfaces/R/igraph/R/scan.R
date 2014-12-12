@@ -165,5 +165,11 @@ local_scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
     }
   }
 
-  as.numeric(res)
+  res <- as.numeric(res)
+
+  if (igraph_opt("add.vertex.names") && is_named(graph.us)) {
+    names(res) <- V(graph.us)$name
+  }
+
+  res
 }
