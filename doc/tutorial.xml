@@ -64,7 +64,7 @@ following <option>-L</option> should contain the
 library file itself, usually a file called
 <filename>libigraph.so</filename>, <filename>libigraph.a</filename> or
 <filename>igraph.dll</filename>. 
-It your system has the <command>pkg-config</command> utility you are
+If your system has the <command>pkg-config</command> utility you are
 likely to get the neccessary compile options by issuing the command
 <programlisting>
 pkg-config --libs --cflags igraph
@@ -79,7 +79,7 @@ The executable can be run by simply typing its name like this:
 on most systems. If you use dynamic linking and the <command>igraph</command>
 libraries are not at a standard place, you may need to set the
 <envar>LD_LIBRARY_PATH</envar> variable, the syntax depends on the
-shell use are using. In <command>bash</command> it goes like this:
+shell you are using. In <command>bash</command> it goes like this:
 <programlisting>
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/libs/igraph
 ./igraph_test
