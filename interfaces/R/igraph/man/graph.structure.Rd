@@ -12,6 +12,7 @@
 \alias{[<-.igraph}
 \alias{+.igraph}
 \alias{-.igraph}
+\alias{*.igraph}
 \alias{edge}
 \alias{edges}
 \alias{vertex}
@@ -31,6 +32,7 @@
 
 \method{+}{igraph}(e1, e2)
 \method{-}{igraph}(e1, e2)
+\method{*}{igraph}(e1, e2)
 vertex(\dots)
 vertices(\dots)
 edge(\dots)
@@ -99,6 +101,10 @@ delete_vertices(graph, v)
   form is sometimes more readable, and is usually the best if the user 
   also wants to add attributes, together with the new vertices/edges.
   Please see the details below.
+
+  The product operator (\sQuote{\code{*}}) can be used to create bigger
+  graphs from patterns. It creates a graph that contains the \code{e1}
+  pattern graph \code{e2} times, as \code{e1} unconnected components.
 
   In addition, the four functions, \code{add_vertices}, \code{add_edges},
   \code{delete_vertices} and \code{delete_edges} can also be used

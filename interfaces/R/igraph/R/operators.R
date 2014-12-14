@@ -857,3 +857,24 @@ path <- function(...) {
   }
   res
 }
+
+#' @method "*" igraph
+#' @export
+
+`*.igraph` <- function(e1, e2) {
+
+  if (!is_igraph(e1) && is_igraph(e2)) {
+    tmp <- e1
+    e1 <- e2
+    e2 <- tmp
+  }
+
+  if (is.numeric(e2) && length(e2) == 1) {
+    if (e2 < 0) stop("Number of replications must be positive")
+    do_call(disjoint_union, .args = replicate(e2, e1, simplify = FALSE))
+
+  } else {
+    stop("Cannot multiply igraph graph with this type")
+  }
+
+}
