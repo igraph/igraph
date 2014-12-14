@@ -47,7 +47,8 @@ karate
 
   Graph attributes: \sQuote{name}, \sQuote{Citation}, \sQuote{Author}.
 
-  Vertex attributes: \sQuote{name}, \sQuote{Faction}.
+  Vertex attributes: \sQuote{name}, \sQuote{Faction}, \sQuote{color} is
+  the same as \sQuote{Faction}, \sQuote{label} are short labels for plotting.
 
   Edge attribute: \sQuote{weight}.
 }
