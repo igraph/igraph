@@ -858,23 +858,51 @@ path <- function(...) {
   res
 }
 
+#' Replicate a graph multiple times
+#'
+#' The new graph will contain the input graph the given number
+#' of times, as unconnected components.
+#'
+#' @param graph The input graph.
+#' @param n Number of times to replicate it.
+#' @param mark Whether to mark the vertices with a \code{which} attribute,
+#'   an integer number denoting which replication the vertex is coming
+#'   from.
+#'
+#' @method rep igraph
+#' @export
+#'
+#' @examples
+#' rings <- make_ring(5) * 5
+
+rep.igraph <- function(graph, n, mark = TRUE) {
+
+  if (n < 0) stop("Number of replications must be positive")
+
+  res <- do_call(disjoint_union, .args =
+                   replicate(n, graph, simplify = FALSE))
+
+  if (mark) V(res)$which <- rep(seq_len(n), each = gorder(graph))
+
+  res
+}
+
+#' @rdname rep.igraph
 #' @method "*" igraph
 #' @export
 
-`*.igraph` <- function(e1, e2) {
+`*.igraph` <- function(graph, n) {
 
-  if (!is_igraph(e1) && is_igraph(e2)) {
-    tmp <- e1
-    e1 <- e2
-    e2 <- tmp
+  if (!is_igraph(graph) && is_igraph(n)) {
+    tmp <- graph
+    graph <- n
+    n <- tmp
   }
 
-  if (is.numeric(e2) && length(e2) == 1) {
-    if (e2 < 0) stop("Number of replications must be positive")
-    do_call(disjoint_union, .args = replicate(e2, e1, simplify = FALSE))
+  if (is.numeric(n) && length(n) == 1) {
+    rep.igraph(graph, n)
 
   } else {
     stop("Cannot multiply igraph graph with this type")
   }
-
 }
