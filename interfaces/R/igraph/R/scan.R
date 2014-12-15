@@ -266,11 +266,15 @@ local_scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
 #' @param ell The number of previous time steps to consider
 #'   for the aggregated scan statistics. This is essentially a smoothing
 #'   parameter.
-#' @param locality Whether to calculate the \sWuote{us} or \sQuote{them}
+#' @param locality Whether to calculate the \sQuote{us} or \sQuote{them}
 #'   statistics.
 #' @param ... Extra arguments are passed to \code{\link{local_scan}}.
 #' @return A list with entries:
-#'   \item{stat}
+#'   \item{stat} The scan statistics in each time step. It is \code{NA}
+#'     for the initial \code{tau + ell} time steps.
+#'   \item{arg_max_v} The (numeric) vertex ids for the vertex with
+#'     the largest locality statistics, at each time step. It is \code{NA}
+#'     for the initial \code{tau + ell} time steps.
 #'
 #' @family scan statistics
 #' @export
@@ -398,10 +402,10 @@ scan_temp_norm <- function (stat, tau, ell) {
   argmaxV <- apply(stat, 2, which.max)
 
   if (ell == 0) {
-    list(stat = Mtilde, arg_max_v = argmaxV)
+    res <- list(stat = Mtilde, arg_max_v = argmaxV)
 
   } else if(ell ==1 ) {
-    list(stat = Mtilde - c(0, Mtilde[-maxTime]), arg_max_v = argmaxV)
+    res <- list(stat = Mtilde - c(NA, Mtilde[-maxTime]), arg_max_v = argmaxV)
 
   } else {
     muMtilde <- rep(0, maxTime)
@@ -411,8 +415,10 @@ scan_temp_norm <- function (stat, tau, ell) {
       sdMtilde[i] <- sd(Mtilde[(i - ell):(i - 1)])
     }
     sstat <- (Mtilde - muMtilde) / pmax(sdMtilde, 1)
-    sstat[1:(tau + ell)] <- 0
-    argmaxV[1:(tau + ell)] <- NA
-    list(stat = sstat, arg_max_v = argmaxV)
+    res <- list(stat = sstat, arg_max_v = argmaxV)
   }
+
+  res$stat[seq_len(tau + ell)] <- NA
+  res$arg_max_v[seq_len(tau + ell)] <- NA
+  res
 }
