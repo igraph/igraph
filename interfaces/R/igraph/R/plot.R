@@ -130,6 +130,12 @@ plot.igraph <- function(x,
   xlab               <- params("plot", "xlab")
   ylab               <- params("plot", "ylab")
 
+  palette            <- params("plot", "palette")
+  if (!is.null(palette)) {
+    old_palette <- palette(palette)
+    on.exit(palette(old_palette), add = TRUE)
+  }
+
   # the new style parameters can't do this yet
   arrow.mode         <- i.get.arrow.mode(graph, arrow.mode)
 

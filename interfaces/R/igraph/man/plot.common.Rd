@@ -109,11 +109,16 @@
     \item{color}{The fill color of the vertex. If it is numeric then
       the current palette is used, see
       \code{\link[grDevices]{palette}}. If it is a character vector then
-      it may either contain named colors or RGB specified colors with
-      three or four bytes. All strings starting with \sQuote{\code{#}}
-      are assumed to be RGB color specifications. It is possible to mix
-      named color and RGB colors. Note that \code{\link{tkplot}} ignores
-      the fourth byte (alpha channel) in the RGB color specification.
+      it may either contain integer values, named colors or RGB
+      specified colors with three or four bytes. All strings starting
+      with \sQuote{\code{#}} are assumed to be RGB color
+      specifications. It is possible to mix named color and RGB
+      colors. Note that \code{\link{tkplot}} ignores the fourth byte
+      (alpha channel) in the RGB color specification.
+
+      For \code{plot.igraph} and integer values, the default igraph
+      palette is used (see the \sQuote{palette} parameter below. Note
+      that this is different from the R palette.
 
       If you don't want (some) vertices to have any color, supply
       \code{NA} as the color name.
@@ -394,6 +399,12 @@
       zoom in and out the graph in a more flexible way.
       
       Its default value is 0.
+    }
+    \item{palette}{The color palette to use for vertex color.
+      The default is \code{\link{categorical_pal}}, which is a
+      color-blind friendly categorical palette. See its manual page
+      for details and other palettes. This parameters is only supported
+      by \code{plot}, and not by \code{tkplot} and \code{rglplot}.
     }
     \item{rescale}{Logical constant, whether to rescale the coordinates
       to the [-1,1]x[-1,1](x[-1,1]) interval. This parameter is not

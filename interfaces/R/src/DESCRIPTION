@@ -13,7 +13,7 @@ Imports: Matrix,
     printr,
     NMF,
     irlba
-Suggests: igraphdata, stats4, rgl, tcltk, graph, ape
+Suggests: igraphdata, stats4, rgl, tcltk, graph, ape, scales
 License: GPL (>= 2)
 URL: http://igraph.org
 SystemRequirements: gmp, libxml2

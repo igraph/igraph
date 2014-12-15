@@ -936,7 +936,9 @@ structure(c(16777215L, 16777215L, 16777215L, 16777215L, 16777215L,
 16777215L, 16777215L, 16777215L, 16777215L, 16777215L, 16777215L, 
 16777215L, 16777215L, 16777215L), .Dim = c(64L, 64L), class = "nativeRaster", channels = 4L)
 
-i.vertex.default <- list(color="SkyBlue2",
+#' @include palette.R
+
+i.vertex.default <- list(color=1,
                          size=15,
                          size2=15,
                          label=i.get.labels,
@@ -975,7 +977,8 @@ i.edge.default <- list(color="darkgrey",
                        curved=curve_multiple,
                        arrow.width=1)
 
-i.plot.default <- list(layout=layout_nicely,
+i.plot.default <- list(palette=categorical_pal(8),
+                       layout=layout_nicely,
                        margin=c(0,0,0,0),
                        rescale=TRUE,
                        asp=1,
