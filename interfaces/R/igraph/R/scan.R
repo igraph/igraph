@@ -21,7 +21,81 @@
 ##
 ## -----------------------------------------------------------------------
 
+#' Compute local scan statistics on graphs
+#'
+#' The scan statistic is a summary of the locality statistics that is
+#' computed from the local neighborhood of each vertex. The
+#' \code{local_scan} function computes the local statistics for each vertex
+#' for a given neighborhood size and the statistic function.
+#'
+#' See the given reference below for the details on the local scan
+#' statistics.
+#'
+#' \code{local_scan} calculates exact local scan statistics.
+#'
+#' If \code{graph.them} is \code{NULL}, then \code{local_scan} computes the
+#' \sQuote{us} variant of the scan statistics.  Otherwise,
+#' \code{graph.them} should be an igraph object and the \sQuote{them}
+#' variant is computed using \code{graph.us} to extract the neighborhood
+#' information, and applying \code{FUN} on these neighborhoods in
+#' \code{graph.them}.
+#'
+#' @param graph.us,graph An igraph object, the graph for which the scan
+#'   statistics will be computed
+#' @param graph.them An igraph object or \code{NULL}, if not \code{NULL},
+#'   then the \sQuote{them} statistics is computed, i.e. the neighborhoods
+#'   calculated from \code{graph.us} are evaluated on \code{graph.them}.
+#' @param k An integer scalar, the size of the local neighborhood for each
+#'   vertex. Should be non-negative.
+#' @param FUN Character, a function name, or a function object itself, for
+#'   computing the local statistic in each neighborhood. If \code{NULL}(the
+#'   default value), \code{ecount} is used for unweighted graphs (if
+#'   \code{weighted=FALSE}) and a function that computes the sum of edge
+#'   weights is used for weighted graphs (if \code{weighted=TRUE}). This
+#'   argument is ignored if \code{k} is zero.
+#' @param weighted Logical scalar, TRUE if the edge weights should be used
+#'   for computation of the scan statistic. If TRUE, the graph should be
+#'   weighted.  Note that this argument is ignored if \code{FUN} is not
+#'   \code{NULL}, \code{"ecount"} and \code{"sumweights"}.
+#' @param mode Character scalar, the kind of neighborhoods to use for the
+#'   calculation. One of \sQuote{\code{out}}, \sQuote{\code{in}},
+#'   \sQuote{\code{all}} or \sQuote{\code{total}}. This argument is ignored
+#'   for undirected graphs.
+#' @param neighborhoods A list of neighborhoods, one for each vertex, or
+#'   \code{NULL}. If it is not \code{NULL}, then the function is evaluated on
+#'   the induced subgraphs specified by these neighborhoods.
+#'
+#'   In theory this could be useful if the same \code{graph.us} graph is used
+#'   for multiple \code{graph.them} arguments. Then the neighborhoods can be
+#'   calculated on \code{graph.us} and used with multiple graphs. In
+#'   practice, this is currently slower than simply using \code{graph.them}
+#'   multiple times.
+#' @param \dots Arguments passed to \code{FUN}, the function that computes
+#'   the local statistics.
+#' @return For \code{local_scan} typically a numeric vector containing the
+#'   computed local statistics for each vertex. In general a list or vector
+#'   of objects, as returned by \code{FUN}.
+#'
+#' @references Priebe, C. E., Conroy, J. M., Marchette, D. J., Park,
+#'   Y. (2005).  Scan Statistics on Enron Graphs. \emph{Computational and
+#'   Mathematical Organization Theory}.
+#'
+#' @family scan statistics
 #' @export
+#' @examples
+#' pair <- sample_correlated_gnp_pair(n = 10^3, corr = 0.8, p = 0.1)
+#' local_0_us <- local_scan(graph.us = pair$graph1, k = 0)
+#' local_1_us <- local_scan(graph.us = pair$graph1, k = 1)
+#'
+#' local_0_them <- local_scan(graph.us = pair$graph1,
+#'                            graph.them = pair$graph2, k = 0)
+#' local_1_them <- local_scan(graph.us = pair$graph1,
+#'                            graph.them = pair$graph2, k = 1)
+#'
+#' Neigh_1 <- neighborhood(pair$graph1, order = 1)
+#' local_1_them_nhood <- local_scan(graph.us = pair$graph1,
+#'                                  graph.them = pair$graph2,
+#'                                  neighborhoods = Neigh_1)
 
 local_scan <- function(graph.us, graph.them=NULL, k=1, FUN=NULL,
                        weighted=FALSE, mode=c("out", "in", "all"),
