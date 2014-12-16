@@ -898,7 +898,6 @@ int igraph_scg_norm_eps(const igraph_matrix_t *V,
 			igraph_scg_norm_t norm) {
 
   int no_of_nodes=(int) igraph_vector_size(groups);
-  int no_of_groups;
   int no_of_vectors=(int) igraph_matrix_ncol(V);
   igraph_real_t min, max;
   igraph_sparsemat_t Lsparse, Rsparse, Lsparse2, Rsparse2, Rsparse3, proj;
@@ -911,7 +910,6 @@ int igraph_scg_norm_eps(const igraph_matrix_t *V,
   }
 
   igraph_vector_minmax(groups, &min, &max);
-  no_of_groups=(int) max+1;
   
   if (min < 0 || max >= no_of_nodes) {
     IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
