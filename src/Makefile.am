@@ -377,7 +377,8 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     embedding.c scan.c triangles.c glet.c \
 			     maximal_cliques.c sbm.c dotproduct.c sir.c \
 			     prpack.cpp $(CHOLMOD) $(AMD) $(COLAMD) \
-			     $(SPCONFIG) layout_gem.c layout_dh.c lsap.c
+			     $(SPCONFIG) layout_gem.c layout_dh.c lsap.c \
+				 layout_fr.c layout_kk.c paths.c
 
 if INTERNAL_F2C
 else

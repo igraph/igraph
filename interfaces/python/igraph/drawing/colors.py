@@ -486,6 +486,8 @@ def color_name_to_rgba(color, palette=None):
                 components.append(1.0)
             elif len(color) == 8:
                 components = [int(color[i:i+2], 16) / 255. for i in (0, 2, 4, 6)]
+        elif color.lower() in known_colors:
+            components = known_colors[color.lower()]
         else:
             color_mode = "rgba"
             maximums = (255.0, 255.0, 255.0, 1.0)
@@ -512,10 +514,7 @@ def color_name_to_rgba(color, palette=None):
                 elif color_mode[:3] == "hsl":
                     components = hsla_to_rgba(*components)
             else:
-                try:
-                    components = palette.get(int(color))
-                except (ValueError, AttributeError):
-                    components = known_colors[color.lower()]
+                components = palette.get(int(color))
 
     # At this point, the components are floats
     return tuple(clamp(val, 0., 1.) for val in components)
