@@ -1,18 +1,5 @@
 
-all: igraph igraphdata
-
-########################################################
-# Data package, this is simple, it is static
-
-DATAVERSION=$(shell grep "^Version" igraphdata/DESCRIPTION | cut -d" " -f 2)
-DATAFILES = $(wildcard igraphdata/data/*.rda) igraphdata/DESCRIPTION \
-	igraphdata/LICENSE $(wildcard igraphdata/man/*.Rd) \
-	$(wildcard igraphdata/inst/*)
-
-igraphdata: igraphdata_$(DATAVERSION).tar.gz
-
-igraphdata_$(DATAVERSION).tar.gz: $(DATAFILES)
-	R CMD build igraphdata
+all: igraph
 
 ########################################################
 # Main package, a lot more complicated
@@ -198,4 +185,4 @@ igraph_$(VERSION).tar.gz: $(CSRC2) $(CINC2) $(PARSER2) $(RSRC) $(RGEN) \
 	R CMD build igraph
 #############
 
-.PHONY: all igraph igraphdata force
+.PHONY: all igraph force
