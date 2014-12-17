@@ -228,6 +228,14 @@ constructor_spec <- function(fun, ..., .lazy = FALSE) {
 #'   Alternatively, this can be a character scalar, the name of a
 #'   notable graph. See Notable graphs below. The name is case
 #'   insensitive.
+#'
+#'   Starting from igraph 0.8.0, you can also include literals here,
+#'   via igraph's formula notation (see \code{\link{graph_from_formula}}).
+#'   In this case, the first term of the formula has to start with
+#'   a \sQuote{\code{~}} character, just like regular formulae in R.
+#'   See examples below.
+#' @param ... Extra arguments for the case when the graph is given
+#'   via a literal, see \code{\link{graph_from_literal}}.
 #' @param n The number of vertices in the graph. This argument is
 #'   ignored (with a warning) if \code{edges} are symbolic vertex names. It
 #'   is also ignored if there is a bigger vertex id in \code{edges}. This
@@ -236,6 +244,9 @@ constructor_spec <- function(fun, ..., .lazy = FALSE) {
 #' @param isolates Character vector, names of isolate vertices,
 #'   for symbolic edge lists. It is ignored for numeric edge lists.
 #' @param directed Whether to create a directed graph.
+#' @param dir It is the same as \code{directed}, for compatibility.
+#'   Do not give both of them.
+#' @param simplify For graph literals, whether to simplify the graph.
 #' @return An igraph graph.
 #'
 #' @family determimistic constructors
@@ -249,42 +260,82 @@ constructor_spec <- function(fun, ..., .lazy = FALSE) {
 #'                make_graph("Octahedron"),
 #'                make_graph("Dodecahedron"),
 #'                make_graph("Icosahedron"))
+#'
+#' graph <- make_graph( ~ A-B-C-D-A, E-A:B:C:D,
+#'                       F-G-H-I-F, J-F:G:H:I,
+#'                       K-L-M-N-K, O-K:L:M:N,
+#'                       P-Q-R-S-P, T-P:Q:R:S,
+#'                       B-F, E-J, C-I, L-T, O-T, M-S,
+#'                       C-P, C-L, I-L, I-P)
 
-make_graph <- function(edges, n=max(edges), isolates = NULL, directed=TRUE) {
 
-  if (is.character(edges) && length(edges) == 1) {
-    if (!missing(n)) warning("'n' is ignored for the '", edges, "' graph")
+make_graph <- function(edges, ..., n = max(edges), isolates = NULL,
+                       directed = TRUE, dir = directed, simplify = TRUE) {
+
+  if (class(edges) == "formula") {
+    if (!missing(n)) stop("'n' should not be given for graph literals")
     if (!missing(isolates)) {
-      warning("'isolates' is ignored for the '", edges, "' graph")
+      stop("'isolates' should not be given for graph literals")
     }
     if (!missing(directed)) {
-      warning("'directed' is ignored for the '", edges, "' graph")
+      stop("'directed' should not be given for graph literals")
     }
-    make_famous_graph(edges)
 
-  } else if (is.numeric(edges)) {
-    if (!is.null(isolates)) {
-      warning("'isolates' ignored for numeric edge list")
-    }
-    on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
-    .Call("R_igraph_create", as.numeric(edges)-1, as.numeric(n),
-          as.logical(directed),
-          PACKAGE="igraph")
-
-  } else if (is.character(edges)) {
-    if (!missing(n)) {
-      warning("'n' is ignored for edge list with vertex names")
-    }
-    el <- matrix(edges, ncol = 2, byrow = TRUE)
-    res <- graph_from_edgelist(el, directed = directed)
-    if (!is.null(isolates)) {
-      isolates <- as.character(isolates)
-      res <- res + vertices(isolates)
-    }
-    res
+    mf <- as.list(match.call())[-1]
+    mf[[1]] <- mf[[1]][[2]]
+    graph_from_literal_i(mf)
 
   } else {
-    stop("'edges' must be numeric of character")
+
+    if (length(list(...))) stop("Extra arguments in make_graph")
+    if (!missing(simplify)) {
+      stop("'simplify' should not be given for graph literals")
+    }
+
+    if (!missing(dir) && !missing(directed)) {
+      stop("Only give one of 'dir' and 'directed'")
+    }
+
+    if (!missing(dir) && missing(directed)) directed <- dir
+
+    if (is.character(edges) && length(edges) == 1) {
+      if (!missing(n)) warning("'n' is ignored for the '", edges, "' graph")
+      if (!missing(isolates)) {
+        warning("'isolates' is ignored for the '", edges, "' graph")
+      }
+      if (!missing(directed)) {
+        warning("'directed' is ignored for the '", edges, "' graph")
+      }
+      if (!missing(dir)) {
+        warning("'dir' is ignored for the '", edges, "' graph")
+      }
+
+      make_famous_graph(edges)
+
+    } else if (is.numeric(edges)) {
+      if (!is.null(isolates)) {
+        warning("'isolates' ignored for numeric edge list")
+      }
+      on.exit( .Call("R_igraph_finalizer", PACKAGE="igraph") )
+      .Call("R_igraph_create", as.numeric(edges)-1, as.numeric(n),
+            as.logical(directed),
+            PACKAGE="igraph")
+
+    } else if (is.character(edges)) {
+      if (!missing(n)) {
+        warning("'n' is ignored for edge list with vertex names")
+      }
+      el <- matrix(edges, ncol = 2, byrow = TRUE)
+      res <- graph_from_edgelist(el, directed = directed)
+      if (!is.null(isolates)) {
+        isolates <- as.character(isolates)
+        res <- res + vertices(isolates)
+      }
+      res
+
+    } else {
+      stop("'edges' must be numeric of character")
+    }
   }
 }
 
@@ -486,11 +537,17 @@ empty_graph <- function(...) constructor_spec(make_empty_graph, ...)
 
 graph_from_literal <- function(..., simplify=TRUE) {
   mf <- as.list(match.call())[-1]
+  graph_from_literal_i(mf)
+}
+
+graph_from_literal_i <- function(mf) {
 
   ## In case 'simplify' is given
+  simplify <- TRUE
   if ('simplify' %in% names(mf)) {
     w <- which(names(mf)=='simplify')
     if (length(w) > 1) { stop("'simplify' specified multiple times") }
+    simplify <- eval(mf[[w]])
     mf <- mf[-w]
   }
 
