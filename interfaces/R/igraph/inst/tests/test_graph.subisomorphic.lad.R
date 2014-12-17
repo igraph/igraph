@@ -36,7 +36,7 @@ test_that("LAD stress test", {
     pattern <- induced_subgraph(target, sample(vcount(target), pn))
     iso <- subgraph_isomorphic(pattern, target, induced=TRUE,
                                method = "lad")
-    expect_that(iso$iso, is_true())
+    expect_that(iso, is_true())
   }
 
   set.seed(42)
@@ -47,7 +47,7 @@ test_that("LAD stress test", {
     pattern <- sample_gnp(pn, .6)
     iso <- subgraph_isomorphic(pattern, target, induced=TRUE,
                                method = "lad")
-    expect_that(iso$iso, is_false())
+    expect_that(iso, is_false())
   }
 
 })
