@@ -1981,6 +1981,26 @@ i_compare <- function (comm1, comm2, method=c("vi", "nmi", "split.join",
   res  
 }
 
+
+#' @export
+
+split_join_distance <- function(comm1, comm2) {
+  comm1 <- if (inherits(comm1, "communities")) {
+    as.numeric(membership(comm1))
+  } else {
+    as.numeric(comm1)
+  }
+  comm2 <- if (inherits(comm2, "communities")) {
+    as.numeric(membership(comm2))
+  } else {
+    as.numeric(comm2)
+  }
+  on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
+  res <- .Call("R_igraph_split_join_distance", comm1, comm2,
+               PACKAGE = "igraph")
+  unlist(res)
+}
+
 #' @export
 
 groups <- function(x)

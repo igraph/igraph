@@ -1356,7 +1356,7 @@ igraph_split_join_distance:
         PARAMS: VECTOR comm1, VECTOR comm2, OUT INTEGERPTR distance12, \
 		        OUT INTEGERPTR distance21
         NAME-R: split.join.distance
-        IGNORE: RR, RC, RNamespace
+        IGNORE: RR, RNamespace
 
 igraph_hrg_fit:
         PARAMS: GRAPH graph, INOUT HRG hrg=Default, BOOLEAN start=False, \
