@@ -622,3 +622,5 @@ deprecated("vertex.shapes", shapes)
 deprecated("igraph.shape.noclip", shape_noclip)
 #' @export igraph.shape.noplot
 deprecated("igraph.shape.noplot", shape_noplot)
+#' @export create.communities
+deprecated("create.communities", make_clusters)

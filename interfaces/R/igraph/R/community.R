@@ -118,7 +118,7 @@
 #' \code{\link{plot.igraph}}, please see that and also
 #' \code{\link{igraph.plotting}} on how to change the plot.
 #' 
-#' \code{create.communities} creates a \code{communities} object. This is
+#' \code{make_clusters} creates a \code{communities} object. This is
 #' useful to integrate the results of community finding algorithms (that are
 #' not included in igraph).
 #'
@@ -127,7 +127,7 @@
 #' is.hierarchical print.communities plot.communities length.communities
 #' as.dendrogram.communities as.hclust.communities code_len
 #' asPhylo asPhylo.communities showtrace code.length create.communities
-#' as_phylo as_phylo.communities show_trace is_hierarchical
+#' as_phylo as_phylo.communities show_trace is_hierarchical make_clusters
 #' @param communities,x,object A \code{communities} object, the result of an
 #' igraph community detection function.
 #' @param graph An igraph graph object, corresponding to \code{communities}.
@@ -161,7 +161,7 @@
 #' @param use.modularity Logical scalar, whether to use the modularity values
 #' to define the height of the branches.
 #' @param \dots Additional arguments. \code{plot.communities} passes these to
-#' \code{\link{plot.igraph}}. \code{create.communities} adds them to the
+#' \code{\link{plot.igraph}}. \code{make_clusters} adds them to the
 #' \code{communtiies} object it creates. The other functions silently ignore
 #' them.
 #' @param membership Numeric vector, one value for each vertex, the membership
@@ -207,7 +207,7 @@
 #' 
 #' \code{plot} for \code{communities} objects returns \code{NULL}, invisibly.
 #' 
-#' \code{create.communities} returns a \code{communities} object.
+#' \code{make_clusters} returns a \code{communities} object.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso See \code{\link{plot_dendrogram}} for plotting community structure
 #' dendrograms.
@@ -308,7 +308,7 @@ print.communities <- function(x, ...) {
 #' @rdname communities
 #' @export
 
-create.communities <- function(membership, algorithm=NULL, merges=NULL,
+make_clusters <- function(membership, algorithm=NULL, merges=NULL,
                                modularity=NULL, ...) {
 
   stopifnot(is.numeric(membership))
@@ -2005,3 +2005,17 @@ groups.communities <- function(x) {
 #' @export
 
 communities <- groups.communities
+
+#' @method "[" communities
+#' @export
+
+`[.communities` <- function(x, i) {
+  groups(x)[i]
+}
+
+#' @method "[[" communities
+#' @export
+
+`[[.communities` <- function(x, i) {
+  groups(x)[[i]]
+}
