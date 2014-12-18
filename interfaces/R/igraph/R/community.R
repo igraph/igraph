@@ -280,24 +280,28 @@ as_membership <- function(x) add_class(x, "membership")
 
 print.communities <- function(x, ...) {
 
-  noc <- max(membership(x))
+  noc <- if (!is.null(x$membership)) max(membership(x)) else NA
   mod <- if (!is.null(x$modularity)) {
     modularity(x) %>% format(digits = 2)
   } else {
     NA_real_
   }
   alg <- x$algorithm %||% "unknown"
-  grp <- groups(x)
 
   cat("IGRAPH clustering ", alg, ", groups: ", noc, ", mod: ", mod, "\n", sep="")
-  cat("+ groups:\n")
 
-  hp <- function(o) {
-    head_print(o, max_lines = igraph_opt("auto.print.lines"),
-               omitted_footer = "+ ... omitted several groups/vertices\n",)
+  if (!is.null(x$membership)) {
+    grp <- groups(x)
+    cat("+ groups:\n")
+    hp <- function(o) {
+      head_print(o, max_lines = igraph_opt("auto.print.lines"),
+                 omitted_footer = "+ ... omitted several groups/vertices\n",)
+    }
+    indent_print(grp, .printer = hp, .indent = "  ")
+
+  } else {
+    cat(" + groups not available\n")
   }
-
-  indent_print(grp, .printer = hp, .indent = "  ")
 
   invisible(x)
 }
