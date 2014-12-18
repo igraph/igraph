@@ -131,10 +131,6 @@
 #' @param communities,x,object A \code{communities} object, the result of an
 #' igraph community detection function.
 #' @param graph An igraph graph object, corresponding to \code{communities}.
-#' @param full Logical scalar, if \code{TRUE}, then \code{is_hierarchical} only
-#' returns \code{TRUE} for fully hierarchical algorithms. The \sQuote{leading
-#' eigenvector} algorithm is hierarchical, it gives a hierarchy of groups, but
-#' not a full dendrogram with all vertices, so it is not fully hierarchical.
 #' @param y An igraph graph object, corresponding to the communities in
 #' \code{x}.
 #' @param no Integer scalar, the desired number of communities. If too low or
@@ -508,18 +504,8 @@ code_len <- function(communities) {
 #' @rdname communities
 #' @export
 
-is_hierarchical <- function(communities, full=FALSE) {
-  alg <- algorithm(communities)
-  if (alg %in% c("walktrap", "edge betweenness","fast greedy") ||
-      (alg == "leading eigenvector" && !full)) {
-    TRUE
-  } else if (alg %in% c("spinglass", "label propagation", "multi level",
-                        "optimal") ||
-             (alg == "leading eigenvector" && full)) {
-    FALSE
-  } else {
-    stop("Unknown community detection algorithm")
-  }
+is_hierarchical <- function(communities) {
+  ! is.null(communities$merges)
 }
 
 complete.dend <- function(comm, use.modularity) {
@@ -714,7 +700,7 @@ cut_at <- function(communities, no, steps) {
     stop("Not a community structure")
   }
   if (!is_hierarchical(communities)) {
-    stop("Not a fully hierarchical communitity structure")
+    stop("Not a hierarchical communitity structure")
   }
 
   if ((!missing(no) && !missing(steps)) ||
