@@ -61,12 +61,11 @@ test_that("creating communities objects works", {
   membership <- sample(1:2, vcount(karate), replace=TRUE)
   mod <- modularity(karate, membership)
   comm <- make_clusters(algorithm="random", membership=membership,
-                             mod=mod, foo="bar")
+                             modularity = mod)
 
   expect_that(as.vector(membership(comm)), equals(membership))
   expect_that(modularity(comm), equals(mod))
   expect_that(algorithm(comm), equals("random"))
-  expect_that(comm$foo, equals("bar"))
 
 })
 

@@ -118,16 +118,12 @@
 #' \code{\link{plot.igraph}}, please see that and also
 #' \code{\link{igraph.plotting}} on how to change the plot.
 #' 
-#' \code{make_clusters} creates a \code{communities} object. This is
-#' useful to integrate the results of community finding algorithms (that are
-#' not included in igraph).
-#'
 #' @rdname communities
 #' @aliases communities membership algorithm crossing cutat merges sizes cut_at
 #' is.hierarchical print.communities plot.communities length.communities
 #' as.dendrogram.communities as.hclust.communities code_len
-#' asPhylo asPhylo.communities showtrace code.length create.communities
-#' as_phylo as_phylo.communities show_trace is_hierarchical make_clusters
+#' asPhylo asPhylo.communities showtrace code.length
+#' as_phylo as_phylo.communities show_trace is_hierarchical
 #' @param communities,x,object A \code{communities} object, the result of an
 #' igraph community detection function.
 #' @param graph An igraph graph object, corresponding to \code{communities}.
@@ -157,8 +153,7 @@
 #' @param use.modularity Logical scalar, whether to use the modularity values
 #' to define the height of the branches.
 #' @param \dots Additional arguments. \code{plot.communities} passes these to
-#' \code{\link{plot.igraph}}. \code{make_clusters} adds them to the
-#' \code{communtiies} object it creates. The other functions silently ignore
+#' \code{\link{plot.igraph}}. The other functions silently ignore
 #' them.
 #' @param membership Numeric vector, one value for each vertex, the membership
 #' vector of the community structure. Might also be \code{NULL} if the
@@ -204,8 +199,7 @@
 #' 
 #' \code{plot} for \code{communities} objects returns \code{NULL}, invisibly.
 #' 
-#' \code{make_clusters} returns a \code{communities} object.
-#' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
+#' #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
 #' @seealso See \code{\link{plot_dendrogram}} for plotting community structure
 #' dendrograms.
 #' 
@@ -306,11 +300,28 @@ print.communities <- function(x, ...) {
   invisible(x)
 }
 
-#' @rdname communities
+#' Creates a communities object.
+#'
+#' This is useful to integrate the results of community finding algorithms
+#' that are not included in igraph.
+#'
+#' @param graph The graph of the community structure.
+#' @param membership The membership vector of the community structure, a
+#'   numeric vector denoting the id of the community for each vertex. It
+#'   might be \code{NULL} for hierarchical community structures.
+#' @param algorithm Character string, the algorithm that generated
+#'   the community structure, it can be arbitrary.
+#' @param merges A merge matrix, for hierarchical community structures (or
+#'   \code{NULL} otherwise.
+#' @param modularity Modularity value of the community structure. If this
+#'   is \code{TRUE} and the membership vector is available, then it the
+#'   modularity values is calculated automatically.
+#' @return A \code{communities} object.
+#'
 #' @export
 
-make_clusters <- function(membership = NULL, algorithm = NULL,
-                          merges = NULL, modularity = NULL, ...) {
+make_clusters <- function(graph, membership = NULL, algorithm = NULL,
+                          merges = NULL, modularity = TRUE) {
 
   stopifnot(is.null(membership) || is.numeric(membership))
   stopifnot(is.null(algorithm) ||
@@ -318,12 +329,21 @@ make_clusters <- function(membership = NULL, algorithm = NULL,
   stopifnot(is.null(merges) ||
               (is.matrix(merges) && is.numeric(merges) && ncol(merges)==2))
   stopifnot(is.null(modularity) ||
+            (is.logical(modularity) && length(modularity) == 1) ||
             (is.numeric(modularity) &&
              length(modularity) %in% c(1, length(membership))))
 
+  if (is.logical(modularity)) {
+    if (modularity && !is.null(membership)) {
+      modularity <- modularity(graph, membership)
+    } else {
+      modularity <- NULL
+    }
+  }
+
   res <- list(membership=membership,
               algorithm=if (is.null(algorithm)) "unknown" else algorithm,
-              modularity=modularity, ...)
+              modularity=modularity)
   if (!is.null(merges)) {
     res$merges <- merges
   }
