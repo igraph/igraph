@@ -161,7 +161,8 @@
 #' \code{communtiies} object it creates. The other functions silently ignore
 #' them.
 #' @param membership Numeric vector, one value for each vertex, the membership
-#' vector of the community structure.
+#' vector of the community structure. Might also be \code{NULL} if the
+#' community structure is given in another way, e.g. by a merge matrix.
 #' @param algorithm If not \code{NULL} (meaning an unknown algorithm), then a
 #' character scalar, the name of the algorithm that produced the community
 #' structure.
@@ -304,14 +305,14 @@ print.communities <- function(x, ...) {
 #' @rdname communities
 #' @export
 
-make_clusters <- function(membership, algorithm=NULL, merges=NULL,
-                               modularity=NULL, ...) {
+make_clusters <- function(membership = NULL, algorithm = NULL,
+                          merges = NULL, modularity = NULL, ...) {
 
-  stopifnot(is.numeric(membership))
+  stopifnot(is.null(membership) || is.numeric(membership))
   stopifnot(is.null(algorithm) ||
             (is.character(algorithm) && length(algorithm)==1))
   stopifnot(is.null(merges) ||
-            (is.matrix(merges) && is.numeric(merges) && ncol(merges)==2))
+              (is.matrix(merges) && is.numeric(merges) && ncol(merges)==2))
   stopifnot(is.null(modularity) ||
             (is.numeric(modularity) &&
              length(modularity) %in% c(1, length(membership))))
@@ -321,6 +322,11 @@ make_clusters <- function(membership, algorithm=NULL, merges=NULL,
               modularity=modularity, ...)
   if (!is.null(merges)) {
     res$merges <- merges
+  }
+  if (!is.null(membership)) {
+    res$vcount <- length(membership)
+  } else if (!is.null(merges)) {
+    res$vcount <- nrow(merges) + 1
   }
   class(res) <- "communities"
   res
