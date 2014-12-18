@@ -1955,16 +1955,21 @@ compare.membership <- function(comm1, comm2,
   i_compare(comm1, comm2, method)
 }
 
+#' @method compare default
+#' @export
+
+compare.default <- compare.membership
+
 i_compare <- function (comm1, comm2, method=c("vi", "nmi", "split.join",
                                        "rand", "adjusted.rand")) {
 
   comm1 <- if (inherits(comm1, "communities")) {
-    membership(comm1)
+    as.numeric(membership(comm1))
   } else {
     as.numeric(comm1)
   }
   comm2 <- if (inherits(comm2, "communities")) {
-    membership(comm2)
+    as.numeric(membership(comm2))
   } else {
     as.numeric(comm2)
   }
