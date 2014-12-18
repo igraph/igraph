@@ -564,8 +564,8 @@ complete.dend <- function(comm, use.modularity) {
  
 as.dendrogram.communities <- function(object, hang=-1, use.modularity=FALSE,
                                       ...) {
-  if (!is_hierarchical(object, full=TRUE)) {
-    stop("Not a fully hierarchical community structure")
+  if (!is_hierarchical(object)) {
+    stop("Not a hierarchical community structure")
   }
 
   .memberDend <- function(x) {
