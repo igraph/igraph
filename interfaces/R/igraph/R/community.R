@@ -669,8 +669,8 @@ as_phylo <- function(x, ...)
 
 as_phylo.communities <- function(x, use.modularity=FALSE, ...) {
 
-  if (!is_hierarchical(x, full=TRUE)) {
-    stop("Not a fully hierarchical community structure")
+  if (!is_hierarchical(x)) {
+    stop("Not a hierarchical community structure")
   }
 
   require(ape, quietly = TRUE)
