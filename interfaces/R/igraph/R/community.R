@@ -1755,8 +1755,7 @@ plot_dendrogram <- function(x, mode=igraph_opt("dend.plot.type"), ...)
 #' The different plotting functions take different sets of arguments. When
 #' using \code{plot.phylo} (\code{mode="phylo"}), we have the following syntax:
 #' \preformatted{
-#'     plot_dendrogram(x, mode="phylo",
-#'             colbar = rainbow(11, start=0.7, end=0.1),
+#'     plot_dendrogram(x, mode="phylo", colbar = palette(),
 #'             edge.color = NULL, use.edge.length = FALSE, \dots)
 #' } The extra arguments not documented above: \itemize{
 #'   \item \code{colbar} Color bar for the edges.
@@ -1767,7 +1766,7 @@ plot_dendrogram <- function(x, mode=igraph_opt("dend.plot.type"), ...)
 #' }
 #' 
 #' The syntax for \code{plot.hclust} (\code{mode="hclust"}): \preformatted{
-#'     plot_dendrogram(x, mode="hclust", rect = 0, colbar = rainbow(rect),
+#'     plot_dendrogram(x, mode="hclust", rect = 0, colbar = palette(),
 #'             hang = 0.01, ann = FALSE, main = "", sub = "", xlab = "",
 #'             ylab = "", \dots)
 #' } The extra arguments not documented above: \itemize{
@@ -1804,6 +1803,7 @@ plot_dendrogram <- function(x, mode=igraph_opt("dend.plot.type"), ...)
 #' function.
 #' @param use.modularity Logical scalar, whether to use the modularity values
 #' to define the height of the branches.
+#' @param palette The color palette to use for colored plots.
 #' @return Returns whatever the return value was from the plotting function,
 #' \code{plot.phylo}, \code{plot.dendrogram} or \code{plot.hclust}.
 #' @author Gabor Csardi \email{csardi.gabor@@gmail.com}
@@ -1818,8 +1818,12 @@ plot_dendrogram <- function(x, mode=igraph_opt("dend.plot.type"), ...)
 #' 
 plot_dendrogram.communities <- function(x, 
                                  mode=igraph_opt("dend.plot.type"), ...,
-                                 use.modularity=FALSE) {  
+                                 use.modularity=FALSE,
+                                 palette=categorical_pal(8)) {
   mode <- igraph.match.arg(mode, c("auto", "phylo", "hclust", "dendrogram"))
+
+  old_palette <- palette(palette)
+  on.exit(palette(old_palette), add = TRUE)
 
   if (mode=="auto") {
     value <- tryCatch(suppressWarnings(library("ape", character.only=TRUE,
@@ -1841,7 +1845,7 @@ plot_dendrogram.communities <- function(x,
 }
 
 dendPlotHclust <- function(communities, rect=length(communities),
-                           colbar=rainbow(rect), hang=-1, ann=FALSE,
+                           colbar=palette(), hang=-1, ann=FALSE,
                            main="", sub="", xlab="", ylab="", ...,
                            use.modularity=FALSE) {
   hc <- as.hclust(communities, hang=hang, use.modularity=use.modularity)
@@ -1859,7 +1863,7 @@ dendPlotDendrogram <- function(communities, hang=-1, ...,
        ...)
 }
 
-dendPlotPhylo <- function(communities, colbar=rainbow(length(communities)),
+dendPlotPhylo <- function(communities, colbar=palette(),
                           col=colbar[membership(communities)],
                           mark.groups=communities(communities),
                           use.modularity=FALSE, 
