@@ -165,7 +165,7 @@ plot.igraph <- function(x,
   mark.expand <- rep(mark.expand, length=length(mark.groups))
   
   for (g in seq_along(mark.groups)) {
-    v <- mark.groups[[g]]
+    v <- V(graph)[mark.groups[[g]]]
     if (length(vertex.size)==1) {
       vs <- vertex.size
     } else {
