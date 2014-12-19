@@ -134,11 +134,6 @@
 #' \code{steps} must be supplied.
 #' @param steps The number of merge operations to perform to produce the
 #' communities. Exactly one of \code{no} and \code{steps} must be supplied.
-#' @param colbar A vector of colors, in any format that is accepted by the
-#' regular R plotting methods. E.g. it may be an integer vector, a character
-#' vector of color names, a character vector of RGB colors. This vector gives
-#' the color bar for the vertices. The length of the vector should be the same
-#' as the number of communities.
 #' @param col A vector of colors, in any format that is accepted by the regular
 #' R plotting methods. This vector gives the colors of the vertices explicitly.
 #' @param mark.groups A list of numeric vectors. The communities can be
@@ -1715,8 +1710,7 @@ cluster_infomap <- function(graph, e.weights=NULL, v.weights=NULL,
 #' @export
 
 plot.communities <- function(x, y,
-                             colbar=rainbow(length(x)),
-                             col=colbar[membership(x)],
+                             col=membership(x),
                              mark.groups=communities(x),
                              edge.color=c("black", "red")[crossing(x,y)+1],
                              ...) {
