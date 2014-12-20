@@ -52,10 +52,69 @@ make_ <- function(...) {
   cons <- args[ cidx][[1]]
   args <- args[!cidx]
 
+  ## Modifiers
+  wmods <- vapply(args, class, "") %>%
+    equals("igraph_constructor_modifier")
+  mods <- args[wmods]
+  args <- args[!wmods]
+
   args2 <- if (cons$lazy) lapply(cons$args, "[[", "expr") else lazy_eval(cons$args)
 
-  do_call(cons$fun, args2, args)
+  res <- do_call(cons$fun, args2, args)
 
+  for (m in mods) {
+    if (m$id == "without_attr") {
+      ## TODO: speed this up
+      ga <- graph_attr_names(res)
+      va <- vertex_attr_names(res)
+      ea <- edge_attr_names(res)
+      for (g in ga) res <- delete_graph_attr(res, g)
+      for (v in va) res <- delete_vertex_attr(res, v)
+      for (e in ea) res <- delete_edge_attr(res, e)
+
+    } else if (m$id == "without_loops") {
+      res <- simplify(res, remove.loops = TRUE, remove.multiple = FALSE)
+
+    } else if (m$id == "without_multiples") {
+      res <- simplify(res, remove.loops = FALSE, remove.multiple = TRUE)
+
+    } else if (m$id == "simplified") {
+      res <- simplify(res)
+
+    } else if (m$id == "with_vertex_") {
+      m$args <- lapply(m$args, eval)
+      ## TODO speed this up
+      for (a in seq_along(m$args)) {
+        n <- names(m$args)[a]
+        v <- m$args[[a]]
+        stopifnot(! is.null(n))
+        res <- set_vertex_attr(res, n, value = v)
+      }
+
+    } else if (m$id == "with_edge_") {
+      m$args <- lapply(m$args, eval)
+      ## TODO speed this up
+      for (a in seq_along(m$args)) {
+        n <- names(m$args)[a]
+        v <- m$args[[a]]
+        stopifnot(! is.null(n))
+        res <- set_edge_attr(res, n, value = v)
+      }
+
+    } else if (m$id == "with_graph_") {
+      m$args <- lapply(m$args, eval)
+      ## TODO speed this up
+      for (a in seq_along(m$args)) {
+        n <- names(m$args)[a]
+        v <- m$args[[a]]
+        stopifnot(! is.null(n))
+        res <- set_graph_attr(res, n, value = v)
+      }
+
+    }
+  }
+
+  res
 }
 
 #' Sample from a random graph model
@@ -114,6 +173,95 @@ constructor_spec <- function(fun, ..., .lazy = FALSE) {
     class = "igraph_constructor_spec"
   )
 }
+
+
+## -----------------------------------------------------------------
+## Constructor modifiers
+
+
+constructor_modifier <- function(...) {
+  structure(
+    list(...),
+    class = "igraph_constructor_modifier"
+  )
+}
+
+
+#' @export
+
+without_attr <- function() {
+  constructor_modifier(
+    id = "without_attr"
+  )
+}
+
+
+#' @export
+
+without_loops <- function() {
+  constructor_modifier(
+    id = "without_loops"
+  )
+}
+
+
+#' @export
+
+without_multiples <- function() {
+  constructor_modifier(
+    id = "without_multiples"
+  )
+}
+
+
+#' @export
+
+simplified <- function() {
+  constructor_modifier(
+    id = "simplified"
+  )
+}
+
+
+#' @export
+
+with_vertex_ <- function(...) {
+
+  args <- grab_args()
+
+  constructor_modifier(
+    id = "with_vertex_",
+    args = args
+  )
+}
+
+
+#' @export
+
+with_edge_ <- function(...) {
+
+  args <- grab_args()
+
+  constructor_modifier(
+    id = "with_edge_",
+    args = args
+  )
+}
+
+
+#' @export
+
+with_graph_ <- function(...) {
+
+  args <- grab_args()
+
+  constructor_modifier(
+    id = "with_graph_",
+    args = args
+  )
+}
+
+
 
 ## -----------------------------------------------------------------
 
