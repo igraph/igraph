@@ -16,8 +16,8 @@ test_that("without_attr", {
 
   expect_equivalent(g, g2)
   expect_equal(graph_attr_names(g2), character())
-  expect_equal(graph_vertex_names(g2), character())
-  expect_equal(graph_edge_names(g2), character())
+  expect_equal(vertex_attr_names(g2), character())
+  expect_equal(edge_attr_names(g2), character())
 
 })
 
