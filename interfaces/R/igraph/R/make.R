@@ -53,8 +53,7 @@ make_ <- function(...) {
   args <- args[!cidx]
 
   ## Modifiers
-  wmods <- vapply(args, class, "") %>%
-    equals("igraph_constructor_modifier")
+  wmods <- vapply(args, class, "") == "igraph_constructor_modifier"
   mods <- args[wmods]
   args <- args[!wmods]
 
