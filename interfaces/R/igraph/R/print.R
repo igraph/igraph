@@ -241,17 +241,42 @@
 .print.edges.compressed <- function(x, edges = E(x), names, num = FALSE,
                                       max.lines = igraph_opt("auto.print.lines")) {
 
+  len <- length(edges)
+
   title <- "+" %+%
-    (if (num) " " %+% chr(length(edges)) %+% "/" %+%
-       (if (is.null(x)) "?" else chr(ecount(x))) else "") %+%
-    " edges" %+%
+    (if (num) " " %+% chr(len) %+% "/" %+%
+       (if (is.null(x)) "?" else chr(gsize(x))) else "") %+%
+    (if (len == 1) " edge" else " edges") %+%
     (if (is.null(x)) ", unknown graph" else "") %+%
     (if (is.null(attr(edges, "vnames"))) "" else " (vertex names)") %+%
     ":\n"
   cat(title)
 
-  if (is.null(max.lines)) {
+  if (!is.null(attr(edges, "single")) && attr(edges, "single") &&
+      !is.null(x)) {
+    ## Double bracket
+    ea <- edge_attr(x)
+    if (all(sapply(ea, is.atomic))) {
+      df <- data.frame(
+        stringsAsFactors = FALSE,
+        tail = tail_of(x, edges),
+        head = head_of(x, edges),
+        tid  = tail_of(x, edges, names = FALSE),
+        hid  = head_of(x, edges, names = FALSE)
+      )
+      if (length(ea)) {
+        ea <- do_call(data.frame, .args = ea, stringsAsFactors = FALSE)
+        df <- cbind(df, ea[as.vector(edges), , drop = FALSE])
+      }
+      print(df)
+
+    } else {
+      print(lapply(ea, "[", as.vector(edges)))
+    }
+
+  } else if (is.null(max.lines)) {
     .print.edges.compressed.all(x, edges, names)
+
   } else {
     .print.edges.compressed.limit(x, edges, names, max.lines)
   }

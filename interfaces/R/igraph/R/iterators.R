@@ -135,15 +135,11 @@ create_es <- function(graph, idx, na_ok = FALSE) {
   E(graph)[idx]
 }
 
-## TODO: remove this? What is the point?
 #' @method "[[" igraph.vs
 #' @export
 
-`[[.igraph.vs` <- function(x, i) {
-  if (length(i) != 1) {
-    stop("Invalid `[[` indexing, need single vertex")
-  }
-  res <- x[i]
+`[[.igraph.vs` <- function(x, ...) {
+  res <- x[...]
   attr(res, "single") <- TRUE
   res
 }
@@ -263,15 +259,11 @@ simple_vs_index <- function(x, i, na_ok = FALSE) {
   }
 }
 
-## TODO: remove this? What is it for?
 #' @method "[[" igraph.es
 #' @export
 
-`[[.igraph.es` <- function(x, i) {
-  if (length(i) != 1) {
-    stop("Invalid `[[` indexing, need single edge")
-  }
-  res <- x[i]
+`[[.igraph.es` <- function(x, ...) {
+  res <- x[...]
   attr(res, "single") <- TRUE
   res
 }
@@ -539,23 +531,41 @@ simple_es_index <- function(x, i) {
 #' @export
 
 print.igraph.vs <- function(x, full = igraph_opt("print.full"), ...) {
+
   graph <- get_vs_graph(x)
-  title <- "+ " %+% chr(length(x)) %+% "/" %+%
+  len <- length(x)
+
+  title <- "+ " %+% chr(len) %+% "/" %+%
     (if (is.null(graph)) "?" else chr(vcount(graph))) %+%
-    " vertices" %+%
-    (if (!is.null(names(x))) ", named" else "") %+%
-    ":\n"
+    (if (len == 1) " vertex" else " vertices") %+%
+    (if (!is.null(names(x))) ", named" else "") %+% ":\n"
   cat(title)
 
-  x2 <- if (!is.null(names(x))) names(x) else as.vector(x)
-  if (length(x2)) {
-    if (is.logical(full) && full) {
-      print(x2, quote = FALSE)
-    }  else {
-      head_print(x2, omitted_footer = "+ ... omitted several vertices\n",
-                 quote = FALSE, max_lines = igraph_opt("auto.print.lines"))
+  if (!is.null(attr(x, "single")) && attr(x, "single") &&
+      !is.null(graph) && length(vertex_attr_names(graph) > 0)) {
+    ## Double bracket
+    va <- vertex_attr(graph)
+    if (all(sapply(va, is.atomic))) {
+      print(as.data.frame(va, stringsAsFactors =
+                            FALSE)[as.vector(x),, drop = FALSE])
+    } else {
+      print(lapply(va, "[", as.vector(x)))
+    }
+
+  } else {
+    ## Single bracket
+
+    x2 <- if (!is.null(names(x))) names(x) else as.vector(x)
+    if (length(x2)) {
+      if (is.logical(full) && full) {
+        print(x2, quote = FALSE)
+      }  else {
+        head_print(x2, omitted_footer = "+ ... omitted several vertices\n",
+                   quote = FALSE, max_lines = igraph_opt("auto.print.lines"))
+      }
     }
   }
+
   invisible(x)
 }
 
