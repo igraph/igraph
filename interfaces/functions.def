@@ -481,6 +481,7 @@ igraph_get_all_simple_paths:
         DEPS: from ON graph, to ON graph, res ON graph
         NAME-R: all_simple_paths
         PP-R: get.all.simple.paths.pp
+        IGNORE: RR
 
 igraph_subcomponent: 
         PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
