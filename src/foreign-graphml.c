@@ -1229,7 +1229,12 @@ int igraph_i_xml_escape(char* src, char** dest) {
     else if (ch == '>') destlen += 3;
     else if (ch == '"') destlen += 5;
     else if (ch == '\'') destlen += 5;
-    else if (IS_FORBIDDEN_CONTROL_CHAR(ch)) destlen += 5;
+    else if (IS_FORBIDDEN_CONTROL_CHAR(ch)) {
+      char msg[4096];
+      snprintf(msg, 4096, "Forbidden control character 0x%02X found in igraph_i_xml_escape",
+	  ch);
+      IGRAPH_ERROR(msg, IGRAPH_EINVAL);
+    }
   }
   *dest=igraph_Calloc(destlen+1, char);
   if (!*dest) IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
@@ -1247,11 +1252,7 @@ int igraph_i_xml_escape(char* src, char** dest) {
     case '\'':
       strcpy(d, "&apos;"); d+=5; break;
     default:
-      if (IS_FORBIDDEN_CONTROL_CHAR(ch)) {
-	d += sprintf(d, "&#x%02x;", (unsigned char)(ch))-1;
-      } else {
-	*d = ch;
-      }
+      *d = ch;
     }
   }
   *d=0;
@@ -1395,7 +1396,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
   const char *vprefix= prefixattr ? "v_" : "";
   const char *eprefix= prefixattr ? "e_" : "";
   
-  ret=fprintf(outstream, "<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n");
+  ret=fprintf(outstream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
   ret=fprintf(outstream, "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
