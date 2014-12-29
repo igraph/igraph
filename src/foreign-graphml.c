@@ -1215,20 +1215,32 @@ static xmlSAXHandler igraph_i_graphml_sax_handler={
 
 #endif
 
+#define IS_FORBIDDEN_CONTROL_CHAR(x) ((x) < ' ' && (x) != '\t' && (x) != '\r' && (x) != '\n')
+
 int igraph_i_xml_escape(char* src, char** dest) {
   long int destlen=0;
   char *s, *d;
+  unsigned char ch;
+
   for (s=src; *s; s++, destlen++) {
-    if (*s == '&') destlen += 4;
-    else if (*s == '<') destlen += 3;
-    else if (*s == '>') destlen += 3;
-    else if (*s == '"') destlen += 5;
-    else if (*s == '\'') destlen += 5;
+    ch = (unsigned char)(*s);
+    if (ch == '&') destlen += 4;
+    else if (ch == '<') destlen += 3;
+    else if (ch == '>') destlen += 3;
+    else if (ch == '"') destlen += 5;
+    else if (ch == '\'') destlen += 5;
+    else if (IS_FORBIDDEN_CONTROL_CHAR(ch)) {
+      char msg[4096];
+      snprintf(msg, 4096, "Forbidden control character 0x%02X found in igraph_i_xml_escape",
+	  ch);
+      IGRAPH_ERROR(msg, IGRAPH_EINVAL);
+    }
   }
   *dest=igraph_Calloc(destlen+1, char);
   if (!*dest) IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
   for (s=src, d=*dest; *s; s++, d++) {
-    switch (*s) {
+    ch = (unsigned char)(*s);
+    switch (ch) {
     case '&':
       strcpy(d, "&amp;"); d+=4; break;
     case '<':
@@ -1240,7 +1252,7 @@ int igraph_i_xml_escape(char* src, char** dest) {
     case '\'':
       strcpy(d, "&apos;"); d+=5; break;
     default:
-      *d = *s;
+      *d = ch;
     }
   }
   *d=0;
@@ -1480,9 +1492,12 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
       IGRAPH_CHECK(igraph_i_attribute_get_numeric_graph_attr(graph, name, &numv));
       if (!isnan(VECTOR(numv)[0])) {
         IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-        ret=fprintf(outstream, "    <data key=\"%s%s\">%g</data>\n",
-                    gprefix, name_escaped, VECTOR(numv)[0]);
+        ret=fprintf(outstream, "    <data key=\"%s%s\">", gprefix, name_escaped);
         igraph_Free(name_escaped);
+        if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        ret=igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
+        if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+        ret=fprintf(outstream, "</data>");
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
     } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
@@ -1526,9 +1541,12 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                      igraph_vss_1(l), &numv));
         if (!isnan(VECTOR(numv)[0])) {
           IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-          ret=fprintf(outstream, "      <data key=\"%s%s\">%g</data>\n",
-                      vprefix, name_escaped, VECTOR(numv)[0]);
+          ret=fprintf(outstream, "      <data key=\"%s%s\">", vprefix, name_escaped);
           igraph_Free(name_escaped);
+          if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+          ret=igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
+          if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+          ret=fprintf(outstream, "</data>\n");
           if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
         }
       } else if (VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
@@ -1582,9 +1600,12 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
 			      igraph_ess_1((igraph_integer_t) edge), &numv));
         if (!isnan(VECTOR(numv)[0])) {
           IGRAPH_CHECK(igraph_i_xml_escape(name, &name_escaped));
-          ret=fprintf(outstream, "      <data key=\"%s%s\">%g</data>\n",
-                      eprefix, name_escaped, VECTOR(numv)[0]);
+          ret=fprintf(outstream, "      <data key=\"%s%s\">", eprefix, name_escaped);
           igraph_Free(name_escaped);
+          if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+          ret=igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
+          if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
+          ret=fprintf(outstream, "</data>\n");
           if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
         }
       } else if (VECTOR(etypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
