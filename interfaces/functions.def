@@ -479,7 +479,7 @@ igraph_get_all_simple_paths:
         PARAMS: GRAPH graph, OUT VERTEXSET_INT res, VERTEX from, \
                 VERTEXSET to=ALL, NEIMODE mode=OUT
         DEPS: from ON graph, to ON graph, res ON graph
-        NAME-R: get.all.simple.paths
+        NAME-R: all_simple_paths
         PP-R: get.all.simple.paths.pp
 
 igraph_subcomponent: 

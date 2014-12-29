@@ -1,12 +1,12 @@
-\name{get.all.simple.paths}
-\alias{get.all.simple.paths}
+\name{all_simple_paths}
+\alias{all_simple_paths}
 \concept{Simple path}
 \title{List all simple paths from one source}
 \description{This function lists are simple paths from one source vertex
   to another vertex or vertices. A path is simple if the vertices it
   visits are not visited more than once.}
 \usage{
-get.all.simple.paths (graph, from, to = V(graph),
+all_simple_paths (graph, from, to = V(graph),
     mode = c("out", "in", "all", "total"))
 }
 \arguments{
@@ -39,7 +39,7 @@ get.all.simple.paths (graph, from, to = V(graph),
 %\seealso{}
 \examples{
 g <- make_ring(10)
-get.all.simple.paths(g, 1, 5)
-get.all.simple.paths(g, 1, c(3,5))
+all_simple_paths(g, 1, 5)
+all_simple_paths(g, 1, c(3,5))
 }
 \keyword{graphs}
