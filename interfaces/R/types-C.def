@@ -1095,3 +1095,8 @@ LSETYPE:
   CTYPE: igraph_laplacian_spectral_embedding_type_t
   INCONV:
     IN: %C%=(igraph_laplacian_spectral_embedding_type_t) INTEGER(%I%)[0];
+
+RWSTUCK:
+  CTYPE: igraph_random_walk_stuck_t
+  INCONV:
+    IN: %C%=(igraph_random_walk_stuck_t) INTEGER(%I%)[0];

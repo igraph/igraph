@@ -17,4 +17,8 @@
 <!-- doxrox-include igraph_dfshandler_t -->
 </section>
 
+<section><title>Random walks</title>
+<!-- doxrox-include igraph_random_walk -->
+</section>
+
 </chapter>

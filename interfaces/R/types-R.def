@@ -475,3 +475,8 @@ LSETYPE:
                         "oap"=3L)
   DEFAULT:
     Default: c("default", "D-A", "DAD", "I-DAD", "OAP")
+
+RWSTUCK:
+  INCONV: %I% <- switch(igraph.match.arg(%I%), "error" = 0L, "return" = 1L)
+  DEFAULT:
+    RETURN: c("return", "error")

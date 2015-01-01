@@ -179,8 +179,8 @@ arpack.xml: arpack.xxml $(INCLUDEDIR)/igraph_arpack.h $(SRCDIR)/arpack.c $(INCLU
 bipartite.xml: bipartite.xxml $(SRCDIR)/bipartite.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/bipartite.c
 
-visitors.xml: visitors.xxml $(SRCDIR)/visitors.c  $(INCLUDEDIR)/igraph_visitor.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/visitors.c  $(INCLUDEDIR)/igraph_visitor.h
+visitors.xml: visitors.xxml $(SRCDIR)/visitors.c  $(SRCDIR)/random_walk.c $(INCLUDEDIR)/igraph_visitor.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/visitors.c  $(SRCDIR)/random_walk.c $(INCLUDEDIR)/igraph_visitor.h
 
 random.xml: random.xxml $(SRCDIR)/random.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/random.c

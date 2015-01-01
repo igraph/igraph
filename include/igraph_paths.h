@@ -39,6 +39,7 @@
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_matrix.h"
+#include "igraph_iterators.h"
 
 __BEGIN_DECLS
 
@@ -135,6 +136,11 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
 				igraph_integer_t from,
 				const igraph_vs_t to,
 				igraph_neimode_t mode);
+
+int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
+		       igraph_integer_t start, igraph_neimode_t mode,
+		       igraph_integer_t steps,
+		       igraph_random_walk_stuck_t stuck);
 
 __END_DECLS
 

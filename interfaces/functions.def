@@ -848,6 +848,13 @@ igraph_diversity:
         DEPS: weights ON graph, vids ON graph, res ON graph vids
         NAME-R: diversity
 
+igraph_random_walk:
+        PARAMS: GRAPH graph, OUT VERTEXSET walk, VERTEX start, NEIMODE mode = OUT, \
+	        INTEGER steps, RWSTUCK stuck=RETURN
+        DEPS: start ON graph, walk ON graph
+        NAME-R: random_walk
+        IGNORE: RR
+
 #######################################
 # Degree sequences     
 #######################################

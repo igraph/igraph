@@ -336,6 +336,7 @@ igraph_set_error_handler(igraph_error_handler_t* new_handler);
  * \enumval IGRAPH_EGLP Internal GLPK error.
  * \enumval IGRAPH_CPUTIME CPU time exceeded.
  * \enumval IGRAPH_EUNDERFLOW Integer or double underflow.
+ * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
  */
 
 typedef enum {
@@ -396,7 +397,8 @@ typedef enum {
   IGRAPH_EOVERFLOW        = 55,
   IGRAPH_EGLP             = 56,
   IGRAPH_CPUTIME          = 57,
-  IGRAPH_EUNDERFLOW       = 58
+  IGRAPH_EUNDERFLOW       = 58,
+  IGRAPH_ERWSTUCK         = 59
 } igraph_error_type_t;
 
 /**

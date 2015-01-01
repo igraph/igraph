@@ -28,9 +28,4 @@ that is computed from the local neighborhood of each vertex.
 <!-- doxrox-include igraph_local_scan_neighborhood_ecount -->
 </section>
 
-<section><title>Estimating scan statistics</title>
-<!-- doxrox-include igraph_local_scan_1_ecount_approximate -->
-<!-- doxrox-include igraph_local_scan_1_ecount_approximate_eigen -->
-</section>
-
 </chapter>

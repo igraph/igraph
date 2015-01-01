@@ -158,6 +158,10 @@ typedef enum { IGRAPH_LAYOUT_GRID = 0,
 	       IGRAPH_LAYOUT_NOGRID,
 	       IGRAPH_LAYOUT_AUTOGRID } igraph_layout_grid_t;
 
+typedef enum { IGRAPH_RANDOM_WALK_STUCK_ERROR = 0,
+	       IGRAPH_RANDOM_WALK_STUCK_RETURN } igraph_random_walk_stuck_t;
+
+
 __END_DECLS
 
 #endif
