@@ -313,7 +313,7 @@ int igraphmodule_PyObject_to_eigen_which_t(PyObject *object,
         igraphmodule_PyObject_to_enum(value, eigen_which_position_tt,
                                       (int*) &w->pos);
       } else if (!strcasecmp(kv, "howmany")) {
-        w->howmany = PyInt_AsLong(value);
+        w->howmany = (int) PyInt_AsLong(value);
       } else if (!strcasecmp(kv, "il")) {
         w->il = (int) PyInt_AsLong(value);
       } else if (!strcasecmp(kv, "iu")) {
@@ -479,6 +479,21 @@ int igraphmodule_PyObject_to_layout_grid_t(PyObject *o, igraph_layout_grid_t *re
   } else {
     return igraphmodule_PyObject_to_enum(o, layout_grid_tt, (int*)result);
   }
+}
+
+/**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_random_walk_stuck_t
+ */
+int igraphmodule_PyObject_to_random_walk_stuck_t(PyObject *o,
+  igraph_random_walk_stuck_t *result) {
+  static igraphmodule_enum_translation_table_entry_t random_walk_stuck_tt[] = {
+        {"return", IGRAPH_RANDOM_WALK_STUCK_RETURN},
+        {"error", IGRAPH_RANDOM_WALK_STUCK_ERROR},
+        {0,0}
+  };
+
+  return igraphmodule_PyObject_to_enum(o, random_walk_stuck_tt, (int*)result);
 }
 
 /**

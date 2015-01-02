@@ -11524,7 +11524,49 @@ PyObject *igraphmodule_Graph_community_walktrap(igraphmodule_GraphObject * self,
   return res;
 }
 
-/* }}} */
+/**********************************************************************
+ * Random walks                                                       *
+ **********************************************************************/
+
+/**
+ * Simple random walk of a given length
+ */
+PyObject *igraphmodule_Graph_random_walk(igraphmodule_GraphObject * self,
+  PyObject * args, PyObject * kwds) {
+  static char *kwlist[] = { "start", "steps", "mode", "stuck", NULL };
+  PyObject *start_o, *mode_o = Py_None, *stuck_o = Py_None, *res;
+  igraph_integer_t start;
+  int steps=10;
+  igraph_neimode_t mode = IGRAPH_OUT;
+  igraph_random_walk_stuck_t stuck = IGRAPH_RANDOM_WALK_STUCK_RETURN;
+  igraph_vector_t walk;
+
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|OiOO", kwlist, &start_o,
+		&steps, &mode_o, &stuck_o))
+    return NULL;
+
+  if (igraphmodule_PyObject_to_vid(start_o, &start, &self->g))
+	return NULL;
+
+  if (igraphmodule_PyObject_to_neimode_t(mode_o, &mode))
+	return NULL;
+
+  if (igraphmodule_PyObject_to_random_walk_stuck_t(stuck_o, &stuck))
+	return NULL;
+
+  if (igraph_vector_init(&walk, steps))
+	return igraphmodule_handle_igraph_error();
+
+  if (igraph_random_walk(&self->g, &walk, start, mode, steps, stuck)) {
+	igraph_vector_destroy(&walk);
+	return igraphmodule_handle_igraph_error();
+  }
+
+  res = igraphmodule_vector_t_to_PyList(&walk, IGRAPHMODULE_TYPE_INT);
+  igraph_vector_destroy(&walk);
+
+  return res;
+}
 
 /**********************************************************************
  * Special internal methods that you won't need to mess around with   *
@@ -15423,6 +15465,24 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "_maximum_bipartite_matching(types, weights=None)\n\n"
    "Internal function, undocumented.\n\n"
    "@see: L{Graph.maximum_bipartite_matching}\n"
+  },
+
+  /****************/
+  /* RANDOM WALKS */
+  /****************/
+  {"random_walk", (PyCFunction)igraphmodule_Graph_random_walk,
+   METH_VARARGS | METH_KEYWORDS,
+   "random_walk(start, steps, mode=\"out\", stuck=\"return\")\n\n"
+   "Performs a random walk of a given length from a given node.\n\n"
+   "@param start: the starting vertex of the walk\n"
+   "@param steps: the number of steps that the random walk should take\n"
+   "@param mode: whether to follow outbound edges only (L{OUT}),\n"
+   "  inbound edges only (L{IN}) or both (L{ALL}). Ignored for undirected\n"
+   "  graphs."
+   "@param stuck: what to do when the random walk gets stuck. C{\"return\"}\n"
+   "  returns a partial random walk; C{\"error\"} throws an exception.\n"
+   "@return: a random walk that starts from the given vertex and has at most\n"
+   "  the given length (shorter if the random walk got stuck)\n"
   },
 
   /**********************/
