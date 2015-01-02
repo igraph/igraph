@@ -313,7 +313,7 @@ int igraphmodule_PyObject_to_eigen_which_t(PyObject *object,
         igraphmodule_PyObject_to_enum(value, eigen_which_position_tt,
                                       (int*) &w->pos);
       } else if (!strcasecmp(kv, "howmany")) {
-        w->howmany = PyInt_AsLong(value);
+        w->howmany = (int) PyInt_AsLong(value);
       } else if (!strcasecmp(kv, "il")) {
         w->il = (int) PyInt_AsLong(value);
       } else if (!strcasecmp(kv, "iu")) {
