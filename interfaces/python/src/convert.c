@@ -482,6 +482,21 @@ int igraphmodule_PyObject_to_layout_grid_t(PyObject *o, igraph_layout_grid_t *re
 }
 
 /**
+ * \ingroup python_interface_conversion
+ * \brief Converts a Python object to an igraph \c igraph_random_walk_stuck_t
+ */
+int igraphmodule_PyObject_to_random_walk_stuck_t(PyObject *o,
+  igraph_random_walk_stuck_t *result) {
+  static igraphmodule_enum_translation_table_entry_t random_walk_stuck_tt[] = {
+        {"return", IGRAPH_RANDOM_WALK_STUCK_RETURN},
+        {"error", IGRAPH_RANDOM_WALK_STUCK_ERROR},
+        {0,0}
+  };
+
+  return igraphmodule_PyObject_to_enum(o, random_walk_stuck_tt, (int*)result);
+}
+
+/**
  * \brief Converts a Python object to an igraph \c igraph_reciprocity_t
  */
 int igraphmodule_PyObject_to_reciprocity_t(PyObject *o, igraph_reciprocity_t *result) {
