@@ -181,6 +181,8 @@ igraph_$(VERSION).tar.gz: $(CSRC2) $(CINC2) $(PARSER2) $(RSRC) $(RGEN) \
 	rm -f igraph/src/Makevars
 	touch igraph/src/config.h
 	mkdir -p igraph/man
+	Rscript -e 'devtools::install_github("gaborcsardi/bundler")'
+	Rscript -e 'bundler::bundle_dependencies("igraph", overwrite = TRUE)'
 	tools/builddocs.sh
 	R CMD build igraph
 #############

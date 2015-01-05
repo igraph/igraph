@@ -526,8 +526,11 @@ simple_es_index <- function(x, i) {
                   value=attr(value, "value"), check = FALSE)
 }
 
+#' @include printr.R
+
+head_print <- printr$head_print
+
 #' @method print igraph.vs
-#' @importFrom printr head_print
 #' @export
 
 print.igraph.vs <- function(x, full = igraph_opt("print.full"), ...) {

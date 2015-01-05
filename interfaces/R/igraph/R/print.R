@@ -236,7 +236,10 @@
   }    
 }
 
-#' @importFrom printr head_print printer_callback
+#' @include printr.R
+
+head_print <- printr$head_print
+printer_callback <- printr$printer_callback
 
 .print.edges.compressed <- function(x, edges = E(x), names, num = FALSE,
                                       max.lines = igraph_opt("auto.print.lines")) {
