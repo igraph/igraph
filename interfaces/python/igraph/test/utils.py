@@ -1,10 +1,16 @@
 """Utility functions for unit testing."""
 
 import functools
+import os
 import sys
+import tempfile
 import types
 
-__all__ = ["skip", "skipIf"]
+from contextlib import contextmanager
+from textwrap import dedent
+
+__all__ = ["skip", "skipIf", "temporary_file"]
+
 
 def _id(obj):
     return obj
@@ -37,3 +43,26 @@ except ImportError:
         if condition:
             return skip(reason)
         return _id
+
+
+@contextmanager
+def temporary_file(content=None, mode=None):
+    tmpf, tmpfname = tempfile.mkstemp()
+    os.close(tmpf)
+
+    if mode is None:
+        if content is None:
+            mode = "rb"
+        else:
+            mode = "wb"
+
+    tmpf = open(tmpfname, mode)
+    if content is not None:
+        if isinstance(content, unicode):
+            tmpf.write(dedent(content).encode("utf8"))
+        else:
+            tmpf.write(content)
+
+    tmpf.close()
+    yield tmpfname
+    os.unlink(tmpfname)

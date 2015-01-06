@@ -2,24 +2,7 @@ from __future__ import with_statement
 
 import unittest
 from igraph import *
-import tempfile
-import os
-
-from contextlib import contextmanager
-from textwrap import dedent
-
-@contextmanager
-def temporary_file(content, mode="wb"):
-    tmpf, tmpfname = tempfile.mkstemp()
-    os.close(tmpf)
-    tmpf = open(tmpfname, mode)
-    if isinstance(content, unicode):
-        tmpf.write(dedent(content).encode("utf8"))
-    else:
-        tmpf.write(content)
-    tmpf.close()
-    yield tmpfname
-    os.unlink(tmpfname)
+from igraph.test.utils import temporary_file
 
 
 class ForeignTests(unittest.TestCase):
@@ -28,7 +11,7 @@ class ForeignTests(unittest.TestCase):
         c
         c        This is a simple example file to demonstrate the
         c     DIMACS input file format for minimum-cost flow problems.
-        c 
+        c
         c problem line :
         p max 4 5
         c
@@ -93,7 +76,7 @@ class ForeignTests(unittest.TestCase):
             self.assertTrue(sorted(g.get_edgelist()) == \
                     [(0,1),(0,2),(0,3),(1,0),(1,4),(2,0),(2,3),(3,0),\
                      (3,2),(3,4),(4,1),(4,3)])
-        
+
         with temporary_file(u"""\
         DL n=5
         format = edgelist1
@@ -228,7 +211,7 @@ def suite():
 def test():
     runner = unittest.TextTestRunner()
     runner.run(suite())
-    
+
 if __name__ == "__main__":
     test()
 

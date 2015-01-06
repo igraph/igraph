@@ -1,5 +1,6 @@
 import unittest
 from igraph import *
+from igraph.test.foreign import temporary_file
 
 class CliqueTests(unittest.TestCase):
     def setUp(self):
@@ -34,6 +35,24 @@ class CliqueTests(unittest.TestCase):
                          [[1, 2, 3, 4], [1, 2, 4, 5]])
         self.assertEqual(sorted(map(sorted, self.g.maximal_cliques(max=3))),
                          [[0, 3, 4], [0, 4, 5]])
+
+    def testMaximalCliquesFile(self):
+        def read_cliques(fname):
+            return sorted(sorted(int(item) for item in line.split())
+                              for line in open(fname))
+
+        with temporary_file() as fname:
+            self.g.maximal_cliques(file=fname)
+            self.assertEqual([[0, 3, 4], [0, 4, 5], [1, 2, 3, 4], [1, 2, 4, 5]],
+                             read_cliques(fname))
+
+        with temporary_file() as fname:
+            self.g.maximal_cliques(min=4, file=fname)
+            self.assertEqual([[1, 2, 3, 4], [1, 2, 4, 5]], read_cliques(fname))
+
+        with temporary_file() as fname:
+            self.g.maximal_cliques(max=3, file=fname)
+            self.assertEqual([[0, 3, 4], [0, 4, 5]], read_cliques(fname))
 
     def testCliqueNumber(self):
         self.assertEqual(self.g.clique_number(), 4)
@@ -107,7 +126,7 @@ class CliqueBenchmark(object):
     """This is a benchmark, not a real test case. You can run it
     using:
 
-    >>> from igraph.test.clique import CliqueBenchmark
+    >>> from igraph.test.cliques import CliqueBenchmark
     >>> CliqueBenchmark().run()
     """
 
@@ -195,7 +214,7 @@ def suite():
 def test():
     runner = unittest.TextTestRunner()
     runner.run(suite())
-    
+
 if __name__ == "__main__":
     test()
 
