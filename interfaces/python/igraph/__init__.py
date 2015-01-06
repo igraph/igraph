@@ -2787,6 +2787,13 @@ class Graph(GraphBase):
         """
         return super(Graph, self).get_incidence(types, *args, **kwds)
 
+    ###########################
+    # ctypes support
+
+    @property
+    def _as_parameter_(self):
+        return self._raw_pointer()
+
     ###################
     # Custom operators
 

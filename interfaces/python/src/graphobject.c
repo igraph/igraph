@@ -11614,6 +11614,15 @@ PyObject *igraphmodule_Graph___graph_as_cobject__(igraphmodule_GraphObject *
 #endif
 
 /** \ingroup python_interface_internal
+ * \brief Returns the pointer of the encapsulated igraph graph as an ordinary
+ * Python integer. This allows us to use igraph graphs with the Python ctypes
+ * module without any additional conversions.
+ */
+PyObject *igraphmodule_Graph__raw_pointer(igraphmodule_GraphObject *self) {
+  return PyInt_FromLong((long int)&self->g);
+}
+
+/** \ingroup python_interface_internal
  * \brief Registers a destructor to be called when the object is destroyed
  * \return the previous destructor (if any)
  * Unimplemented.
@@ -15535,12 +15544,23 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "must be passed to other C code through Python.\n\n"},
 #endif
 
+  {"_raw_pointer",
+   (PyCFunction) igraphmodule_Graph__raw_pointer,
+   METH_NOARGS,
+   "_raw_pointer()\n\n"
+   "Returns the memory address of the igraph graph encapsulated by the Python\n"
+   "object as an ordinary Python integer.\n\n"
+   "This function should not be used directly by igraph users, it is useful\n"
+   "only if you want to access some unwrapped function in the C core of igraph\n"
+   "using the ctypes module.\n\n"},
+
   {"__register_destructor",
    (PyCFunction) igraphmodule_Graph___register_destructor__,
    METH_VARARGS | METH_KEYWORDS,
    "__register_destructor(destructor)\n\n"
    "Registers a destructor to be called when the object is freed by\n"
    "Python. This function should not be used directly by igraph users."},
+
   {NULL}
 };
 
