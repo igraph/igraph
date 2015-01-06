@@ -10670,48 +10670,66 @@ PyObject *igraphmodule_Graph_maximum_bipartite_matching(igraphmodule_GraphObject
  */
 PyObject *igraphmodule_Graph_maximal_cliques(igraphmodule_GraphObject * self,
     PyObject* args, PyObject* kwds) {
-  static char* kwlist[] = { "min", "max", NULL };
-  PyObject *list, *item;
+  static char* kwlist[] = { "min", "max", "file", NULL };
+  PyObject *list, *item, *file = Py_None;
   long int i = 0, j = 0;
+  igraph_integer_t min, max;
   Py_ssize_t n;
   igraph_vector_ptr_t result;
+  igraphmodule_filehandle_t filehandle;
 
-  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|ll", kwlist, &i, &j))
+  if (!PyArg_ParseTupleAndKeywords(args, kwds, "|llO", kwlist, &i, &j, &file))
     return NULL;
 
-  if (igraph_vector_ptr_init(&result, 0)) {
-    PyErr_SetString(PyExc_MemoryError, "");
-    return NULL;
-  }
+  min = (igraph_integer_t) i;
+  max = (igraph_integer_t) j;
 
-  if (igraph_maximal_cliques(&self->g, &result, (igraph_integer_t) i, (igraph_integer_t) j)) {
-    igraph_vector_ptr_destroy(&result);
-    return igraphmodule_handle_igraph_error();
-  }
-
-  n = (Py_ssize_t)igraph_vector_ptr_size(&result);
-  list = PyList_New(n);
-  if (!list)
-    return NULL;
-
-  for (i = 0; i < n; i++) {
-    igraph_vector_t *vec = (igraph_vector_t *) VECTOR(result)[i];
-    item = igraphmodule_vector_t_to_PyTuple(vec);
-    if (!item) {
-      for (j = i; j < n; j++)
-        igraph_vector_destroy((igraph_vector_t *) VECTOR(result)[j]);
-      igraph_vector_ptr_destroy_all(&result);
-      Py_DECREF(list);
+  if (file == Py_None) {
+    if (igraph_vector_ptr_init(&result, 0)) {
+      PyErr_SetString(PyExc_MemoryError, "");
       return NULL;
     }
-    else {
-      PyList_SET_ITEM(list, i, item);
-    }
-    igraph_vector_destroy(vec);
-  }
-  igraph_vector_ptr_destroy_all(&result);
 
-  return list;
+    if (igraph_maximal_cliques(&self->g, &result, min, max)) {
+      igraph_vector_ptr_destroy(&result);
+      return igraphmodule_handle_igraph_error();
+    }
+
+    n = (Py_ssize_t)igraph_vector_ptr_size(&result);
+    list = PyList_New(n);
+    if (!list)
+      return NULL;
+
+    for (i = 0; i < n; i++) {
+      igraph_vector_t *vec = (igraph_vector_t *) VECTOR(result)[i];
+      item = igraphmodule_vector_t_to_PyTuple(vec);
+      if (!item) {
+        for (j = i; j < n; j++)
+          igraph_vector_destroy((igraph_vector_t *) VECTOR(result)[j]);
+        igraph_vector_ptr_destroy_all(&result);
+        Py_DECREF(list);
+        return NULL;
+      }
+      else {
+        PyList_SET_ITEM(list, i, item);
+      }
+      igraph_vector_destroy(vec);
+    }
+    igraph_vector_ptr_destroy_all(&result);
+
+    return list;
+  } else {
+    if (igraphmodule_filehandle_init(&filehandle, file, "w")) {
+      return igraphmodule_handle_igraph_error();
+    }
+    if (igraph_maximal_cliques_file(&self->g,
+          igraphmodule_filehandle_get(&filehandle), min, max)) {
+      igraphmodule_filehandle_destroy(&filehandle);
+      return igraphmodule_handle_igraph_error();
+    }
+    igraphmodule_filehandle_destroy(&filehandle);
+    Py_RETURN_NONE;
+  }
 }
 
 /** \ingroup python_interface_graph
@@ -15097,7 +15115,7 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  L{maximal_cliques()} for the maximal cliques"},
   {"maximal_cliques", (PyCFunction) igraphmodule_Graph_maximal_cliques,
    METH_VARARGS | METH_KEYWORDS,
-   "maximal_cliques(min=0, max=0)\n\n"
+   "maximal_cliques(min=0, max=0, file=None)\n\n"
    "Returns the maximal cliques of the graph as a list of tuples.\n\n"
    "A maximal clique is a clique which can't be extended by adding any other\n"
    "vertex to it. A maximal clique is not necessarily one of the largest\n"
@@ -15108,6 +15126,11 @@ struct PyMethodDef igraphmodule_Graph_methods[] = {
    "  or negative, no upper bound will be used. If nonzero, the size of every\n"
    "  maximal clique found will be compared to this value and a clique will\n"
    "  be returned only if its size is smaller than this limit.\n\n"
+   "@param file: a file object or the name of the file to write the results\n"
+   "  to. When this argument is C{None}, the maximal cliques will be returned\n"
+   "  as a list of lists.\n"
+   "@return: the maximal cliques of the graph as a list of lists, or C{None}\n"
+   "  if the C{file} argument was given."
    "@see: L{largest_cliques()} for the largest cliques."},
   {"clique_number", (PyCFunction) igraphmodule_Graph_clique_number,
    METH_NOARGS,
