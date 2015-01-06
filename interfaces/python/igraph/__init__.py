@@ -25,7 +25,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
-Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301 USA
 """
 
@@ -67,7 +67,7 @@ def deprecated(message):
 # pylint: disable-msg=E1101
 class Graph(GraphBase):
     """Generic graph.
-    
+
     This class is built on top of L{GraphBase}, so the order of the
     methods in the Epydoc documentation is a little bit obscure:
     inherited methods come after the ones implemented directly in the
@@ -105,7 +105,7 @@ class Graph(GraphBase):
       >>> g["A", "B"] = 0
       >>> g.ecount()
       2
-    
+
     Assigning values different from zero or one to the adjacency matrix will
     be translated to one, unless the graph is weighted, in which case the
     numbers will be treated as weights:
@@ -144,7 +144,7 @@ class Graph(GraphBase):
     def __init__(self, *args, **kwds):
         """__init__(n=0, edges=None, directed=False, graph_attrs=None,
         vertex_attrs=None, edge_attrs=None)
-        
+
         Constructs a graph from scratch.
 
         @keyword n: the number of vertices. Can be omitted, the default is
@@ -363,7 +363,7 @@ class Graph(GraphBase):
 
     def indegree(self, *args, **kwds):
         """Returns the in-degrees in a list.
-        
+
         See L{degree} for possible arguments.
         """
         kwds['mode'] = IN
@@ -371,7 +371,7 @@ class Graph(GraphBase):
 
     def outdegree(self, *args, **kwds):
         """Returns the out-degrees in a list.
-        
+
         See L{degree} for possible arguments.
         """
         kwds['mode'] = OUT
@@ -421,7 +421,7 @@ class Graph(GraphBase):
     def biconnected_components(self, return_articulation_points=False):
         """\
         Calculates the biconnected components of the graph.
-        
+
         @param return_articulation_points: whether to return the articulation
           points as well
         @return: a L{VertexCover} object describing the biconnected components,
@@ -521,7 +521,7 @@ class Graph(GraphBase):
           (uses both parts). Ignored for directed graphs.
         @param attribute: if C{None}, returns the ordinary adjacency
           matrix. When the name of a valid edge attribute is given
-          here, the matrix returned will contain the default value 
+          here, the matrix returned will contain the default value
           at the places where there is no edge or the value of the
           given attribute where there is an edge. Multiple edges are
           not supported, the value written in the matrix in this case
@@ -549,7 +549,7 @@ class Graph(GraphBase):
             result -= 1
             return result
 
-        if attribute is None: 
+        if attribute is None:
             return Matrix(GraphBase.get_adjacency(self, type))
 
         if attribute not in self.es.attribute_names():
@@ -607,17 +607,17 @@ class Graph(GraphBase):
 
     def get_all_simple_paths(self, v, to=None, mode=OUT):
         """get_all_simple_paths(v, to=None, mode=OUT)
-        
+
         Calculates all the simple paths from a given node to some other nodes
         (or all of them) in a graph.
-        
+
         A path is simple if its vertices are unique, i.e. no vertex is visited
         more than once.
-        
+
         Note that potentially there are exponentially many paths between two
         vertices of a graph, especially if your graph is lattice-like. In this
         case, you may run out of memory when using this function.
-        
+
         @param v: the source for the calculated paths
         @param to: a vertex selector describing the destination for the calculated
           paths. This can be a single vertex ID, a list of vertex IDs, a single
@@ -713,7 +713,7 @@ class Graph(GraphBase):
 
             2. For every vertex except the source and the target, the
                incoming flow is the same as the outgoing flow.
-               
+
         The value of the flow is the incoming flow of the target or the
         outgoing flow of the source (which are equal). The maximum flow
         is the maximum possible such value.
@@ -774,7 +774,7 @@ class Graph(GraphBase):
 
         Calculates the modularity score of the graph with respect to a given
         clustering.
-        
+
         The modularity of a graph w.r.t. some division measures how good the
         division is, or how separated are the different vertex types from each
         other. It's defined as M{Q=1/(2m)*sum(Aij-ki*kj/(2m)delta(ci,cj),i,j)}.
@@ -783,18 +783,18 @@ class Graph(GraphBase):
         node M{i}, M{kj} is the degree of node M{j}, and M{Ci} and C{cj} are
         the types of the two vertices (M{i} and M{j}). M{delta(x,y)} is one iff
         M{x=y}, 0 otherwise.
-        
+
         If edge weights are given, the definition of modularity is modified as
         follows: M{Aij} becomes the weight of the corresponding edge, M{ki}
         is the total weight of edges adjacent to vertex M{i}, M{kj} is the
         total weight of edges adjacent to vertex M{j} and M{m} is the total
         edge weight in the graph.
-        
+
         @param membership: a membership list or a L{VertexClustering} object
         @param weights: optional edge weights or C{None} if all edges are
           weighed equally. Attribute names are also allowed.
         @return: the modularity score
-        
+
         @newfield ref: Reference
         @ref: MEJ Newman and M Girvan: Finding and evaluating community
           structure in networks. Phys Rev E 69 026113, 2004.
@@ -830,7 +830,7 @@ class Graph(GraphBase):
                  weights=None, arpack_options=None, implementation="prpack",
                  niter=1000, eps=0.001):
         """Calculates the Google PageRank values of a graph.
-        
+
         @param vertices: the indices of the vertices being queried.
           C{None} means all of the vertices.
         @param directed: whether to consider directed paths.
@@ -912,7 +912,7 @@ class Graph(GraphBase):
           will be excluded from the average.
         @param weights: edge weights to be used. Can be a sequence or iterable
           or even an edge attribute name.
-        
+
         @see: L{transitivity_undirected()}, L{transitivity_local_undirected()}
         @newfield ref: Reference
         @ref: Watts DJ and Strogatz S: I{Collective dynamics of small-world
@@ -945,11 +945,11 @@ class Graph(GraphBase):
     def count_automorphisms_vf2(self, color=None, edge_color=None,
             node_compat_fn=None, edge_compat_fn=None):
         """Returns the number of automorphisms of the graph.
-        
+
         This function simply calls C{count_isomorphisms_vf2} with the graph
         itself. See C{count_isomorphisms_vf2} for an explanation of the
         parameters.
-        
+
         @return: the number of automorphisms of the graph
         @see: Graph.count_isomorphisms_vf2
         """
@@ -960,11 +960,11 @@ class Graph(GraphBase):
     def get_automorphisms_vf2(self, color=None, edge_color=None,
             node_compat_fn=None, edge_compat_fn=None):
         """Returns all the automorphisms of the graph
-        
+
         This function simply calls C{get_isomorphisms_vf2} with the graph
         itself. See C{get_isomorphisms_vf2} for an explanation of the
         parameters.
-        
+
         @return: a list of lists, each item containing a possible mapping
           of the graph vertices to itself according to the automorphism
         @see: Graph.get_isomorphisms_vf2
@@ -1009,7 +1009,7 @@ class Graph(GraphBase):
     def community_infomap(self, edge_weights=None, vertex_weights=None, trials=10):
         """Finds the community structure of the network according to the Infomap
         method of Martin Rosvall and Carl T. Bergstrom.
-        
+
         @param edge_weights: name of an edge attribute or a list containing
           edge weights.
         @param vertex_weights: name of an vertex attribute or a list containing
@@ -1018,7 +1018,7 @@ class Graph(GraphBase):
         @return: an appropriate L{VertexClustering} object with an extra attribute
           called C{codelength} that stores the code length determined by the
           algorithm.
-        
+
         @newfield ref: Reference
         @ref: M. Rosvall and C. T. Bergstrom: Maps of information flow reveal
           community structure in complex networks, PNAS 105, 1118 (2008).
@@ -1057,7 +1057,7 @@ class Graph(GraphBase):
           dendrogram instead of a single clustering.
         @return: an appropriate L{VertexClustering} or L{VertexDendrogram}
           object.
-        
+
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
         eigenvectors of matrices, arXiv:physics/0605087"""
@@ -1075,12 +1075,12 @@ class Graph(GraphBase):
             arpack_options=None):
         """community_leading_eigenvector(clusters=None, weights=None,
           arpack_options=None)
-        
+
         Newman's leading eigenvector method for detecting community structure.
         This is the proper implementation of the recursive, divisive algorithm:
         each split is done by maximizing the modularity regarding the
         original network.
-        
+
         @param clusters: the desired number of communities. If C{None}, the
           algorithm tries to do as many splits as possible. Note that the
           algorithm won't split a community further if the signs of the leading
@@ -1092,7 +1092,7 @@ class Graph(GraphBase):
           the ARPACK eigenvector calculation. If omitted, the module-level
           variable called C{arpack_options} is used.
         @return: an appropriate L{VertexClustering} object.
-        
+
         @newfield ref: Reference
         @ref: MEJ Newman: Finding community structure in networks using the
         eigenvectors of matrices, arXiv:physics/0605087"""
@@ -1152,7 +1152,7 @@ class Graph(GraphBase):
     def community_multilevel(self, weights=None, return_levels=False):
         """Community structure based on the multilevel algorithm of
         Blondel et al.
-        
+
         This is a bottom-up algorithm: initially every vertex belongs to a
         separate community, and vertices are moved between communities
         iteratively in a way that maximizes the vertices' local contribution
@@ -1307,18 +1307,18 @@ class Graph(GraphBase):
     def community_walktrap(self, weights=None, steps=4):
         """Community detection algorithm of Latapy & Pons, based on random
         walks.
-        
+
         The basic idea of the algorithm is that short random walks tend to stay
         in the same community. The result of the clustering will be represented
         as a dendrogram.
-        
+
         @param weights: name of an edge attribute or a list containing
           edge weights
         @param steps: length of random walks to perform
-        
+
         @return: a L{VertexDendrogram} object, initially cut at the maximum
           modularity.
-          
+
         @newfield ref: Reference
         @ref: Pascal Pons, Matthieu Latapy: Computing communities in large
           networks using random walks, U{http://arxiv.org/abs/physics/0512106}.
@@ -1400,7 +1400,7 @@ class Graph(GraphBase):
           - C{fr_3d}, C{fr3d}, C{fruchterman_reingold_3d}: 3D Fruchterman-
             Reingold layout (see L{Graph.layout_fruchterman_reingold}).
 
-          - C{grid}: regular grid layout in 2D (see L{Graph.layout_grid}) 
+          - C{grid}: regular grid layout in 2D (see L{Graph.layout_grid})
 
           - C{grid_3d}: regular grid layout in 3D (see L{Graph.layout_grid_3d})
 
@@ -1610,11 +1610,11 @@ class Graph(GraphBase):
 
     def maximum_bipartite_matching(self, types="type", weights=None, eps=None):
         """Finds a maximum matching in a bipartite graph.
-        
+
         A maximum matching is a set of edges such that each vertex is incident on
         at most one matched edge and the number (or weight) of such edges in the
         set is as large as possible.
-        
+
         @param types: vertex types in a list or the name of a vertex attribute
           holding vertex types. Types should be denoted by zeros and ones (or
           C{False} and C{True}) for the two sides of the bipartite graph.
@@ -1678,7 +1678,7 @@ class Graph(GraphBase):
         @return: the created graph"""
         if isinstance(f, basestring):
             f = open(f)
-        matrix, ri, weights = [], 0, {} 
+        matrix, ri, weights = [], 0, {}
         for line in f:
             line = line.strip()
             if len(line) == 0: continue
@@ -1921,10 +1921,10 @@ class Graph(GraphBase):
                   edge_stroke_widths="width", \
                   font_size=16, *args, **kwds):
         """Saves the graph as an SVG (Scalable Vector Graphics) file
-        
+
         The file will be Inkscape (http://inkscape.org) compatible.
         In Inkscape, as nodes are rearranged, the edges auto-update.
-        
+
         @param fname: the name of the file or a Python file handle
         @param layout: the layout of the graph. Can be either an
           explicitly specified layout (using a list of coordinate
@@ -1967,7 +1967,7 @@ class Graph(GraphBase):
             width = height
         elif height is None:
             height = width
-                
+
         if width <= 0 or height <= 0:
             raise ValueError("width and height must be positive")
 
@@ -1993,7 +1993,7 @@ class Graph(GraphBase):
                 shapes = self.vs.get_attribute_values(shapes)
             except KeyError:
                 shapes = [1] * self.vcount()
-        
+
         if isinstance(edge_colors, str):
             try:
                 edge_colors = self.es.get_attribute_values(edge_colors)
@@ -2027,7 +2027,7 @@ class Graph(GraphBase):
 
         sizes = [width-2*vertex_size, height-2*vertex_size]
         w, h = bbox.width, bbox.height
-        
+
         ratios = []
         if w == 0:
             ratios.append(1.0)
@@ -2037,11 +2037,11 @@ class Graph(GraphBase):
             ratios.append(1.0)
         else:
             ratios.append(sizes[1] / h)
-        
+
         layout = [[(row[0] - bbox.left) * ratios[0] + vertex_size, \
                   (row[1] - bbox.top) * ratios[1] + vertex_size] \
                   for row in layout]
-                
+
         directed = self.is_directed()
 
         print >> f, '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
@@ -2049,8 +2049,8 @@ class Graph(GraphBase):
         print >> f
         print >> f, '<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"'
         print >> f, 'width="{0}px" height="{1}px">'.format(width, height),
-        
-        
+
+
         edge_color_dict = {}
         print >> f, '<defs id="defs3">'
         for e_col in set(edge_colors):
@@ -2058,7 +2058,7 @@ class Graph(GraphBase):
                 marker_index = ""
             else:
                 marker_index = str(len(edge_color_dict))
-            # Print an arrow marker for each possible line color 
+            # Print an arrow marker for each possible line color
             # This is a copy of Inkscape's standard Arrow 2 marker
             print >> f, '<marker'
             print >> f, '   inkscape:stockid="Arrow2Lend{0}"'.format(marker_index)
@@ -2073,11 +2073,11 @@ class Graph(GraphBase):
             print >> f, '     d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "'
             print >> f, '     transform="scale(1.1) rotate(180) translate(1,0)" />'
             print >> f, '</marker>'
-            
+
             edge_color_dict[e_col] = "Arrow2Lend{0}".format(marker_index)
         print >> f, '</defs>'
         print >> f, '<g inkscape:groupmode="layer" id="layer2" inkscape:label="Lines" sodipodi:insensitive="true">'
-       
+
         for eidx, edge in enumerate(self.es):
             vidxs = edge.tuple
             x1 = layout[vidxs[0]][0]
@@ -2087,7 +2087,7 @@ class Graph(GraphBase):
             angle = math.atan2(y2 - y1, x2 - x1)
             x2 = x2 - vertex_size * math.cos(angle)
             y2 = y2 - vertex_size * math.sin(angle)
-            
+
             print >> f, '<path'
             print >> f, '    style="fill:none;stroke:{0};stroke-width:{2};stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none{1}"'\
                         .format(edge_colors[eidx], ";marker-end:url(#{0})".\
@@ -2111,12 +2111,12 @@ class Graph(GraphBase):
 
         if any(x == 3 for x in shapes):
             # Only import tkFont if we really need it. Unfortunately, this will
-            # flash up an unneccesary Tk window in some cases        
+            # flash up an unneccesary Tk window in some cases
             import tkFont
             import Tkinter as tk
             # This allows us to dynamically size the width of the nodes
             font = tkFont.Font(root=tk.Tk(), font=("Sans", font_size, tkFont.NORMAL))
-        
+
         for vidx in range(self.vcount()):
             print >> f, '    <g id="g{0}" transform="translate({1},{2})">'.\
                         format(vidx, layout[vidx][0], layout[vidx][1])
@@ -2142,7 +2142,7 @@ class Graph(GraphBase):
                 (vertex_width, vertex_height) = (font.measure(str(labels[vidx])) + 2, font.metrics("linespace") + 2)
                 print >> f, '      <rect ry="5" rx="5" x="-{0}" y="-{1}" width="{2}" height="{3}" id="rect{4}" style="fill:{5};fill-opacity:1" />'.\
                     format(vertex_width / 2., vertex_height / 2., vertex_width, vertex_height, vidx, colors[vidx])
-            
+
             print >> f, '      <text sodipodi:linespacing="125%" y="{0}" x="0" id="text{1}" style="font-size:{2}px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans">'.format(vertex_size / 2.,vidx, font_size)
             print >> f, '<tspan y="{0}" x="0" id="tspan{1}" sodipodi:role="line">{2}</tspan></text>'.format(vertex_size / 2.,vidx, str(labels[vidx]))
             print >> f, '    </g>'
@@ -2150,7 +2150,7 @@ class Graph(GraphBase):
         print >> f, '</g>'
         print >> f
         print >> f, '</svg>'
-        
+
         if our_file:
             f.close()
 
@@ -2259,7 +2259,7 @@ class Graph(GraphBase):
         return reader(f, *args, **kwds)
     Load = Read
 
-    
+
     def write(self, f, format=None, *args, **kwds):
         """Unified writing function for graphs.
 
@@ -2540,7 +2540,7 @@ class Graph(GraphBase):
 
     #############################################
     # Friendlier interface for bipartite methods
-    
+
     @classmethod
     def Bipartite(klass, types, *args, **kwds):
         """Bipartite(types, edges, directed=False)
@@ -2694,7 +2694,7 @@ class Graph(GraphBase):
         True
         >>> g2.isomorphic(Graph.Full(5))
         True
-        
+
         @param types: an igraph vector containing the vertex types, or an
           attribute name. Anything that evalulates to C{False} corresponds to
           vertices of the first kind, everything else to the second kind.
@@ -2759,7 +2759,7 @@ class Graph(GraphBase):
         This is useful if you have a bipartite graph and you want to estimate
         the amount of memory you would need to calculate the projections
         themselves.
-        
+
         @param types: an igraph vector containing the vertex types, or an
           attribute name. Anything that evalulates to C{False} corresponds to
           vertices of the first kind, everything else to the second kind.
@@ -2994,7 +2994,7 @@ class Graph(GraphBase):
 
     def __plot__(self, context, bbox, palette, *args, **kwds):
         """Plots the graph to the given Cairo context in the given bounding box
-       
+
         The visual style of vertices and edges can be modified at three
         places in the following order of precedence (lower indices override
         higher indices):
@@ -3046,14 +3046,14 @@ class Graph(GraphBase):
             does not change with every plot, you must either use a
             deterministic layout function (like L{Graph.layout_circle}) or
             calculate the layout in advance and pass a L{Layout} object here.
-            
+
           - C{margin}: the top, right, bottom, left margins as a 4-tuple.
             If it has less than 4 elements or is a single float, the elements
             will be re-used until the length is at least 4.
 
           - C{mark_groups}: whether to highlight some of the vertex groups by
             colored polygons. This argument can be one of the following:
-            
+
               - C{False}: no groups will be highlighted
 
               - A dict mapping tuples of vertex indices to color names.
@@ -3199,7 +3199,7 @@ class Graph(GraphBase):
 
     def summary(self, verbosity=0, width=None, *args, **kwds):
         """Returns the summary of the graph.
-        
+
         The output of this method is similar to the output of the
         C{__str__} method. If I{verbosity} is zero, only the header line
         is returned (see C{__str__} for more details), otherwise the
@@ -3283,7 +3283,7 @@ class Graph(GraphBase):
 
 class VertexSeq(_igraph.VertexSeq):
     """Class representing a sequence of vertices in the graph.
-    
+
     This class is most easily accessed by the C{vs} field of the
     L{Graph} object, which returns an ordered sequence of all vertices in
     the graph. The vertex sequence can be refined by invoking the
@@ -3292,7 +3292,7 @@ class VertexSeq(_igraph.VertexSeq):
 
     An alternative way to create a vertex sequence referring to a given
     graph is to use the constructor directly:
-    
+
       >>> g = Graph.Full(3)
       >>> vs = VertexSeq(g)
       >>> restricted_vs = VertexSeq(g, [0, 1])
@@ -3300,18 +3300,18 @@ class VertexSeq(_igraph.VertexSeq):
     The individual vertices can be accessed by indexing the vertex sequence
     object. It can be used as an iterable as well, or even in a list
     comprehension:
-    
+
       >>> g=Graph.Full(3)
       >>> for v in g.vs:
       ...   v["value"] = v.index ** 2
       ...
       >>> [v["value"] ** 0.5 for v in g.vs]
       [0.0, 1.0, 2.0]
-      
+
     The vertex set can also be used as a dictionary where the keys are the
     attribute names. The values corresponding to the keys are the values
     of the given attribute for every vertex selected by the sequence.
-    
+
       >>> g=Graph.Full(3)
       >>> for idx, v in enumerate(g.vs):
       ...   v["weight"] = idx*(idx+1)
@@ -3386,19 +3386,19 @@ class VertexSeq(_igraph.VertexSeq):
 
     def select(self, *args, **kwds):
         """Selects a subset of the vertex sequence based on some criteria
-        
+
         The selection criteria can be specified by the positional and the keyword
         arguments. Positional arguments are always processed before keyword
         arguments.
-        
+
           - If the first positional argument is C{None}, an empty sequence is
             returned.
-            
+
           - If the first positional argument is a callable object, the object
             will be called for every vertex in the sequence. If it returns
             C{True}, the vertex will be included, otherwise it will
             be excluded.
-            
+
           - If the first positional argument is an iterable, it must return
             integers and they will be considered as indices of the current
             vertex set (NOT the whole vertex set of the graph -- the
@@ -3407,7 +3407,7 @@ class VertexSeq(_igraph.VertexSeq):
             L{VertexSeq.select()}. In this case, the indices do not refer
             directly to the vertices of the graph but to the elements of
             the filtered vertex sequence.
-            
+
           - If the first positional argument is an integer, all remaining
             arguments are expected to be integers. They are considered as
             indices of the current vertex set again.
@@ -3425,7 +3425,7 @@ class VertexSeq(_igraph.VertexSeq):
           - C{ne}: not equal to
 
           - C{lt}: less than
-          
+
           - C{gt}: greater than
 
           - C{le}: less than or equal to
@@ -3510,7 +3510,7 @@ class VertexSeq(_igraph.VertexSeq):
 
             if attr[0] == '_':
                 # Method call, not an attribute
-                values = getattr(vs.graph, attr[1:])(vs) 
+                values = getattr(vs.graph, attr[1:])(vs)
             else:
                 values = vs[attr]
             filtered_idxs=[i for i, v in enumerate(values) if func(v, value)]
@@ -3529,7 +3529,7 @@ class VertexSeq(_igraph.VertexSeq):
 
 class EdgeSeq(_igraph.EdgeSeq):
     """Class representing a sequence of edges in the graph.
-    
+
     This class is most easily accessed by the C{es} field of the
     L{Graph} object, which returns an ordered sequence of all edges in
     the graph. The edge sequence can be refined by invoking the
@@ -3538,7 +3538,7 @@ class EdgeSeq(_igraph.EdgeSeq):
 
     An alternative way to create an edge sequence referring to a given
     graph is to use the constructor directly:
-    
+
       >>> g = Graph.Full(3)
       >>> es = EdgeSeq(g)
       >>> restricted_es = EdgeSeq(g, [0, 1])
@@ -3546,7 +3546,7 @@ class EdgeSeq(_igraph.EdgeSeq):
     The individual edges can be accessed by indexing the edge sequence
     object. It can be used as an iterable as well, or even in a list
     comprehension:
-    
+
       >>> g=Graph.Full(3)
       >>> for e in g.es:
       ...   print e.tuple
@@ -3556,11 +3556,11 @@ class EdgeSeq(_igraph.EdgeSeq):
       (1, 2)
       >>> [max(e.tuple) for e in g.es]
       [1, 2, 2]
-      
+
     The edge sequence can also be used as a dictionary where the keys are the
     attribute names. The values corresponding to the keys are the values
     of the given attribute of every edge in the graph:
-    
+
       >>> g=Graph.Full(3)
       >>> for idx, e in enumerate(g.es):
       ...   e["weight"] = idx*(idx+1)
@@ -3631,19 +3631,19 @@ class EdgeSeq(_igraph.EdgeSeq):
 
     def select(self, *args, **kwds):
         """Selects a subset of the edge sequence based on some criteria
-        
+
         The selection criteria can be specified by the positional and the
         keyword arguments. Positional arguments are always processed before
         keyword arguments.
-        
+
           - If the first positional argument is C{None}, an empty sequence is
             returned.
-            
+
           - If the first positional argument is a callable object, the object
             will be called for every edge in the sequence. If it returns
             C{True}, the edge will be included, otherwise it will
             be excluded.
-            
+
           - If the first positional argument is an iterable, it must return
             integers and they will be considered as indices of the current
             edge set (NOT the whole edge set of the graph -- the
@@ -3652,7 +3652,7 @@ class EdgeSeq(_igraph.EdgeSeq):
             L{EdgeSeq.select()}. In this case, the indices do not refer
             directly to the edges of the graph but to the elements of
             the filtered edge sequence.
-            
+
           - If the first positional argument is an integer, all remaining
             arguments are expected to be integers. They are considered as
             indices of the current edge set again.
@@ -3670,7 +3670,7 @@ class EdgeSeq(_igraph.EdgeSeq):
           - C{ne}: not equal to
 
           - C{lt}: less than
-          
+
           - C{gt}: greater than
 
           - C{le}: less than or equal to
@@ -3724,7 +3724,7 @@ class EdgeSeq(_igraph.EdgeSeq):
              L{Graph} object. This method is called with the edge sequence as
              its first argument (all others left at default values) and edges
              are filtered according to the value returned by the method.
-             
+
         For instance, if you want to exclude edges with a betweenness
         centrality less than 2:
 
@@ -3733,7 +3733,7 @@ class EdgeSeq(_igraph.EdgeSeq):
 
         To select edges originating from vertices 2 and 4:
 
-          >>> edges = g.es.select(_source_in = [2, 4]) 
+          >>> edges = g.es.select(_source_in = [2, 4])
 
         To select edges lying entirely within the subgraph spanned by vertices
         2, 3, 4 and 7:
@@ -3811,7 +3811,7 @@ class EdgeSeq(_igraph.EdgeSeq):
                     candidates = set()
                     for v in value:
                         candidates.update(es.graph.incident(v))
-                    
+
                     if not es.is_all():
                         # Find those where both endpoints are OK
                         filtered_idxs = [i for i, e in enumerate(es) if e.index in candidates
@@ -3849,7 +3849,7 @@ class EdgeSeq(_igraph.EdgeSeq):
                                 (es[i].target in set1 and es[i].source in set2)]
                 else:
                     # Method call, not an attribute
-                    values = getattr(es.graph, attr[1:])(es) 
+                    values = getattr(es.graph, attr[1:])(es)
             else:
                 values = es[attr]
 
@@ -3876,7 +3876,7 @@ class EdgeSeq(_igraph.EdgeSeq):
 
 def _graphmethod(func=None, name=None):
     """Auxiliary decorator
-    
+
     This decorator allows some methods of L{VertexSeq} and L{EdgeSeq} to
     call their respective counterparts in L{Graph} to avoid code duplication.
 
@@ -4070,7 +4070,7 @@ def read(filename, *args, **kwds):
 
     This is just a convenience function, calls L{Graph.Read} directly.
     All arguments are passed unchanged to L{Graph.Read}
-    
+
     @param filename: the name of the file to be loaded
     """
     return Graph.Read(filename, *args, **kwds)
