@@ -2192,7 +2192,7 @@ class Graph(GraphBase):
 
         if ext in [".graphml", ".graphmlz", ".lgl", ".ncol", ".pajek",
             ".gml", ".dimacs", ".edgelist", ".edges", ".edge", ".net",
-            ".pickle", ".picklez", ".dot", ".gw", ".lgr"]:
+            ".pickle", ".picklez", ".dot", ".gw", ".lgr", ".dl"]:
             return ext[1:]
 
         if ext == ".txt" or ext == ".dat":
@@ -2242,7 +2242,8 @@ class Graph(GraphBase):
           GraphML format), C{"gml"} (GML format), C{"net"}, C{"pajek"}
           (Pajek format), C{"dimacs"} (DIMACS format), C{"edgelist"},
           C{"edges"} or C{"edge"} (edge list), C{"adjacency"}
-          (adjacency matrix), C{"pickle"} (Python pickled format),
+          (adjacency matrix), C{"dl"} (DL format used by UCINET),
+          C{"pickle"} (Python pickled format),
           C{"picklez"} (gzipped Python pickled format)
         @raises IOError: if the file format can't be identified and
           none was given.
@@ -3246,7 +3247,8 @@ class Graph(GraphBase):
           "svg":        (None, "write_svg"),
           "gw":         (None, "write_leda"),
           "leda":       (None, "write_leda"),
-          "lgr":        (None, "write_leda")
+          "lgr":        (None, "write_leda"),
+          "dl":         ("Read_DL", None)
     }
 
     _layout_mapping = {
