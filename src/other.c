@@ -179,55 +179,40 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
   igraph_Free(angles);
   IGRAPH_FINALLY_CLEAN(1);
 
-  if (no_of_nodes == 1) {
-    IGRAPH_CHECK(igraph_vector_push_back(&stack, 0));
-    igraph_indheap_delete_max(&order);
-  } else {
-    /* Do the trick */
-    IGRAPH_CHECK(igraph_vector_push_back(&stack, igraph_indheap_max_index(&order)-1));
-    igraph_indheap_delete_max(&order);
-    IGRAPH_CHECK(igraph_vector_push_back(&stack, igraph_indheap_max_index(&order)-1));
-    igraph_indheap_delete_max(&order);
-    
-    j=2;
-    while (!igraph_indheap_empty(&order)) {
-      /* Determine whether we are at a left or right turn */
-      last_idx=(long int) VECTOR(stack)[j-1];
-      before_last_idx=(long int) VECTOR(stack)[j-2];
-      next_idx=(long)igraph_indheap_max_index(&order)-1;
-      igraph_indheap_delete_max(&order);
+  j=0;
+  last_idx=-1;
+  before_last_idx=-1;
+  while (!igraph_indheap_empty(&order)) {
+    next_idx=(long)igraph_indheap_max_index(&order)-1;
+    /* Determine whether we are at a left or right turn */
+    if (j < 2) {
+      /* Pretend that we are turning into the right direction if we have less
+       * than two items in the stack */
+      cp=-1;
+    } else {
       cp=(MATRIX(*data, last_idx, 0)-MATRIX(*data, before_last_idx, 0))*
-	(MATRIX(*data, next_idx, 1)-MATRIX(*data, before_last_idx, 1))-
-	(MATRIX(*data, next_idx, 0)-MATRIX(*data, before_last_idx, 0))*
-	(MATRIX(*data, last_idx, 1)-MATRIX(*data, before_last_idx, 1));
-      /*
-       printf("B L N cp: %d, %d, %d, %f [", before_last_idx, last_idx, next_idx, (float)cp);
-       for (k=0; k<j; k++) printf("%ld ", (long)VECTOR(stack)[k]);
-       printf("]\n");
-       */
-      if (cp == 0) {
-	/* The last three points are collinear. Replace the last one in
-	 * the stack to the newest one */
-	VECTOR(stack)[j-1]=next_idx;
-      } else if (cp < 0) {
-	/* We are turning into the right direction */
-	IGRAPH_CHECK(igraph_vector_push_back(&stack, next_idx));
-	j++;
-      } else {
-	/* No, skip back until we're okay */
-	while (cp >= 0 && j > 2) {
-	  igraph_vector_pop_back(&stack);
-	  j--;
-	  last_idx=(long int) VECTOR(stack)[j-1];
-	  before_last_idx=(long int) VECTOR(stack)[j-2];
-	  cp=(MATRIX(*data, last_idx, 0)-MATRIX(*data, before_last_idx, 0))*
-	    (MATRIX(*data, next_idx, 1)-MATRIX(*data, before_last_idx, 1))-
-	    (MATRIX(*data, next_idx, 0)-MATRIX(*data, before_last_idx, 0))*
-	    (MATRIX(*data, last_idx, 1)-MATRIX(*data, before_last_idx, 1));
-	}
-	IGRAPH_CHECK(igraph_vector_push_back(&stack, next_idx));
-	j++;
-      }
+         (MATRIX(*data, next_idx, 1)-MATRIX(*data, before_last_idx, 1))-
+         (MATRIX(*data, next_idx, 0)-MATRIX(*data, before_last_idx, 0))*
+         (MATRIX(*data, last_idx, 1)-MATRIX(*data, before_last_idx, 1));
+    }
+    /*
+    printf("B L N cp: %ld, %ld, %ld, %f [", before_last_idx, last_idx, next_idx, (float)cp);
+    for (int k=0; k<j; k++) printf("%ld ", (long)VECTOR(stack)[k]);
+    printf("]\n");
+    */
+    if (cp < 0) {
+      /* We are turning into the right direction */
+      igraph_indheap_delete_max(&order);
+      IGRAPH_CHECK(igraph_vector_push_back(&stack, next_idx));
+      before_last_idx = last_idx;
+      last_idx = next_idx;
+      j++;
+    } else {
+      /* No, skip back and try again in the next iteration */
+      igraph_vector_pop_back(&stack);
+      j--;
+      last_idx = before_last_idx;
+      before_last_idx = (j >= 2) ? (long int) VECTOR(stack)[j-2] : -1;
     }
   }
   
