@@ -1497,7 +1497,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
         ret=igraph_real_fprintf_precise(outstream, VECTOR(numv)[0]);
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
-        ret=fprintf(outstream, "</data>");
+        ret=fprintf(outstream, "</data>\n");
         if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
       }
     } else if (VECTOR(gtypes)[i] == IGRAPH_ATTRIBUTE_STRING) {
