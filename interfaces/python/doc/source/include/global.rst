@@ -1,1 +1,0 @@
-.. |igraph| replace:: *igraph*
