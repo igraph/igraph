@@ -1,1 +1,0 @@
-PKG_CFLAGS=-DUSING_R -I.
