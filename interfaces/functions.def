@@ -327,6 +327,7 @@ igraph_hsbm_game:
         GATTR-R: name IS Hierarchical stochastic block model
         GATTR-PARAM-R: m, rho, C, p
         IGNORE: RNamespace
+        INTERNAL: True
 
 igraph_hsbm_list_game:
         PARAMS: OUT GRAPH graph, INTEGER n, VECTOR_INT mlist, \
@@ -335,6 +336,7 @@ igraph_hsbm_list_game:
         GATTR-R: name IS Hierarchical stochastic block model
         GATTR-PARAM-R: p
         IGNORE: RNamespace
+        INTERNAL: True
 
 igraph_correlated_game:
         PARAMS: GRAPH old_graph, OUT GRAPH new_graph, \

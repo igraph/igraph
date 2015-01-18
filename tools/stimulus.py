@@ -353,7 +353,10 @@ class RRCodeGenerator(CodeGenerator):
             params[p].setdefault('mode', 'IN')
 
         ## Roxygen to export the function
-        out.write("#' @export\n")
+        internal = self.func[function].get("INTERNAL")
+        print internal
+        if internal is None or internal == 'False':
+            out.write("#' @export\n")
 
         ## Header
         ## do_par handles the translation of a single argument in the
