@@ -1,0 +1,21 @@
+
+language: c
+
+before_install:
+- sudo apt-get -y install gfortran flex bison
+
+install:
+- ./bootstrap.sh
+- ./configure
+- make
+
+script:
+- make check
+
+after_failure:
+- find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
