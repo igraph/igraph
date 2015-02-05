@@ -31,11 +31,7 @@ int main() {
   int major, minor, subminor;  
   
   igraph_version(&string, &major, &minor, &subminor);
-  if (subminor != 0) { 
-    sprintf(tmp, "%i.%i.%i", major, minor, subminor);
-  } else {
-    sprintf(tmp, "%i.%i", major, minor);    
-  }
+  sprintf(tmp, "%i.%i.%i", major, minor, subminor);
 
   if (strncmp(string, tmp, strlen(tmp))) {
     return 1;
