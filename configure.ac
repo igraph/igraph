@@ -181,7 +181,7 @@ tls_support=no
 HAVE_TLS=0
 THREAD_LOCAL=
 AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
-if test "x$enable_tls" != "xno"; then
+if test "x$enable_tls" == "xyes"; then
   keywords="__thread __declspec(thread)"
   for kw in $keywords ; do
       AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw)
