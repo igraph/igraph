@@ -4309,7 +4309,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
   return 0;
 }
 
-static int computePathFromParents(
+static int igraph_i_compute_path_from_parents(
   const igraph_t *graph,
   const igraph_integer_t from,
   const long int *parents,
@@ -4612,9 +4612,9 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 
   if (to_reach > 0) IGRAPH_WARNING("Couldn't reach some vertices");
 
-  computePathFromParents(graph, from, parents, &vit,
-			 vertices, edges,
-			 predecessors, inbound_edges);
+  igraph_i_compute_path_from_parents(graph, from, parents, &vit,
+				     vertices, edges,
+				     predecessors, inbound_edges);
   
   igraph_lazy_inclist_destroy(&inclist);
   igraph_2wheap_destroy(&Q);
@@ -5408,9 +5408,9 @@ int igraph_get_shortest_paths_bellman_ford(const igraph_t *graph,
     }
   }
 
-  computePathFromParents(graph, from, parents, &tovit,
-			 vertices, edges,
-			 predecessors, inbound_edges);
+  igraph_i_compute_path_from_parents(graph, from, parents, &tovit,
+				     vertices, edges,
+				     predecessors, inbound_edges);
 
   igraph_vector_destroy(&dist);
   IGRAPH_FINALLY_CLEAN(1);
