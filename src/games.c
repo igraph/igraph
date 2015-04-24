@@ -99,6 +99,10 @@ int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
   long int i,j,k;
   long int bagsize, start_nodes, start_edges, new_edges, no_of_edges;
 
+  if (!directed) {
+    outpref = 1;
+  }
+
   start_nodes= start_from ? igraph_vcount(start_from) : 1;
   start_edges= start_from ? igraph_ecount(start_from) : 0;
   if (outseq) { 
@@ -203,6 +207,10 @@ int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
   igraph_vector_t degree;
   long int start_nodes, start_edges, new_edges, no_of_edges;
 
+  if (!directed) {
+    outpref = 1;
+  }
+
   start_nodes= start_from ? igraph_vcount(start_from) : 1;
   start_edges= start_from ? igraph_ecount(start_from) : 0;
   if (outseq) { 
@@ -304,6 +312,10 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
   long int edgeptr=0;
   igraph_vector_t degree;
   long int start_nodes, start_edges, new_edges, no_of_edges;
+
+  if (!directed) {
+    outpref = 1;
+  }
 
   start_nodes= start_from ? igraph_vcount(start_from) : 1;
   start_edges= start_from ? igraph_ecount(start_from) : 0;
@@ -425,7 +437,8 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  * \param outpref Boolean, if true not only the in- but also the out-degree
  *        of a vertex increases its citation probability. Ie. the
  *        citation probability is determined by the total degree of
- *        the vertices.
+ *        the vertices. Ignored and assumed to be true if the graph
+ *        being generated is undirected.
  * \param A The probability that a vertex is cited is proportional to
  *        d^power+A, where d is its degree (see also the \p outpref
  *        argument), power and A are given by arguments. In the
@@ -483,9 +496,12 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
   long int start_nodes= start_from ? igraph_vcount(start_from) : 0;
   long int newn= start_from ? n-start_nodes : n;
 
-  /* Fix an obscure parameterization */
+  /* Fix obscure parameterizations */
   if (outseq && igraph_vector_size(outseq) == 0) {
     outseq=0;
+  }
+  if (!directed) {
+    outpref=1;
   }
   
   /* Check arguments */
