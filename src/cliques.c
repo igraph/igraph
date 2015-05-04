@@ -731,15 +731,6 @@ int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no) {
 /* MAXIMAL CLIQUES, LARGEST CLIQUES                                      */
 /*************************************************************************/
 
-int igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique, void* data,
-    igraph_bool_t* cont) {
-  igraph_integer_t* result = (igraph_integer_t*)data;
-  IGRAPH_UNUSED(cont);
-  if (*result < igraph_vector_size(clique))
-    *result = (igraph_integer_t) igraph_vector_size(clique);
-  return IGRAPH_SUCCESS;
-}
-
 int igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
   igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
   igraph_vector_t* vec;
@@ -863,7 +854,8 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
  */
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
   *no = 0;
-  return igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store_max_size, (void*)no);
+  igraph_maximal_cliques_number(graph,no,-1,-1);
+  return IGRAPH_SUCCESS;
 }
 
 typedef struct {

@@ -404,3 +404,16 @@ int igraph_maximal_cliques_subset(const igraph_t *graph,
 #include "maximal_cliques_template.h"
 #undef IGRAPH_MC_FULL
 
+/**
+ * \function igraph_maximal_cliques_number
+ * \brief Find the clique number of the graph
+ */
+
+int igraph_maximal_cliques_number(const igraph_t *graph,
+				 igraph_integer_t *res,
+				 igraph_integer_t min_size,
+				 igraph_integer_t max_size);
+
+#define IGRAPH_MC_NUMBER
+#include "maximal_cliques_template.h"
+#undef IGRAPH_MC_NUMBER
