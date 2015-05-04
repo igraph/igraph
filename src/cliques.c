@@ -794,7 +794,6 @@ int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, ig
 
   return IGRAPH_SUCCESS;
 }
-
 /**
  * \function igraph_largest_cliques
  * \brief Finds the largest clique(s) in a graph.
@@ -836,6 +835,10 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
   return IGRAPH_SUCCESS;
 }
 
+int igraph_largest_single_clique(const igraph_t *graph, igraph_vector_t *res) {
+  igraph_maximal_cliques_single_largest(graph, res, -1, -1);
+  return IGRAPH_SUCCESS;
+}
 /**
  * \function igraph_clique_number
  * \brief Find the clique number of the graph

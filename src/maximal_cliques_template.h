@@ -113,6 +113,19 @@
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
+#ifdef IGRAPH_MC_SINGLE_LARGEST
+#define RESTYPE igraph_vector_t *res
+#define RESNAME res
+#define SUFFIX _single_largest
+#define RECORD do { \
+  if (igraph_vector_size(res) < clsize) \
+    igraph_vector_update(res,R); \
+  } while (0)
+#define FINALLY igraph_vector_init(res,0);
+#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
+#endif
+
 #ifdef IGRAPH_MC_ORIG
 void igraph_i_maximal_cliques_free(void *ptr) {
   igraph_vector_ptr_t *res=(igraph_vector_ptr_t*) ptr;

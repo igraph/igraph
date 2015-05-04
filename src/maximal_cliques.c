@@ -417,3 +417,17 @@ int igraph_maximal_cliques_number(const igraph_t *graph,
 #define IGRAPH_MC_NUMBER
 #include "maximal_cliques_template.h"
 #undef IGRAPH_MC_NUMBER
+
+/**
+ * \function igraph_maximal_cliques_single_largest
+ * \brief finds a single clique from the set of largest cliques
+ */
+
+int igraph_maximal_cliques_single_largest(const igraph_t *graph,
+				 igraph_vector_t *res,
+				 igraph_integer_t min_size,
+				 igraph_integer_t max_size);
+
+#define IGRAPH_MC_SINGLE_LARGEST
+#include "maximal_cliques_template.h"
+#undef IGRAPH_MC_SINGLE_LARGEST
