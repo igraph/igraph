@@ -1577,7 +1577,7 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
     if (num_swaps % 1000 == 0) {
       snprintf(message, sizeof(message),
           "Random rewiring (%.2f%% of the trials were successful)",
-          (100.0 * num_successful_swaps) / num_swaps);
+          num_swaps > 0 ? ((100.0 * num_successful_swaps) / num_swaps) : 0.0);
       IGRAPH_PROGRESS(message, (100.0 * num_swaps) / n, 0);
     }
     
