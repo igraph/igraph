@@ -26,6 +26,7 @@
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 #include "igraph_interrupt_internal.h"
+#include "igraph_progress.h"
 #include "igraph_structural.h"
 #include "igraph_dqueue.h"
 #include "igraph_stack.h"
@@ -166,21 +167,22 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
   long int no_of_nodes=igraph_vcount(graph);
   igraph_vector_t next_nei=IGRAPH_VECTOR_NULL;
   
-  long int i;
+  long int i, n, num_seen;
   igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
   
   long int no_of_clusters=1;
   long int act_cluster_size;
 
   igraph_vector_t out=IGRAPH_VECTOR_NULL;
-  igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
+  const igraph_vector_int_t* tmp;
+
+  igraph_adjlist_t adjlist;
 
   /* The result */
 
   IGRAPH_VECTOR_INIT_FINALLY(&next_nei, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&out, 0);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
-  IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
 
   if (membership) {
     IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
@@ -191,25 +193,30 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
   if (csize) {
     igraph_vector_clear(csize);
   }
-  
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+  num_seen = 0;
   for (i=0; i<no_of_nodes; i++) {
     IGRAPH_ALLOW_INTERRUPTION();
-    IGRAPH_CHECK(igraph_neighbors(graph, &tmp, (igraph_integer_t) i,
-				  IGRAPH_OUT));
-    if (VECTOR(next_nei)[i] > igraph_vector_size(&tmp)) { continue; }
+
+    tmp = igraph_adjlist_get(&adjlist, i);
+    if (VECTOR(next_nei)[i] > igraph_vector_int_size(tmp)) {
+      continue;
+    }
     
     IGRAPH_CHECK(igraph_dqueue_push(&q, i));
     while (!igraph_dqueue_empty(&q)) {
       long int act_node=(long int) igraph_dqueue_back(&q);
-      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, (igraph_integer_t) act_node,
-				    IGRAPH_OUT));
+      tmp = igraph_adjlist_get(&adjlist, act_node);
       if (VECTOR(next_nei)[act_node]==0) {
 	/* this is the first time we've met this vertex */
 	VECTOR(next_nei)[act_node]++;
-      } else if (VECTOR(next_nei)[act_node] <= igraph_vector_size(&tmp)) {
+      } else if (VECTOR(next_nei)[act_node] <= igraph_vector_int_size(tmp)) {
 	/* we've already met this vertex but it has more children */
-	long int neighbor=(long int) VECTOR(tmp)[(long int)
-						 VECTOR(next_nei)[act_node]-1];
+	long int neighbor=(long int) VECTOR(*tmp)[(long int)
+						  VECTOR(next_nei)[act_node]-1];
 	if (VECTOR(next_nei)[neighbor] == 0) {
 	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	}
@@ -218,18 +225,35 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 	/* we've met this vertex and it has no more children */
 	IGRAPH_CHECK(igraph_vector_push_back(&out, act_node));
 	igraph_dqueue_pop_back(&q);
+	num_seen++;
+
+	if (num_seen % 10000 == 0) {
+	  /* time to report progress and allow the user to interrupt */
+	  IGRAPH_PROGRESS("Strongly connected components: ",
+	      num_seen * 50.0 / no_of_nodes, NULL);
+	  IGRAPH_ALLOW_INTERRUPTION();
+	}
       }
     } /* while q */
   }  /* for */
 
+  IGRAPH_PROGRESS("Strongly connected components: ", 50.0, NULL);
+
+  igraph_adjlist_destroy(&adjlist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
   /* OK, we've the 'out' values for the nodes, let's use them in
      decreasing order with the help of a heap */
 
-  igraph_vector_null(&next_nei);                            /* mark already
-							added vertices */
+  igraph_vector_null(&next_nei);             /* mark already added vertices */
+  num_seen = 0;
+
   while (!igraph_vector_empty(&out)) {
     long int grandfather=(long int) igraph_vector_pop_back(&out);
-    IGRAPH_ALLOW_INTERRUPTION();
+
     if (VECTOR(next_nei)[grandfather] != 0) { continue; }
     VECTOR(next_nei)[grandfather]=1;
     act_cluster_size=1;
@@ -238,12 +262,20 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
     }
     IGRAPH_CHECK(igraph_dqueue_push(&q, grandfather));
     
+    num_seen++;
+    if (num_seen % 10000 == 0) {
+      /* time to report progress and allow the user to interrupt */
+      IGRAPH_PROGRESS("Strongly connected components: ",
+	  50.0 + num_seen * 50.0 / no_of_nodes, NULL);
+      IGRAPH_ALLOW_INTERRUPTION();
+    }
+
     while (!igraph_dqueue_empty(&q)) {
       long int act_node=(long int) igraph_dqueue_pop_back(&q);
-      IGRAPH_CHECK(igraph_neighbors(graph, &tmp, (igraph_integer_t) act_node, 
-				    IGRAPH_IN));
-      for (i=0; i<igraph_vector_size(&tmp); i++) {
-	long int neighbor=(long int) VECTOR(tmp)[i];
+      tmp = igraph_adjlist_get(&adjlist, act_node);
+      n = igraph_vector_int_size(tmp);
+      for (i=0; i<n; i++) {
+	long int neighbor=(long int) VECTOR(*tmp)[i];
 	if (VECTOR(next_nei)[neighbor] != 0) { continue; }
 	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	VECTOR(next_nei)[neighbor]=1;
@@ -251,20 +283,31 @@ int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 	if (membership) {
 	  VECTOR(*membership)[neighbor]=no_of_clusters-1;
 	}
+
+	num_seen++;
+	if (num_seen % 10000 == 0) {
+	  /* time to report progress and allow the user to interrupt */
+	  IGRAPH_PROGRESS("Strongly connected components: ",
+	      50.0 + num_seen * 50.0 / no_of_nodes, NULL);
+	  IGRAPH_ALLOW_INTERRUPTION();
+	}
       }
     }
+
     no_of_clusters++;
     if (csize) {
       IGRAPH_CHECK(igraph_vector_push_back(csize, act_cluster_size));
     }
   }
   
+  IGRAPH_PROGRESS("Strongly connected components: ", 100.0, NULL);
+
   if (no) { *no=(igraph_integer_t) no_of_clusters-1; }
 
   /* Clean up, return */
 
+  igraph_adjlist_destroy(&adjlist);
   igraph_vector_destroy(&out);
-  igraph_vector_destroy(&tmp);
   igraph_dqueue_destroy(&q);
   igraph_vector_destroy(&next_nei);
   IGRAPH_FINALLY_CLEAN(4);
