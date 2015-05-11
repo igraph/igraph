@@ -1,5 +1,5 @@
 
-[![](https://travis-ci.org/igraph/igraph.png?branch=master)](https://travis-ci.org/igraph/igraph)
+[![](https://travis-ci.org/igraph/igraph.svg?branch=master)](https://travis-ci.org/igraph/igraph)
 
 The igraph library
 ------------------
