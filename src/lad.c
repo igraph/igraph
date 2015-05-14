@@ -66,13 +66,26 @@
 #define false 0
 #define bool char
 
-/* helper to allocate an array of given size */
+/* helper to allocate an array of given size and free it using IGRAPH_FINALLY
+ * when needed */
 #define ALLOC_ARRAY(VAR, SIZE, TYPE) { \
   VAR = igraph_Calloc(SIZE, TYPE);   \
   if (VAR == 0) {                    \
     IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
   }  \
   IGRAPH_FINALLY(igraph_free, VAR);  \
+}
+
+/* helper to allocate an array of given size and store its address in a
+ * pointer array */
+#define ALLOC_ARRAY_IN_HISTORY(VAR, SIZE, TYPE, HISTORY) { \
+  VAR = igraph_Calloc(SIZE, TYPE);   \
+  if (VAR == 0) {                    \
+    IGRAPH_ERROR("cannot allocate '" #VAR "' array in LAD isomorphism search", IGRAPH_ENOMEM); \
+  }  \
+  IGRAPH_FINALLY(igraph_free, VAR);  \
+  IGRAPH_CHECK(igraph_vector_ptr_push_back(HISTORY, VAR));  \
+  IGRAPH_FINALLY_CLEAN(1);           \
 }
 
 /* ---------------------------------------------------------*/
@@ -1303,7 +1316,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
 		       int *invalid, igraph_bool_t *iso, 
 		       igraph_vector_t *map, igraph_vector_ptr_t *maps, 
 		       int *nbNodes, int *nbFail, int *nbSol, 
-		       clock_t *begin) {
+		       clock_t *begin, igraph_vector_ptr_t *alloc_history) {
   /* if firstSol then search for the first solution; otherwise search
      for all solutions if induced then search for induced subgraphs;
      otherwise search for partial subgraphs 
@@ -1326,8 +1339,8 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   }
 
   /* Allocate memory */
-  ALLOC_ARRAY(nbVal, Gp->nbVertices, int);
-  ALLOC_ARRAY(globalMatching, Gp->nbVertices, int);
+  ALLOC_ARRAY_IN_HISTORY(nbVal, Gp->nbVertices, int, alloc_history);
+  ALLOC_ARRAY_IN_HISTORY(globalMatching, Gp->nbVertices, int, alloc_history);
 
   IGRAPH_CHECK(igraph_i_lad_filter(induced, D, Gp, Gt, &result));
   if (!result) { 
@@ -1378,7 +1391,7 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   }
 	
   /* save the domain of minDom to iterate on its values */
-  ALLOC_ARRAY(val, VECTOR(D->nbVal)[minDom], int);
+  ALLOC_ARRAY_IN_HISTORY(val, VECTOR(D->nbVal)[minDom], int, alloc_history);
   for (i=0; i < VECTOR(D->nbVal)[minDom]; i++) {
     val[i]=VECTOR(D->val)[ VECTOR(D->firstVal)[minDom]+i ]; 
   }
@@ -1395,7 +1408,8 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
     } else {
       IGRAPH_CHECK(igraph_i_lad_solve(timeLimit, firstSol, induced,
 				      D, Gp, Gt, invalid, iso, map, maps, 
-				      nbNodes, nbFail, nbSol, begin));
+				      nbNodes, nbFail, nbSol, begin,
+				      alloc_history));
     }
     /* restore domain sizes and global all different matching */
     igraph_vector_int_fill(&D->globalMatchingT, -1);
@@ -1408,12 +1422,13 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
   *invalid=0;
 
   igraph_free(val);
-  IGRAPH_FINALLY_CLEAN(1);
+  igraph_vector_ptr_pop_back(alloc_history);
 
 cleanup:
   igraph_free(globalMatching);
+  igraph_vector_ptr_pop_back(alloc_history);
   igraph_free(nbVal);
-  IGRAPH_FINALLY_CLEAN(2);
+  igraph_vector_ptr_pop_back(alloc_history);
 
   return 0;
 }
@@ -1484,6 +1499,8 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   int nbSol=0;
   /* reusable structure to get CPU time usage */
   clock_t begin=clock();
+  /* Stack to store memory blocks that are allocated during igraph_i_lad_solve */
+  igraph_vector_ptr_t alloc_history;
 
   if (!iso && !map && !maps) {
     IGRAPH_ERROR("Please give least one of `iso', `map' or `maps'", 
@@ -1531,10 +1548,17 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
   igraph_vector_int_destroy(&toMatch);
   IGRAPH_FINALLY_CLEAN(1);
   if (invalidDomain) { goto exit; }
-	
+
+  IGRAPH_CHECK(igraph_vector_ptr_init(&alloc_history, 0));
+  IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &alloc_history);
+
   IGRAPH_CHECK(igraph_i_lad_solve(time_limit, firstSol, (char) induced, &D, 
 				  &Gp, &Gt, &invalidDomain, iso, map, maps, 
-				  &nbNodes, &nbFail, &nbSol, &begin));
+				  &nbNodes, &nbFail, &nbSol, &begin,
+				  &alloc_history));
+
+  igraph_vector_ptr_destroy_all(&alloc_history);
+  IGRAPH_FINALLY_CLEAN(1);
 
  exit:
   
