@@ -149,9 +149,17 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_MATRIX_INIT_FINALLY(&dij, no_nodes, no_nodes);
   IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
   IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
-  IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, &dij, igraph_vss_all(),
-					      igraph_vss_all(), weights,
-					      IGRAPH_ALL));
+
+  if (weights && igraph_vector_min(weights) < 0) {
+    IGRAPH_CHECK(igraph_shortest_paths_bellman_ford(graph, &dij, igraph_vss_all(),
+						    igraph_vss_all(), weights,
+						    IGRAPH_ALL));
+  } else {
+
+    IGRAPH_CHECK(igraph_shortest_paths_dijkstra(graph, &dij, igraph_vss_all(),
+						igraph_vss_all(), weights,
+						IGRAPH_ALL));
+  }
   
   max_dij = 0.0;
   for (i=0; i<no_nodes; i++) {
