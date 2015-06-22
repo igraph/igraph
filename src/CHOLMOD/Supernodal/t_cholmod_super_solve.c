@@ -14,6 +14,37 @@
 
 #include "cholmod_template.h"
 
+#ifdef USING_R
+#include <Rconfig.h>
+#ifdef HAVE_F77_UNDERSCORE
+# define F77_CALL(x)    x ## _
+#else
+# define F77_CALL(x)    x
+#endif
+#define F77_NAME(x)    F77_CALL(x)
+#define F77_SUB(x)     F77_CALL(x)
+#define F77_COM(x)     F77_CALL(x)
+#define F77_COMDECL(x) F77_CALL(x)
+void F77_NAME(dsyrk)(const char *uplo, const char *trans,
+		     const int *n, const int *k,
+		     const double *alpha, const double *a, const int *lda,
+		     const double *beta, double *c, const int *ldc);
+
+void F77_NAME(dpotrf)(const char* uplo, const int* n,
+		      double* a, const int* lda, int* info);
+
+void F77_NAME(dtrsm)(const char *side, const char *uplo,
+		     const char *transa, const char *diag,
+		     const int *m, const int *n, const double *alpha,
+		     const double *a, const int *lda,
+		     double *b, const int *ldb);
+
+void F77_NAME(dtrsv)(const char *uplo, const char *trans,
+		     const char *diag, const int *n,
+		     const double *a, const int *lda,
+		     double *x, const int *incx);
+#endif
+
 static void TEMPLATE (cholmod_super_lsolve)
 (
     /* ---- input ---- */
