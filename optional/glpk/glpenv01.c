@@ -132,7 +132,9 @@ ENV *get_env_ptr(void)
       {  /* not initialized yet; perform initialization */
          if (glp_init_env() != 0)
          {  /* initialization failed; display an error message */
-	   IGRAPH_ERROR("GLPK initialization failed", IGRAPH_EGLP);
+	   igraph_error("GLPK initialization failed", __FILE__, __LINE__,
+			IGRAPH_EGLP);
+	   return NULL;
          }
          /* initialization successful; retrieve the pointer */
          env = tls_get_ptr();
@@ -140,7 +142,9 @@ ENV *get_env_ptr(void)
       /* check if the environment block is valid */
       if (env->magic != ENV_MAGIC)
       {  
-	IGRAPH_ERROR("Invalid GLPK environment", IGRAPH_EGLP);
+	igraph_error("Invalid GLPK environment", __FILE__, __LINE__,
+		     IGRAPH_EGLP);
+	return NULL;
       }
       return env;
 }
