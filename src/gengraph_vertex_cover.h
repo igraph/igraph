@@ -29,6 +29,10 @@
 
 #include "gengraph_box_list.h"
 
+#ifndef register
+#define register
+#endif
+
 namespace gengraph { 
 
 void vertex_cover(int n, int *links, int *deg, int **neigh = NULL) {

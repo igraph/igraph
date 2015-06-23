@@ -24,6 +24,10 @@
 #include <assert.h>
 #include <stdio.h>
 
+#ifndef register
+#define register
+#endif
+
 namespace gengraph {
 
 //___________________________________________________________________________
