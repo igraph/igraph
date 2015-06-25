@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
+#include <stdint.h>
 using namespace prpack;
 using namespace std;
 
@@ -433,7 +434,7 @@ prpack_result* prpack_solver::solve_via_gs_err(
     double delta = 0.;
     // run Gauss-Seidel, note that we store x/deg[i] throughout this 
     // iteration.
-    long long maxedges = (long long)((double)num_es*std::min(
+    int64_t maxedges = (int64_t)((double)num_es*std::min(
                             log(tol)/log(alpha),
                             (double)PRPACK_SOLVER_MAX_ITERS));
     ret->num_es_touched = 0;
