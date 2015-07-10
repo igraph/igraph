@@ -519,13 +519,13 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 				igraph_vector_t *modularity, 
 				igraph_vector_t *membership) {
   long int no_of_edges, no_of_nodes, no_of_joins, total_joins;
-  long int i, j, k, n, m, from, to, dummy;
+  long int i, j, k, n, m, from, to, dummy, best_no_of_joins;
   igraph_integer_t ffrom, fto;
   igraph_eit_t edgeit;
   igraph_i_fastgreedy_commpair *pairs, *p1, *p2;
   igraph_i_fastgreedy_community_list communities;
   igraph_vector_t a;
-  igraph_real_t q, *dq, weight_sum, loop_weight_sum;
+  igraph_real_t q, *dq, bestq, weight_sum, loop_weight_sum;
   igraph_bool_t has_multiple;
 
   /*long int join_order[] = { 16,5, 5,6, 6,0, 4,0, 10,0, 26,29, 29,33, 23,33, 27,33, 25,24, 24,31, 12,3, 21,1, 30,8, 8,32, 9,2, 17,1, 11,0, 7,3, 3,2, 13,2, 1,2, 28,31, 31,33, 22,32, 18,32, 20,32, 32,33, 15,33, 14,33, 0,19, 19,2, -1,-1 };*/
@@ -682,6 +682,10 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 	  q -= VECTOR(a)[i]*VECTOR(a)[i];
   }
 
+  /* Initialize "best modularity" value and best merge counter */
+  bestq = q;
+  best_no_of_joins = 0;
+
   /* Initializing community heap */
   debug("Initializing community heap\n");
   igraph_i_fastgreedy_community_list_build_heap(&communities);
@@ -698,6 +702,12 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 	if (modularity)
       VECTOR(*modularity)[no_of_joins] = q;
     
+    /* Update best modularity if needed */
+	if (q >= bestq) {
+      bestq = q;
+      best_no_of_joins = no_of_joins;
+    }
+
 	/* Some debug info if needed */
 	/* igraph_i_fastgreedy_community_list_check_heap(&communities); */
 #ifdef DEBUG
@@ -903,10 +913,9 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(4);
 
   if (membership) {
-    long int m=igraph_vector_which_max(modularity);
     IGRAPH_CHECK(igraph_community_to_membership(merges,
 						(igraph_integer_t) no_of_nodes, 
-						/*steps=*/ (igraph_integer_t) m,
+						/*steps=*/ (igraph_integer_t) best_no_of_joins,
 						membership, 
 						/*csize=*/ 0));
   }

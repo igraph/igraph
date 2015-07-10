@@ -23,32 +23,40 @@
 
 #include <igraph.h>
 
-void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges, FILE* f) {
+void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges,
+		igraph_vector_t *membership, FILE* f) {
   long int i;
-  igraph_vector_t membership;
+  igraph_vector_t our_membership;
 
-  igraph_vector_init(&membership, 0);
+  igraph_vector_init(&our_membership, 0);
 
-  i=igraph_vector_which_max(mod);
-  fprintf(f, "Modularity:  %f\n", VECTOR(*mod)[i]);
-  igraph_community_to_membership(merges, igraph_vcount(g), i, &membership, 0);
+  if (membership != 0) {
+    igraph_vector_update(&our_membership, membership);
+    fprintf(f, "Modularity:  ---\n");
+  } else {
+    i=igraph_vector_which_max(mod);
+    fprintf(f, "Modularity:  %f\n", VECTOR(*mod)[i]);
+    igraph_community_to_membership(merges, igraph_vcount(g), i, &our_membership, 0);
+  }
+
   printf("Membership: ");
-  for (i=0; i<igraph_vector_size(&membership); i++) {
-    printf("%li ", (long int)VECTOR(membership)[i]);
+  for (i=0; i<igraph_vector_size(&our_membership); i++) {
+    printf("%li ", (long int)VECTOR(our_membership)[i]);
   }
   printf("\n");
 
-  igraph_vector_destroy(&membership);
+  igraph_vector_destroy(&our_membership);
 }
 
 int main() {
   igraph_t g;
-  igraph_vector_t modularity, weights;
+  igraph_vector_t modularity, weights, membership;
   igraph_matrix_t merges;
 
   igraph_vector_init(&modularity,0);
   igraph_matrix_init(&merges,0,0);
   igraph_vector_init(&weights,0);
+  igraph_vector_init(&membership,0);
 
   /* Simple unweighted graph */
   igraph_small(&g, 10, IGRAPH_UNDIRECTED, 
@@ -56,14 +64,14 @@ int main() {
 	       5,6,5,7,5,8,5,9, 6,7,6,8,6,9, 7,8,7,9, 8,9,
            0,5, -1);
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout); 
+  show_results(&g, &modularity, &merges, 0, stdout); 
 
   /* Same simple graph, with uniform edge weights */
   igraph_vector_resize(&weights, igraph_ecount(&g));
   igraph_vector_fill(&weights, 2);
   igraph_community_fastgreedy(&g, &weights, &merges, &modularity, 
 			      /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout); 
+  show_results(&g, &modularity, &merges, 0, stdout); 
   igraph_destroy(&g);
 
   /* Simple nonuniform weighted graph, with and without weights */
@@ -73,10 +81,10 @@ int main() {
   igraph_vector_fill(&weights, 1);
   VECTOR(weights)[0] = 10; VECTOR(weights)[1] = 10;
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout); 
+  show_results(&g, &modularity, &merges, 0, stdout); 
   igraph_community_fastgreedy(&g, &weights, &merges, &modularity, 
 			      /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout); 
+  show_results(&g, &modularity, &merges, 0, stdout); 
   igraph_destroy(&g);
 
   /* Zachary Karate club */
@@ -100,7 +108,7 @@ int main() {
 	       -1);
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, 
 			      /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout); 
+  show_results(&g, &modularity, &merges, 0, stdout); 
   igraph_destroy(&g);
    
   /* Simple disconnected graph with isolates */
@@ -109,7 +117,7 @@ int main() {
 	       4,  5,  4,  6,  4,  7,  5,  6,  5,  7,  6,  7,
 	       -1);
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout); 
+  show_results(&g, &modularity, &merges, 0, stdout); 
   igraph_destroy(&g);
 
   /* Disjoint union of two rings */
@@ -117,28 +125,39 @@ int main() {
            0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,0,9,
 	   10,11,11,12,12,13,13,14,14,15,15,16,16,17,17,18,18,19,10,19,-1);
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout);
+  show_results(&g, &modularity, &merges, 0, stdout);
   igraph_destroy(&g);
 
   /* Completely empty graph */
   igraph_small(&g, 10, IGRAPH_UNDIRECTED, -1);
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout);
+  show_results(&g, &modularity, &merges, 0, stdout);
   igraph_destroy(&g);
 
   /* Ring graph with loop edges */
   igraph_small(&g, 6, IGRAPH_UNDIRECTED,
           0,1,1,2,2,3,3,4,4,5,5,0,0,0,2,2,-1);
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout);
+  show_results(&g, &modularity, &merges, 0, stdout);
   igraph_destroy(&g);
 
   /* Regression test -- graph with two vertices and two edges */
   igraph_small(&g, 2, IGRAPH_UNDIRECTED, 0,0,1,1,-1);
   igraph_community_fastgreedy(&g, 0, &merges, &modularity, /*membership=*/ 0);
-  show_results(&g, &modularity, &merges, stdout);
+  show_results(&g, &modularity, &merges, 0, stdout);
   igraph_destroy(&g);
 
+  /* Regression test -- asking for optimal membership vector but not
+   * providing a modularity vector */
+  igraph_small(&g, 10, IGRAPH_UNDIRECTED, 
+	       0,1,0,2,0,3,0,4, 1,2,1,3,1,4, 2,3,2,4, 3,4,
+	       5,6,5,7,5,8,5,9, 6,7,6,8,6,9, 7,8,7,9, 8,9,
+           0,5, -1);
+  igraph_community_fastgreedy(&g, 0, &merges, 0, &membership);
+  show_results(&g, 0, &merges, &membership, stdout);
+  igraph_destroy(&g);
+
+  igraph_vector_destroy(&membership);
   igraph_vector_destroy(&modularity);
   igraph_vector_destroy(&weights);
   igraph_matrix_destroy(&merges);
