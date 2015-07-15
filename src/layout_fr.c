@@ -132,7 +132,8 @@ int igraph_layout_i_fr(const igraph_t *graph,
       igraph_integer_t u=IGRAPH_TO(graph, e);
       igraph_real_t dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
       igraph_real_t dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
-      igraph_real_t dlen=sqrt(dx * dx + dy * dy);
+      igraph_real_t w=weight ? VECTOR(*weight)[e] : 1.0;
+      igraph_real_t dlen=sqrt(dx * dx + dy * dy) * w;
       VECTOR(dispx)[v] -= (dx * dlen);
       VECTOR(dispy)[v] -= (dy * dlen);
       VECTOR(dispx)[u] += (dx * dlen);
@@ -256,7 +257,8 @@ int igraph_layout_i_grid_fr(const igraph_t *graph,
       igraph_integer_t u=IGRAPH_TO(graph, e);
       igraph_real_t dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
       igraph_real_t dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
-      igraph_real_t dlen=sqrt(dx * dx + dy * dy);
+      igraph_real_t w=weight ? VECTOR(*weight)[e] : 1.0;
+      igraph_real_t dlen=sqrt(dx * dx + dy * dy) * w;
       VECTOR(dispx)[v] -= (dx * dlen);
       VECTOR(dispy)[v] -= (dy * dlen);
       VECTOR(dispx)[u] += (dx * dlen);
@@ -619,7 +621,8 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
       igraph_real_t dx=MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
       igraph_real_t dy=MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
       igraph_real_t dz=MATRIX(*res, v, 2) - MATRIX(*res, u, 2);
-      igraph_real_t dlen=sqrt(dx * dx + dy * dy + dz * dz);
+      igraph_real_t w=weight ? VECTOR(*weight)[e] : 1.0;
+      igraph_real_t dlen=sqrt(dx * dx + dy * dy + dz * dz) * w;
       VECTOR(dispx)[v] -= (dx * dlen);
       VECTOR(dispy)[v] -= (dy * dlen);
       VECTOR(dispz)[v] -= (dz * dlen);
