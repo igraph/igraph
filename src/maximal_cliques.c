@@ -413,6 +413,27 @@ int igraph_i_maximal_cliques_number(const igraph_t *graph,
 				 igraph_integer_t *res,
 				 igraph_integer_t min_size,
 				 igraph_integer_t max_size);
+/**
+ * \function igraph_clique_number
+ * \brief Find the clique number of the graph
+ *
+ * </para><para>
+ * The clique number of a graph is the size of the largest clique.
+ *
+ * \param graph The input graph.
+ * \param no The clique number will be returned to the \c igraph_integer_t
+ *   pointed by this variable.
+ * \return Error code.
+ *
+ * \sa \ref igraph_maximal_cliques().
+ *
+ * Time complexity: O(3^(|V|/3)) worst case.
+ */
+int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
+  *no = 0;
+  igraph_i_maximal_cliques_number(graph,no,-1,-1);
+  return IGRAPH_SUCCESS;
+}
 
 #define IGRAPH_MC_NUMBER
 #include "maximal_cliques_template.h"
@@ -427,6 +448,37 @@ int igraph_i_maximal_cliques_single_largest(const igraph_t *graph,
 				 igraph_vector_t *res,
 				 igraph_integer_t min_size,
 				 igraph_integer_t max_size);
+
+/**
+ * \function igraph_largest_single_clique
+ * \brief Finds a single clique from the set of largest cliques
+ *
+ * </para><para>
+ * This is similar to \ref igraph_largest_cliques() except that only a
+ * single clique from the set of largest cliques is returned.
+ *
+ * </para><para>The current implementation of this function searches
+ * for maximal cliques using \ref igraph_maximal_cliques() and drops
+ * those that are not larger then the current largest.  If a larger
+ * clique is found it replaces the current largest and continues.
+ * Since only one clique is stored at any given time this function uses
+ * much less memory then \ref igraph_largest_cliques().
+ *
+ * \param graph The input graph.
+ * \param res Pointer to an igraph_vector, the result
+ *        will be stored here. It will be resized as needed. Note that
+ *        vertices of the clique may be returned in arbitrary order.
+ * \return Error code.
+ *
+ * \sa \ref igraph_maximal_cliques().
+ *
+ * Time complexity: O(3^(|V|/3)) worst case.
+ */
+
+int igraph_largest_single_clique(const igraph_t *graph, igraph_vector_t *res) {
+  igraph_i_maximal_cliques_single_largest(graph, res, -1, -1);
+  return IGRAPH_SUCCESS;
+}
 
 #define IGRAPH_MC_SINGLE_LARGEST
 #include "maximal_cliques_template.h"

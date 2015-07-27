@@ -125,12 +125,11 @@
 #define PREFIX i_
 #define RECORD do { \
   if (igraph_vector_size(res) < clsize){ \
-    int j = 0; \
-    igraph_vector_t *cl = igraph_Calloc(1, igraph_vector_t); \
-    igraph_vector_init(cl, clsize); \
-    for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; } \
-      igraph_vector_update(res,cl); \
-      igraph_vector_destroy(cl); \
+    igraph_vector_init(res, clsize); \
+    int j; \
+    for (j=0; j<clsize; j++) { \
+      VECTOR(*res)[j] = VECTOR(*R)[j]; \
+    } \
   } \
   } while (0)
 #define FINALLY igraph_vector_init(res,0);

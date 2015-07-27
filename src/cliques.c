@@ -835,32 +835,6 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
   return IGRAPH_SUCCESS;
 }
 
-int igraph_largest_single_clique(const igraph_t *graph, igraph_vector_t *res) {
-  igraph_i_maximal_cliques_single_largest(graph, res, -1, -1);
-  return IGRAPH_SUCCESS;
-}
-/**
- * \function igraph_clique_number
- * \brief Find the clique number of the graph
- *
- * </para><para>
- * The clique number of a graph is the size of the largest clique.
- *
- * \param graph The input graph.
- * \param no The clique number will be returned to the \c igraph_integer_t
- *   pointed by this variable.
- * \return Error code.
- * 
- * \sa \ref igraph_cliques(), \ref igraph_largest_cliques().
- * 
- * Time complexity: O(3^(|V|/3)) worst case.
- */
-int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
-  *no = 0;
-  igraph_i_maximal_cliques_number(graph,no,-1,-1);
-  return IGRAPH_SUCCESS;
-}
-
 typedef struct {
   igraph_vector_int_t cand;
   igraph_vector_int_t fini;
