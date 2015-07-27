@@ -427,7 +427,8 @@ int igraph_i_maximal_cliques_number(const igraph_t *graph,
  *
  * \sa \ref igraph_maximal_cliques().
  *
- * Time complexity: O(3^(|V|/3)) worst case.
+ * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
+ * of the graph, this is typically small for sparse graphs.
  */
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
   *no = 0;
@@ -472,7 +473,8 @@ int igraph_i_maximal_cliques_single_largest(const igraph_t *graph,
  *
  * \sa \ref igraph_maximal_cliques().
  *
- * Time complexity: O(3^(|V|/3)) worst case.
+ * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
+ * of the graph, this is typically small for sparse graphs.
  */
 
 int igraph_largest_single_clique(const igraph_t *graph, igraph_vector_t *res) {
