@@ -69,10 +69,6 @@ int igraph_largest_cliques(const igraph_t *graph,
 int igraph_largest_single_clique(const igraph_t *graph,
 			   igraph_vector_t *clique);
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no);
-int igraph_maximal_cliques_number(const igraph_t *graph,
-				 igraph_integer_t *res,
-				 igraph_integer_t min_size,
-				 igraph_integer_t max_size);
 int igraph_independent_vertex_sets(const igraph_t *graph,
 				   igraph_vector_ptr_t *res,
 				   igraph_integer_t min_size,

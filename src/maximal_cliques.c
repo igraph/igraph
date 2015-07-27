@@ -31,9 +31,9 @@
 #include "igraph_progress.h"
 #include "igraph_math.h"
 
-#define CONCAT2x(a,b) a ## b 
-#define CONCAT2(a,b) CONCAT2x(a,b)
-#define FUNCTION(name,sfx) CONCAT2(name,sfx)
+#define CONCAT4x(a,b,c,d) a ## b ## c ## d
+#define CONCAT4(a,b,c,d) CONCAT4x(a,b,c,d)
+#define FUNCTION(namepfx,pfx,name,sfx) CONCAT4(namepfx,pfx,name,sfx)
 
 int igraph_i_maximal_cliques_reorder_adjlists(
 			      const igraph_vector_int_t *PX,
@@ -409,7 +409,7 @@ int igraph_maximal_cliques_subset(const igraph_t *graph,
  * \brief Find the clique number of the graph
  */
 
-int igraph_maximal_cliques_number(const igraph_t *graph,
+int igraph_i_maximal_cliques_number(const igraph_t *graph,
 				 igraph_integer_t *res,
 				 igraph_integer_t min_size,
 				 igraph_integer_t max_size);
@@ -423,7 +423,7 @@ int igraph_maximal_cliques_number(const igraph_t *graph,
  * \brief finds a single clique from the set of largest cliques
  */
 
-int igraph_maximal_cliques_single_largest(const igraph_t *graph,
+int igraph_i_maximal_cliques_single_largest(const igraph_t *graph,
 				 igraph_vector_t *res,
 				 igraph_integer_t min_size,
 				 igraph_integer_t max_size);

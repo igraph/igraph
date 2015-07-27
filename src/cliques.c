@@ -836,7 +836,7 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
 }
 
 int igraph_largest_single_clique(const igraph_t *graph, igraph_vector_t *res) {
-  igraph_maximal_cliques_single_largest(graph, res, -1, -1);
+  igraph_i_maximal_cliques_single_largest(graph, res, -1, -1);
   return IGRAPH_SUCCESS;
 }
 /**
@@ -857,7 +857,7 @@ int igraph_largest_single_clique(const igraph_t *graph, igraph_vector_t *res) {
  */
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no) {
   *no = 0;
-  igraph_maximal_cliques_number(graph,no,-1,-1);
+  igraph_i_maximal_cliques_number(graph,no,-1,-1);
   return IGRAPH_SUCCESS;
 }
 
