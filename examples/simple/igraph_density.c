@@ -130,4 +130,6 @@ int main() {
   igraph_destroy(&g);
 
   igraph_vector_destroy(&v);
+
+  return 0;
 }

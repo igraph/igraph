@@ -1499,69 +1499,40 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
-/**
- * \ingroup structural
- * \function igraph_rewire
- * \brief Randomly rewires a graph while preserving the degree distribution.
- * 
- * </para><para>
- * This function generates a new graph based on the original one by randomly
- * rewiring edges while preserving the original graph's degree distribution.
- * Please note that the rewiring is done "in place", so no new graph will
- * be allocated. If you would like to keep the original graph intact, use
- * \ref igraph_copy() beforehand.
- * 
- * \param graph The graph object to be rewired.
- * \param n Number of rewiring trials to perform.
- * \param mode The rewiring algorithm to be used. It can be one of the following:
- *         \clist
- *           \cli IGRAPH_REWIRING_SIMPLE
- *                Simple rewiring algorithm which chooses two arbitrary edges
- *                in each step (namely (a,b) and (c,d)) and substitutes them
- *                with (a,d) and (c,b) if they don't exist.  The method will
- *                neither destroy nor create self-loops.
- *           \cli IGRAPH_REWIRING_SIMPLE_LOOPS
- *                Same as \c IGRAPH_REWIRING_SIMPLE but allows the creation or
- *                destruction of self-loops.
- *         \endclist
- *
- * \return Error code:
- *         \clist
- *           \cli IGRAPH_EINVMODE
- *                Invalid rewiring mode.
- *           \cli IGRAPH_EINVAL
- *                Graph unsuitable for rewiring (e.g. it has
- *                less than 4 nodes in case of \c IGRAPH_REWIRING_SIMPLE)
- *           \cli IGRAPH_ENOMEM
- *                Not enough memory for temporary data.
- *         \endclist
- *
- * Time complexity: TODO.
- * 
- * \example examples/simple/igraph_rewire.c
- */
-
-int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
+// Not declared static so that the testsuite can use it, but not part of the public API.
+int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
   char message[256];
   igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
-  igraph_vector_t eids, edgevec;
+  igraph_vector_t eids, edgevec, alledges;
   igraph_bool_t directed, loops, ok;
   igraph_es_t es;
+  igraph_adjlist_t al;
   
-  if ((mode == IGRAPH_REWIRING_SIMPLE || mode == IGRAPH_REWIRING_SIMPLE_LOOPS) &&
-      no_of_nodes<4)
+  if (no_of_nodes<4)
     IGRAPH_ERROR("graph unsuitable for rewiring", IGRAPH_EINVAL);
   
   directed = igraph_is_directed(graph);
-  loops = (mode == IGRAPH_REWIRING_SIMPLE_LOOPS);
+  loops = (mode & IGRAPH_REWIRING_SIMPLE_LOOPS);
   
   RNG_BEGIN();
 
-  IGRAPH_VECTOR_INIT_FINALLY(&edgevec, 4);
   IGRAPH_VECTOR_INIT_FINALLY(&eids, 2);
-  es = igraph_ess_vector(&eids);
+
+  if(use_adjlist) {
+    /* As well as the sorted adjacency list, we maintain an unordered
+     * list of edges for picking a random edge in constant time.
+     */
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_OUT));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+    IGRAPH_VECTOR_INIT_FINALLY(&alledges, no_of_edges * 2);
+    igraph_get_edgelist(graph, &alledges, /*bycol=*/ 0);
+  }
+  else {
+    IGRAPH_VECTOR_INIT_FINALLY(&edgevec, 4);
+    es = igraph_ess_vector(&eids);
+  }
 
   /* We don't want the algorithm to get stuck in an infinite loop when
    * it can't choose two edges satisfying the conditions. Instead of
@@ -1593,16 +1564,30 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
       } while (VECTOR(eids)[0] == VECTOR(eids)[1]);
 
       /* Get the endpoints */
-      IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) VECTOR(eids)[0], 
-			       &a, &b));
-      IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) VECTOR(eids)[1],
-			       &c, &d));
+      if(use_adjlist) {
+	a = VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[0]) * 2];
+	b = VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[0]) * 2) + 1];
+	c = VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[1]) * 2];
+	d = VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1];
+      }
+      else {
+	IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) VECTOR(eids)[0], 
+				 &a, &b));
+	IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) VECTOR(eids)[1],
+				 &c, &d));
+      }
 
       /* For an undirected graph, we have two "variants" of each edge, i.e.
        * a -- b and b -- a. Since some rewirings can be performed only when we
        * "swap" the endpoints, we do it now with probability 0.5 */
       if (!directed && RNG_UNIF01() < 0.5) {
         dummy = c; c = d; d = dummy;
+	if(use_adjlist) {
+	  /* Flip the edge in the unordered edge-list, so the update later on
+	   * hits the correct end. */
+	  VECTOR(alledges)[((igraph_integer_t)VECTOR(eids)[1]) * 2] = c;
+	  VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1] = d;
+	}
       }
 
       /* If we do not touch loops, check whether a == b or c == d and disallow
@@ -1628,24 +1613,46 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
       /* All good so far. Now check for the existence of a --> d and c --> b to
        * disallow the creation of multiple edges */
       if (ok) {
-        IGRAPH_CHECK(igraph_are_connected(graph, a, d, &ok));
-        ok = !ok;
+	if(use_adjlist) {
+	  if(igraph_adjlist_has_edge(&al, a, d, directed))
+	    ok = 0;
+	}
+	else {
+	  IGRAPH_CHECK(igraph_are_connected(graph, a, d, &ok));
+	  ok = !ok;
+	}
       }
       if (ok) {
-        IGRAPH_CHECK(igraph_are_connected(graph, c, b, &ok));
-        ok = !ok;
+	if(use_adjlist) {
+	  if(igraph_adjlist_has_edge(&al, c, b, directed))
+	    ok = 0;
+	}
+	else {
+	  IGRAPH_CHECK(igraph_are_connected(graph, c, b, &ok));
+	  ok = !ok;
+	}
       }
 
       /* If we are still okay, we can perform the rewiring */
       if (ok) {
 	/* printf("Deleting: %ld -> %ld, %ld -> %ld\n",
                   (long)a, (long)b, (long)c, (long)d); */
-	IGRAPH_CHECK(igraph_delete_edges(graph, es));	
-	VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=d;
-	VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=b;
-	/* printf("Adding: %ld -> %ld, %ld -> %ld\n",
+	if(use_adjlist) {
+	  // Replace entry in sorted adjlist:
+	  IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, a, b, d, directed));
+	  IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, c, d, b, directed));
+	  // Also replace in unsorted edgelist:
+	  VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[0]) * 2) + 1] = d;
+	  VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1] = b;
+	}
+	else {
+	  IGRAPH_CHECK(igraph_delete_edges(graph, es));	
+	  VECTOR(edgevec)[0]=a; VECTOR(edgevec)[1]=d;
+	  VECTOR(edgevec)[2]=c; VECTOR(edgevec)[3]=b;
+	  /* printf("Adding: %ld -> %ld, %ld -> %ld\n",
                   (long)a, (long)d, (long)c, (long)b); */
-	igraph_add_edges(graph, &edgevec, 0);
+	  igraph_add_edges(graph, &edgevec, 0);
+	}
         num_successful_swaps++;
       }
       break;
@@ -1655,16 +1662,80 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
     }
     num_swaps++;
   }
+
+  if(use_adjlist) {
+    /* Replace graph edges with the adjlist current state */
+    IGRAPH_CHECK(igraph_delete_edges(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID)));
+    IGRAPH_CHECK(igraph_add_edges(graph, &alledges, 0));
+  }
   
   IGRAPH_PROGRESS("Random rewiring: ", 100.0, 0);
 
+  if(use_adjlist) {
+    igraph_vector_destroy(&alledges);
+    igraph_adjlist_destroy(&al);
+  }
+  else {
+    igraph_vector_destroy(&edgevec);
+  }
+
   igraph_vector_destroy(&eids);
-  igraph_vector_destroy(&edgevec);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(use_adjlist ? 3 : 2);
   
   RNG_END();
   
   return 0;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_rewire
+ * \brief Randomly rewires a graph while preserving the degree distribution.
+ * 
+ * </para><para>
+ * This function generates a new graph based on the original one by randomly
+ * rewiring edges while preserving the original graph's degree distribution.
+ * Please note that the rewiring is done "in place", so no new graph will
+ * be allocated. If you would like to keep the original graph intact, use
+ * \ref igraph_copy() beforehand.
+ * 
+ * \param graph The graph object to be rewired.
+ * \param n Number of rewiring trials to perform.
+ * \param mode The rewiring algorithm to be used. It can be one of the following flags:
+ *         \clist
+ *           \cli IGRAPH_REWIRING_SIMPLE
+ *                Simple rewiring algorithm which chooses two arbitrary edges
+ *                in each step (namely (a,b) and (c,d)) and substitutes them
+ *                with (a,d) and (c,b) if they don't exist.  The method will
+ *                neither destroy nor create self-loops.
+ *           \cli IGRAPH_REWIRING_SIMPLE_LOOPS
+ *                Same as \c IGRAPH_REWIRING_SIMPLE but allows the creation or
+ *                destruction of self-loops.
+ *         \endclist
+ *
+ * \return Error code:
+ *         \clist
+ *           \cli IGRAPH_EINVMODE
+ *                Invalid rewiring mode.
+ *           \cli IGRAPH_EINVAL
+ *                Graph unsuitable for rewiring (e.g. it has
+ *                less than 4 nodes in case of \c IGRAPH_REWIRING_SIMPLE)
+ *           \cli IGRAPH_ENOMEM
+ *                Not enough memory for temporary data.
+ *         \endclist
+ *
+ * Time complexity: TODO.
+ * 
+ * \example examples/simple/igraph_rewire.c
+ */
+
+#define REWIRE_ADJLIST_THRESHOLD 10
+
+int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
+
+  igraph_bool_t use_adjlist = n >= REWIRE_ADJLIST_THRESHOLD;
+  return igraph_rewire_core(graph, n, mode, use_adjlist);
+
 }
 
 int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,

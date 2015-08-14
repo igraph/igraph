@@ -23,29 +23,50 @@
 
 #include <igraph.h>
 
-int main() {
-  
+int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist);
+
+static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjlist, const char* description) {
+
   igraph_t g;
-  igraph_vector_t res;
-  long i, n;
+  igraph_vector_t indegree_before, outdegree_before, indegree_after, outdegree_after;
+
+  igraph_tree(&g, 10, 3, tree_mode);
   
-  igraph_tree(&g, 10, 3, IGRAPH_TREE_OUT);
-  igraph_rewire(&g, 1000, IGRAPH_REWIRING_SIMPLE);
-  
-  n=igraph_vcount(&g);
-  igraph_vector_init(&res, 0);
-  igraph_degree(&g, &res, igraph_vss_all(), IGRAPH_IN, 0);
-  for (i=0; i<n; i++)
-    printf("%ld ", (long)igraph_vector_e(&res, i));
-  printf("\n");
-  
-  igraph_degree(&g, &res, igraph_vss_all(), IGRAPH_OUT, 0);
-  for (i=0; i<n; i++)
-    printf("%ld ", (long)igraph_vector_e(&res, i));
-  printf("\n");
-    
+  igraph_vector_init(&indegree_before, 0);
+  igraph_vector_init(&outdegree_before, 0);
+  igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, 0);
+  igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, 0);
+
+  igraph_rewire_core(&g, 1000, IGRAPH_REWIRING_SIMPLE, use_adjlist);
+
+  igraph_vector_init(&indegree_after, 0);
+  igraph_vector_init(&outdegree_after, 0);
+  igraph_degree(&g, &indegree_after, igraph_vss_all(), IGRAPH_IN, 0);
+  igraph_degree(&g, &outdegree_after, igraph_vss_all(), IGRAPH_OUT, 0);
+
+  if((!igraph_vector_all_e(&indegree_before, &indegree_after)) ||
+     (!igraph_vector_all_e(&outdegree_before, &outdegree_after))) {
+
+    fprintf(stderr, "%s graph degrees changed\n", description);
+    exit(1);
+
+  }
+
   igraph_destroy(&g);
-  igraph_vector_destroy(&res);
+  igraph_vector_destroy(&indegree_before);
+  igraph_vector_destroy(&outdegree_before);
+  igraph_vector_destroy(&indegree_after);
+  igraph_vector_destroy(&outdegree_after);
+
+}
+
+int main() {
+
+  check_rewiring(IGRAPH_TREE_OUT, 0, "Directed, standard-method");
+  check_rewiring(IGRAPH_TREE_OUT, 1, "Directed, adjlist-method");
+  check_rewiring(IGRAPH_TREE_UNDIRECTED, 0, "Undirected, standard-method");
+  check_rewiring(IGRAPH_TREE_UNDIRECTED, 1, "Undirected, adjlist-method");
   
   return 0;
+
 }

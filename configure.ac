@@ -133,9 +133,14 @@ if test $graphml_support = yes; then
   AC_PATH_PROG([XML2CONFIG], [xml2-config], [none])
   if test "$XML2CONFIG" = "none"; then
 	# Hmmm, no xml2-config. OS X does not have it while still
-	# having libxml2, so let's try an educated guess
-	XML2_LIBS="-lxml2 -lz -lm"
-	XML2_CFLAGS="-I/usr/include/libxml2"
+	# having libxml2, so let's try an educated guess if
+	# /usr/include/libxml2/libxml/parser.h exists.
+	AC_CHECK_FILE([/usr/include/libxml2/libxml/parser.h], [
+	  XML2_LIBS="-lxml2 -lz -lm"
+	  XML2_CFLAGS="-I/usr/include/libxml2"
+	], [
+	  graphml_support=no
+	])
   else
     XML2_LIBS=`$XML2CONFIG --libs`
     XML2_CFLAGS=`$XML2CONFIG --cflags`

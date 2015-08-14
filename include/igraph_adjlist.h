@@ -61,6 +61,9 @@ int igraph_adjlist_remove_duplicate(const igraph_t *graph,
 				    igraph_adjlist_t *al);
 int igraph_adjlist_print(const igraph_adjlist_t *al);
 int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
+igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed);
+int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed);
+
 /* igraph_vector_int_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
 /* 			       igraph_integer_t no); */
 /**

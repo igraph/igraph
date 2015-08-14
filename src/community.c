@@ -889,6 +889,9 @@ int igraph_modularity(const igraph_t *graph,
     IGRAPH_ERROR("cannot calculate modularity, membership vector too short",
       IGRAPH_EINVAL);
   }
+  if (igraph_vector_min(membership) < 0) {
+    IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
+  }
 
   IGRAPH_VECTOR_INIT_FINALLY(&e, types);
   IGRAPH_VECTOR_INIT_FINALLY(&a, types);
