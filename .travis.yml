@@ -1,8 +1,12 @@
 
 language: c
 
-before_install:
-- sudo apt-get -y install gfortran flex bison
+addons:
+  apt:
+    packages:
+    - gfortran
+    - flex
+    - bison
 
 install:
 - ./bootstrap.sh
