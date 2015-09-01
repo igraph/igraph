@@ -136,5 +136,35 @@ int main() {
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
+	/* Invalid directed graphical degree sequence when there is only one vertex
+	 * with a non-zero out-degree. Regression test for bug #851 */
+	igraph_vector_init_int_end(&inseq, -1, 1, -1);
+	igraph_vector_init_int_end(&outseq, -1, 1, -1);
+    igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
+    if (result)
+        return 13;
+    igraph_vector_destroy(&outseq);
+    igraph_vector_destroy(&inseq);
+
+	/* Another invalid directed graphical degree sequence when there is only
+	 * one vertex with a non-zero out-degree. Regression test for bug #851 */
+	igraph_vector_init_int_end(&inseq, -1, 2, 0, -1);
+	igraph_vector_init_int_end(&outseq, -1, 0, 2, -1);
+    igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
+    if (result)
+        return 14;
+    igraph_vector_destroy(&outseq);
+    igraph_vector_destroy(&inseq);
+
+	/* Another invalid directed graphical degree sequence when there is only
+	 * one vertex with a non-zero out-degree. Regression test for bug #851 */
+	igraph_vector_init_int_end(&inseq, -1, 2, 2, -1);
+	igraph_vector_init_int_end(&outseq, -1, 2, 2, -1);
+    igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
+    if (result)
+        return 13;
+    igraph_vector_destroy(&outseq);
+    igraph_vector_destroy(&inseq);
+
     return 0;
 }

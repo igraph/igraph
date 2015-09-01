@@ -6823,8 +6823,12 @@ int igraph_i_is_graphical_degree_sequence_directed(
 		/* Is the degree larger than the number of vertices with nonzero in-degree?
 		 * (Make sure that u is excluded from the vertices with nonzero in-degree).
 		 */
-		if (degree > nonzero_indegree_count - (VECTOR(work_in)[u] > 0 ? 1 : 0))
+		if (degree > nonzero_indegree_count - (VECTOR(work_in)[u] > 0 ? 1 : 0)) {
+      /* Put u back into the queue to detect the failure even if u was the
+       * last vertex. See Github bug #851 */
+      IGRAPH_CHECK(igraph_vector_long_push_back(&out_vertices, u));
 			break;
+    }
 
 		/* Find the prefix of index_array that consists solely of vertices with
 		 * zero indegree. We don't need to sort these */
