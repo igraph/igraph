@@ -146,7 +146,7 @@ int FUNCTION(igraph_vector,init)      (TYPE(igraph_vector)* v, int long size) {
  * Be sure that you \em don't ever call the destructor (\ref
  * igraph_vector_destroy()) on objects created by this constructor.
  * \param v Pointer to an uninitialized \type igraph_vector_t object.
- * \param data Pointer, the C array.
+ * \param data Pointer, the C array. It may not be \c NULL.
  * \param length The length of the C array.
  * \return Pointer to the vector object, the same as the 
  *     \p v parameter, for convenience.
@@ -158,6 +158,9 @@ const TYPE(igraph_vector)*FUNCTION(igraph_vector,view) (const TYPE(igraph_vector
 							const BASE *data, 
 							long int length) {
   TYPE(igraph_vector) *v2=(TYPE(igraph_vector)*)v;
+
+  assert(data != 0);
+
   v2->stor_begin=(BASE*)data;
   v2->stor_end=(BASE*)data+length;
   v2->end=v2->stor_end;
