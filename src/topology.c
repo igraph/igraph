@@ -2844,6 +2844,9 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
     IGRAPH_ERROR("Cannot compare directed and undirected graphs",
 		 IGRAPH_EINVAL);
   }
+  if (igraph_is_directed(graph1) || igraph_is_directed(graph2)) {
+    IGRAPH_WARNING("Directed graphs will be treated as undirected by BLISS.");
+  }
 
   if (no_of_nodes != igraph_vcount(graph2) ||
       no_of_edges != igraph_ecount(graph2)) {
