@@ -33,7 +33,7 @@ int main() {
   igraph_tree(&g, 42, 3, IGRAPH_TREE_OUT);
   igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT);
   igraph_adjlist(&g2, &adjlist, IGRAPH_OUT, /*duplicate=*/ 0);
-  igraph_isomorphic_bliss(&g, &g2, &iso, 0, 0, IGRAPH_BLISS_F, IGRAPH_BLISS_F, 0, 0);
+  igraph_isomorphic(&g, &g2, &iso);
   if (!iso) { return 1; }
   igraph_adjlist_destroy(&adjlist);
   igraph_destroy(&g2);
@@ -43,7 +43,7 @@ int main() {
   igraph_tree(&g, 42, 3, IGRAPH_TREE_OUT);
   igraph_adjlist_init(&g, &adjlist, IGRAPH_IN);
   igraph_adjlist(&g2, &adjlist, IGRAPH_IN, /*duplicate=*/ 0);
-  igraph_isomorphic_bliss(&g, &g2, &iso, 0, 0, IGRAPH_BLISS_F, IGRAPH_BLISS_F, 0, 0);
+  igraph_isomorphic(&g, &g2, &iso);
   if (!iso) { return 1; }
   igraph_adjlist_destroy(&adjlist);
   igraph_destroy(&g2);
@@ -53,7 +53,7 @@ int main() {
   igraph_tree(&g, 42, 3, IGRAPH_TREE_UNDIRECTED);
   igraph_adjlist_init(&g, &adjlist, IGRAPH_OUT);
   igraph_adjlist(&g2, &adjlist, IGRAPH_ALL, /*duplicate=*/ 1);
-  igraph_isomorphic_bliss(&g, &g2, &iso, 0, 0, IGRAPH_BLISS_F, IGRAPH_BLISS_F, 0, 0);
+  igraph_isomorphic(&g, &g2, &iso);
   if (!iso) { return 1; }
   igraph_adjlist_destroy(&adjlist);
   igraph_destroy(&g2);
