@@ -32,6 +32,8 @@ void check_attr(igraph_t *graph, int offset) {
 int main() {
 
   igraph_t graph;
+  igraph_error_handler_t* oldhandler;
+  int result;
   FILE *ifile = fopen("cattr_bool_bug.graphml", "r");
 
   if (!ifile) {
@@ -41,7 +43,14 @@ int main() {
 
   igraph_i_set_attribute_table(&igraph_cattribute_table);
 
-  igraph_read_graph_graphml(&graph, ifile, 0);
+  oldhandler=igraph_set_error_handler(igraph_error_handler_ignore);
+  if ((result=igraph_read_graph_graphml(&graph, ifile, 0))) {
+    /* maybe it is simply disabled at compile-time */
+    if (result == IGRAPH_UNIMPLEMENTED) return 77;
+    return 1;
+  }
+  igraph_set_error_handler(oldhandler);
+
   fclose(ifile);
 
   check_attr(&graph, 10);
