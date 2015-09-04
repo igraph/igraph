@@ -192,7 +192,7 @@ int main() {
   igraph_spmatrix_init(&m, 5, 5);
   for (i=0; i<igraph_spmatrix_nrow(&m); i++) {
     for (j=0; j<igraph_spmatrix_ncol(&m); j++) {
-      if (abs(i-j) == 1)
+      if (labs(i-j) == 1)
         igraph_spmatrix_set(&m, i, j, (i+1)*(j+1));
     }
   }

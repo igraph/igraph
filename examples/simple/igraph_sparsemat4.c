@@ -47,7 +47,7 @@ igraph_bool_t check_solution(const igraph_sparsemat_t *A,
   igraph_vector_minmax(&res, &min, &max);
   igraph_vector_destroy(&res);
 
-  return abs(min) < 1e-15 && abs(max) < 1e-15;
+  return fabs(min) < 1e-15 && fabs(max) < 1e-15;
 }
 
 int main() {
