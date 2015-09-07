@@ -540,9 +540,11 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
 
     /* Set up variables */
     k = n*(n-1)/2;
-    glp_add_cols(ip, (int) k);
-    for (j = 1; j <= k; j++)
-      glp_set_col_kind(ip, (int) j, GLP_BV);
+    if (k > 0) {
+      glp_add_cols(ip, (int) k);
+      for (j = 1; j <= k; j++)
+        glp_set_col_kind(ip, (int) j, GLP_BV);
+    }
 
     /* Set up coefficients in the goal function */
     k = igraph_vector_size(edges_in_comp);
@@ -565,28 +567,30 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
     }
 
     /* Add constraints */
-    glp_add_rows(ip, (int)(n*(n-1)/2 + n*(n-1)*(n-2)/3));
-    m = 1;
-    for (j = 0; j < n; j++) {
-      int ind[4];
-      double val[4] = {0, 1, 1, -1};
-      for (k = j+1; k < n; k++) {
-        ind[1] = (int) VAR2IDX(j, k);
-        /* Type (2a) */
-        val[2] = 1;
-        for (l = k+1; l < n; l++, m++) {
-          ind[2] = (int) VAR2IDX(k, l);
-          ind[3] = (int) VAR2IDX(j, l);
-          glp_set_row_bnds(ip, (int) m, GLP_UP, 1, 1);
-          glp_set_mat_row(ip, (int) m, 3, ind, val);
-        }
-        /* Type (2b) */
-        val[2] = -1;
-        for (l = j+1; l < k; l++, m++) {
-          ind[2] = (int) VAR2IDX(l, k);
-          ind[3] = (int) VAR2IDX(j, l);
-          glp_set_row_bnds(ip, (int) m, GLP_UP, 0, 0);
-          glp_set_mat_row(ip, (int) m, 3, ind, val);
+    if (n > 1) {
+      glp_add_rows(ip, (int)(n*(n-1)/2 + n*(n-1)*(n-2)/3));
+      m = 1;
+      for (j = 0; j < n; j++) {
+        int ind[4];
+        double val[4] = {0, 1, 1, -1};
+        for (k = j+1; k < n; k++) {
+          ind[1] = (int) VAR2IDX(j, k);
+          /* Type (2a) */
+          val[2] = 1;
+          for (l = k+1; l < n; l++, m++) {
+            ind[2] = (int) VAR2IDX(k, l);
+            ind[3] = (int) VAR2IDX(j, l);
+            glp_set_row_bnds(ip, (int) m, GLP_UP, 1, 1);
+            glp_set_mat_row(ip, (int) m, 3, ind, val);
+          }
+          /* Type (2b) */
+          val[2] = -1;
+          for (l = j+1; l < k; l++, m++) {
+            ind[2] = (int) VAR2IDX(l, k);
+            ind[3] = (int) VAR2IDX(j, l);
+            glp_set_row_bnds(ip, (int) m, GLP_UP, 0, 0);
+            glp_set_mat_row(ip, (int) m, 3, ind, val);
+          }
         }
       }
     }

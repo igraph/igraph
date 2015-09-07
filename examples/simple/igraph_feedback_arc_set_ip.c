@@ -86,6 +86,16 @@ int main() {
     return 4;
   igraph_destroy(&g);
 
+  /* Graph with lots of isolated vertices */
+  igraph_small(&g, 10000, IGRAPH_DIRECTED, 0,1, -1);
+  igraph_feedback_arc_set(&g, &result, 0, IGRAPH_FAS_EXACT_IP);
+  igraph_vector_print(&result);
+  igraph_delete_edges(&g, igraph_ess_vector(&result));
+  igraph_is_dag(&g, &dag);
+  if (!dag)
+    return 5;
+  igraph_destroy(&g);
+
   igraph_vector_destroy(&result);
 
   return 0;
