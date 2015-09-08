@@ -1023,7 +1023,8 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
  * finds an isomorphism between the two graphs. The mapping between
  * the two graphs will be also provided to this function. If the
  * callback returns a nonzero value then the search is continued,
- * otherwise it stops.
+ * otherwise it stops. The callback function must not destroy the 
+ * mapping vectors that are passed to it.
  * \param graph1 The first input graph.
  * \param graph2 The second input graph.
  * \param vertex_color1 An optional color vector for the first graph. If
