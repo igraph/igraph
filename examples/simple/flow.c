@@ -23,17 +23,6 @@
 
 #include <igraph.h>
 
-#include <sys/time.h>
-#include <sys/resource.h>
-
-float timer ()
-{
-  struct rusage r;
-
-  getrusage(0, &r);
-  return (float)(r.ru_utime.tv_sec+r.ru_utime.tv_usec/(float)1000000);
-}
-
 int main() {
   
   igraph_t g;
@@ -52,10 +41,8 @@ int main() {
 			   IGRAPH_DIRECTED);
   fclose(infile);
 
-  t=timer();
   igraph_maxflow_value(&g, &flow, source, target, &capacity, &stats);
-  t=timer()-t;
-/*   printf("4102: %g (time %.10f)\n", flow, t); */
+
   if (flow != 8207) {
     return 1;
   }
