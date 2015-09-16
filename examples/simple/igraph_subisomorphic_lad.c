@@ -28,7 +28,7 @@ int main() {
   igraph_bool_t iso;
   igraph_vector_t map;
   igraph_vector_ptr_t maps;
-  int i, n;
+  int i, n, result;
   int domainsvec[] = { 0, 2, 8, -1,
 		       4, 5, 6, 7, -1, 
 		       1, 3, 5, 6, 7, 8, -1,
@@ -136,5 +136,45 @@ int main() {
   igraph_destroy(&pattern);
   igraph_destroy(&target);
   
+  printf("---------\n");
+
+  igraph_vector_init(&map, 0);
+  igraph_vector_ptr_init(&maps, 0);
+  
+  igraph_small(&target, 9, IGRAPH_UNDIRECTED, 
+	       0,1,0,4,0,6,
+	       1,0,1,4,1,2,
+	       2,1,2,3,
+	       3,2,3,4,3,5,3,7,3,8,
+	       4,0,4,1,4,3,4,5,4,6,
+	       5,6,5,4,5,3,5,8,
+	       6,0,6,4,6,5,
+	       7,3,7,8,
+	       8,5,8,3,8,7, 
+	       -1);
+  igraph_simplify(&target, /*multiple=*/ 1, /*loops=*/ 0, /*edge_comb=*/ 0);
+
+  igraph_small(&pattern, 0, IGRAPH_DIRECTED, -1);
+  igraph_set_error_handler(igraph_error_handler_ignore);
+  result = igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0,
+                                    &iso, &map, &maps, /*induced=*/ 0,
+				    /*time_limit=*/ 0);
+  igraph_set_error_handler(igraph_error_handler_abort);
+  if (result != IGRAPH_EINVAL) { return 4; }
+  igraph_destroy(&pattern);
+
+  igraph_small(&pattern, 0, IGRAPH_UNDIRECTED, -1);
+  igraph_subisomorphic_lad(&pattern, &target, /*domains=*/ 0, &iso, &map, &maps,
+			   /*induced=*/ 0, /*time_limit=*/ 0);
+  if (!iso) { return 5; }
+  if (igraph_vector_size(&map) != 0) { return 6; }
+  if (igraph_vector_ptr_size(&maps) != 0) { return 7; }
+
+  igraph_destroy(&pattern);
+  igraph_destroy(&target);
+  
+  igraph_vector_destroy(&map);
+  igraph_vector_ptr_destroy(&maps);
+
   return 0;
 }

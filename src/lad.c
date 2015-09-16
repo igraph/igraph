@@ -1448,7 +1448,11 @@ cleanup:
  * 2010, Elsevier
  * 
  * \param pattern The smaller graph, it can be directed or undirected.
+ *   However, directed graphs are treated as undirected by the current
+ *   LAD implementation.
  * \param target The bigger graph, it can be directed or undirected. 
+ *   However, directed graphs are treated as undirected by the current
+ *   LAD implementation.
  * \param domains A pointer vector, or a null pointer. If a pointer
  *    vector, then it must contain pointers to \c igraph_vector_t
  *    objects and the length of the vector must match the number of
@@ -1507,15 +1511,27 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
 		 IGRAPH_EINVAL);
   }
 
+  if (igraph_is_directed(pattern) != igraph_is_directed(target)) {
+    IGRAPH_ERROR("Cannot search for a directed pattern in an undirected target "
+		 "or vice versa", IGRAPH_EINVAL);
+  }
+  if (igraph_is_directed(pattern) || igraph_is_directed(target)) {
+    IGRAPH_WARNING("Directed graphs will be treated as undirected by LAD.");
+  }
   if (time_limit<=0) { time_limit = INT_MAX; }
     
-  IGRAPH_CHECK(igraph_i_lad_createGraph(pattern, &Gp));
-  IGRAPH_CHECK(igraph_i_lad_createGraph(target, &Gt));
-  
-  if (iso)  { *iso = 0; }
+  if (iso)  { *iso = (igraph_vcount(pattern) == 0); }
   if (map)  { igraph_vector_clear(map); } 
   if (maps) { igraph_vector_ptr_clear(maps); }
 
+  if (igraph_vcount(pattern) == 0) {
+    /* Special case for empty graphs */
+    return IGRAPH_SUCCESS;
+  }
+  
+  IGRAPH_CHECK(igraph_i_lad_createGraph(pattern, &Gp));
+  IGRAPH_CHECK(igraph_i_lad_createGraph(target, &Gt));
+  
   if (Gp.nbVertices > Gt.nbVertices) { goto exit3; }
   
   IGRAPH_CHECK(igraph_i_lad_initDomains(initialDomains, domains, &D, &Gp, 
