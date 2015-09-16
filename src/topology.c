@@ -2788,6 +2788,15 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  * is open source and licensed according to the GNU GPL. See 
  * http://www.tcs.hut.fi/Software/bliss/index.html for
  * details. Currently the 0.35 version of BLISS is included in igraph.
+ *
+ * </para><para>
+ * Previous versions of igraph accidentally included separate splitting
+ * heuristics arguments for the two graphs. However, BLISS does not work
+ * correctly if the two graphs use different splitting heuristics as the
+ * generated canonical labeling will be different. Therefore, even though
+ * there are two splitting heuristics arguments, one must pass the \em same
+ * value to both arguments; not doing so will yield an error.
+ *
  * \param graph1 The first input graph, it is assumed to be
  *   undirected, directed graphs are treated as undirected too.
  *   The algorithm eliminates multiple edges from the graph first.
@@ -2804,7 +2813,8 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  * \param sh1 Splitting heuristics to be used for the first graph. See
  *   \ref igraph_bliss_sh_t.
  * \param sh2 Splitting heuristics to be used for the second
- *   graph. See \ref igraph_bliss_sh_t.
+ *   graph. See \ref igraph_bliss_sh_t. This \em must be equal to
+ *   \p sh1 .
  * \param info1 If not \c NULL, information about the canonization of
  *    the first input graph is stored here. See \ref igraph_bliss_info_t
  *    for details. Note that if the two graphs have different number
@@ -2847,6 +2857,10 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
   }
   if (igraph_is_directed(graph1) || igraph_is_directed(graph2)) {
     IGRAPH_WARNING("Directed graphs will be treated as undirected by BLISS.");
+  }
+  if (sh1 != sh2) {
+    IGRAPH_ERROR("Cannot decide isomorphism with different splitting heuristics",
+		 IGRAPH_EINVAL);
   }
 
   if (no_of_nodes != igraph_vcount(graph2) ||
