@@ -552,6 +552,10 @@ int igraph_graphlets_candidate_basis(const igraph_t *graph,
   int i;
 
   /* Some checks */
+  if (weights == NULL) {
+    IGRAPH_ERROR("Graphlet functions require weighted graphs", IGRAPH_EINVAL);
+  }
+  
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
   }
@@ -593,6 +597,9 @@ int igraph_i_graphlets_project(const igraph_t *graph,
   igraph_bool_t simple;
 
   /* Check arguments */
+  if (weights == NULL) {
+    IGRAPH_ERROR("Graphlet functions require weighted graphs", IGRAPH_EINVAL);
+  }
   if (no_of_edges != igraph_vector_size(weights)) {
     IGRAPH_ERROR("Invalid weight vector size", IGRAPH_EINVAL);
   }
