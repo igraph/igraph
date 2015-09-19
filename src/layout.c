@@ -2044,6 +2044,12 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
  * Since \ref igraph_layout_merge_dla works for 2D layouts only,
  * you cannot run the MDS layout on disconnected graphs for
  * more than two dimensions.
+ * 
+ * </para><para>
+ * Warning: if the graph is symmetric to the exchange of two vertices
+ * (as is the case with leaves of a tree connecting to the same parent),
+ * classical multidimensional scaling may assign the same coordinates to
+ * these vertices.
  *
  * \param graph A graph object.
  * \param res Pointer to an initialized matrix object. This will
