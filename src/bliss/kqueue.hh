@@ -1,50 +1,72 @@
-/*
-Copyright (C) 2003-2006 Tommi Junttila
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License version 2
- as published by the Free Software Foundation.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.
-*/
-
-/* FSF address fixed in the above notice on 1 Oct 2009 by Tamas Nepusz */
-
 #ifndef BLISS_KQUEUE_HH
 #define BLISS_KQUEUE_HH
 
-#include "bliss_defs.hh"
-#include <cstdlib>		// malloc
+/*
+  Copyright (c) 2003-2015 Tommi Junttila
+  Released under the GNU Lesser General Public License version 3.
+  
+  This file is part of bliss.
+  
+  bliss is free software: you can redistribute it and/or modify
+  it under the terms of the GNU Lesser General Public License as published by
+  the Free Software Foundation, version 3 of the License.
 
-namespace igraph {
+  bliss is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU Lesser General Public License for more details.
 
-/* 
- * A queue with fixed capacity
+  You should have received a copy of the GNU Lesser General Public License
+  along with bliss.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "defs.hh"
+
+namespace bliss {
+
+/** \internal
+ * \brief A very simple implementation of queues with fixed capacity.
  */
+
 template <class Type>
 class KQueue
 {
 public:
+  /**
+   * Create a new queue with capacity zero.
+   * The function init() should be called next.
+   */
   KQueue();
+
   ~KQueue();
-  void init(const unsigned int k);
+
+  /**
+   * Initialize the queue to have the capacity to hold at most \a N elements.
+   */
+  void init(const unsigned int N);
   
+  /** Is the queue empty? */
   bool is_empty() const;
+
+  /** Return the number of elements in the queue. */
   unsigned int size() const;
-  unsigned int capacity() const;
+
+  /** Remove all the elements in the queue. */
   void clear();
 
+  /** Return (but don't remove) the first element in the queue. */
   Type front() const;
+
+  /** Remove and return the first element of the queue. */
   Type pop_front();
+
+  /** Push the element \a e in the front of the queue. */
   void push_front(Type e);
+
+  /** Remove and return the last element of the queue. */
   Type pop_back();
+
+  /** Push the element \a e in the back of the queue. */
   void push_back(Type e);
 private:
   Type *entries, *end;
@@ -103,14 +125,12 @@ unsigned int KQueue<Type>::size() const
 template <class Type>
 Type KQueue<Type>::front() const
 {
-  DEBUG_ASSERT(head != tail);
   return *head;
 }
 
 template <class Type>
 Type KQueue<Type>::pop_front()
 {
-  DEBUG_ASSERT(head != tail);
   Type *old_head = head;
   head++;
   if(head == end)
@@ -125,7 +145,6 @@ void KQueue<Type>::push_front(Type e)
     head = end - 1;
   else
     head--;
-  DEBUG_ASSERT(head != tail);
   *head = e;
 }
 
@@ -136,9 +155,8 @@ void KQueue<Type>::push_back(Type e)
   tail++;
   if(tail == end)
     tail = entries;
-  DEBUG_ASSERT(head != tail);
 }
 
-}
+} // namespace bliss
 
 #endif

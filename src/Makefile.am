@@ -347,9 +347,9 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
 			     spmatrix.c community.c fast_community.c \
 			     gml_tree.c \
-			     bliss_orbit.cc bliss_eqrefhash.cc \
-			     bliss_partition.cc bliss_graph.cc bliss_timer.cc \
-			     bliss_heap.cc bliss_utils.cc bliss.cc \
+			     bliss/orbit.cc bliss/defs.cc bliss/uintseqhash.cc \
+			     bliss/partition.cc bliss/graph.cc \
+			     bliss/heap.cc bliss/utils.cc bliss.cc \
 			     cattributes.c zeroin.c bfgs.c math.c \
 			     forestfire.c microscopic_update.c \
 			     blas.c arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
