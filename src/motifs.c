@@ -1053,31 +1053,43 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&cut_prob, 3); /* all zeros */
   IGRAPH_CHECK(igraph_vector_resize(res, 16));
+  igraph_vector_null(res);
   IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
-  
   IGRAPH_CHECK(igraph_triad_census_24(graph, &m2, &m4));
-  VECTOR(tmp)[0]=0;
-  VECTOR(tmp)[1]=m2;
-  VECTOR(tmp)[3]=m4;
-  VECTOR(tmp)[0]=vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
   
   /* Reorder */
-  VECTOR(*res)[0] = VECTOR(tmp)[0];
-  VECTOR(*res)[1] = VECTOR(tmp)[1];
-  VECTOR(*res)[2] = VECTOR(tmp)[3];
-  VECTOR(*res)[3] = VECTOR(tmp)[6];
-  VECTOR(*res)[4] = VECTOR(tmp)[2];
-  VECTOR(*res)[5] = VECTOR(tmp)[4];
-  VECTOR(*res)[6] = VECTOR(tmp)[5];
-  VECTOR(*res)[7] = VECTOR(tmp)[9];
-  VECTOR(*res)[8] = VECTOR(tmp)[7];
-  VECTOR(*res)[9] = VECTOR(tmp)[11];
-  VECTOR(*res)[10] = VECTOR(tmp)[10];
-  VECTOR(*res)[11] = VECTOR(tmp)[8];
-  VECTOR(*res)[12] = VECTOR(tmp)[13];
-  VECTOR(*res)[13] = VECTOR(tmp)[12];
-  VECTOR(*res)[14] = VECTOR(tmp)[14];
-  VECTOR(*res)[15] = VECTOR(tmp)[15];
+  if (igraph_is_directed(graph)) {    
+    VECTOR(tmp)[0] = 0;
+    VECTOR(tmp)[1] = m2;
+    VECTOR(tmp)[3] = m4;
+    VECTOR(tmp)[0] = vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
+
+    VECTOR(*res)[0] = VECTOR(tmp)[0];
+    VECTOR(*res)[1] = VECTOR(tmp)[1];
+    VECTOR(*res)[2] = VECTOR(tmp)[3];
+    VECTOR(*res)[3] = VECTOR(tmp)[6];
+    VECTOR(*res)[4] = VECTOR(tmp)[2];
+    VECTOR(*res)[5] = VECTOR(tmp)[4];
+    VECTOR(*res)[6] = VECTOR(tmp)[5];
+    VECTOR(*res)[7] = VECTOR(tmp)[9];
+    VECTOR(*res)[8] = VECTOR(tmp)[7];
+    VECTOR(*res)[9] = VECTOR(tmp)[11];
+    VECTOR(*res)[10] = VECTOR(tmp)[10];
+    VECTOR(*res)[11] = VECTOR(tmp)[8];
+    VECTOR(*res)[12] = VECTOR(tmp)[13];
+    VECTOR(*res)[13] = VECTOR(tmp)[12];
+    VECTOR(*res)[14] = VECTOR(tmp)[14];
+    VECTOR(*res)[15] = VECTOR(tmp)[15];
+  } else {
+    VECTOR(tmp)[0] = 0;
+    VECTOR(tmp)[1] = m2;
+    VECTOR(tmp)[0] = vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
+
+    VECTOR(*res)[0] = VECTOR(tmp)[0];
+    VECTOR(*res)[2] = VECTOR(tmp)[1];
+    VECTOR(*res)[10] = VECTOR(tmp)[2];
+    VECTOR(*res)[15] = VECTOR(tmp)[3];
+  }
   
   igraph_vector_destroy(&cut_prob);
   igraph_vector_destroy(&tmp);
