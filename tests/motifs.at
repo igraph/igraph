@@ -25,3 +25,8 @@ AT_SETUP([RAND-ESU algorithm (igraph_motifs_randesu)])
 AT_KEYWORDS([motif RAND-ESU])
 AT_COMPILE_CHECK([simple/igraph_motifs_randesu.c], [simple/igraph_motifs_randesu.out])
 AT_CLEANUP
+
+AT_SETUP([Triad counts (igraph_triad_census):])
+AT_KEYWORDS([motif RAND-ESU])
+AT_COMPILE_CHECK([simple/triad_census.c], [simple/triad_census.out])
+AT_CLEANUP
