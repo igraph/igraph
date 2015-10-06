@@ -52,6 +52,9 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
 }
 
 
+void bliss_free_graph(AbstractGraph *g) { delete g; }
+
+
 inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
     if (directed) {
       Digraph::SplittingHeuristic gsh = Digraph::shs_fsm;
@@ -89,8 +92,20 @@ inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) 
         info->nof_leaf_nodes = stats.get_nof_leaf_nodes();
         info->nof_bad_nodes  = stats.get_nof_bad_nodes();
         info->nof_canupdates = stats.get_nof_canupdates();
+        info->nof_generators = stats.get_nof_generators();
         stats.group_size.tostring(&info->group_size);
     }
+}
+
+
+// this is the callback function used with AbstractGraph::find_automorphisms()
+// it collects the group generators into a pointer vector
+void collect_generators(void *generators, unsigned int n, const unsigned int *aut) {
+    igraph_vector_ptr_t *gen = static_cast<igraph_vector_ptr_t *>(generators);
+    igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
+    igraph_vector_init(newvector, n);
+    copy(aut, aut+n, newvector->stor_begin); // takes care of unsigned int -> double conversion
+    igraph_vector_ptr_push_back(gen, newvector);
 }
 
 } // end unnamed namespace
@@ -102,13 +117,13 @@ inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) 
  * This function computes the canonical permutation which transforms
  * the graph into a canonical form by using the BLISS algorithm.
  * 
- * \param graph The input graph, it is treated as undirected and the
- *    multiple edges are ignored.
+ * \param graph The input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
  * \param labeling Pointer to a vector, the result is stored here. The
  *    permutation takes vertex 0 to the first element of the vector,
  *    vertex 1 to the second, etc. The vector will be resized as
  *    needed.
- * \param sh The split heuristics to be used in BLISS. See \ref
+ * \param sh The splitting heuristics to be used in BLISS. See \ref
  *    igraph_bliss_sh_t.
  * \param info If not \c NULL then information on BLISS internals is
  *    stored here. See \ref igraph_bliss_info_t.
@@ -119,21 +134,23 @@ inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) 
 int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling,
 				 igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
   AbstractGraph *g = bliss_from_igraph(graph);
-  Stats stats;
+  IGRAPH_FINALLY(bliss_free_graph, g);
   const unsigned int N=g->get_nof_vertices();
 
   IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
 
+  Stats stats;
   const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
   IGRAPH_CHECK(igraph_vector_resize(labeling, N));
   for (unsigned int i=0; i<N; i++) {
     VECTOR(*labeling)[i] = cl[i];
   }
-  delete g;
 
   bliss_info_to_igraph(info, stats);
   
-  return 0;
+  delete g;
+  IGRAPH_FINALLY_CLEAN(1);
+  return IGRAPH_SUCCESS;
 }
 
 /**
@@ -147,9 +164,9 @@ int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labelin
  * this number is exact, otherwise a <type>long double</type> is used
  * and it is only approximate. See also \ref igraph_bliss_info_t.
  * 
- * \param graph The input graph, it is treated as undirected and the
- *    multiple edges are ignored.
- * \param sh The split heuristics to be used in BLISS. See \ref
+ * \param graph The input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
+ * \param sh The splitting heuristics to be used in BLISS. See \ref
  *    igraph_bliss_sh_t.
  * \param info The result is stored here, in particular in the \c
  *    group_size tag of \p info.
@@ -158,22 +175,64 @@ int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labelin
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
 int igraph_automorphisms(const igraph_t *graph,
-			 igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
-  
+             igraph_bliss_sh_t sh, igraph_bliss_info_t *info)
+{
   AbstractGraph *g = bliss_from_igraph(graph);
-  Stats stats;
+  IGRAPH_FINALLY(bliss_free_graph, g);
 
   IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
 
+  Stats stats;
   g->find_automorphisms(stats, NULL, NULL);
-
-  delete g;
   
   bliss_info_to_igraph(info, stats);
 
-  return 0;
+  delete g;
+  IGRAPH_FINALLY_CLEAN(1);
+  return IGRAPH_SUCCESS;
 }
 
+/**
+ * \function igraph_automorphism_group
+ * Automorphism group generators using BLISS
+ *
+ * The generators of the automorphism group of a graph are computed
+ * using BLISS. The generator set may not be minimal and may depend on
+ * the splitting heuristics.
+ *
+ * \param graph The input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
+ * \param generators Must be an initialized pointer vector. It will
+ *    contain pointers to \ref igraph_vector_t objects
+ *    representing generators of the automorphism group.
+ * \param sh The splitting heuristics to be used in BLISS. See \ref
+ *    igraph_bliss_sh_t.
+ * \param info If not \c NULL then information on BLISS internals is
+ *    stored here. See \ref igraph_bliss_info_t.
+ * \return Error code.
+ *
+ * Time complexity: exponential, in practice it is fast for many graphs.
+ */
+int igraph_automorphism_group(
+        const igraph_t *graph, igraph_vector_ptr_t *generators,
+        igraph_bliss_sh_t sh, igraph_bliss_info_t *info)
+{
+    AbstractGraph *g = bliss_from_igraph(graph);
+    IGRAPH_FINALLY(bliss_free_graph, g);
+
+
+    IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+
+    Stats stats;
+    igraph_vector_ptr_resize(generators, 0);
+    g->find_automorphisms(stats, collect_generators, generators);
+
+    bliss_info_to_igraph(info, stats);
+
+    delete g;
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
+}
 
 
 

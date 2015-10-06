@@ -649,8 +649,7 @@ const unsigned int igraph_i_classedges_4u[] = { 2,3, 1,3, 0,3, 1,2, 0,2, 0,1 };
  * starters.</para>
  * 
  * <para>Functions for the BLISS algorithm constitute the third set, 
- * see \ref igraph_isomorphic_bliss(). This implementation only works
- * for undirected graphs.</para>
+ * see \ref igraph_isomorphic_bliss().</para>
  * 
  * <para>Finally, the isomorphism classes of all graphs with three and
  * four vertices are precomputed and stored in igraph, so for these
@@ -760,8 +759,6 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  *    and edges it returns with \c FALSE.
  * \oli Otherwise, if the graphs have three or four vertices then an O(1)
  *    algorithm is used with precomputed data.
- * \oli Otherwise, if the graphs are directed then VF2 is used, see
- *    \ref igraph_isomorphic_vf2().
  * \oli Otherwise BLISS is used, see \ref igraph_isomorphic_bliss().
  * \endolist 
  * </para>
@@ -793,8 +790,6 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
     *iso=0;
   } else if (nodes1==3 || nodes1==4) {
 	igraph_isomorphic_34(graph1, graph2, iso);
-  } else if (dir1) {
-    igraph_isomorphic_vf2(graph1, graph2, 0, 0, 0, 0, iso, 0, 0, 0, 0, 0);
   } else {
     igraph_isomorphic_bliss(graph1, graph2, iso, 0, 0, /*sh1=*/0, /*sh2=*/0, 0, 0);
   }
@@ -2775,7 +2770,7 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  * </para>
  * 
  * <para>
- * BLISS version 0.35 is included in igraph.
+ * BLISS version 0.73 is included in igraph.
  * </para>
  */
 
@@ -2787,7 +2782,7 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  * successor of the famous NAUTY algorithm and implementation. BLISS
  * is open source and licensed according to the GNU GPL. See 
  * http://www.tcs.hut.fi/Software/bliss/index.html for
- * details. Currently the 0.35 version of BLISS is included in igraph.
+ * details. Currently the 0.73 version of BLISS is included in igraph.
  *
  * </para><para>
  * Previous versions of igraph accidentally included separate splitting
@@ -2797,12 +2792,10 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  * there are two splitting heuristics arguments, one must pass the \em same
  * value to both arguments; not doing so will yield an error.
  *
- * \param graph1 The first input graph, it is assumed to be
- *   undirected, directed graphs are treated as undirected too.
- *   The algorithm eliminates multiple edges from the graph first.
- * \param graph2 The second input graph, it is assumed to be
- *   undirected, directed graphs are treated as undirected too.
- *   The algorithm eliminates multiple edges from the graph first.
+ * \param graph1 The first input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
+ * \param graph2 The second input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
  * \param iso Pointer to a boolean, the result is stored here.
  * \param map12 A vector or \c NULL pointer. If not \c NULL then an
  *   isomorphic mapping from \p graph1 to \p graph2 is stored here.
@@ -2837,21 +2830,23 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
   igraph_vector_t vmap12, *mymap12=&vmap12;  
   igraph_vector_t from, to, index;
   igraph_vector_t from2, to2, index2;
+  igraph_bool_t directed;
   long int i, j;
 
   *iso=0;
 	if (info1) {
 		info1->nof_nodes = info1->nof_leaf_nodes = info1->nof_bad_nodes = 
-			info1->nof_canupdates = info1->max_level = -1;
+            info1->nof_canupdates = info1->max_level = info1->nof_generators = -1;
 		info1->group_size = 0;
 	}
 	if (info2) {
 		info2->nof_nodes = info2->nof_leaf_nodes = info2->nof_bad_nodes = 
-			info2->nof_canupdates = info2->max_level = -1;
+            info2->nof_canupdates = info2->max_level = info2->nof_generators = -1;
 		info2->group_size = 0;
 	}
 
-  if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
+  directed = igraph_is_directed(graph1);
+  if (igraph_is_directed(graph2) != directed) {
     IGRAPH_ERROR("Cannot compare directed and undirected graphs",
 		 IGRAPH_EINVAL);
   }
@@ -2909,7 +2904,7 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
   for (i=0; i<no_of_edges; i++) {
     VECTOR(from)[i] = VECTOR(*mymap12)[ (long int) IGRAPH_FROM(graph1, i) ];
     VECTOR(to)[i]   = VECTOR(*mymap12)[ (long int) IGRAPH_TO  (graph1, i) ];
-    if (VECTOR(from)[i] < VECTOR(to)[i]) {
+    if (! directed && VECTOR(from)[i] < VECTOR(to)[i]) {
       igraph_real_t tmp=VECTOR(from)[i];
       VECTOR(from)[i] = VECTOR(to)[i];
       VECTOR(to)[i] = tmp;
@@ -2920,7 +2915,7 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
   igraph_get_edgelist(graph2, &from2, /*bycol=*/ 1);
   for (i=0, j=no_of_edges; i<no_of_edges; i++, j++) {
     VECTOR(to2)[i] = VECTOR(from2)[j];
-    if (VECTOR(from2)[i] < VECTOR(to2)[i]) {
+    if (! directed && VECTOR(from2)[i] < VECTOR(to2)[i]) {
       igraph_real_t tmp=VECTOR(from2)[i];
       VECTOR(from2)[i] = VECTOR(to2)[i];
       VECTOR(to2)[i] = tmp;

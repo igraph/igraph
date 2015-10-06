@@ -226,6 +226,7 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
  * \member nof_leaf_nodes The number of leaf nodes in the search tree.
  * \member nof_bad_nodes Number of bad nodes.
  * \member nof_canupdates Number of canrep updates.
+ * \member nof_generators Number of generators of the automorphism group.
  * \member max_level Maximum level.
  * \member group_size The size of the automorphism group of the graph,
  *    given as a string. It should be deallocated via
@@ -239,6 +240,7 @@ typedef struct igraph_bliss_info_t {
   unsigned long nof_leaf_nodes;
   unsigned long nof_bad_nodes;
   unsigned long nof_canupdates;
+  unsigned long nof_generators;
   unsigned long max_level;
   char *group_size;
 } igraph_bliss_info_t;
@@ -272,6 +274,10 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
 
 int igraph_automorphisms(const igraph_t *graph,
 			 igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
+
+int igraph_automorphism_group(
+        const igraph_t *graph, igraph_vector_ptr_t *generators,
+        igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 
 /* Functions for 3-4 graphs */
 int igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2, 
