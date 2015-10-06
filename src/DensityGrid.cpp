@@ -84,6 +84,7 @@ void DensityGrid::Init()
 	  #else
 	    igraph_error("DrL is out of memory", __FILE__, __LINE__,
 			 IGRAPH_ENOMEM);
+		return;
 	  #endif
     }
 	
@@ -185,6 +186,19 @@ void DensityGrid::Subtract(Node &N)
   y_grid -= RADIUS;
   diam = 2*RADIUS;
 
+  // check to see that we are inside grid
+  if ( (x_grid >= GRID_SIZE) || (x_grid < 0) ||
+       (y_grid >= GRID_SIZE) || (y_grid < 0) )
+    {
+      #ifdef MUSE_MPI
+ 	    MPI_Abort ( MPI_COMM_WORLD, 1 );
+	  #else
+	    igraph_error("Exceeded density grid in DrL", __FILE__, 
+			 __LINE__, IGRAPH_EDRL);
+		return;
+	  #endif
+    }    
+
   /* Subtract density values */
   den_ptr = &Density[y_grid][x_grid];
   fall_ptr = &fall_off[0][0];
@@ -221,13 +235,12 @@ void DensityGrid::Add(Node &N)
   if ( (x_grid >= GRID_SIZE) || (x_grid < 0) ||
        (y_grid >= GRID_SIZE) || (y_grid < 0) )
     {
-      // cout << endl << "Error: Exceeded density grid with x_grid = " << x_grid 
-      // 	       << " and y_grid = " << y_grid << ".  Program stopped." << endl;
       #ifdef MUSE_MPI
  	    MPI_Abort ( MPI_COMM_WORLD, 1 );
 	  #else
 	    igraph_error("Exceeded density grid in DrL", __FILE__, 
 			 __LINE__, IGRAPH_EDRL);
+		return;
 	  #endif
     }    
 
