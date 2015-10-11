@@ -68,15 +68,15 @@ int main() {
 
   /* Check first projection */
   igraph_full(&full, igraph_vcount(&p1), /*directed=*/0, /*loops=*/0);
-  igraph_isomorphic_bliss(&p1, &full, &iso, 0, 0, 
-			  IGRAPH_BLISS_FM, IGRAPH_BLISS_FM, 0, 0);
+  igraph_isomorphic_bliss(&p1, &full, 0, 0, &iso, 0, 0, 
+			  IGRAPH_BLISS_FM, 0, 0);
   if (!iso) { return 1; }
   igraph_destroy(&full);
   
   /* Check second projection */
   igraph_full(&full, igraph_vcount(&p2), /*directed=*/0, /*loops=*/0);
-  igraph_isomorphic_bliss(&p2, &full, &iso, 0, 0, 
-			  IGRAPH_BLISS_FM, IGRAPH_BLISS_FM, 0, 0);
+  igraph_isomorphic_bliss(&p2, &full, 0, 0, &iso, 0, 0, 
+			  IGRAPH_BLISS_FM, 0, 0);
   if (!iso) { return 2; }
   igraph_destroy(&full);
   
@@ -103,13 +103,13 @@ int main() {
   /* Check first projection */
   igraph_ring(&ring, igraph_vcount(&g)/2, /*directed=*/ 0, 
 	      /*mutual=*/ 0, /*circular=*/ 1);
-  igraph_isomorphic_bliss(&p1, &ring, &iso, 0, 0, 
-			  IGRAPH_BLISS_FM, IGRAPH_BLISS_FM, 0, 0);
+  igraph_isomorphic_bliss(&p1, &ring, 0, 0, &iso, 0, 0, 
+			  IGRAPH_BLISS_FM, 0, 0);
   if (!iso) { return 1; }
   
   /* Check second projection */
-  igraph_isomorphic_bliss(&p2, &ring, &iso, 0, 0, 
-			  IGRAPH_BLISS_FM, IGRAPH_BLISS_FM, 0, 0);
+  igraph_isomorphic_bliss(&p2, &ring, 0, 0, &iso, 0, 0, 
+			  IGRAPH_BLISS_FM, 0, 0);
   if (!iso) { return 2; }
   igraph_destroy(&ring);
   

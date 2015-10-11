@@ -85,6 +85,18 @@ inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
 }
 
 
+inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors) {
+    if (colors == NULL)
+        return IGRAPH_SUCCESS;
+    const int n = g->get_nof_vertices();
+    if (n != igraph_vector_int_size(colors))
+        IGRAPH_ERROR("Invalid vertex color vector length", IGRAPH_EINVAL);
+    for (int i=0; i < n; ++i)
+        g->change_color(i, VECTOR(*colors)[i]);
+    return IGRAPH_SUCCESS;
+}
+
+
 inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) {
     if (info) {
         info->max_level      = stats.get_max_level();
@@ -119,6 +131,8 @@ void collect_generators(void *generators, unsigned int n, const unsigned int *au
  * 
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
+ * \param colors An optional vertex color vector for the graph. Supply a
+ *   null pointer is the graph is not colored.
  * \param labeling Pointer to a vector, the result is stored here. The
  *    permutation takes vertex 0 to the first element of the vector,
  *    vertex 1 to the second, etc. The vector will be resized as
@@ -131,13 +145,14 @@ void collect_generators(void *generators, unsigned int n, const unsigned int *au
  * 
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling,
-				 igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors,
+                igraph_vector_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
   AbstractGraph *g = bliss_from_igraph(graph);
   IGRAPH_FINALLY(bliss_free_graph, g);
   const unsigned int N=g->get_nof_vertices();
 
   IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+  IGRAPH_CHECK(bliss_set_colors(g, colors));
 
   Stats stats;
   const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
@@ -166,6 +181,8 @@ int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labelin
  * 
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
+ * \param colors An optional vertex color vector for the graph. Supply a
+ *   null pointer is the graph is not colored.
  * \param sh The splitting heuristics to be used in BLISS. See \ref
  *    igraph_bliss_sh_t.
  * \param info The result is stored here, in particular in the \c
@@ -174,13 +191,14 @@ int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labelin
  * 
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-int igraph_automorphisms(const igraph_t *graph,
+int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
              igraph_bliss_sh_t sh, igraph_bliss_info_t *info)
 {
   AbstractGraph *g = bliss_from_igraph(graph);
   IGRAPH_FINALLY(bliss_free_graph, g);
 
   IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+  IGRAPH_CHECK(bliss_set_colors(g, colors));
 
   Stats stats;
   g->find_automorphisms(stats, NULL, NULL);
@@ -202,6 +220,8 @@ int igraph_automorphisms(const igraph_t *graph,
  *
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
+ * \param colors An optional vertex color vector for the graph. Supply a
+ *   null pointer is the graph is not colored.
  * \param generators Must be an initialized pointer vector. It will
  *    contain pointers to \ref igraph_vector_t objects
  *    representing generators of the automorphism group.
@@ -214,14 +234,14 @@ int igraph_automorphisms(const igraph_t *graph,
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
 int igraph_automorphism_group(
-        const igraph_t *graph, igraph_vector_ptr_t *generators,
+        const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_ptr_t *generators,
         igraph_bliss_sh_t sh, igraph_bliss_info_t *info)
 {
     AbstractGraph *g = bliss_from_igraph(graph);
     IGRAPH_FINALLY(bliss_free_graph, g);
 
-
     IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+    IGRAPH_CHECK(bliss_set_colors(g, colors));
 
     Stats stats;
     igraph_vector_ptr_resize(generators, 0);

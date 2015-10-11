@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -21,6 +21,7 @@
 <!-- doxrox-include igraph_canonical_permutation -->
 <!-- doxrox-include igraph_isomorphic_bliss -->
 <!-- doxrox-include igraph_automorphisms -->
+<!-- doxrox-include igraph_automorphism_group -->
 </section>
 
 <section><title>The VF2 algorithm</title>

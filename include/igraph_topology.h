@@ -264,19 +264,19 @@ typedef enum { IGRAPH_BLISS_F=0, IGRAPH_BLISS_FL,
 	       IGRAPH_BLISS_FS, IGRAPH_BLISS_FM, 
 	       IGRAPH_BLISS_FLM, IGRAPH_BLISS_FSM } igraph_bliss_sh_t;
 
-int igraph_canonical_permutation(const igraph_t *graph, igraph_vector_t *labeling, 
-				 igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
+int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_t *labeling,
+                 igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
+                const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
 			    igraph_bool_t *iso, igraph_vector_t *map12, 
 			    igraph_vector_t *map21,
-			    igraph_bliss_sh_t sh1, igraph_bliss_sh_t sh2, 
+                igraph_bliss_sh_t sh,
 			    igraph_bliss_info_t *info1, igraph_bliss_info_t *info2);
 
-int igraph_automorphisms(const igraph_t *graph,
-			 igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
+int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
+             igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 
-int igraph_automorphism_group(
-        const igraph_t *graph, igraph_vector_ptr_t *generators,
+int igraph_automorphism_group(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_ptr_t *generators,
         igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 
 /* Functions for 3-4 graphs */
