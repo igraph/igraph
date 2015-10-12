@@ -54,7 +54,7 @@ int print_and_destroy(igraph_vector_ptr_t *cliques) {
     igraph_vector_print(v);
     igraph_vector_destroy(v);
   }
-  igraph_vector_ptr_destroy(cliques);
+  igraph_vector_ptr_destroy_all(cliques);
   return 0;
 }
 

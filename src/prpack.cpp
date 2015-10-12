@@ -67,6 +67,11 @@ int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *
     prpack_solver solver(&prpack_graph, false);
     res = solver.solve(damping, 1e-10, u, v, "");
 
+    // Delete the personalization vector
+    if (v) {
+	delete[] v;
+    }
+
     // Check whether the solver converged
     // TODO: this is commented out because some of the solvers do not implement it yet
     /*

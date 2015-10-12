@@ -171,7 +171,9 @@ int igraph_ecumulative_proportionate_values(const igraph_t *graph,
 
   igraph_eit_destroy(&A);
   igraph_es_destroy(&es);
-  IGRAPH_FINALLY_CLEAN(2);
+
+  /* Pop V, A and es from the finally stack -- that's three items */
+  IGRAPH_FINALLY_CLEAN(3);
 
   return IGRAPH_SUCCESS;
 }

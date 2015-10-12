@@ -126,6 +126,8 @@ int test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
     igraph_vector_destroy(weights); free(weights);
   }
 
+  igraph_sparsemat_destroy(&sm);
+
   return 0;
 }
 
@@ -199,6 +201,8 @@ int test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
 
   if (ok)
     printf("OK\n");
+
+  igraph_sparsemat_destroy(&sm);
 
   return !ok;
 }
