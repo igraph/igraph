@@ -108,6 +108,7 @@ for i in *.c; do
         echo "executed, memory access problems found!"
       elif [ $ERRCODE -eq 77 ]; then
         echo "skipped, OK"
+		rm ${LOG}
       elif [ $ERRCODE -ne 0 ]; then
         echo "test case failed, error code: $ERRCODE!"
       elif [ `cat $LOG | grep -c 'no leaks are possible'` -ne 1 ]; then
