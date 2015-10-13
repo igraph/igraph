@@ -42,6 +42,12 @@ AT_COMPILE_CHECK([simple/igraph_subisomorphic_lad.c],
 		 [simple/igraph_subisomorphic_lad.out])
 AT_CLEANUP
 
+AT_SETUP([Additional isomorphism tests])
+AT_KEYWORDS([isomorph isomorphic isomorphism BLISS VF2])
+AT_COMPILE_CHECK([simple/isomorphism_test.c],
+		 [simple/isomorphism_test.out])
+AT_CLEANUP
+
 AT_SETUP([Graphical degree sequences])
 AT_KEYWORDS([degree sequence graphical])
 AT_COMPILE_CHECK([simple/igraph_is_degree_sequence.c])
