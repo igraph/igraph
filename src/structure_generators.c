@@ -22,6 +22,7 @@
 */
 
 #include "igraph_constructors.h"
+#include "igraph_structural.h"
 #include "igraph_memory.h"
 #include "igraph_interface.h"
 #include "igraph_attributes.h"
@@ -1621,9 +1622,9 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
   long int no_of_shifts=igraph_vector_size(shifts);
   long int ptr=0, i, sptr=0;
   long int no_of_nodes=n;
-  long int no_of_edges=n+no_of_shifts*repeats/2;
+  long int no_of_edges=n+no_of_shifts*repeats;
 
-	if (repeats<0) IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
+  if (repeats<0) IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
 
   /* Create a ring first */
@@ -1638,15 +1639,14 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
     long int sh=(long int) VECTOR(*shifts)[sptr % no_of_shifts];
     long int from=sptr % no_of_nodes;
     long int to=(no_of_nodes+sptr+sh) % no_of_nodes;
-    if (from < to) {
-      VECTOR(edges)[ptr++]=from;
-      VECTOR(edges)[ptr++]=to;
-    }
+    VECTOR(edges)[ptr++]=from;
+    VECTOR(edges)[ptr++]=to;
     sptr++;
   }
   
   IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes, 
 			     IGRAPH_UNDIRECTED));
+  IGRAPH_CHECK(igraph_simplify(graph, 1 /* true */, 1 /* true */, NULL));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
   
