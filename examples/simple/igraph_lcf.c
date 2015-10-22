@@ -28,6 +28,7 @@ int main() {
   igraph_t g, g2;
   igraph_bool_t iso;
   
+  // Franklin graph
   igraph_lcf(&g, 12, 5, -5, 6, 0);
   igraph_famous(&g2, "franklin");
   
@@ -36,12 +37,42 @@ int main() {
 			/*edge.color1=*/ 0, /*edge.color2=*/ 0,
 			&iso, 0, 0, 0, 0, 0);
   if (!iso) {
-    printf("OOOPS!\n");
+    printf("Failure: Franklin\n");
     return 1;
   }
   
   igraph_destroy(&g);
   igraph_destroy(&g2);
+
+  // [3, -2]^4, n=8
+  igraph_lcf(&g, 8, 3, -2, 4, 0);
+
+  if (igraph_ecount(&g) != 16) {
+    printf("Failure: [3, -2]^4, n=8\n");
+    return 1;
+  }
+
+  igraph_destroy(&g);
   
+  // [2, -2]^2, n=2
+  igraph_lcf(&g, 2, 2, -2, 2, 0);
+
+  if (igraph_ecount(&g) != 1) {
+    printf("Failure: [2, -2]^2, n=2\n");
+    return 1;
+  }
+
+  igraph_destroy(&g);
+
+  // [2]^2, n=2
+  igraph_lcf(&g, 2, 2, 2, 0);
+
+  if (igraph_ecount(&g) != 1) {
+    printf("Failure: [2]^2, n=2\n");
+    return 1;
+  }
+
+  igraph_destroy(&g);
+
   return 0;
 }
