@@ -27,10 +27,21 @@ int print_matrix(const igraph_matrix_t *m) {
   long int nrow=igraph_matrix_nrow(m);
   long int ncol=igraph_matrix_ncol(m);
   long int i, j;
+  igraph_real_t val;
+
   for (i=0; i<nrow; i++) {
     printf("%li:", i);
     for (j=0; j<ncol; j++) {
-      printf(" %3.0F", MATRIX(*m, i, j));
+      val = MATRIX(*m, i, j);
+      if (igraph_is_inf(val)) {
+        if (val < 0) {
+          printf("-inf");
+        } else {
+          printf(" inf");
+        }
+      } else {
+        printf(" %3.0f", val);
+      }
     }
     printf("\n");
   }
