@@ -64,9 +64,18 @@ int igraph_maximal_cliques_subset(const igraph_t *graph,
 
 int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                    igraph_integer_t min_size, igraph_integer_t max_size);
+int igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
+                   igraph_integer_t min_size, igraph_integer_t max_size);
 int igraph_largest_cliques(const igraph_t *graph, 
 			   igraph_vector_ptr_t *cliques);
 int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no);
+int igraph_weighted_cliques(const igraph_t *graph,
+                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
+                    igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal);
+int igraph_largest_weighted_cliques(const igraph_t *graph,
+                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res);
+int igraph_weighted_clique_number(const igraph_t *graph,
+                    const igraph_vector_t *vertex_weights, igraph_real_t *res);
 int igraph_independent_vertex_sets(const igraph_t *graph,
 				   igraph_vector_ptr_t *res,
 				   igraph_integer_t min_size,
@@ -76,6 +85,28 @@ int igraph_largest_independent_vertex_sets(const igraph_t *graph,
 int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 					   igraph_vector_ptr_t *res);
 int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no);
+
+/**
+ * \typedef igraph_clique_handler_t
+ * \brief Type of clique handler functions
+ *
+ * Callback type, called when a clique was found.
+ *
+ * See the details at the documentation of \ref
+ * igraph_cliques_callback().
+ *
+ * \param clique The current clique. Destroying and freeing
+ *   this vector is left to the user.
+ * \param arg This extra argument was passed to \ref
+ *   igraph_cliques_callback() when it was called.
+ * \return Boolean, whether to continue with the clique search.
+ */
+typedef igraph_bool_t igraph_clique_handler_t(igraph_vector_t *clique, void *arg);
+
+int igraph_cliques_callback(const igraph_t *graph,
+                    igraph_integer_t min_size, igraph_integer_t max_size,
+                    igraph_clique_handler_t *cliquehandler_fn, void *arg);
+
 
 __END_DECLS
 

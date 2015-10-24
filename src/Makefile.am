@@ -280,7 +280,9 @@ HEADERS_PRIVATE = atlas-edges.h \
 		foreign-ncol-header.h foreign-lgl-header.h \
 		foreign-pajek-header.h igraph_interrupt_internal.h \
 		scg_headers.h igraph_hacks_internal.h triangles_template.h \
-		triangles_template1.h maximal_cliques_template.h prpack.h
+		triangles_template1.h maximal_cliques_template.h prpack.h \
+		igraph_cliquer.h cliquer/graph.h cliquer/cliquer.h cliquer/misc.h \
+		cliquer/cliquerconf.h cliquer/reorder.h cliquer/set.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -379,7 +381,8 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     prpack.cpp $(CHOLMOD) $(AMD) $(COLAMD) \
 			     $(SPCONFIG) layout_gem.c layout_dh.c lsap.c \
 			     layout_fr.c layout_kk.c paths.c \
-			     random_walk.c
+			     random_walk.c \
+				 igraph_cliquer.c cliquer/cliquer.c cliquer/graph.c cliquer/reorder.c 
 
 if INTERNAL_F2C
 else
