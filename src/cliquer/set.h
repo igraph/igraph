@@ -373,6 +373,7 @@ static int set_return_next(set_t s, int n) {
  * Prints the size and contents of set s to stdout.
  * Mainly useful for debugging purposes and trivial output.
  */
+/*
 UNUSED_FUNCTION
 static void set_print(set_t s) {
 	int i;
@@ -383,5 +384,6 @@ static void set_print(set_t s) {
 	printf("\n");
 	return;
 }
+*/
 
 #endif /* !CLIQUER_SET_H */

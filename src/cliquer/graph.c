@@ -13,8 +13,10 @@
 #include "graph.h"
 
 
+/*
 static graph_t *graph_read_dimacs_binary(FILE *fp,char *firstline);
 static graph_t *graph_read_dimacs_ascii(FILE *fp,char *firstline);
+*/
 
 
 /*
@@ -150,6 +152,7 @@ int graph_edge_count(graph_t *g) {
 }
 
 
+#if 0
 /*
  * graph_write_dimacs_ascii_file()
  *
@@ -540,7 +543,7 @@ static graph_t *graph_read_dimacs_ascii(FILE *fp, char *firstline) {
 
 	return g;
 }
-
+#endif
 
 
 /*

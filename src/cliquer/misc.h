@@ -15,16 +15,10 @@
 
 
 /*
- * Default value for UNUSED_FUNCTION:  use "__attribute__((unused))" for
- * GCC versions that support it, otherwise leave blank.
+ * The original cliquer source has some functions incorrectly marked as unused,
+ * thus leave this undefined.
  */
-#ifndef UNUSED_FUNCTION
-# if     __GNUC__ > 2 || (__GNUC__ == 2 && __GNUC_MINOR__ > 4)
-#  define UNUSED_FUNCTION __attribute__((unused))
-# else
-#  define UNUSED_FUNCTION
-# endif
-#endif  /* !UNUSED_FUNCTION */
+#define UNUSED_FUNCTION
 
 
 /*

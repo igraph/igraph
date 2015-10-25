@@ -8,11 +8,11 @@
 
 #include "reorder.h"
 
-#include <time.h>
-#include <sys/times.h>
 #include <stdlib.h>
 
 #include <limits.h>
+
+#include <igraph_random.h>
 
 
 /*
@@ -406,18 +406,15 @@ int *reorder_by_degree(graph_t *g, boolean weighted) {
  *       is called using the system time.
  */
 int *reorder_by_random(graph_t *g, boolean weighted) {
-	struct tms t;
 	int i,r;
 	int *new;
 	boolean *used;
-
-	srand(times(&t)+time(NULL));
 
 	new=calloc(g->n, sizeof(int));
 	used=calloc(g->n, sizeof(boolean));
 	for (i=0; i < g->n; i++) {
 		do {
-			r=rand() % g->n;
+            r = igraph_rng_get_integer(igraph_rng_default(), 0, g->n - 1);
 		} while (used[r]);
 		new[i]=r;
 		used[r]=TRUE;

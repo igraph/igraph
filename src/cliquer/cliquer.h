@@ -43,13 +43,14 @@ extern int clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
 				      boolean maximal, clique_options *opts);
 
 /* Time printing functions */
+/*
 extern boolean clique_print_time(int level, int i, int n, int max,
 				 double cputime, double realtime,
 				 clique_options *opts);
 extern boolean clique_print_time_always(int level, int i, int n, int max,
 					double cputime, double realtime,
 					clique_options *opts);
-
+*/
 
 /* Alternate spelling (let's be a little forgiving): */
 #define cliquer_options clique_options

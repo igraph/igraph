@@ -33,6 +33,7 @@ extern void graph_crop(graph_t *g);
 extern boolean graph_weighted(graph_t *g);
 extern int graph_edge_count(graph_t *g);
 
+/*
 extern graph_t *graph_read_dimacs(FILE *fp);
 extern graph_t *graph_read_dimacs_file(char *file);
 extern boolean graph_write_dimacs_ascii(graph_t *g, char *comment,FILE *fp);
@@ -41,6 +42,7 @@ extern boolean graph_write_dimacs_ascii_file(graph_t *g,char *comment,
 extern boolean graph_write_dimacs_binary(graph_t *g, char *comment,FILE *fp);
 extern boolean graph_write_dimacs_binary_file(graph_t *g, char *comment,
 					      char *file);
+*/
 
 extern void graph_print(graph_t *g);
 extern boolean graph_test(graph_t *g, FILE *output);
