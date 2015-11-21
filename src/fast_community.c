@@ -527,6 +527,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
   igraph_vector_t a;
   igraph_real_t q, *dq, bestq, weight_sum, loop_weight_sum;
   igraph_bool_t has_multiple;
+  igraph_matrix_t merges_local;
 
   /*long int join_order[] = { 16,5, 5,6, 6,0, 4,0, 10,0, 26,29, 29,33, 23,33, 27,33, 25,24, 24,31, 12,3, 21,1, 30,8, 8,32, 9,2, 17,1, 11,0, 7,3, 3,2, 13,2, 1,2, 28,31, 31,33, 22,32, 18,32, 20,32, 32,33, 15,33, 14,33, 0,19, 19,2, -1,-1 };*/
   /*long int join_order[] = { 43,42, 42,41, 44,41, 41,36, 35,36, 37,36, 36,29, 38,29, 34,29, 39,29, 33,29, 40,29, 32,29, 14,29, 30,29, 31,29, 6,18, 18,4, 23,4, 21,4, 19,4, 27,4, 20,4, 22,4, 26,4, 25,4, 24,4, 17,4, 0,13, 13,2, 1,2, 11,2, 8,2, 5,2, 3,2, 10,2, 9,2, 7,2, 2,28, 28,15, 12,15, 29,16, 4,15, -1,-1 };*/
@@ -553,10 +554,19 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     IGRAPH_ERROR("fast-greedy community finding works only on graphs without multiple edges", IGRAPH_EINVAL);
   }
 
+  if (membership != 0 && merges == 0) {
+	/* We need the merge matrix because the user wants the membership
+	 * vector, so we allocate one on our own */
+	IGRAPH_CHECK(igraph_matrix_init(&merges_local, total_joins, 2));
+	IGRAPH_FINALLY(igraph_matrix_destroy, &merges_local);
+	merges = &merges_local;
+  }
+
   if (merges != 0) {
 	IGRAPH_CHECK(igraph_matrix_resize(merges, total_joins, 2));
 	igraph_matrix_null(merges);
   }
+
   if (modularity != 0) {
 	IGRAPH_CHECK(igraph_vector_resize(modularity, total_joins+1));
   }
@@ -918,6 +928,11 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 						/*steps=*/ (igraph_integer_t) best_no_of_joins,
 						membership, 
 						/*csize=*/ 0));
+  }
+
+  if (merges == &merges_local) {
+	igraph_matrix_destroy(&merges_local);
+	IGRAPH_FINALLY_CLEAN(1);
   }
 
   return 0;

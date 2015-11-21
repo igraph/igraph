@@ -30,12 +30,16 @@ void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges,
 
   igraph_vector_init(&our_membership, 0);
 
-  if (membership != 0) {
-    igraph_vector_update(&our_membership, membership);
-    fprintf(f, "Modularity:  ---\n");
-  } else {
+  if (mod != 0) {
     i=igraph_vector_which_max(mod);
     fprintf(f, "Modularity:  %f\n", VECTOR(*mod)[i]);
+  } else {
+	fprintf(f, "Modularity:  ---\n");
+  }
+
+  if (membership != 0) {
+    igraph_vector_update(&our_membership, membership);
+  } else if (merges != 0) {
     igraph_community_to_membership(merges, igraph_vcount(g), i, &our_membership, 0);
   }
 
@@ -155,6 +159,20 @@ int main() {
            0,5, -1);
   igraph_community_fastgreedy(&g, 0, &merges, 0, &membership);
   show_results(&g, 0, &merges, &membership, stdout);
+
+  /* Regression test -- asking for optimal membership vector but not
+   * providing a merge matrix */
+  igraph_small(&g, 10, IGRAPH_UNDIRECTED, 
+	       0,1,0,2,0,3,0,4, 1,2,1,3,1,4, 2,3,2,4, 3,4,
+	       5,6,5,7,5,8,5,9, 6,7,6,8,6,9, 7,8,7,9, 8,9,
+           0,5, -1);
+  igraph_community_fastgreedy(&g, 0, 0, &modularity, &membership);
+  show_results(&g, &modularity, 0, &membership, stdout);
+
+  /* Regression test -- asking for optimal membership vector but not
+   * providing a merge matrix or a modularity vector */
+  igraph_community_fastgreedy(&g, 0, 0, 0, &membership);
+  show_results(&g, 0, 0, &membership, stdout);
   igraph_destroy(&g);
 
   igraph_vector_destroy(&membership);
