@@ -23,6 +23,126 @@
 
 #include <igraph.h>
 
+
+/* This test counts motifs using LAD and compares the results with
+ * the RANDESU motif finder */
+void test_motifs() {
+    igraph_t graph;
+    igraph_vector_t randesu_counts, lad_counts;
+    igraph_vector_t cut_prob;
+    int i, n;
+    igraph_bool_t equal;
+    igraph_integer_t vcount;
+
+    igraph_rng_seed(igraph_rng_default(), 42);
+
+    igraph_erdos_renyi_game_gnm(&graph, 40, 400, /* directed = */ 1, /* loops = */ 0);
+    vcount = igraph_vcount(&graph);
+
+    /* 3-motifs */
+
+    n = 16; /* there are 16 size-3 directed graphs */
+
+    igraph_vector_init(&lad_counts, n);
+
+    for (i=0; i < n; i++) {
+        igraph_t pattern;
+        igraph_vector_ptr_t maps;
+        igraph_integer_t nAutomorphisms;
+
+        igraph_isoclass_create(&pattern, 3, i, /* directed = */ 1);
+        igraph_vector_ptr_init(&maps, 0);
+
+        igraph_subisomorphic_lad(&pattern, &graph, NULL, NULL, NULL, &maps, /* induced = */ 1, 0);
+
+        igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL);
+
+        VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
+
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
+        igraph_vector_ptr_destroy_all(&maps);
+
+        igraph_destroy(&pattern);
+    }
+
+    igraph_vector_init(&cut_prob, 3);
+    igraph_vector_init(&randesu_counts, 0);
+    igraph_motifs_randesu(&graph, &randesu_counts, 3, &cut_prob);
+
+    equal = 1 /* true */;
+    for (i=0; i < n; i++) {
+        if (igraph_is_nan(VECTOR(randesu_counts)[i]))
+            continue;
+        if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
+            equal = 0;
+            break;
+        }
+    }
+
+    if (! equal)
+        printf("LAD 3-motif count does not agree with RANDESU.\n");
+
+    if (igraph_vector_sum(&lad_counts) != vcount*(vcount-1)*(vcount-2)/6)
+        printf("Total 3-vertex subgraph count is incorrect.\n");
+
+    igraph_vector_destroy(&randesu_counts);
+    igraph_vector_destroy(&lad_counts);
+    igraph_vector_destroy(&cut_prob);
+
+    /* 4-motifs */
+
+    n = 218; /* there are 218 size-4 directed graphs */
+
+    igraph_vector_init(&lad_counts, n);
+
+    for (i=0; i < n; i++) {
+        igraph_t pattern;
+        igraph_vector_ptr_t maps;
+        igraph_integer_t nAutomorphisms;
+
+        igraph_isoclass_create(&pattern, 4, i, /* directed = */ 1);
+        igraph_vector_ptr_init(&maps, 0);
+
+        igraph_subisomorphic_lad(&pattern, &graph, NULL, NULL, NULL, &maps, /* induced = */ 1, 0);
+
+        igraph_count_subisomorphisms_vf2(&pattern, &pattern, NULL, NULL, NULL, NULL, &nAutomorphisms, NULL, NULL, NULL);
+
+        VECTOR(lad_counts)[i] = igraph_vector_ptr_size(&maps) / nAutomorphisms;
+
+        IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&maps, igraph_vector_destroy);
+        igraph_vector_ptr_destroy_all(&maps);
+
+        igraph_destroy(&pattern);
+    }
+
+    igraph_vector_init(&cut_prob, 4);
+    igraph_vector_init(&randesu_counts, 0);
+    igraph_motifs_randesu(&graph, &randesu_counts, 4, &cut_prob);
+
+    equal = 1 /* true */;
+    for (i=0; i < n; i++) {
+        if (igraph_is_nan(VECTOR(randesu_counts)[i]))
+            continue;
+        if (VECTOR(randesu_counts)[i] != VECTOR(lad_counts)[i]) {
+            equal = 0;
+            break;
+        }
+    }
+
+    if (! equal)
+        printf("LAD 4-motif count does not agree with RANDESU.\n");
+
+    if (igraph_vector_sum(&lad_counts) != vcount*(vcount-1)*(vcount-2)*(vcount-3)/24)
+        printf("Total 4-vertex subgraph count is incorrect.\n");
+
+    igraph_vector_destroy(&randesu_counts);
+    igraph_vector_destroy(&lad_counts);
+    igraph_vector_destroy(&cut_prob);
+
+    igraph_destroy(&graph);
+}
+
+
 int main() {
   igraph_t target, pattern;
   igraph_bool_t iso;
@@ -175,6 +295,8 @@ int main() {
   
   igraph_vector_destroy(&map);
   igraph_vector_ptr_destroy(&maps);
+
+  test_motifs();
 
   return 0;
 }
