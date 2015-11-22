@@ -1043,6 +1043,7 @@ void igraph_i_graphml_sax_handler_start_element_ns(
       }
       state->st=INSIDE_EDGE;
     } else if (xmlStrEqual(localname, toXmlChar("node"))) {
+      id1=-1;
       for (i=0, it=(xmlChar**)attributes; i < nb_attributes; i++, it+=5) {
 	if (XML_ATTR_URI(it) != 0 &&
 	    !xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), XML_ATTR_URI(it))) {
@@ -1056,8 +1057,14 @@ void igraph_i_graphml_sax_handler_start_element_ns(
 	  break;
 	}
       }
+      if (id1 >= 0) {
+	state->act_node = id1;
+      } else {
+	state->act_node = -1;
+	igraph_i_graphml_sax_handler_error(state, "Node with missing id encountered");
+	return;
+      }
       state->st=INSIDE_NODE;
-      state->act_node = id1;
     } else if (xmlStrEqual(localname, toXmlChar("data"))) {
       igraph_i_graphml_attribute_data_setup(state, attributes, nb_attributes,
 	  IGRAPH_ATTRIBUTE_GRAPH);
