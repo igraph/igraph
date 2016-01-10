@@ -956,7 +956,7 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
     }
   }
       
-  IGRAPH_CHECK(igraph_create(graph, &edges, 0, type!=IGRAPH_TREE_UNDIRECTED));
+  IGRAPH_CHECK(igraph_create(graph, &edges, n, type!=IGRAPH_TREE_UNDIRECTED));
   
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
