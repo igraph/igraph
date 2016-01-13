@@ -1376,7 +1376,7 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
   igraph_vit_t vit;
 
   IGRAPH_WARNING("igraph_pagerank_old is deprecated from igraph 0.7, "
-		 "use igraph_pagerank instead");
+		 "use page_rank_old instead");
 
   if (niter<=0) IGRAPH_ERROR("Invalid iteration count", IGRAPH_EINVAL);
   if (eps<=0) IGRAPH_ERROR("Invalid epsilon value", IGRAPH_EINVAL);
@@ -2013,7 +2013,7 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
 int igraph_subgraph(const igraph_t *graph, igraph_t *res, 
 		    const igraph_vs_t vids) {
 	IGRAPH_WARNING("igraph_subgraph is deprecated from igraph 0.6, "
-			           "use igraph_induced_subgraph instead");
+			           "use induced_subgraph instead");
   return igraph_induced_subgraph(graph, res, vids, IGRAPH_SUBGRAPH_AUTO);
 }
 
