@@ -6107,7 +6107,9 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
   if (!weights) {
     igraph_integer_t diameter;
     IGRAPH_CHECK(igraph_diameter(graph, &diameter, pfrom, pto, path, directed, unconn));
-    *pres = diameter;
+    if (pres) {
+      *pres = diameter;
+    }
     return IGRAPH_SUCCESS;
   }
 
