@@ -980,6 +980,9 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
   }
   
   if (m == 0 || n1 * n2 == 0) {
+    if (m > 0) {
+      IGRAPH_ERROR("Invalid number (too large) of edges", IGRAPH_EINVAL);
+    }  	
     IGRAPH_CHECK(retval=igraph_empty(graph, n1 + n2, directed));
   } else {
     
