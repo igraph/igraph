@@ -2421,8 +2421,8 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  * </para><para>
  * The closeness centrality of a vertex measures how easily other
  * vertices can be reached from it (or the other way: how easily it
- * can be reached from the other vertices). It is defined as the
- * number of the number of vertices minus one divided by the sum of the
+ * can be reached from the other vertices). It is defined as
+ * the number of vertices minus one divided by the sum of the
  * lengths of all geodesics from/to the given vertex.
  *
  * </para><para>
@@ -2599,8 +2599,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  * </para><para>
  * The closeness centrality of a vertex measures how easily other
  * vertices can be reached from it (or the other way: how easily it
- * can be reached from the other vertices). It is defined as the
- * number of the number of vertices minus one divided by the sum of the
+ * can be reached from the other vertices). It is defined as
+ * the number of vertices minus one divided by the sum of the
  * lengths of all geodesics from/to the given vertex. When estimating
  * closeness centrality, igraph considers paths having a length less than
  * or equal to a prescribed cutoff value.
