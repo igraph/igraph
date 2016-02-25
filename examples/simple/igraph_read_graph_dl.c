@@ -31,7 +31,7 @@ int main() {
 			  "fullmatrix3.dl", "fullmatrix4.dl",
 			  "edgelist1.dl", "edgelist2.dl", "edgelist3.dl",
 			  "edgelist4.dl", "edgelist5.dl", "edgelist6.dl",
-			  "nodelist1.dl", "nodelist2.dl" };
+			  "edgelist7.dl", "nodelist1.dl", "nodelist2.dl" };
   int no_files=sizeof(files)/sizeof(const char*);
   int i, ret;
   igraph_t g;
@@ -48,7 +48,7 @@ int main() {
     ret=fclose(infile);
     if (ret) {
       printf("Cannot close file: %s\n", files[i]);
-      exit(11+i);
+      exit(101+i);
     }
     igraph_write_graph_edgelist(&g, stdout);
     igraph_destroy(&g);

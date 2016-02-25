@@ -1,0 +1,6 @@
+DL n=4
+format = edgelist1
+data:
+1 2
+2 3
+2 4

@@ -181,7 +181,7 @@ labeledmatrixline: LABEL zerooneseq NEWLINE { } ;
 
 edgelist1: FORMATEDGELIST1 newline edgelist1rest {} ;
 
-edgelist1rest:   DATA edgelist1data {}
+edgelist1rest:   DATA newline edgelist1data {}
              | LABELS newline labels newline DATA newline edgelist1data {}
              | LABELSEMBEDDED newline DATA newline labelededgelist1data {}
              | LABELS newline labels newline LABELSEMBEDDED newline DATA newline labelededgelist1data {}
