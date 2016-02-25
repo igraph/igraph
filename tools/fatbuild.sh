@@ -18,8 +18,8 @@ GCC_VERSION_PATCHLEVEL="4.2.1"
 BUILD_PPC=0
 
 # Mac OS X SDK versions for 32-bit and 64-bit builds go here
-SDK_VERSION_32="10.8"
-SDK_VERSION_64="10.8"
+SDK_VERSION_32="10.9"
+SDK_VERSION_64="10.9"
 
 # Generic configure flags you always want go here.
 CONFIG_GENERIC="--disable-gmp"
