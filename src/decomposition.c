@@ -68,6 +68,12 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
   /***************/
   
   long int j, v;
+  
+  if (no_of_nodes == 0) {
+    igraph_vector_clear(alpha);
+    if (alpham1) igraph_vector_clear(alpham1);
+    return IGRAPH_SUCCESS;
+  }
 
   IGRAPH_CHECK(igraph_vector_long_init(&size, no_of_nodes));
   IGRAPH_FINALLY(igraph_vector_long_destroy, &size);
