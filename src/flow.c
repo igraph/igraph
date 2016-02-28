@@ -1974,6 +1974,13 @@ int igraph_i_connectivity_checks(const igraph_t *graph,
 				 igraph_bool_t *found) {
   igraph_bool_t conn;
   *found=0;
+
+  if (igraph_vcount(graph) == 0) {
+    *res=0;
+    *found=1;
+    return 0;
+  }
+
   IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_STRONG));
   if (!conn) {
     *res=0;
