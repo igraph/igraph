@@ -49,6 +49,7 @@ __BEGIN_DECLS
 /* #endif */
 
 int igraph_free(void *p);
+void *igraph_malloc(size_t n);
 
 __END_DECLS
 

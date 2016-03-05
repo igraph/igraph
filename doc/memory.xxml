@@ -7,6 +7,7 @@
 <chapter id="igraph-Memory">
 <title>Memory (de)allocation</title>
 
+<!-- doxrox-include igraph_malloc -->
 <!-- doxrox-include igraph_free -->
 
 </chapter>
