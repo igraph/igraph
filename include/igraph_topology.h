@@ -230,7 +230,7 @@ int igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
  * \member max_level Maximum level.
  * \member group_size The size of the automorphism group of the graph,
  *    given as a string. It should be deallocated via
- *    <function>free()</function> if not needed any more.
+ *    \ref igraph_free() if not needed any more.
  * 
  * See http://www.tcs.hut.fi/Software/bliss/index.html
  * for details about the algorithm and these parameters.

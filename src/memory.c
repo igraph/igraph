@@ -67,9 +67,33 @@
  * \return Error code, currently always zero, meaning success.
  * 
  * Time complexity: platform dependent, ideally it should be O(1).
+ *
+ * \sa \ref igraph_malloc()
  */
 
 int igraph_free(void *p) {
   igraph_Free(p);
   return 0;
+}
+
+
+/**
+ * \function igraph_malloc
+ * Allocate memory that can be safely deallocated by igraph functions
+ *
+ * Some igraph functions, such as \ref igraph_vector_ptr_free_all() and
+ * \ref igraph_vector_ptr_destroy_all() can free memory that may have been
+ * allocated by the user.  \c igraph_malloc() works exactly like \c malloc()
+ * from the C standard library, but it is guaranteed that it can be safely
+ * paired with the \c free() function used by igraph internally (which is
+ * also user-accessible through \ref igraph_free()).
+ *
+ * \param n Number of bytes to be allocated.
+ * \return Pointer to the piece of allocated memory.
+ *
+ * \sa \ref igraph_free()
+ */
+
+void *igraph_malloc(size_t n) {
+    return malloc(n);
 }
