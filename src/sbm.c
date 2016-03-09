@@ -119,14 +119,14 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
   RNG_BEGIN();
 
   for (from = 0; from < no_blocks; from++) {
-    int fromsize = VECTOR(*block_sizes)[from];
+    double fromsize = VECTOR(*block_sizes)[from];
     int start = directed ? 0 : from;
     int i, tooff=0;
     for (i=0; i<start; i++) {
       tooff += VECTOR(*block_sizes)[i];
     }
     for (to = start; to < no_blocks; to++) {
-      int tosize = VECTOR(*block_sizes)[to];
+      double tosize = VECTOR(*block_sizes)[to];
       igraph_real_t prob=MATRIX(*pref_matrix, from, to);
       double maxedges, last=RNG_GEOM(prob);
       if (directed && loops) {
@@ -181,7 +181,7 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 	  last += 1;
 	}	
       } else if (!directed && !loops && from!=to) {
-	maxedges = fromsize * tosize;	
+	maxedges = fromsize * tosize;
 	while (last < maxedges) {
 	  int vto=floor(last/fromsize);
 	  int vfrom=last - (igraph_real_t)vto * fromsize;
