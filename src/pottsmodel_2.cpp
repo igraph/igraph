@@ -2096,7 +2096,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 	}
 	assign_initial_conf(false);
 	
-	delete cluster_assign;
+	delete[] cluster_assign;
 		
 	if (temperature) { *temperature=t; }
 	
