@@ -2197,7 +2197,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     }
   } else {
     for (i=0; i<no_of_nodes; i++) {
-      VECTOR(*membership)[i] = i;
+      VECTOR(*membership)[i] = i+1;
     }
   }
 
