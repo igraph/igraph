@@ -1,4 +1,4 @@
-<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -13,10 +13,19 @@ to cliques and independent vertex sets.
 
 <section><title>Cliques</title>
 <!-- doxrox-include igraph_cliques -->
+<!-- doxrox-include igraph_clique_size_hist -->
+<!-- doxrox-include igraph_cliques_callback -->
+<!-- doxrox-include igraph_clique_handler_t -->
 <!-- doxrox-include igraph_largest_cliques -->
 <!-- doxrox-include igraph_maximal_cliques -->
 <!-- doxrox-include igraph_maximal_cliques_count -->
 <!-- doxrox-include igraph_clique_number -->
+</section>
+
+<section><title>Weighted cliques</title>
+<!-- doxrox-include igraph_weighted_cliques -->
+<!-- doxrox-include igraph_largest_weighted_cliques -->
+<!-- doxrox-include igraph_weighted_clique_number -->
 </section>
 
 <section><title>Independent Vertex Sets</title>

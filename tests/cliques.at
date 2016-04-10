@@ -3,20 +3,20 @@
 # Test suite for the IGraph library.
 # Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
 # 334 Harvard street, Cambridge, MA 02139 USA
-# 
+#
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
-# Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+# Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301 USA
 
 # Macros
@@ -36,20 +36,26 @@ AT_CLEANUP
 
 AT_SETUP([More maximal cliques (igraph_maximal_cliques):])
 AT_KEYWORDS([igraph_maximal_cliques cliques maximal cliques])
-AT_COMPILE_CHECK([simple/igraph_maximal_cliques2.c], 
+AT_COMPILE_CHECK([simple/igraph_maximal_cliques2.c],
                  [simple/igraph_maximal_cliques2.out])
 AT_CLEANUP
 
 AT_SETUP([Maximal cliques 3 (igraph_maximal_cliques):])
 AT_KEYWORDS([igraph_maximal_cliques cliques maximal cliques])
-AT_COMPILE_CHECK([simple/igraph_maximal_cliques3.c], 
+AT_COMPILE_CHECK([simple/igraph_maximal_cliques3.c],
                  [simple/igraph_maximal_cliques3.out])
 AT_CLEANUP
 
 AT_SETUP([Maximal cliques for a subset (igraph_maximal_cliques):])
 AT_KEYWORDS([igraph_maximal_cliques cliques maximal cliques])
-AT_COMPILE_CHECK([simple/igraph_maximal_cliques4.c], 
+AT_COMPILE_CHECK([simple/igraph_maximal_cliques4.c],
                  [simple/igraph_maximal_cliques4.out])
+AT_CLEANUP
+
+AT_SETUP([Weighted cliques (igraph_weighted_cliques):])
+AT_KEYWORDS([igraph_weighted_cliques cliques])
+AT_COMPILE_CHECK([simple/igraph_weighted_cliques.c],
+				 [simple/igraph_weighted_cliques.out])
 AT_CLEANUP
 
 AT_SETUP([Calculating independent vertex sets (igraph_independent_vertex_sets): ])
@@ -58,4 +64,3 @@ AT_KEYWORDS([igraph_independent_vertex_sets,
 	igraph_independence_number])
 AT_COMPILE_CHECK([simple/igraph_independent_sets.c], [simple/igraph_independent_sets.out])
 AT_CLEANUP
-

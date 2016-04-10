@@ -31,6 +31,7 @@
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_types_internal.h"
+#include "igraph_cliquer.h"
 #include "config.h"
 
 #include <assert.h>
@@ -326,7 +327,185 @@ int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  */
 int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                    igraph_integer_t min_size, igraph_integer_t max_size) {
-  return igraph_i_cliques(graph, res, min_size, max_size, 0);
+  return igraph_i_cliquer_cliques(graph, res, min_size, max_size);
+}
+
+
+/**
+ * \function igraph_clique_size_hist
+ * \brief Count cliques of each size in the graph
+ *
+ * </para><para>
+ * Cliques are fully connected subgraphs of a graph.
+ *
+ * </para><para>The current implementation of this function
+ * uses version 1.21 of the Cliquer library by Sampo Niskanen and
+ * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
+ *
+ * \param graph The input graph.
+ * \param hist Pointer to an initialized vector. The result will be stored
+ * here. The first element will store the number of size-1 cliques, the second
+ * element the number of size-2 cliques, etc.  For cliques smaller than \c min_size,
+ * zero counts will be returned.
+ * \param min_size Integer giving the minimum size of the cliques to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer giving the maximum size of the cliques to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \return Error code.
+ *
+ * \sa \ref igraph_cliques() and \ref igraph_cliques_callback()
+ *
+ * Time complexity: Exponential
+ *
+ */
+int igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
+                    igraph_integer_t min_size, igraph_integer_t max_size) {
+    return igraph_i_cliquer_histogram(graph, hist, min_size, max_size);
+}
+
+
+/**
+ * \function igraph_cliques_callback
+ * \brief Calls a function for each clique in the graph.
+ *
+ * </para><para>
+ * Cliques are fully connected subgraphs of a graph. This function
+ * enumerates all cliques within the given size range and calls
+ * \p cliquehandler_fn for each of them. The cliques are passed to the
+ * callback function as an <type>igraph_vector_t *</type>.  Destroying and
+ * freeing this vector is left up to the user.  Use \ref igraph_vector_destroy()
+ * to destroy it first, then free it using \ref igraph_free().
+ *
+ * </para><para>The current implementation of this function
+ * uses version 1.21 of the Cliquer library by Sampo Niskanen and
+ * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
+ *
+ * \param graph The input graph.
+ * \param min_size Integer giving the minimum size of the cliques to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer giving the maximum size of the cliques to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \param cliquehandler_fn Callback function to be called for each clique.
+ * See also igraph_clique_handler_t.
+ * \param arg Extra argument to supply to \p cliquehandler_fn.
+ * \return Error code.
+ *
+ * \sa \ref igraph_cliques()
+ *
+ * Time complexity: Exponential
+ *
+ */
+int igraph_cliques_callback(const igraph_t *graph,
+                    igraph_integer_t min_size, igraph_integer_t max_size,
+                    igraph_clique_handler_t *cliquehandler_fn, void *arg)
+{
+    return igraph_i_cliquer_callback(graph, min_size, max_size, cliquehandler_fn, arg);
+}
+
+
+/**
+ * \function igraph_weighted_cliques
+ * \brief Find all cliques in a given weight range in a vertex weighted graph
+ *
+ * </para><para>
+ * Cliques are fully connected subgraphs of a graph.
+ * The weight of a clique is the sum of the weights
+ * of individual vertices within the clique.
+ *
+ * </para><para>The current implementation of this function
+ * uses version 1.21 of the Cliquer library by Sampo Niskanen and
+ * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
+ *
+ * Only positive integer vertex weights are supported.
+ *
+ * \param graph The input graph.
+ * \param vertex_weights A vector of vertex weights. The current implementation
+ *   will truncate all weights to their integer parts.
+ * \param res Pointer to a pointer vector, the result will be stored
+ *   here, ie. \c res will contain pointers to \c igraph_vector_t
+ *   objects which contain the indices of vertices involved in a clique.
+ *   The pointer vector will be resized if needed but note that the
+ *   objects in the pointer vector will not be freed.
+ * \param min_weight Integer giving the minimum weight of the cliques to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_weight Integer giving the maximum weight of the cliques to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \param maximal If true, only maximal cliques will be returned
+ * \return Error code.
+ *
+ * \sa \ref igraph_cliques(), \ref igraph_maximal_cliques()
+ *
+ * Time complexity: Exponential
+ *
+ */
+int igraph_weighted_cliques(const igraph_t *graph,
+                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
+                    igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal)
+{
+    return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
+}
+
+
+/**
+ * \function igraph_largest_weighted_cliques
+ * \brief Finds the largest weight clique(s) in a graph.
+ *
+ * </para><para>
+ * Finds the clique(s) having the largest weight in the graph.
+ *
+ * </para><para>The current implementation of this function
+ * uses version 1.21 of the Cliquer library by Sampo Niskanen and
+ * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
+ *
+ * Only positive integer vertex weights are supported.
+ *
+ * \param graph The input graph.
+ * \param vertex_weights A vector of vertex weights. The current implementation
+ *   will truncate all weights to their integer parts.
+ * \param res Pointer to a pointer vector, the result will be stored
+ *   here, ie. \c res will contain pointers to \c igraph_vector_t
+ *   objects which contain the indices of vertices involved in a clique.
+ *   The pointer vector will be resized if needed but note that the
+ *   objects in the pointer vector will not be freed.
+ * \return Error code.
+ *
+ * \sa \ref igraph_weighted_cliques(), \ref igraph_weighted_clique_number(), \ref igraph_largest_cliques()
+ *
+ * Time complexity: TODO
+ */
+int igraph_largest_weighted_cliques(const igraph_t *graph,
+                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res)
+{
+    return igraph_i_largest_weighted_cliques(graph, vertex_weights, res);
+}
+
+
+/**
+ * \function igraph_weighted_clique_number
+ * \brief Find the weight of the largest weight clique in the graph
+ *
+ * </para><para>The current implementation of this function
+ * uses version 1.21 of the Cliquer library by Sampo Niskanen and
+ * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
+ *
+ * Only positive integer vertex weights are supported.
+ *
+ * \param graph The input graph.
+ * \param vertex_weights A vector of vertex weights. The current implementation
+ *   will truncate all weights to their integer parts.
+ * \param res The largest weight will be returned to the \c igraph_real_t
+ *   pointed to by this variable.
+ * \return Error code.
+ *
+ * \sa \ref igraph_weighted_cliques(), \ref igraph_largest_weighted_cliques(), \ref igraph_clique_number()
+ *
+ * Time complexity: TODO
+ *
+ */
+int igraph_weighted_clique_number(const igraph_t *graph,
+                    const igraph_vector_t *vertex_weights, igraph_real_t *res)
+{
+    return igraph_i_weighted_clique_number(graph, vertex_weights, res);
 }
 
 typedef int(*igraph_i_maximal_clique_func_t)(const igraph_vector_t*, void*, igraph_bool_t*);
