@@ -609,7 +609,7 @@ public:
 
 
 
-IGRAPH_THREAD_LOCAL typedef struct {
+typedef struct {
   unsigned int splitting_element;
   unsigned int certificate_index;
   unsigned int subcertificate_length;
