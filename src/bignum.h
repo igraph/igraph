@@ -49,7 +49,12 @@
 #endif
 
 /* up to 512 limbs (512 * 32 = 16384 bits) numbers */
-#define	BN_MAXSIZE 512
+/* BN_MAXSIZE used to be 512 here, allowing us to go up to 512*32 = 16384 bits.
+ * However, this has caused compilation problems with clang 7.3 (unless
+ * compiling with -O2 -g). Since it is unlikely that we'll need that many bits,
+ * I have changed this to 202, which still yields 6464 bits of precision but
+ * does not cause problems with clang -- TN, 2016-04-18 */
+#define	BN_MAXSIZE 202
 #define	LIMBBITS 32
 #define	LIMBMASK 0xfffffffful
 #define	HALFMASK 0x0000fffful
