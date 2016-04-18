@@ -21,10 +21,9 @@
 
 
 /* Default cliquer options */
-IGRAPH_THREAD_LOCAL static clique_options clique_default_options_struct = {
+IGRAPH_THREAD_LOCAL static clique_options clique_default_options = {
     reorder_by_default, NULL, /*clique_print_time*/ NULL, NULL, NULL, NULL, NULL, 0
 };
-IGRAPH_THREAD_LOCAL clique_options *clique_default_options=&clique_default_options_struct;
 
 
 /* Calculate d/q, rounding result upwards/downwards. */
@@ -1110,7 +1109,7 @@ set_t clique_unweighted_find_single(graph_t *g,int min_size,int max_size,
 	entrance_level++;
 
 	if (opts==NULL)
-		opts=clique_default_options;
+		opts=&clique_default_options;
 
 	ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
 	ASSERT(g!=NULL);
@@ -1238,7 +1237,7 @@ int clique_unweighted_find_all(graph_t *g, int min_size, int max_size,
 	entrance_level++;
 
 	if (opts==NULL)
-		opts=clique_default_options;
+		opts=&clique_default_options;
 
 	ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
 	ASSERT(g!=NULL);
@@ -1392,7 +1391,7 @@ set_t clique_find_single(graph_t *g,int min_weight,int max_weight,
 	entrance_level++;
 
 	if (opts==NULL)
-		opts=clique_default_options;
+		opts=&clique_default_options;
 
 	ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
 	ASSERT(g!=NULL);
@@ -1555,7 +1554,7 @@ int clique_find_all(graph_t *g, int min_weight, int max_weight,
 	entrance_level++;
 
 	if (opts==NULL)
-		opts=clique_default_options;
+		opts=&clique_default_options;
 
 	ASSERT((sizeof(setelement)*8)==ELEMENTSIZE);
 	ASSERT(g!=NULL);
