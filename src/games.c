@@ -3524,14 +3524,15 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                 igraph_vector_t* fitness_out, igraph_vector_t* fitness_in,
                 igraph_bool_t loops, igraph_bool_t multiple) {
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
-  igraph_integer_t no_of_nodes;
+  igraph_integer_t no_of_nodes, max_no_of_edges;
+  igraph_integer_t outnodes, innodes, nodes;
   igraph_vector_t cum_fitness_in, cum_fitness_out;
   igraph_vector_t *p_cum_fitness_in, *p_cum_fitness_out;
   igraph_real_t x, max_in, max_out;
   igraph_bool_t is_directed = (fitness_in != 0);
   float num_steps;
   igraph_integer_t step_counter = 0;
-  long int from, to, pos;
+  long int i, from, to, pos;
 
   if (fitness_out == 0) {
     IGRAPH_ERROR("fitness_out must not be null", IGRAPH_EINVAL);
@@ -3560,13 +3561,9 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
   }
   
   /* Avoid getting into an infinite loop when too many edges are requested */
-  if (! multiple) {
-      igraph_integer_t max_no_of_edges;
-
+  if (!multiple) {
     if (is_directed) {
-      igraph_integer_t outnodes = 0, innodes = 0, nodes = 0;
-      long i;
-
+      outnodes = innodes = nodes = 0;
       for (i=0; i < no_of_nodes; i++) {
         if (VECTOR(*fitness_out)[i] != 0)
             outnodes++;
@@ -3575,26 +3572,17 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
         if (VECTOR(*fitness_out)[i] != 0 && VECTOR(*fitness_in)[i] != 0)
             nodes++;
       }
-      if (loops)
-          max_no_of_edges = outnodes * innodes;
-      else
-          max_no_of_edges = outnodes * innodes - nodes;
-    }
-    else {
-      igraph_integer_t nodes = 0;
-      long i;
-
-      for (i=0; i < no_of_nodes; i++)
+      max_no_of_edges = outnodes * innodes - (loops ? 0 : nodes);
+    } else {
+      nodes = 0;
+      for (i=0; i < no_of_nodes; i++) {
         if (VECTOR(*fitness_out)[i] != 0)
-            nodes++;
-
-      if (loops)
-          max_no_of_edges = nodes*(nodes+1)/2;
-      else
-          max_no_of_edges = nodes*(nodes-1)/2;
+          nodes++;
+      }
+      max_no_of_edges = loops ? nodes*(nodes+1)/2 : nodes*(nodes-1)/2;
     }
     if (no_of_edges > max_no_of_edges)
-        IGRAPH_ERROR("Too many edges requested", IGRAPH_EINVAL);
+      IGRAPH_ERROR("Too many edges requested", IGRAPH_EINVAL);
   }
 
   /* Calculate the cumulative fitness scores */
