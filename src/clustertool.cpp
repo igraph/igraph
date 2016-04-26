@@ -272,7 +272,7 @@ int igraph_i_community_spinglass_orig(const igraph_t *graph,
     IGRAPH_ERROR("Invalid cooling factor", IGRAPH_EINVAL);
   }
   if (gamma < 0.0) {
-    IGRAPH_ERROR("Invalid gamme value", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
   }
   if (starttemp/stoptemp<1.0) {
     IGRAPH_ERROR("starttemp should be larger in absolute value than stoptemp",
@@ -582,8 +582,13 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
   if (!conn) {
     IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
   }
-  
-  igraph_vector_minmax(weights, &d_n, &d_p);
+
+  if (weights) {
+    igraph_vector_minmax(weights, &d_n, &d_p);
+  } else {
+    d_n = d_p = 1;
+  }
+
   if (d_n > 0) { d_n=0; }
   if (d_p < 0) { d_p=0; }
   d_n = -d_n;
