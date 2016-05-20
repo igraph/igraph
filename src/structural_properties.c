@@ -204,10 +204,10 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        \c TRUE the average of the geodesics
- *        within the components 
- *        will be returned, otherwise the number of vertices is
- *        used for the length of non-existing geodesics. (The rationale
+ *        \c TRUE the average of the geodesic lengths between connected
+ *        vertex pairs will be returned and unconnected pairs are ignored.
+ *        Otherwise the number of vertices is
+ *        used for the length between unconnected pairs. (The rationale
  *        behind this is that this is always longer than the longest
  *        possible geodesic in a graph.) 
  * \return Error code:
