@@ -21,7 +21,7 @@
 
 
 /* Default cliquer options */
-IGRAPH_THREAD_LOCAL static clique_options clique_default_options = {
+IGRAPH_THREAD_LOCAL clique_options clique_default_options = {
     reorder_by_default, NULL, /*clique_print_time*/ NULL, NULL, NULL, NULL, NULL, 0
 };
 
@@ -33,18 +33,18 @@ IGRAPH_THREAD_LOCAL static clique_options clique_default_options = {
 
 /* Global variables used: */
 /* These must be saved and restored in re-entrance. */
-IGRAPH_THREAD_LOCAL static int *clique_size;      /* c[i] == max. clique size in {0,1,...,i-1} */
-IGRAPH_THREAD_LOCAL static set_t current_clique;  /* Current clique being searched. */
-IGRAPH_THREAD_LOCAL static set_t best_clique;     /* Largest/heaviest clique found so far. */
+static IGRAPH_THREAD_LOCAL int *clique_size;      /* c[i] == max. clique size in {0,1,...,i-1} */
+static IGRAPH_THREAD_LOCAL set_t current_clique;  /* Current clique being searched. */
+static IGRAPH_THREAD_LOCAL set_t best_clique;     /* Largest/heaviest clique found so far. */
 /*static struct tms cputimer;*/      /* Timer for opts->time_function() */
 /*static struct timeval realtimer;*/ /* Timer for opts->time_function() */
-IGRAPH_THREAD_LOCAL static int clique_list_count=0;  /* No. of cliques in opts->clique_list[] */
-IGRAPH_THREAD_LOCAL static int weight_multiplier=1;  /* Weights multiplied by this when passing
+static IGRAPH_THREAD_LOCAL int clique_list_count=0;  /* No. of cliques in opts->clique_list[] */
+static IGRAPH_THREAD_LOCAL int weight_multiplier=1;  /* Weights multiplied by this when passing
 				  * to time_function(). */
 
 /* List cache (contains memory blocks of size g->n * sizeof(int)) */
-IGRAPH_THREAD_LOCAL static int **temp_list=NULL;
-IGRAPH_THREAD_LOCAL static int temp_count=0;
+static IGRAPH_THREAD_LOCAL int **temp_list=NULL;
+static IGRAPH_THREAD_LOCAL int temp_count=0;
 
 
 /*
@@ -53,7 +53,7 @@ IGRAPH_THREAD_LOCAL static int temp_count=0;
  * variables to original values.  entrance_level should be increased
  * and decreased accordingly.
  */
-IGRAPH_THREAD_LOCAL static int entrance_level=0;  /* How many levels for entrance have occurred? */
+static IGRAPH_THREAD_LOCAL int entrance_level=0;  /* How many levels for entrance have occurred? */
 
 #define ENTRANCE_SAVE() \
 int *old_clique_size = clique_size;                     \

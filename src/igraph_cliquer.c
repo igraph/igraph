@@ -29,7 +29,7 @@
 
 
 /* Nonzero value signals interuption from Cliquer callback function */
-IGRAPH_THREAD_LOCAL static int cliquer_interrupted;
+static IGRAPH_THREAD_LOCAL int cliquer_interrupted;
 
 
 /* For use with IGRAPH_FINALLY */
@@ -42,7 +42,7 @@ static void free_clique_list(igraph_vector_ptr_t *vp) {
 }
 
 /* We shall use this option struct for all calls to Cliquer */
-IGRAPH_THREAD_LOCAL static clique_options igraph_cliquer_opt = {
+static IGRAPH_THREAD_LOCAL clique_options igraph_cliquer_opt = {
     reorder_by_default, NULL, NULL, NULL, NULL, NULL, NULL, 0
 };
 
