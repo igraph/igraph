@@ -197,19 +197,18 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
 /**
  * \ingroup structural
  * \function igraph_average_path_length
- * \brief Calculates the average geodesic length in a graph.
+ * \brief Calculates the average shortest path length between all vertex pairs.
  *
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
  * \param directed Boolean, whether to consider directed
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        \c TRUE the average of the geodesics
- *        within the components 
- *        will be returned, otherwise the number of vertices is
- *        used for the length of non-existing geodesics. (The rationale
- *        behind this is that this is always longer than the longest
- *        possible geodesic in a graph.) 
+ *        \c TRUE, only those vertex pairs will be included in the calculation
+ *        between which there is a path. If \c FALSE, the number of vertices is
+ *        used as the distance between vertices unreachable from each other. 
+ *        The rationale behind this is that this is always longer than the longest
+ *        possible geodesic in a graph.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         data structures 
