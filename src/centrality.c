@@ -1764,7 +1764,9 @@ void igraph_i_destroy_biguints(igraph_biguint_t *p) {
  *        for directed graphs. It is ignored for undirected graphs.
  * \param cutoff The maximal length of paths that will be considered.
  *        If zero or negative, the exact betweenness will be calculated
- *        (no upper limit on path lengths).
+ *        (no upper limit on path lengths). Note that the length of a
+ *        path is considered to be equal to the number of edges in it,
+ *        irrespectively of the total weight of the edges.
  * \param weights An optional vector containing edge weights for 
  *        calculating weighted betweenness. Supply a null pointer here
  *        for unweighted betweenness.
@@ -2234,7 +2236,9 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  *        for directed graphs. It is ignored for undirected graphs.
  * \param cutoff The maximal length of paths that will be considered.
  *        If zero or negative, the exact betweenness will be calculated
- *        (no upper limit on path lengths).
+ *        (no upper limit on path lengths). Note that the length of a
+ *        path is considered to be equal to the number of edges in it,
+ *        irrespectively of the total weight of the edges.
  * \param weights An optional weight vector for weighted
  *        betweenness. Supply a null pointer here for unweighted
  *        betweenness.
