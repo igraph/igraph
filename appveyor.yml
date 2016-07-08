@@ -9,19 +9,21 @@ environment:
     - TARGET_ARCH: "x64"
       PYTHON_VERSION: "2.7"
       CONDA_INSTALL_LOCN: "C:\\Miniconda-x64"
-      VCVARS: C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat
       MSYSTEM: MINGW64
       PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
     - TARGET_ARCH: "x64"
       PYTHON_VERSION: "3.4"
       CONDA_INSTALL_LOCN: "C:\\Miniconda3-x64"
-      VCVARS: C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\vcvars64.bat
       MSYSTEM: MINGW64
       PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
     - TARGET_ARCH: "x64"
       PYTHON_VERSION: "3.5"
       CONDA_INSTALL_LOCN: "C:\\Miniconda35-x64"
-      VCVARS: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat
+      MSYSTEM: MINGW64
+      PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
+    - TARGET_ARCH: "x64"
+      PYTHON_VERSION: "NONE"
+      CONDA_INSTALL_LOCN: "C:\\Miniconda-x64"
       MSYSTEM: MINGW64
       PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
 
@@ -59,7 +61,7 @@ install:
     # also install a msvc build environment -> use libxml2 from conda-forge
     # updating conda always updates python, even with "no-update-deps" and
     # updating python takes ages on appveyor... So just keep the shorter PATH
-    # workaround for teh activate failure and don't update conda itself...
+    # workaround for the activate failure and don't update conda itself...
     #- cmd: conda update conda --no-update-dependencies
     - cmd: conda config --add channels conda-forge
     - cmd: conda config --set show_channel_urls yes
@@ -71,7 +73,7 @@ install:
     - cmd: bash bootstrap.sh
     - cmd: bash configure
     # for testing purpose removed, takes ages...
-    #- cmd: make
+    - cmd: if %PYTHON_VERSION%==NONE  make
 
     # now make the msvc builds
     - cmd: make msvc
@@ -80,17 +82,23 @@ install:
     - cmd: set "OLDPATH=%PATH%"
     # conda activate script doesn't like too long PATHs...
     - cmd: set "PATH=%CONDA_INSTALL_LOCN%;%CONDA_INSTALL_LOCN%\scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\"
+
     - cmd: call activate msvc-build-env
-    - cmd: call "%VCVARS%"
+
+    # now build the with the right compiler for each python version
     - cmd: cd igraph-*-msvc
+
+    - cmd: if %PYTHON_VERSION%==2.7 call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat"
     - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe /upgrade
-    - cmd: if %PYTHON_VERSION%==3.4 VCUpgrade.exe /overwrite igraph.vcproj
-    - cmd: if %PYTHON_VERSION%==3.5 devenv.exe  /Upgrade igraph.sln
-
-    # now build it...
     - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe igraph.vcproj "Release|%TARGET_ARCH%"
-    - cmd: if %PYTHON_VERSION%==3.4 msbuild.exe igraph.vcxproj
-    - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj
-    - cmd: cd ..
 
+    - cmd: if %PYTHON_VERSION%==3.4 msbuild.exe igraph.vcxproj
+    - cmd: if %PYTHON_VERSION%==3.4 VCUpgrade.exe /overwrite igraph.vcproj
+    - cmd: if %PYTHON_VERSION%==3.4 call "%VS100COMNTOOLS%\vsvars32.bat"
+
+    - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj
+    - cmd: if %PYTHON_VERSION%==3.5 VCUpgrade.exe /overwrite igraph.vcproj
+    - cmd: if %PYTHON_VERSION%==3.5 call "%VS120COMNTOOLS%\vsvars32.bat"
+
+    - cmd: cd ..
     - cmd: set "PATH=%OLDPATH%"
