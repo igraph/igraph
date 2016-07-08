@@ -212,9 +212,11 @@ int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
     for (i=0; i<edgeslen1; i++) {
       int e2=VECTOR(*edges1)[i];
       int nei=IGRAPH_OTHER(graph, e2, node);
+      igraph_vector_int_t *edges2;
+      int j, edgeslen2;
       if (VECTOR(neis)[nei] != node+1) { continue; }
-      igraph_vector_int_t *edges2=igraph_inclist_get(&incs, nei);
-      int j, edgeslen2=igraph_vector_int_size(edges2);
+      edges2=igraph_inclist_get(&incs, nei);
+      edgeslen2=igraph_vector_int_size(edges2);
       for (j=0; j<edgeslen2; j++) {
 	int e2=VECTOR(*edges2)[j];
 	int nei2=IGRAPH_OTHER(graph, e2, nei);
