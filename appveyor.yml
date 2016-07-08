@@ -73,7 +73,10 @@ install:
     - cmd: make msvc
 
     # now build the with the right compiler for each python version
-    - cmd: activate msvc-build-env
+    - cmd: set "OLDPATH=%PATH%"
+    # conda activate script doesn't like too long PATHs...
+    - cmd: set "PATH=%CONDA_INSTALL_LOCN%;%CONDA_INSTALL_LOCN%\scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\"
+    - cmd: call activate msvc-build-env
     - cmd: call %VCVARS%
     - cmd: cd igraph-*-msvc
     - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe /upgrade
@@ -86,3 +89,4 @@ install:
     - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj
     - cmd: cd ..
 
+    - cmd: set "PATH=%OLDPATH%"
