@@ -85,9 +85,9 @@ install:
     - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe /upgrade
     - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe igraph.vcproj "Release|%TARGET_ARCH%"
 
-    - cmd: if %PYTHON_VERSION%==3.4 msbuild.exe igraph.vcxproj
-    - cmd: if %PYTHON_VERSION%==3.4 VCUpgrade.exe /overwrite igraph.vcproj
     - cmd: if %PYTHON_VERSION%==3.4 call "%VS100COMNTOOLS%\vsvars32.bat"
+    - cmd: if %PYTHON_VERSION%==3.4 VCUpgrade.exe /overwrite igraph.vcproj
+    - cmd: if %PYTHON_VERSION%==3.4 msbuild.exe igraph.vcxproj
 
     - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj
     - cmd: if %PYTHON_VERSION%==3.5 VCUpgrade.exe /overwrite igraph.vcproj
