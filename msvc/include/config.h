@@ -170,7 +170,9 @@
 #define hypot _hypot
 #include <float.h>
 
+#if _MSC_VER<1900
 #define snprintf igraph_i_snprintf
+#endif
 
 /* To turn off some warnings about fscanf, strcpy etc */
 #define _CRT_SECURE_NO_WARNINGS 1
