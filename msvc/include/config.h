@@ -177,3 +177,4 @@
 /* To turn off some warnings about fscanf, strcpy etc */
 #define _CRT_SECURE_NO_WARNINGS 1
 
+#define PRPACK_IGRAPH_SUPPORT 1
