@@ -57,6 +57,7 @@ install:
 
     
     # also install a msvc build environment -> use libxml2 from conda-forge
+    - cmd: conda update conda
     - cmd: conda config --add channels conda-forge
     - cmd: conda config --set show_channel_urls yes
     - cmd: conda config --set always_yes true
