@@ -88,7 +88,7 @@ install:
     - cmd: if %PYTHON_VERSION%==3.5 devenv.exe  /Upgrade igraph.sln
 
     # now build it...
-    - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe 'igraph.vcproj', 'release|%TARGET_ARCH%
+    - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe igraph.vcproj "Release|%TARGET_ARCH%"
     - cmd: if %PYTHON_VERSION%==3.4 msbuild.exe igraph.vcxproj
     - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj
     - cmd: cd ..
