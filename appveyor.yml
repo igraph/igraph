@@ -66,7 +66,7 @@ install:
     - cmd: conda config --add channels conda-forge
     - cmd: conda config --set show_channel_urls yes
     - cmd: conda config --set always_yes true
-    - cmd: conda create -n msvc-build-env --quiet libxml2 python=%PYTHON_VERSION%
+    - cmd: conda install --quiet libxml2 python=%PYTHON_VERSION%
     - cmd: conda info -a
     
     # Now start with the build: first the msys2 based one
@@ -77,13 +77,6 @@ install:
 
     # now make the msvc builds
     - cmd: make msvc
-
-    # now build the with the right compiler for each python version
-    - cmd: set "OLDPATH=%PATH%"
-    # conda activate script doesn't like too long PATHs...
-    - cmd: set "PATH=%CONDA_INSTALL_LOCN%;%CONDA_INSTALL_LOCN%\scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\"
-
-    - cmd: call activate msvc-build-env
 
     # now build the with the right compiler for each python version
     - cmd: cd igraph-*-msvc
@@ -101,4 +94,3 @@ install:
     - cmd: if %PYTHON_VERSION%==3.5 call "%VS120COMNTOOLS%\vsvars32.bat"
 
     - cmd: cd ..
-    - cmd: set "PATH=%OLDPATH%"
