@@ -109,14 +109,15 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, act);
     int n=igraph_vector_size(neis);
     int *ptr=igraph_vector_int_e_ptr(&nptr, act);
+    igraph_bool_t any;
+    int nei;
 
     if (iteration == 0) {
       IGRAPH_ALLOW_INTERRUPTION();
     }
 
     /* Search for a neighbor that was not yet visited */
-    igraph_bool_t any=0;
-    int nei;
+    any = 0;
     while (!any && (*ptr) <n) {
       nei = (int) VECTOR(*neis)[(*ptr)];
       any = !VECTOR(added)[nei];
