@@ -43,7 +43,7 @@ def runmake(makefile, target):
     out = check_output("make -q -C " + os.path.dirname(makefile) + 
                        " -f " + os.path.basename(makefile) + 
                        " " + target, shell=True)
-    out = out.decode(sys.stdout.encoding)
+    out = out.decode(sys.stdout.encoding or "utf8")
     return out.replace("/", "\\")
 
 def rreplace(s, old, new, occurrence):
@@ -72,8 +72,8 @@ def main():
     htext = "\n".join([ headtext % s for s in headers ])
     hptext = "\n".join([ headptext % s for s in headersprivate + headers2 ])
 
-    proj = str.replace(proj, "<!-- SOURCE-FILES -->", stext)
-    proj = str.replace(proj, "<!-- HEADER-FILES -->", htext + "\n" + hptext)
+    proj = proj.replace("<!-- SOURCE-FILES -->", stext)
+    proj = proj.replace("<!-- HEADER-FILES -->", htext + "\n" + hptext)
 
     out_file = open(package + "/igraph.vcproj", "w")
     out_file.write(proj)
