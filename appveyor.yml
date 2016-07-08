@@ -15,13 +15,13 @@ environment:
     - TARGET_ARCH: "x64"
       PYTHON_VERSION: "3.4"
       CONDA_INSTALL_LOCN: "C:\\Miniconda3-x64"
-      VCVARS: C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\vcvars64.bat
+      VCVARS: C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\amd64\vcvars64.bat
       MSYSTEM: MINGW64
       PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
     - TARGET_ARCH: "x64"
       PYTHON_VERSION: "3.5"
       CONDA_INSTALL_LOCN: "C:\\Miniconda35-x64"
-      VCVARS: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars64.bat
+      VCVARS: C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat
       MSYSTEM: MINGW64
       PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
 
@@ -78,7 +78,7 @@ install:
     # conda activate script doesn't like too long PATHs...
     - cmd: set "PATH=%CONDA_INSTALL_LOCN%;%CONDA_INSTALL_LOCN%\scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\"
     - cmd: call activate msvc-build-env
-    - cmd: call %VCVARS%
+    - cmd: call "%VCVARS%"
     - cmd: cd igraph-*-msvc
     - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe /upgrade
     - cmd: if %PYTHON_VERSION%==3.4 VCUpgrade.exe /overwrite igraph.vcproj
