@@ -22,6 +22,4 @@ MSVC compilation (needed for python)
 * Compile python-igraph to a *.exe installer with 'python setup.py bdist_wininst' 
 
 If you have problems with the python compilations 
-* http://blog.victorjabur.com/2011/06/05/compiling-python-2-7-modules-on-windows-32-and-64-using-msvc-2008-express/)
-
-If you have setup cygwin like above abd run "./bootstrap.sh; ./configure", you can call 'make python-msvc' to build a msvc directory, build it with msvc and build the python installer.
+* http://blog.victorjabur.com/2011/06/05/compiling-python-2-7-modules-on-windows-32-and-64-using-msvc-2008-express/
