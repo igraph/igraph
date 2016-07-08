@@ -33,7 +33,7 @@
 #else
  #if defined(_MSC_VER)
   #define INLINE __inline
- #elseif defined(__GNUC__)
+ #elif defined(__GNUC__)
   #define INLINE __inline__
  #else
   #define INLINE
