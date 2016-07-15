@@ -1,13 +1,13 @@
-Vertex 0: id="S65" 
-Vertex 1: id="S29" 
-Vertex 2: id="S04" 
-Vertex 3: id="S75" 
-Vertex 4: id="S24" 
-Vertex 5: id="S81" 
-Vertex 6: id="S51" 
-Vertex 7: id="S78" 
-Vertex 8: id="S86" 
-Vertex 9: id="S39" 
+Vertex 0: id="S65" name="S65" 
+Vertex 1: id="S29" name="S29" 
+Vertex 2: id="S04" name="S04" 
+Vertex 3: id="S75" name="S75" 
+Vertex 4: id="S24" name="S24" 
+Vertex 5: id="S81" name="S81" 
+Vertex 6: id="S51" name="S51" 
+Vertex 7: id="S78" name="S78" 
+Vertex 8: id="S86" name="S86" 
+Vertex 9: id="S39" name="S39" 
 Edge 0 (0-5): weight=1 
 Edge 1 (0-9): weight=-1 
 Edge 2 (1-2): weight=1 

@@ -253,7 +253,7 @@ int main() {
   DELVA(&g, "xfact");
   DELVA(&g, "yfact");
   igraph_cattribute_list(&g, 0,0, &vnames, 0,0,0);  
-  if (igraph_strvector_size(&vnames) != 2) {
+  if (igraph_strvector_size(&vnames) != 3) {
     return 15;
   }
   

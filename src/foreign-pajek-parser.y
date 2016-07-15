@@ -222,6 +222,7 @@ vertex: longint { $$=$1; context->mode=1; };
 
 vertexid: word {
   igraph_i_pajek_add_string_vertex_attribute("id", $1.str, $1.len, context);
+  igraph_i_pajek_add_string_vertex_attribute("name", $1.str, $1.len, context);
 };
 
 vertexcoords: /* empty */ 
