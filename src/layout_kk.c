@@ -224,7 +224,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     
     /* Calculate D1 and D2, A, B, C */
     for (i=0; i<no_nodes; i++) {
-      igraph_real_t dx, dy, dist, den
+      igraph_real_t dx, dy, dist, den;
       if (i==m) { continue; }
       dx=old_x - MATRIX(*res, i, 0);
       dy=old_y - MATRIX(*res, i, 1);
@@ -253,7 +253,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     /* Update delta, only with/for the affected node */
     VECTOR(D1)[m] = VECTOR(D2)[m] = 0.0;
     for (i=0; i<no_nodes; i++) {
-      igraph_real_t old_dx, old_dy, old_mi, new_dx, new_dy, new_mi_dist
+      igraph_real_t old_dx, old_dy, old_mi, new_dx, new_dy, new_mi_dist, old_mi_dist;
       if (i==m) { continue; }
       old_dx=old_x - MATRIX(*res, i, 0);
       old_dy=old_y - MATRIX(*res, i, 1);
@@ -551,16 +551,17 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
     /* Update delta, only with/for the affected node */
     VECTOR(D1)[m] = VECTOR(D2)[m] = VECTOR(D3)[m] = 0.0;
     for (i=0; i<no_nodes; i++) {
+      igraph_real_t old_dx, old_dy, old_dz, old_mi_dist, new_dx, new_dy, new_dz, new_mi_dist;
       if (i==m) { continue; }
-      igraph_real_t old_dx=old_x - MATRIX(*res, i, 0);
-      igraph_real_t old_dy=old_y - MATRIX(*res, i, 1);
-      igraph_real_t old_dz=old_z - MATRIX(*res, i, 2);
-      igraph_real_t old_mi_dist=sqrt(old_dx * old_dx + old_dy * old_dy + 
+      old_dx=old_x - MATRIX(*res, i, 0);
+      old_dy=old_y - MATRIX(*res, i, 1);
+      old_dz=old_z - MATRIX(*res, i, 2);
+      old_mi_dist=sqrt(old_dx * old_dx + old_dy * old_dy +
 				     old_dz * old_dz);
-      igraph_real_t new_dx=new_x - MATRIX(*res, i, 0);
-      igraph_real_t new_dy=new_y - MATRIX(*res, i, 1);
-      igraph_real_t new_dz=new_z - MATRIX(*res, i, 2);
-      igraph_real_t new_mi_dist=sqrt(new_dx * new_dx + new_dy * new_dy +
+      new_dx=new_x - MATRIX(*res, i, 0);
+      new_dy=new_y - MATRIX(*res, i, 1);
+      new_dz=new_z - MATRIX(*res, i, 2);
+      new_mi_dist=sqrt(new_dx * new_dx + new_dy * new_dy +
 				     new_dz * new_dz);
 
       VECTOR(D1)[i] -= MATRIX(kij, m, i) * 
