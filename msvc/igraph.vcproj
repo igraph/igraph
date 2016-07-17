@@ -22,7 +22,7 @@
 			CharacterSet="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)COLAMD\Include;$(ProjectDir)CHOLMOD\Include;$(ProjectDir)AMD\Include"
 				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
