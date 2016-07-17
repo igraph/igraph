@@ -66,7 +66,7 @@ install:
     - cmd: conda config --add channels conda-forge
     - cmd: conda config --set show_channel_urls yes
     - cmd: conda config --set always_yes true
-    - cmd: conda install --quiet libxml2 python=%PYTHON_VERSION%
+    - cmd: if [%PYTHON_VERSION%] NEQ [NONE] conda install --quiet libxml2 python=%PYTHON_VERSION%
     - cmd: conda info -a
     
     # Now start with the build: first the msys2 based one
