@@ -402,25 +402,27 @@ int igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
   } while(0);
 
 igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed) {
-
+  igraph_vector_int_t* fromvec;
   ADJLIST_CANON_EDGE(from, to, directed);
-  igraph_vector_int_t* fromvec = igraph_adjlist_get(al, from);
+  fromvec = igraph_adjlist_get(al, from);
   return igraph_vector_int_binsearch2(fromvec, to);
 
 }
 
 int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
-
+  igraph_vector_int_t* oldfromvec, newfromvec;
+  int err1, err2;
+  long int oldpos, newpos;
   igraph_integer_t oldfrom = from, newfrom = from;
   ADJLIST_CANON_EDGE(oldfrom, oldto, directed);
   ADJLIST_CANON_EDGE(newfrom, newto, directed);
 
-  igraph_vector_int_t* oldfromvec = igraph_adjlist_get(al, oldfrom);
-  igraph_vector_int_t* newfromvec = igraph_adjlist_get(al, newfrom);
+  oldfromvec = igraph_adjlist_get(al, oldfrom);
+  newfromvec = igraph_adjlist_get(al, newfrom);
 
-  long int oldpos, newpos;
-  int err1 = igraph_vector_int_binsearch(oldfromvec, oldto, &oldpos);
-  int err2 = igraph_vector_int_binsearch(newfromvec, newto, &newpos);
+  
+  err1 = igraph_vector_int_binsearch(oldfromvec, oldto, &oldpos);
+  err2 = igraph_vector_int_binsearch(newfromvec, newto, &newpos);
 
   /* oldfrom -> oldto should exist; newfrom -> newto should not. */
   if((!err1) || err2)
