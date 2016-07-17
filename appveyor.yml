@@ -35,6 +35,9 @@ platform:
 init:
   - cmd: "ECHO %PYTHON_VERSION% %CONDA_INSTALL_LOCN%"
 
+# all our builds have to happen in install...
+build: false
+
 install:
     # If there is a newer build queued for the same PR, cancel this one.
     # The AppVeyor 'rollout builds' option is supposed to serve the same
@@ -87,10 +90,18 @@ install:
 
     - cmd: if %PYTHON_VERSION%==3.4 call "%VS100COMNTOOLS%\vsvars32.bat"
     - cmd: if %PYTHON_VERSION%==3.4 VCUpgrade.exe /overwrite igraph.vcproj
-    - cmd: if %PYTHON_VERSION%==3.4 msbuild.exe igraph.vcxproj
+    - cmd: if %PYTHON_VERSION%==3.4 msbuild.exe igraph.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
     - cmd: if %PYTHON_VERSION%==3.5 call "%VS140COMNTOOLS%\vsvars32.bat"
     - cmd: if %PYTHON_VERSION%==3.5 VCUpgrade.exe /overwrite igraph.vcproj
-    - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj
+    - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
     - cmd: cd ..
+
+test_script:
+    - cmd: if [%PYTHON_VERSION%] NEQ [NONE] make check
+
+on_failure:
+  - echo zipping everything after a failure...
+  - 7z a failed_state.zip . |grep -v "Compressing"
+  - appveyor PushArtifact failed_state.zip
