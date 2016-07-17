@@ -410,7 +410,7 @@ igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t fro
 }
 
 int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed) {
-  igraph_vector_int_t* oldfromvec, newfromvec;
+  igraph_vector_int_t *oldfromvec, *newfromvec;
   int err1, err2;
   long int oldpos, newpos;
   igraph_integer_t oldfrom = from, newfrom = from;
