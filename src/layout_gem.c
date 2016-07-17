@@ -25,8 +25,7 @@
 #include "igraph_layout.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
-
-#include <math.h>
+#include "igraph_math.h"
 
 /**
  * \ingroup layout
