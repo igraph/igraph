@@ -74,9 +74,9 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
     igraph_vector_t v1;
     igraph_vector_view(&v1, &MATRIX(*vecs, 0, i), nrow);
     for (j = from; j < ncol; j++) {
-      if (i==j) { continue; }
       igraph_real_t prob;
       igraph_vector_t v2;
+      if (i==j) { continue; }
       igraph_vector_view(&v2, &MATRIX(*vecs, 0, j), nrow);
       igraph_lapack_ddot(&v1, &v2, &prob);
       if (prob < 0 && ! warned_neg) {
