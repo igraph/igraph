@@ -103,5 +103,6 @@ test_script:
 
 on_failure:
   - echo zipping everything after a failure...
+  - cd ..
   - 7z a failed_state.zip . |grep -v "Compressing"
   - appveyor PushArtifact failed_state.zip
