@@ -2,6 +2,7 @@
 
 import sys
 import os.path
+import re
 
 try:
     from subprocess import check_output
@@ -44,7 +45,9 @@ def runmake(makefile, target):
                        " -f " + os.path.basename(makefile) + 
                        " " + target, shell=True)
     out = out.decode(sys.stdout.encoding or "utf8")
-    return out.replace("/", "\\")
+    out = out.replace("/", "\\")
+    out = re.sub("make.*'.*'", "", out) # msys2 make adds "make[x]: entering '<dir>'""
+    return out
 
 def rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
