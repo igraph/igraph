@@ -22,7 +22,7 @@
 			CharacterSet="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)COLAMD\Include;$(ProjectDir)CHOLMOD\Include;$(ProjectDir)AMD\Include"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)src\COLAMD\Include;$(ProjectDir)src\CHOLMOD\Include;$(ProjectDir)src\AMD\Include"
 				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -61,7 +61,7 @@
 			CharacterSet="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)COLAMD\Include;$(ProjectDir)CHOLMOD\Include;$(ProjectDir)AMD\Include"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)src\COLAMD\Include;$(ProjectDir)src\CHOLMOD\Include;$(ProjectDir)src\AMD\Include"
 				PreprocessorDefinitions="Win64;WIN64;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -100,7 +100,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)COLAMD\Include;$(ProjectDir)CHOLMOD\Include;$(ProjectDir)AMD\Include"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)src\COLAMD\Include;$(ProjectDir)src\CHOLMOD\Include;$(ProjectDir)src\AMD\Include"
 				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -141,7 +141,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)COLAMD\Include;$(ProjectDir)CHOLMOD\Include;$(ProjectDir)AMD\Include"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)src\COLAMD\Include;$(ProjectDir)src\CHOLMOD\Include;$(ProjectDir)src\AMD\Include"
 				PreprocessorDefinitions="Win64;WIN64;_DEBUG;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
