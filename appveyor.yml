@@ -93,7 +93,7 @@ install:
     - cmd: if %PYTHON_VERSION%==3.4 msbuild.exe igraph.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
     - cmd: if %PYTHON_VERSION%==3.5 call "%VS140COMNTOOLS%\vsvars32.bat"
-    - cmd: if %PYTHON_VERSION%==3.5 VCUpgrade.exe /overwrite igraph.vcproj
+    - cmd: if %PYTHON_VERSION%==3.5 devenv /upgrade igraph.vcproj
     - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
     - cmd: cd ..
