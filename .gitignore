@@ -513,3 +513,4 @@
 *.exe
 igraph-*-msvc.zip
 igraph-*-msvc/
+igraphtest/
