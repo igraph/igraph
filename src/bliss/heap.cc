@@ -4,6 +4,11 @@
 #include "defs.hh"
 #include "heap.hh"
 
+/* use 'and' instead of '&&' */
+#if _MSC_VER
+#include <ciso646>
+#endif
+
 /*
   Copyright (c) 2003-2015 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
