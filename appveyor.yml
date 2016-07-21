@@ -99,7 +99,7 @@ install:
     - cmd: cd ..
 
 test_script:
-    - cmd: if [%PYTHON_VERSION%] NEQ [NONE] make check
+    - cmd: if [%PYTHON_VERSION%]==[NONE] make check
 
 on_failure:
   - echo zipping everything after a failure...
