@@ -6089,14 +6089,27 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
 			     igraph_bool_t directed,
 			     igraph_bool_t unconn) {
 
+  /* Implementation details. This is the basic Dijkstra algorithm, 
+     with a binary heap. The heap is indexed, i.e. it stores not only
+     the distances, but also which vertex they belong to.
+
+     From now on we use a 2-way heap, so the distances can be queried
+     directly from the heap.
+
+     Dirty tricks:
+     - the opposite of the distance is stored in the heap, as it is a
+       maximum heap and we need a minimum heap.
+     - we don't use IGRAPH_INFINITY during the computation, as IGRAPH_FINITE()
+       might involve a function call and we want to spare that. -1 will denote
+       infinity instead.
+  */
+  
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
 
-  igraph_vector_t dist;
-  igraph_indheap_t Q;
+  igraph_2wheap_t Q;
   igraph_inclist_t inclist;
-  igraph_vector_long_t already_added;
-  long int source;
+  long int source, j;
   igraph_neimode_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
   long int from=-1, to=-1;
@@ -6120,11 +6133,8 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
   }
   
-  IGRAPH_CHECK(igraph_vector_long_init(&already_added, no_of_nodes));
-  IGRAPH_FINALLY(igraph_vector_long_destroy, &already_added);
-  IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
-  IGRAPH_CHECK(igraph_indheap_init(&Q, no_of_nodes));
-  IGRAPH_FINALLY(igraph_indheap_destroy, &Q);
+  IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
+  IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
   IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
   IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
   
@@ -6133,44 +6143,43 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     IGRAPH_PROGRESS("Weighted diameter: ", source*100.0/no_of_nodes, NULL);
     IGRAPH_ALLOW_INTERRUPTION();
 
-    igraph_indheap_push_with_index(&Q, source, -0);
-    VECTOR(already_added)[source] = source+1;
-    VECTOR(dist)[source] = 1.0;
+    igraph_2wheap_clear(&Q);
+    igraph_2wheap_push_with_index(&Q, source, -1.0);
+
     nodes_reached = 0.0;
 
-    while (!igraph_indheap_empty(&Q)) {
-      long int minnei=igraph_indheap_max_index(&Q);
-      igraph_real_t mindist=-igraph_indheap_delete_max(&Q);
+    while (!igraph_2wheap_empty(&Q)) {
+      long int minnei=igraph_2wheap_max_index(&Q);
+      igraph_real_t mindist=-igraph_2wheap_deactivate_max(&Q);
       igraph_vector_int_t *neis;
-      long int nlen, j;
+      long int nlen;
       
       if (mindist > res) {
 	res=mindist; from=source; to=minnei;
       }
       nodes_reached++;
 
+      /* Now check all neighbors of 'minnei' for a shorter path */
       neis=igraph_inclist_get(&inclist, minnei);
       nlen=igraph_vector_int_size(neis);
       for (j=0; j<nlen; j++) {
 	long int edge=(long int) VECTOR(*neis)[j];
 	long int tto=IGRAPH_OTHER(graph, edge, minnei);
-	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
-	igraph_real_t curdist= (VECTOR(already_added)[tto]==source+1) ? 
-	  VECTOR(dist)[tto] : 0;
+	igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
+        igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
+        igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
+	igraph_real_t curdist = active ? -igraph_2wheap_get(&Q, tto) : 0.0;
 	
-	if (curdist==0) {
-	  /* First non-finite distance */
-	  VECTOR(already_added)[tto] = source+1;
-	  VECTOR(dist)[tto] = altdist+1.0;
-	  IGRAPH_CHECK(igraph_indheap_push_with_index(&Q, tto, -altdist));
-	} else if (altdist < curdist-1) {
+	if (!has) {
+	  /* First finite distance */
+	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, tto, -altdist));
+	} else if (altdist < curdist) {
 	  /* A shorter path */
-	  VECTOR(dist)[tto] = altdist+1.0;
-	  IGRAPH_CHECK(igraph_indheap_modify(&Q, tto, -altdist));
+	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, tto, -altdist));
 	}
       }
       
-    } /* !igraph_indheap_empty(&Q) */
+    } /* !igraph_2wheap_empty(&Q) */
 
     /* not connected, return infinity */
     if (nodes_reached != no_of_nodes && !unconn) {
@@ -6180,12 +6189,13 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     }
     
   } /* source < no_of_nodes */
-  
+
+  /* Compensate for the +1 that we have added to distances */
+  res -= 1;
+
   igraph_inclist_destroy(&inclist);
-  igraph_indheap_destroy(&Q);
-  igraph_vector_destroy(&dist);
-  igraph_vector_long_destroy(&already_added);
-  IGRAPH_FINALLY_CLEAN(4);
+  igraph_2wheap_destroy(&Q);
+  IGRAPH_FINALLY_CLEAN(2);
 
   IGRAPH_PROGRESS("Weighted diameter: ", 100.0, NULL);
   
