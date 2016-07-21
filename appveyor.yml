@@ -79,10 +79,10 @@ install:
     - cmd: if %PYTHON_VERSION%==NONE  make
 
     # now make the msvc builds
-    - cmd: make msvc
+    - cmd: if [%PYTHON_VERSION%] NEQ [NONE] make msvc
 
     # now build the with the right compiler for each python version
-    - cmd: cd igraph-*-msvc
+    - cmd: if [%PYTHON_VERSION%] NEQ [NONE] cd igraph-*-msvc
 
     - cmd: if %PYTHON_VERSION%==2.7 call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\bin\vcvars64.bat"
     - cmd: if %PYTHON_VERSION%==2.7 vcbuild.exe /upgrade
@@ -96,13 +96,14 @@ install:
     - cmd: if %PYTHON_VERSION%==3.5 devenv /upgrade igraph.vcproj
     - cmd: if %PYTHON_VERSION%==3.5 msbuild.exe igraph.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
 
-    - cmd: cd ..
-
 test_script:
+    - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
+    - cmd: set "PATH=%APPVEYOR_BUILD_FOLDER%\src\.libs;%PATH%"
+    - cmd: path
     - cmd: if [%PYTHON_VERSION%]==[NONE] make check
 
 on_failure:
-  - echo zipping everything after a failure...
-  - cd ..
-  - 7z a failed_state.zip . |grep -v "Compressing"
-  - appveyor PushArtifact failed_state.zip
+    - cmd: echo zipping everything after a failure...
+    - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
+    - cmd: 7z a failed_state.zip . |grep -v "Compressing"
+    - cmd: appveyor PushArtifact failed_state.zip
