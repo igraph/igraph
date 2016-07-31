@@ -26,9 +26,6 @@
   igraph_vit_t vit;
   long int nodes_to_calc;
   igraph_vector_t *neis1, *neis2;
-#ifdef TRIPLES
-  igraph_real_t triples;
-#endif
   igraph_real_t triangles;
   long int i, j, k;
   long int neilen1, neilen2;
@@ -60,9 +57,6 @@
     for (j=0; j<neilen1; j++) {
       neis[ (long int)VECTOR(*neis1)[j] ] = i+1;
     }
-#ifdef TRIPLES
-    triples = (double)neilen1*(neilen1-1);
-#endif
     triangles = 0;
 
     for (j=0; j<neilen1; j++) {
@@ -78,10 +72,10 @@
     }
 
 #ifdef TRANSIT		
-    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
+    if (mode == IGRAPH_TRANSITIVITY_ZERO && neilen1 < 2)
       VECTOR(*res)[i] = 0.0;
     else
-      VECTOR(*res)[i] = triangles/triples;
+      VECTOR(*res)[i] = triangles/neilen1/(neilen1-1);
 #else
     VECTOR(*res)[i] = triangles/2;
 #endif

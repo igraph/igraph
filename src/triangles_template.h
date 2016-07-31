@@ -27,9 +27,6 @@
   igraph_adjlist_t allneis;
   igraph_vector_int_t *neis1, *neis2;
   long int neilen1, neilen2, deg1;
-#ifdef TRIPLES
-  igraph_real_t triples;
-#endif
   long int *neis;
   long int maxdegree;
 
@@ -76,9 +73,6 @@
     neis1=igraph_adjlist_get(&allneis, node);
     neilen1=igraph_vector_int_size(neis1);
     deg1=(long int) VECTOR(degree)[node];
-#ifdef TRIPLES
-    triples= ((double)deg1*(deg1-1)/2);
-#endif
     /* Mark the neighbors of the node */
     for (i=0; i<neilen1; i++) {
       neis[ (long int) VECTOR(*neis1)[i] ] = node+1;
@@ -105,10 +99,10 @@
     }
 
 #ifdef TRANSIT
-    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
+    if (mode == IGRAPH_TRANSITIVITY_ZERO && deg1 < 2)
       VECTOR(*res)[node] = 0.0;
     else
-      VECTOR(*res)[node] /= triples;
+      VECTOR(*res)[node] = VECTOR(*res)[node] / deg1 / (deg1-1) * 2.0;
 #endif
 #ifdef TRIEDGES
 		VECTOR(*res)[node] += deg1;

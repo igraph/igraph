@@ -83,7 +83,6 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
   igraph_adjlist_t allneis;
   igraph_vector_int_t *neis1, *neis2;
   long int neilen1, neilen2;
-  igraph_real_t triples;
   long int *neis;
   long int maxdegree;
 
@@ -126,7 +125,6 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     
     neis1=igraph_adjlist_get(&allneis, node);
     neilen1=igraph_vector_int_size(neis1);
-    triples = ((double)neilen1) * (neilen1 - 1) / 2.0;
     /* Mark the neighbors of 'node' */
     for (i=0; i<neilen1; i++) {
       neis[ (long int)VECTOR(*neis1)[i] ] = node+1;
@@ -151,8 +149,8 @@ int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
       }
     }
     
-    if (triples != 0) {
-      sum += VECTOR(triangles)[node] / triples;
+    if (neilen1 >= 2) {
+      sum += VECTOR(triangles)[node] / neilen1 / (neilen1-1) * 2.0;
       count++;
     } else if (mode == IGRAPH_TRANSITIVITY_ZERO) {
       count++;
@@ -175,10 +173,8 @@ int igraph_transitivity_local_undirected1(const igraph_t *graph,
 					  const igraph_vs_t vids,
 					  igraph_transitivity_mode_t mode) {
 	
-#define TRIPLES
 #define TRANSIT
 #include "triangles_template1.h"
-#undef TRIPLES
 #undef TRANSIT	
 	
 	return 0;
@@ -314,11 +310,10 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
     igraph_vector_t *neis2=igraph_lazy_adjlist_get(&adjlist, 
 						   (igraph_integer_t) node);
     long int deg=igraph_vector_size(neis2);
-    igraph_real_t triples=(double) deg * (deg-1) / 2;
-    if (mode == IGRAPH_TRANSITIVITY_ZERO && triples == 0)
+    if (mode == IGRAPH_TRANSITIVITY_ZERO && deg < 2)
       VECTOR(*res)[i] = 0.0;
     else
-      VECTOR(*res)[i] = VECTOR(triangles)[idx] / triples;
+      VECTOR(*res)[i] = VECTOR(triangles)[idx] / deg / (deg-1) * 2.0;
 /*     fprintf(stderr, "%f %f\n", VECTOR(triangles)[idx], triples); */
   }
   
@@ -432,10 +427,8 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
 					  const igraph_vs_t vids,
 					  igraph_transitivity_mode_t mode) {
 
-#define TRIPLES 1
 #define TRANSIT 1
 #include "triangles_template.h"
-#undef TRIPLES
 #undef TRANSIT
   
   return 0;
