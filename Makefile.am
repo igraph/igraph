@@ -79,8 +79,5 @@ msvc: parsersources
 	cp -r $(top_srcdir)/msvc/igraphtest .
 	rm -rf igraph-$(VERSION)-msvc.zip
 	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest
-
-python-msvc: msvc
-	cmd /c "tools\build_python_msvc.cmd"
     
 CLEANFILES=

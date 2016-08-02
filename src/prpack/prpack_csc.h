@@ -1,7 +1,11 @@
 #ifndef PRPACK_CSC
 #define PRPACK_CSC
 
+#ifndef _MSC_VER
 #include <stdint.h>
+#else
+typedef __int64 int64_t;
+#endif
 
 namespace prpack {
 

@@ -509,3 +509,8 @@
 /www/python/doc/
 /www/stamp
 /interfaces/R/igraph/man/*.Rd
+*.o
+*.exe
+igraph-*-msvc.zip
+igraph-*-msvc/
+igraphtest/

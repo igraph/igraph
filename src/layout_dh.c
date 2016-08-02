@@ -25,6 +25,9 @@
 #include "igraph_layout.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
+#include "igraph_math.h"
+
+#include <math.h>
 
 igraph_bool_t igraph_i_segments_intersect(float p0_x, float p0_y,
 					  float p1_x, float p1_y,
@@ -349,10 +352,11 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
 	    float u_y=MATRIX(*res, u, 1);
 	    igraph_integer_t w;
 	    for (w = 0; w < no_nodes; w++) {
+	      float w_x, w_y, d_ev;
 	      if (w == v || w == u) { continue; }
-	      float w_x=MATRIX(*res, w, 0);
-	      float w_y=MATRIX(*res, w, 1);
-	      float d_ev = igraph_i_point_segment_dist2(w_x, w_y, old_x,
+	      w_x=MATRIX(*res, w, 0);
+	      w_y=MATRIX(*res, w, 1);
+	      d_ev = igraph_i_point_segment_dist2(w_x, w_y, old_x,
 							old_y, u_x, u_y);
 	      diff_energy -= w_node_edge_dist / d_ev;
 	      d_ev = igraph_i_point_segment_dist2(w_x, w_y, new_x, new_y,

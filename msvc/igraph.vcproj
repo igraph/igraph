@@ -22,8 +22,8 @@
 			CharacterSet="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
-				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)src\COLAMD\Include;$(ProjectDir)src\CHOLMOD\Include;$(ProjectDir)src\AMD\Include;$(ProjectDir)src\SuiteSparse_config"
+				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK;NCAMD;NPARTITION;PRPACK_IGRAPH_SUPPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -61,8 +61,8 @@
 			CharacterSet="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
-				PreprocessorDefinitions="Win64;WIN64;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)src\COLAMD\Include;$(ProjectDir)src\CHOLMOD\Include;$(ProjectDir)src\AMD\Include;$(ProjectDir)src\SuiteSparse_config"
+				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK;NCAMD;NPARTITION;PRPACK_IGRAPH_SUPPORT"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -100,8 +100,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
-				PreprocessorDefinitions="Win32;WIN32;_DEBUG;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)src\COLAMD\Include;$(ProjectDir)src\CHOLMOD\Include;$(ProjectDir)src\AMD\Include;$(ProjectDir)src\SuiteSparse_config"
+				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK;NCAMD;NPARTITION;PRPACK_IGRAPH_SUPPORT"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -141,8 +141,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include"
-				PreprocessorDefinitions="Win64;WIN64;_DEBUG;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK"
+				AdditionalIncludeDirectories="$(ProjectDir)src;$(ProjectDir)winclude;$(ProjectDir)include;$(ProjectDir)src\COLAMD\Include;$(ProjectDir)src\CHOLMOD\Include;$(ProjectDir)src\AMD\Include;$(ProjectDir)src\SuiteSparse_config"
+				PreprocessorDefinitions="Win32;WIN32;_WINDOWS;_USRDLL;NCOMPLEX;IGRAPH_EXPORTS;USE_CLOCK;NCAMD;NPARTITION;PRPACK_IGRAPH_SUPPORT"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"

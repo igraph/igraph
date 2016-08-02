@@ -2,6 +2,7 @@
 
 import sys
 import os.path
+import re
 
 try:
     from subprocess import check_output
@@ -43,7 +44,10 @@ def runmake(makefile, target):
     out = check_output("make -q -C " + os.path.dirname(makefile) + 
                        " -f " + os.path.basename(makefile) + 
                        " " + target, shell=True)
-    return out.replace("/", "\\")
+    out = out.decode(sys.stdout.encoding or "utf8")
+    out = out.replace("/", "\\")
+    out = re.sub("make.*'.*'", "", out) # msys2 make adds "make[x]: entering '<dir>'""
+    return out
 
 def rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
@@ -51,7 +55,7 @@ def rreplace(s, old, new, occurrence):
 
 def main():
     if len(sys.argv) != 4:
-        print "Error: need three arguments"
+        print( "Error: need three arguments")
         sys.exit(1)
     package = sys.argv[1]
     projectfile = sys.argv[2]
@@ -71,8 +75,8 @@ def main():
     htext = "\n".join([ headtext % s for s in headers ])
     hptext = "\n".join([ headptext % s for s in headersprivate + headers2 ])
 
-    proj = str.replace(proj, "<!-- SOURCE-FILES -->", stext)
-    proj = str.replace(proj, "<!-- HEADER-FILES -->", htext + "\n" + hptext)
+    proj = proj.replace("<!-- SOURCE-FILES -->", stext)
+    proj = proj.replace("<!-- HEADER-FILES -->", htext + "\n" + hptext)
 
     out_file = open(package + "/igraph.vcproj", "w")
     out_file.write(proj)
