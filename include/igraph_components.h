@@ -34,6 +34,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
@@ -46,18 +63,18 @@ __BEGIN_DECLS
 /* Components                                         */
 /* -------------------------------------------------- */
 
-int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership, 
+DECLDIR int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership, 
 		    igraph_vector_t *csize, igraph_integer_t *no,
 		    igraph_connectedness_t mode);
-int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res, 
+DECLDIR int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res, 
 			igraph_connectedness_t mode);
-void igraph_decompose_destroy(igraph_vector_ptr_t *complist);
-int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
+DECLDIR void igraph_decompose_destroy(igraph_vector_ptr_t *complist);
+DECLDIR int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
 		     igraph_connectedness_t mode, 
 		     long int maxcompno, long int minelements);
-int igraph_articulation_points(const igraph_t *graph,
+DECLDIR int igraph_articulation_points(const igraph_t *graph,
 			       igraph_vector_t *res);
-int igraph_biconnected_components(const igraph_t *graph,
+DECLDIR int igraph_biconnected_components(const igraph_t *graph,
 				  igraph_integer_t *no,
 				  igraph_vector_ptr_t *tree_edges,
 				  igraph_vector_ptr_t *component_edges,

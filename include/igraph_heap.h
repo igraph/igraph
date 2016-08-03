@@ -34,6 +34,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */

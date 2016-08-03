@@ -34,35 +34,52 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 #include "igraph_datatype.h"
 #include "igraph_constants.h"
 #include "igraph_iterators.h"
 
 __BEGIN_DECLS
 
-int igraph_transitivity_undirected(const igraph_t *graph, 
+DECLDIR int igraph_transitivity_undirected(const igraph_t *graph, 
 				   igraph_real_t *res,
 				   igraph_transitivity_mode_t mode);
-int igraph_transitivity_local_undirected(const igraph_t *graph, 
+DECLDIR int igraph_transitivity_local_undirected(const igraph_t *graph, 
 					 igraph_vector_t *res,
 					 const igraph_vs_t vids,
 					 igraph_transitivity_mode_t mode);
-int igraph_transitivity_local_undirected1(const igraph_t *graph, 
+DECLDIR int igraph_transitivity_local_undirected1(const igraph_t *graph, 
 					  igraph_vector_t *res,
 					  const igraph_vs_t vids,
 					  igraph_transitivity_mode_t mode);
-int igraph_transitivity_local_undirected2(const igraph_t *graph, 
+DECLDIR int igraph_transitivity_local_undirected2(const igraph_t *graph, 
 					  igraph_vector_t *res,
 					  const igraph_vs_t vids,
 					  igraph_transitivity_mode_t mode);
-int igraph_transitivity_local_undirected4(const igraph_t *graph, 
+DECLDIR int igraph_transitivity_local_undirected4(const igraph_t *graph, 
 					  igraph_vector_t *res,
 					  const igraph_vs_t vids,
 					  igraph_transitivity_mode_t mode);
-int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
+DECLDIR int igraph_transitivity_avglocal_undirected(const igraph_t *graph,
 					    igraph_real_t *res,
 					    igraph_transitivity_mode_t mode);
-int igraph_transitivity_barrat(const igraph_t *graph,
+DECLDIR int igraph_transitivity_barrat(const igraph_t *graph,
 			       igraph_vector_t *res,
 			       const igraph_vs_t vids,
 			       const igraph_vector_t *weights,

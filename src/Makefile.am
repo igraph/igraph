@@ -334,7 +334,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     foreign-lgl-parser.y foreign-lgl-lexer.l \
 			     foreign-pajek-parser.y foreign-pajek-lexer.l \
 			     foreign-gml-parser.y foreign-gml-lexer.l \
-			     dqueue.c heap.c igraph_heap.c igraph_stack.c \
+			     dqueue.c heap2.c igraph_heap.c igraph_stack.c \
 			     igraph_strvector.c igraph_trie.c matrix.c \
 			     vector.c vector_ptr.c memory.c adjlist.c \
 			     visitors.c igraph_grid.c atlas.c topology.c \
@@ -382,7 +382,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     $(SPCONFIG) layout_gem.c layout_dh.c lsap.c \
 			     layout_fr.c layout_kk.c paths.c \
 			     random_walk.c \
-				 igraph_cliquer.c cliquer/cliquer.c cliquer/graph.c cliquer/reorder.c 
+				 igraph_cliquer.c cliquer/cliquer.c cliquer/graph2.c cliquer/reorder.c 
 
 if INTERNAL_F2C
 else
@@ -422,7 +422,7 @@ MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
 
 echosources:
 	$(info $(SOURCES) $(LAPACK) $(ARPACK) $(BLAS) $(libf2c_la_SOURCES) \
-	$(libdlamch_la_SOURCES) $(libplfit_la_SOURCES))
+	$(libdlamch_la_SOURCES) $(libplfit_la_SOURCES) $(PRPACK))
 
 echoheaders:
 	$(info $(HEADERS_PUBLIC))

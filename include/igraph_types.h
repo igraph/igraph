@@ -34,6 +34,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 __BEGIN_DECLS
 
 #ifndef _GNU_SOURCE
@@ -78,13 +95,13 @@ double igraph_i_fdiv(const double a, const double b);
 #  define IGRAPH_NEGINFINITY (igraph_i_fdiv(-1.0, 0.0))
 #endif
 
-int igraph_finite(double x);
+DECLDIR int igraph_finite(double x);
 #define IGRAPH_FINITE(x) igraph_finite(x)
 
-int igraph_is_nan(double x);
-int igraph_is_inf(double x);
-int igraph_is_posinf(double x);
-int igraph_is_neginf(double x);
+DECLDIR int igraph_is_nan(double x);
+DECLDIR int igraph_is_inf(double x);
+DECLDIR int igraph_is_posinf(double x);
+DECLDIR int igraph_is_neginf(double x);
 
 #if defined(NAN)
 #  define IGRAPH_NAN NAN

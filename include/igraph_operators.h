@@ -34,6 +34,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
@@ -45,26 +62,26 @@ __BEGIN_DECLS
 /* Graph operators                                    */
 /* -------------------------------------------------- */
 
-int igraph_disjoint_union(igraph_t *res, 
+DECLDIR int igraph_disjoint_union(igraph_t *res, 
 			  const igraph_t *left, const igraph_t *right);
-int igraph_disjoint_union_many(igraph_t *res, 
+DECLDIR int igraph_disjoint_union_many(igraph_t *res, 
 			       const igraph_vector_ptr_t *graphs);
-int igraph_union(igraph_t *res, const igraph_t *left, const igraph_t *right,
+DECLDIR int igraph_union(igraph_t *res, const igraph_t *left, const igraph_t *right,
 		 igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
-int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
+DECLDIR int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
 		      igraph_vector_ptr_t *edgemaps);
-int igraph_intersection(igraph_t *res, 
+DECLDIR int igraph_intersection(igraph_t *res, 
 			const igraph_t *left, const igraph_t *right, 
 			igraph_vector_t *edge_map1, 
 			igraph_vector_t *edge_map2);
-int igraph_intersection_many(igraph_t *res,
+DECLDIR int igraph_intersection_many(igraph_t *res,
 			     const igraph_vector_ptr_t *graphs,
 			     igraph_vector_ptr_t *edgemaps);
-int igraph_difference(igraph_t *res, 
+DECLDIR int igraph_difference(igraph_t *res, 
 		      const igraph_t *orig, const igraph_t *sub);
-int igraph_complementer(igraph_t *res, const igraph_t *graph, 
+DECLDIR int igraph_complementer(igraph_t *res, const igraph_t *graph, 
 			igraph_bool_t loops);
-int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
+DECLDIR int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
 		   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
 
 __END_DECLS

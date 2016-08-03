@@ -33,6 +33,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
@@ -44,19 +61,19 @@ __BEGIN_DECLS
 /* Matchings in graphs                                */
 /* -------------------------------------------------- */
 
-int igraph_is_matching(const igraph_t* graph,
+DECLDIR int igraph_is_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
     igraph_bool_t* result);
-int igraph_is_maximal_matching(const igraph_t* graph,
+DECLDIR int igraph_is_maximal_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
     igraph_bool_t* result);
 
-int igraph_maximum_bipartite_matching(const igraph_t* graph,
+DECLDIR int igraph_maximum_bipartite_matching(const igraph_t* graph,
     const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
     igraph_real_t* matching_weight, igraph_vector_long_t* matching,
     const igraph_vector_t* weights, igraph_real_t eps);
 
-int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
+DECLDIR int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
     igraph_real_t* matching_weight, igraph_vector_long_t* matching,
     const igraph_vector_t* weights);
 

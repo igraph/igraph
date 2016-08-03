@@ -34,6 +34,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
@@ -43,11 +60,11 @@
 
 __BEGIN_DECLS
 
-int igraph_diameter(const igraph_t *graph, igraph_integer_t *res, 
+DECLDIR int igraph_diameter(const igraph_t *graph, igraph_integer_t *res, 
 		    igraph_integer_t *from, igraph_integer_t *to,
 		    igraph_vector_t *path,
 		    igraph_bool_t directed, igraph_bool_t unconn);
-int igraph_diameter_dijkstra(const igraph_t *graph,
+DECLDIR int igraph_diameter_dijkstra(const igraph_t *graph,
 			     const igraph_vector_t *weights,
 			     igraph_real_t *pres,
 			     igraph_integer_t *pfrom,
@@ -56,41 +73,41 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
 			     igraph_bool_t directed,
 			     igraph_bool_t unconn);
 
-int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
+DECLDIR int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res, 
 			  const igraph_vs_t from, const igraph_vs_t to, 
 			  igraph_neimode_t mode);
-int igraph_get_shortest_paths(const igraph_t *graph, 
+DECLDIR int igraph_get_shortest_paths(const igraph_t *graph, 
 			      igraph_vector_ptr_t *vertices,
 			      igraph_vector_ptr_t *edges,
 			      igraph_integer_t from, const igraph_vs_t to, 
 			      igraph_neimode_t mode,
 			      igraph_vector_long_t *predecessors,
 			      igraph_vector_long_t *inbound_edges);
-int igraph_get_shortest_path(const igraph_t *graph, 
+DECLDIR int igraph_get_shortest_path(const igraph_t *graph, 
 			     igraph_vector_t *vertices,
 			     igraph_vector_t *edges, 
 			     igraph_integer_t from,
 			     igraph_integer_t to,
 			     igraph_neimode_t mode);
 
-int igraph_get_all_shortest_paths(const igraph_t *graph,
+DECLDIR int igraph_get_all_shortest_paths(const igraph_t *graph,
 				  igraph_vector_ptr_t *res, 
 				  igraph_vector_t *nrgeo,
 				  igraph_integer_t from, const igraph_vs_t to, 
 				  igraph_neimode_t mode);
-int igraph_shortest_paths_dijkstra(const igraph_t *graph,
+DECLDIR int igraph_shortest_paths_dijkstra(const igraph_t *graph,
 				   igraph_matrix_t *res,
 				   const igraph_vs_t from,
 				   const igraph_vs_t to,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode);
-int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+DECLDIR int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 				   igraph_matrix_t *res,
 				   const igraph_vs_t from,
 				   const igraph_vs_t to,
 				   const igraph_vector_t *weights, 
 				   igraph_neimode_t mode);
-int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
+DECLDIR int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
                                        igraph_vector_ptr_t *vertices,
 				       igraph_vector_ptr_t *edges,
 				       igraph_integer_t from,
@@ -99,45 +116,45 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
 				       igraph_neimode_t mode,
 				       igraph_vector_long_t *predecessors,
 				       igraph_vector_long_t *inbound_edges);
-int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
+DECLDIR int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
 				      igraph_vector_t *vertices,
 				      igraph_vector_t *edges,
 				      igraph_integer_t from,
 				      igraph_integer_t to,
 				      const igraph_vector_t *weights,
 				      igraph_neimode_t mode);
-int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
+DECLDIR int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                igraph_vector_ptr_t *res, 
                igraph_vector_t *nrgeo,
                igraph_integer_t from, igraph_vs_t to,
                const igraph_vector_t *weights,
                igraph_neimode_t mode);
-int igraph_shortest_paths_johnson(const igraph_t *graph,
+DECLDIR int igraph_shortest_paths_johnson(const igraph_t *graph,
 				  igraph_matrix_t *res,
 				  const igraph_vs_t from,
 				  const igraph_vs_t to,
 				  const igraph_vector_t *weights);
 
-int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
+DECLDIR int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
 			       igraph_bool_t directed, igraph_bool_t unconn);
-int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
+DECLDIR int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
 			    igraph_real_t *unconnected, igraph_bool_t directed);
 
-int igraph_eccentricity(const igraph_t *graph, 
+DECLDIR int igraph_eccentricity(const igraph_t *graph, 
 			igraph_vector_t *res,
 			igraph_vs_t vids,
 			igraph_neimode_t mode);
 
-int igraph_radius(const igraph_t *graph, igraph_real_t *radius, 
+DECLDIR int igraph_radius(const igraph_t *graph, igraph_real_t *radius, 
 		  igraph_neimode_t mode);
 
-int igraph_get_all_simple_paths(const igraph_t *graph,
+DECLDIR int igraph_get_all_simple_paths(const igraph_t *graph,
 				igraph_vector_int_t *res,
 				igraph_integer_t from,
 				const igraph_vs_t to,
 				igraph_neimode_t mode);
 
-int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
+DECLDIR int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
 		       igraph_integer_t start, igraph_neimode_t mode,
 		       igraph_integer_t steps,
 		       igraph_random_walk_stuck_t stuck);

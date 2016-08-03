@@ -34,6 +34,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_datatype.h"
@@ -77,36 +94,36 @@ typedef struct igraph_hrg_t {
   igraph_vector_t left, right, prob, edges, vertices;
 } igraph_hrg_t;
 
-int igraph_hrg_init(igraph_hrg_t *hrg, int n);
-void igraph_hrg_destroy(igraph_hrg_t *hrg);
-int igraph_hrg_size(const igraph_hrg_t *hrg);
-int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize);
+DECLDIR int igraph_hrg_init(igraph_hrg_t *hrg, int n);
+DECLDIR void igraph_hrg_destroy(igraph_hrg_t *hrg);
+DECLDIR int igraph_hrg_size(const igraph_hrg_t *hrg);
+DECLDIR int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize);
 
-int igraph_hrg_fit(const igraph_t *graph, 
+DECLDIR int igraph_hrg_fit(const igraph_t *graph, 
 		   igraph_hrg_t *hrg,
 		   igraph_bool_t start,
 		   int steps);
 
-int igraph_hrg_sample(const igraph_t *graph,
+DECLDIR int igraph_hrg_sample(const igraph_t *graph,
 		      igraph_t *sample,
 		      igraph_vector_ptr_t *samples,
 		      igraph_hrg_t *hrg,
 		      igraph_bool_t start);
 
-int igraph_hrg_game(igraph_t *graph,
+DECLDIR int igraph_hrg_game(igraph_t *graph,
 		    const igraph_hrg_t *hrg);
 
-int igraph_hrg_dendrogram(igraph_t *graph,
+DECLDIR int igraph_hrg_dendrogram(igraph_t *graph,
 			  const igraph_hrg_t *hrg);
 
-int igraph_hrg_consensus(const igraph_t *graph,
+DECLDIR int igraph_hrg_consensus(const igraph_t *graph,
 			 igraph_vector_t *parents,
 			 igraph_vector_t *weights,
 			 igraph_hrg_t *hrg,
 			 igraph_bool_t start, 
 			 int num_samples);
 
-int igraph_hrg_predict(const igraph_t *graph,
+DECLDIR int igraph_hrg_predict(const igraph_t *graph,
 		       igraph_vector_t *edges,
 		       igraph_vector_t *prob,
 		       igraph_hrg_t *hrg,
@@ -114,7 +131,7 @@ int igraph_hrg_predict(const igraph_t *graph,
 		       int num_samples,
 		       int num_bins);
 
-int igraph_hrg_create(igraph_hrg_t *hrg,
+DECLDIR int igraph_hrg_create(igraph_hrg_t *hrg,
 		      const igraph_t *graph, 
 		      const igraph_vector_t *prob);
 

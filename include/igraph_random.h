@@ -34,6 +34,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 __BEGIN_DECLS
 
 #include <stdlib.h>
@@ -69,30 +86,30 @@ typedef struct igraph_rng_t {
 
 /* --------------------------------- */
 
-int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type);
-void igraph_rng_destroy(igraph_rng_t *rng);
+DECLDIR int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type);
+DECLDIR void igraph_rng_destroy(igraph_rng_t *rng);
 
-int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed);
-unsigned long int igraph_rng_max(igraph_rng_t *rng);
-unsigned long int igraph_rng_min(igraph_rng_t *rng);
-const char *igraph_rng_name(igraph_rng_t *rng);
+DECLDIR int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed);
+DECLDIR unsigned long int igraph_rng_max(igraph_rng_t *rng);
+DECLDIR unsigned long int igraph_rng_min(igraph_rng_t *rng);
+DECLDIR const char *igraph_rng_name(igraph_rng_t *rng);
 
-long int igraph_rng_get_integer(igraph_rng_t *rng,
+DECLDIR long int igraph_rng_get_integer(igraph_rng_t *rng,
 				long int l, long int h);
-igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng, 
+DECLDIR igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng, 
 				    igraph_real_t m, igraph_real_t s);
-igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng, 
+DECLDIR igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng, 
 				  igraph_real_t l, igraph_real_t h);
-igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
-igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
-igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
+DECLDIR igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
+DECLDIR igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
+DECLDIR igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
 				   igraph_real_t p);
-igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
-unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
-igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
-igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
+DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
+DECLDIR unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
+DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
+DECLDIR igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
 				   igraph_real_t scale);
-int igraph_rng_get_dirichlet(igraph_rng_t *rng,
+DECLDIR int igraph_rng_get_dirichlet(igraph_rng_t *rng,
 			     const igraph_vector_t *alpha,
 			     igraph_vector_t *result);
 
@@ -102,8 +119,8 @@ extern const igraph_rng_type_t igraph_rngtype_glibc2;
 extern const igraph_rng_type_t igraph_rngtype_rand;
 extern const igraph_rng_type_t igraph_rngtype_mt19937;
 
-igraph_rng_t *igraph_rng_default(void);
-void igraph_rng_set_default(igraph_rng_t *rng);
+DECLDIR igraph_rng_t *igraph_rng_default(void);
+DECLDIR void igraph_rng_set_default(igraph_rng_t *rng);
 
 /* --------------------------------- */
 

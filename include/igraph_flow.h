@@ -34,6 +34,23 @@
 # define __END_DECLS /* empty */
 #endif
 
+#ifdef DECLDIR
+# undef DECLDIR
+#endif
+#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
+# if defined (__MINGW32__) || defined (__CYGWIN32__)
+#  define DECLDIR /**/
+# else
+#  ifdef IGRAPH_EXPORTS
+#   define DECLDIR __declspec(dllexport)
+#  else
+#   define DECLDIR __declspec(dllimport)
+#  endif
+# endif
+#else
+# define DECLDIR /**/
+#endif
+
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
@@ -66,67 +83,67 @@ typedef struct {
   int nopush, norelabel, nogap, nogapnodes, nobfs;
 } igraph_maxflow_stats_t;
 
-int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
+DECLDIR int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 		   igraph_vector_t *flow, igraph_vector_t *cut,
 		   igraph_vector_t *partition, igraph_vector_t *partition2,
 		   igraph_integer_t source, igraph_integer_t target,
 		   const igraph_vector_t *capacity,
 		   igraph_maxflow_stats_t *stats);
-int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
+DECLDIR int igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
 			 igraph_integer_t source, igraph_integer_t target,
 			 const igraph_vector_t *capacity,
 			 igraph_maxflow_stats_t *stats);
 
-int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
+DECLDIR int igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 		     igraph_vector_t *cut, igraph_vector_t *partition,
 		     igraph_vector_t *partition2,
 		     igraph_integer_t source, igraph_integer_t target,
 		     const igraph_vector_t *capacity);
-int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
+DECLDIR int igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *res,
                            igraph_integer_t source, igraph_integer_t target,
 			   const igraph_vector_t *capacity);
 
-int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res, 
+DECLDIR int igraph_mincut_value(const igraph_t *graph, igraph_real_t *res, 
 			const igraph_vector_t *capacity);
-int igraph_mincut(const igraph_t *graph,
+DECLDIR int igraph_mincut(const igraph_t *graph,
 		  igraph_real_t *value,
 		  igraph_vector_t *partition,
 		  igraph_vector_t *partition2,
 		  igraph_vector_t *cut,
 		  const igraph_vector_t *capacity);
 
-int igraph_st_vertex_connectivity(const igraph_t *graph, 
+DECLDIR int igraph_st_vertex_connectivity(const igraph_t *graph, 
 				  igraph_integer_t *res,
 				  igraph_integer_t source,
 				  igraph_integer_t target,
 				  igraph_vconn_nei_t neighbors);
-int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
 			       igraph_bool_t checks);
 
-int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 				igraph_integer_t source, 
 				igraph_integer_t target);
-int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
 			     igraph_bool_t checks);
 
-int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 			       igraph_integer_t source, 
 			       igraph_integer_t target);
-int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
 				 igraph_integer_t source,
 				 igraph_integer_t target);
 
-int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
 		    igraph_bool_t checks);
-int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
 		    igraph_bool_t checks);
 
 /* s-t cut listing related stuff */
 
-int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
+DECLDIR int igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
 				 igraph_vector_t *capacity);
 
-int igraph_residual_graph(const igraph_t *graph,
+DECLDIR int igraph_residual_graph(const igraph_t *graph,
 			  const igraph_vector_t *capacity,
 			  igraph_t *residual,
 			  igraph_vector_t *residual_capacity,
@@ -143,32 +160,32 @@ int igraph_i_reverse_residual_graph(const igraph_t *graph,
 				    igraph_t *residual,
 				    const igraph_vector_t *flow,
 				    igraph_vector_t *tmp);
-int igraph_reverse_residual_graph(const igraph_t *graph,
+DECLDIR int igraph_reverse_residual_graph(const igraph_t *graph,
 				  const igraph_vector_t *capacity,
 				  igraph_t *residual,
 				  const igraph_vector_t *flow);
 
-int igraph_dominator_tree(const igraph_t *graph,
+DECLDIR int igraph_dominator_tree(const igraph_t *graph,
 			  igraph_integer_t root,
 			  igraph_vector_t *dom,
 			  igraph_t *domtree,
 			  igraph_vector_t *leftout,
 			  igraph_neimode_t mode);
 
-int igraph_all_st_cuts(const igraph_t *graph,
+DECLDIR int igraph_all_st_cuts(const igraph_t *graph,
 		       igraph_vector_ptr_t *cuts,
 		       igraph_vector_ptr_t *partition1s,
 		       igraph_integer_t source,
 		       igraph_integer_t target);
 
-int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
+DECLDIR int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 			  igraph_vector_ptr_t *cuts,
 			  igraph_vector_ptr_t *partition1s,
 			  igraph_integer_t source,
 			  igraph_integer_t target,
 			  const igraph_vector_t *capacity);
 
-int igraph_gomory_hu_tree(const igraph_t *graph,
+DECLDIR int igraph_gomory_hu_tree(const igraph_t *graph,
 			  igraph_t *tree,
 			  igraph_vector_t *flows,
 			  const igraph_vector_t *capacity);
