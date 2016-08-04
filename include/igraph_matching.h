@@ -23,33 +23,7 @@
 #ifndef IGRAPH_MATCHING_H
 #define IGRAPH_MATCHING_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
-#ifdef DECLDIR
-# undef DECLDIR
-#endif
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-# if defined (__MINGW32__) || defined (__CYGWIN32__)
-#  define DECLDIR /**/
-# else
-#  ifdef IGRAPH_EXPORTS
-#   define DECLDIR __declspec(dllexport)
-#  else
-#   define DECLDIR __declspec(dllimport)
-#  endif
-# endif
-#else
-# define DECLDIR /**/
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
@@ -62,20 +36,20 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_is_matching(const igraph_t* graph,
-    const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
-    igraph_bool_t* result);
+                const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
+                igraph_bool_t* result);
 DECLDIR int igraph_is_maximal_matching(const igraph_t* graph,
-    const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
-    igraph_bool_t* result);
+                const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
+                igraph_bool_t* result);
 
 DECLDIR int igraph_maximum_bipartite_matching(const igraph_t* graph,
-    const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
-    igraph_real_t* matching_weight, igraph_vector_long_t* matching,
-    const igraph_vector_t* weights, igraph_real_t eps);
+                const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
+                igraph_real_t* matching_weight, igraph_vector_long_t* matching,
+                const igraph_vector_t* weights, igraph_real_t eps);
 
 DECLDIR int igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
-    igraph_real_t* matching_weight, igraph_vector_long_t* matching,
-    const igraph_vector_t* weights);
+                igraph_real_t* matching_weight, igraph_vector_long_t* matching,
+                const igraph_vector_t* weights);
 
 __END_DECLS
 

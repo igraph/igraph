@@ -24,16 +24,7 @@
 #ifndef IGRAPH_PROGRESS_H
 #define IGRAPH_PROGRESS_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 
 __BEGIN_DECLS
@@ -152,17 +143,16 @@ __BEGIN_DECLS
  */
 
 typedef int igraph_progress_handler_t(const char *message, igraph_real_t percent,
-				      void *data);
+                void *data);
 
 extern igraph_progress_handler_t igraph_progress_handler_stderr;
 
-igraph_progress_handler_t *
-igraph_set_progress_handler(igraph_progress_handler_t new_handler);
+DECLDIR igraph_progress_handler_t * igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 
-int igraph_progress(const char *message, igraph_real_t percent, void *data);
+DECLDIR int igraph_progress(const char *message, igraph_real_t percent, void *data);
 
-int igraph_progressf(const char *message, igraph_real_t percent, void *data, 
-		     ...);
+DECLDIR int igraph_progressf(const char *message, igraph_real_t percent, void *data, 
+                ...);
 
 /**
  * \define IGRAPH_PROGRESS

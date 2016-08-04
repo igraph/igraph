@@ -24,47 +24,38 @@
 #ifndef IGRAPH_GRAPHLETS_H
 #define IGRAPH_GRAPHLETS_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_vector_ptr.h"
 #include "igraph_interface.h"
 
 __BEGIN_DECLS
 
-int igraph_subclique_next(const igraph_t *graph,
-			  const igraph_vector_t *weights,
-			  const igraph_vector_int_t *ids,
-			  const igraph_vector_ptr_t *cliques,
-			  igraph_vector_ptr_t *result,
-			  igraph_vector_ptr_t *resultweights,
-			  igraph_vector_ptr_t *resultids,
-			  igraph_vector_t *clique_thr,
-			  igraph_vector_t *next_thr);
+DECLDIR int igraph_subclique_next(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                const igraph_vector_int_t *ids,
+                const igraph_vector_ptr_t *cliques,
+                igraph_vector_ptr_t *result,
+                igraph_vector_ptr_t *resultweights,
+                igraph_vector_ptr_t *resultids,
+                igraph_vector_t *clique_thr,
+                igraph_vector_t *next_thr);
 
-int igraph_graphlets_candidate_basis(const igraph_t *graph,
-				     const igraph_vector_t *weights,
-				     igraph_vector_ptr_t *cliques,
-				     igraph_vector_t *thresholds);
+DECLDIR int igraph_graphlets_candidate_basis(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                igraph_vector_ptr_t *cliques,
+                igraph_vector_t *thresholds);
 
-int igraph_graphlets_project(const igraph_t *graph,
-			     const igraph_vector_t *weights,
-			     const igraph_vector_ptr_t *cliques,
-			     igraph_vector_t *Mu, igraph_bool_t startMu,
-			     int niter);
+DECLDIR int igraph_graphlets_project(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                const igraph_vector_ptr_t *cliques,
+                igraph_vector_t *Mu, igraph_bool_t startMu,
+                int niter);
 
-int igraph_graphlets(const igraph_t *graph,
-		     const igraph_vector_t *weights,
-		     igraph_vector_ptr_t *cliques,
-		     igraph_vector_t *Mu, int niter);
+DECLDIR int igraph_graphlets(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                igraph_vector_ptr_t *cliques,
+                igraph_vector_t *Mu, int niter);
 
 __END_DECLS
 

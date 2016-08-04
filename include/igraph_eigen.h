@@ -28,32 +28,7 @@
 #ifndef IGRAPH_EIGEN_H
 #define IGRAPH_EIGEN_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
-#ifdef DECLDIR
-# undef DECLDIR
-#endif
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-# if defined (__MINGW32__) || defined (__CYGWIN32__)
-#  define DECLDIR /**/
-# else
-#  ifdef IGRAPH_EXPORTS
-#   define DECLDIR __declspec(dllexport)
-#  else
-#   define DECLDIR __declspec(dllimport)
-#  endif
-# endif
-#else
-# define DECLDIR /**/
-#endif
+#include "igraph_decls.h"
 
 __BEGIN_DECLS
 
@@ -89,46 +64,46 @@ typedef struct igraph_eigen_which_t {
     
 
 DECLDIR int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
-				  const igraph_sparsemat_t *sA,
-				  igraph_arpack_function_t *fun, int n,
-				  void *extra,
-				  igraph_eigen_algorithm_t algorithm,
-				  const igraph_eigen_which_t *which,
-				  igraph_arpack_options_t *options,
-				  igraph_arpack_storage_t *storage,
-				  igraph_vector_t *values, 
-				  igraph_matrix_t *vectors);
+                const igraph_sparsemat_t *sA,
+                igraph_arpack_function_t *fun, int n,
+                void *extra,
+                igraph_eigen_algorithm_t algorithm,
+                const igraph_eigen_which_t *which,
+                igraph_arpack_options_t *options,
+                igraph_arpack_storage_t *storage,
+                igraph_vector_t *values, 
+                igraph_matrix_t *vectors);
 
 DECLDIR int igraph_eigen_matrix(const igraph_matrix_t *A,
-			const igraph_sparsemat_t *sA,
-			igraph_arpack_function_t *fun, int n,
-			void *extra,
-			igraph_eigen_algorithm_t algorithm,
-			const igraph_eigen_which_t *which,
-			igraph_arpack_options_t *options,
-			igraph_arpack_storage_t *storage,
-			igraph_vector_complex_t *values,
-			igraph_matrix_complex_t *vectors);
+                const igraph_sparsemat_t *sA,
+                igraph_arpack_function_t *fun, int n,
+                void *extra,
+                igraph_eigen_algorithm_t algorithm,
+                const igraph_eigen_which_t *which,
+                igraph_arpack_options_t *options,
+                igraph_arpack_storage_t *storage,
+                igraph_vector_complex_t *values,
+                igraph_matrix_complex_t *vectors);
 
 DECLDIR int igraph_eigen_adjacency(const igraph_t *graph,
-			   igraph_eigen_algorithm_t algorithm,
-			   const igraph_eigen_which_t *which,
-			   igraph_arpack_options_t *options,
-			   igraph_arpack_storage_t *storage,
-			   igraph_vector_t *values,
-			   igraph_matrix_t *vectors,
-			   igraph_vector_complex_t *cmplxvalues,
-			   igraph_matrix_complex_t *cmplxvectors);
+                igraph_eigen_algorithm_t algorithm,
+                const igraph_eigen_which_t *which,
+                igraph_arpack_options_t *options,
+                igraph_arpack_storage_t *storage,
+                igraph_vector_t *values,
+                igraph_matrix_t *vectors,
+                igraph_vector_complex_t *cmplxvalues,
+                igraph_matrix_complex_t *cmplxvectors);
 
 DECLDIR int igraph_eigen_laplacian(const igraph_t *graph,
-			   igraph_eigen_algorithm_t algorithm,
-			   const igraph_eigen_which_t *which,
-			   igraph_arpack_options_t *options,
-			   igraph_arpack_storage_t *storage,
-			   igraph_vector_t *values,
-			   igraph_matrix_t *vectors,
-			   igraph_vector_complex_t *cmplxvalues,
-			   igraph_matrix_complex_t *cmplxvectors);
+                igraph_eigen_algorithm_t algorithm,
+                const igraph_eigen_which_t *which,
+                igraph_arpack_options_t *options,
+                igraph_arpack_storage_t *storage,
+                igraph_vector_t *values,
+                igraph_matrix_t *vectors,
+                igraph_vector_complex_t *cmplxvalues,
+                igraph_matrix_complex_t *cmplxvectors);
 
 
 __END_DECLS

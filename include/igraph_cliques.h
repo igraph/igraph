@@ -24,33 +24,7 @@
 #ifndef IGRAPH_CLIQUES_H
 #define IGRAPH_CLIQUES_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
-#ifdef DECLDIR
-# undef DECLDIR
-#endif
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-# if defined (__MINGW32__) || defined (__CYGWIN32__)
-#  define DECLDIR /**/
-# else
-#  ifdef IGRAPH_EXPORTS
-#   define DECLDIR __declspec(dllexport)
-#  else
-#   define DECLDIR __declspec(dllimport)
-#  endif
-# endif
-#else
-# define DECLDIR /**/
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_vector_ptr.h"
@@ -62,45 +36,45 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
-                   igraph_integer_t min_size, igraph_integer_t max_size);
+                igraph_integer_t min_size, igraph_integer_t max_size);
 DECLDIR int igraph_maximal_cliques_file(const igraph_t *graph,
-				FILE *outfile,
-				igraph_integer_t min_size, 
-				igraph_integer_t max_size);
+                FILE *outfile,
+                igraph_integer_t min_size, 
+                igraph_integer_t max_size);
 DECLDIR int igraph_maximal_cliques_count(const igraph_t *graph,
-				 igraph_integer_t *res, 
-				 igraph_integer_t min_size, 
-				 igraph_integer_t max_size);
+                igraph_integer_t *res, 
+                igraph_integer_t min_size, 
+                igraph_integer_t max_size);
 DECLDIR int igraph_maximal_cliques_subset(const igraph_t *graph,
-				  igraph_vector_int_t *subset,
-				  igraph_vector_ptr_t *res,
-				  igraph_integer_t *no,
-				  FILE *outfile,
-				  igraph_integer_t min_size,
-				  igraph_integer_t max_size);
+                igraph_vector_int_t *subset,
+                igraph_vector_ptr_t *res,
+                igraph_integer_t *no,
+                FILE *outfile,
+                igraph_integer_t min_size,
+                igraph_integer_t max_size);
 
 DECLDIR int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
-                   igraph_integer_t min_size, igraph_integer_t max_size);
+                igraph_integer_t min_size, igraph_integer_t max_size);
 DECLDIR int igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
-                   igraph_integer_t min_size, igraph_integer_t max_size);
+                igraph_integer_t min_size, igraph_integer_t max_size);
 DECLDIR int igraph_largest_cliques(const igraph_t *graph, 
-			   igraph_vector_ptr_t *cliques);
+                igraph_vector_ptr_t *cliques);
 DECLDIR int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no);
 DECLDIR int igraph_weighted_cliques(const igraph_t *graph,
-                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
-                    igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal);
+                const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
+                igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal);
 DECLDIR int igraph_largest_weighted_cliques(const igraph_t *graph,
-                    const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res);
+                const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res);
 DECLDIR int igraph_weighted_clique_number(const igraph_t *graph,
-                    const igraph_vector_t *vertex_weights, igraph_real_t *res);
+                const igraph_vector_t *vertex_weights, igraph_real_t *res);
 DECLDIR int igraph_independent_vertex_sets(const igraph_t *graph,
-				   igraph_vector_ptr_t *res,
-				   igraph_integer_t min_size,
-				   igraph_integer_t max_size);
+                igraph_vector_ptr_t *res,
+                igraph_integer_t min_size,
+                igraph_integer_t max_size);
 DECLDIR int igraph_largest_independent_vertex_sets(const igraph_t *graph,
-					   igraph_vector_ptr_t *res);
+                igraph_vector_ptr_t *res);
 DECLDIR int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
-					   igraph_vector_ptr_t *res);
+                igraph_vector_ptr_t *res);
 DECLDIR int igraph_independence_number(const igraph_t *graph, igraph_integer_t *no);
 
 /**
@@ -120,9 +94,9 @@ DECLDIR int igraph_independence_number(const igraph_t *graph, igraph_integer_t *
  */
 typedef igraph_bool_t igraph_clique_handler_t(igraph_vector_t *clique, void *arg);
 
-int igraph_cliques_callback(const igraph_t *graph,
-                    igraph_integer_t min_size, igraph_integer_t max_size,
-                    igraph_clique_handler_t *cliquehandler_fn, void *arg);
+DECLDIR int igraph_cliques_callback(const igraph_t *graph,
+                igraph_integer_t min_size, igraph_integer_t max_size,
+                igraph_clique_handler_t *cliquehandler_fn, void *arg);
 
 
 __END_DECLS

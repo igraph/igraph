@@ -24,16 +24,7 @@
 #ifndef IGRAPH_SEPARATORS_H
 #define IGRAPH_SEPARATORS_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
@@ -43,19 +34,19 @@
 
 __BEGIN_DECLS
 
-int igraph_is_separator(const igraph_t *graph, 
-			const igraph_vs_t candidate,
-			igraph_bool_t *res);
+DECLDIR int igraph_is_separator(const igraph_t *graph, 
+                const igraph_vs_t candidate,
+                igraph_bool_t *res);
 
-int igraph_all_minimal_st_separators(const igraph_t *graph, 
-				     igraph_vector_ptr_t *separators);
+DECLDIR int igraph_all_minimal_st_separators(const igraph_t *graph, 
+                igraph_vector_ptr_t *separators);
 
-int igraph_is_minimal_separator(const igraph_t *graph,
-				const igraph_vs_t candidate, 
-				igraph_bool_t *res);
+DECLDIR int igraph_is_minimal_separator(const igraph_t *graph,
+                const igraph_vs_t candidate, 
+                igraph_bool_t *res);
 
-int igraph_minimum_size_separators(const igraph_t *graph,
-				   igraph_vector_ptr_t *separators);
+DECLDIR int igraph_minimum_size_separators(const igraph_t *graph,
+                igraph_vector_ptr_t *separators);
 
 __END_DECLS
 

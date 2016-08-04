@@ -24,16 +24,7 @@
 #ifndef IGRAPH_COMMUNITY_H
 #define IGRAPH_COMMUNITY_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
@@ -46,8 +37,8 @@ __BEGIN_DECLS
 /* K-Cores                                            */
 /* -------------------------------------------------- */
 
-int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
-		    igraph_neimode_t mode);
+DECLDIR int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
+                igraph_neimode_t mode);
 
 /* -------------------------------------------------- */
 /* Community Structure                                */
@@ -57,102 +48,102 @@ int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
 /* TODO: edge.type.matrix */
 /* TODO:  */
 
-int igraph_community_optimal_modularity(const igraph_t *graph,
-					igraph_real_t *modularity,
-					igraph_vector_t *membership,
-					const igraph_vector_t *weights);
+DECLDIR int igraph_community_optimal_modularity(const igraph_t *graph,
+                igraph_real_t *modularity,
+                igraph_vector_t *membership,
+                const igraph_vector_t *weights);
 
-int igraph_community_spinglass(const igraph_t *graph,
-			       const igraph_vector_t *weights,
-			       igraph_real_t *modularity,
-			       igraph_real_t *temperature,
-			       igraph_vector_t *membership, 
-			       igraph_vector_t *csize, 
-			       igraph_integer_t spins,
-			       igraph_bool_t parupdate,
-			       igraph_real_t starttemp,
-			       igraph_real_t stoptemp,
-			       igraph_real_t coolfact,
-			       igraph_spincomm_update_t update_rule,
-			       igraph_real_t gamma, 
-			       /* the rest is for the NegSpin implementation */
-			       igraph_spinglass_implementation_t implementation,
-/* 			       igraph_matrix_t *adhesion, */
-/* 			       igraph_matrix_t *normalised_adhesion, */
-/* 			       igraph_real_t *polarization, */
-			       igraph_real_t lambda);
+DECLDIR int igraph_community_spinglass(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                igraph_real_t *modularity,
+                igraph_real_t *temperature,
+                igraph_vector_t *membership, 
+                igraph_vector_t *csize, 
+                igraph_integer_t spins,
+                igraph_bool_t parupdate,
+                igraph_real_t starttemp,
+                igraph_real_t stoptemp,
+                igraph_real_t coolfact,
+                igraph_spincomm_update_t update_rule,
+                igraph_real_t gamma, 
+                /* the rest is for the NegSpin implementation */
+                igraph_spinglass_implementation_t implementation,
+/* 			          igraph_matrix_t *adhesion, */
+/* 			          igraph_matrix_t *normalised_adhesion, */
+/* 			          igraph_real_t *polarization, */
+                igraph_real_t lambda);
 
-int igraph_community_spinglass_single(const igraph_t *graph,
-				      const igraph_vector_t *weights,
-				      igraph_integer_t vertex,
-				      igraph_vector_t *community,
-				      igraph_real_t *cohesion,
-				      igraph_real_t *adhesion,
-				      igraph_integer_t *inner_links,
-				      igraph_integer_t *outer_links,
-				      igraph_integer_t spins,
-				      igraph_spincomm_update_t update_rule,
-				      igraph_real_t gamma);
+DECLDIR int igraph_community_spinglass_single(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                igraph_integer_t vertex,
+                igraph_vector_t *community,
+                igraph_real_t *cohesion,
+                igraph_real_t *adhesion,
+                igraph_integer_t *inner_links,
+                igraph_integer_t *outer_links,
+                igraph_integer_t spins,
+                igraph_spincomm_update_t update_rule,
+                igraph_real_t gamma);
 				   
-int igraph_community_walktrap(const igraph_t *graph, 
-			      const igraph_vector_t *weights,
-			      int steps,
-			      igraph_matrix_t *merges,
-			      igraph_vector_t *modularity, 
-			      igraph_vector_t *membership);
+DECLDIR int igraph_community_walktrap(const igraph_t *graph, 
+                const igraph_vector_t *weights,
+                int steps,
+                igraph_matrix_t *merges,
+                igraph_vector_t *modularity, 
+                igraph_vector_t *membership);
 
-int igraph_community_infomap(const igraph_t * graph,
-			     const igraph_vector_t *e_weights,
-			     const igraph_vector_t *v_weights,
-			     int nb_trials,
-			     igraph_vector_t *membership,
-			     igraph_real_t *codelength);
+DECLDIR int igraph_community_infomap(const igraph_t * graph,
+                const igraph_vector_t *e_weights,
+                const igraph_vector_t *v_weights,
+                int nb_trials,
+                igraph_vector_t *membership,
+                igraph_real_t *codelength);
 
-int igraph_community_edge_betweenness(const igraph_t *graph, 
-				      igraph_vector_t *result,
-				      igraph_vector_t *edge_betweenness,
-				      igraph_matrix_t *merges,
-				      igraph_vector_t *bridges,
-				      igraph_vector_t *modularity,
-				      igraph_vector_t *membership,
-				      igraph_bool_t directed,
-				      const igraph_vector_t *weights);
-int igraph_community_eb_get_merges(const igraph_t *graph, 
-				   const igraph_vector_t *edges,
-                                   const igraph_vector_t *weights,
-				   igraph_matrix_t *merges,
-				   igraph_vector_t *bridges,
-				   igraph_vector_t *modularity,
-				   igraph_vector_t *membership);
+DECLDIR int igraph_community_edge_betweenness(const igraph_t *graph, 
+                igraph_vector_t *result,
+                igraph_vector_t *edge_betweenness,
+                igraph_matrix_t *merges,
+                igraph_vector_t *bridges,
+                igraph_vector_t *modularity,
+                igraph_vector_t *membership,
+                igraph_bool_t directed,
+                const igraph_vector_t *weights);
+DECLDIR int igraph_community_eb_get_merges(const igraph_t *graph, 
+                const igraph_vector_t *edges,
+                const igraph_vector_t *weights,
+                igraph_matrix_t *merges,
+                igraph_vector_t *bridges,
+                igraph_vector_t *modularity,
+                igraph_vector_t *membership);
 
-int igraph_community_fastgreedy(const igraph_t *graph,
-				const igraph_vector_t *weights,
-				igraph_matrix_t *merges,
-				igraph_vector_t *modularity, 
-				igraph_vector_t *membership);
+DECLDIR int igraph_community_fastgreedy(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                igraph_matrix_t *merges,
+                igraph_vector_t *modularity, 
+                igraph_vector_t *membership);
 
-int igraph_community_to_membership(const igraph_matrix_t *merges,
-				   igraph_integer_t nodes,
-				   igraph_integer_t steps,
-				   igraph_vector_t *membership,
-				   igraph_vector_t *csize);
-int igraph_le_community_to_membership(const igraph_matrix_t *merges,
-				      igraph_integer_t steps,
-				      igraph_vector_t *membership,
-				      igraph_vector_t *csize);
+DECLDIR int igraph_community_to_membership(const igraph_matrix_t *merges,
+                igraph_integer_t nodes,
+                igraph_integer_t steps,
+                igraph_vector_t *membership,
+                igraph_vector_t *csize);
+DECLDIR int igraph_le_community_to_membership(const igraph_matrix_t *merges,
+                igraph_integer_t steps,
+                igraph_vector_t *membership,
+                igraph_vector_t *csize);
 
-int igraph_modularity(const igraph_t *graph, 
-		      const igraph_vector_t *membership,
-		      igraph_real_t *modularity,
-              const igraph_vector_t *weights);
+DECLDIR int igraph_modularity(const igraph_t *graph, 
+                const igraph_vector_t *membership,
+                igraph_real_t *modularity,
+                const igraph_vector_t *weights);
 
-int igraph_modularity_matrix(const igraph_t *graph, 
-			     const igraph_vector_t *membership,
-			     igraph_matrix_t *modmat, 
-			     const igraph_vector_t *weights);
+DECLDIR int igraph_modularity_matrix(const igraph_t *graph, 
+                const igraph_vector_t *membership,
+                igraph_matrix_t *modmat, 
+                const igraph_vector_t *weights);
 
-int igraph_reindex_membership(igraph_vector_t *membership,
-                              igraph_vector_t *new_to_old);
+DECLDIR int igraph_reindex_membership(igraph_vector_t *membership,
+                igraph_vector_t *new_to_old);
 
 typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
 	       IGRAPH_LEVC_HIST_FAILED,
@@ -197,44 +188,44 @@ typedef int igraph_community_leading_eigenvector_callback_t(
         void *arpack_extra,
         void *extra);
 
-int igraph_community_leading_eigenvector(const igraph_t *graph,
-	const igraph_vector_t *weights,
-	igraph_matrix_t *merges,
-	igraph_vector_t *membership,
-	igraph_integer_t steps,
-	igraph_arpack_options_t *options, 
-	igraph_real_t *modularity,
-	igraph_bool_t start,
-	igraph_vector_t *eigenvalues,
-	igraph_vector_ptr_t *eigenvectors,
-        igraph_vector_t *history, 
-        igraph_community_leading_eigenvector_callback_t *callback,
-        void *callback_extra);
+DECLDIR int igraph_community_leading_eigenvector(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                igraph_matrix_t *merges,
+                igraph_vector_t *membership,
+                igraph_integer_t steps,
+                igraph_arpack_options_t *options, 
+                igraph_real_t *modularity,
+                igraph_bool_t start,
+                igraph_vector_t *eigenvalues,
+                igraph_vector_ptr_t *eigenvectors,
+                igraph_vector_t *history, 
+                igraph_community_leading_eigenvector_callback_t *callback,
+                void *callback_extra);
 
-int igraph_community_label_propagation(const igraph_t *graph,
-                                       igraph_vector_t *membership,
-                                       const igraph_vector_t *weights,
-                                       const igraph_vector_t *initial,
-                                       igraph_vector_bool_t *fixed,
-				       igraph_real_t *modularity);
-int igraph_community_multilevel(const igraph_t *graph,
-                                const igraph_vector_t *weights,
-                                igraph_vector_t *membership,
-                                igraph_matrix_t *memberships,
-                                igraph_vector_t *modularity);
+DECLDIR int igraph_community_label_propagation(const igraph_t *graph,
+                igraph_vector_t *membership,
+                const igraph_vector_t *weights,
+                const igraph_vector_t *initial,
+                igraph_vector_bool_t *fixed,
+                igraph_real_t *modularity);
+DECLDIR int igraph_community_multilevel(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                igraph_vector_t *membership,
+                igraph_matrix_t *memberships,
+                igraph_vector_t *modularity);
 
 /* -------------------------------------------------- */
 /* Community Structure Comparison                     */
 /* -------------------------------------------------- */
 
-int igraph_compare_communities(const igraph_vector_t *comm1,
-	                       const igraph_vector_t *comm2,
-			       igraph_real_t* result,
-			       igraph_community_comparison_t method);
-int igraph_split_join_distance(const igraph_vector_t *comm1,
-        const igraph_vector_t *comm2,
-        igraph_integer_t* distance12,
-        igraph_integer_t* distance21);
+DECLDIR int igraph_compare_communities(const igraph_vector_t *comm1,
+                const igraph_vector_t *comm2,
+                igraph_real_t* result,
+                igraph_community_comparison_t method);
+DECLDIR int igraph_split_join_distance(const igraph_vector_t *comm1,
+                const igraph_vector_t *comm2,
+                igraph_integer_t* distance12,
+                igraph_integer_t* distance21);
 
 __END_DECLS
 

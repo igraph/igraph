@@ -24,32 +24,7 @@
 #ifndef REST_RANDOM_H
 #define REST_RANDOM_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
-#ifdef DECLDIR
-# undef DECLDIR
-#endif
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-# if defined (__MINGW32__) || defined (__CYGWIN32__)
-#  define DECLDIR /**/
-# else
-#  ifdef IGRAPH_EXPORTS
-#   define DECLDIR __declspec(dllexport)
-#  else
-#   define DECLDIR __declspec(dllimport)
-#  endif
-# endif
-#else
-# define DECLDIR /**/
-#endif
+#include "igraph_decls.h"
 
 __BEGIN_DECLS
 
@@ -95,23 +70,23 @@ DECLDIR unsigned long int igraph_rng_min(igraph_rng_t *rng);
 DECLDIR const char *igraph_rng_name(igraph_rng_t *rng);
 
 DECLDIR long int igraph_rng_get_integer(igraph_rng_t *rng,
-				long int l, long int h);
+                     long int l, long int h);
 DECLDIR igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng, 
-				    igraph_real_t m, igraph_real_t s);
+                          igraph_real_t m, igraph_real_t s);
 DECLDIR igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng, 
-				  igraph_real_t l, igraph_real_t h);
+                          igraph_real_t l, igraph_real_t h);
 DECLDIR igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
 DECLDIR igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
 DECLDIR igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
-				   igraph_real_t p);
+                          igraph_real_t p);
 DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 DECLDIR unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
 DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 DECLDIR igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
-				   igraph_real_t scale);
+                          igraph_real_t scale);
 DECLDIR int igraph_rng_get_dirichlet(igraph_rng_t *rng,
-			     const igraph_vector_t *alpha,
-			     igraph_vector_t *result);
+                const igraph_vector_t *alpha,
+                igraph_vector_t *result);
 
 /* --------------------------------- */
 
@@ -142,7 +117,7 @@ double Rf_dnorm4(double x, double mu, double sigma, int give_log);
   }
 #define RNG_END()		/* do nothing */
 
-double igraph_dnorm(double x, double mu, double sigma, int give_log);
+DECLDIR double igraph_dnorm(double x, double mu, double sigma, int give_log);
 
 #endif
 

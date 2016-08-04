@@ -24,33 +24,7 @@
 #ifndef IGRAPH_COCITATION_H
 #define IGRAPH_COCITATION_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
-#ifdef DECLDIR
-# undef DECLDIR
-#endif
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-# if defined (__MINGW32__) || defined (__CYGWIN32__)
-#  define DECLDIR /**/
-# else
-#  ifdef IGRAPH_EXPORTS
-#   define DECLDIR __declspec(dllexport)
-#  else
-#   define DECLDIR __declspec(dllimport)
-#  endif
-# endif
-#else
-# define DECLDIR /**/
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_matrix.h"
 #include "igraph_datatype.h"
@@ -63,29 +37,29 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res, 
-		      const igraph_vs_t vids);
+                const igraph_vs_t vids);
 DECLDIR int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res, 
-		       const igraph_vs_t vids);
+                const igraph_vs_t vids);
 
 DECLDIR int igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
-              const igraph_vs_t vids, igraph_neimode_t mode,
-			  igraph_bool_t loops);
+                const igraph_vs_t vids, igraph_neimode_t mode,
+                igraph_bool_t loops);
 DECLDIR int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
-	const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
+                const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
 DECLDIR int igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
-	const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
+                const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
 
 DECLDIR int igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
-              const igraph_vs_t vids, igraph_neimode_t mode,
-			  igraph_bool_t loops);
+                const igraph_vs_t vids, igraph_neimode_t mode,
+                igraph_bool_t loops);
 DECLDIR int igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
-	const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
+                const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops);
 DECLDIR int igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
-	const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
+                const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops);
 
 DECLDIR int igraph_similarity_inverse_log_weighted(const igraph_t *graph,
-              igraph_matrix_t *res, const igraph_vs_t vids,
-              igraph_neimode_t mode);
+                igraph_matrix_t *res, const igraph_vs_t vids,
+                igraph_neimode_t mode);
 
 __END_DECLS
 

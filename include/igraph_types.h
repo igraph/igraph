@@ -24,32 +24,7 @@
 #ifndef REST_TYPES_H
 #define REST_TYPES_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
-#ifdef DECLDIR
-# undef DECLDIR
-#endif
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-# if defined (__MINGW32__) || defined (__CYGWIN32__)
-#  define DECLDIR /**/
-# else
-#  ifdef IGRAPH_EXPORTS
-#   define DECLDIR __declspec(dllexport)
-#  else
-#   define DECLDIR __declspec(dllimport)
-#  endif
-# endif
-#else
-# define DECLDIR /**/
-#endif
+#include "igraph_decls.h"
 
 __BEGIN_DECLS
 
@@ -71,15 +46,15 @@ typedef int    igraph_bool_t;
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */
-int igraph_real_printf(igraph_real_t val);
-int igraph_real_fprintf(FILE *file, igraph_real_t val);
-int igraph_real_snprintf(char* str, size_t size, igraph_real_t val);
+DECLDIR int igraph_real_printf(igraph_real_t val);
+DECLDIR int igraph_real_fprintf(FILE *file, igraph_real_t val);
+DECLDIR int igraph_real_snprintf(char* str, size_t size, igraph_real_t val);
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) with the largest possible precision */
-int igraph_real_printf_precise(igraph_real_t val);
-int igraph_real_fprintf_precise(FILE *file, igraph_real_t val);
-int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val);
+DECLDIR int igraph_real_printf_precise(igraph_real_t val);
+DECLDIR int igraph_real_fprintf_precise(FILE *file, igraph_real_t val);
+DECLDIR int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val);
 
 /* igraph_i_fdiv is needed here instead of in igraph_math.h because
  * some constants use it */

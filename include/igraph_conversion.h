@@ -24,33 +24,7 @@
 #ifndef IGRAPH_CONVERSION_H
 #define IGRAPH_CONVERSION_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
-#ifdef DECLDIR
-# undef DECLDIR
-#endif
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-# if defined (__MINGW32__) || defined (__CYGWIN32__)
-#  define DECLDIR /**/
-# else
-#  ifdef IGRAPH_EXPORTS
-#   define DECLDIR __declspec(dllexport)
-#  else
-#   define DECLDIR __declspec(dllimport)
-#  endif
-# endif
-#else
-# define DECLDIR /**/
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
@@ -66,25 +40,25 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
-			 igraph_get_adjacency_t type, igraph_bool_t eids);
+                igraph_get_adjacency_t type, igraph_bool_t eids);
 DECLDIR int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
-			        igraph_get_adjacency_t type);
+                igraph_get_adjacency_t type);
 
 DECLDIR int igraph_get_stochastic(const igraph_t *graph, 
-			  igraph_matrix_t *matrix,
-			  igraph_bool_t column_wise);
+                igraph_matrix_t *matrix,
+                igraph_bool_t column_wise);
 
 DECLDIR int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
-				    igraph_sparsemat_t *sparsemat,
-				    igraph_bool_t column_wise);
+                igraph_sparsemat_t *sparsemat,
+                igraph_bool_t column_wise);
 
 DECLDIR int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);
 
 DECLDIR int igraph_to_directed(igraph_t *graph, 
-		       igraph_to_directed_t flags);
+                igraph_to_directed_t flags);
 DECLDIR int igraph_to_undirected(igraph_t *graph,
-			 igraph_to_undirected_t flags,
-			 const igraph_attribute_combination_t *edge_comb);
+                igraph_to_undirected_t flags,
+                const igraph_attribute_combination_t *edge_comb);
 
 __END_DECLS
 
