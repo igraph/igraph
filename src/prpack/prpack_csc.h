@@ -1,16 +1,8 @@
 #ifndef PRPACK_CSC
 #define PRPACK_CSC
 
-#ifndef _MSC_VER
-#  ifdef HAVE_STDINT_H
-#    include <stdint.h>
-#  else
-#    ifdef HAVE_SYS_INT_TYPES_H
-#      include <sys/int_types.h>
-#    else
-#      include "pstdint.h"
-#    endif
-#  endif
+#if !defined(_MSC_VER) && !defined (__MINGW32__) && !defined (__MINGW64__)
+#  include <stdint.h>
 #else
 typedef __int64 int64_t;
 #endif
