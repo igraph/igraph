@@ -2,7 +2,15 @@
 #define PRPACK_CSC
 
 #ifndef _MSC_VER
-#include <stdint.h>
+#  ifdef HAVE_STDINT_H
+#    include <stdint.h>
+#  else
+#    ifdef HAVE_SYS_INT_TYPES_H
+#      include <sys/int_types.h>
+#    else
+#      include "pstdint.h"
+#    endif
+#  endif
 #else
 typedef __int64 int64_t;
 #endif
