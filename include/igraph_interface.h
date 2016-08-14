@@ -24,16 +24,7 @@
 #ifndef IGRAPH_INTERFACE_H
 #define IGRAPH_INTERFACE_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
@@ -44,46 +35,46 @@ __BEGIN_DECLS
 /* Interface                                          */
 /* -------------------------------------------------- */
 
-int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed);
-int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr);
-int igraph_destroy(igraph_t *graph);
-int igraph_copy(igraph_t *to, const igraph_t *from);
-int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges, 
-		     void *attr);
-int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, 
-			void *attr);
-int igraph_delete_edges(igraph_t *graph, igraph_es_t edges);
-int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices);
-int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices, 
-			       igraph_vector_t *idx, 
-			       igraph_vector_t *invidx);
-igraph_integer_t igraph_vcount(const igraph_t *graph);
-igraph_integer_t igraph_ecount(const igraph_t *graph);
-int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t vid, 
-		     igraph_neimode_t mode); 
-igraph_bool_t igraph_is_directed(const igraph_t *graph);
-int igraph_degree(const igraph_t *graph, igraph_vector_t *res, 
-		  const igraph_vs_t vids, igraph_neimode_t mode, 
-		  igraph_bool_t loops);
-int igraph_edge(const igraph_t *graph, igraph_integer_t eid, 
-		igraph_integer_t *from, igraph_integer_t *to);		
-int igraph_edges(const igraph_t *graph, igraph_es_t eids,
-		 igraph_vector_t *edges);
-int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
-		   igraph_integer_t from, igraph_integer_t to,
-		   igraph_bool_t directed, igraph_bool_t error);
-int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
-                    const igraph_vector_t *pairs,
-		    const igraph_vector_t *path,
-		    igraph_bool_t directed, igraph_bool_t error);
-int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
-			  const igraph_vector_t *pairs, 
-			  const igraph_vector_t *path,
-			  igraph_bool_t directed, igraph_bool_t error);
-int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
-		    igraph_neimode_t mode);          /* deprecated */
-int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
-		    igraph_neimode_t mode);
+DECLDIR int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed);
+DECLDIR int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr);
+DECLDIR int igraph_destroy(igraph_t *graph);
+DECLDIR int igraph_copy(igraph_t *to, const igraph_t *from);
+DECLDIR int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges, 
+                void *attr);
+DECLDIR int igraph_add_vertices(igraph_t *graph, igraph_integer_t nv, 
+                void *attr);
+DECLDIR int igraph_delete_edges(igraph_t *graph, igraph_es_t edges);
+DECLDIR int igraph_delete_vertices(igraph_t *graph, const igraph_vs_t vertices);
+DECLDIR int igraph_delete_vertices_idx(igraph_t *graph, const igraph_vs_t vertices, 
+                igraph_vector_t *idx, 
+                igraph_vector_t *invidx);
+DECLDIR igraph_integer_t igraph_vcount(const igraph_t *graph);
+DECLDIR igraph_integer_t igraph_ecount(const igraph_t *graph);
+DECLDIR int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_integer_t vid, 
+                igraph_neimode_t mode); 
+DECLDIR igraph_bool_t igraph_is_directed(const igraph_t *graph);
+DECLDIR int igraph_degree(const igraph_t *graph, igraph_vector_t *res, 
+                const igraph_vs_t vids, igraph_neimode_t mode, 
+                igraph_bool_t loops);
+DECLDIR int igraph_edge(const igraph_t *graph, igraph_integer_t eid, 
+                igraph_integer_t *from, igraph_integer_t *to);		
+DECLDIR int igraph_edges(const igraph_t *graph, igraph_es_t eids,
+                igraph_vector_t *edges);
+DECLDIR int igraph_get_eid(const igraph_t *graph, igraph_integer_t *eid,
+                igraph_integer_t from, igraph_integer_t to,
+                igraph_bool_t directed, igraph_bool_t error);
+DECLDIR int igraph_get_eids(const igraph_t *graph, igraph_vector_t *eids,
+                const igraph_vector_t *pairs,
+                const igraph_vector_t *path,
+                igraph_bool_t directed, igraph_bool_t error);
+DECLDIR int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
+                const igraph_vector_t *pairs, 
+                const igraph_vector_t *path,
+                igraph_bool_t directed, igraph_bool_t error);
+DECLDIR int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
+                igraph_neimode_t mode);          /* deprecated */
+DECLDIR int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
+                igraph_neimode_t mode);
 
 #define IGRAPH_FROM(g,e) ((igraph_integer_t)(VECTOR((g)->from)[(long int)(e)]))
 #define IGRAPH_TO(g,e)   ((igraph_integer_t)(VECTOR((g)->to)  [(long int)(e)]))

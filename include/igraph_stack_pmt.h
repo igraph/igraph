@@ -34,14 +34,14 @@ typedef struct TYPE(igraph_stack) {
   BASE* end;
 } TYPE(igraph_stack);
 
-int FUNCTION(igraph_stack,init)(TYPE(igraph_stack)* s, long int size);
-void FUNCTION(igraph_stack,destroy)(TYPE(igraph_stack)* s);
-int FUNCTION(igraph_stack,reserve)(TYPE(igraph_stack)* s, long int size);
-igraph_bool_t FUNCTION(igraph_stack,empty)(TYPE(igraph_stack)* s);
-long int FUNCTION(igraph_stack,size)(const TYPE(igraph_stack)* s);
-void FUNCTION(igraph_stack,clear)(TYPE(igraph_stack)* s);
-int FUNCTION(igraph_stack,push)(TYPE(igraph_stack)* s, BASE elem);
-BASE FUNCTION(igraph_stack,pop)(TYPE(igraph_stack)* s);
-BASE FUNCTION(igraph_stack,top)(const TYPE(igraph_stack)* s);
-int FUNCTION(igraph_stack,print)(const TYPE(igraph_stack)* s);
-int FUNCTION(igraph_stack,fprint)(const TYPE(igraph_stack)* s, FILE *file);
+DECLDIR int FUNCTION(igraph_stack,init)(TYPE(igraph_stack)* s, long int size);
+DECLDIR void FUNCTION(igraph_stack,destroy)(TYPE(igraph_stack)* s);
+DECLDIR int FUNCTION(igraph_stack,reserve)(TYPE(igraph_stack)* s, long int size);
+DECLDIR igraph_bool_t FUNCTION(igraph_stack,empty)(TYPE(igraph_stack)* s);
+DECLDIR long int FUNCTION(igraph_stack,size)(const TYPE(igraph_stack)* s);
+DECLDIR void FUNCTION(igraph_stack,clear)(TYPE(igraph_stack)* s);
+DECLDIR int FUNCTION(igraph_stack,push)(TYPE(igraph_stack)* s, BASE elem);
+DECLDIR BASE FUNCTION(igraph_stack,pop)(TYPE(igraph_stack)* s);
+DECLDIR BASE FUNCTION(igraph_stack,top)(const TYPE(igraph_stack)* s);
+DECLDIR int FUNCTION(igraph_stack,print)(const TYPE(igraph_stack)* s);
+DECLDIR int FUNCTION(igraph_stack,fprint)(const TYPE(igraph_stack)* s, FILE *file);

@@ -24,16 +24,7 @@
 #ifndef REST_ATTRIBUTES_H
 #define REST_ATTRIBUTES_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
@@ -151,19 +142,19 @@ typedef struct igraph_attribute_combination_t {
 
 #define IGRAPH_NO_MORE_ATTRIBUTES ((const char*)0)
 
-int igraph_attribute_combination_init(igraph_attribute_combination_t *comb);
-int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...);
-void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb);
-int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
-				     const char *name, 
-				     igraph_attribute_combination_type_t type,
-				     void *func);
-int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb, 
-					const char *name);
-int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
-				       const char *name,
-				       igraph_attribute_combination_type_t *type,
-				       void **func);
+DECLDIR int igraph_attribute_combination_init(igraph_attribute_combination_t *comb);
+DECLDIR int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...);
+DECLDIR void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb);
+DECLDIR int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
+                const char *name, 
+                igraph_attribute_combination_type_t type,
+                void *func);
+DECLDIR int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb, 
+                const char *name);
+DECLDIR int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
+                const char *name,
+                igraph_attribute_combination_type_t *type,
+                void **func);
 
 /**
  * \struct igraph_attribute_table_t
@@ -298,10 +289,9 @@ typedef struct igraph_attribute_table_t {
 			    igraph_vector_bool_t *value);
 } igraph_attribute_table_t;
 
-igraph_attribute_table_t *
-igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
+DECLDIR igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_attribute_table_t * table);
 
-igraph_bool_t igraph_has_attribute_table(void);
+DECLDIR igraph_bool_t igraph_has_attribute_table(void);
 
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
         do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
@@ -392,80 +382,80 @@ int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
 
 extern const igraph_attribute_table_t igraph_cattribute_table;
 
-igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name);
-igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name);
-const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name);
-igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
-				      igraph_integer_t vid);
-igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
-				    igraph_integer_t vid);
-const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
-				    igraph_integer_t vid);
-igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
-				      igraph_integer_t eid);
-igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
-				    igraph_integer_t eid);
-const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
-				    igraph_integer_t eid);
+DECLDIR igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name);
+DECLDIR igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name);
+DECLDIR const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name);
+DECLDIR igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
+                          igraph_integer_t vid);
+DECLDIR igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
+                          igraph_integer_t vid);
+DECLDIR const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
+                        igraph_integer_t vid);
+DECLDIR igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
+                          igraph_integer_t eid);
+DECLDIR igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
+                          igraph_integer_t eid);
+DECLDIR const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
+                        igraph_integer_t eid);
 
-int igraph_cattribute_VANV(const igraph_t *graph, const char *name, 
-			   igraph_vs_t vids, igraph_vector_t *result);
-int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
-			   igraph_es_t eids, igraph_vector_t *result);
-int igraph_cattribute_VASV(const igraph_t *graph, const char *name, 
-			   igraph_vs_t vids, igraph_strvector_t *result);
-int igraph_cattribute_EASV(const igraph_t *graph, const char *name,
-			   igraph_es_t eids, igraph_strvector_t *result);
-int igraph_cattribute_VABV(const igraph_t *graph, const char *name, 
-			   igraph_vs_t vids, igraph_vector_bool_t *result);
-int igraph_cattribute_EABV(const igraph_t *graph, const char *name,
-			   igraph_es_t eids, igraph_vector_bool_t *result);
+DECLDIR int igraph_cattribute_VANV(const igraph_t *graph, const char *name, 
+                igraph_vs_t vids, igraph_vector_t *result);
+DECLDIR int igraph_cattribute_EANV(const igraph_t *graph, const char *name,
+                igraph_es_t eids, igraph_vector_t *result);
+DECLDIR int igraph_cattribute_VASV(const igraph_t *graph, const char *name, 
+                igraph_vs_t vids, igraph_strvector_t *result);
+DECLDIR int igraph_cattribute_EASV(const igraph_t *graph, const char *name,
+                igraph_es_t eids, igraph_strvector_t *result);
+DECLDIR int igraph_cattribute_VABV(const igraph_t *graph, const char *name, 
+                igraph_vs_t vids, igraph_vector_bool_t *result);
+DECLDIR int igraph_cattribute_EABV(const igraph_t *graph, const char *name,
+                igraph_es_t eids, igraph_vector_bool_t *result);
 
-int igraph_cattribute_list(const igraph_t *graph,
-			   igraph_strvector_t *gnames, igraph_vector_t *gtypes,
-			   igraph_strvector_t *vnames, igraph_vector_t *vtypes,
-			   igraph_strvector_t *enames, igraph_vector_t *etypes);
-igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
-					 igraph_attribute_elemtype_t type,
-					 const char *name);
+DECLDIR int igraph_cattribute_list(const igraph_t *graph,
+                igraph_strvector_t *gnames, igraph_vector_t *gtypes,
+                igraph_strvector_t *vnames, igraph_vector_t *vtypes,
+                igraph_strvector_t *enames, igraph_vector_t *etypes);
+DECLDIR igraph_bool_t igraph_cattribute_has_attr(const igraph_t *graph,
+                          igraph_attribute_elemtype_t type,
+                          const char *name);
 
-int igraph_cattribute_GAN_set(igraph_t *graph, const char *name, 
-			      igraph_real_t value);
-int igraph_cattribute_GAB_set(igraph_t *graph, const char *name, 
-			      igraph_bool_t value);
-int igraph_cattribute_GAS_set(igraph_t *graph, const char *name, 
-			      const char *value);
-int igraph_cattribute_VAN_set(igraph_t *graph, const char *name, 
-			      igraph_integer_t vid, igraph_real_t value);
-int igraph_cattribute_VAB_set(igraph_t *graph, const char *name, 
-			      igraph_integer_t vid, igraph_bool_t value);
-int igraph_cattribute_VAS_set(igraph_t *graph, const char *name, 
-			      igraph_integer_t vid, const char *value);
-int igraph_cattribute_EAN_set(igraph_t *graph, const char *name, 
-			      igraph_integer_t eid, igraph_real_t value);
-int igraph_cattribute_EAB_set(igraph_t *graph, const char *name, 
-			      igraph_integer_t eid, igraph_bool_t value);
-int igraph_cattribute_EAS_set(igraph_t *graph, const char *name, 
-			      igraph_integer_t eid, const char *value);
+DECLDIR int igraph_cattribute_GAN_set(igraph_t *graph, const char *name, 
+                igraph_real_t value);
+DECLDIR int igraph_cattribute_GAB_set(igraph_t *graph, const char *name, 
+                igraph_bool_t value);
+DECLDIR int igraph_cattribute_GAS_set(igraph_t *graph, const char *name, 
+                const char *value);
+DECLDIR int igraph_cattribute_VAN_set(igraph_t *graph, const char *name, 
+                igraph_integer_t vid, igraph_real_t value);
+DECLDIR int igraph_cattribute_VAB_set(igraph_t *graph, const char *name, 
+                igraph_integer_t vid, igraph_bool_t value);
+DECLDIR int igraph_cattribute_VAS_set(igraph_t *graph, const char *name, 
+                igraph_integer_t vid, const char *value);
+DECLDIR int igraph_cattribute_EAN_set(igraph_t *graph, const char *name, 
+                igraph_integer_t eid, igraph_real_t value);
+DECLDIR int igraph_cattribute_EAB_set(igraph_t *graph, const char *name, 
+                igraph_integer_t eid, igraph_bool_t value);
+DECLDIR int igraph_cattribute_EAS_set(igraph_t *graph, const char *name, 
+                igraph_integer_t eid, const char *value);
 
-int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name, 
-			       const igraph_vector_t *v);
-int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name, 
-			       const igraph_vector_bool_t *v);
-int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
-			       const igraph_strvector_t *sv);
-int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name, 
-			       const igraph_vector_t *v);
-int igraph_cattribute_EAB_setv(igraph_t *graph, const char *name, 
-			       const igraph_vector_bool_t *v);
-int igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
-			       const igraph_strvector_t *sv);
+DECLDIR int igraph_cattribute_VAN_setv(igraph_t *graph, const char *name, 
+                const igraph_vector_t *v);
+DECLDIR int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name, 
+                const igraph_vector_bool_t *v);
+DECLDIR int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
+                const igraph_strvector_t *sv);
+DECLDIR int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name, 
+                const igraph_vector_t *v);
+DECLDIR int igraph_cattribute_EAB_setv(igraph_t *graph, const char *name, 
+                const igraph_vector_bool_t *v);
+DECLDIR int igraph_cattribute_EAS_setv(igraph_t *graph, const char *name,
+                const igraph_strvector_t *sv);
 
-void igraph_cattribute_remove_g(igraph_t *graph, const char *name);
-void igraph_cattribute_remove_v(igraph_t *graph, const char *name);
-void igraph_cattribute_remove_e(igraph_t *graph, const char *name);
-void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
-				  igraph_bool_t v, igraph_bool_t e);
+DECLDIR void igraph_cattribute_remove_g(igraph_t *graph, const char *name);
+DECLDIR void igraph_cattribute_remove_v(igraph_t *graph, const char *name);
+DECLDIR void igraph_cattribute_remove_e(igraph_t *graph, const char *name);
+DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
+                 igraph_bool_t v, igraph_bool_t e);
 
 /**
  * \define GAN

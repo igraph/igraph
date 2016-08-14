@@ -24,16 +24,7 @@
 #ifndef IGRAPH_CENTRALITY_H
 #define IGRAPH_CENTRALITY_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
@@ -46,33 +37,33 @@ __BEGIN_DECLS
 /* Centrality                                         */
 /* -------------------------------------------------- */
 
-int igraph_closeness(const igraph_t *graph, igraph_vector_t *res, 
-		     const igraph_vs_t vids, igraph_neimode_t mode,
-		     const igraph_vector_t *weights, igraph_bool_t normalized);
-int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
-		              const igraph_vs_t vids, igraph_neimode_t mode,
-                              igraph_real_t cutoff,
-			      const igraph_vector_t *weights,
-			      igraph_bool_t normalized);
+DECLDIR int igraph_closeness(const igraph_t *graph, igraph_vector_t *res, 
+                const igraph_vs_t vids, igraph_neimode_t mode,
+                const igraph_vector_t *weights, igraph_bool_t normalized);
+DECLDIR int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
+                const igraph_vs_t vids, igraph_neimode_t mode,
+                igraph_real_t cutoff,
+                const igraph_vector_t *weights,
+                igraph_bool_t normalized);
 
-int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res, 
-                       const igraph_vs_t vids, igraph_bool_t directed,
-		       const igraph_vector_t *weights, igraph_bool_t nobigint);
-int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res, 
-			        const igraph_vs_t vids, igraph_bool_t directed,
-                                igraph_real_t cutoff, 
-				const igraph_vector_t *weights, 
-				igraph_bool_t nobigint);
-int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
-                            igraph_bool_t directed, 
-			    const igraph_vector_t *weigths);
-int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-				     igraph_bool_t directed, igraph_real_t cutoff,
-				     const igraph_vector_t *weights);
-int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res, 
-			const igraph_vs_t vids, igraph_bool_t directed,
-			igraph_integer_t niter, igraph_real_t eps, 
-			igraph_real_t damping, igraph_bool_t old);
+DECLDIR int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res, 
+                const igraph_vs_t vids, igraph_bool_t directed,
+                const igraph_vector_t *weights, igraph_bool_t nobigint);
+DECLDIR int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res, 
+                const igraph_vs_t vids, igraph_bool_t directed,
+                igraph_real_t cutoff, 
+                const igraph_vector_t *weights, 
+                igraph_bool_t nobigint);
+DECLDIR int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
+                igraph_bool_t directed, 
+                const igraph_vector_t *weigths);
+DECLDIR int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
+                igraph_bool_t directed, igraph_real_t cutoff,
+                const igraph_vector_t *weights);
+DECLDIR int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res, 
+                const igraph_vs_t vids, igraph_bool_t directed,
+                igraph_integer_t niter, igraph_real_t eps, 
+                igraph_real_t damping, igraph_bool_t old);
 
 /**
  * \typedef igraph_pagerank_algo_t
@@ -109,112 +100,112 @@ typedef struct igraph_pagerank_power_options_t {
   igraph_real_t eps;
 } igraph_pagerank_power_options_t;
 
-int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
-		    igraph_vector_t *vector,
-		    igraph_real_t *value, const igraph_vs_t vids,
-		    igraph_bool_t directed, igraph_real_t damping, 
-		    const igraph_vector_t *weights, void *options);
-int igraph_personalized_pagerank(const igraph_t *graph, 
-		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
-		    igraph_real_t *value, const igraph_vs_t vids,
-		    igraph_bool_t directed, igraph_real_t damping, 
-		    igraph_vector_t *reset,
-		    const igraph_vector_t *weights, void *options);
-int igraph_personalized_pagerank_vs(const igraph_t *graph, 
-		    igraph_pagerank_algo_t algo,
-		    igraph_vector_t *vector,
-		    igraph_real_t *value, const igraph_vs_t vids,
-		    igraph_bool_t directed, igraph_real_t damping,
-			igraph_vs_t reset_vids,
-		    const igraph_vector_t *weights, void *options);
+DECLDIR int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
+                igraph_vector_t *vector,
+                igraph_real_t *value, const igraph_vs_t vids,
+                igraph_bool_t directed, igraph_real_t damping, 
+                const igraph_vector_t *weights, void *options);
+DECLDIR int igraph_personalized_pagerank(const igraph_t *graph, 
+                igraph_pagerank_algo_t algo, igraph_vector_t *vector,
+                igraph_real_t *value, const igraph_vs_t vids,
+                igraph_bool_t directed, igraph_real_t damping, 
+                igraph_vector_t *reset,
+                const igraph_vector_t *weights, void *options);
+DECLDIR int igraph_personalized_pagerank_vs(const igraph_t *graph, 
+                igraph_pagerank_algo_t algo,
+                igraph_vector_t *vector,
+                igraph_real_t *value, const igraph_vs_t vids,
+                igraph_bool_t directed, igraph_real_t damping,
+                igraph_vs_t reset_vids,
+                const igraph_vector_t *weights, void *options);
 
-int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
-				  igraph_real_t *value,
-				  igraph_bool_t directed, igraph_bool_t scale,
-				  const igraph_vector_t *weights,
-				  igraph_arpack_options_t *options);
+DECLDIR int igraph_eigenvector_centrality(const igraph_t *graph, igraph_vector_t *vector,
+                igraph_real_t *value,
+                igraph_bool_t directed, igraph_bool_t scale,
+                const igraph_vector_t *weights,
+                igraph_arpack_options_t *options);
 
-int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
-		     igraph_real_t *value, igraph_bool_t scale,
-		     const igraph_vector_t *weights,
-		     igraph_arpack_options_t *options);
-int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
-			   igraph_real_t *value, igraph_bool_t scale,
-			   const igraph_vector_t *weights,
-			   igraph_arpack_options_t *options);
+DECLDIR int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
+                igraph_real_t *value, igraph_bool_t scale,
+                const igraph_vector_t *weights,
+                igraph_arpack_options_t *options);
+DECLDIR int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
+                igraph_real_t *value, igraph_bool_t scale,
+                const igraph_vector_t *weights,
+                igraph_arpack_options_t *options);
 
-int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
-		      igraph_vs_t vids, const igraph_vector_t *weights);
+DECLDIR int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
+                igraph_vs_t vids, const igraph_vector_t *weights);
 
-int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
-		    const igraph_vs_t vids, igraph_neimode_t mode,
-		    igraph_bool_t loops, const igraph_vector_t *weights);
+DECLDIR int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
+                const igraph_vs_t vids, igraph_neimode_t mode,
+                igraph_bool_t loops, const igraph_vector_t *weights);
 
-int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
-         igraph_vector_t *ins, igraph_vector_t *outs);
+DECLDIR int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
+                igraph_vector_t *ins, igraph_vector_t *outs);
 
-int igraph_sort_vertex_ids_by_degree(const igraph_t *graph, 
-				     igraph_vector_t *outvids, 
-				     igraph_vs_t vids,
-				     igraph_neimode_t mode, 
-				     igraph_bool_t loops,
-                     igraph_order_t order,
-				     igraph_bool_t only_indices);
+DECLDIR int igraph_sort_vertex_ids_by_degree(const igraph_t *graph, 
+                igraph_vector_t *outvids, 
+                igraph_vs_t vids,
+                igraph_neimode_t mode, 
+                igraph_bool_t loops,
+                igraph_order_t order,
+                igraph_bool_t only_indices);
 
-igraph_real_t igraph_centralization(const igraph_vector_t *scores,
-				    igraph_real_t theoretical_max,
-				    igraph_bool_t normalized);
+DECLDIR igraph_real_t igraph_centralization(const igraph_vector_t *scores,
+                igraph_real_t theoretical_max,
+                igraph_bool_t normalized);
 
-int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res, 
-				 igraph_neimode_t mode, igraph_bool_t loops,
-				 igraph_real_t *centralization,
-				 igraph_real_t *theoretical_max,
-				 igraph_bool_t normalized);
-int igraph_centralization_degree_tmax(const igraph_t *graph, 
-				      igraph_integer_t nodes,
-				      igraph_neimode_t mode,
-				      igraph_bool_t loops,
-				      igraph_real_t *res);
+DECLDIR int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res, 
+                igraph_neimode_t mode, igraph_bool_t loops,
+                igraph_real_t *centralization,
+                igraph_real_t *theoretical_max,
+                igraph_bool_t normalized);
+DECLDIR int igraph_centralization_degree_tmax(const igraph_t *graph, 
+                igraph_integer_t nodes,
+                igraph_neimode_t mode,
+                igraph_bool_t loops,
+                igraph_real_t *res);
 
-int igraph_centralization_betweenness(const igraph_t *graph, 
-				      igraph_vector_t *res,
-				      igraph_bool_t directed,
-				      igraph_bool_t nobigint,
-				      igraph_real_t *centralization,
-				      igraph_real_t *theoretical_max,
-				      igraph_bool_t normalized);
-int igraph_centralization_betweenness_tmax(const igraph_t *graph, 
-					   igraph_integer_t nodes,
-					   igraph_bool_t directed,
-					   igraph_real_t *res);
+DECLDIR int igraph_centralization_betweenness(const igraph_t *graph, 
+                igraph_vector_t *res,
+                igraph_bool_t directed,
+                igraph_bool_t nobigint,
+                igraph_real_t *centralization,
+                igraph_real_t *theoretical_max,
+                igraph_bool_t normalized);
+DECLDIR int igraph_centralization_betweenness_tmax(const igraph_t *graph, 
+                igraph_integer_t nodes,
+                igraph_bool_t directed,
+                igraph_real_t *res);
 
-int igraph_centralization_closeness(const igraph_t *graph, 
-				    igraph_vector_t *res, 
-				    igraph_neimode_t mode, 
-				    igraph_real_t *centralization,
-				    igraph_real_t *theoretical_max,
-				    igraph_bool_t normalized);
-int igraph_centralization_closeness_tmax(const igraph_t *graph,
-					 igraph_integer_t nodes,
-					 igraph_neimode_t mode,
-					 igraph_real_t *res);
+DECLDIR int igraph_centralization_closeness(const igraph_t *graph, 
+                igraph_vector_t *res, 
+                igraph_neimode_t mode, 
+                igraph_real_t *centralization,
+                igraph_real_t *theoretical_max,
+                igraph_bool_t normalized);
+DECLDIR int igraph_centralization_closeness_tmax(const igraph_t *graph,
+                igraph_integer_t nodes,
+                igraph_neimode_t mode,
+                igraph_real_t *res);
 
-int igraph_centralization_eigenvector_centrality(
-					 const igraph_t *graph,
-					 igraph_vector_t *vector,
-					 igraph_real_t *value,
-					 igraph_bool_t directed,
-					 igraph_bool_t scale,
-					 igraph_arpack_options_t *options,
-					 igraph_real_t *centralization,
-					 igraph_real_t *theoretical_max,
-					 igraph_bool_t normalized);
-int igraph_centralization_eigenvector_centrality_tmax(
-					 const igraph_t *graph,
-					 igraph_integer_t nodes,
-					 igraph_bool_t directed,
-					 igraph_bool_t scale, 
-					 igraph_real_t *res);
+DECLDIR int igraph_centralization_eigenvector_centrality(
+                const igraph_t *graph,
+                igraph_vector_t *vector,
+                igraph_real_t *value,
+                igraph_bool_t directed,
+                igraph_bool_t scale,
+                igraph_arpack_options_t *options,
+                igraph_real_t *centralization,
+                igraph_real_t *theoretical_max,
+                igraph_bool_t normalized);
+DECLDIR int igraph_centralization_eigenvector_centrality_tmax(
+                const igraph_t *graph,
+                igraph_integer_t nodes,
+                igraph_bool_t directed,
+                igraph_bool_t scale, 
+                igraph_real_t *res);
 
 __END_DECLS
 

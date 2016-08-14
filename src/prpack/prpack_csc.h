@@ -1,8 +1,8 @@
 #ifndef PRPACK_CSC
 #define PRPACK_CSC
 
-#ifndef _MSC_VER
-#include <stdint.h>
+#if !defined(_MSC_VER) && !defined (__MINGW32__) && !defined (__MINGW64__)
+#  include <stdint.h>
 #else
 typedef __int64 int64_t;
 #endif

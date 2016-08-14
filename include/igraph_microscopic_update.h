@@ -22,16 +22,7 @@
 #ifndef IGRAPH_MICROSCOPIC_UPDATE_H
 #define IGRAPH_MICROSCOPIC_UPDATE_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
@@ -40,29 +31,29 @@
 
 __BEGIN_DECLS
 
-int igraph_deterministic_optimal_imitation(const igraph_t *graph,
-					   igraph_integer_t vid,
-					   igraph_optimal_t optimality,
-					   const igraph_vector_t *quantities,
-					   igraph_vector_t *strategies,
-					   igraph_neimode_t mode);
-int igraph_moran_process(const igraph_t *graph,
-                         const igraph_vector_t *weights,
-                         igraph_vector_t *quantities,
-                         igraph_vector_t *strategies,
-                         igraph_neimode_t mode);
-int igraph_roulette_wheel_imitation(const igraph_t *graph,
-                                    igraph_integer_t vid,
-                                    igraph_bool_t islocal,
-                                    const igraph_vector_t *quantities,
-                                    igraph_vector_t *strategies,
-                                    igraph_neimode_t mode);
-int igraph_stochastic_imitation(const igraph_t *graph,
-                                igraph_integer_t vid,
-                                igraph_imitate_algorithm_t algo,
-                                const igraph_vector_t *quantities,
-                                igraph_vector_t *strategies,
-                                igraph_neimode_t mode);
+DECLDIR int igraph_deterministic_optimal_imitation(const igraph_t *graph,
+                igraph_integer_t vid,
+                igraph_optimal_t optimality,
+                const igraph_vector_t *quantities,
+                igraph_vector_t *strategies,
+                igraph_neimode_t mode);
+DECLDIR int igraph_moran_process(const igraph_t *graph,
+                const igraph_vector_t *weights,
+                igraph_vector_t *quantities,
+                igraph_vector_t *strategies,
+                igraph_neimode_t mode);
+DECLDIR int igraph_roulette_wheel_imitation(const igraph_t *graph,
+                igraph_integer_t vid,
+                igraph_bool_t islocal,
+                const igraph_vector_t *quantities,
+                igraph_vector_t *strategies,
+                igraph_neimode_t mode);
+DECLDIR int igraph_stochastic_imitation(const igraph_t *graph,
+                igraph_integer_t vid,
+                igraph_imitate_algorithm_t algo,
+                const igraph_vector_t *quantities,
+                igraph_vector_t *strategies,
+                igraph_neimode_t mode);
 
 __END_DECLS
 

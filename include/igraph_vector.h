@@ -24,16 +24,7 @@
 #ifndef IGRAPH_VECTOR_H
 #define IGRAPH_VECTOR_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_complex.h"
 
@@ -163,14 +154,14 @@ __BEGIN_DECLS
 /* Type-specific vector functions                     */
 /* -------------------------------------------------- */
 
-int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
-int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
+DECLDIR int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
+DECLDIR int igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
 
-igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
+DECLDIR igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
 				  const igraph_vector_t *rhs,
 				  igraph_real_t tol);
 
-int igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol);
+DECLDIR int igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol);
 
 /* These are for internal use only */
 int igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,

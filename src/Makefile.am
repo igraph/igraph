@@ -322,7 +322,7 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_matching.h	../include/igraph_embedding.h \
 	        ../include/igraph_scan.h        ../include/igraph_graphlets.h \
 		../include/igraph_vector_type.h ../include/igraph_epidemics.h \
-		../include/igraph_lsap.h
+		../include/igraph_lsap.h ../include/igraph_decls.h
 
 SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
@@ -351,7 +351,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     gml_tree.c \
 			     bliss/orbit.cc bliss/defs.cc bliss/uintseqhash.cc \
 			     bliss/partition.cc bliss/graph.cc \
-			     bliss/heap.cc bliss/utils.cc bliss.cc \
+			     bliss/bliss_heap.cc bliss/utils.cc bliss.cc \
 			     cattributes.c zeroin.c bfgs.c math.c \
 			     forestfire.c microscopic_update.c \
 			     blas.c arpack.c centrality.c drl_layout.cpp drl_parse.cpp \
@@ -382,7 +382,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     $(SPCONFIG) layout_gem.c layout_dh.c lsap.c \
 			     layout_fr.c layout_kk.c paths.c \
 			     random_walk.c \
-				 igraph_cliquer.c cliquer/cliquer.c cliquer/graph.c cliquer/reorder.c 
+				 igraph_cliquer.c cliquer/cliquer.c cliquer/cliquer_graph.c cliquer/reorder.c 
 
 if INTERNAL_F2C
 else
@@ -422,7 +422,7 @@ MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
 
 echosources:
 	$(info $(SOURCES) $(LAPACK) $(ARPACK) $(BLAS) $(libf2c_la_SOURCES) \
-	$(libdlamch_la_SOURCES) $(libplfit_la_SOURCES))
+	$(libdlamch_la_SOURCES) $(libplfit_la_SOURCES) $(PRPACK))
 
 echoheaders:
 	$(info $(HEADERS_PUBLIC))

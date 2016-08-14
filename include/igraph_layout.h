@@ -24,16 +24,7 @@
 #ifndef IGRAPH_LAYOUT_H
 #define IGRAPH_LAYOUT_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
@@ -49,93 +40,93 @@ __BEGIN_DECLS
 /* Layouts                                            */
 /* -------------------------------------------------- */
 
-int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res);
-int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
-			 igraph_vs_t order);
-int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
-		       igraph_integer_t center, const igraph_vector_t *order);
-int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width);
-int igraph_layout_fruchterman_reingold(const igraph_t *graph,
-				       igraph_matrix_t *res,
-				       igraph_bool_t use_seed,
-				       igraph_integer_t niter,
-				       igraph_real_t start_temp,
-				       igraph_layout_grid_t grid,
-				       const igraph_vector_t *weight,
-				       const igraph_vector_t *minx,
-				       const igraph_vector_t *maxx,
-				       const igraph_vector_t *miny,
-				       const igraph_vector_t *maxy);
+DECLDIR int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res);
+DECLDIR int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_vs_t order);
+DECLDIR int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_integer_t center, const igraph_vector_t *order);
+DECLDIR int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width);
+DECLDIR int igraph_layout_fruchterman_reingold(const igraph_t *graph,
+                igraph_matrix_t *res,
+                igraph_bool_t use_seed,
+                igraph_integer_t niter,
+                igraph_real_t start_temp,
+                igraph_layout_grid_t grid,
+                const igraph_vector_t *weight,
+                const igraph_vector_t *minx,
+                const igraph_vector_t *maxx,
+                const igraph_vector_t *miny,
+                const igraph_vector_t *maxy);
 
-int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
-	       igraph_bool_t use_seed, igraph_integer_t maxiter,
-	       igraph_real_t epsilon, igraph_real_t kkconst, 
-	       const igraph_vector_t *weights,
-	       const igraph_vector_t *minx, const igraph_vector_t *maxx,
-	       const igraph_vector_t *miny, const igraph_vector_t *maxy);
+DECLDIR int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_bool_t use_seed, igraph_integer_t maxiter,
+                igraph_real_t epsilon, igraph_real_t kkconst, 
+                const igraph_vector_t *weights,
+                const igraph_vector_t *minx, const igraph_vector_t *maxx,
+                const igraph_vector_t *miny, const igraph_vector_t *maxy);
 
-int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
-			  igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
-			  igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse);
-int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
-		      igraph_integer_t maxiter, igraph_real_t maxdelta, 
-		      igraph_real_t area, igraph_real_t coolexp,
-		      igraph_real_t repulserad, igraph_real_t cellsize, igraph_integer_t root);
-int igraph_layout_reingold_tilford(const igraph_t *graph, igraph_matrix_t *res,
-				   igraph_neimode_t mode,
-				   const igraph_vector_t *roots,
-				   const igraph_vector_t *rootlevel);
-int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
-					    igraph_matrix_t *res, 
-					    igraph_neimode_t mode,
-					    const igraph_vector_t *roots,
-					    const igraph_vector_t *rootlevel);
-int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
-        igraph_t *extd_graph, igraph_vector_t *extd_to_orig_eids,
-        const igraph_vector_t* layers, igraph_real_t hgap,
-        igraph_real_t vgap, long int maxiter, const igraph_vector_t *weights);
+DECLDIR int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
+                igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse);
+DECLDIR int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_integer_t maxiter, igraph_real_t maxdelta, 
+                igraph_real_t area, igraph_real_t coolexp,
+                igraph_real_t repulserad, igraph_real_t cellsize, igraph_integer_t root);
+DECLDIR int igraph_layout_reingold_tilford(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_neimode_t mode,
+                const igraph_vector_t *roots,
+                const igraph_vector_t *rootlevel);
+DECLDIR int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
+                igraph_matrix_t *res, 
+                igraph_neimode_t mode,
+                const igraph_vector_t *roots,
+                const igraph_vector_t *rootlevel);
+DECLDIR int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_t *extd_graph, igraph_vector_t *extd_to_orig_eids,
+                const igraph_vector_t* layers, igraph_real_t hgap,
+                igraph_real_t vgap, long int maxiter, const igraph_vector_t *weights);
 
-int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);
-int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);
-int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
-        long int width, long int height);
-int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
-					  igraph_matrix_t *res,
-					  igraph_bool_t use_seed,
-					  igraph_integer_t niter,
-					  igraph_real_t start_temp,
-					  const igraph_vector_t *weight, 
-					  const igraph_vector_t *minx,
-					  const igraph_vector_t *maxx,
-					  const igraph_vector_t *miny,
-					  const igraph_vector_t *maxy,
-					  const igraph_vector_t *minz,
-					  const igraph_vector_t *maxz);
+DECLDIR int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);
+DECLDIR int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);
+DECLDIR int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
+                long int width, long int height);
+DECLDIR int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
+                igraph_matrix_t *res,
+                igraph_bool_t use_seed,
+                igraph_integer_t niter,
+                igraph_real_t start_temp,
+                const igraph_vector_t *weight, 
+                const igraph_vector_t *minx,
+                const igraph_vector_t *maxx,
+                const igraph_vector_t *miny,
+                const igraph_vector_t *maxy,
+                const igraph_vector_t *minz,
+                const igraph_vector_t *maxz);
 
-int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
-	       igraph_bool_t use_seed, igraph_integer_t maxiter,
-	       igraph_real_t epsilon, igraph_real_t kkconst, 
-	       const igraph_vector_t *weights,
-	       const igraph_vector_t *minx, const igraph_vector_t *maxx,
-	       const igraph_vector_t *miny, const igraph_vector_t *maxy,
-	       const igraph_vector_t *minz, const igraph_vector_t *maxz);
+DECLDIR int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_bool_t use_seed, igraph_integer_t maxiter,
+                igraph_real_t epsilon, igraph_real_t kkconst, 
+                const igraph_vector_t *weights,
+                const igraph_vector_t *minx, const igraph_vector_t *maxx,
+                const igraph_vector_t *miny, const igraph_vector_t *maxy,
+                const igraph_vector_t *minz, const igraph_vector_t *maxz);
 
-int igraph_layout_graphopt(const igraph_t *graph, 
-			   igraph_matrix_t *res, igraph_integer_t niter,
-			   igraph_real_t node_charge, igraph_real_t node_mass,
-			   igraph_real_t spring_length,
-			   igraph_real_t spring_constant, 
-			   igraph_real_t max_sa_movement,
-			   igraph_bool_t use_seed);
+DECLDIR int igraph_layout_graphopt(const igraph_t *graph, 
+                igraph_matrix_t *res, igraph_integer_t niter,
+                igraph_real_t node_charge, igraph_real_t node_mass,
+                igraph_real_t spring_length,
+                igraph_real_t spring_constant, 
+                igraph_real_t max_sa_movement,
+                igraph_bool_t use_seed);
 
-int igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res, 
-                      const igraph_matrix_t *dist, long int dim,
-                      igraph_arpack_options_t *options);
+DECLDIR int igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res, 
+                const igraph_matrix_t *dist, long int dim,
+                igraph_arpack_options_t *options);
 
-int igraph_layout_bipartite(const igraph_t *graph, 
-			    const igraph_vector_bool_t *types,
-			    igraph_matrix_t *res, igraph_real_t hgap, 
-			    igraph_real_t vgap, long int maxiter);
+DECLDIR int igraph_layout_bipartite(const igraph_t *graph, 
+                const igraph_vector_bool_t *types,
+                igraph_matrix_t *res, igraph_real_t hgap, 
+                igraph_real_t vgap, long int maxiter);
 
 /** 
  * \struct igraph_layout_drl_options_t
@@ -222,36 +213,36 @@ typedef enum { IGRAPH_LAYOUT_DRL_DEFAULT=0,
 	       IGRAPH_LAYOUT_DRL_REFINE,
 	       IGRAPH_LAYOUT_DRL_FINAL } igraph_layout_drl_default_t;
 
-int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
-				   igraph_layout_drl_default_t templ);
-int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res, 
-		      igraph_bool_t use_seed,
-		      igraph_layout_drl_options_t *options,
-		      const igraph_vector_t *weights, 
-		      const igraph_vector_bool_t *fixed);
+DECLDIR int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
+                igraph_layout_drl_default_t templ);
+DECLDIR int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res, 
+                igraph_bool_t use_seed,
+                igraph_layout_drl_options_t *options,
+                const igraph_vector_t *weights, 
+                const igraph_vector_bool_t *fixed);
 
-int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res, 
-			 igraph_bool_t use_seed,
-			 igraph_layout_drl_options_t *options,
-			 const igraph_vector_t *weights,
-			 const igraph_vector_bool_t *fixed);
+DECLDIR int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res, 
+                igraph_bool_t use_seed,
+                igraph_layout_drl_options_t *options,
+                const igraph_vector_t *weights,
+                const igraph_vector_bool_t *fixed);
 
-int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
-			    igraph_vector_ptr_t *coords, 
-			    igraph_matrix_t *res);
+DECLDIR int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
+                igraph_vector_ptr_t *coords, 
+                igraph_matrix_t *res);
 
-int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
-		      igraph_bool_t use_seed, igraph_integer_t maxiter,
-		      igraph_real_t temp_max, igraph_real_t temp_min,
-		      igraph_real_t temp_init);
+DECLDIR int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_bool_t use_seed, igraph_integer_t maxiter,
+                igraph_real_t temp_max, igraph_real_t temp_min,
+                igraph_real_t temp_init);
 
-int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
-		 igraph_bool_t use_seed, igraph_integer_t maxiter,
-		 igraph_integer_t fineiter, igraph_real_t cool_fact,
-		 igraph_real_t weight_node_dist, igraph_real_t weight_border, 
-		 igraph_real_t weight_edge_lengths, 
-		 igraph_real_t weight_edge_crossings,
-		 igraph_real_t weight_node_edge_dist);
+DECLDIR int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
+                igraph_bool_t use_seed, igraph_integer_t maxiter,
+                igraph_integer_t fineiter, igraph_real_t cool_fact,
+                igraph_real_t weight_node_dist, igraph_real_t weight_border, 
+                igraph_real_t weight_edge_lengths, 
+                igraph_real_t weight_edge_crossings,
+                igraph_real_t weight_node_edge_dist);
 
 __END_DECLS
 

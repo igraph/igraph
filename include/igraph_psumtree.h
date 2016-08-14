@@ -24,16 +24,7 @@
 #ifndef IGRAPH_PSUMTREE_H
 #define IGRAPH_PSUMTREE_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_vector.h"
 
 __BEGIN_DECLS
@@ -43,15 +34,16 @@ typedef struct {
   long int size;
   long int offset;
 } igraph_psumtree_t;
-int igraph_psumtree_init(igraph_psumtree_t *t, long int size);
-void igraph_psumtree_destroy(igraph_psumtree_t *t);
-igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx);
-long int igraph_psumtree_size(const igraph_psumtree_t *t);
-int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
-			   igraph_real_t elem);
-int igraph_psumtree_update(igraph_psumtree_t *t, long int idx, 
-			   igraph_real_t new_value);
-igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
+
+DECLDIR int igraph_psumtree_init(igraph_psumtree_t *t, long int size);
+DECLDIR void igraph_psumtree_destroy(igraph_psumtree_t *t);
+DECLDIR igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, long int idx);
+DECLDIR long int igraph_psumtree_size(const igraph_psumtree_t *t);
+DECLDIR int igraph_psumtree_search(const igraph_psumtree_t *t, long int *idx,
+                igraph_real_t elem);
+DECLDIR int igraph_psumtree_update(igraph_psumtree_t *t, long int idx, 
+                igraph_real_t new_value);
+DECLDIR igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
 
 __END_DECLS
 

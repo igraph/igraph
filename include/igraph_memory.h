@@ -25,16 +25,7 @@
 #define REST_MEMORY_H
 
 #include <stdlib.h>
-
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
+#include "igraph_decls.h"
 
 __BEGIN_DECLS
 
@@ -48,8 +39,8 @@ __BEGIN_DECLS
 /* #  define Free igraph_Free */
 /* #endif */
 
-int igraph_free(void *p);
-void *igraph_malloc(size_t n);
+DECLDIR int igraph_free(void *p);
+DECLDIR void *igraph_malloc(size_t n);
 
 __END_DECLS
 

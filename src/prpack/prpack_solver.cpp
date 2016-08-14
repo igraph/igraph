@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <algorithm>
-#include <stdint.h>
 using namespace prpack;
 using namespace std;
 

@@ -24,16 +24,7 @@
 #ifndef IGRAPH_NONGRAPH_H
 #define IGRAPH_NONGRAPH_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_constants.h"
 #include "igraph_matrix.h"
 #include "igraph_types.h"
@@ -79,23 +70,23 @@ typedef struct igraph_plfit_result_t {
   double p;
 } igraph_plfit_result_t;
 
-int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res, 
-			igraph_integer_t binwidth);
-int igraph_fisher_yates_shuffle(igraph_vector_t *seq);
-int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h, 
-			 igraph_integer_t length);
-int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
-		       igraph_matrix_t *rescoords);
-int igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
-		  igraph_real_t (*f)(igraph_real_t x, void *info),
-		  void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res);
-int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin, 
-		igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
-		int maxit, int trace,
-		igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
-		igraph_integer_t *fncount, igraph_integer_t *grcount);
-int igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
-                         igraph_real_t xmin, igraph_bool_t force_continuous);
+DECLDIR int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res, 
+                igraph_integer_t binwidth);
+DECLDIR int igraph_fisher_yates_shuffle(igraph_vector_t *seq);
+DECLDIR int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h, 
+                igraph_integer_t length);
+DECLDIR int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
+                igraph_matrix_t *rescoords);
+DECLDIR int igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
+                igraph_real_t (*f)(igraph_real_t x, void *info),
+                void *info, igraph_real_t *Tol, int *Maxit, igraph_real_t *res);
+DECLDIR int igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin, 
+                igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
+                int maxit, int trace,
+                igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
+                igraph_integer_t *fncount, igraph_integer_t *grcount);
+DECLDIR int igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
+                igraph_real_t xmin, igraph_bool_t force_continuous);
 
 __END_DECLS
 

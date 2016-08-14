@@ -24,16 +24,7 @@
 #ifndef IGRAPH_MOTIFS_H
 #define IGRAPH_MOTIFS_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_iterators.h"
@@ -73,33 +64,33 @@ typedef igraph_bool_t igraph_motifs_handler_t(const igraph_t *graph,
 					      int isoclass,
 					      void* extra);
 
-int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
-			  int size, const igraph_vector_t *cut_prob);
+DECLDIR int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
+                int size, const igraph_vector_t *cut_prob);
 
-int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
-				   const igraph_vector_t *cut_prob,
-				   igraph_motifs_handler_t *callback,
-				   void* extra);
+DECLDIR int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
+                const igraph_vector_t *cut_prob,
+                igraph_motifs_handler_t *callback,
+                void* extra);
 
-int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
-				   int size, const igraph_vector_t *cut_prob, 
-				   igraph_integer_t sample_size, 
-				   const igraph_vector_t *sample);
-int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
-			     int size, const igraph_vector_t *cut_prob);
+DECLDIR int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
+                int size, const igraph_vector_t *cut_prob, 
+                igraph_integer_t sample_size, 
+                const igraph_vector_t *sample);
+DECLDIR int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
+                int size, const igraph_vector_t *cut_prob);
 
-int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
-		       igraph_integer_t *asym, igraph_integer_t *null);
-int igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
-int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
-			   igraph_integer_t *res4);
+DECLDIR int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
+                igraph_integer_t *asym, igraph_integer_t *null);
+DECLDIR int igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
+DECLDIR int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
+                igraph_integer_t *res4);
 
-int igraph_adjacent_triangles(const igraph_t *graph,
-			      igraph_vector_t *res,
-			      const igraph_vs_t vids);
+DECLDIR int igraph_adjacent_triangles(const igraph_t *graph,
+                igraph_vector_t *res,
+                const igraph_vs_t vids);
 
-int igraph_list_triangles(const igraph_t *graph,
-			  igraph_vector_int_t *res);
+DECLDIR int igraph_list_triangles(const igraph_t *graph,
+                igraph_vector_int_t *res);
 
 __END_DECLS
 

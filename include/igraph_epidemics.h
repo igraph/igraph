@@ -24,16 +24,7 @@
 #ifndef IGRAPH_EPIDEMICS_H
 #define IGRAPH_EPIDEMICS_H
 
-#undef __BEGIN_DECLS
-#undef __END_DECLS
-#ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
-#else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
-#endif
-
+#include "igraph_decls.h"
 #include "igraph_datatype.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
@@ -63,12 +54,12 @@ typedef struct igraph_sir_t {
   igraph_vector_int_t no_s, no_i, no_r;
 } igraph_sir_t;
 
-int igraph_sir_init(igraph_sir_t *sir);
-void igraph_sir_destroy(igraph_sir_t *sir);
+DECLDIR int igraph_sir_init(igraph_sir_t *sir);
+DECLDIR void igraph_sir_destroy(igraph_sir_t *sir);
 
-int igraph_sir(const igraph_t *graph, igraph_real_t beta,
-	       igraph_real_t gamma, igraph_integer_t no_sim,
-	       igraph_vector_ptr_t *result);
+DECLDIR int igraph_sir(const igraph_t *graph, igraph_real_t beta,
+                igraph_real_t gamma, igraph_integer_t no_sim,
+                igraph_vector_ptr_t *result);
 
 __END_DECLS
 

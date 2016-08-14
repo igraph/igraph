@@ -52,7 +52,7 @@
 #define CHOLMOD_CYGWIN
 #else
 #define CHOLMOD_WINDOWS
-#define BLAS_NO_UNDERSCORE
+//#define BLAS_NO_UNDERSCORE
 #endif
 #define CHOLMOD_ARCHITECTURE "Microsoft Windows"
 
