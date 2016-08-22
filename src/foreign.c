@@ -2727,6 +2727,17 @@ int igraph_i_dot_escape(const char *orig, char **result) {
   /* do we have to escape the string at all? */
   long int i, j, len=(long int) strlen(orig), newlen=0;
   igraph_bool_t need_quote=0, is_number=1;
+
+  /* first, check whether the string is equal to some reserved word */
+  if (!strcasecmp(orig, "graph") || !strcasecmp(orig, "digraph") ||
+      !strcasecmp(orig, "node") || !strcasecmp(orig, "edge") ||
+      !strcasecmp(orig, "strict") || !strcasecmp(orig, "subgraph")) {
+    need_quote=1;
+    is_number=0;
+  }
+
+  /* next, check whether we need to escape the string for any other reason.
+   * Also update is_number and newlen */
   for (i=0; i<len; i++) {
 	if (isdigit(orig[i])) { newlen++; }
 	else if (orig[i] == '-' && i==0) { newlen++; }
