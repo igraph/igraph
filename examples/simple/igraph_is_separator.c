@@ -40,6 +40,15 @@ int main() {
   /* Same graph, but another vertex */
   igraph_is_separator(&graph, igraph_vss_1(6), &result);
   if (result) FAIL("Non-center of star graph failed.", 2);
+
+  /* Same graph, all vertices but the center */
+  igraph_is_separator(&graph, igraph_vss_seq(1, 9), &result);
+  if (result) FAIL("All non-central vertices of star graph failed.", 5);
+  igraph_destroy(&graph);
+
+  /* Same graph, all vertices */
+  igraph_is_separator(&graph, igraph_vss_seq(0, 9), &result);
+  if (result) FAIL("All vertices of star graph failed.", 6);
   igraph_destroy(&graph);
 
   /* Karate club */

@@ -47,7 +47,7 @@ int igraph_i_is_separator(const igraph_t *graph,
   long int start=0;
 
   if (IGRAPH_VIT_SIZE(*vit) >= no_of_nodes-1) {
-    /* Just need to check that we really have n-1 vertices in it */
+    /* Just need to check that we really have at least n-1 vertices in it */
     igraph_vector_bool_t hit;
     long int nohit=0;
     IGRAPH_CHECK(igraph_vector_bool_init(&hit, no_of_nodes));
@@ -63,8 +63,8 @@ int igraph_i_is_separator(const igraph_t *graph,
     }
     igraph_vector_bool_destroy(&hit);
     IGRAPH_FINALLY_CLEAN(1);
-    if (nohit == no_of_nodes-1) {
-      *res = 1;
+    if (nohit >= no_of_nodes-1) {
+      *res = 0;
       return 0;
     }
   }
