@@ -43,6 +43,7 @@
 #include "igraph_topology.h"
 #include "igraph_qsort.h"
 #include "config.h"
+#include "structural_properties_internal.h"
 
 #include <assert.h>
 #include <string.h>
@@ -1737,17 +1738,6 @@ int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
 
 }
 
-int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
-				      const igraph_vs_t vids, 
-				      igraph_vector_t *map,
-				      igraph_vector_t *invmap);
-
-int igraph_i_subgraph_create_from_scratch(const igraph_t *graph, 
-					  igraph_t *res,
-					  const igraph_vs_t vids,
-					  igraph_vector_t *map,
-					  igraph_vector_t *invmap);
-
 /**
  * Subgraph creation, old version: it copies the graph and then deletes
  * unneeded vertices.
@@ -1814,8 +1804,9 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
   igraph_bool_t directed = igraph_is_directed(graph);
   long int no_of_nodes = igraph_vcount(graph);
   long int no_of_new_nodes = 0;
-  char* seen_edges = 0;
   long int i, j, n;
+  long int to;
+	igraph_integer_t eid;
   igraph_vector_t vids_old2new, vids_new2old;
   igraph_vector_t eids_new2old;
   igraph_vector_t nei_edges;
@@ -1828,7 +1819,7 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
    * opposite order */
   IGRAPH_VECTOR_INIT_FINALLY(&eids_new2old, 0);
   if (invmap) {
-    my_vids_new2old=invmap;
+    my_vids_new2old = invmap;
     igraph_vector_clear(my_vids_new2old);
   } else {
     IGRAPH_VECTOR_INIT_FINALLY(&vids_new2old, 0);
@@ -1836,7 +1827,7 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
   IGRAPH_VECTOR_INIT_FINALLY(&new_edges, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&nei_edges, 0);
   if (map) {
-    my_vids_old2new=map;
+    my_vids_old2new = map;
     IGRAPH_CHECK(igraph_vector_resize(map, no_of_nodes));
     igraph_vector_null(map);
   } else {
@@ -1863,65 +1854,42 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
   for (i = 0; i < n; i++) {
     long int vid = (long int) VECTOR(nei_edges)[i];
     if (VECTOR(*my_vids_old2new)[vid] == 0) {
-      VECTOR(*my_vids_old2new)[vid] = ++no_of_new_nodes;
+			IGRAPH_CHECK(igraph_vector_push_back(my_vids_new2old, vid));
+			no_of_new_nodes++;
+      VECTOR(*my_vids_old2new)[vid] = no_of_new_nodes;
     }
   }
 
-  /* Allocate some memory for the seen_edges array that avoids processing edges
-   * twice for undirected graphs */
-  if (!directed) {
-    seen_edges = igraph_Calloc(igraph_ecount(graph), char);
-    if (seen_edges == 0)
-      IGRAPH_ERROR("cannot calculate subgraph", IGRAPH_ENOMEM);
-    IGRAPH_FINALLY(igraph_free, seen_edges);
-  }
+  /* Create the new edge list */
+  for (i = 0; i < no_of_new_nodes; i++) {
+		long int old_vid = (long int) VECTOR(*my_vids_new2old)[i];
+    long int new_vid = i;
 
-  /* Calculate the mapping from the new node IDs to the new ones
-   * and also create the new edge list */
-  IGRAPH_CHECK(igraph_vector_resize(my_vids_new2old, no_of_new_nodes));
-  for (i = 0; i < no_of_nodes; i++) {
-    long int new_vid = (long int) VECTOR(*my_vids_old2new)[i] - 1;
-    if (new_vid < 0)
-      continue;
-
-    VECTOR(*my_vids_new2old)[new_vid] = i;
-
-    IGRAPH_CHECK(igraph_incident(graph, &nei_edges, (igraph_integer_t) i,
-				 IGRAPH_OUT));
+    IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
     n = igraph_vector_size(&nei_edges);
 
     if (directed) {
       for (j = 0; j < n; j++) {
-        igraph_integer_t eid  = (igraph_integer_t) VECTOR(nei_edges)[j];
-        long int from, to;
+				eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
-        from = (long int) VECTOR(*my_vids_old2new)[
-				(long int)IGRAPH_FROM(graph, eid) ];
-        if (!from) continue;
-        to = (long int) VECTOR(*my_vids_old2new)[
-				(long int)IGRAPH_TO(graph, eid)];
+        to = (long int) VECTOR(*my_vids_old2new)[ (long int)IGRAPH_TO(graph, eid) ];
         if (!to) continue;
 
-        IGRAPH_CHECK(igraph_vector_push_back(&new_edges, from-1));
+        IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
         IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to-1));
         IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
       }
     } else {
       for (j = 0; j < n; j++) {
-        igraph_integer_t eid  = (igraph_integer_t) VECTOR(nei_edges)[j];
-        long int from, to;
+				eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
-        from = (long int) VECTOR(*my_vids_old2new)[
-				(long int)IGRAPH_FROM(graph, eid)];
-        if (!from) continue;
-        to = (long int) VECTOR(*my_vids_old2new)[
-			        (long int)IGRAPH_TO(graph, eid)];
-        if (!to) continue;
-        if (seen_edges[(long int)eid])
+        if (IGRAPH_FROM(graph, eid) != old_vid)   /* avoid processing edges twice */
           continue;
 
-        seen_edges[(long int)eid] = 1;
-        IGRAPH_CHECK(igraph_vector_push_back(&new_edges, from-1));
+        to = (long int) VECTOR(*my_vids_old2new)[ (long int)IGRAPH_TO(graph, eid) ];
+        if (!to) continue;
+
+        IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
         IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to-1));
         IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
       }
@@ -1929,10 +1897,6 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
   }
 
   /* Get rid of some vectors that are not needed anymore */
-  if (!directed) {
-    igraph_free(seen_edges);
-    IGRAPH_FINALLY_CLEAN(1);
-  }
   if (!map) {
     igraph_vector_destroy(&vids_old2new);
     IGRAPH_FINALLY_CLEAN(1);
@@ -2066,6 +2030,26 @@ int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
 				     /* invmap= */ 0);
 }
 
+igraph_subgraph_implementation_t igraph_i_induced_subgraph_suggest_implementation(
+    const igraph_t *graph, const igraph_vs_t vids) {
+  double ratio;
+  igraph_integer_t num_vs;
+
+  if (igraph_vs_is_all(&vids)) {
+    ratio = 1.0;
+  } else {
+    IGRAPH_CHECK(igraph_vs_size(graph, &vids, &num_vs));
+    ratio = (igraph_real_t) num_vs / igraph_vcount(graph);
+  }
+
+  /* TODO: needs benchmarking; threshold was chosen totally arbitrarily */
+  if (ratio > 0.5) {
+    return IGRAPH_SUBGRAPH_COPY_AND_DELETE;
+  } else {
+    return IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;
+  }
+}
+
 int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 				const igraph_vs_t vids, 
 				igraph_subgraph_implementation_t impl,
@@ -2073,20 +2057,7 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 				igraph_vector_t *invmap) {
 
   if (impl == IGRAPH_SUBGRAPH_AUTO) {
-    double ratio;
-
-    if (igraph_vs_is_all(&vids))
-      ratio = 1.0;
-    else {
-      igraph_integer_t num_vs;
-      IGRAPH_CHECK(igraph_vs_size(graph, &vids, &num_vs));
-      ratio = (igraph_real_t) num_vs / igraph_vcount(graph);
-    }
-
-    if (ratio > 0.5)
-      impl = IGRAPH_SUBGRAPH_COPY_AND_DELETE;
-    else
-      impl = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;
+    impl = igraph_i_induced_subgraph_suggest_implementation(graph, vids);
   }
 
   switch (impl) {
