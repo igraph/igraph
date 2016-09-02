@@ -4,6 +4,7 @@
 #if !defined(_MSC_VER) && !defined (__MINGW32__) && !defined (__MINGW64__)
 #  include <stdint.h>
 #else
+#  include <stdio.h>
 typedef __int64 int64_t;
 #endif
 
