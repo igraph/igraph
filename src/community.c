@@ -858,7 +858,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * See also Clauset, A.; Newman, M. E. J.; Moore, C. Finding
  * community structure in very large networks, Physical Review E,
  * 2004, 70, 066111.
- * \param graph The input graph.
+ * \param graph The input graph. It must be undirected; directed graphs are
+ *     not supported yet.
  * \param membership Numeric vector which gives the type of each
  *     vertex, ie. the component to which it belongs.
  *     It does not have to be consecutive, i.e. empty communities are
@@ -884,6 +885,10 @@ int igraph_modularity(const igraph_t *graph,
   igraph_integer_t from, to;
   igraph_real_t m;
   long int c1, c2;
+
+  if (igraph_is_directed(graph)) {
+    IGRAPH_ERROR("modularity is implemented for undirected graphs", IGRAPH_EINVAL);
+  }
 
   if (igraph_vector_size(membership) < igraph_vcount(graph)) {
     IGRAPH_ERROR("cannot calculate modularity, membership vector too short",
