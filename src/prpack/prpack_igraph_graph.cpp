@@ -8,11 +8,11 @@ using namespace std;
 #ifdef PRPACK_IGRAPH_SUPPORT
 
 prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_t* weights,
-		igraph_bool_t directed) {
+        igraph_bool_t directed) {
     const igraph_bool_t treat_as_directed = igraph_is_directed(g) && directed;
     igraph_es_t es;
     igraph_eit_t eit;
-	igraph_vector_t neis;
+    igraph_vector_t neis;
     long int i, j, eid, sum, temp, num_ignored_es;
     int *p_head, *p_head_copy;
     double* p_weight;
@@ -21,7 +21,7 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     // an edge in both directions.
     num_vs = igraph_vcount(g);
     num_es = igraph_ecount(g);
-	num_self_es = 0;
+    num_self_es = 0;
     if (!treat_as_directed) {
         num_es *= 2;
     }
@@ -39,15 +39,15 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     // Count the number of ignored edges (those with negative or zero weight)
     num_ignored_es = 0;
 
-	if (treat_as_directed) {
-		// Select all the edges and iterate over them by the source vertices
-		es = igraph_ess_all(IGRAPH_EDGEORDER_TO);
+    if (treat_as_directed) {
+        // Select all the edges and iterate over them by the source vertices
+        es = igraph_ess_all(IGRAPH_EDGEORDER_TO);
 
-		// Add the edges
-		igraph_eit_create(g, es, &eit);
-		while (!IGRAPH_EIT_END(eit)) {
-			eid = IGRAPH_EIT_GET(eit);
-			IGRAPH_EIT_NEXT(eit);
+        // Add the edges
+        igraph_eit_create(g, es, &eit);
+        while (!IGRAPH_EIT_END(eit)) {
+            eid = IGRAPH_EIT_GET(eit);
+            IGRAPH_EIT_NEXT(eit);
 
             // Handle the weight
             if (weights != 0) {
@@ -58,30 +58,30 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
                     continue;
                 }
 
-				*p_weight = VECTOR(*weights)[eid];
-				++p_weight;
+                *p_weight = VECTOR(*weights)[eid];
+                ++p_weight;
             }
 
-			*p_head = IGRAPH_FROM(g, eid);
-			++p_head;
-			++tails[IGRAPH_TO(g, eid)];
+            *p_head = IGRAPH_FROM(g, eid);
+            ++p_head;
+            ++tails[IGRAPH_TO(g, eid)];
 
-			if (IGRAPH_FROM(g, eid) == IGRAPH_TO(g, eid)) {
-				++num_self_es;
-			}
-		}
-		igraph_eit_destroy(&eit);
-	} else {
-		// Select all the edges and iterate over them by the target vertices
-		igraph_vector_init(&neis, 0);
+            if (IGRAPH_FROM(g, eid) == IGRAPH_TO(g, eid)) {
+                ++num_self_es;
+            }
+        }
+        igraph_eit_destroy(&eit);
+    } else {
+        // Select all the edges and iterate over them by the target vertices
+        igraph_vector_init(&neis, 0);
 
-		for (i = 0; i < num_vs; i++) {
-			igraph_incident(g, &neis, i, IGRAPH_ALL);
-			temp = igraph_vector_size(&neis);
+        for (i = 0; i < num_vs; i++) {
+            igraph_incident(g, &neis, i, IGRAPH_ALL);
+            temp = igraph_vector_size(&neis);
 
-			// TODO: should loop edges be added in both directions?
+            // TODO: should loop edges be added in both directions?
             p_head_copy = p_head;
-			for (j = 0; j < temp; j++) {
+            for (j = 0; j < temp; j++) {
                 if (weights != 0) {
                     if (VECTOR(*weights)[(long int)VECTOR(neis)[j]] <= 0) {
                         // Ignore
@@ -89,21 +89,21 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
                         continue;
                     }
 
-					*p_weight = VECTOR(*weights)[(long int)VECTOR(neis)[j]];
-					++p_weight;
+                    *p_weight = VECTOR(*weights)[(long int)VECTOR(neis)[j]];
+                    ++p_weight;
                 }
 
-				*p_head = IGRAPH_OTHER(g, VECTOR(neis)[j], i);
-				if (i == *p_head) {
-					num_self_es++;
-				}
-				++p_head;
-			}
+                *p_head = IGRAPH_OTHER(g, VECTOR(neis)[j], i);
+                if (i == *p_head) {
+                    num_self_es++;
+                }
+                ++p_head;
+            }
             tails[i] = p_head - p_head_copy;
-		}
+        }
 
-		igraph_vector_destroy(&neis);
-	}
+        igraph_vector_destroy(&neis);
+    }
 
     // Decrease num_es by the number of ignored edges
     num_es -= num_ignored_es;
@@ -118,26 +118,26 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     // Normalize the weights
     normalize_weights();
 
-	// Debug
+    // Debug
     /*
-	printf("Heads:");
-	for (i = 0; i < num_es; ++i) {
-		printf(" %d", heads[i]);
-	}
-	printf("\n");
-	printf("Tails:");
-	for (i = 0; i < num_vs; ++i) {
-		printf(" %d", tails[i]);
-	}
-	printf("\n");
-	if (vals) {
-		printf("Vals:");
-		for (i = 0; i < num_es; ++i) {
-			printf(" %.4f", vals[i]);
-		}
-		printf("\n");
-	}
-	printf("===========================\n");
+    printf("Heads:");
+    for (i = 0; i < num_es; ++i) {
+        printf(" %d", heads[i]);
+    }
+    printf("\n");
+    printf("Tails:");
+    for (i = 0; i < num_vs; ++i) {
+        printf(" %d", tails[i]);
+    }
+    printf("\n");
+    if (vals) {
+        printf("Vals:");
+        for (i = 0; i < num_es; ++i) {
+            printf(" %.4f", vals[i]);
+        }
+        printf("\n");
+    }
+    printf("===========================\n");
     */
 }
 
