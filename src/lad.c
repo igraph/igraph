@@ -1426,13 +1426,9 @@ int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
 
 cleanup:
   igraph_free(globalMatching);
-  if (! igraph_vector_ptr_empty(alloc_history)) {
-    igraph_vector_ptr_pop_back(alloc_history);
-  }
+  igraph_vector_ptr_pop_back(alloc_history);
   igraph_free(nbVal);
-  if (!igraph_vector_ptr_empty(alloc_history)) {
-    igraph_vector_ptr_pop_back(alloc_history);
-  }
+  igraph_vector_ptr_pop_back(alloc_history);
 
   return 0;
 }
