@@ -300,7 +300,7 @@ void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) 
 int igraph_attribute_combination_add(igraph_attribute_combination_t *comb, 
 				     const char *name,
 				     igraph_attribute_combination_type_t type,
-				     void *func) {
+				     igraph_function_pointer_t func) {
   long int i, n=igraph_vector_ptr_size(&comb->list);
 
   /* Search, in case it is already there */
@@ -368,7 +368,7 @@ int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
 int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
 				       const char *name,
 				       igraph_attribute_combination_type_t *type,
-				       void **func) {
+				       igraph_function_pointer_t *func) {
   long int i, def=-1, len=igraph_vector_ptr_size(&comb->list);
 
   for (i=0; i<len; i++) {
@@ -406,7 +406,7 @@ int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
   
   va_start(ap, comb);
   while (1) { 
-    void *func=0;
+    igraph_function_pointer_t func=0;
     igraph_attribute_combination_type_t type;
     const char *name;
     

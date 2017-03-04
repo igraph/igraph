@@ -130,10 +130,12 @@ typedef enum {
   IGRAPH_ATTRIBUTE_COMBINE_MEDIAN=11,
   IGRAPH_ATTRIBUTE_COMBINE_CONCAT=12 } igraph_attribute_combination_type_t;
 
+typedef void (*igraph_function_pointer_t)(void);
+
 typedef struct igraph_attribute_combination_record_t {
   const char *name;		/* can be NULL, meaning: the rest */
   igraph_attribute_combination_type_t type;
-  void *func;
+  igraph_function_pointer_t func;
 } igraph_attribute_combination_record_t;
 
 typedef struct igraph_attribute_combination_t {
@@ -148,13 +150,13 @@ DECLDIR void igraph_attribute_combination_destroy(igraph_attribute_combination_t
 DECLDIR int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
                 const char *name, 
                 igraph_attribute_combination_type_t type,
-                void *func);
+                igraph_function_pointer_t func);
 DECLDIR int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb, 
                 const char *name);
 DECLDIR int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
                 const char *name,
                 igraph_attribute_combination_type_t *type,
-                void **func);
+                igraph_function_pointer_t *func);
 
 /**
  * \struct igraph_attribute_table_t

@@ -1366,7 +1366,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
   long int valno=igraph_vector_ptr_size(val);
   long int i, j, keepno=0;
   int *TODO;
-  void **funcs;
+  igraph_function_pointer_t *funcs;
 
   TODO=igraph_Calloc(valno, int);
   if (!TODO) {
@@ -1374,7 +1374,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
 		 IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, TODO);
-  funcs=igraph_Calloc(valno, void*);
+  funcs=igraph_Calloc(valno, igraph_function_pointer_t);
   if (!funcs) {
     IGRAPH_ERROR("Cannot combine vertex attributes",
 		 IGRAPH_ENOMEM);
@@ -1385,7 +1385,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
     igraph_attribute_record_t *oldrec=VECTOR(*val)[i];    
     const char *name=oldrec->name;
     igraph_attribute_combination_type_t todo;
-    void *voidfunc;
+    igraph_function_pointer_t voidfunc;
     igraph_attribute_combination_query(comb, name, &todo, &voidfunc);
     TODO[i]=todo;
     funcs[i]=voidfunc;
@@ -1974,7 +1974,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
   long int ealno=igraph_vector_ptr_size(eal);
   long int i, j, keepno=0;
   int *TODO;
-  void **funcs;
+  igraph_function_pointer_t *funcs;
 
   TODO=igraph_Calloc(ealno, int);
   if (!TODO) {
@@ -1982,7 +1982,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
 		 IGRAPH_ENOMEM);
   }
   IGRAPH_FINALLY(igraph_free, TODO);
-  funcs=igraph_Calloc(ealno, void*);
+  funcs=igraph_Calloc(ealno, igraph_function_pointer_t);
   if (!funcs) {
     IGRAPH_ERROR("Cannot combine edge attributes",
 		 IGRAPH_ENOMEM);
@@ -1993,7 +1993,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
     igraph_attribute_record_t *oldrec=VECTOR(*eal)[i];    
     const char *name=oldrec->name;
     igraph_attribute_combination_type_t todo;
-    void *voidfunc;
+    igraph_function_pointer_t voidfunc;
     igraph_attribute_combination_query(comb, name, &todo, &voidfunc);
     TODO[i]=todo;
     funcs[i]=voidfunc;
