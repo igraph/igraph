@@ -23,6 +23,8 @@
 
 namespace bliss {
 
+#ifndef USING_R
+
 void
 fatal_error(const char* fmt, ...)
 {
@@ -34,5 +36,7 @@ fatal_error(const char* fmt, ...)
   va_end(ap);
   exit(1);
 }
+
+#endif
 
 }

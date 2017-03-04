@@ -15,6 +15,11 @@
 #include <ciso646>
 #endif
 
+#ifdef USING_R
+#undef stdout
+#define stdout NULL
+#endif
+
 /*
   Copyright (c) 2003-2015 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
