@@ -416,7 +416,7 @@ int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
     
     type=(igraph_attribute_combination_type_t)va_arg(ap, int);
     if (type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
-      func=va_arg(ap, void*);      
+      func=va_arg(ap, void (*)(void));
     }
 
     if (strlen(name)==0) { name=0; }
