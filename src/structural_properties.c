@@ -2574,7 +2574,7 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
 
     /* add the indirect contributions, in-in, in-out, out-in, out-out */
     for (b=0; b<igraph_vector_size(&ineis_in); b++) {
-      edge=(igraph_integer_t) VECTOR(ineis_out)[b];
+      edge=(igraph_integer_t) VECTOR(ineis_in)[b];
       igraph_edge(graph, edge, &from, &to);
       if (to==i) { to=from; }
       j=to;
