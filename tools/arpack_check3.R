@@ -13,9 +13,8 @@ arpack2 <- function (func, extra = NULL, sym = FALSE,
     complex <- FALSE
     warning("Symmetric matrix, setting `complex' to FALSE")
     }
-  on.exit(.Call("R_igraph_finalizer", PACKAGE = "igraph"))
-  .Call("R_igraph_arpack", func, extra, options, env, 
-        sym, PACKAGE = "igraph")
+  on.exit(.Call(C_R_igraph_finalizer))
+  .Call(C_R_igraph_arpack, func, extra, options, env, sym)
 }
 
 
