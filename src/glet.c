@@ -90,7 +90,7 @@ void igraph_i_subclique_next_free(void *ptr) {
   }
 }
 
-/*
+/**
  * \function igraph_subclique_next
  * Calculate subcliques of the cliques found at the previous level
  *
