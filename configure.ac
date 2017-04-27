@@ -132,7 +132,7 @@ HAVE_LIBXML=0
 if test $graphml_support = yes; then
   AC_PATH_PROG([XML2CONFIG], [xml2-config], [none])
   if test "$XML2CONFIG" = "none"; then
-	# Hmmm, no xml2-config. OS X does not have it while still
+	# Hmmm, no xml2-config. Older versions of OS X do not have it while still
 	# having libxml2, so let's try an educated guess if
 	# /usr/include/libxml2/libxml/parser.h exists.
 	AC_CHECK_FILE([/usr/include/libxml2/libxml/parser.h], [
@@ -144,6 +144,12 @@ if test $graphml_support = yes; then
   else
     XML2_LIBS=`$XML2CONFIG --libs`
     XML2_CFLAGS=`$XML2CONFIG --cflags`
+	if test -f /usr/bin/sw_vers -a `sw_vers -productVersion | grep -c "^10\.11\."` -gt 0 -a `echo $XML2_LIBS | grep -c '/Developer/'` -gt 0; then
+      # We are on OS X 10.11, which has a known bug with xml2-config; see
+      # https://github.com/igraph/igraph/issues/973 . We work around it
+      # here
+      XML2_LIBS=`$XML2CONFIG --exec-prefix=/usr --libs`
+	fi
   fi
   AC_CHECK_LIB([xml2], [xmlSAXUserParseFile], [
     ac_save_CFLAGS="$CFLAGS"
