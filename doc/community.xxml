@@ -42,6 +42,10 @@
 <!-- doxrox-include igraph_community_multilevel -->
 </section>
 
+<section><title>Fluid Communities</title>
+<!-- doxrox-include igraph_community_fluid_communities -->
+</section>
+
 <section><title>Label propagation</title>
 <!-- doxrox-include igraph_community_label_propagation -->
 </section>
