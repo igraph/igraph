@@ -1236,12 +1236,13 @@ int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
  * \function igraph_connect_neighborhood
  * \brief Connects every vertex to its neighborhood
  * 
- * This function adds new edges to the input graph. For each vertex 
- * vertices reachable by at most \p order steps and not yet connected
- * to the vertex a new edge is created.
+ * This function adds new edges to the input graph. Each vertex is connected
+ * to all vertices reachable by at most \p order steps from it
+ * (unless a connection already existed).  In other words, the \p order power of
+ * the graph is computed.
  * 
  * </para><para> Note that the input graph is modified in place, no
- * new graph is created, call \ref igraph_copy() if you want to keep
+ * new graph is created. Call \ref igraph_copy() if you want to keep
  * the original graph as well.
  * 
  * </para><para> For undirected graphs reachability is always
@@ -1261,8 +1262,8 @@ int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
  * \sa \ref igraph_lattice() uses this function to connect the
  * neighborhood of the vertices.
  * 
- * Time complexity: O(|V|*d^o), |V| is the number of vertices in the
- * graph, d is the average degree and o is the \p order argument.
+ * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
+ * graph, d is the average degree and k is the \p order argument.
  */
 
 int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
