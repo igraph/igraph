@@ -910,8 +910,8 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
  * TODO
  */
 
-int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
-			   igraph_integer_t *res4) {
+int igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
+			   igraph_real_t *res4) {
   
   long int vc=igraph_vcount(graph);
   igraph_vector_long_t seen;
@@ -1042,7 +1042,7 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
 int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
   igraph_vector_t cut_prob;
-  igraph_integer_t m2, m4;
+  igraph_real_t m2, m4;
   igraph_vector_t tmp;
   igraph_integer_t vc=igraph_vcount(graph);
   igraph_real_t total;
