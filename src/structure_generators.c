@@ -1628,13 +1628,15 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
   if (repeats<0) IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
 
-  /* Create a ring first */
-  for (i=0; i<no_of_nodes; i++) {
-    VECTOR(edges)[ptr++]=i;
-    VECTOR(edges)[ptr++]=i+1;
+  if (no_of_nodes > 0) {
+    /* Create a ring first */
+    for (i=0; i<no_of_nodes; i++) {
+      VECTOR(edges)[ptr++]=i;
+      VECTOR(edges)[ptr++]=i+1;
+    }
+    VECTOR(edges)[ptr-1]=0;
   }
-  VECTOR(edges)[ptr-1]=0;
-  
+
   /* Then add the rest */
   while (ptr<2*no_of_edges) {
     long int sh=(long int) VECTOR(*shifts)[sptr % no_of_shifts];
