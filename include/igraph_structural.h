@@ -80,6 +80,7 @@ DECLDIR int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
 DECLDIR int igraph_density(const igraph_t *graph, igraph_real_t *res, 
                 igraph_bool_t loops);
 
+DECLDIR int igraph_has_loop(const igraph_t *graph, igraph_bool_t *res); 
 DECLDIR int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res, 
                 igraph_es_t es);
 DECLDIR int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);

@@ -778,22 +778,31 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  */
 
 int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
-		      igraph_bool_t *iso) {
+                      igraph_bool_t *iso) {
   
   long int nodes1=igraph_vcount(graph1), nodes2=igraph_vcount(graph2);
   long int edges1=igraph_ecount(graph1), edges2=igraph_ecount(graph2);
   igraph_bool_t dir1=igraph_is_directed(graph1), dir2=igraph_is_directed(graph2);
+  igraph_bool_t loop1, loop2;
 
   if (dir1 != dir2) {
     IGRAPH_ERROR("Cannot compare directed and undirected graphs", IGRAPH_EINVAL);
   } else if (nodes1 != nodes2 || edges1 != edges2) { 
     *iso=0;
   } else if (nodes1==3 || nodes1==4) {
-	igraph_isomorphic_34(graph1, graph2, iso);
+    IGRAPH_CHECK(igraph_has_loop(graph1, &loop1));
+    IGRAPH_CHECK(igraph_has_loop(graph2, &loop2));
+    if (!loop1 && !loop2) {
+      IGRAPH_CHECK(igraph_isomorphic_34(graph1, graph2, iso));
+    } else {
+      IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
+                0, 0, /*sh=*/ IGRAPH_BLISS_F, 0, 0));
+    }
   } else {
-    igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso, 0, 0, /*sh=*/ IGRAPH_BLISS_F, 0, 0);
+    IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
+                0, 0, /*sh=*/ IGRAPH_BLISS_F, 0, 0));
   }
-				
+                
   return 0;
 }
 

@@ -3474,6 +3474,37 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
 }
 
 /**
+ * \function igraph_has_loop
+ * \brief Returns whether the graph has at least one loop edge.
+ * 
+ * </para><para>
+ * A loop edge is an edge from a vertex to itself.
+ * \param graph The input graph.
+ * \param res Pointer to an initialized boolean vector for storing the result.
+ * 
+ * \sa \ref igraph_simplify() to get rid of loop edges.
+ *
+ * Time complexity: O(e), the number of edges to check.
+ * 
+ * \example examples/simple/igraph_has_loop.c
+ */
+
+int igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
+  long int i, m = igraph_ecount(graph);
+
+  *res = 0;
+
+  for (i = 0; i < m; i++) {
+    if (IGRAPH_FROM(graph, i) == IGRAPH_TO(graph, i)) {
+      *res = 1;
+      break;
+    }
+  }
+  
+  return 0;
+}
+
+/**
  * \function igraph_is_loop
  * \brief Find the loop edges in a graph.
  * 
