@@ -75,7 +75,7 @@ int main() {
   igraph_destroy(&g);
 
   // Regression test for bug #996
-  igraph_lcf(&g, 0);
+  igraph_lcf(&g, 0, 0);
   if (igraph_vcount(&g) != 0 || igraph_ecount(&g) != 0) {
     printf("Failure: regression test for #996\n");
     return 1;
