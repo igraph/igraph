@@ -1045,6 +1045,7 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
   igraph_integer_t m2, m4;
   igraph_vector_t tmp;
   igraph_integer_t vc=igraph_vcount(graph);
+  igraph_real_t total;
 
   if (!igraph_is_directed(graph)) {
     IGRAPH_WARNING("Triad census called on an undirected graph");
@@ -1056,13 +1057,17 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
   igraph_vector_null(res);
   IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
   IGRAPH_CHECK(igraph_triad_census_24(graph, &m2, &m4));
+
+  total = ((igraph_real_t)vc) * (vc-1);
+  total *= (vc-2);
+  total /= 6;
   
   /* Reorder */
   if (igraph_is_directed(graph)) {    
     VECTOR(tmp)[0] = 0;
     VECTOR(tmp)[1] = m2;
     VECTOR(tmp)[3] = m4;
-    VECTOR(tmp)[0] = vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
+    VECTOR(tmp)[0] = total - igraph_vector_sum(&tmp);
 
     VECTOR(*res)[0] = VECTOR(tmp)[0];
     VECTOR(*res)[1] = VECTOR(tmp)[1];
@@ -1083,7 +1088,7 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
   } else {
     VECTOR(tmp)[0] = 0;
     VECTOR(tmp)[1] = m2;
-    VECTOR(tmp)[0] = vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
+    VECTOR(tmp)[0] = total - igraph_vector_sum(&tmp);
 
     VECTOR(*res)[0] = VECTOR(tmp)[0];
     VECTOR(*res)[2] = VECTOR(tmp)[1];
