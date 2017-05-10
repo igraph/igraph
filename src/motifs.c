@@ -836,7 +836,8 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
  * \param asym Pointer to an integer, the number of asymmetric dyads
  *    is stored here.
  * \param null Pointer to an integer, the number of null dyads is
- *    stored here.
+ *    stored here. In case of an integer overflow (i.e. too many
+ *    null dyads), -1 will be returned.
  * \return Error code.
  *
  * \sa \ref igraph_reciprocity(), \ref igraph_triad_census().
@@ -896,8 +897,8 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 		*null = (vc/2) * (vc-1);
 	}
 	if (*null < vc) {
-		IGRAPH_WARNING("Integer overflow, returning zero");
-		*null = IGRAPH_NAN;
+		IGRAPH_WARNING("Integer overflow, returning -1");
+		*null = -1;
 	} else {
 		*null = *null-(*mut)-(*asym);
 	}
