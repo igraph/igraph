@@ -128,6 +128,9 @@ DECLDIR int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t 
 
 DECLDIR int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob, 
                 igraph_bool_t loops, igraph_bool_t multiple);
+DECLDIR int igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
+                igraph_bool_t loops, igraph_neimode_t mode);
+
 DECLDIR int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                 igraph_integer_t size, igraph_integer_t nei,
                 igraph_real_t p, igraph_bool_t loops, 

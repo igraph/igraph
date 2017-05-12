@@ -38,6 +38,7 @@
 <!-- doxrox-include igraph_erdos_renyi_game -->
 <!-- doxrox-include igraph_watts_strogatz_game -->
 <!-- doxrox-include igraph_rewire_edges -->
+<!-- doxrox-include igraph_rewire_directed_edges -->
 <!-- doxrox-include igraph_degree_sequence_game -->
 <!-- doxrox-include igraph_k_regular_game -->
 <!-- doxrox-include igraph_static_fitness_game -->

@@ -2908,6 +2908,116 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
 }
 
 /**
+ * \function igraph_rewire_directed_edges
+ * \brief Rewire the chosen endpoint of directed edges
+ *
+ * This function rewires either the start or end of directed edges in a graph
+ * with a constant probability. Correspondingly, either the in-degree sequence
+ * or the out-degree sequence of the graph will be preserved.
+ *
+ * </para><para> Note that this function modifies the input \p graph,
+ * call \ref igraph_copy() if you want to keep it.
+ *
+ * \param graph The input graph, this will be rewired, it can be
+ *    directed or undirected. If it is directed, \ref igraph_rewire_edges()
+ *    will be called.
+ * \param prob The rewiring probability, a constant between zero and
+ *    one (inclusive).
+ * \param loops Boolean, whether loop edges are allowed in the new
+ *    graph, or not.
+ * \param mode The endpoints of directed edges to rewire. It is ignored for
+ *    undirected graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          rewire the end of each directed edge
+ *        \cli IGRAPH_IN
+ *          rewire the start of each directed edge
+ *        \cli IGRAPH_ALL
+ *          rewire both endpoints of each edge
+ *        \endclist
+ * \return Error code.
+ *
+ * \sa \ref igraph_rewire_edges(), \ref igraph_rewire()
+ *
+ * Time complexity: O(|E|).
+ */
+
+int igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
+                                 igraph_bool_t loops, igraph_neimode_t mode) {
+
+  if (prob < 0 || prob > 1) {
+    IGRAPH_ERROR("Rewiring probability should be between zero and one",
+         IGRAPH_EINVAL);
+  }
+
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
+      mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
+
+  if (prob == 0) {
+    return IGRAPH_SUCCESS;
+  }
+
+  if (igraph_is_directed(graph) && mode != IGRAPH_ALL) {
+    igraph_t newgraph;
+    long int no_of_edges = igraph_ecount(graph);
+    long int no_of_nodes = igraph_vcount(graph);
+    long int to_rewire;
+    long int offset;
+    igraph_vector_t edges;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
+
+    switch (mode) {
+    case IGRAPH_IN:
+      offset = 0;
+      break;
+    case IGRAPH_OUT:
+      offset = 1;
+      break;
+    case IGRAPH_ALL:
+      break; /* suppress compiler warning */
+    }
+
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
+
+    RNG_BEGIN();
+
+    to_rewire = RNG_GEOM(prob);
+    while (to_rewire < no_of_edges) {
+      if (loops) {
+        VECTOR(edges)[2*to_rewire + offset] = RNG_INTEGER(0, no_of_nodes-1);
+      } else {
+        long int nei= (long int) VECTOR(edges)[2*to_rewire + (1-offset)];
+        long int r = RNG_INTEGER(0, no_of_nodes-2);
+        VECTOR(edges)[2*to_rewire + offset] = (r != nei ? r : no_of_nodes-1);
+      }
+      to_rewire += RNG_GEOM(prob)+1;
+    }
+
+    RNG_END();
+
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges, (igraph_integer_t) no_of_nodes,
+                   igraph_is_directed(graph)));
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_FINALLY(igraph_destroy, &newgraph);
+    IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
+    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
+    IGRAPH_FINALLY_CLEAN(1);
+    igraph_destroy(graph);
+    *graph=newgraph;
+
+  } else {
+    IGRAPH_CHECK(igraph_rewire_edges(graph, prob, loops, /* multiple = */ 0));
+  }
+
+  return 0;
+}
+
+/**
  * \function igraph_watts_strogatz_game
  * \brief The Watts-Strogatz small-world model
  * 
