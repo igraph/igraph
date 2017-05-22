@@ -228,6 +228,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
   igraph_vector_bool_t Qcheck;
   long int Qptr=0;
   igraph_integer_t conn;
+  igraph_bool_t is_simple;
 
   igraph_t *graph_copy;
   
@@ -242,6 +243,12 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 
   if (igraph_is_directed(graph)) {
     IGRAPH_ERROR("Cohesive blocking only works on undirected graphs",
+		 IGRAPH_EINVAL);
+  }
+
+  IGRAPH_CHECK(igraph_is_simple(graph, &is_simple));
+  if (!is_simple) {
+    IGRAPH_ERROR("Cohesive blocking only works on simple graphs",
 		 IGRAPH_EINVAL);
   }
 
