@@ -4625,6 +4625,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   if (vertices || edges) {
     for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
       long int node=IGRAPH_VIT_GET(vit);
+      long int size, act, edge;
       igraph_vector_t *vvec=0, *evec=0;
       if (vertices) {
 	vvec=VECTOR(*vertices)[i];
@@ -4637,30 +4638,27 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
       
       IGRAPH_ALLOW_INTERRUPTION();
       
-      if (parents[node]>0) {
-	long int size=0;
-	long int act=node;
-	long int edge;
-	while (parents[act]) {
-	  size++;
-	  edge=parents[act]-1;
-	  act=IGRAPH_OTHER(graph, edge, act);
-	}
-	if (vvec) { 
-	  IGRAPH_CHECK(igraph_vector_resize(vvec, size+1)); 
-	  VECTOR(*vvec)[size]=node;
-	}
-	if (evec) {
-	  IGRAPH_CHECK(igraph_vector_resize(evec, size));
-	}
-	act=node;
-	while (parents[act]) {
-	  edge=parents[act]-1;
-	  act=IGRAPH_OTHER(graph, edge, act);
-	  size--;
-	  if (vvec) { VECTOR(*vvec)[size]=act; }
-	  if (evec) { VECTOR(*evec)[size]=edge; }
-	}
+      size=0;
+      act=node;
+      while (parents[act]) {
+	size++;
+	edge=parents[act]-1;
+	act=IGRAPH_OTHER(graph, edge, act);
+      }
+      if (vvec) { 
+	IGRAPH_CHECK(igraph_vector_resize(vvec, size+1)); 
+	VECTOR(*vvec)[size]=node;
+      }
+      if (evec) {
+	IGRAPH_CHECK(igraph_vector_resize(evec, size));
+      }
+      act=node;
+      while (parents[act]) {
+	edge=parents[act]-1;
+	act=IGRAPH_OTHER(graph, edge, act);
+	size--;
+	if (vvec) { VECTOR(*vvec)[size]=act; }
+	if (evec) { VECTOR(*evec)[size]=edge; }
       }
     }
   }
