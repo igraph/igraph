@@ -466,12 +466,14 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *          edges are allowed. This method was implemented under the
  *          name \c igraph_nonlinear_barabasi_game before version 0.6.
  *        \endclist
- * \param start_from Either a null pointer, or a graph. In the latter 
- *        case the graph as a starting configuration. The graph must
- *        be non-empty, i.e. it must have at least one vertex. If a
- *        graph is supplied here and the \p outseq argument is also
- *        given, then \p outseq should only contain information on the
- *        vertices that are not in the \p start_from graph.
+ * \param start_from Either a null pointer, or a graph. In the former
+ *        case, the starting configuration is a clique of size \p m.
+ *        In the latter case, the graph is a starting configuration.
+ *        The graph must be non-empty, i.e. it must have at least one
+ *        vertex. If a graph is supplied here and the \p outseq
+ *        argument is also given, then \p outseq should only contain
+ *        information on the vertices that are not in the \p
+ *        start_from graph.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n,
  *         \p m or \p outseq parameter.
