@@ -45,6 +45,10 @@
 #include <string.h>
 #include <math.h>
 
+#ifdef USING_R
+#include <R.h>
+#endif
+
 int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
   long int no=(long int) igraph_vector_max(membership)+1;
   igraph_vector_t idx;
@@ -886,9 +890,13 @@ int igraph_modularity(const igraph_t *graph,
   igraph_real_t m;
   long int c1, c2;
 
+#ifndef USING_R
   if (igraph_is_directed(graph)) {
     IGRAPH_ERROR("modularity is implemented for undirected graphs", IGRAPH_EINVAL);
   }
+#else
+  REprintf("Modularity is implemented for undirected graphs only.\n");
+#endif
 
   if (igraph_vector_size(membership) < igraph_vcount(graph)) {
     IGRAPH_ERROR("cannot calculate modularity, membership vector too short",
