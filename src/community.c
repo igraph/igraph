@@ -890,13 +890,13 @@ int igraph_modularity(const igraph_t *graph,
   igraph_real_t m;
   long int c1, c2;
 
-#ifndef USING_R
   if (igraph_is_directed(graph)) {
+#ifndef USING_R
     IGRAPH_ERROR("modularity is implemented for undirected graphs", IGRAPH_EINVAL);
-  }
 #else
-  REprintf("Modularity is implemented for undirected graphs only.\n");
+    REprintf("Modularity is implemented for undirected graphs only.\n");
 #endif
+  }
 
   if (igraph_vector_size(membership) < igraph_vcount(graph)) {
     IGRAPH_ERROR("cannot calculate modularity, membership vector too short",
