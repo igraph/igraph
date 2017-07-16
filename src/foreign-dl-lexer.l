@@ -57,8 +57,13 @@
 #define YY_EXTRA_TYPE igraph_i_dl_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 /* We assume that 'file' is 'stderr' here. */
-#define fprintf(file, msg, ...) \
-  igraph_warningf(msg, __FILE__, __LINE__, 0, __VA_ARGS__)
+#ifdef __GNUC__
+	#define fprintf(file, msg, ...) \
+	  igraph_warningf(msg, __FILE__, __LINE__, 0, ##__VA_ARGS__)
+#else
+	#define fprintf(file, msg, ...) \
+	  igraph_warningf(msg, __FILE__, __LINE__, 0, __VA_ARGS__)
+#endif
 #ifdef stdout 
 #  undef stdout
 #endif
