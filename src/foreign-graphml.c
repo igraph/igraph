@@ -34,11 +34,11 @@
 #include "igraph_memory.h"
 #include <stdarg.h> 		/* va_start & co */
 
+#define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
+
 #if HAVE_LIBXML == 1
 #include <libxml/encoding.h>
 #include <libxml/parser.h>
-
-#define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 
 xmlEntity blankEntityStruct = {
 #ifndef XML_WITHOUT_CORBA
