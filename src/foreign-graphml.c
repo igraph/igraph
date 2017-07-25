@@ -1405,13 +1405,13 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
   
   ret=fprintf(outstream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
-  ret=fprintf(outstream, "<graphml xmlns=\"" GRAPHML_NAMESPACE_URI "\"\n");
+  ret=fprintf(outstream, "<graphml xmlns=\"%s\"\n", GRAPHML_NAMESPACE_URI);
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
   ret=fprintf(outstream, "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
-  ret=fprintf(outstream, "         xsi:schemaLocation=\"" GRAPHML_NAMESPACE_URI "\n");
+  ret=fprintf(outstream, "         xsi:schemaLocation=\"%s\n", GRAPHML_NAMESPACE_URI);
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
-  ret=fprintf(outstream, "         " GRAPHML_NAMESPACE_URI "/1.0/graphml.xsd\">\n");
+  ret=fprintf(outstream, "         %s/1.0/graphml.xsd\">\n", GRAPHML_NAMESPACE_URI);
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
   ret=fprintf(outstream, "<!-- Created by igraph -->\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
