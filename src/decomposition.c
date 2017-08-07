@@ -204,8 +204,9 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     /* do j>=0 and set(j)=emptyset -> j:=j-1; od */ 
     /*********************************************/
     
-    while (j>=0 && VECTOR(head)[j]==0) j--;
-    
+    if (j < no_of_nodes) {
+      while (j>=0 && VECTOR(head)[j]==0) j--;
+    } 
   }
   
   igraph_adjlist_destroy(&adjlist);
