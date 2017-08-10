@@ -18,7 +18,9 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#ifdef __clang__
 #pragma clang diagnostic ignored "-Wconversion"
+#endif // __clang__
 
 #include "cs.h"
 /* [L,U,pinv]=lu(A, [q lnz unz]). lnz and unz can be guess */
