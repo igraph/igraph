@@ -67,7 +67,7 @@
 #  undef stdout
 #endif
 #define stdout 0
-#define exit(code) igraph_error("Fatal error in DL parser", __FILE__, \
+#define exit(code) igraph_error("Fatal error in PAJEK parser", __FILE__, \
 				__LINE__, IGRAPH_PARSEERROR);
 %}
 
