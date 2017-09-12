@@ -118,6 +118,11 @@ AC_ARG_ENABLE(profiling,
               AC_HELP_STRING([--enable-profiling], [Enable gprof profiling]),
               [use_gprof=$enableval], [use_gprof=no])
 
+use_asan=no
+AC_ARG_ENABLE(asan,
+			  AC_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
+			  [use_asan=$enableval], [use_asan=no])
+
 debug=no
 AC_ARG_ENABLE(debug,
               AC_HELP_STRING([--enable-debug], [Enable debug build]),
@@ -337,6 +342,13 @@ if test "$use_gprof" = "yes"; then
   CXXFLAGS="${CXXFLAGS} -pg"
 fi
 
+if test "$use_asan" = "yes"; then
+  CFLAGS="${CFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
+  CXXFLAGS="${CXXFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
+  CC="clang"
+  CXX="clang++"
+fi
+
 AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
@@ -357,4 +369,6 @@ if test "$glpk_support" != "no"; then
   AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
 fi
 AC_MSG_RESULT([  Debug build            -- $debug])
+AC_MSG_RESULT([  Clang AddressSanitizer -- $use_asan])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
+

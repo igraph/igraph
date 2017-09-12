@@ -19,3 +19,8 @@ $LIBTOOLIZE --force --copy
 autoheader
 automake --add-missing --copy
 autoconf
+
+# Try to patch ltmain.sh to allow -fsanitize=* linker flags to be passed
+# through to the linker. Don't do anything if it fails; maybe libtool has
+# been upgraded already.
+patch -N -p0 <tools/ltmain.patch || true
