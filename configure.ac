@@ -49,7 +49,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([stdarg.h stdlib.h string.h time.h unistd.h stdint.h sys/int_types.h])
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([expm1 rint rintf finite log2 snprintf log1p round fabsl fmin strcasecmp isnan strdup _strdup ftruncate stpcpy])
+AC_CHECK_FUNCS([expm1 rint rintf finite log2 snprintf log1p round fabsl fmin strcasecmp isfinite isnan strdup _strdup ftruncate stpcpy])
 AC_CHECK_DECL([stpcpy],
 	[AC_DEFINE([HAVE_STPCPY_SIGNATURE], [1], [Define to 1 if the stpcpy function has a signature])])
 LIBS=$LIBS_SAVE
@@ -343,8 +343,8 @@ if test "$use_gprof" = "yes"; then
 fi
 
 if test "$use_asan" = "yes"; then
-  CFLAGS="${CFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
-  CXXFLAGS="${CXXFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
+  CFLAGS="${CFLAGS} -g -fsanitize=address,undefined -fno-omit-frame-pointer"
+  CXXFLAGS="${CXXFLAGS} -g -fsanitize=address,undefined -fno-omit-frame-pointer"
   CC="clang"
   CXX="clang++"
 fi

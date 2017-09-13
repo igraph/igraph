@@ -1525,10 +1525,10 @@ int imin2(int x, int y)
     return (x < y) ? x : y;
 }
 
-#ifdef HAVE_WORKING_ISFINITE
+#ifdef HAVE_WORKING_ISFINITE || HAVE_ISFINITE
 /* isfinite is defined in <math.h> according to C99 */
 # define R_FINITE(x)    isfinite(x)
-#elif HAVE_WORKING_FINITE
+#elif HAVE_WORKING_FINITE || HAVE_FINITE
 /* include header needed to define finite() */
 #  ifdef HAVE_IEEE754_H
 #   include <ieee754.h>         /* newer Linuxen */
@@ -1544,9 +1544,9 @@ int imin2(int x, int y)
 
 int R_finite(double x)
 {
-#ifdef HAVE_WORKING_ISFINITE
+#ifdef HAVE_WORKING_ISFINITE || HAVE_ISFINITE
     return isfinite(x);
-#elif HAVE_WORKING_FINITE
+#elif HAVE_WORKING_FINITE || HAVE_FINITE
     return finite(x);
 #else
 /* neither finite nor isfinite work. Do we really need the AIX exception? */
