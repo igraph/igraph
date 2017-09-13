@@ -278,7 +278,12 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
     }    
   } /* for i<no_of_nodes */
 
-  *res /= normfact;
+  
+  if (normfact > 0) {
+    *res /= normfact;
+  } else {
+    *res = IGRAPH_NAN;
+  }
 
   /* clean */
   igraph_Free(already_added);
