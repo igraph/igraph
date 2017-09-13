@@ -72,8 +72,10 @@ void *thread_function(void *arg) {
   igraph_real_t *v, *workl, *workd, *d, *resid, *ax;
   int *select;
   int ido=0;
+#if IGRAPH_THREAD_SAFE
   int rvec=1;
   char *all="All";
+#endif
   int i;
 
   igraph_arpack_options_init(&options);

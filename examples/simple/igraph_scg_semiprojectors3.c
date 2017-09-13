@@ -75,6 +75,8 @@ int main() {
     printf("---\n");				\
     igraph_matrix_print(&R);			\
     printf("---\n");				\
+    igraph_sparsemat_destroy(&Lsparse);         \
+    igraph_sparsemat_destroy(&Rsparse);         \
   } while (0)
 
   /* -------------- */

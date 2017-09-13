@@ -76,18 +76,19 @@
  */
 int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
 		igraph_integer_t n, igraph_bool_t directed) {
-  igraph_real_t max=igraph_vector_max(edges)+1;
+  igraph_bool_t has_edges=igraph_vector_size(edges) > 0;
+  igraph_real_t max=has_edges ? igraph_vector_max(edges)+1 : 0;
 
   if (igraph_vector_size(edges) % 2 != 0) {
     IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
   }
-  if (!igraph_vector_isininterval(edges, 0, max-1)) {
+  if (has_edges && !igraph_vector_isininterval(edges, 0, max-1)) {
     IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
   }
 
   IGRAPH_CHECK(igraph_empty(graph, n, directed));
   IGRAPH_FINALLY(igraph_destroy, graph);
-  if (igraph_vector_size(edges)>0) {
+  if (has_edges) {
     igraph_integer_t vc=igraph_vcount(graph);
     if (vc < max) {
       IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) (max-vc), 0));

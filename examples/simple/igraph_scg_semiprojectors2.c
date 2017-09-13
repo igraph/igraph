@@ -25,7 +25,6 @@
 
 int main() {
 
-  int nodes=10;
   igraph_t g;
   igraph_matrix_t L, R;
   igraph_sparsemat_t Lsparse, Rsparse;
@@ -47,7 +46,6 @@ int main() {
   
   igraph_tree(&g, 10, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
   
-  igraph_sparsemat_init(&stochastic, nodes, nodes, igraph_ecount(&g)*2);
   igraph_matrix_complex_init(&V2, 0, 0);
   igraph_vector_init(&p, 0);
   
@@ -90,6 +88,8 @@ int main() {
     printf("---\n");				\
     igraph_matrix_print(&R);			\
     printf("---\n");				\
+    igraph_sparsemat_destroy(&Lsparse);         \
+    igraph_sparsemat_destroy(&Rsparse);         \
   } while (0)
 
   /* -------------- */

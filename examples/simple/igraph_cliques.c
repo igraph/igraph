@@ -103,6 +103,9 @@ void test_callback(const igraph_t *graph) {
     ud.list = &list;
 
     igraph_cliques_callback(graph, 0, 0, &handler, (void *) &ud);
+
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&list, igraph_vector_destroy);
+    igraph_vector_ptr_destroy_all(&list);
 }
 
 
