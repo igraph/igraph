@@ -23,4 +23,4 @@ autoconf
 # Try to patch ltmain.sh to allow -fsanitize=* linker flags to be passed
 # through to the linker. Don't do anything if it fails; maybe libtool has
 # been upgraded already.
-patch -N -p0 <tools/ltmain.patch >/dev/null || true
+patch -N -p0 -r- <tools/ltmain.patch >/dev/null || true
