@@ -169,7 +169,6 @@ int main() {
            0,5, -1);
   igraph_community_fastgreedy(&g, 0, 0, &modularity, &membership);
   show_results(&g, &modularity, 0, &membership, stdout);
-  igraph_destroy(&g);
 
   /* Regression test -- asking for optimal membership vector but not
    * providing a merge matrix or a modularity vector */
