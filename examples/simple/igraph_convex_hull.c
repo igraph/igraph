@@ -86,7 +86,7 @@ int test_collinear() {
 
 int test_degenerate() {
   igraph_matrix_t coords;
-  int i, result;
+  int result;
 
   printf("test_degenerate\n");
 
