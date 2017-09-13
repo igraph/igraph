@@ -5562,7 +5562,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   igraph_dqueue_t Q;
   igraph_vector_t neis;
   
-  long int r, v_ptr=no_of_nodes;
+  long int i, n, r, v_ptr=no_of_nodes;
 
   /* TODO: handle not-connected graphs, multiple root vertices */
 
@@ -5575,10 +5575,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   IGRAPH_FINALLY(igraph_vector_bool_destroy, &seen_edges);
   
   if (vertex_index) { 
-    long int i;
-    IGRAPH_CHECK(igraph_vector_resize(vertex_index, 
-				      no_of_nodes > no_of_edges+1 ? 
-				      no_of_nodes : no_of_edges+1));
+    IGRAPH_CHECK(igraph_vector_resize(vertex_index, no_of_nodes));
     for (i=0; i<no_of_nodes; i++) {
       VECTOR(*vertex_index)[i] = i;
     }
@@ -5592,7 +5589,6 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   
     while (!igraph_dqueue_empty(&Q)) {
       long int actnode=(long int) igraph_dqueue_pop(&Q);
-      long int i, n;
       
       IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode,
 				   mode));
@@ -5619,7 +5615,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 	  } else {
 	    
 	    if (vertex_index) { 
-	      VECTOR(*vertex_index)[v_ptr] = nei;
+	      IGRAPH_CHECK(igraph_vector_push_back(vertex_index, nei));
 	    }
 	    
 	    if (from==nei) {
