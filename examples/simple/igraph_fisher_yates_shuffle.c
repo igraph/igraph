@@ -102,5 +102,5 @@ int main() {
   ret = igraph_vector_shuffle(&v);
   igraph_vector_destroy(&v);
 
-  return 0;
+  return ret == 0 ? 0 : 6;
 }

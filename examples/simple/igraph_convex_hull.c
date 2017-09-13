@@ -124,7 +124,7 @@ int test_bug_805() {
   for (i=0; i<66; i++) MATRIX(coords, i/2, i%2) = coords_array[i/2][i%2];
   result = check_convex_hull(&coords);
   igraph_matrix_destroy(&coords);
-  return 0;
+  return result;
 }
 
 int main() {
