@@ -343,8 +343,8 @@ if test "$use_gprof" = "yes"; then
 fi
 
 if test "$use_asan" = "yes"; then
-  CFLAGS="${CFLAGS} -g -fsanitize=address,undefined -fno-omit-frame-pointer"
-  CXXFLAGS="${CXXFLAGS} -g -fsanitize=address,undefined -fno-omit-frame-pointer"
+  CFLAGS="${CFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
+  CXXFLAGS="${CXXFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
   CC="clang"
   CXX="clang++"
 fi
