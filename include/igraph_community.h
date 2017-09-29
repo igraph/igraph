@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -34,11 +34,13 @@
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
-/* K-Cores                                            */
+/* K-Cores and K-Truss                                */
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
                 igraph_neimode_t mode);
+DECLDIR int igraph_truss(const igraph_t* graph,
+                igraph_vector_int_t* truss);
 
 /* -------------------------------------------------- */
 /* Community Structure                                */
@@ -57,15 +59,15 @@ DECLDIR int igraph_community_spinglass(const igraph_t *graph,
                 const igraph_vector_t *weights,
                 igraph_real_t *modularity,
                 igraph_real_t *temperature,
-                igraph_vector_t *membership, 
-                igraph_vector_t *csize, 
+                igraph_vector_t *membership,
+                igraph_vector_t *csize,
                 igraph_integer_t spins,
                 igraph_bool_t parupdate,
                 igraph_real_t starttemp,
                 igraph_real_t stoptemp,
                 igraph_real_t coolfact,
                 igraph_spincomm_update_t update_rule,
-                igraph_real_t gamma, 
+                igraph_real_t gamma,
                 /* the rest is for the NegSpin implementation */
                 igraph_spinglass_implementation_t implementation,
 /* 			          igraph_matrix_t *adhesion, */
@@ -84,12 +86,12 @@ DECLDIR int igraph_community_spinglass_single(const igraph_t *graph,
                 igraph_integer_t spins,
                 igraph_spincomm_update_t update_rule,
                 igraph_real_t gamma);
-				   
-DECLDIR int igraph_community_walktrap(const igraph_t *graph, 
+
+DECLDIR int igraph_community_walktrap(const igraph_t *graph,
                 const igraph_vector_t *weights,
                 int steps,
                 igraph_matrix_t *merges,
-                igraph_vector_t *modularity, 
+                igraph_vector_t *modularity,
                 igraph_vector_t *membership);
 
 DECLDIR int igraph_community_infomap(const igraph_t * graph,
@@ -99,7 +101,7 @@ DECLDIR int igraph_community_infomap(const igraph_t * graph,
                 igraph_vector_t *membership,
                 igraph_real_t *codelength);
 
-DECLDIR int igraph_community_edge_betweenness(const igraph_t *graph, 
+DECLDIR int igraph_community_edge_betweenness(const igraph_t *graph,
                 igraph_vector_t *result,
                 igraph_vector_t *edge_betweenness,
                 igraph_matrix_t *merges,
@@ -108,7 +110,7 @@ DECLDIR int igraph_community_edge_betweenness(const igraph_t *graph,
                 igraph_vector_t *membership,
                 igraph_bool_t directed,
                 const igraph_vector_t *weights);
-DECLDIR int igraph_community_eb_get_merges(const igraph_t *graph, 
+DECLDIR int igraph_community_eb_get_merges(const igraph_t *graph,
                 const igraph_vector_t *edges,
                 const igraph_vector_t *weights,
                 igraph_matrix_t *merges,
@@ -119,7 +121,7 @@ DECLDIR int igraph_community_eb_get_merges(const igraph_t *graph,
 DECLDIR int igraph_community_fastgreedy(const igraph_t *graph,
                 const igraph_vector_t *weights,
                 igraph_matrix_t *merges,
-                igraph_vector_t *modularity, 
+                igraph_vector_t *modularity,
                 igraph_vector_t *membership);
 
 DECLDIR int igraph_community_to_membership(const igraph_matrix_t *merges,
@@ -132,14 +134,14 @@ DECLDIR int igraph_le_community_to_membership(const igraph_matrix_t *merges,
                 igraph_vector_t *membership,
                 igraph_vector_t *csize);
 
-DECLDIR int igraph_modularity(const igraph_t *graph, 
+DECLDIR int igraph_modularity(const igraph_t *graph,
                 const igraph_vector_t *membership,
                 igraph_real_t *modularity,
                 const igraph_vector_t *weights);
 
-DECLDIR int igraph_modularity_matrix(const igraph_t *graph, 
+DECLDIR int igraph_modularity_matrix(const igraph_t *graph,
                 const igraph_vector_t *membership,
-                igraph_matrix_t *modmat, 
+                igraph_matrix_t *modmat,
                 const igraph_vector_t *weights);
 
 DECLDIR int igraph_reindex_membership(igraph_vector_t *membership,
@@ -181,7 +183,7 @@ typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
 
 typedef int igraph_community_leading_eigenvector_callback_t(
 	const igraph_vector_t *membership,
-	long int comm, 
+	long int comm,
 	igraph_real_t eigenvalue,
 	const igraph_vector_t *eigenvector,
 	igraph_arpack_function_t *arpack_multiplier,
@@ -193,12 +195,12 @@ DECLDIR int igraph_community_leading_eigenvector(const igraph_t *graph,
                 igraph_matrix_t *merges,
                 igraph_vector_t *membership,
                 igraph_integer_t steps,
-                igraph_arpack_options_t *options, 
+                igraph_arpack_options_t *options,
                 igraph_real_t *modularity,
                 igraph_bool_t start,
                 igraph_vector_t *eigenvalues,
                 igraph_vector_ptr_t *eigenvectors,
-                igraph_vector_t *history, 
+                igraph_vector_t *history,
                 igraph_community_leading_eigenvector_callback_t *callback,
                 void *callback_extra);
 
