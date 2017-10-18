@@ -80,10 +80,8 @@
 %option bison-bridge
 %option bison-locations
 
-%x LEX_PAJEK_INTERVAL
-
 digit [0-9]
-word [[:alnum:]]
+word [^ \t\r\n]
 
 %%
 
@@ -101,17 +99,7 @@ word [[:alnum:]]
 \n\r|\r\n|\n|\r   { yyextra->mode=0; return NEWLINE; }
 \"[^\"]*\"        { return QSTR; }
 \([^\)]*\)        { return PSTR; }
-
-"," |
-"*" |
-\[  |
-\]                                                      return yytext[0];
-<LEX_PAJEK_INTERVAL>{
-"-"                                                     return yytext[0];
-{digit}+                    BEGIN(INITIAL);             return INTEGER;
-}
-{digit}+/[[:blank:]]*"-"    BEGIN(LEX_PAJEK_INTERVAL);  return INTEGER;
-\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
+\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { 
                     return NUM; }
 
 [Xx]_[Ff][Aa][Cc][Tt]/[ \t\n\r]  { if (yyextra->mode==1) { return VP_X_FACT; } else { return ALNUM; } }
