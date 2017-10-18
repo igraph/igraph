@@ -989,6 +989,9 @@ int igraph_modularity_matrix(const igraph_t *graph,
 				    /*eids=*/ 0));
 
   for (i=0; i<no_of_nodes; i++) {
+    MATRIX(*modmat, i, i) *= 2;
+  }
+  for (i=0; i<no_of_nodes; i++) {
     for (j=0; j<no_of_nodes; j++) {
       MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg)[j] / 2.0 / sw;
     }

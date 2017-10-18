@@ -67,7 +67,7 @@
 #  undef stdout
 #endif
 #define stdout 0
-#define exit(code) igraph_error("Fatal error in DL parser", __FILE__, \
+#define exit(code) igraph_error("Fatal error in PAJEK parser", __FILE__, \
 				__LINE__, IGRAPH_PARSEERROR);
 %}
 
@@ -80,8 +80,10 @@
 %option bison-bridge
 %option bison-locations
 
+%x LEX_PAJEK_INTERVAL
+
 digit [0-9]
-word [^ \t\r\n]
+word [[:alnum:]]
 
 %%
 
@@ -99,7 +101,17 @@ word [^ \t\r\n]
 \n\r|\r\n|\n|\r   { yyextra->mode=0; return NEWLINE; }
 \"[^\"]*\"        { return QSTR; }
 \([^\)]*\)        { return PSTR; }
-\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { 
+
+"," |
+"*" |
+\[  |
+\]                                                      return yytext[0];
+<LEX_PAJEK_INTERVAL>{
+"-"                                                     return yytext[0];
+{digit}+                    BEGIN(INITIAL);             return INTEGER;
+}
+{digit}+/[[:blank:]]*"-"    BEGIN(LEX_PAJEK_INTERVAL);  return INTEGER;
+\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? {
                     return NUM; }
 
 [Xx]_[Ff][Aa][Cc][Tt]/[ \t\n\r]  { if (yyextra->mode==1) { return VP_X_FACT; } else { return ALNUM; } }
