@@ -142,7 +142,6 @@ extern long int igraph_i_pajek_actedge;
 
 %token NEWLINE
 %token NUM
-%token INTEGER
 %token ALNUM
 %token QSTR
 %token PSTR
@@ -241,8 +240,7 @@ shape: /* empty */ | word {
   igraph_i_pajek_add_string_vertex_attribute("shape", $1.str, $1.len, context);
 };
 
-params: params_opt | params_opt activity_intervals;
-params_opt: /* empty */ | params_opt param;
+params: /* empty */ | params param;
 
 param:
        vpword
@@ -322,22 +320,6 @@ vpword: VP_FONT { context->mode=3; } vpwordpar {
 
 vpwordpar: word { $$=$1; };
 
-/* http://vlado.fmf.uni-lj.si/pub/networks/pajek/doc/pajekman.pdf, p. 17 */
-activity_intervals
-    : '[' activity_interval_list ']'
-    ;
-
-activity_interval_list
-    : activity_interval
-    | activity_interval_list ',' activity_interval
-    ;
-
-activity_interval
-    : longint
-    | longint '-' longint
-    | longint '-' '*'
-    ;
-
 edgeblock: /* empty */ | edgeblock arcs | edgeblock edges | edgeblock arcslist | edgeblock edgeslist | edgeblock adjmatrix;
 
 arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=1; } 
@@ -376,8 +358,7 @@ weight: /* empty */ | number {
   igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);
 };
 
-edgeparams: edgeparams_opt | edgeparams_opt activity_intervals;
-edgeparams_opt: /* empty */ | edgeparams_opt edgeparam;
+edgeparams: /* empty */ | edgeparams edgeparam;
 
 edgeparam:
      epword
@@ -476,9 +457,7 @@ edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
 
 edgelistlines: /* empty */ | edgelistlines edgelistline;
 
-edgelistline: NEWLINE | edgelistfrom edgetolist NEWLINE
-                        /* http://vlado.fmf.uni-lj.si/pub/networks/pajek/doc/pajekman.pdf, pp. 17 */
-                      | edgelistfrom edgetolist activity_intervals NEWLINE;
+edgelistline: NEWLINE | edgelistfrom edgetolist NEWLINE;
 
 edgetolist: /* empty */ | edgetolist edgelistto;
 
@@ -525,10 +504,7 @@ adjmatrixentry: number {
 /* -----------------------------------------------------*/
 
 longint: NUM { $$=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
-					  igraph_pajek_yyget_leng(scanner)); }
-    |    INTEGER { $$=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
-					  igraph_pajek_yyget_leng(scanner)); }
-        ;
+					  igraph_pajek_yyget_leng(scanner)); };
 
 number: NUM  { $$=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
 					  igraph_pajek_yyget_leng(scanner)); };
