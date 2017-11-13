@@ -454,6 +454,19 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     if (igraph_vector_min(weights) <= 0) {
       IGRAPH_ERROR("weights must be strictly positive", IGRAPH_EINVAL);
     }
+
+    if (membership != 0) {
+      IGRAPH_WARNING("Membership vector is be selected based on the lowest "\
+          "modularity score.");
+    }
+    
+    if (modularity != 0 || membership != 0) {
+      IGRAPH_WARNING("Modularity calculation with weighted edge betweenness "\
+          "community detection might not make sense -- modularity treats edge "\
+          "weights as similarities while edge betwenness treats them as "\
+          "distances");
+    }
+
     IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &heap);
     IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, 
