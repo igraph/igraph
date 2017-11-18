@@ -456,7 +456,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     }
 
     if (membership != 0) {
-      IGRAPH_WARNING("Membership vector is be selected based on the lowest "\
+      IGRAPH_WARNING("Membership vector will be selected based on the lowest "\
           "modularity score.");
     }
     
