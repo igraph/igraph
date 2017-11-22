@@ -95,5 +95,6 @@
 #include "igraph_graphlets.h"
 #include "igraph_epidemics.h"
 #include "igraph_lsap.h"
+#include "igraph_coloring.h"
 
 #endif
