@@ -15,7 +15,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
 	      separators.xml memory.xml sparsemat.xml hrg.xml \
 	      scg.xml spatialgames.xml threading.xml progress.xml status.xml \
-	      graphlets.xml epi.xml embedding.xml scan.xml
+	      graphlets.xml epi.xml embedding.xml scan.xml coloring.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -140,6 +140,9 @@ nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/versi
 
 isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
+
+coloring.xml: coloring.xxml $(SRCDIR)/coloring.c $(INCLUDEDIR)/igraph_coloring.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/coloring.c $(INCLUDEDIR)/igraph_coloring.h
 
 motifs.xml: motifs.xxml $(INCLUDEDIR)/igraph_motifs.h $(SRCDIR)/motifs.c \
 		$(SRCDIR)/triangles.c
