@@ -26,7 +26,7 @@
 
 int main() {
   igraph_t g;
-  int k;
+  igraph_integer_t k;
   igraph_vector_t membership;
   long int i;
 

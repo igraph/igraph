@@ -2155,7 +2155,7 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  * \example examples/simple/igraph_community_fluid_communities.c
  */
 int igraph_community_fluid_communities(const igraph_t *graph,
-                                        int *no_of_communities,
+                                        igraph_integer_t *no_of_communities,
                                         igraph_vector_t *membership,
                                         igraph_real_t *modularity) {
   long int no_of_nodes = igraph_vcount(graph);
@@ -2173,7 +2173,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
   /* Initialize density and com_to_numvertices vectors */
   IGRAPH_CHECK(igraph_vector_init(&density, (long int) *no_of_communities));
   IGRAPH_FINALLY(igraph_vector_destroy, &density);
-  IGRAPH_CHECK(igraph_vector_init(&com_to_numvertices, (long int) *no_of_communities));
+  IGRAPH_CHECK(igraph_vector_int_init(&com_to_numvertices, (long int) *no_of_communities));
   IGRAPH_FINALLY(igraph_vector_destroy, &com_to_numvertices);
 
   /* Initialize node ordering vector */
@@ -2334,7 +2334,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
 
   igraph_vector_destroy(&node_order);
   igraph_vector_destroy(&density);
-  igraph_vector_destroy(&com_to_numvertices);
+  igraph_vector_int_destroy(&com_to_numvertices);
   igraph_vector_destroy(&label_counters);
   igraph_vector_destroy(&dominant_labels);
   igraph_vector_destroy(&nonzero_labels);
