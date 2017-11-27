@@ -2162,7 +2162,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
                                         igraph_real_t *modularity) {
   /* Initialization of variables needed for initial checking */
   long int no_of_nodes = igraph_vcount(graph);
-  igraph_bool_t *res;
+  igraph_bool_t res;
 
   /* Checking input values */
   if (no_of_nodes < 2) {
@@ -2172,15 +2172,15 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_ERROR("'no_of_communities' must be greater than 0.", IGRAPH_EINVAL);
   }
   if ((long int) no_of_communities > no_of_nodes) {
-    IGRAPH_ERROR("'no_of_communities' can not be greater than number of nodes in 
-      the graph.", IGRAPH_EINVAL);
+    IGRAPH_ERROR("'no_of_communities' can not be greater than number of nodes in " 
+      "the graph.", IGRAPH_EINVAL);
   }
-  igraph_is_simple(graph, *res);
-  if (!*res) {
+  igraph_is_simple(graph, &res);
+  if (!res) {
     IGRAPH_ERROR("Only simple graphs are supported.", IGRAPH_EINVAL);
   }
-  igraph_is_connected(graph, *res, IGRAPH_WEAK);
-  if (!*res) {
+  igraph_is_connected(graph, &res, IGRAPH_WEAK);
+  if (!res) {
     IGRAPH_ERROR("Disconnected graphs are not supported.", IGRAPH_EINVAL);
   }
   if (igraph_is_directed(graph)) {
@@ -2351,8 +2351,8 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     VECTOR(*membership)[i] -= 1;
     /* Something went wrong: At least one vertex has no community assigned */
     if (VECTOR(*membership)[i] < 0) {
-      IGRAPH_ERROR("Something went wrong during execution. One or more vertices got 
-        no community assigned at algorithm convergence.", IGRAPH_EINTERNAL);
+      IGRAPH_ERROR("Something went wrong during execution. One or more vertices got "
+        "no community assigned at algorithm convergence.", IGRAPH_EINTERNAL);
     }
   }
 
