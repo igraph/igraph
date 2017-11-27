@@ -2140,9 +2140,11 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  * Parés F., Garcia-Gasulla D., et al.: Fluid Communities: A Community
  * Detection Algorithm. [https://arxiv.org/abs/1703.09307].
  *
- * \param graph The input graph. Only undirected, unweighted graphs are
- * supported.
- * \param no_of_communities The number of communities to be found.
+ * \param graph The input graph. The graph must be simple and connected.
+ *   Empty graphs are not supported as well as single vertex graphs. 
+ *   Edge directions are ignored. Weights are not considered.
+ * \param no_of_communities The number of communities to be found. Must be 
+ *   greater than 0 and fewer than number of vertices in the graph.
  * \param membership The result vector mapping vertices to the communities
  * they are assigned to.
  * \param modularity If not a null pointer, then it must be a pointer
@@ -2155,10 +2157,34 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  * \example examples/simple/igraph_community_fluid_communities.c
  */
 int igraph_community_fluid_communities(const igraph_t *graph,
-                                        igraph_integer_t *no_of_communities,
+                                        igraph_integer_t no_of_communities,
                                         igraph_vector_t *membership,
                                         igraph_real_t *modularity) {
   long int no_of_nodes = igraph_vcount(graph);
+  igraph_bool_t *res;
+
+  /* Checking input values */
+  if (no_of_nodes < 2) {
+    IGRAPH_ERROR("Empty and single vertex graphs are not supported.", IGRAPH_EINVAL);
+  }
+  if ((long int) no_of_communities < 1) {
+    IGRAPH_ERROR("'no_of_communities' must be greater than 0.", IGRAPH_EINVAL);
+  }
+  if ((long int) no_of_communities > no_of_nodes) {
+    IGRAPH_ERROR("'no_of_communities' can not be greater than number of nodes in the graph.", IGRAPH_EINVAL);
+  }
+  igraph_is_simple(graph, *res);
+  if (!*res) {
+    IGRAPH_ERROR("Only simple graphs are supported.", IGRAPH_EINVAL);
+  }
+  igraph_is_connected(graph, *res, IGRAPH_WEAK);
+  if (!*res) {
+    IGRAPH_ERROR("Disconnected graphs are not supported.", IGRAPH_EINVAL);
+  }
+  if (igraph_is_directed(graph)) {
+    IGRAPH_WARNING("Edge directions are ignored.");
+  }
+
   long int i, j, k, kv1;
   igraph_adjlist_t al;
   double max_density = 1.0;
@@ -2171,9 +2197,9 @@ int igraph_community_fluid_communities(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
 
   /* Initialize density and com_to_numvertices vectors */
-  IGRAPH_CHECK(igraph_vector_init(&density, (long int) *no_of_communities));
+  IGRAPH_CHECK(igraph_vector_init(&density, (long int) no_of_communities));
   IGRAPH_FINALLY(igraph_vector_destroy, &density);
-  IGRAPH_CHECK(igraph_vector_int_init(&com_to_numvertices, (long int) *no_of_communities));
+  IGRAPH_CHECK(igraph_vector_int_init(&com_to_numvertices, (long int) no_of_communities));
   IGRAPH_FINALLY(igraph_vector_destroy, &com_to_numvertices);
 
   /* Initialize node ordering vector */
@@ -2189,7 +2215,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
 
   /* Initialize com_to_numvertices and initialize communities into membership vector */
   IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
-  for (i=0; i<*no_of_communities; i++) {
+  for (i=0; i<no_of_communities; i++) {
     /* Initialize membership at initial nodes for each community
      * where 0 refers to have no label*/
     VECTOR(*membership)[(long int)VECTOR(node_order)[i]] = i+1.0;
@@ -2206,10 +2232,10 @@ int igraph_community_fluid_communities(const igraph_t *graph,
   /* Create storage space for counting distinct labels and dominant ones */
   IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, 0);
-  IGRAPH_CHECK(igraph_vector_reserve(&dominant_labels, (long int) *no_of_communities));
-  IGRAPH_CHECK(igraph_vector_reserve(&nonzero_labels, (long int) *no_of_communities));
+  IGRAPH_CHECK(igraph_vector_reserve(&dominant_labels, (long int) no_of_communities));
+  IGRAPH_CHECK(igraph_vector_reserve(&nonzero_labels, (long int) no_of_communities));
 
-  IGRAPH_CHECK(igraph_vector_init(&label_counters, (long int) *no_of_communities));
+  IGRAPH_CHECK(igraph_vector_init(&label_counters, (long int) no_of_communities));
   IGRAPH_FINALLY(igraph_vector_destroy, &label_counters);
   igraph_vector_null(&label_counters);
 

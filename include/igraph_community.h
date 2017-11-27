@@ -202,7 +202,7 @@ DECLDIR int igraph_community_leading_eigenvector(const igraph_t *graph,
                 void *callback_extra);
 
 DECLDIR int igraph_community_fluid_communities(const igraph_t *graph,
-                igraph_integer_t *no_of_communities,
+                igraph_integer_t no_of_communities,
                 igraph_vector_t *membership,
                 igraph_real_t *modularity);
 

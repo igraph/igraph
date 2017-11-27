@@ -52,7 +52,7 @@ int main() {
   
   igraph_vector_init(&membership, 0);
   k = 2;
-  igraph_community_fluid_communities(&g, &k, &membership, 
+  igraph_community_fluid_communities(&g, k, &membership, 
 				     /*modularity=*/ 0);
   if (igraph_vector_max(&membership) > 1) {
     printf("Resulting graph had more than two clusters:\n");
