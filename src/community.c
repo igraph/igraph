@@ -2160,6 +2160,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
                                         igraph_integer_t no_of_communities,
                                         igraph_vector_t *membership,
                                         igraph_real_t *modularity) {
+  /* Initialization of variables needed for initial checking */
   long int no_of_nodes = igraph_vcount(graph);
   igraph_bool_t *res;
 
@@ -2171,7 +2172,8 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_ERROR("'no_of_communities' must be greater than 0.", IGRAPH_EINVAL);
   }
   if ((long int) no_of_communities > no_of_nodes) {
-    IGRAPH_ERROR("'no_of_communities' can not be greater than number of nodes in the graph.", IGRAPH_EINVAL);
+    IGRAPH_ERROR("'no_of_communities' can not be greater than number of nodes in 
+      the graph.", IGRAPH_EINVAL);
   }
   igraph_is_simple(graph, *res);
   if (!*res) {
@@ -2185,6 +2187,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     IGRAPH_WARNING("Edge directions are ignored.");
   }
 
+  /* Internal variables initialization */
   long int i, j, k, kv1;
   igraph_adjlist_t al;
   double max_density = 1.0;
@@ -2223,10 +2226,8 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     VECTOR(com_to_numvertices)[i] = 1;
   }
 
-  /* Create an adjacency/incidence list representation for efficiency.
-   * For the unweighted case, the adjacency list is enough. For the
-   * weighted case, we need the incidence list */
-  IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_IN));
+  /* Create an adjacency list representation for efficiency. */
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
 
   /* Create storage space for counting distinct labels and dominant ones */
@@ -2348,6 +2349,11 @@ int igraph_community_fluid_communities(const igraph_t *graph,
   /* There must be no 0 labels in membership vector at this point */
   for (i=0; i<no_of_nodes; i++) {
     VECTOR(*membership)[i] -= 1;
+    /* Something went wrong: At least one vertex has no community assigned */
+    if (VECTOR(*membership)[i] < 0) {
+      IGRAPH_ERROR("Something went wrong during execution. One or more vertices got 
+        no community assigned at algorithm convergence.", IGRAPH_EINTERNAL);
+    }
   }
 
   igraph_adjlist_destroy(&al);
