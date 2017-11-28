@@ -25,6 +25,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
+#include "igraph_memory.h"
 
 /**
  * \function igraph_random_walk
@@ -113,6 +114,13 @@ int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
 }
 
 
+/* Used as item destructor for 'cdfs' in igraph_random_edge_walk(). */
+static void vec_destr(igraph_vector_t *vec) {
+    if (vec != NULL)
+        igraph_vector_destroy(vec);
+}
+
+
 /**
  * \function igraph_random_edge_walk
  * \brief Perform a random walk on a graph and return the traversed edges
@@ -156,7 +164,16 @@ int igraph_random_edge_walk(const igraph_t *graph,
     igraph_integer_t ec = igraph_ecount(graph);
     igraph_integer_t i;
     igraph_inclist_t il;
-    igraph_vector_t ws, cs;
+    igraph_vector_t weight_temp;
+    igraph_vector_ptr_t cdfs; /* cumulative distribution vectors for each node, used for weighted choice */
+
+    /* the fourth igraph_neimode_t value, IGRAPH_TOTAL, is disallowed */
+    if (! (mode == IGRAPH_ALL || mode == IGRAPH_IN || mode == IGRAPH_OUT))
+        IGRAPH_ERROR("Invalid mode parameter", IGRAPH_EINVMODE);
+
+    /* ref switch statement at end of main loop */
+    if (! igraph_is_directed(graph))
+        mode = IGRAPH_ALL;
 
     if (start < 0 || start >= vc)
         IGRAPH_ERROR("Invalid start vertex", IGRAPH_EINVAL);
@@ -176,8 +193,14 @@ int igraph_random_edge_walk(const igraph_t *graph,
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, mode));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ws, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&cs, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&weight_temp, 0);
+
+    /* cdf vectors will be computed lazily */
+    IGRAPH_CHECK(igraph_vector_ptr_init(&cdfs, vc));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &cdfs);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&cdfs, vec_destr);
+    for (i=0; i < vc; ++i)
+        VECTOR(cdfs)[i] = NULL;
 
     RNG_BEGIN();
 
@@ -187,7 +210,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
 
         degree = igraph_vector_int_size(edges);
 
-        /* Are we stuck? */
+        /* are we stuck? */
         if (IGRAPH_UNLIKELY(degree == 0)) {
             igraph_vector_resize(edgewalk, i); /* can't fail since size is reduced, skip IGRAPH_CHECK */
             if (stuck == IGRAPH_RANDOM_WALK_STUCK_RETURN)
@@ -196,31 +219,61 @@ int igraph_random_edge_walk(const igraph_t *graph,
                 IGRAPH_ERROR("Random walk got stuck", IGRAPH_ERWSTUCK);
         }
 
-        if (weights) { /* weighted: choose an out-edge with probability proportional to its weight */
+        if (weights) /* weighted: choose an out-edge with probability proportional to its weight */
+        {
             igraph_real_t r;
-            long j;
+            igraph_vector_t **cd = (igraph_vector_t **) &(VECTOR(cdfs)[start]);
 
-            IGRAPH_CHECK(igraph_vector_resize(&ws, degree));
-            for (j=0; j < degree; ++j)
-                VECTOR(ws)[j] = VECTOR(*weights)[ VECTOR(*edges)[j] ];
+            /* compute out-edge cdf for this node if not already done */
+            if (IGRAPH_UNLIKELY(! *cd)) {
+                long j;
 
-            IGRAPH_CHECK(igraph_vector_cumsum(&cs, &ws));
+                *cd = igraph_malloc(sizeof(igraph_vector_t));
+                IGRAPH_CHECK(igraph_vector_init(*cd, degree));
 
-            r = RNG_UNIF(0, VECTOR(cs)[degree-1]);
-            igraph_vector_binsearch(&cs, r, &idx);
-        } else { /* unweighted: choose an out-edge at random */
+                IGRAPH_CHECK(igraph_vector_resize(&weight_temp, degree));
+                for (j=0; j < degree; ++j)
+                    VECTOR(weight_temp)[j] = VECTOR(*weights)[ VECTOR(*edges)[j] ];
+
+                IGRAPH_CHECK(igraph_vector_cumsum(*cd, &weight_temp));
+            }
+
+            r = RNG_UNIF(0, VECTOR( **cd )[degree-1]);
+            igraph_vector_binsearch(*cd, r, &idx);
+        }
+        else /* unweighted: choose an out-edge at random */
+        {
             idx = RNG_INTEGER(0, degree-1);
         }
 
         edge = VECTOR(*edges)[idx];
         VECTOR(*edgewalk)[i] = edge;
-        start = IGRAPH_TO(graph, edge);
+
+        /* travel along edge in a direction specified by 'mode' */
+        /* note: 'mode' is always set to IGRAPH_ALL for undirected graphs */
+        switch (mode) {
+        case IGRAPH_OUT:
+            start = IGRAPH_TO(graph, edge);
+            break;
+        case IGRAPH_IN:
+            start = IGRAPH_FROM(graph, edge);
+            break;
+        case IGRAPH_ALL:
+            {
+                igraph_integer_t next = IGRAPH_TO(graph, edge);
+                if (start == next)
+                    start = IGRAPH_FROM(graph, edge);
+                else
+                    start = next;
+            }
+            break;
+        }
     }
 
     RNG_END();
 
-    igraph_vector_destroy(&cs);
-    igraph_vector_destroy(&ws);
+    igraph_vector_ptr_destroy_all(&cdfs);
+    igraph_vector_destroy(&weight_temp);
     igraph_inclist_destroy(&il);
     IGRAPH_FINALLY_CLEAN(3);
 
