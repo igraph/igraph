@@ -2035,8 +2035,9 @@ int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
 				     /* invmap= */ 0);
 }
 
-igraph_subgraph_implementation_t igraph_i_induced_subgraph_suggest_implementation(
-    const igraph_t *graph, const igraph_vs_t vids) {
+int igraph_i_induced_subgraph_suggest_implementation(
+    const igraph_t *graph, const igraph_vs_t vids,
+    igraph_subgraph_implementation_t *result) {
   double ratio;
   igraph_integer_t num_vs;
 
@@ -2049,10 +2050,12 @@ igraph_subgraph_implementation_t igraph_i_induced_subgraph_suggest_implementatio
 
   /* TODO: needs benchmarking; threshold was chosen totally arbitrarily */
   if (ratio > 0.5) {
-    return IGRAPH_SUBGRAPH_COPY_AND_DELETE;
+    *result = IGRAPH_SUBGRAPH_COPY_AND_DELETE;
   } else {
-    return IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;
+    *result = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;
   }
+
+  return 0;
 }
 
 int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
@@ -2062,7 +2065,7 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 				igraph_vector_t *invmap) {
 
   if (impl == IGRAPH_SUBGRAPH_AUTO) {
-    impl = igraph_i_induced_subgraph_suggest_implementation(graph, vids);
+    IGRAPH_CHECK(igraph_i_induced_subgraph_suggest_implementation(graph, vids, &impl));
   }
 
   switch (impl) {
