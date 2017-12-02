@@ -26,6 +26,7 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 #include "igraph_memory.h"
+#include "igraph_interrupt_internal.h"
 
 /**
  * \function igraph_random_walk
@@ -268,6 +269,8 @@ int igraph_random_edge_walk(const igraph_t *graph,
             }
             break;
         }
+
+        IGRAPH_ALLOW_INTERRUPTION();
     }
 
     RNG_END();
