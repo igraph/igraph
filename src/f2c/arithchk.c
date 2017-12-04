@@ -110,7 +110,8 @@ icheck(void)
 	return 0;
 	}
 
-char *emptyfmt = "";	/* avoid possible warning message with printf("") */
+/* avoid possible warning message with printf("") */
+const char *const emptyfmt = "";
 
  static Akind *
 ccheck(void)
