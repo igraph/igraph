@@ -2137,8 +2137,11 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  * interaction and density. 
  *
  * This function implements the community detection method described in:
- * Parés F., Garcia-Gasulla D., et al.: Fluid Communities: A Community
- * Detection Algorithm. [https://arxiv.org/abs/1703.09307].
+ * Parés F, Gasulla DG, et. al. (2018) Fluid Communities: A Competitive,
+ * Scalable and Diverse Community Detection Algorithm. In: Complex Networks
+ * & Their Applications VI: Proceedings of Complex Networks 2017 (The Sixth 
+ * International Conference on Complex Networks and Their Applications), 
+ * Springer, vol 689, p 229.
  *
  * \param graph The input graph. The graph must be simple and connected.
  *   Empty graphs are not supported as well as single vertex graphs. 
@@ -2160,9 +2163,16 @@ int igraph_community_fluid_communities(const igraph_t *graph,
                                         igraph_integer_t no_of_communities,
                                         igraph_vector_t *membership,
                                         igraph_real_t *modularity) {
+  /* Declaration of variables */
+  long int no_of_nodes, i, j, k, kv1;
+  igraph_adjlist_t al;
+  double max_density;
+  igraph_bool_t res, running;
+  igraph_vector_t node_order, density, label_counters, dominant_labels, nonzero_labels;
+  igraph_vector_int_t com_to_numvertices;
+  
   /* Initialization of variables needed for initial checking */
-  long int no_of_nodes = igraph_vcount(graph);
-  igraph_bool_t res;
+  no_of_nodes = igraph_vcount(graph);
 
   /* Checking input values */
   if (no_of_nodes < 2) {
@@ -2188,13 +2198,8 @@ int igraph_community_fluid_communities(const igraph_t *graph,
   }
 
   /* Internal variables initialization */
-  long int i, j, k, kv1;
-  igraph_adjlist_t al;
-  double max_density = 1.0;
-  igraph_bool_t running = 1;
-
-  igraph_vector_t node_order, density, label_counters, dominant_labels, nonzero_labels;
-  igraph_vector_int_t com_to_numvertices;
+  max_density = 1.0;
+  running = 1;
 
   /* Resize membership vector (number of nodes) */
   IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
@@ -2243,6 +2248,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
   /* running is the convergence boolean variable */
   running = 1;
   while (running) {
+    /* Declarations of varibales used inside main loop */
     long int v1, size, rand_idx;
     igraph_real_t max_count, label_counter_diff;
     igraph_vector_int_t *neis;
