@@ -2428,8 +2428,15 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  * </para><para>
  * If the graph is not connected, and there is no path between two
  * vertices, the number of vertices is used instead the length of the
- * geodesic. This is always longer than the longest possible geodesic.
+ * geodesic. This is longer than the longest possible geodesic in case
+ * of unweighted graphs, but may not be so in weighted graphs, so it is
+ * best not to use this function on weighted graphs.
  * 
+ * </para><para>
+ * If the graph has a single vertex only, the closeness centrality of
+ * that single vertex will be NaN (because we are essentially dividing
+ * zero with zero).
+ *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        closeness centrality scores for the given vertices.
