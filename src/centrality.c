@@ -2509,6 +2509,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
   igraph_vector_t dist;
   igraph_vector_long_t which;
   long int nodes_reached;
+
+  igraph_bool_t warning_shown = 0;
   
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
@@ -2580,6 +2582,10 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
     VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
 
+    if (no_of_nodes > nodes_reached && !warning_shown) {
+      IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
+      warning_shown = 1;
+    }
   } /* !IGRAPH_VIT_END(vit) */
 
   if (!normalized) {
@@ -2682,6 +2688,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   long int nodes_to_calc;
   igraph_vit_t vit;
 
+  igraph_bool_t warning_shown = 0;
+  
   if (weights) { 
     return igraph_i_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
 						weights, normalized);
@@ -2736,9 +2744,15 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_CHECK(igraph_dqueue_push(&q, actdist+1));
       }
     }
+
     /* using igraph_real_t here instead of igraph_integer_t to avoid overflow */
     VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
+
+    if (no_of_nodes > nodes_reached && !warning_shown) {
+      IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
+      warning_shown = 1;
+    }
   }
 
   if (!normalized) {
