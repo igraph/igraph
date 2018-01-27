@@ -531,8 +531,12 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
   if (outseq && igraph_vector_min(outseq) < 0) {
     IGRAPH_ERROR("Negative out degree in sequence", IGRAPH_EINVAL);
   }
-  if (A <= 0) {
+  if (!outpref && A <= 0) {
     IGRAPH_ERROR("Constant attractiveness (A) must be positive",
+		 IGRAPH_EINVAL);
+  }
+  if (outpref && A < 0) {
+    IGRAPH_ERROR("Constant attractiveness (A) must be non-negative",
 		 IGRAPH_EINVAL);
   }
   if (algo == IGRAPH_BARABASI_BAG) {
