@@ -250,9 +250,11 @@ ieee0(Void)
  */
 
 
-#if (defined(__GLIBC__)&& ( __GLIBC__>=2) && (__GLIBC_MINOR__>=2) )
-#define _GNU_SOURCE 1
+#ifdef __GLIBC__
 #define IEEE0_done
+
+#if ((__GLIBC__>=2) && (__GLIBC_MINOR__>=2))
+#define _GNU_SOURCE 1
 #include <fenv.h>
  static void
   ieee0(Void)
@@ -265,14 +267,11 @@ ieee0(Void)
          unsupported_error();
 }
 
-#endif /* Glibc control */
-
 /* Many linux cases will be treated through GLIBC.  Note that modern
  * linux runs on many non-i86 plaforms and as a result the following code
  * must be processor dependent rather than simply OS specific */
 
-#if (defined(__linux__)&&(!defined(IEEE0_done)))
-#define IEEE0_done
+#else /* __GLIBC__<2.2 */
 #include <fpu_control.h>
 
 
@@ -401,7 +400,8 @@ static void ieee0(Void)
 
 #endif /* _FPU_IEEE */
 	}
-#endif /* __linux__ */
+#endif /* __GLIBC__>2.2 */
+#endif /* __GLIBC__ */
 
 /* Specific to OSF/1 */
 #if (defined(__alpha)&&defined(__osf__))
