@@ -441,11 +441,11 @@ arclistline: NEWLINE | arclistfrom arctolist NEWLINE;
 
 arctolist: /* empty */ | arctolist arclistto;
 
-arclistfrom: longint { context->mode=0; context->actfrom=fabs($1)-1; };
+arclistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
 
 arclistto: longint { 
   igraph_vector_push_back(context->vector, context->actfrom); 
-  igraph_vector_push_back(context->vector, fabs($1)-1); 
+  igraph_vector_push_back(context->vector, labs($1)-1); 
 };
 
 edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
@@ -456,11 +456,11 @@ edgelistline: NEWLINE | edgelistfrom edgetolist NEWLINE;
 
 edgetolist: /* empty */ | edgetolist edgelistto;
 
-edgelistfrom: longint { context->mode=0; context->actfrom=fabs($1)-1; };
+edgelistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
 
 edgelistto: longint { 
   igraph_vector_push_back(context->vector, context->actfrom); 
-  igraph_vector_push_back(context->vector, fabs($1)-1); 
+  igraph_vector_push_back(context->vector, labs($1)-1); 
 };
 
 /* -----------------------------------------------------*/
