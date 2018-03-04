@@ -2254,3 +2254,12 @@ int igraph_scg_laplacian(const igraph_t *graph,
 }
 
 #endif
+
+#ifdef USING_R
+
+int igraph_scg_dummy() {
+  return 'b' + 'a' + 's' + 's' + 'z' + 'a' + 't' + 'o' + 'k' +
+    'm' + 'e' + 'g';
+}
+
+#endif
