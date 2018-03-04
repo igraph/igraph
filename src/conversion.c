@@ -774,6 +774,8 @@ int igraph_get_stochastic(const igraph_t *graph,
   return 0;
 }
 
+#ifndef USING_R
+ 
 int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat, 
 				 igraph_bool_t column_wise);
 
@@ -845,3 +847,6 @@ int igraph_get_stochastic_sparsemat(const igraph_t *graph,
   
   return 0;
 }
+
+#endif
+

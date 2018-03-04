@@ -27,6 +27,8 @@
 #include "config.h"
 #include <math.h>
 
+#ifndef USING_R
+
 int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                                 igraph_sparsemat_t *sparseres,
 				igraph_bool_t normalized, 
@@ -433,3 +435,5 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   IGRAPH_FINALLY_CLEAN(2);
   return 0;
 }
+
+#endif

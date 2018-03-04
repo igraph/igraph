@@ -1926,6 +1926,8 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
   return 0;
 }
 
+#ifndef USING_R
+
 int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
 			     int n, void *extra);
 
@@ -2194,6 +2196,8 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
 
   return IGRAPH_SUCCESS;
 }
+
+#endif
 
 /**
  * \function igraph_layout_bipartite

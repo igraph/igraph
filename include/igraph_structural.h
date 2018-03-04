@@ -130,10 +130,12 @@ DECLDIR int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
 
+#ifndef USING_R
 DECLDIR int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                 igraph_sparsemat_t *sparseres,
                 igraph_bool_t normalized, 
                 const igraph_vector_t *weights);
+#endif
 
 /* -------------------------------------------------- */
 /* Internal functions, may change any time            */

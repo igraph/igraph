@@ -1189,7 +1189,7 @@ igraph_layout_sugiyama:
 igraph_layout_mds:
         PARAMS: GRAPH graph, OUT MATRIX res, MATRIX_OR_0 dist=NULL, \
                 INTEGER dim=2, NULL options
-        IGNORE: RR
+        IGNORE: RR, RC
         NAME-R: layout.mds
 
 igraph_layout_bipartite:
@@ -1464,7 +1464,7 @@ igraph_get_stochastic:
 igraph_get_stochastic_sparsemat:
         PARAMS: GRAPH graph, OUT SPARSEMATPTR sparsemat, \
                 BOOLEAN column_wise=False
-        IGNORE: RR, RNamespace
+        IGNORE: RR, RC, RNamespace 
 
 #######################################
 # Read and write foreign formats
@@ -1922,7 +1922,7 @@ igraph_scg_grouping:
                 SCGALGO algo=Default, VECTOR_OR_0 p=NULL, \
 		INTEGER maxiter=100
         NAME-R: scg_group
-        IGNORE: RR
+        IGNORE: RR, RC
 
 igraph_scg_semiprojectors:
         PARAMS: VECTORM1 groups, SCGMAT mtype=Default, \
@@ -1937,6 +1937,7 @@ igraph_scg_norm_eps:
                 SCGMAT mtype=Default, VECTOR_OR_0 p=NULL, \
                 SCGNORM norm=Default
         NAME-R: scg_eps
+        IGNORE: RC
 
 igraph_scg_adjacency:
         PARAMS: GRAPH_OR_0 graph, MATRIX_OR_0 matrix, \

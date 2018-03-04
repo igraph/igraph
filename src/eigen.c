@@ -357,6 +357,8 @@ int igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_matrix_t *A,
   return 0;
 }
 
+#ifndef USING_R
+
 int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
 			   const igraph_sparsemat_t *sA,
 			   igraph_arpack_function_t *fun,
@@ -605,6 +607,8 @@ int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
     return 0;
   }
 }
+
+#endif
 
 /* Get the eigenvalues and the eigenvectors from the compressed 
    form. Order them according to the ordering criteria.
@@ -1032,6 +1036,8 @@ int igraph_i_eigen_matrix_lapack_all(const igraph_matrix_t *A,
   return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
+#ifndef USING_R
+
 int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
 				 const igraph_sparsemat_t *sA,
 				 igraph_arpack_function_t *fun,
@@ -1254,6 +1260,8 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
 
   return 0;
 }
+
+#endif
 
 int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
 					   const igraph_real_t *from,

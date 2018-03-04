@@ -48,9 +48,11 @@ DECLDIR int igraph_get_stochastic(const igraph_t *graph,
                 igraph_matrix_t *matrix,
                 igraph_bool_t column_wise);
 
+#ifndef USING_R
 DECLDIR int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
                 igraph_sparsemat_t *sparsemat,
                 igraph_bool_t column_wise);
+#endif
 
 DECLDIR int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);
 

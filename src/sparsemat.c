@@ -23,6 +23,8 @@
 
 #include "config.h"
 
+#ifndef USING_R
+
 #include "cs/cs.h"
 
 #include "igraph_sparsemat.h"
@@ -3013,3 +3015,14 @@ int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it) {
 int igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it) {
   return it->pos;
 }
+
+#endif
+
+#ifdef USING_R
+
+int igraph_sparsemat_dummy() {
+  return 'b' + 'a' + 's' + 's' + 'z' + 'a' + 't' + 'o' + 'k' +
+    'm' + 'e' + 'g';
+}
+
+#endif
