@@ -32,8 +32,8 @@
  */
 
 #ifdef __clang__
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#pragma clang diagnostic ignored "-Wshorten-64-to-32"
+# pragma clang diagnostic ignored "-Wsign-conversion"
+# pragma clang diagnostic ignored "-Wshorten-64-to-32"
 #endif
 
 #ifdef _MSC_VER
