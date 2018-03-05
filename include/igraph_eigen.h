@@ -62,8 +62,6 @@ typedef struct igraph_eigen_which_t {
   igraph_lapack_dgeevx_balance_t balance;
 } igraph_eigen_which_t;
 
-#ifndef USING_R
-
 DECLDIR int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
                 const igraph_sparsemat_t *sA,
                 igraph_arpack_function_t *fun, int n,
@@ -85,8 +83,6 @@ DECLDIR int igraph_eigen_matrix(const igraph_matrix_t *A,
                 igraph_arpack_storage_t *storage,
                 igraph_vector_complex_t *values,
                 igraph_matrix_complex_t *vectors);
-
-#endif
 
 DECLDIR int igraph_eigen_adjacency(const igraph_t *graph,
                 igraph_eigen_algorithm_t algorithm,
