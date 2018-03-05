@@ -53,7 +53,7 @@
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 /* We assume that 'file' is 'stderr' here. */
 #ifdef USING_R
-#define fprintf(file, msg, ...) while (0) { }
+#define fprintf(file, msg, ...) (1)
 #endif
 #ifdef stdout 
 #  undef stdout
