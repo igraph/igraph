@@ -369,7 +369,7 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
      FC(diff); true otherwise; */
   int j, u, v, u2, oldNbVal;
   igraph_vector_int_t *vneis;
-  bool result;
+  bool result = false;
 
   while (nb>0) {
     u = VECTOR(*toBeMatched)[--nb];
