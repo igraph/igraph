@@ -21,8 +21,6 @@
 
 */
 
-#ifndef USING_R
-
 /*
  *  SCGlib : A C library for the spectral coarse graining of matrices
  *	as described in the paper: Shrinking Matrices while preserving their
@@ -2252,14 +2250,3 @@ int igraph_scg_laplacian(const igraph_t *graph,
 
   return 0;
 }
-
-#endif
-
-#ifdef USING_R
-
-int igraph_scg_dummy() {
-  return 'b' + 'a' + 's' + 's' + 'z' + 'a' + 't' + 'o' + 'k' +
-    'm' + 'e' + 'g';
-}
-
-#endif
