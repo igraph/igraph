@@ -64,7 +64,7 @@ int igraph_pajek_yylex(YYSTYPE* lvalp, YYLTYPE* llocp,
 		       void* scanner);
 int igraph_pajek_yyerror(YYLTYPE* locp, 
 			 igraph_i_pajek_parsedata_t *context, 
-			 char *s);
+			 const char *s);
 char *igraph_pajek_yyget_text (yyscan_t yyscanner );
 int igraph_pajek_yyget_leng (yyscan_t yyscanner );
 
@@ -517,7 +517,7 @@ word: ALNUM { $$.str=igraph_pajek_yyget_text(scanner);
 
 int igraph_pajek_yyerror(YYLTYPE* locp, 
 			 igraph_i_pajek_parsedata_t *context, 
-			 char *s) {
+			 const char *s) {
   snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
 	   "Parse error in Pajek file, line %i (%s)", 
 	   locp->first_line, s);

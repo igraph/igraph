@@ -61,7 +61,7 @@
 
 int igraph_gml_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, void *scanner);
 int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
-		       char *s);
+		       const char *s);
 char *igraph_gml_yyget_text (yyscan_t yyscanner );
 int igraph_gml_yyget_leng (yyscan_t yyscanner );
 void igraph_i_gml_get_keyword(char *s, int len, void *res);
@@ -147,7 +147,7 @@ string: STRING { igraph_i_gml_get_string(igraph_gml_yyget_text(scanner),
 %%
 
 int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
-		       char *s) {
+		       const char *s) {
   snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
 	   "Parse error in GML file, line %i (%s)", 
 	   locp->first_line, s);
