@@ -230,6 +230,8 @@ int igraph_random_edge_walk(const igraph_t *graph,
                 long j;
 
                 *cd = igraph_malloc(sizeof(igraph_vector_t));
+                if (*cd == NULL)
+                    IGRAPH_ERROR("random edge walk failed", IGRAPH_ENOMEM);
                 IGRAPH_CHECK(igraph_vector_init(*cd, degree));
 
                 IGRAPH_CHECK(igraph_vector_resize(&weight_temp, degree));
