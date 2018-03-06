@@ -111,6 +111,7 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 %token LISTOPEN
 %token LISTCLOSE
 %token EOFF
+%token ERROR
 
 %destructor { igraph_Free($$.s); } string key KEYWORD;
 %destructor { igraph_gml_tree_destroy($$); } list keyvalue;

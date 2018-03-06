@@ -104,6 +104,7 @@ extern igraph_real_t igraph_pajek_get_number(const char *str, long int len);
 %token DIGIT
 %token LABEL
 %token EOFF
+%token ERROR
 
 %%
 

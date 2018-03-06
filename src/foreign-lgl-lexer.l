@@ -67,6 +67,7 @@
 %option outfile="lex.yy.c"
 %option nounput
 %option noinput
+%option nodefault
 %option reentrant
 %option bison-bridge
 %option bison-locations
@@ -94,5 +95,7 @@ alnum [^ \t\r\n#]
                        return NEWLINE; 
                     }
                   }
+
+.                 { return ERROR; }
 
 %%

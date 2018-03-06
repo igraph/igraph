@@ -147,6 +147,7 @@ extern long int igraph_i_pajek_actedge;
 %token ARCSLISTLINE
 %token EDGESLISTLINE
 %token MATRIXLINE
+%token ERROR
 
 %token VP_X_FACT
 %token VP_Y_FACT
