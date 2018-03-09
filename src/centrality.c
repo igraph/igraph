@@ -2566,8 +2566,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
     long int source=IGRAPH_VIT_GET(vit);
     igraph_2wheap_clear(&Q);
     igraph_2wheap_push_with_index(&Q, source, 0);
-    VECTOR(which)[source]=i+1;
-    VECTOR(dist)[source]=0.0;
+    VECTOR(which)[source] = i+1;
+    VECTOR(dist)[source] = 1.0;     /* actual distance is zero but we need to store distance + 1 */
     nodes_reached=0;
     
     while (!igraph_2wheap_empty(&Q)) {
