@@ -101,12 +101,12 @@ int igraph_i_is_separator(const igraph_t *graph,
 		 IGRAPH_EINVAL);
   }
   
-  igraph_dqueue_push(Q, start);
+  IGRAPH_CHECK(igraph_dqueue_push(Q, start));
   VECTOR(*removed)[start]=1;
   while (!igraph_dqueue_empty(Q)) {
     long int node=(long int) igraph_dqueue_pop(Q);
     long int j, n;
-    igraph_neighbors(graph, neis, (igraph_integer_t) node, IGRAPH_ALL);
+    IGRAPH_CHECK(igraph_neighbors(graph, neis, (igraph_integer_t) node, IGRAPH_ALL));
     n=igraph_vector_size(neis);
     for (j=0; j<n; j++) {
       long int nei=(long int) VECTOR(*neis)[j];
