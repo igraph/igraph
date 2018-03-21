@@ -75,6 +75,10 @@ typedef enum { IGRAPH_DEGSEQ_SIMPLE=0,
 	       IGRAPH_DEGSEQ_VL,
 	       IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE } igraph_degseq_t;
 
+typedef enum { IGRAPH_REALIZE_DEGSEQ_SMALLEST = 0,
+             IGRAPH_REALIZE_DEGSEQ_LARGEST,
+             IGRAPH_REALIZE_DEGSEQ_INDEX } igraph_realize_degseq_t;
+
 typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
 	       IGRAPH_FILEFORMAT_NCOL,
 	       IGRAPH_FILEFORMAT_PAJEK,

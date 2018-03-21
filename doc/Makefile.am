@@ -90,7 +90,8 @@ generators.xml: generators.xxml \
 		$(SRCDIR)/structure_generators.c \
 		$(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/sbm.c \
-		$(SRCDIR)/dotproduct.c
+		$(SRCDIR)/dotproduct.c \
+		$(SRCDIR)/degree_sequence.cpp
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
 	$(SRCDIR)/atlas.c \
 	$(SRCDIR)/forestfire.c \
@@ -98,7 +99,8 @@ generators.xml: generators.xxml \
 	$(SRCDIR)/structure_generators.c \
 	$(SRCDIR)/structural_properties.c \
 	$(SRCDIR)/sbm.c \
-	$(SRCDIR)/dotproduct.c
+	$(SRCDIR)/dotproduct.c \
+	$(SRCDIR)/degree_sequence.cpp
 
 structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 		$(SRCDIR)/spanning_trees.c \

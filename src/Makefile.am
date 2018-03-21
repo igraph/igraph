@@ -384,7 +384,8 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     layout_fr.c layout_kk.c paths.c \
 			     random_walk.c \
 				 igraph_cliquer.c cliquer/cliquer.c cliquer/cliquer_graph.c cliquer/reorder.c \
-				 coloring.c
+				 coloring.c \
+				 degree_sequence.cpp
 
 if INTERNAL_F2C
 else
