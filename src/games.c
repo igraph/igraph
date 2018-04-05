@@ -4161,3 +4161,51 @@ int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
   IGRAPH_CHECK(igraph_correlated_game(graph1, graph2, corr, p, permutation));
   return 0;
 }
+
+
+/**
+ * \ingroup generators
+ * \function igraph_tree_game
+ * \brief Generates a random tree with the given number of nodes
+ *
+ * This function samples uniformly from the set of labelled trees.
+ * It works by sampling Pr&uuml;fer sequences unformly, then converting
+ * them to graphs using \ref igraph_from_prufer().
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of nodes in the tree.
+ * \return Error code:
+ *          \c IGRAPH_ENOMEM: there is not enough
+ *           memory to perform the operation.
+ *          \c IGRAPH_EINVAL: invalid tree size
+ *
+ * \sa \ref igraph_from_prufer()
+ *
+ */
+
+int igraph_tree_game(igraph_t *graph, igraph_integer_t n) {
+    igraph_vector_int_t prufer;
+    long i;
+
+    if (n < 2) {
+        IGRAPH_CHECK(igraph_empty(graph, n, /* directed = */ 0));
+        return IGRAPH_SUCCESS;
+    }
+
+    IGRAPH_CHECK(igraph_vector_int_init(&prufer, n-2));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &prufer);
+
+    RNG_BEGIN();
+
+    for (i=0; i < n-2; ++i)
+        VECTOR(prufer)[i] = RNG_INTEGER(0,n-1);
+
+    RNG_END();
+
+    IGRAPH_CHECK(igraph_from_prufer(graph, &prufer));
+
+    igraph_vector_int_destroy(&prufer);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
