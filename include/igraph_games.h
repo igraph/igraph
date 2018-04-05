@@ -200,6 +200,8 @@ DECLDIR int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
                 igraph_bool_t directed,
                 const igraph_vector_t *permutation);
 
+DECLDIR int igraph_tree_game(igraph_t *graph, igraph_integer_t n);
+
 DECLDIR int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                 igraph_bool_t directed);
 

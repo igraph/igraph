@@ -2293,3 +2293,72 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   
   return 0;
 }
+
+
+/**
+ * \ingroup generators
+ * \function igraph_from_prufer
+ * \brief Generates a tree from a Pr&uuml;fer sequence
+ *
+ * A Pr&uuml;fer sequence is a unique sequence of integers associated
+ * with a labelled tree. A tree on n vertices can be represented by a
+ * sequence of n-2 integers, each between 0 and n-1 (inclusive).
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param prufer The Pr&uuml;fer sequence
+ * \return Error code:
+ *          \c IGRAPH_ENOMEM: there is not enough
+ *           memory to perform the operation.
+ *          \c IGRAPH_EINVAL: invalid Pr&uuml;fer sequence given
+ *
+ * \sa \ref igraph_tree_game()
+ *
+ */
+
+int igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {
+    igraph_vector_int_t degree;
+    igraph_vector_t edges;
+    long n;
+    long i, j, ec;
+
+    n = igraph_vector_int_size(prufer) + 2;
+
+    IGRAPH_CHECK(igraph_vector_int_init(&degree, n));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
+
+    IGRAPH_CHECK(igraph_vector_init(&edges, 2*(n-1)));
+    IGRAPH_FINALLY(igraph_vector_destroy, &edges);
+
+    for (i=0; i < n; ++i)
+        VECTOR(degree)[i] = 1;
+
+    for (i=0; i < n-2; ++i) {
+        long k = VECTOR(*prufer)[i];
+        if (k >= n || k < 0)
+            IGRAPH_ERROR("Invalid Prufer sequence", IGRAPH_EINVAL);
+        VECTOR(degree)[k] += 1;
+    }
+
+    ec = 0; /* index into the edges vector */
+    for (i=0; i < n-2; ++i)
+        for (j=0; j < n; ++j)
+            if (VECTOR(degree)[j] == 1) {
+                VECTOR(edges)[ec++] = VECTOR(*prufer)[i];
+                VECTOR(edges)[ec++] = j;
+                VECTOR(degree)[ VECTOR(*prufer)[i] ]--;
+                VECTOR(degree)[j]--;
+                break;
+            }
+
+    for (i=0; i < n; ++i)
+        if (VECTOR(degree)[i] == 1)
+            VECTOR(edges)[ec++] = i;
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) n, /* directed = */ 0));
+
+    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&degree);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
