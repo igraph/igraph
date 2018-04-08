@@ -2348,8 +2348,11 @@ int igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {
             }
 
     for (i=0; i < n; ++i)
-        if (VECTOR(degree)[i] == 1)
+        if (VECTOR(degree)[i] == 1) {
             VECTOR(edges)[ec++] = i;
+            if (ec == 2*(n-1))
+                break;
+        }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) n, /* directed = */ 0));
 
