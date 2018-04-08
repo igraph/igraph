@@ -4308,6 +4308,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
  *        \cli IGRAPH_RANDOM_LERW
  *          This algorithm effectively performs a loop-erased random walk on the complete graph
  *          to uniformly sample its spanning trees (Wilson's algorithm).
+ *        \endclist
  * \return Error code:
  *          \c IGRAPH_ENOMEM: there is not enough
  *           memory to perform the operation.

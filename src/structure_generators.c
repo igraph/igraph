@@ -2307,9 +2307,12 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
  * \param graph Pointer to an uninitialized graph object.
  * \param prufer The Pr&uuml;fer sequence
  * \return Error code:
- *          \c IGRAPH_ENOMEM: there is not enough
- *           memory to perform the operation.
- *          \c IGRAPH_EINVAL: invalid Pr&uuml;fer sequence given
+ *          \clist
+ *          \cli IGRAPH_ENOMEM
+ *             there is not enough memory to perform the operation.
+ *          \cli IGRAPH_EINVAL
+ *             invalid Pr&uuml;fer sequence given
+ *          \endclist
  *
  * \sa \ref igraph_tree_game()
  *
