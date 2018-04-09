@@ -59,7 +59,7 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 
 // Generate undirected realization as edge-list.
 // Always choose the vertex with the smallest remaining degree to connect up next.
-int igraph_i_havel_hakimi_smallest(const igraph_vector_t *deg, igraph_vector_t *edges) {
+static int igraph_i_havel_hakimi_smallest(const igraph_vector_t *deg, igraph_vector_t *edges) {
     long n = igraph_vector_size(deg);
 
     long ec = 0; // number of edges added so far
@@ -102,7 +102,7 @@ int igraph_i_havel_hakimi_smallest(const igraph_vector_t *deg, igraph_vector_t *
 
 
 // Always choose the vertex with the largest remaining degree to connect up next.
-int igraph_i_havel_hakimi_largest(const igraph_vector_t *deg, igraph_vector_t *edges) {
+static int igraph_i_havel_hakimi_largest(const igraph_vector_t *deg, igraph_vector_t *edges) {
     long n = igraph_vector_size(deg);
 
     long ec = 0; // number of edges added so far
@@ -145,7 +145,7 @@ fail:
 
 
 // Choose vertices in the order of their IDs.
-int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector_t *edges) {
+static int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector_t *edges) {
     long n = igraph_vector_size(deg);
 
     long ec = 0; // number of edges added so far
@@ -197,7 +197,7 @@ fail:
 }
 
 
-bool is_nonzero_outdeg(const vbd_pair &vd) {
+inline bool is_nonzero_outdeg(const vbd_pair &vd) {
     return (vd.degree.second != 0);
 }
 
@@ -207,7 +207,7 @@ bool is_nonzero_outdeg(const vbd_pair &vd) {
 // Realize bi-degree sequence as edge list
 // If smallest=true, always choose the vertex with "smallest" bi-degree for connecting up next,
 // otherwise choose the "largest" (based on lexicographic bi-degree ordering).
-int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igraph_vector_t *edges, bool smallest) {
+static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igraph_vector_t *edges, bool smallest) {
     long n = igraph_vector_size(indeg); // number of vertices
 
     long ec = 0; // number of edges added so far
@@ -273,7 +273,7 @@ fail:
 
 
 // Choose vertices in the order of their IDs.
-int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igraph_vector_t *edges) {
+static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igraph_vector_t *indeg, igraph_vector_t *edges) {
     long n = igraph_vector_size(indeg); // number of vertices
 
     long ec = 0; // number of edges added so far
@@ -332,7 +332,7 @@ fail:
 }
 
 
-int igraph_i_realize_undirected_degree_sequence(
+static int igraph_i_realize_undirected_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *deg,
         igraph_realize_degseq_t method)
@@ -370,7 +370,7 @@ int igraph_i_realize_undirected_degree_sequence(
 }
 
 
-int igraph_i_realize_directed_degree_sequence(
+static int igraph_i_realize_directed_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *outdeg,
         const igraph_vector_t *indeg,
@@ -467,7 +467,7 @@ int igraph_i_realize_directed_degree_sequence(
  *
  */
 
-extern "C" int igraph_realize_degree_sequence(
+int igraph_realize_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
         igraph_realize_degseq_t method)
