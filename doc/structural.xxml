@@ -51,6 +51,7 @@
 <!-- doxrox-include igraph_decompose_destroy -->
 <!-- doxrox-include igraph_biconnected_components -->
 <!-- doxrox-include igraph_articulation_points -->
+<!-- doxrox-include igraph_bridges -->
 </section>
 
 <section><title>Degree Sequences</title>
