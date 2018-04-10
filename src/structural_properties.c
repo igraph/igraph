@@ -6897,3 +6897,185 @@ int igraph_i_is_graphical_degree_sequence_directed(
 
 #undef SUCCEED
 #undef FAIL
+
+
+/* igraph_is_tree -- check if a graph is a tree */
+
+/* count the number of vertices reachable from the root */
+static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_t *al, igraph_integer_t *visited_count) {
+    igraph_stack_int_t stack;
+    igraph_vector_bool_t visited;
+    long i;
+
+    IGRAPH_CHECK(igraph_vector_bool_init(&visited, igraph_adjlist_size(al)));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
+
+    IGRAPH_CHECK(igraph_stack_int_init(&stack, 0));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
+
+    *visited_count = 0;
+
+    /* push the root into the stack */
+    IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
+
+    while (! igraph_stack_int_empty(&stack)) {
+        igraph_integer_t u;
+        igraph_vector_int_t *neighbors;
+        long ncount;
+
+        /* take a vertex from the stack, mark it as visited */
+        u = igraph_stack_int_pop(&stack);
+        VECTOR(visited)[u] = 1;
+        *visited_count += 1;
+
+        /* register all its yet-unvisited neighbours for future processing */
+        neighbors = igraph_adjlist_get(al, u);
+        ncount = igraph_vector_int_size(neighbors);
+        for (i=0; i < ncount; ++i) {
+            igraph_integer_t v = VECTOR(*neighbors)[i];
+            if (! VECTOR(visited)[v])
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
+        }
+    }
+
+    igraph_stack_int_destroy(&stack);
+    igraph_vector_bool_destroy(&visited);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup structural
+ * \function igraph_is_tree
+ * \brief Decides whether the graph is a tree.
+ *
+ * An undirected graph is a tree if it is connected and has no cycles.
+ * </para><para>
+ *
+ * In the directed case, a possible additional requirement is that all
+ * edges are oriented away from a root (out-tree or arborescence) or all edges
+ * are oriented towards a root (in-tree or anti-arborescence).
+ * This test can be controlled using the \p mode parameter.
+ * </para><para>
+ *
+ * By convention, the null graph (i.e. the graph with no vertices) is considered not to be a tree.
+ *
+ * \param graph The graph object to analyze.
+ * \param res Pointer to a logical variable, the result will be stored
+ *        here.
+ * \param root If not \c NULL, the root node will be stored here. When \p mode
+ *        is \c IGRAPH_ALL or the graph is undirected, any vertex can be the root
+ *        and \p root is set to 0 (the first vertex). When \p mode is \c IGRAPH_OUT
+ *        or \c IGRAPH_IN, the root is set to the vertex with zero in- or out-degree,
+ *        respectively.
+ * \param mode For a directed graph this specifies whether to test for an
+ *        out-tree, an in-tree or ignore edge directions. The respective
+ *        possible values are:
+ *        \c IGRAPH_OUT, \c IGRAPH_IN, \c IGRAPH_ALL. This argument is
+ *        ignored for undirected graphs.
+ * \return Error code:
+ *        \c IGRAPH_EINVAL: invalid mode argument.
+ *
+ * Time complexity: At most O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa igraph_is_weakly_connected()
+ */
+
+int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
+    igraph_adjlist_t al;
+    igraph_integer_t iroot;
+    igraph_integer_t visited_count;
+    igraph_integer_t vcount, ecount;
+
+    vcount = igraph_vcount(graph);
+    ecount = igraph_ecount(graph);
+
+    /* A tree must have precisely vcount-1 edges. */
+    /* By convention, the zero-vertex graph will not be considered a tree. */
+    if (ecount != vcount-1) {
+        *res = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* The single-vertex graph is a tree, provided it has no edges (checked in the previous if (..)) */
+    if (vcount == 1) {
+        *res = 1;
+        if (root)
+            *root = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* For higher vertex counts we cannot short-circuit due to the possibility
+     * of loops or multi-edges even when the edge count is correct. */
+
+    /* Ignore mode for undirected graphs. */
+    if (! igraph_is_directed(graph))
+        mode = IGRAPH_ALL;
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+
+    /* The main algorithm:
+     * We find a root and check that all other vertices are reachable from it.
+     * We have already checked the number of edges, so with the additional
+     * reachability condition we can verify if the graph is a tree.
+     *
+     * For directed graphs, the root is the node with no incoming/outgoing
+     * connections, depending on 'mode'. For undirected, it is arbitrary, so
+     * we choose 0.
+     */
+
+    *res = 1; /* assume success */
+
+    switch (mode) {
+    case IGRAPH_ALL:
+        iroot = 0;
+        break;
+
+    case IGRAPH_IN:
+    case IGRAPH_OUT:
+    {
+        igraph_vector_t degree;
+        igraph_integer_t i;
+
+        IGRAPH_CHECK(igraph_vector_init(&degree, 0));
+        IGRAPH_FINALLY(igraph_vector_destroy, &degree);
+
+        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, /* loops = */ 1));
+
+        for (i=0; i < vcount; ++i)
+            if (VECTOR(degree)[i] == 0)
+                break;
+
+        /* if no suitable root is found, the graph is not a tree */
+        if (i == vcount)
+            *res = 0;
+        else
+            iroot = i;
+
+        igraph_vector_destroy(&degree);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+        break;
+    default:
+        IGRAPH_ERROR("Invalid mode", IGRAPH_EINVMODE);
+    }
+
+    /* if no suitable root was found, skip visting vertices */
+    if (*res) {
+        IGRAPH_CHECK(igraph_i_is_tree_visitor(iroot, &al, &visited_count));
+        *res = visited_count == vcount;
+    }
+
+    if (root)
+        *root = iroot;
+
+    igraph_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
