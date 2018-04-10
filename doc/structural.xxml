@@ -111,6 +111,7 @@
 <!-- doxrox-include igraph_minimum_spanning_tree -->
 <!-- doxrox-include igraph_minimum_spanning_tree_unweighted -->
 <!-- doxrox-include igraph_minimum_spanning_tree_prim -->
+<!-- doxrox-include igraph_is_tree -->
 </section>
 
 <section><title>Transitivity or Clustering Coefficient</title>
