@@ -27,6 +27,9 @@
 #include "igraph_interface.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_memory.h"
+#include "igraph_adjlist.h"
+#include "igraph_random.h"
+#include "igraph_components.h"
 #include "igraph_progress.h"
 #include "igraph_types_internal.h"
 
@@ -365,4 +368,145 @@ int igraph_i_minimum_spanning_tree_prim(const igraph_t* graph,
   return IGRAPH_SUCCESS;
 }
 
+
+/* igraph_random_spanning_tree */
+
+/* Loop-erased random walk (LERW) implementation.
+ * res must be an initialized vector. The edge IDs of the spanning tree
+ * will be added to the end of it. res will not be cleared before doing this.
+ *
+ * The walk is started from vertex start. comp_size must be the size of the connected
+ * component containing start.
+ */
+static int igraph_i_lerw(const igraph_t *graph, igraph_vector_t *res, igraph_integer_t start,
+                  igraph_integer_t comp_size, igraph_vector_bool_t *visited, const igraph_inclist_t *il)
+{
+    igraph_integer_t visited_count;
+
+    IGRAPH_CHECK(igraph_vector_reserve(res, igraph_vector_size(res) + comp_size-1));
+
+    RNG_BEGIN();
+
+    VECTOR(*visited)[start] = 1;
+    visited_count = 1;
+
+    while (visited_count < comp_size) {
+        long degree, edge;
+        igraph_vector_int_t *edges;
+
+        edges = igraph_inclist_get(il, start);
+
+        /* choose a random edge */
+        degree = igraph_vector_int_size(edges);
+        edge = VECTOR(*edges)[ RNG_INTEGER(0, degree-1) ];
+
+        /* set 'start' to the next vertex */        
+        start = IGRAPH_OTHER(graph, edge, start);
+
+        /* if the next vertex hasn't been visited yet, register the edge we just traversed */
+        if (! VECTOR(*visited)[start]) {
+            IGRAPH_CHECK(igraph_vector_push_back(res, edge));
+            VECTOR(*visited)[start] = 1;
+            visited_count++;
+        }
+
+        IGRAPH_ALLOW_INTERRUPTION();
+    }
+
+    RNG_END();
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_random_spanning_tree
+ * \brief Uniformly sample the spanning trees of a graph
+ *
+ * Performs a loop-erased random walk on the graph to uniformly sample
+ * its spanning trees. Edge directions are ignored.
+ * </para><para>
+ *
+ * Multi-graphs are supported, and edge multiplicities will affect the sampling
+ * frequency. For example, consider the 3-cycle graph <code>1=2-3-1</code>, with two edges
+ * between vertices 1 and 2. Due to these parallel edges, the trees <code>1-2-3</code>
+ * and <code>3-1-2</code> will be sampled with multiplicity 2, while the tree
+ * <code>2-3-1</code> will be sampled with multiplicity 1.
+ *
+ * \param graph The input graph. Edge directions are ignored.
+ * \param res An initialized vector, the IDs of the edges that constitute
+ *        a spanning tree will be returned here. Use
+ *        \ref igraph_subgraph_edges() to extract the spanning tree as
+ *        a separate graph object.
+ * \param vid This parameter is relevant if the graph is not connected.
+ *        If negative, a random spanning forest of all components will be
+ *        generated. Otherwise, it should be the ID of a vertex. A random
+ *        spanning tree of the component containing the vertex will be
+ *        generated.
+ *
+ * \return Error code.
+ *
+ * \sa \ref igraph_minimum_spanning_tree(), \ref igraph_random_walk()
+ *
+ */
+int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *res, igraph_integer_t vid) {
+    igraph_inclist_t il;
+    igraph_vector_bool_t visited;
+    igraph_integer_t vcount = igraph_vcount(graph);
+
+    if (vid >= vcount)
+        IGRAPH_ERROR("Invalid vertex id given for random spanning tree", IGRAPH_EINVVID);
+
+    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &il);
+
+    IGRAPH_CHECK(igraph_vector_bool_init(&visited, vcount));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
+
+    igraph_vector_clear(res);
+
+    if (vid < 0) { /* generate random spanning forest: consider each component separately */
+        igraph_vector_t membership, csize;
+        igraph_integer_t comp_count;
+        igraph_integer_t i;
+
+        IGRAPH_VECTOR_INIT_FINALLY(&membership, 0);
+        IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
+
+        IGRAPH_CHECK(igraph_clusters(graph, &membership, &csize, &comp_count, IGRAPH_WEAK));
+
+        /* for each component ... */
+        for (i=0; i < comp_count; ++i) {
+            /* ... find a vertex to start the LERW from */
+            igraph_integer_t j = 0;
+            while (VECTOR(membership)[j] != i)
+                ++j;
+
+            IGRAPH_CHECK(igraph_i_lerw(graph, res, j, (igraph_integer_t) VECTOR(csize)[i], &visited, &il));
+        }
+
+        igraph_vector_destroy(&membership);
+        igraph_vector_destroy(&csize);
+        IGRAPH_FINALLY_CLEAN(2);
+    }
+    else /* consider the component containing vid */
+    {
+        igraph_vector_t comp_vertices;
+        igraph_integer_t comp_size;
+
+        /* we measure the size of the component */
+        IGRAPH_VECTOR_INIT_FINALLY(&comp_vertices, 0);        
+        IGRAPH_CHECK(igraph_subcomponent(graph, &comp_vertices, vid, IGRAPH_ALL));
+        comp_size = (igraph_integer_t) igraph_vector_size(&comp_vertices);
+        igraph_vector_destroy(&comp_vertices);
+        IGRAPH_FINALLY_CLEAN(1);
+
+        IGRAPH_CHECK(igraph_i_lerw(graph, res, vid, comp_size, &visited, &il));
+    }
+
+    igraph_vector_bool_destroy(&visited);
+    igraph_inclist_destroy(&il);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
 
