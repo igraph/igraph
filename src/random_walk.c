@@ -262,13 +262,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
             start = IGRAPH_FROM(graph, edge);
             break;
         case IGRAPH_ALL:
-            {
-                igraph_integer_t next = IGRAPH_TO(graph, edge);
-                if (start == next)
-                    start = IGRAPH_FROM(graph, edge);
-                else
-                    start = next;
-            }
+            start = IGRAPH_OTHER(graph, edge, start);
             break;
         }
 
