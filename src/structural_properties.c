@@ -6824,6 +6824,14 @@ int igraph_i_is_graphical_degree_sequence_directed(
   lhs = 0;
   for (i = 0; i < vcount; i++) {
     lhs += INDEGREE(i);
+
+    /* It is enough to check for indexes where the in-degree is about to
+     * decrease in the next step; see "Stronger condition" in the Wikipedia
+     * entry for the Fulkerson-Chen-Anstee condition */
+    if (i != vcount - 1 && INDEGREE(i) == INDEGREE(i+1)) {
+      continue;
+    }
+
     rhs = 0;
     for (j = 0; j <= i; j++) {
       rhs += OUTDEGREE(j) < i ? OUTDEGREE(j) : i;
@@ -6831,6 +6839,7 @@ int igraph_i_is_graphical_degree_sequence_directed(
     for (j = i+1; j < vcount; j++) {
       rhs += OUTDEGREE(j) < (i + 1) ? OUTDEGREE(j) : (i + 1);
     }
+
     if (lhs > rhs) {
       *res = 0;
       break;
