@@ -6699,7 +6699,8 @@ int igraph_i_is_graphical_degree_sequence_directed(
  * \param res  pointer to a boolean variable, the result will be stored here
  * \return Error code.
  * 
- * Time complexity: O(n^2 log n) where n is the length of the degree sequence.
+ * Time complexity: O(n log n) for undirected graphs, O(n^2) for directed
+ *                  graphs, where n is the length of the degree sequence.
  */
 int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
     const igraph_vector_t *in_degrees, igraph_bool_t *res) {
@@ -6720,36 +6721,38 @@ int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
 int igraph_i_is_graphical_degree_sequence_undirected(
     const igraph_vector_t *degrees, igraph_bool_t *res) {
   igraph_vector_t work;
-  igraph_integer_t degree;
-  long int i, vcount;
+  long int w, b, s, c, n, k;
 
   IGRAPH_CHECK(igraph_vector_copy(&work, degrees));
   IGRAPH_FINALLY(igraph_vector_destroy, &work);
 
-  vcount = igraph_vector_size(&work);
-  *res = 0;
-  while (vcount) {
-    /* RFE: theoretically, a counting sort would be only O(n) here and not
-     * O(n log n) since the degrees are bounded from above by n. I am not sure
-     * whether it's worth the fuss, though, sort() in the C library is highly
-     * optimized */
-    igraph_vector_sort(&work);
-    if (VECTOR(work)[0] < 0)
-      break;
+  igraph_vector_sort(&work);
 
-    degree = (igraph_integer_t) igraph_vector_pop_back(&work);
-    vcount--;
-
-    if (degree == 0) {
-      *res = 1;
+  /* This algorithm is outlined in TR-2011-11 of the Egervary Research Group,
+   * ISSN 1587-4451. The main loop of the algorithm is O(n) but it is dominated
+   * by an O(n log n) quicksort; this could in theory be brought down to
+   * O(n) with binsort but it's probably not worth the fuss.
+   *
+   * Variables names are mostly according to the technical report, apart from
+   * the degrees themselves. w and k are zero-based here; in the technical
+   * report they are 1-based */
+  *res = 1;
+  n = igraph_vector_size(&work);
+  w = n - 1; b = 0; s = 0; c = 0;
+  for (k = 0; k < n; k++) {
+    b += VECTOR(*degrees)[k];
+    c += w;
+    while (w > k && VECTOR(*degrees)[w] <= k + 1) {
+      s += VECTOR(*degrees)[w];
+      c -= (k + 1);
+      w--;
+    }
+    if (b > c + s) {
+      *res = 0;
       break;
     }
-
-    if (degree > vcount)
+    if (w == k) {
       break;
-
-    for (i = vcount-degree; i < vcount; i++) {
-      VECTOR(work)[i]--;
     }
   }
 
