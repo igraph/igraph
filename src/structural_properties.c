@@ -6691,6 +6691,11 @@ int igraph_i_is_graphical_degree_sequence_directed(
  * PL Erdos, I Miklos and Z Toroczkai: A simple Havel-Hakimi type algorithm
  * to realize graphical degree sequences of directed graphs. The Electronic
  * Journal of Combinatorics 17(1):R66, 2010.
+ * 
+ * </para><para>
+ * Z Kiraly: Recognizing graphic degree sequences and generating all
+ * realizations. TR-2011-11, Egervary Research Group, H-1117, Budapest,
+ * Hungary. ISSN 1587-4451, 2012.
  *
  * \param out_degrees  an integer vector specifying the degree sequence for
  *     undirected graphs or the out-degree sequence for directed graphs.
