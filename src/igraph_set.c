@@ -160,7 +160,7 @@ void igraph_set_clear(igraph_set_t* set) {
 
 /**
  * \ingroup set
- * \function igraph_vector_set
+ * \function igraph_set_size
  * \brief Gives the size (=length) of the set.
  * 
  * \param v The set object
@@ -256,6 +256,9 @@ int igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
   left = 0;
   right = igraph_set_size(set)-1;
 
+  if (right == -1)
+      return 0; /* the set is empty */
+
   /* search for the new element */
   while (left < right-1) {
     middle = (left+right)/2;
@@ -264,13 +267,11 @@ int igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
     } else if (SET(*set)[middle] < e) {
       left = middle;
     } else {
-      left = middle;
       return 1;
     }
   }
 
-  if (SET(*set)[left] != e && SET(*set)[right] == e) return 1;
-  return (SET(*set)[left] == e);
+  return SET(*set)[left] == e || SET(*set)[right] == e;
 }
 
 /**
