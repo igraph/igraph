@@ -6606,15 +6606,15 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
 #define SUCCEED {   \
   if (res) {        \
     *res = 1;       \
-    return IGRAPH_SUCCESS; \
   }                 \
+  return IGRAPH_SUCCESS; \
 }
 
 #define FAIL {   \
   if (res) {     \
     *res = 0;    \
-    return IGRAPH_SUCCESS; \
   }              \
+  return IGRAPH_SUCCESS; \
 }
 
 /**
@@ -6786,12 +6786,6 @@ int igraph_i_is_graphical_degree_sequence_directed(
   igraph_vector_long_t index_array;
   long int i, j, vcount, lhs, rhs;
   igraph_i_qsort_dual_vector_cmp_data_t sort_data;
-
-  /* Quick smoke test: sum of out-degrees must be equal to the sum of in-degrees */
-  if (igraph_vector_sum(out_degrees) != igraph_vector_sum(in_degrees)) {
-    *res = 0;
-    return IGRAPH_SUCCESS;
-  }
 
   /* Create an index vector that sorts the vertices by decreasing in-degree */
   vcount = igraph_vector_size(out_degrees);
