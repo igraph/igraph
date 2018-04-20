@@ -2598,11 +2598,11 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 	if (VECTOR(which)[to] != i+1) {
 	  /* First non-infinite distance */
 	  VECTOR(which)[to]=i+1;
-	  VECTOR(dist)[to]=altdist;
+	  VECTOR(dist)[to]=altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (cmp_result < 0) {
 	  /* This is a shorter path */
-	  VECTOR(dist)[to]=altdist;
+	  VECTOR(dist)[to]=altdist+1.0;
 	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	}
       }
