@@ -3530,11 +3530,12 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                 igraph_vector_t* fitness_out, igraph_vector_t* fitness_in,
                 igraph_bool_t loops, igraph_bool_t multiple) {
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
-  igraph_integer_t no_of_nodes, max_no_of_edges;
+  igraph_integer_t no_of_nodes;
   igraph_integer_t outnodes, innodes, nodes;
   igraph_vector_t cum_fitness_in, cum_fitness_out;
   igraph_vector_t *p_cum_fitness_in, *p_cum_fitness_out;
   igraph_real_t x, max_in, max_out;
+  igraph_real_t max_no_of_edges;
   igraph_bool_t is_directed = (fitness_in != 0);
   float num_steps;
   igraph_integer_t step_counter = 0;
@@ -3578,14 +3579,16 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
         if (VECTOR(*fitness_out)[i] != 0 && VECTOR(*fitness_in)[i] != 0)
             nodes++;
       }
-      max_no_of_edges = ((long int) outnodes) * innodes - (loops ? 0 : nodes);
+      max_no_of_edges = ((igraph_real_t) outnodes) * innodes - (loops ? 0 : nodes);
     } else {
       nodes = 0;
       for (i=0; i < no_of_nodes; i++) {
         if (VECTOR(*fitness_out)[i] != 0)
           nodes++;
       }
-      max_no_of_edges = loops ? nodes*((long int)nodes+1)/2 : nodes*((long int)nodes-1)/2;
+      max_no_of_edges = loops
+        ? nodes*((igraph_real_t)nodes+1)/2
+        : nodes*((igraph_real_t)nodes-1)/2;
     }
     if (no_of_edges > max_no_of_edges)
       IGRAPH_ERROR("Too many edges requested", IGRAPH_EINVAL);
