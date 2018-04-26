@@ -1181,7 +1181,7 @@ int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  * \param directed Whether the graph should be directed.
  * \return Error code.
  * 
- * \sa \ref igraph_ring().
+ * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector()
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
@@ -1613,7 +1613,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
  *        for the shifts.
  * \return Error code.
  * 
- * \sa \ref igraph_lcf()
+ * \sa \ref igraph_lcf(), \ref igraph_extended_chordal_ring()
  * 
  * Time complexity: O(|V|+|E|), linear in the number of vertices plus
  * the number of edges.
