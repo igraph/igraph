@@ -915,7 +915,8 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  * number of vertices plus the number of edges in the graph.
  * 
  * \sa \ref igraph_lattice(), \ref igraph_star() for creating other regular
- * structures. 
+ * structures; \ref igraph_from_prufer() for creating arbitrary trees;
+ * \ref igraph_tree_game() for uniform random sampling of trees.
  * 
  * \example examples/simple/igraph_tree.c
  */
@@ -2311,7 +2312,7 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
  *             invalid Pr&uuml;fer sequence given
  *          \endclist
  *
- * \sa \ref igraph_tree_game()
+ * \sa \ref igraph_tree(), \ref igraph_tree_game()
  *
  */
 
