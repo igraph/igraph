@@ -61,7 +61,6 @@ typedef struct igraph_eigen_which_t {
   int vestimate;
   igraph_lapack_dgeevx_balance_t balance;
 } igraph_eigen_which_t;
-    
 
 DECLDIR int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
                 const igraph_sparsemat_t *sA,

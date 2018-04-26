@@ -1959,16 +1959,17 @@ int FUNCTION(igraph_vector,get_interval)(const TYPE(igraph_vector) *v,
  * vector.
  */
 
-BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
-					   const TYPE(igraph_vector) *m2) {
+igraph_real_t FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
+					     const TYPE(igraph_vector) *m2) {
   long int n1=FUNCTION(igraph_vector,size)(m1);
   long int n2=FUNCTION(igraph_vector,size)(m2);
   long int n= n1 < n2 ? n1 : n2;
   long int i;
-  BASE diff=ZERO;
+  igraph_real_t diff=0.0;
   
   for (i=0; i<n; i++) {
-    BASE d=(BASE) fabs(VECTOR(*m1)[i]-VECTOR(*m2)[i]);
+    igraph_real_t d=fabs((igraph_real_t)(VECTOR(*m1)[i]) -
+			 (igraph_real_t)(VECTOR(*m2)[i]));
     if (d > diff) {
       diff=d;
     }

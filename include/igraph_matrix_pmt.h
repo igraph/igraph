@@ -177,8 +177,8 @@ DECLDIR int FUNCTION(igraph_matrix,colsum)(const TYPE(igraph_matrix) *m,
 				   TYPE(igraph_vector) *res);
 DECLDIR igraph_bool_t FUNCTION(igraph_matrix,is_equal)(const TYPE(igraph_matrix) *m1, 
 					       const TYPE(igraph_matrix) *m2);
-DECLDIR BASE FUNCTION(igraph_matrix,maxdifference)(const TYPE(igraph_matrix) *m1,
-						    const TYPE(igraph_matrix) *m2);
+DECLDIR igraph_real_t FUNCTION(igraph_matrix,maxdifference)(const TYPE(igraph_matrix) *m1,
+							    const TYPE(igraph_matrix) *m2);
 
 /*------------------------*/
 /* Searching for elements */

@@ -166,8 +166,8 @@ DECLDIR igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vect
 						  BASE limit);
 DECLDIR igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
                                               const TYPE(igraph_vector) *rhs);
-DECLDIR BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
-					   const TYPE(igraph_vector) *m2);
+DECLDIR igraph_real_t FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
+							    const TYPE(igraph_vector) *m2);
 
 /*------------------------*/
 /* Searching for elements */

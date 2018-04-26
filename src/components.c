@@ -590,7 +590,7 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
  * 
  * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
  * 
- * \sa \ref igraph_biconnected_components(), \ref igraph_clusters()
+ * \sa \ref igraph_biconnected_components(), \ref igraph_clusters(), \ref igraph_bridges()
  */
 
 int igraph_articulation_points(const igraph_t *graph,
@@ -879,3 +879,103 @@ int igraph_biconnected_components(const igraph_t *graph,
   return 0;
 }
 
+
+/* igraph_bridges -- find all bridges in the graph */
+/* based on https://www.geeksforgeeks.org/bridge-in-a-graph/ */
+
+static int igraph_i_bridges_rec(const igraph_t *graph, const igraph_inclist_t *il, igraph_integer_t u, igraph_integer_t *time, igraph_vector_t *bridges, igraph_vector_bool_t *visited, igraph_vector_int_t *disc, igraph_vector_int_t *low, igraph_vector_int_t *parent) {
+    igraph_vector_int_t *incedges;
+    long nc; /* neighbour count */
+    long i;
+
+    VECTOR(*visited)[u] = 1;
+
+    *time += 1;
+
+    VECTOR(*disc)[u] = *time;
+    VECTOR(*low)[u] = *time;
+
+    incedges = igraph_inclist_get(il, u);
+    nc = igraph_vector_int_size(incedges);
+    for (i=0; i < nc; ++i) {
+        long edge = (long) VECTOR(*incedges)[i];
+        igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
+
+        if (! VECTOR(*visited)[v]) {
+            VECTOR(*parent)[v] = u;
+            IGRAPH_CHECK(igraph_i_bridges_rec(graph, il, v, time, bridges, visited, disc, low, parent));
+
+            VECTOR(*low)[u] = VECTOR(*low)[u] < VECTOR(*low)[v] ? VECTOR(*low)[u] : VECTOR(*low)[v];
+
+            if (VECTOR(*low)[v] > VECTOR(*disc)[u])
+                IGRAPH_CHECK(igraph_vector_push_back(bridges, edge));
+        }
+        else if (v != VECTOR(*parent)[u]) {
+            VECTOR(*low)[u] = VECTOR(*low)[u] < VECTOR(*disc)[v] ? VECTOR(*low)[u] : VECTOR(*disc)[v];
+        }
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+/**
+ * \function igraph_bridges
+ * Find all bridges in a graph.
+ *
+ * An edge is a bridge if its removal increases the number of (weakly)
+ * connected components in the graph.
+ *
+ * \param graph The input graph.
+ * \param res Pointer to an initialized vector, the
+ *    bridges will be stored here as edge indices.
+ * \return Error code.
+ *
+ * Time complexity: O(|V|+|E|), linear in the number of vertices and edges.
+ *
+ * \sa \ref igraph_articulation_points(), \ref igraph_biconnected_components(), \ref igraph_clusters()
+ */
+
+int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
+    igraph_inclist_t il;
+    igraph_vector_bool_t visited;
+    igraph_vector_int_t disc, low;
+    igraph_vector_int_t parent;
+    long n;
+    long i;
+    igraph_integer_t time;
+
+    n = igraph_vcount(graph);
+
+    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &il);
+
+    IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&disc, n));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &disc);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&low, n));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&parent, n));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &parent);
+    for (i=0; i < n; ++i)
+        VECTOR(parent)[i] = -1;
+
+    igraph_vector_clear(bridges);
+
+    time = 0;
+    for (i=0; i < n; ++i)
+        if (! VECTOR(visited)[i])
+            IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &parent));
+
+    igraph_vector_int_destroy(&parent);
+    igraph_vector_int_destroy(&low);
+    igraph_vector_int_destroy(&disc);
+    igraph_vector_bool_destroy(&visited);
+    igraph_inclist_destroy(&il);
+    IGRAPH_FINALLY_CLEAN(5);
+
+    return IGRAPH_SUCCESS;
+}

@@ -31,6 +31,36 @@ void print_vector(igraph_vector_t *v, FILE *f) {
   fprintf(f, "\n");
 }
 
+int test_bug950() {
+  /* Testing the case of weighted graphs with multiple alternate
+   * paths to the same node with slightly different weights due to
+   * floating point inaccuracies. */
+  igraph_t g;
+  igraph_vector_t eb;
+  igraph_vector_t weights;
+  igraph_integer_t from, to;
+  long int i;
+
+  igraph_full(&g, 6, 0, 0);
+  igraph_vector_init(&weights, igraph_ecount(&g));
+  igraph_vector_init(&eb, igraph_ecount(&g));
+
+  for (i = 0; i < igraph_ecount(&g); i++) {
+    igraph_edge(&g, i, &from, &to);
+    VECTOR(weights)[i] =
+		((from < 3 && to < 3) || (from >= 3 && to >= 3)) ? 1 : 0.1;
+  }
+
+  igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, &weights);
+  print_vector(&eb, stdout);
+
+  igraph_vector_destroy(&eb);
+  igraph_vector_destroy(&weights);
+  igraph_destroy(&g);
+
+  return 0;
+}
+
 int main() {
 
   igraph_t g;
@@ -79,6 +109,10 @@ int main() {
   print_vector(&eb, stdout);
   igraph_vector_destroy(&eb);
   igraph_destroy(&g);
+
+  if (test_bug950()) {
+    return 1;
+  }
 
   return 0;
 }

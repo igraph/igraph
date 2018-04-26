@@ -54,6 +54,7 @@ DECLDIR int igraph_biconnected_components(const igraph_t *graph,
                 igraph_vector_ptr_t *component_edges,
                 igraph_vector_ptr_t *components,
                 igraph_vector_t *articulation_points);
+DECLDIR int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges);
 
 __END_DECLS
 

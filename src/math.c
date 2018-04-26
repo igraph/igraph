@@ -246,3 +246,65 @@ int igraph_is_posinf(double x) {
 int igraph_is_neginf(double x) {
   return isinf(x) == -1;
 }
+
+/**
+ * \function igraph_almost_equals
+ * Compare two double-precision floats with a tolerance
+ *
+ * Determines whether two double-precision floats are "almost equal"
+ * to each other with a given level of tolerance on the relative error.
+ *
+ * \param  a  the first float
+ * \param  b  the second float
+ * \param  eps  the level of tolerance on the relative error. The relative
+ *         error is defined as \c "abs(a-b) / (abs(a) + abs(b))". The
+ *         two numbers are considered equal if this is less than \c eps.
+ *         
+ * \return nonzero if the two floats are nearly equal to each other within
+ *         the given level of tolerance, zero otherwise
+ */
+int igraph_almost_equals(double a, double b, double eps) {
+  return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
+}
+
+
+/**
+ * \function igraph_cmp_epsilon
+ * Compare two double-precision floats with a tolerance
+ *
+ * Determines whether two double-precision floats are "almost equal"
+ * to each other with a given level of tolerance on the relative error.
+ *
+ * \param  a  the first float
+ * \param  b  the second float
+ * \param  eps  the level of tolerance on the relative error. The relative
+ *         error is defined as \c "abs(a-b) / (abs(a) + abs(b))". The
+ *         two numbers are considered equal if this is less than \c eps.
+ *         
+ * \return zero if the two floats are nearly equal to each other within
+ *         the given level of tolerance, positive number if the first float is
+ *         larger, negative number if the second float is larger
+ */
+int igraph_cmp_epsilon(double a, double b, double eps) {
+  double diff;
+  double abs_diff;
+  
+  if (a == b) {
+    /* shortcut, handles infinities */
+    return 0;
+  }
+  
+  diff = a-b;
+  abs_diff = fabs(diff);
+  
+  if (a == 0 || b == 0 || diff < DBL_MIN) {
+    /* a or b is zero or both are extremely close to it; relative
+     * error is less meaningful here so just compare it with
+     * epsilon */
+    return abs_diff < (eps * DBL_MIN) ? 0 : (diff < 0 ? -1 : 1);
+  } else {
+    /* use relative error */
+    return (abs_diff / (fabs(a) + fabs(b)) < eps) ? 0 : (diff < 0 ? -1 : 1);
+  }
+}
+

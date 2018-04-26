@@ -54,10 +54,12 @@ int main() {
     return 2; 
   }
 
+  igraph_set_warning_handler(igraph_warning_handler_ignore);
   igraph_centralization_closeness(&g, /*res=*/ 0,
 				  IGRAPH_IN, &cent, 
 				  /*theoretical_max=*/ 0,
 				  /*normalization=*/ 1);
+  igraph_set_warning_handler(igraph_warning_handler_print);
   
   if (!ALMOST_EQUALS(cent, 1.0)) {
     fprintf(stderr, "in-star, closeness: %g\n", cent);
@@ -88,10 +90,12 @@ int main() {
     return 12; 
   }
 
+  igraph_set_warning_handler(igraph_warning_handler_ignore);
   igraph_centralization_closeness(&g, /*res=*/ 0,
 				  IGRAPH_OUT, &cent, 
 				  /*theoretical_max=*/ 0,
 				  /*normalization=*/ 1);
+  igraph_set_warning_handler(igraph_warning_handler_print);
   
   if (!ALMOST_EQUALS(cent, 1.0)) {
     fprintf(stderr, "out-star, closeness: %g\n", cent);

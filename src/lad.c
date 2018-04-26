@@ -369,7 +369,7 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
      FC(diff); true otherwise; */
   int j, u, v, u2, oldNbVal;
   igraph_vector_int_t *vneis;
-  bool result;
+  bool result = false;
 
   while (nb>0) {
     u = VECTOR(*toBeMatched)[--nb];
@@ -377,6 +377,7 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
     vneis = igraph_adjlist_get(&Gt->succ, v);
     /* match u to v */
     for (u2=0; u2<Gp->nbVertices; u2++) {
+      result = 0;
       if (u != u2) {
 	oldNbVal = VECTOR(D->nbVal)[u2];
 	if (igraph_i_lad_isInD(u2, v, D)) {
