@@ -441,11 +441,14 @@ int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
  * \param options The parameters to pass to the layout generator.
  * \param weights Edge weights, pointer to a vector. If this is a null
  *    pointer then every edge will have the same weight.
- * \param fixed Pointer to a logical vector, or a null pointer. This
- *    can be used to fix the position of some vertices. Vertices for
- *    which it is true will not be moved, but stay at the coordinates
- *    given in the \p res matrix. This argument is ignored if it is a
- *    null pointer or if use_seed is false.
+ * \param fixed Pointer to a logical vector, or a null pointer. Originally,
+ *    this argument was used in the DrL algorithm to keep the nodes marked
+ *    with this argument as fixed; fixed nodes would then keep their
+ *    positions in the initial stages of the algorithm. However, due to how
+ *    the DrL code imported into igraph is organized, it seems that the
+ *    argument does not do anything and we are not sure whether this is a
+ *    bug or a feature in DrL. We are leaving the argument here in order not
+ *    to break the API, but note that at the present stage it has no effect.
  * \return Error code.
  * 
  * Time complexity: ???.
