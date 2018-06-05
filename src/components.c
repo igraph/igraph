@@ -628,6 +628,12 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  * one biconnected component. Note that this is not true for
  * vertices: the same vertex can be part of many biconnected
  * components.
+ *
+ * </para><para>
+ * Somewhat arbitrarily, igraph does not consider comppnents containing
+ * a single vertex only as being biconnected. Isolated vertices will
+ * not be part of any of the biconnected components.
+ *
  * \param graph The input graph.
  * \param no The number of biconnected components will be stored here.
  * \param tree_edges If not a NULL pointer, then the found components
