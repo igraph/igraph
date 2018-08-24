@@ -10,7 +10,7 @@ addons:
 
 install:
 - ./bootstrap.sh
-- ./configure --enable-asan
+- ./configure
 - make
 
 script:
