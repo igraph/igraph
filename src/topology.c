@@ -2824,10 +2824,9 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  */
 
 int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
-                const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
+			    const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
 			    igraph_bool_t *iso, igraph_vector_t *map12, 
-			    igraph_vector_t *map21,
-                igraph_bliss_sh_t sh,
+			    igraph_vector_t *map21, igraph_bliss_sh_t sh,
 			    igraph_bliss_info_t *info1, igraph_bliss_info_t *info2) {
   
   long int no_of_nodes=igraph_vcount(graph1);
@@ -2943,9 +2942,10 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
 
   /* If the graphs are coloured, we also need to check that applying the
      permutation mymap12 to colors1 gives colors2. */
+
   if (*iso && colors1 != NULL) {
     for (i=0; i < no_of_nodes; i++) {
-      if (VECTOR(*colors1)[ (long int) VECTOR(*mymap12)[i] ] != VECTOR(*colors2)[i]) {
+      if (VECTOR(*colors1)[i] != VECTOR(*colors2)[(long int) VECTOR(*mymap12)[i] ]) {
           *iso = 0;
           break;
       }

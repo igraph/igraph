@@ -31,6 +31,12 @@ AT_KEYWORDS([isomorph isomorphic VF2])
 AT_COMPILE_CHECK([simple/igraph_isomorphic_vf2.c])
 AT_CLEANUP
 
+AT_SETUP([The BLISS isomorphism algorithm])
+AT_KEYWORDS([isomorph isomorphic BLISS])
+AT_COMPILE_CHECK([simple/igraph_isomorphic_bliss.c])
+AT_CLEANUP
+
+
 AT_SETUP([VF algorithm with compatibility functions])
 AT_KEYWORDS([isomorph isomorphic VF2 compatibility])
 AT_COMPILE_CHECK([simple/VF2-compat.c])
