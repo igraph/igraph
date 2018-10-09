@@ -794,9 +794,9 @@ void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
   if (options->ncv < min_ncv) {
     options->ncv = min_ncv;
   }
-  /* ...but at most n-1 */
-  if (options->ncv > options->n - 1) {
-    options->ncv = options->n - 1;
+  /* ...but at most n */
+  if (options->ncv > options->n) {
+    options->ncv = options->n;
   }
 }
 
