@@ -26,17 +26,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-int random_permutation(igraph_vector_t *vec) {
-  /* We just do size(vec) * 2 swaps */
-  long int one, two, tmp, i, n=igraph_vector_size(vec);
-  for (i=0; i<2*n; i++) {
-    one= (double)rand() / RAND_MAX * n;
-    two= (double)rand() / RAND_MAX * n;
-    tmp=one; one=two; two=tmp;
-  }
-  return 0;
-}
-
 int main() {
   
   igraph_t ring1, ring2;
@@ -46,11 +35,11 @@ int main() {
   igraph_integer_t count;
   long int i;
 
-  srand(time(0));
+  srand(12345);
 
   igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
   igraph_vector_init_seq(&perm, 0, igraph_vcount(&ring1)-1);
-  random_permutation(&perm);
+  igraph_vector_shuffle(&perm);
   igraph_permute_vertices(&ring1, &ring2, &perm);
   
   /* Without colors */
