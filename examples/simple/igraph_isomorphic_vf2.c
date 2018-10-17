@@ -68,8 +68,7 @@ int main() {
   
   /* Two colors, just counting */
   for (i=0; i<igraph_vector_int_size(&color1); i+=2) {
-    VECTOR(color1)[i]   = VECTOR(color2)[i] = 0;
-    VECTOR(color1)[i+1] = VECTOR(color2)[i] = 1;
+    VECTOR(color1)[i] = VECTOR(color2)[(long int)VECTOR(perm)[i]] = 1;
   }
   igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count, 0, 0, 0);
   if (count != 100) {
@@ -80,7 +79,7 @@ int main() {
 
   /* Separate colors for each vertex */
   for (i=0; i<igraph_vector_int_size(&color1); i++) {
-    VECTOR(color1)[i]   = VECTOR(color2)[i] = i;
+    VECTOR(color1)[i] = VECTOR(color2)[(long int)VECTOR(perm)[i]] = i;
   }
   igraph_count_isomorphisms_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &count, 0, 0, 0);
   if (count != 1) {
@@ -103,7 +102,7 @@ int main() {
   igraph_vector_int_fill(&color1, 0);
   igraph_vector_int_fill(&color2, 0); 
   VECTOR(color1)[0]=1;  VECTOR(color1)[1]=1;
-  VECTOR(color2)[0]=1;  VECTOR(color2)[2]=1;
+  VECTOR(color2)[0]=1;  VECTOR(color2)[((long int)VECTOR(perm)[1] + 1) % igraph_vcount(&ring2)]=1;
   igraph_isomorphic_vf2(&ring1, &ring2, &color1, &color2, 0, 0, &iso, 0, 0, 0, 0, 0);
   if (iso) {
     fprintf(stderr, "Second negative test failed.\n");
@@ -164,7 +163,7 @@ int main() {
 
   igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
   igraph_vector_init_seq(&perm, 0, igraph_ecount(&ring1)-1);
-  random_permutation(&perm);
+  igraph_vector_shuffle(&perm);
   igraph_permute_vertices(&ring1, &ring2, &perm);
   igraph_vector_destroy(&perm);
 

@@ -1098,7 +1098,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 
   if ( (vertex_color1 && !vertex_color2) || (!vertex_color1 && vertex_color2) ) {
     IGRAPH_WARNING("Only one graph is vertex-colored, vertex colors will be ignored");
-    vertex_color1=vertex_color2=0;
+    vertex_color1 = vertex_color2 = 0;
   }
 
   if ( (edge_color1 && !edge_color2) || (!edge_color1 && edge_color2)) {
