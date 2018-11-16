@@ -121,7 +121,29 @@ int test_bug_805() {
   printf("test_bug_805\n");
 
   igraph_matrix_init(&coords, 33, 2);
-  for (i=0; i<66; i++) MATRIX(coords, i/2, i%2) = coords_array[i/2][i%2];
+  for (i=0; i < 66; i++) MATRIX(coords, i/2, i%2) = coords_array[i/2][i%2];
+  result = check_convex_hull(&coords);
+  igraph_matrix_destroy(&coords);
+  return result;
+}
+
+int test_bug_1115() {
+  igraph_real_t coords_array[][2] = {
+    {37, 52}, {49, 49}, {52, 64}, {20, 26}, {40, 30}, {21, 47}, {17, 63}, {31, 62},
+    {52, 33}, {51, 21}, {42, 41}, {31, 32}, {5, 25}, {12, 42}, {36, 16}, {52, 41},
+    {27, 23}, {17, 33}, {13, 13}, {57, 58}, {62, 42}, {42, 57}, {16, 57}, {8, 52},
+    {7, 38}, {27, 68}, {30, 48}, {43, 67}, {58, 48}, {58, 27}, {37, 69}, {38, 46},
+    {46, 10}, {61, 33}, {62, 63}, {63, 69}, {32, 22}, {45, 35}, {59, 15}, {5, 6},
+    {10, 17}, {21, 10}, {5, 64}, {30, 15}, {39, 10}, {32, 39}, {25, 32}, {25, 55},
+    {48, 28}, {56, 37}, {30, 40}
+  };
+  igraph_matrix_t coords;
+  int i, result;
+
+  printf("test_bug_1115\n");
+
+  igraph_matrix_init(&coords, 51, 2);
+  for (i=0; i < 102; i++) MATRIX(coords, i/2, i%2) = coords_array[i/2][i%2];
   result = check_convex_hull(&coords);
   igraph_matrix_destroy(&coords);
   return result;
@@ -143,6 +165,10 @@ int main() {
     return result;
 
   result = test_bug_805();
+  if (result != 0)
+    return result;
+
+  result = test_bug_1115();
   if (result != 0)
     return result;
 

@@ -32,3 +32,8 @@ AT_COMPILE_CHECK([simple/igraph_biconnected_components.c],
   [simple/igraph_biconnected_components.out])
 AT_CLEANUP
 
+AT_SETUP([Bridges (igraph_bridges):])
+AT_KEYWORDS([igraph_bridges bridges])
+AT_COMPILE_CHECK([simple/igraph_bridges.c], [simple/igraph_bridges.out])
+AT_CLEANUP
+

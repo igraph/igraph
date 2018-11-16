@@ -53,12 +53,13 @@ DECLDIR int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t direc
                 igraph_bool_t mutual, igraph_bool_t circular);
 DECLDIR int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children, 
                 igraph_tree_mode_t type);
+DECLDIR int igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer);
 DECLDIR int igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_bool_t loops);
 DECLDIR int igraph_full_citation(igraph_t *graph, igraph_integer_t n, 
                 igraph_bool_t directed);
 DECLDIR int igraph_atlas(igraph_t *graph, int number);
 DECLDIR int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes, 
-                const igraph_matrix_t *W);
+                const igraph_matrix_t *W, igraph_bool_t directed);
 DECLDIR int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
                 igraph_neimode_t mode);
 DECLDIR int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);

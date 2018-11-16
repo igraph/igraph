@@ -67,7 +67,7 @@ if INTERNAL_F2C
   libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I. -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
   f2c/arith.h: f2c/arithchk.c
 	$(CC) $(CFLAGS) -DNO_FPINIT f2c/arithchk.c -lm -o f2c/arith || \
-	$(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT f2c/arithchk.c \
+	$(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT $(top_srcdir)/src/f2c/arithchk.c \
 		$(WARNING_CFLAGS) -lm -o f2c/arith
 	f2c/arith > f2c/arith.h
   f2c/sysdep1.h: f2c/sysdep1.h0

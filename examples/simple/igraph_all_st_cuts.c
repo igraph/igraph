@@ -369,6 +369,24 @@ int main() {
   igraph_vector_ptr_destroy(&partition1s);
   igraph_vector_ptr_destroy(&cuts);
   
+  /* Check whether it also works if we don't provide partition1s */
+  igraph_vector_ptr_init(&cuts, 0);
+  igraph_vector_ptr_init(&partition1s, 0);
+  igraph_all_st_cuts(&g, &cuts, /*partition1s=*/ 0,
+                     /*source=*/ 0, /*target=*/ 3);
+
+  n=igraph_vector_ptr_size(&cuts);
+  printf("Cuts only (no partitions):\n");
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v2=VECTOR(cuts)[i];
+    printf("C: ");
+    igraph_vector_print(v2);
+    igraph_vector_destroy(v2);
+    igraph_free(v2);
+  }
+  igraph_vector_ptr_destroy(&partition1s);
+  igraph_vector_ptr_destroy(&cuts);
+
   igraph_destroy(&g);  
 
   return 0;
