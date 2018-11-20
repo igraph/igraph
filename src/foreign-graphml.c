@@ -121,6 +121,7 @@ struct igraph_i_graphml_parser_state {
   char *error_message;
   char *data_char;
   long int act_node;
+  igraph_bool_t ignore_namespaces;
 };
 
 static void igraph_i_report_unhandled_attribute_target(const char* target,
@@ -261,6 +262,7 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
   state->error_message=0;
   state->data_char=0;
   state->unknown_depth=0;
+  state->ignore_namespaces=0;
 
   ret=igraph_vector_int_init(&state->prev_state_stack, 0);
   if (ret) {
@@ -938,26 +940,46 @@ void igraph_i_graphml_sax_handler_start_element_ns(
   char* attr_value;
   long int id1, id2;
   int i;
+  igraph_bool_t tag_is_unknown = 0;
 
   if (!state->successful)
     return;
 
-  if (!xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), uri)) {
-    /* Tag is in a different namespace, so treat it as an unknown start
-     * tag irrespectively of our state */
+  if (uri) {
+    if (!xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), uri)) {
+      /* Tag is in a different namespace, so treat it as an unknown start
+       * tag irrespectively of our state */
+      tag_is_unknown = 1;
+    }
+  } else {
+    /* No namespace URI. If we are in lenient mode, accept it and proceed
+     * as if we are in the GraphML namespace to handle lots of naive
+     * non-namespace-aware GraphML files floating out there. If we are not
+     * in lenient mode _but_ we are in the START state, accept it as well
+     * and see whether the root tag is <graphml> (in which case we will
+     * enter lenient mode). Otherwise, reject the tag */
+    if (!state->ignore_namespaces && state->st != START) {
+      tag_is_unknown = 1;
+    }
+  }
+
+  if (tag_is_unknown) {
     igraph_i_graphml_handle_unknown_start_tag(state);
     return;
   }
-
-
+  
   switch (state->st) {
   case START:
     /* If we are in the START state and received a graphml tag,
      * change to INSIDE_GRAPHML state. Otherwise, change to UNKNOWN. */
-    if (xmlStrEqual(localname, toXmlChar("graphml")))
+    if (xmlStrEqual(localname, toXmlChar("graphml"))) {
+      if (uri == 0) {
+        state->ignore_namespaces=1;
+      }
       state->st=INSIDE_GRAPHML;
-    else
+    } else {
       igraph_i_graphml_handle_unknown_start_tag(state);
+    }
     break;
     
   case INSIDE_GRAPHML:
