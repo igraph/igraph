@@ -45,7 +45,7 @@
  *
  * <para>The data type is essentially a wrapper to some of the
  * functions in the CXSparse library, by Tim Davis, see
- * http://www.cise.ufl.edu/research/sparse/CXSparse/
+ * http://faculty.cse.tamu.edu/davis/suitesparse.html
  * </para>
  * 
  * <para>
