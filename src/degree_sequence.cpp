@@ -422,7 +422,7 @@ static int igraph_i_realize_directed_degree_sequence(
  *
  * The algorithms work by choosing an arbitrary vertex and connecting all its stubs
  * to other vertices of highest degree.  In the directed case, the "highest" (in, out) degree
- * pairs are determined based on lexigographic ordering.
+ * pairs are determined based on lexicographic ordering.
  *
  * The \c method parameter controls the order in which the vertices to be connected are chosen.
  *
