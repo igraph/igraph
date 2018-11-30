@@ -70,7 +70,7 @@ static int igraph_i_havel_hakimi_smallest(const igraph_vector_t *deg, igraph_vec
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
 
     while (! vertices.empty()) {
-        std::sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+        std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
 
         // take smallest-degree vertex an remove it from the list
         vd_pair vd = vertices.back();
@@ -113,7 +113,7 @@ static int igraph_i_havel_hakimi_largest(const igraph_vector_t *deg, igraph_vect
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
 
     while (! vertices.empty()) {
-        std::sort(vertices.begin(), vertices.end(), degree_less<vd_pair>);
+        std::stable_sort(vertices.begin(), vertices.end(), degree_less<vd_pair>);
         vd_pair vd = vertices.back();
         vertices.pop_back(); // remove vertex
 
@@ -219,7 +219,7 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
 
     while (true) {
         // sort vertices by (in, out) degree pairs in decreasing order
-        std::sort(vertices.begin(), vertices.end(), degree_greater<vbd_pair>);
+        std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vbd_pair>);
 
         // remove (0,0)-degree vertices
         while (!vertices.empty() && vertices.back().degree == bidegree(0,0))
@@ -290,6 +290,7 @@ static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igr
 
     for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
         // sort vertices by (in, out) degree pairs in decreasing order
+        // note: std::list::sort does a stable sort
         vertices.sort(degree_greater<vbd_pair>);
 
         // choose a vertex the out-stubs of which will be connected
