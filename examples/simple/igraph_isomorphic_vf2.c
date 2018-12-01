@@ -24,7 +24,6 @@
 #include <igraph.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 
 int main() {
   
@@ -35,7 +34,7 @@ int main() {
   igraph_integer_t count;
   long int i;
 
-  srand(12345);
+  igraph_rng_seed(igraph_rng_default(), 12345);
 
   igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
   igraph_vector_init_seq(&perm, 0, igraph_vcount(&ring1)-1);
