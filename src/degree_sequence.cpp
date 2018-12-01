@@ -58,8 +58,9 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 
 
 // Generate undirected realization as edge-list.
-// Always choose the vertex with the smallest remaining degree to connect up next.
-static int igraph_i_havel_hakimi_smallest(const igraph_vector_t *deg, igraph_vector_t *edges) {
+// If largest=true, always choose the vertex with the largest remaining degree to connect up next.
+// Otherwise, always choose the one with the smallest remaining degree.
+static int igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *edges, bool largest) {
     long n = igraph_vector_size(deg);
 
     long ec = 0; // number of edges added so far
@@ -70,9 +71,12 @@ static int igraph_i_havel_hakimi_smallest(const igraph_vector_t *deg, igraph_vec
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
 
     while (! vertices.empty()) {
-        std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+        if (largest)
+            std::stable_sort(vertices.begin(), vertices.end(), degree_less<vd_pair>);
+        else
+            std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
 
-        // take smallest-degree vertex an remove it from the list
+        // take the next vertex to be connected up
         vd_pair vd = vertices.back();
         vertices.pop_back();
 
@@ -83,55 +87,25 @@ static int igraph_i_havel_hakimi_smallest(const igraph_vector_t *deg, igraph_vec
             continue;
 
         if (vertices.size() < size_t(vd.degree))
-            IGRAPH_ERROR("The given degree sequence is not realizable", IGRAPH_EINVAL);
-
-        // this loop can only be reached if all zero-degree nodes have already been removed
-        // therefore decrementing remaining degrees is safe
-        for (int i=0; i < vd.degree; ++i) {
-            vertices[i].degree--;
-
-            VECTOR(*edges)[2*(ec+i)] = vd.vertex;
-            VECTOR(*edges)[2*(ec+i)+1] = vertices[i].vertex;
-        }
-
-        ec += vd.degree;
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-
-// Always choose the vertex with the largest remaining degree to connect up next.
-static int igraph_i_havel_hakimi_largest(const igraph_vector_t *deg, igraph_vector_t *edges) {
-    long n = igraph_vector_size(deg);
-
-    long ec = 0; // number of edges added so far
-
-    std::vector<vd_pair> vertices;
-    vertices.reserve(n);
-    for (int i=0; i < n; ++i)
-        vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
-
-    while (! vertices.empty()) {
-        std::stable_sort(vertices.begin(), vertices.end(), degree_less<vd_pair>);
-        vd_pair vd = vertices.back();
-        vertices.pop_back(); // remove vertex
-
-        if (vd.degree < 0)
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
-
-        if (vd.degree == 0)
-            continue;
-
-        if (vertices.size() < size_t(vd.degree))
             goto fail;
 
-        for (int i=0; i < vd.degree; ++i) {
-            if (--(vertices[vertices.size() - 1 - i].degree) < 0)
-                goto fail;
+        if (largest) {
+            for (int i=0; i < vd.degree; ++i) {
+                if (--(vertices[vertices.size() - 1 - i].degree) < 0)
+                    goto fail;
 
-            VECTOR(*edges)[2*(ec+i)] = vd.vertex;
-            VECTOR(*edges)[2*(ec+i)+1] = vertices[vertices.size() - 1 - i].vertex;
+                VECTOR(*edges)[2*(ec+i)] = vd.vertex;
+                VECTOR(*edges)[2*(ec+i)+1] = vertices[vertices.size() - 1 - i].vertex;
+            }
+        } else {
+            // this loop can only be reached if all zero-degree nodes have already been removed
+            // therefore decrementing remaining degrees is safe
+            for (int i=0; i < vd.degree; ++i) {
+                vertices[i].degree--;
+
+                VECTOR(*edges)[2*(ec+i)] = vd.vertex;
+                VECTOR(*edges)[2*(ec+i)+1] = vertices[i].vertex;
+            }
         }
 
         ec += vd.degree;
@@ -350,10 +324,10 @@ static int igraph_i_realize_undirected_degree_sequence(
 
     switch (method) {
     case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
-        IGRAPH_CHECK(igraph_i_havel_hakimi_smallest(deg, &edges));
+        IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, false));
         break;
     case IGRAPH_REALIZE_DEGSEQ_LARGEST:
-        IGRAPH_CHECK(igraph_i_havel_hakimi_largest(deg, &edges));
+        IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, true));
         break;
     case IGRAPH_REALIZE_DEGSEQ_INDEX:
         IGRAPH_CHECK(igraph_i_havel_hakimi_index(deg, &edges));
