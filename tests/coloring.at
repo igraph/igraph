@@ -1,4 +1,4 @@
-# Check the functions related to clique and independent set calculations
+# Check the functions related to graph coloring
 
 # Test suite for the IGraph library.
 # Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
