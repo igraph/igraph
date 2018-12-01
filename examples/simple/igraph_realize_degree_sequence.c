@@ -136,4 +136,6 @@ int main() {
         print_edges(&graph);
         igraph_destroy(&graph);
     }
+
+    return 0;
 }
