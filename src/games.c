@@ -557,6 +557,9 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
 		 "graph", IGRAPH_EINVAL);
   }
 
+  if (n == 0)
+      return igraph_empty(graph, 0, directed);
+
   if (algo == IGRAPH_BARABASI_BAG) {
     return igraph_i_barabasi_game_bag(graph, n, m, outseq, outpref, directed, 
 				      start_from);
