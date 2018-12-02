@@ -158,7 +158,7 @@ int main() {
   igraph_vector_t y;
   igraph_strvector_t id;
   igraph_vector_bool_t type;
-  char str[20];
+  char str[21];
 
   /* turn on attribute handling */
   igraph_i_set_attribute_table(&igraph_cattribute_table);

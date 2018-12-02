@@ -38,3 +38,9 @@ Edges: 2
 Directed: 0
 0 1
 1 2
+The undirected graph:
+Vertices: 3
+Edges: 2
+Directed: 0
+0 1
+1 2

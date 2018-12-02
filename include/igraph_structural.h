@@ -52,6 +52,8 @@ DECLDIR int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
                 igraph_t *mst);
 DECLDIR int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
                 const igraph_vector_t *weights);
+DECLDIR int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *res,
+                igraph_integer_t vid);
 
 DECLDIR int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid, 
 			          igraph_neimode_t mode);	

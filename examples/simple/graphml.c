@@ -137,6 +137,15 @@ int main(int argc, char **argv) {
   dump_graph("The undirected graph:\n", &g);
   igraph_destroy(&g);
 
+  /* Test a not-really-valid GraphML file as it has no namespace information */
+  ifile=fopen("graphml-lenient.xml", "r");
+  if ((result=igraph_read_graph_graphml(&g, ifile, 0))) {
+    return 1;
+  }
+  fclose(ifile);
+  dump_graph("The undirected graph:\n", &g);
+  igraph_destroy(&g);
+
   /* Restore the old warning handler */
   igraph_set_warning_handler(oldwarnhandler);
 

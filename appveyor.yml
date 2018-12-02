@@ -4,28 +4,23 @@
 # build, both the "normal" one and the msvc based one.
 
 environment:
+  PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
+  MSYSTEM: MINGW64
+  TARGET_ARCH: "x64"
   
   matrix:
-    - TARGET_ARCH: "x64"
+    -
       PYTHON_VERSION: "2.7"
       CONDA_INSTALL_LOCN: "C:\\Miniconda-x64"
-      MSYSTEM: MINGW64
-      PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
-    - TARGET_ARCH: "x64"
-      PYTHON_VERSION: "3.4"
-      CONDA_INSTALL_LOCN: "C:\\Miniconda3-x64"
-      MSYSTEM: MINGW64
-      PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
-    - TARGET_ARCH: "x64"
+    -
       PYTHON_VERSION: "3.5"
       CONDA_INSTALL_LOCN: "C:\\Miniconda35-x64"
-      MSYSTEM: MINGW64
-      PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
-    - TARGET_ARCH: "x64"
+    -
+      PYTHON_VERSION: "3.6"
+      CONDA_INSTALL_LOCN: "C:\\Miniconda36-x64"
+    -
       PYTHON_VERSION: "NONE"
-      CONDA_INSTALL_LOCN: "C:\\Miniconda-x64"
-      MSYSTEM: MINGW64
-      PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
+      CONDA_INSTALL_LOCN: "C:\\Miniconda37-x64"
 
 # We always use a 64-bit machine, but can build x86 distributions
 # with the PYTHON_ARCH variable (which is used by CMD_IN_ENV).
