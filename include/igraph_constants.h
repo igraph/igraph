@@ -75,6 +75,10 @@ typedef enum { IGRAPH_DEGSEQ_SIMPLE=0,
 	       IGRAPH_DEGSEQ_VL,
 	       IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE } igraph_degseq_t;
 
+typedef enum { IGRAPH_REALIZE_DEGSEQ_SMALLEST = 0,
+             IGRAPH_REALIZE_DEGSEQ_LARGEST,
+             IGRAPH_REALIZE_DEGSEQ_INDEX } igraph_realize_degseq_t;
+			 
 typedef enum { IGRAPH_RANDOM_TREE_PRUFER = 0,
              IGRAPH_RANDOM_TREE_LERW } igraph_random_tree_t;
 
