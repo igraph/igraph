@@ -806,7 +806,18 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
     /* impossible */
     break;
   }
-  
+
+  if (key == 0) {
+    /* no key specified, issue a warning */
+    igraph_warningf(
+        "missing attribute key in a <data> tag, ignoring attribute",
+        __FILE__, __LINE__, 0,
+        key
+    );
+    igraph_Free(state->data_char);
+    return;
+  }
+
   igraph_trie_check(trie, key, &recid);
   if (recid < 0) {
     /* no such attribute key, issue a warning */
