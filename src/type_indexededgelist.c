@@ -157,11 +157,10 @@ int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t direct
  * iterators of a graph should be destroyed before the graph itself
  * anyway. 
  * \param graph Pointer to the graph to free.
- * \return Error code.
  * 
  * Time complexity: operating system specific.
  */
-int igraph_destroy(igraph_t *graph) {
+void igraph_destroy(igraph_t *graph) {
 
   IGRAPH_I_ATTRIBUTE_DESTROY(graph);
 
@@ -170,9 +169,7 @@ int igraph_destroy(igraph_t *graph) {
   igraph_vector_destroy(&graph->oi);
   igraph_vector_destroy(&graph->ii);
   igraph_vector_destroy(&graph->os);
-  igraph_vector_destroy(&graph->is);
-  
-  return 0;
+  igraph_vector_destroy(&graph->is);  
 }
 
 /**
