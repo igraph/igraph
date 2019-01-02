@@ -1768,13 +1768,19 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       igraph_set_error_handler(errh);
       igraph_set_warning_handler(warnh);
       if (options->nconv < 1) {
-	/* Call again, from a fixed starting point */
+	/* Call again from a fixed starting point. Note that we cannot use a
+	 * fixed all-1 starting vector as sometimes ARPACK would return a
+	 * 'starting vector is zero' error -- this is of course not true but
+	 * it's a result of ARPACK >= 3.6.3 trying to force the starting vector
+	 * into the range of OP (i.e. the matrix being solved). The initial
+	 * vector we use here seems to work, but I have no theoretical argument
+	 * for its usage; it just happens to work. */
 	options->start=1;
 	options->info=0;
 	options->ncv=0;
 	options->lworkl = 0;	/* we surely have enough space */
 	for (i=0; i < options->n ; i++) {
-	  storage.resid[i] = 1;
+	  storage.resid[i] = i % 2 ? 1 : -1;
 	}
 	IGRAPH_CHECK(igraph_arpack_rssolve(arpcb2, &extra, options, &storage,
 					   /*values=*/ 0, /*vectors=*/ 0));
@@ -1806,12 +1812,13 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 			    /*values=*/ 0, /*vectors=*/ 0);
       igraph_set_error_handler(errh);
       if (options->nconv < 1) {
-	/* Call again from a fixed starting point */
+	/* Call again from a fixed starting point. See the comment a few lines
+	 * above about the exact choice of this starting vector */
 	options->start=1;
 	options->info=0;
 	options->ncv=0;
 	options->lworkl = 0;	/* we surely have enough space */
-	for (i=0; i < options->n; i++) { storage.resid[i] = 1; }
+	for (i=0; i < options->n; i++) { storage.resid[i] = i % 2 ? 1 : -1; }
 	IGRAPH_CHECK(igraph_arpack_rssolve(arpcb1, &extra, options, &storage, 
 					   /*values=*/ 0, /*vectors=*/ 0));
 	options->start=0;
