@@ -70,24 +70,10 @@ DensityGrid::~DensityGrid ()
 void DensityGrid::Init() 
 {
   
-  try
-    {
-      Density = new float[GRID_SIZE][GRID_SIZE];
-      fall_off = new float[RADIUS*2+1][RADIUS*2+1];
-      Bins = new deque<Node>[GRID_SIZE*GRID_SIZE];
-    }
-  catch (bad_alloc errora)
-    {
-      // cout << "Error: Out of memory! Program stopped." << endl;
-	  #ifdef MUSE_MPI
-        MPI_Abort ( MPI_COMM_WORLD, 1 );
-	  #else
-	    igraph_error("DrL is out of memory", __FILE__, __LINE__,
-			 IGRAPH_ENOMEM);
-		return;
-	  #endif
-    }
-	
+  Density = new float[GRID_SIZE][GRID_SIZE];
+  fall_off = new float[RADIUS*2+1][RADIUS*2+1];
+  Bins = new deque<Node>[GRID_SIZE*GRID_SIZE];
+
   // Clear Grid
   int i;
   for (i=0; i< GRID_SIZE; i++) 
