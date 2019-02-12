@@ -1063,7 +1063,7 @@ long int FUNCTION(igraph_vector,which_min)(const TYPE(igraph_vector)* v) {
  */
 
 int FUNCTION(igraph_vector,init_copy)(TYPE(igraph_vector) *v, 
-				      BASE *data, long int length) {
+				      const BASE *data, long int length) {
   v->stor_begin=igraph_Calloc(length, BASE);
   if (v->stor_begin==0) {
     IGRAPH_ERROR("cannot init vector from array", IGRAPH_ENOMEM);

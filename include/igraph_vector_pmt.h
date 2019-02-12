@@ -27,7 +27,7 @@
 
 DECLDIR int FUNCTION(igraph_vector,init)(TYPE(igraph_vector)* v, long int size);
 DECLDIR int FUNCTION(igraph_vector,init_copy)(TYPE(igraph_vector)* v, 
-				       BASE* data, long int length);
+				       const BASE* data, long int length);
 DECLDIR int FUNCTION(igraph_vector,init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
 DECLDIR int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to, 
 				 const TYPE(igraph_vector) *from);
