@@ -844,3 +844,93 @@ int igraph_get_stochastic_sparsemat(const igraph_t *graph,
   
   return 0;
 }
+
+
+/**
+ * \ingroup conversion
+ * \function igraph_to_prufer
+ * \brief Converts a tree to its Pr&uuml;fer sequence
+ *
+ * A Pr&uuml;fer sequence is a unique sequence of integers associated
+ * with a labelled tree. A tree on n >= 2 vertices can be represented by a
+ * sequence of n-2 integers, each between 0 and n-1 (inclusive).
+ *
+ * \param graph Pointer to an initialized graph object which
+          must be a tree on n >= 2 vertices.
+ * \param prufer A pointer to the integer vector that should hold the Pr&uuml;fer sequence;
+                 the vector must be initialized and will be resized to n - 2.
+ * \return Error code:
+ *          \clist
+ *          \cli IGRAPH_ENOMEM
+ *             there is not enough memory to perform the operation.
+ *          \cli IGRAPH_EINVAL
+ *             the graph has less than 2 vertices.
+ *          \endclist
+ *
+ * \sa \ref igraph_tree(), \ref igraph_from_prufer()
+ *
+ */
+int igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* prufer) {
+  /* For generating the Prüfer sequence, we enumerate the vertices u of the tree.
+     We keep track of the degrees of all vertices, treating vertices
+     of degree 0 as removed. We maintain the invariant that all leafs
+     that are still contained in the tree are >= u.
+     If u is a leaf, we remove it and add its unique neighbor to the prüfer
+     sequence. If the removal of u turns the neighbor into a leaf which is < u,
+     we repeat the procedure for the new leaf and so on. */
+  igraph_integer_t u;
+  igraph_vector_t degrees, neighbors;
+  igraph_integer_t prufer_index = 0;
+  igraph_integer_t n = igraph_vcount(graph);
+
+  if(n < 2)
+    return IGRAPH_EINVAL;
+
+  IGRAPH_CHECK(igraph_vector_int_resize(prufer, n-2));
+  IGRAPH_CHECK(igraph_vector_init(&degrees, n));
+  IGRAPH_CHECK(igraph_vector_init(&neighbors, 1));
+
+  IGRAPH_FINALLY(&degrees, &igraph_vector_destroy);
+  IGRAPH_FINALLY(&neighbors, &igraph_vector_destroy);
+
+  IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
+
+  for(u = 0; u < n; ++u) {
+    igraph_integer_t degree = VECTOR(degrees)[u];
+    igraph_integer_t leaf = u;
+
+    while(degree == 1 && leaf <= u) {
+      igraph_integer_t i;
+      igraph_integer_t neighbor = 0;
+
+      VECTOR(degrees)[leaf] = 0; /* mark leaf v as deleted */
+
+      IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, leaf, IGRAPH_ALL));
+
+      /* Find the unique remaining neighbor of the leaf */
+      for(i = 0; i < igraph_vector_size(&neighbors); i++) {
+	neighbor = VECTOR(neighbors)[i];
+	if(VECTOR(degrees)[neighbor] > 0)
+	  break;
+      }
+
+      /* remember that we have removed the leaf */
+      VECTOR(degrees)[neighbor]--;
+      degree = VECTOR(degrees)[neighbor];
+
+      /* Add the neighbor to the prufer sequence unless it is the last vertex
+	 (i.e. degree == 0) */
+      if(degree > 0) {
+	VECTOR(*prufer)[prufer_index] = neighbor;
+	prufer_index++;
+      }
+      leaf = neighbor;
+    }
+  }
+
+  igraph_vector_destroy(&degrees);
+  igraph_vector_destroy(&neighbors);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  return IGRAPH_SUCCESS;
+}
