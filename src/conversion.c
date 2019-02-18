@@ -26,6 +26,7 @@
 #include "igraph_interface.h"
 #include "igraph_attributes.h"
 #include "igraph_constructors.h"
+#include "igraph_structural.h"
 #include "igraph_types_internal.h"
 #include "igraph_sparsemat.h"
 #include "config.h"
@@ -864,10 +865,10 @@ int igraph_get_stochastic_sparsemat(const igraph_t *graph,
  *          \cli IGRAPH_ENOMEM
  *             there is not enough memory to perform the operation.
  *          \cli IGRAPH_EINVAL
- *             the graph has less than 2 vertices.
+ *             the graph is not a tree or it is has less than vertices
  *          \endclist
  *
- * \sa \ref igraph_tree(), \ref igraph_from_prufer()
+ * \sa \ref igraph_from_prufer()
  *
  */
 int igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* prufer) {
@@ -882,16 +883,21 @@ int igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* prufer) {
   igraph_vector_t degrees, neighbors;
   igraph_integer_t prufer_index = 0;
   igraph_integer_t n = igraph_vcount(graph);
+  igraph_bool_t is_tree = 0;
+  
+  IGRAPH_CHECK(igraph_is_tree(graph, &is_tree, NULL, IGRAPH_ALL));
 
-  if(n < 2)
-    return IGRAPH_EINVAL;
-
+  if(!is_tree) {
+    IGRAPH_ERROR("The graph must be a tree", IGRAPH_EINVAL);
+  }
+  
+  if(n < 2) {
+    IGRAPH_ERROR("The tree must have at least 2 vertices", IGRAPH_EINVAL);
+  }
+  
   IGRAPH_CHECK(igraph_vector_int_resize(prufer, n-2));
-  IGRAPH_CHECK(igraph_vector_init(&degrees, n));
-  IGRAPH_CHECK(igraph_vector_init(&neighbors, 1));
-
-  IGRAPH_FINALLY(&degrees, &igraph_vector_destroy);
-  IGRAPH_FINALLY(&neighbors, &igraph_vector_destroy);
+  IGRAPH_VECTOR_INIT_FINALLY(&degrees, n);
+  IGRAPH_VECTOR_INIT_FINALLY(&neighbors, 1);
 
   IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
@@ -902,13 +908,15 @@ int igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* prufer) {
     while(degree == 1 && leaf <= u) {
       igraph_integer_t i;
       igraph_integer_t neighbor = 0;
+      igraph_integer_t neighbor_count = 0;
 
       VECTOR(degrees)[leaf] = 0; /* mark leaf v as deleted */
 
       IGRAPH_CHECK(igraph_neighbors(graph, &neighbors, leaf, IGRAPH_ALL));
 
       /* Find the unique remaining neighbor of the leaf */
-      for(i = 0; i < igraph_vector_size(&neighbors); i++) {
+      neighbor_count = igraph_vector_size(&neighbors);
+      for(i = 0; i < neighbor_count; i++) {
 	neighbor = VECTOR(neighbors)[i];
 	if(VECTOR(degrees)[neighbor] > 0)
 	  break;
