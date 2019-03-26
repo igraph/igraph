@@ -1,23 +1,23 @@
 /* -*- mode: C -*-  */
-/* vim:set sw=2 ts=2 sts=2 et: */
-/* 
+/* vim:set sw=2 ts=8 sts=2 noet: */
+/*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -73,7 +73,7 @@ int igraph_i_arpack_err_dseupd(int error) {
   case -17:     return IGRAPH_ARPACK_EVDIFF;
   default:      return IGRAPH_ARPACK_UNKNOWN;
   }
-  
+
 }
 
 int igraph_i_arpack_err_dnaupd(int error) {
@@ -155,7 +155,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
   o->sigma=0;
   o->sigmai=0;
   o->info=o->start;
-  
+
   o->iparam[0]=o->ishift; o->iparam[1]=0; o->iparam[2]=o->mxiter; o->iparam[3]=o->nb;
   o->iparam[4]=0; o->iparam[5]=0; o->iparam[6]=o->mode; o->iparam[7]=0;
   o->iparam[8]=0; o->iparam[9]=0; o->iparam[10]=0;
@@ -190,7 +190,7 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
 int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
 			       long int maxncv, long int maxldv,
 			       igraph_bool_t symm) {
-  
+
   /* TODO: check arguments */
   s->maxn=(int) maxn;
   s->maxncv=(int) maxncv;
@@ -221,7 +221,7 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
   }
 
 #undef CHECKMEM
-  
+
   IGRAPH_FINALLY_CLEAN(7);
   return 0;
 }
@@ -237,14 +237,14 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
  */
 
 void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
-  
+
   if (s->di) {
     igraph_Free(s->di);
   }
   if (s->workev) {
     igraph_Free(s->workev);
   }
-  
+
   igraph_Free(s->workl);
   igraph_Free(s->select);
   igraph_Free(s->ax);
@@ -320,7 +320,7 @@ int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
 
   if (vectors != 0) {
     IGRAPH_CHECK(igraph_matrix_resize(vectors, 1, 1));
-    MATRIX(*vectors, 0, 0) = 1; 
+    MATRIX(*vectors, 0, 0) = 1;
   }
 
   return IGRAPH_SUCCESS;
@@ -574,7 +574,7 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
 }
 
 int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
-			 const igraph_arpack_options_t *options, 
+			 const igraph_arpack_options_t *options,
 			 igraph_real_t *d, const igraph_real_t *v) {
 
   igraph_vector_t order;
@@ -614,12 +614,12 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
     IGRAPH_VECTOR_INIT_FINALLY(&order2, nev);
     IGRAPH_VECTOR_INIT_FINALLY(&d2, nev);
     while (l1 <= l2) {
-      VECTOR(order2)[w] = VECTOR(order)[l1]; 
-      VECTOR(d2)[w]=d[l1]; 
+      VECTOR(order2)[w] = VECTOR(order)[l1];
+      VECTOR(d2)[w]=d[l1];
       w++; l1++;
       if (l1 <= l2) {
-	VECTOR(order2)[w] = VECTOR(order)[l2]; 
-	VECTOR(d2)[w]=d[l2]; 
+	VECTOR(order2)[w] = VECTOR(order)[l2];
+	VECTOR(d2)[w]=d[l2];
 	w++; l2--;
       }
     }
@@ -627,13 +627,13 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
     igraph_vector_copy_to(&d2, d);
     igraph_vector_destroy(&order2);
     igraph_vector_destroy(&d2);
-    IGRAPH_FINALLY_CLEAN(2);  
+    IGRAPH_FINALLY_CLEAN(2);
   }
 
 #undef which
 
   /* Copy values */
-  if (values) { 
+  if (values) {
     IGRAPH_CHECK(igraph_vector_resize(values, nans));
     memcpy(VECTOR(*values), d, sizeof(igraph_real_t) * nans);
   }
@@ -642,13 +642,13 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
   if (vectors) {
     int i;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, n, nans));
-    for (i=0; i<nans; i++) { 
+    for (i=0; i<nans; i++) {
       unsigned int idx=(unsigned int) VECTOR(order)[i];
       const igraph_real_t *ptr=v + n * idx;
       memcpy(&MATRIX(*vectors, 0, i), ptr, sizeof(igraph_real_t) * n);
     }
   }
-  
+
   igraph_vector_destroy(&order);
   IGRAPH_FINALLY_CLEAN(1);
 
@@ -656,13 +656,13 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
 }
 
 int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
-			 const igraph_arpack_options_t *options, 
-			 igraph_real_t *dr, igraph_real_t *di, 
+			 const igraph_arpack_options_t *options,
+			 igraph_real_t *dr, igraph_real_t *di,
 			 igraph_real_t *v) {
 
   igraph_vector_t order;
   char sort[2];
-  int apply=1;
+  int apply=1, i;
   unsigned int n=(unsigned int) options->n;
   int nconv=options->nconv;
   int nev=options->nev;
@@ -685,7 +685,7 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
   }
 
 #undef which
-  
+
   IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
   IGRAPH_FINALLY(igraph_vector_destroy, &order);
 #ifdef HAVE_GFORTRAN
@@ -701,31 +701,68 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
   }
 
   if (vectors) {
-    int i, nc=0, nr=0, ncol, wh=0, vx=0;
+    int nc=0, nr=0, ncol, vx=0;
     for (i=0; i<nans; i++) {
       if (di[i] == 0) { nr++; } else { nc++; }
     }
     ncol=(nc/2)*2 + (nc%2)*2 + nr;
     IGRAPH_CHECK(igraph_matrix_resize(vectors, n, ncol));
+
     for (i=0; i<nans; i++) {
-      unsigned int idx=(unsigned int) VECTOR(order)[i];
-      igraph_real_t *ptr=v + n * idx;
-      if (di[i]==0) {
-	memcpy(&MATRIX(*vectors, 0, vx), ptr, sizeof(igraph_real_t) * n);
+      unsigned int idx;
+
+      idx = (unsigned int) VECTOR(order)[i];
+      
+      if (di[i] == 0) {
+	/* real eigenvalue, single eigenvector */
+	memcpy(&MATRIX(*vectors, 0, vx), v + n * idx, sizeof(igraph_real_t) * n);
 	vx++;
-      } else if (wh==0) {
-	if (di[i] < 0) { ptr -= n; }
-	memcpy(&MATRIX(*vectors, 0, vx), ptr, sizeof(igraph_real_t) * n * 2);
-	wh=1-wh;
-	vx+=2;
+      } else if (di[i] > 0) {
+	/* complex eigenvalue, positive imaginary part encountered first.
+	 * ARPACK stores its eigenvector directly in two consecutive columns.
+	 * The complex conjugate pair of the eigenvalue (if any) will be in
+	 * the next column and we will skip it because we advance 'i' below */
+	memcpy(&MATRIX(*vectors, 0, vx), v + n * idx, sizeof(igraph_real_t) * 2 * n);
+	vx += 2;
+	i++;
       } else {
-	wh=1-wh;
+	/* complex eigenvalue, negative imaginary part encountered first.
+         * The positive one will be the next one, but we need to copy the
+         * eigenvector corresponding to the eigenvalue with the positive
+         * imaginary part. */
+	idx = (unsigned int) VECTOR(order)[i+1];
+	memcpy(&MATRIX(*vectors, 0, vx), v + n * idx, sizeof(igraph_real_t) * 2 * n);
+	vx += 2;
+	i++;
       }
     }
   }
 
   igraph_vector_destroy(&order);
   IGRAPH_FINALLY_CLEAN(1);
+
+  if (values) {
+    /* Strive to include complex conjugate eigenvalue pairs in a way that the
+     * positive imaginary part comes first */
+    for (i = 0; i < nans; i++) {
+      if (MATRIX(*values, i, 1) == 0) {
+	/* Real eigenvalue, nothing to do */
+      } else if (MATRIX(*values, i, 1) < 0) {
+	/* Negative imaginary part came first; negate the imaginary part for
+	 * this eigenvalue and the next one (which is the complex conjugate
+	 * pair), and skip it */
+	MATRIX(*values, i, 1) *= -1;
+	i++;
+	if (i < nans) {
+	  MATRIX(*values, i, 1) *= -1;
+	}
+      } else {
+	/* Positive imaginary part; skip the next eigenvalue, which is the
+	 * complex conjugate pair */
+	i++;
+      }
+    }
+  }
 
   return 0;
 }
@@ -757,7 +794,7 @@ void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
   if (options->ncv < min_ncv) {
     options->ncv = min_ncv;
   }
-  /* ...but at most n-1 */
+  /* ...but at most n */
   if (options->ncv > options->n) {
     options->ncv = options->n;
   }
@@ -788,9 +825,9 @@ void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t* option
  * \param options An \ref igraph_arpack_options_t object.
  * \param storage An \ref igraph_arpack_storage_t object, or a null
  *     pointer. In the latter case memory allocation and deallocation
- *     is performed automatically. Either this or the \p vectors argument 
- *     must be non-null if the ARPACK iteration is started from a 
- *     given starting vector. If both are given \p vectors take 
+ *     is performed automatically. Either this or the \p vectors argument
+ *     must be non-null if the ARPACK iteration is started from a
+ *     given starting vector. If both are given \p vectors take
  *     precedence.
  * \param values If not a null pointer, then it should be a pointer to an
  *     initialized vector. The eigenvalues will be stored here. The
@@ -814,7 +851,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 			  igraph_arpack_options_t *options,
 			  igraph_arpack_storage_t *storage,
 			  igraph_vector_t *values, igraph_matrix_t *vectors) {
-  
+
   igraph_real_t *v, *workl, *workd, *d, *resid, *ax;
   igraph_bool_t free_them=0;
   int *select, i;
@@ -828,10 +865,10 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
 
-  /* Special case for 1x1 and 2x2 matrices */
-  if (options->n == 1) {
+  /* Special case for 1x1 and 2x2 matrices in mode 1 */
+  if (options->mode == 1 && options->n == 1) {
     return igraph_i_arpack_rssolve_1x1(fun, extra, options, values, vectors);
-  } else if (options->n == 2) {
+  } else if (options->mode == 1 && options->n == 2) {
     return igraph_i_arpack_rssolve_2x2(fun, extra, options, values, vectors);
   }
 
@@ -842,7 +879,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
   if (options->lworkl == 0) { options->lworkl=options->ncv*(options->ncv+8); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
-  
+
   if (storage) {
     /* Storage provided */
     if (storage->maxn < options->n) {
@@ -862,11 +899,11 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     resid  = storage->resid;
     ax     = storage->ax;
     select = storage->select;
-    
+
   } else {
     /* Storage not provided */
     free_them=1;
-    
+
 #define CHECKMEM(x) \
     if (!x) { \
       IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); \
@@ -886,17 +923,24 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   /* Set final bits */
+  options->bmat[0]='I';
   options->iparam[0]=options->ishift;
+  options->iparam[1]=0;     // not referenced
   options->iparam[2]=options->mxiter;
-  options->iparam[3]=options->nb;
+  options->iparam[3]=1;     // currently dsaupd() works only for nb=1
   options->iparam[4]=0;
+  options->iparam[5]=0;     // not referenced
   options->iparam[6]=options->mode;
+  options->iparam[7]=0;     // return value
+  options->iparam[8]=0;     // return value
+  options->iparam[9]=0;     // return value
+  options->iparam[10]=0;    // return value
   options->info=options->start;
   if (options->start) {
     if (!storage && !vectors) {
       IGRAPH_ERROR("Starting vector not given", IGRAPH_EINVAL);
     }
-    if (vectors && (igraph_matrix_nrow(vectors) != options->n || 
+    if (vectors && (igraph_matrix_nrow(vectors) != options->n ||
 		    igraph_matrix_ncol(vectors) != 1)) {
       IGRAPH_ERROR("Invalid starting vector size", IGRAPH_EINVAL);
     }
@@ -931,19 +975,19 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 	IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
 		     IGRAPH_ARPACK_PROD);
       }
-      
+
     } else {
       break;
     }
   }
-  
+
   if (options->info == 1) {
     igraph_i_arpack_report_no_convergence(options);
   }
   if (options->info != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dsaupd(options->info));
   }
-  
+
   options->ierr=0;
 #ifdef HAVE_GFORTRAN
   igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
@@ -965,9 +1009,9 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   if (options->ierr != 0) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dseupd(options->ierr));
   }
-  
+
   /* Save the result */
-  
+
   options->noiter=options->iparam[2];
   options->nconv=options->iparam[4];
   options->numop=options->iparam[8];
@@ -979,17 +1023,17 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 		   "solver");
   }
 
-  if (values || vectors) { 
+  if (values || vectors) {
     IGRAPH_CHECK(igraph_arpack_rssort(values, vectors, options, d, v));
   }
-  
+
   options->ldv=origldv;
   options->ncv=origncv;
   options->lworkl=origlworkl;
   options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
   options->tol=origtol;
   options->nev=orignev;
-    
+
   /* Clean up if needed */
   if (free_them) {
     igraph_Free(select);
@@ -1031,6 +1075,17 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
  * \param vectors If not a null pointer, then it must be a pointer to
  *     an initialized matrix. The eigenvectors will be stored in the
  *     columns of the matrix. The matrix will be resized as needed.
+ *     Note that real eigenvalues will have real eigenvectors in a single
+ *     column in this matrix; however, complex eigenvalues come in conjugate
+ *     pairs and the result matrix will store the eigenvector corresponding to
+ *     the eigenvalue with \em positive imaginary part only. Since in this case
+ *     the eigenvector is also complex, it will occupy \em two columns in the
+ *     eigenvector matrix (the real and the imaginary parts, in this order).
+ *     Caveat: if the eigenvalue vector returns only the eigenvalue with the
+ *     \em negative imaginary part for a complex conjugate eigenvalue pair, the
+ *     result vector will \em still store the eigenvector corresponding to the
+ *     eigenvalue with the positive imaginary part (since this is how ARPACK
+ *     works).
  * \return Error code.
  *
  * Time complexity: depends on the matrix-vector
@@ -1048,21 +1103,21 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   igraph_real_t *v, *workl, *workd, *dr, *di, *resid, *workev;
   igraph_bool_t free_them=0;
   int *select, i;
-  
+
   int ido=0;
   int rvec= vectors || storage ? 1 : 0;
   char *all="All";
-  
+
   int origldv=options->ldv, origlworkl=options->lworkl,
     orignev=options->nev, origncv=options->ncv;
   char origwhich[2]={ options->which[0], options->which[1] };
   igraph_real_t origtol=options->tol;
   int d_size;
 
-  /* Special case for 1x1 and 2x2 matrices */
-  if (options->n == 1) {
+  /* Special case for 1x1 and 2x2 matrices in mode 1 */
+  if (options->mode == 1 && options->n == 1) {
     return igraph_i_arpack_rnsolve_1x1(fun, extra, options, values, vectors);
-  } else if (options->n == 2) {
+  } else if (options->mode == 1 && options->n == 2) {
     return igraph_i_arpack_rnsolve_2x2(fun, extra, options, values, vectors);
   }
 
@@ -1073,7 +1128,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   }
   if (options->lworkl == 0) { options->lworkl=3*options->ncv*(options->ncv+2); }
   if (options->which[0] == 'X') { options->which[0]='L'; options->which[1]='M'; }
-  
+
   if (storage) {
     /* Storage provided */
     if (storage->maxn < options->n) {
@@ -1095,11 +1150,11 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     d_size = options->n;
     resid  = storage->resid;
     select = storage->select;
-    
+
   } else {
     /* Storage not provided */
     free_them=1;
-    
+
 #define CHECKMEM(x) \
     if (!x) { \
       IGRAPH_ERROR("Cannot allocate memory for ARPACK", IGRAPH_ENOMEM); \
@@ -1115,17 +1170,24 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     resid=igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
     select=igraph_Calloc(options->ncv, int); CHECKMEM(select);
     workev=igraph_Calloc(3*options->ncv, igraph_real_t); CHECKMEM(workev);
-    
+
 #undef CHECKMEM
 
   }
-  
+
   /* Set final bits */
+  options->bmat[0]='I';
   options->iparam[0]=options->ishift;
+  options->iparam[1]=0;     // not referenced
   options->iparam[2]=options->mxiter;
-  options->iparam[3]=options->nb;
+  options->iparam[3]=1;     // currently dnaupd() works only for nb=1
   options->iparam[4]=0;
+  options->iparam[5]=0;     // not referenced
   options->iparam[6]=options->mode;
+  options->iparam[7]=0;     // return value
+  options->iparam[8]=0;     // return value
+  options->iparam[9]=0;     // return value
+  options->iparam[10]=0;    // return value
   options->info=options->start;
   if (options->start) {
     if (igraph_matrix_nrow(vectors) != options->n || igraph_matrix_ncol(vectors) != 1) {
@@ -1135,7 +1197,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
       resid[i]=MATRIX(*vectors, i, 0);
     }
   }
-  
+
   /* Ok, we have everything */
   while (1) {
 #ifdef HAVE_GFORTRAN
@@ -1145,7 +1207,6 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 		  options->iparam, options->ipntr,
 		  workd, workl, &options->lworkl, &options->info,
 		  /*bmat_len=*/ 1, /*which_len=*/ 2);
-
 #else
     igraphdnaupd_(&ido, options->bmat, &options->n, options->which,
     		  &options->nev, &options->tol,
@@ -1153,7 +1214,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     		  options->iparam, options->ipntr,
     		  workd, workl, &options->lworkl, &options->info);
 #endif
-    
+
     if (ido==-1 || ido==1) {
       igraph_real_t *from=workd+options->ipntr[0]-1;
       igraph_real_t *to=workd+options->ipntr[1]-1;
@@ -1161,7 +1222,6 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 	IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
 		     IGRAPH_ARPACK_PROD);
       }
-      
     } else {
       break;
     }
@@ -1170,7 +1230,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   if (options->info == 1) {
     igraph_i_arpack_report_no_convergence(options);
   }
-  if (options->info != 0) {
+  if (options->info != 0 && options->info != -9999) {
     IGRAPH_ERROR("ARPACK error", igraph_i_arpack_err_dnaupd(options->info));
   }
 
@@ -1197,7 +1257,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
   }
 
   /* Save the result */
-  
+
   options->noiter=options->iparam[2];
   options->nconv=options->iparam[4];
   options->numop=options->iparam[8];
@@ -1209,18 +1269,20 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 		   "solver");
   }
 
-  if (values || vectors) { 
-    IGRAPH_CHECK(igraph_arpack_rnsort(values, vectors, options,
-				      dr, di, v));
-  }
-
+  /* ARPACK might modify stuff in 'options' so reset everything that could
+   * potentially get modified */
   options->ldv=origldv;
   options->ncv=origncv;
   options->lworkl=origlworkl;
   options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
   options->tol=origtol;
   options->nev=orignev;
-  
+
+  if (values || vectors) {
+    IGRAPH_CHECK(igraph_arpack_rnsort(values, vectors, options,
+				      dr, di, v));
+  }
+
   /* Clean up if needed */
   if (free_them) {
     igraph_Free(workev);
@@ -1288,7 +1350,7 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
   for (i=nev; i<igraph_matrix_nrow(values); i++) {
     IGRAPH_CHECK(igraph_matrix_remove_row(values, i));
   }
-  
+
   /* Calculate where to start copying */
   for (i=0, j=0, wh=0; i<nev; i++) {
     if (MATRIX(*values,i,1) == 0) { /* TODO: == 0.0 ???? */
@@ -1333,7 +1395,7 @@ int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *valu
 	/* Conjugate */
 	int l;
 	for (l=0; l<nodes; l++) {
-	  MATRIX(*vectors,l,k) = - MATRIX(*vectors,l,k);	 
+	  MATRIX(*vectors,l,k) = - MATRIX(*vectors,l,k);
 	}
       }
       k-=2;

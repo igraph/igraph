@@ -38,3 +38,7 @@ AT_COMPILE_CHECK([simple/igraph_laplacian.c],
                  [simple/igraph_laplacian.out])
 AT_CLEANUP
 
+AT_SETUP([Tree to prufer sequence (igraph_to_prufer):])
+AT_KEYWORDS([igraph_to_prufer])
+AT_COMPILE_CHECK([simple/igraph_to_prufer.c])
+AT_CLEANUP

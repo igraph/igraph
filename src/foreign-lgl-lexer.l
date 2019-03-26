@@ -44,11 +44,6 @@
 
 */
 
-#ifdef __clang__
-#pragma clang diagnostic ignored "-Wconversion"
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#endif
-
 #include "config.h"
 #include <stdlib.h>
 #include "foreign-lgl-header.h"
@@ -56,12 +51,8 @@
 #define YY_EXTRA_TYPE igraph_i_lgl_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 /* We assume that 'file' is 'stderr' here. */
-#ifdef __GNUC__
-	#define fprintf(file, msg, ...) \
-	  igraph_warningf(msg, __FILE__, __LINE__, 0, ##__VA_ARGS__)
-#else
-	#define fprintf(file, msg, ...) \
-	  igraph_warningf(msg, __FILE__, __LINE__, 0, __VA_ARGS__)
+#ifdef USING_R
+#define fprintf(file, msg, ...) (1)
 #endif
 #ifdef stdout 
 #  undef stdout
@@ -76,6 +67,7 @@
 %option outfile="lex.yy.c"
 %option nounput
 %option noinput
+%option nodefault
 %option reentrant
 %option bison-bridge
 %option bison-locations
@@ -103,5 +95,7 @@ alnum [^ \t\r\n#]
                        return NEWLINE; 
                     }
                   }
+
+.                 { return ERROR; }
 
 %%

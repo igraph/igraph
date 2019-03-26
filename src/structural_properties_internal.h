@@ -27,8 +27,10 @@
 #include "igraph_constants.h"
 #include "igraph_types.h"
 
-igraph_subgraph_implementation_t igraph_i_induced_subgraph_suggest_implementation(
-    const igraph_t *graph, const igraph_vs_t vids);
+int igraph_i_induced_subgraph_suggest_implementation(
+    const igraph_t *graph, const igraph_vs_t vids,
+	igraph_subgraph_implementation_t* result
+);
 
 int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
 				      const igraph_vs_t vids, 

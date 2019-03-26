@@ -128,6 +128,9 @@ DECLDIR int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t 
 
 DECLDIR int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob, 
                 igraph_bool_t loops, igraph_bool_t multiple);
+DECLDIR int igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
+                igraph_bool_t loops, igraph_neimode_t mode);
+
 DECLDIR int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                 igraph_integer_t size, igraph_integer_t nei,
                 igraph_real_t p, igraph_bool_t loops, 
@@ -199,6 +202,9 @@ DECLDIR int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
                 int n, igraph_real_t corr, igraph_real_t p,
                 igraph_bool_t directed,
                 const igraph_vector_t *permutation);
+
+DECLDIR int igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+                igraph_random_tree_t method);
 
 DECLDIR int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                 igraph_bool_t directed);

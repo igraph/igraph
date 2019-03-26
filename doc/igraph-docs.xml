@@ -82,6 +82,8 @@
 
   <xi:include href="isomorphism.xml"/>
 
+  <xi:include href="coloring.xml"/>
+
   <xi:include href="motifs.xml"/>
   
   <xi:include href="layout.xml"/>  

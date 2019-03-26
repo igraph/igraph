@@ -197,7 +197,7 @@ tls_support=no
 HAVE_TLS=0
 THREAD_LOCAL=
 AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
-if test "x$enable_tls" == "xyes"; then
+if test "x$enable_tls" = "xyes"; then
   keywords="__thread __declspec(thread)"
   for kw in $keywords ; do
       AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw)
@@ -343,8 +343,8 @@ if test "$use_gprof" = "yes"; then
 fi
 
 if test "$use_asan" = "yes"; then
-  CFLAGS="${CFLAGS} -g -fsanitize=address,undefined -fno-omit-frame-pointer"
-  CXXFLAGS="${CXXFLAGS} -g -fsanitize=address,undefined -fno-omit-frame-pointer"
+  CFLAGS="${CFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
+  CXXFLAGS="${CXXFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
   CC="clang"
   CXX="clang++"
 fi

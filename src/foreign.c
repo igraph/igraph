@@ -2493,7 +2493,7 @@ int igraph_i_gml_convert_to_key(const char *orig, char **key) {
  * http://www.fim.uni-passau.de/en/fim/faculty/chairs/theoretische-informatik/projects.html for details.
  * 
  * </para><para> The graph, vertex and edges attributes are written to the
- * file as well, if they are numeric of string.
+ * file as well, if they are numeric or string.
  * 
  * </para><para> As igraph is more forgiving about attribute names, it might 
  * be necessary to simplify the them before writing to the GML file.

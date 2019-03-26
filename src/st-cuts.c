@@ -990,15 +990,20 @@ int igraph_all_st_cuts(const igraph_t *graph,
   long int no_of_edges=igraph_ecount(graph);
   igraph_marked_queue_t S;
   igraph_estack_t T;
+  igraph_vector_ptr_t *mypartition1s=partition1s, vpartition1s;
+  long int i, nocuts;
 
   if (!igraph_is_directed(graph)) {
     IGRAPH_ERROR("Listing all s-t cuts only implemented for "
 		 "directed graphs", IGRAPH_UNIMPLEMENTED);
   }
-  
-  if (!partition1s) { 
-    IGRAPH_ERROR("`partition1s' must not be a null pointer", 
-		 IGRAPH_UNIMPLEMENTED);
+
+  if (!partition1s) {
+    mypartition1s=&vpartition1s;
+    IGRAPH_CHECK(igraph_vector_ptr_init(mypartition1s, 0));
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, mypartition1s);
+  } else {
+    igraph_vector_ptr_clear(mypartition1s);
   }
 
   IGRAPH_CHECK(igraph_marked_queue_init(&S, no_of_nodes));
@@ -1007,23 +1012,23 @@ int igraph_all_st_cuts(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_estack_destroy, &T);
 
   if (cuts)        { igraph_vector_ptr_clear(cuts);        }
-  if (partition1s) { igraph_vector_ptr_clear(partition1s); }    
-  
+
   /* We call it with S={}, T={} */
   IGRAPH_CHECK(igraph_provan_shier_list(graph, &S, &T,
-					source, target, partition1s,
-					igraph_i_all_st_cuts_pivot, 
+					source, target, mypartition1s,
+					igraph_i_all_st_cuts_pivot,
 					/*pivot_arg=*/ 0));
-  
+
+  nocuts=igraph_vector_ptr_size(mypartition1s);
+
   if (cuts) {
     igraph_vector_long_t inS;
-    long int i, nocuts=igraph_vector_ptr_size(partition1s);
     IGRAPH_CHECK(igraph_vector_long_init(&inS, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &inS);
     IGRAPH_CHECK(igraph_vector_ptr_resize(cuts, nocuts));
     for (i=0; i<nocuts; i++) {
       igraph_vector_t *cut;
-      igraph_vector_t *part=VECTOR(*partition1s)[i];
+      igraph_vector_t *part=VECTOR(*mypartition1s)[i];
       long int cutsize=0;
       long int j, partlen=igraph_vector_size(part);
       /* Mark elements */
@@ -1068,6 +1073,17 @@ int igraph_all_st_cuts(const igraph_t *graph,
   igraph_estack_destroy(&T);
   igraph_marked_queue_destroy(&S);
   IGRAPH_FINALLY_CLEAN(2);
+
+  if (!partition1s) {
+    for (i=0; i<nocuts; i++) {
+      igraph_vector_t *cut=VECTOR(*mypartition1s)[i];
+      igraph_vector_destroy(cut);
+      igraph_free(cut);
+      VECTOR(*mypartition1s)[i]=0;
+    }
+    igraph_vector_ptr_destroy(mypartition1s);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
 
   return 0;
 }

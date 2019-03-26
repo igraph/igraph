@@ -110,7 +110,18 @@ icheck(void)
 	return 0;
 	}
 
-char *emptyfmt = "";	/* avoid possible warning message with printf("") */
+/* avoid possible warning message with printf("") */
+const char *const emptyfmt = "";
+
+#ifdef __GNUC__
+#  pragma GCC diagnostic push
+#  ifndef __clang__
+#    pragma GCC diagnostic ignored "-Wformat-security"
+#    pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#  else
+#    pragma GCC diagnostic ignored "-Wformat-zero-length"
+#  endif
+#endif
 
  static Akind *
 ccheck(void)
@@ -165,6 +176,12 @@ need_nancheck(void)
 	t = sqrt(t_nan);
 	return errno == 0;
 	}
+
+#ifdef __GNUC__
+#  ifndef __clang__
+#    pragma GCC diagnostic pop
+#  endif
+#endif
 
  void
 get_nanbits(unsigned int *b, int k)

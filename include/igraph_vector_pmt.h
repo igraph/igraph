@@ -27,7 +27,7 @@
 
 DECLDIR int FUNCTION(igraph_vector,init)(TYPE(igraph_vector)* v, long int size);
 DECLDIR int FUNCTION(igraph_vector,init_copy)(TYPE(igraph_vector)* v, 
-				       BASE* data, long int length);
+				       const BASE* data, long int length);
 DECLDIR int FUNCTION(igraph_vector,init_seq)(TYPE(igraph_vector)*v, BASE from, BASE to);
 DECLDIR int FUNCTION(igraph_vector,copy)(TYPE(igraph_vector) *to, 
 				 const TYPE(igraph_vector) *from);
@@ -166,8 +166,8 @@ DECLDIR igraph_bool_t FUNCTION(igraph_vector,any_smaller)(const TYPE(igraph_vect
 						  BASE limit);
 DECLDIR igraph_bool_t FUNCTION(igraph_vector,is_equal)(const TYPE(igraph_vector) *lhs, 
                                               const TYPE(igraph_vector) *rhs);
-DECLDIR BASE FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
-					   const TYPE(igraph_vector) *m2);
+DECLDIR igraph_real_t FUNCTION(igraph_vector,maxdifference)(const TYPE(igraph_vector) *m1,
+							    const TYPE(igraph_vector) *m2);
 
 /*------------------------*/
 /* Searching for elements */
