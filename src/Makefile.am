@@ -257,6 +257,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		igraph_gml_tree.h \
 		walktrap_graph.h	walktrap_communities.h \
 		walktrap_heap.h \
+		truss.h \
 		infomap_Greedy.h infomap_Node.h infomap_Greedy.h infomap_FlowGraph.h \
 		igraph_math.h \
 		drl_layout.h drl_parse.h drl_graph.h \
@@ -347,6 +348,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     igraph_set.c cliques.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
+				 truss.cpp \
 			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
 			     spmatrix.c community.c fast_community.c \
 			     gml_tree.c \
