@@ -348,7 +348,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     igraph_set.c cliques.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
-				 truss.cpp \
+			     truss.cpp \
 			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
 			     spmatrix.c community.c fast_community.c \
 			     gml_tree.c \
