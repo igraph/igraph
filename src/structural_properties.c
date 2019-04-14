@@ -6885,8 +6885,10 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
 
         /* take a vertex from the stack, mark it as visited */
         u = igraph_stack_int_pop(&stack);
-        VECTOR(visited)[u] = 1;
-        *visited_count += 1;
+        if (IGRAPH_LIKELY(! VECTOR(visited)[u])) {
+            VECTOR(visited)[u] = 1;
+            *visited_count += 1;
+        }
 
         /* register all its yet-unvisited neighbours for future processing */
         neighbors = igraph_adjlist_get(al, u);
