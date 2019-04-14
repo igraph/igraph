@@ -1504,7 +1504,7 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
-// Not declared static so that the testsuite can use it, but not part of the public API.
+/* Not declared static so that the testsuite can use it, but not part of the public API. */
 int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
