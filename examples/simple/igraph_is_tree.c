@@ -109,5 +109,17 @@ int main() {
 
     igraph_destroy(&g);
 
+    /* Regression test, see:
+     * https://github.com/szhorvat/IGraphM/issues/90
+     * https://github.com/igraph/igraph/pull/1160
+     */
+    igraph_small(&g, 5, 0,
+                 0,3, 0,4, 1,3, 1,4, -1);
+
+    igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
+    assert(! res);
+
+    igraph_destroy(&g);
+
     return 0;
 }
