@@ -231,6 +231,8 @@ int igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV, bool* result) {
   int nextOut = 0;
   int i, v, v2, u2;
 
+  *result = false;
+
   /* Allocate memory */
   ALLOC_ARRAY(fifo, nbV, int);
   ALLOC_ARRAY(pred, nbV, int);
@@ -374,7 +376,6 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
     vneis = igraph_adjlist_get(&Gt->succ, v);
     /* match u to v */
     for (u2=0; u2<Gp->nbVertices; u2++) {
-      result = 0;
       if (u != u2) {
         oldNbVal = VECTOR(D->nbVal)[u2];
         if (igraph_i_lad_isInD(u2, v, D)) {
