@@ -9,7 +9,6 @@
 
 <section><title>The simple interface</title>
 <!-- doxrox-include about_graph_isomorphism -->
-<!-- doxrox-include igraph_permute_vertices -->
 <!-- doxrox-include igraph_isomorphic -->
 <!-- doxrox-include igraph_subisomorphic -->
 </section>
@@ -46,6 +45,11 @@
 <!-- doxrox-include igraph_isoclass -->
 <!-- doxrox-include igraph_isoclass_subgraph -->
 <!-- doxrox-include igraph_isoclass_create -->
+</section>
+
+<section><title>Utility functions</title>
+<!-- doxrox-include igraph_permute_vertices -->
+<!-- doxrox-include igraph_colored_simple_graph -->
 </section>
 
 </chapter>
