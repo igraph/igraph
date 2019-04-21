@@ -1429,7 +1429,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *          edges. For directed graphs, the algorithm is basically the same,
  *          but two separate bags are used for the in- and out-degrees.
  *          Undirected graphs are generated with probability proportional to
- *          <code>(\prod_{i<j} A_{ij} ! \prod_i A_{ii} !!)^{-1}</code>,
+ *          <code>(\prod_{i&lt;j} A_{ij} ! \prod_i A_{ii} !!)^{-1}</code>,
  *          where \c A denotes the adjacency matrix and <code>!!</code> denotes
  *          the double factorial.
  *          The corresponding  expression for directed ones is
