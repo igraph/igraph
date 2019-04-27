@@ -49,7 +49,7 @@
 
 <section><title>Utility functions</title>
 <!-- doxrox-include igraph_permute_vertices -->
-<!-- doxrox-include igraph_colored_simple_graph -->
+<!-- doxrox-include igraph_simplify_and_colorize -->
 </section>
 
 </chapter>
