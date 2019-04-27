@@ -3011,14 +3011,15 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
 
 
 /**
- * \function igraph_colored_simple_graph
+ * \function igraph_simplify_and_colorize
  * \brief Simplify the graph and compute self-loop and edge multiplicities.
  *
  * </para><para>
- * This function computes a vertex and edge colored simple graph from the input
- * graph. The vertex colors are computed as the number of incident self-loops in
- * the input graph. The edge colors are computed as the number of
- * parallel edges that were merged to create each edge in the simple graph.
+ * This function creates a vertex and edge colored simple graph from the input
+ * graph. The vertex colors are computed as the number of incident self-loops
+ * to each vertex in the input graph. The edge colors are computed as the number of
+ * parallel edges in the input graph that were merged to create each edge
+ * in the simple graph.
  *
  * </para><para>
  * The resulting colored simple graph is suitable for use by isomorphism checking
@@ -3034,7 +3035,7 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
  * \sa \ref igraph_simplify(), \ref igraph_isomorphic_vf2(), \ref igraph_subisomorphic_vf2()
  *
  */
-int igraph_colored_simple_graph(
+int igraph_simplify_and_colorize(
         const igraph_t *graph, igraph_t *res,
         igraph_vector_int_t *vertex_color, igraph_vector_int_t *edge_color)
 {
