@@ -26,6 +26,36 @@
 
 #include <stdlib.h>
 
+/* Compares two paths based on their last elements. If they are equal, proceeds
+ * with the ones preceding these elements, until we find a difference. If one
+ * of the vectors is a suffix of the other, the shorter vector gets ordered
+ * first.
+ */
+int vector_tail_cmp(const void* path1, const void* path2) {
+  const igraph_vector_t* vec1 = *(const igraph_vector_t**)path1;
+  const igraph_vector_t* vec2 = *(const igraph_vector_t**)path2;
+  size_t length1 = igraph_vector_size(vec1);
+  size_t length2 = igraph_vector_size(vec2);
+  int diff;
+
+  while (length1 > 0 && length2 > 0) {
+    length1--;
+    length2--;
+    diff = VECTOR(*vec1)[length1] - VECTOR(*vec2)[length2];
+    if (diff != 0) {
+      return diff;
+    }
+  }
+
+  if (length1 == 0 && length2 == 0) {
+    return 0;
+  } else if (length1 == 0) {
+    return -1;
+  } else {
+    return 1;
+  }
+}
+
 void check_nrgeo(igraph_t *graph, igraph_vs_t vs,
                  igraph_vector_ptr_t* paths,
                  igraph_vector_t* nrgeo) {
@@ -135,6 +165,10 @@ int main() {
 				     /*weights=*/ &weights_vec, /*mode=*/ IGRAPH_OUT);
 
   check_nrgeo(&g, vs, &res, &nrgeo);
+
+  /* Sort the paths in a deterministic manner to avoid problems with
+   * different qsort() implementations on different platforms */
+  igraph_vector_ptr_sort(&res, vector_tail_cmp);
 
   for (i=0; i<igraph_vector_ptr_size(&res); i++) {
     igraph_vector_print(VECTOR(res)[i]);
