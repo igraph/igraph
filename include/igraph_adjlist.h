@@ -98,7 +98,7 @@ DECLDIR int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
  * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
  * incidence list containing edge ids. The vector can be modified,
  * resized, etc. as desired. 
- * \param graph il The incidence list.
+ * \param il Pointer to the incidence list.
  * \param no The vertex for which the incident edges are returned.
  * \return Pointer to an <type>igraph_vector_int_t</type> object.
  * 

@@ -278,7 +278,12 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
     }    
   } /* for i<no_of_nodes */
 
-  *res /= normfact;
+  
+  if (normfact > 0) {
+    *res /= normfact;
+  } else {
+    *res = IGRAPH_NAN;
+  }
 
   /* clean */
   igraph_Free(already_added);
@@ -1499,7 +1504,7 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
-// Not declared static so that the testsuite can use it, but not part of the public API.
+/* Not declared static so that the testsuite can use it, but not part of the public API. */
 int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
@@ -2030,8 +2035,9 @@ int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
 				     /* invmap= */ 0);
 }
 
-igraph_subgraph_implementation_t igraph_i_induced_subgraph_suggest_implementation(
-    const igraph_t *graph, const igraph_vs_t vids) {
+int igraph_i_induced_subgraph_suggest_implementation(
+    const igraph_t *graph, const igraph_vs_t vids,
+    igraph_subgraph_implementation_t *result) {
   double ratio;
   igraph_integer_t num_vs;
 
@@ -2044,10 +2050,12 @@ igraph_subgraph_implementation_t igraph_i_induced_subgraph_suggest_implementatio
 
   /* TODO: needs benchmarking; threshold was chosen totally arbitrarily */
   if (ratio > 0.5) {
-    return IGRAPH_SUBGRAPH_COPY_AND_DELETE;
+    *result = IGRAPH_SUBGRAPH_COPY_AND_DELETE;
   } else {
-    return IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;
+    *result = IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH;
   }
+
+  return 0;
 }
 
 int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
@@ -2057,7 +2065,7 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
 				igraph_vector_t *invmap) {
 
   if (impl == IGRAPH_SUBGRAPH_AUTO) {
-    impl = igraph_i_induced_subgraph_suggest_implementation(graph, vids);
+    IGRAPH_CHECK(igraph_i_induced_subgraph_suggest_implementation(graph, vids, &impl));
   }
 
   switch (impl) {
@@ -3474,6 +3482,37 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
 }
 
 /**
+ * \function igraph_has_loop
+ * \brief Returns whether the graph has at least one loop edge.
+ * 
+ * </para><para>
+ * A loop edge is an edge from a vertex to itself.
+ * \param graph The input graph.
+ * \param res Pointer to an initialized boolean vector for storing the result.
+ * 
+ * \sa \ref igraph_simplify() to get rid of loop edges.
+ *
+ * Time complexity: O(e), the number of edges to check.
+ * 
+ * \example examples/simple/igraph_has_loop.c
+ */
+
+int igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
+  long int i, m = igraph_ecount(graph);
+
+  *res = 0;
+
+  for (i = 0; i < m; i++) {
+    if (IGRAPH_FROM(graph, i) == IGRAPH_TO(graph, i)) {
+      *res = 1;
+      break;
+    }
+  }
+  
+  return 0;
+}
+
+/**
  * \function igraph_is_loop
  * \brief Find the loop edges in a graph.
  * 
@@ -4594,6 +4633,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
   if (vertices || edges) {
     for (IGRAPH_VIT_RESET(vit), i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
       long int node=IGRAPH_VIT_GET(vit);
+      long int size, act, edge;
       igraph_vector_t *vvec=0, *evec=0;
       if (vertices) {
 	vvec=VECTOR(*vertices)[i];
@@ -4606,30 +4646,27 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
       
       IGRAPH_ALLOW_INTERRUPTION();
       
-      if (parents[node]>0) {
-	long int size=0;
-	long int act=node;
-	long int edge;
-	while (parents[act]) {
-	  size++;
-	  edge=parents[act]-1;
-	  act=IGRAPH_OTHER(graph, edge, act);
-	}
-	if (vvec) { 
-	  IGRAPH_CHECK(igraph_vector_resize(vvec, size+1)); 
-	  VECTOR(*vvec)[size]=node;
-	}
-	if (evec) {
-	  IGRAPH_CHECK(igraph_vector_resize(evec, size));
-	}
-	act=node;
-	while (parents[act]) {
-	  edge=parents[act]-1;
-	  act=IGRAPH_OTHER(graph, edge, act);
-	  size--;
-	  if (vvec) { VECTOR(*vvec)[size]=act; }
-	  if (evec) { VECTOR(*evec)[size]=edge; }
-	}
+      size=0;
+      act=node;
+      while (parents[act]) {
+	size++;
+	edge=parents[act]-1;
+	act=IGRAPH_OTHER(graph, edge, act);
+      }
+      if (vvec) { 
+	IGRAPH_CHECK(igraph_vector_resize(vvec, size+1)); 
+	VECTOR(*vvec)[size]=node;
+      }
+      if (evec) {
+	IGRAPH_CHECK(igraph_vector_resize(evec, size));
+      }
+      act=node;
+      while (parents[act]) {
+	edge=parents[act]-1;
+	act=IGRAPH_OTHER(graph, edge, act);
+	size--;
+	if (vvec) { VECTOR(*vvec)[size]=act; }
+	if (evec) { VECTOR(*evec)[size]=edge; }
       }
     }
   }
@@ -5533,7 +5570,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   igraph_dqueue_t Q;
   igraph_vector_t neis;
   
-  long int r, v_ptr=no_of_nodes;
+  long int i, n, r, v_ptr=no_of_nodes;
 
   /* TODO: handle not-connected graphs, multiple root vertices */
 
@@ -5546,10 +5583,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   IGRAPH_FINALLY(igraph_vector_bool_destroy, &seen_edges);
   
   if (vertex_index) { 
-    long int i;
-    IGRAPH_CHECK(igraph_vector_resize(vertex_index, 
-				      no_of_nodes > no_of_edges+1 ? 
-				      no_of_nodes : no_of_edges+1));
+    IGRAPH_CHECK(igraph_vector_resize(vertex_index, no_of_nodes));
     for (i=0; i<no_of_nodes; i++) {
       VECTOR(*vertex_index)[i] = i;
     }
@@ -5563,7 +5597,6 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   
     while (!igraph_dqueue_empty(&Q)) {
       long int actnode=(long int) igraph_dqueue_pop(&Q);
-      long int i, n;
       
       IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode,
 				   mode));
@@ -5590,7 +5623,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 	  } else {
 	    
 	    if (vertex_index) { 
-	      VECTOR(*vertex_index)[v_ptr] = nei;
+	      IGRAPH_CHECK(igraph_vector_push_back(vertex_index, nei));
 	    }
 	    
 	    if (from==nei) {
@@ -5827,8 +5860,11 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  *   this.
  * \param weights Optional edge weights. Supply a null pointer here
  *   for the non-weighted version. If this is not a null pointer, then
- *   the strength of the vertices is used instead of the normal vertex
- *   degree, see \ref igraph_strength().
+ *   the calculated quantity will be the sum of the strengths of the
+ *   neighbors of a given vertex (see \ref igraph_strength() ), divided 
+ *   by the strength of the vertex itself. Note that the denominator is
+ *   \em not the unweighted degree of the vertex so the quantity is not
+ *   really an "average" in this case.
  * \return Error code.
  * 
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
@@ -6570,15 +6606,15 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
 #define SUCCEED {   \
   if (res) {        \
     *res = 1;       \
-    return IGRAPH_SUCCESS; \
   }                 \
+  return IGRAPH_SUCCESS; \
 }
 
 #define FAIL {   \
   if (res) {     \
     *res = 0;    \
-    return IGRAPH_SUCCESS; \
   }              \
+  return IGRAPH_SUCCESS; \
 }
 
 /**
@@ -6655,6 +6691,11 @@ int igraph_i_is_graphical_degree_sequence_directed(
  * PL Erdos, I Miklos and Z Toroczkai: A simple Havel-Hakimi type algorithm
  * to realize graphical degree sequences of directed graphs. The Electronic
  * Journal of Combinatorics 17(1):R66, 2010.
+ * 
+ * </para><para>
+ * Z Kiraly: Recognizing graphic degree sequences and generating all
+ * realizations. TR-2011-11, Egervary Research Group, H-1117, Budapest,
+ * Hungary. ISSN 1587-4451, 2012.
  *
  * \param out_degrees  an integer vector specifying the degree sequence for
  *     undirected graphs or the out-degree sequence for directed graphs.
@@ -6663,7 +6704,8 @@ int igraph_i_is_graphical_degree_sequence_directed(
  * \param res  pointer to a boolean variable, the result will be stored here
  * \return Error code.
  * 
- * Time complexity: O(n^2 log n) where n is the length of the degree sequence.
+ * Time complexity: O(n log n) for undirected graphs, O(n^2) for directed
+ *                  graphs, where n is the length of the degree sequence.
  */
 int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
     const igraph_vector_t *in_degrees, igraph_bool_t *res) {
@@ -6684,36 +6726,38 @@ int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
 int igraph_i_is_graphical_degree_sequence_undirected(
     const igraph_vector_t *degrees, igraph_bool_t *res) {
   igraph_vector_t work;
-  igraph_integer_t degree;
-  long int i, vcount;
+  long int w, b, s, c, n, k;
 
   IGRAPH_CHECK(igraph_vector_copy(&work, degrees));
   IGRAPH_FINALLY(igraph_vector_destroy, &work);
 
-  vcount = igraph_vector_size(&work);
-  *res = 0;
-  while (vcount) {
-    /* RFE: theoretically, a counting sort would be only O(n) here and not
-     * O(n log n) since the degrees are bounded from above by n. I am not sure
-     * whether it's worth the fuss, though, sort() in the C library is highly
-     * optimized */
-    igraph_vector_sort(&work);
-    if (VECTOR(work)[0] < 0)
-      break;
+  igraph_vector_sort(&work);
 
-    degree = (igraph_integer_t) igraph_vector_pop_back(&work);
-    vcount--;
-
-    if (degree == 0) {
-      *res = 1;
+  /* This algorithm is outlined in TR-2011-11 of the Egervary Research Group,
+   * ISSN 1587-4451. The main loop of the algorithm is O(n) but it is dominated
+   * by an O(n log n) quicksort; this could in theory be brought down to
+   * O(n) with binsort but it's probably not worth the fuss.
+   *
+   * Variables names are mostly according to the technical report, apart from
+   * the degrees themselves. w and k are zero-based here; in the technical
+   * report they are 1-based */
+  *res = 1;
+  n = igraph_vector_size(&work);
+  w = n - 1; b = 0; s = 0; c = 0;
+  for (k = 0; k < n; k++) {
+    b += VECTOR(*degrees)[k];
+    c += w;
+    while (w > k && VECTOR(*degrees)[w] <= k + 1) {
+      s += VECTOR(*degrees)[w];
+      c -= (k + 1);
+      w--;
+    }
+    if (b > c + s) {
+      *res = 0;
       break;
     }
-
-    if (degree > vcount)
+    if (w == k) {
       break;
-
-    for (i = vcount-degree; i < vcount; i++) {
-      VECTOR(work)[i]--;
     }
   }
 
@@ -6724,140 +6768,276 @@ int igraph_i_is_graphical_degree_sequence_undirected(
 }
 
 typedef struct {
-	igraph_vector_t* first;
-	igraph_vector_t* second;
+  const igraph_vector_t* first;
+  const igraph_vector_t* second;
 } igraph_i_qsort_dual_vector_cmp_data_t;
 
-int igraph_i_qsort_dual_vector_cmp_asc(void* data, const void *p1, const void *p2) {
-	igraph_i_qsort_dual_vector_cmp_data_t* sort_data =
-		(igraph_i_qsort_dual_vector_cmp_data_t*)data;
-	long int index1 = *((long int*)p1);
-	long int index2 = *((long int*)p2);
-	if (VECTOR(*sort_data->first)[index1] < VECTOR(*sort_data->first)[index2])
-		return -1;
-	if (VECTOR(*sort_data->first)[index1] > VECTOR(*sort_data->first)[index2])
-		return 1;
-	if (VECTOR(*sort_data->second)[index1] < VECTOR(*sort_data->second)[index2])
-		return -1;
-	if (VECTOR(*sort_data->second)[index1] > VECTOR(*sort_data->second)[index2])
-		return 1;
-	return 0;
+int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *p2) {
+  igraph_i_qsort_dual_vector_cmp_data_t* sort_data =
+    (igraph_i_qsort_dual_vector_cmp_data_t*)data;
+  long int index1 = *((long int*)p1);
+  long int index2 = *((long int*)p2);
+  if (VECTOR(*sort_data->first)[index1] < VECTOR(*sort_data->first)[index2])
+    return 1;
+  if (VECTOR(*sort_data->first)[index1] > VECTOR(*sort_data->first)[index2])
+    return -1;
+  if (VECTOR(*sort_data->second)[index1] < VECTOR(*sort_data->second)[index2])
+    return 1;
+  if (VECTOR(*sort_data->second)[index1] > VECTOR(*sort_data->second)[index2])
+    return -1;
+  return 0;
 }
 
 int igraph_i_is_graphical_degree_sequence_directed(
     const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees,
     igraph_bool_t *res) {
-  igraph_vector_t work_in;
-	igraph_vector_t work_out;
-	igraph_vector_long_t out_vertices;
-	igraph_vector_long_t index_array;
-	long int i, vcount, u, v, degree;
-	long int index_array_unused_prefix_length, nonzero_indegree_count;
-	igraph_i_qsort_dual_vector_cmp_data_t sort_data;
+  igraph_vector_long_t index_array;
+  long int i, j, vcount, lhs, rhs;
+  igraph_i_qsort_dual_vector_cmp_data_t sort_data;
 
-  IGRAPH_CHECK(igraph_vector_copy(&work_in, in_degrees));
-  IGRAPH_FINALLY(igraph_vector_destroy, &work_in);
-  IGRAPH_CHECK(igraph_vector_copy(&work_out, out_degrees));
-  IGRAPH_FINALLY(igraph_vector_destroy, &work_in);
-	IGRAPH_CHECK(igraph_vector_long_init(&out_vertices, 0));
-	IGRAPH_FINALLY(igraph_vector_long_destroy, &out_vertices);
-	
-  vcount = igraph_vector_size(&work_out);
-	IGRAPH_CHECK(igraph_vector_long_reserve(&out_vertices, vcount));
+  /* Create an index vector that sorts the vertices by decreasing in-degree */
+  vcount = igraph_vector_size(out_degrees);
+  IGRAPH_CHECK(igraph_vector_long_init_seq(&index_array, 0, vcount-1));
+  IGRAPH_FINALLY(igraph_vector_long_destroy, &index_array);
 
-	IGRAPH_CHECK(igraph_vector_long_init(&index_array, vcount));
-	IGRAPH_FINALLY(igraph_vector_long_destroy, &index_array);
+  /* Set up the auxiliary struct for sorting */
+  sort_data.first  = in_degrees;
+  sort_data.second = out_degrees;
 
-	/* Set up the auxiliary struct for sorting */
-  sort_data.first  = &work_in;
-  sort_data.second = &work_out;
+  /* Sort the index vector */
+  igraph_qsort_r(VECTOR(index_array), vcount, sizeof(long int), &sort_data,
+                 igraph_i_qsort_dual_vector_cmp_desc);
 
-	/* Fill the index array. This will contain the indices of the "active" vertices,
-	 * i.e. those that have a non-zero in- or out-degree */
-	nonzero_indegree_count = 0;
-	for (i = 0; i < vcount; i++) {
-		if (VECTOR(work_in)[i] > 0) {
-			VECTOR(index_array)[i] = i;
-			nonzero_indegree_count++;
-		}
-		if (VECTOR(work_out)[i] > 0) {
-			IGRAPH_CHECK(igraph_vector_long_push_back(&out_vertices, i));
-		}
-	}
+  /* Be optimistic, then check whether the Fulkerson–Chen–Anstee condition
+   * holds for every k. In particular, for every k in [0; n), it must be true
+   * that:
+   *
+   * \sum_{i=0}^k indegree[i] <=
+   *     \sum_{i=0}^k min(outdegree[i], k) +
+   *     \sum_{i=k+1}^{n-1} min(outdegree[i], k + 1)
+   */
 
-  *res = 0;
-	index_array_unused_prefix_length = 0;
-  while (!igraph_vector_long_empty(&out_vertices)) {
-		/* Find a vertex with non-zero out-degree. */
-		u = igraph_vector_long_pop_back(&out_vertices);
-		/*
-		printf("Using vertex %ld\n", (long int)u);
-		printf("  Degree vectors:\n  ");
-		igraph_vector_print(&work_out); printf("  ");
-		igraph_vector_print(&work_in);
-		*/
+#define INDEGREE(x) (VECTOR(*in_degrees)[VECTOR(index_array)[x]])
+#define OUTDEGREE(x) (VECTOR(*out_degrees)[VECTOR(index_array)[x]])
 
-		/* Remember the degree of u and clear the degree itself */
-		degree = (long int) VECTOR(work_out)[u];
-		VECTOR(work_out)[u] = 0;
-		/* printf("  Out-degree: %ld\n", (long int)degree); */
+  *res = 1;
+  lhs = 0;
+  for (i = 0; i < vcount; i++) {
+    lhs += INDEGREE(i);
 
-		/* Is the degree larger than the number of vertices with nonzero in-degree?
-		 * (Make sure that u is excluded from the vertices with nonzero in-degree).
-		 */
-		if (degree > nonzero_indegree_count - (VECTOR(work_in)[u] > 0 ? 1 : 0)) {
-      /* Put u back into the queue to detect the failure even if u was the
-       * last vertex. See Github bug #851 */
-      IGRAPH_CHECK(igraph_vector_long_push_back(&out_vertices, u));
-			break;
+    /* It is enough to check for indexes where the in-degree is about to
+     * decrease in the next step; see "Stronger condition" in the Wikipedia
+     * entry for the Fulkerson-Chen-Anstee condition */
+    if (i != vcount - 1 && INDEGREE(i) == INDEGREE(i+1)) {
+      continue;
     }
 
-		/* Find the prefix of index_array that consists solely of vertices with
-		 * zero indegree. We don't need to sort these */
-		while (index_array_unused_prefix_length < vcount &&
-				VECTOR(work_in)[VECTOR(index_array)[index_array_unused_prefix_length]] == 0) {
-			index_array_unused_prefix_length++;
-			nonzero_indegree_count--;
-		}
-
-		/* Sort work_in first and then sort work_out for equal indegrees only. This
-		 * is done by sorting an index vector first; indexing work_out and work_in by
-		 * the sorted index vector would then give the sorted order of these vectors. */
-		igraph_qsort_r(VECTOR(index_array) + index_array_unused_prefix_length,
-			       (size_t) nonzero_indegree_count, 
-			       sizeof(long int), &sort_data,
-				igraph_i_qsort_dual_vector_cmp_asc);
-		/* printf("  Sorted index array:\n  ");
-		igraph_vector_long_print(&index_array); */
-
-		/* Create edges from u to the vertices with the largest in-degrees */
-		i = vcount;
-		while (degree > 0) {
-			v = VECTOR(index_array)[--i];
-			if (u == v) {
-				/* Avoid creating a loop edge */
-				continue;
-			}
-      VECTOR(work_in)[v]--;
-		  /* printf("  Created edge from %ld to %ld, in-degree is now %ld\n", 
-					(long int)u, (long int)v, (long int)VECTOR(work_in)[v]); */
-			degree--;
+    rhs = 0;
+    for (j = 0; j <= i; j++) {
+      rhs += OUTDEGREE(j) < i ? OUTDEGREE(j) : i;
     }
-	}
+    for (j = i+1; j < vcount; j++) {
+      rhs += OUTDEGREE(j) < (i + 1) ? OUTDEGREE(j) : (i + 1);
+    }
 
-	if (igraph_vector_long_empty(&out_vertices)) {
-		/* No more vertices with non-zero outdegree, so we were successful */
-		*res = 1;
-	}
+    if (lhs > rhs) {
+      *res = 0;
+      break;
+    }
+  }
 
-	igraph_vector_long_destroy(&index_array);
-	igraph_vector_long_destroy(&out_vertices);
-  igraph_vector_destroy(&work_out);
-  igraph_vector_destroy(&work_in);
-  IGRAPH_FINALLY_CLEAN(4);
+#undef INDEGREE
+#undef OUTDEGREE
 
-	return IGRAPH_SUCCESS;
+  igraph_vector_long_destroy(&index_array);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return IGRAPH_SUCCESS;
 }
 
 #undef SUCCEED
 #undef FAIL
+
+
+/* igraph_is_tree -- check if a graph is a tree */
+
+/* count the number of vertices reachable from the root */
+static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_t *al, igraph_integer_t *visited_count) {
+    igraph_stack_int_t stack;
+    igraph_vector_bool_t visited;
+    long i;
+
+    IGRAPH_CHECK(igraph_vector_bool_init(&visited, igraph_adjlist_size(al)));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
+
+    IGRAPH_CHECK(igraph_stack_int_init(&stack, 0));
+    IGRAPH_FINALLY(igraph_stack_int_destroy, &stack);
+
+    *visited_count = 0;
+
+    /* push the root into the stack */
+    IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
+
+    while (! igraph_stack_int_empty(&stack)) {
+        igraph_integer_t u;
+        igraph_vector_int_t *neighbors;
+        long ncount;
+
+        /* take a vertex from the stack, mark it as visited */
+        u = igraph_stack_int_pop(&stack);
+        if (IGRAPH_LIKELY(! VECTOR(visited)[u])) {
+            VECTOR(visited)[u] = 1;
+            *visited_count += 1;
+        }
+
+        /* register all its yet-unvisited neighbours for future processing */
+        neighbors = igraph_adjlist_get(al, u);
+        ncount = igraph_vector_int_size(neighbors);
+        for (i=0; i < ncount; ++i) {
+            igraph_integer_t v = VECTOR(*neighbors)[i];
+            if (! VECTOR(visited)[v])
+                IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
+        }
+    }
+
+    igraph_stack_int_destroy(&stack);
+    igraph_vector_bool_destroy(&visited);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
+}
+
+
+/**
+ * \ingroup structural
+ * \function igraph_is_tree
+ * \brief Decides whether the graph is a tree.
+ *
+ * An undirected graph is a tree if it is connected and has no cycles.
+ * </para><para>
+ *
+ * In the directed case, a possible additional requirement is that all
+ * edges are oriented away from a root (out-tree or arborescence) or all edges
+ * are oriented towards a root (in-tree or anti-arborescence).
+ * This test can be controlled using the \p mode parameter.
+ * </para><para>
+ *
+ * By convention, the null graph (i.e. the graph with no vertices) is considered not to be a tree.
+ *
+ * \param graph The graph object to analyze.
+ * \param res Pointer to a logical variable, the result will be stored
+ *        here.
+ * \param root If not \c NULL, the root node will be stored here. When \p mode
+ *        is \c IGRAPH_ALL or the graph is undirected, any vertex can be the root
+ *        and \p root is set to 0 (the first vertex). When \p mode is \c IGRAPH_OUT
+ *        or \c IGRAPH_IN, the root is set to the vertex with zero in- or out-degree,
+ *        respectively.
+ * \param mode For a directed graph this specifies whether to test for an
+ *        out-tree, an in-tree or ignore edge directions. The respective
+ *        possible values are:
+ *        \c IGRAPH_OUT, \c IGRAPH_IN, \c IGRAPH_ALL. This argument is
+ *        ignored for undirected graphs.
+ * \return Error code:
+ *        \c IGRAPH_EINVAL: invalid mode argument.
+ *
+ * Time complexity: At most O(|V|+|E|), the
+ * number of vertices plus the number of edges in the graph.
+ *
+ * \sa igraph_is_weakly_connected()
+ */
+
+int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
+    igraph_adjlist_t al;
+    igraph_integer_t iroot;
+    igraph_integer_t visited_count;
+    igraph_integer_t vcount, ecount;
+
+    vcount = igraph_vcount(graph);
+    ecount = igraph_ecount(graph);
+
+    /* A tree must have precisely vcount-1 edges. */
+    /* By convention, the zero-vertex graph will not be considered a tree. */
+    if (ecount != vcount-1) {
+        *res = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* The single-vertex graph is a tree, provided it has no edges (checked in the previous if (..)) */
+    if (vcount == 1) {
+        *res = 1;
+        if (root)
+            *root = 0;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* For higher vertex counts we cannot short-circuit due to the possibility
+     * of loops or multi-edges even when the edge count is correct. */
+
+    /* Ignore mode for undirected graphs. */
+    if (! igraph_is_directed(graph))
+        mode = IGRAPH_ALL;
+
+    IGRAPH_CHECK(igraph_adjlist_init(graph, &al, mode));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+
+    /* The main algorithm:
+     * We find a root and check that all other vertices are reachable from it.
+     * We have already checked the number of edges, so with the additional
+     * reachability condition we can verify if the graph is a tree.
+     *
+     * For directed graphs, the root is the node with no incoming/outgoing
+     * connections, depending on 'mode'. For undirected, it is arbitrary, so
+     * we choose 0.
+     */
+
+    *res = 1; /* assume success */
+
+    switch (mode) {
+    case IGRAPH_ALL:
+        iroot = 0;
+        break;
+
+    case IGRAPH_IN:
+    case IGRAPH_OUT:
+    {
+        igraph_vector_t degree;
+        igraph_integer_t i;
+
+        IGRAPH_CHECK(igraph_vector_init(&degree, 0));
+        IGRAPH_FINALLY(igraph_vector_destroy, &degree);
+
+        IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), mode == IGRAPH_IN ? IGRAPH_OUT : IGRAPH_IN, /* loops = */ 1));
+
+        for (i=0; i < vcount; ++i)
+            if (VECTOR(degree)[i] == 0)
+                break;
+
+        /* if no suitable root is found, the graph is not a tree */
+        if (i == vcount)
+            *res = 0;
+        else
+            iroot = i;
+
+        igraph_vector_destroy(&degree);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+        break;
+    default:
+        IGRAPH_ERROR("Invalid mode", IGRAPH_EINVMODE);
+    }
+
+    /* if no suitable root was found, skip visting vertices */
+    if (*res) {
+        IGRAPH_CHECK(igraph_i_is_tree_visitor(iroot, &al, &visited_count));
+        *res = visited_count == vcount;
+    }
+
+    if (root)
+        *root = iroot;
+
+    igraph_adjlist_destroy(&al);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}

@@ -82,8 +82,8 @@ DECLDIR int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no
 DECLDIR int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
                 igraph_integer_t *asym, igraph_integer_t *null);
 DECLDIR int igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
-DECLDIR int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
-                igraph_integer_t *res4);
+DECLDIR int igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
+                igraph_real_t *res4);
 
 DECLDIR int igraph_adjacent_triangles(const igraph_t *graph,
                 igraph_vector_t *res,

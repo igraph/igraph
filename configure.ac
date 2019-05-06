@@ -1,4 +1,4 @@
-AC_INIT(igraph, esyscmd([tr -d '\n' < VERSION]), csardi.gabor@gmail.com)
+AC_INIT(igraph, esyscmd([tr -d '\n' < IGRAPH_VERSION]), csardi.gabor@gmail.com)
 AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_HEADERS([config.h])
@@ -49,7 +49,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([stdarg.h stdlib.h string.h time.h unistd.h stdint.h sys/int_types.h])
 LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
-AC_CHECK_FUNCS([expm1 rint rintf finite log2 snprintf log1p round fabsl fmin strcasecmp isnan strdup _strdup ftruncate stpcpy])
+AC_CHECK_FUNCS([expm1 rint rintf finite log2 snprintf log1p round fabsl fmin strcasecmp isfinite isnan strdup _strdup ftruncate stpcpy])
 AC_CHECK_DECL([stpcpy],
 	[AC_DEFINE([HAVE_STPCPY_SIGNATURE], [1], [Define to 1 if the stpcpy function has a signature])])
 LIBS=$LIBS_SAVE
@@ -118,6 +118,11 @@ AC_ARG_ENABLE(profiling,
               AC_HELP_STRING([--enable-profiling], [Enable gprof profiling]),
               [use_gprof=$enableval], [use_gprof=no])
 
+use_asan=no
+AC_ARG_ENABLE(asan,
+			  AC_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
+			  [use_asan=$enableval], [use_asan=no])
+
 debug=no
 AC_ARG_ENABLE(debug,
               AC_HELP_STRING([--enable-debug], [Enable debug build]),
@@ -132,7 +137,7 @@ HAVE_LIBXML=0
 if test $graphml_support = yes; then
   AC_PATH_PROG([XML2CONFIG], [xml2-config], [none])
   if test "$XML2CONFIG" = "none"; then
-	# Hmmm, no xml2-config. OS X does not have it while still
+	# Hmmm, no xml2-config. Older versions of OS X do not have it while still
 	# having libxml2, so let's try an educated guess if
 	# /usr/include/libxml2/libxml/parser.h exists.
 	AC_CHECK_FILE([/usr/include/libxml2/libxml/parser.h], [
@@ -144,6 +149,12 @@ if test $graphml_support = yes; then
   else
     XML2_LIBS=`$XML2CONFIG --libs`
     XML2_CFLAGS=`$XML2CONFIG --cflags`
+	if test -f /usr/bin/sw_vers -a `sw_vers -productVersion | grep -c "^10\.11\."` -gt 0 -a `echo $XML2_LIBS | grep -c '/Developer/'` -gt 0; then
+      # We are on OS X 10.11, which has a known bug with xml2-config; see
+      # https://github.com/igraph/igraph/issues/973 . We work around it
+      # here
+      XML2_LIBS=`$XML2CONFIG --exec-prefix=/usr --libs`
+	fi
   fi
   AC_CHECK_LIB([xml2], [xmlSAXUserParseFile], [
     ac_save_CFLAGS="$CFLAGS"
@@ -186,7 +197,7 @@ tls_support=no
 HAVE_TLS=0
 THREAD_LOCAL=
 AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
-if test "x$enable_tls" == "xyes"; then
+if test "x$enable_tls" = "xyes"; then
   keywords="__thread __declspec(thread)"
   for kw in $keywords ; do
       AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw)
@@ -331,6 +342,11 @@ if test "$use_gprof" = "yes"; then
   CXXFLAGS="${CXXFLAGS} -pg"
 fi
 
+if test "$use_asan" = "yes"; then
+  CFLAGS="${CFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
+  CXXFLAGS="${CXXFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
+fi
+
 AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
@@ -351,4 +367,6 @@ if test "$glpk_support" != "no"; then
   AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
 fi
 AC_MSG_RESULT([  Debug build            -- $debug])
+AC_MSG_RESULT([  Clang AddressSanitizer -- $use_asan])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
+

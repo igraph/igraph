@@ -1889,7 +1889,7 @@ igraph_isomorphic_34:
         PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso
 
 igraph_canonical_permutation:
-        PARAMS: GRAPH graph, OUT VECTORM1 labeling, BLISSSH sh="fm", OUT BLISSINFO info
+        PARAMS: GRAPH graph, NULL colors, OUT VECTORM1 labeling, BLISSSH sh="fm", OUT BLISSINFO info
         NAME-R: canonical_permutation
 
 igraph_permute_vertices:
@@ -1897,13 +1897,13 @@ igraph_permute_vertices:
         NAME-R: permute
 
 igraph_isomorphic_bliss:
-        PARAMS: GRAPH graph1, GRAPH graph2, OUT BOOLEANPTR iso, \
-                OUT VECTORM1_OR_0 map12, OUT VECTORM1_OR_0 map21, \
-                BLISSSH sh1="fm", BLISSSH sh2="fm", OUT BLISSINFO info1, \
-                OUT BLISSINFO info2
+        PARAMS: GRAPH graph1, GRAPH graph2, NULL colors1, NULL colors2, \
+                OUT BOOLEANPTR iso, OUT VECTORM1_OR_0 map12, \
+                OUT VECTORM1_OR_0 map21, BLISSSH sh="fm", \
+                OUT BLISSINFO info1, OUT BLISSINFO info2
 
 igraph_automorphisms:
-        PARAMS: GRAPH graph, BLISSSH sh="fm", OUT BLISSINFO info
+        PARAMS: GRAPH graph, NULL colors, BLISSSH sh="fm", OUT BLISSINFO info
         NAME-R: automorphisms
 
 igraph_subisomorphic_lad:

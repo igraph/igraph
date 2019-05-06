@@ -466,12 +466,14 @@ int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *          edges are allowed. This method was implemented under the
  *          name \c igraph_nonlinear_barabasi_game before version 0.6.
  *        \endclist
- * \param start_from Either a null pointer, or a graph. In the latter 
- *        case the graph as a starting configuration. The graph must
- *        be non-empty, i.e. it must have at least one vertex. If a
- *        graph is supplied here and the \p outseq argument is also
- *        given, then \p outseq should only contain information on the
- *        vertices that are not in the \p start_from graph.
+ * \param start_from Either a null pointer, or a graph. In the former
+ *        case, the starting configuration is a clique of size \p m.
+ *        In the latter case, the graph is a starting configuration.
+ *        The graph must be non-empty, i.e. it must have at least one
+ *        vertex. If a graph is supplied here and the \p outseq
+ *        argument is also given, then \p outseq should only contain
+ *        information on the vertices that are not in the \p
+ *        start_from graph.
  * \return Error code:
  *         \c IGRAPH_EINVAL: invalid \p n,
  *         \p m or \p outseq parameter.
@@ -529,8 +531,12 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
   if (outseq && igraph_vector_min(outseq) < 0) {
     IGRAPH_ERROR("Negative out degree in sequence", IGRAPH_EINVAL);
   }
-  if (A <= 0) {
+  if (!outpref && A <= 0) {
     IGRAPH_ERROR("Constant attractiveness (A) must be positive",
+		 IGRAPH_EINVAL);
+  }
+  if (outpref && A < 0) {
+    IGRAPH_ERROR("Constant attractiveness (A) must be non-negative",
 		 IGRAPH_EINVAL);
   }
   if (algo == IGRAPH_BARABASI_BAG) {
@@ -550,6 +556,9 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
     IGRAPH_ERROR("`outpref' must be true if starting from an undirected "
 		 "graph", IGRAPH_EINVAL);
   }
+
+  if (n == 0)
+      return igraph_empty(graph, 0, directed);
 
   if (algo == IGRAPH_BARABASI_BAG) {
     return igraph_i_barabasi_game_bag(graph, n, m, outseq, outpref, directed, 
@@ -1195,6 +1204,202 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
   return IGRAPH_SUCCESS;
 }
 
+int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, const igraph_vector_t *degseq) {
+    igraph_vector_int_t stubs;
+    igraph_vector_t edges;
+    igraph_bool_t degseq_ok;
+    igraph_vector_ptr_t adjlist;
+    long i, j, k;
+    long vcount, ecount, stub_count;
+
+    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(degseq, 0, &degseq_ok));
+    if (!degseq_ok) {
+      IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
+    }
+
+    stub_count = (long) igraph_vector_sum(degseq);
+    ecount = stub_count / 2;
+    vcount = igraph_vector_size(degseq);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&stubs, stub_count);
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, stub_count);
+
+    k=0;
+    for (i=0; i < vcount; ++i) {
+        long deg = (long) VECTOR(*degseq)[i];
+        for (j=0; j < deg; ++j)
+            VECTOR(stubs)[k++] = i;
+    }
+
+    IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
+    for (i=0; i < vcount; ++i) {
+        igraph_set_t *set = igraph_malloc(sizeof(igraph_set_t));
+        if (! set)
+            IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+        IGRAPH_CHECK(igraph_set_init(set, 0));
+        VECTOR(adjlist)[i] = set;
+        IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*degseq)[i]));
+    }
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
+
+    RNG_BEGIN();
+
+    for (;;) {
+        igraph_bool_t success = 1;
+        IGRAPH_CHECK(igraph_vector_int_shuffle(&stubs));
+
+        for (i=0; i < ecount; ++i) {
+            igraph_integer_t from = VECTOR(stubs)[2*i];
+            igraph_integer_t to = VECTOR(stubs)[2*i+1];
+
+            /* loop edge, fail */
+            if (to == from) {
+                success = 0;
+                break;
+            }
+
+            /* multi-edge, fail */
+            if (igraph_set_contains((igraph_set_t *) VECTOR(adjlist)[to], from)) {
+                success = 0;
+                break;
+            }
+
+            /* sets are already reserved */
+            igraph_set_add((igraph_set_t *) VECTOR(adjlist)[to], from);
+            igraph_set_add((igraph_set_t *) VECTOR(adjlist)[from], to);
+
+            /* register edge */
+            VECTOR(edges)[2*i]   = from;
+            VECTOR(edges)[2*i+1] = to;
+        }
+
+        if (success)
+            break;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        for (j=0; j < vcount; ++j)
+            igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
+    }
+
+    RNG_END();
+
+    igraph_vector_ptr_destroy_all(&adjlist);
+    igraph_vector_int_destroy(&stubs);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, /* directed = */ 0));
+
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+int igraph_degree_sequence_game_no_multiple_directed_uniform(
+        igraph_t *graph, const igraph_vector_t *out_deg, const igraph_vector_t *in_deg)
+{
+    igraph_vector_int_t out_stubs, in_stubs;
+    igraph_vector_t edges;
+    igraph_bool_t degseq_ok;
+    igraph_vector_ptr_t adjlist;
+    long i, j, k, l;
+    long vcount, ecount;
+
+    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(out_deg, in_deg, &degseq_ok));
+    if (!degseq_ok) {
+      IGRAPH_ERROR("No simple directed graph can realize the given degree sequence", IGRAPH_EINVAL);
+    }
+
+    ecount = (long) igraph_vector_sum(out_deg);
+    vcount = igraph_vector_size(out_deg);
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&out_stubs, ecount);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&in_stubs, ecount);
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*ecount);
+
+    k=0; l=0;
+    for (i=0; i < vcount; ++i) {
+        long dout, din;
+
+        dout = (long) VECTOR(*out_deg)[i];
+        for (j=0; j < dout; ++j)
+            VECTOR(out_stubs)[k++] = i;
+
+        din  = (long) VECTOR(*in_deg)[i];
+        for (j=0; j < din; ++j)
+            VECTOR(in_stubs)[l++] = i;
+    }
+
+    IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
+    for (i=0; i < vcount; ++i) {
+        igraph_set_t *set = igraph_malloc(sizeof(igraph_set_t));
+        if (! set)
+            IGRAPH_ERROR("Out of memory", IGRAPH_ENOMEM);
+        IGRAPH_CHECK(igraph_set_init(set, 0));
+        VECTOR(adjlist)[i] = set;
+        IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*out_deg)[i]));
+    }
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
+
+    RNG_BEGIN();
+
+    for (;;) {
+        igraph_bool_t success = 1;
+        IGRAPH_CHECK(igraph_vector_int_shuffle(&out_stubs));
+
+        for (i=0; i < ecount; ++i) {
+            igraph_integer_t from = VECTOR(out_stubs)[i];
+            igraph_integer_t to = VECTOR(in_stubs)[i];
+            igraph_set_t *set;
+
+            /* loop edge, fail */
+            if (to == from) {
+                success = 0;
+                break;
+            }
+
+            /* multi-edge, fail */
+            set = (igraph_set_t *) VECTOR(adjlist)[from];
+            if (igraph_set_contains(set, to)) {
+                success = 0;
+                break;
+            }
+
+            /* sets are already reserved */
+            igraph_set_add(set, to);
+
+            /* register edge */
+            VECTOR(edges)[2*i]   = from;
+            VECTOR(edges)[2*i+1] = to;
+        }
+
+        if (success)
+            break;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        for (j=0; j < vcount; ++j)
+            igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
+    }
+
+    RNG_END();
+
+    igraph_vector_ptr_destroy_all(&adjlist);
+    igraph_vector_int_destroy(&out_stubs);
+    igraph_vector_int_destroy(&in_stubs);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, vcount, /* directed = */ 1));
+
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
 /* This is in gengraph_mr-connected.cpp */
 
 int igraph_degree_sequence_game_vl(igraph_t *graph,
@@ -1216,12 +1421,22 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  * \param method The method to generate the graph. Possible values: 
  *        \clist
  *          \cli IGRAPH_DEGSEQ_SIMPLE
- *          For undirected graphs, this method puts all vertex ids in a bag
+ *          This method implements the configuration model.
+ *          For undirected graphs, it puts all vertex IDs in a bag
  *          such that the multiplicity of a vertex in the bag is the same as
  *          its degree. Then it draws pairs from the bag until the bag becomes
  *          empty. This method can generate both loop (self) edges and multiple
  *          edges. For directed graphs, the algorithm is basically the same,
- *          but two separate bags are used for the in- and out-degrees. 
+ *          but two separate bags are used for the in- and out-degrees.
+ *          Undirected graphs are generated with probability proportional to
+ *          <code>(\prod_{i&lt;j} A_{ij} ! \prod_i A_{ii} !!)^{-1}</code>,
+ *          where \c A denotes the adjacency matrix and <code>!!</code> denotes
+ *          the double factorial.
+ *          The corresponding  expression for directed ones is
+ *          <code>(\prod_{i,j} A_{ij}!)^{-1}</code>.
+ *          Thus the probability of all simple graphs (which only have 0s and 1s
+ *          in the adjacency matrix) is the same, while that of
+ *          non-simple ones depends on their structure.
  *          \cli IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE
  *          This method is similar to \c IGRAPH_DEGSEQ_SIMPLE
  *          but tries to avoid multiple and loop edges and restarts the
@@ -1230,15 +1445,19 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *          the given sequence, but it is relatively fast and it will
  *          eventually succeed if the provided degree sequence is graphical,
  *          but there is no upper bound on the number of iterations.
+ *          \cli IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM
+ *          This method is identical to \c IGRAPH_DEGSEQ_SIMPLE, but if the
+ *          generated graph is not simple, it rejects it and re-starts the
+ *          generation. It samples all simple graphs with the same probability.
  *          \cli IGRAPH_DEGSEQ_VL
  *          This method is a much more sophisticated generator than the
  *          previous ones. It can sample undirected, connected simple graphs
  *          uniformly and uses Monte-Carlo methods to randomize the graphs. 
  *          This generator should be favoured if undirected and connected 
  *          graphs are to be generated and execution time is not a concern.
- *          igraph uses the original implementation of Fabien Viger; see
- *          http://www-rp.lip6.fr/~latapy/FV/generation.html
- *          and the paper cited on it for the details of the algorithm.
+ *          igraph uses the original implementation of Fabien Viger; for the algorithm,
+ *          see https://www-complexnetworks.lip6.fr/~latapy/FV/generation.html
+ *          and the paper https://arxiv.org/abs/cs/0502085
  *        \endclist
  * \return Error code: 
  *          \c IGRAPH_ENOMEM: there is not enough
@@ -1264,28 +1483,33 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
 
 int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
 				const igraph_vector_t *in_deg, 
-				igraph_degseq_t method) {
+                igraph_degseq_t method)
+{
+  if (in_deg && igraph_vector_empty(in_deg) && !igraph_vector_empty(out_deg))
+      in_deg=0;
 
-  int retval;
+  switch (method) {
+  case IGRAPH_DEGSEQ_SIMPLE:
+      return igraph_degree_sequence_game_simple(graph, out_deg, in_deg);
 
-  if (in_deg && igraph_vector_empty(in_deg) && !igraph_vector_empty(out_deg)) {
-    in_deg=0;
+  case IGRAPH_DEGSEQ_VL:
+      return igraph_degree_sequence_game_vl(graph, out_deg, in_deg);
+
+  case IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE:
+      if (in_deg == 0)
+          return igraph_degree_sequence_game_no_multiple_undirected(graph, out_deg);
+      else
+          return igraph_degree_sequence_game_no_multiple_directed(graph, out_deg, in_deg);
+
+  case IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM:
+      if (in_deg == 0)
+          return igraph_degree_sequence_game_no_multiple_undirected_uniform(graph, out_deg);
+      else
+          return igraph_degree_sequence_game_no_multiple_directed_uniform(graph, out_deg, in_deg);
+
+  default:
+      IGRAPH_ERROR("Invalid degree sequence game method", IGRAPH_EINVAL);
   }
-  if (method==IGRAPH_DEGSEQ_SIMPLE) {
-    retval=igraph_degree_sequence_game_simple(graph, out_deg, in_deg);
-  } else if (method==IGRAPH_DEGSEQ_VL) {
-    retval=igraph_degree_sequence_game_vl(graph, out_deg, in_deg);
-  } else if (method==IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE) {
-    if (in_deg == 0 || (igraph_vector_empty(in_deg) && !igraph_vector_empty(out_deg))) {
-      retval=igraph_degree_sequence_game_no_multiple_undirected(graph, out_deg);
-    } else {
-      retval=igraph_degree_sequence_game_no_multiple_directed(graph, out_deg, in_deg);
-    }
-  } else {
-    IGRAPH_ERROR("Invalid degree sequence game method", IGRAPH_EINVAL);
-  }
-
-  return retval;
 }
 
 /**
@@ -2908,6 +3132,116 @@ int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
 }
 
 /**
+ * \function igraph_rewire_directed_edges
+ * \brief Rewire the chosen endpoint of directed edges
+ *
+ * This function rewires either the start or end of directed edges in a graph
+ * with a constant probability. Correspondingly, either the in-degree sequence
+ * or the out-degree sequence of the graph will be preserved.
+ *
+ * </para><para> Note that this function modifies the input \p graph,
+ * call \ref igraph_copy() if you want to keep it.
+ *
+ * \param graph The input graph, this will be rewired, it can be
+ *    directed or undirected. If it is directed, \ref igraph_rewire_edges()
+ *    will be called.
+ * \param prob The rewiring probability, a constant between zero and
+ *    one (inclusive).
+ * \param loops Boolean, whether loop edges are allowed in the new
+ *    graph, or not.
+ * \param mode The endpoints of directed edges to rewire. It is ignored for
+ *    undirected graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          rewire the end of each directed edge
+ *        \cli IGRAPH_IN
+ *          rewire the start of each directed edge
+ *        \cli IGRAPH_ALL
+ *          rewire both endpoints of each edge
+ *        \endclist
+ * \return Error code.
+ *
+ * \sa \ref igraph_rewire_edges(), \ref igraph_rewire()
+ *
+ * Time complexity: O(|E|).
+ */
+
+int igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
+                                 igraph_bool_t loops, igraph_neimode_t mode) {
+
+  if (prob < 0 || prob > 1) {
+    IGRAPH_ERROR("Rewiring probability should be between zero and one",
+         IGRAPH_EINVAL);
+  }
+
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
+      mode != IGRAPH_ALL) {
+    IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+  }
+
+  if (prob == 0) {
+    return IGRAPH_SUCCESS;
+  }
+
+  if (igraph_is_directed(graph) && mode != IGRAPH_ALL) {
+    igraph_t newgraph;
+    long int no_of_edges = igraph_ecount(graph);
+    long int no_of_nodes = igraph_vcount(graph);
+    long int to_rewire;
+    long int offset;
+    igraph_vector_t edges;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
+
+    switch (mode) {
+    case IGRAPH_IN:
+      offset = 0;
+      break;
+    case IGRAPH_OUT:
+      offset = 1;
+      break;
+    case IGRAPH_ALL:
+      break; /* suppress compiler warning */
+    }
+
+    IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
+
+    RNG_BEGIN();
+
+    to_rewire = RNG_GEOM(prob);
+    while (to_rewire < no_of_edges) {
+      if (loops) {
+        VECTOR(edges)[2*to_rewire + offset] = RNG_INTEGER(0, no_of_nodes-1);
+      } else {
+        long int nei= (long int) VECTOR(edges)[2*to_rewire + (1-offset)];
+        long int r = RNG_INTEGER(0, no_of_nodes-2);
+        VECTOR(edges)[2*to_rewire + offset] = (r != nei ? r : no_of_nodes-1);
+      }
+      to_rewire += RNG_GEOM(prob)+1;
+    }
+
+    RNG_END();
+
+    IGRAPH_CHECK(igraph_create(&newgraph, &edges, (igraph_integer_t) no_of_nodes,
+                   igraph_is_directed(graph)));
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_FINALLY(igraph_destroy, &newgraph);
+    IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
+    IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1,1,1);
+    IGRAPH_FINALLY_CLEAN(1);
+    igraph_destroy(graph);
+    *graph=newgraph;
+
+  } else {
+    IGRAPH_CHECK(igraph_rewire_edges(graph, prob, loops, /* multiple = */ 0));
+  }
+
+  return 0;
+}
+
+/**
  * \function igraph_watts_strogatz_game
  * \brief The Watts-Strogatz small-world model
  * 
@@ -3524,11 +3858,12 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
                 igraph_vector_t* fitness_out, igraph_vector_t* fitness_in,
                 igraph_bool_t loops, igraph_bool_t multiple) {
   igraph_vector_t edges=IGRAPH_VECTOR_NULL;
-  igraph_integer_t no_of_nodes, max_no_of_edges;
+  igraph_integer_t no_of_nodes;
   igraph_integer_t outnodes, innodes, nodes;
   igraph_vector_t cum_fitness_in, cum_fitness_out;
   igraph_vector_t *p_cum_fitness_in, *p_cum_fitness_out;
   igraph_real_t x, max_in, max_out;
+  igraph_real_t max_no_of_edges;
   igraph_bool_t is_directed = (fitness_in != 0);
   float num_steps;
   igraph_integer_t step_counter = 0;
@@ -3572,14 +3907,16 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
         if (VECTOR(*fitness_out)[i] != 0 && VECTOR(*fitness_in)[i] != 0)
             nodes++;
       }
-      max_no_of_edges = outnodes * innodes - (loops ? 0 : nodes);
+      max_no_of_edges = ((igraph_real_t) outnodes) * innodes - (loops ? 0 : nodes);
     } else {
       nodes = 0;
       for (i=0; i < no_of_nodes; i++) {
         if (VECTOR(*fitness_out)[i] != 0)
           nodes++;
       }
-      max_no_of_edges = loops ? nodes*(nodes+1)/2 : nodes*(nodes-1)/2;
+      max_no_of_edges = loops
+        ? nodes*((igraph_real_t)nodes+1)/2
+        : nodes*((igraph_real_t)nodes-1)/2;
     }
     if (no_of_edges > max_no_of_edges)
       IGRAPH_ERROR("Too many edges requested", IGRAPH_EINVAL);
@@ -4160,4 +4497,167 @@ int igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
 				       directed, IGRAPH_NO_LOOPS));
   IGRAPH_CHECK(igraph_correlated_game(graph1, graph2, corr, p, permutation));
   return 0;
+}
+
+
+/* Uniform sampling of labelled trees (igraph_tree_game) */
+
+/* The following implementation uniformly samples Prufer trees and converts
+ * them to trees.
+ */
+
+static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+    igraph_vector_int_t prufer;
+    long i;
+
+    if (directed)
+        IGRAPH_ERROR("The Prufer method for random tree generation does not support directed trees", IGRAPH_EINVAL);
+
+    IGRAPH_CHECK(igraph_vector_int_init(&prufer, n-2));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &prufer);
+
+    RNG_BEGIN();
+
+    for (i=0; i < n-2; ++i)
+        VECTOR(prufer)[i] = RNG_INTEGER(0,n-1);
+
+    RNG_END();
+
+    IGRAPH_CHECK(igraph_from_prufer(graph, &prufer));
+
+    igraph_vector_int_destroy(&prufer);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
+
+/* The following implementation is based on loop-erased random walks and Wilson's algorithm
+ * for uniformly sampling spanning trees. We effectively sample spanning trees of the complete
+ * graph.
+ */
+
+/* swap two elements of a vector_int */
+#define SWAP_INT_ELEM(vec, i, j) \
+    { \
+        igraph_integer_t temp; \
+        temp = VECTOR(vec)[i]; \
+        VECTOR(vec)[i] = VECTOR(vec)[j]; \
+        VECTOR(vec)[j] = temp; \
+    }
+
+static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+    igraph_vector_t edges;
+    igraph_vector_int_t vertices;
+    igraph_vector_bool_t visited;
+    long i, j, k;
+
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*(n-1));
+
+    IGRAPH_CHECK(igraph_vector_bool_init(&visited, n));
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
+
+    /* The vertices vector contains visited vertices between 0..k-1, unvisited ones between k..n-1. */
+    IGRAPH_CHECK(igraph_vector_int_init_seq(&vertices, 0, n-1));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &vertices);
+
+    RNG_BEGIN();
+
+    /* A simple implementation could be as below. This is for illustration only.
+     * The actually implemented algorithm avoids unnecessary walking on the already visited
+     * portion of the vertex set.
+     */
+    /*
+    // pick starting point for the walk
+    i = RNG_INTEGER(0, n-1);
+    VECTOR(visited)[i] = 1;
+
+    k=1;
+    while (k < n) {
+        // pick next vertex in the walk
+        j = RNG_INTEGER(0, n-1);
+        // if it has not been visited before, connect to the previous vertex in the sequence
+        if (! VECTOR(visited)[j]) {
+            VECTOR(edges)[2*k - 2] = i;
+            VECTOR(edges)[2*k - 1] = j;
+            VECTOR(visited)[j] = 1;
+            k++;
+        }
+        i=j;
+    }
+    */
+
+    i = RNG_INTEGER(0, n-1);
+    VECTOR(visited)[i] = 1;
+    SWAP_INT_ELEM(vertices, 0, i);
+
+    for (k=1; k < n; ++k) {
+        j = RNG_INTEGER(0, n-1);
+        if (VECTOR(visited)[VECTOR(vertices)[j]]) {
+            i = VECTOR(vertices)[j];
+            j = RNG_INTEGER(k, n-1);
+        }
+        VECTOR(visited)[VECTOR(vertices)[j]] = 1;
+        SWAP_INT_ELEM(vertices, k, j);
+        VECTOR(edges)[2*k - 2] = i;
+        i = VECTOR(vertices)[k];
+        VECTOR(edges)[2*k - 1] = i;
+    }
+
+    RNG_END();
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, n, directed));
+
+    igraph_vector_int_destroy(&vertices);
+    igraph_vector_bool_destroy(&visited);
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
+}
+
+#undef SWAP_INT_ELEM
+
+/**
+ * \ingroup generators
+ * \function igraph_tree_game
+ * \brief Generates a random tree with the given number of nodes
+ *
+ * This function samples uniformly from the set of labelled trees,
+ * i.e. it can generate each labelled tree with the same probability.
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param n The number of nodes in the tree.
+ * \param directed Whether to create a directed tree. The edges are oriented away from the root.
+ * \param method The algorithm to use to generate the tree. Possible values:
+ *        \clist
+ *        \cli IGRAPH_RANDOM_TREE_PRUFER
+ *          This algorithm samples Pr&uuml;fer sequences unformly, then converts them to trees.
+ *          Directed trees are not currently supported.
+ *        \cli IGRAPH_RANDOM_LERW
+ *          This algorithm effectively performs a loop-erased random walk on the complete graph
+ *          to uniformly sample its spanning trees (Wilson's algorithm).
+ *        \endclist
+ * \return Error code:
+ *          \c IGRAPH_ENOMEM: there is not enough
+ *           memory to perform the operation.
+ *          \c IGRAPH_EINVAL: invalid tree size
+ *
+ * \sa \ref igraph_from_prufer()
+ *
+ */
+
+int igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
+    if (n < 2) {
+        IGRAPH_CHECK(igraph_empty(graph, n, directed));
+        return IGRAPH_SUCCESS;
+    }
+
+    switch (method) {
+    case IGRAPH_RANDOM_TREE_PRUFER:
+        return igraph_i_tree_game_prufer(graph, n, directed);
+    case IGRAPH_RANDOM_TREE_LERW:
+        return igraph_i_tree_game_loop_erased_random_walk(graph, n, directed);
+    default:
+        IGRAPH_ERROR("Invalid method for random tree construction", IGRAPH_EINVAL);
+    }
 }

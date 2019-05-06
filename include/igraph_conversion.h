@@ -59,6 +59,7 @@ DECLDIR int igraph_to_directed(igraph_t *graph,
 DECLDIR int igraph_to_undirected(igraph_t *graph,
                 igraph_to_undirected_t flags,
                 const igraph_attribute_combination_t *edge_comb);
+DECLDIR int igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t *prufer);
 
 __END_DECLS
 

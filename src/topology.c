@@ -30,6 +30,7 @@
 #include "igraph_conversion.h"
 #include "igraph_stack.h"
 #include "igraph_attributes.h"
+#include "igraph_structural.h"
 #include "config.h"
 
 const unsigned int igraph_i_isoclass_3[] = {  0, 1, 1, 3, 1, 5, 6, 7,
@@ -778,22 +779,31 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  */
 
 int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
-		      igraph_bool_t *iso) {
+                      igraph_bool_t *iso) {
   
   long int nodes1=igraph_vcount(graph1), nodes2=igraph_vcount(graph2);
   long int edges1=igraph_ecount(graph1), edges2=igraph_ecount(graph2);
   igraph_bool_t dir1=igraph_is_directed(graph1), dir2=igraph_is_directed(graph2);
+  igraph_bool_t loop1, loop2;
 
   if (dir1 != dir2) {
     IGRAPH_ERROR("Cannot compare directed and undirected graphs", IGRAPH_EINVAL);
   } else if (nodes1 != nodes2 || edges1 != edges2) { 
     *iso=0;
   } else if (nodes1==3 || nodes1==4) {
-	igraph_isomorphic_34(graph1, graph2, iso);
+    IGRAPH_CHECK(igraph_has_loop(graph1, &loop1));
+    IGRAPH_CHECK(igraph_has_loop(graph2, &loop2));
+    if (!loop1 && !loop2) {
+      IGRAPH_CHECK(igraph_isomorphic_34(graph1, graph2, iso));
+    } else {
+      IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
+                0, 0, /*sh=*/ IGRAPH_BLISS_F, 0, 0));
+    }
   } else {
-    igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso, 0, 0, /*sh=*/ IGRAPH_BLISS_F, 0, 0);
+    IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
+                0, 0, /*sh=*/ IGRAPH_BLISS_F, 0, 0));
   }
-				
+                
   return 0;
 }
 
@@ -1088,7 +1098,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
 
   if ( (vertex_color1 && !vertex_color2) || (!vertex_color1 && vertex_color2) ) {
     IGRAPH_WARNING("Only one graph is vertex-colored, vertex colors will be ignored");
-    vertex_color1=vertex_color2=0;
+    vertex_color1 = vertex_color2 = 0;
   }
 
   if ( (edge_color1 && !edge_color2) || (!edge_color1 && edge_color2)) {
@@ -1096,6 +1106,11 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     edge_color1 = edge_color2 = 0;
   }
 
+  if (no_of_nodes != igraph_vcount(graph2) ||
+      no_of_edges != igraph_ecount(graph2)) {
+    return 0;
+  }
+  
   if (vertex_color1) {
     if (igraph_vector_int_size(vertex_color1) != no_of_nodes ||
 	igraph_vector_int_size(vertex_color2) != no_of_nodes) {
@@ -1110,11 +1125,6 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     }
   }
 
-  if (no_of_nodes != igraph_vcount(graph2) ||
-      no_of_edges != igraph_ecount(graph2)) {
-    return 0;
-  }
-  
   /* Check color distribution */
   if (vertex_color1) {
     int ret=0;
@@ -2814,10 +2824,9 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  */
 
 int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
-                const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
+			    const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
 			    igraph_bool_t *iso, igraph_vector_t *map12, 
-			    igraph_vector_t *map21,
-                igraph_bliss_sh_t sh,
+			    igraph_vector_t *map21, igraph_bliss_sh_t sh,
 			    igraph_bliss_info_t *info1, igraph_bliss_info_t *info2) {
   
   long int no_of_nodes=igraph_vcount(graph1);
@@ -2933,9 +2942,10 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
 
   /* If the graphs are coloured, we also need to check that applying the
      permutation mymap12 to colors1 gives colors2. */
+
   if (*iso && colors1 != NULL) {
     for (i=0; i < no_of_nodes; i++) {
-      if (VECTOR(*colors1)[ (long int) VECTOR(*mymap12)[i] ] != VECTOR(*colors2)[i]) {
+      if (VECTOR(*colors1)[i] != VECTOR(*colors2)[(long int) VECTOR(*mymap12)[i] ]) {
           *iso = 0;
           break;
       }

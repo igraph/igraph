@@ -31,7 +31,7 @@ This document is concerned with the igraph C library.
 * Please always use the `master` branch. Choose this branch in your
   fork.
 * Then look for the file you want to modify.
-* Clique on the edit symbol (pen) on the upper right corner of the file view.
+* Click on the edit symbol (pen) on the upper right corner of the file view.
 * Make your edits.
 * Write a short commit message, less than 65 characters. E.g.
   "Fix C docs typo" or "Fix degree bug for loops". If needed, elaborate
@@ -123,6 +123,11 @@ source code.
 Unless you change something trivial, please consider adding test cases.
 This is important! See the `tests` and the `examples/simple` directories
 for existing tests that you can use as examples.
+
+Whenever possible, make sure that the tests are determistic. If you are using
+random numbers or a random graph generator in the tests, seed the random number
+generator with a constant in the main function of the test to make sure that
+every run generates the same set of random numbers.
 
 ### Ask Us!
 

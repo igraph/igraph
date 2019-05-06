@@ -2,8 +2,8 @@
 
 ## Find out our version number, need git for this
 printf "Finding out version number/string... "
-tools/getversion.sh > VERSION
-cat VERSION
+tools/getversion.sh > IGRAPH_VERSION
+cat IGRAPH_VERSION
 
 for i in glibtoolize libtoolize; do
   LIBTOOLIZE=`which $i` && break
@@ -19,3 +19,8 @@ $LIBTOOLIZE --force --copy
 autoheader
 automake --add-missing --copy
 autoconf
+
+# Try to patch ltmain.sh to allow -fsanitize=* linker flags to be passed
+# through to the linker. Don't do anything if it fails; maybe libtool has
+# been upgraded already.
+patch -N -p0 -r- <tools/ltmain.patch >/dev/null || true

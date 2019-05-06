@@ -15,6 +15,11 @@
 #include <ciso646>
 #endif
 
+#ifdef USING_R
+#undef stdout
+#define stdout NULL
+#endif
+
 /*
   Copyright (c) 2003-2015 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
@@ -702,6 +707,9 @@ AbstractGraph::search(const bool canonical, Stats& stats)
       update_labeling(best_path_labeling);
       /* Update statistics */
       stats.nof_leaf_nodes = 1;
+      /* Free component recursion data */
+      if(opt_use_comprec)
+        p.cr_free();
       return;
     }
 

@@ -51,6 +51,7 @@
 <!-- doxrox-include igraph_decompose_destroy -->
 <!-- doxrox-include igraph_biconnected_components -->
 <!-- doxrox-include igraph_articulation_points -->
+<!-- doxrox-include igraph_bridges -->
 </section>
 
 <section><title>Degree Sequences</title>
@@ -110,6 +111,8 @@
 <!-- doxrox-include igraph_minimum_spanning_tree -->
 <!-- doxrox-include igraph_minimum_spanning_tree_unweighted -->
 <!-- doxrox-include igraph_minimum_spanning_tree_prim -->
+<!-- doxrox-include igraph_random_spanning_tree -->
+<!-- doxrox-include igraph_is_tree -->
 </section>
 
 <section><title>Transitivity or Clustering Coefficient</title>

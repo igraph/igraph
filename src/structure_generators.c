@@ -76,18 +76,19 @@
  */
 int igraph_create(igraph_t *graph, const igraph_vector_t *edges,
 		igraph_integer_t n, igraph_bool_t directed) {
-  igraph_real_t max=igraph_vector_max(edges)+1;
+  igraph_bool_t has_edges=igraph_vector_size(edges) > 0;
+  igraph_real_t max=has_edges ? igraph_vector_max(edges)+1 : 0;
 
   if (igraph_vector_size(edges) % 2 != 0) {
     IGRAPH_ERROR("Invalid (odd) edges vector", IGRAPH_EINVEVECTOR);
   }
-  if (!igraph_vector_isininterval(edges, 0, max-1)) {
+  if (has_edges && !igraph_vector_isininterval(edges, 0, max-1)) {
     IGRAPH_ERROR("Invalid (negative) vertex id", IGRAPH_EINVVID);
   }
 
   IGRAPH_CHECK(igraph_empty(graph, n, directed));
   IGRAPH_FINALLY(igraph_destroy, graph);
-  if (igraph_vector_size(edges)>0) {
+  if (has_edges) {
     igraph_integer_t vc=igraph_vcount(graph);
     if (vc < max) {
       IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) (max-vc), 0));
@@ -914,7 +915,8 @@ int igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
  * number of vertices plus the number of edges in the graph.
  * 
  * \sa \ref igraph_lattice(), \ref igraph_star() for creating other regular
- * structures. 
+ * structures; \ref igraph_from_prufer() for creating arbitrary trees;
+ * \ref igraph_tree_game() for uniform random sampling of trees.
  * 
  * \example examples/simple/igraph_tree.c
  */
@@ -1156,92 +1158,96 @@ int igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
 /**
  * \function igraph_extended_chordal_ring
  * Create an extended chordal ring
- * 
- * An extended chordal ring is a regular graph, each node has the same
- * degree. It can be obtained from a simple ring by adding some extra
- * edges specified by a matrix. Let p denote the number of columns in
- * the <parameter>W</parameter> matrix. The extra edges of vertex i
- * are added according to column (i mod p) in
- * <parameter>W</parameter>. The number of extra edges is the number
- * of rows in <parameter>W</parameter>: for each row j an edge
- * i->i+w[ij] is added if i+w[ij] is less than the number of total
- * nodes. 
+ *
+ * An extended chordal ring is a cycle graph with additional chords
+ * connecting its vertices.
+ *
+ * Each row \c L of the matrix \p W specifies a set of chords to be
+ * inserted, in the following way: vertex \c i will connect to a vertex
+ * <code>L[(i mod p)]</code> steps ahead of it along the cycle, where
+ * \c p is the length of \c L.
+ * In other words, vertex \c i will be connected to vertex
+ * <code>(i + L[(i mod p)]) mod nodes</code>.
  * 
  * </para><para>
  * See also Kotsis, G: Interconnection Topologies for Parallel Processing
  * Systems, PARS Mitteilungen 11, 1-6, 1993.
  * 
  * \param graph Pointer to an uninitialized graph object, the result
- *   will be stored here. The result is always an undirected graph.
+ *   will be stored here.
  * \param nodes Integer constant, the number of vertices in the
  *   graph. It must be at least 3.
  * \param W The matrix specifying the extra edges. The number of
  *   columns should divide the number of total vertices.
+ * \param directed Whether the graph should be directed.
  * \return Error code.
  * 
- * \sa \ref igraph_ring().
+ * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector()
  * 
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
 
-int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes, 
-				 const igraph_matrix_t *W) {
+int igraph_extended_chordal_ring(
+        igraph_t *graph, igraph_integer_t nodes, const igraph_matrix_t *W,
+        igraph_bool_t directed)
+{
+    igraph_vector_t edges;
+    long int period = igraph_matrix_ncol(W);
+    long int nrow   = igraph_matrix_nrow(W);
+    long int i, j, mpos=0, epos=0;
 
-  igraph_vector_t edges;
-  long int period=igraph_matrix_ncol(W);
-  long int degree=igraph_matrix_nrow(W)+2;
-  long int i, j, mpos=0, epos=0;
-  
-  if (nodes<3) {
-    IGRAPH_ERROR("An extended chordal ring has at least 3 nodes",
-		 IGRAPH_EINVAL);
-  }
-  
-  if ((long int)nodes % period != 0) {
-    IGRAPH_ERROR("The period (number of columns in W) should divide the " 
-		 "number of nodes", IGRAPH_EINVAL);
-  }
-
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, nodes*degree);
-
-  for (i=0; i<nodes-1; i++) {
-    VECTOR(edges)[epos++] = i;
-    VECTOR(edges)[epos++] = i+1;
-  }
-  VECTOR(edges)[epos++] = 0;
-  VECTOR(edges)[epos++] = nodes-1;
-  
-  if (degree > 2) {
-    for (i=0; i<nodes; i++) {
-      for (j=0; j<degree-2; j++) {
-	long int offset=(long int) MATRIX(*W, j, mpos);
-	if (i+offset < nodes) {
-	  VECTOR(edges)[epos++] = i;
-	  VECTOR(edges)[epos++] = i+offset;
-	}
-      }
-      mpos++; if (mpos==period) { mpos=0; }
+    if (nodes<3) {
+        IGRAPH_ERROR("An extended chordal ring has at least 3 nodes", IGRAPH_EINVAL);
     }
-  }
-  
-  igraph_vector_resize(&edges, epos);
-  IGRAPH_CHECK(igraph_create(graph, &edges, nodes, IGRAPH_UNDIRECTED));
-  igraph_vector_destroy(&edges);
-  IGRAPH_FINALLY_CLEAN(1);
-  return 0;  
+
+    if ((long int)nodes % period != 0) {
+        IGRAPH_ERROR("The period (number of columns in W) should divide the "
+                     "number of nodes", IGRAPH_EINVAL);
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*(nodes + nodes*nrow));
+
+    for (i=0; i<nodes-1; i++) {
+        VECTOR(edges)[epos++] = i;
+        VECTOR(edges)[epos++] = i+1;
+    }
+    VECTOR(edges)[epos++] = nodes-1;
+    VECTOR(edges)[epos++] = 0;
+
+    if (nrow > 0) {
+        for (i=0; i<nodes; i++) {
+            for (j=0; j< nrow; j++) {
+                long int offset=(long int) MATRIX(*W, j, mpos);
+                long int v = (i+offset) % nodes;
+
+                if (v < 0) v += nodes; /* handle negative offsets */
+
+                VECTOR(edges)[epos++] = i;
+                VECTOR(edges)[epos++] = v;
+
+            }
+            mpos++; if (mpos==period) { mpos=0; }
+        }
+    }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_connect_neighborhood
  * \brief Connects every vertex to its neighborhood
  * 
- * This function adds new edges to the input graph. For each vertex 
- * vertices reachable by at most \p order steps and not yet connected
- * to the vertex a new edge is created.
+ * This function adds new edges to the input graph. Each vertex is connected
+ * to all vertices reachable by at most \p order steps from it
+ * (unless a connection already existed).  In other words, the \p order power of
+ * the graph is computed.
  * 
  * </para><para> Note that the input graph is modified in place, no
- * new graph is created, call \ref igraph_copy() if you want to keep
+ * new graph is created. Call \ref igraph_copy() if you want to keep
  * the original graph as well.
  * 
  * </para><para> For undirected graphs reachability is always
@@ -1261,8 +1267,8 @@ int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
  * \sa \ref igraph_lattice() uses this function to connect the
  * neighborhood of the vertices.
  * 
- * Time complexity: O(|V|*d^o), |V| is the number of vertices in the
- * graph, d is the average degree and o is the \p order argument.
+ * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
+ * graph, d is the average degree and k is the \p order argument.
  */
 
 int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
@@ -1608,7 +1614,7 @@ int igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
  *        for the shifts.
  * \return Error code.
  * 
- * \sa \ref igraph_lcf()
+ * \sa \ref igraph_lcf(), \ref igraph_extended_chordal_ring()
  * 
  * Time complexity: O(|V|+|E|), linear in the number of vertices plus
  * the number of edges.
@@ -1627,13 +1633,15 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
   if (repeats<0) IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
   IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*no_of_edges);
 
-  /* Create a ring first */
-  for (i=0; i<no_of_nodes; i++) {
-    VECTOR(edges)[ptr++]=i;
-    VECTOR(edges)[ptr++]=i+1;
+  if (no_of_nodes > 0) {
+    /* Create a ring first */
+    for (i=0; i<no_of_nodes; i++) {
+      VECTOR(edges)[ptr++]=i;
+      VECTOR(edges)[ptr++]=i+1;
+    }
+    VECTOR(edges)[ptr-1]=0;
   }
-  VECTOR(edges)[ptr-1]=0;
-  
+
   /* Then add the rest */
   while (ptr<2*no_of_edges) {
     long int sh=(long int) VECTOR(*shifts)[sptr % no_of_shifts];
@@ -2285,4 +2293,79 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
   IGRAPH_FINALLY_CLEAN(1);
   
   return 0;
+}
+
+
+/**
+ * \ingroup generators
+ * \function igraph_from_prufer
+ * \brief Generates a tree from a Pr&uuml;fer sequence
+ *
+ * A Pr&uuml;fer sequence is a unique sequence of integers associated
+ * with a labelled tree. A tree on n vertices can be represented by a
+ * sequence of n-2 integers, each between 0 and n-1 (inclusive).
+ *
+ * \param graph Pointer to an uninitialized graph object.
+ * \param prufer The Pr&uuml;fer sequence
+ * \return Error code:
+ *          \clist
+ *          \cli IGRAPH_ENOMEM
+ *             there is not enough memory to perform the operation.
+ *          \cli IGRAPH_EINVAL
+ *             invalid Pr&uuml;fer sequence given
+ *          \endclist
+ *
+ * \sa \ref igraph_tree(), \ref igraph_tree_game()
+ *
+ */
+
+int igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {
+    igraph_vector_int_t degree;
+    igraph_vector_t edges;
+    long n;
+    long i, j, ec;
+
+    n = igraph_vector_int_size(prufer) + 2;
+
+    IGRAPH_CHECK(igraph_vector_int_init(&degree, n));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
+
+    IGRAPH_CHECK(igraph_vector_init(&edges, 2*(n-1)));
+    IGRAPH_FINALLY(igraph_vector_destroy, &edges);
+
+    for (i=0; i < n; ++i)
+        VECTOR(degree)[i] = 1;
+
+    for (i=0; i < n-2; ++i) {
+        long k = VECTOR(*prufer)[i];
+        if (k >= n || k < 0)
+            IGRAPH_ERROR("Invalid Prufer sequence", IGRAPH_EINVAL);
+        VECTOR(degree)[k] += 1;
+    }
+
+    ec = 0; /* index into the edges vector */
+    for (i=0; i < n-2; ++i)
+        for (j=0; j < n; ++j)
+            if (VECTOR(degree)[j] == 1) {
+                VECTOR(edges)[ec++] = VECTOR(*prufer)[i];
+                VECTOR(edges)[ec++] = j;
+                VECTOR(degree)[ VECTOR(*prufer)[i] ]--;
+                VECTOR(degree)[j]--;
+                break;
+            }
+
+    for (i=0; i < n; ++i)
+        if (VECTOR(degree)[i] == 1) {
+            VECTOR(edges)[ec++] = i;
+            if (ec == 2*(n-1))
+                break;
+        }
+
+    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) n, /* directed = */ 0));
+
+    igraph_vector_destroy(&edges);
+    igraph_vector_int_destroy(&degree);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    return IGRAPH_SUCCESS;
 }

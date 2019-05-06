@@ -30,7 +30,6 @@ int main() {
   igraph_vector_t capacity;
   igraph_integer_t source, target;
   FILE *infile;
-  float t;
   igraph_maxflow_stats_t stats;
 
   igraph_vector_init(&capacity, 0);

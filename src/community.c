@@ -45,6 +45,10 @@
 #include <string.h>
 #include <math.h>
 
+#ifdef USING_R
+#include <R.h>
+#endif
+
 int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
   long int no=(long int) igraph_vector_max(membership)+1;
   igraph_vector_t idx;
@@ -450,6 +454,19 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     if (igraph_vector_min(weights) <= 0) {
       IGRAPH_ERROR("weights must be strictly positive", IGRAPH_EINVAL);
     }
+
+    if (membership != 0) {
+      IGRAPH_WARNING("Membership vector will be selected based on the lowest "\
+          "modularity score.");
+    }
+    
+    if (modularity != 0 || membership != 0) {
+      IGRAPH_WARNING("Modularity calculation with weighted edge betweenness "\
+          "community detection might not make sense -- modularity treats edge "\
+          "weights as similarities while edge betwenness treats them as "\
+          "distances");
+    }
+
     IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &heap);
     IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, 
@@ -887,7 +904,11 @@ int igraph_modularity(const igraph_t *graph,
   long int c1, c2;
 
   if (igraph_is_directed(graph)) {
+#ifndef USING_R
     IGRAPH_ERROR("modularity is implemented for undirected graphs", IGRAPH_EINVAL);
+#else
+    REprintf("Modularity is implemented for undirected graphs only.\n");
+#endif
   }
 
   if (igraph_vector_size(membership) < igraph_vcount(graph)) {
@@ -980,6 +1001,9 @@ int igraph_modularity_matrix(const igraph_t *graph,
   IGRAPH_CHECK(igraph_get_adjacency(graph, modmat, IGRAPH_GET_ADJACENCY_BOTH, 
 				    /*eids=*/ 0));
 
+  for (i=0; i<no_of_nodes; i++) {
+    MATRIX(*modmat, i, i) *= 2;
+  }
   for (i=0; i<no_of_nodes; i++) {
     for (j=0; j<no_of_nodes; j++) {
       MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg)[j] / 2.0 / sw;
@@ -1744,13 +1768,19 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
       igraph_set_error_handler(errh);
       igraph_set_warning_handler(warnh);
       if (options->nconv < 1) {
-	/* Call again, from a fixed starting point */
+	/* Call again from a fixed starting point. Note that we cannot use a
+	 * fixed all-1 starting vector as sometimes ARPACK would return a
+	 * 'starting vector is zero' error -- this is of course not true but
+	 * it's a result of ARPACK >= 3.6.3 trying to force the starting vector
+	 * into the range of OP (i.e. the matrix being solved). The initial
+	 * vector we use here seems to work, but I have no theoretical argument
+	 * for its usage; it just happens to work. */
 	options->start=1;
 	options->info=0;
 	options->ncv=0;
 	options->lworkl = 0;	/* we surely have enough space */
 	for (i=0; i < options->n ; i++) {
-	  storage.resid[i] = 1;
+	  storage.resid[i] = i % 2 ? 1 : -1;
 	}
 	IGRAPH_CHECK(igraph_arpack_rssolve(arpcb2, &extra, options, &storage,
 					   /*values=*/ 0, /*vectors=*/ 0));
@@ -1782,12 +1812,13 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 			    /*values=*/ 0, /*vectors=*/ 0);
       igraph_set_error_handler(errh);
       if (options->nconv < 1) {
-	/* Call again from a fixed starting point */
+	/* Call again from a fixed starting point. See the comment a few lines
+	 * above about the exact choice of this starting vector */
 	options->start=1;
 	options->info=0;
 	options->ncv=0;
 	options->lworkl = 0;	/* we surely have enough space */
-	for (i=0; i < options->n; i++) { storage.resid[i] = 1; }
+	for (i=0; i < options->n; i++) { storage.resid[i] = i % 2 ? 1 : -1; }
 	IGRAPH_CHECK(igraph_arpack_rssolve(arpcb1, &extra, options, &storage, 
 					   /*values=*/ 0, /*vectors=*/ 0));
 	options->start=0;

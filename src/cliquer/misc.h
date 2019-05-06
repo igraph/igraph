@@ -33,12 +33,21 @@
 #include <stdlib.h>
 
 #ifndef ASSERT
+#ifdef USING_R
+#include <R.h>
+#define ASSERT(expr) \
+        if (!(expr)) { \
+	        error("cliquer file %s: line %d: assertion failed: " \
+			"(%s)\n",__FILE__,__LINE__,#expr); \
+	}
+#else
 #define ASSERT(expr) \
         if (!(expr)) { \
 		fprintf(stderr,"cliquer file %s: line %d: assertion failed: " \
 			"(%s)\n",__FILE__,__LINE__,#expr); \
 		abort(); \
 	}
+#endif
 #endif /* !ASSERT */
 
 

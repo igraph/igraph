@@ -12,6 +12,9 @@
 #include <string.h>
 #include "graph.h"
 
+#ifdef USING_R
+#include <R.h>
+#endif
 
 /*
 static graph_t *graph_read_dimacs_binary(FILE *fp,char *firstline);
@@ -546,6 +549,7 @@ static graph_t *graph_read_dimacs_ascii(FILE *fp, char *firstline) {
 #endif
 
 
+#ifndef USING_R
 /*
  * graph_print()
  *
@@ -638,6 +642,7 @@ void graph_print(graph_t *g) {
 	return;
 }
 
+#endif
 
 /*
  * graph_test()

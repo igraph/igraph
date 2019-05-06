@@ -50,7 +50,7 @@ int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
   if (sparseres) {
     int nz=directed ? no_of_edges + no_of_nodes : 
       no_of_edges * 2 + no_of_nodes;
-    igraph_sparsemat_init(sparseres, no_of_nodes, no_of_nodes, nz);
+    igraph_sparsemat_resize(sparseres, no_of_nodes, no_of_nodes, nz);
   }
   
   IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));

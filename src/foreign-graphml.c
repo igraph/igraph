@@ -34,11 +34,11 @@
 #include "igraph_memory.h"
 #include <stdarg.h> 		/* va_start & co */
 
+#define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
+
 #if HAVE_LIBXML == 1
 #include <libxml/encoding.h>
 #include <libxml/parser.h>
-
-#define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 
 xmlEntity blankEntityStruct = {
 #ifndef XML_WITHOUT_CORBA
@@ -121,6 +121,7 @@ struct igraph_i_graphml_parser_state {
   char *error_message;
   char *data_char;
   long int act_node;
+  igraph_bool_t ignore_namespaces;
 };
 
 static void igraph_i_report_unhandled_attribute_target(const char* target,
@@ -261,6 +262,7 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
   state->error_message=0;
   state->data_char=0;
   state->unknown_depth=0;
+  state->ignore_namespaces=0;
 
   ret=igraph_vector_int_init(&state->prev_state_stack, 0);
   if (ret) {
@@ -804,7 +806,18 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
     /* impossible */
     break;
   }
-  
+
+  if (key == 0) {
+    /* no key specified, issue a warning */
+    igraph_warningf(
+        "missing attribute key in a <data> tag, ignoring attribute",
+        __FILE__, __LINE__, 0,
+        key
+    );
+    igraph_Free(state->data_char);
+    return;
+  }
+
   igraph_trie_check(trie, key, &recid);
   if (recid < 0) {
     /* no such attribute key, issue a warning */
@@ -938,26 +951,46 @@ void igraph_i_graphml_sax_handler_start_element_ns(
   char* attr_value;
   long int id1, id2;
   int i;
+  igraph_bool_t tag_is_unknown = 0;
 
   if (!state->successful)
     return;
 
-  if (!xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), uri)) {
-    /* Tag is in a different namespace, so treat it as an unknown start
-     * tag irrespectively of our state */
+  if (uri) {
+    if (!xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), uri)) {
+      /* Tag is in a different namespace, so treat it as an unknown start
+       * tag irrespectively of our state */
+      tag_is_unknown = 1;
+    }
+  } else {
+    /* No namespace URI. If we are in lenient mode, accept it and proceed
+     * as if we are in the GraphML namespace to handle lots of naive
+     * non-namespace-aware GraphML files floating out there. If we are not
+     * in lenient mode _but_ we are in the START state, accept it as well
+     * and see whether the root tag is <graphml> (in which case we will
+     * enter lenient mode). Otherwise, reject the tag */
+    if (!state->ignore_namespaces && state->st != START) {
+      tag_is_unknown = 1;
+    }
+  }
+
+  if (tag_is_unknown) {
     igraph_i_graphml_handle_unknown_start_tag(state);
     return;
   }
-
-
+  
   switch (state->st) {
   case START:
     /* If we are in the START state and received a graphml tag,
      * change to INSIDE_GRAPHML state. Otherwise, change to UNKNOWN. */
-    if (xmlStrEqual(localname, toXmlChar("graphml")))
+    if (xmlStrEqual(localname, toXmlChar("graphml"))) {
+      if (uri == 0) {
+        state->ignore_namespaces=1;
+      }
       state->st=INSIDE_GRAPHML;
-    else
+    } else {
       igraph_i_graphml_handle_unknown_start_tag(state);
+    }
     break;
     
   case INSIDE_GRAPHML:
@@ -1405,13 +1438,13 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
   
   ret=fprintf(outstream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
-  ret=fprintf(outstream, "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n");
+  ret=fprintf(outstream, "<graphml xmlns=\"%s\"\n", GRAPHML_NAMESPACE_URI);
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
   ret=fprintf(outstream, "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
-  ret=fprintf(outstream, "         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n");
+  ret=fprintf(outstream, "         xsi:schemaLocation=\"%s\n", GRAPHML_NAMESPACE_URI);
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
-  ret=fprintf(outstream, "         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd\">\n");
+  ret=fprintf(outstream, "         %s/1.0/graphml.xsd\">\n", GRAPHML_NAMESPACE_URI);
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
   ret=fprintf(outstream, "<!-- Created by igraph -->\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);

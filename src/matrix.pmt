@@ -690,8 +690,8 @@ FUNCTION(igraph_matrix,all_ge)(const TYPE(igraph_matrix) *lhs,
  * Time complexity: O(mn), the elements in the smaller matrix.
  */
 
-BASE FUNCTION(igraph_matrix,maxdifference)(const TYPE(igraph_matrix) *m1,
-					   const TYPE(igraph_matrix) *m2) {
+igraph_real_t FUNCTION(igraph_matrix,maxdifference)(const TYPE(igraph_matrix) *m1,
+						    const TYPE(igraph_matrix) *m2) {
   long int col1=FUNCTION(igraph_matrix,ncol)(m1);
   long int col2=FUNCTION(igraph_matrix,ncol)(m2);
   long int row1=FUNCTION(igraph_matrix,nrow)(m1);

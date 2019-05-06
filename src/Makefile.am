@@ -67,7 +67,7 @@ if INTERNAL_F2C
   libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I. -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
   f2c/arith.h: f2c/arithchk.c
 	$(CC) $(CFLAGS) -DNO_FPINIT f2c/arithchk.c -lm -o f2c/arith || \
-	$(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT f2c/arithchk.c \
+	$(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT $(top_srcdir)/src/f2c/arithchk.c \
 		$(WARNING_CFLAGS) -lm -o f2c/arith
 	f2c/arith > f2c/arith.h
   f2c/sysdep1.h: f2c/sysdep1.h0
@@ -322,7 +322,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_matching.h	../include/igraph_embedding.h \
 	        ../include/igraph_scan.h        ../include/igraph_graphlets.h \
 		../include/igraph_vector_type.h ../include/igraph_epidemics.h \
-		../include/igraph_lsap.h ../include/igraph_decls.h
+		../include/igraph_lsap.h ../include/igraph_decls.h \
+		../include/igraph_coloring.h
 
 SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
@@ -382,7 +383,9 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     $(SPCONFIG) layout_gem.c layout_dh.c lsap.c \
 			     layout_fr.c layout_kk.c paths.c \
 			     random_walk.c \
-				 igraph_cliquer.c cliquer/cliquer.c cliquer/cliquer_graph.c cliquer/reorder.c 
+				 igraph_cliquer.c cliquer/cliquer.c cliquer/cliquer_graph.c cliquer/reorder.c \
+				 coloring.c \
+				 degree_sequence.cpp
 
 if INTERNAL_F2C
 else

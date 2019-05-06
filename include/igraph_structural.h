@@ -52,6 +52,8 @@ DECLDIR int igraph_minimum_spanning_tree_unweighted(const igraph_t *graph,
                 igraph_t *mst);
 DECLDIR int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
                 const igraph_vector_t *weights);
+DECLDIR int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *res,
+                igraph_integer_t vid);
 
 DECLDIR int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid, 
 			          igraph_neimode_t mode);	
@@ -80,6 +82,7 @@ DECLDIR int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
 DECLDIR int igraph_density(const igraph_t *graph, igraph_real_t *res, 
                 igraph_bool_t loops);
 
+DECLDIR int igraph_has_loop(const igraph_t *graph, igraph_bool_t *res); 
 DECLDIR int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res, 
                 igraph_es_t es);
 DECLDIR int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
@@ -87,6 +90,7 @@ DECLDIR int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res);
 DECLDIR int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res, 
                 igraph_es_t es);
 DECLDIR int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es);
+DECLDIR int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
 DECLDIR int igraph_girth(const igraph_t *graph, igraph_integer_t *girth, 
                 igraph_vector_t *circle);
 DECLDIR int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);

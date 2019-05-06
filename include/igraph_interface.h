@@ -37,7 +37,7 @@ __BEGIN_DECLS
 
 DECLDIR int igraph_empty(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed);
 DECLDIR int igraph_empty_attrs(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, void *attr);
-DECLDIR int igraph_destroy(igraph_t *graph);
+DECLDIR void igraph_destroy(igraph_t *graph);
 DECLDIR int igraph_copy(igraph_t *to, const igraph_t *from);
 DECLDIR int igraph_add_edges(igraph_t *graph, const igraph_vector_t *edges, 
                 void *attr);

@@ -1243,7 +1243,8 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
     if (MATRIX(*res, i, 0) > maxx) maxx=MATRIX(*res, i, 0);
 	if (MATRIX(*res, i, 0) < minx) minx=MATRIX(*res, i, 0);
   }
-  ratio /= (maxx-minx);
+  if (maxx > minx)
+    ratio /= (maxx-minx);
   for (i=0; i<no_of_nodes; i++) {
     igraph_real_t phi=(MATRIX(*res, i, 0)-minx)*ratio;
     igraph_real_t r=MATRIX(*res, i, 1);

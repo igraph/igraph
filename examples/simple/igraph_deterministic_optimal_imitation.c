@@ -159,13 +159,12 @@ int isolated_vertex_test() {
 int petersen_game_test() {
   igraph_t g;
   igraph_vector_t known_max_v, known_min_v, quant, strat, stratcopy;
-  int i, nedge, nvert;  
+  int i, nvert;  
 
   /* the Petersen graph */
   igraph_small(&g, /*n=*/ 0, IGRAPH_UNDIRECTED, 
 	       0,1,0,4,0,5, 1,2,1,6, 2,3,2,7, 3,4,3,8, 4,9,
 	       5,7,5,8, 6,8,6,9, 7,9, -1);
-  nedge = igraph_ecount(&g);
   nvert = igraph_vcount(&g);
   /* Strategies vector, one strategy for each vertex. Thus vec[i] is the */
   /* strategy of vertex i. The strategy space is: {0, 1, 2, 3}. */

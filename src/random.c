@@ -1065,7 +1065,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
   int retval;
 
   igraph_real_t nreal=length;
-  igraph_real_t ninv=1.0/nreal;
+  igraph_real_t ninv=(nreal != 0) ? 1.0/nreal : 0.0;
   igraph_real_t Nreal=N;
   igraph_real_t Vprime;
   igraph_real_t qu1=-n+1+N;
@@ -1085,6 +1085,10 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
   if (l==h) {
     IGRAPH_CHECK(igraph_vector_resize(res, 1));
     VECTOR(*res)[0] = l;
+    return 0;
+  }
+  if (length==0) {
+    igraph_vector_clear(res);
     return 0;
   }
   if (length==N) {
@@ -1272,15 +1276,9 @@ double igraph_rgamma(igraph_rng_t *rng, double shape, double scale) {
 #ifndef MATHLIB_PRIVATE_H
 #define MATHLIB_PRIVATE_H
 
-#ifdef _MSC_VER
-#  define ML_POSINF IGRAPH_INFINITY
-#  define ML_NEGINF -IGRAPH_INFINITY
-#  define ML_NAN    IGRAPH_NAN
-#else
-#  define ML_POSINF	(1.0 / 0.0)
-#  define ML_NEGINF	((-1.0) / 0.0)
-#  define ML_NAN		(0.0 / 0.0)
-#endif
+#define ML_POSINF IGRAPH_INFINITY
+#define ML_NEGINF -IGRAPH_INFINITY
+#define ML_NAN    IGRAPH_NAN
 
 #define ML_ERROR(x)	/* nothing */
 #define ML_UNDERFLOW	(DBL_MIN * DBL_MIN)
@@ -1525,10 +1523,10 @@ int imin2(int x, int y)
     return (x < y) ? x : y;
 }
 
-#ifdef HAVE_WORKING_ISFINITE
+#if HAVE_WORKING_ISFINITE || HAVE_ISFINITE
 /* isfinite is defined in <math.h> according to C99 */
 # define R_FINITE(x)    isfinite(x)
-#elif HAVE_WORKING_FINITE
+#elif HAVE_WORKING_FINITE || HAVE_FINITE
 /* include header needed to define finite() */
 #  ifdef HAVE_IEEE754_H
 #   include <ieee754.h>         /* newer Linuxen */
@@ -1544,9 +1542,9 @@ int imin2(int x, int y)
 
 int R_finite(double x)
 {
-#ifdef HAVE_WORKING_ISFINITE
+#if HAVE_WORKING_ISFINITE || HAVE_ISFINITE
     return isfinite(x);
-#elif HAVE_WORKING_FINITE
+#elif HAVE_WORKING_FINITE || HAVE_FINITE
     return finite(x);
 #else
 /* neither finite nor isfinite work. Do we really need the AIX exception? */

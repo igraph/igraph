@@ -340,12 +340,8 @@ int igraph_maximal_cliques(const igraph_t *graph,
  * Lecture Notes in Computer Science Volume 6506, 2010, pp 403-414.
  *
  * \param graph The input graph.
- * \param res Pointer to a pointer vector, the result will be stored
- *   here, ie. \c res will contain pointers to \c igraph_vector_t
- *   objects which contain the indices of vertices involved in a clique.
- *   The pointer vector will be resized if needed but note that the
- *   objects in the pointer vector will not be freed. Note that vertices
- *   of a clique may be returned in arbitrary order.
+ * \param res Pointer to an \c igraph_integer_t; the number of maximal
+ *   cliques will be stored here.
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the cliques to be

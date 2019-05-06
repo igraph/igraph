@@ -19,6 +19,9 @@
 
 #include "config.h"
 
+#ifdef USING_R
+#include <R.h>
+#endif
 
 /* Default cliquer options */
 IGRAPH_THREAD_LOCAL clique_options clique_default_options = {
@@ -839,8 +842,9 @@ static int sub_weighted_all(int *table, int size, int weight,
 		/* current_weight < min_weight, prune_low < min_weight,
 		 * so return value is always < min_weight. */
 		if (current_weight>prune_low) {
-			if (best_clique)
-				set_copy(best_clique,current_clique);
+			if (best_clique) {
+				best_clique = set_copy(best_clique,current_clique);
+			}
 			if (current_weight < min_weight)
 				return current_weight;
 			else
@@ -934,14 +938,19 @@ static boolean store_clique(set_t clique, graph_t *g, clique_options *opts) {
 		 * the recursions? 
 		 */
 		if (clique_list_count <= 0) {
+#ifdef USING_R
+		        error("CLIQUER INTERNAL ERROR: ",
+			      "clique_list_count has negative value!");
+#else
 			fprintf(stderr,"CLIQUER INTERNAL ERROR: "
 				"clique_list_count has negative value!\n");
 			fprintf(stderr,"Please report as a bug.\n");
 			abort();
+#endif
 		}
 		if (clique_list_count <= opts->clique_list_length)
 			opts->clique_list[clique_list_count-1] =
-				set_duplicate(clique);
+				set_copy(opts->clique_list[clique_list_count-1], clique);
 	}
 
 	/* user_function() */

@@ -836,7 +836,8 @@ int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
  * \param asym Pointer to an integer, the number of asymmetric dyads
  *    is stored here.
  * \param null Pointer to an integer, the number of null dyads is
- *    stored here.
+ *    stored here. In case of an integer overflow (i.e. too many
+ *    null dyads), -1 will be returned.
  * \return Error code.
  *
  * \sa \ref igraph_reciprocity(), \ref igraph_triad_census().
@@ -896,8 +897,8 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
 		*null = (vc/2) * (vc-1);
 	}
 	if (*null < vc) {
-		IGRAPH_WARNING("Integer overflow, returning zero");
-		*null = IGRAPH_NAN;
+		IGRAPH_WARNING("Integer overflow, returning -1");
+		*null = -1;
 	} else {
 		*null = *null-(*mut)-(*asym);
 	}
@@ -910,8 +911,8 @@ int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
  * TODO
  */
 
-int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
-			   igraph_integer_t *res4) {
+int igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
+			   igraph_real_t *res4) {
   
   long int vc=igraph_vcount(graph);
   igraph_vector_long_t seen;
@@ -1042,9 +1043,10 @@ int igraph_triad_census_24(const igraph_t *graph, igraph_integer_t *res2,
 int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
   igraph_vector_t cut_prob;
-  igraph_integer_t m2, m4;
+  igraph_real_t m2, m4;
   igraph_vector_t tmp;
   igraph_integer_t vc=igraph_vcount(graph);
+  igraph_real_t total;
 
   if (!igraph_is_directed(graph)) {
     IGRAPH_WARNING("Triad census called on an undirected graph");
@@ -1056,13 +1058,17 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
   igraph_vector_null(res);
   IGRAPH_CHECK(igraph_motifs_randesu(graph, &tmp, 3, &cut_prob));
   IGRAPH_CHECK(igraph_triad_census_24(graph, &m2, &m4));
+
+  total = ((igraph_real_t)vc) * (vc-1);
+  total *= (vc-2);
+  total /= 6;
   
   /* Reorder */
   if (igraph_is_directed(graph)) {    
     VECTOR(tmp)[0] = 0;
     VECTOR(tmp)[1] = m2;
     VECTOR(tmp)[3] = m4;
-    VECTOR(tmp)[0] = vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
+    VECTOR(tmp)[0] = total - igraph_vector_sum(&tmp);
 
     VECTOR(*res)[0] = VECTOR(tmp)[0];
     VECTOR(*res)[1] = VECTOR(tmp)[1];
@@ -1083,7 +1089,7 @@ int igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
   } else {
     VECTOR(tmp)[0] = 0;
     VECTOR(tmp)[1] = m2;
-    VECTOR(tmp)[0] = vc*(vc-1)*(vc-2)/6 - igraph_vector_sum(&tmp);
+    VECTOR(tmp)[0] = total - igraph_vector_sum(&tmp);
 
     VECTOR(*res)[0] = VECTOR(tmp)[0];
     VECTOR(*res)[2] = VECTOR(tmp)[1];

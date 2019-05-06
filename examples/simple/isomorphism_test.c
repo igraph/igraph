@@ -176,12 +176,27 @@ void test_bliss() {
     igraph_destroy(&directed_ring);
 }
 
+void test_bug_995() {
+    igraph_t g1, g2;
+    igraph_bool_t result;
+
+    igraph_small(&g1, 3, 0, 0, 1, 1, 2, 2, 2, -1);
+    igraph_small(&g2, 3, 0, 0, 1, 1, 2, 1, 1, -1);
+
+    igraph_isomorphic(&g1, &g2, &result);
+    if (result)
+        printf("igraph_isomorphic() failed with loop edges, see bug #995\n");
+
+    igraph_destroy(&g1);
+    igraph_destroy(&g2);
+}
 
 int main() {
 
     test3();
     test4();
     test_bliss();
+    test_bug_995();
 
     return 0;
 }

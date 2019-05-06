@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?> 
+<graphml>
+	<graph id='Barabasi-Albert-73751112' edgedefault='undirected'> 
+		<node id='0'/> 
+		<node id='1'/> 
+		<node id='2'/> 
+		<edge id='0' source='1' target='0' /> 
+		<edge id='1' source='2' target='1' /> 
+	</graph> 
+</graphml> 

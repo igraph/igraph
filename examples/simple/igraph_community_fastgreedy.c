@@ -25,7 +25,7 @@
 
 void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges,
 		igraph_vector_t *membership, FILE* f) {
-  long int i;
+  long int i = 0;
   igraph_vector_t our_membership;
 
   igraph_vector_init(&our_membership, 0);
@@ -159,6 +159,7 @@ int main() {
            0,5, -1);
   igraph_community_fastgreedy(&g, 0, &merges, 0, &membership);
   show_results(&g, 0, &merges, &membership, stdout);
+  igraph_destroy(&g);
 
   /* Regression test -- asking for optimal membership vector but not
    * providing a merge matrix */

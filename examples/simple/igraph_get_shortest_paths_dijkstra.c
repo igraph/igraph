@@ -127,8 +127,8 @@ int main() {
 
   igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
   
-  igraph_vector_ptr_init(&vecs, 5);
-  igraph_vector_ptr_init(&evecs, 5);
+  igraph_vector_ptr_init(&vecs, 6);
+  igraph_vector_ptr_init(&evecs, 6);
   igraph_vector_long_init(&pred, 0);
   igraph_vector_long_init(&inbound, 0);
 
@@ -138,7 +138,7 @@ int main() {
     VECTOR(evecs)[i] = calloc(1, sizeof(igraph_vector_t));
     igraph_vector_init(VECTOR(evecs)[i], 0);
   }
-  igraph_vs_vector_small(&vs, 1, 3, 5, 2, 1,  -1);
+  igraph_vs_vector_small(&vs, 0, 1, 3, 5, 2, 1,  -1);
   
   igraph_get_shortest_paths_dijkstra(&g, /*vertices=*/ &vecs, 
 				     /*edges=*/ &evecs, /*from=*/ 0, /*to=*/ vs, 

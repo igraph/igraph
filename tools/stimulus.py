@@ -457,13 +457,13 @@ class RRCodeGenerator(CodeGenerator):
                     call=""
             return call
               
-        out.write("  on.exit( .Call(\"R_igraph_finalizer\", PACKAGE=\"igraph\") )\n")
+        out.write("  on.exit( .Call(C_R_igraph_finalizer) )\n")
         out.write("  # Function call\n")
-        out.write("  res <- .Call(\"R_" + function + "\", ")
+        out.write("  res <- .Call(C_R_" + function + ", ")
         call=[ do_par(n) for n,p in params.items() if p['mode'] in ['IN', 'INOUT'] ]
         call=[ c for c in call if c != "" ]
         out.write(", ".join(call))
-        out.write(",\n        PACKAGE=\"igraph\")\n")
+        out.write(")\n")
 
         ## Output conversions
         def do_opar(pname, realname=None, iprefix=""):

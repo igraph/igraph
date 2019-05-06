@@ -66,6 +66,8 @@ int main() {
     printf("---\n");				\
     igraph_matrix_print(&R);			\
     printf("---\n");				\
+    igraph_sparsemat_destroy(&Lsparse);         \
+    igraph_sparsemat_destroy(&Rsparse);         \
   } while (0)
 
   /* -------------- */
@@ -103,6 +105,8 @@ int main() {
   /* -------------- */
 
   igraph_vector_destroy(&groups);
+  igraph_matrix_destroy(&L);
+  igraph_matrix_destroy(&R);
   igraph_matrix_destroy(&V);
   igraph_matrix_destroy(&adj);
   igraph_destroy(&g);

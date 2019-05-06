@@ -44,11 +44,6 @@
 
 */
 
-#ifdef __clang__
-#pragma clang diagnostic ignored "-Wconversion"
-#pragma clang diagnostic ignored "-Wsign-conversion"
-#endif
-
 #include <stdio.h>
 #include <string.h>
 #include "igraph_hacks_internal.h"
@@ -69,7 +64,7 @@ int igraph_pajek_yylex(YYSTYPE* lvalp, YYLTYPE* llocp,
 		       void* scanner);
 int igraph_pajek_yyerror(YYLTYPE* locp, 
 			 igraph_i_pajek_parsedata_t *context, 
-			 char *s);
+			 const char *s);
 char *igraph_pajek_yyget_text (yyscan_t yyscanner );
 int igraph_pajek_yyget_leng (yyscan_t yyscanner );
 
@@ -152,6 +147,7 @@ extern long int igraph_i_pajek_actedge;
 %token ARCSLISTLINE
 %token EDGESLISTLINE
 %token MATRIXLINE
+%token ERROR
 
 %token VP_X_FACT
 %token VP_Y_FACT
@@ -446,11 +442,11 @@ arclistline: NEWLINE | arclistfrom arctolist NEWLINE;
 
 arctolist: /* empty */ | arctolist arclistto;
 
-arclistfrom: longint { context->mode=0; context->actfrom=fabs($1)-1; };
+arclistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
 
 arclistto: longint { 
   igraph_vector_push_back(context->vector, context->actfrom); 
-  igraph_vector_push_back(context->vector, fabs($1)-1); 
+  igraph_vector_push_back(context->vector, labs($1)-1); 
 };
 
 edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
@@ -461,11 +457,11 @@ edgelistline: NEWLINE | edgelistfrom edgetolist NEWLINE;
 
 edgetolist: /* empty */ | edgetolist edgelistto;
 
-edgelistfrom: longint { context->mode=0; context->actfrom=fabs($1)-1; };
+edgelistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
 
 edgelistto: longint { 
   igraph_vector_push_back(context->vector, context->actfrom); 
-  igraph_vector_push_back(context->vector, fabs($1)-1); 
+  igraph_vector_push_back(context->vector, labs($1)-1); 
 };
 
 /* -----------------------------------------------------*/
@@ -522,7 +518,7 @@ word: ALNUM { $$.str=igraph_pajek_yyget_text(scanner);
 
 int igraph_pajek_yyerror(YYLTYPE* locp, 
 			 igraph_i_pajek_parsedata_t *context, 
-			 char *s) {
+			 const char *s) {
   snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
 	   "Parse error in Pajek file, line %i (%s)", 
 	   locp->first_line, s);
