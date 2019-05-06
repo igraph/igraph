@@ -2,8 +2,8 @@
 
 ## Find out our version number, need git for this
 printf "Finding out version number/string... "
-tools/getversion.sh > VERSION
-cat VERSION
+tools/getversion.sh > IGRAPH_VERSION
+cat IGRAPH_VERSION
 
 for i in glibtoolize libtoolize; do
   LIBTOOLIZE=`which $i` && break
