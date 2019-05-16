@@ -1014,6 +1014,29 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 }
 
 /**
+ * \section about_vf2
+ *
+ * <para>
+ * The VF2 algorithm can search for a subgraph in a larger graph, or check if two
+ * graphs are isomorphic. See P. Foggia, C. Sansone, M. Vento, An Improved algorithm for
+ * matching large graphs, Proc. of the 3rd IAPR-TC-15 International
+ * Workshop on Graph-based Representations, Italy, 2001.
+ * </para>
+ *
+ * <para>
+ * VF2 supports both vertex and edge-colored graphs, as well as custom vertex or edge
+ * compatibility functions.
+ * </para>
+ *
+ * <para>
+ * VF2 works with both directed and undirected graphs. Only simple graphs are supported.
+ * Self-loops or multi-edges must not be present in the graphs. Currently, the VF2
+ * functions do not check that the input graph is simple: it is the responsibility
+ * of the user to pass in valid input.
+ * </para>
+ */
+
+/**
  * \function igraph_isomorphic_function_vf2
  * The generic VF2 interface
  * 
@@ -2767,16 +2790,21 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  * <para>
  * BLISS is a successor of the famous NAUTY algorithm and
  * implementation. While using the same ideas in general, with better
- * heuristics and data structure BLISS outperforms NAUTY on most
+ * heuristics and data structures BLISS outperforms NAUTY on most
  * graphs.
  * </para>
  * 
  * <para>
  * BLISS was developed and implemented by Tommi Junttila and Petteri Kaski at 
- * Helsinki University of Technology, Finland. See Tommi Juntilla's 
- * homepage at http://www.tcs.hut.fi/~tjunttil/ and the publication at 
- * http://www.siam.org/proceedings/alenex/2007/alx07_013junttilat.pdf
- * for more information.
+ * Helsinki University of Technology, Finland. For more information,
+ * see the BLISS homepage at http://www.tcs.hut.fi/Software/bliss/ and the publication
+ * Tommi Junttila, Petteri Kaski: "Engineering an Efficient Canonical Labeling
+ * Tool for Large and Sparse Graphs" at https://doi.org/10.1137/1.9781611972870.13
+ * </para>
+ *
+ * <para>
+ * BLISS works with both directed graphs and undirected graphs. It supports graphs with
+ * self-loops, but not graphs with multi-edges.
  * </para>
  * 
  * <para>
