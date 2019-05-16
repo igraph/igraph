@@ -1433,6 +1433,30 @@ cleanup:
 }
 
 /**
+ * \section about_lad
+ *
+ * <para>
+ * The LAD algorithm can search for a subgraph in a larger graph, or check
+ * if two graphs are isomorphic.
+ * See Christine Solnon: AllDifferent-based Filtering for Subgraph
+ * Isomorphism. Artificial Intelligence, 174(12-13):850-864, 2010.
+ * https://doi.org/10.1016/j.artint.2010.05.002
+ * as well as the homepage of the LAD library at http://liris.cnrs.fr/csolnon/LAD.html
+ * The implementation in igraph is based on LADv1, but it is
+ * modified to use igraph's own memory allocation and error handling.
+ * </para>
+ *
+ * <para>
+ * LAD uses the concept of domains to indicate vertex compatibility when matching the
+ * pattern graph. Domains can be used to implement matching of colored vertices.
+ * </para>
+ *
+ * <para>
+ * LAD works with both directed and undirected graphs. Only simple graphs are supported.
+ * </para>
+ */
+
+/**
  * \function igraph_subisomorphic_lad
  * Check subgraph isomorphism with the LAD algorithm
  *
@@ -1441,10 +1465,10 @@ cleanup:
  * basis of this code.
  *
  * </para><para>
- * See more about at http://liris.cnrs.fr/csolnon/LAD.html and in
+ * See more about LAD at http://liris.cnrs.fr/csolnon/LAD.html and in
  * Christine Solnon: AllDifferent-based Filtering for Subgraph
- * Isomorphism. Artificial Intelligence, 174(12-13):850-864, August
- * 2010, Elsevier
+ * Isomorphism. Artificial Intelligence, 174(12-13):850-864, 2010.
+ * https://doi.org/10.1016/j.artint.2010.05.002
  *
  * \param pattern The smaller graph, it can be directed or undirected.
  * \param target The bigger graph, it can be directed or undirected.

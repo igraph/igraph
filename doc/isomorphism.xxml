@@ -25,6 +25,7 @@
 </section>
 
 <section><title>The VF2 algorithm</title>
+<!-- doxrox-include about_vf2 -->
 <!-- doxrox-include igraph_isomorphic_vf2 -->
 <!-- doxrox-include igraph_count_isomorphisms_vf2 -->
 <!-- doxrox-include igraph_get_isomorphisms_vf2 -->
@@ -38,6 +39,7 @@
 </section>
 
 <section><title>The LAD algorithm</title>
+<!-- doxrox-include about_lad -->
 <!-- doxrox-include igraph_subisomorphic_lad -->
 </section>
 
