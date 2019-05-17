@@ -54,6 +54,11 @@ AT_COMPILE_CHECK([simple/isomorphism_test.c],
 		 [simple/isomorphism_test.out])
 AT_CLEANUP
 
+AT_SETUP([Simplify and colorize])
+AT_KEYWORDS([simplify multigraph colorize isomorphism])
+AT_COMPILE_CHECK([tests/simplify_and_colorize.c], [tests/simplify_and_colorize.out])
+AT_CLEANUP
+
 AT_SETUP([Graphical degree sequences])
 AT_KEYWORDS([degree sequence graphical])
 AT_COMPILE_CHECK([simple/igraph_is_degree_sequence.c])
