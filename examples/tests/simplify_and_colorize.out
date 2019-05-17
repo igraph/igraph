@@ -1,0 +1,70 @@
+K0
+directed: false
+vcount: 0
+edges: {
+}
+( )
+( )
+
+K1
+directed: false
+vcount: 1
+edges: {
+}
+( 0 )
+( )
+
+C4
+directed: false
+vcount: 4
+edges: {
+1 0
+3 0
+2 1
+3 2
+}
+( 0 0 0 0 )
+( 1 1 1 1 )
+
+Undirected graph 1
+directed: false
+vcount: 2
+edges: {
+1 0
+}
+( 0 1 )
+( 2 )
+
+Undirected graph 2
+directed: false
+vcount: 3
+edges: {
+1 0
+2 0
+2 1
+}
+( 0 0 2 )
+( 1 1 2 )
+
+Directed graph 1
+directed: true
+vcount: 3
+edges: {
+0 1
+1 2
+2 0
+2 1
+}
+( 0 0 2 )
+( 1 1 1 1 )
+
+Directed graph 2
+directed: true
+vcount: 4
+edges: {
+0 1
+1 0
+}
+( 0 2 0 0 )
+( 2 3 )
+
