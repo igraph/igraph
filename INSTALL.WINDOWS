@@ -1,8 +1,8 @@
 Installation Instructions
 *************************
-* download cygwin installer and install it and the following packages: 
+* download cygwin installer and install it and the following packages:
   'setup.exe -q -P automake,autoconf2.5,libtool,flex,bison,libxml2-devel,gcc-g++,gcc-core,make,libgmp-devel,util-linux,git,zip'
-* change into cygwin: Cygwin.bat
+* Make sure python is installed, or when using Anaconda that it is activated and change into cygwin: Cygwin.bat
 * clone igraph and change dir: git clone https://github.com/igraph/igraph.git;cd igraph
 * set the right line endding: git config core.autocrlf false
 * checkout develop branch: git checkout origin/develop
@@ -10,16 +10,17 @@ Installation Instructions
 
 MSVC compilation (needed for python)
 ************************************
-* Open windows commandline and switch to igraph\igraph-msvc\igraph-<version>-msvc
-* set the environment by using one of 
-  'call "%VCINSTALLDIR%\bin\vcvars32.bat"'  (32 bit) or
-  'call "%VCINSTALLDIR%\bin\vcvars64.bat"'  (64 bit)
-* upgrade the vcproj file to the right version: 'vcbuild /upgrade'
-* Compile igraph with 'vcbuild igraph.vcproj "release|x64"' 
-* Switch to the python interface: 'cd ..\interfaces\python'
-* Trick the python compiler into using the environment variables from the 
-  above vcvars call: 'set DISTUTILS_USE_SDK=1'
-* Compile python-igraph to a *.exe installer with 'python setup.py bdist_wininst' 
-
-If you have problems with the python compilations 
-* http://blog.victorjabur.com/2011/06/05/compiling-python-2-7-modules-on-windows-32-and-64-using-msvc-2008-express/
+* Open windows commandline and switch to igraph\igraph-<version>-msvc
+* Activate the msvc development environment by using
+  'call "%VCINSTALLDIR%\vcvars32.bat"'  (32 bit) or
+  'call "%VCINSTALLDIR%\vcvars64.bat"'  (64 bit)
+* upgrade the vcproj file to the right version and compile:
+    VC 9.0
+    - 'vcbuild.exe /upgrade'
+    - 'vcbuild.exe igraph.vcproj "Release|%TARGET_ARCH%"'
+    VC 10.0
+    - VCUpgrade.exe /overwrite igraph.vcproj
+    - msbuild.exe igraph.vcxproj
+    VC 14.0
+    - devenv /upgrade igraph.vcproj
+    - msbuild.exe igraph.vcxproj
