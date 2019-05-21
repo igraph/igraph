@@ -1916,7 +1916,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
       long int actnode=(long int) igraph_dqueue_pop(&q);
       IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
 
-      if (cutoff >= 0 && distance[actnode] >= cutoff+1) { continue; }
+      if (cutoff > 0 && distance[actnode] >= cutoff+1) { continue; }
       
       neis = igraph_adjlist_get(adjlist_out_p, actnode);
       nneis = igraph_vector_int_size(neis);
