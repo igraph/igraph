@@ -1014,6 +1014,29 @@ int igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
 }
 
 /**
+ * \section about_vf2
+ *
+ * <para>
+ * The VF2 algorithm can search for a subgraph in a larger graph, or check if two
+ * graphs are isomorphic. See P. Foggia, C. Sansone, M. Vento, An Improved algorithm for
+ * matching large graphs, Proc. of the 3rd IAPR-TC-15 International
+ * Workshop on Graph-based Representations, Italy, 2001.
+ * </para>
+ *
+ * <para>
+ * VF2 supports both vertex and edge-colored graphs, as well as custom vertex or edge
+ * compatibility functions.
+ * </para>
+ *
+ * <para>
+ * VF2 works with both directed and undirected graphs. Only simple graphs are supported.
+ * Self-loops or multi-edges must not be present in the graphs. Currently, the VF2
+ * functions do not check that the input graph is simple: it is the responsibility
+ * of the user to pass in valid input.
+ * </para>
+ */
+
+/**
  * \function igraph_isomorphic_function_vf2
  * The generic VF2 interface
  * 
@@ -2767,16 +2790,21 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
  * <para>
  * BLISS is a successor of the famous NAUTY algorithm and
  * implementation. While using the same ideas in general, with better
- * heuristics and data structure BLISS outperforms NAUTY on most
+ * heuristics and data structures BLISS outperforms NAUTY on most
  * graphs.
  * </para>
  * 
  * <para>
  * BLISS was developed and implemented by Tommi Junttila and Petteri Kaski at 
- * Helsinki University of Technology, Finland. See Tommi Juntilla's 
- * homepage at http://www.tcs.hut.fi/~tjunttil/ and the publication at 
- * http://www.siam.org/proceedings/alenex/2007/alx07_013junttilat.pdf
- * for more information.
+ * Helsinki University of Technology, Finland. For more information,
+ * see the BLISS homepage at http://www.tcs.hut.fi/Software/bliss/ and the publication
+ * Tommi Junttila, Petteri Kaski: "Engineering an Efficient Canonical Labeling
+ * Tool for Large and Sparse Graphs" at https://doi.org/10.1137/1.9781611972870.13
+ * </para>
+ *
+ * <para>
+ * BLISS works with both directed graphs and undirected graphs. It supports graphs with
+ * self-loops, but not graphs with multi-edges.
  * </para>
  * 
  * <para>
@@ -2979,4 +3007,93 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
   }
   
   return 0;
+}
+
+
+/**
+ * \function igraph_simplify_and_colorize
+ * \brief Simplify the graph and compute self-loop and edge multiplicities.
+ *
+ * </para><para>
+ * This function creates a vertex and edge colored simple graph from the input
+ * graph. The vertex colors are computed as the number of incident self-loops
+ * to each vertex in the input graph. The edge colors are computed as the number of
+ * parallel edges in the input graph that were merged to create each edge
+ * in the simple graph.
+ *
+ * </para><para>
+ * The resulting colored simple graph is suitable for use by isomorphism checking
+ * algorithms such as VF2, which only support simple graphs, but can consider
+ * vertex and edge colors.
+ *
+ * \param graph The graph object, typically having self-loops or multi-edges.
+ * \param res An uninitialized graph object. The result will be stored here
+ * \param vertex_color Computed vertex colors corresponding to self-loop multiplicities.
+ * \param edge_color Computed edge colors corresponding to edge multiplicities
+ * \return Error code.
+ *
+ * \sa \ref igraph_simplify(), \ref igraph_isomorphic_vf2(), \ref igraph_subisomorphic_vf2()
+ *
+ */
+int igraph_simplify_and_colorize(
+        const igraph_t *graph, igraph_t *res,
+        igraph_vector_int_t *vertex_color, igraph_vector_int_t *edge_color)
+{
+  igraph_es_t es;
+  igraph_eit_t eit;
+  igraph_vector_t edges;
+  long int no_of_nodes = igraph_vcount(graph);
+  long int no_of_edges = igraph_ecount(graph);
+  long int pto = -1, pfrom = -1;
+  long int i;
+
+  IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_FROM));
+  IGRAPH_FINALLY(igraph_es_destroy, &es);
+  IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
+  IGRAPH_FINALLY(igraph_eit_destroy, &eit);
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges*2));
+
+  IGRAPH_CHECK(igraph_vector_int_resize(vertex_color, no_of_nodes));
+  igraph_vector_int_null(vertex_color);
+
+  IGRAPH_CHECK(igraph_vector_int_resize(edge_color, no_of_edges));
+  igraph_vector_int_null(edge_color);
+
+  i = -1;
+  for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
+    long int edge = IGRAPH_EIT_GET(eit);
+    long int from = IGRAPH_FROM(graph, edge);
+    long int to   = IGRAPH_TO(graph, edge);
+
+    if (to == from) {
+      VECTOR(*vertex_color)[to]++;
+      continue;
+    }
+
+    if (to == pto && from == pfrom) {
+      VECTOR(*edge_color)[i]++;
+    } else {
+      igraph_vector_push_back(&edges, from);
+      igraph_vector_push_back(&edges, to);
+      i++;
+      VECTOR(*edge_color)[i] = 1;      
+    }
+
+    pfrom=from; pto=to;
+  }
+
+  igraph_vector_int_resize(edge_color, i+1);
+
+  igraph_eit_destroy(&eit);
+  igraph_es_destroy(&es);
+  IGRAPH_FINALLY_CLEAN(2);
+
+  IGRAPH_CHECK(igraph_create(res, &edges, no_of_nodes, igraph_is_directed(graph)));
+
+  igraph_vector_destroy(&edges);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  return IGRAPH_SUCCESS;
 }
