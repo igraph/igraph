@@ -240,7 +240,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
   igraph_ncol_yyset_in(instream, context.scanner);  
 
   if (igraph_ncol_yyparse(&context)) {
-    if (context.errmsg) {
+    if (context.errmsg[0] != 0) {
       IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read NCOL file", IGRAPH_PARSEERROR);
@@ -396,7 +396,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
   igraph_lgl_yyset_in(instream, context.scanner);  
 
   if (igraph_lgl_yyparse(&context)) {
-    if (context.errmsg) {
+    if (context.errmsg[0] != 0) {
       IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read LGL file", IGRAPH_PARSEERROR);
@@ -582,7 +582,7 @@ int igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
   igraph_pajek_yyset_in(instream, context.scanner);    
 
   if (igraph_pajek_yyparse(&context)) {
-    if (context.errmsg) {
+    if (context.errmsg[0] != 0) {
       IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read Pajek file", IGRAPH_PARSEERROR);
@@ -1123,7 +1123,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
   i=igraph_gml_yyparse(&context);
   if (i != 0) {
-    if (context.errmsg) {
+    if (context.errmsg[0] != 0) {
       IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read GML file", IGRAPH_PARSEERROR);
@@ -3046,7 +3046,7 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
   
   i=igraph_dl_yyparse(&context);
   if (i != 0) {
-    if (context.errmsg) { 
+    if (context.errmsg[0] != 0) { 
       IGRAPH_ERROR(context.errmsg, IGRAPH_PARSEERROR);
     } else {
       IGRAPH_ERROR("Cannot read DL file", IGRAPH_PARSEERROR);
