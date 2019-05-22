@@ -902,9 +902,9 @@ int igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
     long int to, from, slen;
     double maxedges, last;
     if (!directed || mode != IGRAPH_ALL) {
-      maxedges = n1 * n2;
+      maxedges = (double) n1 * (double) n2;
     } else {
-      maxedges = 2 * n1 * n2;
+      maxedges = 2.0 * (double) n1 * (double) n2;
     }
     
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -993,12 +993,13 @@ int igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
     IGRAPH_CHECK(retval=igraph_empty(graph, n1 + n2, directed));
   } else {
     
+
     long int i;
     double maxedges;
     if (!directed || mode != IGRAPH_ALL) {
-      maxedges = n1 * n2;
+      maxedges = (double) n1 * (double) n2;
     } else {
-      maxedges = 2 * n1 * n2;
+      maxedges = 2.0 * (double) n1 * (double) n2;
     }
     
     if (m > maxedges) {
