@@ -125,14 +125,14 @@
 #define PREFIX i_
 #define RECORD do { \
   if (igraph_vector_size(res) < clsize){ \
-    igraph_vector_init(res, clsize); \
+    igraph_vector_resize(res, clsize); \
     int j; \
     for (j=0; j<clsize; j++) { \
       VECTOR(*res)[j] = VECTOR(*R)[j]; \
     } \
   } \
   } while (0)
-#define FINALLY igraph_vector_init(res,0);
+#define FINALLY igraph_vector_clear(res);
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
 #define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
