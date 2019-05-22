@@ -968,10 +968,23 @@ int igraph_modularity(const igraph_t *graph,
 
 /** 
  * \function igraph_modularity_matrix
+ * \brief Calculate the modularity matrix
+ *
+ * This function returns the modularity matrix defined as
+ * `B_ij = A_ij - k_i k_j * / 2 m`
+ * where `A_ij` denotes the adjacency matrix, `k_i` is the degree of node `i`
+ * and `m` is the total weight in the graph. Note that self-loops are multiplied
+ * by 2 in this implementation. If weights are specified, the weighted
+ * counterparts are used.
+ *
+ * \param graph   The input graph
+ * \param modmat  Pointer to an initialized matrix in which the modularity
+ *                matrix is stored.
+ * \param weights Edge weights, pointer to a vector. If this is a null pointer
+ *                then every edge is assumed to have a weight of 1.
  */
 
 int igraph_modularity_matrix(const igraph_t *graph, 
-			     const igraph_vector_t *membership,
 			     igraph_matrix_t *modmat, 
 			     const igraph_vector_t *weights) {
 
@@ -981,11 +994,6 @@ int igraph_modularity_matrix(const igraph_t *graph,
   igraph_vector_t deg;
   long int i, j;
 
-  if (igraph_vector_size(membership) != igraph_vcount(graph)) {
-    IGRAPH_ERROR("Cannot calculate modularity matrix, invalid "
-		 "membership vector length", IGRAPH_EINVAL);
-  }
-  
   if (weights && igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
   }
