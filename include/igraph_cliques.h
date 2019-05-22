@@ -97,7 +97,8 @@ typedef igraph_bool_t igraph_clique_handler_t(igraph_vector_t *clique, void *arg
 DECLDIR int igraph_cliques_callback(const igraph_t *graph,
                 igraph_integer_t min_size, igraph_integer_t max_size,
                 igraph_clique_handler_t *cliquehandler_fn, void *arg);
-
+DECLDIR int igraph_largest_single_clique(const igraph_t *graph,
+ 			          igraph_vector_t *clique);
 
 __END_DECLS
 

@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2013  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -25,6 +25,7 @@
 #define RESTYPE igraph_vector_ptr_t *res
 #define RESNAME res
 #define SUFFIX
+#define PREFIX
 #define RECORD do {							\
     igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t);		\
     int j;								\
@@ -47,6 +48,7 @@
 #define RESTYPE igraph_integer_t *res
 #define RESNAME res
 #define SUFFIX _count
+#define PREFIX
 #define RECORD (*res)++
 #define FINALLY *res=0;
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
@@ -57,6 +59,7 @@
 #define RESTYPE FILE *res
 #define RESNAME res
 #define SUFFIX _file
+#define PREFIX
 #define RECORD igraph_vector_int_fprint(R, res)
 #define FINALLY
 #define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
@@ -70,6 +73,7 @@
     igraph_integer_t *no,			\
     FILE *outfile
 #define RESNAME subset, res, no, outfile
+#define PREFIX
 #define SUFFIX _subset
 #define RECORD do {							\
   if (res) {								\
@@ -98,6 +102,39 @@
 #define FOR_LOOP_OVER_VERTICES_PREPARE do {  \
     i= subset ? VECTOR(*subset)[ii] : ii;    \
 } while (0)
+#endif
+
+#ifdef IGRAPH_MC_NUMBER
+#define RESTYPE igraph_integer_t *res
+#define RESNAME res
+#define SUFFIX _number
+#define PREFIX i_
+#define RECORD do { \
+  if (*res < clsize) \
+    *res = clsize; \
+  } while (0)
+#define FINALLY *res=0;
+#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
+#endif
+
+#ifdef IGRAPH_MC_SINGLE_LARGEST
+#define RESTYPE igraph_vector_t *res
+#define RESNAME res
+#define SUFFIX _single_largest
+#define PREFIX i_
+#define RECORD do { \
+  if (igraph_vector_size(res) < clsize){ \
+    igraph_vector_init(res, clsize); \
+    int j; \
+    for (j=0; j<clsize; j++) { \
+      VECTOR(*res)[j] = VECTOR(*R)[j]; \
+    } \
+  } \
+  } while (0)
+#define FINALLY igraph_vector_init(res,0);
+#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
 #ifdef IGRAPH_MC_ORIG
@@ -132,8 +169,8 @@ void igraph_i_maximal_cliques_free_full(void *ptr) {
 }
 #endif
 
-int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
-				igraph_vector_int_t *PX, int PS, int PE, 
+int FUNCTION(igraph_,PREFIX,maximal_cliques_bk,SUFFIX)(
+				igraph_vector_int_t *PX, int PS, int PE,
 				int XS, int XE, int oldPS, int oldXE,
 				igraph_vector_int_t *R,
 				igraph_vector_int_t *pos,
@@ -144,7 +181,7 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 				int min_size, int max_size) {
 
   igraph_vector_int_push_back(H, -1); /* boundary */
-  
+
   if (PS > PE && XS > XE) {
     /* Found a maximum clique, report it */
     int clsize=igraph_vector_int_size(R);
@@ -164,7 +201,7 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
       igraph_i_maximal_cliques_down(PX, PS, PE, XS, XE, pos, adjlist,
 				    mynextv, R, &newPS, &newXE);
       /* Recursive call */
-      FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
+      FUNCTION(igraph_,PREFIX,maximal_cliques_bk,SUFFIX)(
 				  PX, newPS, PE, XS, newXE, PS, XE, R,
 				  pos, adjlist, RESNAME, nextv, H,
 				  min_size, max_size);
@@ -175,17 +212,17 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
       }
     }
   }
-  
+
   /* Putting back vertices from X to P, see notes in H */
   igraph_i_maximal_cliques_up(PX, PS, PE, XS, XE, pos, adjlist, R, H);
 
   return 0;
 }
 
-int FUNCTION(igraph_maximal_cliques,SUFFIX)(
+int FUNCTION(igraph_,PREFIX,maximal_cliques,SUFFIX)(
 			   const igraph_t *graph,
 			   RESTYPE,
-			   igraph_integer_t min_size, 
+			   igraph_integer_t min_size,
 			   igraph_integer_t max_size) {
 
   /* Implementation details. TODO */
@@ -218,7 +255,7 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
 
   igraph_vector_destroy(&coreness);
   IGRAPH_FINALLY_CLEAN(1);
-  
+
   igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL);
 
   igraph_adjlist_simplify(&adjlist);
@@ -261,7 +298,7 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
     }
 
     IGRAPH_ALLOW_INTERRUPTION();
-    
+
     igraph_vector_int_resize(&PX, vdeg);
     igraph_vector_int_resize(&R , 1);
     igraph_vector_int_resize(&H , 1);
@@ -274,7 +311,7 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
     /* ================================================================*/
     /* P <- G(v[i]) intersect { v[i+1], ..., v[n-1] }
        X <- G(v[i]) intersect { v[0], ..., v[i-1] } */
-    
+
     VECTOR(R)[0] = v;
     for (j=0; j<vdeg; j++) {
       int vx=VECTOR(*vneis)[j];
@@ -291,10 +328,10 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
 
     PE = Pptr-1; XS = Xptr+1;	/* end of P, start of X in PX */
 
-    /* Create an adjacency list that is specific to the 
-       v vertex. It only contains 'v' and its neighbors. Moreover, we 
+    /* Create an adjacency list that is specific to the
+       v vertex. It only contains 'v' and its neighbors. Moreover, we
        only deal with the vertices in P and X (and R). */
-    igraph_vector_int_update(igraph_adjlist_get(&adjlist, v), 
+    igraph_vector_int_update(igraph_adjlist_get(&adjlist, v),
 			     igraph_adjlist_get(&fulladjlist, v));
     for (j=0; j<=vdeg-1; j++) {
       int vv=VECTOR(PX)[j];
@@ -315,7 +352,7 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
     igraph_i_maximal_cliques_reorder_adjlists(&PX, PS, PE, XS, XE, &pos,
 					      &adjlist);
 
-    FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
+    FUNCTION(igraph_,PREFIX,maximal_cliques_bk,SUFFIX)(
 				&PX, PS, PE, XS, XE, PS, XE, &R, &pos,
 				&adjlist, RESNAME, &nextv, &H, min_size,
 				max_size);
