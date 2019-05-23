@@ -54,5 +54,5 @@ AT_CLEANUP
 
 AT_SETUP([Boolean graph attribute bug 2:])
 AT_KEYWORDS([attributes bool boolean logical bug])
-AT_COMPILE_CHECK([tests/cattr_bool_bug2.c], [], [tests/cattr_bool_bug2.graphml])
+AT_COMPILE_CHECK([tests/cattr_bool_bug2.c], [tests/cattr_bool_bug2.out], [tests/cattr_bool_bug2.graphml])
 AT_CLEANUP

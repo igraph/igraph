@@ -5,12 +5,12 @@
 #define FILENAME "mybool.graphml.xml"
 
 int main() {
-  igraph_attribute_table_t* oldHandler = igraph_i_set_attribute_table(&igraph_cattribute_table);
+  igraph_t graph;
 
   FILE* graphFile = fopen("cattr_bool_bug2.graphml", "r");
+  igraph_i_set_attribute_table(&igraph_cattribute_table);
 
-
-  if (!ifile) {
+  if (!graphFile) {
     printf("Cannot open input file");
     return 1;
   }
