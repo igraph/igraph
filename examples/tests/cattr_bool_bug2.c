@@ -31,9 +31,9 @@ int main() {
   if (!igraph_cattribute_has_attr(&graph, IGRAPH_ATTRIBUTE_GRAPH, "mybool")) {
       printf("boolean value mybool not found\n");
       return 2;
-  //} else {
-  //    //igraph_bool_t value = igraph_cattribute_GAB(&graph, "mybool");
-  //    //printf("found boolean value %d\n", value);
+  } else {
+      igraph_bool_t value = igraph_cattribute_GAB(&graph, "mybool");
+      printf("found boolean value %d\n", value);
   }
 
   igraph_destroy(&graph);
