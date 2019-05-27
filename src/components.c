@@ -469,8 +469,7 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
  *   this pointer vector to free unneeded memory. Alternatively, you can 
  *   simply call \ref igraph_decompose_destroy() that does this for you.
  * \param mode Either \c IGRAPH_WEAK or \c IGRAPH_STRONG for weakly
- *    and strongly connected components respectively. Right now only
- *    the former is implemented.
+ *    and strongly connected components respectively.
  * \param maxcompno The maximum number of components to return. The
  *    first \p maxcompno components will be returned (which hold at
  *    least \p minelements vertices, see the next parameter), the
@@ -508,10 +507,6 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
     mode=IGRAPH_WEAK;
   }
 
-  if (mode != IGRAPH_WEAK) {
-    IGRAPH_ERROR("only 'IGRAPH_WEAK' is implemented", IGRAPH_EINVAL);
-  }
-
   if (maxcompno<0) {
     maxcompno=LONG_MAX;
   }
@@ -519,6 +514,7 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   igraph_vector_ptr_clear(components);
   IGRAPH_FINALLY(igraph_decompose_destroy, components);
 
+  // already_added keeps track of what nodes made it into a graph already
   already_added=igraph_Calloc(no_of_nodes, char);
   if (already_added==0) {
     IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
@@ -530,26 +526,36 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   
+  // add a node and its neighbors at once, recursively
+  // then switch to next node that has not been added already
   for(actstart=0; resco<maxcompno && actstart < no_of_nodes; actstart++) {
     
     if (already_added[actstart]) { continue; }
     IGRAPH_ALLOW_INTERRUPTION();
     
     igraph_vector_clear(&verts);
+
+    // add the node itself
     already_added[actstart]=1;
     IGRAPH_CHECK(igraph_vector_push_back(&verts, actstart));
     IGRAPH_CHECK(igraph_dqueue_push(&q, actstart));
     
+    // add the neighbors, recursively
     while (!igraph_dqueue_empty(&q) ) {
+      // pop from the queue of this component
       long int actvert=(long int) igraph_dqueue_pop(&q);
       IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actvert,
 				    IGRAPH_ALL));
+      // iterate over the neighbors
       for (i=0; i<igraph_vector_size(&neis); i++) {
 	long int neighbor=(long int) VECTOR(neis)[i];
 	if (already_added[neighbor]==1) { continue; }
+	// add neighbor
+	already_added[neighbor]=1;
+
+	// recursion: append neighbor to the queues
 	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	IGRAPH_CHECK(igraph_vector_push_back(&verts, neighbor));
-	already_added[neighbor]=1;
       }
     }
     
