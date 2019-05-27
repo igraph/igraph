@@ -501,9 +501,9 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
 		     igraph_connectedness_t mode,
 		     long int maxcompno, long int minelements) {
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
-    return igraph_clusters_weak(graph, membership, csize, no);
+    return igraph_clusters_weak(graph, components, maxcompno, minelements);
   } else if (mode==IGRAPH_STRONG) {
-    return igraph_clusters_strong(graph, membership, csize, no);
+    return igraph_clusters_strong(graph, components, maxcompno, minelements);
   } else {
     IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
   }
@@ -623,6 +623,7 @@ int igraph_decompose_strong(const igraph_t *graph,
   const igraph_vector_int_t* tmp;
 
   igraph_adjlist_t adjlist;
+  igraph_vector_t verts;
   igraph_t *newg;
 
   igraph_vector_ptr_clear(components);
@@ -630,6 +631,7 @@ int igraph_decompose_strong(const igraph_t *graph,
 
   /* The result */
 
+  IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&next_nei, no_of_nodes);
   IGRAPH_VECTOR_INIT_FINALLY(&out, 0);
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
@@ -637,9 +639,6 @@ int igraph_decompose_strong(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_reserve(&out, no_of_nodes));
 
   igraph_vector_null(&out);
-  if (csize) {
-    igraph_vector_clear(csize);
-  }
 
   IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -724,13 +723,16 @@ int igraph_decompose_strong(const igraph_t *graph,
     /* been here, done that
      * NOTE: next_nei is initialized as [0, 0, ...] */
     if (VECTOR(next_nei)[grandfather] != 0) { continue; }
+
+    /* collect all the members of this component */
+    igraph_vector_clear(&verts);
  
+    /* this node is gone for any future components */
     VECTOR(next_nei)[grandfather]=1;
     act_cluster_size=1;
-    /* add to component TODO TODO */
-    if (membership) {
-      VECTOR(*membership)[grandfather]=no_of_clusters-1;
-    }
+
+    /* add to component */
+    IGRAPH_CHECK(igraph_vector_push_back(&verts, grandfather));
     IGRAPH_CHECK(igraph_dqueue_push(&q, grandfather));
     
     num_seen++;
@@ -753,10 +755,8 @@ int igraph_decompose_strong(const igraph_t *graph,
 	VECTOR(next_nei)[neighbor]=1;
 	act_cluster_size++;
 
-        /* add to component TODO TODO */
-	if (membership) {
-	  VECTOR(*membership)[neighbor]=no_of_clusters-1;
-	}
+        /* add to component */
+        IGRAPH_CHECK(igraph_vector_push_back(&verts, neighbor));
 
 	num_seen++;
 	if (num_seen % 10000 == 0) {
@@ -768,6 +768,18 @@ int igraph_decompose_strong(const igraph_t *graph,
       }
     }
 
+    /* ok, we have a component */
+    if (igraph_vector_size(&verts)<minelements) { continue; }
+
+    newg=igraph_Calloc(1, igraph_t);
+    if (newg==0) {
+      IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
+    }
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
+    IGRAPH_CHECK(igraph_induced_subgraph(graph, newg, 
+					 igraph_vss_vector(&verts), 
+					 IGRAPH_SUBGRAPH_AUTO));
+
     no_of_clusters++;
   }
   
@@ -775,11 +787,12 @@ int igraph_decompose_strong(const igraph_t *graph,
 
   /* Clean up, return */
 
+  igraph_vector_destroy(&verts);
   igraph_adjlist_destroy(&adjlist);
   igraph_vector_destroy(&out);
   igraph_dqueue_destroy(&q);
   igraph_vector_destroy(&next_nei);
-  IGRAPH_FINALLY_CLEAN(4);
+  IGRAPH_FINALLY_CLEAN(6);	/* + components */
 
   return 0;
 
