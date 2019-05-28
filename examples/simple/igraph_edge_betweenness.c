@@ -61,6 +61,51 @@ int test_bug950() {
   return 0;
 }
 
+int test_bug1050() {
+  /* compare cutoff = -1 with cutoff = 0 */
+  igraph_t g;
+  igraph_vector_t eb, eb2;
+
+  igraph_full(&g, 6, 0, 0);
+
+  /* unweighted */
+  igraph_vector_init(&eb, igraph_ecount(&g));
+  igraph_vector_init(&eb2, igraph_ecount(&g));
+
+  igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, /* cutoff */ -1, /* weights */ 0);
+  igraph_edge_betweenness_estimate(&g, &eb2, IGRAPH_UNDIRECTED, /* cutoff */ 0, /* weights */ 0);
+
+  if (!igraph_vector_all_e(&eb, &eb2)) {
+    return 1;
+  }
+
+  igraph_vector_destroy(&eb);
+  igraph_vector_destroy(&eb2);
+
+  /* weighted */
+  igraph_vector_t weights;
+  igraph_vector_init(&eb, igraph_ecount(&g));
+  igraph_vector_init(&eb2, igraph_ecount(&g));
+
+  igraph_vector_init(&weights, igraph_ecount(&g));
+  VECTOR(weights)[0] = 2;
+
+  igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, /* cutoff */ -1, &weights);
+  igraph_edge_betweenness_estimate(&g, &eb2, IGRAPH_UNDIRECTED, /* cutoff */ 0, &weights);
+
+  if (!igraph_vector_all_e(&eb, &eb2)) {
+    return 1;
+  }
+
+  igraph_vector_destroy(&eb);
+  igraph_vector_destroy(&eb2);
+  igraph_vector_destroy(&weights);
+  igraph_destroy(&g);
+
+  return 0;
+
+}
+
 int main() {
 
   igraph_t g;
@@ -112,6 +157,10 @@ int main() {
 
   if (test_bug950()) {
     return 1;
+  }
+
+  if (test_bug1050()) {
+    return 2;
   }
 
   return 0;

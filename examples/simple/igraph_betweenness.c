@@ -135,6 +135,67 @@ int main() {
   igraph_vector_destroy(&bet);
   igraph_destroy(&g);
 
+
+  /* test corner case of cutoff = 0 */
+  igraph_tree(&g, 20, 3, IGRAPH_TREE_UNDIRECTED);
+
+  /* unweighted */
+  igraph_vector_init(&bet, 0);
+  igraph_betweenness_estimate(/* graph=     */ &g,
+			      /* res=       */ &bet,
+			      /* vids=      */ igraph_vss_all(),
+			      /* directed = */ 0,
+			      /* cutoff=    */ 0,
+			      /* weights=   */ 0, 
+			      /* nobigint=  */ 1);
+
+  igraph_vector_init(&bet2, 0);
+  igraph_betweenness_estimate(/* graph=     */ &g,
+			      /* res=       */ &bet2,
+			      /* vids=      */ igraph_vss_all(),
+			      /* directed = */ 0,
+			      /* cutoff=    */ -1,
+			      /* weights=   */ 0, 
+			      /* nobigint=  */ 1);
+
+  if (!igraph_vector_all_e(&bet, &bet2)) {
+    return 1;
+  }
+
+  igraph_vector_destroy(&bet);
+  igraph_vector_destroy(&bet2);
+
+  /* weighted */
+  igraph_vector_init(&weights, igraph_ecount(&g));
+  igraph_vector_fill(&weights, 2.0);
+
+  igraph_vector_init(&bet, 0);
+  igraph_betweenness_estimate(/* graph=     */ &g,
+			      /* res=       */ &bet,
+			      /* vids=      */ igraph_vss_all(),
+			      /* directed = */ 0,
+			      /* cutoff=    */ 0,
+			      /* weights=   */ &weights, 
+			      /* nobigint=  */ 1);
+
+  igraph_vector_init(&bet2, 0);
+  igraph_betweenness_estimate(/* graph=     */ &g,
+			      /* res=       */ &bet2,
+			      /* vids=      */ igraph_vss_all(),
+			      /* directed = */ 0,
+			      /* cutoff=    */ -1,
+			      /* weights=   */ &weights, 
+			      /* nobigint=  */ 1);
+
+  if (!igraph_vector_all_e(&bet, &bet2)) {
+    return 1;
+  }
+
+  igraph_vector_destroy(&bet);
+  igraph_vector_destroy(&bet2);
+  igraph_vector_destroy(&weights);
+  igraph_destroy(&g);
+
   return 0;
 }
 
