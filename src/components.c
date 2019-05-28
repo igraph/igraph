@@ -501,9 +501,9 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
 		     igraph_connectedness_t mode,
 		     long int maxcompno, long int minelements) {
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
-    return igraph_clusters_weak(graph, components, maxcompno, minelements);
+    return igraph_decompose_weak(graph, components, maxcompno, minelements);
   } else if (mode==IGRAPH_STRONG) {
-    return igraph_clusters_strong(graph, components, maxcompno, minelements);
+    return igraph_decompose_strong(graph, components, maxcompno, minelements);
   } else {
     IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
   }
