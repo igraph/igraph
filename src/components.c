@@ -35,10 +35,10 @@
 #include <string.h>
 #include <limits.h>
 
-int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
+static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
 			 igraph_vector_t *csize, igraph_integer_t *no);
 
-int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
+static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 			   igraph_vector_t *csize, igraph_integer_t *no);
 
 /**
@@ -76,9 +76,9 @@ int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
 		    igraph_vector_t *csize, igraph_integer_t *no,
 		    igraph_connectedness_t mode) {
   if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
-    return igraph_clusters_weak(graph, membership, csize, no);
+    return igraph_i_clusters_weak(graph, membership, csize, no);
   } else if (mode==IGRAPH_STRONG) {
-    return igraph_clusters_strong(graph, membership, csize, no);
+    return igraph_i_clusters_strong(graph, membership, csize, no);
   } else {
     IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
   }
@@ -86,7 +86,7 @@ int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
   return 1;
 }
 
-int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
+static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
 			 igraph_vector_t *csize, igraph_integer_t *no) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -161,7 +161,7 @@ int igraph_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
   return 0;
 }
 
-int igraph_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
+static int igraph_i_clusters_strong(const igraph_t *graph, igraph_vector_t *membership,
 			   igraph_vector_t *csize, igraph_integer_t *no) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -352,7 +352,7 @@ int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
   } else if (mode==IGRAPH_STRONG) {
     int retval;
     igraph_integer_t no;
-    retval = igraph_clusters_strong(graph, 0, 0, &no);
+    retval = igraph_i_clusters_strong(graph, 0, 0, &no);
     *res = (no==1);
     return retval;
   } else {
@@ -453,6 +453,14 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
   }
 }
 
+static int igraph_i_decompose_weak(const igraph_t *graph,
+		          igraph_vector_ptr_t *components, 
+		          long int maxcompno, long int minelements);
+
+static int igraph_i_decompose_strong(const igraph_t *graph,
+		          igraph_vector_ptr_t *components, 
+		          long int maxcompno, long int minelements);
+
 /**
  * \function igraph_decompose
  * \brief Decompose a graph into connected components.
@@ -469,8 +477,7 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
  *   this pointer vector to free unneeded memory. Alternatively, you can 
  *   simply call \ref igraph_decompose_destroy() that does this for you.
  * \param mode Either \c IGRAPH_WEAK or \c IGRAPH_STRONG for weakly
- *    and strongly connected components respectively. Right now only
- *    the former is implemented.
+ *    and strongly connected components respectively.
  * \param maxcompno The maximum number of components to return. The
  *    first \p maxcompno components will be returned (which hold at
  *    least \p minelements vertices, see the next parameter), the
@@ -493,6 +500,20 @@ void igraph_decompose_destroy(igraph_vector_ptr_t *complist) {
 int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components, 
 		     igraph_connectedness_t mode,
 		     long int maxcompno, long int minelements) {
+  if (mode==IGRAPH_WEAK || !igraph_is_directed(graph)) {
+    return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
+  } else if (mode==IGRAPH_STRONG) {
+    return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
+  } else {
+    IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
+  }
+  
+  return 1;
+}
+
+static int igraph_i_decompose_weak(const igraph_t *graph,
+		          igraph_vector_ptr_t *components, 
+		          long int maxcompno, long int minelements) {
 
   long int actstart;
   long int no_of_nodes=igraph_vcount(graph);
@@ -504,13 +525,6 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   long int i;
   igraph_t *newg;
 
-  if (!igraph_is_directed(graph)) {
-    mode=IGRAPH_WEAK;
-  }
-
-  if (mode != IGRAPH_WEAK) {
-    IGRAPH_ERROR("only 'IGRAPH_WEAK' is implemented", IGRAPH_EINVAL);
-  }
 
   if (maxcompno<0) {
     maxcompno=LONG_MAX;
@@ -519,6 +533,7 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   igraph_vector_ptr_clear(components);
   IGRAPH_FINALLY(igraph_decompose_destroy, components);
 
+  /* already_added keeps track of what nodes made it into a graph already */
   already_added=igraph_Calloc(no_of_nodes, char);
   if (already_added==0) {
     IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
@@ -530,26 +545,36 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   
+  /* add a node and its neighbors at once, recursively
+     then switch to next node that has not been added already */
   for(actstart=0; resco<maxcompno && actstart < no_of_nodes; actstart++) {
     
     if (already_added[actstart]) { continue; }
     IGRAPH_ALLOW_INTERRUPTION();
     
     igraph_vector_clear(&verts);
+
+    /* add the node itself */
     already_added[actstart]=1;
     IGRAPH_CHECK(igraph_vector_push_back(&verts, actstart));
     IGRAPH_CHECK(igraph_dqueue_push(&q, actstart));
     
+    /* add the neighbors, recursively */
     while (!igraph_dqueue_empty(&q) ) {
+      /* pop from the queue of this component */
       long int actvert=(long int) igraph_dqueue_pop(&q);
       IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) actvert,
 				    IGRAPH_ALL));
+      /* iterate over the neighbors */
       for (i=0; i<igraph_vector_size(&neis); i++) {
 	long int neighbor=(long int) VECTOR(neis)[i];
 	if (already_added[neighbor]==1) { continue; }
+	/* add neighbor */
+	already_added[neighbor]=1;
+
+	/* recursion: append neighbor to the queues */
 	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
 	IGRAPH_CHECK(igraph_vector_push_back(&verts, neighbor));
-	already_added[neighbor]=1;
       }
     }
     
@@ -575,6 +600,202 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
   IGRAPH_FINALLY_CLEAN(5);	/* + components */
   
   return 0;
+}
+
+static int igraph_i_decompose_strong(const igraph_t *graph,
+		          igraph_vector_ptr_t *components, 
+		          long int maxcompno, long int minelements) {
+
+
+  long int no_of_nodes=igraph_vcount(graph);
+
+  /* this is a heap used twice for checking what nodes have
+   * been counted already */
+  igraph_vector_t next_nei=IGRAPH_VECTOR_NULL;
+  
+  long int i, n, num_seen;
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+  
+  long int no_of_clusters=1;
+  long int act_cluster_size;
+
+  igraph_vector_t out=IGRAPH_VECTOR_NULL;
+  const igraph_vector_int_t* tmp;
+
+  igraph_adjlist_t adjlist;
+  igraph_vector_t verts;
+  igraph_t *newg;
+
+  igraph_vector_ptr_clear(components);
+  IGRAPH_FINALLY(igraph_decompose_destroy, components);
+
+  /* The result */
+
+  IGRAPH_VECTOR_INIT_FINALLY(&verts, 0);
+  IGRAPH_VECTOR_INIT_FINALLY(&next_nei, no_of_nodes);
+  IGRAPH_VECTOR_INIT_FINALLY(&out, 0);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+
+  IGRAPH_CHECK(igraph_vector_reserve(&out, no_of_nodes));
+
+  igraph_vector_null(&out);
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_OUT));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+  /* number of components seen */
+  num_seen = 0;
+  /* populate the 'out' vector by browsing a node and following up
+     all its neighbors recursively, then switching to the next
+     unassigned node */
+  for (i=0; i<no_of_nodes; i++) {
+    IGRAPH_ALLOW_INTERRUPTION();
+
+    /* get all the 'out' neighbors of this node
+     * NOTE: next_nei is initialized [0, 0, ...] */
+    tmp = igraph_adjlist_get(&adjlist, i);
+    if (VECTOR(next_nei)[i] > igraph_vector_int_size(tmp)) {
+      continue;
+    }
+    
+    /* add this node to the queue for this component */
+    IGRAPH_CHECK(igraph_dqueue_push(&q, i));
+
+    /* consume the tree from this node ("root") recursively
+     * until there is no more */
+    while (!igraph_dqueue_empty(&q)) {
+      /* this looks up but does NOT consume the queue */
+      long int act_node=(long int) igraph_dqueue_back(&q);
+
+      /* get all neighbors of this node */
+      tmp = igraph_adjlist_get(&adjlist, act_node);
+      if (VECTOR(next_nei)[act_node]==0) {
+	/* this is the first time we've met this vertex,
+         * because next_nei is initialized [0, 0, ...] */
+	VECTOR(next_nei)[act_node]++;
+	/* back to the queue, same vertex is up again */
+
+      } else if (VECTOR(next_nei)[act_node] <= igraph_vector_int_size(tmp)) {
+	/* we've already met this vertex but it has more children */
+	long int neighbor=(long int) VECTOR(*tmp)[(long int)
+						  VECTOR(next_nei)[act_node]-1];
+	if (VECTOR(next_nei)[neighbor] == 0) {
+	  /* add the root of the other children to the queue */
+	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	}
+	VECTOR(next_nei)[act_node]++;
+      } else {
+	/* we've met this vertex and it has no more children */
+	IGRAPH_CHECK(igraph_vector_push_back(&out, act_node));
+	/* this consumes the queue, since there's nowhere to go */
+	igraph_dqueue_pop_back(&q);
+	num_seen++;
+
+	if (num_seen % 10000 == 0) {
+	  /* time to report progress and allow the user to interrupt */
+	  IGRAPH_PROGRESS("Strongly connected components: ",
+	      num_seen * 50.0 / no_of_nodes, NULL);
+	  IGRAPH_ALLOW_INTERRUPTION();
+	}
+      }
+    } /* while q */
+  }  /* for */
+
+  IGRAPH_PROGRESS("Strongly connected components: ", 50.0, NULL);
+
+  igraph_adjlist_destroy(&adjlist);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+  /* OK, we've the 'out' values for the nodes, let's use them in
+   * decreasing order with the help of the next_nei heap */
+
+  igraph_vector_null(&next_nei);             /* mark already added vertices */
+
+  /* number of components built */
+  num_seen = 0;
+  while (!igraph_vector_empty(&out)) {
+    /* consume the vector from the last element */
+    long int grandfather=(long int) igraph_vector_pop_back(&out);
+
+    /* been here, done that
+     * NOTE: next_nei is initialized as [0, 0, ...] */
+    if (VECTOR(next_nei)[grandfather] != 0) { continue; }
+
+    /* collect all the members of this component */
+    igraph_vector_clear(&verts);
+ 
+    /* this node is gone for any future components */
+    VECTOR(next_nei)[grandfather]=1;
+    act_cluster_size=1;
+
+    /* add to component */
+    IGRAPH_CHECK(igraph_vector_push_back(&verts, grandfather));
+    IGRAPH_CHECK(igraph_dqueue_push(&q, grandfather));
+    
+    num_seen++;
+    if (num_seen % 10000 == 0) {
+      /* time to report progress and allow the user to interrupt */
+      IGRAPH_PROGRESS("Strongly connected components: ",
+	  50.0 + num_seen * 50.0 / no_of_nodes, NULL);
+      IGRAPH_ALLOW_INTERRUPTION();
+    }
+
+    while (!igraph_dqueue_empty(&q)) {
+      /* consume the queue from this node */
+      long int act_node=(long int) igraph_dqueue_pop_back(&q);
+      tmp = igraph_adjlist_get(&adjlist, act_node);
+      n = igraph_vector_int_size(tmp);
+      for (i=0; i<n; i++) {
+	long int neighbor=(long int) VECTOR(*tmp)[i];
+	if (VECTOR(next_nei)[neighbor] != 0) { continue; }
+	IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	VECTOR(next_nei)[neighbor]=1;
+	act_cluster_size++;
+
+        /* add to component */
+        IGRAPH_CHECK(igraph_vector_push_back(&verts, neighbor));
+
+	num_seen++;
+	if (num_seen % 10000 == 0) {
+	  /* time to report progress and allow the user to interrupt */
+	  IGRAPH_PROGRESS("Strongly connected components: ",
+	      50.0 + num_seen * 50.0 / no_of_nodes, NULL);
+	  IGRAPH_ALLOW_INTERRUPTION();
+	}
+      }
+    }
+
+    /* ok, we have a component */
+    if (igraph_vector_size(&verts)<minelements) { continue; }
+
+    newg=igraph_Calloc(1, igraph_t);
+    if (newg==0) {
+      IGRAPH_ERROR("Cannot decompose graph", IGRAPH_ENOMEM);
+    }
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(components, newg));
+    IGRAPH_CHECK(igraph_induced_subgraph(graph, newg, 
+					 igraph_vss_vector(&verts), 
+					 IGRAPH_SUBGRAPH_AUTO));
+
+    no_of_clusters++;
+  }
+  
+  IGRAPH_PROGRESS("Strongly connected components: ", 100.0, NULL);
+
+  /* Clean up, return */
+
+  igraph_vector_destroy(&verts);
+  igraph_adjlist_destroy(&adjlist);
+  igraph_vector_destroy(&out);
+  igraph_dqueue_destroy(&q);
+  igraph_vector_destroy(&next_nei);
+  IGRAPH_FINALLY_CLEAN(6);	/* + components */
+
+  return 0;
+
 }
 
 /** 

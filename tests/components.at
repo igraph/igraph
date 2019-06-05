@@ -26,6 +26,11 @@ AT_KEYWORDS([igraph_decompose decompose component])
 AT_COMPILE_CHECK([simple/igraph_decompose.c], [simple/igraph_decompose.out])
 AT_CLEANUP
 
+AT_SETUP([Decompose a graph into strongly connected components (igraph_decompose_strong):])
+AT_KEYWORDS([igraph_decompose_strong decompose_strong component_strong])
+AT_COMPILE_CHECK([tests/igraph_decompose_strong.c], [tests/igraph_decompose_strong.out])
+AT_CLEANUP
+
 AT_SETUP([Biconnected components (igraph_biconnected_components):])
 AT_KEYWORDS([igraph_biconnected_components biconnected component])
 AT_COMPILE_CHECK([simple/igraph_biconnected_components.c],

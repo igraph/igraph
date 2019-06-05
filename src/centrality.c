@@ -1641,7 +1641,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       
       igraph_stack_push(&S, minnei);
       
-      if (cutoff >=0 && VECTOR(dist)[minnei] >= cutoff+1.0) { continue; }
+      if (cutoff > 0 && VECTOR(dist)[minnei] >= cutoff+1.0) { continue; }
       
       /* Now check all neighbors of 'minnei' for a shorter path */
       neis=igraph_inclist_get(&inclist, minnei);
@@ -1916,7 +1916,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
       long int actnode=(long int) igraph_dqueue_pop(&q);
       IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
 
-      if (cutoff >= 0 && distance[actnode] >= cutoff+1) { continue; }
+      if (cutoff > 0 && distance[actnode] >= cutoff+1) { continue; }
       
       neis = igraph_adjlist_get(adjlist_out_p, actnode);
       nneis = igraph_vector_int_size(neis);
@@ -2101,7 +2101,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
       
       igraph_stack_push(&S, minnei);
 
-      if (cutoff >=0 && VECTOR(distance)[minnei] >= cutoff+1.0) { continue; }
+      if (cutoff > 0 && VECTOR(distance)[minnei] >= cutoff+1.0) { continue; }
 
       neis=igraph_inclist_get(&inclist, minnei);
       nlen=igraph_vector_int_size(neis);
@@ -2353,28 +2353,28 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     while (!igraph_dqueue_empty(&q)) {
       long int actnode=(long int) igraph_dqueue_pop(&q);
 
-      /* TODO: we could just as well 'break' here, no? */
       if (cutoff > 0 && distance[actnode] >= cutoff ) continue;
 
+      /* check the neighbors and add to them to the queue if unseen before */
       neip=igraph_inclist_get(elist_out_p, actnode);
       neino=igraph_vector_int_size(neip);
       for (i=0; i<neino; i++) {
-	igraph_integer_t edge=(igraph_integer_t) VECTOR(*neip)[i], from, to;
-	long int neighbor;
-	igraph_edge(graph, edge, &from, &to);
-	neighbor = actnode!=from ? from : to;
-	if (nrgeo[neighbor] != 0) {
-	  /* we've already seen this node, another shortest path? */
-	  if (distance[neighbor]==distance[actnode]+1) {
-	    nrgeo[neighbor]+=nrgeo[actnode];
-	  }
-	} else {
-	  /* we haven't seen this node yet */
-	  nrgeo[neighbor]+=nrgeo[actnode];
-	  distance[neighbor]=distance[actnode]+1;
-	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-	  IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
-	}
+	      igraph_integer_t edge=(igraph_integer_t) VECTOR(*neip)[i], from, to;
+	      long int neighbor;
+	      igraph_edge(graph, edge, &from, &to);
+	      neighbor = actnode!=from ? from : to;
+	      if (nrgeo[neighbor] != 0) {
+	        /* we've already seen this node, another shortest path? */
+	        if (distance[neighbor]==distance[actnode]+1) {
+	          nrgeo[neighbor]+=nrgeo[actnode];
+	        }
+	      } else {
+	        /* we haven't seen this node yet */
+	        nrgeo[neighbor]+=nrgeo[actnode];
+	        distance[neighbor]=distance[actnode]+1;
+	        IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+	        IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
+	      }
       }
     } /* while !igraph_dqueue_empty */
     
@@ -2580,31 +2580,31 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 
       VECTOR(*res)[i] += mindist;
       nodes_reached++;
-      
+
       if (cutoff>0 && mindist>=cutoff) continue;    /* NOT break!!! */
-      
+
       for (j=0; j<nlen; j++) {
-	long int edge=(long int) VECTOR(*neis)[j];
-	long int to=IGRAPH_OTHER(graph, edge, minnei);
-	igraph_real_t altdist=mindist+VECTOR(*weights)[edge];
-	igraph_real_t curdist=VECTOR(dist)[to];
-	if (curdist == 0) {
-	  /* this means curdist is infinity */
-	  cmp_result = -1;
-	} else {
-	  cmp_result = igraph_cmp_epsilon(altdist, curdist-1, eps);
-	}
-	
-	if (VECTOR(which)[to] != i+1) {
-	  /* First non-infinite distance */
-	  VECTOR(which)[to]=i+1;
-	  VECTOR(dist)[to]=altdist+1.0;
-	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
-	} else if (cmp_result < 0) {
-	  /* This is a shorter path */
-	  VECTOR(dist)[to]=altdist+1.0;
-	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
-	}
+	      long int edge=(long int) VECTOR(*neis)[j];
+	      long int to=IGRAPH_OTHER(graph, edge, minnei);
+	      igraph_real_t altdist=mindist+VECTOR(*weights)[edge];
+	      igraph_real_t curdist=VECTOR(dist)[to];
+	      if (curdist == 0) {
+	        /* this means curdist is infinity */
+	        cmp_result = -1;
+	      } else {
+	        cmp_result = igraph_cmp_epsilon(altdist, curdist-1, eps);
+	      }
+
+	      if (VECTOR(which)[to] != i+1) {
+	        /* First non-infinite distance */
+	        VECTOR(which)[to]=i+1;
+	        VECTOR(dist)[to]=altdist+1.0;
+	        IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
+	      } else if (cmp_result < 0) {
+	        /* This is a shorter path */
+	        VECTOR(dist)[to]=altdist+1.0;
+	        IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
+	      }
       }
 
     } /* !igraph_2wheap_empty(&Q) */
@@ -2763,8 +2763,9 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
       
       VECTOR(*res)[i] += actdist;
 
-      if (cutoff>0 && actdist>=cutoff) continue;   /* NOT break!!! */
+      if (cutoff > 0 && actdist >= cutoff) continue;   /* NOT break!!! */
 
+      /* check the neighbors */
       neis=igraph_adjlist_get(&allneis, act);
       for (j=0; j<igraph_vector_int_size(neis); j++) {
         long int neighbor=(long int) VECTOR(*neis)[j];
