@@ -3507,7 +3507,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_vector_t edges;
   igraph_vector_t cumsum;
   igraph_real_t sum;
-  long int i,j;
+  long int i,j,nnval;
   
   if (igraph_vector_size(types) != nodes) {
       IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
@@ -3529,19 +3529,38 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   
   /* first node */
   VECTOR(cumsum)[0]=0;
-  sum=VECTOR(cumsum)[1]=VECTOR(*pref)[ (long int) VECTOR(*types)[0] ];
+  long int type=(long int) VECTOR(*types)[0];
+  if (type >= igraph_vector_size(pref)) {
+    IGRAPH_ERROR("pref is too short for the given types", IGRAPH_EINVAL);
+  }
+  nnval=VECTOR(*pref)[type];
+  if(nnval < 0) {
+      IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+  }
+  sum=VECTOR(cumsum)[1]=nnval;
   
   RNG_BEGIN();
 
   for (i=1; i<nodes; i++) {
     for (j=0; j<edges_per_step; j++) {
       long int to;
-      igraph_real_t r=RNG_UNIF(0,sum);
-      igraph_vector_binsearch(&cumsum, r, &to);
-        igraph_vector_push_back(&edges, i);
+      if(sum > 0) {
+        igraph_vector_binsearch(&cumsum, RNG_UNIF(0,sum), &to);
+      } else {
+        to=i+1;
+      }
+      igraph_vector_push_back(&edges, i);
       igraph_vector_push_back(&edges, to-1);
     }
-    sum+=VECTOR(*pref)[(long int) VECTOR(*types)[i] ];
+    type=(long int) VECTOR(*types)[i];
+    if (type >= igraph_vector_size(pref)) {
+      IGRAPH_ERROR("pref is too short for the given types", IGRAPH_EINVAL);
+    }
+    nnval=VECTOR(*pref)[type]
+    if (nnval < 0) {
+      IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+    }
+    sum+=nnval;
     igraph_vector_push_back(&cumsum, sum);
   }
   
@@ -3612,8 +3631,8 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_i_citing_cited_type_game_struct_t str = { 0, 0 };
   igraph_psumtree_t *sumtrees;
   igraph_vector_t sums;
-  long int nocats;
-  long int i, j;
+  long int nocats, type;
+  long int i, j, nnval;
 
   if (igraph_vector_size(types) != nodes) {
       IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
@@ -3647,6 +3666,9 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   /* First node */
   for (i=0; i<nocats; i++) {
     long int type=(long int) VECTOR(*types)[0];
+    if ( MATRIX(*pref, i, type) < 0) {
+      IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+    }
     igraph_psumtree_update(&sumtrees[i], 0, MATRIX(*pref, i, type));
     VECTOR(sums)[i]=MATRIX(*pref, i, type);
   }
@@ -3665,6 +3687,9 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     
     /* add i */
     for (j=0; j<nocats; j++) {
+      if ( MATRIX(*pref, j, type) < 0) {
+        IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+      }
       igraph_psumtree_update(&sumtrees[j], i, MATRIX(*pref, j,  type));
       VECTOR(sums)[j] += MATRIX(*pref, j, type);
     }
