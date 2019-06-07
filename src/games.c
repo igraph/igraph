@@ -3509,7 +3509,20 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_real_t sum;
   long int i,j;
   
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  if (igraph_vector_size(types) != nodes) {
+      IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
+  }
+
+  IGRAPH_VECTOR_INIT_FINALLY(&edges,0);
+
+  /* return an empty graph is nodes is zero */
+  if (nodes == 0) {
+    igraph_create(graph, &edges, nodes, directed);
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(1);
+    return 0;
+  }
+
   IGRAPH_VECTOR_INIT_FINALLY(&cumsum, 2);
   IGRAPH_CHECK(igraph_vector_reserve(&cumsum, nodes+1));
   IGRAPH_CHECK(igraph_vector_reserve(&edges, nodes*edges_per_step));
@@ -3599,10 +3612,24 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_i_citing_cited_type_game_struct_t str = { 0, 0 };
   igraph_psumtree_t *sumtrees;
   igraph_vector_t sums;
-  long int nocats=igraph_matrix_ncol(pref);
+  long int nocats;
   long int i, j;
-  
+
+  if (igraph_vector_size(types) != nodes) {
+      IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
+  }
+
   IGRAPH_VECTOR_INIT_FINALLY(&edges,0);
+
+  /* return an empty graph is nodes is zero */
+  if (nodes == 0) {
+    igraph_create(graph, &edges, nodes, directed);
+    igraph_vector_destroy(&edges);
+    IGRAPH_FINALLY_CLEAN(2); /* str and edges */
+    return 0;
+  }
+
+  nocats=igraph_matrix_ncol(pref);
   str.sumtrees=sumtrees=igraph_Calloc(nocats, igraph_psumtree_t);  
   if (!sumtrees) {
     IGRAPH_ERROR("Citing-cited type game failed", IGRAPH_ENOMEM);
