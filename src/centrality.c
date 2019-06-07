@@ -1,23 +1,23 @@
 /* -*- mode: C -*-  */
 /* vim:set ts=2 sts=2 sw=2 et: */
-/*
+/* 
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-
+   
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
    02110-1301 USA
 
 */
@@ -42,10 +42,10 @@
 #include "bigint.h"
 #include "prpack.h"
 
-int igraph_personalized_pagerank_arpack(const igraph_t *graph,
+int igraph_personalized_pagerank_arpack(const igraph_t *graph, 
 		    igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
-		    igraph_bool_t directed, igraph_real_t damping,
+		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vector_t *reset,
 		    const igraph_vector_t *weights,
 		    igraph_arpack_options_t *options);
@@ -89,7 +89,7 @@ int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from
   igraph_adjlist_t *adjlist=extra;
   igraph_vector_int_t *neis;
   long int i, j, nlen;
-
+  
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
     nlen=igraph_vector_int_size(neis);
@@ -98,9 +98,9 @@ int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from
       long int nei=(long int) VECTOR(*neis)[j];
       to[i] += from[nei];
     }
-  }
-
-
+  }				      
+  
+  
   return 0;
 }
 
@@ -136,13 +136,13 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
 }
 
 int igraph_i_eigenvector_centrality_loop(igraph_adjlist_t *adjlist) {
-
+  
   long int i, j, k, nlen, n=igraph_adjlist_size(adjlist);
   igraph_vector_int_t *neis;
 
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(adjlist, i);
-    nlen=igraph_vector_int_size(neis);
+    nlen=igraph_vector_int_size(neis);    
     for (j=0; j<nlen && VECTOR(*neis)[j]<i; j++) ;
     for (k=j; k<nlen && VECTOR(*neis)[k]==i; k++) ;
     if (k!=j) {
@@ -158,12 +158,12 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
 					     igraph_real_t *value, igraph_bool_t scale,
 					     const igraph_vector_t *weights,
 					     igraph_arpack_options_t *options) {
-
+  
   igraph_vector_t values;
   igraph_matrix_t vectors;
   igraph_vector_t degree;
   long int i;
-
+  
   options->n=igraph_vcount(graph);
   options->start=1;		/* no random start vector */
 
@@ -202,7 +202,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
 
   IGRAPH_VECTOR_INIT_FINALLY(&degree, options->n);
-  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(),
+  IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), 
 			     IGRAPH_ALL, /*loops=*/ 0));
   RNG_BEGIN();
   for (i=0; i<options->n; i++) {
@@ -215,7 +215,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   RNG_END();
   igraph_vector_destroy(&degree);
   IGRAPH_FINALLY_CLEAN(1);
-
+  
   options->n = igraph_vcount(graph);
   options->nev = 1;
   options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
@@ -223,33 +223,33 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   options->start=1;		/* no random start vector */
 
   if (!weights) {
-
+    
     igraph_adjlist_t adjlist;
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
     IGRAPH_CHECK(igraph_i_eigenvector_centrality_loop(&adjlist));
-
+    
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
 				       &adjlist, options, 0, &values, &vectors));
 
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
-
+    
   } else {
-
+    
     igraph_inclist_t inclist;
     igraph_i_eigenvector_centrality_t data = { graph, &inclist, weights };
-
+    
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
 
     IGRAPH_CHECK(igraph_inclist_remove_duplicate(graph, &inclist));
-
+    
     IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
 				       &data, options, 0, &values, &vectors));
-
+    
     igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(1);
   }
@@ -257,7 +257,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   if (value) {
     *value=VECTOR(values)[0];
   }
-
+  
   if (vector) {
     igraph_real_t amax=0;
     long int which=0;
@@ -277,8 +277,8 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
         tmp=fabs(VECTOR(*vector)[i]);
         if (tmp>amax) { amax=tmp; which=i; }
       }
-      if (scale && amax!=0) {
-        igraph_vector_scale(vector, 1/VECTOR(*vector)[which]);
+      if (scale && amax!=0) { 
+        igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
       } else if (igraph_i_vector_mostly_negative(vector)) {
         igraph_vector_scale(vector, -1.0);
       }
@@ -294,7 +294,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
   if (options->info) {
     IGRAPH_WARNING("Non-zero return code from ARPACK routine!");
   }
-
+  
   igraph_matrix_destroy(&vectors);
   igraph_vector_destroy(&values);
   IGRAPH_FINALLY_CLEAN(2);
@@ -317,7 +317,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
 					   igraph_real_t *value, igraph_bool_t scale,
 					   const igraph_vector_t *weights,
 					   igraph_arpack_options_t *options) {
-
+  
   igraph_matrix_t values;
   igraph_matrix_t vectors;
   igraph_vector_t indegree;
@@ -389,9 +389,9 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
 
   IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
   IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
-
+  
   IGRAPH_VECTOR_INIT_FINALLY(&indegree, options->n);
-  IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(),
+  IGRAPH_CHECK(igraph_strength(graph, &indegree, igraph_vss_all(), 
 	       IGRAPH_IN, /*loops=*/ 1, weights));
   RNG_BEGIN();
   for (i=0; i<options->n; i++) {
@@ -410,11 +410,11 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_IN));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
-
+    
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality,
-				       &adjlist, options, 0, &values,
+				       &adjlist, options, 0, &values, 
 				       &vectors));
-
+    
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
   } else {
@@ -422,11 +422,11 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     igraph_i_eigenvector_centrality_t data={ graph, &inclist, weights };
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN));
-    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-
+    IGRAPH_FINALLY(igraph_inclist_destroy, &inclist); 
+    
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_eigenvector_centrality2,
 				       &data, options, 0, &values, &vectors));
-
+    
     igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(1);
   }
@@ -455,8 +455,8 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
         tmp=fabs(VECTOR(*vector)[i]);
         if (tmp>amax) { amax=tmp; which=i; }
       }
-      if (scale && amax!=0) {
-        igraph_vector_scale(vector, 1/VECTOR(*vector)[which]);
+      if (scale && amax!=0) { 
+        igraph_vector_scale(vector, 1/VECTOR(*vector)[which]); 
       } else if (igraph_i_vector_mostly_negative(vector)) {
         igraph_vector_scale(vector, -1.0);
       }
@@ -472,10 +472,10 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
   if (options->info) {
     IGRAPH_WARNING("Non-zero return code from ARPACK routine!");
   }
-
+  
   igraph_matrix_destroy(&vectors);
   igraph_matrix_destroy(&values);
-  IGRAPH_FINALLY_CLEAN(2);
+  IGRAPH_FINALLY_CLEAN(2);  
 
   return 0;
 }
@@ -483,7 +483,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
 /**
  * \function igraph_eigenvector_centrality
  * Eigenvector centrality of the vertices
- *
+ * 
  * Eigenvector centrality is a measure of the importance of a node in a
  * network. It assigns relative scores to all nodes in the network based
  * on the principle that connections to high-scoring nodes contribute
@@ -527,22 +527,22 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
  *     the real part is reported.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    <code>n</code> (number of vertices) parameter and 
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code.
- *
+ * 
  * Time complexity: depends on the input graph, usually it is O(|V|+|E|).
- *
- * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for
+ * 
+ * \sa \ref igraph_pagerank and \ref igraph_personalized_pagerank for 
  *   modifications of eigenvector centrality.
- *
+ * 
  * \example examples/simple/eigenvector_centrality.c
  */
 
-int igraph_eigenvector_centrality(const igraph_t *graph,
+int igraph_eigenvector_centrality(const igraph_t *graph, 
 				  igraph_vector_t *vector,
-				  igraph_real_t *value,
+				  igraph_real_t *value, 
 				  igraph_bool_t directed, igraph_bool_t scale,
 				  const igraph_vector_t *weights,
 				  igraph_arpack_options_t *options) {
@@ -551,7 +551,7 @@ int igraph_eigenvector_centrality(const igraph_t *graph,
     return igraph_eigenvector_centrality_directed(graph, vector, value,
 						  scale, weights, options);
   } else {
-    return igraph_eigenvector_centrality_undirected(graph, vector, value,
+    return igraph_eigenvector_centrality_undirected(graph, vector, value, 
 						    scale, weights, options);
   }
 }
@@ -582,7 +582,7 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
   igraph_vector_t *tmp = data->tmp;
   igraph_vector_int_t *neis;
   long int i, j, nlen;
-
+  
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(in, i);
     nlen=igraph_vector_int_size(neis);
@@ -592,7 +592,7 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
       VECTOR(*tmp)[i] += from[nei];
     }
   }
-
+  
   for (i=0; i<n; i++) {
     neis=igraph_adjlist_get(out, i);
     nlen=igraph_vector_int_size(neis);
@@ -601,8 +601,8 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
       long int nei=(long int) VECTOR(*neis)[j];
       to[i] += VECTOR(*tmp)[nei];
     }
-  }
-
+  }      
+  
   return 0;
 }
 
@@ -612,14 +612,14 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
                                 int n, void *extra) {
 
   igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
-  igraph_inclist_t *in = data->in;
-  igraph_inclist_t *out = data->out;
+  igraph_inclist_t *in = data->in; 
+  igraph_inclist_t *out = data->out; 
   igraph_vector_t *tmp = data->tmp;
-  const igraph_vector_t *weights = data->weights;
+  const igraph_vector_t *weights = data->weights; 
   const igraph_t *g = data->graph;
   igraph_vector_int_t *neis;
   long int i, j, nlen;
-
+  
   for (i=0; i<n; i++) {
     neis=igraph_inclist_get(in, i);
     nlen=igraph_vector_int_size(neis);
@@ -630,7 +630,7 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
       VECTOR(*tmp)[i] += from[nei] * VECTOR(*weights)[nei_edge];
     }
   }
-
+  
   for (i=0; i<n; i++) {
     neis=igraph_inclist_get(out, i);
     nlen=igraph_vector_int_size(neis);
@@ -640,8 +640,8 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
       long int nei=IGRAPH_OTHER(g, nei_edge, i);
       to[i] += VECTOR(*tmp)[nei] * VECTOR(*weights)[nei_edge];
     }
-  }
-
+  }      
+  
   return 0;
 }
 
@@ -649,7 +649,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 		       igraph_real_t *value, igraph_bool_t scale,
 			   const igraph_vector_t *weights,
 		       igraph_arpack_options_t *options, int inout) {
-
+  
   igraph_adjlist_t myinadjlist, myoutadjlist;
   igraph_inclist_t myininclist, myoutinclist;
   igraph_adjlist_t *inadjlist, *outadjlist;
@@ -694,13 +694,13 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
   options->n=igraph_vcount(graph);
   options->start=1;     /* no random start vector */
-
+  
   IGRAPH_VECTOR_INIT_FINALLY(&values, 0);
   IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
   IGRAPH_VECTOR_INIT_FINALLY(&tmp, options->n);
-
+  
   if (inout==0) {
-    inadjlist=&myinadjlist;
+    inadjlist=&myinadjlist; 
     outadjlist=&myoutadjlist;
     ininclist=&myininclist;
     outinclist=&myoutinclist;
@@ -729,13 +729,13 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 
   IGRAPH_CHECK(igraph_degree(graph, &tmp, igraph_vss_all(), IGRAPH_ALL, 0));
   for (i=0; i<options->n; i++) {
-    if (VECTOR(tmp)[i] != 0) {
+    if (VECTOR(tmp)[i] != 0) { 
       MATRIX(vectors, i, 0) = VECTOR(tmp)[i];
     } else {
       MATRIX(vectors, i, 0) = 1.0;
     }
   }
-
+	
   extra.in=inadjlist; extra.out=outadjlist; extra.tmp=&tmp;
   extra2.in=ininclist; extra2.out=outinclist; extra2.tmp=&tmp;
   extra2.graph=graph; extra2.weights=weights;
@@ -761,7 +761,7 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
   igraph_vector_destroy(&tmp);
   IGRAPH_FINALLY_CLEAN(1);
 
-  if (value) {
+  if (value) { 
     *value = VECTOR(values)[0];
   }
 
@@ -788,25 +788,25 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
 		  VECTOR(*vector)[i] = 0;
     }
   }
-
+  
   if (options->info) {
     IGRAPH_WARNING("Non-zero return code from ARPACK routine!");
   }
   igraph_matrix_destroy(&vectors);
   igraph_vector_destroy(&values);
   IGRAPH_FINALLY_CLEAN(2);
-
+  
   return 0;
 }
 
 /**
  * \function igraph_hub_score
  * Kleinberg's hub scores
- *
+ * 
  * The hub scores of the vertices are defined as the principal
  * eigenvector of <code>A*A^T</code>, where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
- * </para><para>
+ * </para><para> 
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
  * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
@@ -824,14 +824,14 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
  *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    <code>n</code> (number of vertices) parameter and 
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code.
- *
+ * 
  * Time complexity: depends on the input graph, usually it is O(|V|),
  * the number of vertices.
- *
+ * 
  * \sa \ref igraph_authority_score() for the companion measure,
  * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
  * \ref igraph_eigenvector_centrality() for similar measures.
@@ -848,11 +848,11 @@ int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
 /**
  * \function igraph_authority_score
  * Kleinerg's authority scores
- *
+ * 
  * The authority scores of the vertices are defined as the principal
  * eigenvector of <code>A^T*A</code>, where <code>A</code> is the adjacency
  * matrix of the graph, <code>A^T</code> is its transposed.
- * </para><para>
+ * </para><para> 
  * See the following reference on the meaning of this score:
  * J. Kleinberg. Authoritative sources in a hyperlinked
  * environment. \emb Proc. 9th ACM-SIAM Symposium on Discrete
@@ -870,19 +870,19 @@ int igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
  *     giving the weights of the edges.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    <code>n</code> (number of vertices) parameter and 
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code.
- *
+ * 
  * Time complexity: depends on the input graph, usually it is O(|V|),
  * the number of vertices.
- *
+ * 
  * \sa \ref igraph_hub_score() for the companion measure,
  * \ref igraph_pagerank(), \ref igraph_personalized_pagerank(),
  * \ref igraph_eigenvector_centrality() for similar measures.
  */
-
+			    
 int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
 			   igraph_real_t *value, igraph_bool_t scale,
 			   const igraph_vector_t *weights,
@@ -912,7 +912,7 @@ typedef struct igraph_i_pagerank_data2_t {
 
 int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
 		      int n, void *extra) {
-
+  
   igraph_i_pagerank_data_t *data=extra;
   igraph_adjlist_t *adjlist=data->adjlist;
   igraph_vector_t *outdegree=data->outdegree;
@@ -997,7 +997,7 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
     sumfrom += VECTOR(*outdegree)[i]!=0 ? from[i] * fact : from[i];
     VECTOR(*tmp)[i] = from[i] / VECTOR(*outdegree)[i];
   }
-
+  
   for (i=0; i<n; i++) {
     neis=igraph_inclist_get(inclist, i);
     nlen=igraph_vector_int_size(neis);
@@ -1056,14 +1056,14 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * the PageRank for only some of the vertices does not result in any
  * performance increase at all.
  * </para>
- *
+ * 
  * <para>
  * For the explanation of the PageRank algorithm, see the following
  * webpage:
  * http://infolab.stanford.edu/~backrub/google.html , or the
  * following reference:
  * </para>
- *
+ * 
  * <para>
  * Sergey Brin and Larry Page: The Anatomy of a Large-Scale Hypertextual
  * Web Search Engine. Proceedings of the 7th World-Wide Web Conference,
@@ -1098,35 +1098,35 @@ int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  *    calculated based on the degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
+ *         temporary data. 
  *         \c IGRAPH_EINVVID, invalid vertex id in
- *         \p vids.
- *
+ *         \p vids. 
+ * 
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
- *
- * \sa \ref igraph_pagerank_old() for the old implementation,
+ * 
+ * \sa \ref igraph_pagerank_old() for the old implementation, 
  * \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
  * for the personalized PageRank measure, \ref igraph_arpack_rssolve() and
  * \ref igraph_arpack_rnsolve() for the underlying machinery.
- *
+ * 
  * \example examples/simple/igraph_pagerank.c
  */
 
 int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
 		    igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
-		    igraph_bool_t directed, igraph_real_t damping,
+		    igraph_bool_t directed, igraph_real_t damping, 
 		    const igraph_vector_t *weights, void *options) {
-  return igraph_personalized_pagerank(graph, algo, vector, value, vids,
-				      directed, damping, 0, weights,
+  return igraph_personalized_pagerank(graph, algo, vector, value, vids, 
+				      directed, damping, 0, weights, 
 				      options);
 }
 
 /**
  * \function igraph_personalized_pagerank_vs
  * \brief Calculates the personalized Google PageRank for the specified vertices.
- *
+ * 
  * The personalized PageRank is similar to the original PageRank measure, but the
  * random walk is reset in every step with probability 1-damping to a non-uniform
  * distribution (instead of the uniform distribution in the original PageRank measure.
@@ -1137,7 +1137,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * application of personalized PageRank is when the random walk is reset to the same
  * vertex every time - this can easily be achieved using \ref igraph_vss_1() which
  * generates a vertex sequence containing only a single vertex.
- *
+ * 
  * </para><para>
  * Please note that the personalized PageRank of a given vertex depends on the
  * personalized PageRank of all other vertices, so even if you want to calculate
@@ -1145,7 +1145,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * calculated. Requesting the personalized PageRank for only some of the vertices
  * does not result in any performance increase at all.
  * </para>
- *
+ * 
  * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
@@ -1176,23 +1176,23 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  *    calculated based on the degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
+ *         temporary data. 
  *         \c IGRAPH_EINVVID, invalid vertex id in
  *         \p vids or an empty reset vertex sequence in
  *         \p vids_reset.
- *
+ * 
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
- *
- * \sa \ref igraph_pagerank() for the non-personalized implementation,
+ * 
+ * \sa \ref igraph_pagerank() for the non-personalized implementation, 
  * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
  * the underlying machinery.
  */
 
-int igraph_personalized_pagerank_vs(const igraph_t *graph,
+int igraph_personalized_pagerank_vs(const igraph_t *graph, 
 		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
-		    igraph_bool_t directed, igraph_real_t damping,
+		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vs_t reset_vids,
 		    const igraph_vector_t *weights,
 		    void *options) {
@@ -1209,9 +1209,9 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
 	}
 	igraph_vit_destroy(&vit);
 	IGRAPH_FINALLY_CLEAN(1);
-
-	IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, vector,
-						  value, vids, directed,
+	
+	IGRAPH_CHECK(igraph_personalized_pagerank(graph, algo, vector, 
+						  value, vids, directed, 
 						  damping, &reset, weights,
 						  options));
 
@@ -1224,7 +1224,7 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
 /**
  * \function igraph_personalized_pagerank
  * \brief Calculates the personalized Google PageRank for the specified vertices.
- *
+ * 
  * The personalized PageRank is similar to the original PageRank measure, but the
  * random walk is reset in every step with probability 1-damping to a non-uniform
  * distribution (instead of the uniform distribution in the original PageRank measure.
@@ -1236,7 +1236,7 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * calculated. Requesting the personalized PageRank for only some of the vertices
  * does not result in any performance increase at all.
  * </para>
- *
+ * 
  * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
@@ -1270,43 +1270,43 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  *    calculated based on the degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
+ *         temporary data. 
  *         \c IGRAPH_EINVVID, invalid vertex id in
- *         \p vids or an invalid reset vector in \p reset.
- *
+ *         \p vids or an invalid reset vector in \p reset. 
+ * 
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
- *
- * \sa \ref igraph_pagerank() for the non-personalized implementation,
+ * 
+ * \sa \ref igraph_pagerank() for the non-personalized implementation, 
  * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
  * the underlying machinery.
  */
-int igraph_personalized_pagerank(const igraph_t *graph,
+int igraph_personalized_pagerank(const igraph_t *graph, 
 		    igraph_pagerank_algo_t algo, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
-		    igraph_bool_t directed, igraph_real_t damping,
+		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vector_t *reset,
 		    const igraph_vector_t *weights,
 		    void *options) {
 
   if (algo == IGRAPH_PAGERANK_ALGO_POWER) {
-    igraph_pagerank_power_options_t *o =
+    igraph_pagerank_power_options_t *o = 
       (igraph_pagerank_power_options_t *) options;
-    if (reset) {
+    if (reset) { 
       IGRAPH_WARNING("Cannot use weights with power method, "
 		     "weights will be ignored");
     }
-    return igraph_pagerank_old(graph, vector, vids, directed,
-			       o->niter, o->eps, damping,
+    return igraph_pagerank_old(graph, vector, vids, directed, 
+			       o->niter, o->eps, damping, 
 			       /*old=*/ 0);
   } else if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
     igraph_arpack_options_t *o= (igraph_arpack_options_t*) options;
     return igraph_personalized_pagerank_arpack(graph, vector, value, vids,
-					       directed, damping, reset,
+					       directed, damping, reset, 
 					       weights, o);
   } else if (algo == IGRAPH_PAGERANK_ALGO_PRPACK) {
     return igraph_personalized_pagerank_prpack(graph, vector, value, vids,
-					       directed, damping, reset,
+					       directed, damping, reset, 
 					       weights);
   } else {
     IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);
@@ -1322,7 +1322,7 @@ int igraph_personalized_pagerank(const igraph_t *graph,
  */
 int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
 		    igraph_real_t *value, const igraph_vs_t vids,
-		    igraph_bool_t directed, igraph_real_t damping,
+		    igraph_bool_t directed, igraph_real_t damping, 
 		    igraph_vector_t *reset,
 		    const igraph_vector_t *weights,
 		    igraph_arpack_options_t *options) {
@@ -1406,7 +1406,7 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
   }
 
   if (!weights) {
-
+    
     igraph_adjlist_t adjlist;
     igraph_i_pagerank_data_t data = { graph, &adjlist, damping,
 				      &outdegree, &tmp, reset };
@@ -1432,13 +1432,13 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
 
     igraph_adjlist_destroy(&adjlist);
     IGRAPH_FINALLY_CLEAN(1);
-
+    
   } else {
-
+    
     igraph_inclist_t inclist;
     igraph_bool_t negative_weight_warned = 0;
     igraph_i_pagerank_data2_t data = { graph, &inclist, weights,
-				       damping, &outdegree, &tmp, reset };
+				       damping, &outdegree, &tmp, reset };    
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -1455,7 +1455,7 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
       }
       VECTOR(outdegree)[from] += weight;
       VECTOR(indegree) [to]   += weight;
-      if (!directed) {
+      if (!directed) { 
         VECTOR(outdegree)[to]   += weight;
         VECTOR(indegree) [from] += weight;
       }
@@ -1468,10 +1468,10 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
       else
         MATRIX(vectors, i, 0) = 1;
     }
-
+    
     IGRAPH_CHECK(igraph_arpack_rnsolve(igraph_i_pagerank2,
 				       &data, options, 0, &values, &vectors));
-
+    
     igraph_inclist_destroy(&inclist);
     IGRAPH_FINALLY_CLEAN(1);
   }
@@ -1486,14 +1486,14 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
   if (value) {
     *value=MATRIX(values, 0, 0);
   }
-
+  
   if (vector) {
     long int i;
     igraph_vit_t vit;
     long int nodes_to_calc;
     igraph_real_t sum=0;
-
-    for (i=0; i<no_of_nodes; i++) {
+    
+    for (i=0; i<no_of_nodes; i++) { 
       sum += MATRIX(vectors, i, 0);
     }
 
@@ -1507,7 +1507,7 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
       VECTOR(*vector)[i] = MATRIX(vectors, (long int)IGRAPH_VIT_GET(vit), 0);
       VECTOR(*vector)[i] /= sum;
     }
-
+    
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
   }
@@ -1515,7 +1515,7 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
   if (options->info) {
     IGRAPH_WARNING("Non-zero return code from ARPACK routine!");
   }
-
+  
   igraph_matrix_destroy(&vectors);
   igraph_matrix_destroy(&values);
   IGRAPH_FINALLY_CLEAN(2);
@@ -1526,11 +1526,11 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
  * \ingroup structural
  * \function igraph_betweenness
  * \brief Betweenness centrality of some vertices.
- *
+ * 
  * </para><para>
  * The betweenness centrality of a vertex is the number of geodesics
  * going through it. If there are more than one geodesic between two
- * vertices, the value of these geodesics are weighted by one over the
+ * vertices, the value of these geodesics are weighted by one over the 
  * number of geodesics.
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
@@ -1539,7 +1539,7 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
  *        will be calculated.
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param weights An optional vector containing edge weights for
+ * \param weights An optional vector containing edge weights for 
  *        calculating weighted betweenness. Supply a null pointer here
  *        for unweighted betweenness.
  * \param nobigint Logical, if true, then we don't use big integers
@@ -1548,14 +1548,14 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
  *        graphs.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
+ *        temporary data. 
  *        \c IGRAPH_EINVVID, invalid vertex id passed in
- *        \p vids.
+ *        \p vids. 
  *
  * Time complexity: O(|V||E|),
- * |V| and
+ * |V| and 
  * |E| are the number of vertices and
- * edges in the graph.
+ * edges in the graph. 
  * Note that the time complexity is independent of the number of
  * vertices for which the score is calculated.
  *
@@ -1563,22 +1563,22 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
  *     of the edges in a graph. See \ref igraph_betweenness_estimate() to
  *     estimate the betweenness score of the vertices in a graph.
- *
+ * 
  * \example examples/simple/igraph_betweenness.c
  */
 int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
-		       const igraph_vs_t vids, igraph_bool_t directed,
+		       const igraph_vs_t vids, igraph_bool_t directed, 
 		       const igraph_vector_t* weights, igraph_bool_t nobigint) {
   return igraph_betweenness_estimate(graph, res, vids, directed, -1, weights,
 				     nobigint);
 }
 
-int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
-					 igraph_vector_t *res,
-					 const igraph_vs_t vids,
+int igraph_i_betweenness_estimate_weighted(const igraph_t *graph, 
+					 igraph_vector_t *res, 
+					 const igraph_vs_t vids, 
 					 igraph_bool_t directed,
-					 igraph_real_t cutoff,
-					 const igraph_vector_t *weights,
+					 igraph_real_t cutoff, 
+					 const igraph_vector_t *weights, 
 					 igraph_bool_t nobigint) {
 
   igraph_integer_t no_of_nodes=(igraph_integer_t) igraph_vcount(graph);
@@ -1600,17 +1600,13 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }
-  igraph_real_t minweight = igraph_vector_min(weights);
-  if (minweight <= 0) {
+  if (igraph_vector_min(weights) <= 0) {
     IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
-  }
-  else if (minweight <= eps) {
-    IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
   }
 
   IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
-  IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));
+  IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));  
   IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
   IGRAPH_CHECK(igraph_adjlist_init_empty(&fathers, no_of_nodes));
   IGRAPH_FINALLY(igraph_adjlist_destroy, &fathers);
@@ -1629,64 +1625,66 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(tmpres, no_of_nodes);
   }
 
-  igraph_vector_fill(&dist, -1);
   for (source=0; source<no_of_nodes; source++) {
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
 
     igraph_2wheap_push_with_index(&Q, source, 0);
-    VECTOR(dist)[source]=0.0;
+    VECTOR(dist)[source]=1.0;
     VECTOR(nrgeo)[source]=1;
-
+    
     while (!igraph_2wheap_empty(&Q)) {
       long int minnei=igraph_2wheap_max_index(&Q);
       igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
       igraph_vector_int_t *neis;
       long int nlen;
-
+      
       igraph_stack_push(&S, minnei);
-
-      if (cutoff > 0 && VECTOR(dist)[minnei] >= cutoff) { continue; }
-
+      
+      if (cutoff > 0 && VECTOR(dist)[minnei] >= cutoff+1.0) { continue; }
+      
       /* Now check all neighbors of 'minnei' for a shorter path */
       neis=igraph_inclist_get(&inclist, minnei);
       nlen=igraph_vector_int_size(neis);
       for (j=0; j<nlen; j++) {
-        long int edge=(long int) VECTOR(*neis)[j];
-        long int to=IGRAPH_OTHER(graph, edge, minnei);
-        igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
-        igraph_real_t curdist=VECTOR(dist)[to];
+	long int edge=(long int) VECTOR(*neis)[j];
+	long int to=IGRAPH_OTHER(graph, edge, minnei);
+	igraph_real_t altdist=mindist + VECTOR(*weights)[edge];
+	igraph_real_t curdist=VECTOR(dist)[to];
 
-        if (curdist < 0) {
-          /* This is the first non-infinite distance */
-          igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
-          igraph_vector_int_resize(v,1);
-          VECTOR(*v)[0]=minnei;
-          VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
+	if (curdist == 0) {
+	  /* this means curdist is infinity */
+	  cmp_result = -1;
+	} else {
+	  cmp_result = igraph_cmp_epsilon(altdist, curdist-1, eps);
+	}
+	
+	if (curdist==0) {
+	  /* This is the first non-infinite distance */
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_resize(v,1);
+	  VECTOR(*v)[0]=minnei;
+	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
-          VECTOR(dist)[to]=altdist;
-          IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
-        } else {
+	  VECTOR(dist)[to]=altdist+1.0;
+	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
+	} else if (cmp_result < 0) {
+	  /* This is a shorter path */
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_resize(v,1);
+	  VECTOR(*v)[0]=minnei;
+	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
-          cmp_result = igraph_cmp_epsilon(altdist, curdist, eps);
-
-          if (cmp_result < 0) {
-            /* This is a shorter path */
-            igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
-            igraph_vector_int_resize(v,1);
-            VECTOR(*v)[0]=minnei;
-            VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
-
-            VECTOR(dist)[to]=altdist;
-            IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
-          } else if (cmp_result == 0) {
-            igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
-            igraph_vector_int_push_back(v, minnei);
-            VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
-          }
-        }
+	  VECTOR(dist)[to]=altdist+1.0;
+	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
+	} else if (cmp_result == 0) {
+	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
+	  igraph_vector_int_push_back(v, minnei);
+	  VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
+	}
       }
-    }/* !igraph_2wheap_empty(&Q) */
+      
+    } /* !igraph_2wheap_empty(&Q) */
 
     while (!igraph_stack_empty(&S)) {
       long int w=(long int) igraph_stack_pop(&S);
@@ -1703,22 +1701,22 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(nrgeo)[w]=0;
       igraph_vector_int_clear(igraph_adjlist_get(&fathers, w));
     }
-
+    
   } /* source < no_of_nodes */
 
   if (!igraph_vs_is_all(&vids)) {
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
-
+    
     for (j=0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);
 	 IGRAPH_VIT_NEXT(vit), j++) {
       long int node=IGRAPH_VIT_GET(vit);
       VECTOR(*res)[j] = VECTOR(*tmpres)[node];
     }
-
+    
     no_of_nodes = (igraph_integer_t) j;
-
+    
     igraph_vit_destroy(&vit);
     igraph_vector_destroy(tmpres);
     IGRAPH_FINALLY_CLEAN(2);
@@ -1729,7 +1727,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       VECTOR(*res)[j] /= 2.0;
     }
   }
-
+  
   IGRAPH_PROGRESS("Betweenness centrality: ", 100.0, 0);
 
   igraph_vector_destroy(&nrgeo);
@@ -1740,7 +1738,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_inclist_destroy(&inclist);
   igraph_2wheap_destroy(&Q);
   IGRAPH_FINALLY_CLEAN(7);
-
+  
   return 0;
 }
 
@@ -1757,11 +1755,11 @@ void igraph_i_destroy_biguints(igraph_biguint_t *p) {
  * \ingroup structural
  * \function igraph_betweenness_estimate
  * \brief Estimated betweenness centrality of some vertices.
- *
+ * 
  * </para><para>
  * The betweenness centrality of a vertex is the number of geodesics
  * going through it. If there are more than one geodesic between two
- * vertices, the value of these geodesics are weighted by one over the
+ * vertices, the value of these geodesics are weighted by one over the 
  * number of geodesics. When estimating betweenness centrality, igraph
  * takes into consideration only those paths that are shorter than or
  * equal to a prescribed length. Note that the estimated centrality
@@ -1777,7 +1775,7 @@ void igraph_i_destroy_biguints(igraph_biguint_t *p) {
  * \param cutoff The maximal length of paths that will be considered.
  *        If zero or negative, the exact betweenness will be calculated
  *        (no upper limit on path lengths).
- * \param weights An optional vector containing edge weights for
+ * \param weights An optional vector containing edge weights for 
  *        calculating weighted betweenness. Supply a null pointer here
  *        for unweighted betweenness.
  * \param nobigint Logical, if true, then we don't use big integers
@@ -1786,14 +1784,14 @@ void igraph_i_destroy_biguints(igraph_biguint_t *p) {
  *        graphs.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
+ *        temporary data. 
  *        \c IGRAPH_EINVVID, invalid vertex id passed in
- *        \p vids.
+ *        \p vids. 
  *
  * Time complexity: O(|V||E|),
- * |V| and
+ * |V| and 
  * |E| are the number of vertices and
- * edges in the graph.
+ * edges in the graph. 
  * Note that the time complexity is independent of the number of
  * vertices for which the score is calculated.
  *
@@ -1801,10 +1799,10 @@ void igraph_i_destroy_biguints(igraph_biguint_t *p) {
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
  *     of the edges in a graph.
  */
-int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
+int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 				const igraph_vs_t vids, igraph_bool_t directed,
-				igraph_real_t cutoff,
-				const igraph_vector_t *weights,
+				igraph_real_t cutoff, 
+				const igraph_vector_t *weights, 
 				igraph_bool_t nobigint) {
 
   long int no_of_nodes=igraph_vcount(graph);
@@ -1826,7 +1824,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   igraph_biguint_t D, R, T;
 
-  if (weights) {
+  if (weights) { 
     return igraph_i_betweenness_estimate_weighted(graph, res, vids, directed,
 						cutoff, weights, nobigint);
   }
@@ -1860,7 +1858,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   for (j=0; j<no_of_nodes; j++) {
     igraph_vector_int_clear(igraph_adjlist_get(adjlist_in_p, j));
   }
-
+  
   distance=igraph_Calloc(no_of_nodes, long int);
   if (distance==0) {
     IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
@@ -1899,27 +1897,27 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
   igraph_stack_init(&stack, no_of_nodes);
   IGRAPH_FINALLY(igraph_stack_destroy, &stack);
-
+    
   /* here we go */
-
+  
   for (source=0; source<no_of_nodes; source++) {
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
 
     IGRAPH_CHECK(igraph_dqueue_push(&q, source));
-    if (nobigint) {
+    if (nobigint) { 
       nrgeo[source]=1;
     } else {
       igraph_biguint_set_limb(&big_nrgeo[source], 1);
     }
     distance[source]=1;
-
+    
     while (!igraph_dqueue_empty(&q)) {
       long int actnode=(long int) igraph_dqueue_pop(&q);
       IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
 
       if (cutoff > 0 && distance[actnode] >= cutoff+1) { continue; }
-
+      
       neis = igraph_adjlist_get(adjlist_out_p, actnode);
       nneis = igraph_vector_int_size(neis);
       for (j=0; j<nneis; j++) {
@@ -1927,22 +1925,22 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
         if (distance[neighbor]==0) {
 	  distance[neighbor]=distance[actnode]+1;
 	  IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-	}
+	} 
 	if (distance[neighbor]==distance[actnode]+1) {
-	  igraph_vector_int_t *v=igraph_adjlist_get(adjlist_in_p,
+	  igraph_vector_int_t *v=igraph_adjlist_get(adjlist_in_p, 
 						    neighbor);
 	  igraph_vector_int_push_back(v, actnode);
-	  if (nobigint) {
+	  if (nobigint) { 
 	    nrgeo[neighbor]+=nrgeo[actnode];
 	  } else {
 	    IGRAPH_CHECK(igraph_biguint_add(&big_nrgeo[neighbor],
-					    &big_nrgeo[neighbor],
+					    &big_nrgeo[neighbor], 
 					    &big_nrgeo[actnode]));
 	  }
 	}
       }
     } /* while !igraph_dqueue_empty */
-
+    
     /* Ok, we've the distance of each node and also the number of
        shortest paths to them. Now we do an inverse search, starting
        with the farthest nodes. */
@@ -1961,19 +1959,19 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 	  } else {
 	    double div;
 	    limb_t shift=1000000000L;
-	    IGRAPH_CHECK(igraph_biguint_mul_limb(&T, &big_nrgeo[neighbor],
-						 shift));
+	    IGRAPH_CHECK(igraph_biguint_mul_limb(&T, &big_nrgeo[neighbor], 
+						 shift));	  
 	    igraph_biguint_div(&D, &R, &T, &big_nrgeo[actnode]);
 	    div=igraph_biguint_get(&D) / shift;
 	    tmpscore[neighbor] += (tmpscore[actnode]+1) * div;
 	  }
 	}
       }
-
+      
       if (actnode != source) { VECTOR(*tmpres)[actnode] += tmpscore[actnode]; }
 
       distance[actnode]=0;
-      if (nobigint) {
+      if (nobigint) { 
 	nrgeo[actnode]=0;
       } else {
 	igraph_biguint_set_limb(&big_nrgeo[actnode], 0);
@@ -1989,7 +1987,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   /* clean  */
   igraph_Free(distance);
   if (nobigint) {
-    igraph_Free(nrgeo);
+    igraph_Free(nrgeo); 
   } else {
     igraph_biguint_destroy(&T);
     igraph_biguint_destroy(&R);
@@ -1998,13 +1996,13 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     igraph_i_destroy_biguints(big_nrgeo);
   }
   igraph_Free(tmpscore);
-
+  
   igraph_dqueue_destroy(&q);
   igraph_stack_destroy(&stack);
   IGRAPH_FINALLY_CLEAN(5);
 
   /* Keep only the requested vertices */
-  if (!igraph_vs_is_all(&vids)) {
+  if (!igraph_vs_is_all(&vids)) { 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
     IGRAPH_CHECK(igraph_vector_resize(res, IGRAPH_VIT_SIZE(vit)));
@@ -2018,7 +2016,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     igraph_vit_destroy(&vit);
     igraph_vector_destroy(tmpres);
     IGRAPH_FINALLY_CLEAN(2);
-  }
+  }     
 
   /* divide by 2 for undirected graph */
   if (!directed) {
@@ -2027,7 +2025,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
       VECTOR(*res)[j] /= 2.0;
     }
   }
-
+  
   igraph_adjlist_destroy(&adjlist_out);
   igraph_adjlist_destroy(&adjlist_in);
   IGRAPH_FINALLY_CLEAN(2);
@@ -2035,9 +2033,9 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
   return 0;
 }
 
-int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
+int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph, 
 					      igraph_vector_t *result,
-					      igraph_bool_t directed,
+					      igraph_bool_t directed, 
 					      igraph_real_t cutoff,
 					      const igraph_vector_t *weights) {
   igraph_integer_t no_of_nodes=(igraph_integer_t) igraph_vcount(graph);
@@ -2059,7 +2057,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
   if (igraph_vector_min(weights) < 0) {
     IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
   }
-
+  
   IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));
   IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
   IGRAPH_CHECK(igraph_inclist_init_empty(&fathers, no_of_nodes));
@@ -2083,15 +2081,15 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
     IGRAPH_ALLOW_INTERRUPTION();
 
 /*     printf("source: %li\n", source); */
-
+    
     igraph_vector_null(&distance);
     igraph_vector_null(&tmpscore);
     igraph_vector_long_null(&nrgeo);
-
+    
     igraph_2wheap_push_with_index(&Q, source, 0);
     VECTOR(distance)[source]=1.0;
     VECTOR(nrgeo)[source]=1;
-
+    
     while (!igraph_2wheap_empty(&Q)) {
       long int minnei=igraph_2wheap_max_index(&Q);
       igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
@@ -2100,7 +2098,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 
       /* printf("SP to %li is final, dist: %g, nrgeo: %li\n", minnei, */
       /* VECTOR(distance)[minnei]-1.0, VECTOR(nrgeo)[minnei]); */
-
+      
       igraph_stack_push(&S, minnei);
 
       if (cutoff > 0 && VECTOR(distance)[minnei] >= cutoff+1.0) { continue; }
@@ -2119,7 +2117,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	} else {
 	  cmp_result = igraph_cmp_epsilon(altdist, curdist-1, eps);
 	}
-
+	
 	/* printf("to=%ld, altdist = %lg, curdist = %lg, cmp = %d\n",
 	  to, altdist, curdist-1, cmp_result); */
 	if (curdist == 0) {
@@ -2147,7 +2145,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	  VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
 	}
       }
-
+	  
     } /* igraph_2wheap_empty(&Q) */
 
     while (!igraph_stack_empty(&S)) {
@@ -2161,17 +2159,17 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	VECTOR(tmpscore)[neighbor] += ((double)VECTOR(nrgeo)[neighbor]) /
 	  VECTOR(nrgeo)[w] * (1.0+VECTOR(tmpscore)[w]);
 	/* printf("Scoring %li (edge %li)\n", neighbor, fedge); */
-	VECTOR(*result)[fedge] +=
-	  ((VECTOR(tmpscore)[w]+1) * VECTOR(nrgeo)[neighbor]) /
+	VECTOR(*result)[fedge] += 
+	  ((VECTOR(tmpscore)[w]+1) * VECTOR(nrgeo)[neighbor]) / 
 	  VECTOR(nrgeo)[w];
       }
-
+      
       VECTOR(tmpscore)[w]=0;
       VECTOR(distance)[w]=0;
       VECTOR(nrgeo)[w]=0;
       igraph_vector_int_clear(fatv);
     }
-
+    
   } /* source < no_of_nodes */
 
   if (!directed || !igraph_is_directed(graph)) {
@@ -2185,14 +2183,14 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
   igraph_stack_destroy(&S);
   igraph_2wheap_destroy(&Q);
   IGRAPH_FINALLY_CLEAN(2);
-
+  
   igraph_inclist_destroy(&inclist);
-  igraph_inclist_destroy(&fathers);
+  igraph_inclist_destroy(&fathers);  
   igraph_vector_destroy(&distance);
   igraph_vector_destroy(&tmpscore);
   igraph_vector_long_destroy(&nrgeo);
   IGRAPH_FINALLY_CLEAN(5);
-
+  
   return 0;
 }
 
@@ -2200,11 +2198,11 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
  * \ingroup structural
  * \function igraph_edge_betweenness
  * \brief Betweenness centrality of the edges.
- *
+ * 
  * </para><para>
  * The betweenness centrality of an edge is the number of geodesics
  * going through it. If there are more than one geodesics between two
- * vertices, the value of these geodesics are weighted by one over the
+ * vertices, the value of these geodesics are weighted by one over the 
  * number of geodesics.
  * \param graph The graph object.
  * \param result The result of the computation, vector containing the
@@ -2213,27 +2211,27 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional weight vector for weighted edge
  *        betweenness. Supply a null pointer here for the unweighted
- *        version.
+ *        version. 
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
+ *        temporary data. 
  *
  * Time complexity: O(|V||E|),
  * |V| and
  * |E| are the number of vertices and
- * edges in the graph.
+ * edges in the graph. 
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
  *     of the edges in a graph. See \ref igraph_edge_betweenness_estimate() to
  *     estimate the betweenness score of the edges in a graph.
- *
+ * 
  * \example examples/simple/igraph_edge_betweenness.c
  */
 int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
-                            igraph_bool_t directed,
+                            igraph_bool_t directed, 
 			    const igraph_vector_t *weights) {
-  return igraph_edge_betweenness_estimate(graph, result, directed, -1,
+  return igraph_edge_betweenness_estimate(graph, result, directed, -1, 
 					  weights);
 }
 
@@ -2241,11 +2239,11 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * \ingroup structural
  * \function igraph_edge_betweenness_estimate
  * \brief Estimated betweenness centrality of the edges.
- *
+ * 
  * </para><para>
  * The betweenness centrality of an edge is the number of geodesics
  * going through it. If there are more than one geodesics between two
- * vertices, the value of these geodesics are weighted by one over the
+ * vertices, the value of these geodesics are weighted by one over the 
  * number of geodesics. When estimating betweenness centrality, igraph
  * takes into consideration only those paths that are shorter than or
  * equal to a prescribed length. Note that the estimated centrality
@@ -2263,12 +2261,12 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  *        betweenness.
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
- *        temporary data.
+ *        temporary data. 
  *
  * Time complexity: O(|V||E|),
  * |V| and
  * |E| are the number of vertices and
- * edges in the graph.
+ * edges in the graph. 
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
  *     See \ref igraph_betweenness() for calculating the betweenness score
@@ -2293,8 +2291,8 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   long int neino;
   long int i;
 
-  if (weights) {
-    return igraph_i_edge_betweenness_estimate_weighted(graph, result,
+  if (weights) { 
+    return igraph_i_edge_betweenness_estimate_weighted(graph, result, 
 						     directed, cutoff, weights);
   }
 
@@ -2311,7 +2309,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     IGRAPH_FINALLY(igraph_inclist_destroy, &elist_out);
     elist_out_p=elist_in_p=&elist_out;
   }
-
+  
   distance=igraph_Calloc(no_of_nodes, long int);
   if (distance==0) {
     IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
@@ -2337,7 +2335,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
   igraph_vector_null(result);
 
   /* here we go */
-
+  
   for (source=0; source<no_of_nodes; source++) {
     IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
@@ -2346,12 +2344,12 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     memset(nrgeo, 0, (size_t) no_of_nodes*sizeof(unsigned long long int));
     memset(tmpscore, 0, (size_t) no_of_nodes*sizeof(double));
     igraph_stack_clear(&stack); /* it should be empty anyway... */
-
+    
     IGRAPH_CHECK(igraph_dqueue_push(&q, source));
-
+      
     nrgeo[source]=1;
     distance[source]=0;
-
+    
     while (!igraph_dqueue_empty(&q)) {
       long int actnode=(long int) igraph_dqueue_pop(&q);
 
@@ -2379,14 +2377,14 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
 	      }
       }
     } /* while !igraph_dqueue_empty */
-
+    
     /* Ok, we've the distance of each node and also the number of
        shortest paths to them. Now we do an inverse search, starting
        with the farthest nodes. */
     while (!igraph_stack_empty(&stack)) {
       long int actnode=(long int) igraph_stack_pop(&stack);
       if (distance[actnode]<1) { continue; } /* skip source node */
-
+      
       /* set the temporary score of the friends */
       neip=igraph_inclist_get(elist_in_p, actnode);
       neino=igraph_vector_int_size(neip);
@@ -2432,7 +2430,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
       VECTOR(*result)[j] /= 2.0;
     }
   }
-
+  
   return 0;
 }
 
@@ -2454,7 +2452,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  * geodesic. This is longer than the longest possible geodesic in case
  * of unweighted graphs, but may not be so in weighted graphs, so it is
  * best not to use this function on weighted graphs.
- *
+ * 
  * </para><para>
  * If the graph has a single vertex only, the closeness centrality of
  * that single vertex will be NaN (because we are essentially dividing
@@ -2466,12 +2464,12 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  * \param vids Vector giving the vertices for which the closeness
  *        centrality scores will be computed.
  * \param mode The type of shortest paths to be used for the
- *        calculation in directed graphs. Possible values:
+ *        calculation in directed graphs. Possible values: 
  *        \clist
- *        \cli IGRAPH_OUT
- *          the lengths of the outgoing paths are calculated.
- *        \cli IGRAPH_IN
- *          the lengths of the incoming paths are calculated.
+ *        \cli IGRAPH_OUT 
+ *          the lengths of the outgoing paths are calculated. 
+ *        \cli IGRAPH_IN 
+ *          the lengths of the incoming paths are calculated. 
  *        \cli IGRAPH_ALL
  *          the directed graph is considered as an
  *          undirected one for the computation.
@@ -2492,43 +2490,43 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  *        \endclist
  *
  * Time complexity: O(n|E|),
- * n is the number
+ * n is the number 
  * of vertices for which the calculation is done and
- * |E| is the number
+ * |E| is the number 
  * of edges in the graph.
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
  *   See \ref igraph_closeness_estimate() to estimate closeness values.
  */
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
-                     const igraph_vs_t vids, igraph_neimode_t mode,
+                     const igraph_vs_t vids, igraph_neimode_t mode, 
 		     const igraph_vector_t *weights,
 		     igraph_bool_t normalized) {
   return igraph_closeness_estimate(graph, res, vids, mode, -1, weights,
 				   normalized);
 }
 
-int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
-				       igraph_vector_t *res,
-				       const igraph_vs_t vids,
+int igraph_i_closeness_estimate_weighted(const igraph_t *graph, 
+				       igraph_vector_t *res, 
+				       const igraph_vs_t vids, 
 				       igraph_neimode_t mode,
 				       igraph_real_t cutoff,
 				       const igraph_vector_t *weights,
 				       igraph_bool_t normalized) {
 
-  /* See igraph_shortest_paths_dijkstra() for the implementation
+  /* See igraph_shortest_paths_dijkstra() for the implementation 
      details and the dirty tricks. */
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-
+  
   igraph_2wheap_t Q;
   igraph_vit_t vit;
   long int nodes_to_calc;
-
+  
   igraph_lazy_inclist_t inclist;
   long int i, j;
-
+  
   igraph_vector_t dist;
   igraph_vector_long_t which;
   long int nodes_reached;
@@ -2537,20 +2535,20 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
   const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
   igraph_bool_t warning_shown = 0;
-
+  
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
   }
-
+  
   if (igraph_vector_min(weights) < 0) {
     IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
   }
-
+  
   IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-
+  
   nodes_to_calc=IGRAPH_VIT_SIZE(vit);
-
+  
   IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
   IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
   IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
@@ -2564,18 +2562,18 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
   igraph_vector_null(res);
 
   for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
-
+    
     long int source=IGRAPH_VIT_GET(vit);
     igraph_2wheap_clear(&Q);
     igraph_2wheap_push_with_index(&Q, source, 0);
     VECTOR(which)[source] = i+1;
     VECTOR(dist)[source] = 1.0;     /* actual distance is zero but we need to store distance + 1 */
     nodes_reached=0;
-
+    
     while (!igraph_2wheap_empty(&Q)) {
       igraph_integer_t minnei=(igraph_integer_t) igraph_2wheap_max_index(&Q);
       igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
-
+      
       /* Now check all neighbors of minnei for a shorter path */
       igraph_vector_t *neis=igraph_lazy_inclist_get(&inclist, minnei);
       long int nlen=igraph_vector_size(neis);
@@ -2660,19 +2658,19 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  * Since the estimation considers vertex pairs with a distance greater than
  * the given value as disconnected, the resulting estimation will always be
  * lower than the actual closeness centrality.
- *
+ * 
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        closeness centrality scores for the given vertices.
  * \param vids Vector giving the vertices for which the closeness
  *        centrality scores will be computed.
  * \param mode The type of shortest paths to be used for the
- *        calculation in directed graphs. Possible values:
+ *        calculation in directed graphs. Possible values: 
  *        \clist
- *        \cli IGRAPH_OUT
- *          the lengths of the outgoing paths are calculated.
- *        \cli IGRAPH_IN
- *          the lengths of the incoming paths are calculated.
+ *        \cli IGRAPH_OUT 
+ *          the lengths of the outgoing paths are calculated. 
+ *        \cli IGRAPH_IN 
+ *          the lengths of the incoming paths are calculated. 
  *        \cli IGRAPH_ALL
  *          the directed graph is considered as an
  *          undirected one for the computation.
@@ -2696,14 +2694,14 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  *        \endclist
  *
  * Time complexity: O(n|E|),
- * n is the number
+ * n is the number 
  * of vertices for which the calculation is done and
- * |E| is the number
+ * |E| is the number 
  * of edges in the graph.
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
  */
-int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
+int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res, 
 		              const igraph_vs_t vids, igraph_neimode_t mode,
                               igraph_real_t cutoff,
 			      const igraph_vector_t *weights,
@@ -2717,13 +2715,13 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_adjlist_t allneis;
 
   igraph_dqueue_t q;
-
+  
   long int nodes_to_calc;
   igraph_vit_t vit;
 
   igraph_bool_t warning_shown = 0;
-
-  if (weights) {
+  
+  if (weights) { 
     return igraph_i_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
 						weights, normalized);
   }
@@ -2732,8 +2730,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
   nodes_to_calc=IGRAPH_VIT_SIZE(vit);
-
-  if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
+  
+  if (mode != IGRAPH_OUT && mode != IGRAPH_IN && 
       mode != IGRAPH_ALL) {
     IGRAPH_ERROR("calculating closeness", IGRAPH_EINVMODE);
   }
@@ -2746,9 +2744,9 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
   IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
   igraph_vector_null(res);
-
-  for (IGRAPH_VIT_RESET(vit), i=0;
-       !IGRAPH_VIT_END(vit);
+  
+  for (IGRAPH_VIT_RESET(vit), i=0; 
+       !IGRAPH_VIT_END(vit); 
        IGRAPH_VIT_NEXT(vit), i++) {
     igraph_dqueue_clear(&q);
     IGRAPH_CHECK(igraph_dqueue_push(&q, IGRAPH_VIT_GET(vit)));
@@ -2758,11 +2756,11 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
     IGRAPH_PROGRESS("Closeness: ", 100.0*i/no_of_nodes, NULL);
     IGRAPH_ALLOW_INTERRUPTION();
-
+    
     while (!igraph_dqueue_empty(&q)) {
       long int act=(long int) igraph_dqueue_pop(&q);
       long int actdist=(long int) igraph_dqueue_pop(&q);
-
+      
       VECTOR(*res)[i] += actdist;
 
       if (cutoff > 0 && actdist >= cutoff) continue;   /* NOT break!!! */
@@ -2803,35 +2801,35 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_vit_destroy(&vit);
   igraph_adjlist_destroy(&allneis);
   IGRAPH_FINALLY_CLEAN(4);
-
+  
   return 0;
 }
 
 /**
  * \function igraph_centralization
  * Calculate the centralization score from the node level scores
- *
+ * 
  * For a centrality score defined on the vertices of a graph, it is
  * possible to define a graph level centralization index, by
  * calculating the sum of the deviation from the maximum centrality
  * score. Consequently, the higher the centralization index of the
  * graph, the more centralized the structure is.
- *
+ * 
  * </para><para>In order to make graphs of different sizes comparable,
  * the centralization index is usually normalized to a number between
  * zero and one, by dividing the (unnormalized) centralization score
  * of the most centralized structure with the same number of vertices.
- *
+ * 
  * </para><para>For most centrality indices the most centralized
  * structure is the star graph, a single center connected to all other
  * nodes in the network. There are some variation depending on whether
- * the graph is directed or not, whether loop edges are allowed, etc.
- *
+ * the graph is directed or not, whether loop edges are allowed, etc. 
+ * 
  * </para><para>
  * This function simply calculates the graph level index, if the node
  * level scores and the theoretical maximum are given. It is called by
  * all the measure-specific centralization functions.
- *
+ * 
  * \param scores A vector containing the node-level centrality
  *     scores.
  * \param theoretical_max The graph level centrality score of the most
@@ -2840,26 +2838,26 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * \param normalized Boolean, whether to normalize the centralization
  *     by dividing the supplied theoretical maximum.
  * \return The graph level index.
- *
+ * 
  * \sa \ref igraph_centralization_degree(), \ref
  * igraph_centralization_betweenness(), \ref
  * igraph_centralization_closeness(), and \ref
  * igraph_centralization_eigenvector_centrality() for specific
  * centralization functions.
- *
+ * 
  * Time complexity: O(n), the length of the score vector.
- *
+ * 
  * \example examples/simple/centralization.c
  */
 
 igraph_real_t igraph_centralization(const igraph_vector_t *scores,
 				    igraph_real_t theoretical_max,
 				    igraph_bool_t normalized) {
-
+  
   long int no_of_nodes=igraph_vector_size(scores);
   igraph_real_t maxscore=0.0;
   igraph_real_t cent=0.0;
-
+  
   if (no_of_nodes != 0) {
     maxscore = igraph_vector_max(scores);
     cent = no_of_nodes * maxscore - igraph_vector_sum(scores);
@@ -2874,7 +2872,7 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
 /**
  * \function igraph_centralization_degree
  * Calculate vertex degree and graph centralization
- *
+ * 
  * This function calculates the degree of the vertices by passing its
  * arguments to \ref igraph_degree(); and it calculates the graph
  * level centralization index based on the results by calling \ref
@@ -2897,20 +2895,20 @@ igraph_real_t igraph_centralization(const igraph_vector_t *scores,
  *     centralization score. See \ref igraph_centralization() for how
  *     the normalization is done.
  * \return Error code.
- *
+ * 
  * \sa \ref igraph_centralization(), \ref igraph_degree().
- *
+ * 
  * Time complexity: the complexity of \ref igraph_degree() plus O(n),
  * the number of vertices queried, for calculating the centralization
  * score.
  */
 
-int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
+int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res, 
 				 igraph_neimode_t mode, igraph_bool_t loops,
 				 igraph_real_t *centralization,
 				 igraph_real_t *theoretical_max,
 				 igraph_bool_t normalized) {
-
+  
   igraph_vector_t myscores;
   igraph_vector_t *scores=res;
   igraph_real_t *tmax=theoretical_max, mytmax;
@@ -2921,29 +2919,29 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
     scores=&myscores;
     IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
   }
-
+  
   IGRAPH_CHECK(igraph_degree(graph, scores, igraph_vss_all(), mode, loops));
-
-  IGRAPH_CHECK(igraph_centralization_degree_tmax(graph, 0, mode, loops,
+  
+  IGRAPH_CHECK(igraph_centralization_degree_tmax(graph, 0, mode, loops, 
 						 tmax));
 
   *centralization = igraph_centralization(scores, *tmax, normalized);
-
+  
   if (!res) {
     igraph_vector_destroy(scores);
     IGRAPH_FINALLY_CLEAN(1);
   }
-
+  
   return 0;
 }
 
-/**
+/** 
  * \function igraph_centralization_degree_tmax
  * Theoretical maximum for graph centralization based on degree
- *
+ * 
  * This function returns the theoretical maximum graph centrality
- * based on vertex degree.
- *
+ * based on vertex degree. 
+ * 
  * </para><para>
  * There are two ways to call this function, the first is to supply a
  * graph as the <code>graph</code> argument, and then the number of
@@ -2951,12 +2949,12 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
  * considered as well. The <code>nodes</code> argument is ignored in
  * this case. The <code>mode</code> argument is also ignored if the
  * supplied graph is undirected.
- *
+ * 
  * </para><para>
  * The other way is to supply a null pointer as the <code>graph</code>
  * argument. In this case the <code>nodes</code> and <code>mode</code>
  * arguments are considered.
- *
+ * 
  * </para><para>
  * The most centralized structure is the star. More specifically, for
  * undirected graphs it is the star, for directed graphs it is the
@@ -2969,19 +2967,19 @@ int igraph_centralization_degree(const igraph_t *graph, igraph_vector_t *res,
  *     (<code>IGRAPH_IN</code>), out-degree (<code>IGRAPH_OUT</code>)
  *     or total degree (<code>IGRAPH_ALL</code>). This is ignored if
  *     the <code>graph</code> argument is not a null pointer and the
- *     given graph is undirected.
+ *     given graph is undirected. 
  * \param loops Boolean scalar, whether to consider loop edges in the
- *     calculation.
+ *     calculation. 
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
- *
+ * 
  * Time complexity: O(1).
- *
+ * 
  * \sa \ref igraph_centralization_degree() and \ref
  * igraph_centralization().
  */
 
-int igraph_centralization_degree_tmax(const igraph_t *graph,
+int igraph_centralization_degree_tmax(const igraph_t *graph, 
 				      igraph_integer_t nodes,
 				      igraph_neimode_t mode,
 				      igraph_bool_t loops,
@@ -3029,7 +3027,7 @@ int igraph_centralization_degree_tmax(const igraph_t *graph,
 /**
  * \function igraph_centralization_betweenness
  * Calculate vertex betweenness and graph centralization
- *
+ * 
  * This function calculates the betweenness centrality of the vertices
  * by passing its arguments to \ref igraph_betweenness(); and it
  * calculates the graph level centralization index based on the
@@ -3053,22 +3051,22 @@ int igraph_centralization_degree_tmax(const igraph_t *graph,
  *     centralization score. See \ref igraph_centralization() for how
  *     the normalization is done.
  * \return Error code.
- *
+ * 
  * \sa \ref igraph_centralization(), \ref igraph_betweenness().
- *
+ * 
  * Time complexity: the complexity of \ref igraph_betweenness() plus
  * O(n), the number of vertices queried, for calculating the
  * centralization score.
  */
 
-int igraph_centralization_betweenness(const igraph_t *graph,
+int igraph_centralization_betweenness(const igraph_t *graph, 
 				      igraph_vector_t *res,
 				      igraph_bool_t directed,
 				      igraph_bool_t nobigint,
 				      igraph_real_t *centralization,
 				      igraph_real_t *theoretical_max,
 				      igraph_bool_t normalized) {
-
+  
   igraph_vector_t myscores;
   igraph_vector_t *scores=res;
   igraph_real_t *tmax=theoretical_max, mytmax;
@@ -3079,30 +3077,30 @@ int igraph_centralization_betweenness(const igraph_t *graph,
     scores=&myscores;
     IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
   }
-
-  IGRAPH_CHECK(igraph_betweenness(graph, scores, igraph_vss_all(), directed,
+  
+  IGRAPH_CHECK(igraph_betweenness(graph, scores, igraph_vss_all(), directed, 
 				  /*weights=*/ 0, nobigint));
-
-  IGRAPH_CHECK(igraph_centralization_betweenness_tmax(graph, 0, directed,
+  
+  IGRAPH_CHECK(igraph_centralization_betweenness_tmax(graph, 0, directed, 
 						      tmax));
-
+  
   *centralization = igraph_centralization(scores, *tmax, normalized);
-
+  
   if (!res) {
     igraph_vector_destroy(scores);
     IGRAPH_FINALLY_CLEAN(1);
   }
-
+  
   return 0;
 }
 
-/**
+/** 
  * \function igraph_centralization_betweenness_tmax
  * Theoretical maximum for graph centralization based on betweenness
- *
+ * 
  * This function returns the theoretical maximum graph centrality
- * based on vertex betweenness.
- *
+ * based on vertex betweenness. 
+ * 
  * </para><para>
  * There are two ways to call this function, the first is to supply a
  * graph as the <code>graph</code> argument, and then the number of
@@ -3110,12 +3108,12 @@ int igraph_centralization_betweenness(const igraph_t *graph,
  * considered as well. The <code>nodes</code> argument is ignored in
  * this case. The <code>directed</code> argument is also ignored if the
  * supplied graph is undirected.
- *
+ * 
  * </para><para>
  * The other way is to supply a null pointer as the <code>graph</code>
  * argument. In this case the <code>nodes</code> and <code>directed</code>
  * arguments are considered.
- *
+ * 
  * </para><para>
  * The most centralized structure is the star.
  * \param graph A graph object or a null pointer, see the description
@@ -3127,21 +3125,21 @@ int igraph_centralization_betweenness(const igraph_t *graph,
  *     <code>graph</code> is not a null pointer and it is undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
- *
+ * 
  * Time complexity: O(1).
- *
+ * 
  * \sa \ref igraph_centralization_betweenness() and \ref
  * igraph_centralization().
  */
 
-int igraph_centralization_betweenness_tmax(const igraph_t *graph,
+int igraph_centralization_betweenness_tmax(const igraph_t *graph, 
 					   igraph_integer_t nodes,
 					   igraph_bool_t directed,
 					   igraph_real_t *res) {
   igraph_real_t real_nodes;
 
-  if (graph) {
-    directed=directed && igraph_is_directed(graph);
+  if (graph) { 
+    directed=directed && igraph_is_directed(graph); 
     nodes=igraph_vcount(graph);
   }
 
@@ -3152,14 +3150,14 @@ int igraph_centralization_betweenness_tmax(const igraph_t *graph,
   } else {
     *res = (real_nodes-1) * (real_nodes-1) * (real_nodes-2) / 2.0;
   }
-
+  
   return 0;
 }
 
 /**
  * \function igraph_centralization_closeness
  * Calculate vertex closeness and graph centralization
- *
+ * 
  * This function calculates the closeness centrality of the vertices
  * by passing its arguments to \ref igraph_closeness(); and it
  * calculates the graph level centralization index based on the
@@ -3181,17 +3179,17 @@ int igraph_centralization_betweenness_tmax(const igraph_t *graph,
  *     centralization score. See \ref igraph_centralization() for how
  *     the normalization is done.
  * \return Error code.
- *
+ * 
  * \sa \ref igraph_centralization(), \ref igraph_closeness().
- *
+ * 
  * Time complexity: the complexity of \ref igraph_closeness() plus
  * O(n), the number of vertices queried, for calculating the
  * centralization score.
  */
 
-int igraph_centralization_closeness(const igraph_t *graph,
-				    igraph_vector_t *res,
-				    igraph_neimode_t mode,
+int igraph_centralization_closeness(const igraph_t *graph, 
+				    igraph_vector_t *res, 
+				    igraph_neimode_t mode, 
 				    igraph_real_t *centralization,
 				    igraph_real_t *theoretical_max,
 				    igraph_bool_t normalized) {
@@ -3200,36 +3198,36 @@ int igraph_centralization_closeness(const igraph_t *graph,
   igraph_vector_t *scores=res;
   igraph_real_t *tmax=theoretical_max, mytmax;
 
-  if (!tmax) { tmax=&mytmax; }
+  if (!tmax) { tmax=&mytmax; }    
 
   if (!res) {
     scores=&myscores;
     IGRAPH_VECTOR_INIT_FINALLY(scores, 0);
   }
-
-  IGRAPH_CHECK(igraph_closeness(graph, scores, igraph_vss_all(), mode,
+  
+  IGRAPH_CHECK(igraph_closeness(graph, scores, igraph_vss_all(), mode, 
 				/*weights=*/ 0, /*normalize=*/ 1));
 
-  IGRAPH_CHECK(igraph_centralization_closeness_tmax(graph, 0, mode,
+  IGRAPH_CHECK(igraph_centralization_closeness_tmax(graph, 0, mode, 
 						    tmax));
 
   *centralization = igraph_centralization(scores, *tmax, normalized);
-
+  
   if (!res) {
     igraph_vector_destroy(scores);
     IGRAPH_FINALLY_CLEAN(1);
   }
-
+  
   return 0;
 }
 
-/**
+/** 
  * \function igraph_centralization_closeness_tmax
  * Theoretical maximum for graph centralization based on closeness
- *
+ * 
  * This function returns the theoretical maximum graph centrality
- * based on vertex closeness.
- *
+ * based on vertex closeness. 
+ * 
  * </para><para>
  * There are two ways to call this function, the first is to supply a
  * graph as the <code>graph</code> argument, and then the number of
@@ -3237,12 +3235,12 @@ int igraph_centralization_closeness(const igraph_t *graph,
  * considered as well. The <code>nodes</code> argument is ignored in
  * this case. The <code>mode</code> argument is also ignored if the
  * supplied graph is undirected.
- *
+ * 
  * </para><para>
  * The other way is to supply a null pointer as the <code>graph</code>
  * argument. In this case the <code>nodes</code> and <code>mode</code>
  * arguments are considered.
- *
+ * 
  * </para><para>
  * The most centralized structure is the star.
  * \param graph A graph object or a null pointer, see the description
@@ -3256,9 +3254,9 @@ int igraph_centralization_closeness(const igraph_t *graph,
  *     undirected.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
- *
+ * 
  * Time complexity: O(1).
- *
+ * 
  * \sa \ref igraph_centralization_closeness() and \ref
  * igraph_centralization().
  */
@@ -3270,7 +3268,7 @@ int igraph_centralization_closeness_tmax(const igraph_t *graph,
   igraph_real_t real_nodes;
 
   if (graph) {
-    nodes=igraph_vcount(graph);
+    nodes=igraph_vcount(graph); 
     if (!igraph_is_directed(graph)) { mode=IGRAPH_ALL; }
   }
 
@@ -3281,14 +3279,14 @@ int igraph_centralization_closeness_tmax(const igraph_t *graph,
   } else {
     *res = (real_nodes-1) * (real_nodes-2) / (2.0*real_nodes-3);
   }
-
+  
   return 0;
 }
 
 /**
  * \function igraph_centralization_eigenvector_centrality
  * Calculate eigenvector centrality scores and graph centralization
- *
+ * 
  * This function calculates the eigenvector centrality of the vertices
  * by passing its arguments to \ref igraph_eigenvector_centrality);
  * and it calculates the graph level centralization index based on the
@@ -3302,7 +3300,7 @@ int igraph_centralization_closeness_tmax(const igraph_t *graph,
  *     the absolute value of the maximum centrality is one.
  * \param options Options to ARPACK. See \ref igraph_arpack_options_t
  *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices) parameter and
+ *    <code>n</code> (number of vertices) parameter and 
  *    it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \param centralization Pointer to a real number, the centralization
@@ -3315,9 +3313,9 @@ int igraph_centralization_closeness_tmax(const igraph_t *graph,
  *     centralization score. See \ref igraph_centralization() for how
  *     the normalization is done.
  * \return Error code.
- *
+ * 
  * \sa \ref igraph_centralization(), \ref igraph_eigenvector_centrality().
- *
+ * 
  * Time complexity: the complexity of \ref
  * igraph_eigenvector_centrality() plus O(|V|), the number of vertices
  * for the calculating the centralization.
@@ -3333,7 +3331,7 @@ int igraph_centralization_eigenvector_centrality(
 					 igraph_real_t *centralization,
 					 igraph_real_t *theoretical_max,
 					 igraph_bool_t normalized) {
-
+  
   igraph_vector_t myscores;
   igraph_vector_t *scores=vector;
   igraph_real_t realvalue, *myvalue=value;
@@ -3348,33 +3346,33 @@ int igraph_centralization_eigenvector_centrality(
   if (!value) {
     myvalue=&realvalue;
   }
-
+  
   IGRAPH_CHECK(igraph_eigenvector_centrality(graph, scores, myvalue, directed,
-					     scale, /*weights=*/ 0,
+					     scale, /*weights=*/ 0, 
 					     options));
 
   IGRAPH_CHECK(igraph_centralization_eigenvector_centrality_tmax(
-						 graph, 0, directed,
-						 scale,
+						 graph, 0, directed, 
+						 scale, 
 						 tmax));
 
   *centralization = igraph_centralization(scores, *tmax, normalized);
-
+  
   if (!vector) {
     igraph_vector_destroy(scores);
     IGRAPH_FINALLY_CLEAN(1);
   }
-
+  
   return 0;
 }
 
 /**
  * \function igraph_centralization_eigenvector_centrality_tmax
  * Theoretical maximum centralization for eigenvector centrality
- *
+ * 
  * This function returns the theoretical maximum graph centrality
- * based on vertex eigenvector centrality.
- *
+ * based on vertex eigenvector centrality. 
+ * 
  * </para><para>
  * There are two ways to call this function, the first is to supply a
  * graph as the <code>graph</code> argument, and then the number of
@@ -3382,12 +3380,12 @@ int igraph_centralization_eigenvector_centrality(
  * considered as well. The <code>nodes</code> argument is ignored in
  * this case. The <code>directed</code> argument is also ignored if the
  * supplied graph is undirected.
- *
+ * 
  * </para><para>
  * The other way is to supply a null pointer as the <code>graph</code>
  * argument. In this case the <code>nodes</code> and <code>directed</code>
  * arguments are considered.
- *
+ * 
  * </para><para>
  * The most centralized directed structure is the in-star. The most
  * centralized undirected structure is the graph with a single edge.
@@ -3402,9 +3400,9 @@ int igraph_centralization_eigenvector_centrality(
  *     have a maximum of one.
  * \param res Pointer to a real variable, the result is stored here.
  * \return Error code.
- *
+ * 
  * Time complexity: O(1).
- *
+ * 
  * \sa \ref igraph_centralization_closeness() and \ref
  * igraph_centralization().
  */
@@ -3413,18 +3411,18 @@ int igraph_centralization_eigenvector_centrality_tmax(
 					 const igraph_t *graph,
 					 igraph_integer_t nodes,
 					 igraph_bool_t directed,
-					 igraph_bool_t scale,
+					 igraph_bool_t scale, 
 					 igraph_real_t *res) {
 
   if (graph) {
     nodes=igraph_vcount(graph);
     directed=directed && igraph_is_directed(graph);
   }
-
+  
   if (directed) {
-    *res = nodes - 1;
+    *res = nodes - 1; 
   } else {
-    if (scale) {
+    if (scale) { 
       *res = nodes - 2;
     } else {
       *res = (nodes-2.0) / M_SQRT2;
