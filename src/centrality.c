@@ -1600,8 +1600,12 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }
-  if (igraph_vector_min(weights) <= 0) {
+  igraph_real_t minweight = igraph_vector_min(weights);
+  if (minweight <= 0) {
     IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+  }
+  else if (minweight <= eps) {
+    IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
   }
 
   IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
@@ -1629,7 +1633,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
     IGRAPH_PROGRESS("Betweenness centrality: ", 100.0*source/no_of_nodes, 0);
     IGRAPH_ALLOW_INTERRUPTION();
 
-    igraph_2wheap_push_with_index(&Q, source, 0);
+    igraph_2wheap_push_with_index(&Q, source, -1.0);
     VECTOR(dist)[source]=1.0;
     VECTOR(nrgeo)[source]=1;
     
@@ -1640,7 +1644,6 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
       long int nlen;
       
       igraph_stack_push(&S, minnei);
-      
       if (cutoff > 0 && VECTOR(dist)[minnei] >= cutoff+1.0) { continue; }
       
       /* Now check all neighbors of 'minnei' for a shorter path */
@@ -1656,7 +1659,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 	  /* this means curdist is infinity */
 	  cmp_result = -1;
 	} else {
-	  cmp_result = igraph_cmp_epsilon(altdist, curdist-1, eps);
+	  cmp_result = igraph_cmp_epsilon(altdist, curdist, eps);
 	}
 	
 	if (curdist==0) {
@@ -1666,7 +1669,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 	  VECTOR(*v)[0]=minnei;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
-	  VECTOR(dist)[to]=altdist+1.0;
+	  VECTOR(dist)[to]=altdist;
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (cmp_result < 0) {
 	  /* This is a shorter path */
@@ -1675,7 +1678,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 	  VECTOR(*v)[0]=minnei;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
 
-	  VECTOR(dist)[to]=altdist+1.0;
+	  VECTOR(dist)[to]=altdist;
 	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	} else if (cmp_result == 0) {
 	  igraph_vector_int_t *v=igraph_adjlist_get(&fathers, to);
