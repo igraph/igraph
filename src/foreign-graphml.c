@@ -21,6 +21,7 @@
 
 */
 
+#include <locale.h>
 #include "igraph_foreign.h"
 #include "config.h"
 #include <math.h>               /* isnan */
