@@ -1004,8 +1004,10 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
 
   /* ----------------------------------------------------------------------- */
   /* If root vertices are not given, then do a topological sort and take 
-     the last element from every component for directed graphs, or select the
-     vertex with the maximum degree from each component for undirected graphs */
+     the last element from every component for directed graphs and mode == out,
+     or the first element from every component for directed graphs and mode ==
+     in,or select the vertex with the maximum degree from each component for
+     undirected graphs */
 
   if (!roots || igraph_vector_size(roots)==0) {
     
@@ -1081,31 +1083,31 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
       IGRAPH_VECTOR_INIT_FINALLY(&newedges, plus_levels*2);
 
       for (i=0; i<igraph_vector_size(roots); i++) {
-	long int rl=(long int) VECTOR(*rootlevel)[i];
-	long int rn=(long int) VECTOR(*roots)[i];
-	long int j;
+	      long int rl=(long int) VECTOR(*rootlevel)[i];
+	      long int rn=(long int) VECTOR(*roots)[i];
+	      long int j;
 
-	if (rl==0) { continue; }
+	      if (rl==0) { continue; }
 
-	VECTOR(newedges)[edgeptr++] = no_of_nodes;
-	VECTOR(newedges)[edgeptr++] = rn;
-	
-	for (j=0; j<rl-1; j++) {
-	  VECTOR(newedges)[edgeptr++] = no_of_nodes+1;
-	  VECTOR(newedges)[edgeptr++] = no_of_nodes;
-	  no_of_nodes++;
-	}
+	      VECTOR(newedges)[edgeptr++] = no_of_nodes;
+	      VECTOR(newedges)[edgeptr++] = rn;
+	      
+	      for (j=0; j<rl-1; j++) {
+	        VECTOR(newedges)[edgeptr++] = no_of_nodes+1;
+	        VECTOR(newedges)[edgeptr++] = no_of_nodes;
+	        no_of_nodes++;
+	      }
 
-	VECTOR(*roots)[i]=no_of_nodes++;
+	      VECTOR(*roots)[i]=no_of_nodes++;
       }
       
       /* Opposite direction if mode=="in" */
       if (mode==IGRAPH_IN) {
-	for (i=0; i<igraph_vector_size(&newedges); i+=2) {
-	  igraph_real_t tmp=VECTOR(newedges)[i];
-	  VECTOR(newedges)[i] = VECTOR(newedges)[i+1];
-	  VECTOR(newedges)[i+1] = tmp;
-	}
+	      for (i=0; i<igraph_vector_size(&newedges); i+=2) {
+	        igraph_real_t tmp=VECTOR(newedges)[i];
+	        VECTOR(newedges)[i] = VECTOR(newedges)[i+1];
+	        VECTOR(newedges)[i+1] = tmp;
+	      }
       }
 
       IGRAPH_CHECK(igraph_add_edges(&extended, &newedges, 0));
@@ -1163,8 +1165,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
       long int i;
       IGRAPH_MATRIX_INIT_FINALLY(&tmp, no_of_nodes_orig, 2);
       for (i=0; i<no_of_nodes_orig; i++) {
-	MATRIX(tmp, i, 0) = MATRIX(*res, i, 0);
-	MATRIX(tmp, i, 1) = MATRIX(*res, i, 1);
+	      MATRIX(tmp, i, 0) = MATRIX(*res, i, 0);
+	      MATRIX(tmp, i, 1) = MATRIX(*res, i, 1);
       }
       IGRAPH_CHECK(igraph_matrix_update(res, &tmp));
       igraph_matrix_destroy(&tmp);
