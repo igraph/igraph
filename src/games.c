@@ -3556,7 +3556,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     if (type >= igraph_vector_size(pref)) {
       IGRAPH_ERROR("pref is too short for the given types", IGRAPH_EINVAL);
     }
-    nnval=VECTOR(*pref)[type]
+    nnval=VECTOR(*pref)[type];
     if (nnval < 0) {
       IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
     }
@@ -3631,8 +3631,8 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_i_citing_cited_type_game_struct_t str = { 0, 0 };
   igraph_psumtree_t *sumtrees;
   igraph_vector_t sums;
-  long int nocats, type;
-  long int i, j, nnval;
+  long int nocats;
+  long int i, j;
 
   if (igraph_vector_size(types) != nodes) {
       IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
