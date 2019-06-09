@@ -6944,6 +6944,8 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
  * number of vertices plus the number of edges in the graph.
  *
  * \sa igraph_is_weakly_connected()
+ *
+ * \example examples/simple/igraph_tree.c
  */
 
 int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {

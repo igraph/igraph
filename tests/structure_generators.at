@@ -88,7 +88,12 @@ AT_CLEANUP
 
 AT_SETUP([Tree graph (igraph_tree):])
 AT_KEYWORDS([tree igraph_tree])
-AT_COMPILE_CHECK([simple/igraph_tree.c])
+AT_COMPILE_CHECK([simple/igraph_tree.c], [simple/igraph_tree.out])
+AT_CLEANUP
+
+AT_SETUP([Tree graph 2 (igraph_tree):])
+AT_KEYWORDS([tree igraph_tree])
+AT_COMPILE_CHECK([tests/tree.c], [tests/tree.out])
 AT_CLEANUP
 
 AT_SETUP([Tree graph from Prufer sequence (igraph_from_prufer):])
