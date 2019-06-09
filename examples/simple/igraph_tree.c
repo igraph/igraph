@@ -24,6 +24,20 @@
 #include <igraph.h>
 
 int main() {
+  igraph_t graph;
+  igraph_bool_t res;
+
+  /* Create a directed binary tree on 15 nodes,
+     with edges pointing towards the root. */
+  igraph_tree(&graph, 15, 2, IGRAPH_TREE_IN);
+
+  igraph_is_tree(&graph, &res, NULL, IGRAPH_IN);
+  printf("Is it an in-tree? %s\n", res ? "Yes" : "No");
+
+  igraph_is_tree(&graph, &res, NULL, IGRAPH_OUT);
+  printf("Is it an out-tree? %s\n", res ? "Yes" : "No");
+
+  igraph_destroy(&graph);
 
   return 0;
 }
