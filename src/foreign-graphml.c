@@ -1439,7 +1439,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
 
   /* set standard C locale lest we sometimes get commas instead of dots */
   char *saved_locale = strdup(setlocale(LC_NUMERIC, NULL));
-  setlocale(LC_NUMERIC, "C")
+  setlocale(LC_NUMERIC, "C");
   
   ret=fprintf(outstream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
   if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
