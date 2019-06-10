@@ -1581,6 +1581,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
 					 const igraph_vector_t *weights, 
 					 igraph_bool_t nobigint) {
 
+  igraph_real_t minweight;
   igraph_integer_t no_of_nodes=(igraph_integer_t) igraph_vcount(graph);
   igraph_integer_t no_of_edges=(igraph_integer_t) igraph_ecount(graph);
   igraph_2wheap_t Q;
@@ -1600,7 +1601,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }
-  igraph_real_t minweight = igraph_vector_min(weights);
+  minweight = igraph_vector_min(weights);
   if (minweight <= 0) {
     IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
   }
@@ -2041,6 +2042,8 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 					      igraph_bool_t directed, 
 					      igraph_real_t cutoff,
 					      const igraph_vector_t *weights) {
+
+  igraph_real_t minweight;
   igraph_integer_t no_of_nodes=(igraph_integer_t) igraph_vcount(graph);
   igraph_integer_t no_of_edges=(igraph_integer_t) igraph_ecount(graph);
   igraph_2wheap_t Q;
@@ -2057,8 +2060,12 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
   if (igraph_vector_size(weights) != no_of_edges) {
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }
-  if (igraph_vector_min(weights) < 0) {
+  minweight = igraph_vector_min(weights);
+  if (minweight < 0) {
     IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+  }
+  else if (minweight <= eps) {
+    IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
   }
   
   IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));
@@ -2089,7 +2096,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
     igraph_vector_null(&tmpscore);
     igraph_vector_long_null(&nrgeo);
     
-    igraph_2wheap_push_with_index(&Q, source, 0);
+    igraph_2wheap_push_with_index(&Q, source, -1.0);
     VECTOR(distance)[source]=1.0;
     VECTOR(nrgeo)[source]=1;
     
@@ -2118,7 +2125,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	  /* this means curdist is infinity */
 	  cmp_result = -1;
 	} else {
-	  cmp_result = igraph_cmp_epsilon(altdist, curdist-1, eps);
+	  cmp_result = igraph_cmp_epsilon(altdist, curdist, eps);
 	}
 	
 	/* printf("to=%ld, altdist = %lg, curdist = %lg, cmp = %d\n",
@@ -2130,7 +2137,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	  igraph_vector_int_resize(v,1);
 	  VECTOR(*v)[0]=edge;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
-	  VECTOR(distance)[to]=altdist+1.0;
+	  VECTOR(distance)[to]=altdist;
 	  IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
 	} else if (cmp_result < 0) {
 	  /* This is a shorter path */
@@ -2139,7 +2146,7 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
 	  igraph_vector_int_resize(v,1);
 	  VECTOR(*v)[0]=edge;
 	  VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
-	  VECTOR(distance)[to] = altdist+1.0;
+	  VECTOR(distance)[to] = altdist;
 	  IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
 	} else if (cmp_result == 0) {
 	  igraph_vector_int_t *v=igraph_inclist_get(&fathers, to);
