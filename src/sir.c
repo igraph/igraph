@@ -168,7 +168,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     igraph_vector_int_t *no_r_v = &sir->no_r;
 
     infected = RNG_INTEGER(0, no_of_nodes-1);
-  
+
     /* Initially infected */
     igraph_vector_int_null(&status);
     VECTOR(status)[infected] = S_I;
@@ -182,7 +182,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     VECTOR(*no_r_v)[0]  = nr;
     
     if (igraph_psumtree_sum(&tree) != 0) { 
-      IGRAPH_ERROR("Internal SIR error", IGRAPH_EINTERNAL);
+      igraph_psumtree_reset(&tree);
     }
     
     /* Rates */
@@ -195,7 +195,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     }
     psum=gamma + neilen * beta;	/* only works for simple graphs */
   
-    while (psum > 0) {
+    while (ni > 0) {
 
       igraph_real_t tt=igraph_rng_get_exp(igraph_rng_default(), psum);
       igraph_real_t r=RNG_UNIF(0, psum);

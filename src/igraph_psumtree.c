@@ -42,6 +42,10 @@ int igraph_psumtree_init(igraph_psumtree_t *t, long int size) {
   return 0;
 }
 
+void igraph_psumtree_reset(igraph_psumtree_t *t) {
+  igraph_vector_fill(&(t->v), 0);
+}
+
 void igraph_psumtree_destroy(igraph_psumtree_t *t) {
   igraph_vector_destroy((igraph_vector_t *)t);
 }
