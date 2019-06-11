@@ -195,10 +195,12 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     }
   
     while (ni > 0) {
+      igraph_real_t tt;
+      igraph_real_t r;
 
       psum = igraph_psumtree_sum(&tree);
-      igraph_real_t tt=igraph_rng_get_exp(igraph_rng_default(), psum);
-      igraph_real_t r=RNG_UNIF(0, psum);
+      tt=igraph_rng_get_exp(igraph_rng_default(), psum);
+      r=RNG_UNIF(0, psum);
       long int vchange;
 
       igraph_psumtree_search(&tree, &vchange, r);
