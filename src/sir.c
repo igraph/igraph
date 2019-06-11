@@ -193,10 +193,10 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
       int nei=VECTOR(*neis)[i];
       igraph_psumtree_update(&tree, nei, beta);
     }
-    psum=gamma + neilen * beta;	/* only works for simple graphs */
   
     while (ni > 0) {
 
+      psum = igraph_psumtree_sum(&tree);
       igraph_real_t tt=igraph_rng_get_exp(igraph_rng_default(), psum);
       igraph_real_t r=RNG_UNIF(0, psum);
       long int vchange;
@@ -208,13 +208,11 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
       if (VECTOR(status)[vchange] == S_I) {
 	VECTOR(status)[vchange] = S_R;
 	ni--; nr++;
-	psum -= igraph_psumtree_get(&tree, vchange);
 	igraph_psumtree_update(&tree, vchange, 0.0);
 	for (i=0; i<neilen; i++) {
 	  int nei=VECTOR(*neis)[i];
 	  if (VECTOR(status)[nei] == S_S) {
 	    igraph_real_t rate=igraph_psumtree_get(&tree, nei);
-	    psum -= beta;
 	    igraph_psumtree_update(&tree, nei, rate-beta);
 	  }
 	}
@@ -222,14 +220,11 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
       } else { /* S_S */
 	VECTOR(status)[vchange] = S_I;
 	ns--; ni++;
-	psum -= igraph_psumtree_get(&tree, vchange);
-	psum += gamma;
 	igraph_psumtree_update(&tree, vchange, gamma);
 	for (i=0; i<neilen; i++) {
 	  int nei=VECTOR(*neis)[i];
 	  if (VECTOR(status)[nei] == S_S) {
 	    igraph_real_t rate=igraph_psumtree_get(&tree, nei);
-	    psum += beta;
 	    igraph_psumtree_update(&tree, nei, rate + beta);
 	  }
 	}      
