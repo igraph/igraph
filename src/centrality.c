@@ -2593,7 +2593,7 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
       igraph_vector_t *neis=igraph_lazy_inclist_get(&inclist, minnei);
       long int nlen=igraph_vector_size(neis);
 
-      VECTOR(*res)[i] += mindist;
+      VECTOR(*res)[i] += (mindist - 1.0);
       nodes_reached++;
 
       if (cutoff>0 && mindist>=cutoff) continue;    /* NOT break!!! */
