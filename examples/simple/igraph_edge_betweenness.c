@@ -88,6 +88,7 @@ int test_bug1050() {
   igraph_vector_init(&eb2, igraph_ecount(&g));
 
   igraph_vector_init(&weights, igraph_ecount(&g));
+  igraph_vector_fill(&weights, 1);
   VECTOR(weights)[0] = 2;
 
   igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, /* cutoff */ -1, &weights);
