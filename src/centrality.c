@@ -2061,8 +2061,8 @@ int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
     IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
   }
   minweight = igraph_vector_min(weights);
-  if (minweight < 0) {
-    IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+  if (minweight <= 0) {
+    IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
   }
   else if (minweight <= eps) {
     IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
@@ -2552,8 +2552,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
   }
   
   minweight = igraph_vector_min(weights);
-  if (minweight < 0) {
-    IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+  if (minweight <= 0) {
+    IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
   }
   else if (minweight <= eps) {
     IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
