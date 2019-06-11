@@ -2596,7 +2596,7 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
       VECTOR(*res)[i] += (mindist - 1.0);
       nodes_reached++;
 
-      if (cutoff>0 && mindist>=cutoff) continue;    /* NOT break!!! */
+      if (cutoff>0 && mindist>=cutoff+1.0) continue;    /* NOT break!!! */
 
       for (j=0; j<nlen; j++) {
 	      long int edge=(long int) VECTOR(*neis)[j];
