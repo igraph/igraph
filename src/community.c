@@ -1139,10 +1139,12 @@ int igraph_reindex_membership(igraph_vector_t *membership,
  * detecting community structure. </para>
  * 
  * <para>
- * The leading eigenvector community structure detection method is 
- * implemented in \ref igraph_community_leading_eigenvector(). 
- * After the initial split, the following splits are done in a
- * way to optimize modularity regarding to the original network. 
+ * The leading eigenvector community structure detection method is
+ * implemented in \ref igraph_community_leading_eigenvector(). After
+ * the initial split, the following splits are done in a way to
+ * optimize modularity regarding to the original network. Note that
+ * any further refinement, for example using Kernighan-Lin, as
+ * proposed in Section V.A of Newman (2006), is not implemented here.
  * </para>
  * 
  * <para>
