@@ -3507,7 +3507,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   igraph_vector_t edges;
   igraph_vector_t cumsum;
   igraph_real_t sum;
-  long int i,j,nnval;
+  long int i,j,nnval,type;
   
   if (igraph_vector_size(types) != nodes) {
       IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
@@ -3529,7 +3529,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
   
   /* first node */
   VECTOR(cumsum)[0]=0;
-  long int type=(long int) VECTOR(*types)[0];
+  type=(long int) VECTOR(*types)[0];
   if (type >= igraph_vector_size(pref)) {
     IGRAPH_ERROR("pref is too short for the given types", IGRAPH_EINVAL);
   }
