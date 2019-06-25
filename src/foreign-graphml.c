@@ -1440,7 +1440,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
   /* set standard C locale lest we sometimes get commas instead of dots */
   char *saved_locale = strdup(setlocale(LC_NUMERIC, NULL));
   if (saved_locale == NULL) IGRAPH_ERROR("Not enough memory", IGRAPH_ENOMEM);
-  IGRAPH_FINALLY(igraph_Free, saved_locale);
+  IGRAPH_FINALLY(igraph_free, saved_locale);
   setlocale(LC_NUMERIC, "C");
   
   ret=fprintf(outstream, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -1698,7 +1698,7 @@ int igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
   /* reset locale to whatever was before this function */
   setlocale(LC_NUMERIC, saved_locale);
   
-  igraph_Free(saved_locale);
+  igraph_free(saved_locale);
   igraph_strvector_destroy(&gnames);
   igraph_strvector_destroy(&vnames);
   igraph_strvector_destroy(&enames);
