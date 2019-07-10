@@ -5878,12 +5878,14 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  *   etc. Supply a NULL pointer here if you don't want to calculate
  *   this.
  * \param weights Optional edge weights. Supply a null pointer here
- *   for the non-weighted version. If this is not a null pointer, then
- *   the calculated quantity will be the sum of the strengths of the
- *   neighbors of a given vertex (see \ref igraph_strength() ), divided
- *   by the strength of the vertex itself. Note that the denominator is
- *   \em not the unweighted degree of the vertex so the quantity is not
- *   really an "average" in this case.
+ *   for the non-weighted version. The weighted version computes
+ *   a weighted average of the neighbor degrees, i.e.
+ *
+ *    k_nn_i = 1/s_i sum_j w_ij k_j
+ *
+ *   where s_i is the sum of the weights, the sum runs over
+ *   the neighbors as indicated by \c mode (with appropriate weights)
+ *   and k_j is the degree, specified by \c neighbor_degree_mode.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
