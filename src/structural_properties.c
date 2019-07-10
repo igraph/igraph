@@ -5951,8 +5951,9 @@ int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
   for (i=0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
     igraph_real_t sum=0.0;
     long int v=IGRAPH_VIT_GET(vit);
+    long int nv;
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, mode));
-    long int nv=igraph_vector_size(&neis);
+    nv=igraph_vector_size(&neis);
     for (j=0; j<nv; j++) {
       long int nei=(long int) VECTOR(neis)[j];
       sum += VECTOR(deg)[nei];
