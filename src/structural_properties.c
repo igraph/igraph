@@ -5748,11 +5748,11 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
 						  const igraph_vector_t *weights) {
 
   long int no_of_nodes = igraph_vcount(graph);
-  igraph_vector_t neis;
+  igraph_vector_t neis, edge_neis;
   long int i, j, no_vids;
   igraph_vit_t vit;
   igraph_vector_t my_knn_v, *my_knn=knn;
-  igraph_vector_t deg;
+  igraph_vector_t strength, deg;
   igraph_integer_t maxdeg;
   igraph_vector_t deghist;
   igraph_real_t mynan=IGRAPH_NAN;
@@ -5773,12 +5773,17 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
-  IGRAPH_CHECK(igraph_strength(graph, &deg, igraph_vss_all(),
-			       neighbor_degree_mode, IGRAPH_LOOPS, weights));
+  IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(),
+			       neighbor_degree_mode, IGRAPH_LOOPS));
+  IGRAPH_VECTOR_INIT_FINALLY(&strength, no_of_nodes);
+  IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(),
+			       mode, IGRAPH_LOOPS, weights));
   IGRAPH_CHECK(igraph_maxdegree(graph, &maxdeg, igraph_vss_all(),
 				mode, IGRAPH_LOOPS));
   IGRAPH_VECTOR_INIT_FINALLY(&neis, maxdeg);
+  IGRAPH_VECTOR_INIT_FINALLY(&edge_neis, maxdeg);
   igraph_vector_resize(&neis, 0);
+  igraph_vector_resize(&edge_neis, 0);
 
   if (knnk) {
     IGRAPH_CHECK(igraph_vector_resize(knnk, (long int)maxdeg));
@@ -5790,12 +5795,15 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
     igraph_real_t sum=0.0;
     long int v=IGRAPH_VIT_GET(vit);
     long int nv;
-    igraph_real_t str=VECTOR(deg)[v];
+    igraph_real_t str=VECTOR(strength)[v];
     IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, mode));
+    IGRAPH_CHECK(igraph_incident(graph, &edge_neis, (igraph_integer_t) v, mode));
     nv=igraph_vector_size(&neis);
     for (j=0; j<nv; j++) {
       long int nei=(long int) VECTOR(neis)[j];
-      sum += VECTOR(deg)[nei];
+      long int e = (long int) VECTOR(edge_neis)[j];
+      double w=VECTOR(*weights)[e];
+      sum += w*VECTOR(deg)[nei];
     }
     if (str != 0.0) {
       VECTOR(*my_knn)[i] = sum / str;
