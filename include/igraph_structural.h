@@ -112,6 +112,8 @@ DECLDIR int igraph_is_chordal(const igraph_t *graph,
                 igraph_t *newgraph);
 DECLDIR int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
                 igraph_vs_t vids,
+                igraph_neimode_t mode,
+                igraph_neimode_t neighbor_degree_mode,
                 igraph_vector_t *knn,
                 igraph_vector_t *knnk, 
                 const igraph_vector_t *weights);
