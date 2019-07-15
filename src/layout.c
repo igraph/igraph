@@ -989,13 +989,6 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   if (!igraph_is_directed(graph)) {
     mode=IGRAPH_ALL;
   }
-  if (mode==IGRAPH_IN) {
-    mode2=IGRAPH_OUT;
-  } else if (mode==IGRAPH_OUT) {
-    mode2=IGRAPH_IN;
-  } else {
-    mode2=mode;
-  }
 
   if ( (!roots || igraph_vector_size(roots)==0) && 
        rootlevel && igraph_vector_size(rootlevel) != 0 ) {
@@ -1020,6 +1013,10 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
 
     if (igraph_is_directed(graph) && mode != IGRAPH_ALL) {
+
+      /* look for roots by swimming against the stream */
+      igraph_neimode_t mode2 = (mode==IGRAPH_IN) ? IGRAPH_OUT: IGRAPH_IN;
+
       IGRAPH_CHECK(igraph_topological_sorting(graph, &order, mode2));
       IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0, 
         &no_comps, IGRAPH_WEAK));
@@ -1031,6 +1028,10 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     }
     
     IGRAPH_CHECK(igraph_vector_resize(&myroots, no_comps));
+
+    /* go backwards and fill the roots vector with indices [1, no_of_nodes]
+       The index 0 is used to signal this root has not been found yet:
+       all indices are then decreased by one to [0, no_of_nodes - 1] */
     igraph_vector_null(&myroots);
     proots=&myroots;
     for (i=no_of_nodes-1; noseen < no_comps && i>=0; i--) {
@@ -1041,7 +1042,6 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
         VECTOR(myroots)[mem]=v+1;
       }
     }
-
     for (i=0; i<no_comps; i++) {
       VECTOR(myroots)[i] -= 1;
     }
@@ -1117,8 +1117,49 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   }
   
   /* ----------------------------------------------------------------------- */
-  /* Ok, we have the root vertices now. 
-     Possibly we need to add some edges to make the graph connected. */
+  /* Ok, we have the root vertices. 
+
+     Now, the function that computes the layout is internal only (no API):
+     igraph_i_layout_reingold_tilford. That function needs a connected graph
+     since only then you can compute the coordinates, but we want to extend
+     the algorithm to other cases, including:
+     - undirected disconnected graphs
+     - weakly but not strongly connected directed graphs
+
+     An extreme case a directed tree that goes in the opposite direction
+     than the mode selected for the RT layout, e.g. an "out"-directed
+     tree that is asked to draw an RT layout with mode "in". In this case,
+     the graph is weakly connected but its strong connectivity is all
+     upside down. (No matter that such a layout won't be very useful
+     in practice.)
+
+     To deal with these extensions of the original algorithm, we construct
+     an "extended graph" with "fake" edges that ensure full connectivity
+     for an undirected graph or full strong connectivity for a directed graph.
+     This extended graph is then passed to the layout factory.
+
+     For undirected graphs, we just connect the roots to a single, top
+     "real_root" node.
+
+     For directed graphs, it's more complicated. Above we computed one root
+     per weakly connected component, but there might be nodes within that
+     component that cannot be reached from that root in a strong sense, e.g.:
+
+     1
+     |
+     v
+     2 <- 3
+
+     If the root is 1, how do you reach 3?
+
+     Although more clever ideas are envisioned for future releases, for now
+     just make a list of all nodes of this kind and add directed edges
+     pointing directly from the root to them.
+
+     Then, just like for undirected graphs, add a fake "real_root" and
+     put all roots as directed children of it.
+
+     */
 
   if (igraph_vector_size(proots)==1) {
     real_root=(long int) VECTOR(*proots)[0];
