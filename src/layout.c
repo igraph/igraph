@@ -1012,8 +1012,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
 
-    if (igraph_is_directed(graph) && mode != IGRAPH_ALL) {
-
+    if (mode != IGRAPH_ALL) {
       /* look for roots by swimming against the stream */
       igraph_neimode_t mode2 = (mode==IGRAPH_IN) ? IGRAPH_OUT: IGRAPH_IN;
 
@@ -1143,7 +1142,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
 
      For directed graphs, it's more complicated. Above we computed one root
      per weakly connected component, but there might be nodes within that
-     component that cannot be reached from that root in a strong sense, e.g.:
+     component that cannot be reached from that root in a directed sense, e.g.:
 
      1
      |
@@ -1161,18 +1160,100 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
 
      */
 
+  /* the graph is connected, good */
   if (igraph_vector_size(proots)==1) {
     real_root=(long int) VECTOR(*proots)[0];
     if (real_root<0 || real_root>=no_of_nodes) {
       IGRAPH_ERROR("invalid vertex id", IGRAPH_EINVVID);
     }
-  } else {
+  }
+
+  /* the graph is disconnected and directed, add edges within
+     weakly connected components from the root to all nodes that
+     cannot be reached
+     
+     TODO: a better strategy would be nice here
+     */
+  if (igraph_vector_size(proots) != 1 && mode != IGRAPH_ALL) {
+
+    igraph_vector_t newedges;
+    long int no_of_newedges, root;
+    igraph_vector_t membership;
+    igraph_integer_t no_comps;
+    long int i,rn, noseen=0;
+    igraph_vector_t reachable;
+
+    /* Make copy of the graph unless it exists already */
+    if (pextended == graph) {
+      pextended=&extended;
+      IGRAPH_CHECK(igraph_copy(&extended, graph));
+      IGRAPH_FINALLY(igraph_destroy, &extended);
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&reachable, no_of_nodes);
+
+    IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0, 
+      &no_comps, IGRAPH_WEAK));
+
+    /* mark nodes that are reachable from a root */
+    for (rn=0; rn < igraph_vector_size(proots); rn++) { 
+      long int n;
+      root = VECTOR(*proots)[rn];
+      igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+      igraph_adjlist_t allneis; 
+
+      IGRAPH_CHECK(igraph_dqueue_push(&q, root));
+      while (!igraph_dqueue_empty(&q)) {
+        long int actnode=(long int) igraph_dqueue_pop(&q);
+        reachable[actnode] = 1;
+        /* follow the stream down to the sinks, all of that is reachable */
+        neis=igraph_adjlist_get(&allneis, actnode, mode);
+        n=igraph_vector_int_size(neis);
+        for (j=0; j<n; j++) {
+          long int neighbor=(long int) VECTOR(*neis)[j];
+          IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+        }
+      }
+    }
+
+    /* unreachable nodes need additional edges, one per node.
+       count them first */
+    for (i=0; i<no_of_nodes;i++) {
+      if (!reachable[i]) {
+        no_of_newedges++;
+      }
+    }
+    IGRAPH_VECTOR_INIT_FINALLY(&newedges, no_of_newedges*2);
+
+    /* now add the missing edges */
+    j = 0;
+    for (i=0; i<no_of_nodes;i++) {
+      if (!reachable[i]) {
+        /* find the root in this weakly connected component */
+        long int mem=(long int) VECTOR(membership)[i];
+        root = VECTOR(*proots)[mem];
+        /* edge is FROM the root TO the node if mode == out */
+        if (mode == IGRAPH_OUT) {
+          VECTOR(newedges)[2*j] = root;
+          VECTOR(newedges)[2*j+1] = i;
+        else {
+          VECTOR(newedges)[2*j] = i;
+          VECTOR(newedges)[2*j+1] = root;
+        }
+        j++;
+      }
+  }
+  
+  /* add real_root to bind weakly disconnected components */
+  if (igraph_vector_size(proots)!=1) {
     igraph_vector_t newedges;
     long int no_of_newedges=igraph_vector_size(proots);
     long int i;
     real_root=no_of_nodes;
     
-    /* Make copy if needed */
+    /* Make copy of the graph unless it exists already */
     if (pextended == graph) {
       pextended=&extended;
       IGRAPH_CHECK(igraph_copy(&extended, graph));
