@@ -455,8 +455,7 @@ int igraph_transitivity_local_undirected4(const igraph_t *graph,
  * </para><para>
  * Clustering coefficient is an alternative name for transitivity.
  *
- * \param graph The input graph, it can be directed but direction of
- *   the edges will be ignored.
+ * \param graph The input graph, which should be undirected and simple.
  * \param res Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed.
  * \param vids Vertex set, the vertices for which the local
@@ -477,6 +476,19 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
 					 igraph_vector_t *res,
 					 const igraph_vs_t vids,
 					 igraph_transitivity_mode_t mode) {
+
+  igraph_bool_t simple;
+
+  if (igraph_is_directed(graph))
+  {
+    IGRAPH_ERROR("Transitivity works on undirected graphs only", IGRAPH_EINVAL);
+  }
+
+  igraph_is_simple(graph, &simple);
+  if (!simple) {
+    IGRAPH_ERROR("Transitivity works on simple graphs only", IGRAPH_EINVAL);
+  }
+
   if (igraph_vs_is_all(&vids)) {
     return igraph_transitivity_local_undirected4(graph, res, vids, mode);
   } else {
