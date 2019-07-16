@@ -1180,8 +1180,9 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     long int no_of_newedges, root;
     igraph_vector_t membership;
     igraph_integer_t no_comps;
-    long int i,rn, noseen=0;
+    long int i, j, rn;
     igraph_vector_t reachable;
+    igraph_adjlist_t allneis; 
 
     /* Make copy of the graph unless it exists already */
     if (pextended == graph) {
@@ -1190,7 +1191,9 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
       IGRAPH_FINALLY(igraph_destroy, &extended);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&order, no_of_nodes);
+    IGRAPH_CHECK(igraph_adjlist_init(pextended, &allneis, mode));
+    IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
+
     IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&reachable, no_of_nodes);
 
@@ -1202,14 +1205,14 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
       long int n;
       root = VECTOR(*proots)[rn];
       igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-      igraph_adjlist_t allneis; 
+      igraph_vector_int_t *neis;
 
       IGRAPH_CHECK(igraph_dqueue_push(&q, root));
       while (!igraph_dqueue_empty(&q)) {
         long int actnode=(long int) igraph_dqueue_pop(&q);
-        reachable[actnode] = 1;
+        VECTOR(reachable)[actnode] = 1;
         /* follow the stream down to the sinks, all of that is reachable */
-        neis=igraph_adjlist_get(&allneis, actnode, mode);
+        neis=igraph_adjlist_get(&allneis, actnode);
         n=igraph_vector_int_size(neis);
         for (j=0; j<n; j++) {
           long int neighbor=(long int) VECTOR(*neis)[j];
@@ -1221,7 +1224,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     /* unreachable nodes need additional edges, one per node.
        count them first */
     for (i=0; i<no_of_nodes;i++) {
-      if (!reachable[i]) {
+      if (!VECTOR(reachable)[i]) {
         no_of_newedges++;
       }
     }
@@ -1230,7 +1233,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     /* now add the missing edges */
     j = 0;
     for (i=0; i<no_of_nodes;i++) {
-      if (!reachable[i]) {
+      if (!VECTOR(reachable)[i]) {
         /* find the root in this weakly connected component */
         long int mem=(long int) VECTOR(membership)[i];
         root = VECTOR(*proots)[mem];
@@ -1238,12 +1241,13 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
         if (mode == IGRAPH_OUT) {
           VECTOR(newedges)[2*j] = root;
           VECTOR(newedges)[2*j+1] = i;
-        else {
+        } else {
           VECTOR(newedges)[2*j] = i;
           VECTOR(newedges)[2*j+1] = root;
         }
         j++;
       }
+    }
   }
   
   /* add real_root to bind weakly disconnected components */
