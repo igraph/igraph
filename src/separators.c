@@ -624,8 +624,7 @@ void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
  * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
  * a graph, Networks 23, 533--541, 1993.
  * 
- * \param graph The input graph, it may be directed, but edge
- *        directions will be ignored.
+ * \param graph The input graph, which must be undirected.
  * \param separators An initialized pointer vector, the separators
  *        are stored here. It is a list of pointers to igraph_vector_t
  *        objects. Each vector will contain the ids of the vertices in
@@ -654,6 +653,11 @@ int igraph_minimum_size_separators(const igraph_t *graph,
   igraph_t graph_copy;
   igraph_vector_t capacity;
   igraph_maxflow_stats_t stats;
+
+  if (igraph_is_directed(graph)) {
+    IGRAPH_ERROR("Minimum size separators currently only works on undirected graphs",
+		 IGRAPH_EINVAL);
+  }
 
   igraph_vector_ptr_clear(separators);
   IGRAPH_FINALLY(igraph_i_separators_free, separators);
