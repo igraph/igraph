@@ -1183,6 +1183,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     long int i, j, rn;
     igraph_vector_t reachable;
     igraph_adjlist_t allneis; 
+    igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+    igraph_vector_int_t *neis;
 
     /* Make copy of the graph unless it exists already */
     if (pextended == graph) {
@@ -1191,7 +1193,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
       IGRAPH_FINALLY(igraph_destroy, &extended);
     }
 
-    IGRAPH_CHECK(igraph_adjlist_init(pextended, &allneis, mode));
+    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_CHECK(igraph_adjlist_init(&extended, &allneis, mode));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
     IGRAPH_VECTOR_INIT_FINALLY(&membership, no_of_nodes);
@@ -1204,8 +1207,6 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     for (rn=0; rn < igraph_vector_size(proots); rn++) { 
       long int n;
       root = VECTOR(*proots)[rn];
-      igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-      igraph_vector_int_t *neis;
 
       IGRAPH_CHECK(igraph_dqueue_push(&q, root));
       while (!igraph_dqueue_empty(&q)) {
@@ -1248,6 +1249,15 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
         j++;
       }
     }
+
+    IGRAPH_CHECK(igraph_add_edges(&extended, &newedges, 0));
+
+    igraph_vector_destroy(&newedges);
+    igraph_vector_destroy(&membership);
+    igraph_vector_destroy(&reachable);
+    igraph_dqueue_destroy(&q);
+    igraph_adjlist_destroy(&allneis);
+    IGRAPH_FINALLY_CLEAN(5);
   }
   
   /* add real_root to bind weakly disconnected components */
