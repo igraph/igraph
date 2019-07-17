@@ -31,7 +31,8 @@ int main() {
   igraph_matrix_t coords;
   long int i, n;
 
-  f=fopen("igraph_layout_reingold_tilford.in", "r");
+  f=fopen("igraph_layout_reingold_tilford_extended.in", "r");
+  /* FIXME */
   igraph_read_graph_edgelist(&g, f, 0, 1);
   igraph_matrix_init(&coords, 0, 0);
   igraph_layout_reingold_tilford(&g, &coords, IGRAPH_IN, 0, 0); 
