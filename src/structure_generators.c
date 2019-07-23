@@ -2305,6 +2305,10 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
  * with a labelled tree. A tree on n vertices can be represented by a
  * sequence of n-2 integers, each between 0 and n-1 (inclusive).
  *
+ * The algorithm used by this function is based on
+ * Paulius Micikevi&ccaron;ius, Saverio Caminiti, Narsingh Deo:
+ * Linear-time Algorithms for Encoding Trees as Sequences of Node Labels
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param prufer The Pr&uuml;fer sequence
  * \return Error code:
@@ -2323,43 +2327,57 @@ int igraph_from_prufer(igraph_t *graph, const igraph_vector_int_t *prufer) {
     igraph_vector_int_t degree;
     igraph_vector_t edges;
     long n;
-    long i, j, ec;
+    long i, k;
+    long u, v; /* vertices */
+    long ec;
 
     n = igraph_vector_int_size(prufer) + 2;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&degree, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &degree);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&degree, n); /* initializes vector to zeros */
+    IGRAPH_VECTOR_INIT_FINALLY(&edges, 2*(n-1));
 
-    IGRAPH_CHECK(igraph_vector_init(&edges, 2*(n-1)));
-    IGRAPH_FINALLY(igraph_vector_destroy, &edges);
-
-    for (i=0; i < n; ++i)
-        VECTOR(degree)[i] = 1;
-
+    /* build out-degree vector (i.e. number of child vertices) and verify Prufer sequence */
     for (i=0; i < n-2; ++i) {
-        long k = VECTOR(*prufer)[i];
-        if (k >= n || k < 0)
+        long u = VECTOR(*prufer)[i];
+        if (u >= n || u < 0)
             IGRAPH_ERROR("Invalid Prufer sequence", IGRAPH_EINVAL);
-        VECTOR(degree)[k] += 1;
+        VECTOR(degree)[u] += 1;
     }
 
+    v = 0;  /* initialize v now, in case Prufer sequence is empty */
+    k = 0;  /* index into the Prufer vector */
     ec = 0; /* index into the edges vector */
-    for (i=0; i < n-2; ++i)
-        for (j=0; j < n; ++j)
-            if (VECTOR(degree)[j] == 1) {
-                VECTOR(edges)[ec++] = VECTOR(*prufer)[i];
-                VECTOR(edges)[ec++] = j;
-                VECTOR(degree)[ VECTOR(*prufer)[i] ]--;
-                VECTOR(degree)[j]--;
-                break;
-            }
+    for (i=0; i < n; ++i) {
+        u = i;
 
-    for (i=0; i < n; ++i)
-        if (VECTOR(degree)[i] == 1) {
-            VECTOR(edges)[ec++] = i;
-            if (ec == 2*(n-1))
-                break;
+        while (k < n-2 && u <= i && (VECTOR(degree)[u] == 0)) {
+            /* u is a leaf here */
+
+            v = VECTOR(*prufer)[k]; /* parent of u */
+
+            /* add edge */
+            VECTOR(edges)[ec++] = v;
+            VECTOR(edges)[ec++] = u;
+
+            k += 1;
+
+            VECTOR(degree)[v] -= 1;
+
+            u = v;
         }
+
+        if (k == n-2)
+            break;
+    }
+
+    /* find u for last edge, v is already set */
+    for (u = i+1; u < n; ++u)
+        if ((VECTOR(degree)[u] == 0) && u != v)
+            break;
+
+    /* add last edge */
+    VECTOR(edges)[ec++] = v;
+    VECTOR(edges)[ec++] = u;
 
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) n, /* directed = */ 0));
 
