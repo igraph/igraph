@@ -77,3 +77,18 @@ C: 1 2 5 7 9
 C: 1 2 6 7 8
 C: 1 2 7 8 9
 C: 2 3
+Partitions and cuts:
+P: 0
+C: 0
+P: 0 1
+C: 1
+Partitions and cuts:
+P: 0
+C: 0
+P: 0 1
+C: 1
+Partitions and cuts:
+P: 1
+C: 1
+P: 1 2
+C: 2
