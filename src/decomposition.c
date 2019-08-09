@@ -37,7 +37,7 @@
  * hypergraphs, and selectively reduce acyclic hypergraphs.
  * SIAM Journal of Computation 13, 566--579, 1984.
  * 
- * \param graph The input graph. Can be directed, but the direction
+ * \param graph The input graph, which should be undirected and simple.
  *   of the edges is ignored.
  * \param alpha Pointer to an initialized vector, the result is stored here. 
  *   It will be resized, as needed. Upon return it contains
@@ -63,6 +63,18 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
   long int i;
   igraph_adjlist_t adjlist;
   
+  igraph_bool_t simple;
+
+  if (igraph_is_directed(graph))
+  {
+    IGRAPH_ERROR("Maximum cardinality search works on undirected graphs only", IGRAPH_EINVAL);
+  }
+
+  igraph_is_simple(graph, &simple);
+  if (!simple) {
+    IGRAPH_ERROR("Maximum cardinality search works on simple graphs only", IGRAPH_EINVAL);
+  }
+
   /***************/
   /* local j, v; */
   /***************/
