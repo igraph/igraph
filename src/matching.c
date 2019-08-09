@@ -362,6 +362,8 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
     n = igraph_vector_size(&neis);
     for (j = 0; j < n; j++) {
       k = (long int) VECTOR(neis)[j];
+      if (VECTOR(*types)[k] == VECTOR(*types)[i])
+        IGRAPH_ERROR("Graph is not bipartite with supplied types vector", IGRAPH_EINVAL);
       if (UNMATCHED(k)) {
         /* We match vertex i to vertex VECTOR(neis)[j] */
         VECTOR(match)[k] = i;
@@ -611,10 +613,12 @@ int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
     neis = igraph_inclist_get(&inclist, i);
     n = igraph_vector_int_size(neis);
     for (j = 0, k = 0; j < n; j++) {
-      if (VECTOR(*weights)[(long int)VECTOR(*neis)[j]] > max_weight) {
-        k = (long int) VECTOR(*neis)[j];
+      k = (long int) VECTOR(*neis)[j];
+      u = IGRAPH_OTHER(graph, k, i);
+      if (VECTOR(*types)[u] == VECTOR(*types)[i])
+        IGRAPH_ERROR("Graph is not bipartite with supplied types vector", IGRAPH_EINVAL);
+      if (VECTOR(*weights)[k] > max_weight)
         max_weight = VECTOR(*weights)[k];
-      }
     }
 
     VECTOR(labels)[i] = max_weight;
