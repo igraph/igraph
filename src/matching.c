@@ -297,8 +297,9 @@ int igraph_maximum_bipartite_matching(const igraph_t* graph,
     }
     return IGRAPH_SUCCESS;
   } else {
-    return igraph_i_maximum_bipartite_matching_weighted(graph, types,
-        matching_size, matching_weight, matching, weights, eps);
+    IGRAPH_CHECK(igraph_i_maximum_bipartite_matching_weighted(graph, types,
+        matching_size, matching_weight, matching, weights, eps));
+    return IGRAPH_SUCCESS;
   }
 }
 
