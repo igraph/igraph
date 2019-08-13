@@ -762,7 +762,9 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
       n=igraph_vector_int_size(neis);
       for (j=0; j<n; j++) {
         long int neighbor=(long int) VECTOR(*neis)[j];
-        IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+        if (!VECTOR(visited)[neighbor]) {
+          IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+        }
       }
     }
     igraph_dqueue_destroy(&q);
@@ -786,7 +788,7 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
       IGRAPH_VECTOR_INIT_FINALLY(&newedges, no_of_newedges*2);
       j = 0;
       for (i=0; i<no_of_nodes; i++) {
-        if (~VECTOR(visited)[i]) {
+        if (!VECTOR(visited)[i]) {
           if (mode!=GRAPH_IN) {
             VECTOR(newedges)[2*j] = real_root;
             VECTOR(newedges)[2*j+1] = i;
