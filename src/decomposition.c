@@ -62,8 +62,13 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
   igraph_vector_long_t head, next, prev; /* doubly linked list with head */
   long int i;
   igraph_adjlist_t adjlist;
-  
   igraph_bool_t simple;
+
+  /***************/
+  /* local j, v; */
+  /***************/
+  
+  long int j, v;
 
   if (igraph_is_directed(graph))
   {
@@ -74,12 +79,6 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
   if (!simple) {
     IGRAPH_ERROR("Maximum cardinality search works on simple graphs only", IGRAPH_EINVAL);
   }
-
-  /***************/
-  /* local j, v; */
-  /***************/
-  
-  long int j, v;
   
   if (no_of_nodes == 0) {
     igraph_vector_clear(alpha);
