@@ -2544,6 +2544,7 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 
   int cmp_result;
   const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
+  igraph_real_t mindist;
 
   igraph_bool_t warning_shown = 0;
   
@@ -2584,10 +2585,10 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
     VECTOR(which)[source] = i+1;
     VECTOR(dist)[source] = 1.0;     /* actual distance is zero but we need to store distance + 1 */
     nodes_reached=0;
-    
+
     while (!igraph_2wheap_empty(&Q)) {
       igraph_integer_t minnei=(igraph_integer_t) igraph_2wheap_max_index(&Q);
-      igraph_real_t mindist=-igraph_2wheap_delete_max(&Q);
+      mindist=-igraph_2wheap_delete_max(&Q);
       
       /* Now check all neighbors of minnei for a shorter path */
       igraph_vector_t *neis=igraph_lazy_inclist_get(&inclist, minnei);
@@ -2628,7 +2629,8 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
     VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
 
-    if (no_of_nodes > nodes_reached && !warning_shown) {
+    if (((cutoff > 0 && mindist < cutoff+1.0) || (cutoff <= 0)) &&
+        nodes_reached < no_of_nodes && !warning_shown) {
       IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
       warning_shown = 1;
     }
@@ -2727,6 +2729,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
   igraph_vector_int_t *neis;
   long int i, j;
   long int nodes_reached;
+  long int actdist;
   igraph_adjlist_t allneis;
 
   igraph_dqueue_t q;
@@ -2774,7 +2777,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
     
     while (!igraph_dqueue_empty(&q)) {
       long int act=(long int) igraph_dqueue_pop(&q);
-      long int actdist=(long int) igraph_dqueue_pop(&q);
+      actdist=(long int) igraph_dqueue_pop(&q);
       
       VECTOR(*res)[i] += actdist;
 
@@ -2796,7 +2799,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
     VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes-nodes_reached));
     VECTOR(*res)[i] = (no_of_nodes-1) / VECTOR(*res)[i];
 
-    if (no_of_nodes > nodes_reached && !warning_shown) {
+    if (((cutoff > 0 && actdist < cutoff) || cutoff <= 0) &&
+        no_of_nodes > nodes_reached && !warning_shown) {
       IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
       warning_shown = 1;
     }
