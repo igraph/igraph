@@ -1271,12 +1271,11 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     NOTE: 3. could be done better, e.g. by topological sorting of some kind.
     But for now it's ok like this.
   */
-  real_root = igraph_i_layout_reingold_tilford_preconnect(graph,
-      &pextended, &extended, proots, mode, &no_of_nodes);
+  real_root = IGRAPH_CHECK(igraph_i_layout_reingold_tilford_preconnect(graph,
+      &pextended, &extended, proots, mode, &no_of_nodes));
 
   /* ----------------------------------------------------------------------- */
   /* Layout */
-
   IGRAPH_CHECK(igraph_i_layout_reingold_tilford(pextended, res, mode, real_root));
   
   /* Remove the new vertices from the layout */
