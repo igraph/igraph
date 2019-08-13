@@ -699,6 +699,12 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
   /* memory for extended graph has been allocated already */
   igraph_t *pextended = *amp_pextended;
   igraph_t extended = *amp_extended;
+  long int no_of_newedges;
+  igraph_vector_int_t visited;
+  long int j, n;
+  igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
+  igraph_adjlist_t allneis;
+  igraph_vector_int_t *neis;
 
   /* if there is only one root, no need for real_root */
   if (igraph_vector_size(proots)==1) {
@@ -724,6 +730,7 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
     real_root = no_of_nodes;
     IGRAPH_CHECK(igraph_add_vertices(&extended, 1, 0));
     no_of_nodes++;
+    *pno_of_nodes = no_of_nodes;
 
     /* add edges from the roots to real_root */
     no_of_newedges = igraph_vector_size(proots);
@@ -737,75 +744,68 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
   }
 
-  /* traverse the graph from real_root and see what nodes you
-     cannot reach */
-  if (true) {
-    igraph_vector_t newedges;
-    long int no_of_newedges;
-    long int i, j, n;
-    igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-    igraph_adjlist_t allneis;
-    igraph_vector_int_t *neis;
-    igraph_vector_int_t visited;
+  /* traverse from real_root and see what nodes you cannot reach */
+  no_of_newedges = 0;
+  IGRAPH_VECTOR_INIT_FINALLY(&visited, no_of_nodes);
+  IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
-    IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, mode));
-    IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
-
-    /* start from real_root and go BFS */
-    IGRAPH_VECTOR_INIT_FINALLY(&visited, no_of_nodes);
-    IGRAPH_CHECK(igraph_dqueue_push(&q, root));
-    while (!igraph_dqueue_empty(&q)) {
-      long int actnode=(long int) igraph_dqueue_pop(&q);
-      VECTOR(visited)[actnode] = 1;
-      neis=igraph_adjlist_get(&allneis, actnode);
-      n=igraph_vector_int_size(neis);
-      for (j=0; j<n; j++) {
-        long int neighbor=(long int) VECTOR(*neis)[j];
-        if (!VECTOR(visited)[neighbor]) {
-          IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-        }
+  /* start from real_root and go BFS */
+  IGRAPH_CHECK(igraph_dqueue_push(&q, root));
+  while (!igraph_dqueue_empty(&q)) {
+    long int actnode=(long int) igraph_dqueue_pop(&q);
+    VECTOR(visited)[actnode] = 1;
+    neis=igraph_adjlist_get(&allneis, actnode);
+    n=igraph_vector_int_size(neis);
+    for (j=0; j<n; j++) {
+      long int neighbor=(long int) VECTOR(*neis)[j];
+      if (!VECTOR(visited)[neighbor]) {
+        IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
       }
-    }
-    igraph_dqueue_destroy(&q);
-    igraph_adjlist_destroy(&allneis);
-    IGRAPH_FINALLY_CLEAN(2);
-
-    /* check whether any nodes are unreachable */
-    no_of_newedges = no_of_nodes;
-    for (i=0; i<no_of_nodes; i++) {
-      no_of_newedges -= VECTOR(visited)[i];
-    }
-    if (no_of_newedges != 0) {
-      /* Make copy of the graph unless it exists already */
-      if (pextended == graph) {
-        pextended=&extended;
-        IGRAPH_CHECK(igraph_copy(&extended, graph));
-        IGRAPH_FINALLY(igraph_destroy, &extended);
-      } 
-
-      /* add new edges from the missing nodes to real_root */
-      IGRAPH_VECTOR_INIT_FINALLY(&newedges, no_of_newedges*2);
-      j = 0;
-      for (i=0; i<no_of_nodes; i++) {
-        if (!VECTOR(visited)[i]) {
-          if (mode!=GRAPH_IN) {
-            VECTOR(newedges)[2*j] = real_root;
-            VECTOR(newedges)[2*j+1] = i;
-          } else {
-            VECTOR(newedges)[2*j] = i;
-            VECTOR(newedges)[2*j+1] = real_root;
-          }
-          j++;
-        }
-      }
-      IGRAPH_CHECK(igraph_add_edges(&extended, &newedges, 0));
-      igraph_vector_destroy(&newedges);
-      IGRAPH_FINALLY_CLEAN(1);
     }
   }
+  igraph_dqueue_destroy(&q);
+  igraph_adjlist_destroy(&allneis);
+  IGRAPH_FINALLY_CLEAN(2);
 
-  *pno_of_nodes = no_of_nodes;
+  for (i=0; i<no_of_nodes; i++) {
+    no_of_newedges += 1 - VECTOR(visited)[i];
+  }
+
+  /* if any nodes are unreachable, add edges between them and real_root */
+  if (no_of_newedges != 0) {
+    igraph_vector_t newedges;
+    long int i, j;
+
+    /* Make copy of the graph unless it exists already */
+    if (pextended == graph) {
+      pextended=&extended;
+      IGRAPH_CHECK(igraph_copy(&extended, graph));
+      IGRAPH_FINALLY(igraph_destroy, &extended);
+    } 
+
+    IGRAPH_VECTOR_INIT_FINALLY(&newedges, no_of_newedges*2);
+    j = 0;
+    for (i=0; i<no_of_nodes; i++) {
+      if (!VECTOR(visited)[i]) {
+        if (mode!=GRAPH_IN) {
+          VECTOR(newedges)[2*j] = real_root;
+          VECTOR(newedges)[2*j+1] = i;
+        } else {
+          VECTOR(newedges)[2*j] = i;
+          VECTOR(newedges)[2*j+1] = real_root;
+        }
+        j++;
+      }
+    }
+    IGRAPH_CHECK(igraph_add_edges(&extended, &newedges, 0));
+    igraph_vector_destroy(&newedges);
+    IGRAPH_FINALLY_CLEAN(1);
+  }
+  igraph_vector_destroy(&visited);
+  IGRAPH_FINALLY_CLEAN(1);
+
   return real_root;
 }
 
