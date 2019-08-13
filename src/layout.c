@@ -692,9 +692,10 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
     igraph_t *amp_extended,
     const igraph_vector_t *proots,
     igraph_neimode_t mode,
-    long int *pno_of_nodes) {
+    long int *pno_of_nodes,
+    long int *preal_root) {
 
-  long int real_root;
+  long int real_root = *preal_root;
   long int no_of_nodes = *pno_of_nodes;
   /* memory for extended graph has been allocated already */
   igraph_t *pextended = *amp_pextended;
@@ -728,6 +729,7 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
 
     /* add real_root to the vertices */
     real_root = no_of_nodes;
+    *preal_root = real_root;
     IGRAPH_CHECK(igraph_add_vertices(&extended, 1, 0));
     no_of_nodes++;
     *pno_of_nodes = no_of_nodes;
@@ -752,7 +754,7 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 
   /* start from real_root and go BFS */
-  IGRAPH_CHECK(igraph_dqueue_push(&q, root));
+  IGRAPH_CHECK(igraph_dqueue_push(&q, real_root));
   while (!igraph_dqueue_empty(&q)) {
     long int actnode=(long int) igraph_dqueue_pop(&q);
     VECTOR(visited)[actnode] = 1;
@@ -769,8 +771,8 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
   igraph_adjlist_destroy(&allneis);
   IGRAPH_FINALLY_CLEAN(2);
 
-  for (i=0; i<no_of_nodes; i++) {
-    no_of_newedges += 1 - VECTOR(visited)[i];
+  for (j=0; j<no_of_nodes; j++) {
+    no_of_newedges += 1 - VECTOR(visited)[j];
   }
 
   /* if any nodes are unreachable, add edges between them and real_root */
@@ -789,7 +791,7 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
     j = 0;
     for (i=0; i<no_of_nodes; i++) {
       if (!VECTOR(visited)[i]) {
-        if (mode!=GRAPH_IN) {
+        if (mode!=IGRAPH_IN) {
           VECTOR(newedges)[2*j] = real_root;
           VECTOR(newedges)[2*j+1] = i;
         } else {
@@ -805,8 +807,6 @@ int igraph_i_layout_reingold_tilford_preconnect(const igraph_t *graph,
   }
   igraph_vector_destroy(&visited);
   IGRAPH_FINALLY_CLEAN(1);
-
-  return real_root;
 }
 
 
@@ -1217,7 +1217,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
            and edges at all levels [1, 2, .., rl]
            piercing through the graph. If mode=="in"
            they pierce the other way */
-        if (mode!=GRAPH_IN) {
+        if (mode!=IGRAPH_IN) {
 	        VECTOR(newedges)[edgeptr++] = no_of_nodes;
 	        VECTOR(newedges)[edgeptr++] = rn;
 	        for (j=0; j<rl-1; j++) {
@@ -1271,8 +1271,8 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
     NOTE: 3. could be done better, e.g. by topological sorting of some kind.
     But for now it's ok like this.
   */
-  real_root = IGRAPH_CHECK(igraph_i_layout_reingold_tilford_preconnect(graph,
-      &pextended, &extended, proots, mode, &no_of_nodes));
+  IGRAPH_CHECK(igraph_i_layout_reingold_tilford_preconnect(graph,
+      &pextended, &extended, proots, mode, &no_of_nodes, &real_root));
 
   /* ----------------------------------------------------------------------- */
   /* Layout */
