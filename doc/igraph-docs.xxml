@@ -5,6 +5,8 @@
 <!ENTITY version "@IGRAPH_VERSION@">
 <!ENTITY mdash "&#8212;">
 <!ENTITY aacute "&#xe1;">
+<!ENTITY uuml "&#0252;">
+<!ENTITY ccaron "&#0269;">
 <!ENTITY % local.common.attrib    "xmlns:xi            CDATA       #FIXED       
 'http://www.w3.org/2001/XInclude'" >
 ]>
