@@ -48,6 +48,7 @@ $(top_builddir)/examples/simple/%.c.xml: $(top_srcdir)/examples/simple/%.c tags
 	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=$(top_srcdir)/doc/docbook.outlang
 
 igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
+	sed "s/@IGRAPH_VERSION@/`cat ../IGRAPH_VERSION`/g" $(top_srcdir)/doc/igraph-docs.xxml > $(top_srcdir)/doc/igraph-docs.xml
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(top_srcdir)/doc/igraph-docs.xml . ; fi
 	touch igraph-docs.xml
 

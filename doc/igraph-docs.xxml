@@ -2,6 +2,7 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
+<!ENTITY version "@IGRAPH_VERSION@">
 <!ENTITY mdash "&#8212;">
 <!ENTITY aacute "&#xe1;">
 <!ENTITY % local.common.attrib    "xmlns:xi            CDATA       #FIXED       
@@ -10,7 +11,7 @@
 
 <book id="index" xmlns:xi="http://www.w3.org/2001/XInclude">
   <bookinfo>
-    <title>&igraph; Reference Manual</title>
+    <title>&igraph; &version; Reference Manual</title>
     <authorgroup>
       <author><firstname>Gábor</firstname><surname>Csárdi</surname>
       <affiliation><orgname>Department of Statistics, Harvard University
