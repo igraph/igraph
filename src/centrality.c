@@ -2588,11 +2588,11 @@ int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 
     while (!igraph_2wheap_empty(&Q)) {
       igraph_integer_t minnei=(igraph_integer_t) igraph_2wheap_max_index(&Q);
-      mindist=-igraph_2wheap_delete_max(&Q);
-      
       /* Now check all neighbors of minnei for a shorter path */
       igraph_vector_t *neis=igraph_lazy_inclist_get(&inclist, minnei);
       long int nlen=igraph_vector_size(neis);
+
+      mindist=-igraph_2wheap_delete_max(&Q);
 
       VECTOR(*res)[i] += (mindist - 1.0);
       nodes_reached++;
