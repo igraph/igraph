@@ -278,4 +278,4 @@ igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
 	&& fop -fo igraph-docs.fo -pdf igraph-docs.pdf
 
 CLEANFILES=$(DOCINCLUDES) html/*.html html/stamp \
-	igraph-docs.{dvi,info,pdf,ps,texi,txml} igraph-docs2.xml
+	igraph-docs.{dvi,info,pdf,ps,texi,txml} igraph-docs2.xml igraph-docs.xml
