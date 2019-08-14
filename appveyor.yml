@@ -19,7 +19,7 @@ environment:
       PYTHON_VERSION: "3.6"
       CONDA_INSTALL_LOCN: "C:\\Miniconda36-x64"
     -
-      PYTHON_VERSION: "NONE"
+      PYTHON_VERSION: "3.7"
       CONDA_INSTALL_LOCN: "C:\\Miniconda37-x64"
 
 # We always use a 64-bit machine, but can build x86 distributions
