@@ -1262,8 +1262,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
   }
   
   /* prepare edges to unreachable parts of the graph */
-  IGRAPH_CHECK(igraph_i_layout_reingold_tilford_unreachable(pextended,
-    mode, real_root, no_of_nodes, &newedges));
+  IGRAPH_CHECK(igraph_i_layout_reingold_tilford_unreachable(pextended, mode, real_root, no_of_nodes, &newedges));
 
   if (igraph_vector_size(&newedges) != 0) {
     /* Make copy of the graph unless it exists already */
