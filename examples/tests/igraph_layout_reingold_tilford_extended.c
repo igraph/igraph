@@ -29,18 +29,20 @@ int main() {
   igraph_t g;
   FILE *f;
   igraph_matrix_t coords;
-  long int i, n;
+  /* long int i, n; */
 
   f=fopen("igraph_layout_reingold_tilford_extended.in", "r");
-  /* FIXME */
   igraph_read_graph_edgelist(&g, f, 0, 1);
   igraph_matrix_init(&coords, 0, 0);
+
   igraph_layout_reingold_tilford(&g, &coords, IGRAPH_IN, 0, 0); 
   
+  /*
   n=igraph_vcount(&g);
   for (i=0; i<n; i++) {
     printf("%6.3f %6.3f\n", MATRIX(coords, i, 0), MATRIX(coords, i, 1));
   }
+  */
   
   igraph_matrix_destroy(&coords);
   igraph_destroy(&g);
