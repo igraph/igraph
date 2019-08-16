@@ -48,9 +48,11 @@ $(top_builddir)/examples/simple/%.c.xml: $(top_srcdir)/examples/simple/%.c tags
 	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=$(top_srcdir)/doc/docbook.outlang
 
 igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
-	sed "s/@IGRAPH_VERSION@/`cat ../IGRAPH_VERSION`/g" $(top_srcdir)/doc/igraph-docs.xxml > $(top_srcdir)/doc/igraph-docs.xml
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(top_srcdir)/doc/igraph-docs.xml . ; fi
 	touch igraph-docs.xml
+
+igraph-docs0.xml: igraph-docs.xml
+	sed "s/@IGRAPH_VERSION@/`cat ../IGRAPH_VERSION`/g" $(top_srcdir)/doc/igraph-docs.xml > $(top_srcdir)/doc/igraph-docs0.xml
 
 vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c $(INCLUDEDIR)/igraph_vector_ptr.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_vector_pmt.h \
@@ -219,9 +221,9 @@ epi.xml: epi.xxml $(SRCDIR)/sir.c $(INCLUDEDIR)/igraph_epidemics.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/sir.c \
 		$(INCLUDEDIR)/igraph_epidemics.h
 
-html/stamp: igraph-docs.xml $(DOCFIX2) gtk-doc.xsl
+html/stamp: igraph-docs0.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
-	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs.xml \
+	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs0.xml \
 	&& touch html/stamp
 
 jekyll/stamp: html/stamp
@@ -233,11 +235,11 @@ jekyll/stamp: html/stamp
                   > ../jekyll/$$i; done
 	touch jekyll/stamp
 
-igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
+igraph.info: igraph-docs0.xml $(DOCFIX2) igraph.info.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	cat tutorial.xml | sed '/<link/{N;s/<link\n*[^>]*>//g;}' | \
 	  sed 's/<\/link>//g' >tutorial-info.xml \
-	&& sed 's/tutorial\.xml/tutorial-info.xml/' igraph-docs.xml > igraph-docs-info.xml \
+	&& sed 's/tutorial\.xml/tutorial-info.xml/' igraph-docs0.xml > igraph-docs-info.xml \
 	&& xmllint --xinclude -o igraph-docs-info2.xml igraph-docs-info.xml \
 	&& $(REMOVEEXAMPLES) igraph-docs-info2.xml igraph-docs-info3.xml \
 	&& sed '/<book/q' igraph-docs-info2.xml | grep -v '<book' >igraph-docs-info4.xml\
@@ -249,27 +251,27 @@ igraph.info: igraph-docs.xml $(DOCFIX2) igraph.info.diff
 	&& mv igraph_reference_manual.info igraph.info \
 	&& patch <$(top_srcdir)/doc/igraph.info.diff
 
-igraph-docs.dvi: igraph-docs.xml $(DOCFIX2)
+igraph-docs.dvi: igraph-docs0.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
-	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
+	xmllint --xinclude -o igraph-docs2.xml igraph-docs0.xml \
 	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
 	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
 	&& cat igraph-docs3.xml >> igraph-docs4.xml \
 	&& env < /dev/null hash_extra=650000 docbook2dvi igraph-docs4.xml \
 	&& mv igraph-docs4.dvi igraph-docs.dvi
 
-igraph-docs.ps: igraph-docs.xml $(DOCFIX2)
+igraph-docs.ps: igraph-docs0.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
-	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
+	xmllint --xinclude -o igraph-docs2.xml igraph-docs0.xml \
 	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
 	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
 	&& cat igraph-docs3.xml >> igraph-docs4.xml \
 	&& env < /dev/null hash_extra=65000 docbook2s igraph-docs4.xml \
 	&& mv igraph-docs4.ps igraph-docs.ps
 
-igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
+igraph-docs.pdf: igraph-docs0.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
-	xmllint --xinclude -o igraph-docs2.xml igraph-docs.xml \
+	xmllint --xinclude -o igraph-docs2.xml igraph-docs0.xml \
 	&& $(REMOVEEXAMPLES) igraph-docs2.xml igraph-docs3.xml \
 	&& sed '/<book/q' igraph-docs2.xml | grep -v '<book' >igraph-docs4.xml\
 	&& cat igraph-docs3.xml >> igraph-docs4.xml \
@@ -278,4 +280,4 @@ igraph-docs.pdf: igraph-docs.xml $(DOCFIX2)
 	&& fop -fo igraph-docs.fo -pdf igraph-docs.pdf
 
 CLEANFILES=$(DOCINCLUDES) html/*.html html/stamp \
-	igraph-docs.{dvi,info,pdf,ps,texi,txml} igraph-docs2.xml igraph-docs.xml
+	igraph-docs.{dvi,info,pdf,ps,texi,txml} igraph-docs2.xml igraph-docs0.xml
