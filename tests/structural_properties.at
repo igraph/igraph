@@ -85,6 +85,12 @@ AT_COMPILE_CHECK([simple/igraph_get_all_shortest_paths_dijkstra.c],
          [simple/igraph_get_all_shortest_paths_dijkstra.out])
 AT_CLEANUP
 
+AT_SETUP([Get all simple paths: ])
+AT_KEYWORDS([igraph_get_all_simple_paths simple paths])
+AT_COMPILE_CHECK([simple/igraph_get_all_simple_paths.c],
+         [simple/igraph_get_all_simple_paths.out])
+AT_CLEANUP
+
 AT_SETUP([Shortest path wrappers for single target node: ])
 AT_KEYWORDS([igraph_get_shortest_path igraph_get_shortest_path_dijkstra])
 AT_COMPILE_CHECK([simple/single_target_shortest_path.c], 
