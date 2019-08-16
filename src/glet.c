@@ -498,7 +498,8 @@ int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized vector of pointers. 
  *        The graphlet basis is stored here. Each element of the pointer 
- *        vector will be a vector of vertex ids.
+ *        vector will be a vector of vertex ids. Each elements must be
+ *        destroyed using \ref igraph_vector_destroy() and \ref igraph_free().
  * \param thresholds An initialized vector, the (highest possible)
  *        weight thresholds for finding the basis subgraphs are stored
  *        here.
