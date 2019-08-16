@@ -759,6 +759,8 @@ int igraph_i_layout_reingold_tilford_unreachable(
   igraph_adjlist_destroy(&allneis);
   igraph_vector_destroy(&visited);
   IGRAPH_FINALLY_CLEAN(3);
+
+  return IGRAPH_SUCCESS;
 }
 
 
