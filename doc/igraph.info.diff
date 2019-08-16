@@ -1,13 +1,20 @@
---- igraph.info	2008-07-11 07:10:31.000000000 -0500
-+++ igraph.info.orig	2008-07-11 07:13:28.000000000 -0500
-@@ -1,8 +1,8 @@
- This is igraph_reference_manual.info, produced by makeinfo version 4.11 from igraph.texi.
+--- igraph.info.orig	2019-08-16 10:35:48.540887736 +0200
++++ igraph.info	2019-08-16 10:41:57.388760592 +0200
+@@ -2,8 +2,7 @@
+ from igraph.texi.
  
-+INFO-DIR-SECTION Development
  START-INFO-DIR-ENTRY
 -* igraph Reference Manual: (igraph_reference_manual).
 -                                                  [MISSING TEXT]
-+* Igraph Reference Manual: (igraph.info).    A library for graphs
++* Igraph Reference Manual: (igraph.info).    A library for graphs, version @IGRAPH_VERSION@
  END-INFO-DIR-ENTRY
  
  
+@@ -11,6 +10,7 @@
+ 
+ igraph Reference Manual
+ ***********************
++Version @IGRAPH_VERSION@
+ 
+ * Menu:
+ 

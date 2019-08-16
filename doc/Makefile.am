@@ -52,7 +52,7 @@ igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
 	touch igraph-docs.xml
 
 igraph-docs0.xml: igraph-docs.xml
-	sed "s/@IGRAPH_VERSION@/`cat ../IGRAPH_VERSION`/g" $(top_srcdir)/doc/igraph-docs.xml > $(top_srcdir)/doc/igraph-docs0.xml
+	sed "s/@IGRAPH_VERSION@/`cat $(top_srcdir)/IGRAPH_VERSION`/g" $(top_srcdir)/doc/igraph-docs.xml > $(top_srcdir)/doc/igraph-docs0.xml
 
 vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c $(INCLUDEDIR)/igraph_vector_ptr.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_vector_pmt.h \
@@ -235,7 +235,10 @@ jekyll/stamp: html/stamp
                   > ../jekyll/$$i; done
 	touch jekyll/stamp
 
-igraph.info: igraph-docs0.xml $(DOCFIX2) igraph.info.diff
+igraph.info0.diff: igraph.info.diff
+	sed "s/@IGRAPH_VERSION@/`cat $(top_srcdir)/IGRAPH_VERSION`/g" $(top_srcdir)/doc/igraph.info.diff > igraph.info0.diff
+
+igraph.info: igraph-docs0.xml $(DOCFIX2) igraph.info0.diff
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
 	cat tutorial.xml | sed '/<link/{N;s/<link\n*[^>]*>//g;}' | \
 	  sed 's/<\/link>//g' >tutorial-info.xml \
@@ -245,11 +248,11 @@ igraph.info: igraph-docs0.xml $(DOCFIX2) igraph.info.diff
 	&& sed '/<book/q' igraph-docs-info2.xml | grep -v '<book' >igraph-docs-info4.xml\
 	&& cat igraph-docs-info3.xml >> igraph-docs-info4.xml \
 	&& db2x_xsltproc --xinclude -s texi igraph-docs-info4.xml -o igraph.txml \
-	&& db2x_texixml igraph.txml \
+	&& db2x_texixml --encoding=utf8 igraph.txml \
 	&& mv igraph_reference_manual.texi igraph.texi \
 	&& makeinfo --no-split --number-sections igraph.texi \
 	&& mv igraph_reference_manual.info igraph.info \
-	&& patch <$(top_srcdir)/doc/igraph.info.diff
+	&& patch < igraph.info0.diff
 
 igraph-docs.dvi: igraph-docs0.xml $(DOCFIX2)
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
