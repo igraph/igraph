@@ -116,13 +116,15 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     int n=igraph_vector_size(neis);
     int *ptr=igraph_vector_int_e_ptr(&nptr, act);
     igraph_bool_t any;
+    igraph_bool_t within_dist;
     int nei;
 
     if (iteration == 0) {
       IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    if (curdist < cutoff)
+    within_dist = (curdist < cutoff || cutoff < 0);
+    if (within_dist)
     {
       /* Search for a neighbor that was not yet visited */
       any = 0;
@@ -132,7 +134,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
         (*ptr) ++;
       }
     }
-    if (curdist < cutoff && any) {
+    if (within_dist && any) {
       /* There is such a neighbor, add it */
       IGRAPH_CHECK(igraph_vector_int_push_back(&stack, nei));
       IGRAPH_CHECK(igraph_vector_int_push_back(&dist, curdist + 1));
