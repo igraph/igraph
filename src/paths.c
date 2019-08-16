@@ -49,8 +49,10 @@
  *        are included in arbitrary order, as they are found.
  * \param from The start vertex.
  * \param to The target vertices.
+ * \param cutoff Maximum length of path that is considered. If
+ *        negative, paths of all lengths are considered.
  * \param mode The type of the paths to consider, it is ignored
- *        for undirectred graphs.
+ *        for undirected graphs.
  * \return Error code.
  *
  * Time complexity: O(n!) in the worst case, n is the number of
