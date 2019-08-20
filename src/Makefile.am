@@ -246,12 +246,11 @@ SPCONFIG =      SuiteSparse_config/SuiteSparse_config.c \
                 SuiteSparse_config/SuiteSparse_config.h
 
 HEADERS_PRIVATE = atlas-edges.h \
-		bliss_bignum.hh		bliss_defs.hh \
-		bliss_eqrefhash.hh	bliss_graph.hh \
-		bliss_heap.hh		bliss_kqueue.hh \
-		bliss_kstack.hh		bliss_orbit.hh \
-		bliss_partition.hh	bliss_timer.hh \
-		bliss_utils.hh \
+		bliss/bignum.hh		bliss/defs.hh \
+		bliss/graph.hh		bliss/uintseqhash.hh \
+		bliss/heap.hh		bliss/kqueue.hh \
+		bliss/kstack.hh		bliss/orbit.hh \
+		bliss/partition.hh	bliss/utils.hh \
 		NetDataTypes.h		NetRoutines.h \
 		pottsmodel_2.h \
 		igraph_gml_tree.h \
