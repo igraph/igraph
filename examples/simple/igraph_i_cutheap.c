@@ -22,7 +22,7 @@
 */
 
 #include <igraph.h>
-#include <igraph_types_internal.h>
+#include "igraph_types_internal.h"
 
 void print_vector(igraph_vector_t *v, FILE *f) {
   long int i;

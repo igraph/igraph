@@ -22,7 +22,6 @@
 */
 
 #include <igraph.h>
-#include <igraph_sparsemat.h>
 
 int main() {
   igraph_matrix_t mat, mat2, mat3;

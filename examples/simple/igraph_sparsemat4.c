@@ -23,7 +23,6 @@
 
 #include <cs/cs.h>
 #include <igraph.h>
-#include <igraph_sparsemat.h>
 
 igraph_bool_t check_solution(const igraph_sparsemat_t *A,
 			     const igraph_vector_t *x,
