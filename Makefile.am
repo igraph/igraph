@@ -36,7 +36,7 @@ install-info:
 dist-hook:
 	rm -rf `find $(distdir)/examples -type d -name .arch-ids`
 
-MAINTAINERCLEANFILES = Makefile.in aclocal.m4
+MAINTAINERCLEANFILES = Makefile.in
 
 ## to make sure make deb will generate Debian packages
 .PHONY: framework msvc parsersources
