@@ -28,10 +28,14 @@
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
 
+__BEGIN_DECLS
+
 int igraph_cohesive_blocks(const igraph_t *graph,
 			   igraph_vector_ptr_t *blocks,
 			   igraph_vector_t *cohesion,
 			   igraph_vector_t *parent,
 			   igraph_t *block_tree);
+
+__END_DECLS
 
 #endif

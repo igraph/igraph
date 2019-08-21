@@ -29,6 +29,8 @@
 #include "igraph_matrix.h"
 #include "igraph_sparsemat.h"
 
+__BEGIN_DECLS
+
 typedef enum { IGRAPH_SCG_SYMMETRIC=1, IGRAPH_SCG_LAPLACIAN=2,
 	       IGRAPH_SCG_STOCHASTIC=3 } igraph_scg_matrix_t;
 
@@ -131,5 +133,7 @@ int igraph_scg_laplacian(const igraph_t *graph,
 			 igraph_matrix_t *R,
 			 igraph_sparsemat_t *Lsparse,
 			 igraph_sparsemat_t *Rsparse);
+
+__END_DECLS
 
 #endif

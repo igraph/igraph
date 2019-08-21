@@ -31,6 +31,8 @@
 
 #include <stdio.h>
 
+__BEGIN_DECLS
+
 struct cs_di_sparse;
 struct cs_di_symbolic;
 struct cs_di_numeric;
@@ -277,5 +279,7 @@ int igraph_sparsemat_iterator_idx(const igraph_sparsemat_iterator_t *it);
 igraph_real_t 
 igraph_sparsemat_iterator_get(const igraph_sparsemat_iterator_t *it);
 int igraph_sparsemat_iterator_next(igraph_sparsemat_iterator_t *it);
+
+__END_DECLS
 
 #endif
