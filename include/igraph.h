@@ -28,6 +28,10 @@
 # define _GNU_SOURCE 1
 #endif
 
+#ifdef __cplusplus
+extern "C"{
+#endif
+
 #include "igraph_version.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
@@ -96,5 +100,9 @@
 #include "igraph_epidemics.h"
 #include "igraph_lsap.h"
 #include "igraph_coloring.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
