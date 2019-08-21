@@ -22,7 +22,6 @@
 */
 
 #include <igraph.h>
-#include <igraph_sparsemat.h>
 
 #define EPS 1e-13
 

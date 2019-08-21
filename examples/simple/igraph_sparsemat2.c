@@ -23,9 +23,8 @@
 
 #include <cs/cs.h>
 #include <igraph.h>
-#include <igraph_sparsemat.h>
-#include <igraph_blas_internal.h>
-#include <igraph_arpack_internal.h>
+#include "igraph_blas_internal.h"
+#include "igraph_arpack_internal.h"
 
 int igraph_matrix_dgemv(const igraph_matrix_t *m,
                         const igraph_vector_t *v,

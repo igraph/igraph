@@ -22,7 +22,6 @@
 */
 
 #include <igraph.h>
-#include <igraph_stack.h>
 
 int main() {
 

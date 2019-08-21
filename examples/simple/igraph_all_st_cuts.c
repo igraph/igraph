@@ -22,8 +22,8 @@
 */
 
 #include <igraph.h>
-#include <igraph_marked_queue.h>
-#include <igraph_estack.h>
+#include "igraph_marked_queue.h"
+#include "igraph_estack.h"
 
 int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 			       const igraph_marked_queue_t *S,
