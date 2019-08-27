@@ -742,12 +742,6 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 				     &leftout, IGRAPH_IN));
   IGRAPH_FINALLY(igraph_destroy, &domtree);
 
-  /* Relabel left out vertices (set K in Provan & Shier) to
-     correspond to node labelling of graph instead of SBar. */
-  n = igraph_vector_size(&leftout);
-  for (i = 0; i < n; i++)
-    VECTOR(leftout)[i] = VECTOR(Sbar_invmap)[(long int)VECTOR(leftout)[i]];
-
   /* -------------------------------------------------------------*/
   /* Identify the set M of minimal elements of Gamma(S) with respect
      to the dominator relation. */
@@ -777,6 +771,17 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 	IGRAPH_FINALLY_CLEAN(1);
       }
     }
+  }
+
+  /* Relabel left out vertices (set K in Provan & Shier) to
+     correspond to node labelling of graph instead of SBar.
+     At the same time ensure that GammaS is a proper subset of
+     L, where L are the nodes in the dominator tree. */
+  n = igraph_vector_size(&leftout);
+  for (i = 0; i < n; i++)
+  {
+    VECTOR(leftout)[i] = VECTOR(Sbar_invmap)[(long int)VECTOR(leftout)[i]];
+    VECTOR(GammaS)[(long int)VECTOR(leftout)[i]] = 0;
   }
 
   IGRAPH_VECTOR_INIT_FINALLY(&M, 0);
