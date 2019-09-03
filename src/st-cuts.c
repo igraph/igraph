@@ -1120,12 +1120,9 @@ int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
   igraph_vector_t indeg;
   long int i, minsize;
   igraph_vector_t neis;
-  igraph_dqueue_t to_visit;
   
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
   IGRAPH_VECTOR_INIT_FINALLY(&indeg, no_of_nodes);
-  IGRAPH_CHECK(igraph_dqueue_init(&to_visit, 0));
-  IGRAPH_FINALLY(igraph_dqueue_destroy, &to_visit);
 
   IGRAPH_CHECK(igraph_degree(Sbar, &indeg, igraph_vss_all(), 
 			     IGRAPH_IN, /*loops=*/ 1));
@@ -1133,22 +1130,18 @@ int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
 #define ACTIVE(x) (VECTOR(*active)[(long int)VECTOR(*invmap)[(x)]])
 #define ZEROIN(x) (VECTOR(indeg)[(x)]==0)
 
-  for (i=0; i<no_of_nodes; i++) {
-    if (!ACTIVE(i) && ZEROIN(i)) {
-      IGRAPH_CHECK(igraph_dqueue_push(&to_visit, i));
-    }
-    while (!igraph_dqueue_empty(&to_visit)) {
-      long int rv=(long int) igraph_dqueue_pop(&to_visit);
+  for (i=0; i<no_of_nodes; i++)
+  {
+    if (!ACTIVE(i))
+    {
       long int j, n;
-      IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, (igraph_integer_t) rv,
-				    IGRAPH_OUT));
+      IGRAPH_CHECK(igraph_neighbors(Sbar, &neis, (igraph_integer_t) i,
+            IGRAPH_OUT));
       n=igraph_vector_size(&neis);
-      for (j=0; j<n; j++) {
-	long int nei=(long int) VECTOR(neis)[j];
-	VECTOR(indeg)[nei] -= 1;
-	if (VECTOR(indeg)[nei] == 0) {
-	  IGRAPH_CHECK(igraph_dqueue_push(&to_visit, nei));
-	}
+      for (j=0; j<n; j++)
+      {
+        long int nei=(long int) VECTOR(neis)[j];
+        VECTOR(indeg)[nei] -= 1;
       }
     }
   }
@@ -1168,7 +1161,6 @@ int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
 #undef ACTIVE
 #undef ZEROIN
   
-  igraph_dqueue_destroy(&to_visit);
   igraph_vector_destroy(&indeg);
   igraph_vector_destroy(&neis);
   IGRAPH_FINALLY_CLEAN(3);
