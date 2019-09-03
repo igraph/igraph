@@ -1232,7 +1232,8 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
   nomin=igraph_vector_size(&M);
   for (i=0; i<nomin; i++) {
     long int min=(long int) VECTOR(Sbar_invmap)[ (long int) VECTOR(M)[i] ];
-    if (!igraph_estack_iselement(T, min)) { break; }
+    if (min != target)
+      if (!igraph_estack_iselement(T, min)) { break; }
   }
   if (i!=nomin) {
     /* OK, we found a pivot element. I(S,v) contains all elements
