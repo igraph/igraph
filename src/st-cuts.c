@@ -1252,7 +1252,7 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
       igraph_real_t u = VECTOR(Isv_min)[j];
       if (!IGRAPH_FINITE(u)) { break; }
       if (!igraph_estack_iselement(T, u))
-        igraph_vector_push_back(Isv, u);
+        IGRAPH_CHECK(igraph_vector_push_back(Isv, u));
     }
     igraph_vector_destroy(&Isv_min);
     IGRAPH_FINALLY_CLEAN(1);
