@@ -1443,6 +1443,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     VECTOR(revmap_ptr)[id]=i+1;
   }
   
+  /* Create partitions in original graph */
   nocuts=igraph_vector_ptr_size(&closedsets);
   igraph_vector_ptr_clear(mypartition1s);
   IGRAPH_CHECK(igraph_vector_ptr_reserve(mypartition1s, nocuts));
@@ -1473,6 +1474,7 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
   igraph_vector_ptr_destroy(&closedsets);
   IGRAPH_FINALLY_CLEAN(3);
 
+  /* Create cuts in original graph */
   if (cuts) {
     igraph_vector_long_t memb;
     IGRAPH_CHECK(igraph_vector_long_init(&memb, no_of_nodes));
@@ -1492,11 +1494,13 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
 	VECTOR(memb)[vtx]=i+1;
       }
       for (j=0; j<no_of_edges; j++) {
-	long int from=IGRAPH_FROM(graph, j);
-	long int to=IGRAPH_TO(graph, j);
-	if (VECTOR(memb)[from] == i+1 && VECTOR(memb)[to] != i+1) {
-	  IGRAPH_CHECK(igraph_vector_push_back(v, j)); /* TODO: allocation */
-	}
+        if (VECTOR(flow)[j] > 0) {
+          long int from=IGRAPH_FROM(graph, j);
+          long int to=IGRAPH_TO(graph, j);
+          if (VECTOR(memb)[from] == i+1 && VECTOR(memb)[to] != i+1) {
+            IGRAPH_CHECK(igraph_vector_push_back(v, j)); /* TODO: allocation */
+          }
+        }
       }
       VECTOR(*cuts)[i] = v;
       IGRAPH_FINALLY_CLEAN(1);
