@@ -83,7 +83,7 @@ void FUNCTION(igraph_stack,destroy)    (TYPE(igraph_stack)* s) {
  * \function igraph_stack_reserve
  * \brief Reserve memory.
  *
- * Reverse memory for future use. The actual size of the stack is
+ * Reserve memory for future use. The actual size of the stack is
  * unchanged.
  * \param s The stack object.
  * \param size The number of elements to reserve memory for. If it is
