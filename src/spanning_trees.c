@@ -318,7 +318,8 @@ int igraph_i_minimum_spanning_tree_prim(const igraph_t* graph,
       igraph_edge(graph, (igraph_integer_t) edgeno, &edgefrom, &edgeto);
       neighbor= edgefrom != i ? edgefrom : edgeto;
       if (already_added[neighbor] == 0) {
-	IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
+        /* the heap is a max heap, so use negative weights */
+        IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
 					   edgeno));
       }
     }

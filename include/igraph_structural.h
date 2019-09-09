@@ -131,6 +131,9 @@ DECLDIR int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *resu
 DECLDIR int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
                 igraph_vector_t *res, const igraph_vs_t vs);
 
+DECLDIR int igraph_cycle_basis_unweighted_undirected(const igraph_t* graph,
+                igraph_vector_t* cycles);
+
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
 /* -------------------------------------------------- */
