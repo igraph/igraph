@@ -144,6 +144,11 @@ __BEGIN_DECLS
   do { IGRAPH_CHECK(igraph_vector_bool_init(v, size)); \
   IGRAPH_FINALLY(igraph_vector_bool_destroy, v); } while (0)
 #endif
+#ifndef IGRAPH_VECTOR_CHAR_INIT_FINALLY
+#define IGRAPH_VECTOR_CHAR_INIT_FINALLY(v, size) \
+  do { IGRAPH_CHECK(igraph_vector_char_init(v, size)); \
+  IGRAPH_FINALLY(igraph_vector_char_destroy, v); } while (0)
+#endif
 #ifndef IGRAPH_VECTOR_INT_INIT_FINALLY
 #define IGRAPH_VECTOR_INT_INIT_FINALLY(v, size) \
   do { IGRAPH_CHECK(igraph_vector_int_init(v, size)); \

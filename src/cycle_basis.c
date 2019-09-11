@@ -31,7 +31,7 @@
 #include "igraph_visitor.h"
 
 /**
- * \function igraph_cycle_basis_unweighted_undirected
+ * \function igraph_fundamental_cycle_basis
  * Finds a cycle basis for an unweighted, undirected graph
  * 
  * A cycle basis is a set of cycles such that the set difference
@@ -40,178 +40,234 @@
  * graph, which means it touches all vertices once and never
  * walks the same edge more than once.
  *
- * For unweighted, undirected graphs a cycle basis is always found
- * by calculating a spanning tree and closing it with edges (??)
+ * A fundamental cycle basis is found by calculating a spanning tree
+ * and closing each pair of nonadjacent vertices with an external edge
+ * if that edge is present in the graph.
  *
  * \param graph The input graph, it might be directed, but edge
  *    direction is ignored.
- * \param cycles An initialized vector of graphs. Each cycle will be
- *    a member of this vector (as a graph).
+ * \param basis A pointer to a vector of vectors. Each fundamental cycle
+ *    will be a member as a list of edge ids.
  * \return Error code.
  * 
- * Time complexity: ???.
+ * Time complexity: O(|V| + |E|) (spanning tree) + ??.
  * 
- * \sa \ref igraph_maximum_cardinality_search().
  */
-int igraph_cycle_basis_unweighted_undirected(const igraph_t* graph,
-    igraph_vector_t* cycles) {
-
-    // FIXME: deal with unconnected graphs
-    igraph_t mst;
-    igraph_vector_t edges_tree=IGRAPH_VECTOR_NULL;
-    igraph_vector_t edges_outside=IGRAPH_VECTOR_NULL;
+int igraph_fundamental_cycle_basis(const igraph_t *graph,
+    igraph_vector_ptr_t *basis) {
 
     long int no_of_nodes=igraph_vcount(graph);
     long int no_of_edges=igraph_ecount(graph);
     long int no_of_cycles=no_of_edges - (no_of_nodes - 1);
-    char *added_nodes;
-    char *added_edges;
-    
+    igraph_vector_char_t added_nodes, added_edges;
+    igraph_vector_t parent_nodes, parent_edges, dist, inc_edges;
     igraph_dqueue_t q=IGRAPH_DQUEUE_NULL;
-    igraph_vector_t tmp=IGRAPH_VECTOR_NULL;
+
     long int i, j, k;
-    igraph_vector_t parent;
 
-    igraph_vector_clear(cycles);
-
-    // If the graph is a tree, there are no cycles
-    if (no_of_edges == no_of_nodes - 1)
-	return IGRAPH_SUCCESS;
-
-    // Given a spanning tree, fundamental cycles are given by unions of:
+    // Given a spanning tree (forest), fundamental cycles are given by
+    // unions of:
     // - a path within the tree
     // - a single edge connecting end to start nodes outside the tree
     // The number of fundamental cycles is #edges - (#vertices -1),
     // because the quantity in parenthesis is the number of edges in a
-    // tree (no cycles). So the way to go is to:
-    // 1. find a tree and mark those edges
-    // 2. mark edges outside the tree. Each will form a fundamental cycle
-    // 3. for each edge, find the unique tree path that runs parallel to it
-    // 4. form that cycle by union of the edge and the parallel path
-
-    // 1. find a tree and mark those edges
-    // this is a simple BFS
-    IGRAPH_VECTOR_INIT_FINALLY(&edges_tree, no_of_nodes-1);
-    added_edges=igraph_Calloc(no_of_edges, char);
-    if (added_edges==0) {
-      IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, added_edges);
-    added_nodes=igraph_Calloc(no_of_nodes, char);
-    if (added_nodes==0) {
-      IGRAPH_ERROR("unweighted spanning tree failed", IGRAPH_ENOMEM);
-    }
-    IGRAPH_FINALLY(igraph_free, added_nodes);
-    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
-    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    // tree (no cycles).
     
+    // The key is that every non-tree edge generates a fundamental cycle
+    // so we run a BFS and whenever we encounter a vertex which is not
+    // new we are:
+    // - either trying to walk back the last edge we just walked
+    // - or using a non-tree edge (since both vertices are known already)
+    // Note: every edge must be walked once, so even after the tree
+    // is complete we still have to finish walking the remaining edges.
+    // Note: we cannot use the igraph_bfs function because we have to
+    // inspect outgoing edges that point to vertices that have already
+    // been added
+
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&added_nodes, no_of_nodes);
+    IGRAPH_VECTOR_CHAR_INIT_FINALLY(&added_edges, no_of_edges);
+    IGRAPH_VECTOR_INIT_FINALLY(&parent_nodes, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&parent_edges, no_of_edges);
+    IGRAPH_VECTOR_INIT_FINALLY(&dist, no_of_nodes);
+    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+    IGRAPH_VECTOR_INIT_FINALLY(&inc_edges, 0);
+
     for (i=0; i<no_of_nodes; i++) {
-      if (added_nodes[i]>0) { continue; }
+        /* Start of a new connected component including the first one */
+        if (added_nodes[i]>0) { continue; }
 
-      // We are here once for every connected component.
-      // Within that component, the following deque performs the BFS
-      // that traverses it fully
+        IGRAPH_ALLOW_INTERRUPTION();
 
-      IGRAPH_ALLOW_INTERRUPTION();
+	/* This is the root, mark it visited */
+        added_nodes[i]=1;
+	/* The queue stores both the next vertex, the edge, and the vertex distance */
+        IGRAPH_CHECK(igraph_dqueue_push(&q, i));
+        IGRAPH_CHECK(igraph_dqueue_push(&q, -1));
+        IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
+        while (! igraph_dqueue_empty(&q)) {
+          long int actnode=(long int) igraph_dqueue_pop(&q);
+	  long int actedge=(long int) igraph_dqueue_pop(&q);
+          long int actdist=(long int) igraph_dqueue_pop(&q);
 
-      added_nodes[i]=1;
-      IGRAPH_CHECK(igraph_dqueue_push(&q, i));
-      while (! igraph_dqueue_empty(&q)) {
-        long int act_node=(long int) igraph_dqueue_pop(&q);
-        IGRAPH_CHECK(igraph_incident(graph, &tmp, (igraph_integer_t) act_node,
-          			   IGRAPH_ALL));
-        for (j=0; j<igraph_vector_size(&tmp); j++) {
-          long int edge=(long int) VECTOR(tmp)[j];
-          if (added_edges[edge]==0) {
-            igraph_integer_t from, to;
-            igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
-            if (act_node==to) { to=from; }
-            if (added_nodes[(long int) to]==0) {
-              added_nodes[(long int) to]=1;
-              added_edges[edge]=1;
-              IGRAPH_CHECK(igraph_vector_push_back(&edges_tree, edge));
-              IGRAPH_CHECK(igraph_dqueue_push(&q, to));
-            }
+	  /* check all edges connected to this vertex */
+          IGRAPH_CHECK(igraph_incident(graph, &inc_edges, (igraph_integer_t) actnode,
+				  IGRAPH_ALL));
+
+          for (j=0; j<igraph_vector_size(&inc_edges); j++) {
+              long int edge=(long int) VECTOR(inc_edges)[j];
+
+	      /* visited edges have been given their cycles already */
+              if (added_edges[edge]==0) {
+
+		/* find the neighbour identity */
+                igraph_integer_t from, to;
+                igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
+		
+		/* we only know that either one is actnode, swap if needed */
+                if (to==actnode) {
+		  to=from;
+		  from=to;
+		}
+
+		/* if the edge goes to a new vertex, expand the spanning tree */
+                if (added_nodes[(long int) to]==0) {
+                    added_nodes[(long int) to]=1;
+                    added_edges[edge]=1;
+		    parent_nodes[(long int) to] = actnode;
+		    dist[(long int) to] = actdist + 1;
+		    parent_edges[edge] = actedge;
+
+                    IGRAPH_CHECK(igraph_dqueue_push(&q, to));
+                    IGRAPH_CHECK(igraph_dqueue_push(&q, edge));
+                    IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
+                }
+
+               /* if it's a new edge to a known vertex, it's outside the tree
+                * so because of the above reasoning it generates a cycle */
+                else {
+                    igraph_i_fundamental_cycle_basis_add(graph,
+				    basis,
+				    &parent_nodes, &parent_edges,
+				    &added_edges, dist,
+				    edge, actedge,
+				    (long int) from, (long int) to);
+                }
+              }
           }
         }
-      }
     }
     
-    igraph_Free(added_nodes);
-    igraph_Free(added_edges);
+    igraph_vector_destroy(&inc_edges);
     igraph_dqueue_destroy(&q);
-    igraph_vector_destroy(&tmp);
-    IGRAPH_FINALLY_CLEAN(4);
-
-    // actually make the mst
-    // FIXME: do the vids in the mst differ from the same in the original graph??
-    IGRAPH_CHECK(igraph_subgraph_edges(graph,
-	&mst, igraph_ess_vector(&edges_tree),
-	/* delete_vertices = */ 0));
-
-    // 2. mark edges outside the tree. Each will form a fundamental cycle
-    for(j=0; j<no_of_edges; j++) {
-        IGRAPH_ALLOW_INTERRUPTION();
-	if (!added_edges[j]) {
-              IGRAPH_CHECK(igraph_vector_push_back(&edges_outside, j));
-	}
-    }
-
-    // 3. for each outside edge, find the tree path that runs parallel to it
-    IGRAPH_CHECK(igraph_vector_init(&parent, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_destroy, &parent);
-    for(k=0; k<igraph_vector_size(&edges_outside); k++) {
-    
-        igraph_vector_t edges_cycle=IGRAPH_VECTOR_NULL;
-	igraph_integer_t root, tgt, actnode;
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-	// find the vertices of this outside edge
-        igraph_edge(graph, (igraph_integer_t) k, &root, &tgt);
-	
-	// DFS that sets the parents from the tgt to the root within the tree
-	// TODO: check that the vid in the mst and original graph match
-	// NOTE: they probably don't
-	IGRAPH_CHECK(igraph_dfs(mst, root, IGRAPH_ALL,
-				/*unreachable=*/ 0,
-				/*order=*/ 0,
-				/*order_out=*/ 0,
-				/*parent */ &parent,
-				/*dist=*/ 0,
-				/*in_callback=*/
-				igraph_i_cycle_basis_unweighted_undirected_dfs_incb,
-				/*out_callback=*/ 0,
-				/*extra=*/ &tgt));
-
-	// add the edges inside the tree
-	actnode = tgt;
-        while (actnode != -1) {
-	    IGRAPH_CHECK(igraph_vector_push_back(&edges_cycle, actnode));
-	    actnode = VECTOR(parent)[(long int) actnode];
-	}
-	// no need to add the outside edge to the cycle, it goes without saying
-	// that there is an edge the cycle was identified
-
-	IGRAPH_CHECK(igraph_vector_push_back(cycles, &edges_cycle));
-    }
-    
-    // clean up
-    // TODO: clean up the mst
-    igraph_vector_destroy(&edges_tree);
-    igraph_vector_destroy(&edges_outside);
-    igraph_vector_destroy(&parent);
-    IGRAPH_FINALLY_CLEAN(3);
+    igraph_vector_destroy(&dist);
+    igraph_vector_destroy(&parent_edges);
+    igraph_vector_destroy(&parent_nodes);
+    igraph_vector_char_destroy(&added_edges);
+    igraph_vector_char_destroy(&added_nodes);
+    IGRAPH_FINALLY_CLEAN(7);
 
     return IGRAPH_SUCCESS;
 }
 
-igraph_bool_t igraph_i_cycle_basis_unweighted_undirected_dfs_incb(const igraph_t *graph,
-						    igraph_integer_t vid,
-						    igraph_integer_t dist,
-						    void *extra) {
+/* Note: this function works in the corner case that from == to
+ * i.e. we hit a trivial cycle given by a self-edge */
+int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
+	igraph_vector_ptr_t *basis,
+	const igraph_vector_t *parent_nodes, const igraph_vector_t *parent_edges,
+	const igraph_vector_chat_t *added_edges, const igraph_vector_t *dist,
+	long int edge, long int actedge,
+	long int from, long int to) {
 
-    igraph_integer_t *tgt=extra;
-    IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
-    return *tgt == vid;
+    igraph_vector_t *cycle=igraph_Calloc(1, igraph_vector_t);
+    igraph_vector_t to_backtrack, to_edges;
+    long int n, i;
+    
+    IGRAPH_VECTOR_INIT_FINALLY(&to_backtrack, 0);
+    IGRAPH_VECTOR_INIT_FINALLY(&to_edges, 0);
+
+    /* start by adding the non-tree edge */
+    igraph_vector_init(cycle, 1);
+    cycle[0] = edge;
+
+    /* just like actedge goes from 'from' to its parent,
+     * we recycle edge to go from 'to' to its parent */
+    IGRAPH_CHECK(igraph_incident(graph, &to_edges, (igraph_integer_t) to,
+	IGRAPH_ALL));
+    for (i=0; j<igraph_vector_size(&to_edges); i++) {
+        igraph_integer_t to_from, to_to;
+
+        edge=(long int) VECTOR(to_edges)[i];
+
+        /* only a visited edge can be in the tree */
+        if (added_edges[edge]==0) {
+	    continue
+        }
+
+        /* find the neighbours identity */
+        igraph_edge(graph, (igraph_integer_t) edge, &to_from, &to_to);
+
+	/* we only know that either one is actnode, swap if needed */
+        if (to_to==to) {
+	  to_to=to_from;
+	  to_from=to_to;
+	}
+
+	if (to_to == parent_nodes[to]) {
+	    break;
+	}
+    }
+    igraph_vector_destroy(&to_edges);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* construct the cycle by backtracing */
+    while (from != to) {
+	/* backtrack 'from' */
+        if (dist[from] > dist[to]) {
+            IGRAPH_CHECK(igraph_vector_push_back(cycle, actedge));
+	    from = parent_nodes[from];
+	    actedge = parent_edges[actedge];
+	}
+	/* backtrack 'to' */
+	else if (dist[to] > dist[from]) {
+            IGRAPH_CHECK(igraph_vector_push_back(to_backtrack, edge));
+	    to = parent_nodes[to];
+	    edge = parent_edges[edge];
+	}
+	/* backtrack both */
+	else {
+            IGRAPH_CHECK(igraph_vector_push_back(cycle, actedge));
+            IGRAPH_CHECK(igraph_vector_push_back(to_backtrack, edge));
+	    from = parent_nodes[from];
+	    to = parent_nodes[to];
+	    actedge = parent_edges[actedge];
+	    edge = parent_edges[edge];
+	}
+    }
+
+    /* add the backtracked edges from 'to' in reverse order*/
+    n = igraph_vector_size(to_backtrack);
+    for(i=0; i<n; i++) {
+        IGRAPH_CHECK(igraph_vector_push_back(cycle, to_backtrack[n - 1 - i]));
+    }
+    igraph_vector_destroy(&to_backtrack);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* add the cycle to the basis */
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(basis, cycle));	
+
+    return IGRAPH_SUCCESS;
 }
+
+
+int igraph_minimum_cycle_basis(const igraph_t *graph,
+                igraph_vector_ptr_t *basis,
+                const igraph_vector_t *weights) {
+
+
+
+
+    /* TODO: implement */
+    return IGRAPH_SUCCESS;
+}
+
+
