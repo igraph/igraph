@@ -219,6 +219,15 @@ DECLDIR int igraph_community_multilevel(const igraph_t *graph,
                 igraph_matrix_t *memberships,
                 igraph_vector_t *modularity);
 
+DECLDIR int igraph_community_leiden(const igraph_t *graph,
+                const igraph_vector_t *edge_weights, 
+                const igraph_vector_t *node_weights,
+                const igraph_real_t resolution_parameter, 
+                const igraph_real_t gamma, 
+                igraph_vector_t *membership, 
+                igraph_integer_t *nb_clusters, 
+                igraph_real_t *quality);
+
 /* -------------------------------------------------- */
 /* Community Structure Comparison                     */
 /* -------------------------------------------------- */
