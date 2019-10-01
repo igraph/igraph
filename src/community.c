@@ -4506,7 +4506,7 @@ int igraph_i_community_leiden_quality(const igraph_t *graph, const igraph_vector
     total_edge_weight += VECTOR(*edge_weights)[e];   
     /* We add the internal edge weights */
     if (VECTOR(*membership)[(long int) from] == VECTOR(*membership)[(long int) to])
-      *quality += VECTOR(*edge_weights)[e];
+      *quality += 2*VECTOR(*edge_weights)[e];
     IGRAPH_EIT_NEXT(eit);
   }
   igraph_eit_destroy(&eit);
