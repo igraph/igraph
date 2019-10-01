@@ -3582,9 +3582,8 @@ int igraph_i_community_leiden_clean_membership(igraph_vector_t *membership, igra
   IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
   IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
 
-  /* Clean clusters */
-  /* We will store the new cluster + 1 so that membership == 0 indicates that
-   * no cluster was assigned yet. */
+  /* Clean clusters. We will store the new cluster + 1 so that membership == 0
+   * indicates that no cluster was assigned yet. */
   *nb_clusters = 1;
   for (i = 0; i < n; i++)
   {
@@ -3612,7 +3611,7 @@ int igraph_i_community_leiden_clean_membership(igraph_vector_t *membership, igra
   return IGRAPH_SUCCESS;
 }
 
-/* Move nodes in order to improve the quality of a partition
+/* Move nodes in order to improve the quality of a partition.
  *
  * This function considers each node and greedily moves it to a neighboring
  * community that maximizes the improvement in the quality of a partition.
@@ -3802,9 +3801,8 @@ int igraph_i_community_leiden_clean_refined_membership(const igraph_vector_t* no
   IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
   IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
 
-  /* Clean clusters */
-  /* We will store the new cluster + 1 so that cluster == 0 indicates that
-   * no membership was assigned yet. */
+  /* Clean clusters. We will store the new cluster + 1 so that cluster == 0
+   * indicates that no membership was assigned yet. */
   *nb_refined_clusters += 1;
   for (i = 0; i < n; i++)
   {
@@ -3840,12 +3838,12 @@ int igraph_i_community_leiden_clean_refined_membership(const igraph_vector_t* no
  * membership[i] = cluster_subset.
  *
  * All nodes in \c node_subset are initialized to a singleton partition in \c
- * refined_membership. Only singleton cluster can be merged if they are
+ * refined_membership. Only singleton clusters can be merged if they are
  * sufficiently well connected to the current subgraph induced by \c
  * node_subset.
  *
  * We only examine each node once. Instead of greedily choosing the maximum
- * possible cluster to merge with, the cluster is randomly chosen among all
+ * possible cluster to merge with, the cluster is chosen randomly among all
  * possibilities that do not decrease the quality of the partition. The
  * probability of choosing a certain cluster is proportional to exp(diff/beta).
  * For beta to 0 this converges to selecting a cluster with the maximum
@@ -3860,8 +3858,9 @@ int igraph_i_community_leiden_clean_refined_membership(const igraph_vector_t* no
  * node_subset the refined membership should of course be unique. Hence, after
  * merging, the refined membership starts with \c nb_refined_clusters, which is
  * also updated to ensure that the resulting \c nb_refined_clusters counts all
- * refined clusters that have already been processed.
- * See_igraph_i_community_leiden_clean_refined_membership for more information.
+ * refined clusters that have already been processed. See
+ * igraph_i_community_leiden_clean_refined_membership for more information about
+ * this aspect.
  */
 int igraph_i_community_leiden_mergenodes(const igraph_t *graph,
   const igraph_inclist_t *edges_per_node,
@@ -4004,9 +4003,8 @@ int igraph_i_community_leiden_mergenodes(const igraph_t *graph,
         VECTOR(neighbor_cluster_added)[c] = 0;
       }
 
-      /*
-       * Determine the neighboring cluster to which the currently
-       * selected node will be moved.
+      /* Determine the neighboring cluster to which the currently selected node
+       * will be moved.
        */
       if (total_cum_trans_diff < IGRAPH_INFINITY)
       {
@@ -4109,14 +4107,15 @@ int igraph_i_community_get_clusters(const igraph_vector_t *membership, igraph_ve
 /* Aggregate the graph based on the \c refined membership while setting the
  * membership of each aggregated node according to the \c membership.
  *
- * Technically speaking we have that aggregated_membership[refined_membership[v]] = membership[v] for each node v.
+ * Technically speaking we have that
+ * aggregated_membership[refined_membership[v]] = membership[v] for each node v.
  *
  * The new aggregated graph is returned in \c aggregated_graph. This graph
  * object should not yet be initialized, `igraph_create` is called on it, and
  * responsibility for destroying the object lies with the calling method
  *
  * The remaining results, aggregated_edge_weights, aggregate_node_weights and
- * aggregated_membership is expected to be initialized.
+ * aggregated_membership are all expected to be initialized.
  *
  */
 int igraph_i_community_leiden_aggregate(
@@ -4193,7 +4192,7 @@ int igraph_i_community_leiden_aggregate(
       VECTOR(*aggregated_node_weights)[c] += VECTOR(*node_weights)[v];
     }
 
-    /* Add actual edges from this cluster to the other */
+    /* Add actual edges from this cluster to the other clusters */
     for (i = 0; i < nb_neigh_clusters; i++)
     {
       long int c2 = VECTOR(neighbor_clusters)[i];
@@ -4232,22 +4231,21 @@ int igraph_i_community_leiden_aggregate(
  *
  * 1 / 2m sum_ij (A_ij - gamma n_i n_j)d(s_i, s_j)
  *
- * where m is the total edge weight, A_ij is the weight of edge (i, j), gamma
- * is the so-called resolution parameter, n_i is the node weight of node i, s_i
- * is the cluster of node i and d(x, y) = 1 if and only if x = y and 0
- * otherwise.
+ * where m is the total edge weight, A_ij is the weight of edge (i, j), gamma is
+ * the so-called resolution parameter, n_i is the node weight of node i, s_i is
+ * the cluster of node i and d(x, y) = 1 if and only if x = y and 0 otherwise.
  *
- * Note that by setting n_i = k_i the degree of node i and dividing gamma by
- * 2m, we effectively optimize modularity. By setting n_i = 1 we optimize the
+ * Note that by setting n_i = k_i the degree of node i and dividing gamma by 2m,
+ * we effectively optimize modularity. By setting n_i = 1 we optimize the
  * Constant Potts Model.
  *
  * This can be represented as a sum over clusters as
  *
  * 1 / 2m sum_c (e_c - gamma N_c^2)
  *
- * where e_c = sum_ij A_ij d(s_i, c)d(s_j, c) is the internal edge weight in
- * cluster c and N_c = sum_i n_i d(s_i, c) is the sum of the node weights
- * inside cluster c. This is how the quality is calculated in practice.
+ * where e_c = sum_ij A_ij d(s_i, c)d(s_j, c) is (twice) the internal edge
+ * weight in cluster c and N_c = sum_i n_i d(s_i, c) is the sum of the node
+ * weights inside cluster c. This is how the quality is calculated in practice.
  *
  */
 int igraph_i_community_leiden_quality(const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights, 
