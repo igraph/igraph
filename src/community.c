@@ -2259,7 +2259,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
     for (i=0; i<no_of_nodes; i++) {
       /* Clear dominant_labels and nonzero_labels vectors */
       igraph_vector_clear(&dominant_labels);
-      igraph_vector_clear(&nonzero_labels);
+      igraph_vector_null(&label_counters);
 
       /* Obtain actual node index */
       v1 = (long int) VECTOR(node_order)[i];
@@ -2283,10 +2283,6 @@ int igraph_community_fluid_communities(const igraph_t *graph,
         /* skip if it has no label yet */
         if (k == 0) {
           continue;
-        }
-        /* check if counter is going to be nonzero */
-        if (VECTOR(label_counters)[k-1] == 0.0) {
-          IGRAPH_CHECK(igraph_vector_push_back(&nonzero_labels, k));
         }
         /* Update label counter and evaluate diff against max_count*/
         VECTOR(label_counters)[k-1] += VECTOR(density)[k-1];
@@ -2328,11 +2324,6 @@ int igraph_community_fluid_communities(const igraph_t *graph,
           /* Re-calculate density for new community k */
           VECTOR(density)[k-1] = max_density / VECTOR(com_to_numvertices)[k-1];
         }
-      }
-      /* Clear the nonzero elements in label_counters */
-      size = igraph_vector_size(&nonzero_labels);
-      for (j = 0; j < size; j++) {
-        VECTOR(label_counters)[(long int)VECTOR(nonzero_labels)[j]-1] = 0;
       }
     }
   }
