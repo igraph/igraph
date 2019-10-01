@@ -4832,6 +4832,7 @@ int igraph_community_leiden(const igraph_t *graph,
   igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) 
 {
   igraph_vector_t *i_edge_weights, *i_node_weights;
+  int ret;
 
   if (igraph_vector_size(membership) != igraph_vcount(graph)) 
     IGRAPH_ERROR("Membership length does not equal the number of vertices", IGRAPH_EINVAL);
@@ -4868,7 +4869,7 @@ int igraph_community_leiden(const igraph_t *graph,
       i_node_weights = node_weights;
 
   /* Perform actual Leiden algorithm */
-  int ret = igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
+  ret = igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
                                       resolution_parameter, beta,
                                       membership, nb_clusters, quality);
 
