@@ -78,6 +78,12 @@ AT_KEYWORDS([community structure multilevel Blondel Guillaume Lambiotte Lefebvre
 AT_COMPILE_CHECK([simple/bug-1149658.c])
 AT_CLEANUP
 
+AT_SETUP([Leiden community detection (igraph_community_leiden) :])
+AT_KEYWORDS([community structure using Leiden algorithm])
+AT_COMPILE_CHECK([simple/igraph_community_leiden.c],
+                 [simple/igraph_community_leiden.out])
+AT_CLEANUP
+
 AT_SETUP([Modularity optimization, integer programming (igraph_community_optimal_modularity) :])
 AT_KEYWORDS([community structure optimal modularity integer programming])
 AT_COMPILE_CHECK([simple/igraph_community_optimal_modularity.c])
