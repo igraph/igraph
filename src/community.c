@@ -3759,7 +3759,7 @@ int igraph_i_community_leiden_fastmovenodes(const igraph_t *graph,
         {
           long int e = VECTOR(*edges)[i];
           long int u = (long int)IGRAPH_OTHER(graph, e, v);
-          if (!VECTOR(node_is_stable)[u] && VECTOR(*membership)[u] != best_cluster)
+          if (VECTOR(node_is_stable)[u] && VECTOR(*membership)[u] != best_cluster)
           {
             igraph_dqueue_push(&unstable_nodes, u);
             VECTOR(node_is_stable)[u] = 0;
