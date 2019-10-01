@@ -30,6 +30,8 @@ int main() {
   igraph_vector_t membership;
   long int i;
 
+  igraph_rng_seed(igraph_rng_default(), 247);
+
   /* Zachary Karate club -- this is just a quick smoke test */
   igraph_small(&g, 0, IGRAPH_UNDIRECTED, 
                0,  1,  0,  2,  0,  3,  0,  4,  0,  5,
@@ -54,11 +56,9 @@ int main() {
   k = 2;
   igraph_community_fluid_communities(&g, k, &membership, 
 				     /*modularity=*/ 0);
-  if (igraph_vector_max(&membership) > 1) {
-    printf("Resulting graph had more than two clusters:\n");
-    for (i=0; i<igraph_vcount(&g); i++)
-      printf("%li ", (long)VECTOR(membership)[i]);
-    printf("\n");
+  if (!igraph_vector_contains(&membership, 0) || !igraph_vector_contains(&membership, 1)) {
+    printf("Resulting graph does not have exactly 2 communities as expected.\n");
+    igraph_vector_print(&membership);
     return 1;
   }
 
