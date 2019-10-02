@@ -3640,7 +3640,7 @@ int igraph_i_community_leiden_fastmovenodes(const igraph_t *graph,
   igraph_vector_t node_order, cluster_weights, edge_weights_per_cluster, neighbor_clusters;
   igraph_vector_int_t nb_nodes_per_cluster;
   igraph_stack_t empty_clusters;
-  long int i, c, nb_neigh_clusters;
+  long int i, j, c, nb_neigh_clusters;
 
   /* Initialize queue of unstable nodes and whether node is stable. Only
    * unstable nodes are in the queue. */
@@ -3689,6 +3689,7 @@ int igraph_i_community_leiden_fastmovenodes(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_vector_destroy, &neighbor_clusters);
 
   /* Iterate while the queue is not empty */
+  j = 0;
   while (!igraph_dqueue_empty(&unstable_nodes))
   {
     long int v = (long int)igraph_dqueue_pop(&unstable_nodes);
@@ -3764,6 +3765,13 @@ int igraph_i_community_leiden_fastmovenodes(const igraph_t *graph,
             VECTOR(node_is_stable)[u] = 0;
           }
         }
+    }
+
+    j++;
+    if (j > 10000)
+    {
+      IGRAPH_ALLOW_INTERRUPTION();
+      j = 0;
     }
   }
 
