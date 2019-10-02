@@ -28,7 +28,6 @@ int main() {
   igraph_t g;
   igraph_integer_t k;
   igraph_vector_t membership;
-  long int i;
 
   igraph_rng_seed(igraph_rng_default(), 247);
 
