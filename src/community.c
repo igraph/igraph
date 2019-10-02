@@ -4009,17 +4009,9 @@ int igraph_i_community_leiden_mergenodes(const igraph_t *graph,
       if (total_cum_trans_diff < IGRAPH_INFINITY)
       {
           igraph_real_t r = igraph_rng_get_unif(igraph_rng_default(), 0, total_cum_trans_diff);
-          long int min_idx = -1;
-          long int max_idx = nb_neigh_clusters + 1;
-          while (min_idx < max_idx - 1)
-          {
-              long int mid_idx = (min_idx + max_idx) / 2;
-              if (VECTOR(cum_trans_diff)[mid_idx] >= r)
-                  max_idx = mid_idx;
-              else
-                  min_idx = mid_idx;
-          }
-          chosen_cluster = VECTOR(neighbor_clusters)[max_idx];
+          long int chosen_idx;
+          igraph_i_vector_binsearch_slice(&cum_trans_diff, r, &chosen_idx, 0, nb_neigh_clusters);
+          chosen_cluster = VECTOR(neighbor_clusters)[chosen_idx];
       }
       else
           chosen_cluster = best_cluster;
