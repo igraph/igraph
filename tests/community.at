@@ -85,8 +85,8 @@ AT_CLEANUP
 
 AT_SETUP([Leiden community detection (igraph_community_leiden) :])
 AT_KEYWORDS([community structure using Leiden algorithm])
-AT_COMPILE_CHECK([simple/igraph_community_leiden.c],
-                 [simple/igraph_community_leiden.out])
+AT_COMPILE_CHECK([tests/igraph_community_leiden.c],
+                 [tests/igraph_community_leiden.out])
 AT_CLEANUP
 
 AT_SETUP([Modularity optimization, integer programming (igraph_community_optimal_modularity) :])
