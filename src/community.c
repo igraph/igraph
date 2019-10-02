@@ -4022,7 +4022,7 @@ int igraph_i_community_leiden_fastmovenodes(const igraph_t *graph,
   igraph_dqueue_destroy(&unstable_nodes);
   igraph_vector_bool_destroy(&node_is_stable);
 
-  IGRAPH_FINALLY_CLEAN(8);
+  IGRAPH_FINALLY_CLEAN(9);
 
   return IGRAPH_SUCCESS;
 }
@@ -4298,7 +4298,7 @@ int igraph_i_community_leiden_mergenodes(const igraph_t *graph,
   igraph_vector_int_destroy(&nb_nodes_per_cluster);
   igraph_vector_destroy(&cluster_weights);
 
-  IGRAPH_FINALLY_CLEAN(12);
+  IGRAPH_FINALLY_CLEAN(9);
 
   return IGRAPH_SUCCESS;
 }
@@ -4449,8 +4449,8 @@ int igraph_i_community_leiden_aggregate(
   IGRAPH_CHECK(igraph_create(aggregated_graph, &aggregated_edges, nb_refined_clusters, 
         IGRAPH_UNDIRECTED));
 
-  igraph_vector_bool_destroy(&neighbor_cluster_added);
   igraph_vector_destroy(&neighbor_clusters);
+  igraph_vector_bool_destroy(&neighbor_cluster_added);
   igraph_vector_destroy(&edge_weight_to_cluster);
   igraph_vector_destroy(&aggregated_edges);
   igraph_vector_ptr_destroy_all(&refined_clusters);
@@ -4495,7 +4495,7 @@ int igraph_i_community_leiden_quality(const igraph_t *graph, const igraph_vector
   *quality = 0.0;
     
   /* Create the edgelist */
-  igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
+  IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit));
   IGRAPH_FINALLY(igraph_eit_destroy, &eit);
   i = 0;
   while (!IGRAPH_EIT_END(eit)) {
