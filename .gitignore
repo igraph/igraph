@@ -248,6 +248,7 @@
 /examples/simple/igraph_cocitation.c.xml
 /examples/simple/igraph_community_edge_betweenness.c.xml
 /examples/simple/igraph_community_fastgreedy.c.xml
+/examples/simple/igraph_community_fluid_communities.c.xml
 /examples/simple/igraph_community_label_propagation.c.xml
 /examples/simple/igraph_community_leading_eigenvector.c.xml
 /examples/simple/igraph_community_multilevel.c.xml

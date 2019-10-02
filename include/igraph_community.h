@@ -201,12 +201,18 @@ DECLDIR int igraph_community_leading_eigenvector(const igraph_t *graph,
                 igraph_community_leading_eigenvector_callback_t *callback,
                 void *callback_extra);
 
+DECLDIR int igraph_community_fluid_communities(const igraph_t *graph,
+                igraph_integer_t no_of_communities,
+                igraph_vector_t *membership,
+                igraph_real_t *modularity);
+
 DECLDIR int igraph_community_label_propagation(const igraph_t *graph,
                 igraph_vector_t *membership,
                 const igraph_vector_t *weights,
                 const igraph_vector_t *initial,
                 igraph_vector_bool_t *fixed,
                 igraph_real_t *modularity);
+
 DECLDIR int igraph_community_multilevel(const igraph_t *graph,
                 const igraph_vector_t *weights,
                 igraph_vector_t *membership,

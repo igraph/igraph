@@ -60,6 +60,11 @@ AT_KEYWORDS([community structure leading eigenvector Newman])
 AT_COMPILE_CHECK([simple/levc-stress.c], [], [simple/input.dl])
 AT_CLEANUP
 
+AT_SETUP([Fluid communities algorithm (igraph_community_fluid_communities) :])
+AT_KEYWORDS([community structure fluidc fluid communities Pares Garcia-Gasulla])
+AT_COMPILE_CHECK([tests/igraph_community_fluid_communities.c],
+                 [tests/igraph_community_fluid_communities.out])
+AT_CLEANUP
 
 AT_SETUP([Label propagation algorithm (igraph_community_label_propagation) :])
 AT_KEYWORDS([community structure label propagation Raghavan Albert Kumara])
