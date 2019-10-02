@@ -4533,11 +4533,13 @@ int igraph_i_community_leiden(const igraph_t *graph,
  * Louvain to Leiden: guaranteeing well-connected communities. Scientific
  * reports, 9(1), 5233.  http://dx.doi.org/10.1038/s41598-019-41695-z.
  *
+ * </para><para>
  * It is similar to the multilevel algorithm, often called the Louvain
  * algorithm, but it is faster and yields higher quality solutions. It can
  * optimize both modularity and the Constant Potts Model, which does not suffer
  * from the resolution-limit (see preprint http://arxiv.org/abs/1104.3083).
  *
+ * </para><para>
  * The Leiden algorithm consists of three phases: (1) local moving of nodes,
  * (2) refinement of the partition and (3) aggregation of the network based on
  * the refined partition, using the non-refined partition to create an initial
@@ -4548,6 +4550,7 @@ int igraph_i_community_leiden(const igraph_t *graph,
  * cluster may then be represented by several nodes (which are the subclusters
  * identified in the refinement).
  *
+ * </para><para>
  * The Leiden algorithm provides several guarantees. The Leiden algorithm is
  * typically iterated: the output of one iteration is used as the input for the
  * next iteration. At each iteration all clusters are guaranteed to be
@@ -4557,10 +4560,13 @@ int igraph_i_community_leiden(const igraph_t *graph,
  * guaranteed to be locally optimally assigned. For more details, please see
  * Traag, Waltman &amp; van Eck (2019).
  *
+ * </para><para>
  * The objective function being optimized is
  *
+ * </para><para>
  * 1 / 2m sum_ij (A_ij - gamma n_i n_j)d(s_i, s_j)
  *
+ * </para><para>
  * where m is the total edge weight, A_ij is the weight of edge (i, j), gamma is
  * the so-called resolution parameter, n_i is the node weight of node i, s_i is
  * the cluster of node i and d(x, y) = 1 if and only if x = y and 0 otherwise.
@@ -4578,7 +4584,7 @@ int igraph_i_community_leiden(const igraph_t *graph,
  *    represented by gamma in the objective function mentioned in the
  *    documentation.
  * \param beta The randomness used in the refinement step when merging. A small
- *    amount of randomness (beta = 0.01) typically works well.
+ *    amount of randomness (\c beta = 0.01) typically works well.
  * \param membership The membership vector. This is both used as the initial
  *    membership from which optimisation starts and is updated in place. It
  *    must hence be properly initialized. When finding clusters from scratch it
