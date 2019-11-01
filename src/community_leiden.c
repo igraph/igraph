@@ -814,6 +814,9 @@ int igraph_i_community_leiden(const igraph_t *graph,
   /* Clean membership and count number of *clusters */
   IGRAPH_CHECK(igraph_i_community_leiden_clean_membership(aggregated_membership, nb_clusters));
 
+  if (nb_clusters > n)
+    IGRAPH_ERROR("Too many communities in membership vector", IGRAPH_EINVAL);
+
   do
   {
 
@@ -1083,9 +1086,6 @@ int igraph_community_leiden(const igraph_t *graph,
 
     if (igraph_vector_size(membership) != n)
       IGRAPH_ERROR("Initial membership length does not equal the number of vertices", IGRAPH_EINVAL);
-
-    if (igraph_vector_max(membership) >= n)
-      IGRAPH_ERROR("Too many communities in initial membership start vector", IGRAPH_EINVAL);
   }
   else
   {
@@ -1140,14 +1140,14 @@ int igraph_community_leiden(const igraph_t *graph,
   {
     igraph_vector_destroy(i_edge_weights);
     igraph_Free(i_edge_weights);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
   }
 
   if (!node_weights)
   {
     igraph_vector_destroy(i_node_weights);
     igraph_Free(i_node_weights);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
   }
 
   return ret;
