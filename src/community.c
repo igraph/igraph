@@ -1033,8 +1033,6 @@ int igraph_modularity_matrix(const igraph_t *graph,
  * where C is the number of unique component IDs in the original
  * vector.
  *
- * This function was contributed by Tom Gregorovic.
- *
  * \param  membership  Numeric vector which gives the type of each
  *                     vertex, ie. the component to which it belongs.
  *                     The vector will be altered in-place.
@@ -1042,70 +1040,59 @@ int igraph_modularity_matrix(const igraph_t *graph,
  *                     old component ID for each new one, or NULL,
  *                     in which case it is not returned. The vector
  *                     will be resized as needed.
+ * \param  nb_clusters Pointer to an integer for the number of
+ *                     distinct clusters. If not NULL, this will be
+ *                     updated to reflect the number of distinct
+ *                     clusters found in membership.
  *
- * Time complexity: should be O(n log n) for n elements.
+ * Time complexity: should be O(n) for n elements.
  */
 int igraph_reindex_membership(igraph_vector_t *membership,
-                              igraph_vector_t *new_to_old) {
-  long int i, pos, size = igraph_vector_size(membership);
-  igraph_vector_t old_sorted, *new_to_old_real;
-  igraph_real_t last_id, this_id;
+                              igraph_vector_t *new_to_old,
+                              igraph_integer_t *nb_clusters) {
 
-  /* Make sure that membership is not empty; if empty, return
-   * immediately */
-  if (size == 0) {
-    if (new_to_old != 0) {
-      igraph_vector_clear(new_to_old);
-    }
-    return 0;
-  }
+  long int i, n = igraph_vector_size(membership);
+  igraph_vector_t new_cluster;
+  igraph_integer_t i_nb_clusters;
 
-  /* Prepare storage space for new_to_old */
-  if (new_to_old == 0) {
-    new_to_old_real = igraph_Calloc(1, igraph_vector_t);
-    if (new_to_old_real == 0)
-      IGRAPH_ERROR("cannot reindex membership vector", IGRAPH_ENOMEM);
-    IGRAPH_FINALLY(igraph_free, new_to_old_real);
-    IGRAPH_VECTOR_INIT_FINALLY(new_to_old_real, 0);
-  } else {
-    new_to_old_real = new_to_old;
-    IGRAPH_CHECK(igraph_vector_resize(new_to_old_real, 0));
-  }
+  IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
+  IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
 
-  /* Create sorted membership vector */
-  IGRAPH_CHECK(igraph_vector_copy(&old_sorted, membership));
-  IGRAPH_FINALLY(igraph_vector_destroy, &old_sorted);
-  igraph_vector_sort(&old_sorted);
+  if (new_to_old)
+    igraph_vector_clear(new_to_old);
 
-  /* Create new_to_old_real */
-  last_id = VECTOR(old_sorted)[0] - 1;
-  for (i = 0; i < size; i++) {
-    this_id = VECTOR(old_sorted)[i];
-    if (last_id != this_id) {
-      IGRAPH_CHECK(igraph_vector_push_back(new_to_old_real, this_id));
-      last_id = this_id;
+  /* Clean clusters. We will store the new cluster + 1 so that membership == 0
+   * indicates that no cluster was assigned yet. */
+  i_nb_clusters = 1;
+  for (i = 0; i < n; i++)
+  {
+    long int c = (long int)VECTOR(*membership)[i];
+    if (VECTOR(new_cluster)[c] == 0)
+    {
+      VECTOR(new_cluster)[c] = (igraph_real_t)i_nb_clusters;
+      i_nb_clusters += 1;
+      if (new_to_old)
+        igraph_vector_push_back(new_to_old, c);
     }
   }
 
-  /* old_sorted not needed anymore */
-  igraph_vector_destroy(&old_sorted);
+  /* Assign new membership */
+  for (i = 0; i < n; i++)
+  {
+    long int c = (long int)VECTOR(*membership)[i];
+    VECTOR(*membership)[i] = VECTOR(new_cluster)[c] - 1;
+  }
+  if (nb_clusters)
+  {
+    /* We used the cluster + 1, so correct */
+    *nb_clusters = i_nb_clusters - 1;
+  }
+
+  igraph_vector_destroy(&new_cluster);
+
   IGRAPH_FINALLY_CLEAN(1);
 
-  /* Reindex the original membership vector */
-  for (i = 0; i < size; i++) {
-    this_id = VECTOR(*membership)[i];
-    igraph_vector_binsearch(new_to_old_real, this_id, &pos);
-    VECTOR(*membership)[i] = pos;
-  }
-
-  /* Get rid of new_to_old_real if it was allocated by us */
-  if (new_to_old == 0) {
-    igraph_vector_destroy(new_to_old_real);
-    igraph_free(new_to_old_real);
-    IGRAPH_FINALLY_CLEAN(2);
-  }
-
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 /********************************************************************/
@@ -2882,7 +2869,7 @@ int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 
-  IGRAPH_CHECK(igraph_reindex_membership(membership, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
   /* Create the new edgelist */
   igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
@@ -3097,7 +3084,7 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
   /* debug("Result Communities: %ld Modularity: %lf\n",
     communities.communities_no, (double) q); */
 
-  IGRAPH_CHECK(igraph_reindex_membership(membership, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
   /* Shrink the nodes of the graph according to the present community structure
    * and simplify the resulting graph */
@@ -3365,8 +3352,8 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
   IGRAPH_CHECK(igraph_vector_copy(&c2, comm2));
   IGRAPH_FINALLY(igraph_vector_destroy, &c2);
 
-  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0));
-  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
+  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0, NULL));
 
   switch (method) {
     case IGRAPH_COMMCMP_VI:
@@ -3469,8 +3456,8 @@ int igraph_split_join_distance(const igraph_vector_t *comm1,
   IGRAPH_CHECK(igraph_vector_copy(&c2, comm2));
   IGRAPH_FINALLY(igraph_vector_destroy, &c2);
 
-  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0));
-  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
+  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0, NULL));
 
   IGRAPH_CHECK(igraph_i_split_join_distance(&c1, &c2, distance12, distance21));
 

@@ -31,49 +31,6 @@
 #include "igraph_random.h"
 #include "igraph_stack.h"
 
-/* Clean membership.
- *
- * This function ensures that the membership vector is renumbered in consecutive
- * numbers 0, ..., q, where q is the number of distinct clusters. The number of
- * distinct clusters is also returned in \c nb_clusters.
- */
-int igraph_i_community_leiden_clean_membership(igraph_vector_t *membership, igraph_integer_t* nb_clusters)
-{
-  long int i, n = igraph_vector_size(membership);
-  igraph_vector_t new_cluster;
-
-  IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
-  IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
-
-  /* Clean clusters. We will store the new cluster + 1 so that membership == 0
-   * indicates that no cluster was assigned yet. */
-  *nb_clusters = 1;
-  for (i = 0; i < n; i++)
-  {
-    long int c = (long int)VECTOR(*membership)[i];
-    if (VECTOR(new_cluster)[c] == 0)
-    {
-      VECTOR(new_cluster)[c] = (igraph_real_t)*nb_clusters;
-      *nb_clusters += 1; 
-    }
-  }
-
-  /* Assign new membership */
-  for (i = 0; i < n; i++)
-  {
-    long int c = (long int)VECTOR(*membership)[i];
-    VECTOR(*membership)[i] = VECTOR(new_cluster)[c] - 1;
-  }
-  /* We used the cluster + 1, so correct */
-  *nb_clusters -= 1;
-
-  igraph_vector_destroy(&new_cluster);
-
-  IGRAPH_FINALLY_CLEAN(1);
-
-  return IGRAPH_SUCCESS;
-}
-
 /* Move nodes in order to improve the quality of a partition.
  *
  * This function considers each node and greedily moves it to a neighboring
@@ -238,7 +195,7 @@ int igraph_i_community_leiden_fastmovenodes(const igraph_t *graph,
     }
   }
 
-  IGRAPH_CHECK(igraph_i_community_leiden_clean_membership(membership, nb_clusters));
+  IGRAPH_CHECK(igraph_reindex_membership(membership, NULL, nb_clusters));
 
   igraph_vector_destroy(&neighbor_clusters);
   igraph_vector_bool_destroy(&neighbor_cluster_added);
@@ -812,9 +769,9 @@ int igraph_i_community_leiden(const igraph_t *graph,
   aggregated_membership = membership;
 
   /* Clean membership and count number of *clusters */
-  IGRAPH_CHECK(igraph_i_community_leiden_clean_membership(aggregated_membership, nb_clusters));
+  IGRAPH_CHECK(igraph_reindex_membership(aggregated_membership, NULL, nb_clusters));
 
-  if (nb_clusters > n)
+  if (*nb_clusters > n)
     IGRAPH_ERROR("Too many communities in membership vector", IGRAPH_EINVAL);
 
   do
