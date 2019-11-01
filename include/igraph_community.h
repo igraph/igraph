@@ -142,7 +142,8 @@ DECLDIR int igraph_modularity_matrix(const igraph_t *graph,
                 const igraph_vector_t *weights);
 
 DECLDIR int igraph_reindex_membership(igraph_vector_t *membership,
-                igraph_vector_t *new_to_old);
+                igraph_vector_t *new_to_old,
+                igraph_integer_t *nb_clusters);
 
 typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
 	       IGRAPH_LEVC_HIST_FAILED,
