@@ -26,6 +26,7 @@
 #include "igraph_community.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
+#include "igraph_interrupt_internal.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_stack.h"
@@ -1047,6 +1048,9 @@ int igraph_i_community_leiden(const igraph_t *graph,
  *    documentation.
  * \param beta The randomness used in the refinement step when merging. A small
  *    amount of randomness (\c beta = 0.01) typically works well.
+ * \param start Start from membership vector. If this is true, the optimization
+ *    will start from the provided membership vector. If this is false, the
+ *    optimization will start from a singleton partition.
  * \param membership The membership vector. This is both used as the initial
  *    membership from which optimisation starts and is updated in place. It
  *    must hence be properly initialized. When finding clusters from scratch it
@@ -1065,14 +1069,36 @@ int igraph_i_community_leiden(const igraph_t *graph,
  */
 int igraph_community_leiden(const igraph_t *graph,
   const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
-  const igraph_real_t resolution_parameter, const igraph_real_t beta,
+  const igraph_real_t resolution_parameter, const igraph_real_t beta, const igraph_bool_t start,
   igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) 
 {
   igraph_vector_t *i_edge_weights, *i_node_weights;
   int ret;
+  igraph_integer_t n = igraph_vcount(graph);
 
-  if (igraph_vector_size(membership) != igraph_vcount(graph)) 
-    IGRAPH_ERROR("Membership length does not equal the number of vertices", IGRAPH_EINVAL);
+  if (start)
+  {
+    if (!membership)
+      IGRAPH_ERROR("Cannot start optimization if membership is missing", IGRAPH_EINVAL);
+
+    if (igraph_vector_size(membership) != n)
+      IGRAPH_ERROR("Initial membership length does not equal the number of vertices", IGRAPH_EINVAL);
+
+    if (igraph_vector_max(membership) >= n)
+      IGRAPH_ERROR("Too many communities in initial membership start vector", IGRAPH_EINVAL);
+  }
+  else
+  {
+    int i;
+    if (!membership)
+      IGRAPH_ERROR("Membership vector should be supplied and initialized, "
+                   "even when not starting optimization from it", IGRAPH_EINVAL);
+
+    igraph_vector_resize(membership, n);
+    for (i = 0; i < n; i++)
+      VECTOR(*membership)[i] = i;
+  }
+
 
   if (igraph_is_directed(graph))
     IGRAPH_ERROR("Leiden algorithm is only implemented for undirected graphs", IGRAPH_EINVAL);
@@ -1097,7 +1123,7 @@ int igraph_community_leiden(const igraph_t *graph,
       i_node_weights = igraph_Calloc(1, igraph_vector_t);
       if (i_node_weights == 0)
         IGRAPH_ERROR("Leiden algorithm failed, could not allocate memory for node weights", IGRAPH_ENOMEM);    
-      IGRAPH_CHECK(igraph_vector_init(i_node_weights, igraph_vcount(graph)));
+      IGRAPH_CHECK(igraph_vector_init(i_node_weights, n));
       IGRAPH_FINALLY(free, i_node_weights);
       IGRAPH_FINALLY(igraph_vector_destroy, i_node_weights);
       igraph_vector_fill(i_node_weights, 1);

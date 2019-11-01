@@ -224,6 +224,7 @@ DECLDIR int igraph_community_leiden(const igraph_t *graph,
                 const igraph_vector_t *node_weights,
                 const igraph_real_t resolution_parameter, 
                 const igraph_real_t beta,
+                const igraph_bool_t start,
                 igraph_vector_t *membership,
                 igraph_integer_t *nb_clusters,
                 igraph_real_t *quality);
