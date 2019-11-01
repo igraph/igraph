@@ -365,6 +365,8 @@ int igraph_i_community_leiden_mergenodes(const igraph_t *graph,
   IGRAPH_CHECK(igraph_vector_init(&cum_trans_diff, n));
   IGRAPH_FINALLY(igraph_vector_destroy, &cum_trans_diff);
 
+  RNG_BEGIN();
+
   for (i = 0; i < n; i++)
   {
     long int v = (long int)VECTOR(node_order)[i];
@@ -470,6 +472,8 @@ int igraph_i_community_leiden_mergenodes(const igraph_t *graph,
       }
     } /* end if singleton and may be merged */
   }
+
+  RNG_END();
 
   IGRAPH_CHECK(igraph_i_community_leiden_clean_refined_membership(node_subset, refined_membership, nb_refined_clusters));
 
