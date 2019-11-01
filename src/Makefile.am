@@ -348,7 +348,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
-			     spmatrix.c community.c fast_community.c \
+			     spmatrix.c community.c fast_community.c community_leiden.c \
 			     gml_tree.c \
 			     bliss/orbit.cc bliss/defs.cc bliss/uintseqhash.cc \
 			     bliss/partition.cc bliss/graph.cc \
