@@ -30,9 +30,9 @@ void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, 
   igraph_real_t quality;
   
   /* Initialize with singleton partition. */
-  igraph_vector_init_seq(&membership, 0, igraph_vcount(graph) - 1);  
+  igraph_vector_init(&membership, igraph_vcount(graph));
 
-  igraph_community_leiden(graph, edge_weights, NULL, resolution_parameter, 0.01, &membership, &nb_clusters, &quality);
+  igraph_community_leiden(graph, edge_weights, NULL, resolution_parameter, 0.01, 0, &membership, &nb_clusters, &quality);
 
   printf("Leiden found %i clusters using CPM (resolution parameter=%.2f), quality is %.4f.\n", nb_clusters, resolution_parameter, quality);
 
@@ -56,9 +56,9 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
     igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 1);
   
   /* Initialize with singleton partition. */
-  igraph_vector_init_seq(&membership, 0, igraph_vcount(graph) - 1);  
+  igraph_vector_init(&membership, igraph_vcount(graph));
 
-  igraph_community_leiden(graph, edge_weights, &degree, 1.0/(2*igraph_ecount(graph)), 0.01, &membership, &nb_clusters, &quality);
+  igraph_community_leiden(graph, edge_weights, &degree, 1.0/(2*igraph_ecount(graph)), 0.01, 0, &membership, &nb_clusters, &quality);
 
   printf("Leiden found %i clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
 
