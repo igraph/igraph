@@ -222,6 +222,12 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
 		 IGRAPH_EINVAL);
   }
+
+  if (igraph_vector_size(cut_prob) < size) {
+    IGRAPH_ERROR("The size of the cut probability vector must not be smaller than the motif size.",
+                 IGRAPH_EINVAL);
+  }
+
   if (size==3) {
     mul=3;
     if (igraph_is_directed(graph)) {
