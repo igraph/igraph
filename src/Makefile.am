@@ -418,7 +418,7 @@ endif
 libigraph_la_CFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
 libigraph_la_CXXFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
 
-includedir = $(prefix)/include/igraph
+includedir ?= $(prefix)/include/igraph
 include_HEADERS = $(HEADERS_PUBLIC)
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
