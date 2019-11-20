@@ -60,7 +60,10 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
 
   igraph_community_leiden(graph, edge_weights, &degree, 1.0/(2*igraph_ecount(graph)), 0.01, 0, &membership, &nb_clusters, &quality);
 
-  printf("Leiden found %i clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
+  if(isnan(quality))
+    printf("Leiden found %i clusters using modularity, quality is nan.\n", nb_clusters);
+  else
+    printf("Leiden found %i clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
 
   printf("Membership: ");
   igraph_vector_print(&membership);
