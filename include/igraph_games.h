@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -39,7 +39,7 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
-                igraph_real_t power, 
+                igraph_real_t power,
                 igraph_integer_t m,
                 const igraph_vector_t *outseq,
                 igraph_bool_t outpref,
@@ -49,7 +49,7 @@ DECLDIR int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
                 const igraph_t *start_from);
 DECLDIR int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
                 igraph_real_t power,
-                igraph_integer_t m,  
+                igraph_integer_t m,
                 const igraph_vector_t *outseq,
                 igraph_bool_t outpref,
                 igraph_real_t zeroappeal,
@@ -62,11 +62,11 @@ DECLDIR int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igr
 DECLDIR int igraph_erdos_renyi_game_gnm(igraph_t *graph, igraph_integer_t n, igraph_real_t m,
                 igraph_bool_t directed, igraph_bool_t loops);
 DECLDIR int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
-                const igraph_vector_t *in_deg, 
+                const igraph_vector_t *in_deg,
                 igraph_degseq_t method);
-DECLDIR int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n, 
+DECLDIR int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
                 igraph_integer_t m, igraph_bool_t directed, igraph_bool_t citation);
-DECLDIR int igraph_barabasi_aging_game(igraph_t *graph, 
+DECLDIR int igraph_barabasi_aging_game(igraph_t *graph,
                 igraph_integer_t nodes,
                 igraph_integer_t m,
                 const igraph_vector_t *outseq,
@@ -82,14 +82,14 @@ DECLDIR int igraph_barabasi_aging_game(igraph_t *graph,
 DECLDIR int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
                 igraph_real_t power,
                 igraph_integer_t window,
-                igraph_integer_t m,  
+                igraph_integer_t m,
                 const igraph_vector_t *outseq,
                 igraph_bool_t outpref,
                 igraph_real_t zero_appeal,
                 igraph_bool_t directed);
 DECLDIR int igraph_recent_degree_aging_game(igraph_t *graph,
                 igraph_integer_t nodes,
-                igraph_integer_t m, 
+                igraph_integer_t m,
                 const igraph_vector_t *outseq,
                 igraph_bool_t outpref,
                 igraph_real_t pa_exp,
@@ -98,8 +98,8 @@ DECLDIR int igraph_recent_degree_aging_game(igraph_t *graph,
                 igraph_integer_t window,
                 igraph_real_t zero_appeal,
                 igraph_bool_t directed);
-DECLDIR int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes, 
-                igraph_integer_t types, igraph_integer_t edges_per_step, 
+DECLDIR int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
+                igraph_integer_t types, igraph_integer_t edges_per_step,
                 igraph_vector_t *type_dist,
                 igraph_matrix_t *pref_matrix,
                 igraph_bool_t directed);
@@ -112,7 +112,7 @@ DECLDIR int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
                 igraph_real_t radius, igraph_bool_t torus,
                 igraph_vector_t *x, igraph_vector_t *y);
 DECLDIR int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
-                igraph_integer_t types, 
+                igraph_integer_t types,
                 const igraph_vector_t *type_dist,
                 igraph_bool_t fixed_sizes,
                 const igraph_matrix_t *pref_matrix,
@@ -126,18 +126,18 @@ DECLDIR int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t 
                 igraph_vector_t *node_type_out_vec,
                 igraph_bool_t loops);
 
-DECLDIR int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob, 
+DECLDIR int igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
                 igraph_bool_t loops, igraph_bool_t multiple);
 DECLDIR int igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
                 igraph_bool_t loops, igraph_neimode_t mode);
 
 DECLDIR int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
                 igraph_integer_t size, igraph_integer_t nei,
-                igraph_real_t p, igraph_bool_t loops, 
+                igraph_real_t p, igraph_bool_t loops,
                 igraph_bool_t multiple);
 
-DECLDIR int igraph_lastcit_game(igraph_t *graph, 
-                igraph_integer_t nodes, igraph_integer_t edges_per_node, 
+DECLDIR int igraph_lastcit_game(igraph_t *graph,
+                igraph_integer_t nodes, igraph_integer_t edges_per_node,
                 igraph_integer_t agebins,
                 const igraph_vector_t *preference, igraph_bool_t directed);
 
@@ -159,10 +159,10 @@ DECLDIR int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
 
 
 DECLDIR int igraph_simple_interconnected_islands_game(
-                igraph_t *graph, 
-                igraph_integer_t islands_n, 
+                igraph_t *graph,
+                igraph_integer_t islands_n,
                 igraph_integer_t islands_size,
-                igraph_real_t islands_pin, 
+                igraph_real_t islands_pin,
                 igraph_integer_t n_inter);
 
 DECLDIR int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
@@ -179,12 +179,12 @@ DECLDIR int igraph_k_regular_game(igraph_t *graph,
                 igraph_integer_t no_of_nodes, igraph_integer_t k,
                 igraph_bool_t directed, igraph_bool_t multiple);
 
-DECLDIR int igraph_sbm_game(igraph_t *graph, igraph_integer_t n, 
+DECLDIR int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
                 const igraph_matrix_t *pref_matrix,
                 const igraph_vector_int_t *block_sizes,
                 igraph_bool_t directed, igraph_bool_t loops);
 
-DECLDIR int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n, 
+DECLDIR int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                 igraph_integer_t m, const igraph_vector_t *rho,
                 const igraph_matrix_t *C, igraph_real_t p);
 
@@ -210,11 +210,6 @@ DECLDIR int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs
                 igraph_bool_t directed);
 
 DECLDIR int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
-                igraph_real_t radius, 
-                igraph_bool_t positive, 
-                igraph_matrix_t *res);
-
-DECLDIR int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
                 igraph_real_t radius,
                 igraph_bool_t positive,
                 igraph_matrix_t *res);
