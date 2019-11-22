@@ -31,7 +31,7 @@
 #ifdef HAVE_STDINT_H
 #  include <stdint.h>
 #else
-#  if HAVE_SYS_INT_TYPES_H
+#  if defined(HAVE_SYS_INT_TYPES_H) && HAVE_SYS_INT_TYPES_H
 #    include <sys/int_types.h>    /* for Solaris */
 #  endif
 #endif
