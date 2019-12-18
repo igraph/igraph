@@ -1,5 +1,7 @@
 #! /bin/sh
 
+cd "`dirname $0`"
+
 ## Find out our version number, need git for this
 printf "Finding out version number/string... "
 tools/getversion.sh > IGRAPH_VERSION
