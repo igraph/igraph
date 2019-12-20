@@ -1031,7 +1031,8 @@ int igraph_modularity_matrix(const igraph_t *graph,
  * This function reindexes component IDs in a membership vector
  * in a way that the new IDs start from zero and go up to C-1,
  * where C is the number of unique component IDs in the original
- * vector.
+ * vector. The supplied membership is expected to fall in the
+ * range 0, ..., n - 1.
  *
  * \param  membership  Numeric vector which gives the type of each
  *                     vertex, ie. the component to which it belongs.
@@ -1055,6 +1056,7 @@ int igraph_reindex_membership(igraph_vector_t *membership,
   igraph_vector_t new_cluster;
   igraph_integer_t i_nb_clusters;
 
+  /* We allow original cluster indices in the range 0, ..., n - 1 */
   IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
   IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
 
@@ -1067,12 +1069,16 @@ int igraph_reindex_membership(igraph_vector_t *membership,
   for (i = 0; i < n; i++)
   {
     long int c = (long int)VECTOR(*membership)[i];
+
+    if (c >= n)
+      IGRAPH_ERROR("Cluster out of range", IGRAPH_EINVAL);
+
     if (VECTOR(new_cluster)[c] == 0)
     {
       VECTOR(new_cluster)[c] = (igraph_real_t)i_nb_clusters;
       i_nb_clusters += 1;
       if (new_to_old)
-        igraph_vector_push_back(new_to_old, c);
+        IGRAPH_CHECK(igraph_vector_push_back(new_to_old, c));
     }
   }
 
