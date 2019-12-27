@@ -6973,7 +6973,7 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
 
 int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
     igraph_adjlist_t al;
-    igraph_integer_t iroot;
+    igraph_integer_t iroot = 0;
     igraph_integer_t visited_count;
     igraph_integer_t vcount, ecount;
 
