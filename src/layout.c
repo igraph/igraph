@@ -1099,7 +1099,7 @@ int igraph_layout_reingold_tilford(const igraph_t *graph,
 
     if (mode != IGRAPH_ALL) {
       /* look for roots by swimming against the stream */
-      igraph_neimode_t mode2 = (mode==IGRAPH_IN) ? IGRAPH_OUT: IGRAPH_IN;
+      mode2 = (mode==IGRAPH_IN) ? IGRAPH_OUT: IGRAPH_IN;
 
       IGRAPH_CHECK(igraph_topological_sorting(graph, &order, mode2));
       IGRAPH_CHECK(igraph_clusters(graph, &membership, /*csize=*/ 0, 
