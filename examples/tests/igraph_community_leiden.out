@@ -1,14 +1,14 @@
 Leiden found 2 clusters using modularity, quality is 0.4524.
 Membership: 0 0 0 0 0 1 1 1 1 1
 
-Leiden found 2 clusters using modularity, quality is -0.0476.
+Leiden found 2 clusters using modularity, quality is 0.4524.
 Membership: 0 0 0 0 0 1 1 1 1 1
 
 Leiden found 2 clusters using modularity, quality is 0.1797.
 Membership: 0 0 1 1 1 1
 
-Leiden found 4 clusters using modularity, quality is -0.7861.
-Membership: 0 1 2 3 3 3
+Leiden found 2 clusters using modularity, quality is 0.1709.
+Membership: 0 0 0 1 1 1
 
 Leiden found 4 clusters using modularity, quality is 0.4188.
 Membership: 0 0 0 0 1 1 1 0 2 0 1 0 0 0 2 2 1 0 2 0 2 0 2 3 3 3 2 3 3 2 2 3 2 2
@@ -19,8 +19,8 @@ Membership: 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 1 0 0 1 0 1 0 1 1 1 1 1 1 1 1 1 1 1 1
 Leiden found 3 clusters using modularity, quality is 0.5000.
 Membership: 0 0 0 0 1 1 1 1 2
 
-Leiden found 4 clusters using modularity, quality is 0.5500.
-Membership: 0 0 0 0 0 1 1 1 1 1 2 2 3 3 3 3 3 2 2 2
+Leiden found 4 clusters using modularity, quality is 0.5450.
+Membership: 0 0 0 0 0 1 1 1 1 1 2 2 2 3 3 3 3 2 2 2
 
 Leiden found 2 clusters using CPM (resolution parameter=0.05), quality is 0.7500.
 Membership: 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1

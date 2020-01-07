@@ -39,14 +39,19 @@ int main() {
 	       5,6,5,7,5,8,5,9, 6,7,6,8,6,9, 7,8,7,9, 8,9,
            0,5, -1);
 
-  /* Initialize with singleton partition. */
-  igraph_vector_init_seq(&membership, 0, igraph_vcount(&graph) - 1);  
-  nb_clusters = igraph_vcount(&graph);
-
   /* Perform Leiden algorithm using CPM */
-  igraph_community_leiden(&graph, NULL, NULL, 0.05, 0.01, &membership, &nb_clusters, &quality);
+  igraph_vector_init(&membership, igraph_vcount(&graph));
+  igraph_community_leiden(&graph, NULL, NULL, 0.05, 0.01, 0, &membership, &nb_clusters, &quality);
 
   printf("Leiden found %i clusters using CPM (resolution parameter 0.05), quality is %.4f.\n", nb_clusters, quality);
+  printf("Membership: ");
+  igraph_vector_print(&membership);
+  printf("\n");
+
+  /* Start from existing membership to improve it further */
+  igraph_community_leiden(&graph, NULL, NULL, 0.05, 0.01, 1, &membership, &nb_clusters, &quality);
+
+  printf("Iterated Leiden, using CPM (resolution parameter 0.05), quality is %.4f.\n", nb_clusters, quality);
   printf("Membership: ");
   igraph_vector_print(&membership);
   printf("\n");
@@ -54,14 +59,9 @@ int main() {
   /* Initialize degree vector to use for optimizing modularity */
   igraph_vector_init(&degree, igraph_vcount(&graph));
   igraph_degree(&graph, &degree, igraph_vss_all(), IGRAPH_ALL, 1);
-  
-  /* Initialize with singleton partition. */
-  for (i = 0; i < igraph_vcount(&graph); i++)
-    VECTOR(membership)[i] = i;
-  nb_clusters = igraph_vcount(&graph);
 
   /* Perform Leiden algorithm using modularity */
-  igraph_community_leiden(&graph, NULL, &degree, 1.0/(2*igraph_ecount(&graph)), 0.01, &membership, &nb_clusters, &quality);
+  igraph_community_leiden(&graph, NULL, &degree, 1.0/(2*igraph_ecount(&graph)), 0.01, 0, &membership, &nb_clusters, &quality);
 
   printf("Leiden found %i clusters using modularity, quality is %.4f.\n", nb_clusters, quality);
   printf("Membership: ");

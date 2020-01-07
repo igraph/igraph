@@ -48,17 +48,24 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
   igraph_vector_t membership, degree;
   igraph_integer_t nb_clusters = igraph_vcount(graph);
   igraph_real_t quality;
+  igraph_real_t m;
 
   igraph_vector_init(&degree, igraph_vcount(graph));
   if (edge_weights)
+  {
     igraph_strength(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 1, edge_weights);
+    m = igraph_vector_sum(edge_weights);
+  }
   else
+  {
     igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, 1);
+    m = (igraph_real_t)igraph_ecount(graph);
+  }
   
   /* Initialize with singleton partition. */
   igraph_vector_init(&membership, igraph_vcount(graph));
 
-  igraph_community_leiden(graph, edge_weights, &degree, 1.0/(2*igraph_ecount(graph)), 0.01, 0, &membership, &nb_clusters, &quality);
+  igraph_community_leiden(graph, edge_weights, &degree, 1.0/(2*m), 0.01, 0, &membership, &nb_clusters, &quality);
 
   if(isnan(quality))
     printf("Leiden found %i clusters using modularity, quality is nan.\n", nb_clusters);
