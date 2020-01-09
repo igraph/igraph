@@ -5562,7 +5562,9 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
   long int no_of_nodes=igraph_vcount(graph);
   long int no_of_edges=igraph_ecount(graph);
-
+  long int no_of_roots=igraph_vector_size(roots);
+  long int tree_vertex_count = no_of_nodes;
+  
   igraph_vector_t edges;
   igraph_vector_bool_t seen_vertices;
   igraph_vector_bool_t seen_edges;
@@ -5574,22 +5576,21 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
   /* TODO: handle not-connected graphs, multiple root vertices */
 
-  IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
+  IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
+  igraph_vector_reserve(&edges, no_of_edges * 2);
   IGRAPH_DQUEUE_INIT_FINALLY(&Q, 100);
   IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
-  IGRAPH_CHECK(igraph_vector_bool_init(&seen_vertices, no_of_nodes));
-  IGRAPH_FINALLY(igraph_vector_bool_destroy, &seen_vertices);
-  IGRAPH_CHECK(igraph_vector_bool_init(&seen_edges, no_of_edges));
-  IGRAPH_FINALLY(igraph_vector_bool_destroy, &seen_edges);
-
-  if (vertex_index) {
+  IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_vertices, no_of_nodes);
+  IGRAPH_VECTOR_BOOL_INIT_FINALLY(&seen_edges, no_of_edges);
+  
+  if (vertex_index) { 
     IGRAPH_CHECK(igraph_vector_resize(vertex_index, no_of_nodes));
     for (i=0; i<no_of_nodes; i++) {
       VECTOR(*vertex_index)[i] = i;
     }
   }
 
-  for (r=0; r<igraph_vector_size(roots); r++) {
+  for (r=0; r<no_of_roots; r++) {
 
     long int root=(long int) VECTOR(*roots)[r];
     VECTOR(seen_vertices)[root] = 1;
@@ -5597,9 +5598,8 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     while (!igraph_dqueue_empty(&Q)) {
       long int actnode=(long int) igraph_dqueue_pop(&Q);
-
-      IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode,
-				   mode));
+      
+      IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode, mode));
       n=igraph_vector_size(&neis);
       for (i=0; i<n; i++) {
 
@@ -5613,25 +5613,26 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 	  VECTOR(seen_edges)[edge] = 1;
 
 	  if (! VECTOR(seen_vertices)[nei]) {
-
-	    VECTOR(edges)[ edge*2 ] = from;
-	    VECTOR(edges)[ edge*2+1 ] = to;
-
+	    
+        igraph_vector_push_back(&edges, from);
+        igraph_vector_push_back(&edges, to);
+	    
 	    VECTOR(seen_vertices)[nei] = 1;
 	    IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
 
 	  } else {
-
-	    if (vertex_index) {
+	    
+        tree_vertex_count++;
+	    if (vertex_index) { 
 	      IGRAPH_CHECK(igraph_vector_push_back(vertex_index, nei));
 	    }
 
 	    if (from==nei) {
-	      VECTOR(edges)[ edge*2 ] = v_ptr++;
-	      VECTOR(edges)[ edge*2+1 ] = to;
+          igraph_vector_push_back(&edges, v_ptr++);
+          igraph_vector_push_back(&edges, to);
 	    } else {
-	      VECTOR(edges)[ edge*2 ] = from;
-	      VECTOR(edges)[ edge*2+1 ] = v_ptr++;
+          igraph_vector_push_back(&edges, from);
+          igraph_vector_push_back(&edges, v_ptr++);
 	    }
 	  }
 	}
@@ -5648,8 +5649,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
   igraph_dqueue_destroy(&Q);
   IGRAPH_FINALLY_CLEAN(4);
 
-  IGRAPH_CHECK(igraph_create(tree, &edges, (igraph_integer_t) no_of_edges+1,
-			     igraph_is_directed(graph)));
+  IGRAPH_CHECK(igraph_create(tree, &edges, tree_vertex_count, igraph_is_directed(graph)));
   igraph_vector_destroy(&edges);
   IGRAPH_FINALLY_CLEAN(1);
 
