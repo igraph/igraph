@@ -41,10 +41,16 @@ doctemplate: $(DOCINCLUDES)
 tags: $(DOCINCLUDES) $(DOCFIX)
 	cat $(DOCINCLUDES) $(DOCFIX)| grep 'id="[^-"]*">' | sed 's/.*id="\([^"]*\)">.*/\1@@/' | tr '@' '\t' | sort > tags
 
-EXAMPLES = $(patsubst $(top_srcdir)/%.c,$(top_builddir)/%.c.xml,$(wildcard $(top_srcdir)/examples/simple/*.c))
+EXAMPLES = \
+    $(patsubst $(top_srcdir)/%.c,$(top_builddir)/%.c.xml,$(wildcard $(top_srcdir)/examples/simple/*.c)) \
+    $(patsubst $(top_srcdir)/%.c,$(top_builddir)/%.c.xml,$(wildcard $(top_srcdir)/examples/tests/*.c))
 
 $(top_builddir)/examples/simple/%.c.xml: $(top_srcdir)/examples/simple/%.c tags
 	if [ ! -d "$(top_builddir)/examples/simple" -a "x$(top_srcdir)" != "x$(top_builddir)" ]; then mkdir -p $(top_builddir)/examples/simple; fi
+	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=$(top_srcdir)/doc/docbook.outlang
+
+$(top_builddir)/examples/tests/%.c.xml: $(top_srcdir)/examples/tests/%.c tags
+	if [ ! -d "$(top_builddir)/examples/tests" -a "x$(top_srcdir)" != "x$(top_builddir)" ]; then mkdir -p $(top_builddir)/examples/tests; fi
 	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=$(top_srcdir)/doc/docbook.outlang
 
 igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)

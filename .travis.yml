@@ -11,21 +11,36 @@ addons:
     - gfortran
     - flex
     - bison
+    - docbook2x
+    - xmlto
+    - texinfo
+    - source-highlight
+    - libxml2-utils
+    - xsltproc
+    - fop
   homebrew:
     packages:
     - flex
     - bison
 
 install:
-- ./bootstrap.sh
-- ./configure
-- make
+  - ./bootstrap.sh
+  - ./configure
+  - make
 
 script:
-- make check
+  - make check
 
-after_failure:
-- find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+jobs:
+  include:
+    - stage: test
+      after_failure:
+        - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+    - stage: documentation
+      language: shell
+      script:
+        - make html
+        - make pdf
 
 notifications:
   email:
