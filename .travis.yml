@@ -23,22 +23,23 @@ addons:
     - flex
     - bison
 
-install:
-  - ./bootstrap.sh
-  - ./configure
-  - make
-
 script:
   - make check
+
+after_failure:
+  - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
 
 jobs:
   include:
     - stage: test
-      after_failure:
-        - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+      install:
+        - ./bootstrap.sh
+        - ./configure
+        - make
     - stage: documentation
       language: shell
       script:
+        - cd doc
         - make html
         - make pdf
 
