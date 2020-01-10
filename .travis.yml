@@ -1,10 +1,6 @@
 
 language: c
 
-os:
-  - linux
-  - osx
-
 addons:
   apt:
     packages:
@@ -32,12 +28,23 @@ after_failure:
 jobs:
   include:
     - stage: test
+      os: linux
+      install:
+        - ./bootstrap.sh
+        - ./configure
+        - make
+    - stage: test
+      os: osx
       install:
         - ./bootstrap.sh
         - ./configure
         - make
     - stage: documentation
       language: shell
+      os: linux
+      install:
+        - ./bootstrap.sh
+        - ./configure
       script:
         - cd doc
         - make html
