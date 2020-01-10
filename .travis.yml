@@ -45,8 +45,8 @@ jobs:
       install:
         - ./bootstrap.sh
         - ./configure
-      script:
         - cd doc
+      script:
         - make html
         - make pdf
 
