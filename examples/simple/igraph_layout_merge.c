@@ -22,7 +22,7 @@
 */
 
 #include <igraph.h>
-#include <igraph_types_internal.h>
+#include "igraph_types_internal.h"
 #include <stdlib.h>
 #include <time.h>
 

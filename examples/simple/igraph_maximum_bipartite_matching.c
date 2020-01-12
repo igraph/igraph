@@ -228,6 +228,70 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_w
   return 0;
 }
 
+// This test addresses issue #1110, where an incorrect
+// types vector (i.e. that doesn't correspond to a bipartite
+// labelling of the graph) would cause a possible infinite loop.
+int test_incorrect_types() {
+  igraph_t g;
+  igraph_vector_bool_t types;
+  igraph_vector_t weights;
+
+  igraph_integer_t matching_size;
+  igraph_real_t weighted_size;
+
+  igraph_vector_long_t matching;
+
+  igraph_error_type_t err;
+
+
+  igraph_small(&g, 4, IGRAPH_UNDIRECTED,
+    0,1, 0, 2, 0, 3,
+    -1);
+
+  igraph_vector_bool_init(&types, 4);
+  VECTOR(types)[0] = 0;
+  VECTOR(types)[1] = 1;
+  VECTOR(types)[2] = 0;
+  VECTOR(types)[3] = 1;
+
+  igraph_vector_long_init(&matching, 0);
+
+  igraph_vector_init(&weights, igraph_vcount(&g));
+  igraph_vector_fill(&weights, 1.0);
+
+  igraph_set_error_handler(&igraph_error_handler_ignore);
+
+  // Test incorrect types
+  err = igraph_maximum_bipartite_matching(&g, &types, &matching_size, NULL, &matching, NULL, 0);
+  if (err != IGRAPH_EINVAL)
+    return 3;
+
+  // Test correct types
+  VECTOR(types)[2] = 1;
+  err = igraph_maximum_bipartite_matching(&g, &types, &matching_size, NULL, &matching, NULL, 0);
+  if (err == IGRAPH_EINVAL)
+    return 4;
+
+  // Test incorrect types for weighted graph
+  VECTOR(types)[2] = 0;
+  err = igraph_maximum_bipartite_matching(&g, &types, &matching_size, &weighted_size, &matching, &weights, 0);
+  if (err != IGRAPH_EINVAL)
+    return 5;
+
+  // Test correct types for weighted graph
+  VECTOR(types)[2] = 1;
+  err = igraph_maximum_bipartite_matching(&g, &types, &matching_size, &weighted_size, &matching, &weights, 0);
+  if (err == IGRAPH_EINVAL)
+    return 6;
+
+  igraph_vector_destroy(&weights);
+  igraph_vector_long_destroy(&matching);
+
+  igraph_vector_bool_destroy(&types);
+  igraph_destroy(&g);
+
+  return 0;}
+
 int main() {
   igraph_i_set_attribute_table(&igraph_cattribute_table);
 
@@ -240,9 +304,12 @@ int main() {
   if (test_weighted_graph_generated())
     return 3;
 
+  if (test_incorrect_types())
+    return 4;
+
   if (!IGRAPH_FINALLY_STACK_EMPTY) {
     printf("Finally stack still has %d elements.\n", IGRAPH_FINALLY_STACK_SIZE());
-    return 4;
+    return 5;
   }
 
   return 0;

@@ -22,7 +22,6 @@
 */
 
 #include <igraph.h>
-#include <igraph_sparsemat.h>
 
 int main() {
   

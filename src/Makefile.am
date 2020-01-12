@@ -246,12 +246,11 @@ SPCONFIG =      SuiteSparse_config/SuiteSparse_config.c \
                 SuiteSparse_config/SuiteSparse_config.h
 
 HEADERS_PRIVATE = atlas-edges.h \
-		bliss_bignum.hh		bliss_defs.hh \
-		bliss_eqrefhash.hh	bliss_graph.hh \
-		bliss_heap.hh		bliss_kqueue.hh \
-		bliss_kstack.hh		bliss_orbit.hh \
-		bliss_partition.hh	bliss_timer.hh \
-		bliss_utils.hh \
+		bliss/bignum.hh		bliss/defs.hh \
+		bliss/graph.hh		bliss/uintseqhash.hh \
+		bliss/heap.hh		bliss/kqueue.hh \
+		bliss/kstack.hh		bliss/orbit.hh \
+		bliss/partition.hh	bliss/utils.hh \
 		NetDataTypes.h		NetRoutines.h \
 		pottsmodel_2.h \
 		igraph_gml_tree.h \
@@ -282,7 +281,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		scg_headers.h igraph_hacks_internal.h triangles_template.h \
 		triangles_template1.h maximal_cliques_template.h prpack.h \
 		igraph_cliquer.h cliquer/graph.h cliquer/cliquer.h cliquer/misc.h \
-		cliquer/cliquerconf.h cliquer/reorder.h cliquer/set.h
+		cliquer/cliquerconf.h cliquer/reorder.h cliquer/set.h \
+		structural_properties_internal.h
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
@@ -348,7 +348,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
-			     spmatrix.c community.c fast_community.c \
+			     spmatrix.c community.c fast_community.c community_leiden.c \
 			     gml_tree.c \
 			     bliss/orbit.cc bliss/defs.cc bliss/uintseqhash.cc \
 			     bliss/partition.cc bliss/graph.cc \
@@ -418,8 +418,8 @@ endif
 libigraph_la_CFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
 libigraph_la_CXXFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
 
-includedir = $(prefix)/include/igraph
-include_HEADERS = $(HEADERS_PUBLIC)
+igraphincludedir = $(includedir)/igraph
+igraphinclude_HEADERS = $(HEADERS_PUBLIC)
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
 

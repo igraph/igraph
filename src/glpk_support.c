@@ -34,9 +34,17 @@
 #include <stdio.h>
 
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
-  IGRAPH_UNUSED(tree);
   IGRAPH_UNUSED(info);
-  IGRAPH_ALLOW_INTERRUPTION_NORETURN();
+
+  /* This is a special version of IGRAPH_ALLOW_INTERRUPTION().
+     Calling glp_ios_terminate() from glp_intopt()'s callback function
+     signals to GLPK that it should terminate the optimization and return
+     with the code GLP_ESTOP.
+  */
+  if (igraph_i_interruption_handler) {
+      if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS)
+          glp_ios_terminate(tree);
+  }  
 }
 
 int igraph_i_glpk_check(int retval, const char* message) {
@@ -49,6 +57,7 @@ int igraph_i_glpk_check(int retval, const char* message) {
   /* handle errors */
 #define HANDLE_CODE(c) case c: code = #c; retval = IGRAPH_##c; break;
 #define HANDLE_CODE2(c) case c: code = #c; retval = IGRAPH_FAILURE; break;
+#define HANDLE_CODE3(c) case c: code = #c; retval = IGRAPH_INTERRUPTED; break;
   switch (retval) {
     HANDLE_CODE(GLP_EBOUND);
     HANDLE_CODE(GLP_EROOT);
@@ -57,7 +66,8 @@ int igraph_i_glpk_check(int retval, const char* message) {
     HANDLE_CODE(GLP_EFAIL);
     HANDLE_CODE(GLP_EMIPGAP);
     HANDLE_CODE(GLP_ETMLIM);
-    HANDLE_CODE(GLP_ESTOP);
+
+    HANDLE_CODE3(GLP_ESTOP);
 
     HANDLE_CODE2(GLP_EBADB);
     HANDLE_CODE2(GLP_ESING);
@@ -70,6 +80,8 @@ int igraph_i_glpk_check(int retval, const char* message) {
       IGRAPH_ERROR("unknown GLPK error", IGRAPH_FAILURE);
   }
 #undef HANDLE_CODE
+#undef HANDLE_CODE2
+#undef HANDLE_CODE3
 
   sprintf(message_and_code, "%s (%s)", message, code);
   IGRAPH_ERROR(message_and_code, retval);

@@ -41,10 +41,16 @@ doctemplate: $(DOCINCLUDES)
 tags: $(DOCINCLUDES) $(DOCFIX)
 	cat $(DOCINCLUDES) $(DOCFIX)| grep 'id="[^-"]*">' | sed 's/.*id="\([^"]*\)">.*/\1@@/' | tr '@' '\t' | sort > tags
 
-EXAMPLES = $(patsubst $(top_srcdir)/%.c,$(top_builddir)/%.c.xml,$(wildcard $(top_srcdir)/examples/simple/*.c))
+EXAMPLES = \
+    $(patsubst $(top_srcdir)/%.c,$(top_builddir)/%.c.xml,$(wildcard $(top_srcdir)/examples/simple/*.c)) \
+    $(patsubst $(top_srcdir)/%.c,$(top_builddir)/%.c.xml,$(wildcard $(top_srcdir)/examples/tests/*.c))
 
 $(top_builddir)/examples/simple/%.c.xml: $(top_srcdir)/examples/simple/%.c tags
 	if [ ! -d "$(top_builddir)/examples/simple" -a "x$(top_srcdir)" != "x$(top_builddir)" ]; then mkdir -p $(top_builddir)/examples/simple; fi
+	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=$(top_srcdir)/doc/docbook.outlang
+
+$(top_builddir)/examples/tests/%.c.xml: $(top_srcdir)/examples/tests/%.c tags
+	if [ ! -d "$(top_builddir)/examples/tests" -a "x$(top_srcdir)" != "x$(top_builddir)" ]; then mkdir -p $(top_builddir)/examples/tests; fi
 	source-highlight --src-lang c --out-format docbook --input $< --output $@ --gen-references=inline --ctags="" --outlang-def=$(top_srcdir)/doc/docbook.outlang
 
 igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
@@ -160,8 +166,8 @@ operators.xml: operators.xxml $(SRCDIR)/operators.c
 flows.xml: flows.xxml $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c $(INCLUDEDIR)/igraph_flow.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/flow.c $(SRCDIR)/st-cuts.c $(SRCDIR)/cohesive_blocks.c $(INCLUDEDIR)/igraph_flow.h
 
-community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
+community.xml: community.xxml $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/community_leiden.c $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/community.c $(SRCDIR)/clustertool.cpp $(SRCDIR)/walktrap.cpp $(SRCDIR)/community_leiden.c $(SRCDIR)/fast_community.c $(SRCDIR)/optimal_modularity.c $(INCLUDEDIR)/igraph_community.h $(SRCDIR)/infomap.cc
 
 cliques.xml: cliques.xxml $(SRCDIR)/cliques.c $(SRCDIR)/maximal_cliques.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/cliques.c $(SRCDIR)/maximal_cliques.c $(INCLUDEDIR)/igraph_cliques.h

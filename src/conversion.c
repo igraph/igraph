@@ -344,7 +344,7 @@ int igraph_to_directed(igraph_t *graph,
 
   if (mode != IGRAPH_TO_DIRECTED_ARBITRARY &&
       mode != IGRAPH_TO_DIRECTED_MUTUAL) {
-    IGRAPH_ERROR("Cannot directed graph, invalid mode", IGRAPH_EINVAL);
+    IGRAPH_ERROR("Cannot direct graph, invalid mode", IGRAPH_EINVAL);
   }
 
   if (igraph_is_directed(graph)) {

@@ -22,8 +22,8 @@
 */
 
 #include <igraph.h>
-#include <igraph_marked_queue.h>
-#include <igraph_estack.h>
+#include "igraph_marked_queue.h"
+#include "igraph_estack.h"
 
 int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 			       const igraph_marked_queue_t *S,
@@ -32,6 +32,37 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 			       long int target,
 			       long int *v,
 			       igraph_vector_t *Isv);
+int test_all_st_cuts(const igraph_t *graph,
+             long int source,
+             long int target)
+{
+  igraph_vector_ptr_t cuts, partition1s;
+  long int n, i;
+
+  igraph_vector_ptr_init(&cuts, 0);
+  igraph_vector_ptr_init(&partition1s, 0);
+  igraph_all_st_cuts(graph, &cuts, &partition1s,
+                     source, target);
+
+  n=igraph_vector_ptr_size(&partition1s);
+  printf("Partitions and cuts:\n");
+  for (i=0; i<n; i++) {
+    igraph_vector_t *v=VECTOR(partition1s)[i];
+    igraph_vector_t *v2=VECTOR(cuts)[i];
+    printf("P: ");
+    igraph_vector_print(v);
+    igraph_vector_destroy(v);
+    igraph_free(v);
+    printf("C: ");
+    igraph_vector_print(v2);
+    igraph_vector_destroy(v2);
+    igraph_free(v2);
+  }
+  igraph_vector_ptr_destroy(&partition1s);
+  igraph_vector_ptr_destroy(&cuts);
+
+  return 0;
+}
 
 int main() {
   igraph_t g;
@@ -388,6 +419,23 @@ int main() {
   igraph_vector_ptr_destroy(&cuts);
 
   igraph_destroy(&g);  
+
+  /* -----------------------------------------------------------
+   * Check problematic cases in issue #1102
+   * ----------------------------------------------------------- */
+
+  igraph_small(&g, 4, IGRAPH_DIRECTED,
+          0,1, 1,2, 2,3,
+	       -1);
+  test_all_st_cuts(&g, 0, 2);
+  igraph_destroy(&g);
+
+  igraph_small(&g, 5, IGRAPH_DIRECTED,
+          0,1, 1,2, 2,3, 3,4,
+	       -1);
+  test_all_st_cuts(&g, 0, 2);
+  test_all_st_cuts(&g, 1, 3);
+  igraph_destroy(&g);
 
   return 0;
 }

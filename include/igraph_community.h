@@ -142,7 +142,8 @@ DECLDIR int igraph_modularity_matrix(const igraph_t *graph,
                 const igraph_vector_t *weights);
 
 DECLDIR int igraph_reindex_membership(igraph_vector_t *membership,
-                igraph_vector_t *new_to_old);
+                igraph_vector_t *new_to_old,
+                igraph_integer_t *nb_clusters);
 
 typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
 	       IGRAPH_LEVC_HIST_FAILED,
@@ -201,18 +202,33 @@ DECLDIR int igraph_community_leading_eigenvector(const igraph_t *graph,
                 igraph_community_leading_eigenvector_callback_t *callback,
                 void *callback_extra);
 
+DECLDIR int igraph_community_fluid_communities(const igraph_t *graph,
+                igraph_integer_t no_of_communities,
+                igraph_vector_t *membership,
+                igraph_real_t *modularity);
+
 DECLDIR int igraph_community_label_propagation(const igraph_t *graph,
                 igraph_vector_t *membership,
                 const igraph_vector_t *weights,
                 const igraph_vector_t *initial,
                 igraph_vector_bool_t *fixed,
                 igraph_real_t *modularity);
+
 DECLDIR int igraph_community_multilevel(const igraph_t *graph,
                 const igraph_vector_t *weights,
                 igraph_vector_t *membership,
                 igraph_matrix_t *memberships,
                 igraph_vector_t *modularity);
 
+DECLDIR int igraph_community_leiden(const igraph_t *graph,
+                const igraph_vector_t *edge_weights, 
+                const igraph_vector_t *node_weights,
+                const igraph_real_t resolution_parameter, 
+                const igraph_real_t beta,
+                const igraph_bool_t start,
+                igraph_vector_t *membership,
+                igraph_integer_t *nb_clusters,
+                igraph_real_t *quality);
 /* -------------------------------------------------- */
 /* Community Structure Comparison                     */
 /* -------------------------------------------------- */

@@ -1339,6 +1339,12 @@ igraph_community_leading_eigenvector:
         NAME-R: cluster_leading_eigen
         IGNORE: RR, RC
 
+igraph_community_fluid_communities:
+        PARAMS: GRAPH graph, INTEGER no_of_communities\
+		OUT VECTOR membership, OUT REALPTR modularity
+        NAME-R: cluster_fluid_com
+        IGNORE: RR
+
 igraph_community_label_propagation:
         PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \
                 VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL, \

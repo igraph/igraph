@@ -22,8 +22,8 @@
 */
 
 #include <igraph.h>
-#include <igraph_types_internal.h>
-#include <bigint.h>
+#include "igraph_types_internal.h"
+#include "bigint.h"
 
 #include <limits.h>
 

@@ -23,7 +23,6 @@
 
 #include <cs/cs.h>
 #include <igraph.h>
-#include <igraph_sparsemat.h>
 
 int permute(const igraph_matrix_t *M, 
 	    const igraph_vector_int_t *p,

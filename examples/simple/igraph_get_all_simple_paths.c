@@ -3,7 +3,7 @@
    IGraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
@@ -21,21 +21,43 @@
 
 */
 
-#ifndef IGRAPH_COHESIVE_BLOCKS_H
-#define IGRAPH_COHESIVE_BLOCKS_H
+#include <igraph.h>
 
-#include "igraph_datatype.h"
-#include "igraph_vector.h"
-#include "igraph_vector_ptr.h"
+int main() {
 
-__BEGIN_DECLS
+  igraph_t g;
+  igraph_small(&g, 6, IGRAPH_UNDIRECTED,
+    0,1, 1,2, 2,5,
+    0,3, 3,4, 4,5,
+    3,2, 3, 5,
+    -1);
+  igraph_vector_int_t res;
+  igraph_vector_int_init(&res, 0);
+  int i;
+  
+  for (i = 0; i <= 5; i++)
+  {
+    igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, IGRAPH_ALL);
+  
+    printf("Paths for cutoff %i:\n", i);
+    igraph_vector_int_print(&res);
+    igraph_vector_int_clear(&res);
+  }
 
-int igraph_cohesive_blocks(const igraph_t *graph,
-			   igraph_vector_ptr_t *blocks,
-			   igraph_vector_t *cohesion,
-			   igraph_vector_t *parent,
-			   igraph_t *block_tree);
+  igraph_vector_int_t res_all;
+  igraph_vector_int_init(&res_all, 0);  
 
-__END_DECLS
+  igraph_get_all_simple_paths(&g, &res_all, 0, igraph_vss_1(5), -1, IGRAPH_ALL);
+  
+  if (igraph_vector_int_all_e(&res, &res_all))
+  {
+    printf("Paths of all lengths does not equal result for maximum cutoff.");
+    return 1;
+  }
+  
+  igraph_vector_int_destroy(&res_all);
+  igraph_vector_int_destroy(&res);
+  igraph_destroy(&g);
+  return 0;
 
-#endif
+}

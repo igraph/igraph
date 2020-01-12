@@ -65,7 +65,7 @@ library file itself, usually a file called
 <filename>libigraph.so</filename>, <filename>libigraph.a</filename> or
 <filename>igraph.dll</filename>. 
 It your system has the <command>pkg-config</command> utility you are
-likely to get the neccessary compile options by issuing the command
+likely to get the necessary compile options by issuing the command
 <programlisting>
 pkg-config --libs --cflags igraph
 </programlisting>
@@ -94,7 +94,7 @@ LD_PRELOAD=/home/user/libs/igraph/libigraph.so ./igraph_test
 Please note that <envar>LD_PRELOAD</envar> and
 <envar>LD_LIBRARY_PATH</envar> are usually available only on
 Un*x-like systems. On Windows using Cygwin it is usually enough to set the
-<envar>PATH</envar> enviroment variable to include the folder in which
+<envar>PATH</envar> environment variable to include the folder in which
 the <command>igraph</command> library is installed, look for the 
 <filename>cygigraph-0.dll</filename> or similar file.
 </para>
@@ -104,7 +104,7 @@ the <command>igraph</command> library is installed, look for the
 
 <para>
 The functions generating graph objects are called graph
-generators. Stochastic (=randomized) graph generators are called
+generators. Stochastic (i.e. randomized) graph generators are called
 <quote>games</quote>.
 </para>
 
@@ -114,7 +114,7 @@ generators are able to create both types of graphs and most other
 functions are usually also capable of handling
 both. Eg. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
 which (surprisingly) calculates
-shortest paths from a vertex to another vertices can calculate
+shortest paths from a vertex to other vertices can calculate
 directed or undirected paths.
 </para>
 
@@ -176,7 +176,7 @@ This example illustrates some new points. <command>igraph</command> uses
 instead of plain C arrays. <type>igraph_vector_t</type> is superior to
 regular arrays in almost every sense. Vectors are created by the
 <link linkend="igraph_vector_init"><function>igraph_vector_init()</function></link>
-function and like graphs they should be destroyed if not 
+function and, like graphs, they should be destroyed if not 
 needed any more by calling 
 <link linkend="igraph_vector_destroy"><function>igraph_vector_destroy()</function></link>
 on them. A vector can be indexed by the 
@@ -189,7 +189,7 @@ vector resize it to the size of the result.
 <para>
 <link linkend="igraph_lattice"><function>igraph_lattice()</function></link>
 takes a vector argument specifying the dimensions of 
-the lattice, in this example we generate a 30x30 two dimensional
+the lattice. In this example we generate a 30x30 two dimensional
 lattice. See the documentation of
 <link linkend="igraph_lattice"><function>igraph_lattice()</function></link> in
 the reference manual for the other arguments.
@@ -305,7 +305,7 @@ it to be able to hold the result.
 The <constant>igraph_vss_all()</constant> argument tells the functions to
 calculate the property for every vertex in the graph, it is shorthand
 for a <emphasis>vertex selector</emphasis> (<type>igraph_vs_t</type>). 
-Vertex selectors help performing operations on a subset of vertices,
+Vertex selectors help to perform operations on a subset of vertices,
 you can read more about them in <link linkend="igraph-Iterators">one
 of the following chapters.</link>
 </para>

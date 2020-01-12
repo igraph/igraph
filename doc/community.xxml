@@ -40,6 +40,11 @@
 <section><title>Community structure based on the optimization of modularity</title>
 <!-- doxrox-include igraph_community_fastgreedy -->
 <!-- doxrox-include igraph_community_multilevel -->
+<!-- doxrox-include igraph_community_leiden -->
+</section>
+
+<section><title>Fluid Communities</title>
+<!-- doxrox-include igraph_community_fluid_communities -->
 </section>
 
 <section><title>Label propagation</title>

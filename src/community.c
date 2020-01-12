@@ -1031,9 +1031,8 @@ int igraph_modularity_matrix(const igraph_t *graph,
  * This function reindexes component IDs in a membership vector
  * in a way that the new IDs start from zero and go up to C-1,
  * where C is the number of unique component IDs in the original
- * vector.
- *
- * This function was contributed by Tom Gregorovic.
+ * vector. The supplied membership is expected to fall in the
+ * range 0, ..., n - 1.
  *
  * \param  membership  Numeric vector which gives the type of each
  *                     vertex, ie. the component to which it belongs.
@@ -1042,70 +1041,64 @@ int igraph_modularity_matrix(const igraph_t *graph,
  *                     old component ID for each new one, or NULL,
  *                     in which case it is not returned. The vector
  *                     will be resized as needed.
+ * \param  nb_clusters Pointer to an integer for the number of
+ *                     distinct clusters. If not NULL, this will be
+ *                     updated to reflect the number of distinct
+ *                     clusters found in membership.
  *
- * Time complexity: should be O(n log n) for n elements.
+ * Time complexity: should be O(n) for n elements.
  */
 int igraph_reindex_membership(igraph_vector_t *membership,
-                              igraph_vector_t *new_to_old) {
-  long int i, pos, size = igraph_vector_size(membership);
-  igraph_vector_t old_sorted, *new_to_old_real;
-  igraph_real_t last_id, this_id;
+                              igraph_vector_t *new_to_old,
+                              igraph_integer_t *nb_clusters) {
 
-  /* Make sure that membership is not empty; if empty, return
-   * immediately */
-  if (size == 0) {
-    if (new_to_old != 0) {
-      igraph_vector_clear(new_to_old);
-    }
-    return 0;
-  }
+  long int i, n = igraph_vector_size(membership);
+  igraph_vector_t new_cluster;
+  igraph_integer_t i_nb_clusters;
 
-  /* Prepare storage space for new_to_old */
-  if (new_to_old == 0) {
-    new_to_old_real = igraph_Calloc(1, igraph_vector_t);
-    if (new_to_old_real == 0)
-      IGRAPH_ERROR("cannot reindex membership vector", IGRAPH_ENOMEM);
-    IGRAPH_FINALLY(igraph_free, new_to_old_real);
-    IGRAPH_VECTOR_INIT_FINALLY(new_to_old_real, 0);
-  } else {
-    new_to_old_real = new_to_old;
-    IGRAPH_CHECK(igraph_vector_resize(new_to_old_real, 0));
-  }
+  /* We allow original cluster indices in the range 0, ..., n - 1 */
+  IGRAPH_CHECK(igraph_vector_init(&new_cluster, n));
+  IGRAPH_FINALLY(igraph_vector_destroy, &new_cluster);
 
-  /* Create sorted membership vector */
-  IGRAPH_CHECK(igraph_vector_copy(&old_sorted, membership));
-  IGRAPH_FINALLY(igraph_vector_destroy, &old_sorted);
-  igraph_vector_sort(&old_sorted);
+  if (new_to_old)
+    igraph_vector_clear(new_to_old);
 
-  /* Create new_to_old_real */
-  last_id = VECTOR(old_sorted)[0] - 1;
-  for (i = 0; i < size; i++) {
-    this_id = VECTOR(old_sorted)[i];
-    if (last_id != this_id) {
-      IGRAPH_CHECK(igraph_vector_push_back(new_to_old_real, this_id));
-      last_id = this_id;
+  /* Clean clusters. We will store the new cluster + 1 so that membership == 0
+   * indicates that no cluster was assigned yet. */
+  i_nb_clusters = 1;
+  for (i = 0; i < n; i++)
+  {
+    long int c = (long int)VECTOR(*membership)[i];
+
+    if (c >= n)
+      IGRAPH_ERROR("Cluster out of range", IGRAPH_EINVAL);
+
+    if (VECTOR(new_cluster)[c] == 0)
+    {
+      VECTOR(new_cluster)[c] = (igraph_real_t)i_nb_clusters;
+      i_nb_clusters += 1;
+      if (new_to_old)
+        IGRAPH_CHECK(igraph_vector_push_back(new_to_old, c));
     }
   }
 
-  /* old_sorted not needed anymore */
-  igraph_vector_destroy(&old_sorted);
+  /* Assign new membership */
+  for (i = 0; i < n; i++)
+  {
+    long int c = (long int)VECTOR(*membership)[i];
+    VECTOR(*membership)[i] = VECTOR(new_cluster)[c] - 1;
+  }
+  if (nb_clusters)
+  {
+    /* We used the cluster + 1, so correct */
+    *nb_clusters = i_nb_clusters - 1;
+  }
+
+  igraph_vector_destroy(&new_cluster);
+
   IGRAPH_FINALLY_CLEAN(1);
 
-  /* Reindex the original membership vector */
-  for (i = 0; i < size; i++) {
-    this_id = VECTOR(*membership)[i];
-    igraph_vector_binsearch(new_to_old_real, this_id, &pos);
-    VECTOR(*membership)[i] = pos;
-  }
-
-  /* Get rid of new_to_old_real if it was allocated by us */
-  if (new_to_old == 0) {
-    igraph_vector_destroy(new_to_old_real);
-    igraph_free(new_to_old_real);
-    IGRAPH_FINALLY_CLEAN(2);
-  }
-
-  return 0;
+  return IGRAPH_SUCCESS;
 }
 
 /********************************************************************/
@@ -2130,6 +2123,241 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
 
 /**
  * \ingroup communities
+ * \function igraph_community_fluid_communities
+ * \brief Community detection algorithm based on the simple idea of  
+ * several fluids interacting in a non-homogeneous environment
+ * (the graph topology), expanding and contracting based on their
+ * interaction and density. 
+ *
+ * This function implements the community detection method described in:
+ * Parés F, Gasulla DG, et. al. (2018) Fluid Communities: A Competitive,
+ * Scalable and Diverse Community Detection Algorithm. In: Complex Networks
+ * &amp; Their Applications VI: Proceedings of Complex Networks 2017 (The Sixth
+ * International Conference on Complex Networks and Their Applications), 
+ * Springer, vol 689, p 229.
+ *
+ * \param graph The input graph. The graph must be simple and connected.
+ *   Empty graphs are not supported as well as single vertex graphs. 
+ *   Edge directions are ignored. Weights are not considered.
+ * \param no_of_communities The number of communities to be found. Must be 
+ *   greater than 0 and fewer than number of vertices in the graph.
+ * \param membership The result vector mapping vertices to the communities
+ * they are assigned to.
+ * \param modularity If not a null pointer, then it must be a pointer
+ *   to a real number. The modularity score of the detected community
+ *   structure is stored here.
+ * \return Error code. 
+ * 
+ * Time complexity: O(|E|)
+ * 
+ * \example examples/tests/igraph_community_fluid_communities.c
+ */
+int igraph_community_fluid_communities(const igraph_t *graph,
+                                        igraph_integer_t no_of_communities,
+                                        igraph_vector_t *membership,
+                                        igraph_real_t *modularity) {
+  /* Declaration of variables */
+  long int no_of_nodes, i, j, k, kv1;
+  igraph_adjlist_t al;
+  double max_density;
+  igraph_bool_t res, running;
+  igraph_vector_t node_order, density, label_counters, dominant_labels, nonzero_labels;
+  igraph_vector_int_t com_to_numvertices;
+  
+  /* Initialization of variables needed for initial checking */
+  no_of_nodes = igraph_vcount(graph);
+
+  /* Checking input values */
+  if (no_of_nodes < 2) {
+    IGRAPH_ERROR("Empty and single vertex graphs are not supported.", IGRAPH_EINVAL);
+  }
+  if ((long int) no_of_communities < 1) {
+    IGRAPH_ERROR("'no_of_communities' must be greater than 0.", IGRAPH_EINVAL);
+  }
+  if ((long int) no_of_communities > no_of_nodes) {
+    IGRAPH_ERROR("'no_of_communities' can not be greater than number of nodes in " 
+      "the graph.", IGRAPH_EINVAL);
+  }
+  igraph_is_simple(graph, &res);
+  if (!res) {
+    IGRAPH_ERROR("Only simple graphs are supported.", IGRAPH_EINVAL);
+  }
+  igraph_is_connected(graph, &res, IGRAPH_WEAK);
+  if (!res) {
+    IGRAPH_ERROR("Disconnected graphs are not supported.", IGRAPH_EINVAL);
+  }
+  if (igraph_is_directed(graph)) {
+    IGRAPH_WARNING("Edge directions are ignored.");
+  }
+
+  /* Internal variables initialization */
+  max_density = 1.0;
+  running = 1;
+
+  /* Resize membership vector (number of nodes) */
+  IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+
+  /* Initialize density and com_to_numvertices vectors */
+  IGRAPH_CHECK(igraph_vector_init(&density, (long int) no_of_communities));
+  IGRAPH_FINALLY(igraph_vector_destroy, &density);
+  IGRAPH_CHECK(igraph_vector_int_init(&com_to_numvertices, (long int) no_of_communities));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &com_to_numvertices);
+
+  /* Initialize node ordering vector */
+  IGRAPH_CHECK(igraph_vector_init_seq(&node_order, 0, no_of_nodes-1));
+  IGRAPH_FINALLY(igraph_vector_destroy, &node_order);
+
+  /* Initialize the membership vector with 0 values */
+  igraph_vector_null(membership);
+  /* Initialize densities to max_density */
+  igraph_vector_fill(&density, max_density);
+
+  RNG_BEGIN();
+
+  /* Initialize com_to_numvertices and initialize communities into membership vector */
+  IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+  for (i=0; i<no_of_communities; i++) {
+    /* Initialize membership at initial nodes for each community
+     * where 0 refers to have no label*/
+    VECTOR(*membership)[(long int)VECTOR(node_order)[i]] = i+1.0;
+    /* Initialize com_to_numvertices list: Number of vertices for each community */
+    VECTOR(com_to_numvertices)[i] = 1;
+  }
+
+  /* Create an adjacency list representation for efficiency. */
+  IGRAPH_CHECK(igraph_adjlist_init(graph, &al, IGRAPH_ALL));
+  IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
+
+  /* Create storage space for counting distinct labels and dominant ones */
+  IGRAPH_VECTOR_INIT_FINALLY(&dominant_labels, (long int) no_of_communities);
+  IGRAPH_VECTOR_INIT_FINALLY(&nonzero_labels, (long int) no_of_communities);
+
+  IGRAPH_CHECK(igraph_vector_init(&label_counters, (long int) no_of_communities));
+  IGRAPH_FINALLY(igraph_vector_destroy, &label_counters);
+
+  /* running is the convergence boolean variable */
+  running = 1;
+  while (running) {
+    /* Declarations of varibales used inside main loop */
+    long int v1, size, rand_idx;
+    igraph_real_t max_count, label_counter_diff;
+    igraph_vector_int_t *neis;
+    igraph_bool_t same_label_in_dominant;
+
+    running = 0;
+
+    /* Shuffle the node ordering vector */
+    IGRAPH_CHECK(igraph_vector_shuffle(&node_order));
+    /* In the prescribed order, loop over the vertices and reassign labels */
+    for (i=0; i<no_of_nodes; i++) {
+      /* Clear dominant_labels and nonzero_labels vectors */
+      igraph_vector_clear(&dominant_labels);
+      igraph_vector_null(&label_counters);
+
+      /* Obtain actual node index */
+      v1 = (long int) VECTOR(node_order)[i];
+      /* Take into account same label in updating rule */
+      kv1 = (long int) VECTOR(*membership)[v1];
+      max_count = 0.0;
+      if (kv1 != 0) {
+        VECTOR(label_counters)[kv1-1] += VECTOR(density)[kv1-1];
+        /* Set up max_count */
+        max_count = VECTOR(density)[kv1-1];
+        /* Initialize dominant_labels */
+        IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
+        VECTOR(dominant_labels)[0] = kv1;
+      }
+
+      /* Count the weights corresponding to different labels */
+      neis = igraph_adjlist_get(&al, v1);
+      size = igraph_vector_int_size(neis);
+      for (j=0; j<size; j++) {
+        k = (long int) VECTOR(*membership)[(long)VECTOR(*neis)[j]];
+        /* skip if it has no label yet */
+        if (k == 0) {
+          continue;
+        }
+        /* Update label counter and evaluate diff against max_count*/
+        VECTOR(label_counters)[k-1] += VECTOR(density)[k-1];
+        label_counter_diff = VECTOR(label_counters)[k-1] - max_count;
+        /* Check if this label must be included in dominant_labels vector */
+        if (label_counter_diff > 0.0001) {
+          max_count = VECTOR(label_counters)[k-1];
+          IGRAPH_CHECK(igraph_vector_resize(&dominant_labels, 1));
+          VECTOR(dominant_labels)[0] = k;
+        } else if (-0.0001 < label_counter_diff && label_counter_diff < 0.0001) {
+          IGRAPH_CHECK(igraph_vector_push_back(&dominant_labels, k));
+        }
+      }
+
+      if (!igraph_vector_empty(&dominant_labels)) {
+        /* Maintain same label if it exists in dominant_labels */
+        same_label_in_dominant = igraph_vector_contains(&dominant_labels, kv1);
+
+        if (!same_label_in_dominant) {
+          /* We need at least one more iteration */
+          running = 1;
+
+          /* Select randomly from the dominant labels */
+          rand_idx = RNG_INTEGER(0, igraph_vector_size(&dominant_labels)-1);
+          k = (long int) VECTOR(dominant_labels)[rand_idx];
+
+          if (kv1 != 0) {
+            /* Subtract 1 vertex from corresponding community in com_to_numvertices */
+            VECTOR(com_to_numvertices)[kv1-1] -= 1;
+            /* Re-calculate density for community kv1 */
+            VECTOR(density)[kv1-1] = max_density / VECTOR(com_to_numvertices)[kv1-1];
+          }
+
+          /* Update vertex new label */
+          VECTOR(*membership)[v1] = k;
+
+          /* Add 1 vertex to corresponding new community in com_to_numvertices */
+          VECTOR(com_to_numvertices)[k-1] += 1;
+          /* Re-calculate density for new community k */
+          VECTOR(density)[k-1] = max_density / VECTOR(com_to_numvertices)[k-1];
+        }
+      }
+    }
+  }
+
+  RNG_END();
+
+
+  /* Shift back the membership vector */
+  /* There must be no 0 labels in membership vector at this point */
+  for (i=0; i<no_of_nodes; i++) {
+    VECTOR(*membership)[i] -= 1;
+    /* Something went wrong: At least one vertex has no community assigned */
+    if (VECTOR(*membership)[i] < 0) {
+      IGRAPH_ERROR("Something went wrong during execution. One or more vertices got "
+        "no community assigned at algorithm convergence.", IGRAPH_EINTERNAL);
+    }
+  }
+
+  igraph_adjlist_destroy(&al);
+  IGRAPH_FINALLY_CLEAN(1);
+
+  if (modularity) {
+    IGRAPH_CHECK(igraph_modularity(graph, membership, modularity,
+           NULL));
+  }
+
+  igraph_vector_destroy(&node_order);
+  igraph_vector_destroy(&density);
+  igraph_vector_int_destroy(&com_to_numvertices);
+  igraph_vector_destroy(&label_counters);
+  igraph_vector_destroy(&dominant_labels);
+  igraph_vector_destroy(&nonzero_labels);
+  IGRAPH_FINALLY_CLEAN(6);
+
+  return 0;
+}
+
+/********************************************************************/
+
+/**
+ * \ingroup communities
  * \function igraph_community_label_propagation
  * \brief Community detection based on label propagation
  *
@@ -2647,7 +2875,7 @@ int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
 
   IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 
-  IGRAPH_CHECK(igraph_reindex_membership(membership, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
   /* Create the new edgelist */
   igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &eit);
@@ -2862,7 +3090,7 @@ int igraph_i_community_multilevel_step(igraph_t *graph,
   /* debug("Result Communities: %ld Modularity: %lf\n",
     communities.communities_no, (double) q); */
 
-  IGRAPH_CHECK(igraph_reindex_membership(membership, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(membership, 0, NULL));
 
   /* Shrink the nodes of the graph according to the present community structure
    * and simplify the resulting graph */
@@ -3130,8 +3358,8 @@ int igraph_compare_communities(const igraph_vector_t *comm1,
   IGRAPH_CHECK(igraph_vector_copy(&c2, comm2));
   IGRAPH_FINALLY(igraph_vector_destroy, &c2);
 
-  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0));
-  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
+  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0, NULL));
 
   switch (method) {
     case IGRAPH_COMMCMP_VI:
@@ -3234,8 +3462,8 @@ int igraph_split_join_distance(const igraph_vector_t *comm1,
   IGRAPH_CHECK(igraph_vector_copy(&c2, comm2));
   IGRAPH_FINALLY(igraph_vector_destroy, &c2);
 
-  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0));
-  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0));
+  IGRAPH_CHECK(igraph_reindex_membership(&c1, 0, NULL));
+  IGRAPH_CHECK(igraph_reindex_membership(&c2, 0, NULL));
 
   IGRAPH_CHECK(igraph_i_split_join_distance(&c1, &c2, distance12, distance21));
 

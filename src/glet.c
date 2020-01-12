@@ -498,7 +498,8 @@ int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * \param weights Weights of the edges, a vector.
  * \param cliques An initialized vector of pointers. 
  *        The graphlet basis is stored here. Each element of the pointer 
- *        vector will be a vector of vertex ids. 
+ *        vector will be a vector of vertex ids. Each elements must be
+ *        destroyed using \ref igraph_vector_destroy() and \ref igraph_free().
  * \param thresholds An initialized vector, the (highest possible)
  *        weight thresholds for finding the basis subgraphs are stored
  *        here.
@@ -589,9 +590,9 @@ int igraph_i_graphlets_project(const igraph_t *graph,
 
   /* Count # cliques per vertex. Also, create an index
      for the edges per clique. */
-  igraph_vector_int_init(&vclidx, no_of_nodes+2);
+  IGRAPH_CHECK(igraph_vector_int_init(&vclidx, no_of_nodes+2));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &vclidx);
-  igraph_vector_int_init(&celidx, no_cliques+3);
+  IGRAPH_CHECK(igraph_vector_int_init(&celidx, no_cliques+3));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &celidx);
   for (i=0, total_vertices=0, total_edges=0; i<no_cliques; i++) {
     igraph_vector_t *v=VECTOR(*cliques)[i];
@@ -607,12 +608,12 @@ int igraph_i_graphlets_project(const igraph_t *graph,
   VECTOR(celidx)[i+2]=total_edges;
 
   /* Finalize index vector */
-  for (i=0; i<=no_cliques; i++) {
+  for (i=0; i<no_of_nodes; i++) {
     VECTOR(vclidx)[i+2] += VECTOR(vclidx)[i+1];
   }
 
   /* Create vertex-clique list, the cliques for each vertex. */
-  igraph_vector_int_init(&vcl, total_vertices);
+  IGRAPH_CHECK(igraph_vector_int_init(&vcl, total_vertices));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &vcl);
   for (i=0; i<no_cliques; i++) {
     igraph_vector_t *v=VECTOR(*cliques)[i];
@@ -626,13 +627,13 @@ int igraph_i_graphlets_project(const igraph_t *graph,
   }
 
   /* Create an edge-clique list, the cliques of each edge */
-  igraph_vector_int_init(&ecl, total_edges);
+  IGRAPH_CHECK(igraph_vector_int_init(&ecl, total_edges));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &ecl);
-  igraph_vector_int_init(&eclidx, no_of_edges+1);
+  IGRAPH_CHECK(igraph_vector_int_init(&eclidx, no_of_edges+1));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &eclidx);
-  igraph_vector_init(&edgelist, no_of_edges*2);
+  IGRAPH_CHECK(igraph_vector_init(&edgelist, no_of_edges*2));
   IGRAPH_FINALLY(igraph_vector_destroy, &edgelist);
-  igraph_get_edgelist(graph, &edgelist, /*by_col=*/ 0);
+  IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, /*by_col=*/ 0));
   for (i=0, e=0, ptr=0; e<no_of_edges; e++) {
     int from=VECTOR(edgelist)[i++];
     int to=VECTOR(edgelist)[i++];
@@ -660,7 +661,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
   IGRAPH_FINALLY_CLEAN(1);
 
   /* Convert the edge-clique list to a clique-edge list */
-  igraph_vector_int_init(&cel, total_edges);
+  IGRAPH_CHECK(igraph_vector_int_init(&cel, total_edges));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &cel);
   for (i=0; i<no_of_edges; i++) {
     int ecl_s=VECTOR(eclidx)[i], ecl_e=VECTOR(eclidx)[i+1], j;
@@ -673,7 +674,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
   }
 
   /* Normalizing factors for the iteration */
-  igraph_vector_init(&normfact, no_cliques);
+  IGRAPH_CHECK(igraph_vector_init(&normfact, no_cliques));
   IGRAPH_FINALLY(igraph_vector_destroy, &normfact);
   for (i=0; i<no_cliques; i++) {
     igraph_vector_t *v=VECTOR(*cliques)[i];
@@ -682,7 +683,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
   }
 
   /* We have the clique-edge list, so do the projection now */
-  igraph_vector_init(&newweights, no_of_edges);
+  IGRAPH_CHECK(igraph_vector_init(&newweights, no_of_edges));
   IGRAPH_FINALLY(igraph_vector_destroy, &newweights);
   for (i=0; i<niter; i++) {
     for (e=0; e<no_of_edges; e++) {

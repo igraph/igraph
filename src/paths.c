@@ -49,8 +49,10 @@
  *        are included in arbitrary order, as they are found.
  * \param from The start vertex.
  * \param to The target vertices.
+ * \param cutoff Maximum length of path that is considered. If
+ *        negative, paths of all lengths are considered.
  * \param mode The type of the paths to consider, it is ignored
- *        for undirectred graphs.
+ *        for undirected graphs.
  * \return Error code.
  *
  * Time complexity: O(n!) in the worst case, n is the number of
@@ -61,6 +63,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
 				igraph_vector_int_t *res,
 				igraph_integer_t from,
 				const igraph_vs_t to,
+        igraph_integer_t cutoff,
 				igraph_neimode_t mode) {
 
   igraph_integer_t no_nodes=igraph_vcount(graph);
@@ -68,7 +71,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
   igraph_bool_t toall=igraph_vs_is_all(&to);
   igraph_vector_char_t markto;
   igraph_lazy_adjlist_t adjlist;
-  igraph_vector_int_t stack;
+  igraph_vector_int_t stack, dist;
   igraph_vector_char_t added;
   igraph_vector_int_t nptr;
   int iteration;
@@ -93,6 +96,8 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
   IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
   IGRAPH_CHECK(igraph_vector_int_init(&stack, 100));
   IGRAPH_FINALLY(igraph_vector_int_destroy, &stack);
+  IGRAPH_CHECK(igraph_vector_int_init(&dist, 100));
+  IGRAPH_FINALLY(igraph_vector_int_destroy, &dist);
   IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, 
 					/*simplify=*/ 1));  
   IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
@@ -102,30 +107,39 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
   igraph_vector_int_clear(res);
 
   igraph_vector_int_clear(&stack);
+  igraph_vector_int_clear(&dist);
   igraph_vector_int_push_back(&stack, from);
+  igraph_vector_int_push_back(&dist, 0);
   VECTOR(added)[from] = 1;
   while (!igraph_vector_int_empty(&stack)) {
     int act=igraph_vector_int_tail(&stack);
+    int curdist=igraph_vector_int_tail(&dist);
     igraph_vector_t *neis=igraph_lazy_adjlist_get(&adjlist, act);
     int n=igraph_vector_size(neis);
     int *ptr=igraph_vector_int_e_ptr(&nptr, act);
     igraph_bool_t any;
+    igraph_bool_t within_dist;
     int nei;
 
     if (iteration == 0) {
       IGRAPH_ALLOW_INTERRUPTION();
     }
 
-    /* Search for a neighbor that was not yet visited */
-    any = 0;
-    while (!any && (*ptr) <n) {
-      nei = (int) VECTOR(*neis)[(*ptr)];
-      any = !VECTOR(added)[nei];
-      (*ptr) ++;
+    within_dist = (curdist < cutoff || cutoff < 0);
+    if (within_dist)
+    {
+      /* Search for a neighbor that was not yet visited */
+      any = 0;
+      while (!any && (*ptr) <n) {
+        nei = (int) VECTOR(*neis)[(*ptr)];
+        any = !VECTOR(added)[nei];
+        (*ptr) ++;
+      }
     }
-    if (any) {
+    if (within_dist && any) {
       /* There is such a neighbor, add it */
       IGRAPH_CHECK(igraph_vector_int_push_back(&stack, nei));
+      IGRAPH_CHECK(igraph_vector_int_push_back(&dist, curdist + 1));
       VECTOR(added)[nei] = 1;
       /* Add to results */
       if (toall || VECTOR(markto)[nei]) {
@@ -135,6 +149,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     } else {
       /* There is no such neighbor, finished with the subtree */
       int up=igraph_vector_int_pop_back(&stack);
+      igraph_vector_int_pop_back(&dist);
       VECTOR(added)[up] = 0;
       VECTOR(nptr)[up] = 0;
     }
@@ -147,9 +162,10 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
 
   igraph_vector_int_destroy(&nptr);
   igraph_lazy_adjlist_destroy(&adjlist);
+  igraph_vector_int_destroy(&dist);
   igraph_vector_int_destroy(&stack);
   igraph_vector_char_destroy(&added);
-  IGRAPH_FINALLY_CLEAN(4);
+  IGRAPH_FINALLY_CLEAN(5);
 
   if (!toall) {
     igraph_vector_char_destroy(&markto);

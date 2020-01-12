@@ -22,41 +22,29 @@
 */
 
 #include <igraph.h>
-#include "igraph_types_internal.h"
-
-void print_vector(igraph_vector_t *v, FILE *f) {
-  long int i;
-  for (i=0; i<igraph_vector_size(v); i++) {
-    fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-  }
-  fprintf(f, "\n");
-}
+#include <math.h>
 
 int main() {
-  igraph_i_cutheap_t ch;
-  long int i;
+
+  igraph_t g;
+  FILE *f;
+  igraph_matrix_t coords;
+  /* long int i, n; */
+
+  f=fopen("igraph_layout_reingold_tilford_extended.in", "r");
+  igraph_read_graph_edgelist(&g, f, 0, 1);
+  igraph_matrix_init(&coords, 0, 0);
+
+  igraph_layout_reingold_tilford(&g, &coords, IGRAPH_IN, 0, 0); 
   
-  igraph_i_cutheap_init(&ch, 10);
-
-  for (i=0; i<10; i++) {
-    igraph_i_cutheap_update(&ch, i, i);
+  /*
+  n=igraph_vcount(&g);
+  for (i=0; i<n; i++) {
+    printf("%6.3f %6.3f\n", MATRIX(coords, i, 0), MATRIX(coords, i, 1));
   }
-/*   print_vector(&ch.heap, stdout); */
-/*   print_vector(&ch.index, stdout); */
-/*   print_vector(&ch.hptr, stdout); */
-  while (!igraph_i_cutheap_empty(&ch)) {
-    long int idx=igraph_i_cutheap_popmax(&ch);
-    printf("%li ", idx);
-/*     print_vector(&ch.heap, stdout); */
-/*     print_vector(&ch.index, stdout); */
-/*     print_vector(&ch.hptr, stdout); */
-/*     printf("------------\n"); */
-  }
-  printf("\n");
-
-  igraph_i_cutheap_destroy(&ch);
-
-  if (!IGRAPH_FINALLY_STACK_EMPTY) return 1;
+  */
   
+  igraph_matrix_destroy(&coords);
+  igraph_destroy(&g);
   return 0;
 }

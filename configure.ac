@@ -18,6 +18,10 @@ AC_SUBST(PKGCONFIG_LIBS_PRIVATE)
 AC_CONFIG_TESTDIR(tests)
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 
+# Don't allow AC_PROG_CC to set a default CFLAGS or CXXFLAGS
+: ${CFLAGS=""}
+: ${CXXFLAGS=""}
+
 AC_LANG(C)
 AC_PROG_CC
 
@@ -345,6 +349,12 @@ fi
 if test "$use_asan" = "yes"; then
   CFLAGS="${CFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
   CXXFLAGS="${CXXFLAGS} -g -fsanitize=address -fno-omit-frame-pointer"
+fi
+
+if test "$use_asan" != "yes" -a "$use_gprof" != "yes" -a "$debug" != "yes"; then
+  CFLAGS="${CFLAGS} -O3"
+  CPPFLAGS="${CPPFLAGS} -O3"
+  CXXFLAGS="${CXXFLAGS} -O3"
 fi
 
 AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])

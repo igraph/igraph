@@ -23,7 +23,7 @@
 
 #include <stdio.h>
 #include <igraph.h>
-#include <igraph_types_internal.h>
+#include "igraph_types_internal.h"
 
 int main() {
   

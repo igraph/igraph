@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -42,7 +42,7 @@ typedef struct igraph_rng_type_t {
   unsigned long int max;
   int (*init)(void **state);
   void (*destroy)(void *state);
-  int (*seed)(void *state, unsigned long int seed);  
+  int (*seed)(void *state, unsigned long int seed);
   unsigned long int (*get)(void *state);
   igraph_real_t (*get_real)(void *state);
   igraph_real_t (*get_norm)(void *state);
@@ -71,17 +71,16 @@ DECLDIR const char *igraph_rng_name(igraph_rng_t *rng);
 
 DECLDIR long int igraph_rng_get_integer(igraph_rng_t *rng,
                      long int l, long int h);
-DECLDIR igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng, 
+DECLDIR igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
                           igraph_real_t m, igraph_real_t s);
-DECLDIR igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng, 
+DECLDIR igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
                           igraph_real_t l, igraph_real_t h);
 DECLDIR igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
 DECLDIR igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
-DECLDIR igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n, 
+DECLDIR igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
                           igraph_real_t p);
 DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 DECLDIR unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
-DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 DECLDIR igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
                           igraph_real_t scale);
 DECLDIR int igraph_rng_get_dirichlet(igraph_rng_t *rng,
@@ -109,7 +108,7 @@ void PutRNGstate(void);
 double Rf_dnorm4(double x, double mu, double sigma, int give_log);
 #define igraph_dnorm Rf_dnorm4
 
-#else 
+#else
 
 #define RNG_BEGIN()      if (igraph_rng_default()->def==1) {	\
   igraph_rng_seed(igraph_rng_default(), time(0));		\
