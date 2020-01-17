@@ -15,6 +15,8 @@
 # else
 #  ifdef IGRAPH_EXPORTS
 #   define DECLDIR __declspec(dllexport)
+#  elif defined(IGRAPH_NO_IMPORTS)
+#   define DECLDIR /**/
 #  else
 #   define DECLDIR __declspec(dllimport)
 #  endif
