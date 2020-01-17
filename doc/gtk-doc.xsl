@@ -13,8 +13,8 @@
   <xsl:param name="toc.section.depth">0</xsl:param>
   <xsl:param name="generate.section.toc.level">2</xsl:param>
   <xsl:param name="generate.toc">
-    book	toc
-    chapter	toc
+    book        toc
+    chapter     toc
     section     toc
   </xsl:param>
   
@@ -166,50 +166,54 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
     <xsl:variable name="up" select="parent::*"/>
 
     <xsl:if test="$suppress.navigation = '0' and $home != .">
-      <div class="navigation-header" width="100%"
+      <div class="navigation-header mb-4" width="100%"
            summary = "Navigation header">
-	<div class="btn-group">
+        <div class="btn-group">
           <xsl:if test="count($prev) > 0">
-            <a accesskey="p" class="btn btn-default">
+            <a accesskey="p" class="btn btn-light">
               <xsl:attribute name="href">
-		<xsl:call-template name="href.target">
+                <xsl:call-template name="href.target">
                   <xsl:with-param name="object" select="$prev"/>
-		</xsl:call-template>
+                </xsl:call-template>
               </xsl:attribute>
-	      <i class="icon-chevron-left"></i>
+              <i class="fa fa-chevron-left"></i>
+              Previous
             </a>
           </xsl:if>
           <xsl:if test="count($up) > 0 and $up != $home">
-            <a accesskey="u" class="btn btn-default">
+            <a accesskey="u" class="btn btn-light">
               <xsl:attribute name="href">
                 <xsl:call-template name="href.target">
                   <xsl:with-param name="object" select="$up"/>
                 </xsl:call-template>
               </xsl:attribute>
-	      <i class="icon-chevron-up"></i>
+              <i class="fa fa-chevron-up"></i>
+              Up
             </a>
           </xsl:if>
           <xsl:if test="$home != .">
-            <a accesskey="h" class="btn btn-default">
+            <a accesskey="h" class="btn btn-light">
               <xsl:attribute name="href">
                 <xsl:call-template name="href.target">
                   <xsl:with-param name="object" select="$home"/>
                 </xsl:call-template>
               </xsl:attribute>
-	      <i class="icon-home"></i>
+              <i class="fa fa-home"></i>
+              Home
             </a>
           </xsl:if>
           <xsl:if test="count($next) > 0">
-            <a accesskey="n" class="btn btn-default">
+            <a accesskey="n" class="btn btn-light">
               <xsl:attribute name="href">
                 <xsl:call-template name="href.target">
                   <xsl:with-param name="object" select="$next"/>
                 </xsl:call-template>
               </xsl:attribute>
-	      <i class="icon-chevron-right"></i>
-	    </a>
+              <i class="fa fa-chevron-right"></i>
+              Next
+            </a>
           </xsl:if>
-	</div>
+        </div>
       </div>
     </xsl:if>
   </xsl:template>
