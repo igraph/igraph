@@ -2,32 +2,70 @@ There are two ways to compile igraph on Windows. You can either build from the r
 
 In summary, there are two ways of compiling `igraph`:
 
-1. Compile using MinGW
+1. Compile using `msys2`/`cygwin`
 2. Compile using Microsoft Visual C++
-   - If no project file is provided, this should be generated using MinGW.
+   - If no project file is provided, this should be generated using `msys2`/`cygwin`.
 
 More detailed instructions are provided below.
 
-# Compilation using MinGW
+# Compilation using `msys2`/`cygwin`
 
-MinGW can be installed from http://mingw.org. Please ensure that you also have `msys` installed. After installation, compilation requires the installation of a number of packages, namely:
+## Configuration of `msys2`
+
+We recommend to use [`msys2`](https://www.msys2.org/) to compile `igraph`, because it support both 32-bits and a [64-bits MinGW](http://mingw-w64.org/), whereas the old [MinGW](http://mingw.org/) project only provides a 32-bits version. After installation, the compilation of `igraph` requires the installation of a number of packages, namely:
 
 - `autoconf`
 - `automake`
 - `bison`
 - `flex`
+- `libtool`
 - `libxml2-devel`
+- `make`
 - `zip`
+- `mingw-w64-x86_64-toolchain`
 
-You can install these packages by running the following commands in an open `msys` `bash` terminal:
-  
+You can install these packages by running the following commands in an open `msys2` `bash` terminal:
+
 ```
 pacman --needed --noconfirm -Sy pacman-mirrors
 pacman --noconfirm -Sy
-pacman --noconfirm -S autoconf automake bison flex libxml2-devel zip
+pacman --noconfirm -S autoconf automake bison flex libtool libxml2-devel make zip mingw-w64-x86_64-toolchain
 ```
 
-Once these are installed change to the directory in which the source code is located. You can either download the released source code from https://igraph.org/c/#downloads or compile from the `git` repository from https://github.com/igraph. When clone from GitHub, please ensure that you set `git config core.autocrlf false` before cloning the repository. Otherwise, you might run into problems with line endings.
+Running these commands may require administrator rights. In that case, be sure to run the `msys2` `bash` terminal as administrator.
+
+Finally, the `gcc` compiler from `minGW` may possibly not be found correctly, in which case the path needs to be corrected, which can be done by running `export PATH="/mingw64/bin:$PATH"`.
+`
+
+## Configuration of `cygwin`
+
+You can use [`cygwin`](https://www.cygwin.com/) to compile `igraph`. The compilation of `igraph` requires the installation of a number of packages, namely:
+
+- `automake`
+- `autoconf2.5`
+- `libtool`
+- `flex`
+- `bison`
+- `libxml2-devel`
+- `gcc-g++`
+- `gcc-core`
+- `make`
+- `libgmp-devel`
+- `util-linux`
+- `git`
+- `zip`
+
+You can install `cygwin` including these packages by running the following command from a Windows Command Prompt:
+
+```
+setup-x86_64.exe -q -P automake,autoconf2.5,libtool,flex,bison,libxml2-devel,gcc-g++,gcc-core,make,libgmp-devel,util-linux,git,zip
+```
+
+Make sure that you are in the directory that contains `setup-x86_64.exe`.
+
+## Compilation
+
+You can either download the [released source code](https://igraph.org/c/#downloads) or clone  the [`git` repository](https://github.com/igraph/igraph). When cloning from GitHub, please ensure that you run `git config --global core.autocrlf false` before cloning the repository. Otherwise, you might run into problems with line endings. After extracting the source code you should open the `bash` terminal (from either `msys2` or `cygwin`) and change to the directory in which the source code is located.
 
 If you have cloned the source code from the `git` repository, you first have create the build scripts by running
 
@@ -35,7 +73,7 @@ If you have cloned the source code from the `git` repository, you first have cre
 ./bootstrap.sh
 ```
 
-Compilation is done with the typical steps of 
+Compilation is done with the typical steps of
 
 ```
 ./configure
