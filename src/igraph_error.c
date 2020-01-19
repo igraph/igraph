@@ -34,6 +34,7 @@ static IGRAPH_THREAD_LOCAL igraph_error_handler_t *igraph_i_error_handler=0;
 static IGRAPH_THREAD_LOCAL char igraph_i_errormsg_buffer[500];
 static IGRAPH_THREAD_LOCAL char igraph_i_warningmsg_buffer[500];
 
+/* Error strings corresponding to each igraph_error_type_t enum value. */
 static const char *igraph_i_error_strings[]=
   { /*  0 */ "No error",
     /*  1 */ "Failed",
@@ -97,10 +98,13 @@ static const char *igraph_i_error_strings[]=
     /* 55 */ "Integer or double overflow",
     /* 56 */ "Internal GPLK error",
     /* 57 */ "CPU time exceeded",
-    /* 58 */ "Integer or double underflow"
+    /* 58 */ "Integer or double underflow",
+    /* 59 */ "Random walk got stuck"
 };
 
 const char* igraph_strerror(const int igraph_errno) {
+  if (igraph_errno < 0 || igraph_errno >= sizeof(igraph_i_error_strings) / sizeof(char *))
+    return "Invalid error code; no error string available.";
   return igraph_i_error_strings[igraph_errno];
 }
 

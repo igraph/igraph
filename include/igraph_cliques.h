@@ -39,11 +39,11 @@ DECLDIR int igraph_maximal_cliques(const igraph_t *graph, igraph_vector_ptr_t *r
                 igraph_integer_t min_size, igraph_integer_t max_size);
 DECLDIR int igraph_maximal_cliques_file(const igraph_t *graph,
                 FILE *outfile,
-                igraph_integer_t min_size, 
+                igraph_integer_t min_size,
                 igraph_integer_t max_size);
 DECLDIR int igraph_maximal_cliques_count(const igraph_t *graph,
-                igraph_integer_t *res, 
-                igraph_integer_t min_size, 
+                igraph_integer_t *res,
+                igraph_integer_t min_size,
                 igraph_integer_t max_size);
 DECLDIR int igraph_maximal_cliques_subset(const igraph_t *graph,
                 igraph_vector_int_t *subset,
@@ -52,12 +52,16 @@ DECLDIR int igraph_maximal_cliques_subset(const igraph_t *graph,
                 FILE *outfile,
                 igraph_integer_t min_size,
                 igraph_integer_t max_size);
+DECLDIR int igraph_maximal_cliques_hist(const igraph_t *graph,
+                igraph_vector_t *hist,
+                igraph_integer_t min_size,
+                igraph_integer_t max_size);
 
 DECLDIR int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                 igraph_integer_t min_size, igraph_integer_t max_size);
 DECLDIR int igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
                 igraph_integer_t min_size, igraph_integer_t max_size);
-DECLDIR int igraph_largest_cliques(const igraph_t *graph, 
+DECLDIR int igraph_largest_cliques(const igraph_t *graph,
                 igraph_vector_ptr_t *cliques);
 DECLDIR int igraph_clique_number(const igraph_t *graph, igraph_integer_t *no);
 DECLDIR int igraph_weighted_cliques(const igraph_t *graph,
@@ -88,6 +92,8 @@ DECLDIR int igraph_independence_number(const igraph_t *graph, igraph_integer_t *
  *
  * \param clique The current clique. Destroying and freeing
  *   this vector is left to the user.
+ *   Use \ref igraph_vector_destroy() and \ref igraph_free()
+ *   to do this.
  * \param arg This extra argument was passed to \ref
  *   igraph_cliques_callback() when it was called.
  * \return Boolean, whether to continue with the clique search.
@@ -97,6 +103,10 @@ typedef igraph_bool_t igraph_clique_handler_t(igraph_vector_t *clique, void *arg
 DECLDIR int igraph_cliques_callback(const igraph_t *graph,
                 igraph_integer_t min_size, igraph_integer_t max_size,
                 igraph_clique_handler_t *cliquehandler_fn, void *arg);
+
+DECLDIR int igraph_maximal_cliques_callback(const igraph_t *graph,
+                igraph_clique_handler_t *cliquehandler_fn, void *arg,
+                igraph_integer_t min_size, igraph_integer_t max_size);
 
 
 __END_DECLS
