@@ -99,7 +99,9 @@ static const char *igraph_i_error_strings[]=
     /* 56 */ "Internal GPLK error",
     /* 57 */ "CPU time exceeded",
     /* 58 */ "Integer or double underflow",
-    /* 59 */ "Random walk got stuck"
+    /* 59 */ "Random walk got stuck",
+    /* 60 */ "Search stopped; this error should never be visible to the user,"
+             "please report this error along with the steps to reproduce it."
 };
 
 const char* igraph_strerror(const int igraph_errno) {

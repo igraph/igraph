@@ -31,8 +31,8 @@
     if (!cl) {								\
       IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);	\
     }									\
-    igraph_vector_ptr_push_back(res, cl);				\
-    igraph_vector_init(cl, clsize);					\
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(res, cl));				\
+    IGRAPH_CHECK(igraph_vector_init(cl, clsize));					\
     for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; }	\
   } while (0)
 #define FINALLY do {					\
@@ -78,8 +78,8 @@
     if (!cl) {								\
       IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM);	\
     }									\
-    igraph_vector_ptr_push_back(res, cl);				\
-    igraph_vector_init(cl, clsize);					\
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(res, cl));				\
+    IGRAPH_CHECK(igraph_vector_init(cl, clsize));					\
     for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; }	\
   }									\
   if (no) { (*no)++; }						        \
@@ -98,6 +98,55 @@
 #define FOR_LOOP_OVER_VERTICES_PREPARE do {  \
     i= subset ? VECTOR(*subset)[ii] : ii;    \
 } while (0)
+#endif
+
+#ifdef IGRAPH_MC_CALLBACK
+#define RESTYPE \
+    igraph_clique_handler_t *cliquehandler_fn, \
+    void *arg
+#define RESNAME cliquehandler_fn, arg
+#define SUFFIX _callback
+#define RECORD do { \
+    igraph_vector_t *cl=igraph_Calloc(1, igraph_vector_t); \
+    long j; \
+    if (!cl) { \
+      IGRAPH_ERROR("Cannot list maximal cliques", IGRAPH_ENOMEM); \
+    } \
+    IGRAPH_CHECK(igraph_vector_init(cl, clsize)); \
+    for (j=0; j<clsize; j++) { VECTOR(*cl)[j] = VECTOR(*R)[j]; } \
+    if (!cliquehandler_fn(cl, arg)) \
+        return IGRAPH_STOP; \
+} while (0)
+#define FINALLY
+#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
+#endif
+
+#ifdef IGRAPH_MC_HIST
+#define RESTYPE igraph_vector_t *hist
+#define RESNAME hist
+#define SUFFIX _hist
+#define RECORD do { \
+    long hsize = igraph_vector_size(hist); \
+    if (clsize > hsize) { \
+        long hcapacity = igraph_vector_capacity(hist); \
+        long j; \
+        int err; \
+        if (hcapacity < clsize && clsize < 2*hcapacity) \
+                err = igraph_vector_reserve(hist, 2*hcapacity); \
+        err = igraph_vector_resize(hist, clsize); \
+        if (err != IGRAPH_SUCCESS) \
+            IGRAPH_ERROR("Cannot count maximal cliques", IGRAPH_ENOMEM); \
+        for (j=hsize; j < clsize; j++) \
+            VECTOR(*hist)[j] = 0; \
+    } \
+    VECTOR(*hist)[clsize-1] += 1; \
+} while (0)
+#define FINALLY \
+    igraph_vector_clear(hist); \
+    igraph_vector_reserve(hist, 50); /* initially reserve space for 50 elements */
+#define FOR_LOOP_OVER_VERTICES for (i=0; i<no_of_nodes; i++) {
+#define FOR_LOOP_OVER_VERTICES_PREPARE
 #endif
 
 #ifdef IGRAPH_MC_ORIG
@@ -164,10 +213,10 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
       igraph_i_maximal_cliques_down(PX, PS, PE, XS, XE, pos, adjlist,
 				    mynextv, R, &newPS, &newXE);
       /* Recursive call */
-      FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
+      IGRAPH_CHECK( FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 				  PX, newPS, PE, XS, newXE, PS, XE, R,
 				  pos, adjlist, RESNAME, nextv, H,
-				  min_size, max_size);
+                  min_size, max_size) );
       /* Putting v from P to X */
       if (igraph_vector_int_tail(nextv) != -1) {
 	igraph_i_maximal_cliques_PX(PX, PS, &PE, &XS, XE, pos, adjlist,
@@ -197,6 +246,7 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
   igraph_adjlist_t adjlist, fulladjlist;
   igraph_real_t pgreset=round(no_of_nodes / 100.0), pg=pgreset, pgc=0;
   IGRAPH_UNUSED(nn);
+  int err;
 
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("Edge directions are ignored for maximal clique "
@@ -315,10 +365,15 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
     igraph_i_maximal_cliques_reorder_adjlists(&PX, PS, PE, XS, XE, &pos,
 					      &adjlist);
 
-    FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
+    err = FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 				&PX, PS, PE, XS, XE, PS, XE, &R, &pos,
 				&adjlist, RESNAME, &nextv, &H, min_size,
 				max_size);
+    if (err == IGRAPH_STOP) {
+        break;
+    } else {
+        IGRAPH_CHECK(err);
+    }
   }
 
   IGRAPH_PROGRESS("Maximal cliques: ", 100.0, NULL);
