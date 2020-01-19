@@ -192,6 +192,8 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
 				igraph_vector_int_t *H,
 				int min_size, int max_size) {
 
+  int err;
+
   igraph_vector_int_push_back(H, -1); /* boundary */
   
   if (PS > PE && XS > XE) {
@@ -213,10 +215,15 @@ int FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
       igraph_i_maximal_cliques_down(PX, PS, PE, XS, XE, pos, adjlist,
 				    mynextv, R, &newPS, &newXE);
       /* Recursive call */
-      IGRAPH_CHECK( FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
-				  PX, newPS, PE, XS, newXE, PS, XE, R,
-				  pos, adjlist, RESNAME, nextv, H,
-                  min_size, max_size) );
+      err = FUNCTION(igraph_i_maximal_cliques_bk,SUFFIX)(
+                  PX, newPS, PE, XS, newXE, PS, XE, R,
+                  pos, adjlist, RESNAME, nextv, H,
+                  min_size, max_size);
+
+      if (err == IGRAPH_STOP)
+        return err;
+      else
+        IGRAPH_CHECK(err);
       /* Putting v from P to X */
       if (igraph_vector_int_tail(nextv) != -1) {
 	igraph_i_maximal_cliques_PX(PX, PS, &PE, &XS, XE, pos, adjlist,
