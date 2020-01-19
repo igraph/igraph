@@ -252,8 +252,8 @@ int FUNCTION(igraph_maximal_cliques,SUFFIX)(
   int i, ii, nn, no_of_nodes=igraph_vcount(graph);
   igraph_adjlist_t adjlist, fulladjlist;
   igraph_real_t pgreset=round(no_of_nodes / 100.0), pg=pgreset, pgc=0;
-  IGRAPH_UNUSED(nn);
   int err;
+  IGRAPH_UNUSED(nn);
 
   if (igraph_is_directed(graph)) {
     IGRAPH_WARNING("Edge directions are ignored for maximal clique "
