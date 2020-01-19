@@ -29,6 +29,7 @@
 #include "igraph_interrupt_internal.h"
 #include "igraph_centrality.h"
 #include "igraph_motifs.h"
+#include "igraph_structural.h"
 
 /**
  * \function igraph_transitivity_avglocal_undirected
