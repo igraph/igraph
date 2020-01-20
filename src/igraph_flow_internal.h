@@ -27,6 +27,7 @@
 #include "igraph_types.h"
 #include "igraph_marked_queue.h"
 #include "igraph_estack.h"
+#include "igraph_datatype.h"
 
 typedef int igraph_provan_shier_pivot_t(const igraph_t *graph,
 					const igraph_marked_queue_t *S,

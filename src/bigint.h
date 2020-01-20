@@ -49,6 +49,8 @@
 #include "igraph_pmt_off.h"
 #undef BASE_LIMB
 
+__BEGIN_DECLS
+
 typedef struct igraph_biguint_t {
   igraph_vector_limb_t v;
 } igraph_biguint_t;

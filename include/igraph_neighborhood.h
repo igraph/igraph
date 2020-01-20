@@ -25,6 +25,9 @@
 #define IGRAPH_NEIGHBORHOOD_H
 
 #include "igraph_decls.h"
+#include "igraph_datatype.h"
+#include "igraph_iterators.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 

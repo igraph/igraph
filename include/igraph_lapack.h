@@ -21,8 +21,8 @@
 
 */
 
-#ifndef LAPACK_H
-#define LAPACK_H
+#ifndef IGRAPH_LAPACK_H
+#define IGRAPH_LAPACK_H
 
 #include "igraph_vector.h"
 #include "igraph_matrix.h"

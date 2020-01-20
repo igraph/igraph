@@ -40,6 +40,7 @@
 #include "igraph_types_internal.h"
 #include "igraph_conversion.h"
 #include "igraph_centrality.h"
+#include "igraph_structural.h"
 #include "config.h"
 
 #include <string.h>

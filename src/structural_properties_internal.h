@@ -26,6 +26,7 @@
 
 #include "igraph_constants.h"
 #include "igraph_types.h"
+#include "igraph_iterators.h"
 
 int igraph_i_induced_subgraph_suggest_implementation(
     const igraph_t *graph, const igraph_vs_t vids,

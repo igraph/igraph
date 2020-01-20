@@ -65,6 +65,7 @@
 #include <cstdlib>
 
 #include "hrg_rbtree.h"
+#include "hrg_dendro.h"
 
 using namespace std;
 

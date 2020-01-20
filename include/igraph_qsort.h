@@ -26,6 +26,8 @@
 
 #include "igraph_decls.h"
 
+#include <stddef.h>
+
 __BEGIN_DECLS
 
 DECLDIR void igraph_qsort(void *base, size_t nel, size_t width,
