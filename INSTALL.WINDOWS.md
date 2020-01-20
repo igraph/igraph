@@ -12,7 +12,11 @@ More detailed instructions are provided below.
 
 ## Configuration of `msys2`
 
-We recommend to use [`msys2`](https://www.msys2.org/) to compile `igraph`, because it support both 32-bits and a [64-bits MinGW](http://mingw-w64.org/), whereas the old [MinGW](http://mingw.org/) project only provides a 32-bits version. After installation, first make sure that `msys2` itself is up-to-date. You can do so by opening a `msys2` `bash` terminal and run:
+We recommend to use [`msys2`](https://www.msys2.org/) to compile `igraph`, because includes [MinGW-w64](http://mingw-w64.org/), which supports compiling both for 32- and 64-bit targets. The old [MinGW](http://mingw.org/) project only provides a 32-bit version.
+
+The instructions below assume that you want to compile for a 64-bit target.
+
+After installing `msys2`, first make sure that it is up-to-date. You can do so by opening a `msys2` `bash` terminal and run:
 
 ```
 pacman -Syuu
@@ -26,26 +30,22 @@ Compilation of `igraph` requires the installation of a number of packages, namel
 - `automake`
 - `bison`
 - `flex`
-- `git`
 - `libtool`
 - `make`
 - `mingw-w64-x86_64-toolchain`
 - `mingw-w64-x86_64-libxml2`
-- `patch`
+- `git`
 - `zip`
 
-You can install these packages by running the following command in an open `msys2` `bash` terminal:
+Optionally, you may also install `mingw-w64-x86_64-gmp`, which enables extended functionality in igraph.
+
+You can install these packages by running the following command in an `msys2` terminal:
 
 ```
-pacman -S autoconf automake bison flex git libtool make mingw-w64-x86_64-toolchain mingw-w64-x86_64-libxml2 patch zip
+pacman -S autoconf automake bison flex libtool make mingw-w64-x86_64-toolchain mingw-w64-x86_64-libxml2 mingw-w64-x86_64-gmp git zip
 ```
 
-Once everything is installed you need to open the `msys2` MinGW64 terminal (`mingw64.exe`).
-
-Finally, to compile `igraph` you need to define `MSDOS` by running
-```
-export CPPFLAGS="$CPPFLAGS -DMSDOS"
-```
+Once everything is installed you need to open the `msys2` "MinGW 64-bit" terminal (`mingw64.exe`).
 
 ## Configuration of `cygwin`
 
@@ -75,20 +75,22 @@ You will be asked to choose a mirror, simply choose one, preferably close by. Yo
 
 ## Compilation
 
-You can either download the [released source code](https://igraph.org/c/#downloads) or clone  the [`git` repository](https://github.com/igraph/igraph) using `git clone https://github.com/igraph/igraph.git`. When cloning from GitHub, please ensure that you run `git config --global core.autocrlf false` before cloning the repository. Otherwise, you might run into problems with line endings. After extracting the source code you should open the `bash` terminal (from either `msys2` or `cygwin`) and change to the directory in which the source code is located.
+You can either download the [source code archive of the latest release](https://igraph.org/c/#downloads) or clone the [`git` repository](https://github.com/igraph/igraph) using `git clone https://github.com/igraph/igraph.git`. When cloning from GitHub, please ensure that you run `git config --global core.autocrlf false` before cloning the repository. Otherwise, you might run into problems with line endings.
 
-If you have cloned the source code from the `git` repository, you first have create the build scripts by running
+After extracting the source code, open a `bash` terminal (from either `msys2` or `cygwin`) and change to the directory in which the source code is located. When using `msys2`, use the "MSYS2 MinGW 64-bit" terminal, and *not* the "MSYS2 MSYS" one.
+
+If you have cloned the source code from the `git` repository, you must first create the build scripts by running
 
 ```
 ./bootstrap.sh
 ```
 
-If you are compiling using MinGW (using `msys2`), please do not forget to set the `CPPFLAGS` before running `./configure`:
+If you are compiling using MinGW (using `msys2`), do not forget to set the `CPPFLAGS` before running `./configure`:
 ```
 export CPPFLAGS="$CPPFLAGS -DMSDOS"
 ```
 
-Compilation is done with the typical steps of
+Compilation is done with the usual steps of
 
 ```
 ./configure
@@ -97,7 +99,13 @@ make
 
 If you have multiple cores, for example 4, you can run `make -j4` to speed up the compilation substantially.
 
-You can install the library by running `make install`. If you prefer to install it in a specific location, you can specify `--prefix [DIRECTORY]` to `./configure`, in which case the library will be installed in `[DIRECTORY]/lib`. If you just need the built `dll` file, this is located in `src/.libs/libigraph-0.dll`.
+You can install the library by running `make install`. If you prefer to install it in a specific location, you can specify `--prefix=[DIRECTORY]` to `./configure`, in which case the library will be installed into the `bin`, `lib` and `include` subdirectories of `[DIRECTORY]`. If you just need the built `dll` file, this is located in `src/.libs/libigraph-0.dll`.
+
+You may optionally run the test suite using `make check`. Before doing this, ensure that the directory containing `libigraph-0.dll` is in the `PATH`. This can be achieved for example using the command
+
+```
+export PATH=$PATH:`realpath src/.libs`
+```
 
 ## Preparing the MSVC project file
 
@@ -112,11 +120,11 @@ The necessary source code for compilation with MSVC is then contained in the new
 
 # Compilation using MSVC
 
-Compilation using MSVC is primarily necessary for use with Python. Note that different versions of Python require different versions of MSVC, see the Python [website](https://wiki.python.org/moin/WindowsCompilers) for more details.
+Compilation using MSVC is primarily necessary for use with Python. Note that different versions of Python require different versions of MSVC. See [the Python website](https://wiki.python.org/moin/WindowsCompilers) for more details.
 
-The provided project file is still provided in an older MSVC format. To use it with more recent versions of MSVC, you will have to upgrade the project file. This can be done in various ways. If you dispose of the full Microsoft Visual Studio, you can simply open the project file in the Visual Studio IDE. It will ask you to convert it to a modern format, and you should be able to compile it.
+The provided project file is still provided in an older MSVC format. To use it with more recent versions of MSVC, you will have to upgrade the project file. This can be done in various ways. If you have the full Microsoft Visual Studio, you can simply open the project file in the Visual Studio IDE. It will ask you to convert it to a modern format, and you should be able to compile it.
 
-If you do not have the full Microsoft Visual Studio, but only the standalone tools (as indicated on the Python [website](https://wiki.python.org/moin/WindowsCompilers)), you should follow a slightly different route. In that case, open the "Developer Command Prompt", and depending on your version of MSVC, you should do the following
+If you do not have the full Microsoft Visual Studio, but only the standalone tools (as indicated on [the Python website](https://wiki.python.org/moin/WindowsCompilers)), you should follow a slightly different route. In that case, open the "Developer Command Prompt", and depending on your version of MSVC, you should do the following
 
 MSVC  9.0
 ```
@@ -137,4 +145,4 @@ msbuild.exe igraph.vcxproj
 
 # Compilation problems
 
-If you have any problems with compilation on Windows, please post a message on XXX or file an issue at https://github.com/igraph/igraph.
+If you have any problems with compilation on Windows, please post a message on [the support forum](https://igraph.discourse.group/) or file an issue at https://github.com/igraph/igraph.
