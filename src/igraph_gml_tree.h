@@ -33,11 +33,11 @@
 # define __END_DECLS /* empty */
 #endif
 
-__BEGIN_DECLS
-
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_vector_ptr.h"
+
+__BEGIN_DECLS
 
 typedef enum { IGRAPH_I_GML_TREE_TREE=0, 
 	       IGRAPH_I_GML_TREE_INTEGER,
@@ -84,4 +84,7 @@ const char *igraph_gml_tree_get_string(const igraph_gml_tree_t *t,
 
 igraph_gml_tree_t *igraph_gml_tree_get_tree(const igraph_gml_tree_t *t,
 					    long int pos);
+
+__END_DECLS
+
 #endif

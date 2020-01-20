@@ -238,7 +238,8 @@ const igraph_rng_type_t igraph_rngtype_glibc2 = {
   /* get_norm= */  0,
   /* get_geom= */  0,
   /* get_binom= */ 0,
-  /* get_exp= */   0
+  /* get_exp= */   0,
+  /* get_gamma= */ 0
 };
 
 /* ------------------------------------ */
@@ -314,7 +315,8 @@ const igraph_rng_type_t igraph_rngtype_rand = {
   /* get_norm= */  0,
   /* get_geom= */  0,
   /* get_binom= */ 0,
-  /* get_exp= */   0
+  /* get_exp= */   0,
+  /* get_gamma= */ 0
 };
 
 /* ------------------------------------ */
@@ -467,7 +469,8 @@ const igraph_rng_type_t igraph_rngtype_mt19937 = {
   /* get_norm= */  0,
   /* get_geom= */  0,
   /* get_binom= */ 0,
-  /* get_exp= */   0
+  /* get_exp= */   0,
+  /* get_gamma= */ 0
 };
 
 #undef N

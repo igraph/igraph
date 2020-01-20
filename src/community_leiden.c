@@ -30,6 +30,7 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_stack.h"
+#include "igraph_constructors.h"
 
 /* Move nodes in order to improve the quality of a partition.
  *
