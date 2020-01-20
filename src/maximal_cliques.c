@@ -400,3 +400,85 @@ int igraph_maximal_cliques_subset(const igraph_t *graph,
 #include "maximal_cliques_template.h"
 #undef IGRAPH_MC_FULL
 
+
+/**
+ * \function igraph_maximal_cliques_callback
+ * \brief Finds maximal cliques in a graph and calls a function for each one
+ *
+ * This function enumerates all maximal cliques within the given size range
+ * and calls \p cliquehandler_fn for each of them. The cliques are passed to the
+ * callback function as an <type>igraph_vector_t *</type>.  Destroying and
+ * freeing this vector is left up to the user.  Use \ref igraph_vector_destroy()
+ * to destroy it first, then free it using \ref igraph_free().
+ *
+ * </para><para>
+ *
+ * Edge directions are ignored.
+ *
+ * </para><para>
+ *
+ * \param graph The input graph.
+ * \param cliquehandler_fn Callback function to be called for each clique.
+ * See also \ref igraph_clique_handler_t.
+ * \param arg Extra argument to supply to \p cliquehandler_fn.
+ * \param min_size Integer giving the minimum size of the cliques to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer giving the maximum size of the cliques to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \return Error code.
+ *
+ * \sa \ref igraph_maximal_cliques().
+ *
+ * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
+ * of the graph, this is typically small for sparse graphs.
+ *
+ */
+
+int igraph_maximal_cliques_callback(const igraph_t *graph,
+                igraph_clique_handler_t *cliquehandler_fn, void *arg,
+                igraph_integer_t min_size, igraph_integer_t max_size);
+
+#define IGRAPH_MC_CALLBACK
+#include "maximal_cliques_template.h"
+#undef IGRAPH_MC_CALLBACK
+
+
+/**
+ * \function igraph_maximal_cliques_hist
+ * \brief Count the number of maximal cliques of each size in a graph.
+ *
+ * This function counts how many maximal cliques of each size are present in
+ * the graph. Size-1 maximal cliques are simply isolated vertices.
+ *
+ * </para><para>
+ *
+ * Edge directions are ignored.
+ *
+ * </para><para>
+ *
+ * \param graph The input graph.
+ * \param hist Pointer to an initialized vector. The result will be stored
+ * here. The first element will store the number of size-1 maximal cliques,
+ * the second element the number of size-2 maximal cliques, etc.
+ * For cliques smaller than \c min_size, zero counts will be returned.
+ * \param min_size Integer giving the minimum size of the cliques to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer giving the maximum size of the cliques to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \return Error code.
+ *
+ * \sa \ref igraph_maximal_cliques().
+ *
+ * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
+ * of the graph, this is typically small for sparse graphs.
+ *
+ */
+
+int igraph_maximal_cliques_hist(const igraph_t *graph,
+                igraph_vector_t *hist,
+                igraph_integer_t min_size,
+                igraph_integer_t max_size);
+
+#define IGRAPH_MC_HIST
+#include "maximal_cliques_template.h"
+#undef IGRAPH_MC_HIST
