@@ -1,5 +1,7 @@
 // igraphtest.cpp : Defines the entry point for the console application.
 
+#define IGRAPH_STATIC 1
+
 #include <stdio.h>
 #include "igraph.h"
 
