@@ -1,4 +1,4 @@
-There are two ways to compile igraph on Windows. You can either build from the released source code, or you can build from the `git` repository. Compiling from the released source code is sometimes easier, as it already provides a project file that can be used to compile with Microsoft Visual C++ (MSVC). Of course, compilation from the release source code is limited to released versions, while compilation from the `git` repository allows you to also compile development versions. Compilation can always be done using MinGW or `cygwin`, but if you want to use `igraph` with Python (e.g. as an external library for `python-igraph`) you have to use MSVC. Each Python version requires a specific version of MSVC, please see the Python [website](https://wiki.python.org/moin/WindowsCompilers) for more details. Preparing a project file to compile with MSVC is again done using MinGW (`msys2`) or `cygwin`.
+There are two ways to compile igraph on Windows. You can either build from the released source code, or you can build from the `git` repository. Compiling from the released source code is sometimes easier, as it already provides a project file that can be used to compile with Microsoft Visual C++ (MSVC). Of course, compilation from the released source code is limited to released versions, while compilation from the `git` repository allows you to also compile development versions. Compilation can always be done using MinGW or `cygwin`, but if you want to use `igraph` with Python (e.g. as an external library for `python-igraph`) you have to use MSVC. Each Python version requires a specific version of MSVC, please see the Python [website](https://wiki.python.org/moin/WindowsCompilers) for more details. Preparing a project file to compile with MSVC is again done using MinGW (`msys2`) or `cygwin`.
 
 In summary, there are two routes to compiling `igraph`:
 
@@ -12,11 +12,11 @@ More detailed instructions are provided below.
 
 ## Configuration of `msys2`
 
-We recommend to use [`msys2`](https://www.msys2.org/) to compile `igraph`, because includes [MinGW-w64](http://mingw-w64.org/), which supports compiling both for 32- and 64-bit targets. The old [MinGW](http://mingw.org/) project only provides a 32-bit version.
+We recommend to use [`msys2`](https://www.msys2.org/) to compile `igraph`, because it includes [MinGW-w64](http://mingw-w64.org/), which supports compiling both for 32- and 64-bit targets. The old [MinGW](http://mingw.org/) project only provides a 32-bit version.
 
 The instructions below assume that you want to compile for a 64-bit target.
 
-After installing `msys2`, first make sure that it is up-to-date. You can do so by opening a `msys2` `bash` terminal and run:
+After installing `msys2`, first make sure that it is up-to-date. You can do so by opening an `msys2` `bash` terminal and run:
 
 ```
 pacman -Syuu
@@ -37,7 +37,7 @@ Compilation of `igraph` requires the installation of a number of packages, namel
 - `git`
 - `zip`
 
-Optionally, you may also install `mingw-w64-x86_64-gmp`, which enables extended functionality in igraph.
+The `mingw-w64-x86_64-toolchain` also includes the optional [Gnu Multiple Precision](https://gmplib.org/) package `mingw-w64-x86_64-gmp`. This enables extended functionality in igraph.
 
 You can install these packages by running the following command in an `msys2` terminal:
 
@@ -120,11 +120,13 @@ The necessary source code for compilation with MSVC is then contained in the new
 
 # Compilation using MSVC
 
-Compilation using MSVC is primarily necessary for use with Python. Note that different versions of Python require different versions of MSVC. See [the Python website](https://wiki.python.org/moin/WindowsCompilers) for more details.
+Compilation using MSVC is primarily necessary for use with Python, in particular for `python-igraph`. Note that different versions of Python require different versions of MSVC. See [the Python website](https://wiki.python.org/moin/WindowsCompilers) for more details.
 
-The provided project file is still provided in an older MSVC format. To use it with more recent versions of MSVC, you will have to upgrade the project file. This can be done in various ways. If you have the full Microsoft Visual Studio, you can simply open the project file in the Visual Studio IDE. It will ask you to convert it to a modern format, and you should be able to compile it.
+The provided project file is still provided in an older MSVC format. To use it with more recent versions of MSVC, you will have to upgrade the project file. Note that this can only be done if you have the the full Microsoft Visual Studio install. You can install the Community edition, which is [freely available](https://visualstudio.microsoft.com/downloads/). The Build Tools that are available do not allow you to upgrade the project file, which is necessary to be able to compile `igraph` correctly.
 
-If you do not have the full Microsoft Visual Studio, but only the standalone tools (as indicated on [the Python website](https://wiki.python.org/moin/WindowsCompilers)), you should follow a slightly different route. In that case, open the "Developer Command Prompt", and depending on your version of MSVC, you should do the following
+Compilation can be done in two ways. The easiest way for most users is probably simply to open the project solution file (`igraph.sln`) in the Visual Studio IDE. It will ask you to convert it to the current format, and you should be able to compile it, once that is done.
+
+Alternatively, you can do this via the command line. In that case, open the "Developer Command Prompt", and depending on your version of MSVC, you should do the following
 
 MSVC  9.0
 ```
@@ -142,6 +144,17 @@ MSVC 14.x
 devenv /upgrade igraph.vcproj
 msbuild.exe igraph.vcxproj
 ```
+
+By default, compilation on Windows targets a static library (`.lib`), which is necessary for the compilation of `python-igraph`. To import the static library, you have to make sure to specify
+```
+#define IGRAPH_NO_IMPORTS 1
+```
+before you include
+```
+#include "igraph.h"
+```
+
+Alternatively, you can also reconfigure the MSVC project to compile a dynamic library (`.dll`), in which case the `IGRAPH_NO_IMPORTS` definition should *not* be included.
 
 # Compilation problems
 
