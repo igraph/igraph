@@ -58,7 +58,7 @@ igraph-docs.xml: $(DOCINCLUDES) $(EXAMPLES)
 	touch igraph-docs.xml
 
 igraph-docs0.xml: igraph-docs.xml
-	sed "s/@IGRAPH_VERSION@/`cat $(top_srcdir)/IGRAPH_VERSION`/g" $(top_srcdir)/doc/igraph-docs.xml > $(top_srcdir)/doc/igraph-docs0.xml
+	sed "s/@IGRAPH_VERSION@/`cat $(top_srcdir)/IGRAPH_VERSION`/g" $(top_srcdir)/doc/igraph-docs.xml > igraph-docs0.xml
 
 vector.xml: vector.xxml $(INCLUDEDIR)/igraph_vector_pmt.h $(SRCDIR)/vector.pmt $(SRCDIR)/vector_ptr.c $(SRCDIR)/vector.c $(INCLUDEDIR)/igraph_vector_ptr.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_vector_pmt.h \
