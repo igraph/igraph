@@ -9,6 +9,7 @@ exemptLabels:
   - pinned
   - security
   - todo
+  - wishlist
 
 # Label to use when marking an issue as stale
 staleLabel: stale
