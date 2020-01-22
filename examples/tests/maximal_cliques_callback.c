@@ -15,15 +15,19 @@ int compare_vectors(const void *p1, const void *p2) {
     v2 = *((igraph_vector_t **) p2);
     s1 = igraph_vector_size(v1);
     s2 = igraph_vector_size(v2);
-    if (s1 < s2)
+    if (s1 < s2) {
         return -1;
-    if (s1 > s2)
+    }
+    if (s1 > s2) {
         return 1;
-    for (i=0; i < s1; ++i) {
-        if (VECTOR(*v1)[i] < VECTOR(*v2)[i])
+    }
+    for (i = 0; i < s1; ++i) {
+        if (VECTOR(*v1)[i] < VECTOR(*v2)[i]) {
             return -1;
-        if (VECTOR(*v1)[i] > VECTOR(*v2)[i])
+        }
+        if (VECTOR(*v1)[i] > VECTOR(*v2)[i]) {
             return 1;
+        }
     }
     return 0;
 }
@@ -53,8 +57,9 @@ igraph_bool_t handler(igraph_vector_t *clique, void *arg) {
 igraph_bool_t handler_stop(igraph_vector_t *clique, void *arg) {
     /* Stop search as soon as a 3-clique is found. */
     /* Since there are two 3-cliques in the test graph, this will stop the search before it is complete. */
-    if (igraph_vector_size(clique) == 3)
-        return 0; /* false */
+    if (igraph_vector_size(clique) == 3) {
+        return 0;    /* false */
+    }
 
     igraph_vector_destroy(clique);
     igraph_free(clique);
@@ -69,7 +74,7 @@ int main() {
     struct userdata ud;
 
     igraph_small(&graph, 6, 0,
-                 1,2, 2,3, 3,4, 4,5, 5,2, 2,4,
+                 1, 2, 2, 3, 3, 4, 4, 5, 5, 2, 2, 4,
                  -1);
 
     igraph_vector_ptr_init(&list, 0);

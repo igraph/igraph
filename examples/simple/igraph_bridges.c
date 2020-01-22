@@ -3,12 +3,12 @@
 #include <stdio.h>
 
 void sort_and_print_vector(igraph_vector_t *v) {
-  long int i, n=igraph_vector_size(v);
-  igraph_vector_sort(v);
-  for (i=0; i<n; i++) {
-    printf(" %li", (long int) VECTOR(*v)[i]);
-  }
-  printf("\n");
+    long int i, n = igraph_vector_size(v);
+    igraph_vector_sort(v);
+    for (i = 0; i < n; i++) {
+        printf(" %li", (long int) VECTOR(*v)[i]);
+    }
+    printf("\n");
 }
 
 int main() {

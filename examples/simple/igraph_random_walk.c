@@ -26,8 +26,9 @@ int main() {
     assert(igraph_vector_size(&walk) == 1000);
 
     igraph_vector_resize(&weights, ec);
-    for (i=0; i < ec; ++i)
+    for (i = 0; i < ec; ++i) {
         VECTOR(weights)[i] = igraph_rng_get_unif01(igraph_rng_default());
+    }
 
     /* weighted, directed */
     igraph_random_edge_walk(&graph, &weights, &walk, 0, IGRAPH_OUT, 1000, IGRAPH_RANDOM_WALK_STUCK_RETURN);

@@ -92,26 +92,28 @@ int test_from_prufer_back_to_prufer_with_resize2() {
 }
 
 int random_tree(int size, igraph_t* tree, igraph_vector_int_t* prufer) {
-  int i,j;
-  int prufer_length;
+    int i, j;
+    int prufer_length;
 
-  if (size < 0)
-    return IGRAPH_EINVAL;
+    if (size < 0) {
+        return IGRAPH_EINVAL;
+    }
 
-  if (size < 2)
-    return igraph_empty(tree, size, IGRAPH_UNDIRECTED);
+    if (size < 2) {
+        return igraph_empty(tree, size, IGRAPH_UNDIRECTED);
+    }
 
-  prufer_length = size - 2;
-  IGRAPH_CHECK(igraph_vector_int_resize(prufer, prufer_length));
+    prufer_length = size - 2;
+    IGRAPH_CHECK(igraph_vector_int_resize(prufer, prufer_length));
 
-  for(i = 0; i < prufer_length; ++i) {
-    j = RNG_INTEGER(0, size-1);
-    VECTOR(*prufer)[i] = j;
-  }
+    for (i = 0; i < prufer_length; ++i) {
+        j = RNG_INTEGER(0, size - 1);
+        VECTOR(*prufer)[i] = j;
+    }
 
-  IGRAPH_CHECK(igraph_from_prufer(tree, prufer));
+    IGRAPH_CHECK(igraph_from_prufer(tree, prufer));
 
-  return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 int test_from_random_prufer_back_to_prufer(int tree_size) {
@@ -141,18 +143,18 @@ int test_from_random_prufer_back_to_prufer(int tree_size) {
 
 int test_num = 0;
 #define RUN_TEST(TEST) \
-  test_num++; \
-  if(!(TEST)) { \
-    return test_num; \
-  }
+    test_num++; \
+    if(!(TEST)) { \
+        return test_num; \
+    }
 
 int main() {
-  RUN_TEST(test_from_prufer_back_to_prufer());
-  RUN_TEST(test_from_prufer_back_to_prufer_with_resize());
-  RUN_TEST(test_from_prufer_back_to_prufer_with_resize2());
-  RUN_TEST(test_from_random_prufer_back_to_prufer(10));
-  RUN_TEST(test_from_random_prufer_back_to_prufer(100));
-  RUN_TEST(test_from_random_prufer_back_to_prufer(1000));
-  RUN_TEST(test_from_random_prufer_back_to_prufer(10000));
-  return 0;
+    RUN_TEST(test_from_prufer_back_to_prufer());
+    RUN_TEST(test_from_prufer_back_to_prufer_with_resize());
+    RUN_TEST(test_from_prufer_back_to_prufer_with_resize2());
+    RUN_TEST(test_from_random_prufer_back_to_prufer(10));
+    RUN_TEST(test_from_random_prufer_back_to_prufer(100));
+    RUN_TEST(test_from_random_prufer_back_to_prufer(1000));
+    RUN_TEST(test_from_random_prufer_back_to_prufer(10000));
+    return 0;
 }

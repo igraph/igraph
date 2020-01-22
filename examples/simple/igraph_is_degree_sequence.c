@@ -32,30 +32,34 @@ int main() {
     /* Valid undirected degree sequence */
     igraph_vector_init_int_end(&outseq, -1, 3, 3, 3, 3, 3, 3, 3, 3, -1);
     igraph_is_degree_sequence(&outseq, 0, &result);
-    if (!result)
+    if (!result) {
         return 1;
+    }
     igraph_vector_destroy(&outseq);
 
     /* Undirected degree sequence with negative degree */
     igraph_vector_init_int_end(&outseq, -1, 3, -2, 3, 3, 3, 3, 3, 3, -1);
     igraph_is_degree_sequence(&outseq, 0, &result);
-    if (result)
+    if (result) {
         return 2;
+    }
     igraph_vector_destroy(&outseq);
 
     /* Undirected degree sequence with uneven sum */
     igraph_vector_init_int_end(&outseq, -1, 3, 3, 3, 3, 3, 3, 3, -1);
     igraph_is_degree_sequence(&outseq, 0, &result);
-    if (result)
+    if (result) {
         return 3;
+    }
     igraph_vector_destroy(&outseq);
 
     /* Valid directed degree sequences */
     igraph_vector_init_int_end(&outseq, -1, 0, 2, 3, 0, 4, 3, 1, 3, 4, 2, -1);
     igraph_vector_init_int_end(&inseq, -1, 0, 3, 1, 3, 2, 4, 4, 1, 3, 1, -1);
     igraph_is_degree_sequence(&outseq, &inseq, &result);
-    if (!result)
+    if (!result) {
         return 4;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -63,8 +67,9 @@ int main() {
     igraph_vector_init_int_end(&outseq, -1, 0, 2, 3, 0, 4, 3, 1, 3, 4, 2, -1);
     igraph_vector_init_int_end(&inseq, -1, 0, 3, 1, -7, 2, 4, 4, 1, 3, 1, -1);
     igraph_is_degree_sequence(&outseq, &inseq, &result);
-    if (result)
+    if (result) {
         return 5;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -72,8 +77,9 @@ int main() {
     igraph_vector_init_int_end(&outseq, -1, 0, 2, 3, 0, 4, 3, 1, 3, 4, 2, -1);
     igraph_vector_init_int_end(&inseq, -1, 0, 3, 1, 2, 4, 4, 1, 3, 1, -1);
     igraph_is_degree_sequence(&outseq, &inseq, &result);
-    if (result)
+    if (result) {
         return 5;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -81,8 +87,9 @@ int main() {
     igraph_vector_init_int_end(&outseq, -1, 0, 2, 3, 0, 4, 3, 1, 3, 4, 2, -1);
     igraph_vector_init_int_end(&inseq, -1, 0, 3, 1, 2, 2, 4, 4, 1, 3, 1, -1);
     igraph_is_degree_sequence(&outseq, &inseq, &result);
-    if (result)
+    if (result) {
         return 6;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -91,30 +98,34 @@ int main() {
     /* Valid undirected graphical degree sequence */
     igraph_vector_init_int_end(&outseq, -1, 3, 3, 3, 3, 3, 3, 3, 3, -1);
     igraph_is_graphical_degree_sequence(&outseq, 0, &result);
-    if (!result)
+    if (!result) {
         return 7;
+    }
     igraph_vector_destroy(&outseq);
 
     /* Another valid undirected graphical degree sequence */
     igraph_vector_init_int_end(&outseq, -1, 4, 7, 4, 7, 7, 8, 9, 9, 4, 6, 5, -1);
     igraph_is_graphical_degree_sequence(&outseq, 0, &result);
-    if (!result)
+    if (!result) {
         return 8;
+    }
     igraph_vector_destroy(&outseq);
 
     /* Valid undirected degree sequence but not graphical */
     igraph_vector_init_int_end(&outseq, -1, 3, 3, -1);
     igraph_is_graphical_degree_sequence(&outseq, 0, &result);
-    if (result)
+    if (result) {
         return 9;
+    }
     igraph_vector_destroy(&outseq);
 
     /* Valid directed graphical degree sequence */
     igraph_vector_init_int_end(&inseq, -1, 3, 3, 3, 3, 3, 3, 3, 3, 3, -1);
     igraph_vector_init_int_end(&outseq, -1, 3, 3, 3, 3, 3, 3, 3, 3, 3, -1);
     igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
-    if (!result)
+    if (!result) {
         return 10;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -122,8 +133,9 @@ int main() {
     igraph_vector_init_int_end(&inseq, -1, 1, 3, 2, 1, 3, 4, 3, 3, 1, 3, -1);
     igraph_vector_init_int_end(&outseq, -1, 4, 1, 2, 3, 2, 3, 2, 3, 2, 2, -1);
     igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
-    if (!result)
+    if (!result) {
         return 11;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -131,8 +143,9 @@ int main() {
     igraph_vector_init_int_end(&inseq, -1, 7, 4, 6, 4, 7, 8, 8, 8, 7, 4, -1);
     igraph_vector_init_int_end(&outseq, -1, 8, 5, 6, 8, 6, 6, 5, 7, 5, 7, -1);
     igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
-    if (!result)
+    if (!result) {
         return 12;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -141,8 +154,9 @@ int main() {
     igraph_vector_init_int_end(&inseq, -1, 1, -1);
     igraph_vector_init_int_end(&outseq, -1, 1, -1);
     igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
-    if (result)
+    if (result) {
         return 13;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -151,8 +165,9 @@ int main() {
     igraph_vector_init_int_end(&inseq, -1, 2, 0, -1);
     igraph_vector_init_int_end(&outseq, -1, 0, 2, -1);
     igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
-    if (result)
+    if (result) {
         return 14;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -161,8 +176,9 @@ int main() {
     igraph_vector_init_int_end(&inseq, -1, 2, 2, -1);
     igraph_vector_init_int_end(&outseq, -1, 2, 2, -1);
     igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
-    if (result)
+    if (result) {
         return 15;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
@@ -170,11 +186,13 @@ int main() {
     igraph_vector_init_int_end(&inseq, -1, 1, 0, 1, -1);
     igraph_vector_init_int_end(&outseq, -1, 0, 2, 0, -1);
     igraph_is_graphical_degree_sequence(&outseq, &inseq, &result);
-    if (!result)
+    if (!result) {
         return 16;
+    }
     igraph_is_graphical_degree_sequence(&inseq, &outseq, &result);
-    if (!result)
+    if (!result) {
         return 17;
+    }
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 

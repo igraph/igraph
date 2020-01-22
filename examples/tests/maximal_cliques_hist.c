@@ -6,7 +6,7 @@ int main() {
     igraph_vector_t hist;
 
     igraph_small(&graph, 6, 0,
-                 1,2, 2,3, 3,4, 4,5, 5,2, 2,4,
+                 1, 2, 2, 3, 3, 4, 4, 5, 5, 2, 2, 4,
                  -1);
 
     igraph_vector_init(&hist, 0);
