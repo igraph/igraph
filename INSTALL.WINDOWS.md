@@ -156,6 +156,8 @@ before you include
 
 Alternatively, you can also reconfigure the MSVC project to compile a dynamic library (`.dll`), in which case the `IGRAPH_NO_IMPORTS` definition should *not* be included.
 
+A small test project is included in the `igraphtest` directory. It does not (yet) include the `#define IGRAPH_NO_IMPORTS 1` so you have to include that yourself.
+
 # Compilation problems
 
 If you have any problems with compilation on Windows, please post a message on [the support forum](https://igraph.discourse.group/) or file an issue at https://github.com/igraph/igraph.
