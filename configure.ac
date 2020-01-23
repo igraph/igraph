@@ -41,8 +41,10 @@ AC_LANG_POP([C++])
 AM_PROG_LEX
 AC_PROG_YACC
 
-AC_CHECK_HEADER([sys/times.h], 
-      [AC_DEFINE([HAVE_TIMES_H], [1], [Define to 1 if you have the sys/times.h header])])
+AC_CHECK_HEADER([sys/times.h],
+      [AC_DEFINE([HAVE_TIMES_H], [1], [Define to 1 if you have the sys/times.h header])],
+      [CPPFLAGS="$CPPFLAGS -DMSDOS"],
+      )
 
 AC_LIBTOOL_WIN32_DLL
 AC_LIBTOOL_DLOPEN
@@ -113,7 +115,7 @@ if test "${enableval}" = yes; then
   IGRAPH_WARNING(-Wstrict-prototypes)
   IGRAPH_WARNING(-Wwrite-strings)
 else
-  WARNING_CFLAGS=                                                              
+  WARNING_CFLAGS=
   IGRAPH_WARNING(-Wall)
 fi
 
