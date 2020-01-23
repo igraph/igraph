@@ -65,9 +65,10 @@ msvc: parsersources
 	cp -r $(top_srcdir)/include/*.h $(top_builddir)/igraph-$(VERSION)-msvc/include
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc; fi
 	cp -r $(top_srcdir)/msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
-	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/{.deps,.libs}
+	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type d \( -name .deps -o -name .libs \) | xargs rm -rf
+	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type f \( -name '*.o' -o -name '*.lo' -o -name '*.la' \) | xargs rm
+	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type f \( -name 'Makefile*' -o -name '.dirstamp' \) | xargs rm
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/config.h
-	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*.{o,lo,la}
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*~
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/include/*~
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
@@ -76,8 +77,8 @@ msvc: parsersources
 		$(top_srcdir)/msvc/igraph.vcproj        \
 		$(top_builddir)/src/Makefile
 	cp $(top_srcdir)/msvc/igraph.sln $(top_builddir)/igraph-$(VERSION)-msvc
-	cp -r $(top_srcdir)/msvc/igraphtest .
+	cp -r $(top_srcdir)/msvc/igraphtest $(top_builddir)/igraph-$(VERSION)-msvc/test
 	rm -rf igraph-$(VERSION)-msvc.zip
-	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest
+	zip -q -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc
     
 CLEANFILES=
