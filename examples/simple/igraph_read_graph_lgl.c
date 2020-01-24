@@ -71,7 +71,7 @@ int main() {
     }
     igraph_set_error_handler(igraph_error_handler_ignore);
     if (igraph_read_graph_lgl(&g, input, 0, IGRAPH_ADD_WEIGHTS_NO, 1) !=
-            IGRAPH_PARSEERROR) {
+        IGRAPH_PARSEERROR) {
         return 7;
     }
     fclose(input);

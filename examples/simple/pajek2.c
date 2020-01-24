@@ -38,7 +38,7 @@ int main() {
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
     if (igraph_vcount(&g) != 13 || igraph_ecount(&g) != 11 ||
-            igraph_is_directed(&g)) {
+        igraph_is_directed(&g)) {
         return 6;
     }
 

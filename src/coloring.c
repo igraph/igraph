@@ -20,8 +20,9 @@ int igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_
      * Remember that colours are integers starting from 0,
      * and the 'colors' vector is already 0-initialized above.
      */
-    if (vc <= 1)
+    if (vc <= 1) {
         return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
@@ -47,9 +48,10 @@ int igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_
 
     IGRAPH_CHECK(igraph_2wheap_init(&cn, vc));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &cn);
-    for (i=0; i < vc; ++i)
-        if (i != vertex)
-            igraph_2wheap_push_with_index(&cn, i, 0); /* should not fail since memory was already reserved */
+    for (i = 0; i < vc; ++i)
+        if (i != vertex) {
+            igraph_2wheap_push_with_index(&cn, i, 0);    /* should not fail since memory was already reserved */
+        }
 
     while (1) {
         igraph_vector_int_t *neighbors = igraph_adjlist_get(&adjlist, vertex);
@@ -60,15 +62,17 @@ int igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_
             igraph_integer_t col;
 
             IGRAPH_CHECK(igraph_vector_int_resize(&neigh_colors, neigh_count));
-            for (i=0; i < neigh_count; ++i)
+            for (i = 0; i < neigh_count; ++i) {
                 VECTOR(neigh_colors)[i] = VECTOR(*colors)[ VECTOR(*neighbors)[i] ];
+            }
             igraph_vector_int_sort(&neigh_colors);
 
-            i=0;
+            i = 0;
             col = 0;
             do {
-                while (i < neigh_count && VECTOR(neigh_colors)[i] == col)
+                while (i < neigh_count && VECTOR(neigh_colors)[i] == col) {
                     i++;
+                }
                 col++;
             } while (i < neigh_count && VECTOR(neigh_colors)[i] == col);
 
@@ -76,15 +80,17 @@ int igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_
         }
 
         /* increment number of coloured neighbours for each neighbour of vertex */
-        for (i=0; i < neigh_count; ++i) {
+        for (i = 0; i < neigh_count; ++i) {
             long idx = VECTOR(*neighbors)[i];
-            if (igraph_2wheap_has_elem(&cn, idx))
+            if (igraph_2wheap_has_elem(&cn, idx)) {
                 igraph_2wheap_modify(&cn, idx, igraph_2wheap_get(&cn, idx) + 1);
+            }
         }
 
         /* stop if no more vertices left to colour */
-        if (igraph_2wheap_empty(&cn))
+        if (igraph_2wheap_empty(&cn)) {
             break;
+        }
 
         igraph_2wheap_delete_max_index(&cn, &vertex);
 

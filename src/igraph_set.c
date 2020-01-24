@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -47,13 +47,15 @@
  * O(n), n is the expected size of the set.
  */
 int igraph_set_init(igraph_set_t *set, int long size) {
-  long int alloc_size = size > 0 ? size : 1;
-  if (size < 0) { size = 0; }
-  set->stor_begin=igraph_Calloc(alloc_size, igraph_integer_t);
-  set->stor_end=set->stor_begin + alloc_size;
-  set->end=set->stor_begin;
+    long int alloc_size = size > 0 ? size : 1;
+    if (size < 0) {
+        size = 0;
+    }
+    set->stor_begin = igraph_Calloc(alloc_size, igraph_integer_t);
+    set->stor_end = set->stor_begin + alloc_size;
+    set->end = set->stor_begin;
 
-  return 0;
+    return 0;
 }
 
 /**
@@ -66,11 +68,11 @@ int igraph_set_init(igraph_set_t *set, int long size) {
  * Time complexity: operating system dependent.
  */
 void igraph_set_destroy(igraph_set_t* set) {
-  assert(set != 0);
-  if (set->stor_begin != 0) {
-    igraph_Free(set->stor_begin);
-    set->stor_begin = NULL;
-  }
+    assert(set != 0);
+    if (set->stor_begin != 0) {
+        igraph_Free(set->stor_begin);
+        set->stor_begin = NULL;
+    }
 }
 
 /**
@@ -89,7 +91,7 @@ void igraph_set_destroy(igraph_set_t* set) {
  * Time complexity: O(1)
  */
 igraph_bool_t igraph_set_inited(igraph_set_t* set) {
-  return (set->stor_begin != 0);
+    return (set->stor_begin != 0);
 }
 
 /**
@@ -104,21 +106,23 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set) {
  * O(n), n is the new allocated size of the set.
  */
 int igraph_set_reserve(igraph_set_t* set, long int size) {
-  long int actual_size = igraph_set_size(set);
-  igraph_integer_t *tmp;
-  assert(set != NULL);
-  assert(set->stor_begin != NULL);
-  if (size <= actual_size) return 0;
+    long int actual_size = igraph_set_size(set);
+    igraph_integer_t *tmp;
+    assert(set != NULL);
+    assert(set->stor_begin != NULL);
+    if (size <= actual_size) {
+        return 0;
+    }
 
-  tmp=igraph_Realloc(set->stor_begin, (size_t) size, igraph_integer_t);
-  if (tmp==0) {
-    IGRAPH_ERROR("cannot reserve space for set", IGRAPH_ENOMEM);
-  }
-  set->stor_begin=tmp;
-  set->stor_end=set->stor_begin+size;
-  set->end=set->stor_begin+actual_size;
+    tmp = igraph_Realloc(set->stor_begin, (size_t) size, igraph_integer_t);
+    if (tmp == 0) {
+        IGRAPH_ERROR("cannot reserve space for set", IGRAPH_ENOMEM);
+    }
+    set->stor_begin = tmp;
+    set->stor_end = set->stor_begin + size;
+    set->end = set->stor_begin + actual_size;
 
-  return 0;
+    return 0;
 }
 
 /**
@@ -133,28 +137,28 @@ int igraph_set_reserve(igraph_set_t* set, long int size) {
  * Time complexity: O(1).
  */
 igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
-  assert(set != NULL);
-  assert(set->stor_begin != NULL);
-  return set->stor_begin == set->end;
+    assert(set != NULL);
+    assert(set->stor_begin != NULL);
+    return set->stor_begin == set->end;
 }
 
 /**
  * \ingroup set
  * \function igraph_set_clear
  * \brief Removes all elements from a set.
- * 
+ *
  * </para><para>
  * This function simply sets the size of the set to zero, it does
  * not free any allocated memory. For that you have to call
  * \ref igraph_set_destroy().
  * \param v The set object.
- * 
+ *
  * Time complexity: O(1).
  */
 void igraph_set_clear(igraph_set_t* set) {
-  assert(set != NULL);
-  assert(set->stor_begin != NULL);
-  set->end = set->stor_begin;
+    assert(set != NULL);
+    assert(set->stor_begin != NULL);
+    set->end = set->stor_begin;
 }
 
 
@@ -162,17 +166,17 @@ void igraph_set_clear(igraph_set_t* set) {
  * \ingroup set
  * \function igraph_set_size
  * \brief Gives the size (=length) of the set.
- * 
+ *
  * \param v The set object
  * \return The size of the set.
  *
- * Time complexity: O(1). 
+ * Time complexity: O(1).
  */
 
 long int igraph_set_size(const igraph_set_t* set) {
-  assert(set != NULL);
-  assert(set->stor_begin != NULL);
-  return set->end-set->stor_begin;
+    assert(set != NULL);
+    assert(set->stor_begin != NULL);
+    return set->end - set->stor_begin;
 }
 
 
@@ -189,51 +193,55 @@ long int igraph_set_size(const igraph_set_t* set) {
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
 int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
-  long int left, right, middle;
-  long int size;
-  assert(set != NULL);
-  assert(set->stor_begin != NULL);
+    long int left, right, middle;
+    long int size;
+    assert(set != NULL);
+    assert(set->stor_begin != NULL);
 
-  size = igraph_set_size(set);
+    size = igraph_set_size(set);
 
-  /* search where to insert the new element */
-  left = 0;
-  right = size-1;
-  while (left < right-1) {
-    middle = (left+right)/2;
-    if (SET(*set)[middle] > e) {
-      right = middle;
-    } else if (SET(*set)[middle] < e) {
-      left = middle;
-    } else {
-      left = middle;
-      break;
-    }
-  }
-
-  if (right >= 0 && SET(*set)[left] != e && SET(*set)[right] == e) {
-    left = right;
-  }
-
-  while (left < size && set->stor_begin[left] < e) left++;
-  if (left >= size || set->stor_begin[left] != e) {
-    /* full, allocate more storage */
-    if (set->stor_end == set->end) {
-      long int new_size = size * 2;
-      if (new_size == 0) new_size = 1;
-      IGRAPH_CHECK(igraph_set_reserve(set, new_size));
+    /* search where to insert the new element */
+    left = 0;
+    right = size - 1;
+    while (left < right - 1) {
+        middle = (left + right) / 2;
+        if (SET(*set)[middle] > e) {
+            right = middle;
+        } else if (SET(*set)[middle] < e) {
+            left = middle;
+        } else {
+            left = middle;
+            break;
+        }
     }
 
-    /* Element should be inserted at position 'left' */
-    if (left < size)
-      memmove(set->stor_begin+left+1, set->stor_begin+left, 
-	      (size_t) (size-left)*sizeof(set->stor_begin[0]));
+    if (right >= 0 && SET(*set)[left] != e && SET(*set)[right] == e) {
+        left = right;
+    }
 
-    set->stor_begin[left] = e;
-    set->end += 1;
-  }
+    while (left < size && set->stor_begin[left] < e) {
+        left++;
+    }
+    if (left >= size || set->stor_begin[left] != e) {
+        /* full, allocate more storage */
+        if (set->stor_end == set->end) {
+            long int new_size = size * 2;
+            if (new_size == 0) {
+                new_size = 1;
+            }
+            IGRAPH_CHECK(igraph_set_reserve(set, new_size));
+        }
 
-  return 0;
+        /* Element should be inserted at position 'left' */
+        if (left < size)
+            memmove(set->stor_begin + left + 1, set->stor_begin + left,
+                    (size_t) (size - left)*sizeof(set->stor_begin[0]));
+
+        set->stor_begin[left] = e;
+        set->end += 1;
+    }
+
+    return 0;
 }
 
 /**
@@ -248,30 +256,31 @@ int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
  * Time complexity: O(log(n)), n is the number of elements in \p set.
  */
 int igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
-  long int left, right, middle;
+    long int left, right, middle;
 
-  assert(set != NULL);
-  assert(set->stor_begin != NULL);
+    assert(set != NULL);
+    assert(set->stor_begin != NULL);
 
-  left = 0;
-  right = igraph_set_size(set)-1;
+    left = 0;
+    right = igraph_set_size(set) - 1;
 
-  if (right == -1)
-      return 0; /* the set is empty */
-
-  /* search for the new element */
-  while (left < right-1) {
-    middle = (left+right)/2;
-    if (SET(*set)[middle] > e) {
-      right = middle;
-    } else if (SET(*set)[middle] < e) {
-      left = middle;
-    } else {
-      return 1;
+    if (right == -1) {
+        return 0;    /* the set is empty */
     }
-  }
 
-  return SET(*set)[left] == e || SET(*set)[right] == e;
+    /* search for the new element */
+    while (left < right - 1) {
+        middle = (left + right) / 2;
+        if (SET(*set)[middle] > e) {
+            right = middle;
+        } else if (SET(*set)[middle] < e) {
+            left = middle;
+        } else {
+            return 1;
+        }
+    }
+
+    return SET(*set)[left] == e || SET(*set)[right] == e;
 }
 
 /**
@@ -289,23 +298,23 @@ int igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
  *   not be used for anything during the iteration.
  * \param element The next element or \c NULL (if the iteration
  *   has ended) is returned here.
- * 
+ *
  * \return Nonzero if there are more elements, zero otherwise.
  */
 igraph_bool_t igraph_set_iterate(igraph_set_t* set, long int* state,
-				 igraph_integer_t* element) {
-  assert(set != 0);
-  assert(set->stor_begin != 0);
-  assert(state != 0);
-  assert(element != 0);
+                                 igraph_integer_t* element) {
+    assert(set != 0);
+    assert(set->stor_begin != 0);
+    assert(state != 0);
+    assert(element != 0);
 
-  if (*state < igraph_set_size(set)) {
-    *element = set->stor_begin[*state];
-    *state = *state+1;
-    return 1;
-  } else {
-    *element = 0;
-    return 0;
-  }
+    if (*state < igraph_set_size(set)) {
+        *element = set->stor_begin[*state];
+        *state = *state + 1;
+        return 1;
+    } else {
+        *element = 0;
+        return 0;
+    }
 }
 

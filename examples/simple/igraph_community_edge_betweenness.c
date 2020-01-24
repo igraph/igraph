@@ -128,13 +128,13 @@ void test_weighted() {
                                       &weights);
 
     if (!igraph_vector_all_e(&edges_sol1, &edges) &&
-            !igraph_vector_all_e(&edges_sol2, &edges)) {
+        !igraph_vector_all_e(&edges_sol2, &edges)) {
         printf("Error, edges vector was: \n");
         igraph_vector_print(&edges);
         exit(2);
     }
     if (!igraph_vector_between(&eb, &eb_sol1_lo, &eb_sol1_hi) &&
-            !igraph_vector_between(&eb, &eb_sol2_lo, &eb_sol2_hi)) {
+        !igraph_vector_between(&eb, &eb_sol2_lo, &eb_sol2_hi)) {
         printf("Error, eb vector was: \n");
         igraph_vector_print(&eb);
         exit(2);
@@ -148,7 +148,7 @@ void test_weighted() {
                                       &weights);
 
     if (!igraph_vector_between(&eb, &eb_sol1_lo, &eb_sol1_hi) &&
-            !igraph_vector_between(&eb, &eb_sol2_lo, &eb_sol2_hi)) {
+        !igraph_vector_between(&eb, &eb_sol2_lo, &eb_sol2_hi)) {
         printf("Error, eb vector was: \n");
         igraph_vector_print(&eb);
         exit(2);

@@ -96,86 +96,87 @@
  */
 
 int igraph_ecumulative_proportionate_values(const igraph_t *graph,
-                                            const igraph_vector_t *U,
-                                            igraph_vector_t *V,
-                                            igraph_bool_t islocal,
-                                            igraph_integer_t vid,
-                                            igraph_neimode_t mode) {
-  igraph_eit_t A;   /* all edges in v's perspective */
-  igraph_es_t es;
-  igraph_integer_t e;
-  igraph_real_t C;  /* cumulative probability */
-  igraph_real_t P;  /* probability */
-  igraph_real_t S;  /* sum of values */
-  long int i;
+        const igraph_vector_t *U,
+        igraph_vector_t *V,
+        igraph_bool_t islocal,
+        igraph_integer_t vid,
+        igraph_neimode_t mode) {
+    igraph_eit_t A;   /* all edges in v's perspective */
+    igraph_es_t es;
+    igraph_integer_t e;
+    igraph_real_t C;  /* cumulative probability */
+    igraph_real_t P;  /* probability */
+    igraph_real_t S;  /* sum of values */
+    long int i;
 
-  /* Set the perspective. Let v be the vertex under consideration. The local */
-  /* perspective for v consists of edges incident on it. In contrast, the */
-  /* global perspective for v are all edges in the given graph. Hence in the */
-  /* global perspective, we will ignore the given vertex and the given */
-  /* neighbourhood type, but instead consider all edges in the given graph. */
-  if (islocal)
-    IGRAPH_CHECK(igraph_es_incident(&es, vid, mode));
-  else
-    IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
-  IGRAPH_FINALLY(igraph_es_destroy, &es);
+    /* Set the perspective. Let v be the vertex under consideration. The local */
+    /* perspective for v consists of edges incident on it. In contrast, the */
+    /* global perspective for v are all edges in the given graph. Hence in the */
+    /* global perspective, we will ignore the given vertex and the given */
+    /* neighbourhood type, but instead consider all edges in the given graph. */
+    if (islocal) {
+        IGRAPH_CHECK(igraph_es_incident(&es, vid, mode));
+    } else {
+        IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_ID));
+    }
+    IGRAPH_FINALLY(igraph_es_destroy, &es);
 
-  /* Sum up all the values of vector U in the perspective for v. This sum */
-  /* will be used in normalizing each value. */
-  /* NOTE: Here we assume that each value to be summed is nonnegative, */
-  /* and at least one of the values is nonzero. The behaviour resulting */
-  /* from all values being zero would be division by zero later on when */
-  /* we normalize each value. We check to see that the values sum to zero. */
-  /* NOTE: In this function, the order in which we iterate through the */
-  /* edges of interest should be the same as the order in which we do so */
-  /* in the caller function. If the caller function doesn't care about the */
-  /* order of values in the resulting vector V, then there's no need to take */
-  /* special notice of that order. But in some cases the order of values in */
-  /* V is taken into account, for example, in the Moran process. */
-  S = 0.0;
-  IGRAPH_CHECK(igraph_eit_create(graph, es, &A));
-  IGRAPH_FINALLY(igraph_eit_destroy, &A);
-  while (!IGRAPH_EIT_END(A)) {
-    e = (igraph_integer_t)IGRAPH_EIT_GET(A);
-    S += (igraph_real_t)VECTOR(*U)[e];
-    IGRAPH_EIT_NEXT(A);
-  }
-  /* avoid division by zero later on */
-  if (S == (igraph_real_t)0.0) {
+    /* Sum up all the values of vector U in the perspective for v. This sum */
+    /* will be used in normalizing each value. */
+    /* NOTE: Here we assume that each value to be summed is nonnegative, */
+    /* and at least one of the values is nonzero. The behaviour resulting */
+    /* from all values being zero would be division by zero later on when */
+    /* we normalize each value. We check to see that the values sum to zero. */
+    /* NOTE: In this function, the order in which we iterate through the */
+    /* edges of interest should be the same as the order in which we do so */
+    /* in the caller function. If the caller function doesn't care about the */
+    /* order of values in the resulting vector V, then there's no need to take */
+    /* special notice of that order. But in some cases the order of values in */
+    /* V is taken into account, for example, in the Moran process. */
+    S = 0.0;
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &A));
+    IGRAPH_FINALLY(igraph_eit_destroy, &A);
+    while (!IGRAPH_EIT_END(A)) {
+        e = (igraph_integer_t)IGRAPH_EIT_GET(A);
+        S += (igraph_real_t)VECTOR(*U)[e];
+        IGRAPH_EIT_NEXT(A);
+    }
+    /* avoid division by zero later on */
+    if (S == (igraph_real_t)0.0) {
+        igraph_eit_destroy(&A);
+        igraph_es_destroy(&es);
+        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_ERROR("Vector of values sums to zero", IGRAPH_EINVAL);
+    }
+
+    /* Get cumulative probability and relative value for each edge in the */
+    /* perspective of v. The vector V holds the cumulative proportionate */
+    /* values of all edges in v's perspective. The value V[0] is the */
+    /* cumulative proportionate value of the first edge in the edge iterator */
+    /* A. The value V[1] is the cumulative proportionate value of the second */
+    /* edge in the iterator A. And so on. */
+    C = 0.0;
+    i = 0;
+    IGRAPH_EIT_RESET(A);
+    IGRAPH_VECTOR_INIT_FINALLY(V, IGRAPH_EIT_SIZE(A));
+    while (!IGRAPH_EIT_END(A)) {
+        e = (igraph_integer_t)IGRAPH_EIT_GET(A);
+        /* NOTE: Beware of division by zero here. This can happen if the vector */
+        /* of values, or the combination of interest, sums to zero. */
+        P = (igraph_real_t)VECTOR(*U)[e] / S;
+        C += P;
+        VECTOR(*V)[i] = C;
+        i++;
+        IGRAPH_EIT_NEXT(A);
+    }
+
     igraph_eit_destroy(&A);
     igraph_es_destroy(&es);
-    IGRAPH_FINALLY_CLEAN(2);
-    IGRAPH_ERROR("Vector of values sums to zero", IGRAPH_EINVAL);
-  }
 
-  /* Get cumulative probability and relative value for each edge in the */
-  /* perspective of v. The vector V holds the cumulative proportionate */
-  /* values of all edges in v's perspective. The value V[0] is the */
-  /* cumulative proportionate value of the first edge in the edge iterator */
-  /* A. The value V[1] is the cumulative proportionate value of the second */
-  /* edge in the iterator A. And so on. */
-  C = 0.0;
-  i = 0;
-  IGRAPH_EIT_RESET(A);
-  IGRAPH_VECTOR_INIT_FINALLY(V, IGRAPH_EIT_SIZE(A));
-  while (!IGRAPH_EIT_END(A)) {
-    e = (igraph_integer_t)IGRAPH_EIT_GET(A);
-    /* NOTE: Beware of division by zero here. This can happen if the vector */
-    /* of values, or the combination of interest, sums to zero. */
-    P = (igraph_real_t)VECTOR(*U)[e] / S;
-    C += P;
-    VECTOR(*V)[i] = C;
-    i++;
-    IGRAPH_EIT_NEXT(A);
-  }
+    /* Pop V, A and es from the finally stack -- that's three items */
+    IGRAPH_FINALLY_CLEAN(3);
 
-  igraph_eit_destroy(&A);
-  igraph_es_destroy(&es);
-
-  /* Pop V, A and es from the finally stack -- that's three items */
-  IGRAPH_FINALLY_CLEAN(3);
-
-  return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 /*
@@ -244,96 +245,98 @@ int igraph_ecumulative_proportionate_values(const igraph_t *graph,
  */
 
 int igraph_vcumulative_proportionate_values(const igraph_t *graph,
-                                                  const igraph_vector_t *U,
-                                                  igraph_vector_t *V,
-                                                  igraph_bool_t islocal,
-                                                  igraph_integer_t vid,
-                                                  igraph_neimode_t mode) {
-  igraph_integer_t v;
-  igraph_real_t C;  /* cumulative probability */
-  igraph_real_t P;  /* probability */
-  igraph_real_t S;  /* sum of values */
-  igraph_vit_t A;   /* all vertices in v's perspective */
-  igraph_vs_t vs;
-  long int i;
+        const igraph_vector_t *U,
+        igraph_vector_t *V,
+        igraph_bool_t islocal,
+        igraph_integer_t vid,
+        igraph_neimode_t mode) {
+    igraph_integer_t v;
+    igraph_real_t C;  /* cumulative probability */
+    igraph_real_t P;  /* probability */
+    igraph_real_t S;  /* sum of values */
+    igraph_vit_t A;   /* all vertices in v's perspective */
+    igraph_vs_t vs;
+    long int i;
 
-  /* Set the perspective. Let v be the vertex under consideration; it might */
-  /* be that we want to update v's strategy. The local perspective for v */
-  /* consists of its immediate neighbours. In contrast, the global */
-  /* perspective for v are all the vertices in the given graph. Hence in the */
-  /* global perspective, we will ignore the given vertex and the given */
-  /* neighbourhood type, but instead consider all vertices in the given */
-  /* graph. */
-  if (islocal)
-    IGRAPH_CHECK(igraph_vs_adj(&vs, vid, mode));
-  else
-    IGRAPH_CHECK(igraph_vs_all(&vs));
-  IGRAPH_FINALLY(igraph_vs_destroy, &vs);
+    /* Set the perspective. Let v be the vertex under consideration; it might */
+    /* be that we want to update v's strategy. The local perspective for v */
+    /* consists of its immediate neighbours. In contrast, the global */
+    /* perspective for v are all the vertices in the given graph. Hence in the */
+    /* global perspective, we will ignore the given vertex and the given */
+    /* neighbourhood type, but instead consider all vertices in the given */
+    /* graph. */
+    if (islocal) {
+        IGRAPH_CHECK(igraph_vs_adj(&vs, vid, mode));
+    } else {
+        IGRAPH_CHECK(igraph_vs_all(&vs));
+    }
+    IGRAPH_FINALLY(igraph_vs_destroy, &vs);
 
-  /* Sum up all the values of vector U in the perspective for v. This */
-  /* sum will be used in normalizing each value. If we are using a local */
-  /* perspective, then we also need to consider the quantity of v in */
-  /* computing the sum. */
-  /* NOTE: Here we assume that each value to be summed is nonnegative, */
-  /* and at least one of the values is nonzero. The behaviour resulting */
-  /* from all values being zero would be division by zero later on when */
-  /* we normalize each value. We check to see that the values sum to zero. */
-  /* NOTE: In this function, the order in which we iterate through the */
-  /* vertices of interest should be the same as the order in which we do so */
-  /* in the caller function. If the caller function doesn't care about the */
-  /* order of values in the resulting vector V, then there's no need to take */
-  /* special notice of that order. But in some cases the order of values in */
-  /* V is taken into account, for example, in roulette wheel selection. */
-  S = 0.0;
-  IGRAPH_CHECK(igraph_vit_create(graph, vs, &A));
-  IGRAPH_FINALLY(igraph_vit_destroy, &A);
-  while (!IGRAPH_VIT_END(A)) {
-    v = (igraph_integer_t)IGRAPH_VIT_GET(A);
-    S += (igraph_real_t)VECTOR(*U)[v];
-    IGRAPH_VIT_NEXT(A);
-  }
-  if (islocal)
-    S += (igraph_real_t)VECTOR(*U)[vid];
-  /* avoid division by zero later on */
-  if (S == (igraph_real_t)0.0) {
+    /* Sum up all the values of vector U in the perspective for v. This */
+    /* sum will be used in normalizing each value. If we are using a local */
+    /* perspective, then we also need to consider the quantity of v in */
+    /* computing the sum. */
+    /* NOTE: Here we assume that each value to be summed is nonnegative, */
+    /* and at least one of the values is nonzero. The behaviour resulting */
+    /* from all values being zero would be division by zero later on when */
+    /* we normalize each value. We check to see that the values sum to zero. */
+    /* NOTE: In this function, the order in which we iterate through the */
+    /* vertices of interest should be the same as the order in which we do so */
+    /* in the caller function. If the caller function doesn't care about the */
+    /* order of values in the resulting vector V, then there's no need to take */
+    /* special notice of that order. But in some cases the order of values in */
+    /* V is taken into account, for example, in roulette wheel selection. */
+    S = 0.0;
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &A));
+    IGRAPH_FINALLY(igraph_vit_destroy, &A);
+    while (!IGRAPH_VIT_END(A)) {
+        v = (igraph_integer_t)IGRAPH_VIT_GET(A);
+        S += (igraph_real_t)VECTOR(*U)[v];
+        IGRAPH_VIT_NEXT(A);
+    }
+    if (islocal) {
+        S += (igraph_real_t)VECTOR(*U)[vid];
+    }
+    /* avoid division by zero later on */
+    if (S == (igraph_real_t)0.0) {
+        igraph_vit_destroy(&A);
+        igraph_vs_destroy(&vs);
+        IGRAPH_FINALLY_CLEAN(2);
+        IGRAPH_ERROR("Vector of values sums to zero", IGRAPH_EINVAL);
+    }
+
+    /* Get cumulative probability and relative value for each vertex in the */
+    /* perspective of v. The vector V holds the cumulative proportionate */
+    /* values of all vertices in v's perspective. The value V[0] is the */
+    /* cumulative proportionate value of the first vertex in the vertex */
+    /* iterator A. The value V[1] is the cumulative proportionate value of */
+    /* the second vertex in the iterator A. And so on. If we are using the */
+    /* local perspective, then we also need to consider the cumulative */
+    /* proportionate value of v. In the case of the local perspective, we */
+    /* don't need to compute and store v's cumulative proportionate value, */
+    /* but we pretend that such value is appended to the vector V. */
+    C = 0.0;
+    i = 0;
+    IGRAPH_VIT_RESET(A);
+    IGRAPH_VECTOR_INIT_FINALLY(V, IGRAPH_VIT_SIZE(A));
+    while (!IGRAPH_VIT_END(A)) {
+        v = (igraph_integer_t)IGRAPH_VIT_GET(A);
+        /* NOTE: Beware of division by zero here. This can happen if the vector */
+        /* of values, or a combination of interest, sums to zero. */
+        P = (igraph_real_t)VECTOR(*U)[v] / S;
+        C += P;
+        VECTOR(*V)[i] = C;
+        i++;
+        IGRAPH_VIT_NEXT(A);
+    }
+
     igraph_vit_destroy(&A);
     igraph_vs_destroy(&vs);
-    IGRAPH_FINALLY_CLEAN(2);
-    IGRAPH_ERROR("Vector of values sums to zero", IGRAPH_EINVAL);
-  }
 
-  /* Get cumulative probability and relative value for each vertex in the */
-  /* perspective of v. The vector V holds the cumulative proportionate */
-  /* values of all vertices in v's perspective. The value V[0] is the */
-  /* cumulative proportionate value of the first vertex in the vertex */
-  /* iterator A. The value V[1] is the cumulative proportionate value of */
-  /* the second vertex in the iterator A. And so on. If we are using the */
-  /* local perspective, then we also need to consider the cumulative */
-  /* proportionate value of v. In the case of the local perspective, we */
-  /* don't need to compute and store v's cumulative proportionate value, */
-  /* but we pretend that such value is appended to the vector V. */
-  C = 0.0;
-  i = 0;
-  IGRAPH_VIT_RESET(A);
-  IGRAPH_VECTOR_INIT_FINALLY(V, IGRAPH_VIT_SIZE(A));
-  while (!IGRAPH_VIT_END(A)) {
-    v = (igraph_integer_t)IGRAPH_VIT_GET(A);
-    /* NOTE: Beware of division by zero here. This can happen if the vector */
-    /* of values, or a combination of interest, sums to zero. */
-    P = (igraph_real_t)VECTOR(*U)[v] / S;
-    C += P;
-    VECTOR(*V)[i] = C;
-    i++;
-    IGRAPH_VIT_NEXT(A);
-  }
+    /* Pop V, A and vs from the finally stack -- that's three items */
+    IGRAPH_FINALLY_CLEAN(3);
 
-  igraph_vit_destroy(&A);
-  igraph_vs_destroy(&vs);
-
-  /* Pop V, A and vs from the finally stack -- that's three items */
-  IGRAPH_FINALLY_CLEAN(3);
-
-  return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }
 
 /*
@@ -420,73 +423,74 @@ int igraph_microscopic_standard_tests(const igraph_t *graph,
                                       const igraph_vector_t *quantities,
                                       const igraph_vector_t *strategies,
                                       igraph_neimode_t mode,
-				      igraph_bool_t *updates, 
-				      igraph_bool_t islocal) {
+                                      igraph_bool_t *updates,
+                                      igraph_bool_t islocal) {
 
-  igraph_integer_t nvert;
-  igraph_vector_t degv;
-  *updates=1;
+    igraph_integer_t nvert;
+    igraph_vector_t degv;
+    *updates = 1;
 
-  /* sanity checks */
-  if (graph == NULL) {
-    IGRAPH_ERROR("Graph is a null pointer", IGRAPH_EINVAL);
-  }
-  if (quantities == NULL) {
-    IGRAPH_ERROR("Quantities vector is a null pointer", IGRAPH_EINVAL);
-  }
-  if (strategies == NULL) {
-    IGRAPH_ERROR("Strategies vector is a null pointer", IGRAPH_EINVAL);
-  }
+    /* sanity checks */
+    if (graph == NULL) {
+        IGRAPH_ERROR("Graph is a null pointer", IGRAPH_EINVAL);
+    }
+    if (quantities == NULL) {
+        IGRAPH_ERROR("Quantities vector is a null pointer", IGRAPH_EINVAL);
+    }
+    if (strategies == NULL) {
+        IGRAPH_ERROR("Strategies vector is a null pointer", IGRAPH_EINVAL);
+    }
 
-  /* the empty graph */
-  nvert=igraph_vcount(graph);
-  if (nvert < 1) {
-    IGRAPH_ERROR("Graph cannot be the empty graph", IGRAPH_EINVAL);
-  }
-  /* invalid vector length */
-  if (nvert != (igraph_integer_t)igraph_vector_size(quantities)) {
-    IGRAPH_ERROR("Size of quantities vector different from number of vertices",
-                 IGRAPH_EINVAL);
-  }
-  if (nvert != (igraph_integer_t)igraph_vector_size(strategies)) {
-    IGRAPH_ERROR("Size of strategies vector different from number of vertices",
-                 IGRAPH_EINVAL);
-  }
+    /* the empty graph */
+    nvert = igraph_vcount(graph);
+    if (nvert < 1) {
+        IGRAPH_ERROR("Graph cannot be the empty graph", IGRAPH_EINVAL);
+    }
+    /* invalid vector length */
+    if (nvert != (igraph_integer_t)igraph_vector_size(quantities)) {
+        IGRAPH_ERROR("Size of quantities vector different from number of vertices",
+                     IGRAPH_EINVAL);
+    }
+    if (nvert != (igraph_integer_t)igraph_vector_size(strategies)) {
+        IGRAPH_ERROR("Size of strategies vector different from number of vertices",
+                     IGRAPH_EINVAL);
+    }
 
-  /* Various conditions under which no strategy updates will take place. That
-   * is, the vertex retains its current strategy.
-   */
-  /* given graph has < 2 vertices */
-  if (nvert < 2) {
-    *updates=0;
-  }
-  /* graph has >= 2 vertices, but no edges */
-  if (igraph_ecount(graph) < 1) {
-    *updates=0;
-  }
+    /* Various conditions under which no strategy updates will take place. That
+     * is, the vertex retains its current strategy.
+     */
+    /* given graph has < 2 vertices */
+    if (nvert < 2) {
+        *updates = 0;
+    }
+    /* graph has >= 2 vertices, but no edges */
+    if (igraph_ecount(graph) < 1) {
+        *updates = 0;
+    }
 
-  /* Test for vertex isolation, depending on the perspective given. For
-   * undirected graphs, a given vertex v is isolated if its degree is zero.
-   * If we are considering in-neighbours (respectively out-neighbours), then
-   * we say that v is isolated if its in-degree (respectively out-degree) is
-   * zero. In general, this vertex isolation test is only relevant if we are
-   * using a local perspective, i.e. if we only consider the immediate
-   * neighbours (local perspective) of v as opposed to all vertices in the
-   * vertex set of the graph (global perspective).
-   */
-  if (islocal) {
-    /* Moving on ahead with vertex isolation test, since local perspective */
-    /* is requested. */
-    IGRAPH_VECTOR_INIT_FINALLY(&degv, 1);
-    IGRAPH_CHECK(igraph_degree(graph, &degv, igraph_vss_1(vid),
-			       mode, IGRAPH_NO_LOOPS));
-    if (VECTOR(degv)[0] < 1)
-      *updates = 0;
-    igraph_vector_destroy(&degv);
-    IGRAPH_FINALLY_CLEAN(1);
-  }
-  
-  return IGRAPH_SUCCESS;
+    /* Test for vertex isolation, depending on the perspective given. For
+     * undirected graphs, a given vertex v is isolated if its degree is zero.
+     * If we are considering in-neighbours (respectively out-neighbours), then
+     * we say that v is isolated if its in-degree (respectively out-degree) is
+     * zero. In general, this vertex isolation test is only relevant if we are
+     * using a local perspective, i.e. if we only consider the immediate
+     * neighbours (local perspective) of v as opposed to all vertices in the
+     * vertex set of the graph (global perspective).
+     */
+    if (islocal) {
+        /* Moving on ahead with vertex isolation test, since local perspective */
+        /* is requested. */
+        IGRAPH_VECTOR_INIT_FINALLY(&degv, 1);
+        IGRAPH_CHECK(igraph_degree(graph, &degv, igraph_vss_1(vid),
+                                   mode, IGRAPH_NO_LOOPS));
+        if (VECTOR(degv)[0] < 1) {
+            *updates = 0;
+        }
+        igraph_vector_destroy(&degv);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -570,60 +574,62 @@ int igraph_microscopic_standard_tests(const igraph_t *graph,
  */
 
 int igraph_deterministic_optimal_imitation(const igraph_t *graph,
-                                           igraph_integer_t vid,
-                                           igraph_optimal_t optimality,
-                                           const igraph_vector_t *quantities,
-                                           igraph_vector_t *strategies,
-                                           igraph_neimode_t mode) {
-  igraph_integer_t i, k, v;
-  igraph_real_t q;
-  igraph_vector_t adj;
-  igraph_bool_t updates;
+        igraph_integer_t vid,
+        igraph_optimal_t optimality,
+        const igraph_vector_t *quantities,
+        igraph_vector_t *strategies,
+        igraph_neimode_t mode) {
+    igraph_integer_t i, k, v;
+    igraph_real_t q;
+    igraph_vector_t adj;
+    igraph_bool_t updates;
 
-  IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
-                                                 strategies, mode, &updates,
-                                                 /*is local?*/ 1));
-  if (!updates) { return IGRAPH_SUCCESS; } /* Nothing to do */
-  
-  /* Choose a locally optimal strategy to imitate. This can be either maximum
-   * or minimum deterministic imitation. By now we know that the given vertex v
-   * has degree >= 1 and at least 1 edge. Then within its immediate
-   * neighbourhood adj(v) and including v itself, there exists a vertex whose
-   * strategy yields a local optimal quantity.
-   */
-  /* Random permutation of adj(v). This ensures that if there are multiple */
-  /* candidates with an optimal strategy, then we choose one such candidate */
-  /* at random. */
-  IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
-  IGRAPH_CHECK(igraph_neighbors(graph, &adj, vid, mode));
-  IGRAPH_CHECK(igraph_vector_shuffle(&adj));
-  /* maximum deterministic imitation */
-  i = vid;
-  q = (igraph_real_t)VECTOR(*quantities)[vid];
-  if (optimality == IGRAPH_MAXIMUM) {
-    for (k = 0; k < igraph_vector_size(&adj); k++) {
-      v = (igraph_integer_t) VECTOR(adj)[k];
-      if ((igraph_real_t)VECTOR(*quantities)[v] > q) {
-	i = v;
-	q = (igraph_real_t)VECTOR(*quantities)[v];
-      }
+    IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
+                 strategies, mode, &updates,
+                 /*is local?*/ 1));
+    if (!updates) {
+        return IGRAPH_SUCCESS;    /* Nothing to do */
     }
-  } else { /* minimum deterministic imitation */
-    for (k = 0; k < igraph_vector_size(&adj); k++) {
-      v = (igraph_integer_t) VECTOR(adj)[k];
-      if ((igraph_real_t)VECTOR(*quantities)[v] < q) {
-	i = v;
-	q = (igraph_real_t)VECTOR(*quantities)[v];
-      }
-    }
-  }
-  /* Now i is a vertex with a locally optimal quantity, the value of which */
-  /* is q. Update the strategy of vid to that of i. */
-  VECTOR(*strategies)[vid] = VECTOR(*strategies)[i];
-  igraph_vector_destroy(&adj);
-  IGRAPH_FINALLY_CLEAN(1);
 
-  return IGRAPH_SUCCESS;
+    /* Choose a locally optimal strategy to imitate. This can be either maximum
+     * or minimum deterministic imitation. By now we know that the given vertex v
+     * has degree >= 1 and at least 1 edge. Then within its immediate
+     * neighbourhood adj(v) and including v itself, there exists a vertex whose
+     * strategy yields a local optimal quantity.
+     */
+    /* Random permutation of adj(v). This ensures that if there are multiple */
+    /* candidates with an optimal strategy, then we choose one such candidate */
+    /* at random. */
+    IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+    IGRAPH_CHECK(igraph_neighbors(graph, &adj, vid, mode));
+    IGRAPH_CHECK(igraph_vector_shuffle(&adj));
+    /* maximum deterministic imitation */
+    i = vid;
+    q = (igraph_real_t)VECTOR(*quantities)[vid];
+    if (optimality == IGRAPH_MAXIMUM) {
+        for (k = 0; k < igraph_vector_size(&adj); k++) {
+            v = (igraph_integer_t) VECTOR(adj)[k];
+            if ((igraph_real_t)VECTOR(*quantities)[v] > q) {
+                i = v;
+                q = (igraph_real_t)VECTOR(*quantities)[v];
+            }
+        }
+    } else { /* minimum deterministic imitation */
+        for (k = 0; k < igraph_vector_size(&adj); k++) {
+            v = (igraph_integer_t) VECTOR(adj)[k];
+            if ((igraph_real_t)VECTOR(*quantities)[v] < q) {
+                i = v;
+                q = (igraph_real_t)VECTOR(*quantities)[v];
+            }
+        }
+    }
+    /* Now i is a vertex with a locally optimal quantity, the value of which */
+    /* is q. Update the strategy of vid to that of i. */
+    VECTOR(*strategies)[vid] = VECTOR(*strategies)[i];
+    igraph_vector_destroy(&adj);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -727,139 +733,142 @@ int igraph_moran_process(const igraph_t *graph,
                          igraph_vector_t *quantities,
                          igraph_vector_t *strategies,
                          igraph_neimode_t mode) {
-  igraph_bool_t updates;
-  igraph_integer_t a = -1;  /* vertex chosen for reproduction */
-  igraph_integer_t b = -1;  /* vertex chosen for death */
-  igraph_integer_t e, nedge, u, v;
-  igraph_real_t r;          /* random number */
-  igraph_vector_t deg;
-  igraph_vector_t V;        /* vector of cumulative proportionate values */
-  igraph_vit_t vA;          /* vertex list */
-  igraph_eit_t eA;          /* edge list */
-  igraph_vs_t vs;
-  igraph_es_t es;
-  long int i;
+    igraph_bool_t updates;
+    igraph_integer_t a = -1;  /* vertex chosen for reproduction */
+    igraph_integer_t b = -1;  /* vertex chosen for death */
+    igraph_integer_t e, nedge, u, v;
+    igraph_real_t r;          /* random number */
+    igraph_vector_t deg;
+    igraph_vector_t V;        /* vector of cumulative proportionate values */
+    igraph_vit_t vA;          /* vertex list */
+    igraph_eit_t eA;          /* edge list */
+    igraph_vs_t vs;
+    igraph_es_t es;
+    long int i;
 
-  /* don't test for vertex isolation, hence vid = -1 and islocal = 0 */
-  IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, /*vid*/ -1,
-                                                 quantities, strategies, mode,
-                                                 &updates, /*is local?*/ 0));
-  if (!updates)
-    return IGRAPH_SUCCESS;  /* nothing more to do */
-  if (weights == NULL)
-    IGRAPH_ERROR("Weights vector is a null pointer", IGRAPH_EINVAL);
-  nedge = igraph_ecount(graph);
-  if (nedge != (igraph_integer_t)igraph_vector_size(weights)) {
-    IGRAPH_ERROR("Size of weights vector different from number of edges",
-                 IGRAPH_EINVAL);
-  }
-
-  /* Cumulative proportionate quantities. We are using the global */
-  /* perspective, hence islocal = 0, vid = -1 and mode = IGRAPH_ALL. */
-  IGRAPH_CHECK(igraph_vcumulative_proportionate_values(graph, quantities, &V,
-                                                       /*is local?*/ 0,
-                                                       /*vid*/ -1,
-                                                       /*mode*/ IGRAPH_ALL));
-
-  /* Choose a vertex for reproduction from among all vertices in the graph. */
-  /* The vertex is chosen proportionate to its quantity and such that its */
-  /* degree is >= 1. In case we are considering in-neighbours (respectively */
-  /* out-neighbours), the chosen vertex must have in-degree (respectively */
-  /* out-degree) >= 1. All loops will be ignored. At this point, we know */
-  /* that the graph has at least one edge, which may be directed or not. */
-  /* Furthermore the quantities of all vertices sum to a positive value. */
-  /* Hence at least one vertex will be chosen for reproduction. */
-  IGRAPH_CHECK(igraph_vs_all(&vs));
-  IGRAPH_FINALLY(igraph_vs_destroy, &vs);
-  IGRAPH_CHECK(igraph_vit_create(graph, vs, &vA));
-  IGRAPH_FINALLY(igraph_vit_destroy, &vA);
-  RNG_BEGIN();
-  r = RNG_UNIF01();
-  RNG_END();
-  i = 0;
-  IGRAPH_VECTOR_INIT_FINALLY(&deg, 1);
-  while (!IGRAPH_VIT_END(vA)) {
-    u = (igraph_integer_t)IGRAPH_VIT_GET(vA);
-    IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_1(u), mode,
-                               IGRAPH_NO_LOOPS));
-    if (VECTOR(deg)[0] < 1) {
-      i++;
-      IGRAPH_VIT_NEXT(vA);
-      continue;
+    /* don't test for vertex isolation, hence vid = -1 and islocal = 0 */
+    IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, /*vid*/ -1,
+                 quantities, strategies, mode,
+                 &updates, /*is local?*/ 0));
+    if (!updates) {
+        return IGRAPH_SUCCESS;    /* nothing more to do */
     }
-    if (r <= VECTOR(V)[i]) {
-      /* we have found our candidate vertex for reproduction */
-      a = u;
-      break;
+    if (weights == NULL) {
+        IGRAPH_ERROR("Weights vector is a null pointer", IGRAPH_EINVAL);
     }
-    i++;
-    IGRAPH_VIT_NEXT(vA);
-  }
-  /* By now we should have chosen a vertex for reproduction. Check this. */
-  assert(a >= 0);
-
-  /* Cumulative proportionate weights. We are using the local perspective */
-  /* with respect to vertex a, which has been chosen for reproduction. */
-  /* The degree of a is deg(a) >= 1 with respect to the mode "mode", which */
-  /* can flag either the in-degree, out-degree or all degree of a. But it */
-  /* still might happen that the edge weights of interest would sum to zero. */
-  /* An error would be raised in that case. */
-  igraph_vector_destroy(&V);
-  IGRAPH_CHECK(igraph_ecumulative_proportionate_values(graph, weights, &V,
-                                                       /*is local?*/ 1,
-                                                       /*vertex*/ a, mode));
-
-  /* Choose a vertex for death from among all vertices in a's perspective. */
-  /* Let E be all the edges in the perspective of a. If (u,v) \in E is any */
-  /* such edge, then we have a = u or a = v. That is, any edge in E has a */
-  /* for one of its endpoints. As G is assumed to be a simple graph, then */
-  /* exactly one of u or v is the vertex a. Without loss of generality, we */
-  /* assume that each edge in E has the form (a, v_i). Then the vertex v_j */
-  /* chosen for death is chosen proportionate to the weight of the edge */
-  /* (a, v_j). */
-  IGRAPH_CHECK(igraph_es_incident(&es, a, mode));
-  IGRAPH_FINALLY(igraph_es_destroy, &es);
-  IGRAPH_CHECK(igraph_eit_create(graph, es, &eA));
-  IGRAPH_FINALLY(igraph_eit_destroy, &eA);
-  RNG_BEGIN();
-  r = RNG_UNIF01();
-  RNG_END();
-  i = 0;
-  while (!IGRAPH_EIT_END(eA)) {
-    e = (igraph_integer_t)IGRAPH_EIT_GET(eA);
-    if (r <= VECTOR(V)[i]) {
-      /* We have found our candidate vertex for death; call this vertex b. */
-      /* As G is simple, then a =/= b. Check the latter condition. */
-      IGRAPH_CHECK(igraph_edge(graph, /*edge ID*/ e,
-                               /*tail vertex*/ &u, /*head vertex*/ &v));
-      if (a == u)
-        b = v;
-      else
-        b = u;
-      assert(a != b);  /* always true if G is simple */
-      break;
+    nedge = igraph_ecount(graph);
+    if (nedge != (igraph_integer_t)igraph_vector_size(weights)) {
+        IGRAPH_ERROR("Size of weights vector different from number of edges",
+                     IGRAPH_EINVAL);
     }
-    i++;
-    IGRAPH_EIT_NEXT(eA);
-  }
 
-  /* By now a vertex a is chosen for reproduction and a vertex b is chosen */
-  /* for death. Check that b has indeed been chosen. Clone vertex a and kill */
-  /* vertex b. Let the clone c have the vertex ID of b, and the strategy and */
-  /* quantity of a. */
-  assert(b >= 0);
-  VECTOR(*quantities)[b] = VECTOR(*quantities)[a];
-  VECTOR(*strategies)[b] = VECTOR(*strategies)[a];
+    /* Cumulative proportionate quantities. We are using the global */
+    /* perspective, hence islocal = 0, vid = -1 and mode = IGRAPH_ALL. */
+    IGRAPH_CHECK(igraph_vcumulative_proportionate_values(graph, quantities, &V,
+                 /*is local?*/ 0,
+                 /*vid*/ -1,
+                 /*mode*/ IGRAPH_ALL));
 
-  igraph_vector_destroy(&deg);
-  igraph_vector_destroy(&V);
-  igraph_vit_destroy(&vA);
-  igraph_eit_destroy(&eA);
-  igraph_vs_destroy(&vs);
-  igraph_es_destroy(&es);
-  IGRAPH_FINALLY_CLEAN(6);
+    /* Choose a vertex for reproduction from among all vertices in the graph. */
+    /* The vertex is chosen proportionate to its quantity and such that its */
+    /* degree is >= 1. In case we are considering in-neighbours (respectively */
+    /* out-neighbours), the chosen vertex must have in-degree (respectively */
+    /* out-degree) >= 1. All loops will be ignored. At this point, we know */
+    /* that the graph has at least one edge, which may be directed or not. */
+    /* Furthermore the quantities of all vertices sum to a positive value. */
+    /* Hence at least one vertex will be chosen for reproduction. */
+    IGRAPH_CHECK(igraph_vs_all(&vs));
+    IGRAPH_FINALLY(igraph_vs_destroy, &vs);
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &vA));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vA);
+    RNG_BEGIN();
+    r = RNG_UNIF01();
+    RNG_END();
+    i = 0;
+    IGRAPH_VECTOR_INIT_FINALLY(&deg, 1);
+    while (!IGRAPH_VIT_END(vA)) {
+        u = (igraph_integer_t)IGRAPH_VIT_GET(vA);
+        IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_1(u), mode,
+                                   IGRAPH_NO_LOOPS));
+        if (VECTOR(deg)[0] < 1) {
+            i++;
+            IGRAPH_VIT_NEXT(vA);
+            continue;
+        }
+        if (r <= VECTOR(V)[i]) {
+            /* we have found our candidate vertex for reproduction */
+            a = u;
+            break;
+        }
+        i++;
+        IGRAPH_VIT_NEXT(vA);
+    }
+    /* By now we should have chosen a vertex for reproduction. Check this. */
+    assert(a >= 0);
 
-  return IGRAPH_SUCCESS;
+    /* Cumulative proportionate weights. We are using the local perspective */
+    /* with respect to vertex a, which has been chosen for reproduction. */
+    /* The degree of a is deg(a) >= 1 with respect to the mode "mode", which */
+    /* can flag either the in-degree, out-degree or all degree of a. But it */
+    /* still might happen that the edge weights of interest would sum to zero. */
+    /* An error would be raised in that case. */
+    igraph_vector_destroy(&V);
+    IGRAPH_CHECK(igraph_ecumulative_proportionate_values(graph, weights, &V,
+                 /*is local?*/ 1,
+                 /*vertex*/ a, mode));
+
+    /* Choose a vertex for death from among all vertices in a's perspective. */
+    /* Let E be all the edges in the perspective of a. If (u,v) \in E is any */
+    /* such edge, then we have a = u or a = v. That is, any edge in E has a */
+    /* for one of its endpoints. As G is assumed to be a simple graph, then */
+    /* exactly one of u or v is the vertex a. Without loss of generality, we */
+    /* assume that each edge in E has the form (a, v_i). Then the vertex v_j */
+    /* chosen for death is chosen proportionate to the weight of the edge */
+    /* (a, v_j). */
+    IGRAPH_CHECK(igraph_es_incident(&es, a, mode));
+    IGRAPH_FINALLY(igraph_es_destroy, &es);
+    IGRAPH_CHECK(igraph_eit_create(graph, es, &eA));
+    IGRAPH_FINALLY(igraph_eit_destroy, &eA);
+    RNG_BEGIN();
+    r = RNG_UNIF01();
+    RNG_END();
+    i = 0;
+    while (!IGRAPH_EIT_END(eA)) {
+        e = (igraph_integer_t)IGRAPH_EIT_GET(eA);
+        if (r <= VECTOR(V)[i]) {
+            /* We have found our candidate vertex for death; call this vertex b. */
+            /* As G is simple, then a =/= b. Check the latter condition. */
+            IGRAPH_CHECK(igraph_edge(graph, /*edge ID*/ e,
+                                     /*tail vertex*/ &u, /*head vertex*/ &v));
+            if (a == u) {
+                b = v;
+            } else {
+                b = u;
+            }
+            assert(a != b);  /* always true if G is simple */
+            break;
+        }
+        i++;
+        IGRAPH_EIT_NEXT(eA);
+    }
+
+    /* By now a vertex a is chosen for reproduction and a vertex b is chosen */
+    /* for death. Check that b has indeed been chosen. Clone vertex a and kill */
+    /* vertex b. Let the clone c have the vertex ID of b, and the strategy and */
+    /* quantity of a. */
+    assert(b >= 0);
+    VECTOR(*quantities)[b] = VECTOR(*quantities)[a];
+    VECTOR(*strategies)[b] = VECTOR(*strategies)[a];
+
+    igraph_vector_destroy(&deg);
+    igraph_vector_destroy(&V);
+    igraph_vit_destroy(&vA);
+    igraph_eit_destroy(&eA);
+    igraph_vs_destroy(&vs);
+    igraph_es_destroy(&es);
+    IGRAPH_FINALLY_CLEAN(6);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -964,71 +973,73 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
                                     const igraph_vector_t *quantities,
                                     igraph_vector_t *strategies,
                                     igraph_neimode_t mode) {
-  igraph_bool_t updates;
-  igraph_integer_t u;
-  igraph_real_t r;    /* random number */
-  igraph_vector_t V;  /* vector of cumulative proportionate quantities */
-  igraph_vit_t A;     /* all vertices in v's perspective */
-  igraph_vs_t vs;
-  long int i;
+    igraph_bool_t updates;
+    igraph_integer_t u;
+    igraph_real_t r;    /* random number */
+    igraph_vector_t V;  /* vector of cumulative proportionate quantities */
+    igraph_vit_t A;     /* all vertices in v's perspective */
+    igraph_vs_t vs;
+    long int i;
 
-  IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
-                                                 strategies, mode, &updates,
-                                                 islocal));
-  if (!updates)
-    return IGRAPH_SUCCESS;  /* nothing further to do */
-
-  /* set the perspective */
-  if (islocal)
-    IGRAPH_CHECK(igraph_vs_adj(&vs, vid, mode));
-  else
-    IGRAPH_CHECK(igraph_vs_all(&vs));
-  IGRAPH_FINALLY(igraph_vs_destroy, &vs);
-  IGRAPH_CHECK(igraph_vit_create(graph, vs, &A));
-  IGRAPH_FINALLY(igraph_vit_destroy, &A);
-
-  IGRAPH_CHECK(igraph_vcumulative_proportionate_values(graph, quantities, &V,
-                                                       islocal, vid, mode));
-
-  /* Finally, choose a vertex u to imitate. The vertex u is chosen */
-  /* proportionate to its quantity. In the case of a local perspective, we */
-  /* pretend that v's cumulative proportionate quantity has been appended to */
-  /* the vector V. Let V be of length n so that V[n-1] is the last element */
-  /* of V, and let r be a real number chosen uniformly at random from the */
-  /* unit interval [0,1]. If r > V[i] for all i < n, then v defaults to */
-  /* retaining its current strategy. Similarly in the case of the global */
-  /* perspective, if r > V[i] for all i < n - 1 then v would adopt the */
-  /* strategy of the vertex whose cumulative proportionate quantity is */
-  /* V[n-1]. */
-  /* NOTE: Here we assume that the order in which we iterate through the */
-  /* vertices in A is the same as the order in which we do so in the */
-  /* invoked function igraph_vcumulative_proportionate_values(). */
-  /* Otherwise we would incorrectly associate each V[i] with a vertex in A. */
-  RNG_BEGIN();
-  r = RNG_UNIF01();
-  RNG_END();
-  i = 0;
-  while (!IGRAPH_VIT_END(A)) {
-    if (r <= VECTOR(V)[i]) {
-      /* We have found our candidate vertex for imitation. Update strategy */
-      /* of v to that of u, and exit the selection loop. */
-      u = (igraph_integer_t)IGRAPH_VIT_GET(A);
-      VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
-      break;
+    IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
+                 strategies, mode, &updates,
+                 islocal));
+    if (!updates) {
+        return IGRAPH_SUCCESS;    /* nothing further to do */
     }
-    i++;
-    IGRAPH_VIT_NEXT(A);
-  }
 
-  /* By now, vertex v should either retain its current strategy or it has */
-  /* adopted the strategy of a vertex in its perspective. Nothing else to */
-  /* do, but clean up. */
-  igraph_vector_destroy(&V);
-  igraph_vit_destroy(&A);
-  igraph_vs_destroy(&vs);
-  IGRAPH_FINALLY_CLEAN(3);
+    /* set the perspective */
+    if (islocal) {
+        IGRAPH_CHECK(igraph_vs_adj(&vs, vid, mode));
+    } else {
+        IGRAPH_CHECK(igraph_vs_all(&vs));
+    }
+    IGRAPH_FINALLY(igraph_vs_destroy, &vs);
+    IGRAPH_CHECK(igraph_vit_create(graph, vs, &A));
+    IGRAPH_FINALLY(igraph_vit_destroy, &A);
 
-  return IGRAPH_SUCCESS;
+    IGRAPH_CHECK(igraph_vcumulative_proportionate_values(graph, quantities, &V,
+                 islocal, vid, mode));
+
+    /* Finally, choose a vertex u to imitate. The vertex u is chosen */
+    /* proportionate to its quantity. In the case of a local perspective, we */
+    /* pretend that v's cumulative proportionate quantity has been appended to */
+    /* the vector V. Let V be of length n so that V[n-1] is the last element */
+    /* of V, and let r be a real number chosen uniformly at random from the */
+    /* unit interval [0,1]. If r > V[i] for all i < n, then v defaults to */
+    /* retaining its current strategy. Similarly in the case of the global */
+    /* perspective, if r > V[i] for all i < n - 1 then v would adopt the */
+    /* strategy of the vertex whose cumulative proportionate quantity is */
+    /* V[n-1]. */
+    /* NOTE: Here we assume that the order in which we iterate through the */
+    /* vertices in A is the same as the order in which we do so in the */
+    /* invoked function igraph_vcumulative_proportionate_values(). */
+    /* Otherwise we would incorrectly associate each V[i] with a vertex in A. */
+    RNG_BEGIN();
+    r = RNG_UNIF01();
+    RNG_END();
+    i = 0;
+    while (!IGRAPH_VIT_END(A)) {
+        if (r <= VECTOR(V)[i]) {
+            /* We have found our candidate vertex for imitation. Update strategy */
+            /* of v to that of u, and exit the selection loop. */
+            u = (igraph_integer_t)IGRAPH_VIT_GET(A);
+            VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
+            break;
+        }
+        i++;
+        IGRAPH_VIT_NEXT(A);
+    }
+
+    /* By now, vertex v should either retain its current strategy or it has */
+    /* adopted the strategy of a vertex in its perspective. Nothing else to */
+    /* do, but clean up. */
+    igraph_vector_destroy(&V);
+    igraph_vit_destroy(&A);
+    igraph_vs_destroy(&vs);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -1124,72 +1135,75 @@ int igraph_stochastic_imitation(const igraph_t *graph,
                                 const igraph_vector_t *quantities,
                                 igraph_vector_t *strategies,
                                 igraph_neimode_t mode) {
-  igraph_bool_t updates;
-  igraph_integer_t u;
-  igraph_vector_t adj;
-  int i;
+    igraph_bool_t updates;
+    igraph_integer_t u;
+    igraph_vector_t adj;
+    int i;
 
-  /* sanity checks */
-  if (algo != IGRAPH_IMITATE_AUGMENTED &&
-      algo != IGRAPH_IMITATE_BLIND &&
-      algo != IGRAPH_IMITATE_CONTRACTED) {
-    IGRAPH_ERROR("Unsupported stochastic imitation algorithm",
-                 IGRAPH_EINVAL);
-  }
-  IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
-                                                 strategies, mode, &updates,
-                                                 /*is local?*/ 1));
-  if (!updates)
-    return IGRAPH_SUCCESS;  /* nothing more to do */
+    /* sanity checks */
+    if (algo != IGRAPH_IMITATE_AUGMENTED &&
+        algo != IGRAPH_IMITATE_BLIND &&
+        algo != IGRAPH_IMITATE_CONTRACTED) {
+        IGRAPH_ERROR("Unsupported stochastic imitation algorithm",
+                     IGRAPH_EINVAL);
+    }
+    IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
+                 strategies, mode, &updates,
+                 /*is local?*/ 1));
+    if (!updates) {
+        return IGRAPH_SUCCESS;    /* nothing more to do */
+    }
 
-  /* immediate neighbours of v */
-  IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
-  IGRAPH_CHECK(igraph_neighbors(graph, &adj, vid, mode));
+    /* immediate neighbours of v */
+    IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+    IGRAPH_CHECK(igraph_neighbors(graph, &adj, vid, mode));
 
-  /* Blind imitation. Let v be the vertex whose strategy we want to revise. */
-  /* Choose a vertex u uniformly at random from the immediate neighbours of */
-  /* v, including v itself. Then blindly update the strategy of v to that of */
-  /* u, irrespective of whether doing so would increase or decrease the */
-  /* quantity (e.g. fitness) of v. Here v retains its current strategy if */
-  /* the chosen vertex u is indeed v itself. */
-  if (algo == IGRAPH_IMITATE_BLIND) {
-    IGRAPH_CHECK(igraph_vector_push_back(&adj, vid));
-    RNG_BEGIN();
-    i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
-    RNG_END();
-    u = (igraph_integer_t) VECTOR(adj)[i];
-    VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
-  }
-  /* Augmented imitation. Let v be the vertex whose strategy we want to */
-  /* revise. Let f be the quantity function for the game. Choose a vertex u */
-  /* uniformly at random from the immediate neighbours of v; do not include */
-  /* v. Then v imitates the strategy of u if f(u) > f(v). Otherwise v */
-  /* retains its current strategy. */
-  else if (algo == IGRAPH_IMITATE_AUGMENTED) {
-    RNG_BEGIN();
-    i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
-    RNG_END();
-    u = (igraph_integer_t) VECTOR(adj)[i];
-    if (VECTOR(*quantities)[u] > VECTOR(*quantities)[vid])
-      VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
-  }
-  /* Contracted imitation. Let v be the vertex whose strategy we want to */
-  /* update and let f be the quantity function for the game. Choose a vertex */
-  /* u uniformly at random from the immediate neighbours of v, excluding v */
-  /* itself. Then v imitates the strategy of u provided that f(u) < f(v). */
-  /* Otherwise v retains its current strategy. */
-  else if (algo == IGRAPH_IMITATE_CONTRACTED) {
-    RNG_BEGIN();
-    i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
-    RNG_END();
-    u = (igraph_integer_t) VECTOR(adj)[i];
-    if (VECTOR(*quantities)[u] < VECTOR(*quantities)[vid])
-      VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
-  }
+    /* Blind imitation. Let v be the vertex whose strategy we want to revise. */
+    /* Choose a vertex u uniformly at random from the immediate neighbours of */
+    /* v, including v itself. Then blindly update the strategy of v to that of */
+    /* u, irrespective of whether doing so would increase or decrease the */
+    /* quantity (e.g. fitness) of v. Here v retains its current strategy if */
+    /* the chosen vertex u is indeed v itself. */
+    if (algo == IGRAPH_IMITATE_BLIND) {
+        IGRAPH_CHECK(igraph_vector_push_back(&adj, vid));
+        RNG_BEGIN();
+        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        RNG_END();
+        u = (igraph_integer_t) VECTOR(adj)[i];
+        VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
+    }
+    /* Augmented imitation. Let v be the vertex whose strategy we want to */
+    /* revise. Let f be the quantity function for the game. Choose a vertex u */
+    /* uniformly at random from the immediate neighbours of v; do not include */
+    /* v. Then v imitates the strategy of u if f(u) > f(v). Otherwise v */
+    /* retains its current strategy. */
+    else if (algo == IGRAPH_IMITATE_AUGMENTED) {
+        RNG_BEGIN();
+        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        RNG_END();
+        u = (igraph_integer_t) VECTOR(adj)[i];
+        if (VECTOR(*quantities)[u] > VECTOR(*quantities)[vid]) {
+            VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
+        }
+    }
+    /* Contracted imitation. Let v be the vertex whose strategy we want to */
+    /* update and let f be the quantity function for the game. Choose a vertex */
+    /* u uniformly at random from the immediate neighbours of v, excluding v */
+    /* itself. Then v imitates the strategy of u provided that f(u) < f(v). */
+    /* Otherwise v retains its current strategy. */
+    else if (algo == IGRAPH_IMITATE_CONTRACTED) {
+        RNG_BEGIN();
+        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        RNG_END();
+        u = (igraph_integer_t) VECTOR(adj)[i];
+        if (VECTOR(*quantities)[u] < VECTOR(*quantities)[vid]) {
+            VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
+        }
+    }
 
-  /* clean up */
-  igraph_vector_destroy(&adj);
-  IGRAPH_FINALLY_CLEAN(1);
+    /* clean up */
+    igraph_vector_destroy(&adj);
+    IGRAPH_FINALLY_CLEAN(1);
 
-  return IGRAPH_SUCCESS;
+    return IGRAPH_SUCCESS;
 }

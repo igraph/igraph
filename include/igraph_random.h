@@ -37,26 +37,26 @@ __BEGIN_DECLS
 /* The new RNG interface is (somewhat) modelled based on the GSL */
 
 typedef struct igraph_rng_type_t {
-  const char *name;
-  unsigned long int min;
-  unsigned long int max;
-  int (*init)(void **state);
-  void (*destroy)(void *state);
-  int (*seed)(void *state, unsigned long int seed);
-  unsigned long int (*get)(void *state);
-  igraph_real_t (*get_real)(void *state);
-  igraph_real_t (*get_norm)(void *state);
-  igraph_real_t (*get_geom)(void *state, igraph_real_t p);
-  igraph_real_t (*get_binom)(void *state, long int n, igraph_real_t p);
-  igraph_real_t (*get_exp)(void *state, igraph_real_t rate);
-  igraph_real_t (*get_gamma)(void *state, igraph_real_t shape,
-			     igraph_real_t scale);
+    const char *name;
+    unsigned long int min;
+    unsigned long int max;
+    int (*init)(void **state);
+    void (*destroy)(void *state);
+    int (*seed)(void *state, unsigned long int seed);
+    unsigned long int (*get)(void *state);
+    igraph_real_t (*get_real)(void *state);
+    igraph_real_t (*get_norm)(void *state);
+    igraph_real_t (*get_geom)(void *state, igraph_real_t p);
+    igraph_real_t (*get_binom)(void *state, long int n, igraph_real_t p);
+    igraph_real_t (*get_exp)(void *state, igraph_real_t rate);
+    igraph_real_t (*get_gamma)(void *state, igraph_real_t shape,
+                               igraph_real_t scale);
 } igraph_rng_type_t;
 
 typedef struct igraph_rng_t {
-  const igraph_rng_type_t *type;
-  void *state;
-  int def;
+    const igraph_rng_type_t *type;
+    void *state;
+    int def;
 } igraph_rng_t;
 
 /* --------------------------------- */
@@ -70,22 +70,22 @@ DECLDIR unsigned long int igraph_rng_min(igraph_rng_t *rng);
 DECLDIR const char *igraph_rng_name(igraph_rng_t *rng);
 
 DECLDIR long int igraph_rng_get_integer(igraph_rng_t *rng,
-                     long int l, long int h);
+                                        long int l, long int h);
 DECLDIR igraph_real_t igraph_rng_get_normal(igraph_rng_t *rng,
-                          igraph_real_t m, igraph_real_t s);
+        igraph_real_t m, igraph_real_t s);
 DECLDIR igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
-                          igraph_real_t l, igraph_real_t h);
+        igraph_real_t l, igraph_real_t h);
 DECLDIR igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng);
 DECLDIR igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
 DECLDIR igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
-                          igraph_real_t p);
+        igraph_real_t p);
 DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
 DECLDIR unsigned long int igraph_rng_get_int31(igraph_rng_t *rng);
 DECLDIR igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
-                          igraph_real_t scale);
+        igraph_real_t scale);
 DECLDIR int igraph_rng_get_dirichlet(igraph_rng_t *rng,
-                const igraph_vector_t *alpha,
-                igraph_vector_t *result);
+                                     const igraph_vector_t *alpha,
+                                     igraph_vector_t *result);
 
 /* --------------------------------- */
 

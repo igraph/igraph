@@ -17,35 +17,35 @@
  *  along with this program; if not, write to the Free Software Foundation,
  *  Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  *
- *	$Id: bignum.h,v 1.6 2005/08/11 17:57:39 pullmoll Exp $
+ *  $Id: bignum.h,v 1.6 2005/08/11 17:57:39 pullmoll Exp $
  *****************************************************************************/
 #ifndef _bignum_h_
 #define _bignum_h_
 
 #include "config.h"
 #ifdef HAVE_STDINT_H
-#  include <stdint.h>
+    #include <stdint.h>
 #else
-#  ifdef HAVE_SYS_INT_TYPES_H
-#    include <sys/int_types.h>
-#  else
-#    include "pstdint.h"
-#  endif
+    #ifdef HAVE_SYS_INT_TYPES_H
+        #include <sys/int_types.h>
+    #else
+        #include "pstdint.h"
+    #endif
 #endif
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
 #ifndef NULL
-#define NULL 0
+    #define NULL 0
 #endif
 
-#ifndef	O_BINARY
-#define	O_BINARY 0
+#ifndef O_BINARY
+    #define O_BINARY 0
 #endif
 
-#ifndef	HAVE_U64
-#define	HAVE_U64 1
+#ifndef HAVE_U64
+    #define HAVE_U64 1
 #endif
 
 /* up to 512 limbs (512 * 32 = 16384 bits) numbers */
@@ -54,26 +54,26 @@
  * compiling with -O2 -g). Since it is unlikely that we'll need that many bits,
  * I have changed this to 128, which still yields 4096 bits of precision but
  * does not cause problems with clang -- TN, 2016-04-18 */
-#define	BN_MAXSIZE 128
-#define	LIMBBITS 32
-#define	LIMBMASK 0xfffffffful
-#define	HALFMASK 0x0000fffful
-#define	DIGMSB 0x80000000ul
-#define	DIGLSB 0x00000001ul
+#define BN_MAXSIZE 128
+#define LIMBBITS 32
+#define LIMBMASK 0xfffffffful
+#define HALFMASK 0x0000fffful
+#define DIGMSB 0x80000000ul
+#define DIGLSB 0x00000001ul
 
 typedef uint32_t count_t;
 typedef uint16_t half_t;
 typedef uint32_t limb_t;
 #if HAVE_U64
-typedef uint64_t dlimb_t;
+    typedef uint64_t dlimb_t;
 #endif
 
 /* less significant half limb */
-#define	LSH(d)	((half_t)(d))
+#define LSH(d)  ((half_t)(d))
 /* more significant half limb */
-#define	MSH(d)	((limb_t)(d)>>16)
+#define MSH(d)  ((limb_t)(d)>>16)
 /* shift left half limb */
-#define	SHL(d)	((limb_t)(d)<<16)
+#define SHL(d)  ((limb_t)(d)<<16)
 
 /* single limb functions */
 limb_t sl_div(limb_t *q, limb_t *r, limb_t u[2], limb_t v);
@@ -122,4 +122,4 @@ int bn_modexp(limb_t y[], limb_t x[], limb_t e[], limb_t m[], count_t nlimb);
 int bn_modinv(limb_t inv[], limb_t u[], limb_t v[], count_t nlimb);
 limb_t bn_modmul(limb_t a[], limb_t x[], limb_t y[], limb_t m[], count_t nlimb);
 
-#endif	/* !defined(_bignum_h_) */
+#endif  /* !defined(_bignum_h_) */

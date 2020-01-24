@@ -37,8 +37,8 @@ int real_cplx_mult(const igraph_matrix_t *A,
     int r, c;
 
     if (igraph_matrix_nrow(A) != n ||
-            igraph_matrix_ncol(A) != n ||
-            igraph_vector_size(v_imag) != n) {
+        igraph_matrix_ncol(A) != n ||
+        igraph_vector_size(v_imag) != n) {
         printf("Wrong matrix or vector size");
         return 1;
     }
@@ -147,7 +147,7 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
                           &v_real, &v_imag, &lv_real, &lv_imag);
 
         if (igraph_vector_maxdifference(&AV_real, &lv_real) > tol ||
-                igraph_vector_maxdifference(&AV_imag, &lv_imag) > tol) {
+            igraph_vector_maxdifference(&AV_imag, &lv_imag) > tol) {
             igraph_vector_print(&AV_real);
             igraph_vector_print(&AV_imag);
             igraph_vector_print(&lv_real);

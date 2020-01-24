@@ -101,7 +101,7 @@ int main() {
         return 1;
     }
     if (igraph_matrix_nrow(&vectors) != DIM ||
-            igraph_matrix_ncol(&vectors) != DIM) {
+        igraph_matrix_ncol(&vectors) != DIM) {
         return 2;
     }
     if (check_ev(&A, &values, &vectors, /*tol=*/ 1e-8)) {
@@ -124,7 +124,7 @@ int main() {
         return 4;
     }
     if (igraph_matrix_nrow(&vectors2) != DIM ||
-            igraph_matrix_ncol(&vectors2) != iu - il + 1) {
+        igraph_matrix_ncol(&vectors2) != iu - il + 1) {
         return 5;
     }
     for (i = 0; i < iu - il + 1; i++) {
@@ -178,7 +178,7 @@ int main() {
         return 4;
     }
     if (igraph_matrix_nrow(&vectors2) != DIM ||
-            igraph_matrix_ncol(&vectors2) != iu - il + 1) {
+        igraph_matrix_ncol(&vectors2) != iu - il + 1) {
         return 5;
     }
     for (i = 0; i < iu - il + 1; i++) {

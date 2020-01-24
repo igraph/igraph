@@ -268,9 +268,9 @@ int main() {
     igraph_vector_ptr_destroy_all(&v1);
 
     if (VECTOR(custom_destructor_stack)[0] != block1 ||
-            VECTOR(custom_destructor_stack)[1] != block2 ||
-            VECTOR(custom_destructor_stack)[2] != block1 ||
-            VECTOR(custom_destructor_stack)[3] != block2
+        VECTOR(custom_destructor_stack)[1] != block2 ||
+        VECTOR(custom_destructor_stack)[2] != block1 ||
+        VECTOR(custom_destructor_stack)[3] != block2
        ) {
         return 26;
     }

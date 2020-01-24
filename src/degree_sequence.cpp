@@ -29,10 +29,10 @@
 
 // (vertex, degree) pair
 struct vd_pair {
-   long vertex;
-   igraph_integer_t degree;
+    long vertex;
+    igraph_integer_t degree;
 
-   vd_pair(long vertex, igraph_integer_t degree) : vertex(vertex), degree(degree) {}
+    vd_pair(long vertex, igraph_integer_t degree) : vertex(vertex), degree(degree) {}
 };
 
 // (indegree, outdegree)
@@ -67,44 +67,50 @@ static int igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *ed
 
     std::vector<vd_pair> vertices;
     vertices.reserve(n);
-    for (int i=0; i < n; ++i)
+    for (int i = 0; i < n; ++i) {
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
+    }
 
     while (! vertices.empty()) {
-        if (largest)
+        if (largest) {
             std::stable_sort(vertices.begin(), vertices.end(), degree_less<vd_pair>);
-        else
+        } else {
             std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+        }
 
         // take the next vertex to be connected up
         vd_pair vd = vertices.back();
         vertices.pop_back();
 
-        if (vd.degree < 0)
+        if (vd.degree < 0) {
             IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
+        }
 
-        if (vd.degree == 0)
+        if (vd.degree == 0) {
             continue;
+        }
 
-        if (vertices.size() < size_t(vd.degree))
+        if (vertices.size() < size_t(vd.degree)) {
             goto fail;
+        }
 
         if (largest) {
-            for (int i=0; i < vd.degree; ++i) {
-                if (--(vertices[vertices.size() - 1 - i].degree) < 0)
+            for (int i = 0; i < vd.degree; ++i) {
+                if (--(vertices[vertices.size() - 1 - i].degree) < 0) {
                     goto fail;
+                }
 
-                VECTOR(*edges)[2*(ec+i)] = vd.vertex;
-                VECTOR(*edges)[2*(ec+i)+1] = vertices[vertices.size() - 1 - i].vertex;
+                VECTOR(*edges)[2 * (ec + i)] = vd.vertex;
+                VECTOR(*edges)[2 * (ec + i) + 1] = vertices[vertices.size() - 1 - i].vertex;
             }
         } else {
             // this loop can only be reached if all zero-degree nodes have already been removed
             // therefore decrementing remaining degrees is safe
-            for (int i=0; i < vd.degree; ++i) {
+            for (int i = 0; i < vd.degree; ++i) {
                 vertices[i].degree--;
 
-                VECTOR(*edges)[2*(ec+i)] = vd.vertex;
-                VECTOR(*edges)[2*(ec+i)+1] = vertices[i].vertex;
+                VECTOR(*edges)[2 * (ec + i)] = vd.vertex;
+                VECTOR(*edges)[2 * (ec + i) + 1] = vertices[i].vertex;
             }
         }
 
@@ -126,13 +132,15 @@ static int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector
 
     typedef std::list<vd_pair> vlist;
     vlist vertices;
-    for (int i=0; i < n; ++i)
+    for (int i = 0; i < n; ++i) {
         vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
+    }
 
     std::vector<vlist::iterator> pointers;
     pointers.reserve(n);
-    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it)
+    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
         pointers.push_back(it);
+    }
 
     for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
         vertices.sort(degree_greater<vd_pair>);
@@ -140,26 +148,29 @@ static int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector
         vd_pair vd = **pt;
         vertices.erase(*pt);
 
-        if (vd.degree < 0)
+        if (vd.degree < 0) {
             IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
+        }
 
-        if (vd.degree == 0)
+        if (vd.degree == 0) {
             continue;
+        }
 
         int k;
         vlist::iterator it;
         for (it = vertices.begin(), k = 0;
              k != vd.degree && it != vertices.end();
-             ++it, ++k)
-        {
-            if (--(it->degree) < 0)
+             ++it, ++k) {
+            if (--(it->degree) < 0) {
                 goto fail;
+            }
 
-            VECTOR(*edges)[2*(ec+k)] = vd.vertex;
-            VECTOR(*edges)[2*(ec+k)+1] = it->vertex;
+            VECTOR(*edges)[2 * (ec + k)] = vd.vertex;
+            VECTOR(*edges)[2 * (ec + k) + 1] = it->vertex;
         }
-        if (it == vertices.end() && k < vd.degree)
+        if (it == vertices.end() && k < vd.degree) {
             goto fail;
+        }
 
         ec += vd.degree;
     }
@@ -188,49 +199,56 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
 
     std::vector<vbd_pair> vertices;
     vertices.reserve(n);
-    for (int i=0; i < n; ++i)
+    for (int i = 0; i < n; ++i) {
         vertices.push_back(vbd_pair(i, bidegree(VECTOR(*indeg)[i], VECTOR(*outdeg)[i])));
+    }
 
     while (true) {
         // sort vertices by (in, out) degree pairs in decreasing order
         std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vbd_pair>);
 
         // remove (0,0)-degree vertices
-        while (!vertices.empty() && vertices.back().degree == bidegree(0,0))
+        while (!vertices.empty() && vertices.back().degree == bidegree(0, 0)) {
             vertices.pop_back();
+        }
 
         // if no vertices remain, stop
-        if (vertices.empty())
+        if (vertices.empty()) {
             break;
+        }
 
         // choose a vertex the out-stubs of which will be connected
         vbd_pair *vdp;
-        if (smallest)
+        if (smallest) {
             vdp = &*std::find_if(vertices.rbegin(), vertices.rend(), is_nonzero_outdeg);
-        else
+        } else {
             vdp = &*std::find_if(vertices.begin(), vertices.end(), is_nonzero_outdeg);
+        }
 
 
-        if (vdp->degree.first < 0 || vdp->degree.second < 0)
+        if (vdp->degree.first < 0 || vdp->degree.second < 0) {
             IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
+        }
 
         // are there a sufficient number of other vertices to connect to?
-        if (vertices.size() < vdp->degree.second - 1)
+        if (vertices.size() < vdp->degree.second - 1) {
             goto fail;
+        }
 
         // create the connections
-        int k=0;
+        int k = 0;
         for (std::vector<vbd_pair>::iterator it = vertices.begin();
              k < vdp->degree.second;
-             ++it)
-        {
-            if (it->vertex == vdp->vertex)
-                continue; // do not create a self-loop
-            if (--(it->degree.first) < 0)
+             ++it) {
+            if (it->vertex == vdp->vertex) {
+                continue;    // do not create a self-loop
+            }
+            if (--(it->degree.first) < 0) {
                 goto fail;
+            }
 
-            VECTOR(*edges)[2*(ec+k)] = vdp->vertex;
-            VECTOR(*edges)[2*(ec+k)+1] = it->vertex;
+            VECTOR(*edges)[2 * (ec + k)] = vdp->vertex;
+            VECTOR(*edges)[2 * (ec + k) + 1] = it->vertex;
 
             k++;
         }
@@ -254,13 +272,15 @@ static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igr
 
     typedef std::list<vbd_pair> vlist;
     vlist vertices;
-    for (int i=0; i < n; ++i)
+    for (int i = 0; i < n; ++i) {
         vertices.push_back(vbd_pair(i, bidegree(VECTOR(*indeg)[i], VECTOR(*outdeg)[i])));
+    }
 
     std::vector<vlist::iterator> pointers;
     pointers.reserve(n);
-    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it)
+    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
         pointers.push_back(it);
+    }
 
     for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
         // sort vertices by (in, out) degree pairs in decreasing order
@@ -270,31 +290,35 @@ static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igr
         // choose a vertex the out-stubs of which will be connected
         vbd_pair &vd = **pt;
 
-        if (vd.degree.second == 0)
+        if (vd.degree.second == 0) {
             continue;
+        }
 
-        if (vd.degree.first < 0 || vd.degree.second < 0)
+        if (vd.degree.first < 0 || vd.degree.second < 0) {
             IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
+        }
 
         int k = 0;
         vlist::iterator it;
         for (it = vertices.begin();
              k != vd.degree.second && it != vertices.end();
-             ++it)
-        {
-            if (it->vertex == vd.vertex)
+             ++it) {
+            if (it->vertex == vd.vertex) {
                 continue;
+            }
 
-            if (--(it->degree.first) < 0)
+            if (--(it->degree.first) < 0) {
                 goto fail;
+            }
 
-            VECTOR(*edges)[2*(ec+k)] = vd.vertex;
-            VECTOR(*edges)[2*(ec+k)+1] = it->vertex;
+            VECTOR(*edges)[2 * (ec + k)] = vd.vertex;
+            VECTOR(*edges)[2 * (ec + k) + 1] = it->vertex;
 
             ++k;
         }
-        if (it == vertices.end() && k < vd.degree.second)
+        if (it == vertices.end() && k < vd.degree.second) {
             goto fail;
+        }
 
         ec += vd.degree.second;
         vd.degree.second = 0;
@@ -308,15 +332,15 @@ fail:
 
 
 static int igraph_i_realize_undirected_degree_sequence(
-        igraph_t *graph,
-        const igraph_vector_t *deg,
-        igraph_realize_degseq_t method)
-{
+    igraph_t *graph,
+    const igraph_vector_t *deg,
+    igraph_realize_degseq_t method) {
     long node_count = igraph_vector_size(deg);
     long deg_sum = long(igraph_vector_sum(deg));
 
-    if (deg_sum % 2 != 0)
+    if (deg_sum % 2 != 0) {
         IGRAPH_ERROR("The sum of degrees must be even for an undirected graph", IGRAPH_EINVAL);
+    }
 
     igraph_vector_t edges;
     IGRAPH_CHECK(igraph_vector_init(&edges, deg_sum));
@@ -346,21 +370,22 @@ static int igraph_i_realize_undirected_degree_sequence(
 
 
 static int igraph_i_realize_directed_degree_sequence(
-        igraph_t *graph,
-        const igraph_vector_t *outdeg,
-        const igraph_vector_t *indeg,
-        igraph_realize_degseq_t method)
-{
+    igraph_t *graph,
+    const igraph_vector_t *outdeg,
+    const igraph_vector_t *indeg,
+    igraph_realize_degseq_t method) {
     long node_count = igraph_vector_size(outdeg);
     long edge_count = long(igraph_vector_sum(outdeg));
 
-    if (igraph_vector_size(indeg) != node_count)
+    if (igraph_vector_size(indeg) != node_count) {
         IGRAPH_ERROR("In- and out-degree sequences must have the same length", IGRAPH_EINVAL);
-    if (igraph_vector_sum(indeg) != edge_count)
+    }
+    if (igraph_vector_sum(indeg) != edge_count) {
         IGRAPH_ERROR("In- and out-degree sequences do not sum to the same value", IGRAPH_EINVAL);
+    }
 
     igraph_vector_t edges;
-    IGRAPH_CHECK(igraph_vector_init(&edges, 2*edge_count));
+    IGRAPH_CHECK(igraph_vector_init(&edges, 2 * edge_count));
     IGRAPH_FINALLY(igraph_vector_destroy, &edges);
 
     switch (method) {
@@ -443,23 +468,23 @@ static int igraph_i_realize_directed_degree_sequence(
  */
 
 int igraph_realize_degree_sequence(
-        igraph_t *graph,
-        const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
-        igraph_realize_degseq_t method)
-{
+    igraph_t *graph,
+    const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
+    igraph_realize_degseq_t method) {
     long n = igraph_vector_size(outdeg);
-    if (n != igraph_integer_t(n)) // does the vector size fit into an igraph_integer_t ?
+    if (n != igraph_integer_t(n)) { // does the vector size fit into an igraph_integer_t ?
         IGRAPH_ERROR("Degree sequence vector too long", IGRAPH_EINVAL);
+    }
 
     bool directed = bool(indeg) && igraph_vector_size(indeg) != 0;
 
     try {
-        if (directed)
+        if (directed) {
             return igraph_i_realize_directed_degree_sequence(graph, outdeg, indeg, method);
-        else
+        } else {
             return igraph_i_realize_undirected_degree_sequence(graph, outdeg, method);
-    }
-    catch (const std::bad_alloc &) {
+        }
+    } catch (const std::bad_alloc &) {
         IGRAPH_ERROR("Cannot realize degree sequence due to insufficient memory", IGRAPH_ENOMEM);
     }
 }

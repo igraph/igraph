@@ -1,27 +1,27 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
 
-#define CONCAT2x(a,b) a ## _ ## b 
+#define CONCAT2x(a,b) a ## _ ## b
 #define CONCAT2(a,b) CONCAT2x(a,b)
 #define CONCAT3x(a,b,c) a ## _ ## b ## _ ## c
 #define CONCAT3(a,b,c) CONCAT3x(a,b,c)
@@ -116,8 +116,8 @@
 #  define FUNCTION(dir,name) CONCAT2(dir,name)
 #  define TYPE(dir) CONCAT2(dir,t)
 #elif defined(BASE_BOOL)
-   /* Special case because stdbool.h defines bool as a macro to _Bool which would
-    * screw things up */
+/* Special case because stdbool.h defines bool as a macro to _Bool which would
+ * screw things up */
 #  define FUNCTION(a,c) CONCAT3x(a,bool,c)
 #  define TYPE(dir) CONCAT3x(dir,bool,t)
 #else
