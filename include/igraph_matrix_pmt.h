@@ -24,8 +24,7 @@
 typedef struct TYPE(igraph_matrix) {
     TYPE(igraph_vector) data;
     long int nrow, ncol;
-}
-TYPE(igraph_matrix);
+} TYPE(igraph_matrix);
 
 /*---------------*/
 /* Allocation    */

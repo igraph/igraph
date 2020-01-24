@@ -31,8 +31,7 @@ typedef struct TYPE(igraph_dqueue) {
     BASE *end;
     BASE *stor_begin;
     BASE *stor_end;
-}
-TYPE(igraph_dqueue);
+} TYPE(igraph_dqueue);
 
 DECLDIR int FUNCTION(igraph_dqueue,init)    (TYPE(igraph_dqueue)* q, long int size);
 DECLDIR void FUNCTION(igraph_dqueue,destroy) (TYPE(igraph_dqueue)* q);

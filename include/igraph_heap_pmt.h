@@ -26,8 +26,7 @@ typedef struct TYPE(igraph_heap) {
     BASE* stor_end;
     BASE* end;
     int destroy;
-}
-TYPE(igraph_heap);
+} TYPE(igraph_heap);
 
 DECLDIR int FUNCTION(igraph_heap,init)(TYPE(igraph_heap)* h, long int size);
 DECLDIR int FUNCTION(igraph_heap,init_array)(TYPE(igraph_heap) *t, BASE* data, long int len);
