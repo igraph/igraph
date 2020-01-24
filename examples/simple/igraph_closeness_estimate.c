@@ -424,19 +424,19 @@ int main(void) {
         return 1;
     }
     if (simple_test_case_with_weights_undirected() == 1) {
-        return 2;
+        return 1;
     }
     if (advanced_test_case_no_weights_undirected() == 1) {
-        return 3;
+        return 1;
     }
     if (advanced_test_case_with_weights() == 1) {
-        return 4;
+        return 1;
     }
     if (disconnected_graph_test() == 1) {
-        return 5;
+        return 1;
     }
     if (linear_graph_test() == 1) {
-        return 6;
+        return 1;
     }
     
     return 0;
