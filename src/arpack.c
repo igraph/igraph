@@ -34,152 +34,87 @@
 
 int igraph_i_arpack_err_dsaupd(int error) {
     switch (error) {
-    case  1:
-        return IGRAPH_ARPACK_MAXIT;
-    case  3:
-        return IGRAPH_ARPACK_NOSHIFT;
-    case -1:
-        return IGRAPH_ARPACK_NPOS;
-    case -2:
-        return IGRAPH_ARPACK_NEVNPOS;
-    case -3:
-        return IGRAPH_ARPACK_NCVSMALL;
-    case -4:
-        return IGRAPH_ARPACK_NONPOSI;
-    case -5:
-        return IGRAPH_ARPACK_WHICHINV;
-    case -6:
-        return IGRAPH_ARPACK_BMATINV;
-    case -7:
-        return IGRAPH_ARPACK_WORKLSMALL;
-    case -8:
-        return IGRAPH_ARPACK_TRIDERR;
-    case -9:
-        return IGRAPH_ARPACK_ZEROSTART;
-    case -10:
-        return IGRAPH_ARPACK_MODEINV;
-    case -11:
-        return IGRAPH_ARPACK_MODEBMAT;
-    case -12:
-        return IGRAPH_ARPACK_ISHIFT;
-    case -13:
-        return IGRAPH_ARPACK_NEVBE;
-    case -9999:
-        return IGRAPH_ARPACK_NOFACT;
-    default:
-        return IGRAPH_ARPACK_UNKNOWN;
+    case  1:      return IGRAPH_ARPACK_MAXIT;
+    case  3:      return IGRAPH_ARPACK_NOSHIFT;
+    case -1:      return IGRAPH_ARPACK_NPOS;
+    case -2:      return IGRAPH_ARPACK_NEVNPOS;
+    case -3:      return IGRAPH_ARPACK_NCVSMALL;
+    case -4:      return IGRAPH_ARPACK_NONPOSI;
+    case -5:      return IGRAPH_ARPACK_WHICHINV;
+    case -6:      return IGRAPH_ARPACK_BMATINV;
+    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+    case -8:      return IGRAPH_ARPACK_TRIDERR;
+    case -9:      return IGRAPH_ARPACK_ZEROSTART;
+    case -10:     return IGRAPH_ARPACK_MODEINV;
+    case -11:     return IGRAPH_ARPACK_MODEBMAT;
+    case -12:     return IGRAPH_ARPACK_ISHIFT;
+    case -13:     return IGRAPH_ARPACK_NEVBE;
+    case -9999:   return IGRAPH_ARPACK_NOFACT;
+    default:      return IGRAPH_ARPACK_UNKNOWN;
     }
 }
 
 int igraph_i_arpack_err_dseupd(int error) {
     switch (error) {
-    case -1:
-        return IGRAPH_ARPACK_NPOS;
-    case -2:
-        return IGRAPH_ARPACK_NEVNPOS;
-    case -3:
-        return IGRAPH_ARPACK_NCVSMALL;
-    case -5:
-        return IGRAPH_ARPACK_WHICHINV;
-    case -6:
-        return IGRAPH_ARPACK_BMATINV;
-    case -7:
-        return IGRAPH_ARPACK_WORKLSMALL;
-    case -8:
-        return IGRAPH_ARPACK_TRIDERR;
-    case -9:
-        return IGRAPH_ARPACK_ZEROSTART;
-    case -10:
-        return IGRAPH_ARPACK_MODEINV;
-    case -11:
-        return IGRAPH_ARPACK_MODEBMAT;
-    case -12:
-        return IGRAPH_ARPACK_NEVBE;
-    case -14:
-        return IGRAPH_ARPACK_FAILED;
-    case -15:
-        return IGRAPH_ARPACK_HOWMNY;
-    case -16:
-        return IGRAPH_ARPACK_HOWMNYS;
-    case -17:
-        return IGRAPH_ARPACK_EVDIFF;
-    default:
-        return IGRAPH_ARPACK_UNKNOWN;
+    case -1:      return IGRAPH_ARPACK_NPOS;
+    case -2:      return IGRAPH_ARPACK_NEVNPOS;
+    case -3:      return IGRAPH_ARPACK_NCVSMALL;
+    case -5:      return IGRAPH_ARPACK_WHICHINV;
+    case -6:      return IGRAPH_ARPACK_BMATINV;
+    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+    case -8:      return IGRAPH_ARPACK_TRIDERR;
+    case -9:      return IGRAPH_ARPACK_ZEROSTART;
+    case -10:     return IGRAPH_ARPACK_MODEINV;
+    case -11:     return IGRAPH_ARPACK_MODEBMAT;
+    case -12:     return IGRAPH_ARPACK_NEVBE;
+    case -14:     return IGRAPH_ARPACK_FAILED;
+    case -15:     return IGRAPH_ARPACK_HOWMNY;
+    case -16:     return IGRAPH_ARPACK_HOWMNYS;
+    case -17:     return IGRAPH_ARPACK_EVDIFF;
+    default:      return IGRAPH_ARPACK_UNKNOWN;
     }
 
 }
 
 int igraph_i_arpack_err_dnaupd(int error) {
     switch (error) {
-    case  1:
-        return IGRAPH_ARPACK_MAXIT;
-    case  3:
-        return IGRAPH_ARPACK_NOSHIFT;
-    case -1:
-        return IGRAPH_ARPACK_NPOS;
-    case -2:
-        return IGRAPH_ARPACK_NEVNPOS;
-    case -3:
-        return IGRAPH_ARPACK_NCVSMALL;
-    case -4:
-        return IGRAPH_ARPACK_NONPOSI;
-    case -5:
-        return IGRAPH_ARPACK_WHICHINV;
-    case -6:
-        return IGRAPH_ARPACK_BMATINV;
-    case -7:
-        return IGRAPH_ARPACK_WORKLSMALL;
-    case -8:
-        return IGRAPH_ARPACK_TRIDERR;
-    case -9:
-        return IGRAPH_ARPACK_ZEROSTART;
-    case -10:
-        return IGRAPH_ARPACK_MODEINV;
-    case -11:
-        return IGRAPH_ARPACK_MODEBMAT;
-    case -12:
-        return IGRAPH_ARPACK_ISHIFT;
-    case -9999:
-        return IGRAPH_ARPACK_NOFACT;
-    default:
-        return IGRAPH_ARPACK_UNKNOWN;
+    case  1:      return IGRAPH_ARPACK_MAXIT;
+    case  3:      return IGRAPH_ARPACK_NOSHIFT;
+    case -1:      return IGRAPH_ARPACK_NPOS;
+    case -2:      return IGRAPH_ARPACK_NEVNPOS;
+    case -3:      return IGRAPH_ARPACK_NCVSMALL;
+    case -4:      return IGRAPH_ARPACK_NONPOSI;
+    case -5:      return IGRAPH_ARPACK_WHICHINV;
+    case -6:      return IGRAPH_ARPACK_BMATINV;
+    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+    case -8:      return IGRAPH_ARPACK_TRIDERR;
+    case -9:      return IGRAPH_ARPACK_ZEROSTART;
+    case -10:     return IGRAPH_ARPACK_MODEINV;
+    case -11:     return IGRAPH_ARPACK_MODEBMAT;
+    case -12:     return IGRAPH_ARPACK_ISHIFT;
+    case -9999:   return IGRAPH_ARPACK_NOFACT;
+    default:      return IGRAPH_ARPACK_UNKNOWN;
     }
 }
 
 int igraph_i_arpack_err_dneupd(int error) {
     switch (error) {
-    case  1:
-        return IGRAPH_ARPACK_REORDER;
-    case -1:
-        return IGRAPH_ARPACK_NPOS;
-    case -2:
-        return IGRAPH_ARPACK_NEVNPOS;
-    case -3:
-        return IGRAPH_ARPACK_NCVSMALL;
-    case -5:
-        return IGRAPH_ARPACK_WHICHINV;
-    case -6:
-        return IGRAPH_ARPACK_BMATINV;
-    case -7:
-        return IGRAPH_ARPACK_WORKLSMALL;
-    case -8:
-        return IGRAPH_ARPACK_SHUR;
-    case -9:
-        return IGRAPH_ARPACK_LAPACK;
-    case -10:
-        return IGRAPH_ARPACK_MODEINV;
-    case -11:
-        return IGRAPH_ARPACK_MODEBMAT;
-    case -12:
-        return IGRAPH_ARPACK_HOWMNYS;
-    case -13:
-        return IGRAPH_ARPACK_HOWMNY;
-    case -14:
-        return IGRAPH_ARPACK_FAILED;
-    case -15:
-        return IGRAPH_ARPACK_EVDIFF;
-    default:
-        return IGRAPH_ARPACK_UNKNOWN;
+    case  1:      return IGRAPH_ARPACK_REORDER;
+    case -1:      return IGRAPH_ARPACK_NPOS;
+    case -2:      return IGRAPH_ARPACK_NEVNPOS;
+    case -3:      return IGRAPH_ARPACK_NCVSMALL;
+    case -5:      return IGRAPH_ARPACK_WHICHINV;
+    case -6:      return IGRAPH_ARPACK_BMATINV;
+    case -7:      return IGRAPH_ARPACK_WORKLSMALL;
+    case -8:      return IGRAPH_ARPACK_SHUR;
+    case -9:      return IGRAPH_ARPACK_LAPACK;
+    case -10:     return IGRAPH_ARPACK_MODEINV;
+    case -11:     return IGRAPH_ARPACK_MODEBMAT;
+    case -12:     return IGRAPH_ARPACK_HOWMNYS;
+    case -13:     return IGRAPH_ARPACK_HOWMNY;
+    case -14:     return IGRAPH_ARPACK_FAILED;
+    case -15:     return IGRAPH_ARPACK_EVDIFF;
+    default:      return IGRAPH_ARPACK_UNKNOWN;
     }
 }
 
@@ -206,8 +141,7 @@ int igraph_i_arpack_err_dneupd(int error) {
 void igraph_arpack_options_init(igraph_arpack_options_t *o) {
     o->bmat[0] = 'I';
     o->n = 0;       /* needs to be updated! */
-    o->which[0] = 'X';
-    o->which[1] = 'X';
+    o->which[0] = 'X'; o->which[1] = 'X';
     o->nev = 1;
     o->tol = 0;
     o->ncv = 0;       /* 0 means "automatic" */
@@ -276,31 +210,21 @@ int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
-    s->v = igraph_Calloc(maxldv * maxncv, igraph_real_t);
-    CHECKMEM(s->v);
-    s->workd = igraph_Calloc(3 * maxn, igraph_real_t);
-    CHECKMEM(s->workd);
-    s->d = igraph_Calloc(2 * maxncv, igraph_real_t);
-    CHECKMEM(s->d);
-    s->resid = igraph_Calloc(maxn, igraph_real_t);
-    CHECKMEM(s->resid);
-    s->ax = igraph_Calloc(maxn, igraph_real_t);
-    CHECKMEM(s->ax);
-    s->select = igraph_Calloc(maxncv, int);
-    CHECKMEM(s->select);
+    s->v = igraph_Calloc(maxldv * maxncv, igraph_real_t); CHECKMEM(s->v);
+    s->workd = igraph_Calloc(3 * maxn, igraph_real_t); CHECKMEM(s->workd);
+    s->d = igraph_Calloc(2 * maxncv, igraph_real_t); CHECKMEM(s->d);
+    s->resid = igraph_Calloc(maxn, igraph_real_t); CHECKMEM(s->resid);
+    s->ax = igraph_Calloc(maxn, igraph_real_t); CHECKMEM(s->ax);
+    s->select = igraph_Calloc(maxncv, int); CHECKMEM(s->select);
 
     if (symm) {
-        s->workl = igraph_Calloc(maxncv * (maxncv + 8), igraph_real_t);
-        CHECKMEM(s->workl);
+        s->workl = igraph_Calloc(maxncv * (maxncv + 8), igraph_real_t); CHECKMEM(s->workl);
         s->di = 0;
         s->workev = 0;
     } else {
-        s->workl = igraph_Calloc(3 * maxncv * (maxncv + 2), igraph_real_t);
-        CHECKMEM(s->workl);
-        s->di = igraph_Calloc(2 * maxncv, igraph_real_t);
-        CHECKMEM(s->di);
-        s->workev = igraph_Calloc(3 * maxncv, igraph_real_t);
-        CHECKMEM(s->workev);
+        s->workl = igraph_Calloc(3 * maxncv * (maxncv + 2), igraph_real_t); CHECKMEM(s->workl);
+        s->di = igraph_Calloc(2 * maxncv, igraph_real_t); CHECKMEM(s->di);
+        s->workev = igraph_Calloc(3 * maxncv, igraph_real_t); CHECKMEM(s->workev);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
@@ -649,15 +573,9 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
     /* eval1 is always the larger eigenvalue. If we want the smaller
      * one, we have to swap eval1 with eval2 and also the columns of mat */
     if (options->which[0] == 'S') {
-        trace = eval1;
-        eval1 = eval2;
-        eval2 = trace;
-        trace = mat[0];
-        mat[0] = mat[2];
-        mat[2] = trace;
-        trace = mat[1];
-        mat[1] = mat[3];
-        mat[3] = trace;
+        trace = eval1; eval1 = eval2; eval2 = trace;
+        trace = mat[0]; mat[0] = mat[2]; mat[2] = trace;
+        trace = mat[1]; mat[1] = mat[3]; mat[3] = trace;
     } else if (options->which[0] == 'L' || options->which[0] == 'B') {
         /* Nothing to do here */
     } else if (options->which[0] == 'X' && options->which[1] == 'X') {
@@ -1050,20 +968,13 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
-        v = igraph_Calloc(options->ldv * options->ncv, igraph_real_t);
-        CHECKMEM(v);
-        workl = igraph_Calloc(options->lworkl, igraph_real_t);
-        CHECKMEM(workl);
-        workd = igraph_Calloc(3 * options->n, igraph_real_t);
-        CHECKMEM(workd);
-        d = igraph_Calloc(2 * options->ncv, igraph_real_t);
-        CHECKMEM(d);
-        resid = igraph_Calloc(options->n, igraph_real_t);
-        CHECKMEM(resid);
-        ax = igraph_Calloc(options->n, igraph_real_t);
-        CHECKMEM(ax);
-        select = igraph_Calloc(options->ncv, int);
-        CHECKMEM(select);
+        v = igraph_Calloc(options->ldv * options->ncv, igraph_real_t); CHECKMEM(v);
+        workl = igraph_Calloc(options->lworkl, igraph_real_t); CHECKMEM(workl);
+        workd = igraph_Calloc(3 * options->n, igraph_real_t); CHECKMEM(workd);
+        d = igraph_Calloc(2 * options->ncv, igraph_real_t); CHECKMEM(d);
+        resid = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
+        ax = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(ax);
+        select = igraph_Calloc(options->ncv, int); CHECKMEM(select);
 
 #undef CHECKMEM
 
@@ -1316,23 +1227,15 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     } \
     IGRAPH_FINALLY(igraph_free, x);
 
-        v = igraph_Calloc(options->n * options->ncv, igraph_real_t);
-        CHECKMEM(v);
-        workl = igraph_Calloc(options->lworkl, igraph_real_t);
-        CHECKMEM(workl);
-        workd = igraph_Calloc(3 * options->n, igraph_real_t);
-        CHECKMEM(workd);
+        v = igraph_Calloc(options->n * options->ncv, igraph_real_t); CHECKMEM(v);
+        workl = igraph_Calloc(options->lworkl, igraph_real_t); CHECKMEM(workl);
+        workd = igraph_Calloc(3 * options->n, igraph_real_t); CHECKMEM(workd);
         d_size = 2 * options->nev + 1 > options->ncv ? 2 * options->nev + 1 : options->ncv;
-        dr = igraph_Calloc(d_size, igraph_real_t);
-        CHECKMEM(dr);
-        di = igraph_Calloc(d_size, igraph_real_t);
-        CHECKMEM(di);
-        resid = igraph_Calloc(options->n, igraph_real_t);
-        CHECKMEM(resid);
-        select = igraph_Calloc(options->ncv, int);
-        CHECKMEM(select);
-        workev = igraph_Calloc(3 * options->ncv, igraph_real_t);
-        CHECKMEM(workev);
+        dr = igraph_Calloc(d_size, igraph_real_t); CHECKMEM(dr);
+        di = igraph_Calloc(d_size, igraph_real_t); CHECKMEM(di);
+        resid = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
+        select = igraph_Calloc(options->ncv, int); CHECKMEM(select);
+        workev = igraph_Calloc(3 * options->ncv, igraph_real_t); CHECKMEM(workev);
 
 #undef CHECKMEM
 
