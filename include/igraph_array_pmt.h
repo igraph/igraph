@@ -24,8 +24,7 @@
 typedef struct TYPE(igraph_array3) {
     TYPE(igraph_vector) data;
     long int n1, n2, n3, n1n2;
-}
-TYPE(igraph_array3);
+} TYPE(igraph_array3);
 
 #ifndef IGRAPH_ARRAY3_INIT_FINALLY
 #define IGRAPH_ARRAY3_INIT_FINALLY(a, n1, n2, n3) \

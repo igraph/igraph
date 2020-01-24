@@ -32,8 +32,7 @@ typedef struct TYPE(igraph_stack) {
     BASE* stor_begin;
     BASE* stor_end;
     BASE* end;
-}
-TYPE(igraph_stack);
+} TYPE(igraph_stack);
 
 DECLDIR int FUNCTION(igraph_stack,init)(TYPE(igraph_stack)* s, long int size);
 DECLDIR void FUNCTION(igraph_stack,destroy)(TYPE(igraph_stack)* s);
