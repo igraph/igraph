@@ -21,10 +21,17 @@
 --pad-oper
 --pad-header
 
+# Continuation blocks should have no extra indentation
+--min-conditional-indent=0
+
 # Indent preprocessor blocks and defines
 --indent-preproc-block
 --indent-preproc-define
 
 # Add braces around single-line branches
 --add-braces
+
+# Keep complex statement sequences on the same line; they are that way for
+# a reason
+--keep-one-line-statements
 
