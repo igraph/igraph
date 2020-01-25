@@ -620,7 +620,7 @@ int igraph_hrg_dendrogram(igraph_t *graph,
     igraph_vector_ptr_destroy(&vattrs);
     igraph_vector_destroy(&edges);
     igraph_vector_destroy(&prob);
-    IGRAPH_FINALLY_CLEAN(4);    // + 1 for graph
+    IGRAPH_FINALLY_CLEAN(4);  // + 1 for graph
 
     return 0;
 }
@@ -968,13 +968,8 @@ int igraph_hrg_create(igraph_hrg_t *hrg,
     for (int i = 0; i < no_of_nodes; i++) {
         int d = VECTOR(deg)[i];
         switch (d) {
-        case 0:
-            d0++;
-            root = i;
-            break;
-        case 1:
-            d1++;
-            break;
+        case 0: d0++; root = i; break;
+        case 1: d1++; break;
         default:
             IGRAPH_ERROR("HRG nodes must have in-degree one, except for the "
                          "root vertex", IGRAPH_EINVAL);
@@ -993,12 +988,8 @@ int igraph_hrg_create(igraph_hrg_t *hrg,
     for (int i = 0; i < no_of_nodes; i++) {
         int d = VECTOR(deg)[i];
         switch (d) {
-        case 0:
-            d0++;
-            break;
-        case 2:
-            d2++;
-            break;
+        case 0: d0++; break;
+        case 2: d2++; break;
         default:
             IGRAPH_ERROR("HRG nodes must have out-degree 2 (internal nodes) or "
                          "degree 0 (leaves)", IGRAPH_EINVAL);

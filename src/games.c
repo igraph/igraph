@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=8 sw=2 sts=2 et: */
 /*
    IGraph R library.
    Copyright (C) 2003-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -124,7 +124,7 @@ int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     if (bag == 0) {
         IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, bag);  /* TODO: hack */
+    IGRAPH_FINALLY(free, bag);    /* TODO: hack */
 
     /* The first node(s) in the bag */
     if (start_from) {
@@ -860,7 +860,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     if (bag1 == 0) {
         IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, bag1);     /* TODO: hack */
+    IGRAPH_FINALLY(free, bag1);   /* TODO: hack */
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < VECTOR(*out_seq)[i]; j++) {
@@ -893,8 +893,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
             igraph_vector_push_back(&edges, bag2[to]);   /* ditto */
             bag1[from] = bag1[bagp1 - 1];
             bag2[to] = bag2[bagp2 - 1];
-            bagp1--;
-            bagp2--;
+            bagp1--; bagp2--;
         }
     } else {
         for (i = 0; i < no_of_edges; i++) {
@@ -999,9 +998,7 @@ int igraph_degree_sequence_game_no_multiple_undirected(
                 to = (igraph_integer_t) VECTOR(stubs)[i++];
 
                 if (from > to) {
-                    dummy = from;
-                    from = to;
-                    to = dummy;
+                    dummy = from; from = to; to = dummy;
                 }
 
                 neis = igraph_adjlist_get(&al, from);
@@ -1033,9 +1030,7 @@ int igraph_degree_sequence_game_no_multiple_undirected(
                             break;
                         }
                         if (from > to) {
-                            dummy = from;
-                            from = to;
-                            to = dummy;
+                            dummy = from; from = to; to = dummy;
                         }
                         neis = igraph_adjlist_get(&al, from);
                         if (!igraph_vector_int_binsearch(neis, to, 0)) {
@@ -1333,8 +1328,7 @@ int igraph_degree_sequence_game_no_multiple_directed_uniform(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&in_stubs, ecount);
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * ecount);
 
-    k = 0;
-    l = 0;
+    k = 0; l = 0;
     for (i = 0; i < vcount; ++i) {
         long dout, din;
 
@@ -2886,8 +2880,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
                             from--;
                         }
                         while (c > 0) {
-                            c--;
-                            from--;
+                            c--; from--;
                             if (VECTOR(*v1)[from] == VECTOR(*v2)[to]) {
                                 from--;
                             }
@@ -4118,9 +4111,7 @@ int igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
 
             /* For undirected graphs, ensure that from < to */
             if (!is_directed && from > to) {
-                pos = from;
-                from = to;
-                to = pos;
+                pos = from; from = to; to = pos;
             }
 
             /* Is there already an edge? If so, try again */
@@ -4526,9 +4517,7 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
 { if (p_d < no_del) { \
             next_d = VECTOR(delete)[p_d]; } else { next_d = inf; } }
 
-    UPD_E();
-    UPD_A();
-    UPD_D();
+    UPD_E(); UPD_A(); UPD_D();
 
     while (next_e != inf || next_a != inf || next_d != inf) {
         if (next_e <= next_a && next_e < next_d) {
@@ -4536,18 +4525,13 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
             /* keep an edge */
             IGRAPH_CHECK(igraph_vector_push_back(&newedges, VECTOR(edges)[2 * p_e]));
             IGRAPH_CHECK(igraph_vector_push_back(&newedges, VECTOR(edges)[2 * p_e + 1]));
-            p_e ++;
-            UPD_E();
-            UPD_A()
+            p_e ++; UPD_E(); UPD_A()
 
         } else if (next_e <= next_a && next_e == next_d) {
 
             /* delete an edge */
-            p_e ++;
-            UPD_E();
-            UPD_A();
-            p_d++;
-            UPD_D();
+            p_e ++; UPD_E(); UPD_A();
+            p_d++; UPD_D();
 
         } else {
 
@@ -4565,8 +4549,7 @@ int igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
             }
             IGRAPH_CHECK(igraph_vector_push_back(&newedges, from));
             IGRAPH_CHECK(igraph_vector_push_back(&newedges, to));
-            p_a++;
-            UPD_A();
+            p_a++; UPD_A();
 
         }
     }

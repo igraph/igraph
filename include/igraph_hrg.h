@@ -111,4 +111,4 @@ DECLDIR int igraph_hrg_create(igraph_hrg_t *hrg,
 
 __END_DECLS
 
-#endif	/* IGRAPH_HRG_H */
+#endif  /* IGRAPH_HRG_H */

@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -591,8 +591,7 @@ int igraph_i_community_leiden_aggregate(
             long int c2 = VECTOR(neighbor_clusters)[i];
 
             /* Add edge */
-            igraph_vector_push_back(&aggregated_edges, c);
-            igraph_vector_push_back(&aggregated_edges, c2);
+            igraph_vector_push_back(&aggregated_edges, c); igraph_vector_push_back(&aggregated_edges, c2);
 
             /* Add edge weight */
             igraph_vector_push_back(aggregated_edge_weights, VECTOR(edge_weight_to_cluster)[c2]);

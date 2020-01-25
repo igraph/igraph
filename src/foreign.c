@@ -884,8 +884,7 @@ int igraph_i_read_graph_graphdb_getword(FILE *instream) {
     b1 = fgetc(instream);
     b2 = fgetc(instream);
     if (b1 != EOF) {
-        c1 = (unsigned char) b1;
-        c2 = (unsigned char) b2;
+        c1 = (unsigned char) b1; c2 = (unsigned char) b2;
         return c1 | (c2 << 8);
     } else {
         return -1;
@@ -1114,9 +1113,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     long int edgeptr = 0;
     igraph_i_gml_parsedata_t context;
 
-    attrs[0] = &gattrs;
-    attrs[1] = &vattrs;
-    attrs[2] = &eattrs;
+    attrs[0] = &gattrs; attrs[1] = &vattrs; attrs[2] = &eattrs;
 
     context.eof = 0;
     context.tree = 0;
@@ -1283,7 +1280,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                         }
                     }
                 }
-            }   /* for */
+            } /* for */
             if (!has_source) {
                 IGRAPH_ERROR("No 'source' for edge in GML file", IGRAPH_PARSEERROR);
             }
@@ -1988,22 +1985,18 @@ int igraph_i_pajek_escape(char* src, char** dest) {
     }
 
     d = *dest;
-    *d = '"';
-    d++;
+    *d = '"'; d++;
 
     for (s = src; *s; s++, d++) {
         switch (*s) {
         case '\\':
         case '"':
-            *d = '\\';
-            d++;
+            *d = '\\'; d++;
         default:
             *d = *s;
         }
     }
-    *d = '"';
-    d++;
-    *d = 0;
+    *d = '"'; d++; *d = 0;
 
     return IGRAPH_SUCCESS;
 }
@@ -2133,8 +2126,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
                                    "type");
         if (type_type == IGRAPH_ATTRIBUTE_BOOLEAN) {
             int bptr = 0, tptr = 0;
-            bipartite = 1;
-            write_vertex_attrs = 1;
+            bipartite = 1; write_vertex_attrs = 1;
             /* Count top and bottom vertices, we go over them twice,
             because we want to keep their original order */
             IGRAPH_CHECK(igraph_vector_int_init(&bip_index, no_of_nodes));
@@ -2602,8 +2594,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
             char *n;
             igraph_strvector_get(&vnames, i, &n);
             if (!strcmp(n, "id") && VECTOR(vtypes)[i] == IGRAPH_ATTRIBUTE_NUMERIC) {
-                found = 1;
-                break;
+                found = 1; break;
             }
         }
         if (found) {
@@ -2778,19 +2769,13 @@ int igraph_i_dot_escape(const char *orig, char **result) {
                 newlen++;
             }
         } else if (orig[i] == '_') {
-            is_number = 0;
-            newlen++;
+            is_number = 0; newlen++;
         } else if (orig[i] == '\\' || orig[i] == '"' || orig[i] == '\n') {
-            need_quote = 1;
-            is_number = 0;
-            newlen += 2; /* will be escaped */
+            need_quote = 1; is_number = 0; newlen += 2; /* will be escaped */
         } else if (isalpha(orig[i])) {
-            is_number = 0;
-            newlen++;
+            is_number = 0; newlen++;
         } else {
-            is_number = 0;
-            need_quote = 1;
-            newlen++;
+            is_number = 0; need_quote = 1; newlen++;
         }
     }
     if (is_number && orig[len - 1] == '.') {
@@ -3232,8 +3217,7 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                                                 IGRAPH_ATTRIBUTE_VERTEX, vertex_attr_name));
         if (vertex_attr_type != IGRAPH_ATTRIBUTE_NUMERIC &&
             vertex_attr_type != IGRAPH_ATTRIBUTE_STRING) {
-            vertex_attr_name = 0;
-            vertex_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
+            vertex_attr_name = 0; vertex_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
             IGRAPH_WARNING("specified vertex attribute must be numeric or string");
         }
     }
@@ -3249,8 +3233,7 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                                                 IGRAPH_ATTRIBUTE_EDGE, edge_attr_name));
         if (edge_attr_type != IGRAPH_ATTRIBUTE_NUMERIC &&
             edge_attr_type != IGRAPH_ATTRIBUTE_STRING) {
-            edge_attr_name = 0;
-            edge_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
+            edge_attr_name = 0; edge_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
             IGRAPH_WARNING("specified edge attribute must be numeric or string");
         }
     }

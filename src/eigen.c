@@ -166,8 +166,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
             w = i;
         }
     }
-    p1 = w - 1;
-    p2 = w;
+    p1 = w - 1; p2 = w;
 
     if (values) {
         IGRAPH_CHECK(igraph_vector_resize(values, which->howmany));
@@ -498,16 +497,14 @@ int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
     options->n = n;
     options->nev = high;
     options->ncv = 2 * options->nev < n ? 2 * options->nev : n;
-    options->which[0] = 'L';
-    options->which[1] = 'A';
+    options->which[0] = 'L'; options->which[1] = 'A';
 
     IGRAPH_CHECK(igraph_arpack_rssolve(fun, extra, options, storage,
                                        &tmpvalues, &tmpvectors));
 
     options->nev = low;
     options->ncv = 2 * options->nev < n ? 2 * options->nev : n;
-    options->which[0] = 'S';
-    options->which[1] = 'A';
+    options->which[0] = 'S'; options->which[1] = 'A';
 
     IGRAPH_CHECK(igraph_arpack_rssolve(fun, extra, options, storage,
                                        &tmpvalues2, &tmpvectors2));
@@ -515,21 +512,17 @@ int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
     IGRAPH_CHECK(igraph_vector_resize(values, low + high));
     IGRAPH_CHECK(igraph_matrix_resize(vectors, n, low + high));
 
-    l1 = 0;
-    l2 = 0;
-    w = 0;
+    l1 = 0; l2 = 0; w = 0;
     while (w < which->howmany) {
         VECTOR(*values)[w] = VECTOR(tmpvalues)[l1];
         memcpy(&MATRIX(*vectors, 0, w), &MATRIX(tmpvectors, 0, l1),
                (size_t) n * sizeof(igraph_real_t));
-        w++;
-        l1++;
+        w++; l1++;
         if (w < which->howmany) {
             VECTOR(*values)[w] = VECTOR(tmpvalues2)[l2];
             memcpy(&MATRIX(*vectors, 0, w), &MATRIX(tmpvectors2, 0, l2),
                    (size_t) n * sizeof(igraph_real_t));
-            w++;
-            l2++;
+            w++; l2++;
         }
     }
 
@@ -571,28 +564,23 @@ int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
 
         switch (which->pos) {
         case IGRAPH_EIGEN_LM:
-            options->which[0] = 'L';
-            options->which[1] = 'M';
+            options->which[0] = 'L'; options->which[1] = 'M';
             options->nev = which->howmany;
             break;
         case IGRAPH_EIGEN_SM:
-            options->which[0] = 'S';
-            options->which[1] = 'M';
+            options->which[0] = 'S'; options->which[1] = 'M';
             options->nev = which->howmany;
             break;
         case IGRAPH_EIGEN_LA:
-            options->which[0] = 'L';
-            options->which[1] = 'A';
+            options->which[0] = 'L'; options->which[1] = 'A';
             options->nev = which->howmany;
             break;
         case IGRAPH_EIGEN_SA:
-            options->which[0] = 'S';
-            options->which[1] = 'A';
+            options->which[0] = 'S'; options->which[1] = 'A';
             options->nev = which->howmany;
             break;
         case IGRAPH_EIGEN_ALL:
-            options->which[0] = 'L';
-            options->which[1] = 'M';
+            options->which[0] = 'L'; options->which[1] = 'M';
             options->nev = n;
             break;
         case IGRAPH_EIGEN_INTERVAL:
@@ -1391,28 +1379,23 @@ int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
 
     switch (which->pos) {
     case IGRAPH_EIGEN_LM:
-        options->which[0] = 'L';
-        options->which[1] = 'M';
+        options->which[0] = 'L'; options->which[1] = 'M';
         options->nev = which->howmany;
         break;
     case IGRAPH_EIGEN_SM:
-        options->which[0] = 'S';
-        options->which[1] = 'M';
+        options->which[0] = 'S'; options->which[1] = 'M';
         options->nev = which->howmany;
         break;
     case IGRAPH_EIGEN_LA:
-        options->which[0] = 'L';
-        options->which[1] = 'A';
+        options->which[0] = 'L'; options->which[1] = 'A';
         options->nev = which->howmany;
         break;
     case IGRAPH_EIGEN_SA:
-        options->which[0] = 'S';
-        options->which[1] = 'A';
+        options->which[0] = 'S'; options->which[1] = 'A';
         options->nev = which->howmany;
         break;
     case IGRAPH_EIGEN_ALL:
-        options->which[0] = 'L';
-        options->which[1] = 'M';
+        options->which[0] = 'L'; options->which[1] = 'M';
         options->nev = n;
         break;
     case IGRAPH_EIGEN_BE:

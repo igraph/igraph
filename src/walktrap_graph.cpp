@@ -170,8 +170,7 @@ int Graph::convert_from_igraph(const igraph_t *graph,
         int v1, v2;
         w = weights ? VECTOR(*weights)[i] : 1.0;
         igraph_edge(graph, i, &from, &to);
-        v1 = (int)from;
-        v2 = (int)to;
+        v1 = (int)from; v2 = (int)to;
         EL.add(v1, v2, w);
     }
 

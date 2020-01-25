@@ -77,11 +77,11 @@ namespace fitHRG {
 #define IGRAPH_HRG_EDGE
 class edge {
 public:
-    int x;          // stored integer value  (edge terminator)
-    double* h;          // (histogram) weights of edge existence
-    double total_weight;        // (histogram) total weight observed
-    int obs_count;      // number of observations in histogram
-    edge* next;         // pointer to next elementd
+    int x;            // stored integer value  (edge terminator)
+    double* h;            // (histogram) weights of edge existence
+    double total_weight;      // (histogram) total weight observed
+    int obs_count;        // number of observations in histogram
+    edge* next;           // pointer to next elementd
     edge(): x(-1), h(0), total_weight(0.0), obs_count(0), next(0)  { }
     ~edge() {
         if (h != NULL) {
@@ -96,8 +96,8 @@ public:
 #define IGRAPH_HRG_VERT
 class vert {
 public:
-    string name;            // (external) name of vertex
-    int degree;         // degree of this vertex
+    string name;           // (external) name of vertex
+    int degree;            // degree of this vertex
 
     vert(): name(""), degree(0) { }
     ~vert() { }
@@ -151,16 +151,16 @@ public:
     bool setName(const int, const string);
 
 private:
-    bool predict;        // do we need prediction?
-    vert* nodes;         // list of nodes
-    edge** nodeLink;     // linked list of neighbors to vertex
-    edge** nodeLinkTail;     // pointers to tail of neighbor list
-    double*** A;         // stochastic adjacency matrix for this graph
-    int obs_count;   // number of observations in A
-    double total_weight;     // total weight added to A
-    int n;       // number of vertices
-    int m;       // number of directed edges
-    int num_bins;        // number of bins in edge histograms
+    bool predict;      // do we need prediction?
+    vert* nodes;       // list of nodes
+    edge** nodeLink;   // linked list of neighbors to vertex
+    edge** nodeLinkTail;   // pointers to tail of neighbor list
+    double*** A;       // stochastic adjacency matrix for this graph
+    int obs_count;     // number of observations in A
+    double total_weight;   // total weight added to A
+    int n;         // number of vertices
+    int m;         // number of directed edges
+    int num_bins;      // number of bins in edge histograms
     double bin_resolution; // width of histogram bin
 };
 

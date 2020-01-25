@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph R package.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -163,14 +163,9 @@ int igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     long int i, no_of_nodes;
 
     switch (mode) {
-    case IGRAPH_OUT:
-        mode0 = IGRAPH_IN;
-        break;
-    case IGRAPH_IN:
-        mode0 = IGRAPH_OUT;
-        break;
-    default:
-        mode0 = IGRAPH_ALL;
+    case IGRAPH_OUT: mode0 = IGRAPH_IN; break;
+    case IGRAPH_IN: mode0 = IGRAPH_OUT; break;
+    default: mode0 = IGRAPH_ALL;
     }
 
     no_of_nodes = igraph_vcount(graph);
@@ -268,18 +263,13 @@ int igraph_i_neisets_intersect(const igraph_vector_t *v1,
                                long int *len_intersection) {
     /* ASSERT: v1 and v2 are sorted */
     long int i, j, i0, jj0;
-    i0 = igraph_vector_size(v1);
-    jj0 = igraph_vector_size(v2);
-    *len_union = i0 + jj0;
-    *len_intersection = 0;
-    i = 0;
-    j = 0;
+    i0 = igraph_vector_size(v1); jj0 = igraph_vector_size(v2);
+    *len_union = i0 + jj0; *len_intersection = 0;
+    i = 0; j = 0;
     while (i < i0 && j < jj0) {
         if (VECTOR(*v1)[i] == VECTOR(*v2)[j]) {
-            (*len_intersection)++;
-            (*len_union)--;
-            i++;
-            j++;
+            (*len_intersection)++; (*len_union)--;
+            i++; j++;
         } else if (VECTOR(*v1)[i] < VECTOR(*v2)[j]) {
             i++;
         } else {

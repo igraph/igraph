@@ -416,10 +416,10 @@ typedef enum {
  */
 
 #define IGRAPH_ERROR(reason,igraph_errno) \
-       do { \
-       igraph_error (reason, __FILE__, __LINE__, igraph_errno) ; \
-       return igraph_errno ; \
-       } while (0)
+    do { \
+        igraph_error (reason, __FILE__, __LINE__, igraph_errno) ; \
+        return igraph_errno ; \
+    } while (0)
 
 /**
  * \function igraph_error
@@ -564,18 +564,18 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  */
 
 #define IGRAPH_FINALLY(func,ptr) \
-  IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
+    IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
 
 #if !defined(GCC_VERSION_MAJOR) && defined(__GNUC__)
-#  define GCC_VERSION_MAJOR  __GNUC__
+    #define GCC_VERSION_MAJOR  __GNUC__
 #endif
 
 #if defined(GCC_VERSION_MAJOR) && (GCC_VERSION_MAJOR >= 3)
-#  define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
-#  define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
+    #define IGRAPH_UNLIKELY(a) __builtin_expect((a), 0)
+    #define IGRAPH_LIKELY(a)   __builtin_expect((a), 1)
 #else
-#  define IGRAPH_UNLIKELY(a) a
-#  define IGRAPH_LIKELY(a)   a
+    #define IGRAPH_UNLIKELY(a) a
+    #define IGRAPH_LIKELY(a)   a
 #endif
 
 /**
@@ -602,10 +602,10 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  */
 
 #define IGRAPH_CHECK(a) do { \
-                 int igraph_i_ret=(a); \
-                 if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
-                     IGRAPH_ERROR("", igraph_i_ret); \
-                 } } while (0)
+        int igraph_i_ret=(a); \
+        if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
+            IGRAPH_ERROR("", igraph_i_ret); \
+        } } while (0)
 
 
 /**
@@ -711,9 +711,9 @@ DECLDIR int igraph_warningf(const char *reason, const char *file, int line,
  */
 
 #define IGRAPH_WARNING(reason) \
-       do { \
-         igraph_warning(reason, __FILE__, __LINE__, -1); \
-       } while (0)
+    do { \
+        igraph_warning(reason, __FILE__, __LINE__, -1); \
+    } while (0)
 
 __END_DECLS
 

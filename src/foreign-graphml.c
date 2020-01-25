@@ -87,11 +87,11 @@ xmlEntityPtr blankEntity = &blankEntityStruct;
 /* TODO: proper error handling */
 
 typedef struct igraph_i_graphml_attribute_record_t {
-    const char *id;             /* GraphML id */
+    const char *id;           /* GraphML id */
     enum { I_GRAPHML_BOOLEAN, I_GRAPHML_INTEGER, I_GRAPHML_LONG,
            I_GRAPHML_FLOAT, I_GRAPHML_DOUBLE, I_GRAPHML_STRING,
            I_GRAPHML_UNKNOWN_TYPE
-         } type;    /* GraphML type */
+         } type; /* GraphML type */
     union {
         igraph_real_t as_numeric;
         igraph_bool_t as_boolean;
@@ -709,7 +709,7 @@ igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
 
     /* Ownership of 'rec' is now taken by ptrvector so we can clean the
      * finally stack */
-    IGRAPH_FINALLY_CLEAN(1);    /* rec */
+    IGRAPH_FINALLY_CLEAN(1);  /* rec */
 
     /* create the attribute values */
     switch (rec->record.type) {
@@ -743,8 +743,7 @@ igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
         rec->record.value = strvec;
         igraph_strvector_init(strvec, 0);
         break;
-    default:
-        break;
+    default: break;
     }
 
     return rec;
@@ -1075,8 +1074,7 @@ void igraph_i_graphml_sax_handler_start_element_ns(
     case INSIDE_GRAPH:
         /* If we are in the INSIDE_GRAPH state, check for node and edge tags */
         if (xmlStrEqual(localname, toXmlChar("edge"))) {
-            id1 = -1;
-            id2 = -1;
+            id1 = -1; id2 = -1;
             for (i = 0, it = (xmlChar**)attributes; i < nb_attributes; i++, it += 5) {
                 if (XML_ATTR_URI(it) != 0 &&
                     !xmlStrEqual(toXmlChar(GRAPHML_NAMESPACE_URI), XML_ATTR_URI(it))) {
@@ -1328,25 +1326,15 @@ int igraph_i_xml_escape(char* src, char** dest) {
         ch = (unsigned char)(*s);
         switch (ch) {
         case '&':
-            strcpy(d, "&amp;");
-            d += 4;
-            break;
+            strcpy(d, "&amp;"); d += 4; break;
         case '<':
-            strcpy(d, "&lt;");
-            d += 3;
-            break;
+            strcpy(d, "&lt;"); d += 3; break;
         case '>':
-            strcpy(d, "&gt;");
-            d += 3;
-            break;
+            strcpy(d, "&gt;"); d += 3; break;
         case '"':
-            strcpy(d, "&quot;");
-            d += 5;
-            break;
+            strcpy(d, "&quot;"); d += 5; break;
         case '\'':
-            strcpy(d, "&apos;");
-            d += 5;
-            break;
+            strcpy(d, "&apos;"); d += 5; break;
         default:
             *d = ch;
         }

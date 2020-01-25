@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=8 sw=2 sts=2 et: */
 /*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -352,8 +352,7 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 
             while (!IGRAPH_EIT_END(edgeit)) {
                 igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-                from = ffrom;
-                to = fto;
+                from = ffrom; to = fto;
                 if (from != to) {
                     if (res) {
                         MATRIX(*res, from, to) -= VECTOR(degree)[from];
@@ -412,8 +411,7 @@ int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
 
             while (!IGRAPH_EIT_END(edgeit)) {
                 igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-                from = ffrom;
-                to = fto;
+                from = ffrom; to = fto;
                 if (from != to) {
                     double diff = 1.0 / (VECTOR(degree)[from] * VECTOR(degree)[to]);
                     if (res) {

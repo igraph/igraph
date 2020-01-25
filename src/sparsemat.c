@@ -1196,12 +1196,8 @@ int igraph_i_weighted_sparsemat_triplet(const igraph_sparsemat_t *A,
                                         igraph_vector_t *edges,
                                         igraph_vector_t *weights) {
 
-    IGRAPH_UNUSED(A);
-    IGRAPH_UNUSED(directed);
-    IGRAPH_UNUSED(attr);
-    IGRAPH_UNUSED(loops);
-    IGRAPH_UNUSED(edges);
-    IGRAPH_UNUSED(weights);
+    IGRAPH_UNUSED(A); IGRAPH_UNUSED(directed); IGRAPH_UNUSED(attr);
+    IGRAPH_UNUSED(loops); IGRAPH_UNUSED(edges); IGRAPH_UNUSED(weights);
 
     /* TODO */
     IGRAPH_ERROR("Triplet matrices are not implemented",
@@ -2838,7 +2834,7 @@ int igraph_i_sparsemat_scale_cols_cc(igraph_sparsemat_t *A,
     igraph_real_t *x = A->cs->x;
     int no_of_edges = A->cs->p[A->cs->n];
     int e;
-    int c = 0;          /* actual column */
+    int c = 0;        /* actual column */
 
     for (e = 0; e < no_of_edges; e++, x++, i++) {
         igraph_real_t f;

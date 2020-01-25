@@ -98,12 +98,12 @@ __BEGIN_DECLS
  *   ignored by the igraph functions.
  *
  */
-typedef enum { IGRAPH_ATTRIBUTE_DEFAULT=0,
-               IGRAPH_ATTRIBUTE_NUMERIC=1,
-               IGRAPH_ATTRIBUTE_BOOLEAN=5,
-               IGRAPH_ATTRIBUTE_STRING=2,
-               IGRAPH_ATTRIBUTE_R_OBJECT=3,
-               IGRAPH_ATTRIBUTE_PY_OBJECT=4
+typedef enum { IGRAPH_ATTRIBUTE_DEFAULT = 0,
+               IGRAPH_ATTRIBUTE_NUMERIC = 1,
+               IGRAPH_ATTRIBUTE_BOOLEAN = 5,
+               IGRAPH_ATTRIBUTE_STRING = 2,
+               IGRAPH_ATTRIBUTE_R_OBJECT = 3,
+               IGRAPH_ATTRIBUTE_PY_OBJECT = 4
              } igraph_attribute_type_t;
 
 typedef struct igraph_attribute_record_t {
@@ -112,31 +112,31 @@ typedef struct igraph_attribute_record_t {
     const void *value;
 } igraph_attribute_record_t;
 
-typedef enum { IGRAPH_ATTRIBUTE_GRAPH=0,
+typedef enum { IGRAPH_ATTRIBUTE_GRAPH = 0,
                IGRAPH_ATTRIBUTE_VERTEX,
                IGRAPH_ATTRIBUTE_EDGE
              } igraph_attribute_elemtype_t;
 
 typedef enum {
-    IGRAPH_ATTRIBUTE_COMBINE_IGNORE=0,
-    IGRAPH_ATTRIBUTE_COMBINE_DEFAULT=1,
-    IGRAPH_ATTRIBUTE_COMBINE_FUNCTION=2,
-    IGRAPH_ATTRIBUTE_COMBINE_SUM=3,
-    IGRAPH_ATTRIBUTE_COMBINE_PROD=4,
-    IGRAPH_ATTRIBUTE_COMBINE_MIN=5,
-    IGRAPH_ATTRIBUTE_COMBINE_MAX=6,
-    IGRAPH_ATTRIBUTE_COMBINE_RANDOM=7,
-    IGRAPH_ATTRIBUTE_COMBINE_FIRST=8,
-    IGRAPH_ATTRIBUTE_COMBINE_LAST=9,
-    IGRAPH_ATTRIBUTE_COMBINE_MEAN=10,
-    IGRAPH_ATTRIBUTE_COMBINE_MEDIAN=11,
-    IGRAPH_ATTRIBUTE_COMBINE_CONCAT=12
+    IGRAPH_ATTRIBUTE_COMBINE_IGNORE = 0,
+    IGRAPH_ATTRIBUTE_COMBINE_DEFAULT = 1,
+    IGRAPH_ATTRIBUTE_COMBINE_FUNCTION = 2,
+    IGRAPH_ATTRIBUTE_COMBINE_SUM = 3,
+    IGRAPH_ATTRIBUTE_COMBINE_PROD = 4,
+    IGRAPH_ATTRIBUTE_COMBINE_MIN = 5,
+    IGRAPH_ATTRIBUTE_COMBINE_MAX = 6,
+    IGRAPH_ATTRIBUTE_COMBINE_RANDOM = 7,
+    IGRAPH_ATTRIBUTE_COMBINE_FIRST = 8,
+    IGRAPH_ATTRIBUTE_COMBINE_LAST = 9,
+    IGRAPH_ATTRIBUTE_COMBINE_MEAN = 10,
+    IGRAPH_ATTRIBUTE_COMBINE_MEDIAN = 11,
+    IGRAPH_ATTRIBUTE_COMBINE_CONCAT = 12
 } igraph_attribute_combination_type_t;
 
 typedef void (*igraph_function_pointer_t)(void);
 
 typedef struct igraph_attribute_combination_record_t {
-    const char *name;		/* can be NULL, meaning: the rest */
+    const char *name;     /* can be NULL, meaning: the rest */
     igraph_attribute_combination_type_t type;
     igraph_function_pointer_t func;
 } igraph_attribute_combination_record_t;
@@ -299,18 +299,18 @@ DECLDIR igraph_attribute_table_t * igraph_i_set_attribute_table(const igraph_att
 DECLDIR igraph_bool_t igraph_has_attribute_table(void);
 
 #define IGRAPH_I_ATTRIBUTE_DESTROY(graph) \
-        do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
+    do {if ((graph)->attr) igraph_i_attribute_destroy(graph);} while(0)
 #define IGRAPH_I_ATTRIBUTE_COPY(to,from,ga,va,ea) do { \
         int igraph_i_ret2=0; \
         if ((from)->attr) { \
-          IGRAPH_CHECK(igraph_i_ret2=igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
+            IGRAPH_CHECK(igraph_i_ret2=igraph_i_attribute_copy((to),(from),(ga),(va),(ea))); \
         } else { \
-	  (to)->attr = 0; \
-	} \
-        if (igraph_i_ret2 != 0) { \
-          IGRAPH_ERROR("", igraph_i_ret2); \
+            (to)->attr = 0; \
         } \
-   } while(0)
+        if (igraph_i_ret2 != 0) { \
+            IGRAPH_ERROR("", igraph_i_ret2); \
+        } \
+    } while(0)
 
 int igraph_i_attribute_init(igraph_t *graph, void *attr);
 void igraph_i_attribute_destroy(igraph_t *graph);
@@ -537,7 +537,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return Error code.
  */
 #define VANV(graph,n,vec) (igraph_cattribute_VANV((graph),(n), \
-						  igraph_vss_all(), (vec)))
+                           igraph_vss_all(), (vec)))
 /**
  * \define VABV
  * Query a boolean vertex attribute for all vertices.
@@ -550,7 +550,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return Error code.
  */
 #define VABV(graph,n,vec) (igraph_cattribute_VABV((graph),(n), \
-						  igraph_vss_all(), (vec)))
+                           igraph_vss_all(), (vec)))
 /**
  * \define VASV
  * Query a string vertex attribute for all vertices.
@@ -563,7 +563,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return Error code.
  */
 #define VASV(graph,n,vec) (igraph_cattribute_VASV((graph),(n), \
-						  igraph_vss_all(), (vec)))
+                           igraph_vss_all(), (vec)))
 /**
  * \define EAN
  * Query a numeric edge attribute.
@@ -609,7 +609,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return Error code.
  */
 #define EANV(graph,n,vec) (igraph_cattribute_EANV((graph),(n), \
-						  igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
+                           igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
 /**
  * \define EABV
  * Query a boolean edge attribute for all edges.
@@ -622,7 +622,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return Error code.
  */
 #define EABV(graph,n,vec) (igraph_cattribute_EABV((graph),(n), \
-						  igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
+                           igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
 
 /**
  * \define EASV
@@ -636,7 +636,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
  * \return Error code.
  */
 #define EASV(graph,n,vec) (igraph_cattribute_EASV((graph),(n), \
-						  igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
+                           igraph_ess_all(IGRAPH_EDGEORDER_ID), (vec)))
 /**
  * \define SETGAN
  * Set a numeric graph attribute

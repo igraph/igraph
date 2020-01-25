@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph R package.
    Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>

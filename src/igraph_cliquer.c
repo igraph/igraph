@@ -110,8 +110,7 @@ static boolean collect_cliques_callback(set_t s, graph_t *g, clique_options *opt
     clique = (igraph_vector_t *) malloc(sizeof(igraph_vector_t));
     igraph_vector_init(clique, set_size(s));
 
-    i = -1;
-    j = 0;
+    i = -1; j = 0;
     while ((i = set_return_next(s, i)) >= 0) {
         VECTOR(*clique)[j++] = i;
     }
@@ -238,8 +237,7 @@ static boolean callback_callback(set_t s, graph_t *g, clique_options *opt) {
     clique = (igraph_vector_t *) malloc(sizeof(igraph_vector_t));
     igraph_vector_init(clique, set_size(s));
 
-    i = -1;
-    j = 0;
+    i = -1; j = 0;
     while ((i = set_return_next(s, i)) >= 0) {
         VECTOR(*clique)[j++] = i;
     }

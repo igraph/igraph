@@ -255,7 +255,7 @@ typedef struct igraph_bliss_info_t {
  *      connected non-singletion cell.
  */
 
-typedef enum { IGRAPH_BLISS_F=0, IGRAPH_BLISS_FL,
+typedef enum { IGRAPH_BLISS_F = 0, IGRAPH_BLISS_FL,
                IGRAPH_BLISS_FS, IGRAPH_BLISS_FM,
                IGRAPH_BLISS_FLM, IGRAPH_BLISS_FSM
              } igraph_bliss_sh_t;

@@ -146,8 +146,7 @@ void igraph_2dgrid_move(igraph_2dgrid_t *grid, long int elem,
     igraph_real_t oldyc = MATRIX(*grid->coords, elem, 1);
     long int first;
 
-    xc = oldxc + xc;
-    yc = oldyc + yc;
+    xc = oldxc + xc; yc = oldyc + yc;
 
     igraph_2dgrid_which(grid, oldxc, oldyc, &oldx, &oldy);
     igraph_2dgrid_which(grid, xc, yc, &newx, &newy);
@@ -275,14 +274,11 @@ int igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
 
 void igraph_2dgrid_reset(igraph_2dgrid_t *grid, igraph_2dgrid_iterator_t *it) {
     /* Search for the first cell containing a vertex */
-    it->x = 0;
-    it->y = 0;
-    it->vid = (long int) MATRIX(grid->startidx, 0, 0);
+    it->x = 0; it->y = 0; it->vid = (long int) MATRIX(grid->startidx, 0, 0);
     while ( it->vid == 0 && (it->x < grid->stepsx - 1 || it->y < grid->stepsy - 1)) {
         it->x += 1;
         if (it->x == grid->stepsx) {
-            it->x = 0;
-            it->y += 1;
+            it->x = 0; it->y += 1;
         }
         it->vid = (long int) MATRIX(grid->startidx, it->x, it->y);
     }
@@ -329,8 +325,7 @@ igraph_integer_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
             it->vid == 0) {
         it->x += 1;
         if (it->x == grid->stepsx) {
-            it->x = 0;
-            it->y += 1;
+            it->x = 0; it->y += 1;
         }
         it->vid = (long int) MATRIX(grid->startidx, it->x, it->y);
     }

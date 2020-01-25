@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sts=4 sw=4 et: */
+/* vim:set ts=2 sts=2 sw=2 et: */
 /*
    IGraph library.
    Copyright (C) 2012  Tamas Nepusz <ntamas@gmail.com>
@@ -92,8 +92,7 @@ int igraph_is_matching(const igraph_t* graph,
 
     /* Checking match vector length */
     if (igraph_vector_long_size(matching) != no_of_nodes) {
-        *result = 0;
-        return IGRAPH_SUCCESS;
+        *result = 0; return IGRAPH_SUCCESS;
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -101,8 +100,7 @@ int igraph_is_matching(const igraph_t* graph,
 
         /* Checking range of each element in the match vector */
         if (j < -1 || j >= no_of_nodes) {
-            *result = 0;
-            return IGRAPH_SUCCESS;
+            *result = 0; return IGRAPH_SUCCESS;
         }
         /* When i is unmatched, we're done */
         if (j == -1) {
@@ -110,8 +108,7 @@ int igraph_is_matching(const igraph_t* graph,
         }
         /* Matches must be mutual */
         if (VECTOR(*matching)[j] != i) {
-            *result = 0;
-            return IGRAPH_SUCCESS;
+            *result = 0; return IGRAPH_SUCCESS;
         }
         /* Matched vertices must be connected */
         IGRAPH_CHECK(igraph_are_connected(graph, (igraph_integer_t) i,
@@ -121,8 +118,7 @@ int igraph_is_matching(const igraph_t* graph,
             IGRAPH_CHECK(igraph_are_connected(graph, (igraph_integer_t) j,
                                               (igraph_integer_t) i, &conn));
             if (!conn) {
-                *result = 0;
-                return IGRAPH_SUCCESS;
+                *result = 0; return IGRAPH_SUCCESS;
             }
         }
     }
@@ -135,8 +131,7 @@ int igraph_is_matching(const igraph_t* graph,
                 continue;
             }
             if (VECTOR(*types)[i] == VECTOR(*types)[j]) {
-                *result = 0;
-                return IGRAPH_SUCCESS;
+                *result = 0; return IGRAPH_SUCCESS;
             }
         }
     }
@@ -180,8 +175,7 @@ int igraph_is_maximal_matching(const igraph_t* graph,
 
     IGRAPH_CHECK(igraph_is_matching(graph, types, matching, &valid));
     if (!valid) {
-        *result = 0;
-        return IGRAPH_SUCCESS;
+        *result = 0; return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -200,8 +194,7 @@ int igraph_is_maximal_matching(const igraph_t* graph,
             if (VECTOR(*matching)[(long int)VECTOR(neis)[j]] == -1) {
                 if (types == 0 ||
                     VECTOR(*types)[i] != VECTOR(*types)[(long int)VECTOR(neis)[j]]) {
-                    valid = 0;
-                    break;
+                    valid = 0; break;
                 }
             }
         }
@@ -362,8 +355,7 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
 
     /* (3) Find an initial matching in a greedy manner.
      *     At the same time, find which side of the graph is smaller. */
-    num_matched = 0;
-    j = 0;
+    num_matched = 0; j = 0;
     for (i = 0; i < no_of_nodes; i++) {
         if (VECTOR(*types)[i]) {
             j++;
@@ -437,15 +429,13 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
                 w = VECTOR(match)[u];
                 debug("  Vertex %ld is matched to %ld, performing a double push\n", u, w);
                 if (w != v) {
-                    VECTOR(match)[u] = -1;
-                    VECTOR(match)[w] = -1;  /* Line 9 */
+                    VECTOR(match)[u] = -1; VECTOR(match)[w] = -1;  /* Line 9 */
                     IGRAPH_CHECK(igraph_dqueue_long_push(&q, w));  /* Line 10 */
                     debug("  Unmatching & activating vertex %ld\n", w);
                     num_matched--;
                 }
             }
-            VECTOR(match)[u] = v;
-            VECTOR(match)[v] = u;      /* Line 11 */
+            VECTOR(match)[u] = v; VECTOR(match)[v] = u;      /* Line 11 */
             num_matched++;
             VECTOR(labels)[u] += 2;                          /* Line 12 */
             label_changed++;

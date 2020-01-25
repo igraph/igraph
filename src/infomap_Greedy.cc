@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph library.
    Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -236,7 +236,7 @@ bool Greedy::optimize() {
                                           outFlowNewM - inFlowNewM) - exit;
 
                 double delta_exit_log_exit = - plogp(mod_exit[oldM]) -
-                                             plogp(mod_exit[newM])  +
+                                             plogp(mod_exit[newM]) +
                                              plogp(mod_exit[oldM] - node[flip]->exit + outFlowOldM + inFlowOldM)
                                              + plogp(mod_exit[newM] + node[flip]->exit - outFlowNewM -
                                                      inFlowNewM);

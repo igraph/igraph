@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -164,21 +164,16 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
                 int newrow = glp_add_rows(ip, 3);
 
                 glp_set_row_bnds(ip, newrow, GLP_UP, 0.0, 1.0);
-                idx[1] = (st + IDX(i, j));
-                idx[2] = (st + IDX(j, k));
+                idx[1] = (st + IDX(i, j)); idx[2] = (st + IDX(j, k));
                 idx[3] = (st + IDX(i, k));
                 glp_set_mat_row(ip, newrow, 3, idx, coef);
 
                 glp_set_row_bnds(ip, newrow + 1, GLP_UP, 0.0, 1.0);
-                idx[1] = st + IDX(i, j);
-                idx[2] = st + IDX(i, k);
-                idx[3] = st + IDX(j, k);
+                idx[1] = st + IDX(i, j); idx[2] = st + IDX(i, k); idx[3] = st + IDX(j, k);
                 glp_set_mat_row(ip, newrow + 1, 3, idx, coef);
 
                 glp_set_row_bnds(ip, newrow + 2, GLP_UP, 0.0, 1.0);
-                idx[1] = st + IDX(i, k);
-                idx[2] = st + IDX(j, k);
-                idx[3] = st + IDX(i, j);
+                idx[1] = st + IDX(i, k); idx[2] = st + IDX(j, k); idx[3] = st + IDX(i, j);
                 glp_set_mat_row(ip, newrow + 2, 3, idx, coef);
 
             }
@@ -206,9 +201,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
             i = IGRAPH_FROM(graph, k);
             j = IGRAPH_TO(graph, k);
             if (i > j) {
-                l = i;
-                i = j;
-                j = l;
+                l = i; i = j; j = l;
             }
             c = weights ? VECTOR(*weights)[k] : 1.0;
             if (!directed || i == j) {
@@ -246,7 +239,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
                     break;
                 }
             }
-            if (j == i) {   /* new community */
+            if (j == i) {     /* new community */
                 VECTOR(*membership)[i] = comm++;
             }
         }

@@ -678,9 +678,9 @@ void Communities::merge_communities(Neighbor* merge_N) {
     int c1 = merge_N->community1;
     int c2 = merge_N->community2;
 
-    communities[nb_communities].first_member = communities[c1].first_member;    // merge the
-    communities[nb_communities].last_member = communities[c2].last_member;  // two lists
-    members[communities[c1].last_member] = communities[c2].first_member;        // of members
+    communities[nb_communities].first_member = communities[c1].first_member;  // merge the
+    communities[nb_communities].last_member = communities[c2].last_member;    // two lists
+    members[communities[c1].last_member] = communities[c2].first_member;      // of members
 
     communities[nb_communities].size = communities[c1].size + communities[c2].size;
     communities[nb_communities].this_community = nb_communities;

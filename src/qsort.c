@@ -125,8 +125,7 @@ med3(char *a, char *b, char *c, cmp_t *cmp, void *thunk
     char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
     int d, r, swaptype, swap_cnt;
 
-loop:
-    SWAPINIT(a, es);
+loop:   SWAPINIT(a, es);
     swap_cnt = 0;
     if (n < 7) {
         for (pm = (char *)a + es; pm < (char *)a + n * es; pm += es)

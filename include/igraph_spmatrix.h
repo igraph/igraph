@@ -55,8 +55,8 @@ typedef struct s_spmatrix {
 } igraph_spmatrix_t;
 
 #define IGRAPH_SPMATRIX_INIT_FINALLY(m, nr, nc) \
-  do { IGRAPH_CHECK(igraph_spmatrix_init(m, nr, nc)); \
-  IGRAPH_FINALLY(igraph_spmatrix_destroy, m); } while (0)
+    do { IGRAPH_CHECK(igraph_spmatrix_init(m, nr, nc)); \
+        IGRAPH_FINALLY(igraph_spmatrix_destroy, m); } while (0)
 
 DECLDIR int igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol);
 DECLDIR void igraph_spmatrix_destroy(igraph_spmatrix_t *m);

@@ -1053,7 +1053,7 @@ int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
     }
 
     igraph_vector_destroy(&degree);
-    IGRAPH_FINALLY_CLEAN(2);    /* + mysparse */
+    IGRAPH_FINALLY_CLEAN(2);  /* + mysparse */
 
     return 0;
 }

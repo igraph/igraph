@@ -289,7 +289,7 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
     if (tmp1 == 0) {
         IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp1);     /* TODO: hack */
+    IGRAPH_FINALLY(free, tmp1);   /* TODO: hack */
     tmp2 = igraph_Calloc(size, long int);
     if (tmp2 == 0) {
         IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
@@ -575,17 +575,17 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
     if (tmp1 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp1); /* TODO: hack */
+    IGRAPH_FINALLY(free, tmp1);   /* TODO: hack */
     tmp2 = igraph_Calloc(size, long int);
     if (tmp2 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp2); /* TODO: hack */
+    IGRAPH_FINALLY(free, tmp2);   /* TODO: hack */
     tmp3 = igraph_Calloc(size, long int);
     if (tmp3 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp3);     /* TODO: hack */
+    IGRAPH_FINALLY(free, tmp3);   /* TODO: hack */
 
     memcpy(tmp1, h->stor_begin, (size_t) actual_size * sizeof(igraph_real_t));
     memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(long int));
@@ -763,7 +763,7 @@ void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, long int hidx) {
 
 int igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes) {
     ch->dnodes = nodes;
-    IGRAPH_VECTOR_INIT_FINALLY(&ch->heap, nodes);   /* all zero */
+    IGRAPH_VECTOR_INIT_FINALLY(&ch->heap, nodes); /* all zero */
     IGRAPH_CHECK(igraph_vector_init_seq(&ch->index, 0, nodes - 1));
     IGRAPH_FINALLY(igraph_vector_destroy, &ch->index);
     IGRAPH_CHECK(igraph_vector_init_seq(&ch->hptr, INDEXINC, nodes + INDEXINC - 1));
@@ -1065,15 +1065,13 @@ int igraph_2wheap_check(igraph_2wheap_t *h) {
             break;
         }
         if (VECTOR(h->data)[LEFTCHILD(i)] > VECTOR(h->data)[i]) {
-            error = 1;
-            break;
+            error = 1; break;
         }
         if (RIGHTCHILD(i) >= size) {
             break;
         }
         if (VECTOR(h->data)[RIGHTCHILD(i)] > VECTOR(h->data)[i]) {
-            error = 1;
-            break;
+            error = 1; break;
         }
     }
 

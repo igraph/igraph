@@ -45,7 +45,7 @@ class Node {
 
 public:
 
-    bool fixed; // if true do not change the
+    bool fixed;   // if true do not change the
     // position of this node
     int id;
 
@@ -56,8 +56,7 @@ public:
 public:
 
     Node( int node_id ) {
-        x = y = z = 0.0;
-        fixed = false;
+        x = y = z = 0.0; fixed = false;
         id = node_id;
     }
     ~Node() { }

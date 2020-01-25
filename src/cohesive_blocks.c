@@ -149,8 +149,7 @@ igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
 
     while (np < nlen && hp < hlen) {
         if (VECTOR(*needle)[np] == VECTOR(*haystack)[hp]) {
-            np++;
-            hp++;
+            np++; hp++;
         } else if (VECTOR(*needle)[np] < VECTOR(*haystack)[hp]) {
             return 0;
         } else {
@@ -309,8 +308,8 @@ int igraph_cohesive_blocks(const igraph_t *graph,
     }
     IGRAPH_CHECK(igraph_copy(graph_copy, graph));
     VECTOR(Q)[0] = graph_copy;
-    VECTOR(Qmapping)[0] = 0;    /* Identity mapping */
-    VECTOR(Qparent)[0] = -1;    /* Has no parent */
+    VECTOR(Qmapping)[0] = 0;  /* Identity mapping */
+    VECTOR(Qparent)[0] = -1;  /* Has no parent */
     IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn, /*checks=*/ 1));
     VECTOR(Qcohesion)[0] = conn;
     VECTOR(Qcheck)[0] = 0;
@@ -604,7 +603,7 @@ int igraph_cohesive_blocks(const igraph_t *graph,
 
     igraph_vector_ptr_destroy(&Qmapping);
     igraph_vector_ptr_destroy(&Q);
-    IGRAPH_FINALLY_CLEAN(3);    /* + the elements of Q, they were
+    IGRAPH_FINALLY_CLEAN(3);      /* + the elements of Q, they were
                    already destroyed */
 
     IGRAPH_STATUS("Cohesive blocking done.\n", 0);

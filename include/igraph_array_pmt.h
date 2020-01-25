@@ -28,24 +28,24 @@ typedef struct TYPE(igraph_array3) {
 
 #ifndef IGRAPH_ARRAY3_INIT_FINALLY
 #define IGRAPH_ARRAY3_INIT_FINALLY(a, n1, n2, n3) \
-  do { IGRAPH_CHECK(igraph_array3_init(a, n1, n2, n3)); \
-  IGRAPH_FINALLY(igraph_array3_destroy, a); } while (0)
+    do { IGRAPH_CHECK(igraph_array3_init(a, n1, n2, n3)); \
+        IGRAPH_FINALLY(igraph_array3_destroy, a); } while (0)
 #endif
 
 #ifndef ARRAY3
-#define ARRAY3(m,i,j,k) ((m).data.stor_begin[(m).n1n2*(k)+(m).n1*(j)+(i)])
+    #define ARRAY3(m,i,j,k) ((m).data.stor_begin[(m).n1n2*(k)+(m).n1*(j)+(i)])
 #endif
 
-int FUNCTION(igraph_array3,init)(TYPE(igraph_array3) *a, long int n1, long int n2,
-                                 long int n3);
-void FUNCTION(igraph_array3,destroy)(TYPE(igraph_array3) *a);
-long int FUNCTION(igraph_array3,size)(const TYPE(igraph_array3) *a);
-long int FUNCTION(igraph_array3,n)(const TYPE(igraph_array3) *a, long int idx);
-int FUNCTION(igraph_array3,resize)(TYPE(igraph_array3) *a, long int n1, long int n2,
-                                   long int n3);
-void FUNCTION(igraph_array3,null)(TYPE(igraph_array3) *a);
-BASE FUNCTION(igraph_array3,sum)(const TYPE(igraph_array3) *a);
-void FUNCTION(igraph_array3,scale)(TYPE(igraph_array3) *a, BASE by);
-void FUNCTION(igraph_array3,fill)(TYPE(igraph_array3) *a, BASE e);
-int FUNCTION(igraph_array3,update)(TYPE(igraph_array3) *to,
-                                   const TYPE(igraph_array3) *from);
+int FUNCTION(igraph_array3, init)(TYPE(igraph_array3) *a, long int n1, long int n2,
+                                  long int n3);
+void FUNCTION(igraph_array3, destroy)(TYPE(igraph_array3) *a);
+long int FUNCTION(igraph_array3, size)(const TYPE(igraph_array3) *a);
+long int FUNCTION(igraph_array3, n)(const TYPE(igraph_array3) *a, long int idx);
+int FUNCTION(igraph_array3, resize)(TYPE(igraph_array3) *a, long int n1, long int n2,
+                                    long int n3);
+void FUNCTION(igraph_array3, null)(TYPE(igraph_array3) *a);
+BASE FUNCTION(igraph_array3, sum)(const TYPE(igraph_array3) *a);
+void FUNCTION(igraph_array3, scale)(TYPE(igraph_array3) *a, BASE by);
+void FUNCTION(igraph_array3, fill)(TYPE(igraph_array3) *a, BASE e);
+int FUNCTION(igraph_array3, update)(TYPE(igraph_array3) *to,
+                                    const TYPE(igraph_array3) *from);

@@ -1001,13 +1001,12 @@ int igraph_i_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph
         }
         l += S;
         igraph_vector_push_back(res, l);    /* allocated */
-        Nreal = -1.0 + Nreal;
-        n = -1 + n;
+        Nreal = -1.0 + Nreal; n = -1 + n;
     }
 
     S = floor(round(Nreal) * RNG_UNIF01());
     l += S + 1;
-    igraph_vector_push_back(res, l);    /* allocated */
+    igraph_vector_push_back(res, l);  /* allocated */
 
     return 0;
 }
@@ -1159,13 +1158,9 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
 
         l += S + 1;
         igraph_vector_push_back(res, l);    /* allocated */
-        N = -S + (-1 + N);
-        Nreal = negSreal + (-1.0 + Nreal);
-        n = -1 + n;
-        nreal = -1.0 + nreal;
-        ninv = nmin1inv;
-        qu1 = -S + qu1;
-        qu1real = negSreal + qu1real;
+        N = -S + (-1 + N);   Nreal = negSreal + (-1.0 + Nreal);
+        n = -1 + n;   nreal = -1.0 + nreal; ninv = nmin1inv;
+        qu1 = -S + qu1; qu1real = negSreal + qu1real;
         threshold = threshold + negalphainv;
     }
 
@@ -2061,7 +2056,7 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
             }
             ix = x;
         } else {
-            if (u > p3) {   /* right tail */
+            if (u > p3) { /* right tail */
                 ix = xr - log(v) / xlr;
                 if (ix > n) {
                     continue;

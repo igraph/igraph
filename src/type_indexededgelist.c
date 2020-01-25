@@ -853,20 +853,17 @@ int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vect
     } else {
         idx = -1;
         for (i = 0; i <= EDGE(0); i++) {
-            idx++;
-            VECTOR(*res)[idx] = 0;
+            idx++; VECTOR(*res)[idx] = 0;
         }
         for (i = 1; i < no_of_edges; i++) {
             long int n = (long int) (EDGE(i) - EDGE((long int)VECTOR(*res)[idx]));
             for (j = 0; j < n; j++) {
-                idx++;
-                VECTOR(*res)[idx] = i;
+                idx++; VECTOR(*res)[idx] = i;
             }
         }
         j = (long int) EDGE((long int)VECTOR(*res)[idx]);
         for (i = 0; i < no_of_nodes - j; i++) {
-            idx++;
-            VECTOR(*res)[idx] = no_of_edges;
+            idx++; VECTOR(*res)[idx] = no_of_edges;
         }
     }
 

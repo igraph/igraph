@@ -609,8 +609,7 @@ int igraph_intersection_many(igraph_t *res,
             long int from = VECTOR(*ev)[2 * edge];
             long int to = VECTOR(*ev)[2 * edge + 1];
             if (from < tailfrom || (from == tailfrom && to < tailto)) {
-                tailfrom = from;
-                tailto = to;
+                tailfrom = from; tailto = to;
             }
         }
 
@@ -867,8 +866,7 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
                 long int from = VECTOR(*ev)[2 * edge];
                 long int to = VECTOR(*ev)[2 * edge + 1];
                 if (from > tailfrom || (from == tailfrom && to > tailto)) {
-                    tailfrom = from;
-                    tailto = to;
+                    tailfrom = from; tailto = to;
                 }
             }
         }

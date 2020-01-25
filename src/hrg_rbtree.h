@@ -68,8 +68,8 @@ namespace fitHRG {
 
 class list {
 public:
-    int x;          // stored elementd in linked-list
-    list*   next;           // pointer to next elementd
+    int x;            // stored elementd in linked-list
+    list* next;           // pointer to next elementd
     list(): x(-1), next(0) { }
     ~list() { }
 };
@@ -77,9 +77,9 @@ public:
 
 class keyValuePair {
 public:
-    int x;          // elementrb key (int)
-    int y;          // stored value (int)
-    keyValuePair*   next;       // linked-list pointer
+    int x;            // elementrb key (int)
+    int y;            // stored value (int)
+    keyValuePair* next;       // linked-list pointer
     keyValuePair(): x(-1), y(-1), next(0) { }
     ~keyValuePair() { }
 };
@@ -88,15 +88,15 @@ public:
 
 class elementrb {
 public:
-    int key;            // search key (int)
-    int value;          // stored value (int)
+    int key;          // search key (int)
+    int value;            // stored value (int)
 
-    bool color;         // F: BLACK, T: RED
-    short int mark;     // marker
+    bool color;           // F: BLACK, T: RED
+    short int mark;       // marker
 
-    elementrb *parent;      // pointer to parent node
-    elementrb *left;        // pointer for left subtree
-    elementrb *right;       // pointer for right subtree
+    elementrb *parent;        // pointer to parent node
+    elementrb *left;      // pointer for left subtree
+    elementrb *right;     // pointer for right subtree
 
     elementrb(): key(-1), value(-1), color(false), mark(0), parent(0),
         left(0), right(0) { }
@@ -114,9 +114,9 @@ public:
 
 class rbtree {
 private:
-    elementrb* root;        // binary tree root
-    elementrb* leaf;        // all leaf nodes
-    int support;            // number of nodes in the tree
+    elementrb* root;      // binary tree root
+    elementrb* leaf;      // all leaf nodes
+    int support;          // number of nodes in the tree
 
     void rotateLeft(elementrb *x);    // left-rotation operator
     void rotateRight(elementrb *y);   // right-rotation operator
@@ -129,8 +129,7 @@ private:
     elementrb* returnSuccessor(elementrb *z); // returns successor of z's key
 
 public:
-    rbtree();
-    ~rbtree(); // default constructor/destructor
+    rbtree(); ~rbtree(); // default constructor/destructor
 
     // returns value associated with searchKey
     int returnValue(const int searchKey);

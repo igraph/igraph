@@ -34,51 +34,51 @@ __BEGIN_DECLS
 /* Constants                                          */
 /* -------------------------------------------------- */
 
-typedef enum { IGRAPH_UNDIRECTED=0, IGRAPH_DIRECTED=1 } igraph_i_directed_t;
+typedef enum { IGRAPH_UNDIRECTED = 0, IGRAPH_DIRECTED = 1 } igraph_i_directed_t;
 
-typedef enum { IGRAPH_NO_LOOPS=0, IGRAPH_LOOPS=1 } igraph_i_loops_t;
+typedef enum { IGRAPH_NO_LOOPS = 0, IGRAPH_LOOPS = 1 } igraph_i_loops_t;
 
-typedef enum { IGRAPH_NO_MULTIPLE=0, IGRAPH_MULTIPLE=1 } igraph_i_multiple_t;
+typedef enum { IGRAPH_NO_MULTIPLE = 0, IGRAPH_MULTIPLE = 1 } igraph_i_multiple_t;
 
-typedef enum { IGRAPH_ASCENDING=0, IGRAPH_DESCENDING=1 } igraph_order_t;
+typedef enum { IGRAPH_ASCENDING = 0, IGRAPH_DESCENDING = 1 } igraph_order_t;
 
-typedef enum { IGRAPH_MINIMUM=0, IGRAPH_MAXIMUM=1 } igraph_optimal_t;
+typedef enum { IGRAPH_MINIMUM = 0, IGRAPH_MAXIMUM = 1 } igraph_optimal_t;
 
-typedef enum { IGRAPH_OUT=1, IGRAPH_IN=2, IGRAPH_ALL=3,
-               IGRAPH_TOTAL=3
+typedef enum { IGRAPH_OUT = 1, IGRAPH_IN = 2, IGRAPH_ALL = 3,
+               IGRAPH_TOTAL = 3
              } igraph_neimode_t;
 
-typedef enum { IGRAPH_WEAK=1, IGRAPH_STRONG=2 } igraph_connectedness_t;
+typedef enum { IGRAPH_WEAK = 1, IGRAPH_STRONG = 2 } igraph_connectedness_t;
 
-typedef enum { IGRAPH_RECIPROCITY_DEFAULT=0,
-               IGRAPH_RECIPROCITY_RATIO=1
+typedef enum { IGRAPH_RECIPROCITY_DEFAULT = 0,
+               IGRAPH_RECIPROCITY_RATIO = 1
              } igraph_reciprocity_t;
 
-typedef enum { IGRAPH_ADJ_DIRECTED=0,
-               IGRAPH_ADJ_UNDIRECTED=1, IGRAPH_ADJ_MAX=1,
+typedef enum { IGRAPH_ADJ_DIRECTED = 0,
+               IGRAPH_ADJ_UNDIRECTED = 1, IGRAPH_ADJ_MAX = 1,
                IGRAPH_ADJ_UPPER, IGRAPH_ADJ_LOWER, IGRAPH_ADJ_MIN,
                IGRAPH_ADJ_PLUS
              } igraph_adjacency_t;
 
-typedef enum { IGRAPH_STAR_OUT=0, IGRAPH_STAR_IN,
+typedef enum { IGRAPH_STAR_OUT = 0, IGRAPH_STAR_IN,
                IGRAPH_STAR_UNDIRECTED,
                IGRAPH_STAR_MUTUAL
              } igraph_star_mode_t;
 
-typedef enum { IGRAPH_TREE_OUT=0, IGRAPH_TREE_IN,
+typedef enum { IGRAPH_TREE_OUT = 0, IGRAPH_TREE_IN,
                IGRAPH_TREE_UNDIRECTED
              } igraph_tree_mode_t;
 
-typedef enum { IGRAPH_ERDOS_RENYI_GNP=0,
+typedef enum { IGRAPH_ERDOS_RENYI_GNP = 0,
                IGRAPH_ERDOS_RENYI_GNM
              } igraph_erdos_renyi_t;
 
-typedef enum { IGRAPH_GET_ADJACENCY_UPPER=0,
+typedef enum { IGRAPH_GET_ADJACENCY_UPPER = 0,
                IGRAPH_GET_ADJACENCY_LOWER,
                IGRAPH_GET_ADJACENCY_BOTH
              } igraph_get_adjacency_t;
 
-typedef enum { IGRAPH_DEGSEQ_SIMPLE=0,
+typedef enum { IGRAPH_DEGSEQ_SIMPLE = 0,
                IGRAPH_DEGSEQ_VL,
                IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE,
                IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM
@@ -93,50 +93,50 @@ typedef enum { IGRAPH_RANDOM_TREE_PRUFER = 0,
                IGRAPH_RANDOM_TREE_LERW
              } igraph_random_tree_t;
 
-typedef enum { IGRAPH_FILEFORMAT_EDGELIST=0,
+typedef enum { IGRAPH_FILEFORMAT_EDGELIST = 0,
                IGRAPH_FILEFORMAT_NCOL,
                IGRAPH_FILEFORMAT_PAJEK,
                IGRAPH_FILEFORMAT_LGL,
                IGRAPH_FILEFORMAT_GRAPHML
              } igraph_fileformat_type_t;
 
-typedef enum { IGRAPH_REWIRING_SIMPLE=0,
+typedef enum { IGRAPH_REWIRING_SIMPLE = 0,
                IGRAPH_REWIRING_SIMPLE_LOOPS
              } igraph_rewiring_t;
 
-typedef enum { IGRAPH_EDGEORDER_ID=0,
+typedef enum { IGRAPH_EDGEORDER_ID = 0,
                IGRAPH_EDGEORDER_FROM,
                IGRAPH_EDGEORDER_TO
              } igraph_edgeorder_type_t;
 
-typedef enum { IGRAPH_TO_DIRECTED_ARBITRARY=0,
+typedef enum { IGRAPH_TO_DIRECTED_ARBITRARY = 0,
                IGRAPH_TO_DIRECTED_MUTUAL
              } igraph_to_directed_t;
 
-typedef enum { IGRAPH_TO_UNDIRECTED_EACH=0,
+typedef enum { IGRAPH_TO_UNDIRECTED_EACH = 0,
                IGRAPH_TO_UNDIRECTED_COLLAPSE,
                IGRAPH_TO_UNDIRECTED_MUTUAL
              } igraph_to_undirected_t;
 
-typedef enum { IGRAPH_VCONN_NEI_ERROR=0,
+typedef enum { IGRAPH_VCONN_NEI_ERROR = 0,
                IGRAPH_VCONN_NEI_NUMBER_OF_NODES,
                IGRAPH_VCONN_NEI_IGNORE,
                IGRAPH_VCONN_NEI_NEGATIVE
              } igraph_vconn_nei_t;
 
-typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE=0,
+typedef enum { IGRAPH_SPINCOMM_UPDATE_SIMPLE = 0,
                IGRAPH_SPINCOMM_UPDATE_CONFIG
              } igraph_spincomm_update_t;
 
-typedef enum { IGRAPH_DONT_SIMPLIFY=0,
+typedef enum { IGRAPH_DONT_SIMPLIFY = 0,
                IGRAPH_SIMPLIFY
              } igraph_lazy_adlist_simplify_t;
 
-typedef enum { IGRAPH_TRANSITIVITY_NAN=0,
+typedef enum { IGRAPH_TRANSITIVITY_NAN = 0,
                IGRAPH_TRANSITIVITY_ZERO
              } igraph_transitivity_mode_t;
 
-typedef enum { IGRAPH_SPINCOMM_IMP_ORIG=0,
+typedef enum { IGRAPH_SPINCOMM_IMP_ORIG = 0,
                IGRAPH_SPINCOMM_IMP_NEG
              } igraph_spinglass_implementation_t;
 

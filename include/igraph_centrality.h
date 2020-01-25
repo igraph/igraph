@@ -80,9 +80,9 @@ DECLDIR int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
  */
 
 typedef enum {
-    IGRAPH_PAGERANK_ALGO_POWER=0,
-    IGRAPH_PAGERANK_ALGO_ARPACK=1,
-    IGRAPH_PAGERANK_ALGO_PRPACK=2
+    IGRAPH_PAGERANK_ALGO_POWER = 0,
+    IGRAPH_PAGERANK_ALGO_ARPACK = 1,
+    IGRAPH_PAGERANK_ALGO_PRPACK = 2
 } igraph_pagerank_algo_t;
 
 /**

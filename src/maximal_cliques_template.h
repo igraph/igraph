@@ -249,7 +249,7 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
 
     igraph_vector_int_t PX, R, H, pos, nextv;
     igraph_vector_t coreness, order;
-    igraph_vector_int_t rank;   /* TODO: this is not needed */
+    igraph_vector_int_t rank; /* TODO: this is not needed */
     int i, ii, nn, no_of_nodes = igraph_vcount(graph);
     igraph_adjlist_t adjlist, fulladjlist;
     igraph_real_t pgreset = round(no_of_nodes / 100.0), pg = pgreset, pgc = 0;
@@ -310,10 +310,7 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
     vrank = VECTOR(rank)[v];
     vneis = igraph_adjlist_get(&fulladjlist, v);
     vdeg = igraph_vector_int_size(vneis);
-    Pptr = 0;
-    Xptr = vdeg - 1;
-    PS = 0;
-    XE = vdeg - 1;
+    Pptr = 0; Xptr = vdeg - 1; PS = 0; XE = vdeg - 1;
 
     pg--;
     if (pg <= 0) {
@@ -350,8 +347,7 @@ int FUNCTION(igraph_maximal_cliques, SUFFIX)(
         }
     }
 
-    PE = Pptr - 1;
-    XS = Xptr + 1;  /* end of P, start of X in PX */
+    PE = Pptr - 1; XS = Xptr + 1; /* end of P, start of X in PX */
 
     /* Create an adjacency list that is specific to the
        v vertex. It only contains 'v' and its neighbors. Moreover, we
@@ -399,7 +395,7 @@ igraph_adjlist_destroy(&fulladjlist);
 igraph_adjlist_destroy(&adjlist);
 igraph_vector_int_destroy(&rank);
 igraph_vector_destroy(&order);
-IGRAPH_FINALLY_CLEAN(10);   /* + res */
+IGRAPH_FINALLY_CLEAN(10); /* + res */
 
 return 0;
 }

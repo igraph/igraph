@@ -585,8 +585,7 @@ int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
 
     switch (vs->type) {
     case IGRAPH_VS_NONE:
-        *result = 0;
-        return 0;
+        *result = 0; return 0;
 
     case IGRAPH_VS_1:
         *result = 0;
@@ -600,8 +599,7 @@ int igraph_vs_size(const igraph_t *graph, const igraph_vs_t *vs,
         return 0;
 
     case IGRAPH_VS_ALL:
-        *result = igraph_vcount(graph);
-        return 0;
+        *result = igraph_vcount(graph); return 0;
 
     case IGRAPH_VS_ADJ:
         IGRAPH_VECTOR_INIT_FINALLY(&vec, 0);
@@ -1115,9 +1113,7 @@ igraph_es_t igraph_ess_vector(const igraph_vector_t *v) {
 int igraph_es_fromto(igraph_es_t *es,
                      igraph_vs_t from, igraph_vs_t to) {
 
-    IGRAPH_UNUSED(es);
-    IGRAPH_UNUSED(from);
-    IGRAPH_UNUSED(to);
+    IGRAPH_UNUSED(es); IGRAPH_UNUSED(from); IGRAPH_UNUSED(to);
     IGRAPH_ERROR("igraph_es_fromto not implemented yet", IGRAPH_UNIMPLEMENTED);
     /* TODO */
     return 0;
@@ -1575,9 +1571,7 @@ int igraph_i_es_path_size(const igraph_t *graph,
 
 int igraph_i_es_multipairs_size(const igraph_t *graph,
                                 const igraph_es_t *es, igraph_integer_t *result) {
-    IGRAPH_UNUSED(graph);
-    IGRAPH_UNUSED(es);
-    IGRAPH_UNUSED(result);
+    IGRAPH_UNUSED(graph); IGRAPH_UNUSED(es); IGRAPH_UNUSED(result);
     IGRAPH_ERROR("Cannot calculate edge selector length", IGRAPH_UNIMPLEMENTED);
 }
 

@@ -56,7 +56,7 @@ DECLDIR igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integ
 DECLDIR int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed);
 
 /* igraph_vector_int_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
-/* 			       igraph_integer_t no); */
+/*                 igraph_integer_t no); */
 /**
  * \define igraph_adjlist_get
  * Query a vector in an adjlist
@@ -121,7 +121,7 @@ DECLDIR int igraph_lazy_adjlist_init(const igraph_t *graph,
 DECLDIR void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 DECLDIR void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 /* igraph_vector_t *igraph_lazy_adjlist_get(igraph_lazy_adjlist_t *al, */
-/* 					   igraph_integer_t no); */
+/*                     igraph_integer_t no); */
 /**
  * \define igraph_lazy_adjlist_get
  * Query neighbor vertices
@@ -139,8 +139,8 @@ DECLDIR void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
  * first time, O(1) for subsequent calls.
  */
 #define igraph_lazy_adjlist_get(al,no) \
-  ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
-   (igraph_lazy_adjlist_get_real(al, no)))
+    ((al)->adjs[(long int)(no)] != 0 ? ((al)->adjs[(long int)(no)]) : \
+     (igraph_lazy_adjlist_get_real(al, no)))
 DECLDIR igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
         igraph_integer_t no);
 
@@ -174,8 +174,8 @@ DECLDIR void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
  * time, O(1) for subsequent calls with the same \p no argument.
  */
 #define igraph_lazy_inclist_get(al,no) \
-  ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
-   (igraph_lazy_inclist_get_real(al, no)))
+    ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
+     (igraph_lazy_inclist_get_real(al, no)))
 DECLDIR igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *al,
         igraph_integer_t no);
 
@@ -223,8 +223,8 @@ DECLDIR void igraph_lazy_adjedgelist_destroy(igraph_lazy_inclist_t *il);
  * Deprecated in version 0.6.
  */
 #define igraph_lazy_adjedgelist_get(al,no) \
-  ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
-   (igraph_lazy_adjedgelist_get_real(al, no)))
+    ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
+     (igraph_lazy_adjedgelist_get_real(al, no)))
 DECLDIR igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_inclist_t *al,
         igraph_integer_t no);
 __END_DECLS

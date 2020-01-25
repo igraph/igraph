@@ -531,7 +531,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
 
     long int actstart;
     long int no_of_nodes = igraph_vcount(graph);
-    long int resco = 0;     /* number of graphs created so far */
+    long int resco = 0;   /* number of graphs created so far */
     char *already_added;
     igraph_dqueue_t q;
     igraph_vector_t verts;
@@ -617,7 +617,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
     igraph_vector_destroy(&verts);
     igraph_dqueue_destroy(&q);
     igraph_free(already_added);
-    IGRAPH_FINALLY_CLEAN(5);    /* + components */
+    IGRAPH_FINALLY_CLEAN(5);  /* + components */
 
     return 0;
 }
@@ -818,7 +818,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
     igraph_vector_destroy(&out);
     igraph_dqueue_destroy(&q);
     igraph_vector_destroy(&next_nei);
-    IGRAPH_FINALLY_CLEAN(6);    /* + components */
+    IGRAPH_FINALLY_CLEAN(6);  /* + components */
 
     return 0;
 

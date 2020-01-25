@@ -333,8 +333,7 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times,
         bool ok = is_connected();
         // performance monitor
         {
-            avg_T += double(T_int);
-            avg_K += double(K_int);
+            avg_T += double(T_int); avg_K += double(K_int);
             if (ok) {
                 successes++;
             } else {
@@ -392,9 +391,7 @@ unsigned long graph_molloy_hash::shuffle(unsigned long times,
             }
             break;
         case BRUTE_FORCE_HEURISTICS:
-            K *= 2;
-            delete[] Kbuff;
-            Kbuff = new int[int(K) + 1];
+            K *= 2; delete[] Kbuff; Kbuff = new int[int(K) + 1];
             break;
         default:
             IGRAPH_ERROR("Error in graph_molloy_hash::shuffle(): "

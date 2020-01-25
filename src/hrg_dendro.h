@@ -89,8 +89,8 @@ namespace fitHRG {
 
 class list {
 public:
-    int x;          // stored elementd in linked-list
-    list*   next;           // pointer to next elementd
+    int x;            // stored elementd in linked-list
+    list* next;           // pointer to next elementd
     list::list(): x(-1), next(0) { }
     list::~list() { }
 };
@@ -120,12 +120,12 @@ struct child {
 #define IGRAPH_HRG_CNODE
 class cnode {
 public:
-    int index;          // array index of this node
-    int degree;         // number of children in list
-    int parent;         // index of parent node
-    double weight;      // sampled posterior weight
-    child* children;        // list of children (and their types)
-    child* lastChild;       // pointer to last child in list
+    int index;            // array index of this node
+    int degree;           // number of children in list
+    int parent;           // index of parent node
+    double weight;        // sampled posterior weight
+    child* children;      // list of children (and their types)
+    child* lastChild;     // pointer to last child in list
     cnode(): index(-1), degree(0), parent(-1), weight(0.0),
         children(0), lastChild(0)  { }
     ~cnode() {
@@ -147,7 +147,7 @@ public:
 
 class split {
 public:
-    string s;             // partition assignment of leaf vertices
+    string s;           // partition assignment of leaf vertices
     split(): s("") { }
     ~split() { }
     void initializeSplit(const int n) {
@@ -183,7 +183,7 @@ private:
     ipair* edgelist;   // list of internal edges represented
     string* splitlist; // split representation of the internal edges
     int** indexLUT;    // table of indices of internal edges in edgelist
-    int q;       // number of internal edges
+    int q;         // number of internal edges
     int count;         // (for adding edges) edgelist index of new edge to add
 public:
     interns(const int);
@@ -210,17 +210,17 @@ public:
 class elementd {
 public:
     short int type; // either DENDRO or GRAPH
-    double logL;      // log-likelihood contribution of this internal node
+    double logL;    // log-likelihood contribution of this internal node
     double p;       // probability p_i that an edge exists between L and
     // R subtrees
-    int e;    // number of edges between L and R subtrees
-    int n;    // number of leafs in subtree rooted here
-    int label;    // subtree label: smallest leaf index
-    int index;    // index in containing array
+    int e;      // number of edges between L and R subtrees
+    int n;      // number of leafs in subtree rooted here
+    int label;      // subtree label: smallest leaf index
+    int index;      // index in containing array
 
-    elementd *M;            // pointer to parent node
-    elementd *L;            // pointer for L subtree
-    elementd *R;            // pointer for R subtree
+    elementd *M;          // pointer to parent node
+    elementd *L;          // pointer for L subtree
+    elementd *R;          // pointer for R subtree
 
     elementd(): type(DENDRO), logL(0.0), p(0.0), e(0), n(0),
         label(-1), index(-1), M(0), L(0), R(0) { }
@@ -235,13 +235,13 @@ private:
     elementd* root;     // root of the dendrogram
     elementd* internal; // array of n-1 internal vertices (the dendrogram D)
     elementd* leaf;     // array of n   leaf vertices (the graph G)
-    int n;        // number of leaf vertices to allocate
-    interns* d;       // list of internal edges of dendrogram D
-    splittree* splithist;         // histogram of cumulative split weights
-    list** paths;             // array of path-lists from root to leaf
-    double L;          // log-likelihood of graph G given dendrogram D
+    int n;          // number of leaf vertices to allocate
+    interns* d;         // list of internal edges of dendrogram D
+    splittree* splithist;       // histogram of cumulative split weights
+    list** paths;           // array of path-lists from root to leaf
+    double L;        // log-likelihood of graph G given dendrogram D
     rbtree subtreeL, subtreeR;  // trees for computeEdgeCount() function
-    cnode* ctree;         // (consensus tree) array of internal tree nodes
+    cnode* ctree;       // (consensus tree) array of internal tree nodes
     int* cancestor;     // (consensus tree) oldest ancetor's index for
     // each leaf
 
@@ -269,8 +269,7 @@ public:
     graph* g;
 
     // constructor / destructor
-    dendro();
-    ~dendro();
+    dendro(); ~dendro();
     // build dendrogram from g
     void buildDendrogram();
     // delete dendrograph in prep for importDendrogramStructure

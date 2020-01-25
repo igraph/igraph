@@ -678,20 +678,17 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
     IGRAPH_VECTOR_INIT_FINALLY(&tmpD, no);
 
     options->n = vc;
-    options->start = 0;     /* random start vector */
+    options->start = 0;   /* random start vector */
     options->nev = no;
     switch (which) {
     case IGRAPH_EIGEN_LM:
-        options->which[0] = 'L';
-        options->which[1] = 'M';
+        options->which[0] = 'L'; options->which[1] = 'M';
         break;
     case IGRAPH_EIGEN_LA:
-        options->which[0] = 'L';
-        options->which[1] = 'A';
+        options->which[0] = 'L'; options->which[1] = 'A';
         break;
     case IGRAPH_EIGEN_SA:
-        options->which[0] = 'S';
-        options->which[1] = 'A';
+        options->which[0] = 'S'; options->which[1] = 'A';
         break;
     default:
         break;
@@ -1117,16 +1114,11 @@ int igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim) {
 
     for (i = 0; i < n - 1; i++) {
         int n1 = i + 1, n2 = n - i - 1, n1m1 = n1 - 1, n2m1 = n2 - 1;
-        x = VECTOR(*sv)[i];
-        x2 = x * x;
-        sum1 += x;
-        sum2 -= x;
-        sumsq1 += x2;
-        sumsq2 -= x2;
-        oldmean1 = mean1;
-        oldmean2 = mean2;
-        mean1 = sum1 / n1;
-        mean2 = sum2 / n2;
+        x = VECTOR(*sv)[i]; x2 = x * x;
+        sum1 += x; sum2 -= x;
+        sumsq1 += x2; sumsq2 -= x2;
+        oldmean1 = mean1; oldmean2 = mean2;
+        mean1 = sum1 / n1; mean2 = sum2 / n2;
         varsq1 += (x - oldmean1) * (x - mean1);
         varsq2 -= (x - oldmean2) * (x - mean2);
         var1 = i == 0 ? 0 : varsq1 / n1m1;

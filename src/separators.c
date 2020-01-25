@@ -550,7 +550,7 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
     igraph_vector_destroy(&components);
     igraph_vector_bool_destroy(&already_tried);
     igraph_vector_destroy(&leaveout);
-    IGRAPH_FINALLY_CLEAN(7);    /* +1 for separators */
+    IGRAPH_FINALLY_CLEAN(7);  /* +1 for separators */
 
     return 0;
 }
@@ -656,8 +656,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
-    igraph_integer_t conn;
-    long int k;
+    igraph_integer_t conn; long int k;
     igraph_vector_t X;
     long int i, j;
     igraph_bool_t issepX;
@@ -678,8 +677,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
     /* ---------------------------------------------------------------- */
     /* 1 Find the vertex connectivity of 'graph' */
     IGRAPH_CHECK(igraph_vertex_connectivity(graph, &conn,
-                                            /* checks= */ 1));
-    k = conn;
+                                            /* checks= */ 1)); k = conn;
 
     /* Special cases for low connectivity, two exits here! */
     if (conn == 0) {
@@ -811,7 +809,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
                 igraph_vector_ptr_destroy(&stcuts);
                 IGRAPH_FINALLY_CLEAN(1);
 
-            }   /* if phivalue == k */
+            } /* if phivalue == k */
 
             /* --------------------------------------------------------------- */
             /* 8 Add edge (x[i],v[j]) to G. */
@@ -832,7 +830,7 @@ int igraph_minimum_size_separators(const igraph_t *graph,
     igraph_vector_destroy(&capacity);
     igraph_vector_destroy(&X);
     igraph_destroy(&graph_copy);
-    IGRAPH_FINALLY_CLEAN(6);    /* +1 for separators */
+    IGRAPH_FINALLY_CLEAN(6);  /* +1 for separators */
 
     return 0;
 }

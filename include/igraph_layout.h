@@ -207,7 +207,7 @@ typedef struct igraph_layout_drl_options_t {
  * \enumval IGRAPH_LAYOUT_DRL_FINAL Finalize an already refined layout.
  */
 
-typedef enum { IGRAPH_LAYOUT_DRL_DEFAULT=0,
+typedef enum { IGRAPH_LAYOUT_DRL_DEFAULT = 0,
                IGRAPH_LAYOUT_DRL_COARSEN,
                IGRAPH_LAYOUT_DRL_COARSEST,
                IGRAPH_LAYOUT_DRL_REFINE,

@@ -29,7 +29,7 @@
 __BEGIN_DECLS
 
 #ifndef _GNU_SOURCE
-# define _GNU_SOURCE 1
+    #define _GNU_SOURCE 1
 #endif
 
 #include "igraph_error.h"
@@ -61,13 +61,13 @@ DECLDIR int igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t v
 double igraph_i_fdiv(const double a, const double b);
 
 #if defined(INFINITY)
-#  define IGRAPH_INFINITY INFINITY
-#  define IGRAPH_POSINFINITY INFINITY
-#  define IGRAPH_NEGINFINITY (-INFINITY)
+    #define IGRAPH_INFINITY INFINITY
+    #define IGRAPH_POSINFINITY INFINITY
+    #define IGRAPH_NEGINFINITY (-INFINITY)
 #else
-#  define IGRAPH_INFINITY (igraph_i_fdiv(1.0, 0.0))
-#  define IGRAPH_POSINFINITY (igraph_i_fdiv(1.0, 0.0))
-#  define IGRAPH_NEGINFINITY (igraph_i_fdiv(-1.0, 0.0))
+    #define IGRAPH_INFINITY (igraph_i_fdiv(1.0, 0.0))
+    #define IGRAPH_POSINFINITY (igraph_i_fdiv(1.0, 0.0))
+    #define IGRAPH_NEGINFINITY (igraph_i_fdiv(-1.0, 0.0))
 #endif
 
 DECLDIR int igraph_finite(double x);
@@ -79,11 +79,11 @@ DECLDIR int igraph_is_posinf(double x);
 DECLDIR int igraph_is_neginf(double x);
 
 #if defined(NAN)
-#  define IGRAPH_NAN NAN
+    #define IGRAPH_NAN NAN
 #elif defined(INFINITY)
-#  define IGRAPH_NAN (INFINITY/INFINITY)
+    #define IGRAPH_NAN (INFINITY/INFINITY)
 #else
-#  define IGRAPH_NAN (igraph_i_fdiv(0.0, 0.0))
+    #define IGRAPH_NAN (igraph_i_fdiv(0.0, 0.0))
 #endif
 
 __END_DECLS

@@ -765,10 +765,7 @@ long graph_molloy_opt::gkantsidis_connected_shuffle(long times) {
         } else {
             restore(save);
             //assert(verify());
-            T /= 2;
-            if (T == 0) {
-                T = 1;
-            }
+            T /= 2; if (T == 0) T = 1;
         }
         delete[] save;
     }
@@ -803,10 +800,7 @@ long graph_molloy_opt::slow_connected_shuffle(long times) {
                 nb_swaps++;
             } else {
                 // undo swap
-                *t1f1 = f1;
-                *t2f2 = f2;
-                *f1t1 = t1;
-                *f2t2 = t2;
+                *t1f1 = f1; *t2f2 = f2; *f1t1 = t1; *f2t2 = t2;
             }
         }
     }
@@ -1143,14 +1137,11 @@ double *graph_molloy_opt::vertex_betweenness(int mode, bool trivial_paths) {
         // backwards-cumulative exploration
         switch (mode) {
         case MODE_USP:
-            explore_usp(target, nb_vertices, buff, paths, dist);
-            break;
+            explore_usp(target, nb_vertices, buff, paths, dist); break;
         case MODE_ASP:
-            explore_asp(target, nb_vertices, buff, paths, dist);
-            break;
+            explore_asp(target, nb_vertices, buff, paths, dist); break;
         case MODE_RSP:
-            explore_rsp(target, nb_vertices, buff, paths, dist);
-            break;
+            explore_rsp(target, nb_vertices, buff, paths, dist); break;
         default:
             IGRAPH_WARNING("graph_molloy_opt::vertex_betweenness() "
                            "called with Invalid Mode");
@@ -1262,14 +1253,11 @@ double graph_molloy_opt::traceroute_sample(int mode, int nb_src, int *src, int n
             // traceroute exploration
             switch (mode) {
             case MODE_USP:
-                explore_usp(target, nb_vertices, buff, paths, dist, newdeg, edge_redudancy);
-                break;
+                explore_usp(target, nb_vertices, buff, paths, dist, newdeg, edge_redudancy); break;
             case MODE_ASP:
-                explore_asp(target, nb_vertices, buff, paths, dist, newdeg, edge_redudancy);
-                break;
+                explore_asp(target, nb_vertices, buff, paths, dist, newdeg, edge_redudancy); break;
             case MODE_RSP:
-                explore_rsp(target, nb_vertices, buff, paths, dist, newdeg, edge_redudancy);
-                break;
+                explore_rsp(target, nb_vertices, buff, paths, dist, newdeg, edge_redudancy); break;
             default:
                 IGRAPH_WARNING("graph_molloy_opt::traceroute_sample() called "
                                "with Invalid Mode");
@@ -1315,8 +1303,7 @@ int graph_molloy_opt::disconnecting_edges() {
             i = pick_random_vertex();
         } while (i < 0 || deg[i] < 1);
         int *p = neigh[i] + (my_random() % deg[i]);
-        int j = *p;
-        *p = i;
+        int j = *p; *p = i;
         fast_rpl(neigh[j], i, j);
         removed++;
     }
@@ -1714,14 +1701,11 @@ double graph_molloy_opt::rho(int mode, int nb_src, int *src, int nb_dst, int *ds
             // traceroute exploration
             switch (mode) {
             case MODE_USP:
-                explore_usp(target, nb_vertices, buff, paths, dist);
-                break;
+                explore_usp(target, nb_vertices, buff, paths, dist); break;
             case MODE_ASP:
-                explore_asp(target, nb_vertices, buff, paths, dist);
-                break;
+                explore_asp(target, nb_vertices, buff, paths, dist); break;
             case MODE_RSP:
-                explore_rsp(target, nb_vertices, buff, paths, dist);
-                break;
+                explore_rsp(target, nb_vertices, buff, paths, dist); break;
             default:
                 IGRAPH_WARNING("graph_molloy_opt::rho() called with Invalid Mode");
             }

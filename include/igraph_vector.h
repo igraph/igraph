@@ -29,11 +29,11 @@
 #include "igraph_complex.h"
 
 #ifdef HAVE_STDINT_H
-#  include <stdint.h>
+    #include <stdint.h>
 #else
-#  if defined(HAVE_SYS_INT_TYPES_H) && HAVE_SYS_INT_TYPES_H
-#    include <sys/int_types.h>    /* for Solaris */
-#  endif
+    #if defined(HAVE_SYS_INT_TYPES_H) && HAVE_SYS_INT_TYPES_H
+        #include <sys/int_types.h>    /* for Solaris */
+    #endif
 #endif
 
 __BEGIN_DECLS
@@ -131,28 +131,28 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 #ifndef IGRAPH_VECTOR_NULL
-#define IGRAPH_VECTOR_NULL { 0,0,0 }
+    #define IGRAPH_VECTOR_NULL { 0,0,0 }
 #endif
 
 #ifndef IGRAPH_VECTOR_INIT_FINALLY
 #define IGRAPH_VECTOR_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(igraph_vector_init(v, size)); \
-  IGRAPH_FINALLY(igraph_vector_destroy, v); } while (0)
+    do { IGRAPH_CHECK(igraph_vector_init(v, size)); \
+        IGRAPH_FINALLY(igraph_vector_destroy, v); } while (0)
 #endif
 #ifndef IGRAPH_VECTOR_BOOL_INIT_FINALLY
 #define IGRAPH_VECTOR_BOOL_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(igraph_vector_bool_init(v, size)); \
-  IGRAPH_FINALLY(igraph_vector_bool_destroy, v); } while (0)
+    do { IGRAPH_CHECK(igraph_vector_bool_init(v, size)); \
+        IGRAPH_FINALLY(igraph_vector_bool_destroy, v); } while (0)
 #endif
 #ifndef IGRAPH_VECTOR_INT_INIT_FINALLY
 #define IGRAPH_VECTOR_INT_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(igraph_vector_int_init(v, size)); \
-  IGRAPH_FINALLY(igraph_vector_int_destroy, v); } while (0)
+    do { IGRAPH_CHECK(igraph_vector_int_init(v, size)); \
+        IGRAPH_FINALLY(igraph_vector_int_destroy, v); } while (0)
 #endif
 #ifndef IGRAPH_VECTOR_LONG_INIT_FINALLY
 #define IGRAPH_VECTOR_LONG_INIT_FINALLY(v, size) \
-  do { IGRAPH_CHECK(igraph_vector_long_init(v, size)); \
-  IGRAPH_FINALLY(igraph_vector_long_destroy, v); } while (0)
+    do { IGRAPH_CHECK(igraph_vector_long_init(v, size)); \
+        IGRAPH_FINALLY(igraph_vector_long_destroy, v); } while (0)
 #endif
 
 /* -------------------------------------------------- */

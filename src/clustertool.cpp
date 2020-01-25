@@ -200,9 +200,9 @@ int igraph_community_spinglass(const igraph_t *graph,
                                igraph_real_t gamma,
                                /* the rest is for the NegSpin implementation */
                                igraph_spinglass_implementation_t implementation,
-                               /*                  igraph_matrix_t *adhesion, */
-                               /*                  igraph_matrix_t *normalised_adhesion, */
-                               /*                  igraph_real_t *polarization, */
+                               /*                 igraph_matrix_t *adhesion, */
+                               /*                 igraph_matrix_t *normalised_adhesion, */
+                               /*                 igraph_real_t *polarization, */
                                igraph_real_t gamma_minus) {
 
     switch (implementation) {

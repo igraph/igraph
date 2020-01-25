@@ -601,23 +601,17 @@ int graph::ReCompute( ) {
         }
         break;
     case 1:
-        IGRAPH_PROGRESS("DrL layout (expansion stage)", progress, 0);
-        break;
+        IGRAPH_PROGRESS("DrL layout (expansion stage)", progress, 0); break;
     case 2:
-        IGRAPH_PROGRESS("DrL layout (cooldown and cluster phase)", progress, 0);
-        break;
+        IGRAPH_PROGRESS("DrL layout (cooldown and cluster phase)", progress, 0); break;
     case 3:
-        IGRAPH_PROGRESS("DrL layout (crunch phase)", progress, 0);
-        break;
+        IGRAPH_PROGRESS("DrL layout (crunch phase)", progress, 0); break;
     case 5:
-        IGRAPH_PROGRESS("DrL layout (simmer phase)", progress, 0);
-        break;
+        IGRAPH_PROGRESS("DrL layout (simmer phase)", progress, 0); break;
     case 6:
-        IGRAPH_PROGRESS("DrL layout (final phase)", 100.0, 0);
-        break;
+        IGRAPH_PROGRESS("DrL layout (final phase)", 100.0, 0); break;
     default:
-        IGRAPH_PROGRESS("DrL layout (unknown phase)", 0.0, 0);
-        break;
+        IGRAPH_PROGRESS("DrL layout (unknown phase)", 0.0, 0); break;
     }
 
     /* Compute Energies for individual nodes */

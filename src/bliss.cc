@@ -62,51 +62,25 @@ inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
     if (directed) {
         Digraph::SplittingHeuristic gsh = Digraph::shs_fsm;
         switch (sh) {
-        case IGRAPH_BLISS_F:
-            gsh = Digraph::shs_f;
-            break;
-        case IGRAPH_BLISS_FL:
-            gsh = Digraph::shs_fl;
-            break;
-        case IGRAPH_BLISS_FS:
-            gsh = Digraph::shs_fs;
-            break;
-        case IGRAPH_BLISS_FM:
-            gsh = Digraph::shs_fm;
-            break;
-        case IGRAPH_BLISS_FLM:
-            gsh = Digraph::shs_flm;
-            break;
-        case IGRAPH_BLISS_FSM:
-            gsh = Digraph::shs_fsm;
-            break;
-        default:
-            IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
+        case IGRAPH_BLISS_F:    gsh = Digraph::shs_f;   break;
+        case IGRAPH_BLISS_FL:   gsh = Digraph::shs_fl;  break;
+        case IGRAPH_BLISS_FS:   gsh = Digraph::shs_fs;  break;
+        case IGRAPH_BLISS_FM:   gsh = Digraph::shs_fm;  break;
+        case IGRAPH_BLISS_FLM:  gsh = Digraph::shs_flm; break;
+        case IGRAPH_BLISS_FSM:  gsh = Digraph::shs_fsm; break;
+        default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
         }
         static_cast<Digraph *>(g)->set_splitting_heuristic(gsh);
     } else {
         Graph::SplittingHeuristic gsh = Graph::shs_fsm;
         switch (sh) {
-        case IGRAPH_BLISS_F:
-            gsh = Graph::shs_f;
-            break;
-        case IGRAPH_BLISS_FL:
-            gsh = Graph::shs_fl;
-            break;
-        case IGRAPH_BLISS_FS:
-            gsh = Graph::shs_fs;
-            break;
-        case IGRAPH_BLISS_FM:
-            gsh = Graph::shs_fm;
-            break;
-        case IGRAPH_BLISS_FLM:
-            gsh = Graph::shs_flm;
-            break;
-        case IGRAPH_BLISS_FSM:
-            gsh = Graph::shs_fsm;
-            break;
-        default:
-            IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
+        case IGRAPH_BLISS_F:    gsh = Graph::shs_f;   break;
+        case IGRAPH_BLISS_FL:   gsh = Graph::shs_fl;  break;
+        case IGRAPH_BLISS_FS:   gsh = Graph::shs_fs;  break;
+        case IGRAPH_BLISS_FM:   gsh = Graph::shs_fm;  break;
+        case IGRAPH_BLISS_FLM:  gsh = Graph::shs_flm; break;
+        case IGRAPH_BLISS_FSM:  gsh = Graph::shs_fsm; break;
+        default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
         }
         static_cast<Graph *>(g)->set_splitting_heuristic(gsh);
     }

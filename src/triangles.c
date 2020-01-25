@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sts=4 sw=4 et: */
+/* vim:set ts=2 sts=2 sw=2 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -212,8 +212,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_t *neis2;
         long int neilen;
         if (VECTOR(indexv)[v] == 0) {
-            VECTOR(indexv)[v] = k + 1;
-            k++;
+            VECTOR(indexv)[v] = k + 1; k++;
             IGRAPH_CHECK(igraph_vector_push_back(&avids, v));
         }
 
@@ -222,8 +221,7 @@ int igraph_transitivity_local_undirected2(const igraph_t *graph,
         for (j = 0; j < neilen; j++) {
             long int nei = (long int) VECTOR(*neis2)[j];
             if (VECTOR(indexv)[nei] == 0) {
-                VECTOR(indexv)[nei] = k + 1;
-                k++;
+                VECTOR(indexv)[nei] = k + 1; k++;
                 IGRAPH_CHECK(igraph_vector_push_back(&avids, nei));
             }
         }

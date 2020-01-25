@@ -96,18 +96,13 @@ int igraph_zeroin(              /* An estimate of the root */
     int *Maxit,             /* Max # of iterations */
     igraph_real_t *res) {               /* Result is stored here */
     igraph_real_t a, b, c,      /* Abscissae, descr. see above  */
-                  fa, fb, fc;           /* f(a), f(b), f(c) */
+                  fa, fb, fc;         /* f(a), f(b), f(c) */
     igraph_real_t tol;
     int maxit;
 
-    a = *ax;
-    b = *bx;
-    fa = (*f)(a, info);
-    fb = (*f)(b, info);
-    c = a;
-    fc = fa;
-    maxit = *Maxit + 1;
-    tol = * Tol;
+    a = *ax;  b = *bx;  fa = (*f)(a, info);  fb = (*f)(b, info);
+    c = a;   fc = fa;
+    maxit = *Maxit + 1; tol = * Tol;
 
     /* First test if we have found a root at an endpoint */
     if (fa == 0.0) {
@@ -136,13 +131,9 @@ int igraph_zeroin(              /* An estimate of the root */
         IGRAPH_ALLOW_INTERRUPTION();
 
         if ( fabs(fc) < fabs(fb) ) {
-            /* Swap data for b to be the   */
-            a = b;
-            b = c;
-            c = a;  /* best approximation       */
-            fa = fb;
-            fb = fc;
-            fc = fa;
+            /* Swap data for b to be the    */
+            a = b;  b = c;  c = a;  /* best approximation       */
+            fa = fb;  fb = fc;  fc = fa;
         }
         tol_act = 2 * EPSILON * fabs(b) + tol / 2;
         new_step = (c - b) / 2;
@@ -168,9 +159,7 @@ int igraph_zeroin(              /* An estimate of the root */
                 q = 1.0 - t1;
             } else {        /* Quadric inverse interpolation*/
 
-                q = fa / fc;
-                t1 = fb / fc;
-                t2 = fb / fa;
+                q = fa / fc;  t1 = fb / fc;  t2 = fb / fa;
                 p = t2 * ( cb * q * (q - t1) - (b - a) * (t1 - 1.0) );
                 q = (q - 1.0) * (t1 - 1.0) * (t2 - 1.0);
             }
@@ -197,14 +186,11 @@ int igraph_zeroin(              /* An estimate of the root */
                 new_step = -tol_act;
             }
         }
-        a = b;
-        fa = fb;            /* Save the previous approx. */
-        b += new_step;
-        fb = (*f)(b, info); /* Do step to a new approxim. */
+        a = b;  fa = fb;            /* Save the previous approx. */
+        b += new_step;  fb = (*f)(b, info); /* Do step to a new approxim. */
         if ( (fb > 0 && fc > 0) || (fb < 0 && fc < 0) ) {
             /* Adjust c for it to have a sign opposite to that of b */
-            c = a;
-            fc = fa;
+            c = a;  fc = fa;
         }
 
     }

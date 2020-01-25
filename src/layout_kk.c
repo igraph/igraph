@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph R package.
    Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
@@ -230,14 +230,12 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
         myD1 = 0.0, myD2 = 0.0, A = 0.0, B = 0.0, C = 0.0;
 
         /* Select maximal delta */
-        m = 0;
-        max_delta = -1;
+        m = 0; max_delta = -1;
         for (i = 0; i < no_nodes; i++) {
             igraph_real_t delta = (VECTOR(D1)[i] * VECTOR(D1)[i] +
                                    VECTOR(D2)[i] * VECTOR(D2)[i]);
             if (delta > max_delta) {
-                m = i;
-                max_delta = delta;
+                m = i; max_delta = delta;
             }
         }
         if (max_delta < epsilon) {
@@ -552,15 +550,13 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
         igraph_real_t detnum;
 
         /* Select maximal delta */
-        m = 0;
-        max_delta = -1;
+        m = 0; max_delta = -1;
         for (i = 0; i < no_nodes; i++) {
             igraph_real_t delta = (VECTOR(D1)[i] * VECTOR(D1)[i] +
                                    VECTOR(D2)[i] * VECTOR(D2)[i] +
                                    VECTOR(D3)[i] * VECTOR(D3)[i]);
             if (delta > max_delta) {
-                m = i;
-                max_delta = delta;
+                m = i; max_delta = delta;
             }
         }
         if (max_delta < epsilon) {

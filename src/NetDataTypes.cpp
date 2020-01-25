@@ -90,9 +90,7 @@ void NNode::Add_StateHistory(unsigned int state) {
 }
 
 void NNode::Set_Color(RGBcolor c) {
-    color.red = c.red;
-    color.blue = c.blue;
-    color.green = c.green;
+    color.red = c.red; color.blue = c.blue; color.green = c.green;
     strcpy(color.pajek_c, c.pajek_c);
 }
 

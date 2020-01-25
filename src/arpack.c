@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set sw=4 ts=4 sts=4 et: */
+/* vim:set sw=2 ts=8 sts=2 noet: */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -140,12 +140,12 @@ int igraph_i_arpack_err_dneupd(int error) {
 
 void igraph_arpack_options_init(igraph_arpack_options_t *o) {
     o->bmat[0] = 'I';
-    o->n = 0;       /* needs to be updated! */
+    o->n = 0;         /* needs to be updated! */
     o->which[0] = 'X'; o->which[1] = 'X';
     o->nev = 1;
     o->tol = 0;
     o->ncv = 0;       /* 0 means "automatic" */
-    o->ldv = o->n;          /* will be updated to (real) n */
+    o->ldv = o->n;        /* will be updated to (real) n */
     o->ishift = 1;
     o->mxiter = 3000;
     o->nb = 1;
@@ -156,17 +156,9 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
     o->sigmai = 0;
     o->info = o->start;
 
-    o->iparam[0] = o->ishift;
-    o->iparam[1] = 0;
-    o->iparam[2] = o->mxiter;
-    o->iparam[3] = o->nb;
-    o->iparam[4] = 0;
-    o->iparam[5] = 0;
-    o->iparam[6] = o->mode;
-    o->iparam[7] = 0;
-    o->iparam[8] = 0;
-    o->iparam[9] = 0;
-    o->iparam[10] = 0;
+    o->iparam[0] = o->ishift; o->iparam[1] = 0; o->iparam[2] = o->mxiter; o->iparam[3] = o->nb;
+    o->iparam[4] = 0; o->iparam[5] = 0; o->iparam[6] = o->mode; o->iparam[7] = 0;
+    o->iparam[8] = 0; o->iparam[9] = 0; o->iparam[10] = 0;
 }
 
 /**
@@ -323,8 +315,7 @@ int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
 
     if (values != 0) {
         IGRAPH_CHECK(igraph_matrix_resize(values, 1, 2));
-        MATRIX(*values, 0, 0) = b;
-        MATRIX(*values, 0, 1) = 0;
+        MATRIX(*values, 0, 0) = b; MATRIX(*values, 0, 1) = 0;
     }
 
     if (vectors != 0) {
@@ -359,22 +350,17 @@ int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
     }
 
     /* Probe the values in the matrix */
-    vec[0] = 1;
-    vec[1] = 0;
+    vec[0] = 1; vec[1] = 0;
     if (fun(mat, vec, 2, extra)) {
         IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
                      IGRAPH_ARPACK_PROD);
     }
-    vec[0] = 0;
-    vec[1] = 1;
+    vec[0] = 0; vec[1] = 1;
     if (fun(mat + 2, vec, 2, extra)) {
         IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
                      IGRAPH_ARPACK_PROD);
     }
-    a = mat[0];
-    b = mat[2];
-    c = mat[1];
-    d = mat[3];
+    a = mat[0]; b = mat[2]; c = mat[1]; d = mat[3];
 
     /* Get the trace and the determinant */
     trace = a + d;
@@ -449,15 +435,9 @@ int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
 
     if (swap_evals) {
         igraph_complex_t dummy;
-        dummy = eval1;
-        eval1 = eval2;
-        eval2 = dummy;
-        dummy = evec1[0];
-        evec1[0] = evec2[0];
-        evec2[0] = dummy;
-        dummy = evec1[1];
-        evec1[1] = evec2[1];
-        evec2[1] = dummy;
+        dummy = eval1; eval1 = eval2; eval2 = dummy;
+        dummy = evec1[0]; evec1[0] = evec2[0]; evec2[0] = dummy;
+        dummy = evec1[1]; evec1[1] = evec2[1]; evec2[1] = dummy;
     }
 
     if (complex_evals) {
@@ -465,8 +445,7 @@ int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
          * one with positive imaginary part */
         if (IGRAPH_IMAG(eval1) < 0) {
             eval1 = eval2;
-            evec1[0] = evec2[0];
-            evec1[1] = evec2[1];
+            evec1[0] = evec2[0]; evec1[1] = evec2[1];
         }
     }
 
@@ -522,22 +501,17 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
     }
 
     /* Probe the values in the matrix */
-    vec[0] = 1;
-    vec[1] = 0;
+    vec[0] = 1; vec[1] = 0;
     if (fun(mat, vec, 2, extra)) {
         IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
                      IGRAPH_ARPACK_PROD);
     }
-    vec[0] = 0;
-    vec[1] = 1;
+    vec[0] = 0; vec[1] = 1;
     if (fun(mat + 2, vec, 2, extra)) {
         IGRAPH_ERROR("ARPACK error while evaluating matrix-vector product",
                      IGRAPH_ARPACK_PROD);
     }
-    a = mat[0];
-    b = mat[2];
-    c = mat[1];
-    d = mat[3];
+    a = mat[0]; b = mat[2]; c = mat[1]; d = mat[3];
 
     /* Get the trace and the determinant */
     trace = a + d;
@@ -549,20 +523,14 @@ int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
         eval1 = trace / 2 + sqrt(tsq4_minus_d);
         eval2 = trace / 2 - sqrt(tsq4_minus_d);
         if (c != 0) {
-            mat[0] = eval1 - d;
-            mat[2] = eval2 - d;
-            mat[1] = c;
-            mat[3] = c;
+            mat[0] = eval1 - d; mat[2] = eval2 - d;
+            mat[1] = c;       mat[3] = c;
         } else if (b != 0) {
-            mat[0] = b;
-            mat[2] = b;
-            mat[1] = eval1 - a;
-            mat[3] = eval2 - a;
+            mat[0] = b;       mat[2] = b;
+            mat[1] = eval1 - a; mat[3] = eval2 - a;
         } else {
-            mat[0] = 1;
-            mat[2] = 0;
-            mat[1] = 0;
-            mat[3] = 1;
+            mat[0] = 1; mat[2] = 0;
+            mat[1] = 0; mat[3] = 1;
         }
     } else {
         /* Both eigenvalues are complex. Should not happen with symmetric
@@ -622,20 +590,15 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
     if (which('L', 'A')) {
-        sort[0] = 'S';
-        sort[1] = 'A';
+        sort[0] = 'S'; sort[1] = 'A';
     } else if (which('S', 'A')) {
-        sort[0] = 'L';
-        sort[1] = 'A';
+        sort[0] = 'L'; sort[1] = 'A';
     } else if (which('L', 'M')) {
-        sort[0] = 'S';
-        sort[1] = 'M';
+        sort[0] = 'S'; sort[1] = 'M';
     } else if (which('S', 'M')) {
-        sort[0] = 'L';
-        sort[1] = 'M';
+        sort[0] = 'L'; sort[1] = 'M';
     } else if (which('B', 'E')) {
-        sort[0] = 'L';
-        sort[1] = 'A';
+        sort[0] = 'L'; sort[1] = 'A';
     }
 
     IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv - 1));
@@ -655,13 +618,11 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
         while (l1 <= l2) {
             VECTOR(order2)[w] = VECTOR(order)[l1];
             VECTOR(d2)[w] = d[l1];
-            w++;
-            l1++;
+            w++; l1++;
             if (l1 <= l2) {
                 VECTOR(order2)[w] = VECTOR(order)[l2];
                 VECTOR(d2)[w] = d[l2];
-                w++;
-                l2--;
+                w++; l2--;
             }
         }
         igraph_vector_update(&order, &order2);
@@ -712,23 +673,17 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
     if (which('L', 'M')) {
-        sort[0] = 'S';
-        sort[1] = 'M';
+        sort[0] = 'S'; sort[1] = 'M';
     } else if (which('S', 'M')) {
-        sort[0] = 'L';
-        sort[1] = 'M';
+        sort[0] = 'L'; sort[1] = 'M';
     } else if (which('L', 'R')) {
-        sort[0] = 'S';
-        sort[1] = 'R';
+        sort[0] = 'S'; sort[1] = 'R';
     } else if (which('S', 'R')) {
-        sort[0] = 'L';
-        sort[1] = 'R';
+        sort[0] = 'L'; sort[1] = 'R';
     } else if (which('L', 'I')) {
-        sort[0] = 'S';
-        sort[1] = 'I';
+        sort[0] = 'S'; sort[1] = 'I';
     } else if (which('S', 'I')) {
-        sort[0] = 'L';
-        sort[1] = 'I';
+        sort[0] = 'L'; sort[1] = 'I';
     }
 
 #undef which
@@ -908,7 +863,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     int *select, i;
 
     int ido = 0;
-    int rvec = vectors || storage ? 1 : 0;  /* calculate eigenvectors? */
+    int rvec = vectors || storage ? 1 : 0; /* calculate eigenvectors? */
     char *all = "All";
 
     int origldv = options->ldv, origlworkl = options->lworkl,
@@ -1088,8 +1043,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
     options->ldv = origldv;
     options->ncv = origncv;
     options->lworkl = origlworkl;
-    options->which[0] = origwhich[0];
-    options->which[1] = origwhich[1];
+    options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
     options->tol = origtol;
     options->nev = orignev;
 
@@ -1340,8 +1294,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
     options->ldv = origldv;
     options->ncv = origncv;
     options->lworkl = origlworkl;
-    options->which[0] = origwhich[0];
-    options->which[1] = origwhich[1];
+    options->which[0] = origwhich[0]; options->which[1] = origwhich[1];
     options->tol = origtol;
     options->nev = orignev;
 

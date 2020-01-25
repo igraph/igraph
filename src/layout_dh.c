@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph R package.
    Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
@@ -156,7 +156,7 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
 
     igraph_integer_t no_tries = 30;
     float w_node_dist = weight_node_dist ;          /* 1.0 */
-    float w_borderlines = weight_border;              /* 0.0 */
+    float w_borderlines = weight_border;            /* 0.0 */
     float w_edge_lengths = weight_edge_lengths;     /* 0.0001; */
     float w_edge_crossings = weight_edge_crossings; /* 1.0 */
     float w_node_edge_dist = weight_node_edge_dist; /* 0.2 */
@@ -213,10 +213,8 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
             }
         }
     } else {
-        min_x = IGRAPH_INFINITY;
-        max_x = IGRAPH_NEGINFINITY;
-        min_y = IGRAPH_INFINITY;
-        max_y = IGRAPH_NEGINFINITY;
+        min_x = IGRAPH_INFINITY; max_x = IGRAPH_NEGINFINITY;
+        min_y = IGRAPH_INFINITY; max_y = IGRAPH_NEGINFINITY;
         for (i = 0; i < no_nodes; i++) {
             float x = MATRIX(*res, i, 0);
             float y = MATRIX(*res, i, 1);
@@ -302,26 +300,22 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
                     float dy1 = height / 2 - new_y, dy2 = new_y + height / 2;
                     if (odx1 < 0) {
                         odx1 = 2;
-                    }
-                    if (odx2 < 0) {
+                    } if (odx2 < 0) {
                         odx2 = 2;
                     }
                     if (ody1 < 0) {
                         ody1 = 2;
-                    }
-                    if (ody2 < 0) {
+                    } if (ody2 < 0) {
                         ody2 = 2;
                     }
                     if (dx1 < 0) {
                         dx1 = 2;
-                    }
-                    if (dx2 < 0) {
+                    } if (dx2 < 0) {
                         dx2 = 2;
                     }
                     if (dy1 < 0) {
                         dy1 = 2;
-                    }
-                    if (dy2 < 0) {
+                    } if (dy2 < 0) {
                         dy2 = 2;
                     }
                     diff_energy -= w_borderlines *
@@ -442,7 +436,7 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
                     }
                 }
 
-            }   /* t < no_tries */
+            } /* t < no_tries */
 
         } /* p < no_nodes  */
 

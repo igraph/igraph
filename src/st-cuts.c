@@ -396,8 +396,8 @@ int igraph_dominator_tree(const igraph_t *graph,
 
     igraph_adjlist_t succ, pred;
     igraph_vector_t parent;
-    igraph_vector_long_t semi;  /* +1 always */
-    igraph_vector_t vertex; /* +1 always */
+    igraph_vector_long_t semi;    /* +1 always */
+    igraph_vector_t vertex;   /* +1 always */
     igraph_i_dbucket_t bucket;
     igraph_vector_long_t ancestor;
     igraph_vector_long_t label;
@@ -591,8 +591,7 @@ igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_incb(const igraph_t *graph,
     const igraph_vector_t *map = data->map;
     long int realvid = (long int) VECTOR(*map)[(long int)vid];
 
-    IGRAPH_UNUSED(graph);
-    IGRAPH_UNUSED(dist);
+    IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
     if (VECTOR(*GammaX)[(long int)realvid]) {
         if (!igraph_stack_empty(stack)) {
@@ -614,8 +613,7 @@ igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_otcb(const igraph_t *graph,
     const igraph_vector_t *map = data->map;
     long int realvid = (long int) VECTOR(*map)[(long int)vid];
 
-    IGRAPH_UNUSED(graph);
-    IGRAPH_UNUSED(dist);
+    IGRAPH_UNUSED(graph); IGRAPH_UNUSED(dist);
 
     if (!igraph_stack_empty(stack) &&
         igraph_stack_top(stack) == realvid) {
@@ -1200,8 +1198,7 @@ int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
     igraph_vector_t M;
     long int nomin;
 
-    IGRAPH_UNUSED(source);
-    IGRAPH_UNUSED(target);
+    IGRAPH_UNUSED(source); IGRAPH_UNUSED(target);
 
     if (igraph_marked_queue_size(S) == no_of_nodes) {
         igraph_vector_clear(Isv);

@@ -49,7 +49,7 @@ DECLDIR int igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *
         const igraph_vector_t *weights,
         igraph_neimode_t mode);
 
-DECLDIR int igraph_local_scan_k_ecount(const igraph_t *graph,int k,
+DECLDIR int igraph_local_scan_k_ecount(const igraph_t *graph, int k,
                                        igraph_vector_t *res,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode);

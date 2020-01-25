@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sts=4 sw=4 et: */
+/* vim:set ts=2 sts=2 sw=2 et: */
 /*
    IGraph library.
    Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -723,7 +723,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
         if (father[ (long int) IGRAPH_VIT_GET(vit) ] == 0) {
             father[ (long int) IGRAPH_VIT_GET(vit) ] = -1;
         } else {
-            to_reach--;     /* this node was given multiple times */
+            to_reach--;       /* this node was given multiple times */
         }
     }
 
@@ -1072,7 +1072,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
         if (geodist[ (long int) IGRAPH_VIT_GET(vit) ] == 0) {
             geodist[ (long int) IGRAPH_VIT_GET(vit) ] = -1;
         } else {
-            to_reach--;     /* this node was given multiple times */
+            to_reach--;       /* this node was given multiple times */
         }
     }
 
@@ -1488,8 +1488,7 @@ int igraph_pagerank_old(const igraph_t *graph, igraph_vector_t *res,
 
         /* Calculate the quotient of the actual PageRank value and the
          * outdegree for every node */
-        sumfrom = 0.0;
-        sum = 0.0;
+        sumfrom = 0.0; sum = 0.0;
         for (i = 0; i < no_of_nodes; i++) {
             sumfrom += prvec[i];
             prvec_scaled[i] = prvec[i] / VECTOR(outdegree)[i];
@@ -1635,9 +1634,7 @@ int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mo
              * a -- b and b -- a. Since some rewirings can be performed only when we
              * "swap" the endpoints, we do it now with probability 0.5 */
             if (!directed && RNG_UNIF01() < 0.5) {
-                dummy = c;
-                c = d;
-                d = dummy;
+                dummy = c; c = d; d = dummy;
                 if (use_adjlist) {
                     /* Flip the edge in the unordered edge-list, so the update later on
                      * hits the correct end. */
@@ -1702,10 +1699,8 @@ int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mo
                     VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1] = b;
                 } else {
                     IGRAPH_CHECK(igraph_delete_edges(graph, es));
-                    VECTOR(edgevec)[0] = a;
-                    VECTOR(edgevec)[1] = d;
-                    VECTOR(edgevec)[2] = c;
-                    VECTOR(edgevec)[3] = b;
+                    VECTOR(edgevec)[0] = a; VECTOR(edgevec)[1] = d;
+                    VECTOR(edgevec)[2] = c; VECTOR(edgevec)[3] = b;
                     /* printf("Adding: %ld -> %ld, %ld -> %ld\n",
                                 (long)a, (long)d, (long)c, (long)b); */
                     igraph_add_edges(graph, &edgevec, 0);
@@ -1816,7 +1811,7 @@ int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
     if (remain == 0) {
         IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, remain);   /* TODO: hack */
+    IGRAPH_FINALLY(free, remain); /* TODO: hack */
     IGRAPH_CHECK(igraph_vector_reserve(&delete, no_of_nodes - IGRAPH_VIT_SIZE(vit)));
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
@@ -2195,8 +2190,8 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     if (eremain == 0) {
         IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, vremain);  /* TODO: hack */
-    IGRAPH_FINALLY(free, eremain);  /* TODO: hack */
+    IGRAPH_FINALLY(free, vremain);    /* TODO: hack */
+    IGRAPH_FINALLY(free, eremain);    /* TODO: hack */
     IGRAPH_CHECK(igraph_vector_reserve(&delete, no_of_edges - IGRAPH_EIT_SIZE(eit)));
 
     /* Collect the vertex and edge IDs that will remain */
@@ -2371,8 +2366,7 @@ int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                 VECTOR(mergeinto)[edge] = actedge;
             }
         }
-        pfrom = from;
-        pto = to;
+        pfrom = from; pto = to;
     }
 
     igraph_eit_destroy(&eit);
@@ -2667,7 +2661,7 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                 to = from;
             }
             j = to;
-            if (i != j) {       /* excluding loops */
+            if (i != j) {     /* excluding loops */
                 if (weights) {
                     VECTOR(contrib)[j] +=
                         VECTOR(*weights)[(long int)edge] / VECTOR(degree)[i];
@@ -3434,8 +3428,7 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
 
     /* Take all nodes with no incoming vertices and remove them */
     while (!igraph_dqueue_empty(&sources)) {
-        igraph_real_t tmp = igraph_dqueue_pop(&sources);
-        node = (long) tmp;
+        igraph_real_t tmp = igraph_dqueue_pop(&sources); node = (long) tmp;
         /* Add the node to the result vector */
         igraph_vector_push_back(res, node);
         /* Exclude the node from further source searches */
@@ -3509,8 +3502,7 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
 
     /* Take all nodes with no incoming edges and remove them */
     while (!igraph_dqueue_empty(&sources)) {
-        igraph_real_t tmp = igraph_dqueue_pop(&sources);
-        node = (long) tmp;
+        igraph_real_t tmp = igraph_dqueue_pop(&sources); node = (long) tmp;
         /* Exclude the node from further source searches */
         VECTOR(degrees)[node] = -1;
         vertices_left--;
@@ -3580,12 +3572,10 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
-                    found = 1;
-                    break;
+                    found = 1; break;
                 }
                 if (j > 0 && VECTOR(neis)[j - 1] == VECTOR(neis)[j]) {
-                    found = 1;
-                    break;
+                    found = 1; break;
                 }
             }
         }
@@ -3709,16 +3699,13 @@ int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res) {
                      * list, so check the next item as well */
                     if (directed) {
                         /* Directed, so this is a real multiple edge */
-                        found = 1;
-                        break;
+                        found = 1; break;
                     } else if (VECTOR(neis)[j - 1] != i) {
                         /* Undirected, but not a loop edge */
-                        found = 1;
-                        break;
+                        found = 1; break;
                     } else if (j < n - 1 && VECTOR(neis)[j] == VECTOR(neis)[j + 1]) {
                         /* Undirected, loop edge, multiple times */
-                        found = 1;
-                        break;
+                        found = 1; break;
                     }
                 }
             }
@@ -3958,8 +3945,7 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
                             /* Is it a minimum circle? */
                             mincirc = actlevel + neilevel - 1;
                             minvertex = node;
-                            t1 = actnode;
-                            t2 = nei;
+                            t1 = actnode; t2 = nei;
                             if (neilevel == 2) {
                                 /* Is it a triangle? */
                                 triangle = 1;
@@ -4694,11 +4680,11 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
         if (!is_target[ (long int) IGRAPH_VIT_GET(vit) ]) {
             is_target[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
         } else {
-            to_reach--;     /* this node was given multiple times */
+            to_reach--;       /* this node was given multiple times */
         }
     }
 
-    VECTOR(dists)[(long int)from] = 0.0;    /* zero distance */
+    VECTOR(dists)[(long int)from] = 0.0;  /* zero distance */
     parents[(long int)from] = 0;
     igraph_2wheap_push_with_index(&Q, from, 0);
 
@@ -5058,13 +5044,13 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
         if (!is_target[ (long int) IGRAPH_VIT_GET(vit) ]) {
             is_target[ (long int) IGRAPH_VIT_GET(vit) ] = 1;
         } else {
-            to_reach--;     /* this node was given multiple times */
+            to_reach--;       /* this node was given multiple times */
         }
     }
     igraph_vit_destroy(&vit);
     IGRAPH_FINALLY_CLEAN(1);
 
-    VECTOR(dists)[(long int)from] = 0.0;    /* zero distance */
+    VECTOR(dists)[(long int)from] = 0.0;  /* zero distance */
     igraph_2wheap_push_with_index(&Q, from, 0);
 
     while (!igraph_2wheap_empty(&Q) && to_reach > 0) {
@@ -5332,8 +5318,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 j++;
             } else {
                 /* we don't need this path, free it */
-                igraph_vector_destroy(path);
-                free(path);
+                igraph_vector_destroy(path); free(path);
             }
         }
         IGRAPH_CHECK(igraph_vector_ptr_resize(res, j));
@@ -5798,7 +5783,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                     }
                 }
 
-            }   /* for i<n */
+            } /* for i<n */
 
         } /* ! igraph_dqueue_empty(&Q) */
 
@@ -6347,9 +6332,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
             long int nlen;
 
             if (mindist > res) {
-                res = mindist;
-                from = source;
-                to = minnei;
+                res = mindist; from = source; to = minnei;
             }
             nodes_reached++;
 
@@ -6944,10 +6927,7 @@ int igraph_i_is_graphical_degree_sequence_undirected(
      * report they are 1-based */
     *res = 1;
     n = igraph_vector_size(&work);
-    w = n - 1;
-    b = 0;
-    s = 0;
-    c = 0;
+    w = n - 1; b = 0; s = 0; c = 0;
     for (k = 0; k < n; k++) {
         b += VECTOR(*degrees)[k];
         c += w;

@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -1209,8 +1209,7 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
     }
 
     /* Now calculate k^Tx/2m */
-    ktx = 0.0;
-    ktx2 = 0.0;
+    ktx = 0.0; ktx2 = 0.0;
     for (j = 0; j < size; j++) {
         long int oldid = (long int) VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
@@ -1274,8 +1273,7 @@ int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
     }
 
     /* Now calculate k^Tx/2m */
-    ktx = 0.0;
-    ktx2 = 0.0;
+    ktx = 0.0; ktx2 = 0.0;
     for (j = 0; j < size + 1; j++) {
         long int oldid = (long int) VECTOR(*idx)[j];
         igraph_vector_int_t *neis = igraph_adjlist_get(adjlist, oldid);
@@ -1343,8 +1341,7 @@ int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
     }
 
     /* k^Tx/2m */
-    ktx = 0.0;
-    ktx2 = 0.0;
+    ktx = 0.0; ktx2 = 0.0;
     for (j = 0; j < size; j++) {
         long int oldid = (long int) VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
@@ -1411,8 +1408,7 @@ int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
     }
 
     /* k^Tx/2m */
-    ktx = 0.0;
-    ktx2 = 0.0;
+    ktx = 0.0; ktx2 = 0.0;
     for (j = 0; j < size + 1; j++) {
         long int oldid = (long int) VECTOR(*idx)[j];
         igraph_real_t str = VECTOR(*strength)[oldid];
@@ -1719,8 +1715,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
     options->start = 0;
-    options->which[0] = 'L';
-    options->which[1] = 'A';
+    options->which[0] = 'L'; options->which[1] = 'A';
 
     /* Memory for ARPACK */
     /* We are allocating memory for 20 eigenvectors since options->ncv won't be
@@ -3589,8 +3584,7 @@ int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
 
     igraph_spmatrix_iter_destroy(&mit);
     igraph_spmatrix_destroy(&m);
-    free(p1);
-    free(p2);
+    free(p1); free(p2);
 
     IGRAPH_FINALLY_CLEAN(4);
 

@@ -126,8 +126,7 @@ int igraph_maximum_cardinality_search(const igraph_t *graph,
     /* i:=n; j:=0; */
     /***************/
 
-    i = no_of_nodes;
-    j = 0;
+    i = no_of_nodes; j = 0;
 
     /**************/
     /* do i>=1 -> */
@@ -426,7 +425,7 @@ int igraph_is_chordal(const igraph_t *graph,
 
                 x = VECTOR(f)[x];
 
-            }   /* while (VECTOR(index)[x] < i) */
+            } /* while (VECTOR(index)[x] < i) */
 
             /*****************************/
             /* if (f(x)=x -> f(x):=w; fi */

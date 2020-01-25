@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph R package.
    Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
@@ -203,8 +203,7 @@ int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
             barycenter_y += py;
         }
 
-        pvx = VECTOR(impulse_x)[v];
-        pvy = VECTOR(impulse_y)[v];
+        pvx = VECTOR(impulse_x)[v]; pvy = VECTOR(impulse_y)[v];
         if (pvx != 0 || pvy != 0) {
             float beta = atan2f(pvy - py, pvx - px);
             float sin_beta = sinf(beta);

@@ -214,8 +214,7 @@ void powerlaw::init_to_offset(double _offset, int _tabulated) {
                 mul *= 0.5;
                 dt[k--] = -1;
             };
-            mul *= 0.5;
-            dt[k--] = i - 1;
+            mul *= 0.5; dt[k--] = i - 1;
         }
     }
     table[0] = int(floor(0.5 + ssum));

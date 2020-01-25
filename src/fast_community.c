@@ -459,8 +459,7 @@ int igraph_i_fastgreedy_community_update_dq(
     long int i, j, to, from;
     igraph_real_t olddq;
     igraph_i_fastgreedy_community *comm_to, *comm_from;
-    to = p->first;
-    from = p->second;
+    to = p->first; from = p->second;
     comm_to = &list->e[to];
     comm_from = &list->e[from];
     if (comm_to->maxdq == p && newdq >= *p->dq) {
@@ -738,17 +737,14 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         igraph_edge(graph, (igraph_integer_t) eidx, &ffrom, &fto);
 
         /* Create the pairs themselves */
-        from = (long int)ffrom;
-        to = (long int)fto;
+        from = (long int)ffrom; to = (long int)fto;
         if (from == to) {
             loop_weight_sum += weights ? 2 * VECTOR(*weights)[eidx] : 2;
             continue;
         }
 
         if (from > to) {
-            dummy = from;
-            from = to;
-            to = dummy;
+            dummy = from; from = to; to = dummy;
         }
         if (weights) {
             dq[j] = 2 * (VECTOR(*weights)[eidx] / (weight_sum * 2.0) - VECTOR(a)[from] * VECTOR(a)[to] / (4.0 * weight_sum * weight_sum));
@@ -937,8 +933,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
                      * from.neis[j] != to */
                     p2->first = to;
                     IGRAPH_CHECK(igraph_vector_ptr_insert(&communities.e[to].neis, i, p2));
-                    n++;
-                    i++;
+                    n++; i++;
                     if (*p2->dq > *communities.e[to].maxdq->dq) {
                         communities.e[to].maxdq = p2;
                         k = igraph_i_fastgreedy_community_list_find_in_heap(&communities, to);

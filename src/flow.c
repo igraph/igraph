@@ -278,8 +278,7 @@ void igraph_i_mf_relabel(long int v, long int no_of_nodes,
 
     long int min = no_of_nodes;
     long int k, l, min_edge = 0;
-    (stats->norelabel)++;
-    (*nrelabelsince)++;
+    (stats->norelabel)++; (*nrelabelsince)++;
     DIST(v) = no_of_nodes;
     for (k = FIRST(v), l = LAST(v); k < l; k++) {
         if (RESCAP(k) > 0 && DIST(HEAD(k)) < min) {
@@ -304,8 +303,7 @@ void igraph_i_mf_push(long int v, long int e, long int n,
                       int *npushsince) {
     igraph_real_t delta =
         RESCAP(e) < EXCESS(v) ? RESCAP(e) : EXCESS(v);
-    (stats->nopush)++;
-    (*npushsince)++;
+    (stats->nopush)++; (*npushsince)++;
     if (EXCESS(n) == 0 && n != target) {
         igraph_dbuckets_delete(ibuckets, DIST(n), n);
         igraph_buckets_add(buckets, (long int) DIST(n), n);
@@ -599,15 +597,13 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
     idx = -1;
     for (i = 0; i <= VECTOR(from)[0]; i++) {
-        idx++;
-        VECTOR(first)[idx] = 0;
+        idx++; VECTOR(first)[idx] = 0;
     }
     for (i = 1; i < no_of_edges; i++) {
         long int n = (long int) (VECTOR(from)[i] -
                                  VECTOR(from)[ (long int) VECTOR(first)[idx] ]);
         for (j = 0; j < n; j++) {
-            idx++;
-            VECTOR(first)[idx] = i;
+            idx++; VECTOR(first)[idx] = i;
         }
     }
     idx++;
@@ -943,8 +939,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                                 thisflow = rcap;
                             }
                         }
-                        MYCAP(edge) -= thisflow;
-                        RESCAP(edge) += thisflow;
+                        MYCAP(edge) -= thisflow; RESCAP(edge) += thisflow;
                         for (idx = igraph_vector_long_size(&stack) - 2;
                              idx >= 0 && VECTOR(stack)[idx + 1] != nei; idx -= 2) {
                             long int e = VECTOR(stack)[idx];

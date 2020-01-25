@@ -88,11 +88,7 @@ namespace gengraph {
 inline int HASH_EXPAND(int x) {
     _HASH_EXP_CALL();
     x += x;
-    x |= x >> 1;
-    x |= x >> 2;
-    x |= x >> 4;
-    x |= x >> 8;
-    x |= x >> 16;
+    x |= x >> 1;  x |= x >> 2;  x |= x >> 4;  x |= x >> 8;  x |= x >> 16;
     return x + 1;
 }
 #define HASH_KEY(x,size) ((x*2198737)&((size)-1))

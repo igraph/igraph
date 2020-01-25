@@ -50,7 +50,7 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
     int n = (int) igraph_vector_size(b);
     igraph_bool_t accpoint, enough;
     igraph_vector_t g, t, X, c;
-    igraph_matrix_t B;      /* Lmatrix really */
+    igraph_matrix_t B;        /* Lmatrix really */
     int   count, funcount, gradcount;
     igraph_real_t f, gradproj;
     int   i, j, ilast, iter = 0;
@@ -176,7 +176,7 @@ igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
                 } else {    /* D1 < 0 */
                     ilast = gradcount;
                 }
-            } else {    /* no progress */
+            } else {  /* no progress */
                 if (ilast < gradcount) {
                     count = 0;
                     ilast = gradcount;

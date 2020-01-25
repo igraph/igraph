@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sts=4 sw=4 et: */
+/* vim:set ts=2 sts=2 sw=2 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -170,7 +170,7 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     long int i;
 
     options->n = igraph_vcount(graph);
-    options->start = 1;     /* no random start vector */
+    options->start = 1;   /* no random start vector */
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -226,9 +226,8 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     options->n = igraph_vcount(graph);
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-    options->which[0] = 'L';
-    options->which[1] = 'A';
-    options->start = 1;     /* no random start vector */
+    options->which[0] = 'L'; options->which[1] = 'A';
+    options->start = 1;   /* no random start vector */
 
     if (!weights) {
 
@@ -400,8 +399,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
     /* LM mode is not OK here because +1 and -1 can be eigenvalues at the
      * same time, e.g.: a -> b -> a, c -> a */
-    options->which[0] = 'L' ;
-    options->which[1] = 'R';
+    options->which[0] = 'L' ; options->which[1] = 'R';
 
     IGRAPH_MATRIX_INIT_FINALLY(&values, 0, 0);
     IGRAPH_MATRIX_INIT_FINALLY(&vectors, options->n, 1);
@@ -758,19 +756,13 @@ int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
         }
     }
 
-    extra.in = inadjlist;
-    extra.out = outadjlist;
-    extra.tmp = &tmp;
-    extra2.in = ininclist;
-    extra2.out = outinclist;
-    extra2.tmp = &tmp;
-    extra2.graph = graph;
-    extra2.weights = weights;
+    extra.in = inadjlist; extra.out = outadjlist; extra.tmp = &tmp;
+    extra2.in = ininclist; extra2.out = outinclist; extra2.tmp = &tmp;
+    extra2.graph = graph; extra2.weights = weights;
 
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rssolve */
-    options->which[0] = 'L';
-    options->which[1] = 'M';
+    options->which[0] = 'L'; options->which[1] = 'M';
 
     if (weights == 0) {
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_kleinberg_unweighted, &extra,
@@ -1384,9 +1376,8 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
     options->n = (int) no_of_nodes;
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
-    options->which[0] = 'L';
-    options->which[1] = 'M';
-    options->start = 1;     /* no random start vector */
+    options->which[0] = 'L'; options->which[1] = 'M';
+    options->start = 1;       /* no random start vector */
 
     directed = directed && igraph_is_directed(graph);
 

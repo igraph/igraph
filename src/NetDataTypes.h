@@ -918,9 +918,7 @@ bool DLList_Iter<L_DATA>::Swap(DLList_Iter<L_DATA> b) {
     if (end_reached || b.end_reached) {
         return false;
     }
-    h = current->item;
-    current->item = b.current->item;
-    b.current->item = h;
+    h = current->item; current->item = b.current->item; b.current->item = h;
     return true;
 }
 

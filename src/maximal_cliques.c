@@ -227,8 +227,7 @@ int igraph_i_maximal_cliques_down(igraph_vector_int_t *PX,
     int j, vneislen = igraph_vector_int_size(vneis);
     int sPS = PS + 1, sPE = PE + 1, sXS = XS + 1, sXE = XE + 1;
 
-    *newPS = PE + 1;
-    *newXE = XS - 1;
+    *newPS = PE + 1; *newXE = XS - 1;
     for (j = 0; j < vneislen; j++) {
         int vnei = VECTOR(*vneis)[j];
         int vneipos = VECTOR(*pos)[vnei];
@@ -259,8 +258,7 @@ int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
     VECTOR(*PX)[*PE] = v;
     VECTOR(*pos)[v] = (*PE) + 1;
     VECTOR(*pos)[tmp] = vpos + 1;
-    (*PE)--;
-    (*XS)--;
+    (*PE)--; (*XS)--;
     igraph_vector_int_push_back(H, v);
 
     return 0;
@@ -281,8 +279,7 @@ int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
         VECTOR(*PX)[vvpos - 1] = tmp;
         VECTOR(*pos)[vv] = XS + 1;
         VECTOR(*pos)[tmp] = vvpos;
-        PE++;
-        XS++;
+        PE++; XS++;
     }
 
     return 0;

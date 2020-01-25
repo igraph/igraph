@@ -1707,11 +1707,11 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 
         if (!is_directed) {
             double sum_weight_pos       = sum_weight_pos_out + sum_weight_pos_in;
-            sum_weight_pos_out  = sum_weight_pos;
-            sum_weight_pos_in   = sum_weight_pos;
+            sum_weight_pos_out   = sum_weight_pos;
+            sum_weight_pos_in    = sum_weight_pos;
             double sum_weight_neg = sum_weight_neg_out + sum_weight_neg_in;
-            sum_weight_neg_out  = sum_weight_neg;
-            sum_weight_neg_in   = sum_weight_neg;
+            sum_weight_neg_out   = sum_weight_neg;
+            sum_weight_neg_in    = sum_weight_neg;
         }
 
         //av_k = (av_k*l + sum_weight_pos_in)/(l+1); //Average k
@@ -1927,8 +1927,7 @@ double PottsModelN::HeatBathLookup(double gamma, double lambda, double t, unsign
                 spin[v] = new_spin;
 
                 //The new spin increase by one, and the old spin decreases by one
-                csize[new_spin]++;
-                csize[old_spin]--;
+                csize[new_spin]++; csize[old_spin]--;
 
                 //Change the sums of degree for the old spin...
                 degree_community_pos_in[old_spin]   -= delta_pos_in;

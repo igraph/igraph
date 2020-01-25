@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sts=4 sw=4 et: */
+/* vim:set ts=2 sts=2 sw=2 et: */
 /*
    IGraph library.
    Copyright (C) 2011-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -306,8 +306,7 @@ int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *resu
 
         /* (3) No more sources or sinks. Find the node with the largest
          * difference between its out-strength and in-strength */
-        v = -1;
-        maxdiff = -IGRAPH_INFINITY;
+        v = -1; maxdiff = -IGRAPH_INFINITY;
         for (i = 0; i < no_of_nodes; i++) {
             if (VECTOR(outdegrees)[i] < 0) {
                 continue;
@@ -620,8 +619,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
         IGRAPH_CHECK(igraph_vector_resize(&ordering, n));
         igraph_vector_null(&ordering);
         m = n * (n - 1) / 2;
-        j = 0;
-        k = 1;
+        j = 0; k = 1;
         for (l = 1; l <= m; l++) {
             /* variable l always corresponds to the (j, k) vertex pair */
             /* printf("(%ld, %ld) = %g\n", i, j, glp_mip_col_val(ip, l)); */
@@ -634,8 +632,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
             }
             k++;
             if (k == n) {
-                j++;
-                k = j + 1;
+                j++; k = j + 1;
             }
         }
 

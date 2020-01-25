@@ -1244,16 +1244,13 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     IGRAPH_CHECK(igraph_degree(graph2, &outdeg2, igraph_vss_all(),
                                IGRAPH_OUT, IGRAPH_LOOPS));
 
-    depth = 0;
-    last1 = -1;
-    last2 = -1;
+    depth = 0; last1 = -1; last2 = -1;
     while (depth >= 0) {
         long int i;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        cand1 = -1;
-        cand2 = -1;
+        cand1 = -1; cand2 = -1;
         /* Search for the next pair to try */
         if ((in_1_size != in_2_size) ||
             (out_1_size != out_2_size)) {
@@ -1383,7 +1380,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
 
-            }   /* end of stepping back */
+            } /* end of stepping back */
 
             depth -= 1;
 
@@ -1597,8 +1594,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                         out_2_size += 1;
                     }
                 }
-                last1 = -1;
-                last2 = -1;           /* this the first time here */
+                last1 = -1; last2 = -1;       /* this the first time here */
             } else {
                 last1 = cand1;
                 last2 = cand2;
@@ -1667,10 +1663,9 @@ igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
                                       void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_bool_t *iso = data->arg;
-    IGRAPH_UNUSED(map12);
-    IGRAPH_UNUSED(map21);
+    IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *iso = 1;
-    return 0;           /* don't need to continue */
+    return 0;         /* don't need to continue */
 }
 
 /**
@@ -1766,10 +1761,9 @@ igraph_bool_t igraph_i_count_isomorphisms_vf2(const igraph_vector_t *map12,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_integer_t *count = data->arg;
-    IGRAPH_UNUSED(map12);
-    IGRAPH_UNUSED(map21);
+    IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *count += 1;
-    return 1;           /* always continue */
+    return 1;         /* always continue */
 }
 
 /**
@@ -1861,7 +1855,7 @@ igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
     IGRAPH_CHECK(igraph_vector_ptr_push_back(ptrvector, newvector));
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 1;           /* continue finding subisomorphisms */
+    return 1;         /* continue finding subisomorphisms */
 }
 
 /**
@@ -2132,16 +2126,13 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     IGRAPH_CHECK(igraph_degree(graph2, &outdeg2, igraph_vss_all(),
                                IGRAPH_OUT, IGRAPH_LOOPS));
 
-    depth = 0;
-    last1 = -1;
-    last2 = -1;
+    depth = 0; last1 = -1; last2 = -1;
     while (depth >= 0) {
         long int i;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-        cand1 = -1;
-        cand2 = -1;
+        cand1 = -1; cand2 = -1;
         /* Search for the next pair to try */
         if ((in_1_size < in_2_size) ||
             (out_1_size < out_2_size)) {
@@ -2271,7 +2262,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
 
-            }   /* end of stepping back */
+            } /* end of stepping back */
 
             depth -= 1;
 
@@ -2441,8 +2432,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                         out_2_size += 1;
                     }
                 }
-                last1 = -1;
-                last2 = -1;           /* this the first time here */
+                last1 = -1; last2 = -1;       /* this the first time here */
             } else {
                 last1 = cand1;
                 last2 = cand2;
@@ -2488,8 +2478,7 @@ igraph_bool_t igraph_i_subisomorphic_vf2(const igraph_vector_t *map12,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_bool_t *iso = data->arg;
-    IGRAPH_UNUSED(map12);
-    IGRAPH_UNUSED(map21);
+    IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *iso = 1;
     return 0; /* stop */
 }
@@ -2576,10 +2565,9 @@ igraph_bool_t igraph_i_count_subisomorphisms_vf2(const igraph_vector_t *map12,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_integer_t *count = data->arg;
-    IGRAPH_UNUSED(map12);
-    IGRAPH_UNUSED(map21);
+    IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
     *count += 1;
-    return 1;           /* always continue */
+    return 1;         /* always continue */
 }
 
 /**
@@ -2674,7 +2662,7 @@ igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
     IGRAPH_CHECK(igraph_vector_ptr_push_back(vector, newvector));
     IGRAPH_FINALLY_CLEAN(2);
 
-    return 1;           /* continue finding subisomorphisms */
+    return 1;         /* continue finding subisomorphisms */
 }
 
 /**
@@ -2920,8 +2908,7 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
     }
     if ((colors1 == NULL || colors2 == NULL) && colors1 != colors2) {
         IGRAPH_WARNING("Only one of the graphs is vertex colored, colors will be ignored");
-        colors1 = NULL;
-        colors2 = NULL;
+        colors1 = NULL; colors2 = NULL;
     }
 
     if (no_of_nodes != igraph_vcount(graph2) ||
@@ -3124,8 +3111,7 @@ int igraph_simplify_and_colorize(
             VECTOR(*edge_color)[i] = 1;
         }
 
-        pfrom = from;
-        pto = to;
+        pfrom = from; pto = to;
     }
 
     igraph_vector_int_resize(edge_color, i + 1);

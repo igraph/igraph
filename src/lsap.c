@@ -27,13 +27,13 @@
 
 typedef struct {
     int        n;            /* order of problem             */
-    double   **C;            /* cost matrix        */
-    double   **c;            /* reduced cost matrix    */
+    double   **C;            /* cost matrix          */
+    double   **c;            /* reduced cost matrix      */
     int       *s;            /* assignment                   */
     int       *f;            /* column i is assigned to f[i] */
-    int       na;            /* number of assigned items;      */
-    int     runs;            /* number of iterations       */
-    double  cost;            /* minimum cost           */
+    int       na;            /* number of assigned items;    */
+    int     runs;            /* number of iterations     */
+    double  cost;            /* minimum cost         */
     time_t rtime;            /* time                         */
 } AP;
 

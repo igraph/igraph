@@ -171,12 +171,12 @@ DECLDIR int igraph_progressf(const char *message, igraph_real_t percent, void *d
  */
 
 #define IGRAPH_PROGRESS(message, percent, data) \
-  do { \
-    if (igraph_progress((message), (percent), (data)) != IGRAPH_SUCCESS) { \
-      IGRAPH_FINALLY_FREE(); \
-      return IGRAPH_INTERRUPTED; \
-    } \
-  } while (0)
+    do { \
+        if (igraph_progress((message), (percent), (data)) != IGRAPH_SUCCESS) { \
+            IGRAPH_FINALLY_FREE(); \
+            return IGRAPH_INTERRUPTED; \
+        } \
+    } while (0)
 
 __END_DECLS
 

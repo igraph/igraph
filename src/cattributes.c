@@ -237,9 +237,7 @@ int igraph_i_cattribute_copy(igraph_t *to, const igraph_t *from,
     IGRAPH_FINALLY_CLEAN(3);
     IGRAPH_FINALLY(igraph_i_cattribute_copy_free, attrto);
 
-    alto[0] = &attrto->gal;
-    alto[1] = &attrto->val;
-    alto[2] = &attrto->eal;
+    alto[0] = &attrto->gal; alto[1] = &attrto->val; alto[2] = &attrto->eal;
     for (a = 0; a < 3; a++) {
         if (copy[a]) {
             n = igraph_vector_ptr_size(alfrom[a]);

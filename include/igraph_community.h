@@ -68,9 +68,9 @@ DECLDIR int igraph_community_spinglass(const igraph_t *graph,
                                        igraph_real_t gamma,
                                        /* the rest is for the NegSpin implementation */
                                        igraph_spinglass_implementation_t implementation,
-                                       /* igraph_matrix_t *adhesion, */
-                                       /* igraph_matrix_t *normalised_adhesion, */
-                                       /* igraph_real_t *polarization, */
+                                       /*                    igraph_matrix_t *adhesion, */
+                                       /*                    igraph_matrix_t *normalised_adhesion, */
+                                       /*                    igraph_real_t *polarization, */
                                        igraph_real_t lambda);
 
 DECLDIR int igraph_community_spinglass_single(const igraph_t *graph,
@@ -145,7 +145,7 @@ DECLDIR int igraph_reindex_membership(igraph_vector_t *membership,
                                       igraph_vector_t *new_to_old,
                                       igraph_integer_t *nb_clusters);
 
-typedef enum { IGRAPH_LEVC_HIST_SPLIT=1,
+typedef enum { IGRAPH_LEVC_HIST_SPLIT = 1,
                IGRAPH_LEVC_HIST_FAILED,
                IGRAPH_LEVC_HIST_START_FULL,
                IGRAPH_LEVC_HIST_START_GIVEN

@@ -275,7 +275,7 @@ int igraph_i_subclique_next(const igraph_t *graph,
     igraph_vector_int_destroy(&mark);
     igraph_vector_int_destroy(&map);
     igraph_vector_destroy(&newedges);
-    IGRAPH_FINALLY_CLEAN(6);    /* + freedata */
+    IGRAPH_FINALLY_CLEAN(6);  /* + freedata */
 
     return 0;
 }
@@ -474,8 +474,7 @@ int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
                 } else if (ei > ej) {
                     pj++;
                 } else {
-                    pi++;
-                    pj++;
+                    pi++; pj++;
                 }
             }
             if (pi == n_i) {
@@ -666,8 +665,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
             int to_v = VECTOR(vcl)[to_s];
             if (from_v == to_v) {
                 VECTOR(ecl)[ptr++] = from_v;
-                from_s++;
-                to_s++;
+                from_s++; to_s++;
             } else if (from_v < to_v) {
                 from_s++;
             } else {

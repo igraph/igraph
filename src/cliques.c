@@ -1158,8 +1158,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
     IGRAPH_FINALLY(igraph_vector_int_destroy, &best_fini_cand_nbrs);
 
     /* Find the vertex with the highest degree */
-    best_cand = 0;
-    best_cand_degree = (igraph_integer_t) igraph_vector_int_size(igraph_adjlist_get(&adj_list, 0));
+    best_cand = 0; best_cand_degree = (igraph_integer_t) igraph_vector_int_size(igraph_adjlist_get(&adj_list, 0));
     for (i = 1; i < no_of_nodes; i++) {
         j = igraph_vector_int_size(igraph_adjlist_get(&adj_list, i));
         if (j > best_cand_degree) {
@@ -1183,8 +1182,7 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
     /* TODO: frame.cand and frame.fini should be a set instead of a vector */
 
     /* Main loop starts here */
-    nodes_to_check = (igraph_integer_t) igraph_vector_int_size(&frame.cand_filtered);
-    nodes_done = 0;
+    nodes_to_check = (igraph_integer_t) igraph_vector_int_size(&frame.cand_filtered); nodes_done = 0;
     while (!igraph_vector_int_empty(&frame.cand_filtered) || !igraph_stack_ptr_empty(&stack)) {
         if (igraph_vector_int_empty(&frame.cand_filtered)) {
             /* No candidates left to check in this stack frame, pop out the previous stack frame */
@@ -1212,13 +1210,11 @@ int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_clique_func
         IGRAPH_CHECK(igraph_vector_push_back(&clique, i));
 
         /* Remove the node from the candidate list */
-        assret = igraph_vector_int_binsearch(&frame.cand, i, &j);
-        assert(assret);
+        assret = igraph_vector_int_binsearch(&frame.cand, i, &j); assert(assret);
         igraph_vector_int_remove(&frame.cand, j);
 
         /* Add the node to the finished list */
-        assret = !igraph_vector_int_binsearch(&frame.fini, i, &j);
-        assert(assret);
+        assret = !igraph_vector_int_binsearch(&frame.fini, i, &j); assert(assret);
         IGRAPH_CHECK(igraph_vector_int_insert(&frame.fini, j, i));
 
         /* Create new_cand and new_fini */

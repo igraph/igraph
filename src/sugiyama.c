@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sts=4 sw=4 et: */
+/* vim:set ts=2 sts=2 sw=2 et: */
 /*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
@@ -351,8 +351,7 @@ int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
         igraph_vector_t inds;
         IGRAPH_VECTOR_INIT_FINALLY(&inds, 0);
         IGRAPH_CHECK((int) igraph_vector_qsort_ind(&layers_own, &inds, 0));
-        j = -1;
-        dx = VECTOR(layers_own)[(long int)VECTOR(inds)[0]] - 1;
+        j = -1; dx = VECTOR(layers_own)[(long int)VECTOR(inds)[0]] - 1;
         for (i = 0; i < no_of_nodes; i++) {
             k = (long int)VECTOR(inds)[i];
             if (VECTOR(layers_own)[k] > dx) {
@@ -774,8 +773,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
     IGRAPH_VECTOR_INIT_FINALLY(&sort_indices, 0);
 
     /* Start the effective part of the Sugiyama algorithm */
-    iter = 0;
-    changed = 1;
+    iter = 0; changed = 1;
     while (changed && iter < maxiter) {
         changed = 0;
 
@@ -791,10 +789,8 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
 
 #ifdef SUGIYAMA_DEBUG
             printf("Layer %ld, aligning to upper barycenters\n", layer_index);
-            printf("Vertices: ");
-            igraph_vector_print(layer_members);
-            printf("Barycenters: ");
-            igraph_vector_print(&barycenters);
+            printf("Vertices: "); igraph_vector_print(layer_members);
+            printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
             IGRAPH_CHECK((int) igraph_vector_qsort_ind(&barycenters,
                          &sort_indices, 0));
@@ -806,8 +802,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
             if (!igraph_vector_all_e(layer_members, &barycenters)) {
                 IGRAPH_CHECK(igraph_vector_update(layer_members, &barycenters));
 #ifdef SUGIYAMA_DEBUG
-                printf("New vertex order: ");
-                igraph_vector_print(layer_members);
+                printf("New vertex order: "); igraph_vector_print(layer_members);
 #endif
                 changed = 1;
             } else {
@@ -827,10 +822,8 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
 
 #ifdef SUGIYAMA_DEBUG
             printf("Layer %ld, aligning to lower barycenters\n", layer_index);
-            printf("Vertices: ");
-            igraph_vector_print(layer_members);
-            printf("Barycenters: ");
-            igraph_vector_print(&barycenters);
+            printf("Vertices: "); igraph_vector_print(layer_members);
+            printf("Barycenters: "); igraph_vector_print(&barycenters);
 #endif
 
             IGRAPH_CHECK((int) igraph_vector_qsort_ind(&barycenters,
@@ -843,8 +836,7 @@ static int igraph_i_layout_sugiyama_order_nodes_horizontally(const igraph_t* gra
             if (!igraph_vector_all_e(layer_members, &barycenters)) {
                 IGRAPH_CHECK(igraph_vector_update(layer_members, &barycenters));
 #ifdef SUGIYAMA_DEBUG
-                printf("New vertex order: ");
-                igraph_vector_print(layer_members);
+                printf("New vertex order: "); igraph_vector_print(layer_members);
 #endif
                 changed = 1;
             } else {
@@ -1023,8 +1015,7 @@ static int igraph_i_layout_sugiyama_place_nodes_horizontally(const igraph_t* gra
     {
         igraph_real_t width, min_width, mins[4], maxs[4], diff;
         /* Find the alignment with the minimum width */
-        min_width = IGRAPH_INFINITY;
-        j = 0;
+        min_width = IGRAPH_INFINITY; j = 0;
         for (i = 0; i < 4; i++) {
             mins[i] = igraph_vector_min(&xs[i]);
             maxs[i] = igraph_vector_max(&xs[i]);

@@ -317,15 +317,13 @@ inline int intersect(int *a, int a_len, int *b, int b_len) {
         }
         do if (++a == asup) {
                 return len;
-            }
-        while (*a < *b);
+            } while (*a < *b);
         if (*a == *b) {
             p[len++] = *a;
         }
         do if (++b == bsup) {
                 return len;
-            }
-        while (*b < *a);
+            } while (*b < *a);
     } while (true);
 }
 

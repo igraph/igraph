@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set ts=4 sw=4 sts=4 et: */
+/* vim:set ts=2 sw=2 sts=2 et: */
 /*
    IGraph R package.
    Copyright (C) 2003-2014  Gabor Csardi <csardi.gabor@gmail.com>
@@ -312,8 +312,7 @@ int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int wid
         MATRIX(*res, i, 0) = x++;
         MATRIX(*res, i, 1) = y;
         if (x == width) {
-            x = 0;
-            y++;
+            x = 0; y++;
         }
     }
 
@@ -359,11 +358,9 @@ int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
         MATRIX(*res, i, 1) = y;
         MATRIX(*res, i, 2) = z;
         if (x == width) {
-            x = 0;
-            y++;
+            x = 0; y++;
             if (y == height) {
-                y = 0;
-                z++;
+                y = 0; z++;
             }
         }
     }
@@ -375,14 +372,9 @@ int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
                           igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
                           igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse) {
 
-    IGRAPH_UNUSED(graph);
-    IGRAPH_UNUSED(res);
-    IGRAPH_UNUSED(mass);
-    IGRAPH_UNUSED(equil);
-    IGRAPH_UNUSED(k);
-    IGRAPH_UNUSED(repeqdis);
-    IGRAPH_UNUSED(kfr);
-    IGRAPH_UNUSED(repulse);
+    IGRAPH_UNUSED(graph); IGRAPH_UNUSED(res); IGRAPH_UNUSED(mass);
+    IGRAPH_UNUSED(equil); IGRAPH_UNUSED(k); IGRAPH_UNUSED(repeqdis);
+    IGRAPH_UNUSED(kfr); IGRAPH_UNUSED(repulse);
     IGRAPH_ERROR("Springs layout not implemented", IGRAPH_UNIMPLEMENTED);
     /* TODO */
     return 0;
@@ -653,8 +645,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                         if (dist == 0) {
                             dist = epsilon;
                         };
-                        xd /= dist;
-                        yd /= dist;
+                        xd /= dist; yd /= dist;
                         force = frk * frk * (1.0 / dist - dist * dist / repulserad);
                         VECTOR(forcex)[(long int)vid] += xd * force;
                         VECTOR(forcex)[(long int)nei] -= xd * force;
@@ -675,8 +666,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                 igraph_real_t ded = sqrt(fx * fx + fy * fy);
                 if (ded > t) {
                     ded = t / ded;
-                    fx *= ded;
-                    fy *= ded;
+                    fx *= ded; fy *= ded;
                 }
                 igraph_2dgrid_move(&grid, vvid, fx, fy);
                 if (fx > maxchange) {
@@ -944,12 +934,10 @@ int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_
                  * left contour of the subtree rooted at i */
                 long lnode, rnode;
                 igraph_real_t loffset, roffset, minsep, rootsep;
-                lnode = leftroot;
-                rnode = i;
+                lnode = leftroot; rnode = i;
                 minsep = 1;
                 rootsep = vdata[leftroot].offset + minsep;
-                loffset = 0;
-                roffset = minsep;
+                loffset = 0; roffset = minsep;
                 /*printf("    Contour: [%d, %d], offsets: [%lf, %lf], rootsep: %lf\n",
                        lnode, rnode, loffset, roffset, rootsep);*/
                 while ((lnode >= 0) && (rnode >= 0)) {
@@ -1922,7 +1910,7 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
                                   igraph_vector_e_ptr(&nr, i));
 
     }
-    igraph_vector_order2(&sizes);   /* largest first */
+    igraph_vector_order2(&sizes); /* largest first */
 
     /* 0. create grid */
     minx = miny = -sqrt(5 * area);
@@ -2097,8 +2085,7 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
             ny = *y + len * sin(angle);
             sp = igraph_i_layout_mergegrid_get_sphere(grid, nx, ny, r);
             if (sp < 0) {
-                *x = nx;
-                *y = ny;
+                *x = nx; *y = ny;
             }
         }
     }

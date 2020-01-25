@@ -206,11 +206,9 @@ list* rbtree::returnListOfKeys() {
         newlist = new list;
         newlist->x = curr->x;
         if (head == NULL) {
-            head       = newlist;
-            tail = head;
+            head       = newlist; tail = head;
         } else {
-            tail->next = newlist;
-            tail = newlist;
+            tail->next = newlist; tail = newlist;
         }
         prev = curr;
         curr = curr->next;
@@ -352,10 +350,10 @@ void rbtree::insertItem(int newKey, int newValue) {
         // other properly
         current = root;
         if (current->key == -1) {    // insert as root
-            delete root;             // delete old root
-            root = newNode;          // set root to newNode
-            leaf->parent = newNode;      // set leaf's parent
-            current = leaf;          // skip next loop
+            delete root;           // delete old root
+            root = newNode;            // set root to newNode
+            leaf->parent = newNode;        // set leaf's parent
+            current = leaf;            // skip next loop
         }
 
         // search for insertion point
@@ -369,7 +367,7 @@ void rbtree::insertItem(int newKey, int newValue) {
                     // else found new parent
                     newNode->parent = current; // set parent
                     current->left = newNode;   // set child
-                    current = leaf;      // exit search
+                    current = leaf;        // exit search
                 }
             } else {
                 // try moving down-right
@@ -379,7 +377,7 @@ void rbtree::insertItem(int newKey, int newValue) {
                     // else found new parent
                     newNode->parent = current; // set parent
                     current->right = newNode;  // set child
-                    current = leaf;      // exit search
+                    current = leaf;        // exit search
                 }
             }
         }
@@ -417,8 +415,8 @@ void rbtree::insertCleanup(elementrb *z) {
             } else {
                 if (z == z->parent->right) {
                     // z is RIGHT-CHILD
-                    z = z->parent;           // set z = z's parent      (Case 2)
-                    rotateLeft(z);           // perform left-rotation   (Case 2)
+                    z = z->parent;             // set z = z's parent      (Case 2)
+                    rotateLeft(z);             // perform left-rotation   (Case 2)
                 }
                 z->parent->color = false;        // color z's parent BLACK  (Case 3)
                 z->parent->parent->color = true; // color z's grandpar. RED (Case 3)
@@ -447,7 +445,7 @@ void rbtree::insertCleanup(elementrb *z) {
         }
     }
 
-    root->color = false;                 // color the root BLACK
+    root->color = false;               // color the root BLACK
     return;
 }
 
@@ -477,7 +475,7 @@ void rbtree::deleteItem(int killKey) {
         return;    // item not present; bail out
     }
 
-    if (support == 1) {       // attempt to delete the root
+    if (support == 1) {     // attempt to delete the root
         root->key = -1;       // restore root node to default state
         root->value = -1;
         root->color = false;
@@ -491,21 +489,21 @@ void rbtree::deleteItem(int killKey) {
     if (z != NULL) {
         support--;            // decrement node count
         if ((z->left == leaf) || (z->right == leaf)) {
-            y = z;                    // case of less than two children,
+            y = z;                      // case of less than two children,
             // set y to be z
         } else {
-            y = returnSuccessor(z);       // set y to be z's key-successor
+            y = returnSuccessor(z);     // set y to be z's key-successor
         }
 
         if (y->left != leaf) {
-            x = y->left;          // pick y's one child (left-child)
+            x = y->left;        // pick y's one child (left-child)
         } else {
-            x = y->right;         // (right-child)
+            x = y->right;       // (right-child)
         }
         x->parent = y->parent;        // make y's child's parent be y's parent
 
         if (y->parent == NULL) {
-            root = x;             // if y is the root, x is now root
+            root = x;           // if y is the root, x is now root
         } else {
             if (y == y->parent->left) { // decide y's relationship with y's parent
                 y->parent->left  = x;     // replace x as y's parent's left child
@@ -515,7 +513,7 @@ void rbtree::deleteItem(int killKey) {
         }
 
         if (y != z) {         // insert y into z's spot
-            z->key = y->key;          // copy y data into z
+            z->key = y->key;        // copy y data into z
             z->value = y->value;
         }
 
@@ -537,8 +535,8 @@ void rbtree::deleteCleanup(elementrb *x) {
     // until x is the root, or x is RED
     while ((x != root) && (x->color == false)) {
         if (x == x->parent->left) {   // branch on x being a LEFT-CHILD
-            w = x->parent->right;     // grab x's sibling
-            if (w->color == true) {   // if x's sibling is RED
+            w = x->parent->right;   // grab x's sibling
+            if (w->color == true) { // if x's sibling is RED
                 w->color = false;     // color w BLACK (case 1)
                 x->parent->color = true;  // color x's parent RED            (case 1)
                 rotateLeft(x->parent);    // left rotation on x's parent     (case 1)
@@ -549,12 +547,12 @@ void rbtree::deleteCleanup(elementrb *x) {
                 x = x->parent;        // examine x's parent              (case 2)
             } else {
                 if (w->right->color == false) {
-                    w->left->color = false; // color w's left child BLACK        (case 3)
-                    w->color = true;      // color w RED                     (case 3)
-                    t = x->parent;    // store x's parent                (case 3)
-                    rotateRight(w);   // right rotation on w             (case 3)
-                    x->parent = t;    // restore x's parent              (case 3)
-                    w = x->parent->right;     // make w be x's right sibling     (case 3)
+                    w->left->color = false; // color w's left child BLACK      (case 3)
+                    w->color = true;    // color w RED                     (case 3)
+                    t = x->parent;      // store x's parent                (case 3)
+                    rotateRight(w);     // right rotation on w             (case 3)
+                    x->parent = t;      // restore x's parent              (case 3)
+                    w = x->parent->right;   // make w be x's right sibling     (case 3)
                 }
                 w->color = x->parent->color; // w's color := x's parent's    (case 4)
                 x->parent->color = false; // color x's parent BLACK          (case 4)
@@ -563,8 +561,8 @@ void rbtree::deleteCleanup(elementrb *x) {
                 x = root;                 // finished work. bail out         (case 4)
             }
         } else {                // x is RIGHT-CHILD
-            w = x->parent->left;        // grab x's sibling
-            if (w->color == true) {     // if x's sibling is RED
+            w = x->parent->left;      // grab x's sibling
+            if (w->color == true) {   // if x's sibling is RED
                 w->color = false;       // color w BLACK                 (case 1)
                 x->parent->color    = true; // color x's parent RED          (case 1)
                 rotateRight(x->parent);     // right rotation on x's parent  (case 1)
@@ -576,11 +574,11 @@ void rbtree::deleteCleanup(elementrb *x) {
             } else {
                 if (w->left->color == false) {
                     w->right->color = false;  // color w's right child BLACK   (case 3)
-                    w->color = true;        // color w RED                   (case 3)
-                    t = x->parent;      // store x's parent              (case 3)
-                    rotateLeft(w);      // left rotation on w            (case 3)
-                    x->parent = t;      // restore x's parent            (case 3)
-                    w = x->parent->left;        // make w be x's left sibling    (case 3)
+                    w->color = true;      // color w RED                   (case 3)
+                    t = x->parent;        // store x's parent              (case 3)
+                    rotateLeft(w);        // left rotation on w            (case 3)
+                    x->parent = t;        // restore x's parent            (case 3)
+                    w = x->parent->left;      // make w be x's left sibling    (case 3)
                 }
                 w->color = x->parent->color; // w's color := x's parent's    (case 4)
                 x->parent->color    = false; // color x's parent BLACK       (case 4)
@@ -590,7 +588,7 @@ void rbtree::deleteCleanup(elementrb *x) {
             }
         }
     }
-    x->color = false;            // color x (the root) BLACK (exit)
+    x->color = false;          // color x (the root) BLACK (exit)
 
     return;
 }
@@ -600,9 +598,9 @@ void rbtree::deleteCleanup(elementrb *x) {
 void rbtree::rotateLeft(elementrb *x) {
     elementrb *y;
     // do pointer-swapping operations for left-rotation
-    y = x->right;            // grab right child
-    x->right = y->left;      // make x's RIGHT-CHILD be y's LEFT-CHILD
-    y->left->parent = x;         // make x be y's LEFT-CHILD's parent
+    y = x->right;          // grab right child
+    x->right = y->left;        // make x's RIGHT-CHILD be y's LEFT-CHILD
+    y->left->parent = x;       // make x be y's LEFT-CHILD's parent
     y->parent = x->parent;     // make y's new parent be x's old parent
 
     if (x->parent == NULL) {
@@ -610,13 +608,13 @@ void rbtree::rotateLeft(elementrb *x) {
     } else {
         // if x is LEFT-CHILD, make y be x's parent's
         if (x == x->parent->left) {
-            x->parent->left  = y;   // left-child
+            x->parent->left  = y; // left-child
         } else {
-            x->parent->right = y;   //  right-child
+            x->parent->right = y; //  right-child
         }
     }
-    y->left   = x;      // make x be y's LEFT-CHILD
-    x->parent = y;      // make y be x's parent
+    y->left   = x;        // make x be y's LEFT-CHILD
+    x->parent = y;        // make y be x's parent
 
     return;
 }
@@ -624,9 +622,9 @@ void rbtree::rotateLeft(elementrb *x) {
 void rbtree::rotateRight(elementrb *y) {
     elementrb *x;
     // do pointer-swapping operations for right-rotation
-    x = y->left;          // grab left child
-    y->left = x->right;   // replace left child yith x's right subtree
-    x->right->parent = y;     // replace y as x's right subtree's parent
+    x = y->left;        // grab left child
+    y->left = x->right;     // replace left child yith x's right subtree
+    x->right->parent = y;   // replace y as x's right subtree's parent
 
     x->parent = y->parent;  // make x's new parent be y's old parent
 
@@ -643,8 +641,8 @@ void rbtree::rotateRight(elementrb *y) {
             y->parent->left = x;
         }
     }
-    x->right  = y;      // make y be x's RIGHT-CHILD
-    y->parent = x;      // make x be y's parent
+    x->right  = y;        // make y be x's RIGHT-CHILD
+    y->parent = x;        // make x be y's parent
 
     return;
 }
@@ -746,18 +744,18 @@ dendro::~dendro() {
 // *********************************************************************
 
 void dendro::binarySearchInsert(elementd* x, elementd* y) {
-    if (y->p < x->p) {      // go to left subtree
+    if (y->p < x->p) {        // go to left subtree
         if (x->L == NULL) {     // check if left subtree is empty
-            x->L = y;           // make x left child
-            y->M = x;           // make y parent of child
+            x->L = y;         // make x left child
+            y->M = x;         // make y parent of child
             return;
         } else {
             binarySearchInsert(x->L, y);
         }
-    } else {            // go to right subtree
+    } else {          // go to right subtree
         if (x->R == NULL) {     // check if right subtree is empty
-            x->R = y;           // make x right child
-            y->M = x;           // make y parent of child
+            x->R = y;         // make x right child
+            y->M = x;         // make y parent of child
             return;
         } else {
             binarySearchInsert(x->R, y);
@@ -773,15 +771,13 @@ list* dendro::binarySearchFind(const double v) {
     elementd *current = root;
     bool flag_stopSearch = false;
 
-    while (!flag_stopSearch) {  // continue until we're finished
+    while (!flag_stopSearch) {    // continue until we're finished
         newlist    = new list;  // add this node to the path
         newlist->x = current->label;
         if (current == root) {
-            head = newlist;
-            tail = head;
+            head = newlist; tail = head;
         } else {
-            tail->next = newlist;
-            tail = newlist;
+            tail->next = newlist; tail = newlist;
         }
         if (v < current->p) {   // now try left subtree
             if (current->L->type == GRAPH) {
@@ -817,8 +813,8 @@ string dendro::buildSplit(elementd* thisNode) {
 
     sp.initializeSplit(n);      // default split string O(n)
 
-    curr = thisNode;          // - set start node as top this sub-tree
-    curr->type = k + 1;       // - initialize in-order tree traversal
+    curr = thisNode;        // - set start node as top this sub-tree
+    curr->type = k + 1;     // - initialize in-order tree traversal
     while (flag_go) {
 
         // - is it time, and is left child a graph node?
@@ -843,8 +839,7 @@ string dendro::buildSplit(elementd* thisNode) {
         } else {              // - else go up a level
             curr->type = DENDRO;
             if (curr->index == thisNode->index || curr->M == NULL) {
-                flag_go = false;
-                curr = NULL;
+                flag_go = false; curr = NULL;
             } else {
                 curr = curr->M;
             }
@@ -888,10 +883,10 @@ void dendro::buildDendrogram() {
     // into a random binary tree structure. For simplicity, we make the
     // first internal node in the array the root.
 
-    n = g->numNodes();        // size of graph
-    leaf = new elementd [n];      // allocate memory for G, O(n)
+    n = g->numNodes();          // size of graph
+    leaf = new elementd [n];    // allocate memory for G, O(n)
     internal  = new elementd [n - 1]; // allocate memory for D, O(n)
-    d = new interns(n - 2);           // allocate memory for internal
+    d = new interns(n - 2);         // allocate memory for internal
     // edges of D, O(n)
     for (int i = 0; i < n; i++) { // initialize leaf nodes
         leaf[i].type   = GRAPH;
@@ -922,15 +917,14 @@ void dendro::buildDendrogram() {
     // search, we assign each of them the p value of their parent,
     // perturbed slightly so as to preserve the binary search property.
 
-    block* array;
-    array = new block [n];
+    block* array; array = new block [n];
     for (int i = 0; i < n; i++) {
         array[i].x = RNG_UNIF01();
         array[i].y = i;
     }
     QsortMain(array, 0, n - 1);
 
-    int k = 0;          // replace NULLs with leaf nodes, and
+    int k = 0;        // replace NULLs with leaf nodes, and
     for (int i = 0; i < (n - 1); i++) { // maintain binary search property, O(n)
         if (internal[i].L == NULL) {
             internal[i].L = &leaf[array[k].y];
@@ -983,8 +977,7 @@ void dendro::buildDendrogram() {
     // symmetric, we overcount each e by a factor of 2, so we need to
     // correct this after.
 
-    elementd* ancestor;
-    edge* curr;
+    elementd* ancestor; edge* curr;
     for (int i = 0; i < (n - 1); i++) {
         internal[i].e = 0;
         internal[i].label = -1;
@@ -1094,8 +1087,7 @@ void dendro::buildDendrogram() {
     // \sum_{i=1}^{n} ( ( e_i \log[p_i] ) + ( (nL_i*nR_i - e_i)
     // \log[1-p_i] ) )
 
-    L = 0.0;
-    double dL;
+    L = 0.0; double dL;
     int nL_nR, ei;
     for (int i = 0; i < (n - 1); i++) {
         nL_nR = internal[i].L->n * internal[i].R->n;
@@ -1348,8 +1340,7 @@ void dendro::cullSplitHist() {
             splithist->deleteItem(array[i]);
         }
     }
-    delete [] array;
-    array = NULL;
+    delete [] array; array = NULL;
 
     return;
 }
@@ -1387,8 +1378,7 @@ int dendro::getConsensusSize() {
             numCons++;
         }
     }
-    delete [] array;
-    array = NULL;
+    delete [] array; array = NULL;
     return numCons;
 }
 
@@ -1414,8 +1404,7 @@ splittree* dendro::getConsensusSplits() {
             consensusTree->insertItem(array[i], value / tot);
         }
     }
-    delete [] array;
-    array = NULL;
+    delete [] array; array = NULL;
     return consensusTree;
 }
 
@@ -1542,8 +1531,7 @@ bool dendro::importDendrogramStructure(const igraph_hrg_t *hrg) {
     // log-likelihood of the entire dendrogram structure
     // \log(L) = \sum_{i=1}^{n} ( ( e_i \log[p_i] ) +
     // ( (nL_i*nR_i - e_i) \log[1-p_i] ) )
-    L = 0.0;
-    double dL;
+    L = 0.0; double dL;
     int nL_nR, ei;
     for (int i = 0; i < (n - 1); i++) {
         nL_nR = internal[i].L->n * internal[i].R->n;
@@ -1566,9 +1554,7 @@ bool dendro::importDendrogramStructure(const igraph_hrg_t *hrg) {
 void dendro::makeRandomGraph() {
     if (g != NULL) {
         delete g;
-    }
-    g = NULL;
-    g = new graph(n);
+    } g = NULL; g = new graph(n);
 
     list *curr, *prev;
     if (paths) {
@@ -1921,8 +1907,7 @@ bool dendro::monteCarloMove(double& delta, bool& ftaken, const double T) {
 
 void dendro::refreshLikelihood() {
     // recalculates the log-likelihood of the dendrogram structure
-    L = 0.0;
-    double dL;
+    L = 0.0; double dL;
     int nL_nR, ei;
     for (int i = 0; i < (n - 1); i++) {
         nL_nR = internal[i].L->n * internal[i].R->n;
@@ -2246,8 +2231,7 @@ bool dendro::sampleSplitLikelihoods(int &sample_num) {
                     splithist->deleteItem(array[i]);
                 }
             }
-            delete [] array;
-            array = NULL;
+            delete [] array; array = NULL;
             k++;
         }
     }
@@ -2419,12 +2403,9 @@ graph::~graph() {
             delete prev;
         }
     }
-    delete [] nodeLink;
-    nodeLink = NULL;
-    delete [] nodeLinkTail;
-    nodeLinkTail   = NULL;
-    delete [] nodes;
-    nodes = NULL;
+    delete [] nodeLink; nodeLink = NULL;
+    delete [] nodeLinkTail;  nodeLinkTail   = NULL;
+    delete [] nodes; nodes = NULL;
 
     if (predict) {
         for (int i = 0; i < n; i++) {
@@ -2433,8 +2414,7 @@ graph::~graph() {
             }
             delete [] A[i];
         }
-        delete [] A;
-        A = NULL;
+        delete [] A; A = NULL;
     }
 }
 
@@ -2499,11 +2479,9 @@ void graph::addAdjacencyEnd() {
     // We need to also keep a running total of how much weight has been added
     // to the histogram, and the number of observations in the histogram.
     if (obs_count == 0) {
-        total_weight  = 1.0;
-        obs_count = 1;
+        total_weight  = 1.0; obs_count = 1;
     } else {
-        total_weight += 1.0;
-        obs_count++;
+        total_weight += 1.0; obs_count++;
     }
     return;
 }
@@ -2804,11 +2782,9 @@ bool interns::swapEdges(const int one_x, const int one_y,
 
         } else if (one_isInternal) {
             if (one_type == LEFT)  {
-                index = indexLUT[one_x][0];
-                indexLUT[one_x][0] = -1;
+                index = indexLUT[one_x][0]; indexLUT[one_x][0] = -1;
             } else {
-                index = indexLUT[one_x][1];
-                indexLUT[one_x][1] = -1;
+                index = indexLUT[one_x][1]; indexLUT[one_x][1] = -1;
             }
             edgelist[index].x = two_x;
             edgelist[index].t = two_type;
@@ -2820,11 +2796,9 @@ bool interns::swapEdges(const int one_x, const int one_y,
 
         } else if (two_isInternal) {
             if (two_type == LEFT)  {
-                index = indexLUT[two_x][0];
-                indexLUT[two_x][0] = -1;
+                index = indexLUT[two_x][0]; indexLUT[two_x][0] = -1;
             } else {
-                index = indexLUT[two_x][1];
-                indexLUT[two_x][1] = -1;
+                index = indexLUT[two_x][1]; indexLUT[two_x][1] = -1;
             }
             edgelist[index].x = one_x;
             edgelist[index].t = one_type;
@@ -2860,8 +2834,7 @@ splittree::splittree() {
 
 splittree::~splittree() {
     if (root != NULL && (root->left != leaf || root->right != leaf)) {
-        deleteSubTree(root);
-        root = NULL;
+        deleteSubTree(root); root = NULL;
     }
     support      = 0;
     total_weight = 0.0;
@@ -2995,15 +2968,15 @@ string* splittree::returnArrayOfKeys() {
             if (curr->mark == 2 && curr->right == leaf) {
                 curr->mark = 3;
             }
-            if (curr->mark == 1) {             // - go left
+            if (curr->mark == 1) {               // - go left
                 curr->mark = 2;
                 curr = curr->left;
                 curr->mark = 1;
-            } else if (curr->mark == 2) {          // - else go right
+            } else if (curr->mark == 2) {        // - else go right
                 curr->mark = 3;
                 curr = curr->right;
                 curr->mark = 1;
-            } else {                       // - else go up a level
+            } else {                     // - else go up a level
                 curr->mark = 0;
                 array[index++] = curr->split;
                 curr = curr->parent;
@@ -3026,11 +2999,9 @@ slist* splittree::returnListOfKeys() {
         newlist = new slist;
         newlist->x = curr->x;
         if (head == NULL) {
-            head = newlist;
-            tail = head;
+            head = newlist; tail = head;
         } else {
-            tail->next = newlist;
-            tail = newlist;
+            tail->next = newlist; tail = newlist;
         }
         prev = curr;
         curr = curr->next;
@@ -3171,11 +3142,9 @@ keyValuePairSplit* splittree::returnTheseSplits(const int target) {
             newpair->y    = curr->y;
             newpair->next = NULL;
             if (newhead == NULL) {
-                newhead = newpair;
-                newtail = newpair;
+                newhead = newpair; newtail = newpair;
             } else {
-                newtail->next = newpair;
-                newtail = newpair;
+                newtail->next = newpair; newtail = newpair;
             }
         }
         prev = curr;
@@ -3197,11 +3166,9 @@ void splittree::finishedThisRound() {
     // We need to also keep a running total of how much weight has been
     // added to the histogram.
     if (total_count == 0) {
-        total_weight  = 1.0;
-        total_count = 1;
+        total_weight  = 1.0; total_count = 1;
     } else {
-        total_weight += 1.0;
-        total_count++;
+        total_weight += 1.0; total_count++;
     }
     return;
 }
@@ -3238,10 +3205,10 @@ bool splittree::insertItem(string newKey, double newValue) {
         // other properly
         current = root;
         if (current->split.empty()) {   // insert as root
-            delete root;        //   delete old root
-            root = newNode;     //   set root to newNode
+            delete root;      //   delete old root
+            root = newNode;       //   set root to newNode
             leaf->parent   = newNode; //   set leaf's parent
-            current = leaf;     //   skip next loop
+            current = leaf;       //   skip next loop
         }
 
         // search for insertion point
@@ -3255,7 +3222,7 @@ bool splittree::insertItem(string newKey, double newValue) {
                     // else found new parent
                     newNode->parent = current; // set parent
                     current->left = newNode;   // set child
-                    current = leaf;      // exit search
+                    current = leaf;        // exit search
                 }
             } else { //
                 if (current->right != leaf) {
@@ -3265,7 +3232,7 @@ bool splittree::insertItem(string newKey, double newValue) {
                     // else found new parent
                     newNode->parent = current; // set parent
                     current->right = newNode;  // set child
-                    current = leaf;      // exit search
+                    current = leaf;        // exit search
                 }
             }
         }
@@ -3283,14 +3250,13 @@ void splittree::insertCleanup(elementsp *z) {
 
     // fix now if z is root
     if (z->parent == NULL) {
-        z->color = false;
-        return;
+        z->color = false; return;
     }
     elementsp *temp;
     // while z is not root and z's parent is RED
     while (z->parent != NULL && z->parent->color) {
         if (z->parent == z->parent->parent->left) {  // z's parent is LEFT-CHILD
-            temp = z->parent->parent->right;         // grab z's uncle
+            temp = z->parent->parent->right;       // grab z's uncle
             if (temp->color) {
                 z->parent->color = false;          // color z's parent BLACK (Case 1)
                 temp->color = false;               // color z's uncle BLACK  (Case 1)
@@ -3338,7 +3304,7 @@ void splittree::deleteItem(string killKey) {
         return;    // item not present; bail out
     }
 
-    if (support == 1) {     // -- attempt to delete the root
+    if (support == 1) {   // -- attempt to delete the root
         root->split = "";       // restore root node to default state
         root->weight = 0.0;     //
         root->color = false;    //
@@ -3355,20 +3321,20 @@ void splittree::deleteItem(string killKey) {
         support--;          // decrement node count
         if ((z->left == leaf) || (z->right == leaf)) {
             // case of less than two children
-            y = z;           // set y to be z
+            y = z;             // set y to be z
         } else {
-            y = returnSuccessor(z);      // set y to be z's key-successor
+            y = returnSuccessor(z);    // set y to be z's key-successor
         }
 
         if (y->left != leaf) {
-            x = y->left;         // pick y's one child (left-child)
+            x = y->left;       // pick y's one child (left-child)
         } else {
             x = y->right;              // (right-child)
         }
         x->parent = y->parent;       // make y's child's parent be y's parent
 
         if (y->parent == NULL) {
-            root = x;            // if y is the root, x is now root
+            root = x;          // if y is the root, x is now root
         } else {
             if (y == y->parent->left) {// decide y's relationship with y's parent
                 y->parent->left  = x;    // replace x as y's parent's left child
@@ -3378,9 +3344,9 @@ void splittree::deleteItem(string killKey) {
         }
 
         if (y != z) {        // insert y into z's spot
-            z->split = y->split;     // copy y data into z
-            z->weight = y->weight;   //
-            z->count = y->count;     //
+            z->split = y->split;   // copy y data into z
+            z->weight = y->weight;     //
+            z->count = y->count;   //
         }                //
 
         // do house-keeping to maintain balance
@@ -3389,7 +3355,7 @@ void splittree::deleteItem(string killKey) {
         }
         delete y;            // deallocate y
         y = NULL;            // point y to NULL for safety
-    }                //
+    }              //
 
     return;
 }
@@ -3399,8 +3365,8 @@ void splittree::deleteCleanup(elementsp *x) {
     // until x is the root, or x is RED
     while ((x != root) && (x->color == false)) {
         if (x == x->parent->left) {      // branch on x being a LEFT-CHILD
-            w = x->parent->right;        // grab x's sibling
-            if (w->color == true) {      // if x's sibling is RED
+            w = x->parent->right;      // grab x's sibling
+            if (w->color == true) {    // if x's sibling is RED
                 w->color = false;        // color w BLACK                (case 1)
                 x->parent->color = true;     // color x's parent RED         (case 1)
                 rotateLeft(x->parent);       // left rotation on x's parent  (case 1)
@@ -3409,13 +3375,13 @@ void splittree::deleteCleanup(elementsp *x) {
             if ((w->left->color == false) && (w->right->color == false)) {
                 w->color = true;         // color w RED                  (case 2)
                 x = x->parent;           // examine x's parent           (case 2)
-            } else {                 //
+            } else {               //
                 if (w->right->color == false) {
                     w->left->color = false;    // color w's left child BLACK   (case 3)
-                    w->color = true;         // color w RED                  (case 3)
-                    t = x->parent;       // store x's parent
-                    rotateRight(w);      // right rotation on w          (case 3)
-                    x->parent = t;       // restore x's parent
+                    w->color = true;       // color w RED                  (case 3)
+                    t = x->parent;         // store x's parent
+                    rotateRight(w);        // right rotation on w          (case 3)
+                    x->parent = t;         // restore x's parent
                     w = x->parent->right;      // make w be x's right sibling  (case 3)
                 } //
                 w->color = x->parent->color; // w's color := x's parent's    (case 4)
@@ -3423,10 +3389,10 @@ void splittree::deleteCleanup(elementsp *x) {
                 w->right->color = false;     // color w's right child BLACK  (case 4)
                 rotateLeft(x->parent);       // left rotation on x's parent  (case 4)
                 x = root;            // finished work. bail out      (case 4)
-            }                    //
+            }                  //
         } else {                 // x is RIGHT-CHILD
-            w = x->parent->left;         // grab x's sibling
-            if (w->color == true) {      // if x's sibling is RED
+            w = x->parent->left;       // grab x's sibling
+            if (w->color == true) {    // if x's sibling is RED
                 w->color = false;        // color w BLACK                (case 1)
                 x->parent->color    = true;  // color x's parent RED         (case 1)
                 rotateRight(x->parent);      // right rotation on x's parent (case 1)
@@ -3438,11 +3404,11 @@ void splittree::deleteCleanup(elementsp *x) {
             } else { //
                 if (w->left->color == false) { //
                     w->right->color = false;   // color w's right child BLACK  (case 3)
-                    w->color = true;         // color w RED                  (case 3)
-                    t = x->parent;       // store x's parent
-                    rotateLeft(w);       // left rotation on w           (case 3)
-                    x->parent = t;       // restore x's parent
-                    w = x->parent->left;         // make w be x's left sibling   (case 3)
+                    w->color = true;       // color w RED                  (case 3)
+                    t = x->parent;         // store x's parent
+                    rotateLeft(w);         // left rotation on w           (case 3)
+                    x->parent = t;         // restore x's parent
+                    w = x->parent->left;       // make w be x's left sibling   (case 3)
                 } //
                 w->color = x->parent->color; // w's color := x's parent's    (case 4)
                 x->parent->color    = false; // color x's parent BLACK       (case 4)
@@ -3452,7 +3418,7 @@ void splittree::deleteCleanup(elementsp *x) {
             }
         }
     }
-    x->color = false;            // color x (the root) BLACK (exit)
+    x->color = false;          // color x (the root) BLACK (exit)
 
     return;
 }
@@ -3462,22 +3428,22 @@ void splittree::deleteCleanup(elementsp *x) {
 void splittree::rotateLeft(elementsp *x) {
     elementsp *y;
     // do pointer-swapping operations for left-rotation
-    y = x->right;               // grab right child
-    x->right = y->left;         // make x's RIGHT-CHILD be y's LEFT-CHILD
-    y->left->parent = x;            // make x be y's LEFT-CHILD's parent
+    y = x->right;             // grab right child
+    x->right = y->left;           // make x's RIGHT-CHILD be y's LEFT-CHILD
+    y->left->parent = x;          // make x be y's LEFT-CHILD's parent
     y->parent = x->parent;        // make y's new parent be x's old parent
 
     if (x->parent == NULL) {
         root = y;               // if x was root, make y root
-    } else {                //
+    } else {              //
         if (x == x->parent->left) { // if x is LEFT-CHILD, make y be x's parent's
-            x->parent->left  = y;   // left-child
+            x->parent->left  = y; // left-child
         } else {
-            x->parent->right = y;   // right-child
+            x->parent->right = y; // right-child
         }
     }
-    y->left   = x;      // make x be y's LEFT-CHILD
-    x->parent = y;      // make y be x's parent
+    y->left   = x;        // make x be y's LEFT-CHILD
+    x->parent = y;        // make y be x's parent
 
     return;
 }
@@ -3485,22 +3451,22 @@ void splittree::rotateLeft(elementsp *x) {
 void splittree::rotateRight(elementsp *y) {
     elementsp *x;
     // do pointer-swapping operations for right-rotation
-    x = y->left;                 // grab left child
-    y->left = x->right;          // replace left child yith x's right subtree
-    x->right->parent = y;            // replace y as x's right subtree's parent
+    x = y->left;               // grab left child
+    y->left = x->right;            // replace left child yith x's right subtree
+    x->right->parent = y;          // replace y as x's right subtree's parent
 
     x->parent = y->parent;         // make x's new parent be y's old parent
     if (y->parent == NULL) {
         root = x;            // if y was root, make x root
     } else {
         if (y == y->parent->right) { // if y is R-CHILD, make x be y's parent's
-            y->parent->right = x;    // right-child
+            y->parent->right = x;  // right-child
         } else {
-            y->parent->left = x;     // left-child
+            y->parent->left = x;   // left-child
         }
     }
-    x->right  = y;       // make y be x's RIGHT-CHILD
-    y->parent = x;       // make x be y's parent
+    x->right  = y;         // make y be x's RIGHT-CHILD
+    y->parent = x;         // make x be y's parent
 
     return;
 }
@@ -3546,8 +3512,7 @@ simpleGraph::simpleGraph(const int size): n(size), m(0), num_groups(0) {
     nodeLinkTail = new simpleEdge* [n];
     A = new double* [n];
     for (int i = 0; i < n; i++) {
-        nodeLink[i] = NULL;
-        nodeLinkTail[i] = NULL;
+        nodeLink[i] = NULL; nodeLinkTail[i] = NULL;
         A[i] = new double [n];
         for (int j = 0; j < n; j++) {
             A[i][j] = 0.0;
@@ -3567,20 +3532,15 @@ simpleGraph::~simpleGraph() {
             delete prev;
         }
     }
-    curr = NULL;
-    prev = NULL;
+    curr = NULL; prev = NULL;
     if (E != NULL) {
         delete [] E;
         E = NULL;
     }
-    delete [] A;
-    A = NULL;
-    delete [] nodeLink;
-    nodeLink = NULL;
-    delete [] nodeLinkTail;
-    nodeLinkTail   = NULL;
-    delete [] nodes;
-    nodes = NULL;
+    delete [] A; A = NULL;
+    delete [] nodeLink; nodeLink = NULL;
+    delete [] nodeLinkTail;  nodeLinkTail   = NULL;
+    delete [] nodes; nodes = NULL;
 }
 
 // ***********************************************************************

@@ -211,8 +211,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
 
             if (VECTOR(status)[vchange] == S_I) {
                 VECTOR(status)[vchange] = S_R;
-                ni--;
-                nr++;
+                ni--; nr++;
                 igraph_psumtree_update(&tree, vchange, 0.0);
                 for (i = 0; i < neilen; i++) {
                     int nei = VECTOR(*neis)[i];
@@ -224,8 +223,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
 
             } else { /* S_S */
                 VECTOR(status)[vchange] = S_I;
-                ns--;
-                ni++;
+                ns--; ni++;
                 igraph_psumtree_update(&tree, vchange, gamma);
                 for (i = 0; i < neilen; i++) {
                     int nei = VECTOR(*neis)[i];
@@ -258,7 +256,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     igraph_psumtree_destroy(&tree);
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_int_destroy(&status);
-    IGRAPH_FINALLY_CLEAN(4);    /* + result */
+    IGRAPH_FINALLY_CLEAN(4);  /* + result */
 
     return 0;
 }

@@ -71,8 +71,8 @@ __BEGIN_DECLS
 
 #define IGRAPH_MATRIX_NULL { IGRAPH_VECTOR_NULL, 0, 0 }
 #define IGRAPH_MATRIX_INIT_FINALLY(m, nr, nc) \
-  do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \
-  IGRAPH_FINALLY(igraph_matrix_destroy, m); } while (0)
+    do { IGRAPH_CHECK(igraph_matrix_init(m, nr, nc)); \
+        IGRAPH_FINALLY(igraph_matrix_destroy, m); } while (0)
 
 /**
  * \ingroup matrix

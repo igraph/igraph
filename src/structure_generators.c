@@ -796,7 +796,7 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
     if (coords == 0) {
         IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, coords);   /* TODO: hack */
+    IGRAPH_FINALLY(free, coords); /* TODO: hack */
     weights = igraph_Calloc(dims, long int);
     if (weights == 0) {
         IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
@@ -1262,8 +1262,7 @@ int igraph_extended_chordal_ring(
                 VECTOR(edges)[epos++] = v;
 
             }
-            mpos++;
-            if (mpos == period) {
+            mpos++; if (mpos == period) {
                 mpos = 0;
             }
         }

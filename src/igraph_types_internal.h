@@ -206,8 +206,8 @@ typedef struct igraph_2dgrid_t {
     igraph_matrix_t startidx;
     igraph_vector_t next;
     igraph_vector_t prev;
-    igraph_real_t massx, massy;     /* The sum of the coordinates */
-    long int vertices;      /* Number of active vertices  */
+    igraph_real_t massx, massy;       /* The sum of the coordinates */
+    long int vertices;        /* Number of active vertices  */
 } igraph_2dgrid_t;
 
 int igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,

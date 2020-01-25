@@ -74,8 +74,8 @@ namespace fitHRG {
 #define IGRAPH_HRG_SLIST
 class slist {
 public:
-    string x;           // stored elementd in linked-list
-    slist* next;            // pointer to next elementd
+    string x;         // stored elementd in linked-list
+    slist* next;          // pointer to next elementd
     slist(): x(""), next(0) { }
     ~slist() { }
 };
@@ -83,10 +83,10 @@ public:
 
 class keyValuePairSplit {
 public:
-    string x;           // elementsp split (string)
-    double y;           // stored weight   (double)
-    int c;          // stored count    (int)
-    keyValuePairSplit* next;    // linked-list pointer
+    string x;         // elementsp split (string)
+    double y;         // stored weight   (double)
+    int c;            // stored count    (int)
+    keyValuePairSplit* next;  // linked-list pointer
     keyValuePairSplit(): x(""), y(0.0), c(0), next(0) { }
     ~keyValuePairSplit() { }
 };
@@ -95,16 +95,16 @@ public:
 
 class elementsp {
 public:
-    string split;               // split represented as a string
-    double weight;          // total weight of this split
-    int count;              // number of observations of this split
+    string split;             // split represented as a string
+    double weight;            // total weight of this split
+    int count;                // number of observations of this split
 
-    bool color;         // F: BLACK, T: RED
-    short int mark;     // marker
+    bool color;           // F: BLACK, T: RED
+    short int mark;       // marker
 
-    elementsp *parent;      // pointer to parent node
-    elementsp *left;        // pointer for left subtree
-    elementsp *right;       // pointer for right subtree
+    elementsp *parent;        // pointer to parent node
+    elementsp *left;      // pointer for left subtree
+    elementsp *right;     // pointer for right subtree
 
     elementsp(): split(""), weight(0.0), count(0), color(false), mark(0),
         parent(0), left(0), right(0) { }
@@ -123,11 +123,11 @@ public:
 
 class splittree {
 private:
-    elementsp* root;        // binary tree root
-    elementsp* leaf;        // all leaf nodes
-    int support;            // number of nodes in the tree
-    double total_weight;        // total weight stored
-    int total_count;        // total number of observations stored
+    elementsp* root;      // binary tree root
+    elementsp* leaf;      // all leaf nodes
+    int support;          // number of nodes in the tree
+    double total_weight;      // total weight stored
+    int total_count;      // total number of observations stored
 
     // left-rotation operator
     void rotateLeft(elementsp*);
@@ -147,8 +147,7 @@ private:
 
 public:
     // default constructor/destructor
-    splittree();
-    ~splittree();
+    splittree(); ~splittree();
     // returns value associated with searchKey
     double returnValue(const string);
     // returns T if searchKey found, and points foundNode at the
