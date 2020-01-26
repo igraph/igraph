@@ -10,7 +10,7 @@ REPLACE ----- for the template functions --------------------------------------
 FUNCTION\(
 (?P<base>[^, \)]*)\s*,\s*
 (?P<suffix>[^\)]*)
-\)
+\)\s*
 
 WITH
 
