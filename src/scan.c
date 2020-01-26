@@ -34,6 +34,17 @@
 #include "igraph_stack.h"
 
 /**
+ * \section about_local_scan
+ *
+ * <para>
+ * The scan statistic is a summary of the locality statistics that is computed
+ * from the local neighborhood of each vertex. For details, see
+ * Priebe, C. E., Conroy, J. M., Marchette, D. J., Park, Y. (2005).
+ * Scan Statistics on Enron Graphs. Computational and Mathematical Organization Theory.
+ * </para>
+ */
+
+/**
  * \function igraph_local_scan_0
  * Local scan-statistics, k=0
  *

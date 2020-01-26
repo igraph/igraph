@@ -128,7 +128,8 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c $(SRCDIR)/mixing.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
 	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
-	$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h
+	$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h \
+	$(SRCDIR)/scan.c
 
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h

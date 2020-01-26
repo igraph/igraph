@@ -34,10 +34,21 @@
 <!-- doxrox-include igraph_radius -->
 </section>
 
-<section><title>Neighborhood of a vertex</title>
+<section><title>Neighborhood of a Vertex</title>
 <!-- doxrox-include igraph_neighborhood_size -->
 <!-- doxrox-include igraph_neighborhood -->
 <!-- doxrox-include igraph_neighborhood_graphs -->
+</section>
+
+<section><title>Local Scan Statistics</title>
+<!-- doxrox-include about_local_scan -->
+<!-- doxrox-include igraph_local_scan_0 -->
+<!-- doxrox-include igraph_local_scan_1_ecount -->
+<!-- doxrox-include igraph_local_scan_0_them -->
+<!-- doxrox-include igraph_local_scan_1_ecount_them -->
+<!-- doxrox-include igraph_local_scan_k_ecount -->
+<!-- doxrox-include igraph_local_scan_k_ecount_them -->
+<!-- doxrox-include igraph_local_scan_neighborhood_ecount -->
 </section>
 
 <section><title>Graph Components</title>
@@ -122,16 +133,16 @@
 <!-- doxrox-include igraph_transitivity_barrat -->
 </section>
 
-<section><title>Directedness conversion</title>
+<section><title>Directedness Conversion</title>
 <!-- doxrox-include igraph_to_directed -->
 <!-- doxrox-include igraph_to_undirected -->
 </section>
 
-<section><title>Spectral properties</title>
+<section><title>Spectral Properties</title>
 <!-- doxrox-include igraph_laplacian -->
 </section>
 
-<section><title>Non-simple graphs: multiple and loop edges</title>
+<section><title>Non-simple Graphs: Multiple and Loop Edges</title>
 <!-- doxrox-include igraph_is_simple -->
 <!-- doxrox-include igraph_is_loop -->
 <!-- doxrox-include igraph_is_multiple -->
@@ -140,7 +151,7 @@
 <!-- doxrox-include igraph_simplify -->
 </section>
 
-<section><title>Mixing patterns</title>
+<section><title>Mixing Patterns</title>
 <!-- doxrox-include igraph_assortativity_nominal -->
 <!-- doxrox-include igraph_assortativity -->
 <!-- doxrox-include igraph_assortativity_degree -->
@@ -150,13 +161,13 @@
 <!-- doxrox-include igraph_coreness -->
 </section>
 
-<section><title>Topological sorting, directed acyclic graphs</title>
+<section><title>Topological Sorting, Directed Acyclic Graphs</title>
 <!-- doxrox-include igraph_is_dag -->
 <!-- doxrox-include igraph_topological_sorting -->
 <!-- doxrox-include igraph_feedback_arc_set -->
 </section>
 
-<section><title>Maximum cardinality search, graph decomposition, chordal graphs</title>
+<section><title>Maximum Cardinality Search, Graph Decomposition, Chordal Graphs</title>
 <!-- doxrox-include igraph_maximum_cardinality_search -->
 <!-- doxrox-include igraph_is_chordal -->
 </section>
@@ -167,11 +178,11 @@
 <!-- doxrox-include igraph_maximum_bipartite_matching -->
 </section>
 
-<section><title>Line graphs</title>
+<section><title>Line Graphs</title>
 <!-- doxrox-include igraph_linegraph -->
 </section>
 
-<section><title>Unfolding a graph into a tree</title>
+<section><title>Unfolding a Graph Into a Tree</title>
 <!-- doxrox-include igraph_unfold_tree -->
 </section>
 
