@@ -35,22 +35,36 @@
  * <para>
  * Graphlet decomposition models a weighted undirected graph
  * via the union of potentially overlapping dense social groups.
- * This is done by a two-step algorithm. In the first step a candidate
+ * This is done by a two-step algorithm. In the first step, a candidate
  * set of groups (a candidate basis) is created by finding cliques
- * if the thresholded input graph. In the second step these
- * the graph is projected on the candidate basis, resulting a
+ * in the thresholded input graph. In the second step,
+ * the graph is projected onto the candidate basis, resulting in a
  * weight coefficient for each clique in the candidate basis.
  * </para>
  *
  * <para>
- * igraph contains three functions for performing the graph
+ * For more information on graphlet decomposition, see
+ * Hossein Azari Soufiani and Edoardo M Airoldi: "Graphlet decomposition of a weighted network",
+ * https://arxiv.org/abs/1203.2821 and http://proceedings.mlr.press/v22/azari12/azari12.pdf
+ * </para>
+ *
+ * <para>
+ * igraph contains three functions for performing the graphlet
  * decomponsition of a graph. The first is \ref igraph_graphlets(), which
- * performed both steps on the method and returns a list of subgraphs,
- * with their corresponding weights. The second and third functions
+ * performs both steps of the method and returns a list of subgraphs
+ * with their corresponding weights. The other two functions
  * correspond to the first and second steps of the algorithm, and they are
  * useful if the user wishes to perform them individually:
  * \ref igraph_graphlets_candidate_basis() and
  * \ref igraph_graphlets_project().
+ * </para>
+ *
+ * <para>
+ * <remark>
+ * Note: The term "graphlet" is used for several unrelated concepts
+ * in the literature. If you are looking to count induced subgraphs, see
+ * \ref igraph_motifs_randesu() and \ref igraph_subisomorphic_lad().
+ * </remark>
  * </para>
  */
 
