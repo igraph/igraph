@@ -51,7 +51,6 @@
  - `igraph_vertex_coloring_greedy()` computes a vertex coloring using a greedy algorithm
  - `igraph_rewire_directed_edges()` randomly rewires only the starting points or only the endpoints of directed edges
  - Various `igraph_local_scan_*` functions provide local counts and statistics of neighborhoods
- - `igraph_solve_lsap()` solves the linear sum assignment problem
  - `igraph_malloc()`, to be paired with the existing `igraph_free()`
 
 ### Changed 
