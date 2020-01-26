@@ -987,7 +987,7 @@ int igraph_i_lse_dir(const igraph_t *graph,
  *
  * This function essentially does the same as
  * \ref igraph_adjacency_spectral_embedding, but works on the Laplacian
- * of the graph, instead of the adjacncy matrix.
+ * of the graph, instead of the adjacency matrix.
  * \param graph The input graph.
  * \param no The number of eigenvectors (or singular vectors if the graph
  *        is directed) to use for the embedding.
@@ -1006,7 +1006,7 @@ int igraph_i_lse_dir(const igraph_t *graph,
  *        between them with this argument. Possible values:
  *        <code>IGRAPH_EMBEDDING_D_A</code> means D - A where D is the
  *        degree matrix and A is the adjacency matrix;
- *        <code>IGRAPH_EMBEDDING_DAD<code> means Di times A times Di,
+ *        <code>IGRAPH_EMBEDDING_DAD</code> means Di times A times Di,
  *        where Di is the inverse of the square root of the degree matrix;
  *        <code>IGRAPH_EMBEDDING_I_DAD</code> means I - Di A Di, where I
  *        is the identity matrix.

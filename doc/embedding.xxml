@@ -9,7 +9,8 @@
 
 <section><title>Functions</title>
 <!-- doxrox-include igraph_adjacency_spectral_embedding -->
-<!-- doxroc-include igraph_dim_select -->
+<!-- doxrox-include igraph_laplacian_spectral_embedding -->
+<!-- doxrox-include igraph_dim_select -->
 </section>
 
 </chapter>
