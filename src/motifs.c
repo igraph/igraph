@@ -112,7 +112,8 @@ igraph_bool_t igraph_i_motifs_randesu_update_hist(const igraph_t *graph,
  * parameter; \ref igraph_motifs_randesu_no() to calculate the total
  * number of motifs of a given size in a graph;
  * \ref igraph_motifs_randesu_callback() for calling a callback function
- * for every motif found.
+ * for every motif found; \ref igraph_subisomorphic_lad() for finding
+ * subgraphs on more than 4 vertices.
  *
  * Time complexity: TODO.
  *
