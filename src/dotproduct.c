@@ -117,10 +117,10 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
  * \param n The number of vectors to sample.
  * \param radius Radius of the sphere, it must be positive.
  * \param positive Whether to restrict sampling to the positive
- *    orthant.}
+ *    orthant.
  * \param res Pointer to an initialized matrix, the result is
  *    stored here, each column will be a sampled vector. The matrix is
- *    resized, as needed.}
+ *    resized, as needed.
  * \return Error code.
  *
  * Time complexity: O(n*dim*g), where g is the time complexity of
@@ -184,10 +184,10 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
  * \param n The number of vectors to sample.
  * \param radius Radius of the sphere, it must be positive.
  * \param positive Whether to restrict sampling to the positive
- *    orthant.}
+ *    orthant.
  * \param res Pointer to an initialized matrix, the result is
  *    stored here, each column will be a sampled vector. The matrix is
- *    resized, as needed.}
+ *    resized, as needed.
  * \return Error code.
  *
  * Time complexity: O(n*dim*g), where g is the time complexity of
