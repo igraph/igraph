@@ -82,7 +82,8 @@ void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
  *
  * </para><para>
  * This function runs multiple simulations, all starting with a
- * single uniformly randomly chosen infected individual.
+ * single uniformly randomly chosen infected individual. A simulation
+ * is stopped when no infected individuals are left.
  *
  * \param graph The graph to perform the model on. For directed graphs
  *        edge directions are ignored and a warning is given.

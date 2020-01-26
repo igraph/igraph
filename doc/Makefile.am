@@ -207,9 +207,9 @@ memory.xml: memory.xxml $(SRCDIR)/memory.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/memory.c
 
 spatialgames.xml: spatialgames.xxml \
-		   $(SRCDIR)/microscopic_update.c
+		   $(SRCDIR)/microscopic_update.c $(SRCDIR)/sir.c $(INCLUDEDIR)/igraph_epidemics.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
-	$(SRCDIR)/microscopic_update.c
+	$(SRCDIR)/microscopic_update.c $(SRCDIR)/sir.c $(INCLUDEDIR)/igraph_epidemics.h
 
 threading.xml: threading.xxml $(BUILD_INCLUDEDIR)/igraph_threading.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(BUILD_INCLUDEDIR)/igraph_threading.h
