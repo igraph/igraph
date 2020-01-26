@@ -892,8 +892,8 @@ igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
  *
  * \param rng Pointer to the RNG to use. Use \ref igraph_rng_default()
  *        here to use the default igraph RNG.
- * \param a
- * \param scale
+ * \param shape Shape parameter.
+ * \param scale Scale parameter.
  * \return The generated sample
  *
  * Time complexity: depends on RNG.
