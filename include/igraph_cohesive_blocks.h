@@ -30,7 +30,7 @@
 
 __BEGIN_DECLS
 
-int igraph_cohesive_blocks(const igraph_t *graph,
+DECLDIR int igraph_cohesive_blocks(const igraph_t *graph,
                            igraph_vector_ptr_t *blocks,
                            igraph_vector_t *cohesion,
                            igraph_vector_t *parent,
