@@ -57,7 +57,7 @@
 
   <xi:include href="memory.xml" />
 
-  <chapter>
+  <chapter id="igraph-Data-structures">
     <title>Data structure library: vector, matrix, other data types</title>
     <xi:include href="pmt.xml"/>
     <xi:include href="vector.xml"/>
@@ -117,7 +117,7 @@
   
   <xi:include href="bipartite.xml"/>
 
-  <chapter>
+  <chapter id="igraph-Advanced">
     <title>Advanced igraph programming</title>
     <xi:include href="threading.xml" />
     <xi:include href="progress.xml" />
