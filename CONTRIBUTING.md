@@ -212,7 +212,10 @@ every run generates the same set of random numbers.
 In general, if you are not sure about something, please ask! You can
 open an issue on GitHub, open a thread in our [Discourse
 group](https://igraph.discourse.group), write to the igraph-help mailing list
-(see the homepage at http://igraph.org), or write to @ntamas and @gaborcsardi.
+(see the homepage at http://igraph.org), or write to
+[@ntamas](https://github.com/ntamas), [@vtraag](https://github.com/vtraag),
+[@szhorvat](https://github.com/szhorvat) or
+[@gaborcsardi](https://github.com/gaborcsardi).
 We preper the public forums, though, because then others can learn from it,
 too.
 
