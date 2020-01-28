@@ -38,12 +38,6 @@ typedef struct {
 /* Error tests. Don't be afraid to crash the library function.
  */
 int error_test() {
-    const igraph_integer_t min = -1000;
-    const igraph_integer_t max = 1000;
-    igraph_integer_t low;       /* lower limit */
-    igraph_integer_t high;      /* upper limit */
-    igraph_integer_t length;    /* sample size */
-    igraph_integer_t poolsize;  /* size of candidate pool */
     igraph_vector_t V;
     int i, n, ret;
     sampling_test_t *test;
@@ -54,30 +48,12 @@ int error_test() {
     /* test parameters */
     /*----------low----high----length----retval----------*/
     /* lower limit is greater than upper limit */
-    do {
-        high = (igraph_integer_t)R_INTEGER(min, max);
-    } while (high == max);
-    do {
-        low = (igraph_integer_t)R_INTEGER(min, max);
-    } while (low <= high);
-    assert(low > high);
-    length = (igraph_integer_t)R_INTEGER(min, max);
-    sampling_test_t lower_bigger = {low, high, length, IGRAPH_EINVAL};
+    sampling_test_t lower_bigger = {300, 200, 10, IGRAPH_EINVAL};
     /* sample size is greater than size of candidate pool */
-    do {
-        high = (igraph_integer_t)R_INTEGER(min, max);
-    } while (high == min);
-    do {
-        low = (igraph_integer_t)R_INTEGER(min, max);
-    } while (low >= high);
-    assert(low < high);
-    poolsize = (igraph_integer_t)fabs((double)high - (double)low);
-    length = poolsize * poolsize;
-    sampling_test_t sample_size_bigger = {low, high, length, IGRAPH_EINVAL};
+    sampling_test_t sample_size_bigger = {200, 300, 500, IGRAPH_EINVAL};
 
     sampling_test_t *all_checks[] = {/* 1 */ &lower_bigger,
-                                             /* 2 */ &sample_size_bigger
-                                    };
+                                     /* 2 */ &sample_size_bigger};
 
     /* failure is the mother of success */
     igraph_set_error_handler(igraph_error_handler_ignore);
