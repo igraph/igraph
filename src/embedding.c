@@ -813,12 +813,17 @@ int igraph_i_spectral_embedding(const igraph_t *graph,
  *        unweighted graphs.
  * \param which Which eigenvalues (or singular values, for directed
  *        graphs) to use, possible values:
- *        <code>IGRAPH_EIGEN_LM</code>: the ones with the largest magnitude,
- *        <code>IGRAPH_EIGEN_LA</code>: the (algebraic) largest ones, or
- *        <code>IGRAPH_EIGEN_SA</code>: the (algebraic) smallest ones.
+ *        \clist
+ *          \cli IGRAPH_EIGEN_LM
+ *          the ones with the largest magnitude
+ *          \cli IGRAPH_EIGEN_LA
+ *          the (algebraic) largest ones
+ *          \cli IGRAPH_EIGEN_SA
+ *          the (algebraic) smallest ones.
+ *        \endclist
  *        For directed graphs, <code>IGRAPH_EIGEN_LM</code> and
- *        <code>IGRAPH_EIGEN_LA</code> are the same, because singular
- *        values are used for the orderinf instead of eigenvalues.
+ *        <code>IGRAPH_EIGEN_LA</code> are the same because singular
+ *        values are used for the ordering instead of eigenvalues.
  * \param scaled Whether to return X and Y (if scaled is non-zero), or
  *        U and V.
  * \param X Initialized matrix, the estimated latent positions are
@@ -995,21 +1000,31 @@ int igraph_i_lse_dir(const igraph_t *graph,
  *        unweighted graphs.
  * \param which Which eigenvalues (or singular values, for directed
  *        graphs) to use, possible values:
- *        <code>IGRAPH_EIGEN_LM</code>: the ones with the largest magnitude,
- *        <code>IGRAPH_EIGEN_LA</code>: the (algebraic) largest ones, or
- *        <code>IGRAPH_EIGEN_SA</code>: the (algebraic) smallest ones.
+ *        \clist
+ *          \cli IGRAPH_EIGEN_LM
+ *          the ones with the largest magnitude
+ *          \cli IGRAPH_EIGEN_LA
+ *          the (algebraic) largest ones
+ *          \cli IGRAPH_EIGEN_SA
+ *          the (algebraic) smallest ones.
+ *        \endclist
  *        For directed graphs, <code>IGRAPH_EIGEN_LM</code> and
- *        <code>IGRAPH_EIGEN_LA</code> are the same, because singular
+ *        <code>IGRAPH_EIGEN_LA</code> are the same because singular
  *        values are used for the ordering instead of eigenvalues.
  * \param type The type of the Laplacian to use. Various definitions
  *        exist for the Laplacian of a graph, and one can choose
  *        between them with this argument. Possible values:
- *        <code>IGRAPH_EMBEDDING_D_A</code> means D - A where D is the
- *        degree matrix and A is the adjacency matrix;
- *        <code>IGRAPH_EMBEDDING_DAD</code> means Di times A times Di,
- *        where Di is the inverse of the square root of the degree matrix;
- *        <code>IGRAPH_EMBEDDING_I_DAD</code> means I - Di A Di, where I
- *        is the identity matrix.
+ *        \clist
+ *          \cli IGRAPH_EMBEDDING_D_A
+ *           means D - A where D is the
+ *           degree matrix and A is the adjacency matrix
+ *          \cli IGRAPH_EMBEDDING_DAD
+ *           means Di times A times Di,
+ *           where Di is the inverse of the square root of the degree matrix;
+ *          \cli IGRAPH_EMBEDDING_I_DAD
+ *          means I - Di A Di, where I
+ *          is the identity matrix.
+ *        \endclist
  * \param scaled Whether to return X and Y (if scaled is non-zero), or
  *        U and V.
  * \param X Initialized matrix, the estimated latent positions are
