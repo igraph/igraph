@@ -16,7 +16,7 @@ The issue tracker is the preferred channel for [bug reports](#bugs),
 requests](#pull-requests), but please respect the following restrictions:
 
 * Please **do not** use the issue tracker for personal support requests (use
-  our [Discourse group](https://igraph.discourse.group)).
+  our [igraph support forum](https://igraph.discourse.group)).
 
 * Please **do not** derail or troll issues. Keep the discussion on topic and
   respect the opinions of others.
@@ -210,12 +210,12 @@ every run generates the same set of random numbers.
 ### Ask Us!
 
 In general, if you are not sure about something, please ask! You can
-open an issue on GitHub, open a thread in our [Discourse
-group](https://igraph.discourse.group), or write to
+open an issue on GitHub, open a thread in our 
+[igraph support forum](https://igraph.discourse.group), or write to
 [@ntamas](https://github.com/ntamas), [@vtraag](https://github.com/vtraag),
 [@szhorvat](https://github.com/szhorvat) or
 [@gaborcsardi](https://github.com/gaborcsardi).
-We preper the public forums, though, because then others can learn from it,
+We prefer the igraph support forum, because then others can learn from it 
 too.
 
 ## Legal Stuff
@@ -224,8 +224,6 @@ This is a pain to deal with, but we can't avoid it, unfortunately.
 
 So, igraph is licensed under the "General Public License (GPL) version 2, or
 later". The igraph manual is licensed under the "GNU Free Documentation
-License".  If your contribution is bigger than a typo fix, then please indicate
-that you are fine with releasing your code/text under these licenses.  E.g.
-adding a sentence that reads as "I'm fine with GPL 2 or later and FDL." is
-perfectly enough.
+License". By submitting a patch or PR, you agree to allow the project owner to
+license your work under the same license as that used by the project.
 
