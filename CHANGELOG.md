@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [0.8] - 2020-01-28
+## [0.8.0] - 2020-01-28
 
 ### Added
 
