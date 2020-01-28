@@ -7,7 +7,7 @@
 #### Trees
 
  - `igraph_to_prufer()` and `igraph_from_prufer()` convert labelled trees to/from Prüfer sequences
- - `igraph_tree_game()` samples uniformly from the set of trees
+ - `igraph_tree_game()` samples uniformly from the set of labelled trees
  - `igraph_is_tree()` checks if a graph is a tree
  - `igraph_random_spanning_tree()` picks a spanning tree of a graph uniformly at random
  - `igraph_random_edge_walk()` returns the indices of edges traversed by a random walk; useful for multigraphs
@@ -32,7 +32,7 @@
  - `igraph_hsbm_list_game()` for a more general hierarchical stochastic block model
  - `igraph_correlated_game()` generates pairs of correlated random graphs by perturbing existing adjacency matrix
  - `igraph_correlated_pair_game()` generates pairs of correlated random graphs
- - `igraph_tree_game()` generates a random tree with the given number of nodes
+ - `igraph_tree_game()` samples uniformly from the set of labelled trees
  - `igraph_dot_product_game()` generates a random dot product graph
  - `igraph_sample_sphere_surface()` samples points uniformly from the surface of a sphere
  - `igraph_sample_sphere_volume()` samples points uniformly from the volume of a sphere
