@@ -1,4 +1,4 @@
-AC_INIT(igraph, esyscmd([tr -d '\n' < IGRAPH_VERSION]), csardi.gabor@gmail.com)
+AC_INIT(igraph, esyscmd([tr -d '\n' < IGRAPH_VERSION]), igraph@igraph.org)
 AC_CONFIG_SRCDIR(src/games.c)
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_HEADERS([config.h])
