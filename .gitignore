@@ -516,3 +516,5 @@
 igraph-*-msvc.zip
 igraph-*-msvc/
 igraphtest/
+
+.vscode/
