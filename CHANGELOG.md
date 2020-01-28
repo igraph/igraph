@@ -27,16 +27,15 @@
  - `igraph_weighted_clique_number()` computes the weighted clique number
  - `igraph_largest_weighted_cliques()` finds the largest weighted cliques
 
- #### Games
+#### Graph generators
+
  - `igraph_hsbm_game()` for a hierarchical stochastic block model
  - `igraph_hsbm_list_game()` for a more general hierarchical stochastic block model
  - `igraph_correlated_game()` generates pairs of correlated random graphs by perturbing existing adjacency matrix
  - `igraph_correlated_pair_game()` generates pairs of correlated random graphs
  - `igraph_tree_game()` samples uniformly from the set of labelled trees
  - `igraph_dot_product_game()` generates a random dot product graph
- - `igraph_sample_sphere_surface()` samples points uniformly from the surface of a sphere
- - `igraph_sample_sphere_volume()` samples points uniformly from the volume of a sphere
- - `igraph_sample_dirichlet()` samples points from a Dirichlet distribution
+ - `igraph_realize_degree_sequence()` creates a single graph with a given degree sequence (Havel-Hakimi algorithm)
 
 #### Graph embeddings
 
@@ -47,10 +46,12 @@
 
  - `igraph_simplify_and_colorize()` encodes edge and self-loop multiplicities into edge and vertex colors
  - `igraph_bridges()` finds edges whose removal would disconnect a graph
- - `igraph_realize_degree_sequence()` creates a single graph with a given degree sequence (Havel-Hakimi algorithm)
  - `igraph_vertex_coloring_greedy()` computes a vertex coloring using a greedy algorithm
  - `igraph_rewire_directed_edges()` randomly rewires only the starting points or only the endpoints of directed edges
  - Various `igraph_local_scan_*` functions provide local counts and statistics of neighborhoods
+ - `igraph_sample_sphere_surface()` samples points uniformly from the surface of a sphere
+ - `igraph_sample_sphere_volume()` samples points uniformly from the volume of a sphere
+ - `igraph_sample_dirichlet()` samples points from a Dirichlet distribution
  - `igraph_malloc()`, to be paired with the existing `igraph_free()`
 
 ### Changed 
