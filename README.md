@@ -13,5 +13,8 @@ analysis of large graphs.
 See http://igraph.org for installation instructions,
 and documentation.
 
-Igraph can also be used from R, see https://github.com/igraph/rigraph,
-and from Python, see https://github.com/igraph/python-igraph
+Igraph can also be used from:
+
+ - R — https://github.com/igraph/rigraph
+ - Python — https://github.com/igraph/python-igraph
+ - Mathematica — https://github.com/szhorvat/IGraphM
