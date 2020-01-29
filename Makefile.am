@@ -65,9 +65,11 @@ msvc: parsersources
 	cp -r $(top_srcdir)/include/*.h $(top_builddir)/igraph-$(VERSION)-msvc/include
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc; fi
 	cp -r $(top_srcdir)/msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
-	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type d \( -name .deps -o -name .libs \) | xargs -r rm -rf
-	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type f \( -name '*.o' -o -name '*.lo' -o -name '*.la' \) | xargs -r rm
-	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type f \( -name 'Makefile*' -o -name '.dirstamp' \) | xargs -r rm
+	cp -r $(top_srcdir)/msvc/src/f2c $(top_builddir)/igraph-$(VERSION)-msvc/f2c
+	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type d \( -name .deps -o -name .libs \) | xargs rm -rf
+	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type f \( -name '*.o' -o -name '*.lo' -o -name '*.la' \) | xargs rm
+	find $(top_builddir)/igraph-$(VERSION)-msvc/src -type f \( -name 'Makefile*' -o -name '.dirstamp' \) | xargs rm
+	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/f2c/arith
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/config.h
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*~
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/include/*~
