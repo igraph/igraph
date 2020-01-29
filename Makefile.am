@@ -1,4 +1,4 @@
-
+ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS=src tests
 DOC_FILES = $(top_srcdir)/doc/Makefile.in \
