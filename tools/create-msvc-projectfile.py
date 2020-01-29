@@ -4,23 +4,7 @@ import sys
 import os.path
 import re
 
-try:
-    from subprocess import check_output
-except ImportError:
-    from subprocess import Popen, PIPE, CalledProcessError
-    # Compatibility function for Python 2.6 and earlier
-    def check_output(*args, **kwds):
-        process = Popen(stdout=PIPE, *args, **kwds)
-        output, _ = process.communicate()
-        retcode = process.poll()
-        if retcode:
-            cmd = kwds.get("args")
-            if cmd is None:
-                cmd = args[0]
-            error = CalledProcessError(retcode, cmd)
-            error.output = output
-            raise error
-        return output
+from subprocess import check_output
 
 # Some notes:
 # - we have some sources with .cc extensions, these are marked as type 0
