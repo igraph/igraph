@@ -1,7 +1,7 @@
 
 [![Build status Linux](https://travis-ci.org/igraph/igraph.svg?branch=master)](https://travis-ci.org/igraph/igraph)
 [![Build status Windows](https://ci.appveyor.com/api/projects/status/github/igraph/igraph?branch=master&svg=true)](https://ci.appveyor.com/project/ntamas/igraph/branch/master)
-
+[![DOI](https://zenodo.org/badge/8546198.svg)](https://zenodo.org/badge/latestdoi/8546198)
 
 The igraph library
 ------------------
