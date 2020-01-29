@@ -42,13 +42,19 @@
 
 <section><title>Local Scan Statistics</title>
 <!-- doxrox-include about_local_scan -->
+<section><title>"Us" statistics</title>
 <!-- doxrox-include igraph_local_scan_0 -->
 <!-- doxrox-include igraph_local_scan_1_ecount -->
+<!-- doxrox-include igraph_local_scan_k_ecount -->
+</section>
+<section><title>"Them" statistics</title>
 <!-- doxrox-include igraph_local_scan_0_them -->
 <!-- doxrox-include igraph_local_scan_1_ecount_them -->
-<!-- doxrox-include igraph_local_scan_k_ecount -->
 <!-- doxrox-include igraph_local_scan_k_ecount_them -->
+</section>
+<section><title>Pre-calculated neighborhoods</title>
 <!-- doxrox-include igraph_local_scan_neighborhood_ecount -->
+</section>
 </section>
 
 <section><title>Graph Components</title>
