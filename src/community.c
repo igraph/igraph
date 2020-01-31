@@ -482,7 +482,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_resize(result, no_of_edges));
     if (edge_betweenness) {
         IGRAPH_CHECK(igraph_vector_resize(edge_betweenness, no_of_edges));
-        VECTOR(*edge_betweenness)[no_of_edges - 1] = 0;
+        if (no_of_edges > 0) VECTOR(*edge_betweenness)[no_of_edges - 1] = 0;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&eb, no_of_edges);
