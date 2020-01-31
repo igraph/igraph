@@ -159,8 +159,35 @@ void test_weighted() {
     igraph_destroy(&g);
 }
 
+void test_zero_edge_graph() {
+    igraph_t g;
+    igraph_vector_t eb;
+    igraph_vector_t res;
+
+    igraph_full(&g, 1, 0, 0);
+    igraph_vector_init(&res, igraph_ecount(&g));
+    igraph_vector_init(&eb, igraph_ecount(&g));
+
+    igraph_community_edge_betweenness(&g, 
+        &res, // result
+        &eb, // edge_betweenness result
+        NULL, // merges result
+        NULL, // bridges
+        NULL, // modularity
+        NULL, // membership
+        IGRAPH_UNDIRECTED, // directed
+        NULL // weights
+        );    
+
+    igraph_vector_destroy(&eb);
+    printf("No crash\n");
+    igraph_vector_destroy(&res);
+    igraph_destroy(&g);
+}
+
 int main() {
     test_unweighted();
     test_weighted();
+    test_zero_edge_graph();
     return 0;
 }
