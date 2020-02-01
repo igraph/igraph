@@ -1,8 +1,0 @@
-$def with (tags)
-
-<div class="tags">
-$for t in tags:
-  <span class="tag$t.count">
-    $:link_to_tag(getbase(), t)
-  </span>
-</div>
