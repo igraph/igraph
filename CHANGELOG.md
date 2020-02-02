@@ -1,5 +1,15 @@
 # igraph C library changelog
 
+## [Unreleased]
+
+### Added
+
+### Changed
+
+### Fixed
+
+ - `igraph_community_edge_betweenness()`: fix for graphs with no edges (PR #1312)
+
 ## [0.8.0] - 2020-01-29
 
 ### Added
