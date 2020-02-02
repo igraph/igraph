@@ -42,9 +42,13 @@
    - `igraph_adjacency_spectral_embedding()` and `igraph_laplacian_spectral_embedding()` provide graph embedddings
    - `igraph_dim_select()` provides dimensionality selection for singular values using profile likelihood
 
+ * Isomorphism
+
+   - `igraph_automorphism_group()` computes the generators of the automorphism group of a simple graph
+   - `igraph_simplify_and_colorize()` encodes edge and self-loop multiplicities into edge and vertex colors; use in conjunction with VF2 to test isomorphism of non-simple graphs
+
  * Other
 
-   - `igraph_simplify_and_colorize()` encodes edge and self-loop multiplicities into edge and vertex colors
    - `igraph_bridges()` finds edges whose removal would disconnect a graph
    - `igraph_vertex_coloring_greedy()` computes a vertex coloring using a greedy algorithm
    - `igraph_rewire_directed_edges()` randomly rewires only the starting points or only the endpoints of directed edges
@@ -62,10 +66,11 @@
  - `igraph_get_all_simple_paths()`: added `cutoff` argument (PR #1232).
  - `igraph_unfold_tree()`: no longer preserves edge ordering of original graph
  - `igraph_decompose()`: support strongly connected components
+ - `igraph_isomorphic_bliss()`, `igraph_canonical_permutation()`, `igraph_automorphisms()`: added additional arguments to support vertex colored graphs (PR #873)
 
 ### Other
 
- - The [Bliss library](http://www.tcs.hut.fi/Software/bliss/) was updated to version 0.73
+ - The [Bliss isomorphism library](http://www.tcs.hut.fi/Software/bliss/) was updated to version 0.73. This version adds support for vertex colored and directed graphs.
  - igraph now uses the high-performance [Cliquer library](https://users.aalto.fi/~pat/cliquer.html) to find (non-maximal) cliques
  - Provide proper support for Windows, using `__declspec(dllexport)` and `__declspec(dllimport)` for `DLL`s and static usage by using `#define IGRAPH_STATIC 1`.
  - Provided integer versions of `dqueue` and `stack` data types.
