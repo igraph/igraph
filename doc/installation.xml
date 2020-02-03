@@ -12,7 +12,7 @@ The easiest way to install the igraph C library
 depends on your system, and it might also change, 
 so we no longer include installation instructions here. 
 Please see the igraph homepage at <ulink
-url="http://igraph.org">http://igraph.org</ulink>
+url="https://igraph.org/c/#startc">https://igraph.org/c/</ulink>
 instead.
 </para>
 
