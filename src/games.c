@@ -1257,6 +1257,7 @@ int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, 
         igraph_bool_t success = 1;
         IGRAPH_CHECK(igraph_vector_int_shuffle(&stubs));
 
+        /* optimization: we do an initial pass looking for self-loops */
         for (i = 0; i < ecount; ++i) {
             igraph_integer_t from = VECTOR(stubs)[2 * i];
             igraph_integer_t to = VECTOR(stubs)[2 * i + 1];
@@ -1266,6 +1267,16 @@ int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, 
                 success = 0;
                 break;
             }
+        }
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        if (! success)
+            continue;
+
+        for (i = 0; i < ecount; ++i) {
+            igraph_integer_t from = VECTOR(stubs)[2 * i];
+            igraph_integer_t to = VECTOR(stubs)[2 * i + 1];
 
             /* multi-edge, fail */
             if (igraph_set_contains((igraph_set_t *) VECTOR(adjlist)[to], from)) {
@@ -1362,16 +1373,27 @@ int igraph_degree_sequence_game_no_multiple_directed_uniform(
         igraph_bool_t success = 1;
         IGRAPH_CHECK(igraph_vector_int_shuffle(&out_stubs));
 
+        /* optimization: we do an initial pass looking for self-loops */
         for (i = 0; i < ecount; ++i) {
             igraph_integer_t from = VECTOR(out_stubs)[i];
             igraph_integer_t to = VECTOR(in_stubs)[i];
-            igraph_set_t *set;
 
             /* loop edge, fail */
             if (to == from) {
                 success = 0;
                 break;
             }
+        }
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        if (! success)
+            continue;
+
+        for (i = 0; i < ecount; ++i) {
+            igraph_integer_t from = VECTOR(out_stubs)[i];
+            igraph_integer_t to = VECTOR(in_stubs)[i];
+            igraph_set_t *set;
 
             /* multi-edge, fail */
             set = (igraph_set_t *) VECTOR(adjlist)[from];
