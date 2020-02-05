@@ -28,7 +28,7 @@
 /install-sh
 /libtool
 /ltmain.sh
-/m4
+/m4/lt*
 /missing
 /stamp-h1
 /ylwrap

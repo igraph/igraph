@@ -332,6 +332,29 @@ else
   internal_glpk=no
 fi
 
+# Link time optimization feature in newer gcc/g++
+# based on http://svn.r-project.org/R/trunk/configure.ac
+AC_ARG_ENABLE([lto],
+    [AS_HELP_STRING([--enable-lto],[enable link-time optimization @<:@default=no@:>@])],
+    [if test "x${enableval}" = xyes -o "x${enableval}" = x; then
+        want_lto=yes
+     elif test "x${enableval}" = xno; then
+        want_lto=no
+     else
+        AC_MSG_ERROR([Invalid response to --enable-lto (got ${enableval})])
+     fi], 
+    [want_lto=no]
+)
+use_lto=no
+if test "x${want_lto}" = xyes; then
+  AX_CHECK_COMPILE_FLAG([-flto], 
+                        [use_lto=yes; CFLAGS="$CFLAGS -flto"; CXXFLAGS="$CXXFLAGS -flto"], 
+                        [AC_MSG_ERROR([Compiler doesn't support -flto, requested by link-time optimization (--enable-lto)])]) 
+  LTO=-flto
+fi
+AC_SUBST(LTO)
+AM_CONDITIONAL(BUILD_LTO, [test "x${want_lto}" != xno])
+
 AM_CONDITIONAL(INTERNAL_GLPK, test x$internal_glpk = xyes)
 AM_CONDITIONAL(INTERNAL_ARPACK, test x$internal_arpack = xyes)
 AM_CONDITIONAL(INTERNAL_LAPACK, test x$internal_lapack = xyes)
@@ -382,4 +405,5 @@ fi
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Clang AddressSanitizer -- $use_asan])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
+AC_MSG_RESULT([  Link time optimization -- $use_lto])
 
