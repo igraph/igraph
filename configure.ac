@@ -58,7 +58,7 @@ LIBS_SAVE=$LIBS
 LIBS="$LIBS -lm"
 AC_CHECK_FUNCS([expm1 rint rintf finite log2 snprintf log1p round fabsl fmin strcasecmp isfinite isnan strdup _strdup ftruncate stpcpy])
 AC_CHECK_DECL([stpcpy],
-	[AC_DEFINE([HAVE_STPCPY_SIGNATURE], [1], [Define to 1 if the stpcpy function has a signature])])
+    [AC_DEFINE([HAVE_STPCPY_SIGNATURE], [1], [Define to 1 if the stpcpy function has a signature])])
 LIBS=$LIBS_SAVE
 
 AC_DEFUN([IGRAPH_WARNING],
@@ -93,7 +93,7 @@ AC_SUBST(FLOATSTORE)
 
 AC_ARG_ENABLE(gcc-warnings,
               AC_HELP_STRING([--enable-gcc-warnings],
-	                     [turn on lots of GCC warnings (not recommended)]),
+                         [turn on lots of GCC warnings (not recommended)]),
 [case "${enableval}" in
    yes|no) ;;
    *)      AC_MSG_ERROR([bad value ${enableval} for gcc-warnings option]) ;;
@@ -127,13 +127,13 @@ AC_ARG_ENABLE(profiling,
 
 use_asan=no
 AC_ARG_ENABLE(asan,
-			  AC_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
-			  [use_asan=$enableval], [use_asan=no])
+              AC_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
+              [use_asan=$enableval], [use_asan=no])
 
 debug=no
 AC_ARG_ENABLE(debug,
               AC_HELP_STRING([--enable-debug], [Enable debug build]),
-	      [debug=$enableval])
+          [debug=$enableval])
 
 graphml_support=yes
 AC_ARG_ENABLE(graphml,
@@ -144,24 +144,24 @@ HAVE_LIBXML=0
 if test $graphml_support = yes; then
   AC_PATH_PROG([XML2CONFIG], [xml2-config], [none])
   if test "$XML2CONFIG" = "none"; then
-	# Hmmm, no xml2-config. Older versions of OS X do not have it while still
-	# having libxml2, so let's try an educated guess if
-	# /usr/include/libxml2/libxml/parser.h exists.
-	AC_CHECK_FILE([/usr/include/libxml2/libxml/parser.h], [
-	  XML2_LIBS="-lxml2 -lz -lm"
-	  XML2_CFLAGS="-I/usr/include/libxml2"
-	], [
-	  graphml_support=no
-	])
+    # Hmmm, no xml2-config. Older versions of OS X do not have it while still
+    # having libxml2, so let's try an educated guess if
+    # /usr/include/libxml2/libxml/parser.h exists.
+    AC_CHECK_FILE([/usr/include/libxml2/libxml/parser.h], [
+      XML2_LIBS="-lxml2 -lz -lm"
+      XML2_CFLAGS="-I/usr/include/libxml2"
+    ], [
+      graphml_support=no
+    ])
   else
     XML2_LIBS=`$XML2CONFIG --libs`
     XML2_CFLAGS=`$XML2CONFIG --cflags`
-	if test -f /usr/bin/sw_vers -a `sw_vers -productVersion | grep -c "^10\.11\."` -gt 0 -a `echo $XML2_LIBS | grep -c '/Developer/'` -gt 0; then
+    if test -f /usr/bin/sw_vers -a `sw_vers -productVersion | grep -c "^10\.11\."` -gt 0 -a `echo $XML2_LIBS | grep -c '/Developer/'` -gt 0; then
       # We are on OS X 10.11, which has a known bug with xml2-config; see
       # https://github.com/igraph/igraph/issues/973 . We work around it
       # here
       XML2_LIBS=`$XML2CONFIG --exec-prefix=/usr --libs`
-	fi
+    fi
   fi
   AC_CHECK_LIB([xml2], [xmlSAXUserParseFile], [
     ac_save_CFLAGS="$CFLAGS"
@@ -171,14 +171,14 @@ if test $graphml_support = yes; then
     AC_CHECK_HEADER([libxml/parser.h], [
       HAVE_LIBXML=1
       AC_DEFINE([HAVE_LIBXML], [1], [Define to 1 if you have the libxml2 libraries installed])
-	  CFLAGS="$ac_save_CFLAGS ${XML2_CFLAGS}"
+      CFLAGS="$ac_save_CFLAGS ${XML2_CFLAGS}"
       CPPFLAGS="$ac_save_CPPFLAGS"
       AC_SUBST(XML2_LIBS)
       AC_SUBST(XML2_CFLAGS)
     ], [
       graphml_support=no
       CFLAGS="$ac_save_CFLAGS"
-	  CPPFLAGS="$ac_save_CPPFLAGS"
+      CPPFLAGS="$ac_save_CPPFLAGS"
     ])
   ], [
     graphml_support=no
@@ -224,24 +224,24 @@ AC_DEFINE_UNQUOTED([IGRAPH_F77_SAVE], [static IGRAPH_THREAD_LOCAL],
           [Keyword for thread local storage, or just static if not available])
 
 AC_ARG_WITH([external-f2c], [AS_HELP_STRING([--with-external-f2c],
-		                      [Use external F2C library [default=no]])],
+                              [Use external F2C library [default=no]])],
             [internal_f2c=no],
-	    [internal_f2c=yes])
+        [internal_f2c=yes])
 AC_ARG_WITH([external-blas], [AS_HELP_STRING([--with-external-blas],
-		                      [Use external BLAS library [default=no]])],
+                              [Use external BLAS library [default=no]])],
             [internal_blas=no],
-	    [internal_blas=yes])
+        [internal_blas=yes])
 AC_ARG_WITH([external-lapack], [AS_HELP_STRING([--with-external-lapack],
-		                      [Use external LAPACK library [default=no]])],
+                              [Use external LAPACK library [default=no]])],
             [internal_lapack=no],
-	    [internal_lapack=yes])
+        [internal_lapack=yes])
 AC_ARG_WITH([external-arpack], [AS_HELP_STRING([--with-external-arpack],
-		                      [Use external ARPACK library [default=no]])],
+                              [Use external ARPACK library [default=no]])],
             [internal_arpack=no],
-	    [internal_arpack=yes])
+        [internal_arpack=yes])
 
 AC_ARG_WITH([external-glpk], [AS_HELP_STRING([--with-external-glpk],
-				      [Use external GLPK library [default=no]])],
+                      [Use external GLPK library [default=no]])],
             [internal_glpk=no],
             [internal_glpk=yes])
 
@@ -256,7 +256,7 @@ if test "$needs_f2c" = "yes"; then
       AC_CHECK_LIB([f2c], [f77_alloc], [],
         AC_CHECK_LIB([f2c], [F77_ALLOC_], [],
            AC_CHECK_LIB([f2c], [F77_ALLOC], [],
-	      [AC_MSG_RESULT(not found, trying to use -lf2c anyway.)]))))
+          [AC_MSG_RESULT(not found, trying to use -lf2c anyway.)]))))
     LDFLAGS="${LDFLAGS} -lf2c"
   else
     AC_DEFINE([INTERNAL_F2C], [1], [Define to 1 if you use the internal F2C library])
@@ -270,7 +270,7 @@ if test "$internal_blas" = "no"; then
      AC_CHECK_LIB([blas], [daxpy], [],
         AC_CHECK_LIB([blas], [DAXPY_], [],
            AC_CHECK_LIB([blas], [DAXPY], [],
-	      [AC_MSG_RESULT(not found, trying to use -lblas anyway.)]))))
+          [AC_MSG_RESULT(not found, trying to use -lblas anyway.)]))))
   LDFLAGS="${LDFLAGS} -lblas"
   PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -lblas"
 else
@@ -282,7 +282,7 @@ if test "$internal_lapack" = "no"; then
      AC_CHECK_LIB([lapack], [dlarnv], [],
         AC_CHECK_LIB([lapack], [DLARNV_], [],
            AC_CHECK_LIB([lapack], [DLARNV], [],
-	      [AC_MSG_RESULT(not found, trying to use -llapack anyway.)]))))
+          [AC_MSG_RESULT(not found, trying to use -llapack anyway.)]))))
   LDFLAGS="${LDFLAGS} -llapack"
   PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -llapack"
 else
@@ -297,7 +297,7 @@ if test "$internal_arpack" = "no"; then
      AC_CHECK_LIB([arpack], [dsaupd], [],
         AC_CHECK_LIB([arpack], [DSAUPD_], [],
            AC_CHECK_LIB([arpack], [DSAUPD], [],
-	      [AC_MSG_RESULT(not found, trying to use -larpack anyway.)]))))
+          [AC_MSG_RESULT(not found, trying to use -larpack anyway.)]))))
   LDFLAGS="${LDFLAGS} -larpack"
   PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -larpack"
 else
