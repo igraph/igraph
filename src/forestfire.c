@@ -117,21 +117,20 @@ int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_real_t param_geom_out = 1 - fw_prob;
     igraph_real_t param_geom_in = 1 - fw_prob * bw_factor;
 
-    if (fw_prob < 0) {
-        IGRAPH_ERROR("Forest fire model: 'fw_prob' should be between non-negative",
+    if (fw_prob < 0 || fw_prob >= 1) {
+        IGRAPH_ERROR("Forest fire model: 'fw_prob' must satisfy 0 <= fw_prob < 1.",
                      IGRAPH_EINVAL);
     }
-    if (bw_factor < 0) {
-        IGRAPH_ERROR("Forest fire model: 'bw_factor' should be non-negative",
+    if (bw_factor * fw_prob < 0 || bw_factor * fw_prob >= 1) {
+        IGRAPH_ERROR("Forest fire model: 'bw_factor' must satisfy 0 <= bw_factor * fw_prob < 1.",
                      IGRAPH_EINVAL);
     }
     if (ambs < 0) {
-        IGRAPH_ERROR("Number of ambassadors ('ambs') should be non-negative",
+        IGRAPH_ERROR("Forest fire model: Number of ambassadors must not be negative.",
                      IGRAPH_EINVAL);
     }
 
-    if (fw_prob == 0 || ambs == 0) {
-        IGRAPH_WARNING("'fw_prob or ambs is zero, creating empty graph");
+    if (ambs == 0) {
         IGRAPH_CHECK(igraph_empty(graph, nodes, directed));
         return 0;
     }
