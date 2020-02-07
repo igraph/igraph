@@ -924,7 +924,7 @@ int igraph_i_community_leiden(const igraph_t *graph,
  * This function implements the Leiden algorithm for finding community
  * structure, see Traag, V. A., Waltman, L., &amp; van Eck, N. J. (2019). From
  * Louvain to Leiden: guaranteeing well-connected communities. Scientific
- * reports, 9(1), 5233.  http://dx.doi.org/10.1038/s41598-019-41695-z.
+ * reports, 9(1), 5233. http://dx.doi.org/10.1038/s41598-019-41695-z
  *
  * </para><para>
  * It is similar to the multilevel algorithm, often called the Louvain
