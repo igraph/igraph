@@ -1128,6 +1128,29 @@ static int igraph_i_bridges_rec(const igraph_t *graph, const igraph_inclist_t *i
         long edge = (long) VECTOR(*incedges)[i];
         igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
 
+          if (u == v) {
+            IGRAPH_WARNING("Function not designed to handle loops");
+            return IGRAPH_FAILURE;
+        }
+
+//below is the original method, but i have optimised it as the method below is slower
+//(for loop inside a foor loop) whilst the method above executes with the program
+
+        int node_count = 0;
+        for (int j = 0; j < nc; j++) {
+            long curr_edge = (long) VECTOR(*incedges)[j];
+            if ((IGRAPH_TO(graph, curr_edge) == v && IGRAPH_FROM(graph, curr_edge) == u) 
+                && u != v) {
+                node_count++;
+            }
+        }
+
+        if (node_count > 1) {
+            IGRAPH_WARNING("Function not designed to handle multi-edges");
+            return IGRAPH_FAILURE;
+        }
+
+
         if (! VECTOR(*visited)[v]) {
             VECTOR(*parent)[v] = u;
             IGRAPH_CHECK(igraph_i_bridges_rec(graph, il, v, time, bridges, visited, disc, low, parent));
