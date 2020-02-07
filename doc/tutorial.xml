@@ -5,7 +5,7 @@
 <!ENTITY tut_simple SYSTEM "../examples/doc/tut_simple.c">
 ]>
 
-<chapter id="igraph-tutorial">
+<chapter id="igraph-Tutorial">
 <title>Tutorial</title>
 
 <section><title>Lesson 1. Compiling programs using igraph.</title>

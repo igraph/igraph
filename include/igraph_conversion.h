@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -40,25 +40,25 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_get_adjacency_t type, igraph_bool_t eids);
+                                 igraph_get_adjacency_t type, igraph_bool_t eids);
 DECLDIR int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
-                igraph_get_adjacency_t type);
+                                        igraph_get_adjacency_t type);
 
-DECLDIR int igraph_get_stochastic(const igraph_t *graph, 
-                igraph_matrix_t *matrix,
-                igraph_bool_t column_wise);
+DECLDIR int igraph_get_stochastic(const igraph_t *graph,
+                                  igraph_matrix_t *matrix,
+                                  igraph_bool_t column_wise);
 
-DECLDIR int igraph_get_stochastic_sparsemat(const igraph_t *graph, 
-                igraph_sparsemat_t *sparsemat,
-                igraph_bool_t column_wise);
+DECLDIR int igraph_get_stochastic_sparsemat(const igraph_t *graph,
+        igraph_sparsemat_t *sparsemat,
+        igraph_bool_t column_wise);
 
 DECLDIR int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol);
 
-DECLDIR int igraph_to_directed(igraph_t *graph, 
-                igraph_to_directed_t flags);
+DECLDIR int igraph_to_directed(igraph_t *graph,
+                               igraph_to_directed_t flags);
 DECLDIR int igraph_to_undirected(igraph_t *graph,
-                igraph_to_undirected_t flags,
-                const igraph_attribute_combination_t *edge_comb);
+                                 igraph_to_undirected_t flags,
+                                 const igraph_attribute_combination_t *edge_comb);
 DECLDIR int igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t *prufer);
 
 __END_DECLS

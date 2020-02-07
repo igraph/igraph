@@ -108,7 +108,7 @@ igraph_bool_t check_same(const igraph_sparsemat_t *A,
     long int j, p, nzero = 0;
 
     if (nrow != igraph_matrix_nrow(M) ||
-            ncol != igraph_matrix_ncol(M)) {
+        ncol != igraph_matrix_ncol(M)) {
         return 0;
     }
 

@@ -58,7 +58,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
             long int to = VECTOR(*vvec)[j + 1];
             if (directed) {
                 if (from != IGRAPH_FROM(graph, edge) ||
-                        to   != IGRAPH_TO  (graph, edge)) {
+                    to   != IGRAPH_TO  (graph, edge)) {
                     exit(error_code);
                 }
             } else {

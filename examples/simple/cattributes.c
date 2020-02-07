@@ -97,7 +97,7 @@ int print_attributes(const igraph_t *g) {
             for (i = 0; i < igraph_vcount(g); i++) {
                 igraph_real_t num = VAN(g, STR(vnames, j), i);
                 if (num != VECTOR(vec)[i] &&
-                        (!isnan(num) || !isnan(VECTOR(vec)[i]))) {
+                    (!isnan(num) || !isnan(VECTOR(vec)[i]))) {
                     exit(51);
                 }
             }
@@ -119,7 +119,7 @@ int print_attributes(const igraph_t *g) {
             for (i = 0; i < igraph_ecount(g); i++) {
                 igraph_real_t num = EAN(g, STR(enames, j), i);
                 if (num != VECTOR(vec)[i] &&
-                        (!isnan(num) || !isnan(VECTOR(vec)[i]))) {
+                    (!isnan(num) || !isnan(VECTOR(vec)[i]))) {
                     exit(53);
                 }
             }
@@ -272,13 +272,13 @@ int main() {
     SETVAN(&g, "y", 0, -1);
     SETVAN(&g, "y", 1, 2.1);
     if (VAN(&g, "y", 0) != -1 ||
-            VAN(&g, "y", 1) != 2.1) {
+        VAN(&g, "y", 1) != 2.1) {
         return 17;
     }
     SETVAS(&g, "id", 0, "foo");
     SETVAS(&g, "id", 1, "bar");
     if (strcmp(VAS(&g, "id", 0), "foo") ||
-            strcmp(VAS(&g, "id", 1), "bar")) {
+        strcmp(VAS(&g, "id", 1), "bar")) {
         return 18;
     }
     SETVAB(&g, "type", 0, 1);
@@ -291,13 +291,13 @@ int main() {
     SETEAN(&g, "weight", 2, 100.0);
     SETEAN(&g, "weight", 0, -100.1);
     if (EAN(&g, "weight", 2) != 100.0 ||
-            EAN(&g, "weight", 0) != -100.1) {
+        EAN(&g, "weight", 0) != -100.1) {
         return 19;
     }
     SETEAS(&g, "color", 2, "RED");
     SETEAS(&g, "color", 0, "Blue");
     if (strcmp(EAS(&g, "color", 2), "RED") ||
-            strcmp(EAS(&g, "color", 0), "Blue")) {
+        strcmp(EAS(&g, "color", 0), "Blue")) {
         return 20;
     }
     SETEAB(&g, "type", 0, 1);
@@ -418,8 +418,8 @@ int main() {
     DELALL(&g);
     igraph_cattribute_list(&g, &gnames, &gtypes, &vnames, &vtypes, &enames, &etypes);
     if (igraph_strvector_size(&gnames) != 0 ||
-            igraph_strvector_size(&vnames) != 0 ||
-            igraph_strvector_size(&enames) != 0) {
+        igraph_strvector_size(&vnames) != 0 ||
+        igraph_strvector_size(&enames) != 0) {
         return 25;
     }
 

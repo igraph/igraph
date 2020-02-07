@@ -45,7 +45,7 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     igraph_degree(&g, &outdegree_after, igraph_vss_all(), IGRAPH_OUT, 0);
 
     if ((!igraph_vector_all_e(&indegree_before, &indegree_after)) ||
-            (!igraph_vector_all_e(&outdegree_before, &outdegree_after))) {
+        (!igraph_vector_all_e(&outdegree_before, &outdegree_after))) {
 
         fprintf(stderr, "%s graph degrees changed\n", description);
         exit(1);

@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* vim:set sw=2 ts=2 sts=2 et: */
+/* vim:set sw=4 ts=4 sts=4 et: */
 /*
    IGraph library.
    Copyright (C) 2012  Gabor Csardi <csardi.gabor@gmail.com>

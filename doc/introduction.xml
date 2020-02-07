@@ -4,7 +4,7 @@
 <!ENTITY igraph "igraph">
 ]>
 
-<chapter id="igraph-introduction">
+<chapter id="igraph-Introduction">
 <title>Introduction</title>
 
 <para>
@@ -96,6 +96,8 @@ reference:
 </para><para>
 Gábor Csárdi, Tamás Nepusz: The igraph software package for complex network
 research. InterJournal Complex Systems, 1695, 2006.
+</para><para>
+The igraph C library is assigned the DOI <ulink url="https://doi.org/10.5281/zenodo.3630268">10.5281/zenodo.3630268</ulink> on Zenodo.
 </para>
 
 </section>

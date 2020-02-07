@@ -56,7 +56,7 @@ int main() {
     /* mul */
     c = igraph_complex_mul(a, b);
     if (IGRAPH_REAL(c) != ARE * BRE - AIM * BIM ||
-            IGRAPH_IMAG(c) != ARE * BIM + AIM * BRE) {
+        IGRAPH_IMAG(c) != ARE * BIM + AIM * BRE) {
         return 4;
     }
 
@@ -148,7 +148,7 @@ int main() {
     /* neg */
     c = igraph_complex_neg(a);
     if (IGRAPH_REAL(c) != - IGRAPH_REAL(a) ||
-            IGRAPH_IMAG(c) != - IGRAPH_IMAG(a)) {
+        IGRAPH_IMAG(c) != - IGRAPH_IMAG(a)) {
         return 21;
     }
 

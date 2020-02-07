@@ -32,28 +32,28 @@
 __BEGIN_DECLS
 
 DECLDIR int igraph_deterministic_optimal_imitation(const igraph_t *graph,
-                igraph_integer_t vid,
-                igraph_optimal_t optimality,
-                const igraph_vector_t *quantities,
-                igraph_vector_t *strategies,
-                igraph_neimode_t mode);
+        igraph_integer_t vid,
+        igraph_optimal_t optimality,
+        const igraph_vector_t *quantities,
+        igraph_vector_t *strategies,
+        igraph_neimode_t mode);
 DECLDIR int igraph_moran_process(const igraph_t *graph,
-                const igraph_vector_t *weights,
-                igraph_vector_t *quantities,
-                igraph_vector_t *strategies,
-                igraph_neimode_t mode);
+                                 const igraph_vector_t *weights,
+                                 igraph_vector_t *quantities,
+                                 igraph_vector_t *strategies,
+                                 igraph_neimode_t mode);
 DECLDIR int igraph_roulette_wheel_imitation(const igraph_t *graph,
-                igraph_integer_t vid,
-                igraph_bool_t islocal,
-                const igraph_vector_t *quantities,
-                igraph_vector_t *strategies,
-                igraph_neimode_t mode);
+        igraph_integer_t vid,
+        igraph_bool_t islocal,
+        const igraph_vector_t *quantities,
+        igraph_vector_t *strategies,
+        igraph_neimode_t mode);
 DECLDIR int igraph_stochastic_imitation(const igraph_t *graph,
-                igraph_integer_t vid,
-                igraph_imitate_algorithm_t algo,
-                const igraph_vector_t *quantities,
-                igraph_vector_t *strategies,
-                igraph_neimode_t mode);
+                                        igraph_integer_t vid,
+                                        igraph_imitate_algorithm_t algo,
+                                        const igraph_vector_t *quantities,
+                                        igraph_vector_t *strategies,
+                                        igraph_neimode_t mode);
 
 __END_DECLS
 

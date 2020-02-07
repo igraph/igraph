@@ -48,9 +48,9 @@ int main() {
 
     /* Basic query, nrow, ncol, type, is_triplet, is_cc */
     if (igraph_sparsemat_nrow(&A) != VC ||
-            igraph_sparsemat_ncol(&A) != VC ||
-            igraph_sparsemat_nrow(&B) != VC ||
-            igraph_sparsemat_ncol(&B) != VC) {
+        igraph_sparsemat_ncol(&A) != VC ||
+        igraph_sparsemat_nrow(&B) != VC ||
+        igraph_sparsemat_ncol(&B) != VC) {
         return 1;
     }
     if (!igraph_sparsemat_is_triplet(&A)) {

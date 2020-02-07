@@ -15,7 +15,7 @@ DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
 	      adjlist.xml arpack.xml bipartite.xml visitors.xml random.xml \
 	      separators.xml memory.xml sparsemat.xml hrg.xml \
 	      scg.xml spatialgames.xml threading.xml progress.xml status.xml \
-	      graphlets.xml epi.xml embedding.xml scan.xml coloring.xml
+	      graphlets.xml embedding.xml coloring.xml
 
 DOCFIX = fdl.xml gpl.xml installation.xml introduction.xml \
 	 tutorial.xml licenses.xml pmt.xml
@@ -86,9 +86,6 @@ scg.xml: scg.xxml $(SRCDIR)/scg.c
 embedding.xml: embedding.xxml $(SRCDIR)/embedding.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/embedding.c
 
-scan.xml: scan.xxml $(SRCDIR)/scan.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/scan.c
-
 basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
 
@@ -128,7 +125,8 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 	$(SRCDIR)/centrality.c $(SRCDIR)/decomposition.c $(SRCDIR)/mixing.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
 	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
-	$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h
+	$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h \
+	$(SRCDIR)/scan.c
 
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
@@ -147,7 +145,7 @@ foreign.xml: foreign.xxml $(SRCDIR)/foreign.c $(SRCDIR)/foreign-graphml.c
 	$(SRCDIR)/foreign-graphml.c
 
 nongraph.xml: nongraph.xxml $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c $(INCLUDEDIR)/igraph_nongraph.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_nongraph.h $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(INCLUDEDIR)/igraph_nongraph.h $(SRCDIR)/other.c $(SRCDIR)/random.c $(SRCDIR)/version.c $(SRCDIR)/dotproduct.c
 
 isomorphism.xml: isomorphism.xxml $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/topology.c $(INCLUDEDIR)/igraph_topology.h $(SRCDIR)/bliss.cc $(SRCDIR)/lad.c
@@ -207,9 +205,9 @@ memory.xml: memory.xxml $(SRCDIR)/memory.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/memory.c
 
 spatialgames.xml: spatialgames.xxml \
-		   $(SRCDIR)/microscopic_update.c
+		   $(SRCDIR)/microscopic_update.c $(SRCDIR)/sir.c $(INCLUDEDIR)/igraph_epidemics.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ \
-	$(SRCDIR)/microscopic_update.c
+	$(SRCDIR)/microscopic_update.c $(SRCDIR)/sir.c $(INCLUDEDIR)/igraph_epidemics.h
 
 threading.xml: threading.xxml $(BUILD_INCLUDEDIR)/igraph_threading.h
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(BUILD_INCLUDEDIR)/igraph_threading.h
@@ -222,10 +220,6 @@ status.xml: status.xxml $(INCLUDEDIR)/igraph_statusbar.h $(SRCDIR)/statusbar.c
 
 graphlets.xml: graphlets.xxml $(SRCDIR)/glet.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/glet.c
-
-epi.xml: epi.xxml $(SRCDIR)/sir.c $(INCLUDEDIR)/igraph_epidemics.h
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/sir.c \
-		$(INCLUDEDIR)/igraph_epidemics.h
 
 html/stamp: igraph-docs0.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \

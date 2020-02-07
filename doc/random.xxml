@@ -30,6 +30,7 @@
 <!-- doxrox-include igraph_rng_get_normal -->
 <!-- doxrox-include igraph_rng_get_geom -->
 <!-- doxrox-include igraph_rng_get_binom -->
+<!-- doxrox-include igraph_rng_get_gamma -->
 </section>
 
 <section><title>Supported random number generators</title>

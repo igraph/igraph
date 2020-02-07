@@ -34,7 +34,7 @@ int main() {
                                 /*memberships=*/ 0, &mod);
 
     if (igraph_vector_size(&mod) != 1 ||
-            VECTOR(mod)[0] != 0) {
+        VECTOR(mod)[0] != 0) {
         return 1;
     }
 

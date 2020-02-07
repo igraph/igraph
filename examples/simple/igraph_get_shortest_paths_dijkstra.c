@@ -58,7 +58,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
             long int to = VECTOR(*vvec)[j + 1];
             if (directed) {
                 if (from != IGRAPH_FROM(graph, edge) ||
-                        to   != IGRAPH_TO  (graph, edge)) {
+                    to   != IGRAPH_TO  (graph, edge)) {
                     exit(error_code);
                 }
             } else {
@@ -83,7 +83,7 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
     long int i, n = igraph_vcount(graph);
 
     if (igraph_vector_long_size(pred) != n ||
-            igraph_vector_long_size(inbound) != n) {
+        igraph_vector_long_size(inbound) != n) {
         exit(error_code);
     }
 

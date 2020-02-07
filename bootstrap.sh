@@ -15,6 +15,8 @@ if [ -z "$LIBTOOLIZE" ]; then
   exit 1
 fi
 
+mkdir -p m4
+
 set -x
 aclocal
 $LIBTOOLIZE --force --copy

@@ -9,12 +9,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,9 +22,9 @@
 #define DEFINITIONS_H
 
 #ifndef _MSC_VER
-#ifndef register
-#define register
-#endif
+    #ifndef register
+        #define register
+    #endif
 #endif
 
 #include <stdio.h>
@@ -38,7 +38,7 @@ namespace gengraph {
 
 // disable lousy VC++ warnings
 #ifdef _ATL_VER_
-#pragma warning(disable : 4127)
+    #pragma warning(disable : 4127)
 #endif //_ATL_VER_
 
 // Verbose
@@ -64,29 +64,29 @@ typedef unsigned int ip_addr;
 
 // Compatibility
 #ifdef _WIN32
-#define strcasecmp _stricmp
+    #define strcasecmp _stricmp
 #endif
-//inline double round(double x) throw () { return (floor(0.5+x)); } 
+//inline double round(double x) throw () { return (floor(0.5+x)); }
 
 // No assert
 #ifndef _DEBUG
-#ifndef NDEBUG
-#define NDEBUG
-#endif //NDEBUG
+    #ifndef NDEBUG
+        #define NDEBUG
+    #endif //NDEBUG
 #endif //_DEBUG
 
 // Min & Max
 #ifndef min
-#define defmin(type) inline type min(type a, type b) { return a<b ? a : b; }
-defmin(int)
-defmin(double)
-defmin(unsigned long)
+    #define defmin(type) inline type min(type a, type b) { return a<b ? a : b; }
+    defmin(int)
+    defmin(double)
+    defmin(unsigned long)
 #endif //min
 #ifndef max
-#define defmax(type) inline type max(type a, type b) { return a>b ? a : b; }
-defmax(int)
-defmax(double)
-defmax(unsigned long)
+    #define defmax(type) inline type max(type a, type b) { return a>b ? a : b; }
+    defmax(int)
+    defmax(double)
+    defmax(unsigned long)
 #endif //max
 
 // Traceroute Sampling
@@ -100,11 +100,14 @@ defmax(unsigned long)
 
 // Max Int
 #ifndef MAX_INT
-#define MAX_INT 0x7FFFFFFF
+    #define MAX_INT 0x7FFFFFFF
 #endif //MAX_INT
 
 //Edge type
-typedef struct { int from; int to; } edge;
+typedef struct {
+    int from;
+    int to;
+} edge;
 
 // Tag Int
 #define TAG_INT 0x40000000
@@ -126,14 +129,18 @@ inline double logp(double x) {
 
 //Fast search or replace
 inline int* fast_rpl(int *m, const int a, const int b) {
-  while(*m!=a) m++;
-  *m = b;
-  return m;
+    while (*m != a) {
+        m++;
+    }
+    *m = b;
+    return m;
 }
 inline int* fast_search(int *m, const int size, const int a) {
-  int *p = m+size;
-  while(m != p--) if(*p == a) return p;
-  return NULL;
+    int *p = m + size;
+    while (m != p--) if (*p == a) {
+            return p;
+        }
+    return NULL;
 }
 
 // Lovely percentage print
@@ -147,29 +154,39 @@ inline int* fast_search(int *m, const int size, const int a) {
 
 // Skips non-numerical chars, then numerical chars, then non-numerical chars.
 inline char skip_int(char* &c) {
-  while(*c<'0' || *c>'9') c++;
-  while(*c>='0' && *c<='9') c++;
-  while(*c!=0 && (*c<'0' || *c>'9')) c++;
-  return *c;
+    while (*c < '0' || *c > '9') {
+        c++;
+    }
+    while (*c >= '0' && *c <= '9') {
+        c++;
+    }
+    while (*c != 0 && (*c < '0' || *c > '9')) {
+        c++;
+    }
+    return *c;
 }
 
 // distance+1 modulo 255 for breadth-first search
-inline unsigned char next_dist(const unsigned char c) { return c==255 ? 1 : c+1; }
-inline unsigned char prev_dist(const unsigned char c) { return c==1 ? 255 : c-1; }
+inline unsigned char next_dist(const unsigned char c) {
+    return c == 255 ? 1 : c + 1;
+}
+inline unsigned char prev_dist(const unsigned char c) {
+    return c == 1 ? 255 : c - 1;
+}
 
 // 1/(RANDMAX+1)
 #define inv_RANDMAX (1.0/(1.0+double(MY_RAND_MAX)))
 
 // random number in ]0,1[, _very_ accurate around 0
 inline double random_float() {
-  int r=my_random();
-  double mul=inv_RANDMAX;
-  while(r<=0x7FFFFF) {
-    r<<=8;
-    r+=(my_random()&0xFF);
-    mul*=(1.0/256.0);
-  }
-  return double(r)*mul;
+    int r = my_random();
+    double mul = inv_RANDMAX;
+    while (r <= 0x7FFFFF) {
+        r <<= 8;
+        r += (my_random() & 0xFF);
+        mul *= (1.0 / 256.0);
+    }
+    return double(r) * mul;
 }
 
 // Return true with probability p. Very accurate when p is small.
@@ -180,13 +197,15 @@ static int _random_bits_stored = 0;
 static int _random_bits = 0;
 
 inline int random_bit() {
-  register int a = _random_bits;
-  _random_bits = a >> 1;
-  if(_random_bits_stored--) return a&0x1;
-  a = my_random();
-  _random_bits = a >> 1;
-  _random_bits_stored = 30;
-  return a&0x1;
+    register int a = _random_bits;
+    _random_bits = a >> 1;
+    if (_random_bits_stored--) {
+        return a & 0x1;
+    }
+    a = my_random();
+    _random_bits = a >> 1;
+    _random_bits_stored = 30;
+    return a & 0x1;
 }
 
 // Hash Profiling (see hash.h)

@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -42,93 +42,93 @@ __BEGIN_DECLS
 
 DECLDIR int igraph_layout_random(const igraph_t *graph, igraph_matrix_t *res);
 DECLDIR int igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_vs_t order);
+                                 igraph_vs_t order);
 DECLDIR int igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_integer_t center, const igraph_vector_t *order);
+                               igraph_integer_t center, const igraph_vector_t *order);
 DECLDIR int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width);
 DECLDIR int igraph_layout_fruchterman_reingold(const igraph_t *graph,
-                igraph_matrix_t *res,
-                igraph_bool_t use_seed,
-                igraph_integer_t niter,
-                igraph_real_t start_temp,
-                igraph_layout_grid_t grid,
-                const igraph_vector_t *weight,
-                const igraph_vector_t *minx,
-                const igraph_vector_t *maxx,
-                const igraph_vector_t *miny,
-                const igraph_vector_t *maxy);
+        igraph_matrix_t *res,
+        igraph_bool_t use_seed,
+        igraph_integer_t niter,
+        igraph_real_t start_temp,
+        igraph_layout_grid_t grid,
+        const igraph_vector_t *weight,
+        const igraph_vector_t *minx,
+        const igraph_vector_t *maxx,
+        const igraph_vector_t *miny,
+        const igraph_vector_t *maxy);
 
 DECLDIR int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_bool_t use_seed, igraph_integer_t maxiter,
-                igraph_real_t epsilon, igraph_real_t kkconst, 
-                const igraph_vector_t *weights,
-                const igraph_vector_t *minx, const igraph_vector_t *maxx,
-                const igraph_vector_t *miny, const igraph_vector_t *maxy);
+                                       igraph_bool_t use_seed, igraph_integer_t maxiter,
+                                       igraph_real_t epsilon, igraph_real_t kkconst,
+                                       const igraph_vector_t *weights,
+                                       const igraph_vector_t *minx, const igraph_vector_t *maxx,
+                                       const igraph_vector_t *miny, const igraph_vector_t *maxy);
 
 DECLDIR int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
-                igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse);
+                                  igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
+                                  igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse);
 DECLDIR int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_integer_t maxiter, igraph_real_t maxdelta, 
-                igraph_real_t area, igraph_real_t coolexp,
-                igraph_real_t repulserad, igraph_real_t cellsize, igraph_integer_t root);
+                              igraph_integer_t maxiter, igraph_real_t maxdelta,
+                              igraph_real_t area, igraph_real_t coolexp,
+                              igraph_real_t repulserad, igraph_real_t cellsize, igraph_integer_t root);
 DECLDIR int igraph_layout_reingold_tilford(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_neimode_t mode,
-                const igraph_vector_t *roots,
-                const igraph_vector_t *rootlevel);
+        igraph_neimode_t mode,
+        const igraph_vector_t *roots,
+        const igraph_vector_t *rootlevel);
 DECLDIR int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
-                igraph_matrix_t *res, 
-                igraph_neimode_t mode,
-                const igraph_vector_t *roots,
-                const igraph_vector_t *rootlevel);
+        igraph_matrix_t *res,
+        igraph_neimode_t mode,
+        const igraph_vector_t *roots,
+        const igraph_vector_t *rootlevel);
 DECLDIR int igraph_layout_sugiyama(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_t *extd_graph, igraph_vector_t *extd_to_orig_eids,
-                const igraph_vector_t* layers, igraph_real_t hgap,
-                igraph_real_t vgap, long int maxiter, const igraph_vector_t *weights);
+                                   igraph_t *extd_graph, igraph_vector_t *extd_to_orig_eids,
+                                   const igraph_vector_t* layers, igraph_real_t hgap,
+                                   igraph_real_t vgap, long int maxiter, const igraph_vector_t *weights);
 
 DECLDIR int igraph_layout_random_3d(const igraph_t *graph, igraph_matrix_t *res);
 DECLDIR int igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res);
 DECLDIR int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
-                long int width, long int height);
-DECLDIR int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph, 
-                igraph_matrix_t *res,
-                igraph_bool_t use_seed,
-                igraph_integer_t niter,
-                igraph_real_t start_temp,
-                const igraph_vector_t *weight, 
-                const igraph_vector_t *minx,
-                const igraph_vector_t *maxx,
-                const igraph_vector_t *miny,
-                const igraph_vector_t *maxy,
-                const igraph_vector_t *minz,
-                const igraph_vector_t *maxz);
+                                  long int width, long int height);
+DECLDIR int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
+        igraph_matrix_t *res,
+        igraph_bool_t use_seed,
+        igraph_integer_t niter,
+        igraph_real_t start_temp,
+        const igraph_vector_t *weight,
+        const igraph_vector_t *minx,
+        const igraph_vector_t *maxx,
+        const igraph_vector_t *miny,
+        const igraph_vector_t *maxy,
+        const igraph_vector_t *minz,
+        const igraph_vector_t *maxz);
 
 DECLDIR int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_bool_t use_seed, igraph_integer_t maxiter,
-                igraph_real_t epsilon, igraph_real_t kkconst, 
-                const igraph_vector_t *weights,
-                const igraph_vector_t *minx, const igraph_vector_t *maxx,
-                const igraph_vector_t *miny, const igraph_vector_t *maxy,
-                const igraph_vector_t *minz, const igraph_vector_t *maxz);
+        igraph_bool_t use_seed, igraph_integer_t maxiter,
+        igraph_real_t epsilon, igraph_real_t kkconst,
+        const igraph_vector_t *weights,
+        const igraph_vector_t *minx, const igraph_vector_t *maxx,
+        const igraph_vector_t *miny, const igraph_vector_t *maxy,
+        const igraph_vector_t *minz, const igraph_vector_t *maxz);
 
-DECLDIR int igraph_layout_graphopt(const igraph_t *graph, 
-                igraph_matrix_t *res, igraph_integer_t niter,
-                igraph_real_t node_charge, igraph_real_t node_mass,
-                igraph_real_t spring_length,
-                igraph_real_t spring_constant, 
-                igraph_real_t max_sa_movement,
-                igraph_bool_t use_seed);
+DECLDIR int igraph_layout_graphopt(const igraph_t *graph,
+                                   igraph_matrix_t *res, igraph_integer_t niter,
+                                   igraph_real_t node_charge, igraph_real_t node_mass,
+                                   igraph_real_t spring_length,
+                                   igraph_real_t spring_constant,
+                                   igraph_real_t max_sa_movement,
+                                   igraph_bool_t use_seed);
 
-DECLDIR int igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res, 
-                const igraph_matrix_t *dist, long int dim,
-                igraph_arpack_options_t *options);
+DECLDIR int igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res,
+                              const igraph_matrix_t *dist, long int dim,
+                              igraph_arpack_options_t *options);
 
-DECLDIR int igraph_layout_bipartite(const igraph_t *graph, 
-                const igraph_vector_bool_t *types,
-                igraph_matrix_t *res, igraph_real_t hgap, 
-                igraph_real_t vgap, long int maxiter);
+DECLDIR int igraph_layout_bipartite(const igraph_t *graph,
+                                    const igraph_vector_bool_t *types,
+                                    igraph_matrix_t *res, igraph_real_t hgap,
+                                    igraph_real_t vgap, long int maxiter);
 
-/** 
+/**
  * \struct igraph_layout_drl_options_t
  * Parameters for the DrL layout generator
  *
@@ -166,83 +166,84 @@ DECLDIR int igraph_layout_bipartite(const igraph_t *graph,
  */
 
 typedef struct igraph_layout_drl_options_t {
-  igraph_real_t    edge_cut;
-  igraph_integer_t init_iterations;
-  igraph_real_t    init_temperature;
-  igraph_real_t    init_attraction;
-  igraph_real_t    init_damping_mult;
-  igraph_integer_t liquid_iterations;
-  igraph_real_t    liquid_temperature;
-  igraph_real_t    liquid_attraction;
-  igraph_real_t    liquid_damping_mult;
-  igraph_integer_t expansion_iterations;
-  igraph_real_t    expansion_temperature;
-  igraph_real_t    expansion_attraction;
-  igraph_real_t    expansion_damping_mult;
-  igraph_integer_t cooldown_iterations;
-  igraph_real_t    cooldown_temperature;
-  igraph_real_t    cooldown_attraction;
-  igraph_real_t    cooldown_damping_mult;
-  igraph_integer_t crunch_iterations;
-  igraph_real_t    crunch_temperature;
-  igraph_real_t    crunch_attraction;
-  igraph_real_t    crunch_damping_mult;
-  igraph_integer_t simmer_iterations;
-  igraph_real_t    simmer_temperature;
-  igraph_real_t    simmer_attraction;
-  igraph_real_t    simmer_damping_mult;
+    igraph_real_t    edge_cut;
+    igraph_integer_t init_iterations;
+    igraph_real_t    init_temperature;
+    igraph_real_t    init_attraction;
+    igraph_real_t    init_damping_mult;
+    igraph_integer_t liquid_iterations;
+    igraph_real_t    liquid_temperature;
+    igraph_real_t    liquid_attraction;
+    igraph_real_t    liquid_damping_mult;
+    igraph_integer_t expansion_iterations;
+    igraph_real_t    expansion_temperature;
+    igraph_real_t    expansion_attraction;
+    igraph_real_t    expansion_damping_mult;
+    igraph_integer_t cooldown_iterations;
+    igraph_real_t    cooldown_temperature;
+    igraph_real_t    cooldown_attraction;
+    igraph_real_t    cooldown_damping_mult;
+    igraph_integer_t crunch_iterations;
+    igraph_real_t    crunch_temperature;
+    igraph_real_t    crunch_attraction;
+    igraph_real_t    crunch_damping_mult;
+    igraph_integer_t simmer_iterations;
+    igraph_real_t    simmer_temperature;
+    igraph_real_t    simmer_attraction;
+    igraph_real_t    simmer_damping_mult;
 } igraph_layout_drl_options_t;
 
 /**
- * \typedef igraph_layout_drl_default_t 
+ * \typedef igraph_layout_drl_default_t
  * Predefined parameter templates for the DrL layout generator
- * 
- * These constants can be used to initialize a set of DrL parameters. 
+ *
+ * These constants can be used to initialize a set of DrL parameters.
  * These can then be modified according to the user's needs.
  * \enumval IGRAPH_LAYOUT_DRL_DEFAULT The deafult parameters.
  * \enumval IGRAPH_LAYOUT_DRL_COARSEN Slightly modified parameters to
- *      get a coarser layout.  
+ *      get a coarser layout.
  * \enumval IGRAPH_LAYOUT_DRL_COARSEST An even coarser layout.
  * \enumval IGRAPH_LAYOUT_DRL_REFINE Refine an already calculated layout.
  * \enumval IGRAPH_LAYOUT_DRL_FINAL Finalize an already refined layout.
  */
 
-typedef enum { IGRAPH_LAYOUT_DRL_DEFAULT=0, 
-	       IGRAPH_LAYOUT_DRL_COARSEN,
-	       IGRAPH_LAYOUT_DRL_COARSEST,
-	       IGRAPH_LAYOUT_DRL_REFINE,
-	       IGRAPH_LAYOUT_DRL_FINAL } igraph_layout_drl_default_t;
+typedef enum { IGRAPH_LAYOUT_DRL_DEFAULT = 0,
+               IGRAPH_LAYOUT_DRL_COARSEN,
+               IGRAPH_LAYOUT_DRL_COARSEST,
+               IGRAPH_LAYOUT_DRL_REFINE,
+               IGRAPH_LAYOUT_DRL_FINAL
+             } igraph_layout_drl_default_t;
 
 DECLDIR int igraph_layout_drl_options_init(igraph_layout_drl_options_t *options,
-                igraph_layout_drl_default_t templ);
-DECLDIR int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res, 
-                igraph_bool_t use_seed,
-                igraph_layout_drl_options_t *options,
-                const igraph_vector_t *weights, 
-                const igraph_vector_bool_t *fixed);
+        igraph_layout_drl_default_t templ);
+DECLDIR int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
+                              igraph_bool_t use_seed,
+                              igraph_layout_drl_options_t *options,
+                              const igraph_vector_t *weights,
+                              const igraph_vector_bool_t *fixed);
 
-DECLDIR int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res, 
-                igraph_bool_t use_seed,
-                igraph_layout_drl_options_t *options,
-                const igraph_vector_t *weights,
-                const igraph_vector_bool_t *fixed);
+DECLDIR int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
+                                 igraph_bool_t use_seed,
+                                 igraph_layout_drl_options_t *options,
+                                 const igraph_vector_t *weights,
+                                 const igraph_vector_bool_t *fixed);
 
 DECLDIR int igraph_layout_merge_dla(igraph_vector_ptr_t *graphs,
-                igraph_vector_ptr_t *coords, 
-                igraph_matrix_t *res);
+                                    igraph_vector_ptr_t *coords,
+                                    igraph_matrix_t *res);
 
 DECLDIR int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_bool_t use_seed, igraph_integer_t maxiter,
-                igraph_real_t temp_max, igraph_real_t temp_min,
-                igraph_real_t temp_init);
+                              igraph_bool_t use_seed, igraph_integer_t maxiter,
+                              igraph_real_t temp_max, igraph_real_t temp_min,
+                              igraph_real_t temp_init);
 
 DECLDIR int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
-                igraph_bool_t use_seed, igraph_integer_t maxiter,
-                igraph_integer_t fineiter, igraph_real_t cool_fact,
-                igraph_real_t weight_node_dist, igraph_real_t weight_border, 
-                igraph_real_t weight_edge_lengths, 
-                igraph_real_t weight_edge_crossings,
-                igraph_real_t weight_node_edge_dist);
+        igraph_bool_t use_seed, igraph_integer_t maxiter,
+        igraph_integer_t fineiter, igraph_real_t cool_fact,
+        igraph_real_t weight_node_dist, igraph_real_t weight_border,
+        igraph_real_t weight_edge_lengths,
+        igraph_real_t weight_edge_crossings,
+        igraph_real_t weight_node_edge_dist);
 
 __END_DECLS
 
