@@ -1448,9 +1448,9 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param out_deg The degree sequence for an undirected graph (if
- *        \p in_seq is of length zero), or the out-degree
+ *        \p in_seq is \c NULL or of length zero), or the out-degree
  *        sequence of a directed graph (if \p in_deq is not
- *        of length zero.
+ *        of length zero).
  * \param in_deg It is either a zero-length vector or
  *        \c NULL (if an undirected
  *        graph is generated), or the in-degree sequence.
