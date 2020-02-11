@@ -1461,34 +1461,36 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *          For undirected graphs, it puts all vertex IDs in a bag
  *          such that the multiplicity of a vertex in the bag is the same as
  *          its degree. Then it draws pairs from the bag until the bag becomes
- *          empty. This method can generate both loop (self) edges and multiple
+ *          empty. This method may generate both loop (self) edges and multiple
  *          edges. For directed graphs, the algorithm is basically the same,
  *          but two separate bags are used for the in- and out-degrees.
  *          Undirected graphs are generated with probability proportional to
  *          <code>(\prod_{i&lt;j} A_{ij} ! \prod_i A_{ii} !!)^{-1}</code>,
  *          where \c A denotes the adjacency matrix and <code>!!</code> denotes
- *          the double factorial.
- *          The corresponding  expression for directed ones is
+ *          the double factorial. Here \c A is assumed to have twice the number of
+ *          self-loops on its diagonal.
+ *          The corresponding  expression for directed graphs is
  *          <code>(\prod_{i,j} A_{ij}!)^{-1}</code>.
  *          Thus the probability of all simple graphs (which only have 0s and 1s
  *          in the adjacency matrix) is the same, while that of
- *          non-simple ones depends on their structure.
+ *          non-simple ones depends on their edge and self-loop multiplicities.
  *          \cli IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE
- *          This method is similar to \c IGRAPH_DEGSEQ_SIMPLE
+ *          This method generates simple graphs.
+ *          It is similar to \c IGRAPH_DEGSEQ_SIMPLE
  *          but tries to avoid multiple and loop edges and restarts the
- *          generation from scratch if it gets stuck. It is not guaranteed
- *          to sample uniformly from the space of all possible graphs with
- *          the given sequence, but it is relatively fast and it will
+ *          generation from scratch if it gets stuck. It can generate all simple
+ *          realizations of a degree sequence, but it is not guaranteed
+ *          to sample them uniformly. This method is relatively fast and it will
  *          eventually succeed if the provided degree sequence is graphical,
  *          but there is no upper bound on the number of iterations.
  *          \cli IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM
  *          This method is identical to \c IGRAPH_DEGSEQ_SIMPLE, but if the
  *          generated graph is not simple, it rejects it and re-starts the
- *          generation. It samples all simple graphs with the same probability.
+ *          generation. It generates all simple graphs with the same probability.
  *          \cli IGRAPH_DEGSEQ_VL
- *          This method is a much more sophisticated generator than the
- *          previous ones. It can sample undirected, connected simple graphs
- *          uniformly and uses Monte-Carlo methods to randomize the graphs.
+ *          This method samples undirected connected graphs approximately
+ *          uniformly. It is a Monte Carlo method based on degree-preserving
+ *          edge swaps.
  *          This generator should be favoured if undirected and connected
  *          graphs are to be generated and execution time is not a concern.
  *          igraph uses the original implementation of Fabien Viger; for the algorithm,
