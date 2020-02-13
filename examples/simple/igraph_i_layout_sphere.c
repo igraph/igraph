@@ -22,7 +22,6 @@
 */
 
 #include <igraph.h>
-#include <time.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -36,7 +35,7 @@ int main () {
     igraph_matrix_t m;
     igraph_real_t x, y, z, r;
 
-    srand(time(0));
+    srand(42); /* make tests deterministic */
 
     /* 2D */
     igraph_matrix_init(&m, 1000, 2);

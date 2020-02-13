@@ -32,7 +32,8 @@ int main() {
     igraph_matrix_t coords, dist_mat;
     igraph_arpack_options_t options;
     int i, j;
-    srand(time(0));
+
+    srand(42); /* make tests deterministic */
 
     igraph_arpack_options_init(&options);
 
