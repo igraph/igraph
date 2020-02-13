@@ -1930,7 +1930,7 @@ int FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
  * \function igraph_vector_append
  * \brief Append a vector to another one.
  *
- * The target vector will be resized (except \p from is empty).
+ * The target vector will be resized (except when \p from is empty).
  * \param to The vector to append to.
  * \param from The vector to append, it is kept unchanged.
  * \return Error code.
@@ -2008,8 +2008,8 @@ igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *
  * \brief Update a vector from another one.
  *
  * After this operation the contents of \p to will be exactly the same
- * \p from. \p to will be resized if it was originally shorter or
- * longer than \p from.
+ * as that of \p from. The vector \p to will be resized if it was originally 
+ * shorter or longer than \p from.
  * \param to The vector to update.
  * \param from The vector to update from.
  * \return Error code.
@@ -2063,8 +2063,8 @@ int FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *
  * Note that currently no range checking is performed.
  * \param v The input vector.
  * \param i Index of the first element.
- * \param j index of the second element. (Might be the same as the
- * first.)
+ * \param j Index of the second element (may be the same as the
+ * first one.)
  * \return Error code, currently always \c IGRAPH_SUCCESS.
  *
  * Time complexity: O(1).
@@ -2110,7 +2110,7 @@ int FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
  * \brief Shuffles a vector in-place using the Fisher-Yates method
  *
  * </para><para>
- * The Fisher-Yates shuffle ensures that every implementation is
+ * The Fisher-Yates shuffle ensures that every permutation is
  * equally probable when using a proper randomness source. Of course
  * this does not apply to pseudo-random generators as the cycle of
  * these generators is less than the number of possible permutations
