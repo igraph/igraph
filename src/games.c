@@ -965,6 +965,8 @@ int igraph_degree_sequence_game_no_multiple_undirected(
      * until it finally succeeds. */
     finished = 0;
     while (!finished) {
+        IGRAPH_ALLOW_INTERRUPTION();
+
         /* Be optimistic :) */
         failed = 0;
 
@@ -1111,6 +1113,8 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
      * until it finally succeeds. */
     finished = 0;
     while (!finished) {
+        IGRAPH_ALLOW_INTERRUPTION();
+
         /* Be optimistic :) */
         failed = 0;
 
