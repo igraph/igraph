@@ -42,7 +42,7 @@ int check_simple() {
     long int r, e, ecount;
     igraph_vector_t eids, pairs, path;
 
-    srand(time(0));
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
 
     igraph_vector_init(&pairs, edges * 2);
     igraph_vector_init(&path, 0);

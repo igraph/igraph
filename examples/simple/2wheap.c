@@ -23,7 +23,6 @@
 
 #include <igraph.h>
 #include "igraph_types_internal.h"
-#include <time.h>
 #include <stdlib.h>
 
 int main() {
@@ -33,7 +32,7 @@ int main() {
     long int i;
     igraph_real_t prev = IGRAPH_INFINITY;
 
-    srand(time(0));
+    srand(42); /* make tests deterministic */
 
     igraph_vector_init(&elems, 100);
     for (i = 0; i < igraph_vector_size(&elems); i++) {

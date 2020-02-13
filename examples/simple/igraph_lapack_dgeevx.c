@@ -22,7 +22,6 @@
 */
 
 #include <igraph.h>
-#include <time.h>
 #include <stdio.h>
 
 #define DIM 10

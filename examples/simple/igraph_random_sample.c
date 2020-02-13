@@ -23,7 +23,6 @@
 #include <igraph.h>
 #include <math.h>
 #include <stdio.h>
-#include <time.h>
 
 #define R_INTEGER(a,b) (igraph_rng_get_integer(igraph_rng_default(), (a), (b)))
 
@@ -42,7 +41,7 @@ int error_test() {
     int i, n, ret;
     sampling_test_t *test;
 
-    igraph_rng_seed(igraph_rng_default(), time(0));
+    igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
     igraph_vector_init(&V, /*size*/ 0);
 
     /* test parameters */
@@ -87,7 +86,7 @@ int random_sample_test() {
     igraph_vector_t V;
     int i;
 
-    igraph_rng_seed(igraph_rng_default(), time(0));
+    igraph_rng_seed(igraph_rng_default(), 57); /* make tests deterministic */
 
     /* The generated sequence of numbers must be in increasing order. */
     igraph_vector_init(&V, /*size*/ 0);

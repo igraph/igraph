@@ -24,7 +24,6 @@
 #include <igraph.h>
 #include "igraph_types_internal.h"
 #include <stdlib.h>
-#include <time.h>
 
 int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
                               long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
