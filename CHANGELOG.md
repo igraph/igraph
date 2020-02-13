@@ -6,6 +6,9 @@
 
 ### Changed
 
+ - Improved interruptability: `igraph_degree_sequence_game()`
+ - Improved argument checking: `igraph_forest_fire_game()`
+
 ### Fixed
 
  - `igraph_community_edge_betweenness()`: fix for graphs with no edges (PR #1312)
