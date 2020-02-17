@@ -1146,9 +1146,15 @@ int igraph_biconnected_components(const igraph_t *graph,
 
 
 /* igraph_bridges -- find all bridges in the graph */
-/* based on https://www.geeksforgeeks.org/bridge-in-a-graph/ */
+/* The algorithm is based on https://www.geeksforgeeks.org/bridge-in-a-graph/
+   but instead of keeping track of the parent of each vertex in the DFS tree
+   we keep track of its incoming edge. This is necessary to support multigraphs. */
 
-static int igraph_i_bridges_rec(const igraph_t *graph, const igraph_inclist_t *il, igraph_integer_t u, igraph_integer_t *time, igraph_vector_t *bridges, igraph_vector_bool_t *visited, igraph_vector_int_t *disc, igraph_vector_int_t *low, igraph_vector_int_t *parent) {
+static int igraph_i_bridges_rec(
+        const igraph_t *graph, const igraph_inclist_t *il, igraph_integer_t u,
+        igraph_integer_t *time, igraph_vector_t *bridges, igraph_vector_bool_t *visited,
+        igraph_vector_int_t *disc, igraph_vector_int_t *low, igraph_vector_int_t *incoming_edge)
+{
     igraph_vector_int_t *incedges;
     long nc; /* neighbour count */
     long i;
@@ -1167,15 +1173,15 @@ static int igraph_i_bridges_rec(const igraph_t *graph, const igraph_inclist_t *i
         igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
 
         if (! VECTOR(*visited)[v]) {
-            VECTOR(*parent)[v] = u;
-            IGRAPH_CHECK(igraph_i_bridges_rec(graph, il, v, time, bridges, visited, disc, low, parent));
+            VECTOR(*incoming_edge)[v] = edge;
+            IGRAPH_CHECK(igraph_i_bridges_rec(graph, il, v, time, bridges, visited, disc, low, incoming_edge));
 
             VECTOR(*low)[u] = VECTOR(*low)[u] < VECTOR(*low)[v] ? VECTOR(*low)[u] : VECTOR(*low)[v];
 
             if (VECTOR(*low)[v] > VECTOR(*disc)[u]) {
                 IGRAPH_CHECK(igraph_vector_push_back(bridges, edge));
             }
-        } else if (v != VECTOR(*parent)[u]) {
+        } else if (edge != VECTOR(*incoming_edge)[u]) {
             VECTOR(*low)[u] = VECTOR(*low)[u] < VECTOR(*disc)[v] ? VECTOR(*low)[u] : VECTOR(*disc)[v];
         }
     }
@@ -1204,7 +1210,7 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
     igraph_inclist_t il;
     igraph_vector_bool_t visited;
     igraph_vector_int_t disc, low;
-    igraph_vector_int_t parent;
+    igraph_vector_int_t incoming_edge;
     long n;
     long i;
     igraph_integer_t time;
@@ -1223,10 +1229,10 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
     IGRAPH_CHECK(igraph_vector_int_init(&low, n));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&parent, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &parent);
+    IGRAPH_CHECK(igraph_vector_int_init(&incoming_edge, n));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &incoming_edge);
     for (i = 0; i < n; ++i) {
-        VECTOR(parent)[i] = -1;
+        VECTOR(incoming_edge)[i] = -1;
     }
 
     igraph_vector_clear(bridges);
@@ -1234,10 +1240,10 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
     time = 0;
     for (i = 0; i < n; ++i)
         if (! VECTOR(visited)[i]) {
-            IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &parent));
+            IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &incoming_edge));
         }
 
-    igraph_vector_int_destroy(&parent);
+    igraph_vector_int_destroy(&incoming_edge);
     igraph_vector_int_destroy(&low);
     igraph_vector_int_destroy(&disc);
     igraph_vector_bool_destroy(&visited);
