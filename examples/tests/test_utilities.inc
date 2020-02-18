@@ -11,35 +11,35 @@
 
 /* Print elements of a vector. Use parentheses to make it clear when a vector has size zero. */
 void print_vector(const igraph_vector_t *v, FILE *f) {
-  long i;
-  fprintf(f, "(");
-  for (i=0; i < igraph_vector_size(v); i++) {
-    fprintf(f, " %f", VECTOR(*v)[i]);
-  }
-  fprintf(f, " )\n");
+    long i;
+    fprintf(f, "(");
+    for (i=0; i < igraph_vector_size(v); i++) {
+        fprintf(f, " %f", VECTOR(*v)[i]);
+    }
+    fprintf(f, " )\n");
 }
 
 
 /* Round elements of a vector to integers and print them. */
 /* This is meant to be used when the elements of a vector are integer values. */
 void print_vector_round(const igraph_vector_t *v, FILE *f) {
-  long i;
-  fprintf(f, "(");
-  for (i=0; i < igraph_vector_size(v); i++) {
-    fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-  }
-  fprintf(f, " )\n");
+    long i;
+    fprintf(f, "(");
+    for (i=0; i < igraph_vector_size(v); i++) {
+        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
+    }
+    fprintf(f, " )\n");
 }
 
 
 /* Print elements of an integer vector */
 void print_vector_int(const igraph_vector_int_t *v, FILE *f) {
-  long i;
-  fprintf(f, "(");
-  for (i=0; i < igraph_vector_int_size(v); i++) {
-    fprintf(f, " %d", VECTOR(*v)[i]);
-  }
-  fprintf(f, " )\n");
+    long i;
+    fprintf(f, "(");
+    for (i=0; i < igraph_vector_int_size(v); i++) {
+        fprintf(f, " %d", VECTOR(*v)[i]);
+    }
+    fprintf(f, " )\n");
 }
 
 
