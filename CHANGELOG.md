@@ -77,6 +77,7 @@
  - `igraph_unfold_tree()`: no longer preserves edge ordering of original graph
  - `igraph_decompose()`: support strongly connected components
  - `igraph_isomorphic_bliss()`, `igraph_canonical_permutation()`, `igraph_automorphisms()`: added additional arguments to support vertex colored graphs (PR #873)
+ - `igraph_extended_chordal_ring`: added argument to support direction (PR #1096), and fixed issue #1093.
 
 ### Other
 
