@@ -5968,6 +5968,10 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         }
     }
 
+    igraph_vector_destroy(&edge_neis);
+    igraph_vector_destroy(&neis);
+    IGRAPH_FINALLY_CLEAN(2);
+
     if (knnk) {
         for (i = 0; i < maxdeg; i++) {
             igraph_real_t dh = VECTOR(deghist)[i];
@@ -5982,7 +5986,7 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_destroy(&neis);
+    igraph_vector_destroy(&strength);
     igraph_vector_destroy(&deg);
     IGRAPH_FINALLY_CLEAN(2);
 
