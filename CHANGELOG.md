@@ -13,6 +13,7 @@
 
  - `igraph_community_edge_betweenness()`: fix for graphs with no edges (PR #1312)
  - `igraph_bridges()` now handles multigraphs correctly (PR #1335)
+ - `igraph_avg_nearest_neighbor_degree`: fix for memory leak in weighted case (PR #1339)
 
 ## [0.8.0] - 2020-01-29
 
