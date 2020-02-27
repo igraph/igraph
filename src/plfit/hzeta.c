@@ -45,6 +45,7 @@
 #include <math.h>
 #include <stdio.h>
 #include "error.h"
+#include "platform.h"
 
 /* imported from gsl_machine.h */
 
