@@ -4,14 +4,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or (at
+ * the Free Software Foundation; either version 2 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -55,7 +55,7 @@ typedef struct {
  * The gss() function calls this function to obtain the values of the objective
  * function when needed. A client program must implement this function to evaluate
  * the value of the objective function, given the location.
- *  
+ *
  * @param  instance    The user data sent for the gss() function by the client.
  * @param  x           The current value of the variable.
  * @retval double      The value of the objective function for the current
