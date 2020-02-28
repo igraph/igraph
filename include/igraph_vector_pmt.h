@@ -177,6 +177,9 @@ DECLDIR igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector
 DECLDIR igraph_bool_t FUNCTION(igraph_vector, search)(const TYPE(igraph_vector) *v,
         long int from, BASE what,
         long int *pos);
+DECLDIR igraph_bool_t FUNCTION(igraph_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
+        BASE what, long int *pos,
+        long int start, long int end);
 DECLDIR igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
         BASE what, long int *pos);
 DECLDIR igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,
