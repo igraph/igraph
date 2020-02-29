@@ -126,7 +126,7 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
 	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
 	$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h \
-	$(SRCDIR)/scan.c
+	$(SRCDIR)/scan.c $(SRCDIR)/shortest_paths.c
 
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
