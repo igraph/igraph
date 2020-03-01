@@ -62,7 +62,7 @@ __BEGIN_DECLS
  *    as a request to stop the BFS and return to the caller. If a BFS
  *    is terminated like this, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
- *    contain \c IGRAPH_NAN.
+ *    contain NaN.
  *
  * \sa \ref igraph_bfs()
  */
@@ -109,7 +109,7 @@ int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
  *    as a request to stop the DFS and return to the caller. If a DFS
  *    is terminated like this, then all elements of the result vectors
  *    that were not yet calculated at the point of the termination
- *    contain \c IGRAPH_NAN.
+ *    contain NaN.
  *
  * \sa \ref igraph_dfs()
  */
