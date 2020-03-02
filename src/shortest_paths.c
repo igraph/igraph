@@ -2,7 +2,8 @@
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2020  Szabolcs Horvat <szhorvat@gmail.com>
+   Copyright (C) 2005-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   334 Harvard street, Cambridge, MA 02139 USA
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,6 +39,7 @@
 int igraph_i_average_path_length_unweighted(
         const igraph_t *graph,
         igraph_real_t *res,
+        igraph_real_t *unconnected_pairs, /* if not NULL, will be set to the no. of non-connected ordered vertex pairs */
         const igraph_bool_t directed,
         const igraph_bool_t invert, /* average inverse distances instead of distances */
         const igraph_bool_t unconn  /* average over connected pairs instead of all pairs */)
@@ -107,9 +109,8 @@ int igraph_i_average_path_length_unweighted(
         } else { /* average over all pairs */
             /* no_of_conn_pairs < no_of_pairs implies that the graph is disconnected */
             if (no_of_conn_pairs < no_of_pairs && ! invert) {
-                /* When invert=false, assume the distance between non-connected pairs to be
-                 * the number of nodes, which is larger than any possible unweighted distance. */
-                *res = (*res + no_of_nodes * (no_of_pairs - no_of_conn_pairs)) / no_of_pairs;
+                /* When invert=false, assume the distance between non-connected pairs to be infinity */
+                *res = IGRAPH_INFINITY;
             } else {
                 /* When invert=true, assume the inverse distance between non-connected pairs
                  * to be zero. Therefore, no special treatment is needed for disconnected graphs. */
@@ -117,6 +118,9 @@ int igraph_i_average_path_length_unweighted(
             }
         }
     }
+
+    if (unconnected_pairs)
+        *unconnected_pairs = no_of_pairs - no_of_conn_pairs;
 
     /* clean */
     igraph_Free(already_added);
@@ -135,6 +139,7 @@ int igraph_i_average_path_length_unweighted(
 int igraph_i_average_path_length_dijkstra(
         const igraph_t *graph,
         igraph_real_t *res,
+        igraph_real_t *unconnected_pairs,
         const igraph_vector_t *weights,
         const igraph_bool_t directed,
         const igraph_bool_t invert, /* average inverse distances instead of distances */
@@ -165,7 +170,7 @@ int igraph_i_average_path_length_dijkstra(
     igraph_real_t no_of_conn_pairs = 0.0; /* no. of ordered pairs between which there is a path */
 
     if (!weights) {
-        return igraph_i_average_path_length_unweighted(graph, res, directed, invert, unconn);
+        return igraph_i_average_path_length_unweighted(graph, res, unconnected_pairs, directed, invert, unconn);
     }
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -244,6 +249,9 @@ int igraph_i_average_path_length_dijkstra(
         }
     }
 
+    if (unconnected_pairs)
+        *unconnected_pairs = no_of_pairs - no_of_conn_pairs;
+
     igraph_lazy_inclist_destroy(&inclist);
     igraph_2wheap_destroy(&Q);
     IGRAPH_FINALLY_CLEAN(2);
@@ -264,14 +272,15 @@ int igraph_i_average_path_length_dijkstra(
  *
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
+ * \param unconn_pairs Pointer to a real number. If not a null pointer, the number of
+ *    ordered vertex pairs where the second vertex is unreachable from the first one
+ *    will be stored here.
  * \param directed Boolean, whether to consider directed
- *        paths. Ignored for undirected graphs.
+ *    paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
- *        \c TRUE, only those vertex pairs will be included in the calculation
- *        between which there is a path. If \c FALSE, the number of vertices is
- *        used as the distance between vertices unreachable from each other.
- *        The rationale behind this is that this is always longer than the longest
- *        possible geodesic in a graph.
+ *    \c TRUE, only those vertex pairs will be included in the calculation
+ *    between which there is a path. If \c FALSE, \c IGRAPH_INFINITY is returned
+ *    for disconnected graphs.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for data structures
  *
@@ -282,10 +291,11 @@ int igraph_i_average_path_length_dijkstra(
  * \example examples/simple/igraph_average_path_length.c
  */
 
-int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
+int igraph_average_path_length(const igraph_t *graph,
+                               igraph_real_t *res, igraph_real_t *unconn_pairs,
                                igraph_bool_t directed, igraph_bool_t unconn)
 {
-    return igraph_i_average_path_length_unweighted(graph, res, directed, /* invert= */ 0, unconn);
+    return igraph_i_average_path_length_unweighted(graph, res, unconn_pairs, directed, /* invert= */ 0, unconn);
 }
 
 
@@ -306,11 +316,14 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
  *    \ref igraph_average_path_length() is called.
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
+ * \param unconn_pairs Pointer to a real number. If not a null pointer, the number of
+ *    ordered vertex pairs where the second vertex is unreachable from the first one
+ *    will be stored here.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param unconn If \c TRUE, only those pairs are considered for the calculation
- * between which there is a path. If \c FALSE, \c IGRAPH_INFINITY is returned
- * for disconnected graphs.
+ *    between which there is a path. If \c FALSE, \c IGRAPH_INFINITY is returned
+ *    for disconnected graphs.
  * \return Error code:
  *         \clist
  *         \cli IGRAPH_ENOMEM, not enough memory for data structures
@@ -324,11 +337,12 @@ int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
  *
  */
 
-int igraph_average_path_length_dijkstra(const igraph_t *graph, igraph_real_t *res,
+int igraph_average_path_length_dijkstra(const igraph_t *graph,
+                                        igraph_real_t *res, igraph_real_t *unconn_pairs,
                                         const igraph_vector_t *weights,
                                         igraph_bool_t directed, igraph_bool_t unconn)
 {
-    return igraph_i_average_path_length_dijkstra(graph, res, weights, directed, /* invert= */ 0, unconn);
+    return igraph_i_average_path_length_dijkstra(graph, res, unconn_pairs, weights, directed, /* invert= */ 0, unconn);
 }
 
 
@@ -373,7 +387,7 @@ int igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
                              const igraph_vector_t *weights,
                              igraph_bool_t directed)
 {
-    return igraph_i_average_path_length_dijkstra(graph, res, weights, directed, /* invert= */ 1, /* unconn= */ 0);
+    return igraph_i_average_path_length_dijkstra(graph, res, NULL, weights, directed, /* invert= */ 1, /* unconn= */ 0);
 }
 
 

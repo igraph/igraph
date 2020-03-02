@@ -109,9 +109,11 @@ DECLDIR int igraph_shortest_paths_johnson(const igraph_t *graph,
         const igraph_vs_t to,
         const igraph_vector_t *weights);
 
-DECLDIR int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
+DECLDIR int igraph_average_path_length(const igraph_t *graph,
+                                       igraph_real_t *res, igraph_real_t *unconn_pairs,
                                        igraph_bool_t directed, igraph_bool_t unconn);
-DECLDIR int igraph_average_path_length_dijkstra(const igraph_t *graph, igraph_real_t *res,
+DECLDIR int igraph_average_path_length_dijkstra(const igraph_t *graph,
+                                                igraph_real_t *res, igraph_real_t *unconn_pairs,
                                                 const igraph_vector_t *weights,
                                                 igraph_bool_t directed, igraph_bool_t unconn);
 DECLDIR int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
