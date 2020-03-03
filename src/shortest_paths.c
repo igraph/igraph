@@ -401,13 +401,13 @@ static int igraph_i_local_efficiency_unweighted(
         igraph_adjlist_t *adjlist,
         igraph_dqueue_t *q,
         long int *already_counted,
+        igraph_vector_t *vertex_neis,
         igraph_vector_int_t *nei_mask,
         igraph_real_t *res,
         igraph_integer_t vertex)
 {
 
     long int no_of_nodes = igraph_vcount(graph);
-    igraph_vector_int_t *vertex_neis;
     long int vertex_neis_size;
     long int neighbor_count; /* unlike 'vertex_neis_size', 'neighbor_count' does not count self-loops and multi-edges */
     long int i, j;
@@ -415,8 +415,8 @@ static int igraph_i_local_efficiency_unweighted(
     igraph_dqueue_clear(q);
     memset(already_counted, 0, no_of_nodes * sizeof(long int));
 
-    vertex_neis      = igraph_adjlist_get(adjlist, vertex);
-    vertex_neis_size = igraph_vector_int_size(vertex_neis);
+    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, IGRAPH_ALL));
+    vertex_neis_size = igraph_vector_size(vertex_neis);
 
     igraph_vector_int_fill(nei_mask, 0);
     neighbor_count = 0;
@@ -491,6 +491,7 @@ static int igraph_i_local_efficiency_dijkstra(
         const igraph_t *graph,
         igraph_lazy_inclist_t *inclist,
         igraph_2wheap_t *Q,
+        igraph_vector_t *vertex_neis,
         igraph_vector_int_t *nei_mask, /* true if the corresponding node is a neighbour of 'vertex' */
         igraph_real_t *res,
         igraph_integer_t vertex,
@@ -513,17 +514,16 @@ static int igraph_i_local_efficiency_dijkstra(
     */
 
     long int i, j;
-    igraph_vector_t *inc_edges;
-    long int inc_edges_size;
+    long int vertex_neis_size;
     long int neighbor_count; /* unlike 'inc_edges_size', 'neighbor_count' does not count self-loops or multi-edges */
 
-    inc_edges = igraph_lazy_inclist_get(inclist, vertex);
-    inc_edges_size = igraph_vector_size(inc_edges);
+    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, IGRAPH_ALL));
+    vertex_neis_size = igraph_vector_size(vertex_neis);
 
     igraph_vector_int_fill(nei_mask, 0);
     neighbor_count = 0;
-    for (i=0; i < inc_edges_size; ++i) {
-        long int v = IGRAPH_OTHER(graph, VECTOR(*inc_edges)[i], vertex);
+    for (i=0; i < vertex_neis_size; ++i) {
+        long int v = VECTOR(*vertex_neis)[i];
         if (v != vertex && ! VECTOR(*nei_mask)[v]) {
             VECTOR(*nei_mask)[v] = 1; /* mark as unprocessed neighbour */
             neighbor_count++;
@@ -537,9 +537,9 @@ static int igraph_i_local_efficiency_dijkstra(
         return IGRAPH_SUCCESS;
     }
 
-    for (i=0; i < inc_edges_size; ++i) {
+    for (i=0; i < vertex_neis_size; ++i) {
+        long int source = VECTOR(*vertex_neis)[i];
         long int reached = 0;
-        long int source = IGRAPH_OTHER(graph, VECTOR(*inc_edges)[i], vertex);
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -613,7 +613,8 @@ static int igraph_i_local_efficiency_dijkstra(
  * The local efficiency of a network around a vertex is defined as follows:
  * We remove the vertex and compute the distances (shortest path lengths) between
  * its neighbours through the rest of the network. The local efficiency around the
- * removed vertex is the average of the inverse of these distances.
+ * removed vertex is the average of the inverse of these distances. Both in- and
+ * out-neighbours are considered for this calculation.
  *
  * </para><para>
  * The inverse distance between two vertices which are not reachable from each other
@@ -651,6 +652,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
 {
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
+    igraph_vector_t vertex_neis;
     igraph_vector_int_t nei_mask;
     long int vertex;
 
@@ -663,6 +665,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
      * than once in multigraphs.
      */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&nei_mask, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&vertex_neis, 0);
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
 
@@ -684,7 +687,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
         for (vertex=0; vertex < no_of_nodes; ++vertex) {
-            IGRAPH_CHECK(igraph_i_local_efficiency_unweighted(graph, &adjlist, &q, already_counted, &nei_mask, &(VECTOR(*res)[vertex]), vertex));
+            IGRAPH_CHECK(igraph_i_local_efficiency_unweighted(graph, &adjlist, &q, already_counted, &vertex_neis, &nei_mask, &(VECTOR(*res)[vertex]), vertex));
         }
 
         igraph_dqueue_destroy(&q);
@@ -710,7 +713,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
         for (vertex=0; vertex < no_of_nodes; ++vertex) {
-            IGRAPH_CHECK(igraph_i_local_efficiency_dijkstra(graph, &inclist, &Q, &nei_mask, &(VECTOR(*res)[vertex]), vertex, weights));
+            IGRAPH_CHECK(igraph_i_local_efficiency_dijkstra(graph, &inclist, &Q, &vertex_neis, &nei_mask, &(VECTOR(*res)[vertex]), vertex, weights));
         }
 
         igraph_2wheap_destroy(&Q);
@@ -718,8 +721,9 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_FINALLY_CLEAN(2);
     }
 
+    igraph_vector_destroy(&vertex_neis);
     igraph_vector_int_destroy(&nei_mask);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
