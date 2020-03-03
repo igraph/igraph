@@ -244,7 +244,7 @@ typedef struct igraph_i_dbucket_t {
     igraph_vector_long_t next;
 } igraph_i_dbucket_t;
 
-int igraph_i_dbucket_init(igraph_i_dbucket_t *buck, long int size) {
+static int igraph_i_dbucket_init(igraph_i_dbucket_t *buck, long int size) {
     IGRAPH_CHECK(igraph_vector_long_init(&buck->head, size));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &buck->head);
     IGRAPH_CHECK(igraph_vector_long_init(&buck->next, size));
@@ -252,42 +252,42 @@ int igraph_i_dbucket_init(igraph_i_dbucket_t *buck, long int size) {
     return 0;
 }
 
-void igraph_i_dbucket_destroy(igraph_i_dbucket_t *buck) {
+static void igraph_i_dbucket_destroy(igraph_i_dbucket_t *buck) {
     igraph_vector_long_destroy(&buck->head);
     igraph_vector_long_destroy(&buck->next);
 }
 
-int igraph_i_dbucket_insert(igraph_i_dbucket_t *buck, long int bid,
-                            long int elem) {
+static int igraph_i_dbucket_insert(igraph_i_dbucket_t *buck, long int bid,
+                                   long int elem) {
     /* Note: we can do this, since elem is not in any buckets */
     VECTOR(buck->next)[elem] = VECTOR(buck->head)[bid];
     VECTOR(buck->head)[bid] = elem + 1;
     return 0;
 }
 
-long int igraph_i_dbucket_empty(const igraph_i_dbucket_t *buck,
-                                long int bid) {
+static long int igraph_i_dbucket_empty(const igraph_i_dbucket_t *buck,
+                                       long int bid) {
     return VECTOR(buck->head)[bid] == 0;
 }
 
-long int igraph_i_dbucket_delete(igraph_i_dbucket_t *buck, long int bid) {
+static long int igraph_i_dbucket_delete(igraph_i_dbucket_t *buck, long int bid) {
     long int elem = VECTOR(buck->head)[bid] - 1;
     VECTOR(buck->head)[bid] = VECTOR(buck->next)[elem];
     return elem;
 }
 
-int igraph_i_dominator_LINK(long int v, long int w,
-                            igraph_vector_long_t *ancestor) {
+static int igraph_i_dominator_LINK(long int v, long int w,
+                                   igraph_vector_long_t *ancestor) {
     VECTOR(*ancestor)[w] = v + 1;
     return 0;
 }
 
 /* TODO: don't always reallocate path */
 
-int igraph_i_dominator_COMPRESS(long int v,
-                                igraph_vector_long_t *ancestor,
-                                igraph_vector_long_t *label,
-                                igraph_vector_long_t *semi) {
+static int igraph_i_dominator_COMPRESS(long int v,
+                                       igraph_vector_long_t *ancestor,
+                                       igraph_vector_long_t *label,
+                                       igraph_vector_long_t *semi) {
     igraph_stack_long_t path;
     long int w = v;
     long int top, pretop;
@@ -319,10 +319,10 @@ int igraph_i_dominator_COMPRESS(long int v,
     return 0;
 }
 
-long int igraph_i_dominator_EVAL(long int v,
-                                 igraph_vector_long_t *ancestor,
-                                 igraph_vector_long_t *label,
-                                 igraph_vector_long_t *semi) {
+static long int igraph_i_dominator_EVAL(long int v,
+                                        igraph_vector_long_t *ancestor,
+                                        igraph_vector_long_t *label,
+                                        igraph_vector_long_t *semi) {
     if (VECTOR(*ancestor)[v] == 0) {
         return v;
     } else {
@@ -579,7 +579,8 @@ typedef struct igraph_i_all_st_cuts_minimal_dfs_data_t {
     const igraph_vector_t *map;
 } igraph_i_all_st_cuts_minimal_dfs_data_t;
 
-igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_incb(const igraph_t *graph,
+static igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_incb(
+        const igraph_t *graph,
         igraph_integer_t vid,
         igraph_integer_t dist,
         void *extra) {
@@ -604,7 +605,8 @@ igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_incb(const igraph_t *graph,
     return 0;
 }
 
-igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_otcb(const igraph_t *graph,
+static igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_otcb(
+        const igraph_t *graph,
         igraph_integer_t vid,
         igraph_integer_t dist,
         void *extra) {
@@ -623,13 +625,13 @@ igraph_bool_t igraph_i_all_st_cuts_minimal_dfs_otcb(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
-                                 const igraph_t *domtree,
-                                 long int root,
-                                 const igraph_marked_queue_t *X,
-                                 const igraph_vector_bool_t *GammaX,
-                                 const igraph_vector_t *invmap,
-                                 igraph_vector_t *minimal) {
+static int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
+                                        const igraph_t *domtree,
+                                        long int root,
+                                        const igraph_marked_queue_t *X,
+                                        const igraph_vector_bool_t *GammaX,
+                                        const igraph_vector_t *invmap,
+                                        igraph_vector_t *minimal) {
 
     long int no_of_nodes = igraph_vcount(graph);
     igraph_stack_t stack;
@@ -684,6 +686,7 @@ int igraph_i_all_st_cuts_minimal(const igraph_t *graph,
     return 0;
 }
 
+/* not 'static' because used in igraph_all_st_cuts.c test program */
 int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
                                const igraph_marked_queue_t *S,
                                const igraph_estack_t *T,
@@ -1118,10 +1121,10 @@ int igraph_all_st_cuts(const igraph_t *graph,
    zero-indegree vertices.
 */
 
-int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
-                                    const igraph_vector_bool_t *active,
-                                    const igraph_vector_t *invmap,
-                                    igraph_vector_t *minimal) {
+static int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
+                                           const igraph_vector_bool_t *active,
+                                           const igraph_vector_t *invmap,
+                                           igraph_vector_t *minimal) {
 
     long int no_of_nodes = igraph_vcount(Sbar);
     igraph_vector_t indeg;
@@ -1178,14 +1181,14 @@ typedef struct igraph_i_all_st_mincuts_data_t {
     const igraph_vector_bool_t *active;
 } igraph_i_all_st_mincuts_data_t;
 
-int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
-                                  const igraph_marked_queue_t *S,
-                                  const igraph_estack_t *T,
-                                  long int source,
-                                  long int target,
-                                  long int *v,
-                                  igraph_vector_t *Isv,
-                                  void *arg) {
+static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
+                                         const igraph_marked_queue_t *S,
+                                         const igraph_estack_t *T,
+                                         long int source,
+                                         long int target,
+                                         long int *v,
+                                         igraph_vector_t *Isv,
+                                         void *arg) {
 
     igraph_i_all_st_mincuts_data_t *data = arg;
     const igraph_vector_bool_t *active = data->active;

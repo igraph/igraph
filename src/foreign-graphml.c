@@ -133,8 +133,8 @@ static void igraph_i_report_unhandled_attribute_target(const char* target,
                     "attribute specifications", file, line, 0, target);
 }
 
-igraph_real_t igraph_i_graphml_parse_numeric(const char* char_data,
-        igraph_real_t default_value) {
+static igraph_real_t igraph_i_graphml_parse_numeric(const char* char_data,
+                                                    igraph_real_t default_value) {
     double result;
 
     if (char_data == 0) {
@@ -148,8 +148,8 @@ igraph_real_t igraph_i_graphml_parse_numeric(const char* char_data,
     return result;
 }
 
-igraph_bool_t igraph_i_graphml_parse_boolean(const char* char_data,
-        igraph_bool_t default_value) {
+static igraph_bool_t igraph_i_graphml_parse_boolean(const char* char_data,
+                                                    igraph_bool_t default_value) {
     int value;
     if (char_data == 0) {
         return default_value;
@@ -172,7 +172,7 @@ igraph_bool_t igraph_i_graphml_parse_boolean(const char* char_data,
     return value != 0;
 }
 
-void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute_record_t* rec) {
+static void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute_record_t* rec) {
     if (rec->record.type == IGRAPH_ATTRIBUTE_NUMERIC) {
         if (rec->record.value != 0) {
             igraph_vector_destroy((igraph_vector_t*)rec->record.value);
@@ -200,7 +200,7 @@ void igraph_i_graphml_attribute_record_destroy(igraph_i_graphml_attribute_record
     }
 }
 
-void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state) {
+static void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state) {
     if (state->destroyed) {
         return;
     }
@@ -231,7 +231,7 @@ void igraph_i_graphml_destroy_state(struct igraph_i_graphml_parser_state* state)
     IGRAPH_FINALLY_CLEAN(1);
 }
 
-void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
+static void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
     va_list ap;
@@ -249,7 +249,7 @@ void igraph_i_graphml_sax_handler_error(void *state0, const char* msg, ...) {
     va_end(ap);
 }
 
-xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
+static xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
         const xmlChar* name) {
     xmlEntityPtr predef = xmlGetPredefinedEntity(name);
     IGRAPH_UNUSED(state0);
@@ -260,7 +260,7 @@ xmlEntityPtr igraph_i_graphml_sax_handler_get_entity(void *state0,
     return blankEntity;
 }
 
-void igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_state *state) {
+static void igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_state *state) {
     if (state->st != UNKNOWN) {
         igraph_vector_int_push_back(&state->prev_state_stack, state->st);
         state->st = UNKNOWN;
@@ -270,7 +270,7 @@ void igraph_i_graphml_handle_unknown_start_tag(struct igraph_i_graphml_parser_st
     }
 }
 
-void igraph_i_graphml_sax_handler_start_document(void *state0) {
+static void igraph_i_graphml_sax_handler_start_document(void *state0) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
     int ret;
@@ -359,7 +359,7 @@ void igraph_i_graphml_sax_handler_start_document(void *state0) {
     IGRAPH_FINALLY(igraph_i_graphml_destroy_state, state);
 }
 
-void igraph_i_graphml_sax_handler_end_document(void *state0) {
+static void igraph_i_graphml_sax_handler_end_document(void *state0) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
     long i, l;
@@ -559,9 +559,9 @@ void igraph_i_graphml_sax_handler_end_document(void *state0) {
 #define XML_ATTR_VALUE_END(it) (*(it+4))
 #define XML_ATTR_VALUE(it) *(it+3), (*(it+4))-(*(it+3))
 
-igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
-    const xmlChar** attrs, int nb_attrs,
-    struct igraph_i_graphml_parser_state *state) {
+static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
+        const xmlChar** attrs, int nb_attrs,
+        struct igraph_i_graphml_parser_state *state) {
     xmlChar **it;
     xmlChar *localname;
     igraph_trie_t *trie = 0;
@@ -749,10 +749,10 @@ igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     return rec;
 }
 
-void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser_state *state,
-        const xmlChar **attrs,
-        int nb_attrs,
-        igraph_attribute_elemtype_t type) {
+static void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser_state *state,
+                                                  const xmlChar **attrs,
+                                                  int nb_attrs,
+                                                  igraph_attribute_elemtype_t type) {
     xmlChar **it;
     int i;
 
@@ -782,8 +782,8 @@ void igraph_i_graphml_attribute_data_setup(struct igraph_i_graphml_parser_state 
     }
 }
 
-void igraph_i_graphml_append_to_data_char(struct igraph_i_graphml_parser_state *state,
-        const xmlChar *data, int len) {
+static void igraph_i_graphml_append_to_data_char(struct igraph_i_graphml_parser_state *state,
+                                                 const xmlChar *data, int len) {
     long int data_char_new_start = 0;
 
     if (!state->successful) {
@@ -805,7 +805,7 @@ void igraph_i_graphml_append_to_data_char(struct igraph_i_graphml_parser_state *
     state->data_char[data_char_new_start + len] = '\0';
 }
 
-void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state *state) {
+static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state *state) {
     const char *key = fromXmlChar(state->data_key);
     igraph_attribute_elemtype_t type = state->data_type;
     igraph_trie_t *trie = 0;
@@ -930,8 +930,8 @@ void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parser_state
     }
 }
 
-void igraph_i_graphml_attribute_default_value_finish(
-    struct igraph_i_graphml_parser_state *state) {
+static void igraph_i_graphml_attribute_default_value_finish(
+        struct igraph_i_graphml_parser_state *state) {
     igraph_i_graphml_attribute_record_t *graphmlrec = state->current_attr_record;
 
     if (graphmlrec == 0) {
@@ -971,10 +971,10 @@ void igraph_i_graphml_attribute_default_value_finish(
     }
 }
 
-void igraph_i_graphml_sax_handler_start_element_ns(
-    void *state0, const xmlChar* localname, const xmlChar* prefix,
-    const xmlChar* uri, int nb_namespaces, const xmlChar** namespaces,
-    int nb_attributes, int nb_defaulted, const xmlChar** attributes) {
+static void igraph_i_graphml_sax_handler_start_element_ns(
+        void *state0, const xmlChar* localname, const xmlChar* prefix,
+        const xmlChar* uri, int nb_namespaces, const xmlChar** namespaces,
+        int nb_attributes, int nb_defaulted, const xmlChar** attributes) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
     xmlChar** it;
@@ -1174,7 +1174,8 @@ void igraph_i_graphml_sax_handler_start_element_ns(
     }
 }
 
-void igraph_i_graphml_sax_handler_end_element_ns(void *state0,
+static void igraph_i_graphml_sax_handler_end_element_ns(
+        void *state0,
         const xmlChar* localname, const xmlChar* prefix,
         const xmlChar* uri) {
     struct igraph_i_graphml_parser_state *state =
@@ -1232,7 +1233,7 @@ void igraph_i_graphml_sax_handler_end_element_ns(void *state0,
     }
 }
 
-void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len) {
+static void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
 
@@ -1294,7 +1295,7 @@ static xmlSAXHandler igraph_i_graphml_sax_handler = {
 
 #define IS_FORBIDDEN_CONTROL_CHAR(x) ((x) < ' ' && (x) != '\t' && (x) != '\r' && (x) != '\n')
 
-int igraph_i_xml_escape(char* src, char** dest) {
+static int igraph_i_xml_escape(char* src, char** dest) {
     long int destlen = 0;
     char *s, *d;
     unsigned char ch;

@@ -39,7 +39,7 @@
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
 
-int igraph_i_trie_init_node(igraph_trie_node_t *t) {
+static int igraph_i_trie_init_node(igraph_trie_node_t *t) {
     IGRAPH_STRVECTOR_INIT_FINALLY(&t->strs, 0);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&t->values, 0);
@@ -47,7 +47,7 @@ int igraph_i_trie_init_node(igraph_trie_node_t *t) {
     return 0;
 }
 
-void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree);
+static void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree);
 
 /**
  * \ingroup igraphtrie
@@ -74,7 +74,7 @@ int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
  * \brief Destroys a node of a trie (not to be called directly).
  */
 
-void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree) {
+static void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree) {
     long int i;
     igraph_strvector_destroy(&t->strs);
     for (i = 0; i < igraph_vector_ptr_size(&t->children); i++) {
@@ -108,7 +108,7 @@ void igraph_trie_destroy(igraph_trie_t *t) {
  * \brief Internal helping function for igraph_trie_t
  */
 
-long int igraph_i_strdiff(const char *str, const char *key) {
+static long int igraph_i_strdiff(const char *str, const char *key) {
 
     long int diff = 0;
     while (key[diff] != '\0' && str[diff] != '\0' && str[diff] == key[diff]) {

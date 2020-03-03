@@ -31,7 +31,7 @@
 #include <math.h>
 #include <stdio.h>
 
-double igraph_i_log2(double f) {
+static double igraph_i_log2(double f) {
     return log(f) / log(2.0);
 }
 

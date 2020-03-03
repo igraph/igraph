@@ -50,7 +50,7 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph,
                                         const igraph_vector_t *weights,
                                         igraph_arpack_options_t *options);
 
-igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
+static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
     /* Many of the centrality measures correspond to the eigenvector of some
      * matrix. When v is an eigenvector, c*v is also an eigenvector, therefore
      * it may happen that all the scores in the eigenvector are negative, in which
@@ -89,8 +89,8 @@ igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vector) {
     return (mi < 1e-5) ? 1 : 0;
 }
 
-int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
-                                    int n, void *extra) {
+static int igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
+                                           int n, void *extra) {
     igraph_adjlist_t *adjlist = extra;
     igraph_vector_int_t *neis;
     long int i, j, nlen;
@@ -115,8 +115,8 @@ typedef struct igraph_i_eigenvector_centrality_t {
     const igraph_vector_t *weights;
 } igraph_i_eigenvector_centrality_t;
 
-int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
-                                     int n, void *extra) {
+static int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
+                                            int n, void *extra) {
 
     igraph_i_eigenvector_centrality_t *data = extra;
     const igraph_t *graph = data->graph;
@@ -140,7 +140,7 @@ int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *fro
     return 0;
 }
 
-int igraph_i_eigenvector_centrality_loop(igraph_adjlist_t *adjlist) {
+static int igraph_i_eigenvector_centrality_loop(igraph_adjlist_t *adjlist) {
 
     long int i, j, k, nlen, n = igraph_adjlist_size(adjlist);
     igraph_vector_int_t *neis;
@@ -591,9 +591,9 @@ typedef struct igraph_i_kleinberg_data2_t {
 } igraph_i_kleinberg_data2_t;
 
 /* ARPACK auxiliary routine for the unweighted HITS algorithm */
-int igraph_i_kleinberg_unweighted(igraph_real_t *to,
-                                  const igraph_real_t *from,
-                                  int n, void *extra) {
+static int igraph_i_kleinberg_unweighted(igraph_real_t *to,
+                                         const igraph_real_t *from,
+                                         int n, void *extra) {
     igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
     igraph_adjlist_t *in = data->in;
     igraph_adjlist_t *out = data->out;
@@ -625,9 +625,9 @@ int igraph_i_kleinberg_unweighted(igraph_real_t *to,
 }
 
 /* ARPACK auxiliary routine for the weighted HITS algorithm */
-int igraph_i_kleinberg_weighted(igraph_real_t *to,
-                                const igraph_real_t *from,
-                                int n, void *extra) {
+static int igraph_i_kleinberg_weighted(igraph_real_t *to,
+                                       const igraph_real_t *from,
+                                       int n, void *extra) {
 
     igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
     igraph_inclist_t *in = data->in;
@@ -663,10 +663,10 @@ int igraph_i_kleinberg_weighted(igraph_real_t *to,
     return 0;
 }
 
-int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
-                       igraph_real_t *value, igraph_bool_t scale,
-                       const igraph_vector_t *weights,
-                       igraph_arpack_options_t *options, int inout) {
+static int igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
+                              igraph_real_t *value, igraph_bool_t scale,
+                              const igraph_vector_t *weights,
+                              igraph_arpack_options_t *options, int inout) {
 
     igraph_adjlist_t myinadjlist, myoutadjlist;
     igraph_inclist_t myininclist, myoutinclist;
@@ -934,8 +934,8 @@ typedef struct igraph_i_pagerank_data2_t {
     igraph_vector_t *reset;
 } igraph_i_pagerank_data2_t;
 
-int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
-                      int n, void *extra) {
+static int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
+                             int n, void *extra) {
 
     igraph_i_pagerank_data_t *data = extra;
     igraph_adjlist_t *adjlist = data->adjlist;
@@ -996,8 +996,8 @@ int igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
     return 0;
 }
 
-int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
-                       int n, void *extra) {
+static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
+                              int n, void *extra) {
 
     igraph_i_pagerank_data2_t *data = extra;
     const igraph_t *graph = data->graph;
@@ -1608,7 +1608,8 @@ int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
                                        nobigint);
 }
 
-int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
+static int igraph_i_betweenness_estimate_weighted(
+        const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_bool_t directed,
@@ -1784,7 +1785,7 @@ int igraph_i_betweenness_estimate_weighted(const igraph_t *graph,
     return 0;
 }
 
-void igraph_i_destroy_biguints(igraph_biguint_t *p) {
+static void igraph_i_destroy_biguints(igraph_biguint_t *p) {
     igraph_biguint_t *p2 = p;
     while ( *((long int*)(p)) ) {
         igraph_biguint_destroy(p);
@@ -2079,7 +2080,8 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     return 0;
 }
 
-int igraph_i_edge_betweenness_estimate_weighted(const igraph_t *graph,
+static int igraph_i_edge_betweenness_estimate_weighted(
+        const igraph_t *graph,
         igraph_vector_t *result,
         igraph_bool_t directed,
         igraph_real_t cutoff,
@@ -2563,13 +2565,13 @@ int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
                                      normalized);
 }
 
-int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
-        igraph_vector_t *res,
-        const igraph_vs_t vids,
-        igraph_neimode_t mode,
-        igraph_real_t cutoff,
-        const igraph_vector_t *weights,
-        igraph_bool_t normalized) {
+static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
+                                                igraph_vector_t *res,
+                                                const igraph_vs_t vids,
+                                                igraph_neimode_t mode,
+                                                igraph_real_t cutoff,
+                                                const igraph_vector_t *weights,
+                                                igraph_bool_t normalized) {
 
     /* See igraph_shortest_paths_dijkstra() for the implementation
        details and the dirty tricks. */

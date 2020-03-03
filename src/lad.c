@@ -169,19 +169,19 @@ typedef struct {
        or -1 if v is not matched */
 } Tdomain;
 
-bool igraph_i_lad_toFilterEmpty(Tdomain* D) {
+static bool igraph_i_lad_toFilterEmpty(Tdomain* D) {
     /* return true if there is no more nodes in toFilter */
     return (D->nextOutToFilter < 0);
 }
 
-void igraph_i_lad_resetToFilter(Tdomain *D) {
+static void igraph_i_lad_resetToFilter(Tdomain *D) {
     /* empty to filter and unmark the vertices that are marked to be filtered */
     igraph_vector_char_null(&D->markedToFilter);
     D->nextOutToFilter = -1;
 }
 
 
-int igraph_i_lad_nextToFilter(Tdomain* D, int size) {
+static int igraph_i_lad_nextToFilter(Tdomain* D, int size) {
     /* precondition: emptyToFilter = false
        remove a node from toFilter (FIFO)
        unmark this node and return it */
@@ -198,7 +198,7 @@ int igraph_i_lad_nextToFilter(Tdomain* D, int size) {
     return u;
 }
 
-void igraph_i_lad_addToFilter(int u, Tdomain* D, int size) {
+static void igraph_i_lad_addToFilter(int u, Tdomain* D, int size) {
     /* if u is not marked, then add it to toFilter and mark it */
     if (VECTOR(D->markedToFilter)[u]) {
         return;
@@ -215,13 +215,13 @@ void igraph_i_lad_addToFilter(int u, Tdomain* D, int size) {
     VECTOR(D->toFilter)[D->lastInToFilter] = u;
 }
 
-bool igraph_i_lad_isInD(int u, int v, Tdomain* D) {
+static bool igraph_i_lad_isInD(int u, int v, Tdomain* D) {
     /* returns true if v belongs to D(u); false otherwise */
     return (MATRIX(D->posInVal, u, v) <
             VECTOR(D->firstVal)[u] + VECTOR(D->nbVal)[u]);
 }
 
-int igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV, bool* result) {
+static int igraph_i_lad_augmentingPath(int u, Tdomain* D, int nbV, bool* result) {
     /* return true if there exists an augmenting path starting from u and
        ending on a free vertex v in the bipartite directed graph G=(U,
        V, E) such that U=pattern nodes, V=target nodes, and
@@ -289,7 +289,7 @@ cleanup:
     return 0;
 }
 
-int igraph_i_lad_removeAllValuesButOne(int u, int v, Tdomain* D, Tgraph* Gp,
+static int igraph_i_lad_removeAllValuesButOne(int u, int v, Tdomain* D, Tgraph* Gp,
                                        Tgraph* Gt, bool* result) {
     /* remove all values but v from D(u) and add all successors of u in
        toFilter return false if an inconsistency is detected wrt to
@@ -323,7 +323,7 @@ int igraph_i_lad_removeAllValuesButOne(int u, int v, Tdomain* D, Tgraph* Gp,
 }
 
 
-int igraph_i_lad_removeValue(int u, int v, Tdomain* D, Tgraph* Gp,
+static int igraph_i_lad_removeValue(int u, int v, Tdomain* D, Tgraph* Gp,
                              Tgraph* Gt, bool* result) {
     /* remove v from D(u) and add all successors of u in toFilter
        return false if an inconsistency is detected wrt global all diff */
@@ -358,7 +358,7 @@ int igraph_i_lad_removeValue(int u, int v, Tdomain* D, Tgraph* Gp,
 }
 
 
-int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
+static int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
                                bool induced, Tdomain* D, Tgraph* Gp,
                                Tgraph* Gt, int *invalid) {
     /* for each u in toBeMatched[0..nb-1], match u to
@@ -439,7 +439,7 @@ int igraph_i_lad_matchVertices(int nb, igraph_vector_int_t* toBeMatched,
 }
 
 
-bool igraph_i_lad_matchVertex(int u, bool induced, Tdomain* D, Tgraph* Gp,
+static bool igraph_i_lad_matchVertex(int u, bool induced, Tdomain* D, Tgraph* Gp,
                               Tgraph *Gt) {
     int invalid;
     /* match u to D->val[D->firstVal[u]] and filter domains of other non
@@ -461,13 +461,13 @@ bool igraph_i_lad_matchVertex(int u, bool induced, Tdomain* D, Tgraph* Gp,
 }
 
 
-int igraph_i_lad_qcompare (void const *a, void const *b) {
+static int igraph_i_lad_qcompare (void const *a, void const *b) {
     /* function used by the qsort function */
     int pa = *((int*)a) - *((int*)b);
     return pa;
 }
 
-bool igraph_i_lad_compare(int size_mu, int* mu, int size_mv, int* mv) {
+static bool igraph_i_lad_compare(int size_mu, int* mu, int size_mv, int* mv) {
     /* return true if for every element u of mu there exists
        a different element v of mv such that u <= v;
        return false otherwise */
@@ -484,7 +484,7 @@ bool igraph_i_lad_compare(int size_mu, int* mu, int size_mv, int* mv) {
     return true;
 }
 
-int igraph_i_lad_initDomains(bool initialDomains,
+static int igraph_i_lad_initDomains(bool initialDomains,
                              igraph_vector_ptr_t *domains, Tdomain* D,
                              Tgraph* Gp, Tgraph* Gt, int *empty) {
     /* for every pattern node u, initialize D(u) with every vertex v
@@ -637,14 +637,14 @@ int igraph_i_lad_initDomains(bool initialDomains,
 #define toBeDeleted 3
 #define deleted 4
 
-void igraph_i_lad_addToDelete(int u, int* list, int* nb, int* marked) {
+static void igraph_i_lad_addToDelete(int u, int* list, int* nb, int* marked) {
     if (marked[u] < toBeDeleted) {
         list[(*nb)++] = u;
         marked[u] = toBeDeleted;
     }
 }
 
-int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
+static int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
                                 igraph_vector_int_t *degree,
                                 igraph_vector_int_t *firstAdj,
                                 igraph_vector_int_t *adj,
@@ -897,7 +897,7 @@ cleanup:
     return 0;
 }
 
-void igraph_i_lad_DFS(int nbU, int nbV, int u, bool* marked, int* nbSucc,
+static void igraph_i_lad_DFS(int nbU, int nbV, int u, bool* marked, int* nbSucc,
                       int* succ, igraph_vector_int_t * matchedWithU,
                       int* order, int* nb) {
     /* perform a depth first search, starting from u, in the bipartite
@@ -925,7 +925,7 @@ void igraph_i_lad_DFS(int nbU, int nbV, int u, bool* marked, int* nbSucc,
     order[*nb] = u; (*nb)--;
 }
 
-int igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU,
+static int igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU,
                      int* nbSucc, int* succ,
                      int* nbPred, int* pred,
                      igraph_vector_int_t * matchedWithU,
@@ -1000,7 +1000,7 @@ int igraph_i_lad_SCC(int nbU, int nbV, int* numV, int* numU,
 }
 
 
-int igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
+static int igraph_i_lad_ensureGACallDiff(bool induced, Tgraph* Gp, Tgraph* Gt,
                                   Tdomain* D, int *invalid) {
     /* precondition: D->globalMatchingP is an all different matching of
        the pattern vertices
@@ -1127,7 +1127,7 @@ cleanup:
 /* Coming from lad.c                                        */
 /* ---------------------------------------------------------*/
 
-int igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
+static int igraph_i_lad_checkLAD(int u, int v, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
                           bool *result) {
     /* return true if G_(u, v) has a adj(u)-covering matching; false
        otherwise */
@@ -1278,7 +1278,7 @@ cleanup:
 /* Coming from main.c                                      */
 /* ---------------------------------------------------------*/
 
-int igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
+static int igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
                         bool *result) {
     /* filter domains of all vertices in D->toFilter wrt LAD and ensure
        GAC(allDiff)
@@ -1327,7 +1327,7 @@ int igraph_i_lad_filter(bool induced, Tdomain* D, Tgraph* Gp, Tgraph* Gt,
 
 
 
-int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
+static int igraph_i_lad_solve(int timeLimit, bool firstSol, bool induced,
                        Tdomain* D, Tgraph* Gp, Tgraph* Gt,
                        int *invalid, igraph_bool_t *iso,
                        igraph_vector_t *map, igraph_vector_ptr_t *maps,

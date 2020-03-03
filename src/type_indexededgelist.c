@@ -30,8 +30,9 @@
 
 /* Internal functions */
 
-int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vector_t *index,
-                          igraph_integer_t nodes);
+static int igraph_i_create_start(
+        igraph_vector_t *res, igraph_vector_t *el,
+        igraph_vector_t *index, igraph_integer_t nodes);
 
 /**
  * \section about_basic_interface
@@ -829,8 +830,9 @@ int igraph_neighbors(const igraph_t *graph, igraph_vector_t *neis, igraph_intege
  *
  */
 
-int igraph_i_create_start(igraph_vector_t *res, igraph_vector_t *el, igraph_vector_t *iindex,
-                          igraph_integer_t nodes) {
+static int igraph_i_create_start(
+        igraph_vector_t *res, igraph_vector_t *el,
+        igraph_vector_t *iindex, igraph_integer_t nodes) {
 
 # define EDGE(i) (VECTOR(*el)[ (long int) VECTOR(*iindex)[(i)] ])
 

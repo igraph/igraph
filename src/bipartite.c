@@ -150,11 +150,11 @@ int igraph_bipartite_projection_size(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_bipartite_projection(const igraph_t *graph,
-                                  const igraph_vector_bool_t *types,
-                                  igraph_t *proj,
-                                  int which,
-                                  igraph_vector_t *multiplicity) {
+static int igraph_i_bipartite_projection(const igraph_t *graph,
+                                         const igraph_vector_bool_t *types,
+                                         igraph_t *proj,
+                                         int which,
+                                         igraph_vector_t *multiplicity) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int i, j, k;
