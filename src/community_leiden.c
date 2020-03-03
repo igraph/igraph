@@ -531,7 +531,7 @@ int igraph_i_community_leiden_aggregate(
 
     /* Get refined clusters */
     IGRAPH_CHECK(igraph_vector_ptr_init(&refined_clusters, nb_refined_clusters));
-    igraph_vector_ptr_set_item_destructor(&refined_clusters, igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&refined_clusters, igraph_vector_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &refined_clusters);
     IGRAPH_CHECK(igraph_i_community_get_clusters(refined_membership, &refined_clusters));
 
@@ -722,7 +722,7 @@ int igraph_i_community_leiden(const igraph_t *graph,
 
     /* Initialize clusters */
     IGRAPH_CHECK(igraph_vector_ptr_init(&clusters, n));
-    igraph_vector_ptr_set_item_destructor(&clusters, igraph_vector_destroy);
+    IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&clusters, igraph_vector_destroy);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &clusters);
     /* Initialize aggregate nodes, which initially is identical to simply the
      * nodes in the graph. */

@@ -362,7 +362,7 @@ long int igraph_i_dominator_EVAL(long int v,
  * \param dom Pointer to an initialized vector or a null pointer. If
  *        not a null pointer, then the immediate dominator of each
  *        vertex will be stored here. For vertices that are not
- *        reachable from the root, \c IGRAPH_NAN is stored here. For
+ *        reachable from the root, NaN is stored here. For
  *        the root vertex itself, -1 is added.
  * \param domtree Pointer to an uninitialized igraph_t, or NULL. If
  *        not a null pointer, then the dominator tree is returned

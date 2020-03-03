@@ -5759,8 +5759,8 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  * Calculates the average degree of the neighbors for each vertex, and
  * optionally, the same quantity in the function of vertex degree.
  *
- * </para><para>For isolate vertices \p knn is set to \c
- * IGRAPH_NAN. The same is done in \p knnk for vertex degrees that
+ * </para><para>For isolate vertices \p knn is set to
+ * NaN. The same is done in \p knnk for vertex degrees that
  * don't appear in the graph.
  *
  * \param graph The input graph, it can be directed but the
