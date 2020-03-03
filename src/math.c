@@ -33,9 +33,7 @@
 #endif
 
 int igraph_finite(double x) {
-#ifdef isfinite
-    return isfinite(x);
-#elif HAVE_ISFINITE == 1
+#if HAVE_DECL_ISFINITE
     return isfinite(x);
 #elif HAVE_FINITE == 1
     return finite(x);

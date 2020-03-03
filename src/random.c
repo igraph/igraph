@@ -1538,7 +1538,7 @@ int imin2(int x, int y) {
     return (x < y) ? x : y;
 }
 
-#if HAVE_WORKING_ISFINITE || HAVE_ISFINITE
+#if HAVE_WORKING_ISFINITE || HAVE_DECL_ISFINITE
     /* isfinite is defined in <math.h> according to C99 */
     #define R_FINITE(x)    isfinite(x)
 #elif HAVE_WORKING_FINITE || HAVE_FINITE
@@ -1556,7 +1556,7 @@ int imin2(int x, int y) {
 #endif
 
 int R_finite(double x) {
-#if HAVE_WORKING_ISFINITE || HAVE_ISFINITE
+#if HAVE_WORKING_ISFINITE || HAVE_DECL_ISFINITE
     return isfinite(x);
 #elif HAVE_WORKING_FINITE || HAVE_FINITE
     return finite(x);
