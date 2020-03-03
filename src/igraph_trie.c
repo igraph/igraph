@@ -210,9 +210,9 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
                 IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
             }
             str2[diff] = '\0';
-            IGRAPH_FINALLY(free, str2);
+            IGRAPH_FINALLY(igraph_free, str2);
             IGRAPH_CHECK(igraph_strvector_set(&t->strs, i, str2));
-            free(str2);
+            igraph_Free(str2);
             IGRAPH_FINALLY_CLEAN(4);
 
             VECTOR(t->values)[i] = newvalue;
@@ -246,9 +246,9 @@ int igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
                 IGRAPH_ERROR("cannot add to trie", IGRAPH_ENOMEM);
             }
             str2[diff] = '\0';
-            IGRAPH_FINALLY(free, str2);
+            IGRAPH_FINALLY(igraph_free, str2);
             IGRAPH_CHECK(igraph_strvector_set(&t->strs, i, str2));
-            free(str2);
+            igraph_Free(str2);
             IGRAPH_FINALLY_CLEAN(4);
 
             VECTOR(t->values)[i] = -1;
@@ -345,7 +345,7 @@ int igraph_trie_get2(igraph_trie_t *t, const char *key, long int length,
 
     strncpy(tmp, key, length);
     tmp[length] = '\0';
-    IGRAPH_FINALLY(free, tmp);
+    IGRAPH_FINALLY(igraph_free, tmp);
     IGRAPH_CHECK(igraph_trie_get(t, tmp, id));
     igraph_Free(tmp);
     IGRAPH_FINALLY_CLEAN(1);

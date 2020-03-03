@@ -87,7 +87,7 @@ int igraph_hashtable_addset2(igraph_hashtable_t *ht,
     if (tmp == 0) {
         IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp);
+    IGRAPH_FINALLY(igraph_free, tmp);
     strncpy(tmp, elem, elemlen);
     tmp[elemlen] = '\0';
 
