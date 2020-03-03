@@ -126,8 +126,7 @@ typedef struct {
     long int x[31];
 } igraph_i_rng_glibc2_state_t;
 
-unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n,
-        long int *x) {
+static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int *x) {
     unsigned long int k;
 
     x[*i] += x[*j];
@@ -158,8 +157,8 @@ igraph_real_t igraph_rng_glibc2_get_real(void *state) {
 
 /* this function is independent of the bit size */
 
-void igraph_i_rng_glibc2_init(long int *x, int n,
-                              unsigned long int s) {
+static void igraph_i_rng_glibc2_init(long int *x, int n,
+                                     unsigned long int s) {
     int i;
 
     if (s == 0) {
@@ -977,8 +976,9 @@ float rintf (float x) {
  * result vector.
  */
 
-int igraph_i_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h,
-                                igraph_integer_t length) {
+static int igraph_i_random_sample_alga(igraph_vector_t *res,
+                                       igraph_integer_t l, igraph_integer_t h,
+                                       igraph_integer_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
 

@@ -6,7 +6,7 @@
 #include "igraph_types_internal.h"
 
 
-int igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_t *colors) {
+static int igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_t *colors) {
     long i, vertex, maxdeg;
     long vc = igraph_vcount(graph);
     igraph_2wheap_t cn; /* indexed heap storing number of already coloured neighbours */

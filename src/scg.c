@@ -471,13 +471,13 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
     return 0;
 }
 
-int igraph_i_scg_semiprojectors_sym(const igraph_vector_t *groups,
-                                    igraph_matrix_t *L,
-                                    igraph_matrix_t *R,
-                                    igraph_sparsemat_t *Lsparse,
-                                    igraph_sparsemat_t *Rsparse,
-                                    int no_of_groups,
-                                    int no_of_nodes) {
+static int igraph_i_scg_semiprojectors_sym(const igraph_vector_t *groups,
+                                           igraph_matrix_t *L,
+                                           igraph_matrix_t *R,
+                                           igraph_sparsemat_t *Lsparse,
+                                           igraph_sparsemat_t *Rsparse,
+                                           int no_of_groups,
+                                           int no_of_nodes) {
 
     igraph_vector_t tab;
     int i;
@@ -536,14 +536,14 @@ int igraph_i_scg_semiprojectors_sym(const igraph_vector_t *groups,
     return 0;
 }
 
-int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
-                                    igraph_matrix_t *L,
-                                    igraph_matrix_t *R,
-                                    igraph_sparsemat_t *Lsparse,
-                                    igraph_sparsemat_t *Rsparse,
-                                    int no_of_groups,
-                                    int no_of_nodes,
-                                    igraph_scg_norm_t norm) {
+static int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
+                                           igraph_matrix_t *L,
+                                           igraph_matrix_t *R,
+                                           igraph_sparsemat_t *Lsparse,
+                                           igraph_sparsemat_t *Rsparse,
+                                           int no_of_groups,
+                                           int no_of_nodes,
+                                           igraph_scg_norm_t norm) {
 
     igraph_vector_t tab;
     int i;
@@ -633,15 +633,15 @@ int igraph_i_scg_semiprojectors_lap(const igraph_vector_t *groups,
     return 0;
 }
 
-int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
-                                    igraph_matrix_t *L,
-                                    igraph_matrix_t *R,
-                                    igraph_sparsemat_t *Lsparse,
-                                    igraph_sparsemat_t *Rsparse,
-                                    int no_of_groups,
-                                    int no_of_nodes,
-                                    const igraph_vector_t *p,
-                                    igraph_scg_norm_t norm) {
+static int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
+                                           igraph_matrix_t *L,
+                                           igraph_matrix_t *R,
+                                           igraph_sparsemat_t *Lsparse,
+                                           igraph_sparsemat_t *Rsparse,
+                                           int no_of_groups,
+                                           int no_of_nodes,
+                                           const igraph_vector_t *p,
+                                           igraph_scg_norm_t norm) {
 
     igraph_vector_t pgr, pnormed;
     int i;
@@ -974,9 +974,9 @@ int igraph_scg_norm_eps(const igraph_matrix_t *V,
     return 0;
 }
 
-int igraph_i_matrix_laplacian(const igraph_matrix_t *matrix,
-                              igraph_matrix_t *mymatrix,
-                              igraph_scg_norm_t norm) {
+static int igraph_i_matrix_laplacian(const igraph_matrix_t *matrix,
+                                     igraph_matrix_t *mymatrix,
+                                     igraph_scg_norm_t norm) {
 
     igraph_vector_t degree;
     int i, j, n = (int) igraph_matrix_nrow(matrix);
@@ -1006,9 +1006,9 @@ int igraph_i_matrix_laplacian(const igraph_matrix_t *matrix,
     return 0;
 }
 
-int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
-                                 igraph_sparsemat_t *mysparse,
-                                 igraph_scg_norm_t norm) {
+static int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
+                                        igraph_sparsemat_t *mysparse,
+                                        igraph_scg_norm_t norm) {
 
     igraph_vector_t degree;
     int i, n = (int) igraph_sparsemat_nrow(sparse);
@@ -1058,9 +1058,9 @@ int igraph_i_sparsemat_laplacian(const igraph_sparsemat_t *sparse,
     return 0;
 }
 
-int igraph_i_matrix_stochastic(const igraph_matrix_t *matrix,
-                               igraph_matrix_t *mymatrix,
-                               igraph_scg_norm_t norm) {
+static int igraph_i_matrix_stochastic(const igraph_matrix_t *matrix,
+                                      igraph_matrix_t *mymatrix,
+                                      igraph_scg_norm_t norm) {
 
     int i, j, n = (int) igraph_matrix_nrow(matrix);
     IGRAPH_CHECK(igraph_matrix_copy(mymatrix, matrix));
@@ -1096,12 +1096,13 @@ int igraph_i_matrix_stochastic(const igraph_matrix_t *matrix,
     return 0;
 }
 
+/* TODO prototype; function is defined in conversion.c */
 int igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
                                  igraph_bool_t column_wise);
 
-int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
-                                  igraph_sparsemat_t *mysparse,
-                                  igraph_scg_norm_t norm) {
+static int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
+                                         igraph_sparsemat_t *mysparse,
+                                         igraph_scg_norm_t norm) {
 
     IGRAPH_CHECK(igraph_sparsemat_copy(mysparse, sparse));
     IGRAPH_FINALLY(igraph_sparsemat_destroy, mysparse);
@@ -1112,15 +1113,15 @@ int igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
     return 0;
 }
 
-int igraph_i_scg_get_result(igraph_scg_matrix_t type,
-                            const igraph_matrix_t *matrix,
-                            const igraph_sparsemat_t *sparsemat,
-                            const igraph_sparsemat_t *Lsparse,
-                            const igraph_sparsemat_t *Rsparse_t,
-                            igraph_t *scg_graph,
-                            igraph_matrix_t *scg_matrix,
-                            igraph_sparsemat_t *scg_sparsemat,
-                            igraph_bool_t directed) {
+static int igraph_i_scg_get_result(igraph_scg_matrix_t type,
+                                   const igraph_matrix_t *matrix,
+                                   const igraph_sparsemat_t *sparsemat,
+                                   const igraph_sparsemat_t *Lsparse,
+                                   const igraph_sparsemat_t *Rsparse_t,
+                                   igraph_t *scg_graph,
+                                   igraph_matrix_t *scg_matrix,
+                                   igraph_sparsemat_t *scg_sparsemat,
+                                   igraph_bool_t directed) {
 
     /* We need to calculate either scg_matrix (if input is dense), or
        scg_sparsemat (if input is sparse). For the latter we might need
@@ -1269,20 +1270,20 @@ int igraph_i_scg_get_result(igraph_scg_matrix_t type,
     return 0;
 }
 
-int igraph_i_scg_common_checks(const igraph_t *graph,
-                               const igraph_matrix_t *matrix,
-                               const igraph_sparsemat_t *sparsemat,
-                               const igraph_vector_t *ev,
-                               igraph_integer_t nt,
-                               const igraph_vector_t *nt_vec,
-                               const igraph_matrix_t *vectors,
-                               const igraph_matrix_complex_t *vectors_cmplx,
-                               const igraph_vector_t *groups,
-                               const igraph_t *scg_graph,
-                               const igraph_matrix_t *scg_matrix,
-                               const igraph_sparsemat_t *scg_sparsemat,
-                               const igraph_vector_t *p,
-                               igraph_real_t *evmin, igraph_real_t *evmax) {
+static int igraph_i_scg_common_checks(const igraph_t *graph,
+                                      const igraph_matrix_t *matrix,
+                                      const igraph_sparsemat_t *sparsemat,
+                                      const igraph_vector_t *ev,
+                                      igraph_integer_t nt,
+                                      const igraph_vector_t *nt_vec,
+                                      const igraph_matrix_t *vectors,
+                                      const igraph_matrix_complex_t *vectors_cmplx,
+                                      const igraph_vector_t *groups,
+                                      const igraph_t *scg_graph,
+                                      const igraph_matrix_t *scg_matrix,
+                                      const igraph_sparsemat_t *scg_sparsemat,
+                                      const igraph_vector_t *p,
+                                      igraph_real_t *evmin, igraph_real_t *evmax) {
 
     int no_of_nodes = -1;
     igraph_real_t min, max;

@@ -38,7 +38,7 @@ typedef struct igraph_i_forest_fire_data_t {
 } igraph_i_forest_fire_data_t;
 
 
-void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
+static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
     long int i;
     for (i = 0; i < data->no_of_nodes; i++) {
         igraph_vector_destroy(data->inneis + i);

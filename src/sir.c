@@ -55,7 +55,7 @@ void igraph_sir_destroy(igraph_sir_t *sir) {
     igraph_vector_int_destroy(&sir->no_r);
 }
 
-void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
+static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
     int i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         igraph_sir_t *s = VECTOR(*v)[i];

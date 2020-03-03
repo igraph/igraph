@@ -28,16 +28,16 @@
 #include "igraph_components.h"
 #include "igraph_types_internal.h"
 
-int igraph_layout_i_fr(const igraph_t *graph,
-                       igraph_matrix_t *res,
-                       igraph_bool_t use_seed,
-                       igraph_integer_t niter,
-                       igraph_real_t start_temp,
-                       const igraph_vector_t *weight,
-                       const igraph_vector_t *minx,
-                       const igraph_vector_t *maxx,
-                       const igraph_vector_t *miny,
-                       const igraph_vector_t *maxy) {
+static int igraph_layout_i_fr(const igraph_t *graph,
+                              igraph_matrix_t *res,
+                              igraph_bool_t use_seed,
+                              igraph_integer_t niter,
+                              igraph_real_t start_temp,
+                              const igraph_vector_t *weight,
+                              const igraph_vector_t *minx,
+                              const igraph_vector_t *maxx,
+                              const igraph_vector_t *miny,
+                              const igraph_vector_t *maxy) {
 
     igraph_integer_t no_nodes = igraph_vcount(graph);
     igraph_integer_t no_edges = igraph_ecount(graph);
@@ -188,12 +188,13 @@ int igraph_layout_i_fr(const igraph_t *graph,
     return 0;
 }
 
-int igraph_layout_i_grid_fr(const igraph_t *graph,
-                            igraph_matrix_t *res, igraph_bool_t use_seed,
-                            igraph_integer_t niter, igraph_real_t start_temp,
-                            const igraph_vector_t *weight, const igraph_vector_t *minx,
-                            const igraph_vector_t *maxx, const igraph_vector_t *miny,
-                            const igraph_vector_t *maxy) {
+static int igraph_layout_i_grid_fr(
+        const igraph_t *graph,
+        igraph_matrix_t *res, igraph_bool_t use_seed,
+        igraph_integer_t niter, igraph_real_t start_temp,
+        const igraph_vector_t *weight, const igraph_vector_t *minx,
+        const igraph_vector_t *maxx, const igraph_vector_t *miny,
+        const igraph_vector_t *maxy) {
 
     igraph_integer_t no_nodes = igraph_vcount(graph);
     igraph_integer_t no_edges = igraph_ecount(graph);
