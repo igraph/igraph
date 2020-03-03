@@ -475,7 +475,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
         if (vptr == 0) {
             IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
         }
-        IGRAPH_FINALLY(free, vptr);
+        IGRAPH_FINALLY(igraph_free, vptr);
         IGRAPH_CHECK(igraph_vector_init(vptr, 0));
         IGRAPH_FINALLY_CLEAN(1);
         VECTOR(vertices_by_components)[i] = vptr;
@@ -487,7 +487,7 @@ int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
         if (vptr == 0) {
             IGRAPH_ERROR("cannot calculate feedback arc set using IP", IGRAPH_ENOMEM);
         }
-        IGRAPH_FINALLY(free, vptr);
+        IGRAPH_FINALLY(igraph_free, vptr);
         IGRAPH_CHECK(igraph_vector_init(vptr, 0));
         IGRAPH_FINALLY_CLEAN(1);
         VECTOR(edges_by_components)[i] = vptr;

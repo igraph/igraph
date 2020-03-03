@@ -124,7 +124,7 @@ int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     if (bag == 0) {
         IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, bag);    /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, bag);    /* TODO: hack */
 
     /* The first node(s) in the bag */
     if (start_from) {
@@ -860,7 +860,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     if (bag1 == 0) {
         IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, bag1);   /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, bag1);   /* TODO: hack */
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < VECTOR(*out_seq)[i]; j++) {
@@ -872,7 +872,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
         if (bag2 == 0) {
             IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
         }
-        IGRAPH_FINALLY(free, bag2);
+        IGRAPH_FINALLY(igraph_free, bag2);
         for (i = 0; i < no_of_nodes; i++) {
             for (j = 0; j < VECTOR(*in_seq)[i]; j++) {
                 bag2[bagp2++] = i;

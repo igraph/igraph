@@ -147,12 +147,12 @@ void igraph_i_fastgreedy_community_list_destroy(
     for (i = 0; i < list->n; i++) {
         igraph_vector_ptr_destroy(&list->e[i].neis);
     }
-    free(list->e);
+    igraph_Free(list->e);
     if (list->heapindex != 0) {
-        free(list->heapindex);
+        igraph_Free(list->heapindex);
     }
     if (list->heap != 0) {
-        free(list->heap);
+        igraph_Free(list->heap);
     }
 }
 
@@ -698,12 +698,12 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     if (communities.e == 0) {
         IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, communities.e);
+    IGRAPH_FINALLY(igraph_free, communities.e);
     communities.heap = (igraph_i_fastgreedy_community**)calloc((size_t) no_of_nodes, sizeof(igraph_i_fastgreedy_community*));
     if (communities.heap == 0) {
         IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, communities.heap);
+    IGRAPH_FINALLY(igraph_free, communities.heap);
     communities.heapindex = (igraph_integer_t*)calloc((size_t)no_of_nodes, sizeof(igraph_integer_t));
     if (communities.heapindex == 0) {
         IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
@@ -722,7 +722,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     if (dq == 0) {
         IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, dq);
+    IGRAPH_FINALLY(igraph_free, dq);
     debug("Creating community pair list\n");
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(0), &edgeit));
     IGRAPH_FINALLY(igraph_eit_destroy, &edgeit);
@@ -730,7 +730,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     if (pairs == 0) {
         IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, pairs);
+    IGRAPH_FINALLY(igraph_free, pairs);
     loop_weight_sum = 0;
     for (i = 0, j = 0; !IGRAPH_EIT_END(edgeit); i += 2, j++, IGRAPH_EIT_NEXT(edgeit)) {
         long int eidx = IGRAPH_EIT_GET(edgeit);
@@ -1022,12 +1022,12 @@ int igraph_community_fastgreedy(const igraph_t *graph,
         if (ivec == 0) {
             IGRAPH_ERROR("can't run fast greedy community detection", IGRAPH_ENOMEM);
         }
-        IGRAPH_FINALLY(free, ivec);
+        IGRAPH_FINALLY(igraph_free, ivec);
         for (i = 0; i < no_of_joins; i++) {
             ivec[i] = i + 1;
         }
         igraph_matrix_permdelete_rows(merges, ivec, total_joins - no_of_joins);
-        free(ivec);
+        igraph_Free(ivec);
         IGRAPH_FINALLY_CLEAN(1);
     }
     IGRAPH_PROGRESS("fast greedy community detection", 100.0, 0);
@@ -1038,8 +1038,8 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     }
 
     debug("Freeing memory\n");
-    free(pairs);
-    free(dq);
+    igraph_Free(pairs);
+    igraph_Free(dq);
     igraph_i_fastgreedy_community_list_destroy(&communities);
     igraph_vector_destroy(&a);
     IGRAPH_FINALLY_CLEAN(4);

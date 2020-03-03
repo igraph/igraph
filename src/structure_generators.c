@@ -796,12 +796,12 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
     if (coords == 0) {
         IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, coords); /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, coords);
     weights = igraph_Calloc(dims, long int);
     if (weights == 0) {
         IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, weights);
+    IGRAPH_FINALLY(igraph_free, weights);
     if (dims > 0) {
         weights[0] = 1;
         for (i = 1; i < dims; i++) {
