@@ -30,11 +30,11 @@
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 
-int igraph_i_eccentricity(const igraph_t *graph,
-                          igraph_vector_t *res,
-                          igraph_vs_t vids,
-                          igraph_neimode_t mode,
-                          const igraph_adjlist_t *adjlist) {
+static int igraph_i_eccentricity(const igraph_t *graph,
+                                 igraph_vector_t *res,
+                                 igraph_vs_t vids,
+                                 igraph_neimode_t mode,
+                                 const igraph_adjlist_t *adjlist) {
 
     int no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_long_t q;

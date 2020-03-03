@@ -1640,7 +1640,8 @@ typedef struct {
     void *arg, *carg;
 } igraph_i_iso_cb_data_t;
 
-igraph_bool_t igraph_i_isocompat_node_cb(const igraph_t *graph1,
+static igraph_bool_t igraph_i_isocompat_node_cb(
+        const igraph_t *graph1,
         const igraph_t *graph2,
         const igraph_integer_t g1_num,
         const igraph_integer_t g2_num,
@@ -1649,7 +1650,8 @@ igraph_bool_t igraph_i_isocompat_node_cb(const igraph_t *graph1,
     return data->node_compat_fn(graph1, graph2, g1_num, g2_num, data->carg);
 }
 
-igraph_bool_t igraph_i_isocompat_edge_cb(const igraph_t *graph1,
+static igraph_bool_t igraph_i_isocompat_edge_cb(
+        const igraph_t *graph1,
         const igraph_t *graph2,
         const igraph_integer_t g1_num,
         const igraph_integer_t g2_num,
@@ -1658,9 +1660,9 @@ igraph_bool_t igraph_i_isocompat_edge_cb(const igraph_t *graph1,
     return data->edge_compat_fn(graph1, graph2, g1_num, g2_num, data->carg);
 }
 
-igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
-                                      igraph_vector_t *map21,
-                                      void *arg) {
+static igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
+                                             igraph_vector_t *map21,
+                                             void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
     igraph_bool_t *iso = data->arg;
     IGRAPH_UNUSED(map12); IGRAPH_UNUSED(map21);
@@ -1756,7 +1758,8 @@ int igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
     return 0;
 }
 
-igraph_bool_t igraph_i_count_isomorphisms_vf2(const igraph_vector_t *map12,
+static igraph_bool_t igraph_i_count_isomorphisms_vf2(
+        const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
@@ -1828,7 +1831,7 @@ int igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2
     return 0;
 }
 
-void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
+static void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
     long int i, n = igraph_vector_ptr_size(data);
     for (i = 0; i < n; i++) {
         igraph_vector_t *vec = VECTOR(*data)[i];
@@ -1837,7 +1840,8 @@ void igraph_i_get_isomorphisms_free(igraph_vector_ptr_t *data) {
     }
 }
 
-igraph_bool_t igraph_i_get_isomorphisms_vf2(const igraph_vector_t *map12,
+static igraph_bool_t igraph_i_get_isomorphisms_vf2(
+        const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
 
@@ -2473,7 +2477,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     return 0;
 }
 
-igraph_bool_t igraph_i_subisomorphic_vf2(const igraph_vector_t *map12,
+static igraph_bool_t igraph_i_subisomorphic_vf2(
+        const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
@@ -2560,7 +2565,8 @@ int igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
     return 0;
 }
 
-igraph_bool_t igraph_i_count_subisomorphisms_vf2(const igraph_vector_t *map12,
+static igraph_bool_t igraph_i_count_subisomorphisms_vf2(
+        const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
     igraph_i_iso_cb_data_t *data = arg;
@@ -2635,7 +2641,7 @@ int igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *gra
     return 0;
 }
 
-void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {
+static void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {
     long int i, n = igraph_vector_ptr_size(data);
     for (i = 0; i < n; i++) {
         igraph_vector_t *vec = VECTOR(*data)[i];
@@ -2644,7 +2650,8 @@ void igraph_i_get_subisomorphisms_free(igraph_vector_ptr_t *data) {
     }
 }
 
-igraph_bool_t igraph_i_get_subisomorphisms_vf2(const igraph_vector_t *map12,
+static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
+        const igraph_vector_t *map12,
         const igraph_vector_t *map21,
         void *arg) {
 

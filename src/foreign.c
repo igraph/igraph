@@ -878,7 +878,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
     return 0;
 }
 
-int igraph_i_read_graph_graphdb_getword(FILE *instream) {
+static int igraph_i_read_graph_graphdb_getword(FILE *instream) {
     int b1, b2;
     unsigned char c1, c2;
     b1 = fgetc(instream);
@@ -977,7 +977,7 @@ int igraph_gml_yylex_destroy (void *scanner );
 int igraph_gml_yyparse (igraph_i_gml_parsedata_t* context);
 void igraph_gml_yyset_in  (FILE * in_str, void* yyscanner );
 
-void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
+static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     long int i;
     igraph_vector_ptr_t *vec;
     for (i = 0; i < 3; i++) {
@@ -1005,7 +1005,7 @@ void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     }
 }
 
-igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) {
+static igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) {
 
     igraph_real_t value = 0.0;
     int type = igraph_gml_tree_type(node, pos);
@@ -1025,7 +1025,7 @@ igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) {
     return value;
 }
 
-const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
+static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
 
     int type = igraph_gml_tree_type(node, pos);
     char tmp[256];
@@ -1942,7 +1942,7 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
 #define E_COLOR            22
 #define E_LAST             23
 
-int igraph_i_pajek_escape(char* src, char** dest) {
+static int igraph_i_pajek_escape(char* src, char** dest) {
     long int destlen = 0;
     igraph_bool_t need_escape = 0;
 
@@ -2466,7 +2466,7 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
     return 0;
 }
 
-int igraph_i_gml_convert_to_key(const char *orig, char **key) {
+static int igraph_i_gml_convert_to_key(const char *orig, char **key) {
     int no = 1;
     char strno[50];
     size_t i, len = strlen(orig), newlen = 0, plen = 0;
@@ -2741,7 +2741,7 @@ int igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
     return 0;
 }
 
-int igraph_i_dot_escape(const char *orig, char **result) {
+static int igraph_i_dot_escape(const char *orig, char **result) {
     /* do we have to escape the string at all? */
     long int i, j, len = (long int) strlen(orig), newlen = 0;
     igraph_bool_t need_quote = 0, is_number = 1;

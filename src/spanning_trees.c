@@ -33,10 +33,10 @@
 #include "igraph_progress.h"
 #include "igraph_types_internal.h"
 
-int igraph_i_minimum_spanning_tree_unweighted(const igraph_t *graph,
-        igraph_vector_t *result);
-int igraph_i_minimum_spanning_tree_prim(const igraph_t *graph,
-                                        igraph_vector_t *result, const igraph_vector_t *weights);
+static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t *graph,
+                                                     igraph_vector_t *result);
+static int igraph_i_minimum_spanning_tree_prim(const igraph_t *graph,
+                                               igraph_vector_t *result, const igraph_vector_t *weights);
 
 /**
  * \ingroup structural
@@ -203,8 +203,7 @@ int igraph_minimum_spanning_tree_prim(const igraph_t *graph, igraph_t *mst,
 }
 
 
-int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph,
-        igraph_vector_t* res) {
+static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igraph_vector_t* res) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -271,8 +270,8 @@ int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_i_minimum_spanning_tree_prim(const igraph_t* graph,
-                                        igraph_vector_t* res, const igraph_vector_t *weights) {
+static int igraph_i_minimum_spanning_tree_prim(
+        const igraph_t* graph, igraph_vector_t* res, const igraph_vector_t *weights) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);

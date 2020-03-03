@@ -380,9 +380,7 @@ int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
     return 0;
 }
 
-void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y);
-
-void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
+static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
     igraph_real_t len = sqrt((*x) * (*x) + (*y) * (*y));
     if (len != 0) {
         *x /= len;
@@ -696,13 +694,7 @@ int igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
 
 }
 
-int igraph_i_layout_reingold_tilford_unreachable(
-    const igraph_t *graph,
-    igraph_neimode_t mode,
-    long int real_root,
-    long int no_of_nodes,
-    igraph_vector_t *pnewedges);
-int igraph_i_layout_reingold_tilford_unreachable(
+static int igraph_i_layout_reingold_tilford_unreachable(
     const igraph_t *graph,
     igraph_neimode_t mode,
     long int real_root,
@@ -786,20 +778,16 @@ struct igraph_i_reingold_tilford_vertex {
     igraph_real_t offset_follow_rc;  /* X offset when following the right contour */
 };
 
-int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
-        long int node, long int vcount);
-int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
-        igraph_matrix_t *res, long int node,
-        long int vcount, igraph_real_t xpos);
+static int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
+                                                      long int node, long int vcount);
+static int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
+                                                        igraph_matrix_t *res, long int node,
+                                                        long int vcount, igraph_real_t xpos);
 
-int igraph_i_layout_reingold_tilford(const igraph_t *graph,
-                                     igraph_matrix_t *res,
-                                     igraph_neimode_t mode,
-                                     long int root);
-int igraph_i_layout_reingold_tilford(const igraph_t *graph,
-                                     igraph_matrix_t *res,
-                                     igraph_neimode_t mode,
-                                     long int root) {
+static int igraph_i_layout_reingold_tilford(const igraph_t *graph,
+                                            igraph_matrix_t *res,
+                                            igraph_neimode_t mode,
+                                            long int root) {
     long int no_of_nodes = igraph_vcount(graph);
     long int i, n, j;
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
@@ -871,7 +859,8 @@ int igraph_i_layout_reingold_tilford(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilford_vertex *vdata,
+static int igraph_i_layout_reingold_tilford_calc_coords(
+        struct igraph_i_reingold_tilford_vertex *vdata,
         igraph_matrix_t *res, long int node,
         long int vcount, igraph_real_t xpos) {
     long int i;
@@ -888,7 +877,8 @@ int igraph_i_layout_reingold_tilford_calc_coords(struct igraph_i_reingold_tilfor
     return 0;
 }
 
-int igraph_i_layout_reingold_tilford_postorder(struct igraph_i_reingold_tilford_vertex *vdata,
+static int igraph_i_layout_reingold_tilford_postorder(
+        struct igraph_i_reingold_tilford_vertex *vdata,
         long int node, long int vcount) {
     long int i, j, childcount, leftroot, leftrootidx;
     igraph_real_t avg;
@@ -1419,10 +1409,12 @@ int igraph_layout_reingold_tilford_circular(const igraph_t *graph,
 #define COULOMBS_CONSTANT 8987500000.0
 
 
-igraph_real_t igraph_i_distance_between(const igraph_matrix_t *c, long int a,
-                                        long int b);
+static igraph_real_t igraph_i_distance_between(
+        const igraph_matrix_t *c,
+        long int a, long int b);
 
-int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
+static int igraph_i_determine_electric_axal_forces(
+        const igraph_matrix_t *pos,
         igraph_real_t *x,
         igraph_real_t *y,
         igraph_real_t directed_force,
@@ -1430,14 +1422,16 @@ int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
         long int other_node,
         long int this_node);
 
-int igraph_i_apply_electrical_force(const igraph_matrix_t *pos,
-                                    igraph_vector_t *pending_forces_x,
-                                    igraph_vector_t *pending_forces_y,
-                                    long int other_node, long int this_node,
-                                    igraph_real_t node_charge,
-                                    igraph_real_t distance);
+static int igraph_i_apply_electrical_force(
+        const igraph_matrix_t *pos,
+        igraph_vector_t *pending_forces_x,
+        igraph_vector_t *pending_forces_y,
+        long int other_node, long int this_node,
+        igraph_real_t node_charge,
+        igraph_real_t distance);
 
-int igraph_i_determine_spring_axal_forces(const igraph_matrix_t *pos,
+static int igraph_i_determine_spring_axal_forces(
+        const igraph_matrix_t *pos,
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
         igraph_real_t distance,
@@ -1445,27 +1439,30 @@ int igraph_i_determine_spring_axal_forces(const igraph_matrix_t *pos,
         long int other_node,
         long int this_node);
 
-int igraph_i_apply_spring_force(const igraph_matrix_t *pos,
-                                igraph_vector_t *pending_forces_x,
-                                igraph_vector_t *pending_forces_y,
-                                long int other_node,
-                                long int this_node, int spring_length,
-                                igraph_real_t spring_constant);
+static int igraph_i_apply_spring_force(
+        const igraph_matrix_t *pos,
+        igraph_vector_t *pending_forces_x,
+        igraph_vector_t *pending_forces_y,
+        long int other_node,
+        long int this_node, int spring_length,
+        igraph_real_t spring_constant);
 
-int igraph_i_move_nodes(igraph_matrix_t *pos,
-                        const igraph_vector_t *pending_forces_x,
-                        const igraph_vector_t *pending_forces_y,
-                        igraph_real_t node_mass,
-                        igraph_real_t max_sa_movement);
+static int igraph_i_move_nodes(
+        igraph_matrix_t *pos,
+        const igraph_vector_t *pending_forces_x,
+        const igraph_vector_t *pending_forces_y,
+        igraph_real_t node_mass,
+        igraph_real_t max_sa_movement);
 
-igraph_real_t igraph_i_distance_between(const igraph_matrix_t *c, long int a,
-                                        long int b) {
+static igraph_real_t igraph_i_distance_between(
+        const igraph_matrix_t *c,
+        long int a, long int b) {
     igraph_real_t diffx = MATRIX(*c, a, 0) - MATRIX(*c, b, 0);
     igraph_real_t diffy = MATRIX(*c, a, 1) - MATRIX(*c, b, 1);
     return sqrt( diffx * diffx + diffy * diffy );
 }
 
-int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
+static int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
         igraph_real_t *x,
         igraph_real_t *y,
         igraph_real_t directed_force,
@@ -1518,12 +1515,13 @@ int igraph_i_determine_electric_axal_forces(const igraph_matrix_t *pos,
     return 0;
 }
 
-int igraph_i_apply_electrical_force(const igraph_matrix_t *pos,
-                                    igraph_vector_t *pending_forces_x,
-                                    igraph_vector_t *pending_forces_y,
-                                    long int other_node, long int this_node,
-                                    igraph_real_t node_charge,
-                                    igraph_real_t distance) {
+static int igraph_i_apply_electrical_force(
+        const igraph_matrix_t *pos,
+        igraph_vector_t *pending_forces_x,
+        igraph_vector_t *pending_forces_y,
+        long int other_node, long int this_node,
+        igraph_real_t node_charge,
+        igraph_real_t distance) {
 
     igraph_real_t directed_force = COULOMBS_CONSTANT *
                                    ((node_charge * node_charge) / (distance * distance));
@@ -1541,7 +1539,8 @@ int igraph_i_apply_electrical_force(const igraph_matrix_t *pos,
     return 0;
 }
 
-int igraph_i_determine_spring_axal_forces(const igraph_matrix_t *pos,
+static int igraph_i_determine_spring_axal_forces(
+        const igraph_matrix_t *pos,
         igraph_real_t *x, igraph_real_t *y,
         igraph_real_t directed_force,
         igraph_real_t distance,
@@ -1579,12 +1578,13 @@ int igraph_i_determine_spring_axal_forces(const igraph_matrix_t *pos,
     return 0;
 }
 
-int igraph_i_apply_spring_force(const igraph_matrix_t *pos,
-                                igraph_vector_t *pending_forces_x,
-                                igraph_vector_t *pending_forces_y,
-                                long int other_node,
-                                long int this_node, int spring_length,
-                                igraph_real_t spring_constant) {
+static int igraph_i_apply_spring_force(
+        const igraph_matrix_t *pos,
+        igraph_vector_t *pending_forces_x,
+        igraph_vector_t *pending_forces_y,
+        long int other_node,
+        long int this_node, int spring_length,
+        igraph_real_t spring_constant) {
 
     // determined using Hooke's Law:
     //   force = -kx
@@ -1625,11 +1625,12 @@ int igraph_i_apply_spring_force(const igraph_matrix_t *pos,
     return 0;
 }
 
-int igraph_i_move_nodes(igraph_matrix_t *pos,
-                        const igraph_vector_t *pending_forces_x,
-                        const igraph_vector_t *pending_forces_y,
-                        igraph_real_t node_mass,
-                        igraph_real_t max_sa_movement) {
+static int igraph_i_move_nodes(
+        igraph_matrix_t *pos,
+        const igraph_vector_t *pending_forces_x,
+        const igraph_vector_t *pending_forces_y,
+        igraph_real_t node_mass,
+        igraph_real_t max_sa_movement) {
 
     // Since each iteration is isolated, time is constant at 1.
     // Therefore:
@@ -1822,11 +1823,13 @@ int igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
     return 0;
 }
 
+/* not 'static', used in tests */
 int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
                               long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                               igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
                               igraph_real_t killr);
 
+/* TODO: not 'static' because used in tests */
 int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x,
                               igraph_real_t *y, igraph_real_t *r);
 int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
@@ -1981,7 +1984,8 @@ int igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     return 0;
 }
 
-int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
+int igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
+                              igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *r) {
     long int nodes = igraph_matrix_nrow(coords);
     long int i;
@@ -2012,7 +2016,8 @@ int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_
     return 0;
 }
 
-int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
+int igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
+                              igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *z, igraph_real_t *r) {
     long int nodes = igraph_matrix_nrow(coords);
     long int i;
@@ -2094,14 +2099,14 @@ int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
     return 0;
 }
 
-int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
-                             int n, void *extra);
+static int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
+                                    int n, void *extra);
 
-int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
-                               igraph_matrix_t *dist, long int dim);
+static int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
+                                      igraph_matrix_t *dist, long int dim);
 
-int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
-                             int n, void *extra) {
+static int igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
+                                    int n, void *extra) {
     igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
     IGRAPH_UNUSED(n);
     igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);
