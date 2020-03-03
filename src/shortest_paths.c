@@ -60,7 +60,7 @@ static int igraph_i_average_path_length_unweighted(
     if (already_added == 0) {
         IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
     igraph_adjlist_init(graph, &allneis, directed ? IGRAPH_OUT : IGRAPH_ALL);
@@ -676,7 +676,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         if (already_counted == 0) {
             IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM);
         }
-        IGRAPH_FINALLY(free, already_counted);
+        IGRAPH_FINALLY(igraph_free, already_counted);
 
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, directed ? IGRAPH_OUT : IGRAPH_ALL));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
