@@ -410,7 +410,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
     if (already_added == 0) {
         IGRAPH_ERROR("is connected (weak) failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, already_added);
 
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 10);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -616,7 +616,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
     igraph_vector_destroy(&neis);
     igraph_vector_destroy(&verts);
     igraph_dqueue_destroy(&q);
-    igraph_free(already_added);
+    igraph_Free(already_added);
     IGRAPH_FINALLY_CLEAN(5);  /* + components */
 
     return 0;
@@ -889,7 +889,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  *     a spanning tree of the biconnected component is returned.
  *     Note you'll have to
  *     destroy each vector first by calling \ref igraph_vector_destroy()
- *     and then <code>free()</code> on it, plus you need to call
+ *     and then \ref igraph_free() on it, plus you need to call
  *     \ref igraph_vector_ptr_destroy() on the list to regain all
  *     allocated memory.
  * \param component_edges If not a NULL pointer, then the edges of the

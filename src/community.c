@@ -721,7 +721,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
     if (result_owned) {
         igraph_vector_destroy(result);
-        free(result);
+        igraph_Free(result);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
@@ -1516,7 +1516,7 @@ void igraph_i_error_handler_none(const char *reason, const char *file,
  *    \ref igraph_vector_t object. The user is responsible of
  *    deallocating the memory that belongs to the individual vectors,
  *    by calling first \ref igraph_vector_destroy(), and then
- *    <code>free()</code> on them.
+ *    \ref igraph_free() on them.
  * \param history Pointer to an initialized vector or a null pointer.
  *    If not a null pointer, then a trace of the algorithm is stored
  *    here, encoded numerically. The various operations:
@@ -2732,7 +2732,7 @@ int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids
     if (links == 0) {
         IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, links);
+    IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < ecount; i++) {
         igraph_edge(graph, (igraph_integer_t) i, &from, &to);
@@ -2762,7 +2762,7 @@ int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids
         VECTOR(*eids)[links[i].id] = l;
     }
 
-    free(links);
+    igraph_Free(links);
     IGRAPH_FINALLY_CLEAN(1);
 
     igraph_destroy(graph);
@@ -3533,12 +3533,12 @@ int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
     if (p1 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, p1);
+    IGRAPH_FINALLY(igraph_free, p1);
     p2 = igraph_Calloc(k2, double);
     if (p2 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, p2);
+    IGRAPH_FINALLY(igraph_free, p2);
 
     /* Calculate the entropy of v1 */
     *h1 = 0.0;
@@ -3586,7 +3586,7 @@ int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
 
     igraph_spmatrix_iter_destroy(&mit);
     igraph_spmatrix_destroy(&m);
-    free(p1); free(p2);
+    igraph_Free(p1); igraph_Free(p2);
 
     IGRAPH_FINALLY_CLEAN(4);
 
