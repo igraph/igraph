@@ -631,7 +631,7 @@ int igraph_i_pajek_add_string_vertex_attribute(const char *name,
   if (tmp==0) {
     IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, tmp);
+  IGRAPH_FINALLY(igraph_free, tmp);
   strncpy(tmp, value, len);
   tmp[len]='\0';
 
@@ -658,7 +658,7 @@ int igraph_i_pajek_add_string_edge_attribute(const char *name,
   if (tmp==0) {
     IGRAPH_ERROR("cannot add element to hash table", IGRAPH_ENOMEM);
   }
-  IGRAPH_FINALLY(free, tmp);
+  IGRAPH_FINALLY(igraph_free, tmp);
   strncpy(tmp, value, len);
   tmp[len]='\0';
   
