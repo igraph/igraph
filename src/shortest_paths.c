@@ -37,7 +37,7 @@
 
 /* Computes the average of pairwise distances (used for igraph_average_path_length),
  * or of inverse pairwise distances (used for igraph_global_efficiency), in an unweighted graph. */
-int igraph_i_average_path_length_unweighted(
+static int igraph_i_average_path_length_unweighted(
         const igraph_t *graph,
         igraph_real_t *res,
         igraph_real_t *unconnected_pairs, /* if not NULL, will be set to the no. of non-connected ordered vertex pairs */
@@ -137,7 +137,7 @@ int igraph_i_average_path_length_unweighted(
  * or of inverse pairwise distances (used for igraph_global_efficiency), in an unweighted graph.
  * Uses Dijkstra's algorithm, therefore all weights must be non-negative.
  */
-int igraph_i_average_path_length_dijkstra(
+static int igraph_i_average_path_length_dijkstra(
         const igraph_t *graph,
         igraph_real_t *res,
         igraph_real_t *unconnected_pairs,
@@ -396,7 +396,7 @@ int igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
 /***** Local efficiency *****/
 /****************************/
 
-int igraph_i_local_efficiency_unweighted(
+static int igraph_i_local_efficiency_unweighted(
         const igraph_t *graph,
         igraph_adjlist_t *adjlist,
         igraph_dqueue_t *q,
@@ -487,7 +487,7 @@ int igraph_i_local_efficiency_unweighted(
     return IGRAPH_SUCCESS;
 }
 
-int igraph_i_local_efficiency_dijkstra(
+static int igraph_i_local_efficiency_dijkstra(
         const igraph_t *graph,
         igraph_lazy_inclist_t *inclist,
         igraph_2wheap_t *Q,
