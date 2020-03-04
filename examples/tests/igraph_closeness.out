@@ -1,0 +1,30 @@
+Simple test case, no weights, undirected
+Non normalised results below
+( 0.333333 0.500000 0.333333 )
+
+Normalised results below
+( 0.666667 1.000000 0.666667 )
+
+Simple test case, with weights, undirected
+Non normalised test below
+( 0.090909 0.125000 0.076923 )
+
+Normalised test below
+( 0.181818 0.250000 0.153846 )
+
+Advanced test case, no weights, undirected
+Non normalised test below
+( 0.071429 0.083333 0.100000 0.071429 0.100000 0.083333 0.100000 0.071429 )
+
+Normalised test below
+( 0.500000 0.583333 0.700000 0.500000 0.700000 0.583333 0.700000 0.500000 )
+
+Advanced test case, with weights
+Undirected graph test below
+( 0.016949 0.028571 0.032258 0.014085 0.037037 0.027027 0.033333 0.019231 )
+
+Directed graph test below for OUT
+( 0.008696 0.017241 0.019231 0.007634 0.016129 0.016667 0.011765 0.010000 )
+
+Directed graph test below for IN
+( 0.012821 0.015873 0.015873 0.009804 0.018868 0.007519 0.026316 0.007519 )
