@@ -6006,36 +6006,50 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  * Average nearest neighbor degree.
  *
  * Calculates the average degree of the neighbors for each vertex, and
- * optionally, the same quantity in the function of vertex degree.
+ * optionally, the same quantity as a function of the vertex degree.
  *
- * </para><para>For isolate vertices \p knn is set to
- * NaN. The same is done in \p knnk for vertex degrees that
+ * </para><para>
+ * For isolated vertices \p knn is set to NaN.
+ * The same is done in \p knnk for vertex degrees that
  * don't appear in the graph.
  *
- * \param graph The input graph, it can be directed but the
- *   directedness of the edges is ignored.
+ * </para><para>
+ * The weighted version computes a weighted average of the neighbor degrees as
+ *
+ * <code>k_nn_u = 1/s_u sum_u w_uv k_v</code>,
+ *
+ * where <code>s_u</code> is the sum of the incident edge weights of vertex \c u,
+ * i.e. its strength. The sum runs over the neighbors \c v of vertex \c u
+ * as indicated by \p mode (with appropriate weights)
+ * and <code>k_v</code> is the neighbors' degree, specified by \p neighbor_degree_mode.
+ *
+ * </para><para>
+ * Reference:
+ * A. Barrat, M. Barthélemy, R. Pastor-Satorras, and A. Vespignani,
+ * The architecture of complex weighted networks,
+ * Proc. Natl. Acad. Sci. USA 101, 3747 (2004).
+ * https://dx.doi.org/10.1073/pnas.0400087101
+ *
+ * \param graph The input graph. It may be directed.
  * \param vids The vertices for which the calculation is performed.
- * \param mode The neighbors over which is averaged.
- * \param neighbor_degree_mode The degree of the neighbors which is
- *   averaged.
+ * \param mode The type of neihbors to consider in directed graphs.
+ *   \c IGRAPH_OUT considers out-neighbours, \c IGRAPH_IN in-neighbours
+ *   and \c IGRAPH_ALL ignores edge directions.
+ * \param neighbor_degree_mode The type of degree to compute in directed graphs.
+ *   \c IGRAPH_OUT averages out-degrees, \c IGRAPH_IN averages in-degrees
+ *   and \c IGRAPH_ALL ignores edge directions for the degree calculation.
  * \param vids The vertices for which the calculation is performed.
  * \param knn Pointer to an initialized vector, the result will be
- *   stored here. It will be resized as needed. Supply a NULL pointer
+ *   stored here. It will be resized as needed. Supply a \c NULL pointer
  *   here, if you only want to calculate \c knnk.
  * \param knnk Pointer to an initialized vector, the average nearest
- *   neighbor degree in the function of vertex degree is stored
+ *   neighbor degree as a function of the vertex degree is stored
  *   here. The first (zeroth) element is for degree one vertices,
- *   etc. Supply a NULL pointer here if you don't want to calculate
+ *   etc. Supply a \c NULL pointer here if you don't want to calculate
  *   this.
  * \param weights Optional edge weights. Supply a null pointer here
- *   for the non-weighted version. The weighted version computes
- *   a weighted average of the neighbor degrees, i.e.
+ *   for the non-weighted version.
  *
- *    k_nn_i = 1/s_i sum_j w_ij k_j
- *
- *   where s_i is the sum of the weights, the sum runs over
- *   the neighbors as indicated by \c mode (with appropriate weights)
- *   and k_j is the degree, specified by \c neighbor_degree_mode.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
