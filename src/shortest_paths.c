@@ -327,8 +327,10 @@ int igraph_average_path_length(const igraph_t *graph,
  *    for disconnected graphs.
  * \return Error code:
  *         \clist
- *         \cli IGRAPH_ENOMEM, not enough memory for data structures
- *         \cli IGRAPH_EINVAL, invalid weight vector
+ *         \cli IGRAPH_ENOMEM
+ *              not enough memory for data structures
+ *         \cli IGRAPH_EINVAL
+ *              invalid weight vector
  *         \endclist
  *
  * Time complexity: O(|V| |E| log|E| + |V|), where |V| is the number of
@@ -374,8 +376,10 @@ int igraph_average_path_length_dijkstra(const igraph_t *graph,
  *    Ignored for undirected graphs.
  * \return Error code:
  *         \clist
- *         \cli IGRAPH_ENOMEM, not enough memory for data structures
- *         \cli IGRAPH_EINVAL, invalid weight vector
+ *         \cli IGRAPH_ENOMEM
+ *              not enough memory for data structures
+ *         \cli IGRAPH_EINVAL
+ *              invalid weight vector
  *         \endclist
  *
  * Time complexity: O(|V| |E| log|E| + |V|) for weighted graphs and
@@ -398,13 +402,14 @@ int igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
 
 static int igraph_i_local_efficiency_unweighted(
         const igraph_t *graph,
-        igraph_adjlist_t *adjlist,
+        const igraph_adjlist_t *adjlist,
         igraph_dqueue_t *q,
         long int *already_counted,
         igraph_vector_t *vertex_neis,
         igraph_vector_int_t *nei_mask,
         igraph_real_t *res,
-        igraph_integer_t vertex)
+        igraph_integer_t vertex,
+        igraph_neimode_t mode)
 {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -415,7 +420,7 @@ static int igraph_i_local_efficiency_unweighted(
     igraph_dqueue_clear(q);
     memset(already_counted, 0, no_of_nodes * sizeof(long int));
 
-    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_size(vertex_neis);
 
     igraph_vector_int_fill(nei_mask, 0);
@@ -495,6 +500,7 @@ static int igraph_i_local_efficiency_dijkstra(
         igraph_vector_int_t *nei_mask, /* true if the corresponding node is a neighbour of 'vertex' */
         igraph_real_t *res,
         igraph_integer_t vertex,
+        igraph_neimode_t mode,
         const igraph_vector_t *weights)
 {
 
@@ -517,7 +523,7 @@ static int igraph_i_local_efficiency_dijkstra(
     long int vertex_neis_size;
     long int neighbor_count; /* unlike 'inc_edges_size', 'neighbor_count' does not count self-loops or multi-edges */
 
-    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, IGRAPH_ALL));
+    IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_size(vertex_neis);
 
     igraph_vector_int_fill(nei_mask, 0);
@@ -634,10 +640,23 @@ static int igraph_i_local_efficiency_dijkstra(
  *    If a null pointer is given, all weights are assumed to be 1.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
+ * \param mode How to determine the local neighborhood of each vertex
+ *    in directed graphs. Ignored in undirected graphs.
+ *         \clist
+ *         \cli IGRAPH_ALL
+ *              take both in- and out-neighbours;
+ *              this is a reasonable default for high-level interfaces.
+ *         \cli IGRAPH_OUT
+ *              take only out-neighbours
+ *         \cli IGRAPH_IN
+ *              take only in-neighbours
+ *         \endclist
  * \return Error code:
  *         \clist
- *         \cli IGRAPH_ENOMEM, not enough memory for data structures
- *         \cli IGRAPH_EINVAL, invalid weight vector
+ *         \cli IGRAPH_ENOMEM
+ *              not enough memory for data structures
+ *         \cli IGRAPH_EINVAL
+ *              invalid weight vector
  *         \endclist
  *
  * Time complexity: O(|E|^2 log|E|) for weighted graphs and
@@ -648,7 +667,8 @@ static int igraph_i_local_efficiency_dijkstra(
  */
 
 int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
-                            const igraph_vector_t *weights, igraph_bool_t directed)
+                            const igraph_vector_t *weights,
+                            igraph_bool_t directed, igraph_neimode_t mode)
 {
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -687,7 +707,10 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
         for (vertex=0; vertex < no_of_nodes; ++vertex) {
-            IGRAPH_CHECK(igraph_i_local_efficiency_unweighted(graph, &adjlist, &q, already_counted, &vertex_neis, &nei_mask, &(VECTOR(*res)[vertex]), vertex));
+            IGRAPH_CHECK(igraph_i_local_efficiency_unweighted(
+                             graph, &adjlist,
+                             &q, already_counted, &vertex_neis, &nei_mask,
+                             &(VECTOR(*res)[vertex]), vertex, mode));
         }
 
         igraph_dqueue_destroy(&q);
@@ -713,7 +736,10 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
         for (vertex=0; vertex < no_of_nodes; ++vertex) {
-            IGRAPH_CHECK(igraph_i_local_efficiency_dijkstra(graph, &inclist, &Q, &vertex_neis, &nei_mask, &(VECTOR(*res)[vertex]), vertex, weights));
+            IGRAPH_CHECK(igraph_i_local_efficiency_dijkstra(
+                             graph, &inclist,
+                             &Q, &vertex_neis, &nei_mask,
+                             &(VECTOR(*res)[vertex]), vertex, mode, weights));
         }
 
         igraph_2wheap_destroy(&Q);
@@ -740,10 +766,23 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
  *    If a null pointer is given, all weights are assumed to be 1.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
+ * \param mode How to determine the local neighborhood of each vertex
+ *    in directed graphs. Ignored in undirected graphs.
+ *         \clist
+ *         \cli IGRAPH_ALL
+ *              take both in- and out-neighbours;
+ *              this is a reasonable default for high-level interfaces.
+ *         \cli IGRAPH_OUT
+ *              take only out-neighbours
+ *         \cli IGRAPH_IN
+ *              take only in-neighbours
+ *         \endclist
  * \return Error code:
  *         \clist
- *         \cli IGRAPH_ENOMEM, not enough memory for data structures
- *         \cli IGRAPH_EINVAL, invalid weight vector
+ *         \cli IGRAPH_ENOMEM
+ *              not enough memory for data structures
+ *         \cli IGRAPH_EINVAL
+ *              invalid weight vector
  *         \endclist
  *
  * Time complexity: O(|E|^2 log|E|) for weighted graphs and
@@ -754,7 +793,8 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
  */
 
 int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
-                                    const igraph_vector_t *weights, igraph_bool_t directed)
+                                    const igraph_vector_t *weights,
+                                    igraph_bool_t directed, igraph_neimode_t mode)
 {
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t local_eff;
@@ -766,7 +806,7 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&local_eff, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_local_efficiency(graph, &local_eff, weights, directed));
+    IGRAPH_CHECK(igraph_local_efficiency(graph, &local_eff, weights, directed, mode));
 
     *res = igraph_vector_sum(&local_eff);
     *res /= no_of_nodes;
