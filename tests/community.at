@@ -68,8 +68,8 @@ AT_CLEANUP
 
 AT_SETUP([Label propagation algorithm (igraph_community_label_propagation) :])
 AT_KEYWORDS([community structure label propagation Raghavan Albert Kumara])
-AT_COMPILE_CHECK([simple/igraph_community_label_propagation.c],
-                 [simple/igraph_community_label_propagation.out])
+AT_COMPILE_CHECK([tests/igraph_community_label_propagation.c],
+                 [tests/igraph_community_label_propagation.out])
 AT_CLEANUP
 
 AT_SETUP([Multilevel community detection (igraph_community_multilevel) :])

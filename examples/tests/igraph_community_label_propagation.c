@@ -26,10 +26,12 @@
 
 int main() {
     igraph_t g;
-    igraph_integer_t k;
-    igraph_vector_t membership;
+    igraph_vector_t membership, weights, initial;
+    igraph_vector_bool_t fixed;
+    long int i;
 
-    igraph_rng_seed(igraph_rng_default(), 247);
+    /* label propagation is a stochastic method */
+    igraph_rng_seed(igraph_rng_default(), 765);
 
     /* Zachary Karate club -- this is just a quick smoke test */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -52,16 +54,45 @@ int main() {
                  -1);
 
     igraph_vector_init(&membership, 0);
-    k = 2;
-    igraph_community_fluid_communities(&g, k, &membership,
+    igraph_community_label_propagation(&g, &membership, 0, 0, 0,
                                        /*modularity=*/ 0);
-    if (!igraph_vector_contains(&membership, 0) || !igraph_vector_contains(&membership, 1)) {
-        printf("Resulting graph does not have exactly 2 communities as expected.\n");
-        igraph_vector_print(&membership);
-        return 1;
-    }
 
     igraph_destroy(&g);
+
+    /* Simple star graph to test weights */
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED,
+                 0,  1,  0,  2,  0,  3,  0,  4,  0,  5,
+                 2,  3,  2,  4,  3,  4,  3,  5,  4,  5,  -1);
+    igraph_vector_init_int_end(&weights, -1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 1, -1);
+    igraph_vector_init_int_end(&initial, -1, 0, 0, 1, 1, 1, 1, -1);
+    igraph_vector_bool_init(&fixed, 6);
+    VECTOR(fixed)[3] = 1;
+    VECTOR(fixed)[4] = 1;
+    VECTOR(fixed)[5] = 1;
+    igraph_community_label_propagation(&g, &membership, &weights,
+                                       &initial, &fixed, /*modularity=*/ 0);
+    for (i = 0; i < igraph_vcount(&g); i++)
+        if (VECTOR(membership)[i] != (i < 2 ? 0 : 1)) {
+            return 3;
+        }
+    igraph_community_label_propagation(&g, &membership, 0,
+                                       &initial, &fixed, /*modularity=*/ 0);
+    for (i = 0; i < igraph_vcount(&g); i++)
+        if (VECTOR(membership)[i] != 0) {
+            return 4;
+        }
+
+    /* Check whether it works with no fixed vertices at all
+     * while an initial configuration is given -- see bug
+     * #570902 in Launchpad. This is a simple smoke test only. */
+    igraph_community_label_propagation(&g, &membership, &weights,
+                                       &initial, 0, /*modularity=*/ 0);
+
+    igraph_vector_bool_destroy(&fixed);
+    igraph_vector_destroy(&weights);
+    igraph_vector_destroy(&initial);
+    igraph_destroy(&g);
+
     igraph_vector_destroy(&membership);
 
     return 0;

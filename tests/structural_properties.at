@@ -113,6 +113,12 @@ AT_COMPILE_CHECK([simple/igraph_edge_betweenness.c],
 	         [simple/igraph_edge_betweenness.out])
 AT_CLEANUP
 
+AT_SETUP([Vertex closeness estimate (igraph_closeness): ])
+AT_KEYWORDS([igraph_closeness closeness])
+AT_COMPILE_CHECK([tests/igraph_closeness.c],
+                 [tests/igraph_closeness.out])
+AT_CLEANUP
+
 AT_SETUP([Transitivity (igraph_transitivity): ])
 AT_KEYWORDS([igraph_transitivity transitivity igraph_transitivity_undirected])
 AT_COMPILE_CHECK([simple/igraph_transitivity.c])
