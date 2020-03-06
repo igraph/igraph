@@ -6003,10 +6003,10 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
 
 /**
  * \function igraph_avg_nearest_neighbor_degree
- * Average nearest neighbor degree.
+ * Average neighbor degree.
  *
- * Calculates the average degree of the neighbors for each vertex, and
- * optionally, the same quantity as a function of the vertex degree.
+ * Calculates the average degree of the neighbors for each vertex (\p knn), and
+ * optionally, the same quantity as a function of the vertex degree (\p knnk).
  *
  * </para><para>
  * For isolated vertices \p knn is set to NaN.
@@ -6016,11 +6016,12 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  * </para><para>
  * The weighted version computes a weighted average of the neighbor degrees as
  *
- * <code>k_nn_u = 1/s_u sum_u w_uv k_v</code>,
+ * <code>k_nn_u = 1/s_u sum_v w_uv k_v</code>,
  *
- * where <code>s_u</code> is the sum of the incident edge weights of vertex \c u,
- * i.e. its strength. The sum runs over the neighbors \c v of vertex \c u
- * as indicated by \p mode (with appropriate weights)
+ * where <code>s_u = sum_v w_uv</code> is the sum of the incident edge weights
+ * of vertex \c u, i.e. its strength.
+ * The sum runs over the neighbors \c v of vertex \c u
+ * as indicated by \p mode. <code>w_uv</code> denotes the weighted adjacency matrix
  * and <code>k_v</code> is the neighbors' degree, specified by \p neighbor_degree_mode.
  *
  * </para><para>
@@ -6032,17 +6033,17 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
  *
  * \param graph The input graph. It may be directed.
  * \param vids The vertices for which the calculation is performed.
- * \param mode The type of neihbors to consider in directed graphs.
- *   \c IGRAPH_OUT considers out-neighbours, \c IGRAPH_IN in-neighbours
+ * \param mode The type of neighbors to consider in directed graphs.
+ *   \c IGRAPH_OUT considers out-neighbors, \c IGRAPH_IN in-neighbors
  *   and \c IGRAPH_ALL ignores edge directions.
- * \param neighbor_degree_mode The type of degree to compute in directed graphs.
+ * \param neighbor_degree_mode The type of degree to average in directed graphs.
  *   \c IGRAPH_OUT averages out-degrees, \c IGRAPH_IN averages in-degrees
  *   and \c IGRAPH_ALL ignores edge directions for the degree calculation.
  * \param vids The vertices for which the calculation is performed.
  * \param knn Pointer to an initialized vector, the result will be
  *   stored here. It will be resized as needed. Supply a \c NULL pointer
  *   here, if you only want to calculate \c knnk.
- * \param knnk Pointer to an initialized vector, the average nearest
+ * \param knnk Pointer to an initialized vector, the average
  *   neighbor degree as a function of the vertex degree is stored
  *   here. The first (zeroth) element is for degree one vertices,
  *   etc. Supply a \c NULL pointer here if you don't want to calculate
