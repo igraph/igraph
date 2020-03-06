@@ -702,11 +702,10 @@ static int igraph_i_community_leiden_quality(
  * refined partition, using the non-refined partition to create an initial
  * partition for the aggregate network.
  */
-static int igraph_i_community_leiden(
-        const igraph_t *graph,
-        const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
-        const igraph_real_t resolution_parameter, const igraph_real_t beta,
-        igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
+int igraph_i_community_leiden(const igraph_t *graph,
+                              igraph_vector_t *edge_weights, igraph_vector_t *node_weights,
+                              const igraph_real_t resolution_parameter, const igraph_real_t beta,
+                              igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_integer_t nb_refined_clusters;
     long int i, c, n = igraph_vcount(graph);
     igraph_t *aggregated_graph, *tmp_graph;
@@ -743,7 +742,7 @@ static int igraph_i_community_leiden(
     IGRAPH_FINALLY(igraph_vector_destroy, &refined_membership);
 
     /* Initialize aggregated graph, weights and membership. */
-    aggregated_graph = graph;
+    aggregated_graph = (igraph_t*)graph;
     aggregated_edge_weights = edge_weights;
     aggregated_node_weights = node_weights;
     aggregated_membership = membership;
@@ -807,6 +806,7 @@ static int igraph_i_community_leiden(
              * the actual clustering */
             if (nb_refined_clusters >= igraph_vcount(aggregated_graph)) {
                 igraph_vector_update(&refined_membership, aggregated_membership);
+                nb_refined_clusters = *nb_clusters;
             }
 
             /* Keep track of aggregate node. */
@@ -1048,7 +1048,7 @@ int igraph_community_leiden(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_vector_destroy, i_edge_weights);
         igraph_vector_fill(i_edge_weights, 1);
     } else {
-        i_edge_weights = edge_weights;
+        i_edge_weights = (igraph_vector_t*)edge_weights;
     }
 
     /* Check edge weights to possibly use default */
@@ -1062,7 +1062,7 @@ int igraph_community_leiden(const igraph_t *graph,
         IGRAPH_FINALLY(igraph_vector_destroy, i_node_weights);
         igraph_vector_fill(i_node_weights, 1);
     } else {
-        i_node_weights = node_weights;
+        i_node_weights = (igraph_vector_t*)node_weights;
     }
 
     /* Perform actual Leiden algorithm */
