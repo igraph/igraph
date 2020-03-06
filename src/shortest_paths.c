@@ -406,7 +406,7 @@ static int igraph_i_local_efficiency_unweighted(
         igraph_dqueue_t *q,
         long int *already_counted,
         igraph_vector_t *vertex_neis,
-        igraph_vector_int_t *nei_mask,
+        igraph_vector_char_t *nei_mask,
         igraph_real_t *res,
         igraph_integer_t vertex,
         igraph_neimode_t mode)
@@ -423,7 +423,7 @@ static int igraph_i_local_efficiency_unweighted(
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_size(vertex_neis);
 
-    igraph_vector_int_fill(nei_mask, 0);
+    igraph_vector_char_fill(nei_mask, 0);
     neighbor_count = 0;
     for (i=0; i < vertex_neis_size; ++i) {
         long int v = VECTOR(*vertex_neis)[i];
@@ -497,7 +497,7 @@ static int igraph_i_local_efficiency_dijkstra(
         igraph_lazy_inclist_t *inclist,
         igraph_2wheap_t *Q,
         igraph_vector_t *vertex_neis,
-        igraph_vector_int_t *nei_mask, /* true if the corresponding node is a neighbour of 'vertex' */
+        igraph_vector_char_t *nei_mask, /* true if the corresponding node is a neighbour of 'vertex' */
         igraph_real_t *res,
         igraph_integer_t vertex,
         igraph_neimode_t mode,
@@ -526,7 +526,7 @@ static int igraph_i_local_efficiency_dijkstra(
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_size(vertex_neis);
 
-    igraph_vector_int_fill(nei_mask, 0);
+    igraph_vector_char_fill(nei_mask, 0);
     neighbor_count = 0;
     for (i=0; i < vertex_neis_size; ++i) {
         long int v = VECTOR(*vertex_neis)[i];
@@ -673,7 +673,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
     igraph_vector_t vertex_neis;
-    igraph_vector_int_t nei_mask;
+    igraph_vector_char_t nei_mask;
     long int vertex;
 
     /* 'nei_mask' is a vector indexed by vertices. The meaning of its values is as follows:
@@ -684,7 +684,8 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
      * Marking neighbours of already processed is necessary to avoid processing them more
      * than once in multigraphs.
      */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&nei_mask, no_of_nodes);
+    IGRAPH_CHECK(igraph_vector_char_init(&nei_mask, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_char_destroy, &nei_mask);
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_neis, 0);
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
@@ -748,7 +749,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
     }
 
     igraph_vector_destroy(&vertex_neis);
-    igraph_vector_int_destroy(&nei_mask);
+    igraph_vector_char_destroy(&nei_mask);
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
