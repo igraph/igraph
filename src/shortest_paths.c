@@ -636,6 +636,7 @@ static int igraph_i_local_efficiency_dijkstra(
  *
  * \param graph The graph object.
  * \param res Pointer to an initialized vector, this will contain the result.
+ * \param vids The vertices around which the local efficiency will be calculated.
  * \param weights The edge weights. They must be all non-negative.
  *    If a null pointer is given, all weights are assumed to be 1.
  * \param directed Boolean, whether to consider directed paths.
@@ -667,14 +668,17 @@ static int igraph_i_local_efficiency_dijkstra(
  */
 
 int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
+                            const igraph_vs_t vids,
                             const igraph_vector_t *weights,
                             igraph_bool_t directed, igraph_neimode_t mode)
 {
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
+    long int nodes_to_calc; /* no. of vertices includes in computation */
+    igraph_vit_t vit;
     igraph_vector_t vertex_neis;
     igraph_vector_char_t nei_mask;
-    long int vertex;
+    long int i;
 
     /* 'nei_mask' is a vector indexed by vertices. The meaning of its values is as follows:
      *   0: not a neighbour of 'vertex'
@@ -688,7 +692,12 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
     IGRAPH_FINALLY(igraph_vector_char_destroy, &nei_mask);
     IGRAPH_VECTOR_INIT_FINALLY(&vertex_neis, 0);
 
-    IGRAPH_CHECK(igraph_vector_resize(res, no_of_nodes));
+    IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
+    IGRAPH_FINALLY(igraph_vit_destroy, &vit);
+
+    nodes_to_calc = IGRAPH_VIT_SIZE(vit);
+
+    IGRAPH_CHECK(igraph_vector_resize(res, nodes_to_calc));
 
     if (! weights) /* unweighted case */
     {
@@ -707,11 +716,14 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
 
         IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-        for (vertex=0; vertex < no_of_nodes; ++vertex) {
+        for (IGRAPH_VIT_RESET(vit), i=0;
+             ! IGRAPH_VIT_END(vit);
+             IGRAPH_VIT_NEXT(vit), i++)
+        {
             IGRAPH_CHECK(igraph_i_local_efficiency_unweighted(
                              graph, &adjlist,
                              &q, already_counted, &vertex_neis, &nei_mask,
-                             &(VECTOR(*res)[vertex]), vertex, mode));
+                             &(VECTOR(*res)[i]), IGRAPH_VIT_GET(vit), mode));
         }
 
         igraph_dqueue_destroy(&q);
@@ -736,11 +748,14 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
         IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
 
-        for (vertex=0; vertex < no_of_nodes; ++vertex) {
+        for (IGRAPH_VIT_RESET(vit), i=0;
+             ! IGRAPH_VIT_END(vit);
+             IGRAPH_VIT_NEXT(vit), i++)
+        {
             IGRAPH_CHECK(igraph_i_local_efficiency_dijkstra(
                              graph, &inclist,
                              &Q, &vertex_neis, &nei_mask,
-                             &(VECTOR(*res)[vertex]), vertex, mode, weights));
+                             &(VECTOR(*res)[i]), IGRAPH_VIT_GET(vit), mode, weights));
         }
 
         igraph_2wheap_destroy(&Q);
@@ -748,9 +763,10 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         IGRAPH_FINALLY_CLEAN(2);
     }
 
+    igraph_vit_destroy(&vit);
     igraph_vector_destroy(&vertex_neis);
     igraph_vector_char_destroy(&nei_mask);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
@@ -807,7 +823,7 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
 
     IGRAPH_VECTOR_INIT_FINALLY(&local_eff, no_of_nodes);
 
-    IGRAPH_CHECK(igraph_local_efficiency(graph, &local_eff, weights, directed, mode));
+    IGRAPH_CHECK(igraph_local_efficiency(graph, &local_eff, igraph_vss_all(), weights, directed, mode));
 
     *res = igraph_vector_sum(&local_eff);
     *res /= no_of_nodes;

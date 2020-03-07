@@ -123,6 +123,7 @@ DECLDIR int igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
                                      const igraph_vector_t *weights,
                                      igraph_bool_t directed);
 DECLDIR int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
+                                    const igraph_vs_t vids,
                                     const igraph_vector_t *weights,
                                     igraph_bool_t directed, igraph_neimode_t mode);
 DECLDIR int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
