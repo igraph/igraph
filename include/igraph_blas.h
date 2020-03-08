@@ -21,8 +21,8 @@
 
 */
 
-#ifndef BLAS_H
-#define BLAS_H
+#ifndef IGRAPH_BLAS_H
+#define IGRAPH_BLAS_H
 
 #include "igraph_types.h"
 #include "igraph_vector.h"
