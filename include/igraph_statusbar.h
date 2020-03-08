@@ -21,8 +21,8 @@
 
 */
 
-#ifndef IGRAPH_STATUSBAR
-#define IGRAPH_STATUSBAR
+#ifndef IGRAPH_STATUSBAR_H
+#define IGRAPH_STATUSBAR_H
 
 #include "igraph_decls.h"
 

@@ -21,8 +21,8 @@
 
 */
 
-#ifndef REST_MEMORY_H
-#define REST_MEMORY_H
+#ifndef IGRAPH_MEMORY_H
+#define IGRAPH_MEMORY_H
 
 #include <stdlib.h>
 #include "igraph_decls.h"

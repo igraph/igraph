@@ -1,6 +1,6 @@
 
-#ifndef IGRAPH_LSAP
-#define IGRAPH_LSAP
+#ifndef IGRAPH_LSAP_H
+#define IGRAPH_LSAP_H
 
 #include "igraph_types.h"
 #include "igraph_vector.h"
