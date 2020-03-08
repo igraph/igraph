@@ -61,11 +61,11 @@
 #ifndef IGRAPH_HRG_GRAPH
 #define IGRAPH_HRG_GRAPH
 
-#include <cstdio>
+#include "hrg_rbtree.h"
+
+#include <string>
 #include <cstring>
 #include <cstdlib>
-
-#include "hrg_rbtree.h"
 
 using namespace std;
 

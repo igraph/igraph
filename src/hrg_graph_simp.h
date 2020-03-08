@@ -60,12 +60,11 @@
 #ifndef IGRAPH_HRG_SIMPLEGRAPH
 #define IGRAPH_HRG_SIMPLEGRAPH
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-
 #include "hrg_rbtree.h"
 #include "hrg_dendro.h"
+
+#include <cstring>
+#include <cstdlib>
 
 using namespace std;
 

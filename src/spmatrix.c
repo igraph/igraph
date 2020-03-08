@@ -24,14 +24,11 @@
 
 #include "igraph_types.h"
 #include "igraph_spmatrix.h"
-#include "igraph_memory.h"
-#include "igraph_random.h"
 #include "igraph_error.h"
 #include "config.h"
 
 #include <assert.h>
 #include <string.h>     /* memcpy & co. */
-#include <stdlib.h>
 
 /**
  * \section igraph_spmatrix_constructor_and_destructor Sparse matrix constructors

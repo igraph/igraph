@@ -65,16 +65,14 @@
 #ifndef IGRAPH_HRG_DENDRO
 #define IGRAPH_HRG_DENDRO
 
-#include <iostream>
-#include <fstream>
-#include <cstdio>
-#include <cmath>
-
 #include "hrg_graph.h"
 #include "hrg_rbtree.h"
 #include "hrg_splittree_eq.h"
 
 #include "igraph_hrg.h"
+
+#include <string>
+#include <cmath>
 
 using namespace std;
 using namespace fitHRG;

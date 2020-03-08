@@ -32,14 +32,6 @@
  */
 // This file contains the methods for the parse.h class
 
-#include <string>
-#include <iostream>
-#include <map>
-#include <cstdlib>
-#include <cstdio>
-
-using namespace std;
-
 #include "drl_layout.h"
 #include "drl_parse.h"
 

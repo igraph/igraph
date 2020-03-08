@@ -46,13 +46,6 @@
    -- Tamas Nepusz, 11 July 2013
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <time.h>
-#include <limits.h>
-
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 #include "igraph_vector.h"
@@ -60,6 +53,12 @@
 #include "igraph_memory.h"
 #include "igraph_matrix.h"
 #include "igraph_interrupt_internal.h"
+
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+#include <limits.h>
+
 
 /* define boolean type as char */
 #define true 1

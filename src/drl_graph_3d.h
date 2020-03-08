@@ -37,7 +37,13 @@
 #include "DensityGrid_3d.h"
 #include "igraph_layout.h"
 
+#include <map>
+#include <vector>
+#include <ctime>
+
 namespace drl3d {
+
+using namespace std;
 
 // layout schedule information
 struct layout_schedule {

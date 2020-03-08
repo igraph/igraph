@@ -19,11 +19,10 @@
  *
  *  $Id: bignum.c,v 1.17 2005/07/23 02:55:53 pullmoll Exp $
  ******************************************************************************/
-#include <math.h>
+
 #include "bignum.h"
-#include "config.h"
-#include "math.h"
 #include "igraph_error.h"
+#include "config.h"
 
 #ifndef ASM_X86
     #ifdef  X86

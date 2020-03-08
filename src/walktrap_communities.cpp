@@ -54,12 +54,11 @@
 // see readme.txt for more details
 
 #include "walktrap_communities.h"
-#include <cstdlib>
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-
 #include "config.h"
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
 
 namespace igraph {
 

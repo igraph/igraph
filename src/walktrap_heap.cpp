@@ -54,11 +54,7 @@
 // see readme.txt for more details
 
 #include "walktrap_heap.h"
-#include <cstdlib>
-#include <iostream>
 
-
-using namespace std;
 using namespace igraph::walktrap;
 
 void Neighbor_heap::move_up(int index) {

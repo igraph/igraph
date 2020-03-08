@@ -43,7 +43,7 @@
 #ifndef NETDATATYPES_H
 #define NETDATATYPES_H
 
-#include <string.h>
+#include <cstring>
 
 //###########################################################################################
 

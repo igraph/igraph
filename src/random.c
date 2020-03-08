@@ -23,16 +23,13 @@
 
 #include "igraph_random.h"
 #include "igraph_error.h"
-#include "config.h"
-
-#include <math.h>
-#include <limits.h>
-#include <string.h>
 #include "igraph_math.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_memory.h"
-#include "igraph_matrix.h"
+#include "config.h"
+#include <math.h>
+#include <string.h>
 
 /**
  * \section about_rngs

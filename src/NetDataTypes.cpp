@@ -43,10 +43,9 @@
 #ifdef HAVE_CONFIG_H
     #include <config.h>
 #endif
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
+
 #include "NetDataTypes.h"
+#include <cstring>
 
 //#################################################################################
 //###############################################################################

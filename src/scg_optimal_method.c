@@ -35,12 +35,11 @@
  *    starting from 0.
  */
 
+#include "scg_headers.h"
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "igraph_matrix.h"
 #include "igraph_vector.h"
-
-#include "scg_headers.h"
 
 int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
                                int nt, int matrix, const igraph_real_t *p,

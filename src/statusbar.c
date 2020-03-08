@@ -21,10 +21,10 @@
 
 */
 
-#include "config.h"
 #include "igraph_types.h"
 #include "igraph_statusbar.h"
 #include "igraph_error.h"
+#include "config.h"
 #include <stdio.h>
 #include <stdarg.h>
 

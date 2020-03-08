@@ -23,7 +23,6 @@
 */
 
 #include "igraph_interface.h"
-#include "igraph_structural.h"
 #include "igraph_community.h"
 #include "igraph_error.h"
 #include "igraph_glpk_support.h"
