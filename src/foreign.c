@@ -22,7 +22,6 @@
 */
 
 #include "igraph_foreign.h"
-#include "config.h"
 #include "igraph_math.h"
 #include "igraph_gml_tree.h"
 #include "igraph_memory.h"
@@ -31,6 +30,7 @@
 #include "igraph_interrupt_internal.h"
 #include "igraph_constructors.h"
 #include "igraph_types_internal.h"
+#include "config.h"
 
 #include <ctype.h>      /* isspace */
 #include <string.h>

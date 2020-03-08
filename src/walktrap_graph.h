@@ -57,15 +57,12 @@
 
 #ifndef GRAPH_H
 #define GRAPH_H
-#include <iostream>
 
 #include "igraph_community.h"
 
 namespace igraph {
 
 namespace walktrap {
-
-using namespace std;
 
 class Edge {            // code an edge of a given vertex
 public:

@@ -28,11 +28,8 @@
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_flow.h"
-#include "igraph_flow_internal.h"
 #include "igraph_components.h"
 #include "igraph_structural.h"
-#include "igraph_constructors.h"
-#include "igraph_stack.h"
 #include "igraph_interrupt_internal.h"
 
 static int igraph_i_is_separator(const igraph_t *graph,

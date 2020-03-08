@@ -64,10 +64,9 @@
  *    centers as used in intervals_plus_kmeans.
  */
 
+#include "scg_headers.h"
 #include "igraph_error.h"
 #include "igraph_types.h"
-#include "scg_headers.h"
-#include "igraph_memory.h"
 #include "igraph_vector.h"
 
 int igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, int *gr,

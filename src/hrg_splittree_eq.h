@@ -62,7 +62,7 @@
 #ifndef IGRAPH_HRG_SPLITTREE
 #define IGRAPH_HRG_SPLITTREE
 
-#include <iostream>
+#include <string>
 
 using namespace std;
 

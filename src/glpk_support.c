@@ -30,7 +30,6 @@
 #include "igraph_error.h"
 #include "igraph_interrupt_internal.h"
 #include <glpk.h>
-#include <memory.h>
 #include <stdio.h>
 
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {

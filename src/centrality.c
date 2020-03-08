@@ -22,9 +22,6 @@
 
 */
 
-#include <math.h>
-#include <string.h>    /* memset */
-#include <assert.h>
 #include "igraph_centrality.h"
 #include "igraph_math.h"
 #include "igraph_memory.h"
@@ -41,6 +38,9 @@
 
 #include "bigint.h"
 #include "prpack.h"
+
+#include <math.h>
+#include <string.h>    /* memset */
 
 int igraph_personalized_pagerank_arpack(const igraph_t *graph,
                                         igraph_vector_t *vector,

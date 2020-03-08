@@ -29,8 +29,8 @@
  *    See also Section 5.4.1 (last paragraph) of the above reference.
  */
 
-#include "igraph_memory.h"
 #include "scg_headers.h"
+#include "igraph_memory.h"
 #include <math.h>
 
 int igraph_i_exact_coarse_graining(const igraph_real_t *v,

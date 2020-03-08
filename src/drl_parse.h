@@ -37,7 +37,11 @@
     #include <mpi.h>
 #endif
 
+#include <string>
+
 namespace drl {
+
+using namespace std;
 
 class parse {
 

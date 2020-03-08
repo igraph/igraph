@@ -32,7 +32,6 @@
 #include "igraph_stack.h"
 #include "igraph_vector.h"
 #include "config.h"
-#include <string.h>
 #include <limits.h>
 
 static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,

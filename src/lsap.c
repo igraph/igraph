@@ -7,7 +7,6 @@
 #include <math.h>
 #include <limits.h>     /* INT_MAX */
 #include <float.h>      /* DBL_MAX */
-#include <assert.h>
 #include <time.h>
 
 /* constants used for improving readability of code */

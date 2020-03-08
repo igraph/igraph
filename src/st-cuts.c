@@ -28,18 +28,16 @@
 #include "igraph_constants.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
-#include "igraph_conversion.h"
 #include "igraph_constructors.h"
 #include "igraph_structural.h"
 #include "igraph_components.h"
-#include "igraph_types_internal.h"
-#include "config.h"
 #include "igraph_math.h"
 #include "igraph_dqueue.h"
 #include "igraph_visitor.h"
 #include "igraph_marked_queue.h"
 #include "igraph_stack.h"
 #include "igraph_estack.h"
+#include "config.h"
 
 /*
  * \function igraph_even_tarjan_reduction

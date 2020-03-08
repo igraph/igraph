@@ -22,7 +22,6 @@
 
 */
 
-#include "config.h"
 #include "igraph_centrality.h"
 #include "igraph_components.h"
 #include "igraph_constants.h"
@@ -34,6 +33,7 @@
 #include "igraph_memory.h"
 #include "igraph_structural.h"
 #include "igraph_types.h"
+#include "config.h"
 
 #include <limits.h>
 

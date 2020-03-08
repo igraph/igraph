@@ -59,7 +59,6 @@
 
 #include "walktrap_graph.h"
 #include "walktrap_heap.h"
-
 #include "igraph_community.h"
 #include "config.h"
 

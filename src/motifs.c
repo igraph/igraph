@@ -28,11 +28,8 @@
 #include "igraph_interrupt_internal.h"
 #include "igraph_interface.h"
 #include "igraph_nongraph.h"
-#include "igraph_structural.h"
 #include "igraph_stack.h"
 #include "config.h"
-
-#include <string.h>
 
 extern unsigned int igraph_i_isoclass_3[];
 extern unsigned int igraph_i_isoclass_4[];
