@@ -31,6 +31,7 @@
 #include "igraph_stack.h"
 #include "config.h"
 
+/* TODO create header for these functions: */
 extern unsigned int igraph_i_isoclass_3[];
 extern unsigned int igraph_i_isoclass_4[];
 extern unsigned int igraph_i_isoclass_3u[];
