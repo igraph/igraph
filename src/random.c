@@ -510,7 +510,7 @@ IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = {
  *
  * \param rng The random number generator to use as default from now
  *    on. Calling \ref igraph_rng_destroy() on it, while it is still
- *    being used as the default will result craches and/or
+ *    being used as the default will result crashes and/or
  *    unpredictable results.
  *
  * Time complexity: O(1).

@@ -112,7 +112,7 @@ __BEGIN_DECLS
  * function of type \ref igraph_error_handler_t and calling
  * \ref igraph_set_error_handler(). This feature is useful for interface
  * writers, as \a igraph will have the chance to
- * signal errors the appropriate way, eg. the R interface defines an
+ * signal errors the appropriate way, e.g. the R interface defines an
  * error handler which calls the <function>error()</function>
  * function, as required by R, while the Python interface has an error
  * handler which raises an exception according to the Python way.
@@ -268,7 +268,7 @@ DECLDIR igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t*
  * \enumval IGRAPH_ENOMEM There wasn't enough memory to allocate
  *    on the heap.
  * \enumval IGRAPH_PARSEERROR A parse error was found in a file.
- * \enumval IGRAPH_EINVAL A parameter's value is invalid. Eg. negative
+ * \enumval IGRAPH_EINVAL A parameter's value is invalid. E.g. negative
  *    number was specified as the number of vertices.
  * \enumval IGRAPH_EXISTS A graph/vertex/edge attribute is already
  *    installed with the given name.
@@ -278,7 +278,7 @@ DECLDIR igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t*
  * \enumval IGRAPH_NONSQUARE A non-square matrix was received while a
  *    square matrix was expected.
  * \enumval IGRAPH_EINVMODE Invalid mode parameter.
- * \enumval IGRAPH_EFILE A file operation failed. Eg. a file doesn't exist,
+ * \enumval IGRAPH_EFILE A file operation failed. E.g. a file doesn't exist,
  *   or the user has no rights to open it.
  * \enumval IGRAPH_UNIMPLEMENTED Attempted to call an unimplemented or
  *   disabled (at compile-time) function.
@@ -408,7 +408,7 @@ typedef enum {
  * \ref igraph_error() directly.
  * \param reason Textual description of the error. This should be
  *   something more descriptive than the text associated with the error
- *   code. Eg. if the error code is \c IGRAPH_EINVAL,
+ *   code. E.g. if the error code is \c IGRAPH_EINVAL,
  *   its associated text (see  \ref igraph_strerror()) is "Invalid
  *   value" and this string should explain which parameter was invalid
  *   and maybe why.
@@ -448,7 +448,7 @@ DECLDIR int igraph_error(const char *reason, const char *file, int line,
  * \brief Trigger an error, printf-like version.
  *
  * \param reason Textual description of the error, interpreted as
- *               a printf format string.
+ *               a \c printf format string.
  * \param file The source file in which the error was noticed.
  * \param line The line in the source file which triggered the error.
  * \param igraph_errno The \a igraph error code.
@@ -596,7 +596,7 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  * igraph_error_handler_printignore), and the \a igraph function
  * signalling the error is called from another \a igraph function
  * then we need to make sure that the error is propagated back to
- * the auxiliary (ie. non-igraph) calling function. This is achieved
+ * the auxiliary (i.e. non-igraph) calling function. This is achieved
  * by using <function>IGRAPH_CHECK</function> on every \a igraph
  * call which can return an error code.
  */

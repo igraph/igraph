@@ -2064,7 +2064,7 @@ int FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *
  * \param v The input vector.
  * \param i Index of the first element.
  * \param j Index of the second element (may be the same as the
- * first one.)
+ * first one).
  * \return Error code, currently always \c IGRAPH_SUCCESS.
  *
  * Time complexity: O(1).

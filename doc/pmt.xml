@@ -9,7 +9,7 @@
 <para>
 Some of the container types listed in this section are defined for
 many base types. This is similar to templates in C++ and generics in
-Ada, but it is implemented via precompiler macros since the C language
+Ada, but it is implemented via preprocessor macros since the C language
 cannot handle it. Here is the list of template types and the all base
 types they currently support:
 <glosslist>
@@ -59,8 +59,8 @@ types they currently support:
 </para>
 
 <para>
-The name of the base element (in parens) is added to the function
-names, except for te default type.
+The name of the base element (in parentheses) is added to the function
+names, except for the default type.
 </para>
 
 <para>
