@@ -44,7 +44,7 @@ type. Fourth, the <link
 linkend="igraph_erdos_renyi_game"><function>igraph_erdos_renyi_game()</function></link>
 creates a graph and <link
 linkend="igraph_destroy"><function>igraph_destroy()</function></link>
-destroys it, ie. deallocates the memory associated to it.
+destroys it, i.e. deallocates the memory associated to it.
 </para>
 
 <para>
@@ -112,7 +112,7 @@ generators. Stochastic (i.e. randomized) graph generators are called
 <command>igraph</command> can handle directed and undirected graphs. Most graph
 generators are able to create both types of graphs and most other
 functions are usually also capable of handling
-both. Eg. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
+both. E.g. <link linkend="igraph_shortest_paths"><function>igraph_shortest_paths()</function></link>
 which (surprisingly) calculates
 shortest paths from a vertex to other vertices can calculate
 directed or undirected paths.
@@ -182,7 +182,7 @@ needed any more by calling
 on them. A vector can be indexed by the 
 <link linkend="VECTOR"><function>VECTOR()</function></link> function
 (right now it is a macro). Vectors 
-can be resized, eg. most <command>igraph</command> functions returning the result in a
+can be resized, e.g. most <command>igraph</command> functions returning the result in a
 vector resize it to the size of the result.
 </para>
 
@@ -219,7 +219,7 @@ between the same pair of vertices.
 <type>igraph_t</type> can of course
 represent loops and
 multiple edges, although some routines expect simple graphs,
-ie. graphs without loop and multiple edges, because for example some
+i.e. graphs without loop and multiple edges, because for example some
 structural properties are ill-defined for non-simple graphs. Loop
 edges can be removed by calling 
 <link linkend="igraph_simplify"><function>igraph_simplify()</function></link>.
