@@ -2,7 +2,7 @@
 /*
  * This file contains the graph handling routines.
  *
- * Copyright (C) 2002 Sampo Niskanen, Patric Östergård.
+ * Copyright (C) 2002 Sampo Niskanen, Patric Ã–stergÃ¥rd.
  * Licensed under the GNU GPL, read the file LICENSE for details.
  */
 

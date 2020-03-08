@@ -21,7 +21,7 @@
 
 */
 
-/* The original version of this file was written by Jörg Reichardt
+/* The original version of this file was written by JÃ¶rg Reichardt
    This file was modified by Vincent Traag
    The original copyright notice follows here */
 
