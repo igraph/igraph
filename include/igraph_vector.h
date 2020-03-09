@@ -28,14 +28,6 @@
 #include "igraph_types.h"
 #include "igraph_complex.h"
 
-#ifdef HAVE_STDINT_H
-    #include <stdint.h>
-#else
-    #if defined(HAVE_SYS_INT_TYPES_H) && HAVE_SYS_INT_TYPES_H
-        #include <sys/int_types.h>    /* for Solaris */
-    #endif
-#endif
-
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
