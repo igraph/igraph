@@ -2,7 +2,7 @@
 #include "igraph_lsap.h"
 #include "igraph_error.h"
 
-#include <stdio.h>
+/* #include <stdio.h> */
 #include <stdlib.h>
 #include <math.h>
 #include <limits.h>     /* INT_MAX */
@@ -50,13 +50,13 @@ static int     ap_datamatrix(AP *p, double **m);
 static int     ap_iterations(AP *p);
 static int     ap_hungarian(AP *p);
 static double  ap_mincost(AP *p);
-static void    ap_print_solution(AP *p);
-static void    ap_show_data(AP *p);
+/* static void    ap_print_solution(AP *p); */
+/* static void    ap_show_data(AP *p); */
 static int     ap_size(AP *p);
 static int     ap_time(AP *p);
 
 /* error reporting */
-static void ap_error(char *message);
+/* static void ap_error(char *message); */
 
 /* private functions */
 static void    preprocess(AP *p);
