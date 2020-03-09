@@ -66,8 +66,6 @@
 #include <cstring>
 #include <cstdlib>
 
-using namespace std;
-
 namespace fitHRG {
 
 // ******** Basic Structures *********************************************
@@ -88,7 +86,7 @@ public:
 #define IGRAPH_HRG_SIMPLEVERT
 class simpleVert {
 public:
-    string name;          // (external) name of vertex
+    std::string name;          // (external) name of vertex
     int degree;           // degree of this vertex
     int group_true;       // index of vertex's true group
 
@@ -128,7 +126,7 @@ public:
     // returns group label of vertex i
     int getGroupLabel(const int);
     // returns name of vertex i
-    string getName(const int);
+    std::string getName(const int);
     // returns edge list of vertex i
     simpleEdge* getNeighborList(const int);
     // return pointer to a node
@@ -140,7 +138,7 @@ public:
     // returns n
     int getNumNodes();
     // set name of vertex i
-    bool setName(const int, const string);
+    bool setName(const int, const std::string);
 
 private:
     simpleVert* nodes;        // list of nodes

@@ -28,8 +28,8 @@
 // See the header file random.h for a description of the contents of this
 // file as well as references and credits.
 
-#include <cmath>
 #include "gengraph_random.h"
+#include <cmath>
 
 using namespace std;
 using namespace KW_RNG;

@@ -24,6 +24,8 @@
 
 #include "infomap_Node.h"
 
+using namespace std;
+
 Node::Node() {
     exit = 0.0;
     size = 0.0;
