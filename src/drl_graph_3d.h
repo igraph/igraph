@@ -43,8 +43,6 @@
 
 namespace drl3d {
 
-using namespace std;
-
 // layout schedule information
 struct layout_schedule {
     int iterations;
@@ -79,8 +77,8 @@ private:
     void update_nodes ( );
     float Compute_Node_Energy ( int node_ind );
     void Solve_Analytic ( int node_ind, float &pos_x, float &pos_y, float &pos_z );
-    void get_positions ( vector<int> &node_indices, float return_positions[3 * MAX_PROCS] );
-    void update_density ( vector<int> &node_indices,
+    void get_positions ( std::vector<int> &node_indices, float return_positions[3 * MAX_PROCS] );
+    void update_density ( std::vector<int> &node_indices,
                           float old_positions[3 * MAX_PROCS],
                           float new_positions[3 * MAX_PROCS] );
     void update_node_pos ( int node_ind,
@@ -93,11 +91,11 @@ private:
     // graph decomposition information
     int num_nodes;                  // number of nodes in graph
     float highest_sim;              // highest sim for normalization
-    map <int, int> id_catalog;      // id_catalog[file id] = internal id
-    map <int, map <int, float> > neighbors;     // neighbors of nodes on this proc.
+    std::map <int, int> id_catalog;      // id_catalog[file id] = internal id
+    std::map <int, std::map <int, float> > neighbors;     // neighbors of nodes on this proc.
 
     // graph layout information
-    vector<Node> positions;
+    std::vector<Node> positions;
     DensityGrid density_server;
 
     // original VxOrd information

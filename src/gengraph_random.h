@@ -22,8 +22,6 @@
 #define RNG_H
 
 #include "igraph_random.h"
-#include <iostream>
-using namespace std;
 
 namespace KW_RNG {
 

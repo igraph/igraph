@@ -41,6 +41,7 @@
 #include "igraph_constructors.h"
 #include "igraph_random.h"
 
+using namespace std;
 using namespace fitHRG;
 
 // ******** Red-Black Tree Methods ***************************************
