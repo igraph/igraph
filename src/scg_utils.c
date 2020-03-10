@@ -27,10 +27,9 @@
  *    functions used throughout the SCGlib.
  */
 
+#include "scg_headers.h"
 #include "igraph_error.h"
 #include "igraph_memory.h"
-
-#include "scg_headers.h"
 
 /*to be used with qsort and struct ind_val arrays */
 int igraph_i_compare_ind_val(const void *a, const void *b) {

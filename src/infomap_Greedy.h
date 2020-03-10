@@ -69,16 +69,16 @@ public:
     double alpha, beta;
     // local copy of fgraph alpha, beta (=alpha -  Nnode = graph->Nnode;1)
 
-    vector<int> node_index;  // module number of each node
+    std::vector<int> node_index;  // module number of each node
 
     int Nempty;
-    vector<int> mod_empty;
+    std::vector<int> mod_empty;
 
-    vector<double> mod_exit;  // version tmp de node
-    vector<double> mod_size;
-    vector<double> mod_danglingSize;
-    vector<double> mod_teleportWeight;
-    vector<int> mod_members;
+    std::vector<double> mod_exit;  // version tmp de node
+    std::vector<double> mod_size;
+    std::vector<double> mod_danglingSize;
+    std::vector<double> mod_teleportWeight;
+    std::vector<int> mod_members;
 };
 
 void delete_Greedy(Greedy *greedy);

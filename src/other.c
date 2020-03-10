@@ -23,15 +23,11 @@
 
 #include "igraph_nongraph.h"
 #include "igraph_types.h"
-#include "igraph_memory.h"
 #include "igraph_interrupt_internal.h"
-#include "igraph_types_internal.h"
 #include "config.h"
 #include "plfit/error.h"
 #include "plfit/plfit.h"
 #include <math.h>
-#include <stdarg.h>
-#include <string.h>
 
 /**
  * \ingroup nongraph

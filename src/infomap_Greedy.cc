@@ -26,6 +26,8 @@
 #include <iterator>
 #define plogp( x ) ( (x) > 0.0 ? (x)*log(x) : 0.0 )
 
+using namespace std;
+
 Greedy::Greedy(FlowGraph * fgraph) {
     graph = fgraph;
     Nnode = graph->Nnode;

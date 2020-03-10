@@ -44,7 +44,6 @@
 #include "config.h"
 #include <math.h>
 #include "igraph_math.h"
-#include <stdio.h> /* FIXME */
 
 
 /**

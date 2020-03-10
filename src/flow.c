@@ -33,15 +33,12 @@
 #include "igraph_structural.h"
 #include "igraph_components.h"
 #include "igraph_types_internal.h"
-#include "config.h"
 #include "igraph_math.h"
 #include "igraph_dqueue.h"
-#include "igraph_visitor.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_topology.h"
+#include "config.h"
 
-#include <limits.h>
-#include <stdio.h>
 
 /*
  * Some general remarks about the functions in this file.

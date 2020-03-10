@@ -21,7 +21,7 @@
 
 */
 
-/* The original version of this file was written by Jörg Reichardt
+/* The original version of this file was written by JÃ¶rg Reichardt
    This file was modified by Vincent Traag
    The original copyright notice follows here */
 
@@ -42,18 +42,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <cmath>
 #include "pottsmodel_2.h"
 #include "NetRoutines.h"
-
-using namespace std;
 
 #include "igraph_random.h"
 #include "igraph_interrupt_internal.h"
 #include "config.h"
+
+#include <cstring>
+#include <cmath>
+
+using namespace std;
 
 //#################################################################################################
 PottsModel::PottsModel(network *n, unsigned int qvalue, int m) : acceptance(0) {

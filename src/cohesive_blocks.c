@@ -27,7 +27,6 @@
 #include "igraph_flow.h"
 #include "igraph_separators.h"
 #include "igraph_structural.h"
-#include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_constructors.h"
 #include "igraph_interrupt_internal.h"

@@ -43,7 +43,7 @@
  * \param start The start vertex for the walk.
  * \param steps The number of steps to take. If the random walk gets
  *   stuck, then the \p stuck argument specifies what happens.
- * \param mode How to walk along the edges in direted graphs.
+ * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
  *   edge directions. This argument is ignored for undirected graphs.
@@ -142,7 +142,7 @@ static void vec_destr(igraph_vector_t *vec) {
  * \param start The start vertex for the walk.
  * \param steps The number of steps to take. If the random walk gets
  *   stuck, then the \p stuck argument specifies what happens.
- * \param mode How to walk along the edges in direted graphs.
+ * \param mode How to walk along the edges in directed graphs.
  *   \c IGRAPH_OUT means following edge directions, \c IGRAPH_IN means
  *   going opposite the edge directions, \c IGRAPH_ALL means ignoring
  *   edge directions. This argument is ignored for undirected graphs.

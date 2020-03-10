@@ -26,6 +26,8 @@
 
 #define plogp( x ) ( (x) > 0.0 ? (x)*log(x) : 0.0 )
 
+using namespace std;
+
 void FlowGraph::init(int n, const igraph_vector_t *v_weights) {
     alpha = 0.15;
     beta  = 1.0 - alpha;

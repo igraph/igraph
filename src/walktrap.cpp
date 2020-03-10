@@ -55,18 +55,12 @@
 
 #include "walktrap_graph.h"
 #include "walktrap_communities.h"
-#include <ctime>
-#include <set>
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
 
 #include "igraph_community.h"
 #include "igraph_components.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt_internal.h"
 
-using namespace std;
 using namespace igraph::walktrap;
 
 /**

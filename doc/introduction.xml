@@ -20,7 +20,7 @@ or the index of this book to get an impression of what is available.</para>
 Second, igraph provides a platform for developing and/or
 implementing graph algorithms. It has an efficient data structure
 for representing graphs, and a number of other data structures like
-flexible vectors, stacks, heaps, queues, adjacency lists that are useful for implementing graph algorthms. In fact these data structures evolved along with the
+flexible vectors, stacks, heaps, queues, adjacency lists that are useful for implementing graph algorithms. In fact these data structures evolved along with the
 implementation of the classic and non-classic graph algorithms which
 make up the major part of the igraph library. This way, they were fine-tuned
 and checked for correctness several times.

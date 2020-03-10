@@ -22,9 +22,6 @@
 
 */
 
-#include <math.h>
-#include <string.h>    /* memset */
-#include <assert.h>
 #include "igraph_centrality.h"
 #include "igraph_math.h"
 #include "igraph_memory.h"
@@ -41,6 +38,9 @@
 
 #include "bigint.h"
 #include "prpack.h"
+
+#include <math.h>
+#include <string.h>    /* memset */
 
 int igraph_personalized_pagerank_arpack(const igraph_t *graph,
                                         igraph_vector_t *vector,
@@ -2520,8 +2520,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        closeness centrality scores for the given vertices.
- * \param vids Vector giving the vertices for which the closeness
- *        centrality scores will be computed.
+ * \param vids The vertices for which the closeness centrality will be computed.
  * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist
@@ -2729,8 +2728,7 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        closeness centrality scores for the given vertices.
- * \param vids Vector giving the vertices for which the closeness
- *        centrality scores will be computed.
+ * \param vids The vertices for which the closeness centrality will be estimated.
  * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
  *        \clist

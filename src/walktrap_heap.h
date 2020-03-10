@@ -53,8 +53,8 @@
 //-----------------------------------------------------------------------------
 // see readme.txt for more details
 
-#ifndef HEAP_H
-#define HEAP_H
+#ifndef WALKTRAP_HEAP_H
+#define WALKTRAP_HEAP_H
 
 namespace igraph {
 
@@ -130,5 +130,5 @@ public:
 }
 }        /* end of namespaces */
 
-#endif
+#endif // WALKTRAP_HEAP_H
 

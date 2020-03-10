@@ -45,12 +45,7 @@
 // 5/6/2005
 
 // C++ library routines
-#include <iostream>
-#include <fstream>
 #include <map>
-#include <set>
-#include <string>
-#include <deque>
 #include <vector>
 
 using namespace std;

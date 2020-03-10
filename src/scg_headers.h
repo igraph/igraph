@@ -55,11 +55,11 @@
 #ifndef SCG_HEADERS_H
 #define SCG_HEADERS_H
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "igraph_types.h"
 #include "igraph_vector.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 typedef struct ind_val {
     int ind;

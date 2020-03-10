@@ -23,7 +23,6 @@
 
 #include "igraph_cliques.h"
 #include "igraph_memory.h"
-#include "igraph_random.h"
 #include "igraph_constants.h"
 #include "igraph_adjlist.h"
 #include "igraph_interrupt_internal.h"

@@ -33,17 +33,14 @@
 // This file contains the member definitions of the DensityGrid.h class
 // This code is modified from the original code by B.N. Wylie
 
-#include <string>
-#include <deque>
-#include <iostream>
-#include <cmath>
-#include <cstdlib>
-
-using namespace std;
-
 #include "drl_Node_3d.h"
 #include "DensityGrid_3d.h"
 #include "igraph_error.h"
+
+#include <deque>
+#include <cmath>
+
+using namespace std;
 
 #define GET_BIN(z, y, x) (Bins[(z*GRID_SIZE+y)*GRID_SIZE+x])
 

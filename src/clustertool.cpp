@@ -45,11 +45,6 @@
     #include <config.h>
 #endif
 
-#include <iostream>
-#include <cstdlib>
-#include <cstdio>
-#include <ctime>
-
 #include "NetDataTypes.h"
 #include "NetRoutines.h"
 #include "pottsmodel_2.h"

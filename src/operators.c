@@ -31,8 +31,8 @@
 #include "igraph_attributes.h"
 #include "igraph_conversion.h"
 #include "igraph_qsort.h"
-#include <limits.h>
 #include "config.h"
+#include <limits.h>
 
 /**
  * \function igraph_disjoint_union

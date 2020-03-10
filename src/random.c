@@ -23,16 +23,13 @@
 
 #include "igraph_random.h"
 #include "igraph_error.h"
-#include "config.h"
-
-#include <math.h>
-#include <limits.h>
-#include <string.h>
 #include "igraph_math.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_memory.h"
-#include "igraph_matrix.h"
+#include "config.h"
+#include <math.h>
+#include <string.h>
 
 /**
  * \section about_rngs
@@ -513,7 +510,7 @@ IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = {
  *
  * \param rng The random number generator to use as default from now
  *    on. Calling \ref igraph_rng_destroy() on it, while it is still
- *    being used as the default will result craches and/or
+ *    being used as the default will result crashes and/or
  *    unpredictable results.
  *
  * Time complexity: O(1).

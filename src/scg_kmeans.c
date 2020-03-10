@@ -31,8 +31,6 @@
  *    See also Section 5.3.3 of the above reference.
  */
 
-#include "igraph_memory.h"
-
 #include "scg_headers.h"
 
 int igraph_i_kmeans_Lloyd(const igraph_vector_t *x, int n, int p,

@@ -235,18 +235,10 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
                 }
             }
 
-            if (times_v) {
-                igraph_vector_push_back(times_v, tt + igraph_vector_tail(times_v));
-            }
-            if (no_s_v)  {
-                igraph_vector_int_push_back(no_s_v, ns);
-            }
-            if (no_i_v)  {
-                igraph_vector_int_push_back(no_i_v, ni);
-            }
-            if (no_r_v)  {
-                igraph_vector_int_push_back(no_r_v, nr);
-            }
+            igraph_vector_push_back(times_v, tt + igraph_vector_tail(times_v));
+            igraph_vector_int_push_back(no_s_v, ns);
+            igraph_vector_int_push_back(no_i_v, ni);
+            igraph_vector_int_push_back(no_r_v, nr);
 
         } /* psum > 0 */
 
