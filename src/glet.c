@@ -583,11 +583,12 @@ int igraph_graphlets_candidate_basis(const igraph_t *graph,
     return 0;
 }
 
-static int igraph_i_graphlets_project(const igraph_t *graph,
-                                      const igraph_vector_t *weights,
-                                      const igraph_vector_ptr_t *cliques,
-                                      igraph_vector_t *Mu, igraph_bool_t startMu,
-                                      int niter, int vid1) {
+/* TODO: not made static because it is used by the R interface */
+int igraph_i_graphlets_project(const igraph_t *graph,
+                               const igraph_vector_t *weights,
+                               const igraph_vector_ptr_t *cliques,
+                               igraph_vector_t *Mu, igraph_bool_t startMu,
+                               int niter, int vid1) {
 
     int no_of_nodes = igraph_vcount(graph);
     int no_of_edges = igraph_ecount(graph);
