@@ -6,6 +6,14 @@
 
 ### Changed
 
+### Fixed
+
+### Other
+
+## [0.8.1] - 2020-03-13
+
+### Changed
+
  - Improved interruptability: `igraph_degree_sequence_game()`
  - Improved argument checking: `igraph_forest_fire_game()`
  - Updated the plfit library to version 0.8.1
