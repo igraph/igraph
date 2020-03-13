@@ -14,7 +14,8 @@ EXTRA_DIST = igraph.pc IGRAPH_VERSION $(top_srcdir)/include/* $(DOC_FILES) examp
 	$(wildcard $(top_srcdir)/optional/glpk/amd/{README,COPYING}) \
 	$(wildcard $(top_srcdir)/optional/glpk/colamd/*.{c,h}) \
 	$(wildcard $(top_srcdir)/optional/glpk/colamd/{README,COPYING}) \
-	tests/testsuite
+	tests/testsuite \
+	ACKNOWLEDGEMENTS.md CHANGELOG.md
 
 tests/testsuite:
 	cd tests && make testsuite
