@@ -106,7 +106,7 @@
 #elif defined (BLAS_NO_UNDERSCORE)
 
 #define BLAS_DTRSV igraphdtrsv
-#define BLAS_DGEMV igraphdgemv
+#define BLAS_DGEMV igraphxdgemv
 #define BLAS_DTRSM igraphdtrsm
 #define BLAS_DGEMM igraphdgemm
 #define BLAS_DSYRK igraphdsyrk
@@ -126,7 +126,7 @@
 #else
 
 #define BLAS_DTRSV igraphdtrsv_
-#define BLAS_DGEMV igraphdgemv_
+#define BLAS_DGEMV igraphxdgemv /* this is a macro */
 #define BLAS_DTRSM igraphdtrsm_
 #define BLAS_DGEMM igraphdgemm_
 #define BLAS_DSYRK igraphdsyrk_
@@ -172,7 +172,7 @@
 /* === BLAS and LAPACK prototypes and macros ================================ */
 /* ========================================================================== */
 
-int BLAS_DGEMV (char *trans, BLAS_INT *m, BLAS_INT *n, double *alpha,
+void BLAS_DGEMV (char *trans, BLAS_INT *m, BLAS_INT *n, double *alpha,
 	double *A, BLAS_INT *lda, double *X, BLAS_INT *incx, double *beta,
 	double *Y, BLAS_INT *incy) ;
 

@@ -1,23 +1,23 @@
 /* -*- mode: C -*-  */
 /* vim:set ts=2 sw=2 sts=2 et: */
-/* 
+/*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -52,9 +52,25 @@
 #define igraphdnrm2_    dnrm2_
 #endif
 
-int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
+#ifdef HAVE_GFORTRAN
+
+#define igraphxdgemv(trans,m,n,alpha,a,lda,x,incx,beta,y,incy) \
+  igraphdgemv_(trans,m,n,alpha,a,lda,x,incx,beta,y,incy,1)
+
+void igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
+    igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
+    igraph_real_t *beta, igraph_real_t *y, int *incy,
+    long int trans_len);
+
+#else
+
+#define igraphxdgemv igraphdgemv_
+
+void igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
     igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
     igraph_real_t *beta, igraph_real_t *y, int *incy);
+
+#endif
 
 int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
     double *alpha, double *a, int *lda, double *b, int *ldb,

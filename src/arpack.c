@@ -22,8 +22,8 @@
 
 */
 
-#include "igraph_arpack.h"
 #include "igraph_arpack_internal.h"
+#include "igraph_arpack.h"
 #include "igraph_memory.h"
 
 #include <math.h>
@@ -602,7 +602,7 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
   IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
   IGRAPH_FINALLY(igraph_vector_destroy, &order);
 #ifdef HAVE_GFORTRAN
-  igraphdsortr_(sort, &apply, &nconv, d, VECTOR(order), /*which_len=*/ 2);
+  igraphxdsortr_(sort, &apply, &nconv, d, VECTOR(order), /*which_len=*/ 2);
 #else
   igraphdsortr_(sort, &apply, &nconv, d, VECTOR(order));
 #endif
@@ -689,7 +689,7 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
   IGRAPH_CHECK(igraph_vector_init_seq(&order, 0, nconv-1));
   IGRAPH_FINALLY(igraph_vector_destroy, &order);
 #ifdef HAVE_GFORTRAN
-  igraphdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order), /*which_len=*/ 2);
+  igraphxdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order), /*which_len=*/ 2);
 #else
   igraphdsortc_(sort, &apply, &nconv, dr, di, VECTOR(order));
 #endif
@@ -946,7 +946,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
   
   options->ierr=0;
 #ifdef HAVE_GFORTRAN
-  igraphdseupd_(&rvec, all, select, d, v, &options->ldv,
+  igraphxdseupd_(&rvec, all, select, d, v, &options->ldv,
 		&options->sigma, options->bmat, &options->n,
 		options->which, &options->nev, &options->tol,
 		resid, &options->ncv, v, &options->ldv, options->iparam,
@@ -1176,7 +1176,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
   options->ierr=0;
 #ifdef HAVE_GFORTRAN
-  igraphdneupd_(&rvec, all, select, dr, di, v, &options->ldv,
+  igraphxdneupd_(&rvec, all, select, dr, di, v, &options->ldv,
 		&options->sigma, &options->sigmai, workev, options->bmat,
 		&options->n, options->which, &options->nev, &options->tol,
 		resid, &options->ncv, v, &options->ldv, options->iparam,

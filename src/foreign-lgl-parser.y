@@ -57,13 +57,14 @@
 #include "foreign-lgl-parser.h"
 
 #define yyscan_t void*
+#define yy_size_t size_t
 
 int igraph_lgl_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, 
 		     void* scanner);
 int igraph_lgl_yyerror(YYLTYPE* locp, igraph_i_lgl_parsedata_t *context, 
 		       const char *s);
 char *igraph_lgl_yyget_text (yyscan_t yyscanner );
-int igraph_lgl_yyget_leng (yyscan_t yyscanner );
+yy_size_t igraph_lgl_yyget_leng (yyscan_t yyscanner );
 igraph_real_t igraph_lgl_get_number(const char *str, long int len);
 
 #define scanner context->scanner

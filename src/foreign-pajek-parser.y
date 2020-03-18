@@ -59,6 +59,7 @@
 #include "foreign-pajek-parser.h"
 
 #define yyscan_t void*
+#define yy_size_t size_t
 
 int igraph_pajek_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, 
 		       void* scanner);
@@ -66,7 +67,7 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
 			 igraph_i_pajek_parsedata_t *context, 
 			 const char *s);
 char *igraph_pajek_yyget_text (yyscan_t yyscanner );
-int igraph_pajek_yyget_leng (yyscan_t yyscanner );
+yy_size_t igraph_pajek_yyget_leng (yyscan_t yyscanner );
 
 int igraph_i_pajek_add_string_vertex_attribute(const char *name, 
 					       const char *value,
