@@ -88,7 +88,7 @@ void graph_resize(graph_t *g, int size) {
 	/* Free/alloc extra edge-sets */
 	for (i=size; i < g->n; i++)
 		set_free(g->edges[i]);
-	g->edges=realloc(g->edges, size * sizeof(set_t));
+	g->edges=realloc((void*)(g->edges), size * sizeof(set_t));
 	for (i=g->n; i < size; i++)
 		g->edges[i]=set_new(size);
 
@@ -98,7 +98,7 @@ void graph_resize(graph_t *g, int size) {
 	}
 
 	/* Weights */
-	g->weights=realloc(g->weights,size * sizeof(int));
+	g->weights=realloc((void*)(g->weights),size * sizeof(int));
 	for (i=g->n; i<size; i++)
 		g->weights[i]=1;
 	
@@ -244,7 +244,7 @@ boolean graph_write_dimacs_binary_file(graph_t *g, char *comment, char *file) {
 #define STR_APPEND(s) \
 if (headerlength+strlen(s) >= headersize) {  \
 	headersize+=1024;                    \
-	header=realloc(header,headersize);   \
+	header=realloc((void*)header,headersize);       \
 }                                            \
 strncat(header,s,1000);                      \
 headerlength+=strlen(s);

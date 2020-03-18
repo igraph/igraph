@@ -174,10 +174,10 @@ AP *ap_read_problem(char *file)
     while(EOF != (i = fscanf(f, "%lf", &x))){
 	if(i == 1){
 	    if(n == 0){
-		t = (double **) realloc(t,(m + 1) * sizeof(double *));
+              t = (double **) realloc((void*)t,(m + 1) * sizeof(double *));
 		t[m] = (double *) malloc(sizeof(double));
 	    }else
-		t[m] = (double *) realloc(t[m], (n + 1) * sizeof(double));
+              t[m] = (double *) realloc((void*)(t[m]), (n + 1) * sizeof(double));
 	    
 	    t[m][n++] = x;
 	    

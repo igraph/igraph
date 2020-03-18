@@ -2696,7 +2696,7 @@ int igraph_sparsemat_add_cols(igraph_sparsemat_t *A, long int n) {
   if (igraph_sparsemat_is_triplet(A)) {
     A->cs->n += n;
   } else {
-    int *newp=realloc(A->cs->p, sizeof(int) * (size_t) (A->cs->n + n + 1));
+    int *newp=realloc((void*)(A->cs->p), sizeof(int) * (size_t) (A->cs->n + n + 1));
     int i;
     if (!newp) { 
       IGRAPH_ERROR("Cannot add columns to sparse matrix", IGRAPH_ENOMEM);

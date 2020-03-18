@@ -94,7 +94,7 @@ static double** unique_element_pointers(double* begin, double* end, size_t* resu
         if (used_elts >= num_elts) {
             /* Array full; allocate a new chunk */
             num_elts = num_elts*2 + 1;
-            result = realloc(result, sizeof(double*) * (num_elts+1));
+            result = realloc((void*) result, sizeof(double*) * (num_elts+1));
             if (result == 0)
                 return 0;
         }

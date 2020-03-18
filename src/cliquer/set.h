@@ -181,7 +181,7 @@ static set_t set_resize(set_t s, int size) {
 	ASSERT(size>0);
 
 	n=(size/ELEMENTSIZE+1);
-	s=((setelement *)realloc(s-1,(n+1)*sizeof(setelement)))+1;
+	s=((setelement *)realloc((void*) (s-1),(n+1)*sizeof(setelement)))+1;
 
 	if (n>SET_ARRAY_LENGTH(s))
 		memset(s+SET_ARRAY_LENGTH(s),0,
