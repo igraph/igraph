@@ -51,6 +51,7 @@
 #define YY_EXTRA_TYPE igraph_i_ncol_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 #ifdef USING_R
+#define fprintf(file, msg, ...) (void)(1)
 #define YY_FATAL_ERROR(msg)                                     \
   igraph_error("Fatal error in NCOL parser:" # msg, __FILE__,   \
                __LINE__, IGRAPH_PARSEERROR)
