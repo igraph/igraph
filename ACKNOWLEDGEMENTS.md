@@ -44,7 +44,7 @@ License: [GNU GPLv2][gpl2] or later
 
 Copyright (C) 2010-2011 Tamás Nepusz.
 
-License: [GNU GPLv2][gpl2]
+License: [GNU GPLv2][gpl2] or later
 
 #### DrL
 
