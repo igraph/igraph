@@ -21,7 +21,7 @@
 
 AT_BANNER([[Eulerian paths and cycles]])
 
-AT_SETUP([Check if graph has eulerian path/cycle:])
-AT_KEYWORDS([eulerian])
-AT_COMPILE_CHECK([tests/eulerian.c])
+AT_SETUP([Is eulerian (igraph_is_eulerian):])
+AT_KEYWORDS([igraph_is_eulerian eulerian])
+AT_COMPILE_CHECK([tests/igraph_is_eulerian.c], [tests/igraph_is_eulerian.out])
 AT_CLEANUP

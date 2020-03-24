@@ -2091,6 +2091,15 @@ igraph_dim_select:
         NAME-R: dim_select
 
 #######################################
+# Eulerian functions
+#######################################
+
+igraph_is_eulerian:
+        PARAMS: GRAPH graph
+        IGNORE: RR, RC, RNamespace
+
+
+#######################################
 # Other, (yet) undocumented functions
 #######################################
 igraph_convergence_degree:

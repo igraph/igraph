@@ -36,11 +36,15 @@
 
 __BEGIN_DECLS
 
-/* -------------------------------------------------- */
-/* Basic query functions                              */
-/* -------------------------------------------------- */
-
-DECLDIR int is_eulerian(igraph_t *graph);
+DECLDIR int igraph_is_eulerian(igraph_t *graph);
+DECLDIR int is_eulerian_undirected(igraph_t *graph);
+DECLDIR int is_eulerian_directed(igraph_t *graph);
+DECLDIR igraph_bool_t check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_integer_t v, long edge);
+DECLDIR int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_vector_t *path);
+DECLDIR int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path);
+DECLDIR int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *start_node, igraph_vector_t *outgoing_list, igraph_vector_t *res);
+DECLDIR int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res);
+DECLDIR int igraph_eulerian_paths(igraph_t *graph, igraph_vector_t *res);
 
 __END_DECLS
 
