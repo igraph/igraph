@@ -137,7 +137,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
         IGRAPH_ERROR("Number of SIR simulations must be positive", IGRAPH_EINVAL);
     }
 
-    igraph_is_simple(graph, &simple);
+    IGRAPH_CHECK(igraph_is_simple(graph, &simple));
     if (!simple) {
         IGRAPH_ERROR("SIR model only works with simple graphs", IGRAPH_EINVAL);
     }
@@ -157,7 +157,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
         if (!sir) {
             IGRAPH_ERROR("Cannot run SIR model", IGRAPH_ENOMEM);
         }
-        igraph_sir_init(sir);
+        IGRAPH_CHECK(igraph_sir_init(sir));
         VECTOR(*result)[i] = sir;
     }
 
@@ -236,10 +236,10 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
                 }
             }
 
-            igraph_vector_push_back(times_v, tt + igraph_vector_tail(times_v));
-            igraph_vector_int_push_back(no_s_v, ns);
-            igraph_vector_int_push_back(no_i_v, ni);
-            igraph_vector_int_push_back(no_r_v, nr);
+            IGRAPH_CHECK(igraph_vector_push_back(times_v, tt + igraph_vector_tail(times_v)));
+            IGRAPH_CHECK(igraph_vector_int_push_back(no_s_v, ns));
+            IGRAPH_CHECK(igraph_vector_int_push_back(no_i_v, ni));
+            IGRAPH_CHECK(igraph_vector_int_push_back(no_r_v, nr));
 
         } /* psum > 0 */
 
