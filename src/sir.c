@@ -129,8 +129,9 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
     if (beta < 0) {
         IGRAPH_ERROR("Beta must be non-negative in SIR model", IGRAPH_EINVAL);
     }
-    if (gamma < 0) {
-        IGRAPH_ERROR("Gamma must be non-negative in SIR model", IGRAPH_EINVAL);
+    /* With a recovery rate of zero, the simulation would never stop. */
+    if (gamma <= 0) {
+        IGRAPH_ERROR("Gamma must be positive in SIR model", IGRAPH_EINVAL);
     }
     if (no_sim <= 0) {
         IGRAPH_ERROR("Number of SIR simulations must be positive", IGRAPH_EINVAL);
