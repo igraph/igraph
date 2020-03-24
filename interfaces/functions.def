@@ -570,7 +570,7 @@ igraph_subgraph_edges:
         IGNORE: RR
 
 igraph_average_path_length:
-        PARAMS: GRAPH graph, OUT REALPTR res, BOOLEAN directed=True, BOOLEAN unconn=True
+        PARAMS: GRAPH graph, OUT REALPTR res, OUT REALPTR unconn_pairs=NULL, BOOLEAN directed=True, BOOLEAN unconn=True
         IGNORE: RR, RC, RNamespace
 
 igraph_path_length_hist:
