@@ -28,6 +28,7 @@
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
+#include "igraph_interrupt_internal.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {
     igraph_vector_init(&sir->times, 1);
@@ -61,6 +62,7 @@ static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
         igraph_sir_t *s = VECTOR(*v)[i];
         if (s) {
             igraph_sir_destroy(s);
+            igraph_Free(s);
         }
     }
 }
@@ -202,6 +204,8 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
             igraph_real_t tt;
             igraph_real_t r;
             long int vchange;
+
+            IGRAPH_ALLOW_INTERRUPTION();
 
             psum = igraph_psumtree_sum(&tree);
             tt = igraph_rng_get_exp(igraph_rng_default(), psum);
