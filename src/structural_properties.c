@@ -3568,7 +3568,7 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
         igraph_bool_t found = 0;
         IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc; i++) {
-            igraph_neighbors(graph, &neis, (igraph_integer_t) i, IGRAPH_OUT);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i, IGRAPH_OUT));
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
