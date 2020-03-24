@@ -25,3 +25,8 @@ AT_SETUP([Is eulerian (igraph_is_eulerian):])
 AT_KEYWORDS([igraph_is_eulerian eulerian])
 AT_COMPILE_CHECK([tests/igraph_is_eulerian.c], [tests/igraph_is_eulerian.out])
 AT_CLEANUP
+
+AT_SETUP([Find eulerian path (igraph_eulerian_paths):])
+AT_KEYWORDS([igraph_eulerian_paths eulerian_paths])
+AT_COMPILE_CHECK([tests/igraph_eulerian_paths.c], [tests/igraph_eulerian_paths.out])
+AT_CLEANUP

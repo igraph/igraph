@@ -230,13 +230,14 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     start = 0;
 
+    IGRAPH_CHECK(igraph_inclist_init(graph, &incl, IGRAPH_ALL));
+    IGRAPH_FINALLY(igraph_inclist_destroy, &incl);
+
     if (res == 1) {
         igraph_vector_push_back(path, start);
         print_euler_undirected_implementation(start, &copy, path);
         /* printf("Hello 3\n"); */
     } else {
-        IGRAPH_CHECK(igraph_inclist_init(graph, &incl, IGRAPH_ALL));
-        IGRAPH_FINALLY(igraph_inclist_destroy, &incl);
         for (i = 0; i < igraph_vcount(graph); i++) {
             incedges = igraph_inclist_get(&incl, i);
             if ( igraph_vector_int_size(incedges) % 2 == 1) {
@@ -371,7 +372,7 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
             if ((incoming_count + 1 == outgoing_count) && (incoming_excess < 2 && outgoing_excess < 1)) {
                 outgoing_excess++;
                 start_node = i;
-                // printf("start node is %d\n", start_node);
+                /* printf("start node is %d\n", start_node); */
             } else if ((outgoing_count + 1 == incoming_count) && (incoming_excess < 1 && outgoing_excess < 2)) {
                 incoming_excess++;
             } 

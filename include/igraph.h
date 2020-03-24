@@ -96,5 +96,6 @@
 #include "igraph_epidemics.h"
 #include "igraph_lsap.h"
 #include "igraph_coloring.h"
+#include "igraph_eulerian.h"
 
 #endif
