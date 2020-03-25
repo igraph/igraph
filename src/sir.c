@@ -59,10 +59,9 @@ void igraph_sir_destroy(igraph_sir_t *sir) {
 static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
     int i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
-        igraph_sir_t *s = VECTOR(*v)[i];
-        if (s) {
-            igraph_sir_destroy(s);
-            igraph_Free(s);
+        if ( VECTOR(*v)[i] ) {
+            igraph_sir_destroy( VECTOR(*v)[i]) ;
+            igraph_Free( VECTOR(*v)[i] ); /* this also sets the vector_ptr element to NULL */
         }
     }
 }
