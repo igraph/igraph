@@ -74,6 +74,7 @@ int is_eulerian_undirected(igraph_t *graph) {
     }
 
     igraph_inclist_destroy(&il);
+    IGRAPH_FINALLY_CLEAN(1);
 
     if (odd > 2) return 0;
 
@@ -147,11 +148,13 @@ igraph_bool_t check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_intege
     for (i = 0; i < igraph_vector_size(&bridges); i++) {
         if (VECTOR(bridges)[i] == edge) {
             igraph_vector_destroy(&bridges);
+            IGRAPH_FINALLY_CLEAN(1);
             return 0;   
         }
     }
 
     igraph_vector_destroy(&bridges);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return 1;
 }
@@ -192,6 +195,7 @@ int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, i
     /* if (v == 0) printf("safe\n"); */
 
     igraph_inclist_destroy(&il);
+    IGRAPH_FINALLY_CLEAN(1);
 
     /* if (v == 0) printf("safe 2\n"); */
 
@@ -268,6 +272,8 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     igraph_destroy(&copy);
 
+    IGRAPH_FINALLY_CLEAN(2);
+
     /*
 
     printf("Hello 5");
@@ -329,6 +335,8 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
 
     igraph_stack_destroy(&path);
     igraph_stack_destroy(&tracker);
+
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -392,6 +400,8 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
 
     igraph_vector_destroy(&outgoing_list);
     igraph_destroy(&copy);
+
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
