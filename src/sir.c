@@ -31,13 +31,13 @@
 #include "igraph_interrupt_internal.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {
-    igraph_vector_init(&sir->times, 1);
+    IGRAPH_CHECK(igraph_vector_init(&sir->times, 1));
     IGRAPH_FINALLY(igraph_vector_destroy, &sir->times);
-    igraph_vector_int_init(&sir->no_s, 1);
+    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_s, 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_s);
-    igraph_vector_int_init(&sir->no_i, 1);
+    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_i, 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_i);
-    igraph_vector_int_init(&sir->no_r, 1);
+    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_r, 1));
     IGRAPH_FINALLY_CLEAN(3);
     return 0;
 }
