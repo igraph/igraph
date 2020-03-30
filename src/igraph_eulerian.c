@@ -62,7 +62,7 @@ int is_eulerian_undirected(igraph_t *graph) {
 
     odd = 0;
 
-    igraph_is_connected(graph, &res, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &res, IGRAPH_WEAK));
     if (res == 0) return 0;
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL));
@@ -97,11 +97,11 @@ int is_eulerian_directed(igraph_t *graph) {
 
     /* checking if incoming vertices == outgoing vertices */
     for (i = 0; i < igraph_vcount(graph); i++) {
-        igraph_es_incident(&incoming, i, IGRAPH_IN);
-        igraph_es_incident(&outgoing, i, IGRAPH_OUT);
+        IGRAPH_CHECK(igraph_es_incident(&incoming, i, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_es_incident(&outgoing, i, IGRAPH_OUT));
         
-        igraph_es_size(graph, &incoming, &incoming_count);
-        igraph_es_size(graph, &outgoing, &outgoing_count);
+        IGRAPH_CHECK(igraph_es_size(graph, &incoming, &incoming_count));
+        IGRAPH_CHECK(igraph_es_size(graph, &outgoing, &outgoing_count));
 
         if (incoming_count != outgoing_count) {
             if ((incoming_count + 1 == outgoing_count) && (incoming_excess < 2 && outgoing_excess < 1)) {
@@ -114,8 +114,8 @@ int is_eulerian_directed(igraph_t *graph) {
         }
     }
 
-    igraph_is_connected(graph, &res_strong, IGRAPH_STRONG);
-    igraph_is_connected(graph, &res_weak, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &res_strong, IGRAPH_STRONG));
+    IGRAPH_CHECK(igraph_is_connected(graph, &res_weak, IGRAPH_WEAK));
 
     if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong == 1)) {
         return 1;
@@ -167,8 +167,6 @@ int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, i
     igraph_es_t edge_to_delete;
     long nc, edge;
 
-    /* printf("Hello 2\n"); */
-
     i = 0;
 
     while (1) {
@@ -183,21 +181,17 @@ int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, i
         edge = (long) VECTOR(*incedges)[i];
         v = IGRAPH_TO(g, edge) == start ? IGRAPH_FROM(g, edge) : IGRAPH_TO(g, edge);
         if (nc == 1 || check_if_bridge(g, start, v, edge)) {
-            igraph_vector_push_back(path, v);
-            /* printf("%d\n", v); */
-            igraph_es_1(&edge_to_delete, edge);
-            igraph_delete_edges(g, edge_to_delete);
+            IGRAPH_CHECK(igraph_vector_push_back(path, v));
+            IGRAPH_CHECK(igraph_es_1(&edge_to_delete, edge));
+            IGRAPH_CHECK(igraph_delete_edges(g, edge_to_delete));
             print_euler_undirected_implementation(v, g, path);
         }
         i++;
     }
 
-    /* if (v == 0) printf("safe\n"); */
 
     igraph_inclist_destroy(&il);
     IGRAPH_FINALLY_CLEAN(1);
-
-    /* if (v == 0) printf("safe 2\n"); */
 
     return IGRAPH_SUCCESS;
 
@@ -216,8 +210,6 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     igraph_t copy; 
     igraph_inclist_t incl;
     igraph_vector_int_t *incedges;
-
-    /* printf("Hello\n"); */
 
     res = igraph_is_eulerian(graph);
 
@@ -238,9 +230,8 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     IGRAPH_FINALLY(igraph_inclist_destroy, &incl);
 
     if (res == 1) {
-        igraph_vector_push_back(path, start);
+        IGRAPH_CHECK(igraph_vector_push_back(path, start));
         print_euler_undirected_implementation(start, &copy, path);
-        /* printf("Hello 3\n"); */
     } else {
         for (i = 0; i < igraph_vcount(graph); i++) {
             incedges = igraph_inclist_get(&incl, i);
@@ -249,36 +240,14 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
                 break;
             }
         }
-        igraph_vector_push_back(path, start);
+        IGRAPH_CHECK(igraph_vector_push_back(path, start));
         print_euler_undirected_implementation(start, &copy, path);
-        /* printf("Hello 3"); */
     }
 
-    /*
-
-    printf("Hello 4\n");
-    printf("jks\n");
-
-    */
-
     igraph_inclist_destroy(&incl);
-
-    /*
-
-    printf("Hello 5\n");
-    printf("jks 2\n");
-
-    */
-
     igraph_destroy(&copy);
 
     IGRAPH_FINALLY_CLEAN(2);
-
-    /*
-
-    printf("Hello 5");
-
-    */
 
     return IGRAPH_SUCCESS;
 
@@ -308,9 +277,11 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
     while (!igraph_stack_empty(&tracker)) {
         
         if (VECTOR(*outgoing_list)[curr] != 0) {
-            igraph_stack_push(&tracker, curr);
+            IGRAPH_CHECK(igraph_stack_push(&tracker, curr));
             
-            igraph_inclist_init(graph, &il, IGRAPH_ALL);
+            IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL));
+            IGRAPH_FINALLY(igraph_inclist_destroy, &il);
+            
             incedges = igraph_inclist_get(&il, curr);
             nc = igraph_vector_int_size(incedges);
             edge = (long) VECTOR(*incedges)[0];
@@ -319,8 +290,11 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
 
             /* remove edge here */
             VECTOR(*outgoing_list)[curr]--;
-            igraph_es_1(&es, edge);
-            igraph_delete_edges(graph, es);
+            IGRAPH_CHECK(igraph_es_1(&es, edge));
+            IGRAPH_CHECK(igraph_delete_edges(graph, es));
+
+            igraph_inclist_destroy(&il);
+            IGRAPH_FINALLY_CLEAN(1);
 
             curr = next;
         } else { /* back track to find remaining circuit */
@@ -330,7 +304,7 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
     }
 
     while (!igraph_stack_empty(&path)) {
-        igraph_vector_push_back(res, igraph_stack_pop(&path));           
+        IGRAPH_CHECK(igraph_vector_push_back(res, igraph_stack_pop(&path)));           
     }
 
     igraph_stack_destroy(&path);
@@ -368,29 +342,28 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
     /* determining the start node */
     /* also getting the outgoing list for each vector*/
     for (i = 0; i < igraph_vcount(graph); i++) {
-        igraph_es_incident(&incoming, i, IGRAPH_IN);
-        igraph_es_incident(&outgoing, i, IGRAPH_OUT);
+        IGRAPH_CHECK(igraph_es_incident(&incoming, i, IGRAPH_IN));
+        IGRAPH_CHECK(igraph_es_incident(&outgoing, i, IGRAPH_OUT));
         
-        igraph_es_size(graph, &incoming, &incoming_count);
-        igraph_es_size(graph, &outgoing, &outgoing_count);
+        IGRAPH_CHECK(igraph_es_size(graph, &incoming, &incoming_count));
+        IGRAPH_CHECK(igraph_es_size(graph, &outgoing, &outgoing_count));
 
-        igraph_vector_push_back(&outgoing_list, outgoing_count);
+        IGRAPH_CHECK(igraph_vector_push_back(&outgoing_list, outgoing_count));
 
         if (incoming_count != outgoing_count) {
             if ((incoming_count + 1 == outgoing_count) && (incoming_excess < 2 && outgoing_excess < 1)) {
                 outgoing_excess++;
                 start_node = i;
-                /* printf("start node is %d\n", start_node); */
             } else if ((outgoing_count + 1 == incoming_count) && (incoming_excess < 1 && outgoing_excess < 2)) {
                 incoming_excess++;
             } 
         }
     }
 
-    igraph_is_connected(graph, &res_strong, IGRAPH_STRONG);
-    igraph_is_connected(graph, &res_weak, IGRAPH_WEAK);
+    IGRAPH_CHECK(igraph_is_connected(graph, &res_strong, IGRAPH_STRONG));
+    IGRAPH_CHECK(igraph_is_connected(graph, &res_weak, IGRAPH_WEAK));
 
-    if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong == 1)) {
+    if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong)) {
         start_node = 0;
         eulerian_path_directed_implementation(&copy, &start_node, &outgoing_list, res);
     } else if ((outgoing_excess == 1 && incoming_excess == 1) && 
