@@ -1284,10 +1284,13 @@ static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * \function igraph_all_st_mincuts
  * All minimum s-t cuts of a directed graph
  *
- * This function lists all minimum edge cuts between two vertices, in a
- * directed graph. The implemented algorithm
- * is described in JS Provan and DR Shier: A Paradigm for listing
- * (s,t)-cuts in graphs, Algorithmica 15, 351--372, 1996.
+ * This function lists all edge cuts between two vertices, in a directed graph,
+ * with minimum total capacity. Possibly, multiple cuts may have the same total
+ * capacity, although there is often only one minimal cut in weighted graphs.
+ * Due to numerical errors, it is possible that this function will not find all
+ * minimal cuts. The implemented algorithm is described in JS Provan and DR
+ * Shier: A Paradigm for listing (s,t)-cuts in graphs, Algorithmica 15,
+ * 351--372, 1996.
  *
  * \param graph The input graph, it must be directed.
  * \param value Pointer to a real number, the value of the minimum cut
@@ -1307,8 +1310,9 @@ static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  *        ignored if it is a null pointer.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
- * \param capacity Vector of edge capacities. If this is a null
- *        pointer, then all edges are assumed to have capacity one.
+ * \param capacity Vector of edge capacities. All capacities should be
+ *        strictly positive. If this is a null pointer, then all edges
+ *        are assumed to have capacity one.
  * \return Error code.
  *
  * Time complexity: O(n(|V|+|E|))+O(F), where |V| is the number of
@@ -1359,6 +1363,10 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     }
     if (source == target) {
         IGRAPH_ERROR("`source' and 'target' are the same vertex", IGRAPH_EINVAL);
+    }
+    if (capacity != NULL && igraph_vector_min(capacity) <= 0)
+    {
+        IGRAPH_ERROR("Not all capacities are strictly positive.", IGRAPH_EINVAL);
     }
 
     if (!partition1s) {
