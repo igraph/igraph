@@ -1286,9 +1286,10 @@ static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  *
  * This function lists all edge cuts between two vertices, in a directed graph,
  * with minimum total capacity. Possibly, multiple cuts may have the same total
- * capacity, although there is often only one minimal cut in weighted graphs.
- * Due to numerical errors, it is possible that this function will not find all
- * minimal cuts. The implemented algorithm is described in JS Provan and DR
+ * capacity, although there is often only one minimum cut in weighted graphs.
+ * It is recommended to supply integer-values capacities. Otherwise, not all
+ * minimum cuts may be detected because of numerical roundoff errors.
+ * The implemented algorithm is described in JS Provan and DR
  * Shier: A Paradigm for listing (s,t)-cuts in graphs, Algorithmica 15,
  * 351--372, 1996.
  *
@@ -1310,7 +1311,7 @@ static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  *        ignored if it is a null pointer.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
- * \param capacity Vector of edge capacities. All capacities should be
+ * \param capacity Vector of edge capacities. All capacities must be
  *        strictly positive. If this is a null pointer, then all edges
  *        are assumed to have capacity one.
  * \return Error code.
