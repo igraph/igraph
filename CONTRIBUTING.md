@@ -156,10 +156,10 @@ project:
    git push origin <topic-branch-name>
    ```
 
-8. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/)
+8. [Open a pull request](https://help.github.com/articles/using-pull-requests/)
     with a clear title and description.
 
-**IMPORTANT**: By submitting a Pull Request, you agree to allow the project owner to
+**IMPORTANT**: By submitting a pull request, you agree to allow the project owner to
 license your work under the same license as that used by the project.
 
 <a name="branching"></a>
@@ -169,7 +169,7 @@ license your work under the same license as that used by the project.
 
 There will always be two versions of `igraph`: the most recent released version, and the next upcoming minor release, which is by definition not yet released. The most recent release version is in the `master` branch, while the next upcoming minor release is in the `develop` branch. If you make a change that is API incompatible with the most recent release, it **must** be merged to the `develop` branch. If the change is API backwards-compatible, it **can** be merged to the `master` branch. It is possible that you build on recent improvements in the `develop` branch, in which case your change should of course target the `develop` branch. If you only add new functionality, but do not change anything of the existing API, this should be backwards-compatible, and can be merged in the `master` branch.
 
-When you make a new Pull Request, please specify the correct target branch. The maintainers of `igraph` may decide to retarget your Pull Request to the correct branch. Retargeting you Pull Request may result in merge conflicts, so it is always good to decide **before** starting to work on something whether you should start from the `master` branch or from the `develop` branch. In most cases, changes in the `master` branch will also be merged to the `develop` branch by the maintainers.
+When you make a new pull request, please specify the correct target branch. The maintainers of `igraph` may decide to retarget your pull request to the correct branch. Retargeting you pull request may result in merge conflicts, so it is always good to decide **before** starting to work on something whether you should start from the `master` branch or from the `develop` branch. In most cases, changes in the `master` branch will also be merged to the `develop` branch by the maintainers.
 
 <a name="tips"></a>
 ## Writing igraph Code
@@ -241,6 +241,6 @@ This is a pain to deal with, but we can't avoid it, unfortunately.
 
 So, igraph is licensed under the "General Public License (GPL) version 2, or
 later". The igraph manual is licensed under the "GNU Free Documentation
-License". By submitting a patch or PR, you agree to allow the project owner to
-license your work under the same license as that used by the project.
+License". By submitting a patch or pull request, you agree to allow the project
+owner to license your work under the same license as that used by the project.
 
