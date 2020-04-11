@@ -1066,9 +1066,9 @@ int igraph_community_leiden(const igraph_t *graph,
     }
 
     /* Perform actual Leiden algorithm */
-    ret = igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
-                                    resolution_parameter, beta,
-                                    membership, nb_clusters, quality);
+    IGRAPH_CHECK(igraph_i_community_leiden(graph, i_edge_weights, i_node_weights,
+                                           resolution_parameter, beta,
+                                           membership, nb_clusters, quality));
 
     if (!edge_weights) {
         igraph_vector_destroy(i_edge_weights);
@@ -1082,5 +1082,5 @@ int igraph_community_leiden(const igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
     }
 
-    return ret;
+    return IGRAPH_SUCCESS;
 }
