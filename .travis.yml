@@ -1,5 +1,7 @@
 
 language: c
+dist: xenial
+os: linux
 
 addons:
   apt:
@@ -54,5 +56,3 @@ notifications:
   email:
     on_success: change
     on_failure: always
-
-sudo: false
