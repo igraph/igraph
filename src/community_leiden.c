@@ -122,7 +122,7 @@ static int igraph_i_community_leiden_fastmovenodes(
         VECTOR(cluster_weights)[current_cluster] -= VECTOR(*node_weights)[v];
         VECTOR(nb_nodes_per_cluster)[current_cluster]--;
         if (VECTOR(nb_nodes_per_cluster)[current_cluster] == 0) {
-            igraph_stack_push(&empty_clusters, current_cluster);
+            IGRAPH_CHECK(igraph_stack_push(&empty_clusters, current_cluster));
         }
 
         /* Find out neighboring clusters */
@@ -177,7 +177,7 @@ static int igraph_i_community_leiden_fastmovenodes(
                 long int e = VECTOR(*edges)[i];
                 long int u = (long int)IGRAPH_OTHER(graph, e, v);
                 if (VECTOR(node_is_stable)[u] && VECTOR(*membership)[u] != best_cluster) {
-                    igraph_dqueue_push(&unstable_nodes, u);
+                    IGRAPH_CHECK(igraph_dqueue_push(&unstable_nodes, u));
                     VECTOR(node_is_stable)[u] = 0;
                 }
             }
@@ -503,7 +503,7 @@ static int igraph_i_community_get_clusters(const igraph_vector_t *membership, ig
         }
 
         /* Add node i to cluster vector */
-        igraph_vector_push_back(cluster, i);
+        IGRAPH_CHECK(igraph_vector_push_back(cluster, i));
     }
 
     return IGRAPH_SUCCESS;
@@ -596,10 +596,11 @@ static int igraph_i_community_leiden_aggregate(
             long int c2 = VECTOR(neighbor_clusters)[i];
 
             /* Add edge */
-            igraph_vector_push_back(&aggregated_edges, c); igraph_vector_push_back(&aggregated_edges, c2);
+            IGRAPH_CHECK(igraph_vector_push_back(&aggregated_edges, c));
+            IGRAPH_CHECK(igraph_vector_push_back(&aggregated_edges, c2));
 
             /* Add edge weight */
-            igraph_vector_push_back(aggregated_edge_weights, VECTOR(edge_weight_to_cluster)[c2]);
+            IGRAPH_CHECK(igraph_vector_push_back(aggregated_edge_weights, VECTOR(edge_weight_to_cluster)[c2]));
 
             VECTOR(edge_weight_to_cluster)[c2] = 0.0;
             VECTOR(neighbor_cluster_added)[c2] = 0;
@@ -917,7 +918,7 @@ int igraph_i_community_leiden(const igraph_t *graph,
 
     /* Calculate quality */
     if (quality) {
-        igraph_i_community_leiden_quality(graph, edge_weights, node_weights, membership, *nb_clusters, resolution_parameter, quality);
+        IGRAPH_CHECK(igraph_i_community_leiden_quality(graph, edge_weights, node_weights, membership, *nb_clusters, resolution_parameter, quality));
     }
 
     return IGRAPH_SUCCESS;
@@ -1009,7 +1010,6 @@ int igraph_community_leiden(const igraph_t *graph,
                             const igraph_real_t resolution_parameter, const igraph_real_t beta, const igraph_bool_t start,
                             igraph_vector_t *membership, igraph_integer_t *nb_clusters, igraph_real_t *quality) {
     igraph_vector_t *i_edge_weights, *i_node_weights;
-    int ret;
     igraph_integer_t n = igraph_vcount(graph);
 
     if (start) {
