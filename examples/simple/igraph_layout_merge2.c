@@ -28,6 +28,7 @@ int main() {
     igraph_matrix_t small_coords, big_coords, merged_coords;
     igraph_vector_ptr_t graph_ptr, coords_ptr;
     igraph_arpack_options_t arpack_opts;
+    long int i, j, nrow, ncol;
 
     /* To make things reproducible */
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -43,12 +44,10 @@ int main() {
     igraph_arpack_options_init(&arpack_opts);
 
     igraph_matrix_init(&big_coords, 0, 0);
-    igraph_layout_mds(&big, &big_coords, /*dist=*/ 0, /*dim=*/ 2,
-                      &arpack_opts);
+    igraph_layout_circle(&big, &big_coords, igraph_vss_all());
 
     igraph_matrix_init(&small_coords, 0, 0);
-    igraph_layout_mds(&small, &small_coords, /*dist=*/ 0, /*dim=*/ 2,
-                      &arpack_opts);
+    igraph_layout_circle(&small, &small_coords, igraph_vss_all());
 
     igraph_vector_ptr_init(&graph_ptr, 2);
     igraph_vector_ptr_init(&coords_ptr, 2);
@@ -60,7 +59,17 @@ int main() {
 
     igraph_layout_merge_dla(&graph_ptr, &coords_ptr, &merged_coords);
 
-    igraph_matrix_print(&merged_coords);
+    nrow = igraph_matrix_nrow(&merged_coords);
+    ncol = igraph_matrix_ncol(&merged_coords);
+    for (i = 0; i < nrow; i++) {
+        for (j = 0; j < ncol; j++) {
+            if (fabs((double)MATRIX(merged_coords, i, j)) < 1e-8) {
+                MATRIX(merged_coords, i, j) = 0;
+            }
+        }
+    }
+
+    igraph_matrix_printf(&merged_coords, "%.4f");
 
     igraph_matrix_destroy(&merged_coords);
     igraph_matrix_destroy(&small_coords);
