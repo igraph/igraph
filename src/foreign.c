@@ -1028,7 +1028,7 @@ static igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) 
 static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
 
     int type = igraph_gml_tree_type(node, pos);
-    char tmp[256];
+    static char tmp[256];
     const char *p = tmp;
     long int i;
     igraph_real_t d;
