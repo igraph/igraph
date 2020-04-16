@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "../tests/test_utilities.inc"
+
 /*
 
     R
@@ -56,9 +58,11 @@ int main() {
                                         /*scaled=*/ 0, &U, &V, /*D=*/ 0,
                                         &cvec, &options);
 
-    igraph_matrix_printf(&U, "%8.4f");
+    /* eigenvectors are in the columns of U and V; make sure that the
+     * first row contains positive values */
+    print_matrix_first_row_positive(&U, "%8.4f");
     printf("--\n");
-    igraph_matrix_printf(&V, "%8.4f");
+    print_matrix_first_row_positive(&V, "%8.4f");
 
     igraph_vector_destroy(&cvec);
     igraph_matrix_destroy(&V);
