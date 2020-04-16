@@ -57,4 +57,29 @@ void print_graph(const igraph_t *graph, FILE *f) {
     fprintf(f, "}\n");
 }
 
+/* Print a matrix, ensuring that the first row contains positive elements only.
+ * Useful when the columns are eigenvectors. */
+void print_matrix_first_row_positive(const igraph_matrix_t *matrix, const char* format) {
+    igraph_matrix_t copy;
+    long i, j, nrow, ncol;
+
+    igraph_matrix_copy(&copy, matrix);
+
+    nrow = igraph_matrix_nrow(&copy);
+    ncol = igraph_matrix_ncol(&copy);
+
+    if (nrow > 0) {
+        for (i = 0; i < ncol; i++) {
+            if (MATRIX(copy, 0, i) < 0) {
+                for (j = 0; j < nrow; j++) {
+                    MATRIX(copy, j, i) *= -1;
+                }
+            }
+        }
+    }
+
+    igraph_matrix_printf(&copy, format);
+    igraph_matrix_destroy(&copy);
+}
+
 #endif /* TEST_UTILITIES_INC */
