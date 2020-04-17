@@ -79,6 +79,7 @@
 #include "igraph_eigen.h"
 #include "igraph_interface.h"
 #include "igraph_structural.h"
+#include "igraph_community.h"
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_memory.h"
@@ -467,6 +468,8 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
 
     igraph_matrix_int_destroy(&gr_mat);
     IGRAPH_FINALLY_CLEAN(1);
+
+    IGRAPH_CHECK(igraph_reindex_membership(groups, 0, 0));
 
     return 0;
 }
