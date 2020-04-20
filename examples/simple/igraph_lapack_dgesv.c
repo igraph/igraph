@@ -35,7 +35,7 @@ int main() {
 
     igraph_matrix_t A, B, RHS;
     int info;
-    int i;
+    int i, j;
 
     /* Identity matrix, you have to start somewhere */
 
@@ -117,16 +117,13 @@ int main() {
 
     /* A singular matrix */
 
-    igraph_rng_seed(igraph_rng_default(), 42);
-
     igraph_matrix_init(&A, DIM, DIM);
     igraph_matrix_init(&B, DIM, 1);
     igraph_matrix_init(&RHS, DIM, 1);
     for (i = 0; i < DIM; i++) {
-        int j;
         MATRIX(B, i, 0) = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
         for (j = 0; j < DIM; j++) {
-            MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
+            MATRIX(A, i, j) = i == j ? 1 : 0;
         }
     }
     for (i = 0; i < DIM; i++) {
