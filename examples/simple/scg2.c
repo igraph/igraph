@@ -110,6 +110,7 @@ int main() {
 
     VECTOR(ev)[0] = 1;
     CALLSTO();
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);
@@ -118,7 +119,7 @@ int main() {
 
     VECTOR(ev)[0] = 3;
     CALLSTO();
-    FIXSMALL(1e-10);
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);
@@ -129,7 +130,7 @@ int main() {
     VECTOR(ev)[0] = 1;
     VECTOR(ev)[1] = 3;
     CALLSTO();
-    FIXSMALL(1e-10);
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);
