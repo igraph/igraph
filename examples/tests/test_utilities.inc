@@ -69,9 +69,9 @@ void print_vector_first_nonzero_element_positive(const igraph_vector_t *vector, 
     for (i = 0; i < n; i++) {
         if (VECTOR(copy)[i] < 0) {
             for (; i < n; i++) {
-				if (VECTOR(copy)[i] != 0) {
-					VECTOR(copy)[i] *= -1;
-				}
+                if (VECTOR(copy)[i] != 0) {
+                    VECTOR(copy)[i] *= -1;
+                }
             }
             break;
         } else if (VECTOR(copy)[i] > 0) {
@@ -96,12 +96,12 @@ void print_vector_complex_first_nonzero_real_part_positive(const igraph_vector_c
     for (i = 0; i < n; i++) {
         if (IGRAPH_REAL(VECTOR(copy)[i]) < 0) {
             for (; i < n; i++) {
-				if (IGRAPH_REAL(VECTOR(copy)[i]) != 0) {
+                if (IGRAPH_REAL(VECTOR(copy)[i]) != 0) {
                     IGRAPH_REAL(VECTOR(copy)[i]) *= -1;
-				}
-				if (IGRAPH_IMAG(VECTOR(copy)[i]) != 0) {
-					IGRAPH_IMAG(VECTOR(copy)[i]) *= -1;
-				}
+                }
+                if (IGRAPH_IMAG(VECTOR(copy)[i]) != 0) {
+                    IGRAPH_IMAG(VECTOR(copy)[i]) *= -1;
+                }
             }
             break;
         } else if (IGRAPH_REAL(VECTOR(copy)[i]) > 0) {
@@ -158,12 +158,12 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
         for (j = 0; j < nrow; j++) {
             if (IGRAPH_REAL(MATRIX(copy, j, i)) < 0) {
                 for (; j < nrow; j++) {
-					if (IGRAPH_REAL(MATRIX(copy, j, i)) != 0) {
-						IGRAPH_REAL(MATRIX(copy, j, i)) *= -1;
-					}
-					if (IGRAPH_IMAG(MATRIX(copy, j, i)) != 0) {
-						IGRAPH_IMAG(MATRIX(copy, j, i)) *= -1;
-					}
+                    if (IGRAPH_REAL(MATRIX(copy, j, i)) != 0) {
+                        IGRAPH_REAL(MATRIX(copy, j, i)) *= -1;
+                    }
+                    if (IGRAPH_IMAG(MATRIX(copy, j, i)) != 0) {
+                        IGRAPH_IMAG(MATRIX(copy, j, i)) *= -1;
+                    }
                 }
                 break;
             } else if (IGRAPH_REAL(MATRIX(copy, j, i)) > 0) {
