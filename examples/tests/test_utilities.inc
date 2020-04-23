@@ -8,6 +8,7 @@
 
 #include <igraph.h>
 #include <stdio.h>
+#include <string.h>
 
 /* Print elements of a vector. Use parentheses to make it clear when a vector has size zero. */
 void print_vector(const igraph_vector_t *v, FILE *f) {
@@ -148,6 +149,9 @@ void print_matrix_first_row_positive(const igraph_matrix_t *matrix, const char* 
 void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matrix) {
     igraph_matrix_complex_t copy;
     long i, j, nrow, ncol;
+    igraph_complex_t z;
+    char buf[256];
+    size_t len;
 
     igraph_matrix_complex_copy(&copy, matrix);
 
@@ -172,7 +176,31 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
         }
     }
 
-    igraph_matrix_complex_print(&copy);
+    for (i = 0; i < nrow; i++) {
+        for (j = 0; j < ncol; j++) {
+            z = MATRIX(copy, i, j);
+            if (j != 0) {
+                putchar(' ');
+            }
+
+            snprintf(buf, sizeof(buf), "%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
+            len = strlen(buf);
+
+            /* ensure that we don't print -0 in the imaginary part */
+            if (len > 3 && buf[len-3] == '-' && buf[len-2] == '0' && buf[len-1] == 'i') {
+              buf[len-3] = '+';
+            }
+
+            /* ensure that we don't print -0 in the real part either */
+            if (buf[0] == '-' && buf[1] == '0' && (buf[2] == '+' || buf[2] == '-')) {
+                printf("%s", buf + 1);
+            } else {
+                printf("%s", buf);
+            }
+        }
+        printf("\n");
+    }
+
     igraph_matrix_complex_destroy(&copy);
 }
 
