@@ -10,6 +10,25 @@
 
 ### Other
 
+## [0.8.2] - 2020-04-28
+
+### Changed
+
+ - Improved argument checking: `igraph_all_st_mincuts()` and `igraph_sir()`
+ - Improved interruptibility: `igraph_sir()`
+
+### Fixed
+
+ - `igraph_community_leiden()`: fixed crash when interrupting
+ - The tests are now more robust. Some incorrect test failures were fixed when
+   running on i386 architecture, or when using different versions of external
+   dependencies.
+
+### Others
+
+ - Improved error messages from `igraph_sir()`.
+ - Improved compatibility with more recent versions of Microsoft Visual C.
+
 ## [0.8.1] - 2020-03-13
 
 ### Changed
