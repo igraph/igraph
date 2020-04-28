@@ -165,9 +165,18 @@
 
 #define strcasecmp _stricmp
 
-#define isnan _isnan
-#define finite _finite
-#define hypot _hypot
+#ifndef isnan
+#  define isnan _isnan
+#endif
+
+#ifndef finite
+#  define finite _finite
+#endif
+
+#ifndef hypot
+#  define hypot _hypot
+#endif
+
 #include <float.h>
 
 #if _MSC_VER<1900
