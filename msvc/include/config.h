@@ -5,7 +5,9 @@
 /* #undef HAVE_DLFCN_H */
 
 /* Define to 1 if you have the `expm1' function. */
-/* #undef HAVE_EXPM1 */
+#if defined(_MSC_VER) && _MSC_VER >= 1800
+#define HAVE_EXPM1 1
+#endif
 
 /* Define to 1 if you have the `fabsl' function. */
 #define HAVE_FABSL 1
@@ -179,7 +181,7 @@
 
 #include <float.h>
 
-#if _MSC_VER<1900
+#if _MSC_VER < 1900
 #define snprintf igraph_i_snprintf
 #endif
 
