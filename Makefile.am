@@ -65,6 +65,8 @@ msvc: parsersources
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/include
+	cp -r $(top_srcdir)/*.md $(top_builddir)/igraph-$(VERSION)-msvc/
+	cp -r $(top_srcdir)/COPYING $(top_builddir)/igraph-$(VERSION)-msvc/
 	cp -r $(top_srcdir)/src $(top_builddir)/igraph-$(VERSION)-msvc/
 	cp -r $(top_srcdir)/include/*.h $(top_builddir)/igraph-$(VERSION)-msvc/include
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc; fi
