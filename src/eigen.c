@@ -457,7 +457,7 @@ static int igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
     } else { /* data->sA */
         igraph_vector_t vto, vfrom;
         igraph_vector_view(&vto, to, n);
-        igraph_vector_view(&vfrom, to, n);
+        igraph_vector_view(&vfrom, from, n);
         igraph_vector_null(&vto);
         igraph_sparsemat_gaxpy(data->sA, &vfrom, &vto);
     }
