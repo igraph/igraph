@@ -53,7 +53,7 @@ The function returns one of the following values
 0 -> if graph is not Eulerian
 1 -> if graph has an euler circuit
 2 -> if graph has an euler path */
-int is_eulerian_undirected(igraph_t *graph) {
+igraph_integer_t is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
 
     igraph_bool_t res;
     igraph_inclist_t il;
@@ -63,7 +63,11 @@ int is_eulerian_undirected(igraph_t *graph) {
     odd = 0;
 
     IGRAPH_CHECK(igraph_is_connected(graph, &res, IGRAPH_WEAK));
-    if (res == 0) return 0;
+    if (res == 0) {
+        *has_path = 0;
+        *has_cycle = 0;
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
@@ -76,21 +80,33 @@ int is_eulerian_undirected(igraph_t *graph) {
     igraph_inclist_destroy(&il);
     IGRAPH_FINALLY_CLEAN(1);
 
-    if (odd > 2) return 0;
+    if (odd > 2) {
+        *has_path = 0;
+        *has_cycle = 0;
+        return IGRAPH_SUCCESS;
+    }
 
     /* if pdd count is 2, then semi-eulerian
     if odd count is 0, then eulerian
     odd count never is 1 for undirected graph
     */
 
-    return (odd == 2) ? 2 : 1;
+    if (odd == 2) {
+        *has_path = 1;
+        *has_cycle = 0;
+    } else {
+        *has_path = 0;
+        *has_cycle = 1;
+    }
+
+    return IGRAPH_SUCCESS;
 }
 
-int is_eulerian_directed(igraph_t *graph) {
+igraph_integer_t is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
     igraph_es_t incoming, outgoing;
     igraph_bool_t res_strong, res_weak;
     igraph_integer_t incoming_excess, incoming_count, outgoing_excess, outgoing_count;
-    int i;
+    igraph_integer_t i;
 
     incoming_excess = 0;
     outgoing_excess = 0;
@@ -109,7 +125,9 @@ int is_eulerian_directed(igraph_t *graph) {
             } else if ((outgoing_count + 1 == incoming_count) && (incoming_excess < 1 && outgoing_excess < 2)) {
                 incoming_excess++;
             } else {
-                return 0;
+                *has_path = 0;
+                *has_cycle = 0;
+                return IGRAPH_SUCCESS;
             }
         }
     }
@@ -118,22 +136,29 @@ int is_eulerian_directed(igraph_t *graph) {
     IGRAPH_CHECK(igraph_is_connected(graph, &res_weak, IGRAPH_WEAK));
 
     if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong == 1)) {
-        return 1;
+        *has_path = 0;
+        *has_cycle = 1;
+        return IGRAPH_SUCCESS;
     } else if ((outgoing_excess == 1 && incoming_excess == 1) && 
         (res_strong == 1 || res_weak == 1)) {
-        return 2;
+        *has_path = 1;
+        *has_cycle = 0;
+        return IGRAPH_SUCCESS;
     }
 
-    return 0;
+    *has_path = 0;
+    *has_cycle = 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* flexible function */
-int igraph_is_eulerian(igraph_t *graph) {
+igraph_integer_t igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
     if (igraph_is_directed(graph)) {
-        return is_eulerian_directed(graph);
+        is_eulerian_directed(graph, has_path, has_cycle);
     } else {
-        return is_eulerian_undirected(graph);
+        is_eulerian_undirected(graph, has_path, has_cycle);
     } 
+    return IGRAPH_SUCCESS;
 }
 
 igraph_bool_t check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_integer_t v, long edge) {
@@ -159,7 +184,7 @@ igraph_bool_t check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_intege
     return 1;
 }
 
-int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_vector_t *path) {
+igraph_integer_t print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_vector_t *path) {
 
     igraph_integer_t i, v;
     igraph_inclist_t il;
@@ -199,23 +224,28 @@ int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, i
 
 
 /* solution adapted from https://www.geeksforgeeks.org/eulerian-path-and-circuit/ */
-int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
+igraph_integer_t igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     /* default starting vertex is 0
     when we have no odd vertices, we can start anywhere (usually 0)
     when we have 2 odd vertices, we start at any one of them
     igraph_vector_t path must be initialised prior to its us */
 
-    igraph_integer_t res, start, i;
+    igraph_integer_t start, i;
     igraph_t copy; 
     igraph_inclist_t incl;
     igraph_vector_int_t *incedges;
+    igraph_bool_t has_path;
+    igraph_bool_t cycle;
 
-    res = igraph_is_eulerian(graph);
+    has_path = 0;
+    cycle = 0;
 
-    if (res == 0) {
+    igraph_is_eulerian(graph, &has_path, &cycle);
+
+    if (has_path == 0 && cycle == 0) {
         IGRAPH_WARNING("Euler cycle not possible");
-        return 1;
+        return IGRAPH_FAILURE;
     }
 
     IGRAPH_CHECK(igraph_copy(&copy, graph));
@@ -229,7 +259,7 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     IGRAPH_CHECK(igraph_inclist_init(graph, &incl, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incl);
 
-    if (res == 1) {
+    if (cycle == 1 && has_path == 0) {
         IGRAPH_CHECK(igraph_vector_push_back(path, start));
         print_euler_undirected_implementation(start, &copy, path);
     } else {
@@ -254,7 +284,7 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 }
 
 /* solution adapted from https://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/ */
-int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *start_node, igraph_vector_t *outgoing_list, igraph_vector_t *res) {
+igraph_integer_t eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *start_node, igraph_vector_t *outgoing_list, igraph_vector_t *res) {
     igraph_integer_t start = *start_node;
     igraph_integer_t curr = start;
     igraph_integer_t next;
@@ -316,16 +346,23 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
 }
 
 
-int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
+igraph_integer_t igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
     igraph_es_t incoming, outgoing;
     igraph_bool_t res_strong, res_weak;
     igraph_integer_t incoming_excess, incoming_count, outgoing_excess, outgoing_count;
     igraph_integer_t start_node;
     igraph_vector_t outgoing_list;
     igraph_t copy;
-    int i;
+    igraph_integer_t i;
+    igraph_bool_t has_path;
+    igraph_bool_t cycle;
 
-    if (igraph_is_eulerian(graph) == 0) {
+    has_path = 0;
+    cycle = 0;
+
+    igraph_is_eulerian(graph, &has_path, &cycle);
+
+    if (has_path == 0 && cycle == 0) {
         IGRAPH_WARNING("Euler cycle not possible");
         return IGRAPH_FAILURE;
     }
@@ -379,7 +416,7 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
     return IGRAPH_SUCCESS;
 }
 
-int igraph_eulerian_paths(igraph_t *graph, igraph_vector_t *res) {
+igraph_integer_t igraph_eulerian_paths(igraph_t *graph, igraph_vector_t *res) {
     if (igraph_is_directed(graph)) {
         return igraph_eulerian_path_directed(graph, res);
     } else {
