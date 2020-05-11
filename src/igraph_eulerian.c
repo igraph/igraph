@@ -223,7 +223,7 @@ igraph_integer_t print_euler_undirected_implementation(igraph_integer_t start, i
 }
 
 
-/* solution adapted from https://www.geeksforgeeks.org/eulerian-path-and-circuit/ */
+/* solution adapted from https://www.geeksforgeeks.org/fleurys-algorithm-for-printing-eulerian-path/ */
 igraph_integer_t igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     /* default starting vertex is 0
@@ -415,11 +415,78 @@ igraph_integer_t igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t 
 
     return IGRAPH_SUCCESS;
 }
+/*
+igraph_integer_t igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res) {
+    igraph_bool_t has_path;
+    igraph_bool_t cycle;
 
-igraph_integer_t igraph_eulerian_paths(igraph_t *graph, igraph_vector_t *res) {
+    igraph_is_eulerian(graph, &has_path, &cycle);
+
+    if (has_path == 0 && has_cycle == 0) {
+        IGRAPH_WARNING("Euler cycle not possible");
+        return IGRAPH_FAILURE;
+    }
+    
     if (igraph_is_directed(graph)) {
         return igraph_eulerian_path_directed(graph, res);
     } else {
         return igraph_euler_path_undirected(graph, res);
     } 
 }
+
+igraph_integer_t igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
+    igraph_bool_t has_path;
+    igraph_bool_t cycle;
+
+    igraph_is_eulerian(graph, &has_path, &cycle);
+
+    if (has_cycle == 0) {
+        IGRAPH_WARNING("Euler cycle not possible");
+        return IGRAPH_FAILURE;
+    }
+    
+    if (igraph_is_directed(graph)) {
+        return igraph_eulerian_path_directed(graph, res);
+    } else {
+        return igraph_euler_path_undirected(graph, res);
+    } 
+}
+*/
+
+
+igraph_integer_t igraph_eulerian_paths(igraph_t *graph, igraph_vector_t *res) {
+    double vec1, vec2;
+    igraph_integer_t curr_edge;
+    igraph_bool_t error;
+    igraph_vector_t vector_res;
+
+    error = 0;
+    IGRAPH_CHECK(igraph_vector_init(&vector_res, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, &vector_res);
+
+    if (igraph_is_directed(graph)) {
+        igraph_eulerian_path_directed(graph, &vector_res);
+
+        for (int i = 0; i < igraph_vector_size(&vector_res) - 1; i++) {
+            vec1 = VECTOR(vector_res)[i];
+            vec2 = VECTOR(vector_res)[i+1];
+
+            igraph_get_eid(graph, &curr_edge, (int) vec1, (int) vec2, 1, error);
+            igraph_vector_push_back(res, curr_edge);
+        }
+    } else {
+        igraph_euler_path_undirected(graph, &vector_res);
+
+        for (int i = 0; i < igraph_vector_size(&vector_res) - 1; i++) {
+            vec1 = VECTOR(vector_res)[i];
+            vec2 = VECTOR(vector_res)[i+1];
+
+            igraph_get_eid(graph, &curr_edge, (int) vec1, (int) vec2, 0, error);
+            igraph_vector_push_back(res, curr_edge);
+        }
+    } 
+    igraph_vector_destroy(&vector_res);
+
+    return IGRAPH_SUCCESS;
+}
+
