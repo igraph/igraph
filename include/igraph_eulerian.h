@@ -36,8 +36,9 @@
 
 __BEGIN_DECLS
 
-DECLDIR igraph_integer_t igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle);
-DECLDIR igraph_integer_t igraph_eulerian_paths(igraph_t *graph, igraph_vector_t *res);
+DECLDIR int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle);
+DECLDIR int igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res);
+DECLDIR int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res);
 
 __END_DECLS
 

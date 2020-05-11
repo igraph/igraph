@@ -152,7 +152,7 @@ igraph_integer_t is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, 
 }
 
 /* flexible function */
-igraph_integer_t igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
+int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
     if (igraph_is_directed(graph)) {
         is_eulerian_directed(graph, has_path, has_cycle);
     } else {
@@ -354,18 +354,6 @@ igraph_integer_t igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t 
     igraph_vector_t outgoing_list;
     igraph_t copy;
     igraph_integer_t i;
-    igraph_bool_t has_path;
-    igraph_bool_t cycle;
-
-    has_path = 0;
-    cycle = 0;
-
-    igraph_is_eulerian(graph, &has_path, &cycle);
-
-    if (has_path == 0 && cycle == 0) {
-        IGRAPH_WARNING("Euler cycle not possible");
-        return IGRAPH_FAILURE;
-    }
 
     IGRAPH_CHECK(igraph_vector_init(&outgoing_list, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &outgoing_list);
@@ -415,50 +403,25 @@ igraph_integer_t igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t 
 
     return IGRAPH_SUCCESS;
 }
-/*
-igraph_integer_t igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res) {
-    igraph_bool_t has_path;
-    igraph_bool_t cycle;
-
-    igraph_is_eulerian(graph, &has_path, &cycle);
-
-    if (has_path == 0 && has_cycle == 0) {
-        IGRAPH_WARNING("Euler cycle not possible");
-        return IGRAPH_FAILURE;
-    }
-    
-    if (igraph_is_directed(graph)) {
-        return igraph_eulerian_path_directed(graph, res);
-    } else {
-        return igraph_euler_path_undirected(graph, res);
-    } 
-}
-
-igraph_integer_t igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
-    igraph_bool_t has_path;
-    igraph_bool_t cycle;
-
-    igraph_is_eulerian(graph, &has_path, &cycle);
-
-    if (has_cycle == 0) {
-        IGRAPH_WARNING("Euler cycle not possible");
-        return IGRAPH_FAILURE;
-    }
-    
-    if (igraph_is_directed(graph)) {
-        return igraph_eulerian_path_directed(graph, res);
-    } else {
-        return igraph_euler_path_undirected(graph, res);
-    } 
-}
-*/
 
 
-igraph_integer_t igraph_eulerian_paths(igraph_t *graph, igraph_vector_t *res) {
+int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
     double vec1, vec2;
     igraph_integer_t curr_edge;
     igraph_bool_t error;
     igraph_vector_t vector_res;
+    igraph_bool_t cycle;
+    igraph_bool_t has_path;
+
+    has_path = 0;
+    cycle = 0;
+
+    igraph_is_eulerian(graph, &has_path, &cycle);
+
+    if (cycle == 0) {
+        IGRAPH_WARNING("Eulerian cycle not possible");
+        return IGRAPH_FAILURE;
+    }
 
     error = 0;
     IGRAPH_CHECK(igraph_vector_init(&vector_res, 0));
@@ -490,3 +453,50 @@ igraph_integer_t igraph_eulerian_paths(igraph_t *graph, igraph_vector_t *res) {
     return IGRAPH_SUCCESS;
 }
 
+int igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res) {
+    double vec1, vec2;
+    igraph_integer_t curr_edge;
+    igraph_bool_t error;
+    igraph_vector_t vector_res;
+    igraph_bool_t cycle;
+    igraph_bool_t has_path;
+
+    has_path = 0;
+    cycle = 0;
+
+    igraph_is_eulerian(graph, &has_path, &cycle);
+
+    if (has_path == 0 && cycle == 0) {
+        IGRAPH_WARNING("Eulerian path not possible");
+        return IGRAPH_FAILURE;
+    }
+
+    error = 0;
+    IGRAPH_CHECK(igraph_vector_init(&vector_res, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, &vector_res);
+
+    if (igraph_is_directed(graph)) {
+        igraph_eulerian_path_directed(graph, &vector_res);
+
+        for (int i = 0; i < igraph_vector_size(&vector_res) - 1; i++) {
+            vec1 = VECTOR(vector_res)[i];
+            vec2 = VECTOR(vector_res)[i+1];
+
+            igraph_get_eid(graph, &curr_edge, (int) vec1, (int) vec2, 1, error);
+            igraph_vector_push_back(res, curr_edge);
+        }
+    } else {
+        igraph_euler_path_undirected(graph, &vector_res);
+
+        for (int i = 0; i < igraph_vector_size(&vector_res) - 1; i++) {
+            vec1 = VECTOR(vector_res)[i];
+            vec2 = VECTOR(vector_res)[i+1];
+
+            igraph_get_eid(graph, &curr_edge, (int) vec1, (int) vec2, 0, error);
+            igraph_vector_push_back(res, curr_edge);
+        }
+    } 
+    igraph_vector_destroy(&vector_res);
+
+    return IGRAPH_SUCCESS;
+}
