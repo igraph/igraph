@@ -311,20 +311,32 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *start_node, igraph_vector_t *outgoing_list, igraph_vector_t *res) {
     igraph_integer_t start = *start_node;
     igraph_integer_t curr = start;
-    igraph_integer_t next;
+    igraph_integer_t next, e_count, curr_e;
     igraph_inclist_t il;
     igraph_es_t es;
-    igraph_stack_t path;
-    igraph_stack_t tracker;
+    igraph_stack_t path, tracker, edge_tracker, edge_path;
     igraph_vector_int_t *incedges;
-    long nc;
-    long edge;
+    igraph_vector_bool_t visited_list;
+    long nc, edge;
 
     IGRAPH_CHECK(igraph_stack_init(&path, igraph_vcount(graph)));
     IGRAPH_FINALLY(igraph_stack_destroy, &path);
 
     IGRAPH_CHECK(igraph_stack_init(&tracker, igraph_vcount(graph)));
     IGRAPH_FINALLY(igraph_stack_destroy, &tracker);
+
+    IGRAPH_CHECK(igraph_stack_init(&edge_path, igraph_vcount(graph)));
+    IGRAPH_FINALLY(igraph_stack_destroy, &edge_path);
+
+    IGRAPH_CHECK(igraph_stack_init(&edge_tracker, igraph_vcount(graph)));
+    IGRAPH_FINALLY(igraph_stack_destroy, &edge_tracker);
+
+    e_count = igraph_ecount(graph);
+    igraph_vector_bool_init(&visited_list, e_count);
+
+    for (int i = 0; i < e_count; i++) {
+        VECTOR(visited_list)[i] = 0;
+    }
 
     igraph_stack_push(&tracker, start);
 
@@ -342,11 +354,15 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
             
             next = IGRAPH_TO(graph, edge);
 
+            IGRAPH_CHECK(igraph_stack_push(&edge_tracker, edge));
+
             /* remove edge here */
             VECTOR(*outgoing_list)[curr]--;
+            //VECTOR
+            
             IGRAPH_CHECK(igraph_es_1(&es, edge));
             IGRAPH_CHECK(igraph_delete_edges(graph, es));
-
+            
             igraph_inclist_destroy(&il);
             IGRAPH_FINALLY_CLEAN(1);
 
@@ -354,18 +370,24 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
         } else { /* back track to find remaining circuit */
             igraph_stack_push(&path, curr);
             curr = igraph_stack_pop(&tracker);
+            if (!igraph_stack_empty(&edge_tracker)) {
+                curr_e = igraph_stack_pop(&edge_tracker);
+                igraph_stack_push(&edge_path, curr_e);
+            }
         }
     }
 
-    while (!igraph_stack_empty(&path)) {
-        IGRAPH_CHECK(igraph_vector_push_back(res, igraph_stack_pop(&path)));           
+    while (!igraph_stack_empty(&edge_path)) {
+        IGRAPH_CHECK(igraph_vector_push_back(res, igraph_stack_pop(&edge_path)));           
     }
 
     igraph_stack_destroy(&path);
     igraph_stack_destroy(&tracker);
+    igraph_stack_destroy(&edge_path);
+    igraph_stack_destroy(&edge_tracker);
 
-    IGRAPH_FINALLY_CLEAN(2);
-
+    IGRAPH_FINALLY_CLEAN(4);
+    
     return IGRAPH_SUCCESS;
 }
 
@@ -428,10 +450,6 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
 
 
 int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
-    //double vec1, vec2;
-    //igraph_integer_t curr_edge;
-    //igraph_bool_t error;
-    //igraph_vector_t vector_res;
     igraph_bool_t cycle;
     igraph_bool_t has_path;
 
@@ -451,36 +469,6 @@ int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
     } else {
         igraph_euler_path_undirected(graph, res);
     }
-
-
-/*
-    error = 0;
-    IGRAPH_CHECK(igraph_vector_init(&vector_res, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &vector_res);
-
-    if (igraph_is_directed(graph)) {
-        igraph_eulerian_path_directed(graph, &vector_res);
-
-        for (int i = 0; i < igraph_vector_size(&vector_res) - 1; i++) {
-            vec1 = VECTOR(vector_res)[i];
-            vec2 = VECTOR(vector_res)[i+1];
-
-            igraph_get_eid(graph, &curr_edge, (int) vec1, (int) vec2, 1, error);
-            igraph_vector_push_back(res, curr_edge);
-        }
-    } else {
-        igraph_euler_path_undirected(graph, &vector_res);
-
-        for (int i = 0; i < igraph_vector_size(&vector_res) - 1; i++) {
-            vec1 = VECTOR(vector_res)[i];
-            vec2 = VECTOR(vector_res)[i+1];
-
-            igraph_get_eid(graph, &curr_edge, (int) vec1, (int) vec2, 0, error);
-            igraph_vector_push_back(res, curr_edge);
-        }
-    } 
-    igraph_vector_destroy(&vector_res);
-*/
 
     return IGRAPH_SUCCESS;
 }
