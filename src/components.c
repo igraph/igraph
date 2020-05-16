@@ -876,7 +876,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  * components.
  *
  * </para><para>
- * Somewhat arbitrarily, igraph does not consider comppnents containing
+ * Somewhat arbitrarily, igraph does not consider components containing
  * a single vertex only as being biconnected. Isolated vertices will
  * not be part of any of the biconnected components.
  *
