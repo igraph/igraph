@@ -23,45 +23,21 @@
 */
 
 #include "igraph_eulerian.h"
-#include "igraph_structural.h"
-#include "igraph_transitivity.h"
-#include "igraph_paths.h"
-#include "igraph_math.h"
-#include "igraph_memory.h"
-#include "igraph_random.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
-#include "igraph_progress.h"
-#include "igraph_interrupt_internal.h"
-#include "igraph_centrality.h"
 #include "igraph_components.h"
-#include "igraph_constructors.h"
-#include "igraph_conversion.h"
 #include "igraph_types_internal.h"
-#include "igraph_dqueue.h"
-#include "igraph_attributes.h"
-#include "igraph_neighborhood.h"
-#include "igraph_topology.h"
-#include "igraph_qsort.h"
-#include "config.h"
-#include "structural_properties_internal.h"
-
-#include <assert.h>
 
 /* solution adapted from https://www.geeksforgeeks.org/eulerian-path-and-circuit/
 The function returns one of the following values
-0 -> if graph is not Eulerian
-1 -> if graph has an euler circuit
-2 -> if graph has an euler path */
+has_path is set to 1 if a path exists, 0 otherwise
+has_cycle is set to 1 if a cycle exists, 0 otherwise
+*/
 int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
 
     igraph_bool_t res;
     igraph_integer_t odd, i;
     igraph_vector_t degree;
-    
-    igraph_vector_init(&degree, 0);
-
-    odd = 0;
 
     IGRAPH_CHECK(igraph_is_connected(graph, &res, IGRAPH_WEAK));
     if (!res) {
@@ -69,6 +45,8 @@ int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool
         *has_cycle = 0;
         return IGRAPH_SUCCESS;
     }
+
+    odd = 0;
 
     IGRAPH_CHECK(igraph_vector_init(&degree, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &degree);
@@ -87,11 +65,6 @@ int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool
         *has_cycle = 0;
         return IGRAPH_SUCCESS;
     }
-
-    /* if pdd count is 2, then semi-eulerian
-    if odd count is 0, then eulerian
-    odd count never is 1 for undirected graph 
-    */
 
     if (odd == 2) {
         *has_path = 1;
@@ -133,6 +106,8 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
                 *has_cycle = 0;
                 igraph_vector_destroy(&in_degree);
                 igraph_vector_destroy(&out_degree);
+                IGRAPH_FINALLY_CLEAN(2);
+
                 return IGRAPH_SUCCESS;
             }
         }
@@ -140,6 +115,8 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
 
     igraph_vector_destroy(&in_degree);
     igraph_vector_destroy(&out_degree);
+
+    IGRAPH_FINALLY_CLEAN(2);
 
     IGRAPH_CHECK(igraph_is_connected(graph, &res_strong, IGRAPH_STRONG));
     IGRAPH_CHECK(igraph_is_connected(graph, &res_weak, IGRAPH_WEAK));
@@ -158,12 +135,9 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
     *has_path = 0;
     *has_cycle = 0;
 
-    IGRAPH_FINALLY_CLEAN(2);
-
     return IGRAPH_SUCCESS;
 }
 
-/* flexible function */
 int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
     if (igraph_is_directed(graph)) {
         is_eulerian_directed(graph, has_path, has_cycle);
@@ -196,7 +170,7 @@ igraph_bool_t check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_intege
     return 1;
 }
 
-int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_vector_t *path, igraph_vector_bool_t *visited_list) {
+int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_vector_t *path, igraph_vector_bool_t *visited_list) {
 
     igraph_integer_t i, v, adj;
     igraph_inclist_t il;
@@ -226,7 +200,7 @@ int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, i
             if (adj == 1 || check_if_bridge(g, start, v, edge)) {
                 VECTOR(*visited_list)[edge] = 1;
                 IGRAPH_CHECK(igraph_vector_push_back(path, edge));               
-                print_euler_undirected_implementation(v, g, path, visited_list);
+                euler_undirected_implementation(v, g, path, visited_list);
             }
         }
         i++;
@@ -246,11 +220,9 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     /* default starting vertex is 0
     when we have no odd vertices, we can start anywhere (usually 0)
-    when we have 2 odd vertices, we start at any one of them
-    igraph_vector_t path must be initialised prior to its us */
+    when we have 2 odd vertices, we start at any one of them */
 
     igraph_integer_t start, i, e_count;
-    igraph_t copy; 
     igraph_inclist_t incl;
     igraph_vector_int_t *incedges;
     igraph_bool_t has_path;
@@ -262,11 +234,6 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     igraph_is_eulerian(graph, &has_path, &cycle);
 
-    if (!has_path && !cycle) {
-        IGRAPH_WARNING("Euler cycle not possible");
-        return IGRAPH_FAILURE;
-    }
-
     e_count = igraph_ecount(graph);
     igraph_vector_bool_init(&visited_list, e_count);
 
@@ -274,19 +241,13 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
         VECTOR(visited_list)[i] = 0;
     }
 
-    IGRAPH_CHECK(igraph_copy(&copy, graph));
-    IGRAPH_FINALLY(igraph_destroy, &copy);
-    /* making a copy of the graph
-    this is because this algorithm will delete edges 
-    therefore we do not want to modify our original graph */
-
     start = 0;
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &incl, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incl);
 
     if (cycle && !has_path) {
-        print_euler_undirected_implementation(start, &copy, path, &visited_list);
+        euler_undirected_implementation(start, graph, path, &visited_list);
     } else {
         for (i = 0; i < igraph_vcount(graph); i++) {
             incedges = igraph_inclist_get(&incl, i);
@@ -295,13 +256,12 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
                 break;
             }
         }
-        print_euler_undirected_implementation(start, &copy, path, &visited_list);
+        euler_undirected_implementation(start, graph, path, &visited_list);
     }
 
     igraph_inclist_destroy(&incl);
-    igraph_destroy(&copy);
 
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 
@@ -399,12 +359,8 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
     igraph_bool_t res_strong, res_weak;
     igraph_integer_t incoming_excess, outgoing_excess;
     igraph_integer_t start_node;
-    igraph_t copy;
     igraph_integer_t i;
     igraph_vector_t out_degree, in_degree;
-
-    IGRAPH_CHECK(igraph_copy(&copy, graph));
-    IGRAPH_FINALLY(igraph_destroy, &copy);
 
     incoming_excess = 0;
     outgoing_excess = 0;
@@ -437,16 +393,15 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
 
     if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong)) {
         start_node = 0;
-        eulerian_path_directed_implementation(&copy, &start_node, &out_degree, res);
+        eulerian_path_directed_implementation(graph, &start_node, &out_degree, res);
     } else if ((outgoing_excess == 1 && incoming_excess == 1) && 
         (res_strong || res_weak)) {
-        eulerian_path_directed_implementation(&copy, &start_node, &out_degree, res);
+        eulerian_path_directed_implementation(graph, &start_node, &out_degree, res);
     }
 
     igraph_vector_destroy(&in_degree);
     igraph_vector_destroy(&out_degree);
-    igraph_destroy(&copy);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -462,8 +417,7 @@ int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
     igraph_is_eulerian(graph, &has_path, &cycle);
 
     if (!cycle) {
-        IGRAPH_WARNING("Eulerian cycle not possible");
-        return IGRAPH_FAILURE;
+        return IGRAPH_EINVAL;
     }
 
     if (igraph_is_directed(graph)) {
@@ -485,8 +439,7 @@ int igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res) {
     igraph_is_eulerian(graph, &has_path, &cycle);
 
     if (!has_path && !cycle) {
-        IGRAPH_WARNING("Eulerian path not possible");
-        return IGRAPH_FAILURE;
+        return IGRAPH_EINVAL;
     }
 
     if (igraph_is_directed(graph)) {
