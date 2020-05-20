@@ -90,7 +90,7 @@ int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool
 
     /* if pdd count is 2, then semi-eulerian
     if odd count is 0, then eulerian
-    odd count never is 1 for undirected graph
+    odd count never is 1 for undirected graph 
     */
 
     if (odd == 2) {
