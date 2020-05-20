@@ -152,20 +152,17 @@ igraph_bool_t check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_intege
     igraph_vector_t bridges;
     igraph_integer_t i;
 
-    IGRAPH_CHECK(igraph_vector_init(&bridges, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &bridges);
+    igraph_vector_init(&bridges, 0);
     igraph_bridges(g, &bridges);
 
     for (i = 0; i < igraph_vector_size(&bridges); i++) {
         if (VECTOR(bridges)[i] == edge) {
             igraph_vector_destroy(&bridges);
-            IGRAPH_FINALLY_CLEAN(1);
             return 0;   
         }
     }
 
     igraph_vector_destroy(&bridges);
-    IGRAPH_FINALLY_CLEAN(1);
 
     return 1;
 }
