@@ -202,6 +202,7 @@ int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, i
     igraph_inclist_t il;
     igraph_vector_int_t *incedges;
     long nc, edge;
+    int j;
 
     i = 0;
 
@@ -212,7 +213,7 @@ int print_euler_undirected_implementation(igraph_integer_t start, igraph_t *g, i
         nc = igraph_vector_int_size(incedges);
         adj = 0;
 
-        for (int j = 0; j < nc; j++) {
+        for (j = 0; j < nc; j++) {
             edge = (long) VECTOR(*incedges)[j];
             if (!VECTOR(*visited_list)[edge]) adj++;
         }
@@ -269,7 +270,7 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     e_count = igraph_ecount(graph);
     igraph_vector_bool_init(&visited_list, e_count);
 
-    for (int i = 0; i < e_count; i++) {
+    for (i = 0; i < e_count; i++) {
         VECTOR(visited_list)[i] = 0;
     }
 
@@ -301,7 +302,6 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     igraph_destroy(&copy);
 
     IGRAPH_FINALLY_CLEAN(2);
-    //printf("end\n");
 
     return IGRAPH_SUCCESS;
 
@@ -313,11 +313,11 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
     igraph_integer_t curr = start;
     igraph_integer_t next, e_count, curr_e;
     igraph_inclist_t il;
-    igraph_es_t es;
     igraph_stack_t path, tracker, edge_tracker, edge_path;
     igraph_vector_int_t *incedges;
     igraph_vector_bool_t visited_list;
     long nc, edge;
+    int i, j;
 
     IGRAPH_CHECK(igraph_stack_init(&path, igraph_vcount(graph)));
     IGRAPH_FINALLY(igraph_stack_destroy, &path);
@@ -334,7 +334,7 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
     e_count = igraph_ecount(graph);
     igraph_vector_bool_init(&visited_list, e_count);
 
-    for (int i = 0; i < e_count; i++) {
+    for (i = 0; i < e_count; i++) {
         VECTOR(visited_list)[i] = 0;
     }
 
@@ -351,13 +351,12 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
             incedges = igraph_inclist_get(&il, curr);
             nc = igraph_vector_int_size(incedges);
 
-            for (int j = 0; j < nc; j++) {
+            for (j = 0; j < nc; j++) {
                 edge = (long) VECTOR(*incedges)[j];
                 if (!VECTOR(visited_list)[edge]) {
                     break;
                 }
             }
-            //edge = (long) VECTOR(*incedges)[0];
             
             next = IGRAPH_TO(graph, edge);
 
@@ -366,11 +365,6 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
             /* remove edge here */
             VECTOR(*outgoing_list)[curr]--;
             VECTOR(visited_list)[edge] = 1;
-            //VECTOR
-            /*
-            IGRAPH_CHECK(igraph_es_1(&es, edge));
-            IGRAPH_CHECK(igraph_delete_edges(graph, es));
-            */
             
             igraph_inclist_destroy(&il);
             IGRAPH_FINALLY_CLEAN(1);
