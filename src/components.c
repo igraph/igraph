@@ -635,7 +635,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
     long int i, n, num_seen;
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
 
-    long int no_of_clusters = 1;
+    long int no_of_clusters = 0;
     long int act_cluster_size;
 
     igraph_vector_t out = IGRAPH_VECTOR_NULL;
@@ -644,6 +644,10 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
     igraph_adjlist_t adjlist;
     igraph_vector_t verts;
     igraph_t *newg;
+
+    if (maxcompno < 0) {
+        maxcompno = LONG_MAX;
+    }
 
     igraph_vector_ptr_clear(components);
     IGRAPH_FINALLY(igraph_decompose_destroy, components);
@@ -735,7 +739,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
     /* number of components built */
     num_seen = 0;
-    while (!igraph_vector_empty(&out)) {
+    while (!igraph_vector_empty(&out) && no_of_clusters < maxcompno) {
         /* consume the vector from the last element */
         long int grandfather = (long int) igraph_vector_pop_back(&out);
 
