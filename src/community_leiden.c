@@ -30,7 +30,15 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_stack.h"
+#include "igraph_vector.h"
 #include "igraph_constructors.h"
+
+/* TODO(ntamas): move this to an internal vector-related header, or make it
+ * public */
+igraph_bool_t igraph_i_vector_binsearch_slice(
+    const igraph_vector_t *v, igraph_real_t what, long int *pos,
+    long int start, long int end
+);
 
 /* Move nodes in order to improve the quality of a partition.
  *
