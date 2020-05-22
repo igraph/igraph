@@ -25,6 +25,6 @@ namespace prpack {
             ~prpack_preprocessed_gs_graph();
     };
 
-};
+}
 
 #endif

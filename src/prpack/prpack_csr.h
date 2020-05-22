@@ -11,6 +11,6 @@ namespace prpack {
             int* tails;
     };
 
-};
+}
 
 #endif
