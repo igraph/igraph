@@ -955,6 +955,7 @@ static int igraph_i_maximal_cliques_store_max_size(const igraph_vector_t* clique
     return IGRAPH_SUCCESS;
 }
 
+/*
 static int igraph_i_maximal_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
     igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;
     igraph_vector_t* vec;
@@ -991,6 +992,7 @@ static int igraph_i_maximal_cliques_store_size_check(const igraph_vector_t* cliq
 
     return IGRAPH_SUCCESS;
 }
+*/
 
 static int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* data, igraph_bool_t* cont) {
     igraph_vector_ptr_t* result = (igraph_vector_ptr_t*)data;

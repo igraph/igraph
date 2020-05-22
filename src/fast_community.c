@@ -236,6 +236,7 @@ static void igraph_i_fastgreedy_community_list_build_heap(
 #define igraph_i_fastgreedy_community_list_find_in_heap(list, idx) (list)->heapindex[idx]
 
 /* Dumps the heap - for debugging purposes */
+/*
 static void igraph_i_fastgreedy_community_list_dump_heap(
         igraph_i_fastgreedy_community_list* list) {
     long int i;
@@ -255,9 +256,11 @@ static void igraph_i_fastgreedy_community_list_dump_heap(
     }
     debug("\nEND\n");
 }
+*/
 
 /* Checks if the community heap satisfies the heap property.
  * Only useful for debugging. */
+/*
 static void igraph_i_fastgreedy_community_list_check_heap(
         igraph_i_fastgreedy_community_list* list) {
     long int i;
@@ -270,6 +273,7 @@ static void igraph_i_fastgreedy_community_list_check_heap(
         }
     }
 }
+*/
 
 /* Removes a given element from the heap */
 static void igraph_i_fastgreedy_community_list_remove(
@@ -1063,5 +1067,3 @@ int igraph_community_fastgreedy(const igraph_t *graph,
 #ifdef IGRAPH_FASTCOMM_DEBUG
     #undef IGRAPH_FASTCOMM_DEBUG
 #endif
-
-
