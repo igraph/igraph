@@ -1,0 +1,181 @@
+# Traverse subdirectories
+add_subdirectory(cliquer)
+add_subdirectory(plfit)
+add_subdirectory(prpack)
+
+# Declare the files needed to compile the igraph library
+add_library(
+  igraph
+  adjlist.c
+  arpack.c
+  array.c
+  atlas.c
+  attributes.c
+  basic_query.c
+  bfgs.c
+  bigint.c
+  bignum.c
+  bipartite.c
+  blas.c
+  bliss.cc
+  cattributes.c
+  centrality.c
+  cliques.c
+  clustertool.cpp
+  cocitation.c
+  cohesive_blocks.c
+  coloring.c
+  community_leiden.c
+  community.c
+  complex.c
+  components.c
+  conversion.c
+  cores.c
+  decomposition.c
+  degree_sequence.cpp
+  DensityGrid_3d.cpp
+  DensityGrid.cpp
+  distances.c
+  dotproduct.c
+  dqueue.c
+  drl_graph_3d.cpp
+  drl_layout_3d.cpp
+  drl_layout.cpp
+  eigen.c
+  embedding.c
+  f2c_dummy.c
+  fast_community.c
+  feedback_arc_set.c
+  flow.c
+  foreign-graphml.c
+  foreign.c
+  forestfire.c
+  fortran_intrinsics.c
+  games.c
+  gengraph_box_list.cpp
+  gengraph_degree_sequence.cpp
+  gengraph_graph_molloy_hash.cpp
+  gengraph_graph_molloy_optimized.cpp
+  gengraph_mr-connected.cpp
+  gengraph_powerlaw.cpp
+  glet.c
+  glpk_support.c
+  gml_tree.c
+  hacks.c
+  heap.c
+  igraph_buckets.c
+  igraph_cliquer.c
+  igraph_error.c
+  igraph_estack.c
+  igraph_fixed_vectorlist.c
+  igraph_grid.c
+  igraph_hashtable.c
+  igraph_heap.c
+  igraph_hrg_types.cc
+  igraph_hrg.cc
+  igraph_marked_queue.c
+  igraph_psumtree.c
+  igraph_set.c
+  igraph_stack.c
+  igraph_strvector.c
+  igraph_trie.c
+  infomap_FlowGraph.cc
+  infomap_Greedy.cc
+  infomap_Node.cc
+  infomap.cc
+  interrupt.c
+  iterators.c
+  lad.c
+  lapack.c
+  layout_dh.c
+  layout_fr.c
+  layout_gem.c
+  layout_kk.c
+  layout.c
+  lsap.c
+  matching.c
+  math.c
+  matrix.c
+  maximal_cliques.c
+  memory.c
+  microscopic_update.c
+  mixing.c
+  motifs.c
+  NetDataTypes.cpp
+  NetRoutines.cpp
+  operators.c
+  optimal_modularity.c
+  other.c
+  paths.c
+  pottsmodel_2.cpp
+  progress.c
+  prpack.cpp
+  qsort_r.c
+  qsort.c
+  random_walk.c
+  random.c
+  sbm.c
+  scan.c
+  scg_approximate_methods.c
+  scg_exact_scg.c
+  scg_kmeans.c
+  scg_optimal_method.c
+  scg_utils.c
+  scg.c
+  separators.c
+  sir.c
+  spanning_trees.c
+  sparsemat.c
+  spectral_properties.c
+  spmatrix.c
+  st-cuts.c
+  statusbar.c
+  structural_properties.c
+  structure_generators.c
+  sugiyama.c
+  topology.c
+  triangles.c
+  type_indexededgelist.c
+  types.c
+  vector_ptr.c
+  vector.c
+  version.c
+  visitors.c
+  walktrap_communities.cpp
+  walktrap_graph.cpp
+  walktrap_heap.cpp
+  walktrap.cpp
+  zeroin.c
+)
+
+# Add include path. Includes are in ../include but they get installed to
+# <prefix/include/igraph, hence the two options. We also have some private
+# includes that are generated at compile time but are not part of the public
+# interface.
+target_include_directories(
+  igraph
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>
+  $<INSTALL_INTERFACE:include/igraph>
+  PRIVATE
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${CXSPARSE_INCLUDE_DIRECTORIES}
+)
+
+# Link igraph statically to some of the libraries from the subdirectories
+target_link_libraries(
+  igraph
+  PRIVATE
+  cliquer plfit prpack
+  ${ARPACK_LIBRARIES}
+  ${CXSPARSE_LIBRARIES}
+  ${LAPACK_LIBRARIES}
+)
+
+# Turn on all warnings for GCC, clang and MSVC
+if(MSVC)
+  target_compile_options(igraph PRIVATE /W4 /WX)
+else()
+  target_compile_options(igraph PRIVATE -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-varargs)
+endif()

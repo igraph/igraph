@@ -1,0 +1,19 @@
+#ifndef IGRAPH_CONFIG_H
+#define IGRAPH_CONFIG_H
+
+/* #cmakedefine ez-meg-az */
+
+#cmakedefine HAVE_STPCPY
+#cmakedefine HAVE_STPCPY_SIGNATURE
+#cmakedefine HAVE_STRDUP
+
+/* TODO(ntamas): check at configure time whether we support TLS */
+#define IGRAPH_THREAD_LOCAL
+
+#define PACKAGE_VERSION "@PACKAGE_VERSION@"
+#define PACKAGE_VERSION_MAJOR @PACKAGE_VERSION_MAJOR@
+#define PACKAGE_VERSION_MINOR @PACKAGE_VERSION_MINOR@
+#define PACKAGE_VERSION_PATCH @PACKAGE_VERSION_PATCH@
+#define PACKAGE_VERSION_PRERELEASE "@PACKAGE_VERSION_PRERELEASE@"
+
+#endif
