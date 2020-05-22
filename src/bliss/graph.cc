@@ -608,7 +608,7 @@ public:
   unsigned int cr_cep_index;
   unsigned int cr_level;
 
-  bool needs_long_prune;
+  bool needs_long_prune = false;
   unsigned int long_prune_begin;
   std::set<unsigned int, std::less<unsigned int> > long_prune_redundant;
   
