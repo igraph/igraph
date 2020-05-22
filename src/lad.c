@@ -497,8 +497,6 @@ static int igraph_i_lad_initDomains(bool initialDomains,
     int *mu, *mv;
     int matchingSize, u, v, i, j;
     igraph_vector_t *vec;
-    igraph_vector_t *Gp_uneis;
-    igraph_vector_t *Gt_vneis;
 
     val = igraph_Calloc(Gp->nbVertices * Gt->nbVertices, int);
     if (val == 0) {
