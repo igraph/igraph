@@ -4,6 +4,26 @@ add_subdirectory(cliquer)
 add_subdirectory(plfit)
 add_subdirectory(prpack)
 
+# Generate lexers and parsers
+set(PARSER_SOURCES)
+foreach(FORMAT dl gml lgl ncol pajek)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/foreign-${FORMAT}-parser.c)
+    list(APPEND PARSER_SOURCES
+      ${CMAKE_CURRENT_SOURCE_DIR}/foreign-${FORMAT}-lexer.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/foreign-${FORMAT}-parser.c
+    )
+  else()
+    bison_target(
+      ${FORMAT}_parser foreign-${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/foreign-${FORMAT}-parser.c
+    )
+    flex_target(
+      ${FORMAT}_lexer foreign-${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/foreign-${FORMAT}-lexer.c
+    )
+    add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
+    list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
+  endif()
+endforeach()
+
 # Declare the files needed to compile the igraph library
 add_library(
   igraph
@@ -147,6 +167,8 @@ add_library(
   walktrap_heap.cpp
   walktrap.cpp
   zeroin.c
+
+  ${PARSER_SOURCES}
 )
 
 # Add include path. Includes are in ../include but they get installed to
@@ -161,6 +183,7 @@ target_include_directories(
   $<INSTALL_INTERFACE:include/igraph>
   PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}
   ${CXSPARSE_INCLUDE_DIRECTORIES}
 )
 

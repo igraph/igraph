@@ -1,4 +1,6 @@
-cmake_minimum_required(VERSION 3.0)
+# Minimum CMake that we require is 3.14 because we use --ignore-eol when
+# comparing unit test results with expected outcomes
+cmake_minimum_required(VERSION 3.14)
 
 # Make use of ccache if it is present on the host system
 find_program(CCACHE_PROGRAM ccache)
@@ -52,6 +54,10 @@ configure_file(
 find_package(ARPACK REQUIRED)
 find_package(CXSparse REQUIRED)
 find_package(LAPACK REQUIRED)
+
+# Find optional dependencies
+find_package(FLEX)
+find_package(BISON)
 
 # Enable unit tests. Behave nicely and do this only if we are not being
 # included as a sub-project in another CMake project

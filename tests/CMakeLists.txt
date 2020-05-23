@@ -1,35 +1,4 @@
-function(add_simple_test NAME)
-  add_executable(test_${NAME} ${CMAKE_SOURCE_DIR}/examples/simple/${NAME})
-  target_link_libraries(test_${NAME} PRIVATE igraph)
-
-  # Some tests depend on internal igraph headers so we also have to add src/
-  # to the include path even though it's not part of the public API
-  target_include_directories(
-    test_${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
-  )
-
-  set(EXPECTED_OUTPUT_FILE ${CMAKE_SOURCE_DIR}/examples/simple/${NAME}.out)
-  set(OBSERVED_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/test_${NAME}.out)
-
-  if(EXISTS ${EXPECTED_OUTPUT_FILE})
-    add_test(
-      NAME ${NAME}
-      COMMAND ${CMAKE_COMMAND}
-        -DTEST_EXECUTABLE=$<TARGET_FILE:test_${NAME}>
-        -DEXPECTED_OUTPUT_FILE=${EXPECTED_OUTPUT_FILE}
-        -DOBSERVED_OUTPUT_FILE=${OBSERVED_OUTPUT_FILE}
-        -P ${CMAKE_SOURCE_DIR}/etc/cmake/run_legacy_test.cmake
-    )
-  else()
-    add_test(NAME ${NAME} COMMAND test_${NAME})
-  endif()
-endfunction()
-
-function(add_simple_tests)
-  foreach(NAME ${ARGV})
-    add_simple_test(${NAME})
-  endforeach()
-endfunction()
+include(test_helpers)
 
 # version.at
 add_simple_tests(
@@ -115,16 +84,16 @@ add_simple_tests(
   igraph_adjacency
   igraph_weighted_adjacency
   igraph_star
-  # igraph_lattice
+  igraph_lattice
   igraph_ring
   igraph_tree
   igraph_from_prufer
   igraph_full
-  # igraph_atlas
-  # igraph_small
+  igraph_atlas
+  igraph_small
   igraph_grg_game
   igraph_lcf
-  # watts_strogatz_game
+  watts_strogatz_game
   igraph_correlated_game
   igraph_realize_degree_sequence
 )
@@ -151,10 +120,10 @@ add_simple_tests(
   igraph_transitivity
   igraph_local_transitivity
   igraph_reciprocity
-  # igraph_minimum_spanning_tree
+  igraph_minimum_spanning_tree
   igraph_cocitation
   igraph_similarity
-  # igraph_simplify
+  igraph_simplify
   igraph_topological_sorting
   igraph_feedback_arc_set
   igraph_feedback_arc_set_ip
@@ -173,7 +142,7 @@ add_simple_tests(
 
 # components.at
 add_simple_tests(
-  # igraph_decompose
+  igraph_decompose
   igraph_biconnected_components
   igraph_bridges
 )
@@ -182,7 +151,7 @@ add_simple_tests(
 add_simple_tests(
   igraph_layout_grid
   igraph_layout_lgl
-  # igraph_layout_reingold_tilford
+  igraph_layout_reingold_tilford
   igraph_layout_sugiyama
   igraph_layout_mds
   igraph_i_layout_sphere
@@ -222,24 +191,24 @@ add_simple_tests(
 )
 
 # foreign.at
-# add_simple_tests(
-  # foreign
-  # graphml
-  # igraph_write_graph_pajek
-  # pajek
-  # pajek2
-  # pajek_bipartite2
-  # pajek_signed
-  # pajek_bipartite
-  # igraph_read_graph_lgl
-  # igraph_write_graph_lgl
-  # igraph_read_graph_graphdb
-  # gml
-  # dot
-  # lineendings
-  # igraph_read_graph_dl
-  # igraph_write_graph_leda
-# )
+add_simple_tests(
+  foreign
+  graphml
+  igraph_write_graph_pajek
+  pajek
+  pajek2
+  pajek_bipartite2
+  pajek_signed
+  pajek_bipartite
+  igraph_read_graph_lgl
+  igraph_write_graph_lgl
+  igraph_read_graph_graphdb
+  gml
+  dot
+  lineendings
+  igraph_read_graph_dl
+  igraph_write_graph_leda
+)
 
 # other.at
 add_simple_tests(
@@ -248,19 +217,19 @@ add_simple_tests(
 )
 
 # operators.at
-# add_simple_tests(
-  # igraph_disjoint_union
-  # igraph_union
-  # igraph_intersection
-  # igraph_intersection2
-  # igraph_difference
-  # igraph_complementer
-  # igraph_compose
-# )
+add_simple_tests(
+  igraph_disjoint_union
+  igraph_union
+  igraph_intersection
+  igraph_intersection2
+  igraph_difference
+  igraph_complementer
+  igraph_compose
+)
 
 # conversion.at
 add_simple_tests(
-  # igraph_to_undirected
+  igraph_to_undirected
   adjlist
   igraph_laplacian
   igraph_to_prufer
@@ -268,11 +237,11 @@ add_simple_tests(
 
 # flow.at
 add_simple_tests(
-  # flow
-  # flow2
+  flow
+  flow2
   igraph_mincut
   even_tarjan
-  # dominator_tree
+  dominator_tree
   igraph_all_st_cuts
   igraph_all_st_mincuts
   igraph_gomory_hu_tree
@@ -290,7 +259,7 @@ add_simple_tests(
   igraph_community_multilevel
   bug-1149658
   igraph_community_optimal_modularity
-  # igraph_community_infomap
+  igraph_community_infomap
 )
 
 # cliques.at
@@ -316,8 +285,8 @@ add_simple_tests(
 
 # attributes.at
 add_simple_tests(
-  # cattributes
-  # cattributes2
+  cattributes
+  cattributes2
   cattributes3
   cattributes4
   cattributes5
@@ -338,7 +307,7 @@ add_simple_tests(
 
 # bipartite.at
 add_simple_tests(
-  # igraph_bipartite_create
+  igraph_bipartite_create
   igraph_bipartite_projection
 )
 
@@ -354,7 +323,7 @@ add_simple_tests(
   igraph_minimal_separators
   bug-1033045
   igraph_minimum_size_separators
-  # cohesive_blocks
+  cohesive_blocks
 )
 
 # hrg.at
@@ -374,8 +343,8 @@ add_simple_tests(
 
 # mt.at
 # add_simple_tests(
-#   tls1
-#   tls2
+  # tls1
+  # tls2
 # )
 
 # scg.at
@@ -387,9 +356,9 @@ add_simple_tests(
   igraph_scg_semiprojectors
   igraph_scg_semiprojectors2
   igraph_scg_semiprojectors3
-  # scg
-  # scg2
-  # scg3
+  scg
+  scg2
+  scg3
 )
 
 # random.at
@@ -408,9 +377,9 @@ add_simple_tests(
 )
 
 # matching.at
-# add_simple_tests(
-#   igraph_maximum_bipartite_matching
-# )
+add_simple_tests(
+  igraph_maximum_bipartite_matching
+)
 
 # embedding.at
 add_simple_tests(

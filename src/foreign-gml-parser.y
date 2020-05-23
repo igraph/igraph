@@ -82,7 +82,6 @@ igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* 
 %}
 
 %pure-parser
-%output="y.tab.c"
 %name-prefix="igraph_gml_yy"
 %defines
 %locations

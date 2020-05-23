@@ -71,7 +71,6 @@ igraph_real_t igraph_ncol_get_number(const char *str, long int len);
 %}
 
 %pure-parser
-%output="y.tab.c"
 %name-prefix="igraph_ncol_yy"
 %defines
 %locations

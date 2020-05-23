@@ -107,7 +107,6 @@ extern long int igraph_i_pajek_actedge;
 %}
 
 %pure-parser
-%output="y.tab.c"
 %name-prefix="igraph_pajek_yy"
 %defines
 %locations

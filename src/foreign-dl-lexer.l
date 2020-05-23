@@ -65,7 +65,6 @@
 
 %option noyywrap
 %option prefix="igraph_dl_yy"
-%option outfile="lex.yy.c"
 %option nounput
 %option noinput
 %option nodefault
