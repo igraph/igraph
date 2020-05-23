@@ -608,7 +608,7 @@ public:
   unsigned int cr_cep_index;
   unsigned int cr_level;
 
-  bool needs_long_prune = false;
+  bool needs_long_prune;
   unsigned int long_prune_begin;
   std::set<unsigned int, std::less<unsigned int> > long_prune_redundant;
 
@@ -810,6 +810,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
     root.fp_extendable = TreeNode::MAYBE;
     root.in_best_path = false;
     root.cmp_to_best_path = 0;
+    root.needs_long_prune = false;
     root.long_prune_begin = 0;
 
     root.failure_recording_ival = 0;

@@ -1,4 +1,5 @@
 # Traverse subdirectories
+add_subdirectory(bliss)
 add_subdirectory(cliquer)
 add_subdirectory(plfit)
 add_subdirectory(prpack)
@@ -167,7 +168,7 @@ target_include_directories(
 target_link_libraries(
   igraph
   PRIVATE
-  cliquer plfit prpack
+  bliss cliquer plfit prpack
   ${ARPACK_LIBRARIES}
   ${CXSPARSE_LIBRARIES}
   ${LAPACK_LIBRARIES}
