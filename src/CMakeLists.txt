@@ -185,6 +185,7 @@ target_include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CXSPARSE_INCLUDE_DIRECTORIES}
+  ${LIBXML2_INCLUDE_DIRS}
 )
 
 # Link igraph statically to some of the libraries from the subdirectories
@@ -195,6 +196,7 @@ target_link_libraries(
   ${ARPACK_LIBRARIES}
   ${CXSPARSE_LIBRARIES}
   ${LAPACK_LIBRARIES}
+  ${LIBXML2_LIBRARIES}
 )
 
 # Turn on all warnings for GCC, clang and MSVC

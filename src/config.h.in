@@ -1,10 +1,12 @@
 #ifndef IGRAPH_CONFIG_H
 #define IGRAPH_CONFIG_H
 
-#cmakedefine HAVE_STPCPY
-#cmakedefine HAVE_STPCPY_SIGNATURE
-#cmakedefine HAVE_STRDUP
-#cmakedefine HAVE_TLS
+#cmakedefine HAVE_STPCPY 1
+#cmakedefine HAVE_STPCPY_SIGNATURE 1
+#cmakedefine HAVE_STRDUP 1
+#cmakedefine HAVE_TLS 1
+
+#cmakedefine HAVE_LIBXML 1
 
 #define IGRAPH_F77_SAVE static @TLS_KEYWORD@
 #define IGRAPH_THREAD_LOCAL @TLS_KEYWORD@

@@ -36,6 +36,19 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/include/igraph_version.h
 )
 
+# Find dependencies
+find_package(ARPACK REQUIRED)
+find_package(CXSparse REQUIRED)
+find_package(LAPACK REQUIRED)
+
+# Find dependencies dependent on some configuration settings
+find_package(LibXml2)
+set(HAVE_LIBXML ${LIBXML2_FOUND})
+
+# Find optional dependencies
+find_package(FLEX)
+find_package(BISON)
+
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckFunctionExists)
 include(CheckSymbolExists)
@@ -58,15 +71,6 @@ configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/igraph_threading.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/igraph_threading.h
 )
-
-# Find dependencies
-find_package(ARPACK REQUIRED)
-find_package(CXSparse REQUIRED)
-find_package(LAPACK REQUIRED)
-
-# Find optional dependencies
-find_package(FLEX)
-find_package(BISON)
 
 # Enable unit tests. Behave nicely and do this only if we are not being
 # included as a sub-project in another CMake project
