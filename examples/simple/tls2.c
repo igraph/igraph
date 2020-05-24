@@ -49,7 +49,7 @@ int arpack_mult(igraph_real_t *to, igraph_real_t *from, int n,
     return 0;
 }
 
-/* This is the function performed by each thread. It calles the
+/* This is the function performed by each thread. It calls the
    low-level ARPACK symmetric eigensolver, step by step. After each
    step, it synchronizes with the other thread.
 

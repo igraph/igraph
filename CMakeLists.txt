@@ -1,6 +1,7 @@
-# Minimum CMake that we require is 3.14 because we use --ignore-eol when
-# comparing unit test results with expected outcomes
-cmake_minimum_required(VERSION 3.14)
+# Minimum CMake that we require is 3.16 because we use --ignore-eol when
+# comparing unit test results with expected outcomes (added in 3.14) and we
+# also use SKIP_REGULAR_EXPRESSION to handle skipped tests properly
+cmake_minimum_required(VERSION 3.16)
 
 # Make use of ccache if it is present on the host system
 find_program(CCACHE_PROGRAM ccache)
@@ -38,9 +39,17 @@ configure_file(
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckFunctionExists)
 include(CheckSymbolExists)
+include(CheckTLSSupport)
 check_function_exists(stpcpy HAVE_STPCPY)
 check_symbol_exists(stpcpy "string.h" HAVE_STPCPY_SIGNATURE)
 check_symbol_exists(strdup "string.h" HAVE_STRDUP)
+# check_tls_support(TLS_KEYWORD)
+set(TLS_KEYWORD "")  # when using a third-party ARPACK, TLS support cannot be guaranteed
+if(TLS_KEYWORD)
+  set(HAVE_TLS 1)
+else()
+  set(HAVE_TLS 0)
+endif()
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.h
