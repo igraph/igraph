@@ -897,8 +897,9 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * \param modularity Pointer to a real number, the result will be
  *     stored here.
  * \param weights Weight vector or NULL if no weights are specified.
- * \param gamma Resolution parameter. Must be >=0. Default is 1. <1 leads to less 
- *     communities (larger in size); >1 more communities (smaller in size).
+ * \param gamma Resolution parameter. Must be greater or equal to 0. Default is 1. 
+ *     Lower than 1 leads to less communities (larger in size); greater than 1 more 
+ *     communities (smaller in size).
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
@@ -2961,8 +2962,9 @@ static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membersh
  *     For each vertex it gives the ID of its community.
  * \param modularity The modularity of the partition is returned here.
  *     \c NULL means that the modularity is not needed.
- * \param gamma Resolution parameter. Must be >=0. Default is 1. <1 leads to less 
- *     communities (larger in size); >1 more communities (smaller in size).
+ * \param gamma Resolution parameter. Must be greater or equal to 0. Default is 1. 
+ *     Lower than 1 leads to less communities (larger in size); greater than 1 more 
+ *     communities (smaller in size).
  * \return Error code.
  *
  * Time complexity: in average near linear on sparse graphs.
@@ -3211,8 +3213,9 @@ static int igraph_i_community_multilevel_step(
  * \param modularity Numeric vector that will contain the modularity score
  *     after each level, if not \c NULL. It must be initialized and it
  *     will be resized accordingly.
- * \param gamma Resolution parameter. Must be >=0. Default is 1. <1 leads to less 
- *     communities (larger in size); >1 more communities (smaller in size).
+ * \param gamma Resolution parameter. Must be greater or equal to 0. Default is 1. 
+ *     Lower than 1 leads to less communities (larger in size); greater than 1 more 
+ *     communities (smaller in size).
  * \return Error code.
  *
  * Time complexity: in average near linear on sparse graphs.
