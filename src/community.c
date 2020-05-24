@@ -864,42 +864,52 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
 }
 
 /**
- * \function igraph_modularity
- * \brief Calculate the modularity of a graph with respect to some vertex types
- *
- * The modularity of a graph with respect to some division (or vertex
- * types) measures how good the division is, or how separated are the
- * different vertex types from each other. It is defined as
- * Q=1/(2m) * sum((Aij - ki*kj / (2m)) delta(ci,cj), i, j), here `m' is the
- * number of edges, `Aij' is the element of the `A' adjacency matrix
- * in row `i' and column `j', `ki' is the degree of `i', `kj' is the
- * degree of `j', `ci' is the type (or component) of `i', `cj' that of
- * `j', the sum goes over all `i' and `j' pairs of vertices, and
- * `delta(x,y)' is one if x=y and zero otherwise.
- *
- * </para><para>
- * Modularity on weighted graphs is also meaningful. When taking edge
- * weights into account, `Aij' becomes the weight of the corresponding
- * edge (or 0 if there is no edge), `ki' is the total weight of edges
- * incident on vertex `i', `kj' is the total weight of edges incident
- * on vertex `j' and `m' is the total weight of all edges.
+ * \function igraph_modularity \brief Calculate the modularity of a graph with
+ * respect to some clusters or vertex types.
+
+ * The modularity of a graph with respect to some partition or vertex types
+ * measures how strongly separated the different vertex types are from each
+ * other compared to a random null model. It is defined as `Q=1/(2m) sum_ij
+ * (A_ij - gamma * k_i * k_j / (2m)) * d(c_i,c_j)', where `m' is the number of
+ * edges, `A_ij = 1' if vertex `i` and `j` are connected and 0 otherwise, `k_i'
+ * is the degree of vertex `i', `c_i' is the cluster (or vertex type) of vertex
+ * `i', `d(x,y)=1' if `x=y' and 0 otherwise and the sum goes over all `i' and
+ * `j' pairs of vertices
  *
  * </para><para>
- * See also Clauset, A.; Newman, M. E. J.; Moore, C. Finding
- * community structure in very large networks, Physical Review E,
- * 2004, 70, 066111.
- * \param graph The input graph. It must be undirected; directed graphs are
- *     not supported yet.
+ * The resolution parameter `gamma` allows to weigh the random null model, which
+ * might be useful when finding partitions with a high modularity. Higher values
+ * of the resolution parameter typically result in more, smaller clusters when
+ * finding partitions with a high modularity. Lower values typically result in
+ * fewer, larger clusters. The original definition of modularity is retrieved
+ * when setting `gamma=1`.
+ *
+ * </para><para>
+ * Modularity on weighted graphs is also meaningful. When taking
+ * edge weights into account, `A_ij' equals the weight of the corresponding edge
+ * (or 0 if there is no edge), `k_i' is the total weight of edges incident on
+ * vertex `i', `m' is the total weight of all edges.
+ *
+ * </para><para>
+ * For the original definition of modularity, see Newman, M. E. J., & Girvan, M.
+ * (2004). Finding and evaluating community structure in networks. Physical
+ * Review E, 69(2), 026113. https://doi.org/10.1103/PhysRevE.69.026113
+ * For the introduction of the resolution parameter, see Reichardt, J., &
+ * Bornholdt, S. (2006). Statistical mechanics of community detection. Physical
+ * Review E, 74(1), 016110. https://doi.org/10.1103/PhysRevE.74.016110
+ *
+ * \param graph      The input graph. It must be undirected; directed graphs are
+ *                   not supported yet.
  * \param membership Numeric vector which gives the type of each
- *     vertex, ie. the component to which it belongs.
- *     It does not have to be consecutive, i.e. empty communities are
- *     allowed.
+ *                   vertex, i.e. the cluster to which it belongs.
+ *                   It does not have to be consecutive, i.e. empty communities
+ *                   are allowed.
  * \param modularity Pointer to a real number, the result will be
- *     stored here.
- * \param weights Weight vector or NULL if no weights are specified.
- * \param gamma Resolution parameter. Must be greater or equal to 0. Default is 1. 
- *     Lower than 1 leads to less communities (larger in size); greater than 1 more 
- *     communities (smaller in size).
+ *                   stored here.
+ * \param weights    Weight vector or NULL if no weights are specified.
+ * \param gamma      Resolution parameter. Must be greater than or equal to 0.
+ *                   Default is 1. Lower values favor fewer, larger communities;
+ *                   higher values favor more, smaller communities.
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
@@ -921,11 +931,7 @@ int igraph_modularity(const igraph_t *graph,
     long int c1, c2;
 
     if (igraph_is_directed(graph)) {
-#ifndef USING_R
         IGRAPH_ERROR("modularity is implemented for undirected graphs", IGRAPH_EINVAL);
-#else
-        REprintf("Modularity is implemented for undirected graphs only.\n");
-#endif
     }
 
     if (igraph_vector_size(membership) < igraph_vcount(graph)) {
@@ -995,23 +1001,28 @@ int igraph_modularity(const igraph_t *graph,
  * \function igraph_modularity_matrix
  * \brief Calculate the modularity matrix
  *
- * This function returns the modularity matrix defined as
- * `B_ij = A_ij - k_i k_j * / 2 m`
- * where `A_ij` denotes the adjacency matrix, `k_i` is the degree of node `i`
- * and `m` is the total weight in the graph. Note that self-loops are multiplied
- * by 2 in this implementation. If weights are specified, the weighted
- * counterparts are used.
+ * This function returns the modularity matrix defined as `B_ij = A_ij - gamma *
+ * k_i * k_j / (2m)` where `A_ij = 1' if vertex `i` and `j` are connected and 0
+ * otherwise, `gamma` is the resolution parameter, `k_i' is the degree of vertex
+ * `i' and `m' is the number of edges in the graph.
+ *
+ * Note that self-loops are multiplied by 2 in this
+ * implementation. If weights are specified, the weighted counterparts are used.
  *
  * \param graph   The input graph
  * \param modmat  Pointer to an initialized matrix in which the modularity
  *                matrix is stored.
  * \param weights Edge weights, pointer to a vector. If this is a null pointer
  *                then every edge is assumed to have a weight of 1.
+ * \param gamma   Resolution parameter. Must be greater than or equal to 0.
+ *                Default is 1. Lower values favor fewer, larger communities;
+ *                higher values favor more, smaller communities.
  */
 
 int igraph_modularity_matrix(const igraph_t *graph,
                              igraph_matrix_t *modmat,
-                             const igraph_vector_t *weights) {
+                             const igraph_vector_t *weights,
+                             const igraph_real_t gamma) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -1039,7 +1050,7 @@ int igraph_modularity_matrix(const igraph_t *graph,
     }
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < no_of_nodes; j++) {
-            MATRIX(*modmat, i, j) -= VECTOR(deg)[i] * VECTOR(deg)[j] / 2.0 / sw;
+            MATRIX(*modmat, i, j) -= gamma * VECTOR(deg)[i] * VECTOR(deg)[j] / 2.0 / sw;
         }
     }
 
@@ -2955,16 +2966,17 @@ static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membersh
  *
  * This function was contributed by Tom Gregorovic.
  *
- * \param graph   The input graph. It must be an undirected graph.
- * \param weights Numeric vector containing edge weights. If \c NULL, every edge
- *     has equal weight. The weights are expected to be non-negative.
+ * \param graph      The input graph. It must be an undirected graph.
+ * \param weights    Numeric vector containing edge weights. If \c NULL,
+ *                   every edge has equal weight. The weights are expected
+ *                   to be non-negative.
  * \param membership The membership vector, the result is returned here.
- *     For each vertex it gives the ID of its community.
+ *                   For each vertex it gives the ID of its community.
  * \param modularity The modularity of the partition is returned here.
- *     \c NULL means that the modularity is not needed.
- * \param gamma Resolution parameter. Must be greater or equal to 0. Default is 1. 
- *     Lower than 1 leads to less communities (larger in size); greater than 1 more 
- *     communities (smaller in size).
+ *                   \c NULL means that the modularity is not needed.
+ * \param gamma      Resolution parameter. Must be greater than or equal to 0.
+ *                   Default is 1. Lower values favor fewer, larger communities;
+ *                   higher values favor more, smaller communities.
  * \return Error code.
  *
  * Time complexity: in average near linear on sparse graphs.
@@ -3003,7 +3015,7 @@ static int igraph_i_community_multilevel_step(
     if (gamma < 0.0) {
       IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
     }
-    
+
     /* Initialize data structures */
     IGRAPH_VECTOR_INIT_FINALLY(&links_community, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&links_weight, 0);
@@ -3186,11 +3198,15 @@ static int igraph_i_community_multilevel_step(
  *
  * This function implements the multi-level modularity optimization
  * algorithm for finding community structure, see
- * VD Blondel, J-L Guillaume, R Lambiotte and E Lefebvre: Fast unfolding of
- * community hierarchies in large networks, J Stat Mech P10008 (2008)
- * for the details (preprint: http://arxiv.org/abs/arXiv:0803.0476).
+ * Blondel, V. D., Guillaume, J.-L., Lambiotte, R., & Lefebvre, E. (2008). Fast
+ * unfolding of communities in large networks. Journal of Statistical Mechanics:
+ * Theory and Experiment, 10008(10), 6.
+ * https://doi.org/10.1088/1742-5468/2008/10/P10008 for the details (preprint:
+ * http://arxiv.org/abs/0803.0476). The algorithm is sometimes known as the
+ * "Louvain" algorithm.
  *
- * It is based on the modularity measure and a hierarchical approach.
+ * </para><para>
+ * The algorithm is based on the modularity measure and a hierarchical approach.
  * Initially, each vertex is assigned to a community on its own. In every step,
  * vertices are re-assigned to communities in a local, greedy way: each vertex
  * is moved to the community with which it achieves the highest contribution to
@@ -3199,23 +3215,31 @@ static int igraph_i_community_multilevel_step(
  * The process stops when there is only a single vertex left or when the modularity
  * cannot be increased any more in a step.
  *
+ * </para><para>
+ * The resolution parameter `gamma` allows to find communities at different
+ * resolutions. Higher values of the resolution parameter typically result in
+ * more, smaller communities. Lower values typically result in fewer, larger
+ * communities. The original definition of modularity is retrieved when setting
+ * `gamma=1`. Please note that the returned modularity value is calculated using
+ * the indicated resolution parameter.
+ *
  * This function was contributed by Tom Gregorovic.
  *
- * \param graph The input graph. It must be an undirected graph.
- * \param weights Numeric vector containing edge weights. If \c NULL, every edge
- *    has equal weight. The weights are expected to be non-negative.
- * \param membership The membership vector, the result is returned here.
- *    For each vertex it gives the ID of its community. The vector
- *    must be initialized and it will be resized accordingly.
- * \param memberships Numeric matrix that will contain the membership
- *     vector after each level, if not \c NULL. It must be initialized and
- *     it will be resized accordingly.
- * \param modularity Numeric vector that will contain the modularity score
- *     after each level, if not \c NULL. It must be initialized and it
- *     will be resized accordingly.
- * \param gamma Resolution parameter. Must be greater or equal to 0. Default is 1. 
- *     Lower than 1 leads to less communities (larger in size); greater than 1 more 
- *     communities (smaller in size).
+ * \param graph       The input graph. It must be an undirected graph.
+ * \param weights     Numeric vector containing edge weights. If \c NULL, every edge
+ *                    has equal weight. The weights are expected to be non-negative.
+ * \param membership  The membership vector, the result is returned here.
+ *                    For each vertex it gives the ID of its community. The vector
+ *                    must be initialized and it will be resized accordingly.
+ * \param memberships Numeric matrix that will contain the membership vector after
+ *                    each level, if not \c NULL. It must be initialized and
+ *                    it will be resized accordingly.
+ * \param modularity  Numeric vector that will contain the modularity score
+ *                    after each level, if not \c NULL. It must be initialized
+ *                    and it will be resized accordingly.
+ * \param gamma       Resolution parameter. Must be greater than or equal to 0.
+ *                    Default is 1. Lower values favor fewer, larger communities;
+ *                    higher values favor more, smaller communities.
  * \return Error code.
  *
  * Time complexity: in average near linear on sparse graphs.
