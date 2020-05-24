@@ -1,0 +1,5 @@
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "igraph library")
+set(CPACK_PACKAGE_VENDOR "The igraph development team")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
+
+include(CPack)

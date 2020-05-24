@@ -3,11 +3,17 @@
 # also use SKIP_REGULAR_EXPRESSION to handle skipped tests properly
 cmake_minimum_required(VERSION 3.16)
 
+# Add etc/cmake to CMake's search path so we can put our private stuff there
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
+
 # Make use of ccache if it is present on the host system
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
+
+# Figure out the version number from Git
+include(version)
 
 # Declare the project, its version number and language
 project(igraph VERSION 0.9.0 LANGUAGES C CXX)
@@ -18,36 +24,18 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Add etc/cmake to CMake's search path so we can put our private stuff there
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
-
 # Add switches to use sanitizers if needed
 include(sanitizers)
 
 # Add version information
-# TODO(ntamas): get this from Git or IGRAPH_VERSION
-set(PACKAGE_VERSION "0.9.0-cmake-experimental")
-set(PACKAGE_VERSION_MAJOR 0)
-set(PACKAGE_VERSION_MINOR 9)
-set(PACKAGE_VERSION_PATCH 0)
-set(PACKAGE_VERSION_PRERELEASE "cmake-experimental")
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/include/igraph_version.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/include/igraph_version.h
 )
 
-# Find dependencies
-find_package(ARPACK REQUIRED)
-find_package(CXSparse REQUIRED)
-find_package(LAPACK REQUIRED)
-
-# Find dependencies dependent on some configuration settings
-find_package(LibXml2)
-set(HAVE_LIBXML ${LIBXML2_FOUND})
-
-# Find optional dependencies
-find_package(FLEX)
-find_package(BISON)
+# Handle dependencies and dependency-related configuration options
+include(dependencies)
+find_dependencies()
 
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckFunctionExists)
@@ -84,9 +72,8 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
 endif()
 
+# Configure packaging
+include(packaging)
+
 # Show result of configuration
-message(STATUS " ")
-message(STATUS "----------------------------------")
-message(STATUS "igraph configured successfully.")
-message(STATUS "----------------------------------")
-message(STATUS " ")
+summarize_dependencies()

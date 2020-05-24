@@ -185,6 +185,8 @@ target_include_directories(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CXSPARSE_INCLUDE_DIRECTORIES}
+  ${GLPK_INCLUDE_DIR}
+  ${GMP_INCLUDE_DIR}
   ${LIBXML2_INCLUDE_DIRS}
 )
 
@@ -195,6 +197,8 @@ target_link_libraries(
   bliss cliquer plfit prpack
   ${ARPACK_LIBRARIES}
   ${CXSPARSE_LIBRARIES}
+  ${GLPK_LIBRARIES}
+  ${GMP_LIBRARY}
   ${LAPACK_LIBRARIES}
   ${LIBXML2_LIBRARIES}
 )
