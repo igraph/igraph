@@ -1310,7 +1310,7 @@ igraph_le_community_to_membership:
 
 igraph_modularity:
         PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity, \
-                IN VECTOR_OR_0 weights=NULL
+                IN VECTOR_OR_0 weights=NULL, REAL gamma=1.0
         NAME-R: modularity.igraph
         IGNORE: RNamespace, RR
 
@@ -1358,7 +1358,7 @@ igraph_community_label_propagation:
 igraph_community_multilevel:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
                 OUT VECTOR membership, \
-		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
+		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity, REAL gamma=1.0
         DEPS: weights ON graph
         NAME-R: cluster_louvain
         IGNORE: RR
