@@ -118,7 +118,7 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
         igraph_vector_update(membership, &mymembership);
     }
 
-    IGRAPH_CHECK(igraph_modularity(graph, &mymembership, &maxmod, weights));
+    IGRAPH_CHECK(igraph_modularity(graph, &mymembership, &maxmod, weights, 1));
     if (modularity) {
         VECTOR(*modularity)[0] = maxmod;
     }
@@ -148,7 +148,7 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
                 }
             }
 
-            IGRAPH_CHECK(igraph_modularity(graph, &mymembership, &actmod, weights));
+            IGRAPH_CHECK(igraph_modularity(graph, &mymembership, &actmod, weights, 1));
             if (modularity) {
                 VECTOR(*modularity)[midx + 1] = actmod;
                 if (actmod > maxmod) {
@@ -897,6 +897,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * \param modularity Pointer to a real number, the result will be
  *     stored here.
  * \param weights Weight vector or NULL if no weights are specified.
+ * \param gamma Resolution parameter. Must be >=0. Default is 1. <1 leads to less 
+ *     communities (larger in size); >1 more communities (smaller in size).
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
@@ -906,7 +908,8 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
 int igraph_modularity(const igraph_t *graph,
                       const igraph_vector_t *membership,
                       igraph_real_t *modularity,
-                      const igraph_vector_t *weights) {
+                      const igraph_vector_t *weights,
+                      const igraph_real_t gamma) {
 
     igraph_vector_t e, a;
     long int types = (long int) igraph_vector_max(membership) + 1;
@@ -930,6 +933,9 @@ int igraph_modularity(const igraph_t *graph,
     }
     if (igraph_vector_min(membership) < 0) {
         IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
+    }
+    if (gamma < 0.0) {
+      IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&e, types);
@@ -973,7 +979,7 @@ int igraph_modularity(const igraph_t *graph,
         for (i = 0; i < types; i++) {
             igraph_real_t tmp = VECTOR(a)[i] / 2 / m;
             *modularity += VECTOR(e)[i] / 2 / m;
-            *modularity -= tmp * tmp;
+            *modularity -= gamma * tmp * tmp;
         }
     }
 
@@ -2050,7 +2056,7 @@ int igraph_community_leading_eigenvector(const igraph_t *graph,
 
     if (modularity) {
         IGRAPH_CHECK(igraph_modularity(graph, mymembership, modularity,
-                                       weights));
+                                       weights, 1));
     }
 
     if (!membership) {
@@ -2365,7 +2371,7 @@ int igraph_community_fluid_communities(const igraph_t *graph,
 
     if (modularity) {
         IGRAPH_CHECK(igraph_modularity(graph, membership, modularity,
-                                       NULL));
+                                       NULL, 1));
     }
 
     igraph_vector_destroy(&node_order);
@@ -2651,7 +2657,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
 
     if (modularity) {
         IGRAPH_CHECK(igraph_modularity(graph, membership, modularity,
-                                       weights));
+                                       weights, 1));
     }
 
     igraph_vector_destroy(&node_order);
@@ -2684,14 +2690,15 @@ typedef struct {
 
 /* Computes the modularity of a community partitioning */
 static igraph_real_t igraph_i_multilevel_community_modularity(
-    const igraph_i_multilevel_community_list *communities) {
+                                                              const igraph_i_multilevel_community_list *communities,
+                                                              const igraph_real_t gamma) {
     igraph_real_t result = 0;
     long int i;
     igraph_real_t m = communities->weight_sum;
 
     for (i = 0; i < communities->vertices_no; i++) {
         if (communities->item[i].size > 0) {
-            result += (communities->item[i].weight_inside - communities->item[i].weight_all * communities->item[i].weight_all / m) / m;
+            result += (communities->item[i].weight_inside - gamma * communities->item[i].weight_all * communities->item[i].weight_all / m) / m;
         }
     }
 
@@ -2872,12 +2879,13 @@ static int igraph_i_multilevel_community_links(
 }
 
 static igraph_real_t igraph_i_multilevel_community_modularity_gain(
-        const igraph_i_multilevel_community_list *communities,
-        igraph_integer_t community, igraph_integer_t vertex,
-        igraph_real_t weight_all, igraph_real_t weight_inside) {
+                                                                   const igraph_i_multilevel_community_list *communities,
+                                                                   igraph_integer_t community, igraph_integer_t vertex,
+                                                                   igraph_real_t weight_all, igraph_real_t weight_inside,
+                                                                   const igraph_real_t gamma) {
     IGRAPH_UNUSED(vertex);
     return weight_inside -
-           communities->item[(long int)community].weight_all * weight_all / communities->weight_sum;
+           gamma * communities->item[(long int)community].weight_all * weight_all / communities->weight_sum;
 }
 
 /* Shrinks communities into single vertices, keeping all the edges.
@@ -2953,6 +2961,8 @@ static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membersh
  *     For each vertex it gives the ID of its community.
  * \param modularity The modularity of the partition is returned here.
  *     \c NULL means that the modularity is not needed.
+ * \param gamma Resolution parameter. Must be >=0. Default is 1. <1 leads to less 
+ *     communities (larger in size); >1 more communities (smaller in size).
  * \return Error code.
  *
  * Time complexity: in average near linear on sparse graphs.
@@ -2961,7 +2971,8 @@ static int igraph_i_community_multilevel_step(
         igraph_t *graph,
         igraph_vector_t *weights,
         igraph_vector_t *membership,
-        igraph_real_t *modularity) {
+        igraph_real_t *modularity,
+        const igraph_real_t gamma) {
 
     long int i, j;
     long int vcount = igraph_vcount(graph);
@@ -2987,7 +2998,10 @@ static int igraph_i_community_multilevel_step(
     if (igraph_vector_any_smaller(weights, 0)) {
         IGRAPH_ERROR("weights must be positive", IGRAPH_EINVAL);
     }
-
+    if (gamma < 0.0) {
+      IGRAPH_ERROR("Invalid gamma value", IGRAPH_EINVAL);
+    }
+    
     /* Initialize data structures */
     IGRAPH_VECTOR_INIT_FINALLY(&links_community, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&links_weight, 0);
@@ -3028,7 +3042,7 @@ static int igraph_i_community_multilevel_step(
         }
     }
 
-    q = igraph_i_multilevel_community_modularity(&communities);
+    q = igraph_i_multilevel_community_modularity(&communities, gamma);
     pass = 1;
 
     do { /* Pass begin */
@@ -3080,9 +3094,9 @@ static int igraph_i_community_multilevel_step(
 
                 igraph_real_t q_gain =
                     igraph_i_multilevel_community_modularity_gain(&communities,
-                            (igraph_integer_t) c,
-                            (igraph_integer_t) i,
-                            weight_all, w);
+                                                                  (igraph_integer_t) c,
+                                                                  (igraph_integer_t) i,
+                                                                  weight_all, w, gamma);
                 /* debug("Link %ld -> %ld weight: %lf gain: %lf\n", i, c, (double) w, (double) q_gain); */
                 if (q_gain > max_q_gain) {
                     new_id = c;
@@ -3107,7 +3121,7 @@ static int igraph_i_community_multilevel_step(
             }
         }
 
-        q = igraph_i_multilevel_community_modularity(&communities);
+        q = igraph_i_multilevel_community_modularity(&communities, gamma);
 
         if (changed && (q > pass_q)) {
             /* debug("Pass %d (changed: %d) Communities: %ld Modularity from %lf to %lf\n",
@@ -3197,6 +3211,8 @@ static int igraph_i_community_multilevel_step(
  * \param modularity Numeric vector that will contain the modularity score
  *     after each level, if not \c NULL. It must be initialized and it
  *     will be resized accordingly.
+ * \param gamma Resolution parameter. Must be >=0. Default is 1. <1 leads to less 
+ *     communities (larger in size); >1 more communities (smaller in size).
  * \return Error code.
  *
  * Time complexity: in average near linear on sparse graphs.
@@ -3206,7 +3222,8 @@ static int igraph_i_community_multilevel_step(
 
 int igraph_community_multilevel(const igraph_t *graph,
                                 const igraph_vector_t *weights, igraph_vector_t *membership,
-                                igraph_matrix_t *memberships, igraph_vector_t *modularity) {
+                                igraph_matrix_t *memberships, igraph_vector_t *modularity,
+                                const igraph_real_t gamma) {
 
     igraph_t g;
     igraph_vector_t w, m, level_membership;
@@ -3249,7 +3266,7 @@ int igraph_community_multilevel(const igraph_t *graph,
         igraph_integer_t step_vcount = igraph_vcount(&g);
 
         prev_q = q;
-        IGRAPH_CHECK(igraph_i_community_multilevel_step(&g, &w, &m, &q));
+        IGRAPH_CHECK(igraph_i_community_multilevel_step(&g, &w, &m, &q, gamma));
 
         /* Were there any merges? If not, we have to stop the process */
         if (igraph_vcount(&g) == step_vcount || q < prev_q) {
@@ -3292,7 +3309,7 @@ int igraph_community_multilevel(const igraph_t *graph,
         for (i = 0; i < vcount; i++) {
             VECTOR(tmp)[i] = i;
         }
-        IGRAPH_CHECK(igraph_modularity(graph, &tmp, &mod, weights));
+        IGRAPH_CHECK(igraph_modularity(graph, &tmp, &mod, weights, gamma));
         igraph_vector_destroy(&tmp);
         IGRAPH_FINALLY_CLEAN(1);
         IGRAPH_CHECK(igraph_vector_resize(modularity, 1));

@@ -135,7 +135,8 @@ DECLDIR int igraph_le_community_to_membership(const igraph_matrix_t *merges,
 DECLDIR int igraph_modularity(const igraph_t *graph,
                               const igraph_vector_t *membership,
                               igraph_real_t *modularity,
-                              const igraph_vector_t *weights);
+                              const igraph_vector_t *weights,
+                              const igraph_real_t gamma);
 
 DECLDIR int igraph_modularity_matrix(const igraph_t *graph,
                                      igraph_matrix_t *modmat,
@@ -218,7 +219,8 @@ DECLDIR int igraph_community_multilevel(const igraph_t *graph,
                                         const igraph_vector_t *weights,
                                         igraph_vector_t *membership,
                                         igraph_matrix_t *memberships,
-                                        igraph_vector_t *modularity);
+                                        igraph_vector_t *modularity,
+                                        const igraph_real_t gamma);
 
 DECLDIR int igraph_community_leiden(const igraph_t *graph,
                                     const igraph_vector_t *edge_weights,
