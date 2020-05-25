@@ -147,24 +147,30 @@ int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *
     return IGRAPH_SUCCESS;
 }
 
-igraph_bool_t check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_integer_t v, long edge) {
+int check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_integer_t v, long edge, igraph_bool_t *is_bridge) {
 
     igraph_vector_t bridges;
     igraph_integer_t i;
 
+    IGRAPH_CHECK(igraph_vector_init(&bridges, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, &bridges);
     igraph_vector_init(&bridges, 0);
     igraph_bridges(g, &bridges);
 
     for (i = 0; i < igraph_vector_size(&bridges); i++) {
         if (VECTOR(bridges)[i] == edge) {
             igraph_vector_destroy(&bridges);
-            return 0;   
+            IGRAPH_FINALLY_CLEAN(1);
+            *is_bridge = 0;
+            return IGRAPH_SUCCESS;   
         }
     }
 
     igraph_vector_destroy(&bridges);
+    IGRAPH_FINALLY_CLEAN(1);
 
-    return 1;
+    *is_bridge = 1;
+    return IGRAPH_SUCCESS;
 }
 
 int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_vector_t *path, igraph_vector_bool_t *visited_list) {
@@ -172,6 +178,7 @@ int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_
     igraph_integer_t i, v, adj;
     igraph_inclist_t il;
     igraph_vector_int_t *incedges;
+    igraph_bool_t is_bridge;
     long nc, edge;
     int j;
 
@@ -194,7 +201,8 @@ int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_
         edge = (long) VECTOR(*incedges)[i];
         if (!VECTOR(*visited_list)[edge]) {
             v = IGRAPH_TO(g, edge) == start ? IGRAPH_FROM(g, edge) : IGRAPH_TO(g, edge);
-            if (adj == 1 || check_if_bridge(g, start, v, edge)) {
+            check_if_bridge(g, start, v, edge, &is_bridge);
+            if (adj == 1 || is_bridge) {
                 VECTOR(*visited_list)[edge] = 1;
                 IGRAPH_CHECK(igraph_vector_push_back(path, edge));               
                 euler_undirected_implementation(v, g, path, visited_list);
