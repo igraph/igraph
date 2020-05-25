@@ -48,12 +48,15 @@ int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool
 
     odd = 0;
 
+    //printf("checkpoint 1\n");
+
     IGRAPH_CHECK(igraph_vector_init(&degree, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &degree);
 
     igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
 
     for (i = 0; i < igraph_vector_size(&degree); i++) {
+        //printf("%li\n", (long int) VECTOR(degree)[i]);
         if (((long int) VECTOR(degree)[i]) % 2 == 1) odd++;
     }
 
@@ -63,6 +66,7 @@ int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool
     if (odd > 2) {
         *has_path = 0;
         *has_cycle = 0;
+        //printf("checkpoint 2\n");
         return IGRAPH_SUCCESS;
     }
 
@@ -73,6 +77,8 @@ int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool
         *has_path = 0;
         *has_cycle = 1;
     }
+
+    //printf("end\n");
 
     return IGRAPH_SUCCESS;
 }
@@ -97,16 +103,20 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
     /* checking if incoming vertices == outgoing vertices */
     for (i = 0; i < igraph_vcount(graph); i++) {
         if (VECTOR(in_degree)[i] != VECTOR(out_degree)[i]) {
+            //printf("%d\n", i);
             if ((VECTOR(in_degree)[i] + 1 == VECTOR(out_degree)[i]) && (incoming_excess < 2 && outgoing_excess < 1)) {
                 outgoing_excess++;
+                //printf("outgoing\n");
             } else if ((VECTOR(out_degree)[i] + 1 == VECTOR(in_degree)[i]) && (incoming_excess < 1 && outgoing_excess < 2)) {
                 incoming_excess++;
+                //printf("incoming\n");
             } else {
                 *has_path = 0;
                 *has_cycle = 0;
                 igraph_vector_destroy(&in_degree);
                 igraph_vector_destroy(&out_degree);
                 IGRAPH_FINALLY_CLEAN(2);
+                //printf("premature exit\n");
 
                 return IGRAPH_SUCCESS;
             }
@@ -120,6 +130,8 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
 
     IGRAPH_CHECK(igraph_is_connected(graph, &res_strong, IGRAPH_STRONG));
     IGRAPH_CHECK(igraph_is_connected(graph, &res_weak, IGRAPH_WEAK));
+
+    //if (!res_weak && !res_strong ) printf("weak\n");
 
     if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong)) {
         *has_path = 0;
