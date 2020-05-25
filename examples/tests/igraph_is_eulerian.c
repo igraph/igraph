@@ -1,4 +1,5 @@
 #include <igraph.h>
+#include <stdio.h>
 
 int main() {
 
