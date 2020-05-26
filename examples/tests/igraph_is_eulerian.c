@@ -61,6 +61,11 @@ int main() {
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);
 
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  7,8, 8,9, 9,7, -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
     /* directed cases*/
 
     igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,1 , 1,2, -1);
@@ -112,6 +117,16 @@ int main() {
 
     igraph_small(&graph, 0, IGRAPH_DIRECTED, 1,3 , 3,5 , 5,6 , 6,3 , 3,1 , 1,2 , 
                                         2,2 , 2,4 , 2,4 , 4,3 , 3,2 , 4,6 , -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
+    igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,1, 0,1 , 0,1, -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
+    igraph_small(&graph, 0, IGRAPH_DIRECTED, 8,9, 9,10, 10,8, -1);
     igraph_is_eulerian(&graph, &has_path, &has_cycle);
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);

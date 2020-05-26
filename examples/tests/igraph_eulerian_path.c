@@ -51,6 +51,14 @@ int main() {
     igraph_vector_destroy(&res);
     igraph_vector_init(&res, 0);
 
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED, 7,8, 8,9, 9,7, -1);
+    igraph_eulerian_path(&graph, &res);
+    print_vector_round(&res, stdout);
+
+    igraph_destroy(&graph);
+    igraph_vector_destroy(&res);
+    igraph_vector_init(&res, 0);
+
     igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,1 , 1,2, -1);
     igraph_eulerian_path(&graph, &res);
     print_vector_round(&res, stdout);
@@ -118,6 +126,31 @@ int main() {
 
     igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,2 , 2,4 , 4,5 , 5,2 , 2,0 , 0,1 , 
                                         1,1 , 1,3 , 1,3 , 3,2 , 2,1 , 3,5 , -1);
+    igraph_eulerian_path(&graph, &res);
+    print_vector_round(&res, stdout);
+
+    igraph_vector_destroy(&res);
+    igraph_vector_init(&res, 0);
+    igraph_destroy(&graph);
+
+    igraph_small(&graph, 0, IGRAPH_DIRECTED, 1,3 , 3,5 , 5,6 , 6,3 , 3,1 , 1,2 , 
+                                        2,2 , 2,4 , 2,4 , 4,3 , 3,2 , 4,6 , -1);
+    igraph_eulerian_path(&graph, &res);
+    print_vector_round(&res, stdout);
+
+    igraph_vector_destroy(&res);
+    igraph_vector_init(&res, 0);
+    igraph_destroy(&graph);
+
+    igraph_small(&graph, 0, IGRAPH_DIRECTED, 7,8, 8,9, -1);
+    igraph_eulerian_path(&graph, &res);
+    print_vector_round(&res, stdout);
+
+    igraph_vector_destroy(&res);
+    igraph_vector_init(&res, 0);
+    igraph_destroy(&graph);
+
+    igraph_small(&graph, 0, IGRAPH_DIRECTED, 7,8, 8,9, 9,7, -1);
     igraph_eulerian_path(&graph, &res);
     print_vector_round(&res, stdout);
 
