@@ -65,8 +65,9 @@ int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool
         if (((long int) VECTOR(degree)[i]) % 2 == 1) odd++;
     }
 
+    igraph_vector_destroy(&csize);
     igraph_vector_destroy(&degree);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     if (odd > 2) {
         *has_path = 0;
@@ -78,7 +79,7 @@ int is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, igraph_bool
         *has_path = 1;
         *has_cycle = 0;
     } else {
-        *has_path = 0;
+        *has_path = 1;
         *has_cycle = 1;
     }
 
@@ -124,12 +125,8 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
         }
     }
 
-    igraph_vector_destroy(&in_degree);
-    igraph_vector_destroy(&out_degree);
-    IGRAPH_FINALLY_CLEAN(2);
-
     IGRAPH_CHECK(igraph_vector_init(&csize_weak, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &degree);
+    IGRAPH_FINALLY(igraph_vector_destroy, &csize_weak);
 
     IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize_weak, &clusters_weak, IGRAPH_WEAK));
     cluster_count = 0;
@@ -142,7 +139,7 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
     }
 
     IGRAPH_CHECK(igraph_vector_init(&csize_strong, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &size_strong);
+    IGRAPH_FINALLY(igraph_vector_destroy, &csize_strong);
 
     IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize_strong, &clusters_strong, IGRAPH_STRONG));
 
@@ -154,10 +151,12 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
 
     igraph_vector_destroy(&csize_strong);
     igraph_vector_destroy(&csize_weak);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_vector_destroy(&in_degree);
+    igraph_vector_destroy(&out_degree);
+    IGRAPH_FINALLY_CLEAN(4);
 
     if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong)) {
-        *has_path = 0;
+        *has_path = 1;
         *has_cycle = 1;
         return IGRAPH_SUCCESS;
     } else if ((outgoing_excess == 1 && incoming_excess == 1) && 
@@ -182,32 +181,22 @@ int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *
     return IGRAPH_SUCCESS;
 }
 
-int check_if_bridge(igraph_t *g, igraph_integer_t start, igraph_integer_t v, long edge, igraph_bool_t *is_bridge) {
-
-    igraph_vector_t bridges;
+int check_if_bridge(igraph_integer_t start, igraph_integer_t v, long edge, igraph_bool_t *is_bridge, igraph_vector_t *bridges) {
+    
     int i;
 
-    IGRAPH_CHECK(igraph_vector_init(&bridges, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &bridges);
-    igraph_bridges(g, &bridges);
-
-    for (i = 0; i < igraph_vector_size(&bridges); i++) {
-        if (VECTOR(bridges)[i] == edge) {
-            igraph_vector_destroy(&bridges);
-            IGRAPH_FINALLY_CLEAN(1);
+    for (i = 0; i < igraph_vector_size(bridges); i++) {
+        if (VECTOR(*bridges)[i] == edge) {
             *is_bridge = 0;
             return IGRAPH_SUCCESS;   
         }
     }
 
-    igraph_vector_destroy(&bridges);
-    IGRAPH_FINALLY_CLEAN(1);
-
     *is_bridge = 1;
     return IGRAPH_SUCCESS;
 }
 
-int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_vector_t *path, igraph_vector_bool_t *visited_list) {
+int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_vector_t *path, igraph_vector_bool_t *visited_list, igraph_vector_t *bridges) {
 
     igraph_integer_t i, v, adj;
     igraph_inclist_t il;
@@ -235,11 +224,11 @@ int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_
         edge = (long) VECTOR(*incedges)[i];
         if (!VECTOR(*visited_list)[edge]) {
             v = IGRAPH_TO(g, edge) == start ? IGRAPH_FROM(g, edge) : IGRAPH_TO(g, edge);
-            IGRAPH_CHECK(check_if_bridge(g, start, v, edge, &is_bridge));
+            IGRAPH_CHECK(check_if_bridge(start, v, edge, &is_bridge, bridges));
             if (adj == 1 || is_bridge) {
                 VECTOR(*visited_list)[edge] = 1;
                 IGRAPH_CHECK(igraph_vector_push_back(path, edge));               
-                IGRAPH_CHECK(euler_undirected_implementation(v, g, path, visited_list));
+                IGRAPH_CHECK(euler_undirected_implementation(v, g, path, visited_list, bridges));
             }
         }
         i++;
@@ -263,7 +252,7 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     igraph_integer_t start, i, e_count;
     igraph_inclist_t incl;
     igraph_vector_int_t *incedges;
-    igraph_vector_t degree;
+    igraph_vector_t degree, bridges;
     igraph_bool_t has_path;
     igraph_bool_t cycle;
     igraph_vector_bool_t visited_list;
@@ -275,7 +264,7 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     e_count = igraph_ecount(graph);
     IGRAPH_CHECK(igraph_vector_bool_init(&visited_list, e_count));
-    IGRAPH_FINALLY(igraph_vector_destroy, &visited_list);
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited_list);
 
     for (i = 0; i < e_count; i++) {
         VECTOR(visited_list)[i] = 0;
@@ -299,8 +288,12 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     IGRAPH_CHECK(igraph_inclist_init(graph, &incl, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_inclist_destroy, &incl);
 
+    IGRAPH_CHECK(igraph_vector_init(&bridges, 0));
+    IGRAPH_FINALLY(igraph_vector_destroy, &bridges);
+    igraph_bridges(graph, &bridges);
+
     if (cycle && !has_path) {
-        IGRAPH_CHECK(euler_undirected_implementation(start, graph, path, &visited_list));
+        IGRAPH_CHECK(euler_undirected_implementation(start, graph, path, &visited_list, &bridges));
     } else {
         for (i = 0; i < igraph_vcount(graph); i++) {
             incedges = igraph_inclist_get(&incl, i);
@@ -309,11 +302,13 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
                 break;
             }
         }
-        euler_undirected_implementation(start, graph, path, &visited_list);
+        euler_undirected_implementation(start, graph, path, &visited_list, &bridges);
     }
 
     igraph_inclist_destroy(&incl);
-    IGRAPH_FINALLY_CLEAN(1);
+    igraph_vector_destroy(&degree);
+    igraph_vector_bool_destroy(&visited_list);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 
@@ -345,7 +340,7 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
 
     e_count = igraph_ecount(graph);
     IGRAPH_CHECK(igraph_vector_bool_init(&visited_list, e_count));
-    IGRAPH_FINALLY(igraph_vector_destroy, &visited_list);
+    IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited_list);
 
     for (i = 0; i < e_count; i++) {
         VECTOR(visited_list)[i] = 0;
@@ -401,6 +396,7 @@ int eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *sta
     igraph_stack_destroy(&tracker);
     igraph_stack_destroy(&edge_path);
     igraph_stack_destroy(&edge_tracker);
+    igraph_vector_bool_destroy(&visited_list);
     IGRAPH_FINALLY_CLEAN(4);
 
     return IGRAPH_SUCCESS;
@@ -530,7 +526,7 @@ int igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res) {
 
     IGRAPH_CHECK(igraph_is_eulerian(graph, &has_path, &cycle));
 
-    if (!has_path && !cycle) {
+    if (!has_path) {
         IGRAPH_ERROR("graph does not have path", IGRAPH_EINVAL);
     }
 
