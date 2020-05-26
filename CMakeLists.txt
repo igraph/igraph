@@ -16,7 +16,7 @@ endif()
 include(version)
 
 # Declare the project, its version number and language
-project(igraph VERSION 0.9.0 LANGUAGES C CXX)
+project(igraph VERSION ${PACKAGE_VERSION_BASE} LANGUAGES C CXX)
 
 # Set C and C++ standard version
 set(CMAKE_C_STANDARD 99)

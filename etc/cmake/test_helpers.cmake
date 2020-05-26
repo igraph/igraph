@@ -1,7 +1,8 @@
 include(CMakeParseArguments)
 
 function(add_legacy_test FOLDER NAME)
-  add_executable(test_${NAME} ${CMAKE_SOURCE_DIR}/examples/${FOLDER}/${NAME})
+  add_executable(test_${NAME} EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/examples/${FOLDER}/${NAME})
+  add_dependencies(build_tests test_${NAME})
   target_link_libraries(test_${NAME} PRIVATE igraph)
 
   # Some tests depend on internal igraph headers so we also have to add src/
