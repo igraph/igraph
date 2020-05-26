@@ -784,29 +784,29 @@ static int igraph_i_spectral_embedding(const igraph_t *graph,
  * Adjacency spectral embedding
  *
  * Spectral decomposition of the adjacency matrices of graphs.
- * This function computes a \code{no}-dimensional Euclidean
+ * This function computes an <code>n</code>-dimensional Euclidean
  * representation of the graph based on its adjacency
  * matrix, A. This representation is computed via the singular value
- * decomposition of the adjacency matrix, A=UDV^T. In the case,
+ * decomposition of the adjacency matrix, A=U D V^T. In the case,
  * where the graph is a random dot product graph generated using latent
- * position vectors in R^no for each vertex, the embedding will
+ * position vectors in R^n for each vertex, the embedding will
  * provide an estimate of these latent vectors.
  *
  * </para><para>
- * For undirected graphs the latent positions are calculated as
- * X=U^no D^(1/2) where U^no equals to the first no columns of U, and
+ * For undirected graphs, the latent positions are calculated as
+ * X = U^n D^(1/2) where U^n equals to the first no columns of U, and
  * D^(1/2) is a diagonal matrix containing the square root of the selected
  * singular values on the diagonal.
  *
  * </para><para>
- * For directed graphs the embedding is defined as the pair
- * X=U^no D^(1/2), Y=V^no D^(1/2). (For undirected graphs U=V,
- * so it is enough to keep one of them.)
+ * For directed graphs, the embedding is defined as the pair
+ * X = U^n D^(1/2), Y = V^n D^(1/2).
+ * (For undirected graphs U=V, so it is sufficient to keep one of them.)
  *
  * \param graph The input graph, can be directed or undirected.
- * \param no An integer scalar. This value is the embedding dimension of
+ * \param n An integer scalar. This value is the embedding dimension of
  *        the spectral embedding. Should be smaller than the number of
- *        vertices. The largest no-dimensional non-zero
+ *        vertices. The largest n-dimensional non-zero
  *        singular values are used for the spectral embedding.
  * \param weights Optional edge weights. Supply a null pointer for
  *        unweighted graphs.
@@ -823,7 +823,7 @@ static int igraph_i_spectral_embedding(const igraph_t *graph,
  *        For directed graphs, <code>IGRAPH_EIGEN_LM</code> and
  *        <code>IGRAPH_EIGEN_LA</code> are the same because singular
  *        values are used for the ordering instead of eigenvalues.
- * \param scaled Whether to return X and Y (if scaled is non-zero), or
+ * \param scaled Whether to return X and Y (if \c scaled is true), or
  *        U and V.
  * \param X Initialized matrix, the estimated latent positions are
  *        stored here.
@@ -846,7 +846,7 @@ static int igraph_i_spectral_embedding(const igraph_t *graph,
  */
 
 int igraph_adjacency_spectral_embedding(const igraph_t *graph,
-                                        igraph_integer_t no,
+                                        igraph_integer_t n,
                                         const igraph_vector_t *weights,
                                         igraph_eigen_which_position_t which,
                                         igraph_bool_t scaled,
@@ -868,7 +868,7 @@ int igraph_adjacency_spectral_embedding(const igraph_t *graph,
         callback_right = 0;
     }
 
-    return igraph_i_spectral_embedding(graph, no, weights, which, scaled,
+    return igraph_i_spectral_embedding(graph, n, weights, which, scaled,
                                        X, Y, D, cvec, /* deg2=*/ 0,
                                        options, callback, callback_right,
                                        /*symmetric=*/ !directed,
@@ -993,7 +993,7 @@ static int igraph_i_lse_dir(const igraph_t *graph,
  * \ref igraph_adjacency_spectral_embedding, but works on the Laplacian
  * of the graph, instead of the adjacency matrix.
  * \param graph The input graph.
- * \param no The number of eigenvectors (or singular vectors if the graph
+ * \param n The number of eigenvectors (or singular vectors if the graph
  *        is directed) to use for the embedding.
  * \param weights Optional edge weights. Supply a null pointer for
  *        unweighted graphs.
@@ -1024,7 +1024,7 @@ static int igraph_i_lse_dir(const igraph_t *graph,
  *          means I - Di A Di, where I
  *          is the identity matrix.
  *        \endclist
- * \param scaled Whether to return X and Y (if scaled is non-zero), or
+ * \param scaled Whether to return X and Y (if \c scaled is true), or
  *        U and V.
  * \param X Initialized matrix, the estimated latent positions are
  *        stored here.
@@ -1046,7 +1046,7 @@ static int igraph_i_lse_dir(const igraph_t *graph,
  */
 
 int igraph_laplacian_spectral_embedding(const igraph_t *graph,
-                                        igraph_integer_t no,
+                                        igraph_integer_t n,
                                         const igraph_vector_t *weights,
                                         igraph_eigen_which_position_t which,
                                         igraph_neimode_t degmode,
@@ -1058,10 +1058,10 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
                                         igraph_arpack_options_t *options) {
 
     if (igraph_is_directed(graph)) {
-        return igraph_i_lse_dir(graph, no, weights, which, degmode, type, scaled,
+        return igraph_i_lse_dir(graph, n, weights, which, degmode, type, scaled,
                                 X, Y, D, options);
     } else {
-        return igraph_i_lse_und(graph, no, weights, which, degmode, type, scaled,
+        return igraph_i_lse_und(graph, n, weights, which, degmode, type, scaled,
                                 X, Y, D, options);
     }
 }
@@ -1089,7 +1089,7 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
  * </para><para>
  * This function can also be used for the general separation problem,
  * where we assume that the left and the right of the vector are coming
- * from two Normal distributions, with different means, and we want
+ * from two normal distributions, with different means, and we want
  * to know their border.
  *
  * \param sv A numeric vector, the ordered singular values.
