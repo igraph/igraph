@@ -1713,6 +1713,51 @@ igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
             0, FUNCTION(igraph_vector, size)(v));
 }
 
+/**
+ * \ingroup vector
+ * \function igraph_vector_binsearch_slice
+ * \brief Finds an element by binary searching a sorted slice of a vector.
+ *
+ * </para><para>
+
+ * It is assumed that the indicated slice of the vector, from \p start to \p end,
+ * is sorted. If the specified element (\p what) is not in the slice of the
+ * vector, then the position of where it should be inserted (to keep the vector
+ * sorted) is returned.
+ * \param v The \type igraph_vector_t object.
+ * \param what The element to search for.
+ * \param pos Pointer to a \type long int. This is set to the position of an
+ *        instance of \p what in the slice of the vector if it is present. If \p
+ *        v does not contain \p what then \p pos is set to the position to which
+ *        it should be inserted (to keep the the vector sorted).
+ * \param start The start position of the slice to search (inclusive).
+ * \param end The end position of the slice to search (exclusive).
+ * \return Positive integer (true) if \p what is found in the vector,
+ *         zero (false) otherwise.
+ *
+ * Time complexity: O(log(n)),
+ * n is the number of elements in the slice of \p v, i.e. \p end - \p start.
+ */
+
+igraph_bool_t FUNCTION(igraph_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
+        BASE what, long int *pos,
+        long int start, long int end) {
+    long int left  = start;
+    long int right = end - 1;
+
+    if (left < 0)
+        IGRAPH_ERROR("Invalid start position.", IGRAPH_EINVAL);
+
+    if (right >= FUNCTION(igraph_vector, size)(v))
+        IGRAPH_ERROR("Invalid end position.", IGRAPH_EINVAL);
+
+    if (left > right)
+        IGRAPH_ERROR("Invalid slice, start position must be smaller than end position.",
+                     IGRAPH_EINVAL);
+
+    return FUNCTION(igraph_i_vector, binsearch_slice)(v, what, pos, start, end);
+}
+
 igraph_bool_t FUNCTION(igraph_i_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
         BASE what, long int *pos,
         long int start, long int end) {
