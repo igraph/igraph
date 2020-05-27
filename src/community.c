@@ -905,8 +905,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * Bornholdt, S. (2006). Statistical mechanics of community detection. Physical
  * Review E, 74(1), 016110. https://doi.org/10.1103/PhysRevE.74.016110
  *
- * \param graph      The input graph. It must be undirected; directed graphs are
- *                   not supported yet.
+ * \param graph      The input graph. Edge directions will be ignored.
  * \param membership Numeric vector of integer values which gives the type of each
  *                   vertex, i.e. the cluster to which it belongs.
  *                   It does not have to be consecutive, i.e. empty communities
@@ -939,7 +938,7 @@ int igraph_modularity(const igraph_t *graph,
     long int c1, c2;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_ERROR("modularity is implemented for undirected graphs", IGRAPH_EINVAL);
+        IGRAPH_WARNING("Modularity is implemented for undirected graphs only; ignoring edge directions");
     }
 
     if (igraph_vector_size(membership) < igraph_vcount(graph)) {
