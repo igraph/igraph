@@ -4,6 +4,12 @@
 
 ### Added
 
+ * Eulerian paths/cycles
+
+   - `igraph_is_eulerian()`: finds out whether an Eulerian path/cycle exists
+   - `igraph_eulerian_path()`: returns a Eulerian path
+   - `igraph_eulerian_cycle()`: returns a Eulerian cycle
+
 ### Changed
 
 ### Fixed
