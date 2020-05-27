@@ -2097,7 +2097,15 @@ igraph_dim_select:
 #######################################
 
 igraph_is_eulerian:
-        PARAMS: GRAPH graph
+        PARAMS: GRAPH graph, BOOL has_path, BOOL has_cycle
+        IGNORE: RR, RC, RNamespace
+
+igraph_eulerian_path:
+        PARAMS: GRAPH graph, VECTOR res
+        IGNORE: RR, RC, RNamespace
+
+igraph_eulerian_cycle:
+        PARAMS: GRAPH graph, VECTOR res
         IGNORE: RR, RC, RNamespace
 
 
