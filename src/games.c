@@ -47,8 +47,8 @@ typedef struct {
     igraph_psumtree_t *sumtrees;
 } igraph_i_citing_cited_type_game_struct_t;
 
-void igraph_i_citing_cited_type_game_free (
-    igraph_i_citing_cited_type_game_struct_t *s);
+static void igraph_i_citing_cited_type_game_free (
+        igraph_i_citing_cited_type_game_struct_t *s);
 /**
  * \section about_games
  *
@@ -56,39 +56,39 @@ void igraph_i_citing_cited_type_game_free (
  * they generate a different graph every time you call them. </para>
  */
 
-int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
-                               igraph_integer_t m,
-                               const igraph_vector_t *outseq,
-                               igraph_bool_t outpref,
-                               igraph_bool_t directed,
-                               const igraph_t *start_from);
+static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
+                                      igraph_integer_t m,
+                                      const igraph_vector_t *outseq,
+                                      igraph_bool_t outpref,
+                                      igraph_bool_t directed,
+                                      const igraph_t *start_from);
 
-int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
-        igraph_integer_t n,
-        igraph_real_t power,
-        igraph_integer_t m,
-        const igraph_vector_t *outseq,
-        igraph_bool_t outpref,
-        igraph_real_t A,
-        igraph_bool_t directed,
-        const igraph_t *start_from);
+static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
+                                                    igraph_integer_t n,
+                                                    igraph_real_t power,
+                                                    igraph_integer_t m,
+                                                    const igraph_vector_t *outseq,
+                                                    igraph_bool_t outpref,
+                                                    igraph_real_t A,
+                                                    igraph_bool_t directed,
+                                                    const igraph_t *start_from);
 
-int igraph_i_barabasi_game_psumtree(igraph_t *graph,
-                                    igraph_integer_t n,
-                                    igraph_real_t power,
-                                    igraph_integer_t m,
-                                    const igraph_vector_t *outseq,
-                                    igraph_bool_t outpref,
-                                    igraph_real_t A,
-                                    igraph_bool_t directed,
-                                    const igraph_t *start_from);
+static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
+                                           igraph_integer_t n,
+                                           igraph_real_t power,
+                                           igraph_integer_t m,
+                                           const igraph_vector_t *outseq,
+                                           igraph_bool_t outpref,
+                                           igraph_real_t A,
+                                           igraph_bool_t directed,
+                                           const igraph_t *start_from);
 
-int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
-                               igraph_integer_t m,
-                               const igraph_vector_t *outseq,
-                               igraph_bool_t outpref,
-                               igraph_bool_t directed,
-                               const igraph_t *start_from) {
+static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
+                                      igraph_integer_t m,
+                                      const igraph_vector_t *outseq,
+                                      igraph_bool_t outpref,
+                                      igraph_bool_t directed,
+                                      const igraph_t *start_from) {
 
     long int no_of_nodes = n;
     long int no_of_neighbors = m;
@@ -124,7 +124,7 @@ int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     if (bag == 0) {
         IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, bag);    /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, bag);
 
     /* The first node(s) in the bag */
     if (start_from) {
@@ -190,15 +190,15 @@ int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     return 0;
 }
 
-int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
-        igraph_integer_t n,
-        igraph_real_t power,
-        igraph_integer_t m,
-        const igraph_vector_t *outseq,
-        igraph_bool_t outpref,
-        igraph_real_t A,
-        igraph_bool_t directed,
-        const igraph_t *start_from) {
+static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
+                                                    igraph_integer_t n,
+                                                    igraph_real_t power,
+                                                    igraph_integer_t m,
+                                                    const igraph_vector_t *outseq,
+                                                    igraph_bool_t outpref,
+                                                    igraph_real_t A,
+                                                    igraph_bool_t directed,
+                                                    const igraph_t *start_from) {
 
     long int no_of_nodes = n;
     long int no_of_neighbors = m;
@@ -296,15 +296,15 @@ int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     return 0;
 }
 
-int igraph_i_barabasi_game_psumtree(igraph_t *graph,
-                                    igraph_integer_t n,
-                                    igraph_real_t power,
-                                    igraph_integer_t m,
-                                    const igraph_vector_t *outseq,
-                                    igraph_bool_t outpref,
-                                    igraph_real_t A,
-                                    igraph_bool_t directed,
-                                    const igraph_t *start_from) {
+static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
+                                           igraph_integer_t n,
+                                           igraph_real_t power,
+                                           igraph_integer_t m,
+                                           const igraph_vector_t *outseq,
+                                           igraph_bool_t outpref,
+                                           igraph_real_t A,
+                                           igraph_bool_t directed,
+                                           const igraph_t *start_from) {
 
     long int no_of_nodes = n;
     long int no_of_neighbors = m;
@@ -860,7 +860,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     if (bag1 == 0) {
         IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, bag1);   /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, bag1);
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < VECTOR(*out_seq)[i]; j++) {
@@ -872,7 +872,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
         if (bag2 == 0) {
             IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
         }
-        IGRAPH_FINALLY(free, bag2);
+        IGRAPH_FINALLY(igraph_free, bag2);
         for (i = 0; i < no_of_nodes; i++) {
             for (j = 0; j < VECTOR(*in_seq)[i]; j++) {
                 bag2[bagp2++] = i;
@@ -2410,9 +2410,7 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
 }
 
 
-void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs);
-
-void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
+static void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs) {
     int i = 0, n;
     igraph_vector_t *v;
 
@@ -2954,13 +2952,9 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     return 0;
 }
 
-int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
-                                      igraph_bool_t loops,
-                                      igraph_vector_t *edges);
-
-int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
-                                      igraph_bool_t loops,
-                                      igraph_vector_t *edges) {
+static int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
+                                             igraph_bool_t loops,
+                                             igraph_vector_t *edges) {
 
     int no_verts = igraph_vcount(graph);
     int no_edges = igraph_ecount(graph);
@@ -3655,7 +3649,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     return 0;
 }
 
-void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct_t *s) {
+static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct_t *s) {
     long int i;
     if (!s->sumtrees) {
         return;

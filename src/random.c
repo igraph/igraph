@@ -23,16 +23,13 @@
 
 #include "igraph_random.h"
 #include "igraph_error.h"
-#include "config.h"
-
-#include <math.h>
-#include <limits.h>
-#include <string.h>
 #include "igraph_math.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
 #include "igraph_memory.h"
-#include "igraph_matrix.h"
+#include "config.h"
+#include <math.h>
+#include <string.h>
 
 /**
  * \section about_rngs
@@ -126,8 +123,7 @@ typedef struct {
     long int x[31];
 } igraph_i_rng_glibc2_state_t;
 
-unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n,
-        long int *x) {
+static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int *x) {
     unsigned long int k;
 
     x[*i] += x[*j];
@@ -158,8 +154,8 @@ igraph_real_t igraph_rng_glibc2_get_real(void *state) {
 
 /* this function is independent of the bit size */
 
-void igraph_i_rng_glibc2_init(long int *x, int n,
-                              unsigned long int s) {
+static void igraph_i_rng_glibc2_init(long int *x, int n,
+                                     unsigned long int s) {
     int i;
 
     if (s == 0) {
@@ -514,7 +510,7 @@ IGRAPH_THREAD_LOCAL igraph_rng_t igraph_i_rng_default = {
  *
  * \param rng The random number generator to use as default from now
  *    on. Calling \ref igraph_rng_destroy() on it, while it is still
- *    being used as the default will result craches and/or
+ *    being used as the default will result crashes and/or
  *    unpredictable results.
  *
  * Time complexity: O(1).
@@ -977,8 +973,9 @@ float rintf (float x) {
  * result vector.
  */
 
-int igraph_i_random_sample_alga(igraph_vector_t *res, igraph_integer_t l, igraph_integer_t h,
-                                igraph_integer_t length) {
+static int igraph_i_random_sample_alga(igraph_vector_t *res,
+                                       igraph_integer_t l, igraph_integer_t h,
+                                       igraph_integer_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
 
@@ -1538,7 +1535,7 @@ int imin2(int x, int y) {
     return (x < y) ? x : y;
 }
 
-#if HAVE_WORKING_ISFINITE || HAVE_ISFINITE
+#if HAVE_WORKING_ISFINITE || HAVE_DECL_ISFINITE
     /* isfinite is defined in <math.h> according to C99 */
     #define R_FINITE(x)    isfinite(x)
 #elif HAVE_WORKING_FINITE || HAVE_FINITE
@@ -1556,7 +1553,7 @@ int imin2(int x, int y) {
 #endif
 
 int R_finite(double x) {
-#if HAVE_WORKING_ISFINITE || HAVE_ISFINITE
+#if HAVE_WORKING_ISFINITE || HAVE_DECL_ISFINITE
     return isfinite(x);
 #elif HAVE_WORKING_FINITE || HAVE_FINITE
     return finite(x);

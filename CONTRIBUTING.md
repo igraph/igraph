@@ -115,15 +115,18 @@ project:
    git remote add upstream https://github.com/<upstream-owner>/<repo-name>
    ```
 
-2. If you cloned a while ago, get the latest changes from upstream:
+2. Please checkout the section on [branching](#branching) to see whether you
+   need to branch off from the `master` branch or the `develop` branch.
+
+   If you cloned a while ago, get the latest changes from upstream:
 
    ```bash
    git checkout <dev-branch>
-   git pull upstream <dev-branch>
+   git pull --rebase upstream <dev-branch>
    ```
 
-3. Create a new topic branch (off the main project development branch) to
-   contain your feature, change, or fix:
+3. Create a new topic branch (off the targeted branch, see
+   [branching](#branching) section) to contain your feature, change, or fix:
 
    ```bash
    git checkout -b <topic-branch-name>
@@ -153,15 +156,23 @@ project:
    git push origin <topic-branch-name>
    ```
 
-8. [Open a Pull Request](https://help.github.com/articles/using-pull-requests/)
+8. [Open a pull request](https://help.github.com/articles/using-pull-requests/)
     with a clear title and description.
 
-**IMPORTANT**: By submitting a patch, you agree to allow the project owner to
+**IMPORTANT**: By submitting a pull request, you agree to allow the project owner to
 license your work under the same license as that used by the project.
 
+<a name="branching"></a>
+### Branching
+
+`igraph` is committed to [semantic versioning](https://semver.org/). We are currently still in the development release (0.x), which in principle is a mark that the public API is not yet stable. Regardless, we try to maintain semantic versioning also for the development releases. We do so as follows. Any released minor version (0.x.z) will be API backwards-compatible with any previous release of the *same* minor version (0.x.y, with y < z). This means that *if* there is an API incompatible change, we will increase the minor version. For example, release 0.8.1 is API backwards-compatible with release 0.8.0. A new release 0.9.0 will be API incompatible with version 0.8.1. Note that this only concerns the *public* API, internal functions may change also within a minor version.
+
+There will always be two versions of `igraph`: the most recent released version, and the next upcoming minor release, which is by definition not yet released. The most recent release version is in the `master` branch, while the next upcoming minor release is in the `develop` branch. If you make a change that is API incompatible with the most recent release, it **must** be merged to the `develop` branch. If the change is API backwards-compatible, it **can** be merged to the `master` branch. It is possible that you build on recent improvements in the `develop` branch, in which case your change should of course target the `develop` branch. If you only add new functionality, but do not change anything of the existing API, this should be backwards-compatible, and can be merged in the `master` branch.
+
+When you make a new pull request, please specify the correct target branch. The maintainers of `igraph` may decide to retarget your pull request to the correct branch. Retargeting you pull request may result in merge conflicts, so it is always good to decide **before** starting to work on something whether you should start from the `master` branch or from the `develop` branch. In most cases, changes in the `master` branch will also be merged to the `develop` branch by the maintainers.
 
 <a name="tips"></a>
-## Writing igraph Code 
+## Writing igraph Code
 
 Some tips on writing igraph code. In general, look at how things are done,
 and try to do them similarly. (Unless you think they are not done well, in
@@ -216,12 +227,12 @@ every run generates the same set of random numbers.
 ### Ask Us!
 
 In general, if you are not sure about something, please ask! You can
-open an issue on GitHub, open a thread in our 
+open an issue on GitHub, open a thread in our
 [igraph support forum](https://igraph.discourse.group), or write to
 [@ntamas](https://github.com/ntamas), [@vtraag](https://github.com/vtraag),
 [@szhorvat](https://github.com/szhorvat) or
 [@gaborcsardi](https://github.com/gaborcsardi).
-We prefer the igraph support forum, because then others can learn from it 
+We prefer the igraph support forum, because then others can learn from it
 too.
 
 ## Legal Stuff
@@ -230,6 +241,6 @@ This is a pain to deal with, but we can't avoid it, unfortunately.
 
 So, igraph is licensed under the "General Public License (GPL) version 2, or
 later". The igraph manual is licensed under the "GNU Free Documentation
-License". By submitting a patch or PR, you agree to allow the project owner to
-license your work under the same license as that used by the project.
+License". By submitting a patch or pull request, you agree to allow the project
+owner to license your work under the same license as that used by the project.
 

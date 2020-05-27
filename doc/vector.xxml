@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 ]>
@@ -91,6 +91,7 @@
 <!-- doxrox-include igraph_vector_contains -->
 <!-- doxrox-include igraph_vector_search -->
 <!-- doxrox-include igraph_vector_binsearch -->
+<!-- doxrox-include igraph_vector_binsearch_slice -->
 <!-- doxrox-include igraph_vector_binsearch2 -->
 </section>
 

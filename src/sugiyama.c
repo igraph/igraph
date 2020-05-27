@@ -22,7 +22,6 @@
 
 */
 
-#include "config.h"
 #include "igraph_centrality.h"
 #include "igraph_components.h"
 #include "igraph_constants.h"
@@ -34,6 +33,7 @@
 #include "igraph_memory.h"
 #include "igraph_structural.h"
 #include "igraph_types.h"
+#include "config.h"
 
 #include <limits.h>
 
@@ -157,8 +157,8 @@ typedef struct {
 /**
  * Initializes a layering.
  */
-int igraph_i_layering_init(igraph_i_layering_t* layering,
-                           const igraph_vector_t* membership) {
+static int igraph_i_layering_init(igraph_i_layering_t* layering,
+                                  const igraph_vector_t* membership) {
     long int i, n, num_layers;
 
     if (igraph_vector_size(membership) == 0) {
@@ -193,21 +193,21 @@ int igraph_i_layering_init(igraph_i_layering_t* layering,
 /**
  * Destroys a layering.
  */
-void igraph_i_layering_destroy(igraph_i_layering_t* layering) {
+static void igraph_i_layering_destroy(igraph_i_layering_t* layering) {
     igraph_vector_ptr_destroy_all(&layering->layers);
 }
 
 /**
  * Returns the number of layers in a layering.
  */
-int igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
+static int igraph_i_layering_num_layers(const igraph_i_layering_t* layering) {
     return (int) igraph_vector_ptr_size(&layering->layers);
 }
 
 /**
  * Returns the list of vertices in a given layer
  */
-igraph_vector_t* igraph_i_layering_get(const igraph_i_layering_t* layering,
+static igraph_vector_t* igraph_i_layering_get(const igraph_i_layering_t* layering,
                                        long int index) {
     return (igraph_vector_t*)VECTOR(layering->layers)[index];
 }

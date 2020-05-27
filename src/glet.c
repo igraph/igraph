@@ -75,7 +75,7 @@ typedef struct {
     int nc;
 } igraph_i_subclique_next_free_t;
 
-void igraph_i_subclique_next_free(void *ptr) {
+static void igraph_i_subclique_next_free(void *ptr) {
     igraph_i_subclique_next_free_t *data = ptr;
     int i;
     if (data->resultids) {
@@ -123,15 +123,15 @@ void igraph_i_subclique_next_free(void *ptr) {
  *
  */
 
-int igraph_i_subclique_next(const igraph_t *graph,
-                            const igraph_vector_t *weights,
-                            const igraph_vector_int_t *ids,
-                            const igraph_vector_ptr_t *cliques,
-                            igraph_t **result,
-                            igraph_vector_t **resultweights,
-                            igraph_vector_int_t **resultids,
-                            igraph_vector_t *clique_thr,
-                            igraph_vector_t *next_thr) {
+static int igraph_i_subclique_next(const igraph_t *graph,
+                                   const igraph_vector_t *weights,
+                                   const igraph_vector_int_t *ids,
+                                   const igraph_vector_ptr_t *cliques,
+                                   igraph_t **result,
+                                   igraph_vector_t **resultweights,
+                                   igraph_vector_int_t **resultids,
+                                   igraph_vector_t *clique_thr,
+                                   igraph_vector_t *next_thr) {
 
     /* The input is a set of cliques, that were found at a previous level.
        For each clique, we calculate the next threshold, drop the isolate
@@ -294,7 +294,7 @@ int igraph_i_subclique_next(const igraph_t *graph,
     return 0;
 }
 
-void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
+static void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
     int i, n = igraph_vector_ptr_size(vl);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = (igraph_vector_t*) VECTOR(*vl)[i];
@@ -305,12 +305,12 @@ void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
     igraph_vector_ptr_destroy(vl);
 }
 
-int igraph_i_graphlets(const igraph_t *graph,
-                       const igraph_vector_t *weights,
-                       igraph_vector_ptr_t *cliques,
-                       igraph_vector_t *thresholds,
-                       const igraph_vector_int_t *ids,
-                       igraph_real_t startthr) {
+static int igraph_i_graphlets(const igraph_t *graph,
+                              const igraph_vector_t *weights,
+                              igraph_vector_ptr_t *cliques,
+                              igraph_vector_t *thresholds,
+                              const igraph_vector_int_t *ids,
+                              igraph_real_t startthr) {
 
     /* This version is different from the main function, and is
        appropriate to use in recursive calls, because it _adds_ the
@@ -401,7 +401,7 @@ typedef struct {
     const igraph_vector_t *thresholds;
 } igraph_i_graphlets_filter_t;
 
-int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *b) {
+static int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *b) {
     igraph_i_graphlets_filter_t *ddata = (igraph_i_graphlets_filter_t *) data;
     int *aa = (int*) a;
     int *bb = (int*) b;
@@ -430,8 +430,8 @@ int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *b) {
     }
 }
 
-int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
-                              igraph_vector_t *thresholds) {
+static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
+                                     igraph_vector_t *thresholds) {
 
     /* Filter out non-maximal cliques. Every non-maximal clique is
        part of a maximal clique, at the same threshold.
@@ -583,6 +583,7 @@ int igraph_graphlets_candidate_basis(const igraph_t *graph,
     return 0;
 }
 
+/* TODO: not made static because it is used by the R interface */
 int igraph_i_graphlets_project(const igraph_t *graph,
                                const igraph_vector_t *weights,
                                const igraph_vector_ptr_t *cliques,
@@ -794,7 +795,7 @@ typedef struct igraph_i_graphlets_order_t {
     const igraph_vector_t *Mu;
 } igraph_i_graphlets_order_t;
 
-int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b) {
+static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b) {
     igraph_i_graphlets_order_t *ddata = (igraph_i_graphlets_order_t*) data;
     int *aa = (int*) a;
     int *bb = (int*) b;

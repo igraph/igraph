@@ -62,9 +62,7 @@
 #ifndef IGRAPH_HRG_SPLITTREE
 #define IGRAPH_HRG_SPLITTREE
 
-#include <iostream>
-
-using namespace std;
+#include <string>
 
 namespace fitHRG {
 
@@ -74,7 +72,7 @@ namespace fitHRG {
 #define IGRAPH_HRG_SLIST
 class slist {
 public:
-    string x;         // stored elementd in linked-list
+    std::string x;         // stored elementd in linked-list
     slist* next;          // pointer to next elementd
     slist(): x(""), next(0) { }
     ~slist() { }
@@ -83,7 +81,7 @@ public:
 
 class keyValuePairSplit {
 public:
-    string x;         // elementsp split (string)
+    std::string x;         // elementsp split (string)
     double y;         // stored weight   (double)
     int c;            // stored count    (int)
     keyValuePairSplit* next;  // linked-list pointer
@@ -95,7 +93,7 @@ public:
 
 class elementsp {
 public:
-    string split;             // split represented as a string
+    std::string split;             // split represented as a string
     double weight;            // total weight of this split
     int count;                // number of observations of this split
 
@@ -149,21 +147,21 @@ public:
     // default constructor/destructor
     splittree(); ~splittree();
     // returns value associated with searchKey
-    double returnValue(const string);
+    double returnValue(const std::string);
     // returns T if searchKey found, and points foundNode at the
     // corresponding node
-    elementsp* findItem(const string);
+    elementsp* findItem(const std::string);
     // update total_count and total_weight
     void finishedThisRound();
     // insert a new key with stored value
-    bool insertItem(string, double);
+    bool insertItem(std::string, double);
     void clearTree();
     // delete a node with given key
-    void deleteItem(string);
+    void deleteItem(std::string);
     // delete the entire tree
     void deleteTree();
     // return array of keys in tree
-    string* returnArrayOfKeys();
+    std::string* returnArrayOfKeys();
     // return list of keys in tree
     slist* returnListOfKeys();
     // return the tree as a list of keyValuePairSplits

@@ -36,16 +36,13 @@
 
 // Compile time adjustable parameters
 
-
-#include <deque>
-
-using namespace std;
-
 #include "drl_layout.h"
 #include "drl_Node.h"
 #ifdef MUSE_MPI
     #include <mpi.h>
 #endif
+
+#include <deque>
 
 namespace drl {
 
@@ -74,7 +71,7 @@ private:
     // new dynamic variables -- SBM
     float (*fall_off)[RADIUS * 2 + 1];
     float (*Density)[GRID_SIZE];
-    deque<Node>* Bins;
+    std::deque<Node>* Bins;
 
     // old static variables
     //float fall_off[RADIUS*2+1][RADIUS*2+1];

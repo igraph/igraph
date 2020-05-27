@@ -55,18 +55,12 @@
 
 #include "walktrap_graph.h"
 #include "walktrap_communities.h"
-#include <ctime>
-#include <set>
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
 
 #include "igraph_community.h"
 #include "igraph_components.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt_internal.h"
 
-using namespace std;
 using namespace igraph::walktrap;
 
 /**
@@ -75,12 +69,12 @@ using namespace igraph::walktrap;
  * This function is the implementation of the Walktrap community
  * finding algorithm, see Pascal Pons, Matthieu Latapy: Computing
  * communities in large networks using random walks,
- * http://arxiv.org/abs/physics/0512106
+ * https://arxiv.org/abs/physics/0512106
  *
  * </para><para>
  * Currently the original C++ implementation is used in igraph,
- * see http://www-rp.lip6.fr/~latapy/PP/walktrap.html
- * I'm grateful to Matthieu Latapy and Pascal Pons for providing this
+ * see https://www-complexnetworks.lip6.fr/~latapy/PP/walktrap.html
+ * We are grateful to Matthieu Latapy and Pascal Pons for providing this
  * source code.
  *
  * </para><para>

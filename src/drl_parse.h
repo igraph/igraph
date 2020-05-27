@@ -37,6 +37,8 @@
     #include <mpi.h>
 #endif
 
+#include <string>
+
 namespace drl {
 
 class parse {
@@ -49,10 +51,10 @@ public:
     ~parse () {}
 
     // user parameters
-    string sim_file;        // .sim file
-    string coord_file;      // .coord file
-    string parms_file;      // .parms file
-    string real_file;       // .real file
+    std::string sim_file;        // .sim file
+    std::string coord_file;      // .coord file
+    std::string parms_file;      // .parms file
+    std::string real_file;       // .real file
 
     int rand_seed;      // random seed int >= 0
     float edge_cut;         // edge cutting real [0,1]

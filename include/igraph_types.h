@@ -21,8 +21,8 @@
 
 */
 
-#ifndef REST_TYPES_H
-#define REST_TYPES_H
+#ifndef IGRAPH_TYPES_H
+#define IGRAPH_TYPES_H
 
 #include "igraph_decls.h"
 

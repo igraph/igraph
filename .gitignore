@@ -14,6 +14,7 @@
 /aclocal.m4
 /autom4te.cache
 /build
+/build-*
 /compile
 /config.guess
 /config.h
@@ -28,12 +29,12 @@
 /install-sh
 /libtool
 /ltmain.sh
+/m4/libtool.m4
 /m4/lt*
 /missing
 /stamp-h1
 /ylwrap
 /igraph.msvc
-/fatbuild
 /valgrind-testbed
 /Makefile
 /src/Makefile

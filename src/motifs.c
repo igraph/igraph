@@ -28,12 +28,10 @@
 #include "igraph_interrupt_internal.h"
 #include "igraph_interface.h"
 #include "igraph_nongraph.h"
-#include "igraph_structural.h"
 #include "igraph_stack.h"
 #include "config.h"
 
-#include <string.h>
-
+/* TODO create header for these functions: */
 extern unsigned int igraph_i_isoclass_3[];
 extern unsigned int igraph_i_isoclass_4[];
 extern unsigned int igraph_i_isoclass_3u[];
@@ -51,7 +49,8 @@ extern unsigned int igraph_i_isoclass_4u_idx[];
  * Callback function for igraph_motifs_randesu that counts the motifs by
  * isomorphism class in a histogram.
  */
-igraph_bool_t igraph_i_motifs_randesu_update_hist(const igraph_t *graph,
+static igraph_bool_t igraph_i_motifs_randesu_update_hist(
+        const igraph_t *graph,
         igraph_vector_t *vids, int isoclass, void* extra) {
     igraph_vector_t *hist = (igraph_vector_t*)extra;
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(vids);

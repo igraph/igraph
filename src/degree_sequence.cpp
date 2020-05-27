@@ -231,7 +231,7 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
         }
 
         // are there a sufficient number of other vertices to connect to?
-        if (vertices.size() < vdp->degree.second - 1) {
+        if (static_cast<long>(vertices.size()) < vdp->degree.second - 1) {
             goto fail;
         }
 

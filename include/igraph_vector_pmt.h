@@ -40,25 +40,25 @@ DECLDIR long int FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);
 /*--------------------*/
 
 #ifndef VECTOR
-    /**
-    * \ingroup vector
-    * \define VECTOR
-    * \brief Accessing an element of a vector.
-    *
-    * Usage:
-    * \verbatim VECTOR(v)[0] \endverbatim
-    * to access the first element of the vector, you can also use this in
-    * assignments, like:
-    * \verbatim VECTOR(v)[10]=5; \endverbatim
-    *
-    * Note that there are no range checks right now.
-    * This functionality might be redefined later as a real function
-    * instead of a <code>#define</code>.
-    * \param v The vector object.
-    *
-    * Time complexity: O(1).
-    */
-    #define VECTOR(v) ((v).stor_begin)
+/**
+ * \ingroup vector
+ * \define VECTOR
+ * \brief Accessing an element of a vector.
+ *
+ * Usage:
+ * \verbatim VECTOR(v)[0] \endverbatim
+ * to access the first element of the vector, you can also use this in
+ * assignments, like:
+ * \verbatim VECTOR(v)[10]=5; \endverbatim
+ *
+ * Note that there are no range checks right now.
+ * This functionality might be redefined later as a real function
+ * instead of a <code>#define</code>.
+ * \param v The vector object.
+ *
+ * Time complexity: O(1).
+ */
+#define VECTOR(v) ((v).stor_begin)
 #endif
 
 DECLDIR BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, long int pos);
@@ -177,6 +177,9 @@ DECLDIR igraph_bool_t FUNCTION(igraph_vector, contains)(const TYPE(igraph_vector
 DECLDIR igraph_bool_t FUNCTION(igraph_vector, search)(const TYPE(igraph_vector) *v,
         long int from, BASE what,
         long int *pos);
+DECLDIR igraph_bool_t FUNCTION(igraph_vector, binsearch_slice)(const TYPE(igraph_vector) *v,
+        BASE what, long int *pos,
+        long int start, long int end);
 DECLDIR igraph_bool_t FUNCTION(igraph_vector, binsearch)(const TYPE(igraph_vector) *v,
         BASE what, long int *pos);
 DECLDIR igraph_bool_t FUNCTION(igraph_vector, binsearch2)(const TYPE(igraph_vector) *v,

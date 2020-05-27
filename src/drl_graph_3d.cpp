@@ -32,13 +32,9 @@
  */
 // This file contains the member definitions of the master class
 
-#include <iostream>
-#include <fstream>
 #include <map>
 #include <vector>
-#include <cstdlib>
 #include <cmath>
-#include <cstring>
 
 using namespace std;
 

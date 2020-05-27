@@ -21,6 +21,6 @@ namespace prpack {
             ~prpack_preprocessed_ge_graph();
     };
 
-};
+}
 
 #endif

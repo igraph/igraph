@@ -65,18 +65,15 @@
 #ifndef IGRAPH_HRG_DENDRO
 #define IGRAPH_HRG_DENDRO
 
-#include <iostream>
-#include <fstream>
-#include <cstdio>
-#include <cmath>
-
 #include "hrg_graph.h"
 #include "hrg_rbtree.h"
 #include "hrg_splittree_eq.h"
 
 #include "igraph_hrg.h"
 
-using namespace std;
+#include <string>
+#include <cmath>
+
 using namespace fitHRG;
 
 namespace fitHRG {
@@ -105,7 +102,7 @@ struct ipair {
     int    x;
     int y;
     short int t;
-    string sp;
+    std::string sp;
 };
 struct child {
     int index;
@@ -147,7 +144,7 @@ public:
 
 class split {
 public:
-    string s;           // partition assignment of leaf vertices
+    std::string s;           // partition assignment of leaf vertices
     split(): s("") { }
     ~split() { }
     void initializeSplit(const int n) {
@@ -157,7 +154,7 @@ public:
         }
     }
     bool checkSplit() {
-        if (s.empty() || s.find("-", 0) != string::npos) {
+        if (s.empty() || s.find("-", 0) != std::string::npos) {
             return false;
         } else {
             return true;
@@ -181,7 +178,7 @@ public:
 class interns {
 private:
     ipair* edgelist;   // list of internal edges represented
-    string* splitlist; // split representation of the internal edges
+    std::string* splitlist; // split representation of the internal edges
     int** indexLUT;    // table of indices of internal edges in edgelist
     int q;         // number of internal edges
     int count;         // (for adding edges) edgelist index of new edge to add
@@ -196,9 +193,9 @@ public:
     // returns a uniformly random internal edge, O(1)
     ipair* getRandomEdge();
     // returns the ith split of the splitlist, O(1)
-    string getSplit(const int);
+    std::string getSplit(const int);
     // replace an existing split, O(1)
-    bool replaceSplit(const int, const string);
+    bool replaceSplit(const int, const std::string);
     // swaps two edges, O(1)
     bool swapEdges(const int, const int, const short int, const int,
                    const int, const short int);
@@ -250,12 +247,12 @@ private:
     // return path to root from leaf
     list* binarySearchFind(const double);
     // build split for this internal edge
-    string buildSplit(elementd*);
+    std::string buildSplit(elementd*);
     // compute number of edges between two internal subtrees
     int computeEdgeCount(const int, const short int, const int,
                          const short int);
     // (consensus tree) counts children
-    int countChildren(const string);
+    int countChildren(const std::string);
     // find internal node of D that is common ancestor of i,j
     elementd* findCommonAncestor(list**, const int, const int);
     // return reverse of path to leaf from root

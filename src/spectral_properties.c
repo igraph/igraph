@@ -27,10 +27,10 @@
 #include "config.h"
 #include <math.h>
 
-int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
-                                igraph_sparsemat_t *sparseres,
-                                igraph_bool_t normalized,
-                                const igraph_vector_t *weights) {
+static int igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
+                                       igraph_sparsemat_t *sparseres,
+                                       igraph_bool_t normalized,
+                                       const igraph_vector_t *weights) {
 
     igraph_eit_t edgeit;
     int no_of_nodes = (int) igraph_vcount(graph);

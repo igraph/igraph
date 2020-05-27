@@ -31,8 +31,8 @@
 #include "igraph_attributes.h"
 #include "igraph_conversion.h"
 #include "igraph_qsort.h"
-#include <limits.h>
 #include "config.h"
+#include <limits.h>
 
 /**
  * \function igraph_disjoint_union
@@ -183,8 +183,7 @@ int igraph_disjoint_union_many(igraph_t *res,
     return 0;
 }
 
-int igraph_i_order_edgelist_cmp(void *edges, const void *e1,
-                                const void *e2) {
+static int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
     igraph_vector_t *edgelist = edges;
     long int edge1 = (*(const long int*) e1) * 2;
     long int edge2 = (*(const long int*) e2) * 2;
@@ -210,9 +209,9 @@ int igraph_i_order_edgelist_cmp(void *edges, const void *e1,
 #define IGRAPH_MODE_UNION        1
 #define IGRAPH_MODE_INTERSECTION 2
 
-int igraph_i_merge(igraph_t *res, int mode,
-                   const igraph_t *left, const igraph_t *right,
-                   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
+static int igraph_i_merge(igraph_t *res, int mode,
+                          const igraph_t *left, const igraph_t *right,
+                          igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
 
     long int no_of_nodes_left = igraph_vcount(left);
     long int no_of_nodes_right = igraph_vcount(right);
@@ -431,7 +430,7 @@ int igraph_intersection(igraph_t *res,
                           edge_map1, edge_map2);
 }
 
-void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
+static void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
     long int i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
@@ -442,7 +441,7 @@ void igraph_i_union_many_free(igraph_vector_ptr_t *v) {
     igraph_vector_ptr_destroy(v);
 }
 
-void igraph_i_union_many_free2(igraph_vector_ptr_t *v) {
+static void igraph_i_union_many_free2(igraph_vector_ptr_t *v) {
     long int i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
@@ -453,7 +452,7 @@ void igraph_i_union_many_free2(igraph_vector_ptr_t *v) {
     igraph_vector_ptr_destroy(v);
 }
 
-void igraph_i_union_many_free3(igraph_vector_ptr_t *v) {
+static void igraph_i_union_many_free3(igraph_vector_ptr_t *v) {
     long int i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {

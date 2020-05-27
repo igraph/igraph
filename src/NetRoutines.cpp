@@ -40,15 +40,15 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
+
 #include "NetRoutines.h"
 #include "NetDataTypes.h"
 
 #include "igraph_types.h"
 #include "igraph_interface.h"
 #include "igraph_conversion.h"
+
+#include <cstring>
 
 int igraph_i_read_network(const igraph_t *graph,
                           const igraph_vector_t *weights,

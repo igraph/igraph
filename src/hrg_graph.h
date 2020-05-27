@@ -61,13 +61,11 @@
 #ifndef IGRAPH_HRG_GRAPH
 #define IGRAPH_HRG_GRAPH
 
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
-
 #include "hrg_rbtree.h"
 
-using namespace std;
+#include <string>
+#include <cstring>
+#include <cstdlib>
 
 namespace fitHRG {
 
@@ -96,7 +94,7 @@ public:
 #define IGRAPH_HRG_VERT
 class vert {
 public:
-    string name;           // (external) name of vertex
+    std::string name;           // (external) name of vertex
     int degree;            // degree of this vertex
 
     vert(): name(""), degree(0) { }
@@ -122,7 +120,7 @@ public:
     // returns degree of vertex i
     int getDegree(const int);
     // returns name of vertex i
-    string getName(const int);
+    std::string getName(const int);
     // returns edge list of vertex i
     edge* getNeighborList(const int);
     // return ptr to histogram of edge (i,j)
@@ -148,7 +146,7 @@ public:
     // allocate edge histograms
     void setAdjacencyHistograms(const int);
     // set name of vertex i
-    bool setName(const int, const string);
+    bool setName(const int, const std::string);
 
 private:
     bool predict;      // do we need prediction?

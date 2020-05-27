@@ -54,12 +54,11 @@
 // see readme.txt for more details
 
 
-#ifndef COMMUNITIES_H
-#define COMMUNITIES_H
+#ifndef WALKTRAP_COMMUNITIES_H
+#define WALKTRAP_COMMUNITIES_H
 
 #include "walktrap_graph.h"
 #include "walktrap_heap.h"
-
 #include "igraph_community.h"
 #include "config.h"
 
@@ -173,4 +172,4 @@ public:
 }
 }       /* end of namespaces */
 
-#endif
+#endif // WALKTRAP_COMMUNITIES_H

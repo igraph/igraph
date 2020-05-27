@@ -55,10 +55,6 @@
 #ifndef IGRAPH_HRG_RBTREE
 #define IGRAPH_HRG_RBTREE
 
-#include <iostream>
-
-using namespace std;
-
 namespace fitHRG {
 
 // ******** Basic Structures *********************************************

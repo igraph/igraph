@@ -6,12 +6,48 @@
 
 ### Changed
 
+### Fixed
+
+### Other
+
+## [0.8.2] - 2020-04-28
+
+### Changed
+
+ - Improved argument checking: `igraph_all_st_mincuts()` and `igraph_sir()`
+ - Improved interruptibility: `igraph_sir()`
+
+### Fixed
+
+ - `igraph_community_leiden()`: fixed crash when interrupting
+ - The tests are now more robust. Some incorrect test failures were fixed when
+   running on i386 architecture, or when using different versions of external
+   dependencies.
+
+### Others
+
+ - Improved error messages from `igraph_sir()`.
+ - Improved compatibility with more recent versions of Microsoft Visual C.
+
+## [0.8.1] - 2020-03-13
+
+### Changed
+
  - Improved interruptability: `igraph_degree_sequence_game()`
  - Improved argument checking: `igraph_forest_fire_game()`
+ - Updated the plfit library to version 0.8.1
 
 ### Fixed
 
  - `igraph_community_edge_betweenness()`: fix for graphs with no edges (PR #1312)
+ - `igraph_bridges()` now handles multigraphs correctly (PR #1335)
+ - `igraph_avg_nearest_neighbor_degree()`: fix for memory leak in weighted case (PR #1339)
+ - `igraph_community_leiden()`: fix crash bug (PR #1357)
+ 
+### Other
+
+ - Included `ACKOWLEDGEMENTS.md`
+ - Documentation improvements
 
 ## [0.8.0] - 2020-01-29
 
@@ -80,6 +116,7 @@
  - `igraph_unfold_tree()`: no longer preserves edge ordering of original graph
  - `igraph_decompose()`: support strongly connected components
  - `igraph_isomorphic_bliss()`, `igraph_canonical_permutation()`, `igraph_automorphisms()`: added additional arguments to support vertex colored graphs (PR #873)
+ - `igraph_extended_chordal_ring`: added argument to support direction (PR #1096), and fixed issue #1093.
 
 ### Other
 

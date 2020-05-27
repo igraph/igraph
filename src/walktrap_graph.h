@@ -55,17 +55,14 @@
 /* FSF address above was fixed by Tamas Nepusz */
 
 
-#ifndef GRAPH_H
-#define GRAPH_H
-#include <iostream>
+#ifndef WALKTRAP_GRAPH_H
+#define WALKTRAP_GRAPH_H
 
 #include "igraph_community.h"
 
 namespace igraph {
 
 namespace walktrap {
-
-using namespace std;
 
 class Edge {            // code an edge of a given vertex
 public:
@@ -104,5 +101,5 @@ public:
 }
 }        /* end of namespaces */
 
-#endif
+#endif // WALKTRAP_GRAPH_H
 

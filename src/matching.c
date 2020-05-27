@@ -21,17 +21,15 @@
 
 */
 
-#include <assert.h>
-#include <math.h>
-#include "config.h"
 #include "igraph_adjlist.h"
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_dqueue.h"
-#include "igraph_flow.h"
 #include "igraph_interface.h"
 #include "igraph_matching.h"
 #include "igraph_structural.h"
+#include "config.h"
+#include <math.h>
 
 /* #define MATCHING_DEBUG */
 
@@ -207,10 +205,12 @@ int igraph_is_maximal_matching(const igraph_t* graph,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
+static int igraph_i_maximum_bipartite_matching_unweighted(
+        const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_vector_long_t* matching);
-int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
+static int igraph_i_maximum_bipartite_matching_weighted(
+        const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_real_t* matching_weight, igraph_vector_long_t* matching,
         const igraph_vector_t* weights, igraph_real_t eps);
@@ -306,7 +306,8 @@ int igraph_maximum_bipartite_matching(const igraph_t* graph,
     }
 }
 
-int igraph_i_maximum_bipartite_matching_unweighted_relabel(const igraph_t* graph,
+static int igraph_i_maximum_bipartite_matching_unweighted_relabel(
+        const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_vector_t* labels,
         igraph_vector_long_t* matching, igraph_bool_t smaller_set);
 
@@ -323,7 +324,8 @@ int igraph_i_maximum_bipartite_matching_unweighted_relabel(const igraph_t* graph
  * Avancée en Calcul Scientifique).
  * http://www.cerfacs.fr/algor/reports/2011/TR_PA_11_33.pdf
  */
-int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
+static int igraph_i_maximum_bipartite_matching_unweighted(
+        const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_vector_long_t* matching) {
     long int i, j, k, n, no_of_nodes = igraph_vcount(graph);
@@ -460,7 +462,8 @@ int igraph_i_maximum_bipartite_matching_unweighted(const igraph_t* graph,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_i_maximum_bipartite_matching_unweighted_relabel(const igraph_t* graph,
+static int igraph_i_maximum_bipartite_matching_unweighted_relabel(
+        const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_vector_t* labels,
         igraph_vector_long_t* match, igraph_bool_t smaller_set) {
     long int i, j, n, no_of_nodes = igraph_vcount(graph), matched_to;
@@ -529,7 +532,8 @@ int igraph_i_maximum_bipartite_matching_unweighted_relabel(const igraph_t* graph
  * an edge falls below \c eps, it will be considered tight. If all your
  * weights are integers, you can safely set \c eps to zero.
  */
-int igraph_i_maximum_bipartite_matching_weighted(const igraph_t* graph,
+static int igraph_i_maximum_bipartite_matching_weighted(
+        const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
         igraph_real_t* matching_weight, igraph_vector_long_t* matching,
         const igraph_vector_t* weights, igraph_real_t eps) {

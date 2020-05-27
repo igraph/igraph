@@ -23,10 +23,10 @@
 
 #include "igraph_attributes.h"
 #include "igraph_memory.h"
-#include "config.h"
 #include "igraph_math.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
+#include "config.h"
 
 #include <string.h>
 

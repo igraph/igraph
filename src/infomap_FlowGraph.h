@@ -62,7 +62,7 @@ public:
     double alpha, beta;
 
     int Ndanglings;
-    vector<int> danglings; // id of dangling nodes
+    std::vector<int> danglings; // id of dangling nodes
 
     double exit;                  //
     double exitFlow;              //

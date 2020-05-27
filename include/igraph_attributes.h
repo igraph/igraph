@@ -21,8 +21,8 @@
 
 */
 
-#ifndef REST_ATTRIBUTES_H
-#define REST_ATTRIBUTES_H
+#ifndef IGRAPH_ATTRIBUTES_H
+#define IGRAPH_ATTRIBUTES_H
 
 #include "igraph_decls.h"
 #include "igraph_datatype.h"

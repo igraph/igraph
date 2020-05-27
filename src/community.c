@@ -27,7 +27,6 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_arpack.h"
-#include "igraph_arpack_internal.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt_internal.h"
@@ -50,7 +49,7 @@
     #include <R.h>
 #endif
 
-int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
+static int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
     long int no = (long int) igraph_vector_max(membership) + 1;
     igraph_vector_t idx;
     long int realno = 0;
@@ -73,13 +72,13 @@ int igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
     return 0;
 }
 
-int igraph_i_community_eb_get_merges2(const igraph_t *graph,
-                                      const igraph_vector_t *edges,
-                                      const igraph_vector_t *weights,
-                                      igraph_matrix_t *res,
-                                      igraph_vector_t *bridges,
-                                      igraph_vector_t *modularity,
-                                      igraph_vector_t *membership) {
+static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
+                                             const igraph_vector_t *edges,
+                                             const igraph_vector_t *weights,
+                                             igraph_matrix_t *res,
+                                             igraph_vector_t *bridges,
+                                             igraph_vector_t *modularity,
+                                             igraph_vector_t *membership) {
 
     igraph_vector_t mymembership;
     long int no_of_nodes = igraph_vcount(graph);
@@ -293,8 +292,8 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
 }
 
 /* Find the smallest active element in the vector */
-long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
-        const char *passive) {
+static long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
+                                                   const char *passive) {
     long int which, i = 0, size = igraph_vector_size(v);
     igraph_real_t max;
     while (passive[i]) {
@@ -721,7 +720,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
     if (result_owned) {
         igraph_vector_destroy(result);
-        free(result);
+        igraph_Free(result);
         IGRAPH_FINALLY_CLEAN(2);
     }
 
@@ -1178,9 +1177,9 @@ typedef struct igraph_i_community_leading_eigenvector_data_t {
     igraph_real_t sumweights;
 } igraph_i_community_leading_eigenvector_data_t;
 
-int igraph_i_community_leading_eigenvector(igraph_real_t *to,
-        const igraph_real_t *from,
-        int n, void *extra) {
+static int igraph_i_community_leading_eigenvector(igraph_real_t *to,
+                                                  const igraph_real_t *from,
+                                                  int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
     long int j, k, nlen, size = n;
@@ -1239,9 +1238,9 @@ int igraph_i_community_leading_eigenvector(igraph_real_t *to,
     return 0;
 }
 
-int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
-        const igraph_real_t *from,
-        int n, void *extra) {
+static int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
+                                                   const igraph_real_t *from,
+                                                   int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
     long int j, k, nlen, size = n;
@@ -1305,9 +1304,9 @@ int igraph_i_community_leading_eigenvector2(igraph_real_t *to,
     return 0;
 }
 
-int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
-        const igraph_real_t *from,
-        int n, void *extra) {
+static int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
+                                                           const igraph_real_t *from,
+                                                           int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
     long int j, k, nlen, size = n;
@@ -1369,9 +1368,9 @@ int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
     return 0;
 }
 
-int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
-        const igraph_real_t *from,
-        int n, void *extra) {
+static int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
+                                                            const igraph_real_t *from,
+                                                            int n, void *extra) {
 
     igraph_i_community_leading_eigenvector_data_t *data = extra;
     long int j, k, nlen, size = n;
@@ -1438,7 +1437,7 @@ int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
     return 0;
 }
 
-void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
+static void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
     long int i, n = igraph_vector_ptr_size(ptr);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*ptr)[i];
@@ -1449,8 +1448,8 @@ void igraph_i_levc_free(igraph_vector_ptr_t *ptr) {
     }
 }
 
-void igraph_i_error_handler_none(const char *reason, const char *file,
-                                 int line, int igraph_errno) {
+static void igraph_i_error_handler_none(const char *reason, const char *file,
+                                        int line, int igraph_errno) {
     IGRAPH_UNUSED(reason);
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
@@ -1516,7 +1515,7 @@ void igraph_i_error_handler_none(const char *reason, const char *file,
  *    \ref igraph_vector_t object. The user is responsible of
  *    deallocating the memory that belongs to the individual vectors,
  *    by calling first \ref igraph_vector_destroy(), and then
- *    <code>free()</code> on them.
+ *    \ref igraph_free() on them.
  * \param history Pointer to an initialized vector or a null pointer.
  *    If not a null pointer, then a trace of the algorithm is stored
  *    here, encoded numerically. The various operations:
@@ -2684,7 +2683,7 @@ typedef struct {
 } igraph_i_multilevel_community_list;
 
 /* Computes the modularity of a community partitioning */
-igraph_real_t igraph_i_multilevel_community_modularity(
+static igraph_real_t igraph_i_multilevel_community_modularity(
     const igraph_i_multilevel_community_list *communities) {
     igraph_real_t result = 0;
     long int i;
@@ -2705,7 +2704,7 @@ typedef struct {
     long int id;
 } igraph_i_multilevel_link;
 
-int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
+static int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
     long int r = (((igraph_i_multilevel_link*)a)->from -
                   ((igraph_i_multilevel_link*)b)->from);
     if (r != 0) {
@@ -2717,7 +2716,7 @@ int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
 }
 
 /* removes multiple edges and returns new edge id's for each edge in |E|log|E| */
-int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids) {
+static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids) {
     long int ecount = igraph_ecount(graph);
     long int i, l = -1, last_from = -1, last_to = -1;
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -2732,7 +2731,7 @@ int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids
     if (links == 0) {
         IGRAPH_ERROR("multi-level community structure detection failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, links);
+    IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < ecount; i++) {
         igraph_edge(graph, (igraph_integer_t) i, &from, &to);
@@ -2762,7 +2761,7 @@ int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids
         VECTOR(*eids)[links[i].id] = l;
     }
 
-    free(links);
+    igraph_Free(links);
     IGRAPH_FINALLY_CLEAN(1);
 
     igraph_destroy(graph);
@@ -2779,7 +2778,7 @@ typedef struct {
     igraph_real_t weight;
 } igraph_i_multilevel_community_link;
 
-int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
+static int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
     return (int) (((igraph_i_multilevel_community_link*)a)->community -
                   ((igraph_i_multilevel_community_link*)b)->community);
 }
@@ -2797,11 +2796,12 @@ int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
  *   communities incident on this vertex and the total weight of edges
  *   pointing to these communities
  */
-int igraph_i_multilevel_community_links(const igraph_t *graph,
-                                        const igraph_i_multilevel_community_list *communities,
-                                        igraph_integer_t vertex, igraph_vector_t *edges,
-                                        igraph_real_t *weight_all, igraph_real_t *weight_inside, igraph_real_t *weight_loop,
-                                        igraph_vector_t *links_community, igraph_vector_t *links_weight) {
+static int igraph_i_multilevel_community_links(
+        const igraph_t *graph,
+        const igraph_i_multilevel_community_list *communities,
+        igraph_integer_t vertex, igraph_vector_t *edges,
+        igraph_real_t *weight_all, igraph_real_t *weight_inside, igraph_real_t *weight_loop,
+        igraph_vector_t *links_community, igraph_vector_t *links_weight) {
 
     long int i, n, last = -1, c = -1;
     igraph_real_t weight = 1;
@@ -2871,10 +2871,10 @@ int igraph_i_multilevel_community_links(const igraph_t *graph,
     return 0;
 }
 
-igraph_real_t igraph_i_multilevel_community_modularity_gain(
-    const igraph_i_multilevel_community_list *communities,
-    igraph_integer_t community, igraph_integer_t vertex,
-    igraph_real_t weight_all, igraph_real_t weight_inside) {
+static igraph_real_t igraph_i_multilevel_community_modularity_gain(
+        const igraph_i_multilevel_community_list *communities,
+        igraph_integer_t community, igraph_integer_t vertex,
+        igraph_real_t weight_all, igraph_real_t weight_inside) {
     IGRAPH_UNUSED(vertex);
     return weight_inside -
            communities->item[(long int)community].weight_all * weight_all / communities->weight_sum;
@@ -2886,7 +2886,7 @@ igraph_real_t igraph_i_multilevel_community_modularity_gain(
  * detection where a copy of the original graph is used anyway.
  * The membership vector will also be rewritten by the underlying
  * igraph_membership_reindex call */
-int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
+static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
     igraph_vector_t edges;
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -2957,9 +2957,11 @@ int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
  *
  * Time complexity: in average near linear on sparse graphs.
  */
-int igraph_i_community_multilevel_step(igraph_t *graph,
-                                       igraph_vector_t *weights, igraph_vector_t *membership,
-                                       igraph_real_t *modularity) {
+static int igraph_i_community_multilevel_step(
+        igraph_t *graph,
+        igraph_vector_t *weights,
+        igraph_vector_t *membership,
+        igraph_real_t *modularity) {
 
     long int i, j;
     long int vcount = igraph_vcount(graph);
@@ -3318,15 +3320,15 @@ int igraph_community_multilevel(const igraph_t *graph,
 }
 
 
-int igraph_i_compare_communities_vi(const igraph_vector_t *v1,
-                                    const igraph_vector_t *v2, igraph_real_t* result);
-int igraph_i_compare_communities_nmi(const igraph_vector_t *v1,
-                                     const igraph_vector_t *v2, igraph_real_t* result);
-int igraph_i_compare_communities_rand(const igraph_vector_t *v1,
-                                      const igraph_vector_t *v2, igraph_real_t* result, igraph_bool_t adjust);
-int igraph_i_split_join_distance(const igraph_vector_t *v1,
-                                 const igraph_vector_t *v2, igraph_integer_t* distance12,
-                                 igraph_integer_t* distance21);
+static int igraph_i_compare_communities_vi(const igraph_vector_t *v1,
+                                           const igraph_vector_t *v2, igraph_real_t* result);
+static int igraph_i_compare_communities_nmi(const igraph_vector_t *v1,
+                                            const igraph_vector_t *v2, igraph_real_t* result);
+static int igraph_i_compare_communities_rand(const igraph_vector_t *v1,
+                                             const igraph_vector_t *v2, igraph_real_t* result, igraph_bool_t adjust);
+static int igraph_i_split_join_distance(const igraph_vector_t *v1,
+                                        const igraph_vector_t *v2, igraph_integer_t* distance12,
+                                        igraph_integer_t* distance21);
 
 /**
  * \ingroup communities
@@ -3520,7 +3522,7 @@ int igraph_split_join_distance(const igraph_vector_t *comm1,
  * membership vectors v1 and v2. This is needed by both Meila's and Danon's
  * community comparison measure.
  */
-int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
+static int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
         const igraph_vector_t* v2, double* h1, double* h2, double* mut_inf) {
     long int i, n = igraph_vector_size(v1);
     long int k1 = (long int)igraph_vector_max(v1) + 1;
@@ -3533,12 +3535,12 @@ int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
     if (p1 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, p1);
+    IGRAPH_FINALLY(igraph_free, p1);
     p2 = igraph_Calloc(k2, double);
     if (p2 == 0) {
         IGRAPH_ERROR("igraph_i_entropy_and_mutual_information failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, p2);
+    IGRAPH_FINALLY(igraph_free, p2);
 
     /* Calculate the entropy of v1 */
     *h1 = 0.0;
@@ -3586,7 +3588,7 @@ int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
 
     igraph_spmatrix_iter_destroy(&mit);
     igraph_spmatrix_destroy(&m);
-    free(p1); free(p2);
+    igraph_Free(p1); igraph_Free(p2);
 
     IGRAPH_FINALLY_CLEAN(4);
 
@@ -3605,7 +3607,7 @@ int igraph_i_entropy_and_mutual_information(const igraph_vector_t* v1,
  * </para><para>
  * Time complexity: O(n log(n))
  */
-int igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static int igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igraph_vector_t *v2,
                                      igraph_real_t* result) {
     double h1, h2, mut_inf;
 
@@ -3635,7 +3637,7 @@ int igraph_i_compare_communities_nmi(const igraph_vector_t *v1, const igraph_vec
  * </para><para>
  * Time complexity: O(n log(n))
  */
-int igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static int igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igraph_vector_t *v2,
                                     igraph_real_t* result) {
     double h1, h2, mut_inf;
 
@@ -3656,7 +3658,7 @@ int igraph_i_compare_communities_vi(const igraph_vector_t *v1, const igraph_vect
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
  * and k2 are the number of clusters in each of the clusterings.
  */
-int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *v2,
                               igraph_spmatrix_t *m) {
     long int k1 = (long int)igraph_vector_max(v1) + 1;
     long int k2 = (long int)igraph_vector_max(v2) + 1;
@@ -3687,7 +3689,7 @@ int igraph_i_confusion_matrix(const igraph_vector_t *v1, const igraph_vector_t *
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
  * and k2 are the number of clusters in each of the clusterings.
  */
-int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_vector_t *v2,
+static int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_vector_t *v2,
                                  igraph_integer_t* distance12, igraph_integer_t* distance21) {
     long int n = igraph_vector_size(v1);
     igraph_vector_t rowmax, colmax;
@@ -3752,8 +3754,9 @@ int igraph_i_split_join_distance(const igraph_vector_t *v1, const igraph_vector_
  * Time complexity: O(n log(max(k1, k2))), where n is the number of vertices, k1
  * and k2 are the number of clusters in each of the clusterings.
  */
-int igraph_i_compare_communities_rand(const igraph_vector_t *v1,
-                                      const igraph_vector_t *v2, igraph_real_t *result, igraph_bool_t adjust) {
+static int igraph_i_compare_communities_rand(
+        const igraph_vector_t *v1, const igraph_vector_t *v2,
+        igraph_real_t *result, igraph_bool_t adjust) {
     igraph_spmatrix_t m;
     igraph_spmatrix_iter_t mit;
     igraph_vector_t rowsums, colsums;

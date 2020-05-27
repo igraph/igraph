@@ -5,7 +5,9 @@
 /* #undef HAVE_DLFCN_H */
 
 /* Define to 1 if you have the `expm1' function. */
-/* #undef HAVE_EXPM1 */
+#if defined(_MSC_VER) && _MSC_VER >= 1800
+#define HAVE_EXPM1 1
+#endif
 
 /* Define to 1 if you have the `fabsl' function. */
 #define HAVE_FABSL 1
@@ -56,7 +58,9 @@
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `rint' function. */
-/* #undef HAVE_RINT */
+#if defined(_MSC_VER) && _MSC_VER >= 1800
+#define HAVE_RINT 1
+#endif
 
 /* Define to 1 if you have the `rintf' function. */
 /* #undef HAVE_RINTF */
@@ -165,12 +169,21 @@
 
 #define strcasecmp _stricmp
 
-#define isnan _isnan
-#define finite _finite
-#define hypot _hypot
+#ifndef isnan
+#  define isnan _isnan
+#endif
+
+#ifndef finite
+#  define finite _finite
+#endif
+
+#ifndef hypot
+#  define hypot _hypot
+#endif
+
 #include <float.h>
 
-#if _MSC_VER<1900
+#if _MSC_VER < 1900
 #define snprintf igraph_i_snprintf
 #endif
 

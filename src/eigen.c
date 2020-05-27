@@ -30,7 +30,7 @@
 #include <math.h>
 #include <float.h>
 
-int igraph_i_eigen_arpackfun_to_mat(igraph_arpack_function_t *fun,
+static int igraph_i_eigen_arpackfun_to_mat(igraph_arpack_function_t *fun,
                                     int n, void *extra,
                                     igraph_matrix_t *res) {
 
@@ -55,7 +55,7 @@ int igraph_i_eigen_arpackfun_to_mat(igraph_arpack_function_t *fun,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -133,7 +133,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_lm(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -209,7 +209,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_sm(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -226,7 +226,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_la(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack_sa(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack_sa(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -242,7 +242,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_sa(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -321,7 +321,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_be(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_matrix_t *A,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
 
@@ -334,7 +334,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_all(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack_iv(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack_iv(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -349,7 +349,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_iv(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_matrix_t *A,
         const igraph_eigen_which_t *which,
         igraph_vector_t *values,
         igraph_matrix_t *vectors) {
@@ -363,7 +363,7 @@ int igraph_i_eigen_matrix_symmetric_lapack_sel(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_lapack(const igraph_matrix_t *A,
         const igraph_sparsemat_t *sA,
         igraph_arpack_function_t *fun,
         int n, void *extra,
@@ -444,7 +444,7 @@ typedef struct igraph_i_eigen_matrix_sym_arpack_data_t {
     const igraph_sparsemat_t *sA;
 } igraph_i_eigen_matrix_sym_arpack_data_t;
 
-int igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
+static int igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
                                         const igraph_real_t *from,
                                         int n, void *extra) {
 
@@ -457,14 +457,14 @@ int igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
     } else { /* data->sA */
         igraph_vector_t vto, vfrom;
         igraph_vector_view(&vto, to, n);
-        igraph_vector_view(&vfrom, to, n);
+        igraph_vector_view(&vfrom, from, n);
         igraph_vector_null(&vto);
         igraph_sparsemat_gaxpy(data->sA, &vfrom, &vto);
     }
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
         const igraph_sparsemat_t *sA,
         igraph_arpack_function_t *fun,
         int n, void *extra,
@@ -535,7 +535,7 @@ int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
         const igraph_sparsemat_t *sA,
         igraph_arpack_function_t *fun,
         int n, void *extra,
@@ -637,7 +637,7 @@ typedef struct igraph_i_eml_cmp_t {
    3 Larger real part
    4 Larger imaginary part */
 
-int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
                                         const void *b) {
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
     int *aa = (int*) a, *bb = (int*) b;
@@ -682,7 +682,7 @@ int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
    4 Smaller imaginary part
    This ensures that lm has exactly the opposite order to sm */
 
-int igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
                                         const void *b) {
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
     int *aa = (int*) a, *bb = (int*) b;
@@ -725,7 +725,7 @@ int igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
    2 Real eigenvalues come before complex ones
    3 Larger complex part */
 
-int igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
@@ -764,7 +764,7 @@ int igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void *a,
    This is opposite to LR
 */
 
-int igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
@@ -801,7 +801,7 @@ int igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void *a,
    2 Real eigenvalues before complex ones
    3 Larger real part */
 
-int igraph_i_eigen_matrix_lapack_cmp_li(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_li(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
@@ -839,7 +839,7 @@ int igraph_i_eigen_matrix_lapack_cmp_li(void *extra, const void *a,
    3 Smaller real part
    Order is opposite to LI */
 
-int igraph_i_eigen_matrix_lapack_cmp_si(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_si(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
@@ -888,7 +888,7 @@ int igraph_i_eigen_matrix_lapack_cmp_si(void *extra, const void *a,
         }                                   \
     } while (0)
 
-int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
+static int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
         const igraph_vector_t *imag,
         const igraph_matrix_t *compressed,
         const igraph_eigen_which_t *which,
@@ -1006,7 +1006,7 @@ int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
     return 0;
 }
 
-int igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t *A,
                                         const igraph_eigen_which_t *which,
                                         igraph_vector_complex_t *values,
                                         igraph_matrix_complex_t *vectors) {
@@ -1042,21 +1042,21 @@ int igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t *A,
 
 }
 
-int igraph_i_eigen_matrix_lapack_lm(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_lm(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-int igraph_i_eigen_matrix_lapack_sm(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_sm(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-int igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
@@ -1064,42 +1064,42 @@ int igraph_i_eigen_matrix_lapack_lr(const igraph_matrix_t *A,
 }
 
 
-int igraph_i_eigen_matrix_lapack_sr(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_sr(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-int igraph_i_eigen_matrix_lapack_li(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_li(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-int igraph_i_eigen_matrix_lapack_si(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_si(const igraph_matrix_t *A,
                                     const igraph_eigen_which_t *which,
                                     igraph_vector_complex_t *values,
                                     igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-int igraph_i_eigen_matrix_lapack_select(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_select(const igraph_matrix_t *A,
                                         const igraph_eigen_which_t *which,
                                         igraph_vector_complex_t *values,
                                         igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-int igraph_i_eigen_matrix_lapack_all(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack_all(const igraph_matrix_t *A,
                                      const igraph_eigen_which_t *which,
                                      igraph_vector_complex_t *values,
                                      igraph_matrix_complex_t *vectors) {
     return igraph_i_eigen_matrix_lapack_common(A, which, values, vectors);
 }
 
-int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
+static int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
                                  const igraph_sparsemat_t *sA,
                                  igraph_arpack_function_t *fun,
                                  int n, void *extra,
@@ -1172,7 +1172,7 @@ int igraph_i_eigen_matrix_lapack(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_checks(const igraph_matrix_t *A,
+static int igraph_i_eigen_checks(const igraph_matrix_t *A,
                           const igraph_sparsemat_t *sA,
                           igraph_arpack_function_t *fun, int n) {
 
@@ -1322,7 +1322,7 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
     return 0;
 }
 
-int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
+static int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
         const igraph_real_t *from,
         int n, void *extra) {
     igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
@@ -1342,7 +1342,7 @@ int igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
     return 0;
 }
 
-int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
+static int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
                                     const igraph_eigen_which_t *which,
                                     igraph_arpack_options_t *options,
                                     igraph_arpack_storage_t* storage,

@@ -254,13 +254,10 @@ int igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
     return 0;
 }
 
-int igraph_i_neisets_intersect(const igraph_vector_t *v1,
-                               const igraph_vector_t *v2, long int *len_union,
-                               long int *len_intersection);
 
-int igraph_i_neisets_intersect(const igraph_vector_t *v1,
-                               const igraph_vector_t *v2, long int *len_union,
-                               long int *len_intersection) {
+static int igraph_i_neisets_intersect(const igraph_vector_t *v1,
+                                      const igraph_vector_t *v2, long int *len_union,
+                                      long int *len_intersection) {
     /* ASSERT: v1 and v2 are sorted */
     long int i, j, i0, jj0;
     i0 = igraph_vector_size(v1); jj0 = igraph_vector_size(v2);
@@ -460,7 +457,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
         if (seen == 0) {
             IGRAPH_ERROR("cannot calculate Jaccard similarity", IGRAPH_ENOMEM);
         }
-        IGRAPH_FINALLY(free, seen);
+        IGRAPH_FINALLY(igraph_free, seen);
 
         for (i = 0; i < k; i++) {
             j = (long int) VECTOR(*pairs)[i];
@@ -474,7 +471,7 @@ int igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
             }
         }
 
-        free(seen);
+        igraph_Free(seen);
         IGRAPH_FINALLY_CLEAN(1);
     }
 

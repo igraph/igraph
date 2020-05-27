@@ -25,7 +25,7 @@
 #include <igraph.h>
 
 
-void gsumary(const igraph_t * g) {
+void gsummary(const igraph_t * g) {
     printf("|V|=%d |E|=%d directed=%d\n", (int)igraph_vcount(g), (int)igraph_ecount(g), (int)igraph_is_directed(g));
 }
 
@@ -49,31 +49,36 @@ void show_results_lite(igraph_vector_t * membership, igraph_real_t codelength) {
     printf("\n");
 }
 
-void infomap_weighted_test(const igraph_t * g, const igraph_vector_t *weights) {
+igraph_real_t infomap_weighted_test(const igraph_t * g, const igraph_vector_t *weights, igraph_bool_t smoke_test) {
     igraph_vector_t membership;
     igraph_real_t codelength = 1000;
     igraph_vector_init(&membership, 0);
 
     igraph_community_infomap(/*in */ g, /*e_weight=*/ weights, NULL, /*nb_trials=*/5,
                                      /*out*/ &membership, &codelength);
-    if (igraph_vcount(g) > 500) {
-        show_results_lite(&membership, codelength);
-    } else {
-        show_results(&membership, codelength);
+    if (!smoke_test) {
+        if (igraph_vcount(g) > 500) {
+            show_results_lite(&membership, codelength);
+        } else {
+            show_results(&membership, codelength);
+        }
     }
 
     igraph_vector_destroy(&membership);
+
+    return codelength;
 }
 
 
-void infomap_test(const igraph_t * g) {
-    infomap_weighted_test(g, 0);
+igraph_real_t infomap_test(const igraph_t * g, igraph_bool_t smoke_test) {
+    return infomap_weighted_test(g, 0, smoke_test);
 }
 
 
 int main() {
     igraph_t g;
     igraph_vector_t weights;
+    igraph_real_t codelength;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -84,7 +89,7 @@ int main() {
                  3, 4, 4, 5, 5, 3,
                  0, 5,
                  -1);
-    infomap_test(&g);
+    infomap_test(&g, /* smoke_test = */ 0);
     igraph_destroy(&g);
     //return 0;
 
@@ -95,12 +100,12 @@ int main() {
                  7, 4,  7, 5,  7, 6,  4, 5,  4, 6,  5, 6, // 4-clique 4,5,6,7
                  0, 4,  1, 5, //8, 0, 8, 4,
                  -1);
-    infomap_test(&g);
+    infomap_test(&g, /* smoke_test = */ 0);
 
     printf("# Two 4-cliques (0123 and 4567) connected by two edges (0-4 and 1-5)\n");
     igraph_add_edge(&g, 0, 4);
     igraph_add_edge(&g, 1, 5);
-    infomap_test(&g);
+    infomap_test(&g, /* smoke_test = */ 0);
     igraph_destroy(&g);
 
     /* Zachary Karate club -- this is just a quick smoke test */
@@ -123,7 +128,7 @@ int main() {
                  28, 33, 29, 32, 29, 33, 30, 32, 30, 33,
                  31, 32, 31, 33, 32, 33,
                  -1);
-    infomap_test(&g);
+    infomap_test(&g, /* smoke_test = */ 0);
     igraph_destroy(&g);
 
     /* Flow.net that come in infomap_dir.tgz  */
@@ -134,7 +139,7 @@ int main() {
                  8, 9,     9, 10,  10, 11,  11, 8,    9, 12,
                  12, 13,  13, 14,  14, 15,  15, 12,  13, 0,
                  -1);
-    infomap_test(&g);
+    infomap_test(&g, /* smoke_test = */ 0);
     igraph_destroy(&g);
 
     /* MultiphysChemBioEco40W_weighted_dir.net */
@@ -237,17 +242,26 @@ int main() {
                             9.0,  2.0,  2.0,  5.0,  4.0,  2.0,  7.0,  3.0,
                             3.0,  5.0,  8.0,  14.0,  3.0,  38.0,  3.0,  9.0,
                             2.0,  8.0,  21.0,  18.0,  58.0);
-    infomap_weighted_test(&g, &weights);
+    infomap_weighted_test(&g, &weights, /* smoke_test = */ 0);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
-    /* Two triangles connected by one edge */
+    /* Wiktionary English verbs -- this one is a bit flaky, igraph reports
+     * 1444 or 1445 modules, depending on the platform, so let's just run it as
+     * a quick smoke test but don't check the results too thoroughly as some
+     * changes are expected. We only check the codelength of the partition,
+     * this is more reliable. */
     printf("# Wiktionary english verbs (synonymy 2008)\n");
     FILE *wikt = fopen("wikti_en_V_syn.elist", "r");
     igraph_read_graph_edgelist(&g, wikt, 0, 0);
     fclose(wikt);
-    gsumary(&g);
-    infomap_test(&g);
+    gsummary(&g);
+    codelength = infomap_test(&g, /* smoke_test = */ 1);
+    if (fabs(codelength - 5.708) >= 1e-3) {
+        printf("Codelength was %0.5f, expected %0.5f\n", codelength, 5.708);
+    } else {
+        printf("Codelength OK.\n");
+    }
     igraph_destroy(&g);
 
     return 0;

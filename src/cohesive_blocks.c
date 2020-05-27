@@ -27,13 +27,12 @@
 #include "igraph_flow.h"
 #include "igraph_separators.h"
 #include "igraph_structural.h"
-#include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_constructors.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_statusbar.h"
 
-void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {
+static void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {
     long int i, n = igraph_vector_ptr_size(ptr);
 
     for (i = 0; i < n; i++) {
@@ -45,7 +44,7 @@ void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {
     }
 }
 
-void igraph_i_cohesive_blocks_free2(igraph_vector_ptr_t *ptr) {
+static void igraph_i_cohesive_blocks_free2(igraph_vector_ptr_t *ptr) {
     long int i, n = igraph_vector_ptr_size(ptr);
 
     for (i = 0; i < n; i++) {
@@ -57,7 +56,7 @@ void igraph_i_cohesive_blocks_free2(igraph_vector_ptr_t *ptr) {
     }
 }
 
-void igraph_i_cohesive_blocks_free3(igraph_vector_ptr_t *ptr) {
+static void igraph_i_cohesive_blocks_free3(igraph_vector_ptr_t *ptr) {
     long int i, n = igraph_vector_ptr_size(ptr);
 
     for (i = 0; i < n; i++) {
@@ -75,14 +74,14 @@ void igraph_i_cohesive_blocks_free3(igraph_vector_ptr_t *ptr) {
  * all neighboring components.
  */
 
-int igraph_i_cb_components(igraph_t *graph,
-                           const igraph_vector_bool_t *excluded,
-                           igraph_vector_long_t *components,
-                           long int *no,
-                           /* working area follows */
-                           igraph_vector_long_t *compid,
-                           igraph_dqueue_t *Q,
-                           igraph_vector_t *neis) {
+static int igraph_i_cb_components(igraph_t *graph,
+                                  const igraph_vector_bool_t *excluded,
+                                  igraph_vector_long_t *components,
+                                  long int *no,
+                                  /* working area follows */
+                                  igraph_vector_long_t *compid,
+                                  igraph_dqueue_t *Q,
+                                  igraph_vector_t *neis) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int i;
@@ -137,8 +136,8 @@ int igraph_i_cb_components(igraph_t *graph,
     return 0;
 }
 
-igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
-                               const igraph_vector_t *haystack) {
+static igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
+                                      const igraph_vector_t *haystack) {
     long int nlen = igraph_vector_size(needle);
     long int hlen = igraph_vector_size(haystack);
     long int np = 0, hp = 0;

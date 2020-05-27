@@ -23,7 +23,6 @@
 
 #include "igraph_iterators.h"
 #include "igraph_memory.h"
-#include "igraph_random.h"
 #include "igraph_interface.h"
 #include "config.h"
 
@@ -1430,12 +1429,12 @@ int igraph_es_type(const igraph_es_t *es) {
     return es->type;
 }
 
-int igraph_i_es_pairs_size(const igraph_t *graph,
-                           const igraph_es_t *es, igraph_integer_t *result);
-int igraph_i_es_path_size(const igraph_t *graph,
-                          const igraph_es_t *es, igraph_integer_t *result);
-int igraph_i_es_multipairs_size(const igraph_t *graph,
-                                const igraph_es_t *es, igraph_integer_t *result);
+static int igraph_i_es_pairs_size(const igraph_t *graph,
+                                  const igraph_es_t *es, igraph_integer_t *result);
+static int igraph_i_es_path_size(const igraph_t *graph,
+                                 const igraph_es_t *es, igraph_integer_t *result);
+static int igraph_i_es_multipairs_size(const igraph_t *graph,
+                                       const igraph_es_t *es, igraph_integer_t *result);
 
 /**
  * \function igraph_es_size
@@ -1514,8 +1513,8 @@ int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
     return 0;
 }
 
-int igraph_i_es_pairs_size(const igraph_t *graph,
-                           const igraph_es_t *es, igraph_integer_t *result) {
+static int igraph_i_es_pairs_size(const igraph_t *graph,
+                                  const igraph_es_t *es, igraph_integer_t *result) {
     long int n = igraph_vector_size(es->data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
     long int i;
@@ -1542,8 +1541,8 @@ int igraph_i_es_pairs_size(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_es_path_size(const igraph_t *graph,
-                          const igraph_es_t *es, igraph_integer_t *result) {
+static int igraph_i_es_path_size(const igraph_t *graph,
+                                 const igraph_es_t *es, igraph_integer_t *result) {
     long int n = igraph_vector_size(es->data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
     long int i;
@@ -1569,27 +1568,27 @@ int igraph_i_es_path_size(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_es_multipairs_size(const igraph_t *graph,
-                                const igraph_es_t *es, igraph_integer_t *result) {
+static int igraph_i_es_multipairs_size(const igraph_t *graph,
+                                       const igraph_es_t *es, igraph_integer_t *result) {
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(es); IGRAPH_UNUSED(result);
     IGRAPH_ERROR("Cannot calculate edge selector length", IGRAPH_UNIMPLEMENTED);
 }
 
 /**************************************************/
 
-int igraph_i_eit_create_allfromto(const igraph_t *graph,
-                                  igraph_eit_t *eit,
-                                  igraph_neimode_t mode);
-int igraph_i_eit_pairs(const igraph_t *graph,
-                       igraph_es_t es, igraph_eit_t *eit);
-int igraph_i_eit_multipairs(const igraph_t *graph,
-                            igraph_es_t es, igraph_eit_t *eit);
-int igraph_i_eit_path(const igraph_t *graph,
-                      igraph_es_t es, igraph_eit_t *eit);
+static int igraph_i_eit_create_allfromto(const igraph_t *graph,
+                                         igraph_eit_t *eit,
+                                         igraph_neimode_t mode);
+static int igraph_i_eit_pairs(const igraph_t *graph,
+                              igraph_es_t es, igraph_eit_t *eit);
+static int igraph_i_eit_multipairs(const igraph_t *graph,
+                                   igraph_es_t es, igraph_eit_t *eit);
+static int igraph_i_eit_path(const igraph_t *graph,
+                             igraph_es_t es, igraph_eit_t *eit);
 
-int igraph_i_eit_create_allfromto(const igraph_t *graph,
-                                  igraph_eit_t *eit,
-                                  igraph_neimode_t mode) {
+static int igraph_i_eit_create_allfromto(const igraph_t *graph,
+                                         igraph_eit_t *eit,
+                                         igraph_neimode_t mode) {
     igraph_vector_t *vec;
     long int no_of_nodes = igraph_vcount(graph);
     long int i;
@@ -1647,8 +1646,8 @@ int igraph_i_eit_create_allfromto(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_eit_pairs(const igraph_t *graph,
-                       igraph_es_t es, igraph_eit_t *eit) {
+static int igraph_i_eit_pairs(const igraph_t *graph,
+                              igraph_es_t es, igraph_eit_t *eit) {
     long int n = igraph_vector_size(es.data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
     long int i;
@@ -1686,8 +1685,8 @@ int igraph_i_eit_pairs(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_eit_multipairs(const igraph_t *graph,
-                            igraph_es_t es, igraph_eit_t *eit) {
+static int igraph_i_eit_multipairs(const igraph_t *graph,
+                                   igraph_es_t es, igraph_eit_t *eit) {
     long int n = igraph_vector_size(es.data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
 
@@ -1718,8 +1717,8 @@ int igraph_i_eit_multipairs(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_eit_path(const igraph_t *graph,
-                      igraph_es_t es, igraph_eit_t *eit) {
+static int igraph_i_eit_path(const igraph_t *graph,
+                             igraph_es_t es, igraph_eit_t *eit) {
     long int n = igraph_vector_size(es.data.path.ptr);
     long int no_of_nodes = igraph_vcount(graph);
     long int i, len;

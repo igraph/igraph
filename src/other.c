@@ -23,15 +23,11 @@
 
 #include "igraph_nongraph.h"
 #include "igraph_types.h"
-#include "igraph_memory.h"
 #include "igraph_interrupt_internal.h"
-#include "igraph_types_internal.h"
 #include "config.h"
 #include "plfit/error.h"
 #include "plfit/plfit.h"
 #include <math.h>
-#include <stdarg.h>
-#include <string.h>
 
 /**
  * \ingroup nongraph
@@ -359,6 +355,8 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
     if (discrete) {
         plfit_discrete_options_init(&disc_options);
+        /* approximation method should be switched to PLFIT_P_VALUE_EXACT in igraph 0.9 */
+        disc_options.p_value_method = PLFIT_P_VALUE_APPROXIMATE;
         disc_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
 
         if (xmin >= 0) {
@@ -369,6 +367,10 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
         }
     } else {
         plfit_continuous_options_init(&cont_options);
+        /* approximation method should be switched to PLFIT_P_VALUE_EXACT in igraph 0.9 */
+        cont_options.p_value_method = PLFIT_P_VALUE_APPROXIMATE;
+        /* xmin method should be switched to PLFIT_STRATIFIED_SAMPLING in igraph 0.9 */
+        cont_options.xmin_method = PLFIT_GSS_OR_LINEAR;
         cont_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
 
         if (xmin >= 0) {

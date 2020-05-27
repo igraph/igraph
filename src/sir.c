@@ -28,15 +28,16 @@
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
+#include "igraph_interrupt_internal.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {
-    igraph_vector_init(&sir->times, 1);
+    IGRAPH_CHECK(igraph_vector_init(&sir->times, 1));
     IGRAPH_FINALLY(igraph_vector_destroy, &sir->times);
-    igraph_vector_int_init(&sir->no_s, 1);
+    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_s, 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_s);
-    igraph_vector_int_init(&sir->no_i, 1);
+    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_i, 1));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_i);
-    igraph_vector_int_init(&sir->no_r, 1);
+    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_r, 1));
     IGRAPH_FINALLY_CLEAN(3);
     return 0;
 }
@@ -55,12 +56,12 @@ void igraph_sir_destroy(igraph_sir_t *sir) {
     igraph_vector_int_destroy(&sir->no_r);
 }
 
-void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
+static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
     int i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
-        igraph_sir_t *s = VECTOR(*v)[i];
-        if (s) {
-            igraph_sir_destroy(s);
+        if ( VECTOR(*v)[i] ) {
+            igraph_sir_destroy( VECTOR(*v)[i]) ;
+            igraph_Free( VECTOR(*v)[i] ); /* this also sets the vector_ptr element to NULL */
         }
     }
 }
@@ -127,16 +128,17 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
         IGRAPH_WARNING("Edge directions are ignored in SIR model");
     }
     if (beta < 0) {
-        IGRAPH_ERROR("Beta must be non-negative in SIR model", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The infection rate beta must be non-negative in SIR model", IGRAPH_EINVAL);
     }
-    if (gamma < 0) {
-        IGRAPH_ERROR("Gamma must be non-negative in SIR model", IGRAPH_EINVAL);
+    /* With a recovery rate of zero, the simulation would never stop. */
+    if (gamma <= 0) {
+        IGRAPH_ERROR("The recovery rate gamma must be positive in SIR model", IGRAPH_EINVAL);
     }
     if (no_sim <= 0) {
         IGRAPH_ERROR("Number of SIR simulations must be positive", IGRAPH_EINVAL);
     }
 
-    igraph_is_simple(graph, &simple);
+    IGRAPH_CHECK(igraph_is_simple(graph, &simple));
     if (!simple) {
         IGRAPH_ERROR("SIR model only works with simple graphs", IGRAPH_EINVAL);
     }
@@ -156,7 +158,7 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
         if (!sir) {
             IGRAPH_ERROR("Cannot run SIR model", IGRAPH_ENOMEM);
         }
-        igraph_sir_init(sir);
+        IGRAPH_CHECK(igraph_sir_init(sir));
         VECTOR(*result)[i] = sir;
     }
 
@@ -202,6 +204,8 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
             igraph_real_t r;
             long int vchange;
 
+            IGRAPH_ALLOW_INTERRUPTION();
+
             psum = igraph_psumtree_sum(&tree);
             tt = igraph_rng_get_exp(igraph_rng_default(), psum);
             r = RNG_UNIF(0, psum);
@@ -235,18 +239,10 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
                 }
             }
 
-            if (times_v) {
-                igraph_vector_push_back(times_v, tt + igraph_vector_tail(times_v));
-            }
-            if (no_s_v)  {
-                igraph_vector_int_push_back(no_s_v, ns);
-            }
-            if (no_i_v)  {
-                igraph_vector_int_push_back(no_i_v, ni);
-            }
-            if (no_r_v)  {
-                igraph_vector_int_push_back(no_r_v, nr);
-            }
+            IGRAPH_CHECK(igraph_vector_push_back(times_v, tt + igraph_vector_tail(times_v)));
+            IGRAPH_CHECK(igraph_vector_int_push_back(no_s_v, ns));
+            IGRAPH_CHECK(igraph_vector_int_push_back(no_i_v, ni));
+            IGRAPH_CHECK(igraph_vector_int_push_back(no_r_v, nr));
 
         } /* psum > 0 */
 

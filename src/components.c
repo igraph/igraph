@@ -32,7 +32,6 @@
 #include "igraph_stack.h"
 #include "igraph_vector.h"
 #include "config.h"
-#include <string.h>
 #include <limits.h>
 
 static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
@@ -410,7 +409,7 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res) {
     if (already_added == 0) {
         IGRAPH_ERROR("is connected (weak) failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, already_added);
 
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 10);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -616,7 +615,7 @@ static int igraph_i_decompose_weak(const igraph_t *graph,
     igraph_vector_destroy(&neis);
     igraph_vector_destroy(&verts);
     igraph_dqueue_destroy(&q);
-    igraph_free(already_added);
+    igraph_Free(already_added);
     IGRAPH_FINALLY_CLEAN(5);  /* + components */
 
     return 0;
@@ -636,7 +635,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
     long int i, n, num_seen;
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
 
-    long int no_of_clusters = 1;
+    long int no_of_clusters = 0;
     long int act_cluster_size;
 
     igraph_vector_t out = IGRAPH_VECTOR_NULL;
@@ -645,6 +644,10 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
     igraph_adjlist_t adjlist;
     igraph_vector_t verts;
     igraph_t *newg;
+
+    if (maxcompno < 0) {
+        maxcompno = LONG_MAX;
+    }
 
     igraph_vector_ptr_clear(components);
     IGRAPH_FINALLY(igraph_decompose_destroy, components);
@@ -736,7 +739,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
 
     /* number of components built */
     num_seen = 0;
-    while (!igraph_vector_empty(&out)) {
+    while (!igraph_vector_empty(&out) && no_of_clusters < maxcompno) {
         /* consume the vector from the last element */
         long int grandfather = (long int) igraph_vector_pop_back(&out);
 
@@ -877,7 +880,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  * components.
  *
  * </para><para>
- * Somewhat arbitrarily, igraph does not consider comppnents containing
+ * Somewhat arbitrarily, igraph does not consider components containing
  * a single vertex only as being biconnected. Isolated vertices will
  * not be part of any of the biconnected components.
  *
@@ -889,7 +892,7 @@ void igraph_i_free_vectorlist(igraph_vector_ptr_t *list) {
  *     a spanning tree of the biconnected component is returned.
  *     Note you'll have to
  *     destroy each vector first by calling \ref igraph_vector_destroy()
- *     and then <code>free()</code> on it, plus you need to call
+ *     and then \ref igraph_free() on it, plus you need to call
  *     \ref igraph_vector_ptr_destroy() on the list to regain all
  *     allocated memory.
  * \param component_edges If not a NULL pointer, then the edges of the
@@ -1146,9 +1149,15 @@ int igraph_biconnected_components(const igraph_t *graph,
 
 
 /* igraph_bridges -- find all bridges in the graph */
-/* based on https://www.geeksforgeeks.org/bridge-in-a-graph/ */
+/* The algorithm is based on https://www.geeksforgeeks.org/bridge-in-a-graph/
+   but instead of keeping track of the parent of each vertex in the DFS tree
+   we keep track of its incoming edge. This is necessary to support multigraphs. */
 
-static int igraph_i_bridges_rec(const igraph_t *graph, const igraph_inclist_t *il, igraph_integer_t u, igraph_integer_t *time, igraph_vector_t *bridges, igraph_vector_bool_t *visited, igraph_vector_int_t *disc, igraph_vector_int_t *low, igraph_vector_int_t *parent) {
+static int igraph_i_bridges_rec(
+        const igraph_t *graph, const igraph_inclist_t *il, igraph_integer_t u,
+        igraph_integer_t *time, igraph_vector_t *bridges, igraph_vector_bool_t *visited,
+        igraph_vector_int_t *disc, igraph_vector_int_t *low, igraph_vector_int_t *incoming_edge)
+{
     igraph_vector_int_t *incedges;
     long nc; /* neighbour count */
     long i;
@@ -1167,15 +1176,15 @@ static int igraph_i_bridges_rec(const igraph_t *graph, const igraph_inclist_t *i
         igraph_integer_t v = IGRAPH_TO(graph, edge) == u ? IGRAPH_FROM(graph, edge) : IGRAPH_TO(graph, edge);
 
         if (! VECTOR(*visited)[v]) {
-            VECTOR(*parent)[v] = u;
-            IGRAPH_CHECK(igraph_i_bridges_rec(graph, il, v, time, bridges, visited, disc, low, parent));
+            VECTOR(*incoming_edge)[v] = edge;
+            IGRAPH_CHECK(igraph_i_bridges_rec(graph, il, v, time, bridges, visited, disc, low, incoming_edge));
 
             VECTOR(*low)[u] = VECTOR(*low)[u] < VECTOR(*low)[v] ? VECTOR(*low)[u] : VECTOR(*low)[v];
 
             if (VECTOR(*low)[v] > VECTOR(*disc)[u]) {
                 IGRAPH_CHECK(igraph_vector_push_back(bridges, edge));
             }
-        } else if (v != VECTOR(*parent)[u]) {
+        } else if (edge != VECTOR(*incoming_edge)[u]) {
             VECTOR(*low)[u] = VECTOR(*low)[u] < VECTOR(*disc)[v] ? VECTOR(*low)[u] : VECTOR(*disc)[v];
         }
     }
@@ -1204,7 +1213,7 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
     igraph_inclist_t il;
     igraph_vector_bool_t visited;
     igraph_vector_int_t disc, low;
-    igraph_vector_int_t parent;
+    igraph_vector_int_t incoming_edge;
     long n;
     long i;
     igraph_integer_t time;
@@ -1223,10 +1232,10 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
     IGRAPH_CHECK(igraph_vector_int_init(&low, n));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &low);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&parent, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &parent);
+    IGRAPH_CHECK(igraph_vector_int_init(&incoming_edge, n));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &incoming_edge);
     for (i = 0; i < n; ++i) {
-        VECTOR(parent)[i] = -1;
+        VECTOR(incoming_edge)[i] = -1;
     }
 
     igraph_vector_clear(bridges);
@@ -1234,10 +1243,10 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
     time = 0;
     for (i = 0; i < n; ++i)
         if (! VECTOR(visited)[i]) {
-            IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &parent));
+            IGRAPH_CHECK(igraph_i_bridges_rec(graph, &il, i, &time, bridges, &visited, &disc, &low, &incoming_edge));
         }
 
-    igraph_vector_int_destroy(&parent);
+    igraph_vector_int_destroy(&incoming_edge);
     igraph_vector_int_destroy(&low);
     igraph_vector_int_destroy(&disc);
     igraph_vector_bool_destroy(&visited);

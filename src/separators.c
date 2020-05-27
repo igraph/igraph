@@ -28,21 +28,18 @@
 #include "igraph_vector.h"
 #include "igraph_interface.h"
 #include "igraph_flow.h"
-#include "igraph_flow_internal.h"
 #include "igraph_components.h"
 #include "igraph_structural.h"
-#include "igraph_constructors.h"
-#include "igraph_stack.h"
 #include "igraph_interrupt_internal.h"
 
-int igraph_i_is_separator(const igraph_t *graph,
-                          igraph_vit_t *vit,
-                          long int except,
-                          igraph_bool_t *res,
-                          igraph_vector_bool_t *removed,
-                          igraph_dqueue_t *Q,
-                          igraph_vector_t *neis,
-                          long int no_of_nodes) {
+static int igraph_i_is_separator(const igraph_t *graph,
+                                 igraph_vit_t *vit,
+                                 long int except,
+                                 igraph_bool_t *res,
+                                 igraph_vector_bool_t *removed,
+                                 igraph_dqueue_t *Q,
+                                 igraph_vector_t *neis,
+                                 long int no_of_nodes) {
 
     long int start = 0;
 
@@ -266,11 +263,11 @@ int igraph_is_minimal_separator(const igraph_t *graph,
         }                                                  \
     } while (0)
 
-int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
-                               igraph_vector_t *components,
-                               igraph_vector_t *leaveout,
-                               unsigned long int *mark,
-                               igraph_dqueue_t *Q) {
+static int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
+                                      igraph_vector_t *components,
+                                      igraph_vector_t *leaveout,
+                                      unsigned long int *mark,
+                                      igraph_dqueue_t *Q) {
 
     /* Another trick: we use the same 'leaveout' vector to mark the
      * vertices that were already found in the BFS
@@ -314,8 +311,8 @@ int igraph_i_clusters_leaveout(const igraph_adjlist_t *adjlist,
     return 0;
 }
 
-igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps,
-        const igraph_vector_t *newc) {
+static igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps,
+                                                const igraph_vector_t *newc) {
 
     long int co, nocomps = igraph_vector_ptr_size(comps);
 
@@ -330,12 +327,12 @@ igraph_bool_t igraph_i_separators_newsep(const igraph_vector_ptr_t *comps,
     return 1;
 }
 
-int igraph_i_separators_store(igraph_vector_ptr_t *separators,
-                              const igraph_adjlist_t *adjlist,
-                              igraph_vector_t *components,
-                              igraph_vector_t *leaveout,
-                              unsigned long int *mark,
-                              igraph_vector_t *sorter) {
+static int igraph_i_separators_store(igraph_vector_ptr_t *separators,
+                                     const igraph_adjlist_t *adjlist,
+                                     igraph_vector_t *components,
+                                     igraph_vector_t *leaveout,
+                                     unsigned long int *mark,
+                                     igraph_vector_t *sorter) {
 
     /* We need to stote N(C), the neighborhood of C, but only if it is
      * not already stored among the separators.
@@ -387,7 +384,7 @@ int igraph_i_separators_store(igraph_vector_ptr_t *separators,
     return 0;
 }
 
-void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
+static void igraph_i_separators_free(igraph_vector_ptr_t *separators) {
     long int i, n = igraph_vector_ptr_size(separators);
     for (i = 0; i < n; i++) {
         igraph_vector_t *vec = VECTOR(*separators)[i];
@@ -557,8 +554,8 @@ int igraph_all_minimal_st_separators(const igraph_t *graph,
 
 #undef UPDATEMARK
 
-int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
-        igraph_vector_ptr_t *new) {
+static int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
+                                                   igraph_vector_ptr_t *new) {
 
     long int olen = igraph_vector_ptr_size(old);
     long int nlen = igraph_vector_ptr_size(new);
@@ -587,9 +584,9 @@ int igraph_i_minimum_size_separators_append(igraph_vector_ptr_t *old,
     return 0;
 }
 
-int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
-        igraph_vector_t *res,
-        long int k) {
+static int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
+                                                    igraph_vector_t *res,
+                                                    long int k) {
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t deg, order;
     long int i;
@@ -612,7 +609,7 @@ int igraph_i_minimum_size_separators_topkdeg(const igraph_t *graph,
     return 0;
 }
 
-void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
+static void igraph_i_separators_stcuts_free(igraph_vector_ptr_t *p) {
     long int i, n = igraph_vector_ptr_size(p);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*p)[i];

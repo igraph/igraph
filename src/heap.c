@@ -24,10 +24,9 @@
 #include "igraph_types.h"
 #include "igraph_types_internal.h"
 #include "igraph_memory.h"
-#include "igraph_random.h"
 #include "igraph_error.h"
-#include "config.h"
 #include "igraph_math.h"
+#include "config.h"
 
 #include <assert.h>
 #include <string.h>         /* memcpy & co. */
@@ -289,12 +288,12 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
     if (tmp1 == 0) {
         IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp1);   /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, tmp1);
     tmp2 = igraph_Calloc(size, long int);
     if (tmp2 == 0) {
         IGRAPH_ERROR("indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp2);
+    IGRAPH_FINALLY(igraph_free, tmp2);
     memcpy(tmp1, h->stor_begin, (size_t) actual_size * sizeof(igraph_real_t));
     memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(long int));
     igraph_Free(h->stor_begin);
@@ -575,17 +574,17 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
     if (tmp1 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp1);   /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, tmp1);
     tmp2 = igraph_Calloc(size, long int);
     if (tmp2 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp2);   /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, tmp2);
     tmp3 = igraph_Calloc(size, long int);
     if (tmp3 == 0) {
         IGRAPH_ERROR("d_indheap reserve failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, tmp3);   /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, tmp3);
 
     memcpy(tmp1, h->stor_begin, (size_t) actual_size * sizeof(igraph_real_t));
     memcpy(tmp2, h->index_begin, (size_t) actual_size * sizeof(long int));

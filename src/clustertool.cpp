@@ -45,11 +45,6 @@
     #include <config.h>
 #endif
 
-#include <iostream>
-#include <cstdlib>
-#include <cstdio>
-#include <ctime>
-
 #include "NetDataTypes.h"
 #include "NetRoutines.h"
 #include "pottsmodel_2.h"
@@ -62,21 +57,23 @@
 #include "igraph_components.h"
 #include "igraph_interrupt_internal.h"
 
-int igraph_i_community_spinglass_orig(const igraph_t *graph,
-                                      const igraph_vector_t *weights,
-                                      igraph_real_t *modularity,
-                                      igraph_real_t *temperature,
-                                      igraph_vector_t *membership,
-                                      igraph_vector_t *csize,
-                                      igraph_integer_t spins,
-                                      igraph_bool_t parupdate,
-                                      igraph_real_t starttemp,
-                                      igraph_real_t stoptemp,
-                                      igraph_real_t coolfact,
-                                      igraph_spincomm_update_t update_rule,
-                                      igraph_real_t gamma);
+static int igraph_i_community_spinglass_orig(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_real_t *modularity,
+        igraph_real_t *temperature,
+        igraph_vector_t *membership,
+        igraph_vector_t *csize,
+        igraph_integer_t spins,
+        igraph_bool_t parupdate,
+        igraph_real_t starttemp,
+        igraph_real_t stoptemp,
+        igraph_real_t coolfact,
+        igraph_spincomm_update_t update_rule,
+        igraph_real_t gamma);
 
-int igraph_i_community_spinglass_negative(const igraph_t *graph,
+static int igraph_i_community_spinglass_negative(
+        const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
         igraph_real_t *temperature,
@@ -89,9 +86,9 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
         igraph_real_t coolfact,
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma,
-        /*                    igraph_matrix_t *adhesion, */
-        /*                    igraph_matrix_t *normalised_adhesion, */
-        /*                    igraph_real_t *polarization, */
+        /* igraph_matrix_t *adhesion, */
+        /* igraph_matrix_t *normalised_adhesion, */
+        /* igraph_real_t *polarization, */
         igraph_real_t gamma_minus);
 
 /**
@@ -231,19 +228,20 @@ int igraph_community_spinglass(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_community_spinglass_orig(const igraph_t *graph,
-                                      const igraph_vector_t *weights,
-                                      igraph_real_t *modularity,
-                                      igraph_real_t *temperature,
-                                      igraph_vector_t *membership,
-                                      igraph_vector_t *csize,
-                                      igraph_integer_t spins,
-                                      igraph_bool_t parupdate,
-                                      igraph_real_t starttemp,
-                                      igraph_real_t stoptemp,
-                                      igraph_real_t coolfact,
-                                      igraph_spincomm_update_t update_rule,
-                                      igraph_real_t gamma) {
+static int igraph_i_community_spinglass_orig(
+        const igraph_t *graph,
+        const igraph_vector_t *weights,
+        igraph_real_t *modularity,
+        igraph_real_t *temperature,
+        igraph_vector_t *membership,
+        igraph_vector_t *csize,
+        igraph_integer_t spins,
+        igraph_bool_t parupdate,
+        igraph_real_t starttemp,
+        igraph_real_t stoptemp,
+        igraph_real_t coolfact,
+        igraph_spincomm_update_t update_rule,
+        igraph_real_t gamma) {
 
     unsigned long changes, runs;
     igraph_bool_t use_weights = 0;
@@ -535,7 +533,8 @@ int igraph_community_spinglass_single(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_community_spinglass_negative(const igraph_t *graph,
+static int igraph_i_community_spinglass_negative(
+        const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
         igraph_real_t *temperature,
@@ -548,9 +547,9 @@ int igraph_i_community_spinglass_negative(const igraph_t *graph,
         igraph_real_t coolfact,
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma,
-        /*                    igraph_matrix_t *adhesion, */
-        /*                    igraph_matrix_t *normalised_adhesion, */
-        /*                    igraph_real_t *polarization, */
+        /* igraph_matrix_t *adhesion, */
+        /* igraph_matrix_t *normalised_adhesion, */
+        /* igraph_real_t *polarization, */
         igraph_real_t gamma_minus) {
 
     unsigned long changes, runs;

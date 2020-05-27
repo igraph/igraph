@@ -75,7 +75,7 @@ int igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 }
 
 /* From triangles.c */
-
+/* TODO add to private header */
 int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
                                 const igraph_vector_int_t *rank);
 
@@ -83,8 +83,8 @@ int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
    "backwards" according to the rank vector. It works on
    edge lists */
 
-int igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
-                                const igraph_vector_int_t *rank) {
+static int igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
+                                       const igraph_vector_int_t *rank) {
 
     long int i;
     long int n = il->length;
@@ -119,10 +119,10 @@ int igraph_i_trans4_il_simplify(const igraph_t *graph, igraph_inclist_t *il,
 
 /* This one handles both weighted and unweighted cases */
 
-int igraph_i_local_scan_1_directed(const igraph_t *graph,
-                                   igraph_vector_t *res,
-                                   const igraph_vector_t *weights,
-                                   igraph_neimode_t mode) {
+static int igraph_i_local_scan_1_directed(const igraph_t *graph,
+                                          igraph_vector_t *res,
+                                          const igraph_vector_t *weights,
+                                          igraph_neimode_t mode) {
 
     int no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
@@ -180,9 +180,9 @@ int igraph_i_local_scan_1_directed(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
-                                       igraph_vector_t *res,
-                                       const igraph_vector_t *weights) {
+static int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
+                                              igraph_vector_t *res,
+                                              const igraph_vector_t *weights) {
 
     int no_of_nodes = igraph_vcount(graph);
     igraph_inclist_t incs;
@@ -250,9 +250,9 @@ int igraph_i_local_scan_1_directed_all(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
-                                     igraph_vector_t *res,
-                                     const igraph_vector_t *weights) {
+static int igraph_i_local_scan_1_sumweights(const igraph_t *graph,
+                                            igraph_vector_t *res,
+                                            const igraph_vector_t *weights) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int node, i, j, nn;
@@ -384,10 +384,10 @@ int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
     return 0;
 }
 
-int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
-                                 igraph_vector_t *res,
-                                 const igraph_vector_t *weights_them,
-                                 igraph_neimode_t mode) {
+static int igraph_i_local_scan_0_them_w(const igraph_t *us, const igraph_t *them,
+                                        igraph_vector_t *res,
+                                        const igraph_vector_t *weights_them,
+                                        igraph_neimode_t mode) {
 
     igraph_t is;
     igraph_vector_t map2;
