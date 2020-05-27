@@ -3366,21 +3366,20 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \brief Calculate a possible topological sorting of the graph.
  *
  * </para><para>
- * A topological sorting of a directed acyclic graph is a linear ordering
- * of its nodes where each node comes before all nodes to which it has
+ * A topological sorting of a directed acyclic graph (DAG) is a linear ordering
+ * of its vertices where each vertex comes before all nodes to which it has
  * edges. Every DAG has at least one topological sort, and may have many.
- * This function returns a possible topological sort among them. If the
- * graph is not acyclic (it has at least one cycle), a partial topological
- * sort is returned and a warning is issued.
+ * This function returns one possible topological sort among them. If the
+ * graph is not acyclic (it has at least one cycle), an error is raised.
  *
  * \param graph The input graph.
  * \param res Pointer to a vector, the result will be stored here.
  *   It will be resized if needed.
  * \param mode Specifies how to use the direction of the edges.
- *   For \c IGRAPH_OUT, the sorting order ensures that each node comes
- *   before all nodes to which it has edges, so nodes with no incoming
+ *   For \c IGRAPH_OUT, the sorting order ensures that each vertex comes
+ *   before all vertices to which it has edges, so vertices with no incoming
  *   edges go first. For \c IGRAPH_IN, it is quite the opposite: each
- *   node comes before all nodes from which it receives edges. Nodes
+ *   vertex comes before all vertices from which it receives edges. Vertices
  *   with no outgoing edges go first.
  * \return Error code.
  *
@@ -3389,7 +3388,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
  *
  * \sa \ref igraph_is_dag() if you are only interested in whether a given
  *     graph is a DAG or not, or \ref igraph_feedback_arc_set() to find a
- *     set of edges whose removal makes the graph a DAG.
+ *     set of edges whose removal makes the graph acyclic.
  *
  * \example examples/simple/igraph_topological_sorting.c
  */
@@ -3402,13 +3401,13 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
     long int node, i, j;
 
     if (mode == IGRAPH_ALL || !igraph_is_directed(graph)) {
-        IGRAPH_ERROR("topological sorting does not make sense for undirected graphs", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Topological sorting does not make sense for undirected graphs", IGRAPH_EINVAL);
     } else if (mode == IGRAPH_OUT) {
         deg_mode = IGRAPH_IN;
     } else if (mode == IGRAPH_IN) {
         deg_mode = IGRAPH_OUT;
     } else {
-        IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
@@ -3445,7 +3444,7 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
     }
 
     if (igraph_vector_size(res) < no_of_nodes) {
-        IGRAPH_WARNING("graph contains a cycle, partial result is returned");
+        IGRAPH_ERROR("The graph has cycles; topological sorting is only possible in acyclic graphs", IGRAPH_EINVAL);
     }
 
     igraph_vector_destroy(&degrees);
