@@ -30,7 +30,7 @@ int main() {
 
     igraph_empty(&graph, 25, IGRAPH_UNDIRECTED);
     igraph_vector_init(&mod, 0);
-    igraph_community_multilevel(&graph, /*weights=*/ 0, /*resolution_parameter=*/ 1,
+    igraph_community_multilevel(&graph, /*weights=*/ 0, /*resolution=*/ 1,
                                 /*membership=*/ 0, /*memberships=*/ 0, &mod);
 
     if (igraph_vector_size(&mod) != 1 ||

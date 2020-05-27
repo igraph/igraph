@@ -905,17 +905,17 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * Bornholdt, S. (2006). Statistical mechanics of community detection. Physical
  * Review E, 74(1), 016110. https://doi.org/10.1103/PhysRevE.74.016110
  *
- * \param graph                The input graph. It must be undirected; directed graphs are
- *                             not supported yet.
- * \param membership           Numeric vector of integer values which gives the type of each
- *                             vertex, i.e. the cluster to which it belongs.
- *                             It does not have to be consecutive, i.e. empty communities
- *                             are allowed.
- * \param weights              Weight vector or \c NULL if no weights are specified.
- * \param resolution_parameter Resolution parameter. Must be greater than or equal to 0.
- *                             Set it to 1 to use the classical definition of modularity.
- * \param modularity           Pointer to a real number, the result will be
- *                             stored here.
+ * \param graph      The input graph. It must be undirected; directed graphs are
+ *                   not supported yet.
+ * \param membership Numeric vector of integer values which gives the type of each
+ *                   vertex, i.e. the cluster to which it belongs.
+ *                   It does not have to be consecutive, i.e. empty communities
+ *                   are allowed.
+ * \param weights    Weight vector or \c NULL if no weights are specified.
+ * \param resolution Resolution parameter. Must be greater than or equal to 0.
+ *                   Set it to 1 to use the classical definition of modularity.
+ * \param modularity Pointer to a real number, the result will be
+ *                   stored here.
  * \return Error code.
  *
  * \sa \ref igraph_modularity_matrix()
@@ -927,7 +927,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
 int igraph_modularity(const igraph_t *graph,
                       const igraph_vector_t *membership,
                       const igraph_vector_t *weights,
-                      const igraph_real_t resolution_parameter,
+                      const igraph_real_t resolution,
                       igraph_real_t *modularity) {
 
     igraph_vector_t e, a;
@@ -949,7 +949,7 @@ int igraph_modularity(const igraph_t *graph,
     if (igraph_vector_min(membership) < 0) {
         IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
     }
-    if (resolution_parameter < 0.0) {
+    if (resolution < 0.0) {
       IGRAPH_ERROR("Invalid resolution parameter value", IGRAPH_EINVAL);
     }
 
@@ -994,7 +994,7 @@ int igraph_modularity(const igraph_t *graph,
         for (i = 0; i < types; i++) {
             igraph_real_t tmp = VECTOR(a)[i] / 2 / m;
             *modularity += VECTOR(e)[i] / 2 / m;
-            *modularity -= resolution_parameter * tmp * tmp;
+            *modularity -= resolution * tmp * tmp;
         }
     }
 
@@ -1021,21 +1021,21 @@ int igraph_modularity(const igraph_t *graph,
  * Note that self-loops are multiplied by 2 in this
  * implementation. If weights are specified, the weighted counterparts are used.
  *
- * \param graph                The input graph.
- * \param weights              Edge weights, pointer to a vector. If this is a null pointer
- *                             then every edge is assumed to have a weight of 1.
- * \param resolution_parameter Resolution parameter. Must be greater than or equal to 0.
- *                             Default is 1. Lower values favor fewer, larger communities;
- *                             higher values favor more, smaller communities.
- * \param modmat               Pointer to an initialized matrix in which the modularity
- *                             matrix is stored.
+ * \param graph      The input graph.
+ * \param weights    Edge weights, pointer to a vector. If this is a null pointer
+ *                   then every edge is assumed to have a weight of 1.
+ * \param resolution Resolution parameter. Must be greater than or equal to 0.
+ *                   Default is 1. Lower values favor fewer, larger communities;
+ *                   higher values favor more, smaller communities.
+ * \param modmat     Pointer to an initialized matrix in which the modularity
+ *                   matrix is stored.
  *
  * \sa \ref igraph_modularity()
  */
 
 int igraph_modularity_matrix(const igraph_t *graph,
                              const igraph_vector_t *weights,
-                             const igraph_real_t resolution_parameter,
+                             const igraph_real_t resolution,
                              igraph_matrix_t *modmat) {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -1064,7 +1064,7 @@ int igraph_modularity_matrix(const igraph_t *graph,
     }
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < no_of_nodes; j++) {
-            MATRIX(*modmat, i, j) -= resolution_parameter * VECTOR(deg)[i] * VECTOR(deg)[j] / 2.0 / sw;
+            MATRIX(*modmat, i, j) -= resolution * VECTOR(deg)[i] * VECTOR(deg)[j] / 2.0 / sw;
         }
     }
 
@@ -3236,22 +3236,22 @@ static int igraph_i_community_multilevel_step(
  *
  * This function was contributed by Tom Gregorovic.
  *
- * \param graph                The input graph. It must be an undirected graph.
- * \param weights              Numeric vector containing edge weights. If \c NULL, every edge
- *                             has equal weight. The weights are expected to be non-negative.
- * \param resolution_parameter Resolution parameter. Must be greater than or equal to 0.
- *                             Lower values favor fewer, larger communities;
- *                             higher values favor more, smaller communities.
- *                             Set it to 1 to use the classical definition of modularity.
- * \param membership           The membership vector, the result is returned here.
- *                             For each vertex it gives the ID of its community. The vector
- *                             must be initialized and it will be resized accordingly.
- * \param memberships          Numeric matrix that will contain the membership vector after
- *                             each level, if not \c NULL. It must be initialized and
- *                             it will be resized accordingly.
- * \param modularity           Numeric vector that will contain the modularity score
- *                             after each level, if not \c NULL. It must be initialized
- *                             and it will be resized accordingly.
+ * \param graph       The input graph. It must be an undirected graph.
+ * \param weights     Numeric vector containing edge weights. If \c NULL, every edge
+ *                    has equal weight. The weights are expected to be non-negative.
+ * \param resolution  Resolution parameter. Must be greater than or equal to 0.
+ *                    Lower values favor fewer, larger communities;
+ *                    higher values favor more, smaller communities.
+ *                    Set it to 1 to use the classical definition of modularity.
+ * \param membership  The membership vector, the result is returned here.
+ *                    For each vertex it gives the ID of its community. The vector
+ *                    must be initialized and it will be resized accordingly.
+ * \param memberships Numeric matrix that will contain the membership vector after
+ *                    each level, if not \c NULL. It must be initialized and
+ *                    it will be resized accordingly.
+ * \param modularity  Numeric vector that will contain the modularity score
+ *                    after each level, if not \c NULL. It must be initialized
+ *                    and it will be resized accordingly.
  * \return Error code.
  *
  * Time complexity: in average near linear on sparse graphs.
@@ -3261,7 +3261,7 @@ static int igraph_i_community_multilevel_step(
 
 int igraph_community_multilevel(const igraph_t *graph,
                                 const igraph_vector_t *weights,
-                                const igraph_real_t resolution_parameter,
+                                const igraph_real_t resolution,
                                 igraph_vector_t *membership,
                                 igraph_matrix_t *memberships, igraph_vector_t *modularity) {
 
@@ -3306,7 +3306,7 @@ int igraph_community_multilevel(const igraph_t *graph,
         igraph_integer_t step_vcount = igraph_vcount(&g);
 
         prev_q = q;
-        IGRAPH_CHECK(igraph_i_community_multilevel_step(&g, &w, &m, &q, resolution_parameter));
+        IGRAPH_CHECK(igraph_i_community_multilevel_step(&g, &w, &m, &q, resolution));
 
         /* Were there any merges? If not, we have to stop the process */
         if (igraph_vcount(&g) == step_vcount || q < prev_q) {
@@ -3349,7 +3349,7 @@ int igraph_community_multilevel(const igraph_t *graph,
         for (i = 0; i < vcount; i++) {
             VECTOR(tmp)[i] = i;
         }
-        IGRAPH_CHECK(igraph_modularity(graph, &tmp, weights, resolution_parameter, &mod));
+        IGRAPH_CHECK(igraph_modularity(graph, &tmp, weights, resolution, &mod));
         igraph_vector_destroy(&tmp);
         IGRAPH_FINALLY_CLEAN(1);
         IGRAPH_CHECK(igraph_vector_resize(modularity, 1));

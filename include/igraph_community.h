@@ -135,12 +135,12 @@ DECLDIR int igraph_le_community_to_membership(const igraph_matrix_t *merges,
 DECLDIR int igraph_modularity(const igraph_t *graph,
                               const igraph_vector_t *membership,
                               const igraph_vector_t *weights,
-                              const igraph_real_t resolution_parameter,
+                              const igraph_real_t resolution,
                               igraph_real_t *modularity);
 
 DECLDIR int igraph_modularity_matrix(const igraph_t *graph,
                                      const igraph_vector_t *weights,
-                                     const igraph_real_t resolution_parameter,
+                                     const igraph_real_t resolution,
                                      igraph_matrix_t *modmat);
 
 DECLDIR int igraph_reindex_membership(igraph_vector_t *membership,
@@ -218,7 +218,7 @@ DECLDIR int igraph_community_label_propagation(const igraph_t *graph,
 
 DECLDIR int igraph_community_multilevel(const igraph_t *graph,
                                         const igraph_vector_t *weights,
-                                        const igraph_real_t resolution_parameter,
+                                        const igraph_real_t resolution,
                                         igraph_vector_t *membership,
                                         igraph_matrix_t *memberships,
                                         igraph_vector_t *modularity);

@@ -73,6 +73,11 @@ int main() {
                  -1);
     igraph_community_multilevel(&g, 0, 1, &membership, &memberships, &modularity);
     show_results(&g, &membership, &memberships, &modularity, stdout);
+
+    /* Higher resolution */
+    igraph_community_multilevel(&g, 0, 1.5, &membership, &memberships, &modularity);
+    show_results(&g, &membership, &memberships, &modularity, stdout);
+
     igraph_destroy(&g);
 
     /* Ring of 30 cliques */

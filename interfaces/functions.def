@@ -1311,7 +1311,7 @@ igraph_le_community_to_membership:
 igraph_modularity:
         PARAMS: GRAPH graph, VECTOR membership, \
                 IN VECTOR_OR_0 weights=NULL, \
-                REAL resolution_parameter=1.0, \
+                REAL resolution=1.0, \
                 OUT REALPTR modularity
         NAME-R: modularity.igraph
         IGNORE: RNamespace, RR
@@ -1319,7 +1319,7 @@ igraph_modularity:
 igraph_modularity_matrix:
         PARAMS: GRAPH graph, \
                 EDGEWEIGHTS weights=NULL, \
-                REAL resolution_parameter=1.0, \
+                REAL resolution=1.0, \
                 OUT MATRIX modmat
         DEPS: weights ON graph
         NAME-R: modularity_matrix
@@ -1361,7 +1361,7 @@ igraph_community_label_propagation:
 
 igraph_community_multilevel:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
-                REAL resolution_parameter=1.0, \
+                REAL resolution=1.0, \
                 OUT VECTOR membership, \
 		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
         DEPS: weights ON graph
