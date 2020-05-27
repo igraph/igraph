@@ -2714,14 +2714,14 @@ typedef struct {
 /* Computes the modularity of a community partitioning */
 static igraph_real_t igraph_i_multilevel_community_modularity(
                                                               const igraph_i_multilevel_community_list *communities,
-                                                              const igraph_real_t gamma) {
+                                                              const igraph_real_t resolution) {
     igraph_real_t result = 0;
     long int i;
     igraph_real_t m = communities->weight_sum;
 
     for (i = 0; i < communities->vertices_no; i++) {
         if (communities->item[i].size > 0) {
-            result += (communities->item[i].weight_inside - gamma * communities->item[i].weight_all * communities->item[i].weight_all / m) / m;
+            result += (communities->item[i].weight_inside - resolution * communities->item[i].weight_all * communities->item[i].weight_all / m) / m;
         }
     }
 
@@ -2905,10 +2905,10 @@ static igraph_real_t igraph_i_multilevel_community_modularity_gain(
                                                                    const igraph_i_multilevel_community_list *communities,
                                                                    igraph_integer_t community, igraph_integer_t vertex,
                                                                    igraph_real_t weight_all, igraph_real_t weight_inside,
-                                                                   const igraph_real_t gamma) {
+                                                                   const igraph_real_t resolution) {
     IGRAPH_UNUSED(vertex);
     return weight_inside -
-           gamma * communities->item[(long int)community].weight_all * weight_all / communities->weight_sum;
+           resolution * communities->item[(long int)community].weight_all * weight_all / communities->weight_sum;
 }
 
 /* Shrinks communities into single vertices, keeping all the edges.
@@ -2985,7 +2985,7 @@ static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membersh
  *                   For each vertex it gives the ID of its community.
  * \param modularity The modularity of the partition is returned here.
  *                   \c NULL means that the modularity is not needed.
- * \param gamma      Resolution parameter. Must be greater than or equal to 0.
+ * \param resolution  Resolution parameter. Must be greater than or equal to 0.
  *                   Default is 1. Lower values favor fewer, larger communities;
  *                   higher values favor more, smaller communities.
  * \return Error code.
@@ -2997,7 +2997,7 @@ static int igraph_i_community_multilevel_step(
         igraph_vector_t *weights,
         igraph_vector_t *membership,
         igraph_real_t *modularity,
-        const igraph_real_t gamma) {
+        const igraph_real_t resolution) {
 
     long int i, j;
     long int vcount = igraph_vcount(graph);
@@ -3067,7 +3067,7 @@ static int igraph_i_community_multilevel_step(
         }
     }
 
-    q = igraph_i_multilevel_community_modularity(&communities, gamma);
+    q = igraph_i_multilevel_community_modularity(&communities, resolution);
     pass = 1;
 
     do { /* Pass begin */
@@ -3121,7 +3121,7 @@ static int igraph_i_community_multilevel_step(
                     igraph_i_multilevel_community_modularity_gain(&communities,
                                                                   (igraph_integer_t) c,
                                                                   (igraph_integer_t) i,
-                                                                  weight_all, w, gamma);
+                                                                  weight_all, w, resolution);
                 /* debug("Link %ld -> %ld weight: %lf gain: %lf\n", i, c, (double) w, (double) q_gain); */
                 if (q_gain > max_q_gain) {
                     new_id = c;
@@ -3146,7 +3146,7 @@ static int igraph_i_community_multilevel_step(
             }
         }
 
-        q = igraph_i_multilevel_community_modularity(&communities, gamma);
+        q = igraph_i_multilevel_community_modularity(&communities, resolution);
 
         if (changed && (q > pass_q)) {
             /* debug("Pass %d (changed: %d) Communities: %ld Modularity from %lf to %lf\n",
