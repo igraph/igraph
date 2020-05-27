@@ -950,7 +950,7 @@ int igraph_modularity(const igraph_t *graph,
         IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
     }
     if (resolution < 0.0) {
-      IGRAPH_ERROR("Invalid resolution parameter value", IGRAPH_EINVAL);
+      IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&e, types);
@@ -1046,6 +1046,10 @@ int igraph_modularity_matrix(const igraph_t *graph,
 
     if (weights && igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+    }
+
+    if (resolution < 0.0) {
+        IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
@@ -3023,8 +3027,8 @@ static int igraph_i_community_multilevel_step(
     if (igraph_vector_any_smaller(weights, 0)) {
         IGRAPH_ERROR("weights must be positive", IGRAPH_EINVAL);
     }
-    if (gamma < 0.0) {
-      IGRAPH_ERROR("Invalid resolution parameter gamma value", IGRAPH_EINVAL);
+    if (resolution < 0.0) {
+      IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
     }
 
     /* Initialize data structures */
