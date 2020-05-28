@@ -192,7 +192,7 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
  *
- * Time complexity: O(|V||E|), the
+ * Time complexity: O(|V|+|E|), the
  * number of vertices times the number of edges.
  *
  * \example examples/test/igraph_is_eulerian.c
