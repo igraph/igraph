@@ -209,3 +209,20 @@ if(MSVC)
 else()
   target_compile_options(igraph PRIVATE -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-varargs)
 endif()
+
+# Define how to install the library
+install(
+  TARGETS igraph
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+)
+INSTALL(
+  DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h"
+)
+INSTALL(
+  DIRECTORY ${CMAKE_BINARY_DIR}/include/
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h"
+)

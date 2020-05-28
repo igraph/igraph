@@ -1,5 +1,9 @@
+set(CPACK_SOURCE_GENERATOR "TGZ")
+
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "igraph library")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://igraph.org")
 set(CPACK_PACKAGE_VENDOR "The igraph development team")
+
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
 
 include(CPack)
