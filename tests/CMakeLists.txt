@@ -149,7 +149,6 @@ add_legacy_tests(
   igraph_rewire
   igraph_similarity
   igraph_simplify
-  igraph_topological_sorting
   igraph_transitive_closure_dag
   igraph_transitivity
   single_target_shortest_path
@@ -158,6 +157,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests NAMES
   igraph_closeness
+  igraph_topological_sorting
 )
 
 # components.at
