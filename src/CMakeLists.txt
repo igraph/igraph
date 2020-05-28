@@ -59,9 +59,10 @@ add_library(
   distances.c
   dotproduct.c
   dqueue.c
+  drl_graph.cpp
   drl_graph_3d.cpp
-  drl_layout_3d.cpp
   drl_layout.cpp
+  drl_layout_3d.cpp
   eigen.c
   embedding.c
   f2c_dummy.c
@@ -171,6 +172,9 @@ add_library(
   ${PARSER_SOURCES}
 )
 
+# Set soname for the library
+set_target_properties(igraph PROPERTIES SOVERSION 0)
+
 # Add include path. Includes are in ../include but they get installed to
 # <prefix/include/igraph, hence the two options. We also have some private
 # includes that are generated at compile time but are not part of the public
@@ -210,19 +214,27 @@ else()
   target_compile_options(igraph PRIVATE -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-varargs)
 endif()
 
+# Generate pkgconfig file
+configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.cmake.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
+
 # Define how to install the library
+include(GNUInstallDirs)
 install(
   TARGETS igraph
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
 )
-INSTALL(
+install(
   DIRECTORY ${CMAKE_SOURCE_DIR}/include/
-  DESTINATION include
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   FILES_MATCHING PATTERN "*.h"
 )
-INSTALL(
+install(
   DIRECTORY ${CMAKE_BINARY_DIR}/include/
-  DESTINATION include
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   FILES_MATCHING PATTERN "*.h"
+)
+install(
+  FILES ${CMAKE_BINARY_DIR}/igraph.pc
+  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig
 )

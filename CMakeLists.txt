@@ -16,7 +16,13 @@ endif()
 include(version)
 
 # Declare the project, its version number and language
-project(igraph VERSION ${PACKAGE_VERSION_BASE} LANGUAGES C CXX)
+project(
+  igraph
+  VERSION ${PACKAGE_VERSION_BASE}
+  DESCRIPTION "A library for creating and manipulating graphs"
+  HOMEPAGE_URL https://igraph.org
+  LANGUAGES C CXX
+)
 
 # Set C and C++ standard version
 set(CMAKE_C_STANDARD 99)
@@ -76,4 +82,4 @@ endif()
 include(packaging)
 
 # Show result of configuration
-summarize_dependencies()
+include(summary)
