@@ -812,6 +812,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
     root.cmp_to_best_path = 0;
     root.needs_long_prune = false;
     root.long_prune_begin = 0;
+    root.needs_long_prune = false;
 
     root.failure_recording_ival = 0;
 

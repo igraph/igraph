@@ -157,7 +157,7 @@ AT_CLEANUP
 
 AT_SETUP([Topological sorting (igraph_topological_sorting, igraph_is_dag): ])
 AT_KEYWORDS([topological sorting directed acyclic graphs])
-AT_COMPILE_CHECK([simple/igraph_topological_sorting.c], [simple/igraph_topological_sorting.out])
+AT_COMPILE_CHECK([tests/igraph_topological_sorting.c], [tests/igraph_topological_sorting.out])
 AT_CLEANUP
 
 AT_SETUP([Feedback arc sets, Eades heuristics (igraph_feedback_arc_set): ])
