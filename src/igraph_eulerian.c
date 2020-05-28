@@ -253,11 +253,17 @@ int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_
         edge = (long) VECTOR(*incedges)[i];
         if (!VECTOR(*visited_list)[edge]) {
             v = IGRAPH_TO(g, edge) == start ? IGRAPH_FROM(g, edge) : IGRAPH_TO(g, edge);
-            IGRAPH_CHECK(check_if_bridge(start, v, edge, &is_bridge, bridges));
-            if (adj == 1 || !is_bridge) { /* checks if something is not a bridge first */
+            if (adj == 1) {
                 VECTOR(*visited_list)[edge] = 1;
                 IGRAPH_CHECK(igraph_vector_push_back(path, edge));               
                 IGRAPH_CHECK(euler_undirected_implementation(v, g, path, visited_list, bridges));
+            } else {
+                 IGRAPH_CHECK(check_if_bridge(start, v, edge, &is_bridge, bridges));
+                if (!is_bridge) { /* checks if something is not a bridge first */
+                    VECTOR(*visited_list)[edge] = 1;
+                    IGRAPH_CHECK(igraph_vector_push_back(path, edge));               
+                    IGRAPH_CHECK(euler_undirected_implementation(v, g, path, visited_list, bridges));
+                }
             }
         }
         i++;
