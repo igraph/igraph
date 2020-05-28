@@ -195,7 +195,6 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
  * Time complexity: O(|V|+|E|), the
  * number of vertices times the number of edges.
  *
- * \example examples/test/igraph_is_eulerian.c
  */
 
 
@@ -546,7 +545,6 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
  * Time complexity: O(|V||E|), the
  * number of vertices times the number of edges.
  *
- * \example examples/test/igraph_eulerian_cycle.c
  */
 
 
@@ -592,7 +590,6 @@ int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
  * Time complexity: O(|V||E|), the
  * number of vertices times the number of edges.
  *
- * \example examples/test/igraph_eulerian_path.c
  */
 
 int igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res) {
