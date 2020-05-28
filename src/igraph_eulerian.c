@@ -28,6 +28,14 @@
 #include "igraph_components.h"
 #include "igraph_types_internal.h"
 
+/**
+ * \section about_eulerian
+ *
+ * <para>These functions calculate whether an Eulerian path or cycle exists
+ * and if so, can find them.</para>
+ */
+
+
 /* solution adapted from https://www.geeksforgeeks.org/eulerian-path-and-circuit/
 The function returns one of the following values
 has_path is set to 1 if a path exists, 0 otherwise
@@ -172,6 +180,25 @@ int is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup Eulerian
+ * \function igraph_is_eulerian
+ * \brief Checks whether an eulerian path or cycle exists.
+ *
+ * \param graph The graph object.
+ * \param has_path Pointer to a boolean, will be set to true if a path exists.
+ * \param has_cycle Pointer to a boolean, will be set to true if a cycle exists.
+ * \return Error code:
+ *         \c IGRAPH_ENOMEM, not enough memory for
+ *         temporary data.
+ *
+ * Time complexity: O(|V||E|), the
+ * number of vertices times the number of edges.
+ *
+ * \example examples/test/igraph_is_eulerian.c
+ */
+
+
 int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
     if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(is_eulerian_directed(graph, has_path, has_cycle));
@@ -227,7 +254,7 @@ int euler_undirected_implementation(igraph_integer_t start, igraph_t *g, igraph_
         if (!VECTOR(*visited_list)[edge]) {
             v = IGRAPH_TO(g, edge) == start ? IGRAPH_FROM(g, edge) : IGRAPH_TO(g, edge);
             IGRAPH_CHECK(check_if_bridge(start, v, edge, &is_bridge, bridges));
-            if (adj == 1 || !is_bridge) { // checks if something is not a bridge first
+            if (adj == 1 || !is_bridge) { /* checks if something is not a bridge first */
                 VECTOR(*visited_list)[edge] = 1;
                 IGRAPH_CHECK(igraph_vector_push_back(path, edge));               
                 IGRAPH_CHECK(euler_undirected_implementation(v, g, path, visited_list, bridges));
@@ -293,7 +320,7 @@ int igraph_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     IGRAPH_CHECK(igraph_vector_init(&bridges, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &bridges);
-    igraph_bridges(graph, &bridges);
+    IGRAPH_CHECK(igraph_bridges(graph, &bridges));
 
     if (cycle && !has_path) {
         IGRAPH_CHECK(euler_undirected_implementation(start, graph, path, &visited_list, &bridges));
@@ -494,6 +521,28 @@ int igraph_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
     return IGRAPH_SUCCESS;
 }
 
+/**
+ * \ingroup Eulerian
+ * \function igraph_eulerian_cycle
+ * \brief Finds an Eulerian cycle and stores it in res. An eulerian cycle must exist in the graph.
+ *
+ * \param graph The graph object.
+ * \param res Pointer to an initialised vector. The cycle will be stored here.
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary
+ *           data.
+ *        \cli IGRAPH_EINVVID
+ *           graph does not have an eulerian cycle
+ *        \endclist
+ *
+ * Time complexity: O(|V||E|), the
+ * number of vertices times the number of edges.
+ *
+ * \example examples/test/igraph_eulerian_cycle.c
+ */
+
 
 int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
     igraph_bool_t cycle;
@@ -517,6 +566,28 @@ int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup Eulerian
+ * \function igraph_eulerian_path
+ * \brief Finds an Eulerian path and stores it in res. An eulerian path must exist in the graph.
+ *
+ * \param graph The graph object.
+ * \param res Pointer to an initialised vector. The path will be stored here.
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary
+ *           data.
+ *        \cli IGRAPH_EINVVID
+ *           graph does not have an eulerian path.
+ *        \endclist
+ *
+ * Time complexity: O(|V||E|), the
+ * number of vertices times the number of edges.
+ *
+ * \example examples/test/igraph_eulerian_path.c
+ */
 
 int igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res) {
     igraph_bool_t cycle;
