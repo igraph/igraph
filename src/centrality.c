@@ -1726,7 +1726,7 @@ static int igraph_i_betweenness_estimate_weighted(
                     VECTOR(dist)[to] = altdist;
                     IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
                 } else if (cmp_result == 0 &&
-                    (altdist <= cutoff + 1.0 || cutoff <= 0)) {
+                    (altdist <= cutoff + 1.0 || cutoff < 0)) {
                     /* Only add if the node is not more distant than the cutoff */
                     igraph_vector_int_t *v = igraph_adjlist_get(&fathers, to);
                     igraph_vector_int_push_back(v, minnei);
@@ -1826,8 +1826,8 @@ static void igraph_i_destroy_biguints(igraph_biguint_t *p) {
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param cutoff The maximal length of paths that will be considered.
- *        If zero or negative, the exact betweenness will be calculated
- *        (no upper limit on path lengths).
+ *        If negative, the exact betweenness will be calculated, and
+ *        there will be no upper limit on path lengths.
  * \param weights An optional vector containing edge weights for
  *        calculating weighted betweenness. Supply a null pointer here
  *        for unweighted betweenness.
@@ -1969,7 +1969,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
             long int actnode = (long int) igraph_dqueue_pop(&q);
 
             /* Ignore vertices that are more distant than the cutoff */
-            if (cutoff > 0 && distance[actnode] > cutoff + 1) {
+            if (cutoff >= 0 && distance[actnode] > cutoff + 1) {
                 /* Reset variables if node is too distant */
                 distance[actnode] = 0;
                 if (nobigint) {
