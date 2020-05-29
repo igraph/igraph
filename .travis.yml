@@ -21,6 +21,9 @@ addons:
     - fop
     - libgmp-dev
     - libglpk-dev
+    - libarpack2-dev
+    - libblas-dev
+    - liblapack-dev    
   homebrew:
     packages:
     - flex
@@ -42,6 +45,13 @@ jobs:
         - ./bootstrap.sh
         - ./configure --with-external-glpk
         - make
+    - name: "Linux external deps"
+      os: linux
+      dist: bionic
+      install:
+        - ./bootstrap.sh
+        - ./configure --with-external-glpk --with-external-blas --with-external-lapack --with-external-arpack
+        - make        
     - name: "Linux x87"
       os: linux
       env:
