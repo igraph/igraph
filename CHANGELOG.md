@@ -6,6 +6,8 @@
 
 ### Changed
 
+ - `igraph_community_multilevel`: added resolution parameter.
+
 ### Fixed
 
 ### Other
