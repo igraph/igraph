@@ -2,13 +2,15 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "igraph_interface.h"
+
 using namespace prpack;
 using namespace std;
 
 #ifdef PRPACK_IGRAPH_SUPPORT
 
 prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_t* weights,
-        igraph_bool_t directed) {
+        bool directed) {
     const igraph_bool_t treat_as_directed = igraph_is_directed(g) && directed;
     igraph_es_t es;
     igraph_eit_t eit;
@@ -141,6 +143,5 @@ prpack_igraph_graph::prpack_igraph_graph(const igraph_t* g, const igraph_vector_
     */
 }
 
-// PRPACK_IGRAPH_SUPPORT 
-#endif 
-
+// PRPACK_IGRAPH_SUPPORT
+#endif

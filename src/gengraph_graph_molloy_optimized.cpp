@@ -34,10 +34,6 @@
 #include "igraph_statusbar.h"
 #include "igraph_progress.h"
 
-#ifndef register
-    #define register
-#endif
-
 using namespace std;
 
 namespace gengraph {

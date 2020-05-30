@@ -21,12 +21,6 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#ifndef _MSC_VER
-    #ifndef register
-        #define register
-    #endif
-#endif
-
 #include <stdio.h>
 #include <math.h>
 #include <string.h>

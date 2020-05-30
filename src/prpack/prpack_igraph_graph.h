@@ -3,8 +3,10 @@
 
 #ifdef PRPACK_IGRAPH_SUPPORT
 
-#include "igraph_interface.h"
 #include "prpack_base_graph.h"
+
+struct igraph_s;
+struct igraph_vector_t;
 
 namespace prpack {
 
@@ -12,15 +14,15 @@ namespace prpack {
 
         public:
             // constructors
-            explicit prpack_igraph_graph(const igraph_t* g,
-					const igraph_vector_t* weights = 0,
-					igraph_bool_t directed = true);
+            explicit prpack_igraph_graph(const struct igraph_s* g,
+					const struct igraph_vector_t* weights = 0,
+					bool directed = true);
     };
 
-};
+}
 
-// PRPACK_IGRAPH_SUPPORT 
-#endif 
+// PRPACK_IGRAPH_SUPPORT
+#endif
 
 // PRPACK_IGRAPH_GRAPH
 #endif
