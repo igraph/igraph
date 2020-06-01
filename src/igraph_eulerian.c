@@ -326,7 +326,7 @@ int igraph_i_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     IGRAPH_FINALLY(igraph_inclist_destroy, &incl);
 
     if (cycle && !has_path) {
-        IGRAPH_CHECK(igraph_i_euler_undirected_implementation(start, graph, path, &out_degree));
+        IGRAPH_CHECK(igraph_i_euler_path_undirected_implementation(start, graph, path, &out_degree));
     } else {
         for (i = 0; i < igraph_vcount(graph); i++) {
             incedges = igraph_inclist_get(&incl, i);
@@ -335,7 +335,7 @@ int igraph_i_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
                 break;
             }
         }
-        igraph_i_euler_undirected_implementation(start, graph, path, &out_degree);
+        igraph_i_euler_path_undirected_implementation(start, graph, path, &out_degree);
     }
 
     igraph_inclist_destroy(&incl);
