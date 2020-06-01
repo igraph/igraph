@@ -203,7 +203,7 @@ int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *
     return IGRAPH_SUCCESS;
 }
 
-int igraph_i_euler_undirected_implementation(igraph_integer_t start_node, igraph_t *graph, igraph_vector_t *res, igraph_vector_t *outgoing_list) {
+int igraph_i_euler_path_undirected_implementation(igraph_integer_t start_node, igraph_t *graph, igraph_vector_t *res, igraph_vector_t *outgoing_list) {
 
     igraph_integer_t start = start_node;
     igraph_integer_t curr = start;
@@ -286,8 +286,7 @@ int igraph_i_euler_undirected_implementation(igraph_integer_t start_node, igraph
     return IGRAPH_SUCCESS;
 }
 
-
-/* solution adapted from https://www.geeksforgeeks.org/fleurys-algorithm-for-printing-eulerian-path/ */
+/* Hierholzer algorithm */
 int igraph_i_euler_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
     /* default starting vertex is 0
