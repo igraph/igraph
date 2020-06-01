@@ -90,6 +90,7 @@ int igraph_i_is_eulerian_undirected(igraph_t *graph, igraph_bool_t *has_path, ig
     return IGRAPH_SUCCESS;
 }
 
+
 int igraph_i_is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
     igraph_bool_t res_strong, res_weak;
     igraph_integer_t incoming_excess, outgoing_excess, clusters_strong, clusters_weak;
@@ -176,14 +177,15 @@ int igraph_i_is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igra
     return IGRAPH_SUCCESS;
 }
 
+
 /**
  * \ingroup Eulerian
  * \function igraph_is_eulerian
  * \brief Checks whether an eulerian path or cycle exists.
  *
  * \param graph The graph object.
- * \param has_path Pointer to a boolean, will be set to true if a path exists.
- * \param has_cycle Pointer to a boolean, will be set to true if a cycle exists.
+ * \param has_path Pointer to a Boolean, will be set to true if a path exists.
+ * \param has_cycle Pointer to a Boolean, will be set to true if a cycle exists.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
@@ -193,7 +195,6 @@ int igraph_i_is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igra
  *
  */
 
-
 int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
     if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_is_eulerian_directed(graph, has_path, has_cycle));
@@ -202,6 +203,7 @@ int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *
     } 
     return IGRAPH_SUCCESS;
 }
+
 
 int igraph_i_eulerian_path_undirected_implementation(igraph_integer_t start_node, igraph_t *graph, igraph_vector_t *res, igraph_vector_t *outgoing_list) {
 
@@ -286,6 +288,7 @@ int igraph_i_eulerian_path_undirected_implementation(igraph_integer_t start_node
     return IGRAPH_SUCCESS;
 }
 
+
 /* Hierholzer algorithm */
 int igraph_i_eulerian_path_undirected(igraph_t *graph, igraph_vector_t *path) {
 
@@ -345,6 +348,7 @@ int igraph_i_eulerian_path_undirected(igraph_t *graph, igraph_vector_t *path) {
     return IGRAPH_SUCCESS;
 
 }
+
 
 /* solution adapted from https://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/ */
 int igraph_i_eulerian_path_directed_implementation(igraph_t *graph, igraph_integer_t *start_node, igraph_vector_t *outgoing_list, igraph_vector_t *res) {
@@ -517,20 +521,24 @@ int igraph_i_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
     return IGRAPH_SUCCESS;
 }
 
+
 /**
  * \ingroup Eulerian
  * \function igraph_eulerian_cycle
- * \brief Finds an Eulerian cycle and stores it in res. An eulerian cycle must exist in the graph.
+ * \brief Finds an Eulerian cycle
+ *
+ * Finds an Eulerian cycle, if it exists. An Eulerian cycle is a closed path
+ * that traverses each edge precisely once.
  *
  * \param graph The graph object.
- * \param res Pointer to an initialised vector. The cycle will be stored here.
+ * \param res Pointer to an initialised vector. The indices of edges
+ *            belonging to the cycle will be stored here.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
- *           not enough memory for temporary
- *           data.
+ *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           graph does not have an eulerian cycle
+ *           graph does not have an Eulerian cycle.
  *        \endclist
  *
  * Time complexity: O(|V||E|), the
@@ -540,17 +548,13 @@ int igraph_i_eulerian_path_directed(igraph_t *graph, igraph_vector_t *res) {
 
 
 int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
-    igraph_bool_t cycle;
+    igraph_bool_t has_cycle;
     igraph_bool_t has_path;
 
-    has_path = 0;
-    cycle = 0;
+    IGRAPH_CHECK(igraph_is_eulerian(graph, &has_path, &has_cycle));
 
-    IGRAPH_CHECK(igraph_is_eulerian(graph, &has_path, &cycle));
-
-    if (!cycle) {
-        IGRAPH_ERROR("graph does not have cycle", IGRAPH_EINVAL);
-
+    if (!has_cycle) {
+        IGRAPH_ERROR("The graph does not have an Eulerian cycle.", IGRAPH_EINVAL);
     }
 
     if (igraph_is_directed(graph)) {
@@ -562,20 +566,24 @@ int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
     return IGRAPH_SUCCESS;
 }
 
+
 /**
  * \ingroup Eulerian
  * \function igraph_eulerian_path
- * \brief Finds an Eulerian path and stores it in res. An eulerian path must exist in the graph.
+ * \brief Finds an Eulerian path
+ *
+ * Finds an Eulerian path, if it exists. An Eulerian path traverses
+ * each edge precisely once.
  *
  * \param graph The graph object.
- * \param res Pointer to an initialised vector. The path will be stored here.
+ * \param res Pointer to an initialised vector. The indices of edges
+ *            belonging to the path will be stored here.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
- *           not enough memory for temporary
- *           data.
+ *           not enough memory for temporary data.
  *        \cli IGRAPH_EINVVID
- *           graph does not have an eulerian path.
+ *           graph does not have an Eulerian path.
  *        \endclist
  *
  * Time complexity: O(|V||E|), the
@@ -584,16 +592,13 @@ int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res) {
  */
 
 int igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res) {
-    igraph_bool_t cycle;
+    igraph_bool_t has_cycle;
     igraph_bool_t has_path;
 
-    has_path = 0;
-    cycle = 0;
-
-    IGRAPH_CHECK(igraph_is_eulerian(graph, &has_path, &cycle));
+    IGRAPH_CHECK(igraph_is_eulerian(graph, &has_path, &has_cycle));
 
     if (!has_path) {
-        IGRAPH_ERROR("graph does not have path", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The graph does not have an Eulerian path.", IGRAPH_EINVAL);
     }
 
     if (igraph_is_directed(graph)) {
