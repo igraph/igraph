@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY igraph "igraph">
+]>
+
+<chapter id="igraph-Cycles">
+<title>Graph cycles</title>
+
+<section><title>Eulerian cycles and paths</title>
+<para>These functions calculate whether an Eulerian path or cycle exists
+and if so, can find them.</para>
+<section id="igraph_is_eulerian">
+<title><function>igraph_is_eulerian</function> &mdash;  Checks whether an eulerian path or cycle exists.</title>
+<indexterm><primary>is_eulerian</primary></indexterm>
+<para>
+<informalexample><programlisting>
+int igraph_is_eulerian(igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle);
+</programlisting></informalexample>
+</para>
+<para>
+
+
+
+
+</para>
+<formalpara><title>Arguments:</title><para>
+<variablelist role="params">
+  <varlistentry><term><parameter>graph</parameter>:</term>
+  <listitem><para>
+  The graph object.
+</para></listitem></varlistentry>    <varlistentry><term><parameter>has_path</parameter>:</term>
+  <listitem><para>
+  Pointer to a Boolean, will be set to true if a path exists.
+</para></listitem></varlistentry>    <varlistentry><term><parameter>has_cycle</parameter>:</term>
+  <listitem><para>
+  Pointer to a Boolean, will be set to true if a cycle exists.
+</para></listitem></varlistentry>  </variablelist></para></formalpara><para>
+</para><formalpara><title>Returns:</title><para><variablelist>
+  <varlistentry><term><parameter></parameter></term>
+  <listitem><para>
+  Error code:
+        <constant>IGRAPH_ENOMEM</constant>, not enough memory for
+        temporary data.
+  </para></listitem></varlistentry>
+</variablelist></para></formalpara><para>
+
+Time complexity: O(|V|+|E|), the
+number of vertices times the number of edges.
+
+ 
+</para>
+</section>
+<section id="igraph_eulerian_cycle">
+<title><function>igraph_eulerian_cycle</function> &mdash;  Finds an Eulerian cycle</title>
+<indexterm><primary>eulerian_cycle</primary></indexterm>
+<para>
+<informalexample><programlisting>
+int igraph_eulerian_cycle(igraph_t *graph, igraph_vector_t *res);
+</programlisting></informalexample>
+</para>
+<para>
+
+
+
+
+Finds an Eulerian cycle, if it exists. An Eulerian cycle is a closed path
+that traverses each edge precisely once.
+
+</para>
+<formalpara><title>Arguments:</title><para>
+<variablelist role="params">
+  <varlistentry><term><parameter>graph</parameter>:</term>
+  <listitem><para>
+  The graph object.
+</para></listitem></varlistentry>    <varlistentry><term><parameter>res</parameter>:</term>
+  <listitem><para>
+  Pointer to an initialised vector. The indices of edges
+           belonging to the cycle will be stored here.
+</para></listitem></varlistentry>  </variablelist></para></formalpara><para>
+</para><formalpara><title>Returns:</title><para><variablelist>
+  <varlistentry><term><parameter></parameter></term>
+  <listitem><para>
+  Error code:
+       <variablelist>
+       <varlistentry><term><constant>IGRAPH_ENOMEM</constant></term>
+<listitem><para>
+
+          not enough memory for temporary data.
+       
+</para></listitem></varlistentry><varlistentry><term><constant>IGRAPH_EINVVID</constant></term>
+<listitem><para>
+
+          graph does not have an Eulerian cycle.
+       
+</para></listitem></varlistentry></variablelist>
+  </para></listitem></varlistentry>
+</variablelist></para></formalpara><para>
+
+Time complexity: O(|V||E|), the
+number of vertices times the number of edges.
+
+ 
+</para>
+</section>
+<section id="igraph_eulerian_path">
+<title><function>igraph_eulerian_path</function> &mdash;  Finds an Eulerian path</title>
+<indexterm><primary>eulerian_path</primary></indexterm>
+<para>
+<informalexample><programlisting>
+int igraph_eulerian_path(igraph_t *graph, igraph_vector_t *res);
+</programlisting></informalexample>
+</para>
+<para>
+
+
+
+
+Finds an Eulerian path, if it exists. An Eulerian path traverses
+each edge precisely once.
+
+</para>
+<formalpara><title>Arguments:</title><para>
+<variablelist role="params">
+  <varlistentry><term><parameter>graph</parameter>:</term>
+  <listitem><para>
+  The graph object.
+</para></listitem></varlistentry>    <varlistentry><term><parameter>res</parameter>:</term>
+  <listitem><para>
+  Pointer to an initialised vector. The indices of edges
+           belonging to the path will be stored here.
+</para></listitem></varlistentry>  </variablelist></para></formalpara><para>
+</para><formalpara><title>Returns:</title><para><variablelist>
+  <varlistentry><term><parameter></parameter></term>
+  <listitem><para>
+  Error code:
+       <variablelist>
+       <varlistentry><term><constant>IGRAPH_ENOMEM</constant></term>
+<listitem><para>
+
+          not enough memory for temporary data.
+       
+</para></listitem></varlistentry><varlistentry><term><constant>IGRAPH_EINVVID</constant></term>
+<listitem><para>
+
+          graph does not have an Eulerian path.
+       
+</para></listitem></varlistentry></variablelist>
+  </para></listitem></varlistentry>
+</variablelist></para></formalpara><para>
+
+Time complexity: O(|V||E|), the
+number of vertices times the number of edges.
+
+ 
+</para>
+</section>
+</section>
+
+</chapter>
