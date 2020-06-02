@@ -181,11 +181,14 @@ int igraph_i_is_eulerian_directed(igraph_t *graph, igraph_bool_t *has_path, igra
 /**
  * \ingroup Eulerian
  * \function igraph_is_eulerian
- * \brief Checks whether an eulerian path or cycle exists.
+ * \brief Checks whether an Eulerian path or cycle exists
+ *
+ * An Eulerian path traverses each edge of the graph precisely once. A closed
+ * Eulerian path is referred to as an Eulerian cycle.
  *
  * \param graph The graph object.
- * \param has_path Pointer to a Boolean, will be set to true if a path exists.
- * \param has_cycle Pointer to a Boolean, will be set to true if a cycle exists.
+ * \param has_path Pointer to a Boolean, will be set to true if an Eulerian path exists.
+ * \param has_cycle Pointer to a Boolean, will be set to true if an Eulerian cycle exists.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
