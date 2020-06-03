@@ -99,7 +99,8 @@ AT_CLEANUP
 
 AT_SETUP([Betweenness (igraph_betweenness): ])
 AT_KEYWORDS([igraph_betweenness betweenness])
-AT_COMPILE_CHECK([simple/igraph_betweenness.c])
+AT_COMPILE_CHECK([simple/igraph_betweenness.c],
+                 [simple/igraph_betweenness.out])
 AT_CLEANUP
 
 AT_SETUP([Betweenness, big integers (igraph_betweenness): ])
