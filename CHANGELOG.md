@@ -8,6 +8,8 @@
 
 ### Fixed
 
+ - `igraph_betweenness`: fixed wrong cutoff (PR #1392).
+
 ### Other
 
 ## [0.8.2] - 2020-04-28
