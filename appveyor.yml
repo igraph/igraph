@@ -7,7 +7,7 @@ environment:
   PATH: C:\msys64\usr\bin;C:\msys64\mingw64\bin;C:\Windows\System32;C:\Windows;%PATH%
   MSYSTEM: MINGW64
   TARGET_ARCH: "x64"
-  
+
   matrix:
     -
       PYTHON_VERSION: "2.7"
@@ -37,17 +37,6 @@ init:
 build: false
 
 install:
-    # If there is a newer build queued for the same PR, cancel this one.
-    # The AppVeyor 'rollout builds' option is supposed to serve the same
-    # purpose but it is problematic because it tends to cancel builds pushed
-    # directly to master instead of just PR builds (or the converse).
-    # credits: JuliaLang developers.
-    - ps: if ($env:APPVEYOR_PULL_REQUEST_NUMBER -and $env:APPVEYOR_BUILD_NUMBER -ne ((Invoke-RestMethod `
-        https://ci.appveyor.com/api/projects/$env:APPVEYOR_ACCOUNT_NAME/$env:APPVEYOR_PROJECT_SLUG/history?recordsNumber=50).builds | `
-        Where-Object pullRequestId -eq $env:APPVEYOR_PULL_REQUEST_NUMBER)[0].buildNumber) { `
-          throw "There are newer queued builds for this pull request, failing early." }
-
-  
     # setup conda environment for building
     - cmd: set "PATH=%CONDA_INSTALL_LOCN%;%CONDA_INSTALL_LOCN%\scripts;%PATH%"
     - cmd: set PYTHONUNBUFFERED=1
@@ -55,10 +44,10 @@ install:
     # update mysy2
     - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S zstd"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S autoconf automake bison flex"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S libxml2-devel zip"
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S libxml2-devel zip xz"
 
-    
     # also install a msvc build environment -> use libxml2 from conda-forge
     # updating conda always updates python, even with "no-update-deps" and
     # updating python takes ages on appveyor... So just keep the shorter PATH
@@ -69,7 +58,7 @@ install:
     - cmd: conda config --set always_yes true
     - cmd: if [%PYTHON_VERSION%] NEQ [NONE] conda install --quiet libxml2 python=%PYTHON_VERSION%
     - cmd: conda info -a
-    
+
     # Now start with the build: first the msys2 based one
     - cmd: bash bootstrap.sh
     - cmd: bash configure

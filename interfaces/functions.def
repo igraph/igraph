@@ -50,7 +50,7 @@ igraph_is_directed:
         IGNORE: RR, RC, RNamespace
 
 igraph_degree:
-        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \ 
+        PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, NEIMODE mode=ALL, \
                 BOOLEAN loops
         NAME-R: degree
         IGNORE: RR, RC, RNamespace
@@ -130,8 +130,8 @@ igraph_atlas:
         IGNORE: RR, RC, RNamespace
 
 igraph_extended_chordal_ring:
-        PARAMS: OUT GRAPH graph, INTEGER nodes, MATRIX W
-        IGNORE: RR, RC, RNamespace
+        PARAMS: OUT GRAPH graph, INTEGER nodes, MATRIX W, BOOLEAN directed=False
+        IGNORE: RR
 
 igraph_connect_neighborhood:
         PARAMS: INOUT GRAPH graph, INTEGER order=2, NEIMODE mode=ALL
@@ -304,7 +304,7 @@ igraph_static_power_law_game:
         GATTR-PARAM-R: exponent_out, exponent_in, loops, multiple, \
                        finite_size_correction
         FLAGS: PROGRESS
-                
+
 igraph_k_regular_game:
         PARAMS: OUT GRAPH graph, INTEGER no_of_nodes, INTEGER k, \
                 BOOLEAN directed=False, BOOLEAN multiple=False
@@ -431,7 +431,7 @@ igraph_shortest_paths:
         IGNORE: RR, RC, RNamespace
 
 igraph_get_shortest_paths:
-        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices, 
+        PARAMS: GRAPH graph, OUT VERTEXSETLIST_OR_0 vertices,
                 OUT EDGESETLIST_OR_0 edges, VERTEX from, VERTEXSET to=ALL, \
                 NEIMODE mode=OUT, OUT VECTOR_LONG_OR_0 predecessors=0, \
                 OUT VECTOR_LONG_OR_0 inbound_edges=0
@@ -479,13 +479,13 @@ igraph_shortest_paths_johnson:
 
 igraph_get_all_simple_paths:
         PARAMS: GRAPH graph, OUT VERTEXSET_INT res, VERTEX from, \
-                VERTEXSET to=ALL, NEIMODE mode=OUT
+                VERTEXSET to=ALL, INTEGER cutoff=-1, NEIMODE mode=OUT
         DEPS: from ON graph, to ON graph, res ON graph
         NAME-R: all_simple_paths
         PP-R: get.all.simple.paths.pp
         IGNORE: RR
 
-igraph_subcomponent: 
+igraph_subcomponent:
         PARAMS: GRAPH graph, OUT VERTEXSET res, VERTEX vid, NEIMODE mode=ALL
         IGNORE: RR, RC, RNamespace
 
@@ -748,8 +748,10 @@ igraph_is_chordal:
         IGNORE: RR, RC
 
 igraph_avg_nearest_neighbor_degree:
-        PARAMS: GRAPH graph, VERTEXSET vids=ALL, OUT VERTEXINDEX_OR_0 knn, \
-                OUT VECTOR_OR_0 knnk, EDGEWEIGHTS weights=NULL
+        PARAMS: GRAPH graph, VERTEXSET vids=ALL, \
+                NEIMODE mode=ALL, NEIMODE neighbor_degree_mode=ALL, \
+                OUT VERTEXINDEX_OR_0 knn, OUT VECTOR_OR_0 knnk, \
+                EDGEWEIGHTS weights=NULL
         DEPS: vids ON graph, weights ON graph, knn ON graph vids
         NAME-R: knn
 
@@ -858,7 +860,7 @@ igraph_random_walk:
         IGNORE: RR
 
 #######################################
-# Degree sequences     
+# Degree sequences
 #######################################
 
 igraph_is_degree_sequence:
@@ -1307,14 +1309,18 @@ igraph_le_community_to_membership:
         IGNORE: RR, RNamespace, RC
 
 igraph_modularity:
-        PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity, \
-                IN VECTOR_OR_0 weights=NULL
+        PARAMS: GRAPH graph, VECTOR membership, \
+                IN VECTOR_OR_0 weights=NULL, \
+                REAL resolution=1.0, \
+                OUT REALPTR modularity
         NAME-R: modularity.igraph
         IGNORE: RNamespace, RR
 
 igraph_modularity_matrix:
-        PARAMS: GRAPH graph, VECTORM1 membership, OUT MATRIX modmat, \
-                EDGEWEIGHTS weights=NULL
+        PARAMS: GRAPH graph, \
+                EDGEWEIGHTS weights=NULL, \
+                REAL resolution=1.0, \
+                OUT MATRIX modmat
         DEPS: weights ON graph
         NAME-R: modularity_matrix
         IGNORE: RR
@@ -1339,6 +1345,12 @@ igraph_community_leading_eigenvector:
         NAME-R: cluster_leading_eigen
         IGNORE: RR, RC
 
+igraph_community_fluid_communities:
+        PARAMS: GRAPH graph, INTEGER no_of_communities, \
+		            OUT VECTOR membership, OUT REALPTR modularity
+        NAME-R: cluster_fluid_com
+        IGNORE: RR
+
 igraph_community_label_propagation:
         PARAMS: GRAPH graph, OUT VECTOR membership, EDGEWEIGHTS weights=NULL, \
                 VECTOR_OR_0 initial=NULL, VECTOR_BOOL_OR_0 fixed=NULL, \
@@ -1349,6 +1361,7 @@ igraph_community_label_propagation:
 
 igraph_community_multilevel:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                REAL resolution=1.0, \
                 OUT VECTOR membership, \
 		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
         DEPS: weights ON graph
@@ -1633,7 +1646,7 @@ igraph_list_triangles:
 igraph_disjoint_union:
         PARAMS: OUT GRAPH res, GRAPH left, GRAPH right, \
                 OUT EDGESET edge_map_left, OUT EDGESET edge_map_right
-        DEPS: edge_map_left ON left, edge_map_right ON right      
+        DEPS: edge_map_left ON left, edge_map_right ON right
         IGNORE: RR, RC, RNamespace
 
 igraph_disjoint_union_many:
@@ -1744,7 +1757,7 @@ igraph_cohesion:
 # Listing s-t cuts, separators
 #######################################
 
-igraph_dominator_tree: 
+igraph_dominator_tree:
         PARAMS: GRAPH graph, VERTEX root, OUT VERTEXSET dom, \
                 OUT GRAPH_OR_0 domtree, OUT VERTEXSET leftout, \
                 INOUTMODE mode=OUT

@@ -1,0 +1,37 @@
+# General Options:
+# - Only display errors
+# - Redirect stderr to stdout
+# - Enforce linux lineendings
+# - Preserve file modification date
+# - Do not create file backups, everything should be VCSed anyway
+--quiet
+--errors-to-stdout
+--lineend=linux
+--preserve-date
+--suffix=none
+
+# Style
+--style=java
+
+# Use 4 spaces
+--indent=spaces=4
+--convert-tabs
+
+# Paddings around operators, parentheses, and a header
+--pad-oper
+--pad-header
+
+# Continuation blocks should have no extra indentation
+--min-conditional-indent=0
+
+# Indent preprocessor blocks and defines
+--indent-preproc-block
+--indent-preproc-define
+
+# Add braces around single-line branches
+--add-braces
+
+# Keep complex statement sequences on the same line; they are that way for
+# a reason
+--keep-one-line-statements
+

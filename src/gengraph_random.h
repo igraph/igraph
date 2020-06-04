@@ -7,14 +7,14 @@
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
+ * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -22,8 +22,6 @@
 #define RNG_H
 
 #include "igraph_random.h"
-#include <iostream>
-using namespace std;
 
 namespace KW_RNG {
 
@@ -32,24 +30,28 @@ typedef unsigned int uint;
 typedef signed long  slong;
 typedef unsigned long ulong;
 
-class RNG
-{
+class RNG {
 public:
-  RNG() { }
-  RNG(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) { 
-    IGRAPH_UNUSED(z_); IGRAPH_UNUSED(w_); IGRAPH_UNUSED(jsr_); 
-    IGRAPH_UNUSED(jcong_);
-  };
-  ~RNG() { }
+    RNG() { }
+    RNG(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) {
+        IGRAPH_UNUSED(z_); IGRAPH_UNUSED(w_); IGRAPH_UNUSED(jsr_);
+        IGRAPH_UNUSED(jcong_);
+    };
+    ~RNG() { }
 
-  void init(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) {
-    IGRAPH_UNUSED(z_); IGRAPH_UNUSED(w_); IGRAPH_UNUSED(jsr_); 
-    IGRAPH_UNUSED(jcong_);    
-  }
-  long rand_int31() { return RNG_INT31(); }
-  double rand_halfopen01()   // (0,1]
-  { return RNG_UNIF01(); }
-  int binomial(double pp, int n) { return RNG_BINOM(n,pp); }
+    void init(ulong z_, ulong w_, ulong jsr_, ulong jcong_ ) {
+        IGRAPH_UNUSED(z_); IGRAPH_UNUSED(w_); IGRAPH_UNUSED(jsr_);
+        IGRAPH_UNUSED(jcong_);
+    }
+    long rand_int31() {
+        return RNG_INT31();
+    }
+    double rand_halfopen01() { // (0,1]
+        return RNG_UNIF01();
+    }
+    int binomial(double pp, int n) {
+        return RNG_BINOM(n, pp);
+    }
 };
 
 } // namespace KW_RNG
@@ -143,15 +145,15 @@ public:
 //   ~RNG() { }
 
 
-//   inline ulong znew() 
+//   inline ulong znew()
 //     { return (z = 36969 * (z & 65535) + (z >> 16)); }
-//   inline ulong wnew() 
+//   inline ulong wnew()
 //     { return (w = 18000 * (w & 65535) + (w >> 16)); }
-//   inline ulong MWC()  
+//   inline ulong MWC()
 //     { return (((znew() & 65535) << 16) + wnew()); }
 //   inline ulong SHR3()
 //     { jsr ^= ((jsr & 32767) << 17); jsr ^= (jsr >> 13); return (jsr ^= ((jsr << 5) & 0xFFFFFFFF)); }
-//   inline ulong CONG() 
+//   inline ulong CONG()
 //     { return (jcong = (69069 * jcong + 1234567) & 0xFFFFFFFF); }
 //   inline double RNOR() {
 //     slong h = rand_int32();

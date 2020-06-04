@@ -1,4 +1,4 @@
-
+ACLOCAL_AMFLAGS = -I m4
 
 SUBDIRS=src tests
 DOC_FILES = $(top_srcdir)/doc/Makefile.in \
@@ -14,7 +14,8 @@ EXTRA_DIST = igraph.pc IGRAPH_VERSION $(top_srcdir)/include/* $(DOC_FILES) examp
 	$(wildcard $(top_srcdir)/optional/glpk/amd/{README,COPYING}) \
 	$(wildcard $(top_srcdir)/optional/glpk/colamd/*.{c,h}) \
 	$(wildcard $(top_srcdir)/optional/glpk/colamd/{README,COPYING}) \
-	tests/testsuite
+	tests/testsuite \
+	ACKNOWLEDGEMENTS.md CHANGELOG.md
 
 tests/testsuite:
 	cd tests && make testsuite
@@ -57,17 +58,25 @@ framework: all
 parsersources:
 	cd src; make parsersources
 
+## in case you are thinking about replacing the ugly find;echo hack below with
+## xargs -r, don't. This is not supported on macOS (no -r option in xargs
+## there)
 msvc: parsersources
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/include
+	cp -r $(top_srcdir)/*.md $(top_builddir)/igraph-$(VERSION)-msvc/
+	cp -r $(top_srcdir)/COPYING $(top_builddir)/igraph-$(VERSION)-msvc/
 	cp -r $(top_srcdir)/src $(top_builddir)/igraph-$(VERSION)-msvc/
 	cp -r $(top_srcdir)/include/*.h $(top_builddir)/igraph-$(VERSION)-msvc/include
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp -r $(top_builddir)/include $(top_builddir)/src $(top_builddir)/igraph-$(VERSION)-msvc; fi
 	cp -r $(top_srcdir)/msvc/include $(top_builddir)/igraph-$(VERSION)-msvc/winclude
-	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/{.deps,.libs}
+	cp -r $(top_srcdir)/msvc/src/f2c/arith.h $(top_builddir)/igraph-$(VERSION)-msvc/src/f2c
+	( find $(top_builddir)/igraph-$(VERSION)-msvc/src -type d \( -name .deps -o -name .libs \); echo ':' ) | xargs rm -rf
+	( find $(top_builddir)/igraph-$(VERSION)-msvc/src -type f \( -name '*.o' -o -name '*.lo' -o -name '*.la' \); echo ':' ) | xargs rm -f
+	( find $(top_builddir)/igraph-$(VERSION)-msvc/src -type f \( -name 'Makefile*' -o -name '.dirstamp' \); echo ':' ) | xargs rm -f
+	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/f2c/arith
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/config.h
-	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*.{o,lo,la}
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/src/*~
 	rm -rf $(top_builddir)/igraph-$(VERSION)-msvc/include/*~
 	mkdir $(top_builddir)/igraph-$(VERSION)-msvc/winlib
@@ -76,8 +85,8 @@ msvc: parsersources
 		$(top_srcdir)/msvc/igraph.vcproj        \
 		$(top_builddir)/src/Makefile
 	cp $(top_srcdir)/msvc/igraph.sln $(top_builddir)/igraph-$(VERSION)-msvc
-	cp -r $(top_srcdir)/msvc/igraphtest .
+	cp -r $(top_srcdir)/msvc/igraphtest $(top_builddir)/igraph-$(VERSION)-msvc/test
 	rm -rf igraph-$(VERSION)-msvc.zip
-	zip -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc igraphtest
-    
+	zip -q -r igraph-$(VERSION)-msvc.zip igraph-$(VERSION)-msvc
+
 CLEANFILES=

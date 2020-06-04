@@ -1,27 +1,83 @@
 
 language: c
+dist: xenial
+os: linux
+
+env:
+  global:
+    - MAKEFLAGS="-j 2"
 
 addons:
   apt:
     packages:
-    - gfortran
     - flex
     - bison
-
-install:
-- ./bootstrap.sh
-- ./configure
-- make
+    - docbook2x
+    - xmlto
+    - texinfo
+    - source-highlight
+    - libxml2-utils
+    - xsltproc
+    - fop
+    - libgmp-dev
+    - libglpk-dev
+    - libarpack2-dev
+    - libblas-dev
+    - liblapack-dev    
+  homebrew:
+    packages:
+    - flex
+    - bison
+    - gmp
+    - glpk
 
 script:
-- make check
+  - make check
 
 after_failure:
-- find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+  - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+
+jobs:
+  include:
+    - name: "Linux"
+      os: linux
+      install:
+        - ./bootstrap.sh
+        - ./configure --with-external-glpk
+        - make
+    - name: "Linux external deps"
+      os: linux
+      dist: bionic
+      install:
+        - ./bootstrap.sh
+        - ./configure --with-external-glpk --with-external-blas --with-external-lapack --with-external-arpack
+        - make        
+    - name: "Linux x87"
+      os: linux
+      env:
+        - CFLAGS="-mfpmath=387" CXXFLAGS="-mfpmath=387"
+      install:
+        - ./bootstrap.sh
+        - ./configure --with-external-glpk
+        - make
+    - name: "macOS"
+      os: osx
+      install:
+        - ./bootstrap.sh
+        - ./configure --with-external-glpk --enable-asan
+        - make
+    - name: "Documentation"
+      language: shell
+      os: linux
+      install:
+        - ./bootstrap.sh
+        - ./configure
+        - cd doc
+      script:
+        - make html
+        - make pdf
 
 notifications:
   email:
     on_success: change
     on_failure: always
-
-sudo: false

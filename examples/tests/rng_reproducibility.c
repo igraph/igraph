@@ -10,8 +10,9 @@ int main() {
     int i;
     igraph_rng_seed(igraph_rng_default(), 137);
 
-    for (i=0; i < 32; ++i)
+    for (i = 0; i < 32; ++i) {
         printf("%ld\n", RNG_INTEGER(0, 100));
+    }
 
     return 0;
 }

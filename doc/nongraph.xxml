@@ -7,7 +7,7 @@
 <chapter id="igraph-Nongraph">
 <title>Not Graph Related Functions </title>
 
-<section><title>Igraph version number</title>
+<section><title>Igraph Version Number</title>
 <!-- doxrox-include igraph_version -->
 </section>
 
@@ -19,11 +19,17 @@
 <!-- doxrox-include igraph_random_sample -->
 </section>
 
-<section><title>Convex hull of a set of points on a plane</title>
+<section><title>Random Sampling of Spatial Points</title>
+<!-- doxrox-include igraph_sample_sphere_surface -->
+<!-- doxrox-include igraph_sample_sphere_volume -->
+<!-- doxrox-include igraph_sample_dirichlet -->
+</section>
+
+<section><title>Convex Hull of A Set of Points on A Plane</title>
 <!-- doxrox-include igraph_convex_hull -->
 </section>
 
-<section><title>Fitting power-law distributions to empirical data</title>
+<section><title>Fitting Power-law Distributions to Empirical Data</title>
 <!-- doxrox-include igraph_plfit_result_t -->
 <!-- doxrox-include igraph_power_law_fit -->
 </section>

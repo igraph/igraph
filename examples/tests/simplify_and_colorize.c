@@ -27,28 +27,28 @@ int main() {
     igraph_empty(&graph, 1, 0);
     SIMPLIFY_PRINT_DESTROY("K1");
 
-    /* 4-cycle-graph */   
+    /* 4-cycle-graph */
     igraph_ring(&graph, 4, 0, 0, 1);
     SIMPLIFY_PRINT_DESTROY("C4");
 
     /* both multi-edges and self loops */
     igraph_small(&graph, 2, 0,
-                 0,1, 0,1, 1,1, -1);
+                 0, 1, 0, 1, 1, 1, -1);
     SIMPLIFY_PRINT_DESTROY("Undirected graph 1");
 
-    /* parallel edges specified with different vertex orderings */   
+    /* parallel edges specified with different vertex orderings */
     igraph_small(&graph, 3, 0,
-                 0,1, 1,2, 2,0, 2,2, 2,2, 2,1, -1);
+                 0, 1, 1, 2, 2, 0, 2, 2, 2, 2, 2, 1, -1);
     SIMPLIFY_PRINT_DESTROY("Undirected graph 2");
 
     /* directed version of the same as above */
     igraph_small(&graph, 3, 1,
-                 0,1, 1,2, 2,0, 2,2, 2,2, 2,1, -1);
+                 0, 1, 1, 2, 2, 0, 2, 2, 2, 2, 2, 1, -1);
     SIMPLIFY_PRINT_DESTROY("Directed graph 1");
 
     /* isolated vertices */
     igraph_small(&graph, 4, 1,
-                 0,1, 0,1, 1,0, 1,0, 1,0, 1,1, 1,1, -1);
+                 0, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, -1);
     SIMPLIFY_PRINT_DESTROY("Directed graph 2");
 
     igraph_vector_int_destroy(&vcol);

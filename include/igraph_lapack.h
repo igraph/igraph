@@ -1,28 +1,28 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
 
-#ifndef LAPACK_H
-#define LAPACK_H
+#ifndef IGRAPH_LAPACK_H
+#define IGRAPH_LAPACK_H
 
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
@@ -32,7 +32,7 @@ __BEGIN_DECLS
 
 /**
  * \section about_lapack LAPACK interface in igraph
- * 
+ *
  * <para>
  * LAPACK is written in Fortran90 and provides routines for solving
  * systems of simultaneous linear equations, least-squares solutions
@@ -45,68 +45,70 @@ __BEGIN_DECLS
  * functionality is provided for real and complex matrices, in both
  * single and double precision.
  * </para>
- * 
+ *
  * <para>
  * igraph provides an interface to a very limited set of LAPACK
  * functions, using the regular igraph data structures.
  * </para>
- * 
+ *
  * <para>
  * See more about LAPACK at http://www.netlib.org/lapack/
  * </para>
  */
 
 DECLDIR int igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                int *info);
+                                 int *info);
 DECLDIR int igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
-                igraph_vector_int_t *ipiv, igraph_matrix_t *b);
+                                 igraph_vector_int_t *ipiv, igraph_matrix_t *b);
 DECLDIR int igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                igraph_matrix_t *b, int *info);
+                                igraph_matrix_t *b, int *info);
 
 typedef enum { IGRAPH_LAPACK_DSYEV_ALL,
-	       IGRAPH_LAPACK_DSYEV_INTERVAL,
-	       IGRAPH_LAPACK_DSYEV_SELECT } igraph_lapack_dsyev_which_t;
+               IGRAPH_LAPACK_DSYEV_INTERVAL,
+               IGRAPH_LAPACK_DSYEV_SELECT
+             } igraph_lapack_dsyev_which_t;
 
-DECLDIR int igraph_lapack_dsyevr(const igraph_matrix_t *A, 
-                igraph_lapack_dsyev_which_t which,
-                igraph_real_t vl, igraph_real_t vu, int vestimate, 
-                int il, int iu, igraph_real_t abstol,
-                igraph_vector_t *values, igraph_matrix_t *vectors,
-                igraph_vector_int_t *support);
+DECLDIR int igraph_lapack_dsyevr(const igraph_matrix_t *A,
+                                 igraph_lapack_dsyev_which_t which,
+                                 igraph_real_t vl, igraph_real_t vu, int vestimate,
+                                 int il, int iu, igraph_real_t abstol,
+                                 igraph_vector_t *values, igraph_matrix_t *vectors,
+                                 igraph_vector_int_t *support);
 
 /* TODO: should we use complex vectors/matrices? */
 
-DECLDIR int igraph_lapack_dgeev(const igraph_matrix_t *A, 
-                igraph_vector_t *valuesreal,
-                igraph_vector_t *valuesimag, 
-                igraph_matrix_t *vectorsleft,
-                igraph_matrix_t *vectorsright, int *info);
+DECLDIR int igraph_lapack_dgeev(const igraph_matrix_t *A,
+                                igraph_vector_t *valuesreal,
+                                igraph_vector_t *valuesimag,
+                                igraph_matrix_t *vectorsleft,
+                                igraph_matrix_t *vectorsright, int *info);
 
-typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE=0, 
-	       IGRAPH_LAPACK_DGEEVX_BALANCE_PERM,
-	       IGRAPH_LAPACK_DGEEVX_BALANCE_SCALE,
-	       IGRAPH_LAPACK_DGEEVX_BALANCE_BOTH } 
-  igraph_lapack_dgeevx_balance_t;
+typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE = 0,
+               IGRAPH_LAPACK_DGEEVX_BALANCE_PERM,
+               IGRAPH_LAPACK_DGEEVX_BALANCE_SCALE,
+               IGRAPH_LAPACK_DGEEVX_BALANCE_BOTH
+             }
+igraph_lapack_dgeevx_balance_t;
 
 DECLDIR int igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
-                const igraph_matrix_t *A,
-                igraph_vector_t *valuesreal,
-                igraph_vector_t *valuesimag,
-                igraph_matrix_t *vectorsleft,
-                igraph_matrix_t *vectorsright,
-                int *ilo, int *ihi, igraph_vector_t *scale,
-                igraph_real_t *abnrm,
-                igraph_vector_t *rconde,
-                igraph_vector_t *rcondv,
-                int *info);
+                                 const igraph_matrix_t *A,
+                                 igraph_vector_t *valuesreal,
+                                 igraph_vector_t *valuesimag,
+                                 igraph_matrix_t *vectorsleft,
+                                 igraph_matrix_t *vectorsright,
+                                 int *ilo, int *ihi, igraph_vector_t *scale,
+                                 igraph_real_t *abnrm,
+                                 igraph_vector_t *rconde,
+                                 igraph_vector_t *rcondv,
+                                 int *info);
 
-DECLDIR int igraph_lapack_dgehrd(const igraph_matrix_t *A, 
-                int ilo, int ihi,
-                igraph_matrix_t *result);
+DECLDIR int igraph_lapack_dgehrd(const igraph_matrix_t *A,
+                                 int ilo, int ihi,
+                                 igraph_matrix_t *result);
 
 DECLDIR int igraph_lapack_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
-                igraph_real_t *res);
-			
+                               igraph_real_t *res);
+
 __END_DECLS
 
 #endif

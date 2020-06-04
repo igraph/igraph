@@ -21,6 +21,7 @@
 <!-- doxrox-include igraph_all_st_mincuts -->
 <!-- doxrox-include igraph_mincut -->
 <!-- doxrox-include igraph_mincut_value -->
+<!-- doxrox-include igraph_gomory_hu_tree -->
 </section>
 
 <section><title>Connectivity</title>

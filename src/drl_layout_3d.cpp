@@ -1,29 +1,29 @@
-/* 
+/*
  * Copyright 2007 Sandia Corporation. Under the terms of Contract
  * DE-AC04-94AL85000 with Sandia Corporation, the U.S. Government retains
  * certain rights in this software.
- * 
+ *
  * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions are 
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are
  * met:
- * 
- *     * Redistributions of source code must retain the above copyright 
+ *
+ *     * Redistributions of source code must retain the above copyright
  * notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright 
- * notice, this list of conditions and the following disclaimer in the 
+ *     * Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
- *     * Neither the name of Sandia National Laboratories nor the names of 
- * its contributors may be used to endorse or promote products derived from 
+ *     * Neither the name of Sandia National Laboratories nor the names of
+ * its contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED 
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
  * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -45,12 +45,7 @@
 // 5/6/2005
 
 // C++ library routines
-#include <iostream>
-#include <fstream>
 #include <map>
-#include <set>
-#include <string>
-#include <deque>
 #include <vector>
 
 using namespace std;
@@ -62,7 +57,7 @@ using namespace std;
 
 // MPI
 #ifdef MUSE_MPI
-  #include <mpi.h>
+    #include <mpi.h>
 #endif
 
 using namespace drl3d;
@@ -73,7 +68,7 @@ using namespace drl3d;
 /**
  * \function igraph_layout_drl_3d
  * The DrL layout generator, 3d version.
- * 
+ *
  * This function implements the force-directed DrL layout generator.
  * Please see more in the technical report: Martin, S., Brown, W.M.,
  * Klavans, R., Boyack, K.W., DrL: Distributed Recursive (Graph)
@@ -95,29 +90,29 @@ using namespace drl3d;
  *    given in the \p res matrix. This argument is ignored if it is a
  *    null pointer or if use_seed is false.
  * \return Error code.
- * 
+ *
  * Time complexity: ???.
- * 
+ *
  * \sa \ref igraph_layout_drl() for the standard 2d version.
  */
 
-int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res, 
-			 igraph_bool_t use_seed,
-			 igraph_layout_drl_options_t *options,
-			 const igraph_vector_t *weights,
-			 const igraph_vector_bool_t *fixed) {
-  
-  RNG_BEGIN();
+int igraph_layout_drl_3d(const igraph_t *graph, igraph_matrix_t *res,
+                         igraph_bool_t use_seed,
+                         igraph_layout_drl_options_t *options,
+                         const igraph_vector_t *weights,
+                         const igraph_vector_bool_t *fixed) {
 
-  drl3d::graph neighbors(graph, options, weights);
-  neighbors.init_parms(options);
-  if (use_seed) {
-    IGRAPH_CHECK(igraph_matrix_resize(res, igraph_vcount(graph), 3));
-    neighbors.read_real(res, fixed);
-  }
-  neighbors.draw_graph(res);
+    RNG_BEGIN();
 
-  RNG_END();
-  
-  return 0;
-}	      
+    drl3d::graph neighbors(graph, options, weights);
+    neighbors.init_parms(options);
+    if (use_seed) {
+        IGRAPH_CHECK(igraph_matrix_resize(res, igraph_vcount(graph), 3));
+        neighbors.read_real(res, fixed);
+    }
+    neighbors.draw_graph(res);
+
+    RNG_END();
+
+    return 0;
+}

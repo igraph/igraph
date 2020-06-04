@@ -99,7 +99,8 @@ AT_CLEANUP
 
 AT_SETUP([Betweenness (igraph_betweenness): ])
 AT_KEYWORDS([igraph_betweenness betweenness])
-AT_COMPILE_CHECK([simple/igraph_betweenness.c])
+AT_COMPILE_CHECK([simple/igraph_betweenness.c],
+                 [simple/igraph_betweenness.out])
 AT_CLEANUP
 
 AT_SETUP([Betweenness, big integers (igraph_betweenness): ])
@@ -111,6 +112,12 @@ AT_SETUP([Edge betweenness (igraph_edge_betweenness): ])
 AT_KEYWORDS([igraph_edge_betweenness betwenness])
 AT_COMPILE_CHECK([simple/igraph_edge_betweenness.c], 
 	         [simple/igraph_edge_betweenness.out])
+AT_CLEANUP
+
+AT_SETUP([Vertex closeness estimate (igraph_closeness): ])
+AT_KEYWORDS([igraph_closeness closeness])
+AT_COMPILE_CHECK([tests/igraph_closeness.c],
+                 [tests/igraph_closeness.out])
 AT_CLEANUP
 
 AT_SETUP([Transitivity (igraph_transitivity): ])
@@ -151,7 +158,7 @@ AT_CLEANUP
 
 AT_SETUP([Topological sorting (igraph_topological_sorting, igraph_is_dag): ])
 AT_KEYWORDS([topological sorting directed acyclic graphs])
-AT_COMPILE_CHECK([simple/igraph_topological_sorting.c], [simple/igraph_topological_sorting.out])
+AT_COMPILE_CHECK([tests/igraph_topological_sorting.c], [tests/igraph_topological_sorting.out])
 AT_CLEANUP
 
 AT_SETUP([Feedback arc sets, Eades heuristics (igraph_feedback_arc_set): ])

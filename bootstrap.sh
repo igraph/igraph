@@ -1,5 +1,7 @@
 #! /bin/sh
 
+cd "`dirname $0`"
+
 ## Find out our version number, need git for this
 printf "Finding out version number/string... "
 tools/getversion.sh > IGRAPH_VERSION
@@ -13,12 +15,20 @@ if [ -z "$LIBTOOLIZE" ]; then
   exit 1
 fi
 
+mkdir -p m4
+
 set -x
-aclocal
+
+# Order of commands in the next few lines are taken from here:
+# https://stackoverflow.com/a/11279735/156771
+
 $LIBTOOLIZE --force --copy
+
+aclocal -I m4 --install
 autoheader
-automake --add-missing --copy
 autoconf
+
+automake --foreign --add-missing --force-missing --copy
 
 # Try to patch ltmain.sh to allow -fsanitize=* linker flags to be passed
 # through to the linker. Don't do anything if it fails; maybe libtool has

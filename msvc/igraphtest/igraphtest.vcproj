@@ -21,7 +21,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\igraph-0.7-msvc\include&quot;"
+				AdditionalIncludeDirectories="&quot;..\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -37,7 +37,7 @@
 				AdditionalDependencies="igraph.lib"
 				OutputFile="$(OutDir)/igraphtest.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\igraph-0.7-msvc\Debug&quot;"
+				AdditionalLibraryDirectories="&quot;..\Debug&quot;"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/igraphtest.pdb"
@@ -73,7 +73,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;..\igraph-0.7-msvc\include&quot;"
+				AdditionalIncludeDirectories="&quot;..\include&quot;"
 				PreprocessorDefinitions="WIN64;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -89,7 +89,7 @@
 				AdditionalDependencies="igraph.lib"
 				OutputFile="$(OutDir)/igraphtest.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;..\igraph-0.7-msvc\Debug&quot;"
+				AdditionalLibraryDirectories="&quot;..\Debug&quot;"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/igraphtest.pdb"
@@ -124,7 +124,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;..\igraph-0.7-msvc\include&quot;"
+				AdditionalIncludeDirectories="&quot;..\include&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
@@ -138,7 +138,7 @@
 				AdditionalDependencies="igraph.lib"
 				OutputFile="$(OutDir)/igraphtest.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\igraph-0.7-msvc\Release"
+				AdditionalLibraryDirectories="..\Release"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
@@ -174,7 +174,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;..\igraph-0.7-msvc\include&quot;"
+				AdditionalIncludeDirectories="&quot;..\include&quot;"
 				PreprocessorDefinitions="WIN64;NDEBUG;_CONSOLE"
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
@@ -188,7 +188,7 @@
 				AdditionalDependencies="igraph.lib"
 				OutputFile="$(OutDir)/igraphtest.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\igraph-0.7-msvc\Release"
+				AdditionalLibraryDirectories="..\Release"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMT.lib"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"

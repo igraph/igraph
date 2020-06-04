@@ -64,9 +64,9 @@ if INTERNAL_F2C
   libf2c_la_SOURCES = f2c.h f2c/fio.h f2c/fmt.h f2c/sysdep1.h\
 					  f2c/sysdep1.h0 f2c/lio.h f2c/fp.h f2c/signal1.h\
 					  f2c/signal1.h0 $(F2C)
-  libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I. -I$(top_srcdir)/include -I$(top_builddir)/include $(WARNING_CFLAGS)
+  libf2c_la_CFLAGS = -DSkip_f2c_Undefs -I. -I$(top_srcdir)/include -I$(top_builddir)/include -I$(top_builddir)/src/f2c $(WARNING_CFLAGS)
   f2c/arith.h: f2c/arithchk.c
-	$(CC) $(CFLAGS) -DNO_FPINIT f2c/arithchk.c -lm -o f2c/arith || \
+	$(CC) $(CFLAGS) -DNO_FPINIT $(top_srcdir)/src/f2c/arithchk.c -lm -o f2c/arith || \
 	$(CC) -DNO_LONG_LONG $(CFLAGS) -DNO_FPINIT $(top_srcdir)/src/f2c/arithchk.c \
 		$(WARNING_CFLAGS) -lm -o f2c/arith
 	f2c/arith > f2c/arith.h
@@ -348,7 +348,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     walktrap.cpp walktrap_heap.cpp \
 			     walktrap_graph.cpp walktrap_communities.cpp \
 			     infomap.cc infomap_Greedy.cc infomap_Node.cc infomap_FlowGraph.cc \
-			     spmatrix.c community.c fast_community.c \
+			     spmatrix.c community.c fast_community.c community_leiden.c \
 			     gml_tree.c \
 			     bliss/orbit.cc bliss/defs.cc bliss/uintseqhash.cc \
 			     bliss/partition.cc bliss/graph.cc \
@@ -418,8 +418,8 @@ endif
 libigraph_la_CFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
 libigraph_la_CXXFLAGS += -I$(top_srcdir)/src/prpack -DPRPACK_IGRAPH_SUPPORT
 
-includedir = $(prefix)/include/igraph
-include_HEADERS = $(HEADERS_PUBLIC)
+igraphincludedir = $(includedir)/igraph
+igraphinclude_HEADERS = $(HEADERS_PUBLIC)
 
 MAINTAINERCLEANFILES = Makefile.in foreign-lgl-parser.h foreign-ncol-parser.h
 

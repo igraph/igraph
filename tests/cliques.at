@@ -52,6 +52,17 @@ AT_COMPILE_CHECK([simple/igraph_maximal_cliques4.c],
                  [simple/igraph_maximal_cliques4.out])
 AT_CLEANUP
 
+AT_SETUP([Maximal cliques callback (igraph_maximal_cliques_callback):])
+AT_KEYWORDS([igraph_maximal_cliques cliques maximal cliques])
+AT_COMPILE_CHECK([tests/maximal_cliques_callback.c])
+AT_CLEANUP
+
+AT_SETUP([Maximal cliques histogram (igraph_maximal_cliques_hist):])
+AT_KEYWORDS([igraph_maximal_cliques cliques maximal cliques])
+AT_COMPILE_CHECK([tests/maximal_cliques_hist.c],
+                 [tests/maximal_cliques_hist.out])
+AT_CLEANUP
+
 AT_SETUP([Weighted cliques (igraph_weighted_cliques):])
 AT_KEYWORDS([igraph_weighted_cliques cliques])
 AT_COMPILE_CHECK([simple/igraph_weighted_cliques.c],

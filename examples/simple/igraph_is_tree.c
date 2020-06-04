@@ -27,7 +27,7 @@ int main() {
 
     /*  4-cycle, not a tree */
     igraph_small(&g, 4, 0,
-                 0,1, 1,2, 2,3, 3,0, -1);
+                 0, 1, 1, 2, 2, 3, 3, 0, -1);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     assert(! res);
@@ -36,7 +36,7 @@ int main() {
 
     /* disconnected graph with the same number of edges a tree would have */
     igraph_small(&g, 4, 0,
-                 0,1, 1,2, 0,2, 3,4, -1);
+                 0, 1, 1, 2, 0, 2, 3, 4, -1);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     assert(! res);
@@ -45,7 +45,7 @@ int main() {
 
     /* 3-star, tree */
     igraph_small(&g, 4, 0,
-                 0,1, 0,2, 0,3, -1);
+                 0, 1, 0, 2, 0, 3, -1);
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
@@ -56,7 +56,7 @@ int main() {
 
     /* out-tree */
     igraph_small(&g, 4, 1,
-                 0,1, 1,2, 1,3, -1);
+                 0, 1, 1, 2, 1, 3, -1);
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_OUT);
@@ -75,7 +75,7 @@ int main() {
 
     /* in-tree */
     igraph_small(&g, 4, 1,
-                 0,1, 2,1, 1,3, -1);
+                 0, 1, 2, 1, 1, 3, -1);
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_IN);
@@ -94,7 +94,7 @@ int main() {
 
     /* neither an in-tree, nor an out-ree, but still a tree when ignoring edge-directions */
     igraph_small(&g, 6, 1,
-                 0,1, 1,2, 2,3, 4,1, 2,5, -1);
+                 0, 1, 1, 2, 2, 3, 4, 1, 2, 5, -1);
 
     root = -1;
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
@@ -114,7 +114,7 @@ int main() {
      * https://github.com/igraph/igraph/pull/1160
      */
     igraph_small(&g, 5, 0,
-                 0,3, 0,4, 1,3, 1,4, -1);
+                 0, 3, 0, 4, 1, 3, 1, 4, -1);
 
     igraph_is_tree(&g, &res, &root, IGRAPH_ALL);
     assert(! res);

@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -35,10 +35,10 @@ using namespace std;
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
 int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
-            igraph_real_t *value, const igraph_vs_t vids,
-            igraph_bool_t directed, igraph_real_t damping, 
-            igraph_vector_t *reset,
-            const igraph_vector_t *weights) {
+                                        igraph_real_t *value, const igraph_vs_t vids,
+                                        igraph_bool_t directed, igraph_real_t damping,
+                                        igraph_vector_t *reset,
+                                        const igraph_vector_t *weights) {
     long int i, no_of_nodes = igraph_vcount(graph), nodes_to_calc;
     igraph_vit_t vit;
     double* u = 0;
@@ -69,7 +69,7 @@ int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *
 
     // Delete the personalization vector
     if (v) {
-	delete[] v;
+        delete[] v;
     }
 
     // Check whether the solver converged
@@ -83,10 +83,10 @@ int igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *
     // Fill the result vector
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
-    nodes_to_calc=IGRAPH_VIT_SIZE(vit);
+    nodes_to_calc = IGRAPH_VIT_SIZE(vit);
     IGRAPH_CHECK(igraph_vector_resize(vector, nodes_to_calc));
     for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit);
-            IGRAPH_VIT_NEXT(vit), i++) {
+         IGRAPH_VIT_NEXT(vit), i++) {
         VECTOR(*vector)[i] = res->x[(long int)IGRAPH_VIT_GET(vit)];
     }
     igraph_vit_destroy(&vit);

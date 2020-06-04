@@ -4,14 +4,14 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or (at
+ * the Free Software Foundation; either version 2 of the License, or (at
  * your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
@@ -35,10 +35,20 @@
 __BEGIN_DECLS
 
 #ifdef _MSC_VER
-#define snprintf sprintf_s
+#include <float.h>
+#include <math.h>
+
+#define snprintf _snprintf
 #define inline  __inline
-#define isnan(x) _isnan(x)
+#define isnan(x) ((x) != (x))
 #define isfinite(x) _finite(x)
+
+extern double _plfit_fmin(double a, double b);
+extern double _plfit_round(double x);
+
+#define fmin _plfit_fmin
+#define round _plfit_round
+
 #endif
 
 #ifndef INFINITY
@@ -46,7 +56,7 @@ __BEGIN_DECLS
 #endif
 
 #ifndef NAN
-#  define NAN (INFINITY-INFINITY)
+#  define NAN ((double)0.0 / (double)DBL_MIN)
 #endif
 
 __END_DECLS

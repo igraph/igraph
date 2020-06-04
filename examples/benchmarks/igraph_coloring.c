@@ -14,8 +14,8 @@ int main() {
     igraph_vector_int_init(&colors, 0);
 
     BENCH("1 Vertex coloring a random graph with 30,000 vertices and 300,000 edges.",
-        igraph_vertex_coloring_greedy(&g, &colors, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS)
-    );
+          igraph_vertex_coloring_greedy(&g, &colors, IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS)
+         );
 
     /* Use the result to prevent optimizing it away. */
     printf("Number of colors used: %d\n", igraph_vector_int_max(&colors));

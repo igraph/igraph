@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2010-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -40,14 +40,14 @@
 */
 
 typedef struct igraph_marked_queue_t {
-  igraph_dqueue_t Q;
-  igraph_vector_long_t set;
-  long int mark;
-  long int size;
+    igraph_dqueue_t Q;
+    igraph_vector_long_t set;
+    long int mark;
+    long int size;
 } igraph_marked_queue_t;
 
 int igraph_marked_queue_init(igraph_marked_queue_t *q,
-			     long int size);
+                             long int size);
 void igraph_marked_queue_destroy(igraph_marked_queue_t *q);
 void igraph_marked_queue_reset(igraph_marked_queue_t *q);
 
@@ -56,15 +56,15 @@ long int igraph_marked_queue_size(const igraph_marked_queue_t *q);
 int igraph_marked_queue_print(const igraph_marked_queue_t *q);
 int igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file);
 
-igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q, 
-					    long int elem);
+igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q,
+        long int elem);
 
 int igraph_marked_queue_push(igraph_marked_queue_t *q, long int elem);
 
 int igraph_marked_queue_start_batch(igraph_marked_queue_t *q);
 void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q);
 
-int igraph_marked_queue_as_vector(const igraph_marked_queue_t *q, 
-				  igraph_vector_t *vec);
+int igraph_marked_queue_as_vector(const igraph_marked_queue_t *q,
+                                  igraph_vector_t *vec);
 
 #endif

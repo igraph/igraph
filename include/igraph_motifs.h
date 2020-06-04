@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -38,7 +38,7 @@ __BEGIN_DECLS
 /**
  * \typedef igraph_motifs_handler_t
  * Callback type for \c igraph_motifs_randesu_callback
- * 
+ *
  * \ref igraph_motifs_randesu_callback() calls a specified callback
  * function whenever a new motif is found during a motif search. This
  * callback function must be of type \c igraph_motifs_handler_t. It has
@@ -55,42 +55,42 @@ __BEGIN_DECLS
  *   igraph_motifs_randesu_callback().
  * \return A logical value, if TRUE (=non-zero), that is interpreted
  *    as a request to stop the motif search and return to the caller.
- * 
+ *
  * \sa \ref igraph_motifs_randesu_callback()
  */
 
 typedef igraph_bool_t igraph_motifs_handler_t(const igraph_t *graph,
-					      igraph_vector_t *vids,
-					      int isoclass,
-					      void* extra);
+        igraph_vector_t *vids,
+        int isoclass,
+        void* extra);
 
-DECLDIR int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist, 
-                int size, const igraph_vector_t *cut_prob);
+DECLDIR int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
+                                  int size, const igraph_vector_t *cut_prob);
 
 DECLDIR int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
-                const igraph_vector_t *cut_prob,
-                igraph_motifs_handler_t *callback,
-                void* extra);
+        const igraph_vector_t *cut_prob,
+        igraph_motifs_handler_t *callback,
+        void* extra);
 
 DECLDIR int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
-                int size, const igraph_vector_t *cut_prob, 
-                igraph_integer_t sample_size, 
-                const igraph_vector_t *sample);
+        int size, const igraph_vector_t *cut_prob,
+        igraph_integer_t sample_size,
+        const igraph_vector_t *sample);
 DECLDIR int igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
-                int size, const igraph_vector_t *cut_prob);
+                                     int size, const igraph_vector_t *cut_prob);
 
 DECLDIR int igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
-                igraph_integer_t *asym, igraph_integer_t *null);
+                               igraph_integer_t *asym, igraph_integer_t *null);
 DECLDIR int igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
 DECLDIR int igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
-                igraph_real_t *res4);
+                                   igraph_real_t *res4);
 
 DECLDIR int igraph_adjacent_triangles(const igraph_t *graph,
-                igraph_vector_t *res,
-                const igraph_vs_t vids);
+                                      igraph_vector_t *res,
+                                      const igraph_vs_t vids);
 
 DECLDIR int igraph_list_triangles(const igraph_t *graph,
-                igraph_vector_int_t *res);
+                                  igraph_vector_int_t *res);
 
 __END_DECLS
 

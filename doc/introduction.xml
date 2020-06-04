@@ -4,32 +4,31 @@
 <!ENTITY igraph "igraph">
 ]>
 
-<chapter id="igraph-introduction">
+<chapter id="igraph-Introduction">
 <title>Introduction</title>
 
 <para>
-This is another library for creating and manipulating graphs.
-You can look at it two ways: first, igraph contains the implementation
-of quite a lot graph algorithms. These include classic graph
+igraph is a library for creating and manipulating graphs.
+You can look at it in two ways: first, igraph contains the implementation
+of quite a lot of graph algorithms. These include classic graph
 algorithms like graph isomorphism, graph girth and connectivity and
 also the new wave graph algorithms like transitivity, graph motifs and 
 community structure detection. Skim through the table of contents
-or the index of this book to get an impression.</para>
+or the index of this book to get an impression of what is available.</para>
 
 <para>
-Second, igraph provides a platform for the developing and/or
-implementing graph algorithms. It has a quite efficient data structure
-for representing graphs and a number of other data structures like
-flexible vectors, stacks, heaps, queues, adjacency lists to accomplish
-this. In fact these data structures evolved along the
+Second, igraph provides a platform for developing and/or
+implementing graph algorithms. It has an efficient data structure
+for representing graphs, and a number of other data structures like
+flexible vectors, stacks, heaps, queues, adjacency lists that are useful for implementing graph algorithms. In fact these data structures evolved along with the
 implementation of the classic and non-classic graph algorithms which
-make up the major part of the igraph library. This way they were fine tuned
+make up the major part of the igraph library. This way, they were fine-tuned
 and checked for correctness several times.
 </para>
 
 <para>
 Our main goal with developing igraph was to create a graph library
-which is efficient on large but not extremely large graphs. More
+which is efficient on large, but not extremely large graphs. More
 precisely, it is assumed that the graph(s) fit into the physical
 memory of the computer. Nowadays this means graphs with
 several million vertices and/or edges. Our definition of efficient is
@@ -38,18 +37,17 @@ that it runs fast, both in theory and (more importantly) in practice.
 
 <para>
 We believe that one of the big strengths of igraph is that it can be
-embedded into a higher level language or environment. Two such
-embeddings (or interfaces if you look at them the other way)
-are currently being developed by us: igraph as a GNU R
-package and igraph as a Python extension module. A third embedding,
-being developed by another developer is a Ruby extension. Other are
-likely to come. The high level languages as R or Python make it
-possible to do use graph routines with mush greater comfort, without
+embedded into a higher-level language or environment. Three such
+embeddings (or interfaces if you look at them another way)
+are currently being developed by us: an R
+package, a Python extension module, and a Mathematica (Wolfram Language) package. Others are
+likely to come. High level languages such as R or Python make it
+possible to use graph routines with much greater comfort, without
 actually writing a single line of C code. They have some, usually very
-small, speed penalty compared to the C version, but add ease and much
-flexibility. This manual however covers only the C library. If you 
-want to use Python or GNU R, please see the documentation written
-specifically for these interfaces and come back here only if you're
+small, speed penalty compared to the C version, but add ease of use and much
+flexibility. This manual, however, covers only the C library. If you 
+want to use Python, R or the Wolfram Language, please see the documentation written
+specifically for these interfaces and come back here only if you are
 interested in some detail which is not covered in those documents.
 </para>
 
@@ -64,7 +62,7 @@ to add and what to improve.
 <para>
 igraph is open source and distributed under the terms of the GNU GPL.
 We strongly believe that all the algorithms used in science, let that
-be graph theory or not, should have an efficient open source
+be graph theory or not, should have an efficient open-source
 implementation allowing use and modification for anyone.
 </para>
 
@@ -72,7 +70,7 @@ implementation allowing use and modification for anyone.
 <para>
     igraph library
 </para><para>
-    Copyright (C) 2003-2012  Gabor Csardi &lt;csardi.gabor@gmail.com>
+    Copyright (C) 2003-2012  Gábor Csardi &lt;csardi.gabor@gmail.com>
     334 Harvard st, Cambridge MA, 02139, USA
 </para><para>
     This program is free software; you can redistribute it and/or modify
@@ -98,6 +96,8 @@ reference:
 </para><para>
 Gábor Csárdi, Tamás Nepusz: The igraph software package for complex network
 research. InterJournal Complex Systems, 1695, 2006.
+</para><para>
+The igraph C library is assigned the DOI <ulink url="https://doi.org/10.5281/zenodo.3630268">10.5281/zenodo.3630268</ulink> on Zenodo.
 </para>
 
 </section>

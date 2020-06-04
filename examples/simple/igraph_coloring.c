@@ -18,8 +18,9 @@ int main() {
     {
         long i;
         long no_of_edges = igraph_ecount(&graph);
-        for (i=0; i < no_of_edges; ++i)
+        for (i = 0; i < no_of_edges; ++i) {
             assert( VECTOR(colors)[ IGRAPH_FROM(&graph, i) ] != VECTOR(colors)[ IGRAPH_TO(&graph, i) ]  );
+        }
     }
 
     igraph_vector_int_destroy(&colors);

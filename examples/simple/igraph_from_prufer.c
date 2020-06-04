@@ -7,8 +7,9 @@ void print_edges(const igraph_t *graph) {
     long ecount = igraph_ecount(graph);
     long i;
 
-    for (i=0; i < ecount; ++i)
+    for (i = 0; i < ecount; ++i) {
         printf("%d %d\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
+    }
     printf("\n");
 }
 

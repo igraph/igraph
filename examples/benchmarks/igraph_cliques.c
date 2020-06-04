@@ -15,16 +15,16 @@ int main() {
     igraph_vector_ptr_init(&res, 0);
 
     BENCH("1 Cliques in random graph with 100 vertices and 3000 edges",
-        igraph_cliques(&g, &res, /* min_size= */ 0, /* max_size= */ 0);
-    );
+          igraph_cliques(&g, &res, /* min_size= */ 0, /* max_size= */ 0);
+         );
 
     igraph_destroy(&g);
 
-    n=igraph_vector_ptr_size(&res);
-    for (i=0; i<n; i++) {
-      igraph_vector_t *v=VECTOR(res)[i];
-      igraph_vector_destroy(v);
-      igraph_free(v);
+    n = igraph_vector_ptr_size(&res);
+    for (i = 0; i < n; i++) {
+        igraph_vector_t *v = VECTOR(res)[i];
+        igraph_vector_destroy(v);
+        igraph_free(v);
     }
     igraph_vector_ptr_destroy(&res);
 

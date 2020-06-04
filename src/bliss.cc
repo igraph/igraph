@@ -33,66 +33,72 @@ using namespace std;
 namespace { // unnamed namespace
 
 inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
-  unsigned int nof_vertices= (unsigned int)igraph_vcount(graph);
-  unsigned int nof_edges= (unsigned int)igraph_ecount(graph);
+    unsigned int nof_vertices = (unsigned int)igraph_vcount(graph);
+    unsigned int nof_edges = (unsigned int)igraph_ecount(graph);
 
-  AbstractGraph *g;
+    AbstractGraph *g;
 
-  if (igraph_is_directed(graph))
-    g = new Digraph(nof_vertices);
-  else
-    g = new Graph(nof_vertices);
+    if (igraph_is_directed(graph)) {
+        g = new Digraph(nof_vertices);
+    } else {
+        g = new Graph(nof_vertices);
+    }
 
-  g->set_verbose_level(0);
+    g->set_verbose_level(0);
 
-  for (unsigned int i=0; i<nof_edges; i++) {
-    g->add_edge((unsigned int)IGRAPH_FROM(graph, i), (unsigned int)IGRAPH_TO(graph, i));
-  }
-  return g;
+    for (unsigned int i = 0; i < nof_edges; i++) {
+        g->add_edge((unsigned int)IGRAPH_FROM(graph, i), (unsigned int)IGRAPH_TO(graph, i));
+    }
+    return g;
 }
 
 
-void bliss_free_graph(AbstractGraph *g) { delete g; }
+void bliss_free_graph(AbstractGraph *g) {
+    delete g;
+}
 
 
 inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
     if (directed) {
-      Digraph::SplittingHeuristic gsh = Digraph::shs_fsm;
-      switch (sh) {
-      case IGRAPH_BLISS_F:    gsh = Digraph::shs_f;   break;
-      case IGRAPH_BLISS_FL:   gsh = Digraph::shs_fl;  break;
-      case IGRAPH_BLISS_FS:   gsh = Digraph::shs_fs;  break;
-      case IGRAPH_BLISS_FM:   gsh = Digraph::shs_fm;  break;
-      case IGRAPH_BLISS_FLM:  gsh = Digraph::shs_flm; break;
-      case IGRAPH_BLISS_FSM:  gsh = Digraph::shs_fsm; break;
-      default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
-      }
-      static_cast<Digraph *>(g)->set_splitting_heuristic(gsh);
+        Digraph::SplittingHeuristic gsh = Digraph::shs_fsm;
+        switch (sh) {
+        case IGRAPH_BLISS_F:    gsh = Digraph::shs_f;   break;
+        case IGRAPH_BLISS_FL:   gsh = Digraph::shs_fl;  break;
+        case IGRAPH_BLISS_FS:   gsh = Digraph::shs_fs;  break;
+        case IGRAPH_BLISS_FM:   gsh = Digraph::shs_fm;  break;
+        case IGRAPH_BLISS_FLM:  gsh = Digraph::shs_flm; break;
+        case IGRAPH_BLISS_FSM:  gsh = Digraph::shs_fsm; break;
+        default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
+        }
+        static_cast<Digraph *>(g)->set_splitting_heuristic(gsh);
     } else {
-      Graph::SplittingHeuristic gsh = Graph::shs_fsm;
-      switch (sh) {
-      case IGRAPH_BLISS_F:    gsh = Graph::shs_f;   break;
-      case IGRAPH_BLISS_FL:   gsh = Graph::shs_fl;  break;
-      case IGRAPH_BLISS_FS:   gsh = Graph::shs_fs;  break;
-      case IGRAPH_BLISS_FM:   gsh = Graph::shs_fm;  break;
-      case IGRAPH_BLISS_FLM:  gsh = Graph::shs_flm; break;
-      case IGRAPH_BLISS_FSM:  gsh = Graph::shs_fsm; break;
-      default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
-      }
-      static_cast<Graph *>(g)->set_splitting_heuristic(gsh);
+        Graph::SplittingHeuristic gsh = Graph::shs_fsm;
+        switch (sh) {
+        case IGRAPH_BLISS_F:    gsh = Graph::shs_f;   break;
+        case IGRAPH_BLISS_FL:   gsh = Graph::shs_fl;  break;
+        case IGRAPH_BLISS_FS:   gsh = Graph::shs_fs;  break;
+        case IGRAPH_BLISS_FM:   gsh = Graph::shs_fm;  break;
+        case IGRAPH_BLISS_FLM:  gsh = Graph::shs_flm; break;
+        case IGRAPH_BLISS_FSM:  gsh = Graph::shs_fsm; break;
+        default: IGRAPH_ERROR("Invalid splitting heuristic", IGRAPH_EINVAL);
+        }
+        static_cast<Graph *>(g)->set_splitting_heuristic(gsh);
     }
     return IGRAPH_SUCCESS;
 }
 
 
 inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors) {
-    if (colors == NULL)
+    if (colors == NULL) {
         return IGRAPH_SUCCESS;
+    }
     const int n = g->get_nof_vertices();
-    if (n != igraph_vector_int_size(colors))
+    if (n != igraph_vector_int_size(colors)) {
         IGRAPH_ERROR("Invalid vertex color vector length", IGRAPH_EINVAL);
-    for (int i=0; i < n; ++i)
+    }
+    for (int i = 0; i < n; ++i) {
         g->change_color(i, VECTOR(*colors)[i]);
+    }
     return IGRAPH_SUCCESS;
 }
 
@@ -116,7 +122,7 @@ void collect_generators(void *generators, unsigned int n, const unsigned int *au
     igraph_vector_ptr_t *gen = static_cast<igraph_vector_ptr_t *>(generators);
     igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
     igraph_vector_init(newvector, n);
-    copy(aut, aut+n, newvector->stor_begin); // takes care of unsigned int -> double conversion
+    copy(aut, aut + n, newvector->stor_begin); // takes care of unsigned int -> double conversion
     igraph_vector_ptr_push_back(gen, newvector);
 }
 
@@ -125,10 +131,10 @@ void collect_generators(void *generators, unsigned int n, const unsigned int *au
 /**
  * \function igraph_canonical_permutation
  * Canonical permutation using BLISS
- * 
+ *
  * This function computes the canonical permutation which transforms
  * the graph into a canonical form by using the BLISS algorithm.
- * 
+ *
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
@@ -142,43 +148,43 @@ void collect_generators(void *generators, unsigned int n, const unsigned int *au
  * \param info If not \c NULL then information on BLISS internals is
  *    stored here. See \ref igraph_bliss_info_t.
  * \return Error code.
- * 
+ *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
 int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors,
-                igraph_vector_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
-  AbstractGraph *g = bliss_from_igraph(graph);
-  IGRAPH_FINALLY(bliss_free_graph, g);
-  const unsigned int N=g->get_nof_vertices();
+                                 igraph_vector_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+    AbstractGraph *g = bliss_from_igraph(graph);
+    IGRAPH_FINALLY(bliss_free_graph, g);
+    const unsigned int N = g->get_nof_vertices();
 
-  IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
-  IGRAPH_CHECK(bliss_set_colors(g, colors));
+    IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+    IGRAPH_CHECK(bliss_set_colors(g, colors));
 
-  Stats stats;
-  const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
-  IGRAPH_CHECK(igraph_vector_resize(labeling, N));
-  for (unsigned int i=0; i<N; i++) {
-    VECTOR(*labeling)[i] = cl[i];
-  }
+    Stats stats;
+    const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
+    IGRAPH_CHECK(igraph_vector_resize(labeling, N));
+    for (unsigned int i = 0; i < N; i++) {
+        VECTOR(*labeling)[i] = cl[i];
+    }
 
-  bliss_info_to_igraph(info, stats);
-  
-  delete g;
-  IGRAPH_FINALLY_CLEAN(1);
-  return IGRAPH_SUCCESS;
+    bliss_info_to_igraph(info, stats);
+
+    delete g;
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
 }
 
 /**
  * \function igraph_automorphisms
  * Number of automorphisms using BLISS
- * 
+ *
  * The number of automorphisms of a graph is computed using BLISS. The
  * result is returned as part of the \p info structure, in tag \c
  * group_size. It is returned as a string, as it can be very high even
  * for relatively small graphs. If the GNU MP library is used then
  * this number is exact, otherwise a <type>long double</type> is used
  * and it is only approximate. See also \ref igraph_bliss_info_t.
- * 
+ *
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
@@ -188,26 +194,25 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
  * \param info The result is stored here, in particular in the \c
  *    group_size tag of \p info.
  * \return Error code.
- * 
+ *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
 int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
-             igraph_bliss_sh_t sh, igraph_bliss_info_t *info)
-{
-  AbstractGraph *g = bliss_from_igraph(graph);
-  IGRAPH_FINALLY(bliss_free_graph, g);
+                         igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
+    AbstractGraph *g = bliss_from_igraph(graph);
+    IGRAPH_FINALLY(bliss_free_graph, g);
 
-  IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
-  IGRAPH_CHECK(bliss_set_colors(g, colors));
+    IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+    IGRAPH_CHECK(bliss_set_colors(g, colors));
 
-  Stats stats;
-  g->find_automorphisms(stats, NULL, NULL);
-  
-  bliss_info_to_igraph(info, stats);
+    Stats stats;
+    g->find_automorphisms(stats, NULL, NULL);
 
-  delete g;
-  IGRAPH_FINALLY_CLEAN(1);
-  return IGRAPH_SUCCESS;
+    bliss_info_to_igraph(info, stats);
+
+    delete g;
+    IGRAPH_FINALLY_CLEAN(1);
+    return IGRAPH_SUCCESS;
 }
 
 /**
@@ -234,9 +239,8 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
 int igraph_automorphism_group(
-        const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_ptr_t *generators,
-        igraph_bliss_sh_t sh, igraph_bliss_info_t *info)
-{
+    const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_ptr_t *generators,
+    igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     AbstractGraph *g = bliss_from_igraph(graph);
     IGRAPH_FINALLY(bliss_free_graph, g);
 

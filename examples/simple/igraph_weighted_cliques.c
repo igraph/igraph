@@ -10,15 +10,19 @@ int compare_vectors(const void *p1, const void *p2) {
     v2 = *((igraph_vector_t **) p2);
     s1 = igraph_vector_size(v1);
     s2 = igraph_vector_size(v2);
-    if (s1 < s2)
+    if (s1 < s2) {
         return -1;
-    if (s1 > s2)
+    }
+    if (s1 > s2) {
         return 1;
-    for (i=0; i < s1; ++i) {
-        if (VECTOR(*v1)[i] < VECTOR(*v2)[i])
+    }
+    for (i = 0; i < s1; ++i) {
+        if (VECTOR(*v1)[i] < VECTOR(*v2)[i]) {
             return -1;
-        if (VECTOR(*v1)[i] > VECTOR(*v2)[i])
+        }
+        if (VECTOR(*v1)[i] > VECTOR(*v2)[i]) {
             return 1;
+        }
     }
     return 0;
 }
@@ -27,7 +31,7 @@ int compare_vectors(const void *p1, const void *p2) {
 void canonicalize_list(igraph_vector_ptr_t *list) {
     long i, len;
     len = igraph_vector_ptr_size(list);
-    for (i=0; i<len; ++i) {
+    for (i = 0; i < len; ++i) {
         igraph_vector_sort((igraph_vector_t *) VECTOR(*list)[i]);
     }
     qsort(&(VECTOR(*list)[0]), len, sizeof(void *), &compare_vectors);
@@ -35,9 +39,9 @@ void canonicalize_list(igraph_vector_ptr_t *list) {
 
 /* Prints a clique vector along with its weight */
 void print_weighted_clique(const igraph_vector_t *clique, const igraph_vector_t *vertex_weights) {
-    long int i, n=igraph_vector_size(clique);
+    long int i, n = igraph_vector_size(clique);
     igraph_real_t clique_weight = 0.0;
-    for (i=0; i<n; i++) {
+    for (i = 0; i < n; i++) {
         int v = VECTOR(*clique)[i];
         clique_weight += igraph_vector_e(vertex_weights, v);
         printf(" %d", v);
@@ -55,7 +59,8 @@ int main() {
     igraph_real_t edge_data[] = {0., 1., 0., 6., 0., 7., 0., 8., 0., 9., 1., 2., 1., 3., 1., 4., 1.,
                                  6., 1., 7., 1., 8., 1., 9., 2., 3., 2., 5., 2., 6., 2., 7., 2., 9.,
                                  3., 5., 3., 6., 3., 7., 3., 9., 4., 5., 4., 6., 4., 7., 4., 9., 5.,
-                                 8., 6., 7., 6., 8., 7., 8., 8., 9.};
+                                 8., 6., 7., 6., 8., 7., 8., 8., 9.
+                                };
 
     /* vertex weights in test graph,
        note that current implementation only supports integer weights */
@@ -71,11 +76,11 @@ int main() {
 
 
     /* create graph */
-    igraph_vector_init_copy(&edges, edge_data, (sizeof edge_data)/sizeof(igraph_real_t));
+    igraph_vector_init_copy(&edges, edge_data, (sizeof edge_data) / sizeof(igraph_real_t));
     igraph_create(&graph, &edges, n, /* directed= */ 0);
 
     /* set up vertex weight vector */
-    igraph_vector_init_copy(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data)/sizeof(igraph_real_t));
+    igraph_vector_init_copy(&vertex_weights, vertex_weight_data, (sizeof vertex_weight_data) / sizeof(igraph_real_t));
 
     /* initialize result vector_ptr */
     igraph_vector_ptr_init(&result, 0);
@@ -88,8 +93,8 @@ int main() {
     printf("%ld weighted cliques found above weight 6\n", (long) count);
 
     canonicalize_list(&result);
-    for (i=0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result,i);
+    for (i = 0; i < count; i++) {
+        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
         igraph_vector_destroy(v);
         free(v);
@@ -103,8 +108,8 @@ int main() {
     printf("%ld weighted cliques found between weights 5 and 10\n", (long) count);
 
     canonicalize_list(&result);
-    for (i=0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result,i);
+    for (i = 0; i < count; i++) {
+        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
         igraph_vector_destroy(v);
         free(v);
@@ -118,8 +123,8 @@ int main() {
     printf("%ld maximal weighted cliques found above weight 7\n", (long) count);
 
     canonicalize_list(&result);
-    for (i=0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result,i);
+    for (i = 0; i < count; i++) {
+        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
         igraph_vector_destroy(v);
         free(v);
@@ -133,8 +138,8 @@ int main() {
     printf("%ld maximal weighted cliques found between weights 5 and 10\n", (long) count);
 
     canonicalize_list(&result);
-    for (i=0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result,i);
+    for (i = 0; i < count; i++) {
+        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
         igraph_vector_destroy(v);
         free(v);
@@ -148,8 +153,8 @@ int main() {
     printf("%ld largest weight cliques found\n", (long) count);
 
     canonicalize_list(&result);
-    for (i=0; i < count; i++) {
-        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result,i);
+    for (i = 0; i < count; i++) {
+        igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
         print_weighted_clique(v, &vertex_weights);
         igraph_vector_destroy(v);
         free(v);

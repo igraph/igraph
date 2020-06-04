@@ -21,7 +21,7 @@ the graph is directed or undirected.
 
 <para>
 Like the edges, the &igraph; vertices are also
-labeled by number between zero and the number of vertices minus one. 
+labeled by numbers between zero and the number of vertices minus one. 
 So, to summarize, a directed graph can be imagined like this:
 <informalexample>
 <programlisting>

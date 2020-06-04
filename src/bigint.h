@@ -1,22 +1,22 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2009-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -27,11 +27,11 @@
 #undef __BEGIN_DECLS
 #undef __END_DECLS
 #ifdef __cplusplus
-# define __BEGIN_DECLS extern "C" {
-# define __END_DECLS }
+    #define __BEGIN_DECLS extern "C" {
+    #define __END_DECLS }
 #else
-# define __BEGIN_DECLS /* empty */
-# define __END_DECLS /* empty */
+    #define __BEGIN_DECLS /* empty */
+    #define __END_DECLS /* empty */
 #endif
 
 #include "igraph_types.h"
@@ -49,8 +49,10 @@
 #include "igraph_pmt_off.h"
 #undef BASE_LIMB
 
+__BEGIN_DECLS
+
 typedef struct igraph_biguint_t {
-  igraph_vector_limb_t v;
+    igraph_vector_limb_t v;
 } igraph_biguint_t;
 
 #define IGRAPH_BIGUINT_DEFAULT_SIZE 5
@@ -73,29 +75,29 @@ igraph_real_t igraph_biguint_get(igraph_biguint_t *b);
 int igraph_biguint_compare_limb(igraph_biguint_t *b, limb_t l);
 int igraph_biguint_compare(igraph_biguint_t *left, igraph_biguint_t *right);
 igraph_bool_t igraph_biguint_equal(igraph_biguint_t *left, igraph_biguint_t *right);
-igraph_bool_t igraph_biguint_bigger(igraph_biguint_t *left, 
-				   igraph_biguint_t *right);
-igraph_bool_t igraph_biguint_biggerorequal(igraph_biguint_t *left, 
-					  igraph_biguint_t *right);
+igraph_bool_t igraph_biguint_bigger(igraph_biguint_t *left,
+                                    igraph_biguint_t *right);
+igraph_bool_t igraph_biguint_biggerorequal(igraph_biguint_t *left,
+        igraph_biguint_t *right);
 
 int igraph_biguint_inc(igraph_biguint_t *res, igraph_biguint_t *b);
 int igraph_biguint_dec(igraph_biguint_t *res, igraph_biguint_t *b);
 
-int igraph_biguint_add_limb(igraph_biguint_t *res, igraph_biguint_t *b, 
-			    limb_t l);
-int igraph_biguint_sub_limb(igraph_biguint_t *res, igraph_biguint_t *b, 
-			    limb_t l);
+int igraph_biguint_add_limb(igraph_biguint_t *res, igraph_biguint_t *b,
+                            limb_t l);
+int igraph_biguint_sub_limb(igraph_biguint_t *res, igraph_biguint_t *b,
+                            limb_t l);
 int igraph_biguint_mul_limb(igraph_biguint_t *res, igraph_biguint_t *b,
-			    limb_t l);
+                            limb_t l);
 
-int igraph_biguint_add(igraph_biguint_t *res, igraph_biguint_t *left, 
-		       igraph_biguint_t *right);
-int igraph_biguint_sub(igraph_biguint_t *res, igraph_biguint_t *left, 
-		       igraph_biguint_t *right);
+int igraph_biguint_add(igraph_biguint_t *res, igraph_biguint_t *left,
+                       igraph_biguint_t *right);
+int igraph_biguint_sub(igraph_biguint_t *res, igraph_biguint_t *left,
+                       igraph_biguint_t *right);
 int igraph_biguint_mul(igraph_biguint_t *res, igraph_biguint_t *left,
-		       igraph_biguint_t *right);
+                       igraph_biguint_t *right);
 int igraph_biguint_div(igraph_biguint_t *q, igraph_biguint_t *r,
-		       igraph_biguint_t *u, igraph_biguint_t *v);
+                       igraph_biguint_t *u, igraph_biguint_t *v);
 
 int igraph_biguint_print(igraph_biguint_t *b);
 int igraph_biguint_fprint(igraph_biguint_t *b, FILE *file);

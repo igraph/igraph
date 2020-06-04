@@ -28,6 +28,6 @@ namespace prpack {
             ~prpack_preprocessed_schur_graph();
     };
 
-};
+}
 
 #endif

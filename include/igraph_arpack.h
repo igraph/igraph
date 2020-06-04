@@ -1,5 +1,5 @@
 /* -*- mode: C -*-  */
-/* 
+/*
    IGraph library.
    Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard street, Cambridge, MA 02139 USA
@@ -8,15 +8,15 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -25,8 +25,8 @@
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 
-#ifndef ARPACK_H
-#define ARPACK_H
+#ifndef IGRAPH_ARPACK_H
+#define IGRAPH_ARPACK_H
 
 #include "igraph_decls.h"
 
@@ -221,38 +221,38 @@ __BEGIN_DECLS
  */
 
 typedef struct igraph_arpack_options_t {
-  /* INPUT */
-  char bmat[1];			/* I-standard problem, G-generalized */
-  int n; 			/* Dimension of the eigenproblem */
-  char which[2];		/* LA, SA, LM, SM, BE */
-  int nev;                 /* Number of eigenvalues to be computed */
-  igraph_real_t tol;		/* Stopping criterion */
-  int ncv;			/* Number of columns in V */
-  int ldv;			/* Leading dimension of V */
-  int ishift;		/* 0-reverse comm., 1-exact with tridiagonal */
-  int mxiter;              /* Maximum number of update iterations to take */
-  int nb;			/* Block size on the recurrence, only 1 works */
-  int mode;		/* The kind of problem to be solved (1-5)
-				   1: A*x=l*x, A symmetric
-				   2: A*x=l*M*x, A symm. M pos. def.
-				   3: K*x = l*M*x, K symm., M pos. semidef.
-				   4: K*x = l*KG*x, K s. pos. semidef. KG s. indef.
-				   5: A*x = l*M*x, A symm., M symm. pos. semidef. */
-  int start;		/* 0: random, 1: use the supplied vector */
-  int lworkl;		/* Size of temporary storage, default is fine */
-  igraph_real_t sigma;          /* The shift for modes 3,4,5 */
-  igraph_real_t sigmai;		/* The imaginary part of shift for rnsolve */
-  /* OUTPUT */
-  int info;		/* What happened, see docs */
-  int ierr;		/* What happened  in the dseupd call */
-  int noiter;		/* The number of iterations taken */
-  int nconv;
-  int numop;		/* Number of OP*x operations */
-  int numopb;		/* Number of B*x operations if BMAT='G' */
-  int numreo;		/* Number of steps of re-orthogonalizations */
-  /* INTERNAL */
-  int iparam[11];
-  int ipntr[14];
+    /* INPUT */
+    char bmat[1];         /* I-standard problem, G-generalized */
+    int n;            /* Dimension of the eigenproblem */
+    char which[2];        /* LA, SA, LM, SM, BE */
+    int nev;                 /* Number of eigenvalues to be computed */
+    igraph_real_t tol;        /* Stopping criterion */
+    int ncv;          /* Number of columns in V */
+    int ldv;          /* Leading dimension of V */
+    int ishift;       /* 0-reverse comm., 1-exact with tridiagonal */
+    int mxiter;              /* Maximum number of update iterations to take */
+    int nb;           /* Block size on the recurrence, only 1 works */
+    int mode;     /* The kind of problem to be solved (1-5)
+                   1: A*x=l*x, A symmetric
+                   2: A*x=l*M*x, A symm. M pos. def.
+                   3: K*x = l*M*x, K symm., M pos. semidef.
+                   4: K*x = l*KG*x, K s. pos. semidef. KG s. indef.
+                   5: A*x = l*M*x, A symm., M symm. pos. semidef. */
+    int start;        /* 0: random, 1: use the supplied vector */
+    int lworkl;       /* Size of temporary storage, default is fine */
+    igraph_real_t sigma;          /* The shift for modes 3,4,5 */
+    igraph_real_t sigmai;     /* The imaginary part of shift for rnsolve */
+    /* OUTPUT */
+    int info;     /* What happened, see docs */
+    int ierr;     /* What happened  in the dseupd call */
+    int noiter;       /* The number of iterations taken */
+    int nconv;
+    int numop;        /* Number of OP*x operations */
+    int numopb;       /* Number of B*x operations if BMAT='G' */
+    int numreo;       /* Number of steps of re-orthogonalizations */
+    /* INTERNAL */
+    int iparam[11];
+    int ipntr[14];
 } igraph_arpack_options_t;
 
 /**
@@ -277,22 +277,22 @@ typedef struct igraph_arpack_options_t {
  */
 
 typedef struct igraph_arpack_storage_t {
-  int maxn, maxncv, maxldv;
-  igraph_real_t *v;
-  igraph_real_t *workl;
-  igraph_real_t *workd;
-  igraph_real_t *d;
-  igraph_real_t *resid;
-  igraph_real_t *ax;
-  int *select;
-  igraph_real_t *di;		/* These two only for non-symmetric problems */
-  igraph_real_t *workev;
+    int maxn, maxncv, maxldv;
+    igraph_real_t *v;
+    igraph_real_t *workl;
+    igraph_real_t *workd;
+    igraph_real_t *d;
+    igraph_real_t *resid;
+    igraph_real_t *ax;
+    int *select;
+    igraph_real_t *di;        /* These two only for non-symmetric problems */
+    igraph_real_t *workev;
 } igraph_arpack_storage_t;
 
 DECLDIR void igraph_arpack_options_init(igraph_arpack_options_t *o);
 
 DECLDIR int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
-                long int maxncv, long int maxldv, igraph_bool_t symm);
+                                       long int maxncv, long int maxldv, igraph_bool_t symm);
 DECLDIR void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
 
 /**
@@ -313,20 +313,20 @@ DECLDIR void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
  */
 
 typedef int igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
-				     int n, void *extra);
+                                     int n, void *extra);
 
 DECLDIR int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
-                igraph_arpack_options_t *options,
-                igraph_arpack_storage_t *storage,
-                igraph_vector_t *values, igraph_matrix_t *vectors);
+                                  igraph_arpack_options_t *options,
+                                  igraph_arpack_storage_t *storage,
+                                  igraph_vector_t *values, igraph_matrix_t *vectors);
 
 DECLDIR int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
-                igraph_arpack_options_t *options,
-                igraph_arpack_storage_t *storage,
-                igraph_matrix_t *values, igraph_matrix_t *vectors);
+                                  igraph_arpack_options_t *options,
+                                  igraph_arpack_storage_t *storage,
+                                  igraph_matrix_t *values, igraph_matrix_t *vectors);
 
 DECLDIR int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-                long int nev);
+        long int nev);
 
 __END_DECLS
 
