@@ -32,7 +32,7 @@
 
 /**
  * \function igraph_fundamental_cycle_basis
- * Finds a cycle basis for an unweighted, undirected graph
+ * \brief Finds a cycle basis for an unweighted, undirected graph
  * 
  * A cycle basis is a set of cycles such that the set difference
  * between them (i.e. the set of edges that are counted an odd
@@ -92,32 +92,34 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
     IGRAPH_VECTOR_INIT_FINALLY(&inc_edges, 0);
 
-    for (i=0; i<no_of_nodes; i++) {
+    for (i = 0; i < no_of_nodes; i++) {
         /* Start of a new connected component including the first one */
-        if (added_nodes[i]>0) { continue; }
+        if (added_nodes[i] > 0) { continue; }
 
         IGRAPH_ALLOW_INTERRUPTION();
 
 	/* This is the root, mark it visited */
-        added_nodes[i]=1;
-	/* The queue stores both the next vertex, the edge, and the vertex distance */
+        added_nodes[i] = 1;
+
+	/* The queue stores the next vertex, the edge to it, and its distance to root */
         IGRAPH_CHECK(igraph_dqueue_push(&q, i));
         IGRAPH_CHECK(igraph_dqueue_push(&q, -1));
         IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
         while (! igraph_dqueue_empty(&q)) {
+          /* current node, incoming edge, and distance from tree root */
           long int actnode=(long int) igraph_dqueue_pop(&q);
 	  long int actedge=(long int) igraph_dqueue_pop(&q);
           long int actdist=(long int) igraph_dqueue_pop(&q);
 
 	  /* check all edges connected to this vertex */
           IGRAPH_CHECK(igraph_incident(graph, &inc_edges, (igraph_integer_t) actnode,
-				  IGRAPH_ALL));
+				       IGRAPH_ALL));
 
           for (j=0; j<igraph_vector_size(&inc_edges); j++) {
               long int edge=(long int) VECTOR(inc_edges)[j];
 
 	      /* visited edges have been given their cycles already */
-              if (added_edges[edge]==0) {
+              if (added_edges[edge] == 0) {
 
 		/* find the neighbour identity */
                 igraph_integer_t from, to;
@@ -125,31 +127,32 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
 		
 		/* we only know that either one is actnode, swap if needed */
                 if (to==actnode) {
-		  to=from;
-		  from=to;
+		  to = from;
+		  from = to;
 		}
 
 		/* if the edge goes to a new vertex, expand the spanning tree */
-                if (added_nodes[(long int) to]==0) {
-                    added_nodes[(long int) to]=1;
-                    added_edges[edge]=1;
+                if (added_nodes[(long int) to] == 0) {
+                    added_nodes[(long int) to] = 1;
+                    added_edges[edge] = 1;
 		    parent_nodes[(long int) to] = actnode;
 		    dist[(long int) to] = actdist + 1;
 		    parent_edges[edge] = actedge;
 
+		    /* and continue the search from there  */
                     IGRAPH_CHECK(igraph_dqueue_push(&q, to));
                     IGRAPH_CHECK(igraph_dqueue_push(&q, edge));
                     IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
                 }
 
                /* if it's a new edge to a known vertex, it's outside the tree
-                * so because of the above reasoning it generates a cycle */
+                * so it generates a cycle */
                 else {
                     igraph_i_fundamental_cycle_basis_add(graph,
 				    basis,
 				    &parent_nodes, &parent_edges,
 				    &added_edges, dist,
-				    edge, actedge,
+				    actedge, edge,
 				    (long int) from, (long int) to);
                 }
               }
@@ -169,14 +172,21 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-/* Note: this function works in the corner case that from == to
- * i.e. we hit a trivial cycle given by a self-edge */
+/* Note: this function also works for self-edges */
 int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
 	igraph_vector_ptr_t *basis,
 	const igraph_vector_t *parent_nodes, const igraph_vector_t *parent_edges,
 	const igraph_vector_chat_t *added_edges, const igraph_vector_t *dist,
-	long int edge, long int actedge,
+	long int edge_from, long int edge_to,
 	long int from, long int to) {
+
+    /* 'from' is the last node visited. 'to' is the neighbor of 'from' that
+     * was already in the tree. They are connected by 'edge_to'. We will need
+     * to backtrack both 'from' and 'to' to their common parent in the tree
+     * so we use two edge variables for that:
+     * - 'edge_from' backtracks 'from' (since it starts with the correct parent)
+     * - 'edge_to' backtracks 'to' (after it's added to the cycle)
+     * */
 
     igraph_vector_t *cycle=igraph_Calloc(1, igraph_vector_t);
     igraph_vector_t to_backtrack, to_edges;
@@ -187,29 +197,30 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
 
     /* start by adding the non-tree edge */
     igraph_vector_init(cycle, 1);
-    cycle[0] = edge;
+    cycle[0] = edge_to;
 
-    /* just like actedge goes from 'from' to its parent,
-     * we recycle edge to go from 'to' to its parent */
+    /* find the edge connecting 'to' to its parent in the tree */
     IGRAPH_CHECK(igraph_incident(graph, &to_edges, (igraph_integer_t) to,
 	IGRAPH_ALL));
-    for (i=0; j<igraph_vector_size(&to_edges); i++) {
+    for (i = 0; i < igraph_vector_size(&to_edges); i++) {
         igraph_integer_t to_from, to_to;
 
-        edge=(long int) VECTOR(to_edges)[i];
+        edge_to = (long int) VECTOR(to_edges)[i];
 
         /* only a visited edge can be in the tree */
         if (added_edges[edge]==0) {
 	    continue
         }
 
-        /* find the neighbours identity */
-        igraph_edge(graph, (igraph_integer_t) edge, &to_from, &to_to);
+        /* find the vertices of this edge */
+        IGRAPH_CHECK(igraph_edge(graph,
+				 (igraph_integer_t) edge_to,
+				 &to_from, &to_to);)
 
-	/* we only know that either one is actnode, swap if needed */
-        if (to_to==to) {
-	  to_to=to_from;
-	  to_from=to_to;
+	/* we only know that either one is to, swap if needed */
+        if (to_to == to) {
+	  to_to = to_from;
+	  to_from = to_to;
 	}
 
 	if (to_to == parent_nodes[to]) {
@@ -219,28 +230,29 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
     igraph_vector_destroy(&to_edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    /* construct the cycle by backtracing */
+    /* construct the cycle by backtracing the farthest one
+     * first, and then both together */
     while (from != to) {
-	/* backtrack 'from' */
         if (dist[from] > dist[to]) {
-            IGRAPH_CHECK(igraph_vector_push_back(cycle, actedge));
+	    /* backtrack 'from' */
+            IGRAPH_CHECK(igraph_vector_push_back(cycle, edge_from));
 	    from = parent_nodes[from];
-	    actedge = parent_edges[actedge];
+	    edge_from = parent_edges[edge_from];
 	}
-	/* backtrack 'to' */
 	else if (dist[to] > dist[from]) {
-            IGRAPH_CHECK(igraph_vector_push_back(to_backtrack, edge));
+	    /* backtrack 'to' */
+            IGRAPH_CHECK(igraph_vector_push_back(to_backtrack, edge_to));
 	    to = parent_nodes[to];
-	    edge = parent_edges[edge];
+	    edge_to = parent_edges[edge_to];
 	}
-	/* backtrack both */
 	else {
-            IGRAPH_CHECK(igraph_vector_push_back(cycle, actedge));
-            IGRAPH_CHECK(igraph_vector_push_back(to_backtrack, edge));
+	    /* same distance but different, backtrack both until they merge */
+            IGRAPH_CHECK(igraph_vector_push_back(cycle, edge_from));
+            IGRAPH_CHECK(igraph_vector_push_back(to_backtrack, edge_to));
 	    from = parent_nodes[from];
 	    to = parent_nodes[to];
-	    actedge = parent_edges[actedge];
-	    edge = parent_edges[edge];
+	    edge_from = parent_edges[edge_from];
+	    edge_to = parent_edges[edge_to];
 	}
     }
 
