@@ -38,10 +38,15 @@ has_path is set to 1 if a path exists, 0 otherwise
 has_cycle is set to 1 if a cycle exists, 0 otherwise
 */
 int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
-
     igraph_integer_t odd;
     igraph_vector_t degree, csize;
     int i, cluster_count;
+
+    if (igraph_vcount(graph) == 0 || (igraph_vcount(graph) == 1 && igraph_ecount(graph) == 0) || (igraph_vcount(graph) > 0 && igraph_ecount(graph) == 0)) {
+        *has_path = 1;
+        *has_cycle = 1;
+        return  IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_vector_init(&csize, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &csize);
@@ -96,6 +101,12 @@ int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path
     igraph_integer_t incoming_excess, outgoing_excess, clusters_strong, clusters_weak;
     int i, cluster_count;
     igraph_vector_t out_degree, in_degree, csize_strong, csize_weak;
+
+    if (igraph_vcount(graph) == 0 || (igraph_vcount(graph) == 1 && igraph_ecount(graph) == 0) || (igraph_vcount(graph) > 0 && igraph_ecount(graph) == 0)) {
+        *has_path = 1;
+        *has_cycle = 1;
+        return IGRAPH_SUCCESS;
+    }
 
     incoming_excess = 0;
     outgoing_excess = 0;
@@ -209,7 +220,6 @@ int igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path, igraph_bo
 
 
 int igraph_i_eulerian_path_undirected_implementation(const igraph_t *graph, igraph_integer_t start_node, igraph_vector_t *res, igraph_vector_t *outgoing_list) {
-
     igraph_integer_t start = start_node;
     igraph_integer_t curr = start;
     igraph_integer_t next, e_count, curr_e;
@@ -222,6 +232,10 @@ int igraph_i_eulerian_path_undirected_implementation(const igraph_t *graph, igra
 
     igraph_vector_clear(res);
     IGRAPH_CHECK(igraph_vector_reserve(res, igraph_ecount(graph)));
+
+    if (igraph_vcount(graph) == 0 || (igraph_vcount(graph) == 1 && igraph_ecount(graph) == 0) || (igraph_vcount(graph) > 0 && igraph_ecount(graph) == 0)) {
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_stack_init(&path, igraph_vcount(graph)));
     IGRAPH_FINALLY(igraph_stack_destroy, &path);
@@ -341,6 +355,10 @@ int igraph_i_eulerian_path_directed_implementation(const igraph_t *graph, igraph
 
     igraph_vector_clear(res);
     IGRAPH_CHECK(igraph_vector_reserve(res, igraph_ecount(graph)));
+
+    if (igraph_vcount(graph) == 0 || (igraph_vcount(graph) == 1 && igraph_ecount(graph) == 0) || (igraph_vcount(graph) > 0 && igraph_ecount(graph) == 0)) {
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_stack_init(&path, igraph_vcount(graph)));
     IGRAPH_FINALLY(igraph_stack_destroy, &path);
