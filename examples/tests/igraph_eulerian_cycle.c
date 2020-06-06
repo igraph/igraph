@@ -10,6 +10,10 @@ int main() {
     igraph_vs_t vs;
 
     igraph_vector_init(&res, 0);
+    igraph_eulerian_path(&graph, &res);
+    print_vector_round(&res, stdout);
+    igraph_vector_destroy(&res);
+    igraph_vector_init(&res, 0);
 
     igraph_small(&graph, 0, IGRAPH_UNDIRECTED, 0, 1, -1);
     igraph_es_1(&es, 0);

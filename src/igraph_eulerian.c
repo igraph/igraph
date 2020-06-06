@@ -312,7 +312,7 @@ int igraph_i_eulerian_path_undirected_implementation(const igraph_t *graph, igra
 /* Hierholzer algorithm */
 int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vector_t *path, igraph_bool_t cycle) {
 
-    /* default starting vertex is 0 (or equivalent, if the 0 node has a degree of 0)
+    /* default starting vertex is 0 (or equivalent, if node 0 has a degree of 0)
     when we have no odd vertices, we can start anywhere (usually 0)
     when we have 2 odd vertices, we start at any one of them */
 
