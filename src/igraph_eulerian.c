@@ -42,7 +42,7 @@ int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_pa
     igraph_vector_t degree, csize;
     int i, cluster_count;
 
-    if (igraph_vcount(graph) == 0 || (igraph_vcount(graph) == 1 && igraph_ecount(graph) == 0) || (igraph_vcount(graph) > 0 && igraph_ecount(graph) == 0)) {
+    if (igraph_ecount(graph) == 0 || igraph_vcount(graph) <= 1) {
         *has_path = 1;
         *has_cycle = 1;
         return  IGRAPH_SUCCESS;
@@ -97,12 +97,12 @@ int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_pa
 
 
 int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle) {
-    igraph_bool_t res_strong, res_weak;
-    igraph_integer_t incoming_excess, outgoing_excess, clusters_strong, clusters_weak;
+    igraph_bool_t res_weak;
+    igraph_integer_t incoming_excess, outgoing_excess, clusters_weak;
     int i, cluster_count;
-    igraph_vector_t out_degree, in_degree, csize_strong, csize_weak;
+    igraph_vector_t out_degree, in_degree, csize_weak;
 
-    if (igraph_vcount(graph) == 0 || (igraph_vcount(graph) == 1 && igraph_ecount(graph) == 0) || (igraph_vcount(graph) > 0 && igraph_ecount(graph) == 0)) {
+    if (igraph_ecount(graph) == 0 || igraph_vcount(graph) <= 1) {
         *has_path = 1;
         *has_cycle = 1;
         return IGRAPH_SUCCESS;
@@ -112,7 +112,6 @@ int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path
     outgoing_excess = 0;
 
     res_weak = 1;
-    res_strong = 1;
 
     IGRAPH_CHECK(igraph_vector_init(&out_degree, 0));
     IGRAPH_FINALLY(igraph_vector_destroy, &out_degree);
@@ -154,29 +153,16 @@ int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path
         res_weak = 0;
     }
 
-    IGRAPH_CHECK(igraph_vector_init(&csize_strong, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &csize_strong);
-
-    IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize_strong, &clusters_strong, IGRAPH_STRONG));
-
-    /* if the number of clusters is the same for strong and weak, and the 
-    graph is weakly connected, then this graph is strongly connected */
-    if (!res_weak || (clusters_strong != clusters_weak)) {
-        res_strong = 0;
-    }
-
-    igraph_vector_destroy(&csize_strong);
     igraph_vector_destroy(&csize_weak);
     igraph_vector_destroy(&in_degree);
     igraph_vector_destroy(&out_degree);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(3);
 
-    if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong)) {
+    if ((outgoing_excess == 0 && incoming_excess == 0) && (res_weak)) {
         *has_path = 1;
         *has_cycle = 1;
         return IGRAPH_SUCCESS;
-    } else if ((outgoing_excess == 1 && incoming_excess == 1) && 
-        (res_strong || res_weak)) {
+    } else if ((outgoing_excess == 1 && incoming_excess == 1) && (res_weak)) {
         *has_path = 1;
         *has_cycle = 0;
         return IGRAPH_SUCCESS;
@@ -233,7 +219,7 @@ int igraph_i_eulerian_path_undirected_implementation(const igraph_t *graph, igra
     igraph_vector_clear(res);
     IGRAPH_CHECK(igraph_vector_reserve(res, igraph_ecount(graph)));
 
-    if (igraph_vcount(graph) == 0 || (igraph_vcount(graph) == 1 && igraph_ecount(graph) == 0) || (igraph_vcount(graph) > 0 && igraph_ecount(graph) == 0)) {
+    if (igraph_ecount(graph) == 0 || igraph_vcount(graph) == 0) {
         return IGRAPH_SUCCESS;
     }
 
@@ -356,7 +342,7 @@ int igraph_i_eulerian_path_directed_implementation(const igraph_t *graph, igraph
     igraph_vector_clear(res);
     IGRAPH_CHECK(igraph_vector_reserve(res, igraph_ecount(graph)));
 
-    if (igraph_vcount(graph) == 0 || (igraph_vcount(graph) == 1 && igraph_ecount(graph) == 0) || (igraph_vcount(graph) > 0 && igraph_ecount(graph) == 0)) {
+    if (igraph_ecount(graph) == 0 || igraph_vcount(graph) == 0) {
         return IGRAPH_SUCCESS;
     }
 
@@ -432,17 +418,13 @@ int igraph_i_eulerian_path_directed_implementation(const igraph_t *graph, igraph
 
 
 int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_t *res) {
-    igraph_bool_t res_strong, res_weak;
-    igraph_integer_t incoming_excess, outgoing_excess, clusters_strong, clusters_weak;
+    igraph_integer_t incoming_excess, outgoing_excess;
     igraph_integer_t start_node;
-    int i, cluster_count;
-    igraph_vector_t out_degree, in_degree, csize_strong, csize_weak, degree;
+    int i;
+    igraph_vector_t out_degree, in_degree, degree;
 
     incoming_excess = 0;
     outgoing_excess = 0;
-
-    res_weak = 1;
-    res_strong = 1;
 
     /* determining the start node */
     /* also getting the outgoing list for each vector*/
@@ -467,30 +449,7 @@ int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_t *res)
         }
     }
 
-    IGRAPH_CHECK(igraph_vector_init(&csize_weak, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &csize_weak);
-
-    IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize_weak, &clusters_weak, IGRAPH_WEAK));
-    cluster_count = 0;
-    for (i = 0; i < igraph_vector_size(&csize_weak); i++) {
-        if (VECTOR(csize_weak)[i] > 1) cluster_count++;
-    }
-
-    if (cluster_count > 1) {
-        res_weak = 0;
-    }
-
-    IGRAPH_CHECK(igraph_vector_init(&csize_strong, 0));
-    IGRAPH_FINALLY(igraph_vector_destroy, &csize_strong);
-    IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize_strong, &clusters_strong, IGRAPH_STRONG));
-
-    /* if the number of clusters is the same for strong and weak, and the 
-    graph is weakly connected, then this graph is strongly connected */
-    if (!res_weak || (clusters_strong != clusters_weak)) {
-        res_strong = 0;
-    }
-
-    if ((outgoing_excess == 0 && incoming_excess == 0) && (res_strong)) {
+    if (outgoing_excess == 0 && incoming_excess == 0) {
         IGRAPH_CHECK(igraph_vector_init(&degree, 0));
         IGRAPH_FINALLY(igraph_vector_destroy, &degree);
 
@@ -505,16 +464,13 @@ int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_t *res)
         IGRAPH_CHECK(igraph_i_eulerian_path_directed_implementation(graph, &start_node, &out_degree, res));
         igraph_vector_destroy(&degree);
         IGRAPH_FINALLY_CLEAN(1);
-    } else if ((outgoing_excess == 1 && incoming_excess == 1) && 
-        (res_strong || res_weak)) {
+    } else if (outgoing_excess == 1 && incoming_excess == 1) {
         IGRAPH_CHECK(igraph_i_eulerian_path_directed_implementation(graph, &start_node, &out_degree, res));
     }
 
     igraph_vector_destroy(&in_degree);
     igraph_vector_destroy(&out_degree);
-    igraph_vector_destroy(&csize_strong);
-    igraph_vector_destroy(&csize_weak);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
