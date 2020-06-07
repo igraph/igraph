@@ -32,7 +32,7 @@
 
 /**
  * \function igraph_fundamental_cycle_basis
- * \brief Finds a cycle basis for an unweighted, undirected graph
+ * \brief Find a fundamental cycle basis for an unweighted, undirected graph
  * 
  * A cycle basis is a set of cycles such that the set difference
  * between them (i.e. the set of edges that are counted an odd
@@ -50,7 +50,7 @@
  *    will be a member as a list of edge ids.
  * \return Error code.
  * 
- * Time complexity: O(|V| + |E|) (spanning tree) + ??.
+ * Time complexity: O(|V| + |E|) (spanning tree) + ?? (backtracking).
  * 
  */
 int igraph_fundamental_cycle_basis(const igraph_t *graph,
@@ -271,15 +271,192 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
 }
 
 
+/**
+ * \function igraph_minimum_weight_cycle_basis
+ * \brief Find a minimum weight cycle basis for a weighted, undirected graph
+ * 
+ * A cycle basis is a set of cycles such that the set difference
+ * between them (i.e. the set of edges that are counted an odd
+ * number of times by the cycles) is a Eulerian path across the
+ * graph, which means it touches all vertices once and never
+ * walks the same edge more than once.
+ *
+ * A minimum weight cycle basis is the equivalent for weighted graphs
+ * of a fundamental cycle basis for unweighted graphs.
+ *
+ * \param graph The input graph, it might be directed, but edge
+ *    direction is ignored.
+ * \param basis A pointer to a vector of vectors. Each fundamental cycle
+ *    will be a member as a list of edge ids.
+ * \param weights A const pointer to a vector of weights.
+ * \return Error code.
+ * 
+ * Time complexity: O(|V| |E|) (Horton cycles) ??.
+ *
+ * A review:
+ * https://www.sciencedirect.com/science/article/pii/S1574013709000483?casa_token=B7FmnsCBElwAAAAA:bfOYZDhzHpP24ym_2S2n5VuEU-dYsdAQJdmH3nvk8efkFrVmJkEY-KhHXawLZfoMFAKPIdHE
+ *
+ * The algorithm implemented here:
+ * https://dl.acm.org/doi/abs/10.1145/1644015.1644023
+ * 
+ */
+
+
 int igraph_minimum_cycle_basis(const igraph_t *graph,
+                const igraph_vector_t *weights,
                 igraph_vector_ptr_t *basis,
-                const igraph_vector_t *weights) {
+		) {
+
+    /* General plan:
+     *
+     * 0. Find a feedback vertex set Z: all cycles pass through a vertex
+     *    in Z. Worst case Z := {all vertices}. Basically, 2-degree nodes
+     *    are excluded because there's no decision: the path goes in one
+     *    way and out another. Of course, 0-degree are also not needed.
+     * 1. Construct all shortest path trees 
+     * 2. Construct candidate set of cycle bases, sorted in nondecreasing
+     *    order of weight
+     * 3. for i = 1 to N do
+     *     3.1 compute vector Si s.t. <Cj, Si> = 0 for each 1 <= j < i
+     *         (orthogonal to the current cycles)
+     *     3.2 for all trees, update vertex labels based on Si
+     *     3.3 for each candidate cycle, compute <C, Si> using the labels
+     *     3.4 append the least-weight cycle non-orthogonal to Si
+     *         (so we can normalize it into <C, Si> = 1
+     *
+     * */
+    /* TODO: implement the actual functions */
+
+    long int i;
+    long int no_of_nodes = igraph_vcount(graph);
+    igraph_vector_t si;
+    igraph_vector_int_t nonorth_cycles;
+
+    igraph_vector_t fvs, basis_weight;
+    /* list of vertices = tree -> list of trees */
+    igraph_vector_ptr_t trees_z;
+    /* list of vertices = vector -> list of vectors = basis -> list of bases */
+    igraph_vector_ptr_t candidate_cycles;
+    /* total weight of each basis (?) */
+    igraph_vector_t candidate_weights;
+
+    /* 0. Feedback vertex set */
+    IGRAPH_CHECK(igraph_i_feedback_vertex_set_approx(
+			    graph, weights, &fvs));
+
+    /* 1. Construct all shortest path trees */
+    IGRAPH_CHECK(igraph_i_shortest_path_trees(
+			    graph, weights, &fvs, &trees_z));
+
+    /* 2. Construct candidate list */
+    IGRAPH_CHECK(igraph_i_candidate_bases(
+			    graph, weights,
+			    &candidate_cycles, &candidate_weights));
+
+    /* 3. Construct basis one by one */
+    for (i = 0; i < no_of_nodes; i++) {
+        /* 3.1 compute Si */
+	igraph_i_compute_Si(graph, weights, basis, i, &si);
+
+	/* 3.2 update tree vertex labels from Si */
+	igraph_i_update_tree_z_vertex_labels(
+			&trees_z, &si);
+
+	/* 3.3 find non-orthogonal candidates */
+	igraph_i_nonorthogonal_candidates(
+			candidate_cycles, &si, &nonorth_cycles);
+
+	/* 3.4 get the shortest nonorthogonal cycle */
+	igraph_i_shortest_nonorthogonal_cycle(
+			candidate_cycles, &candidate_weights, &nonorth_cycles, basis);
+
+    }
+
+    return IGRAPH_SUCCESS;
+}
 
 
+int igraph_i_feedback_vertex_set_approx(const igraph_t *graph,
+		const igraph_vector_t *weights,
+		igraph_vector_t *vertices,
+		) {
 
+    long int i;
+    long int no_of_nodes = igraph_vcount(graph);
+
+    /* TODO: implement */
+    /* For now, return all vertices */
+    igraph_vector_clear(vertices);
+    IGRAPH_CHECK(igraph_vector_reserve(vertices, no_of_nodes));
+
+    igraph_vs_t vertices_all = igraph_vss_all();
+    for (i = 0; i < no_of_nodes; i++) {
+	    vertices[i] = vertices_all[i];
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
+int igraph_i_shortest_path_trees(const igraph_t *graph,
+		const igraph_vector_t *weights,
+		const igraph_vector_t *vertices,
+		igraph_vector_ptr_t *trees_z,
+		) {
 
     /* TODO: implement */
     return IGRAPH_SUCCESS;
 }
 
+int igraph_i_candidate_bases(const igraph_t *graph,
+		const igraph_vector_t *weights,
+		igraph_vector_ptr_t *candidate_cycles,
+		igraph_vector_t *cadidate_weights,
+		){
+
+    /* TODO: implement */
+    return IGRAPH_SUCCESS;
+}
+
+int igraph_i_compte_Si(const igraph_t *graph,
+		const igraph_vector_t *weights,
+		const igraph_vector_ptr_t *basis,
+		long int i,
+		igraph_vector_t *si,
+		) {
+
+    /* TODO: implement */
+    return IGRAPH_SUCCESS;
+
+}
+
+
+int igraph_i_update_tree_z_vertex_labels(igraph_vector_ptr_t *trees_z,
+		const igraph_vector_t *si,
+		) {
+
+    /* TODO: implement */
+    return IGRAPH_SUCCESS;
+}
+
+
+int igraph_i_nonorthogonal_candidates(const igraph_vector_ptr_t *candidate_cycles,
+		const igraph_vector_t *si,
+		igraph_vector_int_t *nonorth_cycles,
+		) {
+
+    /* TODO: implement */
+    return IGRAPH_SUCCESS;
+}
+
+
+int igraph_i_shortest_nonorthogonal_cycle(const igraph_vector_ptr_t *candidate_cycles,
+		const igraph_vector_t *cadidate_weights,
+		const igraph_vector_int_t *nonorth_cycles,
+		igraph_vector_ptr_t *basis,
+		) {
+
+    /* TODO: implement */
+    return IGRAPH_SUCCESS;
+}
 
