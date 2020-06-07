@@ -555,9 +555,9 @@ int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
  * </para><para>
  * When \c mode is \c IGRAPH_IN or \c IGRAPH_OUT, each edge ID will appear
  * in the incidence list \em once. When \c mode is \c IGRAPH_ALL, each edge ID
- * will appear in the incidence list <em>twice</em>, once for the source vertex
+ * will appear in the incidence list \em twice, once for the source vertex
  * and once for the target edge. It also means that the edge IDs of loop edges
- * will appear <em>twice</em> for the <em>same</em> vertex.
+ * will appear \em twice for the \em same vertex.
  *
  * \param graph The input graph.
  * \param il Pointer to an uninitialized incidence list.
@@ -848,9 +848,9 @@ igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *il,
  * </para><para>
  * When \c mode is \c IGRAPH_IN or \c IGRAPH_OUT, each edge ID will appear
  * in the incidence list \em once. When \c mode is \c IGRAPH_ALL, each edge ID
- * will appear in the incidence list <em>twice</em>, once for the source vertex
+ * will appear in the incidence list \em twice, once for the source vertex
  * and once for the target edge. It also means that the edge IDs of loop edges
- * will appear <em>twice</em> for the <em>same</em> vertex.
+ * will appear \em twice for the \em same vertex.
  *
  * \param graph The input graph.
  * \param al Pointer to an uninitialized incidence list.
