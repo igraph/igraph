@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_real_t resolution_parameter) {
 
     igraph_vector_t membership;
@@ -167,6 +169,8 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_vector_destroy(&weights);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

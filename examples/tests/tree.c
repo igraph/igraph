@@ -34,5 +34,7 @@ int main() {
     igraph_tree(&graph, 14, 3, IGRAPH_TREE_OUT);
     PRINT_DESTROY("Ternary out-tree, n=14");
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
