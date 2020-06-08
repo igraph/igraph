@@ -2,6 +2,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 struct userdata {
     int i;
     igraph_vector_ptr_t *list;
@@ -91,6 +93,8 @@ int main() {
 
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&list, igraph_vector_destroy);
     igraph_vector_ptr_destroy_all(&list);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

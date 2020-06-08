@@ -37,7 +37,7 @@
  * neighbor vertices or incident edges of a given vertex. Typically,
  * this representation is good if we need to iterate over the neighbors
  * of all vertices many times. E.g. when finding the shortest paths
- * between every pairs of vertices or calculating closeness centrality
+ * between all pairs of vertices or calculating closeness centrality
  * for all the vertices.</para>
  *
  * <para>The <type>igraph_adjlist_t</type> stores the adjacency lists
@@ -61,7 +61,7 @@
  * the neighbors of v are queried and stored in a vector of the
  * adjacency list, so they don't need to be queried again. Lazy
  * adjacency lists are handy if you have an at least linear operation
- * (because initialization is generally linear in terms of number of
+ * (because initialization is generally linear in terms of the number of
  * vertices), but you don't know how many vertices you will visit
  * during the computation.
  * </para>
@@ -73,9 +73,9 @@
 
 /**
  * \function igraph_adjlist_init
- * Initialize an adjacency list of vertices from a given graph
+ * \brief Constructs an adjacency list of vertices from a given graph.
  *
- * Create a list of vectors containing the neighbors of all vertices
+ * Creates a list of vectors containing the neighbors of all vertices
  * in a graph. The adjacency list is independent of the graph after
  * creation, e.g. the graph can be destroyed and modified, the
  * adjacency list contains the state of the graph at the time of its
@@ -133,7 +133,7 @@ int igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
 
 /**
  * \function igraph_adjlist_init_empty
- * Initialize an empty adjacency list
+ * \brief Initializes an empty adjacency list.
  *
  * Creates a list of vectors, one for each vertex. This is useful when you
  * are \em constructing a graph using an adjacency list representation as
@@ -165,7 +165,7 @@ int igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes
 
 /**
  * \function igraph_adjlist_init_complementer
- * Adjacency lists for the complementer graph
+ * \brief Adjacency lists for the complementer graph.
  *
  * This function creates adjacency lists for the complementer
  * of the input graph. In the complementer graph all edges are present
@@ -248,7 +248,7 @@ int igraph_adjlist_init_complementer(const igraph_t *graph,
 
 /**
  * \function igraph_adjlist_destroy
- * Deallocate memory
+ * \brief Deallocates an adjacency list.
  *
  * Free all memory allocated for an adjacency list.
  * \param al The adjacency list to destroy.
@@ -283,7 +283,7 @@ void igraph_adjlist_clear(igraph_adjlist_t *al) {
 
 /**
  * \function igraph_adjlist_size
- * Number of vertices in an adjacency list.
+ * \brief Number of vertices in an adjacency list.
  *
  * \param al The adjacency list.
  * \return The number of elements.
@@ -301,7 +301,7 @@ igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al) {
 
 /**
  * \function igraph_adjlist_sort
- * Sort each vector in an adjacency list.
+ * \brief Sorts each vector in an adjacency list.
  *
  * Sorts every vector of the adjacency list.
  * \param al The adjacency list.
@@ -319,9 +319,10 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
 
 /**
  * \function igraph_adjlist_simplify
- * Simplify
+ * \brief Simplifies an adjacency list.
  *
- * Simplify an adjacency list, ie. remove loop and multiple edges.
+ * Simplifies an adjacency list, i.e. removes loop and multiple edges.
+ *
  * \param al The adjacency list.
  * \return Error code.
  *
@@ -466,7 +467,7 @@ int igraph_adjedgelist_print(const igraph_inclist_t *al, FILE *outfile) {
 
 /**
  * \function igraph_adjedgelist_init
- * Initialize an incidence list of edges
+ * \brief Initializes an incidence list of edges.
  *
  * This function was superseded by \ref igraph_inclist_init() in igraph 0.6.
  * Please use \ref igraph_inclist_init() instead of this function.
@@ -484,7 +485,7 @@ int igraph_adjedgelist_init(const igraph_t *graph,
 
 /**
  * \function igraph_adjedgelist_destroy
- * Frees all memory allocated for an incidence list.
+ * \brief Frees all memory allocated for an incidence list.
  *
  * This function was superseded by \ref igraph_inclist_destroy() in igraph 0.6.
  * Please use \ref igraph_inclist_destroy() instead of this function.
@@ -544,17 +545,17 @@ int igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
 
 /**
  * \function igraph_inclist_init
- * Initialize an incidence list of edges
+ * \brief Initializes an incidence list.
  *
- * Create a list of vectors containing the incident edges for all
+ * Creates a list of vectors containing the incident edges for all
  * vertices. The incidence list is independent of the graph after
  * creation, subsequent changes of the graph object do not update the
  * incidence list, and changes to the incidence list do not update the
  * graph.
  *
  * </para><para>
- * When \c mode is \c IGRAPH_IN or \c IGRAPH_OUT, each edge ID will appear
- * in the incidence list \em once. When \c mode is \c IGRAPH_ALL, each edge ID
+ * When \p mode is \c IGRAPH_IN or \c IGRAPH_OUT, each edge ID will appear
+ * in the incidence list \em once. When \p mode is \c IGRAPH_ALL, each edge ID
  * will appear in the incidence list \em twice, once for the source vertex
  * and once for the target edge. It also means that the edge IDs of loop edges
  * will appear \em twice for the \em same vertex.
@@ -613,7 +614,7 @@ int igraph_inclist_init(const igraph_t *graph,
 
 /**
  * \function igraph_inclist_init_empty
- * \brief Initialize an incidence list corresponding to an empty graph.
+ * \brief Initializes an incidence list corresponding to an empty graph.
  *
  * This function essentially creates a list of empty vectors that may
  * be treated as an incidence list for a graph with a given number of
@@ -646,7 +647,7 @@ int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n) {
 
 /**
  * \function igraph_inclist_destroy
- * Frees all memory allocated for an incidence list.
+ * \brief Frees all memory allocated for an incidence list.
  *
  * \param eal The incidence list to destroy.
  *
@@ -665,7 +666,7 @@ void igraph_inclist_destroy(igraph_inclist_t *il) {
 
 /**
  * \function igraph_inclist_clear
- * Removes all edges from an incidence list.
+ * \brief Removes all edges from an incidence list.
  *
  * \param il The incidence list.
  * Time complexity: depends on memory management, typically O(n), where n is
@@ -680,7 +681,7 @@ void igraph_inclist_clear(igraph_inclist_t *il) {
 
 /**
  * \function igraph_lazy_adjlist_init
- * Constructor
+ * \brief Initialized a lazy adjacency list.
  *
  * Create a lazy adjacency list for vertices. This function only
  * allocates some memory for storing the vectors of an adjacency list,
@@ -728,7 +729,7 @@ int igraph_lazy_adjlist_init(const igraph_t *graph,
 
 /**
  * \function igraph_lazy_adjlist_destroy
- * Deallocate memory
+ * \brief Deallocate a lazt adjacency list.
  *
  * Free all allocated memory for a lazy adjacency list.
  * \param al The adjacency list to deallocate.
@@ -743,7 +744,7 @@ void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al) {
 
 /**
  * \function igraph_lazy_adjlist_clear
- * Removes all edges from a lazy adjacency list.
+ * \brief Removes all edges from a lazy adjacency list.
  *
  * \param al The lazy adjacency list.
  * Time complexity: depends on memory management, typically O(n), where n is
@@ -797,7 +798,7 @@ igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 
 /**
  * \function igraph_lazy_adjedgelist_init
- * Initializes a lazy incidence list of edges
+ * \brief Initializes a lazy incidence list of edges.
  *
  * This function was superseded by \ref igraph_lazy_inclist_init() in igraph 0.6.
  * Please use \ref igraph_lazy_inclist_init() instead of this function.
@@ -815,7 +816,7 @@ int igraph_lazy_adjedgelist_init(const igraph_t *graph,
 
 /**
  * \function igraph_lazy_adjedgelist_destroy
- * Frees all memory allocated for an incidence list.
+ * \brief Frees all memory allocated for an incidence list.
  *
  * This function was superseded by \ref igraph_lazy_inclist_destroy() in igraph 0.6.
  * Please use \ref igraph_lazy_inclist_destroy() instead of this function.
@@ -838,7 +839,7 @@ igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *il,
 
 /**
  * \function igraph_lazy_inclist_init
- * Initializes a lazy incidence list of edges
+ * \brief Initializes a lazy incidence list of edges.
  *
  * Create a lazy incidence list for edges. This function only
  * allocates some memory for storing the vectors of an incidence list,
@@ -846,8 +847,8 @@ igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *il,
  * igraph_lazy_inclist_get() is called.
  *
  * </para><para>
- * When \c mode is \c IGRAPH_IN or \c IGRAPH_OUT, each edge ID will appear
- * in the incidence list \em once. When \c mode is \c IGRAPH_ALL, each edge ID
+ * When \p mode is \c IGRAPH_IN or \c IGRAPH_OUT, each edge ID will appear
+ * in the incidence list \em once. When \p mode is \c IGRAPH_ALL, each edge ID
  * will appear in the incidence list \em twice, once for the source vertex
  * and once for the target edge. It also means that the edge IDs of loop edges
  * will appear \em twice for the \em same vertex.
@@ -856,7 +857,7 @@ igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *il,
  * \param al Pointer to an uninitialized incidence list.
  * \param mode Constant, it gives whether incoming edges
  *   (<code>IGRAPH_IN</code>), outgoing edges
- *   (<code>IGRPAH_OUT</code>) or both types of edges
+ *   (<code>IGRAPH_OUT</code>) or both types of edges
  *   (<code>IGRAPH_ALL</code>) are considered. It is ignored for
  *   undirected graphs.
  * \return Error code.
@@ -892,7 +893,7 @@ int igraph_lazy_inclist_init(const igraph_t *graph,
 
 /**
  * \function igraph_lazy_inclist_destroy
- * Deallocates memory
+ * \brief Deallocates a lazy incidence list.
  *
  * Frees all allocated memory for a lazy incidence list.
  * \param al The incidence list to deallocate.
@@ -907,9 +908,10 @@ void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il) {
 
 /**
  * \function igraph_lazy_inclist_clear
- * Removes all edges from a lazy incidence list.
+ * \brief Removes all edges from a lazy incidence list.
  *
  * \param il The lazy incidence list.
+ *
  * Time complexity: depends on memory management, typically O(n), where n is
  * the total number of elements in the incidence list.
  */
