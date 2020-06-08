@@ -877,7 +877,7 @@ int igraph_es_all(igraph_es_t *es,
  * \function igraph_ess_all
  * \brief Edge set, all edges (immediate version)
  *
- * The immediate version of the all-vertices selector.
+ * The immediate version of the all-edges selector.
  *
  * \param order Constant giving the order of the edges in the edge
  *        selector. See \ref igraph_es_all() for the possible values.
