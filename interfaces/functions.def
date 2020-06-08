@@ -1312,6 +1312,7 @@ igraph_modularity:
         PARAMS: GRAPH graph, VECTOR membership, \
                 IN VECTOR_OR_0 weights=NULL, \
                 REAL resolution=1.0, \
+                BOOLEAN directed=True,
                 OUT REALPTR modularity
         NAME-R: modularity.igraph
         IGNORE: RNamespace, RR
