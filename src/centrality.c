@@ -2667,7 +2667,7 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
             VECTOR(*res)[i] += (mindist - 1.0);
             nodes_reached++;
 
-            if (cutoff > 0 && mindist >= cutoff + 1.0) {
+            if (cutoff >= 0 && mindist > cutoff + 1.0) {
                 continue;    /* NOT break!!! */
             }
 
@@ -2701,7 +2701,7 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
         VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes - nodes_reached));
         VECTOR(*res)[i] = (no_of_nodes - 1) / VECTOR(*res)[i];
 
-        if (((cutoff > 0 && mindist < cutoff + 1.0) || (cutoff <= 0)) &&
+        if (((cutoff >= 0 && mindist <= cutoff + 1.0) || (cutoff < 0)) &&
             nodes_reached < no_of_nodes && !warning_shown) {
             IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
             warning_shown = 1;
@@ -2764,8 +2764,8 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  *          undirected one for the computation.
  *        \endclist
  * \param cutoff The maximal length of paths that will be considered.
- *        If zero or negative, the exact closeness will be calculated
- *        (no upper limit on path lengths).
+ *        If negative, the exact closeness will be calculated (no upper
+ *        limit on path lengths).
  * \param weights An optional vector containing edge weights for
  *        weighted closeness. Supply a null pointer here for
  *        traditional, unweighted closeness.
@@ -2852,7 +2852,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
             VECTOR(*res)[i] += actdist;
 
-            if (cutoff > 0 && actdist >= cutoff) {
+            if (cutoff >= 0 && actdist > cutoff) {
                 continue;    /* NOT break!!! */
             }
 
@@ -2874,7 +2874,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
         VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes - nodes_reached));
         VECTOR(*res)[i] = (no_of_nodes - 1) / VECTOR(*res)[i];
 
-        if (((cutoff > 0 && actdist < cutoff) || cutoff <= 0) &&
+        if (((cutoff >= 0 && actdist <= cutoff) || cutoff < 0) &&
             no_of_nodes > nodes_reached && !warning_shown) {
             IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
             warning_shown = 1;
