@@ -938,32 +938,32 @@ int igraph_modularity(const igraph_t *graph,
     long int c1, c2;
 
     if (igraph_is_directed(graph)) {
-        IGRAPH_WARNING("Modularity is implemented for undirected graphs only; ignoring edge directions");
+        IGRAPH_WARNING("Modularity is implemented for undirected graphs only. Ignoring edge directions.");
     }
 
-    if (igraph_vector_size(membership) < igraph_vcount(graph)) {
-        IGRAPH_ERROR("cannot calculate modularity, membership vector too short",
+    if (igraph_vector_size(membership) != igraph_vcount(graph)) {
+        IGRAPH_ERROR("Membership vector size differs from number of vertices.",
                      IGRAPH_EINVAL);
     }
     if (igraph_vector_min(membership) < 0) {
-        IGRAPH_ERROR("Invalid membership vector", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);
     }
     if (resolution < 0.0) {
-      IGRAPH_ERROR("The resolution parameter must be non-negative", IGRAPH_EINVAL);
+      IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&e, types);
     IGRAPH_VECTOR_INIT_FINALLY(&a, types);
 
     if (weights) {
-        if (igraph_vector_size(weights) < no_of_edges)
-            IGRAPH_ERROR("cannot calculate modularity, weight vector too short",
+        if (igraph_vector_size(weights) != no_of_edges)
+            IGRAPH_ERROR("Vector size differs from number of edges.",
                          IGRAPH_EINVAL);
         m = igraph_vector_sum(weights);
         for (i = 0; i < no_of_edges; i++) {
             igraph_real_t w = VECTOR(*weights)[i];
             if (w < 0) {
-                IGRAPH_ERROR("negative weight in weight vector", IGRAPH_EINVAL);
+                IGRAPH_ERROR("Negative weight in weight vector.", IGRAPH_EINVAL);
             }
             igraph_edge(graph, (igraph_integer_t) i, &from, &to);
             c1 = (long int) VECTOR(*membership)[from];
