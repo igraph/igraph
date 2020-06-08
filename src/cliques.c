@@ -312,13 +312,9 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * If you are only interested in the size of the largest clique in the graph,
  * use \ref igraph_clique_number() instead.
  *
- * </para><para>The current implementation of this function searches
- * for maximal independent vertex sets (see \ref
- * igraph_maximal_independent_vertex_sets()) in the complementer graph
- * using the algorithm published in:
- * S. Tsukiyama, M. Ide, H. Ariyoshi and I. Shirawaka. A new algorithm
- * for generating all the maximal independent sets. SIAM J Computing,
- * 6:505--517, 1977.
+ * </para><para>The current implementation of this function
+ * uses version 1.21 of the Cliquer library by Sampo Niskanen and
+ * Patric R. J. Östergård, http://users.aalto.fi/~pat/cliquer.html
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
@@ -334,7 +330,7 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  *
  * \sa \ref igraph_largest_cliques() and \ref igraph_clique_number().
  *
- * Time complexity: TODO
+ * Time complexity: Exponential
  *
  * \example examples/simple/igraph_cliques.c
  */
