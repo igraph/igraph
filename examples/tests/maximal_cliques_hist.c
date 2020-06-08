@@ -1,6 +1,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t graph;
     igraph_vector_t hist;
@@ -16,6 +18,8 @@ int main() {
 
     igraph_vector_destroy(&hist);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
