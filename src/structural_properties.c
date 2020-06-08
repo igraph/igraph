@@ -3781,6 +3781,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
     return 0;
 }
 
+
 /**
  * \function igraph_count_multiple
  * \brief Count the number of appearances of the edges in a graph.
@@ -3801,15 +3802,15 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
  *
  * \sa \ref igraph_is_multiple() and \ref igraph_simplify().
  *
- * Time complexity: O(e*d), e is the number of edges to check and d is the
+ * Time complexity: O(E d), E is the number of edges to check and d is the
  * average degree (out-degree in directed graphs) of the vertices at the
  * tail of the edges.
  */
 
-
 int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
     igraph_eit_t eit;
     long int i;
+    igraph_bool_t directed = igraph_is_directed(graph);
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -3835,7 +3836,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
             }
         }
         /* for loop edges, divide the result by two */
-        if (to == from) {
+        if (!directed && to == from) {
             VECTOR(*res)[i] /= 2;
         }
     }
@@ -3843,8 +3844,10 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
     igraph_lazy_inclist_destroy(&inclist);
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
+
 
 /**
  * \function igraph_girth
