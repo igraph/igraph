@@ -109,6 +109,7 @@ DECLDIR int igraph_community_edge_betweenness(const igraph_t *graph,
         igraph_bool_t directed,
         const igraph_vector_t *weights);
 DECLDIR int igraph_community_eb_get_merges(const igraph_t *graph,
+        const igraph_bool_t directed,
         const igraph_vector_t *edges,
         const igraph_vector_t *weights,
         igraph_matrix_t *merges,
@@ -136,6 +137,7 @@ DECLDIR int igraph_modularity(const igraph_t *graph,
                               const igraph_vector_t *membership,
                               const igraph_vector_t *weights,
                               const igraph_real_t resolution,
+                              const igraph_bool_t directed,
                               igraph_real_t *modularity);
 
 DECLDIR int igraph_modularity_matrix(const igraph_t *graph,
