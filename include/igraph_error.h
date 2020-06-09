@@ -564,7 +564,10 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  */
 
 #define IGRAPH_FINALLY(func,ptr) \
-    IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
+    { \
+        if (0) { func(ptr); } \
+        IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr)); \
+    }
 
 #if !defined(GCC_VERSION_MAJOR) && defined(__GNUC__)
     #define GCC_VERSION_MAJOR  __GNUC__
