@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 void *thread_function(void *arg) {
-    IGRAPH_FINALLY(0, 0);
+    IGRAPH_FINALLY(igraph_free, NULL);
     return 0;
 }
 
