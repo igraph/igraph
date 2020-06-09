@@ -565,6 +565,9 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
 
 #define IGRAPH_FINALLY(func,ptr) \
     { \
+        /* the following branch makes the compiler check the compatibility of \
+         * func and ptr to detect cases when we are accidentally invoking an \
+         * incorrect destructor function with the pointer */ \
         if (0) { func(ptr); } \
         IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr)); \
     }
