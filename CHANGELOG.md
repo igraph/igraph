@@ -9,8 +9,9 @@
 ### Changed
 
  - `igraph_community_multilevel()`: added resolution parameter.
- - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter, parameter ordering has changed.
+ - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
  - `igraph_modularity()` will now issue a warning instead of an error when passing a directed graph.
+ - `igraph_modularity()` now supports computing the directed version of modularity.
 
 ### Fixed
 
