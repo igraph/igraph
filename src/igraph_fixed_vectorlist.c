@@ -50,7 +50,7 @@ int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
     }
     IGRAPH_FINALLY(igraph_free, l->vecs);
     IGRAPH_CHECK(igraph_vector_ptr_init(&l->v, size));
-    IGRAPH_FINALLY(igraph_fixed_vectorlist_destroy, &l->v);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, &l->v);
     IGRAPH_VECTOR_INIT_FINALLY(&sizes, size);
 
     for (i = 0; i < no; i++) {
