@@ -1155,7 +1155,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
     gtree = igraph_gml_tree_get_tree(context.tree, gidx);
 
-    IGRAPH_FINALLY(igraph_i_gml_destroy_attrs, &attrs);
+    IGRAPH_FINALLY(igraph_i_gml_destroy_attrs, attrs);
     igraph_vector_ptr_init(&gattrs, 0);
     igraph_vector_ptr_init(&vattrs, 0);
     igraph_vector_ptr_init(&eattrs, 0);
@@ -3386,5 +3386,3 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
 }
 
 #undef CHECK
-
-

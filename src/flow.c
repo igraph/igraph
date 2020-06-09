@@ -742,7 +742,7 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
         IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
         IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
-        IGRAPH_FINALLY(igraph_dqueue_destroy, &added);
+        IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
 
         igraph_dqueue_push(&Q, source);
         igraph_dqueue_push(&Q, 0);
@@ -2526,4 +2526,3 @@ int igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
 
     return IGRAPH_SUCCESS;
 }
-
