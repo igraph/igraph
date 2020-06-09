@@ -314,6 +314,7 @@ add_legacy_tests(
   igraph_community_fluid_communities
   igraph_community_label_propagation
   igraph_community_leiden
+  igraph_modularity
 )
 
 # cliques.at
