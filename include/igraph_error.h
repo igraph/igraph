@@ -330,7 +330,7 @@ DECLDIR igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t*
  * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
  */
 
-typedef enum {    
+typedef enum {
     IGRAPH_SUCCESS           = 0,
     IGRAPH_FAILURE           = 1,
     IGRAPH_ENOMEM            = 2,
@@ -607,11 +607,26 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  * call which can return an error code.
  */
 
+#ifndef NDEBUG
+#define IGRAPH_CHECK(a) \
+        do { \
+            int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
+            int igraph_i_ret=(a); \
+            if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
+                IGRAPH_ERROR("", igraph_i_ret); \
+            } \
+            if (enter_stack_size != IGRAPH_FINALLY_STACK_SIZE()) { \
+                IGRAPH_ERROR("Non-matching number of IGRAPH_FINAL and IGRAPH_FINALLY_CLEAN", IGRAPH_FAILURE); \
+            } \
+        } while (0)
+#else
 #define IGRAPH_CHECK(a) do { \
         int igraph_i_ret=(a); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
             IGRAPH_ERROR("", igraph_i_ret); \
         } } while (0)
+#endif
+
 
 
 /**
