@@ -2187,7 +2187,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
 
     igraph_free(funcs);
     igraph_free(TODO);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return 0;
 }
