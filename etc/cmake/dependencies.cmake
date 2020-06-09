@@ -7,7 +7,7 @@ macro(find_dependencies)
   option(IGRAPH_GRAPHML_SUPPORT "Compile igraph with GraphML support" YES)
 
   # Declare dependencies
-  set(REQUIRED_DEPENDENCIES ARPACK CXSparse LAPACK)
+  set(REQUIRED_DEPENDENCIES ARPACK BLAS CXSparse LAPACK)
   set(OPTIONAL_DEPENDENCIES FLEX BISON)
 
   # Declare dependencies dependent on some configuration settings

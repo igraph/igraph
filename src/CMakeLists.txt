@@ -197,14 +197,16 @@ target_include_directories(
 # Link igraph statically to some of the libraries from the subdirectories
 target_link_libraries(
   igraph
-  PRIVATE
-  bliss cliquer plfit prpack
+  PUBLIC
   ${ARPACK_LIBRARIES}
+  ${BLAS_LIBRARIES}
   ${CXSPARSE_LIBRARIES}
   ${GLPK_LIBRARIES}
   ${GMP_LIBRARY}
   ${LAPACK_LIBRARIES}
   ${LIBXML2_LIBRARIES}
+  PRIVATE
+  bliss cliquer plfit prpack
 )
 
 # Turn on all warnings for GCC, clang and MSVC
