@@ -14,8 +14,10 @@
 
 ### Fixed
 
+ - `igraph_count_multiple()` was giving incorrect results for self-loops in directed graph (PR #1399).
  - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).
  - `igraph_eigen_matrix_symmetric()`: fixed incorrect matrix multiplication (PR #1379).
+ - Corrected several issues that could arise during an error condition (PRs #1405, #1406).
 
 ### Other
 
