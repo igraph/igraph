@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <math.h>
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_t g;
@@ -46,5 +48,8 @@ int main() {
 
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

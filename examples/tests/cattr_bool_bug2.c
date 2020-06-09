@@ -2,6 +2,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 #define FILENAME "mybool.graphml.xml"
 
 int main() {
@@ -39,6 +41,8 @@ int main() {
     }
 
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

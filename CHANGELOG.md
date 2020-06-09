@@ -4,11 +4,24 @@
 
 ### Added
 
+ - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
+
 ### Changed
+
+ - `igraph_community_multilevel()`: added resolution parameter.
+ - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter, parameter ordering has changed.
+ - `igraph_modularity()` will now issue a warning instead of an error when passing a directed graph.
 
 ### Fixed
 
+ - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).
+ - `igraph_eigen_matrix_symmetric()`: fixed incorrect matrix multiplication (PR #1379).
+
 ### Other
+
+ - Documentation improvements.
+ - Improved error and warning messages.
+ - Improved compatibility with recent versions of Microsoft Visual C.
 
 ## [0.8.2] - 2020-04-28
 
@@ -24,7 +37,7 @@
    running on i386 architecture, or when using different versions of external
    dependencies.
 
-### Others
+### Other
 
  - Improved error messages from `igraph_sir()`.
  - Improved compatibility with more recent versions of Microsoft Visual C.
@@ -43,7 +56,7 @@
  - `igraph_bridges()` now handles multigraphs correctly (PR #1335)
  - `igraph_avg_nearest_neighbor_degree()`: fix for memory leak in weighted case (PR #1339)
  - `igraph_community_leiden()`: fix crash bug (PR #1357)
- 
+
 ### Other
 
  - Included `ACKOWLEDGEMENTS.md`

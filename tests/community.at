@@ -21,6 +21,11 @@
 
 AT_BANNER([[Community structure]])
 
+AT_SETUP([Modularity (igraph_modularity): ])
+AT_KEYWORDS([modularity community clustering])
+AT_COMPILE_CHECK([tests/igraph_modularity.c], [tests/igraph_modularity.out])
+AT_CLEANUP
+
 AT_SETUP([Spinglass clustering (igraph_spinglass_community): ])
 AT_KEYWORDS([spin glass spinglass community clustering])
 AT_COMPILE_CHECK([simple/spinglass.c])

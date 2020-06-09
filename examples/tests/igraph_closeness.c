@@ -186,5 +186,7 @@ int main() {
     advanced_test_case_no_weights_undirected();
     advanced_test_case_with_weights();
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

@@ -62,6 +62,7 @@ AbstractGraph::AbstractGraph() : refine_equal_to_first(false)
   first_path_automorphism = 0;
   best_path_automorphism = 0;
   in_search = false;
+  refine_equal_to_first = false;
 
   /* Default value for using "long prune" */
   opt_use_long_prune = true;
