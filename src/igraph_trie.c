@@ -47,7 +47,7 @@ static int igraph_i_trie_init_node(igraph_trie_node_t *t) {
     return 0;
 }
 
-static void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree);
+static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
 
 /**
  * \ingroup igraphtrie
@@ -59,8 +59,8 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfre
 int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     t->maxvalue = -1;
     t->storekeys = storekeys;
-    IGRAPH_CHECK(igraph_i_trie_init_node( (igraph_trie_node_t *)t ));
-    IGRAPH_FINALLY(igraph_i_trie_destroy_node, t);
+    IGRAPH_CHECK(igraph_i_trie_init_node( (igraph_trie_node_t *) t ));
+    IGRAPH_FINALLY(igraph_i_trie_destroy_node, (igraph_trie_node_t *) t );
     if (storekeys) {
         IGRAPH_CHECK(igraph_strvector_init(&t->keys, 0));
     }
@@ -74,13 +74,13 @@ int igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
  * \brief Destroys a node of a trie (not to be called directly).
  */
 
-static void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfree) {
+static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool_t sfree) {
     long int i;
     igraph_strvector_destroy(&t->strs);
     for (i = 0; i < igraph_vector_ptr_size(&t->children); i++) {
         igraph_trie_node_t *child = VECTOR(t->children)[i];
         if (child != 0) {
-            igraph_i_trie_destroy_node(child, 1);
+            igraph_i_trie_destroy_node_helper(child, 1);
         }
     }
     igraph_vector_ptr_destroy(&t->children);
@@ -88,6 +88,10 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t, igraph_bool_t sfre
     if (sfree) {
         igraph_Free(t);
     }
+}
+
+static void igraph_i_trie_destroy_node(igraph_trie_node_t *t) {
+    igraph_i_trie_destroy_node_helper(t, 0);
 }
 
 /**
@@ -99,7 +103,7 @@ void igraph_trie_destroy(igraph_trie_t *t) {
     if (t->storekeys) {
         igraph_strvector_destroy(&t->keys);
     }
-    igraph_i_trie_destroy_node( (igraph_trie_node_t*) t, 0);
+    igraph_i_trie_destroy_node( (igraph_trie_node_t*) t);
 }
 
 
