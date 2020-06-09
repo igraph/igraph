@@ -57,7 +57,7 @@ typedef struct s_igraph_strvector {
 #define IGRAPH_STRVECTOR_NULL { 0,0 }
 #define IGRAPH_STRVECTOR_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_strvector_init(v, size)); \
-        IGRAPH_FINALLY( (igraph_finally_func_t*) igraph_strvector_destroy, v); } while (0)
+        IGRAPH_FINALLY( igraph_strvector_destroy, v); } while (0)
 
 DECLDIR int igraph_strvector_init(igraph_strvector_t *sv, long int len);
 DECLDIR void igraph_strvector_destroy(igraph_strvector_t *sv);
