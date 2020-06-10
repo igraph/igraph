@@ -327,14 +327,14 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
      * */
     /* TODO: implement the actual functions */
 
-    long int i;
+    long int i, n;
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t si;
     igraph_vector_int_t nonorth_cycles;
 
     igraph_vector_t fvs, basis_weight;
     /* list of vertices = tree -> list of trees */
-    igraph_vector_ptr_t trees_z;
+    igraph_vector_ptr_t trees;
     /* list of vertices = vector -> list of vectors = basis -> list of bases */
     igraph_vector_ptr_t candidate_cycles;
     /* total weight of each basis (?) */
@@ -343,10 +343,11 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     /* 0. Feedback vertex set */
     IGRAPH_CHECK(igraph_i_feedback_vertex_set(
 			    graph, &fvs, weights));
+    n = igraph_vector_size(&fvs);
 
     /* 1. Construct all shortest path trees */
     IGRAPH_CHECK(igraph_i_shortest_path_trees(
-			    graph, weights, &fvs, &trees_z));
+			    graph, weights, &fvs, &trees));
 
     /* 2. Construct candidate list */
     IGRAPH_CHECK(igraph_i_candidate_bases(
@@ -362,7 +363,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
 	/* 3.2 update tree vertex labels from Si */
 	IGRAPH_CHECK(igraph_i_update_tree_z_vertex_labels(
-			&trees_z, &si));
+			&trees, &si));
 
 	/* 3.3 find non-orthogonal candidates */
 	IGRAPH_CHECK(igraph_i_nonorthogonal_candidates(
@@ -374,6 +375,12 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
     }
 
+
+    /* Clean */
+    igraph_vector_destroy(&fvs);
+    igraph_vector_ptr_destroy_all(trees);
+    IGRAPH_FINALLY_CLEAN(1 + n + 1); // FIXME: Check this number
+
     return IGRAPH_SUCCESS;
 }
 
@@ -381,19 +388,19 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 int igraph_i_shortest_path_trees(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_vector_t *vertices,
-		igraph_vector_ptr_t *trees_z,
+		igraph_vector_ptr_t *trees,
 		) {
 
     long int i;
     long int n = igraph_vector_size(vertices);
 
-    igraph_vector_ptr_init(trees_z, n);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, trees_z);
+    igraph_vector_ptr_init(trees, n);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, trees);
 
     for(i = 0; i < n; i++) {
         IGRAPH_CHECK(igraph_shortest_path_tree(graph,
 				VECTOR(vertices)[i],
-				VECTOR(trees_z)[i],
+				VECTOR(trees)[i],
 				weights));
     }
 
@@ -405,6 +412,9 @@ int igraph_i_candidate_bases(const igraph_t *graph,
 		igraph_vector_ptr_t *candidate_cycles,
 		igraph_vector_t *cadidate_weights,
 		){
+
+    /* These can be Horton cycles or a subset, which is more efficient
+     * Let's see how far we get with the implementation */
 
     /* TODO: implement */
     return IGRAPH_SUCCESS;
@@ -423,7 +433,7 @@ int igraph_i_compte_Si(const igraph_t *graph,
 }
 
 
-int igraph_i_update_tree_z_vertex_labels(igraph_vector_ptr_t *trees_z,
+int igraph_i_update_tree_z_vertex_labels(igraph_vector_ptr_t *trees,
 		const igraph_vector_t *si,
 		) {
 
