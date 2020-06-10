@@ -335,9 +335,9 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     igraph_vector_t fvs, basis_weight;
     /* list of vertices = tree -> list of trees */
     igraph_vector_ptr_t trees;
-    /* list of vertices = vector -> list of vectors = basis -> list of bases */
-    igraph_vector_ptr_t candidate_cycles;
-    /* total weight of each basis (?) */
+    /* NOTE: [tree_id, edge_id, tree_id2, edge_id2, ...] */
+    igraph_vector_int_t candidate_cycles;
+    /* total weight of each cycle */
     igraph_vector_t candidate_weights;
 
     /* 0. Feedback vertex set */
@@ -409,18 +409,94 @@ int igraph_i_shortest_path_trees(const igraph_t *graph,
 
 int igraph_i_candidate_bases(const igraph_t *graph,
 		const igraph_vector_t *weights,
-		igraph_vector_ptr_t *candidate_cycles,
+		const igraph_vector_ptr_t *trees,
+		igraph_vector_int_t *candidate_cycles,
 		igraph_vector_t *cadidate_weights,
 		){
 
     /* These can be Horton cycles or a subset, which is more efficient
      * Let's see how far we get with the implementation */
 
-    /* TODO: implement */
+    long int i, ie;
+    igraph_vector_int_t subtree_label, cycle_order;
+    long int no_of_nodes=igraph_vcount(graph);
+    long int no_of_edges=igraph_ecount(graph);
+    igraph_vector_es_t edges;
+    igraph_es_all(&es, IGRAPH_EDGEORDER_ID);
+    
+    IGRAPH_CHECK(igraph_vector_int_init(subtree_label, no_of_nodes));
+
+    /* For each tree... */
+    for(i = 0; i < igraph_vector_size(trees); i++) {
+        /* find edges for which the two vertices only meet in the tree at the root */
+	/* how do we find them? well we
+	 * 1. get the children of root and create subtrees
+	 * 2. we test if any edge has vertices in different subtrees
+	 * whether we approach by vertices or edges depends on how sparse the
+	 * graph is. For now let's assign every vertex to a subtree, then go over
+	 * the edges and check */
+         igraph_inclist_t inclist;
+         igraph_vector_int_t *root_edges;
+	 long int j, nchild;
+	 igraph_vector_t children;
+
+	 igraph_vector_t tree = VECTOR(trees)[i];
+	 igraph_integer_t root = VECTOR(tree)[0];
+
+         IGRAPH_CHECK(igraph_inclist_init(tree, &inclist, IGRAPH_ALL));
+         root_edges = igraph_inclist_get(il, root);
+	 nchild = igraph_vector_int_size(edges);
+         IGRAPH_CHECK(igraph_vector_init(children, nchild));
+
+	 /* root is not in any subtree, so put it as -1 */
+	 VECTOR(subtree_label)[0] = -1;
+	 for(j = 0; j < nchild; j++) {
+	     VECTOR(children)[j] = IGRAPH_OTHER(tree, VECTOR(edges)[j], root);
+	     /* label each child into its own subtree */
+	     VECTOR(subtree_label)[VECTOR(children)[j]] = j
+	 }
+
+	 /* TODO: label the rest of the tree recursively based on the children */
+
+	 /* Look through the edges for the ones spanning different subtrees */
+	 for(j = 0; j < no_of_edges; j++) {
+             double weight = 0;
+             igraph_integer_t from, igraph_integer_t to;
+	     igraph_integer_t edge = VECTOR(edges)[j];
+	     igraph_edge(graph, edge, &from, &to);
+
+	     from = VECTOR(subtree_label)[from];
+	     to = VECTOR(subtree_label)[to];
+
+	     if ((from != -1) && (to != -1) && (from != to)) {
+	         /* since we store the trees anyway, we could make it such as the vector
+	          * of candidates contains
+	          *
+	          * [tree_id, key_edge_id, tree_id2, key_edge_id2]
+	          *
+	          * and separately the cycle total weight (since it's a float). The only
+	          * problem is that we need to sort by increasing weight, so we'll do
+	          * argsort and carefully resort this vector too.
+	          * */
+                 IGRAPH_CHECK(igraph_vector_push_back(candidate_cycles, i));
+                 IGRAPH_CHECK(igraph_vector_push_back(candidate_cycles, edge));
+
+		 /* TODO: compute the total weight of this cycle */
+                 IGRAPH_CHECK(igraph_vector_push_back(candidate_weights, weight));
+	     }
+	 }
+    
+    }
+
+    /* sort candidate list by weight */
+    /* TODO implement these functions? */
+    igraph_i_argsort(candidate_weights, &cycle_order);
+    igraph_i_sort_from_argsort(candidate_cycles, candidate_weights, &cycle_order);
+
     return IGRAPH_SUCCESS;
 }
 
-int igraph_i_compte_Si(const igraph_t *graph,
+int igraph_i_compute_Si(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_vector_ptr_t *basis,
 		long int i,
