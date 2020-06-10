@@ -314,8 +314,9 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
      *    are excluded because there's no decision: the path goes in one
      *    way and out another. Of course, 0-degree are also not needed.
      * 1. Construct all shortest path trees 
-     * 2. Construct candidate set of cycle bases, sorted in nondecreasing
-     *    order of weight
+     * 2. Construct candidate set of cycles, sorted in nondecreasing
+     *    order of weight. Each cycle is attached to a tree (but more than
+     *    one cycle can be attached to the same tree).
      * 3. for i = 1 to N do
      *     3.1 compute vector Si s.t. <Cj, Si> = 0 for each 1 <= j < i
      *         (orthogonal to the current cycles)
@@ -325,7 +326,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
      *         (so we can normalize it into <C, Si> = 1
      *
      * */
-    /* TODO: implement the actual functions */
+    /* TODO: finish implementation */
 
     long int i, n;
     long int no_of_nodes = igraph_vcount(graph);
