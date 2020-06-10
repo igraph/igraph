@@ -122,12 +122,21 @@ DECLDIR int igraph_contract_vertices(igraph_t *graph,
                                      const igraph_attribute_combination_t
                                      *vertex_comb);
 
-DECLDIR int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
-                                    const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
-
 DECLDIR int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
                              igraph_vector_t *res, const igraph_vs_t vs);
 
+/* -------------------------------------------------- */
+/* Feedback arc/vertex sets                           */
+/* -------------------------------------------------- */
+DECLDIR int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
+                                    const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
+
+DECLDIR int igraph_feedback_vertex_set(const igraph_t *graph, igraph_vector_t *result,
+                                    const igraph_vector_t *weights);
+
+/* -------------------------------------------------- */
+/* Cycle bases                                        */
+/* -------------------------------------------------- */
 DECLDIR int igraph_fundamental_cycle_basis(const igraph_t *graph,
                 igraph_vector_ptr_t *basis);
 

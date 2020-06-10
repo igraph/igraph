@@ -341,8 +341,8 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     igraph_vector_t candidate_weights;
 
     /* 0. Feedback vertex set */
-    IGRAPH_CHECK(igraph_i_feedback_vertex_set_approx(
-			    graph, weights, &fvs));
+    IGRAPH_CHECK(igraph_i_feedback_vertex_set(
+			    graph, &fvs, weights));
 
     /* 1. Construct all shortest path trees */
     IGRAPH_CHECK(igraph_i_shortest_path_trees(
@@ -356,42 +356,20 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     /* 3. Construct basis one by one */
     for (i = 0; i < no_of_nodes; i++) {
         /* 3.1 compute Si */
-	igraph_i_compute_Si(graph, weights, basis, i, &si);
+	IGRAPH_CHECK(igraph_i_compute_Si(graph, weights, basis, i, &si));
 
 	/* 3.2 update tree vertex labels from Si */
-	igraph_i_update_tree_z_vertex_labels(
-			&trees_z, &si);
+	IGRAPH_CHECK(igraph_i_update_tree_z_vertex_labels(
+			&trees_z, &si));
 
 	/* 3.3 find non-orthogonal candidates */
-	igraph_i_nonorthogonal_candidates(
-			candidate_cycles, &si, &nonorth_cycles);
+	IGRAPH_CHECK(igraph_i_nonorthogonal_candidates(
+			candidate_cycles, &si, &nonorth_cycles));
 
 	/* 3.4 get the shortest nonorthogonal cycle */
-	igraph_i_shortest_nonorthogonal_cycle(
-			candidate_cycles, &candidate_weights, &nonorth_cycles, basis);
+	IGRAPH_CHECK(igraph_i_shortest_nonorthogonal_cycle(
+			candidate_cycles, &candidate_weights, &nonorth_cycles, basis));
 
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-
-int igraph_i_feedback_vertex_set_approx(const igraph_t *graph,
-		const igraph_vector_t *weights,
-		igraph_vector_t *vertices,
-		) {
-
-    long int i;
-    long int no_of_nodes = igraph_vcount(graph);
-
-    /* TODO: implement */
-    /* For now, return all vertices */
-    igraph_vector_clear(vertices);
-    IGRAPH_CHECK(igraph_vector_reserve(vertices, no_of_nodes));
-
-    igraph_vs_t vertices_all = igraph_vss_all();
-    for (i = 0; i < no_of_nodes; i++) {
-	    vertices[i] = vertices_all[i];
     }
 
     return IGRAPH_SUCCESS;
