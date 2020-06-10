@@ -556,12 +556,13 @@ int igraph_i_candidate_cycles(const igraph_t *graph,
 	 * the edges and check */
          igraph_inclist_t inclist;
          igraph_vector_int_t *root_edges;
-	 long int j, nchild;
-	 igraph_vector_t children;
+         long int j, nchild;
+         igraph_vector_t children;
 
 	 igraph_vector_t tree = VECTOR(trees)[i];
 	 igraph_integer_t root = VECTOR(tree)[0];
 
+	 /* FIXME: each tree is not a graph but a list of edges, fix this */
          IGRAPH_CHECK(igraph_inclist_init(tree, &inclist, IGRAPH_ALL));
          root_edges = igraph_inclist_get(il, root);
 	 nchild = igraph_vector_int_size(edges);
