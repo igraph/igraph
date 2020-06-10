@@ -362,7 +362,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 	IGRAPH_CHECK(igraph_i_compute_Si(graph, weights, basis, i, &si));
 
 	/* 3.2 update tree vertex labels from Si */
-	IGRAPH_CHECK(igraph_i_update_tree_z_vertex_labels(
+	IGRAPH_CHECK(igraph_i_update_trees_vertex_labels(
 			&trees, &si));
 
 	/* 3.3 find non-orthogonal candidates */
@@ -385,16 +385,118 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 }
 
 
-/* NOTE: seems like we don't have this function. Could be useful beyond
- * this particular application */
+/* NOTE: Adaptated from igraph_i_minimum_spanning_tree_prim */
 int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_int_t root,
-		/* TODO: decide the output format for the tree */
 		igraph_vector_t *res,
 		) {
 
-    /* TODO: implement */
+    long int no_of_nodes = igraph_vcount(graph);
+    long int no_of_edges = igraph_ecount(graph);
+    char *already_added;
+    char *added_edges;
+
+    igraph_d_indheap_t heap = IGRAPH_D_INDHEAP_NULL;
+    igraph_integer_t mode = IGRAPH_ALL;
+
+    igraph_vector_t adj;
+    igraph_vector_int_t node_order;
+
+    long int i, j, ir;
+
+    igraph_vector_clear(res);
+
+    IGRAPH_FINALLY(igraph_free, already_added);
+    IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));
+    IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap);
+    IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+
+    /* use two pointers: ir goes from 0 to n-1, i starts from the root and follows
+     * e.g. if root = 2
+     *
+     * ir   i
+     * 0 -> 2
+     * 1 -> 0
+     * 2 -> 1
+     * 3 -> 3
+     * 4 -> 4
+     *
+     * et cetera
+     * */
+    for (ir = 0; ir < no_of_nodes; ir++) {
+        if (ir == 0) {
+	    i = root;
+	} else if (ir <= root) {
+	    i = ir - 1;
+	} else {
+	    i = ir;
+	}
+
+        if (already_added[i] > 0) {
+            continue;
+        }
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        already_added[i] = 1;
+        /* add all edges of the first vertex to the heap */
+        igraph_incident(graph, &adj, (igraph_integer_t) i, (igraph_neimode_t) mode);
+        for (j = 0; j < igraph_vector_size(&adj); j++) {
+            long int edgeno = (long int) VECTOR(adj)[j];
+            igraph_integer_t edgefrom, edgeto;
+            long int neighbor;
+            igraph_edge(graph, (igraph_integer_t) edgeno, &edgefrom, &edgeto);
+            neighbor = edgefrom != i ? edgefrom : edgeto;
+            if (already_added[neighbor] == 0) {
+                IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
+                                                   edgeno));
+            }
+        }
+
+        while (! igraph_d_indheap_empty(&heap)) {
+            /* Get minimal edge among the heaped ones */
+            long int from, edge;
+            igraph_integer_t tmp, to;
+            igraph_d_indheap_max_index(&heap, &from, &edge);
+            igraph_edge(graph, (igraph_integer_t) edge, &tmp, &to);
+
+            /* Erase it */
+            igraph_d_indheap_delete_max(&heap);
+
+            /* Is this edge already included? */
+            if (added_edges[edge] == 0) {
+                if (from == to) {
+                    to = tmp;
+                }
+                /* Does it point to a visited node? */
+                if (already_added[(long int)to] == 0) {
+                    already_added[(long int)to] = 1;
+                    added_edges[edge] = 1;
+                    IGRAPH_CHECK(igraph_vector_push_back(res, edge));
+                    /* add all outgoing edges */
+                    igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
+                    for (j = 0; j < igraph_vector_size(&adj); j++) {
+                        long int edgeno = (long int) VECTOR(adj)[j];
+                        igraph_integer_t edgefrom, edgeto;
+                        long int neighbor;
+                        igraph_edge(graph, (igraph_integer_t) edgeno, &edgefrom, &edgeto);
+                        neighbor = edgefrom != to ? edgefrom : edgeto;
+                        if (already_added[neighbor] == 0) {
+                            IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
+                                                               edgeno));
+                        }
+                    }
+                } /* for */
+            } /* if !already_added */
+        } /* while in the same component */
+    } /* for all nodes */
+
+    igraph_d_indheap_destroy(&heap);
+    igraph_Free(already_added);
+    igraph_vector_destroy(&adj);
+    igraph_Free(added_edges);
+    IGRAPH_FINALLY_CLEAN(4);
+
     return IGRAPH_SUCCESS;
 
 }
@@ -402,24 +504,22 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
 
 int igraph_i_shortest_path_trees(const igraph_t *graph,
 		const igraph_vector_t *weights,
-		const igraph_vector_t *vertices,
+		const igraph_vector_t *fvs,
 		igraph_vector_ptr_t *trees,
 		) {
 
     long int i;
-    long int n = igraph_vector_size(vertices);
+    long int n = igraph_vector_size(fvs);
 
     igraph_vector_ptr_init(trees, n);
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, trees);
 
     for(i = 0; i < n; i++) {
-	/* TODO: it's easy to implement the tree as a list of parents. However
-	 * we later need to go down from the root to assign subtree labels,
-	 * therefore lists of children would be preferrable. */
+	/* each tree is a list of edges */
         IGRAPH_CHECK(igraph_i_shortest_path_tree_rooted(graph,
-				VECTOR(vertices)[i],
-				VECTOR(trees)[i],
-				weights));
+				weights,
+				VECTOR(fvs)[i],
+				VECTOR(trees)[i]));
     }
 
     return IGRAPH_SUCCESS;
@@ -507,7 +607,7 @@ int igraph_i_candidate_bases(const igraph_t *graph,
     }
 
     /* sort candidate list by weight */
-    /* TODO implement these functions? */
+    /* TODO implement these functions? or better use structs? */
     igraph_i_argsort(candidate_weights, &cycle_order);
     igraph_i_sort_from_argsort(candidate_cycles, candidate_weights, &cycle_order);
 
@@ -527,7 +627,7 @@ int igraph_i_compute_Si(const igraph_t *graph,
 }
 
 
-int igraph_i_update_tree_z_vertex_labels(igraph_vector_ptr_t *trees,
+int igraph_i_update_trees_vertex_labels(igraph_vector_ptr_t *trees,
 		const igraph_vector_t *si,
 		) {
 
