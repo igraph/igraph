@@ -385,6 +385,21 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 }
 
 
+/* NOTE: seems like we don't have this function. Could be useful beyond
+ * this particular application */
+int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
+		const igraph_vector_t *weights,
+		const igraph_int_t root,
+		/* TODO: decide the output format for the tree */
+		igraph_vector_t *res,
+		) {
+
+    /* TODO: implement */
+    return IGRAPH_SUCCESS;
+
+}
+
+
 int igraph_i_shortest_path_trees(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_vector_t *vertices,
@@ -398,7 +413,10 @@ int igraph_i_shortest_path_trees(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_ptr_destroy, trees);
 
     for(i = 0; i < n; i++) {
-        IGRAPH_CHECK(igraph_shortest_path_tree(graph,
+	/* TODO: it's easy to implement the tree as a list of parents. However
+	 * we later need to go down from the root to assign subtree labels,
+	 * therefore lists of children would be preferrable. */
+        IGRAPH_CHECK(igraph_i_shortest_path_tree_rooted(graph,
 				VECTOR(vertices)[i],
 				VECTOR(trees)[i],
 				weights));
