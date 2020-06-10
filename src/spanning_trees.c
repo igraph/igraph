@@ -290,6 +290,20 @@ static int igraph_i_minimum_spanning_tree_prim(
     if (weights == 0) {
         return igraph_i_minimum_spanning_tree_unweighted(graph, res);
     }
+
+    if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+        IGRAPH_ERROR("Invalid weights length", IGRAPH_EINVAL);
+    }
+
+    added_edges = igraph_Calloc(no_of_edges, char);
+    if (added_edges == 0) {
+        IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, added_edges);
+    already_added = igraph_Calloc(no_of_nodes, char);
+    if (already_added == 0) {
+        IGRAPH_ERROR("prim spanning tree failed", IGRAPH_ENOMEM);
+    }
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));
     IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap);
