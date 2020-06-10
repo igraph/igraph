@@ -351,7 +351,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 			    graph, weights, &fvs, &trees));
 
     /* 2. Construct candidate list */
-    IGRAPH_CHECK(igraph_i_candidate_bases(
+    IGRAPH_CHECK(igraph_i_candidate_cycles(
 			    graph, weights,
 			    &candidate_cycles, &candidate_weights));
 
@@ -526,7 +526,7 @@ int igraph_i_shortest_path_trees(const igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
-int igraph_i_candidate_bases(const igraph_t *graph,
+int igraph_i_candidate_cycles(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_vector_ptr_t *trees,
 		igraph_vector_int_t *candidate_cycles,
