@@ -174,57 +174,9 @@ When you make a new pull request, please specify the correct target branch. The 
 <a name="tips"></a>
 ## Writing igraph Code
 
-Some tips on writing igraph code. In general, look at how things are done,
-and try to do them similarly. (Unless you think they are not done well, in
-which case please tell us.)
+[Some tips on writing igraph code](https://github.com/igraph/igraph/wiki/Tips-on-writing-igraph-code).
 
-### Code Formatting
-
-We use UNIX line endings and we prefer four spaces for indentation. Otherwise
-we are not too picky about code style; the general advice is that you should
-look at the style of some recently committed bigger change around the parts
-that you intend to change, and try to mimic that. The code style within igraph
-is not stricly the same, but we want to keep it reasonably similar.
-
-### C vs. C++
-
-Try to use C, unless you are updating already existing C++ code, or
-you have other good reason for C++ (but then maybe ask us first).
-
-### Data types
-
-Please try to use igraph's data types for vectors, matrices, stacks, etc.
-If they lack some functionality you need, please tell us.
-
-### Memory Allocation, Error Handling
-
-Please use igraph's memory allocation functions. Please also use the
-`FINALLY` stack: `IGRAPH_FINALLY`, `IGRAPH_FINALLY_CLEAN`, etc. See examples
-in the C code.
-
-### Random Numbers
-
-Please look at how random numbers are generated in any function in `src/games.c`.
-Do the same. I.e. use `RNG_BEGIN`, `RNG_END`, and igraph's RNG calls. Do
-not use the libc RNGs or other RNGs.
-
-### Documentation
-
-Please document your new functions. The C documentation is included in the C
-source code.
-
-### Test Cases
-
-Unless you change something trivial, please consider adding test cases.
-This is important! See the `tests`, `examples/simple` and `examples/tests`
-directories for existing tests that you can use as examples.
-
-Whenever possible, make sure that the tests are determistic. If you are using
-random numbers or a random graph generator in the tests, seed the random number
-generator with a constant in the main function of the test to make sure that
-every run generates the same set of random numbers.
-
-### Ask Us!
+## Ask Us!
 
 In general, if you are not sure about something, please ask! You can
 open an issue on GitHub, open a thread in our
