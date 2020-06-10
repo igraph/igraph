@@ -353,9 +353,11 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 			    graph, weights,
 			    &candidate_cycles, &candidate_weights));
 
-    /* 3. Construct basis one by one */
+    /* 3. Construct basis one cycle at a time
+     *    similar to a standard Gram Schmidt orthogonalization */
     for (i = 0; i < no_of_nodes; i++) {
-        /* 3.1 compute Si */
+        /* 3.1 compute Si, the nonnormalized, minimal vector
+	 *     sticking out from the current space */
 	IGRAPH_CHECK(igraph_i_compute_Si(graph, weights, basis, i, &si));
 
 	/* 3.2 update tree vertex labels from Si */
@@ -382,7 +384,19 @@ int igraph_i_shortest_path_trees(const igraph_t *graph,
 		igraph_vector_ptr_t *trees_z,
 		) {
 
-    /* TODO: implement */
+    long int i;
+    long int n = igraph_vector_size(vertices);
+
+    igraph_vector_ptr_init(trees_z, n);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy, trees_z);
+
+    for(i = 0; i < n; i++) {
+        IGRAPH_CHECK(igraph_shortest_path_tree(graph,
+				VECTOR(vertices)[i],
+				VECTOR(trees_z)[i],
+				weights));
+    }
+
     return IGRAPH_SUCCESS;
 }
 
