@@ -76,10 +76,49 @@ DECLDIR int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph
 DECLDIR int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
                             igraph_neimode_t mode);
 
-#define IGRAPH_FROM(g,e) ((igraph_integer_t)(VECTOR((g)->from)[(long int)(e)]))
-#define IGRAPH_TO(g,e)   ((igraph_integer_t)(VECTOR((g)->to)  [(long int)(e)]))
-#define IGRAPH_OTHER(g,e,v) \
-    ((igraph_integer_t)(IGRAPH_TO(g,(e))==(v) ? IGRAPH_FROM((g),(e)) : IGRAPH_TO((g),(e))))
+/**
+ * \define IGRAPH_FROM
+ * \brief The source vertex of an edge.
+ *
+ * Faster than \ref igraph_edge(), but no error checking is done: \p eid is assumed to be valid.
+ *
+ * \param graph The graph.
+ * \param eid   The edge ID.
+ * \return The source vertex of the edge.
+ * \sa \ref igraph_edge() if error checking is desired.
+ */
+#define IGRAPH_FROM(graph,eid) ((igraph_integer_t)(VECTOR((graph)->from)[(long int)(eid)]))
+
+/**
+ * \define IGRAPH_TO
+ * \brief The target vertex of an edge.
+ *
+ * Faster than \ref igraph_edge(), but no error checking is done: \p eid is assumed to be valid.
+ *
+ * \param graph The graph object.
+ * \param eid   The edge ID.
+ * \return The target vertex of the edge.
+ * \sa \ref igraph_edge() if error checking is desired.
+ */
+#define IGRAPH_TO(graph,eid)   ((igraph_integer_t)(VECTOR((graph)->to)  [(long int)(eid)]))
+
+/**
+ * \define IGRAPH_OTHER
+ * \brief The other endpoint of an edge.
+ *
+ * Typically used with undirected edges when one endpoint of the edge is known,
+ * and the other endpoint is needed. No error checking is done:
+ * \p eid and \p vid are assumed to be valid.
+ *
+ * \param graph The graph object.
+ * \param eid   The edge ID.
+ * \param vid   The vertex ID of one endpoint of an edge.
+ * \return The other endpoint of the edge.
+ * \sa \ref IGRAPH_TO() and \ref IGRAPH_FROM() to get the source and target
+ *     of directed edges.
+ */
+#define IGRAPH_OTHER(graph,eid,vid) \
+    ((igraph_integer_t)(IGRAPH_TO(graph,(eid))==(vid) ? IGRAPH_FROM((graph),(eid)) : IGRAPH_TO((graph),(eid))))
 
 __END_DECLS
 

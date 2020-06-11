@@ -1019,7 +1019,9 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
  * will be placed here.
  * \return Error code. The current implementation always returns with
  * success.
- * \sa \ref igraph_get_eid() for the opposite operation.
+ * \sa \ref igraph_get_eid() for the opposite operation;
+ *     \ref IGRAPH_TO(), \ref IGRAPH_FROM() and \ref IGRAPH_OTHER() for
+ *     a faster but non-error-checked version.
  *
  * Added in version 0.2.</para><para>
  *
