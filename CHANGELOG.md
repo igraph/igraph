@@ -22,6 +22,7 @@
 
 ### Other
 
+ - `igraph_degree_sequence_game()`: improved performance with `IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM` method.
  - Documentation improvements.
  - Improved error and warning messages.
  - Improved compatibility with recent versions of Microsoft Visual C.

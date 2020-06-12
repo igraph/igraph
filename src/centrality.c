@@ -1826,7 +1826,7 @@ static void igraph_i_destroy_biguints(igraph_biguint_t *p) {
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param cutoff The maximal length of paths that will be considered.
- *        If negative, the exact betweenness will be calculated, and
+ *        If negative or zero, the exact betweenness will be calculated, and
  *        there will be no upper limit on path lengths.
  * \param weights An optional vector containing edge weights for
  *        calculating weighted betweenness. Supply a null pointer here
@@ -1876,6 +1876,11 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     igraph_adjlist_t *adjlist_out_p, *adjlist_in_p;
 
     igraph_biguint_t D, R, T;
+
+    /* Ensure that 0 is interpreted as infinity in the igraph 0.8 series. TODO: remove for 0.9. */
+    if (cutoff == 0) {
+        cutoff = -1;
+    }
 
     if (weights) {
         return igraph_i_betweenness_estimate_weighted(graph, res, vids, directed,
