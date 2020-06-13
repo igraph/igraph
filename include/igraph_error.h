@@ -584,6 +584,19 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
     #define IGRAPH_LIKELY(a)   a
 #endif
 
+#if IGRAPH_VERIFY_FINALLY_STACK == 1
+#define IGRAPH_CHECK(a) \
+        do { \
+            int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
+            int igraph_i_ret=(a); \
+            if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
+                IGRAPH_ERROR("", igraph_i_ret); \
+            } \
+            if (enter_stack_size != IGRAPH_FINALLY_STACK_SIZE()) { \
+                IGRAPH_ERROR("Non-matching number of IGRAPH_FINALLY and IGRAPH_FINALLY_CLEAN", IGRAPH_FAILURE); \
+            } \
+        } while (0)
+#else
 /**
  * \define IGRAPH_CHECK
  * \brief Check the return value of a function call.
@@ -606,20 +619,6 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  * by using <function>IGRAPH_CHECK</function> on every \a igraph
  * call which can return an error code.
  */
-
-#if IGRAPH_VERIFY_FINALLY_STACK == 1
-#define IGRAPH_CHECK(a) \
-        do { \
-            int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
-            int igraph_i_ret=(a); \
-            if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
-                IGRAPH_ERROR("", igraph_i_ret); \
-            } \
-            if (enter_stack_size != IGRAPH_FINALLY_STACK_SIZE()) { \
-                IGRAPH_ERROR("Non-matching number of IGRAPH_FINALLY and IGRAPH_FINALLY_CLEAN", IGRAPH_FAILURE); \
-            } \
-        } while (0)
-#else
 #define IGRAPH_CHECK(a) do { \
         int igraph_i_ret=(a); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
