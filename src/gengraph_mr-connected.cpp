@@ -34,10 +34,10 @@ namespace gengraph {
 int parse_options(int &argc, char** &argv);
 
 // options
-static const bool MONITOR_TIME = false;
+// static const bool MONITOR_TIME = false;
 static const int  SHUFFLE_TYPE = FINAL_HEURISTICS;
-static const bool RAW_DEGREES  = false;
-static const FILE *Fdeg = stdin;
+// static const bool RAW_DEGREES  = false;
+// static const FILE *Fdeg = stdin;
 
 //_________________________________________________________________________
 // int main(int argc, char** argv) {
