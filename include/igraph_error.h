@@ -592,7 +592,7 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
             if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
                 IGRAPH_ERROR("", igraph_i_ret); \
             } \
-            if (enter_stack_size != IGRAPH_FINALLY_STACK_SIZE()) { \
+            if (IGRAPH_UNLIKELY(enter_stack_size != IGRAPH_FINALLY_STACK_SIZE())) { \
                 IGRAPH_ERROR("Non-matching number of IGRAPH_FINALLY and IGRAPH_FINALLY_CLEAN", IGRAPH_FAILURE); \
             } \
         } while (0)
