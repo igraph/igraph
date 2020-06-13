@@ -607,7 +607,7 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  * call which can return an error code.
  */
 
-#ifndef NDEBUG
+#if IGRAPH_VERIFY_FINALLY_STACK == 1
 #define IGRAPH_CHECK(a) \
         do { \
             int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
