@@ -177,7 +177,8 @@ REPLACE ----- \define ---------------------------------------------------------
 [\s]*(?P<brief>[^\n]*?)\n         # brief description
 (?P<after>.*?)\*\/                # tail of the comment
 \s*                               # whitespace
-(?P<def>\#define\s+[\w0-9,()]+)           # macro
+(?P<def>\#define\s+[\w0-9,]+\s*   # macro name
+(\([\w0-9, ]+\))?)                # macro args (optional)
 .*\Z                              # drop the remainder
 
 WITH --------------------------------------------------------------------------

@@ -24,7 +24,7 @@
 namespace gengraph {
 
 void box_list::insert(int v) {
-    register int d = deg[v];
+    int d = deg[v];
     if (d < 1) {
         return;
     }
@@ -41,10 +41,10 @@ void box_list::insert(int v) {
 }
 
 void box_list::pop(int v) {
-    register int p = prev[v];
-    register int n = next[v];
+    int p = prev[v];
+    int n = next[v];
     if (p < 0) {
-        register int d = deg[v];
+        int d = deg[v];
         assert(list[d - 1] == v);
         list[d - 1] = n;
         if (d == dmax && n < 0) do {
@@ -90,13 +90,13 @@ void box_list::pop_vertex(int v, int **neigh) {
     int *w = neigh[v];
     while (k--) {
         int v2 = *(w++);
-        register int *w2 = neigh[v2];
+        int *w2 = neigh[v2];
         while (*w2 != v) {
             w2++;
         }
-        register int *w3 = neigh[v2] + (deg[v2] - 1);
+        int *w3 = neigh[v2] + (deg[v2] - 1);
         assert(w2 <= w3);
-        register int tmp = *w3;
+        int tmp = *w3;
         *w3 = *w2;
         *w2 = tmp;
         pop(v2);

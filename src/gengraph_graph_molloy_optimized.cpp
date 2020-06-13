@@ -1047,7 +1047,7 @@ void graph_molloy_opt::explore_asp(double *target, int nb_vertices, int *buff, d
             int dv = deg[v];
             double f = target[v] / paths[v];
             // pick ALL fathers
-            register int father;
+            int father;
             for (int k = 0; k < dv; k++) if (dist[father = ww[k]] == pd) {
                     // increase target[] of father
                     target[father] += paths[father] * f;

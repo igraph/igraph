@@ -3801,7 +3801,7 @@ int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
         IGRAPH_FINALLY(igraph_free, log);
         rec->value = log;
         IGRAPH_CHECK(igraph_vector_bool_copy(log, v));
-        IGRAPH_FINALLY(igraph_vector_destroy, log);
+        IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
         IGRAPH_FINALLY_CLEAN(4);
     }

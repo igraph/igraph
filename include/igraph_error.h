@@ -564,7 +564,13 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  */
 
 #define IGRAPH_FINALLY(func,ptr) \
-    IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
+    { \
+        /* the following branch makes the compiler check the compatibility of \
+         * func and ptr to detect cases when we are accidentally invoking an \
+         * incorrect destructor function with the pointer */ \
+        if (0) { func(ptr); } \
+        IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr)); \
+    }
 
 #if !defined(GCC_VERSION_MAJOR) && defined(__GNUC__)
     #define GCC_VERSION_MAJOR  __GNUC__
@@ -578,6 +584,19 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
     #define IGRAPH_LIKELY(a)   a
 #endif
 
+#if IGRAPH_VERIFY_FINALLY_STACK == 1
+#define IGRAPH_CHECK(a) \
+        do { \
+            int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
+            int igraph_i_ret=(a); \
+            if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
+                IGRAPH_ERROR("", igraph_i_ret); \
+            } \
+            if (IGRAPH_UNLIKELY(enter_stack_size != IGRAPH_FINALLY_STACK_SIZE())) { \
+                IGRAPH_ERROR("Non-matching number of IGRAPH_FINALLY and IGRAPH_FINALLY_CLEAN", IGRAPH_FAILURE); \
+            } \
+        } while (0)
+#else
 /**
  * \define IGRAPH_CHECK
  * \brief Check the return value of a function call.
@@ -600,12 +619,13 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  * by using <function>IGRAPH_CHECK</function> on every \a igraph
  * call which can return an error code.
  */
-
 #define IGRAPH_CHECK(a) do { \
         int igraph_i_ret=(a); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
             IGRAPH_ERROR("", igraph_i_ret); \
         } } while (0)
+#endif
+
 
 
 /**
