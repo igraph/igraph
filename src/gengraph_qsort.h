@@ -24,10 +24,6 @@
 #include <assert.h>
 #include <stdio.h>
 
-#ifndef register
-    #define register
-#endif
-
 namespace gengraph {
 
 //___________________________________________________________________________
@@ -63,7 +59,7 @@ inline void isort(int *v, int t) {
         return;
     }
     for (int i = 1; i < t; i++) {
-        register int *w = v + i;
+        int *w = v + i;
         int tmp = *w;
         while (w != v && *(w - 1) > tmp) {
             *w = *(w - 1);
@@ -147,7 +143,7 @@ inline void isort(double *v, int t) {
         return;
     }
     for (int i = 1; i < t; i++) {
-        register double *w = v + i;
+        double *w = v + i;
         double tmp = *w;
         while (w != v && *(w - 1) > tmp) {
             *w = *(w - 1);
@@ -260,7 +256,7 @@ inline int *pre_boxsort(int *mem, int n, int &offset) {
     int mx = mem[0];
     int mn = mem[0];
     for (yo = mem + n - 1; yo != mem; yo--) {
-        register int x = *yo;
+        int x = *yo;
         if (x > mx) {
             mx = x;
         }
@@ -399,7 +395,7 @@ inline void lex_isort(int **l, int *v, int t, int s) {
         return;
     }
     for (int i = 1; i < t; i++) {
-        register int *w = v + i;
+        int *w = v + i;
         int tmp = *w;
         while (w != v && lex_comp(l[tmp], l[*(w - 1)], s) < 0) {
             *w = *(w - 1);
@@ -521,7 +517,7 @@ inline void mix_isort_indirect(int *key, int *v, int t, int **neigh, int *degs) 
         return;
     }
     for (int i = 1; i < t; i++) {
-        register int *w = v + i;
+        int *w = v + i;
         int tmp = *w;
         while (w != v && mix_comp_indirect(key, tmp, *(w - 1), neigh, degs) < 0) {
             *w = *(w - 1);
