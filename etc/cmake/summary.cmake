@@ -48,6 +48,12 @@ foreach(DEPENDENCY ${ALL_DEPENDENCIES})
 endforeach()
 message(STATUS " ")
 
+message(STATUS "----------[ Debugging ]---------")
+print_str(USE_SANITIIZER "Sanitizers" "${USE_SANITIZER}" "none")
+print_bool(IGRAPH_VERIFY_FINALLY_STACK "Verify 'finally' stack")
+
+message(STATUS " ")
+
 set(MISSING_DEPENDENCIES)
 foreach(DEPENDENCY ${REQUIRED_DEPENDENCIES})
   if(NOT ${DEPENDENCY}_FOUND)

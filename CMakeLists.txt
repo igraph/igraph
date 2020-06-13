@@ -30,7 +30,8 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Add switches to use sanitizers if needed
+# Add switches to use sanitizers and debugging helpers if needed
+include(debugging)
 include(sanitizers)
 
 # Add version information

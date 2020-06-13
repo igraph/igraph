@@ -175,6 +175,13 @@ add_library(
 # Set soname for the library
 set_target_properties(igraph PROPERTIES SOVERSION 0)
 
+# Add extra compiler definitions if needed
+target_compile_definitions(
+  igraph
+  PRIVATE
+  IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
+)
+
 # Add include path. Includes are in ../include but they get installed to
 # <prefix/include/igraph, hence the two options. We also have some private
 # includes that are generated at compile time but are not part of the public
