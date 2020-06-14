@@ -24,3 +24,6 @@ target_include_directories(
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
 )
+
+# Turn on all warnings for GCC, clang and MSVC
+use_all_warnings(prpack)

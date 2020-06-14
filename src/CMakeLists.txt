@@ -1,6 +1,11 @@
+# Include some compiler-related helper functions
+include(compilers)
+
 # Traverse subdirectories
 add_subdirectory(bliss)
 add_subdirectory(cliquer)
+add_subdirectory(f2c)
+add_subdirectory(lapack)
 add_subdirectory(plfit)
 add_subdirectory(prpack)
 
@@ -217,11 +222,7 @@ target_link_libraries(
 )
 
 # Turn on all warnings for GCC, clang and MSVC
-if(MSVC)
-  target_compile_options(igraph PRIVATE /W4 /WX)
-else()
-  target_compile_options(igraph PRIVATE -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-varargs)
-endif()
+use_all_warnings(igraph)
 
 # Generate pkgconfig file
 configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.cmake.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)

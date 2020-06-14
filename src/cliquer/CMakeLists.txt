@@ -13,3 +13,6 @@ target_include_directories(
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_BINARY_DIR}/src
 )
+
+# TODO(ntamas): make sure that this works for Cliquer
+# use_all_warnings(cliquer)

@@ -18,3 +18,5 @@ target_include_directories(
   ${CMAKE_BINARY_DIR}/src
   ${GMP_INCLUDE_DIR}
 )
+
+use_all_warnings(bliss)

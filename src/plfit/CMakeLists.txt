@@ -14,3 +14,5 @@ add_library(
   rbinom.c
   sampling.c
 )
+
+use_all_warnings(plfit)
