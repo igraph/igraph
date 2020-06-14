@@ -32,7 +32,7 @@ int igraph_hashtable_init(igraph_hashtable_t *ht) {
     IGRAPH_CHECK(igraph_trie_init(&ht->keys, 1));
     IGRAPH_FINALLY(igraph_trie_destroy, &ht->keys);
     IGRAPH_CHECK(igraph_strvector_init(&ht->elements, 0));
-    IGRAPH_FINALLY(igraph_trie_destroy, &ht->elements);
+    IGRAPH_FINALLY(igraph_strvector_destroy, &ht->elements);
     IGRAPH_CHECK(igraph_strvector_init(&ht->defaults, 0));
 
     IGRAPH_FINALLY_CLEAN(2);

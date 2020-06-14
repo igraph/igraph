@@ -204,4 +204,12 @@ void print_matrix_complex_first_row_positive(const igraph_matrix_complex_t *matr
     igraph_matrix_complex_destroy(&copy);
 }
 
+#define VERIFY_FINALLY_STACK() \
+    if (!IGRAPH_FINALLY_STACK_EMPTY) { \
+        printf( \
+          "Finally stack is not empty. " \
+          "Check that the number in IGRAPH_FINALLY_CLEAN matches the IGRAPH_FINALLY count.\n"); \
+        return 100; \
+    }
+
 #endif /* TEST_UTILITIES_INC */

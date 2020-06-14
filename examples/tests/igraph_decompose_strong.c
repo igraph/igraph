@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 void free_complist(igraph_vector_ptr_t *complist) {
     long int i;
     for (i = 0; i < igraph_vector_ptr_size(complist); i++) {
@@ -68,6 +70,8 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_ptr_destroy(&complist);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

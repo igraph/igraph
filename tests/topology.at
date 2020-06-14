@@ -21,7 +21,7 @@
 
 AT_BANNER([[Graph topology]])
 
-AT_SETUP([The isomorphism class of a subgraph (igraph_isolass_subgraph)])
+AT_SETUP([The isomorphism class of a subgraph (igraph_isoclass_subgraph)])
 AT_KEYWORDS([isomorph isomorphism class motif])
 AT_COMPILE_CHECK([simple/topology.c], [simple/topology.out])
 AT_CLEANUP

@@ -2187,7 +2187,7 @@ int igraph_i_cattribute_combine_edges(const igraph_t *graph,
 
     igraph_free(funcs);
     igraph_free(TODO);
-    IGRAPH_FINALLY_CLEAN(2);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return 0;
 }
@@ -3801,7 +3801,7 @@ int igraph_cattribute_VAB_setv(igraph_t *graph, const char *name,
         IGRAPH_FINALLY(igraph_free, log);
         rec->value = log;
         IGRAPH_CHECK(igraph_vector_bool_copy(log, v));
-        IGRAPH_FINALLY(igraph_vector_destroy, log);
+        IGRAPH_FINALLY(igraph_vector_bool_destroy, log);
         IGRAPH_CHECK(igraph_vector_ptr_push_back(val, rec));
         IGRAPH_FINALLY_CLEAN(4);
     }
@@ -3878,7 +3878,7 @@ int igraph_cattribute_VAS_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAN_setv
- * Set a numeric edge attribute for all vertices.
+ * Set a numeric edge attribute for all edges.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.
@@ -3944,7 +3944,7 @@ int igraph_cattribute_EAN_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAB_setv
- * Set a boolean edge attribute for all vertices.
+ * Set a boolean edge attribute for all edges.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.
@@ -4010,7 +4010,7 @@ int igraph_cattribute_EAB_setv(igraph_t *graph, const char *name,
 
 /**
  * \function igraph_cattribute_EAS_setv
- * Set a string edge attribute for all vertices.
+ * Set a string edge attribute for all edges.
  *
  * The attribute will be added if not present yet.
  * \param graph The graph.

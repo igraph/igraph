@@ -71,8 +71,13 @@ int main() {
                  10, 11, 10, 12, 10, 13, 10, 14,
                  11, 13,
                  -1);
-    igraph_community_multilevel(&g, 0, &membership, &memberships, &modularity);
+    igraph_community_multilevel(&g, 0, 1, &membership, &memberships, &modularity);
     show_results(&g, &membership, &memberships, &modularity, stdout);
+
+    /* Higher resolution */
+    igraph_community_multilevel(&g, 0, 1.5, &membership, &memberships, &modularity);
+    show_results(&g, &membership, &memberships, &modularity, stdout);
+
     igraph_destroy(&g);
 
     /* Ring of 30 cliques */
@@ -90,7 +95,7 @@ int main() {
         igraph_vector_push_back(&edges, (i * 5 + 6) % 150);
     }
     igraph_create(&g, &edges, 150, 0);
-    igraph_community_multilevel(&g, 0, &membership, &memberships, &modularity);
+    igraph_community_multilevel(&g, 0, 1, &membership, &memberships, &modularity);
     show_results(&g, &membership, &memberships, &modularity, stdout);
     igraph_destroy(&g);
 

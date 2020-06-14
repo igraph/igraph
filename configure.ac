@@ -131,6 +131,11 @@ AC_ARG_ENABLE(asan,
               AC_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
               [use_asan=$enableval], [use_asan=no])
 
+verify_finally=no
+AC_ARG_ENABLE(verify-finally,
+              AC_HELP_STRING([--enable-verify-finally], [Enable verifying the ``finally'' stack size]),
+              [verify_finally=$enableval], [verify_finally=no])
+
 debug=no
 AC_ARG_ENABLE(debug,
               AC_HELP_STRING([--enable-debug], [Enable debug build]),
@@ -384,6 +389,14 @@ if test "$use_asan" != "yes" -a "$use_gprof" != "yes" -a "$debug" != "yes"; then
   CXXFLAGS="${CXXFLAGS} -O3"
 fi
 
+if test "$verify_finally" = "yes"; then
+  CPPFLAGS="${CPPFLAGS} -DIGRAPH_VERIFY_FINALLY_STACK=1"
+fi
+
+if test "$verify_finally" = "no"; then
+  CPPFLAGS="${CPPFLAGS} -DIGRAPH_VERIFY_FINALLY_STACK=0"
+fi
+
 AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
 AC_OUTPUT
 
@@ -405,6 +418,7 @@ if test "$glpk_support" != "no"; then
 fi
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Clang AddressSanitizer -- $use_asan])
+AC_MSG_RESULT([  Verify finally stack   -- $verify_finally])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
 AC_MSG_RESULT([  Link time optimization -- $use_lto])
 

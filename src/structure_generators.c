@@ -762,11 +762,18 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
 /**
  * \ingroup generators
  * \function igraph_lattice
- * \brief Creates most kinds of lattices.
+ * \brief Arbitrary dimensional square lattices.
+ *
+ * Creates n-dimensional square lattices of the given size. Optionally,
+ * the lattice can be made periodic, and the neighbors within a given
+ * graph distance can be connected.
+ *
+ * </para><para>
+ * In the zero-dimensional case, the singleton graph is returned.
  *
  * \param graph An uninitialized graph object.
  * \param dimvector Vector giving the sizes of the lattice in each of
- *        its dimensions. Ie. the dimension of the lattice will be the
+ *        its dimensions. I.e. the dimension of the lattice will be the
  *        same as the length of this vector.
  * \param nei Integer value giving the distance (number of steps)
  *        within which two vertices will be connected.
@@ -782,10 +789,10 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
  *         \c IGRAPH_EINVAL: invalid (negative)
  *         dimension vector.
  *
- * Time complexity: if \p nei is less than two then it is O(|V|+|E|) (as
+ * Time complexity: If \p nei is less than two then it is O(|V|+|E|) (as
  * far as I remember), |V| and |E| are the number of vertices
- * and edges in the generated graph. Otherwise it is O(|V|*d^o+|E|), d
- * is the average degree of the graph, o is the \p nei argument.
+ * and edges in the generated graph. Otherwise it is O(|V|*d^k+|E|), d
+ * is the average degree of the graph, k is the \p nei argument.
  */
 int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
                    igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
@@ -806,12 +813,12 @@ int igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
 
     coords = igraph_Calloc(dims, long int);
     if (coords == 0) {
-        IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, coords);
     weights = igraph_Calloc(dims, long int);
     if (weights == 0) {
-        IGRAPH_ERROR("lattice failed", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, weights);
     if (dims > 0) {
