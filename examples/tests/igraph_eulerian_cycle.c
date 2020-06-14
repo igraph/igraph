@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <igraph.h>
 #include "test_utilities.inc"
@@ -127,6 +128,8 @@ int main() {
 
     igraph_destroy(&graph);
     igraph_vector_destroy(&res);
+
+    VERIFY_FINALLY_STACK();
     
     return 0;
 }

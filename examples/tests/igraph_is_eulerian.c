@@ -1,5 +1,7 @@
+
 #include <igraph.h>
 #include <stdio.h>
+#include "test_utilities.inc"
 
 int main() {
 
@@ -145,6 +147,8 @@ int main() {
     igraph_is_eulerian(&graph, &has_path, &has_cycle);
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
     
     return 0;
 }
