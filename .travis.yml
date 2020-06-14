@@ -43,14 +43,14 @@ jobs:
       os: linux
       install:
         - ./bootstrap.sh
-        - ./configure --with-external-glpk
+        - ./configure --enable-verify-finally --with-external-glpk
         - make
     - name: "Linux external deps"
       os: linux
       dist: bionic
       install:
         - ./bootstrap.sh
-        - ./configure --with-external-glpk --with-external-blas --with-external-lapack --with-external-arpack
+        - ./configure --enable-verify-finally --with-external-glpk --with-external-blas --with-external-lapack --with-external-arpack
         - make        
     - name: "Linux x87"
       os: linux
@@ -58,13 +58,13 @@ jobs:
         - CFLAGS="-mfpmath=387" CXXFLAGS="-mfpmath=387"
       install:
         - ./bootstrap.sh
-        - ./configure --with-external-glpk
+        - ./configure --enable-verify-finally --with-external-glpk
         - make
     - name: "macOS"
       os: osx
       install:
         - ./bootstrap.sh
-        - ./configure --with-external-glpk --enable-asan
+        - ./configure --enable-verify-finally --enable-asan --with-external-glpk 
         - make
     - name: "Documentation"
       language: shell
