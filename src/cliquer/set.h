@@ -338,10 +338,7 @@ static set_t set_union(set_t res,set_t a,set_t b) {
  */
 UNUSED_FUNCTION INLINE
 static int set_return_next(set_t s, unsigned int n) {
-	if (n<0)
-		n=0;
-	else
-		n++;
+	n++;
 	if (n >= SET_MAX_SIZE(s))
 		return -1;
 
