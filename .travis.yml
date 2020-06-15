@@ -68,6 +68,7 @@ jobs:
 #        - make
     - name: "macOS"
       os: osx
+      osx_image: xcode11.5    # we need a newer CMake in the image
       install:
         - mkdir build
         - cd build
