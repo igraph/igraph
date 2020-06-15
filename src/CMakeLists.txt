@@ -78,7 +78,6 @@ add_library(
   foreign-graphml.c
   foreign.c
   forestfire.c
-  fortran_intrinsics.c
   games.c
   gengraph_box_list.cpp
   gengraph_degree_sequence.cpp

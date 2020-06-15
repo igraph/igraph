@@ -32,7 +32,7 @@ add_library(
   dlar1v.c dlarrf.c dsterf.c dsytrd.c dlatrd.c dsytd2.c dlanhs.c dgeqr2.c
   dtrsen.c dlacn2.c dtrsyl.c dlasr.c dsteqr.c dgeevx.c dtrsna.c dlaqtr.c
   dgetrf.c dgetf2.c dlaswp.c dgetrs.c dgesv.c dpotrf.c dpotf2.c len_trim.c
-  dlamch.c
+  dlamch.c ../fortran_intrinsics.c
 )
 
 target_link_libraries(
