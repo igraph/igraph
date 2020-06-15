@@ -24,7 +24,7 @@ if(GMP_FOUND)
   target_link_libraries(
     bliss
     PUBLIC
-    ${GMP_LIBRARIES}
+    ${GMP_LIBRARY}
   )
 endif()
 
