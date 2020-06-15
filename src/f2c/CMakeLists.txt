@@ -14,6 +14,7 @@ add_custom_command(
 add_library(
   f2c_vendored
   STATIC
+  EXCLUDE_FROM_ALL
   abort_.c	  dolio.c	    r_sin.c
   dummy.c	  dtime_.c	    iio.c	      r_sinh.c
   backspac.c	  due.c	    ilnw.c	      r_sqrt.c

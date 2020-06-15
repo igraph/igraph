@@ -2,6 +2,7 @@
 add_library(
   blas_vendored
   STATIC
+  EXCLUDE_FROM_ALL
   dscal.c dswap.c lsame.c dnrm2.c idamax.c daxpy.c dgemv.c dger.c dgemm.c
   dcopy.c dtrmm.c dtrmv.c drot.c ddot.c dasum.c dsymv.c dsyr2k.c dsyr2.c
   dtrsm.c dsyrk.c dtrsv.c
@@ -17,6 +18,7 @@ target_link_libraries(
 add_library(
   lapack_vendored
   STATIC
+  EXCLUDE_FROM_ALL
   dgeev.c dgebak.c xerbla.c dgebal.c disnan.c dlaisnan.c dgehrd.c dgehd2.c
   dlarf.c iladlc.c iladlr.c dlarfg.c dlapy2.c dlahr2.c dlacpy.c dlarfb.c
   ilaenv.c ieeeck.c iparmq.c dhseqr.c dlahqr.c dlabad.c dlanv2.c dlaqr0.c
@@ -43,6 +45,7 @@ target_link_libraries(
 add_library(
   arpack_vendored
   STATIC
+  EXCLUDE_FROM_ALL
   dnaupd.c dnaup2.c dgetv0.c dvout.c second.c dmout.c dnaitr.c ivout.c dnapps.c
   dnconv.c dneigh.c dlaqrb.c dngets.c dsortc.c dstatn.c dneupd.c dsaupd.c
   dsaup2.c dsaitr.c dsapps.c dsconv.c dseigt.c dstqrb.c dsgets.c dsortr.c

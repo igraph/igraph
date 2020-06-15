@@ -1,6 +1,7 @@
 add_library(
   glpk_vendored
   STATIC
+  EXCLUDE_FROM_ALL
   glpapi01.c glpapi02.c glpapi03.c glpapi04.c glpapi05.c glpapi06.c glpapi07.c
   glpapi08.c glpapi09.c glpapi10.c glpapi11.c glpapi12.c glpapi13.c glpapi14.c
   glpapi15.c glpapi16.c glpapi17.c glpapi18.c glpapi19.c glpavl.c glpbfd.c

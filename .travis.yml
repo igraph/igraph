@@ -82,7 +82,7 @@ jobs:
 #        - cd doc
 #      script:
 #        - make html
-        - make pdf
+#        - make pdf
 
 notifications:
   email:

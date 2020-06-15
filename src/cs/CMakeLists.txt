@@ -2,6 +2,7 @@
 add_library(
   cxsparse_vendored
   STATIC
+  EXCLUDE_FROM_ALL
   cs_add.c       cs_happly.c    cs_pvec.c
   cs_amd.c       cs_house.c     cs_qr.c
   cs_chol.c      cs_ipvec.c     cs_qrsol.c
