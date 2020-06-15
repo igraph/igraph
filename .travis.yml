@@ -44,6 +44,10 @@ after_failure:
 before_install:
   # CMake is installed there and we prefer it over the CMake provided by the Travis image
   - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH=/usr/local/bin:$PATH; fi   
+  - echo $PATH
+  - which cmake
+  - ls /usr/local/bin/*cmake*
+  - ls /usr/local/*cmake*
 
 jobs:
   include:
