@@ -70,5 +70,8 @@ target_include_directories(
 # mess around with the source of f2c too much to fix these
 if(NOT MSVC)
   target_compile_options(arithchk PRIVATE -Wno-format-zero-length)
-  target_compile_options(f2c_vendored PRIVATE -Wno-parentheses -Wno-format-zero-length)
+  target_compile_options(
+    f2c_vendored PRIVATE -Wno-parentheses -Wno-format-zero-length
+    -Wno-pointer-to-int-cast -Wno-implicit-function-declaration
+  )
 endif()
