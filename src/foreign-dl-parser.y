@@ -75,7 +75,7 @@ extern igraph_real_t igraph_pajek_get_number(const char *str, long int len);
 %}
 
 %pure-parser
-%name-prefix="igraph_dl_yy"
+%name-prefix "igraph_dl_yy"
 %defines
 %locations
 %error-verbose

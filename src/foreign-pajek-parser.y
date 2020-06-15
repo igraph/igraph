@@ -107,7 +107,7 @@ extern long int igraph_i_pajek_actedge;
 %}
 
 %pure-parser
-%name-prefix="igraph_pajek_yy"
+%name-prefix "igraph_pajek_yy"
 %defines
 %locations
 %error-verbose

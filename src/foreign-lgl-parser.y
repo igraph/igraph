@@ -70,7 +70,7 @@ igraph_real_t igraph_lgl_get_number(const char *str, long int len);
 %}
 
 %pure-parser
-%name-prefix="igraph_lgl_yy"
+%name-prefix "igraph_lgl_yy"
 %defines
 %locations
 %error-verbose
