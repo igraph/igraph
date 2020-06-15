@@ -32,7 +32,3 @@ target_include_directories(
 # Suppress some warnings that occur in the output because we do not want to
 # mess around with the source of f2c too much to fix these
 use_all_warnings(cxsparse_vendored)
-
-if(NOT MSVC)
-  # target_compile_options(cxsparse_vendored PRIVATE -Wno-logical-op-parentheses)
-endif()

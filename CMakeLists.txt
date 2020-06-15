@@ -75,6 +75,7 @@ endif()
 
 # Traverse subdirectories
 add_subdirectory(src)
+add_subdirectory(optional)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
   add_subdirectory(tests)
 endif()
