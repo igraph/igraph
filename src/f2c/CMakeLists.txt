@@ -69,5 +69,6 @@ target_include_directories(
 # Suppress some warnings that occur in the output because we do not want to
 # mess around with the source of f2c too much to fix these
 if(NOT MSVC)
-  target_compile_options(f2c_vendored PRIVATE -Wno-parentheses)
+  target_compile_options(arithchk PRIVATE -Wno-format-zero-length)
+  target_compile_options(f2c_vendored PRIVATE -Wno-parentheses -Wno-format-zero-length)
 endif()

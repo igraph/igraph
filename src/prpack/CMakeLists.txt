@@ -26,4 +26,6 @@ target_include_directories(
 )
 
 # Turn on all warnings for GCC, clang and MSVC
-use_all_warnings(prpack)
+# TODO(ntamas): it does not work yet, gcc errors out with:
+#     ignoring #pragma omp parallel [-Werror=unknown-pragmas]
+# use_all_warnings(prpack)
