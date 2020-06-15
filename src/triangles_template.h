@@ -30,6 +30,9 @@ long int neilen1, neilen2, deg1;
 long int *neis;
 long int maxdegree;
 
+/* deg1 is not used in all instantiations of this template */
+IGRAPH_UNUSED(deg1);
+
 igraph_vector_int_t order;
 igraph_vector_int_t rank;
 igraph_vector_t degree;
