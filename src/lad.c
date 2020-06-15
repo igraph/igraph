@@ -701,7 +701,7 @@ static int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
                  vertex of U in the DAG */
     int *listV, *listU, *listDV, *listDU;
     int nbV, nbU, nbDV, nbDU;
-    int i, j, k, stop, u, v, w;
+    int i, j, k, stop, u, v;
     int *markedV, *markedU;
     /* markedX[i]=white if X[i] is not in the DAG
        markedX[i]=grey if X[i] has been added to the DAG, but not its successors
