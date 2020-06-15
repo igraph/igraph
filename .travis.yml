@@ -41,14 +41,6 @@ script:
 after_failure:
   - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
 
-before_install:
-  # CMake is installed there and we prefer it over the CMake provided by the Travis image
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH=/usr/local/bin:$PATH; fi   
-  - echo $PATH
-  - which cmake
-  - ls /usr/local/bin/*cmake*
-  - ls /usr/local/*cmake*
-
 jobs:
   include:
     - name: "Linux"
@@ -56,7 +48,7 @@ jobs:
       install:
         - mkdir build
         - cd build
-        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+        - /usr/bin/cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
         - make
     - name: "Linux external deps"
       os: linux
@@ -64,7 +56,7 @@ jobs:
       install:
         - mkdir build
         - cd build
-        - cmake .. -DIGRAPH_VERIFY_FINALLY_STACK=1
+        - /usr/bin/cmake .. -DIGRAPH_VERIFY_FINALLY_STACK=1
         - make
 #    - name: "Linux x87"
 #      os: linux
