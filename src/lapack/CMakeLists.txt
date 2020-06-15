@@ -5,7 +5,7 @@ add_library(
   EXCLUDE_FROM_ALL
   dscal.c dswap.c lsame.c dnrm2.c daxpy.c dgemv.c dger.c dgemm.c
   dcopy.c dtrmm.c dtrmv.c drot.c ddot.c dasum.c dsymv.c dsyr2k.c dsyr2.c
-  dtrsm.c dsyrk.c dtrsv.c idamax.c xerbla.c
+  dtrsm.c dsyrk.c dtrsv.c idamax.c xerbla.c len_trim.c
 )
 
 target_link_libraries(
@@ -32,7 +32,7 @@ add_library(
   dlar1v.c dlarrf.c dsterf.c dsytrd.c dlatrd.c dsytd2.c dlanhs.c dgeqr2.c
   dtrsen.c dlacn2.c dtrsyl.c dlasr.c dsteqr.c dgeevx.c dtrsna.c dlaqtr.c
   dgetrf.c dgetf2.c dlaswp.c dgetrs.c dgesv.c dpotrf.c dpotf2.c
-  len_trim.c dlamch.c ../fortran_intrinsics.c
+  dlamch.c ../fortran_intrinsics.c
 )
 
 target_link_libraries(
