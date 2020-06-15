@@ -41,6 +41,10 @@ script:
 after_failure:
   - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
 
+before_install:
+  # CMake is installed there and we prefer it over the CMake provided by the Travis image
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then export PATH=/usr/local/bin:$PATH; fi   
+
 jobs:
   include:
     - name: "Linux"
