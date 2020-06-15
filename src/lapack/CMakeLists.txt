@@ -3,9 +3,9 @@ add_library(
   blas_vendored
   STATIC
   EXCLUDE_FROM_ALL
-  dscal.c dswap.c lsame.c dnrm2.c idamax.c daxpy.c dgemv.c dger.c dgemm.c
+  dscal.c dswap.c lsame.c dnrm2.c daxpy.c dgemv.c dger.c dgemm.c
   dcopy.c dtrmm.c dtrmv.c drot.c ddot.c dasum.c dsymv.c dsyr2k.c dsyr2.c
-  dtrsm.c dsyrk.c dtrsv.c
+  dtrsm.c dsyrk.c dtrsv.c idamax.c
 )
 
 target_link_libraries(
@@ -31,13 +31,14 @@ add_library(
   dlasq3.c dlasq4.c dlasq5.c dlasq6.c dlasrt.c dlarrj.c dlarrr.c dlarrv.c
   dlar1v.c dlarrf.c dsterf.c dsytrd.c dlatrd.c dsytd2.c dlanhs.c dgeqr2.c
   dtrsen.c dlacn2.c dtrsyl.c dlasr.c dsteqr.c dgeevx.c dtrsna.c dlaqtr.c
-  dgetrf.c dgetf2.c dlaswp.c dgetrs.c dgesv.c dpotrf.c dpotf2.c len_trim.c
-  dlamch.c ../fortran_intrinsics.c
+  dgetrf.c dgetf2.c dlaswp.c dgetrs.c dgesv.c dpotrf.c dpotf2.c
+  len_trim.c dlamch.c ../fortran_intrinsics.c
 )
 
 target_link_libraries(
   lapack_vendored
   PUBLIC
+  blas_vendored
   f2c_vendored
 )
 

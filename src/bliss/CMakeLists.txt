@@ -19,4 +19,13 @@ target_include_directories(
   ${GMP_INCLUDE_DIR}
 )
 
+# If we are linking igraph to GMP, then Bliss will use GMP for bignums
+if(GMP_FOUND)
+  target_link_libraries(
+    bliss
+    PUBLIC
+    ${GMP_LIBRARIES}
+  )
+endif()
+
 use_all_warnings(bliss)
