@@ -49,7 +49,7 @@
 #ifndef OFF_T
 #define OFF_T off64_t
 #endif
-#ifndef __LARGEFILE_SOURCE
+#ifndef _LARGEFILE_SOURCE
 #define _LARGEFILE_SOURCE
 #endif
 #ifndef _LARGEFILE64_SOURCE
