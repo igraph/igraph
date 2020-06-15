@@ -4,6 +4,7 @@ include(compilers)
 # Traverse subdirectories
 add_subdirectory(bliss)
 add_subdirectory(cliquer)
+add_subdirectory(cs)
 add_subdirectory(f2c)
 add_subdirectory(lapack)
 add_subdirectory(plfit)

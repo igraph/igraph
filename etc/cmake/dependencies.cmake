@@ -2,18 +2,19 @@ include(PadString)
 
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored
-  set(VENDORABLE_DEPENDENCIES BLAS LAPACK ARPACK)
+  set(VENDORABLE_DEPENDENCIES BLAS CXSparse LAPACK ARPACK)
 
   # Declare configuration options for dependencies
   option(IGRAPH_GLPK_SUPPORT "Compile igraph with GLPK support" YES)
   option(IGRAPH_GMP_SUPPORT "Compile igraph with GMP support" YES)
   option(IGRAPH_GRAPHML_SUPPORT "Compile igraph with GraphML support" YES)
   option(IGRAPH_USE_INTERNAL_BLAS "Compile igraph with internal BLAS" NO)
+  option(IGRAPH_USE_INTERNAL_CXSparse "Compile igraph with internal CXSparse" NO)
   option(IGRAPH_USE_INTERNAL_LAPACK "Compile igraph with internal LAPACK" NO)
   option(IGRAPH_USE_INTERNAL_ARPACK "Compile igraph with internal ARPACK" NO)
 
   # Declare dependencies
-  set(REQUIRED_DEPENDENCIES CXSparse)
+  set(REQUIRED_DEPENDENCIES "")
   set(OPTIONAL_DEPENDENCIES FLEX BISON)
   set(VENDORED_DEPENDENCIES "")
 
@@ -51,11 +52,10 @@ macro(find_dependencies)
   # Override libraries of vendored dependencies even if they were somehow
   # detected above
   foreach(DEPENDENCY ${VENDORABLE_DEPENDENCIES})
+    string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
+    string(TOLOWER "${DEPENDENCY}" LIBNAME_LOWER)
     if(IGRAPH_USE_INTERNAL_${DEPENDENCY})
-      string(TOLOWER "${DEPENDENCY}" LIBNAME)
-      set(${DEPENDENCY}_LIBRARIES ${LIBNAME}_vendored)
+      set(${LIBNAME_UPPER}_LIBRARIES ${LIBNAME_LOWER}_vendored)
     endif()
   endforeach()
-
-  message(STATUS ${BLAS_LIBRARIES})
 endmacro()
