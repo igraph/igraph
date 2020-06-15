@@ -667,6 +667,10 @@ static int igraph_i_maximum_bipartite_matching_weighted(
         igraph_real_t min_slack, min_slack_2;
         igraph_integer_t min_slack_u, min_slack_v;
 
+        /* mark min_slack_u as unused; it is actually used when debugging, but
+         * gcc complains when we are not debugging */
+        IGRAPH_UNUSED(min_slack_u);
+
         /* (7) Fill the push queue with the unmatched nodes from the smaller set. */
         igraph_vector_clear(&vec1);
         igraph_vector_clear(&vec2);
