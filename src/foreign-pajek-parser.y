@@ -107,7 +107,9 @@ extern long int igraph_i_pajek_actedge;
 %}
 
 %pure-parser
-%name-prefix "igraph_pajek_yy"
+/* bison: do not remove the equals sign; macOS XCode ships with bison 2.3, which
+ * needs the equals sign */
+%name-prefix="igraph_pajek_yy"
 %defines
 %locations
 %error-verbose

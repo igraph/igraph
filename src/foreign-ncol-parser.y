@@ -71,7 +71,9 @@ igraph_real_t igraph_ncol_get_number(const char *str, long int len);
 %}
 
 %pure-parser
-%name-prefix "igraph_ncol_yy"
+/* bison: do not remove the equals sign; macOS XCode ships with bison 2.3, which
+ * needs the equals sign */
+%name-prefix="igraph_ncol_yy"
 %defines
 %locations
 %error-verbose
