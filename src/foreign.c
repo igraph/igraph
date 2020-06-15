@@ -1992,6 +1992,8 @@ static int igraph_i_pajek_escape(char* src, char** dest) {
         case '\\':
         case '"':
             *d = '\\'; d++;
+            *d = *s;
+            break;
         default:
             *d = *s;
         }
