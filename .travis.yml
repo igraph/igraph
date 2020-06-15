@@ -42,39 +42,42 @@ jobs:
     - name: "Linux"
       os: linux
       install:
-        - ./bootstrap.sh
-        - ./configure --enable-verify-finally --with-external-glpk
+        - mkdir build
+        - cd build
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
         - make
     - name: "Linux external deps"
       os: linux
       dist: bionic
       install:
-        - ./bootstrap.sh
-        - ./configure --enable-verify-finally --with-external-glpk --with-external-blas --with-external-lapack --with-external-arpack
-        - make        
-    - name: "Linux x87"
-      os: linux
-      env:
-        - CFLAGS="-mfpmath=387" CXXFLAGS="-mfpmath=387"
-      install:
-        - ./bootstrap.sh
-        - ./configure --enable-verify-finally --with-external-glpk
+        - mkdir build
+        - cd build
+        - cmake .. -DIGRAPH_VERIFY_FINALLY_STACK=1
         - make
+#    - name: "Linux x87"
+#      os: linux
+#      env:
+#        - CFLAGS="-mfpmath=387" CXXFLAGS="-mfpmath=387"
+#      install:
+#        - ./bootstrap.sh
+#        - ./configure --enable-verify-finally --with-external-glpk
+#        - make
     - name: "macOS"
       os: osx
       install:
-        - ./bootstrap.sh
-        - ./configure --enable-verify-finally --enable-asan --with-external-glpk 
+        - mkdir build
+        - cd build
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1 -DUSE_SANITIZER=Address;Undefined
         - make
-    - name: "Documentation"
-      language: shell
-      os: linux
-      install:
-        - ./bootstrap.sh
-        - ./configure
-        - cd doc
-      script:
-        - make html
+#    - name: "Documentation"
+#      language: shell
+#      os: linux
+#      install:
+#        - ./bootstrap.sh
+#        - ./configure
+#        - cd doc
+#      script:
+#        - make html
         - make pdf
 
 notifications:

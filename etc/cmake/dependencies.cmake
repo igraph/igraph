@@ -22,7 +22,10 @@ macro(find_dependencies)
   # Extend dependencies depending on whether we will be using the vendored
   # copies or not
   foreach(DEPENDENCY ${VENDORABLE_DEPENDENCIES})
+    string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
     if(IGRAPH_USE_INTERNAL_${DEPENDENCY})
+      list(APPEND VENDORED_DEPENDENCIES ${DEPENDENCY})
+    elseif(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER})
       list(APPEND VENDORED_DEPENDENCIES ${DEPENDENCY})
     else()
       list(APPEND REQUIRED_DEPENDENCIES ${DEPENDENCY})
