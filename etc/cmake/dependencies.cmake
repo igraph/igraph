@@ -50,16 +50,16 @@ macro(find_dependencies)
     find_package(${DEPENDENCY})
   endforeach()
 
-    # Override libraries of vendored dependencies even if they were somehow
-    # detected above
-    foreach(DEPENDENCY ${VENDORABLE_DEPENDENCIES})
-      string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
-      string(TOLOWER "${DEPENDENCY}" LIBNAME_LOWER)
-      if(IGRAPH_USE_INTERNAL_${DEPENDENCY})
-        set(${LIBNAME_UPPER}_LIBRARIES ${LIBNAME_LOWER}_vendored)
-        set(${LIBNAME_UPPER}_FOUND 1)
-      endif()
-    endforeach()
+  # Override libraries of vendored dependencies even if they were somehow
+  # detected above
+  foreach(DEPENDENCY ${VENDORED_DEPENDENCIES})
+    string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
+    string(TOLOWER "${DEPENDENCY}" LIBNAME_LOWER)
+    if(IGRAPH_USE_INTERNAL_${DEPENDENCY})
+      set(${LIBNAME_UPPER}_LIBRARIES ${LIBNAME_LOWER}_vendored)
+      set(${LIBNAME_UPPER}_FOUND 1)
+    endif()
+  endforeach()
 
   # Export some aliases that will be used in config.h
   set(HAVE_GLPK ${GLPK_FOUND})
