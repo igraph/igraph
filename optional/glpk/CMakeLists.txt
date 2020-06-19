@@ -27,8 +27,8 @@ add_library(
 
 target_include_directories(
   glpk_vendored
-  PRIVATE
-  ${CMAKE_SOURCE_DIR}/include
   PUBLIC
   ${CMAKE_CURRENT_SOURCE_DIR}
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
 )
