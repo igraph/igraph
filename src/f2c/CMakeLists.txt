@@ -1,7 +1,10 @@
 # arith.h is built during compilation using arithchk.c
 add_executable(arithchk EXCLUDE_FROM_ALL arithchk.c)
 target_compile_definitions(arithchk PRIVATE NO_FPINIT)  # maybe also NO_LONG_LONG?
-target_link_libraries(arithchk PRIVATE m)
+if (NOT MSVC)
+  target_link_libraries(arithchk PRIVATE m)
+endif()
+
 add_custom_command(
   OUTPUT arith.h
   COMMENT "Generating arith.h for f2c..."
