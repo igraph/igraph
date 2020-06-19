@@ -70,6 +70,15 @@ target_include_directories(
   ${CMAKE_BINARY_DIR}/src/f2c
 )
 
+if (MSVC)
+  target_compile_definitions(f2c_vendored PRIVATE MSDOS)
+  target_include_directories(
+    f2c_vendored
+    PUBLIC
+    ${CMAKE_SOURCE_DIR}/msvc/include
+  )
+endif()
+
 # Suppress some warnings that occur in the output because we do not want to
 # mess around with the source of f2c too much to fix these
 if(NOT MSVC)
