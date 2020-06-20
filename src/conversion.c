@@ -37,8 +37,8 @@
  * \brief Returns the adjacency matrix of a graph
  *
  * </para><para>
- * The result is an incidence matrix, it contains numbers greater
- * than one if there are multiple edges in the graph.
+ * The result is an adjacency matrix. Entry i, j of the matrix
+ * contains the number of edges connecting vertex i to vertex j.
  * \param graph Pointer to the graph to convert
  * \param res Pointer to an initialized matrix object, it will be
  *        resized if needed.
@@ -172,8 +172,8 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
  * \brief Returns the adjacency matrix of a graph in sparse matrix format
  *
  * </para><para>
- * The result is an incidence matrix, it contains numbers greater
- * than one if there are multiple edges in the graph.
+ * The result is an adjacency matrix. Entry i, j of the matrix
+ * contains the number of edges connecting vertex i to vertex j.
  * \param graph Pointer to the graph to convert
  * \param res Pointer to an initialized sparse matrix object, it will be
  *        resized if needed.

@@ -89,7 +89,7 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 
     igraph_matrix_minmax(pref_matrix, &minp, &maxp);
     if (minp < 0 || maxp > 1) {
-        IGRAPH_ERROR("Connection probabilities must in [0,1]", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Connection probabilities must be in [0,1]", IGRAPH_EINVAL);
     }
 
     if (n < 0) {
@@ -106,7 +106,7 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
     }
 
     if (igraph_vector_int_min(block_sizes) < 0) {
-        IGRAPH_ERROR("Block size must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Block sizes must be non-negative", IGRAPH_EINVAL);
     }
 
     if (igraph_vector_int_sum(block_sizes) != n) {

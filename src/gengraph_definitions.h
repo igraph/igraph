@@ -191,7 +191,7 @@ static int _random_bits_stored = 0;
 static int _random_bits = 0;
 
 inline int random_bit() {
-    register int a = _random_bits;
+    int a = _random_bits;
     _random_bits = a >> 1;
     if (_random_bits_stored--) {
         return a & 0x1;

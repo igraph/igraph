@@ -1679,10 +1679,17 @@ static int igraph_i_betweenness_estimate_weighted(
             igraph_vector_int_t *neis;
             long int nlen;
 
-            igraph_stack_push(&S, minnei);
-            if (cutoff > 0 && VECTOR(dist)[minnei] >= cutoff + 1.0) {
+            /* Ignore vertices that are more distant than the cutoff */
+            if (cutoff >= 0 && mindist > cutoff + 1.0) {
+                /* Reset variables if node is too distant */
+                VECTOR(tmpscore)[minnei] = 0;
+                VECTOR(dist)[minnei] = 0;
+                VECTOR(nrgeo)[minnei] = 0;
+                igraph_vector_int_clear(igraph_adjlist_get(&fathers, minnei));
                 continue;
             }
+
+            igraph_stack_push(&S, minnei);
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_inclist_get(&inclist, minnei);
@@ -1718,7 +1725,9 @@ static int igraph_i_betweenness_estimate_weighted(
 
                     VECTOR(dist)[to] = altdist;
                     IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
-                } else if (cmp_result == 0) {
+                } else if (cmp_result == 0 &&
+                    (altdist <= cutoff + 1.0 || cutoff < 0)) {
+                    /* Only add if the node is not more distant than the cutoff */
                     igraph_vector_int_t *v = igraph_adjlist_get(&fathers, to);
                     igraph_vector_int_push_back(v, minnei);
                     VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
@@ -1739,6 +1748,7 @@ static int igraph_i_betweenness_estimate_weighted(
                 VECTOR(*tmpres)[w] += VECTOR(tmpscore)[w];
             }
 
+            /* Reset variables */
             VECTOR(tmpscore)[w] = 0;
             VECTOR(dist)[w] = 0;
             VECTOR(nrgeo)[w] = 0;
@@ -1816,8 +1826,8 @@ static void igraph_i_destroy_biguints(igraph_biguint_t *p) {
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param cutoff The maximal length of paths that will be considered.
- *        If zero or negative, the exact betweenness will be calculated
- *        (no upper limit on path lengths).
+ *        If negative, the exact betweenness will be calculated, and
+ *        there will be no upper limit on path lengths.
  * \param weights An optional vector containing edge weights for
  *        calculating weighted betweenness. Supply a null pointer here
  *        for unweighted betweenness.
@@ -1957,12 +1967,22 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
         while (!igraph_dqueue_empty(&q)) {
             long int actnode = (long int) igraph_dqueue_pop(&q);
-            IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
 
-            if (cutoff > 0 && distance[actnode] >= cutoff + 1) {
+            /* Ignore vertices that are more distant than the cutoff */
+            if (cutoff >= 0 && distance[actnode] > cutoff + 1) {
+                /* Reset variables if node is too distant */
+                distance[actnode] = 0;
+                if (nobigint) {
+                    nrgeo[actnode] = 0;
+                } else {
+                    igraph_biguint_set_limb(&big_nrgeo[actnode], 0);
+                }
+                tmpscore[actnode] = 0;
+                igraph_vector_int_clear(igraph_adjlist_get(adjlist_in_p, actnode));
                 continue;
             }
 
+            IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
             neis = igraph_adjlist_get(adjlist_out_p, actnode);
             nneis = igraph_vector_int_size(neis);
             for (j = 0; j < nneis; j++) {
@@ -1971,7 +1991,9 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
                     distance[neighbor] = distance[actnode] + 1;
                     IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
                 }
-                if (distance[neighbor] == distance[actnode] + 1) {
+                if (distance[neighbor] == distance[actnode] + 1 &&
+                    (distance[neighbor] <= cutoff + 1 || cutoff < 0)) {
+                    /* Only add if the node is not more distant than the cutoff */
                     igraph_vector_int_t *v = igraph_adjlist_get(adjlist_in_p,
                                              neighbor);
                     igraph_vector_int_push_back(v, actnode);
@@ -2017,6 +2039,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
                 VECTOR(*tmpres)[actnode] += tmpscore[actnode];
             }
 
+            /* Reset variables */
             distance[actnode] = 0;
             if (nobigint) {
                 nrgeo[actnode] = 0;
@@ -2135,10 +2158,6 @@ static int igraph_i_edge_betweenness_estimate_weighted(
 
         /*     printf("source: %li\n", source); */
 
-        igraph_vector_null(&distance);
-        igraph_vector_null(&tmpscore);
-        igraph_vector_long_null(&nrgeo);
-
         igraph_2wheap_push_with_index(&Q, source, -1.0);
         VECTOR(distance)[source] = 1.0;
         VECTOR(nrgeo)[source] = 1;
@@ -2152,11 +2171,17 @@ static int igraph_i_edge_betweenness_estimate_weighted(
             /* printf("SP to %li is final, dist: %g, nrgeo: %li\n", minnei, */
             /* VECTOR(distance)[minnei]-1.0, VECTOR(nrgeo)[minnei]); */
 
-            igraph_stack_push(&S, minnei);
-
-            if (cutoff > 0 && VECTOR(distance)[minnei] >= cutoff + 1.0) {
+            /* Ignore vertices that are more distant than the cutoff */
+            if (cutoff >= 0 && VECTOR(distance)[minnei] > cutoff + 1.0) {
+                /* Reset variables if node is too distant */
+                VECTOR(tmpscore)[minnei] = 0;
+                VECTOR(distance)[minnei] = 0;
+                VECTOR(nrgeo)[minnei] = 0;
+                igraph_vector_int_clear(igraph_inclist_get(&fathers, minnei));
                 continue;
             }
+
+            igraph_stack_push(&S, minnei);
 
             neis = igraph_inclist_get(&inclist, minnei);
             nlen = igraph_vector_int_size(neis);
@@ -2193,10 +2218,12 @@ static int igraph_i_edge_betweenness_estimate_weighted(
                     VECTOR(nrgeo)[to] = VECTOR(nrgeo)[minnei];
                     VECTOR(distance)[to] = altdist;
                     IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
-                } else if (cmp_result == 0) {
+                } else if (cmp_result == 0 &&
+                    (altdist <= cutoff + 1.0 || cutoff < 0)) {
+                    /* Only add if the edge is not more distant than the cutoff */
                     igraph_vector_int_t *v = igraph_inclist_get(&fathers, to);
                     /* printf("Found a second SP to %li (from %li)\n", to, minnei); */
-                    igraph_vector_int_push_back(v, edge);
+                    IGRAPH_CHECK(igraph_vector_int_push_back(v, edge));
                     VECTOR(nrgeo)[to] += VECTOR(nrgeo)[minnei];
                 }
             }
@@ -2219,6 +2246,7 @@ static int igraph_i_edge_betweenness_estimate_weighted(
                     VECTOR(nrgeo)[w];
             }
 
+            /* Reset variables */
             VECTOR(tmpscore)[w] = 0;
             VECTOR(distance)[w] = 0;
             VECTOR(nrgeo)[w] = 0;
@@ -2309,8 +2337,8 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param cutoff The maximal length of paths that will be considered.
- *        If zero or negative, the exact betweenness will be calculated
- *        (no upper limit on path lengths).
+ *        If negative, the exact betweenness will be calculated (no
+ *        upper limit on path lengths).
  * \param weights An optional weight vector for weighted
  *        betweenness. Supply a null pointer here for unweighted
  *        betweenness.
@@ -2395,11 +2423,6 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
         IGRAPH_PROGRESS("Edge betweenness centrality: ", 100.0 * source / no_of_nodes, 0);
         IGRAPH_ALLOW_INTERRUPTION();
 
-        memset(distance, 0, (size_t) no_of_nodes * sizeof(long int));
-        memset(nrgeo, 0, (size_t) no_of_nodes * sizeof(unsigned long long int));
-        memset(tmpscore, 0, (size_t) no_of_nodes * sizeof(double));
-        igraph_stack_clear(&stack); /* it should be empty anyway... */
-
         IGRAPH_CHECK(igraph_dqueue_push(&q, source));
 
         nrgeo[source] = 1;
@@ -2408,9 +2431,15 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
         while (!igraph_dqueue_empty(&q)) {
             long int actnode = (long int) igraph_dqueue_pop(&q);
 
-            if (cutoff > 0 && distance[actnode] >= cutoff ) {
+            if (cutoff >= 0 && distance[actnode] > cutoff ) {
+                /* Reset variables if node is too distant */
+                distance[actnode] = 0;
+                tmpscore[actnode] = 0;
+                nrgeo[actnode] = 0;
                 continue;
             }
+
+            IGRAPH_CHECK(igraph_stack_push(&stack, actnode));
 
             /* check the neighbors and add to them to the queue if unseen before */
             neip = igraph_inclist_get(elist_out_p, actnode);
@@ -2425,12 +2454,12 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
                     if (distance[neighbor] == distance[actnode] + 1) {
                         nrgeo[neighbor] += nrgeo[actnode];
                     }
-                } else {
-                    /* we haven't seen this node yet */
+                } else if (distance[actnode] + 1 <= cutoff || cutoff < 0) {
+                    /* we haven't seen this node yet, but we only consider
+                     * it if it is not more distant than the cutoff. */
                     nrgeo[neighbor] += nrgeo[actnode];
                     distance[neighbor] = distance[actnode] + 1;
                     IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
-                    IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
                 }
             }
         } /* while !igraph_dqueue_empty */
@@ -2441,9 +2470,11 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
         while (!igraph_stack_empty(&stack)) {
             long int actnode = (long int) igraph_stack_pop(&stack);
             if (distance[actnode] < 1) {
+                distance[actnode] = 0;
+                tmpscore[actnode] = 0;
+                nrgeo[actnode] = 0;
                 continue;    /* skip source node */
             }
-
             /* set the temporary score of the friends */
             neip = igraph_inclist_get(elist_in_p, actnode);
             neino = igraph_vector_int_size(neip);
@@ -2461,6 +2492,10 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
                         (tmpscore[actnode] + 1) * nrgeo[neighbor] / nrgeo[actnode];
                 }
             }
+            /* Reset variables */
+            distance[actnode] = 0;
+            tmpscore[actnode] = 0;
+            nrgeo[actnode] = 0;
         }
         /* Ok, we've the scores for this source */
     } /* for source <= no_of_nodes */
@@ -2644,7 +2679,7 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
             VECTOR(*res)[i] += (mindist - 1.0);
             nodes_reached++;
 
-            if (cutoff > 0 && mindist >= cutoff + 1.0) {
+            if (cutoff >= 0 && mindist > cutoff + 1.0) {
                 continue;    /* NOT break!!! */
             }
 
@@ -2678,7 +2713,7 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
         VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes - nodes_reached));
         VECTOR(*res)[i] = (no_of_nodes - 1) / VECTOR(*res)[i];
 
-        if (((cutoff > 0 && mindist < cutoff + 1.0) || (cutoff <= 0)) &&
+        if (((cutoff >= 0 && mindist <= cutoff + 1.0) || (cutoff < 0)) &&
             nodes_reached < no_of_nodes && !warning_shown) {
             IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
             warning_shown = 1;
@@ -2741,8 +2776,8 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  *          undirected one for the computation.
  *        \endclist
  * \param cutoff The maximal length of paths that will be considered.
- *        If zero or negative, the exact closeness will be calculated
- *        (no upper limit on path lengths).
+ *        If negative, the exact closeness will be calculated (no upper
+ *        limit on path lengths).
  * \param weights An optional vector containing edge weights for
  *        weighted closeness. Supply a null pointer here for
  *        traditional, unweighted closeness.
@@ -2829,7 +2864,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
             VECTOR(*res)[i] += actdist;
 
-            if (cutoff > 0 && actdist >= cutoff) {
+            if (cutoff >= 0 && actdist > cutoff) {
                 continue;    /* NOT break!!! */
             }
 
@@ -2851,7 +2886,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
         VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes - nodes_reached));
         VECTOR(*res)[i] = (no_of_nodes - 1) / VECTOR(*res)[i];
 
-        if (((cutoff > 0 && actdist < cutoff) || cutoff <= 0) &&
+        if (((cutoff >= 0 && actdist <= cutoff) || cutoff < 0) &&
             no_of_nodes > nodes_reached && !warning_shown) {
             IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
             warning_shown = 1;

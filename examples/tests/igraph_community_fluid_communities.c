@@ -24,6 +24,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t g;
     igraph_integer_t k;
@@ -63,6 +65,8 @@ int main() {
 
     igraph_destroy(&g);
     igraph_vector_destroy(&membership);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -42,7 +42,7 @@ int main() {
     igraph_arpack_options_t options;
     igraph_vector_t cvec;
 
-    igraph_tree(&graph, /*n=*/ 10, /*children=*/ 3, IGRAPH_TREE_OUT);
+    igraph_tree(&graph, /*n=*/ 14, /*children=*/ 4, IGRAPH_TREE_OUT);
 
     igraph_matrix_init(&U, 0, 0);
     igraph_matrix_init(&V, 0, 0);

@@ -99,6 +99,9 @@ To eliminate multiple edges from a graph, you can use
 <!-- doxrox-include igraph_vcount -->
 <!-- doxrox-include igraph_ecount -->
 <!-- doxrox-include igraph_edge -->
+<!-- doxrox-include IGRAPH_FROM -->
+<!-- doxrox-include IGRAPH_TO -->
+<!-- doxrox-include IGRAPH_OTHER -->
 <!-- doxrox-include igraph_get_eid -->
 <!-- doxrox-include igraph_get_eids -->
 <!-- doxrox-include igraph_get_eids_multi -->

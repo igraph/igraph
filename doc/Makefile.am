@@ -86,8 +86,8 @@ scg.xml: scg.xxml $(SRCDIR)/scg.c
 embedding.xml: embedding.xxml $(SRCDIR)/embedding.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/embedding.c
 
-basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
-	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c
+basicigraph.xml: basicigraph.xxml $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c $(INCLUDEDIR)/igraph_interface.h
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/type_indexededgelist.c $(SRCDIR)/structural_properties.c $(INCLUDEDIR)/igraph_interface.h
 
 generators.xml: generators.xxml \
 		$(SRCDIR)/atlas.c \

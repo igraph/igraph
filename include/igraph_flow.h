@@ -33,7 +33,7 @@
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
-/* MAximum flows, minimum cuts & such                 */
+/* Maximum flows, minimum cuts & such                 */
 /* -------------------------------------------------- */
 
 /**

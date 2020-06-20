@@ -99,7 +99,8 @@ AT_CLEANUP
 
 AT_SETUP([Betweenness (igraph_betweenness): ])
 AT_KEYWORDS([igraph_betweenness betweenness])
-AT_COMPILE_CHECK([simple/igraph_betweenness.c])
+AT_COMPILE_CHECK([simple/igraph_betweenness.c],
+                 [simple/igraph_betweenness.out])
 AT_CLEANUP
 
 AT_SETUP([Betweenness, big integers (igraph_betweenness): ])
@@ -157,7 +158,7 @@ AT_CLEANUP
 
 AT_SETUP([Topological sorting (igraph_topological_sorting, igraph_is_dag): ])
 AT_KEYWORDS([topological sorting directed acyclic graphs])
-AT_COMPILE_CHECK([simple/igraph_topological_sorting.c], [simple/igraph_topological_sorting.out])
+AT_COMPILE_CHECK([tests/igraph_topological_sorting.c], [tests/igraph_topological_sorting.out])
 AT_CLEANUP
 
 AT_SETUP([Feedback arc sets, Eades heuristics (igraph_feedback_arc_set): ])
@@ -183,6 +184,11 @@ AT_CLEANUP
 AT_SETUP([Multiple edges test (igraph_has_multiple): ])
 AT_KEYWORDS([multiple edge parallel edge igraph_has_multiple])
 AT_COMPILE_CHECK([simple/igraph_has_multiple.c])
+AT_CLEANUP
+
+AT_SETUP([Count edge multiplicities (igraph_count_multiple): ])
+AT_KEYWORDS([multiple edge parallel edge igraph_count_multiple])
+AT_COMPILE_CHECK([tests/igraph_count_multiple.c], [tests/igraph_count_multiple.out])
 AT_CLEANUP
 
 AT_SETUP([Tree test (igraph_is_tree): ])

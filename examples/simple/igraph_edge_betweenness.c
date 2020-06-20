@@ -75,7 +75,7 @@ int test_bug1050() {
     igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, /* cutoff */ -1, /* weights */ 0);
     igraph_edge_betweenness_estimate(&g, &eb2, IGRAPH_UNDIRECTED, /* cutoff */ 0, /* weights */ 0);
 
-    if (!igraph_vector_all_e(&eb, &eb2)) {
+    if (igraph_vector_all_e(&eb, &eb2)) {
         return 1;
     }
 
@@ -94,7 +94,7 @@ int test_bug1050() {
     igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, /* cutoff */ -1, &weights);
     igraph_edge_betweenness_estimate(&g, &eb2, IGRAPH_UNDIRECTED, /* cutoff */ 0, &weights);
 
-    if (!igraph_vector_all_e(&eb, &eb2)) {
+    if (igraph_vector_all_e(&eb, &eb2)) {
         return 1;
     }
 
