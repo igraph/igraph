@@ -345,6 +345,9 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     /* candidate cycles */
     igraph_vector_ptr_t candidate_cycles;
 
+    /* clear the output vector, you never know what you got */
+    igraph_vector_ptr_clear(basis);
+
     /* initialize si
      * it is a boolean adjecency vector */
     IGRAPH_VECTOR_INT_INIT_FINALLY(&si, no_of_nodes);
