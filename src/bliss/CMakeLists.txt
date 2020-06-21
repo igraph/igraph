@@ -1,4 +1,4 @@
-# Declare the files needed to compile bluss
+# Declare the files needed to compile bliss
 add_library(
   bliss
   STATIC
