@@ -23,6 +23,7 @@
 */
 
 #include "igraph_structural.h"
+#include "igraph_cliques.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt_internal.h"
@@ -122,15 +123,9 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
               if (added_edges[edge] == 0) {
 
 		/* find the neighbour identity */
-                igraph_integer_t from, to;
-                igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
+                igraph_integer_t to = IGRAPH_OTHER(graph,
+				(igraph_integer_t) edge, actnode);
 		
-		/* we only know that either one is actnode, swap if needed */
-                if (to==actnode) {
-		  to = from;
-		  from = to;
-		}
-
 		/* if the edge goes to a new vertex, expand the spanning tree */
                 if (added_nodes[(long int) to] == 0) {
                     added_nodes[(long int) to] = 1;
@@ -153,7 +148,7 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
 				    &parent_nodes, &parent_edges,
 				    &added_edges, dist,
 				    actedge, edge,
-				    (long int) from, (long int) to);
+				    (long int) actnode, (long int) to);
                 }
               }
           }
@@ -271,6 +266,13 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
 }
 
 
+/* Weighted cycles struct used for sorting the candidates */
+typedef struct igraph_i_weighted_clique_t {
+    long tree;
+    long external_edge;
+    double weight;
+} igraph_i_weighted_clique_t;
+
 /**
  * \function igraph_minimum_weight_cycle_basis
  * \brief Find a minimum weight cycle basis for a weighted, undirected graph
@@ -347,6 +349,8 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     n = igraph_vector_size(&fvs);
 
     /* 1. Construct all shortest path trees */
+    igraph_vector_ptr_init(&trees, 0);
+    /* TODO: set an item destructor for trees */
     IGRAPH_CHECK(igraph_i_shortest_path_trees(
 			    graph, weights, &fvs, &trees));
 
@@ -380,7 +384,7 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     /* Clean */
     igraph_vector_destroy(&fvs);
     igraph_vector_ptr_destroy_all(trees);
-    IGRAPH_FINALLY_CLEAN(1 + n + 1); // FIXME: Check this number
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
@@ -529,7 +533,7 @@ int igraph_i_shortest_path_trees(const igraph_t *graph,
 int igraph_i_candidate_cycles(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_vector_ptr_t *trees,
-		igraph_vector_int_t *candidate_cycles,
+		igraph_vector_ptr_t *candidate_cycles,
 		igraph_vector_t *cadidate_weights,
 		){
 
@@ -589,31 +593,41 @@ int igraph_i_candidate_cycles(const igraph_t *graph,
 	     to = VECTOR(subtree_label)[to];
 
 	     if ((from != -1) && (to != -1) && (from != to)) {
-	         /* since we store the trees anyway, we could make it such as the vector
-	          * of candidates contains
-	          *
-	          * [tree_id, key_edge_id, tree_id2, key_edge_id2]
-	          *
-	          * and separately the cycle total weight (since it's a float). The only
-	          * problem is that we need to sort by increasing weight, so we'll do
-	          * argsort and carefully resort this vector too.
-	          * */
-                 IGRAPH_CHECK(igraph_vector_push_back(candidate_cycles, i));
-                 IGRAPH_CHECK(igraph_vector_push_back(candidate_cycles, edge));
+	         /* since we store the trees anyway, the data structure
+		  * for candidate cycles is a struct containing tree id, id of
+		  * the non-tree edge, and total weight (for sorting). See
+		  * above for the exact definition */
+                 igraph_i_weighted_clique_t clique;
+                 clique.tree = i;
+		 clique.external_edge = edge;
+		 clique.weight = -1;
 
 		 /* TODO: compute the total weight of this cycle */
-                 IGRAPH_CHECK(igraph_vector_push_back(candidate_weights, weight));
+
+		 /* TODO: some memory management for the vector_ptr */
+                 IGRAPH_CHECK(igraph_vector_push_back(candidate_cycles, clique));
 	     }
 	 }
     
     }
 
     /* sort candidate list by weight */
-    /* TODO implement these functions? or better use structs? */
-    igraph_i_argsort(candidate_weights, &cycle_order);
-    igraph_i_sort_from_argsort(candidate_cycles, candidate_weights, &cycle_order);
+    igraph_vector_ptr_sort(candidate_cycles, igraph_i_compare_cycles)
 
     return IGRAPH_SUCCESS;
+}
+
+int igraph_i_compare_cycles(const void *pc1, const void *pc2) {
+    igraph_i_weighted_clique_t c1 = **pc1;
+    igraph_i_weighted_clique_t c2 = **pc2;
+
+    if (c1.weight > c2.weight) {
+        return 1;
+    } else if (c1.weight < c2.weight) {
+        return -1;
+    } else {
+        return 0;
+    }
 }
 
 int igraph_i_compute_Si(const igraph_t *graph,
