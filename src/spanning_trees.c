@@ -239,10 +239,12 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
         already_added[i] = 1;
         IGRAPH_CHECK(igraph_dqueue_push(&q, i));
         while (! igraph_dqueue_empty(&q)) {
+            long int tmp_size;
             long int act_node = (long int) igraph_dqueue_pop(&q);
             IGRAPH_CHECK(igraph_incident(graph, &tmp, (igraph_integer_t) act_node,
                                          IGRAPH_ALL));
-            for (j = 0; j < igraph_vector_size(&tmp); j++) {
+            tmp_size = igraph_vector_size(&tmp);
+            for (j = 0; j < tmp_size; j++) {
                 long int edge = (long int) VECTOR(tmp)[j];
                 if (added_edges[edge] == 0) {
                     igraph_integer_t to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, act_node);
@@ -306,6 +308,7 @@ static int igraph_i_minimum_spanning_tree_prim(
     IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
 
     for (i = 0; i < no_of_nodes; i++) {
+        long int adj_size;
         if (already_added[i] > 0) {
             continue;
         }
@@ -314,7 +317,8 @@ static int igraph_i_minimum_spanning_tree_prim(
         already_added[i] = 1;
         /* add all edges of the first vertex */
         igraph_incident(graph, &adj, (igraph_integer_t) i, (igraph_neimode_t) mode);
-        for (j = 0; j < igraph_vector_size(&adj); j++) {
+        adj_size = igraph_vector_size(&adj);
+        for (j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = (long int) VECTOR(adj)[j];
             igraph_integer_t neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, edgefrom);
             if (already_added[neighbor] == 0) {
@@ -342,7 +346,8 @@ static int igraph_i_minimum_spanning_tree_prim(
                     IGRAPH_CHECK(igraph_vector_push_back(res, edge));
                     /* add all outgoing edges */
                     igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
-                    for (j = 0; j < igraph_vector_size(&adj); j++) {
+                    adj_size = igraph_vector_size(&adj);
+                    for (j = 0; j < adj_size; j++) {
                         long int edgeno = (long int) VECTOR(adj)[j];
                         igraph_integer_t edgefrom, edgeto;
                         long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, edgefrom);
