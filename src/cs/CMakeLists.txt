@@ -32,7 +32,7 @@ target_include_directories(
 
 # Define symbols to enable compilation of CSXSparse on Windows using MSVC
 if (MSVC)
-    target_compile_definitions(cxsparse_vendored PRIVATE NCOMPLEX)
+  target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
 endif()
 
 # Suppress some warnings that occur in the output because we do not want to
