@@ -99,42 +99,42 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
 
         IGRAPH_ALLOW_INTERRUPTION();
 
-	/* This is the root, mark it visited */
+        /* This is the root, mark it visited */
         added_nodes[i] = 1;
 
-	/* The queue stores the next vertex, the edge to it, and its distance to root */
+        /* The queue stores the next vertex, the edge to it, and its distance to root */
         IGRAPH_CHECK(igraph_dqueue_push(&q, i));
         IGRAPH_CHECK(igraph_dqueue_push(&q, -1));
         IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
         while (! igraph_dqueue_empty(&q)) {
           /* current node, incoming edge, and distance from tree root */
           long int actnode=(long int) igraph_dqueue_pop(&q);
-	  long int actedge=(long int) igraph_dqueue_pop(&q);
+          long int actedge=(long int) igraph_dqueue_pop(&q);
           long int actdist=(long int) igraph_dqueue_pop(&q);
 
-	  /* check all edges connected to this vertex */
+          /* check all edges connected to this vertex */
           IGRAPH_CHECK(igraph_incident(graph, &inc_edges, (igraph_integer_t) actnode,
-				       IGRAPH_ALL));
+                                       IGRAPH_ALL));
 
           for (j=0; j<igraph_vector_size(&inc_edges); j++) {
               long int edge=(long int) VECTOR(inc_edges)[j];
 
-	      /* visited edges have been given their cycles already */
+              /* visited edges have been given their cycles already */
               if (added_edges[edge] == 0) {
 
-		/* find the neighbour identity */
+                /* find the neighbour identity */
                 igraph_integer_t to = IGRAPH_OTHER(graph,
-				(igraph_integer_t) edge, actnode);
-		
-		/* if the edge goes to a new vertex, expand the spanning tree */
+                                (igraph_integer_t) edge, actnode);
+                
+                /* if the edge goes to a new vertex, expand the spanning tree */
                 if (added_nodes[(long int) to] == 0) {
                     added_nodes[(long int) to] = 1;
                     added_edges[edge] = 1;
-		    parent_nodes[(long int) to] = actnode;
-		    dist[(long int) to] = actdist + 1;
-		    parent_edges[edge] = actedge;
+                    parent_nodes[(long int) to] = actnode;
+                    dist[(long int) to] = actdist + 1;
+                    parent_edges[edge] = actedge;
 
-		    /* and continue the search from there  */
+                    /* and continue the search from there  */
                     IGRAPH_CHECK(igraph_dqueue_push(&q, to));
                     IGRAPH_CHECK(igraph_dqueue_push(&q, edge));
                     IGRAPH_CHECK(igraph_dqueue_push(&q, actdist + 1));
@@ -144,11 +144,11 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
                 * so it generates a cycle */
                 else {
                     igraph_i_fundamental_cycle_basis_add(graph,
-				    basis,
-				    &parent_nodes, &parent_edges,
-				    &added_edges, dist,
-				    actedge, edge,
-				    (long int) actnode, (long int) to);
+                                    basis,
+                                    &parent_nodes, &parent_edges,
+                                    &added_edges, dist,
+                                    actedge, edge,
+                                    (long int) actnode, (long int) to);
                 }
               }
           }
@@ -169,11 +169,11 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
 
 /* Note: this function also works for self-edges */
 int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
-	igraph_vector_ptr_t *basis,
-	const igraph_vector_t *parent_nodes, const igraph_vector_t *parent_edges,
-	const igraph_vector_chat_t *added_edges, const igraph_vector_t *dist,
-	long int edge_from, long int edge_to,
-	long int from, long int to) {
+        igraph_vector_ptr_t *basis,
+        const igraph_vector_t *parent_nodes, const igraph_vector_t *parent_edges,
+        const igraph_vector_chat_t *added_edges, const igraph_vector_t *dist,
+        long int edge_from, long int edge_to,
+        long int from, long int to) {
 
     /* 'from' is the last node visited. 'to' is the neighbor of 'from' that
      * was already in the tree. They are connected by 'edge_to'. We will need
@@ -196,7 +196,7 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
 
     /* find the edge connecting 'to' to its parent in the tree */
     IGRAPH_CHECK(igraph_incident(graph, &to_edges, (igraph_integer_t) to,
-	IGRAPH_ALL));
+        IGRAPH_ALL));
     for (i = 0; i < igraph_vector_size(&to_edges); i++) {
         igraph_integer_t to_from, to_to;
 
@@ -204,23 +204,23 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
 
         /* only a visited edge can be in the tree */
         if (added_edges[edge]==0) {
-	    continue
+            continue
         }
 
         /* find the vertices of this edge */
         IGRAPH_CHECK(igraph_edge(graph,
-				 (igraph_integer_t) edge_to,
-				 &to_from, &to_to);)
+                                 (igraph_integer_t) edge_to,
+                                 &to_from, &to_to);)
 
-	/* we only know that either one is to, swap if needed */
+        /* we only know that either one is to, swap if needed */
         if (to_to == to) {
-	  to_to = to_from;
-	  to_from = to_to;
-	}
+          to_to = to_from;
+          to_from = to_to;
+        }
 
-	if (to_to == parent_nodes[to]) {
-	    break;
-	}
+        if (to_to == parent_nodes[to]) {
+            break;
+        }
     }
     igraph_vector_destroy(&to_edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -229,26 +229,26 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
      * first, and then both together */
     while (from != to) {
         if (dist[from] > dist[to]) {
-	    /* backtrack 'from' */
+            /* backtrack 'from' */
             IGRAPH_CHECK(igraph_vector_push_back(cycle, edge_from));
-	    from = parent_nodes[from];
-	    edge_from = parent_edges[edge_from];
-	}
-	else if (dist[to] > dist[from]) {
-	    /* backtrack 'to' */
+            from = parent_nodes[from];
+            edge_from = parent_edges[edge_from];
+        }
+        else if (dist[to] > dist[from]) {
+            /* backtrack 'to' */
             IGRAPH_CHECK(igraph_vector_push_back(to_backtrack, edge_to));
-	    to = parent_nodes[to];
-	    edge_to = parent_edges[edge_to];
-	}
-	else {
-	    /* same distance but different, backtrack both until they merge */
+            to = parent_nodes[to];
+            edge_to = parent_edges[edge_to];
+        }
+        else {
+            /* same distance but different, backtrack both until they merge */
             IGRAPH_CHECK(igraph_vector_push_back(cycle, edge_from));
             IGRAPH_CHECK(igraph_vector_push_back(to_backtrack, edge_to));
-	    from = parent_nodes[from];
-	    to = parent_nodes[to];
-	    edge_from = parent_edges[edge_from];
-	    edge_to = parent_edges[edge_to];
-	}
+            from = parent_nodes[from];
+            to = parent_nodes[to];
+            edge_from = parent_edges[edge_from];
+            edge_to = parent_edges[edge_to];
+        }
     }
 
     /* add the backtracked edges from 'to' in reverse order*/
@@ -260,7 +260,7 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     /* add the cycle to the basis */
-    IGRAPH_CHECK(igraph_vector_ptr_push_back(basis, cycle));	
+    IGRAPH_CHECK(igraph_vector_ptr_push_back(basis, cycle));        
 
     return IGRAPH_SUCCESS;
 }
@@ -307,7 +307,7 @@ typedef struct igraph_i_weighted_clique_t {
 int igraph_minimum_cycle_basis(const igraph_t *graph,
                 const igraph_vector_t *weights,
                 igraph_vector_ptr_t *basis,
-		) {
+                ) {
 
     /* General plan:
      *
@@ -332,18 +332,23 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
     long int i, n;
     long int no_of_nodes = igraph_vcount(graph);
-    igraph_vector_t si;
+    /* support vector for cycle i */
+    igraph_vector_int_t si;
     igraph_vector_int_t nonorth_cycles;
 
     igraph_vector_t fvs, basis_weight;
     /* shortest path trees and subtree labels */
-    igraph_vector_ptr_t trees, parents, labels;
+    igraph_vector_ptr_t trees, parents, distances, labels;
     /* candidate cycles */
     igraph_vector_ptr_t candidate_cycles;
 
+    /* initialize si
+     * it is a boolean adjecency vector */
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&si, no_of_nodes);
+
     /* 0. Feedback vertex set */
     IGRAPH_CHECK(igraph_i_feedback_vertex_set(
-			    graph, &fvs, weights));
+                            graph, &fvs, weights));
     n = igraph_vector_size(&fvs);
 
     /* 1. Construct all shortest path trees */
@@ -351,43 +356,49 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     IGRAPH_VECTOR_PTR_INIT_FINALLY(labels, 0);
     /* TODO: set an item destructor for trees */
     IGRAPH_CHECK(igraph_i_shortest_path_trees(
-			    graph, weights, &fvs,
-			    &trees, &parents, &labels));
+                            graph, weights, &fvs,
+                            &trees, &parents, &istances, &labels));
 
     /* 2. Construct candidate list */
     /* TODO: set an item destructor for cycles */
     IGRAPH_CHECK(igraph_i_candidate_cycles(
-			    graph, weights,
-			    &trees, &parents, &labels,
-			    &candidate_cycles));
+                            graph, weights,
+                            &trees, &parents, &labels,
+                            &candidate_cycles));
 
     /* 3. Construct basis one cycle at a time
      *    similar to a standard Gram Schmidt orthogonalization */
     for (i = 0; i < no_of_nodes; i++) {
         /* 3.1 compute Si, the nonnormalized, minimal vector
-	 *     sticking out from the current space */
-	IGRAPH_CHECK(igraph_i_compute_Si(graph, weights, basis, i, &si));
+         *     sticking out from the current space */
+        IGRAPH_CHECK(igraph_i_compute_Si(
+                        graph, weights,
+                        &trees, &parents, &labels,
+                        &basis, i, &si));
 
-	/* 3.2 update tree vertex labels from Si */
-	IGRAPH_CHECK(igraph_i_update_trees_vertex_labels(
-			&trees, &si));
+        /* 3.2 update tree vertex labels from Si */
+        IGRAPH_CHECK(igraph_i_update_trees_vertex_labels(
+                        &trees, &si));
 
-	/* 3.3 find non-orthogonal candidates */
-	IGRAPH_CHECK(igraph_i_nonorthogonal_candidates(
-			&candidate_cycles, &si, &nonorth_cycles));
+        /* 3.3 find non-orthogonal candidates */
+        IGRAPH_CHECK(igraph_i_nonorthogonal_candidates(
+                        &candidate_cycles, &si, &nonorth_cycles));
 
-	/* 3.4 get the shortest nonorthogonal cycle */
-	IGRAPH_CHECK(igraph_i_shortest_nonorthogonal_cycle(
-			&candidate_cycles, &nonorth_cycles, basis));
+        /* 3.4 get the shortest nonorthogonal cycle */
+        IGRAPH_CHECK(igraph_i_shortest_nonorthogonal_cycle(
+                        &candidate_cycles, &nonorth_cycles, basis));
 
     }
 
 
     /* Clean */
     igraph_vector_destroy(&fvs);
+    igraph_vector_int_destroy(si);
     igraph_vector_ptr_destroy_all(trees);
+    igraph_vector_ptr_destroy_all(parents);
+    igraph_vector_ptr_destroy_all(distances);
     igraph_vector_ptr_destroy_all(labels);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(6);
 
     return IGRAPH_SUCCESS;
 }
@@ -395,12 +406,13 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
 /* NOTE: Adaptated from igraph_i_minimum_spanning_tree_prim */
 int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
-		const igraph_vector_t *weights,
-		const igraph_int_t root,
-		igraph_vector_t *res,
-		igraph_vector_t *parent,
-		igraph_vector_int_t *labels,
-		) {
+                const igraph_vector_t *weights,
+                const igraph_int_t root,
+                igraph_vector_t *res,
+                igraph_vector_t *parent,
+                igraph_vector_t *distance,
+                igraph_vector_int_t *labels,
+                ) {
 
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
@@ -439,12 +451,12 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
      * */
     for (ir = 0; ir < no_of_nodes; ir++) {
         if (ir == 0) {
-	    i = root;
-	} else if (ir <= root) {
-	    i = ir - 1;
-	} else {
-	    i = ir;
-	}
+            i = root;
+        } else if (ir <= root) {
+            i = ir - 1;
+        } else {
+            i = ir;
+        }
 
         if (already_added[i] > 0) {
             continue;
@@ -457,11 +469,11 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
         for (j = 0; j < igraph_vector_size(&adj); j++) {
             long int edgeno = (long int) VECTOR(adj)[j];
             long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, i);
-	    /*
+            /*
             igraph_integer_t edgefrom, edgeto;
             igraph_edge(graph, (igraph_integer_t) edgeno, &edgefrom, &edgeto);
             neighbor = edgefrom != i ? edgefrom : edgeto;
-	    */
+            */
             if (already_added[neighbor] == 0) {
                 IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
                                                    edgeno));
@@ -487,16 +499,16 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
                 if (already_added[(long int)to] == 0) {
                     already_added[(long int)to] = 1;
                     added_edges[edge] = 1;
-		    /* add the edge to the tree */
+                    /* add the edge to the tree */
                     IGRAPH_CHECK(igraph_vector_push_back(res, edge));
-		    /* add the EDGE to the parent */
-		    VECTOR(parents)[to] = edge;
-		    /* label the to node */
-		    if (from == root) {
+                    /* add the EDGE to the parent */
+                    VECTOR(parents)[to] = edge;
+                    /* label the to node */
+                    if (from == root) {
                         VECTOR(labels)[to] = subtree_id++;
-		    } else {
+                    } else {
                         VECTOR(labels)[to] = VECTOR(labels)[from];
-		    }
+                    }
 
                     /* add all outgoing edges */
                     igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
@@ -528,12 +540,13 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
 
 
 int igraph_i_shortest_path_trees(const igraph_t *graph,
-		const igraph_vector_t *weights,
-		const igraph_vector_t *fvs,
-		igraph_vector_ptr_t *trees,
-		igraph_vector_ptr_t *parents,
-		igraph_vector_ptr_t *labels,
-		) {
+                const igraph_vector_t *weights,
+                const igraph_vector_t *fvs,
+                igraph_vector_ptr_t *trees,
+                igraph_vector_ptr_t *parents,
+                igraph_vector_ptr_t *distances,
+                igraph_vector_ptr_t *labels,
+                ) {
 
     long int i;
     long int n = igraph_vector_size(fvs);
@@ -541,34 +554,37 @@ int igraph_i_shortest_path_trees(const igraph_t *graph,
 
     for(i = 0; i < n; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-	
-	/* each tree is a list of edges */
-	igraph_vector_t tree, parent;
-	igraph_vector_int_t labels_tree;
-	/* in disconnected graphs, the number of edges is not always V-1 */
+        
+        /* each tree is a list of edges */
+        igraph_vector_t tree, parent, distance;
+        igraph_vector_int_t labels_tree;
+        /* in disconnected graphs, the number of edges is not always V-1 */
         IGRAPH_VECTOR_INIT_FINALLY(&tree, 0);
-	/* but the parents and labels are the same anyway */
+        /* but the parents, distances, and labels are the same anyway */
         IGRAPH_VECTOR_INIT_FINALLY(&parent, no_of_nodes);
+        IGRAPH_VECTOR_INIT_FINALLY(&distance, no_of_nodes);
         IGRAPH_VECTOR_INT_INIT_FINALLY(&labels_tree, no_of_nodes);
         IGRAPH_CHECK(igraph_i_shortest_path_tree_rooted(graph,
-				weights,
-				VECTOR(fvs)[i],
-				&tree, &parent, &labels_tree);
-	IGRAPH_CHECK(igraph_vector_ptr_push_back(trees, &tree));
-	IGRAPH_CHECK(igraph_vector_ptr_push_back(parents, &parent));
-	IGRAPH_CHECK(igraph_vector_ptr_push_back(labels, &labels_tree));
+                                weights,
+                                VECTOR(fvs)[i],
+                                &tree, &parent, &distance, &labels_tree);
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(trees, &tree));
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(parents, &parent));
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(distances, &distance));
+        IGRAPH_CHECK(igraph_vector_ptr_push_back(labels, &labels_tree));
     }
 
     return IGRAPH_SUCCESS;
 }
 
 int igraph_i_candidate_cycles(const igraph_t *graph,
-		const igraph_vector_t *weights,
-		const igraph_vector_ptr_t *trees,
-		const igraph_vector_ptr_t *parents,
-		const igraph_vector_ptr_t *labels,
-		igraph_vector_ptr_t *candidate_cycles,
-		){
+                const igraph_vector_t *weights,
+                const igraph_vector_ptr_t *trees,
+                const igraph_vector_ptr_t *parents,
+                const igraph_vector_ptr_t *distances,
+                const igraph_vector_ptr_t *labels,
+                igraph_vector_ptr_t *candidate_cycles,
+                ){
 
     /* These can be Horton cycles or a subset, which is more efficient
      * Let's see how far we get with the implementation */
@@ -583,53 +599,45 @@ int igraph_i_candidate_cycles(const igraph_t *graph,
     /* For each tree... */
     for(i = 0; i < igraph_vector_size(trees); i++) {
         /* find edges that:
-	 * 1. are not in the tree
-	 * 2. span different subtrees
-	 * The only way 2. is satisfied but not 1. is if the edge connects
-	 * the root (which has no subtree label) to one of its children
-	 * (which is the founder of a subtree): so we check for that instead
-	 * of searching for the edge in the tree.
-	 */
-	 igraph_vector_t tree = VECTOR(trees)[i];
-	 igraph_vector_t parent = VECTOR(parents)[i];
-	 igraph_vector_int_t labels_tree = VECTOR(labels)[i];
+         * 1. are not in the tree
+         * 2. span different subtrees
+         * The only way 2. is satisfied but not 1. is if the edge connects
+         * the root (which has no subtree label) to one of its children
+         * (which is the founder of a subtree): so we check for that instead
+         * of searching for the edge in the tree.
+         */
+         igraph_vector_t tree = VECTOR(trees)[i];
+         igraph_vector_t parent = VECTOR(parents)[i];
+         igraph_vector_t distance = VECTOR(distances)[i];
+         igraph_vector_int_t labels_tree = VECTOR(labels)[i];
 
          /* subtree labels have been set already in the shortest path BFS */
 
-	 /* Look through the edges for the ones spanning different subtrees */
-	 for(j = 0; j < no_of_edges; j++) {
+         /* Look through the edges for the ones spanning different subtrees */
+         for(j = 0; j < no_of_edges; j++) {
              igraph_integer_t from, igraph_integer_t to, igraph_integer_t par;
-	     long int label_from, label_to, k;
-	     igraph_integer_t edge = VECTOR(edges)[j];
+             long int label_from, label_to, k;
+             igraph_integer_t edge = VECTOR(edges)[j];
 
-	     from = IGRAPH_FROM(graph, edge);
-	     to = IGRAPH_TO(graph, edge);
-	     label_from = VECTOR(labels_tree)[from];
-	     label_to = VECTOR(labels_tree)[to];
+             from = IGRAPH_FROM(graph, edge);
+             to = IGRAPH_TO(graph, edge);
+             label_from = VECTOR(labels_tree)[from];
+             label_to = VECTOR(labels_tree)[to];
 
-	     if ((label_from != -1) && (label_to != -1) && (label_from != label_to)) {
-	         /* since we store the trees anyway, the data structure
-		  * for candidate cycles is a struct containing tree id, id of
-		  * the non-tree edge, and total weight (for sorting). See
-		  * above for the exact definition */
+             if ((label_from != -1) && (label_to != -1) && (label_from != label_to)) {
+                 /* since we store the trees anyway, the data structure
+                  * for candidate cycles is a struct containing tree id, id of
+                  * the non-tree edge, and total weight (for sorting). See
+                  * above for the exact definition */
                  igraph_i_weighted_clique_t clique;
                  clique.tree = i;
-		 clique.external_edge = edge;
+                 clique.external_edge = edge;
+                 clique.weight = VECTOR(weights)[edge] +
+                       VECTOR(distance)[from] + VECTOR(distance)[to];
 
-		 /* swim against the stream until the root from both from and to */
-		 clique.weight = VECTOR(weights)[edge];
-		 for(k=0; k<2; k++) {
-		     par = k == 0 ? to : from;
-		     while(VECTOR(labels_tree)[par] != -1) {
-		         edge = VECTOR(parent)[par];
-		         clique.weight += VECTOR(weights)[edge];
-		         par = IGRAPH_OTHER(graph, edge, par);
-		     }
-		 }
-
-		 IGRAPH_CHECK(igraph_vector_ptr_push_back(candidate_cycles, clique));
-	     }
-	 }
+                 IGRAPH_CHECK(igraph_vector_ptr_push_back(candidate_cycles, clique));
+             }
+         }
     
     }
 
@@ -653,21 +661,76 @@ int igraph_i_compare_cycles(const void *pc1, const void *pc2) {
 }
 
 int igraph_i_compute_Si(const igraph_t *graph,
-		const igraph_vector_t *weights,
-		const igraph_vector_ptr_t *basis,
-		long int i,
-		igraph_vector_t *si,
-		) {
+                const igraph_vector_t *weights,
+                const igraph_vector_ptr_t *trees,
+                const igraph_vector_ptr_t *basis,
+                long int i,
+                igraph_vector_int_t *si,
+                ) {
 
-    /* TODO: implement */
-    return IGRAPH_SUCCESS;
+    long int j, k;
+    int found, orth;
+    long int no_of_nodes = igraph_vcount(graph);
+
+    igraph_vector_int_clear(si);
+
+    found = 0;
+
+    /* FIXME: iterate over the combinatorial space */
+    for(j=0; j<no_of_edges; j++) {
+        VECTOR(si)[j] = 1;
+
+        /* check if the vector is orthogonal to all Ck < i */
+        orth = 1;
+        for(k=0; k<i; k++) {
+	    igraph_vector_t tree = VECTOR(trees)[k];
+            igraph_i_weighted_clique_t clique = VECTOR(basis)[k];
+            if (!igraph_i_orthogonal(graph, &tree, &clique, si)) {
+                orth = 0;
+                break;
+            }
+        }
+        if (orth == 1) {
+            found = 1;
+            break;
+        }
+    }
+
+    if (found) {
+        return IGRAPH_SUCCESS;
+    } else {
+	/* FIXME; more specific error? */
+        return IGRAPH_ERROR;
+    }
+}
+
+int igraph_i_orthogonal(
+                const igraph_t *graph,
+                const igraph_vector_t *tree,
+		const igraph_i_weighted_clique_t *clique,
+		const igraph_vector_int_t *si) {
+
+    /* TODO what does it mean to be orthogonal?? ;-) */
+    int i;
+    int prod = 0;
+    int m = igraph_vector_size(tree);
+    igraph_integer_t edge;
+    for(i=0; i < m; i++) {
+	igraph_integer_t from, to;
+        edge = VECTOR(tree)[i];
+	from = IGRAPH_FROM(edge);
+	to = IGRAPH_TO(edge);
+	if (VECTOR(si)[from] )
+
+    
+    }
 
 }
 
 
 int igraph_i_update_trees_vertex_labels(igraph_vector_ptr_t *trees,
-		const igraph_vector_t *si,
-		) {
+                const igraph_vector_int_t *si,
+                ) {
 
     /* TODO: implement */
     return IGRAPH_SUCCESS;
@@ -675,9 +738,9 @@ int igraph_i_update_trees_vertex_labels(igraph_vector_ptr_t *trees,
 
 
 int igraph_i_nonorthogonal_candidates(const igraph_vector_ptr_t *candidate_cycles,
-		const igraph_vector_t *si,
-		igraph_vector_int_t *nonorth_cycles,
-		) {
+                const igraph_vector_t *si,
+                igraph_vector_int_t *nonorth_cycles,
+                ) {
 
     /* TODO: implement */
     return IGRAPH_SUCCESS;
@@ -685,10 +748,10 @@ int igraph_i_nonorthogonal_candidates(const igraph_vector_ptr_t *candidate_cycle
 
 
 int igraph_i_shortest_nonorthogonal_cycle(const igraph_vector_ptr_t *candidate_cycles,
-		const igraph_vector_t *cadidate_weights,
-		const igraph_vector_int_t *nonorth_cycles,
-		igraph_vector_ptr_t *basis,
-		) {
+                const igraph_vector_t *cadidate_weights,
+                const igraph_vector_int_t *nonorth_cycles,
+                igraph_vector_ptr_t *basis,
+                ) {
 
     /* TODO: implement */
     return IGRAPH_SUCCESS;
