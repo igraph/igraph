@@ -37,14 +37,17 @@
 
 /**
  * \ingroup structural
- * \function igraph_feedback_vertex_set
- * \brief Calculates a feedback vertex set of the graph.
+ * \function igraph_feedback_vertex_set_approx
+ * \brief Calculates an approximate minimum feedback vertex set of the graph.
  *
  * </para><para>
- * A feedback vertex set is a set of vertices whose removal makes the graph acyclic.
+ * A feedback vertex set (FVS) is a set of vertices whose removal makes the graph
+ * acyclic. The set of all vertices is obviously a FVS, however there might often
+ * be smaller vertex sets that are also a FVS.
  *
  * </para><para>
  * The problem is NP complete except in undirected graphs of maximum degree three.
+ * This function finds an approximation to the minimum FVS.
  *
  * \param graph  The graph object.
  * \param result An initialized vector, the result will be returned here.
@@ -55,9 +58,9 @@
  *            is invalid.
  *
  */
-int igraph_feedback_vertex_set(const igraph_t *graph,
+int igraph_feedback_vertex_set_approx(const igraph_t *graph,
 		igraph_vector_t *result,
-                const igraph_vector_t *weights) {
+        const igraph_vector_t *weights) {
 
     if (!igraph_is_directed(graph)) {
         return igraph_i_feedback_vertex_set_undirected(graph, result, weights);
@@ -76,7 +79,6 @@ int igraph_i_feedback_vertex_set_undirected(const igraph_t *graph,
     long int i;
     long int no_of_nodes = igraph_vcount(graph);
 
-    /* TODO: implement */
     /* For now, return all vertices */
     igraph_vector_clear(vertices);
     IGRAPH_CHECK(igraph_vector_reserve(vertices, no_of_nodes));

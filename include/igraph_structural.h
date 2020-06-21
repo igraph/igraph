@@ -131,7 +131,8 @@ DECLDIR int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
 DECLDIR int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
                                     const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
 
-DECLDIR int igraph_feedback_vertex_set(const igraph_t *graph, igraph_vector_t *result,
+DECLDIR int igraph_feedback_vertex_set_approx(const igraph_t *graph,
+                                    igraph_vector_t *result,
                                     const igraph_vector_t *weights);
 
 /* -------------------------------------------------- */
