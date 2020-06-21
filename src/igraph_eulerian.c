@@ -158,6 +158,12 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
     igraph_vector_t out_degree, in_degree, csize_weak, check_for_self_loops, cluster_member;
     igraph_inclist_t il;
 
+    if (!graph) {
+        *has_path = 1;
+        *has_cycle = 1;
+        return IGRAPH_SUCCESS;
+    }
+
     vector_count = igraph_vcount(graph);
 
     if (igraph_ecount(graph) == 0 || vector_count <= 1) {
@@ -561,7 +567,7 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
 
     if (igraph_is_directed(graph)) {
         IGRAPH_CHECK(igraph_i_is_eulerian_directed(graph, &has_path, &has_cycle, &start_of_path));
-        
+
         if (!has_cycle) {
             IGRAPH_ERROR("The graph does not have an Eulerian cycle.", IGRAPH_EINVAL);
         }

@@ -170,6 +170,11 @@ int main() {
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);
 
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  0,0 , 1,1 , 1,1 , -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
     VERIFY_FINALLY_STACK();
     
     return 0;
