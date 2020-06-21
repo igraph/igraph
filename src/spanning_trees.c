@@ -316,9 +316,7 @@ static int igraph_i_minimum_spanning_tree_prim(
         igraph_incident(graph, &adj, (igraph_integer_t) i, (igraph_neimode_t) mode);
         for (j = 0; j < igraph_vector_size(&adj); j++) {
             igraph_integer_t edgeno = (long int) VECTOR(adj)[j];
-            igraph_integer_t edgefrom = IGRAPH_FROM(graph, (igraph_integer_t) edgeno);
-            igraph_integer_t edgeto = IGRAPH_TO(graph, (igraph_integer_t) edgeno);
-            igraph_integer_t neighbor = edgefrom != i ? edgefrom : edgeto;
+            igraph_integer_t neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, edgefrom);
             if (already_added[neighbor] == 0) {
                 IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
                                                    edgeno));
