@@ -336,12 +336,10 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     igraph_vector_int_t nonorth_cycles;
 
     igraph_vector_t fvs, basis_weight;
-    /* list of vertices = tree -> list of trees */
-    igraph_vector_ptr_t trees;
-    /* NOTE: [tree_id, edge_id, tree_id2, edge_id2, ...] */
-    igraph_vector_int_t candidate_cycles;
-    /* total weight of each cycle */
-    igraph_vector_t candidate_weights;
+    /* shortest path trees and subtree labels */
+    igraph_vector_ptr_t trees, parents, labels;
+    /* candidate cycles */
+    igraph_vector_ptr_t candidate_cycles;
 
     /* 0. Feedback vertex set */
     IGRAPH_CHECK(igraph_i_feedback_vertex_set(
@@ -349,15 +347,19 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     n = igraph_vector_size(&fvs);
 
     /* 1. Construct all shortest path trees */
-    igraph_vector_ptr_init(&trees, 0);
+    IGRAPH_VECTOR_PTR_INIT_FINALLY(trees, 0);
+    IGRAPH_VECTOR_PTR_INIT_FINALLY(labels, 0);
     /* TODO: set an item destructor for trees */
     IGRAPH_CHECK(igraph_i_shortest_path_trees(
-			    graph, weights, &fvs, &trees));
+			    graph, weights, &fvs,
+			    &trees, &parents, &labels));
 
     /* 2. Construct candidate list */
+    /* TODO: set an item destructor for cycles */
     IGRAPH_CHECK(igraph_i_candidate_cycles(
 			    graph, weights,
-			    &candidate_cycles, &candidate_weights));
+			    &trees, &parents, &labels,
+			    &candidate_cycles));
 
     /* 3. Construct basis one cycle at a time
      *    similar to a standard Gram Schmidt orthogonalization */
@@ -372,11 +374,11 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
 	/* 3.3 find non-orthogonal candidates */
 	IGRAPH_CHECK(igraph_i_nonorthogonal_candidates(
-			candidate_cycles, &si, &nonorth_cycles));
+			&candidate_cycles, &si, &nonorth_cycles));
 
 	/* 3.4 get the shortest nonorthogonal cycle */
 	IGRAPH_CHECK(igraph_i_shortest_nonorthogonal_cycle(
-			candidate_cycles, &candidate_weights, &nonorth_cycles, basis));
+			&candidate_cycles, &nonorth_cycles, basis));
 
     }
 
@@ -384,7 +386,8 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
     /* Clean */
     igraph_vector_destroy(&fvs);
     igraph_vector_ptr_destroy_all(trees);
-    IGRAPH_FINALLY_CLEAN(2);
+    igraph_vector_ptr_destroy_all(labels);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
@@ -395,6 +398,8 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_int_t root,
 		igraph_vector_t *res,
+		igraph_vector_t *parent,
+		igraph_vector_int_t *labels,
 		) {
 
     long int no_of_nodes = igraph_vcount(graph);
@@ -408,14 +413,17 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
     igraph_vector_t adj;
     igraph_vector_int_t node_order;
 
-    long int i, j, ir;
-
-    igraph_vector_clear(res);
+    long int i, j, ir, subtree_id, nodes_added;
 
     IGRAPH_FINALLY(igraph_free, already_added);
     IGRAPH_CHECK(igraph_d_indheap_init(&heap, 0));
     IGRAPH_FINALLY(igraph_d_indheap_destroy, &heap);
     IGRAPH_VECTOR_INIT_FINALLY(&adj, 0);
+
+    /* the subtree label of root is -1 */
+    /* TODO: this might be messy with disconnected graphs? */
+    labels[root] = -1;
+    subtree_id = 0;
 
     /* use two pointers: ir goes from 0 to n-1, i starts from the root and follows
      * e.g. if root = 2
@@ -448,10 +456,12 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
         igraph_incident(graph, &adj, (igraph_integer_t) i, (igraph_neimode_t) mode);
         for (j = 0; j < igraph_vector_size(&adj); j++) {
             long int edgeno = (long int) VECTOR(adj)[j];
+            long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, i);
+	    /*
             igraph_integer_t edgefrom, edgeto;
-            long int neighbor;
             igraph_edge(graph, (igraph_integer_t) edgeno, &edgefrom, &edgeto);
             neighbor = edgefrom != i ? edgefrom : edgeto;
+	    */
             if (already_added[neighbor] == 0) {
                 IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
                                                    edgeno));
@@ -477,7 +487,17 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
                 if (already_added[(long int)to] == 0) {
                     already_added[(long int)to] = 1;
                     added_edges[edge] = 1;
+		    /* add the edge to the tree */
                     IGRAPH_CHECK(igraph_vector_push_back(res, edge));
+		    /* add the EDGE to the parent */
+		    VECTOR(parents)[to] = edge;
+		    /* label the to node */
+		    if (from == root) {
+                        VECTOR(labels)[to] = subtree_id++;
+		    } else {
+                        VECTOR(labels)[to] = VECTOR(labels)[from];
+		    }
+
                     /* add all outgoing edges */
                     igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
                     for (j = 0; j < igraph_vector_size(&adj); j++) {
@@ -511,20 +531,32 @@ int igraph_i_shortest_path_trees(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_vector_t *fvs,
 		igraph_vector_ptr_t *trees,
+		igraph_vector_ptr_t *parents,
+		igraph_vector_ptr_t *labels,
 		) {
 
     long int i;
     long int n = igraph_vector_size(fvs);
-
-    igraph_vector_ptr_init(trees, n);
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy, trees);
+    long int no_of_nodes = igraph_vcount(graph);
 
     for(i = 0; i < n; i++) {
+        IGRAPH_ALLOW_INTERRUPTION();
+	
 	/* each tree is a list of edges */
+	igraph_vector_t tree, parent;
+	igraph_vector_int_t labels_tree;
+	/* in disconnected graphs, the number of edges is not always V-1 */
+        IGRAPH_VECTOR_INIT_FINALLY(&tree, 0);
+	/* but the parents and labels are the same anyway */
+        IGRAPH_VECTOR_INIT_FINALLY(&parent, no_of_nodes);
+        IGRAPH_VECTOR_INT_INIT_FINALLY(&labels_tree, no_of_nodes);
         IGRAPH_CHECK(igraph_i_shortest_path_tree_rooted(graph,
 				weights,
 				VECTOR(fvs)[i],
-				VECTOR(trees)[i]));
+				&tree, &parent, &labels_tree);
+	IGRAPH_CHECK(igraph_vector_ptr_push_back(trees, &tree));
+	IGRAPH_CHECK(igraph_vector_ptr_push_back(parents, &parent));
+	IGRAPH_CHECK(igraph_vector_ptr_push_back(labels, &labels_tree));
     }
 
     return IGRAPH_SUCCESS;
@@ -533,66 +565,49 @@ int igraph_i_shortest_path_trees(const igraph_t *graph,
 int igraph_i_candidate_cycles(const igraph_t *graph,
 		const igraph_vector_t *weights,
 		const igraph_vector_ptr_t *trees,
+		const igraph_vector_ptr_t *parents,
+		const igraph_vector_ptr_t *labels,
 		igraph_vector_ptr_t *candidate_cycles,
-		igraph_vector_t *cadidate_weights,
 		){
 
     /* These can be Horton cycles or a subset, which is more efficient
      * Let's see how far we get with the implementation */
 
     long int i, ie;
-    igraph_vector_int_t subtree_label, cycle_order;
+    igraph_vector_int_t cycle_order;
     long int no_of_nodes=igraph_vcount(graph);
     long int no_of_edges=igraph_ecount(graph);
     igraph_vector_es_t edges;
-    igraph_es_all(&es, IGRAPH_EDGEORDER_ID);
+    igraph_es_all(&edges, IGRAPH_EDGEORDER_ID);
     
-    IGRAPH_CHECK(igraph_vector_int_init(subtree_label, no_of_nodes));
-
     /* For each tree... */
     for(i = 0; i < igraph_vector_size(trees); i++) {
-        /* find edges for which the two vertices only meet in the tree at the root */
-	/* how do we find them? well we
-	 * 1. get the children of root and create subtrees
-	 * 2. we test if any edge has vertices in different subtrees
-	 * whether we approach by vertices or edges depends on how sparse the
-	 * graph is. For now let's assign every vertex to a subtree, then go over
-	 * the edges and check */
-         igraph_inclist_t inclist;
-         igraph_vector_int_t *root_edges;
-         long int j, nchild;
-         igraph_vector_t children;
-
+        /* find edges that:
+	 * 1. are not in the tree
+	 * 2. span different subtrees
+	 * The only way 2. is satisfied but not 1. is if the edge connects
+	 * the root (which has no subtree label) to one of its children
+	 * (which is the founder of a subtree): so we check for that instead
+	 * of searching for the edge in the tree.
+	 */
 	 igraph_vector_t tree = VECTOR(trees)[i];
-	 igraph_integer_t root = VECTOR(tree)[0];
+	 igraph_vector_t parent = VECTOR(parents)[i];
+	 igraph_vector_int_t labels_tree = VECTOR(labels)[i];
 
-	 /* FIXME: each tree is not a graph but a list of edges, fix this */
-         IGRAPH_CHECK(igraph_inclist_init(tree, &inclist, IGRAPH_ALL));
-         root_edges = igraph_inclist_get(il, root);
-	 nchild = igraph_vector_int_size(edges);
-         IGRAPH_CHECK(igraph_vector_init(children, nchild));
-
-	 /* root is not in any subtree, so put it as -1 */
-	 VECTOR(subtree_label)[0] = -1;
-	 for(j = 0; j < nchild; j++) {
-	     VECTOR(children)[j] = IGRAPH_OTHER(tree, VECTOR(edges)[j], root);
-	     /* label each child into its own subtree */
-	     VECTOR(subtree_label)[VECTOR(children)[j]] = j
-	 }
-
-	 /* TODO: label the rest of the tree recursively based on the children */
+         /* subtree labels have been set already in the shortest path BFS */
 
 	 /* Look through the edges for the ones spanning different subtrees */
 	 for(j = 0; j < no_of_edges; j++) {
-             double weight = 0;
-             igraph_integer_t from, igraph_integer_t to;
+             igraph_integer_t from, igraph_integer_t to, igraph_integer_t par;
+	     long int label_from, label_to, k;
 	     igraph_integer_t edge = VECTOR(edges)[j];
-	     igraph_edge(graph, edge, &from, &to);
 
-	     from = VECTOR(subtree_label)[from];
-	     to = VECTOR(subtree_label)[to];
+	     from = IGRAPH_FROM(graph, edge);
+	     to = IGRAPH_TO(graph, edge);
+	     label_from = VECTOR(labels_tree)[from];
+	     label_to = VECTOR(labels_tree)[to];
 
-	     if ((from != -1) && (to != -1) && (from != to)) {
+	     if ((label_from != -1) && (label_to != -1) && (label_from != label_to)) {
 	         /* since we store the trees anyway, the data structure
 		  * for candidate cycles is a struct containing tree id, id of
 		  * the non-tree edge, and total weight (for sorting). See
@@ -600,12 +615,19 @@ int igraph_i_candidate_cycles(const igraph_t *graph,
                  igraph_i_weighted_clique_t clique;
                  clique.tree = i;
 		 clique.external_edge = edge;
-		 clique.weight = -1;
 
-		 /* TODO: compute the total weight of this cycle */
+		 /* swim against the stream until the root from both from and to */
+		 clique.weight = VECTOR(weights)[edge];
+		 for(k=0; k<2; k++) {
+		     par = k == 0 ? to : from;
+		     while(VECTOR(labels_tree)[par] != -1) {
+		         edge = VECTOR(parent)[par];
+		         clique.weight += VECTOR(weights)[edge];
+		         par = IGRAPH_OTHER(graph, edge, par);
+		     }
+		 }
 
-		 /* TODO: some memory management for the vector_ptr */
-                 IGRAPH_CHECK(igraph_vector_push_back(candidate_cycles, clique));
+		 IGRAPH_CHECK(igraph_vector_ptr_push_back(candidate_cycles, clique));
 	     }
 	 }
     
