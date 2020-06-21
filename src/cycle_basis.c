@@ -66,6 +66,9 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
 
     long int i, j, k;
 
+    /* clear the output vector, you never know what you got */
+    igraph_vector_ptr_clear(basis);
+
     // Given a spanning tree (forest), fundamental cycles are given by
     // unions of:
     // - a path within the tree
