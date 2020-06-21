@@ -328,18 +328,15 @@ static int igraph_i_minimum_spanning_tree_prim(
         while (! igraph_d_indheap_empty(&heap)) {
             /* Get minimal edge */
             long int from, edge;
-            igraph_integer_t tmp, to;
             igraph_d_indheap_max_index(&heap, &from, &edge);
-            igraph_edge(graph, (igraph_integer_t) edge, &tmp, &to);
 
             /* Erase it */
             igraph_d_indheap_delete_max(&heap);
 
             /* Is this edge already included? */
             if (added_edges[edge] == 0) {
-                if (from == to) {
-                    to = tmp;
-                }
+                igraph_integer_t to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, &from);
+
                 /* Does it point to a visited node? */
                 if (already_added[(long int)to] == 0) {
                     already_added[(long int)to] = 1;
@@ -350,9 +347,7 @@ static int igraph_i_minimum_spanning_tree_prim(
                     for (j = 0; j < igraph_vector_size(&adj); j++) {
                         long int edgeno = (long int) VECTOR(adj)[j];
                         igraph_integer_t edgefrom, edgeto;
-                        long int neighbor;
-                        igraph_edge(graph, (igraph_integer_t) edgeno, &edgefrom, &edgeto);
-                        neighbor = edgefrom != to ? edgefrom : edgeto;
+                        long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, edgefrom);
                         if (already_added[neighbor] == 0) {
                             IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
                                                                edgeno));
