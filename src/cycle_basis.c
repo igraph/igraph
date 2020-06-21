@@ -110,6 +110,7 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
         IGRAPH_CHECK(igraph_dqueue_push(&q, -1));
         IGRAPH_CHECK(igraph_dqueue_push(&q, 0));
         while (! igraph_dqueue_empty(&q)) {
+	  long int inc_edges_size;
           /* current node, incoming edge, and distance from tree root */
           long int actnode=(long int) igraph_dqueue_pop(&q);
           long int actedge=(long int) igraph_dqueue_pop(&q);
@@ -118,8 +119,8 @@ int igraph_fundamental_cycle_basis(const igraph_t *graph,
           /* check all edges connected to this vertex */
           IGRAPH_CHECK(igraph_incident(graph, &inc_edges, (igraph_integer_t) actnode,
                                        IGRAPH_ALL));
-
-          for (j=0; j<igraph_vector_size(&inc_edges); j++) {
+	  inc_edges_size = igraph_vector_size(&inc_edges);
+          for (j=0; j<inc_edges_size; j++) {
               long int edge=(long int) VECTOR(inc_edges)[j];
 
               /* visited edges have been given their cycles already */
@@ -188,7 +189,7 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
 
     igraph_vector_t *cycle=igraph_Calloc(1, igraph_vector_t);
     igraph_vector_t to_backtrack, to_edges;
-    long int n, i;
+    long int n, i, to_edges_size;
     
     IGRAPH_VECTOR_INIT_FINALLY(&to_backtrack, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&to_edges, 0);
@@ -200,7 +201,8 @@ int igraph_i_fundamental_cycle_basis_add(const igraph_t *graph,
     /* find the edge connecting 'to' to its parent in the tree */
     IGRAPH_CHECK(igraph_incident(graph, &to_edges, (igraph_integer_t) to,
         IGRAPH_ALL));
-    for (i = 0; i < igraph_vector_size(&to_edges); i++) {
+    to_edges_size = igraph_vector_size(&to_edges);
+    for (i = 0; i < to_edges_size; i++) {
         igraph_integer_t to_from, to_to;
 
         edge_to = (long int) VECTOR(to_edges)[i];
@@ -335,8 +337,8 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
     long int i, n;
     long int no_of_nodes = igraph_vcount(graph);
-    /* support vector for cycle i */
-    igraph_vector_int_t si;
+    /* support vector for cycle i, byte encoded */
+    unsigned long int si;
     igraph_vector_int_t nonorth_cycles;
 
     igraph_vector_t fvs, basis_weight;
@@ -347,10 +349,6 @@ int igraph_minimum_cycle_basis(const igraph_t *graph,
 
     /* clear the output vector, you never know what you got */
     igraph_vector_ptr_clear(basis);
-
-    /* initialize si
-     * it is a boolean adjecency vector */
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&si, no_of_nodes);
 
     /* 0. Feedback vertex set */
     IGRAPH_CHECK(igraph_i_feedback_vertex_set(
@@ -456,6 +454,8 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
      * et cetera
      * */
     for (ir = 0; ir < no_of_nodes; ir++) {
+	long int adj_size;
+
         if (ir == 0) {
             i = root;
         } else if (ir <= root) {
@@ -472,7 +472,8 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
         already_added[i] = 1;
         /* add all edges of the first vertex to the heap */
         igraph_incident(graph, &adj, (igraph_integer_t) i, (igraph_neimode_t) mode);
-        for (j = 0; j < igraph_vector_size(&adj); j++) {
+	adj_size = igraph_vector_size(&adj);
+        for (j = 0; j < adj_size; j++) {
             long int edgeno = (long int) VECTOR(adj)[j];
             long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, i);
             /*
@@ -488,7 +489,7 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
 
         while (! igraph_d_indheap_empty(&heap)) {
             /* Get minimal edge among the heaped ones */
-            long int from, edge;
+            long int from, edge, adj_size;
             igraph_integer_t tmp, to;
             igraph_d_indheap_max_index(&heap, &from, &edge);
             igraph_edge(graph, (igraph_integer_t) edge, &tmp, &to);
@@ -518,7 +519,8 @@ int igraph_i_shortest_path_tree_rooted(const igraph_t *graph,
 
                     /* add all outgoing edges */
                     igraph_incident(graph, &adj, to, (igraph_neimode_t) mode);
-                    for (j = 0; j < igraph_vector_size(&adj); j++) {
+		    adj_size = igraph_vector_size(&adj);
+                    for (j = 0; j < adj_size; j++) {
                         long int edgeno = (long int) VECTOR(adj)[j];
                         igraph_integer_t edgefrom, edgeto;
                         long int neighbor;
@@ -595,7 +597,7 @@ int igraph_i_candidate_cycles(const igraph_t *graph,
     /* These can be Horton cycles or a subset, which is more efficient
      * Let's see how far we get with the implementation */
 
-    long int i, ie;
+    long int i, ie, n_trees;
     igraph_vector_int_t cycle_order;
     long int no_of_nodes=igraph_vcount(graph);
     long int no_of_edges=igraph_ecount(graph);
@@ -603,7 +605,8 @@ int igraph_i_candidate_cycles(const igraph_t *graph,
     igraph_es_all(&edges, IGRAPH_EDGEORDER_ID);
     
     /* For each tree... */
-    for(i = 0; i < igraph_vector_size(trees); i++) {
+    n_trees = igraph_vector_size(trees);
+    for(i = 0; i < n_trees; i++) {
         /* find edges that:
          * 1. are not in the tree
          * 2. span different subtrees
@@ -669,66 +672,82 @@ int igraph_i_compare_cycles(const void *pc1, const void *pc2) {
 int igraph_i_compute_Si(const igraph_t *graph,
                 const igraph_vector_t *weights,
                 const igraph_vector_ptr_t *trees,
+                const igraph_vector_t *fvs,
                 const igraph_vector_ptr_t *basis,
                 long int i,
-                igraph_vector_int_t *si,
+                unsigned long int *si,
                 ) {
 
-    long int j, k;
+    long int j, k, flip;
     int found, orth;
     long int no_of_nodes = igraph_vcount(graph);
 
-    igraph_vector_int_clear(si);
 
     found = 0;
 
-    /* FIXME: iterate over the combinatorial space */
-    for(j=0; j<no_of_edges; j++) {
-        VECTOR(si)[j] = 1;
-
+    while (!found) {
+	/* start from 1, skipping the trivial origin */
+	(*si)++;
+	
         /* check if the vector is orthogonal to all Ck < i */
         orth = 1;
         for(k=0; k<i; k++) {
 	    igraph_vector_t tree = VECTOR(trees)[k];
             igraph_i_weighted_clique_t clique = VECTOR(basis)[k];
-            if (!igraph_i_orthogonal(graph, &tree, &clique, si)) {
+	    igraph_integer_t root = VECTOR(fvs)[k];
+            if (!igraph_i_orthogonal(graph, &tree, root, &clique, si)) {
                 orth = 0;
                 break;
             }
         }
         if (orth == 1) {
             found = 1;
-            break;
+            return IGRAPH_SUCCESS;
         }
     }
 
-    if (found) {
-        return IGRAPH_SUCCESS;
-    } else {
-	/* FIXME; more specific error? */
-        return IGRAPH_ERROR;
-    }
+    return IGRAPH_ERROR;
 }
 
 int igraph_i_orthogonal(
                 const igraph_t *graph,
                 const igraph_vector_t *tree,
+		const igraph_integer_t root,
 		const igraph_i_weighted_clique_t *clique,
-		const igraph_vector_int_t *si) {
+		const unsigned long int si) {
 
-    /* TODO what does it mean to be orthogonal?? ;-) */
     int i;
-    int prod = 0;
     int m = igraph_vector_size(tree);
     igraph_integer_t edge;
-    for(i=0; i < m; i++) {
-	igraph_integer_t from, to;
-        edge = VECTOR(tree)[i];
-	from = IGRAPH_FROM(edge);
-	to = IGRAPH_TO(edge);
-	if (VECTOR(si)[from] )
+    unsigned long int lv;
+    unsigned long int prod;
+    unsigned long int blabels = 0;
 
-    
+    /* TODO what does it mean to be orthogonal?? ;-) */
+    /* we start from the root and go down. For every node v, its blabel is either
+     * {0, 1} so we encode it as bit v. To compute it:
+     * 1. we make a bitarray lv=0
+     * 2. we set the bits for the root and the node v
+     * 3. we compute the bitwise & of si and this array
+     * 4. if the number of 1 is odd, the result is 1
+     * The last two steps are called the inner product over Z2
+     */
+    for(i=0; i < m; i++) {
+	/* set the bitarray for vector v */
+	lv = root | VECTOR(tree)[i];
+
+	/* compute the bitwise and */
+	lv &= si;
+
+	/* compute parity of bits */
+	prod = 0;
+	while(lv) {
+            prod ^= lv & 1;
+	    /* forget the last bit */
+	    lv >>= 1;
+	}
+	blabels |= (prod << i);
+	/* TODO: not done yet! need to close with edge and then take out of the loop */
     }
 
 }
