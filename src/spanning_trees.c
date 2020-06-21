@@ -245,11 +245,7 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
             for (j = 0; j < igraph_vector_size(&tmp); j++) {
                 long int edge = (long int) VECTOR(tmp)[j];
                 if (added_edges[edge] == 0) {
-                    igraph_integer_t from, to;
-                    igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
-                    if (act_node == to) {
-                        to = from;
-                    }
+                    igraph_integer_t to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, act_node);
                     if (already_added[(long int) to] == 0) {
                         already_added[(long int) to] = 1;
                         added_edges[edge] = 1;
@@ -319,11 +315,10 @@ static int igraph_i_minimum_spanning_tree_prim(
         /* add all edges of the first vertex */
         igraph_incident(graph, &adj, (igraph_integer_t) i, (igraph_neimode_t) mode);
         for (j = 0; j < igraph_vector_size(&adj); j++) {
-            long int edgeno = (long int) VECTOR(adj)[j];
-            igraph_integer_t edgefrom, edgeto;
-            long int neighbor;
-            igraph_edge(graph, (igraph_integer_t) edgeno, &edgefrom, &edgeto);
-            neighbor = edgefrom != i ? edgefrom : edgeto;
+            igraph_integer_t edgeno = (long int) VECTOR(adj)[j];
+            igraph_integer_t edgefrom = IGRAPH_FROM(graph, (igraph_integer_t) edgeno);
+            igraph_integer_t edgeto = IGRAPH_TO(graph, (igraph_integer_t) edgeno);
+            igraph_integer_t neighbor = edgefrom != i ? edgefrom : edgeto;
             if (already_added[neighbor] == 0) {
                 IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
                                                    edgeno));
