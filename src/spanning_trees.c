@@ -349,7 +349,7 @@ static int igraph_i_minimum_spanning_tree_prim(
                     adj_size = igraph_vector_size(&adj);
                     for (j = 0; j < adj_size; j++) {
                         long int edgeno = (long int) VECTOR(adj)[j];
-                        long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, edgefrom);
+                        long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, to);
                         if (already_added[neighbor] == 0) {
                             IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
                                                                edgeno));
