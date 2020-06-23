@@ -28,6 +28,7 @@ addons:
     - libarpack2-dev
     - libblas-dev
     - liblapack-dev
+    - git
   homebrew:
     packages:
     - flex
