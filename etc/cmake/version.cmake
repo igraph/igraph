@@ -1,6 +1,8 @@
 include(GetGitRevisionDescription)
 
 git_describe(PACKAGE_VERSION)
+message(STATUS "Version number from Git: ${PACKAGE_VERSION}")
+
 string(REGEX MATCH "^[^-]+" PACKAGE_VERSION_BASE "${PACKAGE_VERSION}")
 string(
   REGEX REPLACE "^([0-9]+)\\.([0-9]+)\\.([0-9+])" "\\1;\\2;\\3"
