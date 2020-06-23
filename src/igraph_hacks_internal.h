@@ -52,6 +52,14 @@ __BEGIN_DECLS
     #endif
 #endif
 
+#ifndef HAVE_STRCASECMP
+    #ifdef HAVE__STRICMP
+        #define strcasecmp _stricmp
+    #else
+        #error "igraph needs strcasecmp() or _stricmp()"
+    #endif
+#endif
+
 __END_DECLS
 
 #endif

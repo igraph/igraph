@@ -25,6 +25,8 @@
 #include <math.h>
 #include <string.h>
 
+#include "igraph_hacks_internal.h"
+
 namespace gengraph {
 
 // Max line size in files
@@ -56,21 +58,7 @@ typedef unsigned int ip_addr;
 #define IP_STAR   0x00000000
 #define IP_MYSELF 0x7F000001
 
-// Compatibility
-#if defined (_WIN32) || defined (WIN32) || defined (_WIN64) || defined (WIN64)
-    #if defined (__MINGW32__) || defined (__CYGWIN32__)
-    #else
-        #define strcasecmp _stricmp
-    #endif
-#endif
 //inline double round(double x) throw () { return (floor(0.5+x)); }
-
-// No assert
-#ifndef _DEBUG
-    #ifndef NDEBUG
-        #define NDEBUG
-    #endif //NDEBUG
-#endif //_DEBUG
 
 // Min & Max
 #ifndef min
