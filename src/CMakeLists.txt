@@ -221,6 +221,13 @@ target_link_libraries(
   bliss cliquer plfit prpack
 )
 
+if (MSVC)
+  # Define symbols to enable compilation of CSXSparse on Windows using MSVC
+  target_compile_definitions(igraph PRIVATE NCOMPLEX)
+  # Define to compile igraph in static mode on Windows
+  target_compile_definitions(igraph PUBLIC IGRAPH_STATIC)
+endif()
+
 # Turn on all warnings for GCC, clang and MSVC
 use_all_warnings(igraph)
 
