@@ -129,8 +129,8 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
 
     for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
         long int edge = (long int) VECTOR(*edges)[i];
-        long int from = IGRAPH_FROM(graph, edge);
-        long int to = IGRAPH_TO(graph, edge);
+        long int from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
+        long int to = IGRAPH_TO(graph, (igraph_integer_t) edge);
         long int c1 = (long int) VECTOR(mymembership)[from];
         long int c2 = (long int) VECTOR(mymembership)[to];
         igraph_real_t actmod;
@@ -266,7 +266,8 @@ int igraph_community_eb_get_merges(const igraph_t *graph,
     for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
         igraph_integer_t edge = (igraph_integer_t) VECTOR(*edges)[i];
         igraph_integer_t from, to, c1, c2, idx;
-        igraph_edge(graph, edge, &from, &to);
+        from = IGRAPH_FROM(graph, edge);
+        to = IGRAPH_TO(graph, edge);
         idx = from + 1;
         while (VECTOR(ptr)[idx - 1] != 0) {
             idx = (igraph_integer_t) VECTOR(ptr)[idx - 1];
@@ -545,9 +546,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                     neino = igraph_vector_int_size(neip);
                     for (i = 0; i < neino; i++) {
                         igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i], from, to;
-                        long int neighbor;
-                        igraph_edge(graph, edge, &from, &to);
-                        neighbor = actnode != from ? from : to;
+                        long int neighbor= (long int) IGRAPH_OTHER(graoh, edge, actnode);
                         if (nrgeo[neighbor] != 0) {
                             /* we've already seen this node, another shortest path? */
                             if (distance[neighbor] == distance[actnode] + 1) {
@@ -577,7 +576,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                     neino = igraph_vector_int_size(neip);
                     for (i = 0; i < neino; i++) {
                         long int edge = (long int) VECTOR(*neip)[i];
-                        long int neighbor = IGRAPH_OTHER(graph, edge, actnode);
+                        long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edge, actnode);
                         if (distance[neighbor] == distance[actnode] - 1 &&
                             nrgeo[neighbor] != 0) {
                             tmpscore[neighbor] +=
@@ -617,7 +616,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
                     for (i = 0; i < neino; i++) {
                         long int edge = VECTOR(*neip)[i];
-                        long int to = IGRAPH_OTHER(graph, edge, minnei);
+                        long int to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, minnei);
                         igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                         igraph_real_t curdist = distance[to];
                         igraph_vector_int_t *v;
@@ -654,7 +653,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
                     for (i = 0; i < fatv_len; i++) {
                         long int fedge = (long int) VECTOR(*fatv)[i];
-                        long int neighbor = IGRAPH_OTHER(graph, fedge, w);
+                        long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) fedge, w);
                         tmpscore[neighbor] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
                         VECTOR(eb)[fedge] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
                     }
@@ -678,7 +677,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
             }
         }
         passive[maxedge] = 1;
-        igraph_edge(graph, (igraph_integer_t) maxedge, &from, &to);
+        from = IGRAPH_FROM(graph, (igraph_integer_t) maxedge);
+        to = IGRAPH_TO(graph, (igraph_integer_t) maxedge);
 
         neip = igraph_inclist_get(elist_in_p, to);
         neino = igraph_vector_int_size(neip);
@@ -994,7 +994,8 @@ int igraph_modularity(const igraph_t *graph,
             if (w < 0) {
                 IGRAPH_ERROR("Negative weight in weight vector.", IGRAPH_EINVAL);
             }
-            igraph_edge(graph, (igraph_integer_t) i, &from, &to);
+            from = IGRAPH_FROM(graph, (igraph_integer_t) i);
+            to = IGRAPH_TO(graph, (igraph_integer_t) i);
             c1 = (long int) VECTOR(*membership)[from];
             c2 = (long int) VECTOR(*membership)[to];
             if (c1 == c2) {
@@ -1007,7 +1008,8 @@ int igraph_modularity(const igraph_t *graph,
     } else {
         m = no_of_edges;
         for (i = 0; i < no_of_edges; i++) {
-            igraph_edge(graph, (igraph_integer_t) i, &from, &to);
+            from = IGRAPH_FROM(graph, (igraph_integer_t) i);
+            to = IGRAPH_TO(graph, (igraph_integer_t) i);
             c1 = (long int) VECTOR(*membership)[from];
             c2 = (long int) VECTOR(*membership)[to];
             if (c1 == c2) {
@@ -1408,7 +1410,7 @@ static int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
         for (k = 0; k < nlen; k++) {
             long int edge = (long int) VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
-            long int nei = IGRAPH_OTHER(graph, edge, oldid);
+            long int nei = IGRAPH_OTHER(graph, (igraph_integer_t) edge, oldid);
             long int neimemb = (long int) VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
                 to[j] += from[ (long int) VECTOR(*idx2)[nei] ] * w;
@@ -1472,7 +1474,7 @@ static int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
         for (k = 0; k < nlen; k++) {
             long int edge = (long int) VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
-            long int nei = IGRAPH_OTHER(graph, edge, oldid);
+            long int nei = IGRAPH_OTHER(graph, (igraph_integer_t) edge, oldid);
             long int neimemb = (long int) VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
                 long int fi = (long int) VECTOR(*idx2)[nei];
@@ -2814,9 +2816,8 @@ static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < ecount; i++) {
-        igraph_edge(graph, (igraph_integer_t) i, &from, &to);
-        links[i].from = from;
-        links[i].to = to;
+        links[i].from = IGRAPH_FROM(graph, (igraph_integer_t) i);
+        links[i].to = IGRAPH_TO(graph, (igraph_integer_t) i);
         links[i].id = i;
     }
 
@@ -2908,7 +2909,7 @@ static int igraph_i_multilevel_community_links(
         long int eidx = (long int) VECTOR(*edges)[i];
         weight = VECTOR(*communities->weights)[eidx];
 
-        to = IGRAPH_OTHER(graph, eidx, vertex);
+        to = IGRAPH_OTHER(graph, (igraph_integer_t) eidx, vertex);
 
         *weight_all += weight;
         if (to == vertex) {
@@ -3052,7 +3053,6 @@ static int igraph_i_community_multilevel_step(
     long int i, j;
     long int vcount = igraph_vcount(graph);
     long int ecount = igraph_ecount(graph);
-    igraph_integer_t ffrom, fto;
     igraph_real_t q, pass_q;
     int pass;
     igraph_bool_t changed = 0;
@@ -3106,14 +3106,15 @@ static int igraph_i_community_multilevel_step(
 
     /* Some more initialization :) */
     for (i = 0; i < ecount; i++) {
+        long int ffrom = (long int) IGRAPH_FROM(graph, (igraph_integer_t) i);
+        long int fto = (long int) IGRAPH_TO(graph, (igraph_integer_t) i);
         igraph_real_t weight = 1;
-        igraph_edge(graph, (igraph_integer_t) i, &ffrom, &fto);
 
         weight = VECTOR(*weights)[i];
-        communities.item[(long int) ffrom].weight_all += weight;
-        communities.item[(long int) fto].weight_all += weight;
+        communities.item[ffrom].weight_all += weight;
+        communities.item[fto].weight_all += weight;
         if (ffrom == fto) {
-            communities.item[(long int) ffrom].weight_inside += 2 * weight;
+            communities.item[ffrom].weight_inside += 2 * weight;
         }
     }
 
