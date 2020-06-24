@@ -92,7 +92,7 @@ WITH --------------------------------------------------------------------------
 \g<before></para>
 <formalpara><title>Arguments:</title><para>
 <variablelist role="params">
-\param
+\\param
 
 REPLACE ----- function parameter descriptions, tail ---------------------------
 
@@ -110,7 +110,7 @@ REPLACE ----- function parameter descriptions, tail ---------------------------
 
 WITH
 
-\param\g<paramtext></variablelist></para></formalpara><para>
+\\param\g<paramtext></variablelist></para></formalpara><para>
 \g<endmark>\g<after>
 
 REPLACE ----- function parameter descriptions ---------------------------------
@@ -269,7 +269,7 @@ WITH --------------------------------------------------------------------------
 \g<before></para>
 <formalpara><title>Values:</title><para>
 <variablelist role="params">
-\enumval
+\\enumval
 
 REPLACE ----- enumeration value descriptions, tail ----------------------------
 
@@ -283,7 +283,7 @@ REPLACE ----- enumeration value descriptions, tail ----------------------------
 
 WITH
 
-\enumval\g<paramtext></variablelist></para></formalpara><para>
+\\enumval\g<paramtext></variablelist></para></formalpara><para>
 \g<endmark>\g<after>
 
 REPLACE ----- enumeration value descriptions ----------------------------------
