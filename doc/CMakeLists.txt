@@ -1,5 +1,28 @@
 find_package(PYTHON)
 
+# Specify the list of .xml files that are used as-is
+set(
+  DOCBOOK_SOURCES
+  fdl.xml
+  gpl.xml
+  igraph-docs.xml
+  installation.xml
+  introduction.xml
+  licenses.xml
+  pmt.xml
+  tutorial.xml
+)
+set(DOCBOOK_OUTPUTS "")
+
+# Specify that each DocBook .xml file is to be copied to the build folder
+# TODO(ntamas): currently this works with out-of-tree builds only
+set(IGRAPH_VERSION ${PACKAGE_VERSION})   # for replacement in igraph-docs.xml
+foreach(DOCBOOK_SOURCE ${DOCBOOK_SOURCES})
+  set(DOCBOOK_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${DOCBOOK_SOURCE}")
+  list(APPEND DOCBOOK_OUTPUTS "${DOCBOOK_OUTPUT}")
+  configure_file(${DOCBOOK_SOURCE} ${DOCBOOK_OUTPUT})
+endforeach()
+
 # Specify the list of .xxml files that have to be piped through doxrox to
 # obtain the final set of .xml files that serve as an input to DocBook
 set(
@@ -99,6 +122,7 @@ if(Python_FOUND)
     doc
     DEPENDS
     ${DOXROX_OUTPUTS}
+	${DOCBOOK_OUTPUTS}
     COMMENT
     "Built DocBook XML files for the documentation"
   )
