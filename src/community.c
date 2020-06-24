@@ -545,8 +545,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                     neip = igraph_inclist_get(elist_out_p, actnode);
                     neino = igraph_vector_int_size(neip);
                     for (i = 0; i < neino; i++) {
-                        igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i], from, to;
-                        long int neighbor= (long int) IGRAPH_OTHER(graoh, edge, actnode);
+                        igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i];
+                        long int neighbor= (long int) IGRAPH_OTHER(graph, edge, actnode);
                         if (nrgeo[neighbor] != 0) {
                             /* we've already seen this node, another shortest path? */
                             if (distance[neighbor] == distance[actnode] + 1) {
@@ -2802,7 +2802,6 @@ static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_
     long int ecount = igraph_ecount(graph);
     long int i, l = -1, last_from = -1, last_to = -1;
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t from, to;
     igraph_vector_t edges;
     igraph_i_multilevel_link *links;
 
