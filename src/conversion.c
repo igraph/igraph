@@ -74,8 +74,6 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
     long int no_of_nodes = igraph_vcount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
     int retval = 0;
-    long int from, to;
-    igraph_integer_t ffrom, fto;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
     igraph_matrix_null(res);
@@ -85,9 +83,8 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
     if (directed) {
         while (!IGRAPH_EIT_END(edgeit)) {
             long int edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
-            from = ffrom;
-            to = fto;
+	    long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) edge);
+	    long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) edge);
             if (eids) {
                 MATRIX(*res, from, to) = edge + 1;
             } else {
@@ -98,9 +95,8 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
         while (!IGRAPH_EIT_END(edgeit)) {
             long int edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
-            from = ffrom;
-            to = fto;
+	    long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) edge);
+	    long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) edge);
             if (to < from) {
                 if (eids) {
                     MATRIX(*res, to, from) = edge + 1;
@@ -119,9 +115,8 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
     } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
         while (!IGRAPH_EIT_END(edgeit)) {
             long int edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
-            from = ffrom;
-            to = fto;
+	    long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) edge);
+	    long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) edge);
             if (to < from) {
                 if (eids) {
                     MATRIX(*res, from, to) = edge + 1;
@@ -140,9 +135,8 @@ int igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
     } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
         while (!IGRAPH_EIT_END(edgeit)) {
             long int edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
-            from = ffrom;
-            to = fto;
+	    long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) edge);
+	    long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) edge);
             if (eids) {
                 MATRIX(*res, from, to) = edge + 1;
             } else {
@@ -206,8 +200,6 @@ int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
     long int no_of_nodes = igraph_vcount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
     int retval = 0;
-    long int from, to;
-    igraph_integer_t ffrom, fto;
 
     igraph_spmatrix_null(res);
     IGRAPH_CHECK(igraph_spmatrix_resize(res, no_of_nodes, no_of_nodes));
@@ -216,17 +208,17 @@ int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
 
     if (directed) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-            from = ffrom;
-            to = fto;
+            long int edge = IGRAPH_EIT_GET(edgeit);
+            long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) edge);
+            long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) edge);
             igraph_spmatrix_add_e(res, from, to, 1);
             IGRAPH_EIT_NEXT(edgeit);
         }
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-            from = ffrom;
-            to = fto;
+            long int edge = IGRAPH_EIT_GET(edgeit);
+            long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) edge);
+            long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) edge);
             if (to < from) {
                 igraph_spmatrix_add_e(res, to, from, 1);
             } else {
@@ -236,9 +228,9 @@ int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
         }
     } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-            from = ffrom;
-            to = fto;
+            long int edge = IGRAPH_EIT_GET(edgeit);
+            long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) edge);
+            long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) edge);
             if (to > from) {
                 igraph_spmatrix_add_e(res, to, from, 1);
             } else {
@@ -248,9 +240,9 @@ int igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
         }
     } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &ffrom, &fto);
-            from = ffrom;
-            to = fto;
+            long int edge = IGRAPH_EIT_GET(edgeit);
+            long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) edge);
+            long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) edge);
             igraph_spmatrix_add_e(res, from, to, 1);
             if (from != to) {
                 igraph_spmatrix_add_e(res, to, from, 1);
@@ -290,7 +282,6 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
     igraph_eit_t edgeit;
     long int no_of_edges = igraph_ecount(graph);
     long int vptr = 0;
-    igraph_integer_t from, to;
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges * 2));
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
@@ -299,7 +290,9 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
 
     if (bycol) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
+            long int edge = IGRAPH_EIT_GET(edgeit);
+            igraph_integer_t from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
+            igraph_integer_t to = IGRAPH_TO(graph, (igraph_integer_t) edge);
             VECTOR(*res)[vptr] = from;
             VECTOR(*res)[vptr + no_of_edges] = to;
             vptr++;
@@ -307,7 +300,9 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
         }
     } else {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_edge(graph, IGRAPH_EIT_GET(edgeit), &from, &to);
+            long int edge = IGRAPH_EIT_GET(edgeit);
+            igraph_integer_t from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
+            igraph_integer_t to = IGRAPH_TO(graph, (igraph_integer_t) edge);
             VECTOR(*res)[vptr++] = from;
             VECTOR(*res)[vptr++] = to;
             IGRAPH_EIT_NEXT(edgeit);
@@ -473,8 +468,8 @@ int igraph_to_undirected(igraph_t *graph,
 
         while (!IGRAPH_EIT_END(eit)) {
             long int edge = IGRAPH_EIT_GET(eit);
-            igraph_integer_t from, to;
-            igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
+            igraph_integer_t from = IGRAPH_FROM(graph,(igraph_integer_t) edge);
+            igraph_integer_t to = IGRAPH_TO(graph, (igraph_integer_t) edge);
             IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
             IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
             IGRAPH_EIT_NEXT(eit);

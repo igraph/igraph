@@ -738,10 +738,10 @@ int igraph_community_fastgreedy(const igraph_t *graph,
     loop_weight_sum = 0;
     for (i = 0, j = 0; !IGRAPH_EIT_END(edgeit); i += 2, j++, IGRAPH_EIT_NEXT(edgeit)) {
         long int eidx = IGRAPH_EIT_GET(edgeit);
-        igraph_edge(graph, (igraph_integer_t) eidx, &ffrom, &fto);
+	from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) eid);
+	to = (long int) IGRAPH_TO(graph, (igraph_integer_t) eid);
 
         /* Create the pairs themselves */
-        from = (long int)ffrom; to = (long int)fto;
         if (from == to) {
             loop_weight_sum += weights ? 2 * VECTOR(*weights)[eidx] : 2;
             continue;
