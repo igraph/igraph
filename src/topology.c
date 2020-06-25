@@ -1123,6 +1123,7 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
     igraph_stack_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
     igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
+    long int vsize;
 
     if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
         IGRAPH_ERROR("Cannot compare directed and undirected graphs",
@@ -1349,7 +1350,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                 }
 
                 inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) last1);
-                for (i = 0; i < igraph_vector_size(inneis_1); i++) {
+		vsize = igraph_vector_size(inneis_1);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*inneis_1)[i];
                     if (VECTOR(in_1)[node] == depth) {
                         VECTOR(in_1)[node] = 0;
@@ -1357,7 +1359,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
                 outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) last1);
-                for (i = 0; i < igraph_vector_size(outneis_1); i++) {
+		vsize = igraph_vector_size(outneis_1);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*outneis_1)[i];
                     if (VECTOR(out_1)[node] == depth) {
                         VECTOR(out_1)[node] = 0;
@@ -1365,7 +1368,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
                 inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) last2);
-                for (i = 0; i < igraph_vector_size(inneis_2); i++) {
+		vsize = igraph_vector_size(inneis_2);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*inneis_2)[i];
                     if (VECTOR(in_2)[node] == depth) {
                         VECTOR(in_2)[node] = 0;
@@ -1373,7 +1377,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
                 outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) last2);
-                for (i = 0; i < igraph_vector_size(outneis_2); i++) {
+		vsize = igraph_vector_size(outneis_2);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*outneis_2)[i];
                     if (VECTOR(out_2)[node] == depth) {
                         VECTOR(out_2)[node] = 0;
@@ -1407,7 +1412,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                 end = 1;
             }
 
-            for (i = 0; !end && i < igraph_vector_size(inneis_1); i++) {
+	    vsize = igraph_vector_size(inneis_1);
+            for (i = 0; !end && i < vsize; i++) {
                 long int node = (long int) VECTOR(*inneis_1)[i];
                 if (VECTOR(*core_1)[node] >= 0) {
                     long int node2 = (long int) VECTOR(*core_1)[node];
@@ -1440,7 +1446,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
             }
-            for (i = 0; !end && i < igraph_vector_size(outneis_1); i++) {
+	    vsize = igraph_vector_size(outneis_1);
+            for (i = 0; !end && i < vsize; i++) {
                 long int node = (long int) VECTOR(*outneis_1)[i];
                 if (VECTOR(*core_1)[node] >= 0) {
                     long int node2 = (long int) VECTOR(*core_1)[node];
@@ -1473,7 +1480,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
             }
-            for (i = 0; !end && i < igraph_vector_size(inneis_2); i++) {
+	    vsize = igraph_vector_size(inneis_2);
+            for (i = 0; !end && i < vsize; i++) {
                 long int node = (long int) VECTOR(*inneis_2)[i];
                 if (VECTOR(*core_2)[node] >= 0) {
                     long int node2 = (long int) VECTOR(*core_2)[node];
@@ -1506,7 +1514,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
             }
-            for (i = 0; !end && i < igraph_vector_size(outneis_2); i++) {
+	    vsize = igraph_vector_size(outneis_2);
+            for (i = 0; !end && i < vsize; i++) {
                 long int node = (long int) VECTOR(*outneis_2)[i];
                 if (VECTOR(*core_2)[node] >= 0) {
                     long int node2 = (long int) VECTOR(*core_2)[node];
@@ -1564,7 +1573,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                 }
 
                 inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) cand1);
-                for (i = 0; i < igraph_vector_size(inneis_1); i++) {
+		vsize = igraph_vector_size(inneis_1);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*inneis_1)[i];
                     if (VECTOR(in_1)[node] == 0 && VECTOR(*core_1)[node] < 0) {
                         VECTOR(in_1)[node] = depth;
@@ -1572,7 +1582,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
                 outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) cand1);
-                for (i = 0; i < igraph_vector_size(outneis_1); i++) {
+		vsize = igraph_vector_size(outneis_1);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*outneis_1)[i];
                     if (VECTOR(out_1)[node] == 0 && VECTOR(*core_1)[node] < 0) {
                         VECTOR(out_1)[node] = depth;
@@ -1580,7 +1591,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
                 inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) cand2);
-                for (i = 0; i < igraph_vector_size(inneis_2); i++) {
+		vsize = igraph_vector_size(inneis_2);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*inneis_2)[i];
                     if (VECTOR(in_2)[node] == 0 && VECTOR(*core_2)[node] < 0) {
                         VECTOR(in_2)[node] = depth;
@@ -1588,7 +1600,8 @@ int igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph
                     }
                 }
                 outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) cand2);
-                for (i = 0; i < igraph_vector_size(outneis_2); i++) {
+		vsize = igraph_vector_size(outneis_2);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*outneis_2)[i];
                     if (VECTOR(out_2)[node] == 0 && VECTOR(*core_2)[node] < 0) {
                         VECTOR(out_2)[node] = depth;
@@ -2039,6 +2052,7 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
     igraph_stack_t path;
     igraph_lazy_adjlist_t inadj1, inadj2, outadj1, outadj2;
     igraph_vector_t indeg1, indeg2, outdeg1, outdeg2;
+    long int vsize;
 
     if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
         IGRAPH_ERROR("Cannot compare directed and undirected graphs",
@@ -2235,7 +2249,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                 }
 
                 inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) last1);
-                for (i = 0; i < igraph_vector_size(inneis_1); i++) {
+		vsize = igraph_vector_size(inneis_1);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*inneis_1)[i];
                     if (VECTOR(in_1)[node] == depth) {
                         VECTOR(in_1)[node] = 0;
@@ -2243,7 +2258,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
                 outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) last1);
-                for (i = 0; i < igraph_vector_size(outneis_1); i++) {
+		vsize = igraph_vector_size(outneis_1);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*outneis_1)[i];
                     if (VECTOR(out_1)[node] == depth) {
                         VECTOR(out_1)[node] = 0;
@@ -2251,7 +2267,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
                 inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) last2);
-                for (i = 0; i < igraph_vector_size(inneis_2); i++) {
+		vsize = igraph_vector_size(inneis_2);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*inneis_2)[i];
                     if (VECTOR(in_2)[node] == depth) {
                         VECTOR(in_2)[node] = 0;
@@ -2259,7 +2276,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
                 outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) last2);
-                for (i = 0; i < igraph_vector_size(outneis_2); i++) {
+		vsize = igraph_vector_size(outneis_2);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*outneis_2)[i];
                     if (VECTOR(out_2)[node] == depth) {
                         VECTOR(out_2)[node] = 0;
@@ -2293,7 +2311,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                 end = 1;
             }
 
-            for (i = 0; !end && i < igraph_vector_size(inneis_1); i++) {
+	    vsize = igraph_vector_size(inneis_1);
+            for (i = 0; !end && i < vsize; i++) {
                 long int node = (long int) VECTOR(*inneis_1)[i];
                 if (VECTOR(*core_1)[node] < 0) {
                     if (VECTOR(in_1)[node] != 0) {
@@ -2304,7 +2323,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
             }
-            for (i = 0; !end && i < igraph_vector_size(outneis_1); i++) {
+	    vsize = igraph_vector_size(outneis_1);
+            for (i = 0; !end && i < vsize; i++) {
                 long int node = (long int) VECTOR(*outneis_1)[i];
                 if (VECTOR(*core_1)[node] < 0) {
                     if (VECTOR(in_1)[node] != 0) {
@@ -2315,7 +2335,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
             }
-            for (i = 0; !end && i < igraph_vector_size(inneis_2); i++) {
+	    vsize = igraph_vector_size(inneis_2);
+            for (i = 0; !end && i < vsize; i++) {
                 long int node = (long int) VECTOR(*inneis_2)[i];
                 if (VECTOR(*core_2)[node] >= 0) {
                     long int node2 = (long int) VECTOR(*core_2)[node];
@@ -2348,7 +2369,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
             }
-            for (i = 0; !end && i < igraph_vector_size(outneis_2); i++) {
+	    vsize = igraph_vector_size(outneis_2);
+            for (i = 0; !end && i < vsize; i++) {
                 long int node = (long int) VECTOR(*outneis_2)[i];
                 if (VECTOR(*core_2)[node] >= 0) {
                     long int node2 = (long int) VECTOR(*core_2)[node];
@@ -2406,7 +2428,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                 }
 
                 inneis_1 = igraph_lazy_adjlist_get(&inadj1, (igraph_integer_t) cand1);
-                for (i = 0; i < igraph_vector_size(inneis_1); i++) {
+		vsize = igraph_vector_size(inneis_1);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*inneis_1)[i];
                     if (VECTOR(in_1)[node] == 0 && VECTOR(*core_1)[node] < 0) {
                         VECTOR(in_1)[node] = depth;
@@ -2414,7 +2437,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
                 outneis_1 = igraph_lazy_adjlist_get(&outadj1, (igraph_integer_t) cand1);
-                for (i = 0; i < igraph_vector_size(outneis_1); i++) {
+		vsize = igraph_vector_size(outneis_1);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*outneis_1)[i];
                     if (VECTOR(out_1)[node] == 0 && VECTOR(*core_1)[node] < 0) {
                         VECTOR(out_1)[node] = depth;
@@ -2422,7 +2446,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
                 inneis_2 = igraph_lazy_adjlist_get(&inadj2, (igraph_integer_t) cand2);
-                for (i = 0; i < igraph_vector_size(inneis_2); i++) {
+		vsize = igraph_vector_size(inneis_2);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*inneis_2)[i];
                     if (VECTOR(in_2)[node] == 0 && VECTOR(*core_2)[node] < 0) {
                         VECTOR(in_2)[node] = depth;
@@ -2430,7 +2455,8 @@ int igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                     }
                 }
                 outneis_2 = igraph_lazy_adjlist_get(&outadj2, (igraph_integer_t) cand2);
-                for (i = 0; i < igraph_vector_size(outneis_2); i++) {
+		vsize = igraph_vector_size(outneis_2);
+                for (i = 0; i < vsize; i++) {
                     long int node = (long int) VECTOR(*outneis_2)[i];
                     if (VECTOR(out_2)[node] == 0 && VECTOR(*core_2)[node] < 0) {
                         VECTOR(out_2)[node] = depth;
