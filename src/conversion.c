@@ -282,6 +282,7 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
     igraph_eit_t edgeit;
     long int no_of_edges = igraph_ecount(graph);
     long int vptr = 0;
+    igraph_integer_t from, to;
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges * 2));
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
@@ -291,8 +292,12 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
     if (bycol) {
         while (!IGRAPH_EIT_END(edgeit)) {
             long int edge = IGRAPH_EIT_GET(edgeit);
-            igraph_integer_t from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
-            igraph_integer_t to = IGRAPH_TO(graph, (igraph_integer_t) edge);
+            igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
+	    /* FIXME: why are the two following lines not equivalent to igraph_edge??
+	    from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
+            to = IGRAPH_TO(graph, (igraph_integer_t) edge);
+	    */
+
             VECTOR(*res)[vptr] = from;
             VECTOR(*res)[vptr + no_of_edges] = to;
             vptr++;
@@ -301,8 +306,13 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
     } else {
         while (!IGRAPH_EIT_END(edgeit)) {
             long int edge = IGRAPH_EIT_GET(edgeit);
-            igraph_integer_t from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
-            igraph_integer_t to = IGRAPH_TO(graph, (igraph_integer_t) edge);
+            igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
+            
+	    /* FIXME: why are the two following lines not equivalent to igraph_edge??
+	    from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
+            to = IGRAPH_TO(graph, (igraph_integer_t) edge);
+	    */
+
             VECTOR(*res)[vptr++] = from;
             VECTOR(*res)[vptr++] = to;
             IGRAPH_EIT_NEXT(edgeit);
