@@ -2446,7 +2446,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
             neino = igraph_vector_int_size(neip);
             for (i = 0; i < neino; i++) {
                 igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i];
-                long int neighbor = (long int) IGRAPH_OTHER(graph, edge, from);
+                long int neighbor = (long int) IGRAPH_OTHER(graph, edge, actnode);
                 if (nrgeo[neighbor] != 0) {
                     /* we've already seen this node, another shortest path? */
                     if (distance[neighbor] == distance[actnode] + 1) {
