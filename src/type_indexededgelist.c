@@ -1013,10 +1013,10 @@ int igraph_degree(const igraph_t *graph, igraph_vector_t *res,
  *
  * \param graph The graph object.
  * \param eid The edge id.
- * \param from Pointer to an \type igraph_integer_t. The tail of the edge
- * will be placed here.
- * \param to Pointer to an \type igraph_integer_t. The head of the edge
- * will be placed here.
+ * \param from Pointer to an \type igraph_integer_t. The tail (head) of
+ * the edge will be placed here for undirected (directed) graphs.
+ * \param to Pointer to an \type igraph_integer_t. The head (tail) of the
+ * edge will be placed here for undirected (directed) graphs.
  * \return Error code. The current implementation always returns with
  * success.
  * \sa \ref igraph_get_eid() for the opposite operation;
@@ -1032,14 +1032,14 @@ int igraph_edge(const igraph_t *graph, igraph_integer_t eid,
                 igraph_integer_t *from, igraph_integer_t *to) {
 
     if (igraph_is_directed(graph)) {
-        *from = (igraph_integer_t) VECTOR(graph->from)[(long int)eid];
-        *to   = (igraph_integer_t) VECTOR(graph->to  )[(long int)eid];
+        *from = IGRAPH_FROM(graph, eid);
+        *to   = IGRAPH_TO(graph, eid);
     } else {
-        *from = (igraph_integer_t) VECTOR(graph->to  )[(long int)eid];
-        *to   = (igraph_integer_t) VECTOR(graph->from)[(long int)eid];
+        *from = IGRAPH_TO(graph, eid);
+        *to   = IGRAPH_FROM(graph, eid);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 int igraph_edges(const igraph_t *graph, igraph_es_t eids,
@@ -1068,7 +1068,7 @@ int igraph_edges(const igraph_t *graph, igraph_es_t eids,
 
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /* This is an unsafe macro. Only supply variable names, i.e. no
