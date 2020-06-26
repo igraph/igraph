@@ -534,7 +534,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                     neip = igraph_inclist_get(elist_out_p, actnode);
                     neino = igraph_vector_int_size(neip);
                     for (i = 0; i < neino; i++) {
-                        igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i], from, to;
+                        igraph_integer_t edge = VECTOR(*neip)[i], from, to;
                         long int neighbor;
                         igraph_edge(graph, edge, &from, &to);
                         neighbor = actnode != from ? from : to;

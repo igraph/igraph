@@ -1310,8 +1310,8 @@ static int igraph_i_mincut_undirected(const igraph_t *graph,
             neis = igraph_adjlist_get(&adjlist, a);
             n = igraph_vector_int_size(edges);
             for (i = 0; i < n; i++) {
-                igraph_integer_t edge = (igraph_integer_t) VECTOR(*edges)[i];
-                igraph_integer_t to = (igraph_integer_t) VECTOR(*neis)[i];
+                igraph_integer_t edge = VECTOR(*edges)[i];
+                igraph_integer_t to = VECTOR(*neis)[i];
                 igraph_real_t weight = capacity ? VECTOR(*capacity)[(long int)edge] : 1.0;
                 igraph_i_cutheap_update(&heap, to, weight);
             }
@@ -1375,7 +1375,7 @@ static int igraph_i_mincut_undirected(const igraph_t *graph,
         neis = igraph_adjlist_get(&adjlist, last);
         n = igraph_vector_int_size(neis);
         for (i = 0; i < n; i++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[i];
+            igraph_integer_t nei = VECTOR(*neis)[i];
             long int n2, j;
             neis2 = igraph_adjlist_get(&adjlist, nei);
             n2 = igraph_vector_int_size(neis2);

@@ -1618,8 +1618,8 @@ static int igraph_i_betweenness_estimate_weighted(
         igraph_bool_t nobigint) {
 
     igraph_real_t minweight;
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_2wheap_t Q;
     igraph_inclist_t inclist;
     igraph_adjlist_t fathers;
@@ -2116,8 +2116,8 @@ static int igraph_i_edge_betweenness_estimate_weighted(
         const igraph_vector_t *weights) {
 
     igraph_real_t minweight;
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_2wheap_t Q;
     igraph_inclist_t inclist;
     igraph_inclist_t fathers;
@@ -2444,7 +2444,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
             neip = igraph_inclist_get(elist_out_p, actnode);
             neino = igraph_vector_int_size(neip);
             for (i = 0; i < neino; i++) {
-                igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i], from, to;
+                igraph_integer_t edge = VECTOR(*neip)[i], from, to;
                 long int neighbor;
                 igraph_edge(graph, edge, &from, &to);
                 neighbor = actnode != from ? from : to;
@@ -2478,7 +2478,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
             for (i = 0; i < neino; i++) {
                 igraph_integer_t from, to;
                 long int neighbor;
-                igraph_integer_t edgeno = (igraph_integer_t) VECTOR(*neip)[i];
+                igraph_integer_t edgeno = VECTOR(*neip)[i];
                 igraph_edge(graph, edgeno, &from, &to);
                 neighbor = actnode != from ? from : to;
                 if (distance[neighbor] == distance[actnode] - 1 &&
