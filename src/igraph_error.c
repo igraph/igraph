@@ -105,7 +105,8 @@ static const char *igraph_i_error_strings[] = {
 };
 
 const char* igraph_strerror(const int igraph_errno) {
-    if (igraph_errno < 0 || igraph_errno >= sizeof(igraph_i_error_strings) / sizeof(char *)) {
+    if (igraph_errno < 0 ||
+        ((unsigned long)igraph_errno) >= sizeof(igraph_i_error_strings) / sizeof(char *)) {
         return "Invalid error code; no error string available.";
     }
     return igraph_i_error_strings[igraph_errno];

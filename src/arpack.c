@@ -586,6 +586,7 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
     int nconv = options->nconv;
     int nev = options->nev;
     unsigned int nans = (unsigned int) (nconv < nev ? nconv : nev);
+    unsigned int i;
 
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
@@ -642,7 +643,6 @@ int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
 
     /* Reorder vectors */
     if (vectors) {
-        int i;
         IGRAPH_CHECK(igraph_matrix_resize(vectors, n, nans));
         for (i = 0; i < nans; i++) {
             unsigned int idx = (unsigned int) VECTOR(order)[i];
@@ -664,11 +664,12 @@ int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
 
     igraph_vector_t order;
     char sort[2];
-    int apply = 1, i;
+    int apply = 1;
     unsigned int n = (unsigned int) options->n;
     int nconv = options->nconv;
     int nev = options->nev;
     unsigned int nans = (unsigned int) (nconv < nev ? nconv : nev);
+    unsigned int i;
 
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 

@@ -568,8 +568,11 @@ int FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE e) {
 int FUNCTION(igraph_vector, insert)(TYPE(igraph_vector) *v, long int pos,
                                     BASE value) {
     size_t size = (size_t) FUNCTION(igraph_vector, size)(v);
+    if (pos < 0) {
+        return IGRAPH_EINVAL;
+    }
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(v, (long) size + 1));
-    if (pos < size) {
+    if (((unsigned long)pos) < size) {
         memmove(v->stor_begin + pos + 1, v->stor_begin + pos,
                 sizeof(BASE) * (size - (size_t) pos));
     }
@@ -834,7 +837,7 @@ int FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2
 
 long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
         igraph_vector_t *inds, igraph_bool_t descending) {
-    long int i;
+    unsigned long int i;
     BASE **vind, *first;
     size_t n = (size_t) FUNCTION(igraph_vector, size)(v);
     IGRAPH_CHECK(igraph_vector_resize(inds, (long) n));

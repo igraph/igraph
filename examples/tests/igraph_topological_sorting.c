@@ -23,19 +23,14 @@
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %d", (int)VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
-
+#include "test_utilities.inc"
 
 int main() {
 
     igraph_t g;
-    igraph_vector_t res;
+    igraph_vector_t v, res;
+    igraph_bool_t is_dag;
+    int ret;
 
     /* Test graph taken from http://en.wikipedia.org/wiki/Topological_sorting
      * @ 05.03.2006 */
@@ -45,13 +40,56 @@ int main() {
 
     igraph_vector_init(&res, 0);
 
+    igraph_is_dag(&g, &is_dag);
+    if (!is_dag) {
+        return 2;
+    }
+
     igraph_topological_sorting(&g, &res, IGRAPH_OUT);
-    print_vector(&res, stdout);
+    print_vector_round(&res, stdout);
     igraph_topological_sorting(&g, &res, IGRAPH_IN);
-    print_vector(&res, stdout);
+    print_vector_round(&res, stdout);
+
+    /* Error handling */
+    igraph_set_error_handler(igraph_error_handler_ignore);
+
+    /* Add a cycle: 5 -> 0 */
+    igraph_vector_init_int(&v, 2, 5, 0);
+    igraph_add_edges(&g, &v, 0);
+    igraph_is_dag(&g, &is_dag);
+    if (is_dag) {
+        return 3;
+    }
+    ret = igraph_topological_sorting(&g, &res, IGRAPH_OUT);
+    if (ret != IGRAPH_EINVAL) {
+        return 1;
+    }
+
+    igraph_vector_destroy(&v);
+    igraph_destroy(&g);
+
+    /* This graph is the same but undirected */
+    igraph_small(&g, 8, IGRAPH_UNDIRECTED,
+                 0, 3, 0, 4, 1, 3, 2, 4, 2, 7, 3, 5, 3, 6, 3, 7, 4, 6,
+                 -1);
+
+    igraph_is_dag(&g, &is_dag);
+    if (is_dag) {
+        return 4;
+    }
+
+    ret = igraph_topological_sorting(&g, &res, IGRAPH_ALL);
+    if (ret != IGRAPH_EINVAL) {
+        return 1;
+    }
+
+    ret = igraph_topological_sorting(&g, &res, IGRAPH_OUT);
+    if (ret != IGRAPH_EINVAL) {
+        return 1;
+    }
 
     igraph_destroy(&g);
-    igraph_vector_destroy(&res);
 
+    igraph_vector_destroy(&res);
     return 0;
 }

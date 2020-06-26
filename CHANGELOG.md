@@ -8,6 +8,11 @@
 
 ### Changed
 
+ - `igraph_community_multilevel()`: added resolution parameter.
+ - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
+ - `igraph_modularity()` now supports computing the directed version of modularity.
+ - `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
+
 ### Fixed
 
  - `igraph_count_multiple()` was giving incorrect results for self-loops in directed graph (PR #1399).

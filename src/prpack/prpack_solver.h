@@ -173,6 +173,6 @@ namespace prpack {
                     const char* method);
     };
 
-};
+}
 
 #endif

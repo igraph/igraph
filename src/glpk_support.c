@@ -88,13 +88,12 @@ int igraph_i_glpk_check(int retval, const char* message) {
     IGRAPH_ERROR(message_and_code, retval);
 }
 
-#endif
-
-#ifdef USING_R
+#else
 
 int igraph_glpk_dummy() {
-    return 'b' + 'a' + 's' + 's' + 'z' + 'a' + 't' + 'o' + 'k' +
-           'm' + 'e' + 'g';
+    /* get rid of "ISO C requires a translation unit to contain at least one
+     * declaration" warning */
+    return 'd' + 'u' + 'm' + 'm' + 'y';
 }
 
 #endif

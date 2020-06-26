@@ -34,6 +34,6 @@ namespace prpack {
             ~prpack_preprocessed_scc_graph();
     };
 
-};
+}
 
 #endif

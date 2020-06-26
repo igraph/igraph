@@ -12,6 +12,6 @@ namespace prpack {
             double* d;
     };
 
-};
+}
 
 #endif

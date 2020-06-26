@@ -22,6 +22,6 @@ namespace prpack {
             ~prpack_result();
     };
 
-};
+}
 
 #endif

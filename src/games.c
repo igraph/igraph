@@ -589,6 +589,7 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
     int retval = 0;
+    long int vsize;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -632,15 +633,16 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
         IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&edges, igraph_vector_size(&s) * 2));
 
+        vsize = igraph_vector_size(&s);
         if (directed && loops) {
-            for (i = 0; i < igraph_vector_size(&s); i++) {
+            for (i = 0; i < vsize; i++) {
                 long int to = (long int) floor(VECTOR(s)[i] / no_of_nodes);
                 long int from = (long int) (VECTOR(s)[i] - ((igraph_real_t)to) * no_of_nodes);
                 igraph_vector_push_back(&edges, from);
                 igraph_vector_push_back(&edges, to);
             }
         } else if (directed && !loops) {
-            for (i = 0; i < igraph_vector_size(&s); i++) {
+            for (i = 0; i < vsize; i++) {
                 long int to = (long int) floor(VECTOR(s)[i] / no_of_nodes);
                 long int from = (long int) (VECTOR(s)[i] - ((igraph_real_t)to) * no_of_nodes);
                 if (from == to) {
@@ -650,14 +652,14 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
                 igraph_vector_push_back(&edges, to);
             }
         } else if (!directed && loops) {
-            for (i = 0; i < igraph_vector_size(&s); i++) {
+            for (i = 0; i < vsize; i++) {
                 long int to = (long int) floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
                 long int from = (long int) (VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2);
                 igraph_vector_push_back(&edges, from);
                 igraph_vector_push_back(&edges, to);
             }
         } else { /* !directed && !loops */
-            for (i = 0; i < igraph_vector_size(&s); i++) {
+            for (i = 0; i < vsize; i++) {
                 long int to = (long int) floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
                 long int from = (long int) (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
                 igraph_vector_push_back(&edges, from);
@@ -3838,6 +3840,7 @@ int igraph_simple_interconnected_islands_game(
     int endIsland = 0;
     int i, j, is;
     double myrand, last;
+    long int vsize;
 
     if (islands_n < 0) {
         IGRAPH_ERROR("Invalid number of islands", IGRAPH_EINVAL);
@@ -3894,7 +3897,8 @@ int igraph_simple_interconnected_islands_game(
 
 
         // change this to edges !
-        for (i = 0; i < igraph_vector_size(&s); i++) {
+        vsize = igraph_vector_size(&s);
+        for (i = 0; i < vsize; i++) {
 
             long int to = (long int) floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
             long int from = (long int) (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);

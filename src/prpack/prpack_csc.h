@@ -25,6 +25,6 @@ namespace prpack {
             int64_t* heads;
             int64_t* tails;
     };
-};
+}
 
 #endif
