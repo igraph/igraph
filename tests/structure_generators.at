@@ -98,7 +98,7 @@ AT_CLEANUP
 
 AT_SETUP([Tree graph from Prufer sequence (igraph_from_prufer):])
 AT_KEYWORDS([tree igraph_from_prufer])
-AT_COMPILE_CHECK([simple/igraph_from_prufer.c], [simple/igraph_from_prufer.out])
+AT_COMPILE_CHECK([tests/igraph_from_prufer.c], [tests/igraph_from_prufer.out])
 AT_CLEANUP
 
 AT_SETUP([Full graph (igraph_full):])
