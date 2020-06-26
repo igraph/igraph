@@ -7,6 +7,7 @@
 #cmakedefine HAVE__STRICMP 1
 #cmakedefine HAVE_STRDUP 1
 #cmakedefine HAVE_TLS 1
+#cmakedefine HAVE_EXPM1 1
 
 #cmakedefine HAVE_GLPK 1
 #cmakedefine HAVE_GMP 1

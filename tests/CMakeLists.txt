@@ -417,11 +417,13 @@ add_legacy_tests(
 )
 
 # mt.at
-add_legacy_tests(
-  FOLDER simple NAMES
-  tls1
-  tls2
-)
+if (NOT(MSVC))
+  add_legacy_tests(
+    FOLDER simple NAMES
+    tls1
+    tls2
+  )
+endif()
 
 # scg.at
 add_legacy_tests(

@@ -22,6 +22,10 @@
 */
 
 #include <igraph.h>
+/* This definition ensures math symbols are also available when
+ * compiling with MSVC.
+ */
+#define _USE_MATH_DEFINES
 #include <math.h>
 
 #define ARE 4
