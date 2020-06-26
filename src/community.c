@@ -575,7 +575,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                     neino = igraph_vector_int_size(neip);
                     for (i = 0; i < neino; i++) {
                         long int edge = (long int) VECTOR(*neip)[i];
-                        long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edge, actnode);
+                        long int neighbor = IGRAPH_OTHER(graph, edge, actnode);
                         if (distance[neighbor] == distance[actnode] - 1 &&
                             nrgeo[neighbor] != 0) {
                             tmpscore[neighbor] +=
@@ -615,7 +615,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
                     for (i = 0; i < neino; i++) {
                         long int edge = VECTOR(*neip)[i];
-                        long int to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, minnei);
+                        long int to = IGRAPH_OTHER(graph, edge, minnei);
                         igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                         igraph_real_t curdist = distance[to];
                         igraph_vector_int_t *v;
@@ -652,7 +652,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
 
                     for (i = 0; i < fatv_len; i++) {
                         long int fedge = (long int) VECTOR(*fatv)[i];
-                        long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) fedge, w);
+                        long int neighbor = IGRAPH_OTHER(graph, fedge, w);
                         tmpscore[neighbor] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
                         VECTOR(eb)[fedge] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
                     }
@@ -1406,7 +1406,7 @@ static int igraph_i_community_leading_eigenvector_weighted(igraph_real_t *to,
         for (k = 0; k < nlen; k++) {
             long int edge = (long int) VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
-            long int nei = IGRAPH_OTHER(graph, (igraph_integer_t) edge, oldid);
+            long int nei = IGRAPH_OTHER(graph, edge, oldid);
             long int neimemb = (long int) VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
                 to[j] += from[ (long int) VECTOR(*idx2)[nei] ] * w;
@@ -1470,7 +1470,7 @@ static int igraph_i_community_leading_eigenvector2_weighted(igraph_real_t *to,
         for (k = 0; k < nlen; k++) {
             long int edge = (long int) VECTOR(*inc)[k];
             igraph_real_t w = VECTOR(*weights)[edge];
-            long int nei = IGRAPH_OTHER(graph, (igraph_integer_t) edge, oldid);
+            long int nei = IGRAPH_OTHER(graph, edge, oldid);
             long int neimemb = (long int) VECTOR(*mymembership)[nei];
             if (neimemb == comm) {
                 long int fi = (long int) VECTOR(*idx2)[nei];
@@ -2906,7 +2906,7 @@ static int igraph_i_multilevel_community_links(
         long int eidx = (long int) VECTOR(*edges)[i];
         weight = VECTOR(*communities->weights)[eidx];
 
-        to = IGRAPH_OTHER(graph, (igraph_integer_t) eidx, vertex);
+        to = IGRAPH_OTHER(graph, eidx, vertex);
 
         *weight_all += weight;
         if (to == vertex) {
