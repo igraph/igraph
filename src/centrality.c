@@ -131,7 +131,7 @@ static int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             long int edge = VECTOR(*edges)[j];
-            long int nei = IGRAPH_OTHER(graph, (igraph_integer_t) edge, i);
+            long int nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * from[nei];
         }
@@ -644,7 +644,7 @@ static int igraph_i_kleinberg_weighted(igraph_real_t *to,
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             long int nei_edge = (long int) VECTOR(*neis)[j];
-            long int nei = IGRAPH_OTHER(g, (igraph_integer_t) nei_edge, i);
+            long int nei = IGRAPH_OTHER(g, nei_edge, i);
             VECTOR(*tmp)[i] += from[nei] * VECTOR(*weights)[nei_edge];
         }
     }
@@ -655,7 +655,7 @@ static int igraph_i_kleinberg_weighted(igraph_real_t *to,
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             long int nei_edge = (long int) VECTOR(*neis)[j];
-            long int nei = IGRAPH_OTHER(g, (igraph_integer_t) nei_edge, i);
+            long int nei = IGRAPH_OTHER(g, nei_edge, i);
             to[i] += VECTOR(*tmp)[nei] * VECTOR(*weights)[nei_edge];
         }
     }
@@ -1028,7 +1028,7 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
             long int edge = (long int) VECTOR(*neis)[j];
-            long int nei = IGRAPH_OTHER(graph, (igraph_integer_t) edge, i);
+            long int nei = IGRAPH_OTHER(graph, edge, i);
             to[i] += VECTOR(*weights)[edge] * VECTOR(*tmp)[nei];
         }
         to[i] *= data->damping;
@@ -1696,7 +1696,7 @@ static int igraph_i_betweenness_estimate_weighted(
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 long int edge = (long int) VECTOR(*neis)[j];
-                long int to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, minnei);
+                long int to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
 
@@ -2187,7 +2187,7 @@ static int igraph_i_edge_betweenness_estimate_weighted(
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
                 long int edge = (long int) VECTOR(*neis)[j];
-                long int to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, minnei);
+                long int to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(distance)[to];
 
@@ -2237,7 +2237,7 @@ static int igraph_i_edge_betweenness_estimate_weighted(
             /* printf("Popping %li.\n", w); */
             for (j = 0; j < fatv_len; j++) {
                 long int fedge = (long int) VECTOR(*fatv)[j];
-                long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) fedge, w);
+                long int neighbor = IGRAPH_OTHER(graph, fedge, w);
                 VECTOR(tmpscore)[neighbor] += ((double)VECTOR(nrgeo)[neighbor]) /
                                               VECTOR(nrgeo)[w] * (1.0 + VECTOR(tmpscore)[w]);
                 /* printf("Scoring %li (edge %li)\n", neighbor, fedge); */
@@ -2680,7 +2680,7 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 
             for (j = 0; j < nlen; j++) {
                 long int edge = (long int) VECTOR(*neis)[j];
-                long int to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, minnei);
+                long int to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
                 if (curdist == 0) {

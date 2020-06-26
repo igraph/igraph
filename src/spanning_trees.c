@@ -247,7 +247,7 @@ static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t* graph, igra
             for (j = 0; j < tmp_size; j++) {
                 long int edge = (long int) VECTOR(tmp)[j];
                 if (added_edges[edge] == 0) {
-                    igraph_integer_t to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, act_node);
+                    igraph_integer_t to = IGRAPH_OTHER(graph, edge, act_node);
                     if (already_added[(long int) to] == 0) {
                         already_added[(long int) to] = 1;
                         added_edges[edge] = 1;
@@ -320,7 +320,7 @@ static int igraph_i_minimum_spanning_tree_prim(
         adj_size = igraph_vector_size(&adj);
         for (j = 0; j < adj_size; j++) {
             igraph_integer_t edgeno = (long int) VECTOR(adj)[j];
-            igraph_integer_t neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, i);
+            igraph_integer_t neighbor = IGRAPH_OTHER(graph, edgeno, i);
             if (already_added[(long int) neighbor] == 0) {
                 IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], i,
                                                    edgeno));
@@ -337,7 +337,7 @@ static int igraph_i_minimum_spanning_tree_prim(
 
             /* Is this edge already included? */
             if (added_edges[edge] == 0) {
-                igraph_integer_t to = IGRAPH_OTHER(graph, (igraph_integer_t) edge, from);
+                igraph_integer_t to = IGRAPH_OTHER(graph, edge, from);
 
                 /* Does it point to a visited node? */
                 if (already_added[(long int)to] == 0) {
@@ -349,7 +349,7 @@ static int igraph_i_minimum_spanning_tree_prim(
                     adj_size = igraph_vector_size(&adj);
                     for (j = 0; j < adj_size; j++) {
                         long int edgeno = (long int) VECTOR(adj)[j];
-                        long int neighbor = IGRAPH_OTHER(graph, (igraph_integer_t) edgeno, to);
+                        long int neighbor = IGRAPH_OTHER(graph, edgeno, to);
                         if (already_added[neighbor] == 0) {
                             IGRAPH_CHECK(igraph_d_indheap_push(&heap, -VECTOR(*weights)[edgeno], to,
                                                                edgeno));
