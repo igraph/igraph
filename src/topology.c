@@ -740,8 +740,7 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
     }
 
     for (e = 0; e < no_of_edges; e++) {
-        from = IGRAPH_FROM(graph, (igraph_integer_t) e);
-        to = IGRAPH_TO(graph, (igraph_integer_t) e);
+	igraph_edge(graph, (igraph_integer_t) e, &from, &to);
         idx = (unsigned char) (mul * from + to);
         code |= arr_idx[idx];
     }

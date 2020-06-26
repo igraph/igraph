@@ -1455,11 +1455,12 @@ static int igraph_i_mincut_undirected(const igraph_t *graph,
            so we first collect the edges in mergehist, we don't
            need that anymore. Then we copy it to 'cut';  */
         if (cut) {
+            igraph_integer_t from, to;
             igraph_vector_clear(&mergehist);
             for (i = 0; i < no_of_edges; i++) {
-		long int from = (long int) IGRAPH_FROM(graph, (igraph_integer_t) i);
-		long int to = (long int) IGRAPH_TO(graph, (igraph_integer_t) i);
-                if ((mark[from] && !mark[to]) || (mark[to] && !mark[from])) {
+                igraph_edge(graph, (igraph_integer_t) i, &from, &to);
+                if ((mark[(long int)from] && !mark[(long int)to]) ||
+                    (mark[(long int)to] && !mark[(long int)from])) {
                     IGRAPH_CHECK(igraph_vector_push_back(&mergehist, i));
                 }
             }
