@@ -60,6 +60,28 @@ jobs:
         - ./bootstrap.sh
         - ./configure --enable-verify-finally --with-external-glpk
         - make
+
+    - name: "Alpine Linux (chroot)"
+      os: linux
+      dist: trusty
+      sudo: true
+      language: minimal
+      before_install:
+        - "wget 'https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.6.0/alpine-chroot-install' \
+              && echo 'a827a4ba3d0817e7c88bae17fe34e50204983d1e  alpine-chroot-install' | sha1sum -c || exit 1"
+        - alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
+        - sudo sh alpine-chroot-install -p 'build-base gfortran perl linux-headers'
+      install:
+        - set -e
+        - alpine ./bootstrap.sh
+        - alpine ./configure --enable-verify-finally --with-external-glpk
+        - alpine make
+      script:
+        - set -e
+        - alpine make check
+      env:
+        - CFLAGS="-Wno-misleading-indentation -Wno-sign-conversion -Wno-incompatible-pointer-types"
+
     - name: "macOS"
       os: osx
       install:
