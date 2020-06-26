@@ -81,6 +81,8 @@ jobs:
         - alpine make check
       env:
         - CFLAGS="-Wno-misleading-indentation -Wno-sign-conversion -Wno-incompatible-pointer-types"
+      after_failure:
+        - alpine find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
 
     - name: "macOS"
       os: osx
