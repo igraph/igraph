@@ -90,7 +90,6 @@ add_legacy_tests(
   igraph_create
   igraph_degree_sequence_game
   igraph_erdos_renyi_game
-  igraph_from_prufer
   igraph_full
   igraph_grg_game
   igraph_growing_random_game
@@ -110,6 +109,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests NAMES
   tree
+  igraph_from_prufer
 )
 
 # structural_properties.at

@@ -5,6 +5,11 @@ function(add_legacy_test FOLDER NAME)
   add_dependencies(build_tests test_${NAME})
   target_link_libraries(test_${NAME} PRIVATE igraph)
 
+  # Define to compile igraph in static mode on Windows
+  if (MSVC)
+    target_compile_definitions(test_${NAME} PRIVATE IGRAPH_STATIC)
+  endif()
+
   # Some tests depend on internal igraph headers so we also have to add src/
   # to the include path even though it's not part of the public API
   target_include_directories(
