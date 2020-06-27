@@ -24,12 +24,11 @@
 #include <igraph.h>
 
 int main() {
-    igraph_matrix_t mat;
-    int i;
+    igraph_matrix_t mat, mat2, mat3;
     /* FIXME
-    , mat2, mat3;
     igraph_sparsemat_t spmat, spmat2;
     */
+    int i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -39,32 +38,36 @@ int main() {
 
     igraph_matrix_init(&mat, NROW, NCOL);
     for (i = 0; i < NZERO; i++) {
+    /* FIXME
         int r = igraph_rng_get_integer(igraph_rng_default(), 0, NROW - 1);
         int c = igraph_rng_get_integer(igraph_rng_default(), 0, NCOL - 1);
         igraph_real_t val = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
         MATRIX(mat, r, c) = val;
+    */
     }
 
+    igraph_matrix_init(&mat2, 0, 0);
     /* FIXME
     igraph_matrix_as_sparsemat(&spmat, &mat, 1e-14);
-    igraph_matrix_init(&mat2, 0, 0);
     igraph_sparsemat_as_matrix(&mat2, &spmat);
     if (!igraph_matrix_all_e(&mat, &mat2)) {
         return 1;
     }
+    */
 
-    igraph_sparsemat_compress(&spmat, &spmat2);
     igraph_matrix_init(&mat3, 0, 0);
+    /* FIXME
+    igraph_sparsemat_compress(&spmat, &spmat2);
     igraph_sparsemat_as_matrix(&mat3, &spmat2);
     if (!igraph_matrix_all_e(&mat, &mat3)) {
         return 2;
     }
-
     */
+
     igraph_matrix_destroy(&mat);
-    /* FIXME
     igraph_matrix_destroy(&mat2);
     igraph_matrix_destroy(&mat3);
+    /* FIXME
     igraph_sparsemat_destroy(&spmat);
     igraph_sparsemat_destroy(&spmat2);
     */
