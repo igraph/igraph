@@ -24,17 +24,17 @@
 #include <igraph.h>
 
 int main() {
+    /* FIXME
     igraph_matrix_t mat, mat2, mat3;
     igraph_sparsemat_t spmat, spmat2;
     int i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
-#define NROW 10
-#define NCOL 7
-#define NZERO 15
+    #define NROW 10
+    #define NCOL 7
+    #define NZERO 15
 
-    /* FIXME
     igraph_matrix_init(&mat, NROW, NCOL);
     for (i = 0; i < NZERO; i++) {
         int r = igraph_rng_get_integer(igraph_rng_default(), 0, NROW - 1);
