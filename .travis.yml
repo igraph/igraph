@@ -77,7 +77,6 @@ jobs:
         - alpine ./configure --enable-verify-finally --with-external-glpk
         - alpine make
       script:
-        - set -e
         - alpine make check
       env:
         - CFLAGS="-Wno-misleading-indentation -Wno-sign-conversion -Wno-incompatible-pointer-types"
