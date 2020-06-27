@@ -34,6 +34,7 @@ int main() {
 #define NCOL 7
 #define NZERO 15
 
+    /* FIXME
     igraph_matrix_init(&mat, NROW, NCOL);
     for (i = 0; i < NZERO; i++) {
         int r = igraph_rng_get_integer(igraph_rng_default(), 0, NROW - 1);
@@ -42,29 +43,26 @@ int main() {
         MATRIX(mat, r, c) = val;
     }
 
-    igraph_matrix_as_sparsemat(&spmat, &mat, /*tol=*/ 1e-14);
+    igraph_matrix_as_sparsemat(&spmat, &mat, 1e-14);
     igraph_matrix_init(&mat2, 0, 0);
     igraph_sparsemat_as_matrix(&mat2, &spmat);
-    /* FIXME
     if (!igraph_matrix_all_e(&mat, &mat2)) {
         return 1;
     }
-    */
 
     igraph_sparsemat_compress(&spmat, &spmat2);
     igraph_matrix_init(&mat3, 0, 0);
     igraph_sparsemat_as_matrix(&mat3, &spmat2);
-    /* FIXME
     if (!igraph_matrix_all_e(&mat, &mat3)) {
         return 2;
     }
-    */
 
     igraph_matrix_destroy(&mat);
     igraph_matrix_destroy(&mat2);
     igraph_matrix_destroy(&mat3);
     igraph_sparsemat_destroy(&spmat);
     igraph_sparsemat_destroy(&spmat2);
+    */
 
     return 0;
 }
