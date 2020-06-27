@@ -24,10 +24,12 @@
 #include <igraph.h>
 
 int main() {
-    /* FIXME
-    igraph_matrix_t mat, mat2, mat3;
-    igraph_sparsemat_t spmat, spmat2;
+    igraph_matrix_t mat;
     int i;
+    /* FIXME
+    , mat2, mat3;
+    igraph_sparsemat_t spmat, spmat2;
+    */
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -43,6 +45,7 @@ int main() {
         MATRIX(mat, r, c) = val;
     }
 
+    /* FIXME
     igraph_matrix_as_sparsemat(&spmat, &mat, 1e-14);
     igraph_matrix_init(&mat2, 0, 0);
     igraph_sparsemat_as_matrix(&mat2, &spmat);
@@ -57,7 +60,9 @@ int main() {
         return 2;
     }
 
+    */
     igraph_matrix_destroy(&mat);
+    /* FIXME
     igraph_matrix_destroy(&mat2);
     igraph_matrix_destroy(&mat3);
     igraph_sparsemat_destroy(&spmat);
