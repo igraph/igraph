@@ -6,7 +6,7 @@ function(add_legacy_test FOLDER NAME)
   target_link_libraries(test_${NAME} PRIVATE igraph)
 
   # Define to compile igraph in static mode on Windows
-  if (MSVC)
+  if (MSVC AND NOT BUILD_SHARED_LIBS)
     target_compile_definitions(test_${NAME} PRIVATE IGRAPH_STATIC)
   endif()
 
