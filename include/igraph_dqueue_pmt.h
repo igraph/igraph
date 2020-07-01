@@ -44,6 +44,6 @@ DECLDIR BASE FUNCTION(igraph_dqueue, pop_back)(TYPE(igraph_dqueue)* q);
 DECLDIR BASE FUNCTION(igraph_dqueue, head)    (const TYPE(igraph_dqueue)* q);
 DECLDIR BASE FUNCTION(igraph_dqueue, back)    (const TYPE(igraph_dqueue)* q);
 DECLDIR int FUNCTION(igraph_dqueue, push)    (TYPE(igraph_dqueue)* q, BASE elem);
-int FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q);
-int FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file);
+DECLDIR int FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q);
+DECLDIR int FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file);
 DECLDIR BASE FUNCTION(igraph_dqueue, e)(const TYPE(igraph_dqueue) *q, long int idx);

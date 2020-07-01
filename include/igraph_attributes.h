@@ -385,7 +385,7 @@ int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
 
 /* Experimental attribute handler in C */
 
-extern const igraph_attribute_table_t igraph_cattribute_table;
+DECLDIR const igraph_attribute_table_t igraph_cattribute_table;
 
 DECLDIR igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name);
 DECLDIR igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name);
