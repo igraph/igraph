@@ -129,8 +129,8 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
 
     for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
         long int edge = (long int) VECTOR(*edges)[i];
-        long int from = IGRAPH_FROM(graph, edge);
-        long int to = IGRAPH_TO(graph, edge);
+        long int from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
+        long int to = IGRAPH_TO(graph, (igraph_integer_t) edge);
         long int c1 = (long int) VECTOR(mymembership)[from];
         long int c2 = (long int) VECTOR(mymembership)[to];
         igraph_real_t actmod;
@@ -544,10 +544,8 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                     neip = igraph_inclist_get(elist_out_p, actnode);
                     neino = igraph_vector_int_size(neip);
                     for (i = 0; i < neino; i++) {
-                        igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i], from, to;
-                        long int neighbor;
-                        igraph_edge(graph, edge, &from, &to);
-                        neighbor = actnode != from ? from : to;
+                        igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i];
+                        long int neighbor= (long int) IGRAPH_OTHER(graph, edge, actnode);
                         if (nrgeo[neighbor] != 0) {
                             /* we've already seen this node, another shortest path? */
                             if (distance[neighbor] == distance[actnode] + 1) {
@@ -886,7 +884,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * <code>Q = 1/(2m) sum_ij (A_ij - gamma * k_i * k_j / (2m)) * d(c_i,c_j)</code>,
  *
  * </para><para>
- * where \c m is the number of edges, <code>A_ij = 1</code> is the adjacency matrix,
+ * where \c m is the number of edges, <code>A_ij</code> is the adjacency matrix,
  * \c k_i is the degree of vertex \c i, \c c_i is the cluster that vertex \c i belongs to
  * (or its vertex type), <code>d(i,j)=1</code> if <code>i=j</code> and 0 otherwise,
  * and the sum goes over all <code>i, j</code> pairs of vertices.
@@ -907,8 +905,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * <code>Q = 1/(m) sum_ij (A_ij - gamma * k^out_i * k^in_j / m) * d(c_i,c_j)</code>,
  *
  * </para><para>
- * where \c k^out_i is the out-degree of node \c i and \c k^in_j is the in-degree of node \c j, and
- * <code>A_ij = 1</code> if there is an edge from \c i to \c j and zero otherwise.
+ * where \c k^out_i is the out-degree of node \c i and \c k^in_j is the in-degree of node \c j.
  *
  * </para><para>
  * Modularity on weighted graphs is also meaningful. When taking
@@ -918,21 +915,21 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * weight of all edges.
  *
  * </para><para>
- * For the original definition of modularity, see Newman, M. E. J., &amp; Girvan, M.
- * (2004). Finding and evaluating community structure in networks. Physical
- * Review E, 69(2), 026113. https://doi.org/10.1103/PhysRevE.69.026113
+ * For the original definition of modularity, see Newman, M. E. J., and Girvan, M.
+ * (2004). Finding and evaluating community structure in networks.
+ * Physical Review E 69, 026113. https://doi.org/10.1103/PhysRevE.69.026113
  *
  * </para><para>
- * For the directed definition of modularity, see Leicht, E. A., & Newman, M. E.
- * J. (2008). Community Structure in Directed Networks. Physical Review Letters,
- * 100(11), 118703. https://doi.org/10.1103/PhysRevLett.100.118703
+ * For the directed definition of modularity, see Leicht, E. A., and Newman, M. E.
+ * J. (2008). Community Structure in Directed Networks. Physical Review Letters 100,
+ * 118703. https://doi.org/10.1103/PhysRevLett.100.118703
  *
  * </para><para>
- * For the introduction of the resolution parameter, see Reichardt, J., &amp;
+ * For the introduction of the resolution parameter, see Reichardt, J., and
  * Bornholdt, S. (2006). Statistical mechanics of community detection. Physical
- * Review E, 74(1), 016110. https://doi.org/10.1103/PhysRevE.74.016110
+ * Review E 74, 016110. https://doi.org/10.1103/PhysRevE.74.016110
  *
- * \param graph      The input graph. Edge directions will be ignored.
+ * \param graph      The input graph.
  * \param membership Numeric vector of integer values which gives the type of each
  *                   vertex, i.e. the cluster to which it belongs.
  *                   It does not have to be consecutive, i.e. empty communities
@@ -941,7 +938,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * \param resolution Resolution parameter. Must be greater than or equal to 0.
  *                   Set it to 1 to use the classical definition of modularity.
  * \param directed   Whether to use the directed or undirected version of modularity.
- *                   Will be ignored for undirected graphs.
+ *                   Ignored for undirected graphs.
  * \param modularity Pointer to a real number, the result will be
  *                   stored here.
  * \return Error code.
@@ -2801,7 +2798,6 @@ static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_
     long int ecount = igraph_ecount(graph);
     long int i, l = -1, last_from = -1, last_to = -1;
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t from, to;
     igraph_vector_t edges;
     igraph_i_multilevel_link *links;
 
@@ -2815,6 +2811,7 @@ static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < ecount; i++) {
+        igraph_integer_t from, to;
         igraph_edge(graph, (igraph_integer_t) i, &from, &to);
         links[i].from = from;
         links[i].to = to;
@@ -3053,7 +3050,6 @@ static int igraph_i_community_multilevel_step(
     long int i, j;
     long int vcount = igraph_vcount(graph);
     long int ecount = igraph_ecount(graph);
-    igraph_integer_t ffrom, fto;
     igraph_real_t q, pass_q;
     int pass;
     igraph_bool_t changed = 0;
@@ -3107,6 +3103,7 @@ static int igraph_i_community_multilevel_step(
 
     /* Some more initialization :) */
     for (i = 0; i < ecount; i++) {
+        igraph_integer_t ffrom, fto;
         igraph_real_t weight = 1;
         igraph_edge(graph, (igraph_integer_t) i, &ffrom, &fto);
 
