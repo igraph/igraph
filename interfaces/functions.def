@@ -1376,6 +1376,15 @@ igraph_community_optimal_modularity:
         NAME-R: cluster_optimal
         IGNORE: RR
 
+igraph_community_leiden:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                VERTEXWEIGHTS vertex_weights=NULL, \
+                REAL resolution_parameter, REAL beta, \
+                BOOLEAN start, INOUT VECTOR_OR_0 membership, \
+                OUT INTEGERPTR nb_clusters, OUT REALPTR quality
+        NAME-R: cluster_leiden
+        IGNORE: RR
+
 igraph_split_join_distance:
         PARAMS: VECTOR comm1, VECTOR comm2, OUT INTEGERPTR distance12, \
 		        OUT INTEGERPTR distance21
