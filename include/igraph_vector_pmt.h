@@ -62,7 +62,7 @@ DECLDIR long int FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v);
 #endif
 
 DECLDIR BASE FUNCTION(igraph_vector, e)(const TYPE(igraph_vector)* v, long int pos);
-BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector)* v, long int pos);
+DECLDIR BASE* FUNCTION(igraph_vector, e_ptr)(const TYPE(igraph_vector)* v, long int pos);
 DECLDIR void FUNCTION(igraph_vector, set)(TYPE(igraph_vector)* v, long int pos, BASE value);
 DECLDIR BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v);
 
@@ -212,10 +212,10 @@ DECLDIR long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
 /* Printing  */
 /*-----------*/
 
-int FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v);
-int FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v,
+DECLDIR int FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v);
+DECLDIR int FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v,
                                     const char *format);
-int FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FILE *file);
+DECLDIR int FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FILE *file);
 
 #ifdef BASE_COMPLEX
 
@@ -235,34 +235,30 @@ DECLDIR int igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
 
 #endif
 
-/* ----------------------------------------------------------------------------*/
-/* For internal use only, may be removed, rewritten ... */
-/* ----------------------------------------------------------------------------*/
+DECLDIR int FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector)*v, int no, ...);
+DECLDIR int FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector)*v, int no, ...);
+DECLDIR int FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector)*v, BASE endmark, ...);
+DECLDIR int FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_vector)*v, int endmark, ...);
 
-int FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector)*v, int no, ...);
-int FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector)*v, int no, ...);
-int FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector)*v, BASE endmark, ...);
-int FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_vector)*v, int endmark, ...);
-
-int FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
+DECLDIR int FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
         long int begin, long int end, long int to);
-int FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
+DECLDIR int FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
         long int begin, long int end, long int to);
-void FUNCTION(igraph_vector, permdelete)(TYPE(igraph_vector) *v,
+DECLDIR void FUNCTION(igraph_vector, permdelete)(TYPE(igraph_vector) *v,
         const igraph_vector_t *index,
         long int nremove);
-int FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v, BASE elem);
-int FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *v,
+DECLDIR int FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v, BASE elem);
+DECLDIR int FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *v,
         TYPE(igraph_vector) *res,
         long int from, long int to);
-int FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vector) *v1,
+DECLDIR int FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vector) *v1,
         const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
-int FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
+DECLDIR int FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
         const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result);
 
-int FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
+DECLDIR int FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
                                    TYPE(igraph_vector) *newv,
                                    const igraph_vector_t *idx);
 
-int FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
+DECLDIR int FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
                                        const igraph_vector_int_t *idx);
