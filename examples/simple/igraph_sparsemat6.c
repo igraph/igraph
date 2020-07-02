@@ -32,10 +32,10 @@ int main() {
 
 #define NROW 10
 #define NCOL 7
-#define NZERO 15
+#define NUM_NONZEROS 15
 
     igraph_matrix_init(&mat, NROW, NCOL);
-    for (i = 0; i < NZERO; i++) {
+    for (i = 0; i < NUM_NONZEROS; i++) {
         int r = igraph_rng_get_integer(igraph_rng_default(), 0, NROW - 1);
         int c = igraph_rng_get_integer(igraph_rng_default(), 0, NCOL - 1);
         igraph_real_t val = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
