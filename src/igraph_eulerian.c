@@ -41,7 +41,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     igraph_integer_t odd;
     igraph_vector_t degree, csize, check_for_self_loops, cluster_member;
     igraph_inclist_t il;
-    long int i, j;
+    long int i, j, nc;
     int cluster_count;
 
     if (igraph_ecount(graph) == 0 || igraph_vcount(graph) <= 1) {
@@ -93,7 +93,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     for (i = 0; i < igraph_vector_size(&check_for_self_loops); i++) {
         igraph_vector_int_t *incedges;
         incedges = igraph_inclist_get(&il, VECTOR(check_for_self_loops)[i]);
-        int nc = igraph_vector_int_size(incedges);
+        nc = igraph_vector_int_size(incedges);
         if (nc > 0) {
             *has_path = 0;
             *has_cycle = 0;
