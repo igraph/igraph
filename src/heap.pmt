@@ -33,6 +33,12 @@
 #define LEFTCHILD(x)  (((x)+1)*2-1)
 #define RIGHTCHILD(x) (((x)+1)*2)
 
+/* Define internal functions */
+void FUNCTION(igraph_heap, i_build)(BASE* arr, long int size, long int head);
+void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, long int size, long int elem);
+void FUNCTION(igraph_heap, i_sink)(BASE* arr, long int size, long int head);
+void FUNCTION(igraph_heap, i_switch)(BASE* arr, long int e1, long int e2);
+
 /**
  * \ingroup heap
  * \function igraph_heap_init
