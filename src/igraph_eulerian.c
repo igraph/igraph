@@ -63,7 +63,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
         /* extracting all clusters with 1 vertex */
         if (VECTOR(csize)[i] == 1) {
             long int vsize2 = igraph_vector_size(&cluster_member);
-            for (j = 0; vsize2; j++) {
+            for (j = 0; j < vsize2; j++) {
                 if (VECTOR(cluster_member)[j] == i) {
                     igraph_vector_push_back(&check_for_self_loops, j);
                     break;
@@ -223,15 +223,16 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
     IGRAPH_VECTOR_INIT_FINALLY(&check_for_self_loops, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&cluster_member, 0);
 
+    /* count non-singleton clusters */
     IGRAPH_CHECK(igraph_clusters(graph, &cluster_member, &csize_weak, NULL, IGRAPH_WEAK));
     cluster_count = 0;
     vsize = igraph_vector_size(&csize_weak);
     for (i = 0; i < vsize; i++) {
-        if (VECTOR(csize_weak)[i] > 1) cluster_count++;
-
-        if (VECTOR(csize_weak)[i] == 1) {
+        if (VECTOR(csize_weak)[i] > 1) {
+            cluster_count++;
+        } else {
             long int vsize2 = igraph_vector_size(&cluster_member);
-            for (j = 0; vsize2; j++) {
+            for (j = 0; j < vsize2; j++) {
                 if (VECTOR(cluster_member)[j] == i) {
                     igraph_vector_push_back(&check_for_self_loops, j);
                     break;
@@ -240,10 +241,12 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
         }
     }
 
+    /* weak connectivity excluding singletons (which are taken care of later on) */
     if (cluster_count > 1) {
         res_weak = 0;
     }
 
+    /* weak && out_exc = 0 && in_exc = 0 means strong connectivity */
     if ((outgoing_excess == 0 && incoming_excess == 0) && (res_weak)) {
         *has_path = 1;
         *has_cycle = 1;
@@ -255,6 +258,8 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
                 break;
             }
         }
+
+    /* strong connectivity is NOT required for just a path */
     } else if ((outgoing_excess == 1 && incoming_excess == 1) && (res_weak)) {
         *has_path = 1;
         *has_cycle = 0;
@@ -266,6 +271,7 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
     IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_OUT));
     IGRAPH_FINALLY(igraph_inclist_destroy, &il);
 
+    /* check if singleton self loops destroy the Eulerian path/cycle */
     vsize = igraph_vector_size(&check_for_self_loops);
     for (i = 0; i < vsize; i++) {
         igraph_vector_int_t *incedges;
