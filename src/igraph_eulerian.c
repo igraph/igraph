@@ -179,21 +179,38 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
 
     /* checking if incoming vertices == outgoing vertices */
     for (i = 0; i < n; i++) {
-        if (VECTOR(in_degree)[i] != VECTOR(out_degree)[i]) {
-            if ((VECTOR(in_degree)[i] + 1 == VECTOR(out_degree)[i]) && (incoming_excess < 2 && outgoing_excess < 1)) {
-                outgoing_excess++;
-                *start_of_path = i;
-            } else if ((VECTOR(out_degree)[i] + 1 == VECTOR(in_degree)[i]) && (incoming_excess < 1 && outgoing_excess < 2)) {
-                incoming_excess++;
-            } else {
-                *has_path = 0;
-                *has_cycle = 0;
-                igraph_vector_destroy(&in_degree);
-                igraph_vector_destroy(&out_degree);
-                IGRAPH_FINALLY_CLEAN(2);
+        int excess = 0;
+        long int degin = VECTOR(in_degree)[i];
+        long int degout = VECTOR(out_degree)[i];
+        if (degin == degout) {
+            continue;
+        }
 
-                return IGRAPH_SUCCESS;
+        if ((degin > degout + 1) || (degout > degin + 1)) {
+            excess = 1;
+        } else if (degout == degin + 1) {
+            outgoing_excess++;
+            if (outgoing_excess > 1) {
+                excess = 1;
+            } else {
+                *start_of_path = i;
             }
+        } else { /* degin == degout + 1 */
+            incoming_excess++;
+            if (incoming_excess > 1) {
+                excess = 1;
+                /* this is the end of the potential path */
+            }
+        }
+
+        if (excess) {
+            *has_path = 0;
+            *has_cycle = 0;
+            igraph_vector_destroy(&in_degree);
+            igraph_vector_destroy(&out_degree);
+            IGRAPH_FINALLY_CLEAN(2);
+
+            return IGRAPH_SUCCESS;
         }
     }
 
