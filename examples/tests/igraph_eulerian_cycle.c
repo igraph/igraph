@@ -78,7 +78,7 @@ int main() {
     igraph_destroy(&graph);
     igraph_vector_destroy(&edge_res);
     igraph_vector_init(&edge_res, 0);
-    igraph_vector_destroy(&vertedxres);
+    igraph_vector_destroy(&vertex_res);
     igraph_vector_init(&vertex_res, 0);
 
     igraph_small(&graph, 0, IGRAPH_DIRECTED, 0, 1, -1);
