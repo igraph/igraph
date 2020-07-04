@@ -327,7 +327,7 @@ int igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path, igraph_bo
 }
 
 
-static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vector_res, igraph_integer_t start_of_path) {
+static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res, igraph_integer_t start_of_path) {
     long int curr;
     igraph_integer_t n, m;
     igraph_inclist_t il;
@@ -343,9 +343,9 @@ static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vecto
         IGRAPH_CHECK(igraph_vector_reserve(edge_res, m));
     }
 
-    if (vector_res) {
-        igraph_vector_clear(vector_res);
-        IGRAPH_CHECK(igraph_vector_reserve(vector_res, n+1)); 
+    if (vertex_res) {
+        igraph_vector_clear(vertex_res);
+        IGRAPH_CHECK(igraph_vector_reserve(vertex_res, m+1)); 
     }
 
     if (m == 0 || n == 0) {
@@ -420,9 +420,9 @@ static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vecto
             IGRAPH_CHECK(igraph_vector_push_back(edge_res, igraph_stack_pop(&edge_path)));           
         }
     }
-    if (vector_res) {
+    if (vertex_res) {
         while (!igraph_stack_empty(&path)) {
-            IGRAPH_CHECK(igraph_vector_push_back(vector_res, igraph_stack_pop(&path)));           
+            IGRAPH_CHECK(igraph_vector_push_back(vertex_res, igraph_stack_pop(&path)));           
         }
     }
 
@@ -439,7 +439,7 @@ static int igraph_i_eulerian_path_undirected(const igraph_t *graph, igraph_vecto
 }
 
 /* solution adapted from https://www.geeksforgeeks.org/hierholzers-algorithm-directed-graph/ */
-static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vector_res, igraph_integer_t start_of_path) {
+static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res, igraph_integer_t start_of_path) {
     long int curr;
     igraph_integer_t n, m;
     igraph_inclist_t il;
@@ -455,9 +455,9 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
         IGRAPH_CHECK(igraph_vector_reserve(edge_res, m));
     }
 
-    if (vector_res) {
-        igraph_vector_clear(vector_res);
-        IGRAPH_CHECK(igraph_vector_reserve(vector_res, n+1));
+    if (vertex_res) {
+        igraph_vector_clear(vertex_res);
+        IGRAPH_CHECK(igraph_vector_reserve(vertex_res, m+1));
     }
 
     if (m == 0 || n == 0) {
@@ -531,9 +531,9 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
             IGRAPH_CHECK(igraph_vector_push_back(edge_res, igraph_stack_pop(&edge_path)));           
         }
     }
-    if (vector_res) {
+    if (vertex_res) {
         while (!igraph_stack_empty(&path)) {
-            IGRAPH_CHECK(igraph_vector_push_back(vector_res, igraph_stack_pop(&path)));           
+            IGRAPH_CHECK(igraph_vector_push_back(vertex_res, igraph_stack_pop(&path)));           
         }
     }
 
@@ -559,8 +559,12 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
  * that traverses each edge precisely once.
  *
  * \param graph The graph object.
- * \param res Pointer to an initialised vector. The indices of edges
- *            belonging to the cycle will be stored here.
+ * \param edge_res Pointer to an initialised vector. The indices of edges
+ *                 belonging to the cycle will be stored here. May be \c NULL
+ *                 if it is not needed by the caller.
+ * \param vertex_res Pointer to an initialised vector. The indices of vertices
+ *                   belonging to the cycle will be stored here. May be \c NULL
+ *                   if it is not needed by the caller.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -575,7 +579,7 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
  */
 
 
-int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vector_res) {
+int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res) {
     igraph_bool_t has_cycle;
     igraph_bool_t has_path;
     igraph_integer_t start_of_path = 0;
@@ -587,7 +591,7 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
             IGRAPH_ERROR("The graph does not have an Eulerian cycle.", IGRAPH_EINVAL);
         }
 
-        IGRAPH_CHECK(igraph_i_eulerian_path_directed(graph, edge_res, vector_res, start_of_path));
+        IGRAPH_CHECK(igraph_i_eulerian_path_directed(graph, edge_res, vertex_res, start_of_path));
     } else {
         IGRAPH_CHECK(igraph_i_is_eulerian_undirected(graph, &has_path, &has_cycle, &start_of_path));
 
@@ -595,7 +599,7 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
             IGRAPH_ERROR("The graph does not have an Eulerian cycle.", IGRAPH_EINVAL);
         }   
 
-        IGRAPH_CHECK(igraph_i_eulerian_path_undirected(graph, edge_res, vector_res, start_of_path));
+        IGRAPH_CHECK(igraph_i_eulerian_path_undirected(graph, edge_res, vertex_res, start_of_path));
     }
 
     return IGRAPH_SUCCESS;
@@ -611,8 +615,12 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
  * each edge precisely once.
  *
  * \param graph The graph object.
- * \param res Pointer to an initialised vector. The indices of edges
- *            belonging to the path will be stored here.
+ * \param edge_res Pointer to an initialised vector. The indices of edges
+ *                 belonging to the cycle will be stored here. May be \c NULL
+ *                 if it is not needed by the caller.
+ * \param vertex_res Pointer to an initialised vector. The indices of vertices
+ *                   belonging to the cycle will be stored here. May be \c NULL
+ *                   if it is not needed by the caller.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -626,7 +634,7 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
  *
  */
 
-int igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vector_res) {
+int igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res) {
     igraph_bool_t has_cycle;
     igraph_bool_t has_path;
     igraph_integer_t start_of_path = 0;
@@ -637,7 +645,7 @@ int igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igrap
         if (!has_path) {
             IGRAPH_ERROR("The graph does not have an Eulerian path.", IGRAPH_EINVAL);
         }
-        IGRAPH_CHECK(igraph_i_eulerian_path_directed(graph, edge_res, vector_res, start_of_path));
+        IGRAPH_CHECK(igraph_i_eulerian_path_directed(graph, edge_res, vertex_res, start_of_path));
     } else {
         IGRAPH_CHECK(igraph_i_is_eulerian_undirected(graph, &has_path, &has_cycle, &start_of_path));
         
@@ -645,7 +653,7 @@ int igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igrap
             IGRAPH_ERROR("The graph does not have an Eulerian path.", IGRAPH_EINVAL);
         }
 
-        IGRAPH_CHECK(igraph_i_eulerian_path_undirected(graph, edge_res, vector_res, start_of_path));
+        IGRAPH_CHECK(igraph_i_eulerian_path_undirected(graph, edge_res, vertex_res, start_of_path));
     }
 
     return IGRAPH_SUCCESS;
