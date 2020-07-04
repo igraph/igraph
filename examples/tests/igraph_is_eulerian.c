@@ -193,6 +193,18 @@ int main() {
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);
 
+    /* no edges except one self loop, multiple vertices */
+    igraph_small(&graph, 4, IGRAPH_UNDIRECTED, 0,0, 1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
+    /* no edges except one self loop, multiple vertices, directed */
+    igraph_small(&graph, 4, IGRAPH_DIRECTED, 0,0, -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
     VERIFY_FINALLY_STACK();
     
     return 0;
