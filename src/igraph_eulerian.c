@@ -45,6 +45,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     long int cluster_count;
 
     if (igraph_ecount(graph) == 0 || igraph_vcount(graph) <= 1) {
+        start_of_path = 0; /* in case the graph has one vertex with self-loops */
         *has_path = 1;
         *has_cycle = 1;
         return  IGRAPH_SUCCESS;
@@ -166,6 +167,7 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
     n = igraph_vcount(graph);
 
     if (igraph_ecount(graph) == 0 || n <= 1) {
+        start_of_path = 0; /* in case the graph has one vertex with self-loops */
         *has_path = 1;
         *has_cycle = 1;
         return IGRAPH_SUCCESS;
