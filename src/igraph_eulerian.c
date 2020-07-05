@@ -42,14 +42,16 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     igraph_vector_t degree, csize, cluster_member;
     /* boolean vector to mark singletons */
     igraph_vector_int_t singleton;
-    long int i, j, vsize;
+    long int i, j, n, vsize;
     long int cluster_count;
     /* number of self-looping singletons */
     long int es;
     /* number of non-singletons with edges */
     long int ens;
 
-    if (igraph_ecount(graph) == 0 || igraph_vcount(graph) <= 1) {
+    n = igraph_vcount(graph);
+
+    if (igraph_ecount(graph) == 0 || n <= 1) {
         start_of_path = 0; /* in case the graph has one vertex with self-loops */
         *has_path = 1;
         *has_cycle = 1;
@@ -57,8 +59,8 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&singleton, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&cluster_member, 0);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&singleton, n);
 
     /* check for connectedness, but singletons are special since they affect
      * the Eulerian nature only if there is a self-loop AND another edge
@@ -74,8 +76,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
             }
         } else {
             /* find what vertex is in this singleton cluster */
-            long int vsize2 = igraph_vector_size(&cluster_member);
-            for (j = 0; j < vsize2; j++) {
+            for (j = 0; j < n; j++) {
                 if (VECTOR(cluster_member)[j] == i) {
                     VECTOR(singleton)[j] = 1;
                     break;
@@ -110,8 +111,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     odd = 0;
     es = 0;
     ens = 0;
-    vsize = igraph_vector_size(&degree);
-    for (i = 0; i < vsize; i++) {
+    for (i = 0; i < n; i++) {
         long int deg = (long int) VECTOR(degree)[i];
         /* Eulerian is about edges, so skip free vertices */
         if (deg == 0) continue;
@@ -156,8 +156,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     /* set start of path if there is one but there is no cycle */
     /* note: we cannot do this in the previous loop because at that time we are
      * not sure yet if a path exists */
-    vsize = igraph_vector_size(&degree);
-    for (i = 0; i < vsize; i++) {
+    for (i = 0; i < n; i++) {
         if ((*has_cycle && ((long int) VECTOR(degree)[i]) > 0) || (!*has_cycle && ((long int) VECTOR(degree)[i]) %2 == 1)) {
             *start_of_path = i;
             break;

@@ -78,6 +78,36 @@ int main() {
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);
 
+    /* two disconnected self loops */
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  1,1, 2,2, -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
+    /* one self loop and one disconnected multiedge selfloop */
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  1,1, 1,1, 2,2, -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph); 
+
+    /* multiple self-loop singletons */
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  0,0 , 1,1 , 1,1 , -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
+    /* no edges, multiple vertices */
+    igraph_small(&graph, 4, IGRAPH_UNDIRECTED, -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
+    /* no edges except one self loop, multiple vertices */
+    igraph_small(&graph, 4, IGRAPH_UNDIRECTED, 0,0, -1);
+    igraph_is_eulerian(&graph, &has_path, &has_cycle);
+    printf("%d %d\n", has_path, has_cycle);
+    igraph_destroy(&graph);
+
     /* directed cases*/
     igraph_small(&graph, 0, IGRAPH_DIRECTED, 0,1 , 1,2, -1);
     igraph_is_eulerian(&graph, &has_path, &has_cycle);
@@ -147,18 +177,6 @@ int main() {
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);
 
-    /* two disconnected self loops */
-    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  1,1, 2,2, -1);
-    igraph_is_eulerian(&graph, &has_path, &has_cycle);
-    printf("%d %d\n", has_path, has_cycle);
-    igraph_destroy(&graph);
-
-    /* one self loop and one disconnected multiedge selfloop */
-    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  1,1, 1,1, 2,2, -1);
-    igraph_is_eulerian(&graph, &has_path, &has_cycle);
-    printf("%d %d\n", has_path, has_cycle);
-    igraph_destroy(&graph);
-
     /* two disconnected self loops, directed */
     igraph_small(&graph, 0, IGRAPH_DIRECTED,  1,1, 2,2, -1);
     igraph_is_eulerian(&graph, &has_path, &has_cycle);
@@ -171,30 +189,8 @@ int main() {
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);
 
-    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  0,1, 2,3, 3,1, 4,5, 5,6, 6,4, -1);
-    igraph_is_eulerian(&graph, &has_path, &has_cycle);
-    printf("%d %d\n", has_path, has_cycle);
-    igraph_destroy(&graph);
-
-    igraph_small(&graph, 0, IGRAPH_UNDIRECTED,  0,0 , 1,1 , 1,1 , -1);
-    igraph_is_eulerian(&graph, &has_path, &has_cycle);
-    printf("%d %d\n", has_path, has_cycle);
-    igraph_destroy(&graph);
-
-    /* no edges, multiple vertices */
-    igraph_small(&graph, 4, IGRAPH_UNDIRECTED, -1);
-    igraph_is_eulerian(&graph, &has_path, &has_cycle);
-    printf("%d %d\n", has_path, has_cycle);
-    igraph_destroy(&graph);
-
     /* no edges, multiple vertices, directed */
     igraph_small(&graph, 4, IGRAPH_DIRECTED, -1);
-    igraph_is_eulerian(&graph, &has_path, &has_cycle);
-    printf("%d %d\n", has_path, has_cycle);
-    igraph_destroy(&graph);
-
-    /* no edges except one self loop, multiple vertices */
-    igraph_small(&graph, 4, IGRAPH_UNDIRECTED, 0,0, 1);
     igraph_is_eulerian(&graph, &has_path, &has_cycle);
     printf("%d %d\n", has_path, has_cycle);
     igraph_destroy(&graph);
