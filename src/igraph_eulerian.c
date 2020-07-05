@@ -39,9 +39,9 @@ has_cycle is set to 1 if a cycle exists, 0 otherwise
 */
 static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
     igraph_integer_t odd;
-    igraph_vector_t degree, csize, cluster_member;
+    igraph_vector_t degree, csize;
     /* boolean vector to mark singletons */
-    igraph_vector_int_t singleton;
+    igraph_vector_t nonsingleton;
     long int i, j, n, vsize;
     long int cluster_count;
     /* number of self-looping singletons */
@@ -58,56 +58,43 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
         return  IGRAPH_SUCCESS;
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&cluster_member, 0);
-    IGRAPH_VECTOR_INT_INIT_FINALLY(&singleton, n);
-
     /* check for connectedness, but singletons are special since they affect
      * the Eulerian nature only if there is a self-loop AND another edge
      * somewhere else in the graph */
-    IGRAPH_CHECK(igraph_clusters(graph, &cluster_member, &csize, NULL, IGRAPH_WEAK));
+    IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
+    IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize, NULL, IGRAPH_WEAK));
     cluster_count = 0;
     vsize = igraph_vector_size(&csize);
     for (i = 0; i < vsize; i++) {
         if (VECTOR(csize)[i] > 1) {
             cluster_count++;
             if (cluster_count > 1) {
-                break;
-            }
-        } else {
-            /* find what vertex is in this singleton cluster */
-            for (j = 0; j < n; j++) {
-                if (VECTOR(cluster_member)[j] == i) {
-                    VECTOR(singleton)[j] = 1;
-                    break;
-                }
+                /* disconnected edges, they'll never reach each other */
+                *has_path = 0;
+                *has_cycle = 0;
+                igraph_vector_destroy(&csize);
+                IGRAPH_FINALLY_CLEAN(1);
+
+                return IGRAPH_SUCCESS;
             }
         }
-
     }
 
-    /* disconnected edges, they'll never reach each other */
-    if (cluster_count > 1) {
-        *has_path = 0;
-        *has_cycle = 0;
-        igraph_vector_destroy(&csize);
-        igraph_vector_int_destroy(&singleton);
-        igraph_vector_destroy(&cluster_member);
-        IGRAPH_FINALLY_CLEAN(3);
-
-        return IGRAPH_SUCCESS;
-    }
+    igraph_vector_destroy(&csize);
+    IGRAPH_FINALLY_CLEAN(1);
 
     /* the graph is connected except for singletons */
-    /* still need to check for self loops */
-    IGRAPH_VECTOR_INIT_FINALLY(&degree, 0);
-    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
+    /* find singletons (except for self-loops) */
+    IGRAPH_VECTOR_INIT_FINALLY(&nonsingleton, 0);
+    IGRAPH_CHECK(igraph_degree(graph, &nonsingleton, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
     /* check the degrees for odd/even:
      * - >= 2 odd means no cycle (1 odd is impossible)
      * - > 2 odd means no path
      * plus there are a few corner cases with singletons
      */
+    IGRAPH_VECTOR_INIT_FINALLY(&degree, 0);
+    IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS));
     odd = 0;
     es = 0;
     ens = 0;
@@ -116,7 +103,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
         /* Eulerian is about edges, so skip free vertices */
         if (deg == 0) continue;
 
-        if (VECTOR(singleton)[i]) {
+        if (!VECTOR(nonsingleton)[i]) {
             /* singleton with self loops */
             es++;
         } else {
@@ -131,15 +118,16 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
              * 1+ edges in the non-singleton part of the graph. */
             *has_path = 0;
             *has_cycle = 0;
-            igraph_vector_destroy(&csize);
+            igraph_vector_destroy(&nonsingleton);
             igraph_vector_destroy(&degree);
-            igraph_vector_int_destroy(&singleton);
-            igraph_vector_destroy(&cluster_member);
-            IGRAPH_FINALLY_CLEAN(4);
+            IGRAPH_FINALLY_CLEAN(2);
 
             return IGRAPH_SUCCESS;
         }
     }
+
+    igraph_vector_destroy(&nonsingleton);
+    IGRAPH_FINALLY_CLEAN(1);
 
     /* this is the usual algorithm on the connected part of the graph */
     if (odd > 2) {
@@ -163,11 +151,8 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
         }
     }
 
-    igraph_vector_destroy(&csize);
-    igraph_vector_int_destroy(&singleton);
     igraph_vector_destroy(&degree);
-    igraph_vector_destroy(&cluster_member);
-    IGRAPH_FINALLY_CLEAN(4);
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
@@ -178,8 +163,13 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
     igraph_integer_t incoming_excess, outgoing_excess, n;
     long int i, j, vsize;
     long int cluster_count;
-    igraph_vector_t out_degree, in_degree, csize_weak, check_for_self_loops, cluster_member;
-    igraph_inclist_t il;
+    igraph_vector_t out_degree, in_degree, csize;
+    /* boolean vector to mark singletons */
+    igraph_vector_t nonsingleton;
+    /* number of self-looping singletons */
+    long int es;
+    /* number of non-singletons with edges */
+    long int ens;
 
     n = igraph_vcount(graph);
 
@@ -192,123 +182,125 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
 
     incoming_excess = 0;
     outgoing_excess = 0;
-
     res_weak = 1;
 
+    /* check for weak connectedness, but singletons are special since they affect
+     * the Eulerian nature only if there is a self-loop AND another edge
+     * somewhere else in the graph */
+    IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
+
+    IGRAPH_CHECK(igraph_clusters(graph, NULL, &csize, NULL, IGRAPH_WEAK));
+    cluster_count = 0;
+    vsize = igraph_vector_size(&csize);
+    for (i = 0; i < vsize; i++) {
+        if (VECTOR(csize)[i] > 1) {
+            cluster_count++;
+            if (cluster_count > 1) {
+                /* weakly disconnected edges, they'll never reach each other */
+                *has_path = 0;
+                *has_cycle = 0;
+                igraph_vector_destroy(&csize);
+                IGRAPH_FINALLY_CLEAN(1);
+
+                return IGRAPH_SUCCESS;
+            }
+        }
+    }
+
+    igraph_vector_destroy(&csize);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    /* the graph is weakly connected except for singletons */
+    /* find the singletons (except self-loops) */
+    IGRAPH_VECTOR_INIT_FINALLY(&nonsingleton, 0);
+    IGRAPH_CHECK(igraph_degree(graph, &nonsingleton, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
+
+
+    /* checking if incoming vertices == outgoing vertices
+     * plus there are a few corner cases with singletons */
     IGRAPH_VECTOR_INIT_FINALLY(&out_degree, 0);
     IGRAPH_CHECK(igraph_degree(graph, &out_degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS));
 
     IGRAPH_VECTOR_INIT_FINALLY(&in_degree, 0);
     IGRAPH_CHECK(igraph_degree(graph, &in_degree, igraph_vss_all(), IGRAPH_IN, IGRAPH_LOOPS));
-
-    /* checking if incoming vertices == outgoing vertices */
+    es = 0;
+    ens = 0;
+    *start_of_path = -1;
     for (i = 0; i < n; i++) {
-        int excess = 0;
         long int degin = VECTOR(in_degree)[i];
         long int degout = VECTOR(out_degree)[i];
+
+        /* Eulerian is about edges, so skip free vertices */
+        if (degin + degout == 0) continue;
+
+        if (!VECTOR(nonsingleton)[i]) {
+            /* singleton with self loops */
+            es++;
+            /* if we ever want a path, it has to be this self-loop */
+            *start_of_path = i;
+        } else {
+            /* at least one non-singleton with edges */
+            ens = 1;
+        }
+
+        if (es + ens > 1) {
+            /* 2+ singletons with self loops or singleton with self-loops and
+             * 1+ edges in the non-singleton part of the graph. */
+            *has_path = 0;
+            *has_cycle = 0;
+            igraph_vector_destroy(&nonsingleton);
+            igraph_vector_destroy(&in_degree);
+            igraph_vector_destroy(&out_degree);
+            IGRAPH_FINALLY_CLEAN(3);
+
+            return IGRAPH_SUCCESS;
+        }
+
+        /* as long as we have perfect balance, you can start
+         * anywhere with an edge */
+        if (*start_of_path == -1 && incoming_excess == 0 && outgoing_excess == 0) {
+            *start_of_path = i;
+        }
+
+        /* same in and out (including self-loops, even in singletons) */
         if (degin == degout) {
             continue;
         }
 
-        if ((degin > degout + 1) || (degout > degin + 1)) {
-            excess = 1;
-        } else if (degout == degin + 1) {
-            outgoing_excess++;
-            if (outgoing_excess > 1) {
-                excess = 1;
-            } else {
+        /* non-singleton, in != out */
+        if (degin > degout) {
+            incoming_excess += degin - degout;
+        } else {
+            outgoing_excess += degout - degin;
+            if (outgoing_excess == 1) {
                 *start_of_path = i;
-            }
-        } else { /* degin == degout + 1 */
-            incoming_excess++;
-            if (incoming_excess > 1) {
-                excess = 1;
-                /* this is the end of the potential path */
             }
         }
 
-        if (excess) {
+        /* too much imbalance, either of the following:
+         * 1. 1+ vertices have 2+ in/out
+         * 2. 2+ nodes have 1+ in/out */
+        if (incoming_excess > 1 || outgoing_excess > 1) {
             *has_path = 0;
             *has_cycle = 0;
+            igraph_vector_destroy(&nonsingleton);
             igraph_vector_destroy(&in_degree);
             igraph_vector_destroy(&out_degree);
-            IGRAPH_FINALLY_CLEAN(2);
+            IGRAPH_FINALLY_CLEAN(3);
 
             return IGRAPH_SUCCESS;
         }
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&csize_weak, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&check_for_self_loops, 0);
-    IGRAPH_VECTOR_INIT_FINALLY(&cluster_member, 0);
+    *has_path = 1;
+    /* perfect edge balance -> strong connectivity */
+    *has_cycle = (incoming_excess == 0) && (outgoing_excess == 0);
+    /* either way, the start was set already */
 
-    /* count non-singleton clusters */
-    IGRAPH_CHECK(igraph_clusters(graph, &cluster_member, &csize_weak, NULL, IGRAPH_WEAK));
-    cluster_count = 0;
-    vsize = igraph_vector_size(&csize_weak);
-    for (i = 0; i < vsize; i++) {
-        if (VECTOR(csize_weak)[i] > 1) {
-            cluster_count++;
-        } else {
-            long int vsize2 = igraph_vector_size(&cluster_member);
-            for (j = 0; j < vsize2; j++) {
-                if (VECTOR(cluster_member)[j] == i) {
-                    igraph_vector_push_back(&check_for_self_loops, j);
-                    break;
-                }
-            }
-        }
-    }
-
-    /* weak connectivity excluding singletons (which are taken care of later on) */
-    if (cluster_count > 1) {
-        res_weak = 0;
-    }
-
-    /* weak && out_exc = 0 && in_exc = 0 means strong connectivity */
-    if ((outgoing_excess == 0 && incoming_excess == 0) && (res_weak)) {
-        *has_path = 1;
-        *has_cycle = 1;
-
-        vsize = igraph_vector_size(&out_degree);
-        for (i = 0; i < vsize; i++) {
-            if ((((long int) VECTOR(out_degree)[i]) > 0) || (((long int) VECTOR(in_degree)[i]) > 0)) {
-                *start_of_path = i;
-                break;
-            }
-        }
-
-    /* strong connectivity is NOT required for just a path */
-    } else if ((outgoing_excess == 1 && incoming_excess == 1) && (res_weak)) {
-        *has_path = 1;
-        *has_cycle = 0;
-    } else {
-        *has_path = 0;
-        *has_cycle = 0;
-    }
-
-    IGRAPH_CHECK(igraph_inclist_init(graph, &il, IGRAPH_OUT));
-    IGRAPH_FINALLY(igraph_inclist_destroy, &il);
-
-    /* check if singleton self loops destroy the Eulerian path/cycle */
-    vsize = igraph_vector_size(&check_for_self_loops);
-    for (i = 0; i < vsize; i++) {
-        igraph_vector_int_t *incedges;
-        incedges = igraph_inclist_get(&il, VECTOR(check_for_self_loops)[i]);
-        long int nc = igraph_vector_int_size(incedges);
-        if (nc > 0) {
-            *has_path = 0;
-            *has_cycle = 0;
-        }
-    }
-
-    igraph_vector_destroy(&check_for_self_loops);
-    igraph_inclist_destroy(&il);
-    igraph_vector_destroy(&csize_weak);
+    igraph_vector_destroy(&nonsingleton);
     igraph_vector_destroy(&in_degree);
     igraph_vector_destroy(&out_degree);
-    igraph_vector_destroy(&cluster_member);
-    IGRAPH_FINALLY_CLEAN(6);
+    IGRAPH_FINALLY_CLEAN(3);
 
     return IGRAPH_SUCCESS;
 }
