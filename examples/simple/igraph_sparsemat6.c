@@ -32,7 +32,7 @@ int main() {
 
 #define NROW 10
 #define NCOL 7
-#define NUM_NONZEROS 25
+#define NUM_NONZEROS 15
 
     igraph_matrix_init(&mat, NROW, NCOL);
     for (i = 0; i < NUM_NONZEROS; i++) {
@@ -62,5 +62,5 @@ int main() {
     igraph_sparsemat_destroy(&spmat);
     igraph_sparsemat_destroy(&spmat2);
 
-    return 0;
+    return 1;
 }
