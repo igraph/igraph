@@ -77,11 +77,13 @@ jobs:
         - alpine ./configure --enable-verify-finally --with-external-glpk
         - alpine make
       script:
-        - alpine make check
+        - alpine_script() { /alpine/enter-chroot -u "$USER" "$@"; }
+        - alpine_script make check
       env:
         - CFLAGS="-Wno-misleading-indentation -Wno-sign-conversion -Wno-incompatible-pointer-types"
       after_failure:
-        - alpine find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+        - alpine_fail() { /alpine/enter-chroot -u "$USER" "$@"; }
+        - alpine_fail find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
 
     - name: "macOS"
       os: osx

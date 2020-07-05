@@ -32,7 +32,7 @@ int main() {
 
 #define NROW 10
 #define NCOL 7
-#define NUM_NONZEROS 15
+#define NUM_NONZEROS 25
 
     igraph_matrix_init(&mat, NROW, NCOL);
     for (i = 0; i < NUM_NONZEROS; i++) {
