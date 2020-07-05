@@ -62,5 +62,5 @@ int main() {
     igraph_sparsemat_destroy(&spmat);
     igraph_sparsemat_destroy(&spmat2);
 
-    return 1;
+    return 0;
 }
