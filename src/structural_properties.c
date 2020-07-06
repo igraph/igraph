@@ -1915,11 +1915,13 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
     for (i = 0; i < no_of_new_nodes; i++) {
         long int old_vid = (long int) VECTOR(*my_vids_new2old)[i];
         long int new_vid = i;
+        igraph_bool_t skip_loop_edge;
 
         IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
         n = igraph_vector_size(&nei_edges);
 
         if (directed) {
+            /* directed graph; this is easier */
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
@@ -1933,10 +1935,15 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
             }
         } else {
+            /* undirected graph. We need to be careful with loop edges as each
+             * loop edge will appear twice. We use a boolean flag to skip every
+             * second loop edge */
+            skip_loop_edge = 0;
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
-                if (IGRAPH_FROM(graph, eid) != old_vid) { /* avoid processing edges twice */
+                if (IGRAPH_FROM(graph, eid) != old_vid) {
+                    /* avoid processing edges twice */
                     continue;
                 }
 
@@ -1944,9 +1951,18 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                 if (!to) {
                     continue;
                 }
+                to -= 1;
+
+                if (new_vid == to) {
+                    /* this is a loop edge; check whether we need to skip it */
+                    skip_loop_edge = !skip_loop_edge;
+                    if (skip_loop_edge) {
+                        continue;
+                    }
+                }
 
                 IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to - 1));
+                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to));
                 IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
             }
         }
