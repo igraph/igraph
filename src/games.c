@@ -3828,7 +3828,6 @@ int igraph_simple_interconnected_islands_game(
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
-    int retval = 0;
     int nbNodes;
     double maxpossibleedgesPerIsland;
     double maxedgesPerIsland;
@@ -3919,13 +3918,13 @@ int igraph_simple_interconnected_islands_game(
     RNG_END();
 
     /* actually fill the graph object */
-    IGRAPH_CHECK(retval = igraph_create(graph, &edges, nbNodes, 0));
+    IGRAPH_CHECK(igraph_create(graph, &edges, nbNodes, 0));
 
     /* clean remaining things */
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 
