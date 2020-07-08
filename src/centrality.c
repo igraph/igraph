@@ -2622,7 +2622,8 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
 
     int cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
-    igraph_real_t mindist;
+
+    igraph_real_t mindist = 0;
 
     igraph_bool_t warning_shown = 0;
 
@@ -2807,8 +2808,9 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
     igraph_vector_int_t *neis;
     long int i, j;
     long int nodes_reached;
-    long int actdist;
     igraph_adjlist_t allneis;
+
+    long int actdist = 0;
 
     igraph_dqueue_t q;
 
