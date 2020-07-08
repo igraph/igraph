@@ -701,7 +701,7 @@ static int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
                  vertex of U in the DAG */
     int *listV, *listU, *listDV, *listDU;
     int nbV, nbU, nbDV, nbDU;
-    int i, j, k, stop, u, v, w;
+    int i, j, k, stop, u, v;
     int *markedV, *markedU;
     /* markedX[i]=white if X[i] is not in the DAG
        markedX[i]=grey if X[i] has been added to the DAG, but not its successors
@@ -894,7 +894,6 @@ static int igraph_i_lad_updateMatching(int sizeOfU, int sizeOfV,
                 while (igraph_vector_int_size(&path) > 1) {
                     u = igraph_vector_int_pop_back(&path);
                     v = igraph_vector_int_pop_back(&path);
-                    w = matchedWithV[v]; /* match v with u instead of v with w */
                     VECTOR(*matchedWithU)[u] = v;
                     matchedWithV[v] = u;
                 }
