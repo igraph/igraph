@@ -604,7 +604,7 @@ static int igraph_i_lad_initDomains(bool initialDomains,
              * We init them anyway so that we can have a consistent destructor. */
             IGRAPH_VECTOR_INT_INIT_FINALLY(&D->val, 0);
             IGRAPH_VECTOR_INT_INIT_FINALLY(&D->matching, 0);
-            IGRAPH_FINALLY_CLEAN(10);
+            IGRAPH_FINALLY_CLEAN(12);
 
             return IGRAPH_SUCCESS;
         }
