@@ -627,10 +627,10 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
  *
  * \param graph The graph object.
  * \param edge_res Pointer to an initialised vector. The indices of edges
- *                 belonging to the cycle will be stored here. May be \c NULL
+ *                 belonging to the path will be stored here. May be \c NULL
  *                 if it is not needed by the caller.
  * \param vertex_res Pointer to an initialised vector. The indices of vertices
- *                   belonging to the cycle will be stored here. May be \c NULL
+ *                   belonging to the path will be stored here. May be \c NULL
  *                   if it is not needed by the caller.
  * \return Error code:
  *        \clist
