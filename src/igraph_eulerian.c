@@ -42,7 +42,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     igraph_vector_t degree, csize;
     /* boolean vector to mark singletons */
     igraph_vector_t nonsingleton;
-    long int i, j, n, vsize;
+    long int i, n, vsize;
     long int cluster_count;
     /* number of self-looping singletons */
     long int es;
@@ -161,7 +161,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
 static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
     igraph_bool_t res_weak;
     igraph_integer_t incoming_excess, outgoing_excess, n;
-    long int i, j, vsize;
+    long int i, vsize;
     long int cluster_count;
     igraph_vector_t out_degree, in_degree, csize;
     /* boolean vector to mark singletons */
