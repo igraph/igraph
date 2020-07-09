@@ -25,5 +25,30 @@
 
 int main() {
 
+    igraph_t g;
+    long int n_vertices = 10;
+
+    /* Create full graph, undirected */
+    igraph_full(&g, n_vertices, 0 /*undirected*/, 0/*no loops*/);
+
+    /* Remember to destroy the object at the end */
+    igraph_destroy(&g);
+
+    /* Create full graph, directed */
+    igraph_full(&g, n_vertices, 1 /*directed*/, 0/*no loops*/);
+
+    igraph_destroy(&g);
+
+    /* Create full graph, undirected with self loops */
+    igraph_full(&g, n_vertices, 0 /*undirected*/, 1/*loops*/);
+
+    igraph_destroy(&g);
+
+    /* Create full graph, directed with self loops */
+    igraph_full(&g, n_vertices, 1 /*directed*/, 1/*loops*/);
+
+    igraph_destroy(&g);
+
     return 0;
+
 }
