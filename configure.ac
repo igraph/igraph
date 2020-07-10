@@ -86,6 +86,64 @@ AC_MSG_RESULT(no)
 $3)
 CFLAGS="$ac_save_CFLAGS"])
 
+## Check if '\n' printed to stdout is converted to '\r\n' (e.g. on Windows)
+AC_CACHE_CHECK([whether '\n' printed to stdout is converted to '\r\n'],
+  [igraph_cv_stdout_LF2CRLF],
+  [AC_RUN_IFELSE([AC_LANG_SOURCE(
+        [[#include <stdio.h>
+        #include <stdlib.h>
+
+        int main (int argc, char **argv)
+        {
+          FILE *fp;
+          char *s, c, c_prev;
+          /* Do nothing if no argument. */
+          if (argc == 1) return 0;
+          s = argv[1];
+          /* First argument is '0'. */
+          if(s[0] == '0' && s[1] == 0) {
+            printf ("EOL\n");
+            return 0;
+          }
+          /* File name expected in first argument. Open file in binary mode. */
+          if (! (fp=fopen (s, "rb"))) {
+            perror (s);
+            return 2;
+          }
+          /* Check for CRLF. */
+          c_prev = 0;
+          while (1) {
+            c = fgetc (fp);
+            if ( c == EOF && ferror (fp)) {
+              perror (s);
+              return 2;
+            } else if ( c == EOF ) {
+              return 0;
+            } else if ( c == '\n' && c_prev == '\r' ) {
+              return 1;
+            }
+            c_prev = c;
+          }
+          return 0;
+        }]])],
+     [# run the test: redirect program's stdout to file,
+      # then check the file content by reading byte-wise.
+      ./conftest$EXEEXT 0 > conftest.txt && ./conftest$EXEEXT conftest.txt
+      case $? in
+        (0) igraph_cv_stdout_LF2CRLF=no;;
+        (1) igraph_cv_stdout_LF2CRLF=yes;;
+        (2) igraph_cv_stdout_LF2CRLF='test failed with error';;
+      esac
+      test -f conftest.txt && rm -f conftest.txt],
+     [igraph_cv_stdout_LF2CRLF='test program compilation failed'],
+     [igraph_cv_stdout_LF2CRLF='cross-compiling - test not run']
+   )])
+if test x$igraph_cv_stdout_LF2CRLF = xyes; then
+  SED_PIPE_CRLF2LF=" | $SED 's|\x0d$||g'"
+fi
+AC_SUBST([SED_PIPE_CRLF2LF])
+
+
 ## Solaris cc does not support -ffloat-store.
 FLOATSTORE=
 IGRAPH_CC_SWITCH([-ffloat-store], [FLOATSTORE="-ffloat-store"], [])
@@ -421,4 +479,5 @@ AC_MSG_RESULT([  Clang AddressSanitizer -- $use_asan])
 AC_MSG_RESULT([  Verify finally stack   -- $verify_finally])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
 AC_MSG_RESULT([  Link time optimization -- $use_lto])
+AC_MSG_RESULT([  CRLF2LF conversion     -- $igraph_cv_stdout_LF2CRLF])
 
