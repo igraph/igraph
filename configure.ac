@@ -47,9 +47,9 @@ AC_CHECK_HEADER([sys/times.h],
       [CPPFLAGS="$CPPFLAGS -DMSDOS"],
       )
 
-AC_LIBTOOL_WIN32_DLL
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+# libtool
+LT_INIT([win32-dll dlopen])
+
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
 AC_HEADER_STDC
@@ -67,23 +67,17 @@ AC_DEFUN([IGRAPH_WARNING],
 AC_SUBST(WARNING_CFLAGS)
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $1"
-AC_TRY_COMPILE(,
-[int x;],
-WARNING_CFLAGS="$WARNING_CFLAGS $1"
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int x;]])],[WARNING_CFLAGS="$WARNING_CFLAGS $1"
+AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 CFLAGS="$ac_save_CFLAGS"])
 
 AC_DEFUN([IGRAPH_CC_SWITCH],
 [AC_MSG_CHECKING(whether compiler supports $1)
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $1"
-AC_TRY_COMPILE(,
-[int x;],
-AC_MSG_RESULT(yes)
-$2,
-AC_MSG_RESULT(no)
-$3)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int x;]])],[AC_MSG_RESULT(yes)
+$2],[AC_MSG_RESULT(no)
+$3])
 CFLAGS="$ac_save_CFLAGS"])
 
 ## Check if '\n' printed to stdout is converted to '\r\n' (e.g. on Windows)
@@ -151,7 +145,7 @@ IGRAPH_CC_SWITCH([-fstore], [FLOATSTORE="$FLOATSTORE -fstore"], [])
 AC_SUBST(FLOATSTORE)
 
 AC_ARG_ENABLE(gcc-warnings,
-              AC_HELP_STRING([--enable-gcc-warnings],
+              AS_HELP_STRING([--enable-gcc-warnings],
                          [turn on lots of GCC warnings (not recommended)]),
 [case "${enableval}" in
    yes|no) ;;
@@ -181,27 +175,27 @@ fi
 
 use_gprof=no
 AC_ARG_ENABLE(profiling,
-              AC_HELP_STRING([--enable-profiling], [Enable gprof profiling]),
+              AS_HELP_STRING([--enable-profiling], [Enable gprof profiling]),
               [use_gprof=$enableval], [use_gprof=no])
 
 use_asan=no
 AC_ARG_ENABLE(asan,
-              AC_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
+              AS_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
               [use_asan=$enableval], [use_asan=no])
 
 verify_finally=no
 AC_ARG_ENABLE(verify-finally,
-              AC_HELP_STRING([--enable-verify-finally], [Enable verifying the ``finally'' stack size]),
+              AS_HELP_STRING([--enable-verify-finally], [Enable verifying the ``finally'' stack size]),
               [verify_finally=$enableval], [verify_finally=no])
 
 debug=no
 AC_ARG_ENABLE(debug,
-              AC_HELP_STRING([--enable-debug], [Enable debug build]),
+              AS_HELP_STRING([--enable-debug], [Enable debug build]),
           [debug=$enableval])
 
 graphml_support=yes
 AC_ARG_ENABLE(graphml,
-              AC_HELP_STRING([--disable-graphml], [Disable support for GraphML format]),
+              AS_HELP_STRING([--disable-graphml], [Disable support for GraphML format]),
               [graphml_support=$enableval], [graphml_support=yes])
 
 HAVE_LIBXML=0
@@ -251,7 +245,7 @@ fi
 
 AC_LANG_PUSH([C++])
 gmp_support=no
-AC_ARG_ENABLE(gmp, AC_HELP_STRING([--disable-gmp], [Compile without the GMP library]))
+AC_ARG_ENABLE(gmp, AS_HELP_STRING([--disable-gmp], [Compile without the GMP library]))
 if test "x$enable_gmp" != "xno"; then
   AC_CHECK_LIB([gmp], [__gmpz_add], [
     AC_CHECK_HEADER([gmp.h], [
@@ -267,12 +261,12 @@ AC_LANG_POP([C++])
 tls_support=no
 HAVE_TLS=0
 THREAD_LOCAL=
-AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
+AC_ARG_ENABLE(tls, AS_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
 if test "x$enable_tls" = "xyes"; then
   keywords="__thread __declspec(thread)"
   for kw in $keywords ; do
-      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw)
-      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw ; break ;)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[int $kw test;]], [[]])],[ac_cv_tls=$kw],[])
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[int $kw test;]], [[]])],[ac_cv_tls=$kw ; break ;],[])
   done
   AX_TLS([
     AC_DEFINE([HAVE_TLS], [1], [Define to 1 if you want to use thread-local storage for global igraph structures])
@@ -369,7 +363,7 @@ else
 fi
 
 glpk_support=no
-AC_ARG_ENABLE(glpk, AC_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
+AC_ARG_ENABLE(glpk, AS_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
 if test "x$enable_glpk" != "xno"; then
   if test "$internal_glpk" = "no"; then
     AC_CHECK_LIB([glpk], [glp_read_mps], [
