@@ -549,11 +549,19 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                         if (nrgeo[neighbor] != 0) {
                             /* we've already seen this node, another shortest path? */
                             if (distance[neighbor] == distance[actnode] + 1) {
-                                nrgeo[neighbor] += nrgeo[actnode];
+                                unsigned long long int tot = nrgeo[neighbor] + nrgeo[actnode];
+                                if (tot < nrgeo[neighbor]) {
+                                    IGRAPH_ERROR("unsigned long long int overflow in geodesics", IGRAPH_EINTOVERFLOW);
+                                }
+                                nrgeo[neighbor] = tot;
                             }
                         } else {
                             /* we haven't seen this node yet */
-                            nrgeo[neighbor] += nrgeo[actnode];
+                            unsigned long long int tot = nrgeo[neighbor] + nrgeo[actnode];
+                            if (tot < nrgeo[neighbor]) {
+                                IGRAPH_ERROR("unsigned long long int overflow in geodesics", IGRAPH_EINTOVERFLOW);
+                            }
+                            nrgeo[neighbor] = tot;
                             distance[neighbor] = distance[actnode] + 1;
                             IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
                             IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
@@ -638,9 +646,13 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                             IGRAPH_CHECK(igraph_2wheap_modify(&heap, to, -altdist));
                         } else if (altdist == curdist - 1) {
                             /* Another path with the same length */
+                            unsigned long long int tot = nrgeo[to] + nrgeo[minnei];
+                            if (tot < nrgeo[to]) {
+                                IGRAPH_ERROR("unsigned long long int overflow in geodesics", IGRAPH_EINTOVERFLOW);
+                            }
+                            nrgeo[to] = tot;
                             v = igraph_inclist_get(&fathers, to);
                             igraph_vector_int_push_back(v, edge);
-                            nrgeo[to] += nrgeo[minnei];
                         }
                     }
                 } /* igraph_2wheap_empty(&Q) */
