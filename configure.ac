@@ -16,7 +16,7 @@ PKGCONFIG_LIBS_PRIVATE="-lxml2 -lz -lm"
 AC_SUBST(PKGCONFIG_LIBS_PRIVATE)
 
 # Test suite
-AC_CONFIG_TESTDIR(tests)
+AC_CONFIG_TESTDIR([tests],[$ac_abs_top_builddir/src/$objdir])
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 
 # Don't allow AC_PROG_CC to set a default CFLAGS or CXXFLAGS
