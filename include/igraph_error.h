@@ -328,6 +328,7 @@ DECLDIR igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t*
  * \enumval IGRAPH_CPUTIME CPU time exceeded.
  * \enumval IGRAPH_EUNDERFLOW Integer or double underflow.
  * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
+ * \enumval IGRAPH_EINTOVERFLOW Integer overflow
  */
 
 typedef enum {
@@ -390,7 +391,8 @@ typedef enum {
     IGRAPH_CPUTIME           = 57,
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
-    IGRAPH_STOP              = 60  /* undocumented, used internally; signals a request to stop in functions like igraph_i_maximal_cliques_bk */
+    IGRAPH_STOP              = 60,  /* undocumented, used internally; signals a request to stop in functions like igraph_i_maximal_cliques_bk */
+    IGRAPH_EINTOVERFLOW      = 61
 } igraph_error_type_t;
 /* Each enum value above must have a corresponding error string in
  * igraph_i_error_strings[] in igraph_error.c */

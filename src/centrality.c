@@ -2450,12 +2450,21 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
                 if (nrgeo[neighbor] != 0) {
                     /* we've already seen this node, another shortest path? */
                     if (distance[neighbor] == distance[actnode] + 1) {
-                        nrgeo[neighbor] += nrgeo[actnode];
+                        /* check for overflow */
+                        unsigned long long int tot = nrgeo[neighbor] + nrgeo[actnode];
+                        if (tot < nrgeo[neighbor]) {
+                            IGRAPH_ERROR("unsigned long long int overflow in geodesics", IGRAPH_EINTOVERFLOW);
+                        }
+                        nrgeo[neighbor] = tot;
                     }
                 } else if (distance[actnode] + 1 <= cutoff || cutoff < 0) {
                     /* we haven't seen this node yet, but we only consider
                      * it if it is not more distant than the cutoff. */
-                    nrgeo[neighbor] += nrgeo[actnode];
+                    unsigned long long int tot = nrgeo[neighbor] + nrgeo[actnode];
+                    if (tot < nrgeo[neighbor]) {
+                        IGRAPH_ERROR("unsigned long long int overflow in geodesics", IGRAPH_EINTOVERFLOW);
+                    }
+                    nrgeo[neighbor] = tot;
                     distance[neighbor] = distance[actnode] + 1;
                     IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
                 }
