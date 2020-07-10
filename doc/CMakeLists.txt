@@ -1,5 +1,3 @@
-find_package(PYTHON)
-
 # Specify the list of .xml files that are used as-is
 set(
   DOCBOOK_SOURCES
@@ -12,16 +10,6 @@ set(
   pmt.xml
   tutorial.xml
 )
-set(DOCBOOK_OUTPUTS "")
-
-# Specify that each DocBook .xml file is to be copied to the build folder
-# TODO(ntamas): currently this works with out-of-tree builds only
-set(IGRAPH_VERSION ${PACKAGE_VERSION})   # for replacement in igraph-docs.xml
-foreach(DOCBOOK_SOURCE ${DOCBOOK_SOURCES})
-  set(DOCBOOK_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${DOCBOOK_SOURCE}")
-  list(APPEND DOCBOOK_OUTPUTS "${DOCBOOK_OUTPUT}")
-  configure_file(${DOCBOOK_SOURCE} ${DOCBOOK_OUTPUT})
-endforeach()
 
 # Specify the list of .xxml files that have to be piped through doxrox to
 # obtain the final set of .xml files that serve as an input to DocBook
@@ -67,7 +55,6 @@ set(
   vector.xxml
   visitors.xxml
 )
-set(DOXROX_OUTPUTS "")
 
 # Specify the igraph source files that may contain documentation chunks
 file(
@@ -81,10 +68,74 @@ file(
   ${CMAKE_SOURCE_DIR}/src/*.h
   ${CMAKE_SOURCE_DIR}/src/*.pmt
 )
-if(Python_FOUND)
+
+# Specify the igraph source files that are used as examples in the
+# documentation
+file(
+  GLOB DOCBOOK_EXAMPLES
+  LIST_DIRECTORIES FALSE
+  RELATIVE ${CMAKE_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/examples/simple/*.c
+  ${CMAKE_SOURCE_DIR}/examples/tests/*.c
+)
+
+# You should not need to change anything below this line if you are simply
+# trying to add new files to produce documentation from
+
+# Documentation build requires Python and DocBook
+find_package(PYTHON)
+find_program(SOURCE_HIGHLIGHT source-highlight)
+find_program(XMLTO xmlto)
+
+set(DOC_BUILD_SUPPORTED Python_FOUND AND XMLTO AND SOURCE_HIGHLIGHT)
+
+if(DOC_BUILD_SUPPORTED)
   set(DOXROX_COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
   set(DOXROX_RULES ${CMAKE_CURRENT_SOURCE_DIR}/c-docbook.re)
   set(DOXROX_CHUNKS ${CMAKE_CURRENT_BINARY_DIR}/chunks.pickle)
+
+  set(HTML_STAMP ${CMAKE_CURRENT_BINARY_DIR}/html/stamp)
+
+  set(DOCBOOK_INPUTS "")
+  set(DOXROX_OUTPUTS "")
+
+  # Specify that each DocBook .xml file is to be copied to the build folder
+  # TODO(ntamas): currently this works with out-of-tree builds only
+  set(IGRAPH_VERSION ${PACKAGE_VERSION})   # for replacement in igraph-docs.xml
+  foreach(DOCBOOK_SOURCE ${DOCBOOK_SOURCES})
+    set(DOCBOOK_INPUT "${CMAKE_CURRENT_BINARY_DIR}/${DOCBOOK_SOURCE}")
+    list(APPEND DOCBOOK_INPUTS "${DOCBOOK_INPUT}")
+    configure_file(${DOCBOOK_SOURCE} ${DOCBOOK_INPUT})
+  endforeach()
+
+  # Specify that each example source file is to be piped through source-higlight
+  # to produce an .xml representation that can be used in the DocBook
+  # documentation
+  foreach(DOCBOOK_EXAMPLE_SOURCE ${DOCBOOK_EXAMPLES})
+    string(REGEX REPLACE "[.]c$" ".c.xml" DOCBOOK_EXAMPLE_OUTPUT ${DOCBOOK_EXAMPLE_SOURCE})
+    set(COMMENT "Highlighting source code in ${DOCBOOK_EXAMPLE_SOURCE}")
+
+    set(DOCBOOK_EXAMPLE_OUTPUT "${CMAKE_BINARY_DIR}/${DOCBOOK_EXAMPLE_SOURCE}.xml")
+    list(APPEND DOCBOOK_INPUTS "${DOCBOOK_EXAMPLE_OUTPUT}")
+
+    get_filename_component(DOCBOOK_EXAMPLE_OUTPUT_DIR "${DOCBOOK_EXAMPLE_OUTPUT}" DIRECTORY)
+
+    add_custom_command(
+      OUTPUT ${DOCBOOK_EXAMPLE_OUTPUT}
+      COMMAND ${CMAKE_COMMAND} -E make_directory ${DOCBOOK_EXAMPLE_OUTPUT_DIR}
+      COMMAND ${SOURCE_HIGHLIGHT}
+      ARGS
+      --src-lang c
+      --out-format docbook
+      --input ${CMAKE_SOURCE_DIR}/${DOCBOOK_EXAMPLE_SOURCE}
+      --output ${DOCBOOK_EXAMPLE_OUTPUT}
+      # --gen-references inline
+      # --ctags=""
+      --outlang-def ${CMAKE_SOURCE_DIR}/doc/docbook.outlang
+      MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/${DOCBOOK_EXAMPLE_SOURCE}
+      COMMENT ${COMMENT}
+    )
+  endforeach()
 
   foreach(DOXROX_SOURCE ${DOXROX_SOURCES})
     string(REGEX REPLACE "[.]xxml$" ".xml" DOXROX_OUTPUT ${DOXROX_SOURCE})
@@ -118,12 +169,19 @@ if(Python_FOUND)
     COMMENT "Parsing documentation chunks from source code"
   )
 
+  add_custom_command(
+    OUTPUT ${HTML_STAMP}
+    COMMAND ${XMLTO} -x ${CMAKE_CURRENT_SOURCE_DIR}/gtk-doc.xsl -o html xhtml igraph-docs.xml
+    COMMAND ${CMAKE_COMMAND} -E touch ${HTML_STAMP}
+    MAIN_DEPENDENCY igraph-docs.xml
+    DEPENDS ${DOXROX_OUTPUTS} ${DOCBOOK_INPUTS}
+    COMMENT "Generating HTML documentation with xmlto"
+  )
+
   add_custom_target(
     doc
-    DEPENDS
-    ${DOXROX_OUTPUTS}
-	${DOCBOOK_OUTPUTS}
+    DEPENDS ${HTML_STAMP}
     COMMENT
     "Built DocBook XML files for the documentation"
   )
-endif(Python_FOUND)
+endif()
