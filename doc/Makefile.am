@@ -223,8 +223,10 @@ graphlets.xml: graphlets.xxml $(SRCDIR)/glet.c
 
 html/stamp: igraph-docs0.xml $(DOCFIX2) gtk-doc.xsl
 	if [ "x$(top_srcdir)" != "x$(top_builddir)" ]; then cp $(DOCFIX2) . ; fi && \
-	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs0.xml \
-	&& touch html/stamp
+	xmlto -x $(top_srcdir)/doc/gtk-doc.xsl -o html xhtml igraph-docs0.xml && \
+	sed -i "/class=\"toc\"/i `cat $(top_srcdir)/doc/search_box.html`" $(top_srcdir)/doc/html/index.html
+
+	touch html/stamp
 
 jekyll/stamp: html/stamp
 	rm -rf jekyll && mkdir jekyll && cp html/* jekyll/ && rm jekyll/stamp
