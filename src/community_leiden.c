@@ -610,16 +610,19 @@ static int igraph_i_community_leiden_aggregate(
 
     }
 
-    IGRAPH_CHECK(igraph_create(aggregated_graph, &aggregated_edges, nb_refined_clusters,
-                               IGRAPH_UNDIRECTED));
-
     igraph_vector_destroy(&neighbor_clusters);
     igraph_vector_bool_destroy(&neighbor_cluster_added);
     igraph_vector_destroy(&edge_weight_to_cluster);
-    igraph_vector_destroy(&aggregated_edges);
     igraph_vector_ptr_destroy_all(&refined_clusters);
 
-    IGRAPH_FINALLY_CLEAN(5);
+    IGRAPH_FINALLY_CLEAN(4);
+
+    IGRAPH_CHECK(igraph_create(aggregated_graph, &aggregated_edges, nb_refined_clusters,
+                               IGRAPH_UNDIRECTED));
+
+    igraph_vector_destroy(&aggregated_edges);
+
+    IGRAPH_FINALLY_CLEAN(1);
 
     return IGRAPH_SUCCESS;
 }
