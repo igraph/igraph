@@ -455,7 +455,28 @@ if test "$verify_finally" = "no"; then
   CPPFLAGS="${CPPFLAGS} -DIGRAPH_VERIFY_FINALLY_STACK=0"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile])
+
+# Generate header files (using script ./config.status), but update only upon changes.
+dnl NB: Approach requires AC_CONFIG_FILES to be called in configure.ac.
+AC_CONFIG_COMMANDS_POST([
+  for _h in include/igraph_version.h include/igraph_threading.h; do
+    AC_MSG_CHECKING([whether to generate header file $_h])
+    ./config.status --file=$_h.tmp:$_h.in > /dev/null 2>&1
+    if ! test -f $_h; then
+      mv $_h.tmp $_h
+      AC_MSG_RESULT([generated])
+    elif diff $_h $_h.tmp > /dev/null 2>&1; then
+      rm -f $_h.tmp
+      AC_MSG_RESULT([unchanged])
+    else
+      rm -f $_h
+      mv $_h.tmp $_h
+      AC_MSG_RESULT([updated])
+    fi
+  done
+])
+
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
