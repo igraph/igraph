@@ -83,7 +83,7 @@ file(
 # trying to add new files to produce documentation from
 
 # Documentation build requires Python and source-highlight
-find_package(PYTHON)
+find_package(Python3)
 find_program(SOURCE_HIGHLIGHT source-highlight)
 
 # HTML documentation additionally requires xmlto from DocBook
@@ -94,12 +94,12 @@ find_program(FOP fop)
 find_program(XMLLINT xmllint)
 find_program(XSLTPROC xsltproc)
 
-set(DOC_BUILD_SUPPORTED Python_FOUND AND SOURCE_HIGHLIGHT)
+set(DOC_BUILD_SUPPORTED Python3_FOUND AND SOURCE_HIGHLIGHT)
 set(HTML_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLTO)
 set(PDF_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLLINT AND XSLTPROC AND FOP)
 
 if(DOC_BUILD_SUPPORTED)
-  set(DOXROX_COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
+  set(DOXROX_COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
   set(DOXROX_RULES ${CMAKE_CURRENT_SOURCE_DIR}/c-docbook.re)
   set(DOXROX_CHUNKS ${CMAKE_CURRENT_BINARY_DIR}/chunks.pickle)
 
