@@ -95,8 +95,8 @@ find_program(XMLLINT xmllint)
 find_program(XSLTPROC xsltproc)
 
 set(DOC_BUILD_SUPPORTED Python_FOUND AND SOURCE_HIGHLIGHT)
-set(HTML_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLTO PARENT_SCOPE)
-set(PDF_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLLINT AND XSLTPROC AND FOP PARENT_SCOPE)
+set(HTML_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLTO)
+set(PDF_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLLINT AND XSLTPROC AND FOP)
 
 if(DOC_BUILD_SUPPORTED)
   set(DOXROX_COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
@@ -197,16 +197,19 @@ if(DOC_BUILD_SUPPORTED)
   )
 
   if(HTML_DOC_BUILD_SUPPORTED)
-    set(HTML_TARGET ${CMAKE_CURRENT_BINARY_DIR}/html/stamp)
+    set(HTML_STAMP ${CMAKE_CURRENT_BINARY_DIR}/html/stamp)
 
     add_custom_command(
-      OUTPUT ${HTML_TARGET}
+      OUTPUT ${HTML_STAMP}
       COMMAND ${XMLTO} -x ${CMAKE_CURRENT_SOURCE_DIR}/gtk-doc.xsl -o html xhtml igraph-docs.xml
-      COMMAND ${CMAKE_COMMAND} -E touch ${HTML_TARGET}
+      COMMAND ${CMAKE_COMMAND} -E touch ${HTML_STAMP}
       MAIN_DEPENDENCY igraph-docs.xml
       DEPENDS ${DOCBOOK_INPUTS}
       COMMENT "Generating HTML documentation with xmlto"
     )
+
+    add_custom_target(html DEPENDS ${HTML_STAMP})
+    set(HTML_TARGET html)
   endif()
 
   if(PDF_DOC_BUILD_SUPPORTED)
@@ -242,8 +245,12 @@ if(DOC_BUILD_SUPPORTED)
       COMMENT "Generating PDF documentation with Apache FOP"
     )
 
-    set(PDF_TARGET igraph-docs.pdf)
+    add_custom_target(pdf DEPENDS igraph-docs.pdf)
+    set(PDF_TARGET pdf)
   endif()
 
   add_custom_target(doc DEPENDS ${HTML_TARGET} ${PDF_TARGET})
 endif()
+
+set(HTML_DOC_BUILD_SUPPORTED ${HTML_DOC_BUILD_SUPPORTED} PARENT_SCOPE)
+set(PDF_DOC_BUILD_SUPPORTED ${PDF_DOC_BUILD_SUPPORTED} PARENT_SCOPE)

@@ -59,14 +59,14 @@ jobs:
         - cd build
         - /usr/bin/cmake .. -DIGRAPH_VERIFY_FINALLY_STACK=1
         - make
-#    - name: "Linux x87"
-#      os: linux
-#      env:
-#        - CFLAGS="-mfpmath=387" CXXFLAGS="-mfpmath=387"
-#      install:
-#        - ./bootstrap.sh
-#        - ./configure --enable-verify-finally --with-external-glpk
-#        - make
+    - name: "Linux x87"
+      os: linux
+      env:
+        - CFLAGS="-mfpmath=387" CXXFLAGS="-mfpmath=387"
+      install:
+        - mkdir build
+        - cd build
+        - cmake .. -DCMAKE_VERBOSE_MAKEFILE=1
     - name: "macOS"
       os: osx
       osx_image: xcode11.5    # we need a newer CMake in the image
@@ -75,16 +75,15 @@ jobs:
         - cd build
         - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1 -DUSE_SANITIZER=Address\;Undefined
         - make
-#    - name: "Documentation"
-#      language: shell
-#      os: linux
-#      install:
-#        - ./bootstrap.sh
-#        - ./configure
-#        - cd doc
-#      script:
-#        - make html
-#        - make pdf
+    - name: "Documentation"
+      language: shell
+      os: linux
+      install:
+        - mkdir build
+        - cd build
+        - cmake ..
+      script:
+        - make doc
 
 notifications:
   email:
