@@ -66,7 +66,7 @@ jobs:
       install:
         - mkdir build
         - cd build
-        - cmake .. -DCMAKE_VERBOSE_MAKEFILE=1
+        - /usr/bin/cmake .. -DCMAKE_VERBOSE_MAKEFILE=1
     - name: "macOS"
       os: osx
       osx_image: xcode11.5    # we need a newer CMake in the image
@@ -81,7 +81,7 @@ jobs:
       install:
         - mkdir build
         - cd build
-        - cmake ..
+        - /usr/bin/cmake ..
       script:
         - make doc
 
