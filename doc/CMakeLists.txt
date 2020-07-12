@@ -97,7 +97,6 @@ if(DOC_BUILD_SUPPORTED)
   set(HTML_STAMP ${CMAKE_CURRENT_BINARY_DIR}/html/stamp)
 
   set(DOCBOOK_INPUTS "")
-  set(DOXROX_OUTPUTS "")
 
   # Specify that each DocBook .xml file is to be copied to the build folder
   # TODO(ntamas): currently this works with out-of-tree builds only
@@ -107,6 +106,46 @@ if(DOC_BUILD_SUPPORTED)
     list(APPEND DOCBOOK_INPUTS "${DOCBOOK_INPUT}")
     configure_file(${DOCBOOK_SOURCE} ${DOCBOOK_INPUT})
   endforeach()
+
+  # Specify that .xxml files should be piped through doxrox.py to get a
+  # DocBook-compatible .xml file. This step inserts the documentation chunks
+  # extracted from the igraph source to the DocBook sources
+  foreach(DOXROX_SOURCE ${DOXROX_SOURCES})
+    string(REGEX REPLACE "[.]xxml$" ".xml" DOXROX_OUTPUT ${DOXROX_SOURCE})
+    set(COMMENT "Generating ${DOXROX_OUTPUT} from ${DOXROX_SOURCE}")
+
+    string(PREPEND DOXROX_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/")
+    list(APPEND DOCBOOK_INPUTS "${DOXROX_OUTPUT}")
+
+    add_custom_command(
+      OUTPUT ${DOXROX_OUTPUT}
+      COMMAND ${DOXROX_COMMAND}
+      ARGS
+      -t ${CMAKE_CURRENT_SOURCE_DIR}/${DOXROX_SOURCE}
+      --chunks ${DOXROX_CHUNKS}
+      -o ${DOXROX_OUTPUT}
+      MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOXROX_SOURCE}
+      DEPENDS ${DOXROX_CHUNKS}
+      COMMENT ${COMMENT}
+    )
+  endforeach()
+
+  # When all .xxml and .xml files have been processed, we have to send them
+  # through a custom Python script that extracts the ID references and produces
+  # a ctags-compatible "tags" file. This will then be used later by
+  # source-highlight to cross-reference the known tokens from the source code
+  # of the examples
+  list(JOIN DOCBOOK_INPUTS ";" DOCBOOK_INPUTS_AS_STRING)
+  add_custom_command(
+    OUTPUT tags
+    COMMAND ${CMAKE_COMMAND}
+    ARGS
+    -DINPUT_FILES="${DOCBOOK_INPUTS_AS_STRING}"
+    -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/tags
+    -P ${CMAKE_SOURCE_DIR}/etc/cmake/generate_tags_file.cmake
+    DEPENDS ${DOCBOOK_INPUTS}
+    COMMENT "Creating tags file from DocBook xmls"
+  )
 
   # Specify that each example source file is to be piped through source-higlight
   # to produce an .xml representation that can be used in the DocBook
@@ -129,30 +168,11 @@ if(DOC_BUILD_SUPPORTED)
       --out-format docbook
       --input ${CMAKE_SOURCE_DIR}/${DOCBOOK_EXAMPLE_SOURCE}
       --output ${DOCBOOK_EXAMPLE_OUTPUT}
-      # --gen-references inline
-      # --ctags=""
+      --gen-references inline
+      --ctags=""
       --outlang-def ${CMAKE_SOURCE_DIR}/doc/docbook.outlang
       MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/${DOCBOOK_EXAMPLE_SOURCE}
-      COMMENT ${COMMENT}
-    )
-  endforeach()
-
-  foreach(DOXROX_SOURCE ${DOXROX_SOURCES})
-    string(REGEX REPLACE "[.]xxml$" ".xml" DOXROX_OUTPUT ${DOXROX_SOURCE})
-    set(COMMENT "Generating ${DOXROX_OUTPUT} from ${DOXROX_SOURCE}")
-
-    string(PREPEND DOXROX_OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/")
-    list(APPEND DOXROX_OUTPUTS "${DOXROX_OUTPUT}")
-
-    add_custom_command(
-      OUTPUT ${DOXROX_OUTPUT}
-      COMMAND ${DOXROX_COMMAND}
-      ARGS
-      -t ${CMAKE_CURRENT_SOURCE_DIR}/${DOXROX_SOURCE}
-      --chunks ${DOXROX_CHUNKS}
-      -o ${DOXROX_OUTPUT}
-      MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${DOXROX_SOURCE}
-      DEPENDS ${DOXROX_CHUNKS}
+      DEPENDS tags
       COMMENT ${COMMENT}
     )
   endforeach()
@@ -174,7 +194,7 @@ if(DOC_BUILD_SUPPORTED)
     COMMAND ${XMLTO} -x ${CMAKE_CURRENT_SOURCE_DIR}/gtk-doc.xsl -o html xhtml igraph-docs.xml
     COMMAND ${CMAKE_COMMAND} -E touch ${HTML_STAMP}
     MAIN_DEPENDENCY igraph-docs.xml
-    DEPENDS ${DOXROX_OUTPUTS} ${DOCBOOK_INPUTS}
+    DEPENDS ${DOCBOOK_INPUTS}
     COMMENT "Generating HTML documentation with xmlto"
   )
 
