@@ -53,10 +53,14 @@ foreach(DEPENDENCY ${ALL_DEPENDENCIES})
 endforeach()
 message(STATUS " ")
 
+message(STATUS "--------[ Documentation ]-------")
+print_bool("HTML" HTML_DOC_BUILD_SUPPORTED)
+print_bool("PDF" PDF_DOC_BUILD_SUPPORTED)
+message(STATUS " ")
+
 message(STATUS "----------[ Debugging ]---------")
 print_str("Sanitizers" "${USE_SANITIZER}" "none")
 print_bool("Verify 'finally' stack" IGRAPH_VERIFY_FINALLY_STACK)
-
 message(STATUS " ")
 
 set(MISSING_DEPENDENCIES)

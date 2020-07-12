@@ -82,9 +82,11 @@ file(
 # You should not need to change anything below this line if you are simply
 # trying to add new files to produce documentation from
 
-# Documentation build requires Python and DocBook
+# Documentation build requires Python and source-highlight
 find_package(PYTHON)
 find_program(SOURCE_HIGHLIGHT source-highlight)
+
+# HTML documentation additionally requires xmlto from DocBook
 find_program(XMLTO xmlto)
 
 # PDF documentation additionally requires xsltproc, xmllint and Apache FOP
@@ -92,15 +94,14 @@ find_program(FOP fop)
 find_program(XMLLINT xmllint)
 find_program(XSLTPROC xsltproc)
 
-set(DOC_BUILD_SUPPORTED Python_FOUND AND XMLTO AND SOURCE_HIGHLIGHT)
-set(PDF_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLLINT AND XSLTPROC AND FOP)
+set(DOC_BUILD_SUPPORTED Python_FOUND AND SOURCE_HIGHLIGHT)
+set(HTML_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLTO PARENT_SCOPE)
+set(PDF_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLLINT AND XSLTPROC AND FOP PARENT_SCOPE)
 
 if(DOC_BUILD_SUPPORTED)
   set(DOXROX_COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
   set(DOXROX_RULES ${CMAKE_CURRENT_SOURCE_DIR}/c-docbook.re)
   set(DOXROX_CHUNKS ${CMAKE_CURRENT_BINARY_DIR}/chunks.pickle)
-
-  set(HTML_STAMP ${CMAKE_CURRENT_BINARY_DIR}/html/stamp)
 
   set(DOCBOOK_INPUTS "")
 
@@ -195,14 +196,18 @@ if(DOC_BUILD_SUPPORTED)
     COMMENT "Parsing documentation chunks from source code"
   )
 
-  add_custom_command(
-    OUTPUT ${HTML_STAMP}
-    COMMAND ${XMLTO} -x ${CMAKE_CURRENT_SOURCE_DIR}/gtk-doc.xsl -o html xhtml igraph-docs.xml
-    COMMAND ${CMAKE_COMMAND} -E touch ${HTML_STAMP}
-    MAIN_DEPENDENCY igraph-docs.xml
-    DEPENDS ${DOCBOOK_INPUTS}
-    COMMENT "Generating HTML documentation with xmlto"
-  )
+  if(HTML_DOC_BUILD_SUPPORTED)
+    set(HTML_TARGET ${CMAKE_CURRENT_BINARY_DIR}/html/stamp)
+
+    add_custom_command(
+      OUTPUT ${HTML_TARGET}
+      COMMAND ${XMLTO} -x ${CMAKE_CURRENT_SOURCE_DIR}/gtk-doc.xsl -o html xhtml igraph-docs.xml
+      COMMAND ${CMAKE_COMMAND} -E touch ${HTML_TARGET}
+      MAIN_DEPENDENCY igraph-docs.xml
+      DEPENDS ${DOCBOOK_INPUTS}
+      COMMENT "Generating HTML documentation with xmlto"
+    )
+  endif()
 
   if(PDF_DOC_BUILD_SUPPORTED)
     add_custom_command(
@@ -240,5 +245,5 @@ if(DOC_BUILD_SUPPORTED)
     set(PDF_TARGET igraph-docs.pdf)
   endif()
 
-  add_custom_target(doc DEPENDS ${HTML_STAMP} ${PDF_TARGET})
+  add_custom_target(doc DEPENDS ${HTML_TARGET} ${PDF_TARGET})
 endif()
