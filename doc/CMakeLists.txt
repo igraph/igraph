@@ -87,7 +87,13 @@ find_package(PYTHON)
 find_program(SOURCE_HIGHLIGHT source-highlight)
 find_program(XMLTO xmlto)
 
+# PDF documentation additionally requires xsltproc, xmllint and Apache FOP
+find_program(FOP fop)
+find_program(XMLLINT xmllint)
+find_program(XSLTPROC xsltproc)
+
 set(DOC_BUILD_SUPPORTED Python_FOUND AND XMLTO AND SOURCE_HIGHLIGHT)
+set(PDF_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLLINT AND XSLTPROC AND FOP)
 
 if(DOC_BUILD_SUPPORTED)
   set(DOXROX_COMMAND ${Python_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
@@ -137,7 +143,7 @@ if(DOC_BUILD_SUPPORTED)
   # of the examples
   list(JOIN DOCBOOK_INPUTS ";" DOCBOOK_INPUTS_AS_STRING)
   add_custom_command(
-    OUTPUT tags
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/tags"
     COMMAND ${CMAKE_COMMAND}
     ARGS
     -DINPUT_FILES="${DOCBOOK_INPUTS_AS_STRING}"
@@ -198,10 +204,41 @@ if(DOC_BUILD_SUPPORTED)
     COMMENT "Generating HTML documentation with xmlto"
   )
 
-  add_custom_target(
-    doc
-    DEPENDS ${HTML_STAMP}
-    COMMENT
-    "Built DocBook XML files for the documentation"
-  )
+  if(PDF_DOC_BUILD_SUPPORTED)
+    add_custom_command(
+      OUTPUT igraph-docs-with-resolved-includes.xml
+      COMMAND ${XMLLINT}
+      ARGS
+      --xinclude
+      --output igraph-docs-with-resolved-includes.xml
+      igraph-docs.xml
+      MAIN_DEPENDENCY igraph-docs.xml
+      DEPENDS ${DOCBOOK_INPUTS}
+      COMMENT "Resolving includes in DocBook XML source"
+    )
+
+    add_custom_command(
+      OUTPUT igraph-docs.fo
+      COMMAND ${XSLTPROC}
+      ARGS
+      --output igraph-docs.fo
+      --stringparam paper.type A4
+      http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl
+      igraph-docs-with-resolved-includes.xml
+      MAIN_DEPENDENCY igraph-docs-with-resolved-includes.xml
+      COMMENT "Converting DocBook XML to Apache FOP format"
+    )
+
+    add_custom_command(
+      OUTPUT igraph-docs.pdf
+      COMMAND ${FOP}
+      ARGS -fo igraph-docs.fo -pdf igraph-docs.pdf
+      MAIN_DEPENDENCY igraph-docs.fo
+      COMMENT "Generating PDF documentation with Apache FOP"
+    )
+
+    set(PDF_TARGET igraph-docs.pdf)
+  endif()
+
+  add_custom_target(doc DEPENDS ${HTML_STAMP} ${PDF_TARGET})
 endif()
