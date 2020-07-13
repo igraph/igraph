@@ -22,58 +22,30 @@
 */
 
 #include <igraph.h>
+#include "test_utilities.inc"
 
 int main() {
-
     igraph_t g;
     long int n_vertices = 10;
-    long int i, m;
 
     printf("Undirected, no loops\n");
     igraph_full(&g, n_vertices, 0 /*undirected*/, 0/*no loops*/);
-    m = igraph_ecount(&g);
-    for(i=0; i<m; i++) {
-	igraph_integer_t from, to;
-	igraph_integer_t edge = (igraph_integer_t) i;
-        igraph_edge(&g, edge, &from, &to);
-	printf("%li %li\n", (long int) from, (long int) to);
-    }
-    printf("\n");
+    print_graph(&g, stdout);
     igraph_destroy(&g);
 
     printf("Directed, no loops\n");
     igraph_full(&g, n_vertices, 1 /*directed*/, 0/*no loops*/);
-    m = igraph_ecount(&g);
-    for(i=0; i<m; i++) {
-	igraph_integer_t from, to;
-	igraph_integer_t edge = (igraph_integer_t) i;
-        igraph_edge(&g, edge, &from, &to);
-	printf("%li %li\n", (long int) from, (long int) to);
-    }
-    printf("\n");
+    print_graph(&g, stdout);
     igraph_destroy(&g);
 
     printf("Undirected, with loops\n");
     igraph_full(&g, n_vertices, 0 /*undirected*/, 1/*loops*/);
-    m = igraph_ecount(&g);
-    for(i=0; i<m; i++) {
-	igraph_integer_t from, to;
-	igraph_integer_t edge = (igraph_integer_t) i;
-        igraph_edge(&g, edge, &from, &to);
-	printf("%li %li\n", (long int) from, (long int) to);
-    }
-    printf("\n");
+    print_graph(&g, stdout);
     igraph_destroy(&g);
 
     printf("Directed, with loops\n");
     igraph_full(&g, n_vertices, 1 /*directed*/, 1/*loops*/);
-    m = igraph_ecount(&g);
-    for(i=0; i<m; i++) {
-	igraph_integer_t from, to;
-	igraph_integer_t edge = (igraph_integer_t) i;
-        igraph_edge(&g, edge, &from, &to);
-	printf("%li %li\n", (long int) from, (long int) to);
-    }
+    print_graph(&g, stdout);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
