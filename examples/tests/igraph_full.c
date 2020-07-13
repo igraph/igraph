@@ -22,32 +22,33 @@
 */
 
 #include <igraph.h>
+#include "test_utilities.inc"
 
 int main() {
-
     igraph_t g;
     long int n_vertices = 10;
 
-    /* Create full graph, undirected */
+    printf("Undirected, no loops\n");
     igraph_full(&g, n_vertices, 0 /*undirected*/, 0/*no loops*/);
-
-    /* Remember to destroy the object at the end */
+    print_graph(&g, stdout);
     igraph_destroy(&g);
 
-    /* Create full graph, directed */
+    printf("Directed, no loops\n");
     igraph_full(&g, n_vertices, 1 /*directed*/, 0/*no loops*/);
-
+    print_graph(&g, stdout);
     igraph_destroy(&g);
 
-    /* Create full graph, undirected with self loops */
+    printf("Undirected, with loops\n");
     igraph_full(&g, n_vertices, 0 /*undirected*/, 1/*loops*/);
-
+    print_graph(&g, stdout);
     igraph_destroy(&g);
 
-    /* Create full graph, directed with self loops */
+    printf("Directed, with loops\n");
     igraph_full(&g, n_vertices, 1 /*directed*/, 1/*loops*/);
-
+    print_graph(&g, stdout);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 
