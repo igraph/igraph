@@ -37,6 +37,6 @@ namespace prpack {
             void normalize_weights();
     };
 
-};
+}
 
 #endif

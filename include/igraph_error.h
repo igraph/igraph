@@ -217,7 +217,7 @@ typedef void igraph_error_handler_t (const char * reason, const char * file,
  * program.
  */
 
-extern igraph_error_handler_t igraph_error_handler_abort;
+DECLDIR igraph_error_handler_t igraph_error_handler_abort;
 
 /**
  * \var igraph_error_handler_ignore
@@ -227,7 +227,7 @@ extern igraph_error_handler_t igraph_error_handler_abort;
  * with the error code.
  */
 
-extern igraph_error_handler_t igraph_error_handler_ignore;
+DECLDIR igraph_error_handler_t igraph_error_handler_ignore;
 
 /**
  * \var igraph_error_handler_printignore
@@ -237,7 +237,7 @@ extern igraph_error_handler_t igraph_error_handler_ignore;
  * standard error and returns with the error code.
  */
 
-extern igraph_error_handler_t igraph_error_handler_printignore;
+DECLDIR igraph_error_handler_t igraph_error_handler_printignore;
 
 /**
  * \function igraph_set_error_handler
@@ -330,7 +330,7 @@ DECLDIR igraph_error_handler_t* igraph_set_error_handler(igraph_error_handler_t*
  * \enumval IGRAPH_ERWSTUCK Random walk got stuck.
  */
 
-typedef enum {    
+typedef enum {
     IGRAPH_SUCCESS           = 0,
     IGRAPH_FAILURE           = 1,
     IGRAPH_ENOMEM            = 2,
@@ -390,7 +390,7 @@ typedef enum {
     IGRAPH_CPUTIME           = 57,
     IGRAPH_EUNDERFLOW        = 58,
     IGRAPH_ERWSTUCK          = 59,
-    IGRAPH_STOP              = 60, /* undocumented, used internally; signals a request to stop in functions like igraph_i_maximal_cliques_bk */
+    IGRAPH_STOP              = 60  /* undocumented, used internally; signals a request to stop in functions like igraph_i_maximal_cliques_bk */
 } igraph_error_type_t;
 /* Each enum value above must have a corresponding error string in
  * igraph_i_error_strings[] in igraph_error.c */
@@ -564,7 +564,13 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  */
 
 #define IGRAPH_FINALLY(func,ptr) \
-    IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr))
+    { \
+        /* the following branch makes the compiler check the compatibility of \
+         * func and ptr to detect cases when we are accidentally invoking an \
+         * incorrect destructor function with the pointer */ \
+        if (0) { func(ptr); } \
+        IGRAPH_FINALLY_REAL((igraph_finally_func_t*)(func), (ptr)); \
+    }
 
 #if !defined(GCC_VERSION_MAJOR) && defined(__GNUC__)
     #define GCC_VERSION_MAJOR  __GNUC__
@@ -578,6 +584,19 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
     #define IGRAPH_LIKELY(a)   a
 #endif
 
+#if IGRAPH_VERIFY_FINALLY_STACK == 1
+#define IGRAPH_CHECK(a) \
+        do { \
+            int enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
+            int igraph_i_ret=(a); \
+            if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
+                IGRAPH_ERROR("", igraph_i_ret); \
+            } \
+            if (IGRAPH_UNLIKELY(enter_stack_size != IGRAPH_FINALLY_STACK_SIZE())) { \
+                IGRAPH_ERROR("Non-matching number of IGRAPH_FINALLY and IGRAPH_FINALLY_CLEAN", IGRAPH_FAILURE); \
+            } \
+        } while (0)
+#else
 /**
  * \define IGRAPH_CHECK
  * \brief Check the return value of a function call.
@@ -600,12 +619,13 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  * by using <function>IGRAPH_CHECK</function> on every \a igraph
  * call which can return an error code.
  */
-
 #define IGRAPH_CHECK(a) do { \
         int igraph_i_ret=(a); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
             IGRAPH_ERROR("", igraph_i_ret); \
         } } while (0)
+#endif
+
 
 
 /**
@@ -658,8 +678,8 @@ typedef igraph_error_handler_t igraph_warning_handler_t;
 
 DECLDIR igraph_warning_handler_t* igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 
-extern igraph_warning_handler_t igraph_warning_handler_ignore;
-extern igraph_warning_handler_t igraph_warning_handler_print;
+DECLDIR igraph_warning_handler_t igraph_warning_handler_ignore;
+DECLDIR igraph_warning_handler_t igraph_warning_handler_print;
 
 /**
  * \function igraph_warning

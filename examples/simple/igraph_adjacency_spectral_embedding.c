@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "../tests/test_utilities.inc"
+
 /*
 
     R
@@ -40,7 +42,7 @@ int main() {
     igraph_arpack_options_t options;
     igraph_vector_t cvec;
 
-    igraph_tree(&graph, /*n=*/ 10, /*children=*/ 3, IGRAPH_TREE_OUT);
+    igraph_tree(&graph, /*n=*/ 14, /*children=*/ 4, IGRAPH_TREE_OUT);
 
     igraph_matrix_init(&U, 0, 0);
     igraph_matrix_init(&V, 0, 0);
@@ -56,9 +58,11 @@ int main() {
                                         /*scaled=*/ 0, &U, &V, /*D=*/ 0,
                                         &cvec, &options);
 
-    igraph_matrix_printf(&U, "%8.4f");
+    /* eigenvectors are in the columns of U and V; make sure that the
+     * first row contains positive values */
+    print_matrix_first_row_positive(&U, "%8.4f");
     printf("--\n");
-    igraph_matrix_printf(&V, "%8.4f");
+    print_matrix_first_row_positive(&V, "%8.4f");
 
     igraph_vector_destroy(&cvec);
     igraph_matrix_destroy(&V);

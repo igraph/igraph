@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "../tests/test_utilities.inc"
+
 int main() {
 
     igraph_t g;
@@ -63,13 +65,38 @@ int main() {
                               &Lsparse, &Rsparse);               \
     } while (0)
 
+#define FIXSMALL(eps) do { \
+    long int i, j, ncol, nrow; \
+    ncol = igraph_vector_complex_size(&eval); \
+    for (i = 0; i < ncol; i++) { \
+        if (fabs((double)IGRAPH_REAL(VECTOR(eval)[i])) < eps) { \
+            IGRAPH_REAL(VECTOR(eval)[i]) = 0; \
+        } \
+        if (fabs((double)IGRAPH_IMAG(VECTOR(eval)[i])) < eps) { \
+            IGRAPH_IMAG(VECTOR(eval)[i]) = 0; \
+        } \
+    } \
+    nrow = igraph_matrix_complex_nrow(&evec); \
+    ncol = igraph_matrix_complex_ncol(&evec); \
+    for (i = 0; i < nrow; i++) { \
+        for (j = 0; j < ncol; j++) { \
+            if (fabs((double)IGRAPH_REAL(MATRIX(evec, i, j))) < eps) { \
+                IGRAPH_REAL(MATRIX(evec, i, j)) = 0; \
+            } \
+            if (fabs((double)IGRAPH_IMAG(MATRIX(evec, i, j))) < eps) { \
+                IGRAPH_IMAG(MATRIX(evec, i, j)) = 0; \
+            } \
+        } \
+    } \
+    } while (0)
+
 #define PRINTRES()                      \
     do {                              \
         printf("--------------------------------\n");       \
         igraph_vector_print(&groups);               \
         printf("---\n");                        \
         igraph_vector_complex_print(&eval);             \
-        igraph_matrix_complex_print(&evec);             \
+        print_matrix_complex_first_row_positive(&evec);             \
         printf("---\n");                        \
         igraph_write_graph_edgelist(&scg_graph, stdout);        \
         printf("---\n");                        \
@@ -83,6 +110,7 @@ int main() {
 
     VECTOR(ev)[0] = 1;
     CALLSTO();
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);
@@ -91,6 +119,7 @@ int main() {
 
     VECTOR(ev)[0] = 3;
     CALLSTO();
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);
@@ -101,6 +130,7 @@ int main() {
     VECTOR(ev)[0] = 1;
     VECTOR(ev)[1] = 3;
     CALLSTO();
+    FIXSMALL(1e-4);
     PRINTRES();
     igraph_destroy(&scg_graph);
     igraph_sparsemat_destroy(&scg_sparsemat);

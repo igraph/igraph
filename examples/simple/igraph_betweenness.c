@@ -36,6 +36,8 @@ int main() {
     igraph_t g;
     igraph_vector_t bet, bet2, weights, edges;
 
+    igraph_real_t cutoff = 0.0;
+
     igraph_real_t nontriv[] = { 0, 19, 0, 16, 0, 20, 1, 19, 2, 5, 3, 7, 3, 8,
                                 4, 15, 4, 11, 5, 8, 5, 19, 6, 7, 6, 10, 6, 8,
                                 6, 9, 7, 20, 9, 10, 9, 20, 10, 19,
@@ -57,6 +59,8 @@ int main() {
 
     /*******************************************************/
 
+    printf("BA graph\n");
+    printf("==========================================================\n");
     igraph_barabasi_game(/* graph= */    &g,
                                          /* n= */        1000,
                                          /* power= */    1,
@@ -83,8 +87,8 @@ int main() {
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
 
-    /*******************************************************/
-
+    printf("Tree\n");
+    printf("==========================================================\n");
     igraph_tree(&g, 20000, 10, IGRAPH_TREE_UNDIRECTED);
 
     igraph_vector_init(&bet, 0);
@@ -118,7 +122,8 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
-    /* Non-trivial weighted graph */
+    printf("Non-trivial weighted graph\n");
+    printf("==========================================================\n");
     igraph_vector_view(&edges, nontriv, sizeof(nontriv) / sizeof(igraph_real_t));
     igraph_create(&g, &edges, 0, /* directed= */ 0);
     igraph_vector_view(&weights, nontriv_weights,
@@ -139,7 +144,8 @@ int main() {
     igraph_destroy(&g);
 
 
-    /* test corner case of cutoff = 0 */
+    printf("Corner case cutoff 0.0\n");
+    printf("==========================================================\n");
     igraph_tree(&g, 20, 3, IGRAPH_TREE_UNDIRECTED);
 
     /* unweighted */
@@ -161,9 +167,8 @@ int main() {
             /* weights=   */ 0,
             /* nobigint=  */ 1);
 
-    if (!igraph_vector_all_e(&bet, &bet2)) {
-        return 1;
-    }
+    igraph_vector_print(&bet);
+    igraph_vector_print(&bet2);
 
     igraph_vector_destroy(&bet);
     igraph_vector_destroy(&bet2);
@@ -190,8 +195,90 @@ int main() {
             /* weights=   */ &weights,
             /* nobigint=  */ 1);
 
-    if (!igraph_vector_all_e(&bet, &bet2)) {
-        return 1;
+    igraph_vector_print(&bet);
+    igraph_vector_print(&bet2);
+
+    igraph_vector_destroy(&bet);
+    igraph_vector_destroy(&bet2);
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
+
+    printf("Single path graph\n");
+    printf("==========================================================\n");
+    igraph_small(&g, 5, IGRAPH_UNDIRECTED,
+                            0, 1,
+                            1, 2,
+                            2, 3,
+                            3, 4, -1);
+    igraph_vector_init(&bet, igraph_vcount(&g));
+    igraph_vector_init(&bet2, igraph_vcount(&g));
+    igraph_vector_init(&weights, igraph_ecount(&g));
+    igraph_vector_fill(&weights, 1);
+
+    for (cutoff = -1.0; cutoff < 5.0; cutoff++)
+    {
+        printf("Cutoff %.0f\n", cutoff);
+        printf("Unweighted\n");
+        igraph_betweenness_estimate(&g, &bet,
+                                    igraph_vss_all(), IGRAPH_UNDIRECTED,
+                                    /* cutoff */ cutoff,
+                                    /* weights */ NULL,
+                                    /* nobigint */ 1);
+        igraph_vector_print(&bet);
+
+        printf("Weighted\n");
+        igraph_betweenness_estimate(&g, &bet2,
+                                    igraph_vss_all(), IGRAPH_UNDIRECTED,
+                                    /* cutoff */ cutoff,
+                                    /* weights */ &weights,
+                                    /* nobigint */ 1);
+        igraph_vector_print(&bet2);
+        printf("\n");
+
+        if (!igraph_vector_all_e(&bet, &bet2)) {
+            return 3;
+        }        
+    }
+
+    igraph_vector_destroy(&bet);
+    igraph_vector_destroy(&bet2);
+    igraph_vector_destroy(&weights);
+    igraph_destroy(&g);
+
+    printf("Cycle graph\n");
+    printf("==========================================================\n");
+    igraph_small(&g, 4, IGRAPH_UNDIRECTED,
+                            0, 1,
+                            0, 2,
+                            1, 3,
+                            2, 3, -1);
+    igraph_vector_init(&bet, igraph_vcount(&g));
+    igraph_vector_init(&bet2, igraph_vcount(&g));
+    igraph_vector_init(&weights, igraph_ecount(&g));
+    VECTOR(weights)[0] = 1.01;
+    VECTOR(weights)[1] = 2;
+    VECTOR(weights)[2] = 0.99;
+    VECTOR(weights)[3] = 2;
+
+    for (cutoff = -1.0; cutoff < 5.0; cutoff++)
+    {
+        printf("Cutoff %.0f\n", cutoff);
+        printf("Unweighted\n");
+        igraph_betweenness_estimate(&g, &bet,
+                                    igraph_vss_all(), IGRAPH_UNDIRECTED,
+                                    /* cutoff */ cutoff,
+                                    /* weights */ NULL,
+                                    /* nobigint */ 1);
+        igraph_vector_print(&bet);
+
+        printf("Weighted\n");
+        igraph_betweenness_estimate(&g, &bet2,
+                                    igraph_vss_all(), IGRAPH_UNDIRECTED,
+                                    /* cutoff */ cutoff,
+                                    /* weights */ &weights,
+                                    /* nobigint */ 1);
+        igraph_vector_print(&bet2);
+        printf("\n");
     }
 
     igraph_vector_destroy(&bet);

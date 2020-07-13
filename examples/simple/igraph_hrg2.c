@@ -27,6 +27,7 @@
 int main() {
     igraph_t karate;
     igraph_vector_t parents, weights;
+    long int i, n;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -65,9 +66,24 @@ int main() {
     igraph_hrg_consensus(&karate, &parents, &weights, /* hrg= */ 0,
                          /* start= */ 0, /* num_samples= */ 100);
 
-    /* Check */
-    igraph_vector_print(&parents);
-    igraph_vector_print(&weights);
+    /* We do some simple validity tests on the resolts only; the exact results
+     * are different on i386 vs other platforms due to numerical inaccuracies */
+    if (igraph_vector_size(&weights) + igraph_vcount(&karate) != igraph_vector_size(&parents)) {
+        printf("Vector length mismatch: %ld + %ld != %ld\n",
+            (long int) igraph_vector_size(&weights), (long int) igraph_vcount(&karate),
+            (long int) igraph_vector_size(&parents)
+        );
+        return 1;
+    }
+
+    n = igraph_vector_size(&parents);
+    for (i = 0; i < n; i++) {
+        if (VECTOR(parents)[i] < -1 || VECTOR(parents)[i] >= igraph_vcount(&karate) + igraph_vector_size(&weights)) {
+            printf("Invalid parents vector:\n");
+            igraph_vector_print(&parents);
+			return 2;
+        }
+    }
 
     igraph_vector_destroy(&parents);
     igraph_vector_destroy(&weights);

@@ -1,10 +1,15 @@
 
 language: c
+dist: xenial
+os: linux
+
+env:
+  global:
+    - MAKEFLAGS="-j 2"
 
 addons:
   apt:
     packages:
-    - gfortran
     - flex
     - bison
     - docbook2x
@@ -14,10 +19,17 @@ addons:
     - libxml2-utils
     - xsltproc
     - fop
+    - libgmp-dev
+    - libglpk-dev
+    - libarpack2-dev
+    - libblas-dev
+    - liblapack-dev    
   homebrew:
     packages:
     - flex
     - bison
+    - gmp
+    - glpk
 
 script:
   - make check
@@ -27,19 +39,56 @@ after_failure:
 
 jobs:
   include:
-    - stage: test
+    - name: "Linux"
       os: linux
       install:
         - ./bootstrap.sh
-        - ./configure
+        - ./configure --enable-verify-finally --with-external-glpk
         - make
-    - stage: test
+    - name: "Linux external deps"
+      os: linux
+      dist: bionic
+      install:
+        - ./bootstrap.sh
+        - ./configure --enable-verify-finally --with-external-glpk --with-external-blas --with-external-lapack --with-external-arpack
+        - make        
+    - name: "Linux x87"
+      os: linux
+      env:
+        - CFLAGS="-mfpmath=387" CXXFLAGS="-mfpmath=387"
+      install:
+        - ./bootstrap.sh
+        - ./configure --enable-verify-finally --with-external-glpk
+        - make
+
+    - name: "Alpine Linux (chroot)"
+      os: linux
+      dist: xenial
+      sudo: true
+      language: minimal
+      before_install:
+        - "wget 'https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.6.0/alpine-chroot-install' \
+              && echo 'a827a4ba3d0817e7c88bae17fe34e50204983d1e  alpine-chroot-install' | sha1sum -c || exit 1"
+        - alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
+        - sudo sh alpine-chroot-install -p 'build-base gfortran perl linux-headers libtool git m4 autoconf automake make bison flex'
+      install:
+        - alpine ./bootstrap.sh
+        - alpine ./configure --enable-verify-finally --with-external-glpk
+        - alpine make
+      script:
+        - alpine make check
+      env:
+        - CFLAGS="-Wno-misleading-indentation -Wno-sign-conversion -Wno-incompatible-pointer-types"
+      after_failure:
+        - alpine find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
+
+    - name: "macOS"
       os: osx
       install:
         - ./bootstrap.sh
-        - ./configure --enable-asan
+        - ./configure --enable-verify-finally --enable-asan --with-external-glpk 
         - make
-    - stage: documentation
+    - name: "Documentation"
       language: shell
       os: linux
       install:
@@ -54,5 +103,3 @@ notifications:
   email:
     on_success: change
     on_failure: always
-
-sudo: false

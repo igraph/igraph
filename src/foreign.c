@@ -1028,7 +1028,7 @@ static igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) 
 static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
 
     int type = igraph_gml_tree_type(node, pos);
-    char tmp[256];
+    static char tmp[256];
     const char *p = tmp;
     long int i;
     igraph_real_t d;
@@ -1155,7 +1155,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     }
     gtree = igraph_gml_tree_get_tree(context.tree, gidx);
 
-    IGRAPH_FINALLY(igraph_i_gml_destroy_attrs, &attrs);
+    IGRAPH_FINALLY(igraph_i_gml_destroy_attrs, attrs);
     igraph_vector_ptr_init(&gattrs, 0);
     igraph_vector_ptr_init(&vattrs, 0);
     igraph_vector_ptr_init(&eattrs, 0);
@@ -3386,5 +3386,3 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
 }
 
 #undef CHECK
-
-

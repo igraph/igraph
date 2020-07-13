@@ -113,7 +113,7 @@ int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
 
     IGRAPH_MATRIX_INIT_FINALLY(&F, nt, n);
     IGRAPH_CHECK(igraph_matrix_int_init(&Q, nt, n));
-    IGRAPH_FINALLY(igraph_matrix_destroy, &Q);
+    IGRAPH_FINALLY(igraph_matrix_int_destroy, &Q);
 
     for (i = 0; i < n; i++) {
         MATRIX(Q, 0, i)++;
@@ -237,4 +237,3 @@ int igraph_i_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
 
     return 0;
 }
-

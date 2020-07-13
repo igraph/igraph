@@ -59,13 +59,12 @@ DECLDIR int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t f
 /*                 igraph_integer_t no); */
 /**
  * \define igraph_adjlist_get
- * Query a vector in an adjlist
+ * \brief Query a vector in an adjacency list.
  *
  * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
  * adjacency list. The vector can be modified as desired.
  * \param al The adjacency list object.
- * \param no The vertex of which the vertex of adjacent vertices are
- *   returned.
+ * \param no The vertex whose adjacent vertices will be returned.
  * \return Pointer to the <type>igraph_vector_int_t</type> object.
  *
  * Time complexity: O(1).
@@ -93,7 +92,7 @@ DECLDIR int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 
 /**
  * \define igraph_inclist_get
- * Query a vector in an incidence list
+ * \brief Query a vector in an incidence list.
  *
  * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
  * incidence list containing edge ids. The vector can be modified,
@@ -124,14 +123,14 @@ DECLDIR void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 /*                     igraph_integer_t no); */
 /**
  * \define igraph_lazy_adjlist_get
- * Query neighbor vertices
+ * \brief Query neighbor vertices.
  *
  * If the function is called for the first time for a vertex then the
  * result is stored in the adjacency list and no further query
  * operations are needed when the neighbors of the same vertex are
  * queried again.
  * \param al The lazy adjacency list.
- * \param no The vertex id to query.
+ * \param no The vertex ID to query.
  * \return Pointer to a vector. It is allowed to modify it and
  *   modification does not affect the original graph.
  *
@@ -159,7 +158,7 @@ DECLDIR void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
 
 /**
  * \define igraph_lazy_inclist_get
- * Query incident edges
+ * \brief Query incident edges.
  *
  * If the function is called for the first time for a vertex, then the
  * result is stored in the incidence list and no further query
@@ -195,7 +194,7 @@ DECLDIR int igraph_adjedgelist_print(const igraph_inclist_t *il, FILE *outfile);
 
 /**
  * \define igraph_adjedgelist_get
- * Query a vector in an incidence list
+ * \brief Query a vector in an incidence list.
  *
  * This macro was superseded by \ref igraph_inclist_get() in igraph 0.6.
  * Please use \ref igraph_inclist_get() instead of this macro.
@@ -214,7 +213,7 @@ DECLDIR void igraph_lazy_adjedgelist_destroy(igraph_lazy_inclist_t *il);
 
 /**
  * \define igraph_lazy_adjedgelist_get
- * Query a vector in a lazy incidence list
+ * \brief Query a vector in a lazy incidence list.
  *
  * This macro was superseded by \ref igraph_lazy_inclist_get() in igraph 0.6.
  * Please use \ref igraph_lazy_inclist_get() instead of this macro.

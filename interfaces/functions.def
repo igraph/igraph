@@ -1309,14 +1309,19 @@ igraph_le_community_to_membership:
         IGNORE: RR, RNamespace, RC
 
 igraph_modularity:
-        PARAMS: GRAPH graph, VECTOR membership, OUT REALPTR modularity, \
-                IN VECTOR_OR_0 weights=NULL
+        PARAMS: GRAPH graph, VECTOR membership, \
+                IN VECTOR_OR_0 weights=NULL, \
+                REAL resolution=1.0, \
+                BOOLEAN directed=True,
+                OUT REALPTR modularity
         NAME-R: modularity.igraph
         IGNORE: RNamespace, RR
 
 igraph_modularity_matrix:
-        PARAMS: GRAPH graph, OUT MATRIX modmat, \
-                EDGEWEIGHTS weights=NULL
+        PARAMS: GRAPH graph, \
+                EDGEWEIGHTS weights=NULL, \
+                REAL resolution=1.0, \
+                OUT MATRIX modmat
         DEPS: weights ON graph
         NAME-R: modularity_matrix
         IGNORE: RR
@@ -1357,6 +1362,7 @@ igraph_community_label_propagation:
 
 igraph_community_multilevel:
         PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                REAL resolution=1.0, \
                 OUT VECTOR membership, \
 		OUT MATRIX_OR_0 memberships, OUT VECTOR_OR_0 modularity
         DEPS: weights ON graph
@@ -1368,6 +1374,15 @@ igraph_community_optimal_modularity:
                 OUT VECTOR_OR_0 membership, \
                 EDGEWEIGHTS weights=NULL
         NAME-R: cluster_optimal
+        IGNORE: RR
+
+igraph_community_leiden:
+        PARAMS: GRAPH graph, EDGEWEIGHTS weights=NULL, \
+                VERTEXWEIGHTS vertex_weights=NULL, \
+                REAL resolution_parameter, REAL beta, \
+                BOOLEAN start, INOUT VECTOR_OR_0 membership, \
+                OUT INTEGERPTR nb_clusters, OUT REALPTR quality
+        NAME-R: cluster_leiden
         IGNORE: RR
 
 igraph_split_join_distance:
@@ -2091,6 +2106,23 @@ igraph_convex_hull:
 igraph_dim_select:
         PARAMS: VECTOR sv, OUT INTEGERPTR dim
         NAME-R: dim_select
+
+#######################################
+# Eulerian functions
+#######################################
+
+igraph_is_eulerian:
+        PARAMS: GRAPH graph, BOOL has_path, BOOL has_cycle
+        IGNORE: RR, RC, RNamespace
+
+igraph_eulerian_path:
+        PARAMS: GRAPH graph, VECTOR res
+        IGNORE: RR, RC, RNamespace
+
+igraph_eulerian_cycle:
+        PARAMS: GRAPH graph, VECTOR res
+        IGNORE: RR, RC, RNamespace
+
 
 #######################################
 # Other, (yet) undocumented functions

@@ -40,20 +40,20 @@ typedef struct {
 
 /* constructors and destructor */
 static AP     *ap_create_problem(double *t, int n);
-static AP     *ap_create_problem_from_matrix(double **t, int n);
-static AP     *ap_read_problem(char *file);
+/* static AP     *ap_create_problem_from_matrix(double **t, int n); */
+/* static AP     *ap_read_problem(char *file); */
 static void    ap_free(AP *p);
 
 static int     ap_assignment(AP *p, int *res);
-static int     ap_costmatrix(AP *p, double **m);
-static int     ap_datamatrix(AP *p, double **m);
-static int     ap_iterations(AP *p);
+/* static int     ap_costmatrix(AP *p, double **m); */
+/* static int     ap_datamatrix(AP *p, double **m); */
+/* static int     ap_iterations(AP *p); */
 static int     ap_hungarian(AP *p);
-static double  ap_mincost(AP *p);
+/* static double  ap_mincost(AP *p); */
 /* static void    ap_print_solution(AP *p); */
 /* static void    ap_show_data(AP *p); */
-static int     ap_size(AP *p);
-static int     ap_time(AP *p);
+/* static int     ap_size(AP *p); */
+/* static int     ap_time(AP *p); */
 
 /* error reporting */
 /* static void ap_error(char *message); */
@@ -347,7 +347,6 @@ void ap_show_data(AP *p)
     printf("\n");
     }
 }
-*/
 
 double ap_mincost(AP *p) {
     if (p->s == NULL) {
@@ -369,7 +368,6 @@ int ap_iterations(AP *p) {
     return p->runs;
 }
 
-/*
 void ap_print_solution(AP *p)
 {
     int i;
@@ -381,7 +379,6 @@ void ap_print_solution(AP *p)
     printf("%4d",p->s[i]);
     printf("\n");
 }
-*/
 
 int ap_costmatrix(AP *p, double **m) {
     int i, j;
@@ -404,6 +401,7 @@ int ap_datamatrix(AP *p, double **m) {
 
     return p->n;
 }
+*/
 
 /* error reporting */
 

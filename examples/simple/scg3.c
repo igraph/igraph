@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "../tests/test_utilities.inc"
+
 int main() {
 
     igraph_t g;
@@ -67,7 +69,7 @@ int main() {
         igraph_vector_print(&groups);               \
         printf("---\n");                        \
         igraph_vector_complex_print(&eval);             \
-        igraph_matrix_complex_print(&evec);             \
+        print_matrix_complex_first_row_positive(&evec);             \
         printf("---\n");                        \
         igraph_write_graph_edgelist(&scg_graph, stdout);        \
         printf("---\n");                        \

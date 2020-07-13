@@ -175,8 +175,8 @@ static void set_free(set_t s) {
  * Returns a pointer to the new set.
  */
 UNUSED_FUNCTION INLINE
-static set_t set_resize(set_t s, int size) {
-	int n;
+static set_t set_resize(set_t s, unsigned int size) {
+	unsigned int n;
 
 	ASSERT(size>0);
 
@@ -337,7 +337,7 @@ static set_t set_union(set_t res,set_t a,set_t b) {
  * }
  */
 UNUSED_FUNCTION INLINE
-static int set_return_next(set_t s, int n) {
+static int set_return_next(set_t s, unsigned int n) {
 	if (n<0)
 		n=0;
 	else

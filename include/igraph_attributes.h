@@ -385,7 +385,7 @@ int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
 
 /* Experimental attribute handler in C */
 
-extern const igraph_attribute_table_t igraph_cattribute_table;
+DECLDIR extern const igraph_attribute_table_t igraph_cattribute_table;
 
 DECLDIR igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name);
 DECLDIR igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name);
@@ -778,7 +778,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
 #define SETVASV(graph,n,v) (igraph_cattribute_VAS_setv((graph),(n),(v)))
 /**
  * \define SETEANV
- *  Set a numeric edge attribute for all vertices
+ *  Set a numeric edge attribute for all edges
  *
  * This is a shorthand for \ref igraph_cattribute_EAN_setv().
  * \param graph The graph.
@@ -788,7 +788,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
 #define SETEANV(graph,n,v) (igraph_cattribute_EAN_setv((graph),(n),(v)))
 /**
  * \define SETEABV
- *  Set a boolean edge attribute for all vertices
+ *  Set a boolean edge attribute for all edges
  *
  * This is a shorthand for \ref igraph_cattribute_EAB_setv().
  * \param graph The graph.
@@ -798,7 +798,7 @@ DECLDIR void igraph_cattribute_remove_all(igraph_t *graph, igraph_bool_t g,
 #define SETEABV(graph,n,v) (igraph_cattribute_EAB_setv((graph),(n),(v)))
 /**
  * \define SETEASV
- *  Set a string edge attribute for all vertices
+ *  Set a string edge attribute for all edges
  *
  * This is a shorthand for \ref igraph_cattribute_EAS_setv().
  * \param graph The graph.

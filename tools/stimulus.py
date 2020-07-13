@@ -212,14 +212,14 @@ class CodeGenerator:
         parser=PParser()
         self.func=seqdict.seqdict()
         for f in func:
-            ff=open(f)
+            ff=open(f, "rU")
             newfunc=parser.parse(ff)
             self.func.extend(newfunc)
             ff.close()
 
         self.types=seqdict.seqdict()
         for t in types:
-            ff=open(t)
+            ff=open(t, "rU")
             newtypes=parser.parse(ff)
             self.types.extend(newtypes)
             ff.close()
@@ -288,7 +288,7 @@ class CodeGenerator:
 
     def append_inputs(self, inputs, output):
         for i in inputs:
-            ii=open(i)
+            ii=open(i, "rU")
             str=ii.read()
             while str != "":
                 output.write(str)
@@ -915,7 +915,7 @@ class JavaJavaCodeGenerator(JavaCodeGenerator):
         if len(inputs)>1:
             raise StimulusError, "Java code generator supports only a single input"
 
-        input = open(inputs[0])
+        input = open(inputs[0], "rU")
         for line in input:
             if "%STIMULUS%" not in line:
                 out.write(line)

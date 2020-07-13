@@ -47,7 +47,7 @@ static int igraph_layout_i_fr(const igraph_t *graph,
     igraph_real_t difftemp = start_temp / niter;
     float width = sqrtf(no_nodes), height = width;
     igraph_bool_t conn = 1;
-    float C;
+    float C = 0;
 
     igraph_is_connected(graph, &conn, IGRAPH_WEAK);
     if (!conn) {
@@ -501,7 +501,7 @@ int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
     igraph_real_t difftemp = start_temp / niter;
     float width = sqrtf(no_nodes), height = width, depth = width;
     igraph_bool_t conn = 1;
-    float C;
+    float C = 0;
 
     if (niter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in "

@@ -589,6 +589,7 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
     int retval = 0;
+    long int vsize;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -632,15 +633,16 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
         IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&edges, igraph_vector_size(&s) * 2));
 
+        vsize = igraph_vector_size(&s);
         if (directed && loops) {
-            for (i = 0; i < igraph_vector_size(&s); i++) {
+            for (i = 0; i < vsize; i++) {
                 long int to = (long int) floor(VECTOR(s)[i] / no_of_nodes);
                 long int from = (long int) (VECTOR(s)[i] - ((igraph_real_t)to) * no_of_nodes);
                 igraph_vector_push_back(&edges, from);
                 igraph_vector_push_back(&edges, to);
             }
         } else if (directed && !loops) {
-            for (i = 0; i < igraph_vector_size(&s); i++) {
+            for (i = 0; i < vsize; i++) {
                 long int to = (long int) floor(VECTOR(s)[i] / no_of_nodes);
                 long int from = (long int) (VECTOR(s)[i] - ((igraph_real_t)to) * no_of_nodes);
                 if (from == to) {
@@ -650,14 +652,14 @@ int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real
                 igraph_vector_push_back(&edges, to);
             }
         } else if (!directed && loops) {
-            for (i = 0; i < igraph_vector_size(&s); i++) {
+            for (i = 0; i < vsize; i++) {
                 long int to = (long int) floor((sqrt(8 * VECTOR(s)[i] + 1) - 1) / 2);
                 long int from = (long int) (VECTOR(s)[i] - (((igraph_real_t)to) * (to + 1)) / 2);
                 igraph_vector_push_back(&edges, from);
                 igraph_vector_push_back(&edges, to);
             }
         } else { /* !directed && !loops */
-            for (i = 0; i < igraph_vector_size(&s); i++) {
+            for (i = 0; i < vsize; i++) {
                 long int to = (long int) floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
                 long int from = (long int) (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
                 igraph_vector_push_back(&edges, from);
@@ -1214,15 +1216,24 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
     return IGRAPH_SUCCESS;
 }
 
+/* swap two elements of a vector_int */
+#define SWAP_INT_ELEM(vec, i, j) \
+    { \
+        igraph_integer_t temp; \
+        temp = VECTOR(vec)[i]; \
+        VECTOR(vec)[i] = VECTOR(vec)[j]; \
+        VECTOR(vec)[j] = temp; \
+    }
+
 int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, const igraph_vector_t *degseq) {
     igraph_vector_int_t stubs;
     igraph_vector_t edges;
     igraph_bool_t degseq_ok;
     igraph_vector_ptr_t adjlist;
-    long i, j, k;
+    long i, j;
     long vcount, ecount, stub_count;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(degseq, 0, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(degseq, NULL, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
@@ -1234,16 +1245,21 @@ int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&stubs, stub_count);
     IGRAPH_VECTOR_INIT_FINALLY(&edges, stub_count);
 
-    k = 0;
-    for (i = 0; i < vcount; ++i) {
-        long deg = (long) VECTOR(*degseq)[i];
-        for (j = 0; j < deg; ++j) {
-            VECTOR(stubs)[k++] = i;
+    /* Fill stubs vector. */
+    {
+        long k = 0;
+        for (i = 0; i < vcount; ++i) {
+            long deg = (long) VECTOR(*degseq)[i];
+            for (j = 0; j < deg; ++j) {
+                VECTOR(stubs)[k++] = i;
+            }
         }
     }
 
+    /* Build an adjacency list in terms of sets; used to check for multi-edges. */
     IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = igraph_malloc(sizeof(igraph_set_t));
         if (! set) {
@@ -1252,35 +1268,31 @@ int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, 
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
         IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*degseq)[i]));
-    }
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
+    }    
 
     RNG_BEGIN();
 
     for (;;) {
         igraph_bool_t success = 1;
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&stubs));
 
-        /* optimization: we do an initial pass looking for self-loops */
+        /* Shuffle stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
         for (i = 0; i < ecount; ++i) {
-            igraph_integer_t from = VECTOR(stubs)[2 * i];
-            igraph_integer_t to = VECTOR(stubs)[2 * i + 1];
+            long k, from, to;
 
-            /* loop edge, fail */
-            if (to == from) {
+            k = RNG_INTEGER(2*i, stub_count-1);
+            SWAP_INT_ELEM(stubs, 2*i, k);
+
+            k = RNG_INTEGER(2*i+1, stub_count-1);
+            SWAP_INT_ELEM(stubs, 2*i+1, k);
+
+            from = VECTOR(stubs)[2*i];
+            to   = VECTOR(stubs)[2*i+1];
+
+            /* self-loop, fail */
+            if (from == to) {
                 success = 0;
                 break;
             }
-        }
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        if (! success)
-            continue;
-
-        for (i = 0; i < ecount; ++i) {
-            igraph_integer_t from = VECTOR(stubs)[2 * i];
-            igraph_integer_t to = VECTOR(stubs)[2 * i + 1];
 
             /* multi-edge, fail */
             if (igraph_set_contains((igraph_set_t *) VECTOR(adjlist)[to], from)) {
@@ -1301,11 +1313,12 @@ int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, 
             break;
         }
 
-        IGRAPH_ALLOW_INTERRUPTION();
-
+        /* Clear adjacency list. */
         for (j = 0; j < vcount; ++j) {
             igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
         }
+
+        IGRAPH_ALLOW_INTERRUPTION();
     }
 
     RNG_END();
@@ -1322,13 +1335,14 @@ int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, 
     return IGRAPH_SUCCESS;
 }
 
+
 int igraph_degree_sequence_game_no_multiple_directed_uniform(
     igraph_t *graph, const igraph_vector_t *out_deg, const igraph_vector_t *in_deg) {
     igraph_vector_int_t out_stubs, in_stubs;
     igraph_vector_t edges;
     igraph_bool_t degseq_ok;
     igraph_vector_ptr_t adjlist;
-    long i, j, k, l;
+    long i, j;
     long vcount, ecount;
 
     IGRAPH_CHECK(igraph_is_graphical_degree_sequence(out_deg, in_deg, &degseq_ok));
@@ -1343,23 +1357,28 @@ int igraph_degree_sequence_game_no_multiple_directed_uniform(
     IGRAPH_VECTOR_INT_INIT_FINALLY(&in_stubs, ecount);
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * ecount);
 
-    k = 0; l = 0;
-    for (i = 0; i < vcount; ++i) {
-        long dout, din;
+    /* Fill in- and out-stubs vectors. */
+    {
+        long k = 0, l = 0;
+        for (i = 0; i < vcount; ++i) {
+            long dout, din;
 
-        dout = (long) VECTOR(*out_deg)[i];
-        for (j = 0; j < dout; ++j) {
-            VECTOR(out_stubs)[k++] = i;
-        }
+            dout = (long) VECTOR(*out_deg)[i];
+            for (j = 0; j < dout; ++j) {
+                VECTOR(out_stubs)[k++] = i;
+            }
 
-        din  = (long) VECTOR(*in_deg)[i];
-        for (j = 0; j < din; ++j) {
-            VECTOR(in_stubs)[l++] = i;
+            din  = (long) VECTOR(*in_deg)[i];
+            for (j = 0; j < din; ++j) {
+                VECTOR(in_stubs)[l++] = i;
+            }
         }
     }
 
+    /* Build an adjacency list in terms of sets; used to check for multi-edges. */
     IGRAPH_CHECK(igraph_vector_ptr_init(&adjlist, vcount));
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&adjlist, igraph_set_destroy);
+    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
     for (i = 0; i < vcount; ++i) {
         igraph_set_t *set = igraph_malloc(sizeof(igraph_set_t));
         if (! set) {
@@ -1368,36 +1387,29 @@ int igraph_degree_sequence_game_no_multiple_directed_uniform(
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
         IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*out_deg)[i]));
-    }
-    IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &adjlist);
+    }    
 
     RNG_BEGIN();
 
     for (;;) {
         igraph_bool_t success = 1;
-        IGRAPH_CHECK(igraph_vector_int_shuffle(&out_stubs));
 
-        /* optimization: we do an initial pass looking for self-loops */
+        /* Shuffle out-stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
         for (i = 0; i < ecount; ++i) {
-            igraph_integer_t from = VECTOR(out_stubs)[i];
-            igraph_integer_t to = VECTOR(in_stubs)[i];
+            long k, from, to;
+            igraph_set_t *set;
 
-            /* loop edge, fail */
+            k = RNG_INTEGER(i, ecount-1);
+            SWAP_INT_ELEM(out_stubs, i, k);
+
+            from = VECTOR(out_stubs)[i];
+            to   = VECTOR(in_stubs)[i];
+
+            /* self-loop, fail */
             if (to == from) {
                 success = 0;
                 break;
             }
-        }
-
-        IGRAPH_ALLOW_INTERRUPTION();
-
-        if (! success)
-            continue;
-
-        for (i = 0; i < ecount; ++i) {
-            igraph_integer_t from = VECTOR(out_stubs)[i];
-            igraph_integer_t to = VECTOR(in_stubs)[i];
-            igraph_set_t *set;
 
             /* multi-edge, fail */
             set = (igraph_set_t *) VECTOR(adjlist)[from];
@@ -1418,11 +1430,12 @@ int igraph_degree_sequence_game_no_multiple_directed_uniform(
             break;
         }
 
-        IGRAPH_ALLOW_INTERRUPTION();
-
+        /* Clear adjacency list. */
         for (j = 0; j < vcount; ++j) {
             igraph_set_clear((igraph_set_t *) VECTOR(adjlist)[j]);
         }
+
+        IGRAPH_ALLOW_INTERRUPTION();
     }
 
     RNG_END();
@@ -1439,6 +1452,9 @@ int igraph_degree_sequence_game_no_multiple_directed_uniform(
 
     return IGRAPH_SUCCESS;
 }
+
+#undef SWAP_INT_ELEM
+
 
 /* This is in gengraph_mr-connected.cpp */
 
@@ -3805,16 +3821,15 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
  *
  */
 int igraph_simple_interconnected_islands_game(
-    igraph_t        *graph,
-    igraph_integer_t    islands_n,
-    igraph_integer_t    islands_size,
-    igraph_real_t       islands_pin,
-    igraph_integer_t    n_inter) {
+        igraph_t *graph,
+        igraph_integer_t islands_n,
+        igraph_integer_t islands_size,
+        igraph_real_t islands_pin,
+        igraph_integer_t n_inter) {
 
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
-    int retval = 0;
     int nbNodes;
     double maxpossibleedgesPerIsland;
     double maxedgesPerIsland;
@@ -3824,6 +3839,7 @@ int igraph_simple_interconnected_islands_game(
     int endIsland = 0;
     int i, j, is;
     double myrand, last;
+    long int vsize;
 
     if (islands_n < 0) {
         IGRAPH_ERROR("Invalid number of islands", IGRAPH_EINVAL);
@@ -3838,73 +3854,64 @@ int igraph_simple_interconnected_islands_game(
         IGRAPH_ERROR("Invalid number of inter-islands links", IGRAPH_EINVAL);
     }
 
-    // how much memory ?
+    /* how much memory ? */
     nbNodes = islands_n * islands_size;
     maxpossibleedgesPerIsland = ((double)islands_size * ((double)islands_size - (double)1)) / (double)2;
     maxedgesPerIsland = islands_pin * maxpossibleedgesPerIsland;
     nbEdgesInterIslands = n_inter * (islands_n * (islands_n - 1)) / 2;
-    maxedges = maxedgesPerIsland * islands_n + nbEdgesInterIslands;
+    maxedges = maxedgesPerIsland * islands_n + nbEdgesInterIslands;    
 
-    // debug&tests : printf("total nodes %d, maxedgesperisland %f, maxedgesinterislands %d, maxedges %f\n", nbNodes, maxedgesPerIsland, nbEdgesInterIslands, maxedges);
-
-    // reserve enough place for all the edges, thanks !
+    /* reserve enough space for all the edges */
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, (long int) maxedges));
 
     RNG_BEGIN();
 
-    // first create all the islands
-    for (is = 1; is <= islands_n; is++) { // for each island
+    /* first create all the islands */
+    for (is = 1; is <= islands_n; is++) { /* for each island */
 
-        // index for start and end of nodes in this island
+        /* index for start and end of nodes in this island */
         startIsland = islands_size * (is - 1);
         endIsland = startIsland + islands_size - 1;
 
-
-        // debug&tests : printf("start %d,end %d\n", startIsland, endIsland);
-
-        // create the random numbers to be used (into s)
+        /* create the random numbers to be used (into s) */
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&s, (long int) maxedgesPerIsland));
 
         last = RNG_GEOM(islands_pin);
-        // debug&tests : printf("last=%f \n", last);
-        while (last < maxpossibleedgesPerIsland) { // maxedgesPerIsland
+        while (last < maxpossibleedgesPerIsland) { /* maxedgesPerIsland */
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             myrand = RNG_GEOM(islands_pin);
-            last += myrand; //RNG_GEOM(islands_pin);
-            //printf("myrand=%f , last=%f \n", myrand, last);
+            last += myrand; /* RNG_GEOM(islands_pin); */
             last += 1;
         }
 
 
 
-        // change this to edges !
-        for (i = 0; i < igraph_vector_size(&s); i++) {
-
+        /* change this to edges ! */
+        vsize = igraph_vector_size(&s);
+        for (i = 0; i < vsize; i++) {
             long int to = (long int) floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
             long int from = (long int) (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
             to += startIsland;
             from += startIsland;
-            // debug&tests : printf("from %d to %d\n", from, to);
+
             igraph_vector_push_back(&edges, from);
             igraph_vector_push_back(&edges, to);
         }
 
-        // clear the memory used for random number for this island
+        /* clear the memory used for random number for this island */
         igraph_vector_destroy(&s);
         IGRAPH_FINALLY_CLEAN(1);
 
 
-        // create the links with other islands
-        for (i = is + 1; i <= islands_n; i++) { // for each other island (not the previous ones)
+        /* create the links with other islands */
+        for (i = is + 1; i <= islands_n; i++) { /* for each other island (not the previous ones) */
 
-            // debug&tests : printf("link islands %d and %d\n", is, i);
-            for (j = 0; j < n_inter; j++) { // for each link between islands
-
+            for (j = 0; j < n_inter; j++) { /* for each link between islands */
                 long int from = (long int) RNG_UNIF(startIsland, endIsland);
                 long int to = (long int) RNG_UNIF((i - 1) * islands_size, i * islands_size);
-                //printf("from %d to %d\n", from, to);
+
                 igraph_vector_push_back(&edges, from);
                 igraph_vector_push_back(&edges, to);
             }
@@ -3914,14 +3921,14 @@ int igraph_simple_interconnected_islands_game(
 
     RNG_END();
 
-    // actually fill the graph object
-    IGRAPH_CHECK(retval = igraph_create(graph, &edges, nbNodes, 0));
+    /* actually fill the graph object */
+    IGRAPH_CHECK(igraph_create(graph, &edges, nbNodes, 0));
 
-    // an clear remaining things
+    /* clean remaining things */
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 

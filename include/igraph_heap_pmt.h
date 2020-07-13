@@ -37,9 +37,3 @@ DECLDIR BASE FUNCTION(igraph_heap, top)(TYPE(igraph_heap)* h);
 DECLDIR BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h);
 DECLDIR long int FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h);
 DECLDIR int FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int size);
-
-void FUNCTION(igraph_heap, i_build)(BASE* arr, long int size, long int head);
-void FUNCTION(igraph_heap, i_shift_up)(BASE* arr, long int size, long int elem);
-void FUNCTION(igraph_heap, i_sink)(BASE* arr, long int size, long int head);
-void FUNCTION(igraph_heap, i_switch)(BASE* arr, long int e1, long int e2);
-

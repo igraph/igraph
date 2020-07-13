@@ -50,7 +50,7 @@ extern int graph_test_regular(graph_t *g);
 
 UNUSED_FUNCTION INLINE
 static int graph_subgraph_weight(graph_t *g,set_t s) {
-	int i,j;
+	unsigned int i,j;
 	int count=0;
 	setelement e;
 

@@ -39,9 +39,35 @@
 #include "igraph_estack.h"
 #include "config.h"
 
-/*
+/**
  * \function igraph_even_tarjan_reduction
  * Even-Tarjan reduction of a graph
+ *
+ * A digraph is created with twice as many vertices and edges. For each
+ * original vertex i, two vertices i'= i and i'' = i' + n are created,
+ * with a directed edge from i' to i''. For each original directed edge
+ * from i to j, two new edges are created, from i' to j'' and from i''
+ * to j'.
+ *
+ * </para><para>This reduction is used in the paper (observation 2):
+ * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
+ * a graph, Networks 23, 533--541, 1993.
+ *
+ * </para><para>The original paper where this reduction was conceived is
+ * Shimon Even and R. Endre Tarjan: Network Flow and Testing Graph
+ * Connectivity, SIAM J. Comput., 4(4), 507–518.
+ *
+ * \param graph A graph. Although directness is not checked, this function
+ *        is commonly used only on directed graphs.
+ * \param graphbar Pointer to a new directed graph that will contain the
+ *        reduction, with twice as many vertices and edges.
+ * \param capacity Pointer to an initialized vector or a null pointer. If
+ *        not a null pointer, then it will be filled the capacity from
+ *        the reduction: the first |E| elements are 1, the remaining |E|
+ *        are equal to |V| (which is used to mean infinity).
+ * \return Error code.
+ *
+ * Time complexity: O(|E|+|V|).
  *
  * \example examples/simple/even_tarjan.c
  */
@@ -1170,7 +1196,7 @@ static int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
 
     igraph_vector_destroy(&indeg);
     igraph_vector_destroy(&neis);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return 0;
 }
@@ -1284,10 +1310,14 @@ static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  * \function igraph_all_st_mincuts
  * All minimum s-t cuts of a directed graph
  *
- * This function lists all minimum edge cuts between two vertices, in a
- * directed graph. The implemented algorithm
- * is described in JS Provan and DR Shier: A Paradigm for listing
- * (s,t)-cuts in graphs, Algorithmica 15, 351--372, 1996.
+ * This function lists all edge cuts between two vertices, in a directed graph,
+ * with minimum total capacity. Possibly, multiple cuts may have the same total
+ * capacity, although there is often only one minimum cut in weighted graphs.
+ * It is recommended to supply integer-values capacities. Otherwise, not all
+ * minimum cuts may be detected because of numerical roundoff errors.
+ * The implemented algorithm is described in JS Provan and DR
+ * Shier: A Paradigm for listing (s,t)-cuts in graphs, Algorithmica 15,
+ * 351--372, 1996.
  *
  * \param graph The input graph, it must be directed.
  * \param value Pointer to a real number, the value of the minimum cut
@@ -1307,8 +1337,9 @@ static int igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  *        ignored if it is a null pointer.
  * \param source The id of the source vertex.
  * \param target The id of the target vertex.
- * \param capacity Vector of edge capacities. If this is a null
- *        pointer, then all edges are assumed to have capacity one.
+ * \param capacity Vector of edge capacities. All capacities must be
+ *        strictly positive. If this is a null pointer, then all edges
+ *        are assumed to have capacity one.
  * \return Error code.
  *
  * Time complexity: O(n(|V|+|E|))+O(F), where |V| is the number of
@@ -1359,6 +1390,10 @@ int igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
     }
     if (source == target) {
         IGRAPH_ERROR("`source' and 'target' are the same vertex", IGRAPH_EINVAL);
+    }
+    if (capacity != NULL && igraph_vector_min(capacity) <= 0)
+    {
+        IGRAPH_ERROR("Not all capacities are strictly positive.", IGRAPH_EINVAL);
     }
 
     if (!partition1s) {

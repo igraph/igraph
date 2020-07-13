@@ -173,9 +173,9 @@ static int igraph_i_subclique_next(const igraph_t *graph,
     igraph_vector_init(&newedges, 100);
     IGRAPH_FINALLY(igraph_vector_destroy, &newedges);
     igraph_vector_int_init(&mark, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_destroy, &mark);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &mark);
     igraph_vector_int_init(&map, no_of_nodes);
-    IGRAPH_FINALLY(igraph_vector_destroy, &map);
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &map);
     igraph_vector_int_init(&edges, 100);
     IGRAPH_FINALLY(igraph_vector_int_destroy, &edges);
     igraph_vector_init(&neis, 10);
@@ -583,11 +583,12 @@ int igraph_graphlets_candidate_basis(const igraph_t *graph,
     return 0;
 }
 
-static int igraph_i_graphlets_project(const igraph_t *graph,
-                                      const igraph_vector_t *weights,
-                                      const igraph_vector_ptr_t *cliques,
-                                      igraph_vector_t *Mu, igraph_bool_t startMu,
-                                      int niter, int vid1) {
+/* TODO: not made static because it is used by the R interface */
+int igraph_i_graphlets_project(const igraph_t *graph,
+                               const igraph_vector_t *weights,
+                               const igraph_vector_ptr_t *cliques,
+                               igraph_vector_t *Mu, igraph_bool_t startMu,
+                               int niter, int vid1) {
 
     int no_of_nodes = igraph_vcount(graph);
     int no_of_edges = igraph_ecount(graph);

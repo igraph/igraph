@@ -434,7 +434,7 @@ int igraph_get_shortest_paths(const igraph_t *graph,
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
 
-    long int i, j;
+    long int i, j, vsize;
     igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
 
     igraph_vit_t vit;
@@ -502,7 +502,8 @@ int igraph_get_shortest_paths(const igraph_t *graph,
         long int act = (long int) igraph_dqueue_pop(&q) - 1;
 
         IGRAPH_CHECK(igraph_incident(graph, &tmp, (igraph_integer_t) act, mode));
-        for (j = 0; j < igraph_vector_size(&tmp); j++) {
+        vsize = igraph_vector_size(&tmp);
+        for (j = 0; j < vsize; j++) {
             long int edge = (long int) VECTOR(tmp)[j];
             long int neighbor = IGRAPH_OTHER(graph, edge, act);
             if (father[neighbor] > 0) {
@@ -1025,7 +1026,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
     long int no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
     char *already_added;
-    long int i;
+    long int i, vsize;
     igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
 
     if (!IGRAPH_FINITE(vertex) || vertex < 0 || vertex >= no_of_nodes) {
@@ -1058,7 +1059,8 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
 
         IGRAPH_CHECK(igraph_neighbors(graph, &tmp, (igraph_integer_t) actnode,
                                       mode));
-        for (i = 0; i < igraph_vector_size(&tmp); i++) {
+        vsize = igraph_vector_size(&tmp);
+        for (i = 0; i < vsize; i++) {
             long int neighbor = (long int) VECTOR(tmp)[i];
 
             if (already_added[neighbor]) {
@@ -1666,11 +1668,13 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
     for (i = 0; i < no_of_new_nodes; i++) {
         long int old_vid = (long int) VECTOR(*my_vids_new2old)[i];
         long int new_vid = i;
+        igraph_bool_t skip_loop_edge;
 
         IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
         n = igraph_vector_size(&nei_edges);
 
         if (directed) {
+            /* directed graph; this is easier */
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
@@ -1684,10 +1688,15 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
             }
         } else {
+            /* undirected graph. We need to be careful with loop edges as each
+             * loop edge will appear twice. We use a boolean flag to skip every
+             * second loop edge */
+            skip_loop_edge = 0;
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
-                if (IGRAPH_FROM(graph, eid) != old_vid) { /* avoid processing edges twice */
+                if (IGRAPH_FROM(graph, eid) != old_vid) {
+                    /* avoid processing edges twice */
                     continue;
                 }
 
@@ -1695,9 +1704,18 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                 if (!to) {
                     continue;
                 }
+                to -= 1;
+
+                if (new_vid == to) {
+                    /* this is a loop edge; check whether we need to skip it */
+                    skip_loop_edge = !skip_loop_edge;
+                    if (skip_loop_edge) {
+                        continue;
+                    }
+                }
 
                 IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to - 1));
+                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to));
                 IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
             }
         }
@@ -2331,8 +2349,8 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
     long int no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
     long int nodes_to_calc;
-    long int a, b, c, i, j, q;
-    igraph_integer_t edge, from, to, edge2, from2, to2;
+    long int a, b, c, i, j, q, vsize, vsize2;
+    igraph_integer_t edge, from, to, edge2;
 
     igraph_vector_t contrib;
     igraph_vector_t degree;
@@ -2385,33 +2403,24 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         }
 
         /* zero their contribution */
-        for (b = 0; b < igraph_vector_size(&ineis_in); b++) {
+        vsize = igraph_vector_size(&ineis_in);
+        for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_in)[b];
-            igraph_edge(graph, edge, &from, &to);
-            if (to == i) {
-                to = from;
-            }
-            j = to;
+            j = (long int) IGRAPH_OTHER(graph, edge, i);
             VECTOR(contrib)[j] = 0.0;
         }
-        for (b = 0; b < igraph_vector_size(&ineis_out); b++) {
+        vsize = igraph_vector_size(&ineis_out);
+        for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_out)[b];
-            igraph_edge(graph, edge, &from, &to);
-            if (to == i) {
-                to = from;
-            }
-            j = to;
+            j = (long int) IGRAPH_OTHER(graph, edge, i);
             VECTOR(contrib)[j] = 0.0;
         }
 
         /* add the direct contributions, in-neighbors and out-neighbors */
-        for (b = 0; b < igraph_vector_size(&ineis_in); b++) {
+        vsize = igraph_vector_size(&ineis_in);
+        for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_in)[b];
-            igraph_edge(graph, edge, &from, &to);
-            if (to == i) {
-                to = from;
-            }
-            j = to;
+            j = (long int) IGRAPH_OTHER(graph, edge, i);
             if (i != j) {     /* excluding loops */
                 if (weights) {
                     VECTOR(contrib)[j] +=
@@ -2422,13 +2431,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             }
         }
         if (igraph_is_directed(graph)) {
-            for (b = 0; b < igraph_vector_size(&ineis_out); b++) {
+            vsize = igraph_vector_size(&ineis_out);
+            for (b = 0; b < vsize; b++) {
                 edge = (igraph_integer_t) VECTOR(ineis_out)[b];
-                igraph_edge(graph, edge, &from, &to);
-                if (to == i) {
-                    to = from;
-                }
-                j = to;
+                j = (long int) IGRAPH_OTHER(graph, edge, i);
                 if (i != j) {
                     if (weights) {
                         VECTOR(contrib)[j] +=
@@ -2441,13 +2447,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         }
 
         /* add the indirect contributions, in-in, in-out, out-in, out-out */
-        for (b = 0; b < igraph_vector_size(&ineis_in); b++) {
+        vsize = igraph_vector_size(&ineis_in);
+        for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_in)[b];
-            igraph_edge(graph, edge, &from, &to);
-            if (to == i) {
-                to = from;
-            }
-            j = to;
+            j = (long int) IGRAPH_OTHER(graph, edge, i);
             if (i == j) {
                 continue;
             }
@@ -2455,13 +2458,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                                          IGRAPH_IN));
             IGRAPH_CHECK(igraph_incident(graph, &jneis_out, (igraph_integer_t) j,
                                          IGRAPH_OUT));
-            for (c = 0; c < igraph_vector_size(&jneis_in); c++) {
+            vsize2 = igraph_vector_size(&jneis_in);
+            for (c = 0; c < vsize2; c++) {
                 edge2 = (igraph_integer_t) VECTOR(jneis_in)[c];
-                igraph_edge(graph, edge2, &from2, &to2);
-                if (to2 == j) {
-                    to2 = from2;
-                }
-                q = to2;
+                q = (long int) IGRAPH_OTHER(graph, edge2, j);
                 if (j != q) {
                     if (weights) {
                         VECTOR(contrib)[q] +=
@@ -2474,13 +2474,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                 }
             }
             if (igraph_is_directed(graph)) {
-                for (c = 0; c < igraph_vector_size(&jneis_out); c++) {
+                vsize2 = igraph_vector_size(&jneis_out);
+                for (c = 0; c < vsize2; c++) {
                     edge2 = (igraph_integer_t) VECTOR(jneis_out)[c];
-                    igraph_edge(graph, edge2, &from2, &to2);
-                    if (to2 == j) {
-                        to2 = from2;
-                    }
-                    q = to2;
+                    q = (long int) IGRAPH_OTHER(graph, edge2, j);
                     if (j != q) {
                         if (weights) {
                             VECTOR(contrib)[q] +=
@@ -2495,13 +2492,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             }
         }
         if (igraph_is_directed(graph)) {
-            for (b = 0; b < igraph_vector_size(&ineis_out); b++) {
+            vsize = igraph_vector_size(&ineis_out);
+            for (b = 0; b < vsize; b++) {
                 edge = (igraph_integer_t) VECTOR(ineis_out)[b];
-                igraph_edge(graph, edge, &from, &to);
-                if (to == i) {
-                    to = from;
-                }
-                j = to;
+                j = (long int) IGRAPH_OTHER(graph, edge, i);
                 if (i == j) {
                     continue;
                 }
@@ -2509,13 +2503,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                                              IGRAPH_IN));
                 IGRAPH_CHECK(igraph_incident(graph, &jneis_out, (igraph_integer_t) j,
                                              IGRAPH_OUT));
-                for (c = 0; c < igraph_vector_size(&jneis_in); c++) {
+                vsize2 = igraph_vector_size(&jneis_in);
+                for (c = 0; c < vsize2; c++) {
                     edge2 = (igraph_integer_t) VECTOR(jneis_in)[c];
-                    igraph_edge(graph, edge2, &from2, &to2);
-                    if (to2 == j) {
-                        to2 = from2;
-                    }
-                    q = to2;
+                    q = (long int) IGRAPH_OTHER(graph, edge2, j);
                     if (j != q) {
                         if (weights) {
                             VECTOR(contrib)[q] +=
@@ -2527,13 +2518,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                         }
                     }
                 }
-                for (c = 0; c < igraph_vector_size(&jneis_out); c++) {
+                vsize2 = igraph_vector_size(&jneis_out);
+                for (c = 0; c < vsize2; c++) {
                     edge2 = (igraph_integer_t) VECTOR(jneis_out)[c];
-                    igraph_edge(graph, edge2, &from2, &to2);
-                    if (to2 == j) {
-                        to2 = from2;
-                    }
-                    q = to2;
+                    q = (long int) IGRAPH_OTHER(graph, edge2, j);
                     if (j != q) {
                         if (weights) {
                             VECTOR(contrib)[q] +=
@@ -2549,13 +2537,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         }
 
         /* squared sum of the contributions */
-        for (b = 0; b < igraph_vector_size(&ineis_in); b++) {
+        vsize = igraph_vector_size(&ineis_in);
+        for (b = 0; b < vsize; b++) {
             edge = (igraph_integer_t) VECTOR(ineis_in)[b];
-            igraph_edge(graph, edge, &from, &to);
-            if (to == i) {
-                to = from;
-            }
-            j = to;
+            j = (long int) IGRAPH_OTHER(graph, edge, i);
             if (i == j) {
                 continue;
             }
@@ -2563,13 +2548,10 @@ int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             VECTOR(contrib)[j] = 0.0;
         }
         if (igraph_is_directed(graph)) {
-            for (b = 0; b < igraph_vector_size(&ineis_out); b++) {
+            vsize =  igraph_vector_size(&ineis_out);
+            for (b = 0; b < vsize; b++) {
                 edge = (igraph_integer_t) VECTOR(ineis_out)[b];
-                igraph_edge(graph, edge, &from, &to);
-                if (to == i) {
-                    to = from;
-                }
-                j = to;
+                j = (long int) IGRAPH_OTHER(graph, edge, i);
                 if (i == j) {
                     continue;
                 }
@@ -3117,21 +3099,20 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \brief Calculate a possible topological sorting of the graph.
  *
  * </para><para>
- * A topological sorting of a directed acyclic graph is a linear ordering
- * of its nodes where each node comes before all nodes to which it has
+ * A topological sorting of a directed acyclic graph (DAG) is a linear ordering
+ * of its vertices where each vertex comes before all nodes to which it has
  * edges. Every DAG has at least one topological sort, and may have many.
- * This function returns a possible topological sort among them. If the
- * graph is not acyclic (it has at least one cycle), a partial topological
- * sort is returned and a warning is issued.
+ * This function returns one possible topological sort among them. If the
+ * graph is not acyclic (it has at least one cycle), an error is raised.
  *
  * \param graph The input graph.
  * \param res Pointer to a vector, the result will be stored here.
  *   It will be resized if needed.
  * \param mode Specifies how to use the direction of the edges.
- *   For \c IGRAPH_OUT, the sorting order ensures that each node comes
- *   before all nodes to which it has edges, so nodes with no incoming
+ *   For \c IGRAPH_OUT, the sorting order ensures that each vertex comes
+ *   before all vertices to which it has edges, so vertices with no incoming
  *   edges go first. For \c IGRAPH_IN, it is quite the opposite: each
- *   node comes before all nodes from which it receives edges. Nodes
+ *   vertex comes before all vertices from which it receives edges. Vertices
  *   with no outgoing edges go first.
  * \return Error code.
  *
@@ -3140,7 +3121,7 @@ int igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
  *
  * \sa \ref igraph_is_dag() if you are only interested in whether a given
  *     graph is a DAG or not, or \ref igraph_feedback_arc_set() to find a
- *     set of edges whose removal makes the graph a DAG.
+ *     set of edges whose removal makes the graph acyclic.
  *
  * \example examples/simple/igraph_topological_sorting.c
  */
@@ -3153,13 +3134,13 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
     long int node, i, j;
 
     if (mode == IGRAPH_ALL || !igraph_is_directed(graph)) {
-        IGRAPH_ERROR("topological sorting does not make sense for undirected graphs", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Topological sorting does not make sense for undirected graphs", IGRAPH_EINVAL);
     } else if (mode == IGRAPH_OUT) {
         deg_mode = IGRAPH_IN;
     } else if (mode == IGRAPH_IN) {
         deg_mode = IGRAPH_OUT;
     } else {
-        IGRAPH_ERROR("invalid mode", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid mode", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&degrees, no_of_nodes);
@@ -3196,7 +3177,7 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
     }
 
     if (igraph_vector_size(res) < no_of_nodes) {
-        IGRAPH_WARNING("graph contains a cycle, partial result is returned");
+        IGRAPH_ERROR("The graph has cycles; topological sorting is only possible in acyclic graphs", IGRAPH_EINVAL);
     }
 
     igraph_vector_destroy(&degrees);
@@ -3319,7 +3300,7 @@ int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res) {
         igraph_bool_t found = 0;
         IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
         for (i = 0; i < vc; i++) {
-            igraph_neighbors(graph, &neis, (igraph_integer_t) i, IGRAPH_OUT);
+            IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i, IGRAPH_OUT));
             n = igraph_vector_size(&neis);
             for (j = 0; j < n; j++) {
                 if (VECTOR(neis)[j] == i) {
@@ -3532,6 +3513,7 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
     return 0;
 }
 
+
 /**
  * \function igraph_count_multiple
  * \brief Count the number of appearances of the edges in a graph.
@@ -3552,15 +3534,15 @@ int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
  *
  * \sa \ref igraph_is_multiple() and \ref igraph_simplify().
  *
- * Time complexity: O(e*d), e is the number of edges to check and d is the
+ * Time complexity: O(E d), E is the number of edges to check and d is the
  * average degree (out-degree in directed graphs) of the vertices at the
  * tail of the edges.
  */
 
-
 int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es) {
     igraph_eit_t eit;
     long int i;
+    igraph_bool_t directed = igraph_is_directed(graph);
     igraph_lazy_inclist_t inclist;
 
     IGRAPH_CHECK(igraph_eit_create(graph, es, &eit));
@@ -3586,7 +3568,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
             }
         }
         /* for loop edges, divide the result by two */
-        if (to == from) {
+        if (!directed && to == from) {
             VECTOR(*res)[i] /= 2;
         }
     }
@@ -3594,8 +3576,10 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
     igraph_lazy_inclist_destroy(&inclist);
     igraph_eit_destroy(&eit);
     IGRAPH_FINALLY_CLEAN(2);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }
+
 
 /**
  * \function igraph_girth

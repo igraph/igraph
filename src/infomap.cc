@@ -318,5 +318,8 @@ int igraph_community_infomap(const igraph_t * graph,
 
     delete fgraph;
     IGRAPH_FINALLY_CLEAN(1);
+
+	IGRAPH_CHECK(igraph_reindex_membership(membership, 0, 0));
+
     return IGRAPH_SUCCESS;
 }

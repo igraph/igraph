@@ -285,7 +285,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
         /* Update delta, only with/for the affected node */
         VECTOR(D1)[m] = VECTOR(D2)[m] = 0.0;
         for (i = 0; i < no_nodes; i++) {
-            igraph_real_t old_dx, old_dy, old_mi, new_dx, new_dy, new_mi_dist, old_mi_dist;
+            igraph_real_t old_dx, old_dy, new_dx, new_dy, new_mi_dist, old_mi_dist;
             if (i == m) {
                 continue;
             }

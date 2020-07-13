@@ -4,6 +4,54 @@
 
 ### Added
 
+ - Eulerian paths/cycles
+   * `igraph_is_eulerian()`: finds out whether an Eulerian path/cycle exists.
+   * `igraph_eulerian_path()`: returns an Eulerian path.
+   * `igraph_eulerian_cycle()`: returns an Eulerian cycle.
+ - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
+
+### Changed
+
+ - `igraph_community_multilevel()`: added resolution parameter.
+ - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
+ - `igraph_modularity()` now supports computing the directed version of modularity.
+ - `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
+
+### Fixed
+
+ - `igraph_count_multiple()` was giving incorrect results for self-loops in directed graph (PR #1399).
+ - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).
+ - `igraph_eigen_matrix_symmetric()`: fixed incorrect matrix multiplication (PR #1379).
+ - Corrected several issues that could arise during an error condition (PRs #1405, #1406).
+
+### Other
+
+ - `igraph_degree_sequence_game()`: improved performance with `IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM` method.
+ - Documentation improvements.
+ - Improved error and warning messages.
+ - Improved compatibility with recent versions of Microsoft Visual C.
+
+## [0.8.2] - 2020-04-28
+
+### Changed
+
+ - Improved argument checking: `igraph_all_st_mincuts()` and `igraph_sir()`
+ - Improved interruptibility: `igraph_sir()`
+
+### Fixed
+
+ - `igraph_community_leiden()`: fixed crash when interrupting
+ - The tests are now more robust. Some incorrect test failures were fixed when
+   running on i386 architecture, or when using different versions of external
+   dependencies.
+
+### Other
+
+ - Improved error messages from `igraph_sir()`.
+ - Improved compatibility with more recent versions of Microsoft Visual C.
+
+## [0.8.1] - 2020-03-13
+
 ### Changed
 
  - Improved interruptability: `igraph_degree_sequence_game()`
@@ -16,7 +64,7 @@
  - `igraph_bridges()` now handles multigraphs correctly (PR #1335)
  - `igraph_avg_nearest_neighbor_degree()`: fix for memory leak in weighted case (PR #1339)
  - `igraph_community_leiden()`: fix crash bug (PR #1357)
- 
+
 ### Other
 
  - Included `ACKOWLEDGEMENTS.md`

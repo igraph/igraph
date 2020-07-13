@@ -54,5 +54,7 @@ int main() {
     igraph_vector_int_destroy(&vcol);
     igraph_vector_int_destroy(&ecol);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
