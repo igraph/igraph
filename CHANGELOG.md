@@ -4,6 +4,10 @@
 
 ### Added
 
+ - Eulerian paths/cycles
+   * `igraph_is_eulerian()`: finds out whether an Eulerian path/cycle exists.
+   * `igraph_eulerian_path()`: returns an Eulerian path.
+   * `igraph_eulerian_cycle()`: returns an Eulerian cycle.
  - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
 
 ### Changed
