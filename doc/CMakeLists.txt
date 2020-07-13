@@ -84,19 +84,33 @@ file(
 
 # Documentation build requires Python and source-highlight
 find_package(Python3)
-find_program(SOURCE_HIGHLIGHT source-highlight)
+find_program(SOURCE_HIGHLIGHT_COMMAND source-highlight)
 
 # HTML documentation additionally requires xmlto from DocBook
-find_program(XMLTO xmlto)
+find_program(XMLTO_COMMAND xmlto)
 
 # PDF documentation additionally requires xsltproc, xmllint and Apache FOP
-find_program(FOP fop)
-find_program(XMLLINT xmllint)
-find_program(XSLTPROC xsltproc)
+find_program(FOP_COMMAND fop)
+find_program(XMLLINT_COMMAND xmllint)
+find_program(XSLTPROC_COMMAND xsltproc)
 
-set(DOC_BUILD_SUPPORTED Python3_FOUND AND SOURCE_HIGHLIGHT)
-set(HTML_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLTO)
-set(PDF_DOC_BUILD_SUPPORTED DOC_BUILD_SUPPORTED AND XMLLINT AND XSLTPROC AND FOP)
+if(Python3_FOUND AND SOURCE_HIGHLIGHT_COMMAND)
+  set(DOC_BUILD_SUPPORTED TRUE)
+else()
+  set(DOC_BUILD_SUPPORTED FALSE)
+endif()
+
+if(DOC_BUILD_SUPPORTED AND XMLTO_COMMAND)
+  set(HTML_DOC_BUILD_SUPPORTED TRUE)
+else()
+  set(HTML_DOC_BUILD_SUPPORTED FALSE)
+endif()
+
+if(PDF_DOC_BUILD_SUPPORTED AND XMLLINT_COMMAND AND XSLTPROC_COMMAND AND FOP_COMMAND)
+  set(PDF_DOC_BUILD_SUPPORTED TRUE)
+else()
+  set(PDF_DOC_BUILD_SUPPORTED FALSE)
+endif()
 
 if(DOC_BUILD_SUPPORTED)
   set(DOXROX_COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxrox.py)
@@ -169,7 +183,7 @@ if(DOC_BUILD_SUPPORTED)
     add_custom_command(
       OUTPUT ${DOCBOOK_EXAMPLE_OUTPUT}
       COMMAND ${CMAKE_COMMAND} -E make_directory ${DOCBOOK_EXAMPLE_OUTPUT_DIR}
-      COMMAND ${SOURCE_HIGHLIGHT}
+      COMMAND ${SOURCE_HIGHLIGHT_COMMAND}
       ARGS
       --src-lang c
       --out-format docbook
@@ -201,7 +215,7 @@ if(DOC_BUILD_SUPPORTED)
 
     add_custom_command(
       OUTPUT ${HTML_STAMP}
-      COMMAND ${XMLTO} -x ${CMAKE_CURRENT_SOURCE_DIR}/gtk-doc.xsl -o html xhtml igraph-docs.xml
+      COMMAND ${XMLTO_COMMAND} -x ${CMAKE_CURRENT_SOURCE_DIR}/gtk-doc.xsl -o html xhtml igraph-docs.xml
       COMMAND ${CMAKE_COMMAND} -E touch ${HTML_STAMP}
       MAIN_DEPENDENCY igraph-docs.xml
       DEPENDS ${DOCBOOK_INPUTS}
@@ -215,7 +229,7 @@ if(DOC_BUILD_SUPPORTED)
   if(PDF_DOC_BUILD_SUPPORTED)
     add_custom_command(
       OUTPUT igraph-docs-with-resolved-includes.xml
-      COMMAND ${XMLLINT}
+      COMMAND ${XMLLINT_COMMAND}
       ARGS
       --xinclude
       --output igraph-docs-with-resolved-includes-tmp.xml
@@ -235,7 +249,7 @@ if(DOC_BUILD_SUPPORTED)
 
     add_custom_command(
       OUTPUT igraph-docs.fo
-      COMMAND ${XSLTPROC}
+      COMMAND ${XSLTPROC_COMMAND}
       ARGS
       --output igraph-docs.fo
       --stringparam paper.type A4
@@ -247,7 +261,7 @@ if(DOC_BUILD_SUPPORTED)
 
     add_custom_command(
       OUTPUT igraph-docs.pdf
-      COMMAND ${FOP}
+      COMMAND ${FOP_COMMAND}
       ARGS -fo igraph-docs.fo -pdf igraph-docs.pdf
       MAIN_DEPENDENCY igraph-docs.fo
       COMMENT "Generating PDF documentation with Apache FOP"
