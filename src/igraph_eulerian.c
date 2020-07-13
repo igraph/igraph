@@ -568,7 +568,8 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
  * Finds an Eulerian cycle, if it exists. An Eulerian cycle is a closed path
  * that traverses each edge precisely once.
  *
- * <para>This function uses Hierholzer's algorithm.</para>
+ * </para><para>
+ * This function uses Hierholzer's algorithm.
  *
  * \param graph The graph object.
  * \param edge_res Pointer to an initialised vector. The indices of edges
@@ -624,7 +625,8 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
  * Finds an Eulerian path, if it exists. An Eulerian path traverses
  * each edge precisely once.
  *
- * <para>This function uses Hierholzer's algorithm.</para>
+ * </para><para>
+ * This function uses Hierholzer's algorithm.
  *
  * \param graph The graph object.
  * \param edge_res Pointer to an initialised vector. The indices of edges
