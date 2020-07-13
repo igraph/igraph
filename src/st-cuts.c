@@ -39,7 +39,7 @@
 #include "igraph_estack.h"
 #include "config.h"
 
-/*
+/**
  * \function igraph_even_tarjan_reduction
  * Even-Tarjan reduction of a graph
  *
