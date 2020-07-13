@@ -321,8 +321,7 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
  *
- * Time complexity: O(|V|+|E|), the
- * number of vertices times the number of edges.
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges.
  *
  */
 
@@ -569,6 +568,8 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
  * Finds an Eulerian cycle, if it exists. An Eulerian cycle is a closed path
  * that traverses each edge precisely once.
  *
+ * <para>This function uses Hierholzer's algorithm.</para>
+ *
  * \param graph The graph object.
  * \param edge_res Pointer to an initialised vector. The indices of edges
  *                 belonging to the cycle will be stored here. May be \c NULL
@@ -584,11 +585,9 @@ static int igraph_i_eulerian_path_directed(const igraph_t *graph, igraph_vector_
  *           graph does not have an Eulerian cycle.
  *        \endclist
  *
- * Time complexity: O(|V||E|), the
- * number of vertices times the number of edges.
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges.
  *
  */
-
 
 int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res) {
     igraph_bool_t has_cycle;
@@ -625,6 +624,8 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
  * Finds an Eulerian path, if it exists. An Eulerian path traverses
  * each edge precisely once.
  *
+ * <para>This function uses Hierholzer's algorithm.</para>
+ *
  * \param graph The graph object.
  * \param edge_res Pointer to an initialised vector. The indices of edges
  *                 belonging to the path will be stored here. May be \c NULL
@@ -640,8 +641,7 @@ int igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igra
  *           graph does not have an Eulerian path.
  *        \endclist
  *
- * Time complexity: O(|V||E|), the
- * number of vertices times the number of edges.
+ * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges.
  *
  */
 
