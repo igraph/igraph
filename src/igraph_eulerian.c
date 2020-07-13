@@ -40,13 +40,13 @@ has_cycle is set to 1 if a cycle exists, 0 otherwise
 static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle, igraph_integer_t *start_of_path) {
     igraph_integer_t odd;
     igraph_vector_t degree, csize;
-    /* boolean vector to mark singletons */
+    /* boolean vector to mark singletons: */
     igraph_vector_t nonsingleton;
     long int i, n, vsize;
     long int cluster_count;
-    /* number of self-looping singletons */
+    /* number of self-looping singletons: */
     long int es;
-    /* number of non-singletons with edges */
+    /* will be set to 1 if there are non-isolated vertices, otherwise 0: */
     long int ens;
 
     n = igraph_vcount(graph);
@@ -84,7 +84,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
     IGRAPH_FINALLY_CLEAN(1);
 
     /* the graph is connected except for singletons */
-    /* find singletons (except for self-loops) */
+    /* find singletons (including those with self-loops) */
     IGRAPH_VECTOR_INIT_FINALLY(&nonsingleton, 0);
     IGRAPH_CHECK(igraph_degree(graph, &nonsingleton, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
@@ -107,7 +107,7 @@ static int igraph_i_is_eulerian_undirected(const igraph_t *graph, igraph_bool_t 
             /* singleton with self loops */
             es++;
         } else {
-            /* at least one non-singleton with edges */
+            /* at least one non-singleton */
             ens = 1;
             /* note: self-loops count for two (in and out) */
             if (deg % 2) odd++;
@@ -164,11 +164,11 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
     long int i, vsize;
     long int cluster_count;
     igraph_vector_t out_degree, in_degree, csize;
-    /* boolean vector to mark singletons */
+    /* boolean vector to mark singletons: */
     igraph_vector_t nonsingleton;
-    /* number of self-looping singletons */
+    /* number of self-looping singletons: */
     long int es;
-    /* number of non-singletons with edges */
+    /* will be set to 1 if there are non-isolated vertices, otherwise 0: */
     long int ens;
 
     n = igraph_vcount(graph);
@@ -211,12 +211,12 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
     IGRAPH_FINALLY_CLEAN(1);
 
     /* the graph is weakly connected except for singletons */
-    /* find the singletons (except self-loops) */
+    /* find the singletons (including those with self-loops) */
     IGRAPH_VECTOR_INIT_FINALLY(&nonsingleton, 0);
     IGRAPH_CHECK(igraph_degree(graph, &nonsingleton, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
 
-    /* checking if incoming vertices == outgoing vertices
+    /* checking if no. of incoming edges == outgoing edges
      * plus there are a few corner cases with singletons */
     IGRAPH_VECTOR_INIT_FINALLY(&out_degree, 0);
     IGRAPH_CHECK(igraph_degree(graph, &out_degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS));
@@ -239,7 +239,7 @@ static int igraph_i_is_eulerian_directed(const igraph_t *graph, igraph_bool_t *h
             /* if we ever want a path, it has to be this self-loop */
             *start_of_path = i;
         } else {
-            /* at least one non-singleton with edges */
+            /* at least one non-singleton */
             ens = 1;
         }
 
