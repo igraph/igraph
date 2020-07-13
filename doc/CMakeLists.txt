@@ -218,8 +218,16 @@ if(DOC_BUILD_SUPPORTED)
       COMMAND ${XMLLINT}
       ARGS
       --xinclude
-      --output igraph-docs-with-resolved-includes.xml
+      --output igraph-docs-with-resolved-includes-tmp.xml
       igraph-docs.xml
+      COMMAND ${PYTHON3}
+      ARGS
+      ${CMAKE_SOURCE_DIR}/tools/removeexamples.py
+      igraph-docs-with-resolved-includes-tmp.xml
+      igraph-docs-with-resolved-includes.xml
+      COMMAND ${CMAKE_COMMAND}
+      ARGS
+      -E remove igraph-docs-with-resolved-includes-tmp.xml
       MAIN_DEPENDENCY igraph-docs.xml
       DEPENDS ${DOCBOOK_INPUTS}
       COMMENT "Resolving includes in DocBook XML source"
