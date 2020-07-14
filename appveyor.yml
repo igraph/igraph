@@ -6,18 +6,10 @@ environment:
   MSYSTEM: MINGW64
   TARGET_ARCH: "x64"
 
-  matrix:
-    - MSVC_VERSION: "14"
-      PYTHON_VERSION: "3.5"
-    - MSVC_VERSION: "NONE"
-
 # We always use a 64-bit machine, but can build x86 distributions
 # with the PYTHON_ARCH variable (which is used by CMD_IN_ENV).
 platform:
     - x64
-
-init:
-  - cmd: "ECHO MSVC_VERSION=%MSVC_VERSION%"
 
 # all our builds have to happen in install...
 build: false
@@ -39,11 +31,9 @@ install:
     - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
     - cmd: mkdir build
     - cmd: cd build
-    - cmd: if %MSVC_VERSION%==14 call "%VS140COMNTOOLS%\vsvars32.bat"
-    - cmd: if %MSVC_VERSION%==NONE cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
-    - cmd: if [%MSVC_VERSION%] NEQ [NONE] bash cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
-    - cmd: if %MSVC_VERSION%==NONE cmake --build .
-    - cmd: if [%MSVC_VERSION%] NEQ [NONE] bash cmake --build .
+    - cmd: call "%VS140COMNTOOLS%\vsvars32.bat"
+    - cmd: cmake .. -DIGRAPH_GMP_SUPPORT=NO -DIGRAPH_GRAPHML_SUPPORT=NO -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+    - cmd: cmake --build .
 
 test_script:
     - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
