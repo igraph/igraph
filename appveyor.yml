@@ -29,12 +29,15 @@ install:
     - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S zstd"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S autoconf automake bison flex"
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S bison flex"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S libxml2-devel zip xz"
+
+    # Install dependencies for MSVC build
+    - choco install winflexbison
 
     # Now start with the build
     - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
-    - cmd: bash mkdir build
+    - cmd: mkdir build
     - cmd: cd build
     - cmd: if %MSVC_VERSION%==14 call "%VS140COMNTOOLS%\vsvars32.bat"
     - cmd: if [%MSVC_VERSION%] EQ [NONE] cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
