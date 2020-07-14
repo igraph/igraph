@@ -32,25 +32,20 @@ install:
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S autoconf automake bison flex"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S libxml2-devel zip xz"
 
-    # Now start with the build: first the msys2 based one
-    - cmd: bash bootstrap.sh
-    - cmd: bash configure --enable-verify-finally
-
-    # now make the msvc-specific distribution
-    - cmd: if [%MSVC_VERSION%] NEQ [NONE] make msvc
-    - cmd: if [%MSVC_VERSION%] NEQ [NONE] cd igraph-*-msvc
-
-    # and run the build (use make or msbuild.exe, depending on whether we use MSVC)
-    - cmd: if %MSVC_VERSION%==NONE make
+    # Now start with the build
+    - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
+    - cmd: bash mkdir build
+    - cmd: cd build
     - cmd: if %MSVC_VERSION%==14 call "%VS140COMNTOOLS%\vsvars32.bat"
-    - cmd: if %MSVC_VERSION%==14 devenv /upgrade igraph.vcproj
-    - cmd: if %MSVC_VERSION%==14 msbuild.exe igraph.vcxproj /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+    - cmd: if [%MSVC_VERSION%] EQ [NONE] cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+    - cmd: if [%MSVC_VERSION%] NEQ [NONE] bash cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+    - cmd: if [%MSVC_VERSION%] EQ [NONE] cmake --build .
+    - cmd: if [%MSVC_VERSION%] NEQ [NONE] bash cmake --build .
 
 test_script:
     - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
-    - cmd: set "PATH=%APPVEYOR_BUILD_FOLDER%\src\.libs;%PATH%"
-    - cmd: path
-    - cmd: if %MSVC_VERSION%==NONE make check
+    - cmd: cd build
+    - cmd: ctest
 
 on_failure:
     - cmd: echo zipping everything after a failure...
