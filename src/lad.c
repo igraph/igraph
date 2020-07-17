@@ -98,7 +98,7 @@ typedef struct {
     igraph_matrix_char_t isEdge;
 } Tgraph;
 
-int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
+static int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
     long int i, j, n;
     long int no_of_nodes = igraph_vcount(igraph);
     igraph_vector_int_t *neis;
@@ -111,8 +111,7 @@ int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
 
     IGRAPH_CHECK(igraph_adjlist_init(igraph, &graph->succ, IGRAPH_OUT));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &graph->succ);
-    IGRAPH_CHECK(igraph_matrix_char_init(&graph->isEdge,
-                                         no_of_nodes, no_of_nodes));
+    IGRAPH_CHECK(igraph_matrix_char_init(&graph->isEdge, no_of_nodes, no_of_nodes));
     IGRAPH_FINALLY(igraph_matrix_char_destroy, &graph->isEdge);
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -128,8 +127,17 @@ int igraph_i_lad_createGraph(const igraph_t *igraph, Tgraph* graph) {
         }
     }
 
-    return 0;
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return IGRAPH_SUCCESS;
 }
+
+static void igraph_i_lad_destroyGraph(Tgraph *graph) {
+    igraph_matrix_char_destroy(&graph->isEdge);
+    igraph_adjlist_destroy(&graph->succ);
+    igraph_vector_destroy(&graph->nbSucc);
+}
+
 
 /* ---------------------------------------------------------*/
 /* Coming from domains.c                                    */
@@ -484,8 +492,8 @@ static bool igraph_i_lad_compare(int size_mu, int* mu, int size_mv, int* mv) {
 }
 
 static int igraph_i_lad_initDomains(bool initialDomains,
-                             igraph_vector_ptr_t *domains, Tdomain* D,
-                             Tgraph* Gp, Tgraph* Gt, int *empty) {
+                                    const igraph_vector_ptr_t *domains, Tdomain *D,
+                                    const Tgraph *Gp, const Tgraph *Gt, int *empty) {
     /* for every pattern node u, initialize D(u) with every vertex v
        such that for every neighbor u' of u there exists a different
        neighbor v' of v such that degree(u) <= degree(v)
@@ -497,8 +505,6 @@ static int igraph_i_lad_initDomains(bool initialDomains,
     int *mu, *mv;
     int matchingSize, u, v, i, j;
     igraph_vector_t *vec;
-    igraph_vector_t *Gp_uneis;
-    igraph_vector_t *Gt_vneis;
 
     val = igraph_Calloc(Gp->nbVertices * Gt->nbVertices, int);
     if (val == 0) {
@@ -511,16 +517,13 @@ static int igraph_i_lad_initDomains(bool initialDomains,
         IGRAPH_ERROR("cannot allocated 'dom' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&D->globalMatchingP, Gp->nbVertices));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &D->globalMatchingP);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&D->globalMatchingP, Gp->nbVertices);
     igraph_vector_int_fill(&D->globalMatchingP, -1L);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&D->globalMatchingT, Gt->nbVertices));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &D->globalMatchingT);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&D->globalMatchingT, Gt->nbVertices);
     igraph_vector_int_fill(&D->globalMatchingT, -1L);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&D->nbVal, Gp->nbVertices));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &D->nbVal);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&D->nbVal, Gp->nbVertices);
 
     IGRAPH_CHECK(igraph_vector_int_init(&D->firstVal, Gp->nbVertices));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &D->firstVal);
@@ -536,8 +539,7 @@ static int igraph_i_lad_initDomains(bool initialDomains,
     IGRAPH_CHECK(igraph_vector_char_init(&D->markedToFilter, Gp->nbVertices));
     IGRAPH_FINALLY(igraph_vector_char_destroy, &D->markedToFilter);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&D->toFilter, Gp->nbVertices));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &D->toFilter);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&D->toFilter, Gp->nbVertices);
 
     D->valSize = 0;
     matchingSize = 0;
@@ -602,29 +604,54 @@ static int igraph_i_lad_initDomains(bool initialDomains,
         }
         if (VECTOR(D->nbVal)[u] == 0) {
             *empty = 1;  /* empty domain */
+
             igraph_free(val);
             igraph_free(dom);
-            return 0;
+
+            /* On this branch, 'val' and 'matching' are unused.
+             * We init them anyway so that we can have a consistent destructor. */
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&D->val, 0);
+            IGRAPH_VECTOR_INT_INIT_FINALLY(&D->matching, 0);
+            IGRAPH_FINALLY_CLEAN(10);
+
+            return IGRAPH_SUCCESS;
         }
     }
-    IGRAPH_CHECK(igraph_vector_int_init(&D->val, D->valSize));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &D->val);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&D->val, D->valSize);
     for (i = 0; i < D->valSize; i++) {
         VECTOR(D->val)[i] = val[i];
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&D->matching, matchingSize));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &D->matching);
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&D->matching, matchingSize);
     igraph_vector_int_fill(&D->matching, -1);
 
     D->nextOutToFilter = 0;
     D->lastInToFilter = (int) (Gp->nbVertices - 1);
+
     *empty = 0;
 
     igraph_free(val);
     igraph_free(dom);
-    return 0;
+
+    IGRAPH_FINALLY_CLEAN(10);
+
+    return IGRAPH_SUCCESS;
 }
+
+static void igraph_i_lad_destroyDomains(Tdomain *D) {
+    igraph_vector_int_destroy(&D->globalMatchingP);
+    igraph_vector_int_destroy(&D->globalMatchingT);
+    igraph_vector_int_destroy(&D->nbVal);
+    igraph_vector_int_destroy(&D->firstVal);
+    igraph_matrix_int_destroy(&D->posInVal);
+    igraph_matrix_int_destroy(&D->firstMatch);
+    igraph_vector_char_destroy(&D->markedToFilter);
+    igraph_vector_int_destroy(&D->toFilter);
+
+    igraph_vector_int_destroy(&D->val);
+    igraph_vector_int_destroy(&D->matching);
+}
+
 
 /* ---------------------------------------------------------*/
 /* Coming from allDiff.c                                    */
@@ -1574,14 +1601,18 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
     }
 
     IGRAPH_CHECK(igraph_i_lad_createGraph(pattern, &Gp));
+    IGRAPH_FINALLY(igraph_i_lad_destroyGraph, &Gp);
+
     IGRAPH_CHECK(igraph_i_lad_createGraph(target, &Gt));
+    IGRAPH_FINALLY(igraph_i_lad_destroyGraph, &Gt);
 
     if (Gp.nbVertices > Gt.nbVertices) {
         goto exit3;
     }
 
-    IGRAPH_CHECK(igraph_i_lad_initDomains(initialDomains, domains, &D, &Gp,
-                                          &Gt, &invalidDomain));
+    IGRAPH_CHECK(igraph_i_lad_initDomains(initialDomains, domains, &D, &Gp, &Gt, &invalidDomain));
+    IGRAPH_FINALLY(igraph_i_lad_destroyDomains, &D);
+
     if (invalidDomain) {
         goto exit2;
     }
@@ -1633,32 +1664,16 @@ int igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
     IGRAPH_FINALLY_CLEAN(1);
 
 exit:
-
-    igraph_vector_int_destroy(&D.val);
-    igraph_vector_int_destroy(&D.matching);
-    IGRAPH_FINALLY_CLEAN(2);
-
 exit2:
 
-    igraph_vector_int_destroy(&D.globalMatchingP);
-    igraph_vector_int_destroy(&D.globalMatchingT);
-    igraph_vector_int_destroy(&D.nbVal);
-    igraph_vector_int_destroy(&D.firstVal);
-    igraph_matrix_int_destroy(&D.posInVal);
-    igraph_matrix_int_destroy(&D.firstMatch);
-    igraph_vector_char_destroy(&D.markedToFilter);
-    igraph_vector_int_destroy(&D.toFilter);
-    IGRAPH_FINALLY_CLEAN(8);
+    igraph_i_lad_destroyDomains(&D);
+    IGRAPH_FINALLY_CLEAN(1);
 
 exit3:
 
-    igraph_matrix_char_destroy(&Gt.isEdge);
-    igraph_adjlist_destroy(&Gt.succ);
-    igraph_vector_destroy(&Gt.nbSucc);
-    igraph_matrix_char_destroy(&Gp.isEdge);
-    igraph_adjlist_destroy(&Gp.succ);
-    igraph_vector_destroy(&Gp.nbSucc);
-    IGRAPH_FINALLY_CLEAN(6);
+    igraph_i_lad_destroyGraph(&Gt);
+    igraph_i_lad_destroyGraph(&Gp);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return 0;
 }

@@ -132,7 +132,7 @@ int *graph_molloy_hash::hard_copy() {
     int *p = hc + 2 + n;
     int *l = links;
     for (int i = 0; i < n; i++) for (int j = HASH_SIZE(deg[i]); j--; l++) {
-            register int d;
+            int d;
             if ((d = *l) != HASH_NONE && d >= i) {
                 *(p++) = d;
             }

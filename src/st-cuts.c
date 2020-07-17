@@ -1170,7 +1170,7 @@ static int igraph_i_all_st_mincuts_minimal(const igraph_t *Sbar,
 
     igraph_vector_destroy(&indeg);
     igraph_vector_destroy(&neis);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return 0;
 }

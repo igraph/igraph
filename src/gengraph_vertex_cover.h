@@ -28,10 +28,7 @@
 // Moreover, vertex_cover() keeps links[] intact, permuting only the adjacency lists
 
 #include "gengraph_box_list.h"
-
-#ifndef register
-    #define register
-#endif
+#include <cstddef>
 
 namespace gengraph {
 
@@ -57,9 +54,9 @@ void vertex_cover(int n, int *links, int *deg, int **neigh = NULL) {
         if (!bl.is_empty()) {
             v = bl.get_max();
             int *w = neigh[v];
-            register int v2 = *(w++);
-            register int dm = deg[v2];
-            register int k = deg[v] - 1;
+            int v2 = *(w++);
+            int dm = deg[v2];
+            int k = deg[v] - 1;
             while (k--) if (deg[*(w++)] > dm) {
                     v2 = *(w - 1);
                     dm = deg[v2];
