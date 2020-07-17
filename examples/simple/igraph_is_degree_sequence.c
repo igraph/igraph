@@ -196,5 +196,21 @@ int main() {
     igraph_vector_destroy(&outseq);
     igraph_vector_destroy(&inseq);
 
+    /* Valid undirected degree sequence but not graphical */
+    igraph_vector_init_int_end(&outseq, -1, 1, 2, 3, -1);
+    igraph_is_graphical_degree_sequence(&outseq, 0, &result);
+    if (result) {
+        return 18;
+    }
+    igraph_vector_destroy(&outseq);
+
+    /* Valid undirected degree sequence but not graphical */
+    igraph_vector_init_int_end(&outseq, -1, 3, 2, 1, -1);
+    igraph_is_graphical_degree_sequence(&outseq, 0, &result);
+    if (result) {
+        return 19;
+    }
+    igraph_vector_destroy(&outseq);
+
     return 0;
 }
