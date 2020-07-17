@@ -754,17 +754,27 @@ int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
 
 /**
  * \ingroup vector
+ * \function igraph_vector_reverse_sort_cmp
+ * \brief Internal comparison function of vector elements, used by
+ * \ref igraph_vector_reverse_sort().
+ */
+
+int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
+    const BASE *da = (const BASE *) a;
+    const BASE *db = (const BASE *) b;
+
+    return (*da < *db) - (*da > *db);
+}
+
+/**
+ * \ingroup vector
  * \function igraph_vector_sort
  * \brief Sorts the elements of the vector into ascending order.
  *
- * </para><para>
- * This function uses the built-in sort function of the C library.
  * \param v Pointer to an initialized vector object.
  *
- * Time complexity: should be
- * O(nlogn) for
- * n
- * elements.
+ * Time complexity:
+ * O(n log n) for n elements.
  */
 
 void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v) {
@@ -772,6 +782,24 @@ void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v) {
     assert(v->stor_begin != NULL);
     igraph_qsort(v->stor_begin, (size_t) FUNCTION(igraph_vector, size)(v),
                  sizeof(BASE), FUNCTION(igraph_vector, sort_cmp));
+}
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_reverse_sort
+ * \brief Sorts the elements of the vector into descending order.
+ *
+ * \param v Pointer to an initialized vector object.
+ *
+ * Time complexity:
+ * O(n log n) for n elements.
+ */
+
+void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v) {
+    assert(v != NULL);
+    assert(v->stor_begin != NULL);
+    igraph_qsort(v->stor_begin, (size_t) FUNCTION(igraph_vector, size)(v),
+                 sizeof(BASE), FUNCTION(igraph_vector, reverse_sort_cmp));
 }
 
 /**
