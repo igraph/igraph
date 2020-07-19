@@ -6945,15 +6945,38 @@ int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
     }
 }
 
-int igraph_i_is_graphical_degree_sequence_undirected(
-    const igraph_vector_t *degrees, igraph_bool_t *res) {
+int igraph_i_is_graphical_degree_sequence_undirected(const igraph_vector_t *degrees, igraph_bool_t *res) {
     igraph_vector_t work;
+    long int sum, i;
     long int w, b, s, c, n, k;
+
+    n = igraph_vector_size(degrees);
+
+    /* zero-length sequences are considered graphical */
+    if (n == 0) {
+        *res = 1;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* the sum of degrees must be even, and all degrees must be non-negative */
+    sum = 0;
+    for (i=0; i < n; ++i) {
+        long int d = VECTOR(*degrees)[i];
+        if (d < 0) {
+            *res = 0;
+            return IGRAPH_SUCCESS;
+        }
+        sum += d;
+    }
+    if (sum % 2 == 1) {
+        *res = 0;
+        return IGRAPH_SUCCESS;
+    }
 
     IGRAPH_CHECK(igraph_vector_copy(&work, degrees));
     IGRAPH_FINALLY(igraph_vector_destroy, &work);
 
-    igraph_vector_sort(&work);
+    igraph_vector_reverse_sort(&work);
 
     /* This algorithm is outlined in TR-2011-11 of the Egervary Research Group,
      * ISSN 1587-4451. The main loop of the algorithm is O(n) but it is dominated
@@ -6964,13 +6987,12 @@ int igraph_i_is_graphical_degree_sequence_undirected(
      * the degrees themselves. w and k are zero-based here; in the technical
      * report they are 1-based */
     *res = 1;
-    n = igraph_vector_size(&work);
     w = n - 1; b = 0; s = 0; c = 0;
     for (k = 0; k < n; k++) {
-        b += VECTOR(*degrees)[k];
+        b += VECTOR(work)[k];
         c += w;
-        while (w > k && VECTOR(*degrees)[w] <= k + 1) {
-            s += VECTOR(*degrees)[w];
+        while (w > k && VECTOR(work)[w] <= k + 1) {
+            s += VECTOR(work)[w];
             c -= (k + 1);
             w--;
         }
@@ -6986,7 +7008,7 @@ int igraph_i_is_graphical_degree_sequence_undirected(
     igraph_vector_destroy(&work);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 typedef struct {
