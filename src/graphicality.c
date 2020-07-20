@@ -691,3 +691,124 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
 
     return IGRAPH_SUCCESS;
 }
+
+
+/***** Legacy functions *****/
+
+#define SUCCEED {   \
+        if (res) {        \
+            *res = 1;       \
+        }                 \
+        return IGRAPH_SUCCESS; \
+    }
+
+#define FAIL {   \
+        if (res) {     \
+            *res = 0;    \
+        }              \
+        return IGRAPH_SUCCESS; \
+    }
+
+/**
+ * \function igraph_is_degree_sequence
+ * \brief Determines whether a degree sequence is valid.
+ *
+ * This function is deprecated in favour of \ref igraph_is_graphical() with
+ * <code>allowed_edge_types = IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW</code>.
+ *
+ * </para><para>
+ * A sequence of n integers is a valid degree sequence if there exists some
+ * graph where the degree of the i-th vertex is equal to the i-th element of the
+ * sequence. Note that the graph may contain multiple or loop edges; if you are
+ * interested in whether the degrees of some \em simple graph may realize the
+ * given sequence, use \ref igraph_is_graphical_degree_sequence.
+ *
+ * </para><para>
+ * In particular, the function checks whether all the degrees are non-negative.
+ * For undirected graphs, it also checks whether the sum of degrees is even.
+ * For directed graphs, the function checks whether the lengths of the two
+ * degree vectors are equal and whether their sums are also equal. These are
+ * known sufficient and necessary conditions for a degree sequence to be
+ * valid.
+ *
+ * \param out_degrees  an integer vector specifying the degree sequence for
+ *     undirected graphs or the out-degree sequence for directed graphs.
+ * \param in_degrees   an integer vector specifying the in-degrees of the
+ *     vertices for directed graphs. For undirected graphs, this must be null.
+ * \param res  pointer to a boolean variable, the result will be stored here
+ * \return Error code.
+ *
+ * Time complexity: O(n), where n is the length of the degree sequence.
+ */
+int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
+                              const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+    /* degrees must be non-negative */
+    if (igraph_vector_any_smaller(out_degrees, 0)) {
+        FAIL;
+    }
+    if (in_degrees && igraph_vector_any_smaller(in_degrees, 0)) {
+        FAIL;
+    }
+
+    if (in_degrees == 0) {
+        /* sum of degrees must be even */
+        if (((long int)igraph_vector_sum(out_degrees) % 2) != 0) {
+            FAIL;
+        }
+    } else {
+        /* length of the two degree vectors must be equal */
+        if (igraph_vector_size(out_degrees) != igraph_vector_size(in_degrees)) {
+            FAIL;
+        }
+        /* sum of in-degrees must be equal to sum of out-degrees */
+        if (igraph_vector_sum(out_degrees) != igraph_vector_sum(in_degrees)) {
+            FAIL;
+        }
+    }
+
+    SUCCEED;
+    return 0;
+}
+
+#undef SUCCEED
+#undef FAIL
+
+
+/**
+ * \function igraph_is_graphical_degree_sequence
+ * \brief Determines whether a sequence of integers can be a degree sequence of some simple graph.
+ *
+ * This function is deprecated in favour of \ref igraph_is_graphical() with
+ * <code>allowed_edge_types = IGRAPH_SIMPLE_SW</code>.
+ *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * Hakimi SL: On the realizability of a set of integers as degrees of the
+ * vertices of a simple graph. J SIAM Appl Math 10:496-506, 1962.
+ *
+ * </para><para>
+ * PL Erdos, I Miklos and Z Toroczkai: A simple Havel-Hakimi type algorithm
+ * to realize graphical degree sequences of directed graphs. The Electronic
+ * Journal of Combinatorics 17(1):R66, 2010.
+ *
+ * </para><para>
+ * Z Kiraly: Recognizing graphic degree sequences and generating all
+ * realizations. TR-2011-11, Egervary Research Group, H-1117, Budapest,
+ * Hungary. ISSN 1587-4451, 2012.
+ *
+ * \param out_degrees  an integer vector specifying the degree sequence for
+ *     undirected graphs or the out-degree sequence for directed graphs.
+ * \param in_degrees   an integer vector specifying the in-degrees of the
+ *     vertices for directed graphs. For undirected graphs, this must be null.
+ * \param res  pointer to a boolean variable, the result will be stored here
+ * \return Error code.
+ *
+ * Time complexity: O(n log n) for undirected graphs, O(n^2) for directed
+ *                  graphs, where n is the length of the degree sequence.
+ */
+int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
+                                        const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+    return igraph_is_graphical(out_degrees, in_degrees, IGRAPH_SIMPLE_SW, res);
+}

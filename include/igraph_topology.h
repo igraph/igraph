@@ -33,15 +33,6 @@
 __BEGIN_DECLS
 
 /* -------------------------------------------------- */
-/* Degree sequences                                   */
-/* -------------------------------------------------- */
-
-DECLDIR int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
-                                      const igraph_vector_t *in_degrees, igraph_bool_t *res);
-DECLDIR int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
-        const igraph_vector_t *in_degrees, igraph_bool_t *res);
-
-/* -------------------------------------------------- */
 /* Directed acyclic graphs                            */
 /* -------------------------------------------------- */
 
