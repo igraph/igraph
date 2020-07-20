@@ -6799,8 +6799,12 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
 
 /**
  * \function igraph_is_degree_sequence
- * Determines whether a degree sequence is valid.
+ * \brief Determines whether a degree sequence is valid.
  *
+ * This function is deprecated in favour of \ref igraph_is_graphical() with
+ * <code>allowed_edge_types = IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW</code>.
+ *
+ * </para><para>
  * A sequence of n integers is a valid degree sequence if there exists some
  * graph where the degree of the i-th vertex is equal to the i-th element of the
  * sequence. Note that the graph may contain multiple or loop edges; if you are
@@ -6854,16 +6858,18 @@ int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
     return 0;
 }
 
-int igraph_i_is_graphical_degree_sequence_undirected(
+static int igraph_i_is_graphical_degree_sequence_undirected(
     const igraph_vector_t *degrees, igraph_bool_t *res);
-int igraph_i_is_graphical_degree_sequence_directed(
+static int igraph_i_is_graphical_degree_sequence_directed(
     const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees,
     igraph_bool_t *res);
 
 /**
  * \function igraph_is_graphical_degree_sequence
- * Determines whether a sequence of integers can be a degree sequence of some
- * simple graph.
+ * \brief Determines whether a sequence of integers can be a degree sequence of some simple graph.
+ *
+ * This function is deprecated in favour of \ref igraph_is_graphical() with
+ * <code>allowed_edge_types = IGRAPH_SIMPLE_SW</code>.
  *
  * </para><para>
  * References:
@@ -6910,7 +6916,7 @@ int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
     }
 }
 
-int igraph_i_is_graphical_degree_sequence_undirected(const igraph_vector_t *degrees, igraph_bool_t *res) {
+static int igraph_i_is_graphical_degree_sequence_undirected(const igraph_vector_t *degrees, igraph_bool_t *res) {
     igraph_vector_t work;
     long int w, b, s, c, n, k;
 
@@ -6965,7 +6971,7 @@ typedef struct {
     const igraph_vector_t* second;
 } igraph_i_qsort_dual_vector_cmp_data_t;
 
-int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *p2) {
+static int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *p2) {
     igraph_i_qsort_dual_vector_cmp_data_t* sort_data =
         (igraph_i_qsort_dual_vector_cmp_data_t*)data;
     long int index1 = *((long int*)p1);
@@ -6985,7 +6991,7 @@ int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *
     return 0;
 }
 
-int igraph_i_is_graphical_degree_sequence_directed(
+static int igraph_i_is_graphical_degree_sequence_directed(
     const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees,
     igraph_bool_t *res) {
     igraph_vector_long_t index_array;
