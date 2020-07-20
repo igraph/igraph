@@ -6947,7 +6947,6 @@ int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
 
 int igraph_i_is_graphical_degree_sequence_undirected(const igraph_vector_t *degrees, igraph_bool_t *res) {
     igraph_vector_t work;
-    long int sum, i;
     long int w, b, s, c, n, k;
 
     n = igraph_vector_size(degrees);
@@ -6955,21 +6954,6 @@ int igraph_i_is_graphical_degree_sequence_undirected(const igraph_vector_t *degr
     /* zero-length sequences are considered graphical */
     if (n == 0) {
         *res = 1;
-        return IGRAPH_SUCCESS;
-    }
-
-    /* the sum of degrees must be even, and all degrees must be non-negative */
-    sum = 0;
-    for (i=0; i < n; ++i) {
-        long int d = VECTOR(*degrees)[i];
-        if (d < 0) {
-            *res = 0;
-            return IGRAPH_SUCCESS;
-        }
-        sum += d;
-    }
-    if (sum % 2 == 1) {
-        *res = 0;
         return IGRAPH_SUCCESS;
     }
 
