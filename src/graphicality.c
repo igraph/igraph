@@ -99,8 +99,7 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  *
  * \sa igraph_is_bigraphical()
  *
- * Time complexity: O(n log n) for simple undirected graphs,
- * O(n^2) for simple directed graphs, O(n) for all other cases,
+ * Time complexity: O(n^2) for simple directed graphs, O(n) for all other cases,
  * where n is the length of the degree sequence(s).
  */
 int igraph_is_graphical(const igraph_vector_t *out_degrees,
@@ -357,6 +356,104 @@ static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degree
     return IGRAPH_SUCCESS;
 }
 
+
+/* Undirected simple graph:
+ *  - Degrees must be non-negative.
+ *  - The sum of degrees must be even.
+ *  - Use the Erdős-Gallai theorem.
+ */
+static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
+    igraph_vector_int_t num_degs; /* num_degs[d] is the # of vertices with degree d */
+    const long int p = igraph_vector_size(degrees);
+    long int dmin, dmax, dsum, n;
+    long int k, sum_deg, sum_ni, sum_ini;
+    long int i, dk;
+
+    if (p == 0) {
+        *res = 1;
+        return IGRAPH_SUCCESS;
+    }
+
+    /* The following implementation of the Erdős-Gallai test
+     * is a direct translation of the Python code given in
+     *
+     * Brian Cloteaux, Is This for Real? Fast Graphicality Testing,
+     * Computing Prescriptions, pp. 91-95, vol. 17 (2015)
+     * https://dx.doi.org/10.1109/MCSE.2015.125
+     *
+     * It uses counting sort and a result from
+     *
+     * I. Zverovich and V. Zverovich, Contributions to the Theory of Graphic Sequences,
+     * Discrete Mathematics, vol. 105, nos. 1-3, 1992, pp. 293–303.
+     *
+     * to achieve linear runtime.
+     */
+
+    IGRAPH_VECTOR_INT_INIT_FINALLY(&num_degs, p);
+
+    dmin = p; dmax = 0; dsum = 0; n = 0;
+    for (i=0; i < p; ++i) {
+        long int d = VECTOR(*degrees)[i];
+
+        if (d < 0 || d >= p) {
+            *res = 0;
+            goto finish;
+        }
+
+        if (d > 0) {
+            dmax = d > dmax ? d : dmax;
+            dmin = d < dmin ? d : dmin;
+            dsum += d;
+            n++;
+            VECTOR(num_degs)[d] += 1;
+        }
+    }
+
+    if (dsum % 2 != 0) {
+        *res = 0;
+        goto finish;
+    }
+
+    if (n == 0 || 4*dmin*n >= (dmax + dmin + 1) * (dmax + dmin + 1)) {
+        *res = 1;
+        goto finish;
+    }
+
+    *res = 1;
+
+    k = 0; sum_deg = 0; sum_ni = 0; sum_ini = 0;
+    for (dk = dmax; dk >= dmin; --dk) {
+        long int run_size, v;
+
+        if (dk < k+1) {
+            *res = 1;
+            goto finish;
+        }
+
+        run_size = VECTOR(num_degs)[dk];
+        if (run_size > 0) {
+            if (dk < k + run_size) {
+                run_size = dk - k;
+            }
+            sum_deg += run_size * dk;
+            for (v=0; v < run_size; ++v) {
+                sum_ni += VECTOR(num_degs)[k+v];
+                sum_ini += (k+v) * VECTOR(num_degs)[k+v];
+            }
+            k += run_size;
+            if (sum_deg > k*(n-1) - k*sum_ni + sum_ini) {
+                *res = 0;
+                goto finish;
+            }
+        }
+    }
+
+finish:
+    igraph_vector_int_destroy(&num_degs);
+    IGRAPH_FINALLY_CLEAN(1);
+
+    return IGRAPH_SUCCESS;
+}
 
 
 /***** Directed case *****/
