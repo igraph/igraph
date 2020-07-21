@@ -609,7 +609,7 @@ static int igraph_i_is_bigraphical_multi(const igraph_vector_t *degrees1, const 
 static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res) {
     igraph_vector_t sorted_deg1, sorted_deg2;
     long int n1 = igraph_vector_size(degrees1), n2 = igraph_vector_size(degrees2);
-    long int i, j, k, n;
+    long int i, k;
     long lhs_sum, partial_rhs_sum;
 
     if (n1 == 0 && n2 == 0) {
@@ -623,9 +623,12 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
         return IGRAPH_SUCCESS;
     }
 
-    /* Ensure that degrees1 is the shorter vector. */
+    /* Ensure that degrees1 is the shorter vector as a minor optimization: */
     if (n2 < n1) {
-        const igraph_vector_t *tmp = degrees1;
+        const igraph_vector_t *tmp;
+        long int n;
+
+        tmp = degrees1;
         degrees1 = degrees2;
         degrees2 = tmp;
 
@@ -634,15 +637,15 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
         n2 = n;
     }
 
-    /* Now n is the length of the longer of the two vectors. */
+    /* Copy and sort both vectors: */
 
-    /* Copy degrees1 and pad it with zeros to ensure its size is the same as degrees2 */
     IGRAPH_CHECK(igraph_vector_copy(&sorted_deg1, degrees1));
     IGRAPH_FINALLY(igraph_vector_destroy, &sorted_deg1);
-    IGRAPH_CHECK(igraph_vector_resize(&sorted_deg1, n));
-    for (i=n1; i < n; ++i) {
-        VECTOR(sorted_deg1)[i] = 0;
-    }
+    igraph_vector_reverse_sort(&sorted_deg1); /* decreasing sort */
+
+    IGRAPH_CHECK(igraph_vector_copy(&sorted_deg2, degrees2));
+    IGRAPH_FINALLY(igraph_vector_destroy, &sorted_deg2);
+    igraph_vector_sort(&sorted_deg2); /* increasing sort */
 
     /*
      * We follow the description of the Gale-Ryser theorem in:
@@ -650,46 +653,42 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
      * A. Berger, A note on the characterization of digraphic sequences, Discrete Math. 314, 38 (2014).
      * http://dx.doi.org/10.1016/j.disc.2013.09.010
      *
-     * Gale-Ryser theorem with 0-based indexing:
+     * Gale-Ryser condition with 0-based indexing:
      *
      * a_i and b_i denote the degree sequences of the two partitions.
      *
-     * Assuming that a_0 >= a_1 >= ... >= a_{n-1},
+     * Assuming that a_0 >= a_1 >= ... >= a_{n_1 - 1},
      *
-     * \sum_{i=0}^k a_i <= \sum_{j=0}^n min(b_i, k+1)
-     * for 0 <= k < n
+     * \sum_{i=0}^k a_i <= \sum_{j=0}^{n_2} min(b_i, k+1)
+     *
+     * for all 0 <= k < n_1
      */
 
-    /* Reverse sort the first degree vector. */
-    igraph_vector_reverse_sort(&sorted_deg1);
-
-    /* Copy and sort the second degree vector.
-     * While the theorem does not require this vector to be sorted,
-     * sorting will make a linear-time implementation possible,
-     * as we can compute the RHS incrementally. */
-    IGRAPH_CHECK(igraph_vector_copy(&sorted_deg2, degrees2));
-    IGRAPH_FINALLY(igraph_vector_destroy, &sorted_deg2);
-    igraph_vector_sort(&sorted_deg2);
+    /* While this formulation does not require sorting degree2,
+     * doing so allows for a linear-time incremental computation
+     * of the inequality's right-hand-side.
+     */
 
     *res = 1; /* be optimistic */
     lhs_sum = 0;
     partial_rhs_sum = 0; /* the sum of those elements in sorted_deg2 which are <= (k+1) */
-    j = 0; /* pointing past the fist element of sorted_deg2 which > k */
-    for (k=0; k < n; ++k) {
+    i = 0; /* points past the first element of sorted_deg2 which > (k+1) */
+    for (k=0; k < n1; ++k) {
         lhs_sum += VECTOR(sorted_deg1)[k];
 
         /* Based on Theorem 3 in [Berger 2014], it is sufficient to do the check
-         * for k such that a_k > a_{k+1} and for k=(n-1).
+         * for k such that a_k > a_{k+1} and for k=(n_1-1).
          */
-        if (k < n-1 && VECTOR(sorted_deg1)[k] == VECTOR(sorted_deg1)[k+1])
+        if (k < n1-1 && VECTOR(sorted_deg1)[k] == VECTOR(sorted_deg1)[k+1])
             continue;
 
-        while (j < n && VECTOR(sorted_deg2)[j] <= k+1) {
-            partial_rhs_sum += VECTOR(sorted_deg2)[j];
-            j++;
+        while (i < n2 && VECTOR(sorted_deg2)[i] <= k+1) {
+            partial_rhs_sum += VECTOR(sorted_deg2)[i];
+            i++;
         }
 
-        if (lhs_sum > partial_rhs_sum + (n - j) * (k+1) ) {
+        /* rhs_sum for a given k is partial_rhs_sum + (n2 - i) * (k+1) */
+        if (lhs_sum > partial_rhs_sum + (n2 - i) * (k+1) ) {
             *res = 0;
             break;
         }
