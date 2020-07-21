@@ -111,7 +111,7 @@ int igraph_is_graphical(const igraph_vector_t *out_degrees,
     /* Undirected case: */
     if (in_degrees == NULL)
     {
-        if ( allowed_edge_types & IGRAPH_LOOPS_SW & IGRAPH_I_MULTI_LOOPS_SW ) {
+        if ( (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW )) {
             /* Typically this case is used when multiple edges are allowed both as self-loops and
              * between distinct vertices. However, the conditions are the same even if multi-edges
              * are not allowed between distinct vertices (only as self-loops). Therefore, we
