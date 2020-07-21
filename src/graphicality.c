@@ -203,7 +203,7 @@ int igraph_is_graphical(const igraph_vector_t *out_degrees,
  *
  * \sa igraph_is_graphical()
  *
- * Time complexity: O(n^2) for simple graphs, O(n) for multigraphs,
+ * Time complexity: O(n log n) for simple graphs, O(n) for multigraphs,
  * where n is the length of the larger degree sequence.
  */
 int igraph_is_bigraphical(const igraph_vector_t *degrees1,
@@ -607,10 +607,10 @@ static int igraph_i_is_bigraphical_multi(const igraph_vector_t *degrees1, const 
  *  - Use the Gale-Ryser theorem.
  */
 static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const igraph_vector_t *degrees2, igraph_bool_t *res) {
-    igraph_vector_t sorted_deg1;
+    igraph_vector_t sorted_deg1, sorted_deg2;
     long int n1 = igraph_vector_size(degrees1), n2 = igraph_vector_size(degrees2);
     long int i, j, k, n;
-    long lhs_sum, rhs_sum;
+    long lhs_sum, partial_rhs_sum;
 
     if (n1 == 0 && n2 == 0) {
         *res = 1;
@@ -660,11 +660,21 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
      * for 0 <= k < n
      */
 
-    /* Reverse sort the first degree vector. Note that the second one does not need to be sorted. */
+    /* Reverse sort the first degree vector. */
     igraph_vector_reverse_sort(&sorted_deg1);
+
+    /* Copy and sort the second degree vector.
+     * While the theorem does not require this vector to be sorted,
+     * sorting will make a linear-time implementation possible,
+     * as we can compute the RHS incrementally. */
+    IGRAPH_CHECK(igraph_vector_copy(&sorted_deg2, degrees2));
+    IGRAPH_FINALLY(igraph_vector_destroy, &sorted_deg2);
+    igraph_vector_sort(&sorted_deg2);
 
     *res = 1; /* be optimistic */
     lhs_sum = 0;
+    partial_rhs_sum = 0; /* the sum of those elements in sorted_deg2 which are <= (k+1) */
+    j = 0; /* pointing past the fist element of sorted_deg2 which > k */
     for (k=0; k < n; ++k) {
         lhs_sum += VECTOR(sorted_deg1)[k];
 
@@ -674,20 +684,20 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
         if (k < n-1 && VECTOR(sorted_deg1)[k] == VECTOR(sorted_deg1)[k+1])
             continue;
 
-        rhs_sum = 0;
-        for (j=0; j < n; ++j) {
-            long int b = VECTOR(*degrees2)[j];
-            rhs_sum += b < k+1 ? b : k+1;
+        while (j < n && VECTOR(sorted_deg2)[j] <= k+1) {
+            partial_rhs_sum += VECTOR(sorted_deg2)[j];
+            j++;
         }
 
-        if (lhs_sum > rhs_sum) {
+        if (lhs_sum > partial_rhs_sum + (n - j) * (k+1) ) {
             *res = 0;
             break;
         }
     }
 
+    igraph_vector_destroy(&sorted_deg2);
     igraph_vector_destroy(&sorted_deg1);
-    IGRAPH_FINALLY_CLEAN(1);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
 }
