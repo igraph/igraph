@@ -78,6 +78,10 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * A. Berger, A note on the characterization of digraphic sequences, Discrete Math. 314, 38 (2014).
  * https://dx.doi.org/10.1016/j.disc.2013.09.010
  *
+ * </para><para>
+ * G. Cairns and S. Mendan, Symmetric Bipartite Graphs and Graphs with Loops (2013).
+ * http://arxiv.org/abs/1303.2145
+ *
  * \param out_degrees A vector of integers specifying the degree sequence for
  *     undirected graphs or the our-degree sequence for directed graphs.
  * \param in_degrees A vector of integers specifying the in-degree sequence for
@@ -285,22 +289,11 @@ static int igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t
 
 
 /* Undirected graph with no multi-edges and at most one self-loop per vertex:
- *  - TODO
- */
-static int igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
-    IGRAPH_UNUSED(degrees); IGRAPH_UNUSED(res);
-    IGRAPH_ERROR(
-        "Graphicality check for simple undirected graphs with at most one self-loop on each vertex is not implemented.",
-        IGRAPH_UNIMPLEMENTED);
-}
-
-
-/* Undirected simple graph:
  *  - Degrees must be non-negative.
  *  - The sum of degrees must be even.
- *  - Use the Erdős-Gallai theorem.
+ *  - Use the modification of the Erdős-Gallai theorem due to Cairns and Mendan.
  */
-static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
+static int igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
     igraph_vector_t work;
     long int w, b, s, c, n, k;
 
@@ -318,19 +311,35 @@ static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degree
         return IGRAPH_SUCCESS;
     }
 
+    /*
+     * We follow this paper:
+     *
+     * G. Cairns & S. Mendan: Degree Sequences for Graphs with Loops, 2013
+     * https://arxiv.org/abs/1303.2145v1
+     *
+     * They give the following modification of the Erdős-Gallai theorem:
+     *
+     * A non-increasing degree sequence d_1 >= ... >= d_n has a realization as
+     * a simple graph with loops (i.e. at most one self-loop allowed on each vertex)
+     * iff
+     *
+     * \sum_{i=1}^k d_i <= k(k+1) + \sum_{i=k+1}^{n} min(d_i, k)
+     *
+     * for each k=1..n
+     *
+     * The difference from Erdős-Gallai is that here we have the term
+     * k(k+1) instead of k(k-1).
+     *
+     * The implementation is analogous to igraph_i_is_graphical_undirected_simple(),
+     * which in turn is based on Király 2012. See comments in that function for details.
+     * w and k are zero-based here, unlike in the statement of the theorem above.
+     */
+
     IGRAPH_CHECK(igraph_vector_copy(&work, degrees));
     IGRAPH_FINALLY(igraph_vector_destroy, &work);
 
     igraph_vector_reverse_sort(&work);
 
-    /* This algorithm is outlined in TR-2011-11 of the Egervary Research Group,
-     * ISSN 1587-4451. The main loop of the algorithm is O(n) but it is dominated
-     * by an O(n log n) quicksort; this could in theory be brought down to
-     * O(n) with binsort but it's probably not worth the fuss.
-     *
-     * Variables names are mostly according to the technical report, apart from
-     * the degrees themselves. w and k are zero-based here; in the technical
-     * report they are 1-based. */
     *res = 1;
     w = n - 1; b = 0; s = 0; c = 0;
     for (k = 0; k < n; k++) {
@@ -341,7 +350,7 @@ static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degree
             c -= (k + 1);
             w--;
         }
-        if (b > c + s) {
+        if (b > c + s + 2*(k + 1)) {
             *res = 0;
             break;
         }
