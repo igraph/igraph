@@ -39,6 +39,7 @@ function(add_legacy_test FOLDER NAME)
     )
     set_property(TEST ${NAME} PROPERTY SKIP_RETURN_CODE 77)
   endif()
+  set_target_properties(test_${NAME} PROPERTIES FOLDER tests/test_${NAME})
 endfunction()
 
 function(add_legacy_tests)
