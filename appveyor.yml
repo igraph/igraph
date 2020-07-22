@@ -12,8 +12,8 @@ platform:
     - x64
 
 configuration:
-    - Debug
-    #- Release
+    #- Debug
+    - Release
 
 # all our builds have to happen in install...
 build: false
