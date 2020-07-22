@@ -11,6 +11,10 @@ environment:
 platform:
     - x64
 
+configuration:
+    - Debug
+    #- Release
+
 # all our builds have to happen in install...
 build: false
 
@@ -33,12 +37,13 @@ install:
     - cmd: cd build
     - cmd: call "%VS140COMNTOOLS%\vsvars32.bat"
     - cmd: cmake .. -DIGRAPH_GMP_SUPPORT=NO -DIGRAPH_GRAPHML_SUPPORT=NO -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
-    - cmd: cmake --build .
+    - cmd: cmake --build . --config "%CONFIGURATION%"
+
 
 test_script:
     - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
     - cmd: cd build
-    - cmd: ctest
+    - cmd: ctest -C "%CONFIGURATION%" --output-on-failure
 
 on_failure:
     - cmd: echo zipping everything after a failure...
