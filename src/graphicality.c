@@ -79,8 +79,8 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * https://dx.doi.org/10.1016/j.disc.2013.09.010
  *
  * </para><para>
- * G. Cairns and S. Mendan, Symmetric Bipartite Graphs and Graphs with Loops (2013).
- * http://arxiv.org/abs/1303.2145
+ * G. Cairns and S. Mendan, Degree Sequence for Graphs with Loops (2013).
+ * https://arxiv.org/abs/1303.2145v1
  *
  * \param out_degrees A vector of integers specifying the degree sequence for
  *     undirected graphs or the our-degree sequence for directed graphs.
@@ -89,13 +89,13 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * \param allowed_edge_types The types of edges to allow in the graph:
  *     \clist
  *     \cli IGRAPH_SIMPLE_SW
- *       simple graphs (i.e. no self-loops or multi-edges allowed)
+ *       simple graphs (i.e. no self-loops or multi-edges allowed).
  *     \cli IGRAPH_LOOPS_SW
- *       single self-loops are allowed, but not multi-edges
+ *       single self-loops are allowed, but not multi-edges.
  *     \cli IGRAPH_MULTI_SW
- *       multi-edges are allowed, but not self-loops
+ *       multi-edges are allowed, but not self-loops.
  *     \cli IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW
- *       both self-loops and multi-edges are allowed
+ *       both self-loops and multi-edges are allowed.
  *     \endclist
  * \param res Pointer to a Boolean. The result will be stored here.
  *
