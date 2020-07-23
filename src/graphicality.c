@@ -140,7 +140,7 @@ int igraph_is_graphical(const igraph_vector_t *out_degrees,
     /* Directed case: */
     else
     {
-        if ( allowed_edge_types & IGRAPH_LOOPS_SW & IGRAPH_I_MULTI_EDGES_SW & IGRAPH_I_MULTI_LOOPS_SW ) {
+        if ( (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) && (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW ) ) {
             return igraph_i_is_graphical_directed_loopy_multi(out_degrees, in_degrees, res);
         }
         else if ( ! (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) ) {
