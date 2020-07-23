@@ -354,7 +354,8 @@ static int igraph_i_realize_undirected_multi_index(const igraph_vector_t *deg, i
             // re-sort the list. A possible optimization would be a version of
             // bubble_up() that can exchange list nodes instead of swapping their values.
             if (vertices.size() > 1) {
-                vlist::iterator wit = std::next(uit);
+                vlist::iterator wit = uit;
+                wit++;
 
                 if (wit->degree > uit->degree) {
                     vertices.sort(degree_greater<vd_pair>);
