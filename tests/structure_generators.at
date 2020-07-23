@@ -138,5 +138,5 @@ AT_CLEANUP
 
 AT_SETUP([Realize a degree sequence (igraph_realize_degree_sequence):])
 AT_KEYWORDS([degree sequence])
-AT_COMPILE_CHECK([simple/igraph_realize_degree_sequence.c], [simple/igraph_realize_degree_sequence.out])
+AT_COMPILE_CHECK([tests/igraph_realize_degree_sequence.c], [tests/igraph_realize_degree_sequence.out])
 AT_CLEANUP
