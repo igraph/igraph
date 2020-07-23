@@ -1265,7 +1265,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
  * |E| are the number of vertices and
  * edges in the graph.
  *
- * \sa \ref igraph_subgraph() if you want a graph object consisting only
+ * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
  * a given set of vertices and the edges between them.
  */
 
@@ -1333,15 +1333,12 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  * \ingroup structural
  * \function igraph_pagerank_old
  * \brief Calculates the Google PageRank for the specified vertices.
+ * \deprecated-by igraph_pagerank 0.7
  *
  * </para><para>This is an old implementation,
  * it is provided for compatibility with igraph versions earlier than
  * 0.5. Please use the new implementation \ref igraph_pagerank() in
  * new projects.
- *
- * </para><para>
- * From version 0.7 this function is deprecated and its use gives a
- * warning message.
  *
  * </para><para>
  * Please note that the PageRank of a given vertex depends on the PageRank
@@ -2016,6 +2013,7 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
  * \ingroup structural
  * \function igraph_subgraph
  * \brief Creates a subgraph induced by the specified vertices.
+ * \deprecated-by igraph_induced_subgraph 0.6
  *
  * </para><para>
  * This function is an alias to \ref igraph_induced_subgraph(), it is

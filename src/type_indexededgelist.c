@@ -1628,12 +1628,7 @@ int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
 /**
  * \function igraph_adjacent
  * \brief Gives the incident edges of a vertex.
- *
- * This function was superseded by \ref igraph_incident() in igraph 0.6.
- * Please use \ref igraph_incident() instead of this function.
- *
- * </para><para>
- * Added in version 0.2, deprecated in version 0.6.
+ * \deprecated-by igraph_incident 0.6
  */
 int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids,
                     igraph_integer_t pnode, igraph_neimode_t mode) {
