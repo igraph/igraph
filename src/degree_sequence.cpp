@@ -29,6 +29,10 @@
 #define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
 #define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
 
+/******************************/
+/***** Helper constructs ******/
+/******************************/
+
 // (vertex, degree) pair
 struct vd_pair {
     long vertex;
@@ -59,7 +63,11 @@ template<typename T> inline bool degree_less(const T &a, const T &b) {
 }
 
 
-// Generate undirected realization as edge-list.
+/*************************************/
+/***** Undirected simple graphs ******/
+/*************************************/
+
+// Generate simple undirected realization as edge-list.
 // If largest=true, always choose the vertex with the largest remaining degree to connect up next.
 // Otherwise, always choose the one with the smallest remaining degree.
 static int igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *edges, bool largest) {
@@ -184,9 +192,12 @@ fail:
 }
 
 
-// Given a sequence that is sorted, possibly with the exception of
-// the first element, move the first element to the correct position
-// to restore sorted order.
+/***********************************/
+/***** Undirected multigraphs ******/
+/***********************************/
+
+// Given a sequence that is sorted, except for its first element,
+// move the first element to the correct position fully sort the sequence.
 template<typename It, typename Compare>
 static void bubble_up(It first, It last, Compare comp) {
     if (first == last)
@@ -204,12 +215,14 @@ static void bubble_up(It first, It last, Compare comp) {
     }
 }
 
-// In each step, choose the smallest remaining degree vertex
-// and connect it to the largest remaining degree vertex.
+// In each step, choose a vertex (the largest degree one if largest=true,
+// the smallest degree one otherwise) and connect it to the largest remaining degree vertex.
 // This will create a connected loopless multigraph, if one exists.
 // If loops=true, and a loopless multigraph does not exist, complete the procedure
 // by adding loops on the last vertex.
-static int igraph_i_realize_undirected_multi_smallest(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops) {
+// If largest=false, and the degree sequence was potentially connected, the resulting
+// graph will be connected.
+static int igraph_i_realize_undirected_multi(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops, bool largest) {
     long vcount = igraph_vector_size(deg);
 
     if (vcount == 0)
@@ -227,73 +240,8 @@ static int igraph_i_realize_undirected_multi_smallest(const igraph_vector_t *deg
 
     long ec = 0;
     while (! vertices.empty()) {
-        vd_pair &v = vertices.back(), &u = vertices.front();
+        // Remove any zero degrees, and error on negative ones.
 
-        if (v.degree == 0) {
-            vertices.pop_back();
-            continue;
-        }
-
-        if (v.degree < 0) {
-            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
-        }
-
-        // If only one vertex remains, then the degree sequence cannot be realized as
-        // a loopless multigraph. We either complete the graph by adding loops on this vertex
-        // or throw an error, depending on the 'loops' setting.
-        if (vertices.size() == 1) {
-            if (loops) {
-                for (long i=0; i < v.degree/2; ++i) {
-                    VECTOR(*edges)[2*ec]   = v.vertex;
-                    VECTOR(*edges)[2*ec+1] = v.vertex;
-                    ec++;
-                }
-                break;
-            } else {
-                IGRAPH_ERROR("The given degree sequence cannot be realized as a loopless multigraph.", IGRAPH_EINVAL);
-            }
-        }
-
-        u.degree -= 1;
-        v.degree -= 1;
-
-        VECTOR(*edges)[2*ec]   = u.vertex;
-        VECTOR(*edges)[2*ec+1] = v.vertex;
-        ec++;
-
-        // If the first vertex in the sequence is no longer the largest,
-        // swap it with the next to maintain sorted order.
-
-        // Now the first element (u) may be out of order.
-        // Restore sorted order using one pass of bubble sort.
-        bubble_up(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
-    }
-
-    return IGRAPH_SUCCESS;
-}
-
-
-// In each step, connect the two vertices with largest remaining degrees.
-// This will create a loopless multigraph, if one exists.
-// If loops=true, and a loopless multigraph does not exist, complete the procedure
-// by adding loops on the last vertex.
-static int igraph_i_realize_undirected_multi_largest(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops) {
-    long vcount = igraph_vector_size(deg);
-
-    if (vcount == 0)
-        return IGRAPH_SUCCESS;
-
-    std::vector<vd_pair> vertices;
-    vertices.reserve(vcount);
-    for (int i = 0; i < vcount; ++i) {
-        long d = VECTOR(*deg)[i];
-        vertices.push_back(vd_pair(i, d));
-    }
-
-    std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
-
-    long ec = 0;
-    while (! vertices.empty()) {
         vd_pair &w = vertices.back();
 
         if (w.degree == 0) {
@@ -321,26 +269,107 @@ static int igraph_i_realize_undirected_multi_largest(const igraph_vector_t *deg,
             }
         }
 
-        vd_pair &u = vertices[0], &v = vertices[1];
+        // At this point we are guaranteed to have at least two remaining vertices.
 
-        u.degree -= 1;
-        v.degree -= 1;
+        vd_pair *u, *v;
+        if (largest) {
+            u = &vertices[0];
+            v = &vertices[1];
+        } else {
+            u = &vertices.front();
+            v = &vertices.back();
+        }
 
-        VECTOR(*edges)[2*ec]   = u.vertex;
-        VECTOR(*edges)[2*ec+1] = v.vertex;
+        u->degree -= 1;
+        v->degree -= 1;
+
+        VECTOR(*edges)[2*ec]   = u->vertex;
+        VECTOR(*edges)[2*ec+1] = v->vertex;
         ec++;
 
-        // Now the first two elements (u and v) may be out of order.
-        // Restore sorted order using one pass of bubble sort.
-        if (vertices.size() > 2) {
+        // Now the first element may be out of order.
+        // If largest=true, the first two elements may be out of order.
+        // Restore the sorted order using a single step of bubble sort.
+        if (largest) {
             bubble_up(vertices.begin()+1, vertices.end(), degree_greater<vd_pair>);
-            bubble_up(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+        }
+        bubble_up(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
+static int igraph_i_realize_undirected_multi_index(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops) {
+    long vcount = igraph_vector_size(deg);
+
+    if (vcount == 0)
+        return IGRAPH_SUCCESS;
+
+    typedef std::list<vd_pair> vlist;
+    vlist vertices;
+    for (int i = 0; i < vcount; ++i) {
+        vertices.push_back(vd_pair(i, VECTOR(*deg)[i]));
+    }
+
+    std::vector<vlist::iterator> pointers;
+    pointers.reserve(vcount);
+    for (vlist::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+        pointers.push_back(it);
+    }
+
+    // Initial sort
+    vertices.sort(degree_greater<vd_pair>);
+
+    long ec = 0;
+    for (std::vector<vlist::iterator>::iterator pt = pointers.begin(); pt != pointers.end(); ++pt) {
+        vd_pair vd = **pt;
+        vertices.erase(*pt);
+
+        while (vd.degree > 0) {
+            vlist::iterator uit = vertices.begin();
+
+            if (vertices.empty() || uit->degree == 0) {
+                // We are out of non-zero degree vertices to connect to.
+                if (loops) {
+                    for (long i=0; i < vd.degree/2; ++i) {
+                        VECTOR(*edges)[2*ec]   = vd.vertex;
+                        VECTOR(*edges)[2*ec+1] = vd.vertex;
+                        ec++;
+                    }
+                    return IGRAPH_SUCCESS;
+                } else {
+                    IGRAPH_ERROR("The given degree sequence cannot be realized as a loopless multigraph.", IGRAPH_EINVAL);
+                }
+            }
+
+            vd.degree   -= 1;
+            uit->degree -= 1;
+
+            VECTOR(*edges)[2*ec]   = vd.vertex;
+            VECTOR(*edges)[2*ec+1] = uit->vertex;
+            ec++;
+
+            // If there are at least two elements, and the first two are not in order,
+            // re-sort the list. A possible optimization would be a version of
+            // bubble_up() that can exchange list nodes instead of swapping their values.
+            if (vertices.size() > 1) {
+                vlist::iterator wit = std::next(uit);
+
+                if (wit->degree > uit->degree) {
+                    vertices.sort(degree_greater<vd_pair>);
+                }
+            }
         }
     }
 
     return IGRAPH_SUCCESS;
 }
 
+
+/***********************************/
+/***** Directed simple graphs ******/
+/***********************************/
 
 inline bool is_nonzero_outdeg(const vbd_pair &vd) {
     return (vd.degree.second != 0);
@@ -490,6 +519,10 @@ fail:
 }
 
 
+/**************************/
+/***** Main functions *****/
+/**************************/
+
 static int igraph_i_realize_undirected_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *deg,
@@ -511,13 +544,13 @@ static int igraph_i_realize_undirected_degree_sequence(
     {
         switch (method) {
         case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
-            IGRAPH_CHECK(igraph_i_realize_undirected_multi_smallest(deg, &edges, true));
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi(deg, &edges, true, false));
             break;
         case IGRAPH_REALIZE_DEGSEQ_LARGEST:
-            IGRAPH_CHECK(igraph_i_realize_undirected_multi_largest(deg, &edges, true));
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi(deg, &edges, true, true));
             break;
         case IGRAPH_REALIZE_DEGSEQ_INDEX:
-            IGRAPH_ERROR("", IGRAPH_UNIMPLEMENTED);
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi_index(deg, &edges, true));
             break;
         default:
             IGRAPH_ERROR("Invalid degree sequence realization method.", IGRAPH_EINVAL);
@@ -527,13 +560,13 @@ static int igraph_i_realize_undirected_degree_sequence(
     {
         switch (method) {
         case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
-            IGRAPH_CHECK(igraph_i_realize_undirected_multi_smallest(deg, &edges, false));
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi(deg, &edges, false, false));
             break;
         case IGRAPH_REALIZE_DEGSEQ_LARGEST:
-            IGRAPH_CHECK(igraph_i_realize_undirected_multi_largest(deg, &edges, false));
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi(deg, &edges, false, true));
             break;
         case IGRAPH_REALIZE_DEGSEQ_INDEX:
-            IGRAPH_ERROR("", IGRAPH_UNIMPLEMENTED);
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi_index(deg, &edges, false));
             break;
         default:
             IGRAPH_ERROR("Invalid degree sequence realization method.", IGRAPH_EINVAL);
@@ -582,6 +615,7 @@ static int igraph_i_realize_directed_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *outdeg,
         const igraph_vector_t *indeg,
+        igraph_edge_type_sw_t allowed_edge_types,
         igraph_realize_degseq_t method)
 {
     long node_count = igraph_vector_size(outdeg);
@@ -592,6 +626,11 @@ static int igraph_i_realize_directed_degree_sequence(
     }
     if (igraph_vector_sum(indeg) != edge_count) {
         IGRAPH_ERROR("In- and out-degree sequences do not sum to the same value.", IGRAPH_EINVAL);
+    }
+
+    /* TODO implement loopless and loopy multigraph case */
+    if (allowed_edge_types != IGRAPH_SIMPLE_SW) {
+        IGRAPH_ERROR("Realizing directed degree sequences as non-simple graphs is not implemented.", IGRAPH_UNIMPLEMENTED);
     }
 
     igraph_vector_t edges;
@@ -626,13 +665,21 @@ static int igraph_i_realize_directed_degree_sequence(
  * \function igraph_realize_degree_sequence
  * \brief Generates a graph with the given degree sequence
  *
- * This function constructs a simple graph that realizes the given degree sequence
- * using the Havel-Hakimi algorithm, or the given (directed) out- and in-degree
- * sequences using the related Kleitman-Wang algorithm.
+ * This function generates an undirected graph that realizes a given degree sequence,
+ * or a directed graph that realized a given pair of out- and in-degree sequences.
  *
- * The algorithms work by choosing an arbitrary vertex and connecting all its stubs
+ * Simple undirected graphs are constructed using Havel-Hakimi algorithm
+ * (undirected case), or the related Kleitman-Wang algorithm (directed case).
+ * These algorithms work by choosing an arbitrary vertex and connecting all its stubs
  * to other vertices of highest degree.  In the directed case, the "highest" (in, out) degree
- * pairs are determined based on lexicographic ordering.
+ * pairs are determined based on lexicographic ordering. This step is repeated until all degrees
+ * have been connected up.
+ *
+ * Loopless multigraphs are generated using an analogous algorithm: an arbitrary vertex is chosen,
+ * and it is connected with a single connection to a highest remaining degee vertex. If self-loops
+ * are also allowed, the same algorithm is used, but if a non-zero vertex remains at the end of the
+ * procedure, the graph is completed by adding self-loops to it. Thus, the result will contain at most
+ * one vertex with self-loops.
  *
  * The \c method parameter controls the order in which the vertices to be connected are chosen.
  *
@@ -642,12 +689,26 @@ static int igraph_i_realize_directed_degree_sequence(
  *        a directed graph (if \p indeg is of nonzero size).
  * \param indeg It is either a zero-length vector or \c NULL (if an undirected graph
  *        is generated), or the in-degree sequence.
+ * \param allowed_edge_types The types of edges to allow in the graph. For directed graphs,
+ *        only \c IGRAPH_SIMPLE_SW is implemented at this moment. For undirected
+ *        graphs, the following values are valid:
+ *        \clist
+ *          \cli IGRAPH_SIMPLE_SW
+ *          simple graphs (i.e. no self-loops or multi-edges allowed).
+ *          \cli IGRAPH_LOOPS_SW
+ *          single self-loops are allowed, but not multi-edges; currently not implemented.
+ *          \cli IGRAPH_MULTI_SW
+ *          multi-edges are allowed, but not self-loops.
+ *          \cli IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW
+ *          both self-loops and multi-edges are allowed.
+ *        \endclist
  * \param method The method to generate the graph. Possible values:
  *        \clist
  *          \cli IGRAPH_REALIZE_DEGSEQ_SMALLEST
  *          The vertex with smallest remaining degree is selected first. The result is usually
  *          a graph with high negative degree assortativity. In the undirected case, this method
- *          is guaranteed to generate a connected graph, provided that a connected realization exists.
+ *          is guaranteed to generate a connected graph, regardless of whether multi-edges are allowed,
+ *          provided that a connected realization exists.
  *          See http://szhorvat.net/pelican/hh-connected-graphs.html for a proof.
  *          In the directed case it tends to generate weakly connected graphs, but this is not
  *          guaranteed.
@@ -692,7 +753,7 @@ int igraph_realize_degree_sequence(
 
     try {
         if (directed) {
-            return igraph_i_realize_directed_degree_sequence(graph, outdeg, indeg, method);
+            return igraph_i_realize_directed_degree_sequence(graph, outdeg, indeg, allowed_edge_types, method);
         } else {
             return igraph_i_realize_undirected_degree_sequence(graph, outdeg, allowed_edge_types, method);
         }
