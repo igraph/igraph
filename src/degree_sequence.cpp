@@ -26,6 +26,8 @@
 #include <algorithm>
 #include <utility>
 
+#define IGRAPH_I_MULTI_EDGES_SW 0x02 /* 010, more than one edge allowed between distinct vertices */
+#define IGRAPH_I_MULTI_LOOPS_SW 0x04 /* 100, more than one self-loop allowed on the same vertex   */
 
 // (vertex, degree) pair
 struct vd_pair {
@@ -83,7 +85,7 @@ static int igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *ed
         vertices.pop_back();
 
         if (vd.degree < 0) {
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
         }
 
         if (vd.degree == 0) {
@@ -120,7 +122,7 @@ static int igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *ed
     return IGRAPH_SUCCESS;
 
 fail:
-    IGRAPH_ERROR("The given degree sequence is not realizable", IGRAPH_EINVAL);
+    IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
 }
 
 
@@ -149,7 +151,7 @@ static int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector
         vertices.erase(*pt);
 
         if (vd.degree < 0) {
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
         }
 
         if (vd.degree == 0) {
@@ -178,7 +180,165 @@ static int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector
     return IGRAPH_SUCCESS;
 
 fail:
-    IGRAPH_ERROR("The given degree sequence is not realizable", IGRAPH_EINVAL);
+    IGRAPH_ERROR("The given degree sequence cannot be realized as a simple graph.", IGRAPH_EINVAL);
+}
+
+
+// Given a sequence that is sorted, possibly with the exception of
+// the first element, move the first element to the correct position
+// to restore sorted order.
+template<typename It, typename Compare>
+static void bubble_up(It first, It last, Compare comp) {
+    if (first == last)
+        return;
+    It it = first;
+    it++;
+    while (it != last) {
+        if (comp(*first, *it)) {
+            break;
+        } else {
+            std::swap(*first, *it);
+        }
+        first = it;
+        it++;
+    }
+}
+
+// In each step, choose the smallest remaining degree vertex
+// and connect it to the largest remaining degree vertex.
+// This will create a connected loopless multigraph, if one exists.
+// If loops=true, and a loopless multigraph does not exist, complete the procedure
+// by adding loops on the last vertex.
+static int igraph_i_realize_undirected_multi_smallest(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops) {
+    long vcount = igraph_vector_size(deg);
+
+    if (vcount == 0)
+        return IGRAPH_SUCCESS;
+
+    std::vector<vd_pair> vertices;
+    vertices.reserve(vcount);
+    for (int i = 0; i < vcount; ++i) {
+        long d = VECTOR(*deg)[i];
+        vertices.push_back(vd_pair(i, d));
+    }
+
+    // Initial sort in non-increasing order.
+    std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+
+    long ec = 0;
+    while (! vertices.empty()) {
+        vd_pair &v = vertices.back(), &u = vertices.front();
+
+        if (v.degree == 0) {
+            vertices.pop_back();
+            continue;
+        }
+
+        if (v.degree < 0) {
+            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
+        }
+
+        // If only one vertex remains, then the degree sequence cannot be realized as
+        // a loopless multigraph. We either complete the graph by adding loops on this vertex
+        // or throw an error, depending on the 'loops' setting.
+        if (vertices.size() == 1) {
+            if (loops) {
+                for (long i=0; i < v.degree/2; ++i) {
+                    VECTOR(*edges)[2*ec]   = v.vertex;
+                    VECTOR(*edges)[2*ec+1] = v.vertex;
+                    ec++;
+                }
+                break;
+            } else {
+                IGRAPH_ERROR("The given degree sequence cannot be realized as a loopless multigraph.", IGRAPH_EINVAL);
+            }
+        }
+
+        u.degree -= 1;
+        v.degree -= 1;
+
+        VECTOR(*edges)[2*ec]   = u.vertex;
+        VECTOR(*edges)[2*ec+1] = v.vertex;
+        ec++;
+
+        // If the first vertex in the sequence is no longer the largest,
+        // swap it with the next to maintain sorted order.
+
+        // Now the first element (u) may be out of order.
+        // Restore sorted order using one pass of bubble sort.
+        bubble_up(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+    }
+
+    return IGRAPH_SUCCESS;
+}
+
+
+// In each step, connect the two vertices with largest remaining degrees.
+// This will create a loopless multigraph, if one exists.
+// If loops=true, and a loopless multigraph does not exist, complete the procedure
+// by adding loops on the last vertex.
+static int igraph_i_realize_undirected_multi_largest(const igraph_vector_t *deg, igraph_vector_t *edges, bool loops) {
+    long vcount = igraph_vector_size(deg);
+
+    if (vcount == 0)
+        return IGRAPH_SUCCESS;
+
+    std::vector<vd_pair> vertices;
+    vertices.reserve(vcount);
+    for (int i = 0; i < vcount; ++i) {
+        long d = VECTOR(*deg)[i];
+        vertices.push_back(vd_pair(i, d));
+    }
+
+    std::stable_sort(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+
+    long ec = 0;
+    while (! vertices.empty()) {
+        vd_pair &w = vertices.back();
+
+        if (w.degree == 0) {
+            vertices.pop_back();
+            continue;
+        }
+
+        if (w.degree < 0) {
+            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
+        }
+
+        // If only one vertex remains, then the degree sequence cannot be realized as
+        // a loopless multigraph. We either complete the graph by adding loops on this vertex
+        // or throw an error, depending on the 'loops' setting.
+        if (vertices.size() == 1) {
+            if (loops) {
+                for (long i=0; i < w.degree/2; ++i) {
+                    VECTOR(*edges)[2*ec]   = w.vertex;
+                    VECTOR(*edges)[2*ec+1] = w.vertex;
+                    ec++;
+                }
+                break;
+            } else {
+                IGRAPH_ERROR("The given degree sequence cannot be realized as a loopless multigraph.", IGRAPH_EINVAL);
+            }
+        }
+
+        vd_pair &u = vertices[0], &v = vertices[1];
+
+        u.degree -= 1;
+        v.degree -= 1;
+
+        VECTOR(*edges)[2*ec]   = u.vertex;
+        VECTOR(*edges)[2*ec+1] = v.vertex;
+        ec++;
+
+        // Now the first two elements (u and v) may be out of order.
+        // Restore sorted order using one pass of bubble sort.
+        if (vertices.size() > 2) {
+            bubble_up(vertices.begin()+1, vertices.end(), degree_greater<vd_pair>);
+            bubble_up(vertices.begin(), vertices.end(), degree_greater<vd_pair>);
+        }
+    }
+
+    return IGRAPH_SUCCESS;
 }
 
 
@@ -225,9 +385,8 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
             vdp = &*std::find_if(vertices.begin(), vertices.end(), is_nonzero_outdeg);
         }
 
-
         if (vdp->degree.first < 0 || vdp->degree.second < 0) {
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
         }
 
         // are there a sufficient number of other vertices to connect to?
@@ -260,7 +419,7 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
     return IGRAPH_SUCCESS;
 
 fail:
-    IGRAPH_ERROR("The given directed degree sequence is not realizable", IGRAPH_EINVAL);
+    IGRAPH_ERROR("The given directed degree sequences cannot be realized as a simple graph.", IGRAPH_EINVAL);
 }
 
 
@@ -295,7 +454,7 @@ static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igr
         }
 
         if (vd.degree.first < 0 || vd.degree.second < 0) {
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
         }
 
         int k = 0;
@@ -327,37 +486,87 @@ static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igr
     return IGRAPH_SUCCESS;
 
 fail:
-    IGRAPH_ERROR("The given directed degree sequence is not realizable", IGRAPH_EINVAL);
+    IGRAPH_ERROR("The given directed degree sequences cannot be realized as a simple graph.", IGRAPH_EINVAL);
 }
 
 
 static int igraph_i_realize_undirected_degree_sequence(
-    igraph_t *graph,
-    const igraph_vector_t *deg,
-    igraph_realize_degseq_t method) {
+        igraph_t *graph,
+        const igraph_vector_t *deg,
+        igraph_edge_type_sw_t allowed_edge_types,
+        igraph_realize_degseq_t method)
+{
     long node_count = igraph_vector_size(deg);
     long deg_sum = long(igraph_vector_sum(deg));
 
     if (deg_sum % 2 != 0) {
-        IGRAPH_ERROR("The sum of degrees must be even for an undirected graph", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The sum of degrees must be even for an undirected graph.", IGRAPH_EINVAL);
     }
 
     igraph_vector_t edges;
     IGRAPH_CHECK(igraph_vector_init(&edges, deg_sum));
     IGRAPH_FINALLY(igraph_vector_destroy, &edges);
 
-    switch (method) {
-    case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
-        IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, false));
-        break;
-    case IGRAPH_REALIZE_DEGSEQ_LARGEST:
-        IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, true));
-        break;
-    case IGRAPH_REALIZE_DEGSEQ_INDEX:
-        IGRAPH_CHECK(igraph_i_havel_hakimi_index(deg, &edges));
-        break;
-    default:
-        IGRAPH_ERROR("Invalid degree sequence realization method", IGRAPH_EINVAL);
+    if ( (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) && (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW ) )
+    {
+        switch (method) {
+        case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi_smallest(deg, &edges, true));
+            break;
+        case IGRAPH_REALIZE_DEGSEQ_LARGEST:
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi_largest(deg, &edges, true));
+            break;
+        case IGRAPH_REALIZE_DEGSEQ_INDEX:
+            IGRAPH_ERROR("", IGRAPH_UNIMPLEMENTED);
+            break;
+        default:
+            IGRAPH_ERROR("Invalid degree sequence realization method.", IGRAPH_EINVAL);
+        }
+    }
+    else if ( ! (allowed_edge_types & IGRAPH_LOOPS_SW) && (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) )
+    {
+        switch (method) {
+        case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi_smallest(deg, &edges, false));
+            break;
+        case IGRAPH_REALIZE_DEGSEQ_LARGEST:
+            IGRAPH_CHECK(igraph_i_realize_undirected_multi_largest(deg, &edges, false));
+            break;
+        case IGRAPH_REALIZE_DEGSEQ_INDEX:
+            IGRAPH_ERROR("", IGRAPH_UNIMPLEMENTED);
+            break;
+        default:
+            IGRAPH_ERROR("Invalid degree sequence realization method.", IGRAPH_EINVAL);
+        }
+    }
+    else if ( (allowed_edge_types & IGRAPH_LOOPS_SW) && ! (allowed_edge_types & IGRAPH_I_MULTI_LOOPS_SW) && ! (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) )
+    {
+        IGRAPH_ERROR("Graph realization with at most one self-loop per vertex is not implemented.", IGRAPH_UNIMPLEMENTED);
+    }
+    else if ( ! (allowed_edge_types & IGRAPH_LOOPS_SW) && ! (allowed_edge_types & IGRAPH_I_MULTI_EDGES_SW) )
+    {
+        switch (method) {
+        case IGRAPH_REALIZE_DEGSEQ_SMALLEST:
+            IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, false));
+            break;
+        case IGRAPH_REALIZE_DEGSEQ_LARGEST:
+            IGRAPH_CHECK(igraph_i_havel_hakimi(deg, &edges, true));
+            break;
+        case IGRAPH_REALIZE_DEGSEQ_INDEX:
+            IGRAPH_CHECK(igraph_i_havel_hakimi_index(deg, &edges));
+            break;
+        default:
+            IGRAPH_ERROR("Invalid degree sequence realization method.", IGRAPH_EINVAL);
+        }
+    }
+    else
+    {
+        /* Remainig cases:
+         *  - At most one self-loop per vertex but multi-edges between distinct vertices allowed.
+         *  - At most one edge between distinct vertices but multi-self-loops allowed.
+         * These cases cannot currently be requested through the documented API,
+         * so no explanatory error message for now. */
+        return IGRAPH_UNIMPLEMENTED;
     }
 
     igraph_create(graph, &edges, igraph_integer_t(node_count), false);
@@ -370,18 +579,19 @@ static int igraph_i_realize_undirected_degree_sequence(
 
 
 static int igraph_i_realize_directed_degree_sequence(
-    igraph_t *graph,
-    const igraph_vector_t *outdeg,
-    const igraph_vector_t *indeg,
-    igraph_realize_degseq_t method) {
+        igraph_t *graph,
+        const igraph_vector_t *outdeg,
+        const igraph_vector_t *indeg,
+        igraph_realize_degseq_t method)
+{
     long node_count = igraph_vector_size(outdeg);
     long edge_count = long(igraph_vector_sum(outdeg));
 
     if (igraph_vector_size(indeg) != node_count) {
-        IGRAPH_ERROR("In- and out-degree sequences must have the same length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("In- and out-degree sequences must have the same length.", IGRAPH_EINVAL);
     }
     if (igraph_vector_sum(indeg) != edge_count) {
-        IGRAPH_ERROR("In- and out-degree sequences do not sum to the same value", IGRAPH_EINVAL);
+        IGRAPH_ERROR("In- and out-degree sequences do not sum to the same value.", IGRAPH_EINVAL);
     }
 
     igraph_vector_t edges;
@@ -399,7 +609,7 @@ static int igraph_i_realize_directed_degree_sequence(
         IGRAPH_CHECK(igraph_i_kleitman_wang_index(outdeg, indeg, &edges));
         break;
     default:
-        IGRAPH_ERROR("Invalid bi-degree sequence realization method", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
     }
 
     igraph_create(graph, &edges, igraph_integer_t(node_count), true);
@@ -468,12 +678,14 @@ static int igraph_i_realize_directed_degree_sequence(
  */
 
 int igraph_realize_degree_sequence(
-    igraph_t *graph,
-    const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
-    igraph_realize_degseq_t method) {
+        igraph_t *graph,
+        const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
+        igraph_edge_type_sw_t allowed_edge_types,
+        igraph_realize_degseq_t method)
+{
     long n = igraph_vector_size(outdeg);
     if (n != igraph_integer_t(n)) { // does the vector size fit into an igraph_integer_t ?
-        IGRAPH_ERROR("Degree sequence vector too long", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Degree sequence vector too long.", IGRAPH_EINVAL);
     }
 
     bool directed = bool(indeg) && igraph_vector_size(indeg) != 0;
@@ -482,9 +694,9 @@ int igraph_realize_degree_sequence(
         if (directed) {
             return igraph_i_realize_directed_degree_sequence(graph, outdeg, indeg, method);
         } else {
-            return igraph_i_realize_undirected_degree_sequence(graph, outdeg, method);
+            return igraph_i_realize_undirected_degree_sequence(graph, outdeg, allowed_edge_types, method);
         }
     } catch (const std::bad_alloc &) {
-        IGRAPH_ERROR("Cannot realize degree sequence due to insufficient memory", IGRAPH_ENOMEM);
+        IGRAPH_ERROR("Cannot realize degree sequence due to insufficient memory.", IGRAPH_ENOMEM);
     }
 }
