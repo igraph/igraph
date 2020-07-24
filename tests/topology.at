@@ -61,7 +61,7 @@ AT_CLEANUP
 
 AT_SETUP([Graphical degree sequences])
 AT_KEYWORDS([degree sequence graphical])
-AT_COMPILE_CHECK([simple/igraph_is_degree_sequence.c])
+AT_COMPILE_CHECK([tests/igraph_is_graphical.c], [tests/igraph_is_graphical.out])
 AT_CLEANUP
 
 AT_SETUP([Bigraphical degree sequences])
