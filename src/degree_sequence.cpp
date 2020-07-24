@@ -92,10 +92,6 @@ static int igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *ed
         vd_pair vd = vertices.back();
         vertices.pop_back();
 
-        if (vd.degree < 0) {
-            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
-        }
-
         if (vd.degree == 0) {
             continue;
         }
@@ -157,10 +153,6 @@ static int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector
 
         vd_pair vd = **pt;
         vertices.erase(*pt);
-
-        if (vd.degree < 0) {
-            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
-        }
 
         if (vd.degree == 0) {
             continue;
@@ -247,10 +239,6 @@ static int igraph_i_realize_undirected_multi(const igraph_vector_t *deg, igraph_
         if (w.degree == 0) {
             vertices.pop_back();
             continue;
-        }
-
-        if (w.degree < 0) {
-            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
         }
 
         // If only one vertex remains, then the degree sequence cannot be realized as
@@ -355,7 +343,7 @@ static int igraph_i_realize_undirected_multi_index(const igraph_vector_t *deg, i
             // bubble_up() that can exchange list nodes instead of swapping their values.
             if (vertices.size() > 1) {
                 vlist::iterator wit = uit;
-                wit++;
+                ++wit;
 
                 if (wit->degree > uit->degree) {
                     vertices.sort(degree_greater<vd_pair>);
@@ -413,10 +401,6 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
             vdp = &*std::find_if(vertices.rbegin(), vertices.rend(), is_nonzero_outdeg);
         } else {
             vdp = &*std::find_if(vertices.begin(), vertices.end(), is_nonzero_outdeg);
-        }
-
-        if (vdp->degree.first < 0 || vdp->degree.second < 0) {
-            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
         }
 
         // are there a sufficient number of other vertices to connect to?
@@ -483,10 +467,6 @@ static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igr
             continue;
         }
 
-        if (vd.degree.first < 0 || vd.degree.second < 0) {
-            IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
-        }
-
         int k = 0;
         vlist::iterator it;
         for (it = vertices.begin();
@@ -535,6 +515,10 @@ static int igraph_i_realize_undirected_degree_sequence(
 
     if (deg_sum % 2 != 0) {
         IGRAPH_ERROR("The sum of degrees must be even for an undirected graph.", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_min(deg) < 0) {
+        IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
     }
 
     igraph_vector_t edges;
@@ -629,6 +613,10 @@ static int igraph_i_realize_directed_degree_sequence(
         IGRAPH_ERROR("In- and out-degree sequences do not sum to the same value.", IGRAPH_EINVAL);
     }
 
+    if (igraph_vector_min(outdeg) < 0 || igraph_vector_min(indeg) < 0) {
+        IGRAPH_ERROR("Vertex degrees must be non-negative.", IGRAPH_EINVAL);
+    }
+
     /* TODO implement loopless and loopy multigraph case */
     if (allowed_edge_types != IGRAPH_SIMPLE_SW) {
         IGRAPH_ERROR("Realizing directed degree sequences as non-simple graphs is not implemented.", IGRAPH_UNIMPLEMENTED);
@@ -664,32 +652,35 @@ static int igraph_i_realize_directed_degree_sequence(
 /**
  * \ingroup generators
  * \function igraph_realize_degree_sequence
- * \brief Generates a graph with the given degree sequence
+ * \brief Generates a graph with the given degree sequence.
  *
  * This function generates an undirected graph that realizes a given degree sequence,
  * or a directed graph that realized a given pair of out- and in-degree sequences.
  *
- * Simple undirected graphs are constructed using Havel-Hakimi algorithm
- * (undirected case), or the related Kleitman-Wang algorithm (directed case).
+ * </para><para>
+ * Simple undirected graphs are constructed using the Havel-Hakimi algorithm
+ * (undirected case), or the analogous Kleitman-Wang algorithm (directed case).
  * These algorithms work by choosing an arbitrary vertex and connecting all its stubs
  * to other vertices of highest degree.  In the directed case, the "highest" (in, out) degree
  * pairs are determined based on lexicographic ordering. This step is repeated until all degrees
  * have been connected up.
  *
+ * </para><para>
  * Loopless multigraphs are generated using an analogous algorithm: an arbitrary vertex is chosen,
  * and it is connected with a single connection to a highest remaining degee vertex. If self-loops
  * are also allowed, the same algorithm is used, but if a non-zero vertex remains at the end of the
  * procedure, the graph is completed by adding self-loops to it. Thus, the result will contain at most
  * one vertex with self-loops.
  *
+ * </para><para>
  * The \c method parameter controls the order in which the vertices to be connected are chosen.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param outdeg The degree sequence for a simple undirected graph
- *        (if \p indeg is NULL or of length zero), or the out-degree sequence of
- *        a directed graph (if \p indeg is of nonzero size).
- * \param indeg It is either a zero-length vector or \c NULL (if an undirected graph
- *        is generated), or the in-degree sequence.
+ *        (if \p indeg is NULL), or the out-degree sequence of
+ *        a directed graph (if \p indeg is given).
+ * \param indeg The in-degree sequence of a directed graph. Pass \c NULL
+ *        to generate an undirected graph.
  * \param allowed_edge_types The types of edges to allow in the graph. For directed graphs,
  *        only \c IGRAPH_SIMPLE_SW is implemented at this moment. For undirected
  *        graphs, the following values are valid:
@@ -732,7 +723,7 @@ static int igraph_i_realize_directed_degree_sequence(
  *           and sum of \p outdeg and \p indeg should match for directed graphs.
  *          \endclist
  *
- * \sa  \ref igraph_is_graphical_degree_sequence()
+ * \sa  \ref igraph_is_graphical()
  *      \ref igraph_degree_sequence_game()
  *      \ref igraph_k_regular_game()
  *      \ref igraph_rewire()
@@ -750,7 +741,7 @@ int igraph_realize_degree_sequence(
         IGRAPH_ERROR("Degree sequence vector too long.", IGRAPH_EINVAL);
     }
 
-    bool directed = bool(indeg) && igraph_vector_size(indeg) != 0;
+    bool directed = bool(indeg);
 
     try {
         if (directed) {
