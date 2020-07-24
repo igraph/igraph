@@ -193,5 +193,7 @@ int main() {
     igraph_vector_init_int_end(&ods, -1, 0, 1, 2, -1);
     digraphical_print_destroy(&ids, &ods);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
