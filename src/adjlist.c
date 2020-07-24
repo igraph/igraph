@@ -468,12 +468,7 @@ int igraph_adjedgelist_print(const igraph_inclist_t *al, FILE *outfile) {
 /**
  * \function igraph_adjedgelist_init
  * \brief Initializes an incidence list of edges.
- *
- * This function was superseded by \ref igraph_inclist_init() in igraph 0.6.
- * Please use \ref igraph_inclist_init() instead of this function.
- *
- * </para><para>
- * Deprecated in version 0.6.
+ * \deprecated-by igraph_inclist_init 0.6
  */
 int igraph_adjedgelist_init(const igraph_t *graph,
                             igraph_inclist_t *il,
@@ -486,12 +481,7 @@ int igraph_adjedgelist_init(const igraph_t *graph,
 /**
  * \function igraph_adjedgelist_destroy
  * \brief Frees all memory allocated for an incidence list.
- *
- * This function was superseded by \ref igraph_inclist_destroy() in igraph 0.6.
- * Please use \ref igraph_inclist_destroy() instead of this function.
- *
- * </para><para>
- * Deprecated in version 0.6.
+ * \deprecated-by igraph_inclist_destroy 0.6
  */
 void igraph_adjedgelist_destroy(igraph_inclist_t *il) {
     IGRAPH_WARNING("igraph_adjedgelist_destroy() is deprecated, use "
@@ -799,12 +789,7 @@ igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
 /**
  * \function igraph_lazy_adjedgelist_init
  * \brief Initializes a lazy incidence list of edges.
- *
- * This function was superseded by \ref igraph_lazy_inclist_init() in igraph 0.6.
- * Please use \ref igraph_lazy_inclist_init() instead of this function.
- *
- * </para><para>
- * Deprecated in version 0.6.
+ * \deprecated-by igraph_lazy_inclist_init 0.6
  */
 int igraph_lazy_adjedgelist_init(const igraph_t *graph,
                                  igraph_lazy_inclist_t *il,
@@ -817,12 +802,7 @@ int igraph_lazy_adjedgelist_init(const igraph_t *graph,
 /**
  * \function igraph_lazy_adjedgelist_destroy
  * \brief Frees all memory allocated for an incidence list.
- *
- * This function was superseded by \ref igraph_lazy_inclist_destroy() in igraph 0.6.
- * Please use \ref igraph_lazy_inclist_destroy() instead of this function.
- *
- * </para><para>
- * Deprecated in version 0.6.
+ * \deprecated-by igraph_lazy_inclist_destroy 0.6
  */
 void igraph_lazy_adjedgelist_destroy(igraph_lazy_inclist_t *il) {
     IGRAPH_WARNING("igraph_lazy_adjedgelist_destroy() is deprecated, use "

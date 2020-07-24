@@ -896,12 +896,7 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
 /**
  * \function igraph_es_adj
  * \brief Adjacent edges of a vertex.
- *
- * This function was superseded by \ref igraph_es_incident() in igraph 0.6.
- * Please use \ref igraph_es_incident() instead of this function.
- *
- * </para><para>
- * Deprecated in version 0.6.
+ * \deprecated-by igraph_es_incident 0.6
  */
 int igraph_es_adj(igraph_es_t *es,
                   igraph_integer_t vid, igraph_neimode_t mode) {
