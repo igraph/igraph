@@ -4,124 +4,110 @@
 
 #include "test_utilities.inc"
 
+#define REALIZE1(ods, ids, et, method) \
+    { \
+        igraph_t graph; \
+        int err; \
+        err = igraph_realize_degree_sequence(&graph, ods, ids, et, method); \
+        if (err == IGRAPH_SUCCESS) { \
+            printf("\n"); \
+            print_graph(&graph, stdout); \
+            igraph_destroy(&graph); \
+        } else if (err == IGRAPH_UNIMPLEMENTED) { \
+            printf(" not implemented\n"); \
+        } else { \
+            printf(" not graphical\n"); \
+        } \
+    }
+
+#define REALIZE2(ods, ids, et) \
+    printf("Largest:"); \
+    REALIZE1(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_LARGEST); \
+    printf("Smallest:"); \
+    REALIZE1(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_SMALLEST); \
+    printf("Index:"); \
+    REALIZE1(ods, ids, et, IGRAPH_REALIZE_DEGSEQ_INDEX);
+
+#define UNDIRECTED_CHECK_DESTROY(ds) \
+    print_vector_round(ds, stdout); \
+    printf("\nSIMPLE GRAPH:\n"); \
+    REALIZE2(ds, NULL, IGRAPH_SIMPLE_SW); \
+    printf("\nLOOPLESS MULTIGRAPH:\n"); \
+    REALIZE2(ds, NULL, IGRAPH_MULTI_SW); \
+    printf("\nLOOPY MULTIGRAPH:\n"); \
+    REALIZE2(ds, NULL, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW); \
+    printf("\n\n"); \
+    igraph_vector_destroy(ds);
+
+#define DIRECTED_CHECK_DESTROY(ods, ids) \
+    print_vector_round(ods, stdout); \
+    print_vector_round(ids, stdout); \
+    printf("\nSIMPLE GRAPH:\n"); \
+    REALIZE2(ods, ids, IGRAPH_SIMPLE_SW); \
+    printf("\nLOOPLESS MULTIGRAPH:\n"); \
+    REALIZE2(ods, ids, IGRAPH_MULTI_SW); \
+    printf("\nLOOPY MULTIGRAPH:\n"); \
+    REALIZE2(ods, ids, IGRAPH_MULTI_SW | IGRAPH_LOOPS_SW); \
+    printf("\n\n"); \
+    igraph_vector_destroy(ods); \
+    igraph_vector_destroy(ids);
+
+
 int main() {
-    igraph_t graph;
+    igraph_vector_t ds, ods, ids;
 
-    {
-        igraph_vector_t ds;
-        const igraph_real_t rawds[] = { 3, 2, 2, 1 };
-        igraph_vector_view(&ds, &rawds[0], sizeof(rawds) / sizeof(igraph_real_t));
+    igraph_set_error_handler(&igraph_error_handler_ignore);
 
-        printf("\n");
-        print_vector_round(&ds, stdout);
-        printf("\n");
+    /* Undirected */
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
+    igraph_vector_init(&ds, 0);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
+    igraph_vector_init_int_end(&ds, -1, 1, 2, 2, 3, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-    }
+    /* contains negative degree */
+    igraph_vector_init_int_end(&ds, -1, 1, 2, 2, -3, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-    {
-        igraph_vector_t ds;
-        const igraph_real_t rawds[] = {1, 3, 3, 4, 1, 2, 1, 1, 1, 3};
-        igraph_vector_view(&ds, &rawds[0], sizeof(rawds) / sizeof(igraph_real_t));
+    /* odd sum */
+    igraph_vector_init_int_end(&ds, -1, 1, 1, 2, 3, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-        printf("\n");
-        print_vector_round(&ds, stdout);
-        printf("\n");
+    igraph_vector_init_int_end(&ds, -1, 1, 2, 3, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
+    igraph_vector_init_int_end(&ds, -1, 4, 4, 4, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
+    igraph_vector_init_int_end(&ds, -1, 3, 5, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-    }
+    igraph_vector_init_int_end(&ds, -1, 5, 3, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-    {
-        igraph_vector_t ds;
-        const igraph_real_t rawds[] = {2, 0, 3, 2, 2, 2, 2, 3};
-        igraph_vector_view(&ds, &rawds[0], sizeof(rawds) / sizeof(igraph_real_t));
+    igraph_vector_init_int_end(&ds, -1, 1, 3, 3, 4, 1, 2, 1, 1, 1, 3, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-        printf("\n");
-        print_vector_round(&ds, stdout);
-        printf("\n");
+    igraph_vector_init_int_end(&ds, -1, 2, 0, 3, 2, 2, 2, 2, 3, -1);
+    UNDIRECTED_CHECK_DESTROY(&ds);
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
+    /* Directed */
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
+    igraph_vector_init(&ods, 0);
+    igraph_vector_init(&ids, 0);
+    DIRECTED_CHECK_DESTROY(&ods, &ids);
 
-        igraph_realize_degree_sequence(&graph, &ds, NULL, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-    }
+    igraph_vector_init_int_end(&ods, -1, 3, 0, 1, 1, 1, 1, 0, 1, -1);
+    igraph_vector_init_int_end(&ids, -1, 2, 1, 0, 2, 2, 1, 0, 0, -1);
+    DIRECTED_CHECK_DESTROY(&ods, &ids);
 
-    {
-        igraph_vector_t ods, ids;
-        const igraph_real_t rawods[] = {3, 0, 1, 1, 1, 1, 0, 1};
-        const igraph_real_t rawids[] = {2, 1, 0, 2, 2, 1, 0, 0};
-        igraph_vector_view(&ods, &rawods[0], sizeof(rawods) / sizeof(igraph_real_t));
-        igraph_vector_view(&ids, &rawids[0], sizeof(rawids) / sizeof(igraph_real_t));
+    igraph_vector_init_int_end(&ods, -1, 3, 1, 2, 3, 1, 2, 2, -1);
+    igraph_vector_init_int_end(&ids, -1, 2, 2, 1, 2, 3, 2, 2, -1);
+    DIRECTED_CHECK_DESTROY(&ods, &ids);
 
-        printf("\n");
-        print_vector_round(&ods, stdout);
-        print_vector_round(&ids, stdout);
-        printf("\n");
 
-        igraph_realize_degree_sequence(&graph, &ods, &ids, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-
-        igraph_realize_degree_sequence(&graph, &ods, &ids, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-
-        igraph_realize_degree_sequence(&graph, &ods, &ids, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-    }
-
-    {
-        igraph_vector_t ods, ids;
-        const igraph_real_t rawods[] = {3, 1, 2, 3, 1, 2, 2};
-        const igraph_real_t rawids[] = {2, 2, 1, 2, 3, 2, 2};
-        igraph_vector_view(&ods, &rawods[0], sizeof(rawods) / sizeof(igraph_real_t));
-        igraph_vector_view(&ids, &rawids[0], sizeof(rawids) / sizeof(igraph_real_t));
-
-        printf("\n");
-        print_vector_round(&ods, stdout);
-        print_vector_round(&ids, stdout);
-        printf("\n");
-
-        igraph_realize_degree_sequence(&graph, &ods, &ids, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_LARGEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-
-        igraph_realize_degree_sequence(&graph, &ods, &ids, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_SMALLEST);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-
-        igraph_realize_degree_sequence(&graph, &ods, &ids, IGRAPH_SIMPLE_SW, IGRAPH_REALIZE_DEGSEQ_INDEX);
-        print_graph(&graph, stdout);
-        igraph_destroy(&graph);
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
