@@ -942,7 +942,7 @@ int igraph_degree_sequence_game_no_multiple_undirected(
     long int no_of_nodes, outsum = 0;
     igraph_bool_t degseq_ok;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(seq, 0, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(seq, 0, IGRAPH_SIMPLE_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence",
                      IGRAPH_EINVAL);
@@ -1085,7 +1085,7 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
     long int i, j, k;
     long int no_of_nodes, outsum;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(out_seq, in_seq, &deg_seq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_SIMPLE_SW, &deg_seq_ok));
     if (!deg_seq_ok) {
         IGRAPH_ERROR("No simple directed graph can realize the given degree sequence",
                      IGRAPH_EINVAL);
@@ -1233,7 +1233,7 @@ int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, 
     long i, j;
     long vcount, ecount, stub_count;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(degseq, NULL, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(degseq, NULL, IGRAPH_SIMPLE_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
@@ -1345,7 +1345,7 @@ int igraph_degree_sequence_game_no_multiple_directed_uniform(
     long i, j;
     long vcount, ecount;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(out_deg, in_deg, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(out_deg, in_deg, IGRAPH_SIMPLE_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple directed graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
@@ -1533,8 +1533,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *                  other modes is not known.
  *
  * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game(),
- *     \ref igraph_is_degree_sequence(),
- *     \ref igraph_is_graphical_degree_sequence()
+ *     \ref igraph_is_graphical()
  *
  * \example examples/simple/igraph_degree_sequence_game.c
  */
