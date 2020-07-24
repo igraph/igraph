@@ -844,7 +844,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     long int i, j;
 
-    IGRAPH_CHECK(igraph_is_degree_sequence(out_seq, in_seq, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR(in_seq ? "No directed graph can realize the given degree sequences" :
                      "No undirected graph can realize the given degree sequence", IGRAPH_EINVAL);

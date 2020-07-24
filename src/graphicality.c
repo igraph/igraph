@@ -47,17 +47,18 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * the check also when either self-loops, multi-edge, or both are allowed in the graph.
  *
  * </para><para>
- * For simple undirected graphs, the Erdős-Gallai theorem is used with a relaxation by Tipathy and Vijay.
- * igraph uses the algorithm of Z. Király. If both self-loops and multi-edges are allowed,
+ * For simple undirected graphs, the Erdős-Gallai conditions are checked using the linear-time
+ * algorithm of Cloteaux. If both self-loops and multi-edges are allowed,
  * it is sufficient to chek that that sum of degrees is even. If only multi-edges are allowed, but
  * not self-loops, there is an additional condition that the sum of degrees be no smaller than twice
- * the maximum degree.
+ * the maximum degree. If at most one self-loop is allowed per vertex, but no multi-edges, a modified
+ * version of the Erdős-Gallai conditions are used (see Cairns &amp; Mendan).
  *
  * </para><para>
  * For simple directed graphs, the Fulkerson-Chen-Anstee theorem is used with the relaxation by Berger.
  * If both self-loops and multi-edges are allowed, then it is sufficient to check that the sum of
  * in- and out-degrees is the same. If only multi-edges are allowed, but not self loops, there is an
- * additional condition that the sum of out-degree (or equivalently, in-degrees) is no smaller than
+ * additional condition that the sum of out-degrees (or equivalently, in-degrees) is no smaller than
  * the maximum total degree. If single self-loops are allowed, but not multi-edges, the problem is equivalent
  * to realizability as a simple bipartite graph, thus the Gale-Ryser theorem can be used; see
  * \ref igraph_is_bigraphical() for more information.
@@ -70,9 +71,13 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * https://users.renyi.hu/~p_erdos/1961-05.pdf
  *
  * </para><para>
- * Z Kiraly: Recognizing graphic degree sequences and generating al realizations.
- * TR-2011-11, Egervary Research Group, H-1117, Budapest, Hungary. ISSN 1587-4451, 2012.
+ * Z Király, Recognizing graphic degree sequences and generating all realizations.
+ * TR-2011-11, Egerváry Research Group, H-1117, Budapest, Hungary. ISSN 1587-4451 (2012).
  * http://bolyai.cs.elte.hu/egres/tr/egres-11-11.pdf
+ *
+ * </para><para>
+ * B. Cloteaux, Is This for Real? Fast Graphicality Testing, Comput. Sci. Eng. 17, 91 (2015).
+ * https://dx.doi.org/10.1109/MCSE.2015.125
  *
  * </para><para>
  * A. Berger, A note on the characterization of digraphic sequences, Discrete Math. 314, 38 (2014).
@@ -83,7 +88,7 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * https://arxiv.org/abs/1303.2145v1
  *
  * \param out_degrees A vector of integers specifying the degree sequence for
- *     undirected graphs or the our-degree sequence for directed graphs.
+ *     undirected graphs or the out-degree sequence for directed graphs.
  * \param in_degrees A vector of integers specifying the in-degree sequence for
  *     directed graphs. For undirected graphs, it must be \c NULL.
  * \param allowed_edge_types The types of edges to allow in the graph:
@@ -101,10 +106,11 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  *
  * \return Error code.
  *
- * \sa igraph_is_bigraphical()
+ * \sa igraph_is_bigraphical() to check if a bi-degree-sequence can be realized as a bipartite graph;
+ * \sa igraph_realize_degree_sequence() to construct a graph with a given degree sequence.
  *
- * Time complexity: O(n^2) for simple directed graphs, O(n) for all other cases,
- * where n is the length of the degree sequence(s).
+ * Time complexity: O(n^2) for simple directed graphs, O(n log n) for graphs with self-loops,
+ * and O(n) for all other cases, where n is the length of the degree sequence(s).
  */
 int igraph_is_graphical(const igraph_vector_t *out_degrees,
                         const igraph_vector_t *in_degrees,
@@ -174,7 +180,7 @@ int igraph_is_graphical(const igraph_vector_t *out_degrees,
  * </para><para>
  * When multi-edges are allowed, it is sufficient to check that the sum of degrees is the
  * same in the two partitions. For simple graphs, the Gale-Ryser theorem is used
- * with a relaxation by Berger.
+ * with Berger's relaxation.
  *
  * </para><para>
  * References:
@@ -828,9 +834,6 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * \function igraph_is_degree_sequence
  * \brief Determines whether a degree sequence is valid.
  *
- * This function is deprecated in favour of \ref igraph_is_graphical() with
- * <code>allowed_edge_types = IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW</code>.
- *
  * </para><para>
  * A sequence of n integers is a valid degree sequence if there exists some
  * graph where the degree of the i-th vertex is equal to the i-th element of the
@@ -846,6 +849,8 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * known sufficient and necessary conditions for a degree sequence to be
  * valid.
  *
+ * \deprecated-by igraph_is_graphical 0.9
+ *
  * \param out_degrees  an integer vector specifying the degree sequence for
  *     undirected graphs or the out-degree sequence for directed graphs.
  * \param in_degrees   an integer vector specifying the in-degrees of the
@@ -857,6 +862,8 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  */
 int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
                               const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+    IGRAPH_WARNING("igraph_is_degree_sequence is deprecated, use igraph_is_graphical.");
+
     /* degrees must be non-negative */
     if (igraph_vector_any_smaller(out_degrees, 0)) {
         FAIL;
@@ -891,10 +898,9 @@ int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
 
 /**
  * \function igraph_is_graphical_degree_sequence
- * \brief Determines whether a sequence of integers can be a degree sequence of some simple graph.
+ * \brief Determines whether a sequence of integers can be the degree sequence of some simple graph.
  *
- * This function is deprecated in favour of \ref igraph_is_graphical() with
- * <code>allowed_edge_types = IGRAPH_SIMPLE_SW</code>.
+ * \deprecated-by igraph_is_graphical 0.9
  *
  * </para><para>
  * References:
@@ -925,5 +931,6 @@ int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
  */
 int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
                                         const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+    IGRAPH_WARNING("igraph_is_graphical_degree_sequence is deprecated, use igraph_is_graphical.");
     return igraph_is_graphical(out_degrees, in_degrees, IGRAPH_SIMPLE_SW, res);
 }

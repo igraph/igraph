@@ -676,11 +676,11 @@ static int igraph_i_realize_directed_degree_sequence(
  * The \c method parameter controls the order in which the vertices to be connected are chosen.
  *
  * \param graph Pointer to an uninitialized graph object.
- * \param outdeg The degree sequence for a simple undirected graph
+ * \param outdeg The degree sequence of an undirected graph
  *        (if \p indeg is NULL), or the out-degree sequence of
  *        a directed graph (if \p indeg is given).
- * \param indeg The in-degree sequence of a directed graph. Pass \c NULL
- *        to generate an undirected graph.
+ * \param indeg The in-degree sequence of a directed graph.
+ *        Pass \c NULL to generate an undirected graph.
  * \param allowed_edge_types The types of edges to allow in the graph. For directed graphs,
  *        only \c IGRAPH_SIMPLE_SW is implemented at this moment. For undirected
  *        graphs, the following values are valid:
@@ -715,6 +715,8 @@ static int igraph_i_realize_directed_degree_sequence(
  *         \endclist
  * \return Error code:
  *          \clist
+ *          \cli IGRAPH_UNIMPLEMENTED
+ *           The requested method is not implemented.
  *          \cli IGRAPH_ENOMEM
  *           There is not enough memory to perform the operation.
  *          \cli IGRAPH_EINVAL
@@ -723,10 +725,10 @@ static int igraph_i_realize_directed_degree_sequence(
  *           and sum of \p outdeg and \p indeg should match for directed graphs.
  *          \endclist
  *
- * \sa  \ref igraph_is_graphical()
- *      \ref igraph_degree_sequence_game()
- *      \ref igraph_k_regular_game()
- *      \ref igraph_rewire()
+ * \sa  \ref igraph_is_graphical() to test graphicality without generating a graph;
+ *      \ref igraph_degree_sequence_game() to generate random graphs with a given degree sequence;
+ *      \ref igraph_k_regular_game() to generate random regular graphs;
+ *      \ref igraph_rewire() to randomly rewire the edges of a graph while preserving its degree sequence.
  *
  */
 
