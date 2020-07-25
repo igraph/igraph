@@ -396,6 +396,9 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
         }
 
         // choose a vertex the out-stubs of which will be connected
+        // note: a vertex with non-zero out-degree is guaranteed to exist
+        // because there are _some_ non-zero degrees and the sum of in- and out-degrees
+        // is the same
         vbd_pair *vdp;
         if (smallest) {
             vdp = &*std::find_if(vertices.rbegin(), vertices.rend(), is_nonzero_outdeg);
@@ -404,7 +407,7 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
         }
 
         // are there a sufficient number of other vertices to connect to?
-        if (static_cast<long>(vertices.size()) < vdp->degree.second - 1) {
+        if (static_cast<long>(vertices.size()) - 1 < vdp->degree.second) {
             goto fail;
         }
 

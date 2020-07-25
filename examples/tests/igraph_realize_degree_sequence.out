@@ -848,6 +848,44 @@ Smallest: not implemented
 Index: not implemented
 
 
+( 2 1 0 )
+( 2 0 1 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 1 2 0 )
+( 0 2 1 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
 ( 0 2 )
 ( 2 0 )
 
@@ -855,6 +893,73 @@ SIMPLE GRAPH:
 Largest: not graphical
 Smallest: not graphical
 Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 3 3 3 3 )
+( 3 3 3 3 )
+
+SIMPLE GRAPH:
+Largest:
+directed: true
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+1 0
+1 2
+1 3
+2 0
+2 1
+2 3
+3 0
+3 1
+3 2
+}
+Smallest:
+directed: true
+vcount: 4
+edges: {
+3 0
+3 1
+3 2
+2 3
+2 0
+2 1
+1 3
+1 2
+1 0
+0 3
+0 2
+0 1
+}
+Index:
+directed: true
+vcount: 4
+edges: {
+0 1
+0 2
+0 3
+1 0
+1 2
+1 3
+2 0
+2 1
+2 3
+3 0
+3 1
+3 2
+}
 
 LOOPLESS MULTIGRAPH:
 Largest: not implemented

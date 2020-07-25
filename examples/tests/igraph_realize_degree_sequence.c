@@ -113,8 +113,23 @@ int main() {
     igraph_vector_init_int_end(&ods, -1, 0, 1, 2, -1);
     directed_print_destroy(&ods, &ids);
 
+    /* same as before, different ordering, to test the "index" method */
+    igraph_vector_init_int_end(&ids, -1, 2, 0, 1, -1);
+    igraph_vector_init_int_end(&ods, -1, 2, 1, 0, -1);
+    directed_print_destroy(&ods, &ids);
+
+    /* same as before, different ordering, to test the "index" method */
+    igraph_vector_init_int_end(&ids, -1, 0, 2, 1, -1);
+    igraph_vector_init_int_end(&ods, -1, 1, 2, 0, -1);
+    directed_print_destroy(&ods, &ids);
+
     igraph_vector_init_int_end(&ids, -1, 2, 0, -1);
     igraph_vector_init_int_end(&ods, -1, 0, 2, -1);
+    directed_print_destroy(&ods, &ids);
+
+    /* simple complete graph on 4 vertices */
+    igraph_vector_init_int_end(&ids, -1, 3, 3, 3, 3, -1);
+    igraph_vector_init_int_end(&ods, -1, 3, 3, 3, 3, -1);
     directed_print_destroy(&ods, &ids);
 
     VERIFY_FINALLY_STACK();
