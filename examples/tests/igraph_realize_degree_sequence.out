@@ -829,3 +829,41 @@ Smallest: not implemented
 Index: not implemented
 
 
+( 0 1 2 )
+( 1 0 2 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
+( 0 2 )
+( 2 0 )
+
+SIMPLE GRAPH:
+Largest: not graphical
+Smallest: not graphical
+Index: not graphical
+
+LOOPLESS MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+LOOPY MULTIGRAPH:
+Largest: not implemented
+Smallest: not implemented
+Index: not implemented
+
+
