@@ -31,5 +31,7 @@ int main() {
 
     igraph_vector_destroy(&counts);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
