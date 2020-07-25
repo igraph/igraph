@@ -189,6 +189,7 @@ int main() {
     igraph_vector_init_int_end(&ods, -1, 0, 2, 0, -1);
     digraphical_print_destroy(&ids, &ods);
 
+    /* single loops: graphical, but multi-eges only: non-graphical */
     igraph_vector_init_int_end(&ids, -1, 1, 0, 2, -1);
     igraph_vector_init_int_end(&ods, -1, 0, 1, 2, -1);
     digraphical_print_destroy(&ids, &ods);
