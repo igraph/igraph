@@ -288,10 +288,11 @@ int igraph_bfs(const igraph_t *graph,
  *
  * Added in version 0.2.
  *
- * TODO
+ * Similar as igraph_bfs, but quicker and not as flexible.
  */
 
-int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
+int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid,
+		 igraph_neimode_t mode,
                  igraph_vector_t *vids, igraph_vector_t *layers,
                  igraph_vector_t *parents) {
 
@@ -591,3 +592,97 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
     return 0;
 }
+
+/**
+ * \function igraph_i_dfs
+ * \ingroup internal
+ *
+ * Added in version 0.2.
+ *
+ * Similar as igraph_dfs, but quicker and not as flexible.
+ */
+
+int igraph_i_dfs(const igraph_t *graph, igraph_integer_t vid,
+               igraph_neimode_t mode,
+               igraph_vector_t *vids,
+	       igraph_vector_t *parents) {
+
+    igraph_stack_t stack;
+    long int vidspos = 0;
+    igraph_lazy_adjlist_t adjlist;
+    igraph_vector_long_t nptr;
+    long int no_of_nodes = igraph_vcount(graph);
+    long int actroot;
+    igraph_vector_char_t added;
+
+    if (!igraph_is_directed(graph)) {
+        mode = IGRAPH_ALL;
+    }
+
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
+        mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode argument", IGRAPH_EINVMODE);
+    }
+
+    /* temporary storage */
+    IGRAPH_CHECK(igraph_vector_char_init(&added, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
+
+    IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode, /*simplify=*/ 0));
+    IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
+    IGRAPH_CHECK(igraph_stack_init(&stack, 100));
+    IGRAPH_FINALLY(igraph_stack_destroy, &stack);
+    IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);
+
+    /* results */
+    IGRAPH_CHECK(igraph_vector_resize(vids, no_of_nodes));
+    IGRAPH_CHECK(igraph_vector_resize(parents, no_of_nodes));
+
+    /* ok start with vid */
+    IGRAPH_CHECK(igraph_stack_push(&stack, vid));
+    VECTOR(*parents)[(long int)vid] = -1;
+    VECTOR(*vids)[vidpos++] = vid;
+    VECTOR(added)[(long int)vid] = 1;
+
+    while (!igraph_stack_empty(&stack)) {
+	/* Take the top node */
+        long int actvect = (long int) igraph_stack_top(&stack);
+        igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist,
+                                (igraph_integer_t) actvect);
+        long int n = igraph_vector_size(neis);
+        long int *ptr = igraph_vector_long_e_ptr(&nptr, actvect);
+
+        /* Search for a neighbor that was not yet visited */
+        igraph_bool_t any = 0;
+        long int neighbor;
+        while (!any && (*ptr) < n) {
+            neighbor = (long int) VECTOR(*neis)[(*ptr)];
+            any = !VECTOR(added)[neighbor];
+            (*ptr) ++;
+        }
+        if (any) {
+            /* There is such a neighbor, follow it */
+            VECTOR(added)[neighbor] = 1;
+            VECTOR(*parents)[neighbor] = actvect;
+            IGRAPH_CHECK(igraph_stack_push(&stack, neighbor));
+            VECTOR(*vids)[vidpos++] = neighbor;
+            act_dist++;
+
+        } else {
+            /* There is no such neighbor, finished with the subtree */
+            igraph_stack_pop(&stack);
+            act_dist--;
+
+        }
+    }
+
+    igraph_vector_long_destroy(&nptr);
+    igraph_lazy_adjlist_destroy(&adjlist);
+    igraph_stack_destroy(&stack);
+    igraph_vector_char_destroy(&added);
+    IGRAPH_FINALLY_CLEAN(4);
+
+    return 0;
+}
+

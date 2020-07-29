@@ -85,7 +85,8 @@ DECLDIR int igraph_bfs(const igraph_t *graph,
                igraph_vector_t *dist, igraph_bfshandler_t *callback,
                void *extra);
 
-int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
+int igraph_i_bfs(igraph_t *graph, igraph_integer_t vid,
+                 igraph_neimode_t mode,
                  igraph_vector_t *vids, igraph_vector_t *layers,
                  igraph_vector_t *parents);
 
@@ -126,6 +127,11 @@ DECLDIR int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
                igraph_vector_t *dist, igraph_dfshandler_t *in_callback,
                igraph_dfshandler_t *out_callback,
                void *extra);
+
+int igraph_i_dfs(igraph_t *graph, igraph_integer_t vid,
+                 igraph_neimode_t mode,
+                 igraph_vector_t *vids,
+                 igraph_vector_t *parents);
 
 __END_DECLS
 
