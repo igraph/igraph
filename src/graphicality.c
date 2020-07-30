@@ -478,19 +478,14 @@ finish:
  *  - The sum of in- and out-degrees must be the same.
  */
 static int igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
-    long int i, sumout, sumin;
+    long int i, sumdiff; /* difference between sum of in- and out-degrees */
     long int n = igraph_vector_size(out_degrees);
 
     if (igraph_vector_size(in_degrees) != n) {
         IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
     }
 
-    if (n == 0) {
-        *res = 1;
-        return IGRAPH_SUCCESS;
-    }
-
-    sumin = 0; sumout = 0;
+    sumdiff = 0;
     for (i=0; i < n; ++i) {
         long int dout = VECTOR(*out_degrees)[i];
         long int din  = VECTOR(*in_degrees)[i];
@@ -500,10 +495,10 @@ static int igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out
             return IGRAPH_SUCCESS;
         }
 
-        sumin += din; sumout += dout;
+        sumdiff += din - dout;
     }
 
-    *res = sumin == sumout;
+    *res = sumdiff = 0;
 
     return IGRAPH_SUCCESS;
 }
