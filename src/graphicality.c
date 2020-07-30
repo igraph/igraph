@@ -834,6 +834,8 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * \function igraph_is_degree_sequence
  * \brief Determines whether a degree sequence is valid.
  *
+ * \deprecated-by igraph_is_graphical 0.9
+ *
  * </para><para>
  * A sequence of n integers is a valid degree sequence if there exists some
  * graph where the degree of the i-th vertex is equal to the i-th element of the
@@ -848,8 +850,6 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * degree vectors are equal and whether their sums are also equal. These are
  * known sufficient and necessary conditions for a degree sequence to be
  * valid.
- *
- * \deprecated-by igraph_is_graphical 0.9
  *
  * \param out_degrees  an integer vector specifying the degree sequence for
  *     undirected graphs or the out-degree sequence for directed graphs.
@@ -910,14 +910,16 @@ int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
  * vertices of a simple graph. J SIAM Appl Math 10:496-506, 1962.
  *
  * </para><para>
- * PL Erdos, I Miklos and Z Toroczkai: A simple Havel-Hakimi type algorithm
- * to realize graphical degree sequences of directed graphs. The Electronic
- * Journal of Combinatorics 17(1):R66, 2010.
+ * PL Erdős, I Miklós and Z Toroczkai: A simple Havel-Hakimi type algorithm
+ * to realize graphical degree sequences of directed graphs.
+ * The Electronic Journal of Combinatorics 17(1):R66, 2010.
+ * https://dx.doi.org/10.1017/S0963548317000499
  *
  * </para><para>
  * Z Kiraly: Recognizing graphic degree sequences and generating all
  * realizations. TR-2011-11, Egervary Research Group, H-1117, Budapest,
  * Hungary. ISSN 1587-4451, 2012.
+ * https://www.cs.elte.hu/egres/tr/egres-11-11.pdf
  *
  * \param out_degrees  an integer vector specifying the degree sequence for
  *     undirected graphs or the out-degree sequence for directed graphs.
