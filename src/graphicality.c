@@ -238,9 +238,9 @@ int igraph_is_bigraphical(const igraph_vector_t *degrees1,
  * These conditions are valid regardless of whether multi-edges are allowed between distinct vertices.
  */
 static int igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *degrees, igraph_bool_t *res) {
-    long sum_parity = 0; /* 0 if the degree sum is even, 1 otherwise */
-    long i;
-    long n = igraph_vector_size(degrees);
+    long int sum_parity = 0; /* 0 if the degree sum is even, 1 if it is odd */
+    long int n = igraph_vector_size(degrees);
+    long int i;
 
     for (i=0; i < n; ++i) {
         long int d = VECTOR(*degrees)[i];
@@ -478,8 +478,9 @@ finish:
  *  - The sum of in- and out-degrees must be the same.
  */
 static int igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
-    long int i, sumdiff; /* difference between sum of in- and out-degrees */
+    long int sumdiff; /* difference between sum of in- and out-degrees */
     long int n = igraph_vector_size(out_degrees);
+    long int i;
 
     if (igraph_vector_size(in_degrees) != n) {
         IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
@@ -498,7 +499,7 @@ static int igraph_i_is_graphical_directed_loopy_multi(const igraph_vector_t *out
         sumdiff += din - dout;
     }
 
-    *res = sumdiff = 0;
+    *res = sumdiff == 0;
 
     return IGRAPH_SUCCESS;
 }
