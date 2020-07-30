@@ -238,7 +238,7 @@ int igraph_is_bigraphical(const igraph_vector_t *degrees1,
  * These conditions are valid regardless of whether multi-edges are allowed between distinct vertices.
  */
 static int igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *degrees, igraph_bool_t *res) {
-    long sum = 0;
+    long sum_parity = 0; /* 0 if the degree sum is even, 1 otherwise */
     long i;
     long n = igraph_vector_size(degrees);
 
@@ -249,10 +249,10 @@ static int igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *d
             *res = 0;
             return IGRAPH_SUCCESS;
         }
-        sum += d;
+        sum_parity = (sum_parity + d) & 1;
     }
 
-    *res = (sum % 2 == 0);
+    *res = (sum_parity == 0);
 
     return IGRAPH_SUCCESS;
 }
@@ -266,7 +266,7 @@ static int igraph_i_is_graphical_undirected_multi_loops(const igraph_vector_t *d
 static int igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t *degrees, igraph_bool_t *res) {
     long int i;
     long int n = igraph_vector_size(degrees);
-    long int sum, dmax;
+    long int dsum, dmax;
 
     /* Zero-length sequences are considered graphical. */
     if (n == 0) {
@@ -274,7 +274,7 @@ static int igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t
         return IGRAPH_SUCCESS;
     }
 
-    sum = 0; dmax = 0;
+    dsum = 0; dmax = 0;
     for (i=0; i < n; ++i) {
         long int d = VECTOR(*degrees)[i];
 
@@ -282,13 +282,13 @@ static int igraph_i_is_graphical_undirected_loopless_multi(const igraph_vector_t
             *res = 0;
             return IGRAPH_SUCCESS;
         }
-        sum += d;
+        dsum += d;
         if (d > dmax) {
             dmax = d;
         }
     }
 
-    *res = (sum % 2 == 0) && (sum >= 2*dmax);
+    *res = (dsum % 2 == 0) && (dsum >= 2*dmax);
 
     return IGRAPH_SUCCESS;
 }
