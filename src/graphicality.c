@@ -2,7 +2,7 @@
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
    IGraph library.
-   Copyright (C) 2009-2020  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

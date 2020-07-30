@@ -1,6 +1,6 @@
 /*
   Constructing realizations of degree sequences and bi-degree sequences.
-  Copyright (C) 2018 Szabolcs Horvat <szhorvat@gmail.com>
+  Copyright (C) 2018-2020 Szabolcs Horvat <szhorvat@gmail.com>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
