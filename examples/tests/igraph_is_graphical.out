@@ -13,6 +13,12 @@ simple: false, loops: false, multi: false, multiloops: false
 ( 3 3 3 3 3 3 3 )
 simple: false, loops: false, multi: false, multiloops: false
 
+( 4 4 5 3 6 2 2 8 1 1 10 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 3 3 2 4 1 5 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
 ( 4 7 4 7 7 8 9 9 4 6 5 )
 simple:  true, loops:  true, multi:  true, multiloops:  true
 
@@ -68,6 +74,10 @@ simple:  true, loops:  true, multi:  true, multiloops:  true
 
 ( 8 5 6 8 6 6 5 7 5 7 )
 ( 7 4 6 4 7 8 8 8 7 4 )
+simple:  true, loops:  true, multi:  true, multiloops:  true
+
+( 2 2 4 3 4 3 1 0 )
+( 3 3 1 0 2 3 0 7 )
 simple:  true, loops:  true, multi:  true, multiloops:  true
 
 ( 1 )
