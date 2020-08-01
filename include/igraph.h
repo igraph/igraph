@@ -97,5 +97,6 @@
 #include "igraph_lsap.h"
 #include "igraph_coloring.h"
 #include "igraph_eulerian.h"
+#include "igraph_graphicality.h"
 
 #endif

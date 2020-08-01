@@ -8,6 +8,10 @@
    * `igraph_is_eulerian()`: finds out whether an Eulerian path/cycle exists.
    * `igraph_eulerian_path()`: returns an Eulerian path.
    * `igraph_eulerian_cycle()`: returns an Eulerian cycle.
+ - Degree sequences:
+   * `igraph_is_graphical()` checks if a degree sequence has a realization as a simple or multigraph, with or without self-loops.
+   * `igraph_is_bigraphical()` checks if two degree sequences have a realization as a bipartite graph.
+   * `igraph_realize_degree_sequence()` now supports constructing non-simple graphs as well.
  - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
 
 ### Changed
@@ -16,6 +20,8 @@
  - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
  - `igraph_modularity()` now supports computing the directed version of modularity.
  - `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
+ - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.
+ - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
 
 ### Fixed
 
@@ -23,6 +29,7 @@
  - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).
  - `igraph_eigen_matrix_symmetric()`: fixed incorrect matrix multiplication (PR #1379).
  - Corrected several issues that could arise during an error condition (PRs #1405, #1406).
+ - `igraph_realize_degree_sequence()` did not correctly detect some non-graphical inputs.
 
 ### Other
 

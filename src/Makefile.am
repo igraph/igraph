@@ -324,7 +324,8 @@ HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_vector_type.h ../include/igraph_epidemics.h \
 		../include/igraph_lsap.h ../include/igraph_decls.h \
 		../include/igraph_coloring.h \
-		../include/igraph_eulerian.h 
+		../include/igraph_eulerian.h  \
+		../include/igraph_graphicality.h
 
 SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 			     structural_properties.c components.c layout.c \
@@ -387,6 +388,7 @@ SOURCES = 		     basic_query.c games.c cocitation.c iterators.c \
 				 igraph_cliquer.c cliquer/cliquer.c cliquer/cliquer_graph.c cliquer/reorder.c \
 				 coloring.c \
 				 degree_sequence.cpp \ 
+				 graphicality.c \
 				 igraph_eulerian.c 
 
 if INTERNAL_F2C

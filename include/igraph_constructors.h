@@ -29,6 +29,7 @@
 #include "igraph_types.h"
 #include "igraph_matrix.h"
 #include "igraph_datatype.h"
+#include "igraph_graphicality.h"
 
 __BEGIN_DECLS
 
@@ -72,8 +73,9 @@ DECLDIR int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
                               igraph_integer_t repeats);
 DECLDIR int igraph_lcf(igraph_t *graph, igraph_integer_t n, ...);
 DECLDIR int igraph_realize_degree_sequence(igraph_t *graph,
-        const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
-        igraph_realize_degseq_t method);
+                                           const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
+                                           igraph_edge_type_sw_t allowed_edge_types,
+                                           igraph_realize_degseq_t method);
 
 __END_DECLS
 
