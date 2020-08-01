@@ -110,6 +110,15 @@ int main() {
     igraph_vector_init_int_end(&ds, -1, 4, 7, 4, 7, 7, 8, 9, 9, 4, 6, 5, -1);
     graphical_print_destroy(&ds);
 
+    igraph_vector_init_int_end(&ds, -1, 4, 4, 4, 4, 4, 1, 1, -1);
+    graphical_print_destroy(&ds);
+
+    igraph_vector_init_int_end(&ds, -1, 4, 4, 4, 4, 4, -1);
+    graphical_print_destroy(&ds);
+
+    igraph_vector_init_int_end(&ds, -1, 4, 4, 4, 4, 4, 4, 1, 1, -1);
+    graphical_print_destroy(&ds);
+
     igraph_vector_init_int_end(&ds, -1, 3, 3, -1);
     graphical_print_destroy(&ds);
 
