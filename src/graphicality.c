@@ -380,9 +380,11 @@ static int igraph_i_is_graphical_undirected_loopy_simple(const igraph_vector_t *
 static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degrees, igraph_bool_t *res) {
     igraph_vector_int_t num_degs; /* num_degs[d] is the # of vertices with degree d */
     const long int p = igraph_vector_size(degrees);
-    long int dmin, dmax, dsum, n;
+    long int dmin, dmax, dsum;
+    long int n; /* number of non-zero degrees */
     long int k, sum_deg, sum_ni, sum_ini;
     long int i, dk;
+    long int zverovich_bound;
 
     if (p == 0) {
         *res = 1;
@@ -390,18 +392,13 @@ static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degree
     }
 
     /* The following implementation of the Erdős-Gallai test
-     * is a direct translation of the Python code given in
+     * is mostly a direct translation of the Python code given in
      *
      * Brian Cloteaux, Is This for Real? Fast Graphicality Testing,
      * Computing Prescriptions, pp. 91-95, vol. 17 (2015)
      * https://dx.doi.org/10.1109/MCSE.2015.125
      *
-     * It uses counting sort and a result from
-     *
-     * I. Zverovich and V. Zverovich, Contributions to the Theory of Graphic Sequences,
-     * Discrete Mathematics, vol. 105, nos. 1-3, 1992, pp. 293–303.
-     *
-     * to achieve linear runtime.
+     * It uses counting sort to achieve linear runtime.
      */
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&num_degs, p);
@@ -429,12 +426,38 @@ static int igraph_i_is_graphical_undirected_simple(const igraph_vector_t *degree
         goto finish;
     }
 
-    if (n == 0 || 4*dmin*n >= (dmax + dmin + 1) * (dmax + dmin + 1)) {
+    if (n == 0) {
+        *res = 1;
+        goto finish; /* all degrees are zero => graphical */
+    }
+
+    /* According to:
+     *
+     * G. Cairns, S. Mendan, and Y. Nikolayevsky, A sharp refinement of a result of Zverovich-Zverovich,
+     * Discrete Math. 338, 1085 (2015).
+     * https://dx.doi.org/10.1016/j.disc.2015.02.001
+     *
+     * a sufficient but not necessary condition of graphicality for a sequence of
+     * n strictly positive integers is that
+     *
+     * dmin * n >= floor( (dmax + dmin + 1)^2 / 4 ) - 1
+     * if dmin is odd or (dmax + dmin) mod 4 == 1
+     *
+     * or
+     *
+     * dmin * n >= floor( (dmax + dmin + 1)^2 / 4 )
+     * otherwise.
+     */
+
+    zverovich_bound = ((dmax + dmin + 1) * (dmax + dmin + 1)) / 4;
+    if (dmin % 2 == 1 || (dmax + dmin) % 4 == 1) {
+        zverovich_bound -= 1;
+    }
+
+    if (dmin*n >= zverovich_bound) {
         *res = 1;
         goto finish;
     }
-
-    *res = 1;
 
     k = 0; sum_deg = 0; sum_ni = 0; sum_ini = 0;
     for (dk = dmax; dk >= dmin; --dk) {
