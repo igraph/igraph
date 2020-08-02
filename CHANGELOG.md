@@ -14,6 +14,7 @@
  - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).
  - `igraph_eigen_matrix_symmetric()`: fixed incorrect matrix multiplication (PR #1379).
  - Corrected several issues that could arise during an error condition (PRs #1405, #1406).
+ - `igraph_realize_degree_sequence()` did not correctly detect some non-graphical inputs.
 
 ### Other
 

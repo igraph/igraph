@@ -1,6 +1,6 @@
 /*
   Constructing realizations of degree sequences and bi-degree sequences.
-  Copyright (C) 2018 Szabolcs Horvat <szhorvat@gmail.com>
+  Copyright (C) 2018-2020 Szabolcs Horvat <szhorvat@gmail.com>
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -82,10 +82,6 @@ static int igraph_i_havel_hakimi(const igraph_vector_t *deg, igraph_vector_t *ed
         vd_pair vd = vertices.back();
         vertices.pop_back();
 
-        if (vd.degree < 0) {
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
-        }
-
         if (vd.degree == 0) {
             continue;
         }
@@ -147,10 +143,6 @@ static int igraph_i_havel_hakimi_index(const igraph_vector_t *deg, igraph_vector
 
         vd_pair vd = **pt;
         vertices.erase(*pt);
-
-        if (vd.degree < 0) {
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
-        }
 
         if (vd.degree == 0) {
             continue;
@@ -226,12 +218,8 @@ static int igraph_i_kleitman_wang(const igraph_vector_t *outdeg, const igraph_ve
         }
 
 
-        if (vdp->degree.first < 0 || vdp->degree.second < 0) {
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
-        }
-
         // are there a sufficient number of other vertices to connect to?
-        if (vertices.size() < vdp->degree.second - 1) {
+        if (vertices.size() - 1 < vdp->degree.second) {
             goto fail;
         }
 
@@ -294,10 +282,6 @@ static int igraph_i_kleitman_wang_index(const igraph_vector_t *outdeg, const igr
             continue;
         }
 
-        if (vd.degree.first < 0 || vd.degree.second < 0) {
-            IGRAPH_ERROR("Vertex degrees must be positive", IGRAPH_EINVAL);
-        }
-
         int k = 0;
         vlist::iterator it;
         for (it = vertices.begin();
@@ -342,6 +326,10 @@ static int igraph_i_realize_undirected_degree_sequence(
         IGRAPH_ERROR("The sum of degrees must be even for an undirected graph", IGRAPH_EINVAL);
     }
 
+    if (igraph_vector_min(deg) < 0) {
+        IGRAPH_ERROR("Vertex degrees must be non-negative", IGRAPH_EINVAL);
+    }
+
     igraph_vector_t edges;
     IGRAPH_CHECK(igraph_vector_init(&edges, deg_sum));
     IGRAPH_FINALLY(igraph_vector_destroy, &edges);
@@ -382,6 +370,10 @@ static int igraph_i_realize_directed_degree_sequence(
     }
     if (igraph_vector_sum(indeg) != edge_count) {
         IGRAPH_ERROR("In- and out-degree sequences do not sum to the same value", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_min(outdeg) < 0 || igraph_vector_min(indeg) < 0) {
+        IGRAPH_ERROR("Vertex degrees must be non-negative", IGRAPH_EINVAL);
     }
 
     igraph_vector_t edges;
