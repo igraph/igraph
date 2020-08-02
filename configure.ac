@@ -90,7 +90,8 @@ AC_CACHE_CHECK([whether '\n' printed to stdout is converted to '\r\n'],
         int main (int argc, char **argv)
         {
           FILE *fp;
-          char *s, c, c_prev;
+          char *s;
+          int c, c_prev;
           /* Do nothing if no argument. */
           if (argc == 1) return 0;
           s = argv[1];
