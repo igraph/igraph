@@ -19,16 +19,8 @@ mkdir -p m4
 
 set -x
 
-# Order of commands in the next few lines are taken from here:
-# https://stackoverflow.com/a/11279735/156771
-
-$LIBTOOLIZE --force --copy
-
-aclocal -I m4 --install
-autoheader
-autoconf
-
-automake --foreign --add-missing --force-missing --copy
+# autoreconf calls all its friends in the order it needs.
+LIBTOOLIZE="$LIBTOOLIZE" autoreconf -vfi
 
 # Try to patch ltmain.sh to allow -fsanitize=* linker flags to be passed
 # through to the linker. Don't do anything if it fails; maybe libtool has
