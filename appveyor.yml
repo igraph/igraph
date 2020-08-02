@@ -33,9 +33,9 @@ install:
     # update msys2
     - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S zstd"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S autoconf automake bison flex"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S libxml2-devel zip xz"
+    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S zstd"
+    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S autoconf automake bison flex"
+    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S libxml2-devel zip xz"
 
     # Now start with the build: first the msys2 based one
     - cmd: bash bootstrap.sh
