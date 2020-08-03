@@ -31,6 +31,9 @@ addons:
     - gmp
     - glpk
 
+before_install:
+  - git fetch --unshallow    # to make sure that we can fetch the latest tag
+
 script:
   - make check
 
