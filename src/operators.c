@@ -998,6 +998,10 @@ int igraph_difference(igraph_t *res,
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
                 n1--;
+                /* handle loop edges properly in undirected graphs */
+                if (!directed && i == v1) {
+                    n1--;
+                }
             } else if (v2 > v1) {
                 n2--;
             } else {
@@ -1014,6 +1018,11 @@ int igraph_difference(igraph_t *res,
                 IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+
+                /* handle loop edges properly in undirected graphs */
+                if (!directed && v1 == i) {
+                    n1--;
+                }
             }
             n1--;
         }
@@ -1031,6 +1040,11 @@ int igraph_difference(igraph_t *res,
                 IGRAPH_CHECK(igraph_vector_push_back(&edge_ids, e1));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, v1));
+
+                /* handle loop edges properly in undirected graphs */
+                if (!directed && v1 == i) {
+                    n1--;
+                }
             }
             n1--;
         }
