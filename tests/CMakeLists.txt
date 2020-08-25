@@ -3,7 +3,7 @@ include(test_helpers)
 # Add a compatibility alias to the "test" target so it can also be invoked as
 # "make check" - for people who have it in their muscle memories from autotools
 add_custom_target(build_tests)
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND})
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE})
 add_dependencies(check build_tests)
 
 # version.at
