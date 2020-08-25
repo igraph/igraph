@@ -38,7 +38,7 @@ install:
 test_script:
     - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
     - cmd: cd build
-    - cmd: ctest
+    - cmd: ctest -C Debug
 
 on_failure:
     - cmd: echo zipping everything after a failure...
