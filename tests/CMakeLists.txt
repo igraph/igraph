@@ -31,7 +31,7 @@ add_legacy_tests(
   igraph_sparsemat2
   igraph_sparsemat3
   igraph_sparsemat4
-  igraph_sparsemat5
+  # igraph_sparsemat5
   igraph_sparsemat6
   igraph_sparsemat7
   igraph_sparsemat8
