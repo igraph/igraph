@@ -43,6 +43,7 @@ install:
 test_script:
     - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
     - cmd: cd build
+    - cmd: cmake --build . --target ALL_BUILD
     - cmd: cmake --build . --target RUN_TESTS
 
 on_failure:
