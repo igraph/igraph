@@ -23,6 +23,7 @@ set(
   cliques.xxml
   coloring.xxml
   community.xxml
+  cycles.xxml
   dqueue.xxml
   embedding.xxml
   error.xxml
