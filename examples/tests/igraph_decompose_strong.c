@@ -53,15 +53,11 @@ int main() {
     /* 0 >->  1 >-> 3 >-> 4
        ^      v
        \< 2 < /           */
-    igraph_real_t edges[] = {
-        0, 1, 1, 2, 2, 0,
-        1, 3,
-        3, 4
-    };
-    igraph_vector_t v;
-    igraph_create(&g,
-                  igraph_vector_view(&v, edges, sizeof(edges) / sizeof(igraph_real_t)),
-                  0, IGRAPH_DIRECTED);
+    igraph_small(&g, 5, IGRAPH_DIRECTED,
+                 0, 1, 1, 2, 2, 0,
+                 1, 3,
+                 3, 4,
+                 -1);
     igraph_decompose(&g, &complist, IGRAPH_STRONG, 3, 2);
     for (i = 0; i < igraph_vector_ptr_size(&complist); i++) {
         igraph_write_graph_edgelist(VECTOR(complist)[i], stdout);

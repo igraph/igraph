@@ -7,6 +7,9 @@ env:
   global:
     - MAKEFLAGS="-j 2"
 
+git:
+  depth: 200    # to make sure we find the latest tag when building. Increase if not enough.
+
 addons:
   apt:
     sources:
@@ -35,6 +38,9 @@ addons:
     - bison
     - gmp
     - glpk
+
+before_install:
+  - git fetch --unshallow    # to make sure that we can fetch the latest tag
 
 script:
   - make check
@@ -67,6 +73,7 @@ jobs:
         - mkdir build
         - cd build
         - /usr/bin/cmake .. -DCMAKE_VERBOSE_MAKEFILE=1
+
     - name: "macOS"
       os: osx
       osx_image: xcode11.5    # we need a newer CMake in the image
@@ -75,6 +82,7 @@ jobs:
         - cd build
         - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1 -DUSE_SANITIZER=Address\;Undefined
         - make
+
     - name: "Documentation"
       language: shell
       os: linux

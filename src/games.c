@@ -844,7 +844,7 @@ int igraph_degree_sequence_game_simple(igraph_t *graph,
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     long int i, j;
 
-    IGRAPH_CHECK(igraph_is_degree_sequence(out_seq, in_seq, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR(in_seq ? "No directed graph can realize the given degree sequences" :
                      "No undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
@@ -942,7 +942,7 @@ int igraph_degree_sequence_game_no_multiple_undirected(
     long int no_of_nodes, outsum = 0;
     igraph_bool_t degseq_ok;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(seq, 0, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(seq, 0, IGRAPH_SIMPLE_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence",
                      IGRAPH_EINVAL);
@@ -1085,7 +1085,7 @@ int igraph_degree_sequence_game_no_multiple_directed(igraph_t *graph,
     long int i, j, k;
     long int no_of_nodes, outsum;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(out_seq, in_seq, &deg_seq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_SIMPLE_SW, &deg_seq_ok));
     if (!deg_seq_ok) {
         IGRAPH_ERROR("No simple directed graph can realize the given degree sequence",
                      IGRAPH_EINVAL);
@@ -1233,7 +1233,7 @@ int igraph_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, 
     long i, j;
     long vcount, ecount, stub_count;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(degseq, NULL, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(degseq, NULL, IGRAPH_SIMPLE_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
@@ -1345,7 +1345,7 @@ int igraph_degree_sequence_game_no_multiple_directed_uniform(
     long i, j;
     long vcount, ecount;
 
-    IGRAPH_CHECK(igraph_is_graphical_degree_sequence(out_deg, in_deg, &degseq_ok));
+    IGRAPH_CHECK(igraph_is_graphical(out_deg, in_deg, IGRAPH_SIMPLE_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple directed graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
@@ -1533,8 +1533,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  *                  other modes is not known.
  *
  * \sa \ref igraph_barabasi_game(), \ref igraph_erdos_renyi_game(),
- *     \ref igraph_is_degree_sequence(),
- *     \ref igraph_is_graphical_degree_sequence()
+ *     \ref igraph_is_graphical()
  *
  * \example examples/simple/igraph_degree_sequence_game.c
  */
@@ -3821,16 +3820,15 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
  *
  */
 int igraph_simple_interconnected_islands_game(
-    igraph_t        *graph,
-    igraph_integer_t    islands_n,
-    igraph_integer_t    islands_size,
-    igraph_real_t       islands_pin,
-    igraph_integer_t    n_inter) {
+        igraph_t *graph,
+        igraph_integer_t islands_n,
+        igraph_integer_t islands_size,
+        igraph_real_t islands_pin,
+        igraph_integer_t n_inter) {
 
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
-    int retval = 0;
     int nbNodes;
     double maxpossibleedgesPerIsland;
     double maxedgesPerIsland;
@@ -3855,74 +3853,64 @@ int igraph_simple_interconnected_islands_game(
         IGRAPH_ERROR("Invalid number of inter-islands links", IGRAPH_EINVAL);
     }
 
-    // how much memory ?
+    /* how much memory ? */
     nbNodes = islands_n * islands_size;
     maxpossibleedgesPerIsland = ((double)islands_size * ((double)islands_size - (double)1)) / (double)2;
     maxedgesPerIsland = islands_pin * maxpossibleedgesPerIsland;
     nbEdgesInterIslands = n_inter * (islands_n * (islands_n - 1)) / 2;
-    maxedges = maxedgesPerIsland * islands_n + nbEdgesInterIslands;
+    maxedges = maxedgesPerIsland * islands_n + nbEdgesInterIslands;    
 
-    // debug&tests : printf("total nodes %d, maxedgesperisland %f, maxedgesinterislands %d, maxedges %f\n", nbNodes, maxedgesPerIsland, nbEdgesInterIslands, maxedges);
-
-    // reserve enough place for all the edges, thanks !
+    /* reserve enough space for all the edges */
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, (long int) maxedges));
 
     RNG_BEGIN();
 
-    // first create all the islands
-    for (is = 1; is <= islands_n; is++) { // for each island
+    /* first create all the islands */
+    for (is = 1; is <= islands_n; is++) { /* for each island */
 
-        // index for start and end of nodes in this island
+        /* index for start and end of nodes in this island */
         startIsland = islands_size * (is - 1);
         endIsland = startIsland + islands_size - 1;
 
-
-        // debug&tests : printf("start %d,end %d\n", startIsland, endIsland);
-
-        // create the random numbers to be used (into s)
+        /* create the random numbers to be used (into s) */
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&s, (long int) maxedgesPerIsland));
 
         last = RNG_GEOM(islands_pin);
-        // debug&tests : printf("last=%f \n", last);
-        while (last < maxpossibleedgesPerIsland) { // maxedgesPerIsland
+        while (last < maxpossibleedgesPerIsland) { /* maxedgesPerIsland */
             IGRAPH_CHECK(igraph_vector_push_back(&s, last));
             myrand = RNG_GEOM(islands_pin);
-            last += myrand; //RNG_GEOM(islands_pin);
-            //printf("myrand=%f , last=%f \n", myrand, last);
+            last += myrand; /* RNG_GEOM(islands_pin); */
             last += 1;
         }
 
 
 
-        // change this to edges !
+        /* change this to edges ! */
         vsize = igraph_vector_size(&s);
         for (i = 0; i < vsize; i++) {
-
             long int to = (long int) floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
             long int from = (long int) (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
             to += startIsland;
             from += startIsland;
-            // debug&tests : printf("from %d to %d\n", from, to);
+
             igraph_vector_push_back(&edges, from);
             igraph_vector_push_back(&edges, to);
         }
 
-        // clear the memory used for random number for this island
+        /* clear the memory used for random number for this island */
         igraph_vector_destroy(&s);
         IGRAPH_FINALLY_CLEAN(1);
 
 
-        // create the links with other islands
-        for (i = is + 1; i <= islands_n; i++) { // for each other island (not the previous ones)
+        /* create the links with other islands */
+        for (i = is + 1; i <= islands_n; i++) { /* for each other island (not the previous ones) */
 
-            // debug&tests : printf("link islands %d and %d\n", is, i);
-            for (j = 0; j < n_inter; j++) { // for each link between islands
-
+            for (j = 0; j < n_inter; j++) { /* for each link between islands */
                 long int from = (long int) RNG_UNIF(startIsland, endIsland);
                 long int to = (long int) RNG_UNIF((i - 1) * islands_size, i * islands_size);
-                //printf("from %d to %d\n", from, to);
+
                 igraph_vector_push_back(&edges, from);
                 igraph_vector_push_back(&edges, to);
             }
@@ -3932,14 +3920,14 @@ int igraph_simple_interconnected_islands_game(
 
     RNG_END();
 
-    // actually fill the graph object
-    IGRAPH_CHECK(retval = igraph_create(graph, &edges, nbNodes, 0));
+    /* actually fill the graph object */
+    IGRAPH_CHECK(igraph_create(graph, &edges, nbNodes, 0));
 
-    // an clear remaining things
+    /* clean remaining things */
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
-    return retval;
+    return IGRAPH_SUCCESS;
 }
 
 

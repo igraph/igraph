@@ -91,5 +91,8 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_destroy(&res);
+
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

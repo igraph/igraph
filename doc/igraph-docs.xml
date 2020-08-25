@@ -12,20 +12,43 @@
 ]>
 
 <book id="index" xmlns:xi="http://www.w3.org/2001/XInclude">
+
   <bookinfo>
     <title>&igraph; Reference Manual</title>
     <releaseinfo>&version;</releaseinfo>
     <authorgroup>
       <author><firstname>Gábor</firstname><surname>Csárdi</surname>
-      <affiliation><orgname>Department of Statistics, Harvard University
-    </orgname>
+      <affiliation>
+      <orgname>Department of Statistics, Harvard University</orgname>
       <address>1 Oxford street, Cambridge, MA, 02138 USA</address>
       </affiliation>
       </author>
+
       <author><firstname>Tamás</firstname><surname>Nepusz</surname>
-      <affiliation><orgname>Department of Biological Physics,
-      Eötvös University</orgname>
+      <affiliation>
+      <orgname>Department of Biological Physics, Eötvös University</orgname>
       <address>1/a Pázmány Péter sétány, 1117 Budapest, Hungary</address>
+      </affiliation>
+      </author>
+
+      <author><firstname>Vincent</firstname><surname>Traag</surname>
+      <affiliation>
+      <orgname>Centre for Science and Technology Studies, Leiden University</orgname>
+      <address>Room B5.31, Kolffpad 1, 2333 BN Leiden, Netherlands</address>
+      </affiliation>
+      </author>
+
+      <author><firstname>Szabolcs</firstname><surname>Horvát</surname>
+      <affiliation>
+      <orgname>Center for Systems Biology Dresden</orgname>
+      <address>Room 115, Pfotenhauerstr. 108, 01307 Dresden, Germany</address>
+      </affiliation>
+      </author>
+
+      <author><firstname>Fabio</firstname><surname>Zanini</surname>
+      <affiliation>
+      <orgname>Lowy Cancer Research Centre, University of New South Wales</orgname>
+      <address>Room 211, Botany and High St, Kensington, NSW, 2033, Australia</address>
       </affiliation>
       </author>
     </authorgroup>
@@ -34,7 +57,8 @@
       <para>This manual is for &igraph;, version &version;.</para>
 
       <para>
-      Copyright (C) 2005-2020 Gábor Csárdi and Tamás Nepusz.
+      Copyright (C) 2005-2019 Gábor Csárdi and Tamás Nepusz.
+      Copyright (C) 2020 igraph development team.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;
@@ -82,6 +106,8 @@
   <xi:include href="attributes.xml"/>  
 
   <xi:include href="structural.xml"/>
+
+  <xi:include href="cycles.xml"/>
 
   <xi:include href="visitors.xml"/>
 

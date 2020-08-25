@@ -22,16 +22,24 @@
 
 */
 
+#ifdef TRANSIT
+#define TRANSIT_TRIEDGES
+#endif
+#ifdef TRIEDGES
+#define TRANSIT_TRIEDGES
+#endif
+
 long int no_of_nodes = igraph_vcount(graph);
 long int node, i, j, nn;
 igraph_adjlist_t allneis;
 igraph_vector_int_t *neis1, *neis2;
-long int neilen1, neilen2, deg1;
+long int neilen1, neilen2;
 long int *neis;
 long int maxdegree;
 
-/* deg1 is not used in all instantiations of this template */
-IGRAPH_UNUSED(deg1);
+#ifdef TRANSIT_TRIEDGES
+long int deg1;
+#endif
 
 igraph_vector_int_t order;
 igraph_vector_int_t rank;
@@ -75,7 +83,11 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
 
     neis1 = igraph_adjlist_get(&allneis, node);
     neilen1 = igraph_vector_int_size(neis1);
+
+#ifdef TRANSIT_TRIEDGES
     deg1 = (long int) VECTOR(degree)[node];
+#endif
+
     /* Mark the neighbors of the node */
     for (i = 0; i < neilen1; i++) {
         neis[ (long int) VECTOR(*neis1)[i] ] = node + 1;
@@ -119,3 +131,7 @@ igraph_vector_int_destroy(&rank);
 igraph_vector_destroy(&degree);
 igraph_vector_int_destroy(&order);
 IGRAPH_FINALLY_CLEAN(5);
+
+#ifdef TRANSIT_TRIEDGES
+#undef TRANSIT_TRIEDGES
+#endif

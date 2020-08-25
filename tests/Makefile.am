@@ -23,7 +23,8 @@ TESTSUITE_AT = \
 	other.at foreign.at conversion.at flow.at community.at eigen.at \
 	cliques.at attributes.at arpack.at bipartite.at centralization.at \
 	version.at separators.at hrg.at microscopic.at mt.at random.at scg.at \
-	matching.at qsort.at coloring.at embedding.at
+	matching.at qsort.at coloring.at embedding.at \
+	eulerian.at
 
 TESTSUITE = testsuite
 
@@ -37,8 +38,8 @@ clean-local: $(TESTSUITE)
 
 check-local: atconfig atlocal $(TESTSUITE)
 	if [ ! -f $(TESTSUITE) ]; then cp $(top_srcdir)/tests/testsuite .; fi
-	$(SHELL) $(TESTSUITE)
+	$(SHELL) $(TESTSUITE) $(TESTSUITEFLAGS)
 
 # Run the test suite on the *installed* tree.
 installcheck-local:
-	$(SHELL) $(TESTSUITE) AUTOTEST_PATH=$(exec_prefix)/bin
+	$(SHELL) $(TESTSUITE) AUTOTEST_PATH=$(exec_prefix)/bin $(TESTSUITEFLAGS)

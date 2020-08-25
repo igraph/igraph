@@ -386,7 +386,27 @@ int igraph_maximal_cliques_count(const igraph_t *graph,
  * \function igraph_maximal_cliques_file
  * Find maximal cliques and write them to a file
  *
- * TODO
+ * This function enumerates all maximal cliques and writes them to file.
+ *
+ * </para><para>
+ *
+ * Edge directions are ignored.
+ *
+ * </para><para>
+ *
+ * \param graph The input graph.
+ * \param outfile Pointer to the output file, it should be writable.
+ * \param min_size Integer giving the minimum size of the cliques to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer giving the maximum size of the cliques to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \return Error code.
+ *
+ * \sa \ref igraph_maximal_cliques().
+ *
+ * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
+ * of the graph, this is typically small for sparse graphs.*
+ *
  */
 
 int igraph_maximal_cliques_file(const igraph_t *graph,
@@ -402,7 +422,34 @@ int igraph_maximal_cliques_file(const igraph_t *graph,
  * \function igraph_maximal_cliques_subset
  * Maximal cliques for a subset of initial vertices
  *
- * TODO
+ * This function enumerates all maximal cliques for a subset of initial
+ * vertices and writes them to file.
+ *
+ * </para><para>
+ *
+ * Edge directions are ignored.
+ *
+ * </para><para>
+ *
+ * \param graph The input graph.
+ * \param subset Pointer to an \c  igraph_vector_int_t containing the
+ *   subset of initial vertices
+ * \param res Pointer to an \c igraph_ptr_t; the cliques will be
+ *   stored here
+ * \param no Pointer to an \c igraph_integer_t; the number of maximal
+ *   cliques will be stored here.
+ * \param outfile Pointer to the output file, it should be writable.
+ * \param min_size Integer giving the minimum size of the cliques to be
+ *   returned. If negative or zero, no lower bound will be used.
+ * \param max_size Integer giving the maximum size of the cliques to be
+ *   returned. If negative or zero, no upper bound will be used.
+ * \return Error code.
+ *
+ * \sa \ref igraph_maximal_cliques().
+ *
+ * Time complexity: O(d(n-d)3^(d/3)) worst case, d is the degeneracy
+ * of the graph, this is typically small for sparse graphs.
+ *
  */
 
 int igraph_maximal_cliques_subset(const igraph_t *graph,

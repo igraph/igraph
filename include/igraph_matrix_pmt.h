@@ -44,7 +44,7 @@ DECLDIR long int FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m)
 /* MATRIX */
 DECLDIR BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
                                         long int row, long int col);
-BASE* FUNCTION(igraph_matrix, e_ptr)(const TYPE(igraph_matrix) *m,
+DECLDIR BASE* FUNCTION(igraph_matrix, e_ptr)(const TYPE(igraph_matrix) *m,
                                      long int row, long int col);
 DECLDIR void FUNCTION(igraph_matrix, set)(TYPE(igraph_matrix)* m, long int row, long int col,
         BASE value);
@@ -60,7 +60,7 @@ DECLDIR void FUNCTION(igraph_matrix, fill)(TYPE(igraph_matrix) *m, BASE e);
 /* Matrix views          */
 /*-----------------------*/
 
-const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(const TYPE(igraph_matrix) *m,
+DECLDIR const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(const TYPE(igraph_matrix) *m,
         const BASE *data,
         long int nrow,
         long int ncol);
@@ -207,37 +207,33 @@ DECLDIR int FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, long int
 /* Print as text          */
 /*------------------------*/
 
-int FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m);
-int FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
+DECLDIR int FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m);
+DECLDIR int FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
                                     const char *format);
-int FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
+DECLDIR int FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
                                     FILE *file);
 
 #ifdef BASE_COMPLEX
 
-int igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
+DECLDIR int igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
                                igraph_matrix_t *real);
-int igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
+DECLDIR int igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
                                igraph_matrix_t *imag);
-int igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
+DECLDIR int igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
                                    igraph_matrix_t *real,
                                    igraph_matrix_t *imag);
-int igraph_matrix_complex_create(igraph_matrix_complex_t *v,
+DECLDIR int igraph_matrix_complex_create(igraph_matrix_complex_t *v,
                                  const igraph_matrix_t *real,
                                  const igraph_matrix_t *imag);
-int igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
+DECLDIR int igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
                                        const igraph_matrix_t *r,
                                        const igraph_matrix_t *theta);
 
 #endif
 
-/* ----------------------------------------------------------------------------*/
-/* For internal use only, may be removed, rewritten ... */
-/* ----------------------------------------------------------------------------*/
-
-int FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m,
+DECLDIR int FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m,
         long int *index, long int nremove);
-int FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
+DECLDIR int FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
         const igraph_vector_t *neg,
         long int nremove);
 

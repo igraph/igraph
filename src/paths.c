@@ -74,7 +74,7 @@ int igraph_get_all_simple_paths(const igraph_t *graph,
     igraph_vector_int_t stack, dist;
     igraph_vector_char_t added;
     igraph_vector_int_t nptr;
-    int iteration;
+    int iteration = 0;
 
     if (from < 0 || from >= no_nodes) {
         IGRAPH_ERROR("Invalid starting vertex", IGRAPH_EINVAL);

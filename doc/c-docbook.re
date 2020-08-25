@@ -654,3 +654,48 @@ WITH --------------------------------------------------------------------------
       xmlns:xi="http://www.w3.org/2001/XInclude"/>
   <para></para>
 </example>
+
+REPLACE ----- \deprecated-by --------------------------------------------------
+
+\\deprecated-by\b\s*
+(?P<replacement>[^ \n]+)\s*
+(?P<version>[^\n]+)\n
+
+WITH --------------------------------------------------------------------------
+
+</para>
+<warning>
+<para>Deprecated since version \g<version>. Please do not use this function in new
+code; use <link linkend="\g<replacement>"><function>\g<replacement>()</function></link>
+instead.</para>
+</warning>
+<para>
+
+REPLACE ----- \deprecated -----------------------------------------------------
+
+\\deprecated\b\s*
+(?P<version>[^\n]*?)\n
+
+WITH --------------------------------------------------------------------------
+
+</para>
+<warning>
+<para>Deprecated since version \g<version>. Please do not use this function in new
+code.</para>
+</warning>
+<para>
+
+REPLACE ----- \experimental ---------------------------------------------------
+
+\\experimental\b\s*\n
+
+WITH --------------------------------------------------------------------------
+
+</para>
+<warning>
+<para>This function is experimental and its signature is not considered final yet.
+We reserve the right to change the function signature without changing the
+major version of igraph. Use it at your own risk.</para>
+</warning>
+<para>
+

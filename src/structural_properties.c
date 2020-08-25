@@ -1265,7 +1265,7 @@ int igraph_get_all_shortest_paths(const igraph_t *graph,
  * |E| are the number of vertices and
  * edges in the graph.
  *
- * \sa \ref igraph_subgraph() if you want a graph object consisting only
+ * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
  * a given set of vertices and the edges between them.
  */
 
@@ -1333,15 +1333,12 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
  * \ingroup structural
  * \function igraph_pagerank_old
  * \brief Calculates the Google PageRank for the specified vertices.
+ * \deprecated-by igraph_pagerank 0.7
  *
  * </para><para>This is an old implementation,
  * it is provided for compatibility with igraph versions earlier than
  * 0.5. Please use the new implementation \ref igraph_pagerank() in
  * new projects.
- *
- * </para><para>
- * From version 0.7 this function is deprecated and its use gives a
- * warning message.
  *
  * </para><para>
  * Please note that the PageRank of a given vertex depends on the PageRank
@@ -1917,11 +1914,13 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
     for (i = 0; i < no_of_new_nodes; i++) {
         long int old_vid = (long int) VECTOR(*my_vids_new2old)[i];
         long int new_vid = i;
+        igraph_bool_t skip_loop_edge;
 
         IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
         n = igraph_vector_size(&nei_edges);
 
         if (directed) {
+            /* directed graph; this is easier */
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
@@ -1935,10 +1934,15 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                 IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
             }
         } else {
+            /* undirected graph. We need to be careful with loop edges as each
+             * loop edge will appear twice. We use a boolean flag to skip every
+             * second loop edge */
+            skip_loop_edge = 0;
             for (j = 0; j < n; j++) {
                 eid = (igraph_integer_t) VECTOR(nei_edges)[j];
 
-                if (IGRAPH_FROM(graph, eid) != old_vid) { /* avoid processing edges twice */
+                if (IGRAPH_FROM(graph, eid) != old_vid) {
+                    /* avoid processing edges twice */
                     continue;
                 }
 
@@ -1946,9 +1950,18 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
                 if (!to) {
                     continue;
                 }
+                to -= 1;
+
+                if (new_vid == to) {
+                    /* this is a loop edge; check whether we need to skip it */
+                    skip_loop_edge = !skip_loop_edge;
+                    if (skip_loop_edge) {
+                        continue;
+                    }
+                }
 
                 IGRAPH_CHECK(igraph_vector_push_back(&new_edges, new_vid));
-                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to - 1));
+                IGRAPH_CHECK(igraph_vector_push_back(&new_edges, to));
                 IGRAPH_CHECK(igraph_vector_push_back(&eids_new2old, eid));
             }
         }
@@ -2000,6 +2013,7 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
  * \ingroup structural
  * \function igraph_subgraph
  * \brief Creates a subgraph induced by the specified vertices.
+ * \deprecated-by igraph_induced_subgraph 0.6
  *
  * </para><para>
  * This function is an alias to \ref igraph_induced_subgraph(), it is
@@ -6766,272 +6780,6 @@ int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
 
     return 0;
 }
-
-#define SUCCEED {   \
-        if (res) {        \
-            *res = 1;       \
-        }                 \
-        return IGRAPH_SUCCESS; \
-    }
-
-#define FAIL {   \
-        if (res) {     \
-            *res = 0;    \
-        }              \
-        return IGRAPH_SUCCESS; \
-    }
-
-/**
- * \function igraph_is_degree_sequence
- * Determines whether a degree sequence is valid.
- *
- * A sequence of n integers is a valid degree sequence if there exists some
- * graph where the degree of the i-th vertex is equal to the i-th element of the
- * sequence. Note that the graph may contain multiple or loop edges; if you are
- * interested in whether the degrees of some \em simple graph may realize the
- * given sequence, use \ref igraph_is_graphical_degree_sequence.
- *
- * </para><para>
- * In particular, the function checks whether all the degrees are non-negative.
- * For undirected graphs, it also checks whether the sum of degrees is even.
- * For directed graphs, the function checks whether the lengths of the two
- * degree vectors are equal and whether their sums are also equal. These are
- * known sufficient and necessary conditions for a degree sequence to be
- * valid.
- *
- * \param out_degrees  an integer vector specifying the degree sequence for
- *     undirected graphs or the out-degree sequence for directed graphs.
- * \param in_degrees   an integer vector specifying the in-degrees of the
- *     vertices for directed graphs. For undirected graphs, this must be null.
- * \param res  pointer to a boolean variable, the result will be stored here
- * \return Error code.
- *
- * Time complexity: O(n), where n is the length of the degree sequence.
- */
-int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
-                              const igraph_vector_t *in_degrees, igraph_bool_t *res) {
-    /* degrees must be non-negative */
-    if (igraph_vector_any_smaller(out_degrees, 0)) {
-        FAIL;
-    }
-    if (in_degrees && igraph_vector_any_smaller(in_degrees, 0)) {
-        FAIL;
-    }
-
-    if (in_degrees == 0) {
-        /* sum of degrees must be even */
-        if (((long int)igraph_vector_sum(out_degrees) % 2) != 0) {
-            FAIL;
-        }
-    } else {
-        /* length of the two degree vectors must be equal */
-        if (igraph_vector_size(out_degrees) != igraph_vector_size(in_degrees)) {
-            FAIL;
-        }
-        /* sum of in-degrees must be equal to sum of out-degrees */
-        if (igraph_vector_sum(out_degrees) != igraph_vector_sum(in_degrees)) {
-            FAIL;
-        }
-    }
-
-    SUCCEED;
-    return 0;
-}
-
-int igraph_i_is_graphical_degree_sequence_undirected(
-    const igraph_vector_t *degrees, igraph_bool_t *res);
-int igraph_i_is_graphical_degree_sequence_directed(
-    const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees,
-    igraph_bool_t *res);
-
-/**
- * \function igraph_is_graphical_degree_sequence
- * Determines whether a sequence of integers can be a degree sequence of some
- * simple graph.
- *
- * </para><para>
- * References:
- *
- * </para><para>
- * Hakimi SL: On the realizability of a set of integers as degrees of the
- * vertices of a simple graph. J SIAM Appl Math 10:496-506, 1962.
- *
- * </para><para>
- * PL Erdos, I Miklos and Z Toroczkai: A simple Havel-Hakimi type algorithm
- * to realize graphical degree sequences of directed graphs. The Electronic
- * Journal of Combinatorics 17(1):R66, 2010.
- *
- * </para><para>
- * Z Kiraly: Recognizing graphic degree sequences and generating all
- * realizations. TR-2011-11, Egervary Research Group, H-1117, Budapest,
- * Hungary. ISSN 1587-4451, 2012.
- *
- * \param out_degrees  an integer vector specifying the degree sequence for
- *     undirected graphs or the out-degree sequence for directed graphs.
- * \param in_degrees   an integer vector specifying the in-degrees of the
- *     vertices for directed graphs. For undirected graphs, this must be null.
- * \param res  pointer to a boolean variable, the result will be stored here
- * \return Error code.
- *
- * Time complexity: O(n log n) for undirected graphs, O(n^2) for directed
- *                  graphs, where n is the length of the degree sequence.
- */
-int igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
-                                        const igraph_vector_t *in_degrees, igraph_bool_t *res) {
-    IGRAPH_CHECK(igraph_is_degree_sequence(out_degrees, in_degrees, res));
-    if (!*res) {
-        FAIL;
-    }
-
-    if (igraph_vector_size(out_degrees) == 0) {
-        SUCCEED;
-    }
-
-    if (in_degrees == 0) {
-        return igraph_i_is_graphical_degree_sequence_undirected(out_degrees, res);
-    } else {
-        return igraph_i_is_graphical_degree_sequence_directed(out_degrees, in_degrees, res);
-    }
-}
-
-int igraph_i_is_graphical_degree_sequence_undirected(
-    const igraph_vector_t *degrees, igraph_bool_t *res) {
-    igraph_vector_t work;
-    long int w, b, s, c, n, k;
-
-    IGRAPH_CHECK(igraph_vector_copy(&work, degrees));
-    IGRAPH_FINALLY(igraph_vector_destroy, &work);
-
-    igraph_vector_sort(&work);
-
-    /* This algorithm is outlined in TR-2011-11 of the Egervary Research Group,
-     * ISSN 1587-4451. The main loop of the algorithm is O(n) but it is dominated
-     * by an O(n log n) quicksort; this could in theory be brought down to
-     * O(n) with binsort but it's probably not worth the fuss.
-     *
-     * Variables names are mostly according to the technical report, apart from
-     * the degrees themselves. w and k are zero-based here; in the technical
-     * report they are 1-based */
-    *res = 1;
-    n = igraph_vector_size(&work);
-    w = n - 1; b = 0; s = 0; c = 0;
-    for (k = 0; k < n; k++) {
-        b += VECTOR(*degrees)[k];
-        c += w;
-        while (w > k && VECTOR(*degrees)[w] <= k + 1) {
-            s += VECTOR(*degrees)[w];
-            c -= (k + 1);
-            w--;
-        }
-        if (b > c + s) {
-            *res = 0;
-            break;
-        }
-        if (w == k) {
-            break;
-        }
-    }
-
-    igraph_vector_destroy(&work);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return 0;
-}
-
-typedef struct {
-    const igraph_vector_t* first;
-    const igraph_vector_t* second;
-} igraph_i_qsort_dual_vector_cmp_data_t;
-
-int igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *p2) {
-    igraph_i_qsort_dual_vector_cmp_data_t* sort_data =
-        (igraph_i_qsort_dual_vector_cmp_data_t*)data;
-    long int index1 = *((long int*)p1);
-    long int index2 = *((long int*)p2);
-    if (VECTOR(*sort_data->first)[index1] < VECTOR(*sort_data->first)[index2]) {
-        return 1;
-    }
-    if (VECTOR(*sort_data->first)[index1] > VECTOR(*sort_data->first)[index2]) {
-        return -1;
-    }
-    if (VECTOR(*sort_data->second)[index1] < VECTOR(*sort_data->second)[index2]) {
-        return 1;
-    }
-    if (VECTOR(*sort_data->second)[index1] > VECTOR(*sort_data->second)[index2]) {
-        return -1;
-    }
-    return 0;
-}
-
-int igraph_i_is_graphical_degree_sequence_directed(
-    const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees,
-    igraph_bool_t *res) {
-    igraph_vector_long_t index_array;
-    long int i, j, vcount, lhs, rhs;
-    igraph_i_qsort_dual_vector_cmp_data_t sort_data;
-
-    /* Create an index vector that sorts the vertices by decreasing in-degree */
-    vcount = igraph_vector_size(out_degrees);
-    IGRAPH_CHECK(igraph_vector_long_init_seq(&index_array, 0, vcount - 1));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &index_array);
-
-    /* Set up the auxiliary struct for sorting */
-    sort_data.first  = in_degrees;
-    sort_data.second = out_degrees;
-
-    /* Sort the index vector */
-    igraph_qsort_r(VECTOR(index_array), vcount, sizeof(long int), &sort_data,
-                   igraph_i_qsort_dual_vector_cmp_desc);
-
-    /* Be optimistic, then check whether the Fulkerson–Chen–Anstee condition
-     * holds for every k. In particular, for every k in [0; n), it must be true
-     * that:
-     *
-     * \sum_{i=0}^k indegree[i] <=
-     *     \sum_{i=0}^k min(outdegree[i], k) +
-     *     \sum_{i=k+1}^{n-1} min(outdegree[i], k + 1)
-     */
-
-#define INDEGREE(x) (VECTOR(*in_degrees)[VECTOR(index_array)[x]])
-#define OUTDEGREE(x) (VECTOR(*out_degrees)[VECTOR(index_array)[x]])
-
-    *res = 1;
-    lhs = 0;
-    for (i = 0; i < vcount; i++) {
-        lhs += INDEGREE(i);
-
-        /* It is enough to check for indexes where the in-degree is about to
-         * decrease in the next step; see "Stronger condition" in the Wikipedia
-         * entry for the Fulkerson-Chen-Anstee condition */
-        if (i != vcount - 1 && INDEGREE(i) == INDEGREE(i + 1)) {
-            continue;
-        }
-
-        rhs = 0;
-        for (j = 0; j <= i; j++) {
-            rhs += OUTDEGREE(j) < i ? OUTDEGREE(j) : i;
-        }
-        for (j = i + 1; j < vcount; j++) {
-            rhs += OUTDEGREE(j) < (i + 1) ? OUTDEGREE(j) : (i + 1);
-        }
-
-        if (lhs > rhs) {
-            *res = 0;
-            break;
-        }
-    }
-
-#undef INDEGREE
-#undef OUTDEGREE
-
-    igraph_vector_long_destroy(&index_array);
-    IGRAPH_FINALLY_CLEAN(1);
-
-    return IGRAPH_SUCCESS;
-}
-
-#undef SUCCEED
-#undef FAIL
 
 
 /* igraph_is_tree -- check if a graph is a tree */

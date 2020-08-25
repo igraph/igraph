@@ -109,6 +109,7 @@
 
 <section><title>Sorting</title>
 <!-- doxrox-include igraph_vector_sort -->
+<!-- doxrox-include igraph_vector_reverse_sort -->
 </section>
 
 <section><title>Set operations on sorted vectors</title>

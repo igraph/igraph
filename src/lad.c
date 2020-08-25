@@ -506,16 +506,8 @@ static int igraph_i_lad_initDomains(bool initialDomains,
     int matchingSize, u, v, i, j;
     igraph_vector_t *vec;
 
-    val = igraph_Calloc(Gp->nbVertices * Gt->nbVertices, int);
-    if (val == 0) {
-        IGRAPH_ERROR("cannot allocated 'val' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
-    }
-
-    dom = igraph_Calloc(Gt->nbVertices, bool);
-    if (dom == 0) {
-        igraph_free(val);
-        IGRAPH_ERROR("cannot allocated 'dom' array in igraph_i_lad_initDomains", IGRAPH_ENOMEM);
-    }
+    ALLOC_ARRAY(val, Gp->nbVertices * Gt->nbVertices, int);
+    ALLOC_ARRAY(dom, Gt->nbVertices, bool);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&D->globalMatchingP, Gp->nbVertices);
     igraph_vector_int_fill(&D->globalMatchingP, -1L);
@@ -612,7 +604,7 @@ static int igraph_i_lad_initDomains(bool initialDomains,
              * We init them anyway so that we can have a consistent destructor. */
             IGRAPH_VECTOR_INT_INIT_FINALLY(&D->val, 0);
             IGRAPH_VECTOR_INT_INIT_FINALLY(&D->matching, 0);
-            IGRAPH_FINALLY_CLEAN(10);
+            IGRAPH_FINALLY_CLEAN(12);
 
             return IGRAPH_SUCCESS;
         }
@@ -633,7 +625,7 @@ static int igraph_i_lad_initDomains(bool initialDomains,
     igraph_free(val);
     igraph_free(dom);
 
-    IGRAPH_FINALLY_CLEAN(10);
+    IGRAPH_FINALLY_CLEAN(12);
 
     return IGRAPH_SUCCESS;
 }

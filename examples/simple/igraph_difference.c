@@ -117,5 +117,22 @@ int main() {
     igraph_destroy(&orig);
     igraph_destroy(&sub);
 
+    /* undirected version with loop edge, tests Github issue #597 */
+    printf("Github issue #597, undirected\n");
+    igraph_vector_init_int_end(&v, -1, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 0, -1);
+    igraph_create(&orig, &v, 0, IGRAPH_UNDIRECTED);
+    igraph_vector_destroy(&v);
+
+    igraph_vector_init_int_end(&v, -1, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, -1);
+    igraph_create(&sub, &v, 0, IGRAPH_UNDIRECTED);
+    igraph_vector_destroy(&v);
+
+    igraph_difference(&diff, &orig, &sub);
+    igraph_write_graph_edgelist(&diff, stdout);
+
+    igraph_destroy(&diff);
+    igraph_destroy(&orig);
+    igraph_destroy(&sub);
+
     return 0;
 }

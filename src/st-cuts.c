@@ -39,9 +39,35 @@
 #include "igraph_estack.h"
 #include "config.h"
 
-/*
+/**
  * \function igraph_even_tarjan_reduction
  * Even-Tarjan reduction of a graph
+ *
+ * A digraph is created with twice as many vertices and edges. For each
+ * original vertex i, two vertices i'= i and i'' = i' + n are created,
+ * with a directed edge from i' to i''. For each original directed edge
+ * from i to j, two new edges are created, from i' to j'' and from i''
+ * to j'.
+ *
+ * </para><para>This reduction is used in the paper (observation 2):
+ * Arkady Kanevsky: Finding all minimum-size separating vertex sets in
+ * a graph, Networks 23, 533--541, 1993.
+ *
+ * </para><para>The original paper where this reduction was conceived is
+ * Shimon Even and R. Endre Tarjan: Network Flow and Testing Graph
+ * Connectivity, SIAM J. Comput., 4(4), 507–518.
+ *
+ * \param graph A graph. Although directness is not checked, this function
+ *        is commonly used only on directed graphs.
+ * \param graphbar Pointer to a new directed graph that will contain the
+ *        reduction, with twice as many vertices and edges.
+ * \param capacity Pointer to an initialized vector or a null pointer. If
+ *        not a null pointer, then it will be filled the capacity from
+ *        the reduction: the first |E| elements are 1, the remaining |E|
+ *        are equal to |V| (which is used to mean infinity).
+ * \return Error code.
+ *
+ * Time complexity: O(|E|+|V|).
  *
  * \example examples/simple/even_tarjan.c
  */

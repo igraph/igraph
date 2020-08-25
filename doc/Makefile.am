@@ -8,7 +8,7 @@ BUILD_INCLUDEDIR=$(top_builddir)/include
 REMOVEEXAMPLES=$(top_srcdir)/tools/removeexamples.py
 
 DOCINCLUDES = vector.xml error.xml matrix.xml basicigraph.xml generators.xml \
-	      structural.xml iterators.xml attributes.xml layout.xml \
+	      structural.xml cycles.xml iterators.xml attributes.xml layout.xml \
 	      foreign.xml nongraph.xml isomorphism.xml motifs.xml \
 	      operators.xml flows.xml community.xml cliques.xml \
 	      sparsematrix.xml stack.xml dqueue.xml heap.xml strvector.xml \
@@ -126,8 +126,11 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
 	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
 	$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h \
-	$(SRCDIR)/scan.c
+	$(SRCDIR)/scan.c \
+	$(SRCDIR)/graphicality.c
 
+cycles.xml: cycles.xxml $(SRCDIR)/igraph_eulerian.c
+	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/igraph_eulerian.c
 
 iterators.xml: iterators.xxml $(SRCDIR)/iterators.c $(INCLUDEDIR)/igraph_iterators.h
 	$(DOXROX) -c -t $< -e $(REGEX) -o $@ $(SRCDIR)/iterators.c \

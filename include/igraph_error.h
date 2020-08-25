@@ -217,7 +217,7 @@ typedef void igraph_error_handler_t (const char * reason, const char * file,
  * program.
  */
 
-extern igraph_error_handler_t igraph_error_handler_abort;
+DECLDIR igraph_error_handler_t igraph_error_handler_abort;
 
 /**
  * \var igraph_error_handler_ignore
@@ -227,7 +227,7 @@ extern igraph_error_handler_t igraph_error_handler_abort;
  * with the error code.
  */
 
-extern igraph_error_handler_t igraph_error_handler_ignore;
+DECLDIR igraph_error_handler_t igraph_error_handler_ignore;
 
 /**
  * \var igraph_error_handler_printignore
@@ -237,7 +237,7 @@ extern igraph_error_handler_t igraph_error_handler_ignore;
  * standard error and returns with the error code.
  */
 
-extern igraph_error_handler_t igraph_error_handler_printignore;
+DECLDIR igraph_error_handler_t igraph_error_handler_printignore;
 
 /**
  * \function igraph_set_error_handler
@@ -678,8 +678,8 @@ typedef igraph_error_handler_t igraph_warning_handler_t;
 
 DECLDIR igraph_warning_handler_t* igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 
-extern igraph_warning_handler_t igraph_warning_handler_ignore;
-extern igraph_warning_handler_t igraph_warning_handler_print;
+DECLDIR igraph_warning_handler_t igraph_warning_handler_ignore;
+DECLDIR igraph_warning_handler_t igraph_warning_handler_print;
 
 /**
  * \function igraph_warning
