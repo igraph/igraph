@@ -88,6 +88,7 @@ add_library(
   glet.c
   glpk_support.c
   gml_tree.c
+  graphicality.c
   hacks.c
   heap.c
   igraph_buckets.c
