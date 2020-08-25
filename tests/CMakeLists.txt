@@ -97,7 +97,6 @@ add_legacy_tests(
   igraph_lattice
   igraph_lcf
   igraph_preference_game
-  igraph_realize_degree_sequence
   igraph_ring
   igraph_small
   igraph_star
@@ -110,6 +109,7 @@ add_legacy_tests(
   FOLDER tests NAMES
   tree
   igraph_from_prufer
+  igraph_realize_degree_sequence
 )
 
 # structural_properties.at
@@ -205,7 +205,6 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER simple NAMES
   VF2-compat
-  igraph_is_degree_sequence
   igraph_isomorphic_bliss
   igraph_isomorphic_vf2
   igraph_subisomorphic_lad
