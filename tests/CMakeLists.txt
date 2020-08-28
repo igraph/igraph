@@ -143,7 +143,7 @@ add_legacy_tests(
   igraph_knn
   igraph_local_transitivity
   igraph_minimum_spanning_tree
-  igraph_pagerank
+  # igraph_pagerank
   igraph_radius
   igraph_reciprocity
   igraph_rewire
