@@ -303,7 +303,7 @@ add_legacy_tests(
   # igraph_community_leading_eigenvector2
   igraph_community_multilevel
   igraph_community_optimal_modularity
-  levc-stress
+  # levc-stress
   spinglass
   walktrap
 )
