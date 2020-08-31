@@ -342,7 +342,7 @@ add_legacy_tests(
   igraph_eigen_matrix3
   igraph_eigen_matrix4
   igraph_eigen_matrix_symmetric
-  igraph_eigen_matrix_symmetric_arpack
+  # igraph_eigen_matrix_symmetric_arpack
 )
 
 # attributes.at
