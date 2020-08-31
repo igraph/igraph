@@ -365,7 +365,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER simple NAMES
   blas
-  eigenvector_centrality
+  # eigenvector_centrality
   igraph_arpack_rnsolve
   igraph_lapack_dgeev
   igraph_lapack_dgeevx
