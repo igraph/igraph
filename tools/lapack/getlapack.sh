@@ -38,7 +38,7 @@ cd /tmp
 ## Download and unpack ARPACK
 
 if test ! -f arpack96.tar.gz; then
-    curl -O http://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz
+    curl -O https://www.caam.rice.edu/software/ARPACK/SRC/arpack96.tar.gz
 fi
 arpackdir=`tar tzf arpack96.tar.gz | head -1 | cut -f1 -d"/"`
 rm -rf ${arpackdir}
@@ -63,7 +63,8 @@ known() {
 getdeps() {
     name=$1;
     f2c -a ${name}.f >/dev/null 2>/dev/null && 
-    gcc -c ${name}.c >/dev/null &&
+    gcc -Wno-logical-op-parentheses -Wno-shift-op-parentheses \
+		-c ${name}.c >/dev/null &&
     nm ${name}.o | grep " U " | awk ' { print $2 }' | 
     sed 's/_$//g' | sed 's/^_//g'
 }
@@ -184,8 +185,8 @@ patch -p2 < ${origdir}/mt.patch
 
 echo "Sources are ready, to update your tree please run:
 
-  bzr rm ${origdir}/../../src/lapack
+  git rm -rf ${origdir}/../../src/lapack
   mv /tmp/${destdir} ${origdir}/../../src/lapack
-  bzr add ${origdir}/../../src/lapack
+  git add ${origdir}/../../src/lapack
 
 "

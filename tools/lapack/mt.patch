@@ -1,6 +1,6 @@
 === modified file 'src/lapack/dgetv0.c'
---- src/lapack/dgetv0.c	2011-11-02 20:55:12 +0000
-+++ src/lapack/dgetv0.c	2011-11-03 13:12:52 +0000
+--- src/lapack/dgetv0.c	2020-09-04 14:30:50.000000000 +0200
++++ src/lapack/dgetv0.c	2020-09-04 14:36:38.000000000 +0200
 @@ -144,7 +144,7 @@
  {
      /* Initialized data */
@@ -33,12 +33,12 @@
      real tmvbx;
      extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
  	    integer *, char *, ftnlen);
-     integer mgetv0=0;
+     integer mgetv0;
      real tgetv0;
 -    static doublereal rnorm0;
 +    IGRAPH_F77_SAVE doublereal rnorm0;
      extern /* Subroutine */ int igraphsecond_(real *);
-     integer logfil=0, ndigit;
+     integer logfil, ndigit;
      extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
  	    doublereal *);
 -    static integer msglvl;
@@ -172,8 +172,8 @@
  
 
 === modified file 'src/lapack/dnaup2.c'
---- src/lapack/dnaup2.c	2011-11-02 20:55:12 +0000
-+++ src/lapack/dnaup2.c	2011-11-03 13:12:52 +0000
+--- src/lapack/dnaup2.c	2020-09-04 14:30:50.000000000 +0200
++++ src/lapack/dnaup2.c	2020-09-04 14:39:08.000000000 +0200
 @@ -213,44 +213,44 @@
      double sqrt(doublereal);
  
@@ -213,9 +213,9 @@
  	    , logical *, integer *, integer *, doublereal *, integer *, 
  	    doublereal *, doublereal *, integer *, doublereal *, integer *);
      extern doublereal igraphdlapy2_(doublereal *, doublereal *);
--    static integer mnaup2=0;
+-    static integer mnaup2;
 -    static real tnaup2;
-+    IGRAPH_F77_SAVE integer mnaup2=0;
++    IGRAPH_F77_SAVE integer mnaup2;
 +    IGRAPH_F77_SAVE real tnaup2;
      extern doublereal igraphdlamch_(char *);
      extern /* Subroutine */ int igraphdneigh_(doublereal *, integer *, doublereal *,
@@ -224,8 +224,8 @@
 -    static integer nevbef;
 +    IGRAPH_F77_SAVE integer nevbef;
      extern /* Subroutine */ int igraphsecond_(real *);
--    static integer logfil=0, ndigit;
-+    IGRAPH_F77_SAVE integer logfil=0, ndigit;
+-    static integer logfil, ndigit;
++    IGRAPH_F77_SAVE integer logfil, ndigit;
      extern /* Subroutine */ int igraphdnaitr_(integer *, char *, integer *, integer 
  	    *, integer *, integer *, doublereal *, doublereal *, doublereal *,
  	     integer *, doublereal *, integer *, integer *, doublereal *, 
@@ -250,8 +250,8 @@
  /*     %----------------------------------------------------%   
 
 === modified file 'src/lapack/dnaupd.c'
---- src/lapack/dnaupd.c	2011-11-02 20:55:12 +0000
-+++ src/lapack/dnaupd.c	2011-11-03 13:12:52 +0000
+--- src/lapack/dnaupd.c	2020-09-04 14:30:50.000000000 +0200
++++ src/lapack/dnaupd.c	2020-09-04 14:39:49.000000000 +0200
 @@ -464,19 +464,19 @@
      /* Local variables */
      integer j;
@@ -279,9 +279,9 @@
  	    integer *, integer *, doublereal *, doublereal *, integer *, 
  	    integer *, integer *, integer *, doublereal *, integer *, 
 @@ -489,15 +489,15 @@
-     integer logfil=0, ndigit;
+     integer logfil, ndigit;
      real tneigh;
-     integer mnaupd=0;
+     integer mnaupd;
 -    static integer ishift;
 +    IGRAPH_F77_SAVE integer ishift;
      integer nitref;
@@ -300,8 +300,8 @@
  
 
 === modified file 'src/lapack/dsaitr.c'
---- src/lapack/dsaitr.c	2011-11-02 20:55:12 +0000
-+++ src/lapack/dsaitr.c	2011-11-03 13:12:53 +0000
+--- src/lapack/dsaitr.c	2020-09-04 14:30:52.000000000 +0200
++++ src/lapack/dsaitr.c	2020-09-04 14:40:47.000000000 +0200
 @@ -231,7 +231,7 @@
  {
      /* Initialized data */
@@ -354,12 +354,12 @@
      extern /* Subroutine */ int igraphdlascl_(char *, integer *, integer *, 
  	    doublereal *, doublereal *, integer *, integer *, doublereal *, 
  	    integer *, integer *), igraphsecond_(real *);
-     integer logfil=0;
+     integer logfil;
 -    static doublereal safmin;
 +    IGRAPH_F77_SAVE doublereal safmin;
      integer ndigit, nitref;
      real titref;
-     integer msaitr=0;
+     integer msaitr;
 -    static integer msglvl;
 +    IGRAPH_F77_SAVE integer msglvl;
      real tsaitr;
@@ -371,8 +371,8 @@
  
 
 === modified file 'src/lapack/dsapps.c'
---- src/lapack/dsapps.c	2011-11-02 20:55:12 +0000
-+++ src/lapack/dsapps.c	2011-11-03 13:12:53 +0000
+--- src/lapack/dsapps.c	2020-09-04 14:30:52.000000000 +0200
++++ src/lapack/dsapps.c	2020-09-04 14:41:07.000000000 +0200
 @@ -156,7 +156,7 @@
  {
      /* Initialized data */
@@ -388,7 +388,7 @@
  	     doublereal *, doublereal *, doublereal *, integer *);
 -    static doublereal epsmch;
 +    IGRAPH_F77_SAVE doublereal epsmch;
-     integer logfil=0, ndigit, msapps=0, msglvl, istart;
+     integer logfil, ndigit, msapps, msglvl, istart;
      real tsapps;
      integer kplusp;
 
@@ -459,8 +459,8 @@
  /*     %----------------------------------------------------%   
 
 === modified file 'src/lapack/dsaupd.c'
---- src/lapack/dsaupd.c	2011-11-02 20:55:12 +0000
-+++ src/lapack/dsaupd.c	2011-11-03 13:12:53 +0000
+--- src/lapack/dsaupd.c	2020-09-04 14:30:51.000000000 +0200
++++ src/lapack/dsaupd.c	2020-09-04 14:41:54.000000000 +0200
 @@ -465,11 +465,11 @@
      /* Local variables */
      integer j;
@@ -479,10 +479,10 @@
 @@ -483,14 +483,14 @@
      extern doublereal igraphdlamch_(char *);
      extern /* Subroutine */ int igraphsecond_(real *);
-     integer logfil=0, ndigit;
+     integer logfil, ndigit;
 -    static integer ishift;
 +    IGRAPH_F77_SAVE integer ishift;
-     integer nitref, msaupd=0;
+     integer nitref, msaupd;
 -    static integer bounds;
 +    IGRAPH_F77_SAVE integer bounds;
      real titref, tseigt, tsaupd;
