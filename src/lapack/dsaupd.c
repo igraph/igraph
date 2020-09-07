@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -464,7 +464,7 @@ static integer c__1 = 1;
 
     /* Local variables */
     integer j;
-    real t0, t1;
+    IGRAPH_F77_SAVE real t0, t1;
     IGRAPH_F77_SAVE integer nb, ih, iq, np, iw, ldh, ldq;
     integer nbx = 0;
     IGRAPH_F77_SAVE integer nev0, mode, ierr, iupd, next;

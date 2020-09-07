@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -128,7 +128,7 @@ static doublereal c_b20 = 0.;
 
     /* Local variables */
     integer i__;
-    real t0, t1;
+    IGRAPH_F77_SAVE real t0, t1;
     doublereal vl[1], temp;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 

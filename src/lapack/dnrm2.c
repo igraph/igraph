@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -12,6 +12,76 @@
 
 #include "f2c.h"
 
+/* > \brief \b DNRM2   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+    Definition:   
+    ===========   
+
+         DOUBLE PRECISION FUNCTION DNRM2(N,X,INCX)   
+
+         INTEGER INCX,N   
+         DOUBLE PRECISION X(*)   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DNRM2 returns the euclidean norm of a vector via the function   
+   > name, so that   
+   >   
+   >    DNRM2 := sqrt( x'*x )   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >         number of elements in input vector(s)   
+   > \endverbatim   
+   >   
+   > \param[in] X   
+   > \verbatim   
+   >          X is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCX ) )   
+   > \endverbatim   
+   >   
+   > \param[in] INCX   
+   > \verbatim   
+   >          INCX is INTEGER   
+   >         storage spacing between elements of DX   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2017   
+
+   > \ingroup double_blas_level1   
+
+   > \par Further Details:   
+    =====================   
+   >   
+   > \verbatim   
+   >   
+   >  -- This version written on 25-October-1982.   
+   >     Modified on 14-October-1993 to inline the call to DLASSQ.   
+   >     Sven Hammarling, Nag Ltd.   
+   > \endverbatim   
+   >   
+    ===================================================================== */
 doublereal igraphdnrm2_(integer *n, doublereal *x, integer *incx)
 {
     /* System generated locals */
@@ -26,20 +96,11 @@ doublereal igraphdnrm2_(integer *n, doublereal *x, integer *incx)
     doublereal ssq, norm, scale, absxi;
 
 
-/*  Purpose   
-    =======   
+/*  -- Reference BLAS level1 routine (version 3.8.0) --   
+    -- Reference BLAS is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2017   
 
-    DNRM2 returns the euclidean norm of a vector via the function   
-    name, so that   
-
-       DNRM2 := sqrt( x'*x )   
-
-    Further Details   
-    ===============   
-
-    -- This version written on 25-October-1982.   
-       Modified on 14-October-1993 to inline the call to DLASSQ.   
-       Sven Hammarling, Nag Ltd.   
 
     =====================================================================   
 

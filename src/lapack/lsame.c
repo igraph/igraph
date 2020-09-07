@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -12,6 +12,57 @@
 
 #include "f2c.h"
 
+/* > \brief \b LSAME   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+    Definition:   
+    ===========   
+
+         LOGICAL FUNCTION LSAME(CA,CB)   
+
+         CHARACTER CA,CB   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > LSAME returns .TRUE. if CA is the same letter as CB regardless of   
+   > case.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] CA   
+   > \verbatim   
+   >          CA is CHARACTER*1   
+   > \endverbatim   
+   >   
+   > \param[in] CB   
+   > \verbatim   
+   >          CB is CHARACTER*1   
+   >          CA and CB specify the single characters to be compared.   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date December 2016   
+
+   > \ingroup aux_blas   
+
+    ===================================================================== */
 logical igraphlsame_(char *ca, char *cb)
 {
     /* System generated locals */
@@ -21,24 +72,11 @@ logical igraphlsame_(char *ca, char *cb)
     integer inta, intb, zcode;
 
 
-/*  -- LAPACK auxiliary routine (version 3.1) --   
-       Univ. of Tennessee, Univ. of California Berkeley and NAG Ltd..   
-       November 2006   
+/*  -- Reference BLAS level1 routine (version 3.1) --   
+    -- Reference BLAS is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       December 2016   
 
-
-    Purpose   
-    =======   
-
-    LSAME returns .TRUE. if CA is the same letter as CB regardless of   
-    case.   
-
-    Arguments   
-    =========   
-
-    CA      (input) CHARACTER*1   
-
-    CB      (input) CHARACTER*1   
-            CA and CB specify the single characters to be compared.   
 
    =====================================================================   
 

@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -179,7 +179,7 @@ static doublereal c_b43 = -1.;
     doublereal c__, f, g;
     integer i__, j;
     doublereal r__, s, t, u[3];
-    real t0, t1;
+    IGRAPH_F77_SAVE real t0, t1;
     doublereal h11, h12, h21, h22, h32;
     integer jj, ir, nr;
     doublereal tau;

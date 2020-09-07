@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -248,7 +248,7 @@ static integer c__2 = 2;
     /* Local variables */
     integer i__;
     IGRAPH_F77_SAVE integer j;
-    real t0, t1, t2 = 0, t3, t4, t5;
+    IGRAPH_F77_SAVE real t0, t1, t2, t3, t4, t5;
     integer jj;
     IGRAPH_F77_SAVE integer ipj, irj;
     integer nbx = 0;
@@ -292,7 +292,7 @@ static integer c__2 = 2;
     extern doublereal igraphdlanhs_(char *, integer *, doublereal *, integer *, 
 	    doublereal *);
     extern /* Subroutine */ int igraphsecond_(real *);
-    integer logfil, ndigit, nitref = 0, mnaitr = 0;
+    integer logfil = 0, ndigit, nitref = 0, mnaitr = 0;
     real titref = 0, tnaitr = 0;
     IGRAPH_F77_SAVE integer msglvl;
     IGRAPH_F77_SAVE doublereal smlnum;
