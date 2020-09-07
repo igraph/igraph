@@ -112,14 +112,14 @@ static integer c__1 = 1;
 
     /* Local variables */
     integer k;
-    real t0, t1;
+    IGRAPH_F77_SAVE real t0, t1;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdvout_(integer *, integer *, doublereal 
 	    *, integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil, ndigit, mseigt;
+    integer logfil, ndigit, mseigt = 0;
     extern /* Subroutine */ int igraphdstqrb_(integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *);
-    real tseigt;
+    real tseigt = 0.0;
     integer msglvl;
 
 

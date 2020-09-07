@@ -219,43 +219,43 @@ static integer c__2 = 2;
 
     /* Local variables */
     integer j;
-    real t0, t1, t2, t3;
+    IGRAPH_F77_SAVE real t0, t1, t2, t3;
     integer kp[3];
-    static integer np0;
-    integer nbx;
-    static integer nev0;
+    IGRAPH_F77_SAVE integer np0;
+    integer nbx = 0;
+    IGRAPH_F77_SAVE integer nev0;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    static doublereal eps23;
+    IGRAPH_F77_SAVE doublereal eps23;
     integer ierr;
-    static integer iter;
+    IGRAPH_F77_SAVE integer iter;
     doublereal temp;
     integer nevd2;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    static logical getv0;
+    IGRAPH_F77_SAVE logical getv0;
     integer nevm2;
-    static logical cnorm;
+    IGRAPH_F77_SAVE logical cnorm;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdswap_(integer *, doublereal *, integer 
 	    *, doublereal *, integer *);
-    static integer nconv;
-    static logical initv;
-    static doublereal rnorm;
-    real tmvbx;
+    IGRAPH_F77_SAVE integer nconv;
+    IGRAPH_F77_SAVE logical initv;
+    IGRAPH_F77_SAVE doublereal rnorm;
+    real tmvbx = 0.0;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen), igraphdgetv0_(integer *, char *, integer *
 	    , logical *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
-    integer msaup2;
+    integer msaup2 = 0;
     real tsaup2;
     extern doublereal igraphdlamch_(char *);
     integer nevbef;
     extern /* Subroutine */ int igraphsecond_(real *);
-    integer logfil, ndigit;
+    integer logfil = 0, ndigit;
     extern /* Subroutine */ int igraphdseigt_(doublereal *, integer *, doublereal *,
 	     integer *, doublereal *, doublereal *, doublereal *, integer *);
-    static logical update;
+    IGRAPH_F77_SAVE logical update;
     extern /* Subroutine */ int igraphdsaitr_(integer *, char *, integer *, integer 
 	    *, integer *, integer *, doublereal *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *, doublereal *, 
@@ -265,13 +265,13 @@ static integer c__2 = 2;
 	    integer *, doublereal *, integer *, doublereal *, doublereal *, 
 	    integer *, doublereal *), igraphdsconv_(integer *, doublereal *, 
 	    doublereal *, doublereal *, integer *);
-    static logical ushift;
+    IGRAPH_F77_SAVE logical ushift;
     char wprime[2];
-    static integer msglvl;
+    IGRAPH_F77_SAVE integer msglvl;
     integer nptemp;
     extern /* Subroutine */ int igraphdsortr_(char *, logical *, integer *, 
 	    doublereal *, doublereal *);
-    static integer kplusp;
+    IGRAPH_F77_SAVE integer kplusp;
 
 
 /*     %----------------------------------------------------%   

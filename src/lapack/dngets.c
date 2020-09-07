@@ -122,15 +122,15 @@ static integer c__1 = 1;
     integer s_cmp(char *, char *, ftnlen, ftnlen);
 
     /* Local variables */
-    real t0, t1;
+    IGRAPH_F77_SAVE real t0, t1;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil, ndigit, mngets;
+    integer logfil, ndigit, mngets = 0;
     extern /* Subroutine */ int igraphdsortc_(char *, logical *, integer *, 
 	    doublereal *, doublereal *, doublereal *);
     integer msglvl;
-    real tngets;
+    real tngets = 0.;
 
 
 /*     %----------------------------------------------------%   

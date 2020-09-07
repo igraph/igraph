@@ -393,7 +393,7 @@ static doublereal c_b71 = -1.;
     extern /* Subroutine */ int igraphdtrevc_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, integer *, doublereal *, integer *);
-    integer mneupd, bounds;
+    integer mneupd = 0, bounds;
     extern /* Subroutine */ int igraphdtrsen_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,

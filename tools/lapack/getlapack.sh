@@ -137,6 +137,11 @@ dofunction len_trim
 ## Polish them
 
 cd /tmp/${destdir}
+
+# debug.h and stat.h contained common data blocks that we want to get rid of
+# because it violates encapsulation. Therefore, we replace them with empty
+# files, and patch the f2c-translated files later on to initialize the variables
+# in these data blocks to zero.
 touch debug.h
 touch stat.h
 trans_dir=${origdir} ${origdir}/CompletePolish *.f
@@ -158,7 +163,7 @@ done > /tmp/lapack-sed.txt
 
 for name in ${alreadydone[@]}; do
     sed -f /tmp/lapack-sed.txt < ${name}.c >/tmp/arpackfun.c
-    cp /tmp/arpackfun.c ${name}.c
+    mv /tmp/arpackfun.c ${name}.c
 done
 
 ## Update the file that is included into the main Makefile,
@@ -188,7 +193,7 @@ done >> ${arpackinc}
 ## This is a patch to make BLAS / LAPACK / ARPACK thread-safe
 
 cd /tmp/${destdir}
-# patch -p2 < ${origdir}/mt.patch
+patch -p2 < ${origdir}/mt.patch
 
 ## We are done
 
