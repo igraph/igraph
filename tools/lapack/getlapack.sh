@@ -4,6 +4,13 @@
 #                dgetrf dgetrs dgesv dlapy2 dpotrf dsyrk dtrsv
 #
 
+BLAS_VERSION=3.8.0
+LAPACK_VERSION=3.5.0
+
+# We can't go any further than LAPACK 3.5.0 because LAPACK 3.6.0 starts using
+# recursive functions, which is a Fortran 90 construct and f2c can translate
+# Fortran 77 only.
+
 make
 
 origdir=`pwd`
@@ -16,7 +23,7 @@ mkdir $destdir
 ## Download and unpack BLAS
 
 if test ! -f blas.tgz; then
-    curl -O http://www.netlib.org/blas/blas.tgz
+    curl -o blas.tgz http://www.netlib.org/blas/blas-${BLAS_VERSION}.tgz
 fi
 blasdir=`tar tzf blas.tgz | head -1 | cut -f1 -d"/"`
 rm -rf ${blasdir}
@@ -25,7 +32,7 @@ tar xzf blas.tgz
 ## Download, unpack and patch LAPACK
 
 if test ! -f lapack.tgz; then 
-    curl -O http://www.netlib.org/lapack/lapack.tgz
+    curl -o lapack.tgz http://www.netlib.org/lapack/lapack-${LAPACK_VERSION}.tgz
 fi
 lapackdir=`tar tzf lapack.tgz | head -1 | cut -f1 -d"/"`
 rm -rf ${lapackdir}
@@ -64,6 +71,7 @@ getdeps() {
     name=$1;
     f2c -a ${name}.f >/dev/null 2>/dev/null && 
     gcc -Wno-logical-op-parentheses -Wno-shift-op-parentheses \
+		-I/Users/tamas/include \
 		-c ${name}.c >/dev/null &&
     nm ${name}.o | grep " U " | awk ' { print $2 }' | 
     sed 's/_$//g' | sed 's/^_//g'
@@ -106,13 +114,14 @@ dofunction() {
     done
 }
 
-if test "$#" -eq "0"; then 
-    exit 0
-fi
-
 ## Collect and copy the needed files
 
-for i in "$@"; do
+FUNCS="$@"
+if [ "x$FUNCS" = x ]; then
+	FUNCS="dgeev dsyevr dnaupd dneupd dsaupd dseupd dgemv dgeevx dgetrf dgetrs dgesv dlapy2 dpotrf dsyrk dtrsv"
+fi
+
+for i in $FUNCS; do
     dofunction $i
 done
 
@@ -176,10 +185,10 @@ for name in ${arpack[@]}; do
 done >> ${arpackinc}
 /bin/echo >> ${arpackinc}
 
-## This is a patch to make ARPACK thread-safe
+## This is a patch to make BLAS / LAPACK / ARPACK thread-safe
 
 cd /tmp/${destdir}
-patch -p2 < ${origdir}/mt.patch
+# patch -p2 < ${origdir}/mt.patch
 
 ## We are done
 

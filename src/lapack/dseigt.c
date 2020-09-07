@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -116,10 +116,10 @@ static integer c__1 = 1;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *), igraphdvout_(integer *, integer *, doublereal 
 	    *, integer *, char *, ftnlen), igraphsecond_(real *);
-    integer logfil, ndigit, mseigt = 0;
+    integer logfil, ndigit, mseigt;
     extern /* Subroutine */ int igraphdstqrb_(integer *, doublereal *, doublereal *,
 	     doublereal *, doublereal *, integer *);
-    real tseigt = 0.0;
+    real tseigt;
     integer msglvl;
 
 

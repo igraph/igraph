@@ -74,3 +74,55 @@ diff -ru lapack-3.3.1/INSTALL/dlamch.f lapack-3.3.1-new/INSTALL/dlamch.f
        ELSE
           RMACH = ZERO
        END IF
+diff -ru lapack-3.5.0/SRC/dlarft.f lapack-3.5.0-new/SRC/dlarft.f
+index bc1b53b..512a997 100644
+--- lapack-3.5.0/SRC/dlarft.f	2009-04-16 20:10:16.000000000 +0200
++++ lapack-3.5.0-new/SRC/dlarft.f	2010-10-08 17:53:21.000000000 +0200
+@@ -217,9 +217,9 @@
+                IF( LSAME( STOREV, 'C' ) ) THEN
+ *                 Skip any trailing zeros.
+                   DO LASTV = N, I+1, -1
+-                     IF( V( LASTV, I ).NE.ZERO ) EXIT
++                     IF( V( LASTV, I ).NE.ZERO ) GOTO 11
+                   END DO
+-                  DO J = 1, I-1
++ 11               DO J = 1, I-1
+                      T( J, I ) = -TAU( I ) * V( I , J )
+                   END DO   
+                   J = MIN( LASTV, PREVLASTV )
+@@ -232,9 +232,9 @@
+                ELSE
+ *                 Skip any trailing zeros.
+                   DO LASTV = N, I+1, -1
+-                     IF( V( I, LASTV ).NE.ZERO ) EXIT
++                     IF( V( I, LASTV ).NE.ZERO ) GOTO 21
+                   END DO
+-                  DO J = 1, I-1
++ 21               DO J = 1, I-1
+                      T( J, I ) = -TAU( I ) * V( J , I )
+                   END DO   
+                   J = MIN( LASTV, PREVLASTV )
+@@ -276,9 +276,9 @@
+                   IF( LSAME( STOREV, 'C' ) ) THEN
+ *                    Skip any leading zeros.
+                      DO LASTV = 1, I-1
+-                        IF( V( LASTV, I ).NE.ZERO ) EXIT
++                        IF( V( LASTV, I ).NE.ZERO ) GOTO 31
+                      END DO
+-                     DO J = I+1, K
++ 31                  DO J = I+1, K
+                         T( J, I ) = -TAU( I ) * V( N-K+I , J )
+                      END DO   
+                      J = MAX( LASTV, PREVLASTV )
+@@ -291,9 +291,9 @@
+                   ELSE
+ *                    Skip any leading zeros.
+                      DO LASTV = 1, I-1
+-                        IF( V( I, LASTV ).NE.ZERO ) EXIT
++                        IF( V( I, LASTV ).NE.ZERO ) GOTO 41
+                      END DO
+-                     DO J = I+1, K
++ 41                  DO J = I+1, K
+                         T( J, I ) = -TAU( I ) * V( J, N-K+I )
+                      END DO   
+                      J = MAX( LASTV, PREVLASTV )

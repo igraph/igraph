@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -90,7 +90,7 @@ static doublereal c_b3 = .66666666666666663;
     doublereal eps23, temp;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphsecond_(real *);
-    real tsconv = 0;
+    real tsconv;
 
 
 /*     %----------------------------------------------------%   

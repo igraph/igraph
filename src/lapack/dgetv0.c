@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -144,7 +144,7 @@ static doublereal c_b29 = -1.;
 {
     /* Initialized data */
 
-    IGRAPH_F77_SAVE logical inits = TRUE_;
+    static logical inits = TRUE_;
 
     /* System generated locals */
     integer v_dim1, v_offset, i__1;
@@ -154,33 +154,33 @@ static doublereal c_b29 = -1.;
 
     /* Local variables */
     real t0, t1, t2, t3;
-    integer jj, nbx = 0;
+    integer jj, nbx;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    IGRAPH_F77_SAVE integer iter;
-    IGRAPH_F77_SAVE logical orth;
-    integer nopx = 0;
+    static integer iter;
+    static logical orth;
+    integer nopx;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    IGRAPH_F77_SAVE integer iseed[4];
+    static integer iseed[4];
     extern /* Subroutine */ int igraphdgemv_(char *, integer *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *);
     integer idist;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    IGRAPH_F77_SAVE logical first;
-    real tmvbx = 0;
+    static logical first;
+    real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen);
-    integer mgetv0 = 0;
-    real tgetv0 = 0;
-    IGRAPH_F77_SAVE doublereal rnorm0;
+    integer mgetv0;
+    real tgetv0;
+    static doublereal rnorm0;
     extern /* Subroutine */ int igraphsecond_(real *);
     integer logfil, ndigit;
     extern /* Subroutine */ int igraphdlarnv_(integer *, integer *, integer *, 
 	    doublereal *);
-    IGRAPH_F77_SAVE integer msglvl;
-    real tmvopx = 0;
+    static integer msglvl;
+    real tmvopx;
 
 
 /*     %----------------------------------------------------%   

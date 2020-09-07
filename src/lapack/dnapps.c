@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -168,7 +168,7 @@ static doublereal c_b43 = -1.;
 {
     /* Initialized data */
 
-    IGRAPH_F77_SAVE logical first = TRUE_;
+    static logical first = TRUE_;
 
     /* System generated locals */
     integer h_dim1, h_offset, v_dim1, v_offset, q_dim1, q_offset, i__1, i__2, 
@@ -183,10 +183,10 @@ static doublereal c_b43 = -1.;
     doublereal h11, h12, h21, h22, h32;
     integer jj, ir, nr;
     doublereal tau;
-    IGRAPH_F77_SAVE doublereal ulp;
+    static doublereal ulp;
     doublereal tst1;
     integer iend;
-    IGRAPH_F77_SAVE doublereal unfl, ovfl;
+    static doublereal unfl, ovfl;
     extern /* Subroutine */ int igraphdscal_(integer *, doublereal *, doublereal *, 
 	    integer *), igraphdlarf_(char *, integer *, integer *, doublereal *, 
 	    integer *, doublereal *, doublereal *, integer *, doublereal *);
@@ -215,10 +215,10 @@ static doublereal c_b43 = -1.;
 	    doublereal *);
     integer logfil, ndigit;
     doublereal sigmar;
-    integer mnapps = 0, msglvl;
-    real tnapps = 0.;
+    integer mnapps, msglvl;
+    real tnapps;
     integer istart;
-    IGRAPH_F77_SAVE doublereal smlnum;
+    static doublereal smlnum;
     integer kplusp;
 
 

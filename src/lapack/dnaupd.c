@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -464,19 +464,19 @@ static integer c__1 = 1;
     /* Local variables */
     integer j;
     real t0, t1;
-    IGRAPH_F77_SAVE integer nb, ih, iq, np, iw, ldh, ldq;
-    integer nbx = 0;
-    IGRAPH_F77_SAVE integer nev0, mode;
+    static integer nb, ih, iq, np, iw, ldh, ldq;
+    integer nbx;
+    static integer nev0, mode;
     integer ierr;
-    IGRAPH_F77_SAVE integer iupd, next;
-    integer nopx = 0;
-    IGRAPH_F77_SAVE integer levec;
+    static integer iupd, next;
+    integer nopx;
+    static integer levec;
     real trvec, tmvbx;
-    IGRAPH_F77_SAVE integer ritzi;
+    static integer ritzi;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen);
-    IGRAPH_F77_SAVE integer ritzr;
+    static integer ritzr;
     extern /* Subroutine */ int igraphdnaup2_(integer *, char *, integer *, char *, 
 	    integer *, integer *, doublereal *, doublereal *, integer *, 
 	    integer *, integer *, integer *, doublereal *, integer *, 
@@ -488,17 +488,17 @@ static integer c__1 = 1;
     extern /* Subroutine */ int igraphsecond_(real *);
     integer logfil, ndigit;
     real tneigh;
-    integer mnaupd = 0;
-    IGRAPH_F77_SAVE integer ishift;
+    integer mnaupd;
+    static integer ishift;
     integer nitref;
-    IGRAPH_F77_SAVE integer bounds;
+    static integer bounds;
     real tnaupd;
     extern /* Subroutine */ int igraphdstatn_(void);
     real titref, tnaitr;
-    IGRAPH_F77_SAVE integer msglvl;
+    static integer msglvl;
     real tngets, tnapps, tnconv;
-    IGRAPH_F77_SAVE integer mxiter;
-    integer nrorth = 0, nrstrt = 0;
+    static integer mxiter;
+    integer nrorth, nrstrt;
     real tmvopx;
 
     /* Fortran I/O blocks */

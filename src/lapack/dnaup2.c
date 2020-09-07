@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -213,44 +213,44 @@ static integer c__2 = 2;
     double sqrt(doublereal);
 
     /* Local variables */
-    IGRAPH_F77_SAVE integer j;
-    IGRAPH_F77_SAVE real t0, t1, t2, t3;
-    IGRAPH_F77_SAVE integer kp[4], np0, nbx, nev0;
+    static integer j;
+    static real t0, t1, t2, t3;
+    static integer kp[4], np0, nbx, nev0;
     extern doublereal igraphddot_(integer *, doublereal *, integer *, doublereal *, 
 	    integer *);
-    IGRAPH_F77_SAVE doublereal eps23;
-    IGRAPH_F77_SAVE integer ierr, iter;
-    IGRAPH_F77_SAVE doublereal temp;
+    static doublereal eps23;
+    static integer ierr, iter;
+    static doublereal temp;
     extern doublereal igraphdnrm2_(integer *, doublereal *, integer *);
-    IGRAPH_F77_SAVE logical getv0, cnorm;
+    static logical getv0, cnorm;
     extern /* Subroutine */ int igraphdcopy_(integer *, doublereal *, integer *, 
 	    doublereal *, integer *);
-    IGRAPH_F77_SAVE integer nconv;
+    static integer nconv;
     extern /* Subroutine */ int igraphdmout_(integer *, integer *, integer *, 
 	    doublereal *, integer *, integer *, char *, ftnlen);
-    IGRAPH_F77_SAVE logical initv;
-    IGRAPH_F77_SAVE doublereal rnorm;
-    IGRAPH_F77_SAVE real tmvbx;
+    static logical initv;
+    static doublereal rnorm;
+    static real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
 	    , integer *, char *, ftnlen), igraphdgetv0_(integer *, char *, integer *
 	    , logical *, integer *, integer *, doublereal *, integer *, 
 	    doublereal *, doublereal *, integer *, doublereal *, integer *);
     extern doublereal igraphdlapy2_(doublereal *, doublereal *);
-    IGRAPH_F77_SAVE integer mnaup2;
-    IGRAPH_F77_SAVE real tnaup2;
+    static integer mnaup2;
+    static real tnaup2;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphdneigh_(doublereal *, integer *, doublereal *,
 	     integer *, doublereal *, doublereal *, doublereal *, doublereal *
 	    , integer *, doublereal *, integer *);
-    IGRAPH_F77_SAVE integer nevbef;
+    static integer nevbef;
     extern /* Subroutine */ int igraphsecond_(real *);
-    IGRAPH_F77_SAVE integer logfil, ndigit;
+    static integer logfil, ndigit;
     extern /* Subroutine */ int igraphdnaitr_(integer *, char *, integer *, integer 
 	    *, integer *, integer *, doublereal *, doublereal *, doublereal *,
 	     integer *, doublereal *, integer *, integer *, doublereal *, 
 	    integer *);
-    IGRAPH_F77_SAVE logical update;
+    static logical update;
     extern /* Subroutine */ int igraphdngets_(integer *, char *, integer *, integer 
 	    *, doublereal *, doublereal *, doublereal *, doublereal *, 
 	    doublereal *), igraphdnapps_(integer *, integer *, integer *, 
@@ -259,9 +259,9 @@ static integer c__2 = 2;
 	    doublereal *), igraphdnconv_(integer *, doublereal *, doublereal *, 
 	    doublereal *, doublereal *, integer *), igraphdsortc_(char *, logical *,
 	     integer *, doublereal *, doublereal *, doublereal *);
-    IGRAPH_F77_SAVE logical ushift;
-    IGRAPH_F77_SAVE char wprime[2];
-    IGRAPH_F77_SAVE integer msglvl, nptemp, numcnv, kplusp;
+    static logical ushift;
+    static char wprime[2];
+    static integer msglvl, nptemp, numcnv, kplusp;
 
 
 /*     %----------------------------------------------------%   

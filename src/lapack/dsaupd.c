@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -465,11 +465,11 @@ static integer c__1 = 1;
     /* Local variables */
     integer j;
     real t0, t1;
-    IGRAPH_F77_SAVE integer nb, ih, iq, np, iw, ldh, ldq;
-    integer nbx = 0;
-    IGRAPH_F77_SAVE integer nev0, mode, ierr, iupd, next;
-    integer nopx = 0;
-    IGRAPH_F77_SAVE integer ritz;
+    static integer nb, ih, iq, np, iw, ldh, ldq;
+    integer nbx;
+    static integer nev0, mode, ierr, iupd, next;
+    integer nopx;
+    static integer ritz;
     real tmvbx;
     extern /* Subroutine */ int igraphdvout_(integer *, integer *, doublereal *, 
 	    integer *, char *, ftnlen), igraphivout_(integer *, integer *, integer *
@@ -483,19 +483,19 @@ static integer c__1 = 1;
     extern doublereal igraphdlamch_(char *);
     extern /* Subroutine */ int igraphsecond_(real *);
     integer logfil, ndigit;
-    IGRAPH_F77_SAVE integer ishift;
-    integer nitref, msaupd = 0;
-    IGRAPH_F77_SAVE integer bounds;
+    static integer ishift;
+    integer nitref, msaupd;
+    static integer bounds;
     real titref, tseigt, tsaupd;
     extern /* Subroutine */ int igraphdstats_(void);
-    IGRAPH_F77_SAVE integer msglvl;
-    real tsaitr = 0.0;
-    IGRAPH_F77_SAVE integer mxiter;
+    static integer msglvl;
+    real tsaitr;
+    static integer mxiter;
     real tsgets, tsapps;
-    integer nrorth = 0;
-    real tsconv = 0.0;
-    integer nrstrt = 0;
-    real tmvopx = 0.0;
+    integer nrorth;
+    real tsconv;
+    integer nrstrt;
+    real tmvopx;
 
     /* Fortran I/O blocks */
     static cilist io___28 = { 0, 6, 0, fmt_1000, 0 };

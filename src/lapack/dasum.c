@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -12,6 +12,73 @@
 
 #include "f2c.h"
 
+/* > \brief \b DASUM   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+    Definition:   
+    ===========   
+
+         DOUBLE PRECISION FUNCTION DASUM(N,DX,INCX)   
+
+         INTEGER INCX,N   
+         DOUBLE PRECISION DX(*)   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   >    DASUM takes the sum of the absolute values.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >         number of elements in input vector(s)   
+   > \endverbatim   
+   >   
+   > \param[in] DX   
+   > \verbatim   
+   >          DX is DOUBLE PRECISION array, dimension ( 1 + ( N - 1 )*abs( INCX ) )   
+   > \endverbatim   
+   >   
+   > \param[in] INCX   
+   > \verbatim   
+   >          INCX is INTEGER   
+   >         storage spacing between elements of DX   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date November 2017   
+
+   > \ingroup double_blas_level1   
+
+   > \par Further Details:   
+    =====================   
+   >   
+   > \verbatim   
+   >   
+   >     jack dongarra, linpack, 3/11/78.   
+   >     modified 3/93 to return if incx .le. 0.   
+   >     modified 12/3/93, array(1) declarations changed to array(*)   
+   > \endverbatim   
+   >   
+    ===================================================================== */
 doublereal igraphdasum_(integer *n, doublereal *dx, integer *incx)
 {
     /* System generated locals */
@@ -24,17 +91,11 @@ doublereal igraphdasum_(integer *n, doublereal *dx, integer *incx)
     integer nincx;
 
 
-/*  Purpose   
-    =======   
+/*  -- Reference BLAS level1 routine (version 3.8.0) --   
+    -- Reference BLAS is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       November 2017   
 
-       DASUM takes the sum of the absolute values.   
-
-    Further Details   
-    ===============   
-
-       jack dongarra, linpack, 3/11/78.   
-       modified 3/93 to return if incx .le. 0.   
-       modified 12/3/93, array(1) declarations changed to array(*)   
 
     =====================================================================   
 

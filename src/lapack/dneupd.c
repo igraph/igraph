@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -393,7 +393,7 @@ static doublereal c_b71 = -1.;
     extern /* Subroutine */ int igraphdtrevc_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    integer *, integer *, integer *, doublereal *, integer *);
-    integer mneupd = 0, bounds;
+    integer mneupd, bounds;
     extern /* Subroutine */ int igraphdtrsen_(char *, char *, logical *, integer *, 
 	    doublereal *, integer *, doublereal *, integer *, doublereal *, 
 	    doublereal *, integer *, doublereal *, doublereal *, doublereal *,

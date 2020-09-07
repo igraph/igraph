@@ -1,4 +1,4 @@
-/*  -- translated by f2c (version 20100827).
+/*  -- translated by f2c (version 20191129).
    You must link the resulting object file with libf2c:
 	on Microsoft Windows system, link with libf2c.lib;
 	on Linux or Unix systems, link with .../path/to/libf2c.a -lm
@@ -12,7 +12,133 @@
 
 #include "f2c.h"
 
-/* Subroutine */ int igraphdger_(integer *m, integer *n, doublereal *alpha, 
+/* > \brief \b DGER   
+
+    =========== DOCUMENTATION ===========   
+
+   Online html documentation available at   
+              http://www.netlib.org/lapack/explore-html/   
+
+    Definition:   
+    ===========   
+
+         SUBROUTINE DGER(M,N,ALPHA,X,INCX,Y,INCY,A,LDA)   
+
+         DOUBLE PRECISION ALPHA   
+         INTEGER INCX,INCY,LDA,M,N   
+         DOUBLE PRECISION A(LDA,*),X(*),Y(*)   
+
+
+   > \par Purpose:   
+    =============   
+   >   
+   > \verbatim   
+   >   
+   > DGER   performs the rank 1 operation   
+   >   
+   >    A := alpha*x*y**T + A,   
+   >   
+   > where alpha is a scalar, x is an m element vector, y is an n element   
+   > vector and A is an m by n matrix.   
+   > \endverbatim   
+
+    Arguments:   
+    ==========   
+
+   > \param[in] M   
+   > \verbatim   
+   >          M is INTEGER   
+   >           On entry, M specifies the number of rows of the matrix A.   
+   >           M must be at least zero.   
+   > \endverbatim   
+   >   
+   > \param[in] N   
+   > \verbatim   
+   >          N is INTEGER   
+   >           On entry, N specifies the number of columns of the matrix A.   
+   >           N must be at least zero.   
+   > \endverbatim   
+   >   
+   > \param[in] ALPHA   
+   > \verbatim   
+   >          ALPHA is DOUBLE PRECISION.   
+   >           On entry, ALPHA specifies the scalar alpha.   
+   > \endverbatim   
+   >   
+   > \param[in] X   
+   > \verbatim   
+   >          X is DOUBLE PRECISION array, dimension at least   
+   >           ( 1 + ( m - 1 )*abs( INCX ) ).   
+   >           Before entry, the incremented array X must contain the m   
+   >           element vector x.   
+   > \endverbatim   
+   >   
+   > \param[in] INCX   
+   > \verbatim   
+   >          INCX is INTEGER   
+   >           On entry, INCX specifies the increment for the elements of   
+   >           X. INCX must not be zero.   
+   > \endverbatim   
+   >   
+   > \param[in] Y   
+   > \verbatim   
+   >          Y is DOUBLE PRECISION array, dimension at least   
+   >           ( 1 + ( n - 1 )*abs( INCY ) ).   
+   >           Before entry, the incremented array Y must contain the n   
+   >           element vector y.   
+   > \endverbatim   
+   >   
+   > \param[in] INCY   
+   > \verbatim   
+   >          INCY is INTEGER   
+   >           On entry, INCY specifies the increment for the elements of   
+   >           Y. INCY must not be zero.   
+   > \endverbatim   
+   >   
+   > \param[in,out] A   
+   > \verbatim   
+   >          A is DOUBLE PRECISION array, dimension ( LDA, N )   
+   >           Before entry, the leading m by n part of the array A must   
+   >           contain the matrix of coefficients. On exit, A is   
+   >           overwritten by the updated matrix.   
+   > \endverbatim   
+   >   
+   > \param[in] LDA   
+   > \verbatim   
+   >          LDA is INTEGER   
+   >           On entry, LDA specifies the first dimension of A as declared   
+   >           in the calling (sub) program. LDA must be at least   
+   >           max( 1, m ).   
+   > \endverbatim   
+
+    Authors:   
+    ========   
+
+   > \author Univ. of Tennessee   
+   > \author Univ. of California Berkeley   
+   > \author Univ. of Colorado Denver   
+   > \author NAG Ltd.   
+
+   > \date December 2016   
+
+   > \ingroup double_blas_level2   
+
+   > \par Further Details:   
+    =====================   
+   >   
+   > \verbatim   
+   >   
+   >  Level 2 Blas routine.   
+   >   
+   >  -- Written on 22-October-1986.   
+   >     Jack Dongarra, Argonne National Lab.   
+   >     Jeremy Du Croz, Nag Central Office.   
+   >     Sven Hammarling, Nag Central Office.   
+   >     Richard Hanson, Sandia National Labs.   
+   > \endverbatim   
+   >   
+    =====================================================================   
+   Subroutine */ int igraphdger_(integer *m, integer *n, doublereal *alpha, 
 	doublereal *x, integer *incx, doublereal *y, integer *incy, 
 	doublereal *a, integer *lda)
 {
@@ -25,76 +151,11 @@
     extern /* Subroutine */ int igraphxerbla_(char *, integer *, ftnlen);
 
 
-/*  Purpose   
-    =======   
+/*  -- Reference BLAS level2 routine (version 3.7.0) --   
+    -- Reference BLAS is a software package provided by Univ. of Tennessee,    --   
+    -- Univ. of California Berkeley, Univ. of Colorado Denver and NAG Ltd..--   
+       December 2016   
 
-    DGER   performs the rank 1 operation   
-
-       A := alpha*x*y**T + A,   
-
-    where alpha is a scalar, x is an m element vector, y is an n element   
-    vector and A is an m by n matrix.   
-
-    Arguments   
-    ==========   
-
-    M      - INTEGER.   
-             On entry, M specifies the number of rows of the matrix A.   
-             M must be at least zero.   
-             Unchanged on exit.   
-
-    N      - INTEGER.   
-             On entry, N specifies the number of columns of the matrix A.   
-             N must be at least zero.   
-             Unchanged on exit.   
-
-    ALPHA  - DOUBLE PRECISION.   
-             On entry, ALPHA specifies the scalar alpha.   
-             Unchanged on exit.   
-
-    X      - DOUBLE PRECISION array of dimension at least   
-             ( 1 + ( m - 1 )*abs( INCX ) ).   
-             Before entry, the incremented array X must contain the m   
-             element vector x.   
-             Unchanged on exit.   
-
-    INCX   - INTEGER.   
-             On entry, INCX specifies the increment for the elements of   
-             X. INCX must not be zero.   
-             Unchanged on exit.   
-
-    Y      - DOUBLE PRECISION array of dimension at least   
-             ( 1 + ( n - 1 )*abs( INCY ) ).   
-             Before entry, the incremented array Y must contain the n   
-             element vector y.   
-             Unchanged on exit.   
-
-    INCY   - INTEGER.   
-             On entry, INCY specifies the increment for the elements of   
-             Y. INCY must not be zero.   
-             Unchanged on exit.   
-
-    A      - DOUBLE PRECISION array of DIMENSION ( LDA, n ).   
-             Before entry, the leading m by n part of the array A must   
-             contain the matrix of coefficients. On exit, A is   
-             overwritten by the updated matrix.   
-
-    LDA    - INTEGER.   
-             On entry, LDA specifies the first dimension of A as declared   
-             in the calling (sub) program. LDA must be at least   
-             max( 1, m ).   
-             Unchanged on exit.   
-
-    Further Details   
-    ===============   
-
-    Level 2 Blas routine.   
-
-    -- Written on 22-October-1986.   
-       Jack Dongarra, Argonne National Lab.   
-       Jeremy Du Croz, Nag Central Office.   
-       Sven Hammarling, Nag Central Office.   
-       Richard Hanson, Sandia National Labs.   
 
     =====================================================================   
 
