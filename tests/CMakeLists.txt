@@ -31,7 +31,7 @@ add_legacy_tests(
   igraph_sparsemat2
   igraph_sparsemat3
   igraph_sparsemat4
-  # igraph_sparsemat5
+  igraph_sparsemat5
   igraph_sparsemat6
   igraph_sparsemat7
   igraph_sparsemat8
@@ -143,7 +143,7 @@ add_legacy_tests(
   igraph_knn
   igraph_local_transitivity
   igraph_minimum_spanning_tree
-  # igraph_pagerank
+  igraph_pagerank
   igraph_radius
   igraph_reciprocity
   igraph_rewire
@@ -299,11 +299,11 @@ add_legacy_tests(
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
   igraph_community_infomap
-  # igraph_community_leading_eigenvector
-  # igraph_community_leading_eigenvector2
+  igraph_community_leading_eigenvector
+  igraph_community_leading_eigenvector2
   igraph_community_multilevel
   igraph_community_optimal_modularity
-  # levc-stress
+  levc-stress
   spinglass
   walktrap
 )
@@ -342,7 +342,7 @@ add_legacy_tests(
   igraph_eigen_matrix3
   igraph_eigen_matrix4
   igraph_eigen_matrix_symmetric
-  # igraph_eigen_matrix_symmetric_arpack
+  igraph_eigen_matrix_symmetric_arpack
 )
 
 # attributes.at
@@ -365,7 +365,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER simple NAMES
   blas
-  # eigenvector_centrality
+  eigenvector_centrality
   igraph_arpack_rnsolve
   igraph_lapack_dgeev
   igraph_lapack_dgeevx
