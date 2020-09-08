@@ -159,7 +159,8 @@ int main() {
 
     /* Ring graph with loop edges */
     igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
-                 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 0, 0, 0, 2, 2, -1);
+                 0,1, 1,2, 2,3, 3,4, 4,5, 5,0,
+                 0,0, 1,1, 2,2, 3,3, 4,4, 5,5, -1);
     run_leiden_modularity(&graph, NULL);
     igraph_destroy(&graph);
 
