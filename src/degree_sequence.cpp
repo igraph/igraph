@@ -418,6 +418,32 @@ static int igraph_i_realize_directed_degree_sequence(
  *
  * The \c method parameter controls the order in which the vertices to be connected are chosen.
  *
+ * </para><para>
+ * References:
+ *
+ * </para><para>
+ * V. Havel,
+ * Poznámka o existenci konečných grafů (A remark on the existence of finite graphs),
+ * Časopis pro pěstování matematiky 80, 477-480 (1955).
+ * http://eudml.org/doc/19050
+ *
+ * </para><para>
+ * S. L. Hakimi,
+ * On Realizability of a Set of Integers as Degrees of the Vertices of a Linear Graph,
+ * Journal of the SIAM 10, 3 (1962).
+ * https://www.jstor.org/stable/2098746
+ *
+ * </para><para>
+ * D. J. Kleitman and D. L. Wang,
+ * Algorithms for Constructing Graphs and Digraphs with Given Valences and Factors,
+ * Discrete Mathematics 6, 1 (1973).
+ * https://doi.org/10.1016/0012-365X%2873%2990037-X
+ *
+ * </para><para>
+ * Sz. Horvát and C. D. Modes,
+ * Connectivity matters: Construction and exact random sampling of connected graphs (2020).
+ * https://arxiv.org/abs/2009.03747
+ *
  * \param graph Pointer to an uninitialized graph object.
  * \param outdeg The degree sequence for a simple undirected graph
  *        (if \p indeg is NULL or of length zero), or the out-degree sequence of
@@ -430,8 +456,8 @@ static int igraph_i_realize_directed_degree_sequence(
  *          The vertex with smallest remaining degree is selected first. The result is usually
  *          a graph with high negative degree assortativity. In the undirected case, this method
  *          is guaranteed to generate a connected graph, provided that a connected realization exists.
- *          See http://szhorvat.net/pelican/hh-connected-graphs.html for a proof.
- *          In the directed case it tends to generate weakly connected graphs, but this is not
+ *          See Horvát and Modes (2020) as well as http://szhorvat.net/pelican/hh-connected-graphs.html 
+ *          for a proof. In the directed case it tends to generate weakly connected graphs, but this is not
  *          guaranteed.
  *          \cli IGRAPH_REALIZE_DEGSEQ_LARGEST
  *          The vertex with the largest remaining degree is selected first. The result
