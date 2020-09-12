@@ -10,16 +10,18 @@
 
 ### Fixed
 
+ - `igraph_difference()` was creating superfluous self loops (#597).
  - `igraph_count_multiple()` was giving incorrect results for self-loops in directed graph (PR #1399).
  - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).
  - `igraph_eigen_matrix_symmetric()`: fixed incorrect matrix multiplication (PR #1379).
- - Corrected several issues that could arise during an error condition (PRs #1405, #1406).
+ - Corrected several issues that could arise during an error condition (PRs #1405, #1406, #1438).
  - `igraph_realize_degree_sequence()` did not correctly detect some non-graphical inputs.
  - `igraph_is_graphical_degree_sequence()`: fixed incorrect results in undirected case (PR #1441).
 
 ### Other
 
  - `igraph_degree_sequence_game()`: improved performance with `IGRAPH_DEGSEQ_SIMPLE_NO_MULTIPLE_UNIFORM` method.
+ - Improved the robustness of the test suite.
  - Documentation improvements.
  - Improved error and warning messages.
  - Improved compatibility with recent versions of Microsoft Visual C.
