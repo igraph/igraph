@@ -657,12 +657,9 @@ int igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
  * \brief Count the total number of motifs in a graph
  *
  * </para><para>
- * This function counts the total number of motifs in a graph without
- * assigning isomorphism classes to them.
- *
- * </para><para>
- * Directed motifs will be counted in directed graphs and undirected
- * motifs in undirected graphs.
+ * This function counts the total number of motifs in a graph,
+ * i.e. the number of of (weakly) connected triplets or quadruplets,
+ * without assigning isomorphism classes to them.
  *
  * \param graph The graph object to study.
  * \param no Pointer to an integer type, the result will be stored
