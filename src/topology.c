@@ -689,6 +689,9 @@ const unsigned int igraph_i_classedges_4u[] = { 2, 3, 1, 3, 0, 3, 1, 2, 0, 2, 0,
  * (between 0 and 15), for undirected graph it is only 4. For graphs
  * with four vertices it is 218 (directed) and 11 (undirected).
  *
+ * </para><para>
+ * Multi-edges and self-loops are ignored by this function.
+ *
  * \param graph The graph object.
  * \param isoclass Pointer to an integer, the isomorphism class will
  *        be stored here.
@@ -821,7 +824,8 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
  * Graph isomorphism for 3-4 vertices
  *
  * This function uses precomputed indices to decide isomorphism
- * problems for graphs with only 3 or 4 vertices.
+ * problems for graphs with only 3 or 4 vertices. Multi-edges
+ * and self-loops are ignored by this function.
  * \param graph1 The first input graph.
  * \param graph2 The second input graph. Must have the same
  *   directedness as \p graph1.
