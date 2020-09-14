@@ -71,9 +71,8 @@
  * \sa \ref igraph_malloc()
  */
 
-int igraph_free(void *p) {
+void igraph_free(void *p) {
     igraph_Free(p);
-    return 0;
 }
 
 
