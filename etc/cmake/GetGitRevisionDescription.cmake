@@ -108,8 +108,6 @@ function(git_describe _var)
 	#	message(FATAL_ERROR "Looks like someone's doing something nefarious with git_describe! Passed arguments ${ARGN}")
 	#endif()
 
-	message(STATUS "Arguments to execute_process: ${GIT_EXECUTABLE} describe ${hash} ${ARGN}")
-
 	execute_process(COMMAND
 		"${GIT_EXECUTABLE}"
 		describe
