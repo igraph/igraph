@@ -54,7 +54,7 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
 }
 
 
-void bliss_free_graph(AbstractGraph *g) {
+static void bliss_free_graph(AbstractGraph *g) {
     delete g;
 }
 
@@ -119,7 +119,7 @@ inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) 
 
 // this is the callback function used with AbstractGraph::find_automorphisms()
 // it collects the group generators into a pointer vector
-void collect_generators(void *generators, unsigned int n, const unsigned int *aut) {
+static void collect_generators(void *generators, unsigned int n, const unsigned int *aut) {
     igraph_vector_ptr_t *gen = static_cast<igraph_vector_ptr_t *>(generators);
     igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
     igraph_vector_init(newvector, n);
