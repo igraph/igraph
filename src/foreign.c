@@ -57,8 +57,8 @@
  *
  * </para><para>
  * This format is simply a series of an even number of non-negative integers separated by
- * whitespace. The integers represent vertex IDs. Placing each edge (i.e. pair of integers) 
- * on a separate line is not required, but it is recommended for readability. 
+ * whitespace. The integers represent vertex IDs. Placing each edge (i.e. pair of integers)
+ * on a separate line is not required, but it is recommended for readability.
  * Edges of directed graphs are assumed to be in "from, to" order.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
@@ -127,7 +127,7 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
 
 int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
                                   void* scanner);
-int igraph_ncol_yylex_destroy (void *scanner );
+void igraph_ncol_yylex_destroy (void *scanner );
 int igraph_ncol_yyparse (igraph_i_ncol_parsedata_t* context);
 void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
 
@@ -304,7 +304,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
 int igraph_lgl_yylex_init_extra (igraph_i_lgl_parsedata_t* user_defined,
                                  void* scanner);
-int igraph_lgl_yylex_destroy (void *scanner );
+void igraph_lgl_yylex_destroy (void *scanner );
 int igraph_lgl_yyparse (igraph_i_lgl_parsedata_t* context);
 void igraph_lgl_yyset_in  (FILE * in_str, void* yyscanner );
 
@@ -457,7 +457,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
 
 int igraph_pajek_yylex_init_extra(igraph_i_pajek_parsedata_t* user_defined,
                                   void* scanner);
-int igraph_pajek_yylex_destroy (void *scanner );
+void igraph_pajek_yylex_destroy (void *scanner );
 int igraph_pajek_yyparse (igraph_i_pajek_parsedata_t* context);
 void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
 
@@ -976,7 +976,7 @@ int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
 
 int igraph_gml_yylex_init_extra (igraph_i_gml_parsedata_t* user_defined,
                                  void* scanner);
-int igraph_gml_yylex_destroy (void *scanner );
+void igraph_gml_yylex_destroy (void *scanner );
 int igraph_gml_yyparse (igraph_i_gml_parsedata_t* context);
 void igraph_gml_yyset_in  (FILE * in_str, void* yyscanner );
 
@@ -3022,7 +3022,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
 
 int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
                                 void* scanner);
-int igraph_dl_yylex_destroy (void *scanner );
+void igraph_dl_yylex_destroy (void *scanner );
 int igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
 void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
 
