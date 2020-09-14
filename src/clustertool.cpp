@@ -56,6 +56,7 @@
 #include "igraph_interface.h"
 #include "igraph_components.h"
 #include "igraph_interrupt_internal.h"
+#include "igraph_handle_exceptions.h"
 
 static int igraph_i_community_spinglass_orig(
         const igraph_t *graph,
@@ -202,29 +203,30 @@ int igraph_community_spinglass(const igraph_t *graph,
                                /*                 igraph_real_t *polarization, */
                                igraph_real_t gamma_minus) {
 
-    switch (implementation) {
-    case IGRAPH_SPINCOMM_IMP_ORIG:
-        return igraph_i_community_spinglass_orig(graph, weights, modularity,
-                temperature, membership, csize,
-                spins, parupdate, starttemp,
-                stoptemp, coolfact, update_rule,
-                gamma);
-        break;
-    case IGRAPH_SPINCOMM_IMP_NEG:
-        return igraph_i_community_spinglass_negative(graph, weights, modularity,
-                temperature, membership, csize,
-                spins, parupdate, starttemp,
-                stoptemp, coolfact,
-                update_rule, gamma,
-                /*                       adhesion, normalised_adhesion, */
-                /*                       polarization, */
-                gamma_minus);
-        break;
-    default:
-        IGRAPH_ERROR("Unknown `implementation' in spinglass community finding",
-                     IGRAPH_EINVAL);
-    }
-
+    IGRAPH_HANDLE_EXCEPTIONS(
+        switch (implementation) {
+        case IGRAPH_SPINCOMM_IMP_ORIG:
+            return igraph_i_community_spinglass_orig(graph, weights, modularity,
+                    temperature, membership, csize,
+                    spins, parupdate, starttemp,
+                    stoptemp, coolfact, update_rule,
+                    gamma);
+            break;
+        case IGRAPH_SPINCOMM_IMP_NEG:
+            return igraph_i_community_spinglass_negative(graph, weights, modularity,
+                    temperature, membership, csize,
+                    spins, parupdate, starttemp,
+                    stoptemp, coolfact,
+                    update_rule, gamma,
+                    /*                       adhesion, normalised_adhesion, */
+                    /*                       polarization, */
+                    gamma_minus);
+            break;
+        default:
+            IGRAPH_ERROR("Unknown `implementation' in spinglass community finding",
+                         IGRAPH_EINVAL);
+        }
+    );
     return 0;
 }
 
@@ -446,89 +448,90 @@ int igraph_community_spinglass_single(const igraph_t *graph,
                                       igraph_integer_t spins,
                                       igraph_spincomm_update_t update_rule,
                                       igraph_real_t gamma) {
+    IGRAPH_HANDLE_EXCEPTIONS(
+        igraph_bool_t use_weights = 0;
+        double prob;
+        ClusterList<NNode*> *cl_cur;
+        network *net;
+        PottsModel *pm;
+        char startnode[255];
 
-    igraph_bool_t use_weights = 0;
-    double prob;
-    ClusterList<NNode*> *cl_cur;
-    network *net;
-    PottsModel *pm;
-    char startnode[255];
+        /* Check arguments */
 
-    /* Check arguments */
-
-    if (spins < 2 || spins > 500) {
-        IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
-    }
-    if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
-        update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
-        IGRAPH_ERROR("Invalid update rule", IGRAPH_EINVAL);
-    }
-    if (weights) {
-        if (igraph_vector_size(weights) != igraph_ecount(graph)) {
-            IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        if (spins < 2 || spins > 500) {
+            IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
         }
-        use_weights = 1;
-    }
-    if (gamma < 0.0) {
-        IGRAPH_ERROR("Invalid gamme value", IGRAPH_EINVAL);
-    }
-    if (vertex < 0 || vertex > igraph_vcount(graph)) {
-        IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVAL);
-    }
-
-    /* Check whether we have a single component */
-    igraph_bool_t conn;
-    IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
-    if (!conn) {
-        IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
-    }
-
-    net = new network;
-    net->node_list   = new DL_Indexed_List<NNode*>();
-    net->link_list   = new DL_Indexed_List<NLink*>();
-    net->cluster_list = new DL_Indexed_List<ClusterList<NNode*>*>();
-
-    /* Transform the igraph_t */
-    IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                       net, use_weights, 0));
-
-    prob = 2.0 * net->sum_weights / double(net->node_list->Size())
-           / double(net->node_list->Size() - 1);
-
-    pm = new PottsModel(net, (unsigned int)spins, update_rule);
-
-    /* initialize the random number generator */
-    RNG_BEGIN();
-
-    /* to be exected, if we want to find the community around a particular node*/
-    /* the initial conf is needed, because otherwise,
-       the degree of the nodes is not in the weight property, stupid!!! */
-    pm->assign_initial_conf(-1);
-    snprintf(startnode, 255, "%li", (long int)vertex + 1);
-    pm->FindCommunityFromStart(gamma, prob, startnode, community,
-                               cohesion, adhesion, inner_links, outer_links);
-
-    while (net->link_list->Size()) {
-        delete net->link_list->Pop();
-    }
-    while (net->node_list->Size()) {
-        delete net->node_list->Pop();
-    }
-    while (net->cluster_list->Size()) {
-        cl_cur = net->cluster_list->Pop();
-        while (cl_cur->Size()) {
-            cl_cur->Pop();
+        if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
+            update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
+            IGRAPH_ERROR("Invalid update rule", IGRAPH_EINVAL);
         }
-        delete cl_cur;
-    }
-    delete net->link_list;
-    delete net->node_list;
-    delete net->cluster_list;
+        if (weights) {
+            if (igraph_vector_size(weights) != igraph_ecount(graph)) {
+                IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+            }
+            use_weights = 1;
+        }
+        if (gamma < 0.0) {
+            IGRAPH_ERROR("Invalid gamme value", IGRAPH_EINVAL);
+        }
+        if (vertex < 0 || vertex > igraph_vcount(graph)) {
+            IGRAPH_ERROR("Invalid vertex id", IGRAPH_EINVAL);
+        }
 
-    RNG_END();
+        /* Check whether we have a single component */
+        igraph_bool_t conn;
+        IGRAPH_CHECK(igraph_is_connected(graph, &conn, IGRAPH_WEAK));
+        if (!conn) {
+            IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
+        }
 
-    delete net;
-    delete pm;
+        net = new network;
+        net->node_list   = new DL_Indexed_List<NNode*>();
+        net->link_list   = new DL_Indexed_List<NLink*>();
+        net->cluster_list = new DL_Indexed_List<ClusterList<NNode*>*>();
+
+        /* Transform the igraph_t */
+        IGRAPH_CHECK(igraph_i_read_network(graph, weights,
+                                           net, use_weights, 0));
+
+        prob = 2.0 * net->sum_weights / double(net->node_list->Size())
+               / double(net->node_list->Size() - 1);
+
+        pm = new PottsModel(net, (unsigned int)spins, update_rule);
+
+        /* initialize the random number generator */
+        RNG_BEGIN();
+
+        /* to be exected, if we want to find the community around a particular node*/
+        /* the initial conf is needed, because otherwise,
+           the degree of the nodes is not in the weight property, stupid!!! */
+        pm->assign_initial_conf(-1);
+        snprintf(startnode, 255, "%li", (long int)vertex + 1);
+        pm->FindCommunityFromStart(gamma, prob, startnode, community,
+                                   cohesion, adhesion, inner_links, outer_links);
+
+        while (net->link_list->Size()) {
+            delete net->link_list->Pop();
+        }
+        while (net->node_list->Size()) {
+            delete net->node_list->Pop();
+        }
+        while (net->cluster_list->Size()) {
+            cl_cur = net->cluster_list->Pop();
+            while (cl_cur->Size()) {
+                cl_cur->Pop();
+            }
+            delete cl_cur;
+        }
+        delete net->link_list;
+        delete net->node_list;
+        delete net->cluster_list;
+
+        RNG_END();
+
+        delete net;
+        delete pm;
+    );
 
     return 0;
 }
