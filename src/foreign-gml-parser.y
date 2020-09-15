@@ -138,7 +138,7 @@ keyvalue:   key num
 
 key: KEYWORD { igraph_i_gml_get_keyword(igraph_gml_yyget_text(scanner), 
 					igraph_gml_yyget_leng(scanner), 
-					&$$); USE($1) };
+					&$$); USE($1); };
 num : NUM { $$=igraph_i_gml_get_real(igraph_gml_yyget_text(scanner), 
 				     igraph_gml_yyget_leng(scanner)); };
 
