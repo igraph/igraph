@@ -207,6 +207,10 @@ target_include_directories(
   ${LIBXML2_INCLUDE_DIRS}
 )
 
+if(MATH_LIBRARY)
+    target_link_libraries(igraph PUBLIC ${MATH_LIBRARY})
+endif()
+
 # Link igraph statically to some of the libraries from the subdirectories
 target_link_libraries(
   igraph

@@ -25,6 +25,10 @@ target_include_directories(
   ${CMAKE_SOURCE_DIR}/include
 )
 
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET prpack PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
+
 # Turn on all warnings for GCC, clang and MSVC
 # TODO(ntamas): it does not work yet, gcc errors out with:
 #     ignoring #pragma omp parallel [-Werror=unknown-pragmas]
