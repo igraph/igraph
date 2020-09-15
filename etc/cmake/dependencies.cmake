@@ -63,4 +63,6 @@ macro(find_dependencies)
   set(HAVE_GLPK ${GLPK_FOUND})
   set(HAVE_GMP ${GMP_FOUND})
   set(HAVE_LIBXML ${LIBXML2_FOUND})
+
+  find_library(MATH_LIBRARY m)
 endmacro()

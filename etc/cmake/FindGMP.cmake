@@ -9,7 +9,7 @@
 set(GMP_PREFIX "" CACHE PATH "Path to GMP prefix")
 
 find_path(GMP_INCLUDE_DIR gmp.h PATHS ${GMP_PREFIX}/include /usr/include /usr/local/include)
-find_library(GMP_LIBRARY libgmp.a PATHS ${GMP_PREFIX}/lib /usr/lib /usr/local/lib)
+find_library(GMP_LIBRARY gmp PATHS ${GMP_PREFIX}/lib /usr/lib /usr/local/lib)
 
 if(GMP_INCLUDE_DIR AND GMP_LIBRARY)
   set(GMP_FOUND TRUE)

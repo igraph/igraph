@@ -6,6 +6,12 @@ add_custom_target(build_tests)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE})
 add_dependencies(check build_tests)
 
+set(BUILD_INTERNAL_TESTS YES)
+
+if (MSVC AND BUILD_SHARED_LIBS)
+  set(BUILD_INTERNAL_TESTS NO)
+endif()
+
 # version.at
 add_legacy_tests(
   FOLDER simple NAMES
@@ -15,18 +21,11 @@ add_legacy_tests(
 # types.at
 add_legacy_tests(
   FOLDER simple NAMES
-  2wheap
-  biguint
-  d_indheap
   dqueue
   heap
   igraph_array
   igraph_complex
-  igraph_hashtable
-  igraph_i_cutheap
-  igraph_marked_queue
   igraph_psumtree
-  igraph_set
   igraph_sparsemat
   igraph_sparsemat2
   igraph_sparsemat3
@@ -40,7 +39,6 @@ add_legacy_tests(
   igraph_sparsemat_minmax
   igraph_sparsemat_which_minmax
   igraph_strvector
-  igraph_trie
   indheap
   matrix
   matrix2
@@ -52,6 +50,19 @@ add_legacy_tests(
   vector3
   vector_ptr
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    2wheap
+    biguint
+    d_indheap
+    igraph_hashtable
+    igraph_i_cutheap
+    igraph_marked_queue
+    igraph_set
+    igraph_trie
+  )
+endif()
 
 # basic.at
 add_legacy_tests(
@@ -64,10 +75,15 @@ add_legacy_tests(
   igraph_delete_vertices
   igraph_empty
   igraph_get_eid
-  igraph_get_eids
   igraph_is_directed
   igraph_neighbors
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_get_eids
+  )
+endif()
 
 # iterators.at
 add_legacy_tests(
@@ -126,12 +142,10 @@ add_legacy_tests(
   igraph_convergence_degree
   igraph_density
   igraph_diameter
-  igraph_eccentricity
   igraph_edge_betweenness
   igraph_feedback_arc_set
   igraph_feedback_arc_set_ip
   igraph_get_all_shortest_paths_dijkstra
-  igraph_get_all_simple_paths
   igraph_get_shortest_paths
   igraph_get_shortest_paths2
   igraph_get_shortest_paths_dijkstra
@@ -143,16 +157,23 @@ add_legacy_tests(
   igraph_knn
   igraph_local_transitivity
   igraph_minimum_spanning_tree
-  igraph_pagerank
-  igraph_radius
   igraph_reciprocity
-  igraph_rewire
   igraph_similarity
   igraph_simplify
   igraph_transitive_closure_dag
   igraph_transitivity
-  single_target_shortest_path
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_eccentricity
+    igraph_get_all_simple_paths
+    igraph_pagerank
+    igraph_radius
+    igraph_rewire
+    single_target_shortest_path
+  )
+endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
@@ -176,17 +197,22 @@ add_legacy_tests(
 # layout.at
 add_legacy_tests(
   FOLDER simple NAMES
-  igraph_i_layout_sphere
-  igraph_layout_davidson_harel
   igraph_layout_grid
   igraph_layout_lgl
   igraph_layout_mds
-  igraph_layout_merge
   igraph_layout_merge2
   igraph_layout_merge3
   igraph_layout_reingold_tilford
-  igraph_layout_sugiyama
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_i_layout_sphere
+    igraph_layout_davidson_harel
+    igraph_layout_merge
+    igraph_layout_sugiyama
+  )
+endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
@@ -196,10 +222,16 @@ add_legacy_tests(
 # visitors.at
 add_legacy_tests(
   FOLDER simple NAMES
-  igraph_bfs
+
   igraph_bfs2
   igraph_random_walk
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_bfs
+  )
+endif()
 
 # topology.at
 add_legacy_tests(
@@ -207,10 +239,15 @@ add_legacy_tests(
   VF2-compat
   igraph_isomorphic_bliss
   igraph_isomorphic_vf2
-  igraph_subisomorphic_lad
   isomorphism_test
   topology
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_subisomorphic_lad
+  )
+endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
@@ -227,8 +264,13 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER simple NAMES
   igraph_motifs_randesu
-  triad_census
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    triad_census
+  )
+endif()
 
 # foreign.at
 add_legacy_tests(
@@ -236,7 +278,6 @@ add_legacy_tests(
   dot
   foreign
   gml
-  graphml
   igraph_read_graph_dl
   igraph_read_graph_graphdb
   igraph_read_graph_lgl
@@ -250,6 +291,12 @@ add_legacy_tests(
   pajek_bipartite2
   pajek_signed
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    graphml
+  )
+endif()
 
 # other.at
 add_legacy_tests(
@@ -286,11 +333,16 @@ add_legacy_tests(
   even_tarjan
   flow
   flow2
-  igraph_all_st_cuts
   igraph_all_st_mincuts
   igraph_gomory_hu_tree
   igraph_mincut
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_all_st_cuts
+  )
+endif()
 
 # community.at
 add_legacy_tests(
@@ -321,12 +373,17 @@ add_legacy_tests(
   FOLDER simple NAMES
   igraph_cliques
   igraph_independent_sets
-  igraph_maximal_cliques
-  igraph_maximal_cliques2
-  igraph_maximal_cliques3
-  igraph_maximal_cliques4
   igraph_weighted_cliques
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_maximal_cliques
+    igraph_maximal_cliques2
+    igraph_maximal_cliques3
+    igraph_maximal_cliques4
+  )
+endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
@@ -382,10 +439,12 @@ add_legacy_tests(
 )
 
 # centralization.at
-add_legacy_tests(
-  FOLDER simple NAMES
-  centralization
-)
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    centralization
+  )
+endif()
 
 # separators.at
 add_legacy_tests(
@@ -443,11 +502,16 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER simple NAMES
   igraph_fisher_yates_shuffle
-  igraph_random_sample
   igraph_rng_get_exp
   mt
   random_seed
 )
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_random_sample
+  )
+endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
@@ -455,11 +519,13 @@ add_legacy_tests(
 )
 
 # qsort.at
-add_legacy_tests(
-  FOLDER simple NAMES
-  igraph_qsort
-  igraph_qsort_r
-)
+if (BUILD_INTERNAL_TESTS)
+  add_legacy_tests(
+    FOLDER simple NAMES
+    igraph_qsort
+    igraph_qsort_r
+  )
+endif()
 
 # matching.at
 add_legacy_tests(
