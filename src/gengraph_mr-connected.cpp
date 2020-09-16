@@ -28,6 +28,8 @@
 #include "igraph_types.h"
 #include "igraph_error.h"
 
+#include "igraph_handle_exceptions.h"
+
 namespace gengraph {
 
 // return negative number if program should exit
@@ -137,48 +139,50 @@ extern "C" {
     int igraph_degree_sequence_game_vl(igraph_t *graph,
                                        const igraph_vector_t *out_seq,
                                        const igraph_vector_t *in_seq) {
-        long int sum = igraph_vector_sum(out_seq);
-        if (sum % 2 != 0) {
-            IGRAPH_ERROR("Sum of degrees should be even", IGRAPH_EINVAL);
-        }
+        IGRAPH_HANDLE_EXCEPTIONS(
+            long int sum = igraph_vector_sum(out_seq);
+            if (sum % 2 != 0) {
+                IGRAPH_ERROR("Sum of degrees should be even", IGRAPH_EINVAL);
+            }
 
-        RNG_BEGIN();
+            RNG_BEGIN();
 
-        if (in_seq && igraph_vector_size(in_seq) != 0) {
-            RNG_END();
-            IGRAPH_ERROR("This generator works with undirected graphs only", IGRAPH_EINVAL);
-        }
+            if (in_seq && igraph_vector_size(in_seq) != 0) {
+                RNG_END();
+                IGRAPH_ERROR("This generator works with undirected graphs only", IGRAPH_EINVAL);
+            }
 
-        degree_sequence *dd = new degree_sequence(out_seq);
+            degree_sequence *dd = new degree_sequence(out_seq);
 
-        graph_molloy_opt *g = new graph_molloy_opt(*dd);
-        delete dd;
+            graph_molloy_opt *g = new graph_molloy_opt(*dd);
+            delete dd;
 
-        if (!g->havelhakimi()) {
+            if (!g->havelhakimi()) {
+                delete g;
+                RNG_END();
+                IGRAPH_ERROR("Cannot realize the given degree sequence as an undirected, simple graph",
+                             IGRAPH_EINVAL);
+            }
+
+            if (!g->make_connected()) {
+                delete g;
+                RNG_END();
+                IGRAPH_ERROR("Cannot make a connected graph from the given degree sequence",
+                             IGRAPH_EINVAL);
+            }
+
+            int *hc = g->hard_copy();
             delete g;
+            graph_molloy_hash *gh = new graph_molloy_hash(hc);
+            delete [] hc;
+
+            gh->shuffle(5 * gh->nbarcs(), 100 * gh->nbarcs(), SHUFFLE_TYPE);
+
+            IGRAPH_CHECK(gh->print(graph));
+            delete gh;
+
             RNG_END();
-            IGRAPH_ERROR("Cannot realize the given degree sequence as an undirected, simple graph",
-                         IGRAPH_EINVAL);
-        }
-
-        if (!g->make_connected()) {
-            delete g;
-            RNG_END();
-            IGRAPH_ERROR("Cannot make a connected graph from the given degree sequence",
-                         IGRAPH_EINVAL);
-        }
-
-        int *hc = g->hard_copy();
-        delete g;
-        graph_molloy_hash *gh = new graph_molloy_hash(hc);
-        delete [] hc;
-
-        gh->shuffle(5 * gh->nbarcs(), 100 * gh->nbarcs(), SHUFFLE_TYPE);
-
-        IGRAPH_CHECK(gh->print(graph));
-        delete gh;
-
-        RNG_END();
+        );
 
         return 0;
     }

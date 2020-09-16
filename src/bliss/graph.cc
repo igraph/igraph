@@ -1,4 +1,5 @@
-#include <cstdio>
+
+// #include <cstdio>
 #include <cassert>
 #include <climits>
 #include <set>
@@ -13,11 +14,6 @@
 /* use 'and' instead of '&&' */
 #if _MSC_VER
 #include <ciso646>
-#endif
-
-#ifdef USING_R
-#undef stdout
-#define stdout NULL
 #endif
 
 /*
@@ -1036,15 +1032,6 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 		 */
 		if(index == cell->length and all_same_level == current_level+1)
 		  all_same_level = current_level;
-		if(verbstr and verbose_level >= 2) {
-		  fprintf(verbstr,
-			  "Level %u: orbits=%u, index=%u/%u, all_same_level=%u\n",
-			  current_level,
-			  first_path_orbits.nof_orbits(),
-			  index, cell->length,
-			  all_same_level);
-		  fflush(verbstr);
-		}
 	      }
 	    continue;
 	  }
@@ -2082,6 +2069,7 @@ Digraph::permute(const unsigned int* const perm) const
  *-------------------------------------------------------------------------*/
 
 
+#if 0
 void
 Digraph::write_dot(const char* const filename)
 {
@@ -2118,6 +2106,7 @@ Digraph::write_dot(FILE* const fp)
 
   fprintf(fp, "}\n");
 }
+#endif
 
 
 void
@@ -2187,6 +2176,7 @@ Digraph::get_hash()
  *
  *-------------------------------------------------------------------------*/
 
+#if 0
 Digraph*
 Digraph::read_dimacs(FILE* const fp, FILE* const errstr)
 {
@@ -2343,11 +2333,11 @@ Digraph::read_dimacs(FILE* const fp, FILE* const errstr)
     delete g;
   return 0;
 }
+#endif
 
 
 
-
-
+#if 0
 void
 Digraph::write_dimacs(FILE* const fp)
 {
@@ -2389,7 +2379,7 @@ Digraph::write_dimacs(FILE* const fp)
 	}
     }
 }
-
+#endif
 
 
 
@@ -3690,12 +3680,6 @@ Digraph::nucr_find_first_component(const unsigned int level)
       cr_component_elements += cell->length;
     }
 
-  if(verbstr and verbose_level > 2) {
-    fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
-	    (long unsigned)cr_component.size(), cr_component_elements);
-    fflush(verbstr);
-  }
-
   return true;
 }
 
@@ -3891,12 +3875,6 @@ Digraph::nucr_find_first_component(const unsigned int level,
       component_elements += cell->length;
     }
 
-  if(verbstr and verbose_level > 2) {
-    fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
-	    (long unsigned)component.size(), component_elements);
-    fflush(verbstr);
-  }
-
   return true;
 }
 
@@ -4036,6 +4014,7 @@ Graph::change_color(const unsigned int vertex, const unsigned int color)
  *
  *-------------------------------------------------------------------------*/
 
+#if 0
 Graph*
 Graph::read_dimacs(FILE* const fp, FILE* const errstr)
 {
@@ -4251,7 +4230,7 @@ Graph::write_dimacs(FILE* const fp)
 	}
     }
 }
-
+#endif
 
 
 void
@@ -4372,6 +4351,7 @@ Graph::permute(const unsigned int* perm) const
  *-------------------------------------------------------------------------*/
 
 
+#if 0
 void
 Graph::write_dot(const char* const filename)
 {
@@ -4409,8 +4389,7 @@ Graph::write_dot(FILE* const fp)
 
   fprintf(fp, "}\n");
 }
-
-
+#endif
 
 
 
@@ -5432,12 +5411,6 @@ Graph::nucr_find_first_component(const unsigned int level)
       cr_component_elements += cell->length;
     }
 
-  if(verbstr and verbose_level > 2) {
-    fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
-	    (long unsigned)cr_component.size(), cr_component_elements);
-    fflush(verbstr);
-  }
-
   return true;
 }
 
@@ -5595,12 +5568,6 @@ Graph::nucr_find_first_component(const unsigned int level,
       component.push_back(cell->first);
       component_elements += cell->length;
     }
-
-  if(verbstr and verbose_level > 2) {
-    fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
-	    (long unsigned)component.size(), component_elements);
-    fflush(verbstr);
-  }
 
   return true;
 }

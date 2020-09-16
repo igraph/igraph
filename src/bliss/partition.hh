@@ -25,7 +25,7 @@ namespace bliss {
 }
 
 #include <cstdlib>
-#include <cstdio>
+//#include <cstdio>
 #include <climits>
 #include "kstack.hh"
 #include "kqueue.hh"
@@ -186,12 +186,12 @@ public:
   /**
    * Print the partition into the file stream \a fp.
    */
-  size_t print(FILE* const fp, const bool add_newline = true) const;
+  // size_t print(FILE* const fp, const bool add_newline = true) const;
 
   /**
    * Print the partition cell sizes into the file stream \a fp.
    */
-  size_t print_signature(FILE* const fp, const bool add_newline = true) const;
+  // size_t print_signature(FILE* const fp, const bool add_newline = true) const;
 
   /*
    * Splits the Cell \a cell into [cell_1,...,cell_n]
