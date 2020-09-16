@@ -281,6 +281,7 @@ add_legacy_tests(
   dot
   foreign
   gml
+  graphml
   igraph_read_graph_dl
   igraph_read_graph_graphdb
   igraph_read_graph_lgl
@@ -294,12 +295,6 @@ add_legacy_tests(
   pajek_bipartite2
   pajek_signed
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    graphml
-  )
-endif()
 
 # other.at
 add_legacy_tests(
