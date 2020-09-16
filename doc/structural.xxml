@@ -52,7 +52,7 @@
 <!-- doxrox-include igraph_local_scan_1_ecount_them -->
 <!-- doxrox-include igraph_local_scan_k_ecount_them -->
 </section>
-<section id="precalculated-neighborhoods"><title>Pre-calculated neighborhoods</title>
+<section id="pre-calculated-neighborhoods"><title>Pre-calculated neighborhoods</title>
 <!-- doxrox-include igraph_local_scan_neighborhood_ecount -->
 </section>
 </section>
@@ -148,7 +148,7 @@
 <!-- doxrox-include igraph_laplacian -->
 </section>
 
-<section id="nonsimple-graphs-multiple-and-loop-edges"><title>Non-simple Graphs: Multiple and Loop Edges</title>
+<section id="non-simple-graphs-multiple-and-loop-edges"><title>Non-simple Graphs: Multiple and Loop Edges</title>
 <!-- doxrox-include igraph_is_simple -->
 <!-- doxrox-include igraph_is_loop -->
 <!-- doxrox-include igraph_is_multiple -->
@@ -163,7 +163,7 @@
 <!-- doxrox-include igraph_assortativity_degree -->
 </section>
 
-<section id="kcores"><title>K-Cores</title>
+<section id="k-cores"><title>K-Cores</title>
 <!-- doxrox-include igraph_coreness -->
 </section>
 

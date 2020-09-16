@@ -31,7 +31,7 @@
 <!-- doxrox-include igraph_vertex_connectivity -->
 </section>
 
-<section id="edge-and-vertexdisjoint-paths"><title>Edge- and Vertex-Disjoint Paths</title>
+<section id="edge-and-vertex-disjoint-paths"><title>Edge- and Vertex-Disjoint Paths</title>
 <!-- doxrox-include igraph_edge_disjoint_paths -->
 <!-- doxrox-include igraph_vertex_disjoint_paths -->
 </section>

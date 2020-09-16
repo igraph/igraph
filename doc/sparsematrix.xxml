@@ -44,7 +44,7 @@
 <!-- doxrox-include igraph_spmatrix_colsums -->
 </section>
 
-<section id="spatrix-operations"><title>Matrix operations</title>
+<section id="spmatrix-operations"><title>Matrix operations</title>
 <!-- doxrox-include igraph_spmatrix_scale -->
 <!-- doxrox-include igraph_spmatrix_add_rows -->
 <!-- doxrox-include igraph_spmatrix_add_cols -->
