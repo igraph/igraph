@@ -66,7 +66,7 @@ be graph theory or not, should have an efficient open-source
 implementation allowing use and modification for anyone.
 </para>
 
-<section><title>&igraph; is free software</title>
+<section id="igraph-is-free-software"><title>&igraph; is free software</title>
 <para>
     igraph library
 </para><para>
@@ -89,7 +89,7 @@ implementation allowing use and modification for anyone.
 </para>
 </section>
 
-<section><title>Citing &igraph;</title>
+<section id="citing-igraph"><title>Citing &igraph;</title>
 <para>
 To cite &igraph; in publications, please use the following
 reference:

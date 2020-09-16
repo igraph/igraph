@@ -9,12 +9,12 @@
 
 <!-- doxrox-include about_rngs -->
 
-<section><title>The default random number generator</title>
+<section id="default-random-number-generator"><title>The default random number generator</title>
 <!-- doxrox-include igraph_rng_default -->
 <!-- doxrox-include igraph_rng_set_default -->
 </section>
 
-<section><title>Creating random number generators</title>
+<section id="creating-random-number-generators"><title>Creating random number generators</title>
 <!-- doxrox-include igraph_rng_init -->
 <!-- doxrox-include igraph_rng_destroy -->
 <!-- doxrox-include igraph_rng_seed -->
@@ -23,7 +23,7 @@
 <!-- doxrox-include igraph_rng_name -->
 </section>
 
-<section><title>Generating random numbers</title>
+<section id="generating-random-numbers"><title>Generating random numbers</title>
 <!-- doxrox-include igraph_rng_get_integer -->
 <!-- doxrox-include igraph_rng_get_unif -->
 <!-- doxrox-include igraph_rng_get_unif01 -->
@@ -33,7 +33,7 @@
 <!-- doxrox-include igraph_rng_get_gamma -->
 </section>
 
-<section><title>Supported random number generators</title>
+<section id="supported-random-number-generators"><title>Supported random number generators</title>
 <para>
 By default igraph uses the MT19937 generator. Prior to igraph version
 0.6, the generator supplied by the standard C library was used. This
@@ -48,4 +48,3 @@ generator on others.
 <!-- doxrox-include rng_use_cases -->
 
 </chapter>
-
