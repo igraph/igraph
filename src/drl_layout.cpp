@@ -65,6 +65,8 @@ using namespace drl;
 #include "igraph_random.h"
 #include "igraph_interface.h"
 
+#include "igraph_handle_exceptions.h"
+
 namespace drl {
 
 // int main(int argc, char **argv) {
@@ -455,17 +457,19 @@ int igraph_layout_drl(const igraph_t *graph, igraph_matrix_t *res,
                       const igraph_vector_t *weights,
                       const igraph_vector_bool_t *fixed) {
 
-    RNG_BEGIN();
+    IGRAPH_HANDLE_EXCEPTIONS(
+        RNG_BEGIN();
 
-    drl::graph neighbors(graph, options, weights);
-    neighbors.init_parms(options);
-    if (use_seed) {
-        IGRAPH_CHECK(igraph_matrix_resize(res, igraph_vcount(graph), 2));
-        neighbors.read_real(res, fixed);
-    }
-    neighbors.draw_graph(res);
+        drl::graph neighbors(graph, options, weights);
+        neighbors.init_parms(options);
+        if (use_seed) {
+            IGRAPH_CHECK(igraph_matrix_resize(res, igraph_vcount(graph), 2));
+            neighbors.read_real(res, fixed);
+        }
+        neighbors.draw_graph(res);
 
-    RNG_END();
+        RNG_END();
+    );
 
     return 0;
 }

@@ -25,6 +25,7 @@
 
 ### Fixed
 
+ - `igraph_isomorphic` now verifies that the input graphs have no multi-edges (PR #1464).
  - `igraph_difference()` was creating superfluous self loops (#597).
  - `igraph_count_multiple()` was giving incorrect results for self-loops in directed graph (PR #1399).
  - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).

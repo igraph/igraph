@@ -7,29 +7,29 @@
 <chapter id="igraph-Nongraph">
 <title>Not Graph Related Functions </title>
 
-<section><title>Igraph Version Number</title>
+<section id="igraph-version-number"><title>Igraph Version Number</title>
 <!-- doxrox-include igraph_version -->
 </section>
 
-<section><title>Running Mean of a Time Series</title>
+<section id="running-mean-of-a-time-series"><title>Running Mean of a Time Series</title>
 <!-- doxrox-include igraph_running_mean -->
 </section>
 
-<section><title>Random Sampling from Very Long Sequences</title>
+<section id="random-sampling-from-very-long-sequences"><title>Random Sampling from Very Long Sequences</title>
 <!-- doxrox-include igraph_random_sample -->
 </section>
 
-<section><title>Random Sampling of Spatial Points</title>
+<section id="random-sampling-of-spatial-points"><title>Random Sampling of Spatial Points</title>
 <!-- doxrox-include igraph_sample_sphere_surface -->
 <!-- doxrox-include igraph_sample_sphere_volume -->
 <!-- doxrox-include igraph_sample_dirichlet -->
 </section>
 
-<section><title>Convex Hull of A Set of Points on A Plane</title>
+<section id="convex-hull-of-a-set-of-points-on-a-plane"><title>Convex Hull of A Set of Points on A Plane</title>
 <!-- doxrox-include igraph_convex_hull -->
 </section>
 
-<section><title>Fitting Power-law Distributions to Empirical Data</title>
+<section id="fitting-powerlaw-distributions-to-empirical-data"><title>Fitting Power-law Distributions to Empirical Data</title>
 <!-- doxrox-include igraph_plfit_result_t -->
 <!-- doxrox-include igraph_power_law_fit -->
 </section>

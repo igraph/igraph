@@ -7,14 +7,14 @@
 <chapter id="igraph-Spatial-Games">
 <title>Games on Graphs</title>
 
-<section><title>Microscopic Update Rules</title>
+<section id="microscopic-update-rules"><title>Microscopic Update Rules</title>
 <!-- doxrox-include igraph_deterministic_optimal_imitation -->
 <!-- doxrox-include igraph_moran_process -->
 <!-- doxrox-include igraph_roulette_wheel_imitation -->
 <!-- doxrox-include igraph_stochastic_imitation -->
 </section>
 
-<section><title>Epidemic Models</title>
+<section id="epidemic-models"><title>Epidemic Models</title>
 <!-- doxrox-include igraph_sir -->
 <!-- doxrox-include igraph_sir_t -->
 <!-- doxrox-include igraph_sir_destroy -->

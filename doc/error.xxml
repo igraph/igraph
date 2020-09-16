@@ -7,11 +7,11 @@
 <chapter id="igraph-Error">
 <title>Error Handling</title>
 
-<section id="igraph-errorhandlingbasics">
+<section id="error-handling-basics">
 <!-- doxrox-include errorhandlingbasics -->
 </section>
 
-<section id="igraph-errorhandlers">
+<section id="error-handlers">
 <!-- doxrox-include errorhandlers -->
 <!-- doxrox-include igraph_error_handler_t -->
 <!-- doxrox-include igraph_error_handler_abort -->
@@ -19,13 +19,13 @@
 <!-- doxrox-include igraph_error_handler_printignore -->
 </section>
 
-<section id="igraph-errorcodes">
+<section id="error-codes">
 <!-- doxrox-include errorcodes -->
 <!-- doxrox-include igraph_error_type_t -->
 <!-- doxrox-include igraph_strerror -->
 </section>
 
-<section id="igraph-warnings">
+<section id="warnings">
 <!-- doxrox-include about_igraph_warnings -->
 <!-- doxrox-include igraph_warning_handler_t -->
 <!-- doxrox-include igraph_set_warning_handler -->
@@ -36,15 +36,15 @@
 <!-- doxrox-include igraph_warning_handler_print -->
 </section>
 
-<section id="igraph-erroradvancedtopics">
+<section id="error-advanced-topics">
 <title>Advanced topics</title>
 
-<section id="igraph-writingerrorhandlers">
+<section id="writing-error-handlers">
 <!-- doxrox-include writing_error_handlers -->
 <!-- doxrox-include igraph_set_error_handler -->
 </section>
 
-<section id="igraph-errorhandlinginternals">
+<section id="error-handling-internals">
 <!-- doxrox-include error_handling_internals -->
 <!-- doxrox-include IGRAPH_ERROR -->
 <!-- doxrox-include igraph_error -->
@@ -52,18 +52,18 @@
 <!-- doxrox-include IGRAPH_CHECK -->
 </section>
 
-<section id="igraph-deallocatingmemory">
+<section id="deallocating-memory">
 <!-- doxrox-include deallocating_memory -->
 <!-- doxrox-include IGRAPH_FINALLY -->
 <!-- doxrox-include IGRAPH_FINALLY_CLEAN -->
 <!-- doxrox-include IGRAPH_FINALLY_FREE -->
 </section>
 
-<section id="igraph-writingfunctionserrorhandling">
+<section id="writing-igraph-functions-with-proper-error-handling">
 <!-- doxrox-include writing_functions_error_handling -->
 </section>
 
-<section id="igraph-errorhandlingthreads">
+<section id="error-handling-and-threads">
 <!-- doxrox-include error_handling_threads -->
 </section>
 
