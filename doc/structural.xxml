@@ -35,7 +35,7 @@
 <!-- doxrox-include igraph_radius -->
 </section>
 
-<section><title>Efficiency Measures</title>
+<section id="efficiency-measures"><title>Efficiency Measures</title>
 <!-- doxrox-include igraph_global_efficiency -->
 <!-- doxrox-include igraph_local_efficiency -->
 <!-- doxrox-include igraph_average_local_efficiency -->
