@@ -106,7 +106,6 @@ add_legacy_tests(
   igraph_create
   igraph_degree_sequence_game
   igraph_erdos_renyi_game
-  igraph_full
   igraph_grg_game
   igraph_growing_random_game
   igraph_k_regular_game
@@ -125,6 +124,7 @@ add_legacy_tests(
   FOLDER tests NAMES
   tree
   igraph_from_prufer
+  igraph_full
   igraph_realize_degree_sequence
 )
 
@@ -222,7 +222,6 @@ add_legacy_tests(
 # visitors.at
 add_legacy_tests(
   FOLDER simple NAMES
-
   igraph_bfs2
   igraph_random_walk
 )

@@ -1,5 +1,10 @@
 include(CMakeParseArguments)
 
+find_program(DIFF_TOOL diff)
+if(NOT DIFF_TOOL)
+    find_program(FC_TOOL fc)
+endif()
+
 function(add_legacy_test FOLDER NAME)
   add_executable(test_${NAME} EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/examples/${FOLDER}/${NAME})
   add_dependencies(build_tests test_${NAME})
@@ -18,6 +23,7 @@ function(add_legacy_test FOLDER NAME)
 
   set(EXPECTED_OUTPUT_FILE ${CMAKE_SOURCE_DIR}/examples/${FOLDER}/${NAME}.out)
   set(OBSERVED_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/test_${NAME}.out)
+  set(DIFF_FILE ${CMAKE_CURRENT_BINARY_DIR}/test_${NAME}.diff)
   get_filename_component(WORK_DIR ${EXPECTED_OUTPUT_FILE} DIRECTORY)
 
   if(EXISTS ${EXPECTED_OUTPUT_FILE})
@@ -27,6 +33,9 @@ function(add_legacy_test FOLDER NAME)
         -DTEST_EXECUTABLE=$<TARGET_FILE:test_${NAME}>
         -DEXPECTED_OUTPUT_FILE=${EXPECTED_OUTPUT_FILE}
         -DOBSERVED_OUTPUT_FILE=${OBSERVED_OUTPUT_FILE}
+        -DDIFF_FILE=${DIFF_FILE}
+        -DDIFF_TOOL=${DIFF_TOOL}
+        -DFC_TOOL=${FC_TOOL}
         -DIGRAPH_VERSION=${PACKAGE_VERSION}
         -P ${CMAKE_SOURCE_DIR}/etc/cmake/run_legacy_test.cmake
     )

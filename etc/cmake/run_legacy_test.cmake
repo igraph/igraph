@@ -6,6 +6,10 @@
 # - EXPECTED_OUTPUT_FILE: full path of the file containing the expected output
 # - OBSERVED_OUTPUT_FILE: full path of the file where the observed output
 #   can be written
+# - DIFF_FILE: full path of the file where the differences between the expectd
+#   and the observed output should be written
+# - DIFF_TOOL: full path to a "diff" tool on the system of the user, if present
+# - FC_TOOL: full path to a "fc" tool on the system of the user, if present
 # - IGRAPH_VERSION: version string of igraph that should be replaced in
 #   expected outputs
 
@@ -24,6 +28,7 @@ elseif(ERROR_CODE)
   set(MESSAGE "Test exited abnormally with error: ${ERROR_CODE}")
   file(WRITE ${OBSERVED_OUTPUT_FILE} "${MESSAGE}\n=========================================\n${OBSERVED_OUTPUT}")
   message(FATAL_ERROR ${MESSAGE})
+  file(REMOVE ${DIFF_FILE})
 else()
   string(REPLACE ${IGRAPH_VERSION} "\@VERSION\@" OBSERVED_OUTPUT "${OBSERVED_OUTPUT}")
   file(WRITE ${OBSERVED_OUTPUT_FILE} "${OBSERVED_OUTPUT}")
@@ -35,7 +40,20 @@ else()
   )
 
   if(ARE_DIFFERENT)
+    if(DIFF_TOOL)
+      execute_process(
+        COMMAND ${DIFF_TOOL} -u ${EXPECTED_OUTPUT_FILE} ${OBSERVED_OUTPUT_FILE}
+		OUTPUT_FILE ${DIFF_FILE}
+      )
+    elseif(FC_TOOL)
+      execute_process(
+        COMMAND ${FC_TOOL} /a ${EXPECTED_OUTPUT_FILE} ${OBSERVED_OUTPUT_FILE}
+		OUTPUT_FILE ${DIFF_FILE}
+      )
+    endif()
     message(FATAL_ERROR "Test case output differs from the expected output")
+  else()
+    file(REMOVE ${DIFF_FILE})
   endif()
 
   file(REMOVE ${OBSERVED_OUTPUT_FILE})
