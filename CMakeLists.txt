@@ -30,6 +30,9 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 set(CMAKE_CXX_STANDARD 98)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# Expose the BUILD_SHARED_LIBS option in the ccmake UI
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
+
 # Add switches to use sanitizers and debugging helpers if needed
 include(debugging)
 include(sanitizers)
