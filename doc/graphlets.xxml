@@ -7,11 +7,11 @@
 <chapter id="igraph-Graphlets">
 <title>Graphlets</title>
 
-<section>
+<section id="about-graphlets">
 <!-- doxrox-include graphlets_intro -->
 </section>
 
-<section><title>Performing graphlet decomposition</title>
+<section id="performing-graphlet-decomposition"><title>Performing graphlet decomposition</title>
 <!-- doxrox-include igraph_graphlets -->
 <!-- doxrox-include igraph_graphlets_candidate_basis -->
 <!-- doxrox-include igraph_graphlets_project -->

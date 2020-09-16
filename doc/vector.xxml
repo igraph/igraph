@@ -11,7 +11,7 @@
 <!-- doxrox-include about_igraph_vector_t_objects -->
 </section>
 
-<section>
+<section id="vector-constructors-and-destructors">
 <!-- doxrox-include igraph_vector_constructors_and_destructors -->
 <!-- doxrox-include igraph_vector_init -->
 <!-- doxrox-include igraph_vector_init_copy -->
@@ -20,12 +20,12 @@
 <!-- doxrox-include igraph_vector_destroy -->
 </section>
 
-<section><title>Initializing elements</title>
+<section id="initializing-elements"><title>Initializing elements</title>
 <!-- doxrox-include igraph_vector_null -->
 <!-- doxrox-include igraph_vector_fill -->
 </section>
 
-<section>
+<section id="vector-accessing-elements">
 <!-- doxrox-include igraph_vector_accessing_elements -->
 <!-- doxrox-include VECTOR -->
 <!-- doxrox-include igraph_vector_e -->
@@ -34,24 +34,24 @@
 <!-- doxrox-include igraph_vector_tail -->
 </section>
 
-<section><title>Vector views</title>
+<section id="vector-views"><title>Vector views</title>
 <!-- doxrox-include igraph_vector_view -->
 </section>
 
-<section><title>Copying vectors</title>
+<section id="copying-vectors"><title>Copying vectors</title>
 <!-- doxrox-include igraph_vector_copy_to -->
 <!-- doxrox-include igraph_vector_update -->
 <!-- doxrox-include igraph_vector_append -->
 <!-- doxrox-include igraph_vector_swap -->
 </section>
 
-<section><title>Exchanging elements</title>
+<section id="vector-exchanging-elements"><title>Exchanging elements</title>
 <!-- doxrox-include igraph_vector_swap_elements -->
 <!-- doxrox-include igraph_vector_reverse -->
 <!-- doxrox-include igraph_vector_shuffle -->
 </section>
 
-<section><title>Vector operations</title>
+<section id="vector-operations"><title>Vector operations</title>
 <!-- doxrox-include igraph_vector_add_constant -->
 <!-- doxrox-include igraph_vector_scale -->
 <!-- doxrox-include igraph_vector_add -->
@@ -60,7 +60,7 @@
 <!-- doxrox-include igraph_vector_div -->
 </section>
 
-<section><title>Vector comparisons</title>
+<section id="vector-comparisons"><title>Vector comparisons</title>
 <!-- doxrox-include igraph_vector_all_e -->
 <!-- doxrox-include igraph_vector_all_l -->
 <!-- doxrox-include igraph_vector_all_g -->
@@ -68,7 +68,7 @@
 <!-- doxrox-include igraph_vector_all_ge -->
 </section>
 
-<section><title>Finding minimum and maximum</title>
+<section id="vector-finding-minimum-and-maximum"><title>Finding minimum and maximum</title>
 <!-- doxrox-include igraph_vector_min -->
 <!-- doxrox-include igraph_vector_max -->
 <!-- doxrox-include igraph_vector_which_min -->
@@ -77,7 +77,7 @@
 <!-- doxrox-include igraph_vector_which_minmax -->
 </section>
 
-<section><title>Vector properties</title>
+<section id="vector-properties"><title>Vector properties</title>
 <!-- doxrox-include igraph_vector_empty -->
 <!-- doxrox-include igraph_vector_size -->
 <!-- doxrox-include igraph_vector_capacity -->
@@ -87,7 +87,7 @@
 <!-- doxrox-include igraph_vector_maxdifference -->
 </section>
 
-<section><title>Searching for elements</title>
+<section id="vector-searching-for-elements"><title>Searching for elements</title>
 <!-- doxrox-include igraph_vector_contains -->
 <!-- doxrox-include igraph_vector_search -->
 <!-- doxrox-include igraph_vector_binsearch -->
@@ -95,7 +95,7 @@
 <!-- doxrox-include igraph_vector_binsearch2 -->
 </section>
 
-<section><title>Resizing operations</title>
+<section id="vector-resizing-operations"><title>Resizing operations</title>
 <!-- doxrox-include igraph_vector_clear -->
 <!-- doxrox-include igraph_vector_reserve -->
 <!-- doxrox-include igraph_vector_resize -->
@@ -107,16 +107,16 @@
 <!-- doxrox-include igraph_vector_remove_section -->
 </section>
 
-<section><title>Sorting</title>
+<section id="vector-sorting"><title>Sorting</title>
 <!-- doxrox-include igraph_vector_sort -->
 </section>
 
-<section><title>Set operations on sorted vectors</title>
+<section id="set-operations-on-sorted-vectors"><title>Set operations on sorted vectors</title>
 <!-- doxrox-include igraph_vector_intersect_sorted -->
 <!-- doxrox-include igraph_vector_difference_sorted -->
 </section>
 
-<section>
+<section id="about-vector-ptr">
 <!-- doxrox-include about_igraph_vector_ptr_objects -->
 <!-- doxrox-include igraph_vector_ptr_init -->
 <!-- doxrox-include igraph_vector_ptr_copy -->

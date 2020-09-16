@@ -7,11 +7,11 @@
 <section id="igraph-SparseMatrices2">
 <title>Sparse matrices, another kind</title>
 
-<section>
+<section id="about-sparsemat">
 <!-- doxrox-include about_sparsemat -->
 </section>
 
-<section><title>Creating sparse matrix objects</title>
+<section id="creating-sparse-matrix-objects"><title>Creating sparse matrix objects</title>
 <!-- doxrox-include igraph_sparsemat_init -->
 <!-- doxrox-include igraph_sparsemat_copy -->
 <!-- doxrox-include igraph_sparsemat_realloc -->
@@ -20,7 +20,7 @@
 <!-- doxrox-include igraph_sparsemat_diag -->
 </section>
 
-<section><title>Query properties of a sparse matrix</title>
+<section id="query-properties-of-a-sparse-matrix"><title>Query properties of a sparse matrix</title>
 <!-- doxrox-include igraph_sparsemat_index -->
 <!-- doxrox-include igraph_sparsemat_nrow -->
 <!-- doxrox-include igraph_sparsemat_ncol -->
@@ -36,7 +36,7 @@
 <!-- doxrox-include igraph_sparsemat_colsums-->
 </section>
 
-<section><title>Operations on sprase matrices</title>
+<section id="operations-on-sprase-matrices"><title>Operations on sprase matrices</title>
 <!-- doxrox-include igraph_sparsemat_entry -->
 <!-- doxrox-include igraph_sparsemat_fkeep -->
 <!-- doxrox-include igraph_sparsemat_dropzeros -->
@@ -52,12 +52,12 @@
 <!-- doxrox-include igraph_sparsemat_resize -->
 </section>
 
-<section><title>Operations that change the internal representation</title>
+<section id="operations-that-change-the-internal-representation"><title>Operations that change the internal representation</title>
 <!-- doxrox-include igraph_sparsemat_compress -->
 <!-- doxrox-include igraph_sparsemat_dupl -->
 </section>
 
-<section><title>Decompositions and solving linear systems</title>
+<section id="decompositions-and-solving-linear-systems"><title>Decompositions and solving linear systems</title>
 <!-- doxrox-include igraph_sparsemat_symblu -->
 <!-- doxrox-include igraph_sparsemat_symbqr -->
 <!-- doxrox-include igraph_sparsemat_lsolve -->
@@ -74,19 +74,19 @@
 <!-- doxrox-include igraph_sparsemat_numeric_destroy -->
 </section>
 
-<section><title>Eigenvalues and eigenvectors</title>
+<section id="eigenvalues-and-eigenvectors"><title>Eigenvalues and eigenvectors</title>
 <!-- doxrox-include igraph_sparsemat_arpack_rssolve -->
 <!-- doxrox-include igraph_sparsemat_arpack_rnsolve -->
 </section>
 
-<section><title>Conversion to other data types</title>
+<section id="conversion-to-other-data-types"><title>Conversion to other data types</title>
 <!-- doxrox-include igraph_sparsemat -->
 <!-- doxrox-include igraph_get_sparsemat -->
 <!-- doxrox-include igraph_matrix_as_sparsemat -->
 <!-- doxrox-include igraph_sparsemat_as_matrix -->
 </section>
 
-<section><title>Writing to a file, or to the screen</title>
+<section id="writing-to-a-file-or-to-the-screen"><title>Writing to a file, or to the screen</title>
 <!-- doxrox-include igraph_sparsemat_print -->
 </section>
 

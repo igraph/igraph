@@ -8,7 +8,7 @@
 <chapter id="igraph-Tutorial">
 <title>Tutorial</title>
 
-<section><title>Lesson 1. Compiling programs using igraph.</title>
+<section id="tut-lesson-1"><title>Lesson 1. Compiling programs using igraph.</title>
 
 <para>
 The following short example program demonstrates the basic usage of 
@@ -100,7 +100,7 @@ the <command>igraph</command> library is installed, look for the
 </para>
 
 </section>
-<section><title>Lesson 2. Creating your first graphs.</title>
+<section id="tut-lesson-2"><title>Lesson 2. Creating your first graphs.</title>
 
 <para>
 The functions generating graph objects are called graph
@@ -226,7 +226,7 @@ edges can be removed by calling
 </para>
 
 </section>
-<section><title>Lesson 3. Calculating various properties of graphs.</title>
+<section id="tut-lesson-3"><title>Lesson 3. Calculating various properties of graphs.</title>
 <para>
 In our next example we will calculate various centrality measures in a
 friendship graph. The friendship graph is from the famous Zachary karate
