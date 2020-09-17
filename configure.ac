@@ -16,7 +16,7 @@ PKGCONFIG_LIBS_PRIVATE="-lxml2 -lz -lm"
 AC_SUBST(PKGCONFIG_LIBS_PRIVATE)
 
 # Test suite
-AC_CONFIG_TESTDIR(tests)
+AC_CONFIG_TESTDIR([tests],[$ac_abs_top_builddir/src/$objdir])
 AC_CONFIG_FILES([tests/Makefile tests/atlocal])
 
 # Don't allow AC_PROG_CC to set a default CFLAGS or CXXFLAGS
@@ -47,9 +47,9 @@ AC_CHECK_HEADER([sys/times.h],
       [CPPFLAGS="$CPPFLAGS -DMSDOS"],
       )
 
-AC_LIBTOOL_WIN32_DLL
-AC_LIBTOOL_DLOPEN
-AC_PROG_LIBTOOL
+# libtool
+LT_INIT([win32-dll dlopen])
+
 AM_MISSING_PROG([AUTOM4TE], [autom4te])
 
 AC_HEADER_STDC
@@ -67,24 +67,77 @@ AC_DEFUN([IGRAPH_WARNING],
 AC_SUBST(WARNING_CFLAGS)
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $1"
-AC_TRY_COMPILE(,
-[int x;],
-WARNING_CFLAGS="$WARNING_CFLAGS $1"
-AC_MSG_RESULT(yes),
-AC_MSG_RESULT(no))
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int x;]])],[WARNING_CFLAGS="$WARNING_CFLAGS $1"
+AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 CFLAGS="$ac_save_CFLAGS"])
 
 AC_DEFUN([IGRAPH_CC_SWITCH],
 [AC_MSG_CHECKING(whether compiler supports $1)
 ac_save_CFLAGS="$CFLAGS"
 CFLAGS="$CFLAGS $1"
-AC_TRY_COMPILE(,
-[int x;],
-AC_MSG_RESULT(yes)
-$2,
-AC_MSG_RESULT(no)
-$3)
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[]], [[int x;]])],[AC_MSG_RESULT(yes)
+$2],[AC_MSG_RESULT(no)
+$3])
 CFLAGS="$ac_save_CFLAGS"])
+
+## Check if '\n' printed to stdout is converted to '\r\n' (e.g. on Windows)
+AC_CACHE_CHECK([whether '\n' printed to stdout is converted to '\r\n'],
+  [igraph_cv_stdout_LF2CRLF],
+  [AC_RUN_IFELSE([AC_LANG_SOURCE(
+        [[#include <stdio.h>
+        #include <stdlib.h>
+
+        int main (int argc, char **argv)
+        {
+          FILE *fp;
+          char *s;
+          int c, c_prev;
+          /* Do nothing if no argument. */
+          if (argc == 1) return 0;
+          s = argv[1];
+          /* First argument is '0'. */
+          if(s[0] == '0' && s[1] == 0) {
+            printf ("EOL\n");
+            return 0;
+          }
+          /* File name expected in first argument. Open file in binary mode. */
+          if (! (fp=fopen (s, "rb"))) {
+            perror (s);
+            return 2;
+          }
+          /* Check for CRLF. */
+          c_prev = 0;
+          while (1) {
+            c = fgetc (fp);
+            if ( c == EOF && ferror (fp)) {
+              perror (s);
+              return 2;
+            } else if ( c == EOF ) {
+              return 0;
+            } else if ( c == '\n' && c_prev == '\r' ) {
+              return 1;
+            }
+            c_prev = c;
+          }
+          return 0;
+        }]])],
+     [# run the test: redirect program's stdout to file,
+      # then check the file content by reading byte-wise.
+      ./conftest$EXEEXT 0 > conftest.txt && ./conftest$EXEEXT conftest.txt
+      case $? in
+        (0) igraph_cv_stdout_LF2CRLF=no;;
+        (1) igraph_cv_stdout_LF2CRLF=yes;;
+        (2) igraph_cv_stdout_LF2CRLF='test failed with error';;
+      esac
+      test -f conftest.txt && rm -f conftest.txt],
+     [igraph_cv_stdout_LF2CRLF='test program compilation failed'],
+     [igraph_cv_stdout_LF2CRLF='cross-compiling - test not run']
+   )])
+if test x$igraph_cv_stdout_LF2CRLF = xyes; then
+  SED_PIPE_CRLF2LF=" | $SED 's|\x0d$||g'"
+fi
+AC_SUBST([SED_PIPE_CRLF2LF])
+
 
 ## Solaris cc does not support -ffloat-store.
 FLOATSTORE=
@@ -93,7 +146,7 @@ IGRAPH_CC_SWITCH([-fstore], [FLOATSTORE="$FLOATSTORE -fstore"], [])
 AC_SUBST(FLOATSTORE)
 
 AC_ARG_ENABLE(gcc-warnings,
-              AC_HELP_STRING([--enable-gcc-warnings],
+              AS_HELP_STRING([--enable-gcc-warnings],
                          [turn on lots of GCC warnings (not recommended)]),
 [case "${enableval}" in
    yes|no) ;;
@@ -123,27 +176,27 @@ fi
 
 use_gprof=no
 AC_ARG_ENABLE(profiling,
-              AC_HELP_STRING([--enable-profiling], [Enable gprof profiling]),
+              AS_HELP_STRING([--enable-profiling], [Enable gprof profiling]),
               [use_gprof=$enableval], [use_gprof=no])
 
 use_asan=no
 AC_ARG_ENABLE(asan,
-              AC_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
+              AS_HELP_STRING([--enable-asan], [Enable Clang address sanitizer]),
               [use_asan=$enableval], [use_asan=no])
 
 verify_finally=no
 AC_ARG_ENABLE(verify-finally,
-              AC_HELP_STRING([--enable-verify-finally], [Enable verifying the ``finally'' stack size]),
+              AS_HELP_STRING([--enable-verify-finally], [Enable verifying the ``finally'' stack size]),
               [verify_finally=$enableval], [verify_finally=no])
 
 debug=no
 AC_ARG_ENABLE(debug,
-              AC_HELP_STRING([--enable-debug], [Enable debug build]),
+              AS_HELP_STRING([--enable-debug], [Enable debug build]),
           [debug=$enableval])
 
 graphml_support=yes
 AC_ARG_ENABLE(graphml,
-              AC_HELP_STRING([--disable-graphml], [Disable support for GraphML format]),
+              AS_HELP_STRING([--disable-graphml], [Disable support for GraphML format]),
               [graphml_support=$enableval], [graphml_support=yes])
 
 HAVE_LIBXML=0
@@ -193,7 +246,7 @@ fi
 
 AC_LANG_PUSH([C++])
 gmp_support=no
-AC_ARG_ENABLE(gmp, AC_HELP_STRING([--disable-gmp], [Compile without the GMP library]))
+AC_ARG_ENABLE(gmp, AS_HELP_STRING([--disable-gmp], [Compile without the GMP library]))
 if test "x$enable_gmp" != "xno"; then
   AC_CHECK_LIB([gmp], [__gmpz_add], [
     AC_CHECK_HEADER([gmp.h], [
@@ -209,12 +262,12 @@ AC_LANG_POP([C++])
 tls_support=no
 HAVE_TLS=0
 THREAD_LOCAL=
-AC_ARG_ENABLE(tls, AC_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
+AC_ARG_ENABLE(tls, AS_HELP_STRING([--enable-tls], [Compile with thread-local storage]))
 if test "x$enable_tls" = "xyes"; then
   keywords="__thread __declspec(thread)"
   for kw in $keywords ; do
-      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw)
-      AC_TRY_COMPILE([int $kw test;], [], ac_cv_tls=$kw ; break ;)
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[int $kw test;]], [[]])],[ac_cv_tls=$kw],[])
+      AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[int $kw test;]], [[]])],[ac_cv_tls=$kw ; break ;],[])
   done
   AX_TLS([
     AC_DEFINE([HAVE_TLS], [1], [Define to 1 if you want to use thread-local storage for global igraph structures])
@@ -311,7 +364,7 @@ else
 fi
 
 glpk_support=no
-AC_ARG_ENABLE(glpk, AC_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
+AC_ARG_ENABLE(glpk, AS_HELP_STRING([--disable-glpk], [Compile without the GLPK library]))
 if test "x$enable_glpk" != "xno"; then
   if test "$internal_glpk" = "no"; then
     AC_CHECK_LIB([glpk], [glp_read_mps], [
@@ -397,7 +450,28 @@ if test "$verify_finally" = "no"; then
   CPPFLAGS="${CPPFLAGS} -DIGRAPH_VERIFY_FINALLY_STACK=0"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile include/igraph_version.h include/igraph_threading.h])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile])
+
+# Generate header files (using script ./config.status), but update only upon changes.
+dnl NB: Approach requires AC_CONFIG_FILES to be called in configure.ac.
+AC_CONFIG_COMMANDS_POST([
+  for _h in include/igraph_version.h include/igraph_threading.h; do
+    AC_MSG_CHECKING([whether to generate header file $_h])
+    ./config.status --file=$_h.tmp:$_h.in > /dev/null 2>&1
+    if ! test -f $_h; then
+      mv $_h.tmp $_h
+      AC_MSG_RESULT([generated])
+    elif diff $_h $_h.tmp > /dev/null 2>&1; then
+      rm -f $_h.tmp
+      AC_MSG_RESULT([unchanged])
+    else
+      rm -f $_h
+      mv $_h.tmp $_h
+      AC_MSG_RESULT([updated])
+    fi
+  done
+])
+
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
@@ -421,4 +495,5 @@ AC_MSG_RESULT([  Clang AddressSanitizer -- $use_asan])
 AC_MSG_RESULT([  Verify finally stack   -- $verify_finally])
 AC_MSG_RESULT([  Profiling              -- $use_gprof])
 AC_MSG_RESULT([  Link time optimization -- $use_lto])
+AC_MSG_RESULT([  CRLF2LF conversion     -- $igraph_cv_stdout_LF2CRLF])
 

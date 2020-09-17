@@ -9,7 +9,7 @@
 
 <!-- doxrox-include about_adjlists -->
 
-<section><title>Adjacent vertices</title>
+<section id="adjacenct-vertices"><title>Adjacent vertices</title>
 <!-- doxrox-include igraph_adjlist_init -->
 <!-- doxrox-include igraph_adjlist_init_empty -->
 <!-- doxrox-include igraph_adjlist_init_complementer -->
@@ -20,28 +20,28 @@
 <!-- doxrox-include igraph_adjlist_simplify -->
 </section>
 
-<section><title>Incident edges</title>
+<section id="incident-edges"><title>Incident edges</title>
 <!-- doxrox-include igraph_inclist_init -->
 <!-- doxrox-include igraph_inclist_destroy -->
 <!-- doxrox-include igraph_inclist_get -->
 <!-- doxrox-include igraph_inclist_clear -->
 </section>
 
-<section><title>Lazy adjacency list for vertices</title>
+<section id="lazy-adjacency-list"><title>Lazy adjacency list for vertices</title>
 <!-- doxrox-include igraph_lazy_adjlist_init -->
 <!-- doxrox-include igraph_lazy_adjlist_destroy -->
 <!-- doxrox-include igraph_lazy_adjlist_get -->
 <!-- doxrox-include igraph_lazy_adjlist_clear -->
 </section>
 
-<section><title>Lazy incidence list for edges</title>
+<section id="lazy-incidence-list"><title>Lazy incidence list for edges</title>
 <!-- doxrox-include igraph_lazy_inclist_init -->
 <!-- doxrox-include igraph_lazy_inclist_destroy -->
 <!-- doxrox-include igraph_lazy_inclist_get -->
 <!-- doxrox-include igraph_lazy_inclist_clear -->
 </section>
 
-<section><title>Deprecated functions</title>
+<section id="adjlists-deprecated-functions"><title>Deprecated functions</title>
 <!-- doxrox-include igraph_adjedgelist_init -->
 <!-- doxrox-include igraph_adjedgelist_destroy -->
 <!-- doxrox-include igraph_adjedgelist_get -->

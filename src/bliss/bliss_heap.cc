@@ -1,6 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <limits.h>
+#include <cstdlib>
+//#include <stdio.h>
+#include <climits>
 #include "defs.hh"
 #include "heap.hh"
 

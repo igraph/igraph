@@ -1,4 +1,4 @@
-#include <assert.h>
+#include <cassert>
 #include <vector>
 #include <list>
 #include "graph.hh"
@@ -344,7 +344,7 @@ Partition::aux_split_in_two(Partition::Cell* const cell,
 } 
 
 
-
+#if 0
 size_t
 Partition::print(FILE* const fp, const bool add_newline) const
 {
@@ -388,7 +388,7 @@ Partition::print_signature(FILE* const fp, const bool add_newline) const
   if(add_newline) r += fprintf(fp, "\n");
   return r;
 }
-
+#endif
 
 
 void

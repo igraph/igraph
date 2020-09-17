@@ -25,12 +25,17 @@ build: false
 install:
     - cmd: set PYTHONUNBUFFERED=1
 
+    # update msys2 keyring first
+    - C:\msys64\usr\bin\bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+    - C:\msys64\usr\bin\bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
+    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
+
     # update msys2
     - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -Sy pacman-mirrors"
     - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Sy"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S zstd"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S autoconf automake bison flex"
-    - C:\msys64\usr\bin\bash -lc "pacman --noconfirm -S libxml2-devel zip xz"
+    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S zstd"
+    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S autoconf automake bison flex"
+    - C:\msys64\usr\bin\bash -lc "pacman --needed --noconfirm -S libxml2-devel zip xz"
 
     # Now start with the build: first the msys2 based one
     - cmd: bash bootstrap.sh

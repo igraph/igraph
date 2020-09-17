@@ -23,6 +23,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t g, sub;
     igraph_vector_t keep;
@@ -82,6 +84,8 @@ int main() {
     igraph_destroy(&g);
 
     printf("==============\n");
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

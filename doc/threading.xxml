@@ -4,8 +4,7 @@
 <!ENTITY igraph "igraph">
 ]>
 
-<section>
-<title>Using igraph in multi-threaded programs</title>
+<section id="using-igraph-in-multi-threaded-programs"><title>Using igraph in multi-threaded programs</title>
 <para>
   The igraph library is considered thread-safe on platforms that 
   support thread-local storage. This currently includes Linux and MS
@@ -18,7 +17,7 @@
 
 <!-- doxrox-include IGRAPH_THREAD_SAFE -->
 
-<section><title>Thread-safe ARPACK library</title>
+<section id="thread-safe-arpack-library"><title>Thread-safe ARPACK library</title>
 <para>
 Note that igraph is only thread-safe if it was built with the internal
 ARPACK library, i.e. the one that comes with igraph. The standard

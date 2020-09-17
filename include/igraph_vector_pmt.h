@@ -205,6 +205,7 @@ DECLDIR void FUNCTION(igraph_vector, remove_section)(TYPE(igraph_vector) *v,
 /*-----------*/
 
 DECLDIR void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v);
+DECLDIR void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v);
 DECLDIR long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
         igraph_vector_t *inds, igraph_bool_t descending);
 

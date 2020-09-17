@@ -689,6 +689,9 @@ const unsigned int igraph_i_classedges_4u[] = { 2, 3, 1, 3, 0, 3, 1, 2, 0, 2, 0,
  * (between 0 and 15), for undirected graph it is only 4. For graphs
  * with four vertices it is 218 (directed) and 11 (undirected).
  *
+ * </para><para>
+ * Multi-edges and self-loops are ignored by this function.
+ *
  * \param graph The graph object.
  * \param isoclass Pointer to an integer, the isomorphism class will
  *        be stored here.
@@ -754,26 +757,31 @@ int igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass) {
  * \brief Decides whether two graphs are isomorphic
  *
  * </para><para>
- * From Wikipedia: The graph isomorphism problem or GI problem is the
- * graph theory problem of determining whether, given two graphs G1
- * and G2, it is possible to permute (or relabel) the vertices of one
- * graph so that it is equal to the other. Such a permutation is
- * called a graph isomorphism.</para>
+ * In simple terms, two graphs are isomorphic if they become indistinguishable
+ * from each other once their vertex labels are removed (rendering the vertices
+ * within each graph indistiguishable). More precisely, two graphs are isomorphic
+ * if there is a one-to-one mapping from the vertices of the first one
+ * to the vertices of the second such that it transforms the edge set of the
+ * first graph into the edge set of the second. This mapping is called
+ * an \em isomorphism.
  *
- * <para>This function decides which graph isomorphism algorithm to be
+ * </para><para>Currently, this function supports simple graphs and graphs
+ * with self-loops, but does not support multigraphs.
+ *
+ * </para><para>This function decides which graph isomorphism algorithm to be
  * used based on the input graphs. Right now it does the following:
  * \olist
  * \oli If one graph is directed and the other undirected then an
  *    error is triggered.
+ * \oli If one of the graphs has multi-edges then an error is triggered.
  * \oli If the two graphs does not have the same number of vertices
  *    and edges it returns with \c FALSE.
  * \oli Otherwise, if the graphs have three or four vertices then an O(1)
  *    algorithm is used with precomputed data.
  * \oli Otherwise BLISS is used, see \ref igraph_isomorphic_bliss().
  * \endolist
- * </para>
  *
- * <para> Please call the VF2 and BLISS functions directly if you need
+ * </para><para>Please call the VF2 and BLISS functions directly if you need
  * something more sophisticated, e.g. you need the isomorphic mapping.
  *
  * \param graph1 The first graph.
@@ -793,7 +801,14 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
     long int nodes1 = igraph_vcount(graph1), nodes2 = igraph_vcount(graph2);
     long int edges1 = igraph_ecount(graph1), edges2 = igraph_ecount(graph2);
     igraph_bool_t dir1 = igraph_is_directed(graph1), dir2 = igraph_is_directed(graph2);
-    igraph_bool_t loop1, loop2;
+    igraph_bool_t loop1, loop2, multi1, multi2;
+
+    IGRAPH_CHECK(igraph_has_multiple(graph1, &multi1));
+    IGRAPH_CHECK(igraph_has_multiple(graph2, &multi2));
+
+    if (multi1 || multi2) {
+        IGRAPH_ERROR("Isomorphism testing is not implemented for multigraphs", IGRAPH_UNIMPLEMENTED);
+    }
 
     if (dir1 != dir2) {
         IGRAPH_ERROR("Cannot compare directed and undirected graphs", IGRAPH_EINVAL);
@@ -821,7 +836,8 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
  * Graph isomorphism for 3-4 vertices
  *
  * This function uses precomputed indices to decide isomorphism
- * problems for graphs with only 3 or 4 vertices.
+ * problems for graphs with only 3 or 4 vertices. Multi-edges
+ * and self-loops are ignored by this function.
  * \param graph1 The first input graph.
  * \param graph2 The second input graph. Must have the same
  *   directedness as \p graph1.

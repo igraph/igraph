@@ -38,8 +38,8 @@ clean-local: $(TESTSUITE)
 
 check-local: atconfig atlocal $(TESTSUITE)
 	if [ ! -f $(TESTSUITE) ]; then cp $(top_srcdir)/tests/testsuite .; fi
-	$(SHELL) $(TESTSUITE)
+	$(SHELL) $(TESTSUITE) $(TESTSUITEFLAGS)
 
 # Run the test suite on the *installed* tree.
 installcheck-local:
-	$(SHELL) $(TESTSUITE) AUTOTEST_PATH=$(exec_prefix)/bin
+	$(SHELL) $(TESTSUITE) AUTOTEST_PATH=$(exec_prefix)/bin $(TESTSUITEFLAGS)

@@ -4,7 +4,7 @@ script_dir=$( dirname "${BASH_SOURCE[0]}" )
 if [ ! -d $script_dir/../.git ]; then
     # Not a git repo, so try to infer the version number from the
     # changelog
-	cat CHANGELOG.md | sed -ne 's/^## \[\([0-9].*\)\].*$/\1/p' | head -1
+    cat CHANGELOG.md | sed -ne 's/^## \[\([0-9].*\)\].*$/\1/p' | head -1
     exit 1
 fi
 

@@ -7,17 +7,17 @@
 <chapter id="igraph-Visitors">
 <title>Graph visitors</title>
 
-<section><title>Breadth-first search</title>
+<section id="breadth-first-search"><title>Breadth-first search</title>
 <!-- doxrox-include igraph_bfs -->
 <!-- doxrox-include igraph_bfshandler_t -->
 </section>
 
-<section><title>Depth-first search</title>
+<section id="depth-first-search"><title>Depth-first search</title>
 <!-- doxrox-include igraph_dfs -->
 <!-- doxrox-include igraph_dfshandler_t -->
 </section>
 
-<section><title>Random walks</title>
+<section id="random-walks"><title>Random walks</title>
 <!-- doxrox-include igraph_random_walk -->
 <!-- doxrox-include igraph_random_edge_walk -->
 </section>

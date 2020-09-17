@@ -25,6 +25,7 @@
 #include "igraph_datatype.h"
 #include "igraph_interface.h"
 
+#include "igraph_handle_exceptions.h"
 
 using namespace bliss;
 using namespace std;
@@ -53,7 +54,7 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
 }
 
 
-void bliss_free_graph(AbstractGraph *g) {
+static void bliss_free_graph(AbstractGraph *g) {
     delete g;
 }
 
@@ -118,7 +119,7 @@ inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) 
 
 // this is the callback function used with AbstractGraph::find_automorphisms()
 // it collects the group generators into a pointer vector
-void collect_generators(void *generators, unsigned int n, const unsigned int *aut) {
+static void collect_generators(void *generators, unsigned int n, const unsigned int *aut) {
     igraph_vector_ptr_t *gen = static_cast<igraph_vector_ptr_t *>(generators);
     igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
     igraph_vector_init(newvector, n);
@@ -153,24 +154,27 @@ void collect_generators(void *generators, unsigned int n, const unsigned int *au
  */
 int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors,
                                  igraph_vector_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
-    AbstractGraph *g = bliss_from_igraph(graph);
-    IGRAPH_FINALLY(bliss_free_graph, g);
-    const unsigned int N = g->get_nof_vertices();
+    IGRAPH_HANDLE_EXCEPTIONS(
+        AbstractGraph *g = bliss_from_igraph(graph);
+        IGRAPH_FINALLY(bliss_free_graph, g);
+        const unsigned int N = g->get_nof_vertices();
 
-    IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
-    IGRAPH_CHECK(bliss_set_colors(g, colors));
+        IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+        IGRAPH_CHECK(bliss_set_colors(g, colors));
 
-    Stats stats;
-    const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
-    IGRAPH_CHECK(igraph_vector_resize(labeling, N));
-    for (unsigned int i = 0; i < N; i++) {
-        VECTOR(*labeling)[i] = cl[i];
-    }
+        Stats stats;
+        const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
+        IGRAPH_CHECK(igraph_vector_resize(labeling, N));
+        for (unsigned int i = 0; i < N; i++) {
+            VECTOR(*labeling)[i] = cl[i];
+        }
 
-    bliss_info_to_igraph(info, stats);
+        bliss_info_to_igraph(info, stats);
 
-    delete g;
-    IGRAPH_FINALLY_CLEAN(1);
+        delete g;
+        IGRAPH_FINALLY_CLEAN(1);
+    );
+
     return IGRAPH_SUCCESS;
 }
 
@@ -199,19 +203,21 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
  */
 int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
                          igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
-    AbstractGraph *g = bliss_from_igraph(graph);
-    IGRAPH_FINALLY(bliss_free_graph, g);
+    IGRAPH_HANDLE_EXCEPTIONS(
+        AbstractGraph *g = bliss_from_igraph(graph);
+        IGRAPH_FINALLY(bliss_free_graph, g);
 
-    IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
-    IGRAPH_CHECK(bliss_set_colors(g, colors));
+        IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+        IGRAPH_CHECK(bliss_set_colors(g, colors));
 
-    Stats stats;
-    g->find_automorphisms(stats, NULL, NULL);
+        Stats stats;
+        g->find_automorphisms(stats, NULL, NULL);
 
-    bliss_info_to_igraph(info, stats);
+        bliss_info_to_igraph(info, stats);
 
-    delete g;
-    IGRAPH_FINALLY_CLEAN(1);
+        delete g;
+        IGRAPH_FINALLY_CLEAN(1);
+    );
     return IGRAPH_SUCCESS;
 }
 
@@ -241,20 +247,23 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
 int igraph_automorphism_group(
     const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_ptr_t *generators,
     igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
-    AbstractGraph *g = bliss_from_igraph(graph);
-    IGRAPH_FINALLY(bliss_free_graph, g);
+    IGRAPH_HANDLE_EXCEPTIONS(
+        AbstractGraph *g = bliss_from_igraph(graph);
+        IGRAPH_FINALLY(bliss_free_graph, g);
 
-    IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
-    IGRAPH_CHECK(bliss_set_colors(g, colors));
+        IGRAPH_CHECK(bliss_set_sh(g, sh, igraph_is_directed(graph)));
+        IGRAPH_CHECK(bliss_set_colors(g, colors));
 
-    Stats stats;
-    igraph_vector_ptr_resize(generators, 0);
-    g->find_automorphisms(stats, collect_generators, generators);
+        Stats stats;
+        igraph_vector_ptr_resize(generators, 0);
+        g->find_automorphisms(stats, collect_generators, generators);
 
-    bliss_info_to_igraph(info, stats);
+        bliss_info_to_igraph(info, stats);
 
-    delete g;
-    IGRAPH_FINALLY_CLEAN(1);
+        delete g;
+        IGRAPH_FINALLY_CLEAN(1);
+    );
+
     return IGRAPH_SUCCESS;
 }
 

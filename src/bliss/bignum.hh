@@ -21,7 +21,7 @@
 */
 
 #include <cstdlib>
-#include <cstdio>
+// #include <cstdio>
 #include <cmath>
 #include <cstring>
 #include <sstream>
@@ -111,7 +111,7 @@ public:
   /**
    * Print the number in the file stream \a fp.
    */
-  size_t print(FILE* const fp) const {return fprintf(fp, "%Lg", v); }
+  // size_t print(FILE* const fp) const {return fprintf(fp, "%Lg", v); }
 
   int tostring(char **str) const {
     int size=static_cast<int>( (std::log(std::abs(v))/std::log(10.0))+4 );

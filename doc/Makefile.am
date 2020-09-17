@@ -126,7 +126,8 @@ structural.xml: structural.xxml $(SRCDIR)/structural_properties.c \
 	$(INCLUDEDIR)/igraph_arpack.h  $(SRCDIR)/distances.c \
 	$(SRCDIR)/feedback_arc_set.c $(SRCDIR)/matching.c $(SRCDIR)/triangles.c \
 	$(SRCDIR)/paths.c $(INCLUDEDIR)/igraph_centrality.h \
-	$(SRCDIR)/scan.c $(SRCDIR)/shortest_paths.c
+	$(SRCDIR)/scan.c $(SRCDIR)/shortest_paths.c \
+	$(SRCDIR)/graphicality.c
 
 cycles.xml: cycles.xxml $(SRCDIR)/igraph_eulerian.c
 	$(DOXROX) -t $< -e $(REGEX) -o $@ $(SRCDIR)/igraph_eulerian.c

@@ -7,7 +7,7 @@
 <chapter id="igraph-Layout">
 <title>Generating Layouts for Graph Drawing</title>
 
-<section><title>2D layout generators</title>
+<section id="two-d-layout-generators"><title>2D layout generators</title>
 <!-- doxrox-include about_layouts -->
 <!-- doxrox-include igraph_layout_random -->
 <!-- doxrox-include igraph_layout_circle -->
@@ -15,7 +15,7 @@
 <!-- doxrox-include igraph_layout_grid -->
 <!-- doxrox-include igraph_layout_graphopt -->
 <!-- doxrox-include igraph_layout_bipartite -->
-<section><title>The DrL layout generator</title>
+<section id="drl-layout-generator"><title>The DrL layout generator</title>
 <!-- doxrox-include about_drl -->
 <!-- doxrox-include igraph_layout_drl_options_t -->
 <!-- doxrox-include igraph_layout_drl_default_t -->
@@ -34,7 +34,7 @@
 <!-- doxrox-include igraph_layout_sugiyama -->
 </section>
 
-<section><title>3D layout generators</title>
+<section id="three-d-layout-generators"><title>3D layout generators</title>
 <!-- doxrox-include igraph_layout_random_3d -->
 <!-- doxrox-include igraph_layout_sphere -->
 <!-- doxrox-include igraph_layout_grid_3d -->
@@ -42,7 +42,7 @@
 <!-- doxrox-include igraph_layout_kamada_kawai_3d -->
 </section>
 
-<section><title>Merging layouts</title>
+<section id="merging-layouts"><title>Merging layouts</title>
 <!-- doxrox-include igraph_layout_merge_dla -->
 </section>
 

@@ -9,3 +9,6 @@ CFLAGS='@CFLAGS@ @WARNING_CFLAGS@ @WERROR_CFLAGS@'
 # We need `config.h'.
 CPPFLAGS="-I$abs_top_builddir @CPPFLAGS@"
 
+# SED command to convert a trailing CRLF to LF (incl. leading pipe sign).
+# The variable should be empty if conversion is not needed.
+SED_PIPE_CRLF2LF=@SED_PIPE_CRLF2LF@

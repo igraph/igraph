@@ -53,10 +53,10 @@
  * \brief Reads an edge list from a file and creates a graph.
  *
  * </para><para>
- * This format is simply a series of even number integers separated by
- * whitespace. The one edge (ie. two integers) per line format is thus
- * not required (but recommended for readability). Edges of directed
- * graphs are assumed to be in from, to order.
+ * This format is simply a series of an even number of non-negative integers separated by
+ * whitespace. The integers represent vertex IDs. Placing each edge (i.e. pair of integers) 
+ * on a separate line is not required, but it is recommended for readability. 
+ * Edges of directed graphs are assumed to be in "from, to" order.
  * \param graph Pointer to an uninitialized graph object.
  * \param instream Pointer to a stream, it should be readable.
  * \param n The number of vertices in the graph. If smaller than the

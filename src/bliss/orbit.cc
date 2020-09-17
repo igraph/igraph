@@ -1,5 +1,5 @@
-#include <stdlib.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cassert>
 #include "defs.hh"
 #include "orbit.hh"
 

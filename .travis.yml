@@ -7,6 +7,9 @@ env:
   global:
     - MAKEFLAGS="-j 2"
 
+git:
+  depth: 200    # to make sure we find the latest tag when building. Increase if not enough.
+
 addons:
   apt:
     packages:
@@ -30,6 +33,9 @@ addons:
     - bison
     - gmp
     - glpk
+
+before_install:
+  - git fetch --unshallow    # to make sure that we can fetch the latest tag
 
 script:
   - make check
