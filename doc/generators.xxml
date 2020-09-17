@@ -9,7 +9,7 @@
 
 <!-- doxrox-include about_generators -->
 
-<section><title>Deterministic Graph Generators</title>
+<section id="deterministic-graph-generators"><title>Deterministic Graph Generators</title>
 <!-- doxrox-include igraph_create -->
 <!-- doxrox-include igraph_small -->
 <!-- doxrox-include igraph_adjacency -->
@@ -33,7 +33,7 @@
 <!-- doxrox-include igraph_connect_neighborhood -->
 </section>
 
-<section><title>Games: Randomized Graph Generators</title>
+<section id="games-randomized-graph-generators"><title>Games: Randomized Graph Generators</title>
 <!-- doxrox-include about_games -->
 <!-- doxrox-include igraph_grg_game -->
 <!-- doxrox-include igraph_barabasi_game -->

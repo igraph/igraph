@@ -34,7 +34,7 @@
 /**
  * \section about_rngs
  *
- * <section>
+ * <section id="about-random-numbers-in-igraph">
  * <title>About random numbers in igraph, use cases</title>
  *
  * <para>
@@ -51,9 +51,9 @@
 /**
  * \section rng_use_cases
  *
- * <section><title>Use cases</title>
+ * <section id="random-use-cases"><title>Use cases</title>
  *
- * <section><title>Normal (default) use</title>
+ * <section id="random-normal-use"><title>Normal (default) use</title>
  * <para>
  * If the user does not use any of the RNG functions explicitly, but calls
  * some of the randomized igraph functions, then a default RNG is set
@@ -70,7 +70,7 @@
  * </para>
  * </section>
  *
- * <section><title>Reproducible simulations</title>
+ * <section id="random-reproducible-simulations"><title>Reproducible simulations</title>
  * <para>
  * If reproducible results are needed, then the user should set the
  * seed of the default random number generator explicitly, using the
@@ -81,7 +81,7 @@
  * </para>
  * </section>
  *
- * <section><title>Changing the default generator</title>
+ * <section id="random-changing-default-generator"><title>Changing the default generator</title>
  * <para>
  * By default igraph uses the \ref igraph_rng_default() random number
  * generator. This can be changed any time by calling \ref
@@ -91,7 +91,7 @@
  * </para>
  * </section>
  *
- * <section><title>Using multiple generators</title>
+ * <section id="random-using-multiple-generators"><title>Using multiple generators</title>
  * <para>
  * igraph also provides functions to set up multiple random number
  * generators, using the \ref igraph_rng_init() function, and then
@@ -107,7 +107,7 @@
  * </para>
  * </section>
  *
- * <section><title>Example</title>
+ * <section id="random-example"><title>Example</title>
  * <para>
  * \example examples/simple/random_seed.c
  * </para>

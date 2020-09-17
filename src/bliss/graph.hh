@@ -29,7 +29,7 @@ namespace bliss {
   class AbstractGraph;
 }
 
-#include <cstdio>
+// #include <cstdio>
 #include <vector>
 #include "kstack.hh"
 #include "kqueue.hh"
@@ -81,6 +81,7 @@ private:
 public:
   Stats() { reset(); }
   /** Print the statistics. */
+  /*
   size_t print(FILE* const fp) const
   {
     size_t r = 0;
@@ -94,6 +95,7 @@ public:
     fflush(fp);
     return r;
   }
+  */
   /** An approximation (due to possible overflows/rounding errors) of
    * the size of the automorphism group. */
   long double get_group_size_approx() const {return group_size_approx;}
@@ -241,6 +243,7 @@ public:
 						  const unsigned int* aut),
 				     void* hook_user_param);
 
+#if 0
   /**
    * Write the graph to a file in a variant of the DIMACS format.
    * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
@@ -264,6 +267,7 @@ public:
    * \param file_name  the name of the file to which the graph is written
    */
   virtual void write_dot(const char * const file_name) = 0;
+#endif
 
   /**
    * Get a hash value for the graph.
@@ -658,6 +662,7 @@ public:
    */
   ~Graph();
 
+#if 0
   /**
    * Read the graph from the file \a fp in a variant of the DIMACS format.
    * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
@@ -690,6 +695,7 @@ public:
    * \copydoc AbstractGraph::write_dot(const char * const file_name)
    */
   void write_dot(const char* const file_name);
+#endif
 
   /**
    * \copydoc AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const
@@ -898,6 +904,7 @@ public:
    */
   ~Digraph();
 
+#if 0
   /**
    * Read the graph from the file \a fp in a variant of the DIMACS format.
    * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
@@ -928,6 +935,7 @@ public:
    * \copydoc AbstractGraph::write_dot(const char * const file_name)
    */
   void write_dot(const char * const file_name);
+#endif
 
   /**
    * \copydoc AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const

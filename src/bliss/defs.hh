@@ -29,11 +29,6 @@
 #  define BLISS_USE_GMP
 #endif
 
-#ifdef USING_R
-#include <R.h>
-#define fatal_error(...) (error(__VA_ARGS__))
-#endif
-
 namespace bliss {
 
 /**
@@ -47,9 +42,7 @@ static const char * const version = "0.73";
  * There should not be a return from this function but exit or
  * a jump to code that deallocates the AbstractGraph instance that called this.
  */
-#ifndef USING_R
 void fatal_error(const char* fmt, ...);
-#endif
 
 
 #if defined(BLISS_DEBUG)

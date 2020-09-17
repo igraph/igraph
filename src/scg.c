@@ -122,7 +122,7 @@
  * role, as for instance is the case of dynamical processes on networks.
  * </para>
  *
- * <section><title>SCG in brief</title>
+ * <section id="scg-in-brief"><title>SCG in brief</title>
  * <para>
  * The main idea of SCG is to operate on a matrix a shrinkage operation
  * specifically designed to preserve some of the matrix eigenpairs while
@@ -210,7 +210,7 @@
  * </para>
  * </section>
  *
- * <section><title>Functions for performing SCG</title>
+ * <section id="functions-for-performing-scg"><title>Functions for performing SCG</title>
  * <para>
  * The main functions are \ref igraph_scg_adjacency(), \ref
  * igraph_scg_laplacian() and \ref igraph_scg_stochastic().
@@ -241,7 +241,7 @@
  * </para>
  * </section>
  *
- * <section><title>References</title>
+ * <section id="scg-references"><title>References</title>
  * <para>
  * [1] D. Morton de Lachapelle, D. Gfeller, and P. De Los Rios,
  * Shrinking Matrices while Preserving their Eigenpairs with Application

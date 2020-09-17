@@ -765,23 +765,29 @@ int igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
  * \function igraph_lattice
  * \brief Arbitrary dimensional square lattices.
  *
- * Creates n-dimensional square lattices of the given size. Optionally,
+ * Creates d-dimensional square lattices of the given size. Optionally,
  * the lattice can be made periodic, and the neighbors within a given
  * graph distance can be connected.
  *
  * </para><para>
  * In the zero-dimensional case, the singleton graph is returned.
  *
+ * </para><para>
+ * The vertices of the resulting graph are ordered such that the
+ * index of the vertex at position <code>(i_0, i_1, i_2, ..., i_d)</code>
+ * in a lattice of size <code>(n_0, n_1, ..., n_d)</code> will be
+ * <code>i_0 + n_0 * i_1 + n_0 * n_1 * i_2 + ...</code>.
+ *
  * \param graph An uninitialized graph object.
  * \param dimvector Vector giving the sizes of the lattice in each of
- *        its dimensions. I.e. the dimension of the lattice will be the
+ *        its dimensions. The dimension of the lattice will be the
  *        same as the length of this vector.
  * \param nei Integer value giving the distance (number of steps)
  *        within which two vertices will be connected.
- * \param directed Boolean, whether to create a directed graph. The
- *        direction of the edges is determined by the generation
- *        algorithm and is unlikely to suit you, so this isn't a very
- *        useful option.
+ * \param directed Boolean, whether to create a directed graph. 
+ *        If the \c mutual and \c circular arguments are not set to true,
+ *        edges will be directed from lower-index vertices towards
+ *        higher-index ones.
  * \param mutual Boolean, if the graph is directed this gives whether
  *        to create all connections as mutual.
  * \param circular Boolean, defines whether the generated lattice is

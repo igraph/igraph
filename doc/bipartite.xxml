@@ -7,27 +7,27 @@
 <chapter id="igraph-Bipartite">
 <title>Bipartite, i.e. two-mode graphs</title>
 
-<section>
+<section id="about-bipartite">
 <!-- doxrox-include about_bipartite -->
 </section>
 
-<section><title>Create two-mode networks</title>
+<section id="create-two-mode-networks"><title>Create two-mode networks</title>
 <!-- doxrox-include igraph_create_bipartite -->
 <!-- doxrox-include igraph_full_bipartite -->
 <!-- doxrox-include igraph_bipartite_game -->
 </section>
 
-<section><title>Incidence matrices</title>
+<section id="incidence-matrices"><title>Incidence matrices</title>
 <!-- doxrox-include igraph_incidence -->
 <!-- doxrox-include igraph_get_incidence -->
 </section>
 
-<section><title>Project a two-mode graphs</title>
+<section id="project-two-mode-graphs"><title>Project two-mode graphs</title>
 <!-- doxrox-include igraph_bipartite_projection_size -->
 <!-- doxrox-include igraph_bipartite_projection -->
 </section>
 
-<section><title>Other operations on bipartite graphs</title>
+<section id="other-operations-on-bipartite-graphs"><title>Other operations on bipartite graphs</title>
 <!-- doxrox-include igraph_is_bipartite -->
 </section>
 
