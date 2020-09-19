@@ -31,6 +31,7 @@
 #include "igraph_stack.h"
 #include "igraph_attributes.h"
 #include "igraph_structural.h"
+#include "igraph_isoclasses.h"
 #include "config.h"
 
 const unsigned int igraph_i_isoclass_3[] = {  0, 1, 1, 3, 1, 5, 6, 7,
