@@ -20,9 +20,7 @@ target_include_directories(
   ${GMP_INCLUDE_DIR}
 )
 
-if (BUILD_SHARED_LIBS)
-  set_property(TARGET bliss PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif()
+set_property(TARGET bliss PROPERTY POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
 
 # If we are linking igraph to GMP, then Bliss will use GMP for bignums
 if(GMP_FOUND)

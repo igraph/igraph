@@ -16,8 +16,6 @@ add_library(
   sampling.c
 )
 
-if (BUILD_SHARED_LIBS)
-  set_property(TARGET plfit PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif()
+set_property(TARGET plfit PROPERTY POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
 
 use_all_warnings(plfit)

@@ -79,9 +79,7 @@ if (MSVC)
   )
 endif()
 
-if (BUILD_SHARED_LIBS)
-  set_property(TARGET f2c_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
-endif()
+set_property(TARGET f2c_vendored PROPERTY POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
 
 # Suppress some warnings that occur in the output because we do not want to
 # mess around with the source of f2c too much to fix these
