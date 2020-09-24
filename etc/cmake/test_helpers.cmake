@@ -10,20 +10,23 @@ function(add_legacy_test FOLDER NAME)
   add_dependencies(build_tests test_${NAME})
   target_link_libraries(test_${NAME} PRIVATE igraph)
 
-  add_custom_command(
-    TARGET test_${NAME} POST_BUILD
-    COMMAND "${CMAKE_COMMAND}"
-            "-Dlib=$<TARGET_FILE:igraph>"
-            "-Ddest_dir=$<TARGET_FILE_DIR:test_${NAME}>"
-            -P "${CMAKE_SOURCE_DIR}/etc/cmake/copy_runtime_dependencies.cmake"
-    DEPENDS
-      "$<TARGET_FILE:igraph>"
-      "${CMAKE_SOURCE_DIR}/etc/cmake/copy_runtime_dependencies.cmake"
-    DOC "Copying dependencies for igraph")
-
-  if (MSVC AND NOT BUILD_SHARED_LIBS)
-    # Add a compiler definition required to compile igraph in static mode on Windows
-    target_compile_definitions(test_${NAME} PRIVATE IGRAPH_STATIC)
+  if (MSVC)
+    if (BUILD_SHARED_LIBS)
+      # Make sure to copy DLLs
+      add_custom_command(
+        TARGET test_${NAME} POST_BUILD
+        COMMAND "${CMAKE_COMMAND}"
+                "-Dlib=$<TARGET_FILE:igraph>"
+                "-Ddest_dir=$<TARGET_FILE_DIR:test_${NAME}>"
+                -P "${CMAKE_SOURCE_DIR}/etc/cmake/copy_runtime_dependencies.cmake"
+        DEPENDS
+          "$<TARGET_FILE:igraph>"
+          "${CMAKE_SOURCE_DIR}/etc/cmake/copy_runtime_dependencies.cmake"
+        DOC "Copying dependencies for igraph")
+    else()
+      # Add a compiler definition required to compile igraph in static mode on Windows
+      target_compile_definitions(test_${NAME} PRIVATE IGRAPH_STATIC)
+    endif()
   endif()
 
   # Some tests depend on internal igraph headers so we also have to add src/
