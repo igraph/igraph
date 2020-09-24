@@ -222,34 +222,34 @@ __BEGIN_DECLS
 
 typedef struct igraph_arpack_options_t {
     /* INPUT */
-    char bmat[1];         /* I-standard problem, G-generalized */
-    int n;            /* Dimension of the eigenproblem */
-    char which[2];        /* LA, SA, LM, SM, BE */
-    int nev;                 /* Number of eigenvalues to be computed */
-    igraph_real_t tol;        /* Stopping criterion */
-    int ncv;          /* Number of columns in V */
-    int ldv;          /* Leading dimension of V */
-    int ishift;       /* 0-reverse comm., 1-exact with tridiagonal */
-    int mxiter;              /* Maximum number of update iterations to take */
-    int nb;           /* Block size on the recurrence, only 1 works */
-    int mode;     /* The kind of problem to be solved (1-5)
-                   1: A*x=l*x, A symmetric
-                   2: A*x=l*M*x, A symm. M pos. def.
-                   3: K*x = l*M*x, K symm., M pos. semidef.
-                   4: K*x = l*KG*x, K s. pos. semidef. KG s. indef.
-                   5: A*x = l*M*x, A symm., M symm. pos. semidef. */
-    int start;        /* 0: random, 1: use the supplied vector */
-    int lworkl;       /* Size of temporary storage, default is fine */
-    igraph_real_t sigma;          /* The shift for modes 3,4,5 */
-    igraph_real_t sigmai;     /* The imaginary part of shift for rnsolve */
+    char bmat[1];          /* I-standard problem, G-generalized */
+    int n;                 /* Dimension of the eigenproblem */
+    char which[2];         /* LA, SA, LM, SM, BE */
+    int nev;               /* Number of eigenvalues to be computed */
+    igraph_real_t tol;     /* Stopping criterion */
+    int ncv;               /* Number of columns in V */
+    int ldv;               /* Leading dimension of V */
+    int ishift;            /* 0-reverse comm., 1-exact with tridiagonal */
+    int mxiter;            /* Maximum number of update iterations to take */
+    int nb;                /* Block size on the recurrence, only 1 works */
+    int mode;              /* The kind of problem to be solved (1-5)
+                               1: A*x=l*x, A symmetric
+                               2: A*x=l*M*x, A symm. M pos. def.
+                               3: K*x = l*M*x, K symm., M pos. semidef.
+                               4: K*x = l*KG*x, K s. pos. semidef. KG s. indef.
+                               5: A*x = l*M*x, A symm., M symm. pos. semidef. */
+    int start;             /* 0: random, 1: use the supplied vector */
+    int lworkl;            /* Size of temporary storage, default is fine */
+    igraph_real_t sigma;   /* The shift for modes 3,4,5 */
+    igraph_real_t sigmai;  /* The imaginary part of shift for rnsolve */
     /* OUTPUT */
-    int info;     /* What happened, see docs */
-    int ierr;     /* What happened  in the dseupd call */
-    int noiter;       /* The number of iterations taken */
+    int info;              /* What happened, see docs */
+    int ierr;              /* What happened  in the dseupd call */
+    int noiter;            /* The number of iterations taken */
     int nconv;
-    int numop;        /* Number of OP*x operations */
-    int numopb;       /* Number of B*x operations if BMAT='G' */
-    int numreo;       /* Number of steps of re-orthogonalizations */
+    int numop;             /* Number of OP*x operations */
+    int numopb;            /* Number of B*x operations if BMAT='G' */
+    int numreo;            /* Number of steps of re-orthogonalizations */
     /* INTERNAL */
     int iparam[11];
     int ipntr[14];
