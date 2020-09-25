@@ -18,6 +18,8 @@
  - Corrected several issues that could arise during an error condition (PRs #1405, #1406, #1438).
  - `igraph_realize_degree_sequence()` did not correctly detect some non-graphical inputs.
  - `igraph_is_graphical_degree_sequence()`: fixed incorrect results in undirected case (PR #1441).
+ - `igraph_eigenvector_centrality()`: fixed incorrect value for isolated vertices in weighted graphs.
+ - `igraph_adjlist_remove_duplicate()` and `igraph_inclist_remove_duplicate()` incorrectly created self-loops on isolated vertices.
 
 ### Other
 
