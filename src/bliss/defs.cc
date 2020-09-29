@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cstdio>
+#include <stdexcept>
 #include "defs.hh"
 
 /*
@@ -23,20 +24,17 @@
 
 namespace bliss {
 
-#ifndef USING_R
-
 void
 fatal_error(const char* fmt, ...)
 {
+  char buffer[1024];
   va_list ap;
   va_start(ap, fmt);
-  fprintf(stderr,"Bliss fatal error: ");
-  vfprintf(stderr, fmt, ap);
-  fprintf(stderr, "\nAborting!\n");
+  sprintf(buffer, "Bliss fatal error: ");
+  vsprintf(buffer, fmt, ap);
+  throw std::runtime_error(buffer);
   va_end(ap);
   exit(1);
 }
-
-#endif
 
 }

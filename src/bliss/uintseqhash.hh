@@ -1,7 +1,7 @@
 #ifndef BLISS_UINTSEQHASH_HH
 #define BLISS_UINTSEQHASH_HH
 
-#include <cstdio>
+// #include <cstdio>
 
 /*
   Copyright (c) 2003-2015 Tommi Junttila

@@ -5,7 +5,7 @@
 ]>
 
 <section id="igraph-Dqueues">
-<title>Double-ended queues</title>
+<title id="double-ended-queues">Double-ended queues</title>
 
 <!-- doxrox-include igraph_dqueue -->
 <!-- doxrox-include igraph_dqueue_init -->

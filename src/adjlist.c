@@ -360,21 +360,27 @@ int igraph_adjlist_simplify(igraph_adjlist_t *al) {
 
 int igraph_adjlist_remove_duplicate(const igraph_t *graph,
                                     igraph_adjlist_t *al) {
-    long int i;
-    long int n = al->length;
+    long int i, j, l, n, p;
+    igraph_vector_int_t *v;
+
     IGRAPH_UNUSED(graph);
+
+    n = al->length;
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = &al->adjs[i];
-        long int j, p = 1, l = igraph_vector_int_size(v);
-        for (j = 1; j < l; j++) {
-            long int e = (long int) VECTOR(*v)[j];
-            /* Non-loop edges, and one end of loop edges are fine. */
-            /* We use here, that the vector is sorted and we also keep it sorted */
-            if (e != i || VECTOR(*v)[j - 1] != e) {
-                VECTOR(*v)[p++] = e;
+        v = &al->adjs[i];
+        l = igraph_vector_int_size(v);
+        if (l > 0) {
+            p = 1;
+            for (j = 1; j < l; j++) {
+                long int e = (long int) VECTOR(*v)[j];
+                /* Non-loop edges, and one end of loop edges are fine. */
+                /* We assume that the vector is sorted and we also keep it sorted */
+                if (e != i || VECTOR(*v)[j - 1] != e) {
+                    VECTOR(*v)[p++] = e;
+                }
             }
+            igraph_vector_int_resize(v, p);
         }
-        igraph_vector_int_resize(v, p);
     }
 
     return 0;
@@ -501,21 +507,25 @@ void igraph_adjedgelist_destroy(igraph_inclist_t *il) {
 
 int igraph_inclist_remove_duplicate(const igraph_t *graph,
                                     igraph_inclist_t *al) {
-    long int i;
-    long int n = al->length;
+    long int i, j, l, n, p;
+    igraph_vector_int_t* v;
+
+    n = al->length;
     for (i = 0; i < n; i++) {
-        igraph_vector_int_t *v = &al->incs[i];
-        long int j, p = 1, l = igraph_vector_int_size(v);
-        for (j = 1; j < l; j++) {
-            long int e = (long int) VECTOR(*v)[j];
-            /* Non-loop edges and one end of loop edges are fine. */
-            /* We use here, that the vector is sorted and we also keep it sorted */
-            if (IGRAPH_FROM(graph, e) != IGRAPH_TO(graph, e) ||
-                VECTOR(*v)[j - 1] != e) {
-                VECTOR(*v)[p++] = e;
+        v = &al->incs[i];
+        l = igraph_vector_int_size(v);
+        if (l > 0) {
+            p = 1;
+            for (j = 1; j < l; j++) {
+                long int e = (long int) VECTOR(*v)[j];
+                /* Non-loop edges and one end of loop edges are fine. */
+                /* We assume that the vector is sorted and we also keep it sorted */
+                if (VECTOR(*v)[j - 1] != e) {
+                    VECTOR(*v)[p++] = e;
+                }
             }
+            igraph_vector_int_resize(v, p);
         }
-        igraph_vector_int_resize(v, p);
     }
 
     return 0;

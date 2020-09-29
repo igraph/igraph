@@ -7,11 +7,11 @@
 <chapter id="igraph-Iterators">
 <title>Vertex and Edge Selectors and Sequences, Iterators</title>
 
-<section>
+<section id="about-iterators">
 <!-- doxrox-include about_iterators -->
 </section>
 
-<section><title>Vertex selector constructors</title>
+<section id="vertex-selector-constructors"><title>Vertex selector constructors</title>
 <!-- doxrox-include about_vertex_selectors -->
 <!-- doxrox-include igraph_vs_all -->
 <!-- doxrox-include igraph_vs_adj -->
@@ -24,7 +24,7 @@
 <!-- doxrox-include igraph_vs_seq -->
 </section>
 
-<section><title>Generic vertex selector operations</title>
+<section id="generic-vertex-selector-operations"><title>Generic vertex selector operations</title>
 <!-- doxrox-include igraph_vs_copy -->
 <!-- doxrox-include igraph_vs_destroy -->
 <!-- doxrox-include igraph_vs_is_all -->
@@ -32,7 +32,7 @@
 <!-- doxrox-include igraph_vs_type -->
 </section>
 
-<section><title>Immediate vertex selectors</title>
+<section id="immediate-vertex-selectors"><title>Immediate vertex selectors</title>
 <!-- doxrox-include igraph_vss_all -->
 <!-- doxrox-include igraph_vss_none -->
 <!-- doxrox-include igraph_vss_1 -->
@@ -40,10 +40,10 @@
 <!-- doxrox-include igraph_vss_seq -->
 </section>
 
-<section><title>Vertex iterators</title>
+<section id="vertex-iterators"><title>Vertex iterators</title>
 <!-- doxrox-include igraph_vit_create -->
 <!-- doxrox-include igraph_vit_destroy -->
-<section><!-- doxrox-include IGRAPH_VIT --></section>
+<section id="stepping-over-vertices"><!-- doxrox-include IGRAPH_VIT --></section>
 <!-- doxrox-include IGRAPH_VIT_NEXT -->
 <!-- doxrox-include IGRAPH_VIT_END -->
 <!-- doxrox-include IGRAPH_VIT_SIZE -->
@@ -51,7 +51,7 @@
 <!-- doxrox-include IGRAPH_VIT_GET -->
 </section>
 
-<section><title>Edge selector constructors</title>
+<section id="edge-selector-constructors"><title>Edge selector constructors</title>
 <!-- doxrox-include igraph_es_all -->
 <!-- doxrox-include igraph_es_incident -->
 <!-- doxrox-include igraph_es_none -->
@@ -64,7 +64,7 @@
 <!-- doxrox-include igraph_es_vector_copy -->
 </section>
 
-<section><title>Immediate edge selectors</title>
+<section id="immediate-edge-selectors"><title>Immediate edge selectors</title>
 <!-- doxrox-include igraph_ess_all -->
 <!-- doxrox-include igraph_ess_none -->
 <!-- doxrox-include igraph_ess_1 -->
@@ -72,7 +72,7 @@
 <!-- doxrox-include igraph_ess_seq -->
 </section>
 
-<section><title>Generic edge selector operations</title>
+<section id="generic-edge-selector-operations"><title>Generic edge selector operations</title>
 <!-- doxrox-include igraph_es_copy -->
 <!-- doxrox-include igraph_es_destroy -->
 <!-- doxrox-include igraph_es_is_all -->
@@ -80,10 +80,10 @@
 <!-- doxrox-include igraph_es_type -->
 </section>
 
-<section><title>Edge iterators</title>
+<section id="edge-iterators"><title>Edge iterators</title>
 <!-- doxrox-include igraph_eit_create -->
 <!-- doxrox-include igraph_eit_destroy -->
-<section><!-- doxrox-include IGRAPH_EIT --></section>
+<section id="stepping-over-edges"><!-- doxrox-include IGRAPH_EIT --></section>
 <!-- doxrox-include IGRAPH_EIT_NEXT -->
 <!-- doxrox-include IGRAPH_EIT_END -->
 <!-- doxrox-include IGRAPH_EIT_SIZE -->
@@ -92,7 +92,7 @@
 </section>
 
 
-<!-- <section><title>Examples</title>
+<!-- <section id="examples"><title>Examples</title>
 	</section> 
 -->
 

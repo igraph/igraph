@@ -26,11 +26,12 @@
  *
  */
 
-#include <cstdio>
-using namespace std;
+//#include <cstdio>
+#include <vector>
 
 namespace bliss {
 
+#if 0
 /**
  * Print the permutation \a perm of {0,...,N-1} in the cycle format
  * in the file stream \a fp.
@@ -51,6 +52,7 @@ void print_permutation(FILE* fp,
 void print_permutation(FILE* fp,
 		       const std::vector<unsigned int>& perm,
 		       const unsigned int offset = 0);
+#endif
 
 /**
  * Check whether \a perm is a valid permutation on {0,...,N-1}.

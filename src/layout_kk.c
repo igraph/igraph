@@ -41,8 +41,10 @@
  *        contain the result (x-positions in column zero and
  *        y-positions in column one) and will be resized if needed.
  * \param use_seed Boolean, whether to use the values supplied in the
- *        \p res argument as the initial configuration. If zero then a
- *        random initial configuration is used.
+ *        \p res argument as the initial configuration. If zero and there
+ *        are any limits on the X or Y coordinates, then a random initial
+ *        configuration is used. Otherwise the vertices are placed on a
+ *        circle of radius 1 as the initial configuration.
  * \param maxiter The maximum number of iterations to perform. A reasonable
  *        default value is at least ten (or more) times the number of
  *        vertices.
@@ -340,8 +342,10 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  *        contain the result (x-positions in column zero and
  *        y-positions in column one) and will be resized if needed.
  * \param use_seed Boolean, whether to use the values supplied in the
- *        \p res argument as the initial configuration. If zero then a
- *        random initial configuration is used.
+ *        \p res argument as the initial configuration. If zero and there
+ *        are any limits on the X, Y or Z coordinates, then a random initial
+ *        configuration is used. Otherwise the vertices are placed uniformly
+ *        on a sphere of radius 1 as the initial configuration.
  * \param maxiter The maximum number of iterations to perform. A reasonable
  *        default value is at least ten (or more) times the number of
  *        vertices.
@@ -577,6 +581,7 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
             dz = old_z - MATRIX(*res, i, 2);
             dist = sqrt(dx * dx + dy * dy + dz * dz);
             den = dist * (dx * dx + dy * dy + dz * dz);
+
             k_mi = MATRIX(kij, m, i);
             l_mi = MATRIX(lij, m, i);
             Axx += k_mi * (1 - l_mi * (dy * dy + dz * dz) / den);
@@ -594,9 +599,16 @@ int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
 #define DET(a,b,c,d,e,f,g,h,i) ((a*e*i+b*f*g+c*d*h)-(c*e*g+b*d*i+a*f*h))
 
         detnum  = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Axz, Ayz, Azz);
-        delta_x = DET(Ax, Ay, Az, Axy, Ayy, Ayz, Axz, Ayz, Azz) / detnum;
-        delta_y = DET(Axx, Axy, Axz, Ax, Ay, Az, Axz, Ayz, Azz) / detnum;
-        delta_z = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Ax, Ay, Az ) / detnum;
+        if (detnum != 0) {
+            delta_x = DET(Ax, Ay, Az, Axy, Ayy, Ayz, Axz, Ayz, Azz) / detnum;
+            delta_y = DET(Axx, Axy, Axz, Ax, Ay, Az, Axz, Ayz, Azz) / detnum;
+            delta_z = DET(Axx, Axy, Axz, Axy, Ayy, Ayz, Ax, Ay, Az ) / detnum;
+        } else {
+            /* No new stable position for node m; this can happen in rare
+             * cases, e.g., if the graph has two nodes only. It's best to leave
+             * the node where it is. */
+            delta_x = delta_y = delta_z = 0;
+        }
 
         new_x = old_x + delta_x;
         new_y = old_y + delta_y;

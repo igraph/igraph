@@ -7,11 +7,11 @@
 <chapter id="igraph-HRG">
 <title>Hierarchical random graphs</title>
 
-<section>
+<section id="hrg-intro">
 <!-- doxrox-include hrg_intro -->
 </section>
 
-<section><title>Representing HRGs</title>
+<section id="representing-hrgs"><title>Representing HRGs</title>
 <!-- doxrox-include igraph_hrg_t -->
 <!-- doxrox-include igraph_hrg_init -->
 <!-- doxrox-include igraph_hrg_destroy -->
@@ -19,22 +19,22 @@
 <!-- doxrox-include igraph_hrg_resize -->
 </section>
 
-<section><title>Fitting HRGs</title>
+<section id="fitting-hrgs"><title>Fitting HRGs</title>
 <!-- doxrox-include igraph_hrg_fit -->
 <!-- doxrox-include igraph_hrg_consensus -->
 </section>
 
-<section><title>HRG sampling</title>
+<section id="hrg-sampling"><title>HRG sampling</title>
 <!-- doxrox-include igraph_hrg_sample -->
 <!-- doxrox-include igraph_hrg_game -->
 </section>
 
-<section><title>Conversion to and from igraph graphs</title>
+<section id="conversion-to-and-from-igraph-graphs"><title>Conversion to and from igraph graphs</title>
 <!-- doxrox-include igraph_hrg_dendrogram -->
 <!-- doxrox-include igraph_hrg_create -->
 </section>
 
-<section><title>Predicting missing edges</title>
+<section id="predicting-missing-edges"><title>Predicting missing edges</title>
 <!-- doxrox-include igraph_hrg_predict -->
 </section>
 

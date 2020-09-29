@@ -34,13 +34,13 @@
 
 #ifndef INTERNAL_BLAS
     #define igraphdaxpy_    daxpy_
-    #define igraphdger_ dger_
+    #define igraphdger_     dger_
     #define igraphdcopy_    dcopy_
     #define igraphdscal_    dscal_
     #define igraphdswap_    dswap_
     #define igraphdgemm_    dgemm_
     #define igraphdgemv_    dgemv_
-    #define igraphddot_ ddot_
+    #define igraphddot_     ddot_
     #define igraphdnrm2_    dnrm2_
     #define igraphlsame_    lsame_
     #define igraphdrot_     drot_

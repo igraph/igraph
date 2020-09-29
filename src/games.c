@@ -4772,7 +4772,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
  * \brief Generates a random tree with the given number of nodes
  *
  * This function samples uniformly from the set of labelled trees,
- * i.e. it can generate each labelled tree with the same probability.
+ * i.e. it generates each labelled tree with the same probability.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param n The number of nodes in the tree.
@@ -4780,7 +4780,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
  * \param method The algorithm to use to generate the tree. Possible values:
  *        \clist
  *        \cli IGRAPH_RANDOM_TREE_PRUFER
- *          This algorithm samples Pr&uuml;fer sequences unformly, then converts them to trees.
+ *          This algorithm samples Pr&uuml;fer sequences uniformly, then converts them to trees.
  *          Directed trees are not currently supported.
  *        \cli IGRAPH_RANDOM_LERW
  *          This algorithm effectively performs a loop-erased random walk on the complete graph

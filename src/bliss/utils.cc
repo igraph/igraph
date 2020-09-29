@@ -23,6 +23,7 @@
 
 namespace bliss {
 
+#if 0
 void
 print_permutation(FILE* const fp,
 		  const unsigned int N,
@@ -88,6 +89,7 @@ print_permutation(FILE* const fp,
     fprintf(fp, ")");
   }
 }
+#endif
 
 bool
 is_permutation(const unsigned int N, const unsigned int* perm)

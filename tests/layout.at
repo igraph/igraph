@@ -78,3 +78,9 @@ AT_SETUP([Davidson-Harel layout (igraph_layout_davidson_harel):])
 AT_KEYWORDS([layout Davidson-Harel])
 AT_COMPILE_CHECK([simple/igraph_layout_davidson_harel.c])
 AT_CLEANUP
+
+AT_SETUP([Kamada-Kawai 3D layout bug with two vertices (igraph_layout_kamada_kawai_3d):])
+AT_KEYWORDS([kamada kawai 3d layout bug igraph_layout_kamada_kawai_3d])
+AT_COMPILE_CHECK([tests/igraph_layout_kamada_kawai_3d_bug_1462.c],
+  [tests/igraph_layout_kamada_kawai_3d_bug_1462.out])
+AT_CLEANUP

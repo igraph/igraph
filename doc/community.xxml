@@ -7,7 +7,7 @@
 <chapter id="igraph-Community">
 <title>Detecting Community Structure</title>
 
-<section><title>Common functions related to community structure</title>
+<section id="common-functions-related-to-community-detection"><title>Common functions related to community structure</title>
 <!-- doxrox-include igraph_modularity -->
 <!-- doxrox-include igraph_modularity_matrix -->
 <!-- doxrox-include igraph_community_optimal_modularity -->
@@ -17,42 +17,42 @@
 <!-- doxrox-include igraph_split_join_distance -->
 </section>
 
-<section><title>Community structure based on statistical mechanics</title>
+<section id="community-detection-based-on-statistical-mechanics"><title>Community structure based on statistical mechanics</title>
 <!-- doxrox-include igraph_community_spinglass -->
 <!-- doxrox-include igraph_community_spinglass_single -->
 </section>
 
-<section><title>Community structure based on eigenvectors of matrices</title>
+<section id="community-structure-based-on-eigenvectors-of-matrices"><title>Community structure based on eigenvectors of matrices</title>
 <!-- doxrox-include about_leading_eigenvector_methods -->
 <!-- doxrox-include igraph_community_leading_eigenvector -->
 <!-- doxrox-include igraph_community_leading_eigenvector_callback_t -->
 <!-- doxrox-include igraph_le_community_to_membership -->
 </section>
 
-<section><title>Walktrap: community structure based on random walks</title>
+<section id="walktrap-community-structure-based-on-random-walks"><title>Walktrap: community structure based on random walks</title>
 <!-- doxrox-include igraph_community_walktrap -->
 </section>
 
-<section><title>Edge betweenness based community detection</title>
+<section id="edge-betweenness-based-community-detection"><title>Edge betweenness based community detection</title>
 <!-- doxrox-include igraph_community_edge_betweenness -->
 <!-- doxrox-include igraph_community_eb_get_merges -->
 </section>
 
-<section><title>Community structure based on the optimization of modularity</title>
+<section id="community-structure-based-on-the-optimization-of-modularity"><title>Community structure based on the optimization of modularity</title>
 <!-- doxrox-include igraph_community_fastgreedy -->
 <!-- doxrox-include igraph_community_multilevel -->
 <!-- doxrox-include igraph_community_leiden -->
 </section>
 
-<section><title>Fluid Communities</title>
+<section id="fluid-communities"><title>Fluid Communities</title>
 <!-- doxrox-include igraph_community_fluid_communities -->
 </section>
 
-<section><title>Label propagation</title>
+<section id="label-propagation"><title>Label propagation</title>
 <!-- doxrox-include igraph_community_label_propagation -->
 </section>
 
-<section><title>The InfoMAP algorithm</title>
+<section id="infomap-algorithm"><title>The InfoMAP algorithm</title>
 <!-- doxrox-include igraph_community_infomap -->
 </section>
 
