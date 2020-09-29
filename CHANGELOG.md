@@ -18,6 +18,7 @@
  - Corrected several issues that could arise during an error condition (PRs #1405, #1406, #1438).
  - `igraph_realize_degree_sequence()` did not correctly detect some non-graphical inputs.
  - `igraph_is_graphical_degree_sequence()`: fixed incorrect results in undirected case (PR #1441).
+ - `igraph_community_leiden()`: fixed incorrect result when self-loops are present (PR #1476).
 
 ### Other
 
