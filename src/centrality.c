@@ -140,25 +140,6 @@ static int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real
     return 0;
 }
 
-static int igraph_i_eigenvector_centrality_loop(igraph_adjlist_t *adjlist) {
-
-    long int i, j, k, nlen, n = igraph_adjlist_size(adjlist);
-    igraph_vector_int_t *neis;
-
-    for (i = 0; i < n; i++) {
-        neis = igraph_adjlist_get(adjlist, i);
-        nlen = igraph_vector_int_size(neis);
-        for (j = 0; j < nlen && VECTOR(*neis)[j] < i; j++) ;
-        for (k = j; k < nlen && VECTOR(*neis)[k] == i; k++) ;
-        if (k != j) {
-            /* First loop edge is 'j', first non-loop edge is 'k' */
-            igraph_vector_int_remove_section(neis, j + (k - j) / 2, k);
-        }
-    }
-
-    return 0;
-}
-
 int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
         igraph_real_t *value, igraph_bool_t scale,
         const igraph_vector_t *weights,
@@ -236,8 +217,6 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-        IGRAPH_CHECK(igraph_i_eigenvector_centrality_loop(&adjlist));
-
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
                                            &adjlist, options, 0, &values, &vectors));
 
@@ -251,8 +230,6 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
 
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-
-        IGRAPH_CHECK(igraph_inclist_remove_duplicate(graph, &inclist));
 
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
                                            &data, options, 0, &values, &vectors));
