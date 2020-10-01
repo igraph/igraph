@@ -38,7 +38,7 @@ int main() {
     igraph_arpack_options_init(&options);
     igraph_vector_init(&v, 0);
     igraph_eigenvector_centrality(&g, &v, &value, /*directed=*/ 0,
-                                  /*scale=*/0, /*weights=*/0,
+                                  /*scale=*/1, /*weights=*/0,
                                   &options);
 
     if (options.info != 0) {
@@ -46,7 +46,7 @@ int main() {
     }
 
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        printf(" %.3f", fabs(VECTOR(v)[i]));
+        printf(" %.4f", fabs(VECTOR(v)[i]));
     }
     printf("\n");
 
