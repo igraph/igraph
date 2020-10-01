@@ -134,7 +134,7 @@ static int igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vect
  * \brief Computes a vertex coloring using a greedy algorithm.
  *
  * </para><para>
- * This function assigns a "color"---represented as a non-negative integer---to
+ * This function assigns a "color"—represented as a non-negative integer—to
  * each vertex of the graph in such a way that neighboring vertices never have
  * the same color. The obtained coloring is not necessarily minimal.
  *

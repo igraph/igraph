@@ -22,18 +22,21 @@
  - `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.
  - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
+ - `igraph_eigenvector_centrality()` assumes the adjacency matrix of undirected graphs to have twice the number of self-loops for each vertex on the diagonal.
 
 ### Fixed
 
- - `igraph_isomorphic` now verifies that the input graphs have no multi-edges (PR #1464).
+ - `igraph_isomorphic()` now verifies that the input graphs have no multi-edges (PR #1464).
  - `igraph_difference()` was creating superfluous self loops (#597).
  - `igraph_count_multiple()` was giving incorrect results for self-loops in directed graph (PR #1399).
  - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).
  - `igraph_eigen_matrix_symmetric()`: fixed incorrect matrix multiplication (PR #1379).
  - Corrected several issues that could arise during an error condition (PRs #1405, #1406, #1438).
  - `igraph_realize_degree_sequence()` did not correctly detect some non-graphical inputs.
+ - `igraph_is_graphical_degree_sequence()`: fixed incorrect results in undirected case (PR #1441).
+ - `igraph_community_leiden()`: fixed incorrect result when self-loops are present (PR #1476).
  - `igraph_eigenvector_centrality()`: fixed incorrect value for isolated vertices in weighted graphs.
- - `igraph_adjlist_remove_duplicate()` and `igraph_inclist_remove_duplicate()` incorrectly created self-loops on isolated vertices.
+ - `igraph_eigenvector_centrality()`: corrected the handling of self-loops.
 
 ### Other
 

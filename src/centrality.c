@@ -140,25 +140,6 @@ static int igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real
     return 0;
 }
 
-static int igraph_i_eigenvector_centrality_loop(igraph_adjlist_t *adjlist) {
-
-    long int i, j, k, nlen, n = igraph_adjlist_size(adjlist);
-    igraph_vector_int_t *neis;
-
-    for (i = 0; i < n; i++) {
-        neis = igraph_adjlist_get(adjlist, i);
-        nlen = igraph_vector_int_size(neis);
-        for (j = 0; j < nlen && VECTOR(*neis)[j] < i; j++) ;
-        for (k = j; k < nlen && VECTOR(*neis)[k] == i; k++) ;
-        if (k != j) {
-            /* First loop edge is 'j', first non-loop edge is 'k' */
-            igraph_vector_int_remove_section(neis, j + (k - j) / 2, k);
-        }
-    }
-
-    return 0;
-}
-
 int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
         igraph_real_t *value, igraph_bool_t scale,
         const igraph_vector_t *weights,
@@ -236,8 +217,6 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
         IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
 
-        IGRAPH_CHECK(igraph_i_eigenvector_centrality_loop(&adjlist));
-
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality,
                                            &adjlist, options, 0, &values, &vectors));
 
@@ -251,8 +230,6 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
 
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
-
-        IGRAPH_CHECK(igraph_inclist_remove_duplicate(graph, &inclist));
 
         IGRAPH_CHECK(igraph_arpack_rssolve(igraph_i_eigenvector_centrality2,
                                            &data, options, 0, &values, &vectors));
@@ -504,19 +481,32 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
  *
  * Eigenvector centrality is a measure of the importance of a node in a
  * network. It assigns relative scores to all nodes in the network based
- * on the principle that connections to high-scoring nodes contribute
- * more to the score of the node in question than equal connections to
- * low-scoring nodes. In practice, this is determined by calculating the
+ * on the principle that connections from high-scoring nodes contribute
+ * more to the score of the node in question than equal connections from
+ * low-scoring nodes. Specifically, the eigenvector centrality of each
+ * vertex is proportional to the sum of eigenvector centralities of its
+ * neighbors. In practice, the centralities are determined by calculating the
  * eigenvector corresponding to the largest positive eigenvalue of the
- * adjacency matrix. The centrality scores returned by igraph are always
- * normalized such that the largest eigenvector centrality score is one
- * (with one exception, see below).
+ * adjacency matrix. In the undirected case, this function considers
+ * the diagonal entries of the adjacency matrix to be \em twice the number of
+ * self-loops on the corresponding vertex.
  *
  * </para><para>
- * Since the eigenvector centrality scores of nodes in different components
- * do not affect each other, it may be beneficial for large graphs to
- * decompose it first into weakly connected components and calculate the
- * centrality scores individually for each component.
+ * The centrality scores returned by igraph can be normalized
+ * (using the \p scale parameter) such that the largest eigenvector centrality
+ * score is 1 (with one exception, see below).
+ *
+ * </para><para>
+ * In the directed case, the left eigenvector of the adjacency matrix is
+ * calculated. In other words, the centrality of a vertex is proportional
+ * to the sum of centralities of vertices pointing to it.
+ *
+ * </para><para>
+ * Eigenvector centrality is meaningful only for connected graphs.
+ * Graphs that are not connected should be decomposed into connected
+ * components, and the eigenvector centrality calculated for each separately.
+ * This function does not verify that the graph is connected. If it is not,
+ * in the undirected case the scores of all but one component will be zeros.
  *
  * </para><para>
  * Also note that the adjacency matrix of a directed acyclic graph or the
@@ -529,7 +519,7 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
  * parameter, see below) and checking whether the eigenvalue is very close
  * to zero.
  *
- * \param graph The input graph. It might be directed.
+ * \param graph The input graph. It may be directed.
  * \param vector Pointer to an initialized vector, it will be resized
  *     as needed. The result of the computation is stored here. It can
  *     be a null pointer, then it is ignored.

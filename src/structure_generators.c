@@ -2393,7 +2393,7 @@ int igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
  *             invalid Pr&uuml;fer sequence given
  *          \endclist
  *
- * \sa \ref igraph_tree(), \ref igraph_tree_game()
+ * \sa \ref igraph_to_prufer(), \ref igraph_tree(), \ref igraph_tree_game()
  *
  */
 
