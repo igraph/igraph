@@ -282,7 +282,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		triangles_template1.h maximal_cliques_template.h prpack.h \
 		igraph_cliquer.h cliquer/graph.h cliquer/cliquer.h cliquer/misc.h \
 		cliquer/cliquerconf.h cliquer/reorder.h cliquer/set.h \
-		structural_properties_internal.h
+		structural_properties_internal.h igraph_handle_exceptions.h
+
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \
