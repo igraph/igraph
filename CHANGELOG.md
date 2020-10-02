@@ -4,6 +4,16 @@
 
 ### Added
 
+### Changed
+
+### Fixed
+
+### Other
+
+## [0.8.3]
+
+### Added
+
  - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
 
 ### Changed
