@@ -39,7 +39,8 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
-                                       igraph_integer_t n, igraph_bool_t directed);
+                                       igraph_integer_t n, igraph_bool_t directed,
+                                       char del);
 DECLDIR int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
                                    igraph_strvector_t *predefnames, igraph_bool_t names,
                                    igraph_add_weights_t weights, igraph_bool_t directed);
@@ -62,7 +63,7 @@ DECLDIR int igraph_read_graph_gml(igraph_t *graph, FILE *instream);
 DECLDIR int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                                  igraph_bool_t directed);
 
-DECLDIR int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream);
+DECLDIR int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream, char del);
 DECLDIR int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                                     const char *names, const char *weights);
 DECLDIR int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,

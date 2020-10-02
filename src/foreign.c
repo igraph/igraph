@@ -64,6 +64,7 @@
  *        safe to supply zero here.
  * \param directed Logical, if true the graph is directed, if false it
  *        will be undirected.
+ * \param del character used as column delimiter (e.g. space, comma, tab)
  * \return Error code:
  *         \c IGRAPH_PARSEERROR: if there is a
  *         problem reading the file, or the file is syntactically
@@ -76,7 +77,8 @@
  */
 
 int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
-                               igraph_integer_t n, igraph_bool_t directed) {
+                               igraph_integer_t n, igraph_bool_t directed,
+                               char del) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     long int from, to;
@@ -85,7 +87,7 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, 100));
 
-    /* skip all whitespace */
+    /* skip all initial whitespace */
     do {
         c = getc (instream);
     } while (isspace (c));
@@ -107,10 +109,10 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
         IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
         IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
 
-        /* skip all whitespace */
+        /* skip all delimiter characters */
         do {
             c = getc (instream);
-        } while (isspace (c));
+        } while (c == (int) del);
         ungetc (c, instream);
     }
 
@@ -1438,6 +1440,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
  * For directed graphs edges are written in from, to order.
  * \param graph The graph object to write.
  * \param outstream Pointer to a stream, it should be writable.
+ * \param del character to use as column delimiter (e.g. space, comma, tab)
  * \return Error code:
  *         \c IGRAPH_EFILE if there is an error writing the
  *         file.
@@ -1448,7 +1451,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
  * time.
  */
 
-int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
+int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream, char del) {
 
     igraph_eit_t it;
 
@@ -1460,8 +1463,9 @@ int igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
         igraph_integer_t from, to;
         int ret;
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
-        ret = fprintf(outstream, "%li %li\n",
+        ret = fprintf(outstream, "%li%c%li\n",
                       (long int) from,
+                      del,
                       (long int) to);
         if (ret < 0) {
             IGRAPH_ERROR("Write error", IGRAPH_EFILE);
