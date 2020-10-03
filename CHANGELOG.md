@@ -12,7 +12,6 @@
    * `igraph_is_graphical()` checks if a degree sequence has a realization as a simple or multigraph, with or without self-loops.
    * `igraph_is_bigraphical()` checks if two degree sequences have a realization as a bipartite graph.
    * `igraph_realize_degree_sequence()` now supports constructing non-simple graphs as well.
- - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
 
 ### Changed
 
@@ -22,7 +21,23 @@
  - `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.
  - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
- - `igraph_eigenvector_centrality()` assumes the adjacency matrix of undirected graphs to have twice the number of self-loops for each vertex on the diagonal.
+
+### Fixed
+
+### Other
+
+ - Documentation improvements.
+ - Improved error and warning messages.
+
+## [0.8.3]
+
+### Added
+
+ - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
+
+### Changed
+
+ - `igraph_eigenvector_centrality()` assumes the adjacency matrix of undirected graphs to have twice the number of self-loops for each vertex on the diagonal. This makes the results consistent between an undirected graph and its directed equivalent when each edge is replaced by a mutual edge pair.
 
 ### Fixed
 
