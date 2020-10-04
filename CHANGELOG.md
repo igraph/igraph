@@ -33,6 +33,7 @@
  - `igraph_community_leiden()`: fixed incorrect result when self-loops are present (PR #1476).
  - `igraph_eigenvector_centrality()`: fixed incorrect value for isolated vertices in weighted graphs.
  - `igraph_eigenvector_centrality()`: corrected the handling of self-loops.
+ - `igraph_layout_reingold_tilford()`: fixed an issue where branches of the tree would sometimes overlap. 
 
 ### Other
 
