@@ -85,7 +85,6 @@
 <!-- doxrox-include igraph_pagerank_algo_t -->
 <!-- doxrox-include igraph_pagerank_power_options_t -->
 <!-- doxrox-include igraph_pagerank -->
-<!-- doxrox-include igraph_pagerank_old -->
 <!-- doxrox-include igraph_personalized_pagerank -->
 <!-- doxrox-include igraph_personalized_pagerank_vs -->
 <!-- doxrox-include igraph_constraint -->

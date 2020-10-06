@@ -1052,16 +1052,12 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \function igraph_pagerank
  * \brief Calculates the Google PageRank for the specified vertices.
  *
- * Starting from version 0.7, igraph has three PageRank implementations,
+ * Starting from version 0.9, igraph has two PageRank implementations,
  * and the user can choose between them. The first implementation is
- * \c IGRAPH_PAGERANK_ALGO_POWER, also available as the (now
- * deprecated) function \ref igraph_pagerank_old(). The second
- * implementation is based on the ARPACK library, this was the default
- * before igraph version 0.7: \c IGRAPH_PAGERANK_ALGO_ARPACK.
- *
- * The third and recommmended implementation is \c
- * IGRAPH_PAGERANK_ALGO_PRPACK. This is using the the PRPACK package,
- * see https://github.com/dgleich/prpack .
+ * \c IGRAPH_PAGERANK_ALGO_ARPACKK, based on the ARPACK library. This
+ * was the default before igraph version 0.7. The second and recommended
+ * implementation is \c IGRAPH_PAGERANK_ALGO_PRPACK. This is using the
+ * PRPACK package, see https://github.com/dgleich/prpack .
  *
  * </para><para>
  * Please note that the PageRank of a given vertex depends on the PageRank
@@ -1086,8 +1082,7 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_POWER, \c IGRAPH_PAGERANK_ALGO_ARPACK,
- *    \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable, the eigenvalue
@@ -1100,15 +1095,10 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
  *    as the number of edges.
- * \param options Options to the power method or ARPACK. For the power
- *    method, \c IGRAPH_PAGERANK_ALGO_POWER it must be a pointer to
- *    a \ref igraph_pagerank_power_options_t object.
- *    For \c IGRAPH_PAGERANK_ALGO_ARPACK it must be a pointer to an
- *    \ref igraph_arpack_options_t object. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices), <code>nev</code> (1),
- *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and
- *    it always starts the calculation from a non-random vector
+ * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the <code>n</code> (number
+ *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
+ *    (LM) parameters and it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
@@ -1119,8 +1109,7 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
  *
- * \sa \ref igraph_pagerank_old() for the old implementation,
- * \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
+ * \sa * \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
  * for the personalized PageRank measure, \ref igraph_arpack_rssolve() and
  * \ref igraph_arpack_rnsolve() for the underlying machinery.
  *
@@ -1131,7 +1120,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
                     igraph_vector_t *vector,
                     igraph_real_t *value, const igraph_vs_t vids,
                     igraph_bool_t directed, igraph_real_t damping,
-                    const igraph_vector_t *weights, void *options) {
+                    const igraph_vector_t *weights, igraph_arpack_options_t *options) {
     return igraph_personalized_pagerank(graph, algo, vector, value, vids,
                                         directed, damping, 0, weights,
                                         options);
@@ -1163,8 +1152,7 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_POWER, \c IGRAPH_PAGERANK_ALGO_ARPACK,
- *    \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable, the eigenvalue
@@ -1178,15 +1166,10 @@ int igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
  *    as the number of edges.
- * \param options Options to the power method or ARPACK. For the power
- *    method, \c IGRAPH_PAGERANK_ALGO_POWER it must be a pointer to
- *    a \ref igraph_pagerank_power_options_t object.
- *    For \c IGRAPH_PAGERANK_ALGO_ARPACK it must be a pointer to an
- *    \ref igraph_arpack_options_t object. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices), <code>nev</code> (1),
- *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and
- *    it always starts the calculation from a non-random vector
+ * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the <code>n</code> (number
+ *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
+ *    (LM) parameters and it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
@@ -1209,7 +1192,7 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
                                     igraph_bool_t directed, igraph_real_t damping,
                                     igraph_vs_t reset_vids,
                                     const igraph_vector_t *weights,
-                                    void *options) {
+                                    igraph_arpack_options_t *options) {
     igraph_vector_t reset;
     igraph_vit_t vit;
 
@@ -1254,8 +1237,7 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * <para>
  * \param graph The graph object.
  * \param algo The PageRank implementation to use. Possible values:
- *    \c IGRAPH_PAGERANK_ALGO_POWER, \c IGRAPH_PAGERANK_ALGO_ARPACK,
- *    \c IGRAPH_PAGERANK_ALGO_PRPACK.
+ *    \c IGRAPH_PAGERANK_ALGO_ARPACK, \c IGRAPH_PAGERANK_ALGO_PRPACK.
  * \param vector Pointer to an initialized vector, the result is
  *    stored here. It is resized as needed.
  * \param value Pointer to a real variable, the eigenvalue
@@ -1272,15 +1254,10 @@ int igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \param weights Optional edge weights, it is either a null pointer,
  *    then the edges are not weighted, or a vector of the same length
  *    as the number of edges.
- * \param options Options to the power method or ARPACK. For the power
- *    method, \c IGRAPH_PAGERANK_ALGO_POWER it must be a pointer to
- *    a \ref igraph_pagerank_power_options_t object.
- *    For \c IGRAPH_PAGERANK_ALGO_ARPACK it must be a pointer to an
- *    \ref igraph_arpack_options_t object. See \ref igraph_arpack_options_t
- *    for details. Note that the function overwrites the
- *    <code>n</code> (number of vertices), <code>nev</code> (1),
- *    <code>ncv</code> (3) and <code>which</code> (LM) parameters and
- *    it always starts the calculation from a non-random vector
+ * \param options Options for the ARPACK method. See \ref igraph_arpack_options_t
+ *    for details. Note that the function overwrites the <code>n</code> (number
+ *    of vertices), <code>nev</code> (1), <code>ncv</code> (3) and <code>which</code>
+ *    (LM) parameters and it always starts the calculation from a non-random vector
  *    calculated based on the degree of the vertices.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
@@ -1301,19 +1278,9 @@ int igraph_personalized_pagerank(const igraph_t *graph,
                                  igraph_bool_t directed, igraph_real_t damping,
                                  igraph_vector_t *reset,
                                  const igraph_vector_t *weights,
-                                 void *options) {
+                                 igraph_arpack_options_t *options) {
 
-    if (algo == IGRAPH_PAGERANK_ALGO_POWER) {
-        igraph_pagerank_power_options_t *o =
-            (igraph_pagerank_power_options_t *) options;
-        if (reset) {
-            IGRAPH_WARNING("Cannot use weights with power method, "
-                           "weights will be ignored");
-        }
-        return igraph_pagerank_old(graph, vector, vids, directed,
-                                   o->niter, o->eps, damping,
-                                   /*old=*/ 0);
-    } else if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
+    if (algo == IGRAPH_PAGERANK_ALGO_ARPACK) {
         igraph_arpack_options_t *o = (igraph_arpack_options_t*) options;
         return igraph_personalized_pagerank_arpack(graph, vector, value, vids,
                 directed, damping, reset,
