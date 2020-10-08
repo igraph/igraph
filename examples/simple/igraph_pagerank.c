@@ -232,7 +232,5 @@ int main() {
 
     igraph_vector_destroy(&res);
 
-	igraph_arpack_options_destroy(&arpack_options);
-
     return 0;
 }
