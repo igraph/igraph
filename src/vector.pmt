@@ -241,7 +241,7 @@ int FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector) *v, int no, ...) {
  */
 
 int FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector) *v,
-        BASE endmark, ...) {
+        double endmark, ...) {
     int i = 0, n = 0;
     va_list ap;
 
