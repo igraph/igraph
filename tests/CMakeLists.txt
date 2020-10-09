@@ -216,8 +216,9 @@ endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
-  igraph_layout_reingold_tilford_extended
   igraph_layout_kamada_kawai_3d_bug_1462
+  igraph_layout_reingold_tilford_bug_879
+  igraph_layout_reingold_tilford_extended
 )
 
 # visitors.at
