@@ -137,13 +137,15 @@ static int igraph_i_community_leiden_fastmovenodes(
         degree = igraph_vector_int_size(edges);
         for (i = 0; i < degree; i++) {
             long int e = VECTOR(*edges)[i];
-            long int u = (long int) IGRAPH_OTHER(graph, e, v);
-            c = VECTOR(*membership)[u];
-            if (!VECTOR(neighbor_cluster_added)[c]) {
-                VECTOR(neighbor_cluster_added)[c] = 1;
-                VECTOR(neighbor_clusters)[nb_neigh_clusters++] = c;
+            long int u = (long int)IGRAPH_OTHER(graph, e, v);
+            if (u != v) {
+                c = VECTOR(*membership)[u];
+                if (!VECTOR(neighbor_cluster_added)[c]) {
+                    VECTOR(neighbor_cluster_added)[c] = 1;
+                    VECTOR(neighbor_clusters)[nb_neigh_clusters++] = c;
+                }
+                VECTOR(edge_weights_per_cluster)[c] += VECTOR(*edge_weights)[e];
             }
-            VECTOR(edge_weights_per_cluster)[c] += VECTOR(*edge_weights)[e];
         }
 
         /* Calculate maximum diff */
@@ -329,8 +331,8 @@ static int igraph_i_community_leiden_mergenodes(
         degree = igraph_vector_int_size(edges);
         for (j = 0; j < degree; j++) {
             long int e = VECTOR(*edges)[j];
-            long int u = (long int) IGRAPH_OTHER(graph, e, v);
-            if (VECTOR(*membership)[u] == cluster_subset) {
+            long int u = (long int)IGRAPH_OTHER(graph, e, v);
+            if (u != v && VECTOR(*membership)[u] == cluster_subset) {
                 VECTOR(external_edge_weight_per_cluster_in_subset)[i] += VECTOR(*edge_weights)[e];
             }
         }
@@ -382,9 +384,9 @@ static int igraph_i_community_leiden_mergenodes(
             VECTOR(neighbor_cluster_added)[current_cluster] = 1;
             nb_neigh_clusters = 1;
             for (j = 0; j < degree; j++) {
-                long int e = (long int) VECTOR(*edges)[j];
-                long int u = (long int) IGRAPH_OTHER(graph, e, v);
-                if (VECTOR(*membership)[u] == cluster_subset) {
+                long int e = (long int)VECTOR(*edges)[j];
+                long int u = (long int)IGRAPH_OTHER(graph, e, v);
+                if (u != v && VECTOR(*membership)[u] == cluster_subset) {
                     long int c = VECTOR(*refined_membership)[u];
                     if (!VECTOR(neighbor_cluster_added)[c]) {
                         VECTOR(neighbor_cluster_added)[c] = 1;

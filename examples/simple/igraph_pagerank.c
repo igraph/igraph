@@ -24,12 +24,6 @@
 #include <igraph.h>
 #include <unistd.h>
 
-void warning_handler_stdout (const char *reason, const char *file,
-                             int line, int igraph_errno) {
-    IGRAPH_UNUSED(igraph_errno);
-    printf("Warning: %s\n", reason);
-}
-
 void print_vector(igraph_vector_t *v, FILE *f) {
     long int i;
     for (i = 0; i < igraph_vector_size(v); i++) {
@@ -38,8 +32,6 @@ void print_vector(igraph_vector_t *v, FILE *f) {
     fprintf(f, "\n");
 }
 
-igraph_warning_handler_t *oldwarn;
-
 int main() {
 
     igraph_t g;
@@ -47,7 +39,8 @@ int main() {
     igraph_arpack_options_t arpack_options;
     igraph_real_t value;
     int ret;
-    igraph_pagerank_power_options_t power_options;
+
+    igraph_arpack_options_init(&arpack_options);
 
     /* Test graphs taken from http://www.iprcom.com/papers/pagerank/ */
     igraph_vector_init(&v, 10);
@@ -64,8 +57,11 @@ int main() {
     igraph_create(&g, &v, 0, 1);
 
     igraph_vector_init(&res, 0);
-    oldwarn = igraph_set_warning_handler(warning_handler_stdout);
-    igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 1000, 0.001, 0.85, 0);
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+                    igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+    print_vector(&res, stdout);
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+                    igraph_vss_all(), 0, 0.85, 0, 0);
     print_vector(&res, stdout);
     igraph_vector_destroy(&res);
     igraph_vector_destroy(&v);
@@ -104,18 +100,19 @@ int main() {
     igraph_create(&g, &v, 0, 1);
 
     igraph_vector_init(&res, 0);
-    igraph_pagerank_old(&g, &res, igraph_vss_all(), 1, 10000, 0.0001, 0.85, 0);
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
+                    igraph_vss_all(), 0, 0.85, 0, &arpack_options);
+    print_vector(&res, stdout);
+    igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_PRPACK, &res, 0,
+                    igraph_vss_all(), 0, 0.85, 0, 0);
     print_vector(&res, stdout);
     igraph_vector_destroy(&res);
     igraph_vector_destroy(&v);
     igraph_destroy(&g);
 
-    igraph_set_warning_handler(oldwarn);
-
-    /* New PageRank */
+    /* Undirected star graph */
     igraph_star(&g, 11, IGRAPH_STAR_UNDIRECTED, 0);
     igraph_vector_init(&res, 0);
-    igraph_arpack_options_init(&arpack_options);
     igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
                     igraph_vss_all(), 0, 0.85, 0, &arpack_options);
     print_vector(&res, stdout);
@@ -148,35 +145,6 @@ int main() {
     print_vector(&res, stdout);
 
     /* Errors */
-    power_options.niter = -1;
-    power_options.eps = 0.0001;
-    igraph_set_error_handler(igraph_error_handler_ignore);
-    igraph_set_warning_handler(igraph_warning_handler_ignore);
-    ret = igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_POWER, &res,
-                          /*value=*/ 0, igraph_vss_all(), 1, 0.85,
-                          /*weights=*/ 0, &power_options);
-    if (ret != IGRAPH_EINVAL) {
-        return 1;
-    }
-
-    power_options.niter = 10000;
-    power_options.eps = -1;
-    ret = igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_POWER, &res,
-                          /*value=*/ 0, igraph_vss_all(), 1, 0.85,
-                          /*weights=*/ 0, &power_options);
-    if (ret != IGRAPH_EINVAL) {
-        return 2;
-    }
-
-    power_options.niter = 10000;
-    power_options.eps = 0.0001;
-    ret = igraph_pagerank(&g, IGRAPH_PAGERANK_ALGO_POWER, &res,
-                          /*value=*/ 0, igraph_vss_all(), 1, 1.2,
-                          /*weights=*/ 0, &power_options);
-    if (ret != IGRAPH_EINVAL) {
-        return 3;
-    }
-
     igraph_vector_init(&reset, 2);
     ret = igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
                                        igraph_vss_all(), 0, 0.85, &reset, 0,
@@ -262,5 +230,6 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_destroy(&res);
+
     return 0;
 }

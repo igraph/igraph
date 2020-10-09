@@ -238,7 +238,7 @@ DECLDIR int igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
 
 DECLDIR int FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector)*v, int no, ...);
 DECLDIR int FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector)*v, int no, ...);
-DECLDIR int FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector)*v, BASE endmark, ...);
+DECLDIR int FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector)*v, double endmark, ...);
 DECLDIR int FUNCTION(igraph_vector, init_int_end)(TYPE(igraph_vector)*v, int endmark, ...);
 
 DECLDIR int FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,

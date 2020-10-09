@@ -43,6 +43,13 @@ AT_COMPILE_CHECK([tests/igraph_layout_reingold_tilford_extended.c], [],
   [tests/igraph_layout_reingold_tilford_extended.in])
 AT_CLEANUP
 
+AT_SETUP([Reingold-Tilford tree layout, bug 879 (igraph_layout_reingold_tilford):])
+AT_KEYWORDS([reingold tilford tree layout igraph_layout_reingold_tilford bug])
+AT_COMPILE_CHECK([tests/igraph_layout_reingold_tilford_bug_879.c],
+  [tests/igraph_layout_reingold_tilford_bug_879.out],
+  [tests/igraph_layout_reingold_tilford_bug_879.in])
+AT_CLEANUP
+
 AT_SETUP([Sugiyama layout (igraph_layout_sugiyama):])
 AT_KEYWORDS([sugiyama layout igraph_layout_sugiyama])
 AT_COMPILE_CHECK([simple/igraph_layout_sugiyama.c], [simple/igraph_layout_sugiyama.out])

@@ -85,7 +85,6 @@
 <!-- doxrox-include igraph_pagerank_algo_t -->
 <!-- doxrox-include igraph_pagerank_power_options_t -->
 <!-- doxrox-include igraph_pagerank -->
-<!-- doxrox-include igraph_pagerank_old -->
 <!-- doxrox-include igraph_personalized_pagerank -->
 <!-- doxrox-include igraph_personalized_pagerank_vs -->
 <!-- doxrox-include igraph_constraint -->
@@ -126,12 +125,13 @@
 <!-- doxrox-include igraph_similarity_inverse_log_weighted -->
 </section>
 
-<section id="spanning-trees"><title>Spanning Trees</title>
+<section id="trees"><title>Trees</title>
 <!-- doxrox-include igraph_minimum_spanning_tree -->
 <!-- doxrox-include igraph_minimum_spanning_tree_unweighted -->
 <!-- doxrox-include igraph_minimum_spanning_tree_prim -->
 <!-- doxrox-include igraph_random_spanning_tree -->
 <!-- doxrox-include igraph_is_tree -->
+<!-- doxrox-include igraph_to_prufer -->
 </section>
 
 <section id="transitivity-or-clustering-coefficient"><title>Transitivity or Clustering Coefficient</title>

@@ -27,23 +27,10 @@
 #include "igraph_adjlist.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_interface.h"
+#include "igraph_isoclasses.h"
 #include "igraph_nongraph.h"
 #include "igraph_stack.h"
 #include "config.h"
-
-/* TODO create header for these functions: */
-extern unsigned int igraph_i_isoclass_3[];
-extern unsigned int igraph_i_isoclass_4[];
-extern unsigned int igraph_i_isoclass_3u[];
-extern unsigned int igraph_i_isoclass_4u[];
-extern unsigned int igraph_i_isoclass2_3[];
-extern unsigned int igraph_i_isoclass2_4[];
-extern unsigned int igraph_i_isoclass2_3u[];
-extern unsigned int igraph_i_isoclass2_4u[];
-extern unsigned int igraph_i_isoclass_3_idx[];
-extern unsigned int igraph_i_isoclass_4_idx[];
-extern unsigned int igraph_i_isoclass_3u_idx[];
-extern unsigned int igraph_i_isoclass_4u_idx[];
 
 /**
  * Callback function for igraph_motifs_randesu that counts the motifs by
@@ -213,7 +200,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
     long int *added;
     char *subg;
 
-    unsigned int *arr_idx, *arr_code;
+    const unsigned int *arr_idx, *arr_code;
     int code = 0;
     unsigned char mul, idx;
 

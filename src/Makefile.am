@@ -257,7 +257,7 @@ HEADERS_PRIVATE = atlas-edges.h \
 		walktrap_graph.h	walktrap_communities.h \
 		walktrap_heap.h \
 		infomap_Greedy.h infomap_Node.h infomap_Greedy.h infomap_FlowGraph.h \
-		igraph_math.h \
+		igraph_math.h igraph_isoclasses.h \
 		drl_layout.h drl_parse.h drl_graph.h \
 		drl_graph_3d.h		drl_layout_3d.h \
 		drl_Node.h	drl_Node_3d.h \
@@ -282,7 +282,8 @@ HEADERS_PRIVATE = atlas-edges.h \
 		triangles_template1.h maximal_cliques_template.h prpack.h \
 		igraph_cliquer.h cliquer/graph.h cliquer/cliquer.h cliquer/misc.h \
 		cliquer/cliquerconf.h cliquer/reorder.h cliquer/set.h \
-		structural_properties_internal.h
+		structural_properties_internal.h igraph_handle_exceptions.h
+
 
 HEADERS_PUBLIC =../include/igraph.h 		../include/igraph_memory.h    \
 		../include/igraph_random.h 	../include/igraph_types.h     \

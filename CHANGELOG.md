@@ -12,7 +12,6 @@
    * `igraph_is_graphical()` checks if a degree sequence has a realization as a simple or multigraph, with or without self-loops.
    * `igraph_is_bigraphical()` checks if two degree sequences have a realization as a bipartite graph.
    * `igraph_realize_degree_sequence()` now supports constructing non-simple graphs as well.
- - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
 
 ### Changed
 
@@ -25,7 +24,24 @@
 
 ### Fixed
 
- - `igraph_isomorphic` now verifies that the input graphs have no multi-edges (PR #1464).
+### Other
+
+ - Documentation improvements.
+ - Improved error and warning messages.
+
+## [0.8.3]
+
+### Added
+
+ - `igraph_vector_binsearch_slice()` performs binary search on a sorted slice of a vector.
+
+### Changed
+
+ - `igraph_eigenvector_centrality()` assumes the adjacency matrix of undirected graphs to have twice the number of self-loops for each vertex on the diagonal. This makes the results consistent between an undirected graph and its directed equivalent when each edge is replaced by a mutual edge pair.
+
+### Fixed
+
+ - `igraph_isomorphic()` now verifies that the input graphs have no multi-edges (PR #1464).
  - `igraph_difference()` was creating superfluous self loops (#597).
  - `igraph_count_multiple()` was giving incorrect results for self-loops in directed graph (PR #1399).
  - `igraph_betweenness_estimate()`: fixed incorrect results with finite cutoff (PR #1392).
@@ -33,6 +49,10 @@
  - `igraph_eigen_matrix_symmetric()`: fixed incorrect matrix multiplication (PR #1379).
  - Corrected several issues that could arise during an error condition (PRs #1405, #1406, #1438).
  - `igraph_realize_degree_sequence()` did not correctly detect some non-graphical inputs.
+ - `igraph_is_graphical_degree_sequence()`: fixed incorrect results in undirected case (PR #1441).
+ - `igraph_community_leiden()`: fixed incorrect result when self-loops are present (PR #1476).
+ - `igraph_eigenvector_centrality()`: fixed incorrect value for isolated vertices in weighted graphs.
+ - `igraph_eigenvector_centrality()`: corrected the handling of self-loops.
 
 ### Other
 
