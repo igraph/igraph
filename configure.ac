@@ -450,7 +450,7 @@ if test "$verify_finally" = "no"; then
   CPPFLAGS="${CPPFLAGS} -DIGRAPH_VERIFY_FINALLY_STACK=0"
 fi
 
-AC_CONFIG_FILES([Makefile src/Makefile igraph.pc igraph_Info.plist doc/Makefile])
+AC_CONFIG_FILES([Makefile src/Makefile igraph.pc doc/Makefile])
 
 # Generate header files (using script ./config.status), but update only upon changes.
 dnl NB: Approach requires AC_CONFIG_FILES to be called in configure.ac.
