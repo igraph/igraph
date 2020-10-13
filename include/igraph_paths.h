@@ -34,7 +34,7 @@
 
 __BEGIN_DECLS
 
-DECLDIR int igraph_diameter(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                             igraph_integer_t *from, igraph_integer_t *to,
                             igraph_vector_t *path,
                             igraph_bool_t directed, igraph_bool_t unconn);

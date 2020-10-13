@@ -845,7 +845,7 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
  * \brief Calculates the diameter of a graph (longest geodesic).
  *
  * \param graph The graph object.
- * \param pres Pointer to an integer, if not \c NULL then it will contain
+ * \param pres Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
  * \param pfrom Pointer to an integer, if not \c NULL it will be set to the
  *        source vertex of the diameter path.
@@ -858,10 +858,7 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
  *        paths. Ignored for undirected graphs.
  * \param unconn What to do if the graph is not connected. If
  *        \c TRUE the longest geodesic within a component
- *        will be returned, otherwise the number of vertices is
- *        returned. (The rationale behind the latter is that this is
- *        always longer than the longest possible diameter in a
- *        graph.)
+ *        will be returned, otherwise \c IGRAPH_INFINITY is returned.
  * \return Error code:
  *         \c IGRAPH_ENOMEM, not enough memory for
  *         temporary data.
@@ -872,7 +869,7 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
  * \example examples/simple/igraph_diameter.c
  */
 
-int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
+int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
                     igraph_integer_t *pfrom, igraph_integer_t *pto,
                     igraph_vector_t *path,
                     igraph_bool_t directed, igraph_bool_t unconn) {
@@ -882,7 +879,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
     long int *already_added;
     long int nodes_reached;
     long int from = 0, to = 0;
-    long int res = 0;
+    igraph_real_t res = 0;
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
     igraph_vector_int_t *neis;
@@ -937,9 +934,9 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
             }
         } /* while !igraph_dqueue_empty */
 
-        /* not connected, return largest possible */
+        /* not connected, return IGRAPH_INFINITY */
         if (nodes_reached != no_of_nodes && !unconn) {
-            res = no_of_nodes;
+            res = IGRAPH_INFINITY;
             from = -1;
             to = -1;
             break;
@@ -950,7 +947,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
 
     /* return the requested info */
     if (pres != 0) {
-        *pres = (igraph_integer_t) res;
+        *pres = res;
     }
     if (pfrom != 0) {
         *pfrom = (igraph_integer_t) from;
@@ -959,7 +956,7 @@ int igraph_diameter(const igraph_t *graph, igraph_integer_t *pres,
         *pto = (igraph_integer_t) to;
     }
     if (path != 0) {
-        if (res == no_of_nodes) {
+        if (! igraph_finite(res)) {
             igraph_vector_clear(path);
         } else {
             igraph_vector_ptr_t tmpptr;
@@ -1051,7 +1048,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     long int nodes_reached = 0;
 
     if (!weights) {
-        igraph_integer_t diameter;
+        igraph_real_t diameter;
         IGRAPH_CHECK(igraph_diameter(graph, &diameter, pfrom, pto, path, directed, unconn));
         if (pres) {
             *pres = diameter;
