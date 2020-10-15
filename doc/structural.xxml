@@ -83,7 +83,6 @@
 <!-- doxrox-include igraph_betweenness -->
 <!-- doxrox-include igraph_edge_betweenness -->
 <!-- doxrox-include igraph_pagerank_algo_t -->
-<!-- doxrox-include igraph_pagerank_power_options_t -->
 <!-- doxrox-include igraph_pagerank -->
 <!-- doxrox-include igraph_personalized_pagerank -->
 <!-- doxrox-include igraph_personalized_pagerank_vs -->
