@@ -145,6 +145,7 @@ int main() {
     print_vector(&res, stdout);
 
     /* Errors */
+    igraph_set_error_handler(igraph_error_handler_ignore);
     igraph_vector_init(&reset, 2);
     ret = igraph_personalized_pagerank(&g, IGRAPH_PAGERANK_ALGO_ARPACK, &res, 0,
                                        igraph_vss_all(), 0, 0.85, &reset, 0,
