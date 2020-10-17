@@ -776,6 +776,8 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
  * \function igraph_average_local_efficiency
  * \brief Calculates the average local efficiency in a network.
  *
+ * For the null graph, zero is returned by convention.
+ *
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
  * \param weights The edge weights. They must be all non-negative.
@@ -815,8 +817,10 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t local_eff;
 
+    /* If there are fewer than 3 vertices, no vertex has more than one neighbour, thus all
+       local efficiencies are zero. For the null graph, we return zero by convention. */
     if (no_of_nodes < 3) {
-        *res = IGRAPH_NAN;
+        *res = 0;
         return IGRAPH_SUCCESS;
     }
 
