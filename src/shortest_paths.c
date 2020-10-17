@@ -619,8 +619,7 @@ static int igraph_i_local_efficiency_dijkstra(
  * The local efficiency of a network around a vertex is defined as follows:
  * We remove the vertex and compute the distances (shortest path lengths) between
  * its neighbours through the rest of the network. The local efficiency around the
- * removed vertex is the average of the inverse of these distances. Both in- and
- * out-neighbours are considered for this calculation.
+ * removed vertex is the average of the inverse of these distances.
  *
  * </para><para>
  * The inverse distance between two vertices which are not reachable from each other
