@@ -97,6 +97,12 @@ AT_COMPILE_CHECK([simple/single_target_shortest_path.c],
                  [simple/single_target_shortest_path.out])
 AT_CLEANUP
 
+AT_SETUP([Efficiency: ])
+AT_KEYWORDS([igraph_global_efficiency, igraph_local_efficiency, igraph_average_local_efficiency])
+AT_COMPILE_CHECK([tests/efficiency.c],
+                 [tests/efficiency.out])
+AT_CLEANUP
+
 AT_SETUP([Betweenness (igraph_betweenness): ])
 AT_KEYWORDS([igraph_betweenness betweenness])
 AT_COMPILE_CHECK([simple/igraph_betweenness.c],
