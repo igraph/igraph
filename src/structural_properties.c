@@ -6306,7 +6306,7 @@ int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *
         IGRAPH_ERROR("Invalid mode", IGRAPH_EINVMODE);
     }
 
-    /* if no suitable root was found, skip visting vertices */
+    /* if no suitable root was found, skip visiting vertices */
     if (*res) {
         IGRAPH_CHECK(igraph_i_is_tree_visitor(iroot, &al, &visited_count));
         *res = visited_count == vcount;
