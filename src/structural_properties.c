@@ -691,9 +691,9 @@ int igraph_get_shortest_path(const igraph_t *graph,
     return 0;
 }
 
-void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v);
+static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v);
 
-void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
+static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
     long int i;
     for (i = 0; i < igraph_vector_ptr_size(v); i++) {
         if (VECTOR(*v)[i] != 0) {
@@ -3527,14 +3527,14 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     return 0;
 }
 
-int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph);
+static int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph);
 
-int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph);
+static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph);
 
 /* Note to self: tried using adjacency lists instead of igraph_incident queries,
  * with minimal performance improvements on a graph with 70K vertices and 360K
  * edges. (1.09s instead of 1.10s). I think it's not worth the fuss. */
-int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
+static int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
     long int no_of_edges = igraph_ecount(graph);
     long int i, j, n;
     igraph_vector_t adjedges, adjedges2;
@@ -3590,7 +3590,7 @@ int igraph_i_linegraph_undirected(const igraph_t *graph, igraph_t *linegraph) {
     return 0;
 }
 
-int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
+static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegraph) {
     long int no_of_edges = igraph_ecount(graph);
     long int i, j, n;
     igraph_vector_t adjedges;
@@ -4405,14 +4405,14 @@ int igraph_get_shortest_path_dijkstra(const igraph_t *graph,
     return 0;
 }
 
-int igraph_i_vector_tail_cmp(const void* path1, const void* path2);
+static int igraph_i_vector_tail_cmp(const void* path1, const void* path2);
 
 /* Compares two paths based on their last elements. Required by
  * igraph_get_all_shortest_paths_dijkstra to put the final result
  * in order. Assumes that both paths are pointers to igraph_vector_t
  * objects and that they are not empty
  */
-int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
+static int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
     return (int) (igraph_vector_tail(*(const igraph_vector_t**)path1) -
                   igraph_vector_tail(*(const igraph_vector_t**)path2));
 }
@@ -5387,7 +5387,7 @@ int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es)
     return 0;
 }
 
-int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
+static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         igraph_vs_t vids,
         igraph_neimode_t mode,
         igraph_neimode_t neighbor_degree_mode,
@@ -5395,7 +5395,7 @@ int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         igraph_vector_t *knnk,
         const igraph_vector_t *weights);
 
-int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
+static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         igraph_vs_t vids,
         igraph_neimode_t mode,
         igraph_neimode_t neighbor_degree_mode,
