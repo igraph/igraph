@@ -520,13 +520,6 @@ igraph_edge_betweenness_estimate:
         NAME-R: estimate_edge_betweenness
         IGNORE: RR
 
-igraph_pagerank_old:
-        PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
-                BOOLEAN directed=True, INTEGER niter=1000, REAL eps=0.001, \
-                REAL damping=0.85, BOOLEAN old=False
-        DEPS: vids ON graph, res ON graph vids
-        NAME-R: page_rank_old
-
 igraph_pagerank:
         PARAMS: GRAPH graph, PAGERANKALGO algo=PRPACK, \
                 OUT VERTEXINDEX vector, OUT REALPTR value, \

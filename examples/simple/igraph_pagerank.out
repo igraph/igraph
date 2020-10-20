@@ -1,7 +1,7 @@
-Warning: igraph_pagerank_old is deprecated from igraph 0.7, use igraph_pagerank instead
- 0.37 0.20 0.39 0.04
-Warning: igraph_pagerank_old is deprecated from igraph 0.7, use igraph_pagerank instead
- 0.42 0.14 0.14 0.14 0.04 0.04 0.04 0.04
+ 0.29 0.20 0.39 0.12
+ 0.29 0.20 0.39 0.12
+ 0.34 0.08 0.08 0.21 0.08 0.08 0.08 0.08
+ 0.34 0.08 0.08 0.21 0.08 0.08 0.08 0.08
  0.47 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05
  0.47 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05
  0.47 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05 0.05

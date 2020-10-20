@@ -157,11 +157,25 @@ int main() {
     run_leiden_modularity(&graph, NULL);
     igraph_destroy(&graph);
 
+
+    /* Set default seed to get reproducible results */
+    igraph_rng_seed(igraph_rng_default(), 0);
+
+    /* Ring graph without loop edges */
+    igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
+                 0,1, 1,2, 2,3, 3,4, 4,5, 5,0, -1);
+    run_leiden_CPM(&graph, NULL, 0.4);
+    igraph_destroy(&graph);
+
+    /* Set default seed to get reproducible results */
+    igraph_rng_seed(igraph_rng_default(), 0);
+
     /* Ring graph with loop edges */
     igraph_small(&graph, 6, IGRAPH_UNDIRECTED,
                  0,1, 1,2, 2,3, 3,4, 4,5, 5,0,
-                 0,0, 1,1, 2,2, 3,3, 4,4, 5,5, -1);
-    run_leiden_modularity(&graph, NULL);
+                 0,0, 1,1, 2,2, 3,3, 4,4, 5,5,
+                 -1);
+    run_leiden_CPM(&graph, NULL, 0.4);
     igraph_destroy(&graph);
 
     /* Regression test -- graph with two vertices and two edges */
