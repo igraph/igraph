@@ -433,8 +433,8 @@ int igraph_hrg_fit(const igraph_t *graph,
  *   pointer, then the sample is stored here.
  * \param samples An initialized vector of pointers. If more than one
  *   samples are requested, then they are stored here. Note that to
- *   free this data structure, you need to call \ref igraph_destroy on
- *   each graph first, then \c free() on all pointers, and finally
+ *   free this data structure, you need to call \ref igraph_destroy() on
+ *   each graph first, then \ref igraph_free() on all pointers, and finally
  *   \ref igraph_vector_ptr_destroy.
  * \param no_samples The number of samples to generate.
  * \param hrg A HRG. It is modified during the sampling.

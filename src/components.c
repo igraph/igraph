@@ -486,7 +486,7 @@ static int igraph_i_decompose_strong(const igraph_t *graph,
  * \param components This pointer vector will contain pointers to the
  *   subcomponent graphs. It should be initialized before calling this
  *   function and will be resized to hold the graphs. Don't forget to
- *   call \ref igraph_destroy() and free() on the elements of
+ *   call \ref igraph_destroy() and \ref igraph_free() on the elements of
  *   this pointer vector to free unneeded memory. Alternatively, you can
  *   simply call \ref igraph_decompose_destroy() that does this for you.
  * \param mode Either \c IGRAPH_WEAK or \c IGRAPH_STRONG for weakly
