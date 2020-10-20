@@ -1218,10 +1218,10 @@ int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mo
                 /* printf("Deleting: %ld -> %ld, %ld -> %ld\n",
                               (long)a, (long)b, (long)c, (long)d); */
                 if (use_adjlist) {
-                    // Replace entry in sorted adjlist:
+                    /* Replace entry in sorted adjlist: */
                     IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, a, b, d, directed));
                     IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, c, d, b, directed));
-                    // Also replace in unsorted edgelist:
+                    /* Also replace in unsorted edgelist: */
                     VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[0]) * 2) + 1] = d;
                     VECTOR(alledges)[(((igraph_integer_t)VECTOR(eids)[1]) * 2) + 1] = b;
                 } else {
@@ -5428,17 +5428,17 @@ static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         IGRAPH_CHECK(igraph_vector_resize(knn, no_vids));
     }
 
-    // Get degree of neighbours
+    /* Get degree of neighbours */
     IGRAPH_VECTOR_INIT_FINALLY(&deg, no_of_nodes);
     IGRAPH_CHECK(igraph_degree(graph, &deg, igraph_vss_all(),
                                neighbor_degree_mode, IGRAPH_LOOPS));
     IGRAPH_VECTOR_INIT_FINALLY(&strength, no_of_nodes);
 
-    // Get strength of all nodes
+    /* Get strength of all nodes */
     IGRAPH_CHECK(igraph_strength(graph, &strength, igraph_vss_all(),
                                  mode, IGRAPH_LOOPS, weights));
 
-    // Get maximum degree for initialization
+    /* Get maximum degree for initialization */
     IGRAPH_CHECK(igraph_maxdegree(graph, &maxdeg, igraph_vss_all(),
                                   mode, IGRAPH_LOOPS));
     IGRAPH_VECTOR_INIT_FINALLY(&neis, (long int)maxdeg);
@@ -5457,7 +5457,7 @@ static int igraph_i_avg_nearest_neighbor_degree_weighted(const igraph_t *graph,
         long int v = IGRAPH_VIT_GET(vit);
         long int nv;
         igraph_real_t str = VECTOR(strength)[v];
-        // Get neighbours and incident edges
+        /* Get neighbours and incident edges */
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v, mode));
         IGRAPH_CHECK(igraph_incident(graph, &edge_neis, (igraph_integer_t) v, mode));
         nv = igraph_vector_size(&neis);
