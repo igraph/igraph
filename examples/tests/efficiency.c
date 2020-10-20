@@ -1,5 +1,6 @@
 
 #include <igraph.h>
+#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -9,7 +10,7 @@
 
 int main() {
     igraph_t graph;
-    const igraph_real_t weights_array[] = {4, 4, 4, 3, 1, 5, 1, 2, 4, 5, 3, 5, 5, 4, 1, 1, 5, 4, 1, 1, 2, 1, 3, 5};
+    const igraph_real_t weights_array[N_EDGES] = {4, 4, 4, 3, 1, 5, 1, 2, 4, 5, 3, 5, 5, 4, 1, 1, 5, 4, 1, 1, 2, 1, 3, 5};
     const igraph_vector_t weights;
     igraph_real_t eff;
     igraph_vector_t eff_vec;
@@ -18,6 +19,8 @@ int main() {
                  0,8, 1,3, 1,4, 1,5, 1,8, 1,10, 2,0, 2,1, 2,4, 3,5, 4,2, 4,7,
                  4,9, 5,3, 5,10, 6,7, 8,2, 8,3, 8,4, 8,9, 9,3, 9,4, 11,9, 11,3,
                  -1);
+
+    assert(igraph_ecount(&graph) == N_EDGES);
 
     igraph_vector_view(&weights, weights_array, N_EDGES);
 
