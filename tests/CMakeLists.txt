@@ -177,7 +177,9 @@ endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
+  efficiency
   igraph_closeness
+  igraph_count_multiple
   igraph_topological_sorting
 )
 

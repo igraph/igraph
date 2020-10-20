@@ -151,6 +151,7 @@ add_library(
   scg_utils.c
   scg.c
   separators.c
+  shortest_paths.c
   sir.c
   spanning_trees.c
   sparsemat.c
