@@ -34,7 +34,7 @@
 
 __BEGIN_DECLS
 
-DECLDIR int igraph_diameter(const igraph_t *graph, igraph_integer_t *res,
+DECLDIR int igraph_diameter(const igraph_t *graph, igraph_real_t *res,
                             igraph_integer_t *from, igraph_integer_t *to,
                             igraph_vector_t *path,
                             igraph_bool_t directed, igraph_bool_t unconn);
@@ -109,10 +109,26 @@ DECLDIR int igraph_shortest_paths_johnson(const igraph_t *graph,
         const igraph_vs_t to,
         const igraph_vector_t *weights);
 
-DECLDIR int igraph_average_path_length(const igraph_t *graph, igraph_real_t *res,
+DECLDIR int igraph_average_path_length(const igraph_t *graph,
+                                       igraph_real_t *res, igraph_real_t *unconn_pairs,
                                        igraph_bool_t directed, igraph_bool_t unconn);
+DECLDIR int igraph_average_path_length_dijkstra(const igraph_t *graph,
+                                                igraph_real_t *res, igraph_real_t *unconn_pairs,
+                                                const igraph_vector_t *weights,
+                                                igraph_bool_t directed, igraph_bool_t unconn);
 DECLDIR int igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
                                     igraph_real_t *unconnected, igraph_bool_t directed);
+
+DECLDIR int igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
+                                     const igraph_vector_t *weights,
+                                     igraph_bool_t directed);
+DECLDIR int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
+                                    const igraph_vs_t vids,
+                                    const igraph_vector_t *weights,
+                                    igraph_bool_t directed, igraph_neimode_t mode);
+DECLDIR int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
+                                    const igraph_vector_t *weights,
+                                    igraph_bool_t directed, igraph_neimode_t mode);
 
 DECLDIR int igraph_eccentricity(const igraph_t *graph,
                                 igraph_vector_t *res,

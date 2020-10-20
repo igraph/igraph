@@ -34,7 +34,7 @@ void print_vector(igraph_vector_t *v) {
 int main() {
 
     igraph_t g;
-    igraph_integer_t result;
+    igraph_real_t result;
     igraph_integer_t from, to;
     igraph_vector_t path;
 
