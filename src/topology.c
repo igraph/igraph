@@ -1921,7 +1921,7 @@ static igraph_bool_t igraph_i_get_isomorphisms_vf2(
  *   isomorphic mapping of \p graph2 to \p graph1. Please note that
  *   you need to 1) Destroy the vectors via \ref
  *   igraph_vector_destroy(), 2) free them via
- *   <function>free()</function> and then 3) call \ref
+ *   <function>igraph_free()</function> and then 3) call \ref
  *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
  *   memory when \p maps is no longer needed.
  * \param node_compat_fn A pointer to a function of type \ref
@@ -2744,7 +2744,7 @@ static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
  *   isomorphic mapping of \p graph2 to a subgraph of \p graph1. Please note that
  *   you need to 1) Destroy the vectors via \ref
  *   igraph_vector_destroy(), 2) free them via
- *   <function>free()</function> and then 3) call \ref
+ *   <function>igraph_free()</function> and then 3) call \ref
  *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
  *   memory when \p maps is no longer needed.
  * \param node_compat_fn A pointer to a function of type \ref

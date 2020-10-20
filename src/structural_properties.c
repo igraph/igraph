@@ -260,7 +260,7 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
     if (already_counted == 0) {
         IGRAPH_ERROR("shortest paths failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, already_counted);
+    IGRAPH_FINALLY(igraph_free, already_counted);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
     if ( (all_to = igraph_vs_is_all(&to)) ) {
@@ -1041,7 +1041,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
     if (already_added == 0) {
         IGRAPH_ERROR("subcomponent failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, already_added); /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, already_added);
 
     igraph_vector_clear(res);
 
@@ -1338,7 +1338,7 @@ int igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
     if (remain == 0) {
         IGRAPH_ERROR("subgraph failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, remain); /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, remain);
     IGRAPH_CHECK(igraph_vector_reserve(&delete, no_of_nodes - IGRAPH_VIT_SIZE(vit)));
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
@@ -1734,8 +1734,8 @@ int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
     if (eremain == 0) {
         IGRAPH_ERROR("subgraph_edges failed", IGRAPH_ENOMEM);
     }
-    IGRAPH_FINALLY(free, vremain);    /* TODO: hack */
-    IGRAPH_FINALLY(free, eremain);    /* TODO: hack */
+    IGRAPH_FINALLY(igraph_free, vremain);
+    IGRAPH_FINALLY(igraph_free, eremain);
     IGRAPH_CHECK(igraph_vector_reserve(&delete, no_of_edges - IGRAPH_EIT_SIZE(eit)));
 
     /* Collect the vertex and edge IDs that will remain */
@@ -3837,7 +3837,7 @@ int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_free(geodist);
+    igraph_Free(geodist);
     igraph_dqueue_destroy(&q);
     IGRAPH_FINALLY_CLEAN(2);
 
