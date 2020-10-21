@@ -27,4 +27,8 @@ int main() {
 
     igraph_matrix_destroy(&layout);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
+
+    return 0;
 }
