@@ -1,7 +1,8 @@
 # Declare the files needed to compile plfit
 add_library(
   plfit
-  STATIC
+  OBJECT
+  EXCLUDE_FROM_ALL
   error.c
   gss.c
   hzeta.c

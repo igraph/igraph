@@ -1,7 +1,8 @@
 # Declare the files needed to compile Cliquer
 add_library(
   cliquer
-  STATIC
+  OBJECT
+  EXCLUDE_FROM_ALL
   cliquer.c
   cliquer_graph.c
   reorder.c

@@ -16,7 +16,7 @@ add_custom_command(
 # Declare the files needed to compile our vendored f2c copy
 add_library(
   f2c_vendored
-  STATIC
+  OBJECT
   EXCLUDE_FROM_ALL
   abort_.c	  dolio.c	    r_sin.c
   dummy.c	  dtime_.c	    iio.c	      r_sinh.c

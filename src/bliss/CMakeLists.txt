@@ -1,7 +1,8 @@
 # Declare the files needed to compile bliss
 add_library(
   bliss
-  STATIC
+  OBJECT
+  EXCLUDE_FROM_ALL
   bliss_heap.cc
   defs.cc
   graph.cc

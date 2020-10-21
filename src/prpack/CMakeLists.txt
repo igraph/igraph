@@ -1,7 +1,7 @@
 # Declare the files needed to compile the PRPACK-related stuff
 add_library(
   prpack
-  STATIC
+  OBJECT
   prpack_base_graph.cpp
   prpack_igraph_graph.cpp
   prpack_preprocessed_ge_graph.cpp

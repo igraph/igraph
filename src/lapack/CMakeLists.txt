@@ -1,23 +1,23 @@
 # Declare the files needed to compile our vendored BLAS copy
 add_library(
   blas_vendored
-  STATIC
+  OBJECT
   EXCLUDE_FROM_ALL
   dscal.c dswap.c lsame.c dnrm2.c daxpy.c dgemv.c dger.c dgemm.c
   dcopy.c dtrmm.c dtrmv.c drot.c ddot.c dasum.c dsymv.c dsyr2k.c dsyr2.c
   dtrsm.c dsyrk.c dtrsv.c idamax.c xerbla.c len_trim.c
+  $<TARGET_OBJECTS:f2c_vendored>
 )
-
-target_link_libraries(
+target_include_directories(
   blas_vendored
-  PUBLIC
-  f2c_vendored
+  PRIVATE
+  $<TARGET_PROPERTY:f2c_vendored,INCLUDE_DIRECTORIES>
 )
 
 # Declare the files needed to compile our vendored LAPACK copy
 add_library(
   lapack_vendored
-  STATIC
+  OBJECT
   EXCLUDE_FROM_ALL
   dgeev.c dgebak.c dgebal.c disnan.c dlaisnan.c dgehrd.c dgehd2.c
   dlarf.c iladlc.c iladlr.c dlarfg.c dlapy2.c dlahr2.c dlacpy.c dlarfb.c
@@ -33,30 +33,30 @@ add_library(
   dtrsen.c dlacn2.c dtrsyl.c dlasr.c dsteqr.c dgeevx.c dtrsna.c dlaqtr.c
   dgetrf.c dgetf2.c dlaswp.c dgetrs.c dgesv.c dpotrf.c dpotf2.c
   dlamch.c ../fortran_intrinsics.c
+  $<TARGET_OBJECTS:blas_vendored>
+  $<TARGET_OBJECTS:f2c_vendored>
 )
-
-target_link_libraries(
+target_include_directories(
   lapack_vendored
-  PUBLIC
-  blas_vendored
-  f2c_vendored
+  PRIVATE
+  $<TARGET_PROPERTY:f2c_vendored,INCLUDE_DIRECTORIES>
 )
 
 # Declare the files needed to compile our vendored ARPACK copy
 add_library(
   arpack_vendored
-  STATIC
+  OBJECT
   EXCLUDE_FROM_ALL
   dnaupd.c dnaup2.c dgetv0.c dvout.c second.c dmout.c dnaitr.c ivout.c dnapps.c
   dnconv.c dneigh.c dlaqrb.c dngets.c dsortc.c dstatn.c dneupd.c dsaupd.c
   dsaup2.c dsaitr.c dsapps.c dsconv.c dseigt.c dstqrb.c dsgets.c dsortr.c
   dstats.c dseupd.c dsesrt.c
+  $<TARGET_OBJECTS:f2c_vendored>
 )
-
-target_link_libraries(
+target_include_directories(
   arpack_vendored
-  PUBLIC
-  f2c_vendored
+  PRIVATE
+  $<TARGET_PROPERTY:f2c_vendored,INCLUDE_DIRECTORIES>
 )
 
 # Suppress some warnings that occur in the output because we do not want to

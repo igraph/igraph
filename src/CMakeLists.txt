@@ -71,7 +71,6 @@ add_library(
   drl_layout_3d.cpp
   eigen.c
   embedding.c
-  f2c_dummy.c
   fast_community.c
   feedback_arc_set.c
   flow.c
@@ -177,6 +176,14 @@ add_library(
   zeroin.c
 
   ${PARSER_SOURCES}
+
+  # Vendored library sources. Yes, this is horrible.
+  $<IF:$<OR:$<BOOL:${ARPACK_IS_VENDORED}>,$<BOOL:${BLAS_IS_VENDORED}>,$<BOOL:${LAPACK_IS_VENDORED}>>,$<TARGET_OBJECTS:f2c_vendored>,>
+  $<IF:$<BOOL:${ARPACK_IS_VENDORED}>,$<TARGET_OBJECTS:arpack_vendored>,>
+  $<IF:$<BOOL:${BLAS_IS_VENDORED}>,$<TARGET_OBJECTS:blas_vendored>,>
+  $<IF:$<BOOL:${CXSPARSE_IS_VENDORED}>,$<TARGET_OBJECTS:cxsparse_vendored>,>
+  $<IF:$<BOOL:${GLPK_IS_VENDORED}>,$<TARGET_OBJECTS:glpk_vendored>,>
+  $<IF:$<BOOL:${LAPACK_IS_VENDORED}>,$<TARGET_OBJECTS:lapack_vendored>,>
 )
 
 # Set soname for the library
@@ -186,6 +193,7 @@ set_target_properties(igraph PROPERTIES SOVERSION 0)
 target_compile_definitions(
   igraph
   PRIVATE
+  $<TARGET_PROPERTY:prpack,COMPILE_DEFINITIONS>
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
 

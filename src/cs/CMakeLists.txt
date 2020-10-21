@@ -1,7 +1,7 @@
 # Declare the files needed to compile our vendored CXSparse copy
 add_library(
   cxsparse_vendored
-  STATIC
+  OBJECT
   EXCLUDE_FROM_ALL
   cs_add.c       cs_happly.c    cs_pvec.c
   cs_amd.c       cs_house.c     cs_qr.c
