@@ -24,6 +24,8 @@
 
 ### Fixed
 
+ - `igraph_i_cattribute_combine_vertices()`: fixed invalid cleanup code that eventually filled up the "finally" stack when combining vertices with attributes extensively.
+
 ### Other
 
  - Documentation improvements.
@@ -53,6 +55,7 @@
  - `igraph_community_leiden()`: fixed incorrect result when self-loops are present (PR #1476).
  - `igraph_eigenvector_centrality()`: fixed incorrect value for isolated vertices in weighted graphs.
  - `igraph_eigenvector_centrality()`: corrected the handling of self-loops.
+ - `igraph_layout_reingold_tilford()`: fixed an issue where branches of the tree would sometimes overlap. 
 
 ### Other
 
