@@ -103,5 +103,7 @@ int main() {
     igraph_vector_destroy(&eff_vec);
     igraph_destroy(&graph);
 
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }
