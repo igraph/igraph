@@ -5844,8 +5844,7 @@ int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
 
 int igraph_contract_vertices(igraph_t *graph,
                              const igraph_vector_t *mapping,
-                             const igraph_attribute_combination_t
-                             *vertex_comb) {
+                             const igraph_attribute_combination_t *vertex_comb) {
     igraph_vector_t edges;
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
