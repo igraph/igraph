@@ -1414,7 +1414,6 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
     }
 
     IGRAPH_CHECK(igraph_vector_ptr_resize(new_val, keepno));
-    IGRAPH_FINALLY(igraph_i_cattribute_permute_free, new_val);
 
     for (i = 0, j = 0; i < valno; i++) {
         igraph_attribute_record_t *newrec, *oldrec = VECTOR(*val)[i];
@@ -1577,8 +1576,7 @@ int igraph_i_cattribute_combine_vertices(const igraph_t *graph,
 
     igraph_free(funcs);
     igraph_free(TODO);
-    igraph_i_cattribute_permute_free(new_val);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(2);
 
     return 0;
 }
