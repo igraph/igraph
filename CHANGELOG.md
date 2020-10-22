@@ -9,6 +9,7 @@
 ### Fixed
 
  - `igraph_i_cattribute_combine_vertices()`: fixed invalid cleanup code that eventually filled up the "finally" stack when combining vertices with attributes extensively.
+ - Fixed building with vendored LAPACK and external BLAS
 
 ### Other
 
