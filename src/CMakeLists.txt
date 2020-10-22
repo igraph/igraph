@@ -198,7 +198,7 @@ target_compile_definitions(
 )
 
 # Add include path. Includes are in ../include but they get installed to
-# <prefix/include/igraph, hence the two options. We also have some private
+# <prefix>/include/igraph, hence the two options. We also have some private
 # includes that are generated at compile time but are not part of the public
 # interface.
 target_include_directories(
@@ -210,10 +210,16 @@ target_include_directories(
   PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
+
+  # Include paths for dependencies
   ${CXSPARSE_INCLUDE_DIRS}
   ${GLPK_INCLUDE_DIR}
   ${GMP_INCLUDE_DIR}
   ${LIBXML2_INCLUDE_DIRS}
+
+  # Vendored library include paths
+  $<IF:$<BOOL:${CXSPARSE_IS_VENDORED}>,$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>,>
+  $<IF:$<BOOL:${GLPK_IS_VENDORED}>,$<TARGET_PROPERTY:glpk_vendored,INCLUDE_DIRECTORIES>,>
 )
 
 if(MATH_LIBRARY)
@@ -262,12 +268,12 @@ install(
 )
 install(
   DIRECTORY ${CMAKE_SOURCE_DIR}/include/
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/igraph/
   FILES_MATCHING PATTERN "*.h"
 )
 install(
   DIRECTORY ${CMAKE_BINARY_DIR}/include/
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/igraph/
   FILES_MATCHING PATTERN "*.h"
 )
 install(
