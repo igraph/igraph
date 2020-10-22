@@ -40,7 +40,6 @@ add_legacy_tests(
   igraph_complex
   igraph_psumtree
   igraph_sparsemat
-  igraph_sparsemat2
   igraph_sparsemat3
   igraph_sparsemat4
   igraph_sparsemat5
@@ -73,6 +72,7 @@ if (BUILD_INTERNAL_TESTS)
     igraph_i_cutheap
     igraph_marked_queue
     igraph_set
+    igraph_sparsemat2
     igraph_trie
   )
 endif()
