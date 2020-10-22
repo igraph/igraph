@@ -54,6 +54,7 @@
     #define igraphdsyr2_    dsyr2_
     #define igraphdsyr2k_   dsyr2k_
     #define igraphdtrmv_    dtrmv_
+    #define igraphdsyrk_    dsyrk_
 #endif
 
 int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
