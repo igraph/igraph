@@ -21,6 +21,8 @@
 
 */
 
+#define NCOMPLEX  /* to make it compile with MSVC on Windows */
+
 #include <cs/cs.h>
 #include <igraph.h>
 
