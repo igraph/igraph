@@ -2,7 +2,7 @@ include(CMakeParseArguments)
 
 find_program(DIFF_TOOL diff)
 if(NOT DIFF_TOOL)
-    find_program(FC_TOOL fc)
+  find_program(FC_TOOL fc)
 endif()
 
 function(add_legacy_test FOLDER NAME)
@@ -20,6 +20,11 @@ function(add_legacy_test FOLDER NAME)
   target_include_directories(
     test_${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src ${CMAKE_BINARY_DIR}/src
   )
+
+  if (MSVC)
+    # Add MSVC-specific include path for some headers that are missing on Windows
+    target_include_directories(test_${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/msvc/include)
+  endif()
 
   set(EXPECTED_OUTPUT_FILE ${CMAKE_SOURCE_DIR}/examples/${FOLDER}/${NAME}.out)
   set(OBSERVED_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/test_${NAME}.out)
