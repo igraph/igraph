@@ -6,8 +6,21 @@ add_custom_target(build_tests)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE})
 add_dependencies(check build_tests)
 
-set(BUILD_INTERNAL_TESTS YES)
+# Some newer gcc version have --enable-new-dtags on by default. This then leads
+# to using RUNPATH instead of RPATH. Since RUNPATH is only considered after
+# LD_LIBRARY_PATH, if another version of igraph is installed somewhere it will
+# be linked to that library.
+include(CheckCCompilerFlag)
+set(ORIG_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+set(CMAKE_REQUIRED_FLAGS "-Wl,--enable-new-dtags")
+check_c_compiler_flag("" HAVE_ENABLE_NEW_DTAGS)
+set(CMAKE_REQUIRED_FLAGS ${ORIG_CMAKE_REQUIRED_FLAGS})
+if (HAVE_ENABLE_NEW_DTAGS AND BUILD_SHARED_LIBS)
+  message(STATUS "Disabling new dtags for testing to use RPATH to ensure the correct library is found.")
+  set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+endif()
 
+set(BUILD_INTERNAL_TESTS YES)
 if (MSVC AND BUILD_SHARED_LIBS)
   set(BUILD_INTERNAL_TESTS NO)
 endif()
@@ -27,7 +40,6 @@ add_legacy_tests(
   igraph_complex
   igraph_psumtree
   igraph_sparsemat
-  igraph_sparsemat2
   igraph_sparsemat3
   igraph_sparsemat4
   igraph_sparsemat5
@@ -60,6 +72,7 @@ if (BUILD_INTERNAL_TESTS)
     igraph_i_cutheap
     igraph_marked_queue
     igraph_set
+    igraph_sparsemat2
     igraph_trie
   )
 endif()
@@ -281,6 +294,7 @@ add_legacy_tests(
   dot
   foreign
   gml
+  graphml
   igraph_read_graph_dl
   igraph_read_graph_graphdb
   igraph_read_graph_lgl
@@ -294,12 +308,6 @@ add_legacy_tests(
   pajek_bipartite2
   pajek_signed
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    graphml
-  )
-endif()
 
 # other.at
 add_legacy_tests(

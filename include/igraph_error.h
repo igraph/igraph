@@ -678,8 +678,8 @@ typedef igraph_error_handler_t igraph_warning_handler_t;
 
 DECLDIR igraph_warning_handler_t* igraph_set_warning_handler(igraph_warning_handler_t* new_handler);
 
-extern igraph_warning_handler_t igraph_warning_handler_ignore;
-extern igraph_warning_handler_t igraph_warning_handler_print;
+DECLDIR extern igraph_warning_handler_t igraph_warning_handler_ignore;
+DECLDIR extern igraph_warning_handler_t igraph_warning_handler_print;
 
 /**
  * \function igraph_warning
