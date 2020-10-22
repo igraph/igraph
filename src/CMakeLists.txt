@@ -251,6 +251,9 @@ if (MSVC)
     # Add a compiler definition required to compile igraph as a shared library on Windows
     target_compile_definitions(igraph PRIVATE IGRAPH_EXPORTS)
   endif()
+
+  # Add MSVC-specific include path for some headers that are missing on Windows
+  target_include_directories(igraph PRIVATE ${CMAKE_SOURCE_DIR}/msvc/include)
 endif()
 
 # Turn on all warnings for GCC, clang and MSVC
