@@ -281,5 +281,5 @@ install(
 )
 install(
   FILES ${CMAKE_BINARY_DIR}/igraph.pc
-  DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig
+  DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
 )
