@@ -15,7 +15,9 @@ target_include_directories(
   ${CMAKE_BINARY_DIR}/src
 )
 
-set_property(TARGET cliquer PROPERTY POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET cliquer PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
 
 # TODO(ntamas): make sure that this works for Cliquer
 # use_all_warnings(cliquer)
