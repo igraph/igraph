@@ -57,6 +57,7 @@ macro(find_dependencies)
       set(${LIBNAME_UPPER}_LIBRARIES "")
       set(${LIBNAME_UPPER}_FOUND 1)
       set(${LIBNAME_UPPER}_IS_VENDORED 1)
+      set(INTERNAL_${LIBNAME_UPPER} 1)
     endif()
   endforeach()
 
