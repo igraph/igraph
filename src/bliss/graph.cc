@@ -69,7 +69,7 @@ AbstractGraph::AbstractGraph()
 
 
   verbose_level = 0;
-  verbstr = stdout;
+  // verbstr = stdout;
 
   report_hook = 0;
   report_user_param = 0;
@@ -112,7 +112,7 @@ AbstractGraph::set_verbose_level(const unsigned int level)
 void
 AbstractGraph::set_verbose_file(FILE* const fp)
 {
-  verbstr = fp;
+  // verbstr = fp;
 }
 
 

@@ -298,7 +298,7 @@ protected:
   unsigned int verbose_level;
   /** \internal
    * The output stream for verbose output. */
-  FILE *verbstr;
+  // FILE *verbstr;
 protected:
 
   /** \internal
