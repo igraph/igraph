@@ -33,7 +33,7 @@ macro(find_dependencies)
   # Declare dependencies dependent on some configuration settings
   if(NOT IGRAPH_GLPK_SUPPORT)
     if(IGRAPH_USE_INTERNAL_GLPK)
-      list(REMOVE VENDORED_DEPENDENCIES GLPK)
+      list(REMOVE_ITEM VENDORED_DEPENDENCIES GLPK)
     endif()
   endif()
   if(IGRAPH_GMP_SUPPORT)
