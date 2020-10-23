@@ -24,7 +24,7 @@
 #include "igraph_games.h"
 #include "igraph_random.h"
 #include "igraph_constructors.h"
-#include "igraph_lapack.h"
+#include "igraph_blas.h"
 
 /**
  * \function igraph_dot_product_game
@@ -80,7 +80,7 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                 continue;
             }
             igraph_vector_view(&v2, &MATRIX(*vecs, 0, j), nrow);
-            igraph_lapack_ddot(&v1, &v2, &prob);
+            igraph_blas_ddot(&v1, &v2, &prob);
             if (prob < 0 && ! warned_neg) {
                 warned_neg = 1;
                 IGRAPH_WARNING("Negative connection probability in "

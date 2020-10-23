@@ -140,7 +140,6 @@
     #define igraph_dlamc3_  dlamc3_
     #define igraph_dlamc4_  dlamc4_
     #define igraph_dlamc5_  dlamc5_
-    #define igraphddot_     ddot_
 #endif
 
 int igraphdgetrf_(int *m, int *n, igraph_real_t *a, int *lda, int *ipiv,

@@ -60,6 +60,9 @@ DECLDIR void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alph
 
 DECLDIR igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v);
 
+DECLDIR int igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
+                               igraph_real_t *res);
+
 __END_DECLS
 
 #endif
