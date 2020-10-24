@@ -449,7 +449,7 @@ struct network
 
 template <class DATA>
 HugeArray<DATA>::HugeArray(void) {
-    max_bit_left = 1 << 31; //wir setzen das 31. Bit auf 1
+    max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
     size = 2;
     max_index = 0;
     highest_field_index = 0;
@@ -486,7 +486,7 @@ HUGE_INDEX HugeArray<DATA>::get_huge_index(unsigned long index) {
         shift_index++;
     }
     h_index.field_index = 31 - shift_index;   // das hoechste  besetzte Bit im Index
-    help_index = 1 << h_index.field_index;  // in help_index wird das hoechste besetzte Bit von Index gesetzt
+    help_index = 1UL << h_index.field_index;  // in help_index wird das hoechste besetzte Bit von Index gesetzt
     h_index.in_field_index = (index ^ help_index); // index XOR help_index, womit alle bits unter dem hoechsten erhalten bleiben
     return h_index;
 }
@@ -497,7 +497,7 @@ DATA &HugeArray<DATA>::Set(unsigned long int index) {
     unsigned long data_size;
     while (size < index + 1) {
         highest_field_index++;
-        data_size = 1 << highest_field_index;
+        data_size = 1UL << highest_field_index;
         data = new DATA[data_size];
         for (unsigned long i = 0; i < data_size; i++) {
             data[i] = 0;
