@@ -39,6 +39,7 @@ message(STATUS " ")
 message(STATUS "----------[ Features ]----------")
 print_bool("GLPK for optimization" IGRAPH_GLPK_SUPPORT)
 print_bool("GMP for big integers" IGRAPH_GMP_SUPPORT)
+print_bool("Link-time optimization" IGRAPH_ENABLE_LTO)
 print_bool("Reading GraphML files" IGRAPH_GRAPHML_SUPPORT)
 message(STATUS " ")
 

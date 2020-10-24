@@ -51,19 +51,22 @@ find_dependencies()
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 include(CheckTLSSupport)
+
+# First we check for some functions and symbols
 check_function_exists(stpcpy HAVE_STPCPY)
 check_function_exists(strcasecmp HAVE_STRCASECMP)
 check_function_exists(_stricmp HAVE__STRICMP)
 check_function_exists(expm1 HAVE_EXPM1)
 check_symbol_exists(stpcpy "string.h" HAVE_STPCPY_SIGNATURE)
 check_symbol_exists(strdup "string.h" HAVE_STRDUP)
-# check_tls_support(TLS_KEYWORD)
-set(TLS_KEYWORD "")  # when using a third-party ARPACK, TLS support cannot be guaranteed
-if(TLS_KEYWORD)
-  set(HAVE_TLS 1)
-else()
-  set(HAVE_TLS 0)
-endif()
+
+# Check for TLS support and enable thread-local storage if possible
+include(tls)
+
+# Check for link-time optimization
+include(lto)
+
+# Generate configuration headers
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.in
   ${CMAKE_CURRENT_BINARY_DIR}/src/config.h
