@@ -1168,6 +1168,6 @@ double *graph_molloy_hash::vertex_betweenness_asp(bool trivial_paths) {
 }
 
 //___________________________________________________________________________________
-//*/
+*/
 
 } // namespace gengraph

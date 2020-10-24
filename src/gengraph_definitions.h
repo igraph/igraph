@@ -118,7 +118,7 @@ inline double logp(double x) {
   if(fabs(x)<1e-6) return x+0.5*x*x+0.333333333333333*x*x*x;
   else return log(1.0+x);
 }
-//*/
+*/
 
 
 //Fast search or replace

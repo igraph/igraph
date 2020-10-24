@@ -2078,7 +2078,7 @@ double graph_molloy_opt::effective_K(int K, int quality) {
 
 
 //___________________________________________________________________________________
-//*/
+*/
 
 
 
@@ -2213,6 +2213,6 @@ double *graph_molloy_opt::vertex_betweenness_asp(bool trivial_paths) {
   return b;
 }
 
-//*/
+*/
 
 } // namespace gengraph
