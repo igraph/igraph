@@ -254,11 +254,11 @@ int igraph_is_inf(double x) {
 }
 
 int igraph_is_posinf(double x) {
-    return isinf(x) == 1;
+    return isinf(x) && x > 0;
 }
 
 int igraph_is_neginf(double x) {
-    return isinf(x) == -1;
+    return isinf(x) && x < 0;
 }
 
 /**
