@@ -70,8 +70,11 @@ target_include_directories(
   ${CMAKE_BINARY_DIR}/src/f2c
 )
 
-if (MSVC)
+if (WIN32)
   target_compile_definitions(f2c_vendored PRIVATE MSDOS)
+endif()
+
+if (MSVC)  
   target_include_directories(
     f2c_vendored
     PUBLIC
