@@ -265,7 +265,7 @@ public:
       bool try_shuffle(int T, int K);
 
     //___________________________________________________________________________________
-    //*/
+    */
 
     /*___________________________________________________________________________________
       Not to use anymore : replaced by vertex_betweenness()     22/04/2005
@@ -277,7 +277,7 @@ public:
       // same, but when multiple shortest path are possible, average the weights.
       double *vertex_betweenness_asp(bool trivial_path);
     //___________________________________________________________________________________
-    //*/
+    */
 
 };
 

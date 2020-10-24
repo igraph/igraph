@@ -209,7 +209,7 @@ public:
       // same, but when multiple shortest path are possible, average the weights.
       double *vertex_betweenness_asp(bool trivial_path);
     //___________________________________________________________________________________
-    //*/
+    */
 
 };
 
