@@ -1,12 +1,26 @@
 if(MSVC)
-  string(APPEND CMAKE_C_FLAGS " /FS")
-  string(APPEND CMAKE_CXX_FLAGS " /FS")
+  add_compile_options(/FS)
+else()
+  add_compile_options(
+    # Intel compiler:
+    # disable warning #161: unrecognized #pragma
+    $<$<C_COMPILER_ID:Intel>:-wd161>
+  )
 endif()
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
     target_compile_options(${TARGET_NAME} PRIVATE /W4)
   else()
-    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-varargs -Wno-sign-compare)
+    target_compile_options(${TARGET_NAME} PRIVATE 
+      -Wall -Wextra -pedantic -Werror -Wno-unused-parameter -Wno-sign-compare
+      $<$<NOT:$<C_COMPILER_ID:Intel>>:-Wno-varargs>
+      # Intel compiler:
+      # disable #279: controlling expression is constant; affecting assert(condition && "message")
+      # disable #188: enumerated type mixed with another type; affecting IGRAPH_CHECK
+      # disable #592: variable "var" is used before its value is set; affecting IGRAPH_UNUSED
+      $<$<C_COMPILER_ID:Intel>:-wd279 -wd188 -wd592>
+    )
   endif()
 endmacro()
+

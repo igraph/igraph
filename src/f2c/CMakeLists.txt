@@ -91,7 +91,8 @@ endif()
 if(NOT MSVC)
   target_compile_options(arithchk PRIVATE -Wno-format-zero-length)
   target_compile_options(
-    f2c_vendored PRIVATE -Wno-parentheses -Wno-format-zero-length
+    f2c_vendored PRIVATE -Wno-parentheses
     -Wno-pointer-to-int-cast -Wno-implicit-function-declaration
+    $<$<NOT:$<C_COMPILER_ID:Intel>>:-Wno-format-zero-length>
   )
 endif()
