@@ -53,7 +53,7 @@ function(add_legacy_test FOLDER NAME)
     )
     set_property(TEST ${NAME} PROPERTY SKIP_RETURN_CODE 77)
   endif()
-  if (MSVC AND BUILD_SHARED_LIBS)
+  if (WIN32 AND BUILD_SHARED_LIBS)
     # On Windows the built igraph.dll is not automatically found by the tests. We therefore
     # add the dir that contains the built igraph.dll to the path environment variable
     # so that igraph.dll is found when running the tests.
