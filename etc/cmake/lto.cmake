@@ -6,7 +6,7 @@ if(IGRAPH_ENABLE_LTO)
   if(IPO_SUPPORTED)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
   else()
-    message(FATAL Link-time optimization not supported on this compiler)
+    message(FATAL_ERROR Link-time optimization not supported on this compiler)
   endif()
 endif()
 
