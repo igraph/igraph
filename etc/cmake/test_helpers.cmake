@@ -64,9 +64,12 @@ endfunction()
 
 function(add_legacy_tests)
   cmake_parse_arguments(
-    PARSED "" "FOLDER" "NAMES" ${ARGN}
+    PARSED "" "FOLDER" "NAMES;LIBRARIES" ${ARGN}
   )
   foreach(NAME ${PARSED_NAMES})
     add_legacy_test(${PARSED_FOLDER} ${NAME})
+    if(PARSED_LIBRARIES)
+      target_link_libraries(test_${NAME} PRIVATE ${PARSED_LIBRARIES})
+    endif()
   endforeach()
 endfunction()

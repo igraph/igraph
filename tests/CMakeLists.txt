@@ -485,12 +485,12 @@ add_legacy_tests(
   igraph_stochastic_imitation
 )
 
-# mt.at
-if (NOT(MSVC))
+# mt.at -- only if we have pthreads
+if(CMAKE_USE_PTHREADS_INIT)
   add_legacy_tests(
     FOLDER simple NAMES
-    tls1
-    tls2
+    tls1 tls2
+    LIBRARIES Threads::Threads
   )
 endif()
 

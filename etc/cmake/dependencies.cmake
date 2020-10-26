@@ -1,5 +1,9 @@
 include(PadString)
 
+# The threading library is not needed for igraph itself, but might be needed
+# for tests
+include(FindThreads)
+
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored
   set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK)
