@@ -1,8 +1,9 @@
 option(IGRAPH_ENABLE_LTO "Enable link-time optimization" OFF)
 
 include(CheckIPOSupported)
-check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_NOT_SUPPORTED_REASON)
+
 if(IGRAPH_ENABLE_LTO)
+  check_ipo_supported(RESULT IPO_SUPPORTED OUTPUT IPO_NOT_SUPPORTED_REASON)
   if(IPO_SUPPORTED)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
   else()

@@ -50,7 +50,6 @@ find_dependencies()
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckFunctionExists)
 include(CheckSymbolExists)
-include(CheckTLSSupport)
 
 # First we check for some functions and symbols
 check_function_exists(stpcpy HAVE_STPCPY)
