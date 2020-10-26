@@ -35,7 +35,7 @@ __BEGIN_DECLS
  * igraph library is thread-safe, and 0 if it is not.
  */
 
-#define IGRAPH_THREAD_SAFE @IGRAPH_ENABLE_TLS@
+#cmakedefine IGRAPH_THREAD_SAFE
 
 __END_DECLS
 
