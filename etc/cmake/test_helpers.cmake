@@ -58,7 +58,9 @@ function(add_legacy_test FOLDER NAME)
     # add the dir that contains the built igraph.dll to the path environment variable
     # so that igraph.dll is found when running the tests.
     SET(IGRAPH_LIBDIR $<TARGET_FILE_DIR:igraph>)
-    SET_TESTS_PROPERTIES( ${NAME} PROPERTIES ENVIRONMENT "PATH=${IGRAPH_LIBDIR};$ENV{PATH}" )
+    string(REPLACE "/" "\\" IGRAPH_LIBDIR ${IGRAPH_LIBDIR})
+    string(JOIN "\;" CORRECT_PATH $ENV{PATH})
+    SET_TESTS_PROPERTIES( ${NAME} PROPERTIES ENVIRONMENT "PATH=${IGRAPH_LIBDIR}\;${CORRECT_PATH}" )
   endif()
 endfunction()
 
