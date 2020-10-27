@@ -32,3 +32,13 @@ target_include_directories(
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
 )
+
+if (MSVC)
+  target_compile_options(glpk_vendored PRIVATE
+    /wd4068
+  )
+else()
+  target_compile_options(glpk_vendored PRIVATE
+    $<$<C_COMPILER_ID:Intel>:-wd161>
+  )
+endif()

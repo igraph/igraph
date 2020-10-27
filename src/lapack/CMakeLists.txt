@@ -60,8 +60,12 @@ target_include_directories(
 )
 
 # Suppress some warnings that occur in the output because we do not want to
-# mess around with the source of f2c too much to fix these
+# mess around with the source of lapack too much to fix these
 if(NOT MSVC)
-  target_compile_options(blas_vendored PRIVATE -Wno-logical-op-parentheses)
-  target_compile_options(lapack_vendored PRIVATE -Wno-logical-op-parentheses -Wno-shift-op-parentheses)
+  target_compile_options(blas_vendored PRIVATE 
+    $<$<NOT:$<C_COMPILER_ID:Intel>>:-Wno-logical-op-parentheses>
+  )
+  target_compile_options(lapack_vendored PRIVATE 
+    $<$<NOT:$<C_COMPILER_ID:Intel>>:-Wno-logical-op-parentheses -Wno-shift-op-parentheses>
+  )
 endif()

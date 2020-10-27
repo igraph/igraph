@@ -89,10 +89,12 @@ endif()
 # Suppress some warnings that occur in the output because we do not want to
 # mess around with the source of f2c too much to fix these
 if(NOT MSVC)
-  target_compile_options(arithchk PRIVATE -Wno-format-zero-length)
+  target_compile_options(arithchk PRIVATE 
+    $<$<NOT:$<C_COMPILER_ID:Intel>>:-Wno-format-zero-length>
+  )
   target_compile_options(
-    f2c_vendored PRIVATE -Wno-parentheses
-    -Wno-pointer-to-int-cast -Wno-implicit-function-declaration
+    f2c_vendored PRIVATE 
+    -Wno-parentheses -Wno-pointer-to-int-cast -Wno-implicit-function-declaration
     $<$<NOT:$<C_COMPILER_ID:Intel>>:-Wno-format-zero-length>
   )
 endif()

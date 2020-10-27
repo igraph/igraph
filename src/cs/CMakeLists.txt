@@ -37,6 +37,4 @@ if (MSVC)
   target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
 endif()
 
-# Suppress some warnings that occur in the output because we do not want to
-# mess around with the source of f2c too much to fix these
 use_all_warnings(cxsparse_vendored)
