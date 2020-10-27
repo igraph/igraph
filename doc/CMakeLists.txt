@@ -63,6 +63,7 @@ file(
   LIST_DIRECTORIES FALSE
   ${CMAKE_SOURCE_DIR}/include/*.h
   ${CMAKE_SOURCE_DIR}/include/*.h.in
+  ${CMAKE_BINARY_DIR}/include/*.h
   ${CMAKE_SOURCE_DIR}/src/*.c
   ${CMAKE_SOURCE_DIR}/src/*.cc
   ${CMAKE_SOURCE_DIR}/src/*.cpp
