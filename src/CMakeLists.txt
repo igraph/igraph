@@ -1,4 +1,4 @@
-# Include some compiler-related helper functions
+# Include some compiler-related helper and set global compiler options
 include(compilers)
 
 # Traverse subdirectories
