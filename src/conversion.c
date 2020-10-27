@@ -29,6 +29,7 @@
 #include "igraph_structural.h"
 #include "igraph_types_internal.h"
 #include "igraph_sparsemat.h"
+#include "igraph_random.h"
 #include "config.h"
 
 /**
@@ -327,12 +328,23 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
  * If the supplied graph is directed, this function does nothing.
  * \param graph The graph object to convert.
  * \param mode Constant, specifies the details of how exactly the
- *        conversion is done. Possible values: \c
- *        IGRAPH_TO_DIRECTED_ARBITRARY: the number of edges in the
+ *        conversion is done. Possible values:
+ *        \clist
+ *        \cli IGRAPH_TO_DIRECTED_ARBITRARY
+ *        The number of edges in the
  *        graph stays the same, an arbitrarily directed edge is
- *        created for each undirected edge;
- *         \c IGRAPH_TO_DIRECTED_MUTUAL: two directed edges are
+ *        created for each undirected edge.
+ *        \cli IGRAPH_TO_DIRECTED_MUTUAL
+ *        Two directed edges are
  *        created for each undirected edge, one in each direction.
+ *        \cli IGRAPH_TO_DIRECTED_RANDOM
+ *        Each undirected edge is converted to a randomly oriented
+ *        directed one.
+ *        \cli IGRAPH_TO_DIRECTED_ACYCLIC
+ *        Each undirected edge is converted to a directed edge oriented
+ *        from a lower index vertex to a higher index one. If no self-loops
+ *        were present, then the result is a directed acyclic graph.
+ *        \endclist
  * \return Error code.
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
@@ -341,25 +353,48 @@ int igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool
 
 int igraph_to_directed(igraph_t *graph,
                        igraph_to_directed_t mode) {
-
-    if (mode != IGRAPH_TO_DIRECTED_ARBITRARY &&
-        mode != IGRAPH_TO_DIRECTED_MUTUAL) {
-        IGRAPH_ERROR("Cannot direct graph, invalid mode", IGRAPH_EINVAL);
-    }
+    long int no_of_edges = igraph_ecount(graph);
+    long int no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
-        return 0;
-    }
+        return IGRAPH_SUCCESS;
+    }   
 
-    if (mode == IGRAPH_TO_DIRECTED_ARBITRARY) {
-
+    switch (mode) {
+    case IGRAPH_TO_DIRECTED_ARBITRARY:
+    case IGRAPH_TO_DIRECTED_RANDOM:
+    case IGRAPH_TO_DIRECTED_ACYCLIC:
+      {
         igraph_t newgraph;
         igraph_vector_t edges;
-        long int no_of_edges = igraph_ecount(graph);
-        long int no_of_nodes = igraph_vcount(graph);
         long int size = no_of_edges * 2;
         IGRAPH_VECTOR_INIT_FINALLY(&edges, size);
         IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
+
+        if (mode == IGRAPH_TO_DIRECTED_ACYCLIC) {
+            long int i;
+            for (i=0; i < no_of_edges; ++i) {
+                if (VECTOR(edges)[2*i] > VECTOR(edges)[2*i+1]) {
+                    igraph_real_t temp = VECTOR(edges)[2*i];
+                    VECTOR(edges)[2*i] = VECTOR(edges)[2*i+1];
+                    VECTOR(edges)[2*i+1] = temp;
+                }
+            }
+        } else if (mode == IGRAPH_TO_DIRECTED_RANDOM) {
+            long int i;
+
+            RNG_BEGIN();
+
+            for (i=0; i < no_of_edges; ++i) {
+                if (RNG_INTEGER(0,1)) {
+                    igraph_real_t temp = VECTOR(edges)[2*i];
+                    VECTOR(edges)[2*i] = VECTOR(edges)[2*i+1];
+                    VECTOR(edges)[2*i+1] = temp;
+                }
+            }
+
+            RNG_END();
+        }
 
         IGRAPH_CHECK(igraph_create(&newgraph, &edges,
                                    (igraph_integer_t) no_of_nodes,
@@ -372,13 +407,13 @@ int igraph_to_directed(igraph_t *graph,
         igraph_destroy(graph);
         *graph = newgraph;
 
-    } else if (mode == IGRAPH_TO_DIRECTED_MUTUAL) {
-
+        break;
+      }
+    case IGRAPH_TO_DIRECTED_MUTUAL:
+      {
         igraph_t newgraph;
         igraph_vector_t edges;
         igraph_vector_t index;
-        long int no_of_edges = igraph_ecount(graph);
-        long int no_of_nodes = igraph_vcount(graph);
         long int size = no_of_edges * 4;
         long int i;
         IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -405,9 +440,14 @@ int igraph_to_directed(igraph_t *graph,
         igraph_destroy(graph);
         IGRAPH_FINALLY_CLEAN(3);
         *graph = newgraph;
+
+        break;
+      }
+    default:
+        IGRAPH_ERROR("Cannot direct graph, invalid mode", IGRAPH_EINVAL);
     }
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 /**
