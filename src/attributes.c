@@ -422,11 +422,7 @@ int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
 
         type = (igraph_attribute_combination_type_t)va_arg(ap, int);
         if (type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
-#if defined(__GNUC__)
-            func = va_arg(ap, void (*)(void));
-#else
-            func = va_arg(ap, void*);
-#endif
+            func = va_arg(ap, igraph_function_pointer_t);
         }
 
         if (strlen(name) == 0) {
