@@ -137,4 +137,3 @@ whitespace [ \t\v\f]
 
 <*>. { return 0; }
 
-.                 { return ERROR; }

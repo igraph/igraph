@@ -73,11 +73,11 @@
 %option bison-locations
 
 digit [0-9]
-word [^ \t\r\n]
+word [^ \t\r\n\0]
 
 %%
 
-[ \t]*          { }
+[ \t]+          { }
 %[^\n]*\n[\r]*  { }
 %[^\n]*\r[\n]*  { }
 \*[Nn][eE][Tt]                         { return NETWORKLINE; }

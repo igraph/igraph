@@ -72,7 +72,7 @@
 %option bison-bridge
 %option bison-locations
 
-alnum [^ \t\r\n#]
+alnum [^ \t\r\n\0#]
 
 %%
 
@@ -80,7 +80,7 @@ alnum [^ \t\r\n#]
 #                    { return HASH; }
 
  /* ------------------------------------------------whitespace------*/
-[ \t]*               { }
+[ \t]+               { }
 
  /* ---------------------------------------------------newline------*/
 \n\r|\r\n|\n|\r      { return NEWLINE; }
