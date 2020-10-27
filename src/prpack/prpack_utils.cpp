@@ -16,7 +16,7 @@ using namespace std;
 #include "igraph_error.h"
 #endif
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
