@@ -368,11 +368,12 @@ int igraph_to_directed(igraph_t *graph,
         igraph_t newgraph;
         igraph_vector_t edges;
         long int size = no_of_edges * 2;
+        long int i;
+
         IGRAPH_VECTOR_INIT_FINALLY(&edges, size);
         IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
 
         if (mode == IGRAPH_TO_DIRECTED_ACYCLIC) {
-            long int i;
             for (i=0; i < no_of_edges; ++i) {
                 if (VECTOR(edges)[2*i] > VECTOR(edges)[2*i+1]) {
                     igraph_real_t temp = VECTOR(edges)[2*i];
@@ -381,8 +382,6 @@ int igraph_to_directed(igraph_t *graph,
                 }
             }
         } else if (mode == IGRAPH_TO_DIRECTED_RANDOM) {
-            long int i;
-
             RNG_BEGIN();
 
             for (i=0; i < no_of_edges; ++i) {
