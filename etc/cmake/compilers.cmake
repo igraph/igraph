@@ -3,8 +3,8 @@ if(MSVC)
 else()
   add_compile_options(
     # Intel compiler:
-    # disable warning #161: unrecognized #pragma
-    $<$<C_COMPILER_ID:Intel>:-wd161>
+    # Do not print remarks:
+    $<$<C_COMPILER_ID:Intel>:-diag-disable=remark>
   )
 endif()
 
