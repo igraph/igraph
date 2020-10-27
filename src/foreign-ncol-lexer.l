@@ -71,12 +71,12 @@
 %option bison-bridge
 %option bison-locations
 
-alnum [^ \t\n\r]
+alnum [^ \t\n\r\0]
 
 %%
 
  /* ------------------------------------------------whitespace------*/
-[ \t]*               { }
+[ \t]+               { }
 
  /* ---------------------------------------------------newline------*/
 \n\r|\r\n|\n|\r      { return NEWLINE; }
