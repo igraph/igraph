@@ -405,11 +405,12 @@ int igraph_to_directed(igraph_t *graph,
         IGRAPH_CHECK(igraph_create(&newgraph, &edges,
                                    (igraph_integer_t) no_of_nodes,
                                    IGRAPH_DIRECTED));
-        IGRAPH_FINALLY(igraph_destroy, &newgraph);
-        igraph_vector_destroy(&edges);
+        IGRAPH_FINALLY(igraph_destroy, &newgraph);        
         IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
         IGRAPH_I_ATTRIBUTE_COPY(&newgraph, graph, 1, 1, 1);
+        igraph_vector_destroy(&edges);
         IGRAPH_FINALLY_CLEAN(2);
+
         igraph_destroy(graph);
         *graph = newgraph;
 
@@ -442,9 +443,10 @@ int igraph_to_directed(igraph_t *graph,
         IGRAPH_CHECK(igraph_i_attribute_permute_edges(graph, &newgraph, &index));
 
         igraph_vector_destroy(&index);
-        igraph_vector_destroy(&edges);
-        igraph_destroy(graph);
+        igraph_vector_destroy(&edges);        
         IGRAPH_FINALLY_CLEAN(3);
+
+        igraph_destroy(graph);
         *graph = newgraph;
 
         break;
