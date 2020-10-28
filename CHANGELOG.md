@@ -21,6 +21,7 @@
  - `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.
  - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
+ - `igraph_to_directed`: added RANDOM and ACYCLIC mode (PR #1511).
 
 ### Fixed
 
@@ -55,7 +56,7 @@
  - `igraph_community_leiden()`: fixed incorrect result when self-loops are present (PR #1476).
  - `igraph_eigenvector_centrality()`: fixed incorrect value for isolated vertices in weighted graphs.
  - `igraph_eigenvector_centrality()`: corrected the handling of self-loops.
- - `igraph_layout_reingold_tilford()`: fixed an issue where branches of the tree would sometimes overlap. 
+ - `igraph_layout_reingold_tilford()`: fixed an issue where branches of the tree would sometimes overlap.
 
 ### Other
 
