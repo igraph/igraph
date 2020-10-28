@@ -36,6 +36,12 @@ target_include_directories(
   ${CMAKE_SOURCE_DIR}/include
 )
 
+if (WIN32 AND BUILD_SHARED_LIBS)
+    # Since these are included as object files, they should call the
+    # function as is (without declspec)
+    target_compile_definitions(glpk_vendored PRIVATE IGRAPH_STATIC)
+endif()
+
 if (MSVC)
   target_compile_options(glpk_vendored PRIVATE
     /wd4068
