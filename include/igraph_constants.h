@@ -110,7 +110,9 @@ typedef enum { IGRAPH_EDGEORDER_ID = 0,
              } igraph_edgeorder_type_t;
 
 typedef enum { IGRAPH_TO_DIRECTED_ARBITRARY = 0,
-               IGRAPH_TO_DIRECTED_MUTUAL
+               IGRAPH_TO_DIRECTED_MUTUAL,
+               IGRAPH_TO_DIRECTED_RANDOM,
+               IGRAPH_TO_DIRECTED_ACYCLIC
              } igraph_to_directed_t;
 
 typedef enum { IGRAPH_TO_UNDIRECTED_EACH = 0,
