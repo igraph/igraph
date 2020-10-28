@@ -373,15 +373,7 @@ int igraph_to_directed(igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&edges, size);
         IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
 
-        if (mode == IGRAPH_TO_DIRECTED_ACYCLIC) {
-            for (i=0; i < no_of_edges; ++i) {
-                if (VECTOR(edges)[2*i] > VECTOR(edges)[2*i+1]) {
-                    igraph_real_t temp = VECTOR(edges)[2*i];
-                    VECTOR(edges)[2*i] = VECTOR(edges)[2*i+1];
-                    VECTOR(edges)[2*i+1] = temp;
-                }
-            }
-        } else if (mode == IGRAPH_TO_DIRECTED_RANDOM) {
+        if (mode == IGRAPH_TO_DIRECTED_RANDOM) {
             RNG_BEGIN();
 
             for (i=0; i < no_of_edges; ++i) {
@@ -393,6 +385,21 @@ int igraph_to_directed(igraph_t *graph,
             }
 
             RNG_END();
+        } else if (mode == IGRAPH_TO_DIRECTED_ACYCLIC) {
+            /* Currently, the endpoints of undirected edges are ordered in the
+               internal graph datastructure, i.e. it is always true that from < to.
+               However, it is not guaranteed that this will not be changed in
+               the future, and this ordering should not be relied on outside of
+               the implementation of the minimal API in type_indexededgelist.c.
+
+               Therefore, we order the edge endpoints anyway in the following loop: */
+            for (i=0; i < no_of_edges; ++i) {
+                if (VECTOR(edges)[2*i] > VECTOR(edges)[2*i+1]) {
+                    igraph_real_t temp = VECTOR(edges)[2*i];
+                    VECTOR(edges)[2*i] = VECTOR(edges)[2*i+1];
+                    VECTOR(edges)[2*i+1] = temp;
+                }
+            }
         }
 
         IGRAPH_CHECK(igraph_create(&newgraph, &edges,
