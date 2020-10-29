@@ -241,17 +241,18 @@ target_link_libraries(
   bliss cliquer plfit prpack
 )
 
-if (MSVC)
+if (WIN32)
   # Define symbols to enable compilation of CSXSparse on Windows using MSVC
   target_compile_definitions(igraph PRIVATE NCOMPLEX)
   if (NOT BUILD_SHARED_LIBS)
     # Add a compiler definition required to compile igraph in static mode on Windows
     target_compile_definitions(igraph PRIVATE IGRAPH_STATIC)
   else()
-    # Add a compiler definition required to compile igraph as a shared library on Windows
     target_compile_definitions(igraph PRIVATE IGRAPH_EXPORTS)
   endif()
+endif()
 
+if(MSVC)
   # Add MSVC-specific include path for some headers that are missing on Windows
   target_include_directories(igraph PRIVATE ${CMAKE_SOURCE_DIR}/msvc/include)
 endif()
