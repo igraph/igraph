@@ -35,11 +35,9 @@ target_include_directories(
 # Define symbols to enable compilation of CSXSparse on Windows using MSVC
 if (WIN32)
   target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
-  if (BUILD_SHARED_LIBS)
-    # Since these are included as object files, they should call the
-    # function as is (without declspec)
-    target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
-  endif()
+  # Since these are included as object files, they should call the
+  # function as is (without declspec)
+  target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
 endif()
 
 use_all_warnings(cxsparse_vendored)

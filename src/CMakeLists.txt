@@ -242,7 +242,7 @@ target_link_libraries(
 )
 
 if (WIN32)
-  # Define symbols to enable compilation of CSXSparse on Windows using MSVC
+  # Define symbols to enable compilation of CSXSparse on Windows
   target_compile_definitions(igraph PRIVATE NCOMPLEX)
   if (NOT BUILD_SHARED_LIBS)
     # Add a compiler definition required to compile igraph in static mode on Windows

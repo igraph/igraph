@@ -27,11 +27,12 @@ target_include_directories(
 
 if (BUILD_SHARED_LIBS)
   set_property(TARGET prpack PROPERTY POSITION_INDEPENDENT_CODE ON)
-  if (WIN32)
-    # Since these are included as object files, they should call the
-    # function as is (without declspec)
-    target_compile_definitions(prpack PRIVATE IGRAPH_STATIC)
-  endif()
+endif()
+
+if (WIN32)
+  # Since these are included as object files, they should call the
+  # function as is (without declspec)
+  target_compile_definitions(prpack PRIVATE IGRAPH_STATIC)
 endif()
 
 # Turn on all warnings for GCC, clang and MSVC

@@ -10,7 +10,7 @@ function(add_legacy_test FOLDER NAME)
   add_dependencies(build_tests test_${NAME})
   target_link_libraries(test_${NAME} PRIVATE igraph)
 
-  if (MSVC AND NOT BUILD_SHARED_LIBS)
+  if (WIN32 AND NOT BUILD_SHARED_LIBS)
     # Add a compiler definition required to compile igraph in static mode on Windows
     target_compile_definitions(test_${NAME} PRIVATE IGRAPH_STATIC)
   endif()
@@ -58,13 +58,13 @@ function(add_legacy_test FOLDER NAME)
     # add the dir that contains the built igraph.dll to the path environment variable
     # so that igraph.dll is found when running the tests.
     SET(IGRAPH_LIBDIR $<TARGET_FILE_DIR:igraph>)
-    
+
     # The next line is necessitated by MinGW on Windows. MinGW uses forward slashes in
     # IGRAPH_LIBDIR, but we need to supply CTest with backslashes because CTest is executed
     # in a cmd.exe shell. So we simply replace forward slashes with backslases in
     # IGRAPH_LIBDIR.
     string(REPLACE "/" "\\" IGRAPH_LIBDIR ${IGRAPH_LIBDIR})
-    
+
     # Semicolons are used as list separators in CMake so we need to escape them in the PATH,
     # otherwise the PATH envvar gets split by CMake before it passes the PATH on to CTest.
     string(JOIN "\;" CORRECT_PATH $ENV{PATH})

@@ -17,11 +17,12 @@ target_include_directories(
 
 if (BUILD_SHARED_LIBS)
   set_property(TARGET cliquer PROPERTY POSITION_INDEPENDENT_CODE ON)
-  if (WIN32)
-    # Since these are included as object files, they should call the
-    # function as is (without declspec)
-    target_compile_definitions(cliquer PRIVATE IGRAPH_STATIC)
-  endif()
+endif()
+
+if (WIN32)
+  # Since these are included as object files, they should call the
+  # function as is (without declspec)
+  target_compile_definitions(cliquer PRIVATE IGRAPH_STATIC)
 endif()
 
 # TODO(ntamas): make sure that this works for Cliquer
