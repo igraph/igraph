@@ -337,6 +337,11 @@ add_legacy_tests(
   igraph_to_undirected
 )
 
+add_legacy_tests(
+  FOLDER tests NAMES
+  igraph_to_directed
+)
+
 # flow.at
 add_legacy_tests(
   FOLDER simple NAMES
