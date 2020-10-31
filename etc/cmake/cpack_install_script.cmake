@@ -22,7 +22,7 @@ if(CPACK_SOURCE_INSTALLED_DIRECTORIES)
 		"${SOURCE_DIR}/INSTALL"
 		"${SOURCE_DIR}/NEWS"
 		"${SOURCE_DIR}/ONEWS"
-		"${SOURCE_DIR}/config.h.in"
+		"${SOURCE_DIR}/src/config.h.in"
 		"${SOURCE_DIR}/igraph.pc.cmake.in"
 		DESTINATION "${CMAKE_CURRENT_BINARY_DIR}"
 	)
