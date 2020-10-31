@@ -12,23 +12,25 @@ add_subdirectory(prpack)
 
 # Generate lexers and parsers
 set(PARSER_SOURCES)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/parsers/)
 foreach(FORMAT dl gml lgl ncol pajek)
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/foreign-${FORMAT}-parser.c)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-parser.c)
     list(APPEND PARSER_SOURCES
-      ${CMAKE_CURRENT_SOURCE_DIR}/foreign-${FORMAT}-lexer.c
-      ${CMAKE_CURRENT_SOURCE_DIR}/foreign-${FORMAT}-parser.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-lexer.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-parser.c
     )
   else()
     bison_target(
-      ${FORMAT}_parser foreign-${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/foreign-${FORMAT}-parser.c
+      ${FORMAT}_parser foreign-${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/parsers/foreign-${FORMAT}-parser.c
     )
     flex_target(
-      ${FORMAT}_lexer foreign-${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/foreign-${FORMAT}-lexer.c
+      ${FORMAT}_lexer foreign-${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/parsers/foreign-${FORMAT}-lexer.c
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
     list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
   endif()
 endforeach()
+add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 
 # Declare the files needed to compile the igraph library
 add_library(
