@@ -26,7 +26,7 @@
 #define GLPBFD_H
 
 #ifndef GLPBFD_PRIVATE
-typedef struct { double _opaque_bfd[100]; } BFD;
+typedef struct BFD BFD;
 #endif
 
 /* return codes: */
