@@ -38,7 +38,7 @@ extern "C" {
 
 #ifndef GLP_PROB_DEFINED
 #define GLP_PROB_DEFINED
-typedef struct { double _opaque_prob[100]; } glp_prob;
+typedef struct glp_prob glp_prob;
 /* LP/MIP problem object */
 #endif
 
@@ -149,7 +149,7 @@ typedef struct
 
 #ifndef GLP_TREE_DEFINED
 #define GLP_TREE_DEFINED
-typedef struct { double _opaque_tree[100]; } glp_tree;
+typedef struct glp_tree glp_tree;
 /* branch-and-bound tree */
 #endif
 
@@ -283,7 +283,7 @@ typedef struct
 
 #ifndef GLP_TRAN_DEFINED
 #define GLP_TRAN_DEFINED
-typedef struct { double _opaque_tran[100]; } glp_tran;
+typedef struct glp_tran glp_tran;
 /* MathProg translator workspace */
 #endif
 
@@ -836,7 +836,7 @@ double glp_difftime(glp_long t1, glp_long t0);
 
 #ifndef GLP_DATA_DEFINED
 #define GLP_DATA_DEFINED
-typedef struct { double _opaque_data[100]; } glp_data;
+typedef struct glp_data glp_data;
 /* plain data file */
 #endif
 

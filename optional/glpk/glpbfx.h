@@ -29,7 +29,7 @@
 
 #ifndef GLPBFX_DEFINED
 #define GLPBFX_DEFINED
-typedef struct { double _opaque_bfx; } BFX;
+typedef struct BFX BFX;
 #endif
 
 #define bfx_create_binv       _glp_bfx_create_binv
