@@ -200,7 +200,7 @@ int test_weighted_graph_from_file(const char* fname, int type1_count, long exp_w
         fprintf(stderr, "No such file: %s\n", fname);
         return 1;
     }
-    igraph_read_graph_ncol(&graph, f, 0, 1, 1, 0);
+    igraph_read_graph_ncol(&graph, f, 0, 1, IGRAPH_ADD_WEIGHTS_YES, 0);
     fclose(f);
 
     n = igraph_vcount(&graph);
