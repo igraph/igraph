@@ -23,7 +23,6 @@
 
 #include <igraph.h>
 #include <pthread.h>
-#include <unistd.h>
 
 void *thread_function(void *arg) {
     IGRAPH_FINALLY(igraph_free, NULL);

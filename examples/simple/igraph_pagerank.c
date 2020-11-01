@@ -22,8 +22,6 @@
 */
 
 #include <igraph.h>
-#include <unistd.h>
-#include <libgen.h>
 
 void warning_handler_stdout (const char *reason, const char *file,
                              int line, int igraph_errno) {
