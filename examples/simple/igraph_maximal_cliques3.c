@@ -22,7 +22,6 @@
 */
 
 #include <igraph.h>
-#include <unistd.h>
 
 int sort_cmp(const void *a, const void *b) {
     const igraph_vector_t **da = (const igraph_vector_t **) a;

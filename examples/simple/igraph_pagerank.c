@@ -22,8 +22,6 @@
 */
 
 #include <igraph.h>
-#include <unistd.h>
-#include <libgen.h>
 
 void print_vector(igraph_vector_t *v, FILE *f) {
     long int i;

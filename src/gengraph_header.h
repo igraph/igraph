@@ -42,17 +42,6 @@ double my_random01() {
 
 }
 
-#ifdef _WIN32
-#include <process.h>
-#include <windows.h>
-void set_priority_low() {
-    HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, TRUE, _getpid());
-    SetPriorityClass(hProcess, IDLE_PRIORITY_CLASS);
-}
-#else
-#include <unistd.h>
-#endif
-
 namespace gengraph {
 
 static int VERB;

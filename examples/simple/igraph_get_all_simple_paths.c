@@ -24,26 +24,26 @@
 #include <igraph.h>
 
 int main() {
-
     igraph_t g;
+    igraph_vector_int_t res, res_all;
+    long int i;
+
     igraph_small(&g, 6, IGRAPH_UNDIRECTED,
                  0, 1, 1, 2, 2, 5,
                  0, 3, 3, 4, 4, 5,
                  3, 2, 3, 5,
                  -1);
-    igraph_vector_int_t res;
-    igraph_vector_int_init(&res, 0);
-    int i;
+
+    igraph_vector_int_init(&res, 0);    
 
     for (i = 0; i <= 5; i++) {
         igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, IGRAPH_ALL);
 
-        printf("Paths for cutoff %i:\n", i);
+        printf("Paths for cutoff %li:\n", i);
         igraph_vector_int_print(&res);
         igraph_vector_int_clear(&res);
     }
 
-    igraph_vector_int_t res_all;
     igraph_vector_int_init(&res_all, 0);
 
     igraph_get_all_simple_paths(&g, &res_all, 0, igraph_vss_1(5), -1, IGRAPH_ALL);
@@ -56,6 +56,6 @@ int main() {
     igraph_vector_int_destroy(&res_all);
     igraph_vector_int_destroy(&res);
     igraph_destroy(&g);
-    return 0;
 
+    return 0;
 }

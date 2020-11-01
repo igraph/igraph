@@ -237,7 +237,7 @@ prpack_result* prpack_solver::solve(
     } else {
         // TODO: throw exception
     }
-    ret->method = m.c_str();
+    ret->method = m;
     ret->read_time = read_time;
     ret->preprocess_time = preprocess_time;
     ret->compute_time = compute_time;

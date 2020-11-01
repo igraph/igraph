@@ -28,7 +28,7 @@ namespace prpack {
             static double* permute(const int length, const double* a, const int* coding);
     };
 
-};
+}
 
 #endif
 
