@@ -31,7 +31,8 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
                                long int source,
                                long int target,
                                long int *v,
-                               igraph_vector_t *Isv);
+                               igraph_vector_t *Isv,
+                               void *arg);
 int test_all_st_cuts(const igraph_t *graph,
                      long int source,
                      long int target) {
@@ -106,7 +107,7 @@ int main() {
     igraph_vector_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 10, /*target=*/ 11,
-                               &v, &Isv);
+                               &v, &Isv, NULL);
 
     /* Expected result: v=c, Isv={c,d,e,i} */
     printf("%li; ", v);
@@ -130,7 +131,7 @@ int main() {
     igraph_vector_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
-                               &v, &Isv);
+                               &v, &Isv, NULL);
     printf("%li; ", v);
     igraph_vector_print(&Isv);
 
@@ -154,7 +155,7 @@ int main() {
     igraph_vector_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
-                               &v, &Isv);
+                               &v, &Isv, NULL);
     printf("%li; ", v);
     igraph_vector_print(&Isv);
 
@@ -178,7 +179,7 @@ int main() {
     igraph_vector_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
-                               &v, &Isv);
+                               &v, &Isv, NULL);
     printf("%li; ", v);
     igraph_vector_print(&Isv);
 
@@ -203,7 +204,7 @@ int main() {
     igraph_vector_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
-                               &v, &Isv);
+                               &v, &Isv, NULL);
     printf("%li; ", v);
     igraph_vector_print(&Isv);
 
@@ -228,7 +229,7 @@ int main() {
     igraph_vector_init(&Isv, 0);
     igraph_i_all_st_cuts_pivot(&g, &S, &T,
                                /*source=*/ 0, /*target=*/ 2,
-                               &v, &Isv);
+                               &v, &Isv, NULL);
     printf("%li; ", v);
     igraph_vector_print(&Isv);
 
