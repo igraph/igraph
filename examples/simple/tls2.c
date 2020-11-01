@@ -23,7 +23,6 @@
 
 #include <igraph.h>
 #include <pthread.h>
-#include <unistd.h>
 #include <string.h>
 
 #include "igraph_arpack_internal.h"
