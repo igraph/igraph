@@ -41,7 +41,7 @@ int main() {
     igraph_permute_vertices(&ring1, &ring2, &perm);
 
     /* Without colors */
-    igraph_isomorphic_bliss(&ring1, &ring2, 0, 0, &iso, 0, 0, 0, 0, 0);
+    igraph_isomorphic_bliss(&ring1, &ring2, 0, 0, &iso, 0, 0, IGRAPH_BLISS_F, 0, 0);
     if (!iso) {
         fprintf(stderr, "Without color failed.\n");
         return 1;
@@ -51,7 +51,7 @@ int main() {
     igraph_vector_int_init(&color1, igraph_vcount(&ring1));
     igraph_vector_int_init(&color2, igraph_vcount(&ring2));
 
-    igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, 0, 0, 0);
+    igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, IGRAPH_BLISS_F, 0, 0);
     if (!iso) {
         fprintf(stderr, "Single color failed.\n");
         return 2;
@@ -61,7 +61,7 @@ int main() {
     igraph_vector_int_fill(&color1, 0);
     igraph_vector_int_fill(&color2, 0);
     VECTOR(color1)[0] = 1;
-    igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, 0, 0, 0);
+    igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, IGRAPH_BLISS_F, 0, 0);
     if (iso) {
         fprintf(stderr, "Negative test failed.\n");
         return 3;
@@ -74,7 +74,7 @@ int main() {
     VECTOR(color1)[1] = 1;
     VECTOR(color2)[0] = 1;
     VECTOR(color2)[2] = 1;
-    igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, 0, 0, 0);
+    igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, IGRAPH_BLISS_F, 0, 0);
     if (iso) {
         fprintf(stderr, "Second negative test failed.\n");
         return 4;
@@ -110,7 +110,7 @@ int main() {
     VECTOR(color2)[7] = 1;
 
     iso = 0;
-    igraph_isomorphic_bliss(&g1, &g2, &color1, &color2, &iso, 0, 0, 0, 0, 0);
+    igraph_isomorphic_bliss(&g1, &g2, &color1, &color2, &iso, 0, 0, IGRAPH_BLISS_F, 0, 0);
     if (!iso) {
         fprintf(stderr, "BLISS failed to identify colored graphs as isomorphic.\n");
         return 5;

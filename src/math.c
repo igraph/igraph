@@ -77,11 +77,13 @@ double igraph_chebyshev_eval(double x, const double *a, const int n) {
     int i;
 
     if (n < 1 || n > 1000) {
-        IGRAPH_NAN;
+        IGRAPH_WARNING("chebyshev_eval: argument out of domain");
+        return IGRAPH_NAN;
     }
 
     if (x < -1.1 || x > 1.1) {
-        IGRAPH_NAN;
+        IGRAPH_WARNING("chebyshev_eval: argument out of domain");
+        return IGRAPH_NAN;
     }
 
     twox = x * 2;
