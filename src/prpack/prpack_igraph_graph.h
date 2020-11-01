@@ -17,7 +17,7 @@ namespace prpack {
 					igraph_bool_t directed = true);
     };
 
-};
+}
 
 // PRPACK_IGRAPH_SUPPORT 
 #endif 
