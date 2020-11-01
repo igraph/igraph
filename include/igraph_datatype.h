@@ -57,11 +57,14 @@ __BEGIN_DECLS
  * - <b>is</b> This is basically the same as <b>os</b>, but this time
  *   for the incoming edges.
  *
- * For undirected graph, the same edge list is stored, ie. an
- * undirected edge is stored only once, and for checking whether there
- * is an undirected edge from \c v1 to \c v2 one
- * should search for both \c from=v1, \c to=v2 and
- * \c from=v2, \c to=v1.
+ * For undirected graphs, the same edge list is stored, i.e. an
+ * undirected edge is stored only once. Currently, undirected edges
+ * are canonicalized so that the index of the 'from' vertex is not greater
+ * than the index of the 'to' vertex. Thus, if v1 <= v2, only the edge (v1, v2)
+ * needs to be searched for, not (v2, v1), to determine if v1 and v2 are connected.
+ * However, this fact is NOT guaranteed by the documented public API, 
+ * and should not be relied upon by the implementation of any functions, 
+ * except those belonging to the minimal API in type_indexededgelist.c.
  *
  * The storage requirements for a graph with \c |V| vertices
  * and \c |E| edges is \c O(|E|+|V|).
