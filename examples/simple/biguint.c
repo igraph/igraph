@@ -41,8 +41,10 @@ int main() {
 
     /* set & add & sub */
     igraph_biguint_set_limb(&one, 1);
-    igraph_biguint_set_limb(&A, UINT_MAX);
-    igraph_biguint_set_limb(&B, UINT_MAX);
+    igraph_biguint_set_limb(&A, INT_MAX);
+    igraph_biguint_set_limb(&B, INT_MAX);
+    igraph_biguint_add(&A, &A, &B);                      /* A <- A + B */
+    igraph_biguint_add(&A, &A, &B);                      /* A <- A + B */
     igraph_biguint_add(&A, &A, &B);                      /* A <- A + B */
 
     igraph_biguint_print(&B);
@@ -51,6 +53,8 @@ int main() {
     putchar('\n');
 
     igraph_biguint_sub(&A, &A, &B);                      /* A <- A - B */
+    igraph_biguint_sub(&A, &A, &B);                      /* A <- A + B */
+    igraph_biguint_sub(&A, &A, &B);                      /* A <- A + B */
     if (!igraph_biguint_equal(&A, &B)) {
         return 1;
     }
