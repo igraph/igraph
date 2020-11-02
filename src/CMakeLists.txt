@@ -260,7 +260,31 @@ endif()
 # Turn on all warnings for GCC, clang and MSVC
 use_all_warnings(igraph)
 
-# Generate pkgconfig file
+# Generate pkgconfig file.
+# The library names being used here are Linux-specific, but pkgconfig files
+# are used on Linux anyway.
+set(PKGCONFIG_LIBS_PRIVATE "-lm")
+if(IGRAPH_GRAPHML_SUPPORT)
+	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lxml2 -lz")
+endif()
+if(IGRAPH_GMP_SUPPORT)
+	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lgmp")
+endif()
+if(NOT IGRAPH_USE_INTERNAL_BLAS)
+	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lblas")
+endif()
+if(NOT IGRAPH_USE_INTERNAL_CXSPARSE)
+	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lcxsparse")
+endif()
+if(IGRAPH_GLPK_SUPPORT AND NOT IGRAPH_USE_INTERNAL_GLPK)
+	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lglpk")
+endif()
+if(NOT IGRAPH_USE_INTERNAL_LAPACK)
+	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -llapack")
+endif()
+if(NOT IGRAPH_USE_INTERNAL_ARPACK)
+	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
+endif()
 configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.cmake.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
 
 # Define how to install the library
