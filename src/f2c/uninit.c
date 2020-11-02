@@ -1,12 +1,8 @@
 
-#ifdef __GLIBC__
-/* This enables the GNU extensions fedisableexcept() and feenableexcept() in fenv.h.
-   _GNU_SOURCE must be defined before *any* standard headers are included
-   because other headrs may potentially include fenv.h. */
+/* Defining _GNU_SOURCE enables the GNU extensions fedisableexcept() and feenableexcept()
+ * when using glibc. It must be defined before any standard headers are included. */
 #define _GNU_SOURCE 1
 #include <fenv.h>
-#endif /* __GLIBC__ */
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
