@@ -21,6 +21,7 @@
 
 */
 
+#include "igraph_paths.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_vector_ptr.h"

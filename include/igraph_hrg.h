@@ -81,6 +81,7 @@ DECLDIR int igraph_hrg_fit(const igraph_t *graph,
 DECLDIR int igraph_hrg_sample(const igraph_t *graph,
                               igraph_t *sample,
                               igraph_vector_ptr_t *samples,
+                              igraph_integer_t no_samples,
                               igraph_hrg_t *hrg,
                               igraph_bool_t start);
 

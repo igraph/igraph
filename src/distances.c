@@ -22,6 +22,7 @@
 
 */
 
+#include "igraph_paths.h"
 #include "igraph_datatype.h"
 #include "igraph_dqueue.h"
 #include "igraph_iterators.h"

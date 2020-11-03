@@ -46,6 +46,7 @@
    -- Tamas Nepusz, 11 July 2013
 */
 
+#include "igraph_topology.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 #include "igraph_vector.h"
