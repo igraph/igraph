@@ -22,6 +22,7 @@
 */
 
 #include "igraph_random.h"
+#include "igraph_nongraph.h"
 #include "igraph_error.h"
 #include "igraph_math.h"
 #include "igraph_types.h"
