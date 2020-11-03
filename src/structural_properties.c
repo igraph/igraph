@@ -1081,7 +1081,7 @@ int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real
 }
 
 /* Not declared static so that the testsuite can use it, but not part of the public API. */
-int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
+int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
     char message[256];
@@ -1312,7 +1312,7 @@ int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mo
 int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
 
     igraph_bool_t use_adjlist = n >= REWIRE_ADJLIST_THRESHOLD;
-    return igraph_rewire_core(graph, n, mode, use_adjlist);
+    return igraph_i_rewire(graph, n, mode, use_adjlist);
 
 }
 
