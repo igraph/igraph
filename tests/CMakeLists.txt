@@ -179,7 +179,7 @@ add_legacy_tests(
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER simple NAMES
-    igraph_rewire # Uses internal igraph_rewire_core
+    igraph_rewire # Uses internal igraph_i_rewire
   )
 endif()
 
