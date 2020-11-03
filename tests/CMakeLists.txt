@@ -88,15 +88,10 @@ add_legacy_tests(
   igraph_delete_vertices
   igraph_empty
   igraph_get_eid
+  igraph_get_eids
   igraph_is_directed
   igraph_neighbors
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    igraph_get_eids
-  )
-endif()
 
 # iterators.at
 add_legacy_tests(
@@ -155,13 +150,15 @@ add_legacy_tests(
   igraph_convergence_degree
   igraph_density
   igraph_diameter
+  igraph_eccentricity
   igraph_edge_betweenness
   igraph_feedback_arc_set
   igraph_feedback_arc_set_ip
   igraph_get_all_shortest_paths_dijkstra
+  igraph_get_all_simple_paths
   igraph_get_shortest_paths
-  igraph_get_shortest_paths2
   igraph_get_shortest_paths_dijkstra
+  igraph_get_shortest_paths2
   igraph_girth
   igraph_has_multiple
   igraph_is_loop
@@ -170,21 +167,19 @@ add_legacy_tests(
   igraph_knn
   igraph_local_transitivity
   igraph_minimum_spanning_tree
+  igraph_pagerank
+  igraph_radius
   igraph_reciprocity
   igraph_similarity
   igraph_simplify
   igraph_transitive_closure_dag
   igraph_transitivity
+  single_target_shortest_path
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER simple NAMES
-    igraph_eccentricity
-    igraph_get_all_simple_paths
-    igraph_pagerank
-    igraph_radius
-    igraph_rewire
-    single_target_shortest_path
+    igraph_rewire # Uses internal igraph_rewire_core
   )
 endif()
 
@@ -218,14 +213,14 @@ add_legacy_tests(
   igraph_layout_merge2
   igraph_layout_merge3
   igraph_layout_reingold_tilford
+  igraph_layout_sugiyama
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER simple NAMES
     igraph_i_layout_sphere
-    igraph_layout_davidson_harel
-    igraph_layout_merge
-    igraph_layout_sugiyama
+    igraph_layout_davidson_harel # Uses igraph_i_segments_intersect and igraph_i_point_segment_dist2
+    igraph_layout_merge # Uses igraph_i_layout_merge functions
   )
 endif()
 
@@ -245,25 +240,20 @@ add_legacy_tests(
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER simple NAMES
-    igraph_bfs
+    igraph_bfs # Uses igraph_i_bfs
   )
 endif()
 
 # topology.at
 add_legacy_tests(
   FOLDER simple NAMES
-  VF2-compat
   igraph_isomorphic_bliss
   igraph_isomorphic_vf2
+  igraph_subisomorphic_lad
   isomorphism_test
   topology
+  VF2-compat
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    igraph_subisomorphic_lad
-  )
-endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
@@ -280,13 +270,8 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER simple NAMES
   igraph_motifs_randesu
+  triad_census
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    triad_census
-  )
-endif()
 
 # foreign.at
 add_legacy_tests(
@@ -356,7 +341,7 @@ add_legacy_tests(
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER simple NAMES
-    igraph_all_st_cuts
+    igraph_all_st_cuts # Uses igraph_marked_queue, which is internal.
   )
 endif()
 
@@ -389,17 +374,12 @@ add_legacy_tests(
   FOLDER simple NAMES
   igraph_cliques
   igraph_independent_sets
+  igraph_maximal_cliques
+  igraph_maximal_cliques2
+  igraph_maximal_cliques3
+  igraph_maximal_cliques4
   igraph_weighted_cliques
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    igraph_maximal_cliques
-    igraph_maximal_cliques2
-    igraph_maximal_cliques3
-    igraph_maximal_cliques4
-  )
-endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
@@ -455,12 +435,10 @@ add_legacy_tests(
 )
 
 # centralization.at
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    centralization
-  )
-endif()
+add_legacy_tests(
+  FOLDER simple NAMES
+  centralization
+)
 
 # separators.at
 add_legacy_tests(
@@ -518,16 +496,11 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER simple NAMES
   igraph_fisher_yates_shuffle
+  igraph_random_sample
   igraph_rng_get_exp
   mt
   random_seed
 )
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    igraph_random_sample
-  )
-endif()
 
 add_legacy_tests(
   FOLDER tests NAMES
@@ -535,13 +508,11 @@ add_legacy_tests(
 )
 
 # qsort.at
-if (BUILD_INTERNAL_TESTS)
-  add_legacy_tests(
-    FOLDER simple NAMES
-    igraph_qsort
-    igraph_qsort_r
-  )
-endif()
+add_legacy_tests(
+  FOLDER simple NAMES
+  igraph_qsort
+  igraph_qsort_r
+)
 
 # matching.at
 add_legacy_tests(
