@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int igraph_rewire_core(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist);
+int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist);
 
 static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjlist, const char* description) {
 
@@ -37,7 +37,7 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, 0);
     igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, 0);
 
-    igraph_rewire_core(&g, 1000, IGRAPH_REWIRING_SIMPLE, use_adjlist);
+    igraph_i_rewire(&g, 1000, IGRAPH_REWIRING_SIMPLE, use_adjlist);
 
     igraph_vector_init(&indegree_after, 0);
     igraph_vector_init(&outdegree_after, 0);
