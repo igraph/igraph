@@ -22,6 +22,7 @@
 
 */
 
+#include "igraph_layout.h"
 #include "igraph_centrality.h"
 #include "igraph_components.h"
 #include "igraph_constants.h"

@@ -31,6 +31,8 @@
  * SUCH DAMAGE.
  */
 
+#include "igraph_qsort.h"
+
 #ifdef _MSC_VER
     /* MSVC does not have inline when compiling C source files */
     #define inline __inline
