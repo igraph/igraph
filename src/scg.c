@@ -2119,6 +2119,8 @@ int igraph_scg_laplacian(const igraph_t *graph,
     igraph_bool_t tmp_lsparse = !Lsparse, tmp_rsparse = !Rsparse;
     igraph_sparsemat_t myLsparse, myRsparse, tmpsparse, Rsparse_t;
 
+    IGRAPH_UNUSED(direction);
+
     /* --------------------------------------------------------------------*/
     /* Argument checks */
 

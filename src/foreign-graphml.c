@@ -984,6 +984,11 @@ static void igraph_i_graphml_sax_handler_start_element_ns(
     int i;
     igraph_bool_t tag_is_unknown = 0;
 
+    IGRAPH_UNUSED(prefix);
+    IGRAPH_UNUSED(nb_namespaces);
+    IGRAPH_UNUSED(namespaces);
+    IGRAPH_UNUSED(nb_defaulted);
+
     if (!state->successful) {
         return;
     }

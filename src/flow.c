@@ -237,21 +237,21 @@ static int igraph_i_maxflow_undirected(const igraph_t *graph,
                         &rev, stats, &npushsince,       \
                         &nrelabelsince))
 #define PUSH(v,e,n)    (igraph_i_mf_push((v), (e), (n), current, rescap,      \
-                        excess, target, source, buckets,     \
+                        excess, target, buckets,     \
                         ibuckets, distance, rev, stats,      \
                         npushsince))
 #define RELABEL(v)     (igraph_i_mf_relabel((v), no_of_nodes, distance,       \
                         first, rescap, to, current,       \
                         stats, nrelabelsince))
-#define GAP(b)         (igraph_i_mf_gap((b), stats, buckets, ibuckets,        \
+#define GAP(b)         (igraph_i_mf_gap((b), stats, ibuckets,        \
                                         no_of_nodes, distance))
-#define BFS()          (igraph_i_mf_bfs(&bfsq, source, target, no_of_nodes,   \
+#define BFS()          (igraph_i_mf_bfs(&bfsq, target, no_of_nodes,   \
                                         &buckets, &ibuckets, &distance,       \
                                         &first, &current, &to, &excess,       \
                                         &rescap, &rev))
 
 static void igraph_i_mf_gap(long int b, igraph_maxflow_stats_t *stats,
-                            igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
+                            igraph_dbuckets_t *ibuckets,
                             long int no_of_nodes,
                             igraph_vector_long_t *distance) {
 
@@ -291,9 +291,8 @@ static void igraph_i_mf_relabel(long int v, long int no_of_nodes,
 }
 
 static void igraph_i_mf_push(long int v, long int e, long int n,
-                             igraph_vector_long_t *current,
                              igraph_vector_t *rescap, igraph_vector_t *excess,
-                             long int target, long int source,
+                             long int target,
                              igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
                              igraph_vector_long_t *distance,
                              igraph_vector_long_t *rev, igraph_maxflow_stats_t *stats,
@@ -358,7 +357,7 @@ static void igraph_i_mf_discharge(long int v,
 }
 
 static void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
-                            long int source, long int target,
+                            long int target,
                             long int no_of_nodes, igraph_buckets_t *buckets,
                             igraph_dbuckets_t *ibuckets,
                             igraph_vector_long_t *distance,

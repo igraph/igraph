@@ -1042,7 +1042,7 @@ static int igraph_i_layout_reingold_tilford_postorder(
                         rnode = -1;
                     }
 #ifdef LAYOUT_RT_DEBUG
-                    printf("    Contour: [%ld, %ld], offsets: [%lf, %lf], rootsep: %lf\n", 
+                    printf("    Contour: [%ld, %ld], offsets: [%lf, %lf], rootsep: %lf\n",
                            lnode, rnode, loffset, roffset, rootsep);
 #endif
 
@@ -2346,6 +2346,8 @@ int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
     long int i, no_of_nodes = igraph_vcount(graph);
     igraph_matrix_t m;
     igraph_bool_t conn;
+
+    IGRAPH_UNUSED(options);
 
     RNG_BEGIN();
 
