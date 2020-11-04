@@ -1,14 +1,19 @@
 #ifndef IGRAPH_CONFIG_H
 #define IGRAPH_CONFIG_H
 
+#cmakedefine HAVE_EXPM1 1
+#cmakedefine HAVE_FABSL 1
+#cmakedefine HAVE_FMIN 1
+#cmakedefine HAVE_LOG2 1
+#cmakedefine HAVE_LOG1P 1
+#cmakedefine HAVE_RINT 1
+#cmakedefine HAVE_RINTF 1
+#cmakedefine HAVE_ROUND 1
 #cmakedefine HAVE_STPCPY 1
 #cmakedefine HAVE_STPCPY_SIGNATURE 1
 #cmakedefine HAVE_STRCASECMP 1
 #cmakedefine HAVE__STRICMP 1
 #cmakedefine HAVE_STRDUP 1
-#cmakedefine HAVE_EXPM1 1
-#cmakedefine HAVE_RINT 1
-#cmakedefine HAVE_RINTF 1
 
 #cmakedefine HAVE_GLPK 1
 #cmakedefine HAVE_GMP 1

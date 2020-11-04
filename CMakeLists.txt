@@ -52,6 +52,11 @@ include(CheckFunctionExists)
 include(CheckSymbolExists)
 
 # First we check for some functions and symbols
+check_function_exists(log2 HAVE_LOG2)
+check_function_exists(log1p HAVE_LOG1P)
+check_function_exists(fabsl HAVE_FABSL)
+check_function_exists(fmin HAVE_FMIN)
+check_function_exists(round HAVE_ROUND)
 check_function_exists(stpcpy HAVE_STPCPY)
 check_function_exists(strcasecmp HAVE_STRCASECMP)
 check_function_exists(_stricmp HAVE__STRICMP)
