@@ -13,6 +13,8 @@ add_custom_target(dist
   USES_TERMINAL
 )
 
+add_dependencies(dist parsersources)
+
 #############################################################################
 ## Configuration of the source package
 #############################################################################
@@ -31,6 +33,7 @@ set(
 	"${CMAKE_SOURCE_DIR}/include;/include"
 	"${CMAKE_SOURCE_DIR}/msvc/include;/msvc/include"
 	"${CMAKE_SOURCE_DIR}/optional;/optional"
+	"${CMAKE_BINARY_DIR}/src/parsers/;/src/parsers"
 	"${CMAKE_SOURCE_DIR}/src;/src"
 	"${CMAKE_SOURCE_DIR}/tests;/tests"
 )
@@ -45,6 +48,8 @@ set(CPACK_INSTALL_SCRIPT "${CMAKE_SOURCE_DIR}/etc/cmake/cpack_install_script.cma
 set(
 	CPACK_SOURCE_IGNORE_FILES
 	"\\\\..*/"
+	"\.l$"
+	"\.y$"
 	"${CMAKE_SOURCE_DIR}/build"
 	"${CMAKE_SOURCE_DIR}/optional/simpleraytracer"
 	"Makefile.am"
