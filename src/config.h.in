@@ -7,6 +7,8 @@
 #cmakedefine HAVE__STRICMP 1
 #cmakedefine HAVE_STRDUP 1
 #cmakedefine HAVE_EXPM1 1
+#cmakedefine HAVE_RINT 1
+#cmakedefine HAVE_RINTF 1
 
 #cmakedefine HAVE_GLPK 1
 #cmakedefine HAVE_GMP 1
