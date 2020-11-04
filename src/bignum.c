@@ -1058,7 +1058,7 @@ limb_t bn_div_hdig(limb_t q[], limb_t u[], limb_t v, count_t nlimb) {
     limb_t mask = DIGMSB;
     limb_t r = 0;
     if (v > HALFMASK) {
-        igraph_errorf("bn_div_hdig called with v:%x", __FILE__,
+        igraph_errorf("bn_div_hdig called with v:%x", __IGRAPH_FILE_BASENAME__,
                       __LINE__, (int) v);
     }
 
@@ -1134,7 +1134,7 @@ limb_t bn_mod_hdig(limb_t u[], limb_t v, count_t nlimb) {
     }
 
     if (v > HALFMASK) {
-        igraph_errorf("bn_mod_hdig called with v:%x", __FILE__,
+        igraph_errorf("bn_mod_hdig called with v:%x", __IGRAPH_FILE_BASENAME__,
                       __LINE__, (int) v);
     }
 
@@ -1336,7 +1336,7 @@ limb_t bn_shl(limb_t a[], limb_t b[], count_t x, count_t nlimb) {
 
     /* check shift amount */
     if (x >= LIMBBITS) {
-        igraph_errorf("bn_shl() called with x >= %d", __FILE__,
+        igraph_errorf("bn_shl() called with x >= %d", __IGRAPH_FILE_BASENAME__,
                       __LINE__, LIMBBITS);
         return 0;
     }
@@ -1384,7 +1384,7 @@ limb_t bn_shr(limb_t a[], limb_t b[], count_t x, count_t nlimb) {
 
     /* check shift amount */
     if (x >= LIMBBITS) {
-        igraph_errorf("bn_shr() called with x >= %d", __FILE__,
+        igraph_errorf("bn_shr() called with x >= %d", __IGRAPH_FILE_BASENAME__,
                       __LINE__, LIMBBITS);
     }
 

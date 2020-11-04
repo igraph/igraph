@@ -132,7 +132,7 @@ ENV *get_env_ptr(void)
       {  /* not initialized yet; perform initialization */
          if (glp_init_env() != 0)
          {  /* initialization failed; display an error message */
-	   igraph_error("GLPK initialization failed", __FILE__, __LINE__,
+	   igraph_error("GLPK initialization failed", __IGRAPH_FILE_BASENAME__, __LINE__,
 			IGRAPH_EGLP);
 	   return NULL;
          }
@@ -142,7 +142,7 @@ ENV *get_env_ptr(void)
       /* check if the environment block is valid */
       if (env->magic != ENV_MAGIC)
       {  
-	igraph_error("Invalid GLPK environment", __FILE__, __LINE__,
+	igraph_error("Invalid GLPK environment", __IGRAPH_FILE_BASENAME__, __LINE__,
 		     IGRAPH_EGLP);
 	return NULL;
       }

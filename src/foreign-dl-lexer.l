@@ -54,7 +54,7 @@
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
 #define YY_FATAL_ERROR(msg)                                     \
-  igraph_error("Fatal error in DL parser: " # msg, __FILE__,    \
+  igraph_error("Fatal error in DL parser: " # msg, __IGRAPH_FILE_BASENAME__,    \
                __LINE__, IGRAPH_PARSEERROR);
 #ifdef stdout 
 #  undef stdout

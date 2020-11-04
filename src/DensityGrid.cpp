@@ -74,7 +74,7 @@ void DensityGrid::Init() {
 #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 #else
-        igraph_error("DrL is out of memory", __FILE__, __LINE__,
+        igraph_error("DrL is out of memory", __IGRAPH_FILE_BASENAME__, __LINE__,
                      IGRAPH_ENOMEM);
         return;
 #endif
@@ -188,7 +188,7 @@ void DensityGrid::Subtract(Node &N) {
 #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 #else
-        igraph_error("Exceeded density grid in DrL", __FILE__,
+        igraph_error("Exceeded density grid in DrL", __IGRAPH_FILE_BASENAME__,
                      __LINE__, IGRAPH_EDRL);
         return;
 #endif
@@ -232,7 +232,7 @@ void DensityGrid::Add(Node &N) {
 #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );
 #else
-        igraph_error("Exceeded density grid in DrL", __FILE__,
+        igraph_error("Exceeded density grid in DrL", __IGRAPH_FILE_BASENAME__,
                      __LINE__, IGRAPH_EDRL);
         return;
 #endif

@@ -184,7 +184,7 @@ degree_sequence(int _n, double exp, int degmin, int degmax, double z) {
         // Binomial distribution
         if (z < 0) {
             igraph_error("Fatal error in degree_sequence Ctor: "
-                         "positive average degree must be specified", __FILE__,
+                         "positive average degree must be specified", __IGRAPH_FILE_BASENAME__,
                          __LINE__, IGRAPH_EINVAL);
         }
         if (degmax < 0) {

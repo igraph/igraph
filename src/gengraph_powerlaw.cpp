@@ -50,13 +50,13 @@ powerlaw::powerlaw(double _alpha, int _mini, int _maxi) {
     maxi = _maxi;
     if (alpha <= 2.0 && maxi < 0)
         igraph_warningf("powerlaw exponent %f should be > 2 when no "
-                        "Maximum is specified", __FILE__, __LINE__, -1, alpha);
+                        "Maximum is specified", __IGRAPH_FILE_BASENAME__, __LINE__, -1, alpha);
     if (alpha <= 1.0 && maxi >= 0)
-        igraph_warningf("powerlaw exponent %f should be > 1", __FILE__, __LINE__,
+        igraph_warningf("powerlaw exponent %f should be > 1", __IGRAPH_FILE_BASENAME__, __LINE__,
                         -1, alpha);
     if (maxi >= 0 && mini > maxi)
         igraph_warningf("powerlaw max %d should be greater than min %d",
-                        __FILE__, __LINE__, -1, maxi, mini);
+                        __IGRAPH_FILE_BASENAME__, __LINE__, -1, maxi, mini);
     table = new int[POWERLAW_TABLE];
     tabulated = 0;
     dt = NULL;
@@ -255,7 +255,7 @@ double powerlaw::init_to_mean(double _mean) {
     if (maxi >= 0 && _mean >= 0.5 * double((mini + maxi))) {
         igraph_errorf("Fatal error in powerlaw::init_to_mean(%f): "
                       "Mean must be in ]min, (min+max)/2[ = ]%d, %d[",
-                      __FILE__, __LINE__, IGRAPH_EINVAL,
+                      __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL,
                       _mean, mini, (mini + maxi) / 2);
         return (-1.0);
     }

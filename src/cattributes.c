@@ -2673,7 +2673,7 @@ igraph_real_t igraph_cattribute_GAN(const igraph_t *graph, const char *name) {
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 
@@ -2706,7 +2706,7 @@ igraph_bool_t igraph_cattribute_GAB(const igraph_t *graph, const char *name) {
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 
@@ -2740,7 +2740,7 @@ const char* igraph_cattribute_GAS(const igraph_t *graph, const char *name) {
     igraph_bool_t l = igraph_i_cattribute_find(gal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 
@@ -2773,7 +2773,7 @@ igraph_real_t igraph_cattribute_VAN(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 
@@ -2806,7 +2806,7 @@ igraph_bool_t igraph_cattribute_VAB(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 
@@ -2839,7 +2839,7 @@ const char* igraph_cattribute_VAS(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(val, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 
@@ -2872,7 +2872,7 @@ igraph_real_t igraph_cattribute_EAN(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 
@@ -2905,7 +2905,7 @@ igraph_bool_t igraph_cattribute_EAB(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 
@@ -2938,7 +2938,7 @@ const char* igraph_cattribute_EAS(const igraph_t *graph, const char *name,
     igraph_bool_t l = igraph_i_cattribute_find(eal, name, &j);
 
     if (!l) {
-        igraph_error("Unknown attribute", __FILE__, __LINE__, IGRAPH_EINVAL);
+        igraph_error("Unknown attribute", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_EINVAL);
         return 0;
     }
 

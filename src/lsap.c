@@ -204,7 +204,7 @@ AP *ap_read_problem(char *file) {
           fprintf(stderr,"ap_read_problem: problem not quadratic\nrows =%d, cols = %d\n",nrow,ncol);
         */
         igraph_warningf("ap_read_problem: problem not quadratic\nrows = %d, cols = %d\n",
-                        __FILE__, __LINE__, -1, nrow, ncol);
+                        __IGRAPH_FILE_BASENAME__, __LINE__, -1, nrow, ncol);
         return NULL;
     }
 

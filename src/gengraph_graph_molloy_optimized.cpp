@@ -426,7 +426,7 @@ bool graph_molloy_opt::havelhakimi() {
             compute_neigh();
             igraph_errorf("Error in graph_molloy_opt::havelhakimi():"
                           " Couldn't bind vertex %d entirely "
-                          "(%d edges remaining)", __FILE__, __LINE__,
+                          "(%d edges remaining)", __IGRAPH_FILE_BASENAME__, __LINE__,
                           IGRAPH_EINTERNAL, v, dv);
             return false;
         }
@@ -499,7 +499,7 @@ bool graph_molloy_opt::make_connected() {
                 delete[] dist;
                 delete[] buff;
                 igraph_errorf("graph_molloy_opt::make_connected() returned FALSE : "
-                              "vertex %d has degree 0", __FILE__, __LINE__,
+                              "vertex %d has degree 0", __IGRAPH_FILE_BASENAME__, __LINE__,
                               IGRAPH_EINTERNAL, v0);
                 return false;
             }
@@ -1283,10 +1283,10 @@ double graph_molloy_opt::traceroute_sample(int mode, int nb_src, int *src, int n
     {
         igraph_statusf("discovered %d vertices and %d edges\n", 0,
                        nbvertices_real(), nbarcs());
-        if (src_0)  igraph_warningf("%d sources had degree 0\n", __FILE__,
+        if (src_0)  igraph_warningf("%d sources had degree 0\n", __IGRAPH_FILE_BASENAME__,
                                         __LINE__, -1, src_0);
         if (nopath) igraph_warningf("%d (src,dst) pairs had no possible path\n",
-                                        __FILE__, __LINE__, -1, nopath);
+                                        __IGRAPH_FILE_BASENAME__, __LINE__, -1, nopath);
     }
     return total_dist / double(nb_paths);
 }
@@ -1453,10 +1453,10 @@ double graph_molloy_opt::path_sampling(int *nb_dst, int *dst, double* redudancie
     }
     if (VERBOSE()) {
         igraph_status("Sampling paths :  Done   \n", 0);
-        if (src_0)  igraph_warningf("%d sources had degree 0", __FILE__,
+        if (src_0)  igraph_warningf("%d sources had degree 0", __IGRAPH_FILE_BASENAME__,
                                         __LINE__, -1, src_0);
         if (nopath) igraph_warningf("%d (src,dst) pairs had no possible path",
-                                        __FILE__, __LINE__, -1, nopath);
+                                        __IGRAPH_FILE_BASENAME__, __LINE__, -1, nopath);
     }
     double tdist = double(total_dist64);
     if (total_dist64 > 0) {
@@ -1485,7 +1485,7 @@ int *graph_molloy_opt::vertices_real(int &nb_v) {
         }
     if (yo != buff + nb_v) {
         igraph_warningf("wrong #vertices in graph_molloy_opt::vertices_real(%d)",
-                        __FILE__, __LINE__, -1, nb_v);
+                        __IGRAPH_FILE_BASENAME__, __LINE__, -1, nb_v);
         delete[] buff;
         return NULL;
     } else {
@@ -1502,7 +1502,7 @@ int *graph_molloy_opt::pick_random_vertices(int &k, int *output, int nb_v, int *
     }
     if (k > nb_v) {
         igraph_warningf("Warning : tried to pick %d among %d vertices. "
-                        "Picked only %d", __FILE__, __LINE__, -1, k, nb_v, nb_v);
+                        "Picked only %d", __IGRAPH_FILE_BASENAME__, __LINE__, -1, k, nb_v, nb_v);
         k = nb_v;
     }
     if (k > 0) {
@@ -1743,10 +1743,10 @@ double graph_molloy_opt::rho(int mode, int nb_src, int *src, int nb_dst, int *ds
     delete[] times_seen;
     {
         igraph_status("done\n", 0);
-        if (src_0)  igraph_warningf("%d sources had degree 0", __FILE__, __LINE__,
+        if (src_0)  igraph_warningf("%d sources had degree 0", __IGRAPH_FILE_BASENAME__, __LINE__,
                                         -1, src_0);
         if (nopath) igraph_warningf("%d (src,dst) pairs had no possible path",
-                                        __FILE__, __LINE__, -1, nopath);
+                                        __IGRAPH_FILE_BASENAME__, __LINE__, -1, nopath);
     }
     return (sum_nij - sum_ni) * double(n) * double(nb_src) / (sum_ni * sum_ni * double(nb_src - 1));
 }

@@ -199,6 +199,11 @@ target_compile_definitions(
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
 
+# Make sure that a macro named __IGRAPH_FILE_BASENAME__ is provided in every
+# compiler call so we can use these in debug messages without revealing the
+# full path of the file on the machine where it was compiled
+define_file_basename_for_sources(igraph)
+
 # Add include path. Includes are in ../include but they get installed to
 # <prefix>/include/igraph, hence the two options. We also have some private
 # includes that are generated at compile time but are not part of the public
