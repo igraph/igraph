@@ -879,7 +879,6 @@ static int igraph_i_lse_und(const igraph_t *graph,
                      igraph_integer_t no,
                      const igraph_vector_t *weights,
                      igraph_eigen_which_position_t which,
-                     igraph_neimode_t degmode,
                      igraph_laplacian_spectral_embedding_type_t type,
                      igraph_bool_t scaled,
                      igraph_matrix_t *X,
@@ -940,7 +939,6 @@ static int igraph_i_lse_dir(const igraph_t *graph,
                      igraph_integer_t no,
                      const igraph_vector_t *weights,
                      igraph_eigen_which_position_t which,
-                     igraph_neimode_t degmode,
                      igraph_laplacian_spectral_embedding_type_t type,
                      igraph_bool_t scaled,
                      igraph_matrix_t *X,
@@ -1049,7 +1047,6 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
                                         igraph_integer_t n,
                                         const igraph_vector_t *weights,
                                         igraph_eigen_which_position_t which,
-                                        igraph_neimode_t degmode,
                                         igraph_laplacian_spectral_embedding_type_t type,
                                         igraph_bool_t scaled,
                                         igraph_matrix_t *X,
@@ -1058,10 +1055,10 @@ int igraph_laplacian_spectral_embedding(const igraph_t *graph,
                                         igraph_arpack_options_t *options) {
 
     if (igraph_is_directed(graph)) {
-        return igraph_i_lse_dir(graph, n, weights, which, degmode, type, scaled,
+        return igraph_i_lse_dir(graph, n, weights, which, type, scaled,
                                 X, Y, D, options);
     } else {
-        return igraph_i_lse_und(graph, n, weights, which, degmode, type, scaled,
+        return igraph_i_lse_und(graph, n, weights, which, type, scaled,
                                 X, Y, D, options);
     }
 }

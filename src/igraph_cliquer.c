@@ -104,6 +104,8 @@ static boolean collect_cliques_callback(set_t s, graph_t *g, clique_options *opt
     igraph_vector_t *clique;
     int i, j;
 
+    IGRAPH_UNUSED(g);
+
     CLIQUER_ALLOW_INTERRUPTION();
 
     list = (igraph_vector_ptr_t *) opt->user_data;
@@ -163,6 +165,8 @@ int igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
 
 static boolean count_cliques_callback(set_t s, graph_t *g, clique_options *opt) {
     igraph_vector_t *hist;
+
+    IGRAPH_UNUSED(g);
 
     CLIQUER_ALLOW_INTERRUPTION();
 
@@ -229,6 +233,8 @@ static boolean callback_callback(set_t s, graph_t *g, clique_options *opt) {
     igraph_vector_t *clique;
     struct callback_data *cd;
     int i, j;
+
+    IGRAPH_UNUSED(g);
 
     CLIQUER_ALLOW_INTERRUPTION();
 

@@ -428,7 +428,6 @@ int igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
 
 int igraph_transitivity_local_undirected4(const igraph_t *graph,
         igraph_vector_t *res,
-        const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
 
 #define TRANSIT 1
@@ -493,7 +492,7 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
     }
 
     if (igraph_vs_is_all(&vids)) {
-        return igraph_transitivity_local_undirected4(graph, res, vids, mode);
+        return igraph_transitivity_local_undirected4(graph, res, mode);
     } else {
         igraph_vit_t vit;
         long int size;

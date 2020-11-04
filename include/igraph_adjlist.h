@@ -85,8 +85,7 @@ DECLDIR int igraph_inclist_init(const igraph_t *graph,
 DECLDIR int igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
 DECLDIR void igraph_inclist_destroy(igraph_inclist_t *il);
 DECLDIR void igraph_inclist_clear(igraph_inclist_t *il);
-DECLDIR int igraph_inclist_remove_duplicate(const igraph_t *graph,
-        igraph_inclist_t *il);
+DECLDIR int igraph_inclist_remove_duplicate(igraph_inclist_t *il);
 DECLDIR int igraph_inclist_print(const igraph_inclist_t *il);
 DECLDIR int igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 
@@ -188,8 +187,7 @@ DECLDIR int igraph_adjedgelist_init(const igraph_t *graph,
                                     igraph_inclist_t *il,
                                     igraph_neimode_t mode);
 DECLDIR void igraph_adjedgelist_destroy(igraph_inclist_t *il);
-DECLDIR int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
-        igraph_inclist_t *il);
+DECLDIR int igraph_adjedgelist_remove_duplicate(igraph_inclist_t *il);
 DECLDIR int igraph_adjedgelist_print(const igraph_inclist_t *il, FILE *outfile);
 
 /**
