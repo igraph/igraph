@@ -1528,7 +1528,7 @@ int igraph_eigen_laplacian(const igraph_t *graph,
     IGRAPH_UNUSED(values);
     IGRAPH_UNUSED(vectors);
     IGRAPH_UNUSED(cmplxvalues);
-    IGRAPH_UNUSED(cmplxvector);
+    IGRAPH_UNUSED(cmplxvectors);
 
     IGRAPH_ERROR("'igraph_eigen_laplacian'", IGRAPH_UNIMPLEMENTED);
     /* TODO */
