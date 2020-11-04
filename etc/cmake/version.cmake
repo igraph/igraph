@@ -23,6 +23,11 @@ elseif(EXISTS "${VERSION_FILE}")
   file(READ "${VERSION_FILE}" PACKAGE_VERSION)
   string(STRIP "${PACKAGE_VERSION}" PACKAGE_VERSION)
   message(STATUS "Version number: ${PACKAGE_VERSION}")
+elseif(EXISTS "${NEXT_VERSION_FILE}")
+  file(READ "${NEXT_VERSION_FILE}" PACKAGE_VERSION)
+  string(STRIP "${NEXT_PACKAGE_VERSION}" PACKAGE_VERSION)
+  string(APPEND PACKAGE_VERSION "-dev")
+  message(STATUS "Version number: ${PACKAGE_VERSION}")
 elseif(DEFINED ENV{TRAVIS_COMMIT})
   # git_describe() might fail on Travis if the latest git tag is too far away
   # in the past and Travis did not fetch it as part of the commit history. We
