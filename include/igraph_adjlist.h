@@ -187,8 +187,7 @@ DECLDIR int igraph_adjedgelist_init(const igraph_t *graph,
                                     igraph_inclist_t *il,
                                     igraph_neimode_t mode);
 DECLDIR void igraph_adjedgelist_destroy(igraph_inclist_t *il);
-DECLDIR int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
-        igraph_inclist_t *il);
+DECLDIR int igraph_adjedgelist_remove_duplicate(igraph_inclist_t *il);
 DECLDIR int igraph_adjedgelist_print(const igraph_inclist_t *il, FILE *outfile);
 
 /**
