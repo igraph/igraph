@@ -199,7 +199,7 @@ target_compile_definitions(
   IGRAPH_VERIFY_FINALLY_STACK=$<IF:$<BOOL:${IGRAPH_VERIFY_FINALLY_STACK}>,1,0>
 )
 
-# Make sure that a macro named __IGRAPH_FILE_BASENAME__ is provided in every
+# Make sure that a macro named IGRAPH_FILE_BASENAME is provided in every
 # compiler call so we can use these in debug messages without revealing the
 # full path of the file on the machine where it was compiled
 define_file_basename_for_sources(igraph)

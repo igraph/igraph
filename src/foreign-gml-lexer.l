@@ -53,7 +53,7 @@
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
 #define YY_FATAL_ERROR(msg)                                      \
-  igraph_error("Fatal error in GML parser: " # msg, __IGRAPH_FILE_BASENAME__,    \
+  igraph_error("Fatal error in GML parser: " # msg, IGRAPH_FILE_BASENAME,    \
                __LINE__, IGRAPH_PARSEERROR);
 #ifdef stdout 
 #  undef stdout

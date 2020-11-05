@@ -41,7 +41,7 @@ double prpack_utils::get_time() {
 void prpack_utils::validate(const bool condition, const string& msg) {
     if (!condition) {
 #ifdef PRPACK_IGRAPH_SUPPORT
-        igraph_error("Internal error in PRPACK", __IGRAPH_FILE_BASENAME__, __LINE__, 
+        igraph_error("Internal error in PRPACK", IGRAPH_FILE_BASENAME, __LINE__, 
 	             IGRAPH_EINTERNAL);
 #else
         cerr << msg << endl;

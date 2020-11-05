@@ -767,16 +767,16 @@ igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
     if (al->adjs[no] == 0) {
         al->adjs[no] = igraph_Calloc(1, igraph_vector_t);
         if (al->adjs[no] == 0) {
-            igraph_error("Lazy adjlist failed", __IGRAPH_FILE_BASENAME__, __LINE__,
+            igraph_error("Lazy adjlist failed", IGRAPH_FILE_BASENAME, __LINE__,
                          IGRAPH_ENOMEM);
         }
         ret = igraph_vector_init(al->adjs[no], 0);
         if (ret != 0) {
-            igraph_error("", __IGRAPH_FILE_BASENAME__, __LINE__, ret);
+            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
         }
         ret = igraph_neighbors(al->graph, al->adjs[no], no, al->mode);
         if (ret != 0) {
-            igraph_error("", __IGRAPH_FILE_BASENAME__, __LINE__, ret);
+            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
         }
 
         if (al->simplify == IGRAPH_SIMPLIFY) {
@@ -922,16 +922,16 @@ igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *il,
     if (il->incs[no] == 0) {
         il->incs[no] = igraph_Calloc(1, igraph_vector_t);
         if (il->incs[no] == 0) {
-            igraph_error("Lazy incidence list query failed", __IGRAPH_FILE_BASENAME__, __LINE__,
+            igraph_error("Lazy incidence list query failed", IGRAPH_FILE_BASENAME, __LINE__,
                          IGRAPH_ENOMEM);
         }
         ret = igraph_vector_init(il->incs[no], 0);
         if (ret != 0) {
-            igraph_error("", __IGRAPH_FILE_BASENAME__, __LINE__, ret);
+            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
         }
         ret = igraph_incident(il->graph, il->incs[no], no, il->mode);
         if (ret != 0) {
-            igraph_error("", __IGRAPH_FILE_BASENAME__, __LINE__, ret);
+            igraph_error("", IGRAPH_FILE_BASENAME, __LINE__, ret);
         }
     }
     return il->incs[no];

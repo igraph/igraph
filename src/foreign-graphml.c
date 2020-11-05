@@ -70,7 +70,7 @@ xmlEntityPtr blankEntity = &blankEntityStruct;
 
 #define GRAPHML_PARSE_ERROR_WITH_CODE(state, msg, code) do {  \
         if (state->successful) {                                    \
-            igraph_error(msg, __IGRAPH_FILE_BASENAME__, __LINE__, code);              \
+            igraph_error(msg, IGRAPH_FILE_BASENAME, __LINE__, code);              \
             igraph_i_graphml_sax_handler_error(state, msg);           \
         }                                                           \
     } while (0)
@@ -381,7 +381,7 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
         r = igraph_vector_ptr_init(&vattr,
                                    igraph_vector_ptr_size(&state->v_attrs) + 1);
         if (r) {
-            igraph_error("Cannot parse GraphML file", __IGRAPH_FILE_BASENAME__, __LINE__, r);
+            igraph_error("Cannot parse GraphML file", IGRAPH_FILE_BASENAME, __LINE__, r);
             igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
             return;
         }
@@ -391,14 +391,14 @@ static void igraph_i_graphml_sax_handler_end_document(void *state0) {
         }
         r = igraph_vector_ptr_init(&eattr, esize);
         if (r) {
-            igraph_error("Cannot parse GraphML file", __IGRAPH_FILE_BASENAME__, __LINE__, r);
+            igraph_error("Cannot parse GraphML file", IGRAPH_FILE_BASENAME, __LINE__, r);
             igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
             return;
         }
         IGRAPH_FINALLY(igraph_vector_ptr_destroy, &eattr);
         r = igraph_vector_ptr_init(&gattr, igraph_vector_ptr_size(&state->g_attrs));
         if (r) {
-            igraph_error("Cannot parse GraphML file", __IGRAPH_FILE_BASENAME__, __LINE__, r);
+            igraph_error("Cannot parse GraphML file", IGRAPH_FILE_BASENAME, __LINE__, r);
             igraph_i_graphml_sax_handler_error(state, "Cannot parse GraphML file");
             return;
         }
@@ -639,20 +639,20 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
                 trie = &state->e_names;
                 ptrvector = &state->e_attrs;
             } else if (!xmlStrncmp(toXmlChar("graphml"), XML_ATTR_VALUE(it))) {
-                igraph_i_report_unhandled_attribute_target("graphml", __IGRAPH_FILE_BASENAME__, __LINE__);
+                igraph_i_report_unhandled_attribute_target("graphml", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
             } else if (!xmlStrncmp(toXmlChar("hyperedge"), XML_ATTR_VALUE(it))) {
-                igraph_i_report_unhandled_attribute_target("hyperedge", __IGRAPH_FILE_BASENAME__, __LINE__);
+                igraph_i_report_unhandled_attribute_target("hyperedge", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
             } else if (!xmlStrncmp(toXmlChar("port"), XML_ATTR_VALUE(it))) {
-                igraph_i_report_unhandled_attribute_target("port", __IGRAPH_FILE_BASENAME__, __LINE__);
+                igraph_i_report_unhandled_attribute_target("port", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
             } else if (!xmlStrncmp(toXmlChar("endpoint"), XML_ATTR_VALUE(it))) {
-                igraph_i_report_unhandled_attribute_target("endpoint", __IGRAPH_FILE_BASENAME__, __LINE__);
+                igraph_i_report_unhandled_attribute_target("endpoint", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
             } else if (!xmlStrncmp(toXmlChar("all"), XML_ATTR_VALUE(it))) {
                 /* TODO: we should handle this */
-                igraph_i_report_unhandled_attribute_target("all", __IGRAPH_FILE_BASENAME__, __LINE__);
+                igraph_i_report_unhandled_attribute_target("all", IGRAPH_FILE_BASENAME, __LINE__);
                 skip = 1;
             } else {
                 GRAPHML_PARSE_ERROR(state,
@@ -676,7 +676,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
 
     /* if the attribute type is missing, throw an error */
     if (!skip && rec->type == I_GRAPHML_UNKNOWN_TYPE) {
-        igraph_warningf("Ignoring <key id=\"%s\"> because of a missing or unknown 'attr.type' attribute", __IGRAPH_FILE_BASENAME__, __LINE__, 0, rec->id);
+        igraph_warningf("Ignoring <key id=\"%s\"> because of a missing or unknown 'attr.type' attribute", IGRAPH_FILE_BASENAME, __LINE__, 0, rec->id);
         skip = 1;
     }
 
@@ -841,7 +841,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
         /* no key specified, issue a warning */
         igraph_warningf(
             "missing attribute key in a <data> tag, ignoring attribute",
-            __IGRAPH_FILE_BASENAME__, __LINE__, 0,
+            IGRAPH_FILE_BASENAME, __LINE__, 0,
             key
         );
         igraph_Free(state->data_char);
@@ -853,7 +853,7 @@ static void igraph_i_graphml_attribute_data_finish(struct igraph_i_graphml_parse
         /* no such attribute key, issue a warning */
         igraph_warningf(
             "unknown attribute key '%s' in a <data> tag, ignoring attribute",
-            __IGRAPH_FILE_BASENAME__, __LINE__, 0,
+            IGRAPH_FILE_BASENAME, __LINE__, 0,
             key
         );
         igraph_Free(state->data_char);
@@ -938,7 +938,7 @@ static void igraph_i_graphml_attribute_default_value_finish(
     if (graphmlrec == 0) {
         igraph_warning("state->current_attr_record was null where it should have been "
                        "non-null; this is probably a bug. Please notify the developers!",
-                       __IGRAPH_FILE_BASENAME__, __LINE__, 0);
+                       IGRAPH_FILE_BASENAME, __LINE__, 0);
         return;
     }
 

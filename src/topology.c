@@ -1880,7 +1880,7 @@ static igraph_bool_t igraph_i_get_isomorphisms_vf2(
     igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
     IGRAPH_UNUSED(map12);
     if (!newvector) {
-        igraph_error("Out of memory", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_ENOMEM);
+        igraph_error("Out of memory", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
         return 0;           /* stop right here */
     }
     IGRAPH_FINALLY(igraph_free, newvector);
@@ -2703,7 +2703,7 @@ static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
     igraph_vector_t *newvector = igraph_Calloc(1, igraph_vector_t);
     IGRAPH_UNUSED(map12);
     if (!newvector) {
-        igraph_error("Out of memory", __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_ENOMEM);
+        igraph_error("Out of memory", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
         return 0;           /* stop right here */
     }
     IGRAPH_FINALLY(igraph_free, newvector);

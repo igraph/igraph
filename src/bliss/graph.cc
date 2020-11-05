@@ -38,8 +38,8 @@
 
 namespace bliss {
 
-#define _INTERNAL_ERROR() fatal_error("%s:%d: internal error",__IGRAPH_FILE_BASENAME__,__LINE__)
-#define _OUT_OF_MEMORY() fatal_error("%s:%d: out of memory",__IGRAPH_FILE_BASENAME__,__LINE__)
+#define _INTERNAL_ERROR() fatal_error("%s:%d: internal error",IGRAPH_FILE_BASENAME,__LINE__)
+#define _OUT_OF_MEMORY() fatal_error("%s:%d: out of memory",IGRAPH_FILE_BASENAME,__LINE__)
 
 /*-------------------------------------------------------------------------
  *

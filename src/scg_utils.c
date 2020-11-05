@@ -87,7 +87,7 @@ igraph_real_t *igraph_i_real_sym_matrix(const int size)  {
     igraph_real_t *S = igraph_Calloc(size * (size + 1) / 2, igraph_real_t);
     if (!S) {
         igraph_error("allocation failure in real_sym_matrix()",
-                     __IGRAPH_FILE_BASENAME__, __LINE__, IGRAPH_ENOMEM);
+                     IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     }
     return S;
 }

@@ -395,14 +395,14 @@ typedef enum {
 /* Each enum value above must have a corresponding error string in
  * igraph_i_error_strings[] in igraph_error.c */
 
-/* We use __IGRAPH_FILE_BASENAME__ instead of __FILE__ to ensure that full
- * paths don't leak into the library code. __IGRAPH_FILE_BASENAME__ is set up
+/* We use IGRAPH_FILE_BASENAME instead of __FILE__ to ensure that full
+ * paths don't leak into the library code. IGRAPH_FILE_BASENAME is set up
  * by the build system when compiling the individual files. However, when
  * including igraph_error.h in user code, this macro is not defined so we
  * fall back to __FILE__ here
  */
-#ifndef __IGRAPH_FILE_BASENAME__
-#  define __IGRAPH_FILE_BASENAME__ __FILE__
+#ifndef IGRAPH_FILE_BASENAME
+#  define IGRAPH_FILE_BASENAME __FILE__
 #endif
 
 /**
@@ -427,7 +427,7 @@ typedef enum {
 
 #define IGRAPH_ERROR(reason,igraph_errno) \
     do { \
-        igraph_error (reason, __IGRAPH_FILE_BASENAME__, __LINE__, igraph_errno) ; \
+        igraph_error (reason, IGRAPH_FILE_BASENAME, __LINE__, igraph_errno) ; \
         return igraph_errno ; \
     } while (0)
 
@@ -742,7 +742,7 @@ DECLDIR int igraph_warningf(const char *reason, const char *file, int line,
 
 #define IGRAPH_WARNING(reason) \
     do { \
-        igraph_warning(reason, __IGRAPH_FILE_BASENAME__, __LINE__, -1); \
+        igraph_warning(reason, IGRAPH_FILE_BASENAME, __LINE__, -1); \
     } while (0)
 
 __END_DECLS
