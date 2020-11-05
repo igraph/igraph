@@ -4,19 +4,25 @@ include(PadString)
 # for tests
 include(FindThreads)
 
+macro(tristate OPTION_NAME DESCRIPTION DEFAULT_VALUE)
+  set(${OPTION_NAME} "${DEFAULT_VALUE}" CACHE STRING "${DESCRIPTION}")
+  set_property(CACHE ${OPTION_NAME} PROPERTY STRINGS AUTO ON OFF)
+endmacro()
+
 macro(find_dependencies)
-  # Declare the list of dependencies that _may_ be vendored
+  # Declare the list of dependencies that _may_ be vendored and those that may not
   set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK)
+  set(NONVENDORABLE_DEPENDENCIES GLPK GMP)
 
   # Declare configuration options for dependencies
-  option(IGRAPH_GLPK_SUPPORT "Compile igraph with GLPK support" YES)
-  option(IGRAPH_GMP_SUPPORT "Compile igraph with GMP support" YES)
-  option(IGRAPH_GRAPHML_SUPPORT "Compile igraph with GraphML support" YES)
-  option(IGRAPH_USE_INTERNAL_BLAS "Compile igraph with internal BLAS" NO)
-  option(IGRAPH_USE_INTERNAL_CXSPARSE "Compile igraph with internal CXSparse" NO)
-  option(IGRAPH_USE_INTERNAL_GLPK "Compile igraph with internal GLPK" NO)
-  option(IGRAPH_USE_INTERNAL_LAPACK "Compile igraph with internal LAPACK" NO)
-  option(IGRAPH_USE_INTERNAL_ARPACK "Compile igraph with internal ARPACK" NO)
+  tristate(IGRAPH_GLPK_SUPPORT "Compile igraph with GLPK support" AUTO)
+  tristate(IGRAPH_GMP_SUPPORT "Compile igraph with GMP support" AUTO)
+  tristate(IGRAPH_GRAPHML_SUPPORT "Compile igraph with GraphML support" AUTO)
+  tristate(IGRAPH_USE_INTERNAL_ARPACK "Compile igraph with internal ARPACK" AUTO)
+  tristate(IGRAPH_USE_INTERNAL_BLAS "Compile igraph with internal BLAS" AUTO)
+  tristate(IGRAPH_USE_INTERNAL_CXSPARSE "Compile igraph with internal CXSparse" AUTO)
+  tristate(IGRAPH_USE_INTERNAL_GLPK "Compile igraph with internal GLPK" AUTO)
+  tristate(IGRAPH_USE_INTERNAL_LAPACK "Compile igraph with internal LAPACK" AUTO)
 
   # Declare dependencies
   set(REQUIRED_DEPENDENCIES "")
@@ -27,14 +33,40 @@ macro(find_dependencies)
   # copies or not
   foreach(DEPENDENCY ${VENDORABLE_DEPENDENCIES})
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
-    if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER})
+    if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} STREQUAL "AUTO")
+      find_package(${DEPENDENCY})
+      if(${LIBNAME_UPPER}_FOUND)
+        list(APPEND REQUIRED_DEPENDENCIES ${DEPENDENCY})
+      else()
+        list(APPEND VENDORED_DEPENDENCIES ${DEPENDENCY})
+      endif()
+    elseif(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER})
       list(APPEND VENDORED_DEPENDENCIES ${DEPENDENCY})
     else()
       list(APPEND REQUIRED_DEPENDENCIES ${DEPENDENCY})
     endif()
   endforeach()
 
-  # Declare dependencies dependent on some configuration settings
+  # For nonvendorable dependencies, figure out whether we should attempt to
+  # link to them based on the value of the IGRAPH_..._SUPPORT option
+  foreach(DEPENDENCY ${NONVENDORABLE_DEPENDENCIES})
+    string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
+    if(IGRAPH_${LIBNAME_UPPER}_SUPPORT STREQUAL "AUTO")
+      find_package(${DEPENDENCY})
+      if(${LIBNAME_UPPER}_FOUND)
+        set(IGRAPH_${LIBNAME_UPPER}_SUPPORT ON)
+      else()
+        set(IGRAPH_${LIBNAME_UPPER}_SUPPORT OFF)
+      endif()
+    endif()
+  endforeach()
+
+  # GraphML support is treated separately because the library name is different
+  if(IGRAPH_GRAPHML_SUPPORT STREQUAL "AUTO")
+    find_package(LibXml2)
+	set(IGRAPH_GRAPHML_SUPPORT $<IF:$<BOOL:${LibXml2_FOUND}>,ON,OFF>)
+  endif()
+
   if(NOT IGRAPH_GLPK_SUPPORT)
     if(IGRAPH_USE_INTERNAL_GLPK)
       list(REMOVE_ITEM VENDORED_DEPENDENCIES GLPK)
@@ -42,9 +74,11 @@ macro(find_dependencies)
       list(REMOVE_ITEM REQUIRED_DEPENDENCIES GLPK)
     endif()
   endif()
+
   if(IGRAPH_GMP_SUPPORT)
     list(APPEND REQUIRED_DEPENDENCIES GMP)
   endif()
+
   if(IGRAPH_GRAPHML_SUPPORT)
     list(APPEND REQUIRED_DEPENDENCIES LibXml2)
   endif()
