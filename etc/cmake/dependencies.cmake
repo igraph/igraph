@@ -64,7 +64,11 @@ macro(find_dependencies)
   # GraphML support is treated separately because the library name is different
   if(IGRAPH_GRAPHML_SUPPORT STREQUAL "AUTO")
     find_package(LibXml2)
-	set(IGRAPH_GRAPHML_SUPPORT $<IF:$<BOOL:${LibXml2_FOUND}>,ON,OFF>)
+    if(LibXml2_FOUND)
+      set(IGRAPH_GRAPHML_SUPPORT ON)
+    else()
+      set(IGRAPH_GRAPHML_SUPPORT OFF)
+    endif()
   endif()
 
   if(NOT IGRAPH_GLPK_SUPPORT)
