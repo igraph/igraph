@@ -15,7 +15,7 @@ macro(find_dependencies)
   set(NONVENDORABLE_DEPENDENCIES GLPK GMP)
 
   # Declare configuration options for dependencies
-  tristate(IGRAPH_GLPK_SUPPORT "Compile igraph with GLPK support" AUTO)
+  option(IGRAPH_GLPK_SUPPORT "Compile igraph with GLPK support" ON)
   tristate(IGRAPH_GMP_SUPPORT "Compile igraph with GMP support" AUTO)
   tristate(IGRAPH_GRAPHML_SUPPORT "Compile igraph with GraphML support" AUTO)
   tristate(IGRAPH_USE_INTERNAL_ARPACK "Compile igraph with internal ARPACK" AUTO)
