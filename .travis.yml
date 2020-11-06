@@ -6,7 +6,8 @@ os: linux
 
 env:
   global:
-    - MAKEFLAGS="-j 2"
+    - MAKEFLAGS="-j2"
+    - CTEST_PARALLEL_LEVEL=2
 
 git:
   depth: 200    # to make sure we find the latest tag when building. Increase if not enough.
