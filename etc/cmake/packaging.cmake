@@ -13,8 +13,6 @@ add_custom_target(dist
   USES_TERMINAL
 )
 
-add_dependencies(dist parsersources)
-
 #############################################################################
 ## Configuration of the source package
 #############################################################################

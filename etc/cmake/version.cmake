@@ -76,3 +76,15 @@ if(PACKAGE_VERSION MATCHES "^[^-]+-")
 else()
   set(PACKAGE_VERSION_PRERELEASE "cmake-experimental")
 endif()
+
+# Add a target that we can use to generate an IGRAPH_VERSION file in the build
+# folder, for the sake of creating a tarball
+add_custom_target(
+  versionfile
+  BYPRODUCTS "${CMAKE_BINARY_DIR}/IGRAPH_VERSION"
+  COMMAND "${CMAKE_COMMAND}"
+    -DIGRAPH_VERSION="${PACKAGE_VERSION}"
+	-DVERSION_FILE_PATH="${CMAKE_BINARY_DIR}/IGRAPH_VERSION"
+	-P "${CMAKE_SOURCE_DIR}/etc/cmake/create_igraph_version_file.cmake"
+  COMMENT "Generating IGRAPH_VERSION file in build folder"
+)
