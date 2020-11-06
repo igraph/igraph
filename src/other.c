@@ -360,7 +360,7 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
     if (discrete) {
         plfit_discrete_options_init(&disc_options);
-        /* TODO: pproximation method should be switched to PLFIT_P_VALUE_EXACT in igraph 0.9 */
+        /* TODO: approximation method should be switched to PLFIT_P_VALUE_EXACT in igraph 0.9 */
         disc_options.p_value_method = PLFIT_P_VALUE_APPROXIMATE;
         disc_options.finite_size_correction = (plfit_bool_t) finite_size_correction;
 
