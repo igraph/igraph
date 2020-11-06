@@ -6,8 +6,9 @@ os: linux
 
 env:
   global:
-    - MAKEFLAGS="-j2"
-    - CTEST_PARALLEL_LEVEL=2
+    # - MAKEFLAGS="-j2" # not currently used, as we build with ninja
+    - CTEST_PARALLEL_LEVEL=2 # run tests in parallel
+    - PATH="/usr/bin:$PATH" # needed in order to find the latest cmake
 
 git:
   depth: 200    # to make sure we find the latest tag when building. Increase if not enough.
@@ -19,6 +20,7 @@ addons:
       key_url: "https://apt.kitware.com/keys/kitware-archive-latest.asc"
     packages:
     - cmake
+    - ninja-build
     - flex
     - bison
     - docbook2x
@@ -37,13 +39,14 @@ addons:
   homebrew:
     packages:
     - ccache
-    - flex
-    - bison
+    - ninja
+    # - flex  # test with the old flex version that ships with macOS
+    # - bison # test with the old bison version that ships with macOS
     - gmp
-    - glpk
+    # - glpk # currently we test with internal GLPK on macOS
 
 script:
-  - make check
+  - CTEST_OUTPUT_ON_FAILURE=1 ctest # report output only for failed tests
 
 after_failure:
   - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
@@ -55,16 +58,21 @@ jobs:
       install:
         - mkdir build
         - cd build
-        - /usr/bin/cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
-        - make
+        - cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+        - cmake --build . --target build_tests
+        
     - name: "Linux external deps"
       os: linux
       dist: bionic
       install:
         - mkdir build
         - cd build
-        - /usr/bin/cmake .. -DIGRAPH_VERIFY_FINALLY_STACK=1
-        - make
+        - cmake .. -GNinja -DIGRAPH_VERIFY_FINALLY_STACK=1
+        - cmake --build . --target build_tests
+        
+    # Test with x87 floating-point instructions instead of SSE
+    # This may reveal tests that are numerically unstable, and therefore have a high risk of producing false positives
+    # Since most numerically intensive computations happen in the dependencies, build with all-internal libraries
     - name: "Linux x87"
       os: linux
       env:
@@ -72,7 +80,8 @@ jobs:
       install:
         - mkdir build
         - cd build
-        - /usr/bin/cmake .. -DCMAKE_VERBOSE_MAKEFILE=1
+        - /usr/bin/cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1
+        - cmake --build . --target build_tests
 
     - name: "macOS"
       os: osx
@@ -80,8 +89,10 @@ jobs:
       install:
         - mkdir build
         - cd build
-        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1 -DUSE_SANITIZER=Address\;Undefined
-        - make
+        # disable internal BLAS/LAPACK in order to test building with Apple vecLib, which provides these APIs
+        # do not use IGRAPH_VERIFY_FINALLY_STACK as it increases the runtimes immensely in combination with Address Sanitizer
+        - cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DUSE_SANITIZER=Address\;Undefined
+        - cmake --build . --target build_tests
 
     - name: "Documentation"
       language: shell
@@ -89,9 +100,9 @@ jobs:
       install:
         - mkdir build
         - cd build
-        - /usr/bin/cmake ..
+        - cmake .. -GNinja
       script:
-        - make doc
+        - cmake --build . --target doc
 
 notifications:
   email:
