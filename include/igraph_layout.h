@@ -120,8 +120,7 @@ DECLDIR int igraph_layout_graphopt(const igraph_t *graph,
                                    igraph_bool_t use_seed);
 
 DECLDIR int igraph_layout_mds(const igraph_t *graph, igraph_matrix_t *res,
-                              const igraph_matrix_t *dist, long int dim,
-                              igraph_arpack_options_t *options);
+                              const igraph_matrix_t *dist, long int dim);
 
 DECLDIR int igraph_layout_bipartite(const igraph_t *graph,
                                     const igraph_vector_bool_t *types,

@@ -2330,8 +2330,6 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
  *        used as distances.
  * \param dim The number of dimensions in the embedding space. For
  *        2D layouts, supply 2 here.
- * \param options This argument is currently ignored, it was used for
- *        ARPACK, but LAPACK is used now for calculating the eigenvectors.
  * \return Error code.
  *
  * Added in version 0.6.
@@ -2341,13 +2339,10 @@ int igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
  */
 
 int igraph_layout_mds(const igraph_t* graph, igraph_matrix_t *res,
-                      const igraph_matrix_t *dist, long int dim,
-                      igraph_arpack_options_t *options) {
+                      const igraph_matrix_t *dist, long int dim) {
     long int i, no_of_nodes = igraph_vcount(graph);
     igraph_matrix_t m;
     igraph_bool_t conn;
-
-    IGRAPH_UNUSED(options);
 
     RNG_BEGIN();
 
