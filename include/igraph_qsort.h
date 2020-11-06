@@ -25,7 +25,6 @@
 #define IGRAPH_QSORT_H
 
 #include "igraph_decls.h"
-#include "igraph_types.h"
 
 #include <stddef.h>
 

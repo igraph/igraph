@@ -27,3 +27,6 @@
 #else
     #define DECLDIR /**/
 #endif
+
+/* This is to eliminate gcc warnings about unused parameters */
+#define IGRAPH_UNUSED(x) (void)(x)
