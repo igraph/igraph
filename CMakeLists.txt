@@ -12,6 +12,9 @@ if(CCACHE_PROGRAM)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${CCACHE_PROGRAM}")
 endif()
 
+# Include some compiler-related helpers and set global compiler options
+include(compilers)
+
 # Figure out the version number from Git
 include(version)
 

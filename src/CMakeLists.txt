@@ -1,5 +1,3 @@
-# Include some compiler-related helper and set global compiler options
-include(compilers)
 
 # Traverse subdirectories
 add_subdirectory(bliss)
