@@ -1,5 +1,6 @@
 
 language: c
+cache: ccache
 dist: xenial
 os: linux
 
@@ -34,6 +35,7 @@ addons:
     - git
   homebrew:
     packages:
+    - ccache
     - flex
     - bison
     - gmp
