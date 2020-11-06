@@ -6,7 +6,7 @@ os: linux
 
 env:
   global:
-    # - MAKEFLAGS="-j2" # not currently used, as we build with ninja
+    - MAKEFLAGS="-j2"
     - CTEST_PARALLEL_LEVEL=2 # run tests in parallel
     - PATH="/usr/bin:$PATH" # needed in order to find the latest cmake
 
