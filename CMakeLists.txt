@@ -55,6 +55,8 @@ include(CheckFunctionExists)
 include(CheckSymbolExists)
 
 # First we check for some functions and symbols
+check_function_exists(erf HAVE_ERF)
+check_function_exists(erfc HAVE_ERFC)
 check_function_exists(log2 HAVE_LOG2)
 check_function_exists(log1p HAVE_LOG1P)
 check_function_exists(fabsl HAVE_FABSL)
@@ -66,6 +68,7 @@ check_function_exists(_stricmp HAVE__STRICMP)
 check_function_exists(expm1 HAVE_EXPM1)
 check_function_exists(rint HAVE_RINT)
 check_function_exists(rintf HAVE_RINTF)
+check_function_exists(ungetc HAVE_UNGETC)
 check_symbol_exists(stpcpy "string.h" HAVE_STPCPY_SIGNATURE)
 check_symbol_exists(strdup "string.h" HAVE_STRDUP)
 

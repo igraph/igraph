@@ -74,9 +74,13 @@ un_getc(int x, FILE *f__cf)
 #else
 #define un_getc ungetc
 #ifdef KR_headers
+#ifndef HAVE_UNGETC
  extern int ungetc();
+#endif
 #else
+#ifndef HAVE_UNGETC
 extern int ungetc(int, FILE*);	/* for systems with a buggy stdio.h */
+#endif
 #endif
 #endif
 
