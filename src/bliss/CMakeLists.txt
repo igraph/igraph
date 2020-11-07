@@ -17,7 +17,7 @@ target_include_directories(
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
   ${CMAKE_BINARY_DIR}/src
-  ${GMP_INCLUDE_DIR}
+  $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
 )
 
 if (BUILD_SHARED_LIBS)
