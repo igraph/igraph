@@ -440,6 +440,14 @@ add_legacy_tests(
   centralization
 )
 
+# eulerian.at
+add_legacy_tests(
+  FOLDER tests NAMES
+  igraph_is_eulerian
+  igraph_eulerian_cycle
+  igraph_eulerian_path
+)
+
 # separators.at
 add_legacy_tests(
   FOLDER simple NAMES

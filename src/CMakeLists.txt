@@ -94,6 +94,7 @@ add_library(
   igraph_cliquer.c
   igraph_error.c
   igraph_estack.c
+  igraph_eulerian.c
   igraph_fixed_vectorlist.c
   igraph_grid.c
   igraph_hashtable.c
