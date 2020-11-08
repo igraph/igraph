@@ -33,14 +33,17 @@ macro(find_dependencies)
   # copies or not
   foreach(DEPENDENCY ${VENDORABLE_DEPENDENCIES})
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
+
     if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} STREQUAL "AUTO")
       find_package(${DEPENDENCY})
       if(${LIBNAME_UPPER}_FOUND)
-        list(APPEND REQUIRED_DEPENDENCIES ${DEPENDENCY})
+        set(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} OFF)
       else()
-        list(APPEND VENDORED_DEPENDENCIES ${DEPENDENCY})
+        set(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER} ON)
       endif()
-    elseif(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER})
+    endif()
+
+    if(IGRAPH_USE_INTERNAL_${LIBNAME_UPPER})
       list(APPEND VENDORED_DEPENDENCIES ${DEPENDENCY})
     else()
       list(APPEND REQUIRED_DEPENDENCIES ${DEPENDENCY})
@@ -51,6 +54,7 @@ macro(find_dependencies)
   # link to them based on the value of the IGRAPH_..._SUPPORT option
   foreach(DEPENDENCY ${NONVENDORABLE_DEPENDENCIES})
     string(TOUPPER "${DEPENDENCY}" LIBNAME_UPPER)
+
     if(IGRAPH_${LIBNAME_UPPER}_SUPPORT STREQUAL "AUTO")
       find_package(${DEPENDENCY})
       if(${LIBNAME_UPPER}_FOUND)
