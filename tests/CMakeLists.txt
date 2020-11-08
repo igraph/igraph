@@ -72,7 +72,7 @@ if (BUILD_INTERNAL_TESTS)
     igraph_i_cutheap
     igraph_marked_queue
     igraph_set
-    igraph_sparsemat2
+    igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
     igraph_trie
   )
 endif()
