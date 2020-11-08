@@ -3358,14 +3358,14 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
 
 /**
  * \function igraph_girth
- * \brief The girth of a graph is the length of the shortest circle in it.
+ * \brief The girth of a graph is the length of the shortest cycle in it.
  *
  * </para><para>
  * The current implementation works for undirected graphs only,
- * directed graphs are treated as undirected graphs. Loop edges and
+ * directed graphs are treated as undirected graphs. Self-loops and
  * multiple edges are ignored.
  * </para><para>
- * If the graph is a forest (ie. acyclic), then zero is returned.
+ * For graphs that contain no cycles, zero is returned.
  * </para><para>
  * This implementation is based on Alon Itai and Michael Rodeh:
  * Finding a minimum circuit in a graph
@@ -3382,7 +3382,7 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
  *
  * Time complexity: O((|V|+|E|)^2), |V| is the number of vertices, |E|
  * is the number of edges in the general case. If the graph has no
- * circles at all then the function needs O(|V|+|E|) time to realize
+ * cycles at all then the function needs O(|V|+|E|) time to realize
  * this and then it stops.
  *
  * \example examples/simple/igraph_girth.c
