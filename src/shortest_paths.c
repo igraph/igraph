@@ -845,13 +845,21 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
  * \function igraph_diameter
  * \brief Calculates the diameter of a graph (longest geodesic).
  *
+ * The diameter of a graph is the length of the longest shortest path it has.
+ * This function computes both the diameter, as well as the corresponding path.
+ * The diameter of the null graph is considered be infinity by convention.
+ *
+ * If the graph has no vertices, \c IGRAPH_NAN is returned.
+ *
  * \param graph The graph object.
  * \param pres Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
  * \param pfrom Pointer to an integer, if not \c NULL it will be set to the
- *        source vertex of the diameter path.
+ *        source vertex of the diameter path. If the graph has no diameter path,
+ *        it will be set to -1.
  * \param pto Pointer to an integer, if not \c NULL it will be set to the
- *        target vertex of the diameter path.
+ *        target vertex of the diameter path. If the graph has no diameter path,
+ *        it will be set to -1.
  * \param path Pointer to an initialized vector. If not \c NULL the actual
  *        longest geodesic path will be stored here. The vector will be
  *        resized as needed.
@@ -866,6 +874,8 @@ int igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
  *
  * Time complexity: O(|V||E|), the
  * number of vertices times the number of edges.
+ *
+ * \sa \ref igraph_diameter_dijkstra()
  *
  * \example examples/simple/igraph_diameter.c
  */
@@ -886,6 +896,24 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     igraph_vector_int_t *neis;
     igraph_neimode_t dirmode;
     igraph_adjlist_t allneis;
+
+    /* See https://github.com/igraph/igraph/issues/1538#issuecomment-724071857
+     * for why we return NaN for the null graph. */
+    if (no_of_nodes == 0) {
+        if (pres) {
+            *pres = IGRAPH_NAN;
+        }
+        if (path) {
+            igraph_vector_clear(path);
+        }
+        if (pfrom) {
+            *pfrom = -1;
+        }
+        if (pto) {
+            *pto = -1;
+        }
+        return IGRAPH_SUCCESS;
+    }
 
     if (directed) {
         dirmode = IGRAPH_OUT;
@@ -984,18 +1012,21 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
 
 /**
  * \function igraph_diameter_dijkstra
- * Weighted diameter using Dijkstra's algorithm, non-negative weights only.
+ * \brief Calculates the weighted diameter of a graph using Dijkstra's algorithm.
  *
- * The diameter of a graph is its longest geodesic. I.e. the
- * (weighted) shortest path is calculated for all pairs of vertices
- * and the longest one is the diameter.
+ * This function computes the weighted diameter of a graph.
+ *
+ * If the graph has no vertices, \c IGRAPH_NAN is returned.
+ *
  * \param graph The input graph, can be directed or undirected.
  * \param pres Pointer to a real number, if not \c NULL then it will contain
  *        the diameter (the actual distance).
  * \param pfrom Pointer to an integer, if not \c NULL it will be set to the
- *        source vertex of the diameter path.
+ *        source vertex of the diameter path. If the graph has no diameter path,
+ *        it will be set to -1.
  * \param pto Pointer to an integer, if not \c NULL it will be set to the
- *        target vertex of the diameter path.
+ *        target vertex of the diameter path. If the graph has no diameter path,
+ *        it will be set to -1.
  * \param path Pointer to an initialized vector. If not \c NULL the actual
  *        longest geodesic path will be stored here. The vector will be
  *        resized as needed.
@@ -1009,6 +1040,8 @@ int igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
  *
  * Time complexity: O(|V||E|*log|E|), |V| is the number of vertices,
  * |E| is the number of edges.
+ *
+ * \sa \ref igraph_diameter()
  */
 
 
@@ -1047,6 +1080,24 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
     long int from = -1, to = -1;
     igraph_real_t res = 0;
     long int nodes_reached = 0;
+
+    /* See https://github.com/igraph/igraph/issues/1538#issuecomment-724071857
+     * for why we return NaN for the null graph. */
+    if (no_of_nodes == 0) {
+        if (pres) {
+            *pres = IGRAPH_NAN;
+        }
+        if (path) {
+            igraph_vector_clear(path);
+        }
+        if (pfrom) {
+            *pfrom = -1;
+        }
+        if (pto) {
+            *pto = -1;
+        }
+        return IGRAPH_SUCCESS;
+    }
 
     if (!weights) {
         igraph_real_t diameter;
