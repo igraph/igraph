@@ -269,7 +269,15 @@ use_all_warnings(igraph)
 # Generate pkgconfig file.
 # The library names being used here are Linux-specific, but pkgconfig files
 # are used on Linux anyway.
-set(PKGCONFIG_LIBS_PRIVATE "-lm -lstdc++")
+set(PKGCONFIG_LIBS_PRIVATE "-lm")
+if(APPLE)
+  # All recent macOS distributions use libc++
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lc++")
+else()
+  # Most Linux distributions use libstdc++
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lstdc++")
+endif()
+
 if(IGRAPH_GRAPHML_SUPPORT)
 	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lxml2 -lz")
 endif()
