@@ -269,7 +269,7 @@ use_all_warnings(igraph)
 # Generate pkgconfig file.
 # The library names being used here are Linux-specific, but pkgconfig files
 # are used on Linux anyway.
-set(PKGCONFIG_LIBS_PRIVATE "-lm")
+set(PKGCONFIG_LIBS_PRIVATE "-lm -lstdc++")
 if(IGRAPH_GRAPHML_SUPPORT)
 	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lxml2 -lz")
 endif()
