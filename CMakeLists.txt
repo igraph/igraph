@@ -66,7 +66,6 @@ check_function_exists(_stricmp HAVE__STRICMP)
 check_function_exists(expm1 HAVE_EXPM1)
 check_function_exists(rint HAVE_RINT)
 check_function_exists(rintf HAVE_RINTF)
-check_function_exists(ungetc HAVE_UNGETC)
 check_symbol_exists(stpcpy "string.h" HAVE_STPCPY_SIGNATURE)
 check_symbol_exists(strdup "string.h" HAVE_STRDUP)
 

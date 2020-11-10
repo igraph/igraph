@@ -48,7 +48,6 @@ un_getc(x,f__cf) int x; FILE *f__cf;
 { return ungetc(x,f__cf); }
 #else
 #define un_getc ungetc
- extern int ungetc();
 #endif
 
 #else
@@ -68,9 +67,6 @@ un_getc(int x, FILE *f__cf)
 { return ungetc(x,f__cf); }
 #else
 #define un_getc ungetc
-#ifndef HAVE_UNGETC
-extern int ungetc(int, FILE*);	/* for systems with a buggy stdio.h */
-#endif
 #endif
 #endif
 
