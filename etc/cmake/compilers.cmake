@@ -36,10 +36,28 @@ endmacro()
 # Source: https://stackoverflow.com/a/27990434/156771
 function(define_file_basename_for_sources targetname)
   get_target_property(source_files "${targetname}" SOURCES)
+  get_target_property(source_dir "${targetname}" SOURCE_DIR)
   foreach(sourcefile ${source_files})
-    # Add the IGRAPH_FILE_BASENAME=filename compile definition to the list.
-    get_filename_component(basename "${sourcefile}" NAME)
-    # Set the updated compile definitions on the source file.
+    # Turn relative paths into absolute
+    if(IS_ABSOLUTE "${sourcefile}")
+      set(source_full_path "${sourcefile}")
+    else()
+      set(source_full_path "${source_dir}/${sourcefile}")
+    endif()
+
+    # Figure out whether the relative path from the source or the build folder
+    # is shorter
+    file(RELATIVE_PATH source_rel_path "${CMAKE_SOURCE_DIR}" "${source_full_path}")
+    file(RELATIVE_PATH binary_rel_path "${CMAKE_BINARY_DIR}" "${source_full_path}")
+    string(LENGTH "${source_rel_path}" source_rel_path_length)
+    string(LENGTH "${binary_rel_path}" binary_rel_path_length)
+    if(binary_rel_path_length LESS source_rel_path_length)
+      set(basename "${binary_rel_path}")
+    else()
+      set(basename "${source_rel_path}")
+    endif()
+
+    # Add the IGRAPH_FILE_BASENAME=filename compile definition to the source file
     set_property(
       SOURCE "${sourcefile}" APPEND
       PROPERTY COMPILE_DEFINITIONS "IGRAPH_FILE_BASENAME=\"${basename}\""
