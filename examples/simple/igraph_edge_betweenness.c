@@ -47,8 +47,10 @@ int test_bug950() {
 
     for (i = 0; i < igraph_ecount(&g); i++) {
         igraph_edge(&g, i, &from, &to);
-        VECTOR(weights)[i] =
-            ((from < 3 && to < 3) || (from >= 3 && to >= 3)) ? 1 : 0.1;
+        if((from < 3 && to < 3) || (from >= 3 && to >= 3))
+            VECTOR(weights)[i] = 1;
+        else
+            VECTOR(weights)[i] = 0.1;
     }
 
     igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, &weights);
