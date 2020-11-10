@@ -39,11 +39,7 @@ function(define_file_basename_for_sources targetname)
   get_target_property(source_dir "${targetname}" SOURCE_DIR)
   foreach(sourcefile ${source_files})
     # Turn relative paths into absolute
-    if(IS_ABSOLUTE "${sourcefile}")
-      set(source_full_path "${sourcefile}")
-    else()
-      set(source_full_path "${source_dir}/${sourcefile}")
-    endif()
+    get_filename_component(source_full_path "${sourcefile}" ABSOLUTE BASE_DIR "${source_dir}")
 
     # Figure out whether the relative path from the source or the build folder
     # is shorter
