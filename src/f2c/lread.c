@@ -1,5 +1,6 @@
 #include "f2c.h"
 #include "fio.h"
+#include <stdio.h>
 
 /* Compile with -DF8X_NML_ELIDE_QUOTES to permit eliding quotation */
 /* marks in namelist input a la the Fortran 8X Draft published in  */
