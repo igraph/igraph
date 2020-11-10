@@ -456,10 +456,11 @@ int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igr
 
 }
 
-int igraph_adjedgelist_remove_duplicate(igraph_inclist_t *al) {
+int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
+                                        igraph_inclist_t *al) {
     IGRAPH_WARNING("igraph_adjedgelist_remove_duplicate() is deprecated, use "
                    "igraph_inclist_remove_duplicate() instead");
-    return igraph_inclist_remove_duplicate(al);
+    return igraph_inclist_remove_duplicate(graph, al);
 }
 
 #ifndef USING_R
@@ -494,7 +495,11 @@ void igraph_adjedgelist_destroy(igraph_inclist_t *il) {
     igraph_inclist_destroy(il);
 }
 
-int igraph_inclist_remove_duplicate(igraph_inclist_t *al) {
+int igraph_inclist_remove_duplicate(const igraph_t *graph,
+                                    igraph_inclist_t *al) {
+
+    IGRAPH_UNUSED(graph);
+
     long int i, j, l, n, p;
     igraph_vector_int_t* v;
 
