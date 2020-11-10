@@ -30,16 +30,13 @@
 int main() {
     igraph_t g;
     igraph_matrix_t coords, dist_mat;
-    igraph_arpack_options_t options;
     int i, j;
 
     srand(42); /* make tests deterministic */
 
-    igraph_arpack_options_init(&options);
-
     igraph_tree(&g, 10, 2, IGRAPH_TREE_UNDIRECTED);
     igraph_matrix_init(&coords, 0, 0);
-    igraph_layout_mds(&g, &coords, 0, 2, &options);
+    igraph_layout_mds(&g, &coords, 0, 2);
     if (MATRIX(coords, 0, 0) > 0) {
         for (i = 0; i < igraph_matrix_nrow(&coords); i++) {
             MATRIX(coords, i, 0) *= -1;
@@ -69,7 +66,7 @@ int main() {
             MATRIX(dist_mat, i, j) = sqrt(dist_sq);
             MATRIX(dist_mat, j, i) = sqrt(dist_sq);
         }
-    igraph_layout_mds(&g, &coords, &dist_mat, 2, &options);
+    igraph_layout_mds(&g, &coords, &dist_mat, 2);
     for (i = 0; i < 8; i++)
         for (j = i + 1; j < 8; j++) {
             double dist_sq = 0.0;
