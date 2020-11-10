@@ -4,7 +4,13 @@ endif()
 
 macro(use_all_warnings TARGET_NAME)
   if(MSVC)
-    target_compile_options(${TARGET_NAME} PRIVATE /W4)
+    target_compile_options(${TARGET_NAME} PRIVATE 
+      /W4 # enable most warnings, then disable:
+      /wd4244 # 'conversion' conversion from 'type1' to 'type2', possible loss of data
+      /wd4267 # 'var' : conversion from 'size_t' to 'type', possible loss of data 
+      /wd4996 # deprecated functions, e.g. 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead.
+      /wd4456 # declaration of 'identifier' hides previous local declaration
+    )
   else()
     target_compile_options(${TARGET_NAME} PRIVATE 
       # GCC-style compilers:
