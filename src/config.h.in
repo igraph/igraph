@@ -1,8 +1,6 @@
 #ifndef IGRAPH_CONFIG_H
 #define IGRAPH_CONFIG_H
 
-#cmakedefine HAVE_ERF 1
-#cmakedefine HAVE_ERFC 1
 #cmakedefine HAVE_EXPM1 1
 #cmakedefine HAVE_FABSL 1
 #cmakedefine HAVE_FMIN 1

@@ -55,8 +55,6 @@ include(CheckFunctionExists)
 include(CheckSymbolExists)
 
 # First we check for some functions and symbols
-check_function_exists(erf HAVE_ERF)
-check_function_exists(erfc HAVE_ERFC)
 check_function_exists(log2 HAVE_LOG2)
 check_function_exists(log1p HAVE_LOG1P)
 check_function_exists(fabsl HAVE_FABSL)
