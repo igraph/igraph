@@ -255,6 +255,8 @@ static void igraph_i_mf_gap(long int b, igraph_maxflow_stats_t *stats,
                             long int no_of_nodes,
                             igraph_vector_long_t *distance) {
 
+    IGRAPH_UNUSED(buckets);
+
     long int bo;
     (stats->nogap)++;
     for (bo = b + 1; bo <= no_of_nodes; bo++) {
@@ -298,6 +300,11 @@ static void igraph_i_mf_push(long int v, long int e, long int n,
                              igraph_vector_long_t *distance,
                              igraph_vector_long_t *rev, igraph_maxflow_stats_t *stats,
                              int *npushsince) {
+
+
+    IGRAPH_UNUSED(current);
+    IGRAPH_UNUSED(source);
+
     igraph_real_t delta =
         RESCAP(e) < EXCESS(v) ? RESCAP(e) : EXCESS(v);
     (stats->nopush)++; (*npushsince)++;
@@ -367,6 +374,8 @@ static void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
                             igraph_vector_t *rescap, igraph_vector_long_t *rev) {
 
     long int k, l;
+
+    IGRAPH_UNUSED(source);
 
     igraph_buckets_clear(buckets);
     igraph_dbuckets_clear(ibuckets);

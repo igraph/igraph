@@ -497,6 +497,9 @@ void igraph_adjedgelist_destroy(igraph_inclist_t *il) {
 
 int igraph_inclist_remove_duplicate(const igraph_t *graph,
                                     igraph_inclist_t *al) {
+
+    IGRAPH_UNUSED(graph);
+
     long int i, j, l, n, p;
     igraph_vector_int_t* v;
 

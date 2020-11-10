@@ -121,6 +121,8 @@ static int igraph_i_maximal_cliques_reorder_adjlists(
     int j;
     int sPS = PS + 1, sPE = PE + 1;
 
+    IGRAPH_UNUSED(XS);
+
     for (j = PS; j <= XE; j++) {
         int av = VECTOR(*PX)[j];
         igraph_vector_int_t *avneis = igraph_adjlist_get(adjlist, av);
@@ -155,6 +157,8 @@ static int igraph_i_maximal_cliques_select_pivot(
     igraph_vector_int_t *pivotvectneis;
     int i, pivotvectlen, j, usize = -1;
     int soldPS = oldPS + 1, soldXE = oldXE + 1, sPS = PS + 1, sPE = PE + 1;
+
+    IGRAPH_UNUSED(XS);
 
     /* Choose a pivotvect, and bring up P vertices at the same time */
     for (i = PS; i <= XE; i++) {
@@ -259,6 +263,11 @@ static int igraph_i_maximal_cliques_PX(igraph_vector_int_t *PX, int PS, int *PE,
 
     int vpos = VECTOR(*pos)[v] - 1;
     int tmp = VECTOR(*PX)[*PE];
+
+    IGRAPH_UNUSED(PS);
+    IGRAPH_UNUSED(XE);
+    IGRAPH_UNUSED(adjlist);
+
     VECTOR(*PX)[vpos] = tmp;
     VECTOR(*PX)[*PE] = v;
     VECTOR(*pos)[v] = (*PE) + 1;
@@ -275,6 +284,11 @@ static int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
                                        igraph_vector_int_t *R,
                                        igraph_vector_int_t *H) {
     int vv;
+
+    IGRAPH_UNUSED(PS);
+    IGRAPH_UNUSED(XE);
+    IGRAPH_UNUSED(adjlist);
+
     igraph_vector_int_pop_back(R);
 
     while ((vv = igraph_vector_int_pop_back(H)) != -1) {

@@ -1271,6 +1271,9 @@ int igraph_eigen_matrix(const igraph_matrix_t *A,
                         igraph_vector_complex_t *values,
                         igraph_matrix_complex_t *vectors) {
 
+    IGRAPH_UNUSED(options);
+    IGRAPH_UNUSED(storage);
+
     IGRAPH_CHECK(igraph_i_eigen_checks(A, sA, fun, n));
 
     if (which->pos != IGRAPH_EIGEN_LM &&
@@ -1350,6 +1353,9 @@ static int igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
                                     igraph_matrix_t *vectors,
                                     igraph_vector_complex_t *cmplxvalues,
                                     igraph_matrix_complex_t *cmplxvectors) {
+
+    IGRAPH_UNUSED(cmplxvalues);
+    IGRAPH_UNUSED(cmplxvectors);
 
     igraph_adjlist_t adjlist;
     void *extra = (void*) &adjlist;
@@ -1513,6 +1519,16 @@ int igraph_eigen_laplacian(const igraph_t *graph,
                            igraph_matrix_t *vectors,
                            igraph_vector_complex_t *cmplxvalues,
                            igraph_matrix_complex_t *cmplxvectors) {
+
+    IGRAPH_UNUSED(graph);
+    IGRAPH_UNUSED(algorithm);
+    IGRAPH_UNUSED(which);
+    IGRAPH_UNUSED(options);
+    IGRAPH_UNUSED(storage);
+    IGRAPH_UNUSED(values);
+    IGRAPH_UNUSED(vectors);
+    IGRAPH_UNUSED(cmplxvalues);
+    IGRAPH_UNUSED(cmplxvectors);
 
     IGRAPH_ERROR("'igraph_eigen_laplacian'", IGRAPH_UNIMPLEMENTED);
     /* TODO */

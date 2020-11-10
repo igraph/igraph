@@ -2379,6 +2379,7 @@ int FUNCTION(igraph_vector, div)(TYPE(igraph_vector) *v1,
 int FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
 #ifdef UNSIGNED
     /* Nothing do to, unsigned type */
+    IGRAPH_UNUSED(v);
 #else
     long int i, n = FUNCTION(igraph_vector, size)(v);
     for (i = 0; i < n; i++) {
