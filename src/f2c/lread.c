@@ -1,5 +1,6 @@
 #include "f2c.h"
 #include "fio.h"
+#include <stdio.h>
 
 /* Compile with -DF8X_NML_ELIDE_QUOTES to permit eliding quotation */
 /* marks in namelist input a la the Fortran 8X Draft published in  */
@@ -73,11 +74,6 @@ un_getc(int x, FILE *f__cf)
 { return ungetc(x,f__cf); }
 #else
 #define un_getc ungetc
-#ifdef KR_headers
- extern int ungetc();
-#else
-extern int ungetc(int, FILE*);	/* for systems with a buggy stdio.h */
-#endif
 #endif
 
  int

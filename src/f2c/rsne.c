@@ -1,6 +1,7 @@
 #include "f2c.h"
 #include "fio.h"
 #include "lio.h"
+#include <stdio.h>
 
 #define MAX_NL_CACHE 3	/* maximum number of namelist hash tables to cache */
 #define MAXDIM 20	/* maximum number of subscripts */
@@ -48,7 +49,6 @@ un_getc(x,f__cf) int x; FILE *f__cf;
 { return ungetc(x,f__cf); }
 #else
 #define un_getc ungetc
- extern int ungetc();
 #endif
 
 #else
@@ -68,7 +68,6 @@ un_getc(int x, FILE *f__cf)
 { return ungetc(x,f__cf); }
 #else
 #define un_getc ungetc
-extern int ungetc(int, FILE*);	/* for systems with a buggy stdio.h */
 #endif
 #endif
 

@@ -1,4 +1,6 @@
 #include "f2c.h"
+#include <math.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -8,10 +10,8 @@ extern "C" {
 #endif
 
 #ifdef KR_headers
-double erfc();
 REAL erfc_(x) real *x;
 #else
-extern double erfc(double);
 REAL erfc_(real *x)
 #endif
 {
