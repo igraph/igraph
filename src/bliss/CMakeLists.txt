@@ -33,4 +33,8 @@ if(GMP_FOUND)
   )
 endif()
 
+if (MSVC)
+  target_compile_options(bliss PRIVATE /wd4100) # disable unreferenced parameter warning
+endif()
+
 use_all_warnings(bliss)

@@ -40,4 +40,8 @@ if (WIN32)
   target_compile_definitions(cxsparse_vendored PRIVATE IGRAPH_STATIC)
 endif()
 
+if (MSVC)
+  target_compile_options(cxsparse_vendored PRIVATE /wd4100) # disable unreferenced parameter warning
+endif()
+
 use_all_warnings(cxsparse_vendored)
