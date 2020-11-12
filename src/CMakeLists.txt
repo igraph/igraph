@@ -268,8 +268,15 @@ use_all_warnings(igraph)
 
 # Generate pkgconfig file.
 # The library names being used here are Linux-specific, but pkgconfig files
-# are used on Linux anyway.
-set(PKGCONFIG_LIBS_PRIVATE "-lm")
+# are omstly used on Linux anyway. Nevertheless, we take care not to include
+# -lm on Windows because the Python interface of igraph uses the pkg-config
+# file to decide what to link to, and we don't have a separate math library
+# on Windows.
+if(WIN32)
+  set(PKGCONFIG_LIBS_PRIVATE "")
+else()
+  set(PKGCONFIG_LIBS_PRIVATE "-lm")
+endif()
 if(APPLE)
   # All recent macOS distributions use libc++
   set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lc++")
