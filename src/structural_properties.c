@@ -3364,8 +3364,14 @@ int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es
  * The current implementation works for undirected graphs only,
  * directed graphs are treated as undirected graphs. Self-loops and
  * multiple edges are ignored.
+ *
  * </para><para>
- * For graphs that contain no cycles, zero is returned.
+ * For graphs that contain no cycles, and only for such graphs, 
+ * zero is returned. Note that in some applications, it is customary 
+ * to define the girth of acyclic graphs to be infinity. However, infinity
+ * is not representable as an \c igraph_integer_t, therefore zero is used
+ * for this case.
+ *
  * </para><para>
  * This implementation is based on Alon Itai and Michael Rodeh:
  * Finding a minimum circuit in a graph
