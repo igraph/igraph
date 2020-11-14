@@ -617,7 +617,7 @@ protected:
   /*
    * Routines needed when refining the partition p into equitable
    */
-  bool split_neighbourhood_of_unit_cell(Partition::Cell *);
+  bool split_neighbourhood_of_unit_cell(Partition::Cell * const);
   bool split_neighbourhood_of_cell(Partition::Cell * const);
 
   /** \internal

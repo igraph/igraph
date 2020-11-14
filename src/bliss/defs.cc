@@ -32,9 +32,8 @@ fatal_error(const char* fmt, ...)
   va_start(ap, fmt);
   sprintf(buffer, "Bliss fatal error: ");
   vsprintf(buffer, fmt, ap);
-  throw std::runtime_error(buffer);
   va_end(ap);
-  exit(1);
+  throw std::runtime_error(buffer);
 }
 
 }

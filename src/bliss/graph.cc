@@ -2659,10 +2659,10 @@ Digraph::split_neighbourhood_of_cell(Partition::Cell* const cell)
     {
       for(unsigned int i = p.splitting_queue.size(); i > 0; i--)
 	{
-	  Partition::Cell* const cell = p.splitting_queue.pop_front();
-	  rest.update(cell->first);
-	  rest.update(cell->length);
-	  p.splitting_queue.push_back(cell);
+	  Partition::Cell* const cell_from_queue = p.splitting_queue.pop_front();
+	  rest.update(cell_from_queue->first);
+	  rest.update(cell_from_queue->length);
+	  p.splitting_queue.push_back(cell_from_queue);
 	}
       rest.update(failure_recording_fp_deviation);
       failure_recording_fp_deviation = rest.get_value();
@@ -4678,10 +4678,10 @@ Graph::split_neighbourhood_of_cell(Partition::Cell* const cell)
     {
       for(unsigned int i = p.splitting_queue.size(); i > 0; i--)
 	{
-	  Partition::Cell* const cell = p.splitting_queue.pop_front();
-	  rest.update(cell->first);
-	  rest.update(cell->length);
-	  p.splitting_queue.push_back(cell);
+	  Partition::Cell* const cell_from_queue = p.splitting_queue.pop_front();
+	  rest.update(cell_from_queue->first);
+	  rest.update(cell_from_queue->length);
+	  p.splitting_queue.push_back(cell_from_queue);
 	}
       rest.update(failure_recording_fp_deviation);
       failure_recording_fp_deviation = rest.get_value();
