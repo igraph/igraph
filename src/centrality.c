@@ -226,7 +226,11 @@ int igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vecto
     } else {
 
         igraph_inclist_t inclist;
-        igraph_i_eigenvector_centrality_t data = { graph, &inclist, weights };
+        igraph_i_eigenvector_centrality_t data;
+
+        data.graph = graph;
+        data.inclist = &inclist;
+        data.weights = weights;
 
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -410,7 +414,11 @@ int igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_
         IGRAPH_FINALLY_CLEAN(1);
     } else {
         igraph_inclist_t inclist;
-        igraph_i_eigenvector_centrality_t data = { graph, &inclist, weights };
+        igraph_i_eigenvector_centrality_t data;
+
+        data.graph = graph;
+        data.inclist = &inclist;
+        data.weights = weights;
 
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_IN));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -1289,11 +1297,9 @@ int igraph_personalized_pagerank(const igraph_t *graph,
         return igraph_personalized_pagerank_prpack(graph, vector, value, vids,
                 directed, damping, reset,
                 weights);
-    } else {
-        IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);
     }
 
-    return 0;
+    IGRAPH_ERROR("Unknown PageRank algorithm", IGRAPH_EINVAL);
 }
 
 /*
@@ -1396,9 +1402,14 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
     if (!weights) {
 
         igraph_adjlist_t adjlist;
-        igraph_i_pagerank_data_t data = { graph, &adjlist, damping,
-                                          &outdegree, &tmp, reset
-                                        };
+        igraph_i_pagerank_data_t data;
+
+        data.graph = graph;
+        data.adjlist = &adjlist;
+        data.damping = damping;
+        data.outdegree = &outdegree;
+        data.tmp = &tmp;
+        data.reset = reset;
 
         IGRAPH_CHECK(igraph_degree(graph, &outdegree, igraph_vss_all(),
                                    directed ? IGRAPH_OUT : IGRAPH_ALL, /*loops=*/ 0));
@@ -1427,9 +1438,15 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
 
         igraph_inclist_t inclist;
         igraph_bool_t negative_weight_warned = 0;
-        igraph_i_pagerank_data2_t data = { graph, &inclist, weights,
-                                           damping, &outdegree, &tmp, reset
-                                         };
+        igraph_i_pagerank_data2_t data;
+
+        data.graph = graph;
+        data.inclist = &inclist;
+        data.weights = weights;
+        data.damping = damping;
+        data.outdegree = &outdegree;
+        data.tmp = &tmp;
+        data.reset = reset;
 
         IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, dirmode));
         IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);

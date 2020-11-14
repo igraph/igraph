@@ -179,8 +179,11 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
+
+    /* we won't need the 'mult' vector if 'multiplicity' is NULL, but MSVC will
+     * throw warnings in the compiler output if we initialize it conditionally */
+    IGRAPH_VECTOR_INIT_FINALLY(&mult, multiplicity ? no_of_nodes : 1);
     if (multiplicity) {
-        IGRAPH_VECTOR_INIT_FINALLY(&mult, no_of_nodes);
         igraph_vector_clear(multiplicity);
     }
 
@@ -249,14 +252,11 @@ static int igraph_i_bipartite_projection(const igraph_t *graph,
         } /* if VECTOR(*type)[i] == which */
     }
 
-    if (multiplicity) {
-        igraph_vector_destroy(&mult);
-        IGRAPH_FINALLY_CLEAN(1);
-    }
+    igraph_vector_destroy(&mult);
     igraph_adjlist_destroy(&adjlist);
     igraph_vector_long_destroy(&added);
     igraph_vector_destroy(&vertex_index);
-    IGRAPH_FINALLY_CLEAN(3);
+    IGRAPH_FINALLY_CLEAN(4);
 
     IGRAPH_CHECK(igraph_create(proj, &edges, remaining_nodes,
                                /*directed=*/ 0));

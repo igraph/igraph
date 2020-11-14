@@ -244,7 +244,7 @@ int hsl_sf_hzeta_e(const double s, const double q, gsl_sf_result * result) {
 			}
 		}
 
-	return (PLFIT_SUCCESS); }
+}
 
 extern
 double hsl_sf_hzeta(const double s, const double q) {
@@ -308,7 +308,7 @@ int hsl_sf_hzeta_deriv_e(const double s, const double q, gsl_sf_result * result)
 			}
 		}
 
-	return (PLFIT_SUCCESS); }
+}
 
 extern
 double hsl_sf_hzeta_deriv(const double s, const double q) {
@@ -385,7 +385,7 @@ int hsl_sf_hzeta_deriv2_e(const double s, const double q, gsl_sf_result * result
 			}
 		}
 
-	return (PLFIT_SUCCESS); }
+}
 
 extern
 double hsl_sf_hzeta_deriv2(const double s, const double q) {

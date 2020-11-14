@@ -35,13 +35,14 @@
 __BEGIN_DECLS
 
 #ifdef _MSC_VER
-#include <float.h>
 #include <math.h>
 
 #define snprintf _snprintf
 #define inline  __inline
-#define isnan(x) ((x) != (x))
-#define isfinite(x) _finite(x)
+
+#ifndef isfinite
+#  define isfinite(x) _finite(x)
+#endif
 
 extern double _plfit_fmin(double a, double b);
 extern double _plfit_round(double x);
@@ -49,6 +50,10 @@ extern double _plfit_round(double x);
 #define fmin _plfit_fmin
 #define round _plfit_round
 
+#endif /* _MSC_VER */
+
+#ifndef isnan
+#  define isnan(x) ((x) != (x))
 #endif
 
 #ifndef INFINITY

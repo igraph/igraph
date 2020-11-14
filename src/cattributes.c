@@ -342,7 +342,7 @@ int igraph_i_cattribute_add_vertices(igraph_t *graph, long int nv,
         igraph_attribute_record_t *oldrec = VECTOR(*val)[i];
         igraph_attribute_record_t *newrec = 0;
         const char *name = oldrec->name;
-        long int j;
+        long int j = -1;
         igraph_bool_t l = 0;
         if (nattr) {
             l = igraph_i_cattribute_find(nattr, name, &j);
@@ -1732,7 +1732,7 @@ int igraph_i_cattribute_add_edges(igraph_t *graph, const igraph_vector_t *edges,
         igraph_attribute_record_t *oldrec = VECTOR(*eal)[i];
         igraph_attribute_record_t *newrec = 0;
         const char *name = oldrec->name;
-        long int j;
+        long int j = -1;
         igraph_bool_t l = 0;
         if (nattr) {
             l = igraph_i_cattribute_find(nattr, name, &j);

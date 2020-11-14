@@ -869,8 +869,11 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
 
     int origldv = options->ldv, origlworkl = options->lworkl,
         orignev = options->nev, origncv = options->ncv;
-    char origwhich[2] = { options->which[0], options->which[1] };
     igraph_real_t origtol = options->tol;
+    char origwhich[2];
+
+    origwhich[0] = options->which[0];
+    origwhich[1] = options->which[1];
 
     /* Special case for 1x1 and 2x2 matrices in mode 1 */
     if (options->mode == 1 && options->n == 1) {
@@ -1124,9 +1127,12 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
 
     int origldv = options->ldv, origlworkl = options->lworkl,
         orignev = options->nev, origncv = options->ncv;
-    char origwhich[2] = { options->which[0], options->which[1] };
     igraph_real_t origtol = options->tol;
     int d_size;
+    char origwhich[2];
+
+    origwhich[0] = options->which[0];
+    origwhich[1] = options->which[1];
 
     /* Special case for 1x1 and 2x2 matrices in mode 1 */
     if (options->mode == 1 && options->n == 1) {

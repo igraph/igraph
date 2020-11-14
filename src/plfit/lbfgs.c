@@ -1003,8 +1003,6 @@ static int line_search_morethuente(
             width = fabs(sty - stx);
         }
     }
-
-    return LBFGSERR_LOGICERROR;
 }
 
 
