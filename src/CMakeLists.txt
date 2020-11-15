@@ -306,7 +306,7 @@ endif()
 if(NOT IGRAPH_USE_INTERNAL_ARPACK)
 	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
 endif()
-configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.cmake.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
+configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
 
 # Define how to install the library
 include(GNUInstallDirs)
