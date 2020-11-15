@@ -1527,11 +1527,10 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
     if (names) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
-    }
-    if (names && nametype != IGRAPH_ATTRIBUTE_NUMERIC &&
-        nametype != IGRAPH_ATTRIBUTE_STRING) {
-        IGRAPH_WARNING("ignoring names attribute, unknown attribute type");
-        names = 0;
+        if (nametype != IGRAPH_ATTRIBUTE_NUMERIC && nametype != IGRAPH_ATTRIBUTE_STRING) {
+            IGRAPH_WARNING("ignoring names attribute, unknown attribute type");
+            names = 0;
+        }
     }
 
     /* Check the weights as well */
@@ -1543,10 +1542,10 @@ int igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
     if (weights) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
-    }
-    if (weights && weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
-        IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
-        weights = 0;
+        if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC) {
+            IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
+            weights = 0;
+        }
     }
 
     if (names == 0 && weights == 0) {
@@ -1710,11 +1709,10 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     if (names) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &nametype,
                                                 IGRAPH_ATTRIBUTE_VERTEX, names));
-    }
-    if (names && nametype != IGRAPH_ATTRIBUTE_NUMERIC &&
-        nametype != IGRAPH_ATTRIBUTE_STRING) {
-        IGRAPH_WARNING("ignoring names attribute, unknown attribute type");
-        names = 0;
+        if (nametype != IGRAPH_ATTRIBUTE_NUMERIC && nametype != IGRAPH_ATTRIBUTE_STRING) {
+            IGRAPH_WARNING("ignoring names attribute, unknown attribute type");
+            names = 0;
+        }
     }
 
     /* Check the weights as well */
@@ -1726,11 +1724,10 @@ int igraph_write_graph_lgl(const igraph_t *graph, FILE *outstream,
     if (weights) {
         IGRAPH_CHECK(igraph_i_attribute_gettype(graph, &weighttype,
                                                 IGRAPH_ATTRIBUTE_EDGE, weights));
-    }
-    if (weights && weighttype != IGRAPH_ATTRIBUTE_NUMERIC &&
-        weighttype != IGRAPH_ATTRIBUTE_STRING) {
-        IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
-        weights = 0;
+        if (weighttype != IGRAPH_ATTRIBUTE_NUMERIC && weighttype != IGRAPH_ATTRIBUTE_STRING) {
+            IGRAPH_WARNING("ignoring weights attribute, unknown attribute type");
+            weights = 0;
+        }
     }
 
     if (names == 0 && weights == 0) {

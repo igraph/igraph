@@ -227,7 +227,6 @@ int igraph_community_spinglass(const igraph_t *graph,
                          IGRAPH_EINVAL);
         }
     );
-    return 0;
 }
 
 static int igraph_i_community_spinglass_orig(

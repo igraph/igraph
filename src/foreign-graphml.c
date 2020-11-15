@@ -1449,6 +1449,10 @@ int igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
 
     return 0;
 #else
+    IGRAPH_UNUSED(graph);
+    IGRAPH_UNUSED(instream);
+    IGRAPH_UNUSED(index);
+
     IGRAPH_ERROR("GraphML support is disabled", IGRAPH_UNIMPLEMENTED);
 #endif
 }

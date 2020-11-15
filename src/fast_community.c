@@ -949,6 +949,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
             }
         }
 
+        p1 = 0;
         while (i < n) {
             p1 = (igraph_i_fastgreedy_commpair*)VECTOR(communities.e[to].neis)[i];
             if (p1->second == from) {
@@ -969,7 +970,7 @@ int igraph_community_fastgreedy(const igraph_t *graph,
             }
             /* chain, case 2 */
             debug("    CHAIN(2): %ld %ld-%ld, newdq(%ld,%ld)=%.7f\n",
-                  to, p2->second, from, p1->first, p2->second, *p2->dq - 2 * VECTOR(a)[to]*VECTOR(a)[p2->second]);
+                  to, p2->second, from, p1 ? p1->first : -1, p2->second, *p2->dq - 2 * VECTOR(a)[to]*VECTOR(a)[p2->second]);
             p2->opposite->second = to;
             /* need to re-sort community nei list `p2->second` */
             igraph_i_fastgreedy_community_sort_neighbors_of(&communities, p2->second, p2->opposite);

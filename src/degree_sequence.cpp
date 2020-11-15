@@ -771,7 +771,7 @@ int igraph_realize_degree_sequence(
         IGRAPH_ERROR("Degree sequence vector too long.", IGRAPH_EINVAL);
     }
 
-    bool directed = bool(indeg);
+    bool directed = indeg != 0;
 
     try {
         if (directed) {

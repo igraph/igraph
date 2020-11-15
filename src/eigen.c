@@ -476,9 +476,13 @@ static int igraph_i_eigen_matrix_symmetric_arpack_be(const igraph_matrix_t *A,
 
     igraph_vector_t tmpvalues, tmpvalues2;
     igraph_matrix_t tmpvectors, tmpvectors2;
-    igraph_i_eigen_matrix_sym_arpack_data_t myextra = { A, sA };
+
     int low = (int) floor(which->howmany / 2.0), high = (int) ceil(which->howmany / 2.0);
     int l1, l2, w;
+
+    igraph_i_eigen_matrix_sym_arpack_data_t myextra;
+    myextra.A = A;
+    myextra.sA = sA;
 
     if (low + high >= n) {
         IGRAPH_ERROR("Requested too many eigenvalues/vectors", IGRAPH_EINVAL);
@@ -549,7 +553,10 @@ static int igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_t *A,
        This can be done in any format, so everything is fine,
        we don't have to convert. */
 
-    igraph_i_eigen_matrix_sym_arpack_data_t myextra = { A, sA };
+    igraph_i_eigen_matrix_sym_arpack_data_t myextra;
+
+    myextra.A = A;
+    myextra.sA = sA;
 
     if (!options) {
         IGRAPH_ERROR("`options' must be given for ARPACK algorithm",
@@ -901,8 +908,13 @@ static int igraph_i_eigen_matrix_lapack_reorder(const igraph_vector_t *real,
     int howmany = 0, start = 0;
     int i;
     igraph_i_eigen_matrix_lapack_cmp_t cmpfunc = 0;
-    igraph_i_eml_cmp_t vextra = { &mag, real, imag };
-    void *extra = &vextra;
+    igraph_i_eml_cmp_t vextra;
+    void *extra;
+
+    vextra.mag = &mag;
+    vextra.real = real;
+    vextra.imag = imag;
+    extra = &vextra;
 
     IGRAPH_CHECK(igraph_vector_int_init(&idx, nev));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &idx);

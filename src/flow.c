@@ -1776,7 +1776,6 @@ static int igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
         IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn1));
         if (conn1) {
             IGRAPH_ERROR("vertices connected", IGRAPH_EINVAL);
-            return 0;
         }
         break;
     case IGRAPH_VCONN_NEI_NEGATIVE:
@@ -1860,7 +1859,6 @@ static int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
         IGRAPH_CHECK(igraph_are_connected(graph, source, target, &conn));
         if (conn) {
             IGRAPH_ERROR("vertices connected", IGRAPH_EINVAL);
-            return 0;
         }
         break;
     case IGRAPH_VCONN_NEI_NEGATIVE:
@@ -1964,7 +1962,7 @@ static int igraph_i_vertex_connectivity_directed(const igraph_t *graph,
 
     igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
     long int i, j;
-    igraph_integer_t minconn = no_of_nodes - 1, conn;
+    igraph_integer_t minconn = no_of_nodes - 1, conn = 0;
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < no_of_nodes; j++) {

@@ -69,7 +69,7 @@ void DensityGrid::Init() {
         Density = new float[GRID_SIZE][GRID_SIZE][GRID_SIZE];
         fall_off = new float[RADIUS * 2 + 1][RADIUS * 2 + 1][RADIUS * 2 + 1];
         Bins = new deque<Node>[GRID_SIZE * GRID_SIZE * GRID_SIZE];
-    } catch (bad_alloc& errora) {
+    } catch (bad_alloc&) {
         // cout << "Error: Out of memory! Program stopped." << endl;
 #ifdef MUSE_MPI
         MPI_Abort ( MPI_COMM_WORLD, 1 );

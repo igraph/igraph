@@ -318,14 +318,14 @@ int graph::ReCompute( ) {
 
             // Play with vars
             if (attraction > 1) {
-                attraction -= .05;
+                attraction -= .05f;
             }
             if (min_edges > 12) {
-                min_edges -= .05;
+                min_edges -= .05f;
             }
             cut_off_length -= cut_rate;
             if (damping_mult > .1) {
-                damping_mult -= .005;
+                damping_mult -= .005f;
             }
             iterations++;
 //          if ( myid == 0 ) cout << "." << flush;
@@ -363,7 +363,7 @@ int graph::ReCompute( ) {
                 cut_off_length -= cut_rate * 2;
             }
             if (min_edges > MIN) {
-                min_edges -= .2;
+                min_edges -= .2f;
             }
             //min_edges = 99;
             iterations++;

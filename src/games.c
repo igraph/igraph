@@ -2875,7 +2875,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_VECTOR_INIT_FINALLY(&intersect, 0);
     for (i = 0; i < types; i++) {
         for (j = 0; j < types; j++) {
-            long int kk, l, c;
+            long int kk, l, c = 0;
             igraph_real_t p, last;
             igraph_vector_t *v1, *v2;
             long int v1_size, v2_size;
@@ -3277,7 +3277,7 @@ int igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
         long int no_of_edges = igraph_ecount(graph);
         long int no_of_nodes = igraph_vcount(graph);
         long int to_rewire;
-        long int offset;
+        long int offset = 0;
         igraph_vector_t edges;
 
         IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * no_of_edges);
