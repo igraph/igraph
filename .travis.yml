@@ -49,9 +49,6 @@ addons:
 script:
   - CTEST_OUTPUT_ON_FAILURE=1 ctest # report output only for failed tests
 
-after_failure:
-  - find tests/testsuite.dir -name testsuite.log -exec cat \{\} \;
-
 jobs:
   include:
     - name: "Linux"
