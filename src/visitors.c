@@ -534,7 +534,7 @@ int igraph_dfs(const igraph_t *graph, igraph_integer_t root,
 
             /* Search for a neighbor that was not yet visited */
             igraph_bool_t any = 0;
-            long int nei;
+            long int nei = 0;
             while (!any && (*ptr) < n) {
                 nei = (long int) VECTOR(*neis)[(*ptr)];
                 any = !VECTOR(added)[nei];

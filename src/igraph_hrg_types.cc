@@ -1348,9 +1348,9 @@ void dendro::cullSplitHist() {
 
 // **********************************************************************
 
-elementd* dendro::findCommonAncestor(list** paths, const int i, const int j) {
-    list* headOne = paths[i];
-    list* headTwo = paths[j];
+elementd* dendro::findCommonAncestor(list** paths_, const int i, const int j) {
+    list* headOne = paths_[i];
+    list* headTwo = paths_[j];
     elementd* lastStep = NULL;
     while (headOne->x == headTwo->x) {
         lastStep = &internal[headOne->x];
@@ -3595,7 +3595,6 @@ bool simpleGraph::doesLinkExist(const int i, const int j) {
     } else {
         return false;
     }
-    return false;
 }
 
 // **********************************************************************

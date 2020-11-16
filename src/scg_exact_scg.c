@@ -34,7 +34,7 @@
 #include <math.h>
 
 int igraph_i_exact_coarse_graining(const igraph_real_t *v,
-                                   int *gr, const int n) {
+                                   int *gr, int n) {
     int i, gr_nb;
     igraph_i_scg_indval_t *w = igraph_Calloc(n, igraph_i_scg_indval_t);
 

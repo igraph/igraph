@@ -29,7 +29,9 @@
 #include "igraph_types.h"
 
 #ifdef _MSC_VER
-    #define isinf(x) (!_finite(x) && !_isnan(x))
+#  ifndef isinf
+#    define isinf(x) (!_finite(x) && !_isnan(x))
+#  endif
 #endif
 
 int igraph_finite(double x) {

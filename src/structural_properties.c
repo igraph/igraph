@@ -263,7 +263,8 @@ int igraph_shortest_paths(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_FINALLY(igraph_free, already_counted);
     IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
 
-    if ( (all_to = igraph_vs_is_all(&to)) ) {
+    all_to = igraph_vs_is_all(&to);
+    if (all_to) {
         no_of_to = no_of_nodes;
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&indexv, no_of_nodes);
@@ -1674,7 +1675,6 @@ int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
     default:
         IGRAPH_ERROR("unknown subgraph implementation type", IGRAPH_EINVAL);
     }
-    return 0;
 }
 
 /**
@@ -3944,7 +3944,8 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
-    if ( (all_to = igraph_vs_is_all(&to)) ) {
+    all_to = igraph_vs_is_all(&to);
+    if (all_to) {
         no_of_to = no_of_nodes;
     } else {
         IGRAPH_VECTOR_INIT_FINALLY(&indexv, no_of_nodes);
@@ -4935,7 +4936,8 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
     IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, mode));
     IGRAPH_FINALLY(igraph_lazy_inclist_destroy, &inclist);
 
-    if ( (all_to = igraph_vs_is_all(&to)) ) {
+    all_to = igraph_vs_is_all(&to);
+    if (all_to) {
         no_of_to = no_of_nodes;
     } else {
         IGRAPH_CHECK(igraph_vit_create(graph, to, &tovit));

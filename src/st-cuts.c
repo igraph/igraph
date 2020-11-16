@@ -873,8 +873,8 @@ int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
            such a v is found, compute Isv={x|v[Nu(v) U K]x} and return v and
            Isv; otherwise return Isv={}. */
         for (j = 0; j < isvlen; j++) {
-            long int v = (long int) VECTOR(Isv_min)[j];
-            if (igraph_estack_iselement(T, v) || v == target) {
+            long int u = (long int) VECTOR(Isv_min)[j];
+            if (igraph_estack_iselement(T, u) || u == target) {
                 break;
             }
         }

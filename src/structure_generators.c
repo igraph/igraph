@@ -2257,11 +2257,9 @@ int igraph_famous(igraph_t *graph, const char *name) {
         return igraph_i_famous(graph, igraph_i_famous_walther);
     } else if (!strcasecmp(name, "zachary")) {
         return igraph_i_famous(graph, igraph_i_famous_zachary);
-    } else {
-        IGRAPH_ERROR("Unknown graph, see documentation", IGRAPH_EINVAL);
     }
 
-    return 0;
+    IGRAPH_ERROR("Unknown graph, see documentation", IGRAPH_EINVAL);
 }
 
 /**

@@ -1204,7 +1204,6 @@ static int igraph_i_weighted_sparsemat_triplet(const igraph_sparsemat_t *A,
     /* TODO */
     IGRAPH_ERROR("Triplet matrices are not implemented",
                  IGRAPH_UNIMPLEMENTED);
-    return 0;
 }
 
 int igraph_weighted_sparsemat(igraph_t *graph, const igraph_sparsemat_t *A,

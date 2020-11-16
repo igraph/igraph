@@ -73,15 +73,15 @@ int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     igraph_integer_t i;
     float temp_global;
     igraph_integer_t perm_pointer = 0;
-    float barycenter_x = 0.0, barycenter_y = 0.0;
+    float barycenter_x = 0, barycenter_y = 0;
     igraph_vector_t phi;
     igraph_vector_t neis;
     const float elen_des2 = 128 * 128;
-    const float gamma = 1 / 16.0;
-    const float alpha_o = M_PI;
-    const float alpha_r = M_PI / 3.0;
-    const float sigma_o = 1.0 / 3.0;
-    const float sigma_r = 1.0 / 2.0 / no_nodes;
+    const float gamma = 1 / 16.0f;
+    const float alpha_o = (float)M_PI;
+    const float alpha_r = (float)M_PI / 3.0f;
+    const float sigma_o = 1.0f / 3.0f;
+    const float sigma_r = 1.0f / 2.0f / no_nodes;
 
     if (maxiter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negative in GEM layout",

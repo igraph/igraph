@@ -762,7 +762,6 @@ long int igraph_rng_get_integer(igraph_rng_t *rng,
         return (long int)(type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
     }
     IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
-    return 0;
 }
 
 /**
@@ -812,7 +811,6 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
         return type->get(rng->state) / ((double)max + 1) * (double)(h - l) + l;
     }
     IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
-    return 0;
 }
 
 /**
@@ -835,7 +833,6 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
         return type->get(rng->state) / ((double)max + 1);
     }
     IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
-    return 0;
 }
 
 /**
@@ -1564,6 +1561,7 @@ int R_finite(double x) {
 #  include <fp.h>
     return FINITE(x);
 # elif defined(_MSC_VER)
+#  include <float.h>
     return _finite(x);
 #else
     return (!isnan(x) & (x != 1 / 0.0) & (x != -1.0 / 0.0));

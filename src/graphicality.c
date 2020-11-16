@@ -908,7 +908,6 @@ int igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
     }
 
     SUCCEED;
-    return 0;
 }
 
 #undef SUCCEED

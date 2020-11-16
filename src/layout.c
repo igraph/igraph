@@ -376,7 +376,6 @@ int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_UNUSED(kfr); IGRAPH_UNUSED(repulse);
     IGRAPH_ERROR("Springs layout not implemented", IGRAPH_UNIMPLEMENTED);
     /* TODO */
-    return 0;
 }
 
 static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {

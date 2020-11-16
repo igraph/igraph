@@ -93,7 +93,7 @@ void NNode::Set_Color(RGBcolor c) {
     strcpy(color.pajek_c, c.pajek_c);
 }
 
-int NNode::Connect_To(NNode* neighbour, double weight) {
+int NNode::Connect_To(NNode* neighbour, double weight_) {
     NLink *link;
     //sollen doppelte Links erlaubt sein??  NEIN
     if (!neighbour) {
@@ -103,7 +103,7 @@ int NNode::Connect_To(NNode* neighbour, double weight) {
         neighbours->Push(neighbour);        // nachbar hier eintragen
         neighbour->neighbours->Push(this); // diesen knoten beim nachbarn eintragen
 
-        link = new NLink(this, neighbour, weight);     //link erzeugen
+        link = new NLink(this, neighbour, weight_);     //link erzeugen
         global_link_list->Push(link);                        // in globaler liste eintragen
         n_links->Push(link);                                   // bei diesem Knoten eintragen
         neighbour->n_links->Push(link);                  // beim nachbarn eintragen

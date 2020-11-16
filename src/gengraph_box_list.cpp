@@ -42,19 +42,21 @@ void box_list::insert(int v) {
 
 void box_list::pop(int v) {
     int p = prev[v];
-    int n = next[v];
+    int nxt = next[v];
     if (p < 0) {
         int d = deg[v];
         assert(list[d - 1] == v);
-        list[d - 1] = n;
-        if (d == dmax && n < 0) do {
+        list[d - 1] = nxt;
+        if (d == dmax && nxt < 0) {
+            do {
                 dmax--;
             } while (dmax > 0 && list[dmax - 1] < 0);
+        }
     } else {
-        next[p] = n;
+        next[p] = nxt;
     }
-    if (n >= 0) {
-        prev[n] = p;
+    if (nxt >= 0) {
+        prev[nxt] = p;
     }
 }
 

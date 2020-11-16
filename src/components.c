@@ -78,11 +78,9 @@ int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
         return igraph_i_clusters_weak(graph, membership, csize, no);
     } else if (mode == IGRAPH_STRONG) {
         return igraph_i_clusters_strong(graph, membership, csize, no);
-    } else {
-        IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
     }
 
-    return 1;
+    IGRAPH_ERROR("Cannot calculate clusters", IGRAPH_EINVAL);
 }
 
 static int igraph_i_clusters_weak(const igraph_t *graph, igraph_vector_t *membership,
@@ -366,10 +364,9 @@ int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
         retval = igraph_i_clusters_strong(graph, 0, 0, &no);
         *res = (no == 1);
         return retval;
-    } else {
-        IGRAPH_ERROR("mode argument", IGRAPH_EINVAL);
     }
-    return 0;
+
+    IGRAPH_ERROR("mode argument", IGRAPH_EINVAL);
 }
 
 /**
@@ -517,11 +514,9 @@ int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
         return igraph_i_decompose_weak(graph, components, maxcompno, minelements);
     } else if (mode == IGRAPH_STRONG) {
         return igraph_i_decompose_strong(graph, components, maxcompno, minelements);
-    } else {
-        IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
     }
 
-    return 1;
+    IGRAPH_ERROR("Cannot decompose graph", IGRAPH_EINVAL);
 }
 
 static int igraph_i_decompose_weak(const igraph_t *graph,

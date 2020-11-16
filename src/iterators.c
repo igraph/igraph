@@ -1110,7 +1110,6 @@ int igraph_es_fromto(igraph_es_t *es,
     IGRAPH_UNUSED(es); IGRAPH_UNUSED(from); IGRAPH_UNUSED(to);
     IGRAPH_ERROR("igraph_es_fromto not implemented yet", IGRAPH_UNIMPLEMENTED);
     /* TODO */
-    return 0;
 }
 
 /**
@@ -1504,8 +1503,6 @@ int igraph_es_size(const igraph_t *graph, const igraph_es_t *es,
         IGRAPH_ERROR("Cannot calculate selector length, invalid selector type",
                      IGRAPH_EINVAL);
     }
-
-    return 0;
 }
 
 static int igraph_i_es_pairs_size(const igraph_t *graph,

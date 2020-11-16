@@ -152,7 +152,7 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_float_t try_x, try_y;
     igraph_vector_int_t try_idx;
     float move_radius = width / 2;
-    float fine_tuning_factor = 0.01;
+    float fine_tuning_factor = 0.01f;
     igraph_vector_t neis;
     float min_x = width / 2, max_x = -width / 2, min_y = height / 2, max_y = -height / 2;
 

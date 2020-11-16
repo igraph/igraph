@@ -583,11 +583,11 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
     //HugeArray<int> neighbours;
     double h, delta = 0, norm, r, beta, minweight, prefac = 0, w, degree;
     bool cyclic = 0, found;
-    unsigned long num_of_nodes;
+    unsigned long number_of_nodes;
 
     sweep = 0;
     changes = 1;
-    num_of_nodes = net->node_list->Size();
+    number_of_nodes = net->node_list->Size();
     while (sweep < max_sweeps && changes) {
         cyclic = true;
         sweep++;
@@ -730,10 +730,10 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
     //again, we would not like to end up in cyclic attractors
     if (cyclic && changes)  {
 //       printf("Cyclic attractor!\n");
-        acceptance = double(changes) / double(num_of_nodes);
+        acceptance = double(changes) / double(number_of_nodes);
         return 0;
     } else {
-        acceptance = double(changes) / double(num_of_nodes);
+        acceptance = double(changes) / double(number_of_nodes);
         return changes;
     }
 }
@@ -755,19 +755,19 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
     //HugeArray<int> neighbours;
     double norm, r, beta, minweight, prefac = 0;
     bool found;
-    long int num_of_nodes;
+    long int number_of_nodes;
     sweep = 0;
     changes = 0;
-    num_of_nodes = net->node_list->Size();
+    number_of_nodes = net->node_list->Size();
     while (sweep < max_sweeps) {
         sweep++;
         //loop over all nodes in network
-        for (int n = 0; n < num_of_nodes; n++) {
+        for (int n = 0; n < number_of_nodes; n++) {
             rn = -1;
-            while ((rn < 0) || (rn > num_of_nodes - 1)) {
-                rn = RNG_INTEGER(0, num_of_nodes - 1);
+            while ((rn < 0) || (rn > number_of_nodes - 1)) {
+                rn = RNG_INTEGER(0, number_of_nodes - 1);
             }
-            /* rn=long(double(num_of_nodes*double(rand())/double(RAND_MAX+1.0))); */
+            /* rn=long(double(number_of_nodes*double(rand())/double(RAND_MAX+1.0))); */
 
             node = net->node_list->Get(rn);
             // initialize the neighbours and the weights
@@ -885,7 +885,7 @@ double PottsModel::HeatBathLookup(double gamma, double prob, double kT, unsigned
             max_q = long(color_field[i] + 0.5);
         }
 
-    acceptance = double(changes) / double(num_of_nodes) / double(sweep);
+    acceptance = double(changes) / double(number_of_nodes) / double(sweep);
     return acceptance;
 }
 
@@ -1336,7 +1336,7 @@ long PottsModel::WriteClusters(igraph_real_t *modularity,
 //#############################################################################
 double PottsModel::GammaSweep(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel, int repetitions) {
     double stepsize;
-    double kT, kT_start;
+    double kT = 0.5, kT_start;
     long changes;
     double gamma, acc;
     NNode *n_cur, *n_cur2;
@@ -1422,7 +1422,7 @@ double PottsModel::GammaSweep(double gamma_start, double gamma_stop, double prob
 double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel, int repetitions) {
     double stepsize;
     long changes;
-    double gamma, acc;
+    double gamma = gamma_start, acc;
     long runs;
     NNode *n_cur, *n_cur2;
     DLList_Iter<NNode*> iter, iter2;

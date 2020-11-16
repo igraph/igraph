@@ -507,8 +507,6 @@ int igraph_transitivity_local_undirected(const igraph_t *graph,
             return igraph_transitivity_local_undirected2(graph, res, vids, mode);
         }
     }
-
-    return 0;
 }
 
 int igraph_adjacent_triangles1(const igraph_t *graph,
@@ -547,9 +545,6 @@ int igraph_adjacent_triangles(const igraph_t *graph,
     } else {
         return igraph_adjacent_triangles1(graph, res, vids);
     }
-
-    return 0;
-
 }
 
 /**
@@ -972,6 +967,4 @@ int igraph_transitivity_barrat(const igraph_t *graph,
     } else {
         return igraph_transitivity_barrat1(graph, res, vids, weights, mode);
     }
-
-    return 0;
 }

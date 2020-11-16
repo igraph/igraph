@@ -2942,12 +2942,12 @@ int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
     *iso = 0;
     if (info1) {
         info1->nof_nodes = info1->nof_leaf_nodes = info1->nof_bad_nodes =
-                               info1->nof_canupdates = info1->max_level = info1->nof_generators = -1;
+                               info1->nof_canupdates = info1->max_level = info1->nof_generators = 0;
         info1->group_size = 0;
     }
     if (info2) {
         info2->nof_nodes = info2->nof_leaf_nodes = info2->nof_bad_nodes =
-                               info2->nof_canupdates = info2->max_level = info2->nof_generators = -1;
+                               info2->nof_canupdates = info2->max_level = info2->nof_generators = 0;
         info2->group_size = 0;
     }
 
