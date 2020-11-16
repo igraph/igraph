@@ -116,8 +116,8 @@ jobs:
         - mkdir build && cd build
         # disable internal BLAS/LAPACK in order to test building with Apple vecLib, which provides these APIs
         # do not use IGRAPH_VERIFY_FINALLY_STACK as it increases the runtimes immensely in combination with Address Sanitizer
-        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 \
-                   -DUSE_SANITIZER=Address\;Undefined \
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1
+                   -DUSE_SANITIZER=Address\;Undefined
                    -DCMAKE_C_FLAGS="-g -Og" -DCMAKE_CXX_FLAGS="-g -Og"
 
     - name: "Documentation"
