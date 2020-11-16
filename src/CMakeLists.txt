@@ -280,8 +280,8 @@ endif()
 if(APPLE)
   # All recent macOS distributions use libc++
   set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lc++")
-elseif(NOT WIN32)
-  # Most Linux distributions use libstdc++
+elseif(NOT MSVC)
+  # Most Linux distributions and MSYS use libstdc++
   set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lstdc++")
 endif()
 
