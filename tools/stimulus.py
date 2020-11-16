@@ -350,6 +350,7 @@ class RRCodeGenerator(CodeGenerator):
             if not tname in self.types.keys():
                 print "Error: Unknown type encountered:", tname
                 sys.exit(7)
+
             params[p].setdefault('mode', 'IN')
 
         ## Roxygen to export the function
@@ -1285,8 +1286,9 @@ class ShellCodeGenerator(CodeGenerator):
         for p in params.keys():
             tname=params[p]['type']
             if not tname in self.types.keys():
-                print "Error: Unknown type encountered:", tname
-                sys.exit(7)
+                print "W: Unknown type encountered:", tname
+                return
+
             params[p].setdefault('mode', 'IN')
             t=self.types[tname]
             mode=params[p]['mode']
