@@ -32,6 +32,7 @@ addons:
     - libblas-dev
     - liblapack-dev
     - git
+    - colordiff
   snaps:
     - name: cmake
       confinement: classic
@@ -39,6 +40,7 @@ addons:
     packages:
     - ccache
     - ninja
+    - colordiff
     # - flex  # test with the old flex version that ships with macOS
     # - bison # test with the old bison version that ships with macOS
     - gmp
@@ -54,6 +56,9 @@ before_script:
 # use && to ensure that ctest is not run if the build failed
 script:
   - cmake --build . --target build_tests && ctest --output-on-failure
+
+after_failure:
+  - for file in tests/*.diff; do cat "$file" | colordiff; done
 
 jobs:
   include:
