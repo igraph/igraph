@@ -13,4 +13,5 @@
 /Makefile
 /src/Makefile
 /doc/Makefile
+/tools/**/*.pyc
 
