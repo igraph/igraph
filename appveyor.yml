@@ -14,6 +14,8 @@ platform:
 # all our builds have to happen in install...
 build: false
 
+cache: c:\tools\vcpkg\installed\
+
 install:
     - cmd: set PYTHONUNBUFFERED=1
 
@@ -32,12 +34,17 @@ install:
     # Install dependencies for MSVC build
     - choco install winflexbison
 
+    - vcpkg install gmp:x64-windows-static
+    - cd c:\tools\vcpkg
+    - vcpkg integrate install
+
     # Now start with the build
     - cmd: cd "%APPVEYOR_BUILD_FOLDER%"
     - cmd: mkdir build
     - cmd: cd build
-    - cmd: call "%VS140COMNTOOLS%\vsvars32.bat"
-    - cmd: cmake .. -DIGRAPH_GMP_SUPPORT=NO -DIGRAPH_GRAPHML_SUPPORT=NO -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+    - cmd: call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
+    - cmd: call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
+    - cmd: cmake .. -DCMAKE_TOOLCHAIN_FILE=c:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake -DIGRAPH_GMP_SUPPORT=1 -DIGRAPH_GRAPHML_SUPPORT=0 -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
     - cmd: cmake --build .
 
 test_script:
