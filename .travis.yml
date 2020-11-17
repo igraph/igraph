@@ -87,7 +87,7 @@ jobs:
             && echo '5571ad4d17d14bb09ad23a75060f05553786e564  alpine-chroot-install' | sha1sum -c \
             || exit 1"
         - alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
-        - sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja bison flex gmp-dev'
+        - sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja ccache bison flex gmp-dev'
       before_script:
         - mkdir build && cd build
         - alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
