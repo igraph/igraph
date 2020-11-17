@@ -24,16 +24,16 @@ set(CPACK_SOURCE_GENERATOR "TGZ")
 # Declare what to include in the source tarball. Unfortunately we can only
 # declare full directories here, not individual files.
 set(
-	CPACK_SOURCE_INSTALLED_DIRECTORIES
-	"${CMAKE_SOURCE_DIR}/doc;/doc"
-	"${CMAKE_SOURCE_DIR}/etc/cmake;/etc/cmake"
-	"${CMAKE_SOURCE_DIR}/examples;/examples"
-	"${CMAKE_SOURCE_DIR}/include;/include"
-	"${CMAKE_SOURCE_DIR}/msvc/include;/msvc/include"
-	"${CMAKE_SOURCE_DIR}/optional;/optional"
-	"${CMAKE_BINARY_DIR}/src/parsers/;/src/parsers"
-	"${CMAKE_SOURCE_DIR}/src;/src"
-	"${CMAKE_SOURCE_DIR}/tests;/tests"
+    CPACK_SOURCE_INSTALLED_DIRECTORIES
+    "${CMAKE_SOURCE_DIR}/doc;/doc"
+    "${CMAKE_SOURCE_DIR}/etc/cmake;/etc/cmake"
+    "${CMAKE_SOURCE_DIR}/examples;/examples"
+    "${CMAKE_SOURCE_DIR}/include;/include"
+    "${CMAKE_SOURCE_DIR}/msvc/include;/msvc/include"
+    "${CMAKE_SOURCE_DIR}/optional;/optional"
+    "${CMAKE_BINARY_DIR}/src/parsers/;/src/parsers"
+    "${CMAKE_SOURCE_DIR}/src;/src"
+    "${CMAKE_SOURCE_DIR}/tests;/tests"
 )
 
 # CPack is pretty dumb as it can only copy full directories (sans the ignored
@@ -44,17 +44,17 @@ set(CPACK_INSTALL_SCRIPT "${CMAKE_SOURCE_DIR}/etc/cmake/cpack_install_script.cma
 # Ignore the build and all hidden folders. Also ignore obsolete autoconf-related
 # stuff. The latter won't be needed once we fully transitioned to CMake.
 set(
-	CPACK_SOURCE_IGNORE_FILES
-	"\\\\..*/"
-	"\.l$"
-	"\.y$"
-	"${CMAKE_SOURCE_DIR}/build"
-	"${CMAKE_SOURCE_DIR}/optional/simpleraytracer"
-	"Makefile.am"
-	"Makefile.in"
-	"configure.ac"
-	"atlocal.in"
-	"\.at$"
+    CPACK_SOURCE_IGNORE_FILES
+    "\\\\..*/"
+    "\.l$"
+    "\.y$"
+    "${CMAKE_SOURCE_DIR}/build"
+    "${CMAKE_SOURCE_DIR}/optional/simpleraytracer"
+    "Makefile.am"
+    "Makefile.in"
+    "configure.ac"
+    "atlocal.in"
+    "\.at$"
 )
 
 #############################################################################

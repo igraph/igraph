@@ -16,7 +16,7 @@ if(PACKAGE_VERSION)
     string(STRIP "${PACKAGE_VERSION}" PACKAGE_VERSION)
     get_git_head_revision(GIT_REFSPEC GIT_COMMIT_HASH)
     string(SUBSTRING "${GIT_COMMIT_HASH}" 0 8 GIT_COMMIT_HASH_SHORT)
-	string(APPEND PACKAGE_VERSION "-dev+${GIT_COMMIT_HASH_SHORT}")
+  string(APPEND PACKAGE_VERSION "-dev+${GIT_COMMIT_HASH_SHORT}")
   endif()
   message(STATUS "Version number from Git: ${PACKAGE_VERSION}")
 elseif(EXISTS "${VERSION_FILE}")
@@ -37,11 +37,11 @@ elseif(DEFINED ENV{TRAVIS_COMMIT})
   if(EXISTS "${NEXT_VERSION_FILE}")
     file(READ "${NEXT_VERSION_FILE}" PACKAGE_VERSION)
     string(STRIP "${PACKAGE_VERSION}" PACKAGE_VERSION)
-	string(APPEND PACKAGE_VERSION "-dev+${GIT_COMMIT_HASH_SHORT}")
+  string(APPEND PACKAGE_VERSION "-dev+${GIT_COMMIT_HASH_SHORT}")
   elseif(EXISTS "${VERSION_FILE}")
     file(READ "${VERSION_FILE}" PACKAGE_VERSION)
     string(STRIP "${PACKAGE_VERSION}" PACKAGE_VERSION)
-	string(APPEND PACKAGE_VERSION "-post+${GIT_COMMIT_HASH_SHORT}")
+  string(APPEND PACKAGE_VERSION "-post+${GIT_COMMIT_HASH_SHORT}")
   else()
     message(STATUS "Cannot find out the version number of this package; IGRAPH_VERSION and NEXT_VERSION are both missing.")
     message(STATUS "")
@@ -84,7 +84,7 @@ add_custom_target(
   BYPRODUCTS "${CMAKE_BINARY_DIR}/IGRAPH_VERSION"
   COMMAND "${CMAKE_COMMAND}"
     -DIGRAPH_VERSION="${PACKAGE_VERSION}"
-	-DVERSION_FILE_PATH="${CMAKE_BINARY_DIR}/IGRAPH_VERSION"
-	-P "${CMAKE_SOURCE_DIR}/etc/cmake/create_igraph_version_file.cmake"
+  -DVERSION_FILE_PATH="${CMAKE_BINARY_DIR}/IGRAPH_VERSION"
+  -P "${CMAKE_SOURCE_DIR}/etc/cmake/create_igraph_version_file.cmake"
   COMMENT "Generating IGRAPH_VERSION file in build folder"
 )

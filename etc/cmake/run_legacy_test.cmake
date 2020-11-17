@@ -43,14 +43,14 @@ else()
     if(DIFF_TOOL)
       execute_process(
         COMMAND ${DIFF_TOOL} -u ${EXPECTED_OUTPUT_FILE} ${OBSERVED_OUTPUT_FILE}
-		OUTPUT_FILE ${DIFF_FILE}
+        OUTPUT_FILE ${DIFF_FILE}
       )
     elseif(FC_TOOL)
       file(TO_NATIVE_PATH "${EXPECTED_OUTPUT_FILE}" REAL_EXPECTED_OUTPUT_FILE)
       file(TO_NATIVE_PATH "${OBSERVED_OUTPUT_FILE}" REAL_OBSERVED_OUTPUT_FILE)
       execute_process(
         COMMAND ${FC_TOOL} /A ${REAL_EXPECTED_OUTPUT_FILE} ${REAL_OBSERVED_OUTPUT_FILE}
-		    OUTPUT_FILE ${DIFF_FILE}
+        OUTPUT_FILE ${DIFF_FILE}
       )
     endif()
     message(FATAL_ERROR "Test case output differs from the expected output")
