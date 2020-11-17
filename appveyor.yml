@@ -37,6 +37,7 @@ install:
     - cd c:\tools\vcpkg
     - git pull
     - .\bootstrap-vcpkg.bat
+    - vcpkg install yasm-tool:x86-windows
     - vcpkg install gmp:x64-windows-static
     - vcpkg integrate install
 
