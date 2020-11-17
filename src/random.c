@@ -1550,6 +1550,10 @@ int imin2(int x, int y) {
     #define R_FINITE(x)    R_finite(x)
 #endif
 
+#if defined(_MSC_VER)
+#include <float.h>   /* needed later down below by _finite() */
+#endif
+
 int R_finite(double x) {
 #if HAVE_WORKING_ISFINITE || HAVE_DECL_ISFINITE
     return isfinite(x);
@@ -1561,7 +1565,6 @@ int R_finite(double x) {
 #  include <fp.h>
     return FINITE(x);
 # elif defined(_MSC_VER)
-#  include <float.h>
     return _finite(x);
 #else
     return (!isnan(x) & (x != 1 / 0.0) & (x != -1.0 / 0.0));
