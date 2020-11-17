@@ -33,9 +33,11 @@ install:
 
     # Install dependencies for MSVC build
     - choco install winflexbison
-
-    - vcpkg install gmp:x64-windows-static
+    
     - cd c:\tools\vcpkg
+    - git pull
+    - .\bootstrap-vcpkg.bat
+    - vcpkg install gmp:x64-windows-static
     - vcpkg integrate install
 
     # Now start with the build
