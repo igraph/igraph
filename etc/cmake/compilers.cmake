@@ -10,6 +10,8 @@ macro(use_all_warnings TARGET_NAME)
       /wd4267 # 'var' : conversion from 'size_t' to 'type', possible loss of data 
       /wd4996 # deprecated functions, e.g. 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead.
       /wd4456 # declaration of 'identifier' hides previous local declaration
+      /wd4800 # forcing value to 'true' or 'false' (performance warning)
+      /wd4204 # nonstandard extension used: non-constant aggregate initializer
     )
   else()
     target_compile_options(${TARGET_NAME} PRIVATE 
