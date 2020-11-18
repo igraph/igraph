@@ -25,7 +25,7 @@
 
 int main() {
 
-    const int nodes = 67;
+    const int nodes = 10;
     igraph_t g;
     igraph_matrix_t V, V3;
     igraph_matrix_complex_t V2;
@@ -34,17 +34,7 @@ int main() {
     igraph_eigen_which_t which;
     igraph_vector_t p, selcol;
 
-    /* This is a tree with no non-trivial automorphisms */
-    igraph_small(&g, nodes, IGRAPH_UNDIRECTED,
-                     16, 59, 11, 16, 11, 22, 22, 60, 31, 60, 12, 31, 12, 20, 20, 47, 18,
-                     47, 18, 23, 23, 24, 24, 38, 18, 21, 21, 56, 56, 65, 34, 65, 34, 64,
-                     54, 64, 22, 25, 56, 63, 28, 63, 37, 63, 1, 47, 1, 5, 50, 65, 2, 50,
-                     23, 53, 11, 32, 0, 32, 0, 48, 8, 48, 0, 27, 40, 50, 40, 41, 3, 5, 3,
-                     51, 52, 60, 18, 55, 9, 40, 16, 42, 6, 21, 6, 14, 14, 43, 50, 66, 30,
-                     38, 30, 62, 13, 14, 7, 37, 42, 44, 41, 49, 29, 60, 4, 29, 61, 65, 43,
-                     46, 35, 65, 35, 45, 36, 43, 19, 36, 10, 19, 1, 58, 12, 39, 6, 17, 26,
-                     44, 25, 57, 15, 66, 33, 36,
-                     -1);
+    igraph_tree(&g, nodes, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
 
     igraph_matrix_complex_init(&V2, 0, 0);
     igraph_matrix_init(&V, 0, 0);
