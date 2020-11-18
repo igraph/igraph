@@ -3,7 +3,11 @@ include(test_helpers)
 # Add a compatibility alias to the "test" target so it can also be invoked as
 # "make check" - for people who have it in their muscle memories from autotools
 add_custom_target(build_tests)
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND} -C ${CMAKE_BUILD_TYPE})
+add_custom_target(
+  check
+  COMMAND ${CMAKE_CTEST_COMMAND} --progress --output-on-failure -C ${CMAKE_BUILD_TYPE}
+  COMMENT "Executing unit tests..."
+)
 add_dependencies(check build_tests)
 
 # Some newer gcc version have --enable-new-dtags on by default. This then leads
