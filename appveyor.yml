@@ -6,7 +6,7 @@ platform:
 cache:
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
-  - C:\Tools\vcpkg\install -> appveyor.yml
+  - C:\Tools\vcpkg\installed -> appveyor.yml
 
 install:
     # Install dependencies for MSVC build
@@ -42,6 +42,7 @@ configuration: Release
 
 build:
     parallel: true
+    verbosity: minimal
 
 test_script:
     - cd "%APPVEYOR_BUILD_FOLDER%"
