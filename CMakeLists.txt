@@ -6,6 +6,9 @@ cmake_minimum_required(VERSION 3.16)
 # Add etc/cmake to CMake's search path so we can put our private stuff there
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/etc/cmake)
 
+# Prevent in-source builds
+include(PreventInSourceBuilds)
+
 # Make use of ccache if it is present on the host system
 find_program(CCACHE_PROGRAM ccache)
 if(CCACHE_PROGRAM)
