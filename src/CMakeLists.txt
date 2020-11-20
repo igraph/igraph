@@ -229,20 +229,40 @@ target_include_directories(
 )
 
 if(MATH_LIBRARY)
-    target_link_libraries(igraph PUBLIC ${MATH_LIBRARY})
+  target_link_libraries(igraph PUBLIC ${MATH_LIBRARY})
+endif()
+
+if(ARPACK_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${ARPACK_LIBRARIES})
+endif()
+
+if(BLAS_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${BLAS_LIBRARIES})
+endif()
+
+if(CXSPARSE_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${CXSPARSE_LIBRARIES})
+endif()
+
+if(GLPK_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${GLPK_LIBRARIES})
+endif()
+
+if(GMP_LIBRARY)
+  target_link_libraries(igraph PUBLIC ${GMP_LIBRARY})
+endif()
+
+if(LAPACK_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${LAPACK_LIBRARIES})
+endif()
+
+if(LIBXML2_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${LIBXML2_LIBRARIES})
 endif()
 
 # Link igraph statically to some of the libraries from the subdirectories
 target_link_libraries(
   igraph
-  PUBLIC
-  "$<$<BOOL:${ARPACK_LIBRARIES}>:${ARPACK_LIBRARIES}>"
-  "$<$<BOOL:${BLAS_LIBRARIES}>:${BLAS_LIBRARIES}>"
-  "$<$<BOOL:${CXSPARSE_LIBRARIES}>:${CXSPARSE_LIBRARIES}>"
-  "$<$<BOOL:${GLPK_LIBRARIES}>:${GLPK_LIBRARIES}>"
-  "$<$<BOOL:${GMP_LIBRARY}>:${GMP_LIBRARY}>"
-  "$<$<BOOL:${LAPACK_LIBRARIES}>:${LAPACK_LIBRARIES}>"
-  "$<$<BOOL:${LIBXML2_LIBRARIES}>:${LIBXML2_LIBRARIES}>"
   PRIVATE
   bliss cliquer plfit prpack
 )
@@ -286,25 +306,25 @@ elseif(NOT MSVC)
 endif()
 
 if(IGRAPH_GRAPHML_SUPPORT)
-	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lxml2 -lz")
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lxml2 -lz")
 endif()
 if(IGRAPH_GMP_SUPPORT)
-	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lgmp")
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lgmp")
 endif()
 if(NOT IGRAPH_USE_INTERNAL_BLAS)
-	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lblas")
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lblas")
 endif()
 if(NOT IGRAPH_USE_INTERNAL_CXSPARSE)
-	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lcxsparse")
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lcxsparse")
 endif()
 if(IGRAPH_GLPK_SUPPORT AND NOT IGRAPH_USE_INTERNAL_GLPK)
-	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lglpk")
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -lglpk")
 endif()
 if(NOT IGRAPH_USE_INTERNAL_LAPACK)
-	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -llapack")
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -llapack")
 endif()
 if(NOT IGRAPH_USE_INTERNAL_ARPACK)
-	set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
+  set(PKGCONFIG_LIBS_PRIVATE "${PKGCONFIG_LIBS_PRIVATE} -larpack")
 endif()
 configure_file(${CMAKE_SOURCE_DIR}/igraph.pc.in ${CMAKE_BINARY_DIR}/igraph.pc @ONLY)
 
