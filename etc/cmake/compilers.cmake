@@ -12,6 +12,7 @@ macro(use_all_warnings TARGET_NAME)
       /wd4456 # declaration of 'identifier' hides previous local declaration
       /wd4800 # forcing value to 'true' or 'false' (performance warning)
       /wd4204 # nonstandard extension used: non-constant aggregate initializer
+      /wd4701 # potentially uninitialized local variable
     )
   else()
     target_compile_options(${TARGET_NAME} PRIVATE 
