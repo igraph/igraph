@@ -30,9 +30,13 @@
 #include <assert.h>
 #include <stdarg.h>
 
+
+/***** Handling errors *****/
+
 static IGRAPH_THREAD_LOCAL igraph_error_handler_t *igraph_i_error_handler = 0;
 static IGRAPH_THREAD_LOCAL char igraph_i_errormsg_buffer[500];
 static IGRAPH_THREAD_LOCAL char igraph_i_warningmsg_buffer[500];
+static IGRAPH_THREAD_LOCAL char igraph_i_fatalmsg_buffer[500];
 
 /* Error strings corresponding to each igraph_error_type_t enum value. */
 static const char *igraph_i_error_strings[] = {
@@ -144,7 +148,7 @@ int igraph_errorvf(const char *reason, const char *file, int line,
 #ifndef USING_R
 void igraph_error_handler_abort (const char *reason, const char *file,
                                  int line, int igraph_errno) {
-    fprintf(stderr, "Error at %s:%i :%s, %s\n", file, line, reason,
+    fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
             igraph_strerror(igraph_errno));
     abort();
 }
@@ -164,7 +168,7 @@ void igraph_error_handler_ignore (const char *reason, const char *file,
 void igraph_error_handler_printignore (const char *reason, const char *file,
                                        int line, int igraph_errno) {
     IGRAPH_FINALLY_FREE();
-    fprintf(stderr, "Error at %s:%i :%s, %s\n", file, line, reason,
+    fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
             igraph_strerror(igraph_errno));
 }
 #endif
@@ -175,6 +179,9 @@ igraph_set_error_handler (igraph_error_handler_t * new_handler) {
     igraph_i_error_handler = new_handler;
     return previous_handler;
 }
+
+
+/***** "Finally" stack *****/
 
 IGRAPH_THREAD_LOCAL struct igraph_i_protectedPtr igraph_i_finally_stack[100];
 
@@ -213,6 +220,9 @@ void IGRAPH_FINALLY_FREE(void) {
 int IGRAPH_FINALLY_STACK_SIZE(void) {
     return igraph_i_finally_stack[0].all;
 }
+
+
+/***** Handling warnings *****/
 
 static IGRAPH_THREAD_LOCAL igraph_warning_handler_t *igraph_i_warning_handler = 0;
 
@@ -288,4 +298,40 @@ igraph_set_warning_handler (igraph_warning_handler_t * new_handler) {
     igraph_warning_handler_t * previous_handler = igraph_i_warning_handler;
     igraph_i_warning_handler = new_handler;
     return previous_handler;
+}
+
+
+/***** Handling fatal errors *****/
+
+static IGRAPH_THREAD_LOCAL igraph_fatal_handler_t *igraph_i_fatal_handler = NULL;
+
+igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_handler_t * new_handler) {
+    igraph_fatal_handler_t * previous_handler = igraph_i_fatal_handler;
+    igraph_i_fatal_handler = new_handler;
+    return previous_handler;
+}
+
+#ifndef USING_R
+void igraph_fatal_handler_abort(const char *reason, const char *file, int line) {
+    fprintf(stderr, "Fatal error at %s:%i : %s\n", file, line, reason);
+    abort();
+}
+#endif
+
+void igraph_fatal(const char *reason, const char *file, int line) {
+    if (igraph_i_error_handler) {
+        igraph_i_fatal_handler(reason, file, line);
+#ifndef USING_R
+    }  else {
+        igraph_fatal_handler_abort(reason, file, line);
+#endif
+    }
+}
+
+void igraph_fatalf(const char *reason, const char *file, int line, ...) {
+    va_list ap;
+    va_start(ap, line);
+    vsnprintf(igraph_i_fatalmsg_buffer, sizeof(igraph_i_fatalmsg_buffer) / sizeof(char), reason, ap);
+    va_end(ap);
+    igraph_fatal(igraph_i_warningmsg_buffer, file, line);
 }

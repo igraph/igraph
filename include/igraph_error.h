@@ -35,6 +35,20 @@ __BEGIN_DECLS
  * prefix renamed to IGRAPH_), as I couldn't find a better way to do
  * them. */
 
+#if defined(__GNUC__)
+/* Compilers that support the GNU C syntax. We use '__noreturn__' instead of 'noreturn' as the latter is a macro in C11. */
+/* This is preferred over the standard as GNU C supports applying 'noreturn' to typedefs. */
+#define IGRAPH_NORETURN __attribute__((__noreturn__))
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+/* Compilers that support the C11 standard. */
+#define IGRAPH_NORETURN _Noreturn
+#elif defined(_MSC_VER)
+/* Compilers that support the MSVC syntax. */
+#define IGRAPH_NORETURN __declspec(noreturn)
+#else
+#define IGRAPH_NORETURN
+#endif
+
 /**
  * \section errorhandlingbasics Error handling basics
  *
@@ -743,6 +757,47 @@ DECLDIR int igraph_warningf(const char *reason, const char *file, int line,
 #define IGRAPH_WARNING(reason) \
     do { \
         igraph_warning(reason, IGRAPH_FILE_BASENAME, __LINE__, -1); \
+    } while (0)
+
+
+/**
+ * \typedef igraph_fatal_handler_t
+ * Type of igraph fatal error handler functions
+ *
+ * Functions of this type must not return.
+ */
+
+typedef
+#if defined(__GNUC__)
+IGRAPH_NORETURN /* 'noreturn' typedefs are a GNU C extension. Without this, GCC/Clang issue a warning for igraph_fatal(). */
+#endif
+void igraph_fatal_handler_t (const char *reason, const char *file, int line);
+
+DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
+DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+
+DECLDIR igraph_fatal_handler_t igraph_fatal_handler_abort;
+
+/**
+ * \define IGRAPH_FATAL
+ * Trigger a fatal error.
+ *
+ * This is the usual way of triggering a fatal error from an igraph
+ * function. It calls \ref igraph_fatal().
+ * \param reason The error message.
+ */
+
+#define IGRAPH_FATAL(reason) \
+    do { \
+        igraph_fatal(reason, IGRAPH_FILE_BASENAME, __LINE__); \
+    } while (0)
+
+
+#define IGRAPH_ASSERT(condition) \
+    do { \
+        if (!(condition)) { \
+            igraph_fatal("Assertion failed: " #condition, IGRAPH_FILE_BASENAME, __LINE__); \
+        } \
     } while (0)
 
 __END_DECLS
