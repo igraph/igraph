@@ -25,9 +25,8 @@
   along with bliss.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#if HAVE_GMP == 1
-#  define BLISS_USE_GMP
-#endif
+
+#define BLISS_USE_GMP
 
 namespace bliss {
 
