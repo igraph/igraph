@@ -63,6 +63,7 @@ else()
   print_str("Diff tool" "not found")
 endif()
 print_str("Sanitizers" "${USE_SANITIZER}" "none")
+print_bool("Code coverage" IGRAPH_ENABLE_CODE_COVERAGE)
 print_bool("Verify 'finally' stack" IGRAPH_VERIFY_FINALLY_STACK)
 message(STATUS " ")
 
