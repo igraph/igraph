@@ -50,7 +50,7 @@ addons:
 # if this phase fails, the build stops immediately
 before_script:
   - mkdir build && cd build
-  - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+  - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DUSE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
 
 # building and testing is in script
 # use && to ensure that ctest is not run if the build failed
@@ -90,7 +90,7 @@ jobs:
         - sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja ccache bison flex gmp-dev'
       before_script:
         - mkdir build && cd build
-        - alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+        - alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
       script:
         - alpine cmake --build . --target build_tests
         - alpine ctest --output-on-failure -j 2
@@ -99,7 +99,7 @@ jobs:
       os: linux
       before_script:
         - mkdir build && cd build
-        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=0 -DIGRAPH_USE_INTERNAL_GLPK=0 -DIGRAPH_USE_INTERNAL_CXSPARSE=0 -DIGRAPH_VERIFY_FINALLY_STACK=1
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=0 -DIGRAPH_USE_INTERNAL_GLPK=0 -DIGRAPH_USE_INTERNAL_CXSPARSE=0 -DIGRAPH_USE_INTERNAL_GMP=0 -DIGRAPH_VERIFY_FINALLY_STACK=1
 
     # Test with x87 floating-point instructions instead of SSE
     # This may reveal tests that are numerically unstable, and therefore have a high risk of producing false positives
@@ -116,7 +116,7 @@ jobs:
         - mkdir build && cd build
         # disable internal BLAS/LAPACK in order to test building with Apple vecLib, which provides these APIs
         # do not use IGRAPH_VERIFY_FINALLY_STACK as it increases the runtimes immensely in combination with Address Sanitizer
-        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1
+        - cmake .. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1
                    -DUSE_SANITIZER=Address\;Undefined
                    -DCMAKE_C_FLAGS="-g -Og" -DCMAKE_CXX_FLAGS="-g -Og"
 
