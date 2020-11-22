@@ -16,12 +16,12 @@
 #cmakedefine HAVE_STRDUP 1
 
 #cmakedefine HAVE_GLPK 1
-#cmakedefine HAVE_GMP 1
 #cmakedefine HAVE_LIBXML 1
 
 #cmakedefine INTERNAL_BLAS 1
 #cmakedefine INTERNAL_LAPACK 1
 #cmakedefine INTERNAL_ARPACK 1
+#cmakedefine INTERNAL_GMP 1
 
 #define IGRAPH_F77_SAVE static @TLS_KEYWORD@
 #define IGRAPH_THREAD_LOCAL @TLS_KEYWORD@
