@@ -67,4 +67,6 @@ int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
 
 double igraphdnrm2_(int *n, double *x, int *incx);
 
+double igraphddot_(int *n, double *dx, int *incx, double *dy, int *incy);
+
 #endif
