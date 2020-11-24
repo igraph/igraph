@@ -22,6 +22,7 @@
 */
 
 #include "igraph_nongraph.h"
+#include "igraph_random.h"
 #include "igraph_types.h"
 #include "igraph_interrupt_internal.h"
 #include "config.h"
@@ -357,6 +358,8 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
         }
     }
 
+    RNG_BEGIN();
+
     plfit_stored_error_handler = plfit_set_error_handler(igraph_i_plfit_error_handler_store);
     if (discrete) {
         plfit_discrete_options_init(&disc_options);
@@ -386,6 +389,8 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
         }
     }
     plfit_set_error_handler(plfit_stored_error_handler);
+
+    RNG_END();
 
     switch (retval) {
     case PLFIT_FAILURE:
