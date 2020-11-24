@@ -38,7 +38,7 @@ __BEGIN_DECLS
 #include <float.h>
 #include <math.h>
 
-#define snprintf _snprintf
+#define snprintf igraph_i_snprintf
 #define inline  __inline
 #define isnan(x) ((x) != (x))
 #define isfinite(x) _finite(x)

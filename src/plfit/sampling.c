@@ -18,11 +18,12 @@
  */
 
 #include <math.h>
+
+#include "igraph_random.h"
+
 #include "error.h"
 #include "sampling.h"
 #include "platform.h"
-
-#include "igraph_random.h"
 
 inline double plfit_runif(double lo, double hi, mt_rng_t* rng) {
     if (rng == 0) {

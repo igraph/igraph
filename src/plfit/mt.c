@@ -12,9 +12,10 @@
  */
 
 #include <stdlib.h>
-#include "mt.h"
 
 #include "igraph_random.h"
+
+#include "mt.h"
 
 static uint16_t get_random_uint16() {
     return RNG_INT31() & 0xFFFF;
