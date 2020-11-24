@@ -11,7 +11,6 @@
  * This file has been placed in the public domain.
  */
 
-#include <stdint.h>
 #include <stdlib.h>
 
 #include "igraph_random.h"

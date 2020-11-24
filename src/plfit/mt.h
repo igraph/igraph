@@ -14,7 +14,8 @@
 #ifndef __MT_H__
 #define __MT_H__
 
-#ifdef _MSC_VER
+/* VS 2010, i.e. _MSC_VER == 1600, already has stdint.h */
+#if defined(_MSC_VER) && _MSC_VER < 1600
 #  define uint32_t __int32
 #else
 #  include <stdint.h>
