@@ -37,12 +37,12 @@
  * (<type>igraph_vector_ptr_t</type>)
  *
  * <para>The \type igraph_vector_ptr_t data type is very similar to
- * the \type igraph_vector_t type, but it stores generic pointers instead of
+ * the \ref igraph_vector_t type, but it stores generic pointers instead of
  * real numbers.</para>
  *
- * <para>This type has the same space complexity as \type
+ * <para>This type has the same space complexity as \ref
  * igraph_vector_t, and most implemented operations work the same way
- * as for \type igraph_vector_t. </para>
+ * as for \ref igraph_vector_t.</para>
  *
  * <para>This type is mostly used to pass to or receive from a set of
  * graphs to some \a igraph functions, such as \ref

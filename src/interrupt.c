@@ -24,10 +24,6 @@
 #include "igraph_interrupt.h"
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-
 IGRAPH_THREAD_LOCAL igraph_interruption_handler_t
 *igraph_i_interruption_handler = 0;
 

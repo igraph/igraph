@@ -27,7 +27,9 @@ __BEGIN_DECLS
 
 /**
  * \typedef igraph_coloring_greedy_t
- * Ordering heuristics for igraph_vertex_coloring_greedy
+ * \brief Ordering heuristics for greedy graph coloring.
+ *
+ * Ordering heuristics for \ref igraph_vertex_coloring_greedy().
  *
  * \enumval IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS  Choose vertex with largest number of already colored neighbors.
  *
