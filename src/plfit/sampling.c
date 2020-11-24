@@ -159,7 +159,7 @@ int plfit_rzeta_array(long int xmin, double alpha, size_t n, mt_rng_t* rng,
             t = pow((x+1.0)/x, alpha_minus_1);
         } while (v*x*(t-1)*one_over_b_minus_1*b > t*xmin);
         *result = x;
-        if (x < 0) abort();
+        if (x < 0) return PLFIT_EINVAL;
         result++; n--;
     }
 
