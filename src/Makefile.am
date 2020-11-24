@@ -116,6 +116,8 @@ libprpack_la_CPPFLAGS = -I$(top_srcdir)/include -DPRPACK_IGRAPH_SUPPORT
 PRPACK_LIB = libprpack.la
 
 libplfit_la_SOURCES = $(PLFIT)
+libplfit_la_CFLAGS = -I$(top_srcdir)/include
+libplfit_la_CPPFLAGS = -I$(top_srcdir)/include
 PLFIT_LIB = libplfit.la
 
 noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) \
