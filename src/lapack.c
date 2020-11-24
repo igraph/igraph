@@ -21,6 +21,7 @@
 
 */
 
+#include "igraph_blas.h"
 #include "igraph_lapack.h"
 #include "igraph_lapack_internal.h"
 
@@ -934,5 +935,14 @@ int igraph_lapack_dgehrd(const igraph_matrix_t *A,
     }
 
     return 0;
+}
+
+int igraph_lapack_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
+                       igraph_real_t *res) {
+    IGRAPH_WARNING(
+        "igraph_lapack_ddot() is a misnomer; use igraph_blas_ddot() instead. "
+        "igraph_lapack_ddot() will be removed in igraph 0.9.0."
+    );
+    return igraph_blas_ddot(v1, v2, res);
 }
 

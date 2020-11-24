@@ -106,6 +106,9 @@ DECLDIR int igraph_lapack_dgehrd(const igraph_matrix_t *A,
                                  int ilo, int ihi,
                                  igraph_matrix_t *result);
 
+DECLDIR int igraph_lapack_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
+                               igraph_real_t *res);
+
 __END_DECLS
 
 #endif
