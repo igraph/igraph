@@ -152,6 +152,8 @@ h1 a, h1 a:visited, h1 a:hover { color: #fff; text-decoration: none }
 h2 a, h2 a:visited, h2 a:hover { color: #000; text-decoration: none }
 h3 a, h3 a:visited, h3 a:hover { color: #000; text-decoration: none }
 
+span.type { font-family: monospace; }
+
 /* Version info */
 #version_info {
   float: right;
