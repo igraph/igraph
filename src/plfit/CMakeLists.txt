@@ -16,6 +16,12 @@ add_library(
   sampling.c
 )
 
+target_include_directories(
+  plfit
+  PRIVATE
+  ${CMAKE_SOURCE_DIR}/include
+)
+
 if (BUILD_SHARED_LIBS)
   set_property(TARGET plfit PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
