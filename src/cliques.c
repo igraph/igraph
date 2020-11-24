@@ -303,7 +303,7 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
 
 /**
  * \function igraph_cliques
- * \brief Find all or some cliques in a graph
+ * \brief Find all or some cliques in a graph.
  *
  * </para><para>
  * Cliques are fully connected subgraphs of a graph.
@@ -318,7 +318,7 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, ie. \c res will contain pointers to \c igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -342,7 +342,7 @@ int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
 
 /**
  * \function igraph_clique_size_hist
- * \brief Count cliques of each size in the graph
+ * \brief Counts cliques of each size in the graph.
  *
  * </para><para>
  * Cliques are fully connected subgraphs of a graph.
@@ -354,7 +354,7 @@ int igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * \param graph The input graph.
  * \param hist Pointer to an initialized vector. The result will be stored
  * here. The first element will store the number of size-1 cliques, the second
- * element the number of size-2 cliques, etc.  For cliques smaller than \c min_size,
+ * element the number of size-2 cliques, etc.  For cliques smaller than \p min_size,
  * zero counts will be returned.
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
@@ -381,7 +381,7 @@ int igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
  * Cliques are fully connected subgraphs of a graph. This function
  * enumerates all cliques within the given size range and calls
  * \p cliquehandler_fn for each of them. The cliques are passed to the
- * callback function as an <type>igraph_vector_t *</type>.  Destroying and
+ * callback function as a pointer to an \ref igraph_vector_t.  Destroying and
  * freeing this vector is left up to the user.  Use \ref igraph_vector_destroy()
  * to destroy it first, then free it using \ref igraph_free().
  *
@@ -395,7 +395,7 @@ int igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
  * \param max_size Integer giving the maximum size of the cliques to be
  *   returned. If negative or zero, no upper bound will be used.
  * \param cliquehandler_fn Callback function to be called for each clique.
- * See also igraph_clique_handler_t.
+ * See also \ref igraph_clique_handler_t.
  * \param arg Extra argument to supply to \p cliquehandler_fn.
  * \return Error code.
  *
@@ -413,7 +413,7 @@ int igraph_cliques_callback(const igraph_t *graph,
 
 /**
  * \function igraph_weighted_cliques
- * \brief Find all cliques in a given weight range in a vertex weighted graph
+ * \brief Finds all cliques in a given weight range in a vertex weighted graph.
  *
  * </para><para>
  * Cliques are fully connected subgraphs of a graph.
@@ -430,7 +430,7 @@ int igraph_cliques_callback(const igraph_t *graph,
  * \param vertex_weights A vector of vertex weights. The current implementation
  *   will truncate all weights to their integer parts.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, ie. \c res will contain pointers to \c igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -470,7 +470,7 @@ int igraph_weighted_cliques(const igraph_t *graph,
  * \param vertex_weights A vector of vertex weights. The current implementation
  *   will truncate all weights to their integer parts.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, ie. \c res will contain pointers to \c igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -488,7 +488,7 @@ int igraph_largest_weighted_cliques(const igraph_t *graph,
 
 /**
  * \function igraph_weighted_clique_number
- * \brief Find the weight of the largest weight clique in the graph
+ * \brief Finds the weight of the largest weight clique in the graph.
  *
  * </para><para>The current implementation of this function
  * uses version 1.21 of the Cliquer library by Sampo Niskanen and
@@ -531,7 +531,7 @@ static int igraph_i_maximal_or_largest_cliques_or_indsets(
 
 /**
  * \function igraph_independent_vertex_sets
- * \brief Find all independent vertex sets in a graph
+ * \brief Finds all independent vertex sets in a graph.
  *
  * </para><para>
  * A vertex set is considered independent if there are no edges between
@@ -550,7 +550,7 @@ static int igraph_i_maximal_or_largest_cliques_or_indsets(
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, ie. \c res will contain pointers to \c igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
  *   objects which contain the indices of vertices involved in an independent
  *   vertex set. The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -772,7 +772,7 @@ static void igraph_i_free_set_array(igraph_set_t* array) {
 
 /**
  * \function igraph_maximal_independent_vertex_sets
- * \brief Find all maximal independent vertex sets of a graph
+ * \brief Finds all maximal independent vertex sets of a graph.
  *
  * </para><para>
  * A maximal independent vertex set is an independent vertex set which
@@ -795,7 +795,7 @@ static void igraph_i_free_set_array(igraph_set_t* array) {
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, ie. \c res will contain pointers to \c igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
  *   objects which contain the indices of vertices involved in an independent
  *   vertex set. The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed.
@@ -862,7 +862,7 @@ int igraph_maximal_independent_vertex_sets(const igraph_t *graph,
 
 /**
  * \function igraph_independence_number
- * \brief Find the independence number of the graph
+ * \brief Finds the independence number of the graph.
  *
  * </para><para>
  * The independence number of a graph is the cardinality of the largest
@@ -1031,7 +1031,7 @@ static int igraph_i_largest_cliques_store(const igraph_vector_t* clique, void* d
  *
  * </para><para>
  * Note that this is not necessarily the same as a maximal clique,
- * ie. the largest cliques are always maximal but a maximal clique is
+ * i.e. the largest cliques are always maximal but a maximal clique is
  * not always largest.
  *
  * </para><para>The current implementation of this function searches
@@ -1064,7 +1064,7 @@ int igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
 
 /**
  * \function igraph_clique_number
- * \brief Find the clique number of the graph
+ * \brief Finds the clique number of the graph.
  *
  * </para><para>
  * The clique number of a graph is the size of the largest clique.
