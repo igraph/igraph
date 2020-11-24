@@ -333,5 +333,5 @@ void igraph_fatalf(const char *reason, const char *file, int line, ...) {
     va_start(ap, line);
     vsnprintf(igraph_i_fatalmsg_buffer, sizeof(igraph_i_fatalmsg_buffer) / sizeof(char), reason, ap);
     va_end(ap);
-    igraph_fatal(igraph_i_warningmsg_buffer, file, line);
+    igraph_fatal(igraph_i_fatalmsg_buffer, file, line);
 }
