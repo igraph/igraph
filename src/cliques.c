@@ -303,7 +303,7 @@ static int igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
 
 /**
  * \function igraph_cliques
- * \brief Find all or some cliques in a graph.
+ * \brief Finds all or some cliques in a graph.
  *
  * </para><para>
  * Cliques are fully connected subgraphs of a graph.

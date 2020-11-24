@@ -292,7 +292,7 @@ static int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
 
 /**
  * \function igraph_maximal_cliques
- * \brief Find all maximal cliques of a graph
+ * \brief Finds all maximal cliques in a graph.
  *
  * </para><para>
  * A maximal clique is a clique which can't be extended any more by
@@ -316,7 +316,7 @@ static int igraph_i_maximal_cliques_up(igraph_vector_int_t *PX, int PS, int PE,
  *
  * \param graph The input graph.
  * \param res Pointer to a pointer vector, the result will be stored
- *   here, ie. \c res will contain pointers to \c igraph_vector_t
+ *   here, i.e. \p res will contain pointers to \ref igraph_vector_t
  *   objects which contain the indices of vertices involved in a clique.
  *   The pointer vector will be resized if needed but note that the
  *   objects in the pointer vector will not be freed. Note that vertices
@@ -420,11 +420,11 @@ int igraph_maximal_cliques_subset(const igraph_t *graph,
 
 /**
  * \function igraph_maximal_cliques_callback
- * \brief Finds maximal cliques in a graph and calls a function for each one
+ * \brief Finds maximal cliques in a graph and calls a function for each one.
  *
  * This function enumerates all maximal cliques within the given size range
  * and calls \p cliquehandler_fn for each of them. The cliques are passed to the
- * callback function as an <type>igraph_vector_t *</type>.  Destroying and
+ * callback function as a pointer to an \ref igraph_vector_t.  Destroying and
  * freeing this vector is left up to the user.  Use \ref igraph_vector_destroy()
  * to destroy it first, then free it using \ref igraph_free().
  *
@@ -462,7 +462,7 @@ int igraph_maximal_cliques_callback(const igraph_t *graph,
 
 /**
  * \function igraph_maximal_cliques_hist
- * \brief Count the number of maximal cliques of each size in a graph.
+ * \brief Counts the number of maximal cliques of each size in a graph.
  *
  * This function counts how many maximal cliques of each size are present in
  * the graph. Size-1 maximal cliques are simply isolated vertices.
@@ -477,7 +477,7 @@ int igraph_maximal_cliques_callback(const igraph_t *graph,
  * \param hist Pointer to an initialized vector. The result will be stored
  * here. The first element will store the number of size-1 maximal cliques,
  * the second element the number of size-2 maximal cliques, etc.
- * For cliques smaller than \c min_size, zero counts will be returned.
+ * For cliques smaller than \p min_size, zero counts will be returned.
  * \param min_size Integer giving the minimum size of the cliques to be
  *   returned. If negative or zero, no lower bound will be used.
  * \param max_size Integer giving the maximum size of the cliques to be
