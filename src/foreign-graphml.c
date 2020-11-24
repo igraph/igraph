@@ -1354,13 +1354,13 @@ static int igraph_i_xml_escape(char* src, char** dest) {
  * graphs. Currently only the most basic import functionality is implemented
  * in igraph: it can read GraphML files without nested graphs and hyperedges.
  * Attributes of the graph are loaded only if an attribute interface
- * is attached, ie. if you use igraph from R or Python.
+ * is attached, i.e. if you use igraph from R or Python.
  *
  * </para><para>
- * Graph attribute names are taken from the \c attr.name attributes of the
- * \c key tags in the GraphML file. Since \c attr.name is not mandatory,
+ * Graph attribute names are taken from the <code>attr.name</code> attributes of the
+ * \c key tags in the GraphML file. Since <code>attr.name</code> is not mandatory,
  * igraph will fall back to the \c id attribute of the \c key tag if
- * \c attr.name is missing.
+ * <code>attr.name</code> is missing.
  *
  * \param graph Pointer to an uninitialized graph object.
  * \param instream A stream, it should be readable.

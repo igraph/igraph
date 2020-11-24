@@ -437,7 +437,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  *        no outgoing edges, so the first number in this vector is
  *        ignored.
  * \param outpref Boolean, if true not only the in- but also the out-degree
- *        of a vertex increases its citation probability. Ie. the
+ *        of a vertex increases its citation probability. I.e., the
  *        citation probability is determined by the total degree of
  *        the vertices. Ignored and assumed to be true if the graph
  *        being generated is undirected.
@@ -1582,7 +1582,7 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  * growing) random graphs.
  * \param graph Uninitialized graph object.
  * \param n The number of vertices in the graph.
- * \param m The number of edges to add in a time step (ie. after
+ * \param m The number of edges to add in a time step (i.e. after
  *        adding a vertex).
  * \param directed Boolean, whether to generate a directed graph.
  * \param citation Boolean, if \c TRUE, the edges always
@@ -2310,7 +2310,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
  * \param nodes The number of vertices in the graph.
  * \param radius The radius within which the vertices will be connected.
  * \param torus Logical constant, if true periodic boundary conditions
- *        will be used, ie. the vertices are assumed to be on a torus
+ *        will be used, i.e. the vertices are assumed to be on a torus
  *        instead of a square.
  * \return Error code.
  *
@@ -3422,7 +3422,7 @@ int igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
  *
  * </para><para>
  * The \p preference argument specifies the preferences for the
- * citation lags, ie. its first elements contains the attractivity
+ * citation lags, i.e. its first elements contains the attractivity
  * of the very recently cited vertices, etc. The last element is
  * special, it contains the attractivity of the vertices which were
  * never cited. This element should be bigger than zero.
@@ -3687,7 +3687,7 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  * category of both the citing and the cited vertex and is given in
  * the \p pref matrix. The categories of the citing vertex correspond
  * to the rows, the categories of the cited vertex to the columns of
- * this matrix. Ie. the element in row \c i and column \c j gives the
+ * this matrix. I.e. the element in row \c i and column \c j gives the
  * probability that a \c j vertex is cited, if the category of the
  * citing vertex is \c i.
  *

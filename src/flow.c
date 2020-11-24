@@ -411,8 +411,8 @@ static void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
  * assigning positive real numbers to the edges and satisfying two
  * requirements: (1) the flow value is less than the capacity of the
  * edge and (2) at each vertex except the source and the target, the
- * incoming flow (ie. the sum of the flow on the incoming edges) is
- * the same as the outgoing flow (ie. the sum of the flow on the
+ * incoming flow (i.e. the sum of the flow on the incoming edges) is
+ * the same as the outgoing flow (i.e. the sum of the flow on the
  * outgoing edges). The value of the flow is the incoming flow at the
  * target vertex. The maximum flow is the flow with the maximum
  * value.
@@ -1028,8 +1028,8 @@ int igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * assigning positive real numbers to the edges and satisfying two
  * requirements: (1) the flow value is less than the capacity of the
  * edge and (2) at each vertex except the source and the target, the
- * incoming flow (ie. the sum of the flow on the incoming edges) is
- * the same as the outgoing flow (ie. the sum of the flow on the
+ * incoming flow (i.e. the sum of the flow on the incoming edges) is
+ * the same as the outgoing flow (i.e. the sum of the flow on the
  * outgoing edges). The value of the flow is the incoming flow at the
  * target vertex. The maximum flow is the flow with the maximum
  * value. </para>
@@ -1899,7 +1899,7 @@ static int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
  * target. Directed paths are considered in directed graphs.</para>
  *
  * <para>The vertex connectivity of a pair is the same as the number
- * of different (ie. node-independent) paths from source to
+ * of different (i.e. node-independent) paths from source to
  * target.</para>
  *
  * <para>The current implementation uses maximum flow calculations to

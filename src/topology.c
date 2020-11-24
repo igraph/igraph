@@ -1718,11 +1718,11 @@ static igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  * \param map12 Pointer to an initialized vector or a NULL pointer. If not
  *    a NULL pointer then the mapping from \p graph1 to \p graph2 is
  *    stored here. If the graphs are not isomorphic then the vector is
- *    cleared (ie. has zero elements).
+ *    cleared (i.e. has zero elements).
  * \param map21 Pointer to an initialized vector or a NULL pointer. If not
  *    a NULL pointer then the mapping from \p graph2 to \p graph1 is
  *    stored here. If the graphs are not isomorphic then the vector is
- *    cleared (ie. has zero elements).
+ *    cleared (i.e. has zero elements).
  * \param node_compat_fn A pointer to a function of type \ref
  *   igraph_isocompat_t. This function will be called by the algorithm to
  *   determine whether two nodes are compatible.

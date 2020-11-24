@@ -2133,11 +2133,11 @@ static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
  *           vertices and 12 edges.
  *   \cli Petersen
  *           A 3-regular graph with 10 vertices and 15 edges. It is
- *           the smallest hypohamiltonian graph, ie. it is
+ *           the smallest hypohamiltonian graph, i.e. it is
  *           non-hamiltonian but removing any single vertex from it makes it
  *           Hamiltonian.
  *   \cli Robertson
- *           The unique (4,5)-cage graph, ie. a 4-regular
+ *           The unique (4,5)-cage graph, i.e. a 4-regular
  *           graph of girth 5. It has 19 vertices and 38 edges.
  *   \cli Smallestcyclicgroup
  *           A smallest nontrivial graph

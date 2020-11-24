@@ -176,7 +176,7 @@ static int igraph_i_community_eb_get_merges2(const igraph_t *graph,
 
 /**
  * \function igraph_community_eb_get_merges
- * \brief Calculating the merges, ie. the dendrogram for an edge betweenness community structure
+ * \brief Calculating the merges, i.e. the dendrogram for an edge betweenness community structure
  *
  * </para><para>
  * This function is handy if you have a sequence of edge which are
@@ -357,7 +357,7 @@ static long int igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
  * \param membership If not a null pointer, then the membership vector,
  *     corresponding to the highest modularity value, is stored here.
  * \param directed Logical constant, whether to calculate directed
- *    betweenness (ie. directed paths) for directed graphs. It is
+ *    betweenness (i.e. directed paths) for directed graphs. It is
  *    ignored for undirected graphs.
  * \param weights An optional vector containing edge weights. If null,
  *     the unweighted edge betweenness scores will be calculated and
@@ -891,7 +891,7 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * \param graph The input graph. It must be undirected; directed graphs are
  *     not supported yet.
  * \param membership Numeric vector which gives the type of each
- *     vertex, ie. the component to which it belongs.
+ *     vertex, i.e. the component to which it belongs.
  *     It does not have to be consecutive, i.e. empty communities are
  *     allowed.
  * \param modularity Pointer to a real number, the result will be
@@ -1053,7 +1053,7 @@ int igraph_modularity_matrix(const igraph_t *graph,
  * range 0, ..., n - 1.
  *
  * \param  membership  Numeric vector which gives the type of each
- *                     vertex, ie. the component to which it belongs.
+ *                     vertex, i.e. the component to which it belongs.
  *                     The vector will be altered in-place.
  * \param  new_to_old  Pointer to a vector which will contain the
  *                     old component ID for each new one, or NULL,
