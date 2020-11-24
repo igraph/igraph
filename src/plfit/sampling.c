@@ -22,16 +22,18 @@
 #include "sampling.h"
 #include "platform.h"
 
+#include "igraph_random.h"
+
 inline double plfit_runif(double lo, double hi, mt_rng_t* rng) {
     if (rng == 0) {
-        return lo + rand() / ((double)RAND_MAX) * (hi-lo);
+        return RNG_UNIF(lo, hi);
     }
     return lo + mt_uniform_01(rng) * (hi-lo);
 }
 
 inline double plfit_runif_01(mt_rng_t* rng) {
     if (rng == 0) {
-        return rand() / ((double)RAND_MAX);
+        return RNG_UNIF01();
     }
     return mt_uniform_01(rng);
 }
@@ -282,8 +284,8 @@ int plfit_walker_alias_sampler_sample(const plfit_walker_alias_sampler_t* sample
     if (rng == 0) {
         /* Using built-in RNG */
         while (n > 0) {
-            u = rand() / ((double)RAND_MAX);
-            j = rand() % sampler->num_bins;
+            u = RNG_UNIF01();
+            j = RNG_INTEGER(0, sampler->num_bins - 1);
             *x = (u < sampler->probs[j]) ? j : sampler->indexes[j];
             n--; x++;
         }
