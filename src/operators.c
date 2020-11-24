@@ -47,7 +47,7 @@
  * and |E1|+|E2| edges.
  *
  * </para><para>
- * Both graphs need to have the same directedness, ie. either both
+ * Both graphs need to have the same directedness, i.e. either both
  * directed or both undirected.
  *
  * </para><para>
@@ -119,7 +119,7 @@ int igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  * of vertices and edges in the graphs.
  *
  * </para><para>
- * Both graphs need to have the same directedness, ie. either both
+ * Both graphs need to have the same directedness, i.e. either both
  * directed or both undirected.
  *
  * </para><para>
@@ -468,8 +468,8 @@ static void igraph_i_union_many_free3(igraph_vector_ptr_t *v) {
  *
  * </para><para>
  * This function calculates the intersection of the graphs stored in
- * the \c graphs argument. Only those edges will be included in the
- * result graph which are part of every graph in \c graphs.
+ * the \p graphs argument. Only those edges will be included in the
+ * result graph which are part of every graph in \p graphs.
  *
  * </para><para>
  * The number of vertices in the result graph will be the maximum
@@ -491,7 +491,7 @@ static void igraph_i_union_many_free3(igraph_vector_ptr_t *v) {
  * igraph_difference() for other operators.
  *
  * Time complexity: O(|V|+|E|), |V| is the number of vertices,
- * |E| is the number of edges in the smallest graph (ie. the graph having
+ * |E| is the number of edges in the smallest graph (i.e. the graph having
  * the less vertices).
  */
 
@@ -923,9 +923,9 @@ int igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
  *
  * </para><para>
  * The number of vertices in the result is the number of vertices in
- * the original graph, ie. the left, first operand. In the results
- * graph only edges will be included from \c orig which are not
- * present in \c sub.
+ * the original graph, i.e. the left, first operand. In the results
+ * graph only edges will be included from \p orig which are not
+ * present in \p sub.
  *
  * \param res Pointer to an uninitialized graph object, the result
  * will be stored here.
