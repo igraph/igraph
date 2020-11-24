@@ -1,6 +1,6 @@
 # igraph C library changelog
 
-## [Unreleased]
+## [0.8.4]
 
 ### Added
 
@@ -10,11 +10,14 @@
 
  - `igraph_i_cattribute_combine_vertices()`: fixed invalid cleanup code that eventually filled up the "finally" stack when combining vertices with attributes extensively.
  - `igraph_hrg_sample()`: fixed incorrect function prototype
+ - `igraph_is_posinf()` and `igraph_is_neginf()`: fixed incorrect result on platforms where the sign of the result of `isinf()` is not indicative of the sign of the input.
  - Fixed building with vendored LAPACK and external BLAS
+ - Fixed building with XCode 12.2 on macOS
 
 ### Other
 
  - Documentation improvements
+ - General code cleanup to reduce the number of compiler warnings
 
 ## [0.8.3]
 
