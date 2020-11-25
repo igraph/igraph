@@ -13,7 +13,7 @@
  * Reference: https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros */
 #undef DECLDIR
 #if defined (_WIN32)
-    #if defined (__CYGWIN__)
+    #if defined (__GNUC__)
         #define DECLDIR /**/
     #else
         #ifdef IGRAPH_EXPORTS
