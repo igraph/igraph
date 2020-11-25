@@ -63,7 +63,6 @@ endif()
 
 # First we check for some functions and symbols
 check_symbol_exists(expm1 math.h HAVE_EXPM1)
-check_symbol_exists(fabsl tgmath.h HAVE_FABSL)
 check_symbol_exists(fmin math.h HAVE_FMIN)
 check_symbol_exists(log2 math.h HAVE_LOG2)
 check_symbol_exists(log1p math.h HAVE_LOG1P)

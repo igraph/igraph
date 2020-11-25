@@ -193,14 +193,6 @@ double igraph_log1p(double x) {
     return log(1 + x);
 }
 
-long double igraph_fabsl(long double a) {
-    if (a < 0) {
-        return -a;
-    } else {
-        return a;
-    }
-}
-
 double igraph_fmin(double a, double b) {
     if (b < a) {
         return b;

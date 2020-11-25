@@ -56,16 +56,12 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 
 double igraph_log2(const double a);
 double igraph_log1p(double a);
-long double igraph_fabsl(long double a);
 double igraph_fmin(double a, double b);
 #ifndef HAVE_LOG2
     #define log2(a) igraph_log2(a)
 #endif
 #ifndef HAVE_LOG1P
     #define log1p(a) igraph_log1p(a)
-#endif
-#ifndef HAVE_FABSL
-    #define fabsl(a) igraph_fabsl(a)
 #endif
 #ifndef HAVE_FMIN
     #define fmin(a,b) igraph_fmin((a),(b))
