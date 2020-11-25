@@ -2091,7 +2091,7 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
                               };
     const char *estrnames2[] = { "a", "p", "l", "lc", "c" };
 
-    const char *newline = "\x0d\x0a";
+    const char *newline = "\n";
 
     igraph_es_t es;
     igraph_eit_t eit;
