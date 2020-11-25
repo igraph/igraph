@@ -10,7 +10,6 @@
 #cmakedefine HAVE_RINTF 1
 #cmakedefine HAVE_ROUND 1
 #cmakedefine HAVE_STPCPY 1
-#cmakedefine HAVE_STPCPY_SIGNATURE 1
 #cmakedefine HAVE_STRCASECMP 1
 #cmakedefine HAVE__STRICMP 1
 #cmakedefine HAVE_STRDUP 1
