@@ -62,33 +62,33 @@ private:
     void compute_neigh();
     // Allocate memory according to degree_sequence (for constructor use only!!)
     int alloc(degree_sequence &);
-    // Add edge (a,b). Return FALSE if vertex a is already full.
+    // Add edge (u,v). Return FALSE if vertex a is already full.
     // WARNING : only to be used by havelhakimi(), restore() or constructors
-    inline bool add_edge(int a, int b, int *realdeg) {
-        int deg_a = realdeg[a];
-        if (deg_a == deg[a]) {
+    inline bool add_edge(int u, int v, int *realdeg) {
+        int deg_u = realdeg[u];
+        if (deg_u == deg[u]) {
             return false;
         }
         // Check that edge was not already inserted
-        assert(fast_search(neigh[a], int((a == n - 1 ? links + size : neigh[a + 1]) - neigh[a]), b) == NULL);
-        assert(fast_search(neigh[b], int((b == n - 1 ? links + size : neigh[b + 1]) - neigh[b]), a) == NULL);
-        assert(deg[a] < deg_a);
-        int deg_b = realdeg[b];
-        if (IS_HASH(deg_a)) {
-            *H_add(neigh[a], HASH_EXPAND(deg_a), b) = b;
+        assert(fast_search(neigh[u], int((u == n - 1 ? links + size : neigh[u + 1]) - neigh[u]), v) == NULL);
+        assert(fast_search(neigh[v], int((v == n - 1 ? links + size : neigh[v + 1]) - neigh[v]), u) == NULL);
+        assert(deg[u] < deg_u);
+        int deg_v = realdeg[v];
+        if (IS_HASH(deg_u)) {
+            *H_add(neigh[u], HASH_EXPAND(deg_u), v) = v;
         } else {
-            neigh[a][deg[a]] = b;
+            neigh[u][deg[u]] = v;
         }
-        if (IS_HASH(deg_b)) {
-            *H_add(neigh[b], HASH_EXPAND(deg_b), a) = a;
+        if (IS_HASH(deg_v)) {
+            *H_add(neigh[v], HASH_EXPAND(deg_v), u) = u;
         } else {
-            neigh[b][deg[b]] = a;
+            neigh[v][deg[v]] = u;
         }
-        deg[a]++;
-        deg[b]++;
+        deg[u]++;
+        deg[v]++;
         // Check that edge was actually inserted
-        assert(fast_search(neigh[a], int((a == n - 1 ? links + size : neigh[a + 1]) - neigh[a]), b) != NULL);
-        assert(fast_search(neigh[b], int((b == n - 1 ? links + size : neigh[b + 1]) - neigh[b]), a) != NULL);
+        assert(fast_search(neigh[u], int((u == n - 1 ? links + size : neigh[u + 1]) - neigh[u]), v) != NULL);
+        assert(fast_search(neigh[v], int((v == n - 1 ? links + size : neigh[v + 1]) - neigh[v]), u) != NULL);
         return true;
     }
     // Swap edges
