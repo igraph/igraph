@@ -13,3 +13,14 @@ target_include_directories(
 )
 
 use_all_warnings(gmp_vendored)
+
+if(MSVC)
+  target_compile_options(
+    gmp_vendored PRIVATE
+    /Wd4100  # unreferenced formal parameter
+    /Wd4127  # conditional expression is constant
+    /Wd4146  # unary minus operator applied to unsigned type
+    /Wd4189  # local variable is initialized but not referenced
+  )
+endif()
+

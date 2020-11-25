@@ -117,19 +117,19 @@ double powerlaw::proba(int k) {
             return (double(MY_RAND_MAX) + 1.0 - double(table[0] >> max_dt)) * div;
         }
         // what block are we in ?
-        int k = 0;
-        while (k < max_dt) {
+        int k1 = 0;
+        while (k1 < max_dt) {
             div *= 0.5;
-            k++;
+            k1++;
         };
-        while (dt[k] < 0 || dt[k] < prev_pos_in_table) {
-            k++;
+        while (dt[k1] < 0 || dt[k1] < prev_pos_in_table) {
+            k1++;
             div *= 0.5;
         };
         double prob2 = double(table[prev_pos_in_table + 1]);
-        if (dt[k] == prev_pos_in_table) do {
+        if (dt[k1] == prev_pos_in_table) do {
                 prob2 *= 0.5;
-            } while (dt[++k] < 0);
+            } while (dt[++k1] < 0);
         return (double(table[prev_pos_in_table]) - prob2) * div;
     }
 }
