@@ -56,6 +56,11 @@ find_dependencies()
 # Run compile-time checks, generate config.h and igraph_threading.h
 include(CheckSymbolExists)
 
+# The math library is needed on Linux to find symbols like exmp1 or fmin
+if(UNIX)
+  set(CMAKE_REQUIRED_LIBRARIES "m")
+endif()
+
 # First we check for some functions and symbols
 check_symbol_exists(expm1 math.h HAVE_EXPM1)
 check_symbol_exists(fabsl tgmath.h HAVE_FABSL)
