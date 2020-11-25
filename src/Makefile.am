@@ -7,6 +7,8 @@ BUILT_SOURCES = foreign-ncol-parser.h foreign-lgl-parser.h \
 # Unfortunately this is not the default behaviour in MinGW/MSYS
 AM_YFLAGS = -d
 
+AM_CPPFLAGS = $(XML2_CFLAGS)
+
 lib_LTLIBRARIES         = libigraph.la
 
 include lapack/blas.inc
