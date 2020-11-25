@@ -12,6 +12,10 @@ target_include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET gmp_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
+
 use_all_warnings(gmp_vendored)
 
 if(MSVC)

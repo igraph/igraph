@@ -13,6 +13,9 @@ target_include_directories(
   PRIVATE
   $<TARGET_PROPERTY:f2c_vendored,INCLUDE_DIRECTORIES>
 )
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET blas_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
 
 # Declare the files needed to compile our vendored LAPACK copy
 add_library(
@@ -41,6 +44,9 @@ target_include_directories(
   PRIVATE
   $<TARGET_PROPERTY:f2c_vendored,INCLUDE_DIRECTORIES>
 )
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET lapack_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
 
 # Declare the files needed to compile our vendored ARPACK copy
 add_library(
@@ -58,6 +64,9 @@ target_include_directories(
   PRIVATE
   $<TARGET_PROPERTY:f2c_vendored,INCLUDE_DIRECTORIES>
 )
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET arpack_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
 
 # Suppress some warnings that occur in the output because we do not want to
 # mess around with the source of lapack too much to fix these

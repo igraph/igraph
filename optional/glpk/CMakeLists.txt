@@ -34,6 +34,10 @@ target_include_directories(
   ${CMAKE_SOURCE_DIR}/include
 )
 
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET glpk_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
+
 if (WIN32)
     # Since these are included as object files, they should call the
     # function as is (without declspec)

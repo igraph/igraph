@@ -32,6 +32,10 @@ target_include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+if (BUILD_SHARED_LIBS)
+  set_property(TARGET cxsparse_vendored PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif()
+
 # Define symbols to enable compilation of CSXSparse on Windows using MSVC
 if (WIN32)
   target_compile_definitions(cxsparse_vendored PUBLIC NCOMPLEX)
