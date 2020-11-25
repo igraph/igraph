@@ -1,6 +1,9 @@
 
 language: c
-cache: ccache
+cache: 
+  ccache: true
+  directories:
+    - /var/lib/snapd/cache
 dist: xenial
 os: linux
 
