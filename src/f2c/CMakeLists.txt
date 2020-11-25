@@ -90,8 +90,8 @@ endif()
 # mess around with the source of f2c too much to fix these
 if(MSVC)
   target_compile_options(f2c_vendored PRIVATE
-    /Wd4005  # macro redefinition: f2c redefines max and min
-    /Wd4311  # pointer truncation; f2c does some magic with signals in signal_.c
+    /wd4005  # macro redefinition: f2c redefines max and min
+    /wd4311  # pointer truncation; f2c does some magic with signals in signal_.c
   )
 else()
   target_compile_options(arithchk PRIVATE 
