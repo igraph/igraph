@@ -177,11 +177,11 @@ public:
     // breadth-first search. Store the distance (modulo 3)  in dist[].
     void breadth_search(int *dist, int v0 = 0, int* buff = NULL);
     // is edge ?
-    inline bool is_edge(const int a, const int b) {
-        if (deg[b] < deg[a]) {
-            return (fast_search(neigh[b], deg[b], a) != NULL);
+    inline bool is_edge(const int u, const int v) {
+        if (deg[v] < deg[u]) {
+            return (fast_search(neigh[v], deg[v], u) != NULL);
         } else {
-            return (fast_search(neigh[a], deg[a], b) != NULL);
+            return (fast_search(neigh[u], deg[u], v) != NULL);
         }
     }
     // Backup graph [sizeof(int) bytes per edge]

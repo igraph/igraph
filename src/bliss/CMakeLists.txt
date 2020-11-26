@@ -16,6 +16,7 @@ target_include_directories(
   bliss
   PRIVATE
   ${CMAKE_SOURCE_DIR}/include
+  ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_BINARY_DIR}/src
   $<$<BOOL:${GMP_INCLUDE_DIR}>:${GMP_INCLUDE_DIR}>
 )
@@ -25,7 +26,7 @@ if (BUILD_SHARED_LIBS)
 endif()
 
 # If we are linking igraph to GMP, then Bliss will use GMP for bignums
-if(GMP_FOUND)
+if(NOT GMP_IS_VENDORED)
   target_link_libraries(
     bliss
     PUBLIC

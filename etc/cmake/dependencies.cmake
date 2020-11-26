@@ -11,13 +11,14 @@ endmacro()
 
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored and those that may not
-  set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK)
-  set(NONVENDORABLE_DEPENDENCIES GLPK GMP)
+  set(VENDORABLE_DEPENDENCIES BLAS CXSparse GLPK LAPACK ARPACK GMP)
+  set(NONVENDORABLE_DEPENDENCIES GLPK)
 
   # Declare configuration options for dependencies
   option(IGRAPH_GLPK_SUPPORT "Compile igraph with GLPK support" ON)
-  tristate(IGRAPH_GMP_SUPPORT "Compile igraph with GMP support" AUTO)
+
   tristate(IGRAPH_GRAPHML_SUPPORT "Compile igraph with GraphML support" AUTO)
+  tristate(IGRAPH_USE_INTERNAL_GMP "Compile igraph with internal Mini-GMP" AUTO)
   tristate(IGRAPH_USE_INTERNAL_ARPACK "Compile igraph with internal ARPACK" AUTO)
   tristate(IGRAPH_USE_INTERNAL_BLAS "Compile igraph with internal BLAS" AUTO)
   tristate(IGRAPH_USE_INTERNAL_CXSPARSE "Compile igraph with internal CXSparse" AUTO)
@@ -81,10 +82,6 @@ macro(find_dependencies)
     else()
       list(REMOVE_ITEM REQUIRED_DEPENDENCIES GLPK)
     endif()
-  endif()
-
-  if(IGRAPH_GMP_SUPPORT)
-    list(APPEND REQUIRED_DEPENDENCIES GMP)
   endif()
 
   if(IGRAPH_GRAPHML_SUPPORT)

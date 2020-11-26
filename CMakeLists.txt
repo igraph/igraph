@@ -54,29 +54,47 @@ include(dependencies)
 find_dependencies()
 
 # Run compile-time checks, generate config.h and igraph_threading.h
-include(CheckFunctionExists)
 include(CheckSymbolExists)
 
+# The math library is needed on Linux to find symbols like exmp1 or fmin
+if(UNIX)
+  set(CMAKE_REQUIRED_LIBRARIES "m")
+endif()
+
 # First we check for some functions and symbols
-check_function_exists(log2 HAVE_LOG2)
-check_function_exists(log1p HAVE_LOG1P)
-check_function_exists(fabsl HAVE_FABSL)
-check_function_exists(fmin HAVE_FMIN)
-check_function_exists(round HAVE_ROUND)
-check_function_exists(stpcpy HAVE_STPCPY)
-check_function_exists(strcasecmp HAVE_STRCASECMP)
-check_function_exists(_stricmp HAVE__STRICMP)
-check_function_exists(expm1 HAVE_EXPM1)
-check_function_exists(rint HAVE_RINT)
-check_function_exists(rintf HAVE_RINTF)
-check_symbol_exists(stpcpy "string.h" HAVE_STPCPY_SIGNATURE)
-check_symbol_exists(strdup "string.h" HAVE_STRDUP)
+check_symbol_exists(expm1 math.h HAVE_EXPM1)
+check_symbol_exists(fmin math.h HAVE_FMIN)
+check_symbol_exists(log2 math.h HAVE_LOG2)
+check_symbol_exists(log1p math.h HAVE_LOG1P)
+check_symbol_exists(rint math.h HAVE_RINT)
+check_symbol_exists(rintf math.h HAVE_RINTF)
+check_symbol_exists(round math.h HAVE_ROUND)
+check_symbol_exists(stpcpy string.h HAVE_STPCPY)
+check_symbol_exists(strcasecmp strings.h HAVE_STRCASECMP)
+check_symbol_exists(strdup string.h HAVE_STRDUP)
+check_symbol_exists(_stricmp string.h HAVE__STRICMP)
 
 # Check for TLS support and enable thread-local storage if possible
 include(tls)
 
 # Check for link-time optimization
 include(lto)
+
+# Check for code coverage support
+option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)
+if(IGRAPH_ENABLE_CODE_COVERAGE)
+  include(CodeCoverage)
+  append_coverage_compiler_flags()
+  setup_target_for_coverage_lcov(
+    NAME coverage
+    EXECUTABLE "${CMAKE_COMMAND}" "--build" "${CMAKE_BINARY_DIR}" "--target" "check"
+    # Generated files are excluded; apparently the CodeCoverage script has some
+	# problems with them. Yes, the exclusion is correct, it refers to a nonexistent
+	# directory that somehow gets into the coverage resolts. /Applications is for
+	# macOS -- it excludes files from the macOS SDK.
+	EXCLUDE "parsers/*" "/Applications/Xcode*" "examples/*"
+  )
+endif()
 
 # Generate configuration headers
 configure_file(

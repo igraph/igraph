@@ -37,12 +37,12 @@
  * (<type>igraph_vector_ptr_t</type>)
  *
  * <para>The \type igraph_vector_ptr_t data type is very similar to
- * the \type igraph_vector_t type, but it stores generic pointers instead of
+ * the \ref igraph_vector_t type, but it stores generic pointers instead of
  * real numbers.</para>
  *
- * <para>This type has the same space complexity as \type
+ * <para>This type has the same space complexity as \ref
  * igraph_vector_t, and most implemented operations work the same way
- * as for \type igraph_vector_t. </para>
+ * as for \ref igraph_vector_t.</para>
  *
  * <para>This type is mostly used to pass to or receive from a set of
  * graphs to some \a igraph functions, such as \ref
@@ -160,7 +160,7 @@ void igraph_i_vector_ptr_call_item_destructor_all(igraph_vector_ptr_t* v) {
  *
  * If an item destructor is set for this pointer vector, this function will
  * first call the destructor on all elements of the vector and then
- * free all the elements using free(). If an item destructor is not set,
+ * free all the elements using \ref igraph_free(). If an item destructor is not set,
  * the elements will simply be freed.
  *
  * \param v Pointer to the pointer vector whose elements will be freed.
@@ -254,7 +254,7 @@ igraph_bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v) {
  * \brief Gives the number of elements in the pointer vector.
  *
  * \param v The pointer vector object.
- * \return The size of the object, ie. the number of pointers stored.
+ * \return The size of the object, i.e. the number of pointers stored.
  *
  * Time complexity: O(1).
  */
@@ -273,7 +273,7 @@ long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v) {
  * </para><para>
  * This function resizes a pointer to vector to zero length. Note that
  * the pointed objects are \em not deallocated, you should call
- * free() on them, or make sure that their allocated memory is freed
+ * \ref igraph_free() on them, or make sure that their allocated memory is freed
  * in some other way, you'll get memory leaks otherwise. If you have
  * set up an item destructor earlier, the destructor will be called
  * on every element.
@@ -537,7 +537,7 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
  * Sometimes it is necessary to sort the pointers in the vector based on
  * the property of the element being referenced by the pointer. This
  * function allows us to sort the vector based on an arbitrary external
- * comparison function which accepts two \c void* pointers \c p1 and \c p2
+ * comparison function which accepts two <type>void *</type> pointers \c p1 and \c p2
  * and returns an integer less than, equal to or greater than zero if the
  * first argument is considered to be respectively less than, equal to, or
  * greater than the second. \c p1 and \c p2 will point to the pointer in the

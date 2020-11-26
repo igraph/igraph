@@ -31,7 +31,7 @@
 #include "igraph_error.h"
 
 #if defined(BLISS_USE_GMP)
-#include <gmp.h>
+#include "igraph_gmp.h"
 #endif
 
 namespace bliss {
@@ -74,7 +74,7 @@ public:
   /**
    * Print the number in the file stream \a fp.
    */
-  size_t print(FILE* const fp) const {return mpz_out_str(fp, 10, v); }
+  // size_t print(FILE* const fp) const {return mpz_out_str(fp, 10, v); }
 
   int tostring(char **str) const {
     *str=igraph_Calloc(mpz_sizeinbase(v, 10)+2, char);

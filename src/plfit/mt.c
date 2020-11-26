@@ -12,7 +12,14 @@
  */
 
 #include <stdlib.h>
+
+#include "igraph_random.h"
+
 #include "mt.h"
+
+static uint16_t get_random_uint16() {
+    return RNG_INT31() & 0xFFFF;
+}
 
 void mt_init(mt_rng_t* rng) {
     mt_init_from_rng(rng, 0);
@@ -25,7 +32,7 @@ void mt_init_from_rng(mt_rng_t* rng, mt_rng_t* seeder) {
         for (i = 0; i < MT_LEN; i++) {
             /* RAND_MAX is guaranteed to be at least 32767, so we can use two
              * calls to rand() to produce a random 32-bit number */
-            rng->mt_buffer[i] = (rand() << 16) + rand();
+            rng->mt_buffer[i] = (get_random_uint16() << 16) + get_random_uint16();
         }
     } else {
         for (i = 0; i < MT_LEN; i++) {

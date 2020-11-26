@@ -51,14 +51,14 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
  *
  * </para><para>
  * Motifs are small connected subgraphs of a given structure in a
- * graph. It is argued that the motif profile (ie. the number of
+ * graph. It is argued that the motif profile (i.e. the number of
  * different motifs in the graph) is characteristic for different
  * types of networks and network function is related to the motifs in
  * the graph.
  *
  * </para><para>
  * This function is able to find the different motifs of size three
- * and four (ie. the number of different subgraphs with three and four
+ * and four (i.e. the number of different subgraphs with three and four
  * vertices) in the network.
  *
  * </para><para>
@@ -94,7 +94,7 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
  *        in a graph.
  * \return Error code.
  * \sa \ref igraph_motifs_randesu_estimate() for estimating the number
- * of motifs in a graph, this can help to set the \c cut_prob
+ * of motifs in a graph, this can help to set the \p cut_prob
  * parameter; \ref igraph_motifs_randesu_no() to calculate the total
  * number of motifs of a given size in a graph;
  * \ref igraph_motifs_randesu_callback() for calling a callback function
@@ -155,14 +155,14 @@ int igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
  *
  * </para><para>
  * Similarly to \ref igraph_motifs_randesu(), this function is able to find the
- * different motifs of size three and four (ie. the number of different
+ * different motifs of size three and four (i.e. the number of different
  * subgraphs with three and four vertices) in the network. However, instead of
  * counting them, the function will call a callback function for each motif
  * found to allow further tests or post-processing.
  *
  * </para><para>
- * The \c cut_prob argument also allows sampling the motifs, just like for
- * \ref igraph_motifs_randesu(). Set the \c cut_prob argument to a zero vector
+ * The \p cut_prob argument also allows sampling the motifs, just like for
+ * \ref igraph_motifs_randesu(). Set the \p cut_prob argument to a zero vector
  * for finding all motifs.
  *
  * \param graph The graph to find the motifs in.
@@ -433,7 +433,7 @@ int igraph_motifs_randesu_callback(const igraph_t *graph, int size,
  * </para><para>
  * The total number of motifs is estimated by taking a sample of
  * vertices and counts all motifs in which these vertices are
- * included. (There is also a \c cut_prob parameter which gives the
+ * included. (There is also a \p cut_prob parameter which gives the
  * probabilities to cut a branch of the search tree.)
  *
  * </para><para>

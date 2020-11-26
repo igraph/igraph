@@ -1468,23 +1468,23 @@ bool dendro::importDendrogramStructure(const igraph_hrg_t *hrg) {
 
     // import basic structure from hrg object, O(n)
     for (int i = 0; i < n - 1; i++) {
-        int L = VECTOR(hrg->left)[i];
-        int R = VECTOR(hrg->right)[i];
+        int left_index = VECTOR(hrg->left)[i];
+        int right_index = VECTOR(hrg->right)[i];
 
-        if (L < 0) {
-            internal[i].L = &internal[-L - 1];
-            internal[-L - 1].M = &internal[i];
+        if (left_index < 0) {
+            internal[i].L = &internal[-left_index - 1];
+            internal[-left_index - 1].M = &internal[i];
         } else {
-            internal[i].L = &leaf[L];
-            leaf[L].M = &internal[i];
+            internal[i].L = &leaf[left_index];
+            leaf[left_index].M = &internal[i];
         }
 
-        if (R < 0) {
-            internal[i].R = &internal[-R - 1];
-            internal[-R - 1].M = &internal[i];
+        if (right_index < 0) {
+            internal[i].R = &internal[-right_index - 1];
+            internal[-right_index - 1].M = &internal[i];
         } else {
-            internal[i].R = &leaf[R];
-            leaf[R].M = &internal[i];
+            internal[i].R = &leaf[right_index];
+            leaf[right_index].M = &internal[i];
         }
 
         internal[i].p = VECTOR(hrg->prob)[i];

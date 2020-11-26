@@ -614,10 +614,18 @@ static int igraph_i_spectral_embedding(const igraph_t *graph,
     igraph_adjlist_t outlist, inlist;
     igraph_inclist_t eoutlist, einlist;
     int i, j, cveclen = igraph_vector_size(cvec);
-    igraph_i_asembedding_data_t data = { graph, cvec, cvec2, &outlist, &inlist,
-                                         &eoutlist, &einlist, &tmp, weights
-                                       };
+    igraph_i_asembedding_data_t data;
     igraph_vector_t tmpD;
+
+    data.graph = graph;
+    data.cvec = cvec;
+    data.cvec2 = cvec2;
+    data.outlist = &outlist;
+    data.inlist = &inlist;
+    data.eoutlist = &eoutlist;
+    data.einlist = &einlist;
+    data.tmp = &tmp;
+    data.weights = weights;
 
     if (weights && igraph_vector_size(weights) != igraph_ecount(graph)) {
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);

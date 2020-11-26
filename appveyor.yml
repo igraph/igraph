@@ -3,6 +3,14 @@
 platform:
     - x64
 
+environment:
+    global:
+        VCPKG_DEFAULT_TRIPLET: x64-windows-static
+
+    matrix:
+        - job_name: Static
+        - job_name: Dynamic
+
 cache:
   - C:\ProgramData\chocolatey\bin -> appveyor.yml
   - C:\ProgramData\chocolatey\lib -> appveyor.yml
@@ -11,7 +19,7 @@ cache:
 install:
     # Install dependencies for MSVC build
     - choco install winflexbison
-    
+
     # Choose VS 2015, https://www.appveyor.com/docs/lang/cpp/#visual-studio-2015
     - call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /x64
     - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
@@ -22,21 +30,41 @@ install:
     - git pull --quiet
     - .\bootstrap-vcpkg.bat -disableMetrics
     - vcpkg install yasm-tool:x86-windows
-    - vcpkg install gmp:x64-windows-static
-    - vcpkg install libxml2:x64-windows-static
+    - vcpkg install gmp
+    - vcpkg install libxml2
     - vcpkg integrate install
 
-before_build:
-    # Configure build with cmake
-    - cd "%APPVEYOR_BUILD_FOLDER%"
-    - mkdir build
-    - cd build
-    - cmake .. 
-        -A x64
-        -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
-        -DVCPKG_TARGET_TRIPLET=x64-windows-static
-        -DIGRAPH_GMP_SUPPORT=1 -DIGRAPH_GRAPHML_SUPPORT=1
-        -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+for:
+    - matrix:
+        only:
+            - job_name: Static
+      before_build:
+        - cd "%APPVEYOR_BUILD_FOLDER%"
+        - mkdir build
+        - cd build
+        - cmake ..
+            -A x64
+            -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static
+            -DIGRAPH_GRAPHML_SUPPORT=1
+            -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1
+            -DIGRAPH_VERIFY_FINALLY_STACK=1
+
+    - matrix:
+        only:
+            - job_name: Dynamic
+      before_build:
+        - cd "%APPVEYOR_BUILD_FOLDER%"
+        - mkdir build
+        - cd build
+        - cmake ..
+            -A x64
+            -DCMAKE_TOOLCHAIN_FILE=C:/Tools/vcpkg/scripts/buildsystems/vcpkg.cmake
+            -DVCPKG_TARGET_TRIPLET=x64-windows-static
+            -DBUILD_SHARED_LIBS=1
+            -DIGRAPH_GRAPHML_SUPPORT=1
+            -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1
+            -DIGRAPH_VERIFY_FINALLY_STACK=1
 
 configuration: Release
 

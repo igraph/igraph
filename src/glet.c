@@ -381,9 +381,9 @@ static int igraph_i_graphlets(const igraph_t *graph,
     for (i = 0; i < nographs; i++) {
         igraph_t *g = newgraphs + i;
         if (igraph_vcount(g) > 1) {
-            igraph_vector_t *w = newweights + i;
-            igraph_vector_int_t *ids = newids + i;
-            igraph_i_graphlets(g, w, cliques, thresholds, ids, VECTOR(next_thr)[i]);
+            igraph_vector_t *w_sub = newweights + i;
+            igraph_vector_int_t *ids_sub = newids + i;
+            igraph_i_graphlets(g, w_sub, cliques, thresholds, ids_sub, VECTOR(next_thr)[i]);
         }
     }
 

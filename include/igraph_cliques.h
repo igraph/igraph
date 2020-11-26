@@ -83,7 +83,7 @@ DECLDIR int igraph_independence_number(const igraph_t *graph, igraph_integer_t *
 
 /**
  * \typedef igraph_clique_handler_t
- * \brief Type of clique handler functions
+ * \brief Type of clique handler functions.
  *
  * Callback type, called when a clique was found.
  *

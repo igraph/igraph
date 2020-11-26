@@ -1731,11 +1731,11 @@ static igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  * \param map12 Pointer to an initialized vector or a NULL pointer. If not
  *    a NULL pointer then the mapping from \p graph1 to \p graph2 is
  *    stored here. If the graphs are not isomorphic then the vector is
- *    cleared (ie. has zero elements).
+ *    cleared (i.e. has zero elements).
  * \param map21 Pointer to an initialized vector or a NULL pointer. If not
  *    a NULL pointer then the mapping from \p graph2 to \p graph1 is
  *    stored here. If the graphs are not isomorphic then the vector is
- *    cleared (ie. has zero elements).
+ *    cleared (i.e. has zero elements).
  * \param node_compat_fn A pointer to a function of type \ref
  *   igraph_isocompat_t. This function will be called by the algorithm to
  *   determine whether two nodes are compatible.
@@ -1917,11 +1917,11 @@ static igraph_bool_t igraph_i_get_isomorphisms_vf2(
  * \param edge_color2 The edge color vector for the second graph.
  * \param maps Pointer vector. On return it is empty if the input graphs
  *   are no isomorphic. Otherwise it contains pointers to
- *   <type>igraph_vector_t</type> objects, each vector is an
+ *   \ref igraph_vector_t objects, each vector is an
  *   isomorphic mapping of \p graph2 to \p graph1. Please note that
  *   you need to 1) Destroy the vectors via \ref
  *   igraph_vector_destroy(), 2) free them via
- *   <function>igraph_free()</function> and then 3) call \ref
+ *   \ref igraph_free() and then 3) call \ref
  *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
  *   memory when \p maps is no longer needed.
  * \param node_compat_fn A pointer to a function of type \ref
@@ -2740,11 +2740,11 @@ static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
  *   edge-colored.
  * \param edge_color2 The edge color vector for the second graph.
  * \param maps Pointer vector. On return it contains pointers to
- *   <type>igraph_vector_t</type> objects, each vector is an
+ *   \ref igraph_vector_t objects, each vector is an
  *   isomorphic mapping of \p graph2 to a subgraph of \p graph1. Please note that
  *   you need to 1) Destroy the vectors via \ref
  *   igraph_vector_destroy(), 2) free them via
- *   <function>igraph_free()</function> and then 3) call \ref
+ *   \ref igraph_free() and then 3) call \ref
  *   igraph_vector_ptr_destroy() on the pointer vector to deallocate all
  *   memory when \p maps is no longer needed.
  * \param node_compat_fn A pointer to a function of type \ref

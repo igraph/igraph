@@ -310,7 +310,8 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
     }
 
     /* And call the permutation routine */
-    if (! (res->cs = cs_permute(A->cs, VECTOR(pinv), VECTOR(*q), /*values=*/ 1))) {
+    res->cs = cs_permute(A->cs, VECTOR(pinv), VECTOR(*q), /*values=*/ 1);
+    if (!res->cs) {
         IGRAPH_ERROR("Cannot index sparse matrix", IGRAPH_FAILURE);
     }
 
@@ -548,7 +549,8 @@ int igraph_sparsemat_entry(igraph_sparsemat_t *A, int row, int col,
 int igraph_sparsemat_compress(const igraph_sparsemat_t *A,
                               igraph_sparsemat_t *res) {
 
-    if (! (res->cs = cs_compress(A->cs)) ) {
+    res->cs = cs_compress(A->cs);
+    if (!res->cs) {
         IGRAPH_ERROR("Cannot compress sparse matrix", IGRAPH_FAILURE);
     }
 
@@ -576,7 +578,8 @@ int igraph_sparsemat_transpose(const igraph_sparsemat_t *A,
 
     if (A->cs->nz < 0) {
         /* column-compressed */
-        if (! (res->cs = cs_transpose(A->cs, values)) ) {
+        res->cs = cs_transpose(A->cs, values);
+        if (!res->cs) {
             IGRAPH_ERROR("Cannot transpose sparse matrix", IGRAPH_FAILURE);
         }
     } else {
@@ -769,7 +772,8 @@ int igraph_sparsemat_multiply(const igraph_sparsemat_t *A,
                               const igraph_sparsemat_t *B,
                               igraph_sparsemat_t *res) {
 
-    if (! (res->cs = cs_multiply(A->cs, B->cs))) {
+    res->cs = cs_multiply(A->cs, B->cs);
+    if (!res->cs) {
         IGRAPH_ERROR("Cannot multiply matrices", IGRAPH_FAILURE);
     }
 
@@ -799,7 +803,8 @@ int igraph_sparsemat_add(const igraph_sparsemat_t *A,
                          igraph_real_t beta,
                          igraph_sparsemat_t *res) {
 
-    if (! (res->cs = cs_add(A->cs, B->cs, alpha, beta))) {
+    res->cs = cs_add(A->cs, B->cs, alpha, beta);
+    if (!res->cs) {
         IGRAPH_ERROR("Cannot add matrices", IGRAPH_FAILURE);
     }
 
@@ -1356,7 +1361,8 @@ static int igraph_i_sparsemat_eye_cc(igraph_sparsemat_t *A, int n,
                                      igraph_real_t value) {
     long int i;
 
-    if (! (A->cs = cs_spalloc(n, n, n, /*values=*/ 1, /*triplet=*/ 0)) ) {
+    A->cs = cs_spalloc(n, n, n, /*values=*/ 1, /*triplet=*/ 0);
+    if (!A->cs) {
         IGRAPH_ERROR("Cannot create eye sparse matrix", IGRAPH_FAILURE);
     }
 
@@ -1418,7 +1424,8 @@ static int igraph_i_sparsemat_diag_cc(igraph_sparsemat_t *A,
 
     int i, n = (int) igraph_vector_size(values);
 
-    if (! (A->cs = cs_spalloc(n, n, n, /*values=*/ 1, /*triplet=*/ 0)) ) {
+    A->cs = cs_spalloc(n, n, n, /*values=*/ 1, /*triplet=*/ 0);
+    if (!A->cs) {
         IGRAPH_ERROR("Cannot create eye sparse matrix", IGRAPH_FAILURE);
     }
 

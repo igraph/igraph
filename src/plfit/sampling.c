@@ -18,20 +18,23 @@
  */
 
 #include <math.h>
+
+#include "igraph_random.h"
+
 #include "error.h"
 #include "sampling.h"
 #include "platform.h"
 
 inline double plfit_runif(double lo, double hi, mt_rng_t* rng) {
     if (rng == 0) {
-        return lo + rand() / ((double)RAND_MAX) * (hi-lo);
+        return RNG_UNIF(lo, hi);
     }
     return lo + mt_uniform_01(rng) * (hi-lo);
 }
 
 inline double plfit_runif_01(mt_rng_t* rng) {
     if (rng == 0) {
-        return rand() / ((double)RAND_MAX);
+        return RNG_UNIF01();
     }
     return mt_uniform_01(rng);
 }
@@ -159,7 +162,7 @@ int plfit_rzeta_array(long int xmin, double alpha, size_t n, mt_rng_t* rng,
             t = pow((x+1.0)/x, alpha_minus_1);
         } while (v*x*(t-1)*one_over_b_minus_1*b > t*xmin);
         *result = x;
-        if (x < 0) abort();
+        if (x < 0) return PLFIT_EINVAL;
         result++; n--;
     }
 
@@ -282,8 +285,8 @@ int plfit_walker_alias_sampler_sample(const plfit_walker_alias_sampler_t* sample
     if (rng == 0) {
         /* Using built-in RNG */
         while (n > 0) {
-            u = rand() / ((double)RAND_MAX);
-            j = rand() % sampler->num_bins;
+            u = RNG_UNIF01();
+            j = RNG_INTEGER(0, sampler->num_bins - 1);
             *x = (u < sampler->probs[j]) ? j : sampler->indexes[j];
             n--; x++;
         }

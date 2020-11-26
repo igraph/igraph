@@ -46,10 +46,6 @@ __BEGIN_DECLS
 #ifndef HAVE_STPCPY
     #define stpcpy igraph_i_stpcpy
     char* igraph_i_stpcpy(char* s1, const char* s2);
-#else
-    #ifndef HAVE_STPCPY_SIGNATURE
-        char* stpcpy(char* s1, const char* s2);
-    #endif
 #endif
 
 #ifndef HAVE_STRCASECMP
