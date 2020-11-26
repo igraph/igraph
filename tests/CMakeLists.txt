@@ -262,6 +262,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests NAMES
   simplify_and_colorize
+  bliss_automorphisms
 )
 
 # coloring.at
