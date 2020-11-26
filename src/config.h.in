@@ -2,7 +2,6 @@
 #define IGRAPH_CONFIG_H
 
 #cmakedefine HAVE_EXPM1 1
-#cmakedefine HAVE_FABSL 1
 #cmakedefine HAVE_FMIN 1
 #cmakedefine HAVE_LOG2 1
 #cmakedefine HAVE_LOG1P 1
