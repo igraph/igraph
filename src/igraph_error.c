@@ -319,7 +319,7 @@ void igraph_fatal_handler_abort(const char *reason, const char *file, int line) 
 #endif
 
 void igraph_fatal(const char *reason, const char *file, int line) {
-    if (igraph_i_error_handler) {
+    if (igraph_i_fatal_handler) {
         igraph_i_fatal_handler(reason, file, line);
 #ifndef USING_R
     }  else {

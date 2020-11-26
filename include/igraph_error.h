@@ -762,7 +762,7 @@ DECLDIR int igraph_warningf(const char *reason, const char *file, int line,
 
 /**
  * \typedef igraph_fatal_handler_t
- * Type of igraph fatal error handler functions
+ * \brief Type of igraph fatal error handler functions.
  *
  * Functions of this type must not return.
  */
@@ -773,17 +773,65 @@ IGRAPH_NORETURN /* 'noreturn' typedefs are a GNU C extension. Without this, GCC/
 #endif
 void igraph_fatal_handler_t (const char *reason, const char *file, int line);
 
-DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
-DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+/**
+ * \function igraph_set_fatal_handler
+ * \brief Installs a fatal error handler.
+ *
+ * Installs the supplied fatal error handler function.
+ *
+ * Fatal error handler functions \em must not return. Typically, the fatal
+ * error handler would either call <code>abort()</code> or <code>longjmp()</code>.
+ *
+ * \param new_handler The new fatal error handler function to install.
+ *        Supply a null pointer here to uninstall the current
+ *        fatal error handler, without installing a new one.
+ * \return The current fatal error handler function.
+ */
+
+DECLDIR igraph_fatal_handler_t* igraph_set_fatal_handler(igraph_fatal_handler_t* new_handler);
 
 DECLDIR igraph_fatal_handler_t igraph_fatal_handler_abort;
 
 /**
+ * \function igraph_fatal
+ * \brief Triggers a fatal error.
+ *
+ * This function triggers a fatal error. Typically it is called indirectly through
+ * \ref IGRAPH_FATAL() or \ref IGRAPH_ASSERT().
+ *
+ * \param reason Textual description of the error.
+ * \param file The source file in which the error was noticed.
+ * \param line The number of line in the source file which triggered the error.
+ */
+
+DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, int line);
+
+/**
+ * \function igraph_fatalf
+ * \brief Triggers a fatal error, printf-like syntax.
+ *
+ * This function is similar to \ref igraph_fatal(), but
+ * uses a printf-like syntax. It substitutes the additional arguments
+ * into the \p reason template string and calls \ref igraph_fatal().
+ *
+ * \param reason Textual description of the error.
+ * \param file The source file in which the error was noticed.
+ * \param line The number of line in the source file which triggered the error.
+ * \param ... The additional arguments to be substituted into the template string.
+ */
+
+DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+
+/**
  * \define IGRAPH_FATAL
- * Trigger a fatal error.
+ * \brief Triggers a fatal error.
  *
  * This is the usual way of triggering a fatal error from an igraph
  * function. It calls \ref igraph_fatal().
+ *
+ * Use this macro only in situations where the error cannot be handled.
+ * The normal way to handle errors is \ref IGRAPH_ERROR().
+ *
  * \param reason The error message.
  */
 
@@ -792,6 +840,23 @@ DECLDIR igraph_fatal_handler_t igraph_fatal_handler_abort;
         igraph_fatal(reason, IGRAPH_FILE_BASENAME, __LINE__); \
     } while (0)
 
+/**
+ * \define IGRAPH_ASSERT
+ * \brief igraph-specific replacement for <code>assert()</code>.
+ *
+ * This macro is like the standard <code>assert()</code>, but instead of
+ * calling <code>abort()</code>, it calls \ref igraph_fatal(). This allows for returning
+ * the control to the calling program, e.g. returning to the top level in a high-level
+ * igraph interface.
+ *
+ * This macro is for internal use only.
+ *
+ * Since a typial fatal error handler does a <code>longjmp()</code>, avoid using this
+ * macro in C++ code. <code>longjmp()</code> may (usually does) prevent those destructors
+ * from running which would be called if the <code>longjmp()</code> were replaced by a \c throw.
+ *
+ * \param condition The condition to be checked.
+ */
 
 #define IGRAPH_ASSERT(condition) \
     do { \
