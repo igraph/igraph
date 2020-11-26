@@ -483,10 +483,18 @@ add_legacy_tests(
 # mt.at -- only if we have pthreads
 if(CMAKE_USE_PTHREADS_INIT)
   add_legacy_tests(
-    FOLDER simple NAMES
-    tls1 tls2
+    FOLDER simple NAMES tls1
     LIBRARIES Threads::Threads
   )
+  
+  # tls2 should be added only if we use vendored ARPACK because a non-vendored
+  # ARPACK is not guaranteed to be thread-safe
+  if(ARPACK_IS_VENDORED)
+    add_legacy_tests(
+      FOLDER simple NAMES tls2
+      LIBRARIES Threads::Threads
+    )
+  endif()
 endif()
 
 # scg.at
