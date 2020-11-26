@@ -934,7 +934,7 @@ static boolean store_clique(set_t clique, graph_t *g, clique_options *opts) {
 		 * the recursions? 
 		 */
 		if (clique_list_count <= 0) {
-                    IGRAPH_FATAL("CLIQUER INTERNAL ERROR: clique_list_count has negative value! Please report as a bug.");
+			IGRAPH_FATAL("CLIQUER INTERNAL ERROR: clique_list_count has negative value! Please report as a bug.");
 		}
 		if (clique_list_count <= opts->clique_list_length)
 			opts->clique_list[clique_list_count-1] =
