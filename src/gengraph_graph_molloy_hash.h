@@ -155,14 +155,14 @@ public:
     // Test if graph is connected
     bool is_connected();
     // is edge ?
-    inline bool is_edge(int a, int b) {
-        assert(H_is(neigh[a], deg[a], b) == (fast_search(neigh[a], HASH_SIZE(deg[a]), b) != NULL));
-        assert(H_is(neigh[b], deg[b], a) == (fast_search(neigh[b], HASH_SIZE(deg[b]), a) != NULL));
-        assert(H_is(neigh[a], deg[a], b) == H_is(neigh[b], deg[b], a));
-        if (deg[a] < deg[b]) {
-            return H_is(neigh[a], deg[a], b);
+    inline bool is_edge(int u, int v) {
+        assert(H_is(neigh[u], deg[u], v) == (fast_search(neigh[u], HASH_SIZE(deg[u]), v) != NULL));
+        assert(H_is(neigh[v], deg[v], u) == (fast_search(neigh[v], HASH_SIZE(deg[v]), u) != NULL));
+        assert(H_is(neigh[u], deg[u], v) == H_is(neigh[v], deg[v], u));
+        if (deg[u] < deg[v]) {
+            return H_is(neigh[u], deg[u], v);
         } else {
-            return H_is(neigh[b], deg[b], a);
+            return H_is(neigh[v], deg[v], u);
         }
     }
     // Random edge swap ATTEMPT. Return 1 if attempt was a succes, 0 otherwise
