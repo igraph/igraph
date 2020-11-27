@@ -49,6 +49,9 @@ configure_file(
   ${CMAKE_CURRENT_BINARY_DIR}/include/igraph_version.h
 )
 
+# Create configuration options for optional features
+include(features)
+
 # Handle dependencies and dependency-related configuration options
 include(dependencies)
 find_dependencies()
@@ -73,12 +76,6 @@ check_symbol_exists(stpcpy string.h HAVE_STPCPY)
 check_symbol_exists(strcasecmp strings.h HAVE_STRCASECMP)
 check_symbol_exists(strdup string.h HAVE_STRDUP)
 check_symbol_exists(_stricmp string.h HAVE__STRICMP)
-
-# Check for TLS support and enable thread-local storage if possible
-include(tls)
-
-# Check for link-time optimization
-include(lto)
 
 # Check for code coverage support
 option(IGRAPH_ENABLE_CODE_COVERAGE "Enable code coverage calculation" OFF)

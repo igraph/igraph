@@ -1,13 +1,8 @@
-include(PadString)
+include(helpers)
 
 # The threading library is not needed for igraph itself, but might be needed
 # for tests
 include(FindThreads)
-
-macro(tristate OPTION_NAME DESCRIPTION DEFAULT_VALUE)
-  set(${OPTION_NAME} "${DEFAULT_VALUE}" CACHE STRING "${DESCRIPTION}")
-  set_property(CACHE ${OPTION_NAME} PROPERTY STRINGS AUTO ON OFF)
-endmacro()
 
 macro(find_dependencies)
   # Declare the list of dependencies that _may_ be vendored and those that may not
@@ -15,9 +10,6 @@ macro(find_dependencies)
   set(NONVENDORABLE_DEPENDENCIES GLPK)
 
   # Declare configuration options for dependencies
-  option(IGRAPH_GLPK_SUPPORT "Compile igraph with GLPK support" ON)
-
-  tristate(IGRAPH_GRAPHML_SUPPORT "Compile igraph with GraphML support" AUTO)
   tristate(IGRAPH_USE_INTERNAL_GMP "Compile igraph with internal Mini-GMP" AUTO)
   tristate(IGRAPH_USE_INTERNAL_ARPACK "Compile igraph with internal ARPACK" AUTO)
   tristate(IGRAPH_USE_INTERNAL_BLAS "Compile igraph with internal BLAS" AUTO)
