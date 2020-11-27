@@ -22,11 +22,13 @@
 */
 
 #include <igraph.h>
+#include <unistd.h>
 
 int main() {
 
     igraph_t g;
     FILE *ifile;
+    FILE *ofile = fdopen(dup(fileno(stdout)), "wb");
 
     /* turn on attribute handling */
     /*   igraph_i_set_attribute_table(&igraph_cattribute_table); */
@@ -37,7 +39,7 @@ int main() {
     }
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
-    igraph_write_graph_pajek(&g, stdout);
+    igraph_write_graph_pajek(&g, ofile);
     igraph_destroy(&g);
 
     ifile = fopen("pajek2.net", "r");
@@ -46,7 +48,7 @@ int main() {
     }
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
-    igraph_write_graph_pajek(&g, stdout);
+    igraph_write_graph_pajek(&g, ofile);
     igraph_destroy(&g);
 
     ifile = fopen("pajek3.net", "r");
@@ -55,7 +57,7 @@ int main() {
     }
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
-    igraph_write_graph_pajek(&g, stdout);
+    igraph_write_graph_pajek(&g, ofile);
     igraph_destroy(&g);
 
     ifile = fopen("pajek4.net", "r");
@@ -64,7 +66,7 @@ int main() {
     }
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
-    igraph_write_graph_pajek(&g, stdout);
+    igraph_write_graph_pajek(&g, ofile);
     igraph_destroy(&g);
 
     return 0;
