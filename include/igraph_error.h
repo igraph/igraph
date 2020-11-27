@@ -35,13 +35,15 @@ __BEGIN_DECLS
  * prefix renamed to IGRAPH_), as I couldn't find a better way to do
  * them. */
 
+/* IGRAPH_NORETRUN indicates to the compiler that a function does not return.
+ * There are standard facilities for this, namely _Noreturn in C11 and [[noreturn]] in C++11.
+ * However, since igraph is currently compiled with older standards, and since
+ * the standard 'noreturn' specification would need to be diferent between C and C++,
+ * we do not use these facilities.
+ */
 #if defined(__GNUC__)
-/* Compilers that support the GNU C syntax. We use '__noreturn__' instead of 'noreturn' as the latter is a macro in C11. */
-/* This is preferred over the standard as GNU C supports applying 'noreturn' to typedefs. */
+/* Compilers that support the GNU C syntax. Use __noreturn__ instead of 'noreturn' as the latter is a macro in C11. */
 #define IGRAPH_NORETURN __attribute__((__noreturn__))
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
-/* Compilers that support the C11 standard. */
-#define IGRAPH_NORETURN _Noreturn
 #elif defined(_MSC_VER)
 /* Compilers that support the MSVC syntax. */
 #define IGRAPH_NORETURN __declspec(noreturn)
@@ -767,11 +769,7 @@ DECLDIR int igraph_warningf(const char *reason, const char *file, int line,
  * Functions of this type must not return.
  */
 
-typedef
-#if defined(__GNUC__)
-IGRAPH_NORETURN /* 'noreturn' typedefs are a GNU C extension. Without this, GCC/Clang issue a warning for igraph_fatal(). */
-#endif
-void igraph_fatal_handler_t (const char *reason, const char *file, int line);
+typedef void igraph_fatal_handler_t (const char *reason, const char *file, int line);
 
 /**
  * \function igraph_set_fatal_handler

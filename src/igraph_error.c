@@ -30,6 +30,31 @@
 #include <assert.h>
 #include <stdarg.h>
 
+#ifdef USING_R
+#include <R.h>
+#endif
+
+/***** Helper functions *****/
+
+/* All calls to abort() in this compilation unit must go through igraph_abort(),
+ * in order to make it easy for igraph's R interface to not have any reference to abort(),
+ * which is disallowed by CRAN.
+ *
+ * Since the R interface sets its own error / fatal error handlers, this function
+ * is never actually called by it.
+ *
+ * Note that some of the other #ifndef USING_R's in this file are still needed
+ * to avoid references to fprintf and stderr.
+ */
+static IGRAPH_NORETURN void igraph_abort() {
+#ifndef USING_R
+    abort();
+#else
+    /* R's error() function is declared 'noreturn'. We use it here to satisfy the compiler that igraph_abort() does indeed not return. */
+    error("igraph_abort() was called. This should never happen. Please report this as an igraph bug, along with steps to reproduce it.");
+#endif
+}
+
 
 /***** Handling errors *****/
 
@@ -150,7 +175,7 @@ void igraph_error_handler_abort (const char *reason, const char *file,
                                  int line, int igraph_errno) {
     fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
             igraph_strerror(igraph_errno));
-    abort();
+    igraph_abort();
 }
 #endif
 
@@ -314,7 +339,7 @@ igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_handler_t * new_ha
 #ifndef USING_R
 void igraph_fatal_handler_abort(const char *reason, const char *file, int line) {
     fprintf(stderr, "Fatal error at %s:%i : %s\n", file, line, reason);
-    abort();
+    igraph_abort();
 }
 #endif
 
@@ -326,6 +351,9 @@ void igraph_fatal(const char *reason, const char *file, int line) {
         igraph_fatal_handler_abort(reason, file, line);
 #endif
     }
+    /* The following line should never be reached, as fatal error handlers are not supposed to return.
+       It is here to satisfy the compiler that this function indeed does not return. */
+    igraph_abort();
 }
 
 void igraph_fatalf(const char *reason, const char *file, int line, ...) {
