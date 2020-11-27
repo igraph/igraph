@@ -19,10 +19,6 @@
 
 #include "config.h"
 
-#ifdef USING_R
-#include <R.h>
-#endif
-
 /* Default cliquer options */
 IGRAPH_THREAD_LOCAL clique_options clique_default_options = {
     reorder_by_default, NULL, /*clique_print_time*/ NULL, NULL, NULL, NULL, NULL, 0
@@ -938,15 +934,7 @@ static boolean store_clique(set_t clique, graph_t *g, clique_options *opts) {
 		 * the recursions? 
 		 */
 		if (clique_list_count <= 0) {
-#ifdef USING_R
-		        error("CLIQUER INTERNAL ERROR: ",
-			      "clique_list_count has negative value!");
-#else
-			fprintf(stderr,"CLIQUER INTERNAL ERROR: "
-				"clique_list_count has negative value!\n");
-			fprintf(stderr,"Please report as a bug.\n");
-			abort();
-#endif
+			IGRAPH_FATAL("CLIQUER INTERNAL ERROR: clique_list_count has negative value! Please report as a bug.");
 		}
 		if (clique_list_count <= opts->clique_list_length)
 			opts->clique_list[clique_list_count-1] =
