@@ -8,11 +8,11 @@
 <title>Error Handling</title>
 
 <section id="error-handling-basics">
-<!-- doxrox-include errorhandlingbasics -->
+<!-- doxrox-include error_handling_basics -->
 </section>
 
 <section id="error-handlers">
-<!-- doxrox-include errorhandlers -->
+<!-- doxrox-include error_handlers -->
 <!-- doxrox-include igraph_error_handler_t -->
 <!-- doxrox-include igraph_error_handler_abort -->
 <!-- doxrox-include igraph_error_handler_ignore -->
@@ -20,7 +20,7 @@
 </section>
 
 <section id="error-codes">
-<!-- doxrox-include errorcodes -->
+<!-- doxrox-include error_codes -->
 <!-- doxrox-include igraph_error_type_t -->
 <!-- doxrox-include igraph_strerror -->
 </section>
@@ -61,6 +61,16 @@
 
 <section id="writing-igraph-functions-with-proper-error-handling">
 <!-- doxrox-include writing_functions_error_handling -->
+</section>
+
+<section id="fatal-error-handlers">
+<!-- doxrox-include fatal_error_handlers -->
+<!-- doxrox-include igraph_fatal_handler_t -->
+<!-- doxrox-include igraph_fatal_handler_abort -->
+<!-- doxrox-include IGRAPH_FATAL -->
+<!-- doxrox-include IGRAPH_ASSERT -->
+<!-- doxrox-include igraph_fatal -->
+<!-- doxrox-include igraph_fatalf -->
 </section>
 
 <section id="error-handling-and-threads">
