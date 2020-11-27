@@ -22,11 +22,13 @@
 */
 
 #include <igraph.h>
+#include <unistd.h>
 
 int main() {
     igraph_t graph;
     igraph_vector_bool_t type;
     igraph_bool_t typev[] = { 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 };
+    FILE* binout = fdopen(dup(fileno(stdout)), "wb");
 
     /* turn on attribute handling */
     igraph_i_set_attribute_table(&igraph_cattribute_table);
@@ -35,9 +37,11 @@ int main() {
     igraph_vector_bool_view(&type, typev, sizeof(typev) / sizeof(igraph_bool_t));
     SETVABV(&graph, "type", &type);
 
-    igraph_write_graph_pajek(&graph, stdout);
+    igraph_write_graph_pajek(&graph, binout);
 
     igraph_destroy(&graph);
+
+    fclose(binout);
 
     return 0;
 }
