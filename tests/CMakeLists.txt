@@ -546,3 +546,9 @@ add_legacy_tests(
   FOLDER simple NAMES
   igraph_adjacency_spectral_embedding
 )
+
+# degree sequences
+add_legacy_tests(
+  FOLDER tests NAMES
+  igraph_is_graphical
+)
