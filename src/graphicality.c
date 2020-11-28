@@ -44,7 +44,7 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  *
  * Determines whether a sequence of integers can be the degree sequence of some graph.
  * The classical concept of graphicality assumes simple graphs. This function can perform
- * the check also when either self-loops, multi-edge, or both are allowed in the graph.
+ * the check also when either self-loops, multi-edges, or both are allowed in the graph.
  *
  * </para><para>
  * For simple undirected graphs, the Erdős-Gallai conditions are checked using the linear-time
@@ -830,6 +830,148 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
     IGRAPH_FINALLY_CLEAN(2);
 
     return IGRAPH_SUCCESS;
+}
+
+
+/***** Potential connectedness *****/
+
+/**
+ * \function igraph_is_potentially_connected_degree_sequence
+ * \brief Is there a connected graph with the given degrees?
+ *
+ * This function determines if the given degree sequence (or pair of out- and in-degree
+ * sequences) is <em>potentially connected</em>. In other words, it checks if there is a connected
+ * graph with the given degrees.
+ *
+ * </para><para>
+ * In the undirected case, the condition is that the sum of degrees be at least
+ * <code>2*(n-1)</code>, where \c n is the number of degrees, and that no degree be zero
+ * (unless <code>n=1</code>).
+ *
+ * </para><para>
+ * In the directed case, the condition is that no out- or in-degrees be zero
+ * (unless <code>n=1</code>).
+ *
+ * </para><para>
+ * If <code>n=0</code>, 'false' is returned, as the null graph is considered to be non-connected.
+ *
+ * </para><para>
+ * This function also verifies that the sum of degrees is even (undirected case)
+ * or the sum of out- and in-degrees is the same (directed case). This is necessary
+ * for a (potentially non-simple) graph with these degrees to exist. Additionally,
+ * it checks that no degrees are negative. If either condition is violated, it
+ * returns 'false'.
+ *
+ * \param out_degrees A vector of integers specifying the degree sequence for
+ *     undirected graphs or the out-degree sequence for directed graphs.
+ * \param in_degrees A vector of integers specifying the in-degree sequence for
+ *     directed graphs. For undirected graphs, it must be \c NULL.
+ * \param res Pointer to a Boolean. The result will be stored here.
+ *
+ * \return Error code.
+ *
+ * \sa igraph_is_graphical()
+ */
+int igraph_is_potentially_connected_degree_sequence(const igraph_vector_t *out_degrees, const igraph_vector_t *in_degrees, igraph_bool_t *res) {
+    long int i;
+    long int n = igraph_vector_size(out_degrees);
+
+    if (in_degrees == NULL)
+    {
+        /* Undirected case:
+         *  - Degrees must be non-negative.
+         *  - The sum of degrees must be even.
+         *  - If there is more than one vertex, then all degrees must be non-zero.
+         *  - The sum of degrees must be at least 2*(n-1), where n is the number of vertices.
+         */
+
+        long int sum;
+
+        /* We consider the null graph non-connected. */
+        if (n == 0) {
+            *res = 0;
+            return IGRAPH_SUCCESS;
+        }
+
+        /* One vertex: its degree must be non-negative and even.
+         * Note that it may be zero as a special case.
+         */
+        if (n == 1) {
+            long int d = VECTOR(*out_degrees)[0];
+            *res = d >= 0 && (d % 2 == 0);
+            return IGRAPH_SUCCESS;
+        }
+
+        *res = 0; /* Be pessimistic. */
+
+        sum = 0;
+        for (i=0; i < n; ++i) {
+            long int d = VECTOR(*out_degrees)[i];
+
+            /* Negative or zero degree: return 'false'. */
+            if (d <= 0) {
+                *res = 0;
+                return IGRAPH_SUCCESS;
+            }
+
+            sum += d;
+
+            /* Set *res to 1 immediately as the sum reaches 2*(n-1), as 'sum' may eventually overflow. */
+            if (sum >= 2*(n-1)) {
+                *res = 1;
+            }
+        }
+        /* It is not a problem if sum overflows, as here we only verify that it is even. */
+        *res = (*res) && (sum % 2 == 0);
+        return IGRAPH_SUCCESS;
+    }
+    else
+    {
+        /* Directed case:
+         *  - Degrees must be non-negative.
+         *  - If there is more than one vertex, then all in- or out-degree must be non-zero.
+         *  - The sum of in- and out-degrees must be the same.
+         */
+        long int sumdiff;
+
+        if (igraph_vector_size(in_degrees) != n) {
+            IGRAPH_ERROR("The length of out- and in-degree sequences must be the same.", IGRAPH_EINVAL);
+        }
+
+        /* We consider the null graph non-connected. */
+        if (n == 0) {
+            *res = 0;
+            return IGRAPH_SUCCESS;
+        }
+
+        /* One vertex: its in- and out-degrees must be the same and non-negative.
+           Note that they may be zero as a specia case. */
+        if (n == 1) {
+            long int dout = VECTOR(*out_degrees)[0];
+            long int din  = VECTOR(*in_degrees)[0];
+            *res = dout >= 0 && din == dout;
+            return IGRAPH_SUCCESS;
+        }
+
+        /* Instead of summing in- and out-degrees separately, we compute the difference
+         * of their sums. This approach is less likely to result in integer overflow. */
+        sumdiff = 0;
+        for (i=0; i < n; ++i) {
+            long int dout = VECTOR(*out_degrees)[i];
+            long int din  = VECTOR(*in_degrees)[i];
+
+            /* Negative or zero degree: return 'false'. */
+            if (dout <= 0 || din <= 0) {
+                *res = 0;
+                return IGRAPH_SUCCESS;
+            }
+
+            sumdiff += din - dout;
+        }
+
+        *res = sumdiff == 0;
+        return IGRAPH_SUCCESS;
+    }
 }
 
 
