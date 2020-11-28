@@ -551,4 +551,5 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests NAMES
   igraph_is_graphical
+  is_potentially_connected
 )

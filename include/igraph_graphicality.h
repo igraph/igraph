@@ -49,6 +49,10 @@ DECLDIR int igraph_is_bigraphical(const igraph_vector_t *degrees1,
                                   const igraph_edge_type_sw_t allowed_edge_types,
                                   igraph_bool_t *res);
 
+DECLDIR int igraph_is_potentially_connected_degree_sequence(
+                            const igraph_vector_t *out_degrees,
+                            const igraph_vector_t *in_degrees,
+                            igraph_bool_t *res);
 
 /* Legacy functions (deprecated): */
 

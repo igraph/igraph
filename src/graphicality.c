@@ -839,13 +839,16 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * \function igraph_is_potentially_connected_degree_sequence
  * \brief Is there a connected graph with the given degrees?
  *
+ * \experimental
+ *
  * This function determines if the given degree sequence (or pair of out- and in-degree
- * sequences) is <em>potentially connected</em>. In other words, it checks if there is a connected
- * graph with the given degrees.
+ * sequences) is <emphasis>potentially connected</emphasis>. In other words, it checks if
+ * there is a connected graph with the given degrees, or if there is a strongly connected
+ * graph with the given out- and in-degrees.
  *
  * </para><para>
  * In the undirected case, the condition is that the sum of degrees be at least
- * <code>2*(n-1)</code>, where \c n is the number of degrees, and that no degree be zero
+ * <code>2*(n-1)</code>, where \c n is the number of vertices, and that no degree be zero
  * (unless <code>n=1</code>).
  *
  * </para><para>
@@ -853,14 +856,14 @@ static int igraph_i_is_bigraphical_simple(const igraph_vector_t *degrees1, const
  * (unless <code>n=1</code>).
  *
  * </para><para>
- * If <code>n=0</code>, 'false' is returned, as the null graph is considered to be non-connected.
+ * If <code>n=0</code>, false is returned, as the null graph is considered to be non-connected.
  *
  * </para><para>
  * This function also verifies that the sum of degrees is even (undirected case)
  * or the sum of out- and in-degrees is the same (directed case). This is necessary
  * for a (potentially non-simple) graph with these degrees to exist. Additionally,
  * it checks that no degrees are negative. If either condition is violated, it
- * returns 'false'.
+ * returns false.
  *
  * \param out_degrees A vector of integers specifying the degree sequence for
  *     undirected graphs or the out-degree sequence for directed graphs.

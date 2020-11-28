@@ -81,6 +81,7 @@
 <section id="degree-sequences"><title>Degree Sequences</title>
 <!-- doxrox-include igraph_is_graphical -->
 <!-- doxrox-include igraph_is_bigraphical -->
+<!-- doxrox-include igraph_is_potentially_connected_degree_sequence -->
 <!-- doxrox-include igraph_is_degree_sequence -->
 <!-- doxrox-include igraph_is_graphical_degree_sequence -->
 </section>

@@ -1,0 +1,52 @@
+Undirected:
+
+( )
+false
+
+( 0 )
+true
+
+( 1 )
+false
+
+( 1 1 1 1 )
+false
+
+( 1 2 3 )
+true
+
+( 1 2 3 0 )
+false
+
+( 3 2 )
+false
+
+( -2 2 )
+false
+
+
+Directed:
+
+( )
+( )
+false
+
+( 0 )
+( 0 )
+true
+
+( 0 )
+( 1 )
+false
+
+( 1 2 3 )
+( 2 2 2 )
+true
+
+( 1 2 3 )
+( 2 4 0 )
+false
+
+( 1 2 3 )
+( 2 6 -2 )
+false
