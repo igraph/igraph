@@ -2016,12 +2016,24 @@ static int igraph_i_pajek_escape(char* src, char** dest) {
  * </para><para>
  * As of version 0.6.1 igraph writes bipartite graphs into Pajek files
  * correctly, i.e. they will be also bipartite when read into Pajek.
- * As Pajek is less flexible for bipartite graphs (the numeric ids of
+ * As Pajek is less flexible for bipartite graphs (the numeric IDs of
  * the vertices must be sorted according to vertex type), igraph might
  * need to reorder the vertices when writing a bipartite Pajek file.
- * This effectively means that numeric vertex ids usually change when
+ * This effectively means that numeric vertex IDs usually change when
  * a bipartite graph is written to a Pajek file, and then read back
  * into igraph.
+ *
+ * </para><para>
+ * Early versions of Pajek supported only Windows-style line endings
+ * in Pajek files, but recent versions support both Windows and Unix
+ * line endings. igraph therefore uses the platform-native line endings
+ * when the input file is opened in text mode, and uses Unix-style
+ * line endings when the input file is opened in binary mode. If you
+ * are using an old version of Pajek, you are on Unix and you are having
+ * problems reading files written by igraph on a Windows machine, convert the
+ * line endings manually with a text editor or with \c unix2dos or \c iconv
+ * from the command line).
+ *
  * \param graph The graph object to write.
  * \param outstream The file to write to. It should be opened and
  * writable. Make sure that you open the file in binary format if you use MS Windows,
@@ -2091,7 +2103,10 @@ int igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
                               };
     const char *estrnames2[] = { "a", "p", "l", "lc", "c" };
 
-    const char *newline = "\x0d\x0a";
+    /* Newer Pajek versions support both Unix and Windows-style line endings,
+     * so we just use Unix style. This will get converted to CRLF on Windows
+     * when the file is opened in text mode */
+    const char *newline = "\n";
 
     igraph_es_t es;
     igraph_eit_t eit;
