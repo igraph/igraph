@@ -22,19 +22,17 @@
 */
 
 #include <igraph.h>
-#include <unistd.h>
 
 int main() {
 
     igraph_t g;
     igraph_strvector_t names;
-    FILE* binout = fdopen(dup(fileno(stdout)), "wb");
 
     igraph_i_set_attribute_table(&igraph_cattribute_table);
 
     /* save a simple ring graph */
     igraph_ring(&g, 10, IGRAPH_DIRECTED, 0 /* mutual */, 1 /* circular */);
-    igraph_write_graph_pajek(&g, binout);
+    igraph_write_graph_pajek(&g, stdout);
 
     /* add some vertex attributes */
     igraph_strvector_init(&names, 0);
@@ -52,7 +50,7 @@ int main() {
     igraph_strvector_destroy(&names);
 
     /* save the graph with vertex names */
-    igraph_write_graph_pajek(&g, binout);
+    igraph_write_graph_pajek(&g, stdout);
 
     igraph_strvector_init(&names, 0);
     igraph_strvector_add(&names, "square");
@@ -69,13 +67,9 @@ int main() {
     igraph_strvector_destroy(&names);
 
     /* save the graph with escaped shapes */
-    igraph_write_graph_pajek(&g, binout);
+    igraph_write_graph_pajek(&g, stdout);
 
     /* destroy the graph */
     igraph_destroy(&g);
-
-    /* close the binary stdout */
-    fclose(binout);
-
     return 0;
 }
