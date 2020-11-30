@@ -26,6 +26,12 @@ if (BUILD_SHARED_LIBS)
   set_property(TARGET plfit PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif()
 
+if (WIN32)
+  # Since these are included as object files, they should call the
+  # function as is (without declspec)
+  target_compile_definitions(plfit PRIVATE IGRAPH_STATIC)
+endif()
+
 if (MSVC)
   target_compile_options(plfit PRIVATE /wd4100) # disable unreferenced parameter warning
 endif()
