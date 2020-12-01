@@ -29,7 +29,6 @@ jobs:
         uses: msys2/setup-msys2@v2
         with:
           msystem: ${{ matrix.msystem }}
-<<<<<<< HEAD
           install: git base-devel mingw-w64-${{ matrix.arch }}-cmake mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-zlib mingw-w64-${{ matrix.arch }}-libxml2 mingw-w64-${{ matrix.arch }}-suitesparse
           update: true
       - name: Checkout
@@ -45,17 +44,3 @@ jobs:
       - name: Test
         run: ctest -j2 --output-on-failure
         working-directory: build-${{ matrix.arch }}
-=======
-          install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-zlib mingw-w64-${{ matrix.arch }}-libxml2
-          update: true
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Build
-        run: |
-          ./bootstrap.sh
-          mkdir -p build-${{ matrix.arch }}
-          cd build-${{ matrix.arch }}
-          ../configure -C --enable-tls --with-external-glp YFLAGS=-Wall || { cat config.log; cat config.cache; exit 1; }
-          make -j V=0 || make
-
->>>>>>> master
