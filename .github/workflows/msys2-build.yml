@@ -1,0 +1,42 @@
+name: MINGW32 and MINGW64
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches: 
+      - master
+
+jobs:
+  build:
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: [
+          { msystem: MINGW32, arch: i686   },
+          { msystem: MINGW64, arch: x86_64 }
+          ]
+
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Init ${{ matrix.msystem }}-System
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.msystem }}
+          install: git base-devel mingw-w64-${{ matrix.arch }}-toolchain mingw-w64-${{ matrix.arch }}-glpk mingw-w64-${{ matrix.arch }}-gmp mingw-w64-${{ matrix.arch }}-zlib mingw-w64-${{ matrix.arch }}-libxml2
+          update: true
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build
+        run: |
+          ./bootstrap.sh
+          mkdir -p build-${{ matrix.arch }}
+          cd build-${{ matrix.arch }}
+          ../configure -C --enable-tls --with-external-glp YFLAGS=-Wall || { cat config.log; cat config.cache; exit 1; }
+          make -j V=0 || make
+
