@@ -20,6 +20,7 @@
 
 */
 
+#include "igraph_error.h"
 #include "igraph_vector.h"
 #include "igraph_types_internal.h"
 

@@ -20,6 +20,7 @@
 
 */
 
+#include "igraph_error.h"
 #include "igraph_gml_tree.h"
 
 typedef struct {

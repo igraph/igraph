@@ -51,11 +51,9 @@
 #include "foreign-dl-parser.h"
 #define YY_EXTRA_TYPE igraph_i_dl_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
+#define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in DL parser: " # msg)
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
-#define YY_FATAL_ERROR(msg)                                     \
-  igraph_error("Fatal error in DL parser: " # msg, IGRAPH_FILE_BASENAME,    \
-               __LINE__, IGRAPH_PARSEERROR);
 #ifdef stdout 
 #  undef stdout
 #endif

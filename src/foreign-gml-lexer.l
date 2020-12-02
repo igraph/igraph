@@ -50,11 +50,9 @@
 #include "foreign-gml-parser.h"
 #define YY_EXTRA_TYPE igraph_i_gml_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
+#define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in GML parser: " # msg)
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
-#define YY_FATAL_ERROR(msg)                                      \
-  igraph_error("Fatal error in GML parser: " # msg, IGRAPH_FILE_BASENAME,    \
-               __LINE__, IGRAPH_PARSEERROR);
 #ifdef stdout 
 #  undef stdout
 #endif
