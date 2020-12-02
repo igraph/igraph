@@ -21,6 +21,7 @@
 
 */
 
+#include "igraph_error.h"
 #include "igraph_cliques.h"
 #include "igraph_memory.h"
 #include "igraph_constants.h"
@@ -33,7 +34,6 @@
 #include "igraph_cliquer.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>    /* memset */
 
 static void igraph_i_cliques_free_res(igraph_vector_ptr_t *res) {
@@ -1121,7 +1121,7 @@ static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_cliq
     igraph_vector_int_t new_cand, new_fini, cn, best_cand_nbrs,
                         best_fini_cand_nbrs;
     igraph_bool_t cont = 1;
-    int assret;
+    igraph_bool_t found;
 
     if (directed) {
         IGRAPH_WARNING("directionality of edges is ignored for directed graphs");
@@ -1210,11 +1210,11 @@ static int igraph_i_maximal_cliques(const igraph_t *graph, igraph_i_maximal_cliq
         IGRAPH_CHECK(igraph_vector_push_back(&clique, i));
 
         /* Remove the node from the candidate list */
-        assret = igraph_vector_int_binsearch(&frame.cand, i, &j); assert(assret);
+        found = igraph_vector_int_binsearch(&frame.cand, i, &j); IGRAPH_ASSERT(found);
         igraph_vector_int_remove(&frame.cand, j);
 
         /* Add the node to the finished list */
-        assret = !igraph_vector_int_binsearch(&frame.fini, i, &j); assert(assret);
+        found = igraph_vector_int_binsearch(&frame.fini, i, &j); IGRAPH_ASSERT(!found);
         IGRAPH_CHECK(igraph_vector_int_insert(&frame.fini, j, i));
 
         /* Create new_cand and new_fini */

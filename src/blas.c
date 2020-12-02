@@ -22,10 +22,9 @@
 
 */
 
+#include "igraph_error.h"
 #include "igraph_blas.h"
 #include "igraph_blas_internal.h"
-
-#include <assert.h>
 
 /**
  * \function igraph_blas_dgemv
@@ -60,8 +59,8 @@ void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
     m = (int) igraph_matrix_nrow(a);
     n = (int) igraph_matrix_ncol(a);
 
-    assert(igraph_vector_size(x) == transpose ? m : n);
-    assert(igraph_vector_size(y) == transpose ? n : m);
+    IGRAPH_ASSERT(igraph_vector_size(x) == transpose ? m : n);
+    IGRAPH_ASSERT(igraph_vector_size(y) == transpose ? n : m);
 
     igraphdgemv_(&trans, &m, &n, &alpha, VECTOR(a->data), &m,
                  VECTOR(*x), &inc, &beta, VECTOR(*y), &inc);

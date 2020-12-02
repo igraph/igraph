@@ -26,5 +26,10 @@ if(MSVC)
     /wd4146  # unary minus operator applied to unsigned type
     /wd4189  # local variable is initialized but not referenced
   )
+else()
+  target_compile_options(
+    gmp_vendored PRIVATE
+    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-unused-variable>
+  )
 endif()
 

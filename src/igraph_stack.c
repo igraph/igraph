@@ -21,6 +21,7 @@
 
 */
 
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_stack.h"
 
@@ -67,8 +68,8 @@
 
 void igraph_stack_ptr_free_all   (igraph_stack_ptr_t* v) {
     void **ptr;
-    assert(v != 0);
-    assert(v->stor_begin != 0);
+    IGRAPH_ASSERT(v != 0);
+    IGRAPH_ASSERT(v->stor_begin != 0);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
         igraph_Free(*ptr);
     }
@@ -80,8 +81,8 @@ void igraph_stack_ptr_free_all   (igraph_stack_ptr_t* v) {
  */
 
 void igraph_stack_ptr_destroy_all   (igraph_stack_ptr_t* v) {
-    assert(v != 0);
-    assert(v->stor_begin != 0);
+    IGRAPH_ASSERT(v != 0);
+    IGRAPH_ASSERT(v->stor_begin != 0);
     igraph_stack_ptr_free_all(v);
     igraph_stack_ptr_destroy(v);
 }

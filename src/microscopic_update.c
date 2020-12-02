@@ -24,8 +24,7 @@
 #include "igraph_microscopic_update.h"
 #include "igraph_nongraph.h"
 #include "igraph_random.h"
-
-#include <assert.h>
+#include "igraph_error.h"
 
 /*
  * Internal use only.
@@ -804,7 +803,7 @@ int igraph_moran_process(const igraph_t *graph,
         IGRAPH_VIT_NEXT(vA);
     }
     /* By now we should have chosen a vertex for reproduction. Check this. */
-    assert(a >= 0);
+    IGRAPH_ASSERT(a >= 0);
 
     /* Cumulative proportionate weights. We are using the local perspective */
     /* with respect to vertex a, which has been chosen for reproduction. */
@@ -845,7 +844,7 @@ int igraph_moran_process(const igraph_t *graph,
             } else {
                 b = u;
             }
-            assert(a != b);  /* always true if G is simple */
+            IGRAPH_ASSERT(a != b);  /* always true if G is simple */
             break;
         }
         i++;
@@ -856,7 +855,7 @@ int igraph_moran_process(const igraph_t *graph,
     /* for death. Check that b has indeed been chosen. Clone vertex a and kill */
     /* vertex b. Let the clone c have the vertex ID of b, and the strategy and */
     /* quantity of a. */
-    assert(b >= 0);
+    IGRAPH_ASSERT(b >= 0);
     VECTOR(*quantities)[b] = VECTOR(*quantities)[a];
     VECTOR(*strategies)[b] = VECTOR(*strategies)[a];
 

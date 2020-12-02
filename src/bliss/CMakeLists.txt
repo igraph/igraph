@@ -34,8 +34,13 @@ if(NOT GMP_IS_VENDORED)
   )
 endif()
 
+use_all_warnings(bliss)
+
 if (MSVC)
   target_compile_options(bliss PRIVATE /wd4100) # disable unreferenced parameter warning
+else()
+  target_compile_options(
+    bliss PRIVATE
+    $<$<C_COMPILER_ID:GCC,Clang,AppleClang>:-Wno-unused-variable>
+  )
 endif()
-
-use_all_warnings(bliss)

@@ -1,12 +1,11 @@
 
 #include "igraph_cliquer.h"
+#include "igraph_error.h"
 #include "igraph_memory.h"
 #include "igraph_constants.h"
 #include "igraph_interrupt_internal.h"
 #include "cliquer/cliquer.h"
 #include "config.h"
-
-#include <assert.h>
 
 
 /* Call this to allow for interruption in Cliquer callback functions */
@@ -77,7 +76,7 @@ static void igraph_to_cliquer(const igraph_t *ig, graph_t **cg) {
 static int set_weights(const igraph_vector_t *vertex_weights, graph_t *g) {
     int i;
 
-    assert(vertex_weights != NULL);
+    IGRAPH_ASSERT(vertex_weights != NULL);
 
     if (igraph_vector_size(vertex_weights) != g->n) {
         IGRAPH_ERROR("Invalid vertex weight vector length", IGRAPH_EINVAL);

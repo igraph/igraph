@@ -25,7 +25,6 @@
 #include "igraph_error.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 
@@ -130,8 +129,8 @@ void FUNCTION(igraph_heap, destroy)(TYPE(igraph_heap)* h) {
  */
 
 igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->stor_begin == h->end;
 }
 
@@ -151,8 +150,8 @@ igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
  */
 
 int FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
@@ -187,9 +186,9 @@ int FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
  */
 
 BASE FUNCTION(igraph_heap, top)(TYPE(igraph_heap)* h) {
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
-    assert(h->stor_begin != h->end);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h->stor_begin != h->end);
 
     return h->stor_begin[0];
 }
@@ -211,8 +210,8 @@ BASE FUNCTION(igraph_heap, top)(TYPE(igraph_heap)* h) {
 BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h) {
     BASE tmp;
 
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     tmp = h->stor_begin[0];
     FUNCTION(igraph_heap, i_switch)(h->stor_begin, 0, FUNCTION(igraph_heap, size)(h) - 1);
@@ -235,8 +234,8 @@ BASE FUNCTION(igraph_heap, delete_top)(TYPE(igraph_heap)* h) {
  */
 
 long int FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
     return h->end - h->stor_begin;
 }
 
@@ -259,8 +258,8 @@ long int FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
 int FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, long int size) {
     long int actual_size = FUNCTION(igraph_heap, size)(h);
     BASE *tmp;
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     if (size <= actual_size) {
         return 0;

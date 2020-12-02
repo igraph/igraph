@@ -28,7 +28,6 @@
 #include "igraph_error.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 
@@ -90,7 +89,7 @@
 
 int igraph_vector_ptr_init      (igraph_vector_ptr_t* v, int long size) {
     long int alloc_size = size > 0 ? size : 1;
-    assert(v != NULL);
+    IGRAPH_ASSERT(v != NULL);
     if (size < 0) {
         size = 0;
     }
@@ -134,7 +133,7 @@ const igraph_vector_ptr_t *igraph_vector_ptr_view (const igraph_vector_ptr_t *v,
  */
 
 void igraph_vector_ptr_destroy   (igraph_vector_ptr_t* v) {
-    assert(v != 0);
+    IGRAPH_ASSERT(v != 0);
     if (v->stor_begin != 0) {
         igraph_Free(v->stor_begin);
         v->stor_begin = NULL;
@@ -173,8 +172,8 @@ void igraph_i_vector_ptr_call_item_destructor_all(igraph_vector_ptr_t* v) {
 
 void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v) {
     void **ptr;
-    assert(v != 0);
-    assert(v->stor_begin != 0);
+    IGRAPH_ASSERT(v != 0);
+    IGRAPH_ASSERT(v->stor_begin != 0);
 
     igraph_i_vector_ptr_call_item_destructor_all(v);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
@@ -201,8 +200,8 @@ void igraph_vector_ptr_free_all   (igraph_vector_ptr_t* v) {
  */
 
 void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v) {
-    assert(v != 0);
-    assert(v->stor_begin != 0);
+    IGRAPH_ASSERT(v != 0);
+    IGRAPH_ASSERT(v->stor_begin != 0);
     igraph_vector_ptr_free_all(v);
     igraph_vector_ptr_set_item_destructor(v, 0);
     igraph_vector_ptr_destroy(v);
@@ -219,8 +218,8 @@ void igraph_vector_ptr_destroy_all   (igraph_vector_ptr_t* v) {
 int igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size) {
     long int actual_size = igraph_vector_ptr_size(v);
     void **tmp;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
 
     if (size <= igraph_vector_ptr_size(v)) {
         return 0;
@@ -243,8 +242,8 @@ int igraph_vector_ptr_reserve   (igraph_vector_ptr_t* v, long int size) {
  */
 
 igraph_bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->stor_begin == v->end;
 }
 
@@ -260,8 +259,8 @@ igraph_bool_t igraph_vector_ptr_empty     (const igraph_vector_ptr_t* v) {
  */
 
 long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v) {
-    assert(v != NULL);
-    /*  assert(v->stor_begin != NULL);       */ /* TODO */
+    IGRAPH_ASSERT(v != NULL);
+    /*  IGRAPH_ASSERT(v->stor_begin != NULL);       */ /* TODO */
     return v->end - v->stor_begin;
 }
 
@@ -289,8 +288,8 @@ long int igraph_vector_ptr_size      (const igraph_vector_ptr_t* v) {
  */
 
 void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     igraph_i_vector_ptr_call_item_destructor_all(v);
     v->end = v->stor_begin;
 }
@@ -312,8 +311,8 @@ void igraph_vector_ptr_clear     (igraph_vector_ptr_t* v) {
  */
 
 int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
 
     /* full, allocate more storage */
     if (v->stor_end == v->end) {
@@ -331,9 +330,9 @@ int igraph_vector_ptr_push_back (igraph_vector_ptr_t* v, void* e) {
 }
 
 void *igraph_vector_ptr_pop_back (igraph_vector_ptr_t *v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
-    assert(v->stor_begin != v->end);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->stor_begin != v->end);
     v->end -= 1;
     return *(v->end);
 }
@@ -376,8 +375,8 @@ int igraph_vector_ptr_insert(igraph_vector_ptr_t* v, long int pos, void* e) {
  */
 
 void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return * (v->stor_begin + pos);
 }
 
@@ -394,8 +393,8 @@ void* igraph_vector_ptr_e         (const igraph_vector_ptr_t* v, long int pos) {
  */
 
 void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, long int pos, void* value) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     *(v->stor_begin + pos) = value;
 }
 
@@ -405,8 +404,8 @@ void igraph_vector_ptr_set       (igraph_vector_ptr_t* v, long int pos, void* va
  */
 
 void igraph_vector_ptr_null      (igraph_vector_ptr_t* v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     if (igraph_vector_ptr_size(v) > 0) {
         memset(v->stor_begin, 0, sizeof(void*) *
                (size_t) igraph_vector_ptr_size(v));
@@ -465,8 +464,8 @@ int igraph_vector_ptr_init_copy(igraph_vector_ptr_t *v, void * *data, long int l
  */
 
 void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     if (v->end != v->stor_begin) {
         memcpy(to, v->stor_begin, sizeof(void*) *
                (size_t) (v->end - v->stor_begin));
@@ -500,8 +499,8 @@ void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to) {
  */
 
 int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from) {
-    assert(from != NULL);
-    /*   assert(from->stor_begin != NULL); */ /* TODO */
+    IGRAPH_ASSERT(from != NULL);
+    /*   IGRAPH_ASSERT(from->stor_begin != NULL); */ /* TODO */
     to->stor_begin = igraph_Calloc(igraph_vector_ptr_size(from), void*);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy ptr vector", IGRAPH_ENOMEM);
@@ -521,8 +520,8 @@ int igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *f
  */
 
 void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, long int pos) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     if (pos + 1 < igraph_vector_ptr_size(v)) { /* TOOD: why is this needed */
         memmove(v->stor_begin + pos, v->stor_begin + pos + 1,
                 sizeof(void*) * (size_t) (igraph_vector_ptr_size(v) - pos - 1));
@@ -623,6 +622,6 @@ igraph_finally_func_t* igraph_vector_ptr_set_item_destructor(
  * Time complexity: O(1).
  */
 igraph_finally_func_t* igraph_vector_ptr_get_item_destructor(const igraph_vector_ptr_t *v) {
-    assert(v != 0);
+    IGRAPH_ASSERT(v != 0);
     return v->item_destructor;
 }
