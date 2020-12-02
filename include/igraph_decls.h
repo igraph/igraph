@@ -13,16 +13,12 @@
  * Reference: https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros */
 #undef DECLDIR
 #if defined (_WIN32)
-    #if defined (__CYGWIN__)
+    #ifdef IGRAPH_EXPORTS
+        #define DECLDIR __declspec(dllexport)
+    #elif defined(IGRAPH_STATIC)
         #define DECLDIR /**/
     #else
-        #ifdef IGRAPH_EXPORTS
-            #define DECLDIR __declspec(dllexport)
-        #elif defined(IGRAPH_STATIC)
-            #define DECLDIR /**/
-        #else
-            #define DECLDIR __declspec(dllimport)
-        #endif
+        #define DECLDIR __declspec(dllimport)
     #endif
 #else
     #define DECLDIR /**/
