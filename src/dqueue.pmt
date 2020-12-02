@@ -25,7 +25,6 @@
 #include "igraph_error.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 
@@ -56,7 +55,7 @@
  */
 
 int FUNCTION(igraph_dqueue, init) (TYPE(igraph_dqueue)* q, long int size) {
-    assert(q != 0);
+    IGRAPH_ASSERT(q != 0);
     if (size <= 0 ) {
         size = 1;
     }
@@ -82,7 +81,7 @@ int FUNCTION(igraph_dqueue, init) (TYPE(igraph_dqueue)* q, long int size) {
  */
 
 void FUNCTION(igraph_dqueue, destroy) (TYPE(igraph_dqueue)* q) {
-    assert(q != 0);
+    IGRAPH_ASSERT(q != 0);
     if (q->stor_begin != 0) {
         igraph_Free(q->stor_begin);
         q->stor_begin = 0;
@@ -102,8 +101,8 @@ void FUNCTION(igraph_dqueue, destroy) (TYPE(igraph_dqueue)* q) {
  */
 
 igraph_bool_t FUNCTION(igraph_dqueue, empty) (const TYPE(igraph_dqueue)* q) {
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     return q->end == NULL;
 }
 
@@ -118,8 +117,8 @@ igraph_bool_t FUNCTION(igraph_dqueue, empty) (const TYPE(igraph_dqueue)* q) {
  */
 
 void FUNCTION(igraph_dqueue, clear)   (TYPE(igraph_dqueue)* q) {
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     q->begin = q->stor_begin;
     q->end = NULL;
 }
@@ -138,8 +137,8 @@ void FUNCTION(igraph_dqueue, clear)   (TYPE(igraph_dqueue)* q) {
  */
 
 igraph_bool_t FUNCTION(igraph_dqueue, full) (TYPE(igraph_dqueue)* q) {
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     return q->begin == q->end;
 }
 
@@ -155,8 +154,8 @@ igraph_bool_t FUNCTION(igraph_dqueue, full) (TYPE(igraph_dqueue)* q) {
  */
 
 long int FUNCTION(igraph_dqueue, size) (const TYPE(igraph_dqueue)* q) {
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     if (q->end == NULL) {
         return 0;
     } else if (q->begin < q->end) {
@@ -179,8 +178,8 @@ long int FUNCTION(igraph_dqueue, size) (const TYPE(igraph_dqueue)* q) {
  */
 
 BASE FUNCTION(igraph_dqueue, head) (const TYPE(igraph_dqueue)* q) {
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     return *(q->begin);
 }
 
@@ -197,8 +196,8 @@ BASE FUNCTION(igraph_dqueue, head) (const TYPE(igraph_dqueue)* q) {
  */
 
 BASE FUNCTION(igraph_dqueue, back) (const TYPE(igraph_dqueue)* q) {
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     if (q->end == q->stor_begin) {
         return *(q->stor_end - 1);
     }
@@ -220,8 +219,8 @@ BASE FUNCTION(igraph_dqueue, back) (const TYPE(igraph_dqueue)* q) {
 
 BASE FUNCTION(igraph_dqueue, pop) (TYPE(igraph_dqueue)* q) {
     BASE tmp = *(q->begin);
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     (q->begin)++;
     if (q->begin == q->stor_end) {
         q->begin = q->stor_begin;
@@ -248,8 +247,8 @@ BASE FUNCTION(igraph_dqueue, pop) (TYPE(igraph_dqueue)* q) {
 
 BASE FUNCTION(igraph_dqueue, pop_back) (TYPE(igraph_dqueue)* q) {
     BASE tmp;
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     if (q->end != q->stor_begin) {
         tmp = *((q->end) - 1);
         q->end = (q->end) - 1;
@@ -282,8 +281,8 @@ BASE FUNCTION(igraph_dqueue, pop_back) (TYPE(igraph_dqueue)* q) {
  */
 
 int FUNCTION(igraph_dqueue, push) (TYPE(igraph_dqueue)* q, BASE elem) {
-    assert(q != 0);
-    assert(q->stor_begin != 0);
+    IGRAPH_ASSERT(q != 0);
+    IGRAPH_ASSERT(q->stor_begin != 0);
     if (q->begin != q->end) {
         /* not full */
         if (q->end == NULL) {

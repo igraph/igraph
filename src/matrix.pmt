@@ -25,7 +25,6 @@
 #include "igraph_random.h"
 #include "igraph_error.h"
 
-#include <assert.h>
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 

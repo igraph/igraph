@@ -27,7 +27,6 @@
 #include "igraph_error.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>     /* memcpy & co. */
 
 /**
@@ -54,7 +53,7 @@
  */
 
 int igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol) {
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&m->ridx, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&m->cidx, ncol + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&m->data, 0);
@@ -79,7 +78,7 @@ int igraph_spmatrix_init(igraph_spmatrix_t *m, long int nrow, long int ncol) {
  */
 
 void igraph_spmatrix_destroy(igraph_spmatrix_t *m) {
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     igraph_vector_destroy(&m->ridx);
     igraph_vector_destroy(&m->cidx);
     igraph_vector_destroy(&m->data);
@@ -102,8 +101,8 @@ void igraph_spmatrix_destroy(igraph_spmatrix_t *m) {
  */
 
 int igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
-    assert(from != NULL);
-    assert(to != NULL);
+    IGRAPH_ASSERT(from != NULL);
+    IGRAPH_ASSERT(to != NULL);
     to->nrow = from->nrow;
     to->ncol = from->ncol;
     IGRAPH_CHECK(igraph_vector_copy(&to->ridx, &from->ridx));
@@ -133,7 +132,7 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
                                 long int row, long int col) {
     long int start, end;
 
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
     end = (long) VECTOR(m->cidx)[col + 1] - 1;
 
@@ -182,7 +181,7 @@ int igraph_spmatrix_set(igraph_spmatrix_t *m, long int row, long int col,
                         igraph_real_t value) {
     long int start, end;
 
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
     end = (long) VECTOR(m->cidx)[col + 1] - 1;
 
@@ -281,7 +280,7 @@ int igraph_spmatrix_add_e(igraph_spmatrix_t *m, long int row, long int col,
                           igraph_real_t value) {
     long int start, end;
 
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     start = (long) VECTOR(m->cidx)[col];
     end = (long) VECTOR(m->cidx)[col + 1] - 1;
 
@@ -399,7 +398,7 @@ int igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, long int to, long int f
 
 int igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol) {
     long int i, j, ci, ei, mincol;
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     /* Iterating through the matrix data and deleting unnecessary data. */
     /* At the same time, we create the new indices as well */
     if (nrow < m->nrow) {
@@ -441,7 +440,7 @@ int igraph_spmatrix_resize(igraph_spmatrix_t *m, long int nrow, long int ncol) {
  */
 
 long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     return igraph_vector_size(&m->data);
 }
 
@@ -458,7 +457,7 @@ long int igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
  */
 
 long int igraph_spmatrix_size(const igraph_spmatrix_t *m) {
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     return (m->nrow) * (m->ncol);
 }
 
@@ -474,7 +473,7 @@ long int igraph_spmatrix_size(const igraph_spmatrix_t *m) {
  */
 
 long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     return m->nrow;
 }
 
@@ -490,7 +489,7 @@ long int igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
  */
 
 long int igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     return m->ncol;
 }
 
@@ -536,7 +535,7 @@ int igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
  */
 
 int igraph_spmatrix_null(igraph_spmatrix_t *m) {
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     igraph_vector_clear(&m->data);
     igraph_vector_clear(&m->ridx);
     igraph_vector_null(&m->cidx);
@@ -588,7 +587,7 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
     long int ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
     for (ci = 0, i = 0, j = 1; ci < m->ncol; ci++) {
         for (ei = (long int) VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
@@ -619,7 +618,7 @@ int igraph_spmatrix_clear_row(igraph_spmatrix_t *m, long int row) {
 int igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, long int row) {
     long int ei, n;
 
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     n = igraph_vector_size(&m->data);
     for (ei = 0; ei < n; ei++) {
         if (VECTOR(m->ridx)[ei] == row) {
@@ -633,7 +632,7 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     long int ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&permvec, igraph_vector_size(&m->data));
     for (ci = 0, i = 0, j = 1; ci < m->ncol; ci++) {
         for (ei = (long int) VECTOR(m->cidx)[ci]; ei < VECTOR(m->cidx)[ci + 1]; ei++) {
@@ -673,7 +672,7 @@ int igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
 
 int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
     long int i, n;
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     n = (long)VECTOR(m->cidx)[col + 1] - (long)VECTOR(m->cidx)[col];
     if (n == 0) {
         return 0;
@@ -698,7 +697,7 @@ int igraph_spmatrix_clear_col(igraph_spmatrix_t *m, long int col) {
  */
 
 void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     igraph_vector_scale(&m->data, by);
 }
 
@@ -714,7 +713,7 @@ void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
 
 int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
     long int i, c;
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     IGRAPH_CHECK(igraph_vector_resize(res, m->ncol));
     igraph_vector_null(res);
     for (c = 0; c < m->ncol; c++) {
@@ -737,7 +736,7 @@ int igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
 
 int igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
     long int i, n;
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
 
     IGRAPH_CHECK(igraph_vector_resize(res, m->nrow));
     n = igraph_vector_size(&m->data);
@@ -764,7 +763,7 @@ igraph_real_t igraph_spmatrix_max_nonzero(const igraph_spmatrix_t *m,
     igraph_real_t res;
     long int i, n, maxidx;
 
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     n = igraph_vector_size(&m->data);
     if (n == 0) {
         return 0.0;
@@ -811,7 +810,7 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
     igraph_real_t res;
     long int i, j, k, maxidx;
 
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     i = igraph_vector_size(&m->data);
     if (i == 0) {
         return 0.0;
@@ -863,7 +862,7 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
 int igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
         igraph_vector_t *res, long int col) {
     long int i, n;
-    assert(m != NULL);
+    IGRAPH_ASSERT(m != NULL);
     n = (long int) (VECTOR(m->cidx)[col + 1] - VECTOR(m->cidx)[col]);
     IGRAPH_CHECK(igraph_vector_resize(res, n));
     for (i = (long int) VECTOR(m->cidx)[col], n = 0;
@@ -918,7 +917,7 @@ int igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatr
  * Time complexity: O(1).
  */
 int igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
-    assert(mit->m);
+    IGRAPH_ASSERT(mit->m);
 
     if (igraph_spmatrix_count_nonzero(mit->m) == 0) {
         mit->pos = mit->ri = mit->ci = -1L;

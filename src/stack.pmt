@@ -26,7 +26,6 @@
 #include "igraph_error.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 
@@ -45,7 +44,7 @@
 
 int FUNCTION(igraph_stack, init)       (TYPE(igraph_stack)* s, long int size) {
     long int alloc_size = size > 0 ? size : 1;
-    assert (s != NULL);
+    IGRAPH_ASSERT(s != NULL);
     if (size < 0) {
         size = 0;
     }
@@ -73,7 +72,7 @@ int FUNCTION(igraph_stack, init)       (TYPE(igraph_stack)* s, long int size) {
  */
 
 void FUNCTION(igraph_stack, destroy)    (TYPE(igraph_stack)* s) {
-    assert( s != NULL);
+    IGRAPH_ASSERT(s != NULL);
     if (s->stor_begin != 0) {
         igraph_Free(s->stor_begin);
         s->stor_begin = NULL;
@@ -99,8 +98,8 @@ void FUNCTION(igraph_stack, destroy)    (TYPE(igraph_stack)* s) {
 int FUNCTION(igraph_stack, reserve)    (TYPE(igraph_stack)* s, long int size) {
     long int actual_size = FUNCTION(igraph_stack, size)(s);
     BASE *tmp;
-    assert(s != NULL);
-    assert(s->stor_begin != NULL);
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
 
     if (size <= actual_size) {
         return 0;
@@ -130,9 +129,9 @@ int FUNCTION(igraph_stack, reserve)    (TYPE(igraph_stack)* s, long int size) {
  */
 
 igraph_bool_t FUNCTION(igraph_stack, empty)      (TYPE(igraph_stack)* s) {
-    assert (s != NULL);
-    assert (s->stor_begin != NULL);
-    assert (s->end != NULL);
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    IGRAPH_ASSERT(s->end != NULL);
     return s->stor_begin == s->end;
 }
 
@@ -148,8 +147,8 @@ igraph_bool_t FUNCTION(igraph_stack, empty)      (TYPE(igraph_stack)* s) {
  */
 
 long int FUNCTION(igraph_stack, size)       (const TYPE(igraph_stack)* s) {
-    assert (s != NULL);
-    assert (s->stor_begin != NULL);
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
     return s->end - s->stor_begin;
 }
 
@@ -164,8 +163,8 @@ long int FUNCTION(igraph_stack, size)       (const TYPE(igraph_stack)* s) {
  */
 
 void FUNCTION(igraph_stack, clear)      (TYPE(igraph_stack)* s) {
-    assert (s != NULL);
-    assert (s->stor_begin != NULL);
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
     s->end = s->stor_begin;
 }
 
@@ -185,8 +184,8 @@ void FUNCTION(igraph_stack, clear)      (TYPE(igraph_stack)* s) {
  */
 
 int FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem) {
-    assert (s != NULL);
-    assert (s->stor_begin != NULL);
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
     if (s->end == s->stor_end) {
         /* full, allocate more storage */
 
@@ -229,10 +228,10 @@ int FUNCTION(igraph_stack, push)(TYPE(igraph_stack)* s, BASE elem) {
 
 BASE FUNCTION(igraph_stack, pop)        (TYPE(igraph_stack)* s) {
 
-    assert (s != NULL);
-    assert (s->stor_begin != NULL);
-    assert (s->end != NULL);
-    assert (s->end != s->stor_begin);
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    IGRAPH_ASSERT(s->end != NULL);
+    IGRAPH_ASSERT(s->end != s->stor_begin);
 
     (s->end)--;
 
@@ -254,10 +253,10 @@ BASE FUNCTION(igraph_stack, pop)        (TYPE(igraph_stack)* s) {
 
 BASE FUNCTION(igraph_stack, top)        (const TYPE(igraph_stack)* s) {
 
-    assert (s != NULL);
-    assert (s->stor_begin != NULL);
-    assert (s->end != NULL);
-    assert (s->end != s->stor_begin);
+    IGRAPH_ASSERT(s != NULL);
+    IGRAPH_ASSERT(s->stor_begin != NULL);
+    IGRAPH_ASSERT(s->end != NULL);
+    IGRAPH_ASSERT(s->end != s->stor_begin);
 
     return *(s->end - 1);
 }

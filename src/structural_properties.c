@@ -42,10 +42,10 @@
 #include "igraph_neighborhood.h"
 #include "igraph_topology.h"
 #include "igraph_qsort.h"
+#include "igraph_error.h"
 #include "config.h"
 #include "structural_properties_internal.h"
 
-#include <assert.h>
 #include <string.h>
 #include <limits.h>
 
@@ -4799,7 +4799,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
                 printf("  Considering parent: %ld\n", parent_node);
                 printf("  Paths to parent start at index %ld in res\n", parent_path_idx);
                 */
-                assert(parent_path_idx >= 0);
+                IGRAPH_ASSERT(parent_path_idx >= 0);
                 for (; parent_path_idx < path_count; parent_path_idx++) {
                     parent_path = (igraph_vector_t*)VECTOR(*res)[parent_path_idx];
                     if (igraph_vector_tail(parent_path) != parent_node) {

@@ -28,7 +28,6 @@
 #include "igraph_error.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 

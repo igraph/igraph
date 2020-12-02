@@ -28,7 +28,6 @@
 #include "igraph_math.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 
@@ -114,7 +113,7 @@ int igraph_indheap_init_array     (igraph_indheap_t *h, igraph_real_t* data, lon
  */
 
 void igraph_indheap_destroy        (igraph_indheap_t* h) {
-    assert(h != 0);
+    IGRAPH_ASSERT(h != 0);
     if (h->destroy) {
         if (h->stor_begin != 0) {
             igraph_Free(h->stor_begin);
@@ -133,8 +132,8 @@ void igraph_indheap_destroy        (igraph_indheap_t* h) {
  */
 
 igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
     return h->stor_begin == h->end;
 }
 
@@ -144,8 +143,8 @@ igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h) {
  */
 
 int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
@@ -172,8 +171,8 @@ int igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
  */
 
 int igraph_indheap_push_with_index(igraph_indheap_t* h, long int idx, igraph_real_t elem) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
@@ -202,8 +201,8 @@ int igraph_indheap_push_with_index(igraph_indheap_t* h, long int idx, igraph_rea
 int igraph_indheap_modify(igraph_indheap_t* h, long int idx, igraph_real_t elem) {
     long int i, n;
 
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
 
     n = igraph_indheap_size(h);
     for (i = 0; i < n; i++)
@@ -228,9 +227,9 @@ int igraph_indheap_modify(igraph_indheap_t* h, long int idx, igraph_real_t elem)
  */
 
 igraph_real_t igraph_indheap_max       (igraph_indheap_t* h) {
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
-    assert(h->stor_begin != h->end);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h->stor_begin != h->end);
 
     return h->stor_begin[0];
 }
@@ -243,8 +242,8 @@ igraph_real_t igraph_indheap_max       (igraph_indheap_t* h) {
 igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h) {
     igraph_real_t tmp;
 
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     tmp = h->stor_begin[0];
     igraph_indheap_i_switch(h, 0, igraph_indheap_size(h) - 1);
@@ -260,8 +259,8 @@ igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h) {
  */
 
 long int igraph_indheap_size      (igraph_indheap_t* h) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
     return h->end - h->stor_begin;
 }
 
@@ -277,8 +276,8 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
     long int actual_size = igraph_indheap_size(h);
     igraph_real_t *tmp1;
     long int *tmp2;
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
 
     if (size <= actual_size) {
         return 0;
@@ -314,8 +313,8 @@ int igraph_indheap_reserve        (igraph_indheap_t* h, long int size) {
  */
 
 long int igraph_indheap_max_index(igraph_indheap_t *h) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
     return h->index_begin[0];
 }
 
@@ -450,7 +449,7 @@ int igraph_d_indheap_init           (igraph_d_indheap_t* h, long int alloc_size)
  */
 
 void igraph_d_indheap_destroy        (igraph_d_indheap_t* h) {
-    assert(h != 0);
+    IGRAPH_ASSERT(h != 0);
     if (h->destroy) {
         if (h->stor_begin != 0) {
             igraph_Free(h->stor_begin);
@@ -473,8 +472,8 @@ void igraph_d_indheap_destroy        (igraph_d_indheap_t* h) {
  */
 
 igraph_bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
     return h->stor_begin == h->end;
 }
 
@@ -485,8 +484,8 @@ igraph_bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h) {
 
 int igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
                                      long int idx, long int idx2) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
 
     /* full, allocate more storage */
     if (h->stor_end == h->end) {
@@ -514,9 +513,9 @@ int igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
  */
 
 igraph_real_t igraph_d_indheap_max       (igraph_d_indheap_t* h) {
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
-    assert(h->stor_begin != h->end);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h->stor_begin != h->end);
 
     return h->stor_begin[0];
 }
@@ -529,8 +528,8 @@ igraph_real_t igraph_d_indheap_max       (igraph_d_indheap_t* h) {
 igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h) {
     igraph_real_t tmp;
 
-    assert(h != NULL);
-    assert(h->stor_begin != NULL);
+    IGRAPH_ASSERT(h != NULL);
+    IGRAPH_ASSERT(h->stor_begin != NULL);
 
     tmp = h->stor_begin[0];
     igraph_d_indheap_i_switch(h, 0, igraph_d_indheap_size(h) - 1);
@@ -546,8 +545,8 @@ igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h) {
  */
 
 long int igraph_d_indheap_size      (igraph_d_indheap_t* h) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
     return h->end - h->stor_begin;
 }
 
@@ -563,8 +562,8 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
     long int actual_size = igraph_d_indheap_size(h);
     igraph_real_t *tmp1;
     long int *tmp2, *tmp3;
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
 
     if (size <= actual_size) {
         return 0;
@@ -609,8 +608,8 @@ int igraph_d_indheap_reserve        (igraph_d_indheap_t* h, long int size) {
  */
 
 void igraph_d_indheap_max_index(igraph_d_indheap_t *h, long int *idx, long int *idx2) {
-    assert(h != 0);
-    assert(h->stor_begin != 0);
+    IGRAPH_ASSERT(h != 0);
+    IGRAPH_ASSERT(h->stor_begin != 0);
     (*idx) = h->index_begin[0];
     (*idx2) = h->index2_begin[0];
 }

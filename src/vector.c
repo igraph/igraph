@@ -21,6 +21,7 @@
 
 */
 
+#include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_types_internal.h"
 #include "igraph_complex.h"
@@ -144,8 +145,8 @@ int igraph_vector_order(const igraph_vector_t* v,
     igraph_vector_t rad;
     long int i, j;
 
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
 
     IGRAPH_VECTOR_INIT_FINALLY(&ptr, (long int) nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
@@ -209,8 +210,8 @@ int igraph_vector_order1(const igraph_vector_t* v,
     igraph_vector_t rad;
     long int i, j;
 
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
 
     IGRAPH_VECTOR_INIT_FINALLY(&ptr, (long int) nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
@@ -251,8 +252,8 @@ int igraph_vector_order1_int(const igraph_vector_t* v,
     igraph_vector_t rad;
     long int i, j;
 
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
 
     IGRAPH_VECTOR_INIT_FINALLY(&ptr, (long int) nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
@@ -425,10 +426,10 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
                                   const igraph_vector_t *rhs,
                                   igraph_real_t tol) {
     long int i, s;
-    assert(lhs != 0);
-    assert(rhs != 0);
-    assert(lhs->stor_begin != 0);
-    assert(rhs->stor_begin != 0);
+    IGRAPH_ASSERT(lhs != 0);
+    IGRAPH_ASSERT(rhs != 0);
+    IGRAPH_ASSERT(lhs->stor_begin != 0);
+    IGRAPH_ASSERT(rhs->stor_begin != 0);
 
     s = igraph_vector_size(lhs);
     if (s != igraph_vector_size(rhs)) {

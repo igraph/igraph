@@ -26,7 +26,6 @@
 #include "igraph_random.h"
 #include "igraph_qsort.h"
 
-#include <assert.h>
 #include <string.h>         /* memcpy & co. */
 #include <stdlib.h>
 #include <stdarg.h>     /* va_start & co */
@@ -161,7 +160,7 @@ const TYPE(igraph_vector)*FUNCTION(igraph_vector, view) (const TYPE(igraph_vecto
         long int length) {
     TYPE(igraph_vector) *v2 = (TYPE(igraph_vector)*)v;
 
-    assert(data != 0);
+    IGRAPH_ASSERT(data != 0);
 
     v2->stor_begin = (BASE*)data;
     v2->stor_end = (BASE*)data + length;
@@ -376,7 +375,7 @@ int FUNCTION(igraph_vector_init, int_end)(TYPE(igraph_vector) *v, int endmark, .
  */
 
 void FUNCTION(igraph_vector, destroy)   (TYPE(igraph_vector)* v) {
-    assert(v != 0);
+    IGRAPH_ASSERT(v != 0);
     if (v->stor_begin != 0) {
         igraph_Free(v->stor_begin);
         v->stor_begin = NULL;
@@ -435,8 +434,8 @@ long int FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v) {
 int FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, long int size) {
     long int actual_size = FUNCTION(igraph_vector, size)(v);
     BASE *tmp;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     if (size <= FUNCTION(igraph_vector, size)(v)) {
         return 0;
     }
@@ -465,8 +464,8 @@ int FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, long int size) {
  */
 
 igraph_bool_t FUNCTION(igraph_vector, empty)     (const TYPE(igraph_vector)* v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->stor_begin == v->end;
 }
 
@@ -482,8 +481,8 @@ igraph_bool_t FUNCTION(igraph_vector, empty)     (const TYPE(igraph_vector)* v) 
  */
 
 long int FUNCTION(igraph_vector, size)      (const TYPE(igraph_vector)* v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->end - v->stor_begin;
 }
 
@@ -502,8 +501,8 @@ long int FUNCTION(igraph_vector, size)      (const TYPE(igraph_vector)* v) {
  */
 
 void FUNCTION(igraph_vector, clear)     (TYPE(igraph_vector)* v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     v->end = v->stor_begin;
 }
 
@@ -533,8 +532,8 @@ void FUNCTION(igraph_vector, clear)     (TYPE(igraph_vector)* v) {
  */
 
 int FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE e) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
 
     /* full, allocate more storage */
     if (v->stor_end == v->end) {
@@ -610,8 +609,8 @@ int FUNCTION(igraph_vector, insert)(TYPE(igraph_vector) *v, long int pos,
  */
 
 BASE FUNCTION(igraph_vector, e)         (const TYPE(igraph_vector)* v, long int pos) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return * (v->stor_begin + pos);
 }
 
@@ -629,8 +628,8 @@ BASE FUNCTION(igraph_vector, e)         (const TYPE(igraph_vector)* v, long int 
  */
 
 BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, long int pos) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return v->stor_begin + pos;
 }
 
@@ -646,8 +645,8 @@ BASE* FUNCTION(igraph_vector, e_ptr)  (const TYPE(igraph_vector)* v, long int po
 
 void FUNCTION(igraph_vector, set)       (TYPE(igraph_vector)* v,
         long int pos, BASE value) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     *(v->stor_begin + pos) = value;
 }
 
@@ -668,8 +667,8 @@ void FUNCTION(igraph_vector, set)       (TYPE(igraph_vector)* v,
  */
 
 void FUNCTION(igraph_vector, null)      (TYPE(igraph_vector)* v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     if (FUNCTION(igraph_vector, size)(v) > 0) {
         memset(v->stor_begin, 0,
                sizeof(BASE) * (size_t) FUNCTION(igraph_vector, size)(v));
@@ -689,8 +688,8 @@ void FUNCTION(igraph_vector, null)      (TYPE(igraph_vector)* v) {
 
 void FUNCTION(igraph_vector, fill)      (TYPE(igraph_vector)* v, BASE e) {
     BASE *ptr;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
         *ptr = e;
     }
@@ -711,8 +710,8 @@ void FUNCTION(igraph_vector, fill)      (TYPE(igraph_vector)* v, BASE e) {
  */
 
 BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     return *((v->end) - 1);
 }
 
@@ -731,9 +730,9 @@ BASE FUNCTION(igraph_vector, tail)(const TYPE(igraph_vector) *v) {
 
 BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
     BASE tmp;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
-    assert(v->end != v->stor_begin);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v->end != v->stor_begin);
     tmp = FUNCTION(igraph_vector, e)(v, FUNCTION(igraph_vector, size)(v) - 1);
     v->end -= 1;
     return tmp;
@@ -781,8 +780,8 @@ int FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
  */
 
 void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     igraph_qsort(v->stor_begin, (size_t) FUNCTION(igraph_vector, size)(v),
                  sizeof(BASE), FUNCTION(igraph_vector, sort_cmp));
 }
@@ -799,8 +798,8 @@ void FUNCTION(igraph_vector, sort)(TYPE(igraph_vector) *v) {
  */
 
 void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     igraph_qsort(v->stor_begin, (size_t) FUNCTION(igraph_vector, size)(v),
                  sizeof(BASE), FUNCTION(igraph_vector, reverse_sort_cmp));
 }
@@ -923,8 +922,8 @@ long int FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  */
 
 int FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, long int newsize) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(v, newsize));
     v->end = v->stor_begin + newsize;
     return 0;
@@ -985,8 +984,8 @@ int FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
 BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     BASE max;
     BASE *ptr;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     max = *(v->stor_begin);
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
@@ -1019,8 +1018,8 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
         BASE max;
         BASE *ptr;
         long int pos;
-        assert(v != NULL);
-        assert(v->stor_begin != NULL);
+        IGRAPH_ASSERT(v != NULL);
+        IGRAPH_ASSERT(v->stor_begin != NULL);
         max = *(v->stor_begin); which = 0;
         ptr = v->stor_begin + 1; pos = 1;
         while (ptr < v->end) {
@@ -1048,8 +1047,8 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
 BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
     BASE min;
     BASE *ptr;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     min = *(v->stor_begin);
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
@@ -1080,8 +1079,8 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
         BASE min;
         BASE *ptr;
         long int pos;
-        assert(v != NULL);
-        assert(v->stor_begin != NULL);
+        IGRAPH_ASSERT(v != NULL);
+        IGRAPH_ASSERT(v->stor_begin != NULL);
         min = *(v->stor_begin); which = 0;
         ptr = v->stor_begin + 1; pos = 1;
         while (ptr < v->end) {
@@ -1141,8 +1140,8 @@ int FUNCTION(igraph_vector, init_copy)(TYPE(igraph_vector) *v,
 
 void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
 
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     if (v->end != v->stor_begin) {
         memcpy(to, v->stor_begin, sizeof(BASE) * (size_t) (v->end - v->stor_begin));
     }
@@ -1168,8 +1167,8 @@ void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
 
 int FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
                                   const TYPE(igraph_vector) *from) {
-    assert(from != NULL);
-    assert(from->stor_begin != NULL);
+    IGRAPH_ASSERT(from != NULL);
+    IGRAPH_ASSERT(from->stor_begin != NULL);
     to->stor_begin = igraph_Calloc(FUNCTION(igraph_vector, size)(from), BASE);
     if (to->stor_begin == 0) {
         IGRAPH_ERROR("cannot copy vector", IGRAPH_ENOMEM);
@@ -1199,8 +1198,8 @@ int FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
 BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v) {
     BASE res = ZERO;
     BASE *p;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
 #ifdef SUM
         SUM(res, res, *p);
@@ -1214,8 +1213,8 @@ BASE FUNCTION(igraph_vector, sum)(const TYPE(igraph_vector) *v) {
 igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v) {
     igraph_real_t res = 0.0;
     BASE *p;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
 #ifdef SQ
         res += SQ(*p);
@@ -1243,8 +1242,8 @@ igraph_real_t FUNCTION(igraph_vector, sumsq)(const TYPE(igraph_vector) *v) {
 BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v) {
     BASE res = ONE;
     BASE *p;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     for (p = v->stor_begin; p < v->end; p++) {
 #ifdef PROD
         PROD(res, res, *p);
@@ -1275,10 +1274,10 @@ int FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
     BASE res = ZERO;
     BASE *p, *p2;
 
-    assert(from != NULL);
-    assert(from->stor_begin != NULL);
-    assert(to != NULL);
-    assert(to->stor_begin != NULL);
+    IGRAPH_ASSERT(from != NULL);
+    IGRAPH_ASSERT(from->stor_begin != NULL);
+    IGRAPH_ASSERT(to != NULL);
+    IGRAPH_ASSERT(to->stor_begin != NULL);
 
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(to, FUNCTION(igraph_vector, size)(from)));
 
@@ -1347,8 +1346,8 @@ int FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
 
 void FUNCTION(igraph_vector, remove_section)(TYPE(igraph_vector) *v,
         long int from, long int to) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     /* Not removing from the end? */
     if (to < FUNCTION(igraph_vector, size)(v)) {
         memmove(v->stor_begin + from, v->stor_begin + to,
@@ -1372,8 +1371,8 @@ void FUNCTION(igraph_vector, remove_section)(TYPE(igraph_vector) *v,
  */
 
 void FUNCTION(igraph_vector, remove)(TYPE(igraph_vector) *v, long int elem) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     FUNCTION(igraph_vector, remove_section)(v, elem, elem + 1);
 }
 
@@ -1398,8 +1397,8 @@ void FUNCTION(igraph_vector, remove)(TYPE(igraph_vector) *v, long int elem) {
 int FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
         long int begin, long int end,
         long int to) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     memcpy(v->stor_begin + to, v->stor_begin + begin,
            sizeof(BASE) * (size_t) (end - begin));
 
@@ -1409,8 +1408,8 @@ int FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
 int FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
         long int begin, long int end,
         long int to) {
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     memmove(v->stor_begin + to, v->stor_begin + begin,
             sizeof(BASE) * (size_t) (end - begin));
 
@@ -1426,8 +1425,8 @@ int FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
 void FUNCTION(igraph_vector, permdelete)(TYPE(igraph_vector) *v,
         const igraph_vector_t *index, long int nremove) {
     long int i, n;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     n = FUNCTION(igraph_vector, size)(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*index)[i] != 0) {
@@ -1459,8 +1458,8 @@ igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v
         BASE low,
         BASE high) {
     BASE *ptr;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
         if (*ptr < low || *ptr > high) {
             return 0;
@@ -1487,8 +1486,8 @@ igraph_bool_t FUNCTION(igraph_vector, isininterval)(const TYPE(igraph_vector) *v
 igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
         BASE limit) {
     BASE *ptr;
-    assert(v != NULL);
-    assert(v->stor_begin != NULL);
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
     for (ptr = v->stor_begin; ptr < v->end; ptr++) {
         if (*ptr < limit) {
             return 1;
@@ -1516,10 +1515,10 @@ igraph_bool_t FUNCTION(igraph_vector, any_smaller)(const TYPE(igraph_vector) *v,
 igraph_bool_t FUNCTION(igraph_vector, all_e)(const TYPE(igraph_vector) *lhs,
         const TYPE(igraph_vector) *rhs) {
     long int i, s;
-    assert(lhs != 0);
-    assert(rhs != 0);
-    assert(lhs->stor_begin != 0);
-    assert(rhs->stor_begin != 0);
+    IGRAPH_ASSERT(lhs != 0);
+    IGRAPH_ASSERT(rhs != 0);
+    IGRAPH_ASSERT(lhs->stor_begin != 0);
+    IGRAPH_ASSERT(rhs->stor_begin != 0);
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
@@ -1565,10 +1564,10 @@ FUNCTION(igraph_vector, is_equal)(const TYPE(igraph_vector) *lhs,
 igraph_bool_t FUNCTION(igraph_vector, all_l)(const TYPE(igraph_vector) *lhs,
         const TYPE(igraph_vector) *rhs) {
     long int i, s;
-    assert(lhs != 0);
-    assert(rhs != 0);
-    assert(lhs->stor_begin != 0);
-    assert(rhs->stor_begin != 0);
+    IGRAPH_ASSERT(lhs != 0);
+    IGRAPH_ASSERT(rhs != 0);
+    IGRAPH_ASSERT(lhs->stor_begin != 0);
+    IGRAPH_ASSERT(rhs->stor_begin != 0);
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
@@ -1603,10 +1602,10 @@ igraph_bool_t FUNCTION(igraph_vector, all_g)(const TYPE(igraph_vector) *lhs,
         const TYPE(igraph_vector) *rhs) {
 
     long int i, s;
-    assert(lhs != 0);
-    assert(rhs != 0);
-    assert(lhs->stor_begin != 0);
-    assert(rhs->stor_begin != 0);
+    IGRAPH_ASSERT(lhs != 0);
+    IGRAPH_ASSERT(rhs != 0);
+    IGRAPH_ASSERT(lhs->stor_begin != 0);
+    IGRAPH_ASSERT(rhs->stor_begin != 0);
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
@@ -1642,10 +1641,10 @@ igraph_bool_t
 FUNCTION(igraph_vector, all_le)(const TYPE(igraph_vector) *lhs,
                                 const TYPE(igraph_vector) *rhs) {
     long int i, s;
-    assert(lhs != 0);
-    assert(rhs != 0);
-    assert(lhs->stor_begin != 0);
-    assert(rhs->stor_begin != 0);
+    IGRAPH_ASSERT(lhs != 0);
+    IGRAPH_ASSERT(rhs != 0);
+    IGRAPH_ASSERT(lhs->stor_begin != 0);
+    IGRAPH_ASSERT(rhs->stor_begin != 0);
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {
@@ -1681,10 +1680,10 @@ igraph_bool_t
 FUNCTION(igraph_vector, all_ge)(const TYPE(igraph_vector) *lhs,
                                 const TYPE(igraph_vector) *rhs) {
     long int i, s;
-    assert(lhs != 0);
-    assert(rhs != 0);
-    assert(lhs->stor_begin != 0);
-    assert(rhs->stor_begin != 0);
+    IGRAPH_ASSERT(lhs != 0);
+    IGRAPH_ASSERT(rhs != 0);
+    IGRAPH_ASSERT(lhs->stor_begin != 0);
+    IGRAPH_ASSERT(rhs->stor_begin != 0);
 
     s = FUNCTION(igraph_vector, size)(lhs);
     if (s != FUNCTION(igraph_vector, size)(rhs)) {

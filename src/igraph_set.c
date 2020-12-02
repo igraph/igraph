@@ -27,7 +27,6 @@
 #include "igraph_types_internal.h"
 #include "config.h"
 
-#include <assert.h>
 #include <string.h>     /* memmove */
 
 #define SET(s) ((s).stor_begin)
@@ -68,7 +67,7 @@ int igraph_set_init(igraph_set_t *set, int long size) {
  * Time complexity: operating system dependent.
  */
 void igraph_set_destroy(igraph_set_t* set) {
-    assert(set != 0);
+    IGRAPH_ASSERT(set != 0);
     if (set->stor_begin != 0) {
         igraph_Free(set->stor_begin);
         set->stor_begin = NULL;
@@ -108,8 +107,8 @@ igraph_bool_t igraph_set_inited(igraph_set_t* set) {
 int igraph_set_reserve(igraph_set_t* set, long int size) {
     long int actual_size = igraph_set_size(set);
     igraph_integer_t *tmp;
-    assert(set != NULL);
-    assert(set->stor_begin != NULL);
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
     if (size <= actual_size) {
         return 0;
     }
@@ -137,8 +136,8 @@ int igraph_set_reserve(igraph_set_t* set, long int size) {
  * Time complexity: O(1).
  */
 igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
-    assert(set != NULL);
-    assert(set->stor_begin != NULL);
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
     return set->stor_begin == set->end;
 }
 
@@ -156,8 +155,8 @@ igraph_bool_t igraph_set_empty(const igraph_set_t* set) {
  * Time complexity: O(1).
  */
 void igraph_set_clear(igraph_set_t* set) {
-    assert(set != NULL);
-    assert(set->stor_begin != NULL);
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
     set->end = set->stor_begin;
 }
 
@@ -174,8 +173,8 @@ void igraph_set_clear(igraph_set_t* set) {
  */
 
 long int igraph_set_size(const igraph_set_t* set) {
-    assert(set != NULL);
-    assert(set->stor_begin != NULL);
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
     return set->end - set->stor_begin;
 }
 
@@ -195,8 +194,8 @@ long int igraph_set_size(const igraph_set_t* set) {
 int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
     long int left, right, middle;
     long int size;
-    assert(set != NULL);
-    assert(set->stor_begin != NULL);
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
 
     size = igraph_set_size(set);
 
@@ -258,8 +257,8 @@ int igraph_set_add(igraph_set_t* set, igraph_integer_t e) {
 int igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
     long int left, right, middle;
 
-    assert(set != NULL);
-    assert(set->stor_begin != NULL);
+    IGRAPH_ASSERT(set != NULL);
+    IGRAPH_ASSERT(set->stor_begin != NULL);
 
     left = 0;
     right = igraph_set_size(set) - 1;
@@ -303,10 +302,10 @@ int igraph_set_contains(igraph_set_t* set, igraph_integer_t e) {
  */
 igraph_bool_t igraph_set_iterate(igraph_set_t* set, long int* state,
                                  igraph_integer_t* element) {
-    assert(set != 0);
-    assert(set->stor_begin != 0);
-    assert(state != 0);
-    assert(element != 0);
+    IGRAPH_ASSERT(set != 0);
+    IGRAPH_ASSERT(set->stor_begin != 0);
+    IGRAPH_ASSERT(state != 0);
+    IGRAPH_ASSERT(element != 0);
 
     if (*state < igraph_set_size(set)) {
         *element = set->stor_begin[*state];
