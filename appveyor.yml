@@ -27,10 +27,10 @@ install:
     # Update vcpkg, as included version does not have GMP
     # https://www.appveyor.com/docs/lang/cpp/#vc-packaging-tool
     - cd C:\Tools\vcpkg
-    - git pull --quiet
-    - .\bootstrap-vcpkg.bat -disableMetrics
-    - vcpkg install yasm-tool:x86-windows
-    - vcpkg install gmp
+    # - git pull --quiet
+    # - .\bootstrap-vcpkg.bat -disableMetrics
+    # - vcpkg install yasm-tool:x86-windows
+    # - vcpkg install gmp
     - vcpkg install libxml2
     - vcpkg integrate install
 
