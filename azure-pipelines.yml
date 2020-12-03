@@ -5,16 +5,21 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
+variables:
+  CMAKE_GENERATOR: Ninja
+
 steps:
+- script: sudo apt install ninja-build
+  displayNames: Install dependencies
 - task: CMake@1
   displayName: Configure
   inputs:
-    cmakeArgs: '..'
+    cmakeArgs: '.. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DUSE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1'
 - task: CMake@1
   displayName: Build
   inputs:
     cmakeArgs: '--build . --target build_tests'
-- script: ctest -j2 --output-on-failure
+- script: cd igraph/build && ctest -j2 --output-on-failure
   displayName: Test
 
 
