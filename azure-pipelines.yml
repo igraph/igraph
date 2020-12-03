@@ -1,7 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
 
 trigger:
 - develop
@@ -11,6 +7,14 @@ pool:
 
 steps:
 - task: CMake@1
+  displayName: Configure
   inputs:
     cmakeArgs: '..'
+- task: CMake@1
+  displayName: Build
+  inputs:
+    cmakeArgs: '--build . --target build_tests'
+- script: ctest -j2 --output-on-failure
+  displayName: Test
+
 
