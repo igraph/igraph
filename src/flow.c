@@ -1921,9 +1921,9 @@ static int igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
  *     \c IGRAPH_VCONN_NEGATIVE, return -1.
  *     \c IGRAPH_VCONN_NUMBER_OF_NODES, return the number of nodes.
  *     \c IGRAPH_VCONN_IGNORE, ignore the fact that the two vertices
- *        are connected and calculated the number of vertices needed
+ *        are connected and calculate the number of vertices needed
  *        to eliminate all paths except for the trivial (direct) paths
- *        between \c source and \c vertex. TOOD: what about neighbors?
+ *        between \p source and \p vertex. TODO: what about neighbors?
  * \return Error code.
  *
  * Time complexity: O(|V|^3), but see the discussion at \ref
