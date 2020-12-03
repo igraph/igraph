@@ -3,6 +3,11 @@ language: c
 dist: xenial
 os: linux
 
+# Ignore branches with names starting with certain keywords:
+branches:
+  except:
+  - /^(appveyor|github)\/.+$/
+
 env:
   global:
     - MAKEFLAGS="-j 2"
@@ -26,7 +31,7 @@ addons:
     - libglpk-dev
     - libarpack2-dev
     - libblas-dev
-    - liblapack-dev    
+    - liblapack-dev
   homebrew:
     packages:
     - flex
@@ -57,7 +62,7 @@ jobs:
       install:
         - ./bootstrap.sh
         - ./configure --enable-verify-finally --with-external-glpk --with-external-blas --with-external-lapack --with-external-arpack
-        - make        
+        - make
     - name: "Linux x87"
       os: linux
       env:
@@ -70,7 +75,7 @@ jobs:
       os: osx
       install:
         - ./bootstrap.sh
-        - ./configure --enable-verify-finally --enable-asan --with-external-glpk 
+        - ./configure --enable-verify-finally --enable-asan --with-external-glpk
         - make
     - name: "Documentation"
       language: shell
