@@ -3,9 +3,11 @@ name: MINGW32 and MINGW64
 on:
   push:
     branches:
-      - master
+      - '**'
+      - '!appveyor/**'
+      - '!travis/**'
   pull_request:
-    branches: 
+    branches:
       - master
 
 jobs:
