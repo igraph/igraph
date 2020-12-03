@@ -178,54 +178,6 @@ DECLDIR void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
 DECLDIR igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *al,
         igraph_integer_t no);
 
-/*************************************************************************
- * DEPRECATED TYPES AND FUNCTIONS
- */
-
-typedef igraph_inclist_t igraph_adjedgelist_t;
-
-DECLDIR int igraph_adjedgelist_init(const igraph_t *graph,
-                                    igraph_inclist_t *il,
-                                    igraph_neimode_t mode);
-DECLDIR void igraph_adjedgelist_destroy(igraph_inclist_t *il);
-DECLDIR int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
-        igraph_inclist_t *il);
-DECLDIR int igraph_adjedgelist_print(const igraph_inclist_t *il, FILE *outfile);
-
-/**
- * \define igraph_adjedgelist_get
- * \brief Query a vector in an incidence list.
- *
- * This macro was superseded by \ref igraph_inclist_get() in igraph 0.6.
- * Please use \ref igraph_inclist_get() instead of this macro.
- *
- * </para><para>
- * Deprecated in version 0.6.
- */
-#define igraph_adjedgelist_get(ael,no) (&(ael)->incs[(long int)(no)])
-
-typedef igraph_lazy_inclist_t igraph_lazy_adjedgelist_t;
-
-DECLDIR int igraph_lazy_adjedgelist_init(const igraph_t *graph,
-        igraph_lazy_inclist_t *il,
-        igraph_neimode_t mode);
-DECLDIR void igraph_lazy_adjedgelist_destroy(igraph_lazy_inclist_t *il);
-
-/**
- * \define igraph_lazy_adjedgelist_get
- * \brief Query a vector in a lazy incidence list.
- *
- * This macro was superseded by \ref igraph_lazy_inclist_get() in igraph 0.6.
- * Please use \ref igraph_lazy_inclist_get() instead of this macro.
- *
- * </para><para>
- * Deprecated in version 0.6.
- */
-#define igraph_lazy_adjedgelist_get(al,no) \
-    ((al)->incs[(long int)(no)] != 0 ? ((al)->incs[(long int)(no)]) : \
-     (igraph_lazy_adjedgelist_get_real(al, no)))
-DECLDIR igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_inclist_t *al,
-        igraph_integer_t no);
 __END_DECLS
 
 #endif

@@ -552,10 +552,6 @@ igraph_induced_subgraph:
         NAME-R: induced_subgraph
         IGNORE: RR
 
-igraph_subgraph:
-        PARAMS: GRAPH graph, OUT GRAPH res, VERTEXSET vids
-        IGNORE: RR, RC, RNamespace
-
 igraph_subgraph_edges:
         PARAMS: GRAPH graph, OUT GRAPH res, EDGESET eids, BOOLEAN delete_vertices=True
         DEPS: eids ON graph
