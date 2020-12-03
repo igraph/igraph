@@ -10,7 +10,7 @@ variables:
 
 steps:
 - script: sudo apt install ninja-build
-  displayNames: Install dependencies
+  displayName: Install dependencies
 - task: CMake@1
   displayName: Configure
   inputs:
