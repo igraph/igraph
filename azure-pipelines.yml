@@ -1,6 +1,6 @@
 
 trigger:
-- develop
+  - develop
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -10,23 +10,24 @@ variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
 steps:
-- script: |
-    sudo apt-get install ninja-build ccache -y
-  displayName: Install dependencies
-- task: CMake@1
-  displayName: Configure
-  inputs:
-    cmakeArgs: '.. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DUSE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1'
-- task: Cache@2
-  inputs:
-    key: 'ccache | "$(Agent.OS)"'
-    path: $(CCACHE_DIR)
-  displayName: Ccache    
-- task: CMake@1
-  displayName: Build
-  inputs:
-    cmakeArgs: '--build . --target build_tests'
-- script: cd build && ctest -j2 --output-on-failure
-  displayName: Test
+  - script: sudo apt-get install ninja-build ccache -y
+    displayName: Install dependencies
 
+  - task: CMake@1
+    displayName: CMake
+    inputs:
+      cmakeArgs: '.. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1'
 
+  - task: Cache@2
+    inputs:
+      key: 'ccache | "$(Agent.OS)"'
+      path: $(CCACHE_DIR)
+    displayName: Ccache
+
+  - task: CMake@1
+    displayName: Build
+    inputs:
+      cmakeArgs: '--build . --target build_tests'
+
+  - script: cd build && ctest -j2 --output-on-failure
+    displayName: Test
