@@ -1,11 +1,13 @@
-name: MINGW32 and MINGW64
+name: MINGW32/MINGW64 - autoconf
 
 on:
   push:
     branches:
-      - master
+      - '**'
+      - '!appveyor/**'
+      - '!travis/**'
   pull_request:
-    branches: 
+    branches:
       - master
 
 jobs:
@@ -32,11 +34,26 @@ jobs:
           update: true
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build
+      - name: Run Configuration
         run: |
+          git fetch --prune --unshallow
           ./bootstrap.sh
-          mkdir -p build-${{ matrix.arch }}
-          cd build-${{ matrix.arch }}
-          ../configure -C --enable-tls --with-external-glp YFLAGS=-Wall || { cat config.log; cat config.cache; exit 1; }
-          make -j V=0 || make
-
+          mkdir -p build
+          cd build
+          ../configure -C --enable-tls YFLAGS=-Wall
+      - name: Build
+        if: ${{ success() }}
+        run: make -j V=0 || make
+        working-directory: build
+      - name: Run Testsuite
+        if: ${{ success() }}
+        run: make check TESTSUITEFLAGS=-j || make check TESTSUITEFLAGS='-j --recheck -d -v -x'
+        working-directory: build
+      - name: Generate Artifacts upon Failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: failure
+          path: |
+            build/config.*
+            build/tests/**
