@@ -34,9 +34,10 @@ jobs:
           update: true
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Run Configuration
         run: |
-          git fetch --prune --unshallow
           ./bootstrap.sh
           mkdir -p build
           cd build
