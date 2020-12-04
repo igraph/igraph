@@ -10,7 +10,7 @@ variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
 jobs:
-  - job: Static build
+  - job: Static
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
@@ -34,7 +34,7 @@ jobs:
       - script: cd build && ctest -j `nproc` --output-on-failure
         displayName: Test
 
-  - job: Dynamic build
+  - job: Dynamic
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
