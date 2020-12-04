@@ -16,6 +16,8 @@ jobs:
         displayName: Install dependencies
 
       - template: .azure/build.yml
+        parameters:
+          extra_cmake_args: '-DUSE_SANITIZER=Address\;Undefined -DCMAKE_C_FLAGS="-g -Og" -DCMAKE_CXX_FLAGS="-g -Og'
 
   - job: linux_static_external
     steps:
@@ -87,4 +89,3 @@ jobs:
         displayName: Doc build
         inputs:
           cmakeArgs: '--build . --target doc'
-
