@@ -75,6 +75,31 @@ jobs:
           int_blas: false
           int_lapack: false
 
+  - job: windows_static
+    pool:
+       vmImage: windows-2019
+
+    variables:
+      CMAKE_GENERATOR: Visual Studio 16 2019
+
+    steps:
+      - script: chocco install libxml2
+        displayName: Install dependencies
+
+      - template: .azure/build.yml
+
+  - job: windows_shared
+    pool:
+       vmImage: windows-2019
+
+    variables:
+      CMAKE_GENERATOR: Visual Studio 16 2019
+
+    steps:
+      - template: .azure/build.yml
+        parameters:
+          build_shared: true
+
   - job: documentation
     steps:
       - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
