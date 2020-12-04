@@ -10,7 +10,7 @@ variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
 jobs:
-  - job: Linux-static-vendored
+  - job: linux_static_vendored
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
@@ -34,7 +34,7 @@ jobs:
       - script: cd build && ctest -j `nproc` --output-on-failure
         displayName: Test
 
-  - job: Linux-static-external
+  - job: linux_static_external
     steps:
       - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libblas-dev -liblapack-dev -y
         displayName: Install dependencies
@@ -58,7 +58,7 @@ jobs:
       - script: cd build && ctest -j `nproc` --output-on-failure
         displayName: Test        
 
-  - job: Linux-shared-vendored
+  - job: linux_shared_vendored
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
@@ -82,7 +82,7 @@ jobs:
       - script: cd build && ctest -j `nproc` --output-on-failure
         displayName: Test
 
-  - job: Documentation
+  - job: documentation
     steps:
       - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
         displayName: Install dependencies
