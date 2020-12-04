@@ -36,7 +36,7 @@ jobs:
 
   - job: linux_static_external
     steps:
-      - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libblas-dev -liblapack-dev -y
+      - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libblas-dev liblapack-dev -y
         displayName: Install dependencies
 
       - task: CMake@1
