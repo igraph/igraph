@@ -89,6 +89,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           extra_ctest_args: -C Debug
+          use_ccache: false
 
   - job: windows_shared
     pool:
@@ -105,6 +106,7 @@ jobs:
         parameters:
           build_shared: true
           extra_ctest_args: -C Debug
+          use_ccache: false
 
   - job: documentation
     steps:
