@@ -909,8 +909,6 @@ igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order) {
  * \sa \ref igraph_es_destroy()
  *
  * Time complexity: O(1).
- *
- * \example examples/simple/igraph_es_adj.c
  */
 
 int igraph_es_incident(igraph_es_t *es,
