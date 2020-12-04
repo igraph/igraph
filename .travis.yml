@@ -4,6 +4,11 @@ cache: ccache
 dist: xenial
 os: linux
 
+# Ignore branches with names starting with certain keywords:
+branches:
+  except:
+  - /^(appveyor|github)\/.+$/
+
 env:
   global:
     - CMAKE_GENERATOR=Ninja   # build with ninja instead of make

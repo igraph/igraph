@@ -1,3 +1,7 @@
+# Ignore branches with names starting with certain keywords:
+branches:
+  except:
+  - /^(github|travis)\/.+$/
 
 # We always use a 64-bit machine, but can build x86 distributions
 platform:

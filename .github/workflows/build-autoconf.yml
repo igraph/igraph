@@ -4,7 +4,9 @@ name: MINGW32 / MINGW64 (MSYS2) - cmake build
 on:
   push:
     branches:
-      - develop
+      - '**'
+      - '!appveyor/**'
+      - '!travis/**'
   pull_request:
     branches:
       - develop
@@ -44,3 +46,10 @@ jobs:
       - name: Test
         run: ctest -j2 --output-on-failure
         working-directory: build-${{ matrix.arch }}
+      - name: Generate Artifacts upon Failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: failure
+          path: |
+            build/tests/**
