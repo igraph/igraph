@@ -10,7 +10,7 @@ variables:
   CCACHE_DIR: $(Pipeline.Workspace)/ccache
 
 jobs:
-  - job: Static
+  - job: Linux-static-vendored
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
@@ -34,7 +34,31 @@ jobs:
       - script: cd build && ctest -j `nproc` --output-on-failure
         displayName: Test
 
-  - job: Dynamic
+  - job: Linux-static-external
+    steps:
+      - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libblas-dev -liblapack-dev -y
+        displayName: Install dependencies
+
+      - task: CMake@1
+        displayName: CMake
+        inputs:
+          cmakeArgs: '.. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=0 -DIGRAPH_USE_INTERNAL_GLPK=0 -DIGRAPH_USE_INTERNAL_CXSPARSE=0 -DIGRAPH_USE_INTERNAL_GMP=0 -DIGRAPH_VERIFY_FINALLY_STACK=1'
+
+      - task: Cache@2
+        inputs:
+          key: 'ccache | "$(Agent.OS)"'
+          path: $(CCACHE_DIR)
+        displayName: Ccache
+
+      - task: CMake@1
+        displayName: Build
+        inputs:
+          cmakeArgs: '--build . --target build_tests'
+
+      - script: cd build && ctest -j `nproc` --output-on-failure
+        displayName: Test        
+
+  - job: Linux-shared-vendored
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
@@ -57,3 +81,19 @@ jobs:
 
       - script: cd build && ctest -j `nproc` --output-on-failure
         displayName: Test
+
+  - job: Documentation
+    steps:
+      - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
+        displayName: Install dependencies
+
+      - task: CMake@1
+        displayName: CMake
+        inputs:
+          cmakeArgs: '..'
+
+      - task: CMake@1
+        displayName: Doc build
+        inputs:
+          cmakeArgs: '--build . --target doc'
+
