@@ -59,24 +59,10 @@ jobs:
       - script: brew install ninja ccache
         displayName: Install dependencies
 
-      - task: CMake@1
-        displayName: CMake
-        inputs:
-          cmakeArgs: '.. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1'
-
-      - task: Cache@2
-        inputs:
-          key: 'ccache | "$(Agent.OS)"'
-          path: $(CCACHE_DIR)
-        displayName: Ccache
-
-      - task: CMake@1
-        displayName: Build
-        inputs:
-          cmakeArgs: '--build . --target build_tests'
-
-      - script: cd build && ctest -j `sysctl -n hw.ncpu` --output-on-failure
-        displayName: Test
+      - template: .azure/build.yml
+        parameters:
+          int_blas: false
+          int_lapack: false
 
   - job: documentation
     steps:
