@@ -83,7 +83,7 @@ jobs:
       CMAKE_GENERATOR: Visual Studio 16 2019
 
     steps:
-      - script: chocco install libxml2
+      - script: choco install winflexbison3
         displayName: Install dependencies
 
       - template: .azure/build.yml
@@ -96,6 +96,9 @@ jobs:
       CMAKE_GENERATOR: Visual Studio 16 2019
 
     steps:
+      - script: choco install winflexbison3
+        displayName: Install dependencies
+
       - template: .azure/build.yml
         parameters:
           build_shared: true
