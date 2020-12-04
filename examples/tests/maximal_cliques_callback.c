@@ -57,14 +57,14 @@ igraph_bool_t handler(igraph_vector_t *clique, void *arg) {
 
 
 igraph_bool_t handler_stop(igraph_vector_t *clique, void *arg) {
+    igraph_vector_destroy(clique);
+    igraph_free(clique);
+
     /* Stop search as soon as a 3-clique is found. */
     /* Since there are two 3-cliques in the test graph, this will stop the search before it is complete. */
     if (igraph_vector_size(clique) == 3) {
         return 0;    /* false */
     }
-
-    igraph_vector_destroy(clique);
-    igraph_free(clique);
 
     return 1 /* true */;
 }
@@ -93,6 +93,8 @@ int main() {
 
     IGRAPH_VECTOR_PTR_SET_ITEM_DESTRUCTOR(&list, igraph_vector_destroy);
     igraph_vector_ptr_destroy_all(&list);
+
+    igraph_destroy(&graph);
 
     VERIFY_FINALLY_STACK();
 

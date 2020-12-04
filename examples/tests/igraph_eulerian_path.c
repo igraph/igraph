@@ -434,6 +434,7 @@ int main() {
     print_vector_round(&vector_res, stdout);
 
     igraph_destroy(&graph);
+    igraph_vector_destroy(&vector_res);
     igraph_vector_destroy(&edge_res);
 
     VERIFY_FINALLY_STACK();

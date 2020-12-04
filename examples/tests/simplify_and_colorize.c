@@ -10,6 +10,7 @@
     print_vector_int(&vcol, stdout); \
     print_vector_int(&ecol, stdout); \
     printf("\n"); \
+    igraph_destroy(&res); \
     igraph_destroy(&graph);
 
 int main() {

@@ -119,10 +119,6 @@ To eliminate multiple edges from a graph, you can use
 <!-- doxrox-include igraph_delete_vertices -->
 </section>
 
-<section id="basic-deprecated-functions"><title>Deprecated functions</title>
-<!-- doxrox-include igraph_adjacent -->
-</section>
-
 </section>
 
 </chapter>

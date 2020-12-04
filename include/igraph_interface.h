@@ -71,8 +71,6 @@ DECLDIR int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
                                   const igraph_vector_t *pairs,
                                   const igraph_vector_t *path,
                                   igraph_bool_t directed, igraph_bool_t error);
-DECLDIR int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
-                            igraph_neimode_t mode);          /* deprecated */
 DECLDIR int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
                             igraph_neimode_t mode);
 

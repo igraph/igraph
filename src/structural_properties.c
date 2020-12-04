@@ -1540,49 +1540,6 @@ int igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
 
 /**
  * \ingroup structural
- * \function igraph_subgraph
- * \brief Creates a subgraph induced by the specified vertices.
- * \deprecated-by igraph_induced_subgraph 0.6
- *
- * </para><para>
- * This function is an alias to \ref igraph_induced_subgraph(), it is
- * left here to ensure API compatibility with igraph versions prior to 0.6.
- *
- * </para><para>
- * This function collects the specified vertices and all edges between
- * them to a new graph.
- * As the vertex ids in a graph always start with zero, this function
- * very likely needs to reassign ids to the vertices.
- * \param graph The graph object.
- * \param res The subgraph, another graph object will be stored here,
- *        do \em not initialize this object before calling this
- *        function, and call \ref igraph_destroy() on it if you don't need
- *        it any more.
- * \param vids A vertex selector describing which vertices to keep.
- * \return Error code:
- *         \c IGRAPH_ENOMEM, not enough memory for
- *         temporary data.
- *         \c IGRAPH_EINVVID, invalid vertex id in
- *         \p vids.
- *
- * Time complexity: O(|V|+|E|),
- * |V| and
- * |E| are the number of vertices and
- * edges in the original graph.
- *
- * \sa \ref igraph_delete_vertices() to delete the specified set of
- * vertices from a graph, the opposite of this function.
- */
-
-int igraph_subgraph(const igraph_t *graph, igraph_t *res,
-                    const igraph_vs_t vids) {
-    IGRAPH_WARNING("igraph_subgraph is deprecated from igraph 0.6, "
-                   "use igraph_induced_subgraph instead");
-    return igraph_induced_subgraph(graph, res, vids, IGRAPH_SUBGRAPH_AUTO);
-}
-
-/**
- * \ingroup structural
  * \function igraph_induced_subgraph
  * \brief Creates a subgraph induced by the specified vertices.
  *

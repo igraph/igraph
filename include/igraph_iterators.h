@@ -256,8 +256,6 @@ DECLDIR int igraph_es_all(igraph_es_t *es,
                           igraph_edgeorder_type_t order);
 DECLDIR igraph_es_t igraph_ess_all(igraph_edgeorder_type_t order);
 
-DECLDIR int igraph_es_adj(igraph_es_t *es,
-                          igraph_integer_t vid, igraph_neimode_t mode);     /* deprecated */
 DECLDIR int igraph_es_incident(igraph_es_t *es,
                                igraph_integer_t vid, igraph_neimode_t mode);
 

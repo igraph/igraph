@@ -1626,17 +1626,6 @@ int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
 }
 
 /**
- * \function igraph_adjacent
- * \brief Gives the incident edges of a vertex.
- * \deprecated-by igraph_incident 0.6
- */
-int igraph_adjacent(const igraph_t *graph, igraph_vector_t *eids,
-                    igraph_integer_t pnode, igraph_neimode_t mode) {
-    IGRAPH_WARNING("igraph_adjacent is deprecated, use igraph_incident");
-    return igraph_incident(graph, eids, pnode, mode);
-}
-
-/**
  * \function igraph_incident
  * \brief Gives the incident edges of a vertex.
  *

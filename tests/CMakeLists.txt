@@ -102,6 +102,7 @@ add_legacy_tests(
   FOLDER simple NAMES
   igraph_es_pairs
   igraph_es_path
+#  igraph_es_fromto
   igraph_vs_nonadj
   igraph_vs_seq
   igraph_vs_vector
@@ -316,6 +317,12 @@ add_legacy_tests(
   igraph_intersection
   igraph_intersection2
   igraph_union
+  igraph_induced_subgraph_map  
+)
+
+add_legacy_tests(
+  FOLDER tests NAMES
+  igraph_induced_subgraph
 )
 
 # conversion.at
@@ -545,4 +552,12 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER simple NAMES
   igraph_adjacency_spectral_embedding
+)
+
+# graphicality
+
+add_legacy_tests(
+  FOLDER tests NAMES
+  igraph_is_graphical
+  igraph_is_bigraphical
 )
