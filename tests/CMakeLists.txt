@@ -102,7 +102,6 @@ add_legacy_tests(
   FOLDER simple NAMES
   igraph_es_pairs
   igraph_es_path
-#  igraph_es_adj
 #  igraph_es_fromto
   igraph_vs_nonadj
   igraph_vs_seq

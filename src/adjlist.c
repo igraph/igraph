@@ -456,45 +456,6 @@ int igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igr
 
 }
 
-int igraph_adjedgelist_remove_duplicate(const igraph_t *graph,
-                                        igraph_inclist_t *al) {
-    IGRAPH_WARNING("igraph_adjedgelist_remove_duplicate() is deprecated, use "
-                   "igraph_inclist_remove_duplicate() instead");
-    return igraph_inclist_remove_duplicate(graph, al);
-}
-
-#ifndef USING_R
-int igraph_adjedgelist_print(const igraph_inclist_t *al, FILE *outfile) {
-    IGRAPH_WARNING("igraph_adjedgelist_print() is deprecated, use "
-                   "igraph_inclist_print() instead");
-    return igraph_inclist_fprint(al, outfile);
-}
-#endif
-
-/**
- * \function igraph_adjedgelist_init
- * \brief Initializes an incidence list of edges.
- * \deprecated-by igraph_inclist_init 0.6
- */
-int igraph_adjedgelist_init(const igraph_t *graph,
-                            igraph_inclist_t *il,
-                            igraph_neimode_t mode) {
-    IGRAPH_WARNING("igraph_adjedgelist_init() is deprecated, use "
-                   "igraph_inclist_init() instead");
-    return igraph_inclist_init(graph, il, mode);
-}
-
-/**
- * \function igraph_adjedgelist_destroy
- * \brief Frees all memory allocated for an incidence list.
- * \deprecated-by igraph_inclist_destroy 0.6
- */
-void igraph_adjedgelist_destroy(igraph_inclist_t *il) {
-    IGRAPH_WARNING("igraph_adjedgelist_destroy() is deprecated, use "
-                   "igraph_inclist_destroy() instead");
-    igraph_inclist_destroy(il);
-}
-
 int igraph_inclist_remove_duplicate(const igraph_t *graph,
                                     igraph_inclist_t *al) {
 
@@ -797,37 +758,6 @@ igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
     }
 
     return al->adjs[no];
-}
-
-/**
- * \function igraph_lazy_adjedgelist_init
- * \brief Initializes a lazy incidence list of edges.
- * \deprecated-by igraph_lazy_inclist_init 0.6
- */
-int igraph_lazy_adjedgelist_init(const igraph_t *graph,
-                                 igraph_lazy_inclist_t *il,
-                                 igraph_neimode_t mode) {
-    IGRAPH_WARNING("igraph_lazy_adjedgelist_init() is deprecated, use "
-                   "igraph_lazy_inclist_init() instead");
-    return igraph_lazy_inclist_init(graph, il, mode);
-}
-
-/**
- * \function igraph_lazy_adjedgelist_destroy
- * \brief Frees all memory allocated for an incidence list.
- * \deprecated-by igraph_lazy_inclist_destroy 0.6
- */
-void igraph_lazy_adjedgelist_destroy(igraph_lazy_inclist_t *il) {
-    IGRAPH_WARNING("igraph_lazy_adjedgelist_destroy() is deprecated, use "
-                   "igraph_lazy_inclist_destroy() instead");
-    igraph_lazy_inclist_destroy(il);
-}
-
-igraph_vector_t *igraph_lazy_adjedgelist_get_real(igraph_lazy_adjedgelist_t *il,
-        igraph_integer_t pno) {
-    IGRAPH_WARNING("igraph_lazy_adjedgelist_get_real() is deprecated, use "
-                   "igraph_lazy_inclist_get_real() instead");
-    return igraph_lazy_inclist_get_real(il, pno);
 }
 
 /**
