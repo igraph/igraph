@@ -79,11 +79,11 @@ jobs:
     pool:
        vmImage: windows-2019
 
-    #variables:
-    #  CMAKE_GENERATOR: Visual Studio 16 2019
+    variables:
+      CMAKE_GENERATOR: Visual Studio 16 2019
 
     steps:
-      - script: choco install winflexbison3 # TODO: Install libxml2 for graphml support
+      - script: choco install winflexbison3
         displayName: Install dependencies
 
       - template: .azure/build.yml
@@ -95,11 +95,11 @@ jobs:
     pool:
        vmImage: windows-2019
 
-    #variables:
-    #  CMAKE_GENERATOR: Visual Studio 16 2019
+    variables:
+      CMAKE_GENERATOR: Visual Studio 16 2019
 
     steps:
-      - script: choco install winflexbison3 # TODO: Install libxml2 for graphml support
+      - script: choco install winflexbison3
         displayName: Install dependencies
 
       - template: .azure/build.yml
