@@ -85,6 +85,9 @@ int main() {
 		}
 	}
 
+    igraph_vector_destroy(&prob);
+    igraph_vector_destroy(&edges);
+
     igraph_destroy(&karate);
 
     return 0;
