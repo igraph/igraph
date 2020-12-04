@@ -87,6 +87,8 @@ jobs:
         displayName: Install dependencies
 
       - template: .azure/build.yml
+        parameters:
+          extra_ctest_args: -C Debug
 
   - job: windows_shared
     pool:
@@ -102,6 +104,7 @@ jobs:
       - template: .azure/build.yml
         parameters:
           build_shared: true
+          extra_ctest_args: -C Debug
 
   - job: documentation
     steps:
