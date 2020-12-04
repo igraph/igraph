@@ -22,48 +22,23 @@ jobs:
       - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libblas-dev liblapack-dev -y
         displayName: Install dependencies
 
-      - task: CMake@1
-        displayName: CMake
-        inputs:
-          cmakeArgs: '.. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=0 -DIGRAPH_USE_INTERNAL_GLPK=0 -DIGRAPH_USE_INTERNAL_CXSPARSE=0 -DIGRAPH_USE_INTERNAL_GMP=0 -DIGRAPH_VERIFY_FINALLY_STACK=1'
-
-      - task: Cache@2
-        inputs:
-          key: 'ccache | "$(Agent.OS)"'
-          path: $(CCACHE_DIR)
-        displayName: Ccache
-
-      - task: CMake@1
-        displayName: Build
-        inputs:
-          cmakeArgs: '--build . --target build_tests'
-
-      - script: cd build && ctest -j `nproc` --output-on-failure
-        displayName: Test
+      - template: .azure/build.yml
+        parameters:
+          int_blas: false
+          int_lapack: false
+          int_arpack: false
+          int_cxsparse: false
+          int_gmp: false
+          int_glpk: false
 
   - job: linux_shared_vendored
     steps:
       - script: sudo apt-get install ninja-build ccache -y
         displayName: Install dependencies
 
-      - task: CMake@1
-        displayName: CMake
-        inputs:
-          cmakeArgs: '.. -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1 -DBUILD_SHARED_LIBS=1'
-
-      - task: Cache@2
-        inputs:
-          key: 'ccache | "$(Agent.OS)"'
-          path: $(CCACHE_DIR)
-        displayName: Ccache
-
-      - task: CMake@1
-        displayName: Build
-        inputs:
-          cmakeArgs: '--build . --target build_tests'
-
-      - script: cd build && ctest -j `nproc` --output-on-failure
-        displayName: Test
+      - template: .azure/build.yml
+        parameters:
+          build_shared: true
 
   - job: linux_alpine
     steps:
