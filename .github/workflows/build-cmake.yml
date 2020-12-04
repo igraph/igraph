@@ -52,4 +52,4 @@ jobs:
         with:
           name: failure
           path: |
-            build/tests/**
+            build-${{ matrix.arch }}/tests/**

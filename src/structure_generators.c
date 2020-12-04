@@ -42,7 +42,7 @@
  * <para>Graph generators create graphs.</para>
  *
  * <para>Almost all functions which create graph objects are documented
- * here. The exceptions are \ref igraph_subgraph() and alike, these
+ * here. The exceptions are \ref igraph_induced_subgraph() and alike, these
  * create graphs based on another graph.</para>
  */
 
