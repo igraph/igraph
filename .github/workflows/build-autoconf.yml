@@ -45,3 +45,7 @@ jobs:
         if: ${{ success() }}
         run: make -j V=0 || make
         working-directory: build
+      - name: Run Testsuite
+        if: ${{ success() }}
+        run: make check TESTSUITEFLAGS=-j || make check TESTSUITEFLAGS='-j --recheck -d -v -x'
+        working-directory: build
