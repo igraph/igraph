@@ -49,3 +49,11 @@ jobs:
         if: ${{ success() }}
         run: make check TESTSUITEFLAGS=-j || make check TESTSUITEFLAGS='-j --recheck -d -v -x'
         working-directory: build
+      - name: Generate Artifacts upon Failure
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: failure
+          path: |
+            build/config.*
+            build/tests/**
