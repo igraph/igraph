@@ -82,6 +82,57 @@ jobs:
       - script: cd build && ctest -j `nproc` --output-on-failure
         displayName: Test
 
+  - job: linux_alpine
+    steps:
+      - script: |
+          wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.12.1/alpine-chroot-install && echo '5571ad4d17d14bb09ad23a75060f05553786e564  alpine-chroot-install' | sha1sum -c || exit 1
+          alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
+          sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja ccache bison flex gmp-dev'
+        displayName: Alpine Linux setup
+
+      - script: |
+          mkdir build && cd build
+          alpine cmake .. -GNinja -DIGRAPH_USE_INTERNAL_BLAS=1 -DIGRAPH_USE_INTERNAL_LAPACK=1 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1
+        displayName: CMake
+
+      - task: Cache@2
+        inputs:
+          key: 'ccache | Alpine'
+          path: $(CCACHE_DIR)
+        displayName: Ccache
+
+      - script: cd build && alpine cmake --build . --target build_tests
+        displayName: Build
+
+      - script: cd build && alpine ctest -j `nproc` --output-on-failure
+        displayName: Test
+
+  - job: macos
+    pool:
+      vmImage: macos-latest
+    steps:
+      - script: brew install ninja ccache -y
+        displayName: Install dependencies
+
+      - task: CMake@1
+        displayName: CMake
+        inputs:
+          cmakeArgs: '.. -DIGRAPH_USE_INTERNAL_BLAS=0 -DIGRAPH_USE_INTERNAL_LAPACK=0 -DIGRAPH_USE_INTERNAL_ARPACK=1 -DIGRAPH_USE_INTERNAL_GLPK=1 -DIGRAPH_USE_INTERNAL_CXSPARSE=1 -DIGRAPH_USE_INTERNAL_GMP=1 -DIGRAPH_VERIFY_FINALLY_STACK=1'
+
+      - task: Cache@2
+        inputs:
+          key: 'ccache | "$(Agent.OS)"'
+          path: $(CCACHE_DIR)
+        displayName: Ccache
+
+      - task: CMake@1
+        displayName: Build
+        inputs:
+          cmakeArgs: '--build . --target build_tests'
+
+      - script: cd build && ctest -j `sysctl -n hw.ncpu` --output-on-failure
+        displayName: Test        
+
   - job: documentation
     steps:
       - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
