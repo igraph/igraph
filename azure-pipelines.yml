@@ -88,7 +88,6 @@ jobs:
 
       - template: .azure/build.yml
         parameters:
-          extrac_cmake_args: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER="cl.exe" -DCMAKE_CXX_COMPILER="cl.exe" -DMSVC_TOOLSET_VERSION=140
           extra_ctest_args: -C Debug
           use_ccache: false
 
@@ -100,19 +99,19 @@ jobs:
     #  CMAKE_GENERATOR: Visual Studio 16 2019
 
     steps:
-      - powershell: choco install winflexbison3 ninja # TODO: Install libxml2 for graphml support
+      - script: choco install winflexbison3 ninja # TODO: Install libxml2 for graphml support
+
         displayName: Install dependencies
 
       - template: .azure/build.yml
         parameters:
-          extrac_cmake_args: -DCMAKE_BUILD_TYPE=Debug -DCMAKE_C_COMPILER="cl.exe" -DCMAKE_CXX_COMPILER="cl.exe" -DMSVC_TOOLSET_VERSION=140
           build_shared: true
           extra_ctest_args: -C Debug
           use_ccache: false
 
   - job: documentation
     steps:
-      - powershell: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
+      - script: sudo apt-get install ninja-build xmlto texinfo source-highlight libxml2-utils xsltproc fop -y
         displayName: Install dependencies
 
       - task: CMake@1
