@@ -56,7 +56,7 @@ jobs:
           cmakeArgs: '--build . --target build_tests'
 
       - script: cd build && ctest -j `nproc` --output-on-failure
-        displayName: Test        
+        displayName: Test
 
   - job: linux_shared_vendored
     steps:
@@ -84,7 +84,14 @@ jobs:
 
   - job: linux_alpine
     steps:
+      - task: Cache@2
+        inputs:
+          key: 'ccache | Alpine'
+          path: $(CCACHE_DIR)
+        displayName: Ccache
+      # https://github.com/alpinelinux/alpine-chroot-install
       - bash: |
+          export CHROOT_KEEP_VARS=CCACHE_DIR
           wget https://raw.githubusercontent.com/alpinelinux/alpine-chroot-install/v0.12.1/alpine-chroot-install && echo '5571ad4d17d14bb09ad23a75060f05553786e564  alpine-chroot-install' | sha1sum -c || exit 1
           alpine() { /alpine/enter-chroot -u "$USER" "$@"; }
           sudo sh alpine-chroot-install -p 'build-base linux-headers git cmake ninja ccache bison flex gmp-dev'
@@ -117,7 +124,7 @@ jobs:
           cmakeArgs: '--build . --target build_tests'
 
       - script: cd build && ctest -j `sysctl -n hw.ncpu` --output-on-failure
-        displayName: Test        
+        displayName: Test
 
   - job: documentation
     steps:
