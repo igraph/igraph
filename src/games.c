@@ -1691,7 +1691,28 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
     igraph_real_t maxcum;
     igraph_vector_t nodetypes;
 
-    /* TODO: parameter checks */
+    //parameter check 
+    if(nodes < 0){
+        IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
+    }
+    
+    if (types < 1) {
+        IGRAPH_ERROR("types must be >= 1", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_size(type_dist) != types) {
+        IGRAPH_ERROR("Number of types is not consistent to type_dist", IGRAPH_EINVAL);
+    }
+    
+    if (igraph_matrix_size(type_dist) != types * types) {
+        IGRAPH_ERROR("Size of matrix is not consistent to type_dist", IGRAPH_EINVAL);
+    }
+
+    for (i = 0; i < types; i++) {
+        if(VECTOR(*type_dist)[i] < 0){
+            IGRAPH_ERROR("Negative component in type_dist", IGRAPH_EINVAL);
+        }
+    }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types + 1);
