@@ -1,8 +1,16 @@
 # igraph C library changelog
 
-## [0.8.5]
+## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+### Other
+
+## [0.8.5] - 2020-12-07
 
 ### Changed
 
@@ -15,13 +23,7 @@
  - Added a missing memory cleanup call in `igraph_i_cattribute_combine_vertices()`.
  - Fixed a few memory leaks in test cases.
 
-### Other
-
-## [0.8.4]
-
-### Added
-
-### Changed
+## [0.8.4] - 2020-11-24
 
 ### Fixed
 
@@ -36,7 +38,7 @@
  - Documentation improvements
  - General code cleanup to reduce the number of compiler warnings
 
-## [0.8.3]
+## [0.8.3] - 2020-10-02
 
 ### Added
 
