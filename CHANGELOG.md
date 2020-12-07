@@ -1,5 +1,22 @@
 # igraph C library changelog
 
+## [0.8.5]
+
+### Added
+
+### Changed
+
+ - `igraph_write_graph_pajek()`: the function now always uses the platform-native line endings (CRLF on Windows, LF on Unix and macOS). Earlier versions tried to enforce Windows line endings, but this was error-prone, and since all recent versions of Pajek support both line endings, enforcing Windows line endings is not necessary any more.
+
+### Fixed
+
+ - Fixed several compilation issues with MINGW32/64 (PR #1554)
+ - `igraph_layout_davidson_harel()` was not interruptible; now it is.
+ - Added a missing memory cleanup call in `igraph_i_cattribute_combine_vertices()`.
+ - Fixed a few memory leaks in test cases.
+
+### Other
+
 ## [0.8.4]
 
 ### Added
