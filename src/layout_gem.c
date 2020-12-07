@@ -26,6 +26,7 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 #include "igraph_math.h"
+#include "igraph_interrupt_internal.h"
 
 /**
  * \ingroup layout
@@ -150,11 +151,13 @@ int igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     igraph_vector_float_fill(&temp, temp_init);
     temp_global = temp_init * no_nodes;
 
-    while (temp_global > temp_min * no_nodes && maxiter > 0) {
-
-        /* choose a vertex v to update */
+    while (temp_global > temp_min * no_nodes && maxiter > 0) {        
         igraph_integer_t u, v, nlen, j;
         float px, py, pvx, pvy;
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        /* choose a vertex v to update */
         if (!perm_pointer) {
             igraph_vector_int_shuffle(&perm);
             perm_pointer = no_nodes - 1;
