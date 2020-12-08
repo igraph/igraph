@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "../tests/test_utilities.inc"
+
 int main() {
 
     const int nodes = 10;
@@ -59,7 +61,7 @@ int main() {
 
     /* `p' is always the eigenvector corresponding to the 1-eigenvalue */
     igraph_matrix_get_col(&V, &p, 0);
-    igraph_vector_print(&p);
+    print_vector_first_nonzero_element_positive(&p, "%.6f");
 
     which.howmany = 3;
     igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0, nodes,
