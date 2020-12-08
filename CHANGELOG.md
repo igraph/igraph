@@ -17,7 +17,6 @@
 
  - `igraph_community_multilevel()`: added resolution parameter.
  - `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
- - `igraph_girth()` now returns zero for the null graph, along with an empty circle.
  - `igraph_is_connected()` now returns false for the null graph; see https://github.com/igraph/igraph/issues/1538 for the reasoning behind this decision.
  - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
  - `igraph_modularity()` now supports computing the directed version of modularity.
