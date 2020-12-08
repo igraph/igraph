@@ -42,6 +42,24 @@ int main() {
     /* Set default seed to get reproducible results */
     igraph_rng_seed(igraph_rng_default(), 0);
 
+    /* Null graph */
+    igraph_vector_init(&membership, 0);
+    igraph_small(&graph, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, &modularity);
+    if (!igraph_is_nan(modularity)) {
+        return 1;
+    }
+    igraph_destroy(&graph);
+    igraph_small(&graph, 0, IGRAPH_DIRECTED, -1);
+    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, &modularity);
+    if (!igraph_is_nan(modularity)) {
+        return 1;
+    }
+	/* Should not crash if we omit 'modularity' */
+    igraph_modularity(&graph, &membership, 0, /* resolution */ 1, /* directed */ 0, /* modularity = */ 0);
+    igraph_destroy(&graph);
+    igraph_vector_destroy(&membership);
+
     /* Simple unweighted graph */
     igraph_small(&graph, 10, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 0, 4, 1, 2, 1, 3, 1, 4, 2, 3, 2, 4, 3, 4,

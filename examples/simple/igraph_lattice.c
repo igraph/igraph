@@ -110,7 +110,7 @@ int check_lattice_properties(const igraph_t *lattice,
 
     /* Connected */
     igraph_is_connected(lattice, &res, IGRAPH_WEAK);
-    if (!res) {
+    if (!res && igraph_vcount(lattice) > 0) {
         printf("Not connected\n");
         return 1;
     }

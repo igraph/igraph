@@ -30,8 +30,30 @@ int main() {
     igraph_t g;
     igraph_integer_t k;
     igraph_vector_t membership;
+    igraph_real_t modularity;
 
     igraph_rng_seed(igraph_rng_default(), 247);
+
+    /* Empty graph */
+    igraph_small(&g, 0, IGRAPH_UNDIRECTED, -1);
+    igraph_vector_init(&membership, 0);
+    igraph_vector_push_back(&membership, 1);
+    igraph_community_fluid_communities(&g, 2, &membership, &modularity);
+    if (!igraph_is_nan(modularity) || igraph_vector_size(&membership) != 0) {
+        return 2;
+    }
+    igraph_vector_destroy(&membership);
+    igraph_destroy(&g);
+
+    /* Graph with one vertex only */
+    igraph_small(&g, 1, IGRAPH_UNDIRECTED, -1);
+    igraph_vector_init(&membership, 0);
+    igraph_community_fluid_communities(&g, 2, &membership, &modularity);
+    if (!igraph_is_nan(modularity) || igraph_vector_size(&membership) != 1 || VECTOR(membership)[0] != 0) {
+        return 3;
+    }
+    igraph_vector_destroy(&membership);
+    igraph_destroy(&g);
 
     /* Zachary Karate club -- this is just a quick smoke test */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,

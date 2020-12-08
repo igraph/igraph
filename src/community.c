@@ -915,6 +915,12 @@ int igraph_community_to_membership(const igraph_matrix_t *merges,
  * weight of all edges.
  *
  * </para><para>
+ * Note that the modularity is not well-defined for graphs with no edges.
+ * igraph assumes that the modularity of graphs with no edges is \c NaN; see
+ * the discussion in https://github.com/igraph/igraph/issues/1539 for
+ * a detailed discussion.
+ *
+ * </para><para>
  * For the original definition of modularity, see Newman, M. E. J., and Girvan, M.
  * (2004). Finding and evaluating community structure in networks.
  * Physical Review E 69, 026113. https://doi.org/10.1103/PhysRevE.69.026113
@@ -976,6 +982,15 @@ int igraph_modularity(const igraph_t *graph,
     }
     if (resolution < 0.0) {
       IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
+    }
+
+    if (no_of_edges == 0) {
+        /* Special case: the modularity of graphs with no edges is not
+         * well-defined */
+        if (modularity) {
+            *modularity = IGRAPH_NAN;
+        }
+        return IGRAPH_SUCCESS;
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&e, types);
@@ -2269,7 +2284,14 @@ int igraph_community_fluid_communities(const igraph_t *graph,
 
     /* Checking input values */
     if (no_of_nodes < 2) {
-        IGRAPH_ERROR("Empty and single vertex graphs are not supported.", IGRAPH_EINVAL);
+        if (membership) {
+            IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
+            igraph_vector_fill(membership, 0);
+        }
+        if (modularity) {
+            IGRAPH_CHECK(igraph_modularity(graph, membership, 0, 1, igraph_is_directed(graph), modularity));
+        }
+        return IGRAPH_SUCCESS;
     }
     if ((long int) no_of_communities < 1) {
         IGRAPH_ERROR("'no_of_communities' must be greater than 0.", IGRAPH_EINVAL);

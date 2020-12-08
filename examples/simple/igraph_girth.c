@@ -24,11 +24,12 @@
 #include <igraph.h>
 
 int main() {
-
     igraph_t g;
     igraph_integer_t girth;
     igraph_vector_t v;
+    igraph_vector_t circle;
     igraph_real_t chord[] = { 0, 50 };
+
     igraph_ring(&g, 100, IGRAPH_UNDIRECTED, 0, 1);
     igraph_vector_view(&v, chord, sizeof(chord) / sizeof(igraph_real_t));
     igraph_add_edges(&g, &v, 0);
@@ -38,5 +39,20 @@ int main() {
     }
 
     igraph_destroy(&g);
+
+    /* Special case: null graph */
+    igraph_ring(&g, 0, IGRAPH_UNDIRECTED, 0, 1);
+    igraph_vector_init(&circle, 1);
+    VECTOR(circle)[0] = 2;
+    igraph_girth(&g, &girth, &circle);
+    if (girth != 0) {
+        return 2;
+    }
+    if (igraph_vector_size(&circle) != 0) {
+        return 3;
+    }
+    igraph_vector_destroy(&circle);
+    igraph_destroy(&g);
+
     return 0;
 }

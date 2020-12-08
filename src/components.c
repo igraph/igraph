@@ -331,7 +331,11 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
  * \function igraph_is_connected
  * \brief Decides whether the graph is (weakly or strongly) connected.
  *
- * A graph with zero vertices (i.e. the null graph) is connected by definition.
+ * A graph with zero vertices (i.e. the null graph) is \em not connected by
+ * definition. This behaviour changed in igraph 0.9; earlier versions assumed
+ * that the null graph is connected. See the following issue on Github for the
+ * argument that led us to change the definition:
+ * https://github.com/igraph/igraph/issues/1538
  *
  * \param graph The graph object to analyze.
  * \param res Pointer to a logical variable, the result will be stored
@@ -352,7 +356,9 @@ int igraph_is_connected_weak(const igraph_t *graph, igraph_bool_t *res);
 int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                         igraph_connectedness_t mode) {
     if (igraph_vcount(graph) == 0) {
-        *res = 1;
+        /* Changed in igraph 0.9; see https://github.com/igraph/igraph/issues/1538
+         * for the reasoning behind the change */
+        *res = 0;
         return IGRAPH_SUCCESS;
     }
 

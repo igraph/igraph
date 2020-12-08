@@ -103,7 +103,7 @@ int check_ring_properties(const igraph_t *ring, igraph_bool_t directed,
 
     /* Connected */
     igraph_is_connected(ring, &res, IGRAPH_WEAK);
-    if (!res) {
+    if (!res && igraph_vcount(ring) > 0) {
         printf("Not connected\n");
         return 1;
     }

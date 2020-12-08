@@ -16,8 +16,12 @@
 ### Changed
 
  - `igraph_community_multilevel()`: added resolution parameter.
+ - `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
+ - `igraph_girth()` now returns zero for the null graph, along with an empty circle.
+ - `igraph_is_connected()` now returns false for the null graph; see https://github.com/igraph/igraph/issues/1538 for the reasoning behind this decision.
  - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
  - `igraph_modularity()` now supports computing the directed version of modularity.
+ - `igraph_modularity()` returns NaN for graphs with no edges to indicate that the modularity is not well-defined for graphs without edges.
  - `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
  - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.
  - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.

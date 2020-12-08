@@ -3366,6 +3366,19 @@ int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     igraph_bool_t anycircle = 0;
     long int t1 = 0, t2 = 0;
 
+    if (no_of_nodes == 0) {
+        /* special case: null graph */
+        if (girth) {
+            *girth = 0;
+        }
+
+        if (circle) {
+            IGRAPH_CHECK(igraph_vector_resize(circle, 0));
+        }
+
+        return IGRAPH_SUCCESS;
+    }
+
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL,
                                           IGRAPH_SIMPLIFY));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
