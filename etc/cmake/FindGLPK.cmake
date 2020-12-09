@@ -25,6 +25,10 @@ if (NOT GLPK_FOUND)
                       ENV GLPK_LIB_DIR
                 )
 
+    # hide the introduced cmake cached variables in cmake GUIs
+    mark_as_advanced(GLPK_INCLUDE_DIR)
+    mark_as_advanced(GLPK_LIBRARIES)
+
     if(GLPK_LIBRARIES AND GLPK_INCLUDE_DIR)
       set(GLPK_FOUND TRUE)
     endif()

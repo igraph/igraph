@@ -250,8 +250,8 @@ if(GLPK_LIBRARIES)
   target_link_libraries(igraph PUBLIC ${GLPK_LIBRARIES})
 endif()
 
-if(GMP_LIBRARY)
-  target_link_libraries(igraph PUBLIC ${GMP_LIBRARY})
+if(GMP_LIBRARIES)
+  target_link_libraries(igraph PUBLIC ${GMP_LIBRARIES})
 endif()
 
 if(LAPACK_LIBRARIES)
