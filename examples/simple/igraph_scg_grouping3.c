@@ -23,8 +23,6 @@
 
 #include <igraph.h>
 
-#include "../tests/test_utilities.inc"
-
 int main() {
 
     const int nodes = 10;
@@ -54,14 +52,18 @@ int main() {
     which.howmany = 1;
 
     igraph_eigen_matrix(/*matrix=*/ 0, &stochasticT, /*fun=*/ 0, nodes,
-                                    /*extra=*/ 0, /*1algorithm=*/ IGRAPH_EIGEN_LAPACK,
+                                    /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
                                     &which, /*options=*/ 0, /*storage=*/ 0,
                                     /*values=*/ 0, &V2);
     igraph_matrix_complex_real(&V2, &V);
 
     /* `p' is always the eigenvector corresponding to the 1-eigenvalue */
     igraph_matrix_get_col(&V, &p, 0);
-    print_vector_first_nonzero_element_positive(&p, "%.6f");
+    /* Ensure that elements of p are non-negative. */
+    if (VECTOR(p)[0] < 0) {
+        igraph_vector_scale(&p, -1);
+    }
+    igraph_vector_print(&p);
 
     which.howmany = 3;
     igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0, nodes,

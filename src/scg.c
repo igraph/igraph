@@ -383,12 +383,18 @@ int igraph_scg_grouping(const igraph_matrix_t *V,
     }
 
     if (mtype == IGRAPH_SCG_STOCHASTIC && !p) {
-        IGRAPH_ERROR("`p' must be given for the stochastic matrix case",
+        IGRAPH_ERROR("The p vector must be given for the stochastic matrix case",
                      IGRAPH_EINVAL);
     }
 
-    if (p && igraph_vector_size(p) != no_of_nodes) {
-        IGRAPH_ERROR("Invalid `p' vector size", IGRAPH_EINVAL);
+    if (p) {
+        if (igraph_vector_size(p) != no_of_nodes) {
+            IGRAPH_ERROR("Invalid p vector size", IGRAPH_EINVAL);
+        }
+
+        if (igraph_vector_min(p) < 0) {
+            IGRAPH_ERROR("The elements of the p vector must be non-negative", IGRAPH_EINVAL);
+        }
     }
 
     IGRAPH_CHECK(igraph_vector_resize(groups, no_of_nodes));
