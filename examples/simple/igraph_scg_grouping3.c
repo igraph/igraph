@@ -29,12 +29,15 @@ int main() {
     igraph_t g;
     igraph_matrix_t V, V3;
     igraph_matrix_complex_t V2;
-    igraph_sparsemat_t stochastic, stochasticT;
+    igraph_sparsemat_t stochastic;
     igraph_vector_t groups;
     igraph_eigen_which_t which;
     igraph_vector_t p, selcol;
 
-    igraph_tree(&g, nodes, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
+    /* This is a 10-node tree with no non-trivial automorphisms. */
+    igraph_small(&g, nodes, IGRAPH_UNDIRECTED,
+                 3, 5, 4, 5, 4, 9, 8, 9, 0, 9, 0, 6, 1, 6, 1, 2, 7, 8,
+                 -1);
 
     igraph_matrix_complex_init(&V2, 0, 0);
     igraph_matrix_init(&V, 0, 0);
@@ -43,28 +46,13 @@ int main() {
     igraph_vector_init(&p, 0);
     igraph_vector_init(&selcol, 1);
 
-    igraph_rng_seed(igraph_rng_default(), 42);
-
     igraph_get_stochastic_sparsemat(&g, &stochastic, /*column-wise=*/ 0);
-    igraph_sparsemat_transpose(&stochastic, &stochasticT, /*values=*/ 1);
+
+    /* p is always the eigenvector corresponding to the 1-eigenvalue.
+     * Since the graph is undirected, p is proportional to the degree vector. */
+    igraph_degree(&g, &p, igraph_vss_all(), IGRAPH_ALL, IGRAPH_LOOPS);
 
     which.pos = IGRAPH_EIGEN_LR;
-    which.howmany = 1;
-
-    igraph_eigen_matrix(/*matrix=*/ 0, &stochasticT, /*fun=*/ 0, nodes,
-                                    /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
-                                    &which, /*options=*/ 0, /*storage=*/ 0,
-                                    /*values=*/ 0, &V2);
-    igraph_matrix_complex_real(&V2, &V);
-
-    /* `p' is always the eigenvector corresponding to the 1-eigenvalue */
-    igraph_matrix_get_col(&V, &p, 0);
-    /* Ensure that elements of p are non-negative. */
-    if (VECTOR(p)[0] < 0) {
-        igraph_vector_scale(&p, -1);
-    }
-    igraph_vector_print(&p);
-
     which.howmany = 3;
     igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0, nodes,
                                     /*extra=*/ 0, /*algorithm=*/ IGRAPH_EIGEN_LAPACK,
@@ -110,7 +98,6 @@ int main() {
     igraph_matrix_destroy(&V);
     igraph_matrix_destroy(&V3);
     igraph_matrix_complex_destroy(&V2);
-    igraph_sparsemat_destroy(&stochasticT);
     igraph_sparsemat_destroy(&stochastic);
     igraph_destroy(&g);
 
