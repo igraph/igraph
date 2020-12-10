@@ -21,7 +21,7 @@ jobs:
 
   - job: linux_static_external
     steps:
-      - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libblas-dev liblapack-dev -y
+      - script: sudo apt-get install ninja-build ccache libgmp-dev libglpk-dev libarpack2-dev libopenblas-dev -y
         displayName: Install dependencies
 
       - template: .azure/build.yml
@@ -32,6 +32,7 @@ jobs:
           int_cxsparse: false
           int_gmp: false
           int_glpk: false
+          extra_cmake_args: '-DBLA_VENDOR=OpenBLAS'
 
   - job: linux_shared_vendored
     steps:
