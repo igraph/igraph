@@ -373,6 +373,9 @@ add_legacy_tests(
   walktrap
 )
 
+# use a higher test timeout for the Infomap algorithm
+set_tests_properties(igraph_community_infomap PROPERTIES TIMEOUT 120)
+
 add_legacy_tests(
   FOLDER tests NAMES
   igraph_community_fluid_communities
