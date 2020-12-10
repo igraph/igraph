@@ -64,6 +64,10 @@ int main() {
     igraph_matrix_complex_real(&V2, &V);
     /* `p' is always the eigenvector corresponding to the 1-eigenvalue */
     igraph_matrix_get_col(&V, &p, 0);
+    /* Ensure that elements of p are non-negative. */
+    if (VECTOR(p)[0] < 0) {
+        igraph_vector_scale(&p, -1);
+    }
 
     which.howmany = 3;
     igraph_eigen_matrix(/*matrix=*/ 0, &stochastic, /*fun=*/ 0, 10,
