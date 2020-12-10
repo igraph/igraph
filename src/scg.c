@@ -268,25 +268,24 @@
 
 /**
  * \function igraph_scg_grouping
- * \brief SCG problem solver
+ * \brief SCG problem solver.
  *
  * This function solves the Spectral Coarse Graining (SCG) problem;
  * either exactly, or approximately but faster.
  *
  * </para><para>
- * The algorithm \c IGRAPH_SCG_OPTIMUM solves exactly the SCG problem
+ * The algorithm \c IGRAPH_SCG_OPTIMUM solves the SCG problem exactly
  * for each eigenvector in \p V. The running time of this algorithm is
- * O(max(nt) m^2) for the symmetric and laplacian matrix problems
+ * O(max(nt) m^2) for the symmetric and Laplacian matrix problems.
  * It is O(m^3) for the stochastic problem. Here m is the number
  * of rows in \p V. In all three cases, the memory usage is O(m^2).
  *
  * </para><para>
  * The algorithms \c IGRAPH_SCG_INTERV and \c IGRAPH_SCG_INTERV_KM solve
- * approximately the SCG problem by performing a (for now) constant
- * binning of the components of the eigenvectors, that is \p nt
- * <code>VECTOR(nt_vec)[i]</code>) constant-size bins are used to
- * partition <code>V[,i]</code>. When \p algo is \c
- * IGRAPH_SCG_INTERV_KM, the (Lloyd) k-means algorithm is
+ * the SCG problem approximately by performing a (for now) constant
+ * binning of the components of the eigenvectors, that is <code>nt_vec[i]</code>
+ * constant-size bins are used to partition the <code>i</code>th eigenvector in \c V.
+ * When \p algo is \c IGRAPH_SCG_INTERV_KM, the (Lloyd) k-means algorithm is
  * run on each partition obtained by \c IGRAPH_SCG_INTERV to improve
  * accuracy.
  *
@@ -294,7 +293,7 @@
  * Once a minimizing partition (either exact or approximate) has been
  * found for each eigenvector, the final grouping is worked out as
  * follows: two vertices are grouped together in the final partition if
- * they are grouped together in each minimizing partition. In general the
+ * they are grouped together in each minimizing partition. In general, the
  * size of the final partition is not known in advance when the number
  * of columns in \p V is larger than one.
  *
@@ -305,7 +304,7 @@
  *
  * \param V The matrix of eigenvectors to be preserved by coarse
  *    graining, each column is an eigenvector.
- * \param groups Pointer to an initialized vector, the result of the
+ * \param groups Pointer to an initialized vector; the result of the
  *    SCG is stored here.
  * \param nt Positive integer. When \p algo is \c IGRAPH_SCG_OPTIMUM,
  *    it gives the number of groups to partition each eigenvector
@@ -313,9 +312,10 @@
  *    IGRAPH_SCG_INTERV_KM, it gives the number of intervals to
  *    partition each eigenvector. This is ignored when \p algo is \c
  *    IGRAPH_SCG_EXACT.
- * \param nt_vec A numeric vector of length one or the length must
- *    match the number of eigenvectors given in \p V, or a \c NULL
- *    pointer. If not \c NULL, then this argument gives the number of
+ * \param nt_vec May be (1) a numeric vector of length one, or
+ *    (2) a vector of the same length as the number of eigenvectors given in \p V, or
+ *    (3) a \c NULL pointer.
+ *    If not \c NULL, then this argument gives the number of
  *    groups or intervals, and \p nt is ignored. Different number of
  *    groups or intervals can be specified for each eigenvector.
  * \param mtype The type of semi-projectors used in the SCG. Possible
@@ -746,7 +746,7 @@ static int igraph_i_scg_semiprojectors_sto(const igraph_vector_t *groups,
 
 /**
  * \function igraph_scg_semiprojectors
- * \brief Compute SCG semi-projectors for a given partition
+ * \brief Compute SCG semi-projectors for a given partition.
  *
  * The three types of semi-projectors are defined as follows.
  * Let gamma(j) label the group of vertex j in a partition of all the
@@ -870,7 +870,7 @@ int igraph_scg_semiprojectors(const igraph_vector_t *groups,
 
 /**
  * \function igraph_scg_norm_eps
- * Calculate SCG residuals
+ * \brief Calculate SCG residuals.
  *
  * Computes |v[i]-Pv[i]|, where v[i] is the i-th eigenvector in \p V
  * and P is the projector corresponding to the \p mtype argument.
@@ -2001,7 +2001,8 @@ int igraph_scg_stochastic(const igraph_t *graph,
 
 /**
  * \function igraph_scg_laplacian
- * Spectral coarse graining, laplacian matrix.
+ * \brief Spectral coarse graining, Laplacian case.
+ *
  * This function handles all the steps involved in the Spectral Coarse
  * Graining (SCG) of some matrices and graphs as described in the
  * reference below.
