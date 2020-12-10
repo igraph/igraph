@@ -44,7 +44,7 @@ jobs:
         run: make -j2 build_tests
         working-directory: build-${{ matrix.arch }}
       - name: Test
-        run: ctest -j1 --output-on-failure
+        run: ctest -j2 --output-on-failure
         working-directory: build-${{ matrix.arch }}
       - name: Generate Artifacts upon Failure
         if: ${{ failure() }}
