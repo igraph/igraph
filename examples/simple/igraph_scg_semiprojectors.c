@@ -38,8 +38,6 @@ int main() {
     igraph_matrix_init(&V, 0, 0);
     igraph_vector_init(&groups, 0);
 
-    igraph_rng_seed(igraph_rng_default(), 42);
-
     igraph_tree(&g, 10, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
 
     igraph_get_adjacency(&g, &adj, IGRAPH_GET_ADJACENCY_BOTH, /*eids=*/ 0);
