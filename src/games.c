@@ -1691,7 +1691,39 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
     igraph_real_t maxcum;
     igraph_vector_t nodetypes;
 
-    /* TODO: parameter checks */
+    /* Argument contracts */
+    if(nodes < 0){
+        IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
+    }
+    
+    if (types < 1) {
+        IGRAPH_ERROR("The number of vertex types must be at least 1.", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_size(type_dist) != types) {
+        IGRAPH_ERROR("The vertex type distribution vector must agree in length with the number of types.", IGRAPH_EINVAL);
+    }
+
+    if (igraph_vector_min(type_dist) < 0) {
+        IGRAPH_ERROR("The vertex type distribution vector must contain non-negative values.", IGRAPH_EINVAL);
+    }
+    
+    if (igraph_matrix_nrow(pref_matrix) != types || igraph_matrix_ncol(pref_matrix) != types) {
+        IGRAPH_ERROR("The preference matrix must be square and agree in dimensions with the number of types.", IGRAPH_EINVAL);
+    }
+
+    if (! directed && ! igraph_matrix_is_symmetric(pref_matrix)) {
+        IGRAPH_ERROR("The preference matrix must be symmetric when generating undirected graphs.", IGRAPH_EINVAL);
+    }
+
+    {
+        igraph_real_t lo, hi;
+        igraph_matrix_minmax(pref_matrix, &lo, &hi);
+
+        if (lo < 0 || hi > 1) {
+            IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
+        }
+    }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types + 1);
