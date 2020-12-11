@@ -1693,43 +1693,35 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
 
     /* Argument contracts */
     if(nodes < 0){
-        IGRAPH_ERROR("The number of vertices must be non-negative", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
     }
     
     if (types < 1) {
-        IGRAPH_ERROR("The number of vertex types must be at least 1", IGRAPH_EINVAL);
+        IGRAPH_ERROR("The number of vertex types must be at least 1.", IGRAPH_EINVAL);
     }
 
     if (igraph_vector_size(type_dist) != types) {
-        IGRAPH_ERROR("The vertex type distribution vector must agree in length with the number of types", IGRAPH_EINVAL);
-    }
-    
-    if (igraph_matrix_size(pref_matrix) != types * types) {
-        IGRAPH_ERROR("Size of matrix is not consistent to the vertex type distribution vector", IGRAPH_EINVAL);
-    }
-    if(igraph_matrix_nrow(pref_matrix) != igraph_matrix_ncol(pref_matrix)){
-                IGRAPH_ERROR("The matrix must be square", IGRAPH_EINVAL);
-    }
-    
-    for (i = 0; i < types; i++) {
-        if(VECTOR(*type_dist)[i] < 0){
-            IGRAPH_ERROR("Negative component in the vertex type distribution vector", IGRAPH_EINVAL);
-        }
-        igraph_vector_t row_i;
-        igraph_matrix_get_row(pref_matrix, &row_i, i); 
-        for(j = 0; j < types; j++){
-            if(VECTOR(row_i)[j] < 0 || VECTOR(row_i)[j] > 1){
-                IGRAPH_ERROR("Probability of index in preference matrix not in [0,1]", IGRAPH_EINVAL);
-            } 
-        }
+        IGRAPH_ERROR("The vertex type distribution vector must agree in length with the number of types.", IGRAPH_EINVAL);
     }
 
-    if(!directed){
-        igraph_matrix_t pref_matrix_copy;
-        igraph_matrix_copy(pref_matrix, &pref_matrix_copy);
-        igraph_matrix_transpose(&pref_matrix_copy);
-        if(igraph_matrix_all_e(pref_matrix, &pref_matrix_copy) <= 0){
-            IGRAPH_ERROR("Undirected graph is not symmetric", IGRAPH_EINVAL);
+    if (igraph_vector_min(type_dist) < 0) {
+        IGRAPH_ERROR("The vertex type distribution vector must contain non-negative values.", IGRAPH_EINVAL);
+    }
+    
+    if (igraph_matrix_nrow(pref_matrix) != types || igraph_matrix_ncol(pref_matrix) != types) {
+        IGRAPH_ERROR("The preference matrix must be square and agree in dimensions with the number of types.", IGRAPH_EINVAL);
+    }
+
+    if (! directed && ! igraph_matrix_is_symmetric(pref_matrix)) {
+        IGRAPH_ERROR("The preference matrix must be symmetric when generating undirected graphs.", IGRAPH_EINVAL);
+    }
+
+    {
+        igraph_real_t lo, hi;
+        igraph_matrix_minmax(pref_matrix, &lo, &hi);
+
+        if (lo < 0 || hi > 1) {
+            IGRAPH_ERROR("The preference matrix must contain probabilities in [0, 1].", IGRAPH_EINVAL);
         }
     }
 
