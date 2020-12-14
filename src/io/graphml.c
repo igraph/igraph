@@ -28,13 +28,14 @@
 #include "igraph_math.h"
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
-#include "igraph_hacks_internal.h"
-#include "igraph_types_internal.h"
+#include "igraph_memory.h"
 
 #include <ctype.h>      /* isspace */
 #include <string.h>
-#include "igraph_memory.h"
 #include <stdarg.h>         /* va_start & co */
+
+#include "core/trie.h"
+#include "igraph_hacks_internal.h"
 
 #define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 

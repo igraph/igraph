@@ -55,7 +55,6 @@ add_legacy_tests(
   igraph_sparsemat_minmax
   igraph_sparsemat_which_minmax
   igraph_strvector
-  indheap
   matrix
   matrix2
   matrix3
@@ -69,18 +68,18 @@ add_legacy_tests(
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER simple NAMES
-    2wheap
-    d_indheap
-    igraph_hashtable
-    igraph_i_cutheap
-    igraph_marked_queue
-    igraph_set
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
-    igraph_trie
   )
   add_legacy_tests(
     FOLDER tests NAMES
+    2wheap
     biguint
+    cutheap
+    d_indheap
+    hashtable
+    marked_queue
+    set
+    trie
   )
 endif()
 

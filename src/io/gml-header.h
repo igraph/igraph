@@ -21,6 +21,7 @@
 */
 
 #include "igraph_error.h"
+
 #include "io/gml-tree.h"
 
 typedef struct {

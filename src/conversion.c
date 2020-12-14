@@ -27,10 +27,11 @@
 #include "igraph_attributes.h"
 #include "igraph_constructors.h"
 #include "igraph_structural.h"
-#include "igraph_types_internal.h"
 #include "igraph_sparsemat.h"
 #include "igraph_random.h"
 #include "config.h"
+
+#include "core/fixed_vectorlist.h"
 
 /**
  * \ingroup conversion

@@ -22,10 +22,12 @@
 */
 
 #include "igraph_types.h"
-#include "igraph_types_internal.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
+
+#include "core/hashtable.h"
+
 #include <string.h>
 
 int igraph_hashtable_init(igraph_hashtable_t *ht) {

@@ -40,7 +40,9 @@ add_library(
   core/dqueue.c
   core/error.c
   core/estack.c
+  core/fixed_vectorlist.c
   core/grid.c
+  core/hashtable.c
   core/heap.c
   core/indheap.c
   core/interruption.c
@@ -130,8 +132,6 @@ add_library(
   hacks.c
   igraph_cliquer.c
   igraph_eulerian.c
-  igraph_fixed_vectorlist.c
-  igraph_hashtable.c
   igraph_hrg_types.cc
   igraph_hrg.cc
   infomap_FlowGraph.cc

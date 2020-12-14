@@ -22,9 +22,10 @@
 */
 
 #include "igraph_types.h"
-#include "igraph_types_internal.h"
 #include "igraph_memory.h"
 #include "config.h"
+
+#include "core/grid.h"
 
 #include <math.h>
 

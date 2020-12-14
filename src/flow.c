@@ -38,8 +38,8 @@
 #include "config.h"
 
 #include "core/buckets.h"
+#include "core/cutheap.h"
 #include "core/interruption.h"
-#include "igraph_types_internal.h"
 
 /*
  * Some general remarks about the functions in this file.

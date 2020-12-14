@@ -42,7 +42,6 @@
 
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "igraph_types_internal.h"
 
 #include <string.h>
 #include <math.h>

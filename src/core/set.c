@@ -24,8 +24,9 @@
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
-#include "igraph_types_internal.h"
 #include "config.h"
+
+#include "core/set.h"
 
 #include <string.h>     /* memmove */
 

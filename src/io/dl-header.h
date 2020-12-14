@@ -22,7 +22,8 @@
 
 #include "igraph_error.h"
 #include "igraph_types.h"
-#include "igraph_types_internal.h"
+
+#include "core/trie.h"
 
 typedef enum { IGRAPH_DL_MATRIX,
                IGRAPH_DL_EDGELIST1, IGRAPH_DL_NODELIST1

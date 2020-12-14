@@ -1,7 +1,6 @@
 #ifndef IGRAPH_CLIQUER_H
 #define IGRAPH_CLIQUER_H
 
-#include "igraph_types_internal.h"
 #include "igraph_interface.h"
 #include "igraph_cliques.h"
 

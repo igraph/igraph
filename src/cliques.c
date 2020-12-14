@@ -26,13 +26,14 @@
 #include "igraph_memory.h"
 #include "igraph_constants.h"
 #include "igraph_adjlist.h"
-#include "core/interruption.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
-#include "igraph_types_internal.h"
 #include "igraph_cliquer.h"
 #include "config.h"
+
+#include "core/interruption.h"
+#include "core/set.h"
 
 #include <string.h>    /* memset */
 

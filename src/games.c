@@ -26,7 +26,6 @@
 #include "igraph_games.h"
 #include "igraph_random.h"
 #include "igraph_memory.h"
-#include "core/interruption.h"
 #include "igraph_attributes.h"
 #include "igraph_constructors.h"
 #include "igraph_nongraph.h"
@@ -37,8 +36,10 @@
 #include "igraph_iterators.h"
 #include "igraph_progress.h"
 #include "igraph_topology.h"
-#include "igraph_types_internal.h"
 #include "config.h"
+
+#include "core/interruption.h"
+#include "core/set.h"
 
 #include <math.h>
 

@@ -46,15 +46,16 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "igraph_hacks_internal.h"
+
 #include "igraph_types.h" 
-#include "igraph_types_internal.h"
 #include "igraph_math.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
+
 #include "io/lgl-header.h"
 #include "io/parsers/lgl-parser.h"
+#include "igraph_hacks_internal.h"
 
 #define yyscan_t void*
 

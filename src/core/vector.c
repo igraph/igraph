@@ -23,7 +23,6 @@
 
 #include "igraph_error.h"
 #include "igraph_types.h"
-#include "igraph_types_internal.h"
 #include "igraph_complex.h"
 #include "config.h"
 #include <float.h>

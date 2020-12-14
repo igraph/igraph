@@ -47,9 +47,9 @@
 #include <string.h>
 #include <limits.h>
 
+#include "core/fixed_vectorlist.h"
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "igraph_types_internal.h"
 #include "structural_properties_internal.h"
 
 /**

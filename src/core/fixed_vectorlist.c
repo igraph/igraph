@@ -21,8 +21,9 @@
 
 */
 
-#include "igraph_types_internal.h"
 #include "igraph_memory.h"
+
+#include "core/fixed_vectorlist.h"
 
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
     long int i, n = igraph_vector_ptr_size(&l->v);

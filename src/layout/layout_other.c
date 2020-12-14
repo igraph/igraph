@@ -29,13 +29,11 @@
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 #include "igraph_progress.h"
-#include "core/interruption.h"
 #include "igraph_paths.h"
 #include "igraph_structural.h"
 #include "igraph_visitor.h"
 #include "igraph_topology.h"
 #include "igraph_components.h"
-#include "igraph_types_internal.h"
 #include "igraph_dqueue.h"
 #include "igraph_arpack.h"
 #include "igraph_blas.h"
@@ -45,6 +43,8 @@
 #include <math.h>
 #include "igraph_math.h"
 
+#include "core/grid.h"
+#include "core/interruption.h"
 
 /**
  * \section about_layouts

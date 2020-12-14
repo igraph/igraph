@@ -26,7 +26,8 @@
 #include "igraph_random.h"
 #include "igraph_interface.h"
 #include "igraph_components.h"
-#include "igraph_types_internal.h"
+
+#include "core/grid.h"
 
 static int igraph_layout_i_fr(const igraph_t *graph,
                               igraph_matrix_t *res,

@@ -22,7 +22,9 @@
 
 #include "igraph_error.h"
 #include "igraph_vector.h"
-#include "igraph_types_internal.h"
+#include "igraph_vector_ptr.h"
+
+#include "core/trie.h"
 
 typedef struct {
     void *scanner;

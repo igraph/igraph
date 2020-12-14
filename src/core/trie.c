@@ -22,14 +22,14 @@
 */
 
 #include "igraph_types.h"
-#include "igraph_types_internal.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_error.h"
 #include "config.h"
 
-#include <string.h>         /* memcpy & co. */
-#include <stdlib.h>
+#include "core/trie.h"
+
+#include <string.h>
 
 /**
  * \ingroup igraphtrie

@@ -23,7 +23,8 @@
 
 #include <stdio.h>
 #include <igraph.h>
-#include "igraph_types_internal.h"
+
+#include "core/trie.h"
 
 int main() {
 

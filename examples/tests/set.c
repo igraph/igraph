@@ -22,8 +22,9 @@
 */
 
 #include <igraph.h>
-#include "igraph_types_internal.h"
 #include <stdlib.h>
+
+#include "core/set.h"
 
 void print_set(igraph_set_t *set, FILE *f) {
     long int state = 0;
