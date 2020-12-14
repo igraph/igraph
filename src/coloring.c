@@ -21,7 +21,7 @@
 #include "igraph_coloring.h"
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 #include "igraph_types_internal.h"
 
 

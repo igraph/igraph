@@ -35,11 +35,14 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 add_library(
   igraph
   core/array.c
+  core/buckets.c
   core/dqueue.c
   core/error.c
+  core/estack.c
   core/heap.c
   core/indheap.c
-  core/interrupt.c
+  core/interruption.c
+  core/marked_queue.c
   core/matrix.c
   core/memory.c
   core/printing.c
@@ -119,16 +122,13 @@ add_library(
   glpk_support.c
   graphicality.c
   hacks.c
-  igraph_buckets.c
   igraph_cliquer.c
-  igraph_estack.c
   igraph_eulerian.c
   igraph_fixed_vectorlist.c
   igraph_grid.c
   igraph_hashtable.c
   igraph_hrg_types.cc
   igraph_hrg.cc
-  igraph_marked_queue.c
   igraph_psumtree.c
   igraph_strvector.c
   igraph_trie.c

@@ -24,7 +24,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_memory.h"
 #include "igraph_interface.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 #include "config.h"
 
 #include <string.h>   /* memset */

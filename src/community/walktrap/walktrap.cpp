@@ -59,7 +59,7 @@
 #include "igraph_community.h"
 #include "igraph_components.h"
 #include "igraph_interface.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 
 using namespace igraph::walktrap;
 

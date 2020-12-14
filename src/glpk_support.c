@@ -28,7 +28,7 @@
 
 #include "igraph_types.h"
 #include "igraph_error.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 #include <glpk.h>
 #include <stdio.h>
 

@@ -26,7 +26,7 @@
 #include "igraph_community.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_stack.h"

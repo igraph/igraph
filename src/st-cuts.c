@@ -34,10 +34,11 @@
 #include "igraph_math.h"
 #include "igraph_dqueue.h"
 #include "igraph_visitor.h"
-#include "igraph_marked_queue.h"
 #include "igraph_stack.h"
-#include "igraph_estack.h"
 #include "config.h"
+
+#include "core/estack.h"
+#include "core/marked_queue.h"
 
 /**
  * \function igraph_even_tarjan_reduction

@@ -28,7 +28,7 @@
 #include "igraph_psumtree.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 
 int igraph_sir_init(igraph_sir_t *sir) {
     IGRAPH_CHECK(igraph_vector_init(&sir->times, 1));

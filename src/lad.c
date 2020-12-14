@@ -53,7 +53,7 @@
 #include "igraph_vector_ptr.h"
 #include "igraph_memory.h"
 #include "igraph_matrix.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 
 #include <stdlib.h>
 #include <string.h>

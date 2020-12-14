@@ -26,7 +26,7 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 #include "igraph_memory.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 
 /**
  * \function igraph_random_walk

@@ -21,7 +21,7 @@
 
 */
 
-#include "igraph_marked_queue.h"
+#include "core/marked_queue.h"
 
 #define BATCH_MARKER -1
 

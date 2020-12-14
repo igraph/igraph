@@ -26,7 +26,7 @@
 #include "igraph_interface.h"
 #include "igraph_community.h"
 #include "igraph_adjlist.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 #include "igraph_memory.h"
 #include "igraph_progress.h"
 #include "igraph_math.h"

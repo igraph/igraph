@@ -22,7 +22,7 @@
 */
 
 #include <igraph.h>
-#include "igraph_marked_queue.h"
+#include "core/marked_queue.h"
 
 int main() {
     igraph_marked_queue_t Q;

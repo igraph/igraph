@@ -25,7 +25,7 @@
 #include "igraph_memory.h"
 #include "igraph_progress.h"
 #include "igraph_types_internal.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 #include <string.h>
 
 

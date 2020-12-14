@@ -24,7 +24,7 @@
 #include "igraph_nongraph.h"
 #include "igraph_random.h"
 #include "igraph_types.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 #include "config.h"
 #include "plfit/error.h"
 #include "plfit/plfit.h"

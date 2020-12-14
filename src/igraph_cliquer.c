@@ -3,7 +3,7 @@
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "igraph_constants.h"
-#include "igraph_interrupt_internal.h"
+#include "core/interruption.h"
 #include "cliquer/cliquer.h"
 #include "config.h"
 
