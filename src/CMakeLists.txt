@@ -48,6 +48,21 @@ add_library(
   core/vector_ptr.c
   core/vector.c
 
+  math/bfgs.c
+  math/bigint.c
+  math/bignum.c
+  math/complex.c
+  math/utils.c
+
+  community/community_other.c
+  community/fast_modularity.c
+  community/leiden.c
+  community/optimal_modularity.c
+  community/walktrap/walktrap_communities.cpp
+  community/walktrap/walktrap_graph.cpp
+  community/walktrap/walktrap_heap.cpp
+  community/walktrap/walktrap.cpp
+
   io/graphml.c
   io/gml-tree.c
   io/io_other.c
@@ -66,12 +81,6 @@ add_library(
   layout/layout_other.c
   layout/sugiyama.c
 
-  math/bfgs.c
-  math/bigint.c
-  math/bignum.c
-  math/complex.c
-  math/utils.c
-
   adjlist.c
   arpack.c
   atlas.c
@@ -87,8 +96,6 @@ add_library(
   cocitation.c
   cohesive_blocks.c
   coloring.c
-  community_leiden.c
-  community.c
   components.c
   conversion.c
   cores.c
@@ -98,7 +105,6 @@ add_library(
   dotproduct.c
   eigen.c
   embedding.c
-  fast_community.c
   feedback_arc_set.c
   flow.c
   forestfire.c
@@ -142,7 +148,6 @@ add_library(
   NetDataTypes.cpp
   NetRoutines.cpp
   operators.c
-  optimal_modularity.c
   other.c
   paths.c
   pottsmodel_2.cpp
@@ -176,10 +181,6 @@ add_library(
   type_indexededgelist.c
   version.c
   visitors.c
-  walktrap_communities.cpp
-  walktrap_graph.cpp
-  walktrap_heap.cpp
-  walktrap.cpp
   zeroin.c
 
   # Vendored library sources. Yes, this is horrible.
