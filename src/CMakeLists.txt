@@ -46,6 +46,19 @@ add_library(
   core/vector_ptr.c
   core/vector.c
 
+  layout/davidson_harel.c
+  layout/drl/DensityGrid.cpp
+  layout/drl/DensityGrid_3d.cpp
+  layout/drl/drl_graph.cpp
+  layout/drl/drl_graph_3d.cpp
+  layout/drl/drl_layout.cpp
+  layout/drl/drl_layout_3d.cpp
+  layout/fruchterman_reingold.c
+  layout/gem.c
+  layout/kamada_kawai.c
+  layout/layout_other.c
+  layout/sugiyama.c
+
   math/bfgs.c
   math/bigint.c
   math/bignum.c
@@ -74,14 +87,8 @@ add_library(
   cores.c
   decomposition.c
   degree_sequence.cpp
-  DensityGrid_3d.cpp
-  DensityGrid.cpp
   distances.c
   dotproduct.c
-  drl_graph.cpp
-  drl_graph_3d.cpp
-  drl_layout.cpp
-  drl_layout_3d.cpp
   eigen.c
   embedding.c
   fast_community.c
@@ -124,11 +131,6 @@ add_library(
   iterators.c
   lad.c
   lapack.c
-  layout_dh.c
-  layout_fr.c
-  layout_gem.c
-  layout_kk.c
-  layout.c
   lsap.c
   matching.c
   maximal_cliques.c
@@ -167,7 +169,6 @@ add_library(
   statusbar.c
   structural_properties.c
   structure_generators.c
-  sugiyama.c
   topology.c
   triangles.c
   type_indexededgelist.c
