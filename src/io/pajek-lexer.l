@@ -46,8 +46,10 @@
 
 #include "config.h"
 #include <stdlib.h>
-#include "foreign-pajek-header.h"
-#include "foreign-pajek-parser.h"
+
+#include "io/pajek-header.h"
+#include "io/parsers/pajek-parser.h"
+
 #define YY_EXTRA_TYPE igraph_i_pajek_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
 #define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in Pajek parser: " # msg)

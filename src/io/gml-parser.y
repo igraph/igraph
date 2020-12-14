@@ -53,9 +53,9 @@
 #include "config.h"
 #include "igraph_hacks_internal.h"
 #include "igraph_math.h"
-#include "igraph_gml_tree.h"
-#include "foreign-gml-header.h"
-#include "foreign-gml-parser.h"
+#include "io/gml-header.h"
+#include "io/gml-tree.h"
+#include "io/parsers/gml-parser.h"
 
 #define yyscan_t void*
 

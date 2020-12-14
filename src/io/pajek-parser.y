@@ -55,8 +55,8 @@
 #include "config.h"
 #include "igraph_math.h"
 #include <math.h>
-#include "foreign-pajek-header.h"
-#include "foreign-pajek-parser.h"
+#include "io/pajek-header.h"
+#include "io/parsers/pajek-parser.h"
 
 #define yyscan_t void*
 

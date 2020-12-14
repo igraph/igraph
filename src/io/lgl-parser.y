@@ -53,8 +53,8 @@
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
-#include "foreign-lgl-header.h"
-#include "foreign-lgl-parser.h"
+#include "io/lgl-header.h"
+#include "io/parsers/lgl-parser.h"
 
 #define yyscan_t void*
 

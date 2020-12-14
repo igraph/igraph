@@ -23,7 +23,6 @@
 
 #include "igraph_foreign.h"
 #include "igraph_math.h"
-#include "igraph_gml_tree.h"
 #include "igraph_memory.h"
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
@@ -32,6 +31,8 @@
 #include "igraph_hacks_internal.h"
 #include "igraph_interrupt_internal.h"
 #include "igraph_types_internal.h"
+
+#include "io/gml-tree.h"
 
 #include "config.h"
 
@@ -123,7 +124,7 @@ int igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
     return 0;
 }
 
-#include "foreign-ncol-header.h"
+#include "ncol-header.h"
 
 int igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
                                   void* scanner);
@@ -300,7 +301,7 @@ int igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
     return 0;
 }
 
-#include "foreign-lgl-header.h"
+#include "lgl-header.h"
 
 int igraph_lgl_yylex_init_extra (igraph_i_lgl_parsedata_t* user_defined,
                                  void* scanner);
@@ -453,7 +454,7 @@ int igraph_read_graph_lgl(igraph_t *graph, FILE *instream,
     return 0;
 }
 
-#include "foreign-pajek-header.h"
+#include "pajek-header.h"
 
 int igraph_pajek_yylex_init_extra(igraph_i_pajek_parsedata_t* user_defined,
                                   void* scanner);
@@ -972,7 +973,7 @@ int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
     return 0;
 }
 
-#include "foreign-gml-header.h"
+#include "gml-header.h"
 
 int igraph_gml_yylex_init_extra (igraph_i_gml_parsedata_t* user_defined,
                                  void* scanner);
@@ -3030,7 +3031,7 @@ int igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     return 0;
 }
 
-#include "foreign-dl-header.h"
+#include "dl-header.h"
 
 int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
                                 void* scanner);

@@ -53,8 +53,8 @@
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
-#include "foreign-ncol-header.h"
-#include "foreign-ncol-parser.h"
+#include "io/ncol-header.h"
+#include "io/parsers/ncol-parser.h"
 
 #define yyscan_t void*
 

@@ -11,19 +11,19 @@ add_subdirectory(mini-gmp)
 
 # Generate lexers and parsers
 set(PARSER_SOURCES)
-file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/parsers/)
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/io/parsers)
 foreach(FORMAT dl gml lgl ncol pajek)
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-parser.c)
+  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-parser.c)
     list(APPEND PARSER_SOURCES
-      ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-lexer.c
-      ${CMAKE_CURRENT_SOURCE_DIR}/parsers/foreign-${FORMAT}-parser.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-lexer.c
+      ${CMAKE_CURRENT_SOURCE_DIR}/io/parsers/${FORMAT}-parser.c
     )
   else()
     bison_target(
-      ${FORMAT}_parser foreign-${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/parsers/foreign-${FORMAT}-parser.c
+      ${FORMAT}_parser io/${FORMAT}-parser.y ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-parser.c
     )
     flex_target(
-      ${FORMAT}_lexer foreign-${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/parsers/foreign-${FORMAT}-lexer.c
+      ${FORMAT}_lexer io/${FORMAT}-lexer.l ${CMAKE_CURRENT_BINARY_DIR}/io/parsers/${FORMAT}-lexer.c
     )
     add_flex_bison_dependency(${FORMAT}_lexer ${FORMAT}_parser)
     list(APPEND PARSER_SOURCES ${BISON_${FORMAT}_parser_OUTPUTS} ${FLEX_${FORMAT}_lexer_OUTPUTS})
@@ -36,8 +36,10 @@ add_library(
   igraph
   core/array.c
   core/dqueue.c
+  core/error.c
   core/heap.c
   core/indheap.c
+  core/interrupt.c
   core/matrix.c
   core/memory.c
   core/printing.c
@@ -45,6 +47,11 @@ add_library(
   core/stack.c
   core/vector_ptr.c
   core/vector.c
+
+  io/graphml.c
+  io/gml-tree.c
+  io/io_other.c
+  ${PARSER_SOURCES}
 
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
@@ -94,8 +101,6 @@ add_library(
   fast_community.c
   feedback_arc_set.c
   flow.c
-  foreign-graphml.c
-  foreign.c
   forestfire.c
   games.c
   gengraph_box_list.cpp
@@ -106,12 +111,10 @@ add_library(
   gengraph_powerlaw.cpp
   glet.c
   glpk_support.c
-  gml_tree.c
   graphicality.c
   hacks.c
   igraph_buckets.c
   igraph_cliquer.c
-  igraph_error.c
   igraph_estack.c
   igraph_eulerian.c
   igraph_fixed_vectorlist.c
@@ -127,7 +130,6 @@ add_library(
   infomap_Greedy.cc
   infomap_Node.cc
   infomap.cc
-  interrupt.c
   iterators.c
   lad.c
   lapack.c
@@ -179,8 +181,6 @@ add_library(
   walktrap_heap.cpp
   walktrap.cpp
   zeroin.c
-
-  ${PARSER_SOURCES}
 
   # Vendored library sources. Yes, this is horrible.
   $<IF:$<OR:$<BOOL:${ARPACK_IS_VENDORED}>,$<BOOL:${BLAS_IS_VENDORED}>,$<BOOL:${LAPACK_IS_VENDORED}>>,$<TARGET_OBJECTS:f2c_vendored>,>

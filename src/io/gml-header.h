@@ -21,7 +21,7 @@
 */
 
 #include "igraph_error.h"
-#include "igraph_gml_tree.h"
+#include "io/gml-tree.h"
 
 typedef struct {
     void *scanner;

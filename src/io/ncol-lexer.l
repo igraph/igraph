@@ -1,6 +1,6 @@
 /* 
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
    
    This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 
 /* 
    IGraph library.
-   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
    
    This program is free software; you can redistribute it and/or modify
@@ -46,11 +46,13 @@
 
 #include "config.h"
 #include <stdlib.h>
-#include "foreign-gml-header.h"
-#include "foreign-gml-parser.h"
-#define YY_EXTRA_TYPE igraph_i_gml_parsedata_t*
+
+#include "io/ncol-header.h"
+#include "io/parsers/ncol-parser.h"
+
+#define YY_EXTRA_TYPE igraph_i_ncol_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
-#define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in GML parser: " # msg)
+#define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in NCOL parser: " # msg)
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
 #ifdef stdout 
@@ -61,7 +63,7 @@
 %}
 
 %option noyywrap
-%option prefix="igraph_gml_yy"
+%option prefix="igraph_ncol_yy"
 %option nounput
 %option noinput
 %option nodefault
@@ -69,28 +71,29 @@
 %option bison-bridge
 %option bison-locations
 
-digit       [0-9]
-whitespace  [ \r\n\t]
+alnum [^ \t\n\r\0]
 
 %%
 
-^#[^\n\r]*[\n]|[\r]     { /* comments ignored */ }
+ /* ------------------------------------------------whitespace------*/
+[ \t]+               { }
 
-\"[^\"]*\"                                      { return STRING; }
-\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
-[a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
-\[                      { return LISTOPEN; }
-\]                      { return LISTCLOSE; }
-\n\r|\r\n|\r|\n         { }
-{whitespace}            { /* other whitespace ignored */ }
+ /* ---------------------------------------------------newline------*/
+\n\r|\r\n|\n|\r      { return NEWLINE; }
 
-<<EOF>>                 { 
-                          if (yyextra->eof) {
-			    yyterminate();
-			  } else {
-			    yyextra->eof=1;
-			    return EOFF;
-			  }			  
-                        }
-.                       { return ERROR; }
+ /* ----------------------------------------------alphanumeric------*/
+{alnum}+             { return ALNUM; }
+
+<<EOF>>           { if (yyextra->eof) {
+                       yyterminate();
+                    } else {
+                       yyextra->eof=1;
+                       return NEWLINE; 
+                    }
+                  }
+
+ /* ---------------------------------------------anything else------*/
+.                    { return ERROR; }
+
 %%
+

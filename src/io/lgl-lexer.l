@@ -1,6 +1,6 @@
 /* 
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
    
    This program is free software; you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 
 /* 
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
+   Copyright (C) 2007-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
    
    This program is free software; you can redistribute it and/or modify
@@ -46,11 +46,13 @@
 
 #include "config.h"
 #include <stdlib.h>
-#include "foreign-ncol-header.h"
-#include "foreign-ncol-parser.h"
-#define YY_EXTRA_TYPE igraph_i_ncol_parsedata_t*
+
+#include "io/lgl-header.h"
+#include "io/parsers/lgl-parser.h"
+
+#define YY_EXTRA_TYPE igraph_i_lgl_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
-#define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in NCOL parser: " # msg)
+#define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in LGL parser: " # msg)
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
 #ifdef stdout 
@@ -61,7 +63,7 @@
 %}
 
 %option noyywrap
-%option prefix="igraph_ncol_yy"
+%option prefix="igraph_lgl_yy"
 %option nounput
 %option noinput
 %option nodefault
@@ -69,9 +71,12 @@
 %option bison-bridge
 %option bison-locations
 
-alnum [^ \t\n\r\0]
+alnum [^ \t\r\n\0#]
 
 %%
+
+ /* --------------------------------------------------hashmark------*/
+#                    { return HASH; }
 
  /* ------------------------------------------------whitespace------*/
 [ \t]+               { }
@@ -90,8 +95,6 @@ alnum [^ \t\n\r\0]
                     }
                   }
 
- /* ---------------------------------------------anything else------*/
-.                    { return ERROR; }
+.                 { return ERROR; }
 
 %%
-

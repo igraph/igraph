@@ -46,11 +46,13 @@
 
 #include "config.h"
 #include <stdlib.h>
-#include "foreign-lgl-header.h"
-#include "foreign-lgl-parser.h"
-#define YY_EXTRA_TYPE igraph_i_lgl_parsedata_t*
+
+#include "io/gml-header.h"
+#include "io/parsers/gml-parser.h"
+
+#define YY_EXTRA_TYPE igraph_i_gml_parsedata_t*
 #define YY_USER_ACTION yylloc->first_line = yylineno;
-#define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in LGL parser: " # msg)
+#define YY_FATAL_ERROR(msg) IGRAPH_FATAL("Error in GML parser: " # msg)
 #ifdef USING_R
 #define fprintf(file, msg, ...) (1)
 #ifdef stdout 
@@ -61,7 +63,7 @@
 %}
 
 %option noyywrap
-%option prefix="igraph_lgl_yy"
+%option prefix="igraph_gml_yy"
 %option nounput
 %option noinput
 %option nodefault
@@ -69,30 +71,28 @@
 %option bison-bridge
 %option bison-locations
 
-alnum [^ \t\r\n\0#]
+digit       [0-9]
+whitespace  [ \r\n\t]
 
 %%
 
- /* --------------------------------------------------hashmark------*/
-#                    { return HASH; }
+^#[^\n\r]*[\n]|[\r]     { /* comments ignored */ }
 
- /* ------------------------------------------------whitespace------*/
-[ \t]+               { }
+\"[^\"]*\"                                      { return STRING; }
+\-?{digit}+(\.{digit}+)?([eE](\+|\-)?{digit}+)? { return NUM; }
+[a-zA-Z_][a-zA-Z_0-9]*  { return KEYWORD; }
+\[                      { return LISTOPEN; }
+\]                      { return LISTCLOSE; }
+\n\r|\r\n|\r|\n         { }
+{whitespace}            { /* other whitespace ignored */ }
 
- /* ---------------------------------------------------newline------*/
-\n\r|\r\n|\n|\r      { return NEWLINE; }
-
- /* ----------------------------------------------alphanumeric------*/
-{alnum}+             { return ALNUM; }
-
-<<EOF>>           { if (yyextra->eof) {
-                       yyterminate();
-                    } else {
-                       yyextra->eof=1;
-                       return NEWLINE; 
-                    }
-                  }
-
-.                 { return ERROR; }
-
+<<EOF>>                 { 
+                          if (yyextra->eof) {
+			    yyterminate();
+			  } else {
+			    yyextra->eof=1;
+			    return EOFF;
+			  }			  
+                        }
+.                       { return ERROR; }
 %%
