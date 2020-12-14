@@ -31,23 +31,26 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
-#include "core/interruption.h"
 #include "igraph_centrality.h"
 #include "igraph_components.h"
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
-#include "igraph_types_internal.h"
 #include "igraph_dqueue.h"
 #include "igraph_attributes.h"
 #include "igraph_neighborhood.h"
+#include "igraph_stack.h"
 #include "igraph_topology.h"
 #include "igraph_qsort.h"
 #include "igraph_error.h"
 #include "config.h"
-#include "structural_properties_internal.h"
 
 #include <string.h>
 #include <limits.h>
+
+#include "core/indheap.h"
+#include "core/interruption.h"
+#include "igraph_types_internal.h"
+#include "structural_properties_internal.h"
 
 /**
  * \section about_structural

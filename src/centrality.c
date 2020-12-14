@@ -29,13 +29,13 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
-#include "core/interruption.h"
 #include "igraph_topology.h"
-#include "igraph_types_internal.h"
 #include "igraph_stack.h"
 #include "igraph_dqueue.h"
 #include "config.h"
 
+#include "core/indheap.h"
+#include "core/interruption.h"
 #include "math/bigint.h"
 #include "prpack.h"
 

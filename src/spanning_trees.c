@@ -25,13 +25,14 @@
 #include "igraph_structural.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
-#include "core/interruption.h"
 #include "igraph_memory.h"
 #include "igraph_adjlist.h"
 #include "igraph_random.h"
 #include "igraph_components.h"
 #include "igraph_progress.h"
-#include "igraph_types_internal.h"
+
+#include "core/indheap.h"
+#include "core/interruption.h"
 
 static int igraph_i_minimum_spanning_tree_unweighted(const igraph_t *graph,
                                                      igraph_vector_t *result);

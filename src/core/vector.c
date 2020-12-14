@@ -80,6 +80,8 @@
 
 #include "igraph_math.h"
 
+#include "core/indheap.h"
+
 int igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
     long int i, n = igraph_vector_size(from);
 

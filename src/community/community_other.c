@@ -29,18 +29,20 @@
 #include "igraph_arpack.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
-#include "core/interruption.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
 #include "igraph_spmatrix.h"
 #include "igraph_statusbar.h"
-#include "igraph_types_internal.h"
 #include "igraph_conversion.h"
 #include "igraph_centrality.h"
 #include "igraph_structural.h"
 #include "config.h"
+
+#include "core/indheap.h"
+#include "core/interruption.h"
+#include "igraph_types_internal.h"
 
 #include <string.h>
 #include <math.h>

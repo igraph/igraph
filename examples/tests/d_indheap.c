@@ -22,7 +22,8 @@
 */
 
 #include <igraph.h>
-#include "igraph_types_internal.h"
+
+#include "core/indheap.h"
 
 int main() {
 

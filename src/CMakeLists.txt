@@ -36,9 +36,11 @@ add_library(
   igraph
   core/array.c
   core/buckets.c
+  core/cutheap.c
   core/dqueue.c
   core/error.c
   core/estack.c
+  core/grid.c
   core/heap.c
   core/indheap.c
   core/interruption.c
@@ -46,8 +48,12 @@ add_library(
   core/matrix.c
   core/memory.c
   core/printing.c
+  core/psumtree.c
   core/set.c
+  core/sparsemat.c
   core/stack.c
+  core/strvector.c
+  core/trie.c
   core/vector_ptr.c
   core/vector.c
 
@@ -125,13 +131,9 @@ add_library(
   igraph_cliquer.c
   igraph_eulerian.c
   igraph_fixed_vectorlist.c
-  igraph_grid.c
   igraph_hashtable.c
   igraph_hrg_types.cc
   igraph_hrg.cc
-  igraph_psumtree.c
-  igraph_strvector.c
-  igraph_trie.c
   infomap_FlowGraph.cc
   infomap_Greedy.cc
   infomap_Node.cc
@@ -169,7 +171,6 @@ add_library(
   shortest_paths.c
   sir.c
   spanning_trees.c
-  sparsemat.c
   spectral_properties.c
   spmatrix.c
   st-cuts.c

@@ -2,7 +2,6 @@
 /*
    IGraph library.
    Copyright (C) 2009-2020  The igraph development team
-   334 Harvard street, Cambridge, MA 02139 USA
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by

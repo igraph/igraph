@@ -24,10 +24,10 @@
 #include "igraph_dqueue.h"
 #include "igraph_memory.h"
 #include "igraph_progress.h"
-#include "igraph_types_internal.h"
-#include "core/interruption.h"
 #include <string.h>
 
+#include "core/indheap.h"
+#include "core/interruption.h"
 
 /*****************************************************/
 /***** Average path length and global efficiency *****/
