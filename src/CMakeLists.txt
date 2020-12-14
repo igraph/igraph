@@ -69,6 +69,14 @@ add_library(
   community/fast_modularity.c
   community/leiden.c
   community/optimal_modularity.c
+  community/infomap/infomap_FlowGraph.cc
+  community/infomap/infomap_Greedy.cc
+  community/infomap/infomap_Node.cc
+  community/infomap/infomap.cc
+  community/spinglass/clustertool.cpp
+  community/spinglass/NetDataTypes.cpp
+  community/spinglass/NetRoutines.cpp
+  community/spinglass/pottsmodel_2.cpp
   community/walktrap/walktrap_communities.cpp
   community/walktrap/walktrap_graph.cpp
   community/walktrap/walktrap_heap.cpp
@@ -103,7 +111,6 @@ add_library(
   cattributes.c
   centrality.c
   cliques.c
-  clustertool.cpp
   cocitation.c
   cohesive_blocks.c
   coloring.c
@@ -134,10 +141,6 @@ add_library(
   igraph_eulerian.c
   igraph_hrg_types.cc
   igraph_hrg.cc
-  infomap_FlowGraph.cc
-  infomap_Greedy.cc
-  infomap_Node.cc
-  infomap.cc
   iterators.c
   lad.c
   lapack.c
@@ -147,12 +150,9 @@ add_library(
   microscopic_update.c
   mixing.c
   motifs.c
-  NetDataTypes.cpp
-  NetRoutines.cpp
   operators.c
   other.c
   paths.c
-  pottsmodel_2.cpp
   progress.c
   prpack.cpp
   qsort_r.c

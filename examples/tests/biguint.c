@@ -22,7 +22,6 @@
 */
 
 #include <igraph.h>
-#include "igraph_types_internal.h"
 #include "math/bigint.h"
 
 #include <limits.h>
