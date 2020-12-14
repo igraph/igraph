@@ -59,7 +59,7 @@ set(
 
 # Specify the igraph source files that may contain documentation chunks
 file(
-  GLOB IGRAPH_SOURCES_FOR_DOXROX
+  GLOB_RECURSE IGRAPH_SOURCES_FOR_DOXROX
   LIST_DIRECTORIES FALSE
   ${CMAKE_SOURCE_DIR}/include/*.h
   ${CMAKE_SOURCE_DIR}/include/*.h.in
