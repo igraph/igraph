@@ -36,7 +36,7 @@
 #include "igraph_dqueue.h"
 #include "config.h"
 
-#include "bigint.h"
+#include "math/bigint.h"
 #include "prpack.h"
 
 #include <math.h>

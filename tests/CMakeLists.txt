@@ -70,7 +70,6 @@ if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER simple NAMES
     2wheap
-    biguint
     d_indheap
     igraph_hashtable
     igraph_i_cutheap
@@ -78,6 +77,10 @@ if (BUILD_INTERNAL_TESTS)
     igraph_set
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
     igraph_trie
+  )
+  add_legacy_tests(
+    FOLDER tests NAMES
+    biguint
   )
 endif()
 

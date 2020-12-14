@@ -34,15 +34,29 @@ add_custom_target(parsersources SOURCES ${PARSER_SOURCES})
 # Declare the files needed to compile the igraph library
 add_library(
   igraph
+  core/array.c
+  core/dqueue.c
+  core/heap.c
+  core/indheap.c
+  core/matrix.c
+  core/memory.c
+  core/printing.c
+  core/set.c
+  core/stack.c
+  core/vector_ptr.c
+  core/vector.c
+
+  math/bfgs.c
+  math/bigint.c
+  math/bignum.c
+  math/complex.c
+  math/utils.c
+
   adjlist.c
   arpack.c
-  array.c
   atlas.c
   attributes.c
   basic_query.c
-  bfgs.c
-  bigint.c
-  bignum.c
   bipartite.c
   blas.c
   bliss.cc
@@ -55,7 +69,6 @@ add_library(
   coloring.c
   community_leiden.c
   community.c
-  complex.c
   components.c
   conversion.c
   cores.c
@@ -65,7 +78,6 @@ add_library(
   DensityGrid.cpp
   distances.c
   dotproduct.c
-  dqueue.c
   drl_graph.cpp
   drl_graph_3d.cpp
   drl_layout.cpp
@@ -90,7 +102,6 @@ add_library(
   gml_tree.c
   graphicality.c
   hacks.c
-  heap.c
   igraph_buckets.c
   igraph_cliquer.c
   igraph_error.c
@@ -99,13 +110,10 @@ add_library(
   igraph_fixed_vectorlist.c
   igraph_grid.c
   igraph_hashtable.c
-  igraph_heap.c
   igraph_hrg_types.cc
   igraph_hrg.cc
   igraph_marked_queue.c
   igraph_psumtree.c
-  igraph_set.c
-  igraph_stack.c
   igraph_strvector.c
   igraph_trie.c
   infomap_FlowGraph.cc
@@ -123,10 +131,7 @@ add_library(
   layout.c
   lsap.c
   matching.c
-  math.c
-  matrix.c
   maximal_cliques.c
-  memory.c
   microscopic_update.c
   mixing.c
   motifs.c
@@ -166,9 +171,6 @@ add_library(
   topology.c
   triangles.c
   type_indexededgelist.c
-  types.c
-  vector_ptr.c
-  vector.c
   version.c
   visitors.c
   walktrap_communities.cpp

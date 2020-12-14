@@ -25,9 +25,10 @@
 #include "igraph_types.h"
 #include "igraph_types_internal.h"
 #include "igraph_complex.h"
-#include "bigint.h"
 #include "config.h"
 #include <float.h>
+
+#include "../math/bigint.h"
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
