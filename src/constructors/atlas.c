@@ -22,8 +22,9 @@
 */
 
 #include "igraph_constructors.h"
-#include "atlas-edges.h"
 #include "config.h"
+
+#include "constructors/atlas-edges.h"
 
 /**
  * \function igraph_atlas

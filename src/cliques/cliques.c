@@ -29,9 +29,9 @@
 #include "igraph_interface.h"
 #include "igraph_progress.h"
 #include "igraph_stack.h"
-#include "igraph_cliquer.h"
 #include "config.h"
 
+#include "cliques/cliquer.h"
 #include "core/interruption.h"
 #include "core/set.h"
 

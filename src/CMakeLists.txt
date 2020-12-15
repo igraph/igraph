@@ -1,13 +1,13 @@
 
 # Traverse subdirectories
-add_subdirectory(bliss)
-add_subdirectory(cliquer)
+add_subdirectory(cliques/cliquer)
 add_subdirectory(cs)
 add_subdirectory(f2c)
 add_subdirectory(lapack)
+add_subdirectory(mini-gmp)
 add_subdirectory(plfit)
 add_subdirectory(prpack)
-add_subdirectory(mini-gmp)
+add_subdirectory(topology/bliss)
 
 # Generate lexers and parsers
 set(PARSER_SOURCES)
@@ -65,6 +65,24 @@ add_library(
   math/complex.c
   math/utils.c
 
+  constructors/atlas.c
+  constructors/constructors_other.c
+
+  games/degree_sequence_vl/gengraph_box_list.cpp
+  games/degree_sequence_vl/gengraph_degree_sequence.cpp
+  games/degree_sequence_vl/gengraph_graph_molloy_hash.cpp
+  games/degree_sequence_vl/gengraph_graph_molloy_optimized.cpp
+  games/degree_sequence_vl/gengraph_mr-connected.cpp
+  games/degree_sequence_vl/gengraph_powerlaw.cpp
+  games/dotproduct.c
+  games/forestfire.c
+  games/games_other.c
+  games/sbm.c
+
+  cliques/cliquer.c
+  cliques/cliques.c
+  cliques/maximal_cliques.c
+
   community/community_other.c
   community/fast_modularity.c
   community/leiden.c
@@ -100,17 +118,17 @@ add_library(
   layout/layout_other.c
   layout/sugiyama.c
 
+  topology/bliss.cc
+  topology/topology_other.c
+
   adjlist.c
   arpack.c
-  atlas.c
   attributes.c
   basic_query.c
   bipartite.c
   blas.c
-  bliss.cc
   cattributes.c
   centrality.c
-  cliques.c
   cocitation.c
   cohesive_blocks.c
   coloring.c
@@ -120,24 +138,14 @@ add_library(
   decomposition.c
   degree_sequence.cpp
   distances.c
-  dotproduct.c
   eigen.c
   embedding.c
   feedback_arc_set.c
   flow.c
-  forestfire.c
-  games.c
-  gengraph_box_list.cpp
-  gengraph_degree_sequence.cpp
-  gengraph_graph_molloy_hash.cpp
-  gengraph_graph_molloy_optimized.cpp
-  gengraph_mr-connected.cpp
-  gengraph_powerlaw.cpp
   glet.c
   glpk_support.c
   graphicality.c
   hacks.c
-  igraph_cliquer.c
   igraph_eulerian.c
   igraph_hrg_types.cc
   igraph_hrg.cc
@@ -146,7 +154,6 @@ add_library(
   lapack.c
   lsap.c
   matching.c
-  maximal_cliques.c
   microscopic_update.c
   mixing.c
   motifs.c
@@ -159,7 +166,6 @@ add_library(
   qsort.c
   random_walk.c
   random.c
-  sbm.c
   scan.c
   scg_approximate_methods.c
   scg_exact_scg.c
@@ -176,8 +182,6 @@ add_library(
   st-cuts.c
   statusbar.c
   structural_properties.c
-  structure_generators.c
-  topology.c
   triangles.c
   type_indexededgelist.c
   version.c
