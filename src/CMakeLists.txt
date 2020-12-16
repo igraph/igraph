@@ -65,6 +65,14 @@ add_library(
   math/complex.c
   math/utils.c
 
+  graph/adjlist.c
+  graph/attributes.c
+  graph/basic_query.c
+  graph/cattributes.c
+  graph/iterators.c
+  graph/type_indexededgelist.c
+  graph/visitors.c
+
   constructors/atlas.c
   constructors/constructors_other.c
 
@@ -128,13 +136,9 @@ add_library(
   topology/bliss.cc
   topology/topology_other.c
 
-  adjlist.c
   arpack.c
-  attributes.c
-  basic_query.c
   bipartite.c
   blas.c
-  cattributes.c
   cocitation.c
   cohesive_blocks.c
   coloring.c
@@ -152,7 +156,6 @@ add_library(
   graphicality.c
   hacks.c
   igraph_eulerian.c
-  iterators.c
   lad.c
   lapack.c
   lsap.c
@@ -185,9 +188,7 @@ add_library(
   statusbar.c
   structural_properties.c
   triangles.c
-  type_indexededgelist.c
   version.c
-  visitors.c
   zeroin.c
 
   # Vendored library sources. Yes, this is horrible.
