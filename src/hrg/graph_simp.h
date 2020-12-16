@@ -60,8 +60,8 @@
 #ifndef IGRAPH_HRG_SIMPLEGRAPH
 #define IGRAPH_HRG_SIMPLEGRAPH
 
-#include "hrg_rbtree.h"
-#include "hrg_dendro.h"
+#include "hrg/rbtree.h"
+#include "hrg/dendro.h"
 
 #include <cstring>
 #include <cstdlib>

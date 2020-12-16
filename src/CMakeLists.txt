@@ -104,6 +104,9 @@ add_library(
   community/walktrap/walktrap_heap.cpp
   community/walktrap/walktrap.cpp
 
+  hrg/hrg_types.cc
+  hrg/hrg.cc
+
   io/graphml.c
   io/gml-tree.c
   io/io_other.c
@@ -149,8 +152,6 @@ add_library(
   graphicality.c
   hacks.c
   igraph_eulerian.c
-  igraph_hrg_types.cc
-  igraph_hrg.cc
   iterators.c
   lad.c
   lapack.c

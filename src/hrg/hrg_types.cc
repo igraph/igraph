@@ -31,11 +31,11 @@
 //
 // ***********************************************************************
 
-#include "hrg_rbtree.h"
-#include "hrg_dendro.h"
-#include "hrg_graph.h"
-#include "hrg_splittree_eq.h"
-#include "hrg_graph_simp.h"
+#include "hrg/rbtree.h"
+#include "hrg/dendro.h"
+#include "hrg/graph.h"
+#include "hrg/splittree_eq.h"
+#include "hrg/graph_simp.h"
 
 #include "igraph_hrg.h"
 #include "igraph_constructors.h"

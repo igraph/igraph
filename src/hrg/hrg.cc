@@ -30,9 +30,9 @@
 #include "igraph_hrg.h"
 #include "igraph_random.h"
 
-#include "hrg_dendro.h"
-#include "hrg_graph.h"
-#include "hrg_graph_simp.h"
+#include "hrg/dendro.h"
+#include "hrg/graph.h"
+#include "hrg/graph_simp.h"
 
 using namespace fitHRG;
 
