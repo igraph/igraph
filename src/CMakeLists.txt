@@ -1,12 +1,12 @@
 
 # Traverse subdirectories
+add_subdirectory(centrality/prpack)
 add_subdirectory(cliques/cliquer)
 add_subdirectory(cs)
 add_subdirectory(f2c)
 add_subdirectory(lapack)
 add_subdirectory(mini-gmp)
 add_subdirectory(plfit)
-add_subdirectory(prpack)
 add_subdirectory(topology/bliss)
 
 # Generate lexers and parsers
@@ -79,6 +79,10 @@ add_library(
   games/games_other.c
   games/sbm.c
 
+  centrality/centrality_other.c
+  centrality/coreness.c
+  centrality/prpack.cpp
+
   cliques/cliquer.c
   cliques/cliques.c
   cliques/maximal_cliques.c
@@ -128,13 +132,11 @@ add_library(
   bipartite.c
   blas.c
   cattributes.c
-  centrality.c
   cocitation.c
   cohesive_blocks.c
   coloring.c
   components.c
   conversion.c
-  cores.c
   decomposition.c
   degree_sequence.cpp
   distances.c
@@ -161,7 +163,6 @@ add_library(
   other.c
   paths.c
   progress.c
-  prpack.cpp
   qsort_r.c
   qsort.c
   random_walk.c
