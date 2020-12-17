@@ -22,13 +22,13 @@
 */
 
 #include "igraph_foreign.h"
-#include "igraph_math.h"
+#include "core/math.h"
 #include "igraph_memory.h"
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 #include "igraph_constructors.h"
 
-#include "igraph_hacks_internal.h"
+#include "internal/hacks.h"
 
 #include "core/interruption.h"
 #include "core/trie.h"

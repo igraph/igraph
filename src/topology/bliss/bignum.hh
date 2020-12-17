@@ -31,7 +31,7 @@
 #include "igraph_error.h"
 
 #if defined(BLISS_USE_GMP)
-#include "igraph_gmp.h"
+#include "internal/gmp.h"
 #endif
 
 namespace bliss {

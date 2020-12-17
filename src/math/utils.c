@@ -25,7 +25,7 @@
 #include <float.h>
 #include <stdarg.h>
 #include "config.h"
-#include "igraph_math.h"
+#include "core/math.h"
 #include "igraph_types.h"
 
 #ifdef _MSC_VER

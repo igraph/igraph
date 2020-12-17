@@ -28,7 +28,7 @@
 #include "igraph_types.h"
 #include "igraph_error.h"
 
-#include "igraph_handle_exceptions.h"
+#include "core/exceptions.h"
 
 namespace gengraph {
 

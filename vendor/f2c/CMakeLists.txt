@@ -66,8 +66,8 @@ target_include_directories(
   ${CMAKE_SOURCE_DIR}/src
   ${CMAKE_BINARY_DIR}/src
   PRIVATE
-  ${CMAKE_SOURCE_DIR}/src/f2c
-  ${CMAKE_BINARY_DIR}/src/f2c
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 if (WIN32)

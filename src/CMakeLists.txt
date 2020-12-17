@@ -2,11 +2,6 @@
 # Traverse subdirectories
 add_subdirectory(centrality/prpack)
 add_subdirectory(cliques/cliquer)
-add_subdirectory(cs)
-add_subdirectory(f2c)
-add_subdirectory(lapack)
-add_subdirectory(mini-gmp)
-add_subdirectory(plfit)
 add_subdirectory(topology/bliss)
 
 # Generate lexers and parsers
@@ -68,6 +63,13 @@ add_library(
   math/complex.c
   math/utils.c
 
+  linalg/arpack.c
+  linalg/blas.c
+  linalg/eigen.c
+  linalg/lapack.c
+
+  random/random.c
+
   graph/adjlist.c
   graph/attributes.c
   graph/basic_query.c
@@ -115,6 +117,10 @@ add_library(
   community/walktrap/walktrap_heap.cpp
   community/walktrap/walktrap.cpp
 
+  decomposition/cohesive_blocks.c
+  decomposition/components.c
+  decomposition/glet.c
+
   flow/flow.c
   flow/st-cuts.c
 
@@ -139,6 +145,9 @@ add_library(
   layout/layout_other.c
   layout/sugiyama.c
 
+  # TODO: each operator should be in a separate file, they are complex enough as they are
+  operators/operators.c
+
   paths/distances.c
   paths/eulerian.c
   paths/random_walk.c
@@ -161,6 +170,7 @@ add_library(
   topology/topology_other.c
 
   misc/bipartite.c
+  misc/chordality.c
   misc/cocitation.c
   misc/coloring.c
   misc/conversion.c
@@ -178,23 +188,14 @@ add_library(
   misc/separators.c
   misc/spanning_trees.c
 
-  arpack.c
-  blas.c
-  cohesive_blocks.c
-  components.c
-  decomposition.c
-  eigen.c
-  glet.c
-  glpk_support.c
-  hacks.c
-  lapack.c
-  lsap.c
-  operators.c
-  qsort_r.c
-  qsort.c
-  random.c
+  internal/glpk_support.c
+  internal/hacks.c
+  internal/lsap.c
+  internal/qsort_r.c
+  internal/qsort.c
+  internal/zeroin.c
+
   version.c
-  zeroin.c
 
   # Vendored library sources. Yes, this is horrible.
   $<IF:$<OR:$<BOOL:${ARPACK_IS_VENDORED}>,$<BOOL:${BLAS_IS_VENDORED}>,$<BOOL:${LAPACK_IS_VENDORED}>>,$<TARGET_OBJECTS:f2c_vendored>,>
@@ -235,6 +236,7 @@ target_include_directories(
   PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/vendor
 
   # Vendored library include paths
   $<$<BOOL:${CXSPARSE_IS_VENDORED}>:$<TARGET_PROPERTY:cxsparse_vendored,INCLUDE_DIRECTORIES>>

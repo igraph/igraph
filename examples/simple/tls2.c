@@ -25,7 +25,7 @@
 #include <pthread.h>
 #include <string.h>
 
-#include "igraph_arpack_internal.h"
+#include "linalg/arpack_internal.h"
 
 /* Test whether ARPACK is thread-safe. We will create two threads,
    each calling a different ARPACK eigensolver. We will make sure that

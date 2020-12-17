@@ -52,11 +52,11 @@
 #include "igraph_community.h"
 #include "igraph_error.h"
 #include "igraph_random.h"
-#include "igraph_math.h"
+#include "core/math.h"
 #include "igraph_interface.h"
 #include "igraph_components.h"
 #include "core/interruption.h"
-#include "igraph_handle_exceptions.h"
+#include "core/exceptions.h"
 
 static int igraph_i_community_spinglass_orig(
         const igraph_t *graph,

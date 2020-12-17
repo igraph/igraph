@@ -65,7 +65,7 @@ using namespace drl3d;
 #include "igraph_random.h"
 #include "igraph_interface.h"
 
-#include "igraph_handle_exceptions.h"
+#include "core/exceptions.h"
 
 /**
  * \function igraph_layout_drl_3d

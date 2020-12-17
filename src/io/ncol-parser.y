@@ -48,14 +48,14 @@
 #include <string.h>
 
 #include "igraph_types.h" 
-#include "igraph_math.h"
+#include "core/math.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "config.h"
 
 #include "io/ncol-header.h"
 #include "io/parsers/ncol-parser.h"
-#include "igraph_hacks_internal.h"
+#include "internal/hacks.h"
 
 #define yyscan_t void*
 

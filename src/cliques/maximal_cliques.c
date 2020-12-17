@@ -29,7 +29,7 @@
 #include "core/interruption.h"
 #include "igraph_memory.h"
 #include "igraph_progress.h"
-#include "igraph_math.h"
+#include "core/math.h"
 
 #define CONCAT2x(a,b) a ## b
 #define CONCAT2(a,b) CONCAT2x(a,b)

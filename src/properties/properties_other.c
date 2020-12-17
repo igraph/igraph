@@ -25,7 +25,7 @@
 #include "igraph_structural.h"
 #include "igraph_transitivity.h"
 #include "igraph_paths.h"
-#include "igraph_math.h"
+#include "core/math.h"
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_adjlist.h"

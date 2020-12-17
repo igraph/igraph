@@ -25,7 +25,7 @@
 #include "igraph_layout.h"
 #include "igraph_interface.h"
 #include "igraph_random.h"
-#include "igraph_math.h"
+#include "core/math.h"
 #include "core/interruption.h"
 
 #include <math.h>

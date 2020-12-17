@@ -24,7 +24,8 @@
 
 #include "igraph_error.h"
 #include "igraph_blas.h"
-#include "igraph_blas_internal.h"
+
+#include "linalg/blas_internal.h"
 
 /**
  * \function igraph_blas_dgemv

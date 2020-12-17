@@ -48,13 +48,13 @@
 #include <string.h>
 #include <math.h>
 
-#include "igraph_hacks_internal.h"
+#include "internal/hacks.h"
 #include "igraph_types.h"
 #include "igraph_memory.h"
 #include "igraph_error.h"
 #include "igraph_attributes.h"
 #include "config.h"
-#include "igraph_math.h"
+#include "core/math.h"
 
 #include "io/pajek-header.h"
 #include "io/parsers/pajek-parser.h"

@@ -29,7 +29,7 @@
 #include "igraph_adjlist.h"
 #include "core/interruption.h"
 #include "igraph_dqueue.h"
-#include "igraph_hacks_internal.h"
+#include "internal/hacks.h"
 #include "config.h"
 
 #include <stdarg.h>

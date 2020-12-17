@@ -21,10 +21,11 @@
 
 */
 
-#include "prpack.h"
-#include "prpack/prpack_igraph_graph.h"
-#include "prpack/prpack_solver.h"
 #include "igraph_error.h"
+
+#include "centrality/prpack.h"
+#include "centrality/prpack/prpack_igraph_graph.h"
+#include "centrality/prpack/prpack_solver.h"
 
 using namespace prpack;
 using namespace std;

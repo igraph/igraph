@@ -25,12 +25,13 @@
 #include "igraph_memory.h"
 #include "igraph_random.h"
 #include "igraph_adjlist.h"
-#include "core/interruption.h"
 #include "igraph_interface.h"
-#include "igraph_isoclasses.h"
 #include "igraph_nongraph.h"
 #include "igraph_stack.h"
 #include "config.h"
+
+#include "core/interruption.h"
+#include "topology/isoclasses.h"
 
 /**
  * Callback function for igraph_motifs_randesu that counts the motifs by

@@ -25,7 +25,7 @@
 #include <math.h>
 #include <string.h>
 
-#include "igraph_hacks_internal.h"
+#include "internal/hacks.h"
 
 namespace gengraph {
 

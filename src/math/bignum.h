@@ -29,7 +29,7 @@
     #ifdef HAVE_SYS_INT_TYPES_H
         #include <sys/int_types.h>
     #else
-        #include "pstdint.h"
+        #include "internal/pstdint.h"
     #endif
 #endif
 #include <stdlib.h>

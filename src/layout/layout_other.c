@@ -41,7 +41,7 @@
 #include "igraph_eigen.h"
 #include "config.h"
 #include <math.h>
-#include "igraph_math.h"
+#include "core/math.h"
 
 #include "core/grid.h"
 #include "core/interruption.h"

@@ -36,7 +36,7 @@ add_library(
   dtrsen.c dlacn2.c dtrsyl.c dlasr.c dsteqr.c dgeevx.c dtrsna.c dlaqtr.c
   dgetrf.c dgetf2.c dlaswp.c dgetrs.c dgesv.c dpotrf.c dpotf2.c
   xerbla.c len_trim.c
-  dlamch.c ../fortran_intrinsics.c  
+  dlamch.c fortran_intrinsics.c  
   $<TARGET_OBJECTS:f2c_vendored>
 )
 target_include_directories(

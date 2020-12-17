@@ -22,7 +22,6 @@
 */
 
 #include "igraph_flow.h"
-#include "igraph_flow_internal.h"
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "igraph_constants.h"
@@ -31,7 +30,7 @@
 #include "igraph_constructors.h"
 #include "igraph_structural.h"
 #include "igraph_components.h"
-#include "igraph_math.h"
+#include "core/math.h"
 #include "igraph_dqueue.h"
 #include "igraph_visitor.h"
 #include "igraph_stack.h"
@@ -39,6 +38,15 @@
 
 #include "core/estack.h"
 #include "core/marked_queue.h"
+
+typedef int igraph_provan_shier_pivot_t(const igraph_t *graph,
+                                        const igraph_marked_queue_t *S,
+                                        const igraph_estack_t *T,
+                                        long int source,
+                                        long int target,
+                                        long int *v,
+                                        igraph_vector_t *Isv,
+                                        void *arg);
 
 /**
  * \function igraph_even_tarjan_reduction

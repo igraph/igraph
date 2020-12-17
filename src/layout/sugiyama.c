@@ -29,12 +29,13 @@
 #include "igraph_constructors.h"
 #include "igraph_datatype.h"
 #include "igraph_error.h"
-#include "igraph_glpk_support.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
 #include "igraph_types.h"
 #include "config.h"
+
+#include "internal/glpk_support.h"
 
 #include <limits.h>
 

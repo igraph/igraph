@@ -25,14 +25,15 @@
 #include "igraph_memory.h"
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
-#include "core/interruption.h"
 #include "igraph_constructors.h"
 #include "igraph_conversion.h"
 #include "igraph_stack.h"
 #include "igraph_attributes.h"
 #include "igraph_structural.h"
-#include "igraph_isoclasses.h"
 #include "config.h"
+
+#include "core/interruption.h"
+#include "topology/isoclasses.h"
 
 const unsigned int igraph_i_isoclass_3[] = {  0, 1, 1, 3, 1, 5, 6, 7,
                                               1, 6, 10, 11, 3, 7, 11, 15,

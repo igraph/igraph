@@ -32,7 +32,7 @@
 #include "igraph_progress.h"
 #include "igraph_structural.h"
 #include "igraph_components.h"
-#include "igraph_math.h"
+#include "core/math.h"
 #include "igraph_dqueue.h"
 #include "igraph_topology.h"
 #include "config.h"

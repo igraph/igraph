@@ -22,7 +22,8 @@
 */
 
 #include "igraph_lapack.h"
-#include "igraph_lapack_internal.h"
+
+#include "linalg/lapack_internal.h"
 
 /**
  * \function igraph_lapack_dgetrf

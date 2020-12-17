@@ -77,7 +77,7 @@
 #include "igraph_pmt_off.h"
 #undef BASE_LIMB
 
-#include "igraph_math.h"
+#include "core/math.h"
 
 #include "core/indheap.h"
 

@@ -25,7 +25,7 @@
 #include "igraph_foreign.h"
 #include "config.h"
 #include <math.h>               /* isnan */
-#include "igraph_math.h"
+#include "core/math.h"
 #include "igraph_attributes.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
@@ -35,7 +35,7 @@
 #include <stdarg.h>         /* va_start & co */
 
 #include "core/trie.h"
-#include "igraph_hacks_internal.h"
+#include "internal/hacks.h"
 
 #define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 

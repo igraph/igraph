@@ -25,7 +25,7 @@
 #include "igraph_datatype.h"
 #include "igraph_interface.h"
 
-#include "igraph_handle_exceptions.h"
+#include "core/exceptions.h"
 
 using namespace bliss;
 using namespace std;
