@@ -30,10 +30,10 @@ set(
     "${CMAKE_SOURCE_DIR}/examples;/examples"
     "${CMAKE_SOURCE_DIR}/include;/include"
     "${CMAKE_SOURCE_DIR}/msvc/include;/msvc/include"
-    "${CMAKE_SOURCE_DIR}/optional;/optional"
-    "${CMAKE_BINARY_DIR}/src/parsers/;/src/parsers"
+    "${CMAKE_BINARY_DIR}/src/io/parsers/;/src/io/parsers"
     "${CMAKE_SOURCE_DIR}/src;/src"
     "${CMAKE_SOURCE_DIR}/tests;/tests"
+    "${CMAKE_SOURCE_DIR}/vendor;/vendor"
 )
 
 # CPack is pretty dumb as it can only copy full directories (sans the ignored

@@ -89,7 +89,7 @@ if(IGRAPH_ENABLE_CODE_COVERAGE)
 	# problems with them. Yes, the exclusion is correct, it refers to a nonexistent
 	# directory that somehow gets into the coverage resolts. /Applications is for
 	# macOS -- it excludes files from the macOS SDK.
-	EXCLUDE "io/parsers/*" "/Applications/Xcode*" "examples/*"
+	EXCLUDE "io/parsers/*" "/Applications/Xcode*" "examples/*" "tests/*"
   )
 endif()
 

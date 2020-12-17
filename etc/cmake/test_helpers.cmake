@@ -6,7 +6,7 @@ if(NOT DIFF_TOOL)
 endif()
 
 function(add_legacy_test FOLDER NAME)
-  add_executable(test_${NAME} EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/examples/${FOLDER}/${NAME})
+  add_executable(test_${NAME} EXCLUDE_FROM_ALL ${CMAKE_SOURCE_DIR}/${FOLDER}/${NAME})
   add_dependencies(build_tests test_${NAME})
   target_link_libraries(test_${NAME} PRIVATE igraph)
 
@@ -26,7 +26,7 @@ function(add_legacy_test FOLDER NAME)
     target_include_directories(test_${NAME} PRIVATE ${CMAKE_SOURCE_DIR}/msvc/include)
   endif()
 
-  set(EXPECTED_OUTPUT_FILE ${CMAKE_SOURCE_DIR}/examples/${FOLDER}/${NAME}.out)
+  set(EXPECTED_OUTPUT_FILE ${CMAKE_SOURCE_DIR}/${FOLDER}/${NAME}.out)
   set(OBSERVED_OUTPUT_FILE ${CMAKE_CURRENT_BINARY_DIR}/test_${NAME}.out)
   set(DIFF_FILE ${CMAKE_CURRENT_BINARY_DIR}/test_${NAME}.diff)
   get_filename_component(WORK_DIR ${EXPECTED_OUTPUT_FILE} DIRECTORY)

@@ -31,13 +31,13 @@ endif()
 
 # version.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_version
 )
 
 # types.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   dqueue
   heap
   igraph_array
@@ -67,11 +67,11 @@ add_legacy_tests(
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER simple NAMES
+    FOLDER examples/simple NAMES
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
   )
   add_legacy_tests(
-    FOLDER tests NAMES
+    FOLDER tests/unit NAMES
     2wheap
     biguint
     cutheap
@@ -85,7 +85,7 @@ endif()
 
 # basic.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_add_edges
   igraph_add_vertices
   igraph_copy
@@ -101,7 +101,7 @@ add_legacy_tests(
 
 # iterators.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_es_pairs
   igraph_es_path
 #  igraph_es_fromto
@@ -112,7 +112,7 @@ add_legacy_tests(
 
 # structure_generators.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_adjacency
   igraph_atlas
   igraph_barabasi_game
@@ -136,7 +136,7 @@ add_legacy_tests(
 )
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   tree
   igraph_from_prufer
   igraph_full
@@ -145,7 +145,7 @@ add_legacy_tests(
 
 # structural_properties.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   assortativity
   bellman_ford
   biguint_betweenness
@@ -185,13 +185,13 @@ add_legacy_tests(
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER simple NAMES
+    FOLDER examples/simple NAMES
     igraph_rewire # Uses internal igraph_i_rewire
   )
 endif()
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   efficiency
   igraph_closeness
   igraph_count_multiple
@@ -200,20 +200,20 @@ add_legacy_tests(
 
 # components.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_biconnected_components
   igraph_bridges
   igraph_decompose
 )
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   igraph_decompose_strong
 )
 
 # layout.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_layout_grid
   igraph_layout_lgl
   igraph_layout_mds
@@ -224,7 +224,7 @@ add_legacy_tests(
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER simple NAMES
+    FOLDER examples/simple NAMES
     igraph_i_layout_sphere
     igraph_layout_davidson_harel # Uses igraph_i_segments_intersect and igraph_i_point_segment_dist2
     igraph_layout_merge # Uses igraph_i_layout_merge functions
@@ -232,7 +232,7 @@ if (BUILD_INTERNAL_TESTS)
 endif()
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   igraph_layout_kamada_kawai_3d_bug_1462
   igraph_layout_reingold_tilford_bug_879
   igraph_layout_reingold_tilford_extended
@@ -240,20 +240,20 @@ add_legacy_tests(
 
 # visitors.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_bfs2
   igraph_random_walk
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER simple NAMES
+    FOLDER examples/simple NAMES
     igraph_bfs # Uses igraph_i_bfs
   )
 endif()
 
 # topology.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_isomorphic_bliss
   igraph_isomorphic_vf2
   igraph_subisomorphic_lad
@@ -263,27 +263,27 @@ add_legacy_tests(
 )
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   simplify_and_colorize
   bliss_automorphisms
 )
 
 # coloring.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_coloring
 )
 
 # motifs.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_motifs_randesu
   triad_census
 )
 
 # foreign.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   dot
   foreign
   gml
@@ -304,14 +304,14 @@ add_legacy_tests(
 
 # other.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_convex_hull
   igraph_power_law_fit
 )
 
 # operators.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_complementer
   igraph_compose
   igraph_difference
@@ -323,13 +323,13 @@ add_legacy_tests(
 )
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   igraph_induced_subgraph
 )
 
 # conversion.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   adjlist
   igraph_laplacian
   igraph_to_prufer
@@ -337,13 +337,13 @@ add_legacy_tests(
 )
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   igraph_to_directed
 )
 
 # flow.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   dominator_tree
   even_tarjan
   flow
@@ -354,14 +354,14 @@ add_legacy_tests(
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER simple NAMES
+    FOLDER examples/simple NAMES
     igraph_all_st_cuts # Uses igraph_marked_queue, which is internal.
   )
 endif()
 
 # community.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   bug-1149658
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
@@ -379,7 +379,7 @@ add_legacy_tests(
 set_tests_properties(igraph_community_infomap PROPERTIES TIMEOUT 120)
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   igraph_community_fluid_communities
   igraph_community_label_propagation
   igraph_community_leiden
@@ -388,7 +388,7 @@ add_legacy_tests(
 
 # cliques.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_cliques
   igraph_independent_sets
   igraph_maximal_cliques
@@ -399,14 +399,14 @@ add_legacy_tests(
 )
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   maximal_cliques_callback
   maximal_cliques_hist
 )
 
 # eigen.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_eigen_matrix
   igraph_eigen_matrix2
   igraph_eigen_matrix3
@@ -417,7 +417,7 @@ add_legacy_tests(
 
 # attributes.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   cattr_bool_bug
   cattributes
   cattributes2
@@ -427,13 +427,13 @@ add_legacy_tests(
 )
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   cattr_bool_bug2
 )
 
 # arpack.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   blas
   eigenvector_centrality
   igraph_arpack_rnsolve
@@ -446,20 +446,20 @@ add_legacy_tests(
 
 # bipartite.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_bipartite_create
   igraph_bipartite_projection
 )
 
 # centralization.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   centralization
 )
 
 # eulerian.at
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   igraph_is_eulerian
   igraph_eulerian_cycle
   igraph_eulerian_path
@@ -467,7 +467,7 @@ add_legacy_tests(
 
 # separators.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   bug-1033045
   cohesive_blocks
   igraph_is_minimal_separator
@@ -478,7 +478,7 @@ add_legacy_tests(
 
 # hrg.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_hrg
   igraph_hrg2
   igraph_hrg3
@@ -486,7 +486,7 @@ add_legacy_tests(
 
 # microscopic.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_deterministic_optimal_imitation
   igraph_moran_process
   igraph_roulette_wheel_imitation
@@ -496,7 +496,7 @@ add_legacy_tests(
 # mt.at -- only if we have pthreads
 if(CMAKE_USE_PTHREADS_INIT)
   add_legacy_tests(
-    FOLDER simple NAMES tls1
+    FOLDER examples/simple NAMES tls1
     LIBRARIES Threads::Threads
   )
   
@@ -504,7 +504,7 @@ if(CMAKE_USE_PTHREADS_INIT)
   # ARPACK is not guaranteed to be thread-safe
   if(ARPACK_IS_VENDORED)
     add_legacy_tests(
-      FOLDER simple NAMES tls2
+      FOLDER examples/simple NAMES tls2
       LIBRARIES Threads::Threads
     )
   endif()
@@ -512,7 +512,7 @@ endif()
 
 # scg.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_scg_grouping
   igraph_scg_grouping2
   igraph_scg_grouping3
@@ -527,7 +527,7 @@ add_legacy_tests(
 
 # random.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_fisher_yates_shuffle
   igraph_random_sample
   igraph_rng_get_exp
@@ -536,33 +536,33 @@ add_legacy_tests(
 )
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   rng_reproducibility
 )
 
 # qsort.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_qsort
   igraph_qsort_r
 )
 
 # matching.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_maximum_bipartite_matching
 )
 
 # embedding.at
 add_legacy_tests(
-  FOLDER simple NAMES
+  FOLDER examples/simple NAMES
   igraph_adjacency_spectral_embedding
 )
 
 # graphicality
 
 add_legacy_tests(
-  FOLDER tests NAMES
+  FOLDER tests/unit NAMES
   igraph_is_graphical
   igraph_is_bigraphical
 )
