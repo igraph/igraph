@@ -50,7 +50,7 @@
 #include "core/fixed_vectorlist.h"
 #include "core/indheap.h"
 #include "core/interruption.h"
-#include "structural_properties_internal.h"
+#include "properties/properties_internal.h"
 
 /**
  * \section about_structural

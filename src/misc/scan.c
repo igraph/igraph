@@ -375,7 +375,7 @@ int igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
         } else {
 
 #define TRIEDGES
-#include "triangles_template.h"
+#include "properties/triangles_template.h"
 #undef TRIEDGES
 
         }

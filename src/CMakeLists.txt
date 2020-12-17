@@ -115,6 +115,9 @@ add_library(
   community/walktrap/walktrap_heap.cpp
   community/walktrap/walktrap.cpp
 
+  flow/flow.c
+  flow/st-cuts.c
+
   hrg/hrg_types.cc
   hrg/hrg.cc
 
@@ -136,58 +139,60 @@ add_library(
   layout/layout_other.c
   layout/sugiyama.c
 
+  paths/distances.c
+  paths/eulerian.c
+  paths/random_walk.c
+  paths/shortest_paths.c
+  paths/simple_paths.c
+
+  properties/properties_other.c
+  properties/spectral.c
+  properties/triangles.c
+
+  scg/scg_approximate_methods.c
+  scg/scg_exact_scg.c
+  scg/scg_kmeans.c
+  scg/scg_optimal_method.c
+  scg/scg_utils.c
+  scg/scg.c
+
   topology/bliss.cc
   topology/lad.c
   topology/topology_other.c
 
+  misc/bipartite.c
+  misc/cocitation.c
+  misc/coloring.c
+  misc/conversion.c
+  misc/degree_sequence.cpp
+  misc/embedding.c
+  misc/feedback_arc_set.c
+  misc/graphicality.c
+  misc/matching.c
+  misc/microscopic_update.c
+  misc/mixing.c
+  misc/motifs.c
+  misc/other.c
+  misc/scan.c
+  misc/sir.c
+  misc/separators.c
+  misc/spanning_trees.c
+
   arpack.c
-  bipartite.c
   blas.c
-  cocitation.c
   cohesive_blocks.c
-  coloring.c
   components.c
-  conversion.c
   decomposition.c
-  degree_sequence.cpp
-  distances.c
   eigen.c
-  embedding.c
-  feedback_arc_set.c
-  flow.c
   glet.c
   glpk_support.c
-  graphicality.c
   hacks.c
-  igraph_eulerian.c
   lapack.c
   lsap.c
-  matching.c
-  microscopic_update.c
-  mixing.c
-  motifs.c
   operators.c
-  other.c
-  paths.c
   qsort_r.c
   qsort.c
-  random_walk.c
   random.c
-  scan.c
-  scg_approximate_methods.c
-  scg_exact_scg.c
-  scg_kmeans.c
-  scg_optimal_method.c
-  scg_utils.c
-  scg.c
-  separators.c
-  shortest_paths.c
-  sir.c
-  spanning_trees.c
-  spectral_properties.c
-  st-cuts.c
-  structural_properties.c
-  triangles.c
   version.c
   zeroin.c
 
