@@ -118,8 +118,9 @@ add_library(
   community/walktrap/walktrap_heap.cpp
   community/walktrap/walktrap.cpp
 
-  decomposition/cohesive_blocks.c
-  decomposition/components.c
+  connectivity/cohesive_blocks.c
+  connectivity/components.c
+  connectivity/separators.c
 
   flow/flow.c
   flow/st-cuts.c
@@ -185,7 +186,6 @@ add_library(
   misc/other.c
   misc/scan.c
   misc/sir.c
-  misc/separators.c
   misc/spanning_trees.c
 
   internal/glpk_support.c
