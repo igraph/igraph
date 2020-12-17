@@ -99,6 +99,7 @@ add_library(
   cliques/cliquer.c
   cliques/cliques.c
   cliques/maximal_cliques.c
+  cliques/glet.c
 
   community/community_other.c
   community/fast_modularity.c
@@ -119,7 +120,6 @@ add_library(
 
   decomposition/cohesive_blocks.c
   decomposition/components.c
-  decomposition/glet.c
 
   flow/flow.c
   flow/st-cuts.c
