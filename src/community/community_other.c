@@ -2266,7 +2266,7 @@ int igraph_le_community_to_membership(const igraph_matrix_t *merges,
  *
  * Time complexity: O(|E|)
  *
- * \example examples/tests/igraph_community_fluid_communities.c
+ * \example examples/simple/igraph_community_fluid_communities.c
  */
 int igraph_community_fluid_communities(const igraph_t *graph,
                                        igraph_integer_t no_of_communities,

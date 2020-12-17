@@ -365,6 +365,7 @@ add_legacy_tests(
   bug-1149658
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
+  igraph_community_fluid_communities
   igraph_community_infomap
   igraph_community_leading_eigenvector
   igraph_community_leading_eigenvector2
@@ -380,7 +381,6 @@ set_tests_properties(igraph_community_infomap PROPERTIES TIMEOUT 120)
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  igraph_community_fluid_communities
   igraph_community_label_propagation
   igraph_community_leiden
   igraph_modularity
