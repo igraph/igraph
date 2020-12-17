@@ -31,7 +31,7 @@
 #include "config.h"
 
 #include "core/interruption.h"
-#include "topology/isoclasses.h"
+#include "isomorphism/isoclasses.h"
 
 /**
  * Callback function for igraph_motifs_randesu that counts the motifs by

@@ -2,7 +2,7 @@
 # Traverse subdirectories
 add_subdirectory(centrality/prpack)
 add_subdirectory(cliques/cliquer)
-add_subdirectory(topology/bliss)
+add_subdirectory(isomorphism/bliss)
 
 # Generate lexers and parsers
 set(PARSER_SOURCES)
@@ -165,9 +165,9 @@ add_library(
   scg/scg_utils.c
   scg/scg.c
 
-  topology/bliss.cc
-  topology/lad.c
-  topology/topology_other.c
+  isomorphism/bliss.cc
+  isomorphism/lad.c
+  isomorphism/isomorphism_other.c
 
   misc/bipartite.c
   misc/chordality.c
