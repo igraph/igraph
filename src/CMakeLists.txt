@@ -50,10 +50,13 @@ add_library(
   core/matrix.c
   core/memory.c
   core/printing.c
+  core/progress.c
   core/psumtree.c
   core/set.c
   core/sparsemat.c
+  core/spmatrix.c
   core/stack.c
+  core/statusbar.c
   core/strvector.c
   core/trie.c
   core/vector_ptr.c
@@ -134,6 +137,7 @@ add_library(
   layout/sugiyama.c
 
   topology/bliss.cc
+  topology/lad.c
   topology/topology_other.c
 
   arpack.c
@@ -156,7 +160,6 @@ add_library(
   graphicality.c
   hacks.c
   igraph_eulerian.c
-  lad.c
   lapack.c
   lsap.c
   matching.c
@@ -166,7 +169,6 @@ add_library(
   operators.c
   other.c
   paths.c
-  progress.c
   qsort_r.c
   qsort.c
   random_walk.c
@@ -183,9 +185,7 @@ add_library(
   sir.c
   spanning_trees.c
   spectral_properties.c
-  spmatrix.c
   st-cuts.c
-  statusbar.c
   structural_properties.c
   triangles.c
   version.c
