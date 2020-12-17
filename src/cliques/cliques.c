@@ -31,7 +31,7 @@
 #include "igraph_stack.h"
 #include "config.h"
 
-#include "cliques/cliquer.h"
+#include "cliques/cliquer_internal.h"
 #include "core/interruption.h"
 #include "core/set.h"
 

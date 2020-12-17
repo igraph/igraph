@@ -34,7 +34,7 @@
 #include "igraph_dqueue.h"
 #include "config.h"
 
-#include "centrality/prpack.h"
+#include "centrality/prpack_internal.h"
 #include "core/indheap.h"
 #include "core/interruption.h"
 #include "math/bigint.h"

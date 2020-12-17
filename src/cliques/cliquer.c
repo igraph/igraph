@@ -5,7 +5,7 @@
 #include "config.h"
 
 #include "core/interruption.h"
-#include "cliques/cliquer.h"
+#include "cliques/cliquer_internal.h"
 #include "cliques/cliquer/cliquer.h"
 
 /* Call this to allow for interruption in Cliquer callback functions */

@@ -23,7 +23,7 @@
 
 #include "igraph_error.h"
 
-#include "centrality/prpack.h"
+#include "centrality/prpack_internal.h"
 #include "centrality/prpack/prpack_igraph_graph.h"
 #include "centrality/prpack/prpack_solver.h"
 
