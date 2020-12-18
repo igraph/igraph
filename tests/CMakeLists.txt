@@ -39,10 +39,6 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER examples/simple NAMES
   dqueue
-  heap
-  igraph_array
-  igraph_complex
-  igraph_psumtree
   igraph_sparsemat
   igraph_sparsemat3
   igraph_sparsemat4
@@ -50,11 +46,19 @@ add_legacy_tests(
   igraph_sparsemat6
   igraph_sparsemat7
   igraph_sparsemat8
+  igraph_strvector
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  heap
+  igraph_array
+  igraph_complex
+  igraph_psumtree
   igraph_sparsemat9
   igraph_sparsemat_is_symmetric
   igraph_sparsemat_minmax
   igraph_sparsemat_which_minmax
-  igraph_strvector
   matrix
   matrix2
   matrix3
@@ -65,6 +69,7 @@ add_legacy_tests(
   vector3
   vector_ptr
 )
+
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER examples/simple NAMES
@@ -102,11 +107,15 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER examples/simple NAMES
   igraph_es_pairs
-  igraph_es_path
 #  igraph_es_fromto
   igraph_vs_nonadj
   igraph_vs_seq
   igraph_vs_vector
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_es_path
 )
 
 # structure_generators.at
@@ -116,14 +125,11 @@ add_legacy_tests(
   igraph_atlas
   igraph_barabasi_game
   igraph_barabasi_game2
-  igraph_correlated_game
   igraph_create
   igraph_degree_sequence_game
   igraph_erdos_renyi_game
   igraph_grg_game
   igraph_growing_random_game
-  igraph_k_regular_game
-  igraph_lattice
   igraph_lcf
   igraph_preference_game
   igraph_ring
@@ -131,15 +137,18 @@ add_legacy_tests(
   igraph_star
   igraph_tree
   igraph_weighted_adjacency
-  watts_strogatz_game
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  tree
+  igraph_correlated_game
   igraph_from_prufer
   igraph_full
+  igraph_k_regular_game
+  igraph_lattice
   igraph_realize_degree_sequence
+  tree
+  watts_strogatz_game
 )
 
 # structural_properties.at
@@ -148,36 +157,27 @@ add_legacy_tests(
   assortativity
   bellman_ford
   dijkstra
-  igraph_are_connected
   igraph_average_path_length
   igraph_cocitation
-  igraph_convergence_degree
-  igraph_density
   igraph_diameter
   igraph_eccentricity
   igraph_feedback_arc_set
   igraph_feedback_arc_set_ip
   igraph_get_all_shortest_paths_dijkstra
-  igraph_get_all_simple_paths
   igraph_get_shortest_paths
   igraph_get_shortest_paths_dijkstra
-  igraph_get_shortest_paths2
   igraph_girth
   igraph_has_multiple
   igraph_is_loop
   igraph_is_multiple
-  igraph_is_tree
   igraph_knn
-  igraph_local_transitivity
   igraph_minimum_spanning_tree
   igraph_pagerank
   igraph_radius
   igraph_reciprocity
   igraph_similarity
   igraph_simplify
-  igraph_transitive_closure_dag
   igraph_transitivity
-  single_target_shortest_path
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
@@ -189,58 +189,66 @@ endif()
 add_legacy_tests(
   FOLDER tests/unit NAMES
   efficiency
+  igraph_are_connected
   igraph_betweenness
   igraph_closeness
+  igraph_convergence_degree
   igraph_count_multiple
+  igraph_density
   igraph_edge_betweenness
+  igraph_get_all_simple_paths
+  igraph_get_shortest_paths2
+  igraph_is_tree
+  igraph_local_transitivity
   igraph_topological_sorting
+  igraph_transitive_closure_dag
+  single_target_shortest_path
 )
 
 # components.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
   igraph_biconnected_components
-  igraph_bridges
   igraph_decompose
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_bridges
   igraph_decompose_strong
 )
 
 # layout.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
+  igraph_layout_reingold_tilford
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   igraph_layout_grid
+  igraph_layout_kamada_kawai_3d_bug_1462
   igraph_layout_lgl
   igraph_layout_mds
   igraph_layout_merge2
   igraph_layout_merge3
-  igraph_layout_reingold_tilford
+  igraph_layout_reingold_tilford_bug_879
+  igraph_layout_reingold_tilford_extended
   igraph_layout_sugiyama
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER examples/simple NAMES
+    FOLDER tests/unit NAMES
     igraph_i_layout_sphere
     igraph_layout_davidson_harel # Uses igraph_i_segments_intersect and igraph_i_point_segment_dist2
     igraph_layout_merge # Uses igraph_i_layout_merge functions
   )
 endif()
 
-add_legacy_tests(
-  FOLDER tests/unit NAMES
-  igraph_layout_kamada_kawai_3d_bug_1462
-  igraph_layout_reingold_tilford_bug_879
-  igraph_layout_reingold_tilford_extended
-)
-
 # visitors.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
   igraph_bfs2
-  igraph_random_walk
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
@@ -249,21 +257,26 @@ if (BUILD_INTERNAL_TESTS)
   )
 endif()
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_random_walk
+)
+
 # topology.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
-  igraph_isomorphic_bliss
   igraph_isomorphic_vf2
   igraph_subisomorphic_lad
-  isomorphism_test
-  topology
-  VF2-compat
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   simplify_and_colorize
   bliss_automorphisms
+  igraph_isomorphic_bliss
+  isomorphism_test
+  topology
+  VF2-compat
 )
 
 # coloring.at
@@ -276,6 +289,10 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER examples/simple NAMES
   igraph_motifs_randesu
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
   triad_census
 )
 
@@ -289,9 +306,13 @@ add_legacy_tests(
   igraph_read_graph_dl
   igraph_read_graph_graphdb
   igraph_read_graph_lgl
-  igraph_write_graph_leda
   igraph_write_graph_lgl
   igraph_write_graph_pajek
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_write_graph_leda
   lineendings
   pajek
   pajek2
@@ -315,14 +336,14 @@ add_legacy_tests(
   igraph_difference
   igraph_disjoint_union
   igraph_intersection
-  igraph_intersection2
   igraph_union
-  igraph_induced_subgraph_map
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_induced_subgraph
+  igraph_induced_subgraph_map
+  igraph_intersection2
 )
 
 # conversion.at
@@ -330,13 +351,13 @@ add_legacy_tests(
   FOLDER examples/simple NAMES
   adjlist
   igraph_laplacian
-  igraph_to_prufer
   igraph_to_undirected
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_to_directed
+  igraph_to_prufer
 )
 
 # flow.at
@@ -347,7 +368,6 @@ add_legacy_tests(
   flow
   flow2
   igraph_all_st_mincuts
-  igraph_gomory_hu_tree
   igraph_mincut
 )
 if (BUILD_INTERNAL_TESTS)
@@ -357,32 +377,37 @@ if (BUILD_INTERNAL_TESTS)
   )
 endif()
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_gomory_hu_tree
+)
+
 # community.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
-  bug-1149658
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
   igraph_community_fluid_communities
-  igraph_community_infomap
   igraph_community_leading_eigenvector
-  igraph_community_leading_eigenvector2
   igraph_community_multilevel
   igraph_community_optimal_modularity
-  levc-stress
   spinglass
   walktrap
 )
 
-# use a higher test timeout for the Infomap algorithm
-set_tests_properties(igraph_community_infomap PROPERTIES TIMEOUT 120)
-
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  bug-1149658
+  igraph_community_infomap
   igraph_community_label_propagation
+  igraph_community_leading_eigenvector2
   igraph_community_leiden
   igraph_modularity
+  levc-stress
 )
+
+# use a higher test timeout for the Infomap algorithm
+set_tests_properties(igraph_community_infomap PROPERTIES TIMEOUT 120)
 
 # cliques.at
 add_legacy_tests(
@@ -390,21 +415,21 @@ add_legacy_tests(
   igraph_cliques
   igraph_independent_sets
   igraph_maximal_cliques
-  igraph_maximal_cliques2
-  igraph_maximal_cliques3
-  igraph_maximal_cliques4
-  igraph_weighted_cliques
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_maximal_cliques2
+  igraph_maximal_cliques3
+  igraph_maximal_cliques4
+  igraph_weighted_cliques
   maximal_cliques_callback
   maximal_cliques_hist
 )
 
 # eigen.at
 add_legacy_tests(
-  FOLDER examples/simple NAMES
+  FOLDER tests/unit NAMES
   igraph_eigen_matrix
   igraph_eigen_matrix2
   igraph_eigen_matrix3
@@ -416,17 +441,17 @@ add_legacy_tests(
 # attributes.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
-  cattr_bool_bug
   cattributes
   cattributes2
   cattributes3
   cattributes4
-  cattributes5
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  cattr_bool_bug
   cattr_bool_bug2
+  cattributes5
 )
 
 # arpack.at
@@ -434,12 +459,16 @@ add_legacy_tests(
   FOLDER examples/simple NAMES
   blas
   eigenvector_centrality
-  igraph_arpack_rnsolve
   igraph_lapack_dgeev
   igraph_lapack_dgeevx
-  igraph_lapack_dgehrd
   igraph_lapack_dgesv
   igraph_lapack_dsyevr
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_arpack_rnsolve
+  igraph_lapack_dgehrd
 )
 
 # bipartite.at
@@ -466,17 +495,20 @@ add_legacy_tests(
 # separators.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
-  bug-1033045
   cohesive_blocks
   igraph_is_minimal_separator
   igraph_is_separator
   igraph_minimal_separators
   igraph_minimum_size_separators
 )
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  bug-1033045
+)
 
 # hrg.at
 add_legacy_tests(
-  FOLDER examples/simple NAMES
+  FOLDER tests/unit NAMES
   igraph_hrg
   igraph_hrg2
   igraph_hrg3
@@ -494,7 +526,7 @@ add_legacy_tests(
 # mt.at -- only if we have pthreads
 if(CMAKE_USE_PTHREADS_INIT)
   add_legacy_tests(
-    FOLDER examples/simple NAMES tls1
+    FOLDER tests/unit NAMES tls1
     LIBRARIES Threads::Threads
   )
 
@@ -502,7 +534,7 @@ if(CMAKE_USE_PTHREADS_INIT)
   # ARPACK is not guaranteed to be thread-safe
   if(ARPACK_IS_VENDORED)
     add_legacy_tests(
-      FOLDER examples/simple NAMES tls2
+      FOLDER tests/unit NAMES tls2
       LIBRARIES Threads::Threads
     )
   endif()
@@ -528,19 +560,19 @@ add_legacy_tests(
   FOLDER examples/simple NAMES
   igraph_fisher_yates_shuffle
   igraph_random_sample
-  igraph_rng_get_exp
-  mt
   random_seed
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  igraph_rng_get_exp
+  mt
   rng_reproducibility
 )
 
 # qsort.at
 add_legacy_tests(
-  FOLDER examples/simple NAMES
+  FOLDER tests/unit NAMES
   igraph_qsort
   igraph_qsort_r
 )
@@ -553,7 +585,7 @@ add_legacy_tests(
 
 # embedding.at
 add_legacy_tests(
-  FOLDER examples/simple NAMES
+  FOLDER tests/unit NAMES
   igraph_adjacency_spectral_embedding
 )
 
