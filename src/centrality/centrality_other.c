@@ -1835,8 +1835,14 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     long int no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
     long int *distance;
-    unsigned long long int *nrgeo = 0;  /* must be long long; consider grid
-                       graphs for example */
+    /* Note: nrgeo holds the number of shortest paths, which may be very large in some cases,
+     * e.g. in a grid graph. If using an integer type, this results in overflow.
+     * With a 'long long int', overflow already affects the result for a grid as small as 36*36.
+     * Therefore, we use a 'double' instead. While a 'double' holds fewer digits than a 'long long int',
+     * i.e. its precision is lower, it is effectively immune to overflow. The impact on the precision
+     * of the final result is negligible. The max betweenness is correct to more than 6 digits even for
+     * a 100*100 grid graph. */
+    double *nrgeo = 0;
     igraph_biguint_t *big_nrgeo = 0;
     double *tmpscore;
     igraph_stack_t stack = IGRAPH_STACK_NULL;
@@ -1892,7 +1898,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
     }
     IGRAPH_FINALLY(igraph_free, distance);
     if (nobigint) {
-        nrgeo = igraph_Calloc(no_of_nodes, unsigned long long int);
+        nrgeo = igraph_Calloc(no_of_nodes, double);
         if (nrgeo == 0) {
             IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
         }
@@ -1992,8 +1998,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
             for (j = 0; j < nneis; j++) {
                 long int neighbor = (long int) VECTOR(*neis)[j];
                 if (nobigint) {
-                    tmpscore[neighbor] +=  (tmpscore[actnode] + 1) *
-                                           ((double)(nrgeo[neighbor])) / nrgeo[actnode];
+                    tmpscore[neighbor] +=  (tmpscore[actnode] + 1) * nrgeo[neighbor] / nrgeo[actnode];
                 } else {
                     if (!igraph_biguint_compare_limb(&big_nrgeo[actnode], 0)) {
                         tmpscore[neighbor] = IGRAPH_INFINITY;
@@ -2336,7 +2341,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     long int no_of_edges = igraph_ecount(graph);
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
     long int *distance;
-    unsigned long long int *nrgeo;
+    double *nrgeo;
     double *tmpscore;
     igraph_stack_t stack = IGRAPH_STACK_NULL;
     long int source;
@@ -2372,7 +2377,7 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
         IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
-    nrgeo = igraph_Calloc(no_of_nodes, unsigned long long int);
+    nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
         IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
     }
