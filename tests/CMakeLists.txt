@@ -190,7 +190,6 @@ endif()
 add_legacy_tests(
   FOLDER tests/unit NAMES
   efficiency
-  biguint_betweenness
   igraph_betweenness
   igraph_closeness
   igraph_count_multiple

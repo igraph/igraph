@@ -46,7 +46,7 @@ int main() {
     }
 
     igraph_centralization_betweenness(&g, /*res=*/ 0,
-                                      IGRAPH_UNDIRECTED, /*nobigint=*/ 1, &cent,
+                                      IGRAPH_UNDIRECTED, &cent,
                                       /*theoretical_max=*/ 0,
                                       /*normalized=*/ 1);
     if (cent != 1.0) {
@@ -82,7 +82,7 @@ int main() {
     }
 
     igraph_centralization_betweenness(&g, /*res=*/ 0,
-                                      IGRAPH_UNDIRECTED, /*nobigint=*/ 1, &cent,
+                                      IGRAPH_UNDIRECTED, &cent,
                                       /*theoretical_max=*/ 0,
                                       /*normalized=*/ 1);
     if (cent != 1.0) {
@@ -118,7 +118,7 @@ int main() {
     }
 
     igraph_centralization_betweenness(&g, /*res=*/ 0,
-                                      IGRAPH_UNDIRECTED, /*nobigint=*/ 1, &cent,
+                                      IGRAPH_UNDIRECTED, &cent,
                                       /*theoretical_max=*/ 0,
                                       /*normalized=*/ 1);
     if (cent != 1.0) {

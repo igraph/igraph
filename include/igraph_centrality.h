@@ -48,12 +48,11 @@ DECLDIR int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *re
 
 DECLDIR int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
                                const igraph_vs_t vids, igraph_bool_t directed,
-                               const igraph_vector_t *weights, igraph_bool_t nobigint);
+                               const igraph_vector_t *weights);
 DECLDIR int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
                                         const igraph_vs_t vids, igraph_bool_t directed,
                                         igraph_real_t cutoff,
-                                        const igraph_vector_t *weights,
-                                        igraph_bool_t nobigint);
+                                        const igraph_vector_t *weights);
 DECLDIR int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                                     igraph_bool_t directed,
                                     const igraph_vector_t *weigths);
@@ -148,7 +147,6 @@ DECLDIR int igraph_centralization_degree_tmax(const igraph_t *graph,
 DECLDIR int igraph_centralization_betweenness(const igraph_t *graph,
         igraph_vector_t *res,
         igraph_bool_t directed,
-        igraph_bool_t nobigint,
         igraph_real_t *centralization,
         igraph_real_t *theoretical_max,
         igraph_bool_t normalized);
