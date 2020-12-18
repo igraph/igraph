@@ -147,18 +147,15 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER examples/simple NAMES
   assortativity
-  bellman_ford
-  biguint_betweenness
+  bellman_ford  
   dijkstra
   igraph_are_connected
-  igraph_average_path_length
-  igraph_betweenness
+  igraph_average_path_length  
   igraph_cocitation
   igraph_convergence_degree
   igraph_density
   igraph_diameter
-  igraph_eccentricity
-  igraph_edge_betweenness
+  igraph_eccentricity  
   igraph_feedback_arc_set
   igraph_feedback_arc_set_ip
   igraph_get_all_shortest_paths_dijkstra
@@ -193,8 +190,11 @@ endif()
 add_legacy_tests(
   FOLDER tests/unit NAMES
   efficiency
+  biguint_betweenness
+  igraph_betweenness
   igraph_closeness
   igraph_count_multiple
+  igraph_edge_betweenness
   igraph_topological_sorting
 )
 

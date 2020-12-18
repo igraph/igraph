@@ -1572,8 +1572,6 @@ int igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
  *     of the edges in a graph. See \ref igraph_betweenness_estimate() to
  *     estimate the betweenness score of the vertices in a graph.
- *
- * \example examples/simple/igraph_betweenness.c
  */
 int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
                        const igraph_vs_t vids, igraph_bool_t directed,
@@ -2287,8 +2285,6 @@ static int igraph_i_edge_betweenness_estimate_weighted(
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
  *     of the edges in a graph. See \ref igraph_edge_betweenness_estimate() to
  *     estimate the betweenness score of the edges in a graph.
- *
- * \example examples/simple/igraph_edge_betweenness.c
  */
 int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed,
