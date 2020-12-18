@@ -22,14 +22,7 @@
 */
 
 #include <igraph.h>
-
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
+#include "test_utilities.inc"
 
 int main() {
 
@@ -81,13 +74,12 @@ int main() {
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
             /* cutoff=    */ 2,
-            /* weights=   */ 0,
-            /* nobigint=  */ 1);
+            /* weights=   */ 0);
 
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
 
-    printf("Tree\n");
+    printf("\nTree\n");
     printf("==========================================================\n");
     igraph_tree(&g, 20000, 10, IGRAPH_TREE_UNDIRECTED);
 
@@ -98,8 +90,9 @@ int main() {
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
             /* cutoff=    */ 3,
-            /* weights=   */ 0,
-            /* nobigint=  */ 1);
+            /* weights=   */ 0);
+
+    printf("Max betweenness: %f\n", igraph_vector_max(&bet));
 
     igraph_vector_init(&bet2, 0);
     igraph_vector_init(&weights, igraph_ecount(&g));
@@ -110,8 +103,7 @@ int main() {
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
             /* cutoff=    */ 3,
-            /* weights=   */ &weights,
-            /* nobigint=  */ 1);
+            /* weights=   */ &weights);
 
     if (!igraph_vector_all_e(&bet, &bet2)) {
         return 1;
@@ -122,7 +114,7 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
-    printf("Non-trivial weighted graph\n");
+    printf("\nNon-trivial weighted graph\n");
     printf("==========================================================\n");
     igraph_vector_view(&edges, nontriv, sizeof(nontriv) / sizeof(igraph_real_t));
     igraph_create(&g, &edges, 0, /* directed= */ 0);
@@ -131,7 +123,9 @@ int main() {
     igraph_vector_init(&bet, 0);
 
     igraph_betweenness(/*graph=*/ &g, /*res=*/ &bet, /*vids=*/ igraph_vss_all(),
-                                  /*directed=*/0, /*weights=*/ &weights, /*nobigint=*/ 1);
+                                  /*directed=*/0, /*weights=*/ &weights);
+
+    printf("Max betweenness: %f\n", igraph_vector_max(&bet));
 
     igraph_vector_view(&bet2, nontriv_res,
                        sizeof(nontriv_res) / sizeof(igraph_real_t));
@@ -144,7 +138,7 @@ int main() {
     igraph_destroy(&g);
 
 
-    printf("Corner case cutoff 0.0\n");
+    printf("\nCorner case cutoff 0.0\n");
     printf("==========================================================\n");
     igraph_tree(&g, 20, 3, IGRAPH_TREE_UNDIRECTED);
 
@@ -155,8 +149,7 @@ int main() {
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
             /* cutoff=    */ 0,
-            /* weights=   */ 0,
-            /* nobigint=  */ 1);
+            /* weights=   */ 0);
 
     igraph_vector_init(&bet2, 0);
     igraph_betweenness_estimate(/* graph=     */ &g,
@@ -164,8 +157,7 @@ int main() {
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
             /* cutoff=    */ -1,
-            /* weights=   */ 0,
-            /* nobigint=  */ 1);
+            /* weights=   */ 0);
 
     igraph_vector_print(&bet);
     igraph_vector_print(&bet2);
@@ -183,8 +175,7 @@ int main() {
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
             /* cutoff=    */ 0,
-            /* weights=   */ &weights,
-            /* nobigint=  */ 1);
+            /* weights=   */ &weights);
 
     igraph_vector_init(&bet2, 0);
     igraph_betweenness_estimate(/* graph=     */ &g,
@@ -192,8 +183,7 @@ int main() {
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
             /* cutoff=    */ -1,
-            /* weights=   */ &weights,
-            /* nobigint=  */ 1);
+            /* weights=   */ &weights);
 
     igraph_vector_print(&bet);
     igraph_vector_print(&bet2);
@@ -203,7 +193,7 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
-    printf("Single path graph\n");
+    printf("\nSingle path graph\n");
     printf("==========================================================\n");
     igraph_small(&g, 5, IGRAPH_UNDIRECTED,
                             0, 1,
@@ -222,16 +212,14 @@ int main() {
         igraph_betweenness_estimate(&g, &bet,
                                     igraph_vss_all(), IGRAPH_UNDIRECTED,
                                     /* cutoff */ cutoff,
-                                    /* weights */ NULL,
-                                    /* nobigint */ 1);
+                                    /* weights */ NULL);
         igraph_vector_print(&bet);
 
         printf("Weighted\n");
         igraph_betweenness_estimate(&g, &bet2,
                                     igraph_vss_all(), IGRAPH_UNDIRECTED,
                                     /* cutoff */ cutoff,
-                                    /* weights */ &weights,
-                                    /* nobigint */ 1);
+                                    /* weights */ &weights);
         igraph_vector_print(&bet2);
         printf("\n");
 
@@ -245,7 +233,7 @@ int main() {
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
 
-    printf("Cycle graph\n");
+    printf("\nCycle graph\n");
     printf("==========================================================\n");
     igraph_small(&g, 4, IGRAPH_UNDIRECTED,
                             0, 1,
@@ -267,16 +255,14 @@ int main() {
         igraph_betweenness_estimate(&g, &bet,
                                     igraph_vss_all(), IGRAPH_UNDIRECTED,
                                     /* cutoff */ cutoff,
-                                    /* weights */ NULL,
-                                    /* nobigint */ 1);
+                                    /* weights */ NULL);
         igraph_vector_print(&bet);
 
         printf("Weighted\n");
         igraph_betweenness_estimate(&g, &bet2,
                                     igraph_vss_all(), IGRAPH_UNDIRECTED,
                                     /* cutoff */ cutoff,
-                                    /* weights */ &weights,
-                                    /* nobigint */ 1);
+                                    /* weights */ &weights);
         igraph_vector_print(&bet2);
         printf("\n");
     }
@@ -285,6 +271,51 @@ int main() {
     igraph_vector_destroy(&bet2);
     igraph_vector_destroy(&weights);
     igraph_destroy(&g);
+
+    printf("\nNull graph\n");
+    printf("==========================================================\n");
+
+    igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
+    igraph_vector_init(&bet, 3); /* purposefully larger than zero, as igraph_betweenness must resize it */
+    igraph_betweenness(&g, &bet, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL);
+    print_vector(&bet, stdout);
+
+    igraph_vector_destroy(&bet);
+    igraph_destroy(&g);
+
+    printf("\nEmpty graph\n");
+    printf("==========================================================\n");
+
+    igraph_empty(&g, 2, IGRAPH_UNDIRECTED);
+    igraph_vector_init(&bet, 0);
+    igraph_betweenness(&g, &bet, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL);
+    print_vector(&bet, stdout);
+
+    igraph_vector_destroy(&bet);
+    igraph_destroy(&g);
+
+    printf("\n37x37 grid graph\n");
+    printf("==========================================================\n");
+
+    {
+        igraph_vector_t dims;
+
+        igraph_vector_init(&dims, 2);
+        VECTOR(dims)[0] = 37;
+        VECTOR(dims)[1] = 37;
+
+        igraph_lattice(&g, &dims, 1, IGRAPH_UNDIRECTED, 0, 0);
+
+        igraph_vector_init(&bet, 0);
+        igraph_betweenness(&g, &bet, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL);
+        printf("Max betweenness: %f\n", igraph_vector_max(&bet));
+
+        igraph_vector_destroy(&bet);
+        igraph_destroy(&g);
+        igraph_vector_destroy(&dims);
+    }
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

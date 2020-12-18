@@ -398,7 +398,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
     double *distance, *tmpscore;
-    unsigned long long int *nrgeo;
+    double *nrgeo;
     long int source, i, e;
 
     igraph_inclist_t elist_out, elist_in, fathers;
@@ -449,7 +449,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
         IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, distance);
-    nrgeo = igraph_Calloc(no_of_nodes, unsigned long long int);
+    nrgeo = igraph_Calloc(no_of_nodes, double);
     if (nrgeo == 0) {
         IGRAPH_ERROR("edge betweenness community structure failed", IGRAPH_ENOMEM);
     }
@@ -530,7 +530,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                 IGRAPH_ALLOW_INTERRUPTION();
 
                 memset(distance, 0, (size_t) no_of_nodes * sizeof(double));
-                memset(nrgeo, 0, (size_t) no_of_nodes * sizeof(unsigned long long int));
+                memset(nrgeo, 0, (size_t) no_of_nodes * sizeof(double));
                 memset(tmpscore, 0, (size_t) no_of_nodes * sizeof(double));
                 igraph_stack_clear(&stack); /* it should be empty anyway... */
 
@@ -598,7 +598,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
                 IGRAPH_ALLOW_INTERRUPTION();
 
                 memset(distance, 0, (size_t) no_of_nodes * sizeof(double));
-                memset(nrgeo, 0, (size_t) no_of_nodes * sizeof(unsigned long long int));
+                memset(nrgeo, 0, (size_t) no_of_nodes * sizeof(double));
                 memset(tmpscore, 0, (size_t) no_of_nodes * sizeof(double));
 
                 igraph_2wheap_push_with_index(&heap, source, 0);

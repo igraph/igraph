@@ -78,14 +78,6 @@
     #define ONE 1
     #define MULTIPLICITY 1
 
-#elif defined(BASE_LIMB)
-    #define BASE limb_t
-    #define SHORT limb
-    #define ZERO 0
-    #define ONE 1
-    #define MULTIPLICITY 1
-    #define UNSIGNED 1
-
 #elif defined(BASE_PTR)
     #define BASE void*
     #define SHORT ptr

@@ -58,8 +58,6 @@ add_library(
   core/vector.c
 
   math/bfgs.c
-  math/bigint.c
-  math/bignum.c
   math/complex.c
   math/utils.c
 
