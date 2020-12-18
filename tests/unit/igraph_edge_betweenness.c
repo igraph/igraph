@@ -22,14 +22,7 @@
 */
 
 #include <igraph.h>
-
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, "%.5f\n", (double) VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
+#include "test_utilities.inc"
 
 int test_bug950() {
     /* Testing the case of weighted graphs with multiple alternate
@@ -165,6 +158,8 @@ int main() {
     if (test_bug1050()) {
         return 2;
     }
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

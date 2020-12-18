@@ -22,7 +22,8 @@
 */
 
 #include <igraph.h>
-#include <stdlib.h>
+
+#include "test_utilities.inc"
 
 int check(const igraph_vector_t *v1, const igraph_vector_t *v2, int code) {
     igraph_vector_t v;
@@ -36,7 +37,7 @@ int check(const igraph_vector_t *v1, const igraph_vector_t *v2, int code) {
         VECTOR(v)[i] = fabs(VECTOR(v)[i]);
     }
 
-    if ( (m = igraph_vector_max(&v)) > 0.01) {
+    if ( (m = igraph_vector_max(&v)) > 1e-6) {
         printf("Difference: %g\n", m);
         exit(code);
     }
@@ -202,9 +203,7 @@ int main() {
     igraph_vector_destroy(&bbet);
     igraph_destroy(&g);
 
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 3;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
