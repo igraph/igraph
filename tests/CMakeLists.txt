@@ -73,7 +73,6 @@ if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER tests/unit NAMES
     2wheap
-    biguint
     cutheap
     d_indheap
     hashtable
@@ -147,15 +146,15 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER examples/simple NAMES
   assortativity
-  bellman_ford  
+  bellman_ford
   dijkstra
   igraph_are_connected
-  igraph_average_path_length  
+  igraph_average_path_length
   igraph_cocitation
   igraph_convergence_degree
   igraph_density
   igraph_diameter
-  igraph_eccentricity  
+  igraph_eccentricity
   igraph_feedback_arc_set
   igraph_feedback_arc_set_ip
   igraph_get_all_shortest_paths_dijkstra
@@ -318,7 +317,7 @@ add_legacy_tests(
   igraph_intersection
   igraph_intersection2
   igraph_union
-  igraph_induced_subgraph_map  
+  igraph_induced_subgraph_map
 )
 
 add_legacy_tests(
@@ -498,7 +497,7 @@ if(CMAKE_USE_PTHREADS_INIT)
     FOLDER examples/simple NAMES tls1
     LIBRARIES Threads::Threads
   )
-  
+
   # tls2 should be added only if we use vendored ARPACK because a non-vendored
   # ARPACK is not guaranteed to be thread-safe
   if(ARPACK_IS_VENDORED)

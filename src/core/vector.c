@@ -23,11 +23,10 @@
 
 #include "igraph_error.h"
 #include "igraph_types.h"
+#include "igraph_vector.h"
 #include "igraph_complex.h"
 #include "config.h"
 #include <float.h>
-
-#include "../math/bigint.h"
 
 #define BASE_IGRAPH_REAL
 #include "igraph_pmt.h"
@@ -70,12 +69,6 @@
 #include "vector.pmt"
 #include "igraph_pmt_off.h"
 #undef BASE_COMPLEX
-
-#define BASE_LIMB
-#include "igraph_pmt.h"
-#include "vector.pmt"
-#include "igraph_pmt_off.h"
-#undef BASE_LIMB
 
 #include "core/math.h"
 
