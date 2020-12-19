@@ -275,7 +275,7 @@ add_legacy_tests(
   bliss_automorphisms
   igraph_isomorphic_bliss
   isomorphism_test
-  topology
+  isoclasses
   VF2-compat
 )
 
