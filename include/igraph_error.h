@@ -889,6 +889,10 @@ DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file,
  * \a igraph interface.
  *
  * </para><para>
+ * Unlike <code>assert()</code>, <code>IGRAPH_ASSERT()</code> is not disabled
+ * when the \c NDEBUG macro is defined.
+ *
+ * </para><para>
  * This macro is meant for internal use by \a igraph.
  *
  * </para><para>
