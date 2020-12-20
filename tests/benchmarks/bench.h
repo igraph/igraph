@@ -24,6 +24,8 @@
 #ifndef IGRAPH_BENCH_H
 #define IGRAPH_BENCH_H
 
+#include <sys/resource.h>
+
 static inline void igraph_get_cpu_time(igraph_real_t *data) {
 
     struct rusage self, children;
