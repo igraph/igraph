@@ -23,23 +23,17 @@
 
 #include <igraph.h>
 
-void print_matrix(igraph_spmatrix_t *m, FILE *f) {
+#include "test_utilities.inc"
+
+void print_spmatrix(igraph_spmatrix_t *m, FILE *f) {
     long int i, j;
     for (i = 0; i < igraph_spmatrix_nrow(m); i++) {
         for (j = 0; j < igraph_spmatrix_ncol(m); j++) {
-            fprintf(f, " %li", (long int)igraph_spmatrix_e(m, i, j));
+            fprintf(f, " %g", igraph_spmatrix_e(m, i, j));
         }
         fprintf(f, "\n");
     }
     fprintf(f, "=========================\n");
-}
-
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int)VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n=========================\n");
 }
 
 int main() {
@@ -93,24 +87,24 @@ int main() {
             igraph_spmatrix_set(&m, i, j, (i + j) % 3);
         }
     }
-    print_matrix(&m, stdout);
+    print_spmatrix(&m, stdout);
     igraph_spmatrix_null(&m);
-    print_matrix(&m, stdout);
+    print_spmatrix(&m, stdout);
     /* now fill it in shuffled order */
     for (i = 0; i < 12; i++) {
         igraph_spmatrix_set(&m, order[i] / 4, order[i] % 4, (order[i] / 4 + order[i] % 4) % 3);
     }
-    print_matrix(&m, stdout);
+    print_spmatrix(&m, stdout);
     /* now decrease all elements by two in shuffled order */
     for (i = 0; i < 12; i++) {
         igraph_spmatrix_add_e(&m, order[i] / 4, order[i] % 4, -2);
     }
-    print_matrix(&m, stdout);
+    print_spmatrix(&m, stdout);
     /* now increase all elements by one in shuffled order */
     for (i = 0; i < 12; i++) {
         igraph_spmatrix_add_e(&m, order[i] / 4, order[i] % 4, 1);
     }
-    print_matrix(&m, stdout);
+    print_spmatrix(&m, stdout);
 
     igraph_spmatrix_destroy(&m);
 
@@ -129,7 +123,7 @@ int main() {
     if (igraph_spmatrix_nrow(&m) != 6) {
         return 9;
     }
-    print_matrix(&m, stdout);
+    print_spmatrix(&m, stdout);
     igraph_spmatrix_destroy(&m);
 
     /* igraph_spmatrix_count_nonzero */
@@ -139,7 +133,7 @@ int main() {
             igraph_spmatrix_set(&m, i, j, i * j);
         }
     }
-    print_matrix(&m, stdout);
+    print_spmatrix(&m, stdout);
     if (igraph_spmatrix_count_nonzero(&m) != 8) {
         return 10;
     }
@@ -153,7 +147,7 @@ int main() {
         }
     }
     igraph_spmatrix_copy(&m1, &m);
-    print_matrix(&m1, stdout);
+    print_spmatrix(&m1, stdout);
     igraph_spmatrix_destroy(&m);
     igraph_spmatrix_destroy(&m1);
 
@@ -188,7 +182,7 @@ int main() {
     }
     igraph_vector_init(&v, 0);
     igraph_spmatrix_colsums(&m, &v);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
     igraph_spmatrix_destroy(&m);
 

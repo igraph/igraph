@@ -24,24 +24,18 @@
 #include <igraph.h>
 #include <stdio.h>
 
-void print_vector(const igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
+#include "test_utilities.inc"
 
-void print_array(const igraph_array3_t *a, FILE *f) {
+void print_array(const igraph_array3_t *a) {
     long int i, j, k;
     for (k = 0; k < igraph_array3_n(a, 3); k++) {
         for (i = 0; i < igraph_array3_n(a, 1); i++) {
             for (j = 0; j < igraph_array3_n(a, 2); j++) {
-                fprintf(f, " %li", (long int) ARRAY3(*a, i, j, k));
+                printf(" %g", (double) ARRAY3(*a, i, j, k));
             }
-            fprintf(f, "\n");
+            printf("\n");
         }
-        fprintf(f, "\n");
+            printf("\n");
     }
 }
 
@@ -54,7 +48,7 @@ int main() {
     igraph_array3_destroy(&a);
 
     igraph_array3_init(&a, 5, 4, 3);
-    print_array(&a, stdout);
+    print_array(&a);
     if (igraph_array3_n(&a, 1) != 5) {
         return 1;
     }
@@ -74,13 +68,11 @@ int main() {
             }
         }
     }
-    print_array(&a, stdout);
-    print_vector(&a.data, stdout);
+    print_array(&a);
+    print_vector_format(&a.data, stdout, "%g");
     igraph_array3_destroy(&a);
 
-    if (!IGRAPH_FINALLY_STACK_EMPTY) {
-        return 2;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

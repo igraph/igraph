@@ -24,13 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
+#include "test_utilities.inc"
 
 int main() {
 
@@ -45,7 +39,7 @@ int main() {
 
     /* vector of zeros */
     igraph_vector_init(&v, 10);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* VECTOR(), igraph_vector_size */
@@ -53,7 +47,7 @@ int main() {
     for (i = 0; i < igraph_vector_size(&v); i++) {
         VECTOR(v)[i] = 10 - i;
     }
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_reserve, igraph_vector_push_back */
@@ -89,7 +83,7 @@ int main() {
     for (i = 0; i < igraph_vector_size(&v); i++) {
         igraph_vector_set(&v, i, 20 * i);
     }
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_null */
@@ -101,7 +95,7 @@ int main() {
         VECTOR(v)[i] = i + 1;
     }
     igraph_vector_null(&v);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_tail, igraph_vector_pop_back */
@@ -120,7 +114,7 @@ int main() {
     igraph_vector_init_seq(&v, 1, 10);
     igraph_vector_init(&v2, 0);
     igraph_vector_order1(&v, &v2, 10);
-    print_vector(&v2, stdout);
+    print_vector_format(&v2, stdout, "%g");
     igraph_vector_destroy(&v2);
     igraph_vector_destroy(&v);
 
@@ -131,7 +125,7 @@ int main() {
     }
     igraph_vector_resize(&v, 10);
     igraph_vector_sort(&v);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_max, igraph_vector_init_copy */
@@ -152,7 +146,7 @@ int main() {
     for (i = 0; i < 10; i++) {
         VECTOR(v)[i] = 100 - i;
     }
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_copy_to */
@@ -262,23 +256,23 @@ int main() {
 
     /* igraph_vector_init_real */
     igraph_vector_init_real(&v, 10, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_init_int */
     igraph_vector_init_int(&v, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_init_real */
     igraph_vector_init_real_end(&v, -1, 1.0, 2.0, 3.0, 4.0, 5.0,
                                 6.0, 7.0, 8.0, 9.0, 10.0, -1.0);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_init_int */
     igraph_vector_init_int_end(&v, -1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, -1);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* igraph_vector_permdelete */
@@ -287,29 +281,29 @@ int main() {
     /* order2 */
     igraph_vector_init_int_end(&v, -1, 10, 9, 8, 7, 6, 7, 8, 9, 10, -1);
     igraph_vector_order2(&v);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* filter_smaller, quite special.... */
     igraph_vector_init_int_end(&v, -1, 0, 1, 2, 3, 4, 4, 4, 4, 5, 6, 7, 8, -1);
     igraph_vector_filter_smaller(&v, 4);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
     igraph_vector_init_int_end(&v, -1, 1, 2, 3, 4, 4, 4, 4, 5, 6, 7, 8, -1);
     igraph_vector_filter_smaller(&v, 0);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
     igraph_vector_init_int_end(&v, -1, 0, 0, 1, 2, 3, 4, 4, 4, 4, 5, 6, 7, 8, -1);
     igraph_vector_filter_smaller(&v, 0);
-    print_vector(&v, stdout);
+    print_vector_format(&v, stdout, "%g");
     igraph_vector_destroy(&v);
 
     /* rank */
     igraph_vector_init_int_end(&v, -1, 0, 1, 2, 6, 5, 2, 1, 0, -1);
     igraph_vector_init(&v2, 0);
     igraph_vector_rank(&v, &v2, 7);
-    print_vector(&v, stdout);
-    print_vector(&v2, stdout);
+    print_vector_format(&v, stdout, "%g");
+    print_vector_format(&v2, stdout, "%g");
     igraph_vector_destroy(&v);
     igraph_vector_destroy(&v2);
 
@@ -318,7 +312,7 @@ int main() {
     igraph_vector_init_int_end(&v2, -1, 2, 3, 1, 3, -1);
     igraph_vector_init(&v3, 0);
     igraph_vector_order(&v, &v2, &v3, 3);
-    print_vector(&v3, stdout);
+    print_vector_format(&v3, stdout, "%g");
     igraph_vector_destroy(&v);
     igraph_vector_destroy(&v2);
     igraph_vector_destroy(&v3);
@@ -334,9 +328,7 @@ int main() {
     }
     igraph_vector_destroy(&v);
 
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 16;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -24,13 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
+#include "test_utilities.inc"
 
 int main() {
 
@@ -43,17 +37,17 @@ int main() {
     igraph_vector_init_seq(&v2, 0, 9);
 
     igraph_vector_swap(&v1, &v2);
-    print_vector(&v1, stdout);
-    print_vector(&v2, stdout);
+    print_vector_format(&v1, stdout, "%g");
+    print_vector_format(&v2, stdout, "%g");
 
     igraph_vector_swap_elements(&v1, 0, 9);
     igraph_vector_swap_elements(&v1, 3, 6);
-    print_vector(&v1, stdout);
+    print_vector_format(&v1, stdout, "%g");
 
     igraph_vector_reverse(&v2);
-    print_vector(&v2, stdout);
+    print_vector_format(&v2, stdout, "%g");
     igraph_vector_reverse(&v2);
-    print_vector(&v2, stdout);
+    print_vector_format(&v2, stdout, "%g");
 
     igraph_vector_destroy(&v1);
     igraph_vector_destroy(&v2);
@@ -64,13 +58,13 @@ int main() {
     igraph_vector_fill(&v2, 2);
 
     igraph_vector_add(&v1, &v2);
-    print_vector(&v1, stdout);
+    print_vector_format(&v1, stdout, "%g");
     igraph_vector_sub(&v1, &v2);
-    print_vector(&v1, stdout);
+    print_vector_format(&v1, stdout, "%g");
     igraph_vector_div(&v1, &v2);
-    print_vector(&v1, stdout);
+    print_vector_format(&v1, stdout, "%g");
     igraph_vector_mul(&v1, &v2);
-    print_vector(&v1, stdout);
+    print_vector_format(&v1, stdout, "%g");
 
     igraph_vector_minmax(&v1, &min, &max);
     igraph_vector_which_minmax(&v1, &imin, &imax);
@@ -108,14 +102,14 @@ int main() {
     igraph_vector_init(&v3, 0);
 
     igraph_vector_intersect_sorted(&v1, &v2, &v3);
-    print_vector(&v3, stdout);
+    print_vector_format(&v3, stdout, "%g");
 
     igraph_vector_difference_sorted(&v1, &v2, &v3);
-    print_vector(&v3, stdout);
+    print_vector_format(&v3, stdout, "%g");
     igraph_vector_difference_sorted(&v2, &v1, &v3);
-    print_vector(&v3, stdout);
+    print_vector_format(&v3, stdout, "%g");
     igraph_vector_difference_sorted(&v2, &v2, &v3);
-    print_vector(&v3, stdout);
+    print_vector_format(&v3, stdout, "%g");
 
     igraph_vector_destroy(&v1);
     igraph_vector_destroy(&v2);

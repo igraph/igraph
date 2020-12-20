@@ -10,13 +10,25 @@
 #include <stdio.h>
 #include <string.h>
 
+/* Print an igraph_real_t value. Be consistent in printing NaN/Inf across platforms. */
+void print_real(FILE *f, igraph_real_t x, const char *format) {
+    if (igraph_finite(x)) {
+        fprintf(f, format, x);
+    } else if (igraph_is_nan(x)) {
+        fprintf(f, "NaN");
+    } else if (igraph_is_posinf(x)) {
+        fprintf(f, "Inf");
+    } else if (igraph_is_neginf(x)) {
+        fprintf(f, "-Inf");
+    }
+}
 
 void print_vector_format(const igraph_vector_t *v, FILE *f, const char *format) {
     long i, n = igraph_vector_size(v);
     fprintf(f, "(");
     for (i=0; i < n; i++) {
         fprintf(f, " ");
-        fprintf(f, format, (double) VECTOR(*v)[i]);
+        print_real(f, VECTOR(*v)[i], format);
     }
     fprintf(f, " )\n");
 }
@@ -51,7 +63,7 @@ void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) 
         fprintf(f, i == 0 ? "[" : " ");
         for (j = 0; j < ncol; j++) {
             fprintf(f, " ");
-            fprintf(f, format, (double) MATRIX(*m, i, j));
+            print_real(f, MATRIX(*m, i, j), format);
         }
         fprintf(f, i == nrow-1 ? " ]\n" : "\n");
     }

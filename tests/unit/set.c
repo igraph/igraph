@@ -26,6 +26,8 @@
 
 #include "core/set.h"
 
+#include "test_utilities.inc"
+
 void print_set(igraph_set_t *set, FILE *f) {
     long int state = 0;
     igraph_integer_t element;
@@ -78,9 +80,7 @@ int main() {
     }
     igraph_set_destroy(&set);
 
-    if (!IGRAPH_FINALLY_STACK_EMPTY) {
-        return 5;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

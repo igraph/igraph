@@ -25,14 +25,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-int print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
-    for (i = 0; i < n; i++) {
-        printf("%li ", (long int) VECTOR(*v)[i]);
-    }
-    printf("\n");
-    return 0;
-}
+#include "test_utilities.inc"
 
 int main() {
     igraph_psumtree_t tree;
@@ -190,9 +183,7 @@ int main() {
     igraph_vector_destroy(&vec);
     igraph_psumtree_destroy(&tree);
 
-    if (!IGRAPH_FINALLY_STACK_EMPTY) {
-        return 13;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

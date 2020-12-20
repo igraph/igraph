@@ -23,15 +23,7 @@
 
 #include <igraph.h>
 
-void print_matrix(igraph_matrix_t *m, FILE *f) {
-    long int i, j;
-    for (i = 0; i < igraph_matrix_nrow(m); i++) {
-        for (j = 0; j < igraph_matrix_ncol(m); j++) {
-            fprintf(f, " %li", (long int)MATRIX(*m, i, j));
-        }
-        fprintf(f, "\n");
-    }
-}
+#include "test_utilities.inc"
 
 int main() {
     igraph_matrix_t m, m1;
@@ -80,9 +72,9 @@ int main() {
             MATRIX(m, i, j) = i + 1;
         }
     }
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_null(&m);
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_destroy(&m);
 
     /* igraph_matrix_add_cols, igraph_matrix_add_rows */
@@ -110,9 +102,9 @@ int main() {
         }
     }
     igraph_matrix_remove_col(&m, 0);
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_remove_col(&m, 1);
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_destroy(&m);
 
     /* TODO: igraph_matrix_permdelete_rows */
@@ -126,7 +118,7 @@ int main() {
         }
     }
     igraph_matrix_copy(&m1, &m);
-    print_matrix(&m1, stdout);
+    print_matrix(&m1);
     igraph_matrix_destroy(&m);
     igraph_matrix_destroy(&m1);
 
@@ -138,9 +130,9 @@ int main() {
             MATRIX(m, j, i) = k++;
         }
     }
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_transpose(&m);
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_destroy(&m);
 
     igraph_matrix_init(&m, 5, 1);
@@ -150,9 +142,9 @@ int main() {
             MATRIX(m, j, i) = k++;
         }
     }
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_transpose(&m);
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_destroy(&m);
 
     igraph_matrix_init(&m, 1, 5);
@@ -162,14 +154,12 @@ int main() {
             MATRIX(m, j, i) = k++;
         }
     }
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_transpose(&m);
-    print_matrix(&m, stdout);
+    print_matrix(&m);
     igraph_matrix_destroy(&m);
 
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 10;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

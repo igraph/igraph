@@ -1,17 +1,10 @@
 
 #include <igraph.h>
 
-void print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
-    for (i = 0; i < n; i++) {
-        igraph_real_printf(VECTOR(*v)[i]);
-        printf(" ");
-    }
-    printf("\n");
-}
+#include "test_utilities.inc"
 
 int main() {
-    // this is a directed graph with 10 vertices and 20 edges:
+    /* this is a directed graph with 10 vertices and 20 edges: */
     igraph_integer_t vc = 10, ec = 20;
     igraph_real_t edge_data[] = {
         0, 2, 1, 4, 2, 5, 2, 7, 3, 7, 3, 8, 4, 2, 5, 8, 6, 0, 6, 1, 6, 2, 7,
@@ -31,14 +24,16 @@ int main() {
     igraph_vector_init(&tri, 0);
 
     igraph_triad_census(&graph, &tri);
-    print_vector(&tri);
+    print_vector_round(&tri);
 
-    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL); // convert to undirected
+    igraph_to_undirected(&graph, IGRAPH_TO_UNDIRECTED_COLLAPSE, NULL); /* convert to undirected */
     igraph_triad_census(&graph, &tri);
-    print_vector(&tri);
+    print_vector_round(&tri);
 
     igraph_vector_destroy(&tri);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -24,23 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-void print_matrix(igraph_matrix_t *m) {
-    long int i, j;
-    for (i = 0; i < igraph_matrix_nrow(m); i++) {
-        for (j = 0; j < igraph_matrix_ncol(m); j++) {
-            printf(" %g", MATRIX(*m, i, j));
-        }
-        printf("\n");
-    }
-}
-
-void print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
-    for (i = 0; i < n; i++) {
-        printf(" %g", VECTOR(*v)[i]);
-    }
-    printf("\n");
-}
+#include "test_utilities.inc"
 
 void byrow(igraph_matrix_t *m) {
     long int r = igraph_matrix_nrow(m), c = igraph_matrix_ncol(m);
@@ -352,9 +336,7 @@ int main() {
     igraph_matrix_destroy(&m2);
     igraph_matrix_destroy(&m);
 
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 10;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
