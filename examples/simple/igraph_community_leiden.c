@@ -28,7 +28,6 @@ int main() {
     igraph_vector_t membership, degree;
     igraph_integer_t nb_clusters;
     igraph_real_t quality;
-    long int i;
 
     /* Set default seed to get reproducible results */
     igraph_rng_seed(igraph_rng_default(), 0);
@@ -51,7 +50,7 @@ int main() {
     /* Start from existing membership to improve it further */
     igraph_community_leiden(&graph, NULL, NULL, 0.05, 0.01, 1, &membership, &nb_clusters, &quality);
 
-    printf("Iterated Leiden, using CPM (resolution parameter 0.05), quality is %.4f.\n", nb_clusters, quality);
+    printf("Iterated Leiden, using CPM (resolution parameter 0.05), quality is %.4f.\n", quality);
     printf("Membership: ");
     igraph_vector_print(&membership);
     printf("\n");
