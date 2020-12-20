@@ -30,22 +30,22 @@ int main() {
 
     printf("Undirected, no loops\n");
     igraph_full(&g, n_vertices, 0 /*undirected*/, 0/*no loops*/);
-    print_graph(&g, stdout);
+    print_graph(&g);
     igraph_destroy(&g);
 
     printf("Directed, no loops\n");
     igraph_full(&g, n_vertices, 1 /*directed*/, 0/*no loops*/);
-    print_graph(&g, stdout);
+    print_graph(&g);
     igraph_destroy(&g);
 
     printf("Undirected, with loops\n");
     igraph_full(&g, n_vertices, 0 /*undirected*/, 1/*loops*/);
-    print_graph(&g, stdout);
+    print_graph(&g);
     igraph_destroy(&g);
 
     printf("Directed, with loops\n");
     igraph_full(&g, n_vertices, 1 /*directed*/, 1/*loops*/);
-    print_graph(&g, stdout);
+    print_graph(&g);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

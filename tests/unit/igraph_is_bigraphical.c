@@ -6,8 +6,8 @@
 #define BIGRAPHICAL_PRINT_DESTROY(deg1, deg2) \
     igraph_is_bigraphical(&(deg1), &(deg2), IGRAPH_SIMPLE_SW, &simple); \
     igraph_is_bigraphical(&(deg1), &(deg2), IGRAPH_MULTI_SW, &multi); \
-    print_vector_round(&(deg1), stdout); \
-    print_vector_round(&(deg2), stdout); \
+    print_vector_round(&(deg1)); \
+    print_vector_round(&(deg2)); \
     printf("simple: %s, multi: %s\n\n", simple ? "true" : "false", multi ? "true" : "false"); \
     igraph_vector_destroy(&(deg1)); \
     igraph_vector_destroy(&(deg2));

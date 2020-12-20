@@ -10,7 +10,7 @@ void realize1(igraph_vector_t *ods, igraph_vector_t *ids, igraph_edge_type_sw_t 
     err = igraph_realize_degree_sequence(&graph, ods, ids, et, method);
     if (err == IGRAPH_SUCCESS) {
         printf("\n");
-        print_graph(&graph, stdout);
+        print_graph(&graph);
         igraph_destroy(&graph);
     } else if (err == IGRAPH_UNIMPLEMENTED) {
         printf(" not implemented\n");
@@ -29,7 +29,7 @@ void realize2(igraph_vector_t *ods, igraph_vector_t *ids, igraph_edge_type_sw_t 
 }
 
 void undirected_print_destroy(igraph_vector_t *ds) {
-    print_vector_round(ds, stdout);
+    print_vector_round(ds);
     printf("\nSIMPLE GRAPH:\n");
     realize2(ds, NULL, IGRAPH_SIMPLE_SW);
     printf("\nLOOPLESS MULTIGRAPH:\n");
@@ -41,8 +41,8 @@ void undirected_print_destroy(igraph_vector_t *ds) {
 }
 
 void directed_print_destroy(igraph_vector_t *ods, igraph_vector_t *ids) {
-    print_vector_round(ods, stdout);
-    print_vector_round(ids, stdout);
+    print_vector_round(ods);
+    print_vector_round(ids);
     printf("\nSIMPLE GRAPH:\n");
     realize2(ods, ids, IGRAPH_SIMPLE_SW);
     printf("\nLOOPLESS MULTIGRAPH:\n");

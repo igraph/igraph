@@ -46,9 +46,9 @@ int main() {
     }
 
     igraph_topological_sorting(&g, &res, IGRAPH_OUT);
-    print_vector_round(&res, stdout);
+    print_vector_round(&res);
     igraph_topological_sorting(&g, &res, IGRAPH_IN);
-    print_vector_round(&res, stdout);
+    print_vector_round(&res);
 
     /* Error handling */
     igraph_set_error_handler(igraph_error_handler_ignore);

@@ -15,7 +15,7 @@ int main() {
                  -1);
 
     igraph_count_multiple(&graph, &counts, igraph_ess_all(IGRAPH_EDGEORDER_ID));
-    print_vector_round(&counts, stdout);
+    print_vector_round(&counts);
 
     igraph_destroy(&graph);
 
@@ -25,7 +25,7 @@ int main() {
                  -1);
 
     igraph_count_multiple(&graph, &counts, igraph_ess_all(IGRAPH_EDGEORDER_ID));
-    print_vector_round(&counts, stdout);
+    print_vector_round(&counts);
 
     igraph_destroy(&graph);
 

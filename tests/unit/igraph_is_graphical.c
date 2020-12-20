@@ -8,7 +8,7 @@ void graphical_print_destroy(igraph_vector_t *ds) {
     int err;
     igraph_bool_t simple, loops, multi, multiloops;
 
-    print_vector_round(ds, stdout);
+    print_vector_round(ds);
 
     err = igraph_is_graphical(ds, NULL, IGRAPH_SIMPLE_SW, &simple);
     if (err != IGRAPH_SUCCESS) {
@@ -43,8 +43,8 @@ void digraphical_print_destroy(igraph_vector_t *ods, igraph_vector_t *ids) {
     int err;
     igraph_bool_t simple, loops, multi, multiloops;
 
-    print_vector_round(ods, stdout);
-    print_vector_round(ids, stdout);
+    print_vector_round(ods);
+    print_vector_round(ids);
 
     err = igraph_is_graphical(ods, ids, IGRAPH_SIMPLE_SW, &simple);
     if (err != IGRAPH_SUCCESS) {

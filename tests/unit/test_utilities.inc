@@ -10,78 +10,76 @@
 #include <stdio.h>
 #include <string.h>
 
-/* Print elements of a vector. Use parentheses to make it clear when a vector has size zero. */
-void print_vector(const igraph_vector_t *v, FILE *f) {
+
+void print_vector_format(const igraph_vector_t *v, FILE *f, const char *format) {
     long i, n = igraph_vector_size(v);
     fprintf(f, "(");
     for (i=0; i < n; i++) {
-        fprintf(f, " %f", (double) VECTOR(*v)[i]);
+        fprintf(f, " ");
+        fprintf(f, format, (double) VECTOR(*v)[i]);
     }
     fprintf(f, " )\n");
 }
 
+/* Print elements of a vector. Use parentheses to make it clear when a vector has size zero. */
+void print_vector(const igraph_vector_t *v) {
+    print_vector_format(v, stdout, "%#g");
+}
 
 /* Round elements of a vector to integers and print them. */
 /* This is meant to be used when the elements of a vector are integer values. */
-void print_vector_round(const igraph_vector_t *v, FILE *f) {
-    long i, n = igraph_vector_size(v);
-    fprintf(f, "(");
-    for (i=0; i < n; i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-    }
-    fprintf(f, " )\n");
+void print_vector_round(const igraph_vector_t *v) {
+    print_vector_format(v, stdout, "%.f");
 }
 
 
 /* Print elements of an integer vector */
-void print_vector_int(const igraph_vector_int_t *v, FILE *f) {
-    long i;
-    fprintf(f, "(");
-    for (i=0; i < igraph_vector_int_size(v); i++) {
-        fprintf(f, " %d", VECTOR(*v)[i]);
+void print_vector_int(const igraph_vector_int_t *v) {
+    long i, n = igraph_vector_int_size(v);
+    printf("(");
+    for (i=0; i < n; i++) {
+        printf(" %d", VECTOR(*v)[i]);
     }
-    fprintf(f, " )\n");
+    printf(" )\n");
 }
 
 
-int print_matrix(const igraph_matrix_t *m, FILE *f) {
+/* Print elements of a matrix. Use brackets to make it clear when a vector has size zero. */
+void print_matrix_format(const igraph_matrix_t *m, FILE *f, const char *format) {
     long i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
     for (i = 0; i < nrow; i++) {
         fprintf(f, i == 0 ? "[" : " ");
         for (j = 0; j < ncol; j++) {
-            fprintf(f, " %f", (double) MATRIX(*m, i, j));
+            fprintf(f, " ");
+            fprintf(f, format, (double) MATRIX(*m, i, j));
         }
         fprintf(f, i == nrow-1 ? " ]\n" : "\n");
     }
-    return 0;
 }
 
+void print_matrix(const igraph_matrix_t *m) {
+    print_matrix_format(m, stdout, "%#g");
+}
 
-int print_matrix_round(const igraph_matrix_t *m, FILE *f) {
-    long i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
-    for (i = 0; i < nrow; i++) {
-        fprintf(f, i == 0 ? "[" : " ");
-        for (j = 0; j < ncol; j++) {
-            fprintf(f, " %li", (long int) MATRIX(*m, i, j));
-        }
-        fprintf(f, i == nrow-1 ? " ]\n" : "\n");
-    }
-    return 0;
+/* Round elements of a matrix to integers and print them. */
+/* This is meant to be used when the elements of a matrix are integer values. */
+void print_matrix_round(const igraph_matrix_t *m) {
+    print_matrix_format(m, stdout, "%.f");
 }
 
 
 /* Print a graph. Use brackets to make it obvious when the edge list is empty. */
-void print_graph(const igraph_t *graph, FILE *f) {
+void print_graph(const igraph_t *graph) {
     long ecount = igraph_ecount(graph);
     long vcount = igraph_vcount(graph);
     long i;
 
-    fprintf(f, "directed: %s\n", igraph_is_directed(graph) ? "true" : "false");
-    fprintf(f, "vcount: %ld\n", vcount);
-    fprintf(f, "edges: {\n");
+    printf("directed: %s\n", igraph_is_directed(graph) ? "true" : "false");
+    printf("vcount: %ld\n", vcount);
+    printf("edges: {\n");
     for (i=0; i < ecount; ++i)
-        fprintf(f, "%d %d\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
-    fprintf(f, "}\n");
+        printf("%d %d\n", IGRAPH_FROM(graph, i), IGRAPH_TO(graph, i));
+    printf("}\n");
 }
 
 /* Print a vector, ensuring that the first nonzero element is positive. */

@@ -22,7 +22,7 @@ void simple_test_case_no_weights_undirected() {
                              NULL /*unweighted*/, /*not normalised*/ 0);
 
     printf("Non normalised results below\n");
-    print_vector(&vector_actual_results, stdout);
+    print_vector(&vector_actual_results);
 
     /* NORMALISED TEST BELOW */
 
@@ -32,7 +32,7 @@ void simple_test_case_no_weights_undirected() {
                              NULL, /*normalised*/ 1);
 
     printf("\nNormalised results below\n");
-    print_vector(&vector_actual_results, stdout); 
+    print_vector(&vector_actual_results);
 
     igraph_vector_destroy(&vector_actual_results);
     igraph_destroy(&g);
@@ -64,7 +64,7 @@ void simple_test_case_with_weights_undirected() {
  
     printf("Non normalised test below\n"); 
     
-    print_vector(&vector_actual_results, stdout);
+    print_vector(&vector_actual_results);
 
     /* NORMALISED TEST BELOW */
 
@@ -75,7 +75,7 @@ void simple_test_case_with_weights_undirected() {
                              IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
                              &vector_weights, /*normalised*/ 1);
 
-    print_vector(&vector_actual_results, stdout);
+    print_vector(&vector_actual_results);
 
     igraph_vector_destroy(&vector_actual_results);
     igraph_destroy(&g);
@@ -105,7 +105,7 @@ void advanced_test_case_no_weights_undirected() {
                              IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
                              NULL, /*not normalised*/ 0);
 
-    print_vector(&vector_actual_results, stdout);
+    print_vector(&vector_actual_results);
  
     /* NORMALISED TEST BELOW*/
 
@@ -116,7 +116,7 @@ void advanced_test_case_no_weights_undirected() {
                              IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
                              NULL, /*normalised*/ 1);
 
-    print_vector(&vector_actual_results, stdout);
+    print_vector(&vector_actual_results);
 
     igraph_vector_destroy(&vector_actual_results);
     igraph_destroy(&g);
@@ -150,7 +150,7 @@ void advanced_test_case_with_weights() {
                              IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
                              &vector_weights, /*not normalised*/ 0);
 
-    print_vector(&vector_actual_results, stdout);
+    print_vector(&vector_actual_results);
 
     /* TEST FOR DIRECTED GRAPH
     OUT means the min distance from the curr node to the other node */
@@ -162,7 +162,7 @@ void advanced_test_case_with_weights() {
                              IGRAPH_OUT  /*graph is "out directed"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
                              &vector_weights, /*not normalised*/ 0);
 
-    print_vector(&vector_actual_results, stdout);
+    print_vector(&vector_actual_results);
 
     /* IN means the min distance from a node to the curr node */
 
@@ -173,7 +173,7 @@ void advanced_test_case_with_weights() {
                              IGRAPH_IN  /*graph is "in directed"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
                              &vector_weights, /*not normalised*/ 0);
 
-    print_vector(&vector_actual_results, stdout); 
+    print_vector(&vector_actual_results);
 
     igraph_vector_destroy(&vector_actual_results);
     igraph_destroy(&g);

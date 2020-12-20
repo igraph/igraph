@@ -70,8 +70,8 @@ int main() {
                                          /*callback=*/ 0,
                                          /*callback_extra=*/ 0);
 
-    print_matrix_round(&merges, stdout);
-    print_vector_round(&membership, stdout);
+    print_matrix_round(&merges);
+    print_vector_round(&membership);
 
     printf("\n");
 
@@ -84,8 +84,8 @@ int main() {
                                          /*callback=*/ 0,
                                          /*callback_extra=*/ 0);
 
-    print_matrix_round(&merges, stdout);
-    print_vector_round(&membership, stdout);
+    print_matrix_round(&merges);
+    print_vector_round(&membership);
 
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&x);

@@ -48,19 +48,19 @@ int main() {
 
     printf("\nLocal efficiency, undirected:\n");
     igraph_local_efficiency(&graph, &eff_vec, igraph_vss_all(), NULL, 0, IGRAPH_ALL);
-    print_vector(&eff_vec, stdout);
+    print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, all neighbors:\n");
     igraph_local_efficiency(&graph, &eff_vec, igraph_vss_all(), NULL, 1, IGRAPH_ALL);
-    print_vector(&eff_vec, stdout);
+    print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, in-neighbors:\n");
     igraph_local_efficiency(&graph, &eff_vec, igraph_vss_all(), NULL, 1, IGRAPH_IN);
-    print_vector(&eff_vec, stdout);
+    print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, out-neighbors:\n");
     igraph_local_efficiency(&graph, &eff_vec, igraph_vss_all(), NULL, 1, IGRAPH_OUT);
-    print_vector(&eff_vec, stdout);
+    print_vector(&eff_vec);
 
 
     printf("\n\nWEIGHTED CASE:\n\n");
@@ -85,19 +85,19 @@ int main() {
 
     printf("\nLocal efficiency, undirected:\n");
     igraph_local_efficiency(&graph, &eff_vec, igraph_vss_all(), &weights, 0, IGRAPH_ALL);
-    print_vector(&eff_vec, stdout);
+    print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, all neighbors:\n");
     igraph_local_efficiency(&graph, &eff_vec, igraph_vss_all(), &weights, 1, IGRAPH_ALL);
-    print_vector(&eff_vec, stdout);
+    print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, in-neighbors:\n");
     igraph_local_efficiency(&graph, &eff_vec, igraph_vss_all(), &weights, 1, IGRAPH_IN);
-    print_vector(&eff_vec, stdout);
+    print_vector(&eff_vec);
 
     printf("\nLocal efficiency, directed, out-neighbors:\n");
     igraph_local_efficiency(&graph, &eff_vec, igraph_vss_all(), &weights, 1, IGRAPH_OUT);
-    print_vector(&eff_vec, stdout);
+    print_vector(&eff_vec);
 
 
     igraph_vector_destroy(&eff_vec);

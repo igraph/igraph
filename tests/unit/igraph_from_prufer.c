@@ -16,14 +16,14 @@ int main() {
     igraph_from_prufer(&graph, &prufer);
     igraph_is_tree(&graph, &tree, NULL, IGRAPH_ALL);
     assert(tree);
-    print_graph(&graph, stdout);
+    print_graph(&graph);
     igraph_destroy(&graph);
 
     igraph_vector_int_view(&prufer, prufer2, sizeof(prufer2) / sizeof(igraph_integer_t));
     igraph_from_prufer(&graph, &prufer);
     igraph_is_tree(&graph, &tree, NULL, IGRAPH_ALL);
     assert(tree);
-    print_graph(&graph, stdout);
+    print_graph(&graph);
     igraph_destroy(&graph);
 
     /* For a zero-length array, we cannot use the same pattern as above because
@@ -32,7 +32,7 @@ int main() {
     igraph_from_prufer(&graph, &prufer);
     igraph_is_tree(&graph, &tree, NULL, IGRAPH_ALL);
     assert(tree);
-    print_graph(&graph, stdout);
+    print_graph(&graph);
     igraph_destroy(&graph);
     igraph_vector_int_destroy(&prufer);
 

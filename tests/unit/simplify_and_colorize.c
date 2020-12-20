@@ -6,9 +6,9 @@
 #define SIMPLIFY_PRINT_DESTROY(name) \
     printf(name "\n"); \
     igraph_simplify_and_colorize(&graph, &res, &vcol, &ecol); \
-    print_graph(&res, stdout); \
-    print_vector_int(&vcol, stdout); \
-    print_vector_int(&ecol, stdout); \
+    print_graph(&res); \
+    print_vector_int(&vcol); \
+    print_vector_int(&ecol); \
     printf("\n"); \
     igraph_destroy(&res); \
     igraph_destroy(&graph);

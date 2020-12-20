@@ -47,7 +47,7 @@ int test_bug950() {
     }
 
     igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, &weights);
-    print_vector(&eb, stdout);
+    print_vector(&eb);
 
     igraph_vector_destroy(&eb);
     igraph_vector_destroy(&weights);
@@ -128,7 +128,7 @@ int main() {
 
     igraph_vector_init(&eb, igraph_ecount(&g));
     igraph_edge_betweenness(&g, &eb, IGRAPH_UNDIRECTED, /*weights=*/ 0);
-    print_vector(&eb, stdout);
+    print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
 
@@ -137,7 +137,7 @@ int main() {
     igraph_vector_init(&eb, igraph_ecount(&g));
     igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, 2,
                                      /*weights=*/ 0);
-    print_vector(&eb, stdout);
+    print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
 
@@ -147,7 +147,7 @@ int main() {
     igraph_vector_init(&eb, igraph_ecount(&g));
     igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, 2,
                                      /*weights=*/ 0);
-    print_vector(&eb, stdout);
+    print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
 

@@ -14,19 +14,19 @@ int main() {
     igraph_copy(&dg, &ug);
     printf("\nARBITRARY:\n");
     igraph_to_directed(&dg, IGRAPH_TO_DIRECTED_ARBITRARY);
-    print_graph(&dg, stdout);    
+    print_graph(&dg);
     igraph_destroy(&dg);
 
     igraph_copy(&dg, &ug);
     printf("\nMUTUAL:\n");
     igraph_to_directed(&dg, IGRAPH_TO_DIRECTED_MUTUAL);
-    print_graph(&dg, stdout);
+    print_graph(&dg);
     igraph_destroy(&dg);
 
     igraph_copy(&dg, &ug);
     printf("\nACYCLIC:\n");
     igraph_to_directed(&dg, IGRAPH_TO_DIRECTED_ACYCLIC);
-    print_graph(&dg, stdout);
+    print_graph(&dg);
     igraph_destroy(&dg);
 
     igraph_copy(&dg, &ug);

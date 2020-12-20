@@ -278,7 +278,7 @@ int main() {
     igraph_empty(&g, 0, IGRAPH_UNDIRECTED);
     igraph_vector_init(&bet, 3); /* purposefully larger than zero, as igraph_betweenness must resize it */
     igraph_betweenness(&g, &bet, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL);
-    print_vector(&bet, stdout);
+    print_vector(&bet);
 
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
@@ -289,7 +289,7 @@ int main() {
     igraph_empty(&g, 2, IGRAPH_UNDIRECTED);
     igraph_vector_init(&bet, 0);
     igraph_betweenness(&g, &bet, igraph_vss_all(), IGRAPH_UNDIRECTED, NULL);
-    print_vector(&bet, stdout);
+    print_vector(&bet);
 
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
