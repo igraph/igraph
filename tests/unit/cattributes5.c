@@ -23,10 +23,7 @@
 
 #include <igraph.h>
 
-int mf(const igraph_strvector_t *input, char *output) {
-    /* TODO */
-    return 0;
-}
+#include "test_utilities.inc"
 
 int main() {
 
@@ -155,6 +152,8 @@ int main() {
     /* ****************************************************** */
 
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

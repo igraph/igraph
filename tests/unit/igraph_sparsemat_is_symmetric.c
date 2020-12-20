@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 #define DIM 10
 
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
@@ -60,6 +62,8 @@ int main() {
         igraph_sparsemat_destroy(&A);
 
     }
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

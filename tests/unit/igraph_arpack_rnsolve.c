@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 typedef struct cb2_data_t {
     igraph_matrix_t *A;
 } cb2_data_t;
@@ -208,6 +210,8 @@ int main() {
     igraph_matrix_destroy(&values);
     igraph_matrix_destroy(&vectors);
     igraph_matrix_destroy(&A);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

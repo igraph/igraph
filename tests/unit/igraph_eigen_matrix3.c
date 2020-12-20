@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 #define DUMP() do {             \
         igraph_vector_complex_print(&values);   \
         igraph_vector_complex_print(&values2);  \
@@ -89,6 +91,8 @@ int main() {
     igraph_vector_complex_destroy(&values2);
     igraph_matrix_complex_destroy(&vectors2);
     igraph_matrix_destroy(&mat2);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

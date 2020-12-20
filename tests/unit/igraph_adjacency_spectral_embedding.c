@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-#include "../../tests/unit/test_utilities.inc"
+#include "test_utilities.inc"
 
 /*
 
@@ -69,6 +69,8 @@ int main() {
     igraph_matrix_destroy(&U);
 
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

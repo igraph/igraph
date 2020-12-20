@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 /* ----------------------------------------------------------- */
 
 /* Vertices/edges with the same parity match */
@@ -242,5 +244,8 @@ int match_rings_open_closed() {
 int main() {
     match_rings();
     match_rings_open_closed();
+
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

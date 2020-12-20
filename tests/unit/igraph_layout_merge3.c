@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t graph;
     igraph_matrix_t coords;
@@ -38,6 +40,8 @@ int main() {
     }
 
     igraph_matrix_destroy(&coords);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

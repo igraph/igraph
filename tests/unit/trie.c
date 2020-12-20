@@ -26,6 +26,8 @@
 
 #include "core/trie.h"
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_trie_t trie;
@@ -125,9 +127,7 @@ int main() {
     }
     igraph_trie_destroy(&trie);
 
-    if (!IGRAPH_FINALLY_STACK_EMPTY) {
-        return 1;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

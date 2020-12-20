@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 typedef struct {
     int dim;
     int m;
@@ -176,6 +178,8 @@ int main() {
         }
         i++;
     }
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

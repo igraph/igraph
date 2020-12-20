@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 #define DIM 10
 
 int check_ev(const igraph_matrix_t *A, const igraph_vector_t *values,
@@ -118,6 +120,8 @@ int main() {
     igraph_vector_destroy(&values);
     igraph_matrix_destroy(&vectors);
     igraph_matrix_destroy(&A);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 void test_density(const igraph_t *graph, igraph_bool_t loops) {
     igraph_real_t density;
 
@@ -146,6 +148,8 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_destroy(&v);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -26,6 +26,8 @@
 
 #include "core/indheap.h"
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_vector_t elems;
@@ -159,6 +161,8 @@ int main() {
     /* MAX       */ MAX;
 
     igraph_2wheap_destroy(&Q);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

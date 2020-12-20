@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 #define N 1000
 
 igraph_bool_t has_loops(const igraph_t *graph) {
@@ -124,6 +126,8 @@ int main() {
     /* This might actually happen */
     /* if (!seen_loops) { return 7; } */
     /* if (!seen_multiple) { return 8; }   */
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -23,7 +23,9 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main(int argc, char **argv) {
+#include "test_utilities.inc"
+
+int main() {
     int i;
     igraph_t g;
     igraph_vector_t values;
@@ -99,6 +101,8 @@ int main(int argc, char **argv) {
     igraph_vector_destroy(&values);
     printf("===\n");
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

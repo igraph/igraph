@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
 
     int nodes = 10;
@@ -72,6 +74,8 @@ int main() {
     igraph_matrix_destroy(&hess);
     igraph_matrix_destroy(&sto);
     igraph_destroy(&tree);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
     const igraph_real_t edges[] = { 0, 1, 0, 2, 1, 6, 2, 6, 1, 3, 1, 4, 1, 5,
                                     3, 2, 4, 2, 5, 2
@@ -84,6 +86,8 @@ int main() {
     igraph_vector_ptr_destroy(&resedges);
     igraph_vector_ptr_destroy(&resvertices);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

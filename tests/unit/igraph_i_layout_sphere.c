@@ -25,6 +25,8 @@
 #include <stdlib.h>
 #include <math.h>
 
+#include "test_utilities.inc"
+
 int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *r);
 int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
@@ -79,7 +81,7 @@ int main () {
     }
     igraph_matrix_destroy(&m);
 
-
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

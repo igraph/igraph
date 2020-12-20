@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t small, big;
     igraph_matrix_t small_coords, big_coords, merged_coords;
@@ -78,6 +80,8 @@ int main() {
     igraph_vector_ptr_destroy(&coords_ptr);
     igraph_destroy(&small);
     igraph_destroy(&big);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

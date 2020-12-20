@@ -28,6 +28,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#include "test_utilities.inc"
+
 #define ARE 4
 #define AIM 5
 #define BRE 6
@@ -242,6 +244,8 @@ int main() {
     /* csc */
 
     /* cot */
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 #define N  10
 #define M  20
 #define NZ 50
@@ -269,6 +271,8 @@ int main() {
 
     /* res = doit(/\*which=*\/ MAX); */
     /* if (res) { return res; } */
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

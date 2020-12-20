@@ -2,6 +2,8 @@
 #include <igraph.h>
 #include <assert.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t graph;
     igraph_vector_t walk, weights;
@@ -48,6 +50,8 @@ int main() {
 
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&walk);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

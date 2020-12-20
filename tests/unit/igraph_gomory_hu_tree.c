@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int validate_tree(const igraph_t *graph, const igraph_t *tree,
                   const igraph_vector_t *flow, const igraph_vector_t *capacity) {
     igraph_integer_t n = igraph_vcount(graph);
@@ -144,6 +146,8 @@ int main() {
     /* destroy flow and capacity vectors */
     igraph_vector_destroy(&flow);
     igraph_vector_destroy(&capacity);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

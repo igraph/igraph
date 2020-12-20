@@ -1,6 +1,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 #define TEST_GRAPH(name) \
     igraph_automorphisms(&graph, NULL, IGRAPH_BLISS_F, &info); \
     printf("%s: %s\n", name, info.group_size); \
@@ -31,6 +33,8 @@ int main() {
 
     igraph_empty(&graph, 1, IGRAPH_UNDIRECTED);
     TEST_GRAPH("Singleton graph");
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

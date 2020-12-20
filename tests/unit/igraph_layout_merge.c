@@ -26,6 +26,8 @@
 
 #include "core/grid.h"
 
+#include "test_utilities.inc"
+
 int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
                               long int actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                               igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
@@ -79,5 +81,8 @@ int main() {
     igraph_vector_destroy(&y);
     igraph_vector_destroy(&r);
     igraph_i_layout_mergegrid_destroy(&grid);
+
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

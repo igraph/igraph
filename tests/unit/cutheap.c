@@ -25,13 +25,7 @@
 
 #include "core/cutheap.h"
 
-void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
-    for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
-    }
-    fprintf(f, "\n");
-}
+#include "test_utilities.inc"
 
 int main() {
     igraph_i_cutheap_t ch;
@@ -42,16 +36,9 @@ int main() {
     for (i = 0; i < 10; i++) {
         igraph_i_cutheap_update(&ch, i, i);
     }
-    /*   print_vector(&ch.heap, stdout); */
-    /*   print_vector(&ch.index, stdout); */
-    /*   print_vector(&ch.hptr, stdout); */
     while (!igraph_i_cutheap_empty(&ch)) {
         long int idx = igraph_i_cutheap_popmax(&ch);
         printf("%li ", idx);
-        /*     print_vector(&ch.heap, stdout); */
-        /*     print_vector(&ch.index, stdout); */
-        /*     print_vector(&ch.hptr, stdout); */
-        /*     printf("------------\n"); */
     }
     printf("\n");
 
@@ -60,6 +47,8 @@ int main() {
     if (!IGRAPH_FINALLY_STACK_EMPTY) {
         return 1;
     }
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

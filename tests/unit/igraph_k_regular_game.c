@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t g;
     igraph_vector_t deg;
@@ -191,6 +193,8 @@ int main() {
     igraph_destroy(&g);
 
     igraph_vector_destroy(&deg);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

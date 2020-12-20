@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 void check_attr(igraph_t *graph, int offset) {
 
     if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "name")) {
@@ -66,6 +68,8 @@ int main() {
     }
 
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

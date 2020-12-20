@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 igraph_vector_ptr_t custom_destructor_stack;
 
 void custom_destructor(void* ptr) {
@@ -277,9 +279,7 @@ int main() {
 
     igraph_vector_ptr_destroy(&custom_destructor_stack);
 
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 27;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

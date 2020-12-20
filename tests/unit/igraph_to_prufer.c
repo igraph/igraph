@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 int test_from_prufer_back_to_prufer() {
     igraph_t graph;
     igraph_integer_t prufer[] = {2, 3, 2, 3};
@@ -156,5 +158,8 @@ int main() {
     RUN_TEST(test_from_random_prufer_back_to_prufer(100));
     RUN_TEST(test_from_random_prufer_back_to_prufer(1000));
     RUN_TEST(test_from_random_prufer_back_to_prufer(10000));
+
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

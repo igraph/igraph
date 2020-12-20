@@ -25,6 +25,8 @@
 
 #include "core/indheap.h"
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_d_indheap_t h;
@@ -95,9 +97,7 @@ int main() {
     printf("\n");
     igraph_d_indheap_destroy(&h);
 
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 5;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

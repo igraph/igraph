@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_t graph;
@@ -45,6 +47,8 @@ int main() {
 
     igraph_vector_ptr_destroy(&separators);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

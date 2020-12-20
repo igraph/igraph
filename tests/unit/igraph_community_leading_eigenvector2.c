@@ -23,31 +23,8 @@
 
 #include <igraph.h>
 
-int print_vector(const igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
-    for (i = 0; i < n; i++) {
-        printf("%.2g", (double)VECTOR(*v)[i]);
-        if (i != n - 1) {
-            printf(" ");
-        }
-    }
-    printf("\n");
-    return 0;
-}
+#include "test_utilities.inc"
 
-int print_matrix(const igraph_matrix_t *m) {
-    long int i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
-    for (i = 0; i < nrow; i++) {
-        for (j = 0; j < ncol; j++) {
-            printf("%.2g", (double)MATRIX(*m, i, j));
-            if (j != ncol - 1) {
-                printf(" ");
-            }
-        }
-        printf("\n");
-    }
-    return 0;
-}
 
 int main() {
 
@@ -93,8 +70,8 @@ int main() {
                                          /*callback=*/ 0,
                                          /*callback_extra=*/ 0);
 
-    print_matrix(&merges);
-    print_vector(&membership);
+    print_matrix_round(&merges, stdout);
+    print_vector_round(&membership, stdout);
 
     printf("\n");
 
@@ -107,8 +84,8 @@ int main() {
                                          /*callback=*/ 0,
                                          /*callback_extra=*/ 0);
 
-    print_matrix(&merges);
-    print_vector(&membership);
+    print_matrix_round(&merges, stdout);
+    print_vector_round(&membership, stdout);
 
     igraph_vector_destroy(&weights);
     igraph_vector_destroy(&x);

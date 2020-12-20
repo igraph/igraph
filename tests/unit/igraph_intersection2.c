@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_t star, ring, uni, result;
@@ -55,6 +57,8 @@ int main() {
     igraph_destroy(&uni);
     igraph_destroy(&ring);
     igraph_destroy(&star);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

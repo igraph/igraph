@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t g, sub;
     igraph_vector_t map, invmap;
@@ -57,6 +59,8 @@ int main() {
 
     igraph_destroy(&sub);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

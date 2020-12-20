@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
 
     int nodes = 10;
@@ -126,6 +128,8 @@ int main() {
     igraph_matrix_complex_destroy(&vectors2);
 
     igraph_matrix_destroy(&mat2);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -25,6 +25,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t g, extd_g;
     igraph_matrix_t coords;
@@ -92,6 +94,8 @@ int main() {
     igraph_matrix_destroy(&coords);
     igraph_vector_destroy(&extd_to_orig_eids);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int print_attributes(const igraph_t *g) {
 
     igraph_vector_t gtypes, vtypes, etypes;
@@ -120,6 +122,8 @@ int main() {
     print_attributes(&graph);
 
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t graph;
     igraph_t full, tree;
@@ -67,6 +69,8 @@ int main() {
     igraph_destroy(&dendrogram);
     igraph_hrg_destroy(&hrg);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

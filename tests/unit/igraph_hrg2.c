@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t karate;
     igraph_vector_t parents, weights;
@@ -88,6 +90,8 @@ int main() {
     igraph_vector_destroy(&parents);
     igraph_vector_destroy(&weights);
     igraph_destroy(&karate);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_stack_t st;
@@ -86,9 +88,7 @@ int main() {
 
     igraph_stack_destroy(&st);
 
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 9;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

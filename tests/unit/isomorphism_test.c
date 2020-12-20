@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "test_utilities.inc"
 
 int random_permutation(igraph_vector_t *vec) {
     /* We just do size(vec) * 2 swaps */
@@ -210,6 +211,8 @@ int main() {
     test4();
     test_bliss();
     test_bug_995();
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 void igraph_warnings_ignore(const char *reason, const char *file,
                             int line, int igraph_errno) {
     /* Do nothing */
@@ -75,6 +77,8 @@ int main() {
     igraph_vector_destroy(&epath);
     igraph_vector_destroy(&vpath);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

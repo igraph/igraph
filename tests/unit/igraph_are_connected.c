@@ -22,6 +22,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 #define R_INTEGER(a,b) (igraph_rng_get_integer(igraph_rng_default(), (a), (b)))
 
 /* Crash the library function here. We expect error codes to be returned here.
@@ -98,12 +100,14 @@ int main() {
 
     ret = error_test();
     if (ret) {
-        return IGRAPH_FAILURE;
+        return 1;
     }
     ret = connected_test();
     if (ret) {
-        return IGRAPH_FAILURE;
+        return 1;
     }
 
-    return IGRAPH_SUCCESS;
+    VERIFY_FINALLY_STACK();
+
+    return 0;
 }

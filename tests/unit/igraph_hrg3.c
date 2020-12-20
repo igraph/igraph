@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t karate;
     igraph_vector_t edges, prob;
@@ -89,6 +91,8 @@ int main() {
     igraph_vector_destroy(&edges);
 
     igraph_destroy(&karate);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

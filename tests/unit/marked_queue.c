@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include "core/marked_queue.h"
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_marked_queue_t Q;
     long int i;
@@ -57,6 +59,8 @@ int main() {
     }
 
     igraph_marked_queue_destroy(&Q);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

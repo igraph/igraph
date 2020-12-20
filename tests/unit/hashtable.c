@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include "core/hashtable.h"
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_hashtable_t ht;
@@ -125,9 +127,7 @@ int main() {
 
     igraph_hashtable_destroy(&ht);
 
-    if (!IGRAPH_FINALLY_STACK_EMPTY) {
-        return 1;
-    }
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int sort_cmp(const void *a, const void *b) {
     const igraph_vector_t **da = (const igraph_vector_t **) a;
     const igraph_vector_t **db = (const igraph_vector_t **) b;
@@ -101,6 +103,8 @@ int main() {
 
     print_and_destroy(&cliques);
     igraph_destroy(&graph);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -2,6 +2,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 int compare_vectors(const void *p1, const void *p2) {
     igraph_vector_t *v1, *v2;
     long s1, s2, i;
@@ -169,6 +171,8 @@ int main() {
     igraph_vector_destroy(&vertex_weights);
     igraph_destroy(&graph);
     igraph_vector_destroy(&edges);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

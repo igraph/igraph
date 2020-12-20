@@ -25,6 +25,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 #define sqr(x) ((x)*(x))
 
 int main() {
@@ -81,6 +83,8 @@ int main() {
     igraph_matrix_destroy(&dist_mat);
     igraph_matrix_destroy(&coords);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

@@ -2,6 +2,8 @@
 #include <igraph.h>
 #include <assert.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_t g;
     igraph_bool_t res;
@@ -120,6 +122,8 @@ int main() {
     assert(! res);
 
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

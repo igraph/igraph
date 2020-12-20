@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 #define DIM1 10
 #define DIM2 5
 #define DIM3 6
@@ -79,6 +81,8 @@ int main() {
     igraph_matrix_destroy(&A3);
     igraph_matrix_destroy(&B);
     igraph_matrix_destroy(&C);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

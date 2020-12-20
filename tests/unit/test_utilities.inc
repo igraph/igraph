@@ -12,10 +12,10 @@
 
 /* Print elements of a vector. Use parentheses to make it clear when a vector has size zero. */
 void print_vector(const igraph_vector_t *v, FILE *f) {
-    long i;
+    long i, n = igraph_vector_size(v);
     fprintf(f, "(");
-    for (i=0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %f", VECTOR(*v)[i]);
+    for (i=0; i < n; i++) {
+        fprintf(f, " %f", (double) VECTOR(*v)[i]);
     }
     fprintf(f, " )\n");
 }
@@ -24,9 +24,9 @@ void print_vector(const igraph_vector_t *v, FILE *f) {
 /* Round elements of a vector to integers and print them. */
 /* This is meant to be used when the elements of a vector are integer values. */
 void print_vector_round(const igraph_vector_t *v, FILE *f) {
-    long i;
+    long i, n = igraph_vector_size(v);
     fprintf(f, "(");
-    for (i=0; i < igraph_vector_size(v); i++) {
+    for (i=0; i < n; i++) {
         fprintf(f, " %li", (long int) VECTOR(*v)[i]);
     }
     fprintf(f, " )\n");
@@ -41,6 +41,32 @@ void print_vector_int(const igraph_vector_int_t *v, FILE *f) {
         fprintf(f, " %d", VECTOR(*v)[i]);
     }
     fprintf(f, " )\n");
+}
+
+
+int print_matrix(const igraph_matrix_t *m, FILE *f) {
+    long i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
+    for (i = 0; i < nrow; i++) {
+        fprintf(f, i == 0 ? "[" : " ");
+        for (j = 0; j < ncol; j++) {
+            fprintf(f, " %f", (double) MATRIX(*m, i, j));
+        }
+        fprintf(f, i == nrow-1 ? " ]\n" : "\n");
+    }
+    return 0;
+}
+
+
+int print_matrix_round(const igraph_matrix_t *m, FILE *f) {
+    long i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
+    for (i = 0; i < nrow; i++) {
+        fprintf(f, i == 0 ? "[" : " ");
+        for (j = 0; j < ncol; j++) {
+            fprintf(f, " %li", (long int) MATRIX(*m, i, j));
+        }
+        fprintf(f, i == nrow-1 ? " ]\n" : "\n");
+    }
+    return 0;
 }
 
 

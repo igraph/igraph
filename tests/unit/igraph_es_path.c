@@ -24,6 +24,8 @@
 #include <igraph.h>
 #include <stdlib.h>
 
+#include "test_utilities.inc"
+
 int main() {
 
     igraph_t g;
@@ -69,6 +71,7 @@ int main() {
     igraph_es_destroy(&es);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

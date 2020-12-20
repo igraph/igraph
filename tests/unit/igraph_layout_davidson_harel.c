@@ -25,6 +25,8 @@
 #include <igraph.h>
 #include <math.h>
 
+#include "test_utilities.inc"
+
 igraph_bool_t igraph_i_segments_intersect(float p0_x, float p0_y,
         float p1_x, float p1_y,
         float p2_x, float p2_y,
@@ -118,5 +120,8 @@ int main() {
         printf("D\n");
         return res2;
     }
+
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

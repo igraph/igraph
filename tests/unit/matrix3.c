@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int main() {
     igraph_matrix_t m;
 
@@ -39,5 +41,8 @@ int main() {
     }
 
     igraph_matrix_destroy(&m);
+
+    VERIFY_FINALLY_STACK();
+
     return 0;
 }

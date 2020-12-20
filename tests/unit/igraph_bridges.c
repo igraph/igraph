@@ -2,6 +2,8 @@
 #include <igraph.h>
 #include <stdio.h>
 
+#include "test_utilities.inc"
+
 void sort_and_print_vector(igraph_vector_t *v) {
     long int i, n = igraph_vector_size(v);
     igraph_vector_sort(v);
@@ -30,6 +32,8 @@ int main() {
     igraph_destroy(&graph);
 
     igraph_vector_destroy(&bridges);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }
