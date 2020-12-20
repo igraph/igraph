@@ -143,7 +143,7 @@ int main() {
             igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
             print_vector(v);
             igraph_vector_destroy(v);
-            free(v);
+            igraph_free(v);
         }
     }
 
