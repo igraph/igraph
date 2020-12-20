@@ -4,36 +4,78 @@
 
 ### Added
 
- - Eulerian paths/cycles
-   * `igraph_is_eulerian()`: finds out whether an Eulerian path/cycle exists.
-   * `igraph_eulerian_path()`: returns an Eulerian path.
-   * `igraph_eulerian_cycle()`: returns an Eulerian cycle.
- - Degree sequences:
+ - Eulerian paths/cycles (PR #1346):
+   * `igraph_is_eulerian()` finds out whether an Eulerian path/cycle exists.
+   * `igraph_eulerian_path()` returns an Eulerian path.
+   * `igraph_eulerian_cycle()` returns an Eulerian cycle.
+ - Efficiency (PR #1344):
+   * `igraph_global_efficiency()` computes the global efficiency of a network.
+   * `igraph_local_efficiency()` computes the local efficiency around each vertex.
+   * `igraph_average_local_efficiency()` computes the mean local efficiency.
+ - Degree sequences (PR #1445):
    * `igraph_is_graphical()` checks if a degree sequence has a realization as a simple or multigraph, with or without self-loops.
    * `igraph_is_bigraphical()` checks if two degree sequences have a realization as a bipartite graph.
    * `igraph_realize_degree_sequence()` now supports constructing non-simple graphs as well.
+ - There is a new fatal error handling mechanism (PR #1548):
+   * `igraph_set_fatal_handler()` sets the fatal error handler. It is the only function in this functionality group that is relevant to end users.
+   * The macro `IGRAPH_FATAL()` and the functions `igraph_fatal()` and `igraph_fatalf()` raise a fatal error. These are for internal use.
+   * `IGRAPH_ASSERT()` is a replacement for the `assert()` macro. It is for internal use.
+   * `igraph_fatal_handler_abort()` is the default fatal error handler.
+ - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
 
 ### Changed
 
- - `igraph_community_multilevel()`: added resolution parameter.
- - `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
+ - igraph now uses a CMake-based build sysyem.
+ - GMP support can no longer be disabled. When GMP is not present on the system, igraph will use an embedded copy of Mini-GMP (PR #1549)
+ - Community detection:
+   * `igraph_community_multilevel()`: added resolution parameter.
+   * `igraph_community_fluid_communities()`: graphs with no vertices or with one vertex only are now supported; they return a trivial partition.
+ - Modularity:
+   * `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
+   * `igraph_modularity()` now supports computing the directed version of modularity.
+   * `igraph_modularity()` returns NaN for graphs with no edges to indicate that the modularity is not well-defined for such graphs.
+ - Centralities:
+   * `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
+   * The `nobigint` argument has been removed from `igraph_betweenness()`, `igraph_betweenness_estimate()` and `igraph_centralization_betweenness()`, as it is not longer needed. The current implementation is more accurate than the old one using big integers.
+ - Shortest paths (PR #1344):
+   * `igraph_average_path_length()` now returns the number of disconnected vertex pairs in the new `unconn_pairs` output argument.
+   * `igraph_diameter()` now return the result as an `igraph_real_t` instead of an `igraph_integer_t`.
+   * `igraph_average_path_length()`  and `igraph_diameter()` now return `IGRAPH_INFINITY` when `unconn=FALSE` and the graph is not connected. Previously they returned the number of vertices.
+ - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.   
  - `igraph_is_connected()` now returns false for the null graph; see https://github.com/igraph/igraph/issues/1538 for the reasoning behind this decision.
- - `igraph_modularity()` and `igraph_modularity_matrix()`: added resolution parameter.
- - `igraph_modularity()` now supports computing the directed version of modularity.
- - `igraph_modularity()` returns NaN for graphs with no edges to indicate that the modularity is not well-defined for graphs without edges.
- - `cutoff=0` is no longer interpreted as infinity (i.e. no cutoff) in `betweenness`, `edge_betweenness` and `closeness`. If no cutoff is desired, use a negative value such as `cutoff=-1`.
- - `igraph_realize_degree_sequence()` has an additional argument controlling whether multi-edges or self-loops are allowed.
- - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
  - `igraph_lapack_ddot()` is renamed to `igraph_blas_ddot()`.
- - `igraph_to_directed`: added RANDOM and ACYCLIC mode (PR #1511).
+ - `igraph_to_directed()`: added RANDOM and ACYCLIC mode (PR #1511).
+ - `igraph_topological_sorting()` now issues an error if the input graph is not acyclic. Previously it issued a warning.
+
+### Deprecated
+
+ - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
+
+### Removed
+
+ - The following functions, all deprecated in igraph 0.6, have been removed (PR #1562):
+   * `igraph_adjedgelist_init()`, `igraph_adjedgelist_destroy()`, `igraph_adjedgelist_get()`, `igraph_adjedgelist_print()`, `igraph_adjedgelist_remove_duplicate()`.
+   * `igraph_lazy_adjedgelist_init()`, `igraph_lazy_adjedgelist_destroy()`, `igraph_lazy_adjedgelist_get()`, `igraph_lazy_adjedgelist_get_real()`.
+   * `igraph_adjacent()`.
+   * `igraph_es_adj()`.
+   * `igraph_subgraph()`.
 
 ### Fixed
+
+ - Betweenness calculations are no longer at risk from integer overflow.
+ - `igraph_layout_gem()` was not interruptible; now it is.
+ - `igraph_callaway_traits_game()` now checks its parameters.
+ - Compatibility with the PGI compiler.
 
 ### Other
 
  - Documentation improvements.
  - Improved error and warning messages.
+ - More robust error handling.
  - General code cleanup to reduce the number of compiler warnings.
+ - igraph's source files have been re-organized for better maintainability.
+ - igraph can now be built with an external CXSparse library.
+ - The references to igraph source files in error and warning messages are now always relative to igraph's base directory.
 
 ## [0.8.5] - 2020-12-07
 
