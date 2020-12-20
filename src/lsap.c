@@ -109,7 +109,7 @@ int ap_hungarian(AP *p) {
                 ++ok;
             }
         if (ok != 1)
-            IGRAPH_ERROR("ap_hungarian: error in assigment, is not a permutation",
+            IGRAPH_ERROR("ap_hungarian: error in assignment, is not a permutation",
                          IGRAPH_EINVAL);
     }
 
