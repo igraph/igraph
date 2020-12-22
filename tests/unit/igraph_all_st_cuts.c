@@ -26,6 +26,8 @@
 #include "core/marked_queue.h"
 #include "core/estack.h"
 
+#include "test_utilities.inc"
+
 int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
                                const igraph_marked_queue_t *S,
                                const igraph_estack_t *T,
@@ -437,6 +439,8 @@ int main() {
     test_all_st_cuts(&g, 0, 2);
     test_all_st_cuts(&g, 1, 3);
     igraph_destroy(&g);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

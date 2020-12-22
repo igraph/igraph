@@ -23,6 +23,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist);
 
 static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjlist, const char* description) {
@@ -67,6 +69,7 @@ int main() {
     check_rewiring(IGRAPH_TREE_UNDIRECTED, 0, "Undirected, standard-method");
     check_rewiring(IGRAPH_TREE_UNDIRECTED, 1, "Undirected, adjlist-method");
 
-    return 0;
+    VERIFY_FINALLY_STACK();
 
+    return 0;
 }
