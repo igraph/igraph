@@ -119,8 +119,9 @@ int igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  * of vertices and edges in the graphs.
  *
  * </para><para>
- * Both graphs need to have the same directedness, i.e. either both
- * directed or both undirected.
+ * All graphs need to have the same directedness, i.e. either all
+ * directed or all undirected. If the graph list has length zero,
+ * the result will be a \em directed graph with no vertices.
  *
  * </para><para>
  * The current version of this function cannot handle graph, vertex
@@ -737,6 +738,8 @@ int igraph_union(igraph_t *res,
  *
  * </para><para>
  * The directedness of the operand graphs must be the same.
+ * If the graph list has length zero, the result will be a \em directed
+ * graph with no vertices.
  *
  * \param res Pointer to an uninitialized graph object, this will
  *        contain the result.
