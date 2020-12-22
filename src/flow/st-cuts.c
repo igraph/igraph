@@ -1021,8 +1021,6 @@ int igraph_provan_shier_list(const igraph_t *graph,
  *
  * Time complexity: O(n(|V|+|E|)), where |V| is the number of
  * vertices, |E| is the number of edges, and n is the number of cuts.
- *
- * \example examples/simple/igraph_all_st_cuts.c
  */
 
 int igraph_all_st_cuts(const igraph_t *graph,

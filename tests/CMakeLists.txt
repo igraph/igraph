@@ -72,7 +72,7 @@ add_legacy_tests(
 
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER examples/simple NAMES
+    FOLDER tests/unit NAMES
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
   )
   add_legacy_tests(
@@ -184,7 +184,7 @@ add_legacy_tests(
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER examples/simple NAMES
+    FOLDER tests/unit NAMES
     igraph_rewire # Uses internal igraph_i_rewire
   )
 endif()
@@ -375,7 +375,7 @@ add_legacy_tests(
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER examples/simple NAMES
+    FOLDER tests/unit NAMES
     igraph_all_st_cuts # Uses igraph_marked_queue, which is internal.
   )
 endif()

@@ -1307,8 +1307,6 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
  *         \endclist
  *
  * Time complexity: TODO.
- *
- * \example examples/simple/igraph_rewire.c
  */
 
 #define REWIRE_ADJLIST_THRESHOLD 10
