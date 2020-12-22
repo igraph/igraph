@@ -179,7 +179,8 @@ add_legacy_tests(
   igraph_reciprocity
   igraph_similarity
   igraph_simplify
-  igraph_transitivity
+  igraph_topological_sorting
+  igraph_transitivity  
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
@@ -201,10 +202,10 @@ add_legacy_tests(
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_is_tree
-  igraph_local_transitivity
-  igraph_topological_sorting
+  igraph_local_transitivity  
   igraph_transitive_closure_dag
   single_target_shortest_path
+  topological_sorting
 )
 
 # components.at
