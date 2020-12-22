@@ -128,6 +128,7 @@ add_legacy_tests(
   igraph_create
   igraph_degree_sequence_game
   igraph_erdos_renyi_game
+  igraph_full
   igraph_grg_game
   igraph_growing_random_game
   igraph_lcf
@@ -141,9 +142,9 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  full
   igraph_correlated_game
-  igraph_from_prufer
-  igraph_full
+  igraph_from_prufer  
   igraph_k_regular_game
   igraph_lattice
   igraph_realize_degree_sequence
