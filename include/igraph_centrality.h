@@ -46,6 +46,16 @@ DECLDIR int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *re
                                       const igraph_vector_t *weights,
                                       igraph_bool_t normalized);
 
+DECLDIR int igraph_harmonic_centrality(const igraph_t *graph, igraph_vector_t *res,
+                                       const igraph_vs_t vids, igraph_neimode_t mode,
+                                       const igraph_vector_t *weights,
+                                       igraph_bool_t normalized);
+DECLDIR int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,
+                                              const igraph_vs_t vids, igraph_neimode_t mode,
+                                              const igraph_vector_t *weights,
+                                              igraph_bool_t normalized,
+                                              igraph_real_t cutoff);
+
 DECLDIR int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
                                const igraph_vs_t vids, igraph_bool_t directed,
                                const igraph_vector_t *weights);

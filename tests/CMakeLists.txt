@@ -202,6 +202,7 @@ add_legacy_tests(
   igraph_local_transitivity
   igraph_topological_sorting
   igraph_transitive_closure_dag
+  harmonic_centrality
   single_target_shortest_path
 )
 
