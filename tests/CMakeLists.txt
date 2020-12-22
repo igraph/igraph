@@ -390,6 +390,7 @@ add_legacy_tests(
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
   igraph_community_fluid_communities
+  igraph_community_label_propagation
   igraph_community_leading_eigenvector
   igraph_community_leiden
   igraph_community_multilevel
@@ -402,8 +403,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bug-1149658
   community_leiden
-  igraph_community_infomap
-  igraph_community_label_propagation
+  community_label_propagation
+  igraph_community_infomap  
   igraph_community_leading_eigenvector2  
   igraph_modularity
   levc-stress
