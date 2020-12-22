@@ -1,6 +1,6 @@
 /*
    IGraph library.
-   Copyright (C) 2007-2020  The igraph development team <igraph@igraph.org>
+   Copyright (C) 2020  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
