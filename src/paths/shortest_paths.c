@@ -175,7 +175,7 @@ static int igraph_i_average_path_length_dijkstra(
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match the number of edges", IGRAPH_EINVAL);
     }
-    if (igraph_vector_min(weights) < 0) {
+    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
         IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
     }
 
@@ -736,7 +736,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Weight vector length does not match the number of edges", IGRAPH_EINVAL);
         }
-        if (igraph_vector_min(weights) < 0) {
+        if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
             IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
         }
 
@@ -1112,7 +1112,7 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
 
-    if (igraph_vector_min(weights) < 0) {
+    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
         IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
     }
 

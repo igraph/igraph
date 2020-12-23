@@ -162,7 +162,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
     IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
 
-    if (weights && igraph_vector_min(weights) < 0) {
+    if (weights && no_edges > 0 && igraph_vector_min(weights) < 0) {
         IGRAPH_CHECK(igraph_shortest_paths_bellman_ford(graph, &dij, igraph_vss_all(),
                      igraph_vss_all(), weights,
                      IGRAPH_ALL));

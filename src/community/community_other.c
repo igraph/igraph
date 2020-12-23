@@ -463,7 +463,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
     if (weights == 0) {
         IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
     } else {
-        if (igraph_vector_min(weights) <= 0) {
+        if (no_of_edges > 0 && igraph_vector_min(weights) <= 0) {
             IGRAPH_ERROR("weights must be strictly positive", IGRAPH_EINVAL);
         }
 
@@ -978,9 +978,6 @@ int igraph_modularity(const igraph_t *graph,
         IGRAPH_ERROR("Membership vector size differs from number of vertices.",
                      IGRAPH_EINVAL);
     }
-    if (igraph_vector_min(membership) < 0) {
-        IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);
-    }
     if (resolution < 0.0) {
       IGRAPH_ERROR("The resolution parameter must be non-negative.", IGRAPH_EINVAL);
     }
@@ -992,6 +989,12 @@ int igraph_modularity(const igraph_t *graph,
             *modularity = IGRAPH_NAN;
         }
         return IGRAPH_SUCCESS;
+    }
+
+    /* At this point, the 'membership' vector does not have length zero,
+       thus it is safe to call igraph_vector_min(). */
+    if (igraph_vector_min(membership) < 0) {
+        IGRAPH_ERROR("Invalid membership vector: negative entry.", IGRAPH_EINVAL);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&e, types);
@@ -2551,7 +2554,7 @@ int igraph_community_label_propagation(const igraph_t *graph,
     if (weights) {
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
-        } else if (igraph_vector_min(weights) < 0) {
+        } else if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
             IGRAPH_ERROR("Weights must be non-negative", IGRAPH_EINVAL);
         }
     }

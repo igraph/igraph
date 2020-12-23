@@ -3889,7 +3889,7 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    if (igraph_vector_min(weights) < 0) {
+    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
         IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
     }
 
@@ -4116,7 +4116,7 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    if (igraph_vector_min(weights) < 0) {
+    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
         IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
     }
 
@@ -4469,7 +4469,7 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    if (igraph_vector_min(weights) < 0) {
+    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
         IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
     }
 
@@ -5047,7 +5047,7 @@ int igraph_shortest_paths_johnson(const igraph_t *graph,
     }
 
     /* If no negative weights, then we can run Dijkstra's algorithm */
-    if (igraph_vector_min(weights) >= 0) {
+    if (no_of_edges > 0 && igraph_vector_min(weights) >= 0) {
         return igraph_shortest_paths_dijkstra(graph, res, from, to,
                                               weights, IGRAPH_OUT);
     }
