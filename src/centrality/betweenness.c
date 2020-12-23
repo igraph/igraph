@@ -85,7 +85,6 @@ static int igraph_i_betweenness_estimate_weighted(
         igraph_real_t cutoff,
         const igraph_vector_t *weights) {
 
-    igraph_real_t minweight;
     igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
     igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
     igraph_2wheap_t Q;
@@ -103,11 +102,13 @@ static int igraph_i_betweenness_estimate_weighted(
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    minweight = igraph_vector_min(weights);
-    if (minweight <= 0) {
-        IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
-    } else if (minweight <= eps) {
-        IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
+    if (no_of_edges > 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight <= 0) {
+            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+        } else if (minweight <= eps) {
+            IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
+        }
     }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
@@ -506,7 +507,6 @@ static int igraph_i_edge_betweenness_estimate_weighted(
         igraph_real_t cutoff,
         const igraph_vector_t *weights) {
 
-    igraph_real_t minweight;
     igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
     igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
     igraph_2wheap_t Q;
@@ -523,11 +523,13 @@ static int igraph_i_edge_betweenness_estimate_weighted(
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    minweight = igraph_vector_min(weights);
-    if (minweight <= 0) {
-        IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
-    } else if (minweight <= eps) {
-        IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
+    if (no_of_edges > 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight <= 0) {
+            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+        } else if (minweight <= eps) {
+            IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
+        }
     }
 
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, mode));

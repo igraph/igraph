@@ -110,7 +110,6 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
     /* See igraph_shortest_paths_dijkstra() for the implementation
        details and the dirty tricks. */
 
-    igraph_real_t minweight;
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
 
@@ -136,11 +135,13 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
 
-    minweight = igraph_vector_min(weights);
-    if (minweight <= 0) {
-        IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
-    } else if (minweight <= eps) {
-        IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
+    if (no_of_edges > 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight <= 0) {
+            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+        } else if (minweight <= eps) {
+            IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
+        }
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
