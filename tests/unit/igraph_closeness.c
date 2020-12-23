@@ -16,20 +16,21 @@ void simple_test_case_no_weights_undirected() {
 
     /* NOT NORMALISED TEST BELOW */
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             NULL /*unweighted*/, /*not normalised*/ 0);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_ALL  /*graph is "undirected"*/,
+                              NULL /*unweighted*/, /*not normalised*/ 0, /*cutoff*/
+                              -1 /*calculating exact centrality*/);
 
     printf("Non normalised results below\n");
     print_vector(&vector_actual_results);
 
     /* NORMALISED TEST BELOW */
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             NULL, /*normalised*/ 1);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_ALL  /*graph is "undirected"*/,
+                              NULL, /*normalised*/ 1, /*cutoff*/ -1 /*calculating exact centrality*/);
 
     printf("\nNormalised results below\n");
     print_vector(&vector_actual_results);
@@ -57,10 +58,10 @@ void simple_test_case_with_weights_undirected() {
 
     /* NOT NORMALISED TEST BELOW */
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             &vector_weights, /*not normalised*/ 0);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_ALL  /*graph is "undirected"*/,
+                              &vector_weights, /*not normalised*/ 0, /*cutoff*/ -1 /*calculating exact centrality*/);
  
     printf("Non normalised test below\n"); 
     
@@ -70,10 +71,10 @@ void simple_test_case_with_weights_undirected() {
 
     printf("\nNormalised test below\n");
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             &vector_weights, /*normalised*/ 1);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_ALL  /*graph is "undirected"*/,
+                              &vector_weights, /*normalised*/ 1, /*cutoff*/ -1 /*calculating exact centrality*/);
 
     print_vector(&vector_actual_results);
 
@@ -100,10 +101,10 @@ void advanced_test_case_no_weights_undirected() {
 
     printf("Non normalised test below\n");
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             NULL, /*not normalised*/ 0);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_ALL  /*graph is "undirected"*/,
+                              NULL, /*not normalised*/ 0, /*cutoff*/ -1 /*calculating exact centrality*/);
 
     print_vector(&vector_actual_results);
  
@@ -111,10 +112,10 @@ void advanced_test_case_no_weights_undirected() {
 
     printf("\nNormalised test below\n");
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             NULL, /*normalised*/ 1);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_ALL  /*graph is "undirected"*/,
+                              NULL, /*normalised*/ 1, /*cutoff*/ -1 /*calculating exact centrality*/);
 
     print_vector(&vector_actual_results);
 
@@ -145,10 +146,10 @@ void advanced_test_case_with_weights() {
 
     printf("Undirected graph test below\n");
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_ALL  /*graph is "undirected"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             &vector_weights, /*not normalised*/ 0);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_ALL  /*graph is "undirected"*/,
+                              &vector_weights, /*not normalised*/ 0, /*cutoff*/ -1 /*calculating exact centrality*/);
 
     print_vector(&vector_actual_results);
 
@@ -157,10 +158,10 @@ void advanced_test_case_with_weights() {
 
     printf("\nDirected graph test below for OUT\n");
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_OUT  /*graph is "out directed"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             &vector_weights, /*not normalised*/ 0);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_OUT  /*graph is "out directed"*/,
+                              &vector_weights, /*not normalised*/ 0, /*cutoff*/ -1 /*calculating exact centrality*/);
 
     print_vector(&vector_actual_results);
 
@@ -168,10 +169,10 @@ void advanced_test_case_with_weights() {
 
     printf("\nDirected graph test below for IN\n");
 
-    igraph_closeness_estimate(&g, &vector_actual_results /*store results here*/, 
-                             /*calculating for all vectors in the graph*/ igraph_vss_all(), 
-                             IGRAPH_IN  /*graph is "in directed"*/, /*cutoff*/ -1 /*calculating exact centrality*/,
-                             &vector_weights, /*not normalised*/ 0);
+    igraph_closeness_cutoff(&g, &vector_actual_results /*store results here*/,
+                              /*calculating for all vectors in the graph*/ igraph_vss_all(),
+                              IGRAPH_IN  /*graph is "in directed"*/,
+                              &vector_weights, /*not normalised*/ 0, /*cutoff*/ -1 /*calculating exact centrality*/);
 
     print_vector(&vector_actual_results);
 

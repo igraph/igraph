@@ -91,17 +91,16 @@
  * of edges in the graph.
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
- *   See \ref igraph_closeness_estimate() to estimate closeness values.
+ *   See \ref igraph_closeness_cutoff() for the range-limited closeness centrality.
  */
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
                      const igraph_vs_t vids, igraph_neimode_t mode,
                      const igraph_vector_t *weights,
                      igraph_bool_t normalized) {
-    return igraph_closeness_estimate(graph, res, vids, mode, -1, weights,
-                                     normalized);
+    return igraph_closeness_cutoff(graph, res, vids, mode, weights, normalized, -1);
 }
 
-static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
+static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
                                                 igraph_vector_t *res,
                                                 const igraph_vs_t vids,
                                                 igraph_neimode_t mode,
@@ -245,6 +244,8 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  * \function igraph_closeness_estimate
  * \brief Closeness centrality estimations for some vertices.
  *
+ * \deprecated-by igraph_closeness_cutoff 0.9
+ *
  * </para><para>
  * The closeness centrality of a vertex measures how easily other
  * vertices can be reached from it (or the other way: how easily it
@@ -305,11 +306,80 @@ static int igraph_i_closeness_estimate_weighted(const igraph_t *graph,
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
  */
+
 int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vs_t vids, igraph_neimode_t mode,
                               igraph_real_t cutoff,
                               const igraph_vector_t *weights,
                               igraph_bool_t normalized) {
+    IGRAPH_WARNING("igraph_closeness_estimate is deprecated, use igraph_closeness_cutoff.");
+    return igraph_closeness_cutoff(graph, res, vids, mode, weights, normalized, cutoff);
+}
+
+
+/**
+ * \ingroup structural
+ * \function igraph_closeness_cutoff
+ * \brief Range limited closeness centrality.
+ *
+ * </para><para>
+ * This function computes a range-limited version of closeness centrality
+ * by considering only those shortest paths whose length is no greater
+ * then the given cutoff values.
+ *
+ * </para><para>
+ * If the graph is not connected, and there is no such path between two
+ * vertices, the number of vertices is used instead the length of the
+ * geodesic. This is always longer than the longest possible geodesic.
+ *
+ * \param graph The graph object.
+ * \param res The result of the computation, a vector containing the
+ *        closeness centrality scores for the given vertices.
+ * \param vids The vertices for which the range limited closeness centrality
+ *             will be computed.
+ * \param mode The type of shortest paths to be used for the
+ *        calculation in directed graphs. Possible values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the lengths of the outgoing paths are calculated.
+ *        \cli IGRAPH_IN
+ *          the lengths of the incoming paths are calculated.
+ *        \cli IGRAPH_ALL
+ *          the directed graph is considered as an
+ *          undirected one for the computation.
+ *        \endclist
+ * \param weights An optional vector containing edge weights for
+ *        weighted closeness. Supply a null pointer here for
+ *        traditional, unweighted closeness.
+ * \param normalized Boolean, whether to normalize results by multiplying
+ *        by the number of vertices minus one.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        If negative, the exact closeness will be calculated (no upper
+ *        limit on path lengths).
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *           not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           invalid vertex id passed.
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument.
+ *        \endclist
+ *
+ * Time complexity: O(n|E|),
+ * n is the number
+ * of vertices for which the calculation is done and
+ * |E| is the number
+ * of edges in the graph.
+ *
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
+ */
+
+int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+                            const igraph_vs_t vids, igraph_neimode_t mode,
+                            const igraph_vector_t *weights,
+                            igraph_bool_t normalized,
+                            igraph_real_t cutoff) {
 
     long int no_of_nodes = igraph_vcount(graph);
     igraph_vector_t already_counted;
@@ -328,7 +398,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
     igraph_bool_t warning_shown = 0;
 
     if (weights) {
-        return igraph_i_closeness_estimate_weighted(graph, res, vids, mode, cutoff,
+        return igraph_i_closeness_cutoff_weighted(graph, res, vids, mode, cutoff,
                 weights, normalized);
     }
 

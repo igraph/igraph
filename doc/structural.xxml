@@ -102,7 +102,7 @@
 </section>
 
 <section id="estimating-centrality-measures"><title>Estimating Centrality Measures</title>
-<!-- doxrox-include igraph_closeness_estimate -->
+<!-- doxrox-include igraph_closeness_cutoff -->
 <!-- doxrox-include igraph_harmonic_centrality_cutoff -->
 <!-- doxrox-include igraph_betweenness_estimate -->
 <!-- doxrox-include igraph_edge_betweenness_estimate -->
