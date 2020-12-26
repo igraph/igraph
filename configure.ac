@@ -304,6 +304,11 @@ AC_ARG_WITH([external-glpk], [AS_HELP_STRING([--with-external-glpk],
             [internal_glpk=no],
             [internal_glpk=yes])
 
+AC_ARG_WITH([external-suitesparse], [AS_HELP_STRING([--with-external-suitesparse],
+                      [Use external SuiteSparse library [default=no]])],
+            [internal_suitesparse=no],
+            [internal_suitesparse=yes])
+
 needs_f2c="no"
 if test "$internal_blas" = "yes" -o "$internal_lapack" = "yes" -o "$internal_arpack" = "yes"; then
   needs_f2c="yes"
@@ -391,6 +396,15 @@ else
   internal_glpk=no
 fi
 
+if test "$internal_suitesparse" = "no"; then
+  AC_CHECK_LIB([cxsparse], [cs_di_sqr], [],
+    [AC_MSG_RESULT(not found, trying to use -lcxsparse anyway.)])
+  LDFLAGS="${LDFLAGS} -lcxsparse -lsuitesparseconfig"
+  PKGCONFIG_LIBS_PRIVATE="${PKGCONFIG_LIBS_PRIVATE} -lcxsparse -lsuitesparseconfig"
+else
+  AC_DEFINE([INTERNAL_SUITESPARSE], [1], [Define to 1 if you use the internal SuiteSparse library])
+fi
+
 # Link time optimization feature in newer gcc/g++
 # based on http://svn.r-project.org/R/trunk/configure.ac
 AC_ARG_ENABLE([lto],
@@ -414,6 +428,7 @@ fi
 AC_SUBST(LTO)
 AM_CONDITIONAL(BUILD_LTO, [test "x${want_lto}" != xno])
 
+AM_CONDITIONAL(INTERNAL_SUITESPARSE, test x$internal_suitesparse = xyes)
 AM_CONDITIONAL(INTERNAL_GLPK, test x$internal_glpk = xyes)
 AM_CONDITIONAL(INTERNAL_ARPACK, test x$internal_arpack = xyes)
 AM_CONDITIONAL(INTERNAL_LAPACK, test x$internal_lapack = xyes)
@@ -475,21 +490,22 @@ AC_CONFIG_COMMANDS_POST([
 AC_OUTPUT
 
 AC_MSG_RESULT([igraph successfully configured.])
-AC_MSG_RESULT([  GraphML format support -- $graphml_support])
-AC_MSG_RESULT([  GMP library support    -- $gmp_support])
-AC_MSG_RESULT([  GLPK library support   -- $glpk_support])
-AC_MSG_RESULT([  Thread-local storage   -- $tls_support])
-AC_MSG_RESULT([  Use internal ARPACK    -- $internal_arpack])
-AC_MSG_RESULT([  Use internal LAPACK    -- $internal_lapack])
-AC_MSG_RESULT([  Use internal BLAS      -- $internal_blas])
+AC_MSG_RESULT([  GraphML format support   -- $graphml_support])
+AC_MSG_RESULT([  GMP library support      -- $gmp_support])
+AC_MSG_RESULT([  GLPK library support     -- $glpk_support])
+AC_MSG_RESULT([  Thread-local storage     -- $tls_support])
+AC_MSG_RESULT([  Use internal ARPACK      -- $internal_arpack])
+AC_MSG_RESULT([  Use internal LAPACK      -- $internal_lapack])
+AC_MSG_RESULT([  Use internal BLAS        -- $internal_blas])
 if test "$needs_f2c" != "yes"; then
-  AC_MSG_RESULT([  Use internal F2C       -- f2c not needed])
+  AC_MSG_RESULT([  Use internal F2C         -- f2c not needed])
 else
-  AC_MSG_RESULT([  Use internal F2C       -- $internal_f2c])
+  AC_MSG_RESULT([  Use internal F2C         -- $internal_f2c])
 fi
 if test "$glpk_support" != "no"; then
-  AC_MSG_RESULT([  Use internal GLPK      -- $internal_glpk])
+  AC_MSG_RESULT([  Use internal GLPK        -- $internal_glpk])
 fi
+AC_MSG_RESULT([  Use internal SuiteSparse -- $internal_suitesparse])
 AC_MSG_RESULT([  Debug build            -- $debug])
 AC_MSG_RESULT([  Clang AddressSanitizer -- $use_asan])
 AC_MSG_RESULT([  Verify finally stack   -- $verify_finally])
