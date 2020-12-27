@@ -506,10 +506,10 @@ if test "$glpk_support" != "no"; then
   AC_MSG_RESULT([  Use internal GLPK        -- $internal_glpk])
 fi
 AC_MSG_RESULT([  Use internal SuiteSparse -- $internal_suitesparse])
-AC_MSG_RESULT([  Debug build            -- $debug])
-AC_MSG_RESULT([  Clang AddressSanitizer -- $use_asan])
-AC_MSG_RESULT([  Verify finally stack   -- $verify_finally])
-AC_MSG_RESULT([  Profiling              -- $use_gprof])
-AC_MSG_RESULT([  Link time optimization -- $use_lto])
-AC_MSG_RESULT([  CRLF2LF conversion     -- $igraph_cv_stdout_LF2CRLF])
+AC_MSG_RESULT([  Debug build              -- $debug])
+AC_MSG_RESULT([  Clang AddressSanitizer   -- $use_asan])
+AC_MSG_RESULT([  Verify finally stack     -- $verify_finally])
+AC_MSG_RESULT([  Profiling                -- $use_gprof])
+AC_MSG_RESULT([  Link time optimization   -- $use_lto])
+AC_MSG_RESULT([  CRLF2LF conversion       -- $igraph_cv_stdout_LF2CRLF])
 
