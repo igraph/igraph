@@ -125,6 +125,7 @@ PLFIT_LIB = libplfit.la
 noinst_LTLIBRARIES = $(F2C_LIB) $(BLAS_LIB) $(LAPACK_LIB) $(ARPACK_LIB) \
 					 $(GLPK_LIB) $(PLFIT_LIB) $(PRPACK_LIB)
 
+if INTERNAL_SUITESPARSE
 CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 	cs/cs_amd.c       cs/cs_house.c     cs/cs_qr.c        \
 	cs/cs_chol.c      cs/cs_ipvec.c     cs/cs_qrsol.c     \
@@ -146,6 +147,8 @@ CS = cs/cs_add.c       cs/cs_happly.c    cs/cs_pvec.c         \
 
 SPCONFIG =      SuiteSparse_config/SuiteSparse_config.c \
                 SuiteSparse_config/SuiteSparse_config.h
+
+endif
 
 HEADERS_PRIVATE = atlas-edges.h \
 		bliss/bignum.hh		bliss/defs.hh \

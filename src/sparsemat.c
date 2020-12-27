@@ -23,7 +23,11 @@
 
 #include "config.h"
 
+#ifndef INTERNAL_SUITESPARSE
+#include <suitesparse/cs.h>
+#else
 #include "cs/cs.h"
+#endif
 
 #include "igraph_sparsemat.h"
 #include "igraph_error.h"
