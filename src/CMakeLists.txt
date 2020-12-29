@@ -131,6 +131,8 @@ add_library(
   io/io_other.c
   ${PARSER_SOURCES}
 
+  layout/bipartite.c
+  layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
   layout/drl/DensityGrid_3d.cpp
@@ -140,8 +142,14 @@ add_library(
   layout/drl/drl_layout_3d.cpp
   layout/fruchterman_reingold.c
   layout/gem.c
+  layout/graphopt.c
+  layout/grid.c
   layout/kamada_kawai.c
   layout/layout_other.c
+  layout/lgl.c
+  layout/mds.c
+  layout/random.c
+  layout/reingold_tilford.c
   layout/sugiyama.c
 
   # TODO: each operator should be in a separate file, they are complex enough as they are
