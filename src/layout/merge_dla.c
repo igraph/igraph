@@ -1,9 +1,8 @@
 /* -*- mode: C -*-  */
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
-   IGraph R package.
-   Copyright (C) 2003-2014  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   IGraph library.
+   Copyright (C) 2003-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,51 +22,11 @@
 */
 
 #include "igraph_layout.h"
-#include "igraph_random.h"
-#include "igraph_memory.h"
-#include "igraph_iterators.h"
-#include "igraph_interface.h"
-#include "igraph_adjlist.h"
 #include "igraph_progress.h"
-#include "igraph_paths.h"
-#include "igraph_structural.h"
-#include "igraph_visitor.h"
-#include "igraph_topology.h"
-#include "igraph_components.h"
-#include "igraph_dqueue.h"
-#include "igraph_arpack.h"
-#include "igraph_blas.h"
-#include "igraph_centrality.h"
-#include "igraph_eigen.h"
-#include "config.h"
-#include <math.h>
-#include "core/math.h"
+#include "igraph_random.h"
 
 #include "core/grid.h"
 #include "core/interruption.h"
-
-/**
- * \section about_layouts
- *
- * <para>Layout generator functions (or at least most of them) try to place the
- * vertices and edges of a graph on a 2D plane or in 3D space in a way
- * which visually pleases the human eye.</para>
- *
- * <para>They take a graph object and a number of parameters as arguments
- * and return an \type igraph_matrix_t, in which each row gives the
- * coordinates of a vertex.</para>
- */
-
-int igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
-                          igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
-                          igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse) {
-
-    IGRAPH_UNUSED(graph); IGRAPH_UNUSED(res); IGRAPH_UNUSED(mass);
-    IGRAPH_UNUSED(equil); IGRAPH_UNUSED(k); IGRAPH_UNUSED(repeqdis);
-    IGRAPH_UNUSED(kfr); IGRAPH_UNUSED(repulse);
-    IGRAPH_ERROR("Springs layout not implemented", IGRAPH_UNIMPLEMENTED);
-    /* TODO */
-}
 
 /* not 'static', used in tests */
 int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
