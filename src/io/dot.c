@@ -31,6 +31,8 @@
 #include "igraph_memory.h"
 #include "igraph_version.h"
 
+#include "internal/hacks.h" /* strcasecmp */
+
 #define CHECK(cmd) do { ret=cmd; if (ret<0) IGRAPH_ERROR("Write failed", IGRAPH_EFILE); } while (0)
 
 static int igraph_i_dot_escape(const char *orig, char **result) {
