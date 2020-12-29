@@ -21,6 +21,8 @@
 
 */
 
+#include <math.h>
+
 #include "igraph_layout.h"
 #include "igraph_interface.h"
 
