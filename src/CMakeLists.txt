@@ -126,9 +126,18 @@ add_library(
   hrg/hrg_types.cc
   hrg/hrg.cc
 
+  io/dimacs.c
+  io/dl.c
+  io/dot.c
+  io/edgelist.c
   io/graphml.c
   io/gml-tree.c
-  io/io_other.c
+  io/gml.c
+  io/graphdb.c
+  io/leda.c
+  io/lgl.c
+  io/ncol.c
+  io/pajek.c
   ${PARSER_SOURCES}
 
   layout/bipartite.c
