@@ -33,6 +33,7 @@
 
 #include "core/grid.h"
 #include "core/interruption.h"
+#include "core/math.h"
 
 static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
     igraph_real_t len = sqrt((*x) * (*x) + (*y) * (*y));

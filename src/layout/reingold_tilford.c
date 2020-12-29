@@ -32,6 +32,8 @@
 #include "igraph_progress.h"
 #include "igraph_topology.h"
 
+#include "core/math.h"
+
 static int igraph_i_layout_reingold_tilford_unreachable(
     const igraph_t *graph,
     igraph_neimode_t mode,
