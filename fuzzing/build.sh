@@ -1,4 +1,4 @@
-!/bin/bash -eu
+#!/bin/bash -eu
 
 sed 's/use_all_warnings/\#use_all_warnings/g' -i $SRC/igraph/src/CMakeLists.txt
 mkdir build && cd build
