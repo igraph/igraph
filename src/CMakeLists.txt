@@ -169,8 +169,14 @@ add_library(
   layout/sugiyama.c
 
   # TODO: each operator should be in a separate file, they are complex enough as they are
+  operators/complementer.c
+  operators/compose.c
+  operators/difference.c
+  operators/disjoint_union.c
+  operators/intersection.c
+  operators/misc_internal.c
   operators/permute.c
-  operators/operators.c
+  operators/union.c
 
   paths/distances.c
   paths/eulerian.c

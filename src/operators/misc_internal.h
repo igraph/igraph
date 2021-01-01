@@ -1,7 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2008-2020  The igraph development team
+   Copyright (C) 2020  The igraph development team
    334 Harvard street, Cambridge, MA 02139 USA
 
    This program is free software; you can redistribute it and/or modify
@@ -21,25 +21,25 @@
 
 */
 
-#ifndef IGRAPH_ISOCLASSES_H
-#define IGRAPH_ISOCLASSES_H
+#ifndef IGRAPH_OPERATORS_MISC_INTERNAL_H
+#define IGRAPH_OPERATORS_MISC_INTERNAL_H
 
 #include "igraph_decls.h"
+#include "igraph_datatype.h"
+#include "igraph_vector.h"
+#include "igraph_vector_ptr.h"
 
 __BEGIN_DECLS
 
-extern const unsigned int igraph_i_isoclass_3[];
-extern const unsigned int igraph_i_isoclass_4[];
-extern const unsigned int igraph_i_isoclass_3u[];
-extern const unsigned int igraph_i_isoclass_4u[];
-extern const unsigned int igraph_i_isoclass2_3[];
-extern const unsigned int igraph_i_isoclass2_4[];
-extern const unsigned int igraph_i_isoclass2_3u[];
-extern const unsigned int igraph_i_isoclass2_4u[];
-extern const unsigned int igraph_i_isoclass_3_idx[];
-extern const unsigned int igraph_i_isoclass_4_idx[];
-extern const unsigned int igraph_i_isoclass_3u_idx[];
-extern const unsigned int igraph_i_isoclass_4u_idx[];
+#define IGRAPH_MERGE_MODE_UNION        1
+#define IGRAPH_MERGE_MODE_INTERSECTION 2
+
+int igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2);
+int igraph_i_merge(igraph_t *res, int mode,
+                   const igraph_t *left, const igraph_t *right,
+                   igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
+void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v);
+void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v);
 
 __END_DECLS
 
