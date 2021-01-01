@@ -99,14 +99,20 @@ add_library(
   cliques/maximal_cliques.c
   cliques/glet.c
 
-  community/community_other.c
+  community/edge_betweenness.c
   community/fast_modularity.c
-  community/leiden.c
-  community/optimal_modularity.c
+  community/fluid.c
   community/infomap/infomap_FlowGraph.cc
   community/infomap/infomap_Greedy.cc
   community/infomap/infomap_Node.cc
   community/infomap/infomap.cc
+  community/label_propagation.c
+  community/leading_eigenvector.c
+  community/leiden.c
+  community/louvain.c
+  community/misc.c
+  community/modularity.c
+  community/optimal_modularity.c
   community/spinglass/clustertool.cpp
   community/spinglass/NetDataTypes.cpp
   community/spinglass/NetRoutines.cpp
