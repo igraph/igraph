@@ -169,6 +169,7 @@ add_library(
   layout/sugiyama.c
 
   # TODO: each operator should be in a separate file, they are complex enough as they are
+  operators/permute.c
   operators/operators.c
 
   paths/distances.c
@@ -189,8 +190,11 @@ add_library(
   scg/scg.c
 
   isomorphism/bliss.cc
+  isomorphism/isoclasses.c
   isomorphism/lad.c
-  isomorphism/isomorphism_other.c
+  isomorphism/misc.c
+  isomorphism/queries.c
+  isomorphism/vf2.c
 
   misc/bipartite.c
   misc/chordality.c

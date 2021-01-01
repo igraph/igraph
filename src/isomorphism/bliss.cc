@@ -19,10 +19,9 @@
 
 #include "bliss/graph.hh"
 
-#include "igraph_types.h"
 #include "igraph_topology.h"
 
-#include "igraph_datatype.h"
+#include "igraph_conversion.h"
 #include "igraph_interface.h"
 
 #include "core/exceptions.h"
@@ -30,6 +29,33 @@
 using namespace bliss;
 using namespace std;
 
+/**
+ * \section about_bliss
+ *
+ * <para>
+ * BLISS is a successor of the famous NAUTY algorithm and
+ * implementation. While using the same ideas in general, with better
+ * heuristics and data structures BLISS outperforms NAUTY on most
+ * graphs.
+ * </para>
+ *
+ * <para>
+ * BLISS was developed and implemented by Tommi Junttila and Petteri Kaski at
+ * Helsinki University of Technology, Finland. For more information,
+ * see the BLISS homepage at http://www.tcs.hut.fi/Software/bliss/ and the publication
+ * Tommi Junttila, Petteri Kaski: "Engineering an Efficient Canonical Labeling
+ * Tool for Large and Sparse Graphs" at https://doi.org/10.1137/1.9781611972870.13
+ * </para>
+ *
+ * <para>
+ * BLISS works with both directed graphs and undirected graphs. It supports graphs with
+ * self-loops, but not graphs with multi-edges.
+ * </para>
+ *
+ * <para>
+ * BLISS version 0.73 is included in igraph.
+ * </para>
+ */
 
 namespace { // unnamed namespace
 
@@ -268,4 +294,229 @@ int igraph_automorphism_group(
 }
 
 
+/* The following license notice applies to the rest of this file */
 
+/*
+   IGraph library.
+   Copyright (C) 2006-2020 The igraph development team
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+   02110-1301 USA
+
+*/
+
+/**
+ * \function igraph_isomorphic_bliss
+ * Graph isomorphism via BLISS
+ *
+ * This function uses the BLISS graph isomorphism algorithm, a
+ * successor of the famous NAUTY algorithm and implementation. BLISS
+ * is open source and licensed according to the GNU GPL. See
+ * http://www.tcs.hut.fi/Software/bliss/index.html for
+ * details. Currently the 0.73 version of BLISS is included in igraph.
+ *
+ * </para><para>
+ *
+ * \param graph1 The first input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
+ * \param graph2 The second input graph. Multiple edges between the same nodes
+ *   are not supported and will cause an incorrect result to be returned.
+ * \param colors1 An optional vertex color vector for the first graph. Supply a
+ *   null pointer if your graph is not colored.
+ * \param colors2 An optional vertex color vector for the second graph. Supply a
+ *   null pointer if your graph is not colored.
+ * \param iso Pointer to a boolean, the result is stored here.
+ * \param map12 A vector or \c NULL pointer. If not \c NULL then an
+ *   isomorphic mapping from \p graph1 to \p graph2 is stored here.
+ *   If the input graphs are not isomorphic then this vector is
+ *   cleared, i.e. it will have length zero.
+ * \param map21 Similar to \p map12, but for the mapping from \p
+ *   graph2 to \p graph1.
+ * \param sh Splitting heuristics to be used for the graphs. See
+ *   \ref igraph_bliss_sh_t.
+ * \param info1 If not \c NULL, information about the canonization of
+ *    the first input graph is stored here. See \ref igraph_bliss_info_t
+ *    for details. Note that if the two graphs have different number
+ *    of vertices or edges, then this is not filled.
+ * \param info2 Same as \p info1, but for the second graph.
+ * \return Error code.
+ *
+ * Time complexity: exponential, but in practice it is quite fast.
+ */
+int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
+                            const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
+                            igraph_bool_t *iso, igraph_vector_t *map12,
+                            igraph_vector_t *map21, igraph_bliss_sh_t sh,
+                            igraph_bliss_info_t *info1, igraph_bliss_info_t *info2) {
+
+    long int no_of_nodes = igraph_vcount(graph1);
+    long int no_of_edges = igraph_ecount(graph1);
+    igraph_vector_t perm1, perm2;
+    igraph_vector_t vmap12, *mymap12 = &vmap12;
+    igraph_vector_t from, to, index;
+    igraph_vector_t from2, to2, index2;
+    igraph_bool_t directed;
+    long int i, j;
+
+    *iso = 0;
+    if (info1) {
+        info1->nof_nodes = info1->nof_leaf_nodes = info1->nof_bad_nodes =
+                               info1->nof_canupdates = info1->max_level = info1->nof_generators = 0;
+        info1->group_size = 0;
+    }
+    if (info2) {
+        info2->nof_nodes = info2->nof_leaf_nodes = info2->nof_bad_nodes =
+                               info2->nof_canupdates = info2->max_level = info2->nof_generators = 0;
+        info2->group_size = 0;
+    }
+
+    directed = igraph_is_directed(graph1);
+    if (igraph_is_directed(graph2) != directed) {
+        IGRAPH_ERROR("Cannot compare directed and undirected graphs",
+                     IGRAPH_EINVAL);
+    }
+    if ((colors1 == NULL || colors2 == NULL) && colors1 != colors2) {
+        IGRAPH_WARNING("Only one of the graphs is vertex colored, colors will be ignored");
+        colors1 = NULL; colors2 = NULL;
+    }
+
+    if (no_of_nodes != igraph_vcount(graph2) ||
+        no_of_edges != igraph_ecount(graph2)) {
+        if (map12) {
+            igraph_vector_clear(map12);
+        }
+        if (map21) {
+            igraph_vector_clear(map21);
+        }
+        return 0;
+    }
+
+    if (map12) {
+        mymap12 = map12;
+    } else {
+        IGRAPH_VECTOR_INIT_FINALLY(mymap12, 0);
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&perm1, no_of_nodes);
+    IGRAPH_VECTOR_INIT_FINALLY(&perm2, no_of_nodes);
+
+    IGRAPH_CHECK(igraph_canonical_permutation(graph1, colors1, &perm1, sh, info1));
+    IGRAPH_CHECK(igraph_canonical_permutation(graph2, colors2, &perm2, sh, info2));
+
+    IGRAPH_CHECK(igraph_vector_resize(mymap12, no_of_nodes));
+
+    /* The inverse of perm2 is produced in mymap12 */
+    for (i = 0; i < no_of_nodes; i++) {
+        VECTOR(*mymap12)[ (long int)VECTOR(perm2)[i] ] = i;
+    }
+    /* Now we produce perm2^{-1} o perm1 in perm2 */
+    for (i = 0; i < no_of_nodes; i++) {
+        VECTOR(perm2)[i] = VECTOR(*mymap12)[ (long int) VECTOR(perm1)[i] ];
+    }
+    /* Copy it to mymap12 */
+    igraph_vector_update(mymap12, &perm2);
+
+    igraph_vector_destroy(&perm1);
+    igraph_vector_destroy(&perm2);
+    IGRAPH_FINALLY_CLEAN(2);
+
+    /* Check isomorphism, we apply the permutation in mymap12 to graph1
+       and should get graph2 */
+
+    IGRAPH_VECTOR_INIT_FINALLY(&from, no_of_edges);
+    IGRAPH_VECTOR_INIT_FINALLY(&to, no_of_edges);
+    IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_edges);
+    IGRAPH_VECTOR_INIT_FINALLY(&from2, no_of_edges * 2);
+    IGRAPH_VECTOR_INIT_FINALLY(&to2, no_of_edges);
+    IGRAPH_VECTOR_INIT_FINALLY(&index2, no_of_edges);
+
+    for (i = 0; i < no_of_edges; i++) {
+        VECTOR(from)[i] = VECTOR(*mymap12)[ (long int) IGRAPH_FROM(graph1, i) ];
+        VECTOR(to)[i]   = VECTOR(*mymap12)[ (long int) IGRAPH_TO  (graph1, i) ];
+        if (! directed && VECTOR(from)[i] < VECTOR(to)[i]) {
+            igraph_real_t tmp = VECTOR(from)[i];
+            VECTOR(from)[i] = VECTOR(to)[i];
+            VECTOR(to)[i] = tmp;
+        }
+    }
+    igraph_vector_order(&from, &to, &index, no_of_nodes);
+
+    igraph_get_edgelist(graph2, &from2, /*bycol=*/ 1);
+    for (i = 0, j = no_of_edges; i < no_of_edges; i++, j++) {
+        VECTOR(to2)[i] = VECTOR(from2)[j];
+        if (! directed && VECTOR(from2)[i] < VECTOR(to2)[i]) {
+            igraph_real_t tmp = VECTOR(from2)[i];
+            VECTOR(from2)[i] = VECTOR(to2)[i];
+            VECTOR(to2)[i] = tmp;
+        }
+    }
+    igraph_vector_resize(&from2, no_of_edges);
+    igraph_vector_order(&from2, &to2, &index2, no_of_nodes);
+
+    *iso = 1;
+    for (i = 0; i < no_of_edges; i++) {
+        long int i1 = (long int) VECTOR(index)[i];
+        long int i2 = (long int) VECTOR(index2)[i];
+        if (VECTOR(from)[i1] != VECTOR(from2)[i2] ||
+            VECTOR(to)[i1] != VECTOR(to2)[i2]) {
+            *iso = 0;
+            break;
+        }
+    }
+
+    /* If the graphs are coloured, we also need to check that applying the
+       permutation mymap12 to colors1 gives colors2. */
+
+    if (*iso && colors1 != NULL) {
+        for (i = 0; i < no_of_nodes; i++) {
+            if (VECTOR(*colors1)[i] != VECTOR(*colors2)[(long int) VECTOR(*mymap12)[i] ]) {
+                *iso = 0;
+                break;
+            }
+        }
+    }
+
+    igraph_vector_destroy(&index2);
+    igraph_vector_destroy(&to2);
+    igraph_vector_destroy(&from2);
+    igraph_vector_destroy(&index);
+    igraph_vector_destroy(&to);
+    igraph_vector_destroy(&from);
+    IGRAPH_FINALLY_CLEAN(6);
+
+    if (*iso) {
+        /* The inverse of mymap12 */
+        if (map21) {
+            IGRAPH_CHECK(igraph_vector_resize(map21, no_of_nodes));
+            for (i = 0; i < no_of_nodes; i++) {
+                VECTOR(*map21)[ (long int) VECTOR(*mymap12)[i] ] = i;
+            }
+        }
+    } else {
+        if (map12) {
+            igraph_vector_clear(map12);
+        }
+        if (map21) {
+            igraph_vector_clear(map21);
+        }
+    }
+
+    if (!map12) {
+        igraph_vector_destroy(mymap12);
+        IGRAPH_FINALLY_CLEAN(1);
+    }
+
+    return 0;
+}

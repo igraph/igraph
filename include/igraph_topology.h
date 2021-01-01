@@ -47,9 +47,6 @@ DECLDIR int igraph_transitive_closure_dag(const igraph_t *graph,
 /* -------------------------------------------------- */
 
 /* Common functions */
-DECLDIR int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
-                                    const igraph_vector_t *permutation);
-
 DECLDIR int igraph_simplify_and_colorize(
     const igraph_t *graph, igraph_t *res,
     igraph_vector_int_t *vertex_color, igraph_vector_int_t *edge_color);
