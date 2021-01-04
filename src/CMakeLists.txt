@@ -76,8 +76,13 @@ add_library(
   graph/type_indexededgelist.c
   graph/visitors.c
 
+  constructors/adjacency.c
   constructors/atlas.c
+  constructors/basic.c
   constructors/constructors_other.c
+  constructors/lcf.c
+  constructors/prufer.c
+  constructors/regular.c
 
   games/degree_sequence_vl/gengraph_box_list.cpp
   games/degree_sequence_vl/gengraph_degree_sequence.cpp
