@@ -24,6 +24,7 @@
 #include "igraph.h"
 #include <stdio.h>
 
+extern "C" 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
 	if(size<5) return 0;
 
@@ -41,7 +42,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
 	FILE *ifile;
 	ifile = fopen("/tmp/libfuzzer.gml", "r");
 	if(ifile == 0){
-		unlink(filename);
+		remove(filename);
 		return 0;
 	}
 	
@@ -52,6 +53,6 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
 	
 	// Clean up
 	igraph_destroy(&g);
-	unlink(filename);
+	remove(filename);
 	return 0;
 }
