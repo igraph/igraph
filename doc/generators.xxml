@@ -30,7 +30,6 @@
 <!-- doxrox-include igraph_de_bruijn -->
 <!-- doxrox-include igraph_kautz -->
 <!-- doxrox-include igraph_extended_chordal_ring -->
-<!-- doxrox-include igraph_connect_neighborhood -->
 </section>
 
 <section id="games-randomized-graph-generators"><title>Games: Randomized Graph Generators</title>

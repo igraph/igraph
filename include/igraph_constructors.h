@@ -61,8 +61,6 @@ DECLDIR int igraph_full_citation(igraph_t *graph, igraph_integer_t n,
 DECLDIR int igraph_atlas(igraph_t *graph, int number);
 DECLDIR int igraph_extended_chordal_ring(igraph_t *graph, igraph_integer_t nodes,
         const igraph_matrix_t *W, igraph_bool_t directed);
-DECLDIR int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
-                                        igraph_neimode_t mode);
 DECLDIR int igraph_linegraph(const igraph_t *graph, igraph_t *linegraph);
 
 DECLDIR int igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n);

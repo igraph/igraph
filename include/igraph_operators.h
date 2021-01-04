@@ -59,6 +59,8 @@ DECLDIR int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2
                            igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
 DECLDIR int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
                                     const igraph_vector_t *permutation);
+DECLDIR int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
+                                        igraph_neimode_t mode);
 
 __END_DECLS
 

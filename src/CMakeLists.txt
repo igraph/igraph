@@ -171,6 +171,7 @@ add_library(
   # TODO: each operator should be in a separate file, they are complex enough as they are
   operators/complementer.c
   operators/compose.c
+  operators/connect_neighborhood.c
   operators/difference.c
   operators/disjoint_union.c
   operators/intersection.c
