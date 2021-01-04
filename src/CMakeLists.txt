@@ -79,7 +79,10 @@ add_library(
   constructors/adjacency.c
   constructors/atlas.c
   constructors/basic.c
-  constructors/constructors_other.c
+  constructors/de_bruijn.c
+  constructors/famous.c
+  constructors/full.c
+  constructors/kautz.c
   constructors/lcf.c
   constructors/prufer.c
   constructors/regular.c
