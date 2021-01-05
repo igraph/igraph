@@ -22,7 +22,7 @@
 
 #include "igraph_constructors.h"
 
-#include "igraph_structural.h"
+#include "igraph_operators.h"
 
 /**
  * \function igraph_lcf_vector

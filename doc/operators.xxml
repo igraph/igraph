@@ -24,6 +24,9 @@
 
 <section id="miscellaneous-operators"><title>Miscellaneous operators</title>
 <!-- doxrox-include igraph_connect_neighborhood -->
+<!-- doxrox-include igraph_contract_vertices -->
+<!-- doxrox-include igraph_linegraph -->
+<!-- doxrox-include igraph_simplify -->
 </section>
 
 </chapter>

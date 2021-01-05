@@ -161,7 +161,6 @@
 <!-- doxrox-include igraph_is_multiple -->
 <!-- doxrox-include igraph_has_multiple -->
 <!-- doxrox-include igraph_count_multiple -->
-<!-- doxrox-include igraph_simplify -->
 </section>
 
 <section id="mixing-patterns"><title>Mixing Patterns</title>
@@ -191,10 +190,6 @@
 <!-- doxrox-include igraph_maximum_bipartite_matching -->
 </section>
 
-<section id="line-graphs"><title>Line Graphs</title>
-<!-- doxrox-include igraph_linegraph -->
-</section>
-
 <section id="unfolding-a-graph-into-a-tree"><title>Unfolding a Graph Into a Tree</title>
 <!-- doxrox-include igraph_unfold_tree -->
 </section>
@@ -209,7 +204,6 @@
 <!-- doxrox-include igraph_get_stochastic -->
 <!-- doxrox-include igraph_get_stochastic_sparsemat -->
 <!-- doxrox-include igraph_get_edgelist -->	
-<!-- doxrox-include igraph_contract_vertices -->
 </section>
 
 </chapter>

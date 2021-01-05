@@ -84,6 +84,7 @@ add_library(
   constructors/full.c
   constructors/kautz.c
   constructors/lcf.c
+  constructors/linegraph.c
   constructors/prufer.c
   constructors/regular.c
 
@@ -180,12 +181,14 @@ add_library(
   operators/complementer.c
   operators/compose.c
   operators/connect_neighborhood.c
+  operators/contract.c
   operators/difference.c
   operators/disjoint_union.c
   operators/intersection.c
   operators/misc_internal.c
   operators/permute.c
   operators/rewire.c
+  operators/simplify.c
   operators/union.c
 
   paths/all_shortest_paths.c

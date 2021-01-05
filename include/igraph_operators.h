@@ -24,8 +24,9 @@
 #ifndef IGRAPH_OPERATORS_H
 #define IGRAPH_OPERATORS_H
 
-#include "igraph_decls.h"
+#include "igraph_attributes.h"
 #include "igraph_constants.h"
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_vector_ptr.h"
@@ -63,6 +64,9 @@ DECLDIR int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
                                         igraph_neimode_t mode);
 DECLDIR int igraph_rewire(igraph_t *graph,
                           igraph_integer_t n, igraph_rewiring_t mode);
+DECLDIR int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
+                            igraph_bool_t loops,
+                            const igraph_attribute_combination_t *edge_comb);
 
 __END_DECLS
 

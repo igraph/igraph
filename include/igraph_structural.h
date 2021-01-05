@@ -66,9 +66,6 @@ DECLDIR int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                                     const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
 DECLDIR int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
                                   const igraph_es_t eids, igraph_bool_t delete_vertices);
-DECLDIR int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
-                            igraph_bool_t loops,
-                            const igraph_attribute_combination_t *edge_comb);
 DECLDIR int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                                igraph_bool_t ignore_loops,
                                igraph_reciprocity_t mode);
