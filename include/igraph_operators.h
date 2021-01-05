@@ -61,6 +61,8 @@ DECLDIR int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
                                     const igraph_vector_t *permutation);
 DECLDIR int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
                                         igraph_neimode_t mode);
+DECLDIR int igraph_rewire(igraph_t *graph,
+                          igraph_integer_t n, igraph_rewiring_t mode);
 
 __END_DECLS
 

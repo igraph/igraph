@@ -185,6 +185,7 @@ add_library(
   operators/intersection.c
   operators/misc_internal.c
   operators/permute.c
+  operators/rewire.c
   operators/union.c
 
   paths/all_shortest_paths.c

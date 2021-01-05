@@ -57,7 +57,6 @@ DECLDIR int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *
 
 DECLDIR int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid,
                                 igraph_neimode_t mode);
-DECLDIR int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode);
 DECLDIR int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                         const igraph_vs_t vids,
                                         igraph_subgraph_implementation_t impl,
