@@ -187,11 +187,16 @@ add_library(
   operators/permute.c
   operators/union.c
 
+  paths/all_shortest_paths.c
+  paths/bellman_ford.c
+  paths/dijkstra.c
   paths/distances.c
   paths/eulerian.c
+  paths/johnson.c
   paths/random_walk.c
   paths/shortest_paths.c
   paths/simple_paths.c
+  paths/unweighted.c
 
   properties/properties_other.c
   properties/spectral.c
