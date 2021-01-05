@@ -36,6 +36,7 @@
 #include "config.h"
 
 #include "internal/glpk_support.h"
+#include "misc/feedback_arc_set.h"
 
 #include <limits.h>
 

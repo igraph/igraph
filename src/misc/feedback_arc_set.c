@@ -22,19 +22,15 @@
 
 */
 
-#include "igraph_centrality.h"
 #include "igraph_components.h"
-#include "igraph_constants.h"
-#include "igraph_datatype.h"
 #include "igraph_dqueue.h"
-#include "igraph_error.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
 #include "igraph_structural.h"
-#include "igraph_types.h"
 #include "igraph_visitor.h"
 
 #include "internal/glpk_support.h"
+#include "misc/feedback_arc_set.h"
 
 int igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
                                  const igraph_vector_t *weights);

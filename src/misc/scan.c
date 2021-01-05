@@ -22,16 +22,19 @@
 */
 
 #include "igraph_scan.h"
-#include "igraph_interface.h"
+
 #include "igraph_adjlist.h"
-#include "igraph_memory.h"
-#include "core/interruption.h"
 #include "igraph_arpack.h"
-#include "igraph_eigen.h"
 #include "igraph_centrality.h"
-#include "igraph_operators.h"
 #include "igraph_dqueue.h"
+#include "igraph_eigen.h"
+#include "igraph_interface.h"
+#include "igraph_memory.h"
+#include "igraph_operators.h"
 #include "igraph_stack.h"
+#include "igraph_structural.h"
+
+#include "core/interruption.h"
 
 /**
  * \section about_local_scan

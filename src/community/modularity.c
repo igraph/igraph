@@ -23,9 +23,9 @@
 
 #include "igraph_community.h"
 
-#include "igraph_centrality.h"
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
+#include "igraph_structural.h"
 
 /**
  * \function igraph_modularity

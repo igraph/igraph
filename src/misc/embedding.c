@@ -22,10 +22,12 @@
 */
 
 #include "igraph_embedding.h"
-#include "igraph_interface.h"
+
 #include "igraph_adjlist.h"
-#include "igraph_centrality.h"
 #include "igraph_blas.h"
+#include "igraph_centrality.h"
+#include "igraph_interface.h"
+#include "igraph_structural.h"
 
 typedef struct {
     const igraph_t *graph;

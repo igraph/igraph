@@ -202,6 +202,7 @@ add_library(
   paths/simple_paths.c
   paths/unweighted.c
 
+  properties/degrees.c
   properties/properties_other.c
   properties/spectral.c
   properties/triangles.c

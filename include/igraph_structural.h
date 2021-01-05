@@ -41,6 +41,38 @@ __BEGIN_DECLS
 /* -------------------------------------------------- */
 
 DECLDIR int igraph_are_connected(const igraph_t *graph, igraph_integer_t v1, igraph_integer_t v2, igraph_bool_t *res);
+DECLDIR int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es);
+DECLDIR int igraph_density(const igraph_t *graph, igraph_real_t *res,
+                           igraph_bool_t loops);
+DECLDIR int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+                             igraph_vector_t *res, const igraph_vs_t vs);
+DECLDIR int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
+                         igraph_vector_t *circle);
+DECLDIR int igraph_has_loop(const igraph_t *graph, igraph_bool_t *res);
+DECLDIR int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res);
+DECLDIR int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
+                           igraph_es_t es);
+DECLDIR int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
+                               igraph_es_t es);
+DECLDIR int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es);
+DECLDIR int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
+DECLDIR int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
+DECLDIR int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
+                             igraph_vs_t vids, igraph_neimode_t mode,
+                             igraph_bool_t loops);
+DECLDIR int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
+                               igraph_bool_t ignore_loops,
+                               igraph_reciprocity_t mode);
+DECLDIR int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
+                            const igraph_vs_t vids, igraph_neimode_t mode,
+                            igraph_bool_t loops, const igraph_vector_t *weights);
+DECLDIR int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
+        igraph_vector_t *outvids,
+        igraph_vs_t vids,
+        igraph_neimode_t mode,
+        igraph_bool_t loops,
+        igraph_order_t order,
+        igraph_bool_t only_indices);
 
 /* -------------------------------------------------- */
 /* Structural properties                              */
@@ -66,34 +98,11 @@ DECLDIR int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                                     const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
 DECLDIR int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
                                   const igraph_es_t eids, igraph_bool_t delete_vertices);
-DECLDIR int igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
-                               igraph_bool_t ignore_loops,
-                               igraph_reciprocity_t mode);
-
-DECLDIR int igraph_maxdegree(const igraph_t *graph, igraph_integer_t *res,
-                             igraph_vs_t vids, igraph_neimode_t mode,
-                             igraph_bool_t loops);
-DECLDIR int igraph_density(const igraph_t *graph, igraph_real_t *res,
-                           igraph_bool_t loops);
-
-DECLDIR int igraph_has_loop(const igraph_t *graph, igraph_bool_t *res);
-DECLDIR int igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
-                           igraph_es_t es);
-DECLDIR int igraph_is_simple(const igraph_t *graph, igraph_bool_t *res);
-DECLDIR int igraph_has_multiple(const igraph_t *graph, igraph_bool_t *res);
-DECLDIR int igraph_is_multiple(const igraph_t *graph, igraph_vector_bool_t *res,
-                               igraph_es_t es);
-DECLDIR int igraph_count_multiple(const igraph_t *graph, igraph_vector_t *res, igraph_es_t es);
-DECLDIR int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode);
-DECLDIR int igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
-                         igraph_vector_t *circle);
 DECLDIR int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
 
 DECLDIR int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                                igraph_neimode_t mode, const igraph_vector_t *roots,
                                igraph_vector_t *vertex_index);
-
-DECLDIR int igraph_is_mutual(igraph_t *graph, igraph_vector_bool_t *res, igraph_es_t es);
 
 DECLDIR int igraph_maximum_cardinality_search(const igraph_t *graph,
         igraph_vector_t *alpha,
@@ -111,16 +120,9 @@ DECLDIR int igraph_avg_nearest_neighbor_degree(const igraph_t *graph,
         igraph_vector_t *knn,
         igraph_vector_t *knnk,
         const igraph_vector_t *weights);
-DECLDIR int igraph_contract_vertices(igraph_t *graph,
-                                     const igraph_vector_t *mapping,
-                                     const igraph_attribute_combination_t
-                                     *vertex_comb);
 
 DECLDIR int igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
                                     const igraph_vector_t *weights, igraph_fas_algorithm_t algo);
-
-DECLDIR int igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
-                             igraph_vector_t *res, const igraph_vs_t vs);
 
 /* -------------------------------------------------- */
 /* Spectral Properties                                */
@@ -130,15 +132,6 @@ DECLDIR int igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                              igraph_sparsemat_t *sparseres,
                              igraph_bool_t normalized,
                              const igraph_vector_t *weights);
-
-/* -------------------------------------------------- */
-/* Internal functions, may change any time            */
-/* -------------------------------------------------- */
-
-int igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
-        const igraph_vector_t *weights, igraph_vector_t *layering);
-int igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
-                                    const igraph_vector_t *weights, igraph_vector_t *layering);
 
 __END_DECLS
 

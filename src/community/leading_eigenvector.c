@@ -24,13 +24,13 @@
 #include "igraph_community.h"
 
 #include "igraph_adjlist.h"
-#include "igraph_centrality.h"
 #include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_iterators.h"
 #include "igraph_memory.h"
 #include "igraph_statusbar.h"
+#include "igraph_structural.h"
 
 #include "core/interruption.h"
 

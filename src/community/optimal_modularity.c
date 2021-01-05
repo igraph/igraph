@@ -22,14 +22,16 @@
 
 */
 
-#include "igraph_interface.h"
 #include "igraph_community.h"
+
 #include "igraph_error.h"
-#include "igraph_centrality.h"
-#include "config.h"
+#include "igraph_interface.h"
+#include "igraph_structural.h"
 
 #include "core/interruption.h"
 #include "internal/glpk_support.h"
+
+#include "config.h"
 
 #ifdef HAVE_GLPK
     #include <glpk.h>
