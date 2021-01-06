@@ -601,3 +601,11 @@ add_legacy_tests(
   igraph_is_graphical
   igraph_is_bigraphical
 )
+
+# regression and fuzzing tests
+
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  igraph_read_graph_gml_invalid_inputs
+)
+

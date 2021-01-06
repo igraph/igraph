@@ -26,33 +26,37 @@
 
 extern "C" 
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
-	if(size<5) return 0;
+    if(size<5) return 0;
 
-	igraph_set_error_handler(igraph_error_handler_ignore);
+    igraph_set_error_handler(igraph_error_handler_ignore);
 
-	// Create input file	
-	char filename[256];
-	sprintf(filename, "/tmp/libfuzzer.gml");
-	FILE *fp = fopen(filename, "wb");
-	if (!fp) return 0;
-	fwrite(data, size, 1, fp);
-	fclose(fp);
-	
-	// Read input file
-	FILE *ifile;
-	ifile = fopen("/tmp/libfuzzer.gml", "r");
-	if(ifile == 0){
-		remove(filename);
-		return 0;
-	}
-	
-	// Do the fuzzing	
-	igraph_t g;
-	igraph_read_graph_gml(&g, ifile);
-	fclose(ifile);
-	
-	// Clean up
-	igraph_destroy(&g);
-	remove(filename);
-	return 0;
+    // Create input file    
+    char filename[256];
+    sprintf(filename, "/tmp/libfuzzer.gml");
+    FILE *fp = fopen(filename, "wb");
+    if (!fp) return 0;
+    fwrite(data, size, 1, fp);
+    fclose(fp);
+    
+    // Read input file
+    FILE *ifile;
+    ifile = fopen("/tmp/libfuzzer.gml", "r");
+    if(ifile == 0){
+        remove(filename);
+        return 0;
+    }
+    
+    // Do the fuzzing   
+    igraph_t g;
+    if (igraph_read_graph_gml(&g, ifile) == IGRAPH_SUCCESS) {
+        // Clean up
+        igraph_destroy(&g);
+    }
+
+    // no need to call igraph_destroy() if igraph_raed_graph_gml() returns an
+    // error code as we don't have a valid graph object in that case
+
+    fclose(ifile);
+    remove(filename);
+    return 0;
 }
