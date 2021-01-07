@@ -68,7 +68,7 @@ static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
     }
 }
 
-static igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) {
+static int igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos, igraph_real_t *result) {
 
     igraph_real_t value = 0.0;
     int type = igraph_gml_tree_type(node, pos);
@@ -85,7 +85,8 @@ static igraph_real_t igraph_i_gml_toreal(igraph_gml_tree_t *node, long int pos) 
         break;
     }
 
-    return value;
+    *result = value;
+	return IGRAPH_SUCCESS;
 }
 
 static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) {
@@ -437,7 +438,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 type = atrec->type;
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                     igraph_vector_t *v = (igraph_vector_t *)atrec->value;
-                    VECTOR(*v)[edgeid] = igraph_i_gml_toreal(edge, j);
+                    IGRAPH_CHECK(igraph_i_gml_toreal(edge, j, VECTOR(*v) + edgeid));
                 } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                     igraph_strvector_t *v = (igraph_strvector_t *)atrec->value;
                     const char *value = igraph_i_gml_tostring(edge, j);
@@ -479,7 +480,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
                 type = atrec->type;
                 if (type == IGRAPH_ATTRIBUTE_NUMERIC) {
                     igraph_vector_t *v = (igraph_vector_t *)atrec->value;
-                    VECTOR(*v)[id] = igraph_i_gml_toreal(node, j);
+                    IGRAPH_CHECK(igraph_i_gml_toreal(node, j, VECTOR(*v) + id));
                 } else if (type == IGRAPH_ATTRIBUTE_STRING) {
                     igraph_strvector_t *v = (igraph_strvector_t *)atrec->value;
                     const char *value = igraph_i_gml_tostring(node, j);
