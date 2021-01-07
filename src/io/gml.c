@@ -115,6 +115,27 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, long int pos) 
     return p;
 }
 
+int igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context) {
+    context->eof = 0;
+    context->scanner = 0;
+    context->tree = 0;
+    context->errmsg[0] = 0;
+
+    return IGRAPH_SUCCESS;
+}
+
+void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t* context) {
+    if (context->tree != 0) {
+        igraph_gml_tree_destroy(context->tree);
+        context->tree = 0;
+    }
+
+    if (context->scanner != 0) {
+        igraph_gml_yylex_destroy(context->scanner);
+        context->scanner = 0;
+    }
+}
+
 /**
  * \function igraph_read_graph_gml
  * \brief Read a graph in GML format.
@@ -177,11 +198,10 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     attrs[0] = &gattrs; attrs[1] = &vattrs; attrs[2] = &eattrs;
 
-    context.eof = 0;
-    context.tree = 0;
+    IGRAPH_CHECK(igraph_i_gml_parsedata_init(&context));
+    IGRAPH_FINALLY(igraph_i_gml_parsedata_destroy, &context);
 
     igraph_gml_yylex_init_extra(&context, &context.scanner);
-    IGRAPH_FINALLY(igraph_gml_yylex_destroy, context.scanner);
 
     igraph_gml_yyset_in(instream, context.scanner);
 
@@ -469,8 +489,6 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
         }
     }
 
-    igraph_gml_tree_destroy(context.tree);
-
     igraph_trie_destroy(&trie);
     igraph_trie_destroy(&gattrnames);
     igraph_trie_destroy(&vattrnames);
@@ -484,7 +502,7 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     igraph_i_gml_destroy_attrs(attrs);
     igraph_vector_destroy(&edges);
-    igraph_gml_yylex_destroy(context.scanner);
+    igraph_i_gml_parsedata_destroy(&context);
     IGRAPH_FINALLY_CLEAN(3);
 
     return 0;

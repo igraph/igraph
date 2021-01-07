@@ -30,3 +30,14 @@ typedef struct {
     char errmsg[300];
     igraph_gml_tree_t *tree;
 } igraph_i_gml_parsedata_t;
+
+/**
+ * Initializes a GML parser context.
+ */
+int igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context);
+
+/**
+ * Destroys a GML parser context, freeing all memory currently used by the
+ * context.
+ */
+void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t* context);
