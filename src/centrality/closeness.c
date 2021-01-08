@@ -125,9 +125,6 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     igraph_vector_long_t which;
     long int nodes_reached;
 
-    int cmp_result;
-    const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
-
     igraph_real_t mindist = 0;
 
     igraph_bool_t warning_shown = 0;
@@ -137,11 +134,8 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     }
 
     if (no_of_edges > 0) {
-        igraph_real_t minweight = igraph_vector_min(weights);
-        if (minweight <= 0) {
+        if (igraph_vector_min(weights) <= 0) {
             IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
-        } else if (minweight <= eps) {
-            IGRAPH_WARNING("Some weights are smaller than epsilon, calculations may suffer from numerical precision.");
         }
     }
 
@@ -191,19 +185,13 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
                 long int to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
-                if (curdist == 0) {
-                    /* this means curdist is infinity */
-                    cmp_result = -1;
-                } else {
-                    cmp_result = igraph_cmp_epsilon(altdist, curdist, eps);
-                }
 
                 if (VECTOR(which)[to] != i + 1) {
                     /* First non-infinite distance */
                     VECTOR(which)[to] = i + 1;
                     VECTOR(dist)[to] = altdist;
                     IGRAPH_CHECK(igraph_2wheap_push_with_index(&Q, to, -altdist));
-                } else if (cmp_result < 0) {
+                } else if (curdist == 0 /* this means curdist is infinity */ || altdist < curdist) {
                     /* This is a shorter path */
                     VECTOR(dist)[to] = altdist;
                     IGRAPH_CHECK(igraph_2wheap_modify(&Q, to, -altdist));
