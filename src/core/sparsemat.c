@@ -68,7 +68,6 @@
  *
  * <para>
  * \example examples/simple/igraph_sparsemat.c
- * \example examples/simple/igraph_sparsemat2.c
  * \example examples/simple/igraph_sparsemat3.c
  * \example examples/simple/igraph_sparsemat4.c
  * \example examples/simple/igraph_sparsemat5.c

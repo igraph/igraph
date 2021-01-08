@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN" 
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
                "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
 <!ENTITY igraph "igraph">
 <!ENTITY version "@IGRAPH_VERSION@">
@@ -26,7 +26,7 @@
 
       <author><firstname>Tamás</firstname><surname>Nepusz</surname>
       <affiliation>
-      <orgname>Department of Biological Physics, Eötvös University</orgname>
+      <orgname>Department of Biological Physics, Eötvös Loránd University</orgname>
       <address>1/a Pázmány Péter sétány, 1117 Budapest, Hungary</address>
       </affiliation>
       </author>
@@ -40,8 +40,8 @@
 
       <author><firstname>Szabolcs</firstname><surname>Horvát</surname>
       <affiliation>
-      <orgname>Center for Systems Biology Dresden</orgname>
-      <address>Room 115, Pfotenhauerstr. 108, 01307 Dresden, Germany</address>
+      <orgname>Center for Systems Biology Dresden, Max Planck Institute for Cell Biology and Genetics</orgname>
+      <address>Pfotenhauerstr. 108, 01307 Dresden, Germany</address>
       </affiliation>
       </author>
 
@@ -58,19 +58,19 @@
 
       <para>
       Copyright (C) 2005-2019 Gábor Csárdi and Tamás Nepusz.
-      Copyright (C) 2020 igraph development team.
+      Copyright (C) 2020-2021 igraph development team.
       Permission is granted to copy, distribute and/or modify this document
       under the terms of the GNU Free Documentation License, Version 1.2
       or any later version published by the Free Software Foundation;
       with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
-      Texts. A copy of the license is included in the section entitled 
-      <quote>GNU Free Documentation License</quote>.      
+      Texts. A copy of the license is included in the section entitled
+      <quote>GNU Free Documentation License</quote>.
       </para>
     </legalnotice>
   </bookinfo>
 
   <xi:include href="introduction.xml"/>
-  
+
   <xi:include href="installation.xml"/>
 
   <xi:include href="tutorial.xml"/>
@@ -101,9 +101,9 @@
 
   <xi:include href="spatialgames.xml"/>
 
-  <xi:include href="iterators.xml"/>  
+  <xi:include href="iterators.xml"/>
 
-  <xi:include href="attributes.xml"/>  
+  <xi:include href="attributes.xml"/>
 
   <xi:include href="structural.xml"/>
 
@@ -118,8 +118,8 @@
   <xi:include href="coloring.xml"/>
 
   <xi:include href="motifs.xml"/>
-  
-  <xi:include href="layout.xml"/>  
+
+  <xi:include href="layout.xml"/>
 
   <xi:include href="foreign.xml"/>
 
@@ -128,19 +128,19 @@
   <xi:include href="separators.xml"/>
 
   <xi:include href="community.xml"/>
-  
+
   <xi:include href="graphlets.xml"/>
 
   <xi:include href="hrg.xml"/>
 
   <xi:include href="scg.xml"/>
-  
+
   <xi:include href="embedding.xml"/>
 
   <xi:include href="operators.xml"/>
-  
+
   <xi:include href="arpack.xml"/>
-  
+
   <xi:include href="bipartite.xml"/>
 
   <chapter id="igraph-Advanced">
@@ -150,7 +150,7 @@
     <xi:include href="status.xml" />
   </chapter>
 
-  <xi:include href="nongraph.xml"/>  
+  <xi:include href="nongraph.xml"/>
 
   <xi:include href="licenses.xml"/>
 

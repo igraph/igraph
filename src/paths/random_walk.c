@@ -190,7 +190,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
         if (igraph_vector_size(weights) != ec) {
             IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
         }
-        if (igraph_vector_min(weights) < 0) {
+        if (ec > 0 && igraph_vector_min(weights) < 0) {
             IGRAPH_ERROR("Weights must be non-negative", IGRAPH_EINVAL);
         }
     }

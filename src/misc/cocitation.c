@@ -97,6 +97,8 @@ int igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  * degree of the vertices in the graph.
  *
  * \sa \ref igraph_cocitation()
+ *
+ * \example examples/simple/igraph_cocitation.c
  */
 
 int igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,

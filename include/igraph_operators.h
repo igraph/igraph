@@ -24,8 +24,9 @@
 #ifndef IGRAPH_OPERATORS_H
 #define IGRAPH_OPERATORS_H
 
-#include "igraph_decls.h"
+#include "igraph_attributes.h"
 #include "igraph_constants.h"
+#include "igraph_decls.h"
 #include "igraph_types.h"
 #include "igraph_datatype.h"
 #include "igraph_vector_ptr.h"
@@ -57,6 +58,28 @@ DECLDIR int igraph_complementer(igraph_t *res, const igraph_t *graph,
                                 igraph_bool_t loops);
 DECLDIR int igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
                            igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
+DECLDIR int igraph_contract_vertices(igraph_t *graph,
+                                     const igraph_vector_t *mapping,
+                                     const igraph_attribute_combination_t
+                                     *vertex_comb);
+DECLDIR int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
+                                    const igraph_vector_t *permutation);
+DECLDIR int igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
+                                        igraph_neimode_t mode);
+DECLDIR int igraph_rewire(igraph_t *graph,
+                          igraph_integer_t n, igraph_rewiring_t mode);
+DECLDIR int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
+                            igraph_bool_t loops,
+                            const igraph_attribute_combination_t *edge_comb);
+DECLDIR int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+                                        const igraph_vs_t vids,
+                                        igraph_subgraph_implementation_t impl,
+                                        igraph_vector_t *map,
+                                        igraph_vector_t *invmap);
+DECLDIR int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
+                                    const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
+DECLDIR int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
+                                  const igraph_es_t eids, igraph_bool_t delete_vertices);
 
 __END_DECLS
 

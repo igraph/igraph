@@ -22,14 +22,15 @@
 
 */
 
-#include "igraph_structural.h"
+#include "igraph_adjlist.h"
+#include "igraph_components.h"
 #include "igraph_dqueue.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_adjlist.h"
-#include "igraph_random.h"
-#include "igraph_components.h"
+#include "igraph_operators.h"
 #include "igraph_progress.h"
+#include "igraph_random.h"
+#include "igraph_structural.h"
 
 #include "core/indheap.h"
 #include "core/interruption.h"

@@ -72,7 +72,7 @@ add_legacy_tests(
 
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER examples/simple NAMES
+    FOLDER tests/unit NAMES
     igraph_sparsemat2 # Uses ARPACK and BLAS functions which are not publicly available when building with internal ARPACK/BLAS
   )
   add_legacy_tests(
@@ -128,6 +128,7 @@ add_legacy_tests(
   igraph_create
   igraph_degree_sequence_game
   igraph_erdos_renyi_game
+  igraph_full
   igraph_grg_game
   igraph_growing_random_game
   igraph_lcf
@@ -141,13 +142,14 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  full
   igraph_correlated_game
-  igraph_from_prufer
-  igraph_full
+  igraph_from_prufer  
   igraph_k_regular_game
   igraph_lattice
   igraph_realize_degree_sequence
   tree
+  ring
   watts_strogatz_game
 )
 
@@ -177,11 +179,12 @@ add_legacy_tests(
   igraph_reciprocity
   igraph_similarity
   igraph_simplify
-  igraph_transitivity
+  igraph_topological_sorting
+  igraph_transitivity  
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER examples/simple NAMES
+    FOLDER tests/unit NAMES
     igraph_rewire # Uses internal igraph_i_rewire
   )
 endif()
@@ -199,11 +202,11 @@ add_legacy_tests(
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_is_tree
-  igraph_local_transitivity
-  igraph_topological_sorting
+  igraph_local_transitivity  
   igraph_transitive_closure_dag
   harmonic_centrality
   single_target_shortest_path
+  topological_sorting
 )
 
 # components.at
@@ -373,7 +376,7 @@ add_legacy_tests(
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
-    FOLDER examples/simple NAMES
+    FOLDER tests/unit NAMES
     igraph_all_st_cuts # Uses igraph_marked_queue, which is internal.
   )
 endif()
@@ -389,6 +392,7 @@ add_legacy_tests(
   igraph_community_edge_betweenness
   igraph_community_fastgreedy
   igraph_community_fluid_communities
+  igraph_community_label_propagation
   igraph_community_leading_eigenvector
   igraph_community_leiden
   igraph_community_multilevel
@@ -401,8 +405,8 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   bug-1149658
   community_leiden
-  igraph_community_infomap
-  igraph_community_label_propagation
+  community_label_propagation
+  igraph_community_infomap  
   igraph_community_leading_eigenvector2  
   igraph_modularity
   levc-stress
@@ -598,3 +602,11 @@ add_legacy_tests(
   igraph_is_graphical
   igraph_is_bigraphical
 )
+
+# regression and fuzzing tests
+
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  igraph_read_graph_gml_invalid_inputs
+)
+

@@ -76,8 +76,17 @@ add_library(
   graph/type_indexededgelist.c
   graph/visitors.c
 
+  constructors/adjacency.c
   constructors/atlas.c
-  constructors/constructors_other.c
+  constructors/basic.c
+  constructors/de_bruijn.c
+  constructors/famous.c
+  constructors/full.c
+  constructors/kautz.c
+  constructors/lcf.c
+  constructors/linegraph.c
+  constructors/prufer.c
+  constructors/regular.c
 
   games/degree_sequence_vl/gengraph_box_list.cpp
   games/degree_sequence_vl/gengraph_degree_sequence.cpp
@@ -102,14 +111,20 @@ add_library(
   cliques/maximal_cliques.c
   cliques/glet.c
 
-  community/community_other.c
+  community/edge_betweenness.c
   community/fast_modularity.c
-  community/leiden.c
-  community/optimal_modularity.c
+  community/fluid.c
   community/infomap/infomap_FlowGraph.cc
   community/infomap/infomap_Greedy.cc
   community/infomap/infomap_Node.cc
   community/infomap/infomap.cc
+  community/label_propagation.c
+  community/leading_eigenvector.c
+  community/leiden.c
+  community/louvain.c
+  community/misc.c
+  community/modularity.c
+  community/optimal_modularity.c
   community/spinglass/clustertool.cpp
   community/spinglass/NetDataTypes.cpp
   community/spinglass/NetRoutines.cpp
@@ -129,11 +144,22 @@ add_library(
   hrg/hrg_types.cc
   hrg/hrg.cc
 
+  io/dimacs.c
+  io/dl.c
+  io/dot.c
+  io/edgelist.c
   io/graphml.c
   io/gml-tree.c
-  io/io_other.c
+  io/gml.c
+  io/graphdb.c
+  io/leda.c
+  io/lgl.c
+  io/ncol.c
+  io/pajek.c
   ${PARSER_SOURCES}
 
+  layout/bipartite.c
+  layout/circular.c
   layout/davidson_harel.c
   layout/drl/DensityGrid.cpp
   layout/drl/DensityGrid_3d.cpp
@@ -143,19 +169,45 @@ add_library(
   layout/drl/drl_layout_3d.cpp
   layout/fruchterman_reingold.c
   layout/gem.c
+  layout/graphopt.c
+  layout/grid.c
   layout/kamada_kawai.c
   layout/layout_other.c
+  layout/lgl.c
+  layout/mds.c
+  layout/merge_dla.c
+  layout/random.c
+  layout/reingold_tilford.c
   layout/sugiyama.c
 
   # TODO: each operator should be in a separate file, they are complex enough as they are
-  operators/operators.c
+  operators/complementer.c
+  operators/compose.c
+  operators/connect_neighborhood.c
+  operators/contract.c
+  operators/difference.c
+  operators/disjoint_union.c
+  operators/intersection.c
+  operators/misc_internal.c
+  operators/permute.c
+  operators/rewire.c
+  operators/simplify.c
+  operators/subgraph.c
+  operators/union.c
 
+  paths/all_shortest_paths.c
+  paths/bellman_ford.c
+  paths/dijkstra.c
   paths/distances.c
   paths/eulerian.c
+  paths/histogram.c
+  paths/johnson.c
   paths/random_walk.c
   paths/shortest_paths.c
   paths/simple_paths.c
+  paths/unweighted.c
 
+  properties/degrees.c
   properties/properties_other.c
   properties/spectral.c
   properties/triangles.c
@@ -168,8 +220,11 @@ add_library(
   scg/scg.c
 
   isomorphism/bliss.cc
+  isomorphism/isoclasses.c
   isomorphism/lad.c
-  isomorphism/isomorphism_other.c
+  isomorphism/misc.c
+  isomorphism/queries.c
+  isomorphism/vf2.c
 
   misc/bipartite.c
   misc/chordality.c

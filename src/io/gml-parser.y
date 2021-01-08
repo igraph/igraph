@@ -51,11 +51,12 @@
 #include "igraph_error.h"
 #include "igraph_memory.h"
 #include "config.h"
-#include "internal/hacks.h"
+
 #include "core/math.h"
 #include "io/gml-header.h"
 #include "io/gml-tree.h"
 #include "io/parsers/gml-parser.h"
+#include "internal/hacks.h" /* strcasecmp */
 
 #define yyscan_t void*
 

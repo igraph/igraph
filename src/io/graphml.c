@@ -35,7 +35,7 @@
 #include <stdarg.h>         /* va_start & co */
 
 #include "core/trie.h"
-#include "internal/hacks.h"
+#include "internal/hacks.h" /* strcasecmp */
 
 #define GRAPHML_NAMESPACE_URI "http://graphml.graphdrawing.org/xmlns"
 

@@ -24,6 +24,7 @@
 #include "igraph_adjlist.h"
 #include "igraph_interface.h"
 #include "igraph_progress.h"
+#include "igraph_structural.h"
 #include "igraph_topology.h"
 #include "igraph_stack.h"
 #include "igraph_dqueue.h"

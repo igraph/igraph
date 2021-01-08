@@ -22,4 +22,13 @@
 <!-- doxrox-include igraph_compose -->
 </section>
 
+<section id="miscellaneous-operators"><title>Miscellaneous operators</title>
+<!-- doxrox-include igraph_connect_neighborhood -->
+<!-- doxrox-include igraph_contract_vertices -->
+<!-- doxrox-include igraph_induced_subgraph -->
+<!-- doxrox-include igraph_linegraph -->
+<!-- doxrox-include igraph_simplify -->
+<!-- doxrox-include igraph_subgraph_edges -->
+</section>
+
 </chapter>

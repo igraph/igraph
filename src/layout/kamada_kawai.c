@@ -1,9 +1,8 @@
 /* -*- mode: C -*-  */
 /* vim:set ts=4 sw=4 sts=4 et: */
 /*
-   IGraph R package.
-   Copyright (C) 2014  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard street, Cambridge, MA 02139 USA
+   IGraph library.
+   Copyright (C) 2003-2020  The igraph development team
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -162,7 +161,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_MATRIX_INIT_FINALLY(&kij, no_nodes, no_nodes);
     IGRAPH_MATRIX_INIT_FINALLY(&lij, no_nodes, no_nodes);
 
-    if (weights && igraph_vector_min(weights) < 0) {
+    if (weights && no_edges > 0 && igraph_vector_min(weights) < 0) {
         IGRAPH_CHECK(igraph_shortest_paths_bellman_ford(graph, &dij, igraph_vss_all(),
                      igraph_vss_all(), weights,
                      IGRAPH_ALL));

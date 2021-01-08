@@ -123,20 +123,8 @@ DECLDIR int igraph_authority_score(const igraph_t *graph, igraph_vector_t *vecto
 DECLDIR int igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                               igraph_vs_t vids, const igraph_vector_t *weights);
 
-DECLDIR int igraph_strength(const igraph_t *graph, igraph_vector_t *res,
-                            const igraph_vs_t vids, igraph_neimode_t mode,
-                            igraph_bool_t loops, const igraph_vector_t *weights);
-
 DECLDIR int igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
                                       igraph_vector_t *ins, igraph_vector_t *outs);
-
-DECLDIR int igraph_sort_vertex_ids_by_degree(const igraph_t *graph,
-        igraph_vector_t *outvids,
-        igraph_vs_t vids,
-        igraph_neimode_t mode,
-        igraph_bool_t loops,
-        igraph_order_t order,
-        igraph_bool_t only_indices);
 
 DECLDIR igraph_real_t igraph_centralization(const igraph_vector_t *scores,
         igraph_real_t theoretical_max,

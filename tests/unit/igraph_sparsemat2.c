@@ -28,6 +28,8 @@
 #include "linalg/blas_internal.h"
 #include "linalg/arpack_internal.h"
 
+#include "test_utilities.inc"
+
 int igraph_matrix_dgemv(const igraph_matrix_t *m,
                         const igraph_vector_t *v,
                         igraph_vector_t *res,
@@ -263,6 +265,8 @@ int main() {
     igraph_matrix_destroy(&M);
     igraph_matrix_destroy(&N);
     igraph_matrix_destroy(&O);
+
+    VERIFY_FINALLY_STACK();
 
     return 0;
 }

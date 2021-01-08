@@ -22,20 +22,21 @@
 */
 
 #include "igraph_flow.h"
-#include "igraph_error.h"
-#include "igraph_memory.h"
-#include "igraph_constants.h"
-#include "igraph_interface.h"
-#include "igraph_adjlist.h"
-#include "igraph_constructors.h"
-#include "igraph_structural.h"
-#include "igraph_components.h"
-#include "core/math.h"
-#include "igraph_dqueue.h"
-#include "igraph_visitor.h"
-#include "igraph_stack.h"
-#include "config.h"
 
+#include "igraph_adjlist.h"
+#include "igraph_constants.h"
+#include "igraph_constructors.h"
+#include "igraph_components.h"
+#include "igraph_dqueue.h"
+#include "igraph_error.h"
+#include "igraph_interface.h"
+#include "igraph_memory.h"
+#include "igraph_operators.h"
+#include "igraph_stack.h"
+#include "igraph_structural.h"
+#include "igraph_visitor.h"
+
+#include "core/math.h"
 #include "core/estack.h"
 #include "core/marked_queue.h"
 
@@ -1021,8 +1022,6 @@ int igraph_provan_shier_list(const igraph_t *graph,
  *
  * Time complexity: O(n(|V|+|E|)), where |V| is the number of
  * vertices, |E| is the number of edges, and n is the number of cuts.
- *
- * \example examples/simple/igraph_all_st_cuts.c
  */
 
 int igraph_all_st_cuts(const igraph_t *graph,
