@@ -298,9 +298,9 @@ static int igraph_i_betweenness_cutoff_weighted(
  * Note that the time complexity is independent of the number of
  * vertices for which the score is calculated.
  *
- * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
- *     See \ref igraph_edge_betweenness() for calculating the betweenness score
- *     of the edges in a graph.
+ * \sa \ref igraph_betweenness() to calculate the exact betweenness and
+ * \ref igraph_edge_betweenness_cutoff() to calculate the range-limited
+ * edge betweenness.
  */
 int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vs_t vids, igraph_bool_t directed,
@@ -796,9 +796,8 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * |E| are the number of vertices and
  * edges in the graph.
  *
- * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
- *     See \ref igraph_betweenness() for calculating the betweenness score
- *     of the vertices in a graph.
+ * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
+ * \ref igraph_betweenness_cutoff() to compute the range-limited vertex betweenness.
  */
 int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
                                    igraph_bool_t directed,

@@ -372,7 +372,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * |E| is the number
  * of edges in the graph.
  *
- * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
+ * \sa \ref igraph_closeness() to calculate the exact closeness centrality.
  */
 
 int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
@@ -699,7 +699,7 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
 /**
  * \ingroup structural
  * \function igraph_harmonic_centrality_cutoff
- * \brief Range limited harmonic centrality
+ * \brief Range limited harmonic centrality.
  *
  * </para><para>
  * This function computes the range limited version of harmonic centrality:
@@ -768,7 +768,7 @@ int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *re
 /**
  * \ingroup structural
  * \function igraph_harmonic_centrality
- * \brief Harmonic centrality for some vertices
+ * \brief Harmonic centrality for some vertices.
  *
  * </para><para>
  * The harmonic centrality of a vertex is the mean inverse distance to
