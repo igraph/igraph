@@ -22,24 +22,26 @@
 */
 
 #include "igraph_flow.h"
-#include "igraph_error.h"
-#include "igraph_memory.h"
-#include "igraph_constants.h"
-#include "igraph_interface.h"
+
 #include "igraph_adjlist.h"
-#include "igraph_conversion.h"
-#include "igraph_constructors.h"
-#include "igraph_progress.h"
-#include "igraph_structural.h"
 #include "igraph_components.h"
-#include "core/math.h"
+#include "igraph_conversion.h"
+#include "igraph_constants.h"
+#include "igraph_constructors.h"
 #include "igraph_dqueue.h"
+#include "igraph_error.h"
+#include "igraph_interface.h"
+#include "igraph_memory.h"
+#include "igraph_progress.h"
+#include "igraph_operators.h"
+#include "igraph_structural.h"
 #include "igraph_topology.h"
 #include "config.h"
 
 #include "core/buckets.h"
 #include "core/cutheap.h"
 #include "core/interruption.h"
+#include "core/math.h"
 
 /*
  * Some general remarks about the functions in this file.

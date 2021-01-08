@@ -22,15 +22,18 @@
 */
 
 #include "igraph_cohesive_blocks.h"
+
+#include "igraph_constructors.h"
+#include "igraph_dqueue.h"
+#include "igraph_flow.h"
 #include "igraph_interface.h"
 #include "igraph_memory.h"
-#include "igraph_flow.h"
+#include "igraph_operators.h"
 #include "igraph_separators.h"
-#include "igraph_structural.h"
-#include "igraph_dqueue.h"
-#include "igraph_constructors.h"
-#include "core/interruption.h"
 #include "igraph_statusbar.h"
+#include "igraph_structural.h"
+
+#include "core/interruption.h"
 
 static void igraph_i_cohesive_blocks_free(igraph_vector_ptr_t *ptr) {
     long int i, n = igraph_vector_ptr_size(ptr);

@@ -189,6 +189,7 @@ add_library(
   operators/permute.c
   operators/rewire.c
   operators/simplify.c
+  operators/subgraph.c
   operators/union.c
 
   paths/all_shortest_paths.c

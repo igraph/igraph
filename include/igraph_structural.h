@@ -89,15 +89,6 @@ DECLDIR int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *
 
 DECLDIR int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid,
                                 igraph_neimode_t mode);
-DECLDIR int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
-                                        const igraph_vs_t vids,
-                                        igraph_subgraph_implementation_t impl,
-                                        igraph_vector_t *map,
-                                        igraph_vector_t *invmap);
-DECLDIR int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
-                                    const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
-DECLDIR int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
-                                  const igraph_es_t eids, igraph_bool_t delete_vertices);
 DECLDIR int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
 
 DECLDIR int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,

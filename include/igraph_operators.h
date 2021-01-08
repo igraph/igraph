@@ -71,6 +71,15 @@ DECLDIR int igraph_rewire(igraph_t *graph,
 DECLDIR int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                             igraph_bool_t loops,
                             const igraph_attribute_combination_t *edge_comb);
+DECLDIR int igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+                                        const igraph_vs_t vids,
+                                        igraph_subgraph_implementation_t impl,
+                                        igraph_vector_t *map,
+                                        igraph_vector_t *invmap);
+DECLDIR int igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
+                                    const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
+DECLDIR int igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
+                                  const igraph_es_t eids, igraph_bool_t delete_vertices);
 
 __END_DECLS
 
