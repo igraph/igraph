@@ -417,10 +417,10 @@ igraph_closeness:
         NAME-R: closeness
         IGNORE: RR
 
-igraph_closeness_estimate:
+igraph_closeness_cutoff:
         PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
-                NEIMODE mode=OUT, REAL cutoff, EDGEWEIGHTS weights=NULL, \
-                BOOLEAN normalized=False
+                NEIMODE mode=OUT, EDGEWEIGHTS weights=NULL, \
+                BOOLEAN normalized=False, REAL cutoff
         DEPS: vids ON graph, weights ON graph, res ON graph vids
         NAME-R: estimate_closeness
         IGNORE: RR
@@ -491,16 +491,15 @@ igraph_subcomponent:
 
 igraph_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, VERTEXSET vids=ALL, \
-                BOOLEAN directed=True, EDGEWEIGHTS weights=NULL, \
-                BOOLEAN nobigint=True
+                BOOLEAN directed=True, EDGEWEIGHTS weights=NULL
         IGNORE: RR, RC, RNamespace
         DEPS: weights ON graph
         FLAGS: PROGRESS
 
-igraph_betweenness_estimate:
+igraph_betweenness_cutoff:
         PARAMS: GRAPH graph, OUT VERTEXINDEX res, VERTEXSET vids=ALL, \
-                BOOLEAN directed=True, REAL cutoff, EDGEWEIGHTS weights=NULL, \
-                BOOLEAN nobigint=True
+                BOOLEAN directed=True, EDGEWEIGHTS weights=NULL, \
+                REAL cutoff
         DEPS: vids ON graph, weights ON graph, res ON graph vids
         NAME-R: estimate_betweenness
         FLAGS: PROGRESS
@@ -513,9 +512,9 @@ igraph_edge_betweenness:
         NAME-R: edge_betweenness
         IGNORE: RR
 
-igraph_edge_betweenness_estimate:
+igraph_edge_betweenness_cutoff:
         PARAMS: GRAPH graph, OUT VECTOR res, BOOLEAN directed=True, \
-                REAL cutoff, EDGEWEIGHTS weights=NULL
+                EDGEWEIGHTS weights=NULL, REAL cutoff
         DEPS: weights ON graph
         NAME-R: estimate_edge_betweenness
         IGNORE: RR
@@ -769,7 +768,7 @@ igraph_centralization_degree_tmax:
 
 igraph_centralization_betweenness:
         PARAMS: GRAPH graph, OUT VECTOR res, \
-                BOOLEAN directed=True, BOOLEAN nobigint=True, \
+                BOOLEAN directed=True, \
                 OUT REALPTR centralization, \
                 OUT REALPTR theoretical_max, \
                 BOOLEAN normalized=True
