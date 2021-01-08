@@ -1113,7 +1113,7 @@ static int igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
  * Time complexity: depends on the input graph, usually it is O(|E|),
  * the number of edges.
  *
- * \sa * \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
+ * \sa \ref igraph_personalized_pagerank() and \ref igraph_personalized_pagerank_vs()
  * for the personalized PageRank measure, \ref igraph_arpack_rssolve() and
  * \ref igraph_arpack_rnsolve() for the underlying machinery.
  *
