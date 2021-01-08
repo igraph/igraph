@@ -325,7 +325,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * </para><para>
  * This function computes a range-limited version of closeness centrality
  * by considering only those shortest paths whose length is no greater
- * then the given cutoff values.
+ * then the given cutoff value.
  *
  * </para><para>
  * If the graph is not connected, and there is no such path between two

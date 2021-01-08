@@ -69,12 +69,12 @@ int main() {
 
     igraph_vector_init(&bet, 0);
 
-    igraph_betweenness_estimate(/* graph=     */ &g,
+    igraph_betweenness_cutoff(/* graph=     */ &g,
             /* res=       */ &bet,
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
-            /* cutoff=    */ 2,
-            /* weights=   */ 0);
+            /* weights=   */ 0,
+            /* cutoff=    */ 2);
 
     igraph_vector_destroy(&bet);
     igraph_destroy(&g);
@@ -85,12 +85,12 @@ int main() {
 
     igraph_vector_init(&bet, 0);
 
-    igraph_betweenness_estimate(/* graph=     */ &g,
+    igraph_betweenness_cutoff(/* graph=     */ &g,
             /* res=       */ &bet,
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
-            /* cutoff=    */ 3,
-            /* weights=   */ 0);
+            /* weights=   */ 0,
+            /* cutoff=    */ 3);
 
     printf("Max betweenness: %f\n", igraph_vector_max(&bet));
 
@@ -98,12 +98,12 @@ int main() {
     igraph_vector_init(&weights, igraph_ecount(&g));
     igraph_vector_fill(&weights, 1.0);
 
-    igraph_betweenness_estimate(/* graph=     */ &g,
+    igraph_betweenness_cutoff(/* graph=     */ &g,
             /* res=       */ &bet2,
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
-            /* cutoff=    */ 3,
-            /* weights=   */ &weights);
+            /* weights=   */ &weights,
+            /* cutoff=    */ 3);
 
     if (!igraph_vector_all_e(&bet, &bet2)) {
         return 1;
@@ -144,20 +144,20 @@ int main() {
 
     /* unweighted */
     igraph_vector_init(&bet, 0);
-    igraph_betweenness_estimate(/* graph=     */ &g,
+    igraph_betweenness_cutoff(/* graph=     */ &g,
             /* res=       */ &bet,
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
-            /* cutoff=    */ 0,
-            /* weights=   */ 0);
+            /* weights=   */ 0,
+            /* cutoff=    */ 0);
 
     igraph_vector_init(&bet2, 0);
-    igraph_betweenness_estimate(/* graph=     */ &g,
+    igraph_betweenness_cutoff(/* graph=     */ &g,
             /* res=       */ &bet2,
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
-            /* cutoff=    */ -1,
-            /* weights=   */ 0);
+            /* weights=   */ 0,
+            /* cutoff=    */ -1);
 
     igraph_vector_print(&bet);
     igraph_vector_print(&bet2);
@@ -170,20 +170,20 @@ int main() {
     igraph_vector_fill(&weights, 2.0);
 
     igraph_vector_init(&bet, 0);
-    igraph_betweenness_estimate(/* graph=     */ &g,
+    igraph_betweenness_cutoff(/* graph=     */ &g,
             /* res=       */ &bet,
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
-            /* cutoff=    */ 0,
-            /* weights=   */ &weights);
+            /* weights=   */ &weights,
+            /* cutoff=    */ 0);
 
     igraph_vector_init(&bet2, 0);
-    igraph_betweenness_estimate(/* graph=     */ &g,
+    igraph_betweenness_cutoff(/* graph=     */ &g,
             /* res=       */ &bet2,
             /* vids=      */ igraph_vss_all(),
             /* directed = */ 0,
-            /* cutoff=    */ -1,
-            /* weights=   */ &weights);
+            /* weights=   */ &weights,
+            /* cutoff=    */ -1);
 
     igraph_vector_print(&bet);
     igraph_vector_print(&bet2);
@@ -209,17 +209,17 @@ int main() {
     {
         printf("Cutoff %.0f\n", cutoff);
         printf("Unweighted\n");
-        igraph_betweenness_estimate(&g, &bet,
-                                    igraph_vss_all(), IGRAPH_UNDIRECTED,
-                                    /* cutoff */ cutoff,
-                                    /* weights */ NULL);
+        igraph_betweenness_cutoff(&g, &bet,
+                                  igraph_vss_all(), IGRAPH_UNDIRECTED,
+                /* weights */ NULL,
+                /* cutoff */ cutoff);
         igraph_vector_print(&bet);
 
         printf("Weighted\n");
-        igraph_betweenness_estimate(&g, &bet2,
-                                    igraph_vss_all(), IGRAPH_UNDIRECTED,
-                                    /* cutoff */ cutoff,
-                                    /* weights */ &weights);
+        igraph_betweenness_cutoff(&g, &bet2,
+                                  igraph_vss_all(), IGRAPH_UNDIRECTED,
+                /* weights */ &weights,
+                /* cutoff */ cutoff);
         igraph_vector_print(&bet2);
         printf("\n");
 
@@ -252,17 +252,17 @@ int main() {
     {
         printf("Cutoff %.0f\n", cutoff);
         printf("Unweighted\n");
-        igraph_betweenness_estimate(&g, &bet,
-                                    igraph_vss_all(), IGRAPH_UNDIRECTED,
-                                    /* cutoff */ cutoff,
-                                    /* weights */ NULL);
+        igraph_betweenness_cutoff(&g, &bet,
+                                  igraph_vss_all(), IGRAPH_UNDIRECTED,
+                /* weights */ NULL,
+                /* cutoff */ cutoff);
         igraph_vector_print(&bet);
 
         printf("Weighted\n");
-        igraph_betweenness_estimate(&g, &bet2,
-                                    igraph_vss_all(), IGRAPH_UNDIRECTED,
-                                    /* cutoff */ cutoff,
-                                    /* weights */ &weights);
+        igraph_betweenness_cutoff(&g, &bet2,
+                                  igraph_vss_all(), IGRAPH_UNDIRECTED,
+                /* weights */ &weights,
+                /* cutoff */ cutoff);
         igraph_vector_print(&bet2);
         printf("\n");
     }
