@@ -101,11 +101,11 @@
 <!-- doxrox-include igraph_authority_score -->
 </section>
 
-<section id="estimating-centrality-measures"><title>Estimating Centrality Measures</title>
+<section id="range-limited-centrality-measures"><title>Range-limited Centrality Measures</title>
 <!-- doxrox-include igraph_closeness_cutoff -->
 <!-- doxrox-include igraph_harmonic_centrality_cutoff -->
 <!-- doxrox-include igraph_betweenness_cutoff -->
-<!-- doxrox-include igraph_edge_betweenness_estimate -->
+<!-- doxrox-include igraph_edge_betweenness_cutoff -->
 </section>
 
 <section id="centralization"><title>Centralization</title>

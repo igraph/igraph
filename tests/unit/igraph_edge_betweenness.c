@@ -67,8 +67,8 @@ int test_bug1050() {
     igraph_vector_init(&eb, igraph_ecount(&g));
     igraph_vector_init(&eb2, igraph_ecount(&g));
 
-    igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, /* cutoff */ -1, /* weights */ 0);
-    igraph_edge_betweenness_estimate(&g, &eb2, IGRAPH_UNDIRECTED, /* cutoff */ 0, /* weights */ 0);
+    igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, /* weights */ 0, /* cutoff */ -1);
+    igraph_edge_betweenness_cutoff(&g, &eb2, IGRAPH_UNDIRECTED, /* weights */ 0, /* cutoff */ 0);
 
     if (igraph_vector_all_e(&eb, &eb2)) {
         return 1;
@@ -86,8 +86,8 @@ int test_bug1050() {
     igraph_vector_fill(&weights, 1);
     VECTOR(weights)[0] = 2;
 
-    igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, /* cutoff */ -1, &weights);
-    igraph_edge_betweenness_estimate(&g, &eb2, IGRAPH_UNDIRECTED, /* cutoff */ 0, &weights);
+    igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED, &weights, /* cutoff */ -1);
+    igraph_edge_betweenness_cutoff(&g, &eb2, IGRAPH_UNDIRECTED, &weights, /* cutoff */ 0);
 
     if (igraph_vector_all_e(&eb, &eb2)) {
         return 1;
@@ -135,8 +135,8 @@ int main() {
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 1, 4, -1);
     igraph_vector_init(&eb, igraph_ecount(&g));
-    igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, 2,
-                                     /*weights=*/ 0);
+    igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED,
+            /*weights=*/ 0, 2);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);
@@ -145,8 +145,8 @@ int main() {
                  0, 1, 0, 3, 1, 2, 1, 4, 2, 5, 3, 4, 3, 6, 4, 5, 4, 7, 5, 8,
                  6, 7, 7, 8, -1);
     igraph_vector_init(&eb, igraph_ecount(&g));
-    igraph_edge_betweenness_estimate(&g, &eb, IGRAPH_UNDIRECTED, 2,
-                                     /*weights=*/ 0);
+    igraph_edge_betweenness_cutoff(&g, &eb, IGRAPH_UNDIRECTED,
+            /*weights=*/ 0, 2);
     print_vector(&eb);
     igraph_vector_destroy(&eb);
     igraph_destroy(&g);

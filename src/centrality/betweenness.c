@@ -278,8 +278,8 @@ static int igraph_i_betweenness_cutoff_weighted(
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        range-limited betweenness scores for the specified vertices.
- * \param vids The vertices of which the betweenness centrality scores
- *        will be estimated.
+ * \param vids The vertices for which the range-limited betweenness centrality
+ *        scores will be computed.
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
  * \param weights An optional vector containing edge weights for
@@ -554,7 +554,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
 /***** Edge betweenness *****/
 
-static int igraph_i_edge_betweenness_estimate_weighted(
+static int igraph_i_edge_betweenness_cutoff_weighted(
         const igraph_t *graph,
         igraph_vector_t *result,
         igraph_bool_t directed,
@@ -758,40 +758,38 @@ static int igraph_i_edge_betweenness_estimate_weighted(
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
- *     of the edges in a graph. See \ref igraph_edge_betweenness_estimate() to
- *     estimate the betweenness score of the edges in a graph.
+ *     of the edges in a graph. See \ref igraph_edge_betweenness_cutoff() to
+ *     compute the range-limited betweenness score of the edges in a graph.
  */
 int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed,
                             const igraph_vector_t *weights) {
-    return igraph_edge_betweenness_estimate(graph, result, directed, -1,
-                                            weights);
+    return igraph_edge_betweenness_cutoff(graph, result, directed,
+                                          weights, -1);
 }
 
 /**
  * \ingroup structural
- * \function igraph_edge_betweenness_estimate
- * \brief Estimated betweenness centrality of the edges.
+ * \function igraph_edge_betweenness_cutoff
+ * \brief Range-limited betweenness centrality of the edges.
  *
  * </para><para>
- * The betweenness centrality of an edge is the number of geodesics
- * going through it. If there are more than one geodesics between two
- * vertices, the value of these geodesics are weighted by one over the
- * number of geodesics. When estimating betweenness centrality, igraph
- * takes into consideration only those paths that are shorter than or
- * equal to a prescribed length. Note that the estimated centrality
- * will always be less than the real one.
+ * </para><para>
+ * This function computes a range-limited version of edge betweenness centrality
+ * by considering only those shortest paths whose length is no greater
+ * then the given cutoff value.
+ *
  * \param graph The graph object.
  * \param result The result of the computation, vector containing the
  *        betweenness scores for the edges.
  * \param directed Logical, if true directed paths will be considered
  *        for directed graphs. It is ignored for undirected graphs.
- * \param cutoff The maximal length of paths that will be considered.
- *        If negative, the exact betweenness will be calculated (no
- *        upper limit on path lengths).
  * \param weights An optional weight vector for weighted
  *        betweenness. Supply a null pointer here for unweighted
  *        betweenness.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        If negative, the exact betweenness will be calculated (no
+ *        upper limit on path lengths).
  * \return Error code:
  *        \c IGRAPH_ENOMEM, not enough memory for
  *        temporary data.
@@ -805,9 +803,9 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  *     See \ref igraph_betweenness() for calculating the betweenness score
  *     of the vertices in a graph.
  */
-int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-                                     igraph_bool_t directed, igraph_real_t cutoff,
-                                     const igraph_vector_t *weights) {
+int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
+                                   igraph_bool_t directed,
+                                   const igraph_vector_t *weights, igraph_real_t cutoff) {
     long int no_of_nodes = igraph_vcount(graph);
     long int no_of_edges = igraph_ecount(graph);
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
@@ -825,8 +823,8 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     long int i;
 
     if (weights) {
-        return igraph_i_edge_betweenness_estimate_weighted(graph, result,
-                directed, cutoff, weights);
+        return igraph_i_edge_betweenness_cutoff_weighted(graph, result,
+                                                         directed, cutoff, weights);
     }
 
     directed = directed && igraph_is_directed(graph);
@@ -971,4 +969,51 @@ int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res
     }
 
     return 0;
+}
+
+/**
+ * \ingroup structural
+ * \function igraph_edge_betweenness_estimate
+ * \brief Estimated betweenness centrality of the edges.
+ *
+ * \deprecated-by igraph_edge_betweenness_cutoff 0.9
+ *
+ * </para><para>
+ * The betweenness centrality of an edge is the number of geodesics
+ * going through it. If there are more than one geodesics between two
+ * vertices, the value of these geodesics are weighted by one over the
+ * number of geodesics. When estimating betweenness centrality, igraph
+ * takes into consideration only those paths that are shorter than or
+ * equal to a prescribed length. Note that the estimated centrality
+ * will always be less than the real one.
+ *
+ * \param graph The graph object.
+ * \param result The result of the computation, vector containing the
+ *        betweenness scores for the edges.
+ * \param directed Logical, if true directed paths will be considered
+ *        for directed graphs. It is ignored for undirected graphs.
+ * \param cutoff The maximal length of paths that will be considered.
+ *        If negative, the exact betweenness will be calculated (no
+ *        upper limit on path lengths).
+ * \param weights An optional weight vector for weighted
+ *        betweenness. Supply a null pointer here for unweighted
+ *        betweenness.
+ * \return Error code:
+ *        \c IGRAPH_ENOMEM, not enough memory for
+ *        temporary data.
+ *
+ * Time complexity: O(|V||E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the graph.
+ *
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_closeness().
+ *     See \ref igraph_betweenness() for calculating the betweenness score
+ *     of the vertices in a graph.
+ */
+int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
+                                   igraph_bool_t directed, igraph_real_t cutoff,
+                                   const igraph_vector_t *weights) {
+    IGRAPH_WARNING("igraph_edge_betweenness_estimate is deprecated, use igraph_edge_betweenness_cutoff.");
+    return igraph_edge_betweenness_cutoff(graph, result, directed, weights, cutoff);
 }

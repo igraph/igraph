@@ -65,9 +65,9 @@ DECLDIR int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *re
 DECLDIR int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                                     igraph_bool_t directed,
                                     const igraph_vector_t *weigths);
-DECLDIR int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-        igraph_bool_t directed, igraph_real_t cutoff,
-        const igraph_vector_t *weights);
+DECLDIR int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
+                                           igraph_bool_t directed,
+                                           const igraph_vector_t *weights, igraph_real_t cutoff);
 
 /**
  * \typedef igraph_pagerank_algo_t
