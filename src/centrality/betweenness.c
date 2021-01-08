@@ -30,9 +30,6 @@
 #include "core/interruption.h"
 #include "core/math.h"
 
-#include <math.h>
-#include <string.h>    /* memset */
-
 /***** Vertex betweenness *****/
 
 /**
