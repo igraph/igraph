@@ -373,6 +373,12 @@ add_legacy_tests(
   igraph_all_st_mincuts
   igraph_mincut
 )
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_st_mincut_value
+)
+
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER tests/unit NAMES
