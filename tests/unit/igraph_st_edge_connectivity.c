@@ -32,4 +32,6 @@ int main() {
     igraph_destroy(&g);
 
     assert(value == 2);
+    
+    return 0;
 }
