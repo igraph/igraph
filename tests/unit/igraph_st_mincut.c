@@ -26,6 +26,8 @@ int main() {
     igraph_real_t value;
     int source = 0;
     int target = 4;
+    int cut_edge;
+    int partition_vertex;
 
     igraph_vector_init(&partition, 0);
     igraph_vector_init(&partition2, 0);
@@ -33,16 +35,19 @@ int main() {
 
     igraph_small(&g, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 3, 2, 4, 3, 4, -1);
 
-    igraph_st_mincut(&g, &value, &cut, &partition, &partition2, source, target, /*capacity*/ 0);
+    igraph_st_mincut(&g, &value, &cut, &partition, &partition2, source, target, /*capacity*/ NULL);
 
     /*     tests     */
 
     assert(igraph_vector_size(&cut) == 1);
-    assert(igraph_vector_size(&cut) == 1);
+    assert(igraph_vector_size(&partition) == 1);
     assert(igraph_vector_size(&partition2) == 4);
 
-    int cut_edge = VECTOR(cut)[0];
-    int partition_vertex = VECTOR(partition)[0];
+    cut_edge = VECTOR(cut)[0];
+
+    /* For this graph there is only one vertex in the source partion,
+       and it's the source vertex. */
+    partition_vertex = VECTOR(partition)[0];
 
     assert(cut_edge == 0);
     assert(partition_vertex == 0);
@@ -54,4 +59,5 @@ int main() {
     igraph_vector_destroy(&partition2);
     igraph_destroy(&g);
 
+    return 0;
 }
