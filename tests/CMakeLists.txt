@@ -377,6 +377,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_st_mincut_value
+  igraph_edge_disjoint_paths
 )
 
 if (BUILD_INTERNAL_TESTS)
