@@ -53,6 +53,8 @@ int main() {
     igraph_vector_destroy(&expected_residual_capacity);
 
     igraph_destroy(&g);
-
+    igraph_destroy(&residual);
+    igraph_destroy(&expected_residual);
+    
     return 0;
 }
