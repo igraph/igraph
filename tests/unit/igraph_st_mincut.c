@@ -65,5 +65,6 @@ int main() {
     igraph_vector_destroy(&capacity);
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     return 0;
 }
