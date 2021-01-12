@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <igraph.h>
+#include "test_utilities.inc"
 #include <assert.h>
 
 int main() {
