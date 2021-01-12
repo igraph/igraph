@@ -33,5 +33,6 @@ int main() {
 
     assert(value == 2);
     
+    VERIFY_FINALLY_STACK();
     return 0;
 }
