@@ -16,6 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#include <igraph.h>
 #include "test_utilities.inc"
 
 void sort_and_print(igraph_vector_t *vec) {
