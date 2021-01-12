@@ -16,7 +16,7 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <igraph.h>
+#include "test_utilities.inc"
 #include <assert.h>
 int main() {
 
@@ -42,5 +42,6 @@ int main() {
 
     igraph_destroy(&g);
 
+    VERIFY_FINALLY_STACK();
     return 0;
 }
