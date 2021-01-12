@@ -16,13 +16,17 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include <igraph.h>
-#include <assert.h>
+#include "test_utilities.inc"
+
+void sort_and_print(igraph_vector_t *vec) {
+    igraph_vector_sort(vec);
+    print_vector_round(vec);
+}
 
 int main() {
 
     igraph_t g;
-    igraph_vector_t cut, partition, partition2;
+    igraph_vector_t cut, partition, partition2, capacity;
     igraph_real_t value;
     int source = 0;
     int target = 4;
@@ -34,29 +38,31 @@ int main() {
     igraph_vector_init(&cut, 0);
 
     igraph_small(&g, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 1, 3, 2, 4, 3, 4, -1);
+    igraph_vector_init_int_end(&capacity, -1, 8, 2, 3, 3, 2, -1);
+
+    /*    test without capacity    */
 
     igraph_st_mincut(&g, &value, &cut, &partition, &partition2, source, target, /*capacity*/ NULL);
 
-    /*     tests     */
+    /* cut and partition should have only one element */
+    print_vector_round(&cut);
+    print_vector_round(&partition);
+    sort_and_print(&partition2);
 
-    assert(igraph_vector_size(&cut) == 1);
-    assert(igraph_vector_size(&partition) == 1);
-    assert(igraph_vector_size(&partition2) == 4);
+    /*    test with capacity    */
 
-    cut_edge = VECTOR(cut)[0];
+    igraph_st_mincut(&g, &value, &cut, &partition, &partition2, source, target, &capacity);
 
-    /* For this graph there is only one vertex in the source partion,
-       and it's the source vertex. */
-    partition_vertex = VECTOR(partition)[0];
-
-    assert(cut_edge == 0);
-    assert(partition_vertex == 0);
+    sort_and_print(&cut);
+    sort_and_print(&partition);
+    sort_and_print(&partition2);
 
     /*     cleanup     */
 
     igraph_vector_destroy(&cut);
     igraph_vector_destroy(&partition);
     igraph_vector_destroy(&partition2);
+    igraph_vector_destroy(&capacity);
     igraph_destroy(&g);
 
     return 0;
