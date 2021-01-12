@@ -378,6 +378,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_st_mincut_value
   igraph_st_edge_connectivity
+  igraph_st_mincut
 )
 
 if (BUILD_INTERNAL_TESTS)
