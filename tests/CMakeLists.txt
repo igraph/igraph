@@ -381,6 +381,9 @@ add_legacy_tests(
   igraph_adhesion
   igraph_cohesion
   igraph_residual_graph
+  igraph_edge_disjoint_paths
+  igraph_st_edge_connectivity
+  igraph_st_mincut
 )
 
 if (BUILD_INTERNAL_TESTS)
