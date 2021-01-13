@@ -309,13 +309,13 @@ add_legacy_tests(
   igraph_read_graph_dl
   igraph_read_graph_graphdb
   igraph_read_graph_lgl
-  igraph_write_graph_lgl
   igraph_write_graph_pajek
 )
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_write_graph_leda
+  igraph_write_graph_lgl
   lineendings
   pajek
   pajek2
