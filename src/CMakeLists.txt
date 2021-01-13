@@ -206,6 +206,7 @@ add_library(
 
   properties/degrees.c
   properties/dag.c
+  properties/multiplicity.c
   properties/properties_other.c
   properties/spectral.c
   properties/triangles.c
