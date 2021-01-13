@@ -356,7 +356,6 @@ class RRCodeGenerator(CodeGenerator):
 
         ## Roxygen to export the function
         internal = self.func[function].get("INTERNAL")
-        print(internal)
         if internal is None or internal == 'False':
             out.write("#' @export\n")
 
@@ -392,12 +391,12 @@ class RRCodeGenerator(CodeGenerator):
                 else:
                     default="=" + params[pname]['default']
             header = header + default
-
             if pname in self.deps.keys():
                 deps = self.deps[pname]
                 for i in range(len(deps)):
                     header=header.replace("%I"+str(i+1)+"%", deps[i])
-
+            if re.search("%I[0-9]*%", header):
+                print("Error: Missing HEADER dependency for " + tname + " " + pname + " in function " + name)
             return header
 
         head=[ do_par(n) for n,p in params.items()
@@ -417,7 +416,8 @@ class RRCodeGenerator(CodeGenerator):
         ## characters.
         out.write("  # Argument checks\n")
         def do_par(pname):
-            t=self.types[params[pname]['type']]
+            tname = params[pname]['type']
+            t=self.types[tname]
             m=params[pname]['mode']
             if m in ['IN', 'INOUT'] and 'INCONV' in t:
                 if m in t['INCONV']:
@@ -432,6 +432,8 @@ class RRCodeGenerator(CodeGenerator):
                 deps = self.deps[pname]
                 for i in range(len(deps)):
                     res=res.replace("%I"+str(i+1)+"%", deps[i])
+            if re.search("%I[0-9]*%", res):
+                print("Error: Missing IN dependency for " + tname + " " + pname + " in function " + name)
             return res
 
         inconv=[ do_par(n) for n in params.keys() ]
@@ -470,7 +472,8 @@ class RRCodeGenerator(CodeGenerator):
         ## Output conversions
         def do_opar(pname, realname=None, iprefix=""):
             if realname is None: realname=pname
-            t=self.types[params[pname]['type']]
+            tname=params[pname]['type']
+            t=self.types[tname]
             mode=params[pname]['mode']
             if 'OUTCONV' in t and mode in t['OUTCONV']:
                 outconv="  " + t['OUTCONV'][mode]
@@ -482,6 +485,8 @@ class RRCodeGenerator(CodeGenerator):
                 deps = self.deps[pname]
                 for i in range(len(deps)):
                     outconv=outconv.replace("%I"+str(i+1)+"%", deps[i])
+            if re.search("%I[0-9]*%", outconv):
+                print("Error: Missing OUT dependency for " + tname + " " + pname + " in function " + name)
             return re.sub("%I[0-9]+%", "", outconv)
 
         retpars=[ n for n,p in params.items() if p['mode'] in
