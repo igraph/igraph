@@ -1691,3 +1691,62 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
 
     return 0;
 }
+
+
+/**
+ * \function igraph_is_same_graph
+ * \brief Check if two graphs are topologically the same
+ *
+ * \param graph1 The first graph object.
+ * \param graph2 The second graph object.
+ * \return 1 if they are the same, 0 if they are different.
+ *
+ * NOTE: this function is mostly for internal use in unit tests.
+ * Users should not rely on it for production code.</para><para>
+ *
+ * Added in version 0.9.</para><para>
+ *
+ * Time complexity: O(E), the number of edges in the graphs.
+ */
+
+int igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2) {
+    long int nv1 = igraph_vcount(graph1);
+    long int nv2 = igraph_vcount(graph2);
+    long int ne1 = igraph_ecount(graph1);
+    long int ne2 = igraph_ecount(graph2);
+    long int i, eid1, eid2;
+
+    /* Check for same number of vertices/edges */
+    if ((nv1 != nv2) || (ne1 != ne2)) {
+        return 0;
+    }
+
+    /* Check for same directedness */
+    if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
+        return 0;
+    }
+
+    /* Vertices have no names, so no they must be 0 to nv - 1 */
+
+    /* Edges are double sorted in the current representations ii/oi of
+     * igraph_t (ii: by incoming, then outgoing, oi: vice versa), so
+     * we just need to check them one by one. If that representation
+     * changes, this part will need to change too. */
+    for (i = 0; i < ne1; i++) {
+        eid1 = (long int) VECTOR(graph1->ii)[i];
+        eid2 = (long int) VECTOR(graph2->ii)[i];
+
+        /* check they have the same source */
+        if (IGRAPH_FROM(eid1) != IGRAPH_FROM(eid2)) {
+            return 0;
+        }
+
+        /* check they have the same target */
+        if (IGRAPH_TO(eid1) != IGRAPH_TO(eid2)) {
+            return 0;
+        }
+
+    }
+
+    return 1;
+}
