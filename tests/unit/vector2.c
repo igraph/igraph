@@ -115,9 +115,7 @@ int main() {
     igraph_vector_destroy(&v2);
     igraph_vector_destroy(&v3);
 
-    if (IGRAPH_FINALLY_STACK_SIZE() != 0) {
-        return 3;
-    }
+	VERIFY_FINALLY_STACK();
 
     return 0;
 }
