@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
 
 import re
-import seqdict
 import sys
+from collections import OrderedDict
 import getopt
 import os
 
@@ -111,7 +111,7 @@ class PLexer:
 class PParser:
     def parse(self, stream):
         lex=PLexer(stream)
-        val=seqdict.seqdict()
+        val=OrderedDict()
         val_stack=[val, None]
         nam_stack=[None, None]
 
@@ -131,7 +131,7 @@ class PParser:
                 if not nam_stack[-1] is None:
                     val_stack[-2][nam_stack[-1]]=val_stack[-1]
                 if tok[1][-5:]=="-list":
-                    val_stack[-1]=seqdict.seqdict()
+                    val_stack[-1]=OrderedDict()
                     nam_stack[-1]=tok[1][:-5]
                 else:
                     val_stack[-1]={}
@@ -210,14 +210,14 @@ class CodeGenerator:
 
         # Parse function and type files
         parser=PParser()
-        self.func=seqdict.seqdict()
+        self.func=OrderedDict()
         for f in func:
             ff=open(f)
             newfunc=parser.parse(ff)
             self.func.extend(newfunc)
             ff.close()
 
-        self.types=seqdict.seqdict()
+        self.types=OrderedDict()
         for t in types:
             ff=open(t)
             newtypes=parser.parse(ff)
@@ -248,7 +248,7 @@ class CodeGenerator:
 
     def parse_params(self, function):
         if "PARAMS" not in self.func[function]:
-            return seqdict.seqdict()
+            return OrderedDict()
 
         params=self.func[function]["PARAMS"]
         params=params.split(",")
@@ -262,7 +262,7 @@ class CodeGenerator:
             if '=' in params[p][2]:
                 params[p]=params[p][:2] + params[p][2].split("=", 1)
         params=[ [ p.strip() for p in pp ] for pp in params ]
-        res=seqdict.seqdict()
+        res=OrderedDict()
         for p in params:
             if len(p)==3:
                 res[ p[2] ] = { 'mode': p[0], 'type': p[1] }
@@ -272,7 +272,7 @@ class CodeGenerator:
 
     def parse_deps(self, function):
         if 'DEPS' not in self.func[function]:
-            return seqdict.seqdict()
+            return OrderedDict()
 
         deps=self.func[function]["DEPS"]
         deps=deps.split(",")
@@ -281,7 +281,7 @@ class CodeGenerator:
         deps=[ [ dd.strip() for dd in d ] for d in deps ]
         deps=[ [d[0]] + d[1].split(" ",1) for d in deps ]
         deps=[ [ dd.strip() for dd in d ] for d in deps ]
-        res=seqdict.seqdict()
+        res=OrderedDict()
         for d in deps:
             res[ d[0] ] = d[1:]
         return res
@@ -1281,7 +1281,7 @@ class ShellCodeGenerator(CodeGenerator):
         params=self.parse_params(function)
 
         # Check types, also enumerate them
-        args=seqdict.seqdict()
+        args=OrderedDict()
         for p in params.keys():
             tname=params[p]['type']
             if not tname in self.types.keys():
