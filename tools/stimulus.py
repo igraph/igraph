@@ -214,14 +214,16 @@ class CodeGenerator:
         for f in func:
             ff=open(f)
             newfunc=parser.parse(ff)
-            self.func.extend(newfunc)
+            for nf, nv in newfunc.items():
+                self.func[nf] = nv
             ff.close()
 
         self.types=OrderedDict()
         for t in types:
             ff=open(t)
             newtypes=parser.parse(ff)
-            self.types.extend(newtypes)
+            for nt, nv in newtypes.items():
+                self.types[nt] = nv
             ff.close()
 
         # The default return type is 'ERROR'
@@ -349,7 +351,7 @@ class RRCodeGenerator(CodeGenerator):
             tname=params[p]['type']
             if not tname in self.types.keys():
                 print("Error: Unknown type encountered:", tname)
-                sys.exit(7)
+                return
             params[p].setdefault('mode', 'IN')
 
         ## Roxygen to export the function
@@ -559,7 +561,7 @@ class RCCodeGenerator(CodeGenerator):
             tname=params[p]['type']
             if not tname in self.types.keys():
                 print("Error: Unknown type encountered:", tname)
-                sys.exit(7)
+                return
             params[p].setdefault('mode', 'IN')
 
         ## Compile the output
@@ -783,11 +785,11 @@ class RCCodeGenerator(CodeGenerator):
             ret="\n".join(outconv) + "\n" + retconv
         else:
             # create a list of output values
-            sets=map ( lambda c, n: "  SET_VECTOR_ELT(result, "+str(c)+", "+n+");",
-                       range(len(retpars)), retpars )
-            names=map ( lambda c, n: "  SET_STRING_ELT(names, "+str(c)+
+            sets=list(map ( lambda c, n: "  SET_VECTOR_ELT(result, "+str(c)+", "+n+");",
+                       range(len(retpars)), retpars ))
+            names=list(map ( lambda c, n: "  SET_STRING_ELT(names, "+str(c)+
                         ", CREATE_STRING_VECTOR(\""+n+"\"));",
-                        range(len(retpars)), retpars )
+                        range(len(retpars)), retpars ))
             ret="\n".join(["  PROTECT(result=NEW_LIST(" + str(len(retpars)) + "));",
                            "  PROTECT(names=NEW_CHARACTER(" + str(len(retpars)) + "));"]+
                           outconv + sets + names +
@@ -1286,7 +1288,7 @@ class ShellCodeGenerator(CodeGenerator):
             tname=params[p]['type']
             if not tname in self.types.keys():
                 print("Error: Unknown type encountered:", tname)
-                sys.exit(7)
+                return
 
             params[p].setdefault('mode', 'IN')
             t=self.types[tname]
