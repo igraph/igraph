@@ -316,6 +316,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_write_graph_leda
+  igraph_write_graph_dimacs
   lineendings
   pajek
   pajek2
