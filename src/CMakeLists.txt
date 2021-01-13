@@ -177,7 +177,7 @@ add_library(
   layout/reingold_tilford.c
   layout/sugiyama.c
 
-  # TODO: each operator should be in a separate file, they are complex enough as they are
+  operators/add_edge.c
   operators/complementer.c
   operators/compose.c
   operators/connect_neighborhood.c
@@ -210,6 +210,7 @@ add_library(
   properties/multiplicity.c
   properties/properties_other.c
   properties/spectral.c
+  properties/trees.c
   properties/triangles.c
 
   scg/scg_approximate_methods.c

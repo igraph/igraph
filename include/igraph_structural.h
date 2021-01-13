@@ -89,7 +89,6 @@ DECLDIR int igraph_random_spanning_tree(const igraph_t *graph, igraph_vector_t *
 
 DECLDIR int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vid,
                                 igraph_neimode_t mode);
-DECLDIR int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
 
 DECLDIR int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                                igraph_neimode_t mode, const igraph_vector_t *roots,
