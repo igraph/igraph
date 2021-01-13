@@ -204,8 +204,10 @@ def main():
 ################################################################################
 class CodeGenerator:
     def __init__(self, func, types):
-        # Set name
-        self.name=str(self.__class__).split(".")[-1]
+        # Set name, note this only works correctly if derived classes always
+        # extend it as by prepending the language to the CodeGenerator class
+        # name
+        self.name=type(self).__name__
         self.name=self.name[0:len(self.name)-len("CodeGenerator")]
 
         # Parse function and type files
