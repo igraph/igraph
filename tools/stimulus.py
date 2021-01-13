@@ -350,7 +350,7 @@ class RRCodeGenerator(CodeGenerator):
         for p in params.keys():
             tname=params[p]['type']
             if not tname in self.types.keys():
-                print("Error: Unknown type encountered:", tname)
+                print("Error: Unknown type " + tname + " in " + function)
                 return
             params[p].setdefault('mode', 'IN')
 
@@ -486,6 +486,8 @@ class RRCodeGenerator(CodeGenerator):
                 for i in range(len(deps)):
                     outconv=outconv.replace("%I"+str(i+1)+"%", deps[i])
             if re.search("%I[0-9]*%", outconv):
+                print(outconv)
+                print(self.deps)
                 print("Error: Missing OUT dependency for " + tname + " " + pname + " in function " + name)
             return re.sub("%I[0-9]+%", "", outconv)
 
@@ -565,7 +567,7 @@ class RCCodeGenerator(CodeGenerator):
         for p in params.keys():
             tname=params[p]['type']
             if not tname in self.types.keys():
-                print("Error: Unknown type encountered:", tname)
+                print("Error: Unknown type " + tname + " in " + function)
                 return
             params[p].setdefault('mode', 'IN')
 
@@ -961,7 +963,7 @@ class JavaCCodeGenerator(JavaCodeGenerator):
         for p in params.keys():
             tname=params[p]['type']
             if not tname in self.types.keys():
-                print("W: Unknown type encountered:", tname)
+                print("Error: Unknown type " + tname + " in " + function)
                 return
             params[p].setdefault('mode', 'IN')
 
@@ -1292,7 +1294,7 @@ class ShellCodeGenerator(CodeGenerator):
         for p in params.keys():
             tname=params[p]['type']
             if not tname in self.types.keys():
-                print("Error: Unknown type encountered:", tname)
+                print("Error: Unknown type ", tname, " in ", name)
                 return
 
             params[p].setdefault('mode', 'IN')
