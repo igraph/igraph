@@ -19,11 +19,6 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-void sort_and_print(igraph_vector_t *vec) {
-    igraph_vector_sort(vec);
-    print_vector_round(vec);
-}
-
 int main() {
 
     igraph_t g;
