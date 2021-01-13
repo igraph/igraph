@@ -36,7 +36,7 @@ int main() {
     igraph_vector_destroy(&capacity);
     igraph_destroy(&g);
 
-    assert(values == 7);
+    assert(value == 7);
     
     VERIFY_FINALLY_STACK();
     return 0;
