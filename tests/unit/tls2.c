@@ -27,6 +27,8 @@
 
 #include "linalg/arpack_internal.h"
 
+#include "test_utilities.inc"
+
 /* Test whether ARPACK is thread-safe. We will create two threads,
    each calling a different ARPACK eigensolver. We will make sure that
    the ARPACK calls from the two threads overlap */
