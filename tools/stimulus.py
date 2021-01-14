@@ -197,10 +197,10 @@ def main():
     # TODO: output files are not checked now
 
     # OK, do the trick:
-    for l in range(len(languages)):
-        cl=globals()[languages[l]+"CodeGenerator"]
+    for language, output in zip(languages, outputs):
+        cl=globals()[language+"CodeGenerator"]
         cg=cl(functions, types)
-        cg.generate(inputs, outputs[l])
+        cg.generate(inputs, output)
 
 ################################################################################
 class CodeGenerator(metaclass=abc.ABCMeta):
@@ -396,8 +396,8 @@ class RRCodeGenerator(CodeGenerator):
             header = header + default
             if pname in self.deps.keys():
                 deps = self.deps[pname]
-                for i in range(len(deps)):
-                    header=header.replace("%I"+str(i+1)+"%", deps[i])
+                for i, dep in enumerate(deps):
+                    header=header.replace("%I"+str(i+1)+"%", dep)
             if re.search("%I[0-9]*%", header):
                 print("Error: Missing HEADER dependency for " + tname + " " + pname + " in function " + name)
             return header
@@ -433,8 +433,8 @@ class RRCodeGenerator(CodeGenerator):
 
             if pname in self.deps.keys():
                 deps = self.deps[pname]
-                for i in range(len(deps)):
-                    res=res.replace("%I"+str(i+1)+"%", deps[i])
+                for i, dep in enumerate(deps):
+                    res=res.replace("%I"+str(i+1)+"%", dep)
             if re.search("%I[0-9]*%", res):
                 print("Error: Missing IN dependency for " + tname + " " + pname + " in function " + name)
             return res
@@ -486,8 +486,8 @@ class RRCodeGenerator(CodeGenerator):
 
             if pname in self.deps.keys():
                 deps = self.deps[pname]
-                for i in range(len(deps)):
-                    outconv=outconv.replace("%I"+str(i+1)+"%", deps[i])
+                for i, dep in enumerate(deps):
+                    outconv=outconv.replace("%I"+str(i+1)+"%", dep)
             if re.search("%I[0-9]*%", outconv):
                 print(outconv)
                 print(self.deps)
@@ -699,8 +699,8 @@ class RCCodeGenerator(CodeGenerator):
 
             if pname in self.deps.keys():
                 deps = self.deps[pname]
-                for i in range(len(deps)):
-                    inconv=inconv.replace("%C"+str(i+1)+"%", "c_"+deps[i])
+                for i, dep in enumerate(deps):
+                    inconv=inconv.replace("%C"+str(i+1)+"%", "c_"+dep)
 
             return inconv.replace("%C%", cname).replace("%I%", pname)
 
@@ -772,8 +772,8 @@ class RCCodeGenerator(CodeGenerator):
 
             if pname in self.deps.keys():
                 deps = self.deps[pname]
-                for i in range(len(deps)):
-                    outconv=outconv.replace("%C"+str(i+1)+"%", "c_"+deps[i])
+                for i, dep in enumerate(deps):
+                    outconv=outconv.replace("%C"+str(i+1)+"%", "c_"+dep)
             return outconv.replace("%C%", cname).replace("%I%", pname)
 
         outconv=[ do_par(n) for n in params.keys() ]
@@ -1128,8 +1128,8 @@ class JavaCCodeGenerator(JavaCodeGenerator):
 
             if pname in self.deps.keys():
                 deps = self.deps[pname]
-                for i in range(len(deps)):
-                    inconv=inconv.replace("%C"+str(i+1)+"%", "c_"+deps[i])
+                for i, dep in enumerate(deps):
+                    inconv=inconv.replace("%C"+str(i+1)+"%", "c_"+dep)
 
             return inconv.replace("%C%", cname).replace("%I%", pname)
 
@@ -1297,7 +1297,7 @@ class ShellCodeGenerator(CodeGenerator):
         for p in params.keys():
             tname=params[p]['type']
             if not tname in self.types.keys():
-                print("Error: Unknown type ", tname, " in ", name)
+                print("Error: Unknown type ", tname, " in ", function)
                 return
 
             params[p].setdefault('mode', 'IN')
