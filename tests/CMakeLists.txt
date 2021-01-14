@@ -126,7 +126,8 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_barabasi_game2
   igraph_create
-  igraph_degree_sequence_game  
+  igraph_degree_sequence_game
+  igraph_erdos_renyi_game
   igraph_full
   igraph_grg_game
   igraph_growing_random_game
