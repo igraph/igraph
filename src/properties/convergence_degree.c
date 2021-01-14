@@ -32,13 +32,6 @@
 
 #include "core/interruption.h"
 
-/**
- * \section about_structural
- *
- * <para>These functions usually calculate some structural property
- * of a graph, like its diameter, the degree of the nodes, etc.</para>
- */
-
 /*
  * \example examples/simple/graph_convergence_degree.c
  */
