@@ -5,6 +5,7 @@ import sys
 from collections import OrderedDict
 import getopt
 import os
+import abc
 
 version="0.2"
 date="Jan 13 2021"
@@ -202,7 +203,7 @@ def main():
         cg.generate(inputs, outputs[l])
 
 ################################################################################
-class CodeGenerator:
+class CodeGenerator(metaclass=abc.ABCMeta):
     def __init__(self, func, types):
         # Set name, note this only works correctly if derived classes always
         # extend it as by prepending the language to the CodeGenerator class
@@ -246,9 +247,9 @@ class CodeGenerator:
             self.generate_function(f, out)
         out.close()
 
+    @abc.abstractmethod
     def generate_function(self, f, out):
-        print("Error: invalid code generator, this method should be overridden")
-        sys.exit(1)
+        raise NotImplementedError("Error: invalid code generator, this method should be overridden")
 
     def parse_params(self, function):
         if "PARAMS" not in self.func[function]:
