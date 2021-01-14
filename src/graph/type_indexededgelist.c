@@ -1736,12 +1736,12 @@ int igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2) {
         eid1 = (long int) VECTOR(graph1->ii)[i];
         eid2 = (long int) VECTOR(graph2->ii)[i];
 
-        /* check they have the same source */
+        /* Check they have the same source */
         if (IGRAPH_FROM(graph1, eid1) != IGRAPH_FROM(graph2, eid2)) {
             return 0;
         }
 
-        /* check they have the same target */
+        /* Check they have the same target */
         if (IGRAPH_TO(graph1, eid1) != IGRAPH_TO(graph2, eid2)) {
             return 0;
         }
