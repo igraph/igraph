@@ -73,7 +73,7 @@ DECLDIR int igraph_get_eids_multi(const igraph_t *graph, igraph_vector_t *eids,
                                   igraph_bool_t directed, igraph_bool_t error);
 DECLDIR int igraph_incident(const igraph_t *graph, igraph_vector_t *eids, igraph_integer_t vid,
                             igraph_neimode_t mode);
-DECLDIR igraph_bool_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *igraph2);
+DECLDIR igraph_bool_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *igraph2, igraph_bool_t *res);
 
 /**
  * \define IGRAPH_FROM

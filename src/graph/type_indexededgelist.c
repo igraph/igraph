@@ -1695,35 +1695,53 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
 
 /**
  * \function igraph_is_same_graph
- * \brief Check if two graphs are topologically the same
+ * \brief Are two graphs identical as labelled graphs?
+ *
+ * Two graphs are considered to be the same if they have the same vertex and edge sets.
+ * Graphs which are the same may have multiple different representations in igraph,
+ * hence the need for this function.
+ *
+ * <para></para>
+ * This function verifies that the two graphs have the same directnedness, the same
+ * number of vertices, and that they contain precise the same edges (regardless of their ordering)
+ * when written in terms of vertex indices. Graph attributes are not taken into account.
+ *
+ * <para></para<
+ * This concept is different from isomorphism. For example, the graphs
+ * <code>0-1, 2-1</code> and <code>1-2, 0-1</code> are considered the same
+ * because they only differ in the ordering of their edge lists and the ordering
+ * of vertices in an undirected edge. However, they are not the same as
+ * <code>0-2, 1-2</code>, even though they are isomorphic to it.
+ * Note that this latter graph contains the edge <code>0-2</code>
+ * while the former two do not—thus their edge sets differ.
  *
  * \param graph1 The first graph object.
  * \param graph2 The second graph object.
- * \return 1 if they are the same, 0 if they are different.
- *
- * NOTE: this function is mostly for internal use in unit tests.
- * Users should not rely on it for production code.</para><para>
- *
- * Added in version 0.9.</para><para>
+ * \param res The result will be stored here.
+ * \return Error code.
  *
  * Time complexity: O(E), the number of edges in the graphs.
+ *
+ * \sa igraph_isomorphic() to test if two graphs are isomorphic.
  */
 
-igraph_bool_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2) {
+int igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_bool_t *res) {
     long int nv1 = igraph_vcount(graph1);
     long int nv2 = igraph_vcount(graph2);
     long int ne1 = igraph_ecount(graph1);
     long int ne2 = igraph_ecount(graph2);
     long int i, eid1, eid2;
 
+    *res = 0; /* Assume failure */
+
     /* Check for same number of vertices/edges */
     if ((nv1 != nv2) || (ne1 != ne2)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Check for same directedness */
     if (igraph_is_directed(graph1) != igraph_is_directed(graph2)) {
-        return 0;
+        return IGRAPH_SUCCESS;
     }
 
     /* Vertices have no names, so no they must be 0 to nv - 1 */
@@ -1731,22 +1749,28 @@ igraph_bool_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph
     /* Edges are double sorted in the current representations ii/oi of
      * igraph_t (ii: by incoming, then outgoing, oi: vice versa), so
      * we just need to check them one by one. If that representation
-     * changes, this part will need to change too. */
+     * changes, this part will need to change too.
+     *
+     * Furthermore, in the current representation the "source" of undirected
+     * edges always has a vertex index that is no larger than that of the
+     * "target".
+     */
     for (i = 0; i < ne1; i++) {
         eid1 = (long int) VECTOR(graph1->ii)[i];
         eid2 = (long int) VECTOR(graph2->ii)[i];
 
         /* Check they have the same source */
         if (IGRAPH_FROM(graph1, eid1) != IGRAPH_FROM(graph2, eid2)) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
 
         /* Check they have the same target */
         if (IGRAPH_TO(graph1, eid1) != IGRAPH_TO(graph2, eid2)) {
-            return 0;
+            return IGRAPH_SUCCESS;
         }
 
     }
 
-    return 1;
+    *res = 1; /* no difference was found, graphs are the same */
+    return IGRAPH_SUCCESS;
 }
