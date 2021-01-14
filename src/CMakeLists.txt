@@ -209,6 +209,7 @@ add_library(
   properties/girth.c
   properties/loops.c
   properties/multiplicity.c
+  properties/neighborhood.c
   properties/properties_other.c
   properties/spectral.c
   properties/trees.c
