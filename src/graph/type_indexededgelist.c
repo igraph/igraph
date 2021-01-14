@@ -1709,7 +1709,7 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
  * Time complexity: O(E), the number of edges in the graphs.
  */
 
-int igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2) {
+igraph_bool_t igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2) {
     long int nv1 = igraph_vcount(graph1);
     long int nv2 = igraph_vcount(graph2);
     long int ne1 = igraph_ecount(graph1);
