@@ -1706,7 +1706,7 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
  * number of vertices, and that they contain precise the same edges (regardless of their ordering)
  * when written in terms of vertex indices. Graph attributes are not taken into account.
  *
- * <para></para<
+ * <para></para>
  * This concept is different from isomorphism. For example, the graphs
  * <code>0-1, 2-1</code> and <code>1-2, 0-1</code> are considered the same
  * because they only differ in the ordering of their edge lists and the ordering
@@ -1732,7 +1732,7 @@ int igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_
     long int ne2 = igraph_ecount(graph2);
     long int i, eid1, eid2;
 
-    *res = 0; /* Assume failure */
+    *res = 0; /* Assume that the graphs differ */
 
     /* Check for same number of vertices/edges */
     if ((nv1 != nv2) || (ne1 != ne2)) {
@@ -1768,9 +1768,8 @@ int igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_
         if (IGRAPH_TO(graph1, eid1) != IGRAPH_TO(graph2, eid2)) {
             return IGRAPH_SUCCESS;
         }
-
     }
 
-    *res = 1; /* no difference was found, graphs are the same */
+    *res = 1; /* No difference was found, graphs are the same */
     return IGRAPH_SUCCESS;
 }
