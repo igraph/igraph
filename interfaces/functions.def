@@ -695,7 +695,7 @@ igraph_eigenvector_centrality:
                 BOOLEAN directed=False, BOOLEAN scale=True, \
                 EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=arpack_defaults
-        DEPS: weights ON graph, vector ON graph vids
+        DEPS: weights ON graph, vector ON graph V(graph)
         DEFAULT-R: options=arpack_defaults
         NAME-R: eigen_centrality
 
@@ -704,7 +704,7 @@ igraph_hub_score:
                 BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=arpack_defaults
         DEFAULT-R: options=arpack_defaults
-        DEPS: weights ON graph, vector ON graph vids
+        DEPS: weights ON graph, vector ON graph V(graph)
         NAME-R: hub_score
 
 igraph_authority_score:
@@ -712,7 +712,7 @@ igraph_authority_score:
                 BOOLEAN scale=True, EDGEWEIGHTS weights=NULL, \
                 INOUT ARPACKOPT options=arpack_defaults
         DEFAULT-R: options=arpack_defaults
-        DEPS: weights ON graph, vector ON graph vids
+        DEPS: weights ON graph, vector ON graph V(graph)
         NAME-R: authority_score
 
 igraph_arpack_rssolve:
