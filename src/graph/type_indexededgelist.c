@@ -1701,12 +1701,12 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
  * Graphs which are the same may have multiple different representations in igraph,
  * hence the need for this function.
  *
- * <para></para>
+ * </para><para>
  * This function verifies that the two graphs have the same directnedness, the same
  * number of vertices, and that they contain precise the same edges (regardless of their ordering)
  * when written in terms of vertex indices. Graph attributes are not taken into account.
  *
- * <para></para>
+ * </para><para>
  * This concept is different from isomorphism. For example, the graphs
  * <code>0-1, 2-1</code> and <code>1-2, 0-1</code> are considered the same
  * because they only differ in the ordering of their edge lists and the ordering
