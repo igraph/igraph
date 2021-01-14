@@ -23,7 +23,7 @@
 
 #include <string.h>
 
-#include "igraph_structural.h"
+#include "igraph_centrality.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_dqueue.h"
