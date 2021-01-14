@@ -24,6 +24,9 @@ int main() {
     igraph_t g;
     igraph_bool_t simple;
 
+    /* Ensure that the test is deterministic */
+    igraph_rng_seed(igraph_rng_default(), 137);
+
     /* G(n,p) */
 
     /* Empty graph */

@@ -126,8 +126,7 @@ add_legacy_tests(
   igraph_barabasi_game
   igraph_barabasi_game2
   igraph_create
-  igraph_degree_sequence_game
-  igraph_erdos_renyi_game
+  igraph_degree_sequence_game  
   igraph_full
   igraph_grg_game
   igraph_growing_random_game
@@ -142,12 +141,13 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  erdos_renyi_game
   full
   igraph_correlated_game
   igraph_from_prufer  
   igraph_k_regular_game
   igraph_lattice
-  igraph_realize_degree_sequence
+  igraph_realize_degree_sequence  
   tree
   ring
   watts_strogatz_game
