@@ -1258,3 +1258,105 @@ int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges) {
 
     return IGRAPH_SUCCESS;
 }
+
+/**
+ * \ingroup structural
+ * \function igraph_subcomponent
+ * \brief The vertices in the same component as a given vertex.
+ *
+ * \param graph The graph object.
+ * \param res The result, vector with the ids of the vertices in the
+ *        same component.
+ * \param vertex The id of the vertex of which the component is
+ *        searched.
+ * \param mode Type of the component for directed graphs, possible
+ *        values:
+ *        \clist
+ *        \cli IGRAPH_OUT
+ *          the set of vertices reachable \em from the
+ *          \p vertex,
+ *        \cli IGRAPH_IN
+ *          the set of vertices from which the
+ *          \p vertex is reachable.
+ *        \cli IGRAPH_ALL
+ *          the graph is considered as an
+ *          undirected graph. Note that this is \em not the same
+ *          as the union of the previous two.
+ *        \endclist
+ * \return Error code:
+ *        \clist
+ *        \cli IGRAPH_ENOMEM
+ *          not enough memory for temporary data.
+ *        \cli IGRAPH_EINVVID
+ *           \p vertex is an invalid vertex id
+ *        \cli IGRAPH_EINVMODE
+ *           invalid mode argument passed.
+ *        \endclist
+ *
+ * Time complexity: O(|V|+|E|),
+ * |V| and
+ * |E| are the number of vertices and
+ * edges in the graph.
+ *
+ * \sa \ref igraph_induced_subgraph() if you want a graph object consisting only
+ * a given set of vertices and the edges between them.
+ */
+int igraph_subcomponent(const igraph_t *graph, igraph_vector_t *res, igraph_real_t vertex,
+                        igraph_neimode_t mode) {
+
+    long int no_of_nodes = igraph_vcount(graph);
+    igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
+    char *already_added;
+    long int i, vsize;
+    igraph_vector_t tmp = IGRAPH_VECTOR_NULL;
+
+    if (!IGRAPH_FINITE(vertex) || vertex < 0 || vertex >= no_of_nodes) {
+        IGRAPH_ERROR("subcomponent failed", IGRAPH_EINVVID);
+    }
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
+        mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("invalid mode argument", IGRAPH_EINVMODE);
+    }
+
+    already_added = igraph_Calloc(no_of_nodes, char);
+    if (already_added == 0) {
+        IGRAPH_ERROR("subcomponent failed", IGRAPH_ENOMEM);
+    }
+    IGRAPH_FINALLY(igraph_free, already_added);
+
+    igraph_vector_clear(res);
+
+    IGRAPH_VECTOR_INIT_FINALLY(&tmp, 0);
+    IGRAPH_DQUEUE_INIT_FINALLY(&q, 100);
+
+    IGRAPH_CHECK(igraph_dqueue_push(&q, vertex));
+    IGRAPH_CHECK(igraph_vector_push_back(res, vertex));
+    already_added[(long int)vertex] = 1;
+
+    while (!igraph_dqueue_empty(&q)) {
+        long int actnode = (long int) igraph_dqueue_pop(&q);
+
+        IGRAPH_ALLOW_INTERRUPTION();
+
+        IGRAPH_CHECK(igraph_neighbors(graph, &tmp, (igraph_integer_t) actnode,
+                                      mode));
+        vsize = igraph_vector_size(&tmp);
+        for (i = 0; i < vsize; i++) {
+            long int neighbor = (long int) VECTOR(tmp)[i];
+
+            if (already_added[neighbor]) {
+                continue;
+            }
+            already_added[neighbor] = 1;
+            IGRAPH_CHECK(igraph_vector_push_back(res, neighbor));
+            IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
+        }
+    }
+
+    igraph_dqueue_destroy(&q);
+    igraph_vector_destroy(&tmp);
+    igraph_Free(already_added);
+    IGRAPH_FINALLY_CLEAN(3);
+
+    return 0;
+}

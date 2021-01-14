@@ -204,13 +204,15 @@ add_library(
   paths/simple_paths.c
   paths/unweighted.c
 
-  properties/degrees.c
+  properties/basic.c
+  properties/constraint.c
+  properties/convergence_degree.c
   properties/dag.c
+  properties/degrees.c
   properties/girth.c
   properties/loops.c
   properties/multiplicity.c
   properties/neighborhood.c
-  properties/properties_other.c
   properties/spectral.c
   properties/trees.c
   properties/triangles.c
