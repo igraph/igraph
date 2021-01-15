@@ -103,6 +103,11 @@ add_legacy_tests(
   igraph_neighbors
 )
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_is_same_graph
+)
+
 # iterators.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
