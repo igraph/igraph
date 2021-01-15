@@ -1544,7 +1544,13 @@ double PottsModel::GammaSweepZeroTemp(double gamma_start, double gamma_stop, dou
 //##############################################################################
 
 //#################################################################################################
-PottsModelN::PottsModelN(network *n, unsigned int num_communities, bool directed) {
+PottsModelN::PottsModelN(network *n, unsigned int num_communities, bool directed) :
+    degree_pos_in(NULL), degree_neg_in(NULL),
+    degree_pos_out(NULL), degree_neg_out(NULL),
+    degree_community_pos_in(NULL), degree_community_neg_in(NULL),
+    degree_community_pos_out(NULL), degree_community_neg_out(NULL),
+    csize(NULL), spin(NULL), neighbours(NULL), weights(NULL)
+{
     //Set internal variable
     net = n;
     q   = num_communities;
@@ -1591,6 +1597,15 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 #ifdef DEBUG
         printf("Initializing spin.\n");
 #endif
+        // Free the arrays before (re-)allocating them
+        // These arrays are initialized to NULL, so it is safe to delete even before allocation
+        delete [] degree_pos_in;
+        delete [] degree_neg_in;
+        delete [] degree_pos_out;
+        delete [] degree_neg_out;
+
+        delete [] spin;
+
         //Bookkeeping of the various degrees (positive/negative) and (in/out)
         degree_pos_in   = new double[num_nodes]; //Postive indegree of the nodes (or sum of weights)
         degree_neg_in   = new double[num_nodes]; //Negative indegree of the nodes (or sum of weights)
