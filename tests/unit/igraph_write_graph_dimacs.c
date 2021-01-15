@@ -54,6 +54,10 @@ int main() {
     igraph_small(&g, 0, IGRAPH_DIRECTED, -1);
     igraph_vector_init(&capacity, 0);
 
+    /* Check that the function does not crash/misbehave on a null graph.
+       Note that currently igraph outputs DIMACS files for the max-flow
+       problem, which only makes sense if there are at least two vertices,
+       a source and the target. Here we use dummy values for them. */
     printf("\nDIMACS graph output for null graph:\n");
     igraph_write_graph_dimacs(&g, stdout, source, target, &capacity);
 
