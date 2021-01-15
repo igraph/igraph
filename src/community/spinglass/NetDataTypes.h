@@ -64,10 +64,10 @@ public:
     HUGE_INDEX get_huge_index(unsigned long);
     DATA &Set(unsigned long);
     DATA Get(unsigned long);
-    HugeArray(void);
-    ~HugeArray(void);
+    HugeArray();
+    ~HugeArray();
     DATA &operator[](unsigned long);
-    unsigned long Size(void) {
+    unsigned long Size() {
         return max_index;
     }
 } ;
@@ -106,19 +106,19 @@ protected:
     DLItem<L_DATA> *pInsert(L_DATA, DLItem<L_DATA>*);
     L_DATA pDelete(DLItem<L_DATA>*);
 public:
-    DLList(void);
+    DLList();
     ~DLList();
-    unsigned long Size(void) {
+    unsigned long Size() {
         return number_of_items;
     }
     int Insert(L_DATA, unsigned long);
     int Delete(unsigned long);
     int fDelete(L_DATA);
     L_DATA Push(L_DATA);
-    L_DATA Pop(void);
+    L_DATA Pop();
     L_DATA Get(unsigned long);
     int Enqueue(L_DATA);
-    L_DATA Dequeue(void);
+    L_DATA Dequeue();
     unsigned long Is_In_List(L_DATA);
     void delete_items();
 };
@@ -132,10 +132,10 @@ private:
     HugeArray<DLItem<L_DATA>*> array;
     unsigned long last_index;
 public:
-    DL_Indexed_List(void);
+    DL_Indexed_List();
     ~DL_Indexed_List();
     L_DATA Push(L_DATA);
-    L_DATA Pop(void);
+    L_DATA Pop();
     L_DATA Get(unsigned long);
 };
 
@@ -147,21 +147,21 @@ private:
     DLItem<L_DATA> *current;
     bool end_reached;
 public:
-    DLList_Iter(void);
+    DLList_Iter();
     ~DLList_Iter() {
         end_reached = true;
     };
-    L_DATA Next(void);
-    L_DATA Previous(void);
+    L_DATA Next();
+    L_DATA Previous();
     L_DATA First(DLList<L_DATA> *l);
     L_DATA Last(DLList<L_DATA> *l);
-    bool End(void) {
+    bool End() {
         return end_reached;
     }
-    DLItem<L_DATA> *Get_Current(void) {
+    DLItem<L_DATA> *Get_Current() {
         return current;
     }
-    L_DATA Get_Current_Item(void) {
+    L_DATA Get_Current_Item() {
         return current->item;
     }
     void Set_Current(DLItem<L_DATA> *c) {
@@ -207,19 +207,19 @@ private :
 public :
     NNode(unsigned long, unsigned long, DLList<NLink*>*, char*, int);
     ~NNode();
-    unsigned long Get_Index(void)  {
+    unsigned long Get_Index()  {
         return (index);
     }
-    unsigned long Get_ClusterIndex(void) {
+    unsigned long Get_ClusterIndex() {
         return (cluster_index);
     }
-    unsigned long Get_Marker(void) {
+    unsigned long Get_Marker() {
         return marker;
     }
     void Set_Marker(unsigned long m) {
         marker = m;
     }
-    unsigned long Get_Affiliations(void) {
+    unsigned long Get_Affiliations() {
         return affiliations;
     }
     void Set_Affiliations(unsigned long m) {
@@ -227,34 +227,32 @@ public :
     }
     void Set_ClusterIndex(unsigned long ci) {
         cluster_index = ci;
-        return;
     }
     void Set_Index(unsigned long i) {
         index = i;
-        return;
     }
-    unsigned long Get_Degree(void) {
+    unsigned long Get_Degree() {
         return (neighbours->Size());
     }
-    char *Get_Name(void) {
+    char *Get_Name() {
         return name;
     }
     void Set_Name(char* n) {
         strcpy(name, n);
     }
-    double Get_Links_Among_Neigbours(void);
-    double Get_Clustering(void);
-    double Get_Weight(void) {
+    double Get_Links_Among_Neigbours();
+    double Get_Clustering();
+    double Get_Weight() {
         return weight;
     }
-    double Get_Affinity(void) {
+    double Get_Affinity() {
         return affinity;
     }
-    unsigned long *Get_StateHistory(void) {
+    unsigned long *Get_StateHistory() {
         return state_history;
     }
     void Add_StateHistory(unsigned int q);
-    //  double Get_OldWeight(void) {return old_weight;}
+    //  double Get_OldWeight() {return old_weight;}
     void Set_Weight(double w) {
         weight = w;
     }
@@ -263,23 +261,23 @@ public :
     }
 
     //  void Set_OldWeight(double w) {old_weight=w;}
-    long Get_Distance(void) {
+    long Get_Distance() {
         return distance;
     }
     void Set_Distance(long d) {
         distance = d;
     }
     int  Connect_To(NNode*, double);
-    DLList<NNode*> *Get_Neighbours(void) {
+    DLList<NNode*> *Get_Neighbours() {
         return neighbours;
     }
-    DLList<NLink*> *Get_Links(void) {
+    DLList<NLink*> *Get_Links() {
         return n_links;
     }
     int  Disconnect_From(NNode*);
-    int  Disconnect_From_All(void);
+    int  Disconnect_From_All();
     bool Is_Linked_To(NNode*);
-    RGBcolor Get_Color(void) {
+    RGBcolor Get_Color() {
         return color;
     }
     void Set_Color(RGBcolor c);
@@ -300,31 +298,31 @@ private :
 public :
     NLink( NNode*, NNode*, double);
     ~NLink();
-    unsigned long Get_Start_Index(void)  {
+    unsigned long Get_Start_Index()  {
         return (start->Get_Index());
     }
-    unsigned long Get_End_Index(void)    {
+    unsigned long Get_End_Index()    {
         return (end->Get_Index());
     }
-    NNode *Get_Start(void) {
+    NNode *Get_Start() {
         return (start);
     }
-    NNode *Get_End(void) {
+    NNode *Get_End() {
         return (end);
     }
-    double Get_Weight(void) {
+    double Get_Weight() {
         return weight;
     }
     void Set_Weight(double w) {
         weight = w;
     }
-    double Get_OldWeight(void) {
+    double Get_OldWeight() {
         return old_weight;
     }
     void Set_OldWeight(double w) {
         old_weight = w;
     }
-    unsigned long Get_Marker(void) {
+    unsigned long Get_Marker() {
         return marker;
     }
     void Set_Marker(unsigned long m) {
@@ -350,38 +348,38 @@ private:
     DLList<L_DATA> *candidates;
     long marker;
 public:
-    ClusterList(void);
+    ClusterList();
     ~ClusterList();
-    long Get_Links_OOC(void) {
+    long Get_Links_OOC() {
         return (links_out_of_cluster);
     }
     void Set_Links_OOC(long looc) {
         links_out_of_cluster = looc;
     }
-    unsigned long Get_Links_IC(void) {
+    unsigned long Get_Links_IC() {
         return (links_inside_cluster);
     }
-    unsigned long Get_Frequency(void) {
+    unsigned long Get_Frequency() {
         return (frequency);
     }
-    void IncreaseFrequency(void) {
+    void IncreaseFrequency() {
         frequency++;
     }
     void Set_Links_IC(unsigned long lic) {
         links_inside_cluster = lic;
     }
-    double Get_Energy(void) {
+    double Get_Energy() {
         return (cluster_energy);
     }
     void Set_Energy(double e) {
         cluster_energy = e;
     }
-    DLList<L_DATA> *Get_Candidates(void) {
+    DLList<L_DATA> *Get_Candidates() {
         return candidates;
     }
     bool operator<(ClusterList<L_DATA> &b);
     bool operator==(ClusterList <L_DATA> &b);
-    long Get_Marker(void) {
+    long Get_Marker() {
         return marker;
     }
     void Set_Marker(long m) {
@@ -398,10 +396,10 @@ private:
     HugeArray<DLItem<NNode*>*> array;
     unsigned long last_index;
 public:
-    DL_Node_List(void);
+    DL_Node_List();
     ~DL_Node_List();
     NNode* Push(NNode*);
-    NNode* Pop(void);
+    NNode* Pop();
     NNode* Get(unsigned long);
     int Delete(unsigned long);
 
@@ -448,7 +446,7 @@ struct network
 */
 
 template <class DATA>
-HugeArray<DATA>::HugeArray(void) {
+HugeArray<DATA>::HugeArray() {
     max_bit_left = 1UL << 31; //wir setzen das 31. Bit auf 1
     size = 2;
     max_index = 0;
@@ -462,7 +460,7 @@ HugeArray<DATA>::HugeArray(void) {
     fields[highest_field_index] = data;
 }
 
-template <class DATA> HugeArray<DATA>::~HugeArray(void) {
+template <class DATA> HugeArray<DATA>::~HugeArray() {
     for (unsigned int i = 0; i <= highest_field_index; i++) {
         data = fields[i];
         delete [] data;
@@ -546,7 +544,7 @@ DLItem<L_DATA>::~DLItem() {
 
 //######################################################################################################################
 template <class L_DATA>
-DLList<L_DATA>::DLList(void) {
+DLList<L_DATA>::DLList() {
     head = tail = NULL;
     number_of_items = 0;
     head = new DLItem<L_DATA>(NULL, 0); //fuer head und Tail gibt es das gleiche Array-Element!! Vorsicht!!
@@ -666,7 +664,7 @@ L_DATA DLList<L_DATA>::Push(L_DATA data) {
 }
 
 template <class L_DATA>
-L_DATA DLList<L_DATA>::Pop(void) {
+L_DATA DLList<L_DATA>::Pop() {
     return (pDelete(tail->previous));
 }
 
@@ -691,7 +689,7 @@ int DLList<L_DATA>::Enqueue(L_DATA data) {
 }
 
 template <class L_DATA>
-L_DATA DLList<L_DATA>::Dequeue(void) {
+L_DATA DLList<L_DATA>::Dequeue() {
     return (pDelete(head->next));
 }
 
@@ -713,7 +711,7 @@ unsigned long DLList<L_DATA>::Is_In_List(L_DATA data) {
 
 //######################################################################################################################
 template <class L_DATA>
-DL_Indexed_List<L_DATA>::DL_Indexed_List(void) : DLList<L_DATA>() {
+DL_Indexed_List<L_DATA>::DL_Indexed_List() : DLList<L_DATA>() {
     last_index = 0;
 }
 
@@ -770,7 +768,7 @@ L_DATA DL_Indexed_List<L_DATA>::Push(L_DATA data) {
 }
 
 template <class L_DATA>
-L_DATA DL_Indexed_List<L_DATA>::Pop(void) {
+L_DATA DL_Indexed_List<L_DATA>::Pop() {
     return (pDelete(this->tail->previous));
 }
 
@@ -786,7 +784,7 @@ L_DATA DL_Indexed_List<L_DATA>::Get(unsigned long pos) {
 
 //************************************************************************************************************
 template <class L_DATA>
-ClusterList<L_DATA>::ClusterList(void) : DLList<L_DATA>() {
+ClusterList<L_DATA>::ClusterList() : DLList<L_DATA>() {
     links_out_of_cluster = 0;
     links_inside_cluster = 0;
     frequency = 1;
@@ -868,7 +866,7 @@ DLList_Iter<L_DATA>::DLList_Iter() {
 }
 
 template <class L_DATA>
-L_DATA DLList_Iter<L_DATA>::Next(void) {
+L_DATA DLList_Iter<L_DATA>::Next() {
     current = current->next;
     if (current == (list->tail)) {
         end_reached = true;
@@ -877,7 +875,7 @@ L_DATA DLList_Iter<L_DATA>::Next(void) {
 }
 
 template <class L_DATA>
-L_DATA DLList_Iter<L_DATA>::Previous(void) {
+L_DATA DLList_Iter<L_DATA>::Previous() {
     current = current->previous;
     if (current == (list->head)) {
         end_reached = true;

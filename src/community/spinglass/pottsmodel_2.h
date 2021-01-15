@@ -63,7 +63,7 @@ private:
     network *net;
     unsigned int q;
     unsigned int operation_mode;
-    FILE *Qfile, *Magfile;
+    // FILE *Qfile, *Magfile;
     double Qmatrix[qmax + 1][qmax + 1];
     double* Qa;
     double* weights;
@@ -80,8 +80,8 @@ public:
     double* color_field;
     unsigned long assign_initial_conf(int spin);
     unsigned long initialize_lookup(double kT, double gamma);
-    double initialize_Qmatrix(void);
-    double calculate_Q(void);
+    double initialize_Qmatrix();
+    double calculate_Q();
     double calculate_genQ(double gamma);
     double FindStartTemp(double gamma, double prob,  double ts);
     long   HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
@@ -90,14 +90,14 @@ public:
     double HeatBathLookup(double gamma, double prob, double kT, unsigned int max_sweeps);
     double GammaSweep(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel = true, int repetitions = 1);
     double GammaSweepZeroTemp(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel = true, int repetitions = 1);
-    long   WriteCorrelationMatrix(char *filename);
+    // long   WriteCorrelationMatrix(char *filename);
     double calculate_energy(double gamma);
     long   WriteClusters(igraph_real_t *modularity,
                          igraph_real_t *temperature,
                          igraph_vector_t *csize, igraph_vector_t *membership,
                          double kT, double gamma);
-    long   WriteSoftClusters(char *filename, double threshold);
-    double Get_Energy(void) {
+    // long   WriteSoftClusters(char *filename, double threshold);
+    double Get_Energy() const {
         return energy;
     }
     double FindCommunityFromStart(double gamma, double prob, char *nodename,
@@ -113,8 +113,8 @@ class PottsModelN {
 private:
     //  HugeArray<double> neg_gammalookup;
     //  HugeArray<double> pos_gammalookup;
-    DL_Indexed_List<unsigned int*> *new_spins;
-    DL_Indexed_List<unsigned int*> *previous_spins;
+    // DL_Indexed_List<unsigned int*> *new_spins;
+    // DL_Indexed_List<unsigned int*> *previous_spins;
     HugeArray<HugeArray<double>*> correlation;
     network *net;
 
@@ -148,8 +148,8 @@ public:
     void assign_initial_conf(bool init_spins);
     double FindStartTemp(double gamma, double lambda, double ts);
     double HeatBathLookup(double gamma, double lambda, double t, unsigned int max_sweeps);
-    double HeatBathJoin(double gamma, double lambda);
-    double HeatBathLookupZeroTemp(double gamma, double lambda, unsigned int max_sweeps);
+    // double HeatBathJoin(double gamma, double lambda);
+    // double HeatBathLookupZeroTemp(double gamma, double lambda, unsigned int max_sweeps);
     long WriteClusters(igraph_real_t *modularity,
                        igraph_real_t *temperature,
                        igraph_vector_t *community_size,

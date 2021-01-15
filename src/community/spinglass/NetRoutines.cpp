@@ -48,8 +48,6 @@
 #include "igraph_interface.h"
 #include "igraph_conversion.h"
 
-#include <cstring>
-
 int igraph_i_read_network(const igraph_t *graph,
                           const igraph_vector_t *weights,
                           network *net, igraph_bool_t use_weights,
@@ -81,13 +79,13 @@ int igraph_i_read_network(const igraph_t *graph,
         }
         // From the original source
         if (max_index < i1) {
-            for (int i = max_index; i < i1; i++) {
+            for (long int i = max_index; i < i1; i++) {
                 net->node_list->Push(new NNode(i, 0, net->link_list, empty, states));
             }
             max_index = i1;
         }
         if (max_index < i2) {
-            for (int i = max_index; i < i2; i++) {
+            for (long int i = max_index; i < i2; i++) {
                 net->node_list->Push(new NNode(i, 0, net->link_list, empty, states));
             }
             max_index = i2;
@@ -145,7 +143,7 @@ int igraph_i_read_network(const igraph_t *graph,
 //###############################################################################################################
 void reduce_cliques(DLList<ClusterList<NNode*>*> *global_cluster_list, FILE *file) {
     unsigned long size;
-    ClusterList<NNode*> *c_cur, *largest_c = 0;
+    ClusterList<NNode*> *c_cur, *largest_c = NULL;
     DLList<ClusterList<NNode*>*> *subsets;
     DLList_Iter<ClusterList<NNode*>*> c_iter, sub_iter;
     DLList_Iter<NNode*> iter;
@@ -204,7 +202,7 @@ void reduce_cliques(DLList<ClusterList<NNode*>*> *global_cluster_list, FILE *fil
 //##################################################################################
 void reduce_cliques2(network *net, bool only_double, long marker) {
     unsigned long size;
-    ClusterList<NNode*> *c_cur, *largest_c = 0;
+    ClusterList<NNode*> *c_cur, *largest_c = NULL;
     DLList_Iter<ClusterList<NNode*>*> c_iter;
     do {
         //wir suchen den groessten, nicht markierten Cluster

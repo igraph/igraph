@@ -115,7 +115,7 @@ int NNode::Connect_To(NNode* neighbour, double weight_) {
 
 NLink *NNode::Get_LinkToNeighbour(NNode* neighbour) {
     DLList_Iter<NLink*> iter;
-    NLink *l_cur, *link = 0;
+    NLink *l_cur, *link = NULL;
     bool found = false;
     // finde einen bestimmten Link aus der Liste der links eines Knotens
     l_cur = iter.First(n_links);
@@ -168,7 +168,7 @@ int NNode::Disconnect_From_All_Grandchildren()
 }
 */
 
-double NNode::Get_Links_Among_Neigbours(void) {
+double NNode::Get_Links_Among_Neigbours() {
 //  long neighbours1, neighbours2;
     double lam = 0;
     DLList_Iter<NNode*> iter1, iter2;

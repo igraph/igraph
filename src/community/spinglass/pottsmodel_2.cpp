@@ -47,7 +47,6 @@
 
 #include "igraph_random.h"
 #include "core/interruption.h"
-#include "config.h"
 
 #include <cstring>
 #include <cmath>
@@ -90,7 +89,6 @@ PottsModel::PottsModel(network *n, unsigned int qvalue, int m) : acceptance(0) {
         previous_spins->Push(i_ptr);
         n_cur = iter.Next();
     }
-    return;
 }
 //#######################################################
 //Destructor of PottsModel
@@ -107,7 +105,6 @@ PottsModel::~PottsModel() {
     delete [] weights;
     delete [] color_field;
     delete [] neighbours;
-    return;
 }
 //#####################################################
 //Assing an initial random configuration of spins to nodes
@@ -204,7 +201,7 @@ unsigned long PottsModel::initialize_lookup(double kT, double gamma) {
 // Note that Qmatrix and Qa are only counting! The normalization
 // by num_of_links is done later
 //####################################################################
-double PottsModel::initialize_Qmatrix(void) {
+double PottsModel::initialize_Qmatrix() {
     DLList_Iter<NLink*> l_iter;
     NLink *l_cur;
     unsigned int i, j;
@@ -280,7 +277,7 @@ double PottsModel::calculate_energy(double gamma) {
     while (!l_iter.End()) {
         if (l_cur->Get_Start()->Get_ClusterIndex() == l_cur->Get_End()->Get_ClusterIndex()) {
             e--;
-        };
+        }
         l_cur = l_iter.Next();
     }
     //and the penalty term contributes according to cluster sizes
@@ -334,7 +331,7 @@ long PottsModel::HeatBathParallelLookupZeroTemp(double gamma, double prob, unsig
     unsigned long changes;
     double h, delta = 0, deltaE, deltaEmin, w, degree;
     //HugeArray<double> neighbours;
-    bool cyclic = 0;
+    bool cyclic = false;
 
     sweep = 0;
     changes = 1;
@@ -582,7 +579,7 @@ long PottsModel::HeatBathParallelLookup(double gamma, double prob, double kT, un
     unsigned long changes, /*degree,*/ problemcount;
     //HugeArray<int> neighbours;
     double h, delta = 0, norm, r, beta, minweight, prefac = 0, w, degree;
-    bool cyclic = 0, found;
+    bool cyclic = false, found;
     unsigned long number_of_nodes;
 
     sweep = 0;
@@ -903,7 +900,7 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
     DLList_Iter<NLink*> l_iter;
     DLList<NNode*>* to_do;
     DLList<NNode*>* community;
-    NNode *start_node = 0, *n_cur, *neighbor, *max_aff_node, *node;
+    NNode *start_node = NULL, *n_cur, *neighbor, *max_aff_node, *node;
     NLink *l_cur;
     bool found = false, add = false, remove = false;
     double degree, delta_aff_add, delta_aff_rem, max_delta_aff, Ks = 0.0, Kr = 0, kis, kir, w;
@@ -1583,7 +1580,7 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 #ifdef DEBUG
     printf("Start assigning.\n");
 #endif
-    int s;
+    unsigned int s;
     DLList_Iter<NNode*> iter;
     DLList_Iter<NLink*> l_iter;
     NNode *n_cur;
@@ -1738,8 +1735,6 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
 #ifdef DEBUG
     printf("Done assigning.\n");
 #endif
-
-    return;
 }
 //##############################################################
 // This is the function generally used for optimisation,
@@ -1999,7 +1994,7 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
 
     //Find out what the new communities will be
     for (unsigned int i = 0; i < num_nodes; i++) {
-        int s = spin[i];
+        unsigned int s = spin[i];
         if (cluster_assign[s] == 0) {
             num_clusters++;
             cluster_assign[s] = num_clusters;
@@ -2058,8 +2053,8 @@ long PottsModelN::WriteClusters(igraph_real_t *modularity,
         IGRAPH_CHECK(igraph_matrix_resize(adhesion, q, q));
         IGRAPH_CHECK(igraph_matrix_resize(normalised_adhesion, q, q));
 
-        double **num_links_pos = 0;
-        double **num_links_neg = 0;
+        double **num_links_pos = NULL;
+        double **num_links_neg = NULL;
         //memory allocated for elements of rows.
         num_links_pos = new double *[q + 1] ;
         num_links_neg = new double *[q + 1] ;
