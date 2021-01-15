@@ -101,15 +101,18 @@ static int igraph_i_community_spinglass_negative(
  * The algorithm is described in their paper: Statistical Mechanics of
  * Community Detection, http://arxiv.org/abs/cond-mat/0603718 .
  *
- * </para><para> From version 0.6 igraph also supports an extension to
+ * </para><para>
+ * From version 0.6, igraph also supports an extension to
  * the algorithm that allows negative edge weights. This is described
- * in  V.A. Traag and Jeroen Bruggeman: Community detection in networks
+ * in  V. A. Traag and Jeroen Bruggeman: Community detection in networks
  * with positive and negative links, http://arxiv.org/abs/0811.2329 .
+ *
  * \param graph The input graph, it may be directed but the direction
- *     of the edge is not used in the algorithm.
+ *     of the edges is not used in the algorithm.
  * \param weights The vector giving the edge weights, it may be \c NULL,
- *     in which case all edges are weighted equally. Edge weights
- *     should be positive, altough this is not tested.
+ *     in which case all edges are weighted equally. The edge weights
+ *     must be positive unless using the \c IGRAPH_SPINCOMM_IMP_NEG
+ *     implementation. This condition is not verified by the function.
  * \param modularity Pointer to a real number, if not \c NULL then the
  *     modularity score of the solution will be stored here. This is the
  *     gereralized modularity that simplifies to the one defined in
@@ -120,38 +123,38 @@ static int igraph_i_community_spinglass_negative(
  *     here.
  * \param membership Pointer to an initialized vector or \c NULL. If
  *     not \c NULL then the result of the clustering will be stored
- *     here, for each vertex the number of its cluster is given, the
- *     first cluster is numbered zero. The vector will be resized as
+ *     here. For each vertex, the number of its cluster is given, with the
+ *     first cluster numbered zero. The vector will be resized as
  *     needed.
  * \param csize Pointer to an initialized vector or \c NULL. If not \c
  *     NULL then the sizes of the clusters will stored here in cluster
  *     number order. The vector will be resized as needed.
- * \param spins Integer giving the number of spins, ie. the maximum
+ * \param spins Integer giving the number of spins, i.e. the maximum
  *     number of clusters. Usually it is not a program to give a high
  *     number here, the default was 25 in the original code. Even if
  *     the number of spins is high the number of clusters in the
- *     result might small.
+ *     result might be small.
  * \param parupdate A logical constant, whether to update all spins in
- *     parallel. The default for this argument was \c FALSE (ie. 0) in
+ *     parallel. The default for this argument was \c FALSE (i.e. 0) in
  *     the original code. It is not implemented in the \c
  *     IGRAPH_SPINCOMM_INP_NEG implementation.
  * \param starttemp Real number, the temperature at the start. The
  *     value of this argument was 1.0 in the original code.
  * \param stoptemp Real number, the algorithm stops at this
  *     temperature. The default was 0.01 in the original code.
- * \param coolfact Real number, the coolinf factor for the simulated
+ * \param coolfact Real number, the cooling factor for the simulated
  *     annealing. The default was 0.99 in the original code.
  * \param update_rule The type of the update rule. Possible values: \c
  *     IGRAPH_SPINCOMM_UPDATE_SIMPLE and \c
- *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defined
+ *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defines
  *     the null model based on which the actual clustering is done. If
  *     this is \c IGRAPH_SPINCOMM_UPDATE_SIMPLE then the random graph
- *     (ie. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE then the
+ *     (i.e. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE then the
  *     configuration model is used. The configuration means that the
  *     baseline for the clustering is a random graph with the same
  *     degree distribution as the input graph.
  * \param gamma Real number. The gamma parameter of the
- *     algorithm. This defined the weight of the missing and existing
+ *     algorithm. This defines the weight of the missing and existing
  *     links in the quality function for the clustering. The default
  *     value in the original code was 1.0, which is equal weight to
  *     missing and existing edges. Smaller values make the existing
@@ -180,7 +183,6 @@ static int igraph_i_community_spinglass_negative(
  *
  * Time complexity: TODO.
  *
- * \example examples/simple/spinglass.c
  */
 
 int igraph_community_spinglass(const igraph_t *graph,

@@ -415,8 +415,7 @@ add_legacy_tests(
   igraph_community_leading_eigenvector
   igraph_community_leiden
   igraph_community_multilevel
-  igraph_community_optimal_modularity
-  spinglass
+  igraph_community_optimal_modularity  
   walktrap
 )
 
@@ -429,6 +428,7 @@ add_legacy_tests(
   igraph_community_leading_eigenvector2  
   igraph_modularity
   levc-stress
+  spinglass
 )
 
 # use a higher test timeout for the Infomap algorithm
