@@ -775,7 +775,7 @@ int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *re
  * https://infoscience.epfl.ch/record/200525
  *
  * </para><para>
- * S. Viga and P. Boldi, Axioms for Centrality, Internet Mathematics 10, (2014).
+ * S. Vigna and P. Boldi, Axioms for Centrality, Internet Mathematics 10, (2014).
  * https://doi.org/10.1080/15427951.2013.865686
  *
  * \param graph The graph object.
