@@ -133,5 +133,6 @@ int main() {
     igraph_vector_destroy(&membership);
     igraph_vector_destroy(&csize);
 
+    VERIFY_FINALLY_STACK();
     return 0;
 }
