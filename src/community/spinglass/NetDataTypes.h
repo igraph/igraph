@@ -420,7 +420,7 @@ struct network {
     DL_Indexed_List<NNode*> *node_list;
     DL_Indexed_List<NLink*> *link_list;
     DL_Indexed_List<ClusterList<NNode*>*> *cluster_list;
-    DL_Indexed_List<cluster_join_move*> *moveset;
+    // DL_Indexed_List<cluster_join_move*> *moveset;
     unsigned long max_k;
     unsigned long min_k;
     unsigned long diameter;
@@ -433,7 +433,34 @@ struct network {
     unsigned long max_bids;
     unsigned long min_bids;
     unsigned long sum_bids;
-} ;
+
+    network() {
+        node_list   = new DL_Indexed_List<NNode*>();
+        link_list   = new DL_Indexed_List<NLink*>();
+        cluster_list = new DL_Indexed_List<ClusterList<NNode*>*>();
+    }
+
+    ~network() {
+        ClusterList<NNode*> *cl_cur;
+
+        while (link_list->Size()) {
+            delete link_list->Pop();
+        }
+        while (node_list->Size()) {
+            delete node_list->Pop();
+        }
+        while (cluster_list->Size()) {
+            cl_cur = cluster_list->Pop();
+            while (cl_cur->Size()) {
+                cl_cur->Pop();
+            }
+            delete cl_cur;
+        }
+        delete link_list;
+        delete node_list;
+        delete cluster_list;
+    }
+};
 
 /*
 struct network
