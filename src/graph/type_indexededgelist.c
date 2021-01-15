@@ -1702,8 +1702,8 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
  * hence the need for this function.
  *
  * </para><para>
- * This function verifies that the two graphs have the same directnedness, the same
- * number of vertices, and that they contain precise the same edges (regardless of their ordering)
+ * This function verifies that the two graphs have the same directedness, the same
+ * number of vertices, and that they contain precisely the same edges (regardless of their ordering)
  * when written in terms of vertex indices. Graph attributes are not taken into account.
  *
  * </para><para>
@@ -1713,7 +1713,7 @@ int igraph_incident(const igraph_t *graph, igraph_vector_t *eids,
  * of vertices in an undirected edge. However, they are not the same as
  * <code>0-2, 1-2</code>, even though they are isomorphic to it.
  * Note that this latter graph contains the edge <code>0-2</code>
- * while the former two do not—thus their edge sets differ.
+ * while the former two do not — thus their edge sets differ.
  *
  * \param graph1 The first graph object.
  * \param graph2 The second graph object.
@@ -1744,7 +1744,7 @@ int igraph_is_same_graph(const igraph_t *graph1, const igraph_t *graph2, igraph_
         return IGRAPH_SUCCESS;
     }
 
-    /* Vertices have no names, so no they must be 0 to nv - 1 */
+    /* Vertices have no names, so they must be 0 to nv - 1 */
 
     /* Edges are double sorted in the current representations ii/oi of
      * igraph_t (ii: by incoming, then outgoing, oi: vice versa), so
