@@ -22,6 +22,7 @@
    * `IGRAPH_ASSERT()` is a replacement for the `assert()` macro. It is for internal use.
    * `igraph_fatal_handler_abort()` is the default fatal error handler.
  - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
+ - `igraph_is_same_graph()` cheks that two labelled graphs are the same (PR #1604).
 
 ### Changed
 
