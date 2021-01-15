@@ -253,8 +253,8 @@ static int igraph_i_community_spinglass_orig(
 
     /* Check arguments */
 
-    if (spins < 2 || spins > 500) {
-        IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
+    if (spins < 2) {
+        IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
     }
     if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
         update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
@@ -430,8 +430,8 @@ int igraph_community_spinglass_single(const igraph_t *graph,
 
         /* Check arguments */
 
-        if (spins < 2 || spins > 500) {
-            IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
+        if (spins < 2) {
+            IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
         }
         if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
             update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
@@ -518,8 +518,8 @@ static int igraph_i_community_spinglass_negative(
                      "negative gamma", IGRAPH_UNIMPLEMENTED);
     }
 
-    if (spins < 2 || spins > 500) {
-        IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
+    if (spins < 2) {
+        IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
     }
     if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
         update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {

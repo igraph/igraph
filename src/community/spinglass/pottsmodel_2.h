@@ -51,7 +51,19 @@
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 
-#define qmax 500
+// Simple matrix class with heap allocation, allowing mat[i][j] indexing.
+class SimpleMatrix {
+    double *data;
+    size_t n;
+
+public:
+    explicit SimpleMatrix(size_t n_) : n(n_) { data = new double[n*n]; }
+    ~SimpleMatrix() { delete [] data; }
+
+    // Return a pointer to the i'th column, which can be indexed into using a second [] operator.
+    // We assume column-major storage.
+    double *operator [] (size_t i) { return &(data[n*i]); }
+};
 
 class PottsModel {
 private:
@@ -64,7 +76,7 @@ private:
     unsigned int q;
     unsigned int operation_mode;
     // FILE *Qfile, *Magfile;
-    double Qmatrix[qmax + 1][qmax + 1];
+    SimpleMatrix Qmatrix;
     double* Qa;
     double* weights;
     double total_degree_sum;

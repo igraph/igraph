@@ -54,7 +54,8 @@
 using namespace std;
 
 //#################################################################################################
-PottsModel::PottsModel(network *n, unsigned int qvalue, int m) : acceptance(0) {
+PottsModel::PottsModel(network *n, unsigned int qvalue, int m) : Qmatrix(qvalue+1), acceptance(0)
+{
     DLList_Iter<NNode*> iter;
     NNode *n_cur;
     unsigned int *i_ptr;
@@ -195,7 +196,7 @@ unsigned long PottsModel::initialize_lookup(double kT, double gamma) {
     return 1;
 }
 //#####################################################################
-// Q denotes the modulary of the network
+// Q denotes the modularity of the network
 // This function calculates it initially
 // In the event of a spin changing its state, it only needs updating
 // Note that Qmatrix and Qa are only counting! The normalization
