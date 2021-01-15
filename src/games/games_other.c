@@ -1578,17 +1578,18 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  * \brief Generates a growing random graph.
  *
  * </para><para>
- * This function simulates a growing random graph. In each discrete
- * time step a new vertex is added and a number of new edges are also
- * added. These graphs are known to be different from standard (not
- * growing) random graphs.
+ * This function simulates a growing random graph. We start out with
+ * one vertex. In each step a new vertex is added and a number of new
+ * edges are also added. These graphs are known to be different
+ * from standard (not growing) random graphs.
  * \param graph Uninitialized graph object.
  * \param n The number of vertices in the graph.
  * \param m The number of edges to add in a time step (i.e. after
  *        adding a vertex).
  * \param directed Boolean, whether to generate a directed graph.
  * \param citation Boolean, if \c TRUE, the edges always
- *        originate from the most recently added vertex.
+ *        originate from the most recently added vertex and are
+ *        connected to a previous vertex.
  * \return Error code:
  *          \c IGRAPH_EINVAL: invalid
  *          \p n or \p m
@@ -1596,8 +1597,6 @@ int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
  *
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
- *
- * \example examples/simple/igraph_growing_random_game.c
  */
 int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
                                igraph_integer_t m, igraph_bool_t directed,
