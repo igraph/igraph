@@ -135,7 +135,6 @@ add_legacy_tests(
   igraph_erdos_renyi_game
   igraph_full
   igraph_grg_game
-  igraph_growing_random_game
   igraph_lcf
   igraph_preference_game
   igraph_ring
@@ -150,7 +149,8 @@ add_legacy_tests(
   erdos_renyi_game
   full
   igraph_correlated_game
-  igraph_from_prufer  
+  igraph_from_prufer
+  igraph_growing_random_game
   igraph_k_regular_game
   igraph_lattice
   igraph_realize_degree_sequence  
