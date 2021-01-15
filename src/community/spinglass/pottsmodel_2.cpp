@@ -1562,23 +1562,21 @@ PottsModelN::PottsModelN(network *n, unsigned int num_communities, bool directed
 //Destructor of PottsModel
 //########################################################
 PottsModelN::~PottsModelN() {
-    delete degree_pos_in;
-    delete degree_neg_in;
-    delete degree_pos_out;
-    delete degree_neg_out;
+    delete [] degree_pos_in;
+    delete [] degree_neg_in;
+    delete [] degree_pos_out;
+    delete [] degree_neg_out;
 
-    delete degree_community_pos_in;
-    delete degree_community_neg_in;
-    delete degree_community_pos_out;
-    delete degree_community_neg_out;
+    delete [] degree_community_pos_in;
+    delete [] degree_community_neg_in;
+    delete [] degree_community_pos_out;
+    delete [] degree_community_neg_out;
 
-    delete weights;
-    delete neighbours;
-    delete csize;
+    delete [] weights;
+    delete [] neighbours;
+    delete [] csize;
 
-    delete spin;
-
-    return;
+    delete [] spin;
 }
 
 void PottsModelN::assign_initial_conf(bool init_spins) {
@@ -1606,14 +1604,14 @@ void PottsModelN::assign_initial_conf(bool init_spins) {
     }
 
     if (is_init) {
-        delete degree_community_pos_in;
-        delete degree_community_neg_in;
-        delete degree_community_pos_out;
-        delete degree_community_neg_out;
+        delete [] degree_community_pos_in;
+        delete [] degree_community_neg_in;
+        delete [] degree_community_pos_out;
+        delete [] degree_community_neg_out;
 
-        delete weights;
-        delete neighbours;
-        delete csize;
+        delete [] weights;
+        delete [] neighbours;
+        delete [] csize;
     }
 
     is_init = true;
