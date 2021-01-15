@@ -68,6 +68,7 @@
  - `igraph_callaway_traits_game()` now checks its parameters.
  - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (#1598).
  - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
+ - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
  - Compatibility with the PGI compiler.
 
 ### Other
