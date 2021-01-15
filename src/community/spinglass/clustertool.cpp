@@ -689,8 +689,14 @@ static int igraph_i_community_spinglass_negative(
         }
         delete cl_cur;
     }
+    delete net->cluster_list;
+    delete net->link_list;
+    delete net->node_list;
 
     RNG_END();
+    
+    delete net;
+    delete pm;
 
     return 0;
 }
