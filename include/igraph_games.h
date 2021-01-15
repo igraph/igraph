@@ -55,7 +55,7 @@ DECLDIR int igraph_nonlinear_barabasi_game(igraph_t *graph, igraph_integer_t n,
         igraph_real_t zeroappeal,
         igraph_bool_t directed);
 DECLDIR int igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
-                                    igraph_integer_t n, igraph_real_t p,
+                                    igraph_integer_t n, igraph_real_t p_or_m,
                                     igraph_bool_t directed, igraph_bool_t loops);
 DECLDIR int igraph_erdos_renyi_game_gnp(igraph_t *graph, igraph_integer_t n, igraph_real_t p,
                                         igraph_bool_t directed, igraph_bool_t loops);
