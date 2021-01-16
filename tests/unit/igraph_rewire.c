@@ -1,8 +1,7 @@
 /* -*- mode: C -*-  */
 /*
    IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
+   Copyright (C) 2006-2021  The igraph development team <igraph@igraph.org>
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,19 +14,16 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <igraph.h>
 
+#include "operators/rewire_internal.h"
+
 #include "test_utilities.inc"
 
-int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist);
-
-static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjlist, const char* description) {
+static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjlist, igraph_bool_t allow_loops, const char* description) {
 
     igraph_t g;
     igraph_vector_t indegree_before, outdegree_before, indegree_after, outdegree_after;
@@ -39,7 +35,7 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, 0);
     igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, 0);
 
-    igraph_i_rewire(&g, 1000, IGRAPH_REWIRING_SIMPLE, use_adjlist);
+    igraph_i_rewire(&g, 1000, allow_loops ? IGRAPH_REWIRING_SIMPLE_LOOPS : IGRAPH_REWIRING_SIMPLE, use_adjlist);
 
     igraph_vector_init(&indegree_after, 0);
     igraph_vector_init(&outdegree_after, 0);
@@ -49,9 +45,10 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
     if ((!igraph_vector_all_e(&indegree_before, &indegree_after)) ||
         (!igraph_vector_all_e(&outdegree_before, &outdegree_after))) {
 
-        fprintf(stderr, "%s graph degrees changed\n", description);
-        exit(1);
+        printf("%s: graph degrees changed. Rewired graph is below.\n", description);
+        print_graph(&g);
 
+        abort();
     }
 
     igraph_destroy(&g);
@@ -63,13 +60,25 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
 }
 
 int main() {
+    igraph_rng_seed(igraph_rng_default(), 3925);
 
-    check_rewiring(IGRAPH_TREE_OUT, 0, "Directed, standard-method");
-    check_rewiring(IGRAPH_TREE_OUT, 1, "Directed, adjlist-method");
-    check_rewiring(IGRAPH_TREE_UNDIRECTED, 0, "Undirected, standard-method");
-    check_rewiring(IGRAPH_TREE_UNDIRECTED, 1, "Undirected, adjlist-method");
+    /* Short test for the top-level igraph_rewire() functions (instead of igraph_i_rewire()). */
+    {
+        igraph_t graph;
+        igraph_ring(&graph, 12, IGRAPH_UNDIRECTED, /* mutual= */ 0, /* circular= */ 1);
+        igraph_rewire(&graph, 50, IGRAPH_REWIRING_SIMPLE);
+        igraph_destroy(&graph);
+    }
+
+    check_rewiring(IGRAPH_TREE_OUT, 0, 0, "Directed, no loops, standard-method");
+    check_rewiring(IGRAPH_TREE_OUT, 1, 0, "Directed, no loops, adjlist-method");
+    check_rewiring(IGRAPH_TREE_OUT, 0, 1, "Directed, loops, standard-method");
+    check_rewiring(IGRAPH_TREE_OUT, 1, 1, "Directed, loops, adjlist-method");
+    check_rewiring(IGRAPH_TREE_UNDIRECTED, 0, 0, "Undirected, no loops, standard-method");
+    check_rewiring(IGRAPH_TREE_UNDIRECTED, 1, 0, "Undirected, no loops, adjlist-method");
+    check_rewiring(IGRAPH_TREE_UNDIRECTED, 0, 1, "Undirected, loops, standard-method");
+    check_rewiring(IGRAPH_TREE_UNDIRECTED, 1, 1, "Undirected, loops, adjlist-method");
 
     VERIFY_FINALLY_STACK();
-
     return 0;
 }
