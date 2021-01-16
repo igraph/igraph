@@ -22,6 +22,7 @@
    * `IGRAPH_ASSERT()` is a replacement for the `assert()` macro. It is for internal use.
    * `igraph_fatal_handler_abort()` is the default fatal error handler.
  - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
+ - `igraph_is_same_graph()` cheks that two labelled graphs are the same (PR #1604).
 
 ### Changed
 
@@ -65,6 +66,9 @@
  - Betweenness calculations are no longer at risk from integer overflow.
  - `igraph_layout_gem()` was not interruptible; now it is.
  - `igraph_callaway_traits_game()` now checks its parameters.
+ - `igraph_residual_graph()` now returns the correct _residual_ capacities; previously it wrongly returned the original capacities (#1598).
+ - Fixed crashes in several functions when passing a weighted graph with zero edges (due to `vector_min` being called on the zero-length weight vector).
+ - `igraph_communities_spinglass()`: fixed several memory leaks in the `IGRAPH_SPINCOMM_IMP_NEG` implementation.
  - Compatibility with the PGI compiler.
 
 ### Other

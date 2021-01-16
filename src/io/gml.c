@@ -222,7 +222,6 @@ int igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
     if (i >= 0 &&
         igraph_gml_tree_type(context.tree, i) == IGRAPH_I_GML_TREE_INTEGER &&
         igraph_gml_tree_get_integer(context.tree, i) != 1) {
-        igraph_gml_tree_destroy(context.tree);
         IGRAPH_ERROR("Unknown GML version", IGRAPH_UNIMPLEMENTED);
         /* RETURN HERE!!!! */
     }

@@ -65,6 +65,8 @@ int main(int argc, char* argv[]) {
     RUN_TEST("invalid1.gml");
     RUN_TEST("invalid2.gml");
     RUN_TEST("invalid3.gml");
+    RUN_TEST("invalid4.gml");
+    RUN_TEST("invalid5.gml");
 
     return 0;
 }

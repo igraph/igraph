@@ -51,7 +51,19 @@
 #include "igraph_vector.h"
 #include "igraph_matrix.h"
 
-#define qmax 500
+// Simple matrix class with heap allocation, allowing mat[i][j] indexing.
+class SimpleMatrix {
+    double *data;
+    size_t n;
+
+public:
+    explicit SimpleMatrix(size_t n_) : n(n_) { data = new double[n*n]; }
+    ~SimpleMatrix() { delete [] data; }
+
+    // Return a pointer to the i'th column, which can be indexed into using a second [] operator.
+    // We assume column-major storage.
+    double *operator [] (size_t i) { return &(data[n*i]); }
+};
 
 class PottsModel {
 private:
@@ -63,8 +75,8 @@ private:
     network *net;
     unsigned int q;
     unsigned int operation_mode;
-    FILE *Qfile, *Magfile;
-    double Qmatrix[qmax + 1][qmax + 1];
+    // FILE *Qfile, *Magfile;
+    SimpleMatrix Qmatrix;
     double* Qa;
     double* weights;
     double total_degree_sum;
@@ -80,8 +92,8 @@ public:
     double* color_field;
     unsigned long assign_initial_conf(int spin);
     unsigned long initialize_lookup(double kT, double gamma);
-    double initialize_Qmatrix(void);
-    double calculate_Q(void);
+    double initialize_Qmatrix();
+    double calculate_Q();
     double calculate_genQ(double gamma);
     double FindStartTemp(double gamma, double prob,  double ts);
     long   HeatBathParallelLookupZeroTemp(double gamma, double prob, unsigned int max_sweeps);
@@ -90,14 +102,14 @@ public:
     double HeatBathLookup(double gamma, double prob, double kT, unsigned int max_sweeps);
     double GammaSweep(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel = true, int repetitions = 1);
     double GammaSweepZeroTemp(double gamma_start, double gamma_stop, double prob, unsigned int steps, bool non_parallel = true, int repetitions = 1);
-    long   WriteCorrelationMatrix(char *filename);
+    // long   WriteCorrelationMatrix(char *filename);
     double calculate_energy(double gamma);
     long   WriteClusters(igraph_real_t *modularity,
                          igraph_real_t *temperature,
                          igraph_vector_t *csize, igraph_vector_t *membership,
                          double kT, double gamma);
-    long   WriteSoftClusters(char *filename, double threshold);
-    double Get_Energy(void) {
+    // long   WriteSoftClusters(char *filename, double threshold);
+    double Get_Energy() const {
         return energy;
     }
     double FindCommunityFromStart(double gamma, double prob, char *nodename,
@@ -113,8 +125,8 @@ class PottsModelN {
 private:
     //  HugeArray<double> neg_gammalookup;
     //  HugeArray<double> pos_gammalookup;
-    DL_Indexed_List<unsigned int*> *new_spins;
-    DL_Indexed_List<unsigned int*> *previous_spins;
+    // DL_Indexed_List<unsigned int*> *new_spins;
+    // DL_Indexed_List<unsigned int*> *previous_spins;
     HugeArray<HugeArray<double>*> correlation;
     network *net;
 
@@ -148,8 +160,8 @@ public:
     void assign_initial_conf(bool init_spins);
     double FindStartTemp(double gamma, double lambda, double ts);
     double HeatBathLookup(double gamma, double lambda, double t, unsigned int max_sweeps);
-    double HeatBathJoin(double gamma, double lambda);
-    double HeatBathLookupZeroTemp(double gamma, double lambda, unsigned int max_sweeps);
+    // double HeatBathJoin(double gamma, double lambda);
+    // double HeatBathLookupZeroTemp(double gamma, double lambda, unsigned int max_sweeps);
     long WriteClusters(igraph_real_t *modularity,
                        igraph_real_t *temperature,
                        igraph_vector_t *community_size,

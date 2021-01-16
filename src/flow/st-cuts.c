@@ -161,10 +161,10 @@ int igraph_i_residual_graph(const igraph_t *graph,
     }
 
     for (i = 0; i < no_of_edges; i++) {
-        if (VECTOR(*capacity)[i] - VECTOR(*flow)[i] > 0) {
+        igraph_real_t c = VECTOR(*capacity)[i] - VECTOR(*flow)[i];
+        if (c > 0) {
             long int from = IGRAPH_FROM(graph, i);
             long int to = IGRAPH_TO(graph, i);
-            igraph_real_t c = VECTOR(*capacity)[i];
             VECTOR(*tmp)[edgeptr++] = from;
             VECTOR(*tmp)[edgeptr++] = to;
             if (residual_capacity) {

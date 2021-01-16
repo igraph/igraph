@@ -62,7 +62,7 @@
 
 int igraph_gml_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, void *scanner);
 int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
-		       const char *s);
+                       const char *s);
 char *igraph_gml_yyget_text (yyscan_t yyscanner );
 int igraph_gml_yyget_leng (yyscan_t yyscanner );
 void igraph_i_gml_get_keyword(char *s, int len, void *res);
@@ -70,11 +70,11 @@ void igraph_i_gml_get_string(char *s, int len, void *res);
 double igraph_i_gml_get_real(char *s, int len);
 igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value);
 igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len, 
-					      char *v, int vlen);
+                                              char *v, int vlen);
 igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len, 
-					    char *value, int valuelen);
+                                            char *value, int valuelen);
 igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len, 
-					  igraph_gml_tree_t *list);
+                                          igraph_gml_tree_t *list);
 igraph_gml_tree_t *igraph_i_gml_merge(igraph_gml_tree_t *t1, igraph_gml_tree_t* t2);
 
 #define scanner context->scanner
@@ -129,7 +129,7 @@ list:   keyvalue      { $$=$1; }
 
 keyvalue:   key num
             { $$=igraph_i_gml_make_numeric($1.s, $1.len, $2); }
-	  | key string
+          | key string
             { $$=igraph_i_gml_make_string($1.s, $1.len, $2.s, $2.len); }
           | key LISTOPEN list LISTCLOSE
             { $$=igraph_i_gml_make_list($1.s, $1.len, $3); }
@@ -138,22 +138,22 @@ keyvalue:   key num
 ;
 
 key: KEYWORD { igraph_i_gml_get_keyword(igraph_gml_yyget_text(scanner), 
-					igraph_gml_yyget_leng(scanner), 
-					&$$); USE($1); };
+                                        igraph_gml_yyget_leng(scanner), 
+                                        &$$); USE($1); };
 num : NUM { $$=igraph_i_gml_get_real(igraph_gml_yyget_text(scanner), 
-				     igraph_gml_yyget_leng(scanner)); };
+                                     igraph_gml_yyget_leng(scanner)); };
 
 string: STRING { igraph_i_gml_get_string(igraph_gml_yyget_text(scanner), 
-					 igraph_gml_yyget_leng(scanner), 
-					 &$$); };
+                                         igraph_gml_yyget_leng(scanner), 
+                                         &$$); };
 
 %%
 
 int igraph_gml_yyerror(YYLTYPE* locp, igraph_i_gml_parsedata_t *context, 
-		       const char *s) {
+                       const char *s) {
   snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
-	   "Parse error in GML file, line %i (%s)", 
-	   locp->first_line, s);
+           "Parse error in GML file, line %i (%s)", 
+           locp->first_line, s);
   return 0;
 }
 
@@ -189,64 +189,105 @@ double igraph_i_gml_get_real(char *s, int len) {
 } 
 
 igraph_gml_tree_t *igraph_i_gml_make_numeric(char* s, int len, double value) {
-  igraph_gml_tree_t *t=igraph_Calloc(1, igraph_gml_tree_t);
+  igraph_gml_tree_t *t = igraph_Calloc(1, igraph_gml_tree_t);
+
   if (!t) { 
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     return 0;
   }
+
   if (floor(value)==value) {
-    igraph_gml_tree_init_integer(t, s, len, value);
+    if (igraph_gml_tree_init_integer(t, s, len, value)) {
+          free(t);
+          return 0;
+        }
   } else {
-    igraph_gml_tree_init_real(t, s, len, value);
+    if (igraph_gml_tree_init_real(t, s, len, value)) {
+      free(t);
+          return 0;
+        }
   }
   
   return t;
 }
 
 igraph_gml_tree_t *igraph_i_gml_make_numeric2(char* s, int len, 
-					      char *v, int vlen) {
-  igraph_gml_tree_t *t=igraph_Calloc(1, igraph_gml_tree_t);
-  char tmp=v[vlen];
-  igraph_real_t value=0;
+                                              char* v, int vlen) {
+  igraph_gml_tree_t *t = igraph_Calloc(1, igraph_gml_tree_t);
+  char tmp = v[vlen];
+
   if (!t) { 
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     return 0;
   }
+
   v[vlen]='\0';
+
+  /* if v == "inf" or v == "nan", the newly created tree node will take ownership
+   * of s. If the creation fails, we need to free s and v as well in order not
+   * to leak memory */
   if (strcasecmp(v, "inf")) {
-    value=IGRAPH_INFINITY;
+    if (igraph_gml_tree_init_real(t, s, len, IGRAPH_INFINITY)) {
+      free(t);
+      t = 0;
+    }
   } else if (strcasecmp(v, "nan")) {
-    value=IGRAPH_NAN;
+    if (igraph_gml_tree_init_real(t, s, len, IGRAPH_NAN)) {
+      free(t);
+      t = 0;
+    }
   } else {
     igraph_error("Parse error", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_PARSEERROR);
+    free(t);
+    t = 0;
   }
+
   v[vlen]=tmp;
-  igraph_gml_tree_init_real(t, s, len, value);  
+  free(v);
+
+  if (t == 0) {
+    /* no new tree node was created so s has no owner any more */
+    free(s);
+  }
 
   return t;
 }
 
 igraph_gml_tree_t *igraph_i_gml_make_string(char* s, int len, 
-					    char *value, int valuelen) {
-  igraph_gml_tree_t *t=igraph_Calloc(1, igraph_gml_tree_t);
+                                            char *value, int valuelen) {
+  igraph_gml_tree_t *t = igraph_Calloc(1, igraph_gml_tree_t);
+
   if (!t) { 
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     return 0;
   }
-  igraph_gml_tree_init_string(t, s, len, value, valuelen);
+
+  /* if igraph_gml_tree_init_string succeeds, the newly created tree node takes
+   * ownership of 'value'. If it fails, we need to free 'value' ourselves in order
+   * not to leak memory */
+  if (igraph_gml_tree_init_string(t, s, len, value, valuelen)) {
+    free(t);
+    free(value);
+    t = 0;
+  }
 
   return t;
 }
 
 igraph_gml_tree_t *igraph_i_gml_make_list(char* s, int len, 
-					  igraph_gml_tree_t *list) {
+                                          igraph_gml_tree_t *list) {
   
   igraph_gml_tree_t *t=igraph_Calloc(1, igraph_gml_tree_t);
+
   if (!t) { 
     igraph_error("Cannot build GML tree", IGRAPH_FILE_BASENAME, __LINE__, IGRAPH_ENOMEM);
     return 0;
   }
-  igraph_gml_tree_init_tree(t, s, len, list);
+
+  if (igraph_gml_tree_init_tree(t, s, len, list)) {
+    free(t);
+    return 0;
+  }
 
   return t;
 }

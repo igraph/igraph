@@ -1,48 +1,43 @@
-/* -*- mode: C -*-  */
-/*
-   IGraph library.
-   Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
-   334 Harvard st, Cambridge MA, 02139 USA
-
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
-   (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
-
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
-   02110-1301 USA
-
-*/
 #include <igraph.h>
-#include <stdio.h>
 
-int main(int argc, char **argv) {
+int main() {
 
-    /* igraph_t g; */
-    /* igraph_error_handler_t *oldhandler; */
-    /* FILE *ofile; */
-    /* int ret; */
+    igraph_t g;
+    igraph_strvector_t names, weights;
+    int i;
+    char str[2] = " ";
+    igraph_i_set_attribute_table(&igraph_cattribute_table);
+    igraph_small(&g, 7, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 2, 4, 3, 4, -1);
 
-    /* This is not used right now, as we don't have attributes */
 
-    /* Testing error handling */
-    /*   igraph_barabasi_game(&g, 10, 1, 0, 0, IGRAPH_DIRECTED); */
-    /*   oldhandler=igraph_set_error_handler(igraph_error_handler_ignore); */
-    /*   ofile=fopen("test.txt", "w"); */
-    /*   ret=igraph_write_graph_lgl(&g, ofile, "names", "weights", 1); */
-    /*   if (ret != IGRAPH_EINVAL) { */
-    /*     return 1; */
-    /*   } */
-    /*   fclose(ofile); */
-    /*   igraph_destroy(&g); */
-    /*   igraph_set_error_handler(oldhandler); */
+    printf("Output without isolates:\n");
+    igraph_write_graph_lgl(&g, stdout, /*names*/ NULL, /*weights*/ NULL, /*isolates*/ 0);
+
+
+    printf("\nOutput with isolates:\n");
+    igraph_write_graph_lgl(&g, stdout, /*names*/ NULL, /*weights*/ NULL, /*isolates*/ 1);
+
+
+    printf("\nOutput vertex and edge labels:\n");
+    igraph_strvector_init(&names, 7);
+    for (i = 0; i < 7; i++) {
+        str[0] = 'A' + i;
+        igraph_strvector_set(&names, i, str);
+    }
+    SETVASV(&g, "names", &names);
+
+    igraph_strvector_init(&weights, 6);
+    for (i = 0; i < 6; i++) {
+        str[0] = '3' + i;
+        igraph_strvector_set(&weights, i, str);
+    }
+    SETEASV(&g, "weights", &weights);
+
+    igraph_write_graph_lgl(&g, stdout, "names", "weights", /*isolates*/ 0);
+
+    igraph_strvector_destroy(&names);
+    igraph_strvector_destroy(&weights);
+    igraph_destroy(&g);
 
     return 0;
 }

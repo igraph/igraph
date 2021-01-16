@@ -101,15 +101,18 @@ static int igraph_i_community_spinglass_negative(
  * The algorithm is described in their paper: Statistical Mechanics of
  * Community Detection, http://arxiv.org/abs/cond-mat/0603718 .
  *
- * </para><para> From version 0.6 igraph also supports an extension to
+ * </para><para>
+ * From version 0.6, igraph also supports an extension to
  * the algorithm that allows negative edge weights. This is described
- * in  V.A. Traag and Jeroen Bruggeman: Community detection in networks
+ * in  V. A. Traag and Jeroen Bruggeman: Community detection in networks
  * with positive and negative links, http://arxiv.org/abs/0811.2329 .
+ *
  * \param graph The input graph, it may be directed but the direction
- *     of the edge is not used in the algorithm.
+ *     of the edges is not used in the algorithm.
  * \param weights The vector giving the edge weights, it may be \c NULL,
- *     in which case all edges are weighted equally. Edge weights
- *     should be positive, altough this is not tested.
+ *     in which case all edges are weighted equally. The edge weights
+ *     must be positive unless using the \c IGRAPH_SPINCOMM_IMP_NEG
+ *     implementation. This condition is not verified by the function.
  * \param modularity Pointer to a real number, if not \c NULL then the
  *     modularity score of the solution will be stored here. This is the
  *     gereralized modularity that simplifies to the one defined in
@@ -120,38 +123,38 @@ static int igraph_i_community_spinglass_negative(
  *     here.
  * \param membership Pointer to an initialized vector or \c NULL. If
  *     not \c NULL then the result of the clustering will be stored
- *     here, for each vertex the number of its cluster is given, the
- *     first cluster is numbered zero. The vector will be resized as
+ *     here. For each vertex, the number of its cluster is given, with the
+ *     first cluster numbered zero. The vector will be resized as
  *     needed.
  * \param csize Pointer to an initialized vector or \c NULL. If not \c
  *     NULL then the sizes of the clusters will stored here in cluster
  *     number order. The vector will be resized as needed.
- * \param spins Integer giving the number of spins, ie. the maximum
+ * \param spins Integer giving the number of spins, i.e. the maximum
  *     number of clusters. Usually it is not a program to give a high
  *     number here, the default was 25 in the original code. Even if
  *     the number of spins is high the number of clusters in the
- *     result might small.
+ *     result might be small.
  * \param parupdate A logical constant, whether to update all spins in
- *     parallel. The default for this argument was \c FALSE (ie. 0) in
+ *     parallel. The default for this argument was \c FALSE (i.e. 0) in
  *     the original code. It is not implemented in the \c
  *     IGRAPH_SPINCOMM_INP_NEG implementation.
  * \param starttemp Real number, the temperature at the start. The
  *     value of this argument was 1.0 in the original code.
  * \param stoptemp Real number, the algorithm stops at this
  *     temperature. The default was 0.01 in the original code.
- * \param coolfact Real number, the coolinf factor for the simulated
+ * \param coolfact Real number, the cooling factor for the simulated
  *     annealing. The default was 0.99 in the original code.
  * \param update_rule The type of the update rule. Possible values: \c
  *     IGRAPH_SPINCOMM_UPDATE_SIMPLE and \c
- *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defined
+ *     IGRAPH_SPINCOMM_UPDATE_CONFIG. Basically this parameter defines
  *     the null model based on which the actual clustering is done. If
  *     this is \c IGRAPH_SPINCOMM_UPDATE_SIMPLE then the random graph
- *     (ie. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE then the
+ *     (i.e. G(n,p)), if it is \c IGRAPH_SPINCOMM_UPDATE then the
  *     configuration model is used. The configuration means that the
  *     baseline for the clustering is a random graph with the same
  *     degree distribution as the input graph.
  * \param gamma Real number. The gamma parameter of the
- *     algorithm. This defined the weight of the missing and existing
+ *     algorithm. This defines the weight of the missing and existing
  *     links in the quality function for the clustering. The default
  *     value in the original code was 1.0, which is equal weight to
  *     missing and existing edges. Smaller values make the existing
@@ -180,7 +183,6 @@ static int igraph_i_community_spinglass_negative(
  *
  * Time complexity: TODO.
  *
- * \example examples/simple/spinglass.c
  */
 
 int igraph_community_spinglass(const igraph_t *graph,
@@ -248,14 +250,11 @@ static int igraph_i_community_spinglass_orig(
     igraph_bool_t use_weights = 0;
     bool zeroT;
     double kT, acc, prob;
-    ClusterList<NNode*> *cl_cur;
-    network *net;
-    PottsModel *pm;
 
     /* Check arguments */
 
-    if (spins < 2 || spins > 500) {
-        IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
+    if (spins < 2) {
+        IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
     }
     if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
         update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
@@ -285,19 +284,16 @@ static int igraph_i_community_spinglass_orig(
         IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
     }
 
-    net = new network;
-    net->node_list   = new DL_Indexed_List<NNode*>();
-    net->link_list   = new DL_Indexed_List<NLink*>();
-    net->cluster_list = new DL_Indexed_List<ClusterList<NNode*>*>();
+    network net;
 
     /* Transform the igraph_t */
     IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                       net, use_weights, 0));
+                                       &net, use_weights, 0));
 
-    prob = 2.0 * net->sum_weights / double(net->node_list->Size())
-           / double(net->node_list->Size() - 1);
+    prob = 2.0 * net.sum_weights / double(net.node_list->Size())
+           / double(net.node_list->Size() - 1);
 
-    pm = new PottsModel(net, (unsigned int)spins, update_rule);
+    PottsModel pm(&net, (unsigned int)spins, update_rule);
 
     /* initialize the random number generator */
     RNG_BEGIN();
@@ -308,26 +304,26 @@ static int igraph_i_community_spinglass_orig(
         zeroT = false;
     }
     if (!zeroT) {
-        kT = pm->FindStartTemp(gamma, prob, starttemp);
+        kT = pm.FindStartTemp(gamma, prob, starttemp);
     } else {
         kT = stoptemp;
     }
     /* assign random initial configuration */
-    pm->assign_initial_conf(-1);
+    pm.assign_initial_conf(-1);
     runs = 0;
     changes = 1;
 
     while (changes > 0 && (kT / stoptemp > 1.0 || (zeroT && runs < 150))) {
 
-        IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
+        IGRAPH_ALLOW_INTERRUPTION();
 
         runs++;
         if (!zeroT) {
             kT *= coolfact;
             if (parupdate) {
-                changes = pm->HeatBathParallelLookup(gamma, prob, kT, 50);
+                changes = pm.HeatBathParallelLookup(gamma, prob, kT, 50);
             } else {
-                acc = pm->HeatBathLookup(gamma, prob, kT, 50);
+                acc = pm.HeatBathLookup(gamma, prob, kT, 50);
                 if (acc < (1.0 - 1.0 / double(spins)) * 0.01) {
                     changes = 0;
                 } else {
@@ -336,9 +332,9 @@ static int igraph_i_community_spinglass_orig(
             }
         } else {
             if (parupdate) {
-                changes = pm->HeatBathParallelLookupZeroTemp(gamma, prob, 50);
+                changes = pm.HeatBathParallelLookupZeroTemp(gamma, prob, 50);
             } else {
-                acc = pm->HeatBathLookupZeroTemp(gamma, prob, 50);
+                acc = pm.HeatBathLookupZeroTemp(gamma, prob, 50);
                 /* less than 1 percent acceptance ratio */
                 if (acc < (1.0 - 1.0 / double(spins)) * 0.01) {
                     changes = 0;
@@ -349,29 +345,9 @@ static int igraph_i_community_spinglass_orig(
         }
     } /* while loop */
 
-    pm->WriteClusters(modularity, temperature, csize, membership, kT, gamma);
-
-    while (net->link_list->Size()) {
-        delete net->link_list->Pop();
-    }
-    while (net->node_list->Size()) {
-        delete net->node_list->Pop();
-    }
-    while (net->cluster_list->Size()) {
-        cl_cur = net->cluster_list->Pop();
-        while (cl_cur->Size()) {
-            cl_cur->Pop();
-        }
-        delete cl_cur;
-    }
-    delete net->link_list;
-    delete net->node_list;
-    delete net->cluster_list;
+    pm.WriteClusters(modularity, temperature, csize, membership, kT, gamma);
 
     RNG_END();
-
-    delete net;
-    delete pm;
 
     return 0;
 }
@@ -450,15 +426,12 @@ int igraph_community_spinglass_single(const igraph_t *graph,
     IGRAPH_HANDLE_EXCEPTIONS(
         igraph_bool_t use_weights = 0;
         double prob;
-        ClusterList<NNode*> *cl_cur;
-        network *net;
-        PottsModel *pm;
         char startnode[255];
 
         /* Check arguments */
 
-        if (spins < 2 || spins > 500) {
-            IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
+        if (spins < 2) {
+            IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
         }
         if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
             update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
@@ -484,19 +457,16 @@ int igraph_community_spinglass_single(const igraph_t *graph,
             IGRAPH_ERROR("Cannot work with unconnected graph", IGRAPH_EINVAL);
         }
 
-        net = new network;
-        net->node_list   = new DL_Indexed_List<NNode*>();
-        net->link_list   = new DL_Indexed_List<NLink*>();
-        net->cluster_list = new DL_Indexed_List<ClusterList<NNode*>*>();
+        network net;
 
         /* Transform the igraph_t */
         IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                           net, use_weights, 0));
+                                           &net, use_weights, 0));
 
-        prob = 2.0 * net->sum_weights / double(net->node_list->Size())
-               / double(net->node_list->Size() - 1);
+        prob = 2.0 * net.sum_weights / double(net.node_list->Size())
+               / double(net.node_list->Size() - 1);
 
-        pm = new PottsModel(net, (unsigned int)spins, update_rule);
+        PottsModel pm(&net, (unsigned int)spins, update_rule);
 
         /* initialize the random number generator */
         RNG_BEGIN();
@@ -504,32 +474,12 @@ int igraph_community_spinglass_single(const igraph_t *graph,
         /* to be exected, if we want to find the community around a particular node*/
         /* the initial conf is needed, because otherwise,
            the degree of the nodes is not in the weight property, stupid!!! */
-        pm->assign_initial_conf(-1);
+        pm.assign_initial_conf(-1);
         snprintf(startnode, 255, "%li", (long int)vertex + 1);
-        pm->FindCommunityFromStart(gamma, prob, startnode, community,
+        pm.FindCommunityFromStart(gamma, prob, startnode, community,
                                    cohesion, adhesion, inner_links, outer_links);
 
-        while (net->link_list->Size()) {
-            delete net->link_list->Pop();
-        }
-        while (net->node_list->Size()) {
-            delete net->node_list->Pop();
-        }
-        while (net->cluster_list->Size()) {
-            cl_cur = net->cluster_list->Pop();
-            while (cl_cur->Size()) {
-                cl_cur->Pop();
-            }
-            delete cl_cur;
-        }
-        delete net->link_list;
-        delete net->node_list;
-        delete net->cluster_list;
-
         RNG_END();
-
-        delete net;
-        delete pm;
     );
 
     return 0;
@@ -558,9 +508,6 @@ static int igraph_i_community_spinglass_negative(
     igraph_bool_t use_weights = 0;
     bool zeroT;
     double kT, acc;
-    ClusterList<NNode*> *cl_cur;
-    network *net;
-    PottsModelN *pm;
     igraph_real_t d_n;
     igraph_real_t d_p;
 
@@ -571,8 +518,8 @@ static int igraph_i_community_spinglass_negative(
                      "negative gamma", IGRAPH_UNIMPLEMENTED);
     }
 
-    if (spins < 2 || spins > 500) {
-        IGRAPH_ERROR("Invalid number of spins", IGRAPH_EINVAL);
+    if (spins < 2) {
+        IGRAPH_ERROR("Number of spins must be at least 2", IGRAPH_EINVAL);
     }
     if (update_rule != IGRAPH_SPINCOMM_UPDATE_SIMPLE &&
         update_rule != IGRAPH_SPINCOMM_UPDATE_CONFIG) {
@@ -616,18 +563,15 @@ static int igraph_i_community_spinglass_negative(
     }
     d_n = -d_n;
 
-    net = new network;
-    net->node_list   = new DL_Indexed_List<NNode*>();
-    net->link_list   = new DL_Indexed_List<NLink*>();
-    net->cluster_list = new DL_Indexed_List<ClusterList<NNode*>*>();
+    network net;
 
     /* Transform the igraph_t */
     IGRAPH_CHECK(igraph_i_read_network(graph, weights,
-                                       net, use_weights, 0));
+                                       &net, use_weights, 0));
 
     bool directed = igraph_is_directed(graph);
 
-    pm = new PottsModelN(net, (unsigned int)spins, directed);
+    PottsModelN pm(&net, (unsigned int)spins, directed);
 
     /* initialize the random number generator */
     RNG_BEGIN();
@@ -639,21 +583,21 @@ static int igraph_i_community_spinglass_negative(
     }
 
     //Begin at a high enough temperature
-    kT = pm->FindStartTemp(gamma, gamma_minus, starttemp);
+    kT = pm.FindStartTemp(gamma, gamma_minus, starttemp);
 
     /* assign random initial configuration */
-    pm->assign_initial_conf(true);
+    pm.assign_initial_conf(true);
 
     runs = 0;
     changes = 1;
     acc = 0;
     while (changes > 0 && (kT / stoptemp > 1.0 || (zeroT && runs < 150))) {
 
-        IGRAPH_ALLOW_INTERRUPTION(); /* This is not clean.... */
+        IGRAPH_ALLOW_INTERRUPTION();
 
         runs++;
         kT = kT * coolfact;
-        acc = pm->HeatBathLookup(gamma, gamma_minus, kT, 50);
+        acc = pm.HeatBathLookup(gamma, gamma_minus, kT, 50);
         if (acc < (1.0 - 1.0 / double(spins)) * 0.001) {
             changes = 0;
         } else {
@@ -667,26 +611,12 @@ static int igraph_i_community_spinglass_negative(
     igraph_real_t polarization;
     IGRAPH_MATRIX_INIT_FINALLY(&adhesion, 0, 0);
     IGRAPH_MATRIX_INIT_FINALLY(&normalized_adhesion, 0, 0);
-    pm->WriteClusters(modularity, temperature, csize, membership,
+    pm.WriteClusters(modularity, temperature, csize, membership,
                       &adhesion, &normalized_adhesion, &polarization,
                       kT, d_p, d_n, gamma, gamma_minus);
     igraph_matrix_destroy(&normalized_adhesion);
     igraph_matrix_destroy(&adhesion);
     IGRAPH_FINALLY_CLEAN(2);
-
-    while (net->link_list->Size()) {
-        delete net->link_list->Pop();
-    }
-    while (net->node_list->Size()) {
-        delete net->node_list->Pop();
-    }
-    while (net->cluster_list->Size()) {
-        cl_cur = net->cluster_list->Pop();
-        while (cl_cur->Size()) {
-            cl_cur->Pop();
-        }
-        delete cl_cur;
-    }
 
     RNG_END();
 

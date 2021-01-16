@@ -180,7 +180,7 @@ add_library(
   layout/reingold_tilford.c
   layout/sugiyama.c
 
-  # TODO: each operator should be in a separate file, they are complex enough as they are
+  operators/add_edge.c
   operators/complementer.c
   operators/compose.c
   operators/connect_neighborhood.c
@@ -207,9 +207,17 @@ add_library(
   paths/simple_paths.c
   paths/unweighted.c
 
+  properties/basic.c
+  properties/constraint.c
+  properties/convergence_degree.c
+  properties/dag.c
   properties/degrees.c
-  properties/properties_other.c
+  properties/girth.c
+  properties/loops.c
+  properties/multiplicity.c
+  properties/neighborhood.c
   properties/spectral.c
+  properties/trees.c
   properties/triangles.c
 
   scg/scg_approximate_methods.c

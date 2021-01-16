@@ -360,7 +360,7 @@ Get a newer version at http://docbook.sourceforge.net/projects/xsl/
 
   <xsl:template match="example">
     <xsl:variable name="id" select="@id"/>
-    <div class="hideshow" onClick="toggle(this)">
+    <div class="hideshow" onClick="toggle(this, event)">
       <xsl:apply-imports />
     </div>
   </xsl:template>

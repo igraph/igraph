@@ -103,6 +103,11 @@ add_legacy_tests(
   igraph_neighbors
 )
 
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_is_same_graph
+)
+
 # iterators.at
 add_legacy_tests(
   FOLDER examples/simple NAMES
@@ -130,7 +135,6 @@ add_legacy_tests(
   igraph_erdos_renyi_game
   igraph_full
   igraph_grg_game
-  igraph_growing_random_game
   igraph_lcf
   igraph_preference_game
   igraph_ring
@@ -142,12 +146,14 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  erdos_renyi_game
   full
   igraph_correlated_game
-  igraph_from_prufer  
+  igraph_from_prufer
+  igraph_growing_random_game
   igraph_k_regular_game
   igraph_lattice
-  igraph_realize_degree_sequence
+  igraph_realize_degree_sequence  
   tree
   ring
   watts_strogatz_game
@@ -205,6 +211,7 @@ add_legacy_tests(
   igraph_local_transitivity  
   igraph_transitive_closure_dag
   harmonic_centrality
+  random_spanning_tree
   single_target_shortest_path
   topological_sorting
 )
@@ -317,6 +324,7 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_write_graph_leda
+  igraph_write_graph_dimacs
   lineendings
   pajek
   pajek2
@@ -374,6 +382,19 @@ add_legacy_tests(
   igraph_all_st_mincuts
   igraph_mincut
 )
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_st_mincut_value
+  igraph_vertex_disjoint_paths
+  igraph_adhesion
+  igraph_cohesion
+  igraph_residual_graph
+  igraph_edge_disjoint_paths
+  igraph_st_edge_connectivity
+  igraph_st_mincut
+)
+
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER tests/unit NAMES
@@ -396,8 +417,7 @@ add_legacy_tests(
   igraph_community_leading_eigenvector
   igraph_community_leiden
   igraph_community_multilevel
-  igraph_community_optimal_modularity
-  spinglass
+  igraph_community_optimal_modularity  
   walktrap
 )
 
@@ -410,6 +430,7 @@ add_legacy_tests(
   igraph_community_leading_eigenvector2  
   igraph_modularity
   levc-stress
+  spinglass
 )
 
 # use a higher test timeout for the Infomap algorithm

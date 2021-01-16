@@ -206,5 +206,7 @@ int main() {
 
     /* TODO: igraph_spmatrix_add_col_values */
 
+	VERIFY_FINALLY_STACK();
+
     return 0;
 }

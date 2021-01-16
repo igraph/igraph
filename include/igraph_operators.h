@@ -37,6 +37,7 @@ __BEGIN_DECLS
 /* Graph operators                                    */
 /* -------------------------------------------------- */
 
+DECLDIR int igraph_add_edge(igraph_t *graph, igraph_integer_t from, igraph_integer_t to);
 DECLDIR int igraph_disjoint_union(igraph_t *res,
                                   const igraph_t *left, const igraph_t *right);
 DECLDIR int igraph_disjoint_union_many(igraph_t *res,

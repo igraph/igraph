@@ -25,6 +25,8 @@
 
 #include <igraph.h>
 
+#include "test_utilities.inc"
+
 typedef struct {
     int n, m;
     igraph_bool_t directed, mutual, circular;
@@ -169,6 +171,8 @@ int main() {
         }
         i++;
     }
+
+	VERIFY_FINALLY_STACK();
 
     return 0;
 }
