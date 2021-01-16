@@ -23,6 +23,13 @@
    * `igraph_fatal_handler_abort()` is the default fatal error handler.
  - `igraph_average_path_length_dijkstra()` computes the mean shortest path length in weighted graphs (PR #1344).
  - `igraph_is_same_graph()` cheks that two labelled graphs are the same (PR #1604).
+ - Harmonic centrality (PR #1583):
+   * `igraph_harmonic_centrality()` computes the harmonic centrality of vertices.
+   * `igraph_harmonic_centrality_cutoff()` computes the range-limited harmonic centrality.
+ - Range-limited centralities, currently equivalent to the old functions with names ending in `_estimate` (PR #1583):
+   * `igraph_closeness_cutoff()`.
+   * `igraph_betweenness_cutoff()`.
+   * `igraph_edge_betweenness_cutoff()`.
 
 ### Changed
 
@@ -51,6 +58,8 @@
 ### Deprecated
 
  - `igraph_is_degree_sequence()` and `igraph_is_graphical_degree_sequence()` are deprecated in favour of the newly added `igraph_is_graphical()`.
+ - `igraph_closeness_estimate()` is deprecated in favour of the newly added `igraph_closeness_cutoff()`.
+ - `igraph_betweenness_estimate()` and `igraph_edge_betweenness_estimate()` are deprecated in favour of the newly added `igraph_betweenness_cutoff()` and `igraph_edge_betweenness_cutoff()`.
 
 ### Removed
 

@@ -210,6 +210,7 @@ add_legacy_tests(
   igraph_is_tree
   igraph_local_transitivity  
   igraph_transitive_closure_dag
+  harmonic_centrality
   random_spanning_tree
   single_target_shortest_path
   topological_sorting

@@ -99,7 +99,10 @@ add_library(
   games/games_other.c
   games/sbm.c
 
+  centrality/betweenness.c
   centrality/centrality_other.c
+  centrality/centralization.c
+  centrality/closeness.c
   centrality/coreness.c
   centrality/prpack.cpp
 

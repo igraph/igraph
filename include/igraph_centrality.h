@@ -40,25 +40,34 @@ __BEGIN_DECLS
 DECLDIR int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
                              const igraph_vs_t vids, igraph_neimode_t mode,
                              const igraph_vector_t *weights, igraph_bool_t normalized);
-DECLDIR int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
-                                      const igraph_vs_t vids, igraph_neimode_t mode,
-                                      igraph_real_t cutoff,
-                                      const igraph_vector_t *weights,
-                                      igraph_bool_t normalized);
+DECLDIR int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+                                    const igraph_vs_t vids, igraph_neimode_t mode,
+                                    const igraph_vector_t *weights,
+                                    igraph_bool_t normalized,
+                                    igraph_real_t cutoff);
+
+DECLDIR int igraph_harmonic_centrality(const igraph_t *graph, igraph_vector_t *res,
+                                       const igraph_vs_t vids, igraph_neimode_t mode,
+                                       const igraph_vector_t *weights,
+                                       igraph_bool_t normalized);
+DECLDIR int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,
+                                              const igraph_vs_t vids, igraph_neimode_t mode,
+                                              const igraph_vector_t *weights,
+                                              igraph_bool_t normalized,
+                                              igraph_real_t cutoff);
 
 DECLDIR int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
                                const igraph_vs_t vids, igraph_bool_t directed,
                                const igraph_vector_t *weights);
-DECLDIR int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
-                                        const igraph_vs_t vids, igraph_bool_t directed,
-                                        igraph_real_t cutoff,
-                                        const igraph_vector_t *weights);
+DECLDIR int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+                                      const igraph_vs_t vids, igraph_bool_t directed,
+                                      const igraph_vector_t *weights, igraph_real_t cutoff);
 DECLDIR int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                                     igraph_bool_t directed,
                                     const igraph_vector_t *weigths);
-DECLDIR int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
-        igraph_bool_t directed, igraph_real_t cutoff,
-        const igraph_vector_t *weights);
+DECLDIR int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
+                                           igraph_bool_t directed,
+                                           const igraph_vector_t *weights, igraph_real_t cutoff);
 
 /**
  * \typedef igraph_pagerank_algo_t
@@ -170,6 +179,19 @@ DECLDIR int igraph_centralization_eigenvector_centrality_tmax(
     igraph_bool_t directed,
     igraph_bool_t scale,
     igraph_real_t *res);
+
+
+/* Deprecated functions: */
+
+DECLDIR int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
+                                      const igraph_vs_t vids, igraph_neimode_t mode,
+                                      igraph_real_t cutoff,
+                                      const igraph_vector_t *weights,
+                                      igraph_bool_t normalized);
+
+DECLDIR int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
+                                        const igraph_vs_t vids, igraph_bool_t directed,
+                                        igraph_real_t cutoff, const igraph_vector_t *weights);
 
 __END_DECLS
 

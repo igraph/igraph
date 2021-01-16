@@ -508,7 +508,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
             /* Unweighted variant follows */
 
             /* The following for loop is copied almost intact from
-             * igraph_edge_betweenness_estimate */
+             * igraph_edge_betweenness_cutoff */
             for (source = 0; source < no_of_nodes; source++) {
 
                 IGRAPH_ALLOW_INTERRUPTION();
@@ -576,7 +576,7 @@ int igraph_community_edge_betweenness(const igraph_t *graph,
             /* Weighted variant follows */
 
             /* The following for loop is copied almost intact from
-             * igraph_i_edge_betweenness_estimate_weighted */
+             * igraph_i_edge_betweenness_cutoff_weighted */
             for (source = 0; source < no_of_nodes; source++) {
                 /* This will contain the edge betweenness in the current step */
                 IGRAPH_ALLOW_INTERRUPTION();

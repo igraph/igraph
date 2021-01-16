@@ -84,6 +84,7 @@
 
 <section id="centrality-measures"><title>Centrality Measures</title>
 <!-- doxrox-include igraph_closeness -->
+<!-- doxrox-include igraph_harmonic_centrality -->
 <!-- doxrox-include igraph_betweenness -->
 <!-- doxrox-include igraph_edge_betweenness -->
 <!-- doxrox-include igraph_pagerank_algo_t -->
@@ -98,10 +99,11 @@
 <!-- doxrox-include igraph_authority_score -->
 </section>
 
-<section id="estimating-centrality-measures"><title>Estimating Centrality Measures</title>
-<!-- doxrox-include igraph_closeness_estimate -->
-<!-- doxrox-include igraph_betweenness_estimate -->
-<!-- doxrox-include igraph_edge_betweenness_estimate -->
+<section id="range-limited-centrality-measures"><title>Range-limited Centrality Measures</title>
+<!-- doxrox-include igraph_closeness_cutoff -->
+<!-- doxrox-include igraph_harmonic_centrality_cutoff -->
+<!-- doxrox-include igraph_betweenness_cutoff -->
+<!-- doxrox-include igraph_edge_betweenness_cutoff -->
 </section>
 
 <section id="centralization"><title>Centralization</title>
