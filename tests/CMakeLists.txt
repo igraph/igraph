@@ -150,6 +150,7 @@ add_legacy_tests(
   full
   igraph_correlated_game
   igraph_from_prufer
+  igraph_full_citation
   igraph_growing_random_game
   igraph_k_regular_game
   igraph_lattice
