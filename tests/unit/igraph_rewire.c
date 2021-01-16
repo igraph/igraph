@@ -32,15 +32,15 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
 
     igraph_vector_init(&indegree_before, 0);
     igraph_vector_init(&outdegree_before, 0);
-    igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, 0);
-    igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, 0);
+    igraph_degree(&g, &indegree_before, igraph_vss_all(), IGRAPH_IN, 1);
+    igraph_degree(&g, &outdegree_before, igraph_vss_all(), IGRAPH_OUT, 1);
 
     igraph_i_rewire(&g, 1000, allow_loops ? IGRAPH_REWIRING_SIMPLE_LOOPS : IGRAPH_REWIRING_SIMPLE, use_adjlist);
 
     igraph_vector_init(&indegree_after, 0);
     igraph_vector_init(&outdegree_after, 0);
-    igraph_degree(&g, &indegree_after, igraph_vss_all(), IGRAPH_IN, 0);
-    igraph_degree(&g, &outdegree_after, igraph_vss_all(), IGRAPH_OUT, 0);
+    igraph_degree(&g, &indegree_after, igraph_vss_all(), IGRAPH_IN, 1);
+    igraph_degree(&g, &outdegree_after, igraph_vss_all(), IGRAPH_OUT, 1);
 
     if ((!igraph_vector_all_e(&indegree_before, &indegree_after)) ||
         (!igraph_vector_all_e(&outdegree_before, &outdegree_after))) {
