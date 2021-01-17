@@ -477,6 +477,8 @@ int igraph_extended_chordal_ring(
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+    IGRAPH_CHECK(igraph_simplify(graph, /*multiple=*/ 1, /*loops=*/ 0,
+                                 /*edge_comb=*/ NULL));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
