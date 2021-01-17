@@ -128,8 +128,10 @@ static int igraph_i_linegraph_directed(const igraph_t *graph, igraph_t *linegrap
  * \brief Create the line graph of a graph.
  *
  * The line graph L(G) of a G undirected graph is defined as follows.
- * L(G) has one vertex for each edge in G and two vertices in L(G) are connected
- * by an edge if their corresponding edges share an end point.
+ * L(G) has one vertex for each edge in G and two different vertices in L(G)
+ * are connected by an edge if their corresponding edges share an end point.
+ * In a multigraph, if two end points are shared, two edges are created.
+ * The vertex of a loop is counted as two end points.
  *
  * </para><para>
  * The line graph L(G) of a G directed graph is slightly different,
