@@ -191,6 +191,7 @@ add_library(
   layout/lgl.c
   layout/mds.c
   layout/merge_dla.c
+  layout/merge_grid.c
   layout/random.c
   layout/reingold_tilford.c
   layout/sugiyama.c

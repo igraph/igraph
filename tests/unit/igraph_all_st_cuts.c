@@ -26,16 +26,10 @@
 #include "core/marked_queue.h"
 #include "core/estack.h"
 
+#include "flow/flow_internal.h"
+
 #include "test_utilities.inc"
 
-int igraph_i_all_st_cuts_pivot(const igraph_t *graph,
-                               const igraph_marked_queue_t *S,
-                               const igraph_estack_t *T,
-                               long int source,
-                               long int target,
-                               long int *v,
-                               igraph_vector_t *Isv,
-                               void *arg);
 int test_all_st_cuts(const igraph_t *graph,
                      long int source,
                      long int target) {

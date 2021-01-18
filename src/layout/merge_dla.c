@@ -28,6 +28,7 @@
 #include "core/grid.h"
 #include "core/interruption.h"
 #include "core/math.h"
+#include "layout/merge_grid.h"
 
 /* not 'static', used in tests */
 int igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,

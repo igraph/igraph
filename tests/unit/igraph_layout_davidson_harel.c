@@ -25,16 +25,9 @@
 #include <igraph.h>
 #include <math.h>
 
+#include "layout/layout_internal.h"
+
 #include "test_utilities.inc"
-
-igraph_bool_t igraph_i_segments_intersect(float p0_x, float p0_y,
-        float p1_x, float p1_y,
-        float p2_x, float p2_y,
-        float p3_x, float p3_y);
-
-float igraph_i_point_segment_dist2(float v_x, float v_y,
-                                   float u1_x, float u1_y,
-                                   float u2_x, float u2_y);
 
 int intersect() {
 
@@ -64,7 +57,7 @@ int intersect() {
 
     for (i = 0; i < no_neg; i++) {
         float *co = negative[i];
-        if (igraph_i_segments_intersect(co[0], co[1], co[2], co[3],
+        if (igraph_i_layout_segments_intersect(co[0], co[1], co[2], co[3],
                                         co[4], co[5], co[6], co[7])) {
             return i + 1;
         }
@@ -72,7 +65,7 @@ int intersect() {
 
     for (i = 0; i < no_pos; i++) {
         float *co = positive[i];
-        if (!igraph_i_segments_intersect(co[0], co[1], co[2], co[3],
+        if (!igraph_i_layout_segments_intersect(co[0], co[1], co[2], co[3],
                                          co[4], co[5], co[6], co[7])) {
             return no_neg + i + 1;
         }
@@ -97,7 +90,7 @@ int distance() {
 
     for (i = 0; i < no; i++) {
         float *co = configs[i];
-        float res = igraph_i_point_segment_dist2(co[0], co[1],
+        float res = igraph_i_layout_point_segment_dist2(co[0], co[1],
                     co[2], co[3], co[4], co[5]);
         if (fabsf(res - co[6]) > 1e-12) {
             printf("%g\n", (double) res);

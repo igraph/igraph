@@ -255,7 +255,7 @@ if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
     FOLDER tests/unit NAMES
     igraph_i_layout_sphere
-    igraph_layout_davidson_harel # Uses igraph_i_segments_intersect and igraph_i_point_segment_dist2
+    igraph_layout_davidson_harel # Uses igraph_i_layout_segments_intersect and igraph_i_layout_point_segment_dist2
     igraph_layout_merge # Uses igraph_i_layout_merge functions
   )
 endif()

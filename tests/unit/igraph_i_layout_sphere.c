@@ -25,12 +25,9 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "test_utilities.inc"
+#include "layout/layout_internal.h"
 
-int igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
-                              igraph_real_t *r);
-int igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x, igraph_real_t *y,
-                              igraph_real_t *z, igraph_real_t *r);
+#include "test_utilities.inc"
 
 int main () {
     long int i;
