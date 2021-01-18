@@ -34,7 +34,8 @@
  * must be different. There is a directed edge from a vertex \c v to
  * another vertex \c w if it is possible to transform the string of
  * \c v into the string of \c w by removing the first letter and
- * appending a letter to it.
+ * appending a letter to it. For string length 1 the new letter
+ * cannot equal the old letter, so there are no loops.
  *
  * </para><para>
  * Kautz graphs have some interesting properties, see eg. Wikipedia
