@@ -158,6 +158,7 @@ add_legacy_tests(
   igraph_kautz
   igraph_realize_degree_sequence  
   tree
+  tree_game
   ring
   watts_strogatz_game
 )
