@@ -88,16 +88,31 @@ add_library(
   constructors/prufer.c
   constructors/regular.c
 
+  games/barabasi.c
+  games/callaway_traits.c
+  games/citations.c
+  games/correlated.c
   games/degree_sequence_vl/gengraph_box_list.cpp
   games/degree_sequence_vl/gengraph_degree_sequence.cpp
   games/degree_sequence_vl/gengraph_graph_molloy_hash.cpp
   games/degree_sequence_vl/gengraph_graph_molloy_optimized.cpp
   games/degree_sequence_vl/gengraph_mr-connected.cpp
   games/degree_sequence_vl/gengraph_powerlaw.cpp
+  games/degree_sequence.c
   games/dotproduct.c
+  games/erdos_renyi.c
+  games/establishment.c
   games/forestfire.c
-  games/games_other.c
+  games/grg.c
+  games/growing_random.c
+  games/islands.c
+  games/k_regular.c
+  games/preference.c
+  games/recent_degree.c
   games/sbm.c
+  games/static_fitness.c
+  games/tree.c
+  games/watts_strogatz.c
 
   centrality/betweenness.c
   centrality/centrality_other.c
@@ -191,6 +206,7 @@ add_library(
   operators/misc_internal.c
   operators/permute.c
   operators/rewire.c
+  operators/rewire_edges.c
   operators/simplify.c
   operators/subgraph.c
   operators/union.c
