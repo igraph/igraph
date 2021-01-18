@@ -240,12 +240,26 @@ int main() {
     }
 
     /* sec */
+    c = igraph_complex_sec(a);
+    d = igraph_complex_inv(igraph_complex_cos(a));
+    if (!igraph_complex_eq_tol(c, d, 1e-14)) {
+        return 34;
+    }
 
     /* csc */
+    c = igraph_complex_csc(a);
+    d = igraph_complex_inv(igraph_complex_sin(a));
+    if (!igraph_complex_eq_tol(c, d, 1e-14)) {
+        return 35;
+    }
 
     /* cot */
+    c = igraph_complex_tan(a);
+    d = igraph_complex_div(igraph_complex_sin(a), igraph_complex_cos(a));
+    if (!igraph_complex_eq_tol(d, c, 1e-14)) {
+        return 36;
+    }
 
     VERIFY_FINALLY_STACK();
-
     return 0;
 }
