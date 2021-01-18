@@ -155,6 +155,7 @@ add_legacy_tests(
   igraph_k_regular_game
   igraph_lattice
   igraph_linegraph
+  igraph_kautz
   igraph_realize_degree_sequence  
   tree
   ring
