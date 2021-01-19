@@ -350,52 +350,6 @@ Partition::aux_split_in_two(Partition::Cell* const cell,
 
 
 
-size_t
-Partition::print(FILE* const fp, const bool add_newline) const
-{
-  size_t r = 0;
-  const char* cell_sep = "";
-  r += fprintf(fp, "[");
-  for(Cell* cell = first_cell; cell; cell = cell->next)
-    {
-      /* Print cell */
-      r += fprintf(fp, "%s{", cell_sep);
-      cell_sep = ",";
-      const char* elem_sep = "";
-      for(unsigned int i = 0; i < cell->length; i++)
-        {
-          r += fprintf(fp, "%s%u", elem_sep, elements[cell->first + i]);
-          elem_sep = ",";
-        }
-      r += fprintf(fp, "}");
-    }
-  r += fprintf(fp, "]");
-  if(add_newline) r += fprintf(fp, "\n");
-  return r;
-}
-
-
-
-size_t
-Partition::print_signature(FILE* const fp, const bool add_newline) const
-{
-  size_t r = 0;
-  const char* cell_sep = "";
-  r += fprintf(fp, "[");
-  for(Cell* cell = first_cell; cell; cell = cell->next)
-    {
-      if(cell->is_unit()) continue;
-      //fprintf(fp, "%s%u", cell_sep, cr_cells[cell->first].level);
-      r += fprintf(fp, "%s%u", cell_sep, cell->length);
-      cell_sep = ",";
-    }
-  r += fprintf(fp, "]");
-  if(add_newline) r += fprintf(fp, "\n");
-  return r;
-}
-
-
-
 void
 Partition::splitting_queue_add(Cell* const cell)
 {

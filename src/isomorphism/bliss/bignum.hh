@@ -30,7 +30,6 @@
 #include "igraph_error.h"
 
 #include <cstdlib>
-#include <cstdio>
 #include "defs.hh"
 
 namespace bliss {
@@ -70,11 +69,6 @@ public:
    */
   void multiply(const int n) {mpz_mul_si(v, v, n); }
 
-  /**
-   * \brief Print the number in the file stream \a fp.
-   */
-  size_t print(FILE* const fp) const {return mpz_out_str(fp, 10, v); }
-
   int to_string_igraph(char **str) const {
     *str=igraph_Calloc(mpz_sizeinbase(v, 10)+2, char);
     if (! *str) {
@@ -105,11 +99,6 @@ public:
    * \brief Multiply the number with \a n.
    */
   void multiply(const int n) {v *= (long double)n; }
-
-  /**
-   * \brief Print the number in the file stream \a fp.
-   */
-  size_t print(FILE* const fp) const {return fprintf(fp, "%Lg", v); }
 };
 
 #endif

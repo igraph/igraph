@@ -28,56 +28,6 @@
 
 namespace bliss {
 
-size_t
-print_permutation(FILE* const fp,
-                  const unsigned int N,
-                  const unsigned int* perm,
-                  const unsigned int offset)
-{
-  assert(N > 0);
-  assert(perm);
-  size_t r = 0;
-  unsigned int nof_cycles = 0;
-  std::vector<bool> seen(N, false);
-  for(unsigned int first = 0; first < N; first++) {
-    if(seen[first] or perm[first] == first) continue;
-    nof_cycles++;
-    r += fprintf(fp, "(%u", first+offset);
-    for(unsigned int i = perm[first]; i != first; i = perm[i]) {
-      seen[i] = true;
-      r += fprintf(fp, ",%u", i+offset);
-    }
-    r += fprintf(fp, ")");
-  }
-  if(nof_cycles == 0)
-    r += fprintf(fp, "()");
-  return r;
-}
-
-size_t
-print_permutation(FILE* const fp,
-                  const std::vector<unsigned int>& perm,
-                  const unsigned int offset)
-{
-  const unsigned int N = perm.size();
-  size_t r = 0;
-  unsigned int nof_cycles = 0;
-  std::vector<bool> seen(N, false);
-  for(unsigned int first = 0; first < N; first++) {
-    if(seen[first] or perm[first] == first) continue;
-    nof_cycles++;
-    r += fprintf(fp, "(%u", first+offset);
-    for(unsigned int i = perm[first]; i != first; i = perm[i]) {
-      seen[i] = true;
-      r += fprintf(fp, ",%u", i+offset);
-    }
-    r += fprintf(fp, ")");
-  }
-  if(nof_cycles == 0)
-    r += fprintf(fp, "()");
-  return r;
-}
-
 bool
 is_permutation(const unsigned int N, const unsigned int* perm)
 {

@@ -181,16 +181,6 @@ public:
 
   unsigned int nof_discrete_cells() const {return(discrete_cell_count); }
 
-  /**
-   * Print the partition into the file stream \a fp.
-   */
-  size_t print(FILE* const fp, const bool add_newline = true) const;
-
-  /**
-   * Print the partition cell sizes into the file stream \a fp.
-   */
-  size_t print_signature(FILE* const fp, const bool add_newline = true) const;
-
   /*
    * Splits the Cell \a cell into [cell_1,...,cell_n]
    * according to the invariant_values of the elements in \a cell.

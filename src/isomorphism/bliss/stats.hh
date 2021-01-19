@@ -20,7 +20,6 @@
   along with bliss.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdio>
 #include "graph.hh"
 #include "bignum.hh"
 
@@ -63,20 +62,7 @@ class Stats
   }
 public:
   Stats() { reset(); }
-  /** Print the statistics. */
-  size_t print(FILE* const fp) const
-  {
-    size_t r = 0;
-    r += fprintf(fp, "Nodes:          %lu\n", nof_nodes);
-    r += fprintf(fp, "Leaf nodes:     %lu\n", nof_leaf_nodes);
-    r += fprintf(fp, "Bad nodes:      %lu\n", nof_bad_nodes);
-    r += fprintf(fp, "Canrep updates: %lu\n", nof_canupdates);
-    r += fprintf(fp, "Generators:     %lu\n", nof_generators);
-    r += fprintf(fp, "Max level:      %lu\n", max_level);
-    r += fprintf(fp, "|Aut|:          ")+group_size.print(fp)+fprintf(fp, "\n");
-    fflush(fp);
-    return r;
-  }
+
   /** An approximation (due to possible overflows/rounding errors) of
    * the size of the automorphism group. */
   long double get_group_size_approx() const {return group_size_approx;}

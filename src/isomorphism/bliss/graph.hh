@@ -193,30 +193,6 @@ public:
                                      bool (*terminate)(const Stats& s) = 0);
 
   /**
-   * Write the graph to a file in a variant of the DIMACS format.
-   * See the <a href="https://users.aalto.fi/tjunttil/bliss">bliss website</a>
-   * for the definition of the file format.
-   * Note that in the DIMACS file the vertices are numbered from 1 to N while
-   * in this C++ API they are from 0 to N-1.
-   * Thus the vertex n in the file corresponds to the vertex n-1 in the API.
-   * \param fp  the file stream where the graph is written
-   */
-  virtual void write_dimacs(FILE * const fp) = 0;
-
-  /**
-   * Write the graph to a file in the graphviz dotty format.
-   * \param fp  the file stream where the graph is written
-   */
-  virtual void write_dot(FILE * const fp) = 0;
-
-  /**
-   * Write the graph in a file in the graphviz dotty format.
-   * Do nothing if the file cannot be written.
-   * \param file_name  the name of the file to which the graph is written
-   */
-  virtual void write_dot(const char * const file_name) = 0;
-
-  /**
    * Get a hash value for the graph.
    * \return  the hash value
    */
@@ -625,39 +601,6 @@ public:
   ~Graph();
 
   /**
-   * Read the graph from the file \a fp in a variant of the DIMACS format.
-   * See the <a href="https://users.aalto.fi/tjunttil/bliss">bliss website</a>
-   * for the definition of the file format.
-   * Note that in the DIMACS file the vertices are numbered from 1 to N while
-   * in this C++ API they are from 0 to N-1.
-   * Thus the vertex n in the file corresponds to the vertex n-1 in the API.
-   *
-   * \param fp      the file stream for the graph file
-   * \param errstr  if non-null, the possible error messages are printed
-   *                in this file stream
-   * \return        a new Graph object or 0 if reading failed for some
-   *                reason
-   */
-  static Graph* read_dimacs(FILE* const fp, FILE* const errstr = stderr);
-
-  /**
-   * Write the graph to a file in a variant of the DIMACS format.
-   * See the <a href="https://users.aalto.fi/tjunttil/bliss">bliss website</a>
-   * for the definition of the file format.
-   */
-  void write_dimacs(FILE* const fp);
-
-  /**
-   * \copydoc AbstractGraph::write_dot(FILE * const fp)
-   */
-  void write_dot(FILE* const fp);
-
-  /**
-   * \copydoc AbstractGraph::write_dot(const char * const file_name)
-   */
-  void write_dot(const char* const file_name);
-
-  /**
    * \copydoc AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const
    */
   bool is_automorphism(const std::vector<unsigned int>& perm) const;
@@ -864,36 +807,6 @@ public:
    */
   ~Digraph();
 
-  /**
-   * Read the graph from the file \a fp in a variant of the DIMACS format.
-   * See the <a href="https://users.aalto.fi/tjunttil/bliss">bliss website</a>
-   * for the definition of the file format.
-   * Note that in the DIMACS file the vertices are numbered from 1 to N while
-   * in this C++ API they are from 0 to N-1.
-   * Thus the vertex n in the file corresponds to the vertex n-1 in the API.
-   * \param fp      the file stream for the graph file
-   * \param errstr  if non-null, the possible error messages are printed
-   *                in this file stream
-   * \return        a new Digraph object or 0 if reading failed for some
-   *                reason
-   */
-  static Digraph* read_dimacs(FILE* const fp, FILE* const errstr = stderr);
-
-  /**
-   * \copydoc AbstractGraph::write_dimacs(FILE * const fp)
-   */
-  void write_dimacs(FILE* const fp);
-
-
-  /**
-   * \copydoc AbstractGraph::write_dot(FILE *fp)
-   */
-  void write_dot(FILE * const fp);
-
-  /**
-   * \copydoc AbstractGraph::write_dot(const char * const file_name)
-   */
-  void write_dot(const char * const file_name);
 
   /**
    * \copydoc AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const
