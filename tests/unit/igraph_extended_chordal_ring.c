@@ -40,6 +40,7 @@ int main() {
     assert(igraph_is_same_graph(&g_rev, &g_test, &same) == IGRAPH_SUCCESS);
     assert(same);
     igraph_destroy(&g);
+    igraph_destroy(&g_rev);
     igraph_destroy(&g_test);
     igraph_matrix_destroy(&W);
 
