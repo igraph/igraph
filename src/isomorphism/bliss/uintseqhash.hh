@@ -1,10 +1,8 @@
 #ifndef BLISS_UINTSEQHASH_HH
 #define BLISS_UINTSEQHASH_HH
 
-// #include <cstdio>
-
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.
@@ -24,8 +22,8 @@
 
 namespace bliss {
 
-/** \internal
- * \brief A hash for sequences of unsigned ints.
+/**
+ * \brief A updatable hash for sequences of unsigned ints.
  */
 class UintSeqHash
 {
@@ -52,14 +50,14 @@ public:
     return (h < other.h)?-1:((h == other.h)?0:1);
   }
   /** An abbreviation for cmp(other) < 0 */
-  bool is_lt(const UintSeqHash &other) const {return(cmp(other) < 0); }
+  bool is_lt(const UintSeqHash &other) const {return cmp(other) < 0; }
   /** An abbreviation for cmp(other) <= 0 */
-  bool is_le(const UintSeqHash &other) const {return(cmp(other) <= 0); }
+  bool is_le(const UintSeqHash &other) const {return cmp(other) <= 0; }
   /** An abbreviation for cmp(other) == 0 */
-  bool is_equal(const UintSeqHash &other) const {return(cmp(other) == 0); }
+  bool is_equal(const UintSeqHash &other) const {return cmp(other) == 0; }
 };
 
 
 } // namespace bliss
 
-#endif
+#endif // BLISS_UINTSEQHASH_HH

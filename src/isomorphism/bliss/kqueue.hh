@@ -2,7 +2,7 @@
 #define BLISS_KQUEUE_HH
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.
@@ -20,14 +20,14 @@
   along with bliss.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "defs.hh"
+#include <new>
+#include <cassert>
 
 namespace bliss {
 
-/** \internal
- * \brief A very simple implementation of queues with fixed capacity.
+/**
+ * \brief A simple implementation of queues with fixed maximum capacity.
  */
-
 template <class Type>
 class KQueue
 {
@@ -76,26 +76,28 @@ private:
 template <class Type>
 KQueue<Type>::KQueue()
 {
-  entries = 0;
-  end = 0;
-  head = 0;
-  tail = 0;
+  entries = nullptr;
+  end = nullptr;
+  head = nullptr;
+  tail = nullptr;
 }
 
 template <class Type>
 KQueue<Type>::~KQueue()
 {
-  if(entries)
-    free(entries);
+  delete[] entries;
+  entries = nullptr;
+  end = nullptr;
+  head = nullptr;
+  tail = nullptr;
 }
 
 template <class Type>
 void KQueue<Type>::init(const unsigned int k)
 {
   assert(k > 0);
-  if(entries)
-    free(entries);
-  entries = (Type*)malloc((k + 1) * sizeof(Type));
+  delete[] entries;
+  entries = new Type[k+1];
   end = entries + k + 1;
   head = entries;
   tail = head;
@@ -111,7 +113,7 @@ void KQueue<Type>::clear()
 template <class Type>
 bool KQueue<Type>::is_empty() const
 {
-  return(head == tail);
+  return head == tail;
 }
 
 template <class Type>
@@ -119,18 +121,20 @@ unsigned int KQueue<Type>::size() const
 {
   if(tail >= head)
     return(tail - head);
-  return((end - head) + (tail - entries));
+  return (end - head) + (tail - entries);
 }
 
 template <class Type>
 Type KQueue<Type>::front() const
 {
+  assert(head != tail);
   return *head;
 }
 
 template <class Type>
 Type KQueue<Type>::pop_front()
 {
+  assert(head != tail);
   Type *old_head = head;
   head++;
   if(head == end)
@@ -145,6 +149,7 @@ void KQueue<Type>::push_front(Type e)
     head = end - 1;
   else
     head--;
+  assert(head != tail);
   *head = e;
 }
 
@@ -155,8 +160,9 @@ void KQueue<Type>::push_back(Type e)
   tail++;
   if(tail == end)
     tail = entries;
+  assert(head != tail);
 }
 
 } // namespace bliss
 
-#endif
+#endif // BLISS_KQUEUE_HH

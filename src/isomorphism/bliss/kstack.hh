@@ -1,8 +1,8 @@
-#ifndef BLISS_KSTACK_H
-#define BLISS_KSTACK_H
+#ifndef BLISS_KSTACK_HH
+#define BLISS_KSTACK_HH
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.
@@ -20,13 +20,13 @@
   along with bliss.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdlib>
-#include "defs.hh"
+#include <new>
+#include <cassert>
 
 namespace bliss {
 
-/** \internal
- * \brief A very simple implementation of a stack with fixed capacity.
+/**
+ * \brief A simple implementation of a stack with fixed maximum capacity.
  */
 template <class Type>
 class KStack {
@@ -52,18 +52,19 @@ public:
   /**
    * Is the stack empty?
    */
-  bool is_empty() const {return(cursor == entries); }
+  bool is_empty() const {return cursor == entries; }
 
   /**
    * Return (but don't remove) the top element of the stack.
    */
-  Type top() const {BLISS_ASSERT(cursor > entries); return *cursor; }
+  Type top() const {assert(cursor > entries); return *cursor; }
 
   /**
    * Pop (remove) the top element of the stack.
    */
   Type pop()
   {
+    assert(cursor > entries);
     return *cursor--;
   }
 
@@ -72,6 +73,7 @@ public:
    */
   void push(Type e)
   {
+    assert(cursor < entries + kapacity);
     *(++cursor) = e;
   }
 
@@ -81,7 +83,7 @@ public:
   /**
    * Get the number of elements in the stack.
    */
-  unsigned int size() const {return(cursor - entries); }
+  unsigned int size() const {return cursor - entries; }
 
   /**
    * Return the i:th element in the stack, where \a i is in the range
@@ -95,7 +97,7 @@ public:
   }
 
   /** Return the capacity (NOT the number of elements) of the stack. */
-  int capacity() {return kapacity; }
+  int capacity() const {return kapacity; }
 private:
   int kapacity;
   Type *entries;
@@ -106,8 +108,8 @@ template <class Type>
 KStack<Type>::KStack()
 {
   kapacity = 0;
-  entries = 0;
-  cursor = 0;
+  entries = nullptr;
+  cursor = nullptr;
 }
 
 template <class Type>
@@ -115,7 +117,7 @@ KStack<Type>::KStack(int k)
 {
   assert(k > 0);
   kapacity = k;
-  entries = (Type*)malloc((k+1) * sizeof(Type));
+  entries = new Type[k+1];
   cursor = entries;
 }
 
@@ -123,19 +125,21 @@ template <class Type>
 void KStack<Type>::init(int k)
 {
   assert(k > 0);
-  if(entries)
-    free(entries);
+  delete[] entries;
   kapacity = k;
-  entries = (Type*)malloc((k+1) * sizeof(Type));
+  entries = new Type[k+1];
   cursor = entries;
 }
 
 template <class Type>
 KStack<Type>::~KStack()
 {
-  free(entries);
+  delete[] entries;
+  kapacity = 0;
+  entries = nullptr;
+  cursor = nullptr;
 }
 
 } // namespace bliss
 
-#endif
+#endif // BLISS_KSTACK_HH

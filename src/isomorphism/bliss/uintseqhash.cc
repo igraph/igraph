@@ -1,7 +1,7 @@
 #include "uintseqhash.hh"
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.

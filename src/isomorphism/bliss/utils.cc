@@ -3,7 +3,7 @@
 #include "utils.hh"
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.
@@ -23,8 +23,7 @@
 
 namespace bliss {
 
-#if 0
-void
+size_t
 print_permutation(FILE* const fp,
 		  const unsigned int N,
 		  const unsigned int* perm,
@@ -32,64 +31,47 @@ print_permutation(FILE* const fp,
 {
   assert(N > 0);
   assert(perm);
-  for(unsigned int i = 0; i < N; i++) {
-    unsigned int j = perm[i];
-    if(j == i)
-      continue;
-    bool is_first = true;
-    while(j != i) {
-      if(j < i) {
-        is_first = false;
-        break;
-      }
-      j = perm[j];
+  size_t r = 0;
+  unsigned int nof_cycles = 0;
+  std::vector<bool> seen(N, false);
+  for(unsigned int first = 0; first < N; first++) {
+    if(seen[first] or perm[first] == first) continue;
+    nof_cycles++;
+    r += fprintf(fp, "(%u", first+offset);
+    for(unsigned int i = perm[first]; i != first; i = perm[i]) {
+      seen[i] = true;
+      r += fprintf(fp, ",%u", i+offset);
     }
-    if(!is_first)
-      continue;
-    fprintf(fp, "(%u,", i+offset);
-    j = perm[i];
-    while(j != i) {
-      fprintf(fp, "%u", j+offset);
-      j = perm[j];
-      if(j != i)
-        fprintf(fp, ",");
-    }
-    fprintf(fp, ")");
+    r += fprintf(fp, ")");
   }
+  if(nof_cycles == 0)
+    r += fprintf(fp, "()");
+  return r;
 }
 
-void
+size_t
 print_permutation(FILE* const fp,
 		  const std::vector<unsigned int>& perm,
 		  const unsigned int offset)
 {
   const unsigned int N = perm.size();
-  for(unsigned int i = 0; i < N; i++) {
-    unsigned int j = perm[i];
-    if(j == i)
-      continue;
-    bool is_first = true;
-    while(j != i) {
-      if(j < i) {
-        is_first = false;
-        break;
-      }
-      j = perm[j];
+  size_t r = 0;
+  unsigned int nof_cycles = 0;
+  std::vector<bool> seen(N, false);
+  for(unsigned int first = 0; first < N; first++) {
+    if(seen[first] or perm[first] == first) continue;
+    nof_cycles++;
+    r += fprintf(fp, "(%u", first+offset);
+    for(unsigned int i = perm[first]; i != first; i = perm[i]) {
+      seen[i] = true;
+      r += fprintf(fp, ",%u", i+offset);
     }
-    if(!is_first)
-      continue;
-    fprintf(fp, "(%u,", i+offset);
-    j = perm[i];
-    while(j != i) {
-      fprintf(fp, "%u", j+offset);
-      j = perm[j];
-      if(j != i)
-        fprintf(fp, ",");
-    }
-    fprintf(fp, ")");
+    r += fprintf(fp, ")");
   }
+  if(nof_cycles == 0)
+    r += fprintf(fp, "()");
+  return r;
 }
-#endif
 
 bool
 is_permutation(const unsigned int N, const unsigned int* perm)

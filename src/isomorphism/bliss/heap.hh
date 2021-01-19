@@ -2,7 +2,7 @@
 #define BLISS_HEAP_HH
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.
@@ -22,7 +22,7 @@
 
 namespace bliss {
 
-/** \internal
+/**
  * \brief A capacity bounded heap data structure.
  */
 
@@ -38,7 +38,7 @@ public:
    * Create a new heap.
    * init() must be called after this.
    */
-  Heap() {array = 0; n = 0; N = 0; }
+  Heap();
   ~Heap();
 
   /**
@@ -50,13 +50,13 @@ public:
    * Is the heap empty?
    * Time complexity is O(1).
    */
-  bool is_empty() const {return(n==0); }
+  bool is_empty() const {return n == 0; }
 
   /**
    * Remove all the elements in the heap.
    * Time complexity is O(1).
    */
-  void clear() {n = 0;}
+  void clear() {n = 0; }
 
   /**
    * Insert the element \a e in the heap.
@@ -64,6 +64,12 @@ public:
    * currently in the heap.
    */
   void insert(const unsigned int e);
+
+  /**
+   * Return the smallest element in the heap.
+   * Time complexity is O(1).
+   */
+  unsigned int smallest() const;
 
   /**
    * Remove and return the smallest element in the heap.
@@ -80,4 +86,4 @@ public:
 
 } // namespace bliss
 
-#endif
+#endif // BLISS_HEAP_HH

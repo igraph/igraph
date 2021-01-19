@@ -2,11 +2,11 @@
 #define BLISS_GRAPH_HH
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-
+  
   This file is part of bliss.
-
+  
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -29,90 +29,17 @@ namespace bliss {
   class AbstractGraph;
 }
 
-// #include <cstdio>
+#include <cstdio>
 #include <vector>
+#include "stats.hh"
 #include "kstack.hh"
 #include "kqueue.hh"
 #include "heap.hh"
 #include "orbit.hh"
 #include "partition.hh"
-#include "bignum.hh"
 #include "uintseqhash.hh"
 
 namespace bliss {
-
-/**
- * \brief Statistics returned by the bliss search algorithm.
- */
-class Stats
-{
-  friend class AbstractGraph;
-public:
-  /** \internal The size of the automorphism group. */
-  BigNum group_size;
-private:
-  /** \internal An approximation (due to possible overflows) of
-   * the size of the automorphism group. */
-  long double group_size_approx;
-  /** \internal The number of nodes in the search tree. */
-  long unsigned int nof_nodes;
-  /** \internal The number of leaf nodes in the search tree. */
-  long unsigned int nof_leaf_nodes;
-  /** \internal The number of bad nodes in the search tree. */
-  long unsigned int nof_bad_nodes;
-  /** \internal The number of canonical representative updates. */
-  long unsigned int nof_canupdates;
-  /** \internal The number of generator permutations. */
-  long unsigned int nof_generators;
-  /** \internal The maximal depth of the search tree. */
-  unsigned long int max_level;
-  /** */
-  void reset()
-  {
-    group_size.assign(1);
-    group_size_approx = 1.0;
-    nof_nodes = 0;
-    nof_leaf_nodes = 0;
-    nof_bad_nodes = 0;
-    nof_canupdates = 0;
-    nof_generators = 0;
-    max_level = 0;
-  }
-public:
-  Stats() { reset(); }
-  /** Print the statistics. */
-  /*
-  size_t print(FILE* const fp) const
-  {
-    size_t r = 0;
-    r += fprintf(fp, "Nodes:          %lu\n", nof_nodes);
-    r += fprintf(fp, "Leaf nodes:     %lu\n", nof_leaf_nodes);
-    r += fprintf(fp, "Bad nodes:      %lu\n", nof_bad_nodes);
-    r += fprintf(fp, "Canrep updates: %lu\n", nof_canupdates);
-    r += fprintf(fp, "Generators:     %lu\n", nof_generators);
-    r += fprintf(fp, "Max level:      %lu\n", max_level);
-    r += fprintf(fp, "|Aut|:          ")+group_size.print(fp)+fprintf(fp, "\n");
-    fflush(fp);
-    return r;
-  }
-  */
-  /** An approximation (due to possible overflows/rounding errors) of
-   * the size of the automorphism group. */
-  long double get_group_size_approx() const {return group_size_approx;}
-  /** The number of nodes in the search tree. */
-  long unsigned int get_nof_nodes() const {return nof_nodes;}
-  /** The number of leaf nodes in the search tree. */
-  long unsigned int get_nof_leaf_nodes() const {return nof_leaf_nodes;}
-  /** The number of bad nodes in the search tree. */
-  long unsigned int get_nof_bad_nodes() const {return nof_bad_nodes;}
-  /** The number of canonical representative updates. */
-  long unsigned int get_nof_canupdates() const {return nof_canupdates;}
-  /** The number of generator permutations. */
-  long unsigned int get_nof_generators() const {return nof_generators;}
-  /** The maximal depth of the search tree. */
-  unsigned long int get_max_level() const {return max_level;}
-};
-
 
 
 
@@ -163,7 +90,7 @@ public:
    * Check whether \a perm is an automorphism of this graph.
    * Unoptimized, mainly for debugging purposes.
    */
-  virtual bool is_automorphism(const std::vector<unsigned int>& perm) const;
+  virtual bool is_automorphism(const std::vector<unsigned int>& perm) const = 0;
 
 
   /** Activate/deactivate failure recording.
@@ -215,12 +142,22 @@ public:
    * if you want to use the automorphism later, you have to take a copy of it.
    * Do not call any member functions in the hook.
    * The search statistics are copied in \a stats.
+   * If the \a terminate function argument is given,
+   * it is called in each search tree node: if the function returns true,
+   * then the search is terminated and thus not all the automorphisms
+   * may have been generated. For older versions of C++ having no lambda
+   * functions, reference to the statistics is given as an argument.
+   * The \a terminate function may be used
+   * to limit the time spent in bliss in case the graph is too difficult
+   * under the available time constraints. If used, keep the function simple
+   * to evaluate so that it does not take too much time.
    */
   void find_automorphisms(Stats& stats,
 			  void (*hook)(void* user_param,
 				       unsigned int n,
-				       const unsigned int* aut),
-			  void* hook_user_param);
+				       const unsigned int* aut) = 0,
+			  void* hook_user_param = 0,
+			  bool (*terminate)(const Stats& s) = 0);
 
   /**
    * Otherwise the same as find_automorphisms() except that
@@ -236,17 +173,28 @@ public:
    * Note that the computed canonical version may depend on the applied version
    * of bliss as well as on some other options (for instance, the splitting
    * heuristic selected with bliss::Graph::set_splitting_heuristic()).
+   *
+   * If the \a terminate function argument is given,
+   * it is called in each search tree node: if the function returns true,
+   * then the search is terminated and thus (i) not all the automorphisms
+   * may have been generated and (ii) the returned labeling may not
+   * be canonical. For older versions of C++ having no lambda
+   * functions, reference to the statistics is given as an argument.
+   * The \a terminate function may be used
+   * to limit the time spent in bliss in case the graph is too difficult
+   * under the available time constraints. If used, keep the function simple
+   * to evaluate so that it does not take too much time.
    */
   const unsigned int* canonical_form(Stats& stats,
 				     void (*hook)(void* user_param,
 						  unsigned int n,
-						  const unsigned int* aut),
-				     void* hook_user_param);
+						  const unsigned int* aut) = 0,
+				     void* hook_user_param = 0,
+				     bool (*terminate)(const Stats& s) = 0);
 
-#if 0
   /**
    * Write the graph to a file in a variant of the DIMACS format.
-   * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
+   * See the <a href="https://users.aalto.fi/tjunttil/bliss">bliss website</a>
    * for the definition of the file format.
    * Note that in the DIMACS file the vertices are numbered from 1 to N while
    * in this C++ API they are from 0 to N-1.
@@ -267,12 +215,11 @@ public:
    * \param file_name  the name of the file to which the graph is written
    */
   virtual void write_dot(const char * const file_name) = 0;
-#endif
 
   /**
    * Get a hash value for the graph.
    * \return  the hash value
-   */
+   */ 
   virtual unsigned int get_hash() = 0;
 
   /**
@@ -298,7 +245,7 @@ protected:
   unsigned int verbose_level;
   /** \internal
    * The output stream for verbose output. */
-  // FILE *verbstr;
+  FILE *verbstr;
 protected:
 
   /** \internal
@@ -395,7 +342,7 @@ protected:
    * Data structures and routines for refining the partition p into equitable
    */
   Heap neighbour_heap;
-  virtual bool split_neighbourhood_of_unit_cell(Partition::Cell * const) = 0;
+  virtual bool split_neighbourhood_of_unit_cell(Partition::Cell *) = 0;
   virtual bool split_neighbourhood_of_cell(Partition::Cell * const) = 0;
   void refine_to_equitable();
   void refine_to_equitable(Partition::Cell * const unit_cell);
@@ -442,7 +389,7 @@ protected:
   void reset_permutation(unsigned int *perm);
 
   /* Mainly for debugging purposes */
-  virtual bool is_automorphism(unsigned int* const perm);
+  virtual bool is_automorphism(unsigned int* const perm) const = 0;
 
   std::vector<unsigned int> certificate_current_path;
   std::vector<unsigned int> certificate_first_path;
@@ -456,7 +403,19 @@ protected:
   virtual Partition::Cell* find_next_cell_to_be_splitted(Partition::Cell *cell) = 0;
 
 
-  void search(const bool canonical, Stats &stats);
+  /** \struct PathInfo
+   *
+   * A structure for holding first, current, and best path information.
+   */
+  typedef struct {
+    unsigned int splitting_element;
+    unsigned int certificate_index;
+    unsigned int subcertificate_length;
+    UintSeqHash eqref_hash;
+  } PathInfo;
+
+  void search(const bool canonical, Stats &stats,
+	      bool (*terminate)(const Stats& s));
 
 
   void (*report_hook)(void *user_param,
@@ -471,10 +430,10 @@ protected:
    *
    */
 
-  /** The currently traversed component */
+  /* The currently traversed component */
   unsigned int cr_level;
 
-  /** \internal
+  /** @internal @class CR_CEP
    * The "Component End Point" data structure
    */
   class CR_CEP {
@@ -521,6 +480,8 @@ protected:
    * The number of vertices in the component \a cr_component
    */
   unsigned int cr_component_elements;
+
+
 
 
 
@@ -617,7 +578,7 @@ protected:
   /*
    * Routines needed when refining the partition p into equitable
    */
-  bool split_neighbourhood_of_unit_cell(Partition::Cell * const);
+  bool split_neighbourhood_of_unit_cell(Partition::Cell *);
   bool split_neighbourhood_of_cell(Partition::Cell * const);
 
   /** \internal
@@ -639,8 +600,8 @@ protected:
   void make_initial_equitable_partition();
 
   void initialize_certificate();
-
-  bool is_automorphism(unsigned int* const perm);
+  
+  bool is_automorphism(unsigned int* const perm) const;
 
 
   bool nucr_find_first_component(const unsigned int level);
@@ -648,6 +609,7 @@ protected:
 				 std::vector<unsigned int>& component,
 				 unsigned int& component_elements,
 				 Partition::Cell*& sh_return);
+
 
 
 
@@ -662,10 +624,9 @@ public:
    */
   ~Graph();
 
-#if 0
   /**
    * Read the graph from the file \a fp in a variant of the DIMACS format.
-   * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
+   * See the <a href="https://users.aalto.fi/tjunttil/bliss">bliss website</a>
    * for the definition of the file format.
    * Note that in the DIMACS file the vertices are numbered from 1 to N while
    * in this C++ API they are from 0 to N-1.
@@ -681,7 +642,7 @@ public:
 
   /**
    * Write the graph to a file in a variant of the DIMACS format.
-   * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
+   * See the <a href="https://users.aalto.fi/tjunttil/bliss">bliss website</a>
    * for the definition of the file format.
    */
   void write_dimacs(FILE* const fp);
@@ -695,7 +656,6 @@ public:
    * \copydoc AbstractGraph::write_dot(const char * const file_name)
    */
   void write_dot(const char* const file_name);
-#endif
 
   /**
    * \copydoc AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const
@@ -705,7 +665,7 @@ public:
 
   /**
    * \copydoc AbstractGraph::get_hash()
-   */
+   */ 
   virtual unsigned int get_hash();
 
   /**
@@ -718,7 +678,7 @@ public:
    */
   Graph* permute(const unsigned int* const perm) const;
   Graph* permute(const std::vector<unsigned int>& perm) const;
-
+  
   /**
    * Add a new vertex with color \a color in the graph and return its index.
    */
@@ -754,7 +714,7 @@ public:
    * for both graphs.
    */
   void set_splitting_heuristic(const SplittingHeuristic shs) {sh = shs; }
-
+  
 
 };
 
@@ -883,7 +843,7 @@ protected:
 
   void initialize_certificate();
 
-  bool is_automorphism(unsigned int* const perm);
+  bool is_automorphism(unsigned int* const perm) const;
 
   void sort_edges();
 
@@ -904,10 +864,9 @@ public:
    */
   ~Digraph();
 
-#if 0
   /**
    * Read the graph from the file \a fp in a variant of the DIMACS format.
-   * See the <A href="http://www.tcs.hut.fi/Software/bliss/">bliss website</A>
+   * See the <a href="https://users.aalto.fi/tjunttil/bliss">bliss website</a>
    * for the definition of the file format.
    * Note that in the DIMACS file the vertices are numbered from 1 to N while
    * in this C++ API they are from 0 to N-1.
@@ -935,7 +894,6 @@ public:
    * \copydoc AbstractGraph::write_dot(const char * const file_name)
    */
   void write_dot(const char * const file_name);
-#endif
 
   /**
    * \copydoc AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const
@@ -946,14 +904,14 @@ public:
 
   /**
    * \copydoc AbstractGraph::get_hash()
-   */
+   */ 
   virtual unsigned int get_hash();
 
   /**
    * Return the number of vertices in the graph.
    */
   unsigned int get_nof_vertices() const {return vertices.size(); }
-
+  
   /**
    * Add a new vertex with color 'color' in the graph and return its index.
    */
@@ -993,13 +951,13 @@ public:
   /**
    * \copydoc AbstractGraph::permute(const unsigned int* const perm) const
    */
-  Digraph* permute(const unsigned int* const perm) const;
+  Digraph* permute(const unsigned int* const perm) const;  
   Digraph* permute(const std::vector<unsigned int>& perm) const;
 };
 
 
 
 
-}
+} // namespace bliss
 
-#endif
+#endif // BLISS_GRAPH_HH

@@ -53,7 +53,7 @@ using namespace std;
  * </para>
  *
  * <para>
- * BLISS version 0.73 is included in igraph.
+ * BLISS version 0.74 is included in igraph.
  * </para>
  */
 
@@ -138,7 +138,7 @@ inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) 
         info->nof_bad_nodes  = stats.get_nof_bad_nodes();
         info->nof_canupdates = stats.get_nof_canupdates();
         info->nof_generators = stats.get_nof_generators();
-        stats.group_size.tostring(&info->group_size);
+        stats.get_group_size_igraph(&info->group_size);
     }
 }
 
@@ -323,9 +323,9 @@ int igraph_automorphism_group(
  *
  * This function uses the BLISS graph isomorphism algorithm, a
  * successor of the famous NAUTY algorithm and implementation. BLISS
- * is open source and licensed according to the GNU GPL. See
- * http://www.tcs.hut.fi/Software/bliss/index.html for
- * details. Currently the 0.73 version of BLISS is included in igraph.
+ * is open source and licensed according to the GNU LGPL. See
+ * https://users.aalto.fi/~tjunttil/bliss/ for
+ * details. Currently the 0.74 version of BLISS is included in igraph.
  *
  * </para><para>
  *

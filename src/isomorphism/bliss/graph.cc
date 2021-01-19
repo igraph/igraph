@@ -1,27 +1,25 @@
+#include "igraph_error.h"
 
-// #include <cstdio>
-#include <cassert>
-#include <climits>
+#include <new>
 #include <set>
 #include <list>
 #include <algorithm>
+#include <stdexcept>
+#include <cstdio>
+#include <cassert>
+#include <climits>
 
 #include "defs.hh"
 #include "graph.hh"
 #include "partition.hh"
 #include "utils.hh"
 
-/* use 'and' instead of '&&' */
-#if _MSC_VER
-#include <ciso646>
-#endif
-
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-
+  
   This file is part of bliss.
-
+  
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -38,8 +36,7 @@
 
 namespace bliss {
 
-#define _INTERNAL_ERROR() fatal_error("%s:%d: internal error",IGRAPH_FILE_BASENAME,__LINE__)
-#define _OUT_OF_MEMORY() fatal_error("%s:%d: out of memory",IGRAPH_FILE_BASENAME,__LINE__)
+#define _INTERNAL_ERROR() IGRAPH_FATAL("Bliss internal error")
 
 /*-------------------------------------------------------------------------
  *
@@ -48,17 +45,16 @@ namespace bliss {
  *-------------------------------------------------------------------------*/
 
 
-AbstractGraph::AbstractGraph() : refine_equal_to_first(false)
+AbstractGraph::AbstractGraph()
 {
   /* Initialize stuff */
-  first_path_labeling = 0;
-  first_path_labeling_inv = 0;
-  best_path_labeling = 0;
-  best_path_labeling_inv = 0;
-  first_path_automorphism = 0;
-  best_path_automorphism = 0;
+  first_path_labeling = nullptr;
+  first_path_labeling_inv = nullptr;
+  best_path_labeling = nullptr;
+  best_path_labeling_inv = nullptr;
+  first_path_automorphism = nullptr;
+  best_path_automorphism = nullptr;
   in_search = false;
-  refine_equal_to_first = false;
 
   /* Default value for using "long prune" */
   opt_use_long_prune = true;
@@ -69,7 +65,7 @@ AbstractGraph::AbstractGraph() : refine_equal_to_first(false)
 
 
   verbose_level = 0;
-  // verbstr = stdout;
+  verbstr = stdout;
 
   report_hook = 0;
   report_user_param = 0;
@@ -78,18 +74,13 @@ AbstractGraph::AbstractGraph() : refine_equal_to_first(false)
 
 AbstractGraph::~AbstractGraph()
 {
-  if(first_path_labeling) {
-    free(first_path_labeling); first_path_labeling = 0; }
-  if(first_path_labeling_inv) {
-    free(first_path_labeling_inv); first_path_labeling_inv = 0; }
-  if(best_path_labeling) {
-    free(best_path_labeling); best_path_labeling = 0; }
-  if(best_path_labeling_inv) {
-    free(best_path_labeling_inv); best_path_labeling_inv = 0; }
-  if(first_path_automorphism) {
-    free(first_path_automorphism); first_path_automorphism = 0; }
-  if(best_path_automorphism) {
-    free(best_path_automorphism); best_path_automorphism = 0; }
+  delete[] first_path_labeling; first_path_labeling = nullptr;
+  delete[] first_path_labeling_inv; first_path_labeling_inv = nullptr;
+  delete[] first_path_automorphism; first_path_automorphism = nullptr;
+
+  delete[] best_path_labeling; best_path_labeling = nullptr;
+  delete[] best_path_labeling_inv; best_path_labeling_inv = nullptr;
+  delete[] best_path_automorphism; best_path_automorphism = nullptr;
 
   report_hook = 0;
   report_user_param = 0;
@@ -112,7 +103,7 @@ AbstractGraph::set_verbose_level(const unsigned int level)
 void
 AbstractGraph::set_verbose_file(FILE* const fp)
 {
-  // verbstr = fp;
+  verbstr = fp;
 }
 
 
@@ -285,20 +276,23 @@ AbstractGraph::reset_permutation(unsigned int* perm)
     *perm = i;
 }
 
+/*
 bool
 AbstractGraph::is_automorphism(unsigned int* const perm)
 {
   _INTERNAL_ERROR();
   return false;
 }
+*/
 
+/*
 bool
 AbstractGraph::is_automorphism(const std::vector<unsigned int>& perm) const
 {
   _INTERNAL_ERROR();
   return false;
 }
-
+*/
 
 
 
@@ -571,6 +565,8 @@ AbstractGraph::update_orbit_information(Orbit& o, const unsigned int* perm)
  *
  *-------------------------------------------------------------------------*/
 
+/** \internal \brief Search tree node information.
+ */
 class TreeNode
 {
   //friend class AbstractGraph;
@@ -608,7 +604,7 @@ public:
   bool needs_long_prune;
   unsigned int long_prune_begin;
   std::set<unsigned int, std::less<unsigned int> > long_prune_redundant;
-
+  
   UintSeqHash eqref_hash;
   unsigned int subcertificate_length;
 };
@@ -616,16 +612,11 @@ public:
 
 
 
-typedef struct {
-  unsigned int splitting_element;
-  unsigned int certificate_index;
-  unsigned int subcertificate_length;
-  UintSeqHash eqref_hash;
-} PathInfo;
-
 
 void
-AbstractGraph::search(const bool canonical, Stats& stats)
+AbstractGraph::search(const bool canonical,
+		      Stats& stats,
+		      bool (*terminate)(const Stats&))
 {
   const unsigned int N = get_nof_vertices();
 
@@ -646,20 +637,14 @@ AbstractGraph::search(const bool canonical, Stats& stats)
   stats.nof_leaf_nodes = 1;
 
   /* Free old first path data structures */
-  if(first_path_labeling) {
-    free(first_path_labeling); first_path_labeling = 0; }
-  if(first_path_labeling_inv) {
-    free(first_path_labeling_inv); first_path_labeling_inv = 0; }
-  if(first_path_automorphism) {
-    free(first_path_automorphism); first_path_automorphism = 0; }
+  delete[] first_path_labeling; first_path_labeling = nullptr;
+  delete[] first_path_labeling_inv; first_path_labeling_inv = nullptr;
+  delete[] first_path_automorphism; first_path_automorphism = nullptr;
 
   /* Free old best path data structures */
-  if(best_path_labeling) {
-    free(best_path_labeling); best_path_labeling = 0; }
-  if(best_path_labeling_inv) {
-    free(best_path_labeling_inv); best_path_labeling_inv = 0; }
-  if(best_path_automorphism) {
-    free(best_path_automorphism); best_path_automorphism = 0; }
+  delete[] best_path_labeling; best_path_labeling = nullptr;
+  delete[] best_path_labeling_inv; best_path_labeling_inv = nullptr;
+  delete[] best_path_automorphism; best_path_automorphism = nullptr;
 
   if(N == 0)
     {
@@ -672,7 +657,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
   /* ... and the component recursion data structures in the partition */
   if(opt_use_comprec)
     p.cr_init();
-
+  
   neighbour_heap.init(N);
 
   in_search = false;
@@ -688,13 +673,13 @@ AbstractGraph::search(const bool canonical, Stats& stats)
   /*
    * Allocate space for the "first path" and "best path" labelings
    */
-  if(first_path_labeling) free(first_path_labeling);
-  first_path_labeling = (unsigned int*)calloc(N, sizeof(unsigned int));
-  if(!first_path_labeling) _OUT_OF_MEMORY();
-  if(best_path_labeling) free(best_path_labeling);
-  best_path_labeling = (unsigned int*)calloc(N, sizeof(unsigned int));
-  if(!best_path_labeling) _OUT_OF_MEMORY();
+  delete[] first_path_labeling;
+  first_path_labeling = new unsigned int[N];
 
+  delete[] best_path_labeling;
+  best_path_labeling = new unsigned int[N];
+  for(unsigned int i = 0; i < N; i++) best_path_labeling[i] = i;
+  
   /*
    * Is the initial partition discrete?
    */
@@ -704,31 +689,29 @@ AbstractGraph::search(const bool canonical, Stats& stats)
       update_labeling(best_path_labeling);
       /* Update statistics */
       stats.nof_leaf_nodes = 1;
-      /* Free component recursion data */
+      /* Release component recursion data in partition */
       if(opt_use_comprec)
-        p.cr_free();
+	p.cr_free();
       return;
     }
 
   /*
    * Allocate the inverses of the "first path" and "best path" labelings
    */
-  if(first_path_labeling_inv) free(first_path_labeling_inv);
-  first_path_labeling_inv = (unsigned int*)calloc(N, sizeof(unsigned int));
-  if(!first_path_labeling_inv) _OUT_OF_MEMORY();
-  if(best_path_labeling_inv) free(best_path_labeling_inv);
-  best_path_labeling_inv = (unsigned int*)calloc(N, sizeof(unsigned int));
-  if(!best_path_labeling_inv) _OUT_OF_MEMORY();
+  delete[] first_path_labeling_inv;
+  first_path_labeling_inv = new unsigned int[N];
+  std::fill_n(first_path_labeling_inv, N, 0);
+  delete[] best_path_labeling_inv;
+  best_path_labeling_inv = new unsigned int[N];
+  std::fill_n(best_path_labeling_inv, N, 0);
 
   /*
    * Allocate space for the automorphisms
    */
-  if(first_path_automorphism) free(first_path_automorphism);
-  first_path_automorphism = (unsigned int*)malloc(N * sizeof(unsigned int));
-  if(!first_path_automorphism) _OUT_OF_MEMORY();
-  if(best_path_automorphism) free(best_path_automorphism);
-  best_path_automorphism = (unsigned int*)malloc(N * sizeof(unsigned int));
-  if(!best_path_automorphism) _OUT_OF_MEMORY();
+  delete[] first_path_automorphism;
+  first_path_automorphism = new unsigned int[N];
+  delete[] best_path_automorphism;
+  best_path_automorphism = new unsigned int[N];
 
   /*
    * Initialize orbit information so that all vertices are in their own orbits
@@ -777,7 +760,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
   cr_level = 0;
   if(opt_use_comprec and
      nucr_find_first_component(cr_level) == true and
-     p.nof_discrete_cells() + cr_component_elements <
+     p.nof_discrete_cells() + cr_component_elements < 
      cr_cep_stack[cr_cep_index].discrete_cell_limit)
     {
       cr_level = p.cr_split_level(0, cr_component);
@@ -807,9 +790,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
     root.fp_extendable = TreeNode::MAYBE;
     root.in_best_path = false;
     root.cmp_to_best_path = 0;
-    root.needs_long_prune = false;
     root.long_prune_begin = 0;
-    root.needs_long_prune = false;
 
     root.failure_recording_ival = 0;
 
@@ -833,8 +814,11 @@ AbstractGraph::search(const bool canonical, Stats& stats)
   /*
    * The actual backtracking search
    */
-  while(!search_stack.empty())
+  while(!search_stack.empty()) 
     {
+      if(terminate and terminate(stats)) {
+	break;
+      }
       TreeNode&          current_node  = search_stack.back();
       const unsigned int current_level = (unsigned int)search_stack.size()-1;
 
@@ -863,7 +847,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 	  if(current_node.fp_extendable == TreeNode::YES)
 	    {
 	      search_stack.pop_back();
-	      continue;
+	      continue;	      
 	    }
 	  if(current_node.split_element == TreeNode::SPLIT_END)
 	    {
@@ -903,7 +887,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
       /* Fetch split cell information */
       Partition::Cell * const cell =
 	p.get_cell(p.elements[current_node.split_cell_first]);
-
+  
       /* Restore component recursion information */
       cr_level = current_node.cr_level;
       cr_cep_stack.resize(current_node.cr_cep_stack_size);
@@ -1033,10 +1017,19 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 		 */
 		if(index == cell->length and all_same_level == current_level+1)
 		  all_same_level = current_level;
+		if(verbstr and verbose_level >= 2) {
+		  fprintf(verbstr,
+			  "Level %u: orbits=%u, index=%u/%u, all_same_level=%u\n",
+			  current_level,
+			  first_path_orbits.nof_orbits(),
+			  index, cell->length,
+			  all_same_level);
+		  fflush(verbstr);
+		}
 	      }
 	    continue;
 	  }
-
+	
 	/* Split on smallest */
 	current_node.split_element = next_split_element;
       }
@@ -1081,7 +1074,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
        */
       if(cell->is_unit())
 	refine_to_equitable(cell, new_cell);
-      else
+      else 
 	refine_to_equitable(new_cell);
 
 
@@ -1095,7 +1088,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
       if(!first_path_info.empty())
 	{
 	  /* We are no longer on the first path */
-	  const unsigned int subcertificate_length =
+	  const unsigned int subcertificate_length = 
 	    certificate_current_path.size() - certificate_index;
 	  if(refine_equal_to_first)
 	    {
@@ -1166,7 +1159,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 		}
 	    }
 
-
+	  
 	  /* Check if no longer equal to the first path and,
 	   * if canonical labeling is desired, also worse than the
 	   * current best path */
@@ -1292,14 +1285,14 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 
 	  if(opt_use_failure_recording)
 	    failure_recording_hashes.resize(base_size);
-
+	  
 	  /*
 	  for(unsigned int j = 0; j < search_stack.size(); j++)
 	    fprintf(stderr, "%u ", search_stack[j].split_element);
 	  fprintf(stderr, "\n");
 	  p.print(stderr); fprintf(stderr, "\n");
 	  */
-
+	  
 	  /*
 	   * Backtrack to the previous level
 	   */
@@ -1549,7 +1542,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 	  continue;
 	}
 
-
+      
     handle_best_path_automorphism:
       /*
        *
@@ -1583,13 +1576,13 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 		  best_path_automorphism[p.elements[i]] = p.elements[i];
 	    }
 	  }
-
+	
 #if defined(BLISS_VERIFY_AUTOMORPHISMS)
 	/* Verify that it really is an automorphism */
 	if(!is_automorphism(best_path_automorphism))
 	  fatal_error("Best path automorhism validation check failed");
 #endif
-
+	
 	unsigned int gca_level_with_first = 0;
 	for(unsigned int i = search_stack.size(); i > 0; i--) {
 	  if((int)first_path_info[gca_level_with_first].splitting_element !=
@@ -1611,7 +1604,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 	    /* Record automorphism */
 	    long_prune_add_automorphism(best_path_automorphism);
 	  }
-
+	    
 	/*
 	 * Update orbit information
 	 */
@@ -1633,7 +1626,7 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 	    /* Update statistics */
 	    stats.nof_generators++;
 	  }
-
+	  
 	/*
 	 * Compute backjumping level
 	 */
@@ -1655,14 +1648,14 @@ AbstractGraph::search(const bool canonical, Stats& stats)
 
       _INTERNAL_ERROR();
 
-
+      
     handle_first_path_automorphism:
       /*
        *
        * A first-path automorphism: aut[i] = elements[first_path_labeling[i]]
        *
        */
-
+      
 
       if(p.is_discrete())
 	{
@@ -1692,17 +1685,17 @@ AbstractGraph::search(const bool canonical, Stats& stats)
       if(!is_automorphism(first_path_automorphism))
 	fatal_error("First path automorphism validation check failed");
 #endif
-
+      
       if(opt_use_long_prune)
 	{
 	  long_prune_add_automorphism(first_path_automorphism);
 	}
-
+      
       /*
        * Update orbit information
        */
       update_orbit_information(first_path_orbits, first_path_automorphism);
-
+      
       /*
        * Compute backjumping level
        */
@@ -1747,23 +1740,16 @@ AbstractGraph::find_automorphisms(Stats& stats,
 				  void (*hook)(void *user_param,
 					       unsigned int n,
 					       const unsigned int *aut),
-				  void *user_param)
+				  void *user_param,
+				  bool (*terminate)(const Stats&))
 {
   report_hook = hook;
   report_user_param = user_param;
 
-  search(false, stats);
+  search(false, stats, terminate);
 
-  if(first_path_labeling)
-    {
-      free(first_path_labeling);
-      first_path_labeling = 0;
-    }
-  if(best_path_labeling)
-    {
-      free(best_path_labeling);
-      best_path_labeling = 0;
-    }
+  delete[] first_path_labeling; first_path_labeling = nullptr;
+  delete[] best_path_labeling; best_path_labeling = nullptr;
 }
 
 
@@ -1772,13 +1758,13 @@ AbstractGraph::canonical_form(Stats& stats,
 			      void (*hook)(void *user_param,
 					   unsigned int n,
 					   const unsigned int *aut),
-			      void *user_param)
+			      void *user_param,
+			      bool (*terminate)(const Stats&))
 {
-
   report_hook = hook;
   report_user_param = user_param;
 
-  search(true, stats);
+  search(true, stats, terminate);
 
   return best_path_labeling;
 }
@@ -1931,8 +1917,10 @@ Digraph::add_vertex(const unsigned int color)
 void
 Digraph::add_edge(const unsigned int vertex1, const unsigned int vertex2)
 {
-  assert(vertex1 < get_nof_vertices());
-  assert(vertex2 < get_nof_vertices());
+  if(vertex1 >= vertices.size() or vertex2 >= vertices.size())
+    throw std::runtime_error("out of bounds vertex number");
+  //assert(vertex1 < get_nof_vertices());
+  //assert(vertex2 < get_nof_vertices());
   vertices[vertex1].add_edge_to(vertex2);
   vertices[vertex2].add_edge_from(vertex1);
 }
@@ -2070,7 +2058,6 @@ Digraph::permute(const unsigned int* const perm) const
  *-------------------------------------------------------------------------*/
 
 
-#if 0
 void
 Digraph::write_dot(const char* const filename)
 {
@@ -2107,7 +2094,6 @@ Digraph::write_dot(FILE* const fp)
 
   fprintf(fp, "}\n");
 }
-#endif
 
 
 void
@@ -2177,7 +2163,6 @@ Digraph::get_hash()
  *
  *-------------------------------------------------------------------------*/
 
-#if 0
 Digraph*
 Digraph::read_dimacs(FILE* const fp, FILE* const errstr)
 {
@@ -2188,7 +2173,7 @@ Digraph::read_dimacs(FILE* const fp, FILE* const errstr)
 
   const bool verbose = false;
   FILE* const verbstr = stdout;
-
+  
   /* Read comments and the problem definition line */
   while(1)
     {
@@ -2225,7 +2210,7 @@ Digraph::read_dimacs(FILE* const fp, FILE* const errstr)
 	fprintf(errstr, "error in line %u: not in DIMACS format\n", line_num);
       goto error_exit;
     }
-
+  
   if(nof_vertices <= 0)
     {
       if(errstr)
@@ -2326,7 +2311,7 @@ Digraph::read_dimacs(FILE* const fp, FILE* const errstr)
       fprintf(verbstr, "Done\n");
       fflush(verbstr);
     }
-
+  
   return g;
 
  error_exit:
@@ -2334,11 +2319,11 @@ Digraph::read_dimacs(FILE* const fp, FILE* const errstr)
     delete g;
   return 0;
 }
-#endif
 
 
 
-#if 0
+
+
 void
 Digraph::write_dimacs(FILE* const fp)
 {
@@ -2380,7 +2365,7 @@ Digraph::write_dimacs(FILE* const fp)
 	}
     }
 }
-#endif
+
 
 
 
@@ -2445,7 +2430,7 @@ Digraph::refine_according_to_invariant(unsigned int (*inv)(const Digraph* const 
 
   for(Partition::Cell* cell = p.first_nonsingleton_cell; cell; )
     {
-
+      
       Partition::Cell* const next_cell = cell->next_nonsingleton;
       const unsigned int* ep = p.elements + cell->first;
       for(unsigned int i = cell->length; i > 0; i--, ep++)
@@ -2481,7 +2466,7 @@ Digraph::refine_according_to_invariant(unsigned int (*inv)(const Digraph* const 
 bool
 Digraph::split_neighbourhood_of_cell(Partition::Cell* const cell)
 {
-
+  
 
   const bool was_equal_to_first = refine_equal_to_first;
 
@@ -2495,7 +2480,7 @@ Digraph::split_neighbourhood_of_cell(Partition::Cell* const cell)
   for(unsigned int i = cell->length; i > 0; i--)
     {
       const Vertex& v = vertices[*ep++];
-
+      
       std::vector<unsigned int>::const_iterator ei = v.edges_out.begin();
       for(unsigned int j = v.nof_edges_out(); j != 0; j--)
 	{
@@ -2520,7 +2505,7 @@ Digraph::split_neighbourhood_of_cell(Partition::Cell* const cell)
     {
       const unsigned int start = neighbour_heap.remove();
       Partition::Cell* const neighbour_cell = p.get_cell(p.elements[start]);
-
+      
       if(compute_eqref_hash)
 	{
 	  eqref_hash.update(neighbour_cell->first);
@@ -2636,7 +2621,7 @@ Digraph::split_neighbourhood_of_cell(Partition::Cell* const cell)
     return true;
 
   return false;
-
+  
  worse_exit:
   /* Clear neighbour heap */
   UintSeqHash rest;
@@ -2659,10 +2644,10 @@ Digraph::split_neighbourhood_of_cell(Partition::Cell* const cell)
     {
       for(unsigned int i = p.splitting_queue.size(); i > 0; i--)
 	{
-	  Partition::Cell* const cell_from_queue = p.splitting_queue.pop_front();
-	  rest.update(cell_from_queue->first);
-	  rest.update(cell_from_queue->length);
-	  p.splitting_queue.push_back(cell_from_queue);
+	  Partition::Cell* const cell = p.splitting_queue.pop_front();
+	  rest.update(cell->first);
+	  rest.update(cell->length);
+	  p.splitting_queue.push_back(cell);
 	}
       rest.update(failure_recording_fp_deviation);
       failure_recording_fp_deviation = rest.get_value();
@@ -2697,7 +2682,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
     {
       const unsigned int dest_vertex = *ei++;
       Partition::Cell* const neighbour_cell = p.get_cell(dest_vertex);
-
+   
       if(neighbour_cell->is_unit()) {
 	if(in_search) {
 	  /* Remember neighbour in order to generate certificate */
@@ -2710,7 +2695,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	  neighbour_heap.insert(neighbour_cell->first);
 	}
       neighbour_cell->max_ival_count++;
-
+      
       unsigned int* const swap_position =
 	p.elements + neighbour_cell->first + neighbour_cell->length -
 	neighbour_cell->max_ival_count;
@@ -2745,7 +2730,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
       if(neighbour_cell->length > 1 and
 	 neighbour_cell->max_ival_count != neighbour_cell->length)
 	{
-
+	  
 	  Partition::Cell* const new_cell =
 	    p.aux_split_in_two(neighbour_cell,
 			       neighbour_cell->length -
@@ -2759,7 +2744,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	    }
 	  neighbour_cell->max_ival_count = 0;
 
-
+	  
 	  if(compute_eqref_hash)
 	    {
 	      /* Update hash */
@@ -2770,7 +2755,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	      eqref_hash.update(new_cell->length);
 	      eqref_hash.update(1);
 	    }
-
+	  
 	  /* Add cells in splitting_queue */
 	  if(neighbour_cell->is_in_splitting_queue()) {
 	    /* Both cells must be included in splitting_queue in order
@@ -2799,7 +2784,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	{
 	  neighbour_cell->max_ival_count = 0;
 	}
-
+      
       /*
        * Build certificate if required
        */
@@ -2830,7 +2815,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
     {
       const unsigned int dest_vertex = *ei++;
       Partition::Cell* const neighbour_cell = p.get_cell(dest_vertex);
-
+      
       if(neighbour_cell->is_unit()) {
 	if(in_search) {
 	  neighbour_heap.insert(neighbour_cell->first);
@@ -2888,8 +2873,8 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	    ep++;
 	  }
 	  neighbour_cell->max_ival_count = 0;
-
-
+	  
+	  
 	  if(compute_eqref_hash)
 	    {
 	      eqref_hash.update(neighbour_cell->first);
@@ -2928,7 +2913,7 @@ Digraph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	{
 	  neighbour_cell->max_ival_count = 0;
 	}
-
+      
       /*
        * Build certificate if required
        */
@@ -3288,7 +3273,7 @@ Digraph::sh_first_max_neighbours()
 	    value++;
 	  neighbour_cell->max_ival = 0;
 	}
-
+      
       if(value > best_value)
 	{
 	  best_value = value;
@@ -3317,10 +3302,10 @@ Digraph::sh_first_smallest_max_neighbours()
       cell;
       cell = cell->next_nonsingleton)
     {
-
+	
       if(opt_use_comprec and p.cr_get_level(cell->first) != cr_level)
 	continue;
-
+	
       int value = 0;
       const Vertex& v = vertices[p.elements[cell->first]];
       std::vector<unsigned int>::const_iterator ei;
@@ -3473,7 +3458,7 @@ Digraph::initialize_certificate()
  * Slow, mainly for debugging and validation purposes.
  */
 bool
-Digraph::is_automorphism(unsigned int* const perm)
+Digraph::is_automorphism(unsigned int* const perm) const
 {
   std::set<unsigned int, std::less<unsigned int> > edges1;
   std::set<unsigned int, std::less<unsigned int> > edges2;
@@ -3485,30 +3470,30 @@ Digraph::is_automorphism(unsigned int* const perm)
 
   for(unsigned int i = 0; i < get_nof_vertices(); i++)
     {
-      Vertex& v1 = vertices[i];
-      Vertex& v2 = vertices[perm[i]];
+      const Vertex& v1 = vertices[i];
+      const Vertex& v2 = vertices[perm[i]];
 
       edges1.clear();
-      for(std::vector<unsigned int>::iterator ei = v1.edges_in.begin();
-	  ei != v1.edges_in.end();
+      for(std::vector<unsigned int>::const_iterator ei = v1.edges_in.cbegin();
+	  ei != v1.edges_in.cend();
 	  ei++)
 	edges1.insert(perm[*ei]);
       edges2.clear();
-      for(std::vector<unsigned int>::iterator ei = v2.edges_in.begin();
-	  ei != v2.edges_in.end();
+      for(std::vector<unsigned int>::const_iterator ei = v2.edges_in.cbegin();
+	  ei != v2.edges_in.cend();
 	  ei++)
 	edges2.insert(*ei);
       if(!(edges1 == edges2))
 	return false;
 
       edges1.clear();
-      for(std::vector<unsigned int>::iterator ei = v1.edges_out.begin();
-	  ei != v1.edges_out.end();
+      for(std::vector<unsigned int>::const_iterator ei = v1.edges_out.cbegin();
+	  ei != v1.edges_out.cend();
 	  ei++)
 	edges1.insert(perm[*ei]);
       edges2.clear();
-      for(std::vector<unsigned int>::iterator ei = v2.edges_out.begin();
-	  ei != v2.edges_out.end();
+      for(std::vector<unsigned int>::const_iterator ei = v2.edges_out.cbegin();
+	  ei != v2.edges_out.cend();
 	  ei++)
 	edges2.insert(*ei);
       if(!(edges1 == edges2))
@@ -3585,7 +3570,7 @@ Digraph::nucr_find_first_component(const unsigned int level)
   /* The component is discrete, return false */
   if(!first_cell)
     return false;
-
+	
   std::vector<Partition::Cell*> component;
   first_cell->max_ival = 1;
   component.push_back(first_cell);
@@ -3593,7 +3578,7 @@ Digraph::nucr_find_first_component(const unsigned int level)
   for(unsigned int i = 0; i < component.size(); i++)
     {
       Partition::Cell* const cell = component[i];
-
+	  
       const Vertex& v = vertices[p.elements[cell->first]];
       std::vector<unsigned int>::const_iterator ei;
 
@@ -3622,13 +3607,13 @@ Digraph::nucr_find_first_component(const unsigned int level)
 	  const unsigned int start = neighbour_heap.remove();
 	  Partition::Cell* const neighbour_cell =
 	    p.get_cell(p.elements[start]);
-
+	  
 	  /* Skip saturated neighbour cells */
 	  if(neighbour_cell->max_ival_count == neighbour_cell->length)
 	    {
 	      neighbour_cell->max_ival_count = 0;
 	      continue;
-	    }
+	    } 
 	  neighbour_cell->max_ival_count = 0;
 	  neighbour_cell->max_ival = 1;
 	  component.push_back(neighbour_cell);
@@ -3638,7 +3623,7 @@ Digraph::nucr_find_first_component(const unsigned int level)
       for(unsigned int j = v.nof_edges_in(); j > 0; j--)
 	{
 	  const unsigned int neighbour = *ei++;
-
+	  
 	  Partition::Cell* const neighbour_cell = p.get_cell(neighbour);
 
 	  /* Skip unit neighbours */
@@ -3660,13 +3645,13 @@ Digraph::nucr_find_first_component(const unsigned int level)
 	  const unsigned int start = neighbour_heap.remove();
 	  Partition::Cell* const neighbour_cell =
 	    p.get_cell(p.elements[start]);
-
+	  
 	  /* Skip saturated neighbour cells */
 	  if(neighbour_cell->max_ival_count == neighbour_cell->length)
 	    {
 	      neighbour_cell->max_ival_count = 0;
 	      continue;
-	    }
+	    } 
 	  neighbour_cell->max_ival_count = 0;
 	  neighbour_cell->max_ival = 1;
 	  component.push_back(neighbour_cell);
@@ -3680,6 +3665,12 @@ Digraph::nucr_find_first_component(const unsigned int level)
       cr_component.push_back(cell->first);
       cr_component_elements += cell->length;
     }
+
+  if(verbstr and verbose_level > 2) {
+    fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
+	    (long unsigned)cr_component.size(), cr_component_elements);
+    fflush(verbstr);
+  }
 
   return true;
 }
@@ -3716,7 +3707,7 @@ Digraph::nucr_find_first_component(const unsigned int level,
       /* The component is discrete, return false */
       return false;
     }
-
+	
   std::vector<Partition::Cell*> comp;
   KStack<Partition::Cell*> neighbours;
   neighbours.init(get_nof_vertices());
@@ -3738,7 +3729,7 @@ Digraph::nucr_find_first_component(const unsigned int level,
       for(unsigned int j = v.nof_edges_out(); j > 0; j--)
 	{
 	  const unsigned int neighbour = *ei++;
-
+	  
 	  Partition::Cell* const neighbour_cell = p.get_cell(neighbour);
 
 	  /* Skip unit neighbours */
@@ -3876,6 +3867,12 @@ Digraph::nucr_find_first_component(const unsigned int level,
       component_elements += cell->length;
     }
 
+  if(verbstr and verbose_level > 2) {
+    fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
+	    (long unsigned)component.size(), component_elements);
+    fflush(verbstr);
+  }
+
   return true;
 }
 
@@ -3993,6 +3990,8 @@ void
 Graph::add_edge(const unsigned int vertex1, const unsigned int vertex2)
 {
   //fprintf(stderr, "(%u,%u) ", vertex1, vertex2);
+  if(vertex1 >= vertices.size() or vertex2 >= vertices.size())
+    throw std::runtime_error("out of bounds vertex number");
   vertices[vertex1].add_edge(vertex2);
   vertices[vertex2].add_edge(vertex1);
 }
@@ -4015,7 +4014,6 @@ Graph::change_color(const unsigned int vertex, const unsigned int color)
  *
  *-------------------------------------------------------------------------*/
 
-#if 0
 Graph*
 Graph::read_dimacs(FILE* const fp, FILE* const errstr)
 {
@@ -4027,7 +4025,7 @@ Graph::read_dimacs(FILE* const fp, FILE* const errstr)
 
   const bool verbose = false;
   FILE* const verbstr = stdout;
-
+  
   /* Read comments and the problem definition line */
   while(1)
     {
@@ -4066,7 +4064,7 @@ Graph::read_dimacs(FILE* const fp, FILE* const errstr)
 	fprintf(errstr, "error in line %u: not in DIMACS format\n", line_num);
       goto error_exit;
     }
-
+  
   if(nof_vertices <= 0)
     {
       if(errstr)
@@ -4231,7 +4229,7 @@ Graph::write_dimacs(FILE* const fp)
 	}
     }
 }
-#endif
+
 
 
 void
@@ -4352,7 +4350,6 @@ Graph::permute(const unsigned int* perm) const
  *-------------------------------------------------------------------------*/
 
 
-#if 0
 void
 Graph::write_dot(const char* const filename)
 {
@@ -4390,7 +4387,9 @@ Graph::write_dot(FILE* const fp)
 
   fprintf(fp, "}\n");
 }
-#endif
+
+
+
 
 
 
@@ -4508,9 +4507,6 @@ Graph::selfloop_invariant(const Graph* const g, const unsigned int v)
 
 
 
-
-
-
 /*-------------------------------------------------------------------------
  *
  * Refine the partition p according to a partition independent invariant
@@ -4585,7 +4581,7 @@ Graph::split_neighbourhood_of_cell(Partition::Cell* const cell)
   for(unsigned int i = cell->length; i > 0; i--)
     {
       const Vertex& v = vertices[*ep++];
-
+      
       std::vector<unsigned int>::const_iterator ei = v.edges.begin();
       for(unsigned int j = v.nof_edges(); j != 0; j--)
 	{
@@ -4607,12 +4603,12 @@ Graph::split_neighbourhood_of_cell(Partition::Cell* const cell)
 	  }
 	}
     }
-
+  
   while(!neighbour_heap.is_empty())
     {
       const unsigned int start = neighbour_heap.remove();
       Partition::Cell * const neighbour_cell = p.get_cell(p.elements[start]);
-
+      
       if(compute_eqref_hash)
 	{
 	  eqref_hash.update(neighbour_cell->first);
@@ -4678,15 +4674,15 @@ Graph::split_neighbourhood_of_cell(Partition::Cell* const cell)
     {
       for(unsigned int i = p.splitting_queue.size(); i > 0; i--)
 	{
-	  Partition::Cell* const cell_from_queue = p.splitting_queue.pop_front();
-	  rest.update(cell_from_queue->first);
-	  rest.update(cell_from_queue->length);
-	  p.splitting_queue.push_back(cell_from_queue);
+	  Partition::Cell* const cell = p.splitting_queue.pop_front();
+	  rest.update(cell->first);
+	  rest.update(cell->length);
+	  p.splitting_queue.push_back(cell);
 	}
       rest.update(failure_recording_fp_deviation);
       failure_recording_fp_deviation = rest.get_value();
     }
-
+ 
   return true;
 }
 
@@ -4713,7 +4709,7 @@ Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
     {
       const unsigned int dest_vertex = *ei++;
       Partition::Cell * const neighbour_cell = p.get_cell(dest_vertex);
-
+      
       if(neighbour_cell->is_unit()) {
 	if(in_search) {
 	  /* Remember neighbour in order to generate certificate */
@@ -4735,7 +4731,7 @@ Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
       *swap_position = dest_vertex;
       p.in_pos[dest_vertex] = swap_position;
     }
-
+  
   while(!neighbour_heap.is_empty())
     {
       const unsigned int start = neighbour_heap.remove();
@@ -4769,8 +4765,8 @@ Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	      ep++;
 	    }
 	  neighbour_cell->max_ival_count = 0;
-
-
+	  
+	  
 	  if(compute_eqref_hash)
 	    {
 	      /* Update hash */
@@ -4781,7 +4777,7 @@ Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	      eqref_hash.update(new_cell->length);
 	      eqref_hash.update(1);
 	    }
-
+	  
 	  /* Add cells in splitting_queue */
 	  if(neighbour_cell->is_in_splitting_queue()) {
 	    /* Both cells must be included in splitting_queue in order
@@ -4812,7 +4808,7 @@ Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	     neighbour_cell->max_ival_count == neighbour_cell->length */
 	  neighbour_cell->max_ival_count = 0;
 	}
-
+      
       /*
        * Build certificate if required
        */
@@ -4833,7 +4829,7 @@ Graph::split_neighbourhood_of_unit_cell(Partition::Cell* const unit_cell)
 	    }
 	} /* if(in_search) */
     } /* while(!neighbour_heap.is_empty()) */
-
+  
   if(refine_compare_certificate and
      (refine_equal_to_first == false) and
      (refine_cmp_to_best < 0))
@@ -4892,7 +4888,7 @@ bool Graph::is_equitable() const
     {
       if(cell->is_unit())
 	continue;
-
+      
       unsigned int *ep = p.elements + cell->first;
       const Vertex &first_vertex = vertices[*ep++];
 
@@ -4962,6 +4958,7 @@ void Graph::make_initial_equitable_partition()
 
   refine_to_equitable();
   //p.print_signature(stderr); fprintf(stderr, "\n");
+
 
 }
 
@@ -5132,7 +5129,7 @@ Graph::sh_first_smallest_max_neighbours()
 
       if(opt_use_comprec and p.cr_get_level(cell->first) != cr_level)
 	continue;
-
+	
       const Vertex& v = vertices[p.elements[cell->first]];
       std::vector<unsigned int>::const_iterator ei = v.edges.begin();
       for(unsigned int j = v.nof_edges(); j > 0; j--)
@@ -5261,7 +5258,7 @@ Graph::initialize_certificate()
  *-------------------------------------------------------------------------*/
 
 bool
-Graph::is_automorphism(unsigned int* const perm)
+Graph::is_automorphism(unsigned int* const perm) const
 {
   std::set<unsigned int, std::less<unsigned int> > edges1;
   std::set<unsigned int, std::less<unsigned int> > edges2;
@@ -5273,17 +5270,17 @@ Graph::is_automorphism(unsigned int* const perm)
 
   for(unsigned int i = 0; i < get_nof_vertices(); i++)
     {
-      Vertex& v1 = vertices[i];
+      const Vertex& v1 = vertices[i];
       edges1.clear();
-      for(std::vector<unsigned int>::iterator ei = v1.edges.begin();
-	  ei != v1.edges.end();
+      for(std::vector<unsigned int>::const_iterator ei = v1.edges.cbegin();
+	  ei != v1.edges.cend();
 	  ei++)
 	edges1.insert(perm[*ei]);
-
-      Vertex& v2 = vertices[perm[i]];
+      
+      const Vertex& v2 = vertices[perm[i]];
       edges2.clear();
-      for(std::vector<unsigned int>::iterator ei = v2.edges.begin();
-	  ei != v2.edges.end();
+      for(std::vector<unsigned int>::const_iterator ei = v2.edges.cbegin();
+	  ei != v2.edges.cend();
 	  ei++)
 	edges2.insert(*ei);
 
@@ -5315,7 +5312,7 @@ Graph::is_automorphism(const std::vector<unsigned int>& perm) const
 	  ei != v1.edges.end();
 	  ei++)
 	edges1.insert(perm[*ei]);
-
+      
       const Vertex& v2 = vertices[perm[i]];
       edges2.clear();
       for(std::vector<unsigned int>::const_iterator ei = v2.edges.begin();
@@ -5355,7 +5352,7 @@ Graph::nucr_find_first_component(const unsigned int level)
   /* The component is discrete, return false */
   if(!first_cell)
     return false;
-
+	
   std::vector<Partition::Cell*> component;
   first_cell->max_ival = 1;
   component.push_back(first_cell);
@@ -5363,13 +5360,13 @@ Graph::nucr_find_first_component(const unsigned int level)
   for(unsigned int i = 0; i < component.size(); i++)
     {
       Partition::Cell* const cell = component[i];
-
+	  
       const Vertex& v = vertices[p.elements[cell->first]];
       std::vector<unsigned int>::const_iterator ei = v.edges.begin();
       for(unsigned int j = v.nof_edges(); j > 0; j--)
 	{
 	  const unsigned int neighbour = *ei++;
-
+	  
 	  Partition::Cell* const neighbour_cell = p.get_cell(neighbour);
 
 	  /* Skip unit neighbours */
@@ -5391,13 +5388,13 @@ Graph::nucr_find_first_component(const unsigned int level)
 	  const unsigned int start = neighbour_heap.remove();
 	  Partition::Cell* const neighbour_cell =
 	    p.get_cell(p.elements[start]);
-
+	  
 	  /* Skip saturated neighbour cells */
 	  if(neighbour_cell->max_ival_count == neighbour_cell->length)
 	    {
 	      neighbour_cell->max_ival_count = 0;
 	      continue;
-	    }
+	    } 
 	  neighbour_cell->max_ival_count = 0;
 	  neighbour_cell->max_ival = 1;
 	  component.push_back(neighbour_cell);
@@ -5411,6 +5408,12 @@ Graph::nucr_find_first_component(const unsigned int level)
       cr_component.push_back(cell->first);
       cr_component_elements += cell->length;
     }
+
+  if(verbstr and verbose_level > 2) {
+    fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
+	    (long unsigned)cr_component.size(), cr_component_elements);
+    fflush(verbstr);
+  }
 
   return true;
 }
@@ -5463,7 +5466,7 @@ Graph::nucr_find_first_component(const unsigned int level,
       for(unsigned int j = v.nof_edges(); j > 0; j--)
 	{
 	  const unsigned int neighbour = *ei++;
-
+	  
 	  Partition::Cell* const neighbour_cell = p.get_cell(neighbour);
 
 	  /* Skip unit neighbours */
@@ -5481,7 +5484,7 @@ Graph::nucr_find_first_component(const unsigned int level,
 	{
 	  Partition::Cell* const neighbour_cell = neighbours.pop();
 	  //neighbours.pop_back();
-
+	  
 	  /* Skip saturated neighbour cells */
 	  if(neighbour_cell->max_ival_count == neighbour_cell->length)
 	    {
@@ -5569,6 +5572,12 @@ Graph::nucr_find_first_component(const unsigned int level,
       component.push_back(cell->first);
       component_elements += cell->length;
     }
+
+  if(verbstr and verbose_level > 2) {
+    fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
+	    (long unsigned)component.size(), component_elements);
+    fflush(verbstr);
+  }
 
   return true;
 }

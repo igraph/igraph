@@ -1,36 +1,34 @@
-This file lists changes that were made to the original Bliss package (version 0.73) to integrate it into igraph.
+This file lists changes that were made to the original Bliss package (version 0.74) to integrate it into igraph.
 
-Remove `Makefile`, `Doxyfile`
+Exclude `CMakeLists.txt`, `Doxyfile`, `Makefile-manual`, `readme.txt`. Make sure not to accidentally overwrite igraph's own `bliss/CMakeLists.txt`.
 
-Removed `bliss.cc`, `bliss_C.cc`, `bliss_C.h`
+Removed `bliss.cc`, `bliss_C.cc`, `bliss_C.h`.
 
-Remove references to `Timer` class in `graph.cc`
+Remove `timer.hh`. Remove references to `timer.hh` and `Timer` class in `graph.cc`.
 
-Remove `timer.cc` and `timer.hh`
+Replace `#pragma once` by traditional header guards in all headers.
 
-Add to `defs.hh`:
+### In `bignum.hh`:
 
-    #include "config.h"
+Replace `#include <gmp.h>` by `#include "internal/gmp_internal.h"`.
 
-    #if HAVE_GMP == 1
-    #  define BLISS_USE_GMP
-    #endif
-
-In `bignum.hh`:
-
-Move `#if defined(BLISS_USE_GMP) ...` below `#include "defs.h"`
+At the beginning, add `#define BLISS_USE_GMP`. Verify that it is only used in this file.
 
 Add:
 
     #include "igraph_memory.h"
     #include "igraph_error.h"
 
-Also add, for the `tostring` method without GMP:
+Add `to_string_igraph` member function to `BigNum` class only for the case with GMP.
 
-    #include <cmath>
-    #include <cstring>
-    #include <sstream>
+### In `stats.hh`:
 
-Add `tostring` member function to `BigNum` class for both cases (with or without GMP).
+Add `get_group_size_igraph` member function to `Stats` class.
 
-In `graph.cc`, add IGRAPH_THREAD_LOCAL to the `PathInfo` global variable on line 612.
+### In `defs.cc` and `defs.hh`:
+
+Remove the `...` argument from `fatal_error` for simplicity, and make the function simply invoke `IGRAPH_FATAL`.
+
+### In `graph.cc`:
+
+Define `_INTERNAL_ERROR` in terms of `IGRAPH_FATAL`.

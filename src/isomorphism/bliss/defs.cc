@@ -1,10 +1,11 @@
+#include "igraph_error.h"
+
 #include <cstdlib>
 #include <cstdio>
-#include <stdexcept>
 #include "defs.hh"
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.
@@ -25,15 +26,9 @@
 namespace bliss {
 
 void
-fatal_error(const char* fmt, ...)
+fatal_error(const char* reason)
 {
-  char buffer[1024];
-  va_list ap;
-  va_start(ap, fmt);
-  sprintf(buffer, "Bliss fatal error: ");
-  vsprintf(buffer, fmt, ap);
-  va_end(ap);
-  throw std::runtime_error(buffer);
+  IGRAPH_FATAL(reason);
 }
 
 }

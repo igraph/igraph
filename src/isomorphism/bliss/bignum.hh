@@ -2,7 +2,7 @@
 #define BLISS_BIGNUM_HH
 
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.
@@ -20,24 +20,23 @@
   along with bliss.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <cstdlib>
-// #include <cstdio>
-#include <cmath>
-#include <cstring>
-#include <sstream>
-#include "defs.hh"
-
-#include "igraph_memory.h"
-#include "igraph_error.h"
+#define BLISS_USE_GMP
 
 #if defined(BLISS_USE_GMP)
 #include "internal/gmp_internal.h"
 #endif
 
+#include "igraph_memory.h"
+#include "igraph_error.h"
+
+#include <cstdlib>
+#include <cstdio>
+#include "defs.hh"
+
 namespace bliss {
 
 /**
- * \brief A very simple class for big integers (or approximation of them).
+ * \brief A simple wrapper class for big integers (or approximation of them).
  *
  * If the compile time flag BLISS_USE_GMP is set,
  * then the GNU Multiple Precision Arithmetic library (GMP) is used to
@@ -52,39 +51,38 @@ class BigNum
   mpz_t v;
 public:
   /**
-   * Create a new big number and set it to zero.
+   * \brief Create a new big number and set it to zero.
    */
   BigNum() {mpz_init(v); }
 
   /**
-   * Destroy the number.
+   * \brief Destroy the number.
    */
   ~BigNum() {mpz_clear(v); }
 
   /**
-   * Set the number to \a n.
+   * \brief Set the number to \a n.
    */
   void assign(const int n) {mpz_set_si(v, n); }
 
   /**
-   * Multiply the number with \a n.
+   * \brief Multiply the number with \a n.
    */
   void multiply(const int n) {mpz_mul_si(v, v, n); }
 
   /**
-   * Print the number in the file stream \a fp.
+   * \brief Print the number in the file stream \a fp.
    */
-  // size_t print(FILE* const fp) const {return mpz_out_str(fp, 10, v); }
+  size_t print(FILE* const fp) const {return mpz_out_str(fp, 10, v); }
 
-  int tostring(char **str) const {
+  int to_string_igraph(char **str) const {
     *str=igraph_Calloc(mpz_sizeinbase(v, 10)+2, char);
     if (! *str) {
-      IGRAPH_ERROR("Cannot convert big number to string", IGRAPH_ENOMEM);
+      IGRAPH_ERROR("Cannot convert big integer to string", IGRAPH_ENOMEM);
     }
     mpz_get_str(*str, 10, v);
-    return 0;
+    return IGRAPH_SUCCESS;
   }
-
 };
 
 #else
@@ -94,40 +92,28 @@ class BigNum
   long double v;
 public:
   /**
-   * Create a new big number and set it to zero.
+   * \brief Create a new big number and set it to zero.
    */
   BigNum(): v(0.0) {}
 
   /**
-   * Set the number to \a n.
+   * \brief Set the number to \a n.
    */
   void assign(const int n) {v = (long double)n; }
 
   /**
-   * Multiply the number with \a n.
+   * \brief Multiply the number with \a n.
    */
   void multiply(const int n) {v *= (long double)n; }
 
   /**
-   * Print the number in the file stream \a fp.
+   * \brief Print the number in the file stream \a fp.
    */
-  // size_t print(FILE* const fp) const {return fprintf(fp, "%Lg", v); }
-
-  int tostring(char **str) const {
-    int size=static_cast<int>( (std::log(std::abs(v))/std::log(10.0))+4 );
-    *str=igraph_Calloc(size, char );
-    if (! *str) {
-      IGRAPH_ERROR("Cannot convert big number to string", IGRAPH_ENOMEM);
-    }
-    std::stringstream ss;
-    ss << v;
-    strncpy(*str, ss.str().c_str(), size);
-    return 0;
-  }
+  size_t print(FILE* const fp) const {return fprintf(fp, "%Lg", v); }
 };
 
 #endif
 
 } //namespace bliss
 
-#endif
+#endif // BLISS_BIGNUM_HH

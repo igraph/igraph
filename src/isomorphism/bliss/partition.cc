@@ -1,16 +1,11 @@
+#include <new>
 #include <cassert>
-#include <vector>
-#include <list>
+
 #include "graph.hh"
 #include "partition.hh"
 
-/* use 'and' instead of '&&' */
-#if _MSC_VER
-#include <ciso646>
-#endif
-
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
   
   This file is part of bliss.
@@ -54,11 +49,11 @@ Partition::Partition()
 
 Partition::~Partition()
 {
-  if(elements)            {free(elements); elements = 0; }
-  if(cells)               {free(cells); cells = 0; }
-  if(element_to_cell_map) {free(element_to_cell_map); element_to_cell_map = 0; }
-  if(in_pos)              {free(in_pos); in_pos = 0; }
-  if(invariant_values)    {free(invariant_values); invariant_values = 0; }
+  delete[] elements; elements = nullptr;
+  delete[] cells; cells = nullptr;
+  delete[] element_to_cell_map; element_to_cell_map = nullptr;
+  delete[] in_pos; in_pos = nullptr;
+  delete[] invariant_values; invariant_values = nullptr;
   N = 0;
 }
 
@@ -69,27 +64,23 @@ void Partition::init(const unsigned int M)
   assert(M > 0);
   N = M;
 
-  if(elements)
-    free(elements);
-  elements = (unsigned int*)malloc(N * sizeof(unsigned int));
+  delete[] elements;
+  elements = new unsigned int[N];
   for(unsigned int i = 0; i < N; i++)
     elements[i] = i;
 
-  if(in_pos)
-    free(in_pos);
-  in_pos = (unsigned int**)malloc(N * sizeof(unsigned int*));
+  delete[] in_pos;
+  in_pos = new unsigned int*[N];
   for(unsigned int i = 0; i < N; i++)
     in_pos[i] = elements + i;
 
-  if(invariant_values)
-    free(invariant_values);
-  invariant_values = (unsigned int*)malloc(N * sizeof(unsigned int));
+  delete[] invariant_values;
+  invariant_values = new unsigned int[N];
   for(unsigned int i = 0; i < N; i++)
     invariant_values[i] = 0;
 
-  if(cells)
-    free(cells);
-  cells = (Cell*)malloc(N * sizeof(Cell));
+  delete[] cells;
+  cells = new Cell[N];
 
   cells[0].first = 0;
   cells[0].length = N;
@@ -132,9 +123,8 @@ void Partition::init(const unsigned int M)
   else
     free_cells = 0;
 
-  if(element_to_cell_map)
-    free(element_to_cell_map);
-  element_to_cell_map = (Cell **)malloc(N * sizeof(Cell *));
+  delete[] element_to_cell_map;
+  element_to_cell_map = new Cell*[N];
   for(unsigned int i = 0; i < N; i++)
     element_to_cell_map[i] = first_cell;
 
@@ -167,6 +157,7 @@ Partition::set_backtrack_point()
 void
 Partition::goto_backtrack_point(BacktrackPoint p)
 {
+  assert(p < bt_stack.size());
   BacktrackInfo info = bt_stack[p];
   bt_stack.resize(p);
 
@@ -226,6 +217,7 @@ Partition::goto_backtrack_point(BacktrackPoint p)
       if(i.prev_nonsingleton_first >= 0)
 	{
 	  Cell* const prev_cell = get_cell(elements[i.prev_nonsingleton_first]);
+	  assert(prev_cell->length > 1);
 	  cell->prev_nonsingleton = prev_cell;
 	  prev_cell->next_nonsingleton = cell;
 	}
@@ -239,6 +231,7 @@ Partition::goto_backtrack_point(BacktrackPoint p)
       if(i.next_nonsingleton_first >= 0)
 	{
 	  Cell* const next_cell = get_cell(elements[i.next_nonsingleton_first]);
+	  assert(next_cell->length > 1);
 	  cell->next_nonsingleton = next_cell;
 	  next_cell->prev_nonsingleton = cell;
 	}
@@ -257,8 +250,12 @@ Partition::Cell*
 Partition::individualize(Partition::Cell * const cell,
 			 const unsigned int element)
 {
+  assert(!cell->is_unit());
 
   unsigned int * const pos = in_pos[element];
+  assert((unsigned int)(pos - elements) >= cell->first);
+  assert((unsigned int)(pos - elements) < cell->first + cell->length);
+  assert(*pos == element);
 
   const unsigned int last = cell->first + cell->length - 1;
   *pos = elements[last];
@@ -267,6 +264,7 @@ Partition::individualize(Partition::Cell * const cell,
   in_pos[element] = elements + last;
   
   Partition::Cell * const new_cell = aux_split_in_two(cell, cell->length-1);
+  assert(elements[new_cell->first] == element);
   element_to_cell_map[element] = new_cell;
 
   return new_cell;
@@ -280,9 +278,11 @@ Partition::aux_split_in_two(Partition::Cell* const cell,
 {
   RefInfo i;
 
+  assert(0 < first_half_size && first_half_size < cell->length);
 
   /* (Pseudo)allocate new cell */
   Cell * const new_cell = free_cells;
+  assert(new_cell != 0);
   free_cells = new_cell->next;
   /* Update new cell parameters */
   new_cell->first = cell->first + first_half_size;
@@ -344,7 +344,7 @@ Partition::aux_split_in_two(Partition::Cell* const cell,
 } 
 
 
-#if 0
+
 size_t
 Partition::print(FILE* const fp, const bool add_newline) const
 {
@@ -388,13 +388,14 @@ Partition::print_signature(FILE* const fp, const bool add_newline) const
   if(add_newline) r += fprintf(fp, "\n");
   return r;
 }
-#endif
+
 
 
 void
 Partition::splitting_queue_add(Cell* const cell)
 {
   static const unsigned int smallish_cell_threshold = 1;
+  assert(!cell->in_splitting_queue);
   cell->in_splitting_queue = true;
   if(cell->length <= smallish_cell_threshold)
     splitting_queue.push_front(cell);
@@ -444,6 +445,7 @@ Partition::sort_and_split_cell1(Partition::Cell* const cell)
 
   /* (Pseudo)allocate new cell */
   Cell* const new_cell = free_cells;
+  assert(new_cell != 0);
   free_cells = new_cell->next;
 
 #define NEW_SORT1
@@ -519,6 +521,9 @@ Partition::sort_and_split_cell1(Partition::Cell* const cell)
       const unsigned int element = *ep0;
       const unsigned int ival = invariant_values[element];
       invariant_values[element] = 0;
+      assert(ival <= 1);
+      assert(element_to_cell_map[element] == cell);
+      assert(in_pos[element] == ep0);
       if(ival == 0)
 	{
 	  ep0++;
@@ -534,6 +539,8 @@ Partition::sort_and_split_cell1(Partition::Cell* const cell)
 	}
     }
 
+  assert(ep1 != elements + cell->first);
+  assert(ep0 != elements + cell->first + cell->length);
 
   /* Update new cell parameters */
   new_cell->first = ep1 - elements;
@@ -597,6 +604,7 @@ Partition::sort_and_split_cell1(Partition::Cell* const cell)
 
 
   /* Add cells in splitting queue */
+  assert(!new_cell->in_splitting_queue);
   if(cell->in_splitting_queue) {
     /* Both cells must be included in splitting_queue in order to have
        refinement to equitable partition */
@@ -634,6 +642,7 @@ Partition::sort_and_split_cell1(Partition::Cell* const cell)
 void
 Partition::dcs_cumulate_count(const unsigned int max) 
 {
+  assert(max <= 255);
   unsigned int* count_p = dcs_count;
   unsigned int* start_p = dcs_start;
   unsigned int sum = 0;
@@ -654,6 +663,7 @@ Partition::Cell*
 Partition::sort_and_split_cell255(Partition::Cell* const cell,
 				  const unsigned int max_ival)
 {
+  assert(max_ival <= 255);
 
   if(cell->is_unit())
     {
@@ -672,7 +682,9 @@ Partition::sort_and_split_cell255(Partition::Cell* const cell,
    */
   {
     const unsigned int *ep = elements + cell->first;
+    assert(element_to_cell_map[*ep] == cell);
     const unsigned int ival = invariant_values[*ep];
+    assert(ival <= 255);
     dcs_count[ival]++;
     ep++;
 #if defined(BLISS_CONSISTENCY_CHECKS)
@@ -680,7 +692,10 @@ Partition::sort_and_split_cell255(Partition::Cell* const cell,
 #endif
     for(unsigned int i = cell->length - 1; i != 0; i--)
       {
+	assert(element_to_cell_map[*ep] == cell);
 	const unsigned int ival2 = invariant_values[*ep];
+	assert(ival2 <= 255);
+	assert(ival2 <= max_ival);
 	dcs_count[ival2]++;
 #if defined(BLISS_CONSISTENCY_CHECKS)
 	if(ival2 != ival) {
@@ -703,6 +718,8 @@ Partition::sort_and_split_cell255(Partition::Cell* const cell,
   /* Build start array */
   dcs_cumulate_count(max_ival);
 
+  //assert(dcs_start[255] + dcs_count[255] == cell->length);
+  assert(dcs_start[max_ival] + dcs_count[max_ival] == cell->length);
 
   /* Do the sorting */
   for(unsigned int i = 0; i <= max_ival; i++)
@@ -716,6 +733,8 @@ Partition::sort_and_split_cell255(Partition::Cell* const cell,
 	      const unsigned int ival = invariant_values[element];
 	      if(ival == i)
 		break;
+	      assert(ival > i);
+	      assert(dcs_count[ival] > 0);
 	      *ep = elements[cell->first + dcs_start[ival]];
 	      elements[cell->first + dcs_start[ival]] = element;
 	      dcs_start[ival]++;
@@ -733,6 +752,7 @@ Partition::sort_and_split_cell255(Partition::Cell* const cell,
 
   /* split cell */
   Cell* const new_cell = split_cell(cell);
+  assert(new_cell != cell);
   return new_cell;
 }
 
@@ -749,6 +769,7 @@ Partition::shellsort_cell(Partition::Cell* const cell)
   unsigned int h;
   unsigned int* ep;
 
+  //assert(cell->first + cell->length <= N);
 
   if(cell->is_unit())
     return false;
@@ -758,9 +779,11 @@ Partition::shellsort_cell(Partition::Cell* const cell)
   {
     ep = elements + cell->first;
     const unsigned int ival = invariant_values[*ep];
+    assert(element_to_cell_map[*ep] == cell);
     ep++;
     for(unsigned int i = cell->length - 1; i > 0; i--)
       {
+	assert(element_to_cell_map[*ep] == cell);
 	if(invariant_values[*ep] != ival) {
 	  equal_invariant_values = false;
 	  break;
@@ -908,6 +931,7 @@ Partition::Cell*
 Partition::zplit_cell(Partition::Cell* const cell,
 		      const bool max_ival_info_ok)
 {
+  assert(cell != 0);
 
   Cell* last_new_cell = cell;
 
@@ -1005,13 +1029,11 @@ Partition::cr_init()
 
   cr_enabled = true;
 
-  if(cr_cells) free(cr_cells);
-  cr_cells = (CRCell*)malloc(N * sizeof(CRCell));
-  if(!cr_cells) {assert(false && "Mem out"); }
+  delete[] cr_cells;
+  cr_cells = new CRCell[N];
 
-  if(cr_levels) free(cr_levels);
-  cr_levels = (CRCell**)malloc(N * sizeof(CRCell*));
-  if(!cr_levels) {assert(false && "Mem out"); }
+  delete[] cr_levels;
+  cr_levels = new CRCell*[N];
 
   for(unsigned int i = 0; i < N; i++) {
     cr_levels[i] = 0;
@@ -1030,8 +1052,8 @@ Partition::cr_init()
 void
 Partition::cr_free()
 {
-  if(cr_cells) {free(cr_cells); cr_cells = 0; }
-  if(cr_levels) {free(cr_levels); cr_levels = 0; }
+  delete[] cr_cells; cr_cells = nullptr;
+  delete[] cr_levels; cr_levels = nullptr;
 
   cr_created_trail.clear();
   cr_splitted_level_trail.clear();
