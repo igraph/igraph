@@ -4,6 +4,11 @@
 #include "graph.hh"
 #include "partition.hh"
 
+/* Allow using 'and' instead of '&&' with MSVC */
+#if _MSC_VER
+#include <ciso646>
+#endif
+
 /*
   Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.

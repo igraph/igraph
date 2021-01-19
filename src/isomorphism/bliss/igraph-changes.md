@@ -32,3 +32,14 @@ Remove the `...` argument from `fatal_error` for simplicity, and make the functi
 ### In `graph.cc`:
 
 Define `_INTERNAL_ERROR` in terms of `IGRAPH_FATAL`.
+
+### MSVC compatibility
+
+Bliss uses `and`, `or`, etc. instead of `&&`, `||`, etc. These are not supported by MSVC by default. Bliss 0.74 uses the `/permissive` option to enable support in MSVC, but this option is only supported wit VS2019. Instead, in igraph we add the following where relevant.
+
+```
+/* Allow using 'and' instead of '&&' with MSVC */
+#if _MSC_VER
+#include <ciso646>
+#endif
+```
