@@ -29,14 +29,6 @@
 #include "igraph_interface.h"
 #include "igraph_random.h"
 
-/**
- * \section about_games
- *
- * <para>Games are randomized graph generators. Randomization means that
- * they generate a different graph every time you call them. </para>
- */
-
-
 static int igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_real_t prob,
                                              igraph_bool_t loops,
                                              igraph_vector_t *edges) {
