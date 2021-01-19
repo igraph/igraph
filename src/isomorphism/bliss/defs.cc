@@ -1,7 +1,5 @@
 #include "igraph_error.h"
 
-#include <cstdlib>
-#include <cstdio>
 #include "defs.hh"
 
 /*

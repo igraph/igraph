@@ -26,7 +26,6 @@
  */
 
 #include <vector>
-#include <cstdio>
 
 namespace bliss {
 

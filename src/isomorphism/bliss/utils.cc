@@ -1,4 +1,3 @@
-#include <cassert>
 #include <vector>
 #include "utils.hh"
 

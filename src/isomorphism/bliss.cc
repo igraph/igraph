@@ -83,7 +83,7 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
         g = new Graph(nof_vertices);
     }
 
-    g->set_verbose_level(0);
+    /* g->set_verbose_level(0); */
 
     for (unsigned int i = 0; i < nof_edges; i++) {
         g->add_edge((unsigned int)IGRAPH_FROM(graph, i), (unsigned int)IGRAPH_TO(graph, i));

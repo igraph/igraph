@@ -29,7 +29,7 @@ namespace bliss {
   class AbstractGraph;
 }
 
-#include <cstdio>
+// #include <cstdio>
 #include <vector>
 #include "stats.hh"
 #include "kstack.hh"
@@ -56,6 +56,7 @@ public:
   AbstractGraph();
   virtual ~AbstractGraph();
 
+#if 0
   /**
    * Set the verbose output level for the algorithms.
    * \param level  the level of verbose output, 0 means no verbose output
@@ -67,6 +68,7 @@ public:
    * \param fp  the file stream; if null, no verbose output is written
    */
   void set_verbose_file(FILE * const fp);
+#endif
 
   /**
    * Add a new vertex with color \a color in the graph and return its index.
@@ -218,10 +220,10 @@ public:
 protected:
   /** \internal
    * How much verbose output is produced (0 means none) */
-  unsigned int verbose_level;
+  /* unsigned int verbose_level; */
   /** \internal
    * The output stream for verbose output. */
-  FILE *verbstr;
+  /* FILE *verbstr; */
 protected:
 
   /** \internal

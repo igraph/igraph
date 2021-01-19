@@ -5,7 +5,7 @@
 #include <list>
 #include <algorithm>
 #include <stdexcept>
-#include <cstdio>
+// #include <cstdio>
 #include <cassert>
 #include <climits>
 
@@ -69,8 +69,10 @@ AbstractGraph::AbstractGraph()
   opt_use_comprec = true;
 
 
+  /*
   verbose_level = 0;
   verbstr = stdout;
+  */
 
   report_hook = 0;
   report_user_param = 0;
@@ -99,6 +101,7 @@ AbstractGraph::~AbstractGraph()
  *
  *-------------------------------------------------------------------------*/
 
+/*
 void
 AbstractGraph::set_verbose_level(const unsigned int level)
 {
@@ -110,6 +113,7 @@ AbstractGraph::set_verbose_file(FILE* const fp)
 {
   verbstr = fp;
 }
+*/
 
 
 
@@ -1022,6 +1026,7 @@ AbstractGraph::search(const bool canonical,
                  */
                 if(index == cell->length and all_same_level == current_level+1)
                   all_same_level = current_level;
+                /*
                 if(verbstr and verbose_level >= 2) {
                   fprintf(verbstr,
                           "Level %u: orbits=%u, index=%u/%u, all_same_level=%u\n",
@@ -1031,6 +1036,7 @@ AbstractGraph::search(const bool canonical,
                           all_same_level);
                   fflush(verbstr);
                 }
+                */
               }
             continue;
           }
@@ -3405,11 +3411,13 @@ Digraph::nucr_find_first_component(const unsigned int level)
       cr_component_elements += cell->length;
     }
 
+  /*
   if(verbstr and verbose_level > 2) {
     fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
             (long unsigned)cr_component.size(), cr_component_elements);
     fflush(verbstr);
   }
+  */
 
   return true;
 }
@@ -3606,11 +3614,13 @@ Digraph::nucr_find_first_component(const unsigned int level,
       component_elements += cell->length;
     }
 
+  /*
   if(verbstr and verbose_level > 2) {
     fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
             (long unsigned)component.size(), component_elements);
     fflush(verbstr);
   }
+  */
 
   return true;
 }
@@ -4864,11 +4874,13 @@ Graph::nucr_find_first_component(const unsigned int level)
       cr_component_elements += cell->length;
     }
 
+  /*
   if(verbstr and verbose_level > 2) {
     fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
             (long unsigned)cr_component.size(), cr_component_elements);
     fflush(verbstr);
   }
+  */
 
   return true;
 }
@@ -5028,11 +5040,13 @@ Graph::nucr_find_first_component(const unsigned int level,
       component_elements += cell->length;
     }
 
+  /*
   if(verbstr and verbose_level > 2) {
     fprintf(verbstr, "NU-component with %lu cells and %u vertices\n",
             (long unsigned)component.size(), component_elements);
     fflush(verbstr);
   }
+  */
 
   return true;
 }

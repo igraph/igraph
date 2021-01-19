@@ -1,5 +1,4 @@
 #include <cassert>
-#include "defs.hh"
 #include "orbit.hh"
 
 /*
