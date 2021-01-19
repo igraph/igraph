@@ -556,7 +556,9 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  * \brief Preferential attachment with aging of vertices
  *
  * </para><para>
- * In this game, the probability that a node gains a new edge is
+ * This game starts with one vertex (if nodes > 0). In each step
+ * a node is added, and then edges from the new node are added.
+ * The probability that a node gains a new edge is
  * given by its (in-)degree (k) and age (l). This probability has a
  * degree dependent component multiplied by an age dependent
  * component. The degree dependent part is: \p deg_coef times k to the
@@ -663,8 +665,12 @@ int igraph_barabasi_aging_game(igraph_t *graph,
             no_of_neighbors = (long int) VECTOR(*outseq)[i];
         }
         sum = igraph_psumtree_sum(&sumtree);
+        printf("sum: %f\n", sum);
+        float test = RNG_UNIF(0, sum);
+        printf("rnd: %f\n", test);
         for (j = 0; j < no_of_neighbors; j++) {
-            igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
+            igraph_psumtree_search(&sumtree, &to, test);
+            printf("To: %ld\n", to);
             VECTOR(degree)[to]++;
             VECTOR(edges)[edgeptr++] = i;
             VECTOR(edges)[edgeptr++] = to;
@@ -700,12 +706,14 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     }
 
     RNG_END();
+    igraph_vector_print(&degree);
+    igraph_vector_print(&edges);
 
-    igraph_vector_destroy(&degree);
+    //igraph_vector_destroy(&degree);
     igraph_psumtree_destroy(&sumtree);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
+    //IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
 
