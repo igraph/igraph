@@ -4,9 +4,9 @@
 /*
   Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -37,9 +37,9 @@ namespace bliss {
  * e.g. the permutation (2 4) is printed as (3 5) when \a offset is 1.
  */
 size_t print_permutation(FILE* fp,
-			 const unsigned int N,
-			 const unsigned int* perm,
-			 const unsigned int offset = 0);
+                         const unsigned int N,
+                         const unsigned int* perm,
+                         const unsigned int offset = 0);
 
 /**
  * Print the permutation \a perm of {0,...,N-1} in the cycle format
@@ -48,8 +48,8 @@ size_t print_permutation(FILE* fp,
  * e.g. the permutation (2 4) is printed as (3 5) when \a offset is 1.
  */
 size_t print_permutation(FILE* fp,
-			 const std::vector<unsigned int>& perm,
-			 const unsigned int offset = 0);
+                         const std::vector<unsigned int>& perm,
+                         const unsigned int offset = 0);
 
 /**
  * Check whether \a perm is a valid permutation on {0,...,N-1}.

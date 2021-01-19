@@ -4,9 +4,9 @@
 /*
   Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -153,11 +153,11 @@ public:
    * to evaluate so that it does not take too much time.
    */
   void find_automorphisms(Stats& stats,
-			  void (*hook)(void* user_param,
-				       unsigned int n,
-				       const unsigned int* aut) = 0,
-			  void* hook_user_param = 0,
-			  bool (*terminate)(const Stats& s) = 0);
+                          void (*hook)(void* user_param,
+                          unsigned int n,
+                          const unsigned int* aut) = 0,
+                          void* hook_user_param = 0,
+                          bool (*terminate)(const Stats& s) = 0);
 
   /**
    * Otherwise the same as find_automorphisms() except that
@@ -186,11 +186,11 @@ public:
    * to evaluate so that it does not take too much time.
    */
   const unsigned int* canonical_form(Stats& stats,
-				     void (*hook)(void* user_param,
-						  unsigned int n,
-						  const unsigned int* aut) = 0,
-				     void* hook_user_param = 0,
-				     bool (*terminate)(const Stats& s) = 0);
+                                     void (*hook)(void* user_param,
+                                     unsigned int n,
+                                     const unsigned int* aut) = 0,
+                                     void* hook_user_param = 0,
+                                     bool (*terminate)(const Stats& s) = 0);
 
   /**
    * Write the graph to a file in a variant of the DIMACS format.
@@ -219,7 +219,7 @@ public:
   /**
    * Get a hash value for the graph.
    * \return  the hash value
-   */ 
+   */
   virtual unsigned int get_hash() = 0;
 
   /**
@@ -286,8 +286,8 @@ protected:
    * May modify refine_equal_to_first and refine_cmp_to_best.
    * May also update eqref_hash and failure_recording_fp_deviation. */
   void cert_add(const unsigned int v1,
-		const unsigned int v2,
-		const unsigned int v3);
+                const unsigned int v2,
+                const unsigned int v3);
 
   /** \internal
    * Add a redundant triple (v1,v2,v3) in the certificate.
@@ -295,8 +295,8 @@ protected:
    * May modify refine_equal_to_first and refine_cmp_to_best.
    * May also update eqref_hash and failure_recording_fp_deviation. */
   void cert_add_redundant(const unsigned int x,
-			  const unsigned int y,
-			  const unsigned int z);
+                          const unsigned int y,
+                          const unsigned int z);
 
   /**\internal
    * Is the long prune method in use?
@@ -347,7 +347,7 @@ protected:
   void refine_to_equitable();
   void refine_to_equitable(Partition::Cell * const unit_cell);
   void refine_to_equitable(Partition::Cell * const unit_cell1,
-			   Partition::Cell * const unit_cell2);
+                           Partition::Cell * const unit_cell2);
 
 
   /** \internal
@@ -383,7 +383,7 @@ protected:
 
   void update_labeling(unsigned int * const lab);
   void update_labeling_and_its_inverse(unsigned int * const lab,
-				       unsigned int * const lab_inv);
+                                       unsigned int * const lab_inv);
   void update_orbit_information(Orbit &o, const unsigned int *perm);
 
   void reset_permutation(unsigned int *perm);
@@ -415,12 +415,12 @@ protected:
   } PathInfo;
 
   void search(const bool canonical, Stats &stats,
-	      bool (*terminate)(const Stats& s));
+              bool (*terminate)(const Stats& s));
 
 
   void (*report_hook)(void *user_param,
-		      unsigned int n,
-		      const unsigned int *aut);
+                      unsigned int n,
+                      const unsigned int *aut);
   void *report_user_param;
 
 
@@ -468,9 +468,9 @@ protected:
    */
   virtual bool nucr_find_first_component(const unsigned int level) = 0;
   virtual bool nucr_find_first_component(const unsigned int level,
-					 std::vector<unsigned int>& component,
-					 unsigned int& component_elements,
-					 Partition::Cell*& sh_return) = 0;
+                                         std::vector<unsigned int>& component,
+                                         unsigned int& component_elements,
+                                         Partition::Cell*& sh_return) = 0;
   /** \internal
    * The non-uniformity component found by nucr_find_first_component()
    * is stored here.
@@ -554,7 +554,7 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int vertex_color_invariant(const Graph* const g,
-					     const unsigned int v);
+                                             const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns the degree of the vertex.
@@ -562,18 +562,18 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int degree_invariant(const Graph* const g,
-				       const unsigned int v);
+                                       const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns 1 if there is an edge from the vertex to itself, 0 if not.
    * Time complexity: O(k), where k is the number of edges leaving the vertex.
    */
   static unsigned int selfloop_invariant(const Graph* const g,
-					 const unsigned int v);
+                                         const unsigned int v);
 
 
   bool refine_according_to_invariant(unsigned int (*inv)(const Graph* const g,
-							 const unsigned int v));
+                                                         const unsigned int v));
 
   /*
    * Routines needed when refining the partition p into equitable
@@ -600,15 +600,15 @@ protected:
   void make_initial_equitable_partition();
 
   void initialize_certificate();
-  
+
   bool is_automorphism(unsigned int* const perm) const;
 
 
   bool nucr_find_first_component(const unsigned int level);
   bool nucr_find_first_component(const unsigned int level,
-				 std::vector<unsigned int>& component,
-				 unsigned int& component_elements,
-				 Partition::Cell*& sh_return);
+                                 std::vector<unsigned int>& component,
+                                 unsigned int& component_elements,
+                                 Partition::Cell*& sh_return);
 
 
 
@@ -665,7 +665,7 @@ public:
 
   /**
    * \copydoc AbstractGraph::get_hash()
-   */ 
+   */
   virtual unsigned int get_hash();
 
   /**
@@ -678,7 +678,7 @@ public:
    */
   Graph* permute(const unsigned int* const perm) const;
   Graph* permute(const std::vector<unsigned int>& perm) const;
-  
+
   /**
    * Add a new vertex with color \a color in the graph and return its index.
    */
@@ -714,7 +714,7 @@ public:
    * for both graphs.
    */
   void set_splitting_heuristic(const SplittingHeuristic shs) {sh = shs; }
-  
+
 
 };
 
@@ -785,7 +785,7 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int vertex_color_invariant(const Digraph* const g,
-					     const unsigned int v);
+                                             const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns the indegree of the vertex.
@@ -793,7 +793,7 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int indegree_invariant(const Digraph* const g,
-					 const unsigned int v);
+                                         const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns the outdegree of the vertex.
@@ -801,21 +801,21 @@ protected:
    * Time complexity: O(1).
    */
   static unsigned int outdegree_invariant(const Digraph* const g,
-					  const unsigned int v);
+                                          const unsigned int v);
   /** \internal
    * Partition independent invariant.
    * Returns 1 if there is an edge from the vertex to itself, 0 if not.
    * Time complexity: O(k), where k is the number of edges leaving the vertex.
    */
   static unsigned int selfloop_invariant(const Digraph* const g,
-					 const unsigned int v);
+                                         const unsigned int v);
 
   /** \internal
    * Refine the partition \a p according to
    * the partition independent invariant \a inv.
    */
   bool refine_according_to_invariant(unsigned int (*inv)(const Digraph* const g,
-							 const unsigned int v));
+                                                         const unsigned int v));
 
   /*
    * Routines needed when refining the partition p into equitable
@@ -849,9 +849,9 @@ protected:
 
   bool nucr_find_first_component(const unsigned int level);
   bool nucr_find_first_component(const unsigned int level,
-				 std::vector<unsigned int>& component,
-				 unsigned int& component_elements,
-				 Partition::Cell*& sh_return);
+                                 std::vector<unsigned int>& component,
+                                 unsigned int& component_elements,
+                                 Partition::Cell*& sh_return);
 
 public:
   /**
@@ -904,14 +904,14 @@ public:
 
   /**
    * \copydoc AbstractGraph::get_hash()
-   */ 
+   */
   virtual unsigned int get_hash();
 
   /**
    * Return the number of vertices in the graph.
    */
   unsigned int get_nof_vertices() const {return vertices.size(); }
-  
+
   /**
    * Add a new vertex with color 'color' in the graph and return its index.
    */
@@ -951,7 +951,7 @@ public:
   /**
    * \copydoc AbstractGraph::permute(const unsigned int* const perm) const
    */
-  Digraph* permute(const unsigned int* const perm) const;  
+  Digraph* permute(const unsigned int* const perm) const;
   Digraph* permute(const std::vector<unsigned int>& perm) const;
 };
 

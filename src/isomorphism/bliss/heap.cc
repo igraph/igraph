@@ -11,9 +11,9 @@
 /*
   Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -65,9 +65,9 @@ void Heap::downheap(unsigned int index)
     {
       unsigned int new_index = index + index;
       if((new_index < n) and (array[new_index] > array[new_index+1]))
-	new_index++;
+        new_index++;
       if(v <= array[new_index])
-	break;
+        break;
       array[index] = array[new_index];
       index = new_index;
     }
