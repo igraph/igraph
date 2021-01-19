@@ -410,23 +410,30 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
  * <code>L[(i mod p)]</code> steps ahead of it along the cycle, where
  * \c p is the length of \c L.
  * In other words, vertex \c i will be connected to vertex
- * <code>(i + L[(i mod p)]) mod nodes</code>.
+ * <code>(i + L[(i mod p)]) mod nodes</code>. If multiple edges are
+ * defined in this way, this will output a non-simple graph. To 
+ * simplify the end result igraph_simplify can be called.
  *
  * </para><para>
  * See also Kotsis, G: Interconnection Topologies for Parallel Processing
- * Systems, PARS Mitteilungen 11, 1-6, 1993.
+ * Systems, PARS Mitteilungen 11, 1-6, 1993. The igraph extended chordal
+ * rings are not identical to the ones in the paper. In igraph
+ * the matrix specifies which edges to add. In the paper, a condition is
+ * specified which should simultaneously hold between two endpoints and
+ * the reverse endpoints.
  *
  * \param graph Pointer to an uninitialized graph object, the result
  *   will be stored here.
  * \param nodes Integer constant, the number of vertices in the
  *   graph. It must be at least 3.
  * \param W The matrix specifying the extra edges. The number of
- *   columns should divide the number of total vertices.
+ *   columns should divide the number of total vertices. The elements
+ *   are allowed to be negative.
  * \param directed Whether the graph should be directed.
  * \return Error code.
  *
- * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector()
- *
+ * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector(),
+ * \ref igraph_simplify()
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
@@ -477,8 +484,6 @@ int igraph_extended_chordal_ring(
     }
 
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, directed));
-    IGRAPH_CHECK(igraph_simplify(graph, /*multiple=*/ 1, /*loops=*/ 0,
-                                 /*edge_comb=*/ NULL));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return IGRAPH_SUCCESS;
