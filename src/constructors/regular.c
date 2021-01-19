@@ -411,8 +411,8 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
  * \c p is the length of \c L.
  * In other words, vertex \c i will be connected to vertex
  * <code>(i + L[(i mod p)]) mod nodes</code>. If multiple edges are
- * defined in this way, this will output a non-simple graph. To 
- * simplify the end result igraph_simplify can be called.
+ * defined in this way, this will output a non-simple graph. The result
+ * can be simplified using \ref igraph_simplify().
  *
  * </para><para>
  * See also Kotsis, G: Interconnection Topologies for Parallel Processing
@@ -432,8 +432,8 @@ int igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
  * \param directed Whether the graph should be directed.
  * \return Error code.
  *
- * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector(),
- * \ref igraph_simplify()
+ * \sa \ref igraph_ring(), \ref igraph_lcf(), \ref igraph_lcf_vector().
+ *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
