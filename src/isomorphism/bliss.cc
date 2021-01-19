@@ -20,11 +20,13 @@
 #include "bliss/graph.hh"
 
 #include "igraph_topology.h"
-
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
+#include "igraph_interrupt.h"
 
 #include "core/exceptions.h"
+
+#include "config.h"
 
 using namespace bliss;
 using namespace std;
@@ -58,6 +60,16 @@ using namespace std;
  */
 
 namespace { // unnamed namespace
+
+IGRAPH_THREAD_LOCAL bool search_aborted;
+
+bool check_abort(const Stats &) {
+    if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+        search_aborted = true;
+        return true;
+    }
+    return false;
+}
 
 inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
     unsigned int nof_vertices = (unsigned int)igraph_vcount(graph);
@@ -189,7 +201,12 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
         IGRAPH_CHECK(bliss_set_colors(g, colors));
 
         Stats stats;
-        const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
+        search_aborted = false;
+        const unsigned int *cl = g->canonical_form(stats, NULL, NULL, &check_abort);
+        if (search_aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
+
         IGRAPH_CHECK(igraph_vector_resize(labeling, N));
         for (unsigned int i = 0; i < N; i++) {
             VECTOR(*labeling)[i] = cl[i];
@@ -237,7 +254,11 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
         IGRAPH_CHECK(bliss_set_colors(g, colors));
 
         Stats stats;
-        g->find_automorphisms(stats, NULL, NULL);
+        search_aborted = false;
+        g->find_automorphisms(stats, NULL, NULL, &check_abort);
+        if (search_aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
 
         bliss_info_to_igraph(info, stats);
 
@@ -282,8 +303,11 @@ int igraph_automorphism_group(
 
         Stats stats;
         igraph_vector_ptr_resize(generators, 0);
-        g->find_automorphisms(stats, collect_generators, generators);
-
+        search_aborted = false;
+        g->find_automorphisms(stats, collect_generators, generators, &check_abort);
+        if (search_aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
         bliss_info_to_igraph(info, stats);
 
         delete g;
