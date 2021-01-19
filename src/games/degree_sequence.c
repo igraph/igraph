@@ -22,6 +22,7 @@
 */
 
 #include "igraph_interface.h"
+#include "igraph_games.h"
 
 #include "igraph_adjlist.h"
 #include "igraph_constructors.h"
@@ -471,7 +472,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
         IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*degseq)[i]));
-    }    
+    }
 
     RNG_BEGIN();
 
@@ -590,7 +591,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
         IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*out_deg)[i]));
-    }    
+    }
 
     RNG_BEGIN();
 
