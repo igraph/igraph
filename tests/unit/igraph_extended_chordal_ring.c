@@ -30,7 +30,7 @@ int main() {
     igraph_matrix_init(&W, 1, 1);
     igraph_matrix_set(&W, 0, 0, 2);
     assert(igraph_extended_chordal_ring(&g, /* nodes */ 5, &W, 1 /*directed*/) == IGRAPH_SUCCESS);
-   igraph_small(&g_test, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 2, 1, 3, 2, 4, 3, 0, 4, 1, -1);
+    igraph_small(&g_test, 5, IGRAPH_DIRECTED, 0, 1, 1, 2, 2, 3, 3, 4, 4, 0, 0, 2, 1, 3, 2, 4, 3, 0, 4, 1, -1);
     assert(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
     assert(same);
 
@@ -71,5 +71,4 @@ int main() {
 
     VERIFY_FINALLY_STACK();
     return 0;
-
 }
