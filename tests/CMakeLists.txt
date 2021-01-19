@@ -149,6 +149,7 @@ add_legacy_tests(
   erdos_renyi_game
   full
   igraph_correlated_game
+  igraph_extended_chordal_ring
   igraph_from_prufer
   igraph_full_citation
   igraph_growing_random_game
