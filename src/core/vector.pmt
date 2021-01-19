@@ -969,18 +969,16 @@ int FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
 /**
  * \ingroup vector
  * \function igraph_vector_max
- * \brief Gives the maximum element of the vector.
+ * \brief Largest element of a vector.
  *
  * </para><para>
  * If the size of the vector is zero, an arbitrary number is
  * returned.
  * \param v The vector object.
- * \return The maximum element.
+ * \return The maximum element of \p v, or NaN if any element is NaN.
  *
- * Time complexity: O(n),
- * n is the size of the vector.
+ * Time complexity: O(n), the number of elements.
  */
-
 BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     BASE max;
     BASE *ptr;
@@ -989,7 +987,8 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     max = *(v->stor_begin);
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
-        if ((*ptr) > max) {
+        if (!((*ptr) <= max)) {
+            /* Double negation to deal with NaN */
             max = *ptr;
         }
         ptr++;
@@ -997,21 +996,22 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     return max;
 }
 
+
 /**
  * \ingroup vector
  * \function igraph_vector_which_max
- * \brief Gives the position of the maximum element of the vector.
+ * \brief Gives the index of the maximum element of the vector.
  *
  * </para><para>
- * If the size of the vector is zero, -1 is
- * returned.
+ * If the size of the vector is zero, -1 is returned. If the largest
+ * element is not unique, then the index of the first is returned.
+ * If the vector contains NaN values, the index of the first NaN value
+ * is returned.
  * \param v The vector object.
- * \return The position of the first maximum element.
+ * \return The index of the first maximum element.
  *
- * Time complexity: O(n),
- * n is the size of the vector.
+ * Time complexity: O(n), n is the size of the vector.
  */
-
 long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
     long int which = -1;
     if (!FUNCTION(igraph_vector, empty)(v)) {
@@ -1023,7 +1023,10 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
         max = *(v->stor_begin); which = 0;
         ptr = v->stor_begin + 1; pos = 1;
         while (ptr < v->end) {
-            if ((*ptr) > max) {
+            if (!((*ptr) <= max) && /* Double negation to deal with NaN */
+                !(max != max) /* Ensure that first NaN value is considered */
+                ) {
+
                 max = *ptr;
                 which = pos;
             }
@@ -1034,12 +1037,13 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
 }
 
 /**
+ * \ingroup vector
  * \function igraph_vector_min
  * \brief Smallest element of a vector.
  *
  * The vector must be non-empty.
  * \param v The input vector.
- * \return The smallest element of \p v.
+ * \return The smallest element of \p v, or nan if any element is nan.
  *
  * Time complexity: O(n), the number of elements.
  */
@@ -1052,7 +1056,8 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
     min = *(v->stor_begin);
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
-        if ((*ptr) < min) {
+        if (!((*ptr) >= min)) {
+            /* Double negation to deal with NaN */
             min = *ptr;
         }
         ptr++;
@@ -1061,18 +1066,19 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
 }
 
 /**
+ * \ingroup vector
  * \function igraph_vector_which_min
  * \brief Index of the smallest element.
  *
- * The vector must be non-empty.
- * If the smallest element is not unique, then the index of the first
- * is returned.
+ * </para><para>
+ * The vector must be non-empty. If the smallest element is not unique,
+ * then the index of the first is returned. If the vector contains NaN
+ * values, the index of the first NaN value is returned.
  * \param v The input vector.
  * \return Index of the smallest element.
  *
  * Time complexity: O(n), the number of elements.
  */
-
 long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
     long int which = -1;
     if (!FUNCTION(igraph_vector, empty)(v)) {
@@ -1084,7 +1090,9 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
         min = *(v->stor_begin); which = 0;
         ptr = v->stor_begin + 1; pos = 1;
         while (ptr < v->end) {
-            if ((*ptr) < min) {
+            if (!((*ptr) >= min) && /* Double negation to deal with NaN */
+                !(min != min) /* Ensure that first NaN value is considered */
+                ) {
                 min = *ptr;
                 which = pos;
             }
