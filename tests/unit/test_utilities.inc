@@ -94,6 +94,62 @@ void print_graph(const igraph_t *graph) {
     printf("}\n");
 }
 
+
+/* Edge comparisong function used for sorting in print_graph_canon(). */
+int edge_compare(const void *e1, const void *e2) {
+    const igraph_real_t *edge1 = (igraph_real_t *) e1, *edge2 = (igraph_real_t *) e2;
+    if (edge1[0] < edge2[0]) {
+        return -1;
+    } else if (edge1[0] > edge2[0]) {
+        return 1;
+    } else if (edge1[1] < edge2[1]) {
+        return -1;
+    } else if (edge1[1] > edge2[1]) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
+
+/* Print a graph using a sorted edge list. Other than sorting (i.e. canonicalizing) the edge list,
+ * this function is identical to print_graph(). */
+void print_graph_canon(const igraph_t *graph) {
+    long ecount = igraph_ecount(graph);
+    long vcount = igraph_vcount(graph);
+    long i;
+    igraph_vector_t edges;
+
+    printf("directed: %s\n", igraph_is_directed(graph) ? "true" : "false");
+    printf("vcount: %ld\n", vcount);
+    printf("edges: {\n");
+
+    igraph_vector_init(&edges, 0);
+    igraph_get_edgelist(graph, &edges, 0);
+
+    /* If the graph is undirected, we make sure that the first vertex of undirected edges
+     * is always the one with the lower ID. */
+    if (! igraph_is_directed(graph)) {
+        for (i=0; i < ecount; ++i) {
+            if (VECTOR(edges)[2*i] > VECTOR(edges)[2*i+1]) {
+                igraph_real_t tmp = VECTOR(edges)[2*i];
+                VECTOR(edges)[2*i] = VECTOR(edges)[2*i+1];
+                VECTOR(edges)[2*i+1] = tmp;
+            }
+        }
+    }
+
+    /* Sort the edge list */
+    igraph_qsort(&VECTOR(edges)[0], ecount, 2*sizeof(igraph_real_t), &edge_compare);
+
+    for (i=0; i < ecount; ++i) {
+        printf("%ld %ld\n", (long) VECTOR(edges)[2*i], (long) VECTOR(edges)[2*i+1]);
+    }
+
+    igraph_vector_destroy(&edges);
+
+    printf("}\n");
+}
+
 /* Print a vector, ensuring that the first nonzero element is positive. */
 void print_vector_first_nonzero_element_positive(const igraph_vector_t *vector, const char* format) {
     igraph_vector_t copy;

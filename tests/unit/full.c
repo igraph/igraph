@@ -26,30 +26,43 @@
 
 int main() {
     igraph_t g;
-    long int n_vertices = 10;
+    igraph_integer_t n_vertices = 10;
+
+    printf("Null graph\n");
+    igraph_full(&g, 0, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    print_graph_canon(&g);
+    igraph_destroy(&g);
+
+    printf("Singleton graph, no loops\n");
+    igraph_full(&g, 1, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    print_graph_canon(&g);
+    igraph_destroy(&g);
+
+    printf("Singleton graph, loops\n");
+    igraph_full(&g, 1, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
+    print_graph_canon(&g);
+    igraph_destroy(&g);
 
     printf("Undirected, no loops\n");
-    igraph_full(&g, n_vertices, 0 /*undirected*/, 0/*no loops*/);
-    print_graph(&g);
+    igraph_full(&g, n_vertices, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
+    print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("Directed, no loops\n");
-    igraph_full(&g, n_vertices, 1 /*directed*/, 0/*no loops*/);
-    print_graph(&g);
+    igraph_full(&g, n_vertices, IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
+    print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("Undirected, with loops\n");
-    igraph_full(&g, n_vertices, 0 /*undirected*/, 1/*loops*/);
-    print_graph(&g);
+    igraph_full(&g, n_vertices, IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
+    print_graph_canon(&g);
     igraph_destroy(&g);
 
     printf("Directed, with loops\n");
-    igraph_full(&g, n_vertices, 1 /*directed*/, 1/*loops*/);
-    print_graph(&g);
+    igraph_full(&g, n_vertices, IGRAPH_DIRECTED, IGRAPH_LOOPS);
+    print_graph_canon(&g);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();
-
     return 0;
-
 }

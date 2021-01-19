@@ -5,7 +5,7 @@
 
 #define PRINT_DESTROY(name) \
     printf(name "\n"); \
-    print_graph(&graph); \
+    print_graph_canon(&graph); \
     igraph_destroy(&graph); \
     printf("\n");
 
