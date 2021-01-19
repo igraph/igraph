@@ -460,3 +460,29 @@ int igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
     }
     return 0;
 }
+
+/**
+ * \ingroup vector
+ * \function igraph_vector_is_any_nan
+ * \brief Check if any element is nan.
+ *
+ * </para><para>
+ * \param v The \type igraph_vector_t object to check.
+ * \return 1 if any element is nan, 0 otherwise.
+ *
+ * Time complexity: O(n), the number of elements.
+ */
+igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v)
+{
+    igraph_real_t *ptr;
+    IGRAPH_ASSERT(v != NULL);
+    IGRAPH_ASSERT(v->stor_begin != NULL);
+    ptr = v->stor_begin;
+    while (ptr < v->end) {
+        if (igraph_is_nan(*ptr)) {
+            return 1;
+        }
+        ptr++;
+    }
+    return 0;
+}
