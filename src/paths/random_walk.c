@@ -133,12 +133,13 @@ static void vec_destr(igraph_vector_t *vec) {
  *
  * \param graph The input graph, it can be directed or undirected.
  *   Multiple edges are respected, so are loop edges.
- * \param weights A vector of non-negative edge weights.
- *   It is assumed that at least one strictly positive weight is found among the
- *   outgoing edges of each vertex.  If it is a NULL pointer, all edges are considered
- *   to have equal weight.
- * \param edgewalk An initialized vector; the indices of traversed edges are stored here.
- *   It will be resized as needed.
+ * \param weights A vector of non-negative edge weights. It is assumed
+ *   that at least one strictly positive weight is found among the
+ *   outgoing edges of each vertex. Additionally, no edge weight may
+ *   be NaN. If either case does not hold, an error is returned. If it
+ *   is a NULL pointer, all edges are considered to have equal weight.
+ * \param edgewalk An initialized vector; the indices of traversed
+ *   edges are stored here. It will be resized as needed.
  * \param start The start vertex for the walk.
  * \param steps The number of steps to take. If the random walk gets
  *   stuck, then the \p stuck argument specifies what happens.
@@ -190,8 +191,14 @@ int igraph_random_edge_walk(const igraph_t *graph,
         if (igraph_vector_size(weights) != ec) {
             IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
         }
-        if (ec > 0 && igraph_vector_min(weights) < 0) {
-            IGRAPH_ERROR("Weights must be non-negative", IGRAPH_EINVAL);
+        if (ec > 0) {
+            igraph_real_t min = igraph_vector_min(weights);
+            if (min < 0) {
+                IGRAPH_ERROR("Weights must be non-negative", IGRAPH_EINVAL);
+            }
+            else if (igraph_is_nan(min)) {
+                IGRAPH_ERROR("Weights must not contain NaN values", IGRAPH_EINVAL);
+            }
         }
     }
 

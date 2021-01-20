@@ -53,11 +53,11 @@
  * \param from The source vertices.
  * \param to The target vertices. It is not allowed to include a
  *    vertex twice or more.
- * \param weights The edge weights. They must be all non-negative for
- *    Dijkstra's algorithm to work. An error code is returned if there
- *    is a negative edge weight in the weight vector. If this is a null
- *    pointer, then the
- *    unweighted version, \ref igraph_shortest_paths() is called.
+ * \param weights The edge weights. All edge weights must be
+ *    non-negative for Dijkstra's algorithm to work. Additionally, no
+ *    edge weight may be NaN. If either case does not hold, an error
+ *    is returned. If this is a null pointer, then the unweighted
+ *    version, \ref igraph_shortest_paths() is called.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -114,8 +114,14 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
-        IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (min < 0) {
+            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+        }
+        else if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        }
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));
@@ -245,8 +251,11 @@ int igraph_shortest_paths_dijkstra(const igraph_t *graph,
  * \param to Vertex sequence with the ids of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
- * \param weights a vector holding the edge weights. All weights must be
- *        positive.
+* \param weights The edge weights. All edge weights must be
+ *       non-negative for Dijkstra's algorithm to work. Additionally, no
+ *       edge weight may be NaN. If either case does not hold, an error
+ *       is returned. If this is a null pointer, then the unweighted
+ *       version, \ref igraph_get_shortest_paths() is called.
  * \param mode The type of shortest paths to be use for the
  *        calculation in directed graphs. Possible values:
  *        \clist
@@ -341,8 +350,14 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
-        IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (min < 0) {
+            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+        }
+        else if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        }
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, to, &vit));
@@ -536,9 +551,11 @@ int igraph_get_shortest_paths_dijkstra(const igraph_t *graph,
  *        path are stored here.
  * \param from The id of the source vertex.
  * \param to The id of the target vertex.
- * \param weights Vector of edge weights, in the order of edge
- *        ids. They must be non-negative, otherwise the algorithm does
- *        not work.
+ * \param weights The edge weights. All edge weights must be
+ *       non-negative for Dijkstra's algorithm to work. Additionally, no
+ *       edge weight may be NaN. If either case does not hold, an error
+ *       is returned. If this is a null pointer, then the unweighted
+ *       version, \ref igraph_get_shortest_paths() is called.
  * \param mode A constant specifying how edge directions are
  *        considered in directed graphs. \c IGRAPH_OUT follows edge
  *        directions, \c IGRAPH_IN follows the opposite directions,
@@ -628,8 +645,11 @@ static int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
  * \param to Vertex sequence with the ids of the vertices to/from which the
  *        shortest paths will be calculated. A vertex might be given multiple
  *        times.
- * \param weights a vector holding the edge weights. All weights must be
- *        non-negative.
+ * \param weights The edge weights. All edge weights must be
+ *       non-negative for Dijkstra's algorithm to work. Additionally, no
+ *       edge weight may be NaN. If either case does not hold, an error
+ *       is returned. If this is a null pointer, then the unweighted
+ *       version, \ref igraph_get_all_shortest_paths() is called.
  * \param mode The type of shortest paths to be use for the
  *        calculation in directed graphs. Possible values:
  *        \clist
@@ -692,8 +712,14 @@ int igraph_get_all_shortest_paths_dijkstra(const igraph_t *graph,
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
     }
-    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
-        IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (min < 0) {
+            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+        }
+        else if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        }
     }
 
     /* parents stores a vector for each vertex, listing the parent vertices
