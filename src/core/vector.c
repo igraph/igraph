@@ -464,11 +464,11 @@ int igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
 /**
  * \ingroup vector
  * \function igraph_vector_is_any_nan
- * \brief Check if any element is nan.
+ * \brief Check if any element is NaN.
  *
  * </para><para>
  * \param v The \type igraph_vector_t object to check.
- * \return 1 if any element is nan, 0 otherwise.
+ * \return 1 if any element is NaN, 0 otherwise.
  *
  * Time complexity: O(n), the number of elements.
  */
