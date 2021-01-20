@@ -193,6 +193,10 @@ DECLDIR int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *
                                         const igraph_vs_t vids, igraph_bool_t directed,
                                         igraph_real_t cutoff, const igraph_vector_t *weights);
 
+DECLDIR int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
+                                             igraph_bool_t directed, igraph_real_t cutoff,
+                                             const igraph_vector_t *weights);
+
 __END_DECLS
 
 #endif
