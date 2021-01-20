@@ -46,8 +46,10 @@
  * \param weights The edge weights. There mustn't be any closed loop in
  *    the graph that has a negative total weight (since this would allow
  *    us to decrease the weight of any path containing at least a single
- *    vertex of this loop infinitely). If this is a null pointer, then the
- *    unweighted version, \ref igraph_shortest_paths() is called.
+ *    vertex of this loop infinitely). Additionally, no edge weight may
+ *    be NaN. If either case does not hold, an error is returned. If this
+ *    is a null pointer, then the unweighted version,
+ *    \ref igraph_shortest_paths() is called.
  * \param mode For directed graphs; whether to follow paths along edge
  *    directions (\c IGRAPH_OUT), or the opposite (\c IGRAPH_IN), or
  *    ignore edge directions completely (\c IGRAPH_ALL). It is ignored
@@ -96,6 +98,9 @@ int igraph_shortest_paths_bellman_ford(const igraph_t *graph,
 
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match", IGRAPH_EINVAL);
+    }
+    if (no_of_edges > 0 && igraph_vector_is_any_nan(weights)) {
+        IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, from, &fromvit));

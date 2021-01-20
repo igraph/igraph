@@ -161,7 +161,7 @@ static int igraph_i_average_path_length_dijkstra(
     */
 
     long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);    
+    long int no_of_edges = igraph_ecount(graph);
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
     long int source, j;
@@ -175,9 +175,16 @@ static int igraph_i_average_path_length_dijkstra(
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Weight vector length does not match the number of edges", IGRAPH_EINVAL);
     }
-    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
-        IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (min < 0) {
+            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+        }
+        else if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        }
     }
+
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
@@ -308,11 +315,11 @@ int igraph_average_path_length(const igraph_t *graph,
  * has fewer than two vertices, or if the graph has no edges and \c unconn is set to \c TRUE,
  * NaN is returned.
  *
- * \param weights The edge weights. They must be all non-negative for
- *    Dijkstra's algorithm to work. An error code is returned if there
- *    is a negative edge weight in the weight vector. If this is a null
- *    pointer, then the unweighted version,
- *    \ref igraph_average_path_length() is called.
+ * \param weights The edge weights. All edge weights must be
+ *       non-negative for Dijkstra's algorithm to work. Additionally, no
+ *       edge weight may be NaN. If either case does not hold, an error
+ *       is returned. If this is a null pointer, then the unweighted
+ *       version, \ref igraph_average_path_length() is called.
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
  * \param unconn_pairs Pointer to a real number. If not a null pointer, the number of
@@ -368,8 +375,12 @@ int igraph_average_path_length_dijkstra(const igraph_t *graph,
  *
  * \param graph The graph object.
  * \param res Pointer to a real number, this will contain the result.
- * \param weights The edge weights. They must be all non-negative.
- *    If a null pointer is given, all weights are assumed to be 1.
+ * \param weights The edge weights. All edge weights must be
+ *       non-negative for Dijkstra's algorithm to work. Additionally, no
+ *       edge weight may be NaN. If either case does not hold, an error
+ *       is returned. If this is a null pointer, then the unweighted
+ *       version, \ref igraph_average_path_length() is used in calculating
+ *       the global efficiency.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \return Error code:
@@ -453,7 +464,7 @@ static int igraph_i_local_efficiency_unweighted(
 
         IGRAPH_CHECK(igraph_dqueue_push(q, source));
         IGRAPH_CHECK(igraph_dqueue_push(q, 0));
-        already_counted[source] = source + 1;        
+        already_counted[source] = source + 1;
 
         while (!igraph_dqueue_empty(q)) {
             igraph_vector_int_t *act_neis;
@@ -634,8 +645,11 @@ static int igraph_i_local_efficiency_dijkstra(
  * \param graph The graph object.
  * \param res Pointer to an initialized vector, this will contain the result.
  * \param vids The vertices around which the local efficiency will be calculated.
- * \param weights The edge weights. They must be all non-negative.
- *    If a null pointer is given, all weights are assumed to be 1.
+ * \param weights The edge weights. All edge weights must be
+ *       non-negative. Additionally, no edge weight may be NaN. If either
+ *       case does not hold, an error is returned. If this is a null
+ *       pointer, then the unweighted version,
+ *       \ref igraph_average_path_length() is called.
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param mode How to determine the local neighborhood of each vertex
@@ -736,8 +750,14 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
         if (igraph_vector_size(weights) != no_of_edges) {
             IGRAPH_ERROR("Weight vector length does not match the number of edges", IGRAPH_EINVAL);
         }
-        if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
-            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+        if (no_of_edges > 0) {
+            igraph_real_t min = igraph_vector_min(weights);
+            if (min < 0) {
+                IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+            }
+            else if (igraph_is_nan(min)) {
+                IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            }
         }
 
         IGRAPH_CHECK(igraph_lazy_inclist_init(graph, &inclist, directed ? IGRAPH_OUT : IGRAPH_ALL));
@@ -780,6 +800,7 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
  * \param res Pointer to a real number, this will contain the result.
  * \param weights The edge weights. They must be all non-negative.
  *    If a null pointer is given, all weights are assumed to be 1.
+ *
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param mode How to determine the local neighborhood of each vertex
@@ -1112,8 +1133,14 @@ int igraph_diameter_dijkstra(const igraph_t *graph,
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
 
-    if (no_of_edges > 0 && igraph_vector_min(weights) < 0) {
-        IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+    if (no_of_edges > 0) {
+        igraph_real_t min = igraph_vector_min(weights);
+        if (min < 0) {
+            IGRAPH_ERROR("Weight vector must be non-negative", IGRAPH_EINVAL);
+        }
+        else if (igraph_is_nan(min)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        }
     }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
