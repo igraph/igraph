@@ -775,14 +775,14 @@ class RCCodeGenerator(CodeGenerator):
                 return t
 
         types = [self.types[params[n]["type"]] for n in params.keys()]
-        call = map(
+        call = list(map(
             lambda t, n: docall(t.get("CALL", "c_" + n), n), types, params.keys()
-        )
-        call = map(
+        ))
+        call = list(map(
             lambda c, n: c.replace("%C%", "c_" + n).replace("%I%", n),
             call,
             params.keys(),
-        )
+        ))
         retpars = [n for n, p in params.items() if p["mode"] in ["OUT", "INOUT"]]
         call = [c for c in call if c != ""]
         res = "  " + function + "(" + ", ".join(call) + ");\n"
@@ -941,9 +941,7 @@ class JavaCodeGenerator(CodeGenerator):
                 return_type_name = types["OUT"][0]["type"]
             else:
                 return_type_name = types["INOUT"][0]["type"]
-        elif len(types["OUT"]) + len(types["INOUT"]) == 0 and self.func[f].has_key(
-            "RETURN"
-        ):
+        elif len(types["OUT"]) + len(types["INOUT"]) == 0 and "RETURN" in self.func[f]:
             # There are only input parameters and the return type is specified,
             # this also fits the Java semantics
             return_type_name = self.func[f]["RETURN"]
@@ -965,7 +963,7 @@ class JavaCodeGenerator(CodeGenerator):
                 data["self_name"] = p
                 continue
             tdesc = self.types.get(type_name, {})
-            if not tdesc.has_key(type_param):
+            if type_param not in tdesc:
                 raise StimulusError(
                     "{}: unknown input type {} (needs {}), skipping".format(
                         data["name"], type_name, type_param
@@ -983,7 +981,7 @@ class JavaCodeGenerator(CodeGenerator):
                     break
 
         tdesc = self.types.get(return_type_name, {})
-        if not tdesc.has_key(type_param):
+        if type_param not in tdesc:
             raise StimulusError(
                 "{}: unknown return type {}, skipping".format(
                     data["name"], return_type_name
@@ -1248,12 +1246,12 @@ class JavaCCodeGenerator(JavaCodeGenerator):
         prefixed C argument name is used.
         """
         types = [self.types[params[n]["type"]] for n in params.keys()]
-        call = map(lambda t, n: t.get("CALL", "c_" + n), types, params.keys())
-        call = map(
+        call = list(map(lambda t, n: t.get("CALL", "c_" + n), types, params.keys()))
+        call = list(map(
             lambda c, n: c.replace("%C%", "c_" + n).replace("%I%", n),
             call,
             params.keys(),
-        )
+        ))
         lines = [
             "  if ((*env)->ExceptionCheck(env)) {",
             "    c__result = IGRAPH_EINVAL;",
@@ -1607,8 +1605,8 @@ int shell_%(func)s(int argc, char **argv) {
 
     def chunk_call(self, function, params):
         types = [self.types[params[n]["type"]] for n in params.keys()]
-        call = map(lambda t, n: t.get("CALL", n), types, params.keys())
-        call = map(lambda c, n: c.replace("%C%", n), call, params.keys())
+        call = list(map(lambda t, n: t.get("CALL", n), types, params.keys()))
+        call = list(map(lambda c, n: c.replace("%C%", n), call, params.keys()))
         return "  shell_result=" + function + "(" + ", ".join(call) + ");"
 
     def chunk_outconv(self, function, params):
