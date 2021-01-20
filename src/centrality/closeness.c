@@ -70,8 +70,8 @@
  *          undirected one for the computation.
  *        \endclist
  * \param weights An optional vector containing edge weights for
- *        weighted closeness. Supply a null pointer here for
- *        traditional, unweighted closeness.
+ *        weighted closeness. No edge weight may be NaN. Supply a null
+ *        pointer here for traditional, unweighted closeness.
  * \param normalized Boolean, whether to normalize results by multiplying
  *        by the number of vertices minus one.
  * \return Error code:
@@ -134,8 +134,11 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     }
 
     if (no_of_edges > 0) {
-        if (igraph_vector_min(weights) <= 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight <= 0) {
             IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+        } else if (igraph_is_nan(minweight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
         }
     }
 
@@ -272,8 +275,8 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
  *        If negative, the exact closeness will be calculated (no upper
  *        limit on path lengths).
  * \param weights An optional vector containing edge weights for
- *        weighted closeness. Supply a null pointer here for
- *        traditional, unweighted closeness.
+ *        weighted closeness. No edge weight may be NaN. Supply a
+ *        null pointer here for traditional, unweighted closeness.
  * \param normalized Boolean, whether to normalize results by multiplying
  *        by the number of vertices minus one.
  * \return Error code:
@@ -337,8 +340,8 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  *          undirected one for the computation.
  *        \endclist
  * \param weights An optional vector containing edge weights for
- *        weighted closeness. Supply a null pointer here for
- *        traditional, unweighted closeness.
+ *        weighted closeness. No edge weight may be NaN. Supply a null
+ *        pointer here for traditional, unweighted closeness.
  * \param normalized Boolean, whether to normalize results by multiplying
  *        by the number of vertices minus one.
  * \param cutoff The maximal length of paths that will be considered.
@@ -601,8 +604,13 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
         IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
     }
 
-    if (no_of_edges > 0 && igraph_vector_min(weights) <= 0) {
-        IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+    if (no_of_edges > 0) {
+        igraph_real_t minweight = igraph_vector_min(weights);
+        if (minweight <= 0) {
+            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+        } else if (igraph_is_nan(minweight)) {
+            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+        }
     }
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -711,8 +719,8 @@ static int igraph_i_harmonic_centrality_weighted(const igraph_t *graph,
  *          undirected one for the computation.
  *        \endclist
  * \param weights An optional vector containing edge weights for
- *        weighted harmonic centrality. If \c NULL, all weights are
- *        considered to be one.
+ *        weighted harmonic centrality. No edge weight may be NaN.
+ *        If \c NULL, all weights are considered to be one.
  * \param normalized Boolean, whether to normalize the result. If true,
  *        the result is the mean inverse path length to other vertices.
  *        i.e. it is normalized by the number of vertices minus one.
@@ -794,8 +802,8 @@ int igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *re
  *          undirected one for the computation.
  *        \endclist
  * \param weights An optional vector containing edge weights for
- *        weighted harmonic centrality. If \c NULL, all weights are
- *        considered to be one.
+ *        weighted harmonic centrality. No edge weight may be NaN.
+ *        If \c NULL, all weights are considered to be one.
  * \param normalized Boolean, whether to normalize the result. If true,
  *        the result is the mean inverse path length to other vertices,
  *        i.e. it is normalized by the number of vertices minus one.
