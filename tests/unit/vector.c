@@ -142,6 +142,7 @@ int main() {
     printf("Test NaN values\n");
     igraph_vector_push_back(&v, IGRAPH_NAN);
     igraph_vector_push_back(&v, IGRAPH_NAN);
+    igraph_vector_push_back(&v, 1);
     assert(igraph_is_nan(igraph_vector_max(&v)));
     /* Index should be to first NaN value */
     assert(igraph_vector_which_max(&v) == 10);

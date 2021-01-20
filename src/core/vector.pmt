@@ -985,12 +985,14 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     max = *(v->stor_begin);
+    if (max != max) { return max; }; /* Result is NaN */
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
-        if (!((*ptr) <= max)) {
-            /* Double negation to deal with NaN */
+        if ((*ptr) > max) {
             max = *ptr;
         }
+        else if (*ptr != *ptr)
+            return *ptr; /* Result is NaN */
         ptr++;
     }
     return max;
@@ -1013,27 +1015,30 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
  * Time complexity: O(n), n is the size of the vector.
  */
 long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
-    long int which = -1;
     if (!FUNCTION(igraph_vector, empty)(v)) {
         BASE max;
         BASE *ptr;
-        long int pos;
+        BASE *which;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
-        max = *(v->stor_begin); which = 0;
-        ptr = v->stor_begin + 1; pos = 1;
+        ptr = v->stor_begin;
+        if (*ptr != *ptr) { return ptr - v->stor_begin; } /* Result is NaN */
+        which = ptr;
+        max = *which;
+        ptr++;
         while (ptr < v->end) {
-            if (!((*ptr) <= max) && /* Double negation to deal with NaN */
-                !(max != max) /* Ensure that first NaN value is considered */
-                ) {
-
-                max = *ptr;
-                which = pos;
+            if ((*ptr) > max) {
+                which = ptr;
+                max = *which;
             }
-            ptr++; pos++;
+            else if (*ptr != *ptr) {
+                return ptr - v->stor_begin; /* Result is NaN */
+            }
+            ptr++;
         }
+        return which - v->stor_begin;
     }
-    return which;
+    return -1;
 }
 
 /**
@@ -1054,12 +1059,14 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     min = *(v->stor_begin);
+    if (min != min) { return min; }; /* Result is NaN */
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
-        if (!((*ptr) >= min)) {
-            /* Double negation to deal with NaN */
+        if ((*ptr) < min) {
             min = *ptr;
         }
+        else if (*ptr != *ptr)
+            return *ptr; /* Result is NaN */
         ptr++;
     }
     return min;
@@ -1080,26 +1087,29 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
  * Time complexity: O(n), the number of elements.
  */
 long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
-    long int which = -1;
     if (!FUNCTION(igraph_vector, empty)(v)) {
         BASE min;
         BASE *ptr;
-        long int pos;
+        BASE *which;
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
-        min = *(v->stor_begin); which = 0;
-        ptr = v->stor_begin + 1; pos = 1;
+        ptr = v->stor_begin;
+        if (*ptr != *ptr) { return ptr - v->stor_begin; } /* Result is NaN */
+        which = ptr;
+        min = *which;
         while (ptr < v->end) {
-            if (!((*ptr) >= min) && /* Double negation to deal with NaN */
-                !(min != min) /* Ensure that first NaN value is considered */
-                ) {
-                min = *ptr;
-                which = pos;
+            if ((*ptr) < min) {
+                which = ptr;
+                min = *which;
             }
-            ptr++; pos++;
+            else if (*ptr != *ptr) {
+                return ptr - v->stor_begin; /* Result is NaN */
+            }
+            ptr++;
         }
+        return which - v->stor_begin;
     }
-    return which;
+    return -1;
 }
 
 #endif
