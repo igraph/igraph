@@ -20,11 +20,13 @@
 #include "bliss/graph.hh"
 
 #include "igraph_topology.h"
-
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
+#include "igraph_interrupt.h"
 
 #include "core/exceptions.h"
+
+#include "config.h"
 
 using namespace bliss;
 using namespace std;
@@ -53,11 +55,21 @@ using namespace std;
  * </para>
  *
  * <para>
- * BLISS version 0.73 is included in igraph.
+ * BLISS version 0.74 is included in igraph.
  * </para>
  */
 
 namespace { // unnamed namespace
+
+IGRAPH_THREAD_LOCAL bool search_aborted;
+
+bool check_abort(const Stats &) {
+    if (igraph_allow_interruption(NULL) != IGRAPH_SUCCESS) {
+        search_aborted = true;
+        return true;
+    }
+    return false;
+}
 
 inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
     unsigned int nof_vertices = (unsigned int)igraph_vcount(graph);
@@ -71,7 +83,7 @@ inline AbstractGraph *bliss_from_igraph(const igraph_t *graph) {
         g = new Graph(nof_vertices);
     }
 
-    g->set_verbose_level(0);
+    /* g->set_verbose_level(0); */
 
     for (unsigned int i = 0; i < nof_edges; i++) {
         g->add_edge((unsigned int)IGRAPH_FROM(graph, i), (unsigned int)IGRAPH_TO(graph, i));
@@ -138,7 +150,7 @@ inline void bliss_info_to_igraph(igraph_bliss_info_t *info, const Stats &stats) 
         info->nof_bad_nodes  = stats.get_nof_bad_nodes();
         info->nof_canupdates = stats.get_nof_canupdates();
         info->nof_generators = stats.get_nof_generators();
-        stats.group_size.tostring(&info->group_size);
+        stats.get_group_size_igraph(&info->group_size);
     }
 }
 
@@ -189,7 +201,12 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
         IGRAPH_CHECK(bliss_set_colors(g, colors));
 
         Stats stats;
-        const unsigned int *cl = g->canonical_form(stats, NULL, NULL);
+        search_aborted = false;
+        const unsigned int *cl = g->canonical_form(stats, NULL, NULL, &check_abort);
+        if (search_aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
+
         IGRAPH_CHECK(igraph_vector_resize(labeling, N));
         for (unsigned int i = 0; i < N; i++) {
             VECTOR(*labeling)[i] = cl[i];
@@ -237,7 +254,11 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
         IGRAPH_CHECK(bliss_set_colors(g, colors));
 
         Stats stats;
-        g->find_automorphisms(stats, NULL, NULL);
+        search_aborted = false;
+        g->find_automorphisms(stats, NULL, NULL, &check_abort);
+        if (search_aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
 
         bliss_info_to_igraph(info, stats);
 
@@ -282,8 +303,11 @@ int igraph_automorphism_group(
 
         Stats stats;
         igraph_vector_ptr_resize(generators, 0);
-        g->find_automorphisms(stats, collect_generators, generators);
-
+        search_aborted = false;
+        g->find_automorphisms(stats, collect_generators, generators, &check_abort);
+        if (search_aborted) {
+            return IGRAPH_INTERRUPTED;
+        }
         bliss_info_to_igraph(info, stats);
 
         delete g;
@@ -323,9 +347,9 @@ int igraph_automorphism_group(
  *
  * This function uses the BLISS graph isomorphism algorithm, a
  * successor of the famous NAUTY algorithm and implementation. BLISS
- * is open source and licensed according to the GNU GPL. See
- * http://www.tcs.hut.fi/Software/bliss/index.html for
- * details. Currently the 0.73 version of BLISS is included in igraph.
+ * is open source and licensed according to the GNU LGPL. See
+ * https://users.aalto.fi/~tjunttil/bliss/ for
+ * details. Currently the 0.74 version of BLISS is included in igraph.
  *
  * </para><para>
  *

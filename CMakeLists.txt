@@ -33,7 +33,7 @@ project(
 # Set C and C++ standard version
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
-set(CMAKE_CXX_STANDARD 98)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Expose the BUILD_SHARED_LIBS option in the ccmake UI

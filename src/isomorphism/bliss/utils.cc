@@ -1,13 +1,17 @@
-#include <cassert>
 #include <vector>
 #include "utils.hh"
 
+/* Allow using 'and' instead of '&&' with MSVC */
+#if _MSC_VER
+#include <ciso646>
+#endif
+
 /*
-  Copyright (c) 2003-2015 Tommi Junttila
+  Copyright (c) 2003-2021 Tommi Junttila
   Released under the GNU Lesser General Public License version 3.
-  
+
   This file is part of bliss.
-  
+
   bliss is free software: you can redistribute it and/or modify
   it under the terms of the GNU Lesser General Public License as published by
   the Free Software Foundation, version 3 of the License.
@@ -22,74 +26,6 @@
 */
 
 namespace bliss {
-
-#if 0
-void
-print_permutation(FILE* const fp,
-		  const unsigned int N,
-		  const unsigned int* perm,
-		  const unsigned int offset)
-{
-  assert(N > 0);
-  assert(perm);
-  for(unsigned int i = 0; i < N; i++) {
-    unsigned int j = perm[i];
-    if(j == i)
-      continue;
-    bool is_first = true;
-    while(j != i) {
-      if(j < i) {
-        is_first = false;
-        break;
-      }
-      j = perm[j];
-    }
-    if(!is_first)
-      continue;
-    fprintf(fp, "(%u,", i+offset);
-    j = perm[i];
-    while(j != i) {
-      fprintf(fp, "%u", j+offset);
-      j = perm[j];
-      if(j != i)
-        fprintf(fp, ",");
-    }
-    fprintf(fp, ")");
-  }
-}
-
-void
-print_permutation(FILE* const fp,
-		  const std::vector<unsigned int>& perm,
-		  const unsigned int offset)
-{
-  const unsigned int N = perm.size();
-  for(unsigned int i = 0; i < N; i++) {
-    unsigned int j = perm[i];
-    if(j == i)
-      continue;
-    bool is_first = true;
-    while(j != i) {
-      if(j < i) {
-        is_first = false;
-        break;
-      }
-      j = perm[j];
-    }
-    if(!is_first)
-      continue;
-    fprintf(fp, "(%u,", i+offset);
-    j = perm[i];
-    while(j != i) {
-      fprintf(fp, "%u", j+offset);
-      j = perm[j];
-      if(j != i)
-        fprintf(fp, ",");
-    }
-    fprintf(fp, ")");
-  }
-}
-#endif
 
 bool
 is_permutation(const unsigned int N, const unsigned int* perm)
