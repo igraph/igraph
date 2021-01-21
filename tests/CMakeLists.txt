@@ -136,7 +136,6 @@ add_legacy_tests(
   igraph_full
   igraph_grg_game
   igraph_lcf
-  igraph_preference_game
   igraph_ring
   igraph_small
   igraph_star
@@ -157,7 +156,8 @@ add_legacy_tests(
   igraph_lattice
   igraph_linegraph
   igraph_kautz
-  igraph_realize_degree_sequence  
+  igraph_preference_game
+  igraph_realize_degree_sequence
   tree
   tree_game
   ring
@@ -191,7 +191,7 @@ add_legacy_tests(
   igraph_similarity
   igraph_simplify
   igraph_topological_sorting
-  igraph_transitivity  
+  igraph_transitivity
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
@@ -213,7 +213,7 @@ add_legacy_tests(
   igraph_get_all_simple_paths
   igraph_get_shortest_paths2
   igraph_is_tree
-  igraph_local_transitivity  
+  igraph_local_transitivity
   igraph_transitive_closure_dag
   harmonic_centrality
   random_spanning_tree
@@ -422,7 +422,7 @@ add_legacy_tests(
   igraph_community_leading_eigenvector
   igraph_community_leiden
   igraph_community_multilevel
-  igraph_community_optimal_modularity  
+  igraph_community_optimal_modularity
   walktrap
 )
 
@@ -431,8 +431,8 @@ add_legacy_tests(
   bug-1149658
   community_leiden
   community_label_propagation
-  igraph_community_infomap  
-  igraph_community_leading_eigenvector2  
+  igraph_community_infomap
+  igraph_community_leading_eigenvector2
   igraph_modularity
   levc-stress
   spinglass
@@ -550,9 +550,13 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER examples/simple NAMES
   igraph_deterministic_optimal_imitation
-  igraph_moran_process
   igraph_roulette_wheel_imitation
   igraph_stochastic_imitation
+)
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  igraph_moran_process
 )
 
 # mt.at -- only if we have pthreads

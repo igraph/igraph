@@ -19,9 +19,10 @@
   02110-1301 USA
 */
 
-#include <assert.h>
 #include <igraph.h>
 #include <stdio.h>
+
+#include "test_utilities.inc"
 
 /* test parameters structure */
 typedef struct {
@@ -45,7 +46,7 @@ int error_tests() {
 
     igraph_empty(&h, 0, 0);  /* empty graph */
     /* nonempty graph */
-    igraph_small(&g, /*nvert=*/ 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
+    igraph_small(&g, /* n= */ 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
     nvert = igraph_vcount(&g);
     /* weights vectors */
     igraph_vector_init(&wgt, 0);
@@ -57,7 +58,7 @@ int error_tests() {
     igraph_vector_init(&strat, 2);
     igraph_vector_init_real(&stratnvert, nvert, 0.0, 1.0, 2.0);
 
-    igraph_small(&gzero, /*nvert=*/ 0, IGRAPH_UNDIRECTED,
+    igraph_small(&gzero, /* n= */ 0, IGRAPH_UNDIRECTED,
                  0, 3, 0, 4, 1, 2, 1, 4, 1, 5, 2, 3, 2, 4, 3, 4, -1);
     nvert = igraph_vcount(&gzero);
     igraph_vector_init(&quantzero, nvert);                /* vector of zeros */
@@ -178,8 +179,8 @@ int moran_one_test() {
             break;
         }
     }
-    assert(v >= 0);
-    assert(q != 0.0);
+    IGRAPH_ASSERT(v >= 0);
+    IGRAPH_ASSERT(q != 0.0);
 
     /* Now we know that v is a clone of some vertex. Determine the vertex that */
     /* v is a clone of. */
@@ -190,7 +191,7 @@ int moran_one_test() {
             break;
         }
     }
-    assert(u >= 0);
+    IGRAPH_ASSERT(u >= 0);
 
     /* check that v is indeed a clone of u */
     if (VECTOR(quant)[u] != VECTOR(quantcp)[v]) {
@@ -211,16 +212,11 @@ int moran_one_test() {
 }
 
 int main() {
-    int ret;
 
-    ret = error_tests();
-    if (ret) {
-        return IGRAPH_FAILURE;
-    }
-    ret = moran_one_test();
-    if (ret) {
-        return IGRAPH_FAILURE;
-    }
+    IGRAPH_ASSERT(error_tests() == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(moran_one_test() == IGRAPH_SUCCESS);
 
-    return IGRAPH_SUCCESS;
+    VERIFY_FINALLY_STACK();
+
+    return 0;
 }

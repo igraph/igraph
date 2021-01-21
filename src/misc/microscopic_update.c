@@ -723,8 +723,6 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
  *   Proceedings of the Cambridge Philosophical Society, \eme 54(1):60--71,
  *   1958.
  * \endclist
- *
- * \example examples/simple/igraph_moran_process.c
  */
 
 int igraph_moran_process(const igraph_t *graph,

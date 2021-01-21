@@ -89,8 +89,6 @@ static void igraph_i_preference_game_free_vids_by_type(igraph_vector_ptr_t *vecs
  * number of vertices plus the number of edges in the graph.
  *
  * \sa igraph_establishment_game()
- *
- * \example examples/simple/igraph_preference_game.c
  */
 
 int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
