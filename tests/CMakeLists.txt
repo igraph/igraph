@@ -148,6 +148,7 @@ add_legacy_tests(
   FOLDER tests/unit NAMES
   erdos_renyi_game
   full
+  igraph_callaway_traits_game
   igraph_correlated_game
   igraph_extended_chordal_ring
   igraph_from_prufer
