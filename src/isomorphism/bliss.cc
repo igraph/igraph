@@ -35,27 +35,37 @@ using namespace std;
  * \section about_bliss
  *
  * <para>
- * BLISS is a successor of the famous NAUTY algorithm and
+ * Bliss is a successor of the famous NAUTY algorithm and
  * implementation. While using the same ideas in general, with better
- * heuristics and data structures BLISS outperforms NAUTY on most
+ * heuristics and data structures Bliss outperforms NAUTY on most
  * graphs.
  * </para>
  *
  * <para>
- * BLISS was developed and implemented by Tommi Junttila and Petteri Kaski at
+ * Bliss was developed and implemented by Tommi Junttila and Petteri Kaski at
  * Helsinki University of Technology, Finland. For more information,
- * see the BLISS homepage at http://www.tcs.hut.fi/Software/bliss/ and the publication
- * Tommi Junttila, Petteri Kaski: "Engineering an Efficient Canonical Labeling
- * Tool for Large and Sparse Graphs" at https://doi.org/10.1137/1.9781611972870.13
+ * see the Bliss homepage at https://users.aalto.fi/~tjunttil/bliss/ and the following
+ * publication:
+ *
+ * <para>
+ * Tommi Junttila and Petteri Kaski: "Engineering an Efficient Canonical Labeling
+ * Tool for Large and Sparse Graphs" In ALENEX 2007, pages 135–149, 2007
+ * https://doi.org/10.1137/1.9781611972870.13
  * </para>
  *
  * <para>
- * BLISS works with both directed graphs and undirected graphs. It supports graphs with
+ * Tommi Junttila and Petteri Kaski: "Conflict Propagation and Component Recursion
+ * for Canonical Labeling" in TAPAS 2011, pages 151–162, 2011.
+ * https://doi.org/10.1007/978-3-642-19754-3_16
+ * </para>
+ *
+ * <para>
+ * Bliss works with both directed graphs and undirected graphs. It supports graphs with
  * self-loops, but not graphs with multi-edges.
  * </para>
  *
  * <para>
- * BLISS version 0.74 is included in igraph.
+ * Bliss version 0.74 is included in igraph.
  * </para>
  */
 
@@ -169,10 +179,10 @@ static void collect_generators(void *generators, unsigned int n, const unsigned 
 
 /**
  * \function igraph_canonical_permutation
- * Canonical permutation using BLISS
+ * Canonical permutation using Bliss
  *
  * This function computes the canonical permutation which transforms
- * the graph into a canonical form by using the BLISS algorithm.
+ * the graph into a canonical form by using the Bliss algorithm.
  *
  * \param graph The input graph. Multiple edges between the same nodes
  *   are not supported and will cause an incorrect result to be returned.
@@ -182,9 +192,9 @@ static void collect_generators(void *generators, unsigned int n, const unsigned 
  *    permutation takes vertex 0 to the first element of the vector,
  *    vertex 1 to the second, etc. The vector will be resized as
  *    needed.
- * \param sh The splitting heuristics to be used in BLISS. See \ref
+ * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
- * \param info If not \c NULL then information on BLISS internals is
+ * \param info If not \c NULL then information on Bliss internals is
  *    stored here. See \ref igraph_bliss_info_t.
  * \return Error code.
  *
@@ -223,9 +233,9 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
 
 /**
  * \function igraph_automorphisms
- * Number of automorphisms using BLISS
+ * Number of automorphisms using Bliss
  *
- * The number of automorphisms of a graph is computed using BLISS. The
+ * The number of automorphisms of a graph is computed using Bliss. The
  * result is returned as part of the \p info structure, in tag \c
  * group_size. It is returned as a string, as it can be very high even
  * for relatively small graphs. If the GNU MP library is used then
@@ -236,7 +246,7 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
  *   are not supported and will cause an incorrect result to be returned.
  * \param colors An optional vertex color vector for the graph. Supply a
  *   null pointer is the graph is not colored.
- * \param sh The splitting heuristics to be used in BLISS. See \ref
+ * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
  * \param info The result is stored here, in particular in the \c
  *    group_size tag of \p info.
@@ -270,10 +280,10 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
 
 /**
  * \function igraph_automorphism_group
- * Automorphism group generators using BLISS
+ * Automorphism group generators using Bliss
  *
  * The generators of the automorphism group of a graph are computed
- * using BLISS. The generator set may not be minimal and may depend on
+ * using Bliss. The generator set may not be minimal and may depend on
  * the splitting heuristics.
  *
  * \param graph The input graph. Multiple edges between the same nodes
@@ -283,9 +293,9 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
  * \param generators Must be an initialized pointer vector. It will
  *    contain pointers to \ref igraph_vector_t objects
  *    representing generators of the automorphism group.
- * \param sh The splitting heuristics to be used in BLISS. See \ref
+ * \param sh The splitting heuristics to be used in Bliss. See \ref
  *    igraph_bliss_sh_t.
- * \param info If not \c NULL then information on BLISS internals is
+ * \param info If not \c NULL then information on Bliss internals is
  *    stored here. See \ref igraph_bliss_info_t.
  * \return Error code.
  *
@@ -343,13 +353,13 @@ int igraph_automorphism_group(
 
 /**
  * \function igraph_isomorphic_bliss
- * Graph isomorphism via BLISS
+ * Graph isomorphism via Bliss
  *
- * This function uses the BLISS graph isomorphism algorithm, a
- * successor of the famous NAUTY algorithm and implementation. BLISS
+ * This function uses the Bliss graph isomorphism algorithm, a
+ * successor of the famous NAUTY algorithm and implementation. Bliss
  * is open source and licensed according to the GNU LGPL. See
  * https://users.aalto.fi/~tjunttil/bliss/ for
- * details. Currently the 0.74 version of BLISS is included in igraph.
+ * details. Currently the 0.74 version of Bliss is included in igraph.
  *
  * </para><para>
  *

@@ -43,7 +43,7 @@
  * igraph_isomorphic_vf2() and \ref igraph_subisomorphic_vf2() for
  * starters.</para>
  *
- * <para>Functions for the BLISS algorithm constitute the third set,
+ * <para>Functions for the Bliss algorithm constitute the third set,
  * see \ref igraph_isomorphic_bliss().</para>
  *
  * <para>Finally, the isomorphism classes of all graphs with three and
@@ -79,10 +79,10 @@
  *    and edges it returns with \c FALSE.
  * \oli Otherwise, if the graphs have three or four vertices then an O(1)
  *    algorithm is used with precomputed data.
- * \oli Otherwise BLISS is used, see \ref igraph_isomorphic_bliss().
+ * \oli Otherwise Bliss is used, see \ref igraph_isomorphic_bliss().
  * \endolist
  *
- * </para><para>Please call the VF2 and BLISS functions directly if you need
+ * </para><para>Please call the VF2 and Bliss functions directly if you need
  * something more sophisticated, e.g. you need the isomorphic mapping.
  *
  * \param graph1 The first graph.
