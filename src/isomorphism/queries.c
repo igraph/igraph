@@ -121,11 +121,11 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
             IGRAPH_CHECK(igraph_isomorphic_34(graph1, graph2, iso));
         } else {
             IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
-                                                 0, 0, /*sh=*/ IGRAPH_BLISS_F, 0, 0));
+                                                 0, 0, /*sh=*/ IGRAPH_BLISS_FL, 0, 0));
         }
     } else {
         IGRAPH_CHECK(igraph_isomorphic_bliss(graph1, graph2, NULL, NULL, iso,
-                                             0, 0, /*sh=*/ IGRAPH_BLISS_F, 0, 0));
+                                             0, 0, /*sh=*/ IGRAPH_BLISS_FL, 0, 0));
     }
 
     return 0;

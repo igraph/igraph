@@ -230,7 +230,12 @@ typedef struct igraph_bliss_info_t {
 
 /**
  * \typedef igraph_bliss_sh_t
- * Splitting heuristics for BLISS
+ * \brief Splitting heuristics for Bliss.
+ *
+ * \c IGRAPH_BLISS_FL provides good performance for many graphs, and is a reasonable
+ * default choice. \c IGRAPH_BLISS_FSM is recommended for graphs that have some
+ * combinatorial structure, and is the default of the Bliss library's command
+ * line tool.
  *
  * \enumval IGRAPH_BLISS_F First non-singleton cell.
  * \enumval IGRAPH_BLISS_FL First largest non-singleton cell.
