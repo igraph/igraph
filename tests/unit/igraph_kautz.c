@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
+
 #include "test_utilities.inc"
 
 int main() {
@@ -25,34 +25,34 @@ int main() {
     igraph_bool_t iso, same;
 
     /*   BA, AB, CB, etc.     */
-    assert(igraph_kautz(&g, /* m */ 2, /* n */ 1) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_kautz(&g, /* m */ 2, /* n */ 1) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 6, IGRAPH_DIRECTED, 0, 1, 0, 5, 1, 0, 1, 4, 2, 0, 2, 4, 3, 1, 3, 5, 4, 2, 4, 3, 5, 3, 5, 2, -1);
-    assert(igraph_isomorphic(&g, &g_test, &iso) == IGRAPH_SUCCESS);
-    assert(iso);
+    IGRAPH_ASSERT(igraph_isomorphic(&g, &g_test, &iso) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(iso);
     igraph_destroy(&g);
     igraph_destroy(&g_test);
 
     /*  1 symbol, string length 11, should be empty graph   */
-    assert(igraph_kautz(&g, /* m */ 0, /* n */ 10) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_kautz(&g, /* m */ 0, /* n */ 10) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 0, IGRAPH_DIRECTED, -1);
-    assert(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
-    assert(same);
+    IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(same);
     igraph_destroy(&g);
     igraph_destroy(&g_test);
 
     /*  1 symbol, string length 1 should be single vertex   */
-    assert(igraph_kautz(&g, /* m */ 0, /* n */ 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_kautz(&g, /* m */ 0, /* n */ 0) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 1, IGRAPH_DIRECTED, -1);
-    assert(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
-    assert(same);
+    IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(same);
     igraph_destroy(&g);
     igraph_destroy(&g_test);
 
     /*  String length 1 should be full graph   */
-    assert(igraph_kautz(&g, /* m */ 5, /* n */ 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_kautz(&g, /* m */ 5, /* n */ 0) == IGRAPH_SUCCESS);
     igraph_full(&g_test, 6, IGRAPH_DIRECTED, /*loops*/ 0);
-    assert(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
-    assert(same);
+    IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(same);
     igraph_destroy(&g);
     igraph_destroy(&g_test);
 

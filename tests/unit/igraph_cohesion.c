@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -32,7 +31,7 @@ int main() {
 
     igraph_cohesion(&g, &value, checks);
 
-    assert(value == 1);
+    IGRAPH_ASSERT(value == 1);
 
     igraph_destroy(&g);
 
@@ -41,7 +40,7 @@ int main() {
 
     igraph_cohesion(&g, &value, checks);
 
-    assert(value == 2);
+    IGRAPH_ASSERT(value == 2);
 
     igraph_destroy(&g);
 

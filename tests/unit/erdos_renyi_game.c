@@ -18,7 +18,6 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
 
 int main() {
     igraph_t g;
@@ -33,90 +32,90 @@ int main() {
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.0,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_ecount(&g) == 0);
-    assert(! igraph_is_directed(&g));
-    igraph_is_simple(&g, &simple); assert(simple);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 0);
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.0,
                             IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_ecount(&g) == 0);
-    assert(igraph_is_directed(&g));
-    igraph_is_simple(&g, &simple); assert(simple);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 0);
+    IGRAPH_ASSERT(igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
     /* Complete graph */
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 1.0,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_ecount(&g) == 10 * 9 / 2);
-    assert(! igraph_is_directed(&g));
-    igraph_is_simple(&g, &simple); assert(simple);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 / 2);
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 1.0,
                             IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_ecount(&g) == 10 * 9);
-    assert(igraph_is_directed(&g));
-    igraph_is_simple(&g, &simple); assert(simple);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9);
+    IGRAPH_ASSERT(igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 1.0,
                             IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
-    assert(igraph_ecount(&g) == 10 * 11 / 2);
-    assert(! igraph_is_directed(&g));
-    igraph_is_simple(&g, &simple); assert(! simple);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 11 / 2);
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(! simple);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 1.0,
                             IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    assert(igraph_ecount(&g) == 10 * 10);
-    assert(igraph_is_directed(&g));
-    igraph_is_simple(&g, &simple); assert(! simple);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 10);
+    IGRAPH_ASSERT(igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(! simple);
     igraph_destroy(&g);
 
     /* Random graph */
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.5,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-    assert(! igraph_is_directed(&g));
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.5,
                             IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_is_directed(&g));
+    IGRAPH_ASSERT(igraph_is_directed(&g));
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.5,
                             IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
-    assert(! igraph_is_directed(&g));
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 10, 0.5,
                             IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    assert(igraph_is_directed(&g));
+    IGRAPH_ASSERT(igraph_is_directed(&g));
     igraph_destroy(&g);
 
     /* Create a couple of large graphs too */
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 100000, 2.0 / 100000,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_vcount(&g) == 100000);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 100000, 2.0 / 100000,
                             IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_vcount(&g) == 100000);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 100000, 2.0 / 100000,
                             IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
-    assert(igraph_vcount(&g) == 100000);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNP, 100000, 2.0 / 100000,
                             IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    assert(igraph_vcount(&g) == 100000);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
     igraph_destroy(&g);
 
 
@@ -126,72 +125,72 @@ int main() {
     /* directed with loops */
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 10, 10 * 10 - 1,
                             IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    assert(igraph_vcount(&g) == 10);
-    assert(igraph_ecount(&g) == 10 * 10 - 1);
-    assert(igraph_is_directed(&g));
+    IGRAPH_ASSERT(igraph_vcount(&g) == 10);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 10 - 1);
+    IGRAPH_ASSERT(igraph_is_directed(&g));
 
     igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ NULL);
-    assert(igraph_ecount(&g) == 10 * 9 || igraph_ecount(&g) == 10 * 9 - 1);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 || igraph_ecount(&g) == 10 * 9 - 1);
 
     igraph_destroy(&g);
 
     /* directed without loops */
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 10, 10 * 9 - 1,
                             IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_vcount(&g) == 10);
-    assert(igraph_ecount(&g) == 10 * 9 - 1);
-    assert(igraph_is_directed(&g));
-    igraph_is_simple(&g, &simple); assert(simple);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 10);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 - 1);
+    IGRAPH_ASSERT(igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
     /* undirected with loops */
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 10, 10 * 11 / 2 - 1,
                             IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
-    assert(igraph_vcount(&g) == 10);
-    assert(igraph_ecount(&g) == 10 * 11 / 2 - 1);
-    assert(! igraph_is_directed(&g));
+    IGRAPH_ASSERT(igraph_vcount(&g) == 10);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 11 / 2 - 1);
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
 
     igraph_simplify(&g, /*multiple=*/0, /*loops=*/1, /*edge_comb=*/ NULL);
-    assert(igraph_ecount(&g) == 10 * 9 / 2 || igraph_ecount(&g) == 10 * 9 / 2 - 1);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 / 2 || igraph_ecount(&g) == 10 * 9 / 2 - 1);
 
     igraph_destroy(&g);
 
     /* undirected without loops */
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 10, 10 * 9 / 2 - 1,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_vcount(&g) == 10);
-    assert(igraph_ecount(&g) == 10 * 9 / 2 - 1);
-    assert(! igraph_is_directed(&g));
-    igraph_is_simple(&g, &simple); assert(simple);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 10);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 10 * 9 / 2 - 1);
+    IGRAPH_ASSERT(! igraph_is_directed(&g));
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
 
     /* Create a couple of large graphs too */
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 100000, 2.0 * 100000,
                             IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);
-    assert(igraph_vcount(&g) == 100000);
-    assert(igraph_ecount(&g) == 200000);
-    igraph_is_simple(&g, &simple); assert(simple);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 100000, 2.0 * 100000,
                             IGRAPH_DIRECTED, IGRAPH_NO_LOOPS);
-    igraph_is_simple(&g, &simple); assert(simple);
-    assert(igraph_vcount(&g) == 100000);
-    assert(igraph_ecount(&g) == 200000);
+    igraph_is_simple(&g, &simple); IGRAPH_ASSERT(simple);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 100000, 2.0 * 100000,
                             IGRAPH_UNDIRECTED, IGRAPH_LOOPS);
-    assert(igraph_vcount(&g) == 100000);
-    assert(igraph_ecount(&g) == 200000);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
     igraph_simplify(&g, 0, 1, /*edge_comb=*/ 0);  /* only remove loops */
     igraph_destroy(&g);
 
     igraph_erdos_renyi_game(&g, IGRAPH_ERDOS_RENYI_GNM, 100000, 2.0 * 100000,
                             IGRAPH_DIRECTED, IGRAPH_LOOPS);
-    assert(igraph_vcount(&g) == 100000);
-    assert(igraph_ecount(&g) == 200000);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 100000);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 200000);
     igraph_destroy(&g);
 
     return 0;

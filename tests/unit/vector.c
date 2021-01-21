@@ -25,7 +25,6 @@
 #include <stdlib.h>
 
 #include "test_utilities.inc"
-#include <assert.h>
 
 int main() {
 
@@ -59,9 +58,9 @@ int main() {
     }
 
     printf("Test igraph_vector_empty and igraph_vector_clear\n");
-    assert(!igraph_vector_empty(&v));
+    IGRAPH_ASSERT(!igraph_vector_empty(&v));
     igraph_vector_clear(&v);
-    assert(igraph_vector_empty(&v));
+    IGRAPH_ASSERT(igraph_vector_empty(&v));
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_e and igraph_vector_e_ptr\n");
@@ -134,21 +133,21 @@ int main() {
         printf(" %li", (long int)VECTOR(v)[i]);
     }
     printf("\n");
-    assert(igraph_vector_max(&v) == 100);
-    assert(igraph_vector_which_max(&v) == 0);
-    assert(igraph_vector_min(&v) == 91);
-    assert(igraph_vector_which_min(&v) == 9);
+    IGRAPH_ASSERT(igraph_vector_max(&v) == 100);
+    IGRAPH_ASSERT(igraph_vector_which_max(&v) == 0);
+    IGRAPH_ASSERT(igraph_vector_min(&v) == 91);
+    IGRAPH_ASSERT(igraph_vector_which_min(&v) == 9);
 
     printf("Test NaN values\n");
     igraph_vector_push_back(&v, IGRAPH_NAN);
     igraph_vector_push_back(&v, IGRAPH_NAN);
     igraph_vector_push_back(&v, 1);
-    assert(igraph_is_nan(igraph_vector_max(&v)));
+    IGRAPH_ASSERT(igraph_is_nan(igraph_vector_max(&v)));
     /* Index should be to first NaN value */
-    assert(igraph_vector_which_max(&v) == 10);
-    assert(igraph_is_nan(igraph_vector_min(&v)));
+    IGRAPH_ASSERT(igraph_vector_which_max(&v) == 10);
+    IGRAPH_ASSERT(igraph_is_nan(igraph_vector_min(&v)));
     /* Index should be to first NaN value */
-    assert(igraph_vector_which_min(&v) == 10);
+    IGRAPH_ASSERT(igraph_vector_which_min(&v) == 10);
 
     printf("Test igraph_vector_init_copy\n");
     igraph_vector_destroy(&v);
@@ -194,18 +193,18 @@ int main() {
     printf("Test igraph_vector_move_interval\n");
     igraph_vector_init_seq(&v, 0, 9);
     igraph_vector_move_interval(&v, 5, 10, 0);
-    assert(igraph_vector_sum(&v) == 70);
+    IGRAPH_ASSERT(igraph_vector_sum(&v) == 70);
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_isininterval\n");
     igraph_vector_init_seq(&v, 1, 10);
-    assert(igraph_vector_isininterval(&v, 1, 10));
-    assert(!igraph_vector_isininterval(&v, 2, 10));
-    assert(!igraph_vector_isininterval(&v, 1, 9));
+    IGRAPH_ASSERT(igraph_vector_isininterval(&v, 1, 10));
+    IGRAPH_ASSERT(!igraph_vector_isininterval(&v, 2, 10));
+    IGRAPH_ASSERT(!igraph_vector_isininterval(&v, 1, 9));
 
     printf("Test igraph_vector_any_smaller\n");
-    assert(!igraph_vector_any_smaller(&v, 1));
-    assert(igraph_vector_any_smaller(&v, 2));
+    IGRAPH_ASSERT(!igraph_vector_any_smaller(&v, 1));
+    IGRAPH_ASSERT(igraph_vector_any_smaller(&v, 2));
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_all_e\n");
@@ -213,26 +212,26 @@ int main() {
     printf("Test igraph_vector_binsearch\n");
     igraph_vector_init_seq(&v, 0, 9);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        assert(igraph_vector_binsearch(&v, 0, 0));
+        IGRAPH_ASSERT(igraph_vector_binsearch(&v, 0, 0));
     }
-    assert(!igraph_vector_binsearch(&v, 10, 0));
-    assert(!igraph_vector_binsearch(&v, -1, 0));
+    IGRAPH_ASSERT(!igraph_vector_binsearch(&v, 10, 0));
+    IGRAPH_ASSERT(!igraph_vector_binsearch(&v, -1, 0));
     for (i = 0; i < igraph_vector_size(&v); i++) {
         VECTOR(v)[i] = 2 * i;
     }
     for (i = 0; i < igraph_vector_size(&v); i++) {
         long int pos;
-        assert(igraph_vector_binsearch(&v, VECTOR(v)[i], &pos));
-        assert(pos == i);
-        assert(!igraph_vector_binsearch(&v, VECTOR(v)[i] + 1, &pos));
+        IGRAPH_ASSERT(igraph_vector_binsearch(&v, VECTOR(v)[i], &pos));
+        IGRAPH_ASSERT(pos == i);
+        IGRAPH_ASSERT(!igraph_vector_binsearch(&v, VECTOR(v)[i] + 1, &pos));
     }
     igraph_vector_destroy(&v);
 
     printf("Test Binsearch in empty vector\n");
     igraph_vector_init(&v, 0);
-    assert(!igraph_vector_binsearch2(&v, 0));
-    assert(!igraph_vector_binsearch(&v, 1, &pos));
-    assert(pos == 0);
+    IGRAPH_ASSERT(!igraph_vector_binsearch2(&v, 0));
+    IGRAPH_ASSERT(!igraph_vector_binsearch(&v, 1, &pos));
+    IGRAPH_ASSERT(pos == 0);
     igraph_vector_destroy(&v);
 
     printf("Test igraph_vector_init_real\n");
@@ -303,7 +302,7 @@ int main() {
     igraph_vector_init(&v, 100);
     igraph_vector_fill(&v, 1.234567);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        assert(VECTOR(v)[i] == 1.234567);
+        IGRAPH_ASSERT(VECTOR(v)[i] == 1.234567);
     }
     igraph_vector_destroy(&v);
 

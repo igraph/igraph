@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
+
 #include "test_utilities.inc"
 
 
@@ -32,15 +32,15 @@ int main() {
     /* no vertices */
 
     igraph_growing_random_game(&g, /* n: vertices */ 0, /* m: edges_per_vertex */ 3, /* directed */ 0, /* citation */ 0);
-    assert(igraph_vcount(&g) == 0);
-    assert(!igraph_is_directed(&g));
+    IGRAPH_ASSERT(igraph_vcount(&g) == 0);
+    IGRAPH_ASSERT(!igraph_is_directed(&g));
     igraph_destroy(&g);
 
     /* 1 edge per vertex with citation makes a tree */
 
     igraph_growing_random_game(&g, /* n: vertices */ 20, /* m: edges_per_vertex */ 1, /* directed */ 0, /* citation */ 1);
     igraph_is_tree(&g, &tree, /* root*/ NULL, /*unused mode*/ 0);
-    assert(tree);
+    IGRAPH_ASSERT(tree);
     igraph_destroy(&g);
 
     /* out degree of citation equals edges per vertex */
@@ -49,16 +49,16 @@ int main() {
     igraph_vector_init(&degree, 0);
     igraph_degree(&g, &degree, igraph_vss_all(), IGRAPH_OUT, IGRAPH_LOOPS);
     for(i = 1; i < 10; i++) {
-        assert(VECTOR(degree)[i] == 7);
+        IGRAPH_ASSERT(VECTOR(degree)[i] == 7);
     }
-    assert(igraph_is_directed(&g));
+    IGRAPH_ASSERT(igraph_is_directed(&g));
     igraph_vector_destroy(&degree);
     igraph_destroy(&g);
 
     /* total number of edges is (vertices - 1) * edges */
 
     igraph_growing_random_game(&g, /* n: vertices */ 10, /* m: edges_per_vertex */ 7, /* directed */ 1, /* citation */ 0);
-    assert(igraph_ecount(&g) == 63);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 63);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

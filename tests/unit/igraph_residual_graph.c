@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -42,11 +41,11 @@ int main() {
 
     /*    tests    */
 
-    assert(!igraph_isomorphic(&residual, &expected_residual, &iso));
+    IGRAPH_ASSERT(!igraph_isomorphic(&residual, &expected_residual, &iso));
 
-    assert(iso);
+    IGRAPH_ASSERT(iso);
 
-    assert(igraph_vector_all_e(&expected_residual_capacity, &residual_capacity));
+    IGRAPH_ASSERT(igraph_vector_all_e(&expected_residual_capacity, &residual_capacity));
 
     /*    cleanup    */
 

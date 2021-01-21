@@ -17,7 +17,7 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
+
 #include "test_utilities.inc"
 
 int main() {
@@ -27,12 +27,12 @@ int main() {
     /*    Undirected    */
     igraph_small(&g_start, 7, IGRAPH_UNDIRECTED,
                  0, 1, 1, 2, 1, 3, 1, 3, 2, 2, 2, 4, 3, 4, 4, 5, -1);
-    assert(igraph_linegraph(&g_start, &g_line) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_linegraph(&g_start, &g_line) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 8, IGRAPH_UNDIRECTED,
                  0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 1, 4, 1, 4, 1, 5, 2, 3, 2, 3,
                  2, 6, 3, 6, 4, 5, 4, 5, 5, 6, 5, 7, 6, 7, -1);
-    assert(igraph_is_same_graph(&g_line, &g_test, &same) == IGRAPH_SUCCESS);
-    assert(same);
+    IGRAPH_ASSERT(igraph_is_same_graph(&g_line, &g_test, &same) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(same);
     igraph_destroy(&g_start);
     igraph_destroy(&g_line);
     igraph_destroy(&g_test);
@@ -40,22 +40,22 @@ int main() {
      /*    Directed    */
     igraph_small(&g_start, 7, IGRAPH_DIRECTED,
                  0, 1, 1, 2, 1, 3, 3, 1, 2, 2, 2, 4, 3, 4, 4, 5, -1);
-    assert(igraph_linegraph(&g_start, &g_line) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_linegraph(&g_start, &g_line) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 8, IGRAPH_DIRECTED,
                  0, 1, 0, 2, 1, 4, 1, 5, 2, 3, 2, 6, 3, 1, 3, 2, 4, 4, 4, 5,
                  5, 7, 6, 7, -1);
-    assert(igraph_is_same_graph(&g_line, &g_test, &same) == IGRAPH_SUCCESS);
-    assert(same);
+    IGRAPH_ASSERT(igraph_is_same_graph(&g_line, &g_test, &same) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(same);
     igraph_destroy(&g_start);
     igraph_destroy(&g_line);
     igraph_destroy(&g_test);
 
     /*    No edges    */
     igraph_small(&g_start, 7, IGRAPH_DIRECTED, -1);
-    assert(igraph_linegraph(&g_start, &g_line) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_linegraph(&g_start, &g_line) == IGRAPH_SUCCESS);
     igraph_small(&g_test, 0, IGRAPH_DIRECTED, -1);
-    assert(igraph_is_same_graph(&g_line, &g_test, &same) == IGRAPH_SUCCESS);
-    assert(same);
+    IGRAPH_ASSERT(igraph_is_same_graph(&g_line, &g_test, &same) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(same);
     igraph_destroy(&g_start);
     igraph_destroy(&g_line);
     igraph_destroy(&g_test);
