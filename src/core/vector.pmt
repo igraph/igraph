@@ -966,6 +966,14 @@ int FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
 
 #ifndef NOTORDERED
 
+/* We will use x != x for NaN checks below and Clang does not like it unless
+ * we disable a warning */
+
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-compare"
+#endif
+
 /**
  * \ingroup vector
  * \function igraph_vector_max
@@ -1111,6 +1119,10 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
     }
     return -1;
 }
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 
 #endif
 
