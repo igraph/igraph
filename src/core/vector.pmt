@@ -993,14 +993,18 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     max = *(v->stor_begin);
-    if (max != max) { return max; }; /* Result is NaN */
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+    if (igraph_is_nan(max)) { return max; }; /* Result is NaN */
+#endif
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
         if ((*ptr) > max) {
             max = *ptr;
         }
-        else if (*ptr != *ptr)
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        else if (igraph_is_nan(*ptr))
             return *ptr; /* Result is NaN */
+#endif
         ptr++;
     }
     return max;
@@ -1030,7 +1034,9 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
         ptr = v->stor_begin;
-        if (*ptr != *ptr) { return ptr - v->stor_begin; } /* Result is NaN */
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
+#endif
         which = ptr;
         max = *which;
         ptr++;
@@ -1039,9 +1045,11 @@ long int FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
                 which = ptr;
                 max = *which;
             }
-            else if (*ptr != *ptr) {
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+            else if (igraph_is_nan(*ptr)) {
                 return ptr - v->stor_begin; /* Result is NaN */
             }
+#endif
             ptr++;
         }
         return which - v->stor_begin;
@@ -1067,14 +1075,19 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     min = *(v->stor_begin);
-    if (min != min) { return min; }; /* Result is NaN */
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+    if (igraph_is_nan(min)) { return min; }; /* Result is NaN */
+#endif
     ptr = v->stor_begin + 1;
     while (ptr < v->end) {
         if ((*ptr) < min) {
             min = *ptr;
         }
-        else if (*ptr != *ptr)
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        else if (igraph_is_nan(*ptr)) {
             return *ptr; /* Result is NaN */
+        }
+#endif
         ptr++;
     }
     return min;
@@ -1102,7 +1115,9 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
         IGRAPH_ASSERT(v != NULL);
         IGRAPH_ASSERT(v->stor_begin != NULL);
         ptr = v->stor_begin;
-        if (*ptr != *ptr) { return ptr - v->stor_begin; } /* Result is NaN */
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+        if (igraph_is_nan(*ptr)) { return ptr - v->stor_begin; } /* Result is NaN */
+#endif
         which = ptr;
         min = *which;
         while (ptr < v->end) {
@@ -1110,9 +1125,11 @@ long int FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
                 which = ptr;
                 min = *which;
             }
-            else if (*ptr != *ptr) {
+#if defined(BASE_IGRAPH_REAL) || defined(BASE_FLOAT)
+            else if (igraph_is_nan(*ptr)) {
                 return ptr - v->stor_begin; /* Result is NaN */
             }
+#endif
             ptr++;
         }
         return which - v->stor_begin;
