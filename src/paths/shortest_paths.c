@@ -800,7 +800,6 @@ int igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
  * \param res Pointer to a real number, this will contain the result.
  * \param weights The edge weights. They must be all non-negative.
  *    If a null pointer is given, all weights are assumed to be 1.
- *
  * \param directed Boolean, whether to consider directed paths.
  *    Ignored for undirected graphs.
  * \param mode How to determine the local neighborhood of each vertex
