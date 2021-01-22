@@ -634,6 +634,13 @@ add_legacy_tests(
   igraph_is_bigraphical
 )
 
+# handlers
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  fatal_handler
+)
+
 # regression and fuzzing tests
 
 add_legacy_tests(
