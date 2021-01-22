@@ -30,6 +30,9 @@ project(
   LANGUAGES C CXX
 )
 
+# Set a default build type if none was specified
+include(BuildType)
+
 # Set C and C++ standard version
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED True)
