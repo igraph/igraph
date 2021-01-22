@@ -46,6 +46,7 @@ using namespace std;
  * Helsinki University of Technology, Finland. For more information,
  * see the Bliss homepage at https://users.aalto.fi/~tjunttil/bliss/ and the following
  * publication:
+ * </para>
  *
  * <para>
  * Tommi Junttila and Petteri Kaski: "Engineering an Efficient Canonical Labeling
