@@ -113,6 +113,10 @@ int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
     }
     maxcum = igraph_vector_tail(&cumdist);
 
+    if (maxcum <= 0) {
+        IGRAPH_ERROR("The vertex type distribution vector must contain at least one positive value.", IGRAPH_EINVAL);
+    }
+
     RNG_BEGIN();
 
     for (i = 0; i < nodes; i++) {
