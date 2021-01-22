@@ -17,7 +17,6 @@
 */
 
 #include <igraph.h>
-#include <assert.h>
 
 #include "test_utilities.inc"
 
@@ -36,7 +35,7 @@ int main() {
     igraph_vector_destroy(&capacity);
     igraph_destroy(&g);
 
-    assert(value == 7);
+    IGRAPH_ASSERT(value == 7);
     
     VERIFY_FINALLY_STACK();
     return 0;
