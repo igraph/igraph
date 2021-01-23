@@ -32,7 +32,7 @@ int main() {
     igraph_destroy(&g);
     igraph_vector_destroy(&preference);
 
-    /*No vertices*/
+    /*No edges*/
     igraph_vector_init_int_end(&preference, -1, 1, 1, -1);
     IGRAPH_ASSERT(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 0, /*pagebins*/ 1, /*preference*/ &preference, /*directed*/ 0) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vcount(&g) == 9);
