@@ -99,9 +99,10 @@ DECLDIR int igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
                                         igraph_vector_t *node_type_vec);
 DECLDIR int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
                                       igraph_integer_t types, igraph_integer_t k,
-                                      igraph_vector_t *type_dist,
-                                      igraph_matrix_t *pref_matrix,
-                                      igraph_bool_t directed);
+                                      const igraph_vector_t *type_dist,
+                                      const igraph_matrix_t *pref_matrix,
+                                      igraph_bool_t directed,
+                                      igraph_vector_t *node_type_vec);
 DECLDIR int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
                             igraph_real_t radius, igraph_bool_t torus,
                             igraph_vector_t *x, igraph_vector_t *y);
