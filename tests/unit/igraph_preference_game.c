@@ -66,8 +66,10 @@ int main() {
     }
     igraph_destroy(&g);
 
+    /* Note: preference matrix must be symmetric in the undirected case. */
     for (i = 0; i < 2; i++) {
         MATRIX(pmat, i, i + 1) = 0.1;
+        MATRIX(pmat, i + 1, i) = 0.1;
     }
 
     /* directed, no loops */
