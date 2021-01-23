@@ -81,21 +81,21 @@ DECLDIR int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
                                       igraph_real_t zero_appeal,
                                       igraph_bool_t directed);
 DECLDIR int igraph_recent_degree_aging_game(igraph_t *graph,
-        igraph_integer_t nodes,
-        igraph_integer_t m,
-        const igraph_vector_t *outseq,
-        igraph_bool_t outpref,
-        igraph_real_t pa_exp,
-        igraph_real_t aging_exp,
-        igraph_integer_t aging_bin,
-        igraph_integer_t window,
-        igraph_real_t zero_appeal,
-        igraph_bool_t directed);
-DECLDIR int igraph_callaway_traits_game (igraph_t *graph, igraph_integer_t nodes,
-        igraph_integer_t types, igraph_integer_t edges_per_step,
-        igraph_vector_t *type_dist,
-        igraph_matrix_t *pref_matrix,
-        igraph_bool_t directed);
+                                            igraph_integer_t nodes,
+                                            igraph_integer_t m,
+                                            const igraph_vector_t *outseq,
+                                            igraph_bool_t outpref,
+                                            igraph_real_t pa_exp,
+                                            igraph_real_t aging_exp,
+                                            igraph_integer_t aging_bin,
+                                            igraph_integer_t window,
+                                            igraph_real_t zero_appeal,
+                                            igraph_bool_t directed);
+DECLDIR int igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
+                                        igraph_integer_t types, igraph_integer_t edges_per_step,
+                                        igraph_vector_t *type_dist,
+                                        igraph_matrix_t *pref_matrix,
+                                        igraph_bool_t directed);
 DECLDIR int igraph_establishment_game(igraph_t *graph, igraph_integer_t nodes,
                                       igraph_integer_t types, igraph_integer_t k,
                                       igraph_vector_t *type_dist,
@@ -141,10 +141,10 @@ DECLDIR int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
                                    igraph_bool_t directed);
 
 DECLDIR int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
-        const igraph_vector_t *types,
-        const igraph_matrix_t *pref,
-        igraph_integer_t edges_per_step,
-        igraph_bool_t directed);
+                                          const igraph_vector_t *types,
+                                          const igraph_matrix_t *pref,
+                                          igraph_integer_t edges_per_step,
+                                          igraph_bool_t directed);
 
 DECLDIR int igraph_forest_fire_game(igraph_t *graph, igraph_integer_t nodes,
                                     igraph_real_t fw_prob, igraph_real_t bw_factor,
@@ -203,9 +203,9 @@ DECLDIR int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs
                                     igraph_bool_t directed);
 
 DECLDIR int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
-        igraph_real_t radius,
-        igraph_bool_t positive,
-        igraph_matrix_t *res);
+                                         igraph_real_t radius,
+                                         igraph_bool_t positive,
+                                         igraph_matrix_t *res);
 
 DECLDIR int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
                                         igraph_real_t radius,
