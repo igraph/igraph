@@ -74,6 +74,7 @@ static void igraph_i_citing_cited_type_game_free (
  *     age bins, the last element is the attractivity of the vertices
  *     which were never cited, and it should be greater than zero.
  *     It is a good idea to have all positive values in this vector.
+ *     Preferences cannot be negative.
  * \param directed Logical constant, whether to create directed
  *      networks.
  * \return Error code.
@@ -96,21 +97,25 @@ int igraph_lastcit_game(igraph_t *graph,
     long int *lastcit;
     long int *index;
     long int agebins = pagebins;
-    long int binwidth = no_of_nodes / agebins + 1;
+    long int binwidth;
 
     if (agebins != igraph_vector_size(preference) - 1) {
         IGRAPH_ERROR("`preference' vector should be of length `agebins' plus one",
                      IGRAPH_EINVAL);
     }
-    if (agebins <= 1 ) {
-        IGRAPH_ERROR("at least two age bins are need for lastcit game",
+    if (agebins < 1 ) {
+        IGRAPH_ERROR("pagebins should be at least 1",
                      IGRAPH_EINVAL);
     }
     if (VECTOR(*preference)[agebins] <= 0) {
         IGRAPH_ERROR("the last element of the `preference' vector needs to be positive",
                      IGRAPH_EINVAL);
     }
+    if (igraph_vector_min(preference) < 0) {
+        IGRAPH_ERROR("The preference vector must contain only non-negative values.", IGRAPH_EINVAL);
+    }
 
+    binwidth = no_of_nodes / agebins + 1;
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
     lastcit = igraph_Calloc(no_of_nodes, long int);
