@@ -27,6 +27,7 @@
 #include "igraph_memory.h"
 #include "igraph_psumtree.h"
 #include "igraph_random.h"
+#include "igraph_interface.h"
 
 typedef struct {
     long int no;
@@ -103,6 +104,10 @@ int igraph_lastcit_game(igraph_t *graph,
         IGRAPH_ERROR("`preference' vector should be of length `agebins' plus one",
                      IGRAPH_EINVAL);
     }
+    if (nodes < 0 ) {
+        IGRAPH_ERROR("nodes should be non-negative",
+                     IGRAPH_EINVAL);
+    }
     if (agebins < 1 ) {
         IGRAPH_ERROR("pagebins should be at least 1",
                      IGRAPH_EINVAL);
@@ -113,6 +118,11 @@ int igraph_lastcit_game(igraph_t *graph,
     }
     if (igraph_vector_min(preference) < 0) {
         IGRAPH_ERROR("The preference vector must contain only non-negative values.", IGRAPH_EINVAL);
+    }
+
+    if (nodes == 0) {
+        IGRAPH_CHECK(igraph_empty(graph, nodes, directed));
+        return IGRAPH_SUCCESS;
     }
 
     binwidth = no_of_nodes / agebins + 1;
