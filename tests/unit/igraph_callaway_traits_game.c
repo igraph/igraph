@@ -39,7 +39,7 @@ void init_vm(igraph_vector_t *type_dist,
 
 int main() {
     igraph_t g;
-    igraph_vector_t type_dist;
+    igraph_vector_t type_dist, node_types;
     igraph_matrix_t pref_matrix;
     igraph_bool_t bipartite;
 
@@ -47,30 +47,44 @@ int main() {
 
     /*Zero matrix elements for only possible vertex type means no edges*/
     init_vm(&type_dist, 1, 0, &pref_matrix, 0, 0, 0, 1);
-    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /*types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /*types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 0, NULL) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_ecount(&g) == 0);
     IGRAPH_ASSERT(igraph_vcount(&g) == 20);
     DESTROY_GVM();
 
     /*No vertices*/
     init_vm(&type_dist, 1, 0, &pref_matrix, 0, 0, 0, 1);
-    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 0, /*types*/ 2, /*edges_per_step*/ 0, &type_dist, &pref_matrix, /*directed*/ 0) == IGRAPH_SUCCESS);
+    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 0, /*types*/ 2, /*edges_per_step*/ 0, &type_dist, &pref_matrix, /*directed*/ 0, NULL) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_vcount(&g) == 0);
     IGRAPH_ASSERT(!igraph_is_directed(&g));
     DESTROY_GVM();
 
     /*Two types with only cross terms makes a bipartite graph*/
-    init_vm(&type_dist, 1, 1, &pref_matrix, 0, 1, 1, 0);
-    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /*types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 1) == IGRAPH_SUCCESS);
+    init_vm(&type_dist, 2, 1, &pref_matrix, 0, 1, 1, 0);
+    igraph_vector_init(&node_types, 0);
+    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /*types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 1, &node_types) == IGRAPH_SUCCESS);
     igraph_is_bipartite(&g, &bipartite, NULL);
     IGRAPH_ASSERT(bipartite);
     IGRAPH_ASSERT(igraph_is_directed(&g));
+    IGRAPH_ASSERT(igraph_vector_size(&node_types) == igraph_vcount(&g));
+    igraph_vector_destroy(&node_types);
     DESTROY_GVM();
 
-    /*Distribution of types should have at least one possible value*/
+    /*Automatically determined type_dist*/
+    init_vm(&type_dist, 0, 0, &pref_matrix, 0, 1, 1, 0);
+    igraph_vector_init(&node_types, 0);
+    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /*types*/ 2, /*edges_per_step*/ 3, /*type_dist*/ NULL, &pref_matrix, /*directed*/ 0, &node_types) == IGRAPH_SUCCESS);
+    igraph_is_bipartite(&g, &bipartite, NULL);
+    IGRAPH_ASSERT(bipartite);
+    IGRAPH_ASSERT(!igraph_is_directed(&g));
+    IGRAPH_ASSERT(igraph_vector_size(&node_types) == igraph_vcount(&g));
+    igraph_vector_destroy(&node_types);
+    DESTROY_GVM();
+
+    /*Distribution of types should have at least one positive value*/
     init_vm(&type_dist, 0, 0, &pref_matrix, 0, 1, 1, 0);
     igraph_set_error_handler(igraph_error_handler_ignore);
-    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /* types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 0) == IGRAPH_EINVAL);
+    IGRAPH_ASSERT(igraph_callaway_traits_game(&g, /*nodes*/ 20, /* types*/ 2, /*edges_per_step*/ 5, &type_dist, &pref_matrix, /*directed*/ 0, NULL) == IGRAPH_EINVAL);
     DESTROY_GVM();
 
     VERIFY_FINALLY_STACK();
