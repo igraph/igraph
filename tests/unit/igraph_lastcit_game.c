@@ -56,6 +56,11 @@ int main() {
 
     igraph_set_error_handler(igraph_error_handler_ignore);
 
+    /*Negative number of nodes*/
+    igraph_vector_init_int_end(&preference, -1, 1, 1, -1);
+    IGRAPH_ASSERT(igraph_lastcit_game(&g, /*nodes*/ -9, /*edges_per_node*/ 1, /*pagebins*/ 1, /*preference*/ &preference, /*directed*/ 0) == IGRAPH_EINVAL);
+    igraph_vector_destroy(&preference);
+
     /*Too few pagebins*/
     igraph_vector_init_int_end(&preference, -1, 1, -1);
     IGRAPH_ASSERT(igraph_lastcit_game(&g, /*nodes*/ 9, /*edges_per_node*/ 1, /*pagebins*/ 0, /*preference*/ &preference, /*directed*/ 0) == IGRAPH_EINVAL);
