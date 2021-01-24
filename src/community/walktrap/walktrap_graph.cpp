@@ -162,7 +162,7 @@ int Graph::convert_from_igraph(const igraph_t *graph,
     Edge_list EL;
 
     for (i = 0; i < no_of_edges; i++) {
-        igraph_integer_t from, to;
+        igraph_long_t from, to;
         int v1, v2;
         w = weights ? VECTOR(*weights)[i] : 1.0;
         igraph_edge(graph, i, &from, &to);

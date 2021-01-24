@@ -895,8 +895,8 @@ double PottsModel::FindCommunityFromStart(double gamma, double prob,
         igraph_vector_t *result,
         igraph_real_t *cohesion,
         igraph_real_t *adhesion,
-        igraph_integer_t *my_inner_links,
-        igraph_integer_t *my_outer_links) {
+        igraph_int_t *my_inner_links,
+        igraph_int_t *my_outer_links) {
     DLList_Iter<NNode*> iter, iter2;
     DLList_Iter<NLink*> l_iter;
     DLList<NNode*>* to_do;

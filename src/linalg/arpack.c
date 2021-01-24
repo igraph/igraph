@@ -855,7 +855,7 @@ static void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t*
  * are found in O(n) time as well.
  */
 
-int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
+igraph_long_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                           igraph_arpack_options_t *options,
                           igraph_arpack_storage_t *storage,
                           igraph_vector_t *values, igraph_matrix_t *vectors) {
@@ -1113,7 +1113,7 @@ int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
  * are found in O(n) time as well.
  */
 
-int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
+igraph_long_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                           igraph_arpack_options_t *options,
                           igraph_arpack_storage_t *storage,
                           igraph_matrix_t *values, igraph_matrix_t *vectors) {
@@ -1357,7 +1357,7 @@ int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
  * matrix.
  */
 
-int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
+igraph_long_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
                                  long int nev) {
 
     long int nodes = igraph_matrix_nrow(vectors);

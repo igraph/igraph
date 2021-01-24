@@ -291,7 +291,7 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
                              igraph_sparsemat_t *res) {
 
     long int nrow = A->cs->m, ncol = A->cs->n;
-    igraph_vector_long_t pinv;
+    igraph_vector_int_t pinv;
     long int i;
 
     if (nrow != igraph_vector_long_size(p)) {
@@ -302,8 +302,8 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
     }
 
     /* We invert the permutation by hand */
-    IGRAPH_CHECK(igraph_vector_long_init(&pinv, nrow));
-    IGRAPH_FINALLY(igraph_vector_long_destroy, &pinv);
+    IGRAPH_CHECK(igraph_vector_int_init(&pinv, nrow));
+    IGRAPH_FINALLY(igraph_vector_int_destroy, &pinv);
     for (i = 0; i < nrow; i++) {
         VECTOR(pinv)[ VECTOR(*p)[i] ] = (int) i;
     }
@@ -314,7 +314,7 @@ int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
         IGRAPH_ERROR("Cannot index sparse matrix", IGRAPH_FAILURE);
     }
 
-    igraph_vector_long_destroy(&pinv);
+    igraph_vector_int_destroy(&pinv);
     IGRAPH_FINALLY_CLEAN(1);
 
     return 0;

@@ -35,13 +35,13 @@
 // (vertex, degree) pair
 struct vd_pair {
     long vertex;
-    igraph_integer_t degree;
+    igraph_int_t degree;
 
-    vd_pair(long vertex, igraph_integer_t degree) : vertex(vertex), degree(degree) {}
+    vd_pair(long vertex, igraph_int_t degree) : vertex(vertex), degree(degree) {}
 };
 
 // (indegree, outdegree)
-typedef std::pair<igraph_integer_t, igraph_integer_t> bidegree;
+typedef std::pair<igraph_int_t, igraph_int_t> bidegree;
 
 // (vertex, bidegree) pair
 struct vbd_pair {
@@ -589,7 +589,7 @@ static int igraph_i_realize_undirected_degree_sequence(
         return IGRAPH_UNIMPLEMENTED;
     }
 
-    igraph_create(graph, &edges, igraph_integer_t(node_count), false);
+    igraph_create(graph, &edges, igraph_int_t(node_count), false);
 
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -642,7 +642,7 @@ static int igraph_i_realize_directed_degree_sequence(
         IGRAPH_ERROR("Invalid directed degree sequence realization method.", IGRAPH_EINVAL);
     }
 
-    igraph_create(graph, &edges, igraph_integer_t(node_count), true);
+    igraph_create(graph, &edges, igraph_int_t(node_count), true);
 
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
@@ -760,14 +760,14 @@ static int igraph_i_realize_directed_degree_sequence(
  *
  */
 
-int igraph_realize_degree_sequence(
+igraph_long_t igraph_realize_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
         igraph_edge_type_sw_t allowed_edge_types,
         igraph_realize_degseq_t method)
 {
     long n = igraph_vector_size(outdeg);
-    if (n != igraph_integer_t(n)) { // does the vector size fit into an igraph_integer_t ?
+    if (n != igraph_int_t(n)) { // does the vector size fit into an igraph_int_t ?
         IGRAPH_ERROR("Degree sequence vector too long.", IGRAPH_EINVAL);
     }
 

@@ -82,7 +82,7 @@ struct pblock {
 };
 }
 
-static int markovChainMonteCarlo(dendro *d, unsigned int period,
+static igraph_long_t markovChainMonteCarlo(dendro *d, unsigned int period,
                           igraph_hrg_t *hrg) {
 
     igraph_real_t bestL = d->getLikelihood();
@@ -121,7 +121,7 @@ static int markovChainMonteCarlo(dendro *d, unsigned int period,
     return 0;
 }
 
-static int markovChainMonteCarlo2(dendro *d, int num_samples) {
+static igraph_long_t markovChainMonteCarlo2(dendro *d, int num_samples) {
     bool flag_taken;
     double dL, ptest = 1.0 / (50.0 * (double)(d->g->numNodes()));
     int sample_num = 0, t = 1, thresh = 200 * d->g->numNodes();
@@ -150,7 +150,7 @@ static int markovChainMonteCarlo2(dendro *d, int num_samples) {
     return 0;
 }
 
-static int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
+static igraph_long_t MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
 
     // We want to run the MCMC until we've found equilibrium; we
     // use the heuristic of the average log-likelihood (which is
@@ -187,7 +187,7 @@ static int MCMCEquilibrium_Find(dendro *d, igraph_hrg_t *hrg) {
     return 0;
 }
 
-static int igraph_i_hrg_getgraph(const igraph_t *igraph,
+static igraph_long_t igraph_i_hrg_getgraph(const igraph_t *igraph,
                                  dendro *d) {
 
     int no_of_nodes = igraph_vcount(igraph);
@@ -217,7 +217,7 @@ static int igraph_i_hrg_getgraph(const igraph_t *igraph,
     return 0;
 }
 
-static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
+static igraph_long_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
                                        dendro *d, simpleGraph **sg,
                                        int num_bins) {
 
@@ -269,7 +269,7 @@ static int igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
  * Time complexity: O(n), the number of vertices in the graph.
  */
 
-int igraph_hrg_init(igraph_hrg_t *hrg, int n) {
+igraph_long_t igraph_hrg_init(igraph_hrg_t *hrg, int n) {
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->left,      n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->right,     n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->prob,      n - 1);
@@ -308,7 +308,7 @@ void igraph_hrg_destroy(igraph_hrg_t *hrg) {
  * Time complexity: O(1).
  */
 
-int igraph_hrg_size(const igraph_hrg_t *hrg) {
+igraph_long_t igraph_hrg_size(const igraph_hrg_t *hrg) {
     return igraph_vector_size(&hrg->left) + 1;
 }
 
@@ -324,7 +324,7 @@ int igraph_hrg_size(const igraph_hrg_t *hrg) {
  * Time complexity: O(n), n is the new size.
  */
 
-int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize) {
+igraph_long_t igraph_hrg_resize(igraph_hrg_t *hrg, int newsize) {
     int origsize = igraph_hrg_size(hrg);
     int ret = 0;
     igraph_error_handler_t *oldhandler =
@@ -370,7 +370,7 @@ int igraph_hrg_resize(igraph_hrg_t *hrg, int newsize) {
  * Time complexity: TODO.
  */
 
-int igraph_hrg_fit(const igraph_t *graph,
+igraph_long_t igraph_hrg_fit(const igraph_t *graph,
                    igraph_hrg_t *hrg,
                    igraph_bool_t start,
                    int steps) {
@@ -445,10 +445,10 @@ int igraph_hrg_fit(const igraph_t *graph,
  * Time complexity: TODO.
  */
 
-int igraph_hrg_sample(const igraph_t *input_graph,
+igraph_long_t igraph_hrg_sample(const igraph_t *input_graph,
                       igraph_t *sample,
                       igraph_vector_ptr_t *samples,
-                      igraph_integer_t no_samples,
+                      igraph_int_t no_samples,
                       igraph_hrg_t *hrg,
                       igraph_bool_t start) {
 
@@ -551,7 +551,7 @@ int igraph_hrg_sample(const igraph_t *input_graph,
  * Time complexity: TODO.
  */
 
-int igraph_hrg_game(igraph_t *graph,
+igraph_long_t igraph_hrg_game(igraph_t *graph,
                     const igraph_hrg_t *hrg) {
     return igraph_hrg_sample(/* input_graph= */ 0, /* sample= */ graph,
             /* samples= */ 0, /* no_samples=*/ 1,
@@ -573,7 +573,7 @@ int igraph_hrg_game(igraph_t *graph,
  * Time complexity: O(n), the number of vertices in the graph.
  */
 
-int igraph_hrg_dendrogram(igraph_t *graph,
+igraph_long_t igraph_hrg_dendrogram(igraph_t *graph,
                           const igraph_hrg_t *hrg) {
 
     int orig_nodes = igraph_hrg_size(hrg);
@@ -725,7 +725,7 @@ static int MCMCEquilibrium_Sample(dendro *d, int num_samples) {
     return 0;
 }
 
-static int QsortPartition (pblock* array, int left, int right, int index) {
+static igraph_long_t QsortPartition (pblock* array, int left, int right, int index) {
     pblock p_value, temp;
     p_value.L = array[index].L;
     p_value.i = array[index].i;
@@ -782,7 +782,7 @@ static void QsortMain (pblock* array, int left, int right) {
     return;
 }
 
-static int rankCandidatesByProbability(simpleGraph *sg, dendro *d,
+static igraph_long_t rankCandidatesByProbability(simpleGraph *sg, dendro *d,
                                 pblock *br_list, int mk) {
     int mkk = 0;
     int n = sg->getNumNodes();
@@ -804,7 +804,7 @@ static int rankCandidatesByProbability(simpleGraph *sg, dendro *d,
     return 0;
 }
 
-static int recordPredictions(pblock *br_list, igraph_vector_t *edges,
+static igraph_long_t recordPredictions(pblock *br_list, igraph_vector_t *edges,
                       igraph_vector_t *prob, int mk) {
 
     IGRAPH_CHECK(igraph_vector_resize(edges, mk * 2));
@@ -842,7 +842,7 @@ static int recordPredictions(pblock *br_list, igraph_vector_t *edges,
  * Time complexity: TODO.
  */
 
-int igraph_hrg_predict(const igraph_t *graph,
+igraph_long_t igraph_hrg_predict(const igraph_t *graph,
                        igraph_vector_t *edges,
                        igraph_vector_t *prob,
                        igraph_hrg_t *hrg,
@@ -915,7 +915,7 @@ int igraph_hrg_predict(const igraph_t *graph,
  * Time complexity: O(n), the number of vertices in the tree.
  */
 
-int igraph_hrg_create(igraph_hrg_t *hrg,
+igraph_long_t igraph_hrg_create(igraph_hrg_t *hrg,
                       const igraph_t *graph,
                       const igraph_vector_t *prob) {
 

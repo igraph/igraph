@@ -1,45 +1,45 @@
-/* 
+/*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
 
 %{
 
-/* 
+/*
    IGraph library.
    Copyright (C) 2006-2012  Gabor Csardi <csardi.gabor@gmail.com>
    334 Harvard st, Cambridge, MA, 02138 USA
-   
+
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA 
+   Foundation, Inc.,  51 Franklin Street, Fifth Floor, Boston, MA
    02110-1301 USA
 
 */
@@ -61,39 +61,39 @@
 
 #define yyscan_t void*
 
-int igraph_pajek_yylex(YYSTYPE* lvalp, YYLTYPE* llocp, 
+int igraph_pajek_yylex(YYSTYPE* lvalp, YYLTYPE* llocp,
 		       void* scanner);
-int igraph_pajek_yyerror(YYLTYPE* locp, 
-			 igraph_i_pajek_parsedata_t *context, 
+int igraph_pajek_yyerror(YYLTYPE* locp,
+			 igraph_i_pajek_parsedata_t *context,
 			 const char *s);
 char *igraph_pajek_yyget_text (yyscan_t yyscanner );
 int igraph_pajek_yyget_leng (yyscan_t yyscanner );
 
-int igraph_i_pajek_add_string_vertex_attribute(const char *name, 
+int igraph_i_pajek_add_string_vertex_attribute(const char *name,
 					       const char *value,
-					       int len, 
+					       int len,
 					       igraph_i_pajek_parsedata_t *context);
-int igraph_i_pajek_add_string_edge_attribute(const char *name, 
+int igraph_i_pajek_add_string_edge_attribute(const char *name,
 					     const char *value,
 					     int len,
 					     igraph_i_pajek_parsedata_t *context);
-int igraph_i_pajek_add_numeric_vertex_attribute(const char *name, 
+int igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
 						igraph_real_t value,
 						igraph_i_pajek_parsedata_t *context);
-int igraph_i_pajek_add_numeric_edge_attribute(const char *name, 
-					      igraph_real_t value, 
+int igraph_i_pajek_add_numeric_edge_attribute(const char *name,
+					      igraph_real_t value,
 					      igraph_i_pajek_parsedata_t *context);
 int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
 					 igraph_vector_ptr_t *attrs,
 					 long int count,
 					 const char *attrname,
-					 igraph_integer_t vid,
+					 igraph_int_t vid,
 					 igraph_real_t number);
 int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 					igraph_vector_ptr_t *attrs,
 					long int count,
 					const char *attrname,
-					igraph_integer_t vid,
+					igraph_int_t vid,
 					const char *str);
 
 int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context);
@@ -119,11 +119,11 @@ extern long int igraph_i_pajek_actedge;
 
 %union {
   long int intnum;
-  double   realnum;  
+  double   realnum;
   struct {
     char *str;
     int len;
-  } string;  
+  } string;
 }
 
 %type <intnum>   longint;
@@ -199,11 +199,11 @@ nethead: /* empty */ | NETWORKLINE words NEWLINE;
 
 vertices: verticeshead NEWLINE vertdefs;
 
-verticeshead: VERTICESLINE longint { 
-  context->vcount=$2; 
+verticeshead: VERTICESLINE longint {
+  context->vcount=$2;
   context->vcount2=0;
-            } 
-            | VERTICESLINE longint longint { 
+            }
+            | VERTICESLINE longint longint {
   context->vcount=$2;
   context->vcount2=$3;
   igraph_i_pajek_add_bipartite_type(context);
@@ -223,18 +223,18 @@ vertexid: word {
   igraph_i_pajek_add_string_vertex_attribute("name", $1.str, $1.len, context);
 };
 
-vertexcoords: /* empty */ 
-            | number number { 
+vertexcoords: /* empty */
+            | number number {
   igraph_i_pajek_add_numeric_vertex_attribute("x", $1, context);
   igraph_i_pajek_add_numeric_vertex_attribute("y", $2, context);
 	    }
-            | number number number { 
+            | number number number {
   igraph_i_pajek_add_numeric_vertex_attribute("x", $1, context);
   igraph_i_pajek_add_numeric_vertex_attribute("y", $2, context);
   igraph_i_pajek_add_numeric_vertex_attribute("z", $3, context);
 	    };
 
-shape: /* empty */ | word { 
+shape: /* empty */ | word {
   igraph_i_pajek_add_string_vertex_attribute("shape", $1.str, $1.len, context);
 };
 
@@ -265,69 +265,69 @@ param:
        }
      | VP_LR number {
          igraph_i_pajek_add_numeric_vertex_attribute("labeldist", $2, context);
-     }  
+     }
      | VP_LPHI number {
          igraph_i_pajek_add_numeric_vertex_attribute("labeldegree2", $2, context);
-     }  
+     }
      | VP_BW number {
          igraph_i_pajek_add_numeric_vertex_attribute("framewidth", $2, context);
-     }         
+     }
      | VP_FOS number {
          igraph_i_pajek_add_numeric_vertex_attribute("fontsize", $2, context);
-     }          
-     | VP_PHI number {       
+     }
+     | VP_PHI number {
          igraph_i_pajek_add_numeric_vertex_attribute("rotation", $2, context);
-     }         
+     }
      | VP_R number {
          igraph_i_pajek_add_numeric_vertex_attribute("radius", $2, context);
-     }         
+     }
      | VP_Q number {
          igraph_i_pajek_add_numeric_vertex_attribute("diamondratio", $2, context);
-     }         
+     }
      | VP_LA number {
          igraph_i_pajek_add_numeric_vertex_attribute("labeldegree", $2, context);
-     }         
+     }
      | VP_SIZE number {
          igraph_i_pajek_add_numeric_vertex_attribute("vertexsize", $2, context);
-     } 
+     }
 ;
 
-vpword: VP_FONT { context->mode=3; } vpwordpar { 
+vpword: VP_FONT { context->mode=3; } vpwordpar {
          context->mode=1;
 	 igraph_i_pajek_add_string_vertex_attribute("font", $3.str, $3.len, context);
-     } 
+     }
      | VP_URL { context->mode=3; } vpwordpar {
          context->mode=1;
 	 igraph_i_pajek_add_string_vertex_attribute("url", $3.str, $3.len, context);
-     } 
+     }
      | VP_IC { context->mode=3; } vpwordpar {
          context->mode=1;
 	 igraph_i_pajek_add_string_vertex_attribute("color", $3.str, $3.len, context);
-     } 
+     }
      | VP_BC { context->mode=3; } vpwordpar {
          context->mode=1;
-	 igraph_i_pajek_add_string_vertex_attribute("framecolor", 
+	 igraph_i_pajek_add_string_vertex_attribute("framecolor",
 						    $3.str, $3.len, context);
-     } 
+     }
      | VP_LC { context->mode=3; } vpwordpar {
          context->mode=1;
-	 igraph_i_pajek_add_string_vertex_attribute("labelcolor", 
+	 igraph_i_pajek_add_string_vertex_attribute("labelcolor",
 						    $3.str, $3.len, context);
-     } 
+     }
 ;
 
 vpwordpar: word { $$=$1; };
 
 edgeblock: /* empty */ | edgeblock arcs | edgeblock edges | edgeblock arcslist | edgeblock edgeslist | edgeblock adjmatrix;
 
-arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=1; } 
-      | ARCSLINE number NEWLINE arcsdefs { context->directed=1; }; 
+arcs:   ARCSLINE NEWLINE arcsdefs        { context->directed=1; }
+      | ARCSLINE number NEWLINE arcsdefs { context->directed=1; };
 
 arcsdefs: /* empty */ | arcsdefs arcsline;
 
-arcsline: NEWLINE | 
+arcsline: NEWLINE |
           arcfrom arcto { context->actedge++;
-	                  context->mode=2; } weight edgeparams NEWLINE  { 
+	                  context->mode=2; } weight edgeparams NEWLINE  {
   igraph_vector_push_back(context->vector, $1-1);
   igraph_vector_push_back(context->vector, $2-1); }
 ;
@@ -341,9 +341,9 @@ edges:   EDGESLINE NEWLINE edgesdefs { context->directed=0; }
 
 edgesdefs: /* empty */ | edgesdefs edgesline;
 
-edgesline: NEWLINE | 
-          edgefrom edgeto { context->actedge++; 
-	                    context->mode=2; } weight edgeparams NEWLINE { 
+edgesline: NEWLINE |
+          edgefrom edgeto { context->actedge++;
+	                    context->mode=2; } weight edgeparams NEWLINE {
   igraph_vector_push_back(context->vector, $1-1);
   igraph_vector_push_back(context->vector, $2-1); }
 ;
@@ -365,7 +365,7 @@ edgeparam:
        igraph_i_pajek_add_numeric_edge_attribute("color-green", $3, context);
        igraph_i_pajek_add_numeric_edge_attribute("color-blue", $4, context);
    }
-   | EP_S number { 
+   | EP_S number {
        igraph_i_pajek_add_numeric_edge_attribute("arrowsize", $2, context);
    }
    | EP_W number {
@@ -446,9 +446,9 @@ arctolist: /* empty */ | arctolist arclistto;
 
 arclistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
 
-arclistto: longint { 
-  igraph_vector_push_back(context->vector, context->actfrom); 
-  igraph_vector_push_back(context->vector, labs($1)-1); 
+arclistto: longint {
+  igraph_vector_push_back(context->vector, context->actfrom);
+  igraph_vector_push_back(context->vector, labs($1)-1);
 };
 
 edgeslist: EDGESLISTLINE NEWLINE edgelistlines { context->directed=0; };
@@ -461,17 +461,17 @@ edgetolist: /* empty */ | edgetolist edgelistto;
 
 edgelistfrom: longint { context->mode=0; context->actfrom=labs($1)-1; };
 
-edgelistto: longint { 
-  igraph_vector_push_back(context->vector, context->actfrom); 
-  igraph_vector_push_back(context->vector, labs($1)-1); 
+edgelistto: longint {
+  igraph_vector_push_back(context->vector, context->actfrom);
+  igraph_vector_push_back(context->vector, labs($1)-1);
 };
 
 /* -----------------------------------------------------*/
 
 adjmatrix: matrixline NEWLINE adjmatrixlines;
 
-matrixline: MATRIXLINE { context->actfrom=0; 
-                         context->actto=0; 
+matrixline: MATRIXLINE { context->actfrom=0;
+                         context->actto=0;
                          context->directed=(context->vcount2==0);
                        };
 
@@ -485,14 +485,14 @@ adjmatrixentry: number {
   if ($1 != 0) {
     if (context->vcount2==0) {
       context->actedge++;
-      igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);    
+      igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);
       igraph_vector_push_back(context->vector, context->actfrom);
       igraph_vector_push_back(context->vector, context->actto);
     } else if (context->vcount2 + context->actto < context->vcount) {
       context->actedge++;
-      igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);    
+      igraph_i_pajek_add_numeric_edge_attribute("weight", $1, context);
       igraph_vector_push_back(context->vector, context->actfrom);
-      igraph_vector_push_back(context->vector, 
+      igraph_vector_push_back(context->vector,
 			      context->vcount2+context->actto);
     }
   }
@@ -509,20 +509,20 @@ number: NUM  { $$=igraph_pajek_get_number(igraph_pajek_yyget_text(scanner),
 
 words: /* empty */ | words word;
 
-word: ALNUM { $$.str=igraph_pajek_yyget_text(scanner); 
+word: ALNUM { $$.str=igraph_pajek_yyget_text(scanner);
               $$.len=igraph_pajek_yyget_leng(scanner); }
-      | NUM { $$.str=igraph_pajek_yyget_text(scanner); 
+      | NUM { $$.str=igraph_pajek_yyget_text(scanner);
               $$.len=igraph_pajek_yyget_leng(scanner); }
-      | QSTR { $$.str=igraph_pajek_yyget_text(scanner)+1; 
+      | QSTR { $$.str=igraph_pajek_yyget_text(scanner)+1;
                $$.len=igraph_pajek_yyget_leng(scanner)-2; };
 
 %%
 
-int igraph_pajek_yyerror(YYLTYPE* locp, 
-			 igraph_i_pajek_parsedata_t *context, 
+int igraph_pajek_yyerror(YYLTYPE* locp,
+			 igraph_i_pajek_parsedata_t *context,
 			 const char *s) {
-  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1, 
-	   "Parse error in Pajek file, line %i (%s)", 
+  snprintf(context->errmsg, sizeof(context->errmsg)/sizeof(char)-1,
+	   "Parse error in Pajek file, line %i (%s)",
 	   locp->first_line, s);
   return 0;
 }
@@ -530,13 +530,13 @@ int igraph_pajek_yyerror(YYLTYPE* locp,
 igraph_real_t igraph_pajek_get_number(const char *str, long int length) {
   igraph_real_t num;
   char *tmp=igraph_Calloc(length+1, char);
-  
+
   strncpy(tmp, str, length);
   tmp[length]='\0';
   sscanf(tmp, "%lf", &num);
   igraph_Free(tmp);
   return num;
-} 
+}
 
 /* TODO: NA's */
 
@@ -544,7 +544,7 @@ int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
 					 igraph_vector_ptr_t *attrs,
 					 long int count,
 					 const char *attrname,
-					 igraph_integer_t vid,
+					 igraph_int_t vid,
 					 igraph_real_t number) {
   long int attrsize=igraph_trie_size(names);
   long int id;
@@ -573,9 +573,9 @@ int igraph_i_pajek_add_numeric_attribute(igraph_trie_t *names,
       VECTOR(*na)[origsize] = IGRAPH_NAN;
     }
     VECTOR(*na)[(long int) vid] = number;
-  } else { 
+  } else {
     VECTOR(*na)[(long int) vid] = number;
-  }    
+  }
 
   return 0;
 }
@@ -586,7 +586,7 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
 					igraph_vector_ptr_t *attrs,
 					long int count,
 					const char *attrname,
-					igraph_integer_t vid,
+					igraph_int_t vid,
 					const char *str) {
   long int attrsize=igraph_trie_size(names);
   long int id;
@@ -610,7 +610,7 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   }
   rec=VECTOR(*attrs)[id];
   na=(igraph_strvector_t*)rec->value;
-  if (igraph_strvector_size(na) <= vid) { 
+  if (igraph_strvector_size(na) <= vid) {
     long int origsize=igraph_strvector_size(na);
     IGRAPH_CHECK(igraph_strvector_resize(na, vid+1));
     for (;origsize<count; origsize++) {
@@ -622,7 +622,7 @@ int igraph_i_pajek_add_string_attribute(igraph_trie_t *names,
   return 0;
 }
 
-int igraph_i_pajek_add_string_vertex_attribute(const char *name, 
+int igraph_i_pajek_add_string_vertex_attribute(const char *name,
 					       const char *value,
 					       int len,
 					       igraph_i_pajek_parsedata_t *context) {
@@ -642,16 +642,16 @@ int igraph_i_pajek_add_string_vertex_attribute(const char *name,
 					  context->vcount,
 					  name, context->actvertex-1,
 					  tmp);
-  
+
   igraph_Free(tmp);
   IGRAPH_FINALLY_CLEAN(1);
-  
+
   return ret;
 }
 
-int igraph_i_pajek_add_string_edge_attribute(const char *name, 
+int igraph_i_pajek_add_string_edge_attribute(const char *name,
 					     const char *value,
-					     int len, 
+					     int len,
 					     igraph_i_pajek_parsedata_t *context) {
   char *tmp;
   int ret;
@@ -663,7 +663,7 @@ int igraph_i_pajek_add_string_edge_attribute(const char *name,
   IGRAPH_FINALLY(igraph_free, tmp);
   strncpy(tmp, value, len);
   tmp[len]='\0';
-  
+
   ret=igraph_i_pajek_add_string_attribute(context->edge_attribute_names,
 					  context->edge_attributes,
 					  context->actedge,
@@ -672,14 +672,14 @@ int igraph_i_pajek_add_string_edge_attribute(const char *name,
 
   igraph_Free(tmp);
   IGRAPH_FINALLY_CLEAN(1);
-  
+
   return ret;
 }
 
-int igraph_i_pajek_add_numeric_vertex_attribute(const char *name, 
-						igraph_real_t value, 
+int igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
+						igraph_real_t value,
 						igraph_i_pajek_parsedata_t *context) {
-  
+
   return
     igraph_i_pajek_add_numeric_attribute(context->vertex_attribute_names,
 					 context->vertex_attributes,
@@ -688,8 +688,8 @@ int igraph_i_pajek_add_numeric_vertex_attribute(const char *name,
 					 value);
 }
 
-int igraph_i_pajek_add_numeric_edge_attribute(const char *name, 
-					      igraph_real_t value, 
+int igraph_i_pajek_add_numeric_edge_attribute(const char *name,
+					      igraph_real_t value,
 					      igraph_i_pajek_parsedata_t *context) {
 
   return
@@ -701,26 +701,26 @@ int igraph_i_pajek_add_numeric_edge_attribute(const char *name,
 }
 
 int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
-  
+
   const char *attrname="type";
   igraph_trie_t *names=context->vertex_attribute_names;
   igraph_vector_ptr_t *attrs=context->vertex_attributes;
   int i, n=context->vcount, n1=context->vcount2;
   long int attrid, attrsize=igraph_trie_size(names);
-  igraph_attribute_record_t *rec;  
+  igraph_attribute_record_t *rec;
   igraph_vector_t *na;
 
-  if (n1 > n) { 
-    IGRAPH_ERROR("Invalid number of vertices in bipartite Pajek file", 
+  if (n1 > n) {
+    IGRAPH_ERROR("Invalid number of vertices in bipartite Pajek file",
 		 IGRAPH_PARSEERROR);
   }
 
   igraph_trie_get(names, attrname, &attrid);
-  if (attrid != attrsize) { 
+  if (attrid != attrsize) {
     IGRAPH_ERROR("Duplicate 'type' attribute in Pajek file, "
 		 "this should not happen", IGRAPH_EINTERNAL);
   }
-  
+
   /* add a new attribute */
   rec=igraph_Calloc(1, igraph_attribute_record_t);
   na=igraph_Calloc(1, igraph_vector_t);
@@ -730,10 +730,10 @@ int igraph_i_pajek_add_bipartite_type(igraph_i_pajek_parsedata_t *context) {
   rec->value=na;
   igraph_vector_ptr_push_back(attrs, rec);
 
-  for (i=0; i<n1; i++) { 
+  for (i=0; i<n1; i++) {
     VECTOR(*na)[i] = 0;
   }
-  for (i=n1; i<n; i++) { 
+  for (i=n1; i<n; i++) {
     VECTOR(*na)[i] = 1;
   }
 
@@ -744,7 +744,7 @@ int igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
   const igraph_vector_t *edges=context->vector;
   int i, n1=context->vcount2;
   int ne=igraph_vector_size(edges);
-  
+
   for (i=0; i<ne; i+=2) {
     int v1=VECTOR(*edges)[i];
     int v2=VECTOR(*edges)[i+1];
@@ -752,6 +752,6 @@ int igraph_i_pajek_check_bipartite(igraph_i_pajek_parsedata_t *context) {
       IGRAPH_WARNING("Invalid edge in bipartite graph");
     }
   }
-  
+
   return 0;
 }

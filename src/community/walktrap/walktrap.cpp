@@ -138,7 +138,7 @@ int igraph_community_walktrap(const igraph_t *graph,
     }
 
     if (merges) {
-        igraph_integer_t no;
+        igraph_long_t no;
         IGRAPH_CHECK(igraph_clusters(graph, /*membership=*/ 0, /*csize=*/ 0,
                                      &no, IGRAPH_WEAK));
         IGRAPH_CHECK(igraph_matrix_resize(merges, no_of_nodes - no, 2));

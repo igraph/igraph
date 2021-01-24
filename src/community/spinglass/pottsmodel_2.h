@@ -116,8 +116,8 @@ public:
                                   igraph_vector_t *result,
                                   igraph_real_t *cohesion,
                                   igraph_real_t *adhesion,
-                                  igraph_integer_t *inner_links,
-                                  igraph_integer_t *outer_links);
+                                  igraph_int_t *inner_links,
+                                  igraph_int_t *outer_links);
 };
 
 

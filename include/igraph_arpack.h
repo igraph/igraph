@@ -312,20 +312,20 @@ DECLDIR void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
  *    this as an error, stops and calls the igraph error handler.
  */
 
-typedef int igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
+typedef igraph_long_t igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
                                      int n, void *extra);
 
-DECLDIR int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
+DECLDIR igraph_long_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                                   igraph_arpack_options_t *options,
                                   igraph_arpack_storage_t *storage,
                                   igraph_vector_t *values, igraph_matrix_t *vectors);
 
-DECLDIR int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
+DECLDIR igraph_long_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                                   igraph_arpack_options_t *options,
                                   igraph_arpack_storage_t *storage,
                                   igraph_matrix_t *values, igraph_matrix_t *vectors);
 
-DECLDIR int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
+DECLDIR igraph_long_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
         long int nev);
 
 __END_DECLS
