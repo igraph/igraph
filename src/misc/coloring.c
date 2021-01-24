@@ -151,7 +151,7 @@ static igraph_long_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, i
  *
  * \example examples/simple/igraph_coloring.c
  */
-igraph_long_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_long_t *colors, igraph_coloring_greedy_t heuristic) {
+igraph_error_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_long_t *colors, igraph_coloring_greedy_t heuristic) {
     switch (heuristic) {
     case IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS:
         return igraph_i_vertex_coloring_greedy_cn(graph, colors);

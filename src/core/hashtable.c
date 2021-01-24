@@ -29,8 +29,7 @@
 #include "core/hashtable.h"
 
 #include <string.h>
-
-igraph_long_t igraph_hashtable_init(igraph_hashtable_t *ht) {
+igraph_error_t igraph_hashtable_init(igraph_hashtable_t *ht) {
     IGRAPH_CHECK(igraph_trie_init(&ht->keys, 1));
     IGRAPH_FINALLY(igraph_trie_destroy, &ht->keys);
     IGRAPH_CHECK(igraph_strvector_init(&ht->elements, 0));
@@ -52,8 +51,7 @@ void igraph_hashtable_destroy(igraph_hashtable_t *ht) {
    defaults, or the defaults plus the elements may contain more elements
    than the keys trie, but the data is always retrieved based on the trie
 */
-
-igraph_long_t igraph_hashtable_addset(igraph_hashtable_t *ht,
+igraph_error_t igraph_hashtable_addset(igraph_hashtable_t *ht,
                             const char *key, const char *def,
                             const char *elem) {
     igraph_long_t size = igraph_trie_size(&ht->keys);
@@ -75,8 +73,7 @@ igraph_long_t igraph_hashtable_addset(igraph_hashtable_t *ht,
 }
 
 /* Previous comment also applies here */
-
-igraph_long_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
+igraph_error_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
                              const char *key, const char *def,
                              const char *elem, igraph_long_t elemlen) {
     igraph_long_t size = igraph_trie_size(&ht->keys);
@@ -107,8 +104,7 @@ igraph_long_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
 
     return 0;
 }
-
-igraph_long_t igraph_hashtable_get(igraph_hashtable_t *ht,
+igraph_error_t igraph_hashtable_get(igraph_hashtable_t *ht,
                          const char *key, char **elem) {
     igraph_long_t newid;
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
@@ -117,14 +113,12 @@ igraph_long_t igraph_hashtable_get(igraph_hashtable_t *ht,
 
     return 0;
 }
-
-igraph_long_t igraph_hashtable_reset(igraph_hashtable_t *ht) {
+igraph_error_t igraph_hashtable_reset(igraph_hashtable_t *ht) {
     igraph_strvector_destroy(&ht->elements);
     IGRAPH_CHECK(igraph_strvector_copy(&ht->elements, &ht->defaults));
     return 0;
 }
-
-igraph_long_t igraph_hashtable_getkeys(igraph_hashtable_t *ht,
+igraph_error_t igraph_hashtable_getkeys(igraph_hashtable_t *ht,
                              const igraph_strvector_t **sv) {
     return igraph_trie_getkeys(&ht->keys, sv);
 }

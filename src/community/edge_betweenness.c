@@ -218,7 +218,7 @@ static igraph_long_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * Time complexity: O(|E|+|V|log|V|), |V| is the number of vertices,
  * |E| is the number of edges.
  */
-igraph_long_t igraph_community_eb_get_merges(const igraph_t *graph,
+igraph_error_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    const igraph_bool_t directed,
                                    const igraph_vector_t *edges,
                                    const igraph_vector_t *weights,
@@ -369,7 +369,7 @@ static igraph_long_t igraph_i_vector_which_max_not_null(const igraph_vector_t *v
  *
  * \example examples/simple/igraph_community_edge_betweenness.c
  */
-igraph_long_t igraph_community_edge_betweenness(const igraph_t *graph,
+igraph_error_t igraph_community_edge_betweenness(const igraph_t *graph,
                                       igraph_vector_t *result,
                                       igraph_vector_t *edge_betweenness,
                                       igraph_matrix_t *merges,

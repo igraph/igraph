@@ -55,8 +55,7 @@
  * igraph_sample_sphere_volume(), \ref igraph_sample_sphere_surface()
  * for functions to generate the latent vectors.
  */
-
-igraph_long_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
+igraph_error_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                             igraph_bool_t directed) {
 
     igraph_long_t nrow = igraph_matrix_nrow(vecs);
@@ -129,8 +128,7 @@ igraph_long_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *ve
  * \sa \ref igraph_sample_sphere_volume(), \ref
  * igraph_sample_dirichlet() for other similar samplers.
  */
-
-igraph_long_t igraph_sample_sphere_surface(igraph_long_t dim, igraph_long_t n,
+igraph_error_t igraph_sample_sphere_surface(igraph_long_t dim, igraph_long_t n,
                                  igraph_real_t radius,
                                  igraph_bool_t positive,
                                  igraph_matrix_t *res) {
@@ -196,9 +194,7 @@ igraph_long_t igraph_sample_sphere_surface(igraph_long_t dim, igraph_long_t n,
  * \sa \ref igraph_sample_sphere_surface(), \ref
  * igraph_sample_dirichlet() for other similar samplers.
  */
-
-
-igraph_long_t igraph_sample_sphere_volume(igraph_long_t dim, igraph_long_t n,
+igraph_error_t igraph_sample_sphere_volume(igraph_long_t dim, igraph_long_t n,
                                 igraph_real_t radius,
                                 igraph_bool_t positive,
                                 igraph_matrix_t *res) {
@@ -244,8 +240,7 @@ igraph_long_t igraph_sample_sphere_volume(igraph_long_t dim, igraph_long_t n,
  * \ref igraph_sample_sphere_volume() for other methods to sample
  * latent vectors.
  */
-
-igraph_long_t igraph_sample_dirichlet(igraph_long_t n, const igraph_vector_t *alpha,
+igraph_error_t igraph_sample_dirichlet(igraph_long_t n, const igraph_vector_t *alpha,
                             igraph_matrix_t *res) {
 
     igraph_long_t len = igraph_vector_size(alpha);

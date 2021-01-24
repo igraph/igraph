@@ -93,8 +93,7 @@
  * Time complexity: O(2n) where n is the number of edges in the perspective
  * of \p vid.
  */
-
-igraph_long_t igraph_ecumulative_proportionate_values(const igraph_t *graph,
+igraph_error_t igraph_ecumulative_proportionate_values(const igraph_t *graph,
         const igraph_vector_t *U,
         igraph_vector_t *V,
         igraph_bool_t islocal,
@@ -242,8 +241,7 @@ igraph_long_t igraph_ecumulative_proportionate_values(const igraph_t *graph,
  * Time complexity: O(2n) where n is the number of vertices in the
  * perspective of vid.
  */
-
-igraph_long_t igraph_vcumulative_proportionate_values(const igraph_t *graph,
+igraph_error_t igraph_vcumulative_proportionate_values(const igraph_t *graph,
         const igraph_vector_t *U,
         igraph_vector_t *V,
         igraph_bool_t islocal,
@@ -416,8 +414,7 @@ igraph_long_t igraph_vcumulative_proportionate_values(const igraph_t *graph,
  *           ahead with updating a vertex's strategy.
  *         \endclist
  */
-
-igraph_long_t igraph_microscopic_standard_tests(const igraph_t *graph,
+igraph_error_t igraph_microscopic_standard_tests(const igraph_t *graph,
                                       igraph_long_t vid,
                                       const igraph_vector_t *quantities,
                                       const igraph_vector_t *strategies,
@@ -571,8 +568,7 @@ igraph_long_t igraph_microscopic_standard_tests(const igraph_t *graph,
  *
  * \example examples/simple/igraph_deterministic_optimal_imitation.c
  */
-
-igraph_long_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
+igraph_error_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
         igraph_long_t vid,
         igraph_optimal_t optimality,
         const igraph_vector_t *quantities,
@@ -724,8 +720,7 @@ igraph_long_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
  *   1958.
  * \endclist
  */
-
-igraph_long_t igraph_moran_process(const igraph_t *graph,
+igraph_error_t igraph_moran_process(const igraph_t *graph,
                          const igraph_vector_t *weights,
                          igraph_vector_t *quantities,
                          igraph_vector_t *strategies,
@@ -963,8 +958,7 @@ igraph_long_t igraph_moran_process(const igraph_t *graph,
  *
  * \example examples/simple/igraph_roulette_wheel_imitation.c
  */
-
-igraph_long_t igraph_roulette_wheel_imitation(const igraph_t *graph,
+igraph_error_t igraph_roulette_wheel_imitation(const igraph_t *graph,
                                     igraph_long_t vid,
                                     igraph_bool_t islocal,
                                     const igraph_vector_t *quantities,
@@ -1125,8 +1119,7 @@ igraph_long_t igraph_roulette_wheel_imitation(const igraph_t *graph,
  *
  * \example examples/simple/igraph_stochastic_imitation.c
  */
-
-igraph_long_t igraph_stochastic_imitation(const igraph_t *graph,
+igraph_error_t igraph_stochastic_imitation(const igraph_t *graph,
                                 igraph_long_t vid,
                                 igraph_imitate_algorithm_t algo,
                                 const igraph_vector_t *quantities,

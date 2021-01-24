@@ -661,8 +661,7 @@ static igraph_long_t igraph_i_degree_sequence_game_no_multiple_directed_uniform(
 
 
 /* This is in gengraph_mr-connected.cpp */
-
-igraph_long_t igraph_degree_sequence_game_vl(igraph_t *graph,
+igraph_error_t igraph_degree_sequence_game_vl(igraph_t *graph,
                                    const igraph_vector_t *out_seq,
                                    const igraph_vector_t *in_seq);
 
@@ -742,8 +741,7 @@ igraph_long_t igraph_degree_sequence_game_vl(igraph_t *graph,
  *
  * \example examples/simple/igraph_degree_sequence_game.c
  */
-
-igraph_long_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
+igraph_error_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
                                 const igraph_vector_t *in_deg,
                                 igraph_degseq_t method) {
     if (in_deg && igraph_vector_empty(in_deg) && !igraph_vector_empty(out_deg)) {

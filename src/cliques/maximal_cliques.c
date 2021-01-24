@@ -349,8 +349,7 @@ static igraph_long_t igraph_i_maximal_cliques_up(igraph_vector_long_t *PX, igrap
  *
  * \example examples/simple/igraph_maximal_cliques.c
  */
-
-igraph_long_t igraph_maximal_cliques(const igraph_t *graph,
+igraph_error_t igraph_maximal_cliques(const igraph_t *graph,
                            igraph_vector_ptr_t *res,
                            igraph_long_t min_size,
                            igraph_long_t max_size);
@@ -386,8 +385,7 @@ igraph_long_t igraph_maximal_cliques(const igraph_t *graph,
  *
  * \example examples/simple/igraph_maximal_cliques.c
  */
-
-igraph_long_t igraph_maximal_cliques_count(const igraph_t *graph,
+igraph_error_t igraph_maximal_cliques_count(const igraph_t *graph,
                                  igraph_long_t *res,
                                  igraph_long_t min_size,
                                  igraph_long_t max_size);
@@ -422,8 +420,7 @@ igraph_long_t igraph_maximal_cliques_count(const igraph_t *graph,
  * of the graph, this is typically small for sparse graphs.*
  *
  */
-
-igraph_long_t igraph_maximal_cliques_file(const igraph_t *graph,
+igraph_error_t igraph_maximal_cliques_file(const igraph_t *graph,
                                 FILE *outfile,
                                 igraph_long_t min_size,
                                 igraph_long_t max_size);
@@ -465,8 +462,7 @@ igraph_long_t igraph_maximal_cliques_file(const igraph_t *graph,
  * of the graph, this is typically small for sparse graphs.
  *
  */
-
-igraph_long_t igraph_maximal_cliques_subset(const igraph_t *graph,
+igraph_error_t igraph_maximal_cliques_subset(const igraph_t *graph,
                                   igraph_vector_long_t *subset,
                                   igraph_vector_ptr_t *res,
                                   igraph_long_t *no,
@@ -511,8 +507,7 @@ igraph_long_t igraph_maximal_cliques_subset(const igraph_t *graph,
  * of the graph, this is typically small for sparse graphs.
  *
  */
-
-igraph_long_t igraph_maximal_cliques_callback(const igraph_t *graph,
+igraph_error_t igraph_maximal_cliques_callback(const igraph_t *graph,
                                     igraph_clique_handler_t *cliquehandler_fn, void *arg,
                                     igraph_long_t min_size, igraph_long_t max_size);
 
@@ -551,8 +546,7 @@ igraph_long_t igraph_maximal_cliques_callback(const igraph_t *graph,
  * of the graph, this is typically small for sparse graphs.
  *
  */
-
-igraph_long_t igraph_maximal_cliques_hist(const igraph_t *graph,
+igraph_error_t igraph_maximal_cliques_hist(const igraph_t *graph,
                                 igraph_vector_t *hist,
                                 igraph_long_t min_size,
                                 igraph_long_t max_size);

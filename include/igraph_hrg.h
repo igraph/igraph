@@ -68,37 +68,37 @@ typedef struct igraph_hrg_t {
     igraph_vector_t left, right, prob, edges, vertices;
 } igraph_hrg_t;
 
-DECLDIR igraph_long_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_long_t n);
+DECLDIR igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_long_t n);
 DECLDIR void igraph_hrg_destroy(igraph_hrg_t *hrg);
-DECLDIR igraph_long_t igraph_hrg_size(const igraph_hrg_t *hrg);
-DECLDIR igraph_long_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_long_t newsize);
+DECLDIR igraph_error_t igraph_hrg_size(const igraph_hrg_t *hrg);
+DECLDIR igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_long_t newsize);
 
-DECLDIR igraph_long_t igraph_hrg_fit(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_hrg_fit(const igraph_t *graph,
                            igraph_hrg_t *hrg,
                            igraph_bool_t start,
                            igraph_long_t steps);
 
-DECLDIR igraph_long_t igraph_hrg_sample(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_hrg_sample(const igraph_t *graph,
                               igraph_t *sample,
                               igraph_vector_ptr_t *samples,
                               igraph_long_t no_samples,
                               igraph_hrg_t *hrg,
                               igraph_bool_t start);
 
-DECLDIR igraph_long_t igraph_hrg_game(igraph_t *graph,
+DECLDIR igraph_error_t igraph_hrg_game(igraph_t *graph,
                             const igraph_hrg_t *hrg);
 
-DECLDIR igraph_long_t igraph_hrg_dendrogram(igraph_t *graph,
+DECLDIR igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
                                   const igraph_hrg_t *hrg);
 
-DECLDIR igraph_long_t igraph_hrg_consensus(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
                                  igraph_vector_t *parents,
                                  igraph_vector_t *weights,
                                  igraph_hrg_t *hrg,
                                  igraph_bool_t start,
                                  igraph_long_t num_samples);
 
-DECLDIR igraph_long_t igraph_hrg_predict(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_hrg_predict(const igraph_t *graph,
                                igraph_vector_t *edges,
                                igraph_vector_t *prob,
                                igraph_hrg_t *hrg,
@@ -106,7 +106,7 @@ DECLDIR igraph_long_t igraph_hrg_predict(const igraph_t *graph,
                                igraph_long_t num_samples,
                                igraph_long_t num_bins);
 
-DECLDIR igraph_long_t igraph_hrg_create(igraph_hrg_t *hrg,
+DECLDIR igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                               const igraph_t *graph,
                               const igraph_vector_t *prob);
 

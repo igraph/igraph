@@ -106,7 +106,7 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
  *
  * \example examples/simple/igraph_motifs_randesu.c
  */
-igraph_long_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
+igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
                           igraph_long_t size, const igraph_vector_t *cut_prob) {
     igraph_long_t histlen;
 
@@ -183,8 +183,7 @@ igraph_long_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist
  *
  * \example examples/simple/igraph_motifs_randesu.c
  */
-
-igraph_long_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_long_t size,
+igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_long_t size,
                                    const igraph_vector_t *cut_prob, igraph_motifs_handler_t *callback,
                                    void* extra) {
 
@@ -462,8 +461,7 @@ igraph_long_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_long_
  *
  * Time complexity: TODO.
  */
-
-igraph_long_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_long_t *est,
+igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_long_t *est,
                                    igraph_long_t size, const igraph_vector_t *cut_prob,
                                    igraph_long_t sample_size,
                                    const igraph_vector_t *parsample) {
@@ -661,8 +659,7 @@ igraph_long_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_long_
  *
  * Time complexity: TODO.
  */
-
-igraph_long_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_long_t *no,
+igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_long_t *no,
                              igraph_long_t size, const igraph_vector_t *cut_prob) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);
@@ -845,8 +842,7 @@ igraph_long_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_long_t *no,
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-
-igraph_long_t igraph_dyad_census(const igraph_t *graph, igraph_long_t *mut,
+igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_long_t *mut,
                        igraph_long_t *asym, igraph_long_t *null) {
 
     igraph_long_t nonrec = 0, rec = 0;
@@ -910,8 +906,7 @@ igraph_long_t igraph_dyad_census(const igraph_t *graph, igraph_long_t *mut,
  * \function igraph_triad_census_24
  * TODO
  */
-
-igraph_long_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
+igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
                            igraph_real_t *res4) {
 
     igraph_long_t vc = igraph_vcount(graph);
@@ -1043,8 +1038,7 @@ igraph_long_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
  *
  * Time complexity: TODO.
  */
-
-igraph_long_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
+igraph_error_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
     igraph_vector_t cut_prob;
     igraph_real_t m2, m4;

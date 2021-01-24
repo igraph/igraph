@@ -139,8 +139,7 @@ const char* igraph_strerror(const igraph_long_t igraph_errno) {
     }
     return igraph_i_error_strings[igraph_errno];
 }
-
-igraph_long_t igraph_error(const char *reason, const char *file, igraph_long_t line,
+igraph_error_t igraph_error(const char *reason, const char *file, igraph_long_t line,
                  igraph_long_t igraph_errno) {
 
     if (igraph_i_error_handler) {
@@ -152,8 +151,7 @@ igraph_long_t igraph_error(const char *reason, const char *file, igraph_long_t l
     }
     return igraph_errno;
 }
-
-igraph_long_t igraph_errorf(const char *reason, const char *file, igraph_long_t line,
+igraph_error_t igraph_errorf(const char *reason, const char *file, igraph_long_t line,
                   igraph_long_t igraph_errno, ...) {
     va_list ap;
     va_start(ap, igraph_errno);
@@ -161,8 +159,7 @@ igraph_long_t igraph_errorf(const char *reason, const char *file, igraph_long_t 
               sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
     return igraph_error(igraph_i_errormsg_buffer, file, line, igraph_errno);
 }
-
-igraph_long_t igraph_errorvf(const char *reason, const char *file, igraph_long_t line,
+igraph_error_t igraph_errorvf(const char *reason, const char *file, igraph_long_t line,
                    igraph_long_t igraph_errno, va_list ap) {
     vsnprintf(igraph_i_errormsg_buffer,
               sizeof(igraph_i_errormsg_buffer) / sizeof(char), reason, ap);
@@ -293,8 +290,7 @@ void igraph_warning_handler_print (const char *reason, const char *file,
     fprintf(stderr, "Warning: %s in file %s, line %li\n", reason, file, line);
 }
 #endif
-
-igraph_long_t igraph_warning(const char *reason, const char *file, igraph_long_t line,
+igraph_error_t igraph_warning(const char *reason, const char *file, igraph_long_t line,
                    igraph_long_t igraph_errno) {
 
     if (igraph_i_warning_handler) {
@@ -306,8 +302,7 @@ igraph_long_t igraph_warning(const char *reason, const char *file, igraph_long_t
     }
     return igraph_errno;
 }
-
-igraph_long_t igraph_warningf(const char *reason, const char *file, igraph_long_t line,
+igraph_error_t igraph_warningf(const char *reason, const char *file, igraph_long_t line,
                     igraph_long_t igraph_errno, ...) {
     va_list ap;
     va_start(ap, igraph_errno);

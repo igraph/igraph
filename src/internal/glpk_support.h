@@ -34,8 +34,7 @@
 #ifdef HAVE_GLPK
 
 #include <glpk.h>
-
-igraph_long_t igraph_i_glpk_check(igraph_long_t retval, const char* message);
+igraph_error_t igraph_i_glpk_check(igraph_long_t retval, const char* message);
 void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info);
 #define IGRAPH_GLPK_CHECK(func, message) do {\
         igraph_long_t igraph_i_ret = igraph_i_glpk_check(func, message); \

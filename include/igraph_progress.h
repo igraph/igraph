@@ -142,16 +142,16 @@ __BEGIN_DECLS
  *     error code \c IGRAPH_INTERRUPTED in this case.
  */
 
-typedef igraph_long_t igraph_progress_handler_t(const char *message, igraph_real_t percent,
+typedef igraph_error_t igraph_progress_handler_t(const char *message, igraph_real_t percent,
                                       void *data);
 
 extern igraph_progress_handler_t igraph_progress_handler_stderr;
 
 DECLDIR igraph_progress_handler_t * igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 
-DECLDIR igraph_long_t igraph_progress(const char *message, igraph_real_t percent, void *data);
+DECLDIR igraph_error_t igraph_progress(const char *message, igraph_real_t percent, void *data);
 
-DECLDIR igraph_long_t igraph_progressf(const char *message, igraph_real_t percent, void *data,
+DECLDIR igraph_error_t igraph_progressf(const char *message, igraph_real_t percent, void *data,
                              ...);
 
 /**

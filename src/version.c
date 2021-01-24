@@ -46,8 +46,7 @@ static const char *igraph_version_string = IGRAPH_VERSION;
  *
  * \example examples/simple/igraph_version.c
  */
-
-igraph_long_t igraph_version(const char **version_string,
+igraph_error_t igraph_version(const char **version_string,
                    int *major,
                    int *minor,
                    int *subminor) {

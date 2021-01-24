@@ -52,8 +52,7 @@
  *
  * \sa \ref igraph_is_chordal().
  */
-
-igraph_long_t igraph_maximum_cardinality_search(const igraph_t *graph,
+igraph_error_t igraph_maximum_cardinality_search(const igraph_t *graph,
                                       igraph_vector_t *alpha,
                                       igraph_vector_t *alpham1) {
 
@@ -269,8 +268,7 @@ igraph_long_t igraph_maximum_cardinality_search(const igraph_t *graph,
  *
  * \sa \ref igraph_maximum_cardinality_search().
  */
-
-igraph_long_t igraph_is_chordal(const igraph_t *graph,
+igraph_error_t igraph_is_chordal(const igraph_t *graph,
                       const igraph_vector_t *alpha,
                       const igraph_vector_t *alpham1,
                       igraph_bool_t *chordal,

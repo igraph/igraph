@@ -74,7 +74,7 @@
  *
  * \sa \ref igraph_write_graph_dimacs()
  */
-igraph_long_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                              igraph_strvector_t *problem,
                              igraph_vector_t *label,
                              igraph_long_t *source,
@@ -271,7 +271,7 @@ igraph_long_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  *
  * \sa igraph_read_graph_dimacs()
  */
-igraph_long_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
                               igraph_long_t source, igraph_long_t target,
                               const igraph_vector_t *capacity) {
 

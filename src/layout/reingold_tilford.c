@@ -492,7 +492,7 @@ static igraph_long_t igraph_i_layout_reingold_tilford_postorder(
  *
  * \example examples/simple/igraph_layout_reingold_tilford.c
  */
-igraph_long_t igraph_layout_reingold_tilford(const igraph_t *graph,
+igraph_error_t igraph_layout_reingold_tilford(const igraph_t *graph,
                                    igraph_matrix_t *res,
                                    igraph_neimode_t mode,
                                    const igraph_vector_t *roots,
@@ -800,7 +800,7 @@ igraph_long_t igraph_layout_reingold_tilford(const igraph_t *graph,
  *
  * \sa \ref igraph_layout_reingold_tilford().
  */
-igraph_long_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
+igraph_error_t igraph_layout_reingold_tilford_circular(const igraph_t *graph,
         igraph_matrix_t *res,
         igraph_neimode_t mode,
         const igraph_vector_t *roots,

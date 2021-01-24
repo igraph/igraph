@@ -63,7 +63,7 @@
  *
  * \example examples/simple/igraph_create.c
  */
-igraph_long_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
+igraph_error_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
                   igraph_long_t n, igraph_bool_t directed) {
     igraph_bool_t has_edges = igraph_vector_size(edges) > 0;
     igraph_real_t max = has_edges ? igraph_vector_max(edges) + 1 : 0;
@@ -124,8 +124,7 @@ igraph_long_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
  *
  * \example examples/simple/igraph_small.c
  */
-
-igraph_long_t igraph_small(igraph_t *graph, igraph_long_t n, igraph_bool_t directed,
+igraph_error_t igraph_small(igraph_t *graph, igraph_long_t n, igraph_bool_t directed,
                  ...) {
     igraph_vector_t edges;
     va_list ap;

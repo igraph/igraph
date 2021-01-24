@@ -61,7 +61,7 @@
 #undef BASE_COMPLEX
 
 #ifndef USING_R
-igraph_long_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
+igraph_error_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
 
     igraph_long_t nr = igraph_matrix_complex_nrow(m);
     igraph_long_t nc = igraph_matrix_complex_ncol(m);
@@ -80,8 +80,7 @@ igraph_long_t igraph_matrix_complex_print(const igraph_matrix_complex_t *m) {
     return 0;
 }
 #endif
-
-igraph_long_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
+igraph_error_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
                                  FILE *file) {
 
     igraph_long_t nr = igraph_matrix_complex_nrow(m);
@@ -100,8 +99,7 @@ igraph_long_t igraph_matrix_complex_fprint(const igraph_matrix_complex_t *m,
 
     return 0;
 }
-
-igraph_long_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
                                igraph_matrix_t *real) {
     igraph_long_t nrow = igraph_matrix_complex_nrow(v);
     igraph_long_t ncol = igraph_matrix_complex_ncol(v);
@@ -109,8 +107,7 @@ igraph_long_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
     IGRAPH_CHECK(igraph_vector_complex_real(&v->data, &real->data));
     return 0;
 }
-
-igraph_long_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
                                igraph_matrix_t *imag) {
     igraph_long_t nrow = igraph_matrix_complex_nrow(v);
     igraph_long_t ncol = igraph_matrix_complex_ncol(v);
@@ -118,8 +115,7 @@ igraph_long_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
     IGRAPH_CHECK(igraph_vector_complex_imag(&v->data, &imag->data));
     return 0;
 }
-
-igraph_long_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
                                    igraph_matrix_t *real,
                                    igraph_matrix_t *imag) {
     igraph_long_t nrow = igraph_matrix_complex_nrow(v);
@@ -130,16 +126,14 @@ igraph_long_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
                  &imag->data));
     return 0;
 }
-
-igraph_long_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
                                  const igraph_matrix_t *real,
                                  const igraph_matrix_t *imag) {
     IGRAPH_CHECK(igraph_vector_complex_create(&v->data, &real->data,
                  &imag->data));
     return 0;
 }
-
-igraph_long_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
+igraph_error_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
                                        const igraph_matrix_t *r,
                                        const igraph_matrix_t *theta) {
     IGRAPH_CHECK(igraph_vector_complex_create_polar(&v->data, &r->data,
@@ -152,7 +146,6 @@ igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
                                       igraph_real_t tol) {
     return igraph_vector_e_tol(&lhs->data, &rhs->data, tol);
 }
-
-igraph_long_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol) {
+igraph_error_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol) {
     return igraph_vector_zapsmall(&m->data, tol);
 }

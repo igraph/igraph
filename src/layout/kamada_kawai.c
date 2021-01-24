@@ -69,8 +69,7 @@
  * log|V|) initialization step. |V| is the number of vertices in the
  * graph.
  */
-
-igraph_long_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
                                igraph_bool_t use_seed, igraph_long_t maxiter,
                                igraph_real_t epsilon, igraph_real_t kkconst,
                                const igraph_vector_t *weights,
@@ -375,8 +374,7 @@ igraph_long_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t 
  * log|V|) initialization step. |V| is the number of vertices in the
  * graph.
  */
-
-igraph_long_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
                                   igraph_bool_t use_seed, igraph_long_t maxiter,
                                   igraph_real_t epsilon, igraph_real_t kkconst,
                                   const igraph_vector_t *weights,

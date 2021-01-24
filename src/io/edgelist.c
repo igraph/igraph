@@ -68,7 +68,7 @@
  * reading an integer requires O(1)
  * time.
  */
-igraph_long_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
                                igraph_long_t n, igraph_bool_t directed) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
@@ -132,7 +132,7 @@ igraph_long_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
  * integer to the file requires O(1)
  * time.
  */
-igraph_long_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
+igraph_error_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
 
     igraph_eit_t it;
 

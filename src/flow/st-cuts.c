@@ -40,7 +40,7 @@
 #include "core/estack.h"
 #include "core/marked_queue.h"
 
-typedef igraph_long_t igraph_provan_shier_pivot_t(const igraph_t *graph,
+typedef igraph_error_t igraph_provan_shier_pivot_t(const igraph_t *graph,
                                         const igraph_marked_queue_t *S,
                                         const igraph_estack_t *T,
                                         igraph_long_t source,
@@ -81,8 +81,7 @@ typedef igraph_long_t igraph_provan_shier_pivot_t(const igraph_t *graph,
  *
  * \example examples/simple/even_tarjan.c
  */
-
-igraph_long_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
+igraph_error_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *graphbar,
                                  igraph_vector_t *capacity) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);
@@ -136,8 +135,7 @@ igraph_long_t igraph_even_tarjan_reduction(const igraph_t *graph, igraph_t *grap
 
     return 0;
 }
-
-igraph_long_t igraph_i_residual_graph(const igraph_t *graph,
+igraph_error_t igraph_i_residual_graph(const igraph_t *graph,
                             const igraph_vector_t *capacity,
                             igraph_t *residual,
                             igraph_vector_t *residual_capacity,
@@ -178,8 +176,7 @@ igraph_long_t igraph_i_residual_graph(const igraph_t *graph,
 
     return 0;
 }
-
-igraph_long_t igraph_residual_graph(const igraph_t *graph,
+igraph_error_t igraph_residual_graph(const igraph_t *graph,
                           const igraph_vector_t *capacity,
                           igraph_t *residual,
                           igraph_vector_t *residual_capacity,
@@ -205,8 +202,7 @@ igraph_long_t igraph_residual_graph(const igraph_t *graph,
 
     return 0;
 }
-
-igraph_long_t igraph_i_reverse_residual_graph(const igraph_t *graph,
+igraph_error_t igraph_i_reverse_residual_graph(const igraph_t *graph,
                                     const igraph_vector_t *capacity,
                                     igraph_t *residual,
                                     const igraph_vector_t *flow,
@@ -248,8 +244,7 @@ igraph_long_t igraph_i_reverse_residual_graph(const igraph_t *graph,
 
     return 0;
 }
-
-igraph_long_t igraph_reverse_residual_graph(const igraph_t *graph,
+igraph_error_t igraph_reverse_residual_graph(const igraph_t *graph,
                                   const igraph_vector_t *capacity,
                                   igraph_t *residual,
                                   const igraph_vector_t *flow) {
@@ -418,8 +413,7 @@ static igraph_long_t igraph_i_dominator_EVAL(igraph_long_t v,
  *
  * \example examples/simple/dominator_tree.c
  */
-
-igraph_long_t igraph_dominator_tree(const igraph_t *graph,
+igraph_error_t igraph_dominator_tree(const igraph_t *graph,
                           igraph_long_t root,
                           igraph_vector_t *dom,
                           igraph_t *domtree,
@@ -721,7 +715,7 @@ static igraph_long_t igraph_i_all_st_cuts_minimal(const igraph_t *graph,
 }
 
 /* not 'static' because used in igraph_all_st_cuts.c test program */
-igraph_long_t igraph_i_all_st_cuts_pivot(const igraph_t *graph,
+igraph_error_t igraph_i_all_st_cuts_pivot(const igraph_t *graph,
                                const igraph_marked_queue_t *S,
                                const igraph_estack_t *T,
                                igraph_long_t source,
@@ -930,8 +924,7 @@ igraph_long_t igraph_i_all_st_cuts_pivot(const igraph_t *graph,
 
 /* TODO: This is a temporary recursive version, without proper error
    handling */
-
-igraph_long_t igraph_provan_shier_list(const igraph_t *graph,
+igraph_error_t igraph_provan_shier_list(const igraph_t *graph,
                              igraph_marked_queue_t *S,
                              igraph_estack_t *T,
                              igraph_long_t source,
@@ -1023,8 +1016,7 @@ igraph_long_t igraph_provan_shier_list(const igraph_t *graph,
  * Time complexity: O(n(|V|+|E|)), where |V| is the number of
  * vertices, |E| is the number of edges, and n is the number of cuts.
  */
-
-igraph_long_t igraph_all_st_cuts(const igraph_t *graph,
+igraph_error_t igraph_all_st_cuts(const igraph_t *graph,
                        igraph_vector_ptr_t *cuts,
                        igraph_vector_ptr_t *partition1s,
                        igraph_long_t source,
@@ -1213,7 +1205,7 @@ typedef struct igraph_i_all_st_mincuts_data_t {
     const igraph_vector_bool_t *active;
 } igraph_i_all_st_mincuts_data_t;
 
-static igraph_long_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
+static igraph_error_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
                                          const igraph_marked_queue_t *S,
                                          const igraph_estack_t *T,
                                          igraph_long_t source,
@@ -1357,8 +1349,7 @@ static igraph_long_t igraph_i_all_st_mincuts_pivot(const igraph_t *graph,
  *
  * \example examples/simple/igraph_all_st_mincuts.c
  */
-
-igraph_long_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
+igraph_error_t igraph_all_st_mincuts(const igraph_t *graph, igraph_real_t *value,
                           igraph_vector_ptr_t *cuts,
                           igraph_vector_ptr_t *partition1s,
                           igraph_long_t source,

@@ -53,7 +53,7 @@
  *
  * \example examples/simple/igraph_difference.c
  */
-igraph_long_t igraph_difference(igraph_t *res,
+igraph_error_t igraph_difference(igraph_t *res,
                       const igraph_t *orig, const igraph_t *sub) {
 
     /* Quite nasty, but we will use that an edge adjacency list

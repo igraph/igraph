@@ -31,8 +31,7 @@
 
 #include "internal/glpk_support.h"
 #include "misc/feedback_arc_set.h"
-
-igraph_long_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
                                  const igraph_vector_t *weights);
 
 
@@ -81,7 +80,7 @@ igraph_long_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_
  *
  * Time complexity: depends on \p algo, see the time complexities there.
  */
-igraph_long_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *result,
                             const igraph_vector_t *weights, igraph_fas_algorithm_t algo) {
 
     if (weights && igraph_vector_size(weights) < igraph_ecount(graph))
@@ -107,7 +106,7 @@ igraph_long_t igraph_feedback_arc_set(const igraph_t *graph, igraph_vector_t *re
 /**
  * Solves the feedback arc set problem for undirected graphs.
  */
-igraph_long_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph_vector_t *result,
         const igraph_vector_t *weights, igraph_vector_t *layering) {
     igraph_vector_t edges;
     igraph_long_t i, j, n, no_of_nodes = igraph_vcount(graph);
@@ -186,7 +185,7 @@ igraph_long_t igraph_i_feedback_arc_set_undirected(const igraph_t *graph, igraph
 /**
  * Solves the feedback arc set problem using the heuristics of Eades et al.
  */
-igraph_long_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vector_t *result,
                                     const igraph_vector_t *weights, igraph_vector_t *layers) {
     igraph_long_t i, j, k, v, eid, no_of_nodes = igraph_vcount(graph), nodes_left;
     igraph_dqueue_t sources, sinks;
@@ -435,7 +434,7 @@ igraph_long_t igraph_i_feedback_arc_set_eades(const igraph_t *graph, igraph_vect
 /**
  * Solves the feedback arc set problem using integer programming.
  */
-igraph_long_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_t *result,
                                  const igraph_vector_t *weights) {
 #ifndef HAVE_GLPK
     IGRAPH_ERROR("GLPK is not available", IGRAPH_UNIMPLEMENTED);

@@ -48,7 +48,7 @@
  *
  * \example examples/simple/igraph_complementer.c
  */
-igraph_long_t igraph_complementer(igraph_t *res, const igraph_t *graph,
+igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *graph,
                         igraph_bool_t loops) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

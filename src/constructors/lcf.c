@@ -43,7 +43,7 @@
  * Time complexity: O(|V|+|E|), linear in the number of vertices plus
  * the number of edges.
  */
-igraph_long_t igraph_lcf_vector(igraph_t *graph, igraph_long_t n,
+igraph_error_t igraph_lcf_vector(igraph_t *graph, igraph_long_t n,
                       const igraph_vector_t *shifts,
                       igraph_long_t repeats) {
 
@@ -112,7 +112,7 @@ igraph_long_t igraph_lcf_vector(igraph_t *graph, igraph_long_t n,
  *
  * \example examples/simple/igraph_lcf.c
  */
-igraph_long_t igraph_lcf(igraph_t *graph, igraph_long_t n, ...) {
+igraph_error_t igraph_lcf(igraph_t *graph, igraph_long_t n, ...) {
     igraph_vector_t shifts;
     igraph_long_t repeats;
     va_list ap;

@@ -57,9 +57,7 @@
  * Time complexity: O(l + d), where \c l is the length of the
  * walk, and \c d is the total degree of the visited nodes.
  */
-
-
-igraph_long_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
+igraph_error_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
                        igraph_long_t start, igraph_neimode_t mode,
                        igraph_long_t steps,
                        igraph_random_walk_stuck_t stuck) {
@@ -156,7 +154,7 @@ static void vec_destr(igraph_vector_t *vec) {
  * \return Error code.
  *
  */
-igraph_long_t igraph_random_edge_walk(const igraph_t *graph,
+igraph_error_t igraph_random_edge_walk(const igraph_t *graph,
                             const igraph_vector_t *weights,
                             igraph_vector_t *edgewalk,
                             igraph_long_t start, igraph_neimode_t mode,

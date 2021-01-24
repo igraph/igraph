@@ -52,7 +52,7 @@
  * Time complexity: O(|V|*k*log(|V|)), |V| is the number of vertices
  * and k is the \p k parameter.
  */
-igraph_long_t igraph_establishment_game(igraph_t *graph, igraph_long_t nodes,
+igraph_error_t igraph_establishment_game(igraph_t *graph, igraph_long_t nodes,
                               igraph_long_t types, igraph_long_t k,
                               igraph_vector_t *type_dist,
                               igraph_matrix_t *pref_matrix,

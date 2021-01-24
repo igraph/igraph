@@ -45,26 +45,22 @@ typedef struct igraph_marked_queue_t {
     igraph_long_t mark;
     igraph_long_t size;
 } igraph_marked_queue_t;
-
-igraph_long_t igraph_marked_queue_init(igraph_marked_queue_t *q,
+igraph_error_t igraph_marked_queue_init(igraph_marked_queue_t *q,
                              igraph_long_t size);
 void igraph_marked_queue_destroy(igraph_marked_queue_t *q);
 void igraph_marked_queue_reset(igraph_marked_queue_t *q);
 
 igraph_bool_t igraph_marked_queue_empty(const igraph_marked_queue_t *q);
-igraph_long_t igraph_marked_queue_size(const igraph_marked_queue_t *q);
-igraph_long_t igraph_marked_queue_print(const igraph_marked_queue_t *q);
-igraph_long_t igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file);
+igraph_error_t igraph_marked_queue_size(const igraph_marked_queue_t *q);
+igraph_error_t igraph_marked_queue_print(const igraph_marked_queue_t *q);
+igraph_error_t igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file);
 
 igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q,
         igraph_long_t elem);
-
-igraph_long_t igraph_marked_queue_push(igraph_marked_queue_t *q, igraph_long_t elem);
-
-igraph_long_t igraph_marked_queue_start_batch(igraph_marked_queue_t *q);
+igraph_error_t igraph_marked_queue_push(igraph_marked_queue_t *q, igraph_long_t elem);
+igraph_error_t igraph_marked_queue_start_batch(igraph_marked_queue_t *q);
 void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q);
-
-igraph_long_t igraph_marked_queue_as_vector(const igraph_marked_queue_t *q,
+igraph_error_t igraph_marked_queue_as_vector(const igraph_marked_queue_t *q,
                                   igraph_vector_t *vec);
 
 #endif

@@ -119,7 +119,7 @@ typedef igraph_long_t igraph_interruption_handler_t (void* data);
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
 
-DECLDIR igraph_long_t igraph_allow_interruption(void* data);
+DECLDIR igraph_error_t igraph_allow_interruption(void* data);
 
 DECLDIR igraph_interruption_handler_t * igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
 

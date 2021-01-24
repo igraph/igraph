@@ -49,8 +49,7 @@ void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v) {
     }
     igraph_vector_ptr_destroy(v);
 }
-
-igraph_long_t igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
+igraph_error_t igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
     igraph_vector_t *edgelist = edges;
     igraph_long_t edge1 = (*(const igraph_long_t*) e1) * 2;
     igraph_long_t edge2 = (*(const igraph_long_t*) e2) * 2;
@@ -72,8 +71,7 @@ igraph_long_t igraph_i_order_edgelist_cmp(void *edges, const void *e1, const voi
         }
     }
 }
-
-igraph_long_t igraph_i_merge(igraph_t *res, igraph_long_t mode,
+igraph_error_t igraph_i_merge(igraph_t *res, igraph_long_t mode,
                    const igraph_t *left, const igraph_t *right,
                    igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
 

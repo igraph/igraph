@@ -40,7 +40,7 @@
  *
  * \example examples/simple/igraph_has_loop.c
  */
-igraph_long_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
+igraph_error_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
     igraph_long_t i, m = igraph_ecount(graph);
 
     *res = 0;
@@ -73,7 +73,7 @@ igraph_long_t igraph_has_loop(const igraph_t *graph, igraph_bool_t *res) {
  *
  * \example examples/simple/igraph_is_loop.c
  */
-igraph_long_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
+igraph_error_t igraph_is_loop(const igraph_t *graph, igraph_vector_bool_t *res,
                    igraph_es_t es) {
     igraph_eit_t eit;
     igraph_long_t i;

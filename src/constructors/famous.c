@@ -423,8 +423,7 @@ static igraph_long_t igraph_i_famous(igraph_t *graph, const igraph_real_t *data)
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the graph.
  */
-
-igraph_long_t igraph_famous(igraph_t *graph, const char *name) {
+igraph_error_t igraph_famous(igraph_t *graph, const char *name) {
 
     if (!strcasecmp(name, "bull")) {
         return igraph_i_famous(graph, igraph_i_famous_bull);

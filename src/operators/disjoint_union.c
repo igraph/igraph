@@ -60,7 +60,7 @@
  *
  * \example examples/simple/igraph_disjoint_union.c
  */
-igraph_long_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
+igraph_error_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
                           const igraph_t *right) {
 
     igraph_long_t no_of_nodes_left = igraph_vcount(left);
@@ -130,7 +130,7 @@ igraph_long_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the result.
  */
-igraph_long_t igraph_disjoint_union_many(igraph_t *res,
+igraph_error_t igraph_disjoint_union_many(igraph_t *res,
                                const igraph_vector_ptr_t *graphs) {
     igraph_long_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_bool_t directed = 1;

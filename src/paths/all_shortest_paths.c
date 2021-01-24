@@ -91,7 +91,7 @@ static void igraph_i_gasp_paths_destroy(igraph_vector_ptr_t *v) {
  * Time complexity: O(|V|+|E|) for most graphs, O(|V|^2) in the worst
  * case.
  */
-igraph_long_t igraph_get_all_shortest_paths(const igraph_t *graph,
+igraph_error_t igraph_get_all_shortest_paths(const igraph_t *graph,
                                   igraph_vector_ptr_t *res,
                                   igraph_vector_t *nrgeo,
                                   igraph_long_t from, const igraph_vs_t to,

@@ -102,8 +102,7 @@ static void igraph_i_forest_fire_free(igraph_i_forest_fire_data_t *data) {
  *
  * Time complexity: TODO.
  */
-
-igraph_long_t igraph_forest_fire_game(igraph_t *graph, igraph_long_t nodes,
+igraph_error_t igraph_forest_fire_game(igraph_t *graph, igraph_long_t nodes,
                             igraph_real_t fw_prob, igraph_real_t bw_factor,
                             igraph_long_t pambs, igraph_bool_t directed) {
 

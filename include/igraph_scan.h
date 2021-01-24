@@ -32,34 +32,34 @@
 
 __BEGIN_DECLS
 
-DECLDIR igraph_long_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
+DECLDIR igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
                                 const igraph_vector_t *weights, igraph_neimode_t mode);
 
-DECLDIR igraph_long_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
+DECLDIR igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
                                      igraph_vector_t *res,
                                      const igraph_vector_t *weigths_them,
                                      igraph_neimode_t mode);
 
-DECLDIR igraph_long_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
+DECLDIR igraph_error_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode);
 
-DECLDIR igraph_long_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
+DECLDIR igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
         igraph_neimode_t mode);
 
-DECLDIR igraph_long_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_long_t k,
+DECLDIR igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_long_t k,
                                        igraph_vector_t *res,
                                        const igraph_vector_t *weights,
                                        igraph_neimode_t mode);
 
-DECLDIR igraph_long_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
+DECLDIR igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
         igraph_long_t k, igraph_vector_t *res,
         const igraph_vector_t *weights_them,
         igraph_neimode_t mode);
 
-DECLDIR igraph_long_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
         const igraph_vector_ptr_t *neighborhoods);

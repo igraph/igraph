@@ -33,8 +33,7 @@
 #    define isinf(x) (!_finite(x) && !_isnan(x))
 #  endif
 #endif
-
-igraph_long_t igraph_finite(double x) {
+igraph_error_t igraph_finite(double x) {
 #if HAVE_DECL_ISFINITE
     return isfinite(x);
 #elif HAVE_FINITE == 1
@@ -53,8 +52,7 @@ igraph_long_t igraph_finite(double x) {
 double igraph_log2(const double a) {
     return log(a) / log(2.0);
 }
-
-igraph_long_t igraph_chebyshev_init(const double *dos, igraph_long_t nos, double eta) {
+igraph_error_t igraph_chebyshev_init(const double *dos, igraph_long_t nos, double eta) {
     igraph_long_t i, ii;
     double err;
 
@@ -225,7 +223,7 @@ double igraph_i_round(double X) {
  * when the number of characters needed by the output, excluding the
  * terminating '\0' is larger than count
  */
-igraph_long_t igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
+igraph_error_t igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
     igraph_long_t n;
     va_list args;
     if (count > 0) {
@@ -240,20 +238,16 @@ igraph_long_t igraph_i_snprintf(char *buffer, size_t count, const char *format, 
 }
 
 #endif
-
-igraph_long_t igraph_is_nan(double x) {
+igraph_error_t igraph_is_nan(double x) {
     return isnan(x);
 }
-
-igraph_long_t igraph_is_inf(double x) {
+igraph_error_t igraph_is_inf(double x) {
     return isinf(x) != 0;
 }
-
-igraph_long_t igraph_is_posinf(double x) {
+igraph_error_t igraph_is_posinf(double x) {
     return isinf(x) && x > 0;
 }
-
-igraph_long_t igraph_is_neginf(double x) {
+igraph_error_t igraph_is_neginf(double x) {
     return isinf(x) && x < 0;
 }
 
@@ -273,7 +267,7 @@ igraph_long_t igraph_is_neginf(double x) {
  * \return nonzero if the two floats are nearly equal to each other within
  *         the given level of tolerance, zero otherwise
  */
-igraph_long_t igraph_almost_equals(double a, double b, double eps) {
+igraph_error_t igraph_almost_equals(double a, double b, double eps) {
     return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
 }
 
@@ -295,7 +289,7 @@ igraph_long_t igraph_almost_equals(double a, double b, double eps) {
  *         the given level of tolerance, positive number if the first float is
  *         larger, negative number if the second float is larger
  */
-igraph_long_t igraph_cmp_epsilon(double a, double b, double eps) {
+igraph_error_t igraph_cmp_epsilon(double a, double b, double eps) {
     double diff;
     double abs_diff;
 

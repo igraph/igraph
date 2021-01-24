@@ -33,11 +33,10 @@
 
 #include "core/trie.h"
 #include "io/gml-header.h"
-
-igraph_long_t igraph_gml_yylex_init_extra (igraph_i_gml_parsedata_t* user_defined,
+igraph_error_t igraph_gml_yylex_init_extra(igraph_i_gml_parsedata_t* user_defined,
                                  void* scanner);
 void igraph_gml_yylex_destroy (void *scanner );
-igraph_long_t igraph_gml_yyparse (igraph_i_gml_parsedata_t* context);
+igraph_error_t igraph_gml_yyparse(igraph_i_gml_parsedata_t* context);
 void igraph_gml_yyset_in  (FILE * in_str, void* yyscanner );
 
 static void igraph_i_gml_destroy_attrs(igraph_vector_ptr_t **ptr) {
@@ -115,8 +114,7 @@ static const char *igraph_i_gml_tostring(igraph_gml_tree_t *node, igraph_long_t 
 
     return p;
 }
-
-igraph_long_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context) {
+igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context) {
     context->eof = 0;
     context->scanner = 0;
     context->tree = 0;
@@ -179,7 +177,7 @@ void igraph_i_gml_parsedata_destroy(igraph_i_gml_parsedata_t* context) {
  *
  * \example examples/simple/gml.c
  */
-igraph_long_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
+igraph_error_t igraph_read_graph_gml(igraph_t *graph, FILE *instream) {
 
     igraph_long_t i, p;
     igraph_long_t no_of_nodes = 0, no_of_edges = 0;
@@ -590,8 +588,7 @@ static igraph_long_t igraph_i_gml_convert_to_key(const char *orig, char **key) {
  *
  * \example examples/simple/gml.c
  */
-
-igraph_long_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_gml(const igraph_t *graph, FILE *outstream,
                            const igraph_vector_t *id, const char *creator) {
     igraph_long_t ret;
     igraph_strvector_t gnames, vnames, enames;

@@ -81,8 +81,7 @@ static igraph_long_t igraph_i_read_graph_graphdb_getword(FILE *instream) {
  *
  * \example examples/simple/igraph_read_graph_graphdb.c
  */
-
-igraph_long_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
                               igraph_bool_t directed) {
 
     igraph_vector_t edges;

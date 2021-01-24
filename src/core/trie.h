@@ -65,16 +65,15 @@ typedef struct s_igraph_trie {
 #define IGRAPH_TRIE_INIT_FINALLY(tr, sk) \
     do { IGRAPH_CHECK(igraph_trie_init(tr, sk)); \
         IGRAPH_FINALLY(igraph_trie_destroy, tr); } while (0)
-
-igraph_long_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys);
+igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys);
 void igraph_trie_destroy(igraph_trie_t *t);
-igraph_long_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_long_t *id);
-igraph_long_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_long_t *id);
-igraph_long_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_long_t length,
+igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_long_t *id);
+igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_long_t *id);
+igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_long_t length,
                      igraph_long_t *id);
 void igraph_trie_idx(igraph_trie_t *t, igraph_long_t idx, char **str);
-igraph_long_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv);
-igraph_long_t igraph_trie_size(igraph_trie_t *t);
+igraph_error_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv);
+igraph_error_t igraph_trie_size(igraph_trie_t *t);
 
 __END_DECLS
 

@@ -83,8 +83,7 @@
  *
  * \example examples/simple/igraph_bipartite_projection.c
  */
-
-igraph_long_t igraph_bipartite_projection_size(const igraph_t *graph,
+igraph_error_t igraph_bipartite_projection_size(const igraph_t *graph,
                                      const igraph_vector_bool_t *types,
                                      igraph_long_t *vcount1,
                                      igraph_long_t *ecount1,
@@ -314,8 +313,7 @@ static igraph_long_t igraph_i_bipartite_projection(const igraph_t *graph,
  *
  * \example examples/simple/igraph_bipartite_projection.c
  */
-
-igraph_long_t igraph_bipartite_projection(const igraph_t *graph,
+igraph_error_t igraph_bipartite_projection(const igraph_t *graph,
                                 const igraph_vector_bool_t *types,
                                 igraph_t *proj1,
                                 igraph_t *proj2,
@@ -403,8 +401,7 @@ igraph_long_t igraph_bipartite_projection(const igraph_t *graph,
  *
  * \sa \ref igraph_full() for non-bipartite full graphs.
  */
-
-igraph_long_t igraph_full_bipartite(igraph_t *graph,
+igraph_error_t igraph_full_bipartite(igraph_t *graph,
                           igraph_vector_bool_t *types,
                           igraph_long_t n1, igraph_long_t n2,
                           igraph_bool_t directed,
@@ -500,8 +497,7 @@ igraph_long_t igraph_full_bipartite(igraph_t *graph,
  *
  * \example examples/simple/igraph_bipartite_create.c
  */
-
-igraph_long_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
+igraph_error_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_t *types,
                             const igraph_vector_t *edges,
                             igraph_bool_t directed) {
 
@@ -592,8 +588,7 @@ igraph_long_t igraph_create_bipartite(igraph_t *graph, const igraph_vector_bool_
  *
  * Time complexity: O(n*m), the size of the incidence matrix.
  */
-
-igraph_long_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
                      const igraph_matrix_t *incidence,
                      igraph_bool_t directed,
                      igraph_neimode_t mode, igraph_bool_t multiple) {
@@ -711,8 +706,7 @@ igraph_long_t igraph_incidence(igraph_t *graph, igraph_vector_bool_t *types,
  *
  * \sa \ref igraph_incidence() for the opposite operation.
  */
-
-igraph_long_t igraph_get_incidence(const igraph_t *graph,
+igraph_error_t igraph_get_incidence(const igraph_t *graph,
                          const igraph_vector_bool_t *types,
                          igraph_matrix_t *res,
                          igraph_vector_t *row_ids,
@@ -811,8 +805,7 @@ igraph_long_t igraph_get_incidence(const igraph_t *graph,
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  */
-
-igraph_long_t igraph_is_bipartite(const igraph_t *graph,
+igraph_error_t igraph_is_bipartite(const igraph_t *graph,
                         igraph_bool_t *res,
                         igraph_vector_bool_t *type) {
 
@@ -888,8 +881,7 @@ igraph_long_t igraph_is_bipartite(const igraph_t *graph,
 
     return 0;
 }
-
-igraph_long_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *types,
                               igraph_long_t n1, igraph_long_t n2,
                               igraph_real_t p, igraph_bool_t directed,
                               igraph_neimode_t mode) {
@@ -979,8 +971,7 @@ igraph_long_t igraph_bipartite_game_gnp(igraph_t *graph, igraph_vector_bool_t *t
 
     return retval;
 }
-
-igraph_long_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *types,
                               igraph_long_t n1, igraph_long_t n2,
                               igraph_long_t m, igraph_bool_t directed,
                               igraph_neimode_t mode) {
@@ -1124,8 +1115,7 @@ igraph_long_t igraph_bipartite_game_gnm(igraph_t *graph, igraph_vector_bool_t *t
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  */
-
-igraph_long_t igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *types,
+igraph_error_t igraph_bipartite_game(igraph_t *graph, igraph_vector_bool_t *types,
                           igraph_erdos_renyi_t type,
                           igraph_long_t n1, igraph_long_t n2,
                           igraph_real_t p, igraph_long_t m,

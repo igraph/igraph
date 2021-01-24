@@ -1053,8 +1053,7 @@ static int igraph_i_random_sample_alga(igraph_vector_t *res,
  *
  * \example examples/simple/igraph_random_sample.c
  */
-
-igraph_long_t igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+igraph_error_t igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
                          igraph_long_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;

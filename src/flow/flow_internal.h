@@ -26,8 +26,7 @@
 #include "igraph_types.h"
 
 __BEGIN_DECLS
-
-igraph_long_t igraph_i_all_st_cuts_pivot(const igraph_t *graph,
+igraph_error_t igraph_i_all_st_cuts_pivot(const igraph_t *graph,
                                const igraph_marked_queue_t *S,
                                const igraph_estack_t *T,
                                igraph_long_t source,

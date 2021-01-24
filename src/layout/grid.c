@@ -40,7 +40,7 @@
  *
  * Time complexity: O(|V|), the number of vertices.
  */
-igraph_long_t igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, igraph_long_t width) {
+igraph_error_t igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, igraph_long_t width) {
     igraph_long_t i, no_of_nodes = igraph_vcount(graph);
     igraph_real_t x, y;
 
@@ -80,7 +80,7 @@ igraph_long_t igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, ig
  *
  * Time complexity: O(|V|), the number of vertices.
  */
-igraph_long_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
                           igraph_long_t width, igraph_long_t height) {
     igraph_long_t i, no_of_nodes = igraph_vcount(graph);
     igraph_real_t x, y, z;

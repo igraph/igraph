@@ -77,39 +77,35 @@ typedef struct groups {
 /*-------------------------------------------------
 ------------DEFINED IN scg_approximate_methods.c---
 ---------------------------------------------------*/
-
-igraph_long_t igraph_i_breaks_computation(const igraph_vector_t *v,
+igraph_error_t igraph_i_breaks_computation(const igraph_vector_t *v,
                                 igraph_vector_t *breaks, igraph_long_t nb,
                                 igraph_long_t method);
-igraph_long_t igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, igraph_long_t *gr,
+igraph_error_t igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, igraph_long_t *gr,
                                    igraph_long_t n, igraph_long_t n_interv,
                                    igraph_long_t maxiter);
-igraph_long_t igraph_i_intervals_method(const igraph_vector_t *v, igraph_long_t *gr,
+igraph_error_t igraph_i_intervals_method(const igraph_vector_t *v, igraph_long_t *gr,
                               igraph_long_t n, igraph_long_t n_interv);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_optimal_method.c--------
 ---------------------------------------------------*/
-
-igraph_long_t igraph_i_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs,
+igraph_error_t igraph_i_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs,
                          igraph_long_t n, igraph_long_t matrix, const igraph_vector_t *ps);
-igraph_long_t igraph_i_optimal_partition(const igraph_real_t *v, igraph_long_t *gr, igraph_long_t n, igraph_long_t nt,
+igraph_error_t igraph_i_optimal_partition(const igraph_real_t *v, igraph_long_t *gr, igraph_long_t n, igraph_long_t nt,
                                igraph_long_t matrix, const igraph_real_t *p,
                                igraph_real_t *value);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
 ---------------------------------------------------*/
-
-igraph_long_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_long_t n,
+igraph_error_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_long_t n,
                           igraph_long_t p, igraph_vector_t *centers,
                           igraph_long_t k, igraph_long_t *cl, igraph_long_t maxiter);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_exact_scg.c-------------
 ---------------------------------------------------*/
-
-igraph_long_t igraph_i_exact_coarse_graining(const igraph_real_t *v, igraph_long_t *gr,
+igraph_error_t igraph_i_exact_coarse_graining(const igraph_real_t *v, igraph_long_t *gr,
                                    igraph_long_t n);
 
 /*-------------------------------------------------

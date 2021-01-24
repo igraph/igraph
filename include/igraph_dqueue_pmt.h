@@ -33,7 +33,7 @@ typedef struct TYPE(igraph_dqueue) {
     BASE *stor_end;
 } TYPE(igraph_dqueue);
 
-DECLDIR igraph_long_t FUNCTION(igraph_dqueue, init)    (TYPE(igraph_dqueue)* q, igraph_long_t size);
+DECLDIR igraph_error_t FUNCTION(igraph_dqueue, init)    (TYPE(igraph_dqueue)* q, igraph_long_t size);
 DECLDIR void FUNCTION(igraph_dqueue, destroy) (TYPE(igraph_dqueue)* q);
 DECLDIR igraph_bool_t FUNCTION(igraph_dqueue, empty)   (const TYPE(igraph_dqueue)* q);
 DECLDIR void FUNCTION(igraph_dqueue, clear)   (TYPE(igraph_dqueue)* q);
@@ -43,7 +43,7 @@ DECLDIR BASE FUNCTION(igraph_dqueue, pop)     (TYPE(igraph_dqueue)* q);
 DECLDIR BASE FUNCTION(igraph_dqueue, pop_back)(TYPE(igraph_dqueue)* q);
 DECLDIR BASE FUNCTION(igraph_dqueue, head)    (const TYPE(igraph_dqueue)* q);
 DECLDIR BASE FUNCTION(igraph_dqueue, back)    (const TYPE(igraph_dqueue)* q);
-DECLDIR igraph_long_t FUNCTION(igraph_dqueue, push)    (TYPE(igraph_dqueue)* q, BASE elem);
-DECLDIR igraph_long_t FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q);
-DECLDIR igraph_long_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file);
+DECLDIR igraph_error_t FUNCTION(igraph_dqueue, push)    (TYPE(igraph_dqueue)* q, BASE elem);
+DECLDIR igraph_error_t FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q);
+DECLDIR igraph_error_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file);
 DECLDIR BASE FUNCTION(igraph_dqueue, e)(const TYPE(igraph_dqueue) *q, igraph_long_t idx);

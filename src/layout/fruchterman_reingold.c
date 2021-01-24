@@ -366,8 +366,7 @@ static igraph_long_t igraph_layout_i_grid_fr(
  * iteration, |V| is the number of
  * vertices in the graph.
  */
-
-igraph_long_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
+igraph_error_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                                        igraph_matrix_t *res,
                                        igraph_bool_t use_seed,
                                        igraph_long_t niter,
@@ -479,8 +478,7 @@ igraph_long_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
  * vertices in the graph.
  *
  */
-
-igraph_long_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
+igraph_error_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         igraph_matrix_t *res,
         igraph_bool_t use_seed,
         igraph_long_t niter,

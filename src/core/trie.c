@@ -54,8 +54,7 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
  * \return Error code: errors by igraph_strvector_init(),
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
-
-igraph_long_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
+igraph_error_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     t->maxvalue = -1;
     t->storekeys = storekeys;
     IGRAPH_CHECK(igraph_i_trie_init_node( (igraph_trie_node_t *) t ));
@@ -127,8 +126,7 @@ static igraph_long_t igraph_i_strdiff(const char *str, const char *key) {
  * @return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
-
-igraph_long_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
+igraph_error_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
                          igraph_real_t newvalue, igraph_long_t *id) {
     char *str;
     igraph_long_t i;
@@ -291,8 +289,7 @@ igraph_long_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
  * \ingroup igraphtrie
  * \brief Search/insert in a trie.
  */
-
-igraph_long_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_long_t *id) {
+igraph_error_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_long_t *id) {
     if (!t->storekeys) {
         IGRAPH_CHECK(igraph_trie_get_node( (igraph_trie_node_t*) t,
                                            key, t->maxvalue + 1, id));
@@ -337,8 +334,7 @@ igraph_long_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_long_t *
  * @return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
-
-igraph_long_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_long_t length,
+igraph_error_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_long_t length,
                      igraph_long_t *id) {
     char *tmp = igraph_Calloc(length + 1, char);
 
@@ -361,8 +357,7 @@ igraph_long_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_long_t 
  * This variant does not add \c key to the trie if it does not exist.
  * In this case, a negative id is returned.
  */
-
-igraph_long_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_long_t *id) {
+igraph_error_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_long_t *id) {
     IGRAPH_CHECK(igraph_trie_get_node( (igraph_trie_node_t*) t,
                                        key, -1, id));
     return 0;
@@ -381,14 +376,12 @@ void igraph_trie_idx(igraph_trie_t *t, igraph_long_t idx, char **str) {
  * \ingroup igraphtrie
  * \brief Returns the size of a trie.
  */
-
-igraph_long_t igraph_trie_size(igraph_trie_t *t) {
+igraph_error_t igraph_trie_size(igraph_trie_t *t) {
     return t->maxvalue + 1;
 }
 
 /* Hmmm, very dirty.... */
-
-igraph_long_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
+igraph_error_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
     *strv = &t->keys;
     return 0;
 }

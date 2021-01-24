@@ -268,8 +268,7 @@ static igraph_long_t igraph_i_weighted_laplacian(const igraph_t *graph, igraph_m
  *
  * \example examples/simple/igraph_laplacian.c
  */
-
-igraph_long_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                      igraph_sparsemat_t *sparseres,
                      igraph_bool_t normalized,
                      const igraph_vector_t *weights) {

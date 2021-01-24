@@ -50,7 +50,7 @@
  * \sa \ref igraph_to_prufer(), \ref igraph_tree(), \ref igraph_tree_game()
  *
  */
-igraph_long_t igraph_from_prufer(igraph_t *graph, const igraph_vector_long_t *prufer) {
+igraph_error_t igraph_from_prufer(igraph_t *graph, const igraph_vector_long_t *prufer) {
     igraph_vector_long_t degree;
     igraph_vector_t edges;
     igraph_long_t n;

@@ -73,8 +73,7 @@
 #include "core/math.h"
 
 #include "core/indheap.h"
-
-igraph_long_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
+igraph_error_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
     igraph_long_t i, n = igraph_vector_size(from);
 
     IGRAPH_CHECK(igraph_vector_long_resize(to, n));
@@ -83,8 +82,7 @@ igraph_long_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_lon
     }
     return 0;
 }
-
-igraph_long_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
+igraph_error_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
     igraph_long_t i, n = igraph_vector_size(from);
 
     IGRAPH_CHECK(igraph_vector_long_resize(to, n));
@@ -93,8 +91,7 @@ igraph_long_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_lon
     }
     return 0;
 }
-
-igraph_long_t igraph_vector_order2(igraph_vector_t *v) {
+igraph_error_t igraph_vector_order2(igraph_vector_t *v) {
 
     igraph_indheap_t heap;
 
@@ -131,8 +128,7 @@ igraph_long_t igraph_vector_order2(igraph_vector_t *v) {
  *
  * Time complexity: O()
  */
-
-igraph_long_t igraph_vector_order(const igraph_vector_t* v,
+igraph_error_t igraph_vector_order(const igraph_vector_t* v,
                         const igraph_vector_t *v2,
                         igraph_vector_t* res, igraph_real_t nodes) {
     igraph_long_t edges = igraph_vector_size(v);
@@ -197,8 +193,7 @@ igraph_long_t igraph_vector_order(const igraph_vector_t* v,
 
     return 0;
 }
-
-igraph_long_t igraph_vector_order1(const igraph_vector_t* v,
+igraph_error_t igraph_vector_order1(const igraph_vector_t* v,
                          igraph_vector_t* res, igraph_real_t nodes) {
     igraph_long_t edges = igraph_vector_size(v);
     igraph_vector_t ptr;
@@ -238,8 +233,7 @@ igraph_long_t igraph_vector_order1(const igraph_vector_t* v,
 
     return 0;
 }
-
-igraph_long_t igraph_vector_order1_int(const igraph_vector_t* v,
+igraph_error_t igraph_vector_order1_int(const igraph_vector_t* v,
                              igraph_vector_long_t* res,
                              igraph_real_t nodes) {
     igraph_long_t edges = igraph_vector_size(v);
@@ -280,8 +274,7 @@ igraph_long_t igraph_vector_order1_int(const igraph_vector_t* v,
 
     return 0;
 }
-
-igraph_long_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
+igraph_error_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
                        igraph_long_t nodes) {
 
     igraph_vector_t rad;
@@ -314,7 +307,7 @@ igraph_long_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
 }
 
 #ifndef USING_R
-igraph_long_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
+igraph_error_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
     igraph_long_t i, n = igraph_vector_complex_size(v);
     if (n != 0) {
         igraph_complex_t z = VECTOR(*v)[0];
@@ -328,8 +321,7 @@ igraph_long_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
     return 0;
 }
 #endif
-
-igraph_long_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
+igraph_error_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
                                  FILE *file) {
     igraph_long_t i, n = igraph_vector_complex_size(v);
     if (n != 0) {
@@ -343,8 +335,7 @@ igraph_long_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
     fprintf(file, "\n");
     return 0;
 }
-
-igraph_long_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
+igraph_error_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
                                igraph_vector_t *real) {
     igraph_long_t i, n = (igraph_long_t) igraph_vector_complex_size(v);
     IGRAPH_CHECK(igraph_vector_resize(real, n));
@@ -354,8 +345,7 @@ igraph_long_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
 
     return 0;
 }
-
-igraph_long_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
+igraph_error_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
                                igraph_vector_t *imag) {
     igraph_long_t i, n = (igraph_long_t) igraph_vector_complex_size(v);
     IGRAPH_CHECK(igraph_vector_resize(imag, n));
@@ -365,8 +355,7 @@ igraph_long_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
 
     return 0;
 }
-
-igraph_long_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
+igraph_error_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
                                    igraph_vector_t *real,
                                    igraph_vector_t *imag) {
     igraph_long_t i, n = (igraph_long_t) igraph_vector_complex_size(v);
@@ -380,8 +369,7 @@ igraph_long_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
 
     return 0;
 }
-
-igraph_long_t igraph_vector_complex_create(igraph_vector_complex_t *v,
+igraph_error_t igraph_vector_complex_create(igraph_vector_complex_t *v,
                                  const igraph_vector_t *real,
                                  const igraph_vector_t *imag) {
     igraph_long_t i, n = (igraph_long_t) igraph_vector_size(real);
@@ -398,8 +386,7 @@ igraph_long_t igraph_vector_complex_create(igraph_vector_complex_t *v,
 
     return 0;
 }
-
-igraph_long_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
+igraph_error_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
                                        const igraph_vector_t *r,
                                        const igraph_vector_t *theta) {
     igraph_long_t i, n = (igraph_long_t) igraph_vector_size(r);
@@ -443,8 +430,7 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
         return 1;
     }
 }
-
-igraph_long_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
+igraph_error_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
     igraph_long_t i, n = igraph_vector_size(v);
     if (tol < 0.0) {
         IGRAPH_ERROR("`tol' tolerance must be non-negative", IGRAPH_EINVAL);

@@ -112,7 +112,7 @@ static igraph_long_t igraph_i_is_bigraphical_simple(const igraph_vector_t *degre
  * Time complexity: O(n^2) for simple directed graphs, O(n log n) for graphs with self-loops,
  * and O(n) for all other cases, where n is the length of the degree sequence(s).
  */
-igraph_long_t igraph_is_graphical(const igraph_vector_t *out_degrees,
+igraph_error_t igraph_is_graphical(const igraph_vector_t *out_degrees,
                         const igraph_vector_t *in_degrees,
                         const igraph_edge_type_sw_t allowed_edge_types,
                         igraph_bool_t *res)
@@ -215,7 +215,7 @@ igraph_long_t igraph_is_graphical(const igraph_vector_t *out_degrees,
  * Time complexity: O(n log n) for simple graphs, O(n) for multigraphs,
  * where n is the length of the larger degree sequence.
  */
-igraph_long_t igraph_is_bigraphical(const igraph_vector_t *degrees1,
+igraph_error_t igraph_is_bigraphical(const igraph_vector_t *degrees1,
                           const igraph_vector_t *degrees2,
                           const igraph_edge_type_sw_t allowed_edge_types,
                           igraph_bool_t *res)
@@ -593,7 +593,7 @@ typedef struct {
     const igraph_vector_t* second;
 } igraph_i_qsort_dual_vector_cmp_data_t;
 
-static igraph_long_t igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *p2) {
+static igraph_error_t igraph_i_qsort_dual_vector_cmp_desc(void* data, const void *p1, const void *p2) {
     igraph_i_qsort_dual_vector_cmp_data_t* sort_data =
         (igraph_i_qsort_dual_vector_cmp_data_t*)data;
     igraph_long_t index1 = *((igraph_long_t*)p1);
@@ -879,7 +879,7 @@ static igraph_long_t igraph_i_is_bigraphical_simple(const igraph_vector_t *degre
  *
  * Time complexity: O(n), where n is the length of the degree sequence.
  */
-igraph_long_t igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
+igraph_error_t igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
                               const igraph_vector_t *in_degrees, igraph_bool_t *res) {
     IGRAPH_WARNING("igraph_is_degree_sequence is deprecated, use igraph_is_graphical.");
 
@@ -949,7 +949,7 @@ igraph_long_t igraph_is_degree_sequence(const igraph_vector_t *out_degrees,
  * Time complexity: O(n log n) for undirected graphs, O(n^2) for directed
  *                  graphs, where n is the length of the degree sequence.
  */
-igraph_long_t igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
+igraph_error_t igraph_is_graphical_degree_sequence(const igraph_vector_t *out_degrees,
                                         const igraph_vector_t *in_degrees, igraph_bool_t *res) {
     IGRAPH_WARNING("igraph_is_graphical_degree_sequence is deprecated, use igraph_is_graphical.");
     return igraph_is_graphical(out_degrees, in_degrees, IGRAPH_SIMPLE_SW, res);

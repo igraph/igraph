@@ -46,7 +46,7 @@
  * Time complexity: O(|V|+|E|), linear in terms of the number of
  * vertices and edges.
  */
-igraph_long_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
+igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
                             const igraph_vector_t *permutation) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

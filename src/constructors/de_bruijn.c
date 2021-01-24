@@ -53,7 +53,7 @@
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges.
  */
-igraph_long_t igraph_de_bruijn(igraph_t *graph, igraph_long_t m, igraph_long_t n) {
+igraph_error_t igraph_de_bruijn(igraph_t *graph, igraph_long_t m, igraph_long_t n) {
 
     /* m - number of symbols */
     /* n - length of strings */

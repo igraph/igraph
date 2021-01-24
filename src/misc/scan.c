@@ -64,8 +64,7 @@
  * \return Error code.
  *
  */
-
-igraph_long_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
                         const igraph_vector_t *weights,
                         igraph_neimode_t mode) {
     if (weights) {
@@ -79,7 +78,7 @@ igraph_long_t igraph_local_scan_0(const igraph_t *graph, igraph_vector_t *res,
 
 /* From triangles.c */
 /* TODO add to private header */
-igraph_long_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
+igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
                                 const igraph_vector_long_t *rank);
 
 /* This removes loop, multiple edges and edges that point
@@ -361,8 +360,7 @@ static igraph_long_t igraph_i_local_scan_1_sumweights(const igraph_t *graph,
  * \return Error code.
  *
  */
-
-igraph_long_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_local_scan_1_ecount(const igraph_t *graph, igraph_vector_t *res,
                                const igraph_vector_t *weights,
                                igraph_neimode_t mode) {
 
@@ -442,8 +440,7 @@ static igraph_long_t igraph_i_local_scan_0_them_w(const igraph_t *us, const igra
  * \return Error code.
  *
  */
-
-igraph_long_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
+igraph_error_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
                              igraph_vector_t *res,
                              const igraph_vector_t *weights_them,
                              igraph_neimode_t mode) {
@@ -489,8 +486,7 @@ igraph_long_t igraph_local_scan_0_them(const igraph_t *us, const igraph_t *them,
  *
  * \sa \ref igraph_local_scan_1_ecount() for the US statistics.
  */
-
-igraph_long_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
+igraph_error_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t *them,
                                     igraph_vector_t *res,
                                     const igraph_vector_t *weights_them,
                                     igraph_neimode_t mode) {
@@ -598,8 +594,7 @@ igraph_long_t igraph_local_scan_1_ecount_them(const igraph_t *us, const igraph_t
  * \return Error code.
  *
  */
-
-igraph_long_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_long_t k,
+igraph_error_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_long_t k,
                                igraph_vector_t *res,
                                const igraph_vector_t *weights,
                                igraph_neimode_t mode) {
@@ -694,8 +689,7 @@ igraph_long_t igraph_local_scan_k_ecount(const igraph_t *graph, igraph_long_t k,
  *
  * \sa \ref igraph_local_scan_1_ecount() for the US statistics.
  */
-
-igraph_long_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
+igraph_error_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t *them,
                                     igraph_long_t k, igraph_vector_t *res,
                                     const igraph_vector_t *weights_them,
                                     igraph_neimode_t mode) {
@@ -817,8 +811,7 @@ igraph_long_t igraph_local_scan_k_ecount_them(const igraph_t *us, const igraph_t
  *        graph.
  * \return Error code.
  */
-
-igraph_long_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
+igraph_error_t igraph_local_scan_neighborhood_ecount(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vector_t *weights,
         const igraph_vector_ptr_t *neighborhoods) {

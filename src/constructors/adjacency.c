@@ -192,7 +192,7 @@ static igraph_long_t igraph_i_adjacency_min(igraph_matrix_t *adjmatrix, igraph_v
  *
  * \example examples/simple/igraph_adjacency.c
  */
-igraph_long_t igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
+igraph_error_t igraph_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
                      igraph_adjacency_t mode) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
@@ -502,7 +502,7 @@ static igraph_long_t igraph_i_weighted_adjacency_min(
  *
  * \example examples/simple/igraph_weighted_adjacency.c
  */
-igraph_long_t igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
+igraph_error_t igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmatrix,
                               igraph_adjacency_t mode, const char* attr,
                               igraph_bool_t loops) {
 
@@ -606,7 +606,7 @@ igraph_long_t igraph_weighted_adjacency(igraph_t *graph, igraph_matrix_t *adjmat
  * Time complexity: O(|V|+|E|).
  *
  */
-igraph_long_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
+igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                    igraph_neimode_t mode, igraph_bool_t duplicate) {
 
     igraph_long_t no_of_nodes = igraph_adjlist_size(adjlist);

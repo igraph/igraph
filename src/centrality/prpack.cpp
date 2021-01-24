@@ -35,7 +35,7 @@ using namespace std;
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
-igraph_long_t  igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
+igraph_error_t igraph_personalized_pagerank_prpack(const igraph_t *graph, igraph_vector_t *vector,
                                         igraph_real_t *value, const igraph_vs_t vids,
                                         igraph_bool_t directed, igraph_real_t damping,
                                         igraph_vector_t *reset,

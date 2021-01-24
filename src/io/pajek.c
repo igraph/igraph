@@ -33,11 +33,10 @@
 #include "igraph_version.h"
 
 #include "pajek-header.h"
-
-igraph_long_t igraph_pajek_yylex_init_extra(igraph_i_pajek_parsedata_t* user_defined,
+igraph_error_t igraph_pajek_yylex_init_extra(igraph_i_pajek_parsedata_t* user_defined,
                                   void* scanner);
 void igraph_pajek_yylex_destroy (void *scanner );
-igraph_long_t igraph_pajek_yyparse (igraph_i_pajek_parsedata_t* context);
+igraph_error_t igraph_pajek_yyparse(igraph_i_pajek_parsedata_t* context);
 void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
 
 /**
@@ -129,8 +128,7 @@ void igraph_pajek_yyset_in  (FILE * in_str, void* yyscanner );
  *
  * \example examples/simple/foreign.c
  */
-
-igraph_long_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
+igraph_error_t igraph_read_graph_pajek(igraph_t *graph, FILE *instream) {
 
     igraph_vector_t edges;
     igraph_trie_t vattrnames;
@@ -412,8 +410,7 @@ static igraph_long_t igraph_i_pajek_escape(char* src, char** dest) {
  *
  * \example examples/simple/igraph_write_graph_pajek.c
  */
-
-igraph_long_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
+igraph_error_t igraph_write_graph_pajek(const igraph_t *graph, FILE *outstream) {
     igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_long_t i, j;
 

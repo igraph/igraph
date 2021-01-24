@@ -153,8 +153,7 @@ static igraph_long_t igraph_i_eccentricity(const igraph_t *graph,
  *
  * \example examples/simple/igraph_eccentricity.c
  */
-
-igraph_long_t igraph_eccentricity(const igraph_t *graph,
+igraph_error_t igraph_eccentricity(const igraph_t *graph,
                         igraph_vector_t *res,
                         igraph_vs_t vids,
                         igraph_neimode_t mode) {
@@ -186,8 +185,7 @@ igraph_long_t igraph_eccentricity(const igraph_t *graph,
  *
  * \example examples/simple/igraph_radius.c
  */
-
-igraph_long_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
+igraph_error_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                   igraph_neimode_t mode) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

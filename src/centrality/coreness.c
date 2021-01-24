@@ -54,8 +54,7 @@
  *
  * Time complexity: O(|E|), the number of edges.
  */
-
-igraph_long_t igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
+igraph_error_t igraph_coreness(const igraph_t *graph, igraph_vector_t *cores,
                     igraph_neimode_t mode) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

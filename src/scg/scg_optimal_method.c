@@ -40,8 +40,7 @@
 #include "igraph_memory.h"
 #include "igraph_matrix.h"
 #include "igraph_vector.h"
-
-igraph_long_t igraph_i_optimal_partition(const igraph_real_t *v, igraph_long_t *gr, igraph_long_t n,
+igraph_error_t igraph_i_optimal_partition(const igraph_real_t *v, igraph_long_t *gr, igraph_long_t n,
                                igraph_long_t nt, igraph_long_t matrix, const igraph_real_t *p,
                                igraph_real_t *value) {
 
@@ -180,8 +179,7 @@ igraph_long_t igraph_i_optimal_partition(const igraph_real_t *v, igraph_long_t *
     }
     return 0;
 }
-
-igraph_long_t igraph_i_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
+igraph_error_t igraph_i_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
                          igraph_long_t n,  igraph_long_t matrix, const igraph_vector_t *ps) {
 
     /* if symmetric of Laplacian SCG -> same Cv */

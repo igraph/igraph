@@ -31,18 +31,18 @@
 
 __BEGIN_DECLS
 
-DECLDIR igraph_long_t igraph_assortativity_nominal(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_assortativity_nominal(const igraph_t *graph,
         const igraph_vector_t *types,
         igraph_real_t *res,
         igraph_bool_t directed);
 
-DECLDIR igraph_long_t igraph_assortativity(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_assortativity(const igraph_t *graph,
                                  const igraph_vector_t *types1,
                                  const igraph_vector_t *types2,
                                  igraph_real_t *res,
                                  igraph_bool_t directed);
 
-DECLDIR igraph_long_t igraph_assortativity_degree(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_assortativity_degree(const igraph_t *graph,
                                         igraph_real_t *res,
                                         igraph_bool_t directed);
 

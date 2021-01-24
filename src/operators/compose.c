@@ -64,7 +64,7 @@
  *
  * \example examples/simple/igraph_compose.c
  */
-igraph_long_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
+igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
                    igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
 
     igraph_long_t no_of_nodes_left = igraph_vcount(g1);

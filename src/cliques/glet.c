@@ -403,7 +403,7 @@ typedef struct {
     const igraph_vector_t *thresholds;
 } igraph_i_graphlets_filter_t;
 
-static igraph_long_t igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *b) {
+static int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *b) {
     igraph_i_graphlets_filter_t *ddata = (igraph_i_graphlets_filter_t *) data;
     igraph_long_t *aa = (igraph_long_t*) a;
     igraph_long_t *bb = (igraph_long_t*) b;
@@ -539,8 +539,7 @@ static igraph_long_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  *
  * See also: \ref igraph_graphlets() and \ref igraph_graphlets_project().
  */
-
-igraph_long_t igraph_graphlets_candidate_basis(const igraph_t *graph,
+igraph_error_t igraph_graphlets_candidate_basis(const igraph_t *graph,
                                      const igraph_vector_t *weights,
                                      igraph_vector_ptr_t *cliques,
                                      igraph_vector_t *thresholds) {
@@ -586,7 +585,7 @@ igraph_long_t igraph_graphlets_candidate_basis(const igraph_t *graph,
 }
 
 /* TODO: not made static because it is used by the R interface */
-igraph_long_t igraph_i_graphlets_project(const igraph_t *graph,
+igraph_error_t igraph_i_graphlets_project(const igraph_t *graph,
                                const igraph_vector_t *weights,
                                const igraph_vector_ptr_t *cliques,
                                igraph_vector_t *Mu, igraph_bool_t startMu,
@@ -781,8 +780,7 @@ igraph_long_t igraph_i_graphlets_project(const igraph_t *graph,
  * See also: \ref igraph_graphlets() and
  * \ref igraph_graphlets_candidate_basis().
  */
-
-igraph_long_t igraph_graphlets_project(const igraph_t *graph,
+igraph_error_t igraph_graphlets_project(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              const igraph_vector_ptr_t *cliques,
                              igraph_vector_t *Mu, igraph_bool_t startMu,
@@ -797,7 +795,7 @@ typedef struct igraph_i_graphlets_order_t {
     const igraph_vector_t *Mu;
 } igraph_i_graphlets_order_t;
 
-static igraph_long_t igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b) {
+static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b) {
     igraph_i_graphlets_order_t *ddata = (igraph_i_graphlets_order_t*) data;
     igraph_long_t *aa = (igraph_long_t*) a;
     igraph_long_t *bb = (igraph_long_t*) b;
@@ -835,8 +833,7 @@ static igraph_long_t igraph_i_graphlets_order_cmp(void *data, const void *a, con
  * See also: \ref igraph_graphlets_candidate_basis() and
  * \ref igraph_graphlets_project().
  */
-
-igraph_long_t igraph_graphlets(const igraph_t *graph,
+igraph_error_t igraph_graphlets(const igraph_t *graph,
                      const igraph_vector_t *weights,
                      igraph_vector_ptr_t *cliques,
                      igraph_vector_t *Mu, igraph_long_t niter) {

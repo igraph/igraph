@@ -60,7 +60,7 @@
  *
  * \example examples/simple/igraph_atlas.c
  */
-igraph_long_t igraph_atlas(igraph_t *graph, igraph_long_t number) {
+igraph_error_t igraph_atlas(igraph_t *graph, igraph_long_t number) {
 
     igraph_long_t pos, n, e;
     igraph_vector_t v = IGRAPH_VECTOR_NULL;

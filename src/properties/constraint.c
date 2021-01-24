@@ -74,7 +74,7 @@
  * graph. If the weights argument is \c NULL then the time complexity
  * is O(|V|+n*d^2).
  */
-igraph_long_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                       igraph_vs_t vids, const igraph_vector_t *weights) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

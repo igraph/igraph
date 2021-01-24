@@ -70,7 +70,7 @@
  *     of the edges in a graph. See \ref igraph_betweenness_cutoff() to
  *     calculate the range-limited betweenness of the vertices in a graph.
  */
-igraph_long_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
                        const igraph_vs_t vids, igraph_bool_t directed,
                        const igraph_vector_t* weights) {
     return igraph_betweenness_cutoff(graph, res, vids, directed, weights, -1);
@@ -304,7 +304,7 @@ static igraph_long_t igraph_i_betweenness_cutoff_weighted(
  * \ref igraph_edge_betweenness_cutoff() to calculate the range-limited
  * edge betweenness.
  */
-igraph_long_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vs_t vids, igraph_bool_t directed,
                               const igraph_vector_t *weights, igraph_real_t cutoff) {
 
@@ -543,8 +543,7 @@ igraph_long_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *
  *     See \ref igraph_edge_betweenness() for calculating the betweenness score
  *     of the edges in a graph.
  */
-
-igraph_long_t igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
                                 const igraph_vs_t vids, igraph_bool_t directed,
                                 igraph_real_t cutoff, const igraph_vector_t *weights) {
     IGRAPH_WARNING("igraph_betweenness_estimate is deprecated, use igraph_betweenness_cutoff.");
@@ -762,7 +761,7 @@ static igraph_long_t igraph_i_edge_betweenness_cutoff_weighted(
  *     of the edges in a graph. See \ref igraph_edge_betweenness_cutoff() to
  *     compute the range-limited betweenness score of the edges in a graph.
  */
-igraph_long_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed,
                             const igraph_vector_t *weights) {
     return igraph_edge_betweenness_cutoff(graph, result, directed,
@@ -803,7 +802,7 @@ igraph_long_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *re
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
  * \ref igraph_betweenness_cutoff() to compute the range-limited vertex betweenness.
  */
-igraph_long_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
                                    igraph_bool_t directed,
                                    const igraph_vector_t *weights, igraph_real_t cutoff) {
     igraph_long_t no_of_nodes = igraph_vcount(graph);
@@ -1011,7 +1010,7 @@ igraph_long_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vecto
  *     See \ref igraph_betweenness() for calculating the betweenness score
  *     of the vertices in a graph.
  */
-igraph_long_t igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
                                    igraph_bool_t directed, igraph_real_t cutoff,
                                    const igraph_vector_t *weights) {
     IGRAPH_WARNING("igraph_edge_betweenness_estimate is deprecated, use igraph_edge_betweenness_cutoff.");

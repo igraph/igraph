@@ -89,8 +89,7 @@ static void igraph_i_norm2d(igraph_real_t *x, igraph_real_t *y) {
  * O(dia*maxit*(|V|^2+|E|)), this is the case when all vertices happen to be
  * in the same grid cell.
  */
-
-igraph_long_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_lgl(const igraph_t *graph, igraph_matrix_t *res,
                       igraph_long_t maxit, igraph_real_t maxdelta,
                       igraph_real_t area, igraph_real_t coolexp,
                       igraph_real_t repulserad, igraph_real_t cellsize,

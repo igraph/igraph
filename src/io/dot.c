@@ -127,7 +127,7 @@ static igraph_long_t igraph_i_dot_escape(const char *orig, char **result) {
  *
  * \example examples/simple/dot.c
  */
-igraph_long_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
+igraph_error_t igraph_write_graph_dot(const igraph_t *graph, FILE* outstream) {
     igraph_long_t ret;
     igraph_long_t i, j;
     igraph_long_t no_of_nodes = igraph_vcount(graph);

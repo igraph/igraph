@@ -45,12 +45,11 @@ typedef struct igraph_buckets_t {
     igraph_vector_long_t buckets;
     igraph_long_t max, no;
 } igraph_buckets_t;
-
-igraph_long_t igraph_buckets_init(igraph_buckets_t *b, igraph_long_t bsize, igraph_long_t size);
+igraph_error_t igraph_buckets_init(igraph_buckets_t *b, igraph_long_t bsize, igraph_long_t size);
 void igraph_buckets_destroy(igraph_buckets_t *b);
 void igraph_buckets_clear(igraph_buckets_t *b);
-igraph_long_t igraph_buckets_popmax(igraph_buckets_t *b);
-igraph_long_t igraph_buckets_pop(igraph_buckets_t *b, igraph_long_t bucket);
+igraph_error_t igraph_buckets_popmax(igraph_buckets_t *b);
+igraph_error_t igraph_buckets_pop(igraph_buckets_t *b, igraph_long_t bucket);
 igraph_bool_t igraph_buckets_empty(const igraph_buckets_t *b);
 igraph_bool_t igraph_buckets_empty_bucket(const igraph_buckets_t *b,
         igraph_long_t bucket);
@@ -62,12 +61,11 @@ typedef struct igraph_dbuckets_t {
     igraph_vector_long_t next, prev;
     igraph_long_t max, no;
 } igraph_dbuckets_t;
-
-igraph_long_t igraph_dbuckets_init(igraph_dbuckets_t *b, igraph_long_t bsize, igraph_long_t size);
+igraph_error_t igraph_dbuckets_init(igraph_dbuckets_t *b, igraph_long_t bsize, igraph_long_t size);
 void igraph_dbuckets_destroy(igraph_dbuckets_t *b);
 void igraph_dbuckets_clear(igraph_dbuckets_t *b);
-igraph_long_t igraph_dbuckets_popmax(igraph_dbuckets_t *b);
-igraph_long_t igraph_dbuckets_pop(igraph_dbuckets_t *b, igraph_long_t bucket);
+igraph_error_t igraph_dbuckets_popmax(igraph_dbuckets_t *b);
+igraph_error_t igraph_dbuckets_pop(igraph_dbuckets_t *b, igraph_long_t bucket);
 igraph_bool_t igraph_dbuckets_empty(const igraph_dbuckets_t *b);
 igraph_bool_t igraph_dbuckets_empty_bucket(const igraph_dbuckets_t *b,
         igraph_long_t bucket);

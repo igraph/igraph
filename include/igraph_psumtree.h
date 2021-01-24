@@ -42,14 +42,14 @@ typedef struct {
     igraph_long_t offset;
 } igraph_psumtree_t;
 
-DECLDIR igraph_long_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_long_t size);
+DECLDIR igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_long_t size);
 DECLDIR void igraph_psumtree_reset(igraph_psumtree_t *t);
 DECLDIR void igraph_psumtree_destroy(igraph_psumtree_t *t);
 DECLDIR igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, igraph_long_t idx);
-DECLDIR igraph_long_t igraph_psumtree_size(const igraph_psumtree_t *t);
-DECLDIR igraph_long_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_long_t *idx,
+DECLDIR igraph_error_t igraph_psumtree_size(const igraph_psumtree_t *t);
+DECLDIR igraph_error_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_long_t *idx,
                                    igraph_real_t elem);
-DECLDIR igraph_long_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_long_t idx,
+DECLDIR igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_long_t idx,
                                    igraph_real_t new_value);
 DECLDIR igraph_real_t igraph_psumtree_sum(const igraph_psumtree_t *t);
 

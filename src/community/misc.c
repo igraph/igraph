@@ -96,7 +96,7 @@
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  */
-igraph_long_t igraph_community_to_membership(const igraph_matrix_t *merges,
+igraph_error_t igraph_community_to_membership(const igraph_matrix_t *merges,
                                    igraph_long_t nodes,
                                    igraph_long_t steps,
                                    igraph_vector_t *membership,
@@ -207,7 +207,7 @@ igraph_long_t igraph_community_to_membership(const igraph_matrix_t *merges,
  *
  * Time complexity: should be O(n) for n elements.
  */
-igraph_long_t igraph_reindex_membership(igraph_vector_t *membership,
+igraph_error_t igraph_reindex_membership(igraph_vector_t *membership,
                               igraph_vector_t *new_to_old,
                               igraph_long_t *nb_clusters) {
 
@@ -324,7 +324,7 @@ static igraph_long_t igraph_i_split_join_distance(const igraph_vector_t *v1,
  *
  * Time complexity: O(n log(n)).
  */
-igraph_long_t igraph_compare_communities(const igraph_vector_t *comm1,
+igraph_error_t igraph_compare_communities(const igraph_vector_t *comm1,
                                const igraph_vector_t *comm2, igraph_real_t* result,
                                igraph_community_comparison_t method) {
     igraph_vector_t c1, c2;
@@ -427,7 +427,7 @@ igraph_long_t igraph_compare_communities(const igraph_vector_t *comm1,
  *
  * Time complexity: O(n log(n)).
  */
-igraph_long_t igraph_split_join_distance(const igraph_vector_t *comm1,
+igraph_error_t igraph_split_join_distance(const igraph_vector_t *comm1,
                                const igraph_vector_t *comm2, igraph_long_t *distance12,
                                igraph_long_t *distance21) {
     igraph_vector_t c1, c2;

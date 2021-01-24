@@ -59,8 +59,7 @@
  * Time complexity: O(n!) in the worst case, n is the number of
  * vertices.
  */
-
-igraph_long_t igraph_get_all_simple_paths(const igraph_t *graph,
+igraph_error_t igraph_get_all_simple_paths(const igraph_t *graph,
                                 igraph_vector_long_t *res,
                                 igraph_long_t from,
                                 const igraph_vs_t to,

@@ -61,7 +61,7 @@
  *
  * \example examples/simple/igraph_intersection.c
  */
-igraph_long_t igraph_intersection(igraph_t *res,
+igraph_error_t igraph_intersection(igraph_t *res,
                         const igraph_t *left, const igraph_t *right,
                         igraph_vector_t *edge_map1,
                         igraph_vector_t *edge_map2) {
@@ -101,7 +101,7 @@ igraph_long_t igraph_intersection(igraph_t *res,
  * |E| is the number of edges in the smallest graph (i.e. the graph having
  * the less vertices).
  */
-igraph_long_t igraph_intersection_many(igraph_t *res,
+igraph_error_t igraph_intersection_many(igraph_t *res,
                              const igraph_vector_ptr_t *graphs,
                              igraph_vector_ptr_t *edgemaps) {
 

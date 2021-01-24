@@ -206,8 +206,7 @@ static igraph_bool_t igraph_i_cb_isin(const igraph_vector_t *needle,
  *
  * \example examples/simple/cohesive_blocks.c
  */
-
-igraph_long_t igraph_cohesive_blocks(const igraph_t *graph,
+igraph_error_t igraph_cohesive_blocks(const igraph_t *graph,
                            igraph_vector_ptr_t *blocks,
                            igraph_vector_t *cohesion,
                            igraph_vector_t *parent,

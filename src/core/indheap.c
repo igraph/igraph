@@ -41,8 +41,7 @@
  * @return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
-
-igraph_long_t igraph_indheap_init(igraph_indheap_t* h, igraph_long_t alloc_size) {
+igraph_error_t igraph_indheap_init(igraph_indheap_t* h, igraph_long_t alloc_size) {
     if (alloc_size <= 0 ) {
         alloc_size = 1;
     }
@@ -64,8 +63,7 @@ igraph_long_t igraph_indheap_init(igraph_indheap_t* h, igraph_long_t alloc_size)
 
     return 0;
 }
-
-igraph_long_t igraph_indheap_clear(igraph_indheap_t *h) {
+igraph_error_t igraph_indheap_clear(igraph_indheap_t *h) {
     h->end = h->stor_begin;
     return 0;
 }
@@ -77,8 +75,7 @@ igraph_long_t igraph_indheap_clear(igraph_indheap_t *h) {
  * @return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
-
-igraph_long_t igraph_indheap_init_array     (igraph_indheap_t *h, igraph_real_t* data, igraph_long_t len) {
+igraph_error_t igraph_indheap_init_array(igraph_indheap_t *h, igraph_real_t* data, igraph_long_t len) {
     igraph_long_t i;
 
     h->stor_begin = igraph_Calloc(len, igraph_real_t);
@@ -140,8 +137,7 @@ igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h) {
  * \ingroup indheap
  * \brief Adds an element to an indexed heap.
  */
-
-igraph_long_t igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem) {
+igraph_error_t igraph_indheap_push(igraph_indheap_t* h, igraph_real_t elem) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
 
@@ -168,8 +164,7 @@ igraph_long_t igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t 
  * \ingroup indheap
  * \brief Adds an element to an indexed heap with a given index.
  */
-
-igraph_long_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_long_t idx, igraph_real_t elem) {
+igraph_error_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_long_t idx, igraph_real_t elem) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
 
@@ -196,8 +191,7 @@ igraph_long_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_long_t 
  * \ingroup indheap
  * \brief Modifies an element in an indexed heap.
  */
-
-igraph_long_t igraph_indheap_modify(igraph_indheap_t* h, igraph_long_t idx, igraph_real_t elem) {
+igraph_error_t igraph_indheap_modify(igraph_indheap_t* h, igraph_long_t idx, igraph_real_t elem) {
     igraph_long_t i, n;
 
     IGRAPH_ASSERT(h != 0);
@@ -256,8 +250,7 @@ igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h) {
  * \ingroup indheap
  * \brief Gives the number of elements in an indexed heap.
  */
-
-igraph_long_t igraph_indheap_size      (igraph_indheap_t* h) {
+igraph_error_t igraph_indheap_size(igraph_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->end - h->stor_begin;
@@ -270,8 +263,7 @@ igraph_long_t igraph_indheap_size      (igraph_indheap_t* h) {
  * @return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
-
-igraph_long_t igraph_indheap_reserve        (igraph_indheap_t* h, igraph_long_t size) {
+igraph_error_t igraph_indheap_reserve(igraph_indheap_t* h, igraph_long_t size) {
     igraph_long_t actual_size = igraph_indheap_size(h);
     igraph_real_t *tmp1;
     igraph_long_t *tmp2;
@@ -310,8 +302,7 @@ igraph_long_t igraph_indheap_reserve        (igraph_indheap_t* h, igraph_long_t 
  * \ingroup indheap
  * \brief Returns the index of the largest element in an indexed heap.
  */
-
-igraph_long_t igraph_indheap_max_index(igraph_indheap_t *h) {
+igraph_error_t igraph_indheap_max_index(igraph_indheap_t *h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->index_begin[0];
@@ -409,8 +400,7 @@ void igraph_indheap_i_switch(igraph_indheap_t* h, igraph_long_t e1, igraph_long_
  * @return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
-
-igraph_long_t igraph_d_indheap_init           (igraph_d_indheap_t* h, igraph_long_t alloc_size) {
+igraph_error_t igraph_d_indheap_init(igraph_d_indheap_t* h, igraph_long_t alloc_size) {
     if (alloc_size <= 0 ) {
         alloc_size = 1;
     }
@@ -480,8 +470,7 @@ igraph_bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h) {
  * \ingroup doubleindheap
  * \brief Adds an element to the heap.
  */
-
-igraph_long_t igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
+igraph_error_t igraph_d_indheap_push(igraph_d_indheap_t* h, igraph_real_t elem,
                                      igraph_long_t idx, igraph_long_t idx2) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
@@ -542,8 +531,7 @@ igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h) {
  * \ingroup doubleindheap
  * \brief Gives the number of elements in the heap.
  */
-
-igraph_long_t igraph_d_indheap_size      (igraph_d_indheap_t* h) {
+igraph_error_t igraph_d_indheap_size(igraph_d_indheap_t* h) {
     IGRAPH_ASSERT(h != 0);
     IGRAPH_ASSERT(h->stor_begin != 0);
     return h->end - h->stor_begin;
@@ -556,8 +544,7 @@ igraph_long_t igraph_d_indheap_size      (igraph_d_indheap_t* h) {
  * @return Error code:
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
-
-igraph_long_t igraph_d_indheap_reserve        (igraph_d_indheap_t* h, igraph_long_t size) {
+igraph_error_t igraph_d_indheap_reserve(igraph_d_indheap_t* h, igraph_long_t size) {
     igraph_long_t actual_size = igraph_d_indheap_size(h);
     igraph_real_t *tmp1;
     igraph_long_t *tmp2, *tmp3;
@@ -769,8 +756,7 @@ void igraph_i_2wheap_sink(igraph_2wheap_t *h,
 /* ------------------ */
 /* These are public   */
 /* ------------------ */
-
-igraph_long_t igraph_2wheap_init(igraph_2wheap_t *h, igraph_long_t size) {
+igraph_error_t igraph_2wheap_init(igraph_2wheap_t *h, igraph_long_t size) {
     h->size = size;
     /* We start with the biggest */
     IGRAPH_CHECK(igraph_vector_long_init(&h->index2, size));
@@ -788,8 +774,7 @@ void igraph_2wheap_destroy(igraph_2wheap_t *h) {
     igraph_vector_long_destroy(&h->index);
     igraph_vector_long_destroy(&h->index2);
 }
-
-igraph_long_t igraph_2wheap_clear(igraph_2wheap_t *h) {
+igraph_error_t igraph_2wheap_clear(igraph_2wheap_t *h) {
     igraph_vector_clear(&h->data);
     igraph_vector_long_clear(&h->index);
     igraph_vector_long_null(&h->index2);
@@ -799,8 +784,7 @@ igraph_long_t igraph_2wheap_clear(igraph_2wheap_t *h) {
 igraph_bool_t igraph_2wheap_empty(const igraph_2wheap_t *h) {
     return igraph_vector_empty(&h->data);
 }
-
-igraph_long_t igraph_2wheap_push_with_index(igraph_2wheap_t *h,
+igraph_error_t igraph_2wheap_push_with_index(igraph_2wheap_t *h,
                                   igraph_long_t idx, igraph_real_t elem) {
 
     /*   printf("-> %.2g [%li]\n", elem, idx); */
@@ -814,20 +798,17 @@ igraph_long_t igraph_2wheap_push_with_index(igraph_2wheap_t *h,
     igraph_i_2wheap_shift_up(h, size);
     return 0;
 }
-
-igraph_long_t igraph_2wheap_size(const igraph_2wheap_t *h) {
+igraph_error_t igraph_2wheap_size(const igraph_2wheap_t *h) {
     return igraph_vector_size(&h->data);
 }
-
-igraph_long_t igraph_2wheap_max_size(const igraph_2wheap_t *h) {
+igraph_error_t igraph_2wheap_max_size(const igraph_2wheap_t *h) {
     return h->size;
 }
 
 igraph_real_t igraph_2wheap_max(const igraph_2wheap_t *h) {
     return VECTOR(h->data)[0];
 }
-
-igraph_long_t igraph_2wheap_max_index(const igraph_2wheap_t *h) {
+igraph_error_t igraph_2wheap_max_index(const igraph_2wheap_t *h) {
     return VECTOR(h->index)[0];
 }
 
@@ -887,8 +868,7 @@ igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, igraph_long_t *
     }
     return tmp;
 }
-
-igraph_long_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_long_t idx, igraph_real_t elem) {
+igraph_error_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_long_t idx, igraph_real_t elem) {
 
     igraph_long_t pos = VECTOR(h->index2)[idx] - 2;
 
@@ -902,8 +882,7 @@ igraph_long_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_long_t idx, igraph
 }
 
 /* Check that the heap is in a consistent state */
-
-igraph_long_t igraph_2wheap_check(igraph_2wheap_t *h) {
+igraph_error_t igraph_2wheap_check(igraph_2wheap_t *h) {
     igraph_long_t size = igraph_2wheap_size(h);
     igraph_long_t i;
     igraph_bool_t error = 0;

@@ -1539,8 +1539,7 @@ cleanup:
  *
  * \example examples/simple/igraph_subisomorphic_lad.c
  */
-
-igraph_long_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
+igraph_error_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
                              igraph_vector_ptr_t *domains,
                              igraph_bool_t *iso, igraph_vector_t *map,
                              igraph_vector_ptr_t *maps,

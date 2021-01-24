@@ -55,8 +55,7 @@
  *
  * \sa \ref igraph_average_path_length() and \ref igraph_shortest_paths()
  */
-
-igraph_long_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
                             igraph_real_t *unconnected, igraph_bool_t directed) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

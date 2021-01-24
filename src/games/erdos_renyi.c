@@ -34,8 +34,7 @@
  * <para>Games are randomized graph generators. Randomization means that
  * they generate a different graph every time you call them. </para>
  */
-
-igraph_long_t igraph_erdos_renyi_game_gnp(
+igraph_error_t igraph_erdos_renyi_game_gnp(
     igraph_t *graph, igraph_long_t n, igraph_real_t p,
     igraph_bool_t directed, igraph_bool_t loops
 ) {
@@ -131,8 +130,7 @@ igraph_long_t igraph_erdos_renyi_game_gnp(
 
     return retval;
 }
-
-igraph_long_t igraph_erdos_renyi_game_gnm(
+igraph_error_t igraph_erdos_renyi_game_gnm(
     igraph_t *graph, igraph_long_t n, igraph_real_t m,
     igraph_bool_t directed, igraph_bool_t loops
 ) {
@@ -268,7 +266,7 @@ igraph_long_t igraph_erdos_renyi_game_gnm(
  *
  * \example examples/simple/igraph_erdos_renyi_game.c
  */
-igraph_long_t igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
+igraph_error_t igraph_erdos_renyi_game(igraph_t *graph, igraph_erdos_renyi_t type,
                             igraph_long_t n, igraph_real_t p_or_m,
                             igraph_bool_t directed, igraph_bool_t loops) {
     igraph_long_t retval = 0;

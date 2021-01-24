@@ -69,7 +69,7 @@
  *
  * \example examples/simple/igraph_girth.c
  */
-igraph_long_t igraph_girth(const igraph_t *graph, igraph_long_t *girth,
+igraph_error_t igraph_girth(const igraph_t *graph, igraph_long_t *girth,
                  igraph_vector_t *circle) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

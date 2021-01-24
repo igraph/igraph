@@ -47,8 +47,7 @@
  * id of the non-empty bucket with the highest id, to facilitate the
  * _empty() and _popmax() operations.
  */
-
-igraph_long_t igraph_buckets_init(igraph_buckets_t *b, igraph_long_t bsize, igraph_long_t size) {
+igraph_error_t igraph_buckets_init(igraph_buckets_t *b, igraph_long_t bsize, igraph_long_t size) {
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->bptr, bsize);
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->buckets, size);
     b->max = -1; b->no = 0;
@@ -60,8 +59,7 @@ void igraph_buckets_destroy(igraph_buckets_t *b) {
     igraph_vector_long_destroy(&b->bptr);
     igraph_vector_long_destroy(&b->buckets);
 }
-
-igraph_long_t igraph_buckets_popmax(igraph_buckets_t *b) {
+igraph_error_t igraph_buckets_popmax(igraph_buckets_t *b) {
     /* Precondition: there is at least a non-empty bucket */
     /* Search for the highest bucket first */
     igraph_long_t max;
@@ -73,8 +71,7 @@ igraph_long_t igraph_buckets_popmax(igraph_buckets_t *b) {
 
     return max - 1;
 }
-
-igraph_long_t igraph_buckets_pop(igraph_buckets_t *b, igraph_long_t bucket) {
+igraph_error_t igraph_buckets_pop(igraph_buckets_t *b, igraph_long_t bucket) {
     igraph_long_t ret = VECTOR(b->bptr)[bucket] - 1;
     VECTOR(b->bptr)[bucket] = VECTOR(b->buckets)[ret];
     b->no--;
@@ -107,8 +104,7 @@ void igraph_buckets_clear(igraph_buckets_t *b) {
     b->max = -1;
     b->no = 0;
 }
-
-igraph_long_t igraph_dbuckets_init(igraph_dbuckets_t *b, igraph_long_t bsize, igraph_long_t size) {
+igraph_error_t igraph_dbuckets_init(igraph_dbuckets_t *b, igraph_long_t bsize, igraph_long_t size) {
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->bptr, bsize);
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->next, size);
     IGRAPH_VECTOR_LONG_INIT_FINALLY(&b->prev, size);
@@ -130,16 +126,14 @@ void igraph_dbuckets_clear(igraph_dbuckets_t *b) {
     b->max = -1;
     b->no = 0;
 }
-
-igraph_long_t igraph_dbuckets_popmax(igraph_dbuckets_t *b) {
+igraph_error_t igraph_dbuckets_popmax(igraph_dbuckets_t *b) {
     igraph_long_t max;
     while ( (max = (igraph_long_t) VECTOR(b->bptr)[(igraph_long_t) b->max]) == 0) {
         b->max --;
     }
     return igraph_dbuckets_pop(b, b->max);
 }
-
-igraph_long_t igraph_dbuckets_pop(igraph_dbuckets_t *b, igraph_long_t bucket) {
+igraph_error_t igraph_dbuckets_pop(igraph_dbuckets_t *b, igraph_long_t bucket) {
     igraph_long_t ret = VECTOR(b->bptr)[bucket] - 1;
     igraph_long_t next = VECTOR(b->next)[ret];
     VECTOR(b->bptr)[bucket] = next;

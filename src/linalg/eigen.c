@@ -623,7 +623,7 @@ static igraph_long_t igraph_i_eigen_matrix_symmetric_arpack(const igraph_matrix_
    form. Order them according to the ordering criteria.
    Comparison functions for the reordering first */
 
-typedef igraph_long_t (*igraph_i_eigen_matrix_lapack_cmp_t)(void*, const void*,
+typedef int(*igraph_i_eigen_matrix_lapack_cmp_t)(void*, const void*,
         const void *);
 
 typedef struct igraph_i_eml_cmp_t {
@@ -644,7 +644,7 @@ typedef struct igraph_i_eml_cmp_t {
    3 Larger real part
    4 Larger imaginary part */
 
-static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void *a,
                                         const void *b) {
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
     igraph_long_t *aa = (igraph_long_t*) a, *bb = (igraph_long_t*) b;
@@ -689,7 +689,7 @@ static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_lm(void *extra, const void
    4 Smaller imaginary part
    This ensures that lm has exactly the opposite order to sm */
 
-static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void *a,
                                         const void *b) {
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
     igraph_long_t *aa = (igraph_long_t*) a, *bb = (igraph_long_t*) b;
@@ -732,7 +732,7 @@ static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_sm(void *extra, const void
    2 Real eigenvalues come before complex ones
    3 Larger complex part */
 
-static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
@@ -771,7 +771,7 @@ static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_lr(void *extra, const void
    This is opposite to LR
 */
 
-static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
@@ -808,7 +808,7 @@ static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_sr(void *extra, const void
    2 Real eigenvalues before complex ones
    3 Larger real part */
 
-static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_li(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_li(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
@@ -846,7 +846,7 @@ static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_li(void *extra, const void
    3 Smaller real part
    Order is opposite to LI */
 
-static igraph_long_t igraph_i_eigen_matrix_lapack_cmp_si(void *extra, const void *a,
+static int igraph_i_eigen_matrix_lapack_cmp_si(void *extra, const void *a,
                                         const void *b) {
 
     igraph_i_eml_cmp_t *myextra = (igraph_i_eml_cmp_t *) extra;
@@ -1211,8 +1211,7 @@ static igraph_long_t igraph_i_eigen_checks(const igraph_matrix_t *A,
  *
  * \example examples/simple/igraph_eigen_matrix_symmetric.c
  */
-
-igraph_long_t igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
+igraph_error_t igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
                                   const igraph_sparsemat_t *sA,
                                   igraph_arpack_function_t *fun, igraph_long_t n,
                                   void *extra,
@@ -1271,8 +1270,7 @@ igraph_long_t igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
  * \function igraph_eigen_matrix
  *
  */
-
-igraph_long_t igraph_eigen_matrix(const igraph_matrix_t *A,
+igraph_error_t igraph_eigen_matrix(const igraph_matrix_t *A,
                         const igraph_sparsemat_t *sA,
                         igraph_arpack_function_t *fun, igraph_long_t n,
                         void *extra,
@@ -1455,8 +1453,7 @@ static igraph_long_t igraph_i_eigen_adjacency_arpack(const igraph_t *graph,
  * \function igraph_eigen_adjacency
  *
  */
-
-igraph_long_t igraph_eigen_adjacency(const igraph_t *graph,
+igraph_error_t igraph_eigen_adjacency(const igraph_t *graph,
                            igraph_eigen_algorithm_t algorithm,
                            const igraph_eigen_which_t *which,
                            igraph_arpack_options_t *options,
@@ -1521,8 +1518,7 @@ igraph_long_t igraph_eigen_adjacency(const igraph_t *graph,
  * \function igraph_eigen_laplacian
  *
  */
-
-igraph_long_t igraph_eigen_laplacian(const igraph_t *graph,
+igraph_error_t igraph_eigen_laplacian(const igraph_t *graph,
                            igraph_eigen_algorithm_t algorithm,
                            const igraph_eigen_which_t *which,
                            igraph_arpack_options_t *options,

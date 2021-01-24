@@ -58,8 +58,7 @@
  *
  * Time complexity: O(\p len).
  */
-
-igraph_long_t igraph_strvector_init(igraph_strvector_t *sv, igraph_long_t len) {
+igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_long_t len) {
     igraph_long_t i;
     sv->data = igraph_Calloc(len, char*);
     if (sv->data == 0) {
@@ -142,8 +141,7 @@ void igraph_strvector_get(const igraph_strvector_t *sv, igraph_long_t idx,
  * Time complexity: O(l), the length of the new string. Maybe more,
  * depending on the memory management, if reallocation is needed.
  */
-
-igraph_long_t igraph_strvector_set(igraph_strvector_t *sv, igraph_long_t idx,
+igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_long_t idx,
                          const char *value) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
@@ -180,7 +178,7 @@ igraph_long_t igraph_strvector_set(igraph_strvector_t *sv, igraph_long_t idx,
  * Time complexity: O(l), the length of the new string. Maybe more,
  * depending on the memory management, if reallocation is needed.
  */
-igraph_long_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_long_t idx,
+igraph_error_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_long_t idx,
                           const char *value, igraph_long_t len) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
@@ -290,8 +288,7 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, igraph_long_t begin,
  *
  * Time complexity: O(l), the total length of the strings in \p from.
  */
-
-igraph_long_t igraph_strvector_copy(igraph_strvector_t *to,
+igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
                           const igraph_strvector_t *from) {
     igraph_long_t i;
     char *str;
@@ -328,8 +325,7 @@ igraph_long_t igraph_strvector_copy(igraph_strvector_t *to,
  * string vector, l2 is the total length of strings in the \p from
  * string vector.
  */
-
-igraph_long_t igraph_strvector_append(igraph_strvector_t *to,
+igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
                             const igraph_strvector_t *from) {
     igraph_long_t len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
     igraph_long_t i;
@@ -393,8 +389,7 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
  * bigger, O(l), the total length of the deleted strings if it is made
  * smaller, maybe less, depending on memory management.
  */
-
-igraph_long_t igraph_strvector_resize(igraph_strvector_t* v, igraph_long_t newsize) {
+igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_long_t newsize) {
     igraph_long_t toadd = newsize - v->len, i, j;
     char **tmp;
     igraph_long_t reallocsize = newsize;
@@ -461,8 +456,7 @@ igraph_long_t igraph_strvector_resize(igraph_strvector_t* v, igraph_long_t newsi
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_strvector_size(const igraph_strvector_t *sv) {
+igraph_error_t igraph_strvector_size(const igraph_strvector_t *sv) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
     return sv->len;
@@ -480,8 +474,7 @@ igraph_long_t igraph_strvector_size(const igraph_strvector_t *sv) {
  * Time complexity: O(n+l), n is the total number of strings, l is the
  * length of the new string.
  */
-
-igraph_long_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
+igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
     igraph_long_t s = igraph_strvector_size(v);
     char **tmp;
     IGRAPH_ASSERT(v != 0);
@@ -557,8 +550,7 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
     }
     v->len -= nremove;
 }
-
-igraph_long_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
+igraph_error_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
                            const char *sep) {
 
     igraph_long_t i, n = igraph_strvector_size(v);
@@ -571,8 +563,7 @@ igraph_long_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
     return 0;
 
 }
-
-igraph_long_t igraph_strvector_index(const igraph_strvector_t *v,
+igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
                            igraph_strvector_t *newv,
                            const igraph_vector_t *idx) {
 

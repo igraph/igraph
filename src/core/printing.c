@@ -39,7 +39,7 @@
 #endif
 
 #ifndef USING_R
-igraph_long_t igraph_real_printf(igraph_real_t val) {
+igraph_error_t igraph_real_printf(igraph_real_t val) {
     if (igraph_finite(val)) {
         return printf("%g", val);
     } else if (igraph_is_nan(val)) {
@@ -56,8 +56,7 @@ igraph_long_t igraph_real_printf(igraph_real_t val) {
     }
 }
 #endif
-
-igraph_long_t igraph_real_fprintf(FILE *file, igraph_real_t val) {
+igraph_error_t igraph_real_fprintf(FILE *file, igraph_real_t val) {
     if (igraph_finite(val)) {
         return fprintf(file, "%g", val);
     } else if (igraph_is_nan(val)) {
@@ -73,8 +72,7 @@ igraph_long_t igraph_real_fprintf(FILE *file, igraph_real_t val) {
         return fprintf(file, "%g", val);
     }
 }
-
-igraph_long_t igraph_real_snprintf(char* str, size_t size, igraph_real_t val) {
+igraph_error_t igraph_real_snprintf(char* str, size_t size, igraph_real_t val) {
     if (igraph_finite(val)) {
         return snprintf(str, size, "%g", val);
     } else if (igraph_is_nan(val)) {
@@ -92,7 +90,7 @@ igraph_long_t igraph_real_snprintf(char* str, size_t size, igraph_real_t val) {
 }
 
 #ifndef USING_R
-igraph_long_t igraph_real_printf_precise(igraph_real_t val) {
+igraph_error_t igraph_real_printf_precise(igraph_real_t val) {
     if (igraph_finite(val)) {
         return printf(IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
     } else if (igraph_is_nan(val)) {
@@ -109,8 +107,7 @@ igraph_long_t igraph_real_printf_precise(igraph_real_t val) {
     }
 }
 #endif
-
-igraph_long_t igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
+igraph_error_t igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
     if (igraph_finite(val)) {
         return fprintf(file, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
     } else if (igraph_is_nan(val)) {
@@ -126,8 +123,7 @@ igraph_long_t igraph_real_fprintf_precise(FILE *file, igraph_real_t val) {
         return fprintf(file, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
     }
 }
-
-igraph_long_t igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val) {
+igraph_error_t igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val) {
     if (igraph_finite(val)) {
         return snprintf(str, size, IGRAPH_REAL_PRINTF_PRECISE_FORMAT, val);
     } else if (igraph_is_nan(val)) {

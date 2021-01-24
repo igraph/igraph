@@ -32,8 +32,7 @@
  */
 
 #include "scg_headers.h"
-
-igraph_long_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_long_t n, igraph_long_t p,
+igraph_error_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_long_t n, igraph_long_t p,
                           igraph_vector_t *cen, igraph_long_t k, igraph_long_t *cl, igraph_long_t maxiter) {
 
     igraph_long_t iter, i, j, c, it, inew = 0;

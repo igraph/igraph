@@ -59,7 +59,7 @@
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
  * graph, d is the average degree and k is the \p order argument.
  */
-igraph_long_t igraph_connect_neighborhood(igraph_t *graph, igraph_long_t order,
+igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_long_t order,
                                 igraph_neimode_t mode) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

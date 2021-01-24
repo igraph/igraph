@@ -760,7 +760,7 @@ static int igraph_i_realize_directed_degree_sequence(
  *
  */
 
-igraph_long_t igraph_realize_degree_sequence(
+igraph_error_t igraph_realize_degree_sequence(
         igraph_t *graph,
         const igraph_vector_t *outdeg, const igraph_vector_t *indeg,
         igraph_edge_type_sw_t allowed_edge_types,

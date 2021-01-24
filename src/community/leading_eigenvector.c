@@ -471,7 +471,7 @@ static void igraph_i_error_handler_none(const char *reason, const char *file,
  * |E| the number of edges, <quote>steps</quote> the number of splits
  * performed.
  */
-igraph_long_t igraph_community_leading_eigenvector(const igraph_t *graph,
+igraph_error_t igraph_community_leading_eigenvector(const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_matrix_t *merges,
         igraph_vector_t *membership,
@@ -996,7 +996,7 @@ igraph_long_t igraph_community_leading_eigenvector(const igraph_t *graph,
  *
  * Time complexity: O(|V|), the number of vertices.
  */
-igraph_long_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
+igraph_error_t igraph_le_community_to_membership(const igraph_matrix_t *merges,
                                       igraph_long_t steps,
                                       igraph_vector_t *membership,
                                       igraph_vector_t *csize) {

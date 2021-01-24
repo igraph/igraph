@@ -34,8 +34,7 @@
 static double igraph_i_log2(double f) {
     return log(f) / log(2.0);
 }
-
-igraph_long_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_long_t size) {
+igraph_error_t igraph_psumtree_init(igraph_psumtree_t *t, igraph_long_t size) {
     t->size = size;
     t->offset = (igraph_long_t) (pow(2, ceil(igraph_i_log2(size))) - 1);
     IGRAPH_CHECK(igraph_vector_init((igraph_vector_t *)t, t->offset + t->size));
@@ -54,8 +53,7 @@ igraph_real_t igraph_psumtree_get(const igraph_psumtree_t *t, igraph_long_t idx)
     const igraph_vector_t *tree = &t->v;
     return VECTOR(*tree)[t->offset + idx];
 }
-
-igraph_long_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_long_t *idx,
+igraph_error_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_long_t *idx,
                            igraph_real_t search) {
     const igraph_vector_t *tree = &t->v;
     igraph_long_t i = 1;
@@ -77,8 +75,7 @@ igraph_long_t igraph_psumtree_search(const igraph_psumtree_t *t, igraph_long_t *
     *idx = i - t->offset - 1;
     return IGRAPH_SUCCESS;
 }
-
-igraph_long_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_long_t idx,
+igraph_error_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_long_t idx,
                            igraph_real_t new_value) {
     const igraph_vector_t *tree = &t->v;
     igraph_real_t difference;
@@ -92,8 +89,7 @@ igraph_long_t igraph_psumtree_update(igraph_psumtree_t *t, igraph_long_t idx,
     }
     return IGRAPH_SUCCESS;
 }
-
-igraph_long_t igraph_psumtree_size(const igraph_psumtree_t *t) {
+igraph_error_t igraph_psumtree_size(const igraph_psumtree_t *t) {
     return t->size;
 }
 

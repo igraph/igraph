@@ -65,7 +65,7 @@
  *
  * \example examples/simple/bellman_ford.c
  */
-igraph_long_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
+igraph_error_t igraph_shortest_paths_bellman_ford(const igraph_t *graph,
                                        igraph_matrix_t *res,
                                        const igraph_vs_t from,
                                        const igraph_vs_t to,

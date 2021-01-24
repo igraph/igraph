@@ -58,7 +58,7 @@
  * Time complexity: O(|V|e*log(|V|)), |V| is the number of vertices, e
  * is \p edges_per_step.
  */
-igraph_long_t igraph_callaway_traits_game(igraph_t *graph, igraph_long_t nodes,
+igraph_error_t igraph_callaway_traits_game(igraph_t *graph, igraph_long_t nodes,
                                 igraph_long_t types, igraph_long_t edges_per_step,
                                 igraph_vector_t *type_dist,
                                 igraph_matrix_t *pref_matrix,

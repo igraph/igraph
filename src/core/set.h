@@ -56,15 +56,14 @@ typedef struct s_set {
 #define IGRAPH_SET_INIT_FINALLY(v, size) \
     do { IGRAPH_CHECK(igraph_set_init(v, size)); \
         IGRAPH_FINALLY(igraph_set_destroy, v); } while (0)
-
-igraph_long_t igraph_set_init(igraph_set_t* set, igraph_long_t size);
+igraph_error_t igraph_set_init(igraph_set_t* set, igraph_long_t size);
 void igraph_set_destroy(igraph_set_t* set);
 igraph_bool_t igraph_set_inited(igraph_set_t* set);
-igraph_long_t igraph_set_reserve(igraph_set_t* set, igraph_long_t size);
+igraph_error_t igraph_set_reserve(igraph_set_t* set, igraph_long_t size);
 igraph_bool_t igraph_set_empty(const igraph_set_t* set);
 void igraph_set_clear(igraph_set_t* set);
-igraph_long_t igraph_set_size(const igraph_set_t* set);
-igraph_long_t igraph_set_add(igraph_set_t* v, igraph_long_t e);
+igraph_error_t igraph_set_size(const igraph_set_t* set);
+igraph_error_t igraph_set_add(igraph_set_t* v, igraph_long_t e);
 igraph_bool_t igraph_set_contains(igraph_set_t* set, igraph_long_t e);
 igraph_bool_t igraph_set_iterate(igraph_set_t* set, igraph_long_t* state,
                                  igraph_long_t* element);

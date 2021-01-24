@@ -671,7 +671,7 @@ const unsigned int igraph_i_classedges_4u[] = { 2, 3, 1, 3, 0, 3, 1, 2, 0, 2, 0,
  * </para><para>
  * Time complexity: O(|E|), the number of edges in the graph.
  */
-igraph_long_t igraph_isoclass(const igraph_t *graph, igraph_long_t *isoclass) {
+igraph_error_t igraph_isoclass(const igraph_t *graph, igraph_long_t *isoclass) {
     igraph_long_t e;
     igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_long_t no_of_edges = igraph_ecount(graph);
@@ -736,7 +736,7 @@ igraph_long_t igraph_isoclass(const igraph_t *graph, igraph_long_t *isoclass) {
  * Time complexity: O((d+n)*n), d is the average degree in the network,
  * and n is the number of vertices in \c vids.
  */
-igraph_long_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
+igraph_error_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
                              igraph_long_t *isoclass) {
     igraph_long_t nodes = (igraph_long_t) igraph_vector_size(vids);
     igraph_bool_t directed = igraph_is_directed(graph);
@@ -816,7 +816,7 @@ igraph_long_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *v
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the graph to create.
  */
-igraph_long_t igraph_isoclass_create(igraph_t *graph, igraph_long_t size,
+igraph_error_t igraph_isoclass_create(igraph_t *graph, igraph_long_t size,
                            igraph_long_t number, igraph_bool_t directed) {
     igraph_vector_t edges;
     const unsigned int *classedges;

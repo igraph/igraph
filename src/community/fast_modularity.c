@@ -619,7 +619,7 @@ static igraph_long_t igraph_i_fastgreedy_community_update_dq(
  *
  * \example examples/simple/igraph_community_fastgreedy.c
  */
-igraph_long_t igraph_community_fastgreedy(const igraph_t *graph,
+igraph_error_t igraph_community_fastgreedy(const igraph_t *graph,
                                 const igraph_vector_t *weights,
                                 igraph_matrix_t *merges,
                                 igraph_vector_t *modularity,

@@ -31,15 +31,15 @@
 #include "layout/merge_grid.h"
 
 /* not 'static', used in tests */
-igraph_long_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
+igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
                               igraph_long_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                               igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
                               igraph_real_t killr);
 
 /* TODO: not 'static' because used in tests */
-igraph_long_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x,
+igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords, igraph_real_t *x,
                               igraph_real_t *y, igraph_real_t *r);
-igraph_long_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
+igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *x,
                               igraph_real_t *y, igraph_real_t *z,
                               igraph_real_t *r);
 
@@ -65,8 +65,7 @@ igraph_long_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords, igraph_real_t *
  * </para><para>
  * Time complexity: TODO.
  */
-
-igraph_long_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
+igraph_error_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
                             igraph_vector_ptr_t *coords,
                             igraph_matrix_t *res) {
     igraph_long_t graphs = igraph_vector_ptr_size(coords);
@@ -190,8 +189,7 @@ igraph_long_t igraph_layout_merge_dla(igraph_vector_ptr_t *thegraphs,
     IGRAPH_FINALLY_CLEAN(8);
     return 0;
 }
-
-igraph_long_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
+igraph_error_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *r) {
     igraph_long_t nodes = igraph_matrix_nrow(coords);
@@ -222,8 +220,7 @@ igraph_long_t igraph_i_layout_sphere_2d(igraph_matrix_t *coords,
 
     return 0;
 }
-
-igraph_long_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
+igraph_error_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
                               igraph_real_t *x, igraph_real_t *y,
                               igraph_real_t *z, igraph_real_t *r) {
     igraph_long_t nodes = igraph_matrix_nrow(coords);
@@ -265,8 +262,7 @@ igraph_long_t igraph_i_layout_sphere_3d(igraph_matrix_t *coords,
 }
 
 #define DIST(x,y) (sqrt(pow((x)-cx,2)+pow((y)-cy,2)))
-
-igraph_long_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
+igraph_error_t igraph_i_layout_merge_dla(igraph_i_layout_mergegrid_t *grid,
                               igraph_long_t actg, igraph_real_t *x, igraph_real_t *y, igraph_real_t r,
                               igraph_real_t cx, igraph_real_t cy, igraph_real_t startr,
                               igraph_real_t killr) {

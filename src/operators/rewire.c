@@ -39,7 +39,7 @@
 #define REWIRE_ADJLIST_THRESHOLD 10
 
 /* Not declared static so that the testsuite can use it, but not part of the public API. */
-igraph_long_t igraph_i_rewire(igraph_t *graph, igraph_long_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
+igraph_error_t igraph_i_rewire(igraph_t *graph, igraph_long_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
     igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_long_t no_of_edges = igraph_ecount(graph);
     char message[256];
@@ -262,7 +262,7 @@ igraph_long_t igraph_i_rewire(igraph_t *graph, igraph_long_t n, igraph_rewiring_
  *
  * Time complexity: TODO.
  */
-igraph_long_t igraph_rewire(igraph_t *graph, igraph_long_t n, igraph_rewiring_t mode) {
+igraph_error_t igraph_rewire(igraph_t *graph, igraph_long_t n, igraph_rewiring_t mode) {
     igraph_bool_t use_adjlist = n >= REWIRE_ADJLIST_THRESHOLD;
     return igraph_i_rewire(graph, n, mode, use_adjlist);
 }

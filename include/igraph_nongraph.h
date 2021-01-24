@@ -70,21 +70,21 @@ typedef struct igraph_plfit_result_t {
     double p;
 } igraph_plfit_result_t;
 
-DECLDIR igraph_long_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
+DECLDIR igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
                                 igraph_long_t binwidth);
-DECLDIR igraph_long_t igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+DECLDIR igraph_error_t igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
                                  igraph_long_t length);
-DECLDIR igraph_long_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
+DECLDIR igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
                                igraph_matrix_t *rescoords);
-DECLDIR igraph_long_t igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
+DECLDIR igraph_error_t igraph_zeroin(igraph_real_t *ax, igraph_real_t *bx,
                           igraph_real_t (*f)(igraph_real_t x, void *info),
                           void *info, igraph_real_t *Tol, igraph_long_t *Maxit, igraph_real_t *res);
-DECLDIR igraph_long_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
+DECLDIR igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
                         igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
                         igraph_long_t maxit, igraph_long_t trace,
                         igraph_real_t abstol, igraph_real_t reltol, igraph_long_t nREPORT, void *ex,
                         igraph_long_t *fncount, igraph_long_t *grcount);
-DECLDIR igraph_long_t igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
+DECLDIR igraph_error_t igraph_power_law_fit(const igraph_vector_t* vector, igraph_plfit_result_t* result,
                                  igraph_real_t xmin, igraph_bool_t force_continuous);
 
 __END_DECLS

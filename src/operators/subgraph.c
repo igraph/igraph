@@ -32,7 +32,7 @@
  * Subgraph creation, old version: it copies the graph and then deletes
  * unneeded vertices.
  */
-igraph_long_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
+igraph_error_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
                                       const igraph_vs_t vids,
                                       igraph_vector_t *map,
                                       igraph_vector_t *invmap) {
@@ -86,7 +86,7 @@ igraph_long_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t 
  * Subgraph creation, new version: creates the new graph instead of
  * copying the old one.
  */
-igraph_long_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
+igraph_error_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
         igraph_t *res,
         const igraph_vs_t vids,
         igraph_vector_t *map,
@@ -293,13 +293,12 @@ igraph_long_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
  * \sa \ref igraph_delete_vertices() to delete the specified set of
  * vertices from a graph, the opposite of this function.
  */
-igraph_long_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
+igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                             const igraph_vs_t vids, igraph_subgraph_implementation_t impl) {
     return igraph_induced_subgraph_map(graph, res, vids, impl, /* map= */ 0,
                                        /* invmap= */ 0);
 }
-
-igraph_long_t igraph_i_induced_subgraph_suggest_implementation(
+igraph_error_t igraph_i_induced_subgraph_suggest_implementation(
     const igraph_t *graph, const igraph_vs_t vids,
     igraph_subgraph_implementation_t *result) {
     double ratio;
@@ -321,8 +320,7 @@ igraph_long_t igraph_i_induced_subgraph_suggest_implementation(
 
     return 0;
 }
-
-igraph_long_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                 const igraph_vs_t vids,
                                 igraph_subgraph_implementation_t impl,
                                 igraph_vector_t *map,
@@ -379,8 +377,7 @@ igraph_long_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
  * \sa \ref igraph_delete_edges() to delete the specified set of
  * edges from a graph, the opposite of this function.
  */
-
-igraph_long_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
+igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
                           const igraph_es_t eids, igraph_bool_t delete_vertices) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);

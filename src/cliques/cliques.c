@@ -335,7 +335,7 @@ static igraph_long_t igraph_i_cliques(const igraph_t *graph, igraph_vector_ptr_t
  *
  * \example examples/simple/igraph_cliques.c
  */
-igraph_long_t igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
+igraph_error_t igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
                    igraph_long_t min_size, igraph_long_t max_size) {
     return igraph_i_cliquer_cliques(graph, res, min_size, max_size);
 }
@@ -368,7 +368,7 @@ igraph_long_t igraph_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
  * Time complexity: Exponential
  *
  */
-igraph_long_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
+igraph_error_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hist,
                             igraph_long_t min_size, igraph_long_t max_size) {
     return igraph_i_cliquer_histogram(graph, hist, min_size, max_size);
 }
@@ -405,7 +405,7 @@ igraph_long_t igraph_clique_size_hist(const igraph_t *graph, igraph_vector_t *hi
  * Time complexity: Exponential
  *
  */
-igraph_long_t igraph_cliques_callback(const igraph_t *graph,
+igraph_error_t igraph_cliques_callback(const igraph_t *graph,
                             igraph_long_t min_size, igraph_long_t max_size,
                             igraph_clique_handler_t *cliquehandler_fn, void *arg) {
     return igraph_i_cliquer_callback(graph, min_size, max_size, cliquehandler_fn, arg);
@@ -447,7 +447,7 @@ igraph_long_t igraph_cliques_callback(const igraph_t *graph,
  * Time complexity: Exponential
  *
  */
-igraph_long_t igraph_weighted_cliques(const igraph_t *graph,
+igraph_error_t igraph_weighted_cliques(const igraph_t *graph,
                             const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
                             igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
     return igraph_i_weighted_cliques(graph, vertex_weights, res, min_weight, max_weight, maximal);
@@ -481,7 +481,7 @@ igraph_long_t igraph_weighted_cliques(const igraph_t *graph,
  *
  * Time complexity: TODO
  */
-igraph_long_t igraph_largest_weighted_cliques(const igraph_t *graph,
+igraph_error_t igraph_largest_weighted_cliques(const igraph_t *graph,
                                     const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res) {
     return igraph_i_largest_weighted_cliques(graph, vertex_weights, res);
 }
@@ -509,7 +509,7 @@ igraph_long_t igraph_largest_weighted_cliques(const igraph_t *graph,
  * Time complexity: TODO
  *
  */
-igraph_long_t igraph_weighted_clique_number(const igraph_t *graph,
+igraph_error_t igraph_weighted_clique_number(const igraph_t *graph,
                                   const igraph_vector_t *vertex_weights, igraph_real_t *res) {
     return igraph_i_weighted_clique_number(graph, vertex_weights, res);
 }
@@ -568,7 +568,7 @@ static igraph_long_t igraph_i_maximal_or_largest_cliques_or_indsets(
  *
  * \example examples/simple/igraph_independent_sets.c
  */
-igraph_long_t igraph_independent_vertex_sets(const igraph_t *graph,
+igraph_error_t igraph_independent_vertex_sets(const igraph_t *graph,
                                    igraph_vector_ptr_t *res,
                                    igraph_long_t min_size,
                                    igraph_long_t max_size) {
@@ -600,8 +600,7 @@ igraph_long_t igraph_independent_vertex_sets(const igraph_t *graph,
  *
  * Time complexity: TODO
  */
-
-igraph_long_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
+igraph_error_t igraph_largest_independent_vertex_sets(const igraph_t *graph,
         igraph_vector_ptr_t *res) {
     return igraph_i_maximal_or_largest_cliques_or_indsets(graph, res, 0, 1, 0);
 }
@@ -807,7 +806,7 @@ static void igraph_i_free_set_array(igraph_set_t* array) {
  *
  * Time complexity: TODO.
  */
-igraph_long_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
+igraph_error_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
         igraph_vector_ptr_t *res) {
     igraph_i_max_ind_vsets_data_t clqdata;
     igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph), i;
@@ -885,7 +884,7 @@ igraph_long_t igraph_maximal_independent_vertex_sets(const igraph_t *graph,
  *
  * Time complexity: TODO.
  */
-igraph_long_t igraph_independence_number(const igraph_t *graph, igraph_long_t *no) {
+igraph_error_t igraph_independence_number(const igraph_t *graph, igraph_long_t *no) {
     igraph_i_max_ind_vsets_data_t clqdata;
     igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph), i;
 
@@ -1056,8 +1055,7 @@ static igraph_long_t igraph_i_largest_cliques_store(const igraph_vector_t* cliqu
  *
  * Time complexity: O(3^(|V|/3)) worst case.
  */
-
-igraph_long_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
+igraph_error_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t *res) {
     igraph_vector_ptr_clear(res);
     IGRAPH_FINALLY(igraph_i_cliques_free_res, res);
     IGRAPH_CHECK(igraph_i_maximal_cliques(graph, &igraph_i_largest_cliques_store, (void*)res));
@@ -1081,7 +1079,7 @@ igraph_long_t igraph_largest_cliques(const igraph_t *graph, igraph_vector_ptr_t 
  *
  * Time complexity: O(3^(|V|/3)) worst case.
  */
-igraph_long_t igraph_clique_number(const igraph_t *graph, igraph_long_t *no) {
+igraph_error_t igraph_clique_number(const igraph_t *graph, igraph_long_t *no) {
     *no = 0;
     return igraph_i_maximal_cliques(graph, &igraph_i_maximal_cliques_store_max_size, (void*)no);
 }

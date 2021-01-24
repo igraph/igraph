@@ -44,7 +44,7 @@
  * Time complexity: O(|V|), the
  * number of vertices.
  */
-igraph_long_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_vs_t order) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);
@@ -86,7 +86,7 @@ igraph_long_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \sa \ref igraph_layout_circle() and other layout generators.
  */
-igraph_long_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
                        igraph_long_t center, const igraph_vector_t *order) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);
@@ -140,7 +140,7 @@ igraph_long_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  */
-igraph_long_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
+igraph_error_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
 
     igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_long_t i;

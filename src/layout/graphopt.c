@@ -345,7 +345,7 @@ static igraph_long_t igraph_i_move_nodes(
  * |V| is the number of vertices, |E| the number
  * of edges. If \p node_charge is zero then it is only O(n|E|).
  */
-igraph_long_t igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_graphopt(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_long_t niter,
                            igraph_real_t node_charge, igraph_real_t node_mass,
                            igraph_real_t spring_length,

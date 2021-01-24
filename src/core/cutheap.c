@@ -79,8 +79,7 @@ void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, igraph_long_t hidx) {
         igraph_i_cutheap_shift_up(ch, PARENT(hidx));
     }
 }
-
-igraph_long_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_long_t nodes) {
+igraph_error_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_long_t nodes) {
     ch->dnodes = nodes;
     IGRAPH_VECTOR_INIT_FINALLY(&ch->heap, nodes); /* all zero */
     IGRAPH_CHECK(igraph_vector_init_seq(&ch->index, 0, nodes - 1));
@@ -101,22 +100,19 @@ igraph_bool_t igraph_i_cutheap_empty(igraph_i_cutheap_t *ch) {
 }
 
 /* Number of active vertices */
-
-igraph_long_t igraph_i_cutheap_active_size(igraph_i_cutheap_t *ch) {
+igraph_error_t igraph_i_cutheap_active_size(igraph_i_cutheap_t *ch) {
     return (igraph_long_t) igraph_vector_size(&ch->heap);
 }
 
 /* Number of all (defined) vertices */
-
-igraph_long_t igraph_i_cutheap_size(igraph_i_cutheap_t *ch) {
+igraph_error_t igraph_i_cutheap_size(igraph_i_cutheap_t *ch) {
     return (igraph_long_t) (ch->dnodes);
 }
 
 igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch) {
     return VECTOR(ch->heap)[0];
 }
-
-igraph_long_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
+igraph_error_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
     igraph_long_t size = igraph_vector_size(&ch->heap);
     igraph_long_t maxindex = (igraph_long_t) VECTOR(ch->index)[0];
     /* put the last element to the top */
@@ -131,8 +127,7 @@ igraph_long_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
 }
 
 /* Update the value of an active vertex, if not active it will be ignored */
-
-igraph_long_t igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_long_t index,
+igraph_error_t igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_long_t index,
                             igraph_real_t add) {
     igraph_real_t hidx = VECTOR(ch->hptr)[(igraph_long_t)index];
     if (hidx != INACTIVE && hidx != UNDEFINED) {
@@ -146,8 +141,7 @@ igraph_long_t igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_long_t inde
 }
 
 /* Reset the value of all vertices to zero and make them active */
-
-igraph_long_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_long_t vertex) {
+igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_long_t vertex) {
     igraph_long_t i, j, n = igraph_vector_size(&ch->hptr);
     /* undefine */
     VECTOR(ch->hptr)[vertex] = UNDEFINED;

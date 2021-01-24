@@ -51,9 +51,9 @@
 #include <stdlib.h>
 
 #ifdef I_AM_QSORT_R
-    typedef igraph_long_t      cmp_t(void *, const void *, const void *);
+    typedef int      cmp_t(void *, const void *, const void *);
 #else
-    typedef igraph_long_t      cmp_t(const void *, const void *);
+    typedef int      cmp_t(const void *, const void *);
 #endif
 static inline char  *med3(char *, char *, char *, cmp_t *, void *);
 static inline void   swapfunc(char *, char *, igraph_long_t, igraph_long_t);

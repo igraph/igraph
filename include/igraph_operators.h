@@ -37,49 +37,49 @@ __BEGIN_DECLS
 /* Graph operators                                    */
 /* -------------------------------------------------- */
 
-DECLDIR igraph_long_t igraph_add_edge(igraph_t *graph, igraph_long_t from, igraph_long_t to);
-DECLDIR igraph_long_t igraph_disjoint_union(igraph_t *res,
+DECLDIR igraph_error_t igraph_add_edge(igraph_t *graph, igraph_long_t from, igraph_long_t to);
+DECLDIR igraph_error_t igraph_disjoint_union(igraph_t *res,
                                   const igraph_t *left, const igraph_t *right);
-DECLDIR igraph_long_t igraph_disjoint_union_many(igraph_t *res,
+DECLDIR igraph_error_t igraph_disjoint_union_many(igraph_t *res,
                                        const igraph_vector_ptr_t *graphs);
-DECLDIR igraph_long_t igraph_union(igraph_t *res, const igraph_t *left, const igraph_t *right,
+DECLDIR igraph_error_t igraph_union(igraph_t *res, const igraph_t *left, const igraph_t *right,
                          igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
-DECLDIR igraph_long_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
+DECLDIR igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
                               igraph_vector_ptr_t *edgemaps);
-DECLDIR igraph_long_t igraph_intersection(igraph_t *res,
+DECLDIR igraph_error_t igraph_intersection(igraph_t *res,
                                 const igraph_t *left, const igraph_t *right,
                                 igraph_vector_t *edge_map1,
                                 igraph_vector_t *edge_map2);
-DECLDIR igraph_long_t igraph_intersection_many(igraph_t *res,
+DECLDIR igraph_error_t igraph_intersection_many(igraph_t *res,
                                      const igraph_vector_ptr_t *graphs,
                                      igraph_vector_ptr_t *edgemaps);
-DECLDIR igraph_long_t igraph_difference(igraph_t *res,
+DECLDIR igraph_error_t igraph_difference(igraph_t *res,
                               const igraph_t *orig, const igraph_t *sub);
-DECLDIR igraph_long_t igraph_complementer(igraph_t *res, const igraph_t *graph,
+DECLDIR igraph_error_t igraph_complementer(igraph_t *res, const igraph_t *graph,
                                 igraph_bool_t loops);
-DECLDIR igraph_long_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
+DECLDIR igraph_error_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
                            igraph_vector_t *edge_map1, igraph_vector_t *edge_map2);
-DECLDIR igraph_long_t igraph_contract_vertices(igraph_t *graph,
+DECLDIR igraph_error_t igraph_contract_vertices(igraph_t *graph,
                                      const igraph_vector_t *mapping,
                                      const igraph_attribute_combination_t
                                      *vertex_comb);
-DECLDIR igraph_long_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
+DECLDIR igraph_error_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
                                     const igraph_vector_t *permutation);
-DECLDIR igraph_long_t igraph_connect_neighborhood(igraph_t *graph, igraph_long_t order,
+DECLDIR igraph_error_t igraph_connect_neighborhood(igraph_t *graph, igraph_long_t order,
                                         igraph_neimode_t mode);
-DECLDIR igraph_long_t igraph_rewire(igraph_t *graph,
+DECLDIR igraph_error_t igraph_rewire(igraph_t *graph,
                           igraph_long_t n, igraph_rewiring_t mode);
-DECLDIR igraph_long_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
+DECLDIR igraph_error_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                             igraph_bool_t loops,
                             const igraph_attribute_combination_t *edge_comb);
-DECLDIR igraph_long_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+DECLDIR igraph_error_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                         const igraph_vs_t vids,
                                         igraph_subgraph_implementation_t impl,
                                         igraph_vector_t *map,
                                         igraph_vector_t *invmap);
-DECLDIR igraph_long_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
+DECLDIR igraph_error_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                                     const igraph_vs_t vids, igraph_subgraph_implementation_t impl);
-DECLDIR igraph_long_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
+DECLDIR igraph_error_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
                                   const igraph_es_t eids, igraph_bool_t delete_vertices);
 
 __END_DECLS

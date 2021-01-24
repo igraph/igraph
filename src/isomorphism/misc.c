@@ -52,7 +52,7 @@
  * \sa \ref igraph_simplify(), \ref igraph_isomorphic_vf2(), \ref igraph_subisomorphic_vf2()
  *
  */
-igraph_long_t igraph_simplify_and_colorize(
+igraph_error_t igraph_simplify_and_colorize(
     const igraph_t *graph, igraph_t *res,
     igraph_vector_long_t *vertex_color, igraph_vector_long_t *edge_color) {
     igraph_es_t es;

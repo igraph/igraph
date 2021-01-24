@@ -29,8 +29,7 @@
 #include "igraph_memory.h"
 #include "igraph_structural.h"
 #include "core/interruption.h"
-
-igraph_long_t igraph_sir_init(igraph_sir_t *sir) {
+igraph_error_t igraph_sir_init(igraph_sir_t *sir) {
     IGRAPH_CHECK(igraph_vector_init(&sir->times, 1));
     IGRAPH_FINALLY(igraph_vector_destroy, &sir->times);
     IGRAPH_CHECK(igraph_vector_long_init(&sir->no_s, 1));
@@ -105,8 +104,7 @@ static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
  *
  * Time complexity: O(no_sim * (|V| + |E| log(|V|))).
  */
-
-igraph_long_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
+igraph_error_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
                igraph_real_t gamma, igraph_long_t no_sim,
                igraph_vector_ptr_t *result) {
 

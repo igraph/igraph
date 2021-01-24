@@ -710,7 +710,7 @@ static igraph_long_t igraph_i_community_leiden_quality(
  * refined partition, using the non-refined partition to create an initial
  * partition for the aggregate network.
  */
-igraph_long_t igraph_i_community_leiden(const igraph_t *graph,
+igraph_error_t igraph_i_community_leiden(const igraph_t *graph,
                               igraph_vector_t *edge_weights, igraph_vector_t *node_weights,
                               const igraph_real_t resolution_parameter, const igraph_real_t beta,
                               igraph_vector_t *membership, igraph_long_t *nb_clusters, igraph_real_t *quality) {
@@ -980,7 +980,7 @@ igraph_long_t igraph_i_community_leiden(const igraph_t *graph,
  *
  * \example examples/simple/igraph_community_leiden.c
  */
-igraph_long_t igraph_community_leiden(const igraph_t *graph,
+igraph_error_t igraph_community_leiden(const igraph_t *graph,
                             const igraph_vector_t *edge_weights, const igraph_vector_t *node_weights,
                             const igraph_real_t resolution_parameter, const igraph_real_t beta, const igraph_bool_t start,
                             igraph_vector_t *membership, igraph_long_t *nb_clusters, igraph_real_t *quality) {

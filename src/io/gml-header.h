@@ -34,7 +34,7 @@ typedef struct {
 /**
  * Initializes a GML parser context.
  */
-igraph_long_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context);
+igraph_error_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context);
 
 /**
  * Destroys a GML parser context, freeing all memory currently used by the

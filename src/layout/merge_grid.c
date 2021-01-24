@@ -45,8 +45,7 @@ static igraph_long_t igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t
 
     return 0;
 }
-
-igraph_long_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
+igraph_error_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
                                    igraph_real_t minx, igraph_real_t maxx, igraph_long_t stepsx,
                                    igraph_real_t miny, igraph_real_t maxy, igraph_long_t stepsy) {
     grid->minx = minx;
@@ -71,8 +70,7 @@ void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid) {
 
 #define MAT(i,j) (grid->data[(grid->stepsy)*(j)+(i)])
 #define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
-
-igraph_long_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+igraph_error_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y, igraph_real_t r,
                                        igraph_long_t id) {
     igraph_long_t cx, cy;
@@ -126,8 +124,7 @@ igraph_long_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *gr
 
     return 0;
 }
-
-igraph_long_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
+igraph_error_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y) {
     igraph_long_t cx, cy;
     igraph_long_t res;
@@ -144,8 +141,7 @@ igraph_long_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
 }
 
 #define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
-
-igraph_long_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *grid,
+igraph_error_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *grid,
         igraph_real_t x, igraph_real_t y, igraph_real_t r) {
     igraph_long_t cx, cy;
     igraph_long_t i, j;

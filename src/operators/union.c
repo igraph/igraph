@@ -61,7 +61,7 @@
  *
  * \example examples/simple/igraph_union.c
  */
-igraph_long_t igraph_union(igraph_t *res,
+igraph_error_t igraph_union(igraph_t *res,
                  const igraph_t *left, const igraph_t *right,
                  igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
     return igraph_i_merge(res, IGRAPH_MERGE_MODE_UNION, left, right,
@@ -102,7 +102,7 @@ igraph_long_t igraph_union(igraph_t *res,
  *
  * \example examples/simple/igraph_union.c
  */
-igraph_long_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
+igraph_error_t igraph_union_many(igraph_t *res, const igraph_vector_ptr_t *graphs,
                       igraph_vector_ptr_t *edgemaps) {
 
     igraph_long_t no_of_graphs = igraph_vector_ptr_size(graphs);

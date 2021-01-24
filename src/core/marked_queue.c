@@ -24,8 +24,7 @@
 #include "core/marked_queue.h"
 
 #define BATCH_MARKER -1
-
-igraph_long_t igraph_marked_queue_init(igraph_marked_queue_t *q,
+igraph_error_t igraph_marked_queue_init(igraph_marked_queue_t *q,
                              igraph_long_t size) {
     IGRAPH_CHECK(igraph_dqueue_init(&q->Q, 0));
     IGRAPH_FINALLY(igraph_dqueue_destroy, &q->Q);
@@ -54,8 +53,7 @@ void igraph_marked_queue_reset(igraph_marked_queue_t *q) {
 igraph_bool_t igraph_marked_queue_empty(const igraph_marked_queue_t *q) {
     return q->size == 0;
 }
-
-igraph_long_t igraph_marked_queue_size(const igraph_marked_queue_t *q) {
+igraph_error_t igraph_marked_queue_size(const igraph_marked_queue_t *q) {
     return q->size;
 }
 
@@ -63,8 +61,7 @@ igraph_bool_t igraph_marked_queue_iselement(const igraph_marked_queue_t *q,
         igraph_long_t elem) {
     return (VECTOR(q->set)[elem] == q->mark);
 }
-
-igraph_long_t igraph_marked_queue_push(igraph_marked_queue_t *q, igraph_long_t elem) {
+igraph_error_t igraph_marked_queue_push(igraph_marked_queue_t *q, igraph_long_t elem) {
     if (VECTOR(q->set)[elem] != q->mark) {
         IGRAPH_CHECK(igraph_dqueue_push(&q->Q, elem));
         VECTOR(q->set)[elem] = q->mark;
@@ -72,8 +69,7 @@ igraph_long_t igraph_marked_queue_push(igraph_marked_queue_t *q, igraph_long_t e
     }
     return 0;
 }
-
-igraph_long_t igraph_marked_queue_start_batch(igraph_marked_queue_t *q) {
+igraph_error_t igraph_marked_queue_start_batch(igraph_marked_queue_t *q) {
     IGRAPH_CHECK(igraph_dqueue_push(&q->Q, BATCH_MARKER));
     return 0;
 }
@@ -90,18 +86,16 @@ void igraph_marked_queue_pop_back_batch(igraph_marked_queue_t *q) {
 }
 
 #ifndef USING_R
-igraph_long_t igraph_marked_queue_print(const igraph_marked_queue_t *q) {
+igraph_error_t igraph_marked_queue_print(const igraph_marked_queue_t *q) {
     IGRAPH_CHECK(igraph_dqueue_print(&q->Q));
     return 0;
 }
 #endif
-
-igraph_long_t igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file) {
+igraph_error_t igraph_marked_queue_fprint(const igraph_marked_queue_t *q, FILE *file) {
     IGRAPH_CHECK(igraph_dqueue_fprint(&q->Q, file));
     return 0;
 }
-
-igraph_long_t igraph_marked_queue_as_vector(const igraph_marked_queue_t *q,
+igraph_error_t igraph_marked_queue_as_vector(const igraph_marked_queue_t *q,
                                   igraph_vector_t *vec) {
     igraph_long_t i, p, n = igraph_dqueue_size(&q->Q);
     IGRAPH_CHECK(igraph_vector_resize(vec, q->size));

@@ -48,7 +48,7 @@
  * Time complexity: O(|V|+|E|), the number of edges plus the number of
  * vertices.
  */
-igraph_long_t igraph_add_edge(igraph_t *graph, igraph_long_t from, igraph_long_t to) {
+igraph_error_t igraph_add_edge(igraph_t *graph, igraph_long_t from, igraph_long_t to) {
     igraph_vector_t edges;
     igraph_long_t ret;
 

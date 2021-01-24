@@ -46,17 +46,16 @@ typedef struct igraph_i_cutheap_t {
     igraph_vector_t hptr;
     igraph_long_t dnodes;
 } igraph_i_cutheap_t;
-
-igraph_long_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_long_t nodes);
+igraph_error_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_long_t nodes);
 void igraph_i_cutheap_destroy(igraph_i_cutheap_t *ch);
 igraph_bool_t igraph_i_cutheap_empty(igraph_i_cutheap_t *ch);
-igraph_long_t igraph_i_cutheap_active_size(igraph_i_cutheap_t *ch);
-igraph_long_t igraph_i_cutheap_size(igraph_i_cutheap_t *ch);
+igraph_error_t igraph_i_cutheap_active_size(igraph_i_cutheap_t *ch);
+igraph_error_t igraph_i_cutheap_size(igraph_i_cutheap_t *ch);
 igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch);
-igraph_long_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch);
-igraph_long_t igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_long_t index,
+igraph_error_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch);
+igraph_error_t igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_long_t index,
                             igraph_real_t add);
-igraph_long_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_long_t vertex);
+igraph_error_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_long_t vertex);
 
 __END_DECLS
 

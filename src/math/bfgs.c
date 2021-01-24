@@ -40,12 +40,11 @@
 in J.C. Nash, `Compact Numerical Methods for Computers', 2nd edition,
 converted by p2c then re-crafted by B.D. Ripley */
 
-igraph_long_t
-igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
-            igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
-            igraph_long_t maxit, igraph_long_t trace,
-            igraph_real_t abstol, igraph_real_t reltol, igraph_long_t nREPORT, void *ex,
-            igraph_long_t *fncount, igraph_long_t *grcount) {
+igraph_error_t igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
+                          igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
+                          igraph_long_t maxit, igraph_long_t trace,
+                          igraph_real_t abstol, igraph_real_t reltol, igraph_long_t nREPORT, void *ex,
+                          igraph_long_t *fncount, igraph_long_t *grcount) {
     igraph_long_t n = (igraph_long_t) igraph_vector_size(b);
     igraph_bool_t accpoint, enough;
     igraph_vector_t g, t, X, c;

@@ -181,7 +181,7 @@ void igraph_i_maximal_cliques_free_full(void *ptr) {
 }
 #endif
 
-igraph_long_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
+igraph_error_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     igraph_vector_long_t *PX, igraph_long_t PS, igraph_long_t PE,
     igraph_long_t XS, igraph_long_t XE, igraph_long_t oldPS, igraph_long_t oldXE,
     igraph_vector_long_t *R,
@@ -239,7 +239,7 @@ igraph_long_t FUNCTION(igraph_i_maximal_cliques_bk, SUFFIX)(
     return 0;
 }
 
-igraph_long_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
+igraph_error_t FUNCTION(igraph_maximal_cliques, SUFFIX)(
     const igraph_t *graph,
     RESTYPE,
     igraph_long_t min_size,

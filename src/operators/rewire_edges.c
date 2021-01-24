@@ -214,7 +214,7 @@ static igraph_long_t igraph_i_rewire_edges_no_multiple(igraph_t *graph, igraph_r
  *
  * Time complexity: O(|V|+|E|).
  */
-igraph_long_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
+igraph_error_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
                         igraph_bool_t loops, igraph_bool_t multiple) {
 
     igraph_t newgraph;
@@ -315,7 +315,7 @@ igraph_long_t igraph_rewire_edges(igraph_t *graph, igraph_real_t prob,
  *
  * Time complexity: O(|E|).
  */
-igraph_long_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
+igraph_error_t igraph_rewire_directed_edges(igraph_t *graph, igraph_real_t prob,
                                  igraph_bool_t loops, igraph_neimode_t mode) {
 
     if (prob < 0 || prob > 1) {

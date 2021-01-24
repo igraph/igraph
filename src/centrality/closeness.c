@@ -93,7 +93,7 @@
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
  *   See \ref igraph_closeness_cutoff() for the range-limited closeness centrality.
  */
-igraph_long_t igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
                      const igraph_vs_t vids, igraph_neimode_t mode,
                      const igraph_vector_t *weights,
                      igraph_bool_t normalized) {
@@ -297,8 +297,7 @@ static igraph_long_t igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
  *
  * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
  */
-
-igraph_long_t igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vs_t vids, igraph_neimode_t mode,
                               igraph_real_t cutoff,
                               const igraph_vector_t *weights,
@@ -365,8 +364,7 @@ igraph_long_t igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *
  *
  * \sa \ref igraph_closeness() to calculate the exact closeness centrality.
  */
-
-igraph_long_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
                             const igraph_vs_t vids, igraph_neimode_t mode,
                             const igraph_vector_t *weights,
                             igraph_bool_t normalized,
@@ -479,8 +477,7 @@ igraph_long_t igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *re
 
 
 /***** Harmonic centrality *****/
-
-igraph_long_t igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_i_harmonic_centrality_unweighted(const igraph_t *graph, igraph_vector_t *res,
                                             const igraph_vs_t vids, igraph_neimode_t mode,
                                             igraph_bool_t normalized,
                                             igraph_real_t cutoff) {
@@ -747,8 +744,7 @@ static igraph_long_t igraph_i_harmonic_centrality_weighted(const igraph_t *graph
  *
  * \sa Other centrality types: \ref igraph_closeness(), \ref igraph_betweenness().
  */
-
-igraph_long_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_vector_t *res,
                                       const igraph_vs_t vids, igraph_neimode_t mode,
                                       const igraph_vector_t *weights,
                                       igraph_bool_t normalized,
@@ -825,8 +821,7 @@ igraph_long_t igraph_harmonic_centrality_cutoff(const igraph_t *graph, igraph_ve
  *
  * \sa Other centrality types: \ref igraph_closeness(), \ref igraph_degree(), \ref igraph_betweenness().
  */
-
-igraph_long_t igraph_harmonic_centrality(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_harmonic_centrality(const igraph_t *graph, igraph_vector_t *res,
                                const igraph_vs_t vids, igraph_neimode_t mode,
                                const igraph_vector_t *weights,
                                igraph_bool_t normalized) {

@@ -29,8 +29,7 @@
 #include "igraph_interface.h"
 #include "config.h"
 #include <math.h>
-
-igraph_long_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids, igraph_neimode_t mode,
                            igraph_vector_t *weights);
 
@@ -64,8 +63,7 @@ igraph_long_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res
  *
  * \example examples/simple/igraph_cocitation.c
  */
-
-igraph_long_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
                       const igraph_vs_t vids) {
     return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT, 0);
 }
@@ -100,8 +98,7 @@ igraph_long_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \example examples/simple/igraph_cocitation.c
  */
-
-igraph_long_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
                        const igraph_vs_t vids) {
     return igraph_cocitation_real(graph, res, vids, IGRAPH_IN, 0);
 }
@@ -157,8 +154,7 @@ igraph_long_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  *
  * \example examples/simple/igraph_similarity.c
  */
-
-igraph_long_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
+igraph_error_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
         igraph_matrix_t *res, const igraph_vs_t vids, igraph_neimode_t mode) {
     igraph_vector_t weights;
     igraph_neimode_t mode0;
@@ -185,8 +181,7 @@ igraph_long_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
     return 0;
 }
-
-igraph_long_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids,
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
@@ -327,7 +322,7 @@ static igraph_long_t igraph_i_neisets_intersect(const igraph_vector_t *v1,
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_long_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
                               const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
     igraph_vit_t vit, vit2;
@@ -435,7 +430,7 @@ igraph_long_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_long_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
                                     const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
     igraph_long_t i, j, k, u, v;
@@ -554,7 +549,7 @@ igraph_long_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vect
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_long_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
                                  const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_vector_t v;
     igraph_eit_t eit;
@@ -629,7 +624,7 @@ igraph_long_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_long_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
                            const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_long_t i, j, nr, nc;
 
@@ -698,7 +693,7 @@ igraph_long_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_long_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
                                  const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_long_t i, n;
 
@@ -763,7 +758,7 @@ igraph_long_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_long_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
+igraph_error_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_long_t i, n;
 

@@ -71,7 +71,7 @@
  *
  * \example examples/simple/igraph_star.c
  */
-igraph_long_t igraph_star(igraph_t *graph, igraph_long_t n, igraph_star_mode_t mode,
+igraph_error_t igraph_star(igraph_t *graph, igraph_long_t n, igraph_star_mode_t mode,
                 igraph_long_t center) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
@@ -176,7 +176,7 @@ igraph_long_t igraph_star(igraph_t *graph, igraph_long_t n, igraph_star_mode_t m
  * and edges in the generated graph. Otherwise it is O(|V|*d^k+|E|), d
  * is the average degree of the graph, k is the \p nei argument.
  */
-igraph_long_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
+igraph_error_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
                    igraph_long_t nei, igraph_bool_t directed, igraph_bool_t mutual,
                    igraph_bool_t circular) {
 
@@ -301,7 +301,7 @@ igraph_long_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
  *
  * \example examples/simple/igraph_ring.c
  */
-igraph_long_t igraph_ring(igraph_t *graph, igraph_long_t n, igraph_bool_t directed,
+igraph_error_t igraph_ring(igraph_t *graph, igraph_long_t n, igraph_bool_t directed,
                 igraph_bool_t mutual, igraph_bool_t circular) {
 
     igraph_vector_t v = IGRAPH_VECTOR_NULL;
@@ -354,7 +354,7 @@ igraph_long_t igraph_ring(igraph_t *graph, igraph_long_t n, igraph_bool_t direct
  *
  * \example examples/simple/igraph_tree.c
  */
-igraph_long_t igraph_tree(igraph_t *graph, igraph_long_t n, igraph_long_t children,
+igraph_error_t igraph_tree(igraph_t *graph, igraph_long_t n, igraph_long_t children,
                 igraph_tree_mode_t type) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
@@ -437,7 +437,7 @@ igraph_long_t igraph_tree(igraph_t *graph, igraph_long_t n, igraph_long_t childr
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-igraph_long_t igraph_extended_chordal_ring(
+igraph_error_t igraph_extended_chordal_ring(
     igraph_t *graph, igraph_long_t nodes, const igraph_matrix_t *W,
     igraph_bool_t directed) {
     igraph_vector_t edges;

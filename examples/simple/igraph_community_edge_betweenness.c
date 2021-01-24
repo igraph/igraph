@@ -22,8 +22,7 @@
 */
 
 #include <igraph.h>
-
-igraph_long_t igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
+igraph_error_t igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
                           const igraph_vector_t* hi) {
     return igraph_vector_all_le(lo, v) && igraph_vector_all_ge(hi, v);
 }

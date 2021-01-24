@@ -59,14 +59,14 @@ typedef struct s_igraph_strvector {
     do { IGRAPH_CHECK(igraph_strvector_init(v, size)); \
         IGRAPH_FINALLY( igraph_strvector_destroy, v); } while (0)
 
-DECLDIR igraph_long_t igraph_strvector_init(igraph_strvector_t *sv, igraph_long_t len);
+DECLDIR igraph_error_t igraph_strvector_init(igraph_strvector_t *sv, igraph_long_t len);
 DECLDIR void igraph_strvector_destroy(igraph_strvector_t *sv);
-DECLDIR igraph_long_t igraph_strvector_size(const igraph_strvector_t *sv);
+DECLDIR igraph_error_t igraph_strvector_size(const igraph_strvector_t *sv);
 DECLDIR void igraph_strvector_get(const igraph_strvector_t *sv,
                                   igraph_long_t idx, char **value);
-DECLDIR igraph_long_t igraph_strvector_set(igraph_strvector_t *sv, igraph_long_t idx,
+DECLDIR igraph_error_t igraph_strvector_set(igraph_strvector_t *sv, igraph_long_t idx,
                                  const char *value);
-DECLDIR igraph_long_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_long_t idx,
+DECLDIR igraph_error_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_long_t idx,
                                   const char *value, igraph_long_t len);
 DECLDIR void igraph_strvector_clear(igraph_strvector_t *sv);
 DECLDIR void igraph_strvector_remove_section(igraph_strvector_t *v, igraph_long_t from,
@@ -74,20 +74,20 @@ DECLDIR void igraph_strvector_remove_section(igraph_strvector_t *v, igraph_long_
 DECLDIR void igraph_strvector_remove(igraph_strvector_t *v, igraph_long_t elem);
 DECLDIR void igraph_strvector_move_interval(igraph_strvector_t *v, igraph_long_t begin,
         igraph_long_t end, igraph_long_t to);
-DECLDIR igraph_long_t igraph_strvector_copy(igraph_strvector_t *to,
+DECLDIR igraph_error_t igraph_strvector_copy(igraph_strvector_t *to,
                                   const igraph_strvector_t *from);
-DECLDIR igraph_long_t igraph_strvector_append(igraph_strvector_t *to,
+DECLDIR igraph_error_t igraph_strvector_append(igraph_strvector_t *to,
                                     const igraph_strvector_t *from);
-DECLDIR igraph_long_t igraph_strvector_resize(igraph_strvector_t* v, igraph_long_t newsize);
-DECLDIR igraph_long_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
+DECLDIR igraph_error_t igraph_strvector_resize(igraph_strvector_t* v, igraph_long_t newsize);
+DECLDIR igraph_error_t igraph_strvector_add(igraph_strvector_t *v, const char *value);
 DECLDIR void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *index,
         igraph_long_t nremove);
 DECLDIR void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t *neg,
         igraph_long_t nremove);
-DECLDIR igraph_long_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
+DECLDIR igraph_error_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
                                    const char *sep);
 
-DECLDIR igraph_long_t igraph_strvector_index(const igraph_strvector_t *v,
+DECLDIR igraph_error_t igraph_strvector_index(const igraph_strvector_t *v,
                                    igraph_strvector_t *newv,
                                    const igraph_vector_t *idx);
 

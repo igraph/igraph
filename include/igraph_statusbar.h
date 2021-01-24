@@ -62,13 +62,13 @@ __BEGIN_DECLS
  *        Existing igraph functions pass a null pointer here.
  */
 
-typedef igraph_long_t igraph_status_handler_t(const char *message, void *data);
+typedef igraph_error_t igraph_status_handler_t(const char *message, void *data);
 
 extern igraph_status_handler_t igraph_status_handler_stderr;
 
 DECLDIR igraph_status_handler_t * igraph_set_status_handler(igraph_status_handler_t new_handler);
 
-DECLDIR igraph_long_t igraph_status(const char *message, void *data);
+DECLDIR igraph_error_t igraph_status(const char *message, void *data);
 
 /**
  * \define IGRAPH_STATUS
@@ -95,7 +95,7 @@ DECLDIR igraph_long_t igraph_status(const char *message, void *data);
         } \
     } while (0)
 
-DECLDIR igraph_long_t igraph_statusf(const char *message, void *data, ...);
+DECLDIR igraph_error_t igraph_statusf(const char *message, void *data, ...);
 
 /**
  * \define IGRAPH_STATUSF

@@ -201,7 +201,7 @@ static void collect_generators(void *generators, unsigned int n, const unsigned 
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_long_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_long_t *colors,
+igraph_error_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_long_t *colors,
                                  igraph_vector_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
@@ -255,7 +255,7 @@ igraph_long_t igraph_canonical_permutation(const igraph_t *graph, const igraph_v
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_long_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_long_t *colors,
+igraph_error_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_long_t *colors,
                          igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
@@ -302,7 +302,7 @@ igraph_long_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_lo
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-igraph_long_t igraph_automorphism_group(
+igraph_error_t igraph_automorphism_group(
     const igraph_t *graph, const igraph_vector_long_t *colors, igraph_vector_ptr_t *generators,
     igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     IGRAPH_HANDLE_EXCEPTIONS(
@@ -390,7 +390,7 @@ igraph_long_t igraph_automorphism_group(
  *
  * Time complexity: exponential, but in practice it is quite fast.
  */
-igraph_long_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
+igraph_error_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
                             const igraph_vector_long_t *colors1, const igraph_vector_long_t *colors2,
                             igraph_bool_t *iso, igraph_vector_t *map12,
                             igraph_vector_t *map21, igraph_bliss_sh_t sh,

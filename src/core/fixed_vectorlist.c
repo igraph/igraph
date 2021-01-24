@@ -36,8 +36,7 @@ void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
     igraph_vector_ptr_destroy(&l->v);
     igraph_free(l->vecs);
 }
-
-igraph_long_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
+igraph_error_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     const igraph_vector_t *from,
                                     igraph_long_t size) {
 

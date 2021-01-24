@@ -35,7 +35,7 @@
 /*
  * \example examples/simple/graph_convergence_degree.c
  */
-igraph_long_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
+igraph_error_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
                               igraph_vector_t *ins, igraph_vector_t *outs) {
     igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_long_t no_of_edges = igraph_ecount(graph);

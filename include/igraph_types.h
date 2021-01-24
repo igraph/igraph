@@ -38,6 +38,12 @@ typedef int32_t igraph_int_t;
 typedef double  igraph_real_t;
 typedef int     igraph_bool_t;
 
+/* We separately typedef igraph_error_t as an int for compatibility
+ * with interpreting an error code as an int. In practice, the return
+ * code igraph_error_t should refer to igraph_error_type_t
+ */
+typedef int igraph_error_t;
+
 #include "igraph_error.h"
 #include <stddef.h>
 #include <math.h>
@@ -45,15 +51,15 @@ typedef int     igraph_bool_t;
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */
-DECLDIR igraph_long_t igraph_real_printf(igraph_real_t val);
-DECLDIR igraph_long_t igraph_real_fprintf(FILE *file, igraph_real_t val);
-DECLDIR igraph_long_t igraph_real_snprintf(char* str, size_t size, igraph_real_t val);
+DECLDIR igraph_error_t igraph_real_printf(igraph_real_t val);
+DECLDIR igraph_error_t igraph_real_fprintf(FILE *file, igraph_real_t val);
+DECLDIR igraph_error_t igraph_real_snprintf(char* str, size_t size, igraph_real_t val);
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) with the largest possible precision */
-DECLDIR igraph_long_t igraph_real_printf_precise(igraph_real_t val);
-DECLDIR igraph_long_t igraph_real_fprintf_precise(FILE *file, igraph_real_t val);
-DECLDIR igraph_long_t igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val);
+DECLDIR igraph_error_t igraph_real_printf_precise(igraph_real_t val);
+DECLDIR igraph_error_t igraph_real_fprintf_precise(FILE *file, igraph_real_t val);
+DECLDIR igraph_error_t igraph_real_snprintf_precise(char* str, size_t size, igraph_real_t val);
 
 /* igraph_i_fdiv is needed here instead of in core/math.h because
  * some constants use it */
@@ -69,13 +75,13 @@ double igraph_i_fdiv(const double a, const double b);
     #define IGRAPH_NEGINFINITY (igraph_i_fdiv(-1.0, 0.0))
 #endif
 
-DECLDIR igraph_long_t igraph_finite(double x);
+DECLDIR igraph_error_t igraph_finite(double x);
 #define IGRAPH_FINITE(x) igraph_finite(x)
 
-DECLDIR igraph_long_t igraph_is_nan(double x);
-DECLDIR igraph_long_t igraph_is_inf(double x);
-DECLDIR igraph_long_t igraph_is_posinf(double x);
-DECLDIR igraph_long_t igraph_is_neginf(double x);
+DECLDIR igraph_error_t igraph_is_nan(double x);
+DECLDIR igraph_error_t igraph_is_inf(double x);
+DECLDIR igraph_error_t igraph_is_posinf(double x);
+DECLDIR igraph_error_t igraph_is_neginf(double x);
 
 #if defined(NAN)
     #define IGRAPH_NAN NAN

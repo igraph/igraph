@@ -63,7 +63,7 @@
  * number of elements in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, init)(TYPE(igraph_matrix) *m, igraph_long_t nrow, igraph_long_t ncol) {
+igraph_error_t FUNCTION(igraph_matrix, init)(TYPE(igraph_matrix) *m, igraph_long_t nrow, igraph_long_t ncol) {
     igraph_long_t ret1;
     ret1 = FUNCTION(igraph_vector, init)(&m->data, nrow * ncol);
     m->nrow = nrow;
@@ -118,7 +118,7 @@ void FUNCTION(igraph_matrix, destroy)(TYPE(igraph_matrix) *m) {
  * Time complexity: O(1).
  */
 
-igraph_long_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m) {
+igraph_error_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m) {
     return FUNCTION(igraph_vector, capacity)(&m->data);
 }
 
@@ -149,7 +149,7 @@ igraph_long_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m) {
  * number of elements in the resized matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_long_t nrow, igraph_long_t ncol) {
+igraph_error_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_long_t nrow, igraph_long_t ncol) {
     FUNCTION(igraph_vector, resize)(&m->data, nrow * ncol);
     m->nrow = nrow;
     m->ncol = ncol;
@@ -177,7 +177,7 @@ igraph_long_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m, igraph_lon
  * Time complexity: operating system dependent.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
+igraph_error_t FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m) {
     TYPE(igraph_vector) tmp;
     igraph_long_t size = FUNCTION(igraph_matrix, size)(m);
     igraph_long_t capacity = FUNCTION(igraph_matrix, capacity)(m);
@@ -220,7 +220,7 @@ igraph_long_t FUNCTION(igraph_matrix, size)(const TYPE(igraph_matrix) *m) {
  * Time complexity: O(1).
  */
 
-igraph_long_t FUNCTION(igraph_matrix, nrow)(const TYPE(igraph_matrix) *m) {
+igraph_error_t FUNCTION(igraph_matrix, nrow)(const TYPE(igraph_matrix) *m) {
     return m->nrow;
 }
 
@@ -235,7 +235,7 @@ igraph_long_t FUNCTION(igraph_matrix, nrow)(const TYPE(igraph_matrix) *m) {
  * Time complexity: O(1).
  */
 
-igraph_long_t FUNCTION(igraph_matrix, ncol)(const TYPE(igraph_matrix) *m) {
+igraph_error_t FUNCTION(igraph_matrix, ncol)(const TYPE(igraph_matrix) *m) {
     return m->ncol;
 }
 
@@ -291,7 +291,7 @@ void FUNCTION(igraph_matrix, null)(TYPE(igraph_matrix) *m) {
  * resized matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, igraph_long_t n) {
+igraph_error_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, igraph_long_t n) {
     FUNCTION(igraph_matrix, resize)(m, m->nrow, m->ncol + n);
     return 0;
 }
@@ -309,7 +309,7 @@ igraph_long_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, igraph_l
  * resized matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, igraph_long_t n) {
+igraph_error_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, igraph_long_t n) {
     igraph_long_t i;
     FUNCTION(igraph_vector, resize)(&m->data, (m->ncol) * (m->nrow + n));
     for (i = m->ncol - 1; i >= 0; i--) {
@@ -333,7 +333,7 @@ igraph_long_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, igraph_l
  * resized matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, remove_col)(TYPE(igraph_matrix) *m, igraph_long_t col) {
+igraph_error_t FUNCTION(igraph_matrix, remove_col)(TYPE(igraph_matrix) *m, igraph_long_t col) {
     FUNCTION(igraph_vector, remove_section)(&m->data, (m->nrow)*col, (m->nrow) * (col + 1));
     m->ncol--;
     return 0;
@@ -348,7 +348,7 @@ igraph_long_t FUNCTION(igraph_matrix, remove_col)(TYPE(igraph_matrix) *m, igraph
  * matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m, igraph_long_t *index, igraph_long_t nremove) {
+igraph_error_t FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m, igraph_long_t *index, igraph_long_t nremove) {
     igraph_long_t i, j;
     for (j = 0; j < m->nrow; j++) {
         if (index[j] != 0) {
@@ -375,7 +375,7 @@ igraph_long_t FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m, i
  * matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
         const igraph_vector_t *neg, igraph_long_t nremove) {
     igraph_long_t i, j, idx = 0;
     for (i = 0; i < m->ncol; i++) {
@@ -407,7 +407,7 @@ igraph_long_t FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
  * of elements in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
+igraph_error_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to, const TYPE(igraph_matrix) *from) {
     to->nrow = from->nrow;
     to->ncol = from->ncol;
     return FUNCTION(igraph_vector, copy)(&to->data, &from->data);
@@ -468,7 +468,7 @@ void FUNCTION(igraph_matrix, scale)(TYPE(igraph_matrix) *m, BASE by) {
  * columns of the result matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, select_rows)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, select_rows)(const TYPE(igraph_matrix) *m,
         TYPE(igraph_matrix) *res,
         const igraph_vector_t *rows) {
     igraph_long_t norows = igraph_vector_size(rows);
@@ -504,7 +504,7 @@ igraph_long_t FUNCTION(igraph_matrix, select_rows)(const TYPE(igraph_matrix) *m,
  * columns of the result matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matrix) *m,
         TYPE(igraph_matrix) *res,
         const igraph_vector_t *rows,
         const igraph_vector_t *cols) {
@@ -537,7 +537,7 @@ igraph_long_t FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matrix
  * Time complexity: O(n), the number of rows in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, get_col)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, get_col)(const TYPE(igraph_matrix) *m,
                                      TYPE(igraph_vector) *res,
                                      igraph_long_t index) {
     igraph_long_t nrow = FUNCTION(igraph_matrix, nrow)(m);
@@ -717,7 +717,7 @@ igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_matrix) *
  * Time complexity: O(mn), the number of elements in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
+igraph_error_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m) {
     igraph_long_t nrow = m->nrow;
     igraph_long_t ncol = m->ncol;
     if (nrow > 1 && ncol > 1) {
@@ -823,7 +823,7 @@ void FUNCTION(igraph_matrix, fill)(TYPE(igraph_matrix) *m, BASE e) {
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, update)(TYPE(igraph_matrix) *to,
+igraph_error_t FUNCTION(igraph_matrix, update)(TYPE(igraph_matrix) *to,
                                     const TYPE(igraph_matrix) *from) {
 
     IGRAPH_CHECK(FUNCTION(igraph_matrix, resize)(to, from->nrow, from->ncol));
@@ -846,7 +846,7 @@ igraph_long_t FUNCTION(igraph_matrix, update)(TYPE(igraph_matrix) *to,
  * matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
+igraph_error_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
                                    const TYPE(igraph_matrix) *from) {
     igraph_long_t tocols = to->ncol, fromcols = from->ncol;
     igraph_long_t torows = to->nrow, fromrows = from->nrow;
@@ -891,7 +891,7 @@ igraph_long_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
  * Time complexity: O(mn), the number of elements on the new matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
+igraph_error_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
                                    const TYPE(igraph_matrix) *from) {
 
     igraph_long_t tocols = to->ncol, fromcols = from->ncol;
@@ -917,7 +917,7 @@ igraph_long_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
  * Time complexity: O(mn), the number of elements in the matrices.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2) {
+igraph_error_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
         IGRAPH_ERROR("Cannot swap non-conformant matrices", IGRAPH_EINVAL);
     }
@@ -938,7 +938,7 @@ igraph_long_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph
  * Time complexity: O(n), the number of columns in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, get_row)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, get_row)(const TYPE(igraph_matrix) *m,
                                      TYPE(igraph_vector) *res, igraph_long_t index) {
     igraph_long_t rows = m->nrow, cols = m->ncol;
     igraph_long_t i, j;
@@ -970,7 +970,7 @@ igraph_long_t FUNCTION(igraph_matrix, get_row)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(n), the number of columns in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, set_row)(TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, set_row)(TYPE(igraph_matrix) *m,
                                      const TYPE(igraph_vector) *v, igraph_long_t index) {
     igraph_long_t rows = m->nrow, cols = m->ncol;
     igraph_long_t i, j;
@@ -1003,7 +1003,7 @@ igraph_long_t FUNCTION(igraph_matrix, set_row)(TYPE(igraph_matrix) *m,
  * Time complexity: O(m), the number of rows in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, set_col)(TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, set_col)(TYPE(igraph_matrix) *m,
                                      const TYPE(igraph_vector) *v, igraph_long_t index) {
     igraph_long_t rows = m->nrow, cols = m->ncol;
     igraph_long_t i, j;
@@ -1033,7 +1033,7 @@ igraph_long_t FUNCTION(igraph_matrix, set_col)(TYPE(igraph_matrix) *m,
  * Time complexity: O(n), the number of columns.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
                                        igraph_long_t i, igraph_long_t j) {
     igraph_long_t ncol = m->ncol, nrow = m->nrow;
     igraph_long_t n = nrow * ncol;
@@ -1066,7 +1066,7 @@ igraph_long_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
  * Time complexity: O(m), the number of rows.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, swap_cols)(TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, swap_cols)(TYPE(igraph_matrix) *m,
                                        igraph_long_t i, igraph_long_t j) {
     igraph_long_t ncol = m->ncol, nrow = m->nrow;
     igraph_long_t k, index1, index2;
@@ -1111,7 +1111,7 @@ void FUNCTION(igraph_matrix, add_constant)(TYPE(igraph_matrix) *m, BASE plus) {
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, add)(TYPE(igraph_matrix) *m1,
+igraph_error_t FUNCTION(igraph_matrix, add)(TYPE(igraph_matrix) *m1,
                                  const TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
         IGRAPH_ERROR("Cannot add non-conformant matrices", IGRAPH_EINVAL);
@@ -1132,7 +1132,7 @@ igraph_long_t FUNCTION(igraph_matrix, add)(TYPE(igraph_matrix) *m1,
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
+igraph_error_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
                                  const TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
         IGRAPH_ERROR("Cannot subtract non-conformant matrices", IGRAPH_EINVAL);
@@ -1153,7 +1153,7 @@ igraph_long_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
+igraph_error_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
         IGRAPH_ERROR("Cannot multiply non-conformant matrices", IGRAPH_EINVAL);
@@ -1174,7 +1174,7 @@ igraph_long_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, div_elements)(TYPE(igraph_matrix) *m1,
+igraph_error_t FUNCTION(igraph_matrix, div_elements)(TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2) {
     if (m1->nrow != m2->nrow || m1->ncol != m2->ncol) {
         IGRAPH_ERROR("Cannot divide non-conformant matrices", IGRAPH_EINVAL);
@@ -1215,7 +1215,7 @@ igraph_real_t FUNCTION(igraph_matrix, min)(const TYPE(igraph_matrix) *m) {
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, which_min)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, which_min)(const TYPE(igraph_matrix) *m,
                                        igraph_long_t *i, igraph_long_t *j) {
     igraph_long_t vmin = FUNCTION(igraph_vector, which_min)(&m->data);
     *i = vmin % m->nrow;
@@ -1239,7 +1239,7 @@ igraph_long_t FUNCTION(igraph_matrix, which_min)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, which_max)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, which_max)(const TYPE(igraph_matrix) *m,
                                        igraph_long_t *i, igraph_long_t *j) {
     igraph_long_t vmax = FUNCTION(igraph_vector, which_max)(&m->data);
     *i = vmax % m->nrow;
@@ -1260,7 +1260,7 @@ igraph_long_t FUNCTION(igraph_matrix, which_max)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
                                     BASE *min, BASE *max) {
     return FUNCTION(igraph_vector, minmax)(&m->data, min, max);
 }
@@ -1285,7 +1285,7 @@ igraph_long_t FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(mn), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
         igraph_long_t *imin, igraph_long_t *jmin,
         igraph_long_t *imax, igraph_long_t *jmax) {
     igraph_long_t vmin, vmax;
@@ -1399,7 +1399,7 @@ BASE FUNCTION(igraph_matrix, prod)(const TYPE(igraph_matrix) *m) {
  * Time complexity: O(mn), the number of elements in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
     igraph_long_t nrow = m->nrow, ncol = m->ncol;
     igraph_long_t r, c;
@@ -1432,7 +1432,7 @@ igraph_long_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(mn), the number of elements in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
                                     TYPE(igraph_vector) *res) {
     igraph_long_t nrow = m->nrow, ncol = m->ncol;
     igraph_long_t r, c;
@@ -1516,7 +1516,7 @@ igraph_bool_t FUNCTION(igraph_matrix, search)(const TYPE(igraph_matrix) *m,
  * Time complexity: O(mn), the number of elements in the matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, igraph_long_t row) {
+igraph_error_t FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, igraph_long_t row) {
 
     igraph_long_t c, r, index = row + 1, leap = 1, n = m->nrow * m->ncol;
     if (row >= m->nrow) {
@@ -1554,7 +1554,7 @@ igraph_long_t FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, igraph
  * columns of the result matrix.
  */
 
-igraph_long_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m,
         TYPE(igraph_matrix) *res,
         const igraph_vector_t *cols) {
     igraph_long_t ncols = igraph_vector_size(cols);
@@ -1573,7 +1573,7 @@ igraph_long_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m,
 #ifdef OUT_FORMAT
 
 #ifndef USING_R
-igraph_long_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
+igraph_error_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
 
     igraph_long_t nr = FUNCTION(igraph_matrix, nrow)(m);
     igraph_long_t nc = FUNCTION(igraph_matrix, ncol)(m);
@@ -1591,7 +1591,7 @@ igraph_long_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m) {
     return 0;
 }
 
-igraph_long_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
                                     const char *format) {
     igraph_long_t nr = FUNCTION(igraph_matrix, nrow)(m);
     igraph_long_t nc = FUNCTION(igraph_matrix, ncol)(m);
@@ -1611,7 +1611,7 @@ igraph_long_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
 
 #endif
 
-igraph_long_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
+igraph_error_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
                                     FILE *file) {
 
     igraph_long_t nr = FUNCTION(igraph_matrix, nrow)(m);

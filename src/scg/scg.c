@@ -346,8 +346,7 @@
  * \example examples/simple/igraph_scg_grouping3.c
  * \example examples/simple/igraph_scg_grouping4.c
  */
-
-igraph_long_t igraph_scg_grouping(const igraph_matrix_t *V,
+igraph_error_t igraph_scg_grouping(const igraph_matrix_t *V,
                         igraph_vector_t *groups,
                         igraph_long_t nt,
                         const igraph_vector_t *nt_vec,
@@ -814,8 +813,7 @@ static igraph_long_t igraph_i_scg_semiprojectors_sto(const igraph_vector_t *grou
  * \example examples/simple/igraph_scg_semiprojectors2.c
  * \example examples/simple/igraph_scg_semiprojectors3.c
  */
-
-igraph_long_t igraph_scg_semiprojectors(const igraph_vector_t *groups,
+igraph_error_t igraph_scg_semiprojectors(const igraph_vector_t *groups,
                               igraph_scg_matrix_t mtype,
                               igraph_matrix_t *L,
                               igraph_matrix_t *R,
@@ -900,8 +898,7 @@ igraph_long_t igraph_scg_semiprojectors(const igraph_vector_t *groups,
  * \ref igraph_scg_laplacian(), \ref igraph_scg_grouping(), \ref
  * igraph_scg_semiprojectors().
  */
-
-igraph_long_t igraph_scg_norm_eps(const igraph_matrix_t *V,
+igraph_error_t igraph_scg_norm_eps(const igraph_matrix_t *V,
                         const igraph_vector_t *groups,
                         igraph_vector_t *eps,
                         igraph_scg_matrix_t mtype,
@@ -1104,7 +1101,7 @@ static igraph_long_t igraph_i_matrix_stochastic(const igraph_matrix_t *matrix,
 }
 
 /* TODO prototype; function is defined in conversion.c */
-igraph_long_t igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
+igraph_error_t igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
                                  igraph_bool_t column_wise);
 
 static igraph_long_t igraph_i_sparsemat_stochastic(const igraph_sparsemat_t *sparse,
@@ -1443,8 +1440,7 @@ static igraph_long_t igraph_i_scg_common_checks(const igraph_t *graph,
  *
  * \example examples/simple/scg.c
  */
-
-igraph_long_t igraph_scg_adjacency(const igraph_t *graph,
+igraph_error_t igraph_scg_adjacency(const igraph_t *graph,
                          const igraph_matrix_t *matrix,
                          const igraph_sparsemat_t *sparsemat,
                          const igraph_vector_t *ev,
@@ -1725,8 +1721,7 @@ igraph_long_t igraph_scg_adjacency(const igraph_t *graph,
  *
  * \example examples/simple/scg2.c
  */
-
-igraph_long_t igraph_scg_stochastic(const igraph_t *graph,
+igraph_error_t igraph_scg_stochastic(const igraph_t *graph,
                           const igraph_matrix_t *matrix,
                           const igraph_sparsemat_t *sparsemat,
                           const igraph_vector_t *ev,
@@ -2083,8 +2078,7 @@ igraph_long_t igraph_scg_stochastic(const igraph_t *graph,
  *
  * \example examples/simple/scg3.c
  */
-
-igraph_long_t igraph_scg_laplacian(const igraph_t *graph,
+igraph_error_t igraph_scg_laplacian(const igraph_t *graph,
                          const igraph_matrix_t *matrix,
                          const igraph_sparsemat_t *sparsemat,
                          const igraph_vector_t *ev,

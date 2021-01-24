@@ -1385,7 +1385,7 @@ static igraph_long_t igraph_i_xml_escape(char* src, char** dest) {
  *
  * \example examples/simple/graphml.c
  */
-igraph_long_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
                               igraph_long_t index) {
 
 #if HAVE_LIBXML == 1
@@ -1484,7 +1484,7 @@ igraph_long_t igraph_read_graph_graphml(igraph_t *graph, FILE *instream,
  *
  * \example examples/simple/graphml.c
  */
-igraph_long_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_graphml(const igraph_t *graph, FILE *outstream,
                                igraph_bool_t prefixattr) {
     igraph_long_t ret;
     igraph_long_t l, vc;

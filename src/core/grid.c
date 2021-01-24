@@ -30,8 +30,7 @@
 #include <math.h>
 
 /* internal function */
-
-igraph_long_t igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t yc,
+igraph_error_t igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igraph_real_t yc,
                         igraph_long_t *x, igraph_long_t *y) {
 
     if (xc <= grid->minx) {
@@ -52,8 +51,7 @@ igraph_long_t igraph_2dgrid_which(igraph_2dgrid_t *grid, igraph_real_t xc, igrap
 
     return 0;
 }
-
-igraph_long_t igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
+igraph_error_t igraph_2dgrid_init(igraph_2dgrid_t *grid, igraph_matrix_t *coords,
                        igraph_real_t minx, igraph_real_t maxx, igraph_real_t deltax,
                        igraph_real_t miny, igraph_real_t maxy, igraph_real_t deltay) {
     igraph_long_t i;
@@ -207,8 +205,7 @@ igraph_real_t igraph_2dgrid_dist2(const igraph_2dgrid_t *grid,
 
     return x * x + y * y;
 }
-
-igraph_long_t igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
+igraph_error_t igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t *eids,
                                 igraph_long_t vid, igraph_real_t r,
                                 igraph_long_t x, igraph_long_t y) {
     igraph_long_t act;
@@ -224,8 +221,7 @@ igraph_long_t igraph_i_2dgrid_addvertices(igraph_2dgrid_t *grid, igraph_vector_t
     }
     return 0;
 }
-
-igraph_long_t igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
+igraph_error_t igraph_2dgrid_neighbors(igraph_2dgrid_t *grid, igraph_vector_t *eids,
                             igraph_long_t vid, igraph_real_t r) {
     igraph_real_t xc = MATRIX(*grid->coords, (igraph_long_t)vid, 0);
     igraph_real_t yc = MATRIX(*grid->coords, (igraph_long_t)vid, 1);
@@ -284,8 +280,7 @@ void igraph_2dgrid_reset(igraph_2dgrid_t *grid, igraph_2dgrid_iterator_t *it) {
         it->vid = (igraph_long_t) MATRIX(grid->startidx, it->x, it->y);
     }
 }
-
-igraph_long_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
+igraph_error_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
                                     igraph_2dgrid_iterator_t *it) {
     igraph_long_t ret = it->vid;
 
@@ -333,8 +328,7 @@ igraph_long_t igraph_2dgrid_next(igraph_2dgrid_t *grid,
 
     return (igraph_long_t) ret;
 }
-
-igraph_long_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
+igraph_error_t igraph_2dgrid_next_nei(igraph_2dgrid_t *grid,
                                         igraph_2dgrid_iterator_t *it) {
     igraph_long_t ret = it->nei;
 

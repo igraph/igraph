@@ -68,8 +68,7 @@
  * |V| is the
  * number of vertices in the graph.
  */
-
-igraph_long_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_get_adjacency_t type, igraph_bool_t eids) {
 
     igraph_eit_t edgeit;
@@ -200,8 +199,7 @@ igraph_long_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
  * |V| is the
  * number of vertices in the graph.
  */
-
-igraph_long_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
+igraph_error_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
                                 igraph_get_adjacency_t type) {
 
     igraph_eit_t edgeit;
@@ -286,8 +284,7 @@ igraph_long_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix
  * Time complexity: O(|E|), the
  * number of edges in the graph.
  */
-
-igraph_long_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol) {
+igraph_error_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol) {
 
     igraph_eit_t edgeit;
     igraph_long_t no_of_edges = igraph_ecount(graph);
@@ -351,8 +348,7 @@ igraph_long_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, i
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-
-igraph_long_t igraph_to_directed(igraph_t *graph,
+igraph_error_t igraph_to_directed(igraph_t *graph,
                        igraph_to_directed_t mode) {
     igraph_long_t no_of_edges = igraph_ecount(graph);
     igraph_long_t no_of_nodes = igraph_vcount(graph);
@@ -487,8 +483,7 @@ igraph_long_t igraph_to_directed(igraph_t *graph,
  *
  * \example examples/simple/igraph_to_undirected.c
  */
-
-igraph_long_t igraph_to_undirected(igraph_t *graph,
+igraph_error_t igraph_to_undirected(igraph_t *graph,
                          igraph_to_undirected_t mode,
                          const igraph_attribute_combination_t *edge_comb) {
 
@@ -795,8 +790,7 @@ igraph_long_t igraph_to_undirected(igraph_t *graph,
  * \sa igraph_get_stochastic_sparsemat(), the sparse version of this
  * function.
  */
-
-igraph_long_t igraph_get_stochastic(const igraph_t *graph,
+igraph_error_t igraph_get_stochastic(const igraph_t *graph,
                           igraph_matrix_t *matrix,
                           igraph_bool_t column_wise) {
 
@@ -831,9 +825,7 @@ igraph_long_t igraph_get_stochastic(const igraph_t *graph,
 
     return 0;
 }
-
-
-igraph_long_t igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
+igraph_error_t igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
                                  igraph_bool_t column_wise) {
     igraph_vector_t sum;
     igraph_long_t no_of_nodes = (igraph_long_t) igraph_sparsemat_nrow(sparsemat);
@@ -888,8 +880,7 @@ igraph_long_t igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
  *
  * \sa igraph_get_stochastic(), the dense version of this function.
  */
-
-igraph_long_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
+igraph_error_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
                                     igraph_sparsemat_t *sparsemat,
                                     igraph_bool_t column_wise) {
 
@@ -926,7 +917,7 @@ igraph_long_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
  * \sa \ref igraph_from_prufer()
  *
  */
-igraph_long_t igraph_to_prufer(const igraph_t *graph, igraph_vector_long_t* prufer) {
+igraph_error_t igraph_to_prufer(const igraph_t *graph, igraph_vector_long_t* prufer) {
     /* For generating the Prüfer sequence, we enumerate the vertices u of the tree.
        We keep track of the degrees of all vertices, treating vertices
        of degree 0 as removed. We maintain the invariant that all leafs

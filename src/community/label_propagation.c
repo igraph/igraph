@@ -71,7 +71,7 @@
  *
  * \example examples/simple/igraph_community_label_propagation.c
  */
-igraph_long_t igraph_community_label_propagation(const igraph_t *graph,
+igraph_error_t igraph_community_label_propagation(const igraph_t *graph,
                                        igraph_vector_t *membership,
                                        const igraph_vector_t *weights,
                                        const igraph_vector_t *initial,

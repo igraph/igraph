@@ -36,24 +36,24 @@ typedef struct igraph_adjlist_t {
     igraph_vector_long_t *adjs;
 } igraph_adjlist_t;
 
-DECLDIR igraph_long_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
+DECLDIR igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                                 igraph_neimode_t mode);
-DECLDIR igraph_long_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_long_t no_of_nodes);
-DECLDIR igraph_long_t igraph_adjlist_size(const igraph_adjlist_t *al);
-DECLDIR igraph_long_t igraph_adjlist_init_complementer(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_long_t no_of_nodes);
+DECLDIR igraph_error_t igraph_adjlist_size(const igraph_adjlist_t *al);
+DECLDIR igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
         igraph_adjlist_t *al,
         igraph_neimode_t mode,
         igraph_bool_t loops);
 DECLDIR void igraph_adjlist_destroy(igraph_adjlist_t *al);
 DECLDIR void igraph_adjlist_clear(igraph_adjlist_t *al);
 DECLDIR void igraph_adjlist_sort(igraph_adjlist_t *al);
-DECLDIR igraph_long_t igraph_adjlist_simplify(igraph_adjlist_t *al);
-DECLDIR igraph_long_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al);
+DECLDIR igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
         igraph_adjlist_t *al);
-DECLDIR igraph_long_t igraph_adjlist_print(const igraph_adjlist_t *al);
-DECLDIR igraph_long_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
+DECLDIR igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al);
+DECLDIR igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
 DECLDIR igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_long_t from, igraph_long_t to, igraph_bool_t directed);
-DECLDIR igraph_long_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_long_t from, igraph_long_t oldto, igraph_long_t newto, igraph_bool_t directed);
+DECLDIR igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_long_t from, igraph_long_t oldto, igraph_long_t newto, igraph_bool_t directed);
 
 /* igraph_vector_long_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
 /*                 igraph_long_t no); */
@@ -71,7 +71,7 @@ DECLDIR igraph_long_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_l
  */
 #define igraph_adjlist_get(al,no) (&(al)->adjs[(igraph_long_t)(no)])
 
-DECLDIR igraph_long_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
+DECLDIR igraph_error_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                            igraph_neimode_t mode, igraph_bool_t duplicate);
 
 typedef struct igraph_inclist_t {
@@ -79,16 +79,16 @@ typedef struct igraph_inclist_t {
     igraph_vector_long_t *incs;
 } igraph_inclist_t;
 
-DECLDIR igraph_long_t igraph_inclist_init(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_inclist_init(const igraph_t *graph,
                                 igraph_inclist_t *il,
                                 igraph_neimode_t mode);
-DECLDIR igraph_long_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_long_t n);
+DECLDIR igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_long_t n);
 DECLDIR void igraph_inclist_destroy(igraph_inclist_t *il);
 DECLDIR void igraph_inclist_clear(igraph_inclist_t *il);
-DECLDIR igraph_long_t igraph_inclist_remove_duplicate(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph,
         igraph_inclist_t *il);
-DECLDIR igraph_long_t igraph_inclist_print(const igraph_inclist_t *il);
-DECLDIR igraph_long_t igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
+DECLDIR igraph_error_t igraph_inclist_print(const igraph_inclist_t *il);
+DECLDIR igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 
 /**
  * \define igraph_inclist_get
@@ -113,7 +113,7 @@ typedef struct igraph_lazy_adjlist_t {
     igraph_lazy_adlist_simplify_t simplify;
 } igraph_lazy_adjlist_t;
 
-DECLDIR igraph_long_t igraph_lazy_adjlist_init(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                                      igraph_lazy_adjlist_t *al,
                                      igraph_neimode_t mode,
                                      igraph_lazy_adlist_simplify_t simplify);
@@ -150,7 +150,7 @@ typedef struct igraph_lazy_inclist_t {
     igraph_neimode_t mode;
 } igraph_lazy_inclist_t;
 
-DECLDIR igraph_long_t igraph_lazy_inclist_init(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
                                      igraph_lazy_inclist_t *il,
                                      igraph_neimode_t mode);
 DECLDIR void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il);

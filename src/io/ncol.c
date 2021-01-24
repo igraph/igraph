@@ -26,11 +26,10 @@
 #include "igraph_interface.h"
 
 #include "ncol-header.h"
-
-igraph_long_t igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
+igraph_error_t igraph_ncol_yylex_init_extra(igraph_i_ncol_parsedata_t* user_defined,
                                   void* scanner);
 void igraph_ncol_yylex_destroy (void *scanner );
-igraph_long_t igraph_ncol_yyparse (igraph_i_ncol_parsedata_t* context);
+igraph_error_t igraph_ncol_yyparse(igraph_i_ncol_parsedata_t* context);
 void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
 
 /**
@@ -94,7 +93,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  */
-igraph_long_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
                            igraph_strvector_t *predefnames,
                            igraph_bool_t names,
                            igraph_add_weights_t weights,
@@ -232,7 +231,7 @@ igraph_long_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
  *
  * \sa \ref igraph_read_graph_ncol(), \ref igraph_write_graph_lgl()
  */
-igraph_long_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
+igraph_error_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                             const char *names, const char *weights) {
     igraph_eit_t it;
     igraph_attribute_type_t nametype, weighttype;

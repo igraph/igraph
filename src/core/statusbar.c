@@ -49,8 +49,7 @@ static IGRAPH_THREAD_LOCAL igraph_status_handler_t *igraph_i_status_handler = 0;
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_status(const char *message, void *data) {
+igraph_error_t igraph_status(const char *message, void *data) {
     if (igraph_i_status_handler) {
         if (igraph_i_status_handler(message, data) != IGRAPH_SUCCESS) {
             return IGRAPH_INTERRUPTED;
@@ -77,8 +76,7 @@ igraph_long_t igraph_status(const char *message, void *data) {
  *        and it did not return with \c IGRAPH_SUCCESS, then
  *        \c IGRAPH_INTERRUPTED is returned by \c igraph_status().
  */
-
-igraph_long_t igraph_statusf(const char *message, void *data, ...) {
+igraph_error_t igraph_statusf(const char *message, void *data, ...) {
     char buffer[300];
     va_list ap;
     va_start(ap, data);
@@ -101,8 +99,7 @@ igraph_long_t igraph_statusf(const char *message, void *data, ...) {
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_status_handler_stderr(const char *message, void *data) {
+igraph_error_t igraph_status_handler_stderr(const char *message, void *data) {
     IGRAPH_UNUSED(data);
     fputs(message, stderr);
     return 0;

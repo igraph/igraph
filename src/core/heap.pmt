@@ -52,7 +52,7 @@ void FUNCTION(igraph_heap, i_switch)(BASE* arr, igraph_long_t e1, igraph_long_t 
  * linear operation.
  */
 
-igraph_long_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_long_t alloc_size) {
+igraph_error_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_long_t alloc_size) {
     if (alloc_size <= 0 ) {
         alloc_size = 1;
     }
@@ -82,7 +82,7 @@ igraph_long_t FUNCTION(igraph_heap, init)(TYPE(igraph_heap)* h, igraph_long_t al
  * Time complexity: O(n), the number of elements in the heap.
  */
 
-igraph_long_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, igraph_long_t len) {
+igraph_error_t FUNCTION(igraph_heap, init_array)(TYPE(igraph_heap) *h, BASE* data, igraph_long_t len) {
     h->stor_begin = igraph_Calloc(len, BASE);
     if (h->stor_begin == 0) {
         IGRAPH_ERROR("heap init from array failed", IGRAPH_ENOMEM);
@@ -149,7 +149,7 @@ igraph_bool_t FUNCTION(igraph_heap, empty)(TYPE(igraph_heap)* h) {
  * that n push operations are performed in O(n log n) time.
  */
 
-igraph_long_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
+igraph_error_t FUNCTION(igraph_heap, push)(TYPE(igraph_heap)* h, BASE elem) {
     IGRAPH_ASSERT(h != NULL);
     IGRAPH_ASSERT(h->stor_begin != NULL);
 
@@ -255,7 +255,7 @@ igraph_long_t FUNCTION(igraph_heap, size)(TYPE(igraph_heap)* h) {
  * number of elements. O(1) otherwise.
  */
 
-igraph_long_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_long_t size) {
+igraph_error_t FUNCTION(igraph_heap, reserve)(TYPE(igraph_heap)* h, igraph_long_t size) {
     igraph_long_t actual_size = FUNCTION(igraph_heap, size)(h);
     BASE *tmp;
     IGRAPH_ASSERT(h != NULL);

@@ -29,8 +29,7 @@
 #include "linalg/arpack_internal.h"
 
 #include "test_utilities.inc"
-
-igraph_long_t igraph_matrix_dgemv(const igraph_matrix_t *m,
+igraph_error_t igraph_matrix_dgemv(const igraph_matrix_t *m,
                         const igraph_vector_t *v,
                         igraph_vector_t *res,
                         igraph_real_t alpha,
@@ -61,8 +60,7 @@ igraph_long_t igraph_matrix_dgemv(const igraph_matrix_t *m,
 
     return 0;
 }
-
-igraph_long_t igraph_matrix_vector_prod(const igraph_matrix_t *m,
+igraph_error_t igraph_matrix_vector_prod(const igraph_matrix_t *m,
                               const igraph_vector_t *v,
                               igraph_vector_t *res) {
     return igraph_matrix_dgemv(m, v, res, 1.0, 0.0, /*transpose=*/ 0);

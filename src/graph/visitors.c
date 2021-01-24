@@ -91,8 +91,7 @@
  * \example examples/simple/igraph_bfs.c
  * \example examples/simple/igraph_bfs2.c
  */
-
-igraph_long_t igraph_bfs(const igraph_t *graph,
+igraph_error_t igraph_bfs(const igraph_t *graph,
                igraph_long_t root, const igraph_vector_t *roots,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                const igraph_vector_t *restricted,
@@ -290,8 +289,7 @@ igraph_long_t igraph_bfs(const igraph_t *graph,
  *
  * TODO
  */
-
-igraph_long_t igraph_i_bfs(igraph_t *graph, igraph_long_t vid, igraph_neimode_t mode,
+igraph_error_t igraph_i_bfs(igraph_t *graph, igraph_long_t vid, igraph_neimode_t mode,
                  igraph_vector_t *vids, igraph_vector_t *layers,
                  igraph_vector_t *parents) {
 
@@ -411,8 +409,7 @@ igraph_long_t igraph_i_bfs(igraph_t *graph, igraph_long_t vid, igraph_neimode_t 
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  */
-
-igraph_long_t igraph_dfs(const igraph_t *graph, igraph_long_t root,
+igraph_error_t igraph_dfs(const igraph_t *graph, igraph_long_t root,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                igraph_vector_t *order,
                igraph_vector_t *order_out, igraph_vector_t *father,

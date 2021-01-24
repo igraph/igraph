@@ -28,9 +28,9 @@
 
 __BEGIN_DECLS
 
-DECLDIR igraph_long_t igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle);
-DECLDIR igraph_long_t igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
-DECLDIR igraph_long_t igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
+DECLDIR igraph_error_t igraph_is_eulerian(const igraph_t *graph, igraph_bool_t *has_path, igraph_bool_t *has_cycle);
+DECLDIR igraph_error_t igraph_eulerian_path(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
+DECLDIR igraph_error_t igraph_eulerian_cycle(const igraph_t *graph, igraph_vector_t *edge_res, igraph_vector_t *vertex_res);
 
 __END_DECLS
 

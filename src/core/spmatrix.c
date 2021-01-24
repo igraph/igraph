@@ -51,8 +51,7 @@
  *
  * Time complexity: operating system dependent.
  */
-
-igraph_long_t igraph_spmatrix_init(igraph_spmatrix_t *m, igraph_long_t nrow, igraph_long_t ncol) {
+igraph_error_t igraph_spmatrix_init(igraph_spmatrix_t *m, igraph_long_t nrow, igraph_long_t ncol) {
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_VECTOR_INIT_FINALLY(&m->ridx, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&m->cidx, ncol + 1);
@@ -99,8 +98,7 @@ void igraph_spmatrix_destroy(igraph_spmatrix_t *m) {
  * Time complexity: O(n), the number
  * of elements in the matrix.
  */
-
-igraph_long_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
+igraph_error_t igraph_spmatrix_copy(igraph_spmatrix_t *to, const igraph_spmatrix_t *from) {
     IGRAPH_ASSERT(from != NULL);
     IGRAPH_ASSERT(to != NULL);
     to->nrow = from->nrow;
@@ -177,7 +175,7 @@ igraph_real_t igraph_spmatrix_e(const igraph_spmatrix_t *m,
  * Time complexity: O(log n), where n is the number of nonzero elements in
  * the requested column.
  */
-igraph_long_t igraph_spmatrix_set(igraph_spmatrix_t *m, igraph_long_t row, igraph_long_t col,
+igraph_error_t igraph_spmatrix_set(igraph_spmatrix_t *m, igraph_long_t row, igraph_long_t col,
                         igraph_real_t value) {
     igraph_long_t start, end;
 
@@ -276,7 +274,7 @@ igraph_long_t igraph_spmatrix_set(igraph_spmatrix_t *m, igraph_long_t row, igrap
  * Time complexity: O(log n), where n is the number of nonzero elements in
  * the requested column.
  */
-igraph_long_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_long_t row, igraph_long_t col,
+igraph_error_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_long_t row, igraph_long_t col,
                           igraph_real_t value) {
     igraph_long_t start, end;
 
@@ -365,7 +363,7 @@ igraph_long_t igraph_spmatrix_add_e(igraph_spmatrix_t *m, igraph_long_t row, igr
  * \param from The index of the column to be added
  * \return Error code.
  */
-igraph_long_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, igraph_long_t to, igraph_long_t from) {
+igraph_error_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, igraph_long_t to, igraph_long_t from) {
     igraph_long_t i;
     /* TODO: I think this implementation could be speeded up if I don't use
      * igraph_spmatrix_add_e directly -- but maybe it's not worth the fuss */
@@ -395,8 +393,7 @@ igraph_long_t igraph_spmatrix_add_col_values(igraph_spmatrix_t *m, igraph_long_t
  * Time complexity: O(n).
  * n is the number of elements in the old matrix.
  */
-
-igraph_long_t igraph_spmatrix_resize(igraph_spmatrix_t *m, igraph_long_t nrow, igraph_long_t ncol) {
+igraph_error_t igraph_spmatrix_resize(igraph_spmatrix_t *m, igraph_long_t nrow, igraph_long_t ncol) {
     igraph_long_t i, j, ci, ei, mincol;
     IGRAPH_ASSERT(m != NULL);
     /* Iterating through the matrix data and deleting unnecessary data. */
@@ -438,8 +435,7 @@ igraph_long_t igraph_spmatrix_resize(igraph_spmatrix_t *m, igraph_long_t nrow, i
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
+igraph_error_t igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return igraph_vector_size(&m->data);
 }
@@ -455,8 +451,7 @@ igraph_long_t igraph_spmatrix_count_nonzero(const igraph_spmatrix_t *m) {
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_spmatrix_size(const igraph_spmatrix_t *m) {
+igraph_error_t igraph_spmatrix_size(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return (m->nrow) * (m->ncol);
 }
@@ -471,8 +466,7 @@ igraph_long_t igraph_spmatrix_size(const igraph_spmatrix_t *m) {
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
+igraph_error_t igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return m->nrow;
 }
@@ -487,8 +481,7 @@ igraph_long_t igraph_spmatrix_nrow(const igraph_spmatrix_t *m) {
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
+igraph_error_t igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     return m->ncol;
 }
@@ -510,8 +503,7 @@ igraph_long_t igraph_spmatrix_ncol(const igraph_spmatrix_t *m) {
  * n is the number of
  * elements in the matrix.
  */
-
-igraph_long_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
+igraph_error_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t *to) {
     igraph_long_t c, dest_idx, idx;
 
     memset(to, 0, sizeof(igraph_real_t) * (size_t) igraph_spmatrix_size(m));
@@ -533,8 +525,7 @@ igraph_long_t igraph_spmatrix_copy_to(const igraph_spmatrix_t *m, igraph_real_t 
  * Time complexity: O(n),
  * n is the number of columns in the matrix
  */
-
-igraph_long_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
+igraph_error_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
     IGRAPH_ASSERT(m != NULL);
     igraph_vector_clear(&m->data);
     igraph_vector_clear(&m->ridx);
@@ -552,8 +543,7 @@ igraph_long_t igraph_spmatrix_null(igraph_spmatrix_t *m) {
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, igraph_long_t n) {
+igraph_error_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, igraph_long_t n) {
     igraph_spmatrix_resize(m, m->nrow, m->ncol + n);
     return 0;
 }
@@ -568,8 +558,7 @@ igraph_long_t igraph_spmatrix_add_cols(igraph_spmatrix_t *m, igraph_long_t n) {
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, igraph_long_t n) {
+igraph_error_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, igraph_long_t n) {
     igraph_spmatrix_resize(m, m->nrow + n, m->ncol);
     return 0;
 }
@@ -582,8 +571,7 @@ igraph_long_t igraph_spmatrix_add_rows(igraph_spmatrix_t *m, igraph_long_t n) {
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
  */
-
-igraph_long_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, igraph_long_t row) {
+igraph_error_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, igraph_long_t row) {
     igraph_long_t ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
@@ -614,8 +602,7 @@ igraph_long_t igraph_spmatrix_clear_row(igraph_spmatrix_t *m, igraph_long_t row)
     IGRAPH_FINALLY_CLEAN(1);
     return 0;
 }
-
-igraph_long_t igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, igraph_long_t row) {
+igraph_error_t igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, igraph_long_t row) {
     igraph_long_t ei, n;
 
     IGRAPH_ASSERT(m != NULL);
@@ -627,8 +614,7 @@ igraph_long_t igraph_i_spmatrix_clear_row_fast(igraph_spmatrix_t *m, igraph_long
     }
     return 0;
 }
-
-igraph_long_t igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
+igraph_error_t igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
     igraph_long_t ci, ei, i, j, nremove = 0, nremove_old = 0;
     igraph_vector_t permvec;
 
@@ -669,8 +655,7 @@ igraph_long_t igraph_i_spmatrix_cleanup(igraph_spmatrix_t *m) {
  *
  * Time complexity: TODO
  */
-
-igraph_long_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, igraph_long_t col) {
+igraph_error_t igraph_spmatrix_clear_col(igraph_spmatrix_t *m, igraph_long_t col) {
     igraph_long_t i, n;
     IGRAPH_ASSERT(m != NULL);
     n = (igraph_long_t)VECTOR(m->cidx)[col + 1] - (igraph_long_t)VECTOR(m->cidx)[col];
@@ -710,8 +695,7 @@ void igraph_spmatrix_scale(igraph_spmatrix_t *m, igraph_real_t by) {
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
  */
-
-igraph_long_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
+igraph_error_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
     igraph_long_t i, c;
     IGRAPH_ASSERT(m != NULL);
     IGRAPH_CHECK(igraph_vector_resize(res, m->ncol));
@@ -733,8 +717,7 @@ igraph_long_t igraph_spmatrix_colsums(const igraph_spmatrix_t *m, igraph_vector_
  *
  * Time complexity: O(n), the number of nonzero elements in the matrix.
  */
-
-igraph_long_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
+igraph_error_t igraph_spmatrix_rowsums(const igraph_spmatrix_t *m, igraph_vector_t *res) {
     igraph_long_t i, n;
     IGRAPH_ASSERT(m != NULL);
 
@@ -858,8 +841,7 @@ igraph_real_t igraph_spmatrix_max(const igraph_spmatrix_t *m,
 
     return res;
 }
-
-igraph_long_t igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
+igraph_error_t igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t *m,
         igraph_vector_t *res, igraph_long_t col) {
     igraph_long_t i, n;
     IGRAPH_ASSERT(m != NULL);
@@ -898,7 +880,7 @@ igraph_long_t igraph_i_spmatrix_get_col_nonzero_indices(const igraph_spmatrix_t 
  *
  * Time complexity: O(1).
  */
-igraph_long_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m) {
+igraph_error_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igraph_spmatrix_t *m) {
     mit->m = m;
     IGRAPH_CHECK(igraph_spmatrix_iter_reset(mit));
     return 0;
@@ -916,7 +898,7 @@ igraph_long_t igraph_spmatrix_iter_create(igraph_spmatrix_iter_t *mit, const igr
  *
  * Time complexity: O(1).
  */
-igraph_long_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
+igraph_error_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
     IGRAPH_ASSERT(mit->m);
 
     if (igraph_spmatrix_count_nonzero(mit->m) == 0) {
@@ -946,7 +928,7 @@ igraph_long_t igraph_spmatrix_iter_reset(igraph_spmatrix_iter_t *mit) {
  *
  * Time complexity: O(1).
  */
-igraph_long_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
+igraph_error_t igraph_spmatrix_iter_next(igraph_spmatrix_iter_t *mit) {
     mit->pos++;
 
     if (igraph_spmatrix_iter_end(mit)) {
@@ -1014,7 +996,7 @@ void igraph_spmatrix_iter_destroy(igraph_spmatrix_iter_t *mit) {
  *
  * Time complexity: O(n), the number of non-zero elements.
  */
-igraph_long_t igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
+igraph_error_t igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
     return igraph_spmatrix_fprint(matrix, stdout);
 }
 #endif
@@ -1030,7 +1012,7 @@ igraph_long_t igraph_spmatrix_print(const igraph_spmatrix_t* matrix) {
  *
  * Time complexity: O(n), the number of non-zero elements.
  */
-igraph_long_t igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *file) {
+igraph_error_t igraph_spmatrix_fprint(const igraph_spmatrix_t* matrix, FILE *file) {
     igraph_spmatrix_iter_t mit;
 
     IGRAPH_CHECK(igraph_spmatrix_iter_create(&mit, matrix));

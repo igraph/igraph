@@ -269,7 +269,7 @@ static igraph_long_t igraph_i_hrg_getsimplegraph(const igraph_t *igraph,
  * Time complexity: O(n), the number of vertices in the graph.
  */
 
-igraph_long_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_long_t n) {
+igraph_error_t igraph_hrg_init(igraph_hrg_t *hrg, igraph_long_t n) {
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->left,      n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->right,     n - 1);
     IGRAPH_VECTOR_INIT_FINALLY(&hrg->prob,      n - 1);
@@ -308,7 +308,7 @@ void igraph_hrg_destroy(igraph_hrg_t *hrg) {
  * Time complexity: O(1).
  */
 
-igraph_long_t igraph_hrg_size(const igraph_hrg_t *hrg) {
+igraph_error_t igraph_hrg_size(const igraph_hrg_t *hrg) {
     return igraph_vector_size(&hrg->left) + 1;
 }
 
@@ -324,7 +324,7 @@ igraph_long_t igraph_hrg_size(const igraph_hrg_t *hrg) {
  * Time complexity: O(n), n is the new size.
  */
 
-igraph_long_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_long_t newsize) {
+igraph_error_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_long_t newsize) {
     igraph_long_t origsize = igraph_hrg_size(hrg);
     igraph_long_t ret = 0;
     igraph_error_handler_t *oldhandler =
@@ -370,7 +370,7 @@ igraph_long_t igraph_hrg_resize(igraph_hrg_t *hrg, igraph_long_t newsize) {
  * Time complexity: TODO.
  */
 
-igraph_long_t igraph_hrg_fit(const igraph_t *graph,
+igraph_error_t igraph_hrg_fit(const igraph_t *graph,
                    igraph_hrg_t *hrg,
                    igraph_bool_t start,
                    igraph_long_t steps) {
@@ -551,7 +551,7 @@ igraph_long_t igraph_hrg_sample(const igraph_t *input_graph,
  * Time complexity: TODO.
  */
 
-igraph_long_t igraph_hrg_game(igraph_t *graph,
+igraph_error_t igraph_hrg_game(igraph_t *graph,
                     const igraph_hrg_t *hrg) {
     return igraph_hrg_sample(/* input_graph= */ 0, /* sample= */ graph,
             /* samples= */ 0, /* no_samples=*/ 1,
@@ -573,7 +573,7 @@ igraph_long_t igraph_hrg_game(igraph_t *graph,
  * Time complexity: O(n), the number of vertices in the graph.
  */
 
-igraph_long_t igraph_hrg_dendrogram(igraph_t *graph,
+igraph_error_t igraph_hrg_dendrogram(igraph_t *graph,
                           const igraph_hrg_t *hrg) {
 
     igraph_long_t orig_nodes = igraph_hrg_size(hrg);
@@ -653,7 +653,7 @@ igraph_long_t igraph_hrg_dendrogram(igraph_t *graph,
  * Time complexity: TODO.
  */
 
-igraph_long_t igraph_hrg_consensus(const igraph_t *graph,
+igraph_error_t igraph_hrg_consensus(const igraph_t *graph,
                          igraph_vector_t *parents,
                          igraph_vector_t *weights,
                          igraph_hrg_t *hrg,
@@ -842,7 +842,7 @@ static igraph_long_t recordPredictions(pblock *br_list, igraph_vector_t *edges,
  * Time complexity: TODO.
  */
 
-igraph_long_t igraph_hrg_predict(const igraph_t *graph,
+igraph_error_t igraph_hrg_predict(const igraph_t *graph,
                        igraph_vector_t *edges,
                        igraph_vector_t *prob,
                        igraph_hrg_t *hrg,
@@ -915,7 +915,7 @@ igraph_long_t igraph_hrg_predict(const igraph_t *graph,
  * Time complexity: O(n), the number of vertices in the tree.
  */
 
-igraph_long_t igraph_hrg_create(igraph_hrg_t *hrg,
+igraph_error_t igraph_hrg_create(igraph_hrg_t *hrg,
                       const igraph_t *graph,
                       const igraph_vector_t *prob) {
 

@@ -68,8 +68,7 @@
 #include "igraph_error.h"
 #include "igraph_types.h"
 #include "igraph_vector.h"
-
-igraph_long_t igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, igraph_long_t *gr,
+igraph_error_t igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, igraph_long_t *gr,
                                    igraph_long_t n, igraph_long_t n_interv,
                                    igraph_long_t maxiter) {
     igraph_long_t i;
@@ -91,8 +90,7 @@ igraph_long_t igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, igraph_lo
 
     return 0;
 }
-
-igraph_long_t igraph_i_intervals_method(const igraph_vector_t *v, igraph_long_t *gr, igraph_long_t n,
+igraph_error_t igraph_i_intervals_method(const igraph_vector_t *v, igraph_long_t *gr, igraph_long_t n,
                               igraph_long_t n_interv) {
     igraph_long_t i, lo, hi, new;
     const igraph_long_t lft = 1;
@@ -128,8 +126,7 @@ igraph_long_t igraph_i_intervals_method(const igraph_vector_t *v, igraph_long_t 
 
     return 0;
 }
-
-igraph_long_t igraph_i_breaks_computation(const igraph_vector_t *v,
+igraph_error_t igraph_i_breaks_computation(const igraph_vector_t *v,
                                 igraph_vector_t *breaks,
                                 igraph_long_t nb, igraph_long_t method) {
     igraph_long_t i;

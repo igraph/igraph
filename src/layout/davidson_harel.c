@@ -136,8 +136,7 @@ float igraph_i_layout_point_segment_dist2(float v_x, float v_y,
  * components of the energy function are set to zero.
  *
  */
-
-igraph_long_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
+igraph_error_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
                                  igraph_bool_t use_seed, igraph_long_t maxiter,
                                  igraph_long_t fineiter, igraph_real_t cool_fact,
                                  igraph_real_t weight_node_dist, igraph_real_t weight_border,

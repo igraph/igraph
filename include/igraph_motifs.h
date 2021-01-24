@@ -64,32 +64,32 @@ typedef igraph_bool_t igraph_motifs_handler_t(const igraph_t *graph,
         igraph_long_t isoclass,
         void* extra);
 
-DECLDIR igraph_long_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
+DECLDIR igraph_error_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
                                   igraph_long_t size, const igraph_vector_t *cut_prob);
 
-DECLDIR igraph_long_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_long_t size,
+DECLDIR igraph_error_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_long_t size,
         const igraph_vector_t *cut_prob,
         igraph_motifs_handler_t *callback,
         void* extra);
 
-DECLDIR igraph_long_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_long_t *est,
+DECLDIR igraph_error_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_long_t *est,
         igraph_long_t size, const igraph_vector_t *cut_prob,
         igraph_long_t sample_size,
         const igraph_vector_t *sample);
-DECLDIR igraph_long_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_long_t *no,
+DECLDIR igraph_error_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_long_t *no,
                                      igraph_long_t size, const igraph_vector_t *cut_prob);
 
-DECLDIR igraph_long_t igraph_dyad_census(const igraph_t *graph, igraph_long_t *mut,
+DECLDIR igraph_error_t igraph_dyad_census(const igraph_t *graph, igraph_long_t *mut,
                                igraph_long_t *asym, igraph_long_t *null);
-DECLDIR igraph_long_t igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
-DECLDIR igraph_long_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
+DECLDIR igraph_error_t igraph_triad_census(const igraph_t *igraph, igraph_vector_t *res);
+DECLDIR igraph_error_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
                                    igraph_real_t *res4);
 
-DECLDIR igraph_long_t igraph_adjacent_triangles(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
                                       igraph_vector_t *res,
                                       const igraph_vs_t vids);
 
-DECLDIR igraph_long_t igraph_list_triangles(const igraph_t *graph,
+DECLDIR igraph_error_t igraph_list_triangles(const igraph_t *graph,
                                   igraph_vector_long_t *res);
 
 __END_DECLS

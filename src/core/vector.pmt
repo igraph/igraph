@@ -121,7 +121,7 @@
  * n is the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_vector, init)      (TYPE(igraph_vector)* v, igraph_long_t size) {
+igraph_error_t FUNCTION(igraph_vector, init)      (TYPE(igraph_vector)* v, igraph_long_t size) {
     igraph_long_t alloc_size = size > 0 ? size : 1;
     if (size < 0) {
         size = 0;
@@ -200,7 +200,7 @@ const TYPE(igraph_vector)*FUNCTION(igraph_vector, view) (const TYPE(igraph_vecto
  * elements in the vector.
  */
 
-igraph_long_t FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector) *v, igraph_long_t no, ...) {
+igraph_error_t FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector) *v, igraph_long_t no, ...) {
     igraph_long_t i = 0;
     va_list ap;
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, no));
@@ -239,7 +239,7 @@ igraph_long_t FUNCTION(igraph_vector, init_real)(TYPE(igraph_vector) *v, igraph_
  * complexity of the memory allocation.
  */
 
-igraph_long_t FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector) *v,
         double endmark, ...) {
     igraph_long_t i = 0, n = 0;
     va_list ap;
@@ -290,7 +290,7 @@ igraph_long_t FUNCTION(igraph_vector, init_real_end)(TYPE(igraph_vector) *v,
  * complexity of the memory allocation.
  */
 
-igraph_long_t FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector) *v, igraph_long_t no, ...) {
+igraph_error_t FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector) *v, igraph_long_t no, ...) {
     igraph_long_t i = 0;
     va_list ap;
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, no));
@@ -329,7 +329,7 @@ igraph_long_t FUNCTION(igraph_vector, init_int)(TYPE(igraph_vector) *v, igraph_l
  * complexity of the memory allocation.
  */
 
-igraph_long_t FUNCTION(igraph_vector_init, int_end)(TYPE(igraph_vector) *v, igraph_long_t endmark, ...) {
+igraph_error_t FUNCTION(igraph_vector_init, int_end)(TYPE(igraph_vector) *v, igraph_long_t endmark, ...) {
     igraph_long_t i = 0, n = 0;
     va_list ap;
 
@@ -399,7 +399,7 @@ void FUNCTION(igraph_vector, destroy)   (TYPE(igraph_vector)* v) {
  * Time complexity: O(1).
  */
 
-igraph_long_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v) {
+igraph_error_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v) {
     return v->stor_end - v->stor_begin;
 }
 
@@ -431,7 +431,7 @@ igraph_long_t FUNCTION(igraph_vector, capacity)(const TYPE(igraph_vector)*v) {
  * is the new allocated size of the vector.
  */
 
-igraph_long_t FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, igraph_long_t size) {
+igraph_error_t FUNCTION(igraph_vector, reserve)   (TYPE(igraph_vector)* v, igraph_long_t size) {
     igraph_long_t actual_size = FUNCTION(igraph_vector, size)(v);
     BASE *tmp;
     IGRAPH_ASSERT(v != NULL);
@@ -531,7 +531,7 @@ void FUNCTION(igraph_vector, clear)     (TYPE(igraph_vector)* v) {
  * complexity of memory allocation is at most linear.)
  */
 
-igraph_long_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE e) {
+igraph_error_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE e) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
@@ -564,7 +564,7 @@ igraph_long_t FUNCTION(igraph_vector, push_back) (TYPE(igraph_vector)* v, BASE e
  * \param pos The position where the new element is to be inserted.
  * \param value The new element to be inserted.
  */
-igraph_long_t FUNCTION(igraph_vector, insert)(TYPE(igraph_vector) *v, igraph_long_t pos,
+igraph_error_t FUNCTION(igraph_vector, insert)(TYPE(igraph_vector) *v, igraph_long_t pos,
                                     BASE value) {
     size_t size = (size_t) FUNCTION(igraph_vector, size)(v);
     if (pos < 0) {
@@ -747,7 +747,7 @@ BASE FUNCTION(igraph_vector, pop_back)(TYPE(igraph_vector)* v) {
  * \ref igraph_vector_sort().
  */
 
-igraph_long_t FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
+int FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
     const BASE *da = (const BASE *) a;
     const BASE *db = (const BASE *) b;
 
@@ -761,7 +761,7 @@ igraph_long_t FUNCTION(igraph_vector, sort_cmp)(const void *a, const void *b) {
  * \ref igraph_vector_reverse_sort().
  */
 
-igraph_long_t FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
+igraph_error_t FUNCTION(igraph_vector, reverse_sort_cmp)(const void *a, const void *b) {
     const BASE *da = (const BASE *) a;
     const BASE *db = (const BASE *) b;
 
@@ -807,7 +807,7 @@ void FUNCTION(igraph_vector, reverse_sort)(TYPE(igraph_vector) *v) {
 /**
  * Ascending comparison function passed to qsort from  igraph_vector_qsort_ind
  */
-igraph_long_t FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2) {
+igraph_error_t FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const void *p2) {
     BASE **pa = (BASE **) p1;
     BASE **pb = (BASE **) p2;
     if ( **pa < **pb ) {
@@ -822,7 +822,7 @@ igraph_long_t FUNCTION(igraph_vector, i_qsort_ind_cmp_asc)(const void *p1, const
 /**
  * Descending comparison function passed to qsort from  igraph_vector_qsort_ind
  */
-igraph_long_t FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2) {
+igraph_error_t FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, const void *p2) {
     BASE **pa = (BASE **) p1;
     BASE **pb = (BASE **) p2;
     if ( **pa < **pb ) {
@@ -862,7 +862,7 @@ igraph_long_t FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, cons
  * for small vectors to a factor of two for large vectors.
  */
 
-igraph_long_t FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
         igraph_vector_t *inds, igraph_bool_t descending) {
     igraph_long_t i;
     BASE **vind, *first;
@@ -921,7 +921,7 @@ igraph_long_t FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
  * n is the new size of the vector.
  */
 
-igraph_long_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_long_t newsize) {
+igraph_error_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_long_t newsize) {
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
     IGRAPH_CHECK(FUNCTION(igraph_vector, reserve)(v, newsize));
@@ -945,7 +945,7 @@ igraph_long_t FUNCTION(igraph_vector, resize)(TYPE(igraph_vector)* v, igraph_lon
  * Time complexity: operating system dependent.
  */
 
-igraph_long_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
+igraph_error_t FUNCTION(igraph_vector, resize_min)(TYPE(igraph_vector)*v) {
     size_t size;
     BASE *tmp;
     if (v->stor_end == v->end) {
@@ -1026,7 +1026,7 @@ BASE FUNCTION(igraph_vector, max)(const TYPE(igraph_vector)* v) {
  *
  * Time complexity: O(n), n is the size of the vector.
  */
-igraph_long_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
+igraph_error_t FUNCTION(igraph_vector, which_max)(const TYPE(igraph_vector)* v) {
     if (!FUNCTION(igraph_vector, empty)(v)) {
         BASE max;
         BASE *ptr;
@@ -1107,7 +1107,7 @@ BASE FUNCTION(igraph_vector, min)(const TYPE(igraph_vector)* v) {
  *
  * Time complexity: O(n), the number of elements.
  */
-igraph_long_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
+igraph_error_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
     if (!FUNCTION(igraph_vector, empty)(v)) {
         BASE min;
         BASE *ptr;
@@ -1158,7 +1158,7 @@ igraph_long_t FUNCTION(igraph_vector, which_min)(const TYPE(igraph_vector)* v) {
  * O(\p length).
  */
 
-igraph_long_t FUNCTION(igraph_vector, init_copy)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, init_copy)(TYPE(igraph_vector) *v,
                                        const BASE *data, igraph_long_t length) {
     v->stor_begin = igraph_Calloc(length, BASE);
     if (v->stor_begin == 0) {
@@ -1212,7 +1212,7 @@ void FUNCTION(igraph_vector, copy_to)(const TYPE(igraph_vector) *v, BASE *to) {
  * n is the size of the vector.
  */
 
-igraph_long_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
+igraph_error_t FUNCTION(igraph_vector, copy)(TYPE(igraph_vector) *to,
                                   const TYPE(igraph_vector) *from) {
     IGRAPH_ASSERT(from != NULL);
     IGRAPH_ASSERT(from->stor_begin != NULL);
@@ -1316,7 +1316,7 @@ BASE FUNCTION(igraph_vector, prod)(const TYPE(igraph_vector) *v) {
  * Time complexity: O(n), the size of the vector.
  */
 
-igraph_long_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
+igraph_error_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     BASE res = ZERO;
     BASE *p, *p2;
@@ -1360,7 +1360,7 @@ igraph_long_t FUNCTION(igraph_vector, cumsum)(TYPE(igraph_vector) *to,
  * of elements in the vector.
  */
 
-igraph_long_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, init_seq)(TYPE(igraph_vector) *v,
                                       BASE from, BASE to) {
     BASE *p;
     IGRAPH_CHECK(FUNCTION(igraph_vector, init)(v, (igraph_long_t) (to - from + 1)));
@@ -1441,7 +1441,7 @@ void FUNCTION(igraph_vector, remove)(TYPE(igraph_vector) *v, igraph_long_t elem)
  * Time complexity: O(end-begin).
  */
 
-igraph_long_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
         igraph_long_t begin, igraph_long_t end,
         igraph_long_t to) {
     IGRAPH_ASSERT(v != NULL);
@@ -1452,7 +1452,7 @@ igraph_long_t FUNCTION(igraph_vector, move_interval)(TYPE(igraph_vector) *v,
     return 0;
 }
 
-igraph_long_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, move_interval2)(TYPE(igraph_vector) *v,
         igraph_long_t begin, igraph_long_t end,
         igraph_long_t to) {
     IGRAPH_ASSERT(v != NULL);
@@ -2029,7 +2029,7 @@ igraph_bool_t FUNCTION(igraph_vector, search)(const TYPE(igraph_vector) *v,
  * \ingroup internal
  */
 
-igraph_long_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
         BASE elem) {
     igraph_long_t i = 0, n = FUNCTION(igraph_vector, size)(v);
     igraph_long_t s;
@@ -2060,7 +2060,7 @@ igraph_long_t FUNCTION(igraph_vector, filter_smaller)(TYPE(igraph_vector) *v,
  * Time complexity: O(n), the number of elements in the new vector.
  */
 
-igraph_long_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
+igraph_error_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     igraph_long_t tosize, fromsize;
 
@@ -2078,7 +2078,7 @@ igraph_long_t FUNCTION(igraph_vector, append)(TYPE(igraph_vector) *to,
  * \function igraph_vector_get_interval
  */
 
-igraph_long_t FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, get_interval)(const TYPE(igraph_vector) *v,
         TYPE(igraph_vector) *res,
         igraph_long_t from, igraph_long_t to) {
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(res, to - from));
@@ -2139,7 +2139,7 @@ igraph_real_t FUNCTION(igraph_vector, maxdifference)(const TYPE(igraph_vector) *
  * Time complexity: O(n), the number of elements in \p from.
  */
 
-igraph_long_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
+igraph_error_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
                                     const TYPE(igraph_vector) *from) {
     size_t n = (size_t) FUNCTION(igraph_vector, size)(from);
     FUNCTION(igraph_vector, resize)(to, (igraph_long_t) n);
@@ -2160,7 +2160,7 @@ igraph_long_t FUNCTION(igraph_vector, update)(TYPE(igraph_vector) *to,
  * Time complexity: O(n), the length of the vectors.
  */
 
-igraph_long_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
+igraph_error_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph_vector) *v2) {
 
     igraph_long_t i, n1 = FUNCTION(igraph_vector, size)(v1);
     igraph_long_t n2 = FUNCTION(igraph_vector, size)(v2);
@@ -2192,7 +2192,7 @@ igraph_long_t FUNCTION(igraph_vector, swap)(TYPE(igraph_vector) *v1, TYPE(igraph
  * Time complexity: O(1).
  */
 
-igraph_long_t FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
         igraph_long_t i, igraph_long_t j) {
     BASE tmp = VECTOR(*v)[i];
     VECTOR(*v)[i] = VECTOR(*v)[j];
@@ -2213,7 +2213,7 @@ igraph_long_t FUNCTION(igraph_vector, swap_elements)(TYPE(igraph_vector) *v,
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
+igraph_error_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
 
     igraph_long_t n = FUNCTION(igraph_vector, size)(v), n2 = n / 2;
     igraph_long_t i, j;
@@ -2259,7 +2259,7 @@ igraph_long_t FUNCTION(igraph_vector, reverse)(TYPE(igraph_vector) *v) {
  * \example examples/simple/igraph_fisher_yates_shuffle.c
  */
 
-igraph_long_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
+igraph_error_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
     igraph_long_t n = FUNCTION(igraph_vector, size)(v);
     igraph_long_t k;
     BASE dummy;
@@ -2290,7 +2290,7 @@ igraph_long_t FUNCTION(igraph_vector, shuffle)(TYPE(igraph_vector) *v) {
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_vector, add)(TYPE(igraph_vector) *v1,
+igraph_error_t FUNCTION(igraph_vector, add)(TYPE(igraph_vector) *v1,
                                  const TYPE(igraph_vector) *v2) {
 
     igraph_long_t n1 = FUNCTION(igraph_vector, size)(v1);
@@ -2326,7 +2326,7 @@ igraph_long_t FUNCTION(igraph_vector, add)(TYPE(igraph_vector) *v1,
  * Time complexity: O(n), the length of the vectors.
  */
 
-igraph_long_t FUNCTION(igraph_vector, sub)(TYPE(igraph_vector) *v1,
+igraph_error_t FUNCTION(igraph_vector, sub)(TYPE(igraph_vector) *v1,
                                  const TYPE(igraph_vector) *v2) {
 
     igraph_long_t n1 = FUNCTION(igraph_vector, size)(v1);
@@ -2361,7 +2361,7 @@ igraph_long_t FUNCTION(igraph_vector, sub)(TYPE(igraph_vector) *v1,
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_vector, mul)(TYPE(igraph_vector) *v1,
+igraph_error_t FUNCTION(igraph_vector, mul)(TYPE(igraph_vector) *v1,
                                  const TYPE(igraph_vector) *v2) {
 
     igraph_long_t n1 = FUNCTION(igraph_vector, size)(v1);
@@ -2398,7 +2398,7 @@ igraph_long_t FUNCTION(igraph_vector, mul)(TYPE(igraph_vector) *v1,
  * Time complexity: O(n), the length of the vectors.
  */
 
-igraph_long_t FUNCTION(igraph_vector, div)(TYPE(igraph_vector) *v1,
+igraph_error_t FUNCTION(igraph_vector, div)(TYPE(igraph_vector) *v1,
                                  const TYPE(igraph_vector) *v2) {
 
     igraph_long_t n1 = FUNCTION(igraph_vector, size)(v1);
@@ -2422,7 +2422,7 @@ igraph_long_t FUNCTION(igraph_vector, div)(TYPE(igraph_vector) *v1,
 
 #ifndef NOABS
 
-igraph_long_t FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
+igraph_error_t FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
 #ifdef UNSIGNED
     /* Nothing do to, unsigned type */
     IGRAPH_UNUSED(v);
@@ -2456,7 +2456,7 @@ igraph_long_t FUNCTION(igraph_vector, abs)(TYPE(igraph_vector) *v) {
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
                                     BASE *min, BASE *max) {
     igraph_long_t n = FUNCTION(igraph_vector, size)(v);
     igraph_long_t i;
@@ -2489,7 +2489,7 @@ igraph_long_t FUNCTION(igraph_vector, minmax)(const TYPE(igraph_vector) *v,
  * Time complexity: O(n), the number of elements.
  */
 
-igraph_long_t FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, which_minmax)(const TYPE(igraph_vector) *v,
         igraph_long_t *which_min, igraph_long_t *which_max) {
 
     igraph_long_t n = FUNCTION(igraph_vector, size)(v);
@@ -2542,7 +2542,7 @@ igraph_bool_t FUNCTION(igraph_vector, isnull)(const TYPE(igraph_vector) *v) {
 
 #ifndef NOTORDERED
 
-igraph_long_t FUNCTION(igraph_i_vector, intersect_sorted)(
+igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
     const TYPE(igraph_vector) *v1, igraph_long_t begin1, igraph_long_t end1,
     const TYPE(igraph_vector) *v2, igraph_long_t begin2, igraph_long_t end2,
     TYPE(igraph_vector) *result);
@@ -2577,7 +2577,7 @@ igraph_long_t FUNCTION(igraph_i_vector, intersect_sorted)(
  * Time complexity: O(m log(n)) where m is the size of the smaller vector
  * and n is the size of the larger one.
  */
-igraph_long_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
+igraph_error_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector) *v1,
         const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
     igraph_long_t size1, size2;
 
@@ -2595,7 +2595,7 @@ igraph_long_t FUNCTION(igraph_vector, intersect_sorted)(const TYPE(igraph_vector
     return 0;
 }
 
-igraph_long_t FUNCTION(igraph_i_vector, intersect_sorted)(
+igraph_error_t FUNCTION(igraph_i_vector, intersect_sorted)(
     const TYPE(igraph_vector) *v1, igraph_long_t begin1, igraph_long_t end1,
     const TYPE(igraph_vector) *v2, igraph_long_t begin2, igraph_long_t end2,
     TYPE(igraph_vector) *result) {
@@ -2650,7 +2650,7 @@ igraph_long_t FUNCTION(igraph_i_vector, intersect_sorted)(
  * \param v2 the second vector
  * \param result the result vector
  */
-igraph_long_t FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vector) *v1,
+igraph_error_t FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vector) *v1,
         const TYPE(igraph_vector) *v2, TYPE(igraph_vector) *result) {
     igraph_long_t i, j, i0, j0;
     i0 = FUNCTION(igraph_vector, size)(v1);
@@ -2713,7 +2713,7 @@ igraph_long_t FUNCTION(igraph_vector, difference_sorted)(const TYPE(igraph_vecto
 #if defined(OUT_FORMAT)
 
 #ifndef USING_R
-igraph_long_t FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v) {
+igraph_error_t FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v) {
     igraph_long_t i, n = FUNCTION(igraph_vector, size)(v);
     if (n != 0) {
 #ifdef PRINTFUNC
@@ -2733,7 +2733,7 @@ igraph_long_t FUNCTION(igraph_vector, print)(const TYPE(igraph_vector) *v) {
     return 0;
 }
 
-igraph_long_t FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v,
                                     const char *format) {
     igraph_long_t i, n = FUNCTION(igraph_vector, size)(v);
     if (n != 0) {
@@ -2748,7 +2748,7 @@ igraph_long_t FUNCTION(igraph_vector, printf)(const TYPE(igraph_vector) *v,
 
 #endif
 
-igraph_long_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FILE *file) {
+igraph_error_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FILE *file) {
     igraph_long_t i, n = FUNCTION(igraph_vector, size)(v);
     if (n != 0) {
 #ifdef FPRINTFUNC
@@ -2770,7 +2770,7 @@ igraph_long_t FUNCTION(igraph_vector, fprint)(const TYPE(igraph_vector) *v, FILE
 
 #endif
 
-igraph_long_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
                                    TYPE(igraph_vector) *newv,
                                    const igraph_vector_t *idx) {
 
@@ -2785,7 +2785,7 @@ igraph_long_t FUNCTION(igraph_vector, index)(const TYPE(igraph_vector) *v,
     return 0;
 }
 
-igraph_long_t FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
+igraph_error_t FUNCTION(igraph_vector, index_int)(TYPE(igraph_vector) *v,
                                        const igraph_vector_long_t *idx) {
     BASE *tmp;
     igraph_long_t i, n = igraph_vector_long_size(idx);

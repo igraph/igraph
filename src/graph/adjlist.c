@@ -92,8 +92,7 @@
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  */
-
-igraph_long_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
+igraph_error_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                         igraph_neimode_t mode) {
     igraph_long_t i;
     igraph_vector_t tmp;
@@ -145,8 +144,7 @@ igraph_long_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
  *
  * Time complexity: O(|V|), linear in the number of vertices.
  */
-
-igraph_long_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_long_t no_of_nodes) {
+igraph_error_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_long_t no_of_nodes) {
     igraph_long_t i;
 
     al->length = no_of_nodes;
@@ -184,8 +182,7 @@ igraph_long_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_long_t no_o
  *
  * Time complexity: O(|V|^2+|E|), quadratic in the number of vertices.
  */
-
-igraph_long_t igraph_adjlist_init_complementer(const igraph_t *graph,
+igraph_error_t igraph_adjlist_init_complementer(const igraph_t *graph,
                                      igraph_adjlist_t *al,
                                      igraph_neimode_t mode,
                                      igraph_bool_t loops) {
@@ -291,8 +288,7 @@ void igraph_adjlist_clear(igraph_adjlist_t *al) {
  *
  * Time complexity: O(1).
  */
-
-igraph_long_t igraph_adjlist_size(const igraph_adjlist_t *al) {
+igraph_error_t igraph_adjlist_size(const igraph_adjlist_t *al) {
     return al->length;
 }
 
@@ -330,8 +326,7 @@ void igraph_adjlist_sort(igraph_adjlist_t *al) {
  * Time complexity: O(|V|+|E|), linear in the number of edges and
  * vertices.
  */
-
-igraph_long_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
+igraph_error_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
     igraph_long_t i;
     igraph_long_t n = al->length;
     igraph_vector_long_t mark;
@@ -358,8 +353,7 @@ igraph_long_t igraph_adjlist_simplify(igraph_adjlist_t *al) {
     IGRAPH_FINALLY_CLEAN(1);
     return 0;
 }
-
-igraph_long_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
+igraph_error_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
                                     igraph_adjlist_t *al) {
     igraph_long_t i, j, l, n, p;
     igraph_vector_long_t *v;
@@ -388,7 +382,7 @@ igraph_long_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
 }
 
 #ifndef USING_R
-igraph_long_t igraph_adjlist_print(const igraph_adjlist_t *al) {
+igraph_error_t igraph_adjlist_print(const igraph_adjlist_t *al) {
     igraph_long_t i;
     igraph_long_t n = al->length;
     for (i = 0; i < n; i++) {
@@ -398,8 +392,7 @@ igraph_long_t igraph_adjlist_print(const igraph_adjlist_t *al) {
     return 0;
 }
 #endif
-
-igraph_long_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
+igraph_error_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile) {
     igraph_long_t i;
     igraph_long_t n = al->length;
     for (i = 0; i < n; i++) {
@@ -426,8 +419,7 @@ igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_long_t from, 
     return igraph_vector_long_binsearch2(fromvec, to);
 
 }
-
-igraph_long_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_long_t from, igraph_long_t oldto, igraph_long_t newto, igraph_bool_t directed) {
+igraph_error_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_long_t from, igraph_long_t oldto, igraph_long_t newto, igraph_bool_t directed) {
     igraph_vector_long_t *oldfromvec, *newfromvec;
     igraph_long_t err1, err2;
     igraph_long_t oldpos, newpos;
@@ -456,8 +448,7 @@ igraph_long_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_long_t fr
     return 0;
 
 }
-
-igraph_long_t igraph_inclist_remove_duplicate(const igraph_t *graph,
+igraph_error_t igraph_inclist_remove_duplicate(const igraph_t *graph,
                                     igraph_inclist_t *al) {
 
     IGRAPH_UNUSED(graph);
@@ -487,7 +478,7 @@ igraph_long_t igraph_inclist_remove_duplicate(const igraph_t *graph,
 }
 
 #ifndef USING_R
-igraph_long_t igraph_inclist_print(const igraph_inclist_t *al) {
+igraph_error_t igraph_inclist_print(const igraph_inclist_t *al) {
     igraph_long_t i;
     igraph_long_t n = al->length;
     for (i = 0; i < n; i++) {
@@ -497,8 +488,7 @@ igraph_long_t igraph_inclist_print(const igraph_inclist_t *al) {
     return 0;
 }
 #endif
-
-igraph_long_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
+igraph_error_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
     igraph_long_t i;
     igraph_long_t n = al->length;
     for (i = 0; i < n; i++) {
@@ -536,8 +526,7 @@ igraph_long_t igraph_inclist_fprint(const igraph_inclist_t *al, FILE *outfile) {
  * Time complexity: O(|V|+|E|), linear in the number of vertices and
  * edges.
  */
-
-igraph_long_t igraph_inclist_init(const igraph_t *graph,
+igraph_error_t igraph_inclist_init(const igraph_t *graph,
                         igraph_inclist_t *il,
                         igraph_neimode_t mode) {
     igraph_long_t i;
@@ -591,8 +580,7 @@ igraph_long_t igraph_inclist_init(const igraph_t *graph,
  *
  * Time complexity: O(|V|), linear in the number of vertices.
  */
-
-igraph_long_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_long_t n) {
+igraph_error_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_long_t n) {
     igraph_long_t i;
 
     il->length = n;
@@ -667,8 +655,7 @@ void igraph_inclist_clear(igraph_inclist_t *il) {
  * Time complexity: O(|V|), the number of vertices, possibly, but
  * depends on the underlying memory management too.
  */
-
-igraph_long_t igraph_lazy_adjlist_init(const igraph_t *graph,
+igraph_error_t igraph_lazy_adjlist_init(const igraph_t *graph,
                              igraph_lazy_adjlist_t *al,
                              igraph_neimode_t mode,
                              igraph_lazy_adlist_simplify_t simplify) {
@@ -789,8 +776,7 @@ igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
  * Time complexity: O(|V|), the number of vertices, possibly. But it
  * also depends on the underlying memory management.
  */
-
-igraph_long_t igraph_lazy_inclist_init(const igraph_t *graph,
+igraph_error_t igraph_lazy_inclist_init(const igraph_t *graph,
                              igraph_lazy_inclist_t *al,
                              igraph_neimode_t mode) {
 

@@ -26,11 +26,10 @@
 #include "igraph_interface.h"
 
 #include "io/dl-header.h"
-
-igraph_long_t igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
+igraph_error_t igraph_dl_yylex_init_extra(igraph_i_dl_parsedata_t* user_defined,
                                 void* scanner);
 void igraph_dl_yylex_destroy (void *scanner );
-igraph_long_t igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
+igraph_error_t igraph_dl_yyparse(igraph_i_dl_parsedata_t* context);
 void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
 
 /**
@@ -57,8 +56,7 @@ void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
  *
  * \example examples/simple/igraph_read_graph_dl.c
  */
-
-igraph_long_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
+igraph_error_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                          igraph_bool_t directed) {
 
     igraph_long_t i;

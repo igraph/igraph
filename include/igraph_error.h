@@ -467,7 +467,7 @@ typedef enum {
  * \sa igraph_errorf().
  */
 
-DECLDIR igraph_long_t igraph_error(const char *reason, const char *file, igraph_long_t line,
+DECLDIR igraph_error_t igraph_error(const char *reason, const char *file, igraph_long_t line,
                          igraph_long_t igraph_errno);
 
 /**
@@ -485,10 +485,10 @@ DECLDIR igraph_long_t igraph_error(const char *reason, const char *file, igraph_
  * \sa igraph_error().
  */
 
-DECLDIR igraph_long_t igraph_errorf(const char *reason, const char *file, igraph_long_t line,
+DECLDIR igraph_error_t igraph_errorf(const char *reason, const char *file, igraph_long_t line,
                           igraph_long_t igraph_errno, ...);
 
-DECLDIR igraph_long_t igraph_errorvf(const char *reason, const char *file, igraph_long_t line,
+DECLDIR igraph_error_t igraph_errorvf(const char *reason, const char *file, igraph_long_t line,
                            igraph_long_t igraph_errno, va_list ap);
 
 /**
@@ -647,7 +647,7 @@ DECLDIR igraph_long_t IGRAPH_FINALLY_STACK_SIZE(void);
  * call which can return an error code.
  */
 #define IGRAPH_CHECK(a) do { \
-        igraph_long_t igraph_i_ret=(a); \
+        igraph_error_t igraph_i_ret=(a); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
             IGRAPH_ERROR("", igraph_i_ret); \
         } } while (0)
@@ -723,7 +723,7 @@ DECLDIR extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-DECLDIR igraph_long_t igraph_warning(const char *reason, const char *file, igraph_long_t line,
+DECLDIR igraph_error_t igraph_warning(const char *reason, const char *file, igraph_long_t line,
                            igraph_long_t igraph_errno);
 
 /**
@@ -745,7 +745,7 @@ DECLDIR igraph_long_t igraph_warning(const char *reason, const char *file, igrap
  * \return The supplied error code.
  */
 
-DECLDIR igraph_long_t igraph_warningf(const char *reason, const char *file, igraph_long_t line,
+DECLDIR igraph_error_t igraph_warningf(const char *reason, const char *file, igraph_long_t line,
                             igraph_long_t igraph_errno, ...);
 
 /**

@@ -72,8 +72,7 @@
  * Time complexity: O(|V|*d^2), |V| is the number of vertices in the
  * graph and d is the average degree.
  */
-
-igraph_long_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
+igraph_error_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         igraph_real_t *res,
         igraph_transitivity_mode_t mode) {
 
@@ -168,8 +167,7 @@ igraph_long_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(5);
     return 0;
 }
-
-igraph_long_t igraph_transitivity_local_undirected1(const igraph_t *graph,
+igraph_error_t igraph_transitivity_local_undirected1(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -180,8 +178,7 @@ igraph_long_t igraph_transitivity_local_undirected1(const igraph_t *graph,
 
     return 0;
 }
-
-igraph_long_t igraph_transitivity_local_undirected2(const igraph_t *graph,
+igraph_error_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -395,7 +392,7 @@ igraph_long_t igraph_transitivity_local_undirected2(const igraph_t *graph,
 /* This removes loop, multiple edges and edges that point
      "backwards" according to the rank vector. */
 /* TODO used in scan.c, add prototype to private header */
-igraph_long_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
+igraph_error_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
                                 const igraph_vector_long_t *rank) {
     igraph_long_t i;
     igraph_long_t n = al->length;
@@ -425,8 +422,7 @@ igraph_long_t igraph_i_trans4_al_simplify(igraph_adjlist_t *al,
     return 0;
 
 }
-
-igraph_long_t igraph_transitivity_local_undirected4(const igraph_t *graph,
+igraph_error_t igraph_transitivity_local_undirected4(const igraph_t *graph,
         igraph_vector_t *res,
         igraph_transitivity_mode_t mode) {
 
@@ -474,8 +470,7 @@ igraph_long_t igraph_transitivity_local_undirected4(const igraph_t *graph,
  * Time complexity: O(n*d^2), n is the number of vertices for which
  * the transitivity is calculated, d is the average vertex degree.
  */
-
-igraph_long_t igraph_transitivity_local_undirected(const igraph_t *graph,
+igraph_error_t igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode) {
@@ -508,15 +503,13 @@ igraph_long_t igraph_transitivity_local_undirected(const igraph_t *graph,
         }
     }
 }
-
-igraph_long_t igraph_adjacent_triangles1(const igraph_t *graph,
+igraph_error_t igraph_adjacent_triangles1(const igraph_t *graph,
                                igraph_vector_t *res,
                                const igraph_vs_t vids) {
 # include "properties/triangles_template1.h"
     return 0;
 }
-
-igraph_long_t igraph_adjacent_triangles4(const igraph_t *graph,
+igraph_error_t igraph_adjacent_triangles4(const igraph_t *graph,
                                igraph_vector_t *res) {
 # include "properties/triangles_template.h"
     return 0;
@@ -536,8 +529,7 @@ igraph_long_t igraph_adjacent_triangles4(const igraph_t *graph,
  * Time complexity: O(d^2 n), d is the average vertex degree of the
  * queried vertices, n is their number.
  */
-
-igraph_long_t igraph_adjacent_triangles(const igraph_t *graph,
+igraph_error_t igraph_adjacent_triangles(const igraph_t *graph,
                               igraph_vector_t *res,
                               const igraph_vs_t vids) {
     if (igraph_vs_is_all(&vids)) {
@@ -565,8 +557,7 @@ igraph_long_t igraph_adjacent_triangles(const igraph_t *graph,
  * Time complexity: O(d^2 n), d is the average degree, n is the number
  * of vertices.
  */
-
-igraph_long_t igraph_list_triangles(const igraph_t *graph,
+igraph_error_t igraph_list_triangles(const igraph_t *graph,
                           igraph_vector_long_t *res) {
 # define TRIANGLES
 # include "properties/triangles_template.h"
@@ -614,9 +605,7 @@ igraph_long_t igraph_list_triangles(const igraph_t *graph,
  *
  * \example examples/simple/igraph_transitivity.c
  */
-
-
-igraph_long_t igraph_transitivity_undirected(const igraph_t *graph,
+igraph_error_t igraph_transitivity_undirected(const igraph_t *graph,
                                    igraph_real_t *res,
                                    igraph_transitivity_mode_t mode) {
 
@@ -700,20 +689,17 @@ igraph_long_t igraph_transitivity_undirected(const igraph_t *graph,
 
     return 0;
 }
-
-igraph_long_t igraph_transitivity_barrat1(const igraph_t *graph,
+igraph_error_t igraph_transitivity_barrat1(const igraph_t *graph,
                                 igraph_vector_t *res,
                                 const igraph_vs_t vids,
                                 const igraph_vector_t *weights,
                                 igraph_transitivity_mode_t mode);
-
-igraph_long_t igraph_transitivity_barrat4(const igraph_t *graph,
+igraph_error_t igraph_transitivity_barrat4(const igraph_t *graph,
                                 igraph_vector_t *res,
                                 const igraph_vs_t vids,
                                 const igraph_vector_t *weights,
                                 igraph_transitivity_mode_t mode);
-
-igraph_long_t igraph_transitivity_barrat1(const igraph_t *graph,
+igraph_error_t igraph_transitivity_barrat1(const igraph_t *graph,
                                 igraph_vector_t *res,
                                 const igraph_vs_t vids,
                                 const igraph_vector_t *weights,
@@ -806,8 +792,7 @@ igraph_long_t igraph_transitivity_barrat1(const igraph_t *graph,
 
     return 0;
 }
-
-igraph_long_t igraph_transitivity_barrat4(const igraph_t *graph,
+igraph_error_t igraph_transitivity_barrat4(const igraph_t *graph,
                                 igraph_vector_t *res,
                                 const igraph_vs_t vids,
                                 const igraph_vector_t *weights,
@@ -956,8 +941,7 @@ igraph_long_t igraph_transitivity_barrat4(const igraph_t *graph,
  * igraph_transitivity_avglocal_undirected() for other kinds of
  * (non-weighted) transitivity.
  */
-
-igraph_long_t igraph_transitivity_barrat(const igraph_t *graph,
+igraph_error_t igraph_transitivity_barrat(const igraph_t *graph,
                                igraph_vector_t *res,
                                const igraph_vs_t vids,
                                const igraph_vector_t *weights,

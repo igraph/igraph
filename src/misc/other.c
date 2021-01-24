@@ -50,8 +50,7 @@
  * n is the length of
  * the data vector.
  */
-
-igraph_long_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
+igraph_error_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
                         igraph_long_t binwidth) {
 
     double sum = 0;
@@ -115,7 +114,7 @@ igraph_long_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *
  *
  * \example examples/simple/igraph_convex_hull.c
  */
-igraph_long_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
+igraph_error_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
                        igraph_matrix_t *rescoords) {
     igraph_long_t no_of_nodes;
     igraph_long_t i, pivot_idx = 0, last_idx, before_last_idx, next_idx, j;
@@ -334,7 +333,7 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
  *
  * \example examples/simple/igraph_power_law_fit.c
  */
-igraph_long_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* result,
+igraph_error_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* result,
                          igraph_real_t xmin, igraph_bool_t force_continuous) {
     plfit_error_handler_t* plfit_stored_error_handler;
     plfit_result_t plfit_result;

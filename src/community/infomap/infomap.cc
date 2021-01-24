@@ -270,7 +270,7 @@ int infomap_partition(FlowGraph * fgraph, bool rcall) {
  *
  * Time complexity: TODO.
  */
-igraph_long_t igraph_community_infomap(const igraph_t * graph,
+igraph_error_t igraph_community_infomap(const igraph_t * graph,
                              const igraph_vector_t *e_weights,
                              const igraph_vector_t *v_weights,
                              igraph_int_t nb_trials,

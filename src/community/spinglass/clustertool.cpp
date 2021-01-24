@@ -185,7 +185,7 @@ static igraph_long_t igraph_i_community_spinglass_negative(
  *
  */
 
-igraph_long_t igraph_community_spinglass(const igraph_t *graph,
+igraph_error_t igraph_community_spinglass(const igraph_t *graph,
                                const igraph_vector_t *weights,
                                igraph_real_t *modularity,
                                igraph_real_t *temperature,
@@ -412,7 +412,7 @@ static igraph_long_t igraph_i_community_spinglass_orig(
  * Time complexity: TODO.
  */
 
-igraph_long_t igraph_community_spinglass_single(const igraph_t *graph,
+igraph_error_t igraph_community_spinglass_single(const igraph_t *graph,
                                       const igraph_vector_t *weights,
                                       igraph_long_t vertex,
                                       igraph_vector_t *community,

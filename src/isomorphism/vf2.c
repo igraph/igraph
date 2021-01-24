@@ -104,8 +104,7 @@
  *
  * Time complexity: exponential.
  */
-
-igraph_long_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2,
+igraph_error_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2,
                                    const igraph_vector_long_t *vertex_color1,
                                    const igraph_vector_long_t *vertex_color2,
                                    const igraph_vector_long_t *edge_color1,
@@ -745,8 +744,7 @@ static igraph_bool_t igraph_i_isomorphic_vf2(igraph_vector_t *map12,
  *
  * \example examples/simple/igraph_isomorphic_vf2.c
  */
-
-igraph_long_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
+igraph_error_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
                           const igraph_vector_long_t *vertex_color1,
                           const igraph_vector_long_t *vertex_color2,
                           const igraph_vector_long_t *edge_color1,
@@ -825,8 +823,7 @@ static igraph_bool_t igraph_i_count_isomorphisms_vf2(
  *
  * Time complexity: exponential.
  */
-
-igraph_long_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2,
+igraph_error_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2,
                                   const igraph_vector_long_t *vertex_color1,
                                   const igraph_vector_long_t *vertex_color2,
                                   const igraph_vector_long_t *edge_color1,
@@ -927,8 +924,7 @@ static igraph_bool_t igraph_i_get_isomorphisms_vf2(
  *
  * Time complexity: exponential.
  */
-
-igraph_long_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
+igraph_error_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
                                 const igraph_t *graph2,
                                 const igraph_vector_long_t *vertex_color1,
                                 const igraph_vector_long_t *vertex_color2,
@@ -1005,8 +1001,7 @@ igraph_long_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
  *
  * Time complexity: exponential.
  */
-
-igraph_long_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
+igraph_error_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
                                       const igraph_t *graph2,
                                       const igraph_vector_long_t *vertex_color1,
                                       const igraph_vector_long_t *vertex_color2,
@@ -1539,8 +1534,7 @@ static igraph_bool_t igraph_i_subisomorphic_vf2(
  *
  * Time complexity: exponential.
  */
-
-igraph_long_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
+igraph_error_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
                              const igraph_vector_long_t *vertex_color1,
                              const igraph_vector_long_t *vertex_color2,
                              const igraph_vector_long_t *edge_color1,
@@ -1623,8 +1617,7 @@ static igraph_bool_t igraph_i_count_subisomorphisms_vf2(
  *
  * Time complexity: exponential.
  */
-
-igraph_long_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2,
+igraph_error_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2,
                                      const igraph_vector_long_t *vertex_color1,
                                      const igraph_vector_long_t *vertex_color2,
                                      const igraph_vector_long_t *edge_color1,
@@ -1725,8 +1718,7 @@ static igraph_bool_t igraph_i_get_subisomorphisms_vf2(
  *
  * Time complexity: exponential.
  */
-
-igraph_long_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
+igraph_error_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
                                    const igraph_t *graph2,
                                    const igraph_vector_long_t *vertex_color1,
                                    const igraph_vector_long_t *vertex_color2,
