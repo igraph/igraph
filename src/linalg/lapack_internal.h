@@ -142,42 +142,42 @@
     #define igraph_dlamc5_  dlamc5_
 #endif
 
-igraph_long_t igraphdgetrf_(igraph_long_t *m, igraph_long_t *n, igraph_real_t *a, igraph_long_t *lda, igraph_long_t *ipiv,
-                  igraph_long_t *info);
-igraph_long_t igraphdgetrs_(char *trans, igraph_long_t *n, igraph_long_t *nrhs, igraph_real_t *a,
-                  igraph_long_t *lda, igraph_long_t *ipiv, igraph_real_t *b, igraph_long_t *ldb,
-                  igraph_long_t *info);
-igraph_long_t igraphdgesv_(igraph_long_t *n, igraph_long_t *nrhs, igraph_real_t *a, igraph_long_t *lda,
-                 igraph_long_t *ipiv, igraph_real_t *b, igraph_long_t *ldb, igraph_long_t *info);
+int igraphdgetrf_(int *m, int *n, igraph_real_t *a, int *lda, int *ipiv,
+                  int *info);
+int igraphdgetrs_(char *trans, int *n, int *nrhs, igraph_real_t *a,
+                  int *lda, int *ipiv, igraph_real_t *b, int *ldb,
+                  int *info);
+int igraphdgesv_(int *n, int *nrhs, igraph_real_t *a, int *lda,
+                 int *ipiv, igraph_real_t *b, int *ldb, int *info);
 
 igraph_real_t igraphdlapy2_(igraph_real_t *x, igraph_real_t *y);
 
-igraph_long_t igraphdsyevr_(char *jobz, char *range, char *uplo, igraph_long_t *n,
-                  igraph_real_t *a, igraph_long_t *lda, igraph_real_t *vl,
-                  igraph_real_t *vu, igraph_long_t * il, igraph_long_t *iu,
-                  igraph_real_t *abstol, igraph_long_t *m, igraph_real_t *w,
-                  igraph_real_t *z, igraph_long_t *ldz, igraph_long_t *isuppz,
-                  igraph_real_t *work, igraph_long_t *lwork, igraph_long_t *iwork,
-                  igraph_long_t *liwork, igraph_long_t *info);
+int igraphdsyevr_(char *jobz, char *range, char *uplo, int *n,
+                  igraph_real_t *a, int *lda, igraph_real_t *vl,
+                  igraph_real_t *vu, int * il, int *iu,
+                  igraph_real_t *abstol, int *m, igraph_real_t *w,
+                  igraph_real_t *z, int *ldz, int *isuppz,
+                  igraph_real_t *work, int *lwork, int *iwork,
+                  int *liwork, int *info);
 
-igraph_long_t igraphdgeev_(char *jobvl, char *jobvr, igraph_long_t *n, igraph_real_t *a,
-                 igraph_long_t *lda, igraph_real_t *wr, igraph_real_t *wi,
-                 igraph_real_t *vl, igraph_long_t *ldvl, igraph_real_t *vr, igraph_long_t *ldvr,
-                 igraph_real_t *work, igraph_long_t *lwork, igraph_long_t *info);
+int igraphdgeev_(char *jobvl, char *jobvr, int *n, igraph_real_t *a,
+                 int *lda, igraph_real_t *wr, igraph_real_t *wi,
+                 igraph_real_t *vl, int *ldvl, igraph_real_t *vr, int *ldvr,
+                 igraph_real_t *work, int *lwork, int *info);
 
-igraph_long_t igraphdgeevx_(char *balanc, char *jobvl, char *jobvr, char *sense,
-                  igraph_long_t *n, igraph_real_t *a, igraph_long_t *lda, igraph_real_t *wr,
-                  igraph_real_t *wi, igraph_real_t *vl, igraph_long_t *ldvl,
-                  igraph_real_t *vr, igraph_long_t *ldvr, igraph_long_t *ilo, igraph_long_t *ihi,
+int igraphdgeevx_(char *balanc, char *jobvl, char *jobvr, char *sense,
+                  int *n, igraph_real_t *a, int *lda, igraph_real_t *wr,
+                  igraph_real_t *wi, igraph_real_t *vl, int *ldvl,
+                  igraph_real_t *vr, int *ldvr, int *ilo, int *ihi,
                   igraph_real_t *scale, igraph_real_t *abnrm,
                   igraph_real_t *rconde, igraph_real_t *rcondv,
-                  igraph_real_t *work, igraph_long_t *lwork, igraph_long_t *iwork, igraph_long_t *info);
+                  igraph_real_t *work, int *lwork, int *iwork, int *info);
 
-igraph_long_t igraphdgehrd_(igraph_long_t *n, igraph_long_t *ilo, igraph_long_t *ihi, igraph_real_t *A, igraph_long_t *lda,
-                  igraph_real_t *tau, igraph_real_t *work, igraph_long_t *lwork,
-                  igraph_long_t *info);
+int igraphdgehrd_(int *n, int *ilo, int *ihi, igraph_real_t *A, int *lda,
+                  igraph_real_t *tau, igraph_real_t *work, int *lwork,
+                  int *info);
 
-igraph_real_t igraphddot_(igraph_long_t *n, igraph_real_t *dx, igraph_long_t *incx,
-                          igraph_real_t *dy, igraph_long_t *incy);
+igraph_real_t igraphddot_(int *n, igraph_real_t *dx, int *incx,
+                          igraph_real_t *dy, int *incy);
 
 #endif

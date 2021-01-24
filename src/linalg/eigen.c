@@ -1026,7 +1026,7 @@ static igraph_long_t igraph_i_eigen_matrix_lapack_common(const igraph_matrix_t *
     igraph_vector_t valuesreal, valuesimag;
     igraph_matrix_t vectorsright, *myvectors = vectors ? &vectorsright : 0;
     igraph_long_t n = (igraph_long_t) igraph_matrix_nrow(A);
-    igraph_long_t info = 1;
+    igraph_int_t info = 1;
 
     IGRAPH_VECTOR_INIT_FINALLY(&valuesreal, n);
     IGRAPH_VECTOR_INIT_FINALLY(&valuesimag, n);
