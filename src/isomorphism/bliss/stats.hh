@@ -63,6 +63,8 @@ class Stats
 public:
   Stats() { reset(); }
 
+  /** The size of the automorphism group. */
+  const BigNum& get_group_size() const {return group_size;}
   /** An approximation (due to possible overflows/rounding errors) of
    * the size of the automorphism group. */
   long double get_group_size_approx() const {return group_size_approx;}
@@ -78,10 +80,6 @@ public:
   long unsigned int get_nof_generators() const {return nof_generators;}
   /** The maximal depth of the search tree. */
   unsigned long int get_max_level() const {return max_level;}
-
-  int get_group_size_igraph(char **str) const {
-      return group_size.to_string_igraph(str);
-  }
 };
 
 } // namespace bliss

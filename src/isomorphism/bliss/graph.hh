@@ -30,6 +30,7 @@ namespace bliss {
 }
 
 // #include <cstdio>
+#include <functional>
 #include <vector>
 #include "stats.hh"
 #include "kstack.hh"
@@ -131,35 +132,31 @@ public:
 
   /**
    * Find a set of generators for the automorphism group of the graph.
-   * The function \a hook (if non-null) is called each time a new generator
+   * The function \a report (if non-null) is called each time a new generator
    * for the automorphism group is found.
-   * The first argument \a user_param for the hook is the
-   * \a hook_user_param given below,
-   * the second argument \a n is the length of the automorphism (equal to
-   * get_nof_vertices()) and
-   * the third argument \a aut is the automorphism
+   * The first argument \a n for the function
+   * is the length of the automorphism (equal to get_nof_vertices()), and
+   * the second argument \a aut is the automorphism
    * (a bijection on {0,...,get_nof_vertices()-1}).
    * The memory for the automorphism \a aut will be invalidated immediately
-   * after the return from the hook function;
+   * after the return from the \a report function;
    * if you want to use the automorphism later, you have to take a copy of it.
-   * Do not call any member functions in the hook.
+   * Do not call any member functions from the \a report function.
+   *
    * The search statistics are copied in \a stats.
+   *
    * If the \a terminate function argument is given,
    * it is called in each search tree node: if the function returns true,
    * then the search is terminated and thus not all the automorphisms
-   * may have been generated. For older versions of C++ having no lambda
-   * functions, reference to the statistics is given as an argument.
-   * The \a terminate function may be used
-   * to limit the time spent in bliss in case the graph is too difficult
-   * under the available time constraints. If used, keep the function simple
-   * to evaluate so that it does not take too much time.
+   * may have been generated.
+   * The \a terminate function may be used to limit the time spent in bliss
+   * in case the graph is too difficult under the available time constraints.
+   * If used, keep the function simple to evaluate so that
+   * it does not consume too much time.
    */
   void find_automorphisms(Stats& stats,
-                          void (*hook)(void* user_param,
-                          unsigned int n,
-                          const unsigned int* aut) = 0,
-                          void* hook_user_param = 0,
-                          bool (*terminate)(const Stats& s) = 0);
+                          const std::function<void(unsigned int n, const unsigned int* aut)>& report = nullptr,
+                          const std::function<bool()>& terminate = nullptr);
 
   /**
    * Otherwise the same as find_automorphisms() except that
@@ -180,19 +177,15 @@ public:
    * it is called in each search tree node: if the function returns true,
    * then the search is terminated and thus (i) not all the automorphisms
    * may have been generated and (ii) the returned labeling may not
-   * be canonical. For older versions of C++ having no lambda
-   * functions, reference to the statistics is given as an argument.
-   * The \a terminate function may be used
-   * to limit the time spent in bliss in case the graph is too difficult
-   * under the available time constraints. If used, keep the function simple
-   * to evaluate so that it does not take too much time.
+   * be canonical.
+   * The \a terminate function may be used to limit the time spent in bliss
+   * in case the graph is too difficult under the available time constraints.
+   * If used, keep the function simple to evaluate so that
+   * it does not consume too much time.
    */
   const unsigned int* canonical_form(Stats& stats,
-                                     void (*hook)(void* user_param,
-                                     unsigned int n,
-                                     const unsigned int* aut) = 0,
-                                     void* hook_user_param = 0,
-                                     bool (*terminate)(const Stats& s) = 0);
+                                     const std::function<void(unsigned int n, const unsigned int* aut)>& report = nullptr,
+                                     const std::function<bool()>& terminate = nullptr);
 
   /**
    * Get a hash value for the graph.
@@ -393,7 +386,8 @@ protected:
   } PathInfo;
 
   void search(const bool canonical, Stats &stats,
-              bool (*terminate)(const Stats& s));
+              const std::function<void(unsigned int n, const unsigned int* aut)>& report_function = nullptr,
+              const std::function<bool()>& terminate = nullptr);
 
 
   void (*report_hook)(void *user_param,

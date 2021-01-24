@@ -69,14 +69,12 @@ public:
    */
   void multiply(const int n) {mpz_mul_si(v, v, n); }
 
-  int to_string_igraph(char **str) const {
-    *str=igraph_Calloc(mpz_sizeinbase(v, 10)+2, char);
-    if (! *str) {
-      IGRAPH_ERROR("Cannot convert big integer to string", IGRAPH_ENOMEM);
-    }
-    mpz_get_str(*str, 10, v);
-    return IGRAPH_SUCCESS;
-  }
+  /**
+   * Get a copy of the internal GNU GMP integer.
+   * The caller is responsible for calling mpz_init before,
+   * and mpz_clear afterwards on the \a result variable.
+   */
+  void get(mpz_t& result) const {mpz_set(result, v); }
 };
 
 #else
