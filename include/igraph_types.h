@@ -32,14 +32,14 @@ __BEGIN_DECLS
     #define _GNU_SOURCE 1
 #endif
 
+typedef int    igraph_integer_t;
+typedef double igraph_real_t;
+typedef int    igraph_bool_t;
+
 #include "igraph_error.h"
 #include <stddef.h>
 #include <math.h>
 #include <stdio.h>
-
-typedef igraph_integer_t    igraph_integer_t;
-typedef double igraph_real_t;
-typedef igraph_integer_t    igraph_bool_t;
 
 /* Replacements for printf that print doubles in the same way on all platforms
  * (even for NaN and infinities) */
