@@ -111,7 +111,7 @@ struct igraph_i_graphml_parser_state {
     igraph_strvector_t edgeids;
     igraph_vector_t edgelist;
     igraph_vector_int_t prev_state_stack;
-    unsigned igraph_integer_t unknown_depth;
+    unsigned int unknown_depth;
     igraph_integer_t index;
     igraph_bool_t successful, edges_directed, destroyed;
     igraph_trie_t v_names;
@@ -569,7 +569,7 @@ static igraph_i_graphml_attribute_record_t* igraph_i_graphml_add_attribute_key(
     igraph_trie_t *trie = 0;
     igraph_vector_ptr_t *ptrvector = 0;
     igraph_integer_t id;
-    unsigned short igraph_integer_t skip = 0;
+    unsigned short int skip = 0;
     igraph_integer_t i, ret;
     igraph_i_graphml_attribute_record_t *rec;
 

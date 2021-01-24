@@ -108,7 +108,7 @@ igraph_integer_t igraph_i_optimal_partition(const igraph_real_t *v, igraph_integ
       -------Fills up matrices F and Q-------------------
       -------------------------------------------------*/
     /*here j also is a counter but the use of unsigned variables
-      is to be proscribed in "for (unsigned igraph_integer_t j=...;j>=0;j--)",
+      is to be proscribed in "for (unsigned int j=...;j>=0;j--)",
       for such loops never ends!*/
 
     IGRAPH_MATRIX_INIT_FINALLY(&F, nt, n);

@@ -38,12 +38,12 @@ __BEGIN_DECLS
 
 typedef struct igraph_rng_type_t {
     const char *name;
-    unsigned igraph_integer_t min;
-    unsigned igraph_integer_t max;
+    unsigned long min;
+    unsigned long max;
     igraph_integer_t (*init)(void **state);
     void (*destroy)(void *state);
-    igraph_integer_t (*seed)(void *state, unsigned igraph_integer_t seed);
-    unsigned igraph_integer_t (*get)(void *state);
+    igraph_integer_t (*seed)(void *state, unsigned long seed);
+    unsigned long (*get)(void *state);
     igraph_real_t (*get_real)(void *state);
     igraph_real_t (*get_norm)(void *state);
     igraph_real_t (*get_geom)(void *state, igraph_real_t p);
@@ -64,9 +64,9 @@ typedef struct igraph_rng_t {
 DECLDIR igraph_integer_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type);
 DECLDIR void igraph_rng_destroy(igraph_rng_t *rng);
 
-DECLDIR igraph_integer_t igraph_rng_seed(igraph_rng_t *rng, unsigned igraph_integer_t seed);
-DECLDIR unsigned igraph_integer_t igraph_rng_max(igraph_rng_t *rng);
-DECLDIR unsigned igraph_integer_t igraph_rng_min(igraph_rng_t *rng);
+DECLDIR igraph_integer_t igraph_rng_seed(igraph_rng_t *rng, unsigned long seed);
+DECLDIR unsigned long igraph_rng_max(igraph_rng_t *rng);
+DECLDIR unsigned long igraph_rng_min(igraph_rng_t *rng);
 DECLDIR const char *igraph_rng_name(igraph_rng_t *rng);
 
 DECLDIR igraph_integer_t igraph_rng_get_integer(igraph_rng_t *rng,
@@ -80,7 +80,7 @@ DECLDIR igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p);
 DECLDIR igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, igraph_integer_t n,
         igraph_real_t p);
 DECLDIR igraph_real_t igraph_rng_get_exp(igraph_rng_t *rng, igraph_real_t rate);
-DECLDIR unsigned igraph_integer_t igraph_rng_get_int31(igraph_rng_t *rng);
+DECLDIR unsigned long igraph_rng_get_int31(igraph_rng_t *rng);
 DECLDIR igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
         igraph_real_t scale);
 DECLDIR igraph_integer_t igraph_rng_get_dirichlet(igraph_rng_t *rng,

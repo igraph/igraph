@@ -583,11 +583,11 @@ igraph_integer_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *
     igraph_vector_t order;
     char sort[2];
     igraph_integer_t apply = 1;
-    unsigned igraph_integer_t n = (unsigned igraph_integer_t) options->n;
+    unsigned int n = (unsigned int) options->n;
     igraph_integer_t nconv = options->nconv;
     igraph_integer_t nev = options->nev;
-    unsigned igraph_integer_t nans = (unsigned igraph_integer_t) (nconv < nev ? nconv : nev);
-    unsigned igraph_integer_t i;
+    unsigned int nans = (unsigned int) (nconv < nev ? nconv : nev);
+    unsigned int i;
 
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
@@ -646,7 +646,7 @@ igraph_integer_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *
     if (vectors) {
         IGRAPH_CHECK(igraph_matrix_resize(vectors, n, nans));
         for (i = 0; i < nans; i++) {
-            unsigned igraph_integer_t idx = (unsigned igraph_integer_t) VECTOR(order)[i];
+            unsigned int idx = (unsigned int) VECTOR(order)[i];
             const igraph_real_t *ptr = v + n * idx;
             memcpy(&MATRIX(*vectors, 0, i), ptr, sizeof(igraph_real_t) * n);
         }
@@ -666,11 +666,11 @@ igraph_integer_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *
     igraph_vector_t order;
     char sort[2];
     igraph_integer_t apply = 1;
-    unsigned igraph_integer_t n = (unsigned igraph_integer_t) options->n;
+    unsigned int n = (unsigned int) options->n;
     igraph_integer_t nconv = options->nconv;
     igraph_integer_t nev = options->nev;
-    unsigned igraph_integer_t nans = (unsigned igraph_integer_t) (nconv < nev ? nconv : nev);
-    unsigned igraph_integer_t i;
+    unsigned int nans = (unsigned int) (nconv < nev ? nconv : nev);
+    unsigned int i;
 
 #define which(a,b) (options->which[0]==a && options->which[1]==b)
 
@@ -717,9 +717,9 @@ igraph_integer_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *
         IGRAPH_CHECK(igraph_matrix_resize(vectors, n, ncol));
 
         for (i = 0; i < nans; i++) {
-            unsigned igraph_integer_t idx;
+            unsigned int idx;
 
-            idx = (unsigned igraph_integer_t) VECTOR(order)[i];
+            idx = (unsigned int) VECTOR(order)[i];
 
             if (di[i] == 0) {
                 /* real eigenvalue, single eigenvector */
@@ -738,7 +738,7 @@ igraph_integer_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *
                      * The positive one will be the next one, but we need to copy the
                      * eigenvector corresponding to the eigenvalue with the positive
                      * imaginary part. */
-                idx = (unsigned igraph_integer_t) VECTOR(order)[i + 1];
+                idx = (unsigned int) VECTOR(order)[i + 1];
                 memcpy(&MATRIX(*vectors, 0, vx), v + n * idx, sizeof(igraph_real_t) * 2 * n);
                 vx += 2;
                 i++;

@@ -219,12 +219,12 @@ DECLDIR igraph_integer_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
  * for details about the algorithm and these parameters.
  */
 typedef struct igraph_bliss_info_t {
-    unsigned igraph_integer_t nof_nodes;
-    unsigned igraph_integer_t nof_leaf_nodes;
-    unsigned igraph_integer_t nof_bad_nodes;
-    unsigned igraph_integer_t nof_canupdates;
-    unsigned igraph_integer_t nof_generators;
-    unsigned igraph_integer_t max_level;
+    unsigned long nof_nodes;
+    unsigned long nof_leaf_nodes;
+    unsigned long nof_bad_nodes;
+    unsigned long nof_canupdates;
+    unsigned long nof_generators;
+    unsigned long max_level;
     char *group_size;
 } igraph_bliss_info_t;
 

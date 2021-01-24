@@ -571,7 +571,7 @@ igraph_integer_t FUNCTION(igraph_vector, insert)(TYPE(igraph_vector) *v, igraph_
         return IGRAPH_EINVAL;
     }
     IGRAPH_CHECK(FUNCTION(igraph_vector, resize)(v, (igraph_integer_t) size + 1));
-    if (((unsigned igraph_integer_t)pos) < size) {
+    if (((igraph_integer_t)pos) < size) {
         memmove(v->stor_begin + pos + 1, v->stor_begin + pos,
                 sizeof(BASE) * (size - (size_t) pos));
     }
@@ -864,7 +864,7 @@ igraph_integer_t FUNCTION(igraph_vector, i_qsort_ind_cmp_desc)(const void *p1, c
 
 igraph_integer_t FUNCTION(igraph_vector, qsort_ind)(TYPE(igraph_vector) *v,
         igraph_vector_t *inds, igraph_bool_t descending) {
-    unsigned igraph_integer_t i;
+    igraph_integer_t i;
     BASE **vind, *first;
     size_t n = (size_t) FUNCTION(igraph_vector, size)(v);
     IGRAPH_CHECK(igraph_vector_resize(inds, (igraph_integer_t) n));

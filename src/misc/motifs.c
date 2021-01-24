@@ -201,7 +201,7 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
     igraph_integer_t *added;
     char *subg;
 
-    const unsigned igraph_integer_t *arr_idx, *arr_code;
+    const igraph_integer_t *arr_idx, *arr_code;
     igraph_integer_t code = 0;
     unsigned char mul, idx;
 
