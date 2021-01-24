@@ -34,13 +34,13 @@
 
 class FlowGraph {
 private:
-    void init(igraph_long_t n, const igraph_vector_t *nodeWeights);
+    void init(int n, const igraph_vector_t *nodeWeights);
 
 public:
-    FlowGraph(igraph_long_t n);
-    FlowGraph(igraph_long_t n, const igraph_vector_t *nodeWeights);
+    FlowGraph(int n);
+    FlowGraph(int n, const igraph_vector_t *nodeWeights);
     FlowGraph(FlowGraph * fgraph);
-    FlowGraph(FlowGraph * fgraph, igraph_long_t sub_Nnode, igraph_long_t * sub_members);
+    FlowGraph(FlowGraph * fgraph, int sub_Nnode, int * sub_members);
 
     FlowGraph(const igraph_t * graph, const igraph_vector_t *e_weights,
               const igraph_vector_t *v_weights);
@@ -57,12 +57,12 @@ public:
 
     /*************************************************************************/
     Node **node;
-    igraph_long_t  Nnode;
+    int  Nnode;
 
     double alpha, beta;
 
-    igraph_long_t Ndanglings;
-    std::vector<igraph_long_t> danglings; // id of dangling nodes
+    int Ndanglings;
+    std::vector<int> danglings; // id of dangling nodes
 
     double exit;                  //
     double exitFlow;              //

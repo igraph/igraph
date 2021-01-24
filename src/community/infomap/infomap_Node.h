@@ -34,11 +34,11 @@ class Node {
 public:
 
     Node();
-    Node(igraph_long_t modulenr, double tpweight);
+    Node(int modulenr, double tpweight);
 
-    std::vector<igraph_long_t> members;
-    std::vector< std::pair<igraph_long_t, double> > inLinks;
-    std::vector< std::pair<igraph_long_t, double> > outLinks;
+    std::vector<int> members;
+    std::vector< std::pair<int, double> > inLinks;
+    std::vector< std::pair<int, double> > outLinks;
     double selfLink;
 
     double teleportWeight;

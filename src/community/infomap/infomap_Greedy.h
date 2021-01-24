@@ -42,8 +42,8 @@ public:
 
     ~Greedy();
 
-    void setMove(igraph_long_t *moveTo);
-    //virtual void determMove(igraph_long_t *moveTo);
+    void setMove(int *moveTo);
+    //virtual void determMove(int *moveTo);
 
     bool optimize();
     //virtual void move(bool &moved);
@@ -56,7 +56,7 @@ public:
     /**************************************************************************/
 
     FlowGraph * graph;
-    igraph_long_t Nnode;
+    int Nnode;
 
     double exit;
     double exitFlow;
@@ -69,16 +69,16 @@ public:
     double alpha, beta;
     // local copy of fgraph alpha, beta (=alpha -  Nnode = graph->Nnode;1)
 
-    std::vector<igraph_long_t> node_index;  // module number of each node
+    std::vector<int> node_index;  // module number of each node
 
-    igraph_long_t Nempty;
-    std::vector<igraph_long_t> mod_empty;
+    int Nempty;
+    std::vector<int> mod_empty;
 
     std::vector<double> mod_exit;  // version tmp de node
     std::vector<double> mod_size;
     std::vector<double> mod_danglingSize;
     std::vector<double> mod_teleportWeight;
-    std::vector<igraph_long_t> mod_members;
+    std::vector<int> mod_members;
 };
 
 void delete_Greedy(Greedy *greedy);
