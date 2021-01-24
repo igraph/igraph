@@ -25,6 +25,7 @@
 #define IGRAPH_VERSION_H
 
 #include "igraph_decls.h"
+#include "igraph_types.h"
 
 __BEGIN_DECLS
 

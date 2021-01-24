@@ -27,6 +27,7 @@
 #include "config.h"
 #include <math.h>
 #include <stddef.h>
+#include "igraph_types.h"
 
 #undef __BEGIN_DECLS
 #undef __END_DECLS
