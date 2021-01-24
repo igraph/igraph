@@ -95,7 +95,7 @@ igraph_long_t connected_test() {
     return IGRAPH_SUCCESS;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t ret;
 
     ret = error_test();

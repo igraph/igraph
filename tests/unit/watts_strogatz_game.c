@@ -54,7 +54,7 @@ igraph_bool_t has_multiple(const igraph_t *graph) {
         igraph_rng_seed(igraph_rng_default(), seed);                \
     } while (0)
 
-igraph_long_t main() {
+int main() {
 
     igraph_t ws;
     igraph_bool_t sim, seen_loops, seen_multiple;

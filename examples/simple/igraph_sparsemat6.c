@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_long_t main() {
+int main() {
     igraph_matrix_t mat, mat2, mat3;
     igraph_sparsemat_t spmat, spmat2;
     igraph_long_t i;

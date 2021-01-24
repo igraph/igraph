@@ -24,7 +24,7 @@ void sort_and_print(igraph_vector_t *vec) {
     print_vector_round(vec);
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t cut, partition, partition2, capacity;

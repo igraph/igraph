@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_t graph;
     igraph_bool_t has_path, has_cycle;

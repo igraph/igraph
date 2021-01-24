@@ -27,7 +27,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t g;
     igraph_matrix_t coords;
 

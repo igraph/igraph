@@ -26,7 +26,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_vector_t v1, v2, v3;
     igraph_real_t min, max;

@@ -148,7 +148,7 @@ igraph_long_t print_attributes(const igraph_t *g) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g, g2;
     FILE *ifile;

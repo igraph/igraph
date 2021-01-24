@@ -40,7 +40,7 @@ void test_density(const igraph_t *graph, igraph_bool_t loops) {
     }
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t v;

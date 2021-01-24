@@ -205,7 +205,7 @@ void test_bug_995() {
     igraph_destroy(&g2);
 }
 
-igraph_long_t main() {
+int main() {
 
     test3();
     test4();

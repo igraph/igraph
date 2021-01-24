@@ -63,7 +63,7 @@ igraph_long_t print_and_destroy(igraph_vector_ptr_t *cliques) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
     igraph_vector_ptr_t cliques;
     igraph_long_t no;

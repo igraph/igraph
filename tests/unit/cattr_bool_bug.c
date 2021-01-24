@@ -31,7 +31,7 @@ void check_attr(igraph_t *graph, igraph_long_t offset) {
     }
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t graph;
     igraph_error_handler_t* oldhandler;

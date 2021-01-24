@@ -101,7 +101,7 @@ igraph_long_t distance() {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t res1, res2;
     res1 = intersect();
     if (res1 != 0) {

@@ -241,7 +241,7 @@ igraph_long_t match_rings_open_closed() {
 
 /* ----------------------------------------------------------- */
 
-igraph_long_t main() {
+int main() {
     match_rings();
     match_rings_open_closed();
 

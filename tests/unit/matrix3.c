@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_matrix_t m;
 
     igraph_matrix_init(&m, 10, 10);

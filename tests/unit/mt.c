@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-igraph_long_t main() {
+int main() {
 
     igraph_long_t i;
     for (i = 0; i < 1000; i++) {

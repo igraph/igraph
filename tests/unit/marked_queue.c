@@ -26,7 +26,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_marked_queue_t Q;
     igraph_long_t i;
 

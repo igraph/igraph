@@ -35,7 +35,7 @@ void print_vector(igraph_vector_t *v) {
 void warning_handler_ignore(const char* reason, const char* file, igraph_long_t line, igraph_long_t e) {
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_ptr_t result;

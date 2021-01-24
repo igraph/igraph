@@ -51,7 +51,7 @@ void print_weighted_clique(const igraph_vector_t *clique, const igraph_vector_t 
     printf(" w=%.1f\n", clique_weight);
 }
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
 
     const igraph_long_t n = 10; /* number of vertices in test graph */

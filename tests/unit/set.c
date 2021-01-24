@@ -37,7 +37,7 @@ void print_set(igraph_set_t *set, FILE *f) {
     fprintf(f, "\n");
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_set_t set;
     igraph_long_t i;

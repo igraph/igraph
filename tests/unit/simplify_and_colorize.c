@@ -13,7 +13,7 @@
     igraph_destroy(&res); \
     igraph_destroy(&graph);
 
-igraph_long_t main() {
+int main() {
     igraph_t graph, res;
     igraph_vector_long_t vcol, ecol;
 

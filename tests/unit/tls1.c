@@ -29,7 +29,7 @@ void *thread_function(void *arg) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     pthread_t thread_id;
     void *exit_status;
 

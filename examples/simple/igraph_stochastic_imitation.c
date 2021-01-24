@@ -224,7 +224,7 @@ igraph_long_t petersen_game_test() {
     return IGRAPH_SUCCESS;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t ret;
 
     ret = error_tests();

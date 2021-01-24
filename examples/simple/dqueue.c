@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_long_t main() {
+int main() {
 
     igraph_dqueue_t q;
     igraph_long_t i;

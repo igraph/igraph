@@ -28,7 +28,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_vector_t elems;
     igraph_2wheap_t Q;

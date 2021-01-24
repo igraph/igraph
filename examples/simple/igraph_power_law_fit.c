@@ -297,7 +297,7 @@ igraph_long_t test_discrete() {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t retval;
 
     retval = test_continuous();

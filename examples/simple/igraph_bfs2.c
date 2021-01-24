@@ -34,7 +34,7 @@ igraph_bool_t bfs_callback(const igraph_t *graph,
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t graph, ring;
     igraph_vector_t order, rank, father, pred, succ, dist;

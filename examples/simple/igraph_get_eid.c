@@ -31,7 +31,7 @@ void print_vector(igraph_vector_t *v, FILE *f) {
     fprintf(f, "\n");
 }
 
-igraph_long_t main() {
+int main() {
     igraph_t g;
     igraph_long_t eid;
     igraph_vector_t hist;
@@ -88,7 +88,7 @@ igraph_long_t main() {
 
 /* Stress test */
 
-/* igraph_long_t main() { */
+/* int main() { */
 
 /*   igraph_t g; */
 /*   igraph_long_t i, n; */

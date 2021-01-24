@@ -122,7 +122,7 @@ igraph_long_t check_pred_inbound(const igraph_t* graph, const igraph_vector_long
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_ptr_t vecs, evecs;

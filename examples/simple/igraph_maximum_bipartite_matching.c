@@ -301,7 +301,7 @@ igraph_long_t test_incorrect_types() {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_i_set_attribute_table(&igraph_cattribute_table);
 
     if (test_graph_from_leda_tutorial()) {

@@ -46,7 +46,7 @@ igraph_long_t print_free_vector_ptr(igraph_vector_ptr_t *v) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t left, right, uni;
     igraph_vector_t v;

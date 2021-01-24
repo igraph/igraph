@@ -20,7 +20,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t g_start, g_line, g_test;
     igraph_bool_t same;
 

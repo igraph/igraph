@@ -199,7 +199,7 @@ igraph_long_t rare_test() {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t ret;
 
     ret = error_test();

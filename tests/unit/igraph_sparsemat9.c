@@ -32,7 +32,7 @@
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 #define REAL() (igraph_rng_get_normal(igraph_rng_default(), 0, 1))
 
-igraph_long_t main() {
+int main() {
     igraph_sparsemat_t sA, sB, sC;
     igraph_matrix_t A1, A2, A3, B, C;
     igraph_long_t i;

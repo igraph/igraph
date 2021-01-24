@@ -34,7 +34,7 @@ void free_complist(igraph_vector_ptr_t *complist) {
     }
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t ring, g;
     igraph_vector_ptr_t complist;

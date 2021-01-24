@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     const igraph_real_t edges[] = { 0, 1, 0, 2, 1, 6, 2, 6, 1, 3, 1, 4, 1, 5,
                                     3, 2, 4, 2, 5, 2
                                   };

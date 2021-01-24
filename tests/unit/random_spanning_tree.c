@@ -20,7 +20,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t graph, spanning_tree;
     igraph_vector_t tree_edges;
     igraph_bool_t is_tree;

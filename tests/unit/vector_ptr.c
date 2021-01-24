@@ -32,7 +32,7 @@ void custom_destructor(void* ptr) {
     igraph_vector_ptr_push_back(&custom_destructor_stack, ptr);
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_vector_ptr_t v1, v2;
     igraph_vector_ptr_t v3 = IGRAPH_VECTOR_PTR_NULL;

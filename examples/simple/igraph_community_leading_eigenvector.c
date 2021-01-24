@@ -49,7 +49,7 @@ igraph_long_t print_matrix(const igraph_matrix_t *m) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_matrix_t merges;

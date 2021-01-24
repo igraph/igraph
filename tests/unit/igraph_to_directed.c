@@ -3,7 +3,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t ug;
     igraph_t dg;
 

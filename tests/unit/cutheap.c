@@ -27,7 +27,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_i_cutheap_t ch;
     igraph_long_t i;
 

@@ -31,7 +31,7 @@ void igraph_print_warning(const char *reason, const char *file,
     printf("Warning: %s\n", reason);
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_matrix_t A, B, RHS;
     igraph_long_t info;

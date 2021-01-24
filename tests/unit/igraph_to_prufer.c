@@ -150,7 +150,7 @@ igraph_long_t test_num = 0;
         return test_num; \
     }
 
-igraph_long_t main() {
+int main() {
     RUN_TEST(test_from_prufer_back_to_prufer());
     RUN_TEST(test_from_prufer_back_to_prufer_with_resize());
     RUN_TEST(test_from_prufer_back_to_prufer_with_resize2());

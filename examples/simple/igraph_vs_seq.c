@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_long_t main() {
+int main() {
 
     igraph_vs_t vs;
     igraph_vit_t vit;

@@ -2,7 +2,7 @@
 #include <igraph.h>
 #include "bench.h"
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
     igraph_vector_t walk, weights;
     igraph_long_t ec, i;

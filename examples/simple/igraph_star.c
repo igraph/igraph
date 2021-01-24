@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
 
     /* Create an undirected 6-star, with the 0th node as the centre. */

@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-igraph_long_t main() {
+int main() {
 
     igraph_t ring1, ring2;
     igraph_vector_long_t color1, color2;

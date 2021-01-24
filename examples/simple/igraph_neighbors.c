@@ -31,7 +31,7 @@ void print_vector(igraph_vector_t *v, FILE *f) {
     fprintf(f, "\n");
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t v;

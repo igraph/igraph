@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_vector_t v;
 
     igraph_vector_init_seq(&v, 1, 1000);

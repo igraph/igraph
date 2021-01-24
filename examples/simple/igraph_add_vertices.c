@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g1;
     igraph_vector_t v1;

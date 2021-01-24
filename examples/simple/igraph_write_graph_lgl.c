@@ -1,6 +1,6 @@
 #include <igraph.h>
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_strvector_t names, weights;

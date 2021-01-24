@@ -26,7 +26,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t g, sub;
     igraph_vector_t map, invmap;
     igraph_vector_t keep;

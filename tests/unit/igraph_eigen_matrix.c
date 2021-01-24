@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_long_t nodes = 10;
     igraph_real_t triplets[] = { 1, 0, 1 / 4.0,       0, 1, 1 / 3.0,

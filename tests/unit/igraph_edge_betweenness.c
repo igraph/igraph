@@ -102,7 +102,7 @@ igraph_long_t test_bug1050() {
 
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t eb;

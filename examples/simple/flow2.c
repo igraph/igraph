@@ -143,7 +143,7 @@ igraph_long_t check_flow(igraph_long_t errorinc,
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_real_t flow_value;

@@ -42,7 +42,7 @@ void print(igraph_t *g) {
     igraph_vector_destroy(&el);
 }
 
-igraph_long_t main() {
+int main() {
     igraph_t g;
     igraph_matrix_t mat;
     igraph_long_t m[4][4] = { { 0, 1, 2, 0 }, { 2, 0, 0, 1 }, { 0, 0, 1, 0 }, { 0, 1, 0, 0 } };

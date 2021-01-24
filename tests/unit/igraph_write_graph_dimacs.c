@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t capacity;

@@ -12,7 +12,7 @@
     igraph_vector_destroy(&(deg1)); \
     igraph_vector_destroy(&(deg2));
 
-igraph_long_t main() {
+int main() {
     igraph_vector_t deg1, deg2;
     igraph_bool_t simple, multi;
 

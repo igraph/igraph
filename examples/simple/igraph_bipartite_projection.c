@@ -46,7 +46,7 @@ igraph_long_t check_projection(const igraph_t *graph,
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g, p1, p2, full, ring;
     igraph_vector_bool_t types;

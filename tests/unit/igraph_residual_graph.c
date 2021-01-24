@@ -20,7 +20,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g, residual, expected_residual;
     igraph_vector_t capacity, residual_capacity, flow, expected_residual_capacity;

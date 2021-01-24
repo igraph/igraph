@@ -28,7 +28,7 @@ igraph_long_t mf(const igraph_vector_t *input, igraph_real_t *output) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g, g2;
     igraph_vector_t weight;

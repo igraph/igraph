@@ -160,7 +160,7 @@ igraph_long_t check_ring(const ring_test_t *test) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t i, ret;
 
     i = 0;

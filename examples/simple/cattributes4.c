@@ -28,7 +28,7 @@ igraph_long_t mf(const igraph_strvector_t *input, char *output) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g, g2;
     igraph_attribute_combination_t comb;

@@ -36,7 +36,7 @@ igraph_long_t comp(const void *a, const void *b) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     const igraph_long_t len = 100;
     igraph_vector_t v;
     igraph_long_t i;

@@ -31,7 +31,7 @@ void vector_print(igraph_vector_t *v) {
     printf("\n");
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t vids, layers, parents;

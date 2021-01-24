@@ -25,7 +25,7 @@
 
 #include "bench.h"
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_real_t toremovev[] = {  2609,  2098, 14517,  7540, 19560,  8855,

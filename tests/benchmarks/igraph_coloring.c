@@ -3,7 +3,7 @@
 
 #include "bench.h"
 
-igraph_long_t main() {
+int main() {
     igraph_t g;
     igraph_vector_long_t colors;
 

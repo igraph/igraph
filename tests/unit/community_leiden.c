@@ -80,7 +80,7 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
     igraph_vector_destroy(&degree);
 }
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
     igraph_vector_t weights;
 

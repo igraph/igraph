@@ -184,7 +184,7 @@ void test_zero_edge_graph() {
     igraph_destroy(&g);
 }
 
-igraph_long_t main() {
+int main() {
     test_unweighted();
     test_weighted();
     test_zero_edge_graph();

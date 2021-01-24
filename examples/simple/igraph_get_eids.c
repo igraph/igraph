@@ -210,7 +210,7 @@ igraph_long_t check_multi() {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t ret;
 
     if ( (ret = check_simple()) != 0) {

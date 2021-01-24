@@ -132,7 +132,7 @@ void print_debug_output(
 
 #define DIM 10
 
-igraph_long_t main() {
+int main() {
     igraph_matrix_t A;
     igraph_matrix_t values, vectors;
     igraph_arpack_options_t options;

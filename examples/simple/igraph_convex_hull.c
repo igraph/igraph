@@ -164,7 +164,7 @@ igraph_long_t test_bug_1115() {
     return result;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t result;
 
     result = test_simple();

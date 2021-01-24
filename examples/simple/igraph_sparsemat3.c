@@ -136,7 +136,7 @@ igraph_bool_t check_same(const igraph_sparsemat_t *A,
     return nzero == 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_sparsemat_t A, B;
     igraph_matrix_t M, N;

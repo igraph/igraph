@@ -83,7 +83,7 @@ igraph_long_t validate_tree(const igraph_t *graph, const igraph_t *tree,
     return IGRAPH_SUCCESS;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_t tree;

@@ -98,7 +98,7 @@ void check_nrgeo(igraph_t *graph, igraph_vs_t vs,
     igraph_vector_destroy(&nrgeo2);
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_ptr_t res;

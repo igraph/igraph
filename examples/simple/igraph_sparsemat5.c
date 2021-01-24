@@ -113,7 +113,7 @@ void test_2x2(igraph_real_t a, igraph_real_t b, igraph_real_t c, igraph_real_t d
     igraph_sparsemat_destroy(&B);
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_sparsemat_t A, B;
     igraph_matrix_t vectors, values2;

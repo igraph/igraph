@@ -36,7 +36,7 @@ void print_spmatrix(igraph_spmatrix_t *m, FILE *f) {
     fprintf(f, "=========================\n");
 }
 
-igraph_long_t main() {
+int main() {
     igraph_spmatrix_t m, m1;
     igraph_spmatrix_iter_t mit;
     igraph_real_t arr[12];

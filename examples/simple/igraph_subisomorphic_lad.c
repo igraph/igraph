@@ -149,7 +149,7 @@ void test_motifs() {
 }
 
 
-igraph_long_t main() {
+int main() {
     igraph_t target, pattern;
     igraph_bool_t iso;
     igraph_vector_t map;

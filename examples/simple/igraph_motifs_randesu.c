@@ -46,7 +46,7 @@ igraph_bool_t print_motif(const igraph_t *graph, igraph_vector_t *vids,
 }
 
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t hist;

@@ -54,7 +54,7 @@ igraph_long_t print_mincut(const igraph_t *graph, igraph_real_t value,
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t weights, partition, partition2, cut;

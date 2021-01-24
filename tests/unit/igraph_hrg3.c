@@ -26,7 +26,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t karate;
     igraph_vector_t edges, prob;
     igraph_long_t i, n;

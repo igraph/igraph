@@ -25,7 +25,7 @@
 
 #define SIZE (1000)
 
-igraph_long_t main() {
+int main() {
 
     igraph_matrix_t M, M2;
     igraph_vector_t lambda;

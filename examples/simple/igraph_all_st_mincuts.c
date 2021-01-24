@@ -66,7 +66,7 @@ igraph_long_t print_and_destroy(igraph_t *g,
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_ptr_t partitions;

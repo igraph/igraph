@@ -21,7 +21,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t g;
     igraph_real_t  modularity, temperature;
     igraph_vector_t membership, csize;

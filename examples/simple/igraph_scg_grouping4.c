@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_long_t main() {
+int main() {
 
     const igraph_long_t nodes = 10;
     igraph_t g;

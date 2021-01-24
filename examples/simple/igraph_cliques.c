@@ -113,7 +113,7 @@ void test_callback(const igraph_t *graph) {
 }
 
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_ptr_t result;

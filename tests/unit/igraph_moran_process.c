@@ -211,7 +211,7 @@ igraph_long_t moran_one_test() {
     return IGRAPH_SUCCESS;
 }
 
-igraph_long_t main() {
+int main() {
 
     IGRAPH_ASSERT(error_tests() == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(moran_one_test() == IGRAPH_SUCCESS);

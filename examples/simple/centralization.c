@@ -26,7 +26,7 @@
 
 #define ALMOST_EQUALS(a, b) (fabs((a)-(b)) < 1e-8)
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_real_t cent;

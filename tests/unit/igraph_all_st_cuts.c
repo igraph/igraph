@@ -61,7 +61,7 @@ igraph_long_t test_all_st_cuts(const igraph_t *graph,
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_t g;
     igraph_vector_ptr_t cuts, partition1s;
     igraph_long_t i, n;

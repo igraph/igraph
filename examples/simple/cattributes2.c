@@ -27,7 +27,7 @@ void null_warning_handler (const char *reason, const char *file,
                            igraph_long_t line, igraph_long_t igraph_errno) {
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_t y;

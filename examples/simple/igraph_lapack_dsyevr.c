@@ -68,7 +68,7 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_matrix_t A;
     igraph_matrix_t vectors, vectors2;

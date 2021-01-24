@@ -39,7 +39,7 @@
  * <programlisting>
  * <![CDATA[#include <igraph.h>
  *
- * igraph_long_t main(void)
+ * int main(void)
  * {
  *    igraph_t graph;
  *    igraph_vector_ptr_t seps;

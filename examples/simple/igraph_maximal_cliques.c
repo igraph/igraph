@@ -76,7 +76,7 @@ void print_and_destroy_cliques(igraph_vector_ptr_t *cliques) {
     }
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g, g2, cli;
     igraph_vector_t perm;

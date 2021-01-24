@@ -63,7 +63,7 @@ igraph_long_t check_ev(const igraph_matrix_t *A, const igraph_vector_t *values,
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_matrix_t A;
     igraph_vector_t values;

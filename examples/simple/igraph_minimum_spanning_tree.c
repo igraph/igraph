@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g, tree;
     igraph_vector_t eb, edges;

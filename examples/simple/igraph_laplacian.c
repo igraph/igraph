@@ -211,7 +211,7 @@ igraph_long_t test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
     return !ok;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t res;
     igraph_long_t i;
     igraph_vector_t weights;

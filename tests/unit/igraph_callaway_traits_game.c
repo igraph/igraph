@@ -37,7 +37,7 @@ void init_vm(igraph_vector_t *type_dist,
     igraph_matrix_destroy(&pref_matrix); \
     } while(0)
 
-igraph_long_t main() {
+int main() {
     igraph_t g;
     igraph_vector_t type_dist;
     igraph_matrix_t pref_matrix;

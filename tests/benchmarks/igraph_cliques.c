@@ -3,7 +3,7 @@
 
 #include "bench.h"
 
-igraph_long_t main() {
+int main() {
     igraph_t g;
     igraph_vector_ptr_t res;
     igraph_long_t i, n;

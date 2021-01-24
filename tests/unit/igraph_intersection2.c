@@ -26,7 +26,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_t star, ring, uni, result;
     igraph_vector_ptr_t glist;

@@ -35,7 +35,7 @@ igraph_long_t print_and_destroy(igraph_vector_ptr_t *ptr) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_t g, g2;
     igraph_vector_ptr_t sep;
     igraph_vs_t vs;

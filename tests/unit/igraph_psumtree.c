@@ -27,7 +27,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_psumtree_t tree;
     igraph_vector_t vec;
     igraph_long_t i;

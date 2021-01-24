@@ -78,7 +78,7 @@ igraph_long_t check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
 
     igraph_t g;
     igraph_vector_ptr_t vecs, evecs;

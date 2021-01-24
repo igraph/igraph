@@ -28,7 +28,7 @@
 
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-igraph_long_t main() {
+int main() {
     igraph_matrix_t mat;
     igraph_sparsemat_t spmat, spmat2;
     igraph_long_t i;

@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-igraph_long_t main() {
+int main() {
 
     const char *files[] = { "fullmatrix1.dl", "fullmatrix2.dl",
                             "fullmatrix3.dl", "fullmatrix4.dl",

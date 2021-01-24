@@ -55,7 +55,7 @@ igraph_long_t test_file(const char* fname) {
     }                       \
 }
 
-igraph_long_t main(igraph_long_t argc, char* argv[]) {
+int main(igraph_long_t argc, char* argv[]) {
     igraph_long_t index = 0;
 
     /* We do not care about errors; all we care about is that the library

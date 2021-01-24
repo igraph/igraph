@@ -13,7 +13,7 @@ void sort_and_print_vector(igraph_vector_t *v) {
     printf("\n");
 }
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
     igraph_vector_t bridges;
 

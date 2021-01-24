@@ -73,7 +73,7 @@ igraph_bool_t handler_stop(igraph_vector_t *clique, void *arg) {
 }
 
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
     igraph_vector_ptr_t list;
     struct userdata ud;

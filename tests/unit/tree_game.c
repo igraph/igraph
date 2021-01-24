@@ -20,7 +20,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
     igraph_bool_t is_tree = 0, are_connected = 0;
 

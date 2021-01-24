@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_long_t main() {
+int main() {
 
     igraph_real_t edges2[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 1, 4, 1, 6, 0, 3 };
     igraph_real_t edges3[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 2, 4, 1, 6, 0, 3 };

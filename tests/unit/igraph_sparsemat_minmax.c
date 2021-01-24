@@ -220,7 +220,7 @@ igraph_long_t doit(igraph_long_t which) {
     return 0;
 }
 
-igraph_long_t main() {
+int main() {
     igraph_long_t res;
 
     res = doit(/*which=*/ MIN);

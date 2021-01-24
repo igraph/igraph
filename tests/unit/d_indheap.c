@@ -27,7 +27,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_d_indheap_t h;
     igraph_long_t idx1, idx2;

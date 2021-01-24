@@ -26,7 +26,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
     igraph_t graph;
     igraph_t full, tree;
     igraph_hrg_t hrg;

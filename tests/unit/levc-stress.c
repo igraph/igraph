@@ -29,7 +29,7 @@
 
 #include "test_utilities.inc"
 
-igraph_long_t main() {
+int main() {
 
     igraph_long_t k;
     for (k = 0; k < 20; k++) {
