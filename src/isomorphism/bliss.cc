@@ -138,12 +138,12 @@ inline int bliss_set_sh(AbstractGraph *g, igraph_bliss_sh_t sh, bool directed) {
 }
 
 
-inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_int_t *colors) {
+inline int bliss_set_colors(AbstractGraph *g, const igraph_vector_long_t *colors) {
     if (colors == NULL) {
         return IGRAPH_SUCCESS;
     }
     const int n = g->get_nof_vertices();
-    if (n != igraph_vector_int_size(colors)) {
+    if (n != igraph_vector_long_size(colors)) {
         IGRAPH_ERROR("Invalid vertex color vector length", IGRAPH_EINVAL);
     }
     for (int i = 0; i < n; ++i) {
@@ -201,7 +201,7 @@ static void collect_generators(void *generators, unsigned int n, const unsigned 
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors,
+igraph_long_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_long_t *colors,
                                  igraph_vector_t *labeling, igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
@@ -255,7 +255,7 @@ int igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
+igraph_long_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_long_t *colors,
                          igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
@@ -302,8 +302,8 @@ int igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *color
  *
  * Time complexity: exponential, in practice it is fast for many graphs.
  */
-int igraph_automorphism_group(
-    const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_ptr_t *generators,
+igraph_long_t igraph_automorphism_group(
+    const igraph_t *graph, const igraph_vector_long_t *colors, igraph_vector_ptr_t *generators,
     igraph_bliss_sh_t sh, igraph_bliss_info_t *info) {
     IGRAPH_HANDLE_EXCEPTIONS(
         AbstractGraph *g = bliss_from_igraph(graph);
@@ -390,8 +390,8 @@ int igraph_automorphism_group(
  *
  * Time complexity: exponential, but in practice it is quite fast.
  */
-int igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
-                            const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
+igraph_long_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
+                            const igraph_vector_long_t *colors1, const igraph_vector_long_t *colors2,
                             igraph_bool_t *iso, igraph_vector_t *map12,
                             igraph_vector_t *map21, igraph_bliss_sh_t sh,
                             igraph_bliss_info_t *info1, igraph_bliss_info_t *info2) {
