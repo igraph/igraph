@@ -27,15 +27,15 @@
 #include <stdio.h>
 
 void print_vector(igraph_vector_t *v) {
-    igraph_integer_t i, l = igraph_vector_size(v);
+    igraph_long_t i, l = igraph_vector_size(v);
     for (i = 0; i < l; i++) {
-        printf(" %li", (igraph_integer_t) VECTOR(*v)[i]);
+        printf(" %li", (igraph_long_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
 
-igraph_integer_t print_free_vector_ptr(igraph_vector_ptr_t *v) {
-    igraph_integer_t i, l = igraph_vector_ptr_size(v);
+igraph_long_t print_free_vector_ptr(igraph_vector_ptr_t *v) {
+    igraph_long_t i, l = igraph_vector_ptr_size(v);
     printf("---\n");
     for (i = 0; i < l; i++) {
         print_vector(VECTOR(*v)[i]);
@@ -46,14 +46,14 @@ igraph_integer_t print_free_vector_ptr(igraph_vector_ptr_t *v) {
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t left, right, uni;
     igraph_vector_t v;
     igraph_vector_ptr_t glist;
     igraph_vector_t edge_map1, edge_map2;
     igraph_vector_ptr_t edgemaps;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_vector_init(&edge_map1, 0);
     igraph_vector_init(&edge_map2, 0);

@@ -156,22 +156,22 @@
  * undirected edge.
  */
 
-static igraph_integer_t igraph_i_maxflow_undirected(const igraph_t *graph,
+static igraph_long_t igraph_i_maxflow_undirected(const igraph_t *graph,
                                        igraph_real_t *value,
                                        igraph_vector_t *flow,
                                        igraph_vector_t *cut,
                                        igraph_vector_t *partition,
                                        igraph_vector_t *partition2,
-                                       igraph_integer_t source,
-                                       igraph_integer_t target,
+                                       igraph_long_t source,
+                                       igraph_long_t target,
                                        const igraph_vector_t *capacity,
                                        igraph_maxflow_stats_t *stats) {
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
+    igraph_long_t no_of_edges = (igraph_long_t) igraph_ecount(graph);
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph);
     igraph_vector_t edges;
     igraph_vector_t newcapacity;
     igraph_t newgraph;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     /* We need to convert this to directed by hand, since we need to be
        sure that the edge ids will be handled properly to build the new
@@ -196,7 +196,7 @@ static igraph_integer_t igraph_i_maxflow_undirected(const igraph_t *graph,
                                 partition2, source, target, &newcapacity, stats));
 
     if (cut) {
-        igraph_integer_t i, cs = igraph_vector_size(cut);
+        igraph_long_t i, cs = igraph_vector_size(cut);
         for (i = 0; i < cs; i++) {
             if (VECTOR(*cut)[i] >= no_of_edges) {
                 VECTOR(*cut)[i] -= no_of_edges;
@@ -210,7 +210,7 @@ static igraph_integer_t igraph_i_maxflow_undirected(const igraph_t *graph,
        from the bigger vertex id to the smaller one. For positive
        values the direction is the opposite. */
     if (flow) {
-        igraph_integer_t i;
+        igraph_long_t i;
         for (i = 0; i < no_of_edges; i++) {
             VECTOR(*flow)[i] -= VECTOR(*flow)[i + no_of_edges];
         }
@@ -253,33 +253,33 @@ static igraph_integer_t igraph_i_maxflow_undirected(const igraph_t *graph,
                                         &first, &current, &to, &excess,       \
                                         &rescap, &rev))
 
-static void igraph_i_mf_gap(igraph_integer_t b, igraph_maxflow_stats_t *stats,
+static void igraph_i_mf_gap(igraph_long_t b, igraph_maxflow_stats_t *stats,
                             igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
-                            igraph_integer_t no_of_nodes,
+                            igraph_long_t no_of_nodes,
                             igraph_vector_long_t *distance) {
 
     IGRAPH_UNUSED(buckets);
 
-    igraph_integer_t bo;
+    igraph_long_t bo;
     (stats->nogap)++;
     for (bo = b + 1; bo <= no_of_nodes; bo++) {
         while (!igraph_dbuckets_empty_bucket(ibuckets, bo)) {
-            igraph_integer_t n = igraph_dbuckets_pop(ibuckets, bo);
+            igraph_long_t n = igraph_dbuckets_pop(ibuckets, bo);
             (stats->nogapnodes)++;
             DIST(n) = no_of_nodes;
         }
     }
 }
 
-static void igraph_i_mf_relabel(igraph_integer_t v, igraph_integer_t no_of_nodes,
+static void igraph_i_mf_relabel(igraph_long_t v, igraph_long_t no_of_nodes,
                                 igraph_vector_long_t *distance,
                                 igraph_vector_long_t *first,
                                 igraph_vector_t *rescap, igraph_vector_long_t *to,
                                 igraph_vector_long_t *current,
-                                igraph_maxflow_stats_t *stats, igraph_integer_t *nrelabelsince) {
+                                igraph_maxflow_stats_t *stats, igraph_long_t *nrelabelsince) {
 
-    igraph_integer_t min = no_of_nodes;
-    igraph_integer_t k, l, min_edge = 0;
+    igraph_long_t min = no_of_nodes;
+    igraph_long_t k, l, min_edge = 0;
     (stats->norelabel)++; (*nrelabelsince)++;
     DIST(v) = no_of_nodes;
     for (k = FIRST(v), l = LAST(v); k < l; k++) {
@@ -295,14 +295,14 @@ static void igraph_i_mf_relabel(igraph_integer_t v, igraph_integer_t no_of_nodes
     }
 }
 
-static void igraph_i_mf_push(igraph_integer_t v, igraph_integer_t e, igraph_integer_t n,
+static void igraph_i_mf_push(igraph_long_t v, igraph_long_t e, igraph_long_t n,
                              igraph_vector_long_t *current,
                              igraph_vector_t *rescap, igraph_vector_t *excess,
-                             igraph_integer_t target, igraph_integer_t source,
+                             igraph_long_t target, igraph_long_t source,
                              igraph_buckets_t *buckets, igraph_dbuckets_t *ibuckets,
                              igraph_vector_long_t *distance,
                              igraph_vector_long_t *rev, igraph_maxflow_stats_t *stats,
-                             igraph_integer_t *npushsince) {
+                             igraph_long_t *npushsince) {
 
 
     IGRAPH_UNUSED(current);
@@ -313,7 +313,7 @@ static void igraph_i_mf_push(igraph_integer_t v, igraph_integer_t e, igraph_inte
     (stats->nopush)++; (*npushsince)++;
     if (EXCESS(n) == 0 && n != target) {
         igraph_dbuckets_delete(ibuckets, DIST(n), n);
-        igraph_buckets_add(buckets, (igraph_integer_t) DIST(n), n);
+        igraph_buckets_add(buckets, (igraph_long_t) DIST(n), n);
     }
     RESCAP(e) -= delta;
     RESCAP(REV(e)) += delta;
@@ -321,26 +321,26 @@ static void igraph_i_mf_push(igraph_integer_t v, igraph_integer_t e, igraph_inte
     EXCESS(v) -= delta;
 }
 
-static void igraph_i_mf_discharge(igraph_integer_t v,
+static void igraph_i_mf_discharge(igraph_long_t v,
                                   igraph_vector_long_t *current,
                                   igraph_vector_long_t *first,
                                   igraph_vector_t *rescap,
                                   igraph_vector_long_t *to,
                                   igraph_vector_long_t *distance,
                                   igraph_vector_t *excess,
-                                  igraph_integer_t no_of_nodes, igraph_integer_t source,
-                                  igraph_integer_t target, igraph_buckets_t *buckets,
+                                  igraph_long_t no_of_nodes, igraph_long_t source,
+                                  igraph_long_t target, igraph_buckets_t *buckets,
                                   igraph_dbuckets_t *ibuckets,
                                   igraph_vector_long_t *rev,
                                   igraph_maxflow_stats_t *stats,
-                                  igraph_integer_t *npushsince, igraph_integer_t *nrelabelsince) {
+                                  igraph_long_t *npushsince, igraph_long_t *nrelabelsince) {
     do {
-        igraph_integer_t i;
-        igraph_integer_t start = (igraph_integer_t) CURRENT(v);
-        igraph_integer_t stop = (igraph_integer_t) LAST(v);
+        igraph_long_t i;
+        igraph_long_t start = (igraph_long_t) CURRENT(v);
+        igraph_long_t stop = (igraph_long_t) LAST(v);
         for (i = start; i < stop; i++) {
             if (RESCAP(i) > 0) {
-                igraph_integer_t nei = HEAD(i);
+                igraph_long_t nei = HEAD(i);
                 if (DIST(v) == DIST(nei) + 1) {
                     PUSH((v), i, nei);
                     if (EXCESS(v) == 0) {
@@ -350,7 +350,7 @@ static void igraph_i_mf_discharge(igraph_integer_t v,
             }
         }
         if (i == stop) {
-            igraph_integer_t origdist = DIST(v);
+            igraph_long_t origdist = DIST(v);
             RELABEL(v);
             if (igraph_buckets_empty_bucket(buckets, origdist) &&
                 igraph_dbuckets_empty_bucket(ibuckets, origdist)) {
@@ -368,15 +368,15 @@ static void igraph_i_mf_discharge(igraph_integer_t v,
 }
 
 static void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
-                            igraph_integer_t source, igraph_integer_t target,
-                            igraph_integer_t no_of_nodes, igraph_buckets_t *buckets,
+                            igraph_long_t source, igraph_long_t target,
+                            igraph_long_t no_of_nodes, igraph_buckets_t *buckets,
                             igraph_dbuckets_t *ibuckets,
                             igraph_vector_long_t *distance,
                             igraph_vector_long_t *first, igraph_vector_long_t *current,
                             igraph_vector_long_t *to, igraph_vector_t *excess,
                             igraph_vector_t *rescap, igraph_vector_long_t *rev) {
 
-    igraph_integer_t k, l;
+    igraph_long_t k, l;
 
     IGRAPH_UNUSED(source);
 
@@ -387,11 +387,11 @@ static void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
 
     igraph_dqueue_long_push(bfsq, target);
     while (!igraph_dqueue_long_empty(bfsq)) {
-        igraph_integer_t node = igraph_dqueue_long_pop(bfsq);
-        igraph_integer_t ndist = DIST(node) + 1;
+        igraph_long_t node = igraph_dqueue_long_pop(bfsq);
+        igraph_long_t ndist = DIST(node) + 1;
         for (k = FIRST(node), l = LAST(node); k < l; k++) {
             if (RESCAP(REV(k)) > 0) {
-                igraph_integer_t nei = HEAD(k);
+                igraph_long_t nei = HEAD(k);
                 if (DIST(nei) == no_of_nodes) {
                     DIST(nei) = ndist;
                     CURRENT(nei) = FIRST(nei);
@@ -480,16 +480,16 @@ static void igraph_i_mf_bfs(igraph_dqueue_long_t *bfsq,
  * \example examples/simple/flow2.c
  */
 
-igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
+igraph_long_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                    igraph_vector_t *flow, igraph_vector_t *cut,
                    igraph_vector_t *partition, igraph_vector_t *partition2,
-                   igraph_integer_t source, igraph_integer_t target,
+                   igraph_long_t source, igraph_long_t target,
                    const igraph_vector_t *capacity,
                    igraph_maxflow_stats_t *stats) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_orig_edges = (igraph_integer_t) igraph_ecount(graph);
-    igraph_integer_t no_of_edges = 2 * no_of_orig_edges;
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph);
+    igraph_long_t no_of_orig_edges = (igraph_long_t) igraph_ecount(graph);
+    igraph_long_t no_of_edges = 2 * no_of_orig_edges;
 
     igraph_vector_t rescap, excess;
     igraph_vector_long_t from, to, rev, distance;
@@ -500,8 +500,8 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
     igraph_dqueue_long_t bfsq;
 
-    igraph_integer_t i, j, idx;
-    igraph_integer_t npushsince = 0, nrelabelsince = 0;
+    igraph_long_t i, j, idx;
+    igraph_long_t npushsince = 0, nrelabelsince = 0;
 
     igraph_maxflow_stats_t local_stats;   /* used if the user passed a null pointer for stats */
 
@@ -589,8 +589,8 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     IGRAPH_CHECK(igraph_vector_rank(&edges, &rank, no_of_nodes));
 
     for (i = 0; i < no_of_edges; i += 2) {
-        igraph_integer_t pos = (igraph_integer_t) VECTOR(rank)[i];
-        igraph_integer_t pos2 = (igraph_integer_t) VECTOR(rank)[i + 1];
+        igraph_long_t pos = (igraph_long_t) VECTOR(rank)[i];
+        igraph_long_t pos2 = (igraph_long_t) VECTOR(rank)[i + 1];
         VECTOR(from)[pos] = VECTOR(edges)[i];
         VECTOR(to)[pos]   = VECTOR(edges)[i + 1];
         VECTOR(from)[pos2] = VECTOR(edges)[i + 1];
@@ -609,8 +609,8 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         idx++; VECTOR(first)[idx] = 0;
     }
     for (i = 1; i < no_of_edges; i++) {
-        igraph_integer_t n = (igraph_integer_t) (VECTOR(from)[i] -
-                                 VECTOR(from)[ (igraph_integer_t) VECTOR(first)[idx] ]);
+        igraph_long_t n = (igraph_long_t) (VECTOR(from)[i] -
+                                 VECTOR(from)[ (igraph_long_t) VECTOR(first)[idx] ]);
         for (j = 0; j < n; j++) {
             idx++; VECTOR(first)[idx] = i;
         }
@@ -656,7 +656,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
     (stats->nobfs)++;
 
     while (!igraph_buckets_empty(&buckets)) {
-        igraph_integer_t vertex = igraph_buckets_popmax(&buckets);
+        igraph_long_t vertex = igraph_buckets_popmax(&buckets);
         DISCHARGE(vertex);
         if (npushsince > no_of_nodes / 2 && nrelabelsince > no_of_nodes) {
             (stats->nobfs)++;
@@ -677,7 +677,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
            backwards. */
         igraph_dqueue_t Q;
         igraph_vector_bool_t added;
-        igraph_integer_t marked = 0;
+        igraph_long_t marked = 0;
 
         IGRAPH_CHECK(igraph_vector_bool_init(&added, no_of_nodes));
         IGRAPH_FINALLY(igraph_vector_bool_destroy, &added);
@@ -686,12 +686,12 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
 
         igraph_dqueue_push(&Q, target);
-        VECTOR(added)[(igraph_integer_t)target] = 1;
+        VECTOR(added)[(igraph_long_t)target] = 1;
         marked++;
         while (!igraph_dqueue_empty(&Q)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&Q);
+            igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&Q);
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
-                igraph_integer_t nei = HEAD(i);
+                igraph_long_t nei = HEAD(i);
                 if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
                     VECTOR(added)[nei] = 1;
                     marked++;
@@ -708,8 +708,8 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         if (cut) {
             igraph_vector_clear(cut);
             for (i = 0; i < no_of_orig_edges; i++) {
-                igraph_integer_t f = IGRAPH_FROM(graph, i);
-                igraph_integer_t t = IGRAPH_TO(graph, i);
+                igraph_long_t f = IGRAPH_FROM(graph, i);
+                igraph_long_t t = IGRAPH_TO(graph, i);
                 if (!VECTOR(added)[f] && VECTOR(added)[t]) {
                     IGRAPH_CHECK(igraph_vector_push_back(cut, i));
                 }
@@ -717,7 +717,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         }
 
         if (partition2) {
-            igraph_integer_t x = 0;
+            igraph_long_t x = 0;
             IGRAPH_CHECK(igraph_vector_resize(partition2, marked));
             for (i = 0; i < no_of_nodes; i++) {
                 if (VECTOR(added)[i]) {
@@ -727,7 +727,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         }
 
         if (partition) {
-            igraph_integer_t x = 0;
+            igraph_long_t x = 0;
             IGRAPH_CHECK(igraph_vector_resize(partition,
                                               no_of_nodes - marked));
             for (i = 0; i < no_of_nodes; i++) {
@@ -745,27 +745,27 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         /* Initialize the backward distances, with a breadth-first search
            from the source */
         igraph_dqueue_t Q;
-        igraph_vector_int_t added;
-        igraph_integer_t j, k, l;
+        igraph_vector_long_t added;
+        igraph_long_t j, k, l;
         igraph_t flow_graph;
         igraph_vector_t flow_edges;
         igraph_bool_t dag;
 
-        IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
+        IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
+        IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
         IGRAPH_CHECK(igraph_dqueue_init(&Q, 100));
         IGRAPH_FINALLY(igraph_dqueue_destroy, &Q);
 
         igraph_dqueue_push(&Q, source);
         igraph_dqueue_push(&Q, 0);
-        VECTOR(added)[(igraph_integer_t)source] = 1;
+        VECTOR(added)[(igraph_long_t)source] = 1;
         while (!igraph_dqueue_empty(&Q)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&Q);
-            igraph_integer_t actdist = (igraph_integer_t) igraph_dqueue_pop(&Q);
+            igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&Q);
+            igraph_long_t actdist = (igraph_long_t) igraph_dqueue_pop(&Q);
             DIST(actnode) = actdist;
 
             for (i = FIRST(actnode), j = LAST(actnode); i < j; i++) {
-                igraph_integer_t nei = HEAD(i);
+                igraph_long_t nei = HEAD(i);
                 if (!VECTOR(added)[nei] && RESCAP(REV(i)) > 0.0) {
                     VECTOR(added)[nei] = 1;
                     IGRAPH_CHECK(igraph_dqueue_push(&Q, nei));
@@ -774,7 +774,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
             }
         } /* !igraph_dqueue_empty(&Q) */
 
-        igraph_vector_int_destroy(&added);
+        igraph_vector_long_destroy(&added);
         igraph_dqueue_destroy(&Q);
         IGRAPH_FINALLY_CLEAN(2);
 
@@ -782,19 +782,19 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
         igraph_buckets_clear(&buckets);
         for (i = 0; i < no_of_nodes; i++) {
             if (EXCESS(i) > 0.0 && i != source && i != target) {
-                igraph_buckets_add(&buckets, (igraph_integer_t) DIST(i), i);
+                igraph_buckets_add(&buckets, (igraph_long_t) DIST(i), i);
             }
         }
 
         /* Now we return the flow to the source */
         while (!igraph_buckets_empty(&buckets)) {
-            igraph_integer_t vertex = igraph_buckets_popmax(&buckets);
+            igraph_long_t vertex = igraph_buckets_popmax(&buckets);
 
             /* DISCHARGE(vertex) comes here */
             do {
-                for (i = (igraph_integer_t) CURRENT(vertex), j = LAST(vertex); i < j; i++) {
+                for (i = (igraph_long_t) CURRENT(vertex), j = LAST(vertex); i < j; i++) {
                     if (RESCAP(i) > 0) {
-                        igraph_integer_t nei = HEAD(i);
+                        igraph_long_t nei = HEAD(i);
 
                         if (DIST(vertex) == DIST(nei) + 1) {
                             igraph_real_t delta =
@@ -804,7 +804,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
                             if (nei != source && EXCESS(nei) == 0.0 &&
                                 DIST(nei) != no_of_nodes) {
-                                igraph_buckets_add(&buckets, (igraph_integer_t) DIST(nei), nei);
+                                igraph_buckets_add(&buckets, (igraph_long_t) DIST(nei), nei);
                             }
 
                             EXCESS(nei) += delta;
@@ -822,7 +822,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
                     /* RELABEL(vertex) comes here */
                     igraph_real_t min;
-                    igraph_integer_t min_edge = 0;
+                    igraph_long_t min_edge = 0;
                     DIST(vertex) = min = no_of_nodes;
                     for (k = FIRST(vertex), l = LAST(vertex); k < l; k++) {
                         if (RESCAP(k) > 0) {
@@ -839,7 +839,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                         DIST(vertex) = min;
                         CURRENT(vertex) = min_edge;
                         /* Vertex is still active */
-                        igraph_buckets_add(&buckets, (igraph_integer_t) DIST(vertex), vertex);
+                        igraph_buckets_add(&buckets, (igraph_long_t) DIST(vertex), vertex);
                     }
 
                     /* TODO: gap heuristics here ??? */
@@ -873,7 +873,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
         IGRAPH_VECTOR_INIT_FINALLY(&flow_edges, 0);
         for (i = 0, j = 0; i < no_of_edges; i += 2, j++) {
-            igraph_integer_t pos = (igraph_integer_t) VECTOR(rank)[i];
+            igraph_long_t pos = (igraph_long_t) VECTOR(rank)[i];
             if ((capacity ? VECTOR(*capacity)[j] : 1.0) > RESCAP(pos)) {
                 IGRAPH_CHECK(igraph_vector_push_back(&flow_edges,
                                                      IGRAPH_FROM(graph, j)));
@@ -896,15 +896,15 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
             IGRAPH_CHECK(igraph_vector_long_init(&stack, 0));
             IGRAPH_FINALLY(igraph_vector_long_destroy, &stack);
-            IGRAPH_CHECK(igraph_vector_int_init(&added, no_of_nodes));
-            IGRAPH_FINALLY(igraph_vector_int_destroy, &added);
+            IGRAPH_CHECK(igraph_vector_long_init(&added, no_of_nodes));
+            IGRAPH_FINALLY(igraph_vector_long_destroy, &added);
             IGRAPH_VECTOR_INIT_FINALLY(&mycap, no_of_edges);
 
 #define MYCAP(i)      (VECTOR(mycap)[(i)])
 
             for (i = 0; i < no_of_edges; i += 2) {
-                igraph_integer_t pos = (igraph_integer_t) VECTOR(rank)[i];
-                igraph_integer_t pos2 = (igraph_integer_t) VECTOR(rank)[i + 1];
+                igraph_long_t pos = (igraph_long_t) VECTOR(rank)[i];
+                igraph_long_t pos2 = (igraph_long_t) VECTOR(rank)[i + 1];
                 MYCAP(pos) = (capacity ? VECTOR(*capacity)[i / 2] : 1.0) - RESCAP(pos);
                 MYCAP(pos2) = 0.0;
             }
@@ -912,16 +912,16 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
             do {
                 igraph_vector_long_null(&current);
                 igraph_vector_long_clear(&stack);
-                igraph_vector_int_null(&added);
+                igraph_vector_long_null(&added);
 
                 IGRAPH_CHECK(igraph_vector_long_push_back(&stack, -1));
                 IGRAPH_CHECK(igraph_vector_long_push_back(&stack, source));
-                VECTOR(added)[(igraph_integer_t)source] = 1;
+                VECTOR(added)[(igraph_long_t)source] = 1;
                 while (!igraph_vector_long_empty(&stack) &&
                        igraph_vector_long_tail(&stack) != target) {
-                    igraph_integer_t actnode = igraph_vector_long_tail(&stack);
-                    igraph_integer_t edge = FIRST(actnode) + (igraph_integer_t) CURRENT(actnode);
-                    igraph_integer_t nei;
+                    igraph_long_t actnode = igraph_vector_long_tail(&stack);
+                    igraph_long_t edge = FIRST(actnode) + (igraph_long_t) CURRENT(actnode);
+                    igraph_long_t nei;
                     while (edge < LAST(actnode) && MYCAP(edge) == 0.0) {
                         edge++;
                     }
@@ -939,10 +939,10 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                            until we find 'nei' again, determine the flow along the
                            cycle. */
                         igraph_real_t thisflow = MYCAP(edge);
-                        igraph_integer_t idx;
+                        igraph_long_t idx;
                         for (idx = igraph_vector_long_size(&stack) - 2;
                              idx >= 0 && VECTOR(stack)[idx + 1] != nei; idx -= 2) {
-                            igraph_integer_t e = VECTOR(stack)[idx];
+                            igraph_long_t e = VECTOR(stack)[idx];
                             igraph_real_t rcap = e >= 0 ? MYCAP(e) : MYCAP(edge);
                             if (rcap < thisflow) {
                                 thisflow = rcap;
@@ -951,7 +951,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                         MYCAP(edge) -= thisflow; RESCAP(edge) += thisflow;
                         for (idx = igraph_vector_long_size(&stack) - 2;
                              idx >= 0 && VECTOR(stack)[idx + 1] != nei; idx -= 2) {
-                            igraph_integer_t e = VECTOR(stack)[idx];
+                            igraph_long_t e = VECTOR(stack)[idx];
                             if (e >= 0) {
                                 MYCAP(e) -= thisflow;
                                 RESCAP(e) += thisflow;
@@ -973,17 +973,17 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
                 /* If non-empty, then it contains a path from source to target
                    in the residual graph. We factor out this path from the flow. */
                 if (!igraph_vector_long_empty(&stack)) {
-                    igraph_integer_t pl = igraph_vector_long_size(&stack);
+                    igraph_long_t pl = igraph_vector_long_size(&stack);
                     igraph_real_t thisflow = EXCESS(target);
                     for (i = 2; i < pl; i += 2) {
-                        igraph_integer_t edge = VECTOR(stack)[i];
+                        igraph_long_t edge = VECTOR(stack)[i];
                         igraph_real_t rcap = MYCAP(edge);
                         if (rcap < thisflow) {
                             thisflow = rcap;
                         }
                     }
                     for (i = 2; i < pl; i += 2) {
-                        igraph_integer_t edge = VECTOR(stack)[i];
+                        igraph_long_t edge = VECTOR(stack)[i];
                         MYCAP(edge) -= thisflow;
                     }
                 }
@@ -991,7 +991,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
             } while (!igraph_vector_long_empty(&stack));
 
             igraph_vector_destroy(&mycap);
-            igraph_vector_int_destroy(&added);
+            igraph_vector_long_destroy(&added);
             igraph_vector_long_destroy(&stack);
             IGRAPH_FINALLY_CLEAN(3);
         }
@@ -1000,7 +1000,7 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
 
         IGRAPH_CHECK(igraph_vector_resize(flow, no_of_orig_edges));
         for (i = 0, j = 0; i < no_of_edges; i += 2, j++) {
-            igraph_integer_t pos = (igraph_integer_t) VECTOR(rank)[i];
+            igraph_long_t pos = (igraph_long_t) VECTOR(rank)[i];
             VECTOR(*flow)[j] = (capacity ? VECTOR(*capacity)[j] : 1.0) -
                                RESCAP(pos);
         }
@@ -1074,8 +1074,8 @@ igraph_integer_t igraph_maxflow(const igraph_t *graph, igraph_real_t *value,
  * properties based on the maximum flow.
  */
 
-igraph_integer_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
-                         igraph_integer_t source, igraph_integer_t target,
+igraph_long_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *value,
+                         igraph_long_t source, igraph_long_t target,
                          const igraph_vector_t *capacity,
                          igraph_maxflow_stats_t *stats) {
 
@@ -1112,8 +1112,8 @@ igraph_integer_t igraph_maxflow_value(const igraph_t *graph, igraph_real_t *valu
  * igraph_maxflow_value(), |V| is the number of vertices.
  */
 
-igraph_integer_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
-                           igraph_integer_t source, igraph_integer_t target,
+igraph_long_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *value,
+                           igraph_long_t source, igraph_long_t target,
                            const igraph_vector_t *capacity) {
 
     if (source == target) {
@@ -1160,10 +1160,10 @@ igraph_integer_t igraph_st_mincut_value(const igraph_t *graph, igraph_real_t *va
  * Time complexity: see \ref igraph_maxflow().
  */
 
-igraph_integer_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
+igraph_long_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
                      igraph_vector_t *cut, igraph_vector_t *partition,
                      igraph_vector_t *partition2,
-                     igraph_integer_t source, igraph_integer_t target,
+                     igraph_long_t source, igraph_long_t target,
                      const igraph_vector_t *capacity) {
 
     return igraph_maxflow(graph, value, /*flow=*/ 0,
@@ -1174,16 +1174,16 @@ igraph_integer_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
 /* This is a flow-based version, but there is a better one
    for undirected graphs */
 
-/* igraph_integer_t igraph_i_mincut_value_undirected(const igraph_t *graph, */
+/* igraph_long_t igraph_i_mincut_value_undirected(const igraph_t *graph, */
 /*                   igraph_real_t *res, */
 /*                   const igraph_vector_t *capacity) { */
 
-/*   igraph_integer_t no_of_edges=igraph_ecount(graph); */
-/*   igraph_integer_t no_of_nodes=igraph_vcount(graph); */
+/*   igraph_long_t no_of_edges=igraph_ecount(graph); */
+/*   igraph_long_t no_of_nodes=igraph_vcount(graph); */
 /*   igraph_vector_t edges; */
 /*   igraph_vector_t newcapacity; */
 /*   igraph_t newgraph; */
-/*   igraph_integer_t i; */
+/*   igraph_long_t i; */
 
 /*   /\* We need to convert this to directed by hand, since we need to be */
 /*      sure that the edge ids will be handled properly to build the new */
@@ -1221,26 +1221,26 @@ igraph_integer_t igraph_st_mincut(const igraph_t *graph, igraph_real_t *value,
  * It can also calculate the cut itself, not just the cut value.
  */
 
-static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
+static igraph_long_t igraph_i_mincut_undirected(const igraph_t *graph,
                                       igraph_real_t *res,
                                       igraph_vector_t *partition,
                                       igraph_vector_t *partition2,
                                       igraph_vector_t *cut,
                                       const igraph_vector_t *capacity) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph);
+    igraph_long_t no_of_edges = (igraph_long_t) igraph_ecount(graph);
 
     igraph_i_cutheap_t heap;
     igraph_real_t mincut = IGRAPH_INFINITY; /* infinity */
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_adjlist_t adjlist;
     igraph_inclist_t inclist;
 
     igraph_vector_t mergehist;
     igraph_bool_t calc_cut = partition || partition2 || cut;
-    igraph_integer_t act_step = 0, mincut_step = 0;
+    igraph_long_t act_step = 0, mincut_step = 0;
 
     if (capacity && igraph_vector_size(capacity) != no_of_edges) {
         IGRAPH_ERROR("Invalid capacity vector size", IGRAPH_EINVAL);
@@ -1249,7 +1249,7 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
     /* Check if the graph is connected at all */
     {
         igraph_vector_t memb, csize;
-        igraph_integer_t no;
+        igraph_long_t no;
         IGRAPH_VECTOR_INIT_FINALLY(&memb, 0);
         IGRAPH_VECTOR_INIT_FINALLY(&csize, 0);
         IGRAPH_CHECK(igraph_clusters(graph, &memb, &csize, &no,
@@ -1262,9 +1262,9 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
                 igraph_vector_clear(cut);
             }
             if (partition) {
-                igraph_integer_t j = 0;
+                igraph_long_t j = 0;
                 IGRAPH_CHECK(igraph_vector_resize(partition,
-                                                  (igraph_integer_t) VECTOR(csize)[0]));
+                                                  (igraph_long_t) VECTOR(csize)[0]));
                 for (i = 0; i < no_of_nodes; i++) {
                     if (VECTOR(memb)[i] == 0) {
                         VECTOR(*partition)[j++] = i;
@@ -1272,9 +1272,9 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
                 }
             }
             if (partition2) {
-                igraph_integer_t j = 0;
+                igraph_long_t j = 0;
                 IGRAPH_CHECK(igraph_vector_resize(partition2, no_of_nodes -
-                                                  (igraph_integer_t) VECTOR(csize)[0]));
+                                                  (igraph_long_t) VECTOR(csize)[0]));
                 for (i = 0; i < no_of_nodes; i++) {
                     if (VECTOR(memb)[i] != 0) {
                         VECTOR(*partition2)[j++] = i;
@@ -1307,12 +1307,12 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
 
     while (igraph_i_cutheap_size(&heap) >= 2) {
 
-        igraph_integer_t last;
+        igraph_long_t last;
         igraph_real_t acut;
-        igraph_integer_t a, n;
+        igraph_long_t a, n;
 
-        igraph_vector_int_t *edges, *edges2;
-        igraph_vector_int_t *neis, *neis2;
+        igraph_vector_long_t *edges, *edges2;
+        igraph_vector_long_t *neis, *neis2;
 
         do {
             a = igraph_i_cutheap_popmax(&heap);
@@ -1320,11 +1320,11 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
             /* update the weights of the active vertices connected to a */
             edges = igraph_inclist_get(&inclist, a);
             neis = igraph_adjlist_get(&adjlist, a);
-            n = igraph_vector_int_size(edges);
+            n = igraph_vector_long_size(edges);
             for (i = 0; i < n; i++) {
-                igraph_integer_t edge = (igraph_integer_t) VECTOR(*edges)[i];
-                igraph_integer_t to = (igraph_integer_t) VECTOR(*neis)[i];
-                igraph_real_t weight = capacity ? VECTOR(*capacity)[(igraph_integer_t)edge] : 1.0;
+                igraph_long_t edge = (igraph_long_t) VECTOR(*edges)[i];
+                igraph_long_t to = (igraph_long_t) VECTOR(*neis)[i];
+                igraph_real_t weight = capacity ? VECTOR(*capacity)[(igraph_long_t)edge] : 1.0;
                 igraph_i_cutheap_update(&heap, to, weight);
             }
 
@@ -1355,13 +1355,13 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
            last deactivated vertex */
         edges = igraph_inclist_get(&inclist, a);
         neis = igraph_adjlist_get(&adjlist, a);
-        n = igraph_vector_int_size(edges);
+        n = igraph_vector_long_size(edges);
         for (i = 0; i < n; ) {
             if (VECTOR(*neis)[i] == last) {
                 VECTOR(*neis)[i] = VECTOR(*neis)[n - 1];
                 VECTOR(*edges)[i] = VECTOR(*edges)[n - 1];
-                igraph_vector_int_pop_back(neis);
-                igraph_vector_int_pop_back(edges);
+                igraph_vector_long_pop_back(neis);
+                igraph_vector_long_pop_back(edges);
                 n--;
             } else {
                 i++;
@@ -1370,13 +1370,13 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
 
         edges = igraph_inclist_get(&inclist, last);
         neis = igraph_adjlist_get(&adjlist, last);
-        n = igraph_vector_int_size(edges);
+        n = igraph_vector_long_size(edges);
         for (i = 0; i < n; ) {
             if (VECTOR(*neis)[i] == a) {
                 VECTOR(*neis)[i] = VECTOR(*neis)[n - 1];
                 VECTOR(*edges)[i] = VECTOR(*edges)[n - 1];
-                igraph_vector_int_pop_back(neis);
-                igraph_vector_int_pop_back(edges);
+                igraph_vector_long_pop_back(neis);
+                igraph_vector_long_pop_back(edges);
                 n--;
             } else {
                 i++;
@@ -1385,12 +1385,12 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
 
         /* Now rewrite the edge lists of last's neighbors */
         neis = igraph_adjlist_get(&adjlist, last);
-        n = igraph_vector_int_size(neis);
+        n = igraph_vector_long_size(neis);
         for (i = 0; i < n; i++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[i];
-            igraph_integer_t n2, j;
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[i];
+            igraph_long_t n2, j;
             neis2 = igraph_adjlist_get(&adjlist, nei);
-            n2 = igraph_vector_int_size(neis2);
+            n2 = igraph_vector_long_size(neis2);
             for (j = 0; j < n2; j++) {
                 if (VECTOR(*neis2)[j] == last) {
                     VECTOR(*neis2)[j] = a;
@@ -1403,10 +1403,10 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
         neis = igraph_adjlist_get(&adjlist, a);
         edges2 = igraph_inclist_get(&inclist, last);
         neis2 = igraph_adjlist_get(&adjlist, last);
-        IGRAPH_CHECK(igraph_vector_int_append(edges, edges2));
-        IGRAPH_CHECK(igraph_vector_int_append(neis, neis2));
-        igraph_vector_int_clear(edges2); /* TODO: free it */
-        igraph_vector_int_clear(neis2);  /* TODO: free it */
+        IGRAPH_CHECK(igraph_vector_long_append(edges, edges2));
+        IGRAPH_CHECK(igraph_vector_long_append(neis, neis2));
+        igraph_vector_long_clear(edges2); /* TODO: free it */
+        igraph_vector_long_clear(neis2);  /* TODO: free it */
 
         /* Remove the deleted vertex from the heap entirely */
         igraph_i_cutheap_reset_undefine(&heap, last);
@@ -1420,9 +1420,9 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(3);
 
     if (calc_cut) {
-        igraph_integer_t bignode = (igraph_integer_t) VECTOR(mergehist)[2 * mincut_step + 1];
-        igraph_integer_t i, idx;
-        igraph_integer_t size = 1;
+        igraph_long_t bignode = (igraph_long_t) VECTOR(mergehist)[2 * mincut_step + 1];
+        igraph_long_t i, idx;
+        igraph_long_t size = 1;
         char *mark;
         mark = igraph_Calloc(no_of_nodes, char);
         if (!mark) {
@@ -1433,9 +1433,9 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
         /* first count the vertices in the partition */
         mark[bignode] = 1;
         for (i = mincut_step - 1; i >= 0; i--) {
-            if ( mark[ (igraph_integer_t) VECTOR(mergehist)[2 * i] ] ) {
+            if ( mark[ (igraph_long_t) VECTOR(mergehist)[2 * i] ] ) {
                 size++;
-                mark [ (igraph_integer_t) VECTOR(mergehist)[2 * i + 1] ] = 1;
+                mark [ (igraph_long_t) VECTOR(mergehist)[2 * i + 1] ] = 1;
             }
         }
 
@@ -1445,7 +1445,7 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
             idx = 0;
             VECTOR(*partition)[idx++] = bignode;
             for (i = mincut_step - 1; i >= 0; i--) {
-                if (mark[ (igraph_integer_t) VECTOR(mergehist)[2 * i] ]) {
+                if (mark[ (igraph_long_t) VECTOR(mergehist)[2 * i] ]) {
                     VECTOR(*partition)[idx++] = VECTOR(mergehist)[2 * i + 1];
                 }
             }
@@ -1467,12 +1467,12 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
            so we first collect the edges in mergehist, we don't
            need that anymore. Then we copy it to 'cut';  */
         if (cut) {
-            igraph_integer_t from, to;
+            igraph_long_t from, to;
             igraph_vector_clear(&mergehist);
             for (i = 0; i < no_of_edges; i++) {
-                igraph_edge(graph, (igraph_integer_t) i, &from, &to);
-                if ((mark[(igraph_integer_t)from] && !mark[(igraph_integer_t)to]) ||
-                    (mark[(igraph_integer_t)to] && !mark[(igraph_integer_t)from])) {
+                igraph_edge(graph, (igraph_long_t) i, &from, &to);
+                if ((mark[(igraph_long_t)from] && !mark[(igraph_long_t)to]) ||
+                    (mark[(igraph_long_t)to] && !mark[(igraph_long_t)from])) {
                     IGRAPH_CHECK(igraph_vector_push_back(&mergehist, i));
                 }
             }
@@ -1488,14 +1488,14 @@ static igraph_integer_t igraph_i_mincut_undirected(const igraph_t *graph,
     return 0;
 }
 
-static igraph_integer_t igraph_i_mincut_directed(const igraph_t *graph,
+static igraph_long_t igraph_i_mincut_directed(const igraph_t *graph,
                                     igraph_real_t *value,
                                     igraph_vector_t *partition,
                                     igraph_vector_t *partition2,
                                     igraph_vector_t *cut,
                                     const igraph_vector_t *capacity) {
-    igraph_integer_t i;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t flow;
     igraph_real_t minmaxflow = IGRAPH_INFINITY;
     igraph_vector_t mypartition, mypartition2, mycut;
@@ -1528,7 +1528,7 @@ static igraph_integer_t igraph_i_mincut_directed(const igraph_t *graph,
     for (i = 1; i < no_of_nodes; i++) {
         IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
                                     pcut, ppartition, ppartition2, /*source=*/ 0,
-                                    /*target=*/ (igraph_integer_t) i, capacity, 0));
+                                    /*target=*/ (igraph_long_t) i, capacity, 0));
         if (flow < minmaxflow) {
             minmaxflow = flow;
             if (cut) {
@@ -1547,7 +1547,7 @@ static igraph_integer_t igraph_i_mincut_directed(const igraph_t *graph,
         }
         IGRAPH_CHECK(igraph_maxflow(graph, /*value=*/ &flow, /*flow=*/ 0,
                                     pcut, ppartition, ppartition2,
-                                    /*source=*/ (igraph_integer_t) i,
+                                    /*source=*/ (igraph_long_t) i,
                                     /*target=*/ 0, capacity, 0));
         if (flow < minmaxflow) {
             minmaxflow = flow;
@@ -1650,7 +1650,7 @@ static igraph_integer_t igraph_i_mincut_directed(const igraph_t *graph,
  * \example examples/simple/igraph_mincut.c
  */
 
-igraph_integer_t igraph_mincut(const igraph_t *graph,
+igraph_long_t igraph_mincut(const igraph_t *graph,
                   igraph_real_t *value,
                   igraph_vector_t *partition,
                   igraph_vector_t *partition2,
@@ -1674,7 +1674,7 @@ igraph_integer_t igraph_mincut(const igraph_t *graph,
 }
 
 
-static igraph_integer_t igraph_i_mincut_value_undirected(const igraph_t *graph,
+static igraph_long_t igraph_i_mincut_value_undirected(const igraph_t *graph,
                                             igraph_real_t *res,
                                             const igraph_vector_t *capacity) {
     return igraph_i_mincut_undirected(graph, res, 0, 0, 0, capacity);
@@ -1716,12 +1716,12 @@ static igraph_integer_t igraph_i_mincut_value_undirected(const igraph_t *graph,
  * documentation of \ref igraph_maxflow_value().
  */
 
-igraph_integer_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
+igraph_long_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
                         const igraph_vector_t *capacity) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t minmaxflow, flow;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     minmaxflow = IGRAPH_INFINITY;
 
@@ -1731,7 +1731,7 @@ igraph_integer_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
     }
 
     for (i = 1; i < no_of_nodes; i++) {
-        IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, 0, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, 0, (igraph_long_t) i,
                                           capacity, 0));
         if (flow < minmaxflow) {
             minmaxflow = flow;
@@ -1739,7 +1739,7 @@ igraph_integer_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
                 break;
             }
         }
-        IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, (igraph_integer_t) i, 0,
+        IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, (igraph_long_t) i, 0,
                                           capacity, 0));
         if (flow < minmaxflow) {
             minmaxflow = flow;
@@ -1756,18 +1756,18 @@ igraph_integer_t igraph_mincut_value(const igraph_t *graph, igraph_real_t *res,
     return 0;
 }
 
-static igraph_integer_t igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
-                                                    igraph_integer_t *res,
-                                                    igraph_integer_t source,
-                                                    igraph_integer_t target,
+static igraph_long_t igraph_i_st_vertex_connectivity_directed(const igraph_t *graph,
+                                                    igraph_long_t *res,
+                                                    igraph_long_t source,
+                                                    igraph_long_t target,
                                                     igraph_vconn_nei_t neighbors) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph);
+    igraph_long_t no_of_edges = (igraph_long_t) igraph_ecount(graph);
     igraph_vector_t edges;
     igraph_real_t real_res;
     igraph_t newgraph;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_bool_t conn1;
 
     if (source < 0 || source >= no_of_nodes || target < 0 || target >= no_of_nodes) {
@@ -1810,7 +1810,7 @@ static igraph_integer_t igraph_i_st_vertex_connectivity_directed(const igraph_t 
     IGRAPH_CHECK(igraph_vector_resize(&edges, 2 * (no_of_edges + no_of_nodes)));
 
     for (i = 0; i < 2 * no_of_edges; i += 2) {
-        igraph_integer_t to = (igraph_integer_t) VECTOR(edges)[i + 1];
+        igraph_long_t to = (igraph_long_t) VECTOR(edges)[i + 1];
         if (to != source && to != target) {
             VECTOR(edges)[i + 1] = no_of_nodes + to;
         }
@@ -1835,7 +1835,7 @@ static igraph_integer_t igraph_i_st_vertex_connectivity_directed(const igraph_t 
 
     IGRAPH_CHECK(igraph_maxflow_value(&newgraph, &real_res,
                                       source, target, 0, 0));
-    *res = (igraph_integer_t)real_res;
+    *res = (igraph_long_t)real_res;
 
     igraph_destroy(&newgraph);
     IGRAPH_FINALLY_CLEAN(1);
@@ -1843,13 +1843,13 @@ static igraph_integer_t igraph_i_st_vertex_connectivity_directed(const igraph_t 
     return 0;
 }
 
-static igraph_integer_t igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
-                                                      igraph_integer_t *res,
-                                                      igraph_integer_t source,
-                                                      igraph_integer_t target,
+static igraph_long_t igraph_i_st_vertex_connectivity_undirected(const igraph_t *graph,
+                                                      igraph_long_t *res,
+                                                      igraph_long_t source,
+                                                      igraph_long_t target,
                                                       igraph_vconn_nei_t neighbors) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph);
     igraph_t newgraph;
     igraph_bool_t conn;
 
@@ -1937,10 +1937,10 @@ static igraph_integer_t igraph_i_st_vertex_connectivity_undirected(const igraph_
  * \ref igraph_maxflow_value().
  */
 
-igraph_integer_t igraph_st_vertex_connectivity(const igraph_t *graph,
-                                  igraph_integer_t *res,
-                                  igraph_integer_t source,
-                                  igraph_integer_t target,
+igraph_long_t igraph_st_vertex_connectivity(const igraph_t *graph,
+                                  igraph_long_t *res,
+                                  igraph_long_t source,
+                                  igraph_long_t target,
                                   igraph_vconn_nei_t neighbors) {
 
     if (source == target) {
@@ -1960,12 +1960,12 @@ igraph_integer_t igraph_st_vertex_connectivity(const igraph_t *graph,
     return 0;
 }
 
-static igraph_integer_t igraph_i_vertex_connectivity_directed(const igraph_t *graph,
-                                                 igraph_integer_t *res) {
+static igraph_long_t igraph_i_vertex_connectivity_directed(const igraph_t *graph,
+                                                 igraph_long_t *res) {
 
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t i, j;
-    igraph_integer_t minconn = no_of_nodes - 1, conn = 0;
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph);
+    igraph_long_t i, j;
+    igraph_long_t minconn = no_of_nodes - 1, conn = 0;
 
     for (i = 0; i < no_of_nodes; i++) {
         for (j = 0; j < no_of_nodes; j++) {
@@ -1976,8 +1976,8 @@ static igraph_integer_t igraph_i_vertex_connectivity_directed(const igraph_t *gr
             IGRAPH_ALLOW_INTERRUPTION();
 
             IGRAPH_CHECK(igraph_st_vertex_connectivity(graph, &conn,
-                         (igraph_integer_t) i,
-                         (igraph_integer_t) j,
+                         (igraph_long_t) i,
+                         (igraph_long_t) j,
                          IGRAPH_VCONN_NEI_NUMBER_OF_NODES));
             if (conn < minconn) {
                 minconn = conn;
@@ -1998,8 +1998,8 @@ static igraph_integer_t igraph_i_vertex_connectivity_directed(const igraph_t *gr
     return 0;
 }
 
-static igraph_integer_t igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
-                                                   igraph_integer_t *res) {
+static igraph_long_t igraph_i_vertex_connectivity_undirected(const igraph_t *graph,
+                                                   igraph_long_t *res) {
     igraph_t newgraph;
 
     IGRAPH_CHECK(igraph_copy(&newgraph, graph));
@@ -2015,8 +2015,8 @@ static igraph_integer_t igraph_i_vertex_connectivity_undirected(const igraph_t *
 }
 
 /* Use that vertex.connectivity(G) <= edge.connectivity(G) <= min(degree(G)) */
-static igraph_integer_t igraph_i_connectivity_checks(const igraph_t *graph,
-                                        igraph_integer_t *res,
+static igraph_long_t igraph_i_connectivity_checks(const igraph_t *graph,
+                                        igraph_long_t *res,
                                         igraph_bool_t *found) {
     igraph_bool_t conn;
     *found = 0;
@@ -2091,7 +2091,7 @@ static igraph_integer_t igraph_i_connectivity_checks(const igraph_t *graph,
  * and \ref igraph_edge_connectivity().
  */
 
-igraph_integer_t igraph_vertex_connectivity(const igraph_t *graph, igraph_integer_t *res,
+igraph_long_t igraph_vertex_connectivity(const igraph_t *graph, igraph_long_t *res,
                                igraph_bool_t checks) {
 
     igraph_bool_t ret = 0;
@@ -2136,9 +2136,9 @@ igraph_integer_t igraph_vertex_connectivity(const igraph_t *graph, igraph_intege
  * igraph_vertex_connectivity().
  */
 
-igraph_integer_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
-                                igraph_integer_t source,
-                                igraph_integer_t target) {
+igraph_long_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_long_t *res,
+                                igraph_long_t source,
+                                igraph_long_t target) {
     igraph_real_t flow;
 
     if (source == target) {
@@ -2146,7 +2146,7 @@ igraph_integer_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integ
     }
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
-    *res = (igraph_integer_t) flow;
+    *res = (igraph_long_t) flow;
 
     return 0;
 }
@@ -2183,10 +2183,10 @@ igraph_integer_t igraph_st_edge_connectivity(const igraph_t *graph, igraph_integ
  * \ref igraph_vertex_connectivity().
  */
 
-igraph_integer_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_t *res,
+igraph_long_t igraph_edge_connectivity(const igraph_t *graph, igraph_long_t *res,
                              igraph_bool_t checks) {
     igraph_bool_t ret = 0;
-    igraph_integer_t number_of_nodes = igraph_vcount(graph);
+    igraph_long_t number_of_nodes = igraph_vcount(graph);
 
     /* igraph_mincut_value returns infinity for the singleton graph,
      * which cannot be cast to an integer. We catch this case early
@@ -2205,7 +2205,7 @@ igraph_integer_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_
     if (!ret) {
         igraph_real_t real_res;
         IGRAPH_CHECK(igraph_mincut_value(graph, &real_res, 0));
-        *res = (igraph_integer_t)real_res;
+        *res = (igraph_long_t)real_res;
     }
 
     return 0;
@@ -2237,9 +2237,9 @@ igraph_integer_t igraph_edge_connectivity(const igraph_t *graph, igraph_integer_
  * igraph_st_edge_connectivity(), \ref igraph_maxflow_value().
  */
 
-igraph_integer_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
-                               igraph_integer_t source,
-                               igraph_integer_t target) {
+igraph_long_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_long_t *res,
+                               igraph_long_t source,
+                               igraph_long_t target) {
 
     igraph_real_t flow;
 
@@ -2249,7 +2249,7 @@ igraph_integer_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_intege
 
     IGRAPH_CHECK(igraph_maxflow_value(graph, &flow, source, target, 0, 0));
 
-    *res = (igraph_integer_t) flow;
+    *res = (igraph_long_t) flow;
 
     return 0;
 }
@@ -2278,9 +2278,9 @@ igraph_integer_t igraph_edge_disjoint_paths(const igraph_t *graph, igraph_intege
  * igraph_vertex_connectivity(), \ref igraph_maxflow_value().
  */
 
-igraph_integer_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_integer_t *res,
-                                 igraph_integer_t source,
-                                 igraph_integer_t target) {
+igraph_long_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_long_t *res,
+                                 igraph_long_t source,
+                                 igraph_long_t target) {
 
     igraph_bool_t conn;
 
@@ -2371,7 +2371,7 @@ igraph_integer_t igraph_vertex_disjoint_paths(const igraph_t *graph, igraph_inte
  * igraph_edge_connectivity(), \ref igraph_mincut_value().
  */
 
-igraph_integer_t igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
+igraph_long_t igraph_adhesion(const igraph_t *graph, igraph_long_t *res,
                     igraph_bool_t checks) {
     return igraph_edge_connectivity(graph, res, checks);
 }
@@ -2404,7 +2404,7 @@ igraph_integer_t igraph_adhesion(const igraph_t *graph, igraph_integer_t *res,
  * \ref igraph_maxflow_value().
  */
 
-igraph_integer_t igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
+igraph_long_t igraph_cohesion(const igraph_t *graph, igraph_long_t *res,
                     igraph_bool_t checks) {
 
     IGRAPH_CHECK(igraph_vertex_connectivity(graph, res, checks));
@@ -2449,11 +2449,11 @@ igraph_integer_t igraph_cohesion(const igraph_t *graph, igraph_integer_t *res,
  *
  * \sa \ref igraph_maxflow()
  */
-igraph_integer_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
+igraph_long_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
                           igraph_vector_t *flows, const igraph_vector_t *capacity) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t source, target, mid, i, n;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t source, target, mid, i, n;
     igraph_vector_t neighbors;
     igraph_vector_t flow_values;
     igraph_vector_t partition;
@@ -2481,14 +2481,14 @@ igraph_integer_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         IGRAPH_PROGRESS("Gomory-Hu tree", (100.0 * (source - 1)) / (no_of_nodes - 1), 0);
 
         /* Find its current neighbor in the tree */
-        target = VECTOR(neighbors)[(igraph_integer_t)source];
+        target = VECTOR(neighbors)[(igraph_long_t)source];
 
         /* Find the maximum flow between source and target */
         IGRAPH_CHECK(igraph_maxflow(graph, &flow_value, 0, 0, &partition, &partition2,
                                     source, target, capacity, 0));
 
         /* Store the maximum flow and determine which side each node is on */
-        VECTOR(flow_values)[(igraph_integer_t)source] = flow_value;
+        VECTOR(flow_values)[(igraph_long_t)source] = flow_value;
 
         /* Update the tree */
         /* igraph_maxflow() guarantees that the source vertex will be in &partition
@@ -2496,8 +2496,8 @@ igraph_integer_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
         n = igraph_vector_size(&partition);
         for (i = 0; i < n; i++) {
             mid = VECTOR(partition)[i];
-            if (mid > source && VECTOR(neighbors)[(igraph_integer_t)mid] == target) {
-                VECTOR(neighbors)[(igraph_integer_t)mid] = source;
+            if (mid > source && VECTOR(neighbors)[(igraph_long_t)mid] == target) {
+                VECTOR(neighbors)[(igraph_long_t)mid] = source;
             }
         }
     }
@@ -2507,8 +2507,8 @@ igraph_integer_t igraph_gomory_hu_tree(const igraph_t *graph, igraph_t *tree,
     /* Re-use the 'partition' vector as an edge list now */
     IGRAPH_CHECK(igraph_vector_resize(&partition, 2 * (no_of_nodes - 1)));
     for (i = 1, mid = 0; i < no_of_nodes; i++, mid += 2) {
-        VECTOR(partition)[(igraph_integer_t)mid]   = i;
-        VECTOR(partition)[(igraph_integer_t)mid + 1] = VECTOR(neighbors)[(igraph_integer_t)i];
+        VECTOR(partition)[(igraph_long_t)mid]   = i;
+        VECTOR(partition)[(igraph_long_t)mid + 1] = VECTOR(neighbors)[(igraph_long_t)i];
     }
 
     /* Create the tree graph; we use igraph_subgraph_edges here to keep the

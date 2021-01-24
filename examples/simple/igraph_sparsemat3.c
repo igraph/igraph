@@ -26,21 +26,21 @@
 #include <cs/cs.h>
 #include <igraph.h>
 
-igraph_integer_t permute(const igraph_matrix_t *M,
-            const igraph_vector_int_t *p,
-            const igraph_vector_int_t *q,
+igraph_long_t permute(const igraph_matrix_t *M,
+            const igraph_vector_long_t *p,
+            const igraph_vector_long_t *q,
             igraph_matrix_t *res) {
 
-    igraph_integer_t nrow = igraph_vector_int_size(p);
-    igraph_integer_t ncol = igraph_vector_int_size(q);
-    igraph_integer_t i, j;
+    igraph_long_t nrow = igraph_vector_long_size(p);
+    igraph_long_t ncol = igraph_vector_long_size(q);
+    igraph_long_t i, j;
 
     igraph_matrix_resize(res, nrow, ncol);
 
     for (i = 0; i < nrow; i++) {
         for (j = 0; j < ncol; j++) {
-            igraph_integer_t ii = VECTOR(*p)[i];
-            igraph_integer_t jj = VECTOR(*q)[j];
+            igraph_long_t ii = VECTOR(*p)[i];
+            igraph_long_t jj = VECTOR(*q)[j];
             MATRIX(*res, i, j) = MATRIX(*M, ii, jj);
         }
     }
@@ -48,19 +48,19 @@ igraph_integer_t permute(const igraph_matrix_t *M,
     return 0;
 }
 
-igraph_integer_t permute_rows(const igraph_matrix_t *M,
-                 const igraph_vector_int_t *p,
+igraph_long_t permute_rows(const igraph_matrix_t *M,
+                 const igraph_vector_long_t *p,
                  igraph_matrix_t *res) {
 
-    igraph_integer_t nrow = igraph_vector_int_size(p);
-    igraph_integer_t ncol = igraph_matrix_ncol(M);
-    igraph_integer_t i, j;
+    igraph_long_t nrow = igraph_vector_long_size(p);
+    igraph_long_t ncol = igraph_matrix_ncol(M);
+    igraph_long_t i, j;
 
     igraph_matrix_resize(res, nrow, ncol);
 
     for (i = 0; i < nrow; i++) {
         for (j = 0; j < ncol; j++) {
-            igraph_integer_t ii = VECTOR(*p)[i];
+            igraph_long_t ii = VECTOR(*p)[i];
             MATRIX(*res, i, j) = MATRIX(*M, ii, j);
         }
     }
@@ -68,19 +68,19 @@ igraph_integer_t permute_rows(const igraph_matrix_t *M,
     return 0;
 }
 
-igraph_integer_t permute_cols(const igraph_matrix_t *M,
-                 const igraph_vector_int_t *q,
+igraph_long_t permute_cols(const igraph_matrix_t *M,
+                 const igraph_vector_long_t *q,
                  igraph_matrix_t *res) {
 
-    igraph_integer_t nrow = igraph_matrix_nrow(M);
-    igraph_integer_t ncol = igraph_vector_int_size(q);
-    igraph_integer_t i, j;
+    igraph_long_t nrow = igraph_matrix_nrow(M);
+    igraph_long_t ncol = igraph_vector_long_size(q);
+    igraph_long_t i, j;
 
     igraph_matrix_resize(res, nrow, ncol);
 
     for (i = 0; i < nrow; i++) {
         for (j = 0; j < ncol; j++) {
-            igraph_integer_t jj = VECTOR(*q)[j];
+            igraph_long_t jj = VECTOR(*q)[j];
             MATRIX(*res, i, j) = MATRIX(*M, i, jj);
         }
     }
@@ -88,10 +88,10 @@ igraph_integer_t permute_cols(const igraph_matrix_t *M,
     return 0;
 }
 
-igraph_integer_t random_permutation(igraph_vector_int_t *vec) {
+igraph_long_t random_permutation(igraph_vector_long_t *vec) {
     /* We just do size(vec) * 2 swaps */
-    igraph_integer_t one, two, i, n = igraph_vector_int_size(vec);
-    igraph_integer_t tmp;
+    igraph_long_t one, two, i, n = igraph_vector_long_size(vec);
+    igraph_long_t tmp;
     for (i = 0; i < 2 * n; i++) {
         one = RNG_INTEGER(0, n - 1);
         two = RNG_INTEGER(0, n - 1);
@@ -105,9 +105,9 @@ igraph_integer_t random_permutation(igraph_vector_int_t *vec) {
 igraph_bool_t check_same(const igraph_sparsemat_t *A,
                          const igraph_matrix_t *M) {
 
-    igraph_integer_t nrow = igraph_sparsemat_nrow(A);
-    igraph_integer_t ncol = igraph_sparsemat_ncol(A);
-    igraph_integer_t j, p, nzero = 0;
+    igraph_long_t nrow = igraph_sparsemat_nrow(A);
+    igraph_long_t ncol = igraph_sparsemat_ncol(A);
+    igraph_long_t j, p, nzero = 0;
 
     if (nrow != igraph_matrix_nrow(M) ||
         ncol != igraph_matrix_ncol(M)) {
@@ -116,7 +116,7 @@ igraph_bool_t check_same(const igraph_sparsemat_t *A,
 
     for (j = 0; j < A->cs->n; j++) {
         for (p = A->cs->p[j]; p < A->cs->p[j + 1]; p++) {
-            igraph_integer_t to = A->cs->i[p];
+            igraph_long_t to = A->cs->i[p];
             igraph_real_t value = A->cs->x[p];
             if (value != MATRIX(*M, to, j)) {
                 return 0;
@@ -136,12 +136,12 @@ igraph_bool_t check_same(const igraph_sparsemat_t *A,
     return nzero == 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_sparsemat_t A, B;
     igraph_matrix_t M, N;
-    igraph_vector_int_t p, q;
-    igraph_integer_t i;
+    igraph_vector_long_t p, q;
+    igraph_long_t i;
 
     /* Permutation of a matrix */
 
@@ -151,8 +151,8 @@ igraph_integer_t main() {
     igraph_matrix_init(&M, NROW, NCOL);
     igraph_sparsemat_init(&A, NROW, NCOL, EDGES);
     for (i = 0; i < EDGES; i++) {
-        igraph_integer_t r = RNG_INTEGER(0, NROW - 1);
-        igraph_integer_t c = RNG_INTEGER(0, NCOL - 1);
+        igraph_long_t r = RNG_INTEGER(0, NROW - 1);
+        igraph_long_t c = RNG_INTEGER(0, NCOL - 1);
         igraph_real_t value = RNG_INTEGER(1, 5);
         MATRIX(M, r, c) = MATRIX(M, r, c) + value;
         igraph_sparsemat_entry(&A, r, c, value);
@@ -160,8 +160,8 @@ igraph_integer_t main() {
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
 
-    igraph_vector_int_init_seq(&p, 0, NROW - 1);
-    igraph_vector_int_init_seq(&q, 0, NCOL - 1);
+    igraph_vector_long_init_seq(&p, 0, NROW - 1);
+    igraph_vector_long_init_seq(&q, 0, NCOL - 1);
 
     /* Identity */
 
@@ -189,8 +189,8 @@ igraph_integer_t main() {
         return 2;
     }
 
-    igraph_vector_int_destroy(&p);
-    igraph_vector_int_destroy(&q);
+    igraph_vector_long_destroy(&p);
+    igraph_vector_long_destroy(&q);
     igraph_sparsemat_destroy(&A);
     igraph_sparsemat_destroy(&B);
     igraph_matrix_destroy(&M);
@@ -210,8 +210,8 @@ igraph_integer_t main() {
     igraph_matrix_init(&M, NROW, NCOL);
     igraph_sparsemat_init(&A, NROW, NCOL, EDGES);
     for (i = 0; i < EDGES; i++) {
-        igraph_integer_t r = RNG_INTEGER(0, NROW - 1);
-        igraph_integer_t c = RNG_INTEGER(0, NCOL - 1);
+        igraph_long_t r = RNG_INTEGER(0, NROW - 1);
+        igraph_long_t c = RNG_INTEGER(0, NCOL - 1);
         igraph_real_t value = RNG_INTEGER(1, 5);
         MATRIX(M, r, c) = MATRIX(M, r, c) + value;
         igraph_sparsemat_entry(&A, r, c, value);
@@ -219,8 +219,8 @@ igraph_integer_t main() {
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
 
-    igraph_vector_int_init(&p, I_NROW);
-    igraph_vector_int_init(&q, I_NCOL);
+    igraph_vector_long_init(&p, I_NROW);
+    igraph_vector_long_init(&q, I_NCOL);
 
     for (i = 0; i < I_NROW; i++) {
         VECTOR(p)[i] = RNG_INTEGER(0, I_NROW - 1);
@@ -240,8 +240,8 @@ igraph_integer_t main() {
 
     /* A single element */
 
-    igraph_vector_int_resize(&p, 1);
-    igraph_vector_int_resize(&q, 1);
+    igraph_vector_long_resize(&p, 1);
+    igraph_vector_long_resize(&q, 1);
 
     for (i = 0; i < 100; i++) {
         igraph_real_t value;
@@ -266,8 +266,8 @@ igraph_integer_t main() {
         }
     }
 
-    igraph_vector_int_destroy(&p);
-    igraph_vector_int_destroy(&q);
+    igraph_vector_long_destroy(&p);
+    igraph_vector_long_destroy(&q);
     igraph_sparsemat_destroy(&B);
     igraph_matrix_destroy(&M);
     igraph_matrix_destroy(&N);
@@ -277,8 +277,8 @@ igraph_integer_t main() {
     igraph_matrix_init(&M, NROW, NCOL);
     igraph_sparsemat_init(&A, NROW, NCOL, EDGES);
     for (i = 0; i < EDGES; i++) {
-        igraph_integer_t r = RNG_INTEGER(0, NROW - 1);
-        igraph_integer_t c = RNG_INTEGER(0, NCOL - 1);
+        igraph_long_t r = RNG_INTEGER(0, NROW - 1);
+        igraph_long_t c = RNG_INTEGER(0, NCOL - 1);
         igraph_real_t value = RNG_INTEGER(1, 5);
         MATRIX(M, r, c) = MATRIX(M, r, c) + value;
         igraph_sparsemat_entry(&A, r, c, value);
@@ -286,8 +286,8 @@ igraph_integer_t main() {
     igraph_sparsemat_compress(&A, &B);
     igraph_sparsemat_destroy(&A);
 
-    igraph_vector_int_init(&p, I_NROW);
-    igraph_vector_int_init(&q, I_NCOL);
+    igraph_vector_long_init(&p, I_NROW);
+    igraph_vector_long_init(&q, I_NCOL);
 
     for (i = 0; i < I_NROW; i++) {
         VECTOR(p)[i] = RNG_INTEGER(0, I_NROW - 1);
@@ -315,8 +315,8 @@ igraph_integer_t main() {
 
     igraph_sparsemat_destroy(&A);
     igraph_sparsemat_destroy(&B);
-    igraph_vector_int_destroy(&p);
-    igraph_vector_int_destroy(&q);
+    igraph_vector_long_destroy(&p);
+    igraph_vector_long_destroy(&q);
     igraph_matrix_destroy(&M);
     igraph_matrix_destroy(&N);
 

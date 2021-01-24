@@ -25,10 +25,10 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
-    igraph_vector_int_t res, res_all;
-    igraph_integer_t i;
+    igraph_vector_long_t res, res_all;
+    igraph_long_t i;
 
     igraph_small(&g, 6, IGRAPH_UNDIRECTED,
                  0, 1, 1, 2, 2, 5,
@@ -36,27 +36,27 @@ igraph_integer_t main() {
                  3, 2, 3, 5,
                  -1);
 
-    igraph_vector_int_init(&res, 0);
+    igraph_vector_long_init(&res, 0);
 
     for (i = 0; i <= 5; i++) {
         igraph_get_all_simple_paths(&g, &res, 0, igraph_vss_1(5), i, IGRAPH_ALL);
 
         printf("Paths for cutoff %li:\n", i);
-        igraph_vector_int_print(&res);
-        igraph_vector_int_clear(&res);
+        igraph_vector_long_print(&res);
+        igraph_vector_long_clear(&res);
     }
 
-    igraph_vector_int_init(&res_all, 0);
+    igraph_vector_long_init(&res_all, 0);
 
     igraph_get_all_simple_paths(&g, &res_all, 0, igraph_vss_1(5), -1, IGRAPH_ALL);
 
-    if (igraph_vector_int_all_e(&res, &res_all)) {
+    if (igraph_vector_long_all_e(&res, &res_all)) {
         printf("Paths of all lengths does not equal result for maximum cutoff.");
         return 1;
     }
 
-    igraph_vector_int_destroy(&res_all);
-    igraph_vector_int_destroy(&res);
+    igraph_vector_long_destroy(&res_all);
+    igraph_vector_long_destroy(&res);
     igraph_destroy(&g);
 
     VERIFY_FINALLY_STACK();

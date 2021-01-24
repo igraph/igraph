@@ -25,15 +25,15 @@
 
 #define SIZE (1000)
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_matrix_t M, M2;
     igraph_vector_t lambda;
     igraph_matrix_t V;
     igraph_vector_t groups;
     igraph_vector_t ivec;
-    igraph_integer_t i, j;
-    igraph_integer_t n;
+    igraph_long_t i, j;
+    igraph_long_t n;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

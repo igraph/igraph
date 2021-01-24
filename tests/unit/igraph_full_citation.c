@@ -20,10 +20,10 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g, g_test;
     igraph_bool_t same;
-    igraph_integer_t n_vertices = 4;
+    igraph_long_t n_vertices = 4;
 
     /*    Undirected, should be a full graph    */
     IGRAPH_ASSERT(igraph_full_citation(&g, n_vertices, 0 /*undirected*/) == IGRAPH_SUCCESS);

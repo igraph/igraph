@@ -33,11 +33,11 @@
 #define MIN 0
 #define MAX 10
 
-typedef igraph_integer_t fun(igraph_sparsemat_t *A, igraph_vector_t *res);
+typedef igraph_long_t fun(igraph_sparsemat_t *A, igraph_vector_t *res);
 
-igraph_integer_t doit(igraph_integer_t which) {
+igraph_long_t doit(igraph_long_t which) {
 
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_sparsemat_t A, A2;
     igraph_vector_t vec;
     fun *colfun, *rowfun;
@@ -113,8 +113,8 @@ igraph_integer_t doit(igraph_integer_t which) {
 
     igraph_sparsemat_init(&A, /*rows=*/ N, /*cols=*/ M, /*nzmax=*/ NZ + 5);
     for (i = 0; i < NZ; i++) {
-        igraph_integer_t r = igraph_rng_get_integer(igraph_rng_default(), 0, N - 1);
-        igraph_integer_t c = igraph_rng_get_integer(igraph_rng_default(), 0, M - 1);
+        igraph_long_t r = igraph_rng_get_integer(igraph_rng_default(), 0, N - 1);
+        igraph_long_t c = igraph_rng_get_integer(igraph_rng_default(), 0, M - 1);
         igraph_real_t x = igraph_rng_get_integer(igraph_rng_default(),
                           -10, 10);
         igraph_sparsemat_entry(&A, r, c, x);
@@ -220,8 +220,8 @@ igraph_integer_t doit(igraph_integer_t which) {
     return 0;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t res;
+igraph_long_t main() {
+    igraph_long_t res;
 
     res = doit(/*which=*/ MIN);
     if (res) {

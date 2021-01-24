@@ -47,12 +47,12 @@ static const char *igraph_version_string = IGRAPH_VERSION;
  * \example examples/simple/igraph_version.c
  */
 
-igraph_integer_t igraph_version(const char **version_string,
-                   igraph_integer_t *major,
-                   igraph_integer_t *minor,
-                   igraph_integer_t *subminor) {
-    igraph_integer_t i1, i2, i3;
-    igraph_integer_t *p1 = major ? major : &i1,
+igraph_long_t igraph_version(const char **version_string,
+                   igraph_long_t *major,
+                   igraph_long_t *minor,
+                   igraph_long_t *subminor) {
+    igraph_long_t i1, i2, i3;
+    igraph_long_t *p1 = major ? major : &i1,
          *p2 = minor ? minor : &i2,
           *p3 = subminor ? subminor : &i3;
 

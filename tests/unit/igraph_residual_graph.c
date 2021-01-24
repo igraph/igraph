@@ -20,11 +20,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g, residual, expected_residual;
     igraph_vector_t capacity, residual_capacity, flow, expected_residual_capacity;
-    igraph_integer_t value;
+    igraph_long_t value;
     igraph_bool_t iso;
 
     igraph_vector_init(&residual_capacity, 0);

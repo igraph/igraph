@@ -31,17 +31,17 @@ typedef struct {
     igraph_vector_t *quantities;
     igraph_vector_t *strategies;
     igraph_neimode_t mode;
-    igraph_integer_t retval;
+    igraph_long_t retval;
 } strategy_test_t;
 
 /* Error tests, i.e. we expect errors to be raised for each test.
  */
-igraph_integer_t error_tests() {
+igraph_long_t error_tests() {
     igraph_t g, gzero, h;
     igraph_vector_t quant, quantnvert, quantzero;
     igraph_vector_t strat, stratnvert, stratzero;
     igraph_vector_t wgt, wgtnedge, wgtzero;
-    igraph_integer_t i, n, nvert, ret;
+    igraph_long_t i, n, nvert, ret;
     strategy_test_t *test;
 
     igraph_empty(&h, 0, 0);  /* empty graph */
@@ -109,7 +109,7 @@ igraph_integer_t error_tests() {
         ret = igraph_moran_process(test->graph, test->weights, test->quantities,
                                    test->strategies, test->mode);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (igraph_integer_t)(i + 1));
+            printf("Error test no. %d failed.\n", (igraph_long_t)(i + 1));
             return IGRAPH_FAILURE;
         }
         i++;
@@ -133,16 +133,16 @@ igraph_integer_t error_tests() {
 
 /* One iteration of the Moran process on a simple digraph.
  */
-igraph_integer_t moran_one_test() {
+igraph_long_t moran_one_test() {
     igraph_t g;
-    igraph_integer_t u = -1;  /* vertex chosen for reproduction */
-    igraph_integer_t v = -1;  /* clone of u */
-    igraph_integer_t nedge, nvert;
+    igraph_long_t u = -1;  /* vertex chosen for reproduction */
+    igraph_long_t v = -1;  /* clone of u */
+    igraph_long_t nedge, nvert;
     igraph_real_t q = 0.0;
     igraph_vector_t quant, quantcp;
     igraph_vector_t strat, stratcp;
     igraph_vector_t wgt;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     /* graph representing the game network; quantities and strategies vectors */
     igraph_small(&g, /*nvert*/ 0, IGRAPH_DIRECTED,
@@ -174,7 +174,7 @@ igraph_integer_t moran_one_test() {
     for (i = 0; i < igraph_vector_size(&quant); i++) {
         if (VECTOR(quant)[i] != VECTOR(quantcp)[i]) {
             /* found the new clone vertex */
-            v = (igraph_integer_t)i;
+            v = (igraph_long_t)i;
             q = (igraph_real_t)VECTOR(quantcp)[i];
             break;
         }
@@ -187,7 +187,7 @@ igraph_integer_t moran_one_test() {
     for (i = 0; i < igraph_vector_size(&quant); i++) {
         if (VECTOR(quant)[i] == q) {
             /* found the vertex chosen for reproduction */
-            u = (igraph_integer_t)i;
+            u = (igraph_long_t)i;
             break;
         }
     }
@@ -211,7 +211,7 @@ igraph_integer_t moran_one_test() {
     return IGRAPH_SUCCESS;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     IGRAPH_ASSERT(error_tests() == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(moran_one_test() == IGRAPH_SUCCESS);

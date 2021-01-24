@@ -51,12 +51,12 @@
 #include <stdlib.h>
 
 #ifdef I_AM_QSORT_R
-    typedef igraph_integer_t      cmp_t(void *, const void *, const void *);
+    typedef igraph_long_t      cmp_t(void *, const void *, const void *);
 #else
-    typedef igraph_integer_t      cmp_t(const void *, const void *);
+    typedef igraph_long_t      cmp_t(const void *, const void *);
 #endif
 static inline char  *med3(char *, char *, char *, cmp_t *, void *);
-static inline void   swapfunc(char *, char *, igraph_integer_t, igraph_integer_t);
+static inline void   swapfunc(char *, char *, igraph_long_t, igraph_long_t);
 
 #define igraph_min(a, b)    (a) < (b) ? a : b
 
@@ -64,7 +64,7 @@ static inline void   swapfunc(char *, char *, igraph_integer_t, igraph_integer_t
  * Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".
  */
 #define swapcode(TYPE, parmi, parmj, n) {       \
-        igraph_integer_t i = (n) / sizeof (TYPE);           \
+        igraph_long_t i = (n) / sizeof (TYPE);           \
         TYPE *pi = (TYPE *) (parmi);        \
         TYPE *pj = (TYPE *) (parmj);        \
         do {                        \
@@ -74,23 +74,23 @@ static inline void   swapfunc(char *, char *, igraph_integer_t, igraph_integer_t
         } while (--i > 0);              \
     }
 
-#define SWAPINIT(a, es) swaptype = ((char *)a - (char *)0) % sizeof(igraph_integer_t) || \
-                                   es % sizeof(igraph_integer_t) ? 2 : es == sizeof(igraph_integer_t)? 0 : 1;
+#define SWAPINIT(a, es) swaptype = ((char *)a - (char *)0) % sizeof(igraph_long_t) || \
+                                   es % sizeof(igraph_long_t) ? 2 : es == sizeof(igraph_long_t)? 0 : 1;
 
 static inline void
-swapfunc(char *a, char *b, igraph_integer_t n, igraph_integer_t swaptype)
+swapfunc(char *a, char *b, igraph_long_t n, igraph_long_t swaptype)
 {
     if (swaptype <= 1)
-        swapcode(igraph_integer_t, a, b, n)
+        swapcode(igraph_long_t, a, b, n)
         else
             swapcode(char, a, b, n)
         }
 
 #define swap(a, b)                  \
     if (swaptype == 0) {                \
-        igraph_integer_t t = *(igraph_integer_t *)(a);          \
-        *(igraph_integer_t *)(a) = *(igraph_integer_t *)(b);        \
-        *(igraph_integer_t *)(b) = t;           \
+        igraph_long_t t = *(igraph_long_t *)(a);          \
+        *(igraph_long_t *)(a) = *(igraph_long_t *)(b);        \
+        *(igraph_long_t *)(b) = t;           \
     } else                      \
         swapfunc(a, b, es, swaptype)
 
@@ -123,7 +123,7 @@ med3(char *a, char *b, char *c, cmp_t *cmp, void *thunk)
 #endif
 {
     char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
-    igraph_integer_t d, r, swaptype, swap_cnt;
+    igraph_long_t d, r, swaptype, swap_cnt;
 
 loop:   SWAPINIT(a, es);
     swap_cnt = 0;

@@ -23,10 +23,10 @@
 
 #include <igraph.h>
 
-igraph_integer_t comp(void *extra, const void *a, const void *b) {
+igraph_long_t comp(void *extra, const void *a, const void *b) {
     igraph_vector_t *v = (igraph_vector_t*) extra;
-    igraph_integer_t *aa = (igraph_integer_t*) a;
-    igraph_integer_t *bb = (igraph_integer_t*) b;
+    igraph_long_t *aa = (igraph_long_t*) a;
+    igraph_long_t *bb = (igraph_long_t*) b;
     igraph_real_t aaa = VECTOR(*v)[*aa];
     igraph_real_t bbb = VECTOR(*v)[*bb];
 
@@ -39,15 +39,15 @@ igraph_integer_t comp(void *extra, const void *a, const void *b) {
     return 0;
 }
 
-igraph_integer_t main() {
-    const igraph_integer_t len = 100;
+igraph_long_t main() {
+    const igraph_long_t len = 100;
     igraph_vector_t v;
-    igraph_vector_int_t idx;
-    igraph_integer_t i;
+    igraph_vector_long_t idx;
+    igraph_long_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_vector_init(&v, len);
-    igraph_vector_int_init(&idx, len);
+    igraph_vector_long_init(&idx, len);
     for (i = 0; i < len; i++) {
         VECTOR(v)[i] = i;
         VECTOR(idx)[i] = i;
@@ -61,7 +61,7 @@ igraph_integer_t main() {
     }
     printf("\n");
 
-    igraph_vector_int_destroy(&idx);
+    igraph_vector_long_destroy(&idx);
     igraph_vector_destroy(&v);
 
     return 0;

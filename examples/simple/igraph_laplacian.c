@@ -25,7 +25,7 @@
 
 igraph_bool_t check_laplacian(igraph_t* graph, igraph_matrix_t* matrix, igraph_vector_t* w) {
     igraph_vector_t vec, res;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     igraph_vector_init(&vec, 0);
     igraph_vector_init(&res, igraph_vcount(graph));
@@ -58,7 +58,7 @@ igraph_bool_t check_laplacian(igraph_t* graph, igraph_matrix_t* matrix, igraph_v
     return 1;
 }
 
-igraph_integer_t test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
+igraph_long_t test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t dir) {
     igraph_t g;
     igraph_matrix_t m, m2;
     igraph_sparsemat_t sm;
@@ -133,7 +133,7 @@ igraph_integer_t test_unnormalized_laplacian(igraph_vector_t* w, igraph_bool_t d
     return 0;
 }
 
-igraph_integer_t test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
+igraph_long_t test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir) {
     igraph_t g;
     igraph_matrix_t m, m2;
     igraph_sparsemat_t sm;
@@ -211,9 +211,9 @@ igraph_integer_t test_normalized_laplacian(igraph_vector_t *w, igraph_bool_t dir
     return !ok;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t res;
-    igraph_integer_t i;
+igraph_long_t main() {
+    igraph_long_t res;
+    igraph_long_t i;
     igraph_vector_t weights;
 
     igraph_vector_init_real(&weights, 5, 1.0, 2.0, 3.0, 4.0, 5.0);

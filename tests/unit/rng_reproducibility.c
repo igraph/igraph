@@ -6,8 +6,8 @@
  * same seed on all platforms (different operating systems and 32- or 64-bit systems).
  */
 
-igraph_integer_t main() {
-    igraph_integer_t i;
+igraph_long_t main() {
+    igraph_long_t i;
     igraph_rng_seed(igraph_rng_default(), 137);
 
     for (i = 0; i < 32; ++i) {

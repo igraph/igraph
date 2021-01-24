@@ -54,7 +54,7 @@
  * Time complexity: O(\p size).
  */
 
-igraph_integer_t FUNCTION(igraph_dqueue, init) (TYPE(igraph_dqueue)* q, igraph_integer_t size) {
+igraph_long_t FUNCTION(igraph_dqueue, init) (TYPE(igraph_dqueue)* q, igraph_long_t size) {
     IGRAPH_ASSERT(q != 0);
     if (size <= 0 ) {
         size = 1;
@@ -153,7 +153,7 @@ igraph_bool_t FUNCTION(igraph_dqueue, full) (TYPE(igraph_dqueue)* q) {
  * Time complexity: O(1).
  */
 
-igraph_integer_t FUNCTION(igraph_dqueue, size) (const TYPE(igraph_dqueue)* q) {
+igraph_long_t FUNCTION(igraph_dqueue, size) (const TYPE(igraph_dqueue)* q) {
     IGRAPH_ASSERT(q != 0);
     IGRAPH_ASSERT(q->stor_begin != 0);
     if (q->end == NULL) {
@@ -280,7 +280,7 @@ BASE FUNCTION(igraph_dqueue, pop_back) (TYPE(igraph_dqueue)* q) {
  * most O(n) time. (Assuming memory allocation is at most linear.)
  */
 
-igraph_integer_t FUNCTION(igraph_dqueue, push) (TYPE(igraph_dqueue)* q, BASE elem) {
+igraph_long_t FUNCTION(igraph_dqueue, push) (TYPE(igraph_dqueue)* q, BASE elem) {
     IGRAPH_ASSERT(q != 0);
     IGRAPH_ASSERT(q->stor_begin != 0);
     if (q->begin != q->end) {
@@ -332,12 +332,12 @@ igraph_integer_t FUNCTION(igraph_dqueue, push) (TYPE(igraph_dqueue)* q, BASE ele
 #if defined (OUT_FORMAT)
 
 #ifndef USING_R
-igraph_integer_t FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q) {
+igraph_long_t FUNCTION(igraph_dqueue, print)(const TYPE(igraph_dqueue)* q) {
     return FUNCTION(igraph_dqueue, fprint)(q, stdout);
 }
 #endif
 
-igraph_integer_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file) {
+igraph_long_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, FILE *file) {
     if (q->end != NULL) {
         /* There is one element at least */
         BASE *p = q->begin;
@@ -370,7 +370,7 @@ igraph_integer_t FUNCTION(igraph_dqueue, fprint)(const TYPE(igraph_dqueue)* q, F
 
 #endif
 
-BASE FUNCTION(igraph_dqueue, e)(const TYPE(igraph_dqueue) *q, igraph_integer_t idx) {
+BASE FUNCTION(igraph_dqueue, e)(const TYPE(igraph_dqueue) *q, igraph_long_t idx) {
     if ((q->begin + idx < q->end) ||
         (q->begin >= q->end && q->begin + idx < q->stor_end)) {
         return q->begin[idx];

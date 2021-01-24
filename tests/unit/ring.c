@@ -28,7 +28,7 @@
 #include "test_utilities.inc"
 
 typedef struct {
-    igraph_integer_t n, m;
+    igraph_long_t n, m;
     igraph_bool_t directed, mutual, circular;
     igraph_real_t *edges;
 } ring_test_t;
@@ -98,7 +98,7 @@ ring_test_t *all_checks[] = { /*  1 */ &ring_uc_6,   /*  2 */ &ring_uc_0,
                                        0
                             };
 
-igraph_integer_t check_ring_properties(const igraph_t *ring, igraph_bool_t directed,
+igraph_long_t check_ring_properties(const igraph_t *ring, igraph_bool_t directed,
                           igraph_bool_t mutual, igraph_bool_t circular) {
 
     igraph_bool_t res;
@@ -119,7 +119,7 @@ igraph_integer_t check_ring_properties(const igraph_t *ring, igraph_bool_t direc
 
     /* Girth, for big enough circular graphs */
     if (circular && igraph_vcount(ring) > 2) {
-        igraph_integer_t girth;
+        igraph_long_t girth;
         igraph_girth(ring, &girth, NULL);
         if (girth != igraph_vcount(ring)) {
             printf("Wrong girth\n");
@@ -130,11 +130,11 @@ igraph_integer_t check_ring_properties(const igraph_t *ring, igraph_bool_t direc
     return 0;
 }
 
-igraph_integer_t check_ring(const ring_test_t *test) {
+igraph_long_t check_ring(const ring_test_t *test) {
     igraph_t graph, othergraph;
     igraph_vector_t otheredges;
     igraph_bool_t iso;
-    igraph_integer_t ret;
+    igraph_long_t ret;
 
     /* Create ring */
     igraph_ring(&graph, test->n, test->directed, test->mutual, test->circular);
@@ -160,13 +160,13 @@ igraph_integer_t check_ring(const ring_test_t *test) {
     return 0;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t i, ret;
+igraph_long_t main() {
+    igraph_long_t i, ret;
 
     i = 0;
     while (all_checks[i]) {
         if ((ret = check_ring(all_checks[i]))) {
-            printf("Check no #%d failed.\n", (igraph_integer_t) (i + 1));
+            printf("Check no #%d failed.\n", (igraph_long_t) (i + 1));
             return ret;
         }
         i++;

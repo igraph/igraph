@@ -82,10 +82,10 @@ static void debug(const char* fmt, ...) {
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-igraph_integer_t igraph_is_matching(const igraph_t* graph,
+igraph_long_t igraph_is_matching(const igraph_t* graph,
                        const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
                        igraph_bool_t* result) {
-    igraph_integer_t i, j, no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i, j, no_of_nodes = igraph_vcount(graph);
     igraph_bool_t conn;
 
     /* Checking match vector length */
@@ -109,12 +109,12 @@ igraph_integer_t igraph_is_matching(const igraph_t* graph,
             *result = 0; return IGRAPH_SUCCESS;
         }
         /* Matched vertices must be connected */
-        IGRAPH_CHECK(igraph_are_connected(graph, (igraph_integer_t) i,
-                                          (igraph_integer_t) j, &conn));
+        IGRAPH_CHECK(igraph_are_connected(graph, (igraph_long_t) i,
+                                          (igraph_long_t) j, &conn));
         if (!conn) {
             /* Try the other direction -- for directed graphs */
-            IGRAPH_CHECK(igraph_are_connected(graph, (igraph_integer_t) j,
-                                              (igraph_integer_t) i, &conn));
+            IGRAPH_CHECK(igraph_are_connected(graph, (igraph_long_t) j,
+                                              (igraph_long_t) i, &conn));
             if (!conn) {
                 *result = 0; return IGRAPH_SUCCESS;
             }
@@ -164,10 +164,10 @@ igraph_integer_t igraph_is_matching(const igraph_t* graph,
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-igraph_integer_t igraph_is_maximal_matching(const igraph_t* graph,
+igraph_long_t igraph_is_maximal_matching(const igraph_t* graph,
                                const igraph_vector_bool_t* types, const igraph_vector_long_t* matching,
                                igraph_bool_t* result) {
-    igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i, j, n, no_of_nodes = igraph_vcount(graph);
     igraph_vector_t neis;
     igraph_bool_t valid;
 
@@ -185,13 +185,13 @@ igraph_integer_t igraph_is_maximal_matching(const igraph_t* graph,
             continue;
         }
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) i,
                                       IGRAPH_ALL));
         n = igraph_vector_size(&neis);
         for (j = 0; j < n; j++) {
-            if (VECTOR(*matching)[(igraph_integer_t)VECTOR(neis)[j]] == -1) {
+            if (VECTOR(*matching)[(igraph_long_t)VECTOR(neis)[j]] == -1) {
                 if (types == 0 ||
-                    VECTOR(*types)[i] != VECTOR(*types)[(igraph_integer_t)VECTOR(neis)[j]]) {
+                    VECTOR(*types)[i] != VECTOR(*types)[(igraph_long_t)VECTOR(neis)[j]]) {
                     valid = 0; break;
                 }
             }
@@ -205,13 +205,13 @@ igraph_integer_t igraph_is_maximal_matching(const igraph_t* graph,
     return IGRAPH_SUCCESS;
 }
 
-static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted(
+static igraph_long_t igraph_i_maximum_bipartite_matching_unweighted(
         const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
+        const igraph_vector_bool_t* types, igraph_long_t* matching_size,
         igraph_vector_long_t* matching);
-static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
+static igraph_long_t igraph_i_maximum_bipartite_matching_weighted(
         const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
+        const igraph_vector_bool_t* types, igraph_long_t* matching_size,
         igraph_real_t* matching_weight, igraph_vector_long_t* matching,
         const igraph_vector_t* weights, igraph_real_t eps);
 
@@ -279,8 +279,8 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
  *
  * \example examples/simple/igraph_maximum_bipartite_matching.c
  */
-igraph_integer_t igraph_maximum_bipartite_matching(const igraph_t* graph,
-                                      const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
+igraph_long_t igraph_maximum_bipartite_matching(const igraph_t* graph,
+                                      const igraph_vector_bool_t* types, igraph_long_t* matching_size,
                                       igraph_real_t* matching_weight, igraph_vector_long_t* matching,
                                       const igraph_vector_t* weights, igraph_real_t eps) {
 
@@ -306,7 +306,7 @@ igraph_integer_t igraph_maximum_bipartite_matching(const igraph_t* graph,
     }
 }
 
-static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
+static igraph_long_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_vector_t* labels,
         igraph_vector_long_t* matching, igraph_bool_t smaller_set);
@@ -324,19 +324,19 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
  * Avancée en Calcul Scientifique).
  * http://www.cerfacs.fr/algor/reports/2011/TR_PA_11_33.pdf
  */
-static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted(
+static igraph_long_t igraph_i_maximum_bipartite_matching_unweighted(
         const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
+        const igraph_vector_bool_t* types, igraph_long_t* matching_size,
         igraph_vector_long_t* matching) {
-    igraph_integer_t i, j, k, n, no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t num_matched;             /* number of matched vertex pairs */
+    igraph_long_t i, j, k, n, no_of_nodes = igraph_vcount(graph);
+    igraph_long_t num_matched;             /* number of matched vertex pairs */
     igraph_vector_long_t match;       /* will store the matching */
     igraph_vector_t labels;           /* will store the labels */
     igraph_vector_t neis;             /* used to retrieve the neighbors of a node */
     igraph_dqueue_long_t q;           /* a FIFO for push ordering */
     igraph_bool_t smaller_set;        /* denotes which part of the bipartite graph is smaller */
-    igraph_integer_t label_changed = 0;       /* Counter to decide when to run a global relabeling */
-    igraph_integer_t relabeling_freq = no_of_nodes / 2;
+    igraph_long_t label_changed = 0;       /* Counter to decide when to run a global relabeling */
+    igraph_long_t relabeling_freq = no_of_nodes / 2;
 
     /* We will use:
      * - FIFO push ordering
@@ -365,11 +365,11 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted(
         if (MATCHED(i)) {
             continue;
         }
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) i,
                                       IGRAPH_ALL));
         n = igraph_vector_size(&neis);
         for (j = 0; j < n; j++) {
-            k = (igraph_integer_t) VECTOR(neis)[j];
+            k = (igraph_long_t) VECTOR(neis)[j];
             if (VECTOR(*types)[k] == VECTOR(*types)[i]) {
                 IGRAPH_ERROR("Graph is not bipartite with supplied types vector", IGRAPH_EINVAL);
             }
@@ -398,9 +398,9 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted(
     /* (6) Main loop from the referenced tech report -- lines 4--13 */
     label_changed = 0;
     while (!igraph_dqueue_long_empty(&q)) {
-        igraph_integer_t v = igraph_dqueue_long_pop(&q);             /* Line 13 */
-        igraph_integer_t u = -1, label_u = 2 * no_of_nodes;
-        igraph_integer_t w;
+        igraph_long_t v = igraph_dqueue_long_pop(&q);             /* Line 13 */
+        igraph_long_t u = -1, label_u = 2 * no_of_nodes;
+        igraph_long_t w;
 
         if (label_changed >= relabeling_freq) {
             /* Run global relabeling */
@@ -412,13 +412,13 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted(
         debug("Considering vertex %ld\n", v);
 
         /* Line 5: find row u among the neighbors of v s.t. label(u) is minimal */
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) v,
                                       IGRAPH_ALL));
         n = igraph_vector_size(&neis);
         for (i = 0; i < n; i++) {
-            if (VECTOR(labels)[(igraph_integer_t)VECTOR(neis)[i]] < label_u) {
-                u = (igraph_integer_t) VECTOR(neis)[i];
-                label_u = (igraph_integer_t) VECTOR(labels)[u];
+            if (VECTOR(labels)[(igraph_long_t)VECTOR(neis)[i]] < label_u) {
+                u = (igraph_long_t) VECTOR(neis)[i];
+                label_u = (igraph_long_t) VECTOR(labels)[u];
                 label_changed++;
             }
         }
@@ -449,7 +449,7 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted(
         IGRAPH_CHECK(igraph_vector_long_update(matching, &match));
     }
     if (matching_size != 0) {
-        *matching_size = (igraph_integer_t) num_matched;
+        *matching_size = (igraph_long_t) num_matched;
     }
 
     /* Release everything */
@@ -462,11 +462,11 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
+static igraph_long_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
         const igraph_t* graph,
         const igraph_vector_bool_t* types, igraph_vector_t* labels,
         igraph_vector_long_t* match, igraph_bool_t smaller_set) {
-    igraph_integer_t i, j, n, no_of_nodes = igraph_vcount(graph), matched_to;
+    igraph_long_t i, j, n, no_of_nodes = igraph_vcount(graph), matched_to;
     igraph_dqueue_long_t q;
     igraph_vector_t neis;
 
@@ -491,15 +491,15 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
 
     /* Run the BFS */
     while (!igraph_dqueue_long_empty(&q)) {
-        igraph_integer_t v = igraph_dqueue_long_pop(&q);
-        igraph_integer_t w;
+        igraph_long_t v = igraph_dqueue_long_pop(&q);
+        igraph_long_t w;
 
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) v,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) v,
                                       IGRAPH_ALL));
 
         n = igraph_vector_size(&neis);
         for (j = 0; j < n; j++) {
-            w = (igraph_integer_t) VECTOR(neis)[j];
+            w = (igraph_long_t) VECTOR(neis)[j];
             if (VECTOR(*labels)[w] == no_of_nodes) {
                 VECTOR(*labels)[w] = VECTOR(*labels)[v] + 1;
                 matched_to = VECTOR(*match)[w];
@@ -532,13 +532,13 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_unweighted_relabel(
  * an edge falls below \c eps, it will be considered tight. If all your
  * weights are integers, you can safely set \c eps to zero.
  */
-static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
+static igraph_long_t igraph_i_maximum_bipartite_matching_weighted(
         const igraph_t* graph,
-        const igraph_vector_bool_t* types, igraph_integer_t* matching_size,
+        const igraph_vector_bool_t* types, igraph_long_t* matching_size,
         igraph_real_t* matching_weight, igraph_vector_long_t* matching,
         const igraph_vector_t* weights, igraph_real_t eps) {
-    igraph_integer_t i, j, k, n, no_of_nodes, no_of_edges;
-    igraph_integer_t u, v, w, msize;
+    igraph_long_t i, j, k, n, no_of_nodes, no_of_edges;
+    igraph_long_t u, v, w, msize;
     igraph_t newgraph;
     igraph_vector_long_t match;       /* will store the matching */
     igraph_vector_t slack;            /* will store the slack on each edge */
@@ -549,13 +549,13 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
     igraph_bool_t smaller_set_type;   /* denotes which part of the bipartite graph is smaller */
     igraph_vector_t smaller_set;      /* stores the vertex IDs of the smaller set */
     igraph_vector_t larger_set;       /* stores the vertex IDs of the larger set */
-    igraph_integer_t smaller_set_size;        /* size of the smaller set */
-    igraph_integer_t larger_set_size;         /* size of the larger set */
+    igraph_long_t smaller_set_size;        /* size of the smaller set */
+    igraph_long_t larger_set_size;         /* size of the larger set */
     igraph_real_t dual;               /* solution of the dual problem */
     igraph_adjlist_t tight_phantom_edges; /* adjacency list to manage tight phantom edges */
-    igraph_integer_t alternating_path_endpoint;
-    igraph_vector_int_t* neis;
-    igraph_vector_int_t *neis2;
+    igraph_long_t alternating_path_endpoint;
+    igraph_vector_long_t* neis;
+    igraph_vector_long_t *neis2;
     igraph_inclist_t inclist;         /* incidence list of the original graph */
 
     /* The Hungarian algorithm is originally for complete bipartite graphs.
@@ -583,7 +583,7 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
     IGRAPH_FINALLY(igraph_dqueue_long_destroy, &q);
     IGRAPH_VECTOR_INIT_FINALLY(&parent, no_of_nodes);
     IGRAPH_CHECK(igraph_adjlist_init_empty(&tight_phantom_edges,
-                                           (igraph_integer_t) no_of_nodes));
+                                           (igraph_long_t) no_of_nodes));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &tight_phantom_edges);
     IGRAPH_CHECK(igraph_inclist_init(graph, &inclist, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_inclist_destroy, &inclist);
@@ -623,9 +623,9 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
         }
 
         neis = igraph_inclist_get(&inclist, i);
-        n = igraph_vector_int_size(neis);
+        n = igraph_vector_long_size(neis);
         for (j = 0, k = 0; j < n; j++) {
-            k = (igraph_integer_t) VECTOR(*neis)[j];
+            k = (igraph_long_t) VECTOR(*neis)[j];
             u = IGRAPH_OTHER(graph, k, i);
             if (VECTOR(*types)[u] == VECTOR(*types)[i]) {
                 IGRAPH_ERROR("Graph is not bipartite with supplied types vector", IGRAPH_EINVAL);
@@ -643,8 +643,8 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
     IGRAPH_CHECK(igraph_get_edgelist(graph, &vec2, 0));
 #define IS_TIGHT(i) (VECTOR(slack)[i] <= eps)
     for (i = 0, j = 0; i < no_of_edges; i++, j += 2) {
-        u = (igraph_integer_t) VECTOR(vec2)[j];
-        v = (igraph_integer_t) VECTOR(vec2)[j + 1];
+        u = (igraph_long_t) VECTOR(vec2)[j];
+        v = (igraph_long_t) VECTOR(vec2)[j + 1];
         VECTOR(slack)[i] = VECTOR(labels)[u] + VECTOR(labels)[v] - VECTOR(*weights)[i];
         if (IS_TIGHT(i)) {
             IGRAPH_CHECK(igraph_vector_push_back(&vec1, u));
@@ -656,7 +656,7 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
     /* (4) Construct a temporary graph on which the initial maximum matching
      *     will be calculated (only on the subset of tight edges) */
     IGRAPH_CHECK(igraph_create(&newgraph, &vec1,
-                               (igraph_integer_t) no_of_nodes, 0));
+                               (igraph_long_t) no_of_nodes, 0));
     IGRAPH_FINALLY(igraph_destroy, &newgraph);
     IGRAPH_CHECK(igraph_maximum_bipartite_matching(&newgraph, types, &msize, 0, &match, 0, 0));
     igraph_destroy(&newgraph);
@@ -665,7 +665,7 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
     /* (5) Main loop until the matching becomes maximal */
     while (msize < smaller_set_size) {
         igraph_real_t min_slack, min_slack_2;
-        igraph_integer_t min_slack_u, min_slack_v;
+        igraph_long_t min_slack_u, min_slack_v;
 
         /* mark min_slack_u as unused; it is actually used when debugging, but
          * gcc complains when we are not debugging */
@@ -698,9 +698,9 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
         /* (8) Run the BFS */
         alternating_path_endpoint = -1;
         while (!igraph_dqueue_long_empty(&q)) {
-            v = (igraph_integer_t) igraph_dqueue_long_pop(&q);
+            v = (igraph_long_t) igraph_dqueue_long_pop(&q);
 
-            debug("Considering vertex %ld\n", (igraph_integer_t)v);
+            debug("Considering vertex %ld\n", (igraph_long_t)v);
 
             /* v is always in the smaller set. Find the neighbors of v, which
              * are all in the larger set. Find the pairs of these nodes in
@@ -713,9 +713,9 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
              * (ab)use an adjacency list data structure that lists the
              * vertices connected to v by phantom edges only. */
             neis = igraph_inclist_get(&inclist, v);
-            n = igraph_vector_int_size(neis);
+            n = igraph_vector_long_size(neis);
             for (i = 0; i < n; i++) {
-                j = (igraph_integer_t) VECTOR(*neis)[i];
+                j = (igraph_long_t) VECTOR(*neis)[i];
                 /* We only care about tight edges */
                 if (!IS_TIGHT(j)) {
                     continue;
@@ -725,10 +725,10 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
                 if (VECTOR(parent)[u] >= 0) {
                     continue;
                 }
-                debug("  Reached vertex %ld via edge %ld\n", (igraph_integer_t)u, (igraph_integer_t)j);
+                debug("  Reached vertex %ld via edge %ld\n", (igraph_long_t)u, (igraph_long_t)j);
                 VECTOR(parent)[u] = v;
                 IGRAPH_CHECK(igraph_vector_push_back(&vec2, u));
-                w = (igraph_integer_t) VECTOR(match)[u];
+                w = (igraph_long_t) VECTOR(match)[u];
                 if (w == -1) {
                     /* u is unmatched and it is in the larger set. Therefore, we
                      * could improve the matching by following the parents back
@@ -745,9 +745,9 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
 
             /* Now do the same with the phantom edges */
             neis2 = igraph_adjlist_get(&tight_phantom_edges, v);
-            n = igraph_vector_int_size(neis2);
+            n = igraph_vector_long_size(neis2);
             for (i = 0; i < n; i++) {
-                u = (igraph_integer_t) VECTOR(*neis2)[i];
+                u = (igraph_long_t) VECTOR(*neis2)[i];
                 /* Have we seen u already? */
                 if (VECTOR(parent)[u] >= 0) {
                     continue;
@@ -756,13 +756,13 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
                  * edge became non-tight in the meanwhile. We do not remove these from
                  * tight_phantom_edges at the moment, so we check them once again here.
                  */
-                if (fabs(VECTOR(labels)[(igraph_integer_t)v] + VECTOR(labels)[(igraph_integer_t)u]) > eps) {
+                if (fabs(VECTOR(labels)[(igraph_long_t)v] + VECTOR(labels)[(igraph_long_t)u]) > eps) {
                     continue;
                 }
-                debug("  Reached vertex %ld via tight phantom edge\n", (igraph_integer_t)u);
+                debug("  Reached vertex %ld via tight phantom edge\n", (igraph_long_t)u);
                 VECTOR(parent)[u] = v;
                 IGRAPH_CHECK(igraph_vector_push_back(&vec2, u));
-                w = (igraph_integer_t) VECTOR(match)[u];
+                w = (igraph_long_t) VECTOR(match)[u];
                 if (w == -1) {
                     /* u is unmatched and it is in the larger set. Therefore, we
                      * could improve the matching by following the parents back
@@ -786,25 +786,25 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
 #endif
             /* Increase the size of the matching with the alternating path. */
             v = alternating_path_endpoint;
-            u = (igraph_integer_t) VECTOR(parent)[v];
-            debug("Extending matching with alternating path ending in %ld.\n", (igraph_integer_t)v);
+            u = (igraph_long_t) VECTOR(parent)[v];
+            debug("Extending matching with alternating path ending in %ld.\n", (igraph_long_t)v);
 
             while (u != v) {
-                w = (igraph_integer_t) VECTOR(match)[v];
+                w = (igraph_long_t) VECTOR(match)[v];
                 if (w != -1) {
                     VECTOR(match)[w] = -1;
                 }
                 VECTOR(match)[v] = u;
 
                 VECTOR(match)[v] = u;
-                w = (igraph_integer_t) VECTOR(match)[u];
+                w = (igraph_long_t) VECTOR(match)[u];
                 if (w != -1) {
                     VECTOR(match)[w] = -1;
                 }
                 VECTOR(match)[u] = v;
 
-                v = (igraph_integer_t) VECTOR(parent)[u];
-                u = (igraph_integer_t) VECTOR(parent)[v];
+                v = (igraph_long_t) VECTOR(parent)[u];
+                u = (igraph_long_t) VECTOR(parent)[v];
             }
 
             msize++;
@@ -812,7 +812,7 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
 #ifdef MATCHING_DEBUG
             debug("New matching after update:");
             igraph_vector_long_print(&match);
-            debug("Matching size is now: %ld\n", (igraph_integer_t)msize);
+            debug("Matching size is now: %ld\n", (igraph_long_t)msize);
 #endif
             continue;
         }
@@ -843,12 +843,12 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
             i = VECTOR(larger_set)[j];
             if (VECTOR(labels)[i] < min_slack) {
                 min_slack = VECTOR(labels)[i];
-                min_slack_v = (igraph_integer_t) i;
+                min_slack_v = (igraph_long_t) i;
             }
         }
         min_slack_2 = IGRAPH_INFINITY;
         for (i = 0; i < n; i++) {
-            u = (igraph_integer_t) VECTOR(vec1)[i];
+            u = (igraph_long_t) VECTOR(vec1)[i];
             /* u is surely from the smaller set, but we are interested in it
              * only if it is reachable from an unmatched vertex */
             if (VECTOR(parent)[u] < 0) {
@@ -861,31 +861,31 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
         }
         min_slack += min_slack_2;
         debug("Starting approximation for min_slack = %.4f (based on vertex pair %ld--%ld)\n",
-              min_slack, (igraph_integer_t)min_slack_u, (igraph_integer_t)min_slack_v);
+              min_slack, (igraph_long_t)min_slack_u, (igraph_long_t)min_slack_v);
 
         n = igraph_vector_size(&vec1);
         for (i = 0; i < n; i++) {
-            u = (igraph_integer_t) VECTOR(vec1)[i];
+            u = (igraph_long_t) VECTOR(vec1)[i];
             /* u is a reachable node in A; get its incident edges.
              *
              * There are two types of incident edges: 1) real edges,
              * 2) phantom edges. Phantom edges were treated earlier
              * when we determined the initial value for min_slack. */
-            debug("Trying to expand along vertex %ld\n", (igraph_integer_t)u);
+            debug("Trying to expand along vertex %ld\n", (igraph_long_t)u);
             neis = igraph_inclist_get(&inclist, u);
-            k = igraph_vector_int_size(neis);
+            k = igraph_vector_long_size(neis);
             for (j = 0; j < k; j++) {
                 /* v is the vertex sitting at the other end of an edge incident
                  * on u; check whether it was reached */
                 v = IGRAPH_OTHER(graph, VECTOR(*neis)[j], u);
-                debug("  Edge %ld -- %ld (ID=%ld)\n", (igraph_integer_t)u, (igraph_integer_t)v, (igraph_integer_t)VECTOR(*neis)[j]);
+                debug("  Edge %ld -- %ld (ID=%ld)\n", (igraph_long_t)u, (igraph_long_t)v, (igraph_long_t)VECTOR(*neis)[j]);
                 if (VECTOR(parent)[v] >= 0) {
                     /* v was reached, so we are not interested in it */
-                    debug("    %ld was reached, so we are not interested in it\n", (igraph_integer_t)v);
+                    debug("    %ld was reached, so we are not interested in it\n", (igraph_long_t)v);
                     continue;
                 }
                 /* v is the ID of the edge from now on */
-                v = (igraph_integer_t) VECTOR(*neis)[j];
+                v = (igraph_long_t) VECTOR(*neis)[j];
                 if (VECTOR(slack)[v] < min_slack) {
                     min_slack = VECTOR(slack)[v];
                     min_slack_u = u;
@@ -895,22 +895,22 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
                       VECTOR(slack)[v], min_slack);
             }
         }
-        debug("Minimum slack: %.4f on edge %d--%d\n", min_slack, (igraph_integer_t)min_slack_u, (igraph_integer_t)min_slack_v);
+        debug("Minimum slack: %.4f on edge %d--%d\n", min_slack, (igraph_long_t)min_slack_u, (igraph_long_t)min_slack_v);
 
         if (min_slack > 0) {
             /* Decrease the label of reachable nodes in A by min_slack.
              * Also update the dual solution */
             n = igraph_vector_size(&vec1);
             for (i = 0; i < n; i++) {
-                u = (igraph_integer_t) VECTOR(vec1)[i];
+                u = (igraph_long_t) VECTOR(vec1)[i];
                 VECTOR(labels)[u] -= min_slack;
                 neis = igraph_inclist_get(&inclist, u);
-                k = igraph_vector_int_size(neis);
+                k = igraph_vector_long_size(neis);
                 for (j = 0; j < k; j++) {
                     debug("  Decreasing slack of edge %ld (%ld--%ld) by %.4f\n",
-                          (igraph_integer_t)VECTOR(*neis)[j], (igraph_integer_t)u,
-                          (igraph_integer_t)IGRAPH_OTHER(graph, VECTOR(*neis)[j], u), min_slack);
-                    VECTOR(slack)[(igraph_integer_t)VECTOR(*neis)[j]] -= min_slack;
+                          (igraph_long_t)VECTOR(*neis)[j], (igraph_long_t)u,
+                          (igraph_long_t)IGRAPH_OTHER(graph, VECTOR(*neis)[j], u), min_slack);
+                    VECTOR(slack)[(igraph_long_t)VECTOR(*neis)[j]] -= min_slack;
                 }
                 dual -= min_slack;
             }
@@ -919,15 +919,15 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
              * Also update the dual solution */
             n = igraph_vector_size(&vec2);
             for (i = 0; i < n; i++) {
-                u = (igraph_integer_t) VECTOR(vec2)[i];
+                u = (igraph_long_t) VECTOR(vec2)[i];
                 VECTOR(labels)[u] += min_slack;
                 neis = igraph_inclist_get(&inclist, u);
-                k = igraph_vector_int_size(neis);
+                k = igraph_vector_long_size(neis);
                 for (j = 0; j < k; j++) {
                     debug("  Increasing slack of edge %ld (%ld--%ld) by %.4f\n",
-                          (igraph_integer_t)VECTOR(*neis)[j], (igraph_integer_t)u,
-                          (igraph_integer_t)IGRAPH_OTHER(graph, (igraph_integer_t)VECTOR(*neis)[j], u), min_slack);
-                    VECTOR(slack)[(igraph_integer_t)VECTOR(*neis)[j]] += min_slack;
+                          (igraph_long_t)VECTOR(*neis)[j], (igraph_long_t)u,
+                          (igraph_long_t)IGRAPH_OTHER(graph, (igraph_long_t)VECTOR(*neis)[j], u), min_slack);
+                    VECTOR(slack)[(igraph_long_t)VECTOR(*neis)[j]] += min_slack;
                 }
                 dual += min_slack;
             }
@@ -943,14 +943,14 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
             u = VECTOR(smaller_set)[i];
             for (j = 0; j < larger_set_size; j++) {
                 v = VECTOR(larger_set)[j];
-                if (VECTOR(labels)[(igraph_integer_t)u] + VECTOR(labels)[(igraph_integer_t)v] <= eps) {
+                if (VECTOR(labels)[(igraph_long_t)u] + VECTOR(labels)[(igraph_long_t)v] <= eps) {
                     /* Tight phantom edge found. Note that we don't have to check whether
                      * u and v are connected; if they were, then the slack of this edge
                      * would be negative. */
                     neis2 = igraph_adjlist_get(&tight_phantom_edges, u);
-                    if (!igraph_vector_int_binsearch(neis2, v, &k)) {
-                        debug("New tight phantom edge: %ld -- %ld\n", (igraph_integer_t)u, (igraph_integer_t)v);
-                        IGRAPH_CHECK(igraph_vector_int_insert(neis2, k, v));
+                    if (!igraph_vector_long_binsearch(neis2, v, &k)) {
+                        debug("New tight phantom edge: %ld -- %ld\n", (igraph_long_t)u, (igraph_long_t)v);
+                        IGRAPH_CHECK(igraph_vector_long_insert(neis2, k, v));
                     }
                 }
             }
@@ -970,7 +970,7 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
         v = VECTOR(match)[u];
         if (v != -1) {
             neis2 = igraph_adjlist_get(&tight_phantom_edges, u);
-            if (igraph_vector_int_binsearch(neis2, v, 0)) {
+            if (igraph_vector_long_binsearch(neis2, v, 0)) {
                 VECTOR(match)[u] = VECTOR(match)[v] = -1;
                 msize--;
             }
@@ -988,7 +988,7 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
         *matching_weight = 0;
         for (i = 0; i < no_of_edges; i++) {
             if (IS_TIGHT(i)) {
-                IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) i, &u, &v));
+                IGRAPH_CHECK(igraph_edge(graph, (igraph_long_t) i, &u, &v));
                 if (VECTOR(match)[u] == v) {
                     *matching_weight += VECTOR(*weights)[i];
                 }
@@ -1014,7 +1014,7 @@ static igraph_integer_t igraph_i_maximum_bipartite_matching_weighted(
     return IGRAPH_SUCCESS;
 }
 
-igraph_integer_t igraph_maximum_matching(const igraph_t* graph, igraph_integer_t* matching_size,
+igraph_long_t igraph_maximum_matching(const igraph_t* graph, igraph_long_t* matching_size,
                             igraph_real_t* matching_weight, igraph_vector_long_t* matching,
                             const igraph_vector_t* weights) {
     IGRAPH_UNUSED(graph);

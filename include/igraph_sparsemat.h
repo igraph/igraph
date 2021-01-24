@@ -72,13 +72,13 @@ DECLDIR igraph_bool_t igraph_sparsemat_is_triplet(const igraph_sparsemat_t *A);
 DECLDIR igraph_bool_t igraph_sparsemat_is_cc(const igraph_sparsemat_t *A);
 
 DECLDIR int igraph_sparsemat_permute(const igraph_sparsemat_t *A,
-                                     const igraph_vector_int_t *p,
-                                     const igraph_vector_int_t *q,
+                                     const igraph_vector_long_t *p,
+                                     const igraph_vector_long_t *q,
                                      igraph_sparsemat_t *res);
 
 DECLDIR int igraph_sparsemat_index(const igraph_sparsemat_t *A,
-                                   const igraph_vector_int_t *p,
-                                   const igraph_vector_int_t *q,
+                                   const igraph_vector_long_t *p,
+                                   const igraph_vector_long_t *q,
                                    igraph_sparsemat_t *res,
                                    igraph_real_t *constres);
 
@@ -228,10 +228,10 @@ DECLDIR int igraph_sparsemat_colmaxs(igraph_sparsemat_t *A,
 
 DECLDIR int igraph_sparsemat_which_min_rows(igraph_sparsemat_t *A,
                                             igraph_vector_t *res,
-                                            igraph_vector_int_t *pos);
+                                            igraph_vector_long_t *pos);
 DECLDIR int igraph_sparsemat_which_min_cols(igraph_sparsemat_t *A,
                                             igraph_vector_t *res,
-                                            igraph_vector_int_t *pos);
+                                            igraph_vector_long_t *pos);
 
 DECLDIR int igraph_sparsemat_scale(igraph_sparsemat_t *A, igraph_real_t by);
 
@@ -242,12 +242,12 @@ DECLDIR int igraph_sparsemat_resize(igraph_sparsemat_t *A, long int nrow,
                                     long int ncol, int nzmax);
 DECLDIR int igraph_sparsemat_nonzero_storage(const igraph_sparsemat_t *A);
 DECLDIR int igraph_sparsemat_getelements(const igraph_sparsemat_t *A,
-                                         igraph_vector_int_t *i,
-                                         igraph_vector_int_t *j,
+                                         igraph_vector_long_t *i,
+                                         igraph_vector_long_t *j,
                                          igraph_vector_t *x);
 DECLDIR int igraph_sparsemat_getelements_sorted(const igraph_sparsemat_t *A,
-                                                igraph_vector_int_t *i,
-                                                igraph_vector_int_t *j,
+                                                igraph_vector_long_t *i,
+                                                igraph_vector_long_t *j,
                                                 igraph_vector_t *x);
 DECLDIR int igraph_sparsemat_scale_rows(igraph_sparsemat_t *A,
                                         const igraph_vector_t *fact);

@@ -27,11 +27,11 @@
 
 typedef struct {
     void *scanner;
-    igraph_integer_t eof;
+    igraph_long_t eof;
     char errmsg[300];
-    igraph_integer_t has_weights;
+    igraph_long_t has_weights;
     igraph_vector_t *vector;
     igraph_vector_t *weights;
     igraph_trie_t *trie;
-    igraph_integer_t actvertex;
+    igraph_long_t actvertex;
 } igraph_i_lgl_parsedata_t;

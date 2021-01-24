@@ -45,21 +45,21 @@
  * \example examples/simple/igraph_simplify.c
  */
 
-igraph_integer_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
+igraph_long_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                     igraph_bool_t loops,
                     const igraph_attribute_combination_t *edge_comb) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t edge;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t edge;
     igraph_bool_t attr = edge_comb && igraph_has_attribute_table();
-    igraph_integer_t from, to, pfrom = -1, pto = -2;
+    igraph_long_t from, to, pfrom = -1, pto = -2;
     igraph_t res;
     igraph_es_t es;
     igraph_eit_t eit;
     igraph_vector_t mergeinto;
-    igraph_integer_t actedge;
+    igraph_long_t actedge;
 
     if (!multiple && !loops)
         /* nothing to do */
@@ -142,7 +142,7 @@ igraph_integer_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
     igraph_es_destroy(&es);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(&res, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(&res, &edges, (igraph_long_t) no_of_nodes,
                                igraph_is_directed(graph)));
 
     igraph_vector_destroy(&edges);

@@ -25,9 +25,9 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
-    igraph_integer_t nodes = 10;
+    igraph_long_t nodes = 10;
     igraph_real_t triplets[] = { 1, 0, 1 / 4.0,       0, 1, 1 / 3.0,
                                  2, 0, 1 / 4.0,       0, 2, 1 / 3.0,
                                  3, 0, 1.0,         0, 3, 1 / 3.0,
@@ -40,7 +40,7 @@ igraph_integer_t main() {
                                };
 
     igraph_sparsemat_t mat;
-    igraph_integer_t i, n = sizeof(triplets) / sizeof(igraph_real_t);
+    igraph_long_t i, n = sizeof(triplets) / sizeof(igraph_real_t);
     igraph_eigen_which_t which;
     igraph_vector_complex_t values, values2;
     igraph_matrix_complex_t vectors, vectors2;
@@ -76,7 +76,7 @@ igraph_integer_t main() {
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_matrix_init(&mat2, nodes, nodes);
     for (i = 0; i < nodes; i++) {
-        igraph_integer_t j;
+        igraph_long_t j;
         for (j = 0; j < nodes; j++) {
             MATRIX(mat2, i, j) = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
         }
@@ -102,7 +102,7 @@ igraph_integer_t main() {
     } while(0)
 
     for (i = 0; i < nodes; i++) {
-        igraph_integer_t j;
+        igraph_long_t j;
         igraph_real_t d =
             igraph_complex_abs(igraph_complex_sub(VECTOR(values)[i],
                                VECTOR(values2)[nodes - i - 1]));

@@ -58,16 +58,16 @@
  * \example examples/simple/assortativity.c
  */
 
-igraph_integer_t igraph_assortativity_nominal(const igraph_t *graph,
+igraph_long_t igraph_assortativity_nominal(const igraph_t *graph,
                                  const igraph_vector_t *types,
                                  igraph_real_t *res,
                                  igraph_bool_t directed) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_types;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_types;
     igraph_vector_t ai, bi, eii;
-    igraph_integer_t e, i;
+    igraph_long_t e, i;
     igraph_real_t sumaibi = 0.0, sumeii = 0.0;
 
     if (igraph_vector_size(types) != no_of_nodes) {
@@ -80,16 +80,16 @@ igraph_integer_t igraph_assortativity_nominal(const igraph_t *graph,
 
     directed = directed && igraph_is_directed(graph);
 
-    no_of_types = (igraph_integer_t) igraph_vector_max(types) + 1;
+    no_of_types = (igraph_long_t) igraph_vector_max(types) + 1;
     IGRAPH_VECTOR_INIT_FINALLY(&ai, no_of_types);
     IGRAPH_VECTOR_INIT_FINALLY(&bi, no_of_types);
     IGRAPH_VECTOR_INIT_FINALLY(&eii, no_of_types);
 
     for (e = 0; e < no_of_edges; e++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, e);
-        igraph_integer_t to = IGRAPH_TO(graph, e);
-        igraph_integer_t from_type = (igraph_integer_t) VECTOR(*types)[from];
-        igraph_integer_t to_type = (igraph_integer_t) VECTOR(*types)[to];
+        igraph_long_t from = IGRAPH_FROM(graph, e);
+        igraph_long_t to = IGRAPH_TO(graph, e);
+        igraph_long_t from_type = (igraph_long_t) VECTOR(*types)[from];
+        igraph_long_t to_type = (igraph_long_t) VECTOR(*types)[to];
 
         VECTOR(ai)[from_type] += 1;
         VECTOR(bi)[to_type] += 1;
@@ -168,15 +168,15 @@ igraph_integer_t igraph_assortativity_nominal(const igraph_t *graph,
  * \example examples/simple/assortativity.c
  */
 
-igraph_integer_t igraph_assortativity(const igraph_t *graph,
+igraph_long_t igraph_assortativity(const igraph_t *graph,
                          const igraph_vector_t *types1,
                          const igraph_vector_t *types2,
                          igraph_real_t *res,
                          igraph_bool_t directed) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t e;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t e;
 
     directed = directed && igraph_is_directed(graph);
 
@@ -196,8 +196,8 @@ igraph_integer_t igraph_assortativity(const igraph_t *graph,
         igraph_real_t num1 = 0.0, num2 = 0.0, den1 = 0.0;
 
         for (e = 0; e < no_of_edges; e++) {
-            igraph_integer_t from = IGRAPH_FROM(graph, e);
-            igraph_integer_t to = IGRAPH_TO(graph, e);
+            igraph_long_t from = IGRAPH_FROM(graph, e);
+            igraph_long_t to = IGRAPH_TO(graph, e);
             igraph_real_t from_type = VECTOR(*types1)[from];
             igraph_real_t to_type = VECTOR(*types1)[to];
 
@@ -223,8 +223,8 @@ igraph_integer_t igraph_assortativity(const igraph_t *graph,
         }
 
         for (e = 0; e < no_of_edges; e++) {
-            igraph_integer_t from = IGRAPH_FROM(graph, e);
-            igraph_integer_t to = IGRAPH_TO(graph, e);
+            igraph_long_t from = IGRAPH_FROM(graph, e);
+            igraph_long_t to = IGRAPH_TO(graph, e);
             igraph_real_t from_type = VECTOR(*types1)[from];
             igraph_real_t to_type = VECTOR(*types2)[to];
 
@@ -270,7 +270,7 @@ igraph_integer_t igraph_assortativity(const igraph_t *graph,
  * \example examples/simple/assortativity.c
  */
 
-igraph_integer_t igraph_assortativity_degree(const igraph_t *graph,
+igraph_long_t igraph_assortativity_degree(const igraph_t *graph,
                                 igraph_real_t *res,
                                 igraph_bool_t directed) {
 

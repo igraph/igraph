@@ -38,7 +38,7 @@
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
 
-static igraph_integer_t igraph_i_trie_init_node(igraph_trie_node_t *t) {
+static igraph_long_t igraph_i_trie_init_node(igraph_trie_node_t *t) {
     IGRAPH_STRVECTOR_INIT_FINALLY(&t->strs, 0);
     IGRAPH_VECTOR_PTR_INIT_FINALLY(&t->children, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&t->values, 0);
@@ -55,7 +55,7 @@ static void igraph_i_trie_destroy_node(igraph_trie_node_t *t);
  *         igraph_vector_ptr_init() and igraph_vector_init() might be returned.
  */
 
-igraph_integer_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
+igraph_long_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
     t->maxvalue = -1;
     t->storekeys = storekeys;
     IGRAPH_CHECK(igraph_i_trie_init_node( (igraph_trie_node_t *) t ));
@@ -74,7 +74,7 @@ igraph_integer_t igraph_trie_init(igraph_trie_t *t, igraph_bool_t storekeys) {
  */
 
 static void igraph_i_trie_destroy_node_helper(igraph_trie_node_t *t, igraph_bool_t sfree) {
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_strvector_destroy(&t->strs);
     for (i = 0; i < igraph_vector_ptr_size(&t->children); i++) {
         igraph_trie_node_t *child = VECTOR(t->children)[i];
@@ -111,9 +111,9 @@ void igraph_trie_destroy(igraph_trie_t *t) {
  * \brief Internal helping function for igraph_trie_t
  */
 
-static igraph_integer_t igraph_i_strdiff(const char *str, const char *key) {
+static igraph_long_t igraph_i_strdiff(const char *str, const char *key) {
 
-    igraph_integer_t diff = 0;
+    igraph_long_t diff = 0;
     while (key[diff] != '\0' && str[diff] != '\0' && str[diff] == key[diff]) {
         diff++;
     }
@@ -128,10 +128,10 @@ static igraph_integer_t igraph_i_strdiff(const char *str, const char *key) {
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-igraph_integer_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
-                         igraph_real_t newvalue, igraph_integer_t *id) {
+igraph_long_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
+                         igraph_real_t newvalue, igraph_long_t *id) {
     char *str;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_bool_t add;
 
     /* If newvalue is negative, we don't add the node if nonexistent, only check
@@ -139,7 +139,7 @@ igraph_integer_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
     add = (newvalue >= 0);
 
     for (i = 0; i < igraph_strvector_size(&t->strs); i++) {
-        igraph_integer_t diff;
+        igraph_long_t diff;
         igraph_strvector_get(&t->strs, i, &str);
         diff = igraph_i_strdiff(str, key);
 
@@ -153,11 +153,11 @@ igraph_integer_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             /* ------------------------------------ */
             /* They are exactly the same */
             if (VECTOR(t->values)[i] != -1) {
-                *id = (igraph_integer_t) VECTOR(t->values)[i];
+                *id = (igraph_long_t) VECTOR(t->values)[i];
                 return 0;
             } else {
                 VECTOR(t->values)[i] = newvalue;
-                *id = (igraph_integer_t) newvalue;
+                *id = (igraph_long_t) newvalue;
                 return 0;
             }
 
@@ -182,7 +182,7 @@ igraph_integer_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 
                 VECTOR(t->children)[i] = node;
 
-                *id = (igraph_integer_t) newvalue;
+                *id = (igraph_long_t) newvalue;
                 IGRAPH_FINALLY_CLEAN(3);
                 return 0;
             } else {
@@ -221,7 +221,7 @@ igraph_integer_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             VECTOR(t->values)[i] = newvalue;
             VECTOR(t->children)[i] = node;
 
-            *id = (igraph_integer_t) newvalue;
+            *id = (igraph_long_t) newvalue;
             return 0;
 
         } else if (add) {
@@ -257,7 +257,7 @@ igraph_integer_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
             VECTOR(t->values)[i] = -1;
             VECTOR(t->children)[i] = node;
 
-            *id = (igraph_integer_t) newvalue;
+            *id = (igraph_long_t) newvalue;
             return 0;
         } else {
 
@@ -279,7 +279,7 @@ igraph_integer_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
 
         igraph_vector_ptr_push_back(&t->children, 0); /* allocated */
         igraph_vector_push_back(&t->values, newvalue); /* allocated */
-        *id = (igraph_integer_t) newvalue;
+        *id = (igraph_long_t) newvalue;
     } else {
         *id = -1;
     }
@@ -292,7 +292,7 @@ igraph_integer_t igraph_trie_get_node(igraph_trie_node_t *t, const char *key,
  * \brief Search/insert in a trie.
  */
 
-igraph_integer_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
+igraph_long_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_long_t *id) {
     if (!t->storekeys) {
         IGRAPH_CHECK(igraph_trie_get_node( (igraph_trie_node_t*) t,
                                            key, t->maxvalue + 1, id));
@@ -301,7 +301,7 @@ igraph_integer_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integ
         }
         return 0;
     } else {
-        igraph_integer_t ret;
+        igraph_long_t ret;
         igraph_error_handler_t *oldhandler;
         oldhandler = igraph_set_error_handler(igraph_error_handler_ignore);
         /* Add it to the string vector first, we can undo this later */
@@ -338,8 +338,8 @@ igraph_integer_t igraph_trie_get(igraph_trie_t *t, const char *key, igraph_integ
  *         - <b>IGRAPH_ENOMEM</b>: out of memory
  */
 
-igraph_integer_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_integer_t length,
-                     igraph_integer_t *id) {
+igraph_long_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_long_t length,
+                     igraph_long_t *id) {
     char *tmp = igraph_Calloc(length + 1, char);
 
     if (tmp == 0) {
@@ -362,7 +362,7 @@ igraph_integer_t igraph_trie_get2(igraph_trie_t *t, const char *key, igraph_inte
  * In this case, a negative id is returned.
  */
 
-igraph_integer_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_integer_t *id) {
+igraph_long_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_long_t *id) {
     IGRAPH_CHECK(igraph_trie_get_node( (igraph_trie_node_t*) t,
                                        key, -1, id));
     return 0;
@@ -373,7 +373,7 @@ igraph_integer_t igraph_trie_check(igraph_trie_t *t, const char *key, igraph_int
  * \brief Get an element of a trie based on its index.
  */
 
-void igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx, char **str) {
+void igraph_trie_idx(igraph_trie_t *t, igraph_long_t idx, char **str) {
     igraph_strvector_get(&t->keys, idx, str);
 }
 
@@ -382,13 +382,13 @@ void igraph_trie_idx(igraph_trie_t *t, igraph_integer_t idx, char **str) {
  * \brief Returns the size of a trie.
  */
 
-igraph_integer_t igraph_trie_size(igraph_trie_t *t) {
+igraph_long_t igraph_trie_size(igraph_trie_t *t) {
     return t->maxvalue + 1;
 }
 
 /* Hmmm, very dirty.... */
 
-igraph_integer_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
+igraph_long_t igraph_trie_getkeys(igraph_trie_t *t, const igraph_strvector_t **strv) {
     *strv = &t->keys;
     return 0;
 }

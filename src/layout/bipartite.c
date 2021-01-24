@@ -48,12 +48,12 @@
  *
  * \sa \ref igraph_layout_sugiyama().
  */
-igraph_integer_t igraph_layout_bipartite(const igraph_t *graph,
+igraph_long_t igraph_layout_bipartite(const igraph_t *graph,
                             const igraph_vector_bool_t *types,
                             igraph_matrix_t *res, igraph_real_t hgap,
-                            igraph_real_t vgap, igraph_integer_t maxiter) {
+                            igraph_real_t vgap, igraph_long_t maxiter) {
 
-    igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i, no_of_nodes = igraph_vcount(graph);
     igraph_vector_t layers;
 
     if (igraph_vector_bool_size(types) != no_of_nodes) {

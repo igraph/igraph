@@ -28,25 +28,25 @@
 
 
 void gsummary(const igraph_t * g) {
-    printf("|V|=%d |E|=%d directed=%d\n", (igraph_integer_t)igraph_vcount(g), (igraph_integer_t)igraph_ecount(g), (igraph_integer_t)igraph_is_directed(g));
+    printf("|V|=%d |E|=%d directed=%d\n", (igraph_long_t)igraph_vcount(g), (igraph_long_t)igraph_ecount(g), (igraph_long_t)igraph_is_directed(g));
 }
 
 void show_results(igraph_vector_t * membership, igraph_real_t codelength) {
-    igraph_integer_t i;
-    printf("Codelength: %0.5f (in %d modules)\n", codelength, (igraph_integer_t)igraph_vector_max(membership) + 1 );
+    igraph_long_t i;
+    printf("Codelength: %0.5f (in %d modules)\n", codelength, (igraph_long_t)igraph_vector_max(membership) + 1 );
     printf("Membership: ");
     for (i = 0; i < igraph_vector_size(membership); i++) {
-        printf("%li ", (igraph_integer_t)VECTOR(*membership)[i] );
+        printf("%li ", (igraph_long_t)VECTOR(*membership)[i] );
     }
     printf("\n");
 }
 
 void show_results_lite(igraph_vector_t * membership, igraph_real_t codelength) {
-    igraph_integer_t i;
-    printf("Codelength: %0.5f (in %d modules)\n", codelength, (igraph_integer_t)igraph_vector_max(membership) + 1 );
+    igraph_long_t i;
+    printf("Codelength: %0.5f (in %d modules)\n", codelength, (igraph_long_t)igraph_vector_max(membership) + 1 );
     printf("Membership (1/100 of vertices): ");
     for (i = 0; i < igraph_vector_size(membership); i += 100) {
-        printf("%li ", (igraph_integer_t)VECTOR(*membership)[i] );
+        printf("%li ", (igraph_long_t)VECTOR(*membership)[i] );
     }
     printf("\n");
 }
@@ -77,7 +77,7 @@ igraph_real_t infomap_test(const igraph_t * g, igraph_bool_t smoke_test) {
 }
 
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_t weights;
     igraph_real_t codelength;

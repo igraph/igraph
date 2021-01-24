@@ -25,15 +25,15 @@
 #include "core/indheap.h"
 #include "core/interruption.h"
 
-static igraph_integer_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_int_t *colors) {
-    igraph_integer_t i, vertex, maxdeg;
-    igraph_integer_t vc = igraph_vcount(graph);
+static igraph_long_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph, igraph_vector_long_t *colors) {
+    igraph_long_t i, vertex, maxdeg;
+    igraph_long_t vc = igraph_vcount(graph);
     igraph_2wheap_t cn; /* indexed heap storing number of already coloured neighbours */
-    igraph_vector_int_t neigh_colors;
+    igraph_vector_long_t neigh_colors;
     igraph_adjlist_t adjlist;
 
-    IGRAPH_CHECK(igraph_vector_int_resize(colors, vc));
-    igraph_vector_int_fill(colors, 0);
+    IGRAPH_CHECK(igraph_vector_long_resize(colors, vc));
+    igraph_vector_long_fill(colors, 0);
 
     /* Nothing to do for 0 or 1 vertices.
      * Remember that colours are integers starting from 0,
@@ -61,9 +61,9 @@ static igraph_integer_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&neigh_colors, 0));
-    IGRAPH_CHECK(igraph_vector_int_reserve(&neigh_colors, maxdeg));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &neigh_colors);
+    IGRAPH_CHECK(igraph_vector_long_init(&neigh_colors, 0));
+    IGRAPH_CHECK(igraph_vector_long_reserve(&neigh_colors, maxdeg));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &neigh_colors);
 
     IGRAPH_CHECK(igraph_2wheap_init(&cn, vc));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &cn);
@@ -73,18 +73,18 @@ static igraph_integer_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph
         }
 
     while (1) {
-        igraph_vector_int_t *neighbors = igraph_adjlist_get(&adjlist, vertex);
-        igraph_integer_t neigh_count = igraph_vector_int_size(neighbors);
+        igraph_vector_long_t *neighbors = igraph_adjlist_get(&adjlist, vertex);
+        igraph_long_t neigh_count = igraph_vector_long_size(neighbors);
 
         /* colour current vertex */
         {
-            igraph_integer_t col;
+            igraph_long_t col;
 
-            IGRAPH_CHECK(igraph_vector_int_resize(&neigh_colors, neigh_count));
+            IGRAPH_CHECK(igraph_vector_long_resize(&neigh_colors, neigh_count));
             for (i = 0; i < neigh_count; ++i) {
                 VECTOR(neigh_colors)[i] = VECTOR(*colors)[ VECTOR(*neighbors)[i] ];
             }
-            igraph_vector_int_sort(&neigh_colors);
+            igraph_vector_long_sort(&neigh_colors);
 
             i = 0;
             col = 0;
@@ -100,7 +100,7 @@ static igraph_integer_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph
 
         /* increment number of coloured neighbours for each neighbour of vertex */
         for (i = 0; i < neigh_count; ++i) {
-            igraph_integer_t idx = VECTOR(*neighbors)[i];
+            igraph_long_t idx = VECTOR(*neighbors)[i];
             if (igraph_2wheap_has_elem(&cn, idx)) {
                 igraph_2wheap_modify(&cn, idx, igraph_2wheap_get(&cn, idx) + 1);
             }
@@ -117,10 +117,10 @@ static igraph_integer_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph
     }
 
     /* subtract 1 from each colour value, so that colours start at 0 */
-    igraph_vector_int_add_constant(colors, -1);
+    igraph_vector_long_add_constant(colors, -1);
 
     /* free data structures */
-    igraph_vector_int_destroy(&neigh_colors);
+    igraph_vector_long_destroy(&neigh_colors);
     igraph_adjlist_destroy(&adjlist);
     igraph_2wheap_destroy(&cn);
     IGRAPH_FINALLY_CLEAN(3);
@@ -151,7 +151,7 @@ static igraph_integer_t igraph_i_vertex_coloring_greedy_cn(const igraph_t *graph
  *
  * \example examples/simple/igraph_coloring.c
  */
-igraph_integer_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_int_t *colors, igraph_coloring_greedy_t heuristic) {
+igraph_long_t igraph_vertex_coloring_greedy(const igraph_t *graph, igraph_vector_long_t *colors, igraph_coloring_greedy_t heuristic) {
     switch (heuristic) {
     case IGRAPH_COLORING_GREEDY_COLORED_NEIGHBORS:
         return igraph_i_vertex_coloring_greedy_cn(graph, colors);

@@ -24,21 +24,21 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v, FILE *f) {
-    igraph_integer_t i;
+    igraph_long_t i;
     for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (igraph_integer_t) VECTOR(*v)[i]);
+        fprintf(f, " %li", (igraph_long_t) VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_t v, seq;
-    igraph_integer_t ret;
-    igraph_integer_t mdeg, nedges;
-    igraph_integer_t i;
-    igraph_integer_t ndeg;
+    igraph_long_t ret;
+    igraph_long_t mdeg, nedges;
+    igraph_long_t i;
+    igraph_long_t ndeg;
 
     /* Create graph */
     igraph_vector_init(&v, 8);
@@ -77,7 +77,7 @@ igraph_integer_t main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += (igraph_long_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 1;
@@ -119,7 +119,7 @@ igraph_integer_t main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += (igraph_long_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 2;
@@ -163,7 +163,7 @@ igraph_integer_t main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += (igraph_long_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 6;
@@ -181,7 +181,7 @@ igraph_integer_t main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += (igraph_long_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 8;
@@ -207,7 +207,7 @@ igraph_integer_t main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (igraph_integer_t) VECTOR(v)[i];
+        ndeg += (igraph_long_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 12;

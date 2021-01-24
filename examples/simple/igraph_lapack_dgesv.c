@@ -27,15 +27,15 @@
 #define DIM 10
 
 void igraph_print_warning(const char *reason, const char *file,
-                          igraph_integer_t line, igraph_integer_t igraph_errno) {
+                          igraph_long_t line, igraph_long_t igraph_errno) {
     printf("Warning: %s\n", reason);
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_matrix_t A, B, RHS;
-    igraph_integer_t info;
-    igraph_integer_t i, j;
+    igraph_long_t info;
+    igraph_long_t i, j;
 
     /* Identity matrix, you have to start somewhere */
 
@@ -91,7 +91,7 @@ igraph_integer_t main() {
     igraph_matrix_init(&B, DIM, 1);
     igraph_matrix_init(&RHS, DIM, 1);
     for (i = 0; i < DIM; i++) {
-        igraph_integer_t j;
+        igraph_long_t j;
         MATRIX(B, i, 0) = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
         for (j = 0; j < DIM; j++) {
             MATRIX(A, i, j) = igraph_rng_get_integer(igraph_rng_default(), 1, 10);

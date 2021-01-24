@@ -60,11 +60,11 @@
  *
  * \example examples/simple/igraph_full.c
  */
-igraph_integer_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+igraph_long_t igraph_full(igraph_t *graph, igraph_long_t n, igraph_bool_t directed,
                 igraph_bool_t loops) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     if (n < 0) {
         IGRAPH_ERROR("invalid number of vertices", IGRAPH_EINVAL);
@@ -134,10 +134,10 @@ igraph_integer_t igraph_full(igraph_t *graph, igraph_integer_t n, igraph_bool_t 
  *
  * Time complexity: O(|V|^2), as we have many edges.
  */
-igraph_integer_t igraph_full_citation(igraph_t *graph, igraph_integer_t n,
+igraph_long_t igraph_full_citation(igraph_t *graph, igraph_long_t n,
                          igraph_bool_t directed) {
     igraph_vector_t edges;
-    igraph_integer_t i, j, ptr = 0;
+    igraph_long_t i, j, ptr = 0;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, n * (n - 1));
     for (i = 1; i < n; i++) {

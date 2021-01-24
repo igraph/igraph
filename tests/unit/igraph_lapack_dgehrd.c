@@ -25,16 +25,16 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
-    igraph_integer_t nodes = 10;
+    igraph_long_t nodes = 10;
     igraph_t tree;
     igraph_matrix_t sto;
     igraph_matrix_t hess;
     igraph_matrix_complex_t evec1, evec2;
     igraph_vector_complex_t eval1, eval2;
     igraph_eigen_which_t which;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_tree(&tree, nodes, /* children= */ 3, IGRAPH_TREE_UNDIRECTED);
 

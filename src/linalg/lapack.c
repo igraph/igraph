@@ -52,16 +52,16 @@
  * Time complexity: TODO.
  */
 
-igraph_integer_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                         igraph_integer_t *info) {
-    igraph_integer_t m = (igraph_integer_t) igraph_matrix_nrow(a);
-    igraph_integer_t n = (igraph_integer_t) igraph_matrix_ncol(a);
-    igraph_integer_t lda = m > 0 ? m : 1;
-    igraph_vector_int_t *myipiv = ipiv, vipiv;
+igraph_long_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_long_t *ipiv,
+                         igraph_long_t *info) {
+    igraph_long_t m = (igraph_long_t) igraph_matrix_nrow(a);
+    igraph_long_t n = (igraph_long_t) igraph_matrix_ncol(a);
+    igraph_long_t lda = m > 0 ? m : 1;
+    igraph_vector_long_t *myipiv = ipiv, vipiv;
 
     if (!ipiv) {
-        IGRAPH_CHECK(igraph_vector_int_init(&vipiv, m < n ? m : n));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &vipiv);
+        IGRAPH_CHECK(igraph_vector_long_init(&vipiv, m < n ? m : n));
+        IGRAPH_FINALLY(igraph_vector_long_destroy, &vipiv);
         myipiv = &vipiv;
     }
 
@@ -96,7 +96,7 @@ igraph_integer_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *i
     }
 
     if (!ipiv) {
-        igraph_vector_int_destroy(&vipiv);
+        igraph_vector_long_destroy(&vipiv);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -123,14 +123,14 @@ igraph_integer_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *i
  * Time complexity: TODO.
  */
 
-igraph_integer_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
-                         igraph_vector_int_t *ipiv, igraph_matrix_t *b) {
+igraph_long_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
+                         igraph_vector_long_t *ipiv, igraph_matrix_t *b) {
     char trans = transpose ? 'T' : 'N';
-    igraph_integer_t n = (igraph_integer_t) igraph_matrix_nrow(a);
-    igraph_integer_t nrhs = (igraph_integer_t) igraph_matrix_ncol(b);
-    igraph_integer_t lda = n > 0 ? n : 1;
-    igraph_integer_t ldb = n > 0 ? n : 1;
-    igraph_integer_t info;
+    igraph_long_t n = (igraph_long_t) igraph_matrix_nrow(a);
+    igraph_long_t nrhs = (igraph_long_t) igraph_matrix_ncol(b);
+    igraph_long_t lda = n > 0 ? n : 1;
+    igraph_long_t ldb = n > 0 ? n : 1;
+    igraph_long_t info;
 
     if (n != igraph_matrix_ncol(a)) {
         IGRAPH_ERROR("Cannot LU solve matrix", IGRAPH_NONSQUARE);
@@ -215,14 +215,14 @@ igraph_integer_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matr
  * \example examples/simple/igraph_lapack_dgesv.c
  */
 
-igraph_integer_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                        igraph_matrix_t *b, igraph_integer_t *info) {
+igraph_long_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_long_t *ipiv,
+                        igraph_matrix_t *b, igraph_long_t *info) {
 
-    igraph_integer_t n = (igraph_integer_t) igraph_matrix_nrow(a);
-    igraph_integer_t nrhs = (igraph_integer_t) igraph_matrix_ncol(b);
-    igraph_integer_t lda = n > 0 ? n : 1;
-    igraph_integer_t ldb = n > 0 ? n : 1;
-    igraph_vector_int_t *myipiv = ipiv, vipiv;
+    igraph_long_t n = (igraph_long_t) igraph_matrix_nrow(a);
+    igraph_long_t nrhs = (igraph_long_t) igraph_matrix_ncol(b);
+    igraph_long_t lda = n > 0 ? n : 1;
+    igraph_long_t ldb = n > 0 ? n : 1;
+    igraph_vector_long_t *myipiv = ipiv, vipiv;
 
     if (n != igraph_matrix_ncol(a)) {
         IGRAPH_ERROR("Cannot LU solve matrix", IGRAPH_NONSQUARE);
@@ -232,8 +232,8 @@ igraph_integer_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ip
     }
 
     if (!ipiv) {
-        IGRAPH_CHECK(igraph_vector_int_init(&vipiv, n));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &vipiv);
+        IGRAPH_CHECK(igraph_vector_long_init(&vipiv, n));
+        IGRAPH_FINALLY(igraph_vector_long_destroy, &vipiv);
         myipiv = &vipiv;
     }
 
@@ -275,7 +275,7 @@ igraph_integer_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ip
     }
 
     if (!ipiv) {
-        igraph_vector_int_destroy(&vipiv);
+        igraph_vector_long_destroy(&vipiv);
         IGRAPH_FINALLY_CLEAN(1);
     }
 
@@ -342,22 +342,22 @@ igraph_integer_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ip
  * \example examples/simple/igraph_lapack_dsyevr.c
  */
 
-igraph_integer_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
+igraph_long_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                          igraph_lapack_dsyev_which_t which,
-                         igraph_real_t vl, igraph_real_t vu, igraph_integer_t vestimate,
-                         igraph_integer_t il, igraph_integer_t iu, igraph_real_t abstol,
+                         igraph_real_t vl, igraph_real_t vu, igraph_long_t vestimate,
+                         igraph_long_t il, igraph_long_t iu, igraph_real_t abstol,
                          igraph_vector_t *values, igraph_matrix_t *vectors,
-                         igraph_vector_int_t *support) {
+                         igraph_vector_long_t *support) {
 
     igraph_matrix_t Acopy;
     char jobz = vectors ? 'V' : 'N', range, uplo = 'U';
-    igraph_integer_t n = (igraph_integer_t) igraph_matrix_nrow(A), lda = n, ldz = n;
-    igraph_integer_t m, info;
+    igraph_long_t n = (igraph_long_t) igraph_matrix_nrow(A), lda = n, ldz = n;
+    igraph_long_t m, info;
     igraph_vector_t *myvalues = values, vvalues;
-    igraph_vector_int_t *mysupport = support, vsupport;
+    igraph_vector_long_t *mysupport = support, vsupport;
     igraph_vector_t work;
-    igraph_vector_int_t iwork;
-    igraph_integer_t lwork = -1, liwork = -1;
+    igraph_vector_long_t iwork;
+    igraph_long_t lwork = -1, liwork = -1;
 
     if (n != igraph_matrix_ncol(A)) {
         IGRAPH_ERROR("Cannot find eigenvalues/vectors", IGRAPH_NONSQUARE);
@@ -375,16 +375,16 @@ igraph_integer_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
 
     IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
-    IGRAPH_CHECK(igraph_vector_int_init(&iwork, 1));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &iwork);
+    IGRAPH_CHECK(igraph_vector_long_init(&iwork, 1));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &iwork);
 
     if (!values) {
         IGRAPH_VECTOR_INIT_FINALLY(&vvalues, 0);
         myvalues = &vvalues;
     }
     if (!support) {
-        IGRAPH_CHECK(igraph_vector_int_init(&vsupport, 0));
-        IGRAPH_FINALLY(igraph_vector_int_destroy, &vsupport);
+        IGRAPH_CHECK(igraph_vector_long_init(&vsupport, 0));
+        IGRAPH_FINALLY(igraph_vector_long_destroy, &vsupport);
         mysupport = &vsupport;
     }
 
@@ -393,21 +393,21 @@ igraph_integer_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
     switch (which) {
     case IGRAPH_LAPACK_DSYEV_ALL:
         range = 'A';
-        IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2 * n));
+        IGRAPH_CHECK(igraph_vector_long_resize(mysupport, 2 * n));
         if (vectors) {
             IGRAPH_CHECK(igraph_matrix_resize(vectors, n, n));
         }
         break;
     case IGRAPH_LAPACK_DSYEV_INTERVAL:
         range = 'V';
-        IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2 * vestimate));
+        IGRAPH_CHECK(igraph_vector_long_resize(mysupport, 2 * vestimate));
         if (vectors) {
             IGRAPH_CHECK(igraph_matrix_resize(vectors, n, vestimate));
         }
         break;
     case IGRAPH_LAPACK_DSYEV_SELECT:
         range = 'I';
-        IGRAPH_CHECK(igraph_vector_int_resize(mysupport, 2 * (iu - il + 1)));
+        IGRAPH_CHECK(igraph_vector_long_resize(mysupport, 2 * (iu - il + 1)));
         if (vectors) {
             IGRAPH_CHECK(igraph_matrix_resize(vectors, n, iu - il + 1));
         }
@@ -423,10 +423,10 @@ igraph_integer_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
         IGRAPH_ERROR("Invalid argument to dsyevr in workspace query", IGRAPH_EINVAL);
     }
 
-    lwork = (igraph_integer_t) VECTOR(work)[0];
+    lwork = (igraph_long_t) VECTOR(work)[0];
     liwork = VECTOR(iwork)[0];
     IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
-    IGRAPH_CHECK(igraph_vector_int_resize(&iwork, liwork));
+    IGRAPH_CHECK(igraph_vector_long_resize(&iwork, liwork));
 
     igraphdsyevr_(&jobz, &range, &uplo, &n, &MATRIX(Acopy, 0, 0), &lda,
                   &vl, &vu, &il, &iu, &abstol, &m, VECTOR(*myvalues),
@@ -444,11 +444,11 @@ igraph_integer_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
         IGRAPH_CHECK(igraph_matrix_resize(vectors, n, m));
     }
     if (support) {
-        IGRAPH_CHECK(igraph_vector_int_resize(support, m));
+        IGRAPH_CHECK(igraph_vector_long_resize(support, m));
     }
 
     if (!support) {
-        igraph_vector_int_destroy(&vsupport);
+        igraph_vector_long_destroy(&vsupport);
         IGRAPH_FINALLY_CLEAN(1);
     }
     if (!values) {
@@ -456,7 +456,7 @@ igraph_integer_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_int_destroy(&iwork);
+    igraph_vector_long_destroy(&iwork);
     igraph_vector_destroy(&work);
     igraph_matrix_destroy(&Acopy);
     IGRAPH_FINALLY_CLEAN(3);
@@ -522,21 +522,21 @@ igraph_integer_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
  * \example examples/simple/igraph_lapack_dgeev.c
  */
 
-igraph_integer_t igraph_lapack_dgeev(const igraph_matrix_t *A,
+igraph_long_t igraph_lapack_dgeev(const igraph_matrix_t *A,
                         igraph_vector_t *valuesreal,
                         igraph_vector_t *valuesimag,
                         igraph_matrix_t *vectorsleft,
                         igraph_matrix_t *vectorsright,
-                        igraph_integer_t *info) {
+                        igraph_long_t *info) {
 
     char jobvl = vectorsleft  ? 'V' : 'N';
     char jobvr = vectorsright ? 'V' : 'N';
-    igraph_integer_t n = (igraph_integer_t) igraph_matrix_nrow(A);
-    igraph_integer_t lda = n, ldvl = n, ldvr = n, lwork = -1;
+    igraph_long_t n = (igraph_long_t) igraph_matrix_nrow(A);
+    igraph_long_t lda = n, ldvl = n, ldvr = n, lwork = -1;
     igraph_vector_t work;
     igraph_vector_t *myreal = valuesreal, *myimag = valuesimag, vreal, vimag;
     igraph_matrix_t Acopy;
-    igraph_integer_t error = *info;
+    igraph_long_t error = *info;
 
     if (igraph_matrix_ncol(A) != n) {
         IGRAPH_ERROR("Cannot calculate eigenvalues (dgeev)", IGRAPH_NONSQUARE);
@@ -572,7 +572,7 @@ igraph_integer_t igraph_lapack_dgeev(const igraph_matrix_t *A,
                  vectorsright ? &MATRIX(*vectorsright, 0, 0) : 0, &ldvr,
                  VECTOR(work), &lwork, info);
 
-    lwork = (igraph_integer_t) VECTOR(work)[0];
+    lwork = (igraph_long_t) VECTOR(work)[0];
     IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
 
     igraphdgeev_(&jobvl, &jobvr, &n, &MATRIX(Acopy, 0, 0), &lda,
@@ -725,28 +725,28 @@ igraph_integer_t igraph_lapack_dgeev(const igraph_matrix_t *A,
  * \example examples/simple/igraph_lapack_dgeevx.c
  */
 
-igraph_integer_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
+igraph_long_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                          const igraph_matrix_t *A,
                          igraph_vector_t *valuesreal,
                          igraph_vector_t *valuesimag,
                          igraph_matrix_t *vectorsleft,
                          igraph_matrix_t *vectorsright,
-                         igraph_integer_t *ilo, igraph_integer_t *ihi, igraph_vector_t *scale,
+                         igraph_long_t *ilo, igraph_long_t *ihi, igraph_vector_t *scale,
                          igraph_real_t *abnrm,
                          igraph_vector_t *rconde,
                          igraph_vector_t *rcondv,
-                         igraph_integer_t *info) {
+                         igraph_long_t *info) {
 
     char balanc;
     char jobvl = vectorsleft  ? 'V' : 'N';
     char jobvr = vectorsright ? 'V' : 'N';
     char sense;
-    igraph_integer_t n = (igraph_integer_t) igraph_matrix_nrow(A);
-    igraph_integer_t lda = n, ldvl = n, ldvr = n, lwork = -1;
+    igraph_long_t n = (igraph_long_t) igraph_matrix_nrow(A);
+    igraph_long_t lda = n, ldvl = n, ldvr = n, lwork = -1;
     igraph_vector_t work;
-    igraph_vector_int_t iwork;
+    igraph_vector_long_t iwork;
     igraph_matrix_t Acopy;
-    igraph_integer_t error = *info;
+    igraph_long_t error = *info;
     igraph_vector_t *myreal = valuesreal, *myimag = valuesimag, vreal, vimag;
     igraph_vector_t *myscale = scale, vscale;
 
@@ -786,8 +786,8 @@ igraph_integer_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     IGRAPH_FINALLY(igraph_matrix_destroy, &Acopy);
 
     IGRAPH_VECTOR_INIT_FINALLY(&work, 1);
-    IGRAPH_CHECK(igraph_vector_int_init(&iwork, n));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &iwork);
+    IGRAPH_CHECK(igraph_vector_long_init(&iwork, n));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &iwork);
 
     if (!valuesreal) {
         IGRAPH_VECTOR_INIT_FINALLY(&vreal, n);
@@ -823,7 +823,7 @@ igraph_integer_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                   rcondv ? VECTOR(*rcondv) : 0,
                   VECTOR(work), &lwork, VECTOR(iwork), info);
 
-    lwork = (igraph_integer_t) VECTOR(work)[0];
+    lwork = (igraph_long_t) VECTOR(work)[0];
     IGRAPH_CHECK(igraph_vector_resize(&work, lwork));
 
     igraphdgeevx_(&balanc, &jobvl, &jobvr, &sense, &n, &MATRIX(Acopy, 0, 0),
@@ -860,7 +860,7 @@ igraph_integer_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
         IGRAPH_FINALLY_CLEAN(1);
     }
 
-    igraph_vector_int_destroy(&iwork);
+    igraph_vector_long_destroy(&iwork);
     igraph_vector_destroy(&work);
     igraph_matrix_destroy(&Acopy);
     IGRAPH_FINALLY_CLEAN(3);
@@ -868,19 +868,19 @@ igraph_integer_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
     return 0;
 }
 
-igraph_integer_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
-                         igraph_integer_t ilo, igraph_integer_t ihi,
+igraph_long_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
+                         igraph_long_t ilo, igraph_long_t ihi,
                          igraph_matrix_t *result) {
 
-    igraph_integer_t n = (igraph_integer_t) igraph_matrix_nrow(A);
-    igraph_integer_t lda = n;
-    igraph_integer_t lwork = -1;
+    igraph_long_t n = (igraph_long_t) igraph_matrix_nrow(A);
+    igraph_long_t lda = n;
+    igraph_long_t lwork = -1;
     igraph_vector_t work;
     igraph_real_t optwork;
     igraph_vector_t tau;
     igraph_matrix_t Acopy;
-    igraph_integer_t info = 0;
-    igraph_integer_t i;
+    igraph_long_t info = 0;
+    igraph_long_t i;
 
     if (igraph_matrix_ncol(A) != n) {
         IGRAPH_ERROR("Hessenberg reduction failed", IGRAPH_NONSQUARE);
@@ -907,7 +907,7 @@ igraph_integer_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
                      IGRAPH_EINTERNAL);
     }
 
-    lwork = (igraph_integer_t) optwork;
+    lwork = (igraph_long_t) optwork;
     IGRAPH_VECTOR_INIT_FINALLY(&work, lwork);
 
     igraphdgehrd_(&n, &ilo, &ihi, &MATRIX(Acopy, 0, 0), &lda, VECTOR(tau),
@@ -928,7 +928,7 @@ igraph_integer_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
     IGRAPH_FINALLY_CLEAN(1);
 
     for (i = 0; i < n - 2; i++) {
-        igraph_integer_t j;
+        igraph_long_t j;
         for (j = i + 2; j < n; j++) {
             MATRIX(*result, j, i) = 0.0;
         }

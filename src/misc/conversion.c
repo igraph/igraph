@@ -69,15 +69,15 @@
  * number of vertices in the graph.
  */
 
-igraph_integer_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_get_adjacency_t type, igraph_bool_t eids) {
 
     igraph_eit_t edgeit;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t retval = 0;
-    igraph_integer_t from, to;
-    igraph_integer_t ffrom, fto;
+    igraph_long_t retval = 0;
+    igraph_long_t from, to;
+    igraph_long_t ffrom, fto;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, no_of_nodes));
     igraph_matrix_null(res);
@@ -86,8 +86,8 @@ igraph_integer_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *re
 
     if (directed) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
+            igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+            igraph_edge(graph, (igraph_long_t) edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
             if (eids) {
@@ -99,8 +99,8 @@ igraph_integer_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *re
         }
     } else if (type == IGRAPH_GET_ADJACENCY_UPPER) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
+            igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+            igraph_edge(graph, (igraph_long_t) edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
             if (to < from) {
@@ -120,8 +120,8 @@ igraph_integer_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *re
         }
     } else if (type == IGRAPH_GET_ADJACENCY_LOWER) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
+            igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+            igraph_edge(graph, (igraph_long_t) edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
             if (to < from) {
@@ -141,8 +141,8 @@ igraph_integer_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *re
         }
     } else if (type == IGRAPH_GET_ADJACENCY_BOTH) {
         while (!IGRAPH_EIT_END(edgeit)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-            igraph_edge(graph, (igraph_integer_t) edge, &ffrom, &fto);
+            igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+            igraph_edge(graph, (igraph_long_t) edge, &ffrom, &fto);
             from = ffrom;
             to = fto;
             if (eids) {
@@ -201,15 +201,15 @@ igraph_integer_t igraph_get_adjacency(const igraph_t *graph, igraph_matrix_t *re
  * number of vertices in the graph.
  */
 
-igraph_integer_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
+igraph_long_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmatrix_t *res,
                                 igraph_get_adjacency_t type) {
 
     igraph_eit_t edgeit;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t retval = 0;
-    igraph_integer_t from, to;
-    igraph_integer_t ffrom, fto;
+    igraph_long_t retval = 0;
+    igraph_long_t from, to;
+    igraph_long_t ffrom, fto;
 
     igraph_spmatrix_null(res);
     IGRAPH_CHECK(igraph_spmatrix_resize(res, no_of_nodes, no_of_nodes));
@@ -287,12 +287,12 @@ igraph_integer_t igraph_get_adjacency_sparse(const igraph_t *graph, igraph_spmat
  * number of edges in the graph.
  */
 
-igraph_integer_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol) {
+igraph_long_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res, igraph_bool_t bycol) {
 
     igraph_eit_t edgeit;
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t vptr = 0;
-    igraph_integer_t from, to;
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t vptr = 0;
+    igraph_long_t from, to;
 
     IGRAPH_CHECK(igraph_vector_resize(res, no_of_edges * 2));
     IGRAPH_CHECK(igraph_eit_create(graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
@@ -352,10 +352,10 @@ igraph_integer_t igraph_get_edgelist(const igraph_t *graph, igraph_vector_t *res
  * of edges.
  */
 
-igraph_integer_t igraph_to_directed(igraph_t *graph,
+igraph_long_t igraph_to_directed(igraph_t *graph,
                        igraph_to_directed_t mode) {
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
 
     if (igraph_is_directed(graph)) {
         return IGRAPH_SUCCESS;
@@ -368,8 +368,8 @@ igraph_integer_t igraph_to_directed(igraph_t *graph,
       {
         igraph_t newgraph;
         igraph_vector_t edges;
-        igraph_integer_t size = no_of_edges * 2;
-        igraph_integer_t i;
+        igraph_long_t size = no_of_edges * 2;
+        igraph_long_t i;
 
         IGRAPH_VECTOR_INIT_FINALLY(&edges, size);
         IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
@@ -404,7 +404,7 @@ igraph_integer_t igraph_to_directed(igraph_t *graph,
         }
 
         IGRAPH_CHECK(igraph_create(&newgraph, &edges,
-                                   (igraph_integer_t) no_of_nodes,
+                                   (igraph_long_t) no_of_nodes,
                                    IGRAPH_DIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
@@ -422,8 +422,8 @@ igraph_integer_t igraph_to_directed(igraph_t *graph,
         igraph_t newgraph;
         igraph_vector_t edges;
         igraph_vector_t index;
-        igraph_integer_t size = no_of_edges * 4;
-        igraph_integer_t i;
+        igraph_long_t size = no_of_edges * 4;
+        igraph_long_t i;
         IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
         IGRAPH_CHECK(igraph_vector_reserve(&edges, size));
         IGRAPH_CHECK(igraph_get_edgelist(graph, &edges, 0));
@@ -436,7 +436,7 @@ igraph_integer_t igraph_to_directed(igraph_t *graph,
         }
 
         IGRAPH_CHECK(igraph_create(&newgraph, &edges,
-                                   (igraph_integer_t) no_of_nodes,
+                                   (igraph_long_t) no_of_nodes,
                                    IGRAPH_DIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         IGRAPH_I_ATTRIBUTE_DESTROY(&newgraph);
@@ -488,12 +488,12 @@ igraph_integer_t igraph_to_directed(igraph_t *graph,
  * \example examples/simple/igraph_to_undirected.c
  */
 
-igraph_integer_t igraph_to_undirected(igraph_t *graph,
+igraph_long_t igraph_to_undirected(igraph_t *graph,
                          igraph_to_undirected_t mode,
                          const igraph_attribute_combination_t *edge_comb) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t edges;
     igraph_t newgraph;
     igraph_bool_t attr = edge_comb && igraph_has_attribute_table();
@@ -521,9 +521,9 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
         IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
         while (!IGRAPH_EIT_END(eit)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-            igraph_integer_t from, to;
-            igraph_edge(graph, (igraph_integer_t) edge, &from, &to);
+            igraph_long_t edge = IGRAPH_EIT_GET(eit);
+            igraph_long_t from, to;
+            igraph_edge(graph, (igraph_long_t) edge, &from, &to);
             IGRAPH_CHECK(igraph_vector_push_back(&edges, from));
             IGRAPH_CHECK(igraph_vector_push_back(&edges, to));
             IGRAPH_EIT_NEXT(eit);
@@ -534,7 +534,7 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
 
         IGRAPH_CHECK(igraph_create(&newgraph, &edges,
-                                   (igraph_integer_t) no_of_nodes,
+                                   (igraph_long_t) no_of_nodes,
                                    IGRAPH_UNDIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         igraph_vector_destroy(&edges);
@@ -546,9 +546,9 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
 
     } else if (mode == IGRAPH_TO_UNDIRECTED_COLLAPSE) {
         igraph_vector_t inadj, outadj;
-        igraph_integer_t i;
+        igraph_long_t i;
         igraph_vector_t mergeinto;
-        igraph_integer_t actedge = 0;
+        igraph_long_t actedge = 0;
 
         if (attr) {
             IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
@@ -559,22 +559,22 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&outadj, 0);
 
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t n_out, n_in;
-            igraph_integer_t p1 = -1, p2 = -1;
-            igraph_integer_t e1 = 0, e2 = 0, n1 = 0, n2 = 0;
-            IGRAPH_CHECK(igraph_incident(graph, &outadj, (igraph_integer_t) i,
+            igraph_long_t n_out, n_in;
+            igraph_long_t p1 = -1, p2 = -1;
+            igraph_long_t e1 = 0, e2 = 0, n1 = 0, n2 = 0;
+            IGRAPH_CHECK(igraph_incident(graph, &outadj, (igraph_long_t) i,
                                          IGRAPH_OUT));
-            IGRAPH_CHECK(igraph_incident(graph, &inadj, (igraph_integer_t) i,
+            IGRAPH_CHECK(igraph_incident(graph, &inadj, (igraph_long_t) i,
                                          IGRAPH_IN));
             n_out = igraph_vector_size(&outadj);
             n_in = igraph_vector_size(&inadj);
 
 #define STEPOUT() if ( (++p1) < n_out) {    \
-        e1 = (igraph_integer_t) VECTOR(outadj)[p1]; \
+        e1 = (igraph_long_t) VECTOR(outadj)[p1]; \
         n1 = IGRAPH_TO(graph, e1);      \
     }
 #define STEPIN()  if ( (++p2) < n_in) {         \
-        e2 = (igraph_integer_t) VECTOR(inadj )[p2]; \
+        e2 = (igraph_long_t) VECTOR(inadj )[p2]; \
         n2 = IGRAPH_FROM(graph, e2);        \
     }
 
@@ -582,7 +582,7 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
             STEPIN();
 
             while (p1 < n_out && n1 <= i && p2 < n_in && n2 <= i) {
-                igraph_integer_t last;
+                igraph_long_t last;
                 if (n1 == n2) {
                     last = n1;
                     IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
@@ -650,7 +650,7 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
 
         IGRAPH_CHECK(igraph_create(&newgraph, &edges,
-                                   (igraph_integer_t) no_of_nodes,
+                                   (igraph_long_t) no_of_nodes,
                                    IGRAPH_UNDIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         igraph_vector_destroy(&edges);
@@ -680,9 +680,9 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
         }
     } else if (mode == IGRAPH_TO_UNDIRECTED_MUTUAL) {
         igraph_vector_t inadj, outadj;
-        igraph_integer_t i;
+        igraph_long_t i;
         igraph_vector_t mergeinto;
-        igraph_integer_t actedge = 0;
+        igraph_long_t actedge = 0;
 
         if (attr) {
             IGRAPH_VECTOR_INIT_FINALLY(&mergeinto, no_of_edges);
@@ -694,22 +694,22 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&outadj, 0);
 
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t n_out, n_in;
-            igraph_integer_t p1 = -1, p2 = -1;
-            igraph_integer_t e1 = 0, e2 = 0, n1 = 0, n2 = 0;
-            IGRAPH_CHECK(igraph_incident(graph, &outadj, (igraph_integer_t) i,
+            igraph_long_t n_out, n_in;
+            igraph_long_t p1 = -1, p2 = -1;
+            igraph_long_t e1 = 0, e2 = 0, n1 = 0, n2 = 0;
+            IGRAPH_CHECK(igraph_incident(graph, &outadj, (igraph_long_t) i,
                                          IGRAPH_OUT));
-            IGRAPH_CHECK(igraph_incident(graph, &inadj,  (igraph_integer_t) i,
+            IGRAPH_CHECK(igraph_incident(graph, &inadj,  (igraph_long_t) i,
                                          IGRAPH_IN));
             n_out = igraph_vector_size(&outadj);
             n_in = igraph_vector_size(&inadj);
 
 #define STEPOUT() if ( (++p1) < n_out) {    \
-        e1 = (igraph_integer_t) VECTOR(outadj)[p1]; \
+        e1 = (igraph_long_t) VECTOR(outadj)[p1]; \
         n1 = IGRAPH_TO(graph, e1);      \
     }
 #define STEPIN()  if ( (++p2) < n_in) {         \
-        e2 = (igraph_integer_t) VECTOR(inadj )[p2]; \
+        e2 = (igraph_long_t) VECTOR(inadj )[p2]; \
         n2 = IGRAPH_FROM(graph, e2);        \
     }
 
@@ -743,7 +743,7 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
         IGRAPH_FINALLY_CLEAN(2);
 
         IGRAPH_CHECK(igraph_create(&newgraph, &edges,
-                                   (igraph_integer_t) no_of_nodes,
+                                   (igraph_long_t) no_of_nodes,
                                    IGRAPH_UNDIRECTED));
         IGRAPH_FINALLY(igraph_destroy, &newgraph);
         igraph_vector_destroy(&edges);
@@ -796,13 +796,13 @@ igraph_integer_t igraph_to_undirected(igraph_t *graph,
  * function.
  */
 
-igraph_integer_t igraph_get_stochastic(const igraph_t *graph,
+igraph_long_t igraph_get_stochastic(const igraph_t *graph,
                           igraph_matrix_t *matrix,
                           igraph_bool_t column_wise) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t sum;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     IGRAPH_CHECK(igraph_get_adjacency(graph, matrix,
                                       IGRAPH_GET_ADJACENCY_BOTH, /*eids=*/ 0));
@@ -833,11 +833,11 @@ igraph_integer_t igraph_get_stochastic(const igraph_t *graph,
 }
 
 
-igraph_integer_t igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
+igraph_long_t igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
                                  igraph_bool_t column_wise) {
     igraph_vector_t sum;
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_sparsemat_nrow(sparsemat);
-    igraph_integer_t i;
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_sparsemat_nrow(sparsemat);
+    igraph_long_t i;
 
     IGRAPH_VECTOR_INIT_FINALLY(&sum, no_of_nodes);
 
@@ -889,7 +889,7 @@ igraph_integer_t igraph_i_normalize_sparsemat(igraph_sparsemat_t *sparsemat,
  * \sa igraph_get_stochastic(), the dense version of this function.
  */
 
-igraph_integer_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
+igraph_long_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
                                     igraph_sparsemat_t *sparsemat,
                                     igraph_bool_t column_wise) {
 
@@ -926,7 +926,7 @@ igraph_integer_t igraph_get_stochastic_sparsemat(const igraph_t *graph,
  * \sa \ref igraph_from_prufer()
  *
  */
-igraph_integer_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* prufer) {
+igraph_long_t igraph_to_prufer(const igraph_t *graph, igraph_vector_long_t* prufer) {
     /* For generating the Prüfer sequence, we enumerate the vertices u of the tree.
        We keep track of the degrees of all vertices, treating vertices
        of degree 0 as removed. We maintain the invariant that all leafs
@@ -934,10 +934,10 @@ igraph_integer_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pr
        If u is a leaf, we remove it and add its unique neighbor to the prüfer
        sequence. If the removal of u turns the neighbor into a leaf which is < u,
        we repeat the procedure for the new leaf and so on. */
-    igraph_integer_t u;
+    igraph_long_t u;
     igraph_vector_t degrees, neighbors;
-    igraph_integer_t prufer_index = 0;
-    igraph_integer_t n = igraph_vcount(graph);
+    igraph_long_t prufer_index = 0;
+    igraph_long_t n = igraph_vcount(graph);
     igraph_bool_t is_tree = 0;
 
     IGRAPH_CHECK(igraph_is_tree(graph, &is_tree, NULL, IGRAPH_ALL));
@@ -950,20 +950,20 @@ igraph_integer_t igraph_to_prufer(const igraph_t *graph, igraph_vector_int_t* pr
         IGRAPH_ERROR("The tree must have at least 2 vertices", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_resize(prufer, n - 2));
+    IGRAPH_CHECK(igraph_vector_long_resize(prufer, n - 2));
     IGRAPH_VECTOR_INIT_FINALLY(&degrees, n);
     IGRAPH_VECTOR_INIT_FINALLY(&neighbors, 1);
 
     IGRAPH_CHECK(igraph_degree(graph, &degrees, igraph_vss_all(), IGRAPH_ALL, IGRAPH_NO_LOOPS));
 
     for (u = 0; u < n; ++u) {
-        igraph_integer_t degree = VECTOR(degrees)[u];
-        igraph_integer_t leaf = u;
+        igraph_long_t degree = VECTOR(degrees)[u];
+        igraph_long_t leaf = u;
 
         while (degree == 1 && leaf <= u) {
-            igraph_integer_t i;
-            igraph_integer_t neighbor = 0;
-            igraph_integer_t neighbor_count = 0;
+            igraph_long_t i;
+            igraph_long_t neighbor = 0;
+            igraph_long_t neighbor_count = 0;
 
             VECTOR(degrees)[leaf] = 0; /* mark leaf v as deleted */
 

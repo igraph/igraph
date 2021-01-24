@@ -31,28 +31,28 @@
 
 __BEGIN_DECLS
 
-DECLDIR igraph_integer_t igraph_transitivity_undirected(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_transitivity_undirected(const igraph_t *graph,
         igraph_real_t *res,
         igraph_transitivity_mode_t mode);
-DECLDIR igraph_integer_t igraph_transitivity_local_undirected(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_transitivity_local_undirected(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode);
-DECLDIR igraph_integer_t igraph_transitivity_local_undirected1(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_transitivity_local_undirected1(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode);
-DECLDIR igraph_integer_t igraph_transitivity_local_undirected2(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_transitivity_local_undirected2(const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
         igraph_transitivity_mode_t mode);
-DECLDIR igraph_integer_t igraph_transitivity_local_undirected4(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_transitivity_local_undirected4(const igraph_t *graph,
         igraph_vector_t *res,
         igraph_transitivity_mode_t mode);
-DECLDIR igraph_integer_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_transitivity_avglocal_undirected(const igraph_t *graph,
         igraph_real_t *res,
         igraph_transitivity_mode_t mode);
-DECLDIR igraph_integer_t igraph_transitivity_barrat(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_transitivity_barrat(const igraph_t *graph,
                                        igraph_vector_t *res,
                                        const igraph_vs_t vids,
                                        const igraph_vector_t *weights,

@@ -30,7 +30,7 @@
 #include "config.h"
 #include <math.h>
 
-igraph_integer_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids, igraph_neimode_t mode,
                            igraph_vector_t *weights);
 
@@ -65,7 +65,7 @@ igraph_integer_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *
  * \example examples/simple/igraph_cocitation.c
  */
 
-igraph_integer_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
                       const igraph_vs_t vids) {
     return igraph_cocitation_real(graph, res, vids, IGRAPH_OUT, 0);
 }
@@ -101,7 +101,7 @@ igraph_integer_t igraph_cocitation(const igraph_t *graph, igraph_matrix_t *res,
  * \example examples/simple/igraph_cocitation.c
  */
 
-igraph_integer_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
                        const igraph_vs_t vids) {
     return igraph_cocitation_real(graph, res, vids, IGRAPH_IN, 0);
 }
@@ -158,11 +158,11 @@ igraph_integer_t igraph_bibcoupling(const igraph_t *graph, igraph_matrix_t *res,
  * \example examples/simple/igraph_similarity.c
  */
 
-igraph_integer_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
+igraph_long_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
         igraph_matrix_t *res, const igraph_vs_t vids, igraph_neimode_t mode) {
     igraph_vector_t weights;
     igraph_neimode_t mode0;
-    igraph_integer_t i, no_of_nodes;
+    igraph_long_t i, no_of_nodes;
 
     switch (mode) {
     case IGRAPH_OUT: mode0 = IGRAPH_IN; break;
@@ -186,14 +186,14 @@ igraph_integer_t igraph_similarity_inverse_log_weighted(const igraph_t *graph,
     return 0;
 }
 
-igraph_integer_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *res,
                            igraph_vs_t vids,
                            igraph_neimode_t mode,
                            igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_vids;
-    igraph_integer_t from, i, j, k, l, u, v;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_vids;
+    igraph_long_t from, i, j, k, l, u, v;
     igraph_vector_t neis = IGRAPH_VECTOR_NULL;
     igraph_vector_t vid_reverse_index;
     igraph_vit_t vit;
@@ -226,17 +226,17 @@ igraph_integer_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *
 
         IGRAPH_ALLOW_INTERRUPTION();
         IGRAPH_CHECK(igraph_neighbors(graph, &neis,
-                                      (igraph_integer_t) from, mode));
+                                      (igraph_long_t) from, mode));
         if (weights) {
             weight = VECTOR(*weights)[from];
         }
 
         for (i = 0; i < igraph_vector_size(&neis) - 1; i++) {
-            u = (igraph_integer_t) VECTOR(neis)[i];
-            k = (igraph_integer_t) VECTOR(vid_reverse_index)[u];
+            u = (igraph_long_t) VECTOR(neis)[i];
+            k = (igraph_long_t) VECTOR(vid_reverse_index)[u];
             for (j = i + 1; j < igraph_vector_size(&neis); j++) {
-                v = (igraph_integer_t) VECTOR(neis)[j];
-                l = (igraph_integer_t) VECTOR(vid_reverse_index)[v];
+                v = (igraph_long_t) VECTOR(neis)[j];
+                l = (igraph_long_t) VECTOR(vid_reverse_index)[v];
                 if (k != -1) {
                     MATRIX(*res, k, v) += weight;
                 }
@@ -257,11 +257,11 @@ igraph_integer_t igraph_cocitation_real(const igraph_t *graph, igraph_matrix_t *
 }
 
 
-static igraph_integer_t igraph_i_neisets_intersect(const igraph_vector_t *v1,
-                                      const igraph_vector_t *v2, igraph_integer_t *len_union,
-                                      igraph_integer_t *len_intersection) {
+static igraph_long_t igraph_i_neisets_intersect(const igraph_vector_t *v1,
+                                      const igraph_vector_t *v2, igraph_long_t *len_union,
+                                      igraph_long_t *len_intersection) {
     /* ASSERT: v1 and v2 are sorted */
-    igraph_integer_t i, j, i0, jj0;
+    igraph_long_t i, j, i0, jj0;
     i0 = igraph_vector_size(v1); jj0 = igraph_vector_size(v2);
     *len_union = i0 + jj0; *len_intersection = 0;
     i = 0; j = 0;
@@ -327,12 +327,12 @@ static igraph_integer_t igraph_i_neisets_intersect(const igraph_vector_t *v1,
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_integer_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_t *res,
                               const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
     igraph_vit_t vit, vit2;
-    igraph_integer_t i, j, k;
-    igraph_integer_t len_union, len_intersection;
+    igraph_long_t i, j, k;
+    igraph_long_t len_union, len_intersection;
     igraph_vector_t *v1, *v2;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -348,7 +348,7 @@ igraph_integer_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_
     if (loops) {
         for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
             i = IGRAPH_VIT_GET(vit);
-            v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) i);
+            v1 = igraph_lazy_adjlist_get(&al, (igraph_long_t) i);
             if (!igraph_vector_binsearch(v1, i, &k)) {
                 igraph_vector_insert(v1, k, i);
             }
@@ -435,11 +435,11 @@ igraph_integer_t igraph_similarity_jaccard(const igraph_t *graph, igraph_matrix_
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_integer_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
+igraph_long_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_vector_t *res,
                                     const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_lazy_adjlist_t al;
-    igraph_integer_t i, j, k, u, v;
-    igraph_integer_t len_union, len_intersection;
+    igraph_long_t i, j, k, u, v;
+    igraph_long_t len_union, len_intersection;
     igraph_vector_t *v1, *v2;
     igraph_bool_t *seen;
 
@@ -462,12 +462,12 @@ igraph_integer_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_v
         IGRAPH_FINALLY(igraph_free, seen);
 
         for (i = 0; i < k; i++) {
-            j = (igraph_integer_t) VECTOR(*pairs)[i];
+            j = (igraph_long_t) VECTOR(*pairs)[i];
             if (seen[j]) {
                 continue;
             }
             seen[j] = 1;
-            v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) j);
+            v1 = igraph_lazy_adjlist_get(&al, (igraph_long_t) j);
             if (!igraph_vector_binsearch(v1, j, &u)) {
                 igraph_vector_insert(v1, u, j);
             }
@@ -478,16 +478,16 @@ igraph_integer_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_v
     }
 
     for (i = 0, j = 0; i < k; i += 2, j++) {
-        u = (igraph_integer_t) VECTOR(*pairs)[i];
-        v = (igraph_integer_t) VECTOR(*pairs)[i + 1];
+        u = (igraph_long_t) VECTOR(*pairs)[i];
+        v = (igraph_long_t) VECTOR(*pairs)[i + 1];
 
         if (u == v) {
             VECTOR(*res)[j] = 1.0;
             continue;
         }
 
-        v1 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) u);
-        v2 = igraph_lazy_adjlist_get(&al, (igraph_integer_t) v);
+        v1 = igraph_lazy_adjlist_get(&al, (igraph_long_t) u);
+        v2 = igraph_lazy_adjlist_get(&al, (igraph_long_t) v);
         igraph_i_neisets_intersect(v1, v2, &len_union, &len_intersection);
         if (len_union > 0) {
             VECTOR(*res)[j] = ((igraph_real_t)len_intersection) / len_union;
@@ -554,7 +554,7 @@ igraph_integer_t igraph_similarity_jaccard_pairs(const igraph_t *graph, igraph_v
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_integer_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
+igraph_long_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vector_t *res,
                                  const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_vector_t v;
     igraph_eit_t eit;
@@ -565,7 +565,7 @@ igraph_integer_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vect
     IGRAPH_FINALLY(igraph_eit_destroy, &eit);
 
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
+        igraph_long_t eid = IGRAPH_EIT_GET(eit);
         igraph_vector_push_back(&v, IGRAPH_FROM(graph, eid));
         igraph_vector_push_back(&v, IGRAPH_TO(graph, eid));
         IGRAPH_EIT_NEXT(eit);
@@ -629,9 +629,9 @@ igraph_integer_t igraph_similarity_jaccard_es(const igraph_t *graph, igraph_vect
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_integer_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *res,
                            const igraph_vs_t vids, igraph_neimode_t mode, igraph_bool_t loops) {
-    igraph_integer_t i, j, nr, nc;
+    igraph_long_t i, j, nr, nc;
 
     IGRAPH_CHECK(igraph_similarity_jaccard(graph, res, vids, mode, loops));
 
@@ -698,9 +698,9 @@ igraph_integer_t igraph_similarity_dice(const igraph_t *graph, igraph_matrix_t *
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_integer_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
+igraph_long_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vector_t *res,
                                  const igraph_vector_t *pairs, igraph_neimode_t mode, igraph_bool_t loops) {
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     IGRAPH_CHECK(igraph_similarity_jaccard_pairs(graph, res, pairs, mode, loops));
     n = igraph_vector_size(res);
@@ -763,9 +763,9 @@ igraph_integer_t igraph_similarity_dice_pairs(const igraph_t *graph, igraph_vect
  *
  * \example examples/simple/igraph_similarity.c
  */
-igraph_integer_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
+igraph_long_t igraph_similarity_dice_es(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_es_t es, igraph_neimode_t mode, igraph_bool_t loops) {
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     IGRAPH_CHECK(igraph_similarity_jaccard_es(graph, res, es, mode, loops));
     n = igraph_vector_size(res);

@@ -27,17 +27,17 @@
 #include "config.h"
 #include <math.h>
 
-static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
+static igraph_long_t igraph_i_weighted_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                                        igraph_sparsemat_t *sparseres,
                                        igraph_bool_t normalized,
                                        const igraph_vector_t *weights) {
 
     igraph_eit_t edgeit;
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph);
+    igraph_long_t no_of_edges = (igraph_long_t) igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_t degree;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     if (igraph_vector_size(weights) != no_of_edges) {
         IGRAPH_ERROR("Invalid edge weight vector length", IGRAPH_EINVAL);
@@ -48,7 +48,7 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
         igraph_matrix_null(res);
     }
     if (sparseres) {
-        igraph_integer_t nz = directed ? no_of_edges + no_of_nodes :
+        igraph_long_t nz = directed ? no_of_edges + no_of_nodes :
                  no_of_edges * 2 + no_of_nodes;
         igraph_sparsemat_resize(sparseres, no_of_nodes, no_of_nodes, nz);
     }
@@ -63,16 +63,16 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
         if (!normalized) {
 
             while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-                igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to  = IGRAPH_TO  (graph, edge);
+                igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+                igraph_long_t from = IGRAPH_FROM(graph, edge);
+                igraph_long_t to  = IGRAPH_TO  (graph, edge);
                 igraph_real_t weight = VECTOR(*weights)[edge];
                 if (from != to) {
                     if (res) {
                         MATRIX(*res, from, to) -= weight;
                     }
                     if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) from, (igraph_integer_t)to,
+                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) from, (igraph_long_t)to,
                                                             -weight));
                     }
                     VECTOR(degree)[from] += weight;
@@ -86,7 +86,7 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
                     MATRIX(*res, i, i) = VECTOR(degree)[i];
                 }
                 if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) i, (igraph_integer_t) i,
+                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) i, (igraph_long_t) i,
                                                         VECTOR(degree)[i]));
                 }
             }
@@ -94,9 +94,9 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
         } else { /* normalized */
 
             while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-                igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to  = IGRAPH_TO  (graph, edge);
+                igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+                igraph_long_t from = IGRAPH_FROM(graph, edge);
+                igraph_long_t to  = IGRAPH_TO  (graph, edge);
                 igraph_real_t weight = VECTOR(*weights)[edge];
                 if (from != to) {
                     VECTOR(degree)[from] += weight;
@@ -105,20 +105,20 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
             }
 
             for (i = 0; i < no_of_nodes; i++) {
-                igraph_integer_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
+                igraph_long_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
                 if (res) {
                     MATRIX(*res, i, i) = t;
                 }
                 if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) i, (igraph_integer_t) i, t));
+                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) i, (igraph_long_t) i, t));
                 }
             }
 
             IGRAPH_EIT_RESET(edgeit);
             while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-                igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to  = IGRAPH_TO  (graph, edge);
+                igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+                igraph_long_t from = IGRAPH_FROM(graph, edge);
+                igraph_long_t to  = IGRAPH_TO  (graph, edge);
                 igraph_real_t weight = VECTOR(*weights)[edge];
                 if (from != to) {
                     igraph_real_t t = weight / VECTOR(degree)[from];
@@ -126,7 +126,7 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
                         MATRIX(*res, from, to) -= t;
                     }
                     if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) from, (igraph_integer_t) to,
+                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) from, (igraph_long_t) to,
                                                             -t));
                     }
                 }
@@ -140,9 +140,9 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
         if (!normalized) {
 
             while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-                igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to  = IGRAPH_TO  (graph, edge);
+                igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+                igraph_long_t from = IGRAPH_FROM(graph, edge);
+                igraph_long_t to  = IGRAPH_TO  (graph, edge);
                 igraph_real_t weight = VECTOR(*weights)[edge];
                 if (from != to) {
                     if (res) {
@@ -150,9 +150,9 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
                         MATRIX(*res, to, from) -= weight;
                     }
                     if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) from, (igraph_integer_t) to,
+                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) from, (igraph_long_t) to,
                                                             -weight));
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) to, (igraph_integer_t) from,
+                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) to, (igraph_long_t) from,
                                                             -weight));
                     }
                     VECTOR(degree)[from] += weight;
@@ -167,7 +167,7 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
                     MATRIX(*res, i, i) = VECTOR(degree)[i];
                 }
                 if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) i, (igraph_integer_t) i,
+                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) i, (igraph_long_t) i,
                                                         VECTOR(degree)[i]));
                 }
             }
@@ -175,9 +175,9 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
         } else { /* normalized */
 
             while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-                igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to  = IGRAPH_TO  (graph, edge);
+                igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+                igraph_long_t from = IGRAPH_FROM(graph, edge);
+                igraph_long_t to  = IGRAPH_TO  (graph, edge);
                 igraph_real_t weight = VECTOR(*weights)[edge];
                 if (from != to) {
                     VECTOR(degree)[from] += weight;
@@ -187,21 +187,21 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
             }
 
             for (i = 0; i < no_of_nodes; i++) {
-                igraph_integer_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
+                igraph_long_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
                 if (res) {
                     MATRIX(*res, i, i) = t;
                 }
                 if (sparseres) {
-                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) i, (igraph_integer_t) i, t));
+                    IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) i, (igraph_long_t) i, t));
                 }
                 VECTOR(degree)[i] = sqrt(VECTOR(degree)[i]);
             }
 
             IGRAPH_EIT_RESET(edgeit);
             while (!IGRAPH_EIT_END(edgeit)) {
-                igraph_integer_t edge = IGRAPH_EIT_GET(edgeit);
-                igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to  = IGRAPH_TO  (graph, edge);
+                igraph_long_t edge = IGRAPH_EIT_GET(edgeit);
+                igraph_long_t from = IGRAPH_FROM(graph, edge);
+                igraph_long_t to  = IGRAPH_TO  (graph, edge);
                 igraph_real_t weight = VECTOR(*weights)[edge];
                 if (from != to) {
                     double diff = weight / (VECTOR(degree)[from] * VECTOR(degree)[to]);
@@ -210,9 +210,9 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
                         MATRIX(*res, to, from) -= diff;
                     }
                     if (sparseres) {
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) from, (igraph_integer_t) to,
+                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) from, (igraph_long_t) to,
                                                             -diff));
-                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_integer_t) to, (igraph_integer_t) from,
+                        IGRAPH_CHECK(igraph_sparsemat_entry(sparseres, (igraph_long_t) to, (igraph_long_t) from,
                                                             -diff));
                     }
                 }
@@ -269,19 +269,19 @@ static igraph_integer_t igraph_i_weighted_laplacian(const igraph_t *graph, igrap
  * \example examples/simple/igraph_laplacian.c
  */
 
-igraph_integer_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
                      igraph_sparsemat_t *sparseres,
                      igraph_bool_t normalized,
                      const igraph_vector_t *weights) {
 
     igraph_eit_t edgeit;
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
-    igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vcount(graph);
+    igraph_long_t no_of_edges = (igraph_long_t) igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t from, to;
-    igraph_integer_t ffrom, fto;
+    igraph_long_t from, to;
+    igraph_long_t ffrom, fto;
     igraph_vector_t degree;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     if (!res && !sparseres) {
         IGRAPH_ERROR("Laplacian: give at least one of `res' or `sparseres'",
@@ -298,7 +298,7 @@ igraph_integer_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
         igraph_matrix_null(res);
     }
     if (sparseres) {
-        igraph_integer_t nz = directed ? no_of_edges + no_of_nodes :
+        igraph_long_t nz = directed ? no_of_edges + no_of_nodes :
                  no_of_edges * 2 + no_of_nodes;
         IGRAPH_CHECK(igraph_sparsemat_resize(sparseres, no_of_nodes,
                                              no_of_nodes, nz));
@@ -338,7 +338,7 @@ igraph_integer_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
             }
         } else {
             for (i = 0; i < no_of_nodes; i++) {
-                igraph_integer_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
+                igraph_long_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
                 if (res) {
                     MATRIX(*res, i, i) = t;
                 }
@@ -399,7 +399,7 @@ igraph_integer_t igraph_laplacian(const igraph_t *graph, igraph_matrix_t *res,
             }
         } else {
             for (i = 0; i < no_of_nodes; i++) {
-                igraph_integer_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
+                igraph_long_t t = VECTOR(degree)[i] > 0 ? 1 : 0;
                 if (res) {
                     MATRIX(*res, i, i) = t;
                 }

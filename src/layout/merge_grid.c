@@ -24,15 +24,15 @@
 
 #include "layout/merge_grid.h"
 
-static igraph_integer_t igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
+static igraph_long_t igraph_i_layout_mergegrid_which(igraph_i_layout_mergegrid_t *grid,
                                     igraph_real_t xc, igraph_real_t yc,
-                                    igraph_integer_t *x, igraph_integer_t *y) {
+                                    igraph_long_t *x, igraph_long_t *y) {
     if (xc <= grid->minx) {
         *x = 0;
     } else if (xc >= grid->maxx) {
         *x = grid->stepsx - 1;
     } else {
-        *x = (igraph_integer_t) floor((xc - (grid->minx)) / (grid->deltax));
+        *x = (igraph_long_t) floor((xc - (grid->minx)) / (grid->deltax));
     }
 
     if (yc <= grid->miny) {
@@ -40,15 +40,15 @@ static igraph_integer_t igraph_i_layout_mergegrid_which(igraph_i_layout_mergegri
     } else if (yc >= grid->maxy) {
         *y = grid->stepsy - 1;
     } else {
-        *y = (igraph_integer_t) floor((yc - (grid->miny)) / (grid->deltay));
+        *y = (igraph_long_t) floor((yc - (grid->miny)) / (grid->deltay));
     }
 
     return 0;
 }
 
-igraph_integer_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
-                                   igraph_real_t minx, igraph_real_t maxx, igraph_integer_t stepsx,
-                                   igraph_real_t miny, igraph_real_t maxy, igraph_integer_t stepsy) {
+igraph_long_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
+                                   igraph_real_t minx, igraph_real_t maxx, igraph_long_t stepsx,
+                                   igraph_real_t miny, igraph_real_t maxy, igraph_long_t stepsy) {
     grid->minx = minx;
     grid->maxx = maxx;
     grid->stepsx = stepsx;
@@ -58,7 +58,7 @@ igraph_integer_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *gri
     grid->stepsy = stepsy;
     grid->deltay = (maxy - miny) / stepsy;
 
-    grid->data = igraph_Calloc(stepsx * stepsy, igraph_integer_t);
+    grid->data = igraph_Calloc(stepsx * stepsy, igraph_long_t);
     if (grid->data == 0) {
         IGRAPH_ERROR("Cannot create grid", IGRAPH_ENOMEM);
     }
@@ -72,11 +72,11 @@ void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid) {
 #define MAT(i,j) (grid->data[(grid->stepsy)*(j)+(i)])
 #define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
 
-igraph_integer_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+igraph_long_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y, igraph_real_t r,
-                                       igraph_integer_t id) {
-    igraph_integer_t cx, cy;
-    igraph_integer_t i, j;
+                                       igraph_long_t id) {
+    igraph_long_t cx, cy;
+    igraph_long_t i, j;
 
     igraph_i_layout_mergegrid_which(grid, x, y, &cx, &cy);
 
@@ -127,10 +127,10 @@ igraph_integer_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t 
     return 0;
 }
 
-igraph_integer_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
+igraph_long_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y) {
-    igraph_integer_t cx, cy;
-    igraph_integer_t res;
+    igraph_long_t cx, cy;
+    igraph_long_t res;
 
     if (x <= grid->minx || x >= grid->maxx ||
         y <= grid->miny || y >= grid->maxy) {
@@ -145,11 +145,11 @@ igraph_integer_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid
 
 #define DIST2(x2,y2) (sqrt(pow(x-(x2),2)+pow(y-(y2), 2)))
 
-igraph_integer_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *grid,
+igraph_long_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *grid,
         igraph_real_t x, igraph_real_t y, igraph_real_t r) {
-    igraph_integer_t cx, cy;
-    igraph_integer_t i, j;
-    igraph_integer_t ret;
+    igraph_long_t cx, cy;
+    igraph_long_t i, j;
+    igraph_long_t ret;
 
     if (x - r <= grid->minx || x + r >= grid->maxx ||
         y - r <= grid->miny || y + r >= grid->maxy) {
@@ -205,8 +205,8 @@ igraph_integer_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_
     return ret;
 }
 
-/* igraph_integer_t print_grid(igraph_i_layout_mergegrid_t *grid) { */
-/*   igraph_integer_t i,j; */
+/* igraph_long_t print_grid(igraph_i_layout_mergegrid_t *grid) { */
+/*   igraph_long_t i,j; */
 
 /*   for (i=0; i<grid->stepsx; i++) { */
 /*     for (j=0; j<grid->stepsy; j++) { */

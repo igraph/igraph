@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_integer_t igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
+igraph_long_t igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
                           const igraph_vector_t* hi) {
     return igraph_vector_all_le(lo, v) && igraph_vector_all_ge(hi, v);
 }
@@ -31,8 +31,8 @@ igraph_integer_t igraph_vector_between(const igraph_vector_t* v, const igraph_ve
 void test_unweighted() {
     igraph_t g;
     igraph_vector_t edges, eb;
-    igraph_integer_t i;
-    igraph_integer_t no_of_edges;
+    igraph_long_t i;
+    igraph_long_t no_of_edges;
 
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -64,7 +64,7 @@ void test_unweighted() {
 
     no_of_edges = igraph_ecount(&g);
     for (i = 0; i < no_of_edges; i++) {
-        printf("%li ", (igraph_integer_t)VECTOR(edges)[i]);
+        printf("%li ", (igraph_long_t)VECTOR(edges)[i]);
     }
     printf("\n");
 
@@ -185,7 +185,7 @@ void test_zero_edge_graph() {
     igraph_destroy(&g);
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     test_unweighted();
     test_weighted();
     test_zero_edge_graph();

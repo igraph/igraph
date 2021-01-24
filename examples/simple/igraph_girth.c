@@ -23,9 +23,9 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
-    igraph_integer_t girth;
+    igraph_long_t girth;
     igraph_vector_t v;
     igraph_vector_t circle;
     igraph_real_t chord[] = { 0, 50 };

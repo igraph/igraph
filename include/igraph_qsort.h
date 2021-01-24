@@ -32,9 +32,9 @@
 __BEGIN_DECLS
 
 DECLDIR void igraph_qsort(void *base, size_t nel, size_t width,
-                          igraph_integer_t (*compar)(const void *, const void *));
+                          igraph_long_t (*compar)(const void *, const void *));
 DECLDIR void igraph_qsort_r(void *base, size_t nel, size_t width, void *thunk,
-                            igraph_integer_t (*compar)(void *, const void *, const void *));
+                            igraph_long_t (*compar)(void *, const void *, const void *));
 
 __END_DECLS
 

@@ -29,7 +29,7 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t intersect() {
+igraph_long_t intersect() {
 
     float negative[][8] = { { 1, 2, 2, 2, 1, 1, 2, 1 }, /* 1 */
         { 1, 2, 1, 1, 2, 2, 2, 1 }, /* 2 */
@@ -51,9 +51,9 @@ igraph_integer_t intersect() {
     /* { 0,0,1,1, 1,1,1,1 }, /\* 15 *\/ */
     /* { 0,0,2,2, 1,1,1,1 }}; /\* 16 *\/ */
 
-    igraph_integer_t no_neg = sizeof(negative) / sizeof(float) / 8;
-    igraph_integer_t no_pos = sizeof(positive) / sizeof(float) / 8;
-    igraph_integer_t i;
+    igraph_long_t no_neg = sizeof(negative) / sizeof(float) / 8;
+    igraph_long_t no_pos = sizeof(positive) / sizeof(float) / 8;
+    igraph_long_t i;
 
     for (i = 0; i < no_neg; i++) {
         float *co = negative[i];
@@ -74,7 +74,7 @@ igraph_integer_t intersect() {
     return 0;
 }
 
-igraph_integer_t distance() {
+igraph_long_t distance() {
 
     float configs[][7] = { { 1, 1, 2, 0, 2, 3, 1.0 }, /* 1 */
         { 1, 1, 1, 0, 1, 3, 0.0 }, /* 2 */
@@ -85,8 +85,8 @@ igraph_integer_t distance() {
         { 0, 3, 1, 1, 1, 2, 2.0 }
     }; /* 7 */
 
-    igraph_integer_t no = sizeof(configs) / sizeof(float) / 8;
-    igraph_integer_t i;
+    igraph_long_t no = sizeof(configs) / sizeof(float) / 8;
+    igraph_long_t i;
 
     for (i = 0; i < no; i++) {
         float *co = configs[i];
@@ -101,8 +101,8 @@ igraph_integer_t distance() {
     return 0;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t res1, res2;
+igraph_long_t main() {
+    igraph_long_t res1, res2;
     res1 = intersect();
     if (res1 != 0) {
         printf("I\n");

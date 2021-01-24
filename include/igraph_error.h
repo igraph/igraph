@@ -224,7 +224,7 @@ __BEGIN_DECLS
  */
 
 typedef void igraph_error_handler_t (const char * reason, const char * file,
-                                     igraph_integer_t line, igraph_integer_t igraph_errno);
+                                     igraph_long_t line, igraph_long_t igraph_errno);
 
 /**
  * \var igraph_error_handler_abort
@@ -467,8 +467,8 @@ typedef enum {
  * \sa igraph_errorf().
  */
 
-DECLDIR igraph_integer_t igraph_error(const char *reason, const char *file, igraph_integer_t line,
-                         igraph_integer_t igraph_errno);
+DECLDIR igraph_long_t igraph_error(const char *reason, const char *file, igraph_long_t line,
+                         igraph_long_t igraph_errno);
 
 /**
  * \function igraph_errorf
@@ -485,11 +485,11 @@ DECLDIR igraph_integer_t igraph_error(const char *reason, const char *file, igra
  * \sa igraph_error().
  */
 
-DECLDIR igraph_integer_t igraph_errorf(const char *reason, const char *file, igraph_integer_t line,
-                          igraph_integer_t igraph_errno, ...);
+DECLDIR igraph_long_t igraph_errorf(const char *reason, const char *file, igraph_long_t line,
+                          igraph_long_t igraph_errno, ...);
 
-DECLDIR igraph_integer_t igraph_errorvf(const char *reason, const char *file, igraph_integer_t line,
-                           igraph_integer_t igraph_errno, va_list ap);
+DECLDIR igraph_long_t igraph_errorvf(const char *reason, const char *file, igraph_long_t line,
+                           igraph_long_t igraph_errno, va_list ap);
 
 /**
  * \function igraph_strerror
@@ -502,7 +502,7 @@ DECLDIR igraph_integer_t igraph_errorvf(const char *reason, const char *file, ig
  * \return pointer to the textual description of the error code.
  */
 
-DECLDIR const char* igraph_strerror(const igraph_integer_t igraph_errno);
+DECLDIR const char* igraph_strerror(const igraph_long_t igraph_errno);
 
 #define IGRAPH_ERROR_SELECT_2(a,b)       ((a) != IGRAPH_SUCCESS ? (a) : ((b) != IGRAPH_SUCCESS ? (b) : IGRAPH_SUCCESS))
 #define IGRAPH_ERROR_SELECT_3(a,b,c)     ((a) != IGRAPH_SUCCESS ? (a) : IGRAPH_ERROR_SELECT_2(b,c))
@@ -515,7 +515,7 @@ DECLDIR const char* igraph_strerror(const igraph_integer_t igraph_errno);
  * information. We don't use the exception handling code though.  */
 
 struct igraph_i_protectedPtr {
-    igraph_integer_t all;
+    igraph_long_t all;
     void *ptr;
     void (*func)(void*);
 };
@@ -535,7 +535,7 @@ DECLDIR void IGRAPH_FINALLY_REAL(void (*func)(void*), void* ptr);
  *   stack.
  */
 
-DECLDIR void IGRAPH_FINALLY_CLEAN(igraph_integer_t num);
+DECLDIR void IGRAPH_FINALLY_CLEAN(igraph_long_t num);
 
 /**
  * \function IGRAPH_FINALLY_FREE
@@ -566,7 +566,7 @@ DECLDIR void IGRAPH_FINALLY_FREE(void);
  * write your own test cases and examine \ref IGRAPH_FINALLY_STACK_SIZE
  * before and after your test cases - the numbers should be equal.
  */
-DECLDIR igraph_integer_t IGRAPH_FINALLY_STACK_SIZE(void);
+DECLDIR igraph_long_t IGRAPH_FINALLY_STACK_SIZE(void);
 
 /**
  * \define IGRAPH_FINALLY_STACK_EMPTY
@@ -614,8 +614,8 @@ DECLDIR igraph_integer_t IGRAPH_FINALLY_STACK_SIZE(void);
 #if IGRAPH_VERIFY_FINALLY_STACK == 1
 #define IGRAPH_CHECK(a) \
         do { \
-            igraph_integer_t enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
-            igraph_integer_t igraph_i_ret=(a); \
+            igraph_long_t enter_stack_size = IGRAPH_FINALLY_STACK_SIZE(); \
+            igraph_long_t igraph_i_ret=(a); \
             if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
                 IGRAPH_ERROR("", igraph_i_ret); \
             } \
@@ -647,7 +647,7 @@ DECLDIR igraph_integer_t IGRAPH_FINALLY_STACK_SIZE(void);
  * call which can return an error code.
  */
 #define IGRAPH_CHECK(a) do { \
-        igraph_integer_t igraph_i_ret=(a); \
+        igraph_long_t igraph_i_ret=(a); \
         if (IGRAPH_UNLIKELY(igraph_i_ret != 0)) {\
             IGRAPH_ERROR("", igraph_i_ret); \
         } } while (0)
@@ -723,8 +723,8 @@ DECLDIR extern igraph_warning_handler_t igraph_warning_handler_print;
  * \return The supplied error code.
  */
 
-DECLDIR igraph_integer_t igraph_warning(const char *reason, const char *file, igraph_integer_t line,
-                           igraph_integer_t igraph_errno);
+DECLDIR igraph_long_t igraph_warning(const char *reason, const char *file, igraph_long_t line,
+                           igraph_long_t igraph_errno);
 
 /**
  * \function igraph_warningf
@@ -745,8 +745,8 @@ DECLDIR igraph_integer_t igraph_warning(const char *reason, const char *file, ig
  * \return The supplied error code.
  */
 
-DECLDIR igraph_integer_t igraph_warningf(const char *reason, const char *file, igraph_integer_t line,
-                            igraph_integer_t igraph_errno, ...);
+DECLDIR igraph_long_t igraph_warningf(const char *reason, const char *file, igraph_long_t line,
+                            igraph_long_t igraph_errno, ...);
 
 /**
  * \define IGRAPH_WARNING
@@ -802,7 +802,7 @@ DECLDIR igraph_integer_t igraph_warningf(const char *reason, const char *file, i
  * \param line The number of the line in the source file which triggered the error
  */
 
-typedef void igraph_fatal_handler_t (const char *reason, const char *file, igraph_integer_t line);
+typedef void igraph_fatal_handler_t (const char *reason, const char *file, igraph_long_t line);
 
 /**
  * \function igraph_set_fatal_handler
@@ -843,7 +843,7 @@ DECLDIR igraph_fatal_handler_t igraph_fatal_handler_abort;
  * \param line The number of line in the source file which triggered the error.
  */
 
-DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, igraph_integer_t line);
+DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, igraph_long_t line);
 
 /**
  * \function igraph_fatalf
@@ -859,7 +859,7 @@ DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, 
  * \param ... The additional arguments to be substituted into the template string.
  */
 
-DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, igraph_integer_t line, ...);
+DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, igraph_long_t line, ...);
 
 /**
  * \define IGRAPH_FATAL

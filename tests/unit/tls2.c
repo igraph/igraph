@@ -38,10 +38,10 @@ typedef struct thread_data_t {
     igraph_vector_t *result;
     pthread_cond_t *cond;
     pthread_mutex_t *mutex;
-    igraph_integer_t *steps, *othersteps;
+    igraph_long_t *steps, *othersteps;
 } thread_data_t;
 
-igraph_integer_t arpack_mult(igraph_real_t *to, igraph_real_t *from, igraph_integer_t n,
+igraph_long_t arpack_mult(igraph_real_t *to, igraph_real_t *from, igraph_long_t n,
                 igraph_matrix_t *matrix) {
     /* TODO */
     igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0, matrix,
@@ -71,13 +71,13 @@ void *thread_function(void *arg) {
     pthread_mutex_t *mutex = data->mutex;
     igraph_arpack_options_t options;
     igraph_real_t *v, *workl, *workd, *d, *resid, *ax;
-    igraph_integer_t *select;
-    igraph_integer_t ido = 0;
+    igraph_long_t *select;
+    igraph_long_t ido = 0;
 #if IGRAPH_THREAD_SAFE
-    igraph_integer_t rvec = 1;
+    igraph_long_t rvec = 1;
     char *all = "All";
 #endif
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_arpack_options_init(&options);
     options.n = igraph_matrix_nrow(M);
@@ -101,7 +101,7 @@ void *thread_function(void *arg) {
     d = igraph_Calloc(2 * options.ncv, igraph_real_t);
     resid = igraph_Calloc(options.n, igraph_real_t);
     ax = igraph_Calloc(options.n, igraph_real_t);
-    select = igraph_Calloc(options.ncv, igraph_integer_t);
+    select = igraph_Calloc(options.ncv, igraph_long_t);
 
     if (!v || !workl || !workd || !d || !resid || !ax || !select) {
         printf("Out of memory\n");
@@ -178,18 +178,18 @@ void *thread_function(void *arg) {
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     pthread_t thread_id1, thread_id2;
     void *exit_status1, *exit_status2;
     igraph_matrix_t m1, m2;
     igraph_vector_t result1, result2;
     pthread_cond_t steps_cond = PTHREAD_COND_INITIALIZER;
     pthread_mutex_t steps_mutex = PTHREAD_MUTEX_INITIALIZER;
-    igraph_integer_t steps1 = 0, steps2 = 0;
+    igraph_long_t steps1 = 0, steps2 = 0;
     thread_data_t
     data1 = { &m1, &result1, &steps_cond, &steps_mutex, &steps1, &steps2 },
     data2 = { &m2, &result2, &steps_cond, &steps_mutex, &steps2, &steps1 };
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     /* Skip if igraph is not thread safe */
     if (!IGRAPH_THREAD_SAFE) {

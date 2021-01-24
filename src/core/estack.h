@@ -32,16 +32,16 @@ typedef struct igraph_estack_t {
     igraph_vector_bool_t isin;
 } igraph_estack_t;
 
-igraph_integer_t igraph_estack_init(igraph_estack_t *s, igraph_integer_t setsize,
-                       igraph_integer_t stacksize);
+igraph_long_t igraph_estack_init(igraph_estack_t *s, igraph_long_t setsize,
+                       igraph_long_t stacksize);
 void igraph_estack_destroy(igraph_estack_t *s);
 
-igraph_integer_t igraph_estack_push(igraph_estack_t *s,  igraph_integer_t elem);
-igraph_integer_t igraph_estack_pop(igraph_estack_t *s);
+igraph_long_t igraph_estack_push(igraph_estack_t *s,  igraph_long_t elem);
+igraph_long_t igraph_estack_pop(igraph_estack_t *s);
 igraph_bool_t igraph_estack_iselement(const igraph_estack_t *s,
-                                      igraph_integer_t elem);
-igraph_integer_t igraph_estack_size(const igraph_estack_t *s);
+                                      igraph_long_t elem);
+igraph_long_t igraph_estack_size(const igraph_estack_t *s);
 
-igraph_integer_t igraph_estack_print(const igraph_estack_t *s);
+igraph_long_t igraph_estack_print(const igraph_estack_t *s);
 
 #endif

@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g, g_copy;
     igraph_bool_t same;
     igraph_vector_t degrees;

@@ -60,17 +60,17 @@
  *
  * \example examples/simple/igraph_disjoint_union.c
  */
-igraph_integer_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
+igraph_long_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
                           const igraph_t *right) {
 
-    igraph_integer_t no_of_nodes_left = igraph_vcount(left);
-    igraph_integer_t no_of_nodes_right = igraph_vcount(right);
-    igraph_integer_t no_of_edges_left = igraph_ecount(left);
-    igraph_integer_t no_of_edges_right = igraph_ecount(right);
+    igraph_long_t no_of_nodes_left = igraph_vcount(left);
+    igraph_long_t no_of_nodes_right = igraph_vcount(right);
+    igraph_long_t no_of_edges_left = igraph_ecount(left);
+    igraph_long_t no_of_edges_right = igraph_ecount(right);
     igraph_vector_t edges;
     igraph_bool_t directed_left = igraph_is_directed(left);
-    igraph_integer_t from, to;
-    igraph_integer_t i;
+    igraph_long_t from, to;
+    igraph_long_t i;
 
     if (directed_left != igraph_is_directed(right)) {
         IGRAPH_ERROR("Cannot union directed and undirected graphs",
@@ -81,17 +81,17 @@ igraph_integer_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
     IGRAPH_CHECK(igraph_vector_reserve(&edges,
                                        2 * (no_of_edges_left + no_of_edges_right)));
     for (i = 0; i < no_of_edges_left; i++) {
-        igraph_edge(left, (igraph_integer_t) i, &from, &to);
+        igraph_edge(left, (igraph_long_t) i, &from, &to);
         igraph_vector_push_back(&edges, from);
         igraph_vector_push_back(&edges, to);
     }
     for (i = 0; i < no_of_edges_right; i++) {
-        igraph_edge(right, (igraph_integer_t) i, &from, &to);
+        igraph_edge(right, (igraph_long_t) i, &from, &to);
         igraph_vector_push_back(&edges, from + no_of_nodes_left);
         igraph_vector_push_back(&edges, to + no_of_nodes_left);
     }
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t)
+    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_long_t)
                                (no_of_nodes_left + no_of_nodes_right),
                                directed_left));
     igraph_vector_destroy(&edges);
@@ -130,16 +130,16 @@ igraph_integer_t igraph_disjoint_union(igraph_t *res, const igraph_t *left,
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges in the result.
  */
-igraph_integer_t igraph_disjoint_union_many(igraph_t *res,
+igraph_long_t igraph_disjoint_union_many(igraph_t *res,
                                const igraph_vector_ptr_t *graphs) {
-    igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
+    igraph_long_t no_of_graphs = igraph_vector_ptr_size(graphs);
     igraph_bool_t directed = 1;
     igraph_vector_t edges;
-    igraph_integer_t no_of_edges = 0;
-    igraph_integer_t shift = 0;
+    igraph_long_t no_of_edges = 0;
+    igraph_long_t shift = 0;
     igraph_t *graph;
-    igraph_integer_t i, j;
-    igraph_integer_t from, to;
+    igraph_long_t i, j;
+    igraph_long_t from, to;
 
     if (no_of_graphs != 0) {
         graph = VECTOR(*graphs)[0];
@@ -158,18 +158,18 @@ igraph_integer_t igraph_disjoint_union_many(igraph_t *res,
     IGRAPH_CHECK(igraph_vector_reserve(&edges, 2 * no_of_edges));
 
     for (i = 0; i < no_of_graphs; i++) {
-        igraph_integer_t ec;
+        igraph_long_t ec;
         graph = VECTOR(*graphs)[i];
         ec = igraph_ecount(graph);
         for (j = 0; j < ec; j++) {
-            igraph_edge(graph, (igraph_integer_t) j, &from, &to);
+            igraph_edge(graph, (igraph_long_t) j, &from, &to);
             igraph_vector_push_back(&edges, from + shift);
             igraph_vector_push_back(&edges, to + shift);
         }
         shift += igraph_vcount(graph);
     }
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) shift, directed));
+    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_long_t) shift, directed));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
     return 0;

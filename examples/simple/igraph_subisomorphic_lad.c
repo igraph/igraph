@@ -30,9 +30,9 @@ void test_motifs() {
     igraph_t graph;
     igraph_vector_t randesu_counts, lad_counts;
     igraph_vector_t cut_prob;
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
     igraph_bool_t equal;
-    igraph_integer_t vcount;
+    igraph_long_t vcount;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -48,7 +48,7 @@ void test_motifs() {
     for (i = 0; i < n; i++) {
         igraph_t pattern;
         igraph_vector_ptr_t maps;
-        igraph_integer_t nAutomorphisms;
+        igraph_long_t nAutomorphisms;
 
         igraph_isoclass_create(&pattern, 3, i, /* directed = */ 1);
         igraph_vector_ptr_init(&maps, 0);
@@ -101,7 +101,7 @@ void test_motifs() {
     for (i = 0; i < n; i++) {
         igraph_t pattern;
         igraph_vector_ptr_t maps;
-        igraph_integer_t nAutomorphisms;
+        igraph_long_t nAutomorphisms;
 
         igraph_isoclass_create(&pattern, 4, i, /* directed = */ 1);
         igraph_vector_ptr_init(&maps, 0);
@@ -149,13 +149,13 @@ void test_motifs() {
 }
 
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t target, pattern;
     igraph_bool_t iso;
     igraph_vector_t map;
     igraph_vector_ptr_t maps;
-    igraph_integer_t i, n, result;
-    igraph_integer_t domainsvec[] = { 0, 2, 8, -1,
+    igraph_long_t i, n, result;
+    igraph_long_t domainsvec[] = { 0, 2, 8, -1,
                          4, 5, 6, 7, -1,
                          1, 3, 5, 6, 7, 8, -1,
                          0, 2, 8, -1,

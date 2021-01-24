@@ -20,11 +20,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g, g_rev, g_test;
     igraph_bool_t same;
     igraph_matrix_t W;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     /*    Directed, pentagram with ring, both clockwise    */
     igraph_matrix_init(&W, 1, 1);
@@ -47,7 +47,7 @@ igraph_integer_t main() {
 
     /*    From article, should give double edges for chords in igraph   */
     igraph_matrix_init(&W, 2, 2);
-    igraph_integer_t m[2][2] = {{4, 2},
+    igraph_long_t m[2][2] = {{4, 2},
                    {8, 10}};
     for (i=0; i < 2; i++) {
         for (j=0; j < 2; j++) {

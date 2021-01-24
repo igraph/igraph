@@ -26,12 +26,12 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_es_t es;
     igraph_eit_t eit;
-    igraph_integer_t size;
+    igraph_long_t size;
 
     /* DIRECTED */
 
@@ -40,8 +40,8 @@ igraph_integer_t main() {
     igraph_eit_create(&g, es, &eit);
     igraph_es_size(&g, &es, &size);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_long_t edge = IGRAPH_EIT_GET(eit);
+        igraph_long_t from, to;
         igraph_edge(&g, edge, &from, &to);
         IGRAPH_EIT_NEXT(eit);
         size--;
@@ -61,8 +61,8 @@ igraph_integer_t main() {
                          0, 1, 2, 3, 4, 3, 2, 3, 4, 5, 6, 5, 4, 5, 6, 7, 8, 9, 0, 1, 0, 9, -1);
     igraph_eit_create(&g, es, &eit);
     while (!IGRAPH_EIT_END(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from, to;
+        igraph_long_t edge = IGRAPH_EIT_GET(eit);
+        igraph_long_t from, to;
         igraph_edge(&g, edge, &from, &to);
         IGRAPH_EIT_NEXT(eit);
     }

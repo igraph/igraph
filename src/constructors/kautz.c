@@ -56,20 +56,20 @@
  * like O(|V|+|E|). |V| is the number of vertices, |E| is the number
  * of edges and \c m and \c n are the corresponding arguments.
  */
-igraph_integer_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
+igraph_long_t igraph_kautz(igraph_t *graph, igraph_long_t m, igraph_long_t n) {
 
     /* m+1 - number of symbols */
     /* n+1 - length of strings */
 
-    igraph_integer_t mm = m;
-    igraph_integer_t no_of_nodes, no_of_edges;
-    igraph_integer_t allstrings;
-    igraph_integer_t i, j, idx = 0;
+    igraph_long_t mm = m;
+    igraph_long_t no_of_nodes, no_of_edges;
+    igraph_long_t allstrings;
+    igraph_long_t i, j, idx = 0;
     igraph_vector_t edges;
     igraph_vector_long_t digits, table;
     igraph_vector_long_t index1, index2;
-    igraph_integer_t actb = 0;
-    igraph_integer_t actvalue = 0;
+    igraph_long_t actb = 0;
+    igraph_long_t actvalue = 0;
 
     if (m < 0 || n < 0) {
         IGRAPH_ERROR("`m' and `n' should be non-negative in a Kautz graph",
@@ -83,9 +83,9 @@ igraph_integer_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_intege
         return igraph_empty(graph, 0, IGRAPH_DIRECTED);
     }
 
-    no_of_nodes = (igraph_integer_t) ((m + 1) * pow(m, n));
+    no_of_nodes = (igraph_long_t) ((m + 1) * pow(m, n));
     no_of_edges = no_of_nodes * m;
-    allstrings = (igraph_integer_t) pow(m + 1, n + 1);
+    allstrings = (igraph_long_t) pow(m + 1, n + 1);
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
@@ -99,7 +99,7 @@ igraph_integer_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_intege
 
     IGRAPH_CHECK(igraph_vector_long_init(&digits, n + 1));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &digits);
-    IGRAPH_CHECK(igraph_vector_long_init(&index1, (igraph_integer_t) pow(m + 1, n + 1)));
+    IGRAPH_CHECK(igraph_vector_long_init(&index1, (igraph_long_t) pow(m + 1, n + 1)));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &index1);
     IGRAPH_CHECK(igraph_vector_long_init(&index2, no_of_nodes));
     IGRAPH_FINALLY(igraph_vector_long_destroy, &index2);
@@ -108,7 +108,7 @@ igraph_integer_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_intege
     while (1) {
         /* at the beginning of the loop, 0:actb contain the valid prefix */
         /* we might need to fill it to get a valid string */
-        igraph_integer_t z = 0;
+        igraph_long_t z = 0;
         if (VECTOR(digits)[actb] == 0) {
             z = 1;
         }
@@ -132,7 +132,7 @@ igraph_integer_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_intege
         /* not yet, we need a valid prefix now */
         while (1) {
             /* try to increase digits at position actb */
-            igraph_integer_t next = VECTOR(digits)[actb] + 1;
+            igraph_long_t next = VECTOR(digits)[actb] + 1;
             if (actb != 0 && VECTOR(digits)[actb - 1] == next) {
                 next++;
             }
@@ -153,11 +153,11 @@ igraph_integer_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_intege
 
     /* Now come the edges at last */
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t fromvalue = VECTOR(index2)[i];
-        igraph_integer_t lastdigit = fromvalue % (mm + 1);
-        igraph_integer_t basis = (fromvalue * (mm + 1)) % allstrings;
+        igraph_long_t fromvalue = VECTOR(index2)[i];
+        igraph_long_t lastdigit = fromvalue % (mm + 1);
+        igraph_long_t basis = (fromvalue * (mm + 1)) % allstrings;
         for (j = 0; j <= m; j++) {
-            igraph_integer_t tovalue, to;
+            igraph_long_t tovalue, to;
             if (j == lastdigit) {
                 continue;
             }
@@ -177,7 +177,7 @@ igraph_integer_t igraph_kautz(igraph_t *graph, igraph_integer_t m, igraph_intege
     igraph_vector_long_destroy(&table);
     IGRAPH_FINALLY_CLEAN(4);
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_long_t) no_of_nodes,
                                IGRAPH_DIRECTED));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);

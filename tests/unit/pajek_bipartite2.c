@@ -25,11 +25,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t print_attributes(const igraph_t *g) {
+igraph_long_t print_attributes(const igraph_t *g) {
 
     igraph_vector_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_vector_init(&gtypes, 0);
     igraph_vector_init(&vtypes, 0);
@@ -42,7 +42,7 @@ igraph_integer_t print_attributes(const igraph_t *g) {
                            &enames, &etypes);
 
     for (i = 0; i < igraph_vcount(g); i++) {
-        igraph_integer_t j;
+        igraph_long_t j;
         printf("Vertex %li: ", i);
         for (j = 0; j < igraph_strvector_size(&vnames); j++) {
             printf("%s=", STR(vnames, j));
@@ -57,8 +57,8 @@ igraph_integer_t print_attributes(const igraph_t *g) {
     }
 
     for (i = 0; i < igraph_ecount(g); i++) {
-        igraph_integer_t j;
-        igraph_integer_t u = IGRAPH_FROM(g, i), v = IGRAPH_TO(g, i);
+        igraph_long_t j;
+        igraph_long_t u = IGRAPH_FROM(g, i), v = IGRAPH_TO(g, i);
         if (u < v && !igraph_is_directed(g)) {
             u = IGRAPH_TO(g, i);
             v = IGRAPH_FROM(g, i);
@@ -86,7 +86,7 @@ igraph_integer_t print_attributes(const igraph_t *g) {
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     FILE *input;
 

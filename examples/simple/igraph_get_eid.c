@@ -24,19 +24,19 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v, FILE *f) {
-    igraph_integer_t i;
+    igraph_long_t i;
     for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (igraph_integer_t) VECTOR(*v)[i]);
+        fprintf(f, " %li", (igraph_long_t) VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
-    igraph_integer_t eid;
+    igraph_long_t eid;
     igraph_vector_t hist;
-    igraph_integer_t i;
-    igraph_integer_t ret;
+    igraph_long_t i;
+    igraph_long_t ret;
 
     /* DIRECTED */
 
@@ -46,7 +46,7 @@ igraph_integer_t main() {
 
     for (i = 1; i < 10; i++) {
         igraph_get_eid(&g, &eid, 0, i, IGRAPH_DIRECTED, /*error=*/ 1);
-        VECTOR(hist)[ (igraph_integer_t) eid ] = 1;
+        VECTOR(hist)[ (igraph_long_t) eid ] = 1;
     }
     print_vector(&hist, stdout);
 
@@ -61,9 +61,9 @@ igraph_integer_t main() {
 
     for (i = 1; i < 10; i++) {
         igraph_get_eid(&g, &eid, 0, i, IGRAPH_UNDIRECTED, /*error=*/ 1);
-        VECTOR(hist)[ (igraph_integer_t) eid ] += 1;
+        VECTOR(hist)[ (igraph_long_t) eid ] += 1;
         igraph_get_eid(&g, &eid, i, 0, IGRAPH_DIRECTED, /*error=*/ 1);
-        VECTOR(hist)[ (igraph_integer_t) eid ] += 1;
+        VECTOR(hist)[ (igraph_long_t) eid ] += 1;
     }
     print_vector(&hist, stdout);
 
@@ -88,11 +88,11 @@ igraph_integer_t main() {
 
 /* Stress test */
 
-/* igraph_integer_t main() { */
+/* igraph_long_t main() { */
 
 /*   igraph_t g; */
-/*   igraph_integer_t i, n; */
-/*   igraph_integer_t from, to, eid; */
+/*   igraph_long_t i, n; */
+/*   igraph_long_t from, to, eid; */
 
 /*   igraph_barabasi_game(&g, 10000, 100, 0, 0, 1); */
 /*   n=igraph_ecount(&g); */

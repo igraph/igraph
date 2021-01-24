@@ -35,7 +35,7 @@
 
 */
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t graph;
     igraph_matrix_t U, V;

@@ -53,15 +53,15 @@
  *
  * Time complexity: O(|V|+|E|), the number of vertices plus the number of edges.
  */
-igraph_integer_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_integer_t n) {
+igraph_long_t igraph_de_bruijn(igraph_t *graph, igraph_long_t m, igraph_long_t n) {
 
     /* m - number of symbols */
     /* n - length of strings */
 
-    igraph_integer_t no_of_nodes, no_of_edges;
+    igraph_long_t no_of_nodes, no_of_edges;
     igraph_vector_t edges;
-    igraph_integer_t i, j;
-    igraph_integer_t mm = m;
+    igraph_long_t i, j;
+    igraph_long_t mm = m;
 
     if (m < 0 || n < 0) {
         IGRAPH_ERROR("`m' and `n' should be non-negative in a de Bruijn graph",
@@ -75,21 +75,21 @@ igraph_integer_t igraph_de_bruijn(igraph_t *graph, igraph_integer_t m, igraph_in
         return igraph_empty(graph, 0, IGRAPH_DIRECTED);
     }
 
-    no_of_nodes = (igraph_integer_t) pow(m, n);
+    no_of_nodes = (igraph_long_t) pow(m, n);
     no_of_edges = no_of_nodes * m;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
 
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t basis = (i * mm) % no_of_nodes;
+        igraph_long_t basis = (i * mm) % no_of_nodes;
         for (j = 0; j < m; j++) {
             igraph_vector_push_back(&edges, i);
             igraph_vector_push_back(&edges, basis + j);
         }
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_long_t) no_of_nodes,
                                IGRAPH_DIRECTED));
 
     igraph_vector_destroy(&edges);

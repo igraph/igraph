@@ -64,16 +64,16 @@
  *
  * \example examples/simple/igraph_compose.c
  */
-igraph_integer_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
+igraph_long_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_t *g2,
                    igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
 
-    igraph_integer_t no_of_nodes_left = igraph_vcount(g1);
-    igraph_integer_t no_of_nodes_right = igraph_vcount(g2);
-    igraph_integer_t no_of_nodes;
+    igraph_long_t no_of_nodes_left = igraph_vcount(g1);
+    igraph_long_t no_of_nodes_right = igraph_vcount(g2);
+    igraph_long_t no_of_nodes;
     igraph_bool_t directed = igraph_is_directed(g1);
     igraph_vector_t edges;
     igraph_vector_t neis1, neis2;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     if (directed != igraph_is_directed(g2)) {
         IGRAPH_ERROR("Cannot compose directed and undirected graph",
@@ -96,20 +96,20 @@ igraph_integer_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_
 
     for (i = 0; i < no_of_nodes_left; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_incident(g1, &neis1, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_incident(g1, &neis1, (igraph_long_t) i,
                                      IGRAPH_OUT));
         while (!igraph_vector_empty(&neis1)) {
-            igraph_integer_t con = (igraph_integer_t) igraph_vector_pop_back(&neis1);
-            igraph_integer_t v1 = IGRAPH_OTHER(g1, con, i);
+            igraph_long_t con = (igraph_long_t) igraph_vector_pop_back(&neis1);
+            igraph_long_t v1 = IGRAPH_OTHER(g1, con, i);
             if (v1 < no_of_nodes_right) {
-                IGRAPH_CHECK(igraph_incident(g2, &neis2, (igraph_integer_t) v1,
+                IGRAPH_CHECK(igraph_incident(g2, &neis2, (igraph_long_t) v1,
                                              IGRAPH_OUT));
             } else {
                 continue;
             }
             while (!igraph_vector_empty(&neis2)) {
-                igraph_integer_t con2 = igraph_vector_pop_back(&neis2);
-                igraph_integer_t v2 = IGRAPH_OTHER(g2, con2, v1);
+                igraph_long_t con2 = igraph_vector_pop_back(&neis2);
+                igraph_long_t v2 = IGRAPH_OTHER(g2, con2, v1);
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, i));
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, v2));
                 if (edge_map1) {
@@ -126,7 +126,7 @@ igraph_integer_t igraph_compose(igraph_t *res, const igraph_t *g1, const igraph_
     igraph_vector_destroy(&neis2);
     IGRAPH_FINALLY_CLEAN(2);
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_long_t) no_of_nodes,
                                directed));
 
     igraph_vector_destroy(&edges);

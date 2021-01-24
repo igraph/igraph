@@ -30,7 +30,7 @@
 
 #include <string.h>
 
-igraph_integer_t igraph_hashtable_init(igraph_hashtable_t *ht) {
+igraph_long_t igraph_hashtable_init(igraph_hashtable_t *ht) {
     IGRAPH_CHECK(igraph_trie_init(&ht->keys, 1));
     IGRAPH_FINALLY(igraph_trie_destroy, &ht->keys);
     IGRAPH_CHECK(igraph_strvector_init(&ht->elements, 0));
@@ -53,11 +53,11 @@ void igraph_hashtable_destroy(igraph_hashtable_t *ht) {
    than the keys trie, but the data is always retrieved based on the trie
 */
 
-igraph_integer_t igraph_hashtable_addset(igraph_hashtable_t *ht,
+igraph_long_t igraph_hashtable_addset(igraph_hashtable_t *ht,
                             const char *key, const char *def,
                             const char *elem) {
-    igraph_integer_t size = igraph_trie_size(&ht->keys);
-    igraph_integer_t newid;
+    igraph_long_t size = igraph_trie_size(&ht->keys);
+    igraph_long_t newid;
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
     if (newid == size) {
@@ -76,11 +76,11 @@ igraph_integer_t igraph_hashtable_addset(igraph_hashtable_t *ht,
 
 /* Previous comment also applies here */
 
-igraph_integer_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
+igraph_long_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
                              const char *key, const char *def,
-                             const char *elem, igraph_integer_t elemlen) {
-    igraph_integer_t size = igraph_trie_size(&ht->keys);
-    igraph_integer_t newid;
+                             const char *elem, igraph_long_t elemlen) {
+    igraph_long_t size = igraph_trie_size(&ht->keys);
+    igraph_long_t newid;
     char *tmp;
 
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
@@ -108,9 +108,9 @@ igraph_integer_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
     return 0;
 }
 
-igraph_integer_t igraph_hashtable_get(igraph_hashtable_t *ht,
+igraph_long_t igraph_hashtable_get(igraph_hashtable_t *ht,
                          const char *key, char **elem) {
-    igraph_integer_t newid;
+    igraph_long_t newid;
     IGRAPH_CHECK(igraph_trie_get(&ht->keys, key, &newid));
 
     igraph_strvector_get(&ht->elements, newid, elem);
@@ -118,13 +118,13 @@ igraph_integer_t igraph_hashtable_get(igraph_hashtable_t *ht,
     return 0;
 }
 
-igraph_integer_t igraph_hashtable_reset(igraph_hashtable_t *ht) {
+igraph_long_t igraph_hashtable_reset(igraph_hashtable_t *ht) {
     igraph_strvector_destroy(&ht->elements);
     IGRAPH_CHECK(igraph_strvector_copy(&ht->elements, &ht->defaults));
     return 0;
 }
 
-igraph_integer_t igraph_hashtable_getkeys(igraph_hashtable_t *ht,
+igraph_long_t igraph_hashtable_getkeys(igraph_hashtable_t *ht,
                              const igraph_strvector_t **sv) {
     return igraph_trie_getkeys(&ht->keys, sv);
 }

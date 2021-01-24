@@ -24,7 +24,7 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_matrix_t m;
     igraph_vector_t x, y;
 

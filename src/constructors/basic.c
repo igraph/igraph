@@ -63,8 +63,8 @@
  *
  * \example examples/simple/igraph_create.c
  */
-igraph_integer_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
-                  igraph_integer_t n, igraph_bool_t directed) {
+igraph_long_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
+                  igraph_long_t n, igraph_bool_t directed) {
     igraph_bool_t has_edges = igraph_vector_size(edges) > 0;
     igraph_real_t max = has_edges ? igraph_vector_max(edges) + 1 : 0;
 
@@ -78,9 +78,9 @@ igraph_integer_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
     IGRAPH_CHECK(igraph_empty(graph, n, directed));
     IGRAPH_FINALLY(igraph_destroy, graph);
     if (has_edges) {
-        igraph_integer_t vc = igraph_vcount(graph);
+        igraph_long_t vc = igraph_vcount(graph);
         if (vc < max) {
-            IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_integer_t) (max - vc), 0));
+            IGRAPH_CHECK(igraph_add_vertices(graph, (igraph_long_t) (max - vc), 0));
         }
         IGRAPH_CHECK(igraph_add_edges(graph, edges, 0));
     }
@@ -100,7 +100,7 @@ igraph_integer_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
  * edge argument.
  *
  * </para><para>Note that only graphs which have vertices less than
- * the highest value of the 'igraph_integer_t' type can be created this way. If you
+ * the highest value of the 'igraph_long_t' type can be created this way. If you
  * give larger values then the result is undefined.
  *
  * \param graph Pointer to an uninitialized graph object. The result
@@ -125,7 +125,7 @@ igraph_integer_t igraph_create(igraph_t *graph, const igraph_vector_t *edges,
  * \example examples/simple/igraph_small.c
  */
 
-igraph_integer_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+igraph_long_t igraph_small(igraph_t *graph, igraph_long_t n, igraph_bool_t directed,
                  ...) {
     igraph_vector_t edges;
     va_list ap;
@@ -134,7 +134,7 @@ igraph_integer_t igraph_small(igraph_t *graph, igraph_integer_t n, igraph_bool_t
 
     va_start(ap, directed);
     while (1) {
-        igraph_integer_t num = va_arg(ap, igraph_integer_t);
+        igraph_long_t num = va_arg(ap, igraph_long_t);
         if (num == -1) {
             break;
         }

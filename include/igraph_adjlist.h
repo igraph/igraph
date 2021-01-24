@@ -32,95 +32,95 @@
 __BEGIN_DECLS
 
 typedef struct igraph_adjlist_t {
-    igraph_integer_t length;
-    igraph_vector_int_t *adjs;
+    igraph_long_t length;
+    igraph_vector_long_t *adjs;
 } igraph_adjlist_t;
 
-DECLDIR igraph_integer_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
+DECLDIR igraph_long_t igraph_adjlist_init(const igraph_t *graph, igraph_adjlist_t *al,
                                 igraph_neimode_t mode);
-DECLDIR igraph_integer_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_integer_t no_of_nodes);
-DECLDIR igraph_integer_t igraph_adjlist_size(const igraph_adjlist_t *al);
-DECLDIR igraph_integer_t igraph_adjlist_init_complementer(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_adjlist_init_empty(igraph_adjlist_t *al, igraph_long_t no_of_nodes);
+DECLDIR igraph_long_t igraph_adjlist_size(const igraph_adjlist_t *al);
+DECLDIR igraph_long_t igraph_adjlist_init_complementer(const igraph_t *graph,
         igraph_adjlist_t *al,
         igraph_neimode_t mode,
         igraph_bool_t loops);
 DECLDIR void igraph_adjlist_destroy(igraph_adjlist_t *al);
 DECLDIR void igraph_adjlist_clear(igraph_adjlist_t *al);
 DECLDIR void igraph_adjlist_sort(igraph_adjlist_t *al);
-DECLDIR igraph_integer_t igraph_adjlist_simplify(igraph_adjlist_t *al);
-DECLDIR igraph_integer_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_adjlist_simplify(igraph_adjlist_t *al);
+DECLDIR igraph_long_t igraph_adjlist_remove_duplicate(const igraph_t *graph,
         igraph_adjlist_t *al);
-DECLDIR igraph_integer_t igraph_adjlist_print(const igraph_adjlist_t *al);
-DECLDIR igraph_integer_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
-DECLDIR igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t to, igraph_bool_t directed);
-DECLDIR igraph_integer_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_integer_t from, igraph_integer_t oldto, igraph_integer_t newto, igraph_bool_t directed);
+DECLDIR igraph_long_t igraph_adjlist_print(const igraph_adjlist_t *al);
+DECLDIR igraph_long_t igraph_adjlist_fprint(const igraph_adjlist_t *al, FILE *outfile);
+DECLDIR igraph_bool_t igraph_adjlist_has_edge(igraph_adjlist_t* al, igraph_long_t from, igraph_long_t to, igraph_bool_t directed);
+DECLDIR igraph_long_t igraph_adjlist_replace_edge(igraph_adjlist_t* al, igraph_long_t from, igraph_long_t oldto, igraph_long_t newto, igraph_bool_t directed);
 
-/* igraph_vector_int_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
-/*                 igraph_integer_t no); */
+/* igraph_vector_long_t *igraph_adjlist_get(const igraph_adjlist_t *al,  */
+/*                 igraph_long_t no); */
 /**
  * \define igraph_adjlist_get
  * \brief Query a vector in an adjacency list.
  *
- * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
+ * Returns a pointer to an <type>igraph_vector_long_t</type> object from an
  * adjacency list. The vector can be modified as desired.
  * \param al The adjacency list object.
  * \param no The vertex whose adjacent vertices will be returned.
- * \return Pointer to the <type>igraph_vector_int_t</type> object.
+ * \return Pointer to the <type>igraph_vector_long_t</type> object.
  *
  * Time complexity: O(1).
  */
-#define igraph_adjlist_get(al,no) (&(al)->adjs[(igraph_integer_t)(no)])
+#define igraph_adjlist_get(al,no) (&(al)->adjs[(igraph_long_t)(no)])
 
-DECLDIR igraph_integer_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
+DECLDIR igraph_long_t igraph_adjlist(igraph_t *graph, const igraph_adjlist_t *adjlist,
                            igraph_neimode_t mode, igraph_bool_t duplicate);
 
 typedef struct igraph_inclist_t {
-    igraph_integer_t length;
-    igraph_vector_int_t *incs;
+    igraph_long_t length;
+    igraph_vector_long_t *incs;
 } igraph_inclist_t;
 
-DECLDIR igraph_integer_t igraph_inclist_init(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_inclist_init(const igraph_t *graph,
                                 igraph_inclist_t *il,
                                 igraph_neimode_t mode);
-DECLDIR igraph_integer_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_integer_t n);
+DECLDIR igraph_long_t igraph_inclist_init_empty(igraph_inclist_t *il, igraph_long_t n);
 DECLDIR void igraph_inclist_destroy(igraph_inclist_t *il);
 DECLDIR void igraph_inclist_clear(igraph_inclist_t *il);
-DECLDIR igraph_integer_t igraph_inclist_remove_duplicate(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_inclist_remove_duplicate(const igraph_t *graph,
         igraph_inclist_t *il);
-DECLDIR igraph_integer_t igraph_inclist_print(const igraph_inclist_t *il);
-DECLDIR igraph_integer_t igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
+DECLDIR igraph_long_t igraph_inclist_print(const igraph_inclist_t *il);
+DECLDIR igraph_long_t igraph_inclist_fprint(const igraph_inclist_t *il, FILE *outfile);
 
 /**
  * \define igraph_inclist_get
  * \brief Query a vector in an incidence list.
  *
- * Returns a pointer to an <type>igraph_vector_int_t</type> object from an
+ * Returns a pointer to an <type>igraph_vector_long_t</type> object from an
  * incidence list containing edge ids. The vector can be modified,
  * resized, etc. as desired.
  * \param il Pointer to the incidence list.
  * \param no The vertex for which the incident edges are returned.
- * \return Pointer to an <type>igraph_vector_int_t</type> object.
+ * \return Pointer to an <type>igraph_vector_long_t</type> object.
  *
  * Time complexity: O(1).
  */
-#define igraph_inclist_get(il,no) (&(il)->incs[(igraph_integer_t)(no)])
+#define igraph_inclist_get(il,no) (&(il)->incs[(igraph_long_t)(no)])
 
 typedef struct igraph_lazy_adjlist_t {
     const igraph_t *graph;
-    igraph_integer_t length;
+    igraph_long_t length;
     igraph_vector_t **adjs;
     igraph_neimode_t mode;
     igraph_lazy_adlist_simplify_t simplify;
 } igraph_lazy_adjlist_t;
 
-DECLDIR igraph_integer_t igraph_lazy_adjlist_init(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_lazy_adjlist_init(const igraph_t *graph,
                                      igraph_lazy_adjlist_t *al,
                                      igraph_neimode_t mode,
                                      igraph_lazy_adlist_simplify_t simplify);
 DECLDIR void igraph_lazy_adjlist_destroy(igraph_lazy_adjlist_t *al);
 DECLDIR void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
 /* igraph_vector_t *igraph_lazy_adjlist_get(igraph_lazy_adjlist_t *al, */
-/*                     igraph_integer_t no); */
+/*                     igraph_long_t no); */
 /**
  * \define igraph_lazy_adjlist_get
  * \brief Query neighbor vertices.
@@ -138,19 +138,19 @@ DECLDIR void igraph_lazy_adjlist_clear(igraph_lazy_adjlist_t *al);
  * first time, O(1) for subsequent calls.
  */
 #define igraph_lazy_adjlist_get(al,no) \
-    ((al)->adjs[(igraph_integer_t)(no)] != 0 ? ((al)->adjs[(igraph_integer_t)(no)]) : \
+    ((al)->adjs[(igraph_long_t)(no)] != 0 ? ((al)->adjs[(igraph_long_t)(no)]) : \
      (igraph_lazy_adjlist_get_real(al, no)))
 DECLDIR igraph_vector_t *igraph_lazy_adjlist_get_real(igraph_lazy_adjlist_t *al,
-        igraph_integer_t no);
+        igraph_long_t no);
 
 typedef struct igraph_lazy_inclist_t {
     const igraph_t *graph;
-    igraph_integer_t length;
+    igraph_long_t length;
     igraph_vector_t **incs;
     igraph_neimode_t mode;
 } igraph_lazy_inclist_t;
 
-DECLDIR igraph_integer_t igraph_lazy_inclist_init(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_lazy_inclist_init(const igraph_t *graph,
                                      igraph_lazy_inclist_t *il,
                                      igraph_neimode_t mode);
 DECLDIR void igraph_lazy_inclist_destroy(igraph_lazy_inclist_t *il);
@@ -173,10 +173,10 @@ DECLDIR void igraph_lazy_inclist_clear(igraph_lazy_inclist_t *il);
  * time, O(1) for subsequent calls with the same \p no argument.
  */
 #define igraph_lazy_inclist_get(al,no) \
-    ((al)->incs[(igraph_integer_t)(no)] != 0 ? ((al)->incs[(igraph_integer_t)(no)]) : \
+    ((al)->incs[(igraph_long_t)(no)] != 0 ? ((al)->incs[(igraph_long_t)(no)]) : \
      (igraph_lazy_inclist_get_real(al, no)))
 DECLDIR igraph_vector_t *igraph_lazy_inclist_get_real(igraph_lazy_inclist_t *al,
-        igraph_integer_t no);
+        igraph_long_t no);
 
 __END_DECLS
 

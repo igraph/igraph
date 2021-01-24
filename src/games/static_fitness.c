@@ -89,20 +89,20 @@
  *
  * Time complexity: O(|V| + |E| log |E|).
  */
-igraph_integer_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no_of_edges,
+igraph_long_t igraph_static_fitness_game(igraph_t *graph, igraph_long_t no_of_edges,
                                igraph_vector_t* fitness_out, igraph_vector_t* fitness_in,
                                igraph_bool_t loops, igraph_bool_t multiple) {
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t outnodes, innodes, nodes;
+    igraph_long_t no_of_nodes;
+    igraph_long_t outnodes, innodes, nodes;
     igraph_vector_t cum_fitness_in, cum_fitness_out;
     igraph_vector_t *p_cum_fitness_in, *p_cum_fitness_out;
     igraph_real_t x, max_in, max_out;
     igraph_real_t max_no_of_edges;
     igraph_bool_t is_directed = (fitness_in != 0);
     float num_steps;
-    igraph_integer_t step_counter = 0;
-    igraph_integer_t i, from, to, pos;
+    igraph_long_t step_counter = 0;
+    igraph_long_t i, from, to, pos;
 
     if (fitness_out == 0) {
         IGRAPH_ERROR("fitness_out must not be null", IGRAPH_EINVAL);
@@ -112,7 +112,7 @@ igraph_integer_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no
         IGRAPH_ERROR("Invalid number of edges", IGRAPH_EINVAL);
     }
 
-    no_of_nodes = (igraph_integer_t) igraph_vector_size(fitness_out);
+    no_of_nodes = (igraph_long_t) igraph_vector_size(fitness_out);
     if (no_of_nodes == 0) {
         IGRAPH_CHECK(igraph_empty(graph, 0, is_directed));
         return IGRAPH_SUCCESS;
@@ -217,7 +217,7 @@ igraph_integer_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no
     } else {
         /* Multiple edges are disallowed */
         igraph_adjlist_t al;
-        igraph_vector_int_t* neis;
+        igraph_vector_long_t* neis;
 
         IGRAPH_CHECK(igraph_adjlist_init_empty(&al, no_of_nodes));
         IGRAPH_FINALLY(igraph_adjlist_destroy, &al);
@@ -245,12 +245,12 @@ igraph_integer_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no
 
             /* Is there already an edge? If so, try again */
             neis = igraph_adjlist_get(&al, from);
-            if (igraph_vector_int_binsearch(neis, to, &pos)) {
+            if (igraph_vector_long_binsearch(neis, to, &pos)) {
                 continue;
             }
 
             /* Insert the edge */
-            IGRAPH_CHECK(igraph_vector_int_insert(neis, pos, to));
+            IGRAPH_CHECK(igraph_vector_long_insert(neis, pos, to));
 
             no_of_edges--;
         }
@@ -356,15 +356,15 @@ igraph_integer_t igraph_static_fitness_game(igraph_t *graph, igraph_integer_t no
  *
  * Time complexity: O(|V| + |E| log |E|).
  */
-igraph_integer_t igraph_static_power_law_game(igraph_t *graph,
-                                 igraph_integer_t no_of_nodes, igraph_integer_t no_of_edges,
+igraph_long_t igraph_static_power_law_game(igraph_t *graph,
+                                 igraph_long_t no_of_nodes, igraph_long_t no_of_edges,
                                  igraph_real_t exponent_out, igraph_real_t exponent_in,
                                  igraph_bool_t loops, igraph_bool_t multiple,
                                  igraph_bool_t finite_size_correction) {
 
     igraph_vector_t fitness_out, fitness_in;
     igraph_real_t alpha_out = 0.0, alpha_in = 0.0;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_real_t j;
 
     if (no_of_nodes < 0) {

@@ -26,10 +26,10 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t karate;
     igraph_vector_t edges, prob;
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

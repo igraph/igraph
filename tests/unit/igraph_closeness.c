@@ -180,7 +180,7 @@ void advanced_test_case_with_weights() {
     igraph_destroy(&g);
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     simple_test_case_no_weights_undirected();
     simple_test_case_with_weights_undirected();

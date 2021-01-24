@@ -74,27 +74,27 @@
 
 #include "core/indheap.h"
 
-igraph_integer_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
-    igraph_integer_t i, n = igraph_vector_size(from);
+igraph_long_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to) {
+    igraph_long_t i, n = igraph_vector_size(from);
 
     IGRAPH_CHECK(igraph_vector_long_resize(to, n));
     for (i = 0; i < n; i++) {
-        VECTOR(*to)[i] = (igraph_integer_t) floor(VECTOR(*from)[i]);
+        VECTOR(*to)[i] = (igraph_long_t) floor(VECTOR(*from)[i]);
     }
     return 0;
 }
 
-igraph_integer_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
-    igraph_integer_t i, n = igraph_vector_size(from);
+igraph_long_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to) {
+    igraph_long_t i, n = igraph_vector_size(from);
 
     IGRAPH_CHECK(igraph_vector_long_resize(to, n));
     for (i = 0; i < n; i++) {
-        VECTOR(*to)[i] = (igraph_integer_t) round(VECTOR(*from)[i]);
+        VECTOR(*to)[i] = (igraph_long_t) round(VECTOR(*from)[i]);
     }
     return 0;
 }
 
-igraph_integer_t igraph_vector_order2(igraph_vector_t *v) {
+igraph_long_t igraph_vector_order2(igraph_vector_t *v) {
 
     igraph_indheap_t heap;
 
@@ -132,23 +132,23 @@ igraph_integer_t igraph_vector_order2(igraph_vector_t *v) {
  * Time complexity: O()
  */
 
-igraph_integer_t igraph_vector_order(const igraph_vector_t* v,
+igraph_long_t igraph_vector_order(const igraph_vector_t* v,
                         const igraph_vector_t *v2,
                         igraph_vector_t* res, igraph_real_t nodes) {
-    igraph_integer_t edges = igraph_vector_size(v);
+    igraph_long_t edges = igraph_vector_size(v);
     igraph_vector_t ptr;
     igraph_vector_t rad;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (igraph_integer_t) nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (igraph_long_t) nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
     IGRAPH_CHECK(igraph_vector_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
-        igraph_integer_t radix = (igraph_integer_t) v2->stor_begin[i];
+        igraph_long_t radix = (igraph_long_t) v2->stor_begin[i];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[i] = VECTOR(ptr)[radix];
         }
@@ -158,10 +158,10 @@ igraph_integer_t igraph_vector_order(const igraph_vector_t* v,
     j = 0;
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
-            igraph_integer_t next = (igraph_integer_t) VECTOR(ptr)[i] - 1;
+            igraph_long_t next = (igraph_long_t) VECTOR(ptr)[i] - 1;
             res->stor_begin[j++] = next;
             while (VECTOR(rad)[next] != 0) {
-                next = (igraph_integer_t) VECTOR(rad)[next] - 1;
+                next = (igraph_long_t) VECTOR(rad)[next] - 1;
                 res->stor_begin[j++] = next;
             }
         }
@@ -171,8 +171,8 @@ igraph_integer_t igraph_vector_order(const igraph_vector_t* v,
     igraph_vector_null(&rad);
 
     for (i = 0; i < edges; i++) {
-        igraph_integer_t edge = (igraph_integer_t) VECTOR(*res)[edges - i - 1];
-        igraph_integer_t radix = (igraph_integer_t) VECTOR(*v)[edge];
+        igraph_long_t edge = (igraph_long_t) VECTOR(*res)[edges - i - 1];
+        igraph_long_t radix = (igraph_long_t) VECTOR(*v)[edge];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[edge] = VECTOR(ptr)[radix];
         }
@@ -182,10 +182,10 @@ igraph_integer_t igraph_vector_order(const igraph_vector_t* v,
     j = 0;
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
-            igraph_integer_t next = (igraph_integer_t) VECTOR(ptr)[i] - 1;
+            igraph_long_t next = (igraph_long_t) VECTOR(ptr)[i] - 1;
             res->stor_begin[j++] = next;
             while (VECTOR(rad)[next] != 0) {
-                next = (igraph_integer_t) VECTOR(rad)[next] - 1;
+                next = (igraph_long_t) VECTOR(rad)[next] - 1;
                 res->stor_begin[j++] = next;
             }
         }
@@ -198,22 +198,22 @@ igraph_integer_t igraph_vector_order(const igraph_vector_t* v,
     return 0;
 }
 
-igraph_integer_t igraph_vector_order1(const igraph_vector_t* v,
+igraph_long_t igraph_vector_order1(const igraph_vector_t* v,
                          igraph_vector_t* res, igraph_real_t nodes) {
-    igraph_integer_t edges = igraph_vector_size(v);
+    igraph_long_t edges = igraph_vector_size(v);
     igraph_vector_t ptr;
     igraph_vector_t rad;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (igraph_integer_t) nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (igraph_long_t) nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
     IGRAPH_CHECK(igraph_vector_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
-        igraph_integer_t radix = (igraph_integer_t) v->stor_begin[i];
+        igraph_long_t radix = (igraph_long_t) v->stor_begin[i];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[i] = VECTOR(ptr)[radix];
         }
@@ -223,10 +223,10 @@ igraph_integer_t igraph_vector_order1(const igraph_vector_t* v,
     j = 0;
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
-            igraph_integer_t next = (igraph_integer_t) VECTOR(ptr)[i] - 1;
+            igraph_long_t next = (igraph_long_t) VECTOR(ptr)[i] - 1;
             res->stor_begin[j++] = next;
             while (VECTOR(rad)[next] != 0) {
-                next = (igraph_integer_t) VECTOR(rad)[next] - 1;
+                next = (igraph_long_t) VECTOR(rad)[next] - 1;
                 res->stor_begin[j++] = next;
             }
         }
@@ -239,23 +239,23 @@ igraph_integer_t igraph_vector_order1(const igraph_vector_t* v,
     return 0;
 }
 
-igraph_integer_t igraph_vector_order1_int(const igraph_vector_t* v,
-                             igraph_vector_int_t* res,
+igraph_long_t igraph_vector_order1_int(const igraph_vector_t* v,
+                             igraph_vector_long_t* res,
                              igraph_real_t nodes) {
-    igraph_integer_t edges = igraph_vector_size(v);
+    igraph_long_t edges = igraph_vector_size(v);
     igraph_vector_t ptr;
     igraph_vector_t rad;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     IGRAPH_ASSERT(v != NULL);
     IGRAPH_ASSERT(v->stor_begin != NULL);
 
-    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (igraph_integer_t) nodes + 1);
+    IGRAPH_VECTOR_INIT_FINALLY(&ptr, (igraph_long_t) nodes + 1);
     IGRAPH_VECTOR_INIT_FINALLY(&rad, edges);
-    IGRAPH_CHECK(igraph_vector_int_resize(res, edges));
+    IGRAPH_CHECK(igraph_vector_long_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
-        igraph_integer_t radix = (igraph_integer_t) v->stor_begin[i];
+        igraph_long_t radix = (igraph_long_t) v->stor_begin[i];
         if (VECTOR(ptr)[radix] != 0) {
             VECTOR(rad)[i] = VECTOR(ptr)[radix];
         }
@@ -265,10 +265,10 @@ igraph_integer_t igraph_vector_order1_int(const igraph_vector_t* v,
     j = 0;
     for (i = 0; i < nodes + 1; i++) {
         if (VECTOR(ptr)[i] != 0) {
-            igraph_integer_t next = (igraph_integer_t) VECTOR(ptr)[i] - 1;
+            igraph_long_t next = (igraph_long_t) VECTOR(ptr)[i] - 1;
             res->stor_begin[j++] = next;
             while (VECTOR(rad)[next] != 0) {
-                next = (igraph_integer_t) VECTOR(rad)[next] - 1;
+                next = (igraph_long_t) VECTOR(rad)[next] - 1;
                 res->stor_begin[j++] = next;
             }
         }
@@ -281,29 +281,29 @@ igraph_integer_t igraph_vector_order1_int(const igraph_vector_t* v,
     return 0;
 }
 
-igraph_integer_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
-                       igraph_integer_t nodes) {
+igraph_long_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
+                       igraph_long_t nodes) {
 
     igraph_vector_t rad;
     igraph_vector_t ptr;
-    igraph_integer_t edges = igraph_vector_size(v);
-    igraph_integer_t i, c = 0;
+    igraph_long_t edges = igraph_vector_size(v);
+    igraph_long_t i, c = 0;
 
     IGRAPH_VECTOR_INIT_FINALLY(&rad, nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&ptr, edges);
     IGRAPH_CHECK(igraph_vector_resize(res, edges));
 
     for (i = 0; i < edges; i++) {
-        igraph_integer_t elem = (igraph_integer_t) VECTOR(*v)[i];
+        igraph_long_t elem = (igraph_long_t) VECTOR(*v)[i];
         VECTOR(ptr)[i] = VECTOR(rad)[elem];
         VECTOR(rad)[elem] = i + 1;
     }
 
     for (i = 0; i < nodes; i++) {
-        igraph_integer_t p = (igraph_integer_t) VECTOR(rad)[i];
+        igraph_long_t p = (igraph_long_t) VECTOR(rad)[i];
         while (p != 0) {
             VECTOR(*res)[p - 1] = c++;
-            p = (igraph_integer_t) VECTOR(ptr)[p - 1];
+            p = (igraph_long_t) VECTOR(ptr)[p - 1];
         }
     }
 
@@ -314,8 +314,8 @@ igraph_integer_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *r
 }
 
 #ifndef USING_R
-igraph_integer_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
-    igraph_integer_t i, n = igraph_vector_complex_size(v);
+igraph_long_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
+    igraph_long_t i, n = igraph_vector_complex_size(v);
     if (n != 0) {
         igraph_complex_t z = VECTOR(*v)[0];
         printf("%g%+gi", IGRAPH_REAL(z), IGRAPH_IMAG(z));
@@ -329,9 +329,9 @@ igraph_integer_t igraph_vector_complex_print(const igraph_vector_complex_t *v) {
 }
 #endif
 
-igraph_integer_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
+igraph_long_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
                                  FILE *file) {
-    igraph_integer_t i, n = igraph_vector_complex_size(v);
+    igraph_long_t i, n = igraph_vector_complex_size(v);
     if (n != 0) {
         igraph_complex_t z = VECTOR(*v)[0];
         fprintf(file, "%g%+g", IGRAPH_REAL(z), IGRAPH_IMAG(z));
@@ -344,9 +344,9 @@ igraph_integer_t igraph_vector_complex_fprint(const igraph_vector_complex_t *v,
     return 0;
 }
 
-igraph_integer_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
+igraph_long_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
                                igraph_vector_t *real) {
-    igraph_integer_t i, n = (igraph_integer_t) igraph_vector_complex_size(v);
+    igraph_long_t i, n = (igraph_long_t) igraph_vector_complex_size(v);
     IGRAPH_CHECK(igraph_vector_resize(real, n));
     for (i = 0; i < n; i++) {
         VECTOR(*real)[i] = IGRAPH_REAL(VECTOR(*v)[i]);
@@ -355,9 +355,9 @@ igraph_integer_t igraph_vector_complex_real(const igraph_vector_complex_t *v,
     return 0;
 }
 
-igraph_integer_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
+igraph_long_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
                                igraph_vector_t *imag) {
-    igraph_integer_t i, n = (igraph_integer_t) igraph_vector_complex_size(v);
+    igraph_long_t i, n = (igraph_long_t) igraph_vector_complex_size(v);
     IGRAPH_CHECK(igraph_vector_resize(imag, n));
     for (i = 0; i < n; i++) {
         VECTOR(*imag)[i] = IGRAPH_IMAG(VECTOR(*v)[i]);
@@ -366,10 +366,10 @@ igraph_integer_t igraph_vector_complex_imag(const igraph_vector_complex_t *v,
     return 0;
 }
 
-igraph_integer_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
+igraph_long_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v,
                                    igraph_vector_t *real,
                                    igraph_vector_t *imag) {
-    igraph_integer_t i, n = (igraph_integer_t) igraph_vector_complex_size(v);
+    igraph_long_t i, n = (igraph_long_t) igraph_vector_complex_size(v);
     IGRAPH_CHECK(igraph_vector_resize(real, n));
     IGRAPH_CHECK(igraph_vector_resize(imag, n));
     for (i = 0; i < n; i++) {
@@ -381,10 +381,10 @@ igraph_integer_t igraph_vector_complex_realimag(const igraph_vector_complex_t *v
     return 0;
 }
 
-igraph_integer_t igraph_vector_complex_create(igraph_vector_complex_t *v,
+igraph_long_t igraph_vector_complex_create(igraph_vector_complex_t *v,
                                  const igraph_vector_t *real,
                                  const igraph_vector_t *imag) {
-    igraph_integer_t i, n = (igraph_integer_t) igraph_vector_size(real);
+    igraph_long_t i, n = (igraph_long_t) igraph_vector_size(real);
     if (n != igraph_vector_size(imag)) {
         IGRAPH_ERROR("Real and imag vector sizes don't match", IGRAPH_EINVAL);
     }
@@ -399,10 +399,10 @@ igraph_integer_t igraph_vector_complex_create(igraph_vector_complex_t *v,
     return 0;
 }
 
-igraph_integer_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
+igraph_long_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
                                        const igraph_vector_t *r,
                                        const igraph_vector_t *theta) {
-    igraph_integer_t i, n = (igraph_integer_t) igraph_vector_size(r);
+    igraph_long_t i, n = (igraph_long_t) igraph_vector_size(r);
     if (n != igraph_vector_size(theta)) {
         IGRAPH_ERROR("'r' and 'theta' vector sizes don't match", IGRAPH_EINVAL);
     }
@@ -420,7 +420,7 @@ igraph_integer_t igraph_vector_complex_create_polar(igraph_vector_complex_t *v,
 igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
                                   const igraph_vector_t *rhs,
                                   igraph_real_t tol) {
-    igraph_integer_t i, s;
+    igraph_long_t i, s;
     IGRAPH_ASSERT(lhs != 0);
     IGRAPH_ASSERT(rhs != 0);
     IGRAPH_ASSERT(lhs->stor_begin != 0);
@@ -444,8 +444,8 @@ igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
     }
 }
 
-igraph_integer_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
-    igraph_integer_t i, n = igraph_vector_size(v);
+igraph_long_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol) {
+    igraph_long_t i, n = igraph_vector_size(v);
     if (tol < 0.0) {
         IGRAPH_ERROR("`tol' tolerance must be non-negative", IGRAPH_EINVAL);
     }

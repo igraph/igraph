@@ -27,10 +27,10 @@
 
 #include "ncol-header.h"
 
-igraph_integer_t igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
+igraph_long_t igraph_ncol_yylex_init_extra (igraph_i_ncol_parsedata_t* user_defined,
                                   void* scanner);
 void igraph_ncol_yylex_destroy (void *scanner );
-igraph_integer_t igraph_ncol_yyparse (igraph_i_ncol_parsedata_t* context);
+igraph_long_t igraph_ncol_yyparse (igraph_i_ncol_parsedata_t* context);
 void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
 
 /**
@@ -94,7 +94,7 @@ void igraph_ncol_yyset_in  (FILE * in_str, void* yyscanner );
  *
  * \sa \ref igraph_read_graph_lgl(), \ref igraph_write_graph_ncol()
  */
-igraph_integer_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
+igraph_long_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
                            igraph_strvector_t *predefnames,
                            igraph_bool_t names,
                            igraph_add_weights_t weights,
@@ -102,8 +102,8 @@ igraph_integer_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     igraph_vector_t edges, ws;
     igraph_trie_t trie = IGRAPH_TRIE_NULL;
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t no_predefined = 0;
+    igraph_long_t no_of_nodes;
+    igraph_long_t no_predefined = 0;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;
     igraph_attribute_record_t namerec, weightrec;
@@ -119,7 +119,7 @@ igraph_integer_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
 
     /* Add the predefined names, if any */
     if (predefnames != 0) {
-        igraph_integer_t i, id, n;
+        igraph_long_t i, id, n;
         char *key;
         n = no_predefined = igraph_strvector_size(predefnames);
         for (i = 0; i < n; i++) {
@@ -232,7 +232,7 @@ igraph_integer_t igraph_read_graph_ncol(igraph_t *graph, FILE *instream,
  *
  * \sa \ref igraph_read_graph_ncol(), \ref igraph_write_graph_lgl()
  */
-igraph_integer_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
+igraph_long_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                             const char *names, const char *weights) {
     igraph_eit_t it;
     igraph_attribute_type_t nametype, weighttype;
@@ -274,12 +274,12 @@ igraph_integer_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
     if (names == 0 && weights == 0) {
         /* No names, no weights */
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t from, to;
-            igraph_integer_t ret;
+            igraph_long_t from, to;
+            igraph_long_t ret;
             igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
             ret = fprintf(outstream, "%li %li\n",
-                          (igraph_integer_t) from,
-                          (igraph_integer_t) to);
+                          (igraph_long_t) from,
+                          (igraph_long_t) to);
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
@@ -294,9 +294,9 @@ igraph_integer_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                      igraph_vss_all(),
                      &nvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
-            igraph_integer_t ret = 0;
+            igraph_long_t edge = IGRAPH_EIT_GET(it);
+            igraph_long_t from, to;
+            igraph_long_t ret = 0;
             char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             igraph_strvector_get(&nvec, from, &str1);
@@ -317,13 +317,13 @@ igraph_integer_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                      igraph_ess_all(IGRAPH_EDGEORDER_ID),
                      &wvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
-            igraph_integer_t ret1, ret2, ret3;
+            igraph_long_t edge = IGRAPH_EIT_GET(it);
+            igraph_long_t from, to;
+            igraph_long_t ret1, ret2, ret3;
             igraph_edge(graph, edge, &from, &to);
             ret1 = fprintf(outstream, "%li %li ",
-                           (igraph_integer_t)from, (igraph_integer_t)to);
-            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(igraph_integer_t)edge]);
+                           (igraph_long_t)from, (igraph_long_t)to);
+            ret2 = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(igraph_long_t)edge]);
             ret3 = fputc('\n', outstream);
             if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
@@ -346,9 +346,9 @@ igraph_integer_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
                      igraph_vss_all(),
                      &nvec));
         while (!IGRAPH_EIT_END(it)) {
-            igraph_integer_t edge = IGRAPH_EIT_GET(it);
-            igraph_integer_t from, to;
-            igraph_integer_t ret = 0, ret2 = 0;
+            igraph_long_t edge = IGRAPH_EIT_GET(it);
+            igraph_long_t from, to;
+            igraph_long_t ret = 0, ret2 = 0;
             char *str1, *str2;
             igraph_edge(graph, edge, &from, &to);
             igraph_strvector_get(&nvec, from, &str1);
@@ -357,7 +357,7 @@ igraph_integer_t igraph_write_graph_ncol(const igraph_t *graph, FILE *outstream,
             if (ret < 0) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);
             }
-            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(igraph_integer_t)edge]);
+            ret = igraph_real_fprintf_precise(outstream, VECTOR(wvec)[(igraph_long_t)edge]);
             ret2 = fputc('\n', outstream);
             if (ret < 0 || ret2 == EOF) {
                 IGRAPH_ERROR("Write failed", IGRAPH_EFILE);

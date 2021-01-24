@@ -19,7 +19,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
 
     /* Create a directed path graph on 10 vertices. */

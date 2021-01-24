@@ -31,10 +31,10 @@ typedef enum { IGRAPH_DL_MATRIX,
 
 typedef struct {
     void *scanner;
-    igraph_integer_t eof;
-    igraph_integer_t mode;
-    igraph_integer_t n;
-    igraph_integer_t from, to;
+    igraph_long_t eof;
+    igraph_long_t mode;
+    igraph_long_t n;
+    igraph_long_t from, to;
     igraph_vector_t edges;
     igraph_vector_t weights;
     igraph_strvector_t labels;

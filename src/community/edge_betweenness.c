@@ -36,16 +36,16 @@
 
 #include <string.h>
 
-static igraph_integer_t igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
-    igraph_integer_t no = (igraph_integer_t) igraph_vector_max(membership) + 1;
+static igraph_long_t igraph_i_rewrite_membership_vector(igraph_vector_t *membership) {
+    igraph_long_t no = (igraph_long_t) igraph_vector_max(membership) + 1;
     igraph_vector_t idx;
-    igraph_integer_t realno = 0;
-    igraph_integer_t i;
-    igraph_integer_t len = igraph_vector_size(membership);
+    igraph_long_t realno = 0;
+    igraph_long_t i;
+    igraph_long_t len = igraph_vector_size(membership);
 
     IGRAPH_VECTOR_INIT_FINALLY(&idx, no);
     for (i = 0; i < len; i++) {
-        igraph_integer_t t = (igraph_integer_t) VECTOR(*membership)[i];
+        igraph_long_t t = (igraph_long_t) VECTOR(*membership)[i];
         if (VECTOR(idx)[t]) {
             VECTOR(*membership)[i] = VECTOR(idx)[t] - 1;
         } else {
@@ -59,7 +59,7 @@ static igraph_integer_t igraph_i_rewrite_membership_vector(igraph_vector_t *memb
     return 0;
 }
 
-static igraph_integer_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
+static igraph_long_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                              const igraph_bool_t directed,
                                              const igraph_vector_t *edges,
                                              const igraph_vector_t *weights,
@@ -69,11 +69,11 @@ static igraph_integer_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
                                              igraph_vector_t *membership) {
 
     igraph_vector_t mymembership;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i;
     igraph_real_t maxmod = -1;
-    igraph_integer_t midx = 0;
-    igraph_integer_t no_comps;
+    igraph_long_t midx = 0;
+    igraph_long_t no_comps;
     igraph_bool_t use_directed = directed && igraph_is_directed(graph);
 
     IGRAPH_VECTOR_INIT_FINALLY(&mymembership, no_of_nodes);
@@ -115,13 +115,13 @@ static igraph_integer_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
     }
 
     for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
-        igraph_integer_t edge = (igraph_integer_t) VECTOR(*edges)[i];
-        igraph_integer_t from = IGRAPH_FROM(graph, (igraph_integer_t) edge);
-        igraph_integer_t to = IGRAPH_TO(graph, (igraph_integer_t) edge);
-        igraph_integer_t c1 = (igraph_integer_t) VECTOR(mymembership)[from];
-        igraph_integer_t c2 = (igraph_integer_t) VECTOR(mymembership)[to];
+        igraph_long_t edge = (igraph_long_t) VECTOR(*edges)[i];
+        igraph_long_t from = IGRAPH_FROM(graph, (igraph_long_t) edge);
+        igraph_long_t to = IGRAPH_TO(graph, (igraph_long_t) edge);
+        igraph_long_t c1 = (igraph_long_t) VECTOR(mymembership)[from];
+        igraph_long_t c2 = (igraph_long_t) VECTOR(mymembership)[to];
         igraph_real_t actmod;
-        igraph_integer_t j;
+        igraph_long_t j;
         if (c1 != c2) {     /* this is a merge */
             if (res) {
                 MATRIX(*res, midx, 0) = c1;
@@ -218,7 +218,7 @@ static igraph_integer_t igraph_i_community_eb_get_merges2(const igraph_t *graph,
  * Time complexity: O(|E|+|V|log|V|), |V| is the number of vertices,
  * |E| is the number of edges.
  */
-igraph_integer_t igraph_community_eb_get_merges(const igraph_t *graph,
+igraph_long_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    const igraph_bool_t directed,
                                    const igraph_vector_t *edges,
                                    const igraph_vector_t *weights,
@@ -227,10 +227,10 @@ igraph_integer_t igraph_community_eb_get_merges(const igraph_t *graph,
                                    igraph_vector_t *modularity,
                                    igraph_vector_t *membership) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t ptr;
-    igraph_integer_t i, midx = 0;
-    igraph_integer_t no_comps;
+    igraph_long_t i, midx = 0;
+    igraph_long_t no_comps;
 
     if (membership || modularity) {
         return igraph_i_community_eb_get_merges2(graph,
@@ -250,17 +250,17 @@ igraph_integer_t igraph_community_eb_get_merges(const igraph_t *graph,
     }
 
     for (i = igraph_vector_size(edges) - 1; i >= 0; i--) {
-        igraph_integer_t edge = (igraph_integer_t) VECTOR(*edges)[i];
-        igraph_integer_t from, to, c1, c2, idx;
+        igraph_long_t edge = (igraph_long_t) VECTOR(*edges)[i];
+        igraph_long_t from, to, c1, c2, idx;
         igraph_edge(graph, edge, &from, &to);
         idx = from + 1;
         while (VECTOR(ptr)[idx - 1] != 0) {
-            idx = (igraph_integer_t) VECTOR(ptr)[idx - 1];
+            idx = (igraph_long_t) VECTOR(ptr)[idx - 1];
         }
         c1 = idx - 1;
         idx = to + 1;
         while (VECTOR(ptr)[idx - 1] != 0) {
-            idx = (igraph_integer_t) VECTOR(ptr)[idx - 1];
+            idx = (igraph_long_t) VECTOR(ptr)[idx - 1];
         }
         c2 = idx - 1;
         if (c1 != c2) {     /* this is a merge */
@@ -288,9 +288,9 @@ igraph_integer_t igraph_community_eb_get_merges(const igraph_t *graph,
 }
 
 /* Find the smallest active element in the vector */
-static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
+static igraph_long_t igraph_i_vector_which_max_not_null(const igraph_vector_t *v,
                                                    const char *passive) {
-    igraph_integer_t which, i = 0, size = igraph_vector_size(v);
+    igraph_long_t which, i = 0, size = igraph_vector_size(v);
     igraph_real_t max;
     while (passive[i]) {
         i++;
@@ -369,7 +369,7 @@ static igraph_integer_t igraph_i_vector_which_max_not_null(const igraph_vector_t
  *
  * \example examples/simple/igraph_community_edge_betweenness.c
  */
-igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
+igraph_long_t igraph_community_edge_betweenness(const igraph_t *graph,
                                       igraph_vector_t *result,
                                       igraph_vector_t *edge_betweenness,
                                       igraph_matrix_t *merges,
@@ -379,19 +379,19 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
                                       igraph_bool_t directed,
                                       const igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
     double *distance, *tmpscore;
     double *nrgeo;
-    igraph_integer_t source, i, e;
+    igraph_long_t source, i, e;
 
     igraph_inclist_t elist_out, elist_in, fathers;
     igraph_inclist_t *elist_out_p, *elist_in_p;
-    igraph_vector_int_t *neip;
-    igraph_integer_t neino;
+    igraph_vector_long_t *neip;
+    igraph_long_t neino;
     igraph_vector_t eb;
-    igraph_integer_t maxedge, pos;
-    igraph_integer_t from, to;
+    igraph_long_t maxedge, pos;
+    igraph_long_t from, to;
     igraph_bool_t result_owned = 0;
     igraph_stack_t stack = IGRAPH_STACK_NULL;
     igraph_real_t steps, steps_done;
@@ -466,7 +466,7 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
         IGRAPH_CHECK(igraph_2wheap_init(&heap, no_of_nodes));
         IGRAPH_FINALLY(igraph_2wheap_destroy, &heap);
         IGRAPH_CHECK(igraph_inclist_init_empty(&fathers,
-                                               (igraph_integer_t) no_of_nodes));
+                                               (igraph_long_t) no_of_nodes));
         IGRAPH_FINALLY(igraph_inclist_destroy, &fathers);
     }
 
@@ -524,13 +524,13 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
                 distance[source] = 0;
 
                 while (!igraph_dqueue_empty(&q)) {
-                    igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
+                    igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&q);
 
                     neip = igraph_inclist_get(elist_out_p, actnode);
-                    neino = igraph_vector_int_size(neip);
+                    neino = igraph_vector_long_size(neip);
                     for (i = 0; i < neino; i++) {
-                        igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i];
-                        igraph_integer_t neighbor= (igraph_integer_t) IGRAPH_OTHER(graph, edge, actnode);
+                        igraph_long_t edge = (igraph_long_t) VECTOR(*neip)[i];
+                        igraph_long_t neighbor= (igraph_long_t) IGRAPH_OTHER(graph, edge, actnode);
                         if (nrgeo[neighbor] != 0) {
                             /* we've already seen this node, another shortest path? */
                             if (distance[neighbor] == distance[actnode] + 1) {
@@ -550,17 +550,17 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
                    shortest paths to them. Now we do an inverse search, starting
                    with the farthest nodes. */
                 while (!igraph_stack_empty(&stack)) {
-                    igraph_integer_t actnode = (igraph_integer_t) igraph_stack_pop(&stack);
+                    igraph_long_t actnode = (igraph_long_t) igraph_stack_pop(&stack);
                     if (distance[actnode] < 1) {
                         continue;    /* skip source node */
                     }
 
                     /* set the temporary score of the friends */
                     neip = igraph_inclist_get(elist_in_p, actnode);
-                    neino = igraph_vector_int_size(neip);
+                    neino = igraph_vector_long_size(neip);
                     for (i = 0; i < neino; i++) {
-                        igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i];
-                        igraph_integer_t neighbor = IGRAPH_OTHER(graph, edge, actnode);
+                        igraph_long_t edge = (igraph_long_t) VECTOR(*neip)[i];
+                        igraph_long_t neighbor = IGRAPH_OTHER(graph, edge, actnode);
                         if (distance[neighbor] == distance[actnode] - 1 &&
                             nrgeo[neighbor] != 0) {
                             tmpscore[neighbor] +=
@@ -590,25 +590,25 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
                 nrgeo[source] = 1;
 
                 while (!igraph_2wheap_empty(&heap)) {
-                    igraph_integer_t minnei = igraph_2wheap_max_index(&heap);
+                    igraph_long_t minnei = igraph_2wheap_max_index(&heap);
                     igraph_real_t mindist = -igraph_2wheap_delete_max(&heap);
 
                     igraph_stack_push(&stack, minnei);
 
                     neip = igraph_inclist_get(elist_out_p, minnei);
-                    neino = igraph_vector_int_size(neip);
+                    neino = igraph_vector_long_size(neip);
 
                     for (i = 0; i < neino; i++) {
-                        igraph_integer_t edge = VECTOR(*neip)[i];
-                        igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
+                        igraph_long_t edge = VECTOR(*neip)[i];
+                        igraph_long_t to = IGRAPH_OTHER(graph, edge, minnei);
                         igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                         igraph_real_t curdist = distance[to];
-                        igraph_vector_int_t *v;
+                        igraph_vector_long_t *v;
 
                         if (curdist == 0) {
                             /* This is the first finite distance to 'to' */
                             v = igraph_inclist_get(&fathers, to);
-                            igraph_vector_int_resize(v, 1);
+                            igraph_vector_long_resize(v, 1);
                             VECTOR(*v)[0] = edge;
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
@@ -616,7 +616,7 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
                         } else if (altdist < curdist - 1) {
                             /* This is a shorter path */
                             v = igraph_inclist_get(&fathers, to);
-                            igraph_vector_int_resize(v, 1);
+                            igraph_vector_long_resize(v, 1);
                             VECTOR(*v)[0] = edge;
                             nrgeo[to] = nrgeo[minnei];
                             distance[to] = altdist + 1.0;
@@ -624,20 +624,20 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
                         } else if (altdist == curdist - 1) {
                             /* Another path with the same length */
                             v = igraph_inclist_get(&fathers, to);
-                            igraph_vector_int_push_back(v, edge);
+                            igraph_vector_long_push_back(v, edge);
                             nrgeo[to] += nrgeo[minnei];
                         }
                     }
                 } /* igraph_2wheap_empty(&Q) */
 
                 while (!igraph_stack_empty(&stack)) {
-                    igraph_integer_t w = (igraph_integer_t) igraph_stack_pop(&stack);
-                    igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, w);
-                    igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
+                    igraph_long_t w = (igraph_long_t) igraph_stack_pop(&stack);
+                    igraph_vector_long_t *fatv = igraph_inclist_get(&fathers, w);
+                    igraph_long_t fatv_len = igraph_vector_long_size(fatv);
 
                     for (i = 0; i < fatv_len; i++) {
-                        igraph_integer_t fedge = (igraph_integer_t) VECTOR(*fatv)[i];
-                        igraph_integer_t neighbor = IGRAPH_OTHER(graph, fedge, w);
+                        igraph_long_t fedge = (igraph_long_t) VECTOR(*fatv)[i];
+                        igraph_long_t neighbor = IGRAPH_OTHER(graph, fedge, w);
                         tmpscore[neighbor] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
                         VECTOR(eb)[fedge] += (tmpscore[w] + 1) * nrgeo[neighbor] / nrgeo[w];
                     }
@@ -645,7 +645,7 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
                     tmpscore[w] = 0;
                     distance[w] = 0;
                     nrgeo[w] = 0;
-                    igraph_vector_int_clear(fatv);
+                    igraph_vector_long_clear(fatv);
                 }
             } /* source < no_of_nodes */
         }
@@ -661,19 +661,19 @@ igraph_integer_t igraph_community_edge_betweenness(const igraph_t *graph,
             }
         }
         passive[maxedge] = 1;
-        igraph_edge(graph, (igraph_integer_t) maxedge, &from, &to);
+        igraph_edge(graph, (igraph_long_t) maxedge, &from, &to);
 
         neip = igraph_inclist_get(elist_in_p, to);
-        neino = igraph_vector_int_size(neip);
-        igraph_vector_int_search(neip, 0, maxedge, &pos);
+        neino = igraph_vector_long_size(neip);
+        igraph_vector_long_search(neip, 0, maxedge, &pos);
         VECTOR(*neip)[pos] = VECTOR(*neip)[neino - 1];
-        igraph_vector_int_pop_back(neip);
+        igraph_vector_long_pop_back(neip);
 
         neip = igraph_inclist_get(elist_out_p, from);
-        neino = igraph_vector_int_size(neip);
-        igraph_vector_int_search(neip, 0, maxedge, &pos);
+        neino = igraph_vector_long_size(neip);
+        igraph_vector_long_search(neip, 0, maxedge, &pos);
         VECTOR(*neip)[pos] = VECTOR(*neip)[neino - 1];
-        igraph_vector_int_pop_back(neip);
+        igraph_vector_long_pop_back(neip);
     }
 
     IGRAPH_PROGRESS("Edge betweenness community detection: ", 100.0, NULL);

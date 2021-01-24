@@ -7,7 +7,7 @@
    This value, 'graph', and 'weights_array' must be consistent. */
 #define N_EDGES 24
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     const igraph_real_t weights_array[N_EDGES] = {4, 4, 4, 3, 1, 5, 1, 2, 4, 5, 3, 5, 5, 4, 1, 1, 5, 4, 1, 1, 2, 1, 3, 5};
     const igraph_vector_t weights;

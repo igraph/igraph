@@ -24,9 +24,9 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-igraph_integer_t compare_vectors(const void *p1, const void *p2) {
+igraph_long_t compare_vectors(const void *p1, const void *p2) {
     igraph_vector_t *v1, *v2;
-    igraph_integer_t s1, s2, i;
+    igraph_long_t s1, s2, i;
 
     v1 = *((igraph_vector_t **) p1);
     v2 = *((igraph_vector_t **) p2);
@@ -51,7 +51,7 @@ igraph_integer_t compare_vectors(const void *p1, const void *p2) {
 
 /* Takes a pointer vector of vectors. Sorts each vector, then sorts the pointer vector */
 void canonicalize_list(igraph_vector_ptr_t *list) {
-    igraph_integer_t i, len;
+    igraph_long_t i, len;
     len = igraph_vector_ptr_size(list);
     for (i = 0; i < len; ++i) {
         igraph_vector_sort((igraph_vector_t *) VECTOR(*list)[i]);
@@ -60,19 +60,19 @@ void canonicalize_list(igraph_vector_ptr_t *list) {
 }
 
 void print_vector(igraph_vector_t *v) {
-    igraph_integer_t i, n = igraph_vector_size(v);
+    igraph_long_t i, n = igraph_vector_size(v);
     for (i = 0; i < n; i++) {
-        printf(" %li", (igraph_integer_t) VECTOR(*v)[i]);
+        printf(" %li", (igraph_long_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
 
-void warning_handler_ignore(const char* reason, const char* file, igraph_integer_t line, igraph_integer_t e) {
+void warning_handler_ignore(const char* reason, const char* file, igraph_long_t line, igraph_long_t e) {
 }
 
 
 struct userdata {
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_vector_ptr_t *list;
 };
 
@@ -113,14 +113,14 @@ void test_callback(const igraph_t *graph) {
 }
 
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_ptr_t result;
     igraph_es_t es;
-    igraph_integer_t omega;
-    igraph_integer_t i, j, n;
-    const igraph_integer_t params[] = {4, -1, 2, 2, 0, 0, -1, -1};
+    igraph_long_t omega;
+    igraph_long_t i, j, n;
+    const igraph_long_t params[] = {4, -1, 2, 2, 0, 0, -1, -1};
 
     igraph_set_warning_handler(warning_handler_ignore);
 
@@ -137,7 +137,7 @@ igraph_integer_t main() {
             igraph_largest_cliques(&g, &result);
         }
         n = igraph_vector_ptr_size(&result);
-        printf("%ld cliques found\n", (igraph_integer_t)n);
+        printf("%ld cliques found\n", (igraph_long_t)n);
         canonicalize_list(&result);
         for (i = 0; i < n; i++) {
             igraph_vector_t* v = (igraph_vector_t*) igraph_vector_ptr_e(&result, i);
@@ -148,7 +148,7 @@ igraph_integer_t main() {
     }
 
     igraph_clique_number(&g, &omega);
-    printf("omega=%ld\n", (igraph_integer_t)omega);
+    printf("omega=%ld\n", (igraph_long_t)omega);
 
     test_callback(&g);
 

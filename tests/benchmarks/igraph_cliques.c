@@ -3,10 +3,10 @@
 
 #include "bench.h"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_ptr_t res;
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

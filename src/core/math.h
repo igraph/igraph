@@ -53,7 +53,7 @@ __BEGIN_DECLS
  * Compiler-related hacks, mostly because of Microsoft Visual C++
  */
 double igraph_i_round(double X);
-igraph_integer_t igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
+igraph_long_t igraph_i_snprintf(char *buffer, size_t count, const char *format, ...);
 
 double igraph_log2(const double a);
 double igraph_log1p(double a);
@@ -88,8 +88,8 @@ double igraph_fmin(double a, double b);
     == log(2*pi)/2 */
 #endif
 
-igraph_integer_t igraph_almost_equals(double a, double b, double eps);
-igraph_integer_t igraph_cmp_epsilon(double a, double b, double eps);
+igraph_long_t igraph_almost_equals(double a, double b, double eps);
+igraph_long_t igraph_cmp_epsilon(double a, double b, double eps);
 
 __END_DECLS
 

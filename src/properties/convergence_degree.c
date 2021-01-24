@@ -35,13 +35,13 @@
 /*
  * \example examples/simple/graph_convergence_degree.c
  */
-igraph_integer_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
+igraph_long_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_t *result,
                               igraph_vector_t *ins, igraph_vector_t *outs) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t i, j, k, n;
-    igraph_integer_t *geodist;
-    igraph_vector_int_t *eids;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t i, j, k, n;
+    igraph_long_t *geodist;
+    igraph_vector_long_t *eids;
     igraph_vector_t *ins_p, *outs_p, ins_v, outs_v;
     igraph_dqueue_t q;
     igraph_inclist_t inclist;
@@ -71,7 +71,7 @@ igraph_integer_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_
         igraph_vector_null(outs_p);
     }
 
-    geodist = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    geodist = igraph_Calloc(no_of_nodes, igraph_long_t);
     if (geodist == 0) {
         IGRAPH_ERROR("Cannot calculate convergence degrees", IGRAPH_ENOMEM);
     }
@@ -87,18 +87,18 @@ igraph_integer_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_
         vec = (k == 0) ? VECTOR(*ins_p) : VECTOR(*outs_p);
         for (i = 0; i < no_of_nodes; i++) {
             igraph_dqueue_clear(&q);
-            memset(geodist, 0, sizeof(igraph_integer_t) * (size_t) no_of_nodes);
+            memset(geodist, 0, sizeof(igraph_long_t) * (size_t) no_of_nodes);
             geodist[i] = 1;
             IGRAPH_CHECK(igraph_dqueue_push(&q, i));
             IGRAPH_CHECK(igraph_dqueue_push(&q, 0.0));
             while (!igraph_dqueue_empty(&q)) {
-                igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
-                igraph_integer_t actdist = (igraph_integer_t) igraph_dqueue_pop(&q);
+                igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&q);
+                igraph_long_t actdist = (igraph_long_t) igraph_dqueue_pop(&q);
                 IGRAPH_ALLOW_INTERRUPTION();
                 eids = igraph_inclist_get(&inclist, actnode);
-                n = igraph_vector_int_size(eids);
+                n = igraph_vector_long_size(eids);
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
+                    igraph_long_t neighbor = IGRAPH_OTHER(graph, VECTOR(*eids)[j], actnode);
                     if (geodist[neighbor] != 0) {
                         /* we've already seen this node, another shortest path? */
                         if (geodist[neighbor] - 1 == actdist + 1) {
@@ -106,12 +106,12 @@ igraph_integer_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_
                              * increase either the size of the infield or the outfield */
                             if (!directed) {
                                 if (actnode < neighbor) {
-                                    VECTOR(*ins_p)[(igraph_integer_t)VECTOR(*eids)[j]] += 1;
+                                    VECTOR(*ins_p)[(igraph_long_t)VECTOR(*eids)[j]] += 1;
                                 } else {
-                                    VECTOR(*outs_p)[(igraph_integer_t)VECTOR(*eids)[j]] += 1;
+                                    VECTOR(*outs_p)[(igraph_long_t)VECTOR(*eids)[j]] += 1;
                                 }
                             } else {
-                                vec[(igraph_integer_t)VECTOR(*eids)[j]] += 1;
+                                vec[(igraph_long_t)VECTOR(*eids)[j]] += 1;
                             }
                         } else if (geodist[neighbor] - 1 < actdist + 1) {
                             continue;
@@ -124,12 +124,12 @@ igraph_integer_t igraph_convergence_degree(const igraph_t *graph, igraph_vector_
                          * increase either the size of the infield or the outfield */
                         if (!directed) {
                             if (actnode < neighbor) {
-                                VECTOR(*ins_p)[(igraph_integer_t)VECTOR(*eids)[j]] += 1;
+                                VECTOR(*ins_p)[(igraph_long_t)VECTOR(*eids)[j]] += 1;
                             } else {
-                                VECTOR(*outs_p)[(igraph_integer_t)VECTOR(*eids)[j]] += 1;
+                                VECTOR(*outs_p)[(igraph_long_t)VECTOR(*eids)[j]] += 1;
                             }
                         } else {
-                            vec[(igraph_integer_t)VECTOR(*eids)[j]] += 1;
+                            vec[(igraph_long_t)VECTOR(*eids)[j]] += 1;
                         }
                         geodist[neighbor] = actdist + 2;
                     }

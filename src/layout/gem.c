@@ -62,17 +62,17 @@
  * performed.
  */
 
-igraph_integer_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
-                      igraph_bool_t use_seed, igraph_integer_t maxiter,
+igraph_long_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
+                      igraph_bool_t use_seed, igraph_long_t maxiter,
                       igraph_real_t temp_max, igraph_real_t temp_min,
                       igraph_real_t temp_init) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
-    igraph_vector_int_t perm;
+    igraph_long_t no_nodes = igraph_vcount(graph);
+    igraph_vector_long_t perm;
     igraph_vector_float_t impulse_x, impulse_y, temp, skew_gauge;
-    igraph_integer_t i;
+    igraph_long_t i;
     float temp_global;
-    igraph_integer_t perm_pointer = 0;
+    igraph_long_t perm_pointer = 0;
     float barycenter_x = 0, barycenter_y = 0;
     igraph_vector_t phi;
     igraph_vector_t neis;
@@ -121,8 +121,8 @@ igraph_integer_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     IGRAPH_FINALLY(igraph_vector_float_destroy, &temp);
     IGRAPH_CHECK(igraph_vector_float_init(&skew_gauge, no_nodes));
     IGRAPH_FINALLY(igraph_vector_float_destroy, &skew_gauge);
-    IGRAPH_CHECK(igraph_vector_int_init_seq(&perm, 0, no_nodes - 1));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &perm);
+    IGRAPH_CHECK(igraph_vector_long_init_seq(&perm, 0, no_nodes - 1));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &perm);
     IGRAPH_VECTOR_INIT_FINALLY(&phi, no_nodes);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 10);
 
@@ -151,14 +151,14 @@ igraph_integer_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
     temp_global = temp_init * no_nodes;
 
     while (temp_global > temp_min * no_nodes && maxiter > 0) {
-        igraph_integer_t u, v, nlen, j;
+        igraph_long_t u, v, nlen, j;
         float px, py, pvx, pvy;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
         /* choose a vertex v to update */
         if (!perm_pointer) {
-            igraph_vector_int_shuffle(&perm);
+            igraph_vector_long_shuffle(&perm);
             perm_pointer = no_nodes - 1;
         }
         v = VECTOR(perm)[perm_pointer--];
@@ -186,7 +186,7 @@ igraph_integer_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, v, IGRAPH_ALL));
         nlen = igraph_vector_size(&neis);
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t u = VECTOR(neis)[j];
+            igraph_long_t u = VECTOR(neis)[j];
             float dx = MATRIX(*res, v, 0) - MATRIX(*res, u, 0);
             float dy = MATRIX(*res, v, 1) - MATRIX(*res, u, 1);
             float dist2 = dx * dx + dy * dy;
@@ -237,7 +237,7 @@ igraph_integer_t igraph_layout_gem(const igraph_t *graph, igraph_matrix_t *res,
 
     igraph_vector_destroy(&neis);
     igraph_vector_destroy(&phi);
-    igraph_vector_int_destroy(&perm);
+    igraph_vector_long_destroy(&perm);
     igraph_vector_float_destroy(&skew_gauge);
     igraph_vector_float_destroy(&temp);
     igraph_vector_float_destroy(&impulse_y);

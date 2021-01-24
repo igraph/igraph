@@ -39,7 +39,7 @@
  */
 static igraph_bool_t igraph_i_motifs_randesu_update_hist(
         const igraph_t *graph,
-        igraph_vector_t *vids, igraph_integer_t isoclass, void* extra) {
+        igraph_vector_t *vids, igraph_long_t isoclass, void* extra) {
     igraph_vector_t *hist = (igraph_vector_t*)extra;
     IGRAPH_UNUSED(graph); IGRAPH_UNUSED(vids);
     VECTOR(*hist)[isoclass]++;
@@ -106,9 +106,9 @@ static igraph_bool_t igraph_i_motifs_randesu_update_hist(
  *
  * \example examples/simple/igraph_motifs_randesu.c
  */
-igraph_integer_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
-                          igraph_integer_t size, const igraph_vector_t *cut_prob) {
-    igraph_integer_t histlen;
+igraph_long_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *hist,
+                          igraph_long_t size, const igraph_vector_t *cut_prob) {
+    igraph_long_t histlen;
 
     if (size != 3 && size != 4) {
         IGRAPH_ERROR("Only 3 and 4 vertex motifs are implemented",
@@ -134,10 +134,10 @@ igraph_integer_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *h
         }
     } else if (size == 4) {
         if (igraph_is_directed(graph)) {
-            igraph_integer_t not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
+            igraph_long_t not_connected[] = { 0, 1, 2, 4, 5, 6, 9, 10, 11, 15, 22, 23, 27,
                                     28, 33, 34, 39, 62, 120
                                   };
-            igraph_integer_t i, n = sizeof(not_connected) / sizeof(igraph_integer_t);
+            igraph_long_t i, n = sizeof(not_connected) / sizeof(igraph_long_t);
             for (i = 0; i < n; i++) {
                 VECTOR(*hist)[not_connected[i]] = IGRAPH_NAN;
             }
@@ -184,25 +184,25 @@ igraph_integer_t igraph_motifs_randesu(const igraph_t *graph, igraph_vector_t *h
  * \example examples/simple/igraph_motifs_randesu.c
  */
 
-igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_integer_t size,
+igraph_long_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_long_t size,
                                    const igraph_vector_t *cut_prob, igraph_motifs_handler_t *callback,
                                    void* extra) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_adjlist_t allneis, alloutneis;
-    igraph_vector_int_t *neis;
-    igraph_integer_t father;
-    igraph_integer_t i, j, s;
-    igraph_integer_t motifs = 0;
+    igraph_vector_long_t *neis;
+    igraph_long_t father;
+    igraph_long_t i, j, s;
+    igraph_long_t motifs = 0;
 
     igraph_vector_t vids;     /* this is G */
     igraph_vector_t adjverts; /* this is V_E */
     igraph_stack_t stack;     /* this is S */
-    igraph_integer_t *added;
+    igraph_long_t *added;
     char *subg;
 
-    const igraph_integer_t *arr_idx, *arr_code;
-    igraph_integer_t code = 0;
+    const igraph_long_t *arr_idx, *arr_code;
+    igraph_long_t code = 0;
     unsigned char mul, idx;
 
     igraph_bool_t terminate = 0;
@@ -237,7 +237,7 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
         }
     }
 
-    added = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    added = igraph_Calloc(no_of_nodes, igraph_long_t);
     if (added == 0) {
         IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
     }
@@ -262,7 +262,7 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
     RNG_BEGIN();
 
     for (father = 0; father < no_of_nodes; father++) {
-        igraph_integer_t level;
+        igraph_long_t level;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -279,9 +279,9 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
         /* init V_E */
         igraph_vector_clear(&adjverts);
         neis = igraph_adjlist_get(&allneis, father);
-        s = igraph_vector_int_size(neis);
+        s = igraph_vector_long_size(neis);
         for (i = 0; i < s; i++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[i];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[i];
             if (!added[nei] && nei > father) {
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, father));
@@ -298,25 +298,25 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
             if (level == size - 1) {
                 s = igraph_vector_size(&adjverts) / 2;
                 for (i = 0; i < s; i++) {
-                    igraph_integer_t k, s2;
-                    igraph_integer_t last;
+                    igraph_long_t k, s2;
+                    igraph_long_t last;
 
                     if (cp != 0 && RNG_UNIF01() < cp) {
                         continue;
                     }
                     motifs += 1;
 
-                    last = (igraph_integer_t) VECTOR(adjverts)[2 * i];
+                    last = (igraph_long_t) VECTOR(adjverts)[2 * i];
                     IGRAPH_CHECK(igraph_vector_push_back(&vids, last));
                     subg[last] = (char) size;
 
                     code = 0; idx = 0;
                     for (k = 0; k < size; k++) {
-                        igraph_integer_t from = (igraph_integer_t) VECTOR(vids)[k];
+                        igraph_long_t from = (igraph_long_t) VECTOR(vids)[k];
                         neis = igraph_adjlist_get(&alloutneis, from);
-                        s2 = igraph_vector_int_size(neis);
+                        s2 = igraph_vector_long_size(neis);
                         for (j = 0; j < s2; j++) {
-                            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+                            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
                             if (subg[nei] && k != subg[nei] - 1) {
                                 idx = (unsigned char) (mul * k + (subg[nei] - 1));
                                 code |= arr_idx[idx];
@@ -324,7 +324,7 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
                         }
                     }
 
-                    if (callback(graph, &vids, (igraph_integer_t) arr_code[code], extra)) {
+                    if (callback(graph, &vids, (igraph_long_t) arr_code[code], extra)) {
                         terminate = 1;
                         break;
                     }
@@ -342,8 +342,8 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
             if (level < size - 1 &&
                 !igraph_vector_empty(&adjverts)) {
                 /* we might step down */
-                igraph_integer_t neifather = (igraph_integer_t) igraph_vector_pop_back(&adjverts);
-                igraph_integer_t nei = (igraph_integer_t) igraph_vector_pop_back(&adjverts);
+                igraph_long_t neifather = (igraph_long_t) igraph_vector_pop_back(&adjverts);
+                igraph_long_t nei = (igraph_long_t) igraph_vector_pop_back(&adjverts);
 
                 if (cp == 0 || RNG_UNIF01() > cp) {
                     /* yes, step down */
@@ -355,9 +355,9 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
                     IGRAPH_CHECK(igraph_stack_push(&stack, level));
 
                     neis = igraph_adjlist_get(&allneis, nei);
-                    s = igraph_vector_int_size(neis);
+                    s = igraph_vector_long_size(neis);
                     for (i = 0; i < s; i++) {
-                        igraph_integer_t nei2 = (igraph_integer_t) VECTOR(*neis)[i];
+                        igraph_long_t nei2 = (igraph_long_t) VECTOR(*neis)[i];
                         if (!added[nei2] && nei2 > father) {
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei2));
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
@@ -367,22 +367,22 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
                 }
             } else {
                 /* no, step back */
-                igraph_integer_t nei, neifather;
+                igraph_long_t nei, neifather;
                 while (!igraph_stack_empty(&stack) &&
                        level == igraph_stack_top(&stack) - 1) {
                     igraph_stack_pop(&stack);
-                    nei = (igraph_integer_t) igraph_stack_pop(&stack);
-                    neifather = (igraph_integer_t) igraph_stack_pop(&stack);
+                    nei = (igraph_long_t) igraph_stack_pop(&stack);
+                    neifather = (igraph_long_t) igraph_stack_pop(&stack);
                     igraph_vector_push_back(&adjverts, nei);
                     igraph_vector_push_back(&adjverts, neifather);
                 }
 
-                nei = (igraph_integer_t) igraph_vector_pop_back(&vids);
+                nei = (igraph_long_t) igraph_vector_pop_back(&vids);
                 subg[nei] = 0; added[nei] -= 1; level -= 1;
                 neis = igraph_adjlist_get(&allneis, nei);
-                s = igraph_vector_int_size(neis);
+                s = igraph_vector_long_size(neis);
                 for (i = 0; i < s; i++) {
-                    added[ (igraph_integer_t) VECTOR(*neis)[i] ] -= 1;
+                    added[ (igraph_long_t) VECTOR(*neis)[i] ] -= 1;
                 }
                 while (!igraph_vector_empty(&adjverts) &&
                        igraph_vector_tail(&adjverts) == nei) {
@@ -402,9 +402,9 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
         added[father] -= 1;
         subg[father] = 0;
         neis = igraph_adjlist_get(&allneis, father);
-        s = igraph_vector_int_size(neis);
+        s = igraph_vector_long_size(neis);
         for (i = 0; i < s; i++) {
-            added[ (igraph_integer_t) VECTOR(*neis)[i] ] -= 1;
+            added[ (igraph_long_t) VECTOR(*neis)[i] ] -= 1;
         }
 
     } /* for father */
@@ -463,23 +463,23 @@ igraph_integer_t igraph_motifs_randesu_callback(const igraph_t *graph, igraph_in
  * Time complexity: TODO.
  */
 
-igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_integer_t *est,
-                                   igraph_integer_t size, const igraph_vector_t *cut_prob,
-                                   igraph_integer_t sample_size,
+igraph_long_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_long_t *est,
+                                   igraph_long_t size, const igraph_vector_t *cut_prob,
+                                   igraph_long_t sample_size,
                                    const igraph_vector_t *parsample) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t neis;
 
     igraph_vector_t vids;     /* this is G */
     igraph_vector_t adjverts; /* this is V_E */
     igraph_stack_t stack;     /* this is S */
-    igraph_integer_t *added;
+    igraph_long_t *added;
     igraph_vector_t *sample;
-    igraph_integer_t sam;
-    igraph_integer_t i;
+    igraph_long_t sam;
+    igraph_long_t i;
 
-    added = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    added = igraph_Calloc(no_of_nodes, igraph_long_t);
     if (added == 0) {
         IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
     }
@@ -501,7 +501,7 @@ igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_in
         IGRAPH_CHECK(igraph_random_sample(sample, 0, no_of_nodes - 1, sample_size));
     } else {
         sample = (igraph_vector_t*)parsample;
-        sample_size = (igraph_integer_t) igraph_vector_size(sample);
+        sample_size = (igraph_long_t) igraph_vector_size(sample);
     }
 
     *est = 0;
@@ -509,8 +509,8 @@ igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_in
     RNG_BEGIN();
 
     for (sam = 0; sam < sample_size; sam++) {
-        igraph_integer_t father = (igraph_integer_t) VECTOR(*sample)[sam];
-        igraph_integer_t level, s;
+        igraph_long_t father = (igraph_long_t) VECTOR(*sample)[sam];
+        igraph_long_t level, s;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -526,11 +526,11 @@ igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_in
 
         /* init V_E */
         igraph_vector_clear(&adjverts);
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) father,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) father,
                                       IGRAPH_ALL));
         s = igraph_vector_size(&neis);
         for (i = 0; i < s; i++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(neis)[i];
+            igraph_long_t nei = (igraph_long_t) VECTOR(neis)[i];
             if (!added[nei] && nei > father) {
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, father));
@@ -557,8 +557,8 @@ igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_in
             if (level < size - 1 &&
                 !igraph_vector_empty(&adjverts)) {
                 /* We might step down */
-                igraph_integer_t neifather = (igraph_integer_t) igraph_vector_pop_back(&adjverts);
-                igraph_integer_t nei = (igraph_integer_t) igraph_vector_pop_back(&adjverts);
+                igraph_long_t neifather = (igraph_long_t) igraph_vector_pop_back(&adjverts);
+                igraph_long_t nei = (igraph_long_t) igraph_vector_pop_back(&adjverts);
 
                 if (cp == 0 || RNG_UNIF01() > cp) {
                     /* Yes, step down */
@@ -569,11 +569,11 @@ igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_in
                     IGRAPH_CHECK(igraph_stack_push(&stack, nei));
                     IGRAPH_CHECK(igraph_stack_push(&stack, level));
 
-                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) nei,
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) nei,
                                                   IGRAPH_ALL));
                     s = igraph_vector_size(&neis);
                     for (i = 0; i < s; i++) {
-                        igraph_integer_t nei2 = (igraph_integer_t) VECTOR(neis)[i];
+                        igraph_long_t nei2 = (igraph_long_t) VECTOR(neis)[i];
                         if (!added[nei2] && nei2 > father) {
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei2));
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
@@ -583,23 +583,23 @@ igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_in
                 }
             } else {
                 /* no, step back */
-                igraph_integer_t nei, neifather;
+                igraph_long_t nei, neifather;
                 while (!igraph_stack_empty(&stack) &&
                        level == igraph_stack_top(&stack) - 1) {
                     igraph_stack_pop(&stack);
-                    nei = (igraph_integer_t) igraph_stack_pop(&stack);
-                    neifather = (igraph_integer_t) igraph_stack_pop(&stack);
+                    nei = (igraph_long_t) igraph_stack_pop(&stack);
+                    neifather = (igraph_long_t) igraph_stack_pop(&stack);
                     igraph_vector_push_back(&adjverts, nei);
                     igraph_vector_push_back(&adjverts, neifather);
                 }
 
-                nei = (igraph_integer_t) igraph_vector_pop_back(&vids);
+                nei = (igraph_long_t) igraph_vector_pop_back(&vids);
                 added[nei] -= 1; level -= 1;
-                IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) nei,
+                IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) nei,
                                               IGRAPH_ALL));
                 s = igraph_vector_size(&neis);
                 for (i = 0; i < s; i++) {
-                    added[ (igraph_integer_t) VECTOR(neis)[i] ] -= 1;
+                    added[ (igraph_long_t) VECTOR(neis)[i] ] -= 1;
                 }
                 while (!igraph_vector_empty(&adjverts) &&
                        igraph_vector_tail(&adjverts) == nei) {
@@ -612,11 +612,11 @@ igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_in
 
         /* clear the added vector */
         added[father] -= 1;
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) father,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) father,
                                       IGRAPH_ALL));
         s = igraph_vector_size(&neis);
         for (i = 0; i < s; i++) {
-            added[ (igraph_integer_t) VECTOR(neis)[i] ] -= 1;
+            added[ (igraph_long_t) VECTOR(neis)[i] ] -= 1;
         }
 
     } /* for father */
@@ -662,20 +662,20 @@ igraph_integer_t igraph_motifs_randesu_estimate(const igraph_t *graph, igraph_in
  * Time complexity: TODO.
  */
 
-igraph_integer_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_t *no,
-                             igraph_integer_t size, const igraph_vector_t *cut_prob) {
+igraph_long_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_long_t *no,
+                             igraph_long_t size, const igraph_vector_t *cut_prob) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t neis;
 
     igraph_vector_t vids;     /* this is G */
     igraph_vector_t adjverts; /* this is V_E */
     igraph_stack_t stack;     /* this is S */
-    igraph_integer_t *added;
-    igraph_integer_t father;
-    igraph_integer_t i;
+    igraph_long_t *added;
+    igraph_long_t father;
+    igraph_long_t i;
 
-    added = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    added = igraph_Calloc(no_of_nodes, igraph_long_t);
     if (added == 0) {
         IGRAPH_ERROR("Cannot find motifs", IGRAPH_ENOMEM);
     }
@@ -692,7 +692,7 @@ igraph_integer_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_
     RNG_BEGIN();
 
     for (father = 0; father < no_of_nodes; father++) {
-        igraph_integer_t level, s;
+        igraph_long_t level, s;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -708,11 +708,11 @@ igraph_integer_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_
 
         /* init V_E */
         igraph_vector_clear(&adjverts);
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) father,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) father,
                                       IGRAPH_ALL));
         s = igraph_vector_size(&neis);
         for (i = 0; i < s; i++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(neis)[i];
+            igraph_long_t nei = (igraph_long_t) VECTOR(neis)[i];
             if (!added[nei] && nei > father) {
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
                 IGRAPH_CHECK(igraph_vector_push_back(&adjverts, father));
@@ -739,8 +739,8 @@ igraph_integer_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_
             if (level < size - 1 &&
                 !igraph_vector_empty(&adjverts)) {
                 /* We might step down */
-                igraph_integer_t neifather = (igraph_integer_t) igraph_vector_pop_back(&adjverts);
-                igraph_integer_t nei = (igraph_integer_t) igraph_vector_pop_back(&adjverts);
+                igraph_long_t neifather = (igraph_long_t) igraph_vector_pop_back(&adjverts);
+                igraph_long_t nei = (igraph_long_t) igraph_vector_pop_back(&adjverts);
 
                 if (cp == 0 || RNG_UNIF01() > cp) {
                     /* Yes, step down */
@@ -751,11 +751,11 @@ igraph_integer_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_
                     IGRAPH_CHECK(igraph_stack_push(&stack, nei));
                     IGRAPH_CHECK(igraph_stack_push(&stack, level));
 
-                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) nei,
+                    IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) nei,
                                                   IGRAPH_ALL));
                     s = igraph_vector_size(&neis);
                     for (i = 0; i < s; i++) {
-                        igraph_integer_t nei2 = (igraph_integer_t) VECTOR(neis)[i];
+                        igraph_long_t nei2 = (igraph_long_t) VECTOR(neis)[i];
                         if (!added[nei2] && nei2 > father) {
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei2));
                             IGRAPH_CHECK(igraph_vector_push_back(&adjverts, nei));
@@ -765,23 +765,23 @@ igraph_integer_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_
                 }
             } else {
                 /* no, step back */
-                igraph_integer_t nei, neifather;
+                igraph_long_t nei, neifather;
                 while (!igraph_stack_empty(&stack) &&
                        level == igraph_stack_top(&stack) - 1) {
                     igraph_stack_pop(&stack);
-                    nei = (igraph_integer_t) igraph_stack_pop(&stack);
-                    neifather = (igraph_integer_t) igraph_stack_pop(&stack);
+                    nei = (igraph_long_t) igraph_stack_pop(&stack);
+                    neifather = (igraph_long_t) igraph_stack_pop(&stack);
                     igraph_vector_push_back(&adjverts, nei);
                     igraph_vector_push_back(&adjverts, neifather);
                 }
 
-                nei = (igraph_integer_t) igraph_vector_pop_back(&vids);
+                nei = (igraph_long_t) igraph_vector_pop_back(&vids);
                 added[nei] -= 1; level -= 1;
-                IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) nei,
+                IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) nei,
                                               IGRAPH_ALL));
                 s = igraph_vector_size(&neis);
                 for (i = 0; i < s; i++) {
-                    added[ (igraph_integer_t) VECTOR(neis)[i] ] -= 1;
+                    added[ (igraph_long_t) VECTOR(neis)[i] ] -= 1;
                 }
                 while (!igraph_vector_empty(&adjverts) &&
                        igraph_vector_tail(&adjverts) == nei) {
@@ -794,11 +794,11 @@ igraph_integer_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_
 
         /* clear the added vector */
         added[father] -= 1;
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) father,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) father,
                                       IGRAPH_ALL));
         s = igraph_vector_size(&neis);
         for (i = 0; i < s; i++) {
-            added[ (igraph_integer_t) VECTOR(neis)[i] ] -= 1;
+            added[ (igraph_long_t) VECTOR(neis)[i] ] -= 1;
         }
 
     } /* for father */
@@ -846,13 +846,13 @@ igraph_integer_t igraph_motifs_randesu_no(const igraph_t *graph, igraph_integer_
  * of edges.
  */
 
-igraph_integer_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut,
-                       igraph_integer_t *asym, igraph_integer_t *null) {
+igraph_long_t igraph_dyad_census(const igraph_t *graph, igraph_long_t *mut,
+                       igraph_long_t *asym, igraph_long_t *null) {
 
-    igraph_integer_t nonrec = 0, rec = 0;
+    igraph_long_t nonrec = 0, rec = 0;
     igraph_vector_t inneis, outneis;
-    igraph_integer_t vc = igraph_vcount(graph);
-    igraph_integer_t i;
+    igraph_long_t vc = igraph_vcount(graph);
+    igraph_long_t i;
 
     if (!igraph_is_directed(graph)) {
         IGRAPH_WARNING("Dyad census called on undirected graph");
@@ -862,7 +862,7 @@ igraph_integer_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut
     IGRAPH_VECTOR_INIT_FINALLY(&outneis, 0);
 
     for (i = 0; i < vc; i++) {
-        igraph_integer_t ip, op;
+        igraph_long_t ip, op;
         igraph_neighbors(graph, &inneis, i, IGRAPH_IN);
         igraph_neighbors(graph, &outneis, i, IGRAPH_OUT);
 
@@ -911,13 +911,13 @@ igraph_integer_t igraph_dyad_census(const igraph_t *graph, igraph_integer_t *mut
  * TODO
  */
 
-igraph_integer_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
+igraph_long_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *res2,
                            igraph_real_t *res4) {
 
-    igraph_integer_t vc = igraph_vcount(graph);
+    igraph_long_t vc = igraph_vcount(graph);
     igraph_vector_long_t seen;
-    igraph_vector_int_t *neis, *neis2;
-    igraph_integer_t i, j, k, s, neilen, neilen2, ign;
+    igraph_vector_long_t *neis, *neis2;
+    igraph_long_t i, j, k, s, neilen, neilen2, ign;
     igraph_adjlist_t adjlist;
 
     IGRAPH_CHECK(igraph_vector_long_init(&seen, vc));
@@ -930,12 +930,12 @@ igraph_integer_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *re
         IGRAPH_ALLOW_INTERRUPTION();
 
         neis = igraph_adjlist_get(&adjlist, i);
-        neilen = igraph_vector_int_size(neis);
+        neilen = igraph_vector_long_size(neis);
         /* mark neighbors of i & i itself */
         VECTOR(seen)[i] = i + 1;
         ign = 0;
         for (j = 0; j < neilen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             if (VECTOR(seen)[nei] == i + 1 || VECTOR(seen)[nei] == -(i + 1)) {
                 /* multiple edges or loop edge */
                 VECTOR(seen)[nei] = -(i + 1);
@@ -946,15 +946,15 @@ igraph_integer_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *re
         }
 
         for (j = 0; j < neilen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             if (nei <= i || (j > 0 && nei == VECTOR(*neis)[j - 1])) {
                 continue;
             }
             neis2 = igraph_adjlist_get(&adjlist, nei);
-            neilen2 = igraph_vector_int_size(neis2);
+            neilen2 = igraph_vector_long_size(neis2);
             s = 0;
             for (k = 0; k < neilen2; k++) {
-                igraph_integer_t nei2 = (igraph_integer_t) VECTOR(*neis2)[k];
+                igraph_long_t nei2 = (igraph_long_t) VECTOR(*neis2)[k];
                 if (k > 0 && nei2 == VECTOR(*neis2)[k - 1]) {
                     continue;
                 }
@@ -1044,12 +1044,12 @@ igraph_integer_t igraph_triad_census_24(const igraph_t *graph, igraph_real_t *re
  * Time complexity: TODO.
  */
 
-igraph_integer_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
+igraph_long_t igraph_triad_census(const igraph_t *graph, igraph_vector_t *res) {
 
     igraph_vector_t cut_prob;
     igraph_real_t m2, m4;
     igraph_vector_t tmp;
-    igraph_integer_t vc = igraph_vcount(graph);
+    igraph_long_t vc = igraph_vcount(graph);
     igraph_real_t total;
 
     if (!igraph_is_directed(graph)) {

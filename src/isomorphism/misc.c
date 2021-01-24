@@ -52,16 +52,16 @@
  * \sa \ref igraph_simplify(), \ref igraph_isomorphic_vf2(), \ref igraph_subisomorphic_vf2()
  *
  */
-igraph_integer_t igraph_simplify_and_colorize(
+igraph_long_t igraph_simplify_and_colorize(
     const igraph_t *graph, igraph_t *res,
-    igraph_vector_int_t *vertex_color, igraph_vector_int_t *edge_color) {
+    igraph_vector_long_t *vertex_color, igraph_vector_long_t *edge_color) {
     igraph_es_t es;
     igraph_eit_t eit;
     igraph_vector_t edges;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t pto = -1, pfrom = -1;
-    igraph_integer_t i;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t pto = -1, pfrom = -1;
+    igraph_long_t i;
 
     IGRAPH_CHECK(igraph_es_all(&es, IGRAPH_EDGEORDER_FROM));
     IGRAPH_FINALLY(igraph_es_destroy, &es);
@@ -71,17 +71,17 @@ igraph_integer_t igraph_simplify_and_colorize(
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
 
-    IGRAPH_CHECK(igraph_vector_int_resize(vertex_color, no_of_nodes));
-    igraph_vector_int_null(vertex_color);
+    IGRAPH_CHECK(igraph_vector_long_resize(vertex_color, no_of_nodes));
+    igraph_vector_long_null(vertex_color);
 
-    IGRAPH_CHECK(igraph_vector_int_resize(edge_color, no_of_edges));
-    igraph_vector_int_null(edge_color);
+    IGRAPH_CHECK(igraph_vector_long_resize(edge_color, no_of_edges));
+    igraph_vector_long_null(edge_color);
 
     i = -1;
     for (; !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t edge = IGRAPH_EIT_GET(eit);
-        igraph_integer_t from = IGRAPH_FROM(graph, edge);
-        igraph_integer_t to   = IGRAPH_TO(graph, edge);
+        igraph_long_t edge = IGRAPH_EIT_GET(eit);
+        igraph_long_t from = IGRAPH_FROM(graph, edge);
+        igraph_long_t to   = IGRAPH_TO(graph, edge);
 
         if (to == from) {
             VECTOR(*vertex_color)[to]++;
@@ -100,7 +100,7 @@ igraph_integer_t igraph_simplify_and_colorize(
         pfrom = from; pto = to;
     }
 
-    igraph_vector_int_resize(edge_color, i + 1);
+    igraph_vector_long_resize(edge_color, i + 1);
 
     igraph_eit_destroy(&eit);
     igraph_es_destroy(&es);

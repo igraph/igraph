@@ -28,11 +28,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_vector_t elems;
     igraph_2wheap_t Q;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_real_t prev = IGRAPH_INFINITY;
 
     srand(42); /* make tests deterministic */
@@ -58,7 +58,7 @@ igraph_integer_t main() {
     /*****/
 
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        igraph_integer_t j;
+        igraph_long_t j;
         igraph_real_t tmp = igraph_2wheap_max(&Q);
         if (tmp > prev) {
             return 2;
@@ -91,7 +91,7 @@ igraph_integer_t main() {
     }
     prev = IGRAPH_INFINITY;
     for (i = 0; i < igraph_vector_size(&elems); i++) {
-        igraph_integer_t j;
+        igraph_long_t j;
         igraph_real_t tmp = igraph_2wheap_max(&Q);
         if (tmp > prev) {
             return 7;

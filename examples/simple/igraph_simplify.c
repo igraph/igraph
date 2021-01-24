@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
 

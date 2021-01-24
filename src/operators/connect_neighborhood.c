@@ -59,14 +59,14 @@
  * Time complexity: O(|V|*d^k), |V| is the number of vertices in the
  * graph, d is the average degree and k is the \p order argument.
  */
-igraph_integer_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t order,
+igraph_long_t igraph_connect_neighborhood(igraph_t *graph, igraph_long_t order,
                                 igraph_neimode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q;
     igraph_vector_t edges;
-    igraph_integer_t i, j, in;
-    igraph_integer_t *added;
+    igraph_long_t i, j, in;
+    igraph_long_t *added;
     igraph_vector_t neis;
 
     if (order < 0) {
@@ -82,7 +82,7 @@ igraph_integer_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t o
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    added = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    added = igraph_Calloc(no_of_nodes, igraph_long_t);
     if (added == 0) {
         IGRAPH_ERROR("Cannot connect neighborhood", IGRAPH_ENOMEM);
     }
@@ -92,11 +92,11 @@ igraph_integer_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t o
 
     for (i = 0; i < no_of_nodes; i++) {
         added[i] = i + 1;
-        igraph_neighbors(graph, &neis, (igraph_integer_t) i, mode);
+        igraph_neighbors(graph, &neis, (igraph_long_t) i, mode);
         in = igraph_vector_size(&neis);
         if (order > 1) {
             for (j = 0; j < in; j++) {
-                igraph_integer_t nei = (igraph_integer_t) VECTOR(neis)[j];
+                igraph_long_t nei = (igraph_long_t) VECTOR(neis)[j];
                 added[nei] = i + 1;
                 igraph_dqueue_push(&q, nei);
                 igraph_dqueue_push(&q, 1);
@@ -104,15 +104,15 @@ igraph_integer_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t o
         }
 
         while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
-            igraph_integer_t actdist = (igraph_integer_t) igraph_dqueue_pop(&q);
-            igraph_integer_t n;
-            igraph_neighbors(graph, &neis, (igraph_integer_t) actnode, mode);
+            igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&q);
+            igraph_long_t actdist = (igraph_long_t) igraph_dqueue_pop(&q);
+            igraph_long_t n;
+            igraph_neighbors(graph, &neis, (igraph_long_t) actnode, mode);
             n = igraph_vector_size(&neis);
 
             if (actdist < order - 1) {
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = (igraph_integer_t) VECTOR(neis)[j];
+                    igraph_long_t nei = (igraph_long_t) VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         IGRAPH_CHECK(igraph_dqueue_push(&q, nei));
@@ -130,7 +130,7 @@ igraph_integer_t igraph_connect_neighborhood(igraph_t *graph, igraph_integer_t o
                 }
             } else {
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = (igraph_integer_t) VECTOR(neis)[j];
+                    igraph_long_t nei = (igraph_long_t) VECTOR(neis)[j];
                     if (added[nei] != i + 1) {
                         added[nei] = i + 1;
                         if (mode != IGRAPH_ALL || i < nei) {

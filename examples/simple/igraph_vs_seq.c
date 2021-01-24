@@ -23,21 +23,21 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_vs_t vs;
     igraph_vit_t vit;
     igraph_t g;
-    igraph_integer_t size;
+    igraph_long_t size;
 
     igraph_ring(&g, 10, IGRAPH_UNDIRECTED, 0, 1);
     igraph_vs_seq(&vs, 0, 9);
     igraph_vit_create(&g, vs, &vit);
     igraph_vs_size(&g, &vs, &size);
-    printf("%li", (igraph_integer_t) size);
+    printf("%li", (igraph_long_t) size);
 
     while (!IGRAPH_VIT_END(vit)) {
-        printf(" %li", (igraph_integer_t)IGRAPH_VIT_GET(vit));
+        printf(" %li", (igraph_long_t)IGRAPH_VIT_GET(vit));
         IGRAPH_VIT_NEXT(vit);
     }
     printf("\n");

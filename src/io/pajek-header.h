@@ -28,19 +28,19 @@
 
 typedef struct {
     void *scanner;
-    igraph_integer_t eof;
+    igraph_long_t eof;
     char errmsg[300];
     igraph_vector_t *vector;
     igraph_bool_t directed;
-    igraph_integer_t vcount, vcount2;
-    igraph_integer_t actfrom;
-    igraph_integer_t actto;
-    igraph_integer_t mode; /* 0: general, 1: vertex, 2: edge */
+    igraph_long_t vcount, vcount2;
+    igraph_long_t actfrom;
+    igraph_long_t actto;
+    igraph_long_t mode; /* 0: general, 1: vertex, 2: edge */
     igraph_trie_t *vertex_attribute_names;
     igraph_vector_ptr_t *vertex_attributes;
     igraph_trie_t *edge_attribute_names;
     igraph_vector_ptr_t *edge_attributes;
-    igraph_integer_t vertexid;
-    igraph_integer_t actvertex;
-    igraph_integer_t actedge;
+    igraph_long_t vertexid;
+    igraph_long_t actvertex;
+    igraph_long_t actedge;
 } igraph_i_pajek_parsedata_t;

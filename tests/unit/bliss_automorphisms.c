@@ -13,7 +13,7 @@
     igraph_famous(&graph, name); \
     TEST_GRAPH(name);
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     igraph_bliss_info_t info;
 

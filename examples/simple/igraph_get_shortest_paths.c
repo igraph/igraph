@@ -26,18 +26,18 @@
 #include <stdlib.h>
 
 void print_vector(igraph_vector_t *v) {
-    igraph_integer_t i, l = igraph_vector_size(v);
+    igraph_long_t i, l = igraph_vector_size(v);
     for (i = 0; i < l; i++) {
-        printf(" %li", (igraph_integer_t) VECTOR(*v)[i]);
+        printf(" %li", (igraph_long_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
 
-igraph_integer_t check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
-                const igraph_vector_ptr_t *evecs, igraph_integer_t error_code) {
+igraph_long_t check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
+                const igraph_vector_ptr_t *evecs, igraph_long_t error_code) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t i, n = igraph_vector_ptr_size(vecs);
+    igraph_long_t i, n = igraph_vector_ptr_size(vecs);
     if (igraph_vector_ptr_size(evecs) != n) {
         exit(error_code + 1);
     }
@@ -45,7 +45,7 @@ igraph_integer_t check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *v
     for (i = 0; i < n; i++) {
         igraph_vector_t *vvec = VECTOR(*vecs)[i];
         igraph_vector_t *evec = VECTOR(*evecs)[i];
-        igraph_integer_t j, n2 = igraph_vector_size(evec);
+        igraph_long_t j, n2 = igraph_vector_size(evec);
         if (igraph_vector_size(vvec) == 0 && n2 == 0) {
             continue;
         }
@@ -53,21 +53,21 @@ igraph_integer_t check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *v
             exit(error_code + 2);
         }
         for (j = 0; j < n2; j++) {
-            igraph_integer_t edge = VECTOR(*evec)[j];
-            igraph_integer_t from = VECTOR(*vvec)[j];
-            igraph_integer_t to = VECTOR(*vvec)[j + 1];
+            igraph_long_t edge = VECTOR(*evec)[j];
+            igraph_long_t from = VECTOR(*vvec)[j];
+            igraph_long_t to = VECTOR(*vvec)[j + 1];
             if (directed) {
                 if (from != IGRAPH_FROM(graph, edge) ||
                     to   != IGRAPH_TO  (graph, edge)) {
                     exit(error_code);
                 }
             } else {
-                igraph_integer_t from2 = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to2 = IGRAPH_TO(graph, edge);
-                igraph_integer_t min1 = from < to ? from : to;
-                igraph_integer_t max1 = from < to ? to : from;
-                igraph_integer_t min2 = from2 < to2 ? from2 : to2;
-                igraph_integer_t max2 = from2 < to2 ? to2 : from2;
+                igraph_long_t from2 = IGRAPH_FROM(graph, edge);
+                igraph_long_t to2 = IGRAPH_TO(graph, edge);
+                igraph_long_t min1 = from < to ? from : to;
+                igraph_long_t max1 = from < to ? to : from;
+                igraph_long_t min2 = from2 < to2 ? from2 : to2;
+                igraph_long_t max2 = from2 < to2 ? to2 : from2;
                 if (min1 != min2 || max1 != max2) {
                     exit(error_code + 3);
                 }
@@ -78,12 +78,12 @@ igraph_integer_t check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *v
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_ptr_t vecs, evecs;
     igraph_vector_long_t pred, inbound;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_vs_t vs;
 
     igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 1);

@@ -1,10 +1,10 @@
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_strvector_t names, weights;
-    igraph_integer_t i;
+    igraph_long_t i;
     char str[2] = " ";
     igraph_i_set_attribute_table(&igraph_cattribute_table);
     igraph_small(&g, 7, IGRAPH_UNDIRECTED, 0, 1, 0, 2, 1, 2, 1, 3, 2, 4, 3, 4, -1);

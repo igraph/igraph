@@ -28,7 +28,7 @@
 void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, const igraph_real_t resolution_parameter) {
 
     igraph_vector_t membership;
-    igraph_integer_t nb_clusters = igraph_vcount(graph);
+    igraph_long_t nb_clusters = igraph_vcount(graph);
     igraph_real_t quality;
 
     /* Initialize with singleton partition. */
@@ -48,7 +48,7 @@ void run_leiden_CPM(const igraph_t *graph, const igraph_vector_t *edge_weights, 
 void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
 
     igraph_vector_t membership, degree;
-    igraph_integer_t nb_clusters = igraph_vcount(graph);
+    igraph_long_t nb_clusters = igraph_vcount(graph);
     igraph_real_t quality;
     igraph_real_t m;
 
@@ -80,7 +80,7 @@ void run_leiden_modularity(igraph_t *graph, igraph_vector_t *edge_weights) {
     igraph_vector_destroy(&degree);
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     igraph_vector_t weights;
 

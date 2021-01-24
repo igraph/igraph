@@ -23,11 +23,11 @@
 
 #include <igraph.h>
 
-igraph_integer_t print_and_destroy(igraph_t *g,
+igraph_long_t print_and_destroy(igraph_t *g,
                       igraph_real_t value,
                       igraph_vector_ptr_t *partitions,
                       igraph_vector_ptr_t *cuts) {
-    igraph_integer_t i, e, m, n = igraph_vector_ptr_size(partitions);
+    igraph_long_t i, e, m, n = igraph_vector_ptr_size(partitions);
     printf("Found %li cuts, value: %g\n", n, value);
     for (i = 0; i < n; i++) {
         igraph_vector_t *vec = VECTOR(*partitions)[i];
@@ -38,7 +38,7 @@ igraph_integer_t print_and_destroy(igraph_t *g,
             printf("Cut %li:\n", i);
             m = igraph_vector_size(vec2);
             for (e = 0; e < m; e++) {
-                igraph_integer_t from, to;
+                igraph_long_t from, to;
                 igraph_edge(g, VECTOR(*vec2)[e], &from, &to);
                 if (igraph_is_directed(g)) {
                     printf("  %i -> %i\n", from, to);
@@ -66,7 +66,7 @@ igraph_integer_t print_and_destroy(igraph_t *g,
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_ptr_t partitions;

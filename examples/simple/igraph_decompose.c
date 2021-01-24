@@ -25,18 +25,18 @@
 #include <stdlib.h>
 
 void free_complist(igraph_vector_ptr_t *complist) {
-    igraph_integer_t i;
+    igraph_long_t i;
     for (i = 0; i < igraph_vector_ptr_size(complist); i++) {
         igraph_destroy(VECTOR(*complist)[i]);
         igraph_free(VECTOR(*complist)[i]);
     }
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t ring, g;
     igraph_vector_ptr_t complist;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_real_t edges[] = { 0, 1, 1, 2, 2, 0,
                               3, 4, 4, 5, 5, 6,
                               8, 9, 9, 10
@@ -90,7 +90,7 @@ igraph_integer_t main() {
     /*                (void**) &from, 0); */
     /*       igraph_get_vertex_attribute(comp, "id", igraph_es_to(comp, &es), */
     /*                (void**) &to, 0); */
-    /*       printf("%li %li\n", (igraph_integer_t) *from, (igraph_integer_t) *to); */
+    /*       printf("%li %li\n", (igraph_long_t) *from, (igraph_long_t) *to); */
     /*       igraph_es_next(comp, &es); */
     /*     } */
     /*   } */

@@ -32,7 +32,7 @@ __BEGIN_DECLS
 /**
  * \section about_progress_handlers About progress handlers
  *
- * <para>It is often useful to report the progress of some igraph_integer_t
+ * <para>It is often useful to report the progress of some igraph_long_t
  * calculation, to allow the user to follow the computation and
  * guess the total running time. A couple of igraph functions
  * support this at the time of writing, hopefully more will support it
@@ -142,16 +142,16 @@ __BEGIN_DECLS
  *     error code \c IGRAPH_INTERRUPTED in this case.
  */
 
-typedef igraph_integer_t igraph_progress_handler_t(const char *message, igraph_real_t percent,
+typedef igraph_long_t igraph_progress_handler_t(const char *message, igraph_real_t percent,
                                       void *data);
 
 extern igraph_progress_handler_t igraph_progress_handler_stderr;
 
 DECLDIR igraph_progress_handler_t * igraph_set_progress_handler(igraph_progress_handler_t new_handler);
 
-DECLDIR igraph_integer_t igraph_progress(const char *message, igraph_real_t percent, void *data);
+DECLDIR igraph_long_t igraph_progress(const char *message, igraph_real_t percent, void *data);
 
-DECLDIR igraph_integer_t igraph_progressf(const char *message, igraph_real_t percent, void *data,
+DECLDIR igraph_long_t igraph_progressf(const char *message, igraph_real_t percent, void *data,
                              ...);
 
 /**

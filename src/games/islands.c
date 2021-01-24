@@ -46,26 +46,26 @@
  * number of vertices plus the number of edges in the graph.
  *
  */
-igraph_integer_t igraph_simple_interconnected_islands_game(
+igraph_long_t igraph_simple_interconnected_islands_game(
         igraph_t *graph,
-        igraph_integer_t islands_n,
-        igraph_integer_t islands_size,
+        igraph_long_t islands_n,
+        igraph_long_t islands_size,
         igraph_real_t islands_pin,
-        igraph_integer_t n_inter) {
+        igraph_long_t n_inter) {
 
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
     igraph_vector_t s = IGRAPH_VECTOR_NULL;
-    igraph_integer_t nbNodes;
+    igraph_long_t nbNodes;
     double maxpossibleedgesPerIsland;
     double maxedgesPerIsland;
-    igraph_integer_t nbEdgesInterIslands;
+    igraph_long_t nbEdgesInterIslands;
     double maxedges;
-    igraph_integer_t startIsland = 0;
-    igraph_integer_t endIsland = 0;
-    igraph_integer_t i, j, is;
+    igraph_long_t startIsland = 0;
+    igraph_long_t endIsland = 0;
+    igraph_long_t i, j, is;
     double myrand, last;
-    igraph_integer_t vsize;
+    igraph_long_t vsize;
 
     if (islands_n < 0) {
         IGRAPH_ERROR("Invalid number of islands", IGRAPH_EINVAL);
@@ -89,7 +89,7 @@ igraph_integer_t igraph_simple_interconnected_islands_game(
 
     /* reserve enough space for all the edges */
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
-    IGRAPH_CHECK(igraph_vector_reserve(&edges, (igraph_integer_t) maxedges));
+    IGRAPH_CHECK(igraph_vector_reserve(&edges, (igraph_long_t) maxedges));
 
     RNG_BEGIN();
 
@@ -102,7 +102,7 @@ igraph_integer_t igraph_simple_interconnected_islands_game(
 
         /* create the random numbers to be used (into s) */
         IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
-        IGRAPH_CHECK(igraph_vector_reserve(&s, (igraph_integer_t) maxedgesPerIsland));
+        IGRAPH_CHECK(igraph_vector_reserve(&s, (igraph_long_t) maxedgesPerIsland));
 
         last = RNG_GEOM(islands_pin);
         while (last < maxpossibleedgesPerIsland) { /* maxedgesPerIsland */
@@ -117,8 +117,8 @@ igraph_integer_t igraph_simple_interconnected_islands_game(
         /* change this to edges ! */
         vsize = igraph_vector_size(&s);
         for (i = 0; i < vsize; i++) {
-            igraph_integer_t to = (igraph_integer_t) floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
-            igraph_integer_t from = (igraph_integer_t) (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
+            igraph_long_t to = (igraph_long_t) floor((sqrt(8 * VECTOR(s)[i] + 1) + 1) / 2);
+            igraph_long_t from = (igraph_long_t) (VECTOR(s)[i] - (((igraph_real_t)to) * (to - 1)) / 2);
             to += startIsland;
             from += startIsland;
 
@@ -135,8 +135,8 @@ igraph_integer_t igraph_simple_interconnected_islands_game(
         for (i = is + 1; i <= islands_n; i++) { /* for each other island (not the previous ones) */
 
             for (j = 0; j < n_inter; j++) { /* for each link between islands */
-                igraph_integer_t from = (igraph_integer_t) RNG_UNIF(startIsland, endIsland);
-                igraph_integer_t to = (igraph_integer_t) RNG_UNIF((i - 1) * islands_size, i * islands_size);
+                igraph_long_t from = (igraph_long_t) RNG_UNIF(startIsland, endIsland);
+                igraph_long_t to = (igraph_long_t) RNG_UNIF((i - 1) * islands_size, i * islands_size);
 
                 igraph_vector_push_back(&edges, from);
                 igraph_vector_push_back(&edges, to);

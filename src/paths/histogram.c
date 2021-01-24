@@ -56,20 +56,20 @@
  * \sa \ref igraph_average_path_length() and \ref igraph_shortest_paths()
  */
 
-igraph_integer_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
+igraph_long_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t *res,
                             igraph_real_t *unconnected, igraph_bool_t directed) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i, j, n;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i, j, n;
     igraph_vector_long_t already_added;
-    igraph_integer_t nodes_reached;
+    igraph_long_t nodes_reached;
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
-    igraph_vector_int_t *neis;
+    igraph_vector_long_t *neis;
     igraph_neimode_t dirmode;
     igraph_adjlist_t allneis;
     igraph_real_t unconn = 0;
-    igraph_integer_t ressize;
+    igraph_long_t ressize;
 
     if (directed) {
         dirmode = IGRAPH_OUT;
@@ -97,13 +97,13 @@ igraph_integer_t igraph_path_length_hist(const igraph_t *graph, igraph_vector_t 
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
-            igraph_integer_t actdist = (igraph_integer_t) igraph_dqueue_pop(&q);
+            igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&q);
+            igraph_long_t actdist = (igraph_long_t) igraph_dqueue_pop(&q);
 
             neis = igraph_adjlist_get(&allneis, actnode);
-            n = igraph_vector_int_size(neis);
+            n = igraph_vector_long_size(neis);
             for (j = 0; j < n; j++) {
-                igraph_integer_t neighbor = (igraph_integer_t) VECTOR(*neis)[j];
+                igraph_long_t neighbor = (igraph_long_t) VECTOR(*neis)[j];
                 if (VECTOR(already_added)[neighbor] == i + 1) {
                     continue;
                 }

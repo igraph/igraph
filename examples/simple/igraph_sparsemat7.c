@@ -28,10 +28,10 @@
 
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_matrix_t mat;
     igraph_sparsemat_t spmat, spmat2;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_real_t m1, m2;
 
     igraph_rng_seed(igraph_rng_default(), 42);

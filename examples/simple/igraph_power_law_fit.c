@@ -33,7 +33,7 @@ void print_result(const igraph_plfit_result_t* result) {
     printf("====================\n");
 }
 
-igraph_integer_t test_continuous() {
+igraph_long_t test_continuous() {
     igraph_plfit_result_t result;
     igraph_vector_t vector;
     double data[] = { 1.52219974, 6.80675663, 1.02798042, 1.31180733, 3.97473174,
@@ -222,7 +222,7 @@ igraph_integer_t test_continuous() {
     return 0;
 }
 
-igraph_integer_t test_discrete() {
+igraph_long_t test_discrete() {
     igraph_plfit_result_t result;
     igraph_vector_t vector;
     double data[] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3, 2, 2, 1, 1, 1, 1, 1, 1, 1,
@@ -297,8 +297,8 @@ igraph_integer_t test_discrete() {
     return 0;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t retval;
+igraph_long_t main() {
+    igraph_long_t retval;
 
     retval = test_continuous();
     if (retval) {

@@ -26,7 +26,7 @@
 #include "test_utilities.inc"
 
 void print_spmatrix(igraph_spmatrix_t *m, FILE *f) {
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
     for (i = 0; i < igraph_spmatrix_nrow(m); i++) {
         for (j = 0; j < igraph_spmatrix_ncol(m); j++) {
             fprintf(f, " %g", igraph_spmatrix_e(m, i, j));
@@ -36,13 +36,13 @@ void print_spmatrix(igraph_spmatrix_t *m, FILE *f) {
     fprintf(f, "=========================\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_spmatrix_t m, m1;
     igraph_spmatrix_iter_t mit;
     igraph_real_t arr[12];
     igraph_vector_t v;
-    igraph_integer_t i, j;
-    igraph_integer_t order[] = { 1, 5, 8, 4, 0, 9, 6, 10, 11, 2, 3, 7 };
+    igraph_long_t i, j;
+    igraph_long_t order[] = { 1, 5, 8, 4, 0, 9, 6, 10, 11, 2, 3, 7 };
 
     /* igraph_spmatrix_init, igraph_spmatrix_destroy */
     igraph_spmatrix_init(&m, 10, 10);
@@ -160,14 +160,14 @@ igraph_integer_t main() {
     }
     igraph_spmatrix_copy_to(&m, arr);
     for (i = 0; i < 12; i++) {
-        printf(" %ld", (igraph_integer_t)arr[i]);
+        printf(" %ld", (igraph_long_t)arr[i]);
     }
     printf("\n=========================\n");
 
     /* igraph_spmatrix_max */
     arr[0] = igraph_spmatrix_max(&m, arr + 1, arr + 2);
     for (i = 0; i < 3; i++) {
-        printf(" %ld", (igraph_integer_t)arr[i]);
+        printf(" %ld", (igraph_long_t)arr[i]);
     }
     printf("\n=========================\n");
 
@@ -197,7 +197,7 @@ igraph_integer_t main() {
     }
     igraph_spmatrix_iter_create(&mit, &m);
     while (!igraph_spmatrix_iter_end(&mit)) {
-        printf("%ld %ld %ld\n", mit.ri, mit.ci, (igraph_integer_t)mit.value);
+        printf("%ld %ld %ld\n", mit.ri, mit.ci, (igraph_long_t)mit.value);
         igraph_spmatrix_iter_next(&mit);
     }
     igraph_spmatrix_iter_destroy(&mit);

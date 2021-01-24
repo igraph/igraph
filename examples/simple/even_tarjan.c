@@ -24,12 +24,12 @@
 #include <igraph.h>
 #include <limits.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g, gbar;
-    igraph_integer_t k1, k2 = (igraph_integer_t) INT_MAX;
+    igraph_long_t k1, k2 = (igraph_long_t) INT_MAX;
     igraph_real_t tmpk;
-    igraph_integer_t i, j, n;
+    igraph_long_t i, j, n;
     igraph_maxflow_stats_t stats;
 
     /* --------------------------------------------------- */
@@ -62,7 +62,7 @@ igraph_integer_t main() {
     igraph_destroy(&g);
 
     if (k1 != k2) {
-        printf("k1 = %ld while k2 = %ld\n", (igraph_integer_t) k1, (igraph_integer_t) k2);
+        printf("k1 = %ld while k2 = %ld\n", (igraph_long_t) k1, (igraph_long_t) k2);
         return 1;
     }
 

@@ -23,10 +23,10 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_dqueue_t q;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     /* igraph_dqueue_init, igraph_dqueue_destroy, igraph_dqueue_empty */
     igraph_dqueue_init(&q, 5);

@@ -28,12 +28,12 @@
 
 
 /* Nonzero value signals interuption from Cliquer callback function */
-static IGRAPH_THREAD_LOCAL igraph_integer_t cliquer_interrupted;
+static IGRAPH_THREAD_LOCAL igraph_long_t cliquer_interrupted;
 
 
 /* For use with IGRAPH_FINALLY */
 static void free_clique_list(igraph_vector_ptr_t *vp) {
-    igraph_integer_t i, len;
+    igraph_long_t i, len;
     len = igraph_vector_ptr_size(vp);
     for (i = 0; i < len; ++i) {
         igraph_vector_destroy((igraph_vector_t *) VECTOR(*vp)[i]);
@@ -49,8 +49,8 @@ static IGRAPH_THREAD_LOCAL clique_options igraph_cliquer_opt = {
 
 /* Convert an igraph graph to a Cliquer graph */
 static void igraph_to_cliquer(const igraph_t *ig, graph_t **cg) {
-    igraph_integer_t vcount, ecount;
-    igraph_integer_t i;
+    igraph_long_t vcount, ecount;
+    igraph_long_t i;
 
     if (igraph_is_directed(ig)) {
         IGRAPH_WARNING("Edge directions are ignored for clique calculations");
@@ -62,7 +62,7 @@ static void igraph_to_cliquer(const igraph_t *ig, graph_t **cg) {
     *cg = graph_new(vcount);
 
     for (i = 0; i < ecount; ++i) {
-        igraph_integer_t s, t;
+        igraph_long_t s, t;
         s = IGRAPH_FROM(ig, i);
         t = IGRAPH_TO(ig, i);
         if (s != t) {
@@ -73,8 +73,8 @@ static void igraph_to_cliquer(const igraph_t *ig, graph_t **cg) {
 
 
 /* Copy weights to a Cliquer graph */
-static igraph_integer_t set_weights(const igraph_vector_t *vertex_weights, graph_t *g) {
-    igraph_integer_t i;
+static igraph_long_t set_weights(const igraph_vector_t *vertex_weights, graph_t *g) {
+    igraph_long_t i;
 
     IGRAPH_ASSERT(vertex_weights != NULL);
 
@@ -101,7 +101,7 @@ static igraph_integer_t set_weights(const igraph_vector_t *vertex_weights, graph
 static boolean collect_cliques_callback(set_t s, graph_t *g, clique_options *opt) {
     igraph_vector_ptr_t *list;
     igraph_vector_t *clique;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     IGRAPH_UNUSED(g);
 
@@ -121,10 +121,10 @@ static boolean collect_cliques_callback(set_t s, graph_t *g, clique_options *opt
     return TRUE;
 }
 
-igraph_integer_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
-                             igraph_integer_t min_size, igraph_integer_t max_size) {
+igraph_long_t igraph_i_cliquer_cliques(const igraph_t *graph, igraph_vector_ptr_t *res,
+                             igraph_long_t min_size, igraph_long_t max_size) {
     graph_t *g;
-    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_long_t vcount = igraph_vcount(graph);
 
     if (vcount == 0) {
         igraph_vector_ptr_clear(res);
@@ -175,11 +175,11 @@ static boolean count_cliques_callback(set_t s, graph_t *g, clique_options *opt) 
     return TRUE;
 }
 
-igraph_integer_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t *hist,
-                               igraph_integer_t min_size, igraph_integer_t max_size) {
+igraph_long_t igraph_i_cliquer_histogram(const igraph_t *graph, igraph_vector_t *hist,
+                               igraph_long_t min_size, igraph_long_t max_size) {
     graph_t *g;
-    igraph_integer_t i;
-    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_long_t i;
+    igraph_long_t vcount = igraph_vcount(graph);
 
     if (vcount == 0) {
         igraph_vector_clear(hist);
@@ -231,7 +231,7 @@ struct callback_data {
 static boolean callback_callback(set_t s, graph_t *g, clique_options *opt) {
     igraph_vector_t *clique;
     struct callback_data *cd;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     IGRAPH_UNUSED(g);
 
@@ -250,12 +250,12 @@ static boolean callback_callback(set_t s, graph_t *g, clique_options *opt) {
     return (*(cd->handler))(clique, cd->arg);
 }
 
-igraph_integer_t igraph_i_cliquer_callback(const igraph_t *graph,
-                              igraph_integer_t min_size, igraph_integer_t max_size,
+igraph_long_t igraph_i_cliquer_callback(const igraph_t *graph,
+                              igraph_long_t min_size, igraph_long_t max_size,
                               igraph_clique_handler_t *cliquehandler_fn, void *arg) {
     graph_t *g;
     struct callback_data cd;
-    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_long_t vcount = igraph_vcount(graph);
 
     if (vcount == 0) {
         return IGRAPH_SUCCESS;
@@ -291,25 +291,25 @@ igraph_integer_t igraph_i_cliquer_callback(const igraph_t *graph,
 
 /* Find weighted cliques in given weight range. */
 
-igraph_integer_t igraph_i_weighted_cliques(const igraph_t *graph,
+igraph_long_t igraph_i_weighted_cliques(const igraph_t *graph,
                               const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res,
                               igraph_real_t min_weight, igraph_real_t max_weight, igraph_bool_t maximal) {
     graph_t *g;
-    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_long_t vcount = igraph_vcount(graph);
 
     if (vcount == 0) {
         igraph_vector_ptr_clear(res);
         return IGRAPH_SUCCESS;
     }
 
-    if (min_weight != (igraph_integer_t) min_weight) {
+    if (min_weight != (igraph_long_t) min_weight) {
         IGRAPH_WARNING("Only integer vertex weights are supported; the minimum weight will be truncated to its integer part");
-        min_weight  = (igraph_integer_t) min_weight;
+        min_weight  = (igraph_long_t) min_weight;
     }
 
-    if (max_weight != (igraph_integer_t) max_weight) {
+    if (max_weight != (igraph_long_t) max_weight) {
         IGRAPH_WARNING("Only integer vertex weights are supported; the maximum weight will be truncated to its integer part");
-        max_weight = (igraph_integer_t) max_weight;
+        max_weight = (igraph_long_t) max_weight;
     }
 
     if (min_weight <= 0) {
@@ -345,10 +345,10 @@ igraph_integer_t igraph_i_weighted_cliques(const igraph_t *graph,
 
 /* Find largest weighted cliques. */
 
-igraph_integer_t igraph_i_largest_weighted_cliques(const igraph_t *graph,
+igraph_long_t igraph_i_largest_weighted_cliques(const igraph_t *graph,
                                       const igraph_vector_t *vertex_weights, igraph_vector_ptr_t *res) {
     graph_t *g;
-    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_long_t vcount = igraph_vcount(graph);
 
     if (vcount == 0) {
         igraph_vector_ptr_clear(res);
@@ -377,10 +377,10 @@ igraph_integer_t igraph_i_largest_weighted_cliques(const igraph_t *graph,
 
 /* Find weight of largest weight clique. */
 
-igraph_integer_t igraph_i_weighted_clique_number(const igraph_t *graph,
+igraph_long_t igraph_i_weighted_clique_number(const igraph_t *graph,
                                     const igraph_vector_t *vertex_weights, igraph_real_t *res) {
     graph_t *g;
-    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_long_t vcount = igraph_vcount(graph);
 
     if (vcount == 0) {
         *res = 0;

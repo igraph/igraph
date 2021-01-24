@@ -24,17 +24,17 @@
 #include <igraph.h>
 #include <stdio.h>
 
-igraph_integer_t test_graph_from_leda_tutorial() {
+igraph_long_t test_graph_from_leda_tutorial() {
     /* Test graph from the LEDA tutorial:
      * http://www.leda-tutorial.org/en/unofficial/ch05s03s05.html
      */
     igraph_t graph;
     igraph_vector_bool_t types;
     igraph_vector_long_t matching;
-    igraph_integer_t matching_size;
+    igraph_long_t matching_size;
     igraph_real_t matching_weight;
     igraph_bool_t is_matching;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_small(&graph, 0, 0,
                  0, 8, 0, 12, 0, 14,
@@ -55,11 +55,11 @@ igraph_integer_t test_graph_from_leda_tutorial() {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, 0, 0);
     if (matching_size != 6) {
-        printf("matching_size is %ld, expected: 6\n", (igraph_integer_t)matching_size);
+        printf("matching_size is %ld, expected: 6\n", (igraph_long_t)matching_size);
         return 1;
     }
     if (matching_weight != 6) {
-        printf("matching_weight is %ld, expected: 6\n", (igraph_integer_t)matching_weight);
+        printf("matching_weight is %ld, expected: 6\n", (igraph_long_t)matching_weight);
         return 2;
     }
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
@@ -76,7 +76,7 @@ igraph_integer_t test_graph_from_leda_tutorial() {
     return 0;
 }
 
-igraph_integer_t test_weighted_graph_from_mit_notes() {
+igraph_long_t test_weighted_graph_from_mit_notes() {
     /* Test graph from the following lecture notes:
      * http://math.mit.edu/~goemans/18433S07/matching-notes.pdf
      */
@@ -84,7 +84,7 @@ igraph_integer_t test_weighted_graph_from_mit_notes() {
     igraph_vector_bool_t types;
     igraph_vector_long_t matching;
     igraph_vector_t weights;
-    igraph_integer_t matching_size;
+    igraph_long_t matching_size;
     igraph_real_t matching_weight;
     igraph_bool_t is_matching;
     igraph_real_t weight_array[] = { 2, 7, 2, 3,
@@ -93,7 +93,7 @@ igraph_integer_t test_weighted_graph_from_mit_notes() {
                                      4, 1, 2,
                                      3
                                    };
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_small(&graph, 0, 0,
                  0, 6, 0, 7, 0, 8, 0, 9,
@@ -112,11 +112,11 @@ igraph_integer_t test_weighted_graph_from_mit_notes() {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_size != 4) {
-        printf("matching_size is %ld, expected: 4\n", (igraph_integer_t)matching_size);
+        printf("matching_size is %ld, expected: 4\n", (igraph_long_t)matching_size);
         return 1;
     }
     if (matching_weight != 19) {
-        printf("matching_weight is %ld, expected: 19\n", (igraph_integer_t)matching_weight);
+        printf("matching_weight is %ld, expected: 19\n", (igraph_long_t)matching_weight);
         return 2;
     }
     igraph_is_maximal_matching(&graph, &types, &matching, &is_matching);
@@ -134,17 +134,17 @@ igraph_integer_t test_weighted_graph_from_mit_notes() {
     return 0;
 }
 
-igraph_integer_t test_weighted_graph_generated() {
+igraph_long_t test_weighted_graph_generated() {
     /* Several randomly generated small test graphs */
     igraph_t graph;
     igraph_vector_bool_t types;
     igraph_vector_long_t matching;
     igraph_vector_t weights;
-    igraph_integer_t matching_size;
+    igraph_long_t matching_size;
     igraph_real_t matching_weight;
     igraph_real_t weight_array_1[] = { 8, 5, 9, 18, 20, 13 };
     igraph_real_t weight_array_2[] = { 20, 4, 20, 3, 13, 1 };
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_vector_bool_init(&types, 10);
     for (i = 0; i < 10; i++) {
@@ -160,7 +160,7 @@ igraph_integer_t test_weighted_graph_generated() {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_weight != 43) {
-        printf("matching_weight is %ld, expected: 43\n", (igraph_integer_t)matching_weight);
+        printf("matching_weight is %ld, expected: 43\n", (igraph_long_t)matching_weight);
         return 2;
     }
     igraph_vector_destroy(&weights);
@@ -174,7 +174,7 @@ igraph_integer_t test_weighted_graph_generated() {
     igraph_maximum_bipartite_matching(&graph, &types, &matching_size,
                                       &matching_weight, &matching, &weights, 0);
     if (matching_weight != 41) {
-        printf("matching_weight is %ld, expected: 41\n", (igraph_integer_t)matching_weight);
+        printf("matching_weight is %ld, expected: 41\n", (igraph_long_t)matching_weight);
         return 2;
     }
     igraph_vector_destroy(&weights);
@@ -186,14 +186,14 @@ igraph_integer_t test_weighted_graph_generated() {
     return 0;
 }
 
-igraph_integer_t test_weighted_graph_from_file(const char* fname, igraph_integer_t type1_count, igraph_integer_t exp_weight) {
+igraph_long_t test_weighted_graph_from_file(const char* fname, igraph_long_t type1_count, igraph_long_t exp_weight) {
     igraph_t graph;
     igraph_vector_bool_t types;
     igraph_vector_long_t matching;
     igraph_vector_t weights;
     igraph_real_t matching_weight;
     FILE* f;
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     f = fopen(fname, "r");
     if (!f) {
@@ -219,8 +219,8 @@ igraph_integer_t test_weighted_graph_from_file(const char* fname, igraph_integer
 
     igraph_vector_long_print(&matching);
     if (matching_weight != exp_weight) {
-        printf("matching_weight is %ld, expected: %ld\n", (igraph_integer_t)matching_weight,
-               (igraph_integer_t)exp_weight);
+        printf("matching_weight is %ld, expected: %ld\n", (igraph_long_t)matching_weight,
+               (igraph_long_t)exp_weight);
         return 2;
     }
 
@@ -235,12 +235,12 @@ igraph_integer_t test_weighted_graph_from_file(const char* fname, igraph_integer
 // This test addresses issue #1110, where an incorrect
 // types vector (i.e. that doesn't correspond to a bipartite
 // labelling of the graph) would cause a possible infinite loop.
-igraph_integer_t test_incorrect_types() {
+igraph_long_t test_incorrect_types() {
     igraph_t g;
     igraph_vector_bool_t types;
     igraph_vector_t weights;
 
-    igraph_integer_t matching_size;
+    igraph_long_t matching_size;
     igraph_real_t weighted_size;
 
     igraph_vector_long_t matching;
@@ -301,7 +301,7 @@ igraph_integer_t test_incorrect_types() {
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_i_set_attribute_table(&igraph_cattribute_table);
 
     if (test_graph_from_leda_tutorial()) {

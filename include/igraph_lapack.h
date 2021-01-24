@@ -56,32 +56,32 @@ __BEGIN_DECLS
  * </para>
  */
 
-DECLDIR igraph_integer_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                                 igraph_integer_t *info);
-DECLDIR igraph_integer_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
-                                 igraph_vector_int_t *ipiv, igraph_matrix_t *b);
-DECLDIR igraph_integer_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_int_t *ipiv,
-                                igraph_matrix_t *b, igraph_integer_t *info);
+DECLDIR igraph_long_t igraph_lapack_dgetrf(igraph_matrix_t *a, igraph_vector_long_t *ipiv,
+                                 igraph_long_t *info);
+DECLDIR igraph_long_t igraph_lapack_dgetrs(igraph_bool_t transpose, const igraph_matrix_t *a,
+                                 igraph_vector_long_t *ipiv, igraph_matrix_t *b);
+DECLDIR igraph_long_t igraph_lapack_dgesv(igraph_matrix_t *a, igraph_vector_long_t *ipiv,
+                                igraph_matrix_t *b, igraph_long_t *info);
 
 typedef enum { IGRAPH_LAPACK_DSYEV_ALL,
                IGRAPH_LAPACK_DSYEV_INTERVAL,
                IGRAPH_LAPACK_DSYEV_SELECT
              } igraph_lapack_dsyev_which_t;
 
-DECLDIR igraph_integer_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
+DECLDIR igraph_long_t igraph_lapack_dsyevr(const igraph_matrix_t *A,
                                  igraph_lapack_dsyev_which_t which,
-                                 igraph_real_t vl, igraph_real_t vu, igraph_integer_t vestimate,
-                                 igraph_integer_t il, igraph_integer_t iu, igraph_real_t abstol,
+                                 igraph_real_t vl, igraph_real_t vu, igraph_long_t vestimate,
+                                 igraph_long_t il, igraph_long_t iu, igraph_real_t abstol,
                                  igraph_vector_t *values, igraph_matrix_t *vectors,
-                                 igraph_vector_int_t *support);
+                                 igraph_vector_long_t *support);
 
 /* TODO: should we use complex vectors/matrices? */
 
-DECLDIR igraph_integer_t igraph_lapack_dgeev(const igraph_matrix_t *A,
+DECLDIR igraph_long_t igraph_lapack_dgeev(const igraph_matrix_t *A,
                                 igraph_vector_t *valuesreal,
                                 igraph_vector_t *valuesimag,
                                 igraph_matrix_t *vectorsleft,
-                                igraph_matrix_t *vectorsright, igraph_integer_t *info);
+                                igraph_matrix_t *vectorsright, igraph_long_t *info);
 
 typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE = 0,
                IGRAPH_LAPACK_DGEEVX_BALANCE_PERM,
@@ -90,20 +90,20 @@ typedef enum { IGRAPH_LAPACK_DGEEVX_BALANCE_NONE = 0,
              }
 igraph_lapack_dgeevx_balance_t;
 
-DECLDIR igraph_integer_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
+DECLDIR igraph_long_t igraph_lapack_dgeevx(igraph_lapack_dgeevx_balance_t balance,
                                  const igraph_matrix_t *A,
                                  igraph_vector_t *valuesreal,
                                  igraph_vector_t *valuesimag,
                                  igraph_matrix_t *vectorsleft,
                                  igraph_matrix_t *vectorsright,
-                                 igraph_integer_t *ilo, igraph_integer_t *ihi, igraph_vector_t *scale,
+                                 igraph_long_t *ilo, igraph_long_t *ihi, igraph_vector_t *scale,
                                  igraph_real_t *abnrm,
                                  igraph_vector_t *rconde,
                                  igraph_vector_t *rcondv,
-                                 igraph_integer_t *info);
+                                 igraph_long_t *info);
 
-DECLDIR igraph_integer_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
-                                 igraph_integer_t ilo, igraph_integer_t ihi,
+DECLDIR igraph_long_t igraph_lapack_dgehrd(const igraph_matrix_t *A,
+                                 igraph_long_t ilo, igraph_long_t ihi,
                                  igraph_matrix_t *result);
 
 __END_DECLS

@@ -23,13 +23,13 @@
 
 #include <igraph.h>
 
-igraph_integer_t doit(igraph_t *g) {
+igraph_long_t doit(igraph_t *g) {
 
     igraph_vector_ptr_t blocks;
     igraph_vector_t cohesion;
     igraph_vector_t parent;
     igraph_t block_tree;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_vector_ptr_init(&blocks, 0);
     igraph_vector_init(&cohesion, 0);
@@ -61,10 +61,10 @@ igraph_integer_t doit(igraph_t *g) {
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
-    igraph_integer_t ret;
+    igraph_long_t ret;
 
     /* --------------------------------------------------------*/
     /* The graph from the Moody-White paper                    */

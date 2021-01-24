@@ -26,12 +26,12 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     igraph_t full, tree;
     igraph_hrg_t hrg;
     igraph_t dendrogram;
-    // igraph_integer_t i, j;
+    // igraph_long_t i, j;
     // igraph_vector_t neis;
 
     igraph_rng_seed(igraph_rng_default(), 42);
@@ -57,10 +57,10 @@ igraph_integer_t main() {
     // Print the tree, with labels
     // igraph_vector_init(&neis, 0);
     // for (i=0; i<igraph_vcount(&graph)-1; i++) {
-    //   printf("Vertex # %2i, ", (igraph_integer_t) (i+igraph_vcount(&graph)));
+    //   printf("Vertex # %2i, ", (igraph_long_t) (i+igraph_vcount(&graph)));
     //   igraph_neighbors(&dendrogram, &neis, i+igraph_vcount(&graph), IGRAPH_OUT);
-    //   printf("left: # %2i, right: # %2i, ", (igraph_integer_t) VECTOR(neis)[0],
-    //       (igraph_integer_t) VECTOR(neis)[1]);
+    //   printf("left: # %2i, right: # %2i, ", (igraph_long_t) VECTOR(neis)[0],
+    //       (igraph_long_t) VECTOR(neis)[1]);
     //   printf("prob: %6.2g\n",
     //       VAN(&dendrogram, "probability", i+igraph_vcount(&graph)));
     // }

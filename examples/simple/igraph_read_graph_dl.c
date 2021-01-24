@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     const char *files[] = { "fullmatrix1.dl", "fullmatrix2.dl",
                             "fullmatrix3.dl", "fullmatrix4.dl",
@@ -33,8 +33,8 @@ igraph_integer_t main() {
                             "edgelist4.dl", "edgelist5.dl", "edgelist6.dl",
                             "edgelist7.dl", "nodelist1.dl", "nodelist2.dl"
                           };
-    igraph_integer_t no_files = sizeof(files) / sizeof(const char*);
-    igraph_integer_t i, ret;
+    igraph_long_t no_files = sizeof(files) / sizeof(const char*);
+    igraph_long_t i, ret;
     igraph_t g;
     FILE *infile;
 

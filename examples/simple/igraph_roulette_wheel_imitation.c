@@ -27,21 +27,21 @@
 /* test parameters structure */
 typedef struct {
     igraph_t *graph;
-    igraph_integer_t vertex;
+    igraph_long_t vertex;
     igraph_bool_t islocal;
     igraph_vector_t *quantities;
     igraph_vector_t *strategies;
     igraph_vector_t *known_strats;
     igraph_neimode_t mode;
-    igraph_integer_t retval;
+    igraph_long_t retval;
 } strategy_test_t;
 
 /* Error tests. That is, we expect error codes to be returned from such tests.
  */
-igraph_integer_t error_tests() {
+igraph_long_t error_tests() {
     igraph_t g, gzero, h;
     igraph_vector_t quant, quantzero, strat, stratzero;
-    igraph_integer_t i, n, nvert, ret;
+    igraph_long_t i, n, nvert, ret;
     strategy_test_t *test;
 
     /* nonempty graph */
@@ -90,7 +90,7 @@ igraph_integer_t error_tests() {
                                               test->islocal, test->quantities,
                                               test->strategies, test->mode);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (igraph_integer_t)(i + 1));
+            printf("Error test no. %d failed.\n", (igraph_long_t)(i + 1));
             return IGRAPH_FAILURE;
         }
         i++;
@@ -112,12 +112,12 @@ igraph_integer_t error_tests() {
  * perspective (whether local or global) could affect the range of
  * possible strategies a vertex could adopt.
  */
-igraph_integer_t roulette_test() {
+igraph_long_t roulette_test() {
     igraph_t g;
     igraph_bool_t success;
     igraph_vector_t *known, quant, strat, stratcopy;
     igraph_vector_t known0, known1, known2, known3, known4, known5;
-    igraph_integer_t i, k, n, nvert, ret;;
+    igraph_long_t i, k, n, nvert, ret;;
     strategy_test_t *test;
 
     /* the game network */
@@ -179,7 +179,7 @@ igraph_integer_t roulette_test() {
         }
         if (!success) {
             printf("Roulette wheel imitation failed for vertex %d.\n",
-                   (igraph_integer_t)test->vertex);
+                   (igraph_long_t)test->vertex);
             return IGRAPH_FAILURE;
         }
         igraph_vector_destroy(&stratcopy);
@@ -202,11 +202,11 @@ igraph_integer_t roulette_test() {
 /* It is possible for a vertex to retain its current strategy. This can
  * happen both in the local and global perspectives.
  */
-igraph_integer_t retain_strategy_test() {
+igraph_long_t retain_strategy_test() {
     igraph_t g;
-    igraph_integer_t max, min, v;
+    igraph_long_t max, min, v;
     igraph_vector_t quant, strat, stratcp;
-    igraph_integer_t i, ntry, nvert;
+    igraph_long_t i, ntry, nvert;
 
     /* the game network */
     igraph_small(&g, /*nvert=*/ 0, IGRAPH_UNDIRECTED,
@@ -225,7 +225,7 @@ igraph_integer_t retain_strategy_test() {
     v = R_INTEGER(min, max);  /* min <= v <= max */
     /* Ensure that it is possible for v to retain its current strategy. We */
     /* will try to do this at most ntry times. As there are at most 6 vertices */
-    /* to choose from, it shouldn't take igraph_integer_t before we encounter a strategy */
+    /* to choose from, it shouldn't take igraph_long_t before we encounter a strategy */
     /* revision round where v retains its current strategy. */
     /* With local perspective. */
     i = 0;
@@ -264,8 +264,8 @@ igraph_integer_t retain_strategy_test() {
     return IGRAPH_SUCCESS;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t ret;
+igraph_long_t main() {
+    igraph_long_t ret;
 
     ret = error_tests();
     if (ret) {

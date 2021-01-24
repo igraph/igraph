@@ -27,11 +27,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g1, g2;
     igraph_t ring1, ring2;
-    igraph_vector_int_t color1, color2;
+    igraph_vector_long_t color1, color2;
     igraph_vector_t perm;
     igraph_bool_t iso;
 
@@ -50,8 +50,8 @@ igraph_integer_t main() {
     }
 
     /* Everything has the same colors */
-    igraph_vector_int_init(&color1, igraph_vcount(&ring1));
-    igraph_vector_int_init(&color2, igraph_vcount(&ring2));
+    igraph_vector_long_init(&color1, igraph_vcount(&ring1));
+    igraph_vector_long_init(&color2, igraph_vcount(&ring2));
 
     igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, IGRAPH_BLISS_F, 0, 0);
     if (!iso) {
@@ -60,8 +60,8 @@ igraph_integer_t main() {
     }
 
     /* Try a negative result */
-    igraph_vector_int_fill(&color1, 0);
-    igraph_vector_int_fill(&color2, 0);
+    igraph_vector_long_fill(&color1, 0);
+    igraph_vector_long_fill(&color2, 0);
     VECTOR(color1)[0] = 1;
     igraph_isomorphic_bliss(&ring1, &ring2, &color1, &color2, &iso, 0, 0, IGRAPH_BLISS_F, 0, 0);
     if (iso) {
@@ -70,8 +70,8 @@ igraph_integer_t main() {
     }
 
     /* Another negative, same color distribution, different topology */
-    igraph_vector_int_fill(&color1, 0);
-    igraph_vector_int_fill(&color2, 0);
+    igraph_vector_long_fill(&color1, 0);
+    igraph_vector_long_fill(&color2, 0);
     VECTOR(color1)[0] = 1;
     VECTOR(color1)[1] = 1;
     VECTOR(color2)[0] = 1;
@@ -84,8 +84,8 @@ igraph_integer_t main() {
 
 
     /* More complicated test with colors */
-    igraph_vector_int_destroy(&color1);
-    igraph_vector_int_destroy(&color2);
+    igraph_vector_long_destroy(&color1);
+    igraph_vector_long_destroy(&color2);
 
     igraph_vector_destroy(&perm);
     igraph_destroy(&ring2);
@@ -98,8 +98,8 @@ igraph_integer_t main() {
                  0, 1, 0, 3, 0, 4, 2, 3, 2, 1, 2, 6, 5, 1, 5, 4, 5, 6, 7, 3, 7, 6, 7, 4, -1
                 );
 
-    igraph_vector_int_init(&color1, 8);
-    igraph_vector_int_init(&color2, 8);
+    igraph_vector_long_init(&color1, 8);
+    igraph_vector_long_init(&color2, 8);
 
     VECTOR(color1)[1] = 1;
     VECTOR(color1)[3] = 1;
@@ -118,8 +118,8 @@ igraph_integer_t main() {
         return 5;
     }
 
-    igraph_vector_int_destroy(&color1);
-    igraph_vector_int_destroy(&color2);
+    igraph_vector_long_destroy(&color1);
+    igraph_vector_long_destroy(&color2);
 
     igraph_destroy(&g2);
     igraph_destroy(&g1);

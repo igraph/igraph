@@ -24,14 +24,14 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_bool_t *v, FILE *f) {
-    igraph_integer_t i;
+    igraph_long_t i;
     for (i = 0; i < igraph_vector_bool_size(v); i++) {
-        fprintf(f, " %i", (igraph_integer_t) VECTOR(*v)[i]);
+        fprintf(f, " %i", (igraph_long_t) VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t graph;
     igraph_bool_t res;

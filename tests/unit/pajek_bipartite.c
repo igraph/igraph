@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     igraph_vector_bool_t type;
     igraph_bool_t typev[] = { 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 };

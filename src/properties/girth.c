@@ -45,7 +45,7 @@
  * For graphs that contain no cycles, and only for such graphs,
  * zero is returned. Note that in some applications, it is customary
  * to define the girth of acyclic graphs to be infinity. However, infinity
- * is not representable as an \c igraph_integer_t, therefore zero is used
+ * is not representable as an \c igraph_long_t, therefore zero is used
  * for this case.
  *
  * </para><para>
@@ -69,20 +69,20 @@
  *
  * \example examples/simple/igraph_girth.c
  */
-igraph_integer_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
+igraph_long_t igraph_girth(const igraph_t *graph, igraph_long_t *girth,
                  igraph_vector_t *circle) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q;
     igraph_lazy_adjlist_t adjlist;
-    igraph_integer_t mincirc = LONG_MAX, minvertex = 0;
-    igraph_integer_t node;
+    igraph_long_t mincirc = LONG_MAX, minvertex = 0;
+    igraph_long_t node;
     igraph_bool_t triangle = 0;
     igraph_vector_t *neis;
     igraph_vector_long_t level;
-    igraph_integer_t stoplevel = no_of_nodes + 1;
+    igraph_long_t stoplevel = no_of_nodes + 1;
     igraph_bool_t anycircle = 0;
-    igraph_integer_t t1 = 0, t2 = 0;
+    igraph_long_t t1 = 0, t2 = 0;
 
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, IGRAPH_ALL,
                                           IGRAPH_SIMPLIFY));
@@ -112,19 +112,19 @@ igraph_integer_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
-            igraph_integer_t actlevel = VECTOR(level)[actnode];
-            igraph_integer_t i, n;
+            igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&q);
+            igraph_long_t actlevel = VECTOR(level)[actnode];
+            igraph_long_t i, n;
 
             if (actlevel >= stoplevel) {
                 break;
             }
 
-            neis = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actnode);
+            neis = igraph_lazy_adjlist_get(&adjlist, (igraph_long_t) actnode);
             n = igraph_vector_size(neis);
             for (i = 0; i < n; i++) {
-                igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[i];
-                igraph_integer_t neilevel = VECTOR(level)[nei];
+                igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[i];
+                igraph_long_t neilevel = VECTOR(level)[nei];
                 if (neilevel != 0) {
                     if (neilevel == actlevel - 1) {
                         continue;
@@ -159,7 +159,7 @@ igraph_integer_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
         if (mincirc == LONG_MAX) {
             *girth = mincirc = 0;
         } else {
-            *girth = (igraph_integer_t) mincirc;
+            *girth = (igraph_long_t) mincirc;
         }
     }
 
@@ -167,18 +167,18 @@ igraph_integer_t igraph_girth(const igraph_t *graph, igraph_integer_t *girth,
     if (circle) {
         IGRAPH_CHECK(igraph_vector_resize(circle, mincirc));
         if (mincirc != 0) {
-            igraph_integer_t i, n, idx = 0;
+            igraph_long_t i, n, idx = 0;
             igraph_dqueue_clear(&q);
             igraph_vector_long_null(&level); /* used for father pointers */
 #define FATHER(x) (VECTOR(level)[(x)])
             IGRAPH_CHECK(igraph_dqueue_push(&q, minvertex));
             FATHER(minvertex) = minvertex;
             while (FATHER(t1) == 0 || FATHER(t2) == 0) {
-                igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
-                neis = igraph_lazy_adjlist_get(&adjlist, (igraph_integer_t) actnode);
+                igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&q);
+                neis = igraph_lazy_adjlist_get(&adjlist, (igraph_long_t) actnode);
                 n = igraph_vector_size(neis);
                 for (i = 0; i < n; i++) {
-                    igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[i];
+                    igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[i];
                     if (FATHER(nei) == 0) {
                         FATHER(nei) = actnode + 1;
                         igraph_dqueue_push(&q, nei);

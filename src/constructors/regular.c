@@ -71,11 +71,11 @@
  *
  * \example examples/simple/igraph_star.c
  */
-igraph_integer_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mode_t mode,
-                igraph_integer_t center) {
+igraph_long_t igraph_star(igraph_t *graph, igraph_long_t n, igraph_star_mode_t mode,
+                igraph_long_t center) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVVID);
@@ -176,16 +176,16 @@ igraph_integer_t igraph_star(igraph_t *graph, igraph_integer_t n, igraph_star_mo
  * and edges in the generated graph. Otherwise it is O(|V|*d^k+|E|), d
  * is the average degree of the graph, k is the \p nei argument.
  */
-igraph_integer_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
-                   igraph_integer_t nei, igraph_bool_t directed, igraph_bool_t mutual,
+igraph_long_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvector,
+                   igraph_long_t nei, igraph_bool_t directed, igraph_bool_t mutual,
                    igraph_bool_t circular) {
 
-    igraph_integer_t dims = igraph_vector_size(dimvector);
-    igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vector_prod(dimvector);
+    igraph_long_t dims = igraph_vector_size(dimvector);
+    igraph_long_t no_of_nodes = (igraph_long_t) igraph_vector_prod(dimvector);
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t *coords, *weights;
-    igraph_integer_t i, j;
-    igraph_integer_t carry, pos;
+    igraph_long_t *coords, *weights;
+    igraph_long_t i, j;
+    igraph_long_t carry, pos;
 
     if (igraph_vector_any_smaller(dimvector, 0)) {
         IGRAPH_ERROR("Invalid dimension vector", IGRAPH_EINVAL);
@@ -193,12 +193,12 @@ igraph_integer_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvecto
 
     /* init coords & weights */
 
-    coords = igraph_Calloc(dims, igraph_integer_t);
+    coords = igraph_Calloc(dims, igraph_long_t);
     if (coords == 0) {
         IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, coords);
-    weights = igraph_Calloc(dims, igraph_integer_t);
+    weights = igraph_Calloc(dims, igraph_long_t);
     if (weights == 0) {
         IGRAPH_ERROR("Lattice creation failed", IGRAPH_ENOMEM);
     }
@@ -206,7 +206,7 @@ igraph_integer_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvecto
     if (dims > 0) {
         weights[0] = 1;
         for (i = 1; i < dims; i++) {
-            weights[i] = weights[i - 1] * (igraph_integer_t) VECTOR(*dimvector)[i - 1];
+            weights[i] = weights[i - 1] * (igraph_long_t) VECTOR(*dimvector)[i - 1];
         }
     }
 
@@ -218,11 +218,11 @@ igraph_integer_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvecto
         IGRAPH_ALLOW_INTERRUPTION();
         for (j = 0; j < dims; j++) {
             if (circular || coords[j] != VECTOR(*dimvector)[j] - 1) {
-                igraph_integer_t new_nei;
+                igraph_long_t new_nei;
                 if (coords[j] != VECTOR(*dimvector)[j] - 1) {
                     new_nei = i + weights[j] + 1;
                 } else {
-                    new_nei = i - (igraph_integer_t) (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
+                    new_nei = i - (igraph_long_t) (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
                 }
                 if (new_nei != i + 1 &&
                     (VECTOR(*dimvector)[j] != 2 || coords[j] != 1 || directed)) {
@@ -231,11 +231,11 @@ igraph_integer_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvecto
                 }
             } /* if circular || coords[j] */
             if (mutual && directed && (circular || coords[j] != 0)) {
-                igraph_integer_t new_nei;
+                igraph_long_t new_nei;
                 if (coords[j] != 0) {
                     new_nei = i - weights[j] + 1;
                 } else {
-                    new_nei = i + (igraph_integer_t) (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
+                    new_nei = i + (igraph_long_t) (VECTOR(*dimvector)[j] - 1) * weights[j] + 1;
                 }
                 if (new_nei != i + 1 &&
                     (VECTOR(*dimvector)[j] != 2 || !circular)) {
@@ -261,7 +261,7 @@ igraph_integer_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvecto
 
     } /* for i<no_of_nodes */
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_long_t) no_of_nodes,
                                directed));
     if (nei >= 2) {
         IGRAPH_CHECK(igraph_connect_neighborhood(graph, nei, IGRAPH_ALL));
@@ -301,7 +301,7 @@ igraph_integer_t igraph_lattice(igraph_t *graph, const igraph_vector_t *dimvecto
  *
  * \example examples/simple/igraph_ring.c
  */
-igraph_integer_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed,
+igraph_long_t igraph_ring(igraph_t *graph, igraph_long_t n, igraph_bool_t directed,
                 igraph_bool_t mutual, igraph_bool_t circular) {
 
     igraph_vector_t v = IGRAPH_VECTOR_NULL;
@@ -354,13 +354,13 @@ igraph_integer_t igraph_ring(igraph_t *graph, igraph_integer_t n, igraph_bool_t 
  *
  * \example examples/simple/igraph_tree.c
  */
-igraph_integer_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer_t children,
+igraph_long_t igraph_tree(igraph_t *graph, igraph_long_t n, igraph_long_t children,
                 igraph_tree_mode_t type) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t i, j;
-    igraph_integer_t idx = 0;
-    igraph_integer_t to = 1;
+    igraph_long_t i, j;
+    igraph_long_t idx = 0;
+    igraph_long_t to = 1;
 
     if (n < 0 || children <= 0) {
         IGRAPH_ERROR("Invalid number of vertices or children", IGRAPH_EINVAL);
@@ -437,19 +437,19 @@ igraph_integer_t igraph_tree(igraph_t *graph, igraph_integer_t n, igraph_integer
  * Time complexity: O(|V|+|E|), the number of vertices plus the number
  * of edges.
  */
-igraph_integer_t igraph_extended_chordal_ring(
-    igraph_t *graph, igraph_integer_t nodes, const igraph_matrix_t *W,
+igraph_long_t igraph_extended_chordal_ring(
+    igraph_t *graph, igraph_long_t nodes, const igraph_matrix_t *W,
     igraph_bool_t directed) {
     igraph_vector_t edges;
-    igraph_integer_t period = igraph_matrix_ncol(W);
-    igraph_integer_t nrow   = igraph_matrix_nrow(W);
-    igraph_integer_t i, j, mpos = 0, epos = 0;
+    igraph_long_t period = igraph_matrix_ncol(W);
+    igraph_long_t nrow   = igraph_matrix_nrow(W);
+    igraph_long_t i, j, mpos = 0, epos = 0;
 
     if (nodes < 3) {
         IGRAPH_ERROR("An extended chordal ring has at least 3 nodes", IGRAPH_EINVAL);
     }
 
-    if ((igraph_integer_t)nodes % period != 0) {
+    if ((igraph_long_t)nodes % period != 0) {
         IGRAPH_ERROR("The period (number of columns in W) should divide the "
                      "number of nodes", IGRAPH_EINVAL);
     }
@@ -466,8 +466,8 @@ igraph_integer_t igraph_extended_chordal_ring(
     if (nrow > 0) {
         for (i = 0; i < nodes; i++) {
             for (j = 0; j < nrow; j++) {
-                igraph_integer_t offset = (igraph_integer_t) MATRIX(*W, j, mpos);
-                igraph_integer_t v = (i + offset) % nodes;
+                igraph_long_t offset = (igraph_long_t) MATRIX(*W, j, mpos);
+                igraph_long_t v = (i + offset) % nodes;
 
                 if (v < 0) {
                     v += nodes;    /* handle negative offsets */

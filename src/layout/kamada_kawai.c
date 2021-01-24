@@ -70,20 +70,20 @@
  * graph.
  */
 
-igraph_integer_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
-                               igraph_bool_t use_seed, igraph_integer_t maxiter,
+igraph_long_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
+                               igraph_bool_t use_seed, igraph_long_t maxiter,
                                igraph_real_t epsilon, igraph_real_t kkconst,
                                const igraph_vector_t *weights,
                                const igraph_vector_t *minx, const igraph_vector_t *maxx,
                                const igraph_vector_t *miny, const igraph_vector_t *maxy) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
-    igraph_integer_t no_edges = igraph_ecount(graph);
+    igraph_long_t no_nodes = igraph_vcount(graph);
+    igraph_long_t no_edges = igraph_ecount(graph);
     igraph_real_t L, L0 = sqrt(no_nodes);
     igraph_matrix_t dij, lij, kij;
     igraph_real_t max_dij;
     igraph_vector_t D1, D2;
-    igraph_integer_t i, j, m;
+    igraph_long_t i, j, m;
 
     if (maxiter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negatice in "
@@ -376,21 +376,21 @@ igraph_integer_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix
  * graph.
  */
 
-igraph_integer_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
-                                  igraph_bool_t use_seed, igraph_integer_t maxiter,
+igraph_long_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
+                                  igraph_bool_t use_seed, igraph_long_t maxiter,
                                   igraph_real_t epsilon, igraph_real_t kkconst,
                                   const igraph_vector_t *weights,
                                   const igraph_vector_t *minx, const igraph_vector_t *maxx,
                                   const igraph_vector_t *miny, const igraph_vector_t *maxy,
                                   const igraph_vector_t *minz, const igraph_vector_t *maxz) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
-    igraph_integer_t no_edges = igraph_ecount(graph);
+    igraph_long_t no_nodes = igraph_vcount(graph);
+    igraph_long_t no_edges = igraph_ecount(graph);
     igraph_real_t L, L0 = sqrt(no_nodes);
     igraph_matrix_t dij, lij, kij;
     igraph_real_t max_dij;
     igraph_vector_t D1, D2, D3;
-    igraph_integer_t i, j, m;
+    igraph_long_t i, j, m;
 
     if (maxiter < 0) {
         IGRAPH_ERROR("Number of iterations must be non-negatice in "

@@ -35,7 +35,7 @@
  * coordinates of a vertex.</para>
  */
 
-igraph_integer_t igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_layout_springs(const igraph_t *graph, igraph_matrix_t *res,
                           igraph_real_t mass, igraph_real_t equil, igraph_real_t k,
                           igraph_real_t repeqdis, igraph_real_t kfr, igraph_bool_t repulse) {
 

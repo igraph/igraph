@@ -26,11 +26,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g, sub;
     igraph_vector_t map, invmap;
     igraph_vector_t keep;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_small(&g, 9, IGRAPH_DIRECTED, 0, 1, 0, 2, 1, 3, 2, 3,
                  1, 4, 4, 2, 1, 5, 5, 2, 1, 6, 6, 2, 1, 7, 7, 2, 1, 8, 8, 2,

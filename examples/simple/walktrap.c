@@ -23,12 +23,12 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_matrix_t merges;
     igraph_vector_t modularity;
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t i;
+    igraph_long_t no_of_nodes;
+    igraph_long_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -47,8 +47,8 @@ igraph_integer_t main() {
     printf("Merges:\n");
     for (i = 0; i < igraph_matrix_nrow(&merges); i++) {
         printf("%2.1li + %2.li -> %2.li (modularity %4.2f)\n",
-               (igraph_integer_t)MATRIX(merges, i, 0),
-               (igraph_integer_t)MATRIX(merges, i, 1),
+               (igraph_long_t)MATRIX(merges, i, 0),
+               (igraph_long_t)MATRIX(merges, i, 1),
                no_of_nodes + i,
                VECTOR(modularity)[i]);
     }

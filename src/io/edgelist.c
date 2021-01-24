@@ -68,12 +68,12 @@
  * reading an integer requires O(1)
  * time.
  */
-igraph_integer_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
-                               igraph_integer_t n, igraph_bool_t directed) {
+igraph_long_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
+                               igraph_long_t n, igraph_bool_t directed) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    igraph_integer_t from, to;
-    igraph_integer_t c;
+    igraph_long_t from, to;
+    igraph_long_t c;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_CHECK(igraph_vector_reserve(&edges, 100));
@@ -85,7 +85,7 @@ igraph_integer_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
     ungetc (c, instream);
 
     while (!feof(instream)) {
-        igraph_integer_t read;
+        igraph_long_t read;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -132,7 +132,7 @@ igraph_integer_t igraph_read_graph_edgelist(igraph_t *graph, FILE *instream,
  * integer to the file requires O(1)
  * time.
  */
-igraph_integer_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
+igraph_long_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstream) {
 
     igraph_eit_t it;
 
@@ -141,12 +141,12 @@ igraph_integer_t igraph_write_graph_edgelist(const igraph_t *graph, FILE *outstr
     IGRAPH_FINALLY(igraph_eit_destroy, &it);
 
     while (!IGRAPH_EIT_END(it)) {
-        igraph_integer_t from, to;
-        igraph_integer_t ret;
+        igraph_long_t from, to;
+        igraph_long_t ret;
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
         ret = fprintf(outstream, "%li %li\n",
-                      (igraph_integer_t) from,
-                      (igraph_integer_t) to);
+                      (igraph_long_t) from,
+                      (igraph_long_t) to);
         if (ret < 0) {
             IGRAPH_ERROR("Write error", IGRAPH_EFILE);
         }

@@ -30,11 +30,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t test_all_st_cuts(const igraph_t *graph,
-                     igraph_integer_t source,
-                     igraph_integer_t target) {
+igraph_long_t test_all_st_cuts(const igraph_t *graph,
+                     igraph_long_t source,
+                     igraph_long_t target) {
     igraph_vector_ptr_t cuts, partition1s;
-    igraph_integer_t n, i;
+    igraph_long_t n, i;
 
     igraph_vector_ptr_init(&cuts, 0);
     igraph_vector_ptr_init(&partition1s, 0);
@@ -61,14 +61,14 @@ igraph_integer_t test_all_st_cuts(const igraph_t *graph,
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_ptr_t cuts, partition1s;
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     igraph_marked_queue_t S;
     igraph_estack_t T;
-    igraph_integer_t v;
+    igraph_long_t v;
     igraph_vector_t Isv;
 
     /* ----------------------------------------------------------- */

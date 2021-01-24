@@ -25,7 +25,7 @@
 
 void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges,
                   igraph_vector_t *membership, FILE* f) {
-    igraph_integer_t i = 0;
+    igraph_long_t i = 0;
     igraph_vector_t our_membership;
 
     igraph_vector_init(&our_membership, 0);
@@ -45,14 +45,14 @@ void show_results(igraph_t *g, igraph_vector_t *mod, igraph_matrix_t *merges,
 
     printf("Membership: ");
     for (i = 0; i < igraph_vector_size(&our_membership); i++) {
-        printf("%li ", (igraph_integer_t)VECTOR(our_membership)[i]);
+        printf("%li ", (igraph_long_t)VECTOR(our_membership)[i]);
     }
     printf("\n");
 
     igraph_vector_destroy(&our_membership);
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_t modularity, weights, membership;
     igraph_matrix_t merges;

@@ -25,12 +25,12 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_t v, res;
     igraph_bool_t is_dag;
-    igraph_integer_t ret;
+    igraph_long_t ret;
 
     /* Test graph taken from http://en.wikipedia.org/wiki/Topological_sorting
      * @ 05.03.2006 */

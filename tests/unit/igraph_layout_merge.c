@@ -28,15 +28,15 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     /*******************/
     /* Testing the DLA */
     /*******************/
-    igraph_integer_t nodes = 10;
+    igraph_long_t nodes = 10;
     igraph_i_layout_mergegrid_t grid;
     igraph_vector_t x, y, r;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

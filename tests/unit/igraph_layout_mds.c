@@ -29,10 +29,10 @@
 
 #define sqr(x) ((x)*(x))
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_matrix_t coords, dist_mat;
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     srand(42); /* make tests deterministic */
 

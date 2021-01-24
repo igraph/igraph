@@ -51,30 +51,30 @@ typedef struct s_indheap {
     igraph_real_t* stor_begin;
     igraph_real_t* stor_end;
     igraph_real_t* end;
-    igraph_integer_t destroy;
-    igraph_integer_t* index_begin;
+    igraph_long_t destroy;
+    igraph_long_t* index_begin;
 } igraph_indheap_t;
 
 #define IGRAPH_INDHEAP_NULL { 0,0,0,0,0 }
 
-igraph_integer_t igraph_indheap_init           (igraph_indheap_t* h, igraph_integer_t size);
-igraph_integer_t igraph_indheap_init_array     (igraph_indheap_t *t, igraph_real_t* data, igraph_integer_t len);
+igraph_long_t igraph_indheap_init           (igraph_indheap_t* h, igraph_long_t size);
+igraph_long_t igraph_indheap_init_array     (igraph_indheap_t *t, igraph_real_t* data, igraph_long_t len);
 void igraph_indheap_destroy        (igraph_indheap_t* h);
-igraph_integer_t igraph_indheap_clear(igraph_indheap_t *h);
+igraph_long_t igraph_indheap_clear(igraph_indheap_t *h);
 igraph_bool_t igraph_indheap_empty          (igraph_indheap_t* h);
-igraph_integer_t igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem);
-igraph_integer_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem);
-igraph_integer_t igraph_indheap_modify(igraph_indheap_t* h, igraph_integer_t idx, igraph_real_t elem);
+igraph_long_t igraph_indheap_push           (igraph_indheap_t* h, igraph_real_t elem);
+igraph_long_t igraph_indheap_push_with_index(igraph_indheap_t* h, igraph_long_t idx, igraph_real_t elem);
+igraph_long_t igraph_indheap_modify(igraph_indheap_t* h, igraph_long_t idx, igraph_real_t elem);
 igraph_real_t igraph_indheap_max       (igraph_indheap_t* h);
 igraph_real_t igraph_indheap_delete_max(igraph_indheap_t* h);
-igraph_integer_t igraph_indheap_size      (igraph_indheap_t* h);
-igraph_integer_t igraph_indheap_reserve        (igraph_indheap_t* h, igraph_integer_t size);
-igraph_integer_t igraph_indheap_max_index(igraph_indheap_t *h);
+igraph_long_t igraph_indheap_size      (igraph_indheap_t* h);
+igraph_long_t igraph_indheap_reserve        (igraph_indheap_t* h, igraph_long_t size);
+igraph_long_t igraph_indheap_max_index(igraph_indheap_t *h);
 
-void igraph_indheap_i_build(igraph_indheap_t* h, igraph_integer_t head);
-void igraph_indheap_i_shift_up(igraph_indheap_t* h, igraph_integer_t elem);
-void igraph_indheap_i_sink(igraph_indheap_t* h, igraph_integer_t head);
-void igraph_indheap_i_switch(igraph_indheap_t* h, igraph_integer_t e1, igraph_integer_t e2);
+void igraph_indheap_i_build(igraph_indheap_t* h, igraph_long_t head);
+void igraph_indheap_i_shift_up(igraph_indheap_t* h, igraph_long_t elem);
+void igraph_indheap_i_sink(igraph_indheap_t* h, igraph_long_t head);
+void igraph_indheap_i_switch(igraph_indheap_t* h, igraph_long_t e1, igraph_long_t e2);
 
 /* -------------------------------------------------- */
 /* Doubly indexed heap                                */
@@ -94,29 +94,29 @@ typedef struct s_indheap_d {
     igraph_real_t* stor_begin;
     igraph_real_t* stor_end;
     igraph_real_t* end;
-    igraph_integer_t destroy;
-    igraph_integer_t* index_begin;
-    igraph_integer_t* index2_begin;
+    igraph_long_t destroy;
+    igraph_long_t* index_begin;
+    igraph_long_t* index2_begin;
 } igraph_d_indheap_t;
 
 
 #define IGRAPH_D_INDHEAP_NULL { 0,0,0,0,0,0 }
 
-igraph_integer_t igraph_d_indheap_init           (igraph_d_indheap_t* h, igraph_integer_t size);
+igraph_long_t igraph_d_indheap_init           (igraph_d_indheap_t* h, igraph_long_t size);
 void igraph_d_indheap_destroy        (igraph_d_indheap_t* h);
 igraph_bool_t igraph_d_indheap_empty          (igraph_d_indheap_t* h);
-igraph_integer_t igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
-                                     igraph_integer_t idx, igraph_integer_t idx2);
+igraph_long_t igraph_d_indheap_push           (igraph_d_indheap_t* h, igraph_real_t elem,
+                                     igraph_long_t idx, igraph_long_t idx2);
 igraph_real_t igraph_d_indheap_max       (igraph_d_indheap_t* h);
 igraph_real_t igraph_d_indheap_delete_max(igraph_d_indheap_t* h);
-igraph_integer_t igraph_d_indheap_size      (igraph_d_indheap_t* h);
-igraph_integer_t igraph_d_indheap_reserve        (igraph_d_indheap_t* h, igraph_integer_t size);
-void igraph_d_indheap_max_index(igraph_d_indheap_t *h, igraph_integer_t *idx, igraph_integer_t *idx2);
+igraph_long_t igraph_d_indheap_size      (igraph_d_indheap_t* h);
+igraph_long_t igraph_d_indheap_reserve        (igraph_d_indheap_t* h, igraph_long_t size);
+void igraph_d_indheap_max_index(igraph_d_indheap_t *h, igraph_long_t *idx, igraph_long_t *idx2);
 
-void igraph_d_indheap_i_build(igraph_d_indheap_t* h, igraph_integer_t head);
-void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, igraph_integer_t elem);
-void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, igraph_integer_t head);
-void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, igraph_integer_t e1, igraph_integer_t e2);
+void igraph_d_indheap_i_build(igraph_d_indheap_t* h, igraph_long_t head);
+void igraph_d_indheap_i_shift_up(igraph_d_indheap_t* h, igraph_long_t elem);
+void igraph_d_indheap_i_sink(igraph_d_indheap_t* h, igraph_long_t head);
+void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, igraph_long_t e1, igraph_long_t e2);
 
 /* -------------------------------------------------- */
 /* Two-way indexed heap                               */
@@ -128,30 +128,30 @@ void igraph_d_indheap_i_switch(igraph_d_indheap_t* h, igraph_integer_t e1, igrap
    normal heap does this in O(n) time.... */
 
 typedef struct igraph_2wheap_t {
-    igraph_integer_t size;
+    igraph_long_t size;
     igraph_vector_t data;
     igraph_vector_long_t index;
     igraph_vector_long_t index2;
 } igraph_2wheap_t;
 
-igraph_integer_t igraph_2wheap_init(igraph_2wheap_t *h, igraph_integer_t size);
+igraph_long_t igraph_2wheap_init(igraph_2wheap_t *h, igraph_long_t size);
 void igraph_2wheap_destroy(igraph_2wheap_t *h);
-igraph_integer_t igraph_2wheap_clear(igraph_2wheap_t *h);
-igraph_integer_t igraph_2wheap_push_with_index(igraph_2wheap_t *h,
-                                  igraph_integer_t idx, igraph_real_t elem);
+igraph_long_t igraph_2wheap_clear(igraph_2wheap_t *h);
+igraph_long_t igraph_2wheap_push_with_index(igraph_2wheap_t *h,
+                                  igraph_long_t idx, igraph_real_t elem);
 igraph_bool_t igraph_2wheap_empty(const igraph_2wheap_t *h);
-igraph_integer_t igraph_2wheap_size(const igraph_2wheap_t *h);
-igraph_integer_t igraph_2wheap_max_size(const igraph_2wheap_t *h);
+igraph_long_t igraph_2wheap_size(const igraph_2wheap_t *h);
+igraph_long_t igraph_2wheap_max_size(const igraph_2wheap_t *h);
 igraph_real_t igraph_2wheap_max(const igraph_2wheap_t *h);
-igraph_integer_t igraph_2wheap_max_index(const igraph_2wheap_t *h);
+igraph_long_t igraph_2wheap_max_index(const igraph_2wheap_t *h);
 igraph_real_t igraph_2wheap_deactivate_max(igraph_2wheap_t *h);
-igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, igraph_integer_t idx);
-igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, igraph_integer_t idx);
-igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, igraph_integer_t idx);
+igraph_bool_t igraph_2wheap_has_elem(const igraph_2wheap_t *h, igraph_long_t idx);
+igraph_bool_t igraph_2wheap_has_active(const igraph_2wheap_t *h, igraph_long_t idx);
+igraph_real_t igraph_2wheap_get(const igraph_2wheap_t *h, igraph_long_t idx);
 igraph_real_t igraph_2wheap_delete_max(igraph_2wheap_t *h);
-igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, igraph_integer_t *idx);
-igraph_integer_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_integer_t idx, igraph_real_t elem);
-igraph_integer_t igraph_2wheap_check(igraph_2wheap_t *h);
+igraph_real_t igraph_2wheap_delete_max_index(igraph_2wheap_t *h, igraph_long_t *idx);
+igraph_long_t igraph_2wheap_modify(igraph_2wheap_t *h, igraph_long_t idx, igraph_real_t elem);
+igraph_long_t igraph_2wheap_check(igraph_2wheap_t *h);
 
 __END_DECLS
 

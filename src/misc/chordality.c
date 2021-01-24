@@ -53,14 +53,14 @@
  * \sa \ref igraph_is_chordal().
  */
 
-igraph_integer_t igraph_maximum_cardinality_search(const igraph_t *graph,
+igraph_long_t igraph_maximum_cardinality_search(const igraph_t *graph,
                                       igraph_vector_t *alpha,
                                       igraph_vector_t *alpham1) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_long_t size;
     igraph_vector_long_t head, next, prev; /* doubly linked list with head */
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_adjlist_t adjlist;
     igraph_bool_t simple;
 
@@ -68,7 +68,7 @@ igraph_integer_t igraph_maximum_cardinality_search(const igraph_t *graph,
     /* local j, v; */
     /***************/
 
-    igraph_integer_t j, v;
+    igraph_long_t j, v;
 
     if (igraph_is_directed(graph)) {
         IGRAPH_ERROR("Maximum cardinality search works on undirected graphs only", IGRAPH_EINVAL);
@@ -133,8 +133,8 @@ igraph_integer_t igraph_maximum_cardinality_search(const igraph_t *graph,
     /**************/
 
     while (i >= 1) {
-        igraph_integer_t x, k, len;
-        igraph_vector_int_t *neis;
+        igraph_long_t x, k, len;
+        igraph_vector_long_t *neis;
 
         /********************************/
         /* v :=  delete any from set(j) */
@@ -162,18 +162,18 @@ igraph_integer_t igraph_maximum_cardinality_search(const igraph_t *graph,
         /********************************************/
 
         neis = igraph_adjlist_get(&adjlist, v);
-        len = igraph_vector_int_size(neis);
+        len = igraph_vector_long_size(neis);
         for (k = 0; k < len; k++) {
-            igraph_integer_t w = (igraph_integer_t) VECTOR(*neis)[k];
-            igraph_integer_t ws = VECTOR(size)[w];
+            igraph_long_t w = (igraph_long_t) VECTOR(*neis)[k];
+            igraph_long_t ws = VECTOR(size)[w];
             if (ws >= 0) {
 
                 /******************************/
                 /* delete w from set(size(w)) */
                 /******************************/
 
-                igraph_integer_t nw = VECTOR(next)[w];
-                igraph_integer_t pw = VECTOR(prev)[w];
+                igraph_long_t nw = VECTOR(next)[w];
+                igraph_long_t pw = VECTOR(prev)[w];
                 if (nw != 0) {
                     VECTOR(prev)[nw - 1] = pw;
                 }
@@ -270,18 +270,18 @@ igraph_integer_t igraph_maximum_cardinality_search(const igraph_t *graph,
  * \sa \ref igraph_maximum_cardinality_search().
  */
 
-igraph_integer_t igraph_is_chordal(const igraph_t *graph,
+igraph_long_t igraph_is_chordal(const igraph_t *graph,
                       const igraph_vector_t *alpha,
                       const igraph_vector_t *alpham1,
                       igraph_bool_t *chordal,
                       igraph_vector_t *fill_in,
                       igraph_t *newgraph) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     const igraph_vector_t *my_alpha = alpha, *my_alpham1 = alpham1;
     igraph_vector_t v_alpha, v_alpham1;
     igraph_vector_long_t f, index;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_adjlist_t adjlist;
     igraph_vector_long_t mark;
     igraph_bool_t calc_edges = fill_in || newgraph;
@@ -291,7 +291,7 @@ igraph_integer_t igraph_is_chordal(const igraph_t *graph,
     /* local v, w, x */
     /*****************/
 
-    igraph_integer_t v, w, x;
+    igraph_long_t v, w, x;
 
     if (!chordal && !calc_edges) {
         /* Nothing to calculate */
@@ -307,19 +307,19 @@ igraph_integer_t igraph_is_chordal(const igraph_t *graph,
                      (igraph_vector_t*) my_alpha,
                      (igraph_vector_t*) my_alpham1));
     } else if (alpha && !alpham1) {
-        igraph_integer_t v;
+        igraph_long_t v;
         IGRAPH_VECTOR_INIT_FINALLY(&v_alpham1, no_of_nodes);
         my_alpham1 = &v_alpham1;
         for (v = 0; v < no_of_nodes; v++) {
-            igraph_integer_t i = (igraph_integer_t) VECTOR(*my_alpha)[v];
+            igraph_long_t i = (igraph_long_t) VECTOR(*my_alpha)[v];
             VECTOR(*my_alpham1)[i] = v;
         }
     } else if (!alpha && alpham1) {
-        igraph_integer_t i;
+        igraph_long_t i;
         IGRAPH_VECTOR_INIT_FINALLY(&v_alpha, no_of_nodes);
         my_alpha = &v_alpha;
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t v = (igraph_integer_t) VECTOR(*my_alpham1)[i];
+            igraph_long_t v = (igraph_long_t) VECTOR(*my_alpham1)[i];
             VECTOR(*my_alpha)[v] = i;
         }
     }
@@ -350,14 +350,14 @@ igraph_integer_t igraph_is_chordal(const igraph_t *graph,
     /*********************/
 
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_vector_int_t *neis;
-        igraph_integer_t j, len;
+        igraph_vector_long_t *neis;
+        igraph_long_t j, len;
 
         /**********************************************/
         /* w := alpham1(i); f(w) := w; index(w) := i; */
         /**********************************************/
 
-        w = (igraph_integer_t) VECTOR(*my_alpham1)[i];
+        w = (igraph_long_t) VECTOR(*my_alpham1)[i];
         VECTOR(f)[w] = w;
         VECTOR(index)[w] = i;
 
@@ -366,14 +366,14 @@ igraph_integer_t igraph_is_chordal(const igraph_t *graph,
         /******************************************/
 
         neis = igraph_adjlist_get(&adjlist, w);
-        len = igraph_vector_int_size(neis);
+        len = igraph_vector_long_size(neis);
         for (j = 0; j < len; j++) {
-            v = (igraph_integer_t) VECTOR(*neis)[j];
+            v = (igraph_long_t) VECTOR(*neis)[j];
             VECTOR(mark)[v] = w + 1;
         }
 
         for (j = 0; j < len; j++) {
-            v = (igraph_integer_t) VECTOR(*neis)[j];
+            v = (igraph_long_t) VECTOR(*neis)[j];
             if (VECTOR(*my_alpha)[v] >= i) {
                 continue;
             }

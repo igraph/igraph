@@ -29,21 +29,21 @@ typedef struct cb2_data_t {
     igraph_matrix_t *A;
 } cb2_data_t;
 
-igraph_integer_t cb2(igraph_real_t *to, const igraph_real_t *from, igraph_integer_t n, void *extra) {
+igraph_long_t cb2(igraph_real_t *to, const igraph_real_t *from, igraph_long_t n, void *extra) {
     cb2_data_t *data = (cb2_data_t*) extra;
     igraph_blas_dgemv_array(/*transpose=*/ 0, /*alpha=*/ 1.0,
                                            data->A, from, /*beta=*/ 0.0, to);
     return 0;
 }
 
-igraph_integer_t check_eigenvector(
+igraph_long_t check_eigenvector(
     const char* test_name,
     igraph_matrix_t* A, igraph_matrix_t* values, igraph_matrix_t* vectors,
-    igraph_integer_t eval_idx, igraph_integer_t evec_col_idx
+    igraph_long_t eval_idx, igraph_long_t evec_col_idx
 ) {
     igraph_complex_t eval, prod;
     igraph_complex_t *evec;
-    igraph_integer_t i, j, n = igraph_matrix_nrow(A);
+    igraph_long_t i, j, n = igraph_matrix_nrow(A);
 
     eval = igraph_complex(MATRIX(*values, eval_idx, 0), MATRIX(*values, eval_idx, 1));
     evec = (igraph_complex_t*) calloc(n, sizeof(igraph_complex_t));
@@ -93,13 +93,13 @@ igraph_integer_t check_eigenvector(
     return 0;
 }
 
-igraph_integer_t check_eigenvectors(
+igraph_long_t check_eigenvectors(
     const char* test_name,
     igraph_matrix_t* A, igraph_matrix_t* values, igraph_matrix_t* vectors
 ) {
-    igraph_integer_t i, j;
-    igraph_integer_t nev = igraph_matrix_nrow(values);
-    igraph_integer_t errors = 0;
+    igraph_long_t i, j;
+    igraph_long_t nev = igraph_matrix_nrow(values);
+    igraph_long_t errors = 0;
     igraph_bool_t conjugate_pair_will_come = 0;
 
     for (i = 0, j = 0; i < nev; i++) {
@@ -132,12 +132,12 @@ void print_debug_output(
 
 #define DIM 10
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_matrix_t A;
     igraph_matrix_t values, vectors;
     igraph_arpack_options_t options;
     cb2_data_t data = { &A };
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
 
     igraph_rng_seed(igraph_rng_default(), 42 * 42);
 

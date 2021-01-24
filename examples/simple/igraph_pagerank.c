@@ -24,20 +24,20 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v, FILE *f) {
-    igraph_integer_t i;
+    igraph_long_t i;
     for (i = 0; i < igraph_vector_size(v); i++) {
         fprintf(f, " %4.2f", VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_t v, res, reset, weights;
     igraph_arpack_options_t arpack_options;
     igraph_real_t value;
-    igraph_integer_t ret;
+    igraph_long_t ret;
 
     igraph_arpack_options_init(&arpack_options);
 

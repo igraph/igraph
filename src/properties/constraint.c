@@ -74,15 +74,15 @@
  * graph. If the weights argument is \c NULL then the time complexity
  * is O(|V|+n*d^2).
  */
-igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
+igraph_long_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                       igraph_vs_t vids, const igraph_vector_t *weights) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
     igraph_vit_t vit;
-    igraph_integer_t nodes_to_calc;
-    igraph_integer_t a, b, c, i, j, q, vsize, vsize2;
-    igraph_integer_t edge, from, to, edge2;
+    igraph_long_t nodes_to_calc;
+    igraph_long_t a, b, c, i, j, q, vsize, vsize2;
+    igraph_long_t edge, from, to, edge2;
 
     igraph_vector_t contrib;
     igraph_vector_t degree;
@@ -108,10 +108,10 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                                    IGRAPH_ALL, IGRAPH_NO_LOOPS));
     } else {
         for (a = 0; a < no_of_edges; a++) {
-            igraph_edge(graph, (igraph_integer_t) a, &from, &to);
+            igraph_edge(graph, (igraph_long_t) a, &from, &to);
             if (from != to) {
-                VECTOR(degree)[(igraph_integer_t) from] += VECTOR(*weights)[a];
-                VECTOR(degree)[(igraph_integer_t) to  ] += VECTOR(*weights)[a];
+                VECTOR(degree)[(igraph_long_t) from] += VECTOR(*weights)[a];
+                VECTOR(degree)[(igraph_long_t) to  ] += VECTOR(*weights)[a];
             }
         }
     }
@@ -123,9 +123,9 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         i = IGRAPH_VIT_GET(vit);
 
         /* get neighbors of i */
-        IGRAPH_CHECK(igraph_incident(graph, &ineis_in, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_incident(graph, &ineis_in, (igraph_long_t) i,
                                      IGRAPH_IN));
-        IGRAPH_CHECK(igraph_incident(graph, &ineis_out, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_incident(graph, &ineis_out, (igraph_long_t) i,
                                      IGRAPH_OUT));
 
         /* NaN for isolates */
@@ -137,26 +137,26 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         /* zero their contribution */
         vsize = igraph_vector_size(&ineis_in);
         for (b = 0; b < vsize; b++) {
-            edge = (igraph_integer_t) VECTOR(ineis_in)[b];
-            j = (igraph_integer_t) IGRAPH_OTHER(graph, edge, i);
+            edge = (igraph_long_t) VECTOR(ineis_in)[b];
+            j = (igraph_long_t) IGRAPH_OTHER(graph, edge, i);
             VECTOR(contrib)[j] = 0.0;
         }
         vsize = igraph_vector_size(&ineis_out);
         for (b = 0; b < vsize; b++) {
-            edge = (igraph_integer_t) VECTOR(ineis_out)[b];
-            j = (igraph_integer_t) IGRAPH_OTHER(graph, edge, i);
+            edge = (igraph_long_t) VECTOR(ineis_out)[b];
+            j = (igraph_long_t) IGRAPH_OTHER(graph, edge, i);
             VECTOR(contrib)[j] = 0.0;
         }
 
         /* add the direct contributions, in-neighbors and out-neighbors */
         vsize = igraph_vector_size(&ineis_in);
         for (b = 0; b < vsize; b++) {
-            edge = (igraph_integer_t) VECTOR(ineis_in)[b];
-            j = (igraph_integer_t) IGRAPH_OTHER(graph, edge, i);
+            edge = (igraph_long_t) VECTOR(ineis_in)[b];
+            j = (igraph_long_t) IGRAPH_OTHER(graph, edge, i);
             if (i != j) {     /* excluding loops */
                 if (weights) {
                     VECTOR(contrib)[j] +=
-                        VECTOR(*weights)[(igraph_integer_t)edge] / VECTOR(degree)[i];
+                        VECTOR(*weights)[(igraph_long_t)edge] / VECTOR(degree)[i];
                 } else {
                     VECTOR(contrib)[j] += 1.0 / VECTOR(degree)[i];
                 }
@@ -165,12 +165,12 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         if (igraph_is_directed(graph)) {
             vsize = igraph_vector_size(&ineis_out);
             for (b = 0; b < vsize; b++) {
-                edge = (igraph_integer_t) VECTOR(ineis_out)[b];
-                j = (igraph_integer_t) IGRAPH_OTHER(graph, edge, i);
+                edge = (igraph_long_t) VECTOR(ineis_out)[b];
+                j = (igraph_long_t) IGRAPH_OTHER(graph, edge, i);
                 if (i != j) {
                     if (weights) {
                         VECTOR(contrib)[j] +=
-                            VECTOR(*weights)[(igraph_integer_t)edge] / VECTOR(degree)[i];
+                            VECTOR(*weights)[(igraph_long_t)edge] / VECTOR(degree)[i];
                     } else {
                         VECTOR(contrib)[j] += 1.0 / VECTOR(degree)[i];
                     }
@@ -181,24 +181,24 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         /* add the indirect contributions, in-in, in-out, out-in, out-out */
         vsize = igraph_vector_size(&ineis_in);
         for (b = 0; b < vsize; b++) {
-            edge = (igraph_integer_t) VECTOR(ineis_in)[b];
-            j = (igraph_integer_t) IGRAPH_OTHER(graph, edge, i);
+            edge = (igraph_long_t) VECTOR(ineis_in)[b];
+            j = (igraph_long_t) IGRAPH_OTHER(graph, edge, i);
             if (i == j) {
                 continue;
             }
-            IGRAPH_CHECK(igraph_incident(graph, &jneis_in, (igraph_integer_t) j,
+            IGRAPH_CHECK(igraph_incident(graph, &jneis_in, (igraph_long_t) j,
                                          IGRAPH_IN));
-            IGRAPH_CHECK(igraph_incident(graph, &jneis_out, (igraph_integer_t) j,
+            IGRAPH_CHECK(igraph_incident(graph, &jneis_out, (igraph_long_t) j,
                                          IGRAPH_OUT));
             vsize2 = igraph_vector_size(&jneis_in);
             for (c = 0; c < vsize2; c++) {
-                edge2 = (igraph_integer_t) VECTOR(jneis_in)[c];
-                q = (igraph_integer_t) IGRAPH_OTHER(graph, edge2, j);
+                edge2 = (igraph_long_t) VECTOR(jneis_in)[c];
+                q = (igraph_long_t) IGRAPH_OTHER(graph, edge2, j);
                 if (j != q) {
                     if (weights) {
                         VECTOR(contrib)[q] +=
-                            VECTOR(*weights)[(igraph_integer_t)edge] *
-                            VECTOR(*weights)[(igraph_integer_t)edge2] /
+                            VECTOR(*weights)[(igraph_long_t)edge] *
+                            VECTOR(*weights)[(igraph_long_t)edge2] /
                             VECTOR(degree)[i] / VECTOR(degree)[j];
                     } else {
                         VECTOR(contrib)[q] += 1 / VECTOR(degree)[i] / VECTOR(degree)[j];
@@ -208,13 +208,13 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
             if (igraph_is_directed(graph)) {
                 vsize2 = igraph_vector_size(&jneis_out);
                 for (c = 0; c < vsize2; c++) {
-                    edge2 = (igraph_integer_t) VECTOR(jneis_out)[c];
-                    q = (igraph_integer_t) IGRAPH_OTHER(graph, edge2, j);
+                    edge2 = (igraph_long_t) VECTOR(jneis_out)[c];
+                    q = (igraph_long_t) IGRAPH_OTHER(graph, edge2, j);
                     if (j != q) {
                         if (weights) {
                             VECTOR(contrib)[q] +=
-                                VECTOR(*weights)[(igraph_integer_t)edge] *
-                                VECTOR(*weights)[(igraph_integer_t)edge2] /
+                                VECTOR(*weights)[(igraph_long_t)edge] *
+                                VECTOR(*weights)[(igraph_long_t)edge2] /
                                 VECTOR(degree)[i] / VECTOR(degree)[j];
                         } else {
                             VECTOR(contrib)[q] += 1 / VECTOR(degree)[i] / VECTOR(degree)[j];
@@ -226,24 +226,24 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         if (igraph_is_directed(graph)) {
             vsize = igraph_vector_size(&ineis_out);
             for (b = 0; b < vsize; b++) {
-                edge = (igraph_integer_t) VECTOR(ineis_out)[b];
-                j = (igraph_integer_t) IGRAPH_OTHER(graph, edge, i);
+                edge = (igraph_long_t) VECTOR(ineis_out)[b];
+                j = (igraph_long_t) IGRAPH_OTHER(graph, edge, i);
                 if (i == j) {
                     continue;
                 }
-                IGRAPH_CHECK(igraph_incident(graph, &jneis_in, (igraph_integer_t) j,
+                IGRAPH_CHECK(igraph_incident(graph, &jneis_in, (igraph_long_t) j,
                                              IGRAPH_IN));
-                IGRAPH_CHECK(igraph_incident(graph, &jneis_out, (igraph_integer_t) j,
+                IGRAPH_CHECK(igraph_incident(graph, &jneis_out, (igraph_long_t) j,
                                              IGRAPH_OUT));
                 vsize2 = igraph_vector_size(&jneis_in);
                 for (c = 0; c < vsize2; c++) {
-                    edge2 = (igraph_integer_t) VECTOR(jneis_in)[c];
-                    q = (igraph_integer_t) IGRAPH_OTHER(graph, edge2, j);
+                    edge2 = (igraph_long_t) VECTOR(jneis_in)[c];
+                    q = (igraph_long_t) IGRAPH_OTHER(graph, edge2, j);
                     if (j != q) {
                         if (weights) {
                             VECTOR(contrib)[q] +=
-                                VECTOR(*weights)[(igraph_integer_t)edge] *
-                                VECTOR(*weights)[(igraph_integer_t)edge2] /
+                                VECTOR(*weights)[(igraph_long_t)edge] *
+                                VECTOR(*weights)[(igraph_long_t)edge2] /
                                 VECTOR(degree)[i] / VECTOR(degree)[j];
                         } else {
                             VECTOR(contrib)[q] += 1 / VECTOR(degree)[i] / VECTOR(degree)[j];
@@ -252,13 +252,13 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
                 }
                 vsize2 = igraph_vector_size(&jneis_out);
                 for (c = 0; c < vsize2; c++) {
-                    edge2 = (igraph_integer_t) VECTOR(jneis_out)[c];
-                    q = (igraph_integer_t) IGRAPH_OTHER(graph, edge2, j);
+                    edge2 = (igraph_long_t) VECTOR(jneis_out)[c];
+                    q = (igraph_long_t) IGRAPH_OTHER(graph, edge2, j);
                     if (j != q) {
                         if (weights) {
                             VECTOR(contrib)[q] +=
-                                VECTOR(*weights)[(igraph_integer_t)edge] *
-                                VECTOR(*weights)[(igraph_integer_t)edge2] /
+                                VECTOR(*weights)[(igraph_long_t)edge] *
+                                VECTOR(*weights)[(igraph_long_t)edge2] /
                                 VECTOR(degree)[i] / VECTOR(degree)[j];
                         } else {
                             VECTOR(contrib)[q] += 1 / VECTOR(degree)[i] / VECTOR(degree)[j];
@@ -271,8 +271,8 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         /* squared sum of the contributions */
         vsize = igraph_vector_size(&ineis_in);
         for (b = 0; b < vsize; b++) {
-            edge = (igraph_integer_t) VECTOR(ineis_in)[b];
-            j = (igraph_integer_t) IGRAPH_OTHER(graph, edge, i);
+            edge = (igraph_long_t) VECTOR(ineis_in)[b];
+            j = (igraph_long_t) IGRAPH_OTHER(graph, edge, i);
             if (i == j) {
                 continue;
             }
@@ -282,8 +282,8 @@ igraph_integer_t igraph_constraint(const igraph_t *graph, igraph_vector_t *res,
         if (igraph_is_directed(graph)) {
             vsize =  igraph_vector_size(&ineis_out);
             for (b = 0; b < vsize; b++) {
-                edge = (igraph_integer_t) VECTOR(ineis_out)[b];
-                j = (igraph_integer_t) IGRAPH_OTHER(graph, edge, i);
+                edge = (igraph_long_t) VECTOR(ineis_out)[b];
+                j = (igraph_long_t) IGRAPH_OTHER(graph, edge, i);
                 if (i == j) {
                     continue;
                 }

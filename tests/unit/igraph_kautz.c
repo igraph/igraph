@@ -20,7 +20,7 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g, g_test;
     igraph_bool_t iso, same;
 

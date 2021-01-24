@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-igraph_integer_t comp(const void *a, const void *b) {
+igraph_long_t comp(const void *a, const void *b) {
     igraph_real_t *aa = (igraph_real_t *) a;
     igraph_real_t *bb = (igraph_real_t *) b;
 
@@ -36,10 +36,10 @@ igraph_integer_t comp(const void *a, const void *b) {
     return 0;
 }
 
-igraph_integer_t main() {
-    const igraph_integer_t len = 100;
+igraph_long_t main() {
+    const igraph_long_t len = 100;
     igraph_vector_t v;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_vector_init(&v, len);

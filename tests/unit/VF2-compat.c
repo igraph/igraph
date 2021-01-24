@@ -31,8 +31,8 @@
 /* Vertices/edges with the same parity match */
 igraph_bool_t compat_parity(const igraph_t *graph1,
                             const igraph_t *graph2,
-                            const igraph_integer_t g1_num,
-                            const igraph_integer_t g2_num,
+                            const igraph_long_t g1_num,
+                            const igraph_long_t g2_num,
                             void *arg) {
     return (g1_num % 2) == (g2_num % 2);
 }
@@ -40,17 +40,17 @@ igraph_bool_t compat_parity(const igraph_t *graph1,
 /* Nothing vertex/edge 0 in graph1 */
 igraph_bool_t compat_not0(const igraph_t *graph1,
                           const igraph_t *graph2,
-                          const igraph_integer_t g1_num,
-                          const igraph_integer_t g2_num,
+                          const igraph_long_t g1_num,
+                          const igraph_long_t g2_num,
                           void *arg) {
     return g1_num != 0;
 }
 
-igraph_integer_t match_rings() {
+igraph_long_t match_rings() {
 
     igraph_t r1, r2;
     igraph_bool_t iso;
-    igraph_integer_t count;
+    igraph_long_t count;
     igraph_ring(&r1, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_ring(&r2, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
 
@@ -141,10 +141,10 @@ igraph_integer_t match_rings() {
     return 0;
 }
 
-igraph_integer_t match_rings_open_closed() {
+igraph_long_t match_rings_open_closed() {
     igraph_t ro, rc;
     igraph_bool_t iso;
-    igraph_integer_t count;
+    igraph_long_t count;
     igraph_ring(&ro, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 0);
     igraph_ring(&rc, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
 
@@ -241,7 +241,7 @@ igraph_integer_t match_rings_open_closed() {
 
 /* ----------------------------------------------------------- */
 
-igraph_integer_t main() {
+igraph_long_t main() {
     match_rings();
     match_rings_open_closed();
 

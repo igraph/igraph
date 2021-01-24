@@ -6,11 +6,11 @@
 
 #define FILENAME "mybool.graphml.xml"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t graph;
     igraph_error_handler_t* oldhandler;
-    igraph_integer_t result;
+    igraph_long_t result;
     FILE* ifile = fopen("cattr_bool_bug2.graphml", "r");
 
     if (!ifile) {

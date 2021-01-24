@@ -27,10 +27,10 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_d_indheap_t h;
-    igraph_integer_t idx1, idx2;
+    igraph_long_t idx1, idx2;
 
     /* igraph_d_indheap_init, igraph_d_indheap_destroy */
     igraph_d_indheap_init(&h, 0);
@@ -68,8 +68,8 @@ igraph_integer_t main() {
 
     /* igraph_d_indheap_max, igraph_d_indheap_delete_max */
     while (!igraph_d_indheap_empty(&h)) {
-        printf("% li", (igraph_integer_t)igraph_d_indheap_max(&h));
-        printf("% li\n", (igraph_integer_t)igraph_d_indheap_delete_max(&h));
+        printf("% li", (igraph_long_t)igraph_d_indheap_max(&h));
+        printf("% li\n", (igraph_long_t)igraph_d_indheap_delete_max(&h));
     }
 
     /* igraph_d_indheap_reserve */

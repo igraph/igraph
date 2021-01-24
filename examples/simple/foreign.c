@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     FILE *ifile;
 
@@ -36,9 +36,9 @@ igraph_integer_t main() {
     igraph_read_graph_pajek(&g, ifile);
     fclose(ifile);
     printf("The graph:\n");
-    printf("Vertices: %li\n", (igraph_integer_t) igraph_vcount(&g));
-    printf("Edges: %li\n", (igraph_integer_t) igraph_ecount(&g));
-    printf("Directed: %i\n", (igraph_integer_t) igraph_is_directed(&g));
+    printf("Vertices: %li\n", (igraph_long_t) igraph_vcount(&g));
+    printf("Edges: %li\n", (igraph_long_t) igraph_ecount(&g));
+    printf("Directed: %i\n", (igraph_long_t) igraph_is_directed(&g));
     igraph_write_graph_edgelist(&g, stdout);
     igraph_destroy(&g);
 

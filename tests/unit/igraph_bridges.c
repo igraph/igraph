@@ -5,15 +5,15 @@
 #include "test_utilities.inc"
 
 void sort_and_print_vector(igraph_vector_t *v) {
-    igraph_integer_t i, n = igraph_vector_size(v);
+    igraph_long_t i, n = igraph_vector_size(v);
     igraph_vector_sort(v);
     for (i = 0; i < n; i++) {
-        printf(" %li", (igraph_integer_t) VECTOR(*v)[i]);
+        printf(" %li", (igraph_long_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     igraph_vector_t bridges;
 

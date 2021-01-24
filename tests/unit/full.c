@@ -24,9 +24,9 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
-    igraph_integer_t n_vertices = 10;
+    igraph_long_t n_vertices = 10;
 
     printf("Null graph\n");
     igraph_full(&g, 0, IGRAPH_UNDIRECTED, IGRAPH_NO_LOOPS);

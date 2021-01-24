@@ -55,10 +55,10 @@
  *
  * Time complexity: O(1).
  */
-igraph_integer_t igraph_density(const igraph_t *graph, igraph_real_t *res,
+igraph_long_t igraph_density(const igraph_t *graph, igraph_real_t *res,
                    igraph_bool_t loops) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_real_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
@@ -112,15 +112,15 @@ igraph_integer_t igraph_density(const igraph_t *graph, igraph_real_t *res,
  * Time complexity: O(|V|+|E|), linear.
  *
  */
-igraph_integer_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
+igraph_long_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weights,
                      igraph_vector_t *res, const igraph_vs_t vids) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t incident;
     igraph_vit_t vit;
     igraph_real_t s, ent, w;
-    igraph_integer_t i, j, k;
+    igraph_long_t i, j, k;
 
     if (!weights) {
         IGRAPH_ERROR("Edge weights must be given", IGRAPH_EINVAL);
@@ -137,8 +137,8 @@ igraph_integer_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weight
         for (i = 0; i < no_of_nodes; i++) {
             s = ent = 0.0;
             IGRAPH_CHECK(igraph_incident(graph, &incident, i, /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = (igraph_integer_t) igraph_vector_size(&incident); j < k; j++) {
-                w = VECTOR(*weights)[(igraph_integer_t)VECTOR(incident)[j]];
+            for (j = 0, k = (igraph_long_t) igraph_vector_size(&incident); j < k; j++) {
+                w = VECTOR(*weights)[(igraph_long_t)VECTOR(incident)[j]];
                 s += w;
                 ent += (w * log(w));
             }
@@ -152,12 +152,12 @@ igraph_integer_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weight
         for (IGRAPH_VIT_RESET(vit), i = 0;
              !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), i++) {
-            igraph_integer_t v = IGRAPH_VIT_GET(vit);
+            igraph_long_t v = IGRAPH_VIT_GET(vit);
             s = ent = 0.0;
-            IGRAPH_CHECK(igraph_incident(graph, &incident, (igraph_integer_t) v,
+            IGRAPH_CHECK(igraph_incident(graph, &incident, (igraph_long_t) v,
                                          /*mode=*/ IGRAPH_ALL));
-            for (j = 0, k = (igraph_integer_t) igraph_vector_size(&incident); j < k; j++) {
-                w = VECTOR(*weights)[(igraph_integer_t)VECTOR(incident)[j]];
+            for (j = 0, k = (igraph_long_t) igraph_vector_size(&incident); j < k; j++) {
+                w = VECTOR(*weights)[(igraph_long_t)VECTOR(incident)[j]];
                 s += w;
                 ent += (w * log(w));
             }
@@ -217,14 +217,14 @@ igraph_integer_t igraph_diversity(igraph_t *graph, const igraph_vector_t *weight
  *
  * \example examples/simple/igraph_reciprocity.c
  */
-igraph_integer_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
+igraph_long_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
                        igraph_bool_t ignore_loops,
                        igraph_reciprocity_t mode) {
 
-    igraph_integer_t nonrec = 0, rec = 0, loops = 0;
+    igraph_long_t nonrec = 0, rec = 0, loops = 0;
     igraph_vector_t inneis, outneis;
-    igraph_integer_t i;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
 
     if (mode != IGRAPH_RECIPROCITY_DEFAULT &&
         mode != IGRAPH_RECIPROCITY_RATIO) {
@@ -241,9 +241,9 @@ igraph_integer_t igraph_reciprocity(const igraph_t *graph, igraph_real_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&outneis, 0);
 
     for (i = 0; i < no_of_nodes; i++) {
-        igraph_integer_t ip, op;
-        igraph_neighbors(graph, &inneis, (igraph_integer_t) i, IGRAPH_IN);
-        igraph_neighbors(graph, &outneis, (igraph_integer_t) i, IGRAPH_OUT);
+        igraph_long_t ip, op;
+        igraph_neighbors(graph, &inneis, (igraph_long_t) i, IGRAPH_IN);
+        igraph_neighbors(graph, &outneis, (igraph_long_t) i, IGRAPH_OUT);
 
         ip = op = 0;
         while (ip < igraph_vector_size(&inneis) &&

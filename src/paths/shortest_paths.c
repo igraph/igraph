@@ -35,7 +35,7 @@
 
 /* Computes the average of pairwise distances (used for igraph_average_path_length),
  * or of inverse pairwise distances (used for igraph_global_efficiency), in an unweighted graph. */
-static igraph_integer_t igraph_i_average_path_length_unweighted(
+static igraph_long_t igraph_i_average_path_length_unweighted(
         const igraph_t *graph,
         igraph_real_t *res,
         igraph_real_t *unconnected_pairs, /* if not NULL, will be set to the no. of non-connected ordered vertex pairs */
@@ -43,18 +43,18 @@ static igraph_integer_t igraph_i_average_path_length_unweighted(
         const igraph_bool_t invert, /* average inverse distances instead of distances */
         const igraph_bool_t unconn  /* average over connected pairs instead of all pairs */)
 {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t source, j, n;
-    igraph_integer_t *already_added;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t source, j, n;
+    igraph_long_t *already_added;
     igraph_real_t no_of_pairs = no_of_nodes * (no_of_nodes - 1.0); /* no. of ordered vertex pairs */
     igraph_real_t no_of_conn_pairs = 0.0; /* no. of ordered pairs between which there is a path */
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
-    igraph_vector_int_t *neis;
+    igraph_vector_long_t *neis;
     igraph_adjlist_t allneis;
 
     *res = 0;
-    already_added = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    already_added = igraph_Calloc(no_of_nodes, igraph_long_t);
     if (already_added == 0) {
         IGRAPH_ERROR("Average path length calculation failed", IGRAPH_ENOMEM);
     }
@@ -72,13 +72,13 @@ static igraph_integer_t igraph_i_average_path_length_unweighted(
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
-            igraph_integer_t actdist = (igraph_integer_t) igraph_dqueue_pop(&q);
+            igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&q);
+            igraph_long_t actdist = (igraph_long_t) igraph_dqueue_pop(&q);
 
             neis = igraph_adjlist_get(&allneis, actnode);
-            n = igraph_vector_int_size(neis);
+            n = igraph_vector_long_size(neis);
             for (j = 0; j < n; j++) {
-                igraph_integer_t neighbor = (igraph_integer_t) VECTOR(*neis)[j];
+                igraph_long_t neighbor = (igraph_long_t) VECTOR(*neis)[j];
                 if (already_added[neighbor] == source + 1) {
                     continue;
                 }
@@ -135,7 +135,7 @@ static igraph_integer_t igraph_i_average_path_length_unweighted(
  * or of inverse pairwise distances (used for igraph_global_efficiency), in an unweighted graph.
  * Uses Dijkstra's algorithm, therefore all weights must be non-negative.
  */
-static igraph_integer_t igraph_i_average_path_length_dijkstra(
+static igraph_long_t igraph_i_average_path_length_dijkstra(
         const igraph_t *graph,
         igraph_real_t *res,
         igraph_real_t *unconnected_pairs,
@@ -160,11 +160,11 @@ static igraph_integer_t igraph_i_average_path_length_dijkstra(
          and we want to spare that. -1 will denote infinity instead.
     */
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
     igraph_2wheap_t Q;
     igraph_lazy_inclist_t inclist;
-    igraph_integer_t source, j;
+    igraph_long_t source, j;
     igraph_real_t no_of_pairs = no_of_nodes * (no_of_nodes - 1.0); /* no. of ordered vertex pairs */
     igraph_real_t no_of_conn_pairs = 0.0; /* no. of ordered pairs between which there is a path */
 
@@ -201,10 +201,10 @@ static igraph_integer_t igraph_i_average_path_length_dijkstra(
         igraph_2wheap_push_with_index(&Q, source, -1.0);
 
         while (!igraph_2wheap_empty(&Q)) {
-            igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
+            igraph_long_t minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
             igraph_vector_t *neis;
-            igraph_integer_t nlen;
+            igraph_long_t nlen;
 
             if (minnei != source) {
                 if (invert) {
@@ -216,11 +216,11 @@ static igraph_integer_t igraph_i_average_path_length_dijkstra(
             }
 
             /* Now check all neighbors of 'minnei' for a shorter path */
-            neis = igraph_lazy_inclist_get(&inclist, (igraph_integer_t) minnei);
+            neis = igraph_lazy_inclist_get(&inclist, (igraph_long_t) minnei);
             nlen = igraph_vector_size(neis);
             for (j = 0; j < nlen; j++) {
-                igraph_integer_t edge = (igraph_integer_t) VECTOR(*neis)[j];
-                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_long_t edge = (igraph_long_t) VECTOR(*neis)[j];
+                igraph_long_t tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
@@ -297,7 +297,7 @@ static igraph_integer_t igraph_i_average_path_length_dijkstra(
  * \example examples/simple/igraph_average_path_length.c
  */
 
-igraph_integer_t igraph_average_path_length(const igraph_t *graph,
+igraph_long_t igraph_average_path_length(const igraph_t *graph,
                                igraph_real_t *res, igraph_real_t *unconn_pairs,
                                igraph_bool_t directed, igraph_bool_t unconn)
 {
@@ -345,7 +345,7 @@ igraph_integer_t igraph_average_path_length(const igraph_t *graph,
  *
  */
 
-igraph_integer_t igraph_average_path_length_dijkstra(const igraph_t *graph,
+igraph_long_t igraph_average_path_length_dijkstra(const igraph_t *graph,
                                         igraph_real_t *res, igraph_real_t *unconn_pairs,
                                         const igraph_vector_t *weights,
                                         igraph_bool_t directed, igraph_bool_t unconn)
@@ -397,7 +397,7 @@ igraph_integer_t igraph_average_path_length_dijkstra(const igraph_t *graph,
  *
  */
 
-igraph_integer_t igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
+igraph_long_t igraph_global_efficiency(const igraph_t *graph, igraph_real_t *res,
                              const igraph_vector_t *weights,
                              igraph_bool_t directed)
 {
@@ -409,25 +409,25 @@ igraph_integer_t igraph_global_efficiency(const igraph_t *graph, igraph_real_t *
 /***** Local efficiency *****/
 /****************************/
 
-static igraph_integer_t igraph_i_local_efficiency_unweighted(
+static igraph_long_t igraph_i_local_efficiency_unweighted(
         const igraph_t *graph,
         const igraph_adjlist_t *adjlist,
         igraph_dqueue_t *q,
-        igraph_integer_t *already_counted,
+        igraph_long_t *already_counted,
         igraph_vector_t *vertex_neis,
         igraph_vector_char_t *nei_mask,
         igraph_real_t *res,
-        igraph_integer_t vertex,
+        igraph_long_t vertex,
         igraph_neimode_t mode)
 {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t vertex_neis_size;
-    igraph_integer_t neighbor_count; /* unlike 'vertex_neis_size', 'neighbor_count' does not count self-loops and multi-edges */
-    igraph_integer_t i, j;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t vertex_neis_size;
+    igraph_long_t neighbor_count; /* unlike 'vertex_neis_size', 'neighbor_count' does not count self-loops and multi-edges */
+    igraph_long_t i, j;
 
     igraph_dqueue_clear(q);
-    memset(already_counted, 0, no_of_nodes * sizeof(igraph_integer_t));
+    memset(already_counted, 0, no_of_nodes * sizeof(igraph_long_t));
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_size(vertex_neis);
@@ -435,7 +435,7 @@ static igraph_integer_t igraph_i_local_efficiency_unweighted(
     igraph_vector_char_fill(nei_mask, 0);
     neighbor_count = 0;
     for (i=0; i < vertex_neis_size; ++i) {
-        igraph_integer_t v = VECTOR(*vertex_neis)[i];
+        igraph_long_t v = VECTOR(*vertex_neis)[i];
         if (v != vertex && ! VECTOR(*nei_mask)[v]) {
             VECTOR(*nei_mask)[v] = 1; /* mark as unprocessed neighbour */
             neighbor_count++;
@@ -450,8 +450,8 @@ static igraph_integer_t igraph_i_local_efficiency_unweighted(
     }
 
     for (i=0; i < vertex_neis_size; ++i) {
-        igraph_integer_t source = VECTOR(*vertex_neis)[i];
-        igraph_integer_t reached = 0;
+        igraph_long_t source = VECTOR(*vertex_neis)[i];
+        igraph_long_t reached = 0;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -467,10 +467,10 @@ static igraph_integer_t igraph_i_local_efficiency_unweighted(
         already_counted[source] = source + 1;
 
         while (!igraph_dqueue_empty(q)) {
-            igraph_vector_int_t *act_neis;
-            igraph_integer_t act_neis_size;
-            igraph_integer_t act = (igraph_integer_t) igraph_dqueue_pop(q);
-            igraph_integer_t actdist = (igraph_integer_t) igraph_dqueue_pop(q);
+            igraph_vector_long_t *act_neis;
+            igraph_long_t act_neis_size;
+            igraph_long_t act = (igraph_long_t) igraph_dqueue_pop(q);
+            igraph_long_t actdist = (igraph_long_t) igraph_dqueue_pop(q);
 
             if (act != source && VECTOR(*nei_mask)[act]) {
                 *res += 1.0 / actdist;
@@ -482,9 +482,9 @@ static igraph_integer_t igraph_i_local_efficiency_unweighted(
             }
 
             act_neis      = igraph_adjlist_get(adjlist, act);
-            act_neis_size = igraph_vector_int_size(act_neis);
+            act_neis_size = igraph_vector_long_size(act_neis);
             for (j = 0; j < act_neis_size; j++) {
-                igraph_integer_t neighbor = (igraph_integer_t) VECTOR(*act_neis)[j];
+                igraph_long_t neighbor = (igraph_long_t) VECTOR(*act_neis)[j];
 
                 if (neighbor == vertex || already_counted[neighbor] == i + 1)
                     continue;
@@ -501,14 +501,14 @@ static igraph_integer_t igraph_i_local_efficiency_unweighted(
     return IGRAPH_SUCCESS;
 }
 
-static igraph_integer_t igraph_i_local_efficiency_dijkstra(
+static igraph_long_t igraph_i_local_efficiency_dijkstra(
         const igraph_t *graph,
         igraph_lazy_inclist_t *inclist,
         igraph_2wheap_t *Q,
         igraph_vector_t *vertex_neis,
         igraph_vector_char_t *nei_mask, /* true if the corresponding node is a neighbour of 'vertex' */
         igraph_real_t *res,
-        igraph_integer_t vertex,
+        igraph_long_t vertex,
         igraph_neimode_t mode,
         const igraph_vector_t *weights)
 {
@@ -528,9 +528,9 @@ static igraph_integer_t igraph_i_local_efficiency_dijkstra(
          and we want to spare that. -1 will denote infinity instead.
     */
 
-    igraph_integer_t i, j;
-    igraph_integer_t vertex_neis_size;
-    igraph_integer_t neighbor_count; /* unlike 'inc_edges_size', 'neighbor_count' does not count self-loops or multi-edges */
+    igraph_long_t i, j;
+    igraph_long_t vertex_neis_size;
+    igraph_long_t neighbor_count; /* unlike 'inc_edges_size', 'neighbor_count' does not count self-loops or multi-edges */
 
     IGRAPH_CHECK(igraph_neighbors(graph, vertex_neis, vertex, mode));
     vertex_neis_size = igraph_vector_size(vertex_neis);
@@ -538,7 +538,7 @@ static igraph_integer_t igraph_i_local_efficiency_dijkstra(
     igraph_vector_char_fill(nei_mask, 0);
     neighbor_count = 0;
     for (i=0; i < vertex_neis_size; ++i) {
-        igraph_integer_t v = VECTOR(*vertex_neis)[i];
+        igraph_long_t v = VECTOR(*vertex_neis)[i];
         if (v != vertex && ! VECTOR(*nei_mask)[v]) {
             VECTOR(*nei_mask)[v] = 1; /* mark as unprocessed neighbour */
             neighbor_count++;
@@ -553,8 +553,8 @@ static igraph_integer_t igraph_i_local_efficiency_dijkstra(
     }
 
     for (i=0; i < vertex_neis_size; ++i) {
-        igraph_integer_t source = VECTOR(*vertex_neis)[i];
-        igraph_integer_t reached = 0;
+        igraph_long_t source = VECTOR(*vertex_neis)[i];
+        igraph_long_t reached = 0;
 
         IGRAPH_ALLOW_INTERRUPTION();
 
@@ -570,10 +570,10 @@ static igraph_integer_t igraph_i_local_efficiency_dijkstra(
         igraph_2wheap_push_with_index(Q, source, -1.0);
 
         while (!igraph_2wheap_empty(Q)) {
-            igraph_integer_t minnei = igraph_2wheap_max_index(Q);
+            igraph_long_t minnei = igraph_2wheap_max_index(Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(Q);
             igraph_vector_t *neis;
-            igraph_integer_t nlen;
+            igraph_long_t nlen;
 
             if (minnei != source && VECTOR(*nei_mask)[minnei]) {
                 *res += 1.0/(mindist - 1.0);
@@ -585,13 +585,13 @@ static igraph_integer_t igraph_i_local_efficiency_dijkstra(
             }
 
             /* Now check all neighbors of 'minnei' for a shorter path */
-            neis = igraph_lazy_inclist_get(inclist, (igraph_integer_t) minnei);
+            neis = igraph_lazy_inclist_get(inclist, (igraph_long_t) minnei);
             nlen = igraph_vector_size(neis);
             for (j = 0; j < nlen; j++) {
                 igraph_real_t altdist, curdist;
                 igraph_bool_t active, has;
-                igraph_integer_t edge = (igraph_integer_t) VECTOR(*neis)[j];
-                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_long_t edge = (igraph_long_t) VECTOR(*neis)[j];
+                igraph_long_t tto = IGRAPH_OTHER(graph, edge, minnei);
 
                 if (tto == vertex)
                     continue;
@@ -678,18 +678,18 @@ static igraph_integer_t igraph_i_local_efficiency_dijkstra(
  *
  */
 
-igraph_integer_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
+igraph_long_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t *res,
                             const igraph_vs_t vids,
                             const igraph_vector_t *weights,
                             igraph_bool_t directed, igraph_neimode_t mode)
 {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t nodes_to_calc; /* no. of vertices includes in computation */
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t nodes_to_calc; /* no. of vertices includes in computation */
     igraph_vit_t vit;
     igraph_vector_t vertex_neis;
     igraph_vector_char_t nei_mask;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     /* 'nei_mask' is a vector indexed by vertices. The meaning of its values is as follows:
      *   0: not a neighbour of 'vertex'
@@ -712,11 +712,11 @@ igraph_integer_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t 
 
     if (! weights) /* unweighted case */
     {
-        igraph_integer_t *already_counted;
+        igraph_long_t *already_counted;
         igraph_adjlist_t adjlist;
         igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
 
-        already_counted = igraph_Calloc(no_of_nodes, igraph_integer_t);
+        already_counted = igraph_Calloc(no_of_nodes, igraph_long_t);
         if (already_counted == 0) {
             IGRAPH_ERROR("Local efficiency calculation failed", IGRAPH_ENOMEM);
         }
@@ -828,11 +828,11 @@ igraph_integer_t igraph_local_efficiency(const igraph_t *graph, igraph_vector_t 
  *
  */
 
-igraph_integer_t igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
+igraph_long_t igraph_average_local_efficiency(const igraph_t *graph, igraph_real_t *res,
                                     const igraph_vector_t *weights,
                                     igraph_bool_t directed, igraph_neimode_t mode)
 {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t local_eff;
 
     /* If there are fewer than 3 vertices, no vertex has more than one neighbour, thus all
@@ -900,20 +900,20 @@ igraph_integer_t igraph_average_local_efficiency(const igraph_t *graph, igraph_r
  * \example examples/simple/igraph_diameter.c
  */
 
-igraph_integer_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
-                    igraph_integer_t *pfrom, igraph_integer_t *pto,
+igraph_long_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
+                    igraph_long_t *pfrom, igraph_long_t *pto,
                     igraph_vector_t *path,
                     igraph_bool_t directed, igraph_bool_t unconn) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i, j, n;
-    igraph_integer_t *already_added;
-    igraph_integer_t nodes_reached;
-    igraph_integer_t from = 0, to = 0;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i, j, n;
+    igraph_long_t *already_added;
+    igraph_long_t nodes_reached;
+    igraph_long_t from = 0, to = 0;
     igraph_real_t res = 0;
 
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
-    igraph_vector_int_t *neis;
+    igraph_vector_long_t *neis;
     igraph_neimode_t dirmode;
     igraph_adjlist_t allneis;
 
@@ -940,7 +940,7 @@ igraph_integer_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
     } else {
         dirmode = IGRAPH_ALL;
     }
-    already_added = igraph_Calloc(no_of_nodes, igraph_integer_t);
+    already_added = igraph_Calloc(no_of_nodes, igraph_long_t);
     if (already_added == 0) {
         IGRAPH_ERROR("diameter failed", IGRAPH_ENOMEM);
     }
@@ -961,8 +961,8 @@ igraph_integer_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
-            igraph_integer_t actdist = (igraph_integer_t) igraph_dqueue_pop(&q);
+            igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&q);
+            igraph_long_t actdist = (igraph_long_t) igraph_dqueue_pop(&q);
             if (actdist > res) {
                 res = actdist;
                 from = i;
@@ -970,9 +970,9 @@ igraph_integer_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
             }
 
             neis = igraph_adjlist_get(&allneis, actnode);
-            n = igraph_vector_int_size(neis);
+            n = igraph_vector_long_size(neis);
             for (j = 0; j < n; j++) {
-                igraph_integer_t neighbor = (igraph_integer_t) VECTOR(*neis)[j];
+                igraph_long_t neighbor = (igraph_long_t) VECTOR(*neis)[j];
                 if (already_added[neighbor] == i + 1) {
                     continue;
                 }
@@ -999,10 +999,10 @@ igraph_integer_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
         *pres = res;
     }
     if (pfrom != 0) {
-        *pfrom = (igraph_integer_t) from;
+        *pfrom = (igraph_long_t) from;
     }
     if (pto != 0) {
-        *pto = (igraph_integer_t) to;
+        *pto = (igraph_long_t) to;
     }
     if (path != 0) {
         if (! igraph_finite(res)) {
@@ -1013,8 +1013,8 @@ igraph_integer_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
             IGRAPH_FINALLY(igraph_vector_ptr_destroy, &tmpptr);
             VECTOR(tmpptr)[0] = path;
             IGRAPH_CHECK(igraph_get_shortest_paths(graph, &tmpptr, 0,
-                                                   (igraph_integer_t) from,
-                                                   igraph_vss_1((igraph_integer_t)to),
+                                                   (igraph_long_t) from,
+                                                   igraph_vss_1((igraph_long_t)to),
                                                    dirmode, 0, 0));
             igraph_vector_ptr_destroy(&tmpptr);
             IGRAPH_FINALLY_CLEAN(1);
@@ -1065,11 +1065,11 @@ igraph_integer_t igraph_diameter(const igraph_t *graph, igraph_real_t *pres,
  */
 
 
-igraph_integer_t igraph_diameter_dijkstra(const igraph_t *graph,
+igraph_long_t igraph_diameter_dijkstra(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              igraph_real_t *pres,
-                             igraph_integer_t *pfrom,
-                             igraph_integer_t *pto,
+                             igraph_long_t *pfrom,
+                             igraph_long_t *pto,
                              igraph_vector_t *path,
                              igraph_bool_t directed,
                              igraph_bool_t unconn) {
@@ -1089,17 +1089,17 @@ igraph_integer_t igraph_diameter_dijkstra(const igraph_t *graph,
          infinity instead.
     */
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
 
     igraph_2wheap_t Q;
     igraph_inclist_t inclist;
-    igraph_integer_t source, j;
+    igraph_long_t source, j;
     igraph_neimode_t dirmode = directed ? IGRAPH_OUT : IGRAPH_ALL;
 
-    igraph_integer_t from = -1, to = -1;
+    igraph_long_t from = -1, to = -1;
     igraph_real_t res = 0;
-    igraph_integer_t nodes_reached = 0;
+    igraph_long_t nodes_reached = 0;
 
     /* See https://github.com/igraph/igraph/issues/1538#issuecomment-724071857
      * for why we return NaN for the null graph. */
@@ -1158,10 +1158,10 @@ igraph_integer_t igraph_diameter_dijkstra(const igraph_t *graph,
         nodes_reached = 0.0;
 
         while (!igraph_2wheap_empty(&Q)) {
-            igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
+            igraph_long_t minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_deactivate_max(&Q);
-            igraph_vector_int_t *neis;
-            igraph_integer_t nlen;
+            igraph_vector_long_t *neis;
+            igraph_long_t nlen;
 
             if (mindist > res) {
                 res = mindist; from = source; to = minnei;
@@ -1170,10 +1170,10 @@ igraph_integer_t igraph_diameter_dijkstra(const igraph_t *graph,
 
             /* Now check all neighbors of 'minnei' for a shorter path */
             neis = igraph_inclist_get(&inclist, minnei);
-            nlen = igraph_vector_int_size(neis);
+            nlen = igraph_vector_long_size(neis);
             for (j = 0; j < nlen; j++) {
-                igraph_integer_t edge = (igraph_integer_t) VECTOR(*neis)[j];
-                igraph_integer_t tto = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_long_t edge = (igraph_long_t) VECTOR(*neis)[j];
+                igraph_long_t tto = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_bool_t active = igraph_2wheap_has_active(&Q, tto);
                 igraph_bool_t has = igraph_2wheap_has_elem(&Q, tto);
@@ -1212,10 +1212,10 @@ igraph_integer_t igraph_diameter_dijkstra(const igraph_t *graph,
         *pres = res;
     }
     if (pfrom) {
-        *pfrom = (igraph_integer_t) from;
+        *pfrom = (igraph_long_t) from;
     }
     if (pto) {
-        *pto = (igraph_integer_t) to;
+        *pto = (igraph_long_t) to;
     }
     if (path) {
         if (!igraph_finite(res)) {
@@ -1227,8 +1227,8 @@ igraph_integer_t igraph_diameter_dijkstra(const igraph_t *graph,
             VECTOR(tmpptr)[0] = path;
             IGRAPH_CHECK(igraph_get_shortest_paths_dijkstra(graph,
                          /*vertices=*/ &tmpptr, /*edges=*/ 0,
-                         (igraph_integer_t) from,
-                         igraph_vss_1((igraph_integer_t) to),
+                         (igraph_long_t) from,
+                         igraph_vss_1((igraph_long_t) to),
                          weights, dirmode, /*predecessors=*/ 0,
                          /*inbound_edges=*/ 0));
             igraph_vector_ptr_destroy(&tmpptr);

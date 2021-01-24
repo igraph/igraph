@@ -44,12 +44,12 @@
  * Time complexity: O(|V|), the
  * number of vertices.
  */
-igraph_integer_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
+igraph_long_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *res,
                          igraph_vs_t order) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t vs_size;
-    igraph_integer_t i;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t vs_size;
+    igraph_long_t i;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vs_size(graph, &order, &vs_size));
@@ -60,7 +60,7 @@ igraph_integer_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *re
     igraph_vit_create(graph, order, &vit);
     for (i = 0; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit), i++) {
         igraph_real_t phi = 2 * M_PI / vs_size * i;
-        igraph_integer_t idx = IGRAPH_VIT_GET(vit);
+        igraph_long_t idx = IGRAPH_VIT_GET(vit);
         MATRIX(*res, idx, 0) = cos(phi);
         MATRIX(*res, idx, 1) = sin(phi);
     }
@@ -86,12 +86,12 @@ igraph_integer_t igraph_layout_circle(const igraph_t *graph, igraph_matrix_t *re
  *
  * \sa \ref igraph_layout_circle() and other layout generators.
  */
-igraph_integer_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
-                       igraph_integer_t center, const igraph_vector_t *order) {
+igraph_long_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
+                       igraph_long_t center, const igraph_vector_t *order) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t c = center;
-    igraph_integer_t i;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t c = center;
+    igraph_long_t i;
     igraph_real_t step;
     igraph_real_t phi;
 
@@ -106,7 +106,7 @@ igraph_integer_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
     } else {
         for (i = 0, step = 2 * M_PI / (no_of_nodes - 1), phi = 0;
              i < no_of_nodes; i++) {
-            igraph_integer_t node = order ? (igraph_integer_t) VECTOR(*order)[i] : i;
+            igraph_long_t node = order ? (igraph_long_t) VECTOR(*order)[i] : i;
             if (node != c) {
                 MATRIX(*res, node, 0) = cos(phi);
                 MATRIX(*res, node, 1) = sin(phi);
@@ -140,10 +140,10 @@ igraph_integer_t igraph_layout_star(const igraph_t *graph, igraph_matrix_t *res,
  *
  * Time complexity: O(|V|), the number of vertices in the graph.
  */
-igraph_integer_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
+igraph_long_t igraph_layout_sphere(const igraph_t *graph, igraph_matrix_t *res) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i;
     igraph_real_t h;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));

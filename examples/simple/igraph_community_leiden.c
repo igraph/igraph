@@ -23,10 +23,10 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     igraph_vector_t membership, degree;
-    igraph_integer_t nb_clusters;
+    igraph_long_t nb_clusters;
     igraph_real_t quality;
 
     /* Set default seed to get reproducible results */

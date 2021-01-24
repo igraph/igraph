@@ -47,7 +47,7 @@
     #define MULTIPLICITY 1
 
 #elif defined(BASE_LONG)
-    #define BASE igraph_integer_t
+    #define BASE igraph_long_t
     #define SHORT long
     #define OUT_FORMAT "%ld"
     #define ZERO 0L
@@ -71,7 +71,7 @@
     #define MULTIPLICITY 1
 
 #elif defined(BASE_INT)
-    #define BASE igraph_integer_t
+    #define BASE igraph_int_t
     #define SHORT int
     #define OUT_FORMAT "%d"
     #define ZERO 0

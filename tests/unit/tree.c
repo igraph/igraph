@@ -10,7 +10,7 @@
     printf("\n");
 
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
 
     igraph_tree(&graph, 0, 1, IGRAPH_TREE_UNDIRECTED);

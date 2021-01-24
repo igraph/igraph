@@ -26,11 +26,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_t membership, weights, initial;
     igraph_vector_bool_t fixed;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     /* label propagation is a stochastic method */
     igraph_rng_seed(igraph_rng_default(), 765);

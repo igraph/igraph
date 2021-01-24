@@ -23,16 +23,16 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_t v = IGRAPH_VECTOR_NULL;
     igraph_real_t edges[] = { 0, 1, 1, 2, 2, 2, 2, 3, 2, 4, 3, 4 };
     igraph_vector_t v2;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_vit_t vit;
     igraph_vs_t vs;
-    igraph_integer_t size;
+    igraph_long_t size;
 
     igraph_vector_view(&v, edges, sizeof(edges) / sizeof(igraph_real_t));
     igraph_create(&g, &v, 0, IGRAPH_DIRECTED);
@@ -68,9 +68,9 @@ igraph_integer_t main() {
     igraph_vs_vector_small(&vs, 0, 2, 4, 0, 2, 4, 2, -1);
     igraph_vit_create(&g, vs, &vit);
     igraph_vs_size(&g, &vs, &size);
-    printf("%li ", (igraph_integer_t) size);
+    printf("%li ", (igraph_long_t) size);
     for (; !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        printf("%li ", (igraph_integer_t) IGRAPH_VIT_GET(vit));
+        printf("%li ", (igraph_long_t) IGRAPH_VIT_GET(vit));
     }
     printf("\n");
 

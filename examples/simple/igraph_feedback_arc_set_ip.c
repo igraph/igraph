@@ -25,11 +25,11 @@
 #include <igraph.h>
 #include <string.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_t weights, result;
     igraph_bool_t dag;
-    igraph_integer_t retval;
+    igraph_long_t retval;
 
     igraph_vector_init(&result, 0);
 

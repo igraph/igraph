@@ -25,11 +25,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t graph;
     igraph_vector_ptr_t separators;
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     igraph_small(&graph, 0, /*directed=*/ 0,
                  0, 1, 0, 2, 1, 3, 1, 4, 2, 3, 2, 5, 3, 4, 3, 5, 4, 6, 5, 6, -1);

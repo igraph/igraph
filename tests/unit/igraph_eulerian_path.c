@@ -3,7 +3,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t graph;
     igraph_vector_t edge_res, vector_res;

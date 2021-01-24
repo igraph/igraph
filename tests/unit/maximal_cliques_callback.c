@@ -5,13 +5,13 @@
 #include "test_utilities.inc"
 
 struct userdata {
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_vector_ptr_t *list;
 };
 
-igraph_integer_t compare_vectors(const void *p1, const void *p2) {
+igraph_long_t compare_vectors(const void *p1, const void *p2) {
     igraph_vector_t *v1, *v2;
-    igraph_integer_t s1, s2, i;
+    igraph_long_t s1, s2, i;
 
     v1 = *((igraph_vector_t **) p1);
     v2 = *((igraph_vector_t **) p2);
@@ -73,7 +73,7 @@ igraph_bool_t handler_stop(igraph_vector_t *clique, void *arg) {
 }
 
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     igraph_vector_ptr_t list;
     struct userdata ud;

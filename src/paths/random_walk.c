@@ -59,9 +59,9 @@
  */
 
 
-igraph_integer_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
-                       igraph_integer_t start, igraph_neimode_t mode,
-                       igraph_integer_t steps,
+igraph_long_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
+                       igraph_long_t start, igraph_neimode_t mode,
+                       igraph_long_t steps,
                        igraph_random_walk_stuck_t stuck) {
 
     /* TODO:
@@ -70,8 +70,8 @@ igraph_integer_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk
     */
 
     igraph_lazy_adjlist_t adj;
-    igraph_integer_t vc = igraph_vcount(graph);
-    igraph_integer_t i;
+    igraph_long_t vc = igraph_vcount(graph);
+    igraph_long_t i;
 
     if (start < 0 || start >= vc) {
         IGRAPH_ERROR("Invalid start vertex", IGRAPH_EINVAL);
@@ -91,7 +91,7 @@ igraph_integer_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk
     VECTOR(*walk)[0] = start;
     for (i = 1; i < steps; i++) {
         igraph_vector_t *neis;
-        igraph_integer_t nn;
+        igraph_long_t nn;
         neis = igraph_lazy_adjlist_get(&adj, start);
         nn = igraph_vector_size(neis);
 
@@ -156,15 +156,15 @@ static void vec_destr(igraph_vector_t *vec) {
  * \return Error code.
  *
  */
-igraph_integer_t igraph_random_edge_walk(const igraph_t *graph,
+igraph_long_t igraph_random_edge_walk(const igraph_t *graph,
                             const igraph_vector_t *weights,
                             igraph_vector_t *edgewalk,
-                            igraph_integer_t start, igraph_neimode_t mode,
-                            igraph_integer_t steps,
+                            igraph_long_t start, igraph_neimode_t mode,
+                            igraph_long_t steps,
                             igraph_random_walk_stuck_t stuck) {
-    igraph_integer_t vc = igraph_vcount(graph);
-    igraph_integer_t ec = igraph_ecount(graph);
-    igraph_integer_t i;
+    igraph_long_t vc = igraph_vcount(graph);
+    igraph_long_t ec = igraph_ecount(graph);
+    igraph_long_t i;
     igraph_inclist_t il;
     igraph_vector_t weight_temp;
     igraph_vector_ptr_t cdfs; /* cumulative distribution vectors for each node, used for weighted choice */
@@ -220,10 +220,10 @@ igraph_integer_t igraph_random_edge_walk(const igraph_t *graph,
     RNG_BEGIN();
 
     for (i = 0; i < steps; ++i) {
-        igraph_integer_t degree, edge, idx;
-        igraph_vector_int_t *edges = igraph_inclist_get(&il, start);
+        igraph_long_t degree, edge, idx;
+        igraph_vector_long_t *edges = igraph_inclist_get(&il, start);
 
-        degree = igraph_vector_int_size(edges);
+        degree = igraph_vector_long_size(edges);
 
         /* are we stuck? */
         if (IGRAPH_UNLIKELY(degree == 0)) {
@@ -241,7 +241,7 @@ igraph_integer_t igraph_random_edge_walk(const igraph_t *graph,
 
             /* compute out-edge cdf for this node if not already done */
             if (IGRAPH_UNLIKELY(! *cd)) {
-                igraph_integer_t j;
+                igraph_long_t j;
 
                 *cd = igraph_malloc(sizeof(igraph_vector_t));
                 if (*cd == NULL) {

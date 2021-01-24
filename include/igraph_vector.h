@@ -143,8 +143,8 @@ __BEGIN_DECLS
 #endif
 #ifndef IGRAPH_VECTOR_INT_INIT_FINALLY
 #define IGRAPH_VECTOR_INT_INIT_FINALLY(v, size) \
-    do { IGRAPH_CHECK(igraph_vector_int_init(v, size)); \
-        IGRAPH_FINALLY(igraph_vector_int_destroy, v); } while (0)
+    do { IGRAPH_CHECK(igraph_vector_long_init(v, size)); \
+        IGRAPH_FINALLY(igraph_vector_long_destroy, v); } while (0)
 #endif
 #ifndef IGRAPH_VECTOR_LONG_INIT_FINALLY
 #define IGRAPH_VECTOR_LONG_INIT_FINALLY(v, size) \
@@ -156,24 +156,24 @@ __BEGIN_DECLS
 /* Type-specific vector functions                     */
 /* -------------------------------------------------- */
 
-DECLDIR igraph_integer_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
-DECLDIR igraph_integer_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
+DECLDIR igraph_long_t igraph_vector_floor(const igraph_vector_t *from, igraph_vector_long_t *to);
+DECLDIR igraph_long_t igraph_vector_round(const igraph_vector_t *from, igraph_vector_long_t *to);
 
 DECLDIR igraph_bool_t igraph_vector_e_tol(const igraph_vector_t *lhs,
         const igraph_vector_t *rhs,
         igraph_real_t tol);
 
-DECLDIR igraph_integer_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol);
+DECLDIR igraph_long_t igraph_vector_zapsmall(igraph_vector_t *v, igraph_real_t tol);
 
-DECLDIR igraph_integer_t igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
+DECLDIR igraph_long_t igraph_vector_order(const igraph_vector_t* v, const igraph_vector_t *v2,
                         igraph_vector_t* res, igraph_real_t maxval);
-DECLDIR igraph_integer_t igraph_vector_order1(const igraph_vector_t* v,
+DECLDIR igraph_long_t igraph_vector_order1(const igraph_vector_t* v,
                          igraph_vector_t* res, igraph_real_t maxval);
-DECLDIR igraph_integer_t igraph_vector_order1_int(const igraph_vector_t* v,
-                             igraph_vector_int_t* res, igraph_real_t maxval);
-DECLDIR igraph_integer_t igraph_vector_order2(igraph_vector_t *v);
-DECLDIR igraph_integer_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
-                       igraph_integer_t nodes);
+DECLDIR igraph_long_t igraph_vector_order1_int(const igraph_vector_t* v,
+                             igraph_vector_long_t* res, igraph_real_t maxval);
+DECLDIR igraph_long_t igraph_vector_order2(igraph_vector_t *v);
+DECLDIR igraph_long_t igraph_vector_rank(const igraph_vector_t *v, igraph_vector_t *res,
+                       igraph_long_t nodes);
 
 DECLDIR igraph_bool_t igraph_vector_is_any_nan(const igraph_vector_t *v);
 

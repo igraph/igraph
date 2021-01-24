@@ -32,8 +32,8 @@
 
 __BEGIN_DECLS
 
-DECLDIR igraph_integer_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
-        igraph_integer_t no,
+DECLDIR igraph_long_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
+        igraph_long_t no,
         const igraph_vector_t *weights,
         igraph_eigen_which_position_t which,
         igraph_bool_t scaled,
@@ -50,8 +50,8 @@ typedef enum {
     IGRAPH_EMBEDDING_OAP
 } igraph_laplacian_spectral_embedding_type_t;
 
-DECLDIR igraph_integer_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
-        igraph_integer_t no,
+DECLDIR igraph_long_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
+        igraph_long_t no,
         const igraph_vector_t *weights,
         igraph_eigen_which_position_t which,
         igraph_laplacian_spectral_embedding_type_t type,
@@ -61,7 +61,7 @@ DECLDIR igraph_integer_t igraph_laplacian_spectral_embedding(const igraph_t *gra
         igraph_vector_t *D,
         igraph_arpack_options_t *options);
 
-DECLDIR igraph_integer_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim);
+DECLDIR igraph_long_t igraph_dim_select(const igraph_vector_t *sv, igraph_long_t *dim);
 
 __END_DECLS
 

@@ -59,13 +59,13 @@
  * vertices and edges, d is the average degree, o is the \p nei
  * argument.
  */
-igraph_integer_t igraph_watts_strogatz_game(igraph_t *graph, igraph_integer_t dim,
-                               igraph_integer_t size, igraph_integer_t nei,
+igraph_long_t igraph_watts_strogatz_game(igraph_t *graph, igraph_long_t dim,
+                               igraph_long_t size, igraph_long_t nei,
                                igraph_real_t p, igraph_bool_t loops,
                                igraph_bool_t multiple) {
 
     igraph_vector_t dimvector;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     if (dim < 1) {
         IGRAPH_ERROR("WS game: dimension should be at least one", IGRAPH_EINVAL);

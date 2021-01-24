@@ -60,22 +60,22 @@
  * vertices.
  */
 
-igraph_integer_t igraph_get_all_simple_paths(const igraph_t *graph,
-                                igraph_vector_int_t *res,
-                                igraph_integer_t from,
+igraph_long_t igraph_get_all_simple_paths(const igraph_t *graph,
+                                igraph_vector_long_t *res,
+                                igraph_long_t from,
                                 const igraph_vs_t to,
-                                igraph_integer_t cutoff,
+                                igraph_long_t cutoff,
                                 igraph_neimode_t mode) {
 
-    igraph_integer_t no_nodes = igraph_vcount(graph);
+    igraph_long_t no_nodes = igraph_vcount(graph);
     igraph_vit_t vit;
     igraph_bool_t toall = igraph_vs_is_all(&to);
     igraph_vector_char_t markto;
     igraph_lazy_adjlist_t adjlist;
-    igraph_vector_int_t stack, dist;
+    igraph_vector_long_t stack, dist;
     igraph_vector_char_t added;
-    igraph_vector_int_t nptr;
-    igraph_integer_t iteration = 0;
+    igraph_vector_long_t nptr;
+    igraph_long_t iteration = 0;
 
     if (from < 0 || from >= no_nodes) {
         IGRAPH_ERROR("Invalid starting vertex", IGRAPH_EINVAL);
@@ -95,32 +95,32 @@ igraph_integer_t igraph_get_all_simple_paths(const igraph_t *graph,
 
     IGRAPH_CHECK(igraph_vector_char_init(&added, no_nodes));
     IGRAPH_FINALLY(igraph_vector_char_destroy, &added);
-    IGRAPH_CHECK(igraph_vector_int_init(&stack, 100));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &stack);
-    IGRAPH_CHECK(igraph_vector_int_init(&dist, 100));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &dist);
+    IGRAPH_CHECK(igraph_vector_long_init(&stack, 100));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &stack);
+    IGRAPH_CHECK(igraph_vector_long_init(&dist, 100));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &dist);
     IGRAPH_CHECK(igraph_lazy_adjlist_init(graph, &adjlist, mode,
                                           /*simplify=*/ 1));
     IGRAPH_FINALLY(igraph_lazy_adjlist_destroy, &adjlist);
-    IGRAPH_CHECK(igraph_vector_int_init(&nptr, no_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nptr);
+    IGRAPH_CHECK(igraph_vector_long_init(&nptr, no_nodes));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &nptr);
 
-    igraph_vector_int_clear(res);
+    igraph_vector_long_clear(res);
 
-    igraph_vector_int_clear(&stack);
-    igraph_vector_int_clear(&dist);
-    igraph_vector_int_push_back(&stack, from);
-    igraph_vector_int_push_back(&dist, 0);
+    igraph_vector_long_clear(&stack);
+    igraph_vector_long_clear(&dist);
+    igraph_vector_long_push_back(&stack, from);
+    igraph_vector_long_push_back(&dist, 0);
     VECTOR(added)[from] = 1;
-    while (!igraph_vector_int_empty(&stack)) {
-        igraph_integer_t act = igraph_vector_int_tail(&stack);
-        igraph_integer_t curdist = igraph_vector_int_tail(&dist);
+    while (!igraph_vector_long_empty(&stack)) {
+        igraph_long_t act = igraph_vector_long_tail(&stack);
+        igraph_long_t curdist = igraph_vector_long_tail(&dist);
         igraph_vector_t *neis = igraph_lazy_adjlist_get(&adjlist, act);
-        igraph_integer_t n = igraph_vector_size(neis);
-        igraph_integer_t *ptr = igraph_vector_int_e_ptr(&nptr, act);
+        igraph_long_t n = igraph_vector_size(neis);
+        igraph_long_t *ptr = igraph_vector_long_e_ptr(&nptr, act);
         igraph_bool_t any;
         igraph_bool_t within_dist;
-        igraph_integer_t nei;
+        igraph_long_t nei;
 
         if (iteration == 0) {
             IGRAPH_ALLOW_INTERRUPTION();
@@ -131,25 +131,25 @@ igraph_integer_t igraph_get_all_simple_paths(const igraph_t *graph,
             /* Search for a neighbor that was not yet visited */
             any = 0;
             while (!any && (*ptr) < n) {
-                nei = (igraph_integer_t) VECTOR(*neis)[(*ptr)];
+                nei = (igraph_long_t) VECTOR(*neis)[(*ptr)];
                 any = !VECTOR(added)[nei];
                 (*ptr) ++;
             }
         }
         if (within_dist && any) {
             /* There is such a neighbor, add it */
-            IGRAPH_CHECK(igraph_vector_int_push_back(&stack, nei));
-            IGRAPH_CHECK(igraph_vector_int_push_back(&dist, curdist + 1));
+            IGRAPH_CHECK(igraph_vector_long_push_back(&stack, nei));
+            IGRAPH_CHECK(igraph_vector_long_push_back(&dist, curdist + 1));
             VECTOR(added)[nei] = 1;
             /* Add to results */
             if (toall || VECTOR(markto)[nei]) {
-                IGRAPH_CHECK(igraph_vector_int_append(res, &stack));
-                IGRAPH_CHECK(igraph_vector_int_push_back(res, -1));
+                IGRAPH_CHECK(igraph_vector_long_append(res, &stack));
+                IGRAPH_CHECK(igraph_vector_long_push_back(res, -1));
             }
         } else {
             /* There is no such neighbor, finished with the subtree */
-            igraph_integer_t up = igraph_vector_int_pop_back(&stack);
-            igraph_vector_int_pop_back(&dist);
+            igraph_long_t up = igraph_vector_long_pop_back(&stack);
+            igraph_vector_long_pop_back(&dist);
             VECTOR(added)[up] = 0;
             VECTOR(nptr)[up] = 0;
         }
@@ -160,10 +160,10 @@ igraph_integer_t igraph_get_all_simple_paths(const igraph_t *graph,
         }
     }
 
-    igraph_vector_int_destroy(&nptr);
+    igraph_vector_long_destroy(&nptr);
     igraph_lazy_adjlist_destroy(&adjlist);
-    igraph_vector_int_destroy(&dist);
-    igraph_vector_int_destroy(&stack);
+    igraph_vector_long_destroy(&dist);
+    igraph_vector_long_destroy(&stack);
     igraph_vector_char_destroy(&added);
     IGRAPH_FINALLY_CLEAN(5);
 

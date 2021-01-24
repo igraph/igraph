@@ -33,16 +33,16 @@
 
 #include "scg_headers.h"
 
-igraph_integer_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_integer_t n, igraph_integer_t p,
-                          igraph_vector_t *cen, igraph_integer_t k, igraph_integer_t *cl, igraph_integer_t maxiter) {
+igraph_long_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_long_t n, igraph_long_t p,
+                          igraph_vector_t *cen, igraph_long_t k, igraph_long_t *cl, igraph_long_t maxiter) {
 
-    igraph_integer_t iter, i, j, c, it, inew = 0;
+    igraph_long_t iter, i, j, c, it, inew = 0;
     igraph_real_t best, dd, tmp;
-    igraph_integer_t updated;
-    igraph_vector_int_t nc;
+    igraph_long_t updated;
+    igraph_vector_long_t nc;
 
-    IGRAPH_CHECK(igraph_vector_int_init(&nc, k));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &nc);
+    IGRAPH_CHECK(igraph_vector_long_init(&nc, k));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &nc);
 
     for (i = 0; i < n; i++) {
         cl[i] = -1;
@@ -90,7 +90,7 @@ igraph_integer_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_integer_
             VECTOR(*cen)[j] /= VECTOR(nc)[j % k];
         }
     }
-    igraph_vector_int_destroy(&nc);
+    igraph_vector_long_destroy(&nc);
     IGRAPH_FINALLY_CLEAN(1);
 
     /* convervenge check */

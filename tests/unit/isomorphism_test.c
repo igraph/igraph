@@ -5,9 +5,9 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t random_permutation(igraph_vector_t *vec) {
+igraph_long_t random_permutation(igraph_vector_t *vec) {
     /* We just do size(vec) * 2 swaps */
-    igraph_integer_t one, two, tmp, i, n = igraph_vector_size(vec);
+    igraph_long_t one, two, tmp, i, n = igraph_vector_size(vec);
     for (i = 0; i < 2 * n; i++) {
         one = (double)rand() / RAND_MAX * n;
         two = (double)rand() / RAND_MAX * n;
@@ -20,7 +20,7 @@ igraph_integer_t random_permutation(igraph_vector_t *vec) {
 
 
 void test3() {
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
     igraph_vector_ptr_t graphs3;
 
     // Verify that no two 3-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
@@ -62,7 +62,7 @@ void test3() {
 
 
 void test4() {
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
     igraph_vector_ptr_t graphs4;
 
     // Verify that no two 4-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
@@ -108,7 +108,7 @@ void test_bliss() {
     igraph_vector_t perm;
     igraph_bool_t iso;
     igraph_bliss_info_t info;
-    igraph_vector_int_t color;
+    igraph_vector_long_t color;
     igraph_vector_ptr_t generators;
 
     igraph_ring(&ring1, 100, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/1);
@@ -164,7 +164,7 @@ void test_bliss() {
                "Note that the generator set is not guaranteed to be minimal.\n");
     igraph_vector_ptr_free_all(&generators);
 
-    igraph_vector_int_init_seq(&color, 0, igraph_vcount(&ring1) - 1);
+    igraph_vector_long_init_seq(&color, 0, igraph_vcount(&ring1) - 1);
 
     igraph_automorphisms(&ring1, &color, IGRAPH_BLISS_F, &info);
     if (strcmp(info.group_size, "1") != 0) {
@@ -180,7 +180,7 @@ void test_bliss() {
 
     igraph_vector_ptr_destroy_all(&generators);
 
-    igraph_vector_int_destroy(&color);
+    igraph_vector_long_destroy(&color);
 
     igraph_vector_destroy(&perm);
 
@@ -205,7 +205,7 @@ void test_bug_995() {
     igraph_destroy(&g2);
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     test3();
     test4();

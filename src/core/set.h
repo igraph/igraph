@@ -47,9 +47,9 @@ __BEGIN_DECLS
  */
 
 typedef struct s_set {
-    igraph_integer_t* stor_begin;
-    igraph_integer_t* stor_end;
-    igraph_integer_t* end;
+    igraph_long_t* stor_begin;
+    igraph_long_t* stor_end;
+    igraph_long_t* end;
 } igraph_set_t;
 
 #define IGRAPH_SET_NULL { 0,0,0 }
@@ -57,17 +57,17 @@ typedef struct s_set {
     do { IGRAPH_CHECK(igraph_set_init(v, size)); \
         IGRAPH_FINALLY(igraph_set_destroy, v); } while (0)
 
-igraph_integer_t igraph_set_init(igraph_set_t* set, igraph_integer_t size);
+igraph_long_t igraph_set_init(igraph_set_t* set, igraph_long_t size);
 void igraph_set_destroy(igraph_set_t* set);
 igraph_bool_t igraph_set_inited(igraph_set_t* set);
-igraph_integer_t igraph_set_reserve(igraph_set_t* set, igraph_integer_t size);
+igraph_long_t igraph_set_reserve(igraph_set_t* set, igraph_long_t size);
 igraph_bool_t igraph_set_empty(const igraph_set_t* set);
 void igraph_set_clear(igraph_set_t* set);
-igraph_integer_t igraph_set_size(const igraph_set_t* set);
-igraph_integer_t igraph_set_add(igraph_set_t* v, igraph_integer_t e);
-igraph_bool_t igraph_set_contains(igraph_set_t* set, igraph_integer_t e);
-igraph_bool_t igraph_set_iterate(igraph_set_t* set, igraph_integer_t* state,
-                                 igraph_integer_t* element);
+igraph_long_t igraph_set_size(const igraph_set_t* set);
+igraph_long_t igraph_set_add(igraph_set_t* v, igraph_long_t e);
+igraph_bool_t igraph_set_contains(igraph_set_t* set, igraph_long_t e);
+igraph_bool_t igraph_set_iterate(igraph_set_t* set, igraph_long_t* state,
+                                 igraph_long_t* element);
 
 __END_DECLS
 

@@ -24,13 +24,13 @@
 #include <igraph.h>
 #include <math.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
-    /* igraph_integer_t i; */
+    /* igraph_long_t i; */
     /* struct tms time; */
     /* clock_t current_time,start_time; */
-    /* igraph_integer_t runs=100, n=10000; */
+    /* igraph_long_t runs=100, n=10000; */
     /* igraph_real_t r=0.01; */
 
     /* Empty graph */

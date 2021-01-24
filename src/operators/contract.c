@@ -27,7 +27,7 @@
 #include "igraph_memory.h"
 
 static void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(p);
+    igraph_long_t i, n = igraph_vector_ptr_size(p);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*p)[i];
         if (v) {
@@ -58,16 +58,16 @@ static void igraph_i_simplify_free(igraph_vector_ptr_t *p) {
  * or vertices plus edges.
  */
 
-igraph_integer_t igraph_contract_vertices(igraph_t *graph,
+igraph_long_t igraph_contract_vertices(igraph_t *graph,
                              const igraph_vector_t *mapping,
                              const igraph_attribute_combination_t *vertex_comb) {
     igraph_vector_t edges;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t vattr = vertex_comb && igraph_has_attribute_table();
     igraph_t res;
-    igraph_integer_t e, last = -1;
-    igraph_integer_t no_new_vertices;
+    igraph_long_t e, last = -1;
+    igraph_long_t no_new_vertices;
 
     if (igraph_vector_size(mapping) != no_of_nodes) {
         IGRAPH_ERROR("Invalid mapping vector length",
@@ -78,15 +78,15 @@ igraph_integer_t igraph_contract_vertices(igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_reserve(&edges, no_of_edges * 2));
 
     if (no_of_nodes > 0) {
-        last = (igraph_integer_t) igraph_vector_max(mapping);
+        last = (igraph_long_t) igraph_vector_max(mapping);
     }
 
     for (e = 0; e < no_of_edges; e++) {
-        igraph_integer_t from = IGRAPH_FROM(graph, e);
-        igraph_integer_t to = IGRAPH_TO(graph, e);
+        igraph_long_t from = IGRAPH_FROM(graph, e);
+        igraph_long_t to = IGRAPH_TO(graph, e);
 
-        igraph_integer_t nfrom = (igraph_integer_t) VECTOR(*mapping)[from];
-        igraph_integer_t nto = (igraph_integer_t) VECTOR(*mapping)[to];
+        igraph_long_t nfrom = (igraph_long_t) VECTOR(*mapping)[from];
+        igraph_long_t nto = (igraph_long_t) VECTOR(*mapping)[to];
 
         igraph_vector_push_back(&edges, nfrom);
         igraph_vector_push_back(&edges, nto);
@@ -101,7 +101,7 @@ igraph_integer_t igraph_contract_vertices(igraph_t *graph,
 
     no_new_vertices = last + 1;
 
-    IGRAPH_CHECK(igraph_create(&res, &edges, (igraph_integer_t) no_new_vertices,
+    IGRAPH_CHECK(igraph_create(&res, &edges, (igraph_long_t) no_new_vertices,
                                igraph_is_directed(graph)));
 
     igraph_vector_destroy(&edges);
@@ -114,7 +114,7 @@ igraph_integer_t igraph_contract_vertices(igraph_t *graph,
                             /*vertex=*/ 0, /*edge=*/ 1);
 
     if (vattr) {
-        igraph_integer_t i;
+        igraph_long_t i;
         igraph_vector_ptr_t merges;
         igraph_vector_t sizes;
         igraph_vector_t *vecs;
@@ -130,17 +130,17 @@ igraph_integer_t igraph_contract_vertices(igraph_t *graph,
         IGRAPH_VECTOR_INIT_FINALLY(&sizes, no_new_vertices);
 
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t to = (igraph_integer_t) VECTOR(*mapping)[i];
+            igraph_long_t to = (igraph_long_t) VECTOR(*mapping)[i];
             VECTOR(sizes)[to] += 1;
         }
         for (i = 0; i < no_new_vertices; i++) {
             igraph_vector_t *v = &vecs[i];
-            IGRAPH_CHECK(igraph_vector_init(v, (igraph_integer_t) VECTOR(sizes)[i]));
+            IGRAPH_CHECK(igraph_vector_init(v, (igraph_long_t) VECTOR(sizes)[i]));
             igraph_vector_clear(v);
             VECTOR(merges)[i] = v;
         }
         for (i = 0; i < no_of_nodes; i++) {
-            igraph_integer_t to = (igraph_integer_t) VECTOR(*mapping)[i];
+            igraph_long_t to = (igraph_long_t) VECTOR(*mapping)[i];
             igraph_vector_t *v = &vecs[to];
             igraph_vector_push_back(v, i);
         }

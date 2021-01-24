@@ -32,14 +32,14 @@
  * Subgraph creation, old version: it copies the graph and then deletes
  * unneeded vertices.
  */
-igraph_integer_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
+igraph_long_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph_t *res,
                                       const igraph_vs_t vids,
                                       igraph_vector_t *map,
                                       igraph_vector_t *invmap) {
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t delete = IGRAPH_VECTOR_NULL;
     char *remain;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_vit_t vit;
 
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
@@ -54,7 +54,7 @@ igraph_integer_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph
     IGRAPH_CHECK(igraph_vector_reserve(&delete, no_of_nodes - IGRAPH_VIT_SIZE(vit)));
 
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        remain[ (igraph_integer_t) IGRAPH_VIT_GET(vit) ] = 1;
+        remain[ (igraph_long_t) IGRAPH_VIT_GET(vit) ] = 1;
     }
 
     for (i = 0; i < no_of_nodes; i++) {
@@ -86,17 +86,17 @@ igraph_integer_t igraph_i_subgraph_copy_and_delete(const igraph_t *graph, igraph
  * Subgraph creation, new version: creates the new graph instead of
  * copying the old one.
  */
-igraph_integer_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
+igraph_long_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
         igraph_t *res,
         const igraph_vs_t vids,
         igraph_vector_t *map,
         igraph_vector_t *invmap) {
     igraph_bool_t directed = igraph_is_directed(graph);
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_new_nodes = 0;
-    igraph_integer_t i, j, n;
-    igraph_integer_t to;
-    igraph_integer_t eid;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_new_nodes = 0;
+    igraph_long_t i, j, n;
+    igraph_long_t to;
+    igraph_long_t eid;
     igraph_vector_t vids_old2new, vids_new2old;
     igraph_vector_t eids_new2old;
     igraph_vector_t nei_edges;
@@ -142,7 +142,7 @@ igraph_integer_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
     igraph_vector_sort(&nei_edges);
     n = igraph_vector_size(&nei_edges);
     for (i = 0; i < n; i++) {
-        igraph_integer_t vid = (igraph_integer_t) VECTOR(nei_edges)[i];
+        igraph_long_t vid = (igraph_long_t) VECTOR(nei_edges)[i];
         if (VECTOR(*my_vids_old2new)[vid] == 0) {
             IGRAPH_CHECK(igraph_vector_push_back(my_vids_new2old, vid));
             no_of_new_nodes++;
@@ -152,8 +152,8 @@ igraph_integer_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
 
     /* Create the new edge list */
     for (i = 0; i < no_of_new_nodes; i++) {
-        igraph_integer_t old_vid = (igraph_integer_t) VECTOR(*my_vids_new2old)[i];
-        igraph_integer_t new_vid = i;
+        igraph_long_t old_vid = (igraph_long_t) VECTOR(*my_vids_new2old)[i];
+        igraph_long_t new_vid = i;
         igraph_bool_t skip_loop_edge;
 
         IGRAPH_CHECK(igraph_incident(graph, &nei_edges, old_vid, IGRAPH_OUT));
@@ -162,9 +162,9 @@ igraph_integer_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
         if (directed) {
             /* directed graph; this is easier */
             for (j = 0; j < n; j++) {
-                eid = (igraph_integer_t) VECTOR(nei_edges)[j];
+                eid = (igraph_long_t) VECTOR(nei_edges)[j];
 
-                to = (igraph_integer_t) VECTOR(*my_vids_old2new)[ (igraph_integer_t)IGRAPH_TO(graph, eid) ];
+                to = (igraph_long_t) VECTOR(*my_vids_old2new)[ (igraph_long_t)IGRAPH_TO(graph, eid) ];
                 if (!to) {
                     continue;
                 }
@@ -179,14 +179,14 @@ igraph_integer_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
              * second loop edge */
             skip_loop_edge = 0;
             for (j = 0; j < n; j++) {
-                eid = (igraph_integer_t) VECTOR(nei_edges)[j];
+                eid = (igraph_long_t) VECTOR(nei_edges)[j];
 
                 if (IGRAPH_FROM(graph, eid) != old_vid) {
                     /* avoid processing edges twice */
                     continue;
                 }
 
-                to = (igraph_integer_t) VECTOR(*my_vids_old2new)[ (igraph_integer_t)IGRAPH_TO(graph, eid) ];
+                to = (igraph_long_t) VECTOR(*my_vids_old2new)[ (igraph_long_t)IGRAPH_TO(graph, eid) ];
                 if (!to) {
                     continue;
                 }
@@ -216,7 +216,7 @@ igraph_integer_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
     IGRAPH_FINALLY_CLEAN(1);
 
     /* Create the new graph */
-    IGRAPH_CHECK(igraph_create(res, &new_edges, (igraph_integer_t)
+    IGRAPH_CHECK(igraph_create(res, &new_edges, (igraph_long_t)
                                no_of_new_nodes, directed));
     IGRAPH_I_ATTRIBUTE_DESTROY(res);
 
@@ -293,17 +293,17 @@ igraph_integer_t igraph_i_subgraph_create_from_scratch(const igraph_t *graph,
  * \sa \ref igraph_delete_vertices() to delete the specified set of
  * vertices from a graph, the opposite of this function.
  */
-igraph_integer_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
+igraph_long_t igraph_induced_subgraph(const igraph_t *graph, igraph_t *res,
                             const igraph_vs_t vids, igraph_subgraph_implementation_t impl) {
     return igraph_induced_subgraph_map(graph, res, vids, impl, /* map= */ 0,
                                        /* invmap= */ 0);
 }
 
-igraph_integer_t igraph_i_induced_subgraph_suggest_implementation(
+igraph_long_t igraph_i_induced_subgraph_suggest_implementation(
     const igraph_t *graph, const igraph_vs_t vids,
     igraph_subgraph_implementation_t *result) {
     double ratio;
-    igraph_integer_t num_vs;
+    igraph_long_t num_vs;
 
     if (igraph_vs_is_all(&vids)) {
         ratio = 1.0;
@@ -322,7 +322,7 @@ igraph_integer_t igraph_i_induced_subgraph_suggest_implementation(
     return 0;
 }
 
-igraph_integer_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
+igraph_long_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *res,
                                 const igraph_vs_t vids,
                                 igraph_subgraph_implementation_t impl,
                                 igraph_vector_t *map,
@@ -380,14 +380,14 @@ igraph_integer_t igraph_induced_subgraph_map(const igraph_t *graph, igraph_t *re
  * edges from a graph, the opposite of this function.
  */
 
-igraph_integer_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
+igraph_long_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
                           const igraph_es_t eids, igraph_bool_t delete_vertices) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t delete = IGRAPH_VECTOR_NULL;
     char *vremain, *eremain;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_eit_t eit;
 
     IGRAPH_CHECK(igraph_eit_create(graph, eids, &eit));
@@ -408,10 +408,10 @@ igraph_integer_t igraph_subgraph_edges(const igraph_t *graph, igraph_t *res,
 
     /* Collect the vertex and edge IDs that will remain */
     for (IGRAPH_EIT_RESET(eit); !IGRAPH_EIT_END(eit); IGRAPH_EIT_NEXT(eit)) {
-        igraph_integer_t from, to;
-        igraph_integer_t eid = (igraph_integer_t) IGRAPH_EIT_GET(eit);
-        IGRAPH_CHECK(igraph_edge(graph, (igraph_integer_t) eid, &from, &to));
-        eremain[eid] = vremain[(igraph_integer_t)from] = vremain[(igraph_integer_t)to] = 1;
+        igraph_long_t from, to;
+        igraph_long_t eid = (igraph_long_t) IGRAPH_EIT_GET(eit);
+        IGRAPH_CHECK(igraph_edge(graph, (igraph_long_t) eid, &from, &to));
+        eremain[eid] = vremain[(igraph_long_t)from] = vremain[(igraph_long_t)to] = 1;
     }
 
     /* Collect the edge IDs to be deleted */

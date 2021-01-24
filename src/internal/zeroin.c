@@ -43,7 +43,7 @@
  *                  the program to find the root as
  *                  accurate as possible
  *
- *  igraph_integer_t *Maxit;         Max. iterations
+ *  igraph_long_t *Maxit;         Max. iterations
  *
  *
  * Output
@@ -88,18 +88,18 @@
 
 #define EPSILON DBL_EPSILON
 
-igraph_integer_t igraph_zeroin(              /* An estimate of the root */
+igraph_long_t igraph_zeroin(              /* An estimate of the root */
     igraph_real_t *ax,          /* Left border | of the range   */
     igraph_real_t *bx,          /* Right border| the root is seeked*/
     igraph_real_t (*f)(igraph_real_t x, void *info),    /* Function under investigation */
     void *info,             /* Add'l info passed on to f    */
     igraph_real_t *Tol,         /* Acceptable tolerance     */
-    igraph_integer_t *Maxit,             /* Max # of iterations */
+    igraph_long_t *Maxit,             /* Max # of iterations */
     igraph_real_t *res) {               /* Result is stored here */
     igraph_real_t a, b, c,      /* Abscissae, descr. see above  */
                   fa, fb, fc;         /* f(a), f(b), f(c) */
     igraph_real_t tol;
-    igraph_integer_t maxit;
+    igraph_long_t maxit;
 
     a = *ax;  b = *bx;  fa = (*f)(a, info);  fb = (*f)(b, info);
     c = a;   fc = fa;

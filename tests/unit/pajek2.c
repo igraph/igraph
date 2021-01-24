@@ -25,10 +25,10 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     FILE *ifile;
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     /* turn on attribute handling */
     igraph_i_set_attribute_table(&igraph_cattribute_table);
@@ -45,7 +45,7 @@ igraph_integer_t main() {
     }
 
     for (i = 0, n = igraph_vcount(&g); i < n; i++) {
-        printf("%i ", (igraph_integer_t) VAN(&g, "type", i));
+        printf("%i ", (igraph_long_t) VAN(&g, "type", i));
     }
     printf("\n");
 

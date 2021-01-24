@@ -2,10 +2,10 @@
 #include <igraph.h>
 #include "bench.h"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph;
     igraph_vector_t walk, weights;
-    igraph_integer_t ec, i;
+    igraph_long_t ec, i;
 
     igraph_rng_seed(igraph_rng_default(), 137);
 

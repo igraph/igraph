@@ -20,10 +20,10 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g1, g2;
     igraph_bool_t res;
-    igraph_integer_t err;
+    igraph_long_t err;
 
     /* undirected graphs */
     igraph_small(&g1, 4, 0,

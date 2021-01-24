@@ -26,12 +26,12 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     FILE *f;
     igraph_matrix_t coords;
-    /* igraph_integer_t i, n; */
+    /* igraph_long_t i, n; */
 
     f = fopen("igraph_layout_reingold_tilford_extended.in", "r");
     igraph_read_graph_edgelist(&g, f, 0, 1);

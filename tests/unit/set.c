@@ -29,18 +29,18 @@
 #include "test_utilities.inc"
 
 void print_set(igraph_set_t *set, FILE *f) {
-    igraph_integer_t state = 0;
-    igraph_integer_t element;
+    igraph_long_t state = 0;
+    igraph_long_t element;
     while (igraph_set_iterate(set, &state, &element)) {
-        fprintf(f, " %li", (igraph_integer_t) element);
+        fprintf(f, " %li", (igraph_long_t) element);
     }
     fprintf(f, "\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_set_t set;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     /* simple init */
     igraph_set_init(&set, 0);

@@ -19,12 +19,12 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_t capacity;
-    igraph_integer_t source = 0;
-    igraph_integer_t target = 5;
+    igraph_long_t source = 0;
+    igraph_long_t target = 5;
 
     /*
     Expected output:

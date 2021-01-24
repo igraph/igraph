@@ -51,7 +51,7 @@ static IGRAPH_THREAD_LOCAL char igraph_i_progressmsg_buffer[1000];
  * Time complexity: O(1).
  */
 
-igraph_integer_t igraph_progress(const char *message, igraph_real_t percent, void *data) {
+igraph_long_t igraph_progress(const char *message, igraph_real_t percent, void *data) {
     if (igraph_i_progress_handler) {
         if (igraph_i_progress_handler(message, percent, data) != IGRAPH_SUCCESS) {
             return IGRAPH_INTERRUPTED;
@@ -89,7 +89,7 @@ igraph_integer_t igraph_progress(const char *message, igraph_real_t percent, voi
  * \return
  */
 
-igraph_integer_t igraph_progressf(const char *message, igraph_real_t percent, void *data,
+igraph_long_t igraph_progressf(const char *message, igraph_real_t percent, void *data,
                      ...) {
     va_list ap;
     va_start(ap, data);
@@ -121,7 +121,7 @@ igraph_integer_t igraph_progressf(const char *message, igraph_real_t percent, vo
  * Time complexity: O(1).
  */
 
-igraph_integer_t igraph_progress_handler_stderr(const char *message, igraph_real_t percent,
+igraph_long_t igraph_progress_handler_stderr(const char *message, igraph_real_t percent,
                                    void* data) {
     IGRAPH_UNUSED(data);
     fputs(message, stderr);

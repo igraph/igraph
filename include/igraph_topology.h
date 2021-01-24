@@ -36,10 +36,10 @@ __BEGIN_DECLS
 /* Directed acyclic graphs                            */
 /* -------------------------------------------------- */
 
-DECLDIR igraph_integer_t igraph_topological_sorting(const igraph_t *graph, igraph_vector_t *res,
+DECLDIR igraph_long_t igraph_topological_sorting(const igraph_t *graph, igraph_vector_t *res,
                                        igraph_neimode_t mode);
-DECLDIR igraph_integer_t igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
-DECLDIR igraph_integer_t igraph_transitive_closure_dag(const igraph_t *graph,
+DECLDIR igraph_long_t igraph_is_dag(const igraph_t *graph, igraph_bool_t *res);
+DECLDIR igraph_long_t igraph_transitive_closure_dag(const igraph_t *graph,
         igraph_t *closure);
 
 /* -------------------------------------------------- */
@@ -47,22 +47,22 @@ DECLDIR igraph_integer_t igraph_transitive_closure_dag(const igraph_t *graph,
 /* -------------------------------------------------- */
 
 /* Common functions */
-DECLDIR igraph_integer_t igraph_simplify_and_colorize(
+DECLDIR igraph_long_t igraph_simplify_and_colorize(
     const igraph_t *graph, igraph_t *res,
-    igraph_vector_int_t *vertex_color, igraph_vector_int_t *edge_color);
+    igraph_vector_long_t *vertex_color, igraph_vector_long_t *edge_color);
 
 /* Generic interface */
-DECLDIR igraph_integer_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
+DECLDIR igraph_long_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
                               igraph_bool_t *iso);
-DECLDIR igraph_integer_t igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
+DECLDIR igraph_long_t igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
                                  igraph_bool_t *iso);
 
 /* LAD */
-DECLDIR igraph_integer_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
+DECLDIR igraph_long_t igraph_subisomorphic_lad(const igraph_t *pattern, const igraph_t *target,
                                      igraph_vector_ptr_t *domains,
                                      igraph_bool_t *iso, igraph_vector_t *map,
                                      igraph_vector_ptr_t *maps,
-                                     igraph_bool_t induced, igraph_integer_t time_limit);
+                                     igraph_bool_t induced, igraph_long_t time_limit);
 
 /* VF2 family*/
 /**
@@ -109,89 +109,89 @@ typedef igraph_bool_t igraph_isohandler_t(const igraph_vector_t *map12,
 
 typedef igraph_bool_t igraph_isocompat_t(const igraph_t *graph1,
         const igraph_t *graph2,
-        const igraph_integer_t g1_num,
-        const igraph_integer_t g2_num,
+        const igraph_long_t g1_num,
+        const igraph_long_t g2_num,
         void *arg);
 
-DECLDIR igraph_integer_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
-                                  const igraph_vector_int_t *vertex_color1,
-                                  const igraph_vector_int_t *vertex_color2,
-                                  const igraph_vector_int_t *edge_color1,
-                                  const igraph_vector_int_t *edge_color2,
+DECLDIR igraph_long_t igraph_isomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
+                                  const igraph_vector_long_t *vertex_color1,
+                                  const igraph_vector_long_t *vertex_color2,
+                                  const igraph_vector_long_t *edge_color1,
+                                  const igraph_vector_long_t *edge_color2,
                                   igraph_bool_t *iso,
                                   igraph_vector_t *map12,
                                   igraph_vector_t *map21,
                                   igraph_isocompat_t *node_compat_fn,
                                   igraph_isocompat_t *edge_compat_fn,
                                   void *arg);
-DECLDIR igraph_integer_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2,
-        const igraph_vector_int_t *vertex_color1,
-        const igraph_vector_int_t *vertex_color2,
-        const igraph_vector_int_t *edge_color1,
-        const igraph_vector_int_t *edge_color2,
+DECLDIR igraph_long_t igraph_isomorphic_function_vf2(const igraph_t *graph1, const igraph_t *graph2,
+        const igraph_vector_long_t *vertex_color1,
+        const igraph_vector_long_t *vertex_color2,
+        const igraph_vector_long_t *edge_color1,
+        const igraph_vector_long_t *edge_color2,
         igraph_vector_t *map12, igraph_vector_t *map21,
         igraph_isohandler_t *isohandler_fn,
         igraph_isocompat_t *node_compat_fn,
         igraph_isocompat_t *edge_compat_fn,
         void *arg);
-DECLDIR igraph_integer_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2,
-        const igraph_vector_int_t *vertex_color1,
-        const igraph_vector_int_t *vertex_color2,
-        const igraph_vector_int_t *edge_color1,
-        const igraph_vector_int_t *edge_color2,
-        igraph_integer_t *count,
+DECLDIR igraph_long_t igraph_count_isomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2,
+        const igraph_vector_long_t *vertex_color1,
+        const igraph_vector_long_t *vertex_color2,
+        const igraph_vector_long_t *edge_color1,
+        const igraph_vector_long_t *edge_color2,
+        igraph_long_t *count,
         igraph_isocompat_t *node_compat_fn,
         igraph_isocompat_t *edge_compat_fn,
         void *arg);
-DECLDIR igraph_integer_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
+DECLDIR igraph_long_t igraph_get_isomorphisms_vf2(const igraph_t *graph1,
                                         const igraph_t *graph2,
-                                        const igraph_vector_int_t *vertex_color1,
-                                        const igraph_vector_int_t *vertex_color2,
-                                        const igraph_vector_int_t *edge_color1,
-                                        const igraph_vector_int_t *edge_color2,
+                                        const igraph_vector_long_t *vertex_color1,
+                                        const igraph_vector_long_t *vertex_color2,
+                                        const igraph_vector_long_t *edge_color1,
+                                        const igraph_vector_long_t *edge_color2,
                                         igraph_vector_ptr_t *maps,
                                         igraph_isocompat_t *node_compat_fn,
                                         igraph_isocompat_t *edge_compat_fn,
                                         void *arg);
 
-DECLDIR igraph_integer_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
-                                     const igraph_vector_int_t *vertex_color1,
-                                     const igraph_vector_int_t *vertex_color2,
-                                     const igraph_vector_int_t *edge_color1,
-                                     const igraph_vector_int_t *edge_color2,
+DECLDIR igraph_long_t igraph_subisomorphic_vf2(const igraph_t *graph1, const igraph_t *graph2,
+                                     const igraph_vector_long_t *vertex_color1,
+                                     const igraph_vector_long_t *vertex_color2,
+                                     const igraph_vector_long_t *edge_color1,
+                                     const igraph_vector_long_t *edge_color2,
                                      igraph_bool_t *iso,
                                      igraph_vector_t *map12,
                                      igraph_vector_t *map21,
                                      igraph_isocompat_t *node_compat_fn,
                                      igraph_isocompat_t *edge_compat_fn,
                                      void *arg);
-DECLDIR igraph_integer_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
+DECLDIR igraph_long_t igraph_subisomorphic_function_vf2(const igraph_t *graph1,
         const igraph_t *graph2,
-        const igraph_vector_int_t *vertex_color1,
-        const igraph_vector_int_t *vertex_color2,
-        const igraph_vector_int_t *edge_color1,
-        const igraph_vector_int_t *edge_color2,
+        const igraph_vector_long_t *vertex_color1,
+        const igraph_vector_long_t *vertex_color2,
+        const igraph_vector_long_t *edge_color1,
+        const igraph_vector_long_t *edge_color2,
         igraph_vector_t *map12,
         igraph_vector_t *map21,
         igraph_isohandler_t *isohandler_fn,
         igraph_isocompat_t *node_compat_fn,
         igraph_isocompat_t *edge_compat_fn,
         void *arg);
-DECLDIR igraph_integer_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2,
-        const igraph_vector_int_t *vertex_color1,
-        const igraph_vector_int_t *vertex_color2,
-        const igraph_vector_int_t *edge_color1,
-        const igraph_vector_int_t *edge_color2,
-        igraph_integer_t *count,
+DECLDIR igraph_long_t igraph_count_subisomorphisms_vf2(const igraph_t *graph1, const igraph_t *graph2,
+        const igraph_vector_long_t *vertex_color1,
+        const igraph_vector_long_t *vertex_color2,
+        const igraph_vector_long_t *edge_color1,
+        const igraph_vector_long_t *edge_color2,
+        igraph_long_t *count,
         igraph_isocompat_t *node_compat_fn,
         igraph_isocompat_t *edge_compat_fn,
         void *arg);
-DECLDIR igraph_integer_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
+DECLDIR igraph_long_t igraph_get_subisomorphisms_vf2(const igraph_t *graph1,
         const igraph_t *graph2,
-        const igraph_vector_int_t *vertex_color1,
-        const igraph_vector_int_t *vertex_color2,
-        const igraph_vector_int_t *edge_color1,
-        const igraph_vector_int_t *edge_color2,
+        const igraph_vector_long_t *vertex_color1,
+        const igraph_vector_long_t *vertex_color2,
+        const igraph_vector_long_t *edge_color1,
+        const igraph_vector_long_t *edge_color2,
         igraph_vector_ptr_t *maps,
         igraph_isocompat_t *node_compat_fn,
         igraph_isocompat_t *edge_compat_fn,
@@ -253,29 +253,29 @@ typedef enum { IGRAPH_BLISS_F = 0, IGRAPH_BLISS_FL,
                IGRAPH_BLISS_FLM, IGRAPH_BLISS_FSM
              } igraph_bliss_sh_t;
 
-DECLDIR igraph_integer_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_t *labeling,
+DECLDIR igraph_long_t igraph_canonical_permutation(const igraph_t *graph, const igraph_vector_long_t *colors, igraph_vector_t *labeling,
         igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
-DECLDIR igraph_integer_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
-                                    const igraph_vector_int_t *colors1, const igraph_vector_int_t *colors2,
+DECLDIR igraph_long_t igraph_isomorphic_bliss(const igraph_t *graph1, const igraph_t *graph2,
+                                    const igraph_vector_long_t *colors1, const igraph_vector_long_t *colors2,
                                     igraph_bool_t *iso, igraph_vector_t *map12,
                                     igraph_vector_t *map21,
                                     igraph_bliss_sh_t sh,
                                     igraph_bliss_info_t *info1, igraph_bliss_info_t *info2);
 
-DECLDIR igraph_integer_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_int_t *colors,
+DECLDIR igraph_long_t igraph_automorphisms(const igraph_t *graph, const igraph_vector_long_t *colors,
                                  igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 
-DECLDIR igraph_integer_t igraph_automorphism_group(const igraph_t *graph, const igraph_vector_int_t *colors, igraph_vector_ptr_t *generators,
+DECLDIR igraph_long_t igraph_automorphism_group(const igraph_t *graph, const igraph_vector_long_t *colors, igraph_vector_ptr_t *generators,
                                       igraph_bliss_sh_t sh, igraph_bliss_info_t *info);
 
 /* Functions for 3-4 graphs */
-DECLDIR igraph_integer_t igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2,
+DECLDIR igraph_long_t igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2,
                                  igraph_bool_t *iso);
-DECLDIR igraph_integer_t igraph_isoclass(const igraph_t *graph, igraph_integer_t *isoclass);
-DECLDIR igraph_integer_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
-                                     igraph_integer_t *isoclass);
-DECLDIR igraph_integer_t igraph_isoclass_create(igraph_t *graph, igraph_integer_t size,
-                                   igraph_integer_t number, igraph_bool_t directed);
+DECLDIR igraph_long_t igraph_isoclass(const igraph_t *graph, igraph_long_t *isoclass);
+DECLDIR igraph_long_t igraph_isoclass_subgraph(const igraph_t *graph, igraph_vector_t *vids,
+                                     igraph_long_t *isoclass);
+DECLDIR igraph_long_t igraph_isoclass_create(igraph_t *graph, igraph_long_t size,
+                                   igraph_long_t number, igraph_bool_t directed);
 
 
 

@@ -27,10 +27,10 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_psumtree_t tree;
     igraph_vector_t vec;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_real_t sum;
 
     /* Uniform random numbers */
@@ -52,7 +52,7 @@ igraph_integer_t main() {
 
     for (i = 0; i < 16000; i++) {
         igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_integer_t idx;
+        igraph_long_t idx;
         igraph_psumtree_search(&tree, &idx, r);
         VECTOR(vec)[idx] += 1;
     }
@@ -74,7 +74,7 @@ igraph_integer_t main() {
     igraph_vector_null(&vec);
     for (i = 0; i < 24000; i++) {
         igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_integer_t idx;
+        igraph_long_t idx;
         igraph_psumtree_search(&tree, &idx, r);
         VECTOR(vec)[idx] += 1;
     }
@@ -96,7 +96,7 @@ igraph_integer_t main() {
     igraph_vector_null(&vec);
     for (i = 0; i < 20000; i++) {
         igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_integer_t idx;
+        igraph_long_t idx;
         igraph_psumtree_search(&tree, &idx, r);
         VECTOR(vec)[idx] += 1;
     }
@@ -121,7 +121,7 @@ igraph_integer_t main() {
 
     for (i = 0; i < 9000; i++) {
         igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_integer_t idx;
+        igraph_long_t idx;
         igraph_psumtree_search(&tree, &idx, r);
         VECTOR(vec)[idx] += 1;
     }
@@ -140,7 +140,7 @@ igraph_integer_t main() {
     igraph_vector_null(&vec);
     for (i = 0; i < 14000; i++) {
         igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_integer_t idx;
+        igraph_long_t idx;
         igraph_psumtree_search(&tree, &idx, r);
         VECTOR(vec)[idx] += 1;
     }
@@ -172,7 +172,7 @@ igraph_integer_t main() {
     igraph_vector_null(&vec);
     for (i = 0; i < 9000; i++) {
         igraph_real_t r = ((double)rand()) / RAND_MAX * sum;
-        igraph_integer_t idx;
+        igraph_long_t idx;
         igraph_psumtree_search(&tree, &idx, r);
         VECTOR(vec)[idx] += 1;
     }

@@ -24,11 +24,11 @@
 #define R_INTEGER(a,b) (igraph_rng_get_integer(igraph_rng_default(), (a), (b)))
 #define R_UNIF(a,b) (igraph_rng_get_unif(igraph_rng_default(), (a), (b)))
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_real_t d;
     igraph_vector_t u, v;
-    igraph_integer_t ret;
-    igraph_integer_t i, k, n;
+    igraph_long_t ret;
+    igraph_long_t i, k, n;
 
     /********************************
      * Example usage

@@ -25,7 +25,7 @@
 #include <igraph.h>
 
 void show_results(igraph_t *g, igraph_vector_t *membership, igraph_matrix_t *memberships, igraph_vector_t *modularity, FILE* f) {
-    igraph_integer_t i, j, no_of_nodes = igraph_vcount(g);
+    igraph_long_t i, j, no_of_nodes = igraph_vcount(g);
 
     j = igraph_vector_which_max(modularity);
     for (i = 0; i < igraph_vector_size(membership); i++) {
@@ -39,7 +39,7 @@ void show_results(igraph_t *g, igraph_vector_t *membership, igraph_matrix_t *mem
 
     for (i = 0; i < igraph_matrix_nrow(memberships); i++) {
         for (j = 0; j < no_of_nodes; j++) {
-            fprintf(f, "%ld ", (igraph_integer_t)MATRIX(*memberships, i, j));
+            fprintf(f, "%ld ", (igraph_long_t)MATRIX(*memberships, i, j));
         }
         fprintf(f, "\n");
     }
@@ -47,11 +47,11 @@ void show_results(igraph_t *g, igraph_vector_t *membership, igraph_matrix_t *mem
     fprintf(f, "\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_t modularity, membership, edges;
     igraph_matrix_t memberships;
-    igraph_integer_t i, j, k;
+    igraph_long_t i, j, k;
 
     igraph_vector_init(&modularity, 0);
     igraph_vector_init(&membership, 0);

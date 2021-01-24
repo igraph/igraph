@@ -972,8 +972,8 @@ float rintf (float x) {
  */
 
 static int igraph_i_random_sample_alga(igraph_vector_t *res,
-                                       igraph_integer_t l, igraph_integer_t h,
-                                       igraph_integer_t length) {
+                                       igraph_long_t l, igraph_long_t h,
+                                       igraph_long_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
 
@@ -1020,7 +1020,7 @@ static int igraph_i_random_sample_alga(igraph_vector_t *res,
  * in a large graph.
  * </para><para>
  * Note that the type of the lower and the upper limit is \c igraph_real_t,
- * not \c igraph_integer_t. This does not mean that you can pass fractional
+ * not \c igraph_long_t. This does not mean that you can pass fractional
  * numbers there; these values must still be integral, but we need the
  * longer range of \c igraph_real_t in several places in the library
  * (for instance, when generating Erdos-Renyi graphs).
@@ -1055,7 +1055,7 @@ static int igraph_i_random_sample_alga(igraph_vector_t *res,
  */
 
 int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
-                         igraph_integer_t length) {
+                         igraph_long_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
     int retval;
@@ -1160,9 +1160,9 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
     }
 
     if (n > 1) {
-        retval = igraph_i_random_sample_alga(res, (igraph_integer_t) l + 1,
-                                             (igraph_integer_t) h,
-                                             (igraph_integer_t) n);
+        retval = igraph_i_random_sample_alga(res, (igraph_long_t) l + 1,
+                                             (igraph_long_t) h,
+                                             (igraph_long_t) n);
     } else {
         retval = 0;
         S = floor(N * Vprime);
@@ -2438,8 +2438,8 @@ int igraph_rng_get_dirichlet(igraph_rng_t *rng,
                              const igraph_vector_t *alpha,
                              igraph_vector_t *result) {
 
-    igraph_integer_t len = igraph_vector_size(alpha);
-    igraph_integer_t j;
+    igraph_long_t len = igraph_vector_size(alpha);
+    igraph_long_t j;
     igraph_real_t sum = 0.0;
 
     if (len < 2) {

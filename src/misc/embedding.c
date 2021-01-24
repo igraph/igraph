@@ -41,21 +41,21 @@ typedef struct {
 
 /* Adjacency matrix, unweighted, undirected.
    Eigendecomposition is used */
-static igraph_integer_t igraph_i_asembeddingu(igraph_real_t *to, const igraph_real_t *from,
-                          igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_asembeddingu(igraph_real_t *to, const igraph_real_t *from,
+                          igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
     const igraph_vector_t *cvec = data->cvec;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* to = (A+cD) from */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             to[i] += from[nei];
         }
         to[i] += VECTOR(*cvec)[i] * from[i];
@@ -66,24 +66,24 @@ static igraph_integer_t igraph_i_asembeddingu(igraph_real_t *to, const igraph_re
 
 /* Adjacency matrix, weighted, undirected.
    Eigendecomposition is used. */
-static igraph_integer_t igraph_i_asembeddinguw(igraph_real_t *to, const igraph_real_t *from,
-                           igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_asembeddinguw(igraph_real_t *to, const igraph_real_t *from,
+                           igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
     const igraph_vector_t *cvec = data->cvec;
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
-    igraph_vector_int_t *incs;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *incs;
+    igraph_long_t i, j, nlen;
 
     /* to = (A+cD) from */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = igraph_vector_int_size(incs);
+        nlen = igraph_vector_long_size(incs);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*incs)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * from[nei];
         }
@@ -94,23 +94,23 @@ static igraph_integer_t igraph_i_asembeddinguw(igraph_real_t *to, const igraph_r
 }
 
 /* Adjacency matrix, unweighted, directed. SVD. */
-static igraph_integer_t igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
-                         igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
+                         igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
     igraph_adjlist_t *inlist = data->inlist;
     const igraph_vector_t *cvec = data->cvec;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* tmp = (A+cD)' from */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(inlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             VECTOR(*tmp)[i] += from[nei];
         }
         VECTOR(*tmp)[i] += VECTOR(*cvec)[i] * from[i];
@@ -119,10 +119,10 @@ static igraph_integer_t igraph_i_asembedding(igraph_real_t *to, const igraph_rea
     /* to = (A+cD) tmp */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             to[i] += VECTOR(*tmp)[nei];
         }
         to[i] += VECTOR(*cvec)[i] * VECTOR(*tmp)[i];
@@ -132,21 +132,21 @@ static igraph_integer_t igraph_i_asembedding(igraph_real_t *to, const igraph_rea
 }
 
 /* Adjacency matrix, unweighted, directed. SVD, right eigenvectors */
-static igraph_integer_t igraph_i_asembedding_right(igraph_real_t *to, const igraph_real_t *from,
-                               igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_asembedding_right(igraph_real_t *to, const igraph_real_t *from,
+                               igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *inlist = data->inlist;
     const igraph_vector_t *cvec = data->cvec;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* to = (A+cD)' from */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(inlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             to[i] += from[nei];
         }
         to[i] += VECTOR(*cvec)[i] * from[i];
@@ -156,8 +156,8 @@ static igraph_integer_t igraph_i_asembedding_right(igraph_real_t *to, const igra
 }
 
 /* Adjacency matrix, weighted, directed. SVD. */
-static igraph_integer_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
-                          igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
+                          igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
     igraph_inclist_t *inlist = data->einlist;
@@ -165,17 +165,17 @@ static igraph_integer_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_re
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *incs;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *incs;
+    igraph_long_t i, j, nlen;
 
     /* tmp = (A+cD)' from */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(inlist, i);
-        nlen = igraph_vector_int_size(incs);
+        nlen = igraph_vector_long_size(incs);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*incs)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             VECTOR(*tmp)[i] += w * from[nei];
         }
@@ -185,11 +185,11 @@ static igraph_integer_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_re
     /* to = (A+cD) tmp */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = igraph_vector_int_size(incs);
+        nlen = igraph_vector_long_size(incs);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*incs)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * VECTOR(*tmp)[nei];
         }
@@ -200,24 +200,24 @@ static igraph_integer_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_re
 }
 
 /* Adjacency matrix, weighted, directed. SVD, right eigenvectors. */
-static igraph_integer_t igraph_i_asembeddingw_right(igraph_real_t *to, const igraph_real_t *from,
-                                igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_asembeddingw_right(igraph_real_t *to, const igraph_real_t *from,
+                                igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *inlist = data->einlist;
     const igraph_vector_t *cvec = data->cvec;
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
-    igraph_vector_int_t *incs;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *incs;
+    igraph_long_t i, j, nlen;
 
     /* to = (A+cD)' from */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(inlist, i);
-        nlen = igraph_vector_int_size(incs);
+        nlen = igraph_vector_long_size(incs);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*incs)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * from[nei];
         }
@@ -228,21 +228,21 @@ static igraph_integer_t igraph_i_asembeddingw_right(igraph_real_t *to, const igr
 }
 
 /* Laplacian D-A, unweighted, undirected. Eigendecomposition. */
-static igraph_integer_t igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
-                            igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
+                            igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
     const igraph_vector_t *cvec = data->cvec;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* to = (D-A) from */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             to[i] -= from[nei];
         }
         to[i] += VECTOR(*cvec)[i] * from[i];
@@ -252,24 +252,24 @@ static igraph_integer_t igraph_i_lsembedding_da(igraph_real_t *to, const igraph_
 }
 
 /* Laplacian D-A, weighted, undirected. Eigendecomposition. */
-static igraph_integer_t igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_real_t *from,
-                             igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_real_t *from,
+                             igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
     const igraph_vector_t *cvec = data->cvec;
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
-    igraph_vector_int_t *incs;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *incs;
+    igraph_long_t i, j, nlen;
 
     /* to = (D-A) from */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = igraph_vector_int_size(incs);
+        nlen = igraph_vector_long_size(incs);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*incs)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] -= w * from[nei];
         }
@@ -280,15 +280,15 @@ static igraph_integer_t igraph_i_lsembedding_daw(igraph_real_t *to, const igraph
 }
 
 /* Laplacian DAD, unweighted, undirected. Eigendecomposition. */
-static igraph_integer_t igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from,
-                             igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from,
+                             igraph_long_t n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
     const igraph_vector_t *cvec = data->cvec;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* to = D^1/2 from */
     for (i = 0; i < n; i++) {
@@ -298,10 +298,10 @@ static igraph_integer_t igraph_i_lsembedding_dad(igraph_real_t *to, const igraph
     /* tmp = A to */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             VECTOR(*tmp)[i] += to[nei];
         }
     }
@@ -314,8 +314,8 @@ static igraph_integer_t igraph_i_lsembedding_dad(igraph_real_t *to, const igraph
     return 0;
 }
 
-static igraph_integer_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *from,
-                              igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *from,
+                              igraph_long_t n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
@@ -323,8 +323,8 @@ static igraph_integer_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igrap
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *incs;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *incs;
+    igraph_long_t i, j, nlen;
 
     /* to = D^-1/2 from */
     for (i = 0; i < n; i++) {
@@ -334,11 +334,11 @@ static igraph_integer_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igrap
     /* tmp = A' to */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = igraph_vector_int_size(incs);
+        nlen = igraph_vector_long_size(incs);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*incs)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             VECTOR(*tmp)[i] += w * to[nei];
         }
@@ -352,11 +352,11 @@ static igraph_integer_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igrap
     /* tmp = A to */
     for (i = 0; i < n; i++) {
         incs = igraph_inclist_get(outlist, i);
-        nlen = igraph_vector_int_size(incs);
+        nlen = igraph_vector_long_size(incs);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*incs)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*incs)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             VECTOR(*tmp)[i] += w * to[nei];
         }
@@ -371,10 +371,10 @@ static igraph_integer_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igrap
 }
 
 /* Laplacian I-DAD, unweighted, undirected. Eigendecomposition. */
-static igraph_integer_t igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *from,
-                              igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *from,
+                              igraph_long_t n, void *extra) {
 
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_i_lsembedding_dad(to, from, n, extra);
     for (i = 0; i < n; i++) {
@@ -384,9 +384,9 @@ static igraph_integer_t igraph_i_lsembedding_idad(igraph_real_t *to, const igrap
     return 0;
 }
 
-static igraph_integer_t igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
-                               igraph_integer_t n, void *extra) {
-    igraph_integer_t i;
+static igraph_long_t igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
+                               igraph_long_t n, void *extra) {
+    igraph_long_t i;
 
     igraph_i_lsembedding_dadw(to, from, n, extra);
     for (i = 0; i < n; i++) {
@@ -397,8 +397,8 @@ static igraph_integer_t igraph_i_lsembedding_idadw(igraph_real_t *to, const igra
 }
 
 /* Laplacian OAP, unweighted, directed. SVD. */
-static igraph_integer_t igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_real_t *from,
-                              igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_real_t *from,
+                              igraph_long_t n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
@@ -406,8 +406,8 @@ static igraph_integer_t igraph_i_lseembedding_oap(igraph_real_t *to, const igrap
     const igraph_vector_t *deg_in = data->cvec;
     const igraph_vector_t *deg_out = data->cvec2;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* tmp = O' from */
     for (i = 0; i < n; i++) {
@@ -417,10 +417,10 @@ static igraph_integer_t igraph_i_lseembedding_oap(igraph_real_t *to, const igrap
     /* to = A' tmp */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(inlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
+            igraph_long_t nei = VECTOR(*neis)[j];
             to[i] += VECTOR(*tmp)[nei];
         }
     }
@@ -438,10 +438,10 @@ static igraph_integer_t igraph_i_lseembedding_oap(igraph_real_t *to, const igrap
     /* tmp = A to */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(outlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
+            igraph_long_t nei = VECTOR(*neis)[j];
             VECTOR(*tmp)[i] += to[nei];
         }
     }
@@ -455,16 +455,16 @@ static igraph_integer_t igraph_i_lseembedding_oap(igraph_real_t *to, const igrap
 }
 
 /* Laplacian OAP, unweighted, directed. SVD, right eigenvectors. */
-static igraph_integer_t igraph_i_lseembedding_oap_right(igraph_real_t *to,
+static igraph_long_t igraph_i_lseembedding_oap_right(igraph_real_t *to,
                                     const igraph_real_t *from,
-                                    igraph_integer_t n, void *extra) {
+                                    igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *inlist = data->inlist;
     const igraph_vector_t *deg_in = data->cvec;
     const igraph_vector_t *deg_out = data->cvec2;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* to = O' from */
     for (i = 0; i < n; i++) {
@@ -474,10 +474,10 @@ static igraph_integer_t igraph_i_lseembedding_oap_right(igraph_real_t *to,
     /* tmp = A' to */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(inlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = VECTOR(*neis)[j];
+            igraph_long_t nei = VECTOR(*neis)[j];
             VECTOR(*tmp)[i] += to[nei];
         }
     }
@@ -491,8 +491,8 @@ static igraph_integer_t igraph_i_lseembedding_oap_right(igraph_real_t *to,
 }
 
 /* Laplacian OAP, weighted, directed. SVD. */
-static igraph_integer_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph_real_t *from,
-                               igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph_real_t *from,
+                               igraph_long_t n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
@@ -502,8 +502,8 @@ static igraph_integer_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igra
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* tmp = O' from */
     for (i = 0; i < n; i++) {
@@ -513,11 +513,11 @@ static igraph_integer_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igra
     /* to = A' tmp */
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(inlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*neis)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * VECTOR(*tmp)[nei];
         }
@@ -536,11 +536,11 @@ static igraph_integer_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igra
     /* tmp = A to */
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(outlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*neis)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             VECTOR(*tmp)[i] += w * to[nei];
         }
@@ -555,9 +555,9 @@ static igraph_integer_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igra
 }
 
 /* Laplacian OAP, weighted, directed. SVD, right eigenvectors. */
-static igraph_integer_t igraph_i_lseembedding_oapw_right(igraph_real_t *to,
+static igraph_long_t igraph_i_lseembedding_oapw_right(igraph_real_t *to,
                                      const igraph_real_t *from,
-                                     igraph_integer_t n, void *extra) {
+                                     igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *inlist = data->einlist;
     const igraph_vector_t *deg_in = data->cvec;
@@ -565,8 +565,8 @@ static igraph_integer_t igraph_i_lseembedding_oapw_right(igraph_real_t *to,
     const igraph_vector_t *weights = data->weights;
     const igraph_t *graph = data->graph;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     /* to = O' from */
     for (i = 0; i < n; i++) {
@@ -576,11 +576,11 @@ static igraph_integer_t igraph_i_lseembedding_oapw_right(igraph_real_t *to,
     /* tmp = A' to */
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(inlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*neis)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             VECTOR(*tmp)[i] += w * to[nei];
         }
@@ -594,8 +594,8 @@ static igraph_integer_t igraph_i_lseembedding_oapw_right(igraph_real_t *to,
     return 0;
 }
 
-static igraph_integer_t igraph_i_spectral_embedding(const igraph_t *graph,
-                                igraph_integer_t no,
+static igraph_long_t igraph_i_spectral_embedding(const igraph_t *graph,
+                                igraph_long_t no,
                                 const igraph_vector_t *weights,
                                 igraph_eigen_which_position_t which,
                                 igraph_bool_t scaled,
@@ -611,11 +611,11 @@ static igraph_integer_t igraph_i_spectral_embedding(const igraph_t *graph,
                                 igraph_bool_t eigen,
                                 igraph_bool_t zapsmall) {
 
-    igraph_integer_t vc = igraph_vcount(graph);
+    igraph_long_t vc = igraph_vcount(graph);
     igraph_vector_t tmp;
     igraph_adjlist_t outlist, inlist;
     igraph_inclist_t eoutlist, einlist;
-    igraph_integer_t i, j, cveclen = igraph_vector_size(cvec);
+    igraph_long_t i, j, cveclen = igraph_vector_size(cvec);
     igraph_i_asembedding_data_t data;
     igraph_vector_t tmpD;
 
@@ -855,8 +855,8 @@ static igraph_integer_t igraph_i_spectral_embedding(const igraph_t *graph,
  *
  */
 
-igraph_integer_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
-                                        igraph_integer_t n,
+igraph_long_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
+                                        igraph_long_t n,
                                         const igraph_vector_t *weights,
                                         igraph_eigen_which_position_t which,
                                         igraph_bool_t scaled,
@@ -885,8 +885,8 @@ igraph_integer_t igraph_adjacency_spectral_embedding(const igraph_t *graph,
                                        /*eigen=*/ !directed, /*zapsmall=*/ 1);
 }
 
-static igraph_integer_t igraph_i_lse_und(const igraph_t *graph,
-                     igraph_integer_t no,
+static igraph_long_t igraph_i_lse_und(const igraph_t *graph,
+                     igraph_long_t no,
                      const igraph_vector_t *weights,
                      igraph_eigen_which_position_t which,
                      igraph_laplacian_spectral_embedding_type_t type,
@@ -924,7 +924,7 @@ static igraph_integer_t igraph_i_lse_und(const igraph_t *graph,
         break;
     case IGRAPH_EMBEDDING_DAD:
     case IGRAPH_EMBEDDING_I_DAD: {
-        igraph_integer_t i, n = igraph_vector_size(&deg);
+        igraph_long_t i, n = igraph_vector_size(&deg);
         for (i = 0; i < n; i++) {
             VECTOR(deg)[i] = 1.0 / sqrt(VECTOR(deg)[i]);
         }
@@ -945,8 +945,8 @@ static igraph_integer_t igraph_i_lse_und(const igraph_t *graph,
     return 0;
 }
 
-static igraph_integer_t igraph_i_lse_dir(const igraph_t *graph,
-                     igraph_integer_t no,
+static igraph_long_t igraph_i_lse_dir(const igraph_t *graph,
+                     igraph_long_t no,
                      const igraph_vector_t *weights,
                      igraph_eigen_which_position_t which,
                      igraph_laplacian_spectral_embedding_type_t type,
@@ -962,7 +962,7 @@ static igraph_integer_t igraph_i_lse_dir(const igraph_t *graph,
         weights ? igraph_i_lseembedding_oapw_right :
         igraph_i_lseembedding_oap_right;
     igraph_vector_t deg_in, deg_out;
-    igraph_integer_t i, n = igraph_vcount(graph);
+    igraph_long_t i, n = igraph_vcount(graph);
 
     if (type != IGRAPH_EMBEDDING_OAP) {
         IGRAPH_ERROR("Invalid Laplacian spectral embedding type", IGRAPH_EINVAL);
@@ -1053,8 +1053,8 @@ static igraph_integer_t igraph_i_lse_dir(const igraph_t *graph,
  * matrix.
  */
 
-igraph_integer_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
-                                        igraph_integer_t n,
+igraph_long_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
+                                        igraph_long_t n,
                                         const igraph_vector_t *weights,
                                         igraph_eigen_which_position_t which,
                                         igraph_laplacian_spectral_embedding_type_t type,
@@ -1108,9 +1108,9 @@ igraph_integer_t igraph_laplacian_spectral_embedding(const igraph_t *graph,
  * \sa \ref igraph_adjacency_spectral_embedding().
  */
 
-igraph_integer_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *dim) {
+igraph_long_t igraph_dim_select(const igraph_vector_t *sv, igraph_long_t *dim) {
 
-    igraph_integer_t i, n = igraph_vector_size(sv);
+    igraph_long_t i, n = igraph_vector_size(sv);
     igraph_real_t x, x2, sum1 = 0.0, sum2 = igraph_vector_sum(sv);
     igraph_real_t sumsq1 = 0.0, sumsq2 = 0.0; /* to be set */
     igraph_real_t oldmean1, oldmean2, mean1 = 0.0, mean2 = sum2 / n;
@@ -1134,7 +1134,7 @@ igraph_integer_t igraph_dim_select(const igraph_vector_t *sv, igraph_integer_t *
     }
 
     for (i = 0; i < n - 1; i++) {
-        igraph_integer_t n1 = i + 1, n2 = n - i - 1, n1m1 = n1 - 1, n2m1 = n2 - 1;
+        igraph_long_t n1 = i + 1, n2 = n - i - 1, n1m1 = n1 - 1, n2m1 = n2 - 1;
         x = VECTOR(*sv)[i]; x2 = x * x;
         sum1 += x; sum2 -= x;
         sumsq1 += x2; sumsq2 -= x2;

@@ -29,9 +29,9 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
                        const igraph_vector_t *values,
                        const igraph_matrix_t *vectors, igraph_real_t tol) {
     igraph_vector_t v, y;
-    igraph_integer_t i, j;
-    igraph_integer_t m = igraph_matrix_ncol(vectors);
-    igraph_integer_t n = igraph_matrix_nrow(A);
+    igraph_long_t i, j;
+    igraph_long_t m = igraph_matrix_ncol(vectors);
+    igraph_long_t n = igraph_matrix_nrow(A);
 
     if (igraph_matrix_ncol(A) != n)       {
         return 1;
@@ -68,13 +68,13 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_matrix_t A;
     igraph_matrix_t vectors, vectors2;
     igraph_vector_t values, values2;
-    igraph_integer_t i, j;
-    igraph_integer_t il, iu;
+    igraph_long_t i, j;
+    igraph_long_t il, iu;
     igraph_real_t vl, vu;
 
     igraph_rng_seed(igraph_rng_default(), 42);

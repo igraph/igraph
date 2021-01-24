@@ -25,7 +25,7 @@
 #include <stdio.h>
 
 extern "C"
-igraph_integer_t LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
+igraph_long_t LLVMFuzzerTestOneInput(const uint8_t *data, size_t size){
     if(size<5) return 0;
 
     igraph_set_error_handler(igraph_error_handler_ignore);

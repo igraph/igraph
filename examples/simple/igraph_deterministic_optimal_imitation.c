@@ -25,20 +25,20 @@
 /* test parameters structure */
 typedef struct {
     igraph_t *graph;
-    igraph_integer_t vertex;
+    igraph_long_t vertex;
     igraph_optimal_t optimality;
     igraph_vector_t *quantities;
     igraph_vector_t *strategies;
     igraph_neimode_t mode;
-    igraph_integer_t retval;
+    igraph_long_t retval;
 } strategy_test_t;
 
 /* Error tests. That is, we expect error codes to be returned from such tests.
  */
-igraph_integer_t error_tests() {
+igraph_long_t error_tests() {
     igraph_t g, h;
     igraph_vector_t quant, strat;
-    igraph_integer_t i, n, ret;
+    igraph_long_t i, n, ret;
     strategy_test_t *test;
 
     /* nonempty graph */
@@ -94,7 +94,7 @@ igraph_integer_t error_tests() {
                     test->strategies,
                     test->mode);
             if (ret != test->retval) {
-                printf("Error test no. %d failed.\n", (igraph_integer_t)(i + 1));
+                printf("Error test no. %d failed.\n", (igraph_long_t)(i + 1));
                 return IGRAPH_FAILURE;
             }
             i++;
@@ -112,10 +112,10 @@ igraph_integer_t error_tests() {
 /* Updating the strategy of an isolated vertex. In this case, the strategies
  * vector should not change at all.
  */
-igraph_integer_t isolated_vertex_test() {
+igraph_long_t isolated_vertex_test() {
     igraph_t g;
     igraph_vector_t quant, strat, v;
-    igraph_integer_t i, ret;
+    igraph_long_t i, ret;
 
     /* graph with one isolated vertex */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
@@ -163,10 +163,10 @@ igraph_integer_t isolated_vertex_test() {
  * result vector, we reset the strategies vector to its default state and
  * repeat the game with another vertex.
  */
-igraph_integer_t petersen_game_test() {
+igraph_long_t petersen_game_test() {
     igraph_t g;
     igraph_vector_t known_max_v, known_min_v, quant, strat, stratcopy;
-    igraph_integer_t i, nvert;
+    igraph_long_t i, nvert;
 
     /* the Petersen graph */
     igraph_small(&g, /*n=*/ 0, IGRAPH_UNDIRECTED,
@@ -199,7 +199,7 @@ igraph_integer_t petersen_game_test() {
         /* maximum deterministic imitation */
         igraph_vector_copy(&stratcopy, &strat);
         igraph_deterministic_optimal_imitation(/*graph*/ &g,
-                /*vertex*/ (igraph_integer_t)i,
+                /*vertex*/ (igraph_long_t)i,
                 /*optimality*/ IGRAPH_MAXIMUM,
                 /*quantities*/ &quant,
                 /*strategies*/ &stratcopy,
@@ -212,7 +212,7 @@ igraph_integer_t petersen_game_test() {
         /* minimum deterministic imitation */
         igraph_vector_copy(&stratcopy, &strat);
         igraph_deterministic_optimal_imitation(/*graph*/ &g,
-                /*vertex*/ (igraph_integer_t)i,
+                /*vertex*/ (igraph_long_t)i,
                 /*optimality*/ IGRAPH_MINIMUM,
                 /*quantities*/ &quant,
                 /*strategies*/ &stratcopy,
@@ -233,8 +233,8 @@ igraph_integer_t petersen_game_test() {
     return IGRAPH_SUCCESS;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t ret;
+igraph_long_t main() {
+    igraph_long_t ret;
 
     ret = error_tests();
     if (ret) {

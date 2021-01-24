@@ -23,11 +23,11 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_t v, v2;
     igraph_vector_t v_weighted, v2_weighted;
-    igraph_integer_t n;
+    igraph_long_t n;
     igraph_neimode_t mode, neighbour_degree_mode;
 
     mode = IGRAPH_IN;
@@ -35,8 +35,8 @@ igraph_integer_t main() {
 
     igraph_ring(&g, 10, /*directed=*/ 1, /*mutual=*/ 0, /*circular=*/ 1);
     n = igraph_vcount(&g);
-    igraph_vector_init(&v, (igraph_integer_t)n);
-    igraph_vector_init(&v2, (igraph_integer_t)n);
+    igraph_vector_init(&v, (igraph_long_t)n);
+    igraph_vector_init(&v2, (igraph_long_t)n);
     igraph_avg_nearest_neighbor_degree(&g, igraph_vss_all(),
                                        mode, neighbour_degree_mode,
                                        &v, &v2, /*weights=*/ 0);
@@ -45,8 +45,8 @@ igraph_integer_t main() {
     igraph_vector_init(&weights, igraph_ecount(&g));
     igraph_vector_fill(&weights, 2.0);
 
-    igraph_vector_init(&v_weighted, (igraph_integer_t)n);
-    igraph_vector_init(&v2_weighted, (igraph_integer_t)n);
+    igraph_vector_init(&v_weighted, (igraph_long_t)n);
+    igraph_vector_init(&v2_weighted, (igraph_long_t)n);
     igraph_avg_nearest_neighbor_degree(&g, igraph_vss_all(),
                                        mode, neighbour_degree_mode,
                                        &v_weighted, &v2_weighted, &weights);

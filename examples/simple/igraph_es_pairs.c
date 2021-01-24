@@ -23,11 +23,11 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
-    igraph_integer_t i;
-    igraph_integer_t size;
+    igraph_long_t i;
+    igraph_long_t size;
 
     /* DIRECTED */
 

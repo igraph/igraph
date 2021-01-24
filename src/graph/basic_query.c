@@ -46,12 +46,12 @@
  * Time complexity: O( min(log(d1), log(d2)) ),
  * d1 is the (out-)degree of \p v1 and d2 is the (in-)degree of \p v2.
  */
-igraph_integer_t igraph_are_connected(const igraph_t *graph,
-                         igraph_integer_t v1, igraph_integer_t v2,
+igraph_long_t igraph_are_connected(const igraph_t *graph,
+                         igraph_long_t v1, igraph_long_t v2,
                          igraph_bool_t *res) {
 
-    igraph_integer_t nov = igraph_vcount(graph);
-    igraph_integer_t eid = -1;
+    igraph_long_t nov = igraph_vcount(graph);
+    igraph_long_t eid = -1;
 
     if (v1 < 0 || v2 < 0 || v1 > nov - 1 || v2 > nov - 1) {
         IGRAPH_ERROR("are connected", IGRAPH_EINVVID);

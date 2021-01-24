@@ -58,12 +58,12 @@
  * Time complexity: O(|V|e*log(|V|)), |V| is the number of vertices, e
  * is \p edges_per_step.
  */
-igraph_integer_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t nodes,
-                                igraph_integer_t types, igraph_integer_t edges_per_step,
+igraph_long_t igraph_callaway_traits_game(igraph_t *graph, igraph_long_t nodes,
+                                igraph_long_t types, igraph_long_t edges_per_step,
                                 igraph_vector_t *type_dist,
                                 igraph_matrix_t *pref_matrix,
                                 igraph_bool_t directed) {
-    igraph_integer_t i, j;
+    igraph_long_t i, j;
     igraph_vector_t edges;
     igraph_vector_t cumdist;
     igraph_real_t maxcum;
@@ -121,17 +121,17 @@ igraph_integer_t igraph_callaway_traits_game(igraph_t *graph, igraph_integer_t n
 
     for (i = 0; i < nodes; i++) {
         igraph_real_t uni = RNG_UNIF(0, maxcum);
-        igraph_integer_t type;
+        igraph_long_t type;
         igraph_vector_binsearch(&cumdist, uni, &type);
         VECTOR(nodetypes)[i] = type - 1;
     }
 
     for (i = 1; i < nodes; i++) {
         for (j = 0; j < edges_per_step; j++) {
-            igraph_integer_t node1 = RNG_INTEGER(0, i);
-            igraph_integer_t node2 = RNG_INTEGER(0, i);
-            igraph_integer_t type1 = (igraph_integer_t) VECTOR(nodetypes)[node1];
-            igraph_integer_t type2 = (igraph_integer_t) VECTOR(nodetypes)[node2];
+            igraph_long_t node1 = RNG_INTEGER(0, i);
+            igraph_long_t node2 = RNG_INTEGER(0, i);
+            igraph_long_t type1 = (igraph_long_t) VECTOR(nodetypes)[node1];
+            igraph_long_t type2 = (igraph_long_t) VECTOR(nodetypes)[node2];
             /*    printf("unif: %f, %f, types: %li, %li\n", uni1, uni2, type1, type2); */
             if (RNG_UNIF01() < MATRIX(*pref_matrix, type1, type2)) {
                 IGRAPH_CHECK(igraph_vector_push_back(&edges, node1));

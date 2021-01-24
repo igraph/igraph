@@ -20,11 +20,11 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t graph, spanning_tree;
     igraph_vector_t tree_edges;
     igraph_bool_t is_tree;
-    igraph_integer_t err;
+    igraph_long_t err;
 
     igraph_rng_seed(igraph_rng_default(), 987);
 

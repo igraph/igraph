@@ -37,24 +37,24 @@ __BEGIN_DECLS
 /* Components                                         */
 /* -------------------------------------------------- */
 
-DECLDIR igraph_integer_t igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
-                            igraph_vector_t *csize, igraph_integer_t *no,
+DECLDIR igraph_long_t igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
+                            igraph_vector_t *csize, igraph_long_t *no,
                             igraph_connectedness_t mode);
-DECLDIR igraph_integer_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
+DECLDIR igraph_long_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                                 igraph_connectedness_t mode);
 DECLDIR void igraph_decompose_destroy(igraph_vector_ptr_t *complist);
-DECLDIR igraph_integer_t igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
+DECLDIR igraph_long_t igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
                              igraph_connectedness_t mode,
-                             igraph_integer_t maxcompno, igraph_integer_t minelements);
-DECLDIR igraph_integer_t igraph_articulation_points(const igraph_t *graph,
+                             igraph_long_t maxcompno, igraph_long_t minelements);
+DECLDIR igraph_long_t igraph_articulation_points(const igraph_t *graph,
                                        igraph_vector_t *res);
-DECLDIR igraph_integer_t igraph_biconnected_components(const igraph_t *graph,
-        igraph_integer_t *no,
+DECLDIR igraph_long_t igraph_biconnected_components(const igraph_t *graph,
+        igraph_long_t *no,
         igraph_vector_ptr_t *tree_edges,
         igraph_vector_ptr_t *component_edges,
         igraph_vector_ptr_t *components,
         igraph_vector_t *articulation_points);
-DECLDIR igraph_integer_t igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges);
+DECLDIR igraph_long_t igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges);
 
 __END_DECLS
 

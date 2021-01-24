@@ -5,7 +5,7 @@
 
 #include "test_utilities.inc"
 
-void check_attr(igraph_t *graph, igraph_integer_t offset) {
+void check_attr(igraph_t *graph, igraph_long_t offset) {
 
     if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_GRAPH, "name")) {
         printf("No graph attribute `name`\n");
@@ -31,11 +31,11 @@ void check_attr(igraph_t *graph, igraph_integer_t offset) {
     }
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t graph;
     igraph_error_handler_t* oldhandler;
-    igraph_integer_t result;
+    igraph_long_t result;
     FILE *ifile = fopen("cattr_bool_bug.graphml", "r");
 
     if (!ifile) {

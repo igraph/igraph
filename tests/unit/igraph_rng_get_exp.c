@@ -23,9 +23,9 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
     for (i = 0; i < 1000; i++) {

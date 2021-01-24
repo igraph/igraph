@@ -27,7 +27,7 @@
 #include "test_utilities.inc"
 
 void print_array(const igraph_array3_t *a) {
-    igraph_integer_t i, j, k;
+    igraph_long_t i, j, k;
     for (k = 0; k < igraph_array3_n(a, 3); k++) {
         for (i = 0; i < igraph_array3_n(a, 1); i++) {
             for (j = 0; j < igraph_array3_n(a, 2); j++) {
@@ -39,10 +39,10 @@ void print_array(const igraph_array3_t *a) {
     }
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_array3_t a;
-    igraph_integer_t i, j, k;
-    igraph_integer_t s = 1;
+    igraph_long_t i, j, k;
+    igraph_long_t s = 1;
 
     igraph_array3_init(&a, 5, 4, 3);
     igraph_array3_destroy(&a);

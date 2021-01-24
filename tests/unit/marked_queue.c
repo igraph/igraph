@@ -26,9 +26,9 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_marked_queue_t Q;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_marked_queue_init(&Q, 100);
     for (i = 0; i < 50; i++) {

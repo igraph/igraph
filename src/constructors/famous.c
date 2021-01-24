@@ -252,14 +252,14 @@ const igraph_real_t igraph_i_famous_zachary[] = {
     32, 33
 };
 
-static igraph_integer_t igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
-    igraph_integer_t no_of_nodes = (igraph_integer_t) data[0];
-    igraph_integer_t no_of_edges = (igraph_integer_t) data[1];
+static igraph_long_t igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
+    igraph_long_t no_of_nodes = (igraph_long_t) data[0];
+    igraph_long_t no_of_edges = (igraph_long_t) data[1];
     igraph_bool_t directed = (igraph_bool_t) data[2];
     igraph_vector_t edges;
 
     igraph_vector_view(&edges, data + 3, 2 * no_of_edges);
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_long_t) no_of_nodes,
                                directed));
     return 0;
 }
@@ -424,7 +424,7 @@ static igraph_integer_t igraph_i_famous(igraph_t *graph, const igraph_real_t *da
  * of edges in the graph.
  */
 
-igraph_integer_t igraph_famous(igraph_t *graph, const char *name) {
+igraph_long_t igraph_famous(igraph_t *graph, const char *name) {
 
     if (!strcasecmp(name, "bull")) {
         return igraph_i_famous(graph, igraph_i_famous_bull);

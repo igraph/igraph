@@ -29,7 +29,7 @@
 #include "igraph_qsort.h"
 
 void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(v);
+    igraph_long_t i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
             igraph_vector_destroy(VECTOR(*v)[i]);
@@ -40,7 +40,7 @@ void igraph_i_union_intersection_destroy_vectors(igraph_vector_ptr_t *v) {
 }
 
 void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(v);
+    igraph_long_t i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if (VECTOR(*v)[i] != 0) {
             igraph_vector_long_destroy(VECTOR(*v)[i]);
@@ -50,19 +50,19 @@ void igraph_i_union_intersection_destroy_vector_longs(igraph_vector_ptr_t *v) {
     igraph_vector_ptr_destroy(v);
 }
 
-igraph_integer_t igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
+igraph_long_t igraph_i_order_edgelist_cmp(void *edges, const void *e1, const void *e2) {
     igraph_vector_t *edgelist = edges;
-    igraph_integer_t edge1 = (*(const igraph_integer_t*) e1) * 2;
-    igraph_integer_t edge2 = (*(const igraph_integer_t*) e2) * 2;
-    igraph_integer_t from1 = VECTOR(*edgelist)[edge1];
-    igraph_integer_t from2 = VECTOR(*edgelist)[edge2];
+    igraph_long_t edge1 = (*(const igraph_long_t*) e1) * 2;
+    igraph_long_t edge2 = (*(const igraph_long_t*) e2) * 2;
+    igraph_long_t from1 = VECTOR(*edgelist)[edge1];
+    igraph_long_t from2 = VECTOR(*edgelist)[edge2];
     if (from1 < from2) {
         return -1;
     } else if (from1 > from2) {
         return 1;
     } else {
-        igraph_integer_t to1 = VECTOR(*edgelist)[edge1 + 1];
-        igraph_integer_t to2 = VECTOR(*edgelist)[edge2 + 1];
+        igraph_long_t to1 = VECTOR(*edgelist)[edge1 + 1];
+        igraph_long_t to2 = VECTOR(*edgelist)[edge2 + 1];
         if (to1 < to2) {
             return -1;
         } else if (to1 > to2) {
@@ -73,21 +73,21 @@ igraph_integer_t igraph_i_order_edgelist_cmp(void *edges, const void *e1, const 
     }
 }
 
-igraph_integer_t igraph_i_merge(igraph_t *res, igraph_integer_t mode,
+igraph_long_t igraph_i_merge(igraph_t *res, igraph_long_t mode,
                    const igraph_t *left, const igraph_t *right,
                    igraph_vector_t *edge_map1, igraph_vector_t *edge_map2) {
 
-    igraph_integer_t no_of_nodes_left = igraph_vcount(left);
-    igraph_integer_t no_of_nodes_right = igraph_vcount(right);
-    igraph_integer_t no_of_nodes;
-    igraph_integer_t no_edges_left = igraph_ecount(left);
-    igraph_integer_t no_edges_right = igraph_ecount(right);
+    igraph_long_t no_of_nodes_left = igraph_vcount(left);
+    igraph_long_t no_of_nodes_right = igraph_vcount(right);
+    igraph_long_t no_of_nodes;
+    igraph_long_t no_edges_left = igraph_ecount(left);
+    igraph_long_t no_edges_right = igraph_ecount(right);
     igraph_bool_t directed = igraph_is_directed(left);
     igraph_vector_t edges;
     igraph_vector_t edges1, edges2;
     igraph_vector_long_t order1, order2;
-    igraph_integer_t i, j, eptr = 0;
-    igraph_integer_t idx1, idx2, edge1 = -1, edge2 = -1, from1 = -1, from2 = -1, to1 = -1, to2 = -1;
+    igraph_long_t i, j, eptr = 0;
+    igraph_long_t idx1, idx2, edge1 = -1, edge2 = -1, from1 = -1, from2 = -1, to1 = -1, to2 = -1;
     igraph_bool_t l;
 
     if (directed != igraph_is_directed(right)) {
@@ -137,14 +137,14 @@ igraph_integer_t igraph_i_merge(igraph_t *res, igraph_integer_t mode,
     if (!directed) {
         for (i = 0, j = 0; i < no_edges_left; i++, j += 2) {
             if (VECTOR(edges1)[j] > VECTOR(edges1)[j + 1]) {
-                igraph_integer_t tmp = VECTOR(edges1)[j];
+                igraph_long_t tmp = VECTOR(edges1)[j];
                 VECTOR(edges1)[j] = VECTOR(edges1)[j + 1];
                 VECTOR(edges1)[j + 1] = tmp;
             }
         }
         for (i = 0, j = 0; i < no_edges_right; i++, j += 2) {
             if (VECTOR(edges2)[j] > VECTOR(edges2)[j + 1]) {
-                igraph_integer_t tmp = VECTOR(edges2)[j];
+                igraph_long_t tmp = VECTOR(edges2)[j];
                 VECTOR(edges2)[j] = VECTOR(edges2)[j + 1];
                 VECTOR(edges2)[j + 1] = tmp;
             }

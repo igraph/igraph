@@ -26,9 +26,9 @@
 #include "test_utilities.inc"
 
 typedef struct {
-    igraph_integer_t dim;
-    igraph_integer_t m;
-    igraph_integer_t nei;
+    igraph_long_t dim;
+    igraph_long_t m;
+    igraph_long_t nei;
     igraph_bool_t directed, mutual, circular;
     igraph_real_t *dimedges;
 } lat_test_t;
@@ -103,7 +103,7 @@ lat_test_t *all_checks[] = { /*  1 */ &lat_u_0,   /*  2 */ &lat_u_01,
                                       0
                            };
 
-igraph_integer_t check_lattice_properties(const igraph_t *lattice,
+igraph_long_t check_lattice_properties(const igraph_t *lattice,
                              const igraph_vector_t *dim,
                              igraph_bool_t directed,
                              igraph_bool_t mutual,
@@ -127,12 +127,12 @@ igraph_integer_t check_lattice_properties(const igraph_t *lattice,
     return 0;
 }
 
-igraph_integer_t check_lattice(const lat_test_t *test) {
+igraph_long_t check_lattice(const lat_test_t *test) {
     igraph_t graph, othergraph;
     igraph_vector_t otheredges;
     igraph_vector_t dimvector;
     igraph_bool_t iso;
-    igraph_integer_t ret;
+    igraph_long_t ret;
 
     /* Create lattice */
     igraph_vector_view(&dimvector, test->dimedges, test->dim);
@@ -167,13 +167,13 @@ igraph_integer_t check_lattice(const lat_test_t *test) {
     return 0;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t i, ret;
+igraph_long_t main() {
+    igraph_long_t i, ret;
 
     i = 0;
     while (all_checks[i]) {
         if ((ret = check_lattice(all_checks[i]))) {
-            printf("Check no #%d failed.\n", (igraph_integer_t) (i + 1));
+            printf("Check no #%d failed.\n", (igraph_long_t) (i + 1));
             return ret;
         }
         i++;

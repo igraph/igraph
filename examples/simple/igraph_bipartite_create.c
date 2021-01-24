@@ -23,15 +23,15 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_real_t edges2[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 1, 4, 1, 6, 0, 3 };
     igraph_real_t edges3[] = {0, 1, 1, 2, 3, 4, 5, 6, 6, 5, 2, 4, 1, 6, 0, 3 };
     igraph_t g;
     igraph_vector_bool_t types;
     igraph_vector_t edges;
-    igraph_integer_t i;
-    igraph_integer_t ret;
+    igraph_long_t i;
+    igraph_long_t ret;
 
     igraph_vector_view(&edges, edges2, sizeof(edges2) / sizeof(igraph_real_t));
     igraph_vector_bool_init(&types, igraph_vector_max(&edges) + 1);

@@ -54,14 +54,14 @@
  * Time complexity: O(n+m), linear in the number vertices and edges.
  *
  */
-igraph_integer_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
+igraph_long_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                        igraph_neimode_t mode, const igraph_vector_t *roots,
                        igraph_vector_t *vertex_index) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
-    igraph_integer_t no_of_roots = igraph_vector_size(roots);
-    igraph_integer_t tree_vertex_count = no_of_nodes;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t no_of_roots = igraph_vector_size(roots);
+    igraph_long_t tree_vertex_count = no_of_nodes;
 
     igraph_vector_t edges;
     igraph_vector_bool_t seen_vertices;
@@ -70,7 +70,7 @@ igraph_integer_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_dqueue_t Q;
     igraph_vector_t neis;
 
-    igraph_integer_t i, n, r, v_ptr = no_of_nodes;
+    igraph_long_t i, n, r, v_ptr = no_of_nodes;
 
     /* TODO: handle not-connected graphs, multiple root vertices */
 
@@ -90,21 +90,21 @@ igraph_integer_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     for (r = 0; r < no_of_roots; r++) {
 
-        igraph_integer_t root = (igraph_integer_t) VECTOR(*roots)[r];
+        igraph_long_t root = (igraph_long_t) VECTOR(*roots)[r];
         VECTOR(seen_vertices)[root] = 1;
         igraph_dqueue_push(&Q, root);
 
         while (!igraph_dqueue_empty(&Q)) {
-            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&Q);
+            igraph_long_t actnode = (igraph_long_t) igraph_dqueue_pop(&Q);
 
-            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode, mode));
+            IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_long_t) actnode, mode));
             n = igraph_vector_size(&neis);
             for (i = 0; i < n; i++) {
 
-                igraph_integer_t edge = (igraph_integer_t) VECTOR(neis)[i];
-                igraph_integer_t from = IGRAPH_FROM(graph, edge);
-                igraph_integer_t to = IGRAPH_TO(graph, edge);
-                igraph_integer_t nei = IGRAPH_OTHER(graph, edge, actnode);
+                igraph_long_t edge = (igraph_long_t) VECTOR(neis)[i];
+                igraph_long_t from = IGRAPH_FROM(graph, edge);
+                igraph_long_t to = IGRAPH_TO(graph, edge);
+                igraph_long_t nei = IGRAPH_OTHER(graph, edge, actnode);
 
                 if (! VECTOR(seen_edges)[edge]) {
 
@@ -157,10 +157,10 @@ igraph_integer_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 /* igraph_is_tree -- check if a graph is a tree */
 
 /* count the number of vertices reachable from the root */
-static igraph_integer_t igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_t *al, igraph_integer_t *visited_count) {
+static igraph_long_t igraph_i_is_tree_visitor(igraph_long_t root, const igraph_adjlist_t *al, igraph_long_t *visited_count) {
     igraph_stack_int_t stack;
     igraph_vector_bool_t visited;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     IGRAPH_CHECK(igraph_vector_bool_init(&visited, igraph_adjlist_size(al)));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
@@ -174,9 +174,9 @@ static igraph_integer_t igraph_i_is_tree_visitor(igraph_integer_t root, const ig
     IGRAPH_CHECK(igraph_stack_int_push(&stack, root));
 
     while (! igraph_stack_int_empty(&stack)) {
-        igraph_integer_t u;
-        igraph_vector_int_t *neighbors;
-        igraph_integer_t ncount;
+        igraph_long_t u;
+        igraph_vector_long_t *neighbors;
+        igraph_long_t ncount;
 
         /* take a vertex from the stack, mark it as visited */
         u = igraph_stack_int_pop(&stack);
@@ -187,9 +187,9 @@ static igraph_integer_t igraph_i_is_tree_visitor(igraph_integer_t root, const ig
 
         /* register all its yet-unvisited neighbours for future processing */
         neighbors = igraph_adjlist_get(al, u);
-        ncount = igraph_vector_int_size(neighbors);
+        ncount = igraph_vector_long_size(neighbors);
         for (i = 0; i < ncount; ++i) {
-            igraph_integer_t v = VECTOR(*neighbors)[i];
+            igraph_long_t v = VECTOR(*neighbors)[i];
             if (! VECTOR(visited)[v]) {
                 IGRAPH_CHECK(igraph_stack_int_push(&stack, v));
             }
@@ -243,11 +243,11 @@ static igraph_integer_t igraph_i_is_tree_visitor(igraph_integer_t root, const ig
  *
  * \example examples/simple/igraph_tree.c
  */
-igraph_integer_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
+igraph_long_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_long_t *root, igraph_neimode_t mode) {
     igraph_adjlist_t al;
-    igraph_integer_t iroot = 0;
-    igraph_integer_t visited_count;
-    igraph_integer_t vcount, ecount;
+    igraph_long_t iroot = 0;
+    igraph_long_t visited_count;
+    igraph_long_t vcount, ecount;
 
     vcount = igraph_vcount(graph);
     ecount = igraph_ecount(graph);
@@ -299,7 +299,7 @@ igraph_integer_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igrap
     case IGRAPH_IN:
     case IGRAPH_OUT: {
         igraph_vector_t degree;
-        igraph_integer_t i;
+        igraph_long_t i;
 
         IGRAPH_CHECK(igraph_vector_init(&degree, 0));
         IGRAPH_FINALLY(igraph_vector_destroy, &degree);

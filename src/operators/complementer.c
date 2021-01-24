@@ -48,14 +48,14 @@
  *
  * \example examples/simple/igraph_complementer.c
  */
-igraph_integer_t igraph_complementer(igraph_t *res, const igraph_t *graph,
+igraph_long_t igraph_complementer(igraph_t *res, const igraph_t *graph,
                         igraph_bool_t loops) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t edges;
     igraph_vector_t neis;
-    igraph_integer_t i, j;
-    igraph_integer_t zero = 0, *limit;
+    igraph_long_t i, j;
+    igraph_long_t zero = 0, *limit;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);
@@ -68,7 +68,7 @@ igraph_integer_t igraph_complementer(igraph_t *res, const igraph_t *graph,
 
     for (i = 0; i < no_of_nodes; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
-        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) i,
+        IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_long_t) i,
                                       IGRAPH_OUT));
         if (loops) {
             for (j = no_of_nodes - 1; j >= *limit; j--) {
@@ -93,7 +93,7 @@ igraph_integer_t igraph_complementer(igraph_t *res, const igraph_t *graph,
         }
     }
 
-    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(res, &edges, (igraph_long_t) no_of_nodes,
                                igraph_is_directed(graph)));
     igraph_vector_destroy(&edges);
     igraph_vector_destroy(&neis);

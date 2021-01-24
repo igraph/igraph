@@ -24,11 +24,11 @@
 #include <igraph.h>
 #include <string.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     char tmp[100];
     const char *string;
-    igraph_integer_t major, minor, subminor;
+    igraph_long_t major, minor, subminor;
 
     igraph_version(&string, &major, &minor, &subminor);
     sprintf(tmp, "%i.%i.%i", major, minor, subminor);

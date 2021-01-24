@@ -23,9 +23,9 @@
 
 #include <igraph.h>
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
-    const igraph_integer_t nodes = 10;
+    const igraph_long_t nodes = 10;
     igraph_t g;
     igraph_matrix_t V;
     igraph_matrix_complex_t V2;

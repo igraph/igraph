@@ -31,12 +31,12 @@
  * of the vectors is a suffix of the other, the shorter vector gets ordered
  * first.
  */
-igraph_integer_t vector_tail_cmp(const void* path1, const void* path2) {
+igraph_long_t vector_tail_cmp(const void* path1, const void* path2) {
     const igraph_vector_t* vec1 = *(const igraph_vector_t**)path1;
     const igraph_vector_t* vec2 = *(const igraph_vector_t**)path2;
     size_t length1 = igraph_vector_size(vec1);
     size_t length2 = igraph_vector_size(vec2);
-    igraph_integer_t diff;
+    igraph_long_t diff;
 
     while (length1 > 0 && length2 > 0) {
         length1--;
@@ -59,7 +59,7 @@ igraph_integer_t vector_tail_cmp(const void* path1, const void* path2) {
 void check_nrgeo(igraph_t *graph, igraph_vs_t vs,
                  igraph_vector_ptr_t* paths,
                  igraph_vector_t* nrgeo) {
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
     igraph_vector_t nrgeo2, *path;
     igraph_vit_t vit;
 
@@ -82,15 +82,15 @@ void check_nrgeo(igraph_t *graph, igraph_vs_t vs,
             printf("Empty path found in result vector at index %ld\n", i);
             return;
         }
-        VECTOR(nrgeo2)[(igraph_integer_t)igraph_vector_tail(path)] += 1;
+        VECTOR(nrgeo2)[(igraph_long_t)igraph_vector_tail(path)] += 1;
     }
 
     igraph_vit_create(graph, vs, &vit);
     for (IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit); IGRAPH_VIT_NEXT(vit)) {
-        igraph_integer_t node = IGRAPH_VIT_GET(vit);
+        igraph_long_t node = IGRAPH_VIT_GET(vit);
         if (VECTOR(*nrgeo)[node] - VECTOR(nrgeo2)[node]) {
             printf("nrgeo[%ld] invalid, observed = %ld, expected = %ld\n",
-                   node, (igraph_integer_t)VECTOR(*nrgeo)[node], (igraph_integer_t)VECTOR(nrgeo2)[node]);
+                   node, (igraph_long_t)VECTOR(*nrgeo)[node], (igraph_long_t)VECTOR(nrgeo2)[node]);
         }
     }
     igraph_vit_destroy(&vit);
@@ -98,11 +98,11 @@ void check_nrgeo(igraph_t *graph, igraph_vs_t vs,
     igraph_vector_destroy(&nrgeo2);
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_ptr_t res;
-    igraph_integer_t i;
+    igraph_long_t i;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_real_t dim[] = { 4, 4 };
@@ -195,9 +195,9 @@ igraph_integer_t main() {
     igraph_vs_destroy(&vs);
     igraph_destroy(&g);
 
-    printf("%ld ", (igraph_integer_t)VECTOR(nrgeo)[3]);
-    printf("%ld ", (igraph_integer_t)VECTOR(nrgeo)[12]);
-    printf("%ld\n", (igraph_integer_t)VECTOR(nrgeo)[15]);
+    printf("%ld ", (igraph_long_t)VECTOR(nrgeo)[3]);
+    printf("%ld ", (igraph_long_t)VECTOR(nrgeo)[12]);
+    printf("%ld\n", (igraph_long_t)VECTOR(nrgeo)[15]);
 
     igraph_vector_ptr_destroy(&res);
     igraph_vector_destroy(&nrgeo);

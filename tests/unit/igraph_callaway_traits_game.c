@@ -20,9 +20,9 @@
 #include "test_utilities.inc"
 
 void init_vm(igraph_vector_t *type_dist,
-             igraph_integer_t v0, igraph_integer_t v1,
+             igraph_long_t v0, igraph_long_t v1,
              igraph_matrix_t *pref_matrix,
-             igraph_integer_t m00, igraph_integer_t m10, igraph_integer_t m01, igraph_integer_t m11) {
+             igraph_long_t m00, igraph_long_t m10, igraph_long_t m01, igraph_long_t m11) {
     igraph_vector_init_int_end(type_dist, -1, v0, v1, -1);
     igraph_matrix_init(pref_matrix, 2, 2);
     MATRIX(*pref_matrix, 0, 0) = m00;
@@ -37,7 +37,7 @@ void init_vm(igraph_vector_t *type_dist,
     igraph_matrix_destroy(&pref_matrix); \
     } while(0)
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t g;
     igraph_vector_t type_dist;
     igraph_matrix_t pref_matrix;

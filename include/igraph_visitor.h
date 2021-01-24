@@ -68,15 +68,15 @@ __BEGIN_DECLS
  */
 
 typedef igraph_bool_t igraph_bfshandler_t(const igraph_t *graph,
-        igraph_integer_t vid,
-        igraph_integer_t pred,
-        igraph_integer_t succ,
-        igraph_integer_t rank,
-        igraph_integer_t dist,
+        igraph_long_t vid,
+        igraph_long_t pred,
+        igraph_long_t succ,
+        igraph_long_t rank,
+        igraph_long_t dist,
         void *extra);
 
-DECLDIR igraph_integer_t igraph_bfs(const igraph_t *graph,
-               igraph_integer_t root, const igraph_vector_t *roots,
+DECLDIR igraph_long_t igraph_bfs(const igraph_t *graph,
+               igraph_long_t root, const igraph_vector_t *roots,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                const igraph_vector_t *restricted,
                igraph_vector_t *order, igraph_vector_t *rank,
@@ -85,7 +85,7 @@ DECLDIR igraph_integer_t igraph_bfs(const igraph_t *graph,
                igraph_vector_t *dist, igraph_bfshandler_t *callback,
                void *extra);
 
-igraph_integer_t igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neimode_t mode,
+igraph_long_t igraph_i_bfs(igraph_t *graph, igraph_long_t vid, igraph_neimode_t mode,
                  igraph_vector_t *vids, igraph_vector_t *layers,
                  igraph_vector_t *parents);
 
@@ -115,11 +115,11 @@ igraph_integer_t igraph_i_bfs(igraph_t *graph, igraph_integer_t vid, igraph_neim
  */
 
 typedef igraph_bool_t igraph_dfshandler_t(const igraph_t *graph,
-        igraph_integer_t vid,
-        igraph_integer_t dist,
+        igraph_long_t vid,
+        igraph_long_t dist,
         void *extra);
 
-DECLDIR igraph_integer_t igraph_dfs(const igraph_t *graph, igraph_integer_t root,
+DECLDIR igraph_long_t igraph_dfs(const igraph_t *graph, igraph_long_t root,
                igraph_neimode_t mode, igraph_bool_t unreachable,
                igraph_vector_t *order,
                igraph_vector_t *order_out, igraph_vector_t *father,

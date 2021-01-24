@@ -26,10 +26,10 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_t karate;
     igraph_vector_t parents, weights;
-    igraph_integer_t i, n;
+    igraph_long_t i, n;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -72,8 +72,8 @@ igraph_integer_t main() {
      * are different on i386 vs other platforms due to numerical inaccuracies */
     if (igraph_vector_size(&weights) + igraph_vcount(&karate) != igraph_vector_size(&parents)) {
         printf("Vector length mismatch: %ld + %ld != %ld\n",
-            (igraph_integer_t) igraph_vector_size(&weights), (igraph_integer_t) igraph_vcount(&karate),
-            (igraph_integer_t) igraph_vector_size(&parents)
+            (igraph_long_t) igraph_vector_size(&weights), (igraph_long_t) igraph_vcount(&karate),
+            (igraph_long_t) igraph_vector_size(&parents)
         );
         return 1;
     }

@@ -39,11 +39,11 @@
  * <programlisting>
  * <![CDATA[#include <igraph.h>
  *
- * igraph_integer_t main(void)
+ * igraph_long_t main(void)
  * {
  *    igraph_t graph;
  *    igraph_vector_ptr_t seps;
- *    igraph_integer_t i;
+ *    igraph_long_t i;
  *
  *    igraph_famous(&graph, "tutte");
  *    igraph_vector_ptr_init(&seps, 0);

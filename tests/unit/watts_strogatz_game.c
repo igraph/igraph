@@ -29,7 +29,7 @@
 #define N 1000
 
 igraph_bool_t has_loops(const igraph_t *graph) {
-    igraph_integer_t i, n = igraph_ecount(graph);
+    igraph_long_t i, n = igraph_ecount(graph);
     for (i = 0; i < n; i++) {
         if (IGRAPH_FROM(graph, i) == IGRAPH_TO(graph, i)) {
             return 1;
@@ -54,11 +54,11 @@ igraph_bool_t has_multiple(const igraph_t *graph) {
         igraph_rng_seed(igraph_rng_default(), seed);                \
     } while (0)
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t ws;
     igraph_bool_t sim, seen_loops, seen_multiple;
-    igraph_integer_t i, seed = 1305473657;
+    igraph_long_t i, seed = 1305473657;
 
     igraph_rng_seed(igraph_rng_default(), seed);
 

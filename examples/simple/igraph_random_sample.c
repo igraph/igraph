@@ -27,17 +27,17 @@
 
 /* test parameters */
 typedef struct {
-    igraph_integer_t low;
-    igraph_integer_t high;
-    igraph_integer_t length;
-    igraph_integer_t retval;
+    igraph_long_t low;
+    igraph_long_t high;
+    igraph_long_t length;
+    igraph_long_t retval;
 } sampling_test_t;
 
 /* Error tests. Don't be afraid to crash the library function.
  */
-igraph_integer_t error_test() {
+igraph_long_t error_test() {
     igraph_vector_t V;
-    igraph_integer_t i, n, ret;
+    igraph_long_t i, n, ret;
     sampling_test_t *test;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
@@ -60,7 +60,7 @@ igraph_integer_t error_test() {
         test = all_checks[i];
         ret = igraph_random_sample(&V, test->low, test->high, test->length);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (igraph_integer_t)(i + 1));
+            printf("Error test no. %d failed.\n", (igraph_long_t)(i + 1));
             return IGRAPH_FAILURE;
         }
     }
@@ -73,31 +73,31 @@ igraph_integer_t error_test() {
 
 /* Get a few random samples and test their properties.
  */
-igraph_integer_t random_sample_test() {
-    const igraph_integer_t min = -1000;
-    const igraph_integer_t max = 1000;
-    igraph_integer_t low;       /* lower limit */
-    igraph_integer_t high;      /* upper limit */
-    igraph_integer_t length;    /* sample size */
-    igraph_integer_t poolsize;  /* size of candidate pool */
+igraph_long_t random_sample_test() {
+    const igraph_long_t min = -1000;
+    const igraph_long_t max = 1000;
+    igraph_long_t low;       /* lower limit */
+    igraph_long_t high;      /* upper limit */
+    igraph_long_t length;    /* sample size */
+    igraph_long_t poolsize;  /* size of candidate pool */
     igraph_real_t sP;           /* population total sum */
     igraph_real_t ss;           /* sample total sum */
     igraph_vector_t V;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_rng_seed(igraph_rng_default(), 57); /* make tests deterministic */
 
     /* The generated sequence of numbers must be in increasing order. */
     igraph_vector_init(&V, /*size*/ 0);
     do {
-        high = (igraph_integer_t)R_INTEGER(min, max);
+        high = (igraph_long_t)R_INTEGER(min, max);
     } while (high == min);
     do {
-        low = (igraph_integer_t)R_INTEGER(min, max);
+        low = (igraph_long_t)R_INTEGER(min, max);
     } while (low >= high);
-    poolsize = (igraph_integer_t)fabs((double)high - (double)low);
+    poolsize = (igraph_long_t)fabs((double)high - (double)low);
     do {
-        length = (igraph_integer_t)R_INTEGER(1, max);
+        length = (igraph_long_t)R_INTEGER(1, max);
     } while (length > poolsize);
     igraph_random_sample(&V, low, high, length);
     if (length != igraph_vector_size(&V)) {
@@ -118,11 +118,11 @@ igraph_integer_t random_sample_test() {
     igraph_vector_init(&V, /*size*/ 0);
     low = 1;
     do {
-        high = (igraph_integer_t)R_INTEGER(low, max);
+        high = (igraph_long_t)R_INTEGER(low, max);
     } while (high == low);
-    poolsize = (igraph_integer_t)fabs((double)high - (double)low);
+    poolsize = (igraph_long_t)fabs((double)high - (double)low);
     do {
-        length = (igraph_integer_t)R_INTEGER(low, max);
+        length = (igraph_long_t)R_INTEGER(low, max);
     } while (length > poolsize);
     igraph_random_sample(&V, low, high, length);
     /* Use Gauss' formula to sum all consecutive positive integers from 1 */
@@ -139,9 +139,9 @@ igraph_integer_t random_sample_test() {
     return IGRAPH_SUCCESS;
 }
 
-igraph_integer_t equal_test() {
+igraph_long_t equal_test() {
     igraph_vector_t V;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_vector_init(&V, 0);
 
@@ -174,7 +174,7 @@ igraph_integer_t equal_test() {
     return 0;
 }
 
-igraph_integer_t rare_test() {
+igraph_long_t rare_test() {
     igraph_vector_t V;
 
     igraph_vector_init(&V, 0);
@@ -199,8 +199,8 @@ igraph_integer_t rare_test() {
     return 0;
 }
 
-igraph_integer_t main() {
-    igraph_integer_t ret;
+igraph_long_t main() {
+    igraph_long_t ret;
 
     ret = error_test();
     if (ret) {

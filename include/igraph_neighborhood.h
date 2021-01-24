@@ -31,16 +31,16 @@
 
 __BEGIN_DECLS
 
-DECLDIR igraph_integer_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
-                                     igraph_vs_t vids, igraph_integer_t order,
-                                     igraph_neimode_t mode, igraph_integer_t mindist);
-DECLDIR igraph_integer_t igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
-                                igraph_vs_t vids, igraph_integer_t order,
-                                igraph_neimode_t mode, igraph_integer_t mindist);
-DECLDIR igraph_integer_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
-                                       igraph_vs_t vids, igraph_integer_t order,
+DECLDIR igraph_long_t igraph_neighborhood_size(const igraph_t *graph, igraph_vector_t *res,
+                                     igraph_vs_t vids, igraph_long_t order,
+                                     igraph_neimode_t mode, igraph_long_t mindist);
+DECLDIR igraph_long_t igraph_neighborhood(const igraph_t *graph, igraph_vector_ptr_t *res,
+                                igraph_vs_t vids, igraph_long_t order,
+                                igraph_neimode_t mode, igraph_long_t mindist);
+DECLDIR igraph_long_t igraph_neighborhood_graphs(const igraph_t *graph, igraph_vector_ptr_t *res,
+                                       igraph_vs_t vids, igraph_long_t order,
                                        igraph_neimode_t mode,
-                                       igraph_integer_t mindist);
+                                       igraph_long_t mindist);
 
 __END_DECLS
 

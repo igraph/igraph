@@ -38,7 +38,7 @@
 #include <math.h>
 #include <string.h>    /* memset */
 
-igraph_integer_t igraph_personalized_pagerank_arpack(const igraph_t *graph,
+igraph_long_t igraph_personalized_pagerank_arpack(const igraph_t *graph,
                                         igraph_vector_t *vector,
                                         igraph_real_t *value, const igraph_vs_t vids,
                                         igraph_bool_t directed, igraph_real_t damping,
@@ -57,7 +57,7 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
      * the values are relatively large negative numbers, in which case we should
      * negate the eigenvector.
      */
-    igraph_integer_t i, n = igraph_vector_size(vector);
+    igraph_long_t i, n = igraph_vector_size(vector);
     igraph_real_t mi, ma;
 
     if (n == 0) {
@@ -85,18 +85,18 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
     return (mi < 1e-5) ? 1 : 0;
 }
 
-static igraph_integer_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
-                                           igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
+                                           igraph_long_t n, void *extra) {
     igraph_adjlist_t *adjlist = extra;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(adjlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             to[i] += from[nei];
         }
     }
@@ -111,23 +111,23 @@ typedef struct igraph_i_eigenvector_centrality_t {
     const igraph_vector_t *weights;
 } igraph_i_eigenvector_centrality_t;
 
-static igraph_integer_t igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
-                                            igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
+                                            igraph_long_t n, void *extra) {
 
     igraph_i_eigenvector_centrality_t *data = extra;
     const igraph_t *graph = data->graph;
     const igraph_inclist_t *inclist = data->inclist;
     const igraph_vector_t *weights = data->weights;
-    igraph_vector_int_t *edges;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *edges;
+    igraph_long_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         edges = igraph_inclist_get(inclist, i);
-        nlen = igraph_vector_int_size(edges);
+        nlen = igraph_vector_long_size(edges);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = VECTOR(*edges)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = VECTOR(*edges)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             igraph_real_t w = VECTOR(*weights)[edge];
             to[i] += w * from[nei];
         }
@@ -136,7 +136,7 @@ static igraph_integer_t igraph_i_eigenvector_centrality2(igraph_real_t *to, cons
     return 0;
 }
 
-igraph_integer_t igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
+igraph_long_t igraph_eigenvector_centrality_undirected(const igraph_t *graph, igraph_vector_t *vector,
         igraph_real_t *value, igraph_bool_t scale,
         const igraph_vector_t *weights,
         igraph_arpack_options_t *options) {
@@ -144,7 +144,7 @@ igraph_integer_t igraph_eigenvector_centrality_undirected(const igraph_t *graph,
     igraph_vector_t values;
     igraph_matrix_t vectors;
     igraph_vector_t degree;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     options->n = igraph_vcount(graph);
     options->start = 1;   /* no random start vector */
@@ -244,8 +244,8 @@ igraph_integer_t igraph_eigenvector_centrality_undirected(const igraph_t *graph,
 
     if (vector) {
         igraph_real_t amax = 0;
-        igraph_integer_t which = 0;
-        igraph_integer_t i;
+        igraph_long_t which = 0;
+        igraph_long_t i;
         IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
 
         if (VECTOR(values)[0] <= 0) {
@@ -289,19 +289,19 @@ igraph_integer_t igraph_eigenvector_centrality_undirected(const igraph_t *graph,
     return 0;
 }
 
-/* igraph_integer_t igraph_i_evcent_dir(igraph_real_t *to, const igraph_real_t *from, */
-/*          igraph_integer_t n, void *extra) { */
+/* igraph_long_t igraph_i_evcent_dir(igraph_real_t *to, const igraph_real_t *from, */
+/*          igraph_long_t n, void *extra) { */
 /*   /\* TODO *\/ */
 /*   return 0; */
 /* } */
 
-/* igraph_integer_t igraph_i_evcent_dir2(igraph_real_t *to, const igraph_real_t *from, */
-/*           igraph_integer_t n, void *extra) { */
+/* igraph_long_t igraph_i_evcent_dir2(igraph_real_t *to, const igraph_real_t *from, */
+/*           igraph_long_t n, void *extra) { */
 /*   /\* TODO *\/ */
 /*   return 0; */
 /* } */
 
-igraph_integer_t igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
+igraph_long_t igraph_eigenvector_centrality_directed(const igraph_t *graph, igraph_vector_t *vector,
         igraph_real_t *value, igraph_bool_t scale,
         const igraph_vector_t *weights,
         igraph_arpack_options_t *options) {
@@ -310,7 +310,7 @@ igraph_integer_t igraph_eigenvector_centrality_directed(const igraph_t *graph, i
     igraph_matrix_t vectors;
     igraph_vector_t indegree;
     igraph_bool_t dag;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     if (igraph_ecount(graph) == 0) {
         /* special case: empty graph */
@@ -432,8 +432,8 @@ igraph_integer_t igraph_eigenvector_centrality_directed(const igraph_t *graph, i
 
     if (vector) {
         igraph_real_t amax = 0;
-        igraph_integer_t which = 0;
-        igraph_integer_t i;
+        igraph_long_t which = 0;
+        igraph_long_t i;
         IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
 
         if (MATRIX(values, 0, 0) <= 0) {
@@ -552,7 +552,7 @@ igraph_integer_t igraph_eigenvector_centrality_directed(const igraph_t *graph, i
  * \example examples/simple/eigenvector_centrality.c
  */
 
-igraph_integer_t igraph_eigenvector_centrality(const igraph_t *graph,
+igraph_long_t igraph_eigenvector_centrality(const igraph_t *graph,
                                   igraph_vector_t *vector,
                                   igraph_real_t *value,
                                   igraph_bool_t directed, igraph_bool_t scale,
@@ -585,32 +585,32 @@ typedef struct igraph_i_kleinberg_data2_t {
 } igraph_i_kleinberg_data2_t;
 
 /* ARPACK auxiliary routine for the unweighted HITS algorithm */
-static igraph_integer_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
+static igraph_long_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
                                          const igraph_real_t *from,
-                                         igraph_integer_t n, void *extra) {
+                                         igraph_long_t n, void *extra) {
     igraph_i_kleinberg_data_t *data = (igraph_i_kleinberg_data_t*)extra;
     igraph_adjlist_t *in = data->in;
     igraph_adjlist_t *out = data->out;
     igraph_vector_t *tmp = data->tmp;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(in, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             VECTOR(*tmp)[i] += from[nei];
         }
     }
 
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(out, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             to[i] += VECTOR(*tmp)[nei];
         }
     }
@@ -619,9 +619,9 @@ static igraph_integer_t igraph_i_kleinberg_unweighted(igraph_real_t *to,
 }
 
 /* ARPACK auxiliary routine for the weighted HITS algorithm */
-static igraph_integer_t igraph_i_kleinberg_weighted(igraph_real_t *to,
+static igraph_long_t igraph_i_kleinberg_weighted(igraph_real_t *to,
                                        const igraph_real_t *from,
-                                       igraph_integer_t n, void *extra) {
+                                       igraph_long_t n, void *extra) {
 
     igraph_i_kleinberg_data2_t *data = (igraph_i_kleinberg_data2_t*)extra;
     igraph_inclist_t *in = data->in;
@@ -629,27 +629,27 @@ static igraph_integer_t igraph_i_kleinberg_weighted(igraph_real_t *to,
     igraph_vector_t *tmp = data->tmp;
     const igraph_vector_t *weights = data->weights;
     const igraph_t *g = data->graph;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
 
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(in, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         VECTOR(*tmp)[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei_edge = (igraph_integer_t) VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(g, nei_edge, i);
+            igraph_long_t nei_edge = (igraph_long_t) VECTOR(*neis)[j];
+            igraph_long_t nei = IGRAPH_OTHER(g, nei_edge, i);
             VECTOR(*tmp)[i] += from[nei] * VECTOR(*weights)[nei_edge];
         }
     }
 
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(out, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei_edge = (igraph_integer_t) VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(g, nei_edge, i);
+            igraph_long_t nei_edge = (igraph_long_t) VECTOR(*neis)[j];
+            igraph_long_t nei = IGRAPH_OTHER(g, nei_edge, i);
             to[i] += VECTOR(*tmp)[nei] * VECTOR(*weights)[nei_edge];
         }
     }
@@ -657,10 +657,10 @@ static igraph_integer_t igraph_i_kleinberg_weighted(igraph_real_t *to,
     return 0;
 }
 
-static igraph_integer_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
+static igraph_long_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_t *vector,
                               igraph_real_t *value, igraph_bool_t scale,
                               const igraph_vector_t *weights,
-                              igraph_arpack_options_t *options, igraph_integer_t inout) {
+                              igraph_arpack_options_t *options, igraph_long_t inout) {
 
     igraph_adjlist_t myinadjlist, myoutadjlist;
     igraph_inclist_t myininclist, myoutinclist;
@@ -671,7 +671,7 @@ static igraph_integer_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_
     igraph_matrix_t vectors;
     igraph_i_kleinberg_data_t extra;
     igraph_i_kleinberg_data2_t extra2;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     if (igraph_ecount(graph) == 0 || igraph_vcount(graph) == 1) {
         /* special case: empty graph or single vertex */
@@ -781,8 +781,8 @@ static igraph_integer_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_
 
     if (vector) {
         igraph_real_t amax = 0;
-        igraph_integer_t which = 0;
-        igraph_integer_t i;
+        igraph_long_t which = 0;
+        igraph_long_t i;
         IGRAPH_CHECK(igraph_vector_resize(vector, options->n));
         for (i = 0; i < options->n; i++) {
             igraph_real_t tmp;
@@ -855,7 +855,7 @@ static igraph_integer_t igraph_i_kleinberg(const igraph_t *graph, igraph_vector_
  * \ref igraph_eigenvector_centrality() for similar measures.
  */
 
-igraph_integer_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
+igraph_long_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector,
                      igraph_real_t *value, igraph_bool_t scale,
                      const igraph_vector_t *weights,
                      igraph_arpack_options_t *options) {
@@ -901,7 +901,7 @@ igraph_integer_t igraph_hub_score(const igraph_t *graph, igraph_vector_t *vector
  * \ref igraph_eigenvector_centrality() for similar measures.
  */
 
-igraph_integer_t igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
+igraph_long_t igraph_authority_score(const igraph_t *graph, igraph_vector_t *vector,
                            igraph_real_t *value, igraph_bool_t scale,
                            const igraph_vector_t *weights,
                            igraph_arpack_options_t *options) {
@@ -928,16 +928,16 @@ typedef struct igraph_i_pagerank_data2_t {
     igraph_vector_t *reset;
 } igraph_i_pagerank_data2_t;
 
-static igraph_integer_t igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
-                             igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_pagerank(igraph_real_t *to, const igraph_real_t *from,
+                             igraph_long_t n, void *extra) {
 
     igraph_i_pagerank_data_t *data = extra;
     igraph_adjlist_t *adjlist = data->adjlist;
     igraph_vector_t *outdegree = data->outdegree;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_t *reset = data->reset;
-    igraph_vector_int_t *neis;
-    igraph_integer_t i, j, nlen;
+    igraph_vector_long_t *neis;
+    igraph_long_t i, j, nlen;
     igraph_real_t sumfrom = 0.0;
     igraph_real_t fact = 1 - data->damping;
 
@@ -960,10 +960,10 @@ static igraph_integer_t igraph_i_pagerank(igraph_real_t *to, const igraph_real_t
      * moving along links (and not from teleportation) */
     for (i = 0; i < n; i++) {
         neis = igraph_adjlist_get(adjlist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+            igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
             to[i] += VECTOR(*tmp)[nei];
         }
         to[i] *= data->damping;
@@ -990,8 +990,8 @@ static igraph_integer_t igraph_i_pagerank(igraph_real_t *to, const igraph_real_t
     return 0;
 }
 
-static igraph_integer_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
-                              igraph_integer_t n, void *extra) {
+static igraph_long_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_t *from,
+                              igraph_long_t n, void *extra) {
 
     igraph_i_pagerank_data2_t *data = extra;
     const igraph_t *graph = data->graph;
@@ -1000,9 +1000,9 @@ static igraph_integer_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_
     igraph_vector_t *outdegree = data->outdegree;
     igraph_vector_t *tmp = data->tmp;
     igraph_vector_t *reset = data->reset;
-    igraph_integer_t i, j, nlen;
+    igraph_long_t i, j, nlen;
     igraph_real_t sumfrom = 0.0;
-    igraph_vector_int_t *neis;
+    igraph_vector_long_t *neis;
     igraph_real_t fact = 1 - data->damping;
 
     /*
@@ -1018,11 +1018,11 @@ static igraph_integer_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_
 
     for (i = 0; i < n; i++) {
         neis = igraph_inclist_get(inclist, i);
-        nlen = igraph_vector_int_size(neis);
+        nlen = igraph_vector_long_size(neis);
         to[i] = 0.0;
         for (j = 0; j < nlen; j++) {
-            igraph_integer_t edge = (igraph_integer_t) VECTOR(*neis)[j];
-            igraph_integer_t nei = IGRAPH_OTHER(graph, edge, i);
+            igraph_long_t edge = (igraph_long_t) VECTOR(*neis)[j];
+            igraph_long_t nei = IGRAPH_OTHER(graph, edge, i);
             to[i] += VECTOR(*weights)[edge] * VECTOR(*tmp)[nei];
         }
         to[i] *= data->damping;
@@ -1120,7 +1120,7 @@ static igraph_integer_t igraph_i_pagerank2(igraph_real_t *to, const igraph_real_
  * \example examples/simple/igraph_pagerank.c
  */
 
-igraph_integer_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
+igraph_long_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t algo,
                     igraph_vector_t *vector,
                     igraph_real_t *value, const igraph_vs_t vids,
                     igraph_bool_t directed, igraph_real_t damping,
@@ -1190,7 +1190,7 @@ igraph_integer_t igraph_pagerank(const igraph_t *graph, igraph_pagerank_algo_t a
  * the underlying machinery.
  */
 
-igraph_integer_t igraph_personalized_pagerank_vs(const igraph_t *graph,
+igraph_long_t igraph_personalized_pagerank_vs(const igraph_t *graph,
                                     igraph_pagerank_algo_t algo, igraph_vector_t *vector,
                                     igraph_real_t *value, const igraph_vs_t vids,
                                     igraph_bool_t directed, igraph_real_t damping,
@@ -1205,7 +1205,7 @@ igraph_integer_t igraph_personalized_pagerank_vs(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     while (!IGRAPH_VIT_END(vit)) {
-        VECTOR(reset)[(igraph_integer_t)IGRAPH_VIT_GET(vit)]++;
+        VECTOR(reset)[(igraph_long_t)IGRAPH_VIT_GET(vit)]++;
         IGRAPH_VIT_NEXT(vit);
     }
     igraph_vit_destroy(&vit);
@@ -1276,7 +1276,7 @@ igraph_integer_t igraph_personalized_pagerank_vs(const igraph_t *graph,
  * \ref igraph_arpack_rssolve() and \ref igraph_arpack_rnsolve() for
  * the underlying machinery.
  */
-igraph_integer_t igraph_personalized_pagerank(const igraph_t *graph,
+igraph_long_t igraph_personalized_pagerank(const igraph_t *graph,
                                  igraph_pagerank_algo_t algo, igraph_vector_t *vector,
                                  igraph_real_t *value, const igraph_vs_t vids,
                                  igraph_bool_t directed, igraph_real_t damping,
@@ -1303,7 +1303,7 @@ igraph_integer_t igraph_personalized_pagerank(const igraph_t *graph,
  *
  * See \c igraph_personalized_pagerank for the documentation of the parameters.
  */
-igraph_integer_t igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
+igraph_long_t igraph_personalized_pagerank_arpack(const igraph_t *graph, igraph_vector_t *vector,
                                         igraph_real_t *value, const igraph_vs_t vids,
                                         igraph_bool_t directed, igraph_real_t damping,
                                         igraph_vector_t *reset,
@@ -1316,9 +1316,9 @@ igraph_integer_t igraph_personalized_pagerank_arpack(const igraph_t *graph, igra
     igraph_vector_t indegree;
     igraph_vector_t tmp;
 
-    igraph_integer_t i;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_long_t i;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_edges = igraph_ecount(graph);
 
     if (no_of_edges == 0) {
         /* special case: empty graph */
@@ -1332,7 +1332,7 @@ igraph_integer_t igraph_personalized_pagerank_arpack(const igraph_t *graph, igra
         return IGRAPH_SUCCESS;
     }
 
-    options->n = (igraph_integer_t) no_of_nodes;
+    options->n = (igraph_long_t) no_of_nodes;
     options->nev = 1;
     options->ncv = 0;   /* 0 means "automatic" in igraph_arpack_rnsolve */
     options->which[0] = 'L'; options->which[1] = 'M';
@@ -1449,8 +1449,8 @@ igraph_integer_t igraph_personalized_pagerank_arpack(const igraph_t *graph, igra
 
         /* Weighted degree */
         for (i = 0; i < no_of_edges; i++) {
-            igraph_integer_t from = IGRAPH_FROM(graph, i);
-            igraph_integer_t to = IGRAPH_TO(graph, i);
+            igraph_long_t from = IGRAPH_FROM(graph, i);
+            igraph_long_t to = IGRAPH_TO(graph, i);
             igraph_real_t weight = VECTOR(*weights)[i];
             if (weight < 0 && !negative_weight_warned) {
                 IGRAPH_WARNING("replacing negative weights with zeros");
@@ -1493,9 +1493,9 @@ igraph_integer_t igraph_personalized_pagerank_arpack(const igraph_t *graph, igra
     }
 
     if (vector) {
-        igraph_integer_t i;
+        igraph_long_t i;
         igraph_vit_t vit;
-        igraph_integer_t nodes_to_calc;
+        igraph_long_t nodes_to_calc;
         igraph_real_t sum = 0;
 
         for (i = 0; i < no_of_nodes; i++) {
@@ -1509,7 +1509,7 @@ igraph_integer_t igraph_personalized_pagerank_arpack(const igraph_t *graph, igra
         IGRAPH_CHECK(igraph_vector_resize(vector, nodes_to_calc));
         for (IGRAPH_VIT_RESET(vit), i = 0; !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), i++) {
-            VECTOR(*vector)[i] = MATRIX(vectors, (igraph_integer_t)IGRAPH_VIT_GET(vit), 0);
+            VECTOR(*vector)[i] = MATRIX(vectors, (igraph_long_t)IGRAPH_VIT_GET(vit), 0);
             VECTOR(*vector)[i] /= sum;
         }
 

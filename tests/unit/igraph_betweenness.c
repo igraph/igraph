@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_t bet, bet2, weights, edges;

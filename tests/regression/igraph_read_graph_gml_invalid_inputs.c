@@ -24,10 +24,10 @@
 #include "igraph.h"
 #include <stdio.h>
 
-igraph_integer_t test_file(const char* fname) {
+igraph_long_t test_file(const char* fname) {
     FILE *ifile;
     igraph_t g;
-    igraph_integer_t retval;
+    igraph_long_t retval;
 
     ifile = fopen(fname, "r");
     if (ifile == 0) {
@@ -55,8 +55,8 @@ igraph_integer_t test_file(const char* fname) {
     }                       \
 }
 
-igraph_integer_t main(igraph_integer_t argc, char* argv[]) {
-    igraph_integer_t index = 0;
+igraph_long_t main(igraph_long_t argc, char* argv[]) {
+    igraph_long_t index = 0;
 
     /* We do not care about errors; all we care about is that the library
      * should not segfault and should not accept invalid input either */

@@ -30,14 +30,14 @@
 #include "igraph_structural.h"
 #include "core/interruption.h"
 
-igraph_integer_t igraph_sir_init(igraph_sir_t *sir) {
+igraph_long_t igraph_sir_init(igraph_sir_t *sir) {
     IGRAPH_CHECK(igraph_vector_init(&sir->times, 1));
     IGRAPH_FINALLY(igraph_vector_destroy, &sir->times);
-    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_s, 1));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_s);
-    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_i, 1));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &sir->no_i);
-    IGRAPH_CHECK(igraph_vector_int_init(&sir->no_r, 1));
+    IGRAPH_CHECK(igraph_vector_long_init(&sir->no_s, 1));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &sir->no_s);
+    IGRAPH_CHECK(igraph_vector_long_init(&sir->no_i, 1));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &sir->no_i);
+    IGRAPH_CHECK(igraph_vector_long_init(&sir->no_r, 1));
     IGRAPH_FINALLY_CLEAN(3);
     return 0;
 }
@@ -51,13 +51,13 @@ igraph_integer_t igraph_sir_init(igraph_sir_t *sir) {
 
 void igraph_sir_destroy(igraph_sir_t *sir) {
     igraph_vector_destroy(&sir->times);
-    igraph_vector_int_destroy(&sir->no_s);
-    igraph_vector_int_destroy(&sir->no_i);
-    igraph_vector_int_destroy(&sir->no_r);
+    igraph_vector_long_destroy(&sir->no_s);
+    igraph_vector_long_destroy(&sir->no_i);
+    igraph_vector_long_destroy(&sir->no_r);
 }
 
 static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
-    igraph_integer_t i, n = igraph_vector_ptr_size(v);
+    igraph_long_t i, n = igraph_vector_ptr_size(v);
     for (i = 0; i < n; i++) {
         if ( VECTOR(*v)[i] ) {
             igraph_sir_destroy( VECTOR(*v)[i]) ;
@@ -106,19 +106,19 @@ static void igraph_i_sir_destroy(igraph_vector_ptr_t *v) {
  * Time complexity: O(no_sim * (|V| + |E| log(|V|))).
  */
 
-igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
-               igraph_real_t gamma, igraph_integer_t no_sim,
+igraph_long_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
+               igraph_real_t gamma, igraph_long_t no_sim,
                igraph_vector_ptr_t *result) {
 
-    igraph_integer_t infected;
-    igraph_vector_int_t status;
+    igraph_long_t infected;
+    igraph_vector_long_t status;
     igraph_adjlist_t adjlist;
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
-    igraph_integer_t i, j, ns, ni, nr;
-    igraph_vector_int_t *neis;
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t i, j, ns, ni, nr;
+    igraph_vector_long_t *neis;
     igraph_psumtree_t tree;
     igraph_real_t psum;
-    igraph_integer_t neilen;
+    igraph_long_t neilen;
     igraph_bool_t simple;
 
     if (no_of_nodes == 0) {
@@ -143,8 +143,8 @@ igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
         IGRAPH_ERROR("SIR model only works with simple graphs", IGRAPH_EINVAL);
     }
 
-    IGRAPH_CHECK(igraph_vector_int_init(&status, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &status);
+    IGRAPH_CHECK(igraph_vector_long_init(&status, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &status);
     IGRAPH_CHECK(igraph_adjlist_init(graph, &adjlist, IGRAPH_ALL));
     IGRAPH_FINALLY(igraph_adjlist_destroy, &adjlist);
     IGRAPH_CHECK(igraph_psumtree_init(&tree, no_of_nodes));
@@ -168,14 +168,14 @@ igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
 
         igraph_sir_t *sir = VECTOR(*result)[j];
         igraph_vector_t *times_v = &sir->times;
-        igraph_vector_int_t *no_s_v = &sir->no_s;
-        igraph_vector_int_t *no_i_v = &sir->no_i;
-        igraph_vector_int_t *no_r_v = &sir->no_r;
+        igraph_vector_long_t *no_s_v = &sir->no_s;
+        igraph_vector_long_t *no_i_v = &sir->no_i;
+        igraph_vector_long_t *no_r_v = &sir->no_r;
 
         infected = RNG_INTEGER(0, no_of_nodes - 1);
 
         /* Initially infected */
-        igraph_vector_int_null(&status);
+        igraph_vector_long_null(&status);
         VECTOR(status)[infected] = S_I;
         ns = no_of_nodes - 1;
         ni = 1;
@@ -193,16 +193,16 @@ igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
         /* Rates */
         igraph_psumtree_update(&tree, infected, gamma);
         neis = igraph_adjlist_get(&adjlist, infected);
-        neilen = igraph_vector_int_size(neis);
+        neilen = igraph_vector_long_size(neis);
         for (i = 0; i < neilen; i++) {
-            igraph_integer_t nei = VECTOR(*neis)[i];
+            igraph_long_t nei = VECTOR(*neis)[i];
             igraph_psumtree_update(&tree, nei, beta);
         }
 
         while (ni > 0) {
             igraph_real_t tt;
             igraph_real_t r;
-            igraph_integer_t vchange;
+            igraph_long_t vchange;
 
             IGRAPH_ALLOW_INTERRUPTION();
 
@@ -212,14 +212,14 @@ igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
 
             igraph_psumtree_search(&tree, &vchange, r);
             neis = igraph_adjlist_get(&adjlist, vchange);
-            neilen = igraph_vector_int_size(neis);
+            neilen = igraph_vector_long_size(neis);
 
             if (VECTOR(status)[vchange] == S_I) {
                 VECTOR(status)[vchange] = S_R;
                 ni--; nr++;
                 igraph_psumtree_update(&tree, vchange, 0.0);
                 for (i = 0; i < neilen; i++) {
-                    igraph_integer_t nei = VECTOR(*neis)[i];
+                    igraph_long_t nei = VECTOR(*neis)[i];
                     if (VECTOR(status)[nei] == S_S) {
                         igraph_real_t rate = igraph_psumtree_get(&tree, nei);
                         igraph_psumtree_update(&tree, nei, rate - beta);
@@ -231,7 +231,7 @@ igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
                 ns--; ni++;
                 igraph_psumtree_update(&tree, vchange, gamma);
                 for (i = 0; i < neilen; i++) {
-                    igraph_integer_t nei = VECTOR(*neis)[i];
+                    igraph_long_t nei = VECTOR(*neis)[i];
                     if (VECTOR(status)[nei] == S_S) {
                         igraph_real_t rate = igraph_psumtree_get(&tree, nei);
                         igraph_psumtree_update(&tree, nei, rate + beta);
@@ -240,9 +240,9 @@ igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
             }
 
             IGRAPH_CHECK(igraph_vector_push_back(times_v, tt + igraph_vector_tail(times_v)));
-            IGRAPH_CHECK(igraph_vector_int_push_back(no_s_v, ns));
-            IGRAPH_CHECK(igraph_vector_int_push_back(no_i_v, ni));
-            IGRAPH_CHECK(igraph_vector_int_push_back(no_r_v, nr));
+            IGRAPH_CHECK(igraph_vector_long_push_back(no_s_v, ns));
+            IGRAPH_CHECK(igraph_vector_long_push_back(no_i_v, ni));
+            IGRAPH_CHECK(igraph_vector_long_push_back(no_r_v, nr));
 
         } /* psum > 0 */
 
@@ -252,7 +252,7 @@ igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
 
     igraph_psumtree_destroy(&tree);
     igraph_adjlist_destroy(&adjlist);
-    igraph_vector_int_destroy(&status);
+    igraph_vector_long_destroy(&status);
     IGRAPH_FINALLY_CLEAN(4);  /* + result */
 
     return 0;

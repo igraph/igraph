@@ -5,7 +5,7 @@
 
 /* Undirected case */
 void graphical_print_destroy(igraph_vector_t *ds) {
-    igraph_integer_t err;
+    igraph_long_t err;
     igraph_bool_t simple, loops, multi, multiloops;
 
     print_vector_round(ds);
@@ -40,7 +40,7 @@ cleanup:
 
 /* Directed case */
 void digraphical_print_destroy(igraph_vector_t *ods, igraph_vector_t *ids) {
-    igraph_integer_t err;
+    igraph_long_t err;
     igraph_bool_t simple, loops, multi, multiloops;
 
     print_vector_round(ods);
@@ -75,7 +75,7 @@ cleanup:
 }
 
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_vector_t ds, ods, ids;
 
     igraph_set_error_handler(&igraph_error_handler_ignore);

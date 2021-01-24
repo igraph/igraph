@@ -24,18 +24,18 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v) {
-    igraph_integer_t i, n = igraph_vector_size(v);
+    igraph_long_t i, n = igraph_vector_size(v);
     for (i = 0; i < n; i++) {
-        printf(" %li", (igraph_integer_t) VECTOR(*v)[i]);
+        printf(" %li", (igraph_long_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_real_t result;
-    igraph_integer_t from, to;
+    igraph_long_t from, to;
     igraph_vector_t path;
 
     igraph_barabasi_game(&g, 30, /*power=*/ 1, 30, 0, 0, /*A=*/ 1,
@@ -43,15 +43,15 @@ igraph_integer_t main() {
                          /*start_from=*/ 0);
     igraph_diameter(&g, &result, 0, 0, 0, IGRAPH_UNDIRECTED, 1);
 
-    /*   printf("Diameter: %li\n", (igraph_integer_t) result); */
+    /*   printf("Diameter: %li\n", (igraph_long_t) result); */
 
     igraph_destroy(&g);
 
     igraph_ring(&g, 10, IGRAPH_DIRECTED, 0, 0);
     igraph_vector_init(&path, 0);
     igraph_diameter(&g, &result, &from, &to, &path, IGRAPH_DIRECTED, 1);
-    printf("diameter: %li, from %li to %li\n", (igraph_integer_t) result,
-           (igraph_integer_t) from, (igraph_integer_t) to);
+    printf("diameter: %li, from %li to %li\n", (igraph_long_t) result,
+           (igraph_long_t) from, (igraph_long_t) to);
     print_vector(&path);
 
     igraph_vector_destroy(&path);

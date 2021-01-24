@@ -24,23 +24,23 @@
 #include <igraph.h>
 
 igraph_bool_t bfs_callback(const igraph_t *graph,
-                           igraph_integer_t vid,
-                           igraph_integer_t pred,
-                           igraph_integer_t succ,
-                           igraph_integer_t rank,
-                           igraph_integer_t dist,
+                           igraph_long_t vid,
+                           igraph_long_t pred,
+                           igraph_long_t succ,
+                           igraph_long_t rank,
+                           igraph_long_t dist,
                            void *extra) {
-    printf(" %li", (igraph_integer_t) vid);
+    printf(" %li", (igraph_long_t) vid);
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t graph, ring;
     igraph_vector_t order, rank, father, pred, succ, dist;
     igraph_vector_t restricted;
     igraph_vector_t roots;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_disjoint_union(&graph, &ring, &ring);

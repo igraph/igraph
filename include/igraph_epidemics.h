@@ -51,14 +51,14 @@ __BEGIN_DECLS
 
 typedef struct igraph_sir_t {
     igraph_vector_t times;
-    igraph_vector_int_t no_s, no_i, no_r;
+    igraph_vector_long_t no_s, no_i, no_r;
 } igraph_sir_t;
 
-DECLDIR igraph_integer_t igraph_sir_init(igraph_sir_t *sir);
+DECLDIR igraph_long_t igraph_sir_init(igraph_sir_t *sir);
 DECLDIR void igraph_sir_destroy(igraph_sir_t *sir);
 
-DECLDIR igraph_integer_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
-                       igraph_real_t gamma, igraph_integer_t no_sim,
+DECLDIR igraph_long_t igraph_sir(const igraph_t *graph, igraph_real_t beta,
+                       igraph_real_t gamma, igraph_long_t no_sim,
                        igraph_vector_ptr_t *result);
 
 __END_DECLS

@@ -23,10 +23,10 @@
 
 #include <igraph.h>
 
-igraph_integer_t print_matrix(const igraph_matrix_t *m) {
-    igraph_integer_t nrow = igraph_matrix_nrow(m);
-    igraph_integer_t ncol = igraph_matrix_ncol(m);
-    igraph_integer_t i, j;
+igraph_long_t print_matrix(const igraph_matrix_t *m) {
+    igraph_long_t nrow = igraph_matrix_nrow(m);
+    igraph_long_t ncol = igraph_matrix_ncol(m);
+    igraph_long_t i, j;
     igraph_real_t val;
 
     for (i = 0; i < nrow; i++) {
@@ -48,7 +48,7 @@ igraph_integer_t print_matrix(const igraph_matrix_t *m) {
     return 0;
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
 
     igraph_t g;
     igraph_vector_t weights;

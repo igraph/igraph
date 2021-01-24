@@ -31,19 +31,19 @@
 #include "igraph_interface.h"
 #include "igraph_adjlist.h"
 
-static igraph_integer_t igraph_i_eccentricity(const igraph_t *graph,
+static igraph_long_t igraph_i_eccentricity(const igraph_t *graph,
                                  igraph_vector_t *res,
                                  igraph_vs_t vids,
                                  igraph_neimode_t mode,
                                  const igraph_adjlist_t *adjlist) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_long_t q;
     igraph_vit_t vit;
-    igraph_vector_int_t counted;
-    igraph_integer_t i, mark = 1;
+    igraph_vector_long_t counted;
+    igraph_long_t i, mark = 1;
     igraph_vector_t vneis;
-    igraph_vector_int_t *neis;
+    igraph_vector_long_t *neis;
 
     IGRAPH_CHECK(igraph_dqueue_long_init(&q, 100));
     IGRAPH_FINALLY(igraph_dqueue_long_destroy, &q);
@@ -51,8 +51,8 @@ static igraph_integer_t igraph_i_eccentricity(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vit_create(graph, vids, &vit));
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
-    IGRAPH_CHECK(igraph_vector_int_init(&counted, no_of_nodes));
-    IGRAPH_FINALLY(igraph_vector_int_destroy, &counted);
+    IGRAPH_CHECK(igraph_vector_long_init(&counted, no_of_nodes));
+    IGRAPH_FINALLY(igraph_vector_long_destroy, &counted);
 
     if (!adjlist) {
         IGRAPH_VECTOR_INIT_FINALLY(&vneis, 0);
@@ -65,7 +65,7 @@ static igraph_integer_t igraph_i_eccentricity(const igraph_t *graph,
          !IGRAPH_VIT_END(vit);
          IGRAPH_VIT_NEXT(vit), mark++, i++) {
 
-        igraph_integer_t source;
+        igraph_long_t source;
         source = IGRAPH_VIT_GET(vit);
         IGRAPH_CHECK(igraph_dqueue_long_push(&q, source));
         IGRAPH_CHECK(igraph_dqueue_long_push(&q, 0));
@@ -74,9 +74,9 @@ static igraph_integer_t igraph_i_eccentricity(const igraph_t *graph,
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_long_empty(&q)) {
-            igraph_integer_t act = igraph_dqueue_long_pop(&q);
-            igraph_integer_t dist = igraph_dqueue_long_pop(&q);
-            igraph_integer_t j, n;
+            igraph_long_t act = igraph_dqueue_long_pop(&q);
+            igraph_long_t dist = igraph_dqueue_long_pop(&q);
+            igraph_long_t j, n;
 
             if (dist > VECTOR(*res)[i]) {
                 VECTOR(*res)[i] = dist;
@@ -84,9 +84,9 @@ static igraph_integer_t igraph_i_eccentricity(const igraph_t *graph,
 
             if (adjlist) {
                 neis = igraph_adjlist_get(adjlist, act);
-                n = (igraph_integer_t) igraph_vector_int_size(neis);
+                n = (igraph_long_t) igraph_vector_long_size(neis);
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis)[j];
+                    igraph_long_t nei = (igraph_long_t) VECTOR(*neis)[j];
                     if (VECTOR(counted)[nei] != mark) {
                         VECTOR(counted)[nei] = mark;
                         IGRAPH_CHECK(igraph_dqueue_long_push(&q, nei));
@@ -95,10 +95,10 @@ static igraph_integer_t igraph_i_eccentricity(const igraph_t *graph,
                 }
             } else {
                 IGRAPH_CHECK(igraph_neighbors(graph, &vneis,
-                                              (igraph_integer_t) act, mode));
-                n = (igraph_integer_t) igraph_vector_size(&vneis);
+                                              (igraph_long_t) act, mode));
+                n = (igraph_long_t) igraph_vector_size(&vneis);
                 for (j = 0; j < n; j++) {
-                    igraph_integer_t nei = (igraph_integer_t) VECTOR(vneis)[j];
+                    igraph_long_t nei = (igraph_long_t) VECTOR(vneis)[j];
                     if (VECTOR(counted)[nei] != mark) {
                         VECTOR(counted)[nei] = mark;
                         IGRAPH_CHECK(igraph_dqueue_long_push(&q, nei));
@@ -114,7 +114,7 @@ static igraph_integer_t igraph_i_eccentricity(const igraph_t *graph,
         igraph_vector_destroy(&vneis);
         IGRAPH_FINALLY_CLEAN(1);
     }
-    igraph_vector_int_destroy(&counted);
+    igraph_vector_long_destroy(&counted);
     igraph_vit_destroy(&vit);
     igraph_dqueue_long_destroy(&q);
     IGRAPH_FINALLY_CLEAN(3);
@@ -154,7 +154,7 @@ static igraph_integer_t igraph_i_eccentricity(const igraph_t *graph,
  * \example examples/simple/igraph_eccentricity.c
  */
 
-igraph_integer_t igraph_eccentricity(const igraph_t *graph,
+igraph_long_t igraph_eccentricity(const igraph_t *graph,
                         igraph_vector_t *res,
                         igraph_vs_t vids,
                         igraph_neimode_t mode) {
@@ -187,10 +187,10 @@ igraph_integer_t igraph_eccentricity(const igraph_t *graph,
  * \example examples/simple/igraph_radius.c
  */
 
-igraph_integer_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
+igraph_long_t igraph_radius(const igraph_t *graph, igraph_real_t *radius,
                   igraph_neimode_t mode) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_long_t no_of_nodes = igraph_vcount(graph);
 
     if (no_of_nodes == 0) {
         *radius = IGRAPH_NAN;

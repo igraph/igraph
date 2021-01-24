@@ -43,15 +43,15 @@
  * Time complexity: O(|V|+|E|), linear in the number of vertices plus
  * the number of edges.
  */
-igraph_integer_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
+igraph_long_t igraph_lcf_vector(igraph_t *graph, igraph_long_t n,
                       const igraph_vector_t *shifts,
-                      igraph_integer_t repeats) {
+                      igraph_long_t repeats) {
 
     igraph_vector_t edges;
-    igraph_integer_t no_of_shifts = igraph_vector_size(shifts);
-    igraph_integer_t ptr = 0, i, sptr = 0;
-    igraph_integer_t no_of_nodes = n;
-    igraph_integer_t no_of_edges = n + no_of_shifts * repeats;
+    igraph_long_t no_of_shifts = igraph_vector_size(shifts);
+    igraph_long_t ptr = 0, i, sptr = 0;
+    igraph_long_t no_of_nodes = n;
+    igraph_long_t no_of_edges = n + no_of_shifts * repeats;
 
     if (repeats < 0) {
         IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
@@ -69,15 +69,15 @@ igraph_integer_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
 
     /* Then add the rest */
     while (ptr < 2 * no_of_edges) {
-        igraph_integer_t sh = (igraph_integer_t) VECTOR(*shifts)[sptr % no_of_shifts];
-        igraph_integer_t from = sptr % no_of_nodes;
-        igraph_integer_t to = (no_of_nodes + sptr + sh) % no_of_nodes;
+        igraph_long_t sh = (igraph_long_t) VECTOR(*shifts)[sptr % no_of_shifts];
+        igraph_long_t from = sptr % no_of_nodes;
+        igraph_long_t to = (no_of_nodes + sptr + sh) % no_of_nodes;
         VECTOR(edges)[ptr++] = from;
         VECTOR(edges)[ptr++] = to;
         sptr++;
     }
 
-    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
+    IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_long_t) no_of_nodes,
                                IGRAPH_UNDIRECTED));
     IGRAPH_CHECK(igraph_simplify(graph, 1 /* true */, 1 /* true */, NULL));
     igraph_vector_destroy(&edges);
@@ -112,16 +112,16 @@ igraph_integer_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  *
  * \example examples/simple/igraph_lcf.c
  */
-igraph_integer_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
+igraph_long_t igraph_lcf(igraph_t *graph, igraph_long_t n, ...) {
     igraph_vector_t shifts;
-    igraph_integer_t repeats;
+    igraph_long_t repeats;
     va_list ap;
 
     IGRAPH_VECTOR_INIT_FINALLY(&shifts, 0);
 
     va_start(ap, n);
     while (1) {
-        igraph_integer_t num = va_arg(ap, igraph_integer_t);
+        igraph_long_t num = va_arg(ap, igraph_long_t);
         if (num == 0) {
             break;
         }
@@ -130,7 +130,7 @@ igraph_integer_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
     if (igraph_vector_size(&shifts) == 0) {
         repeats = 0;
     } else {
-        repeats = (igraph_integer_t) igraph_vector_pop_back(&shifts);
+        repeats = (igraph_long_t) igraph_vector_pop_back(&shifts);
     }
 
     IGRAPH_CHECK(igraph_lcf_vector(graph, n, &shifts, repeats));

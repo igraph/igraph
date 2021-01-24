@@ -25,9 +25,9 @@
 
 #include "test_utilities.inc"
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_matrix_t m, m1;
-    igraph_integer_t i, j, k;
+    igraph_long_t i, j, k;
 
     /* igraph_matrix_init, igraph_matrix_destroy */
     igraph_matrix_init(&m, 10, 10);

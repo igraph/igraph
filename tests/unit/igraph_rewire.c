@@ -59,7 +59,7 @@ static void check_rewiring(igraph_tree_mode_t tree_mode, igraph_bool_t use_adjli
 
 }
 
-igraph_integer_t main() {
+igraph_long_t main() {
     igraph_rng_seed(igraph_rng_default(), 3925);
 
     /* Short test for the top-level igraph_rewire() functions (instead of igraph_i_rewire()). */

@@ -50,12 +50,12 @@
  * \sa \ref igraph_correlated_pair_game() for generating a pair
  * of correlated random graphs in one go.
  */
-igraph_integer_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
+igraph_long_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new_graph,
                            igraph_real_t corr, igraph_real_t p,
                            const igraph_vector_t *permutation) {
 
-    igraph_integer_t no_of_nodes = igraph_vcount(old_graph);
-    igraph_integer_t no_of_edges = igraph_ecount(old_graph);
+    igraph_long_t no_of_nodes = igraph_vcount(old_graph);
+    igraph_long_t no_of_edges = igraph_ecount(old_graph);
     igraph_bool_t directed = igraph_is_directed(old_graph);
     igraph_real_t no_of_all = directed ? no_of_nodes * (no_of_nodes - 1) :
                               no_of_nodes * (no_of_nodes - 1) / 2;
@@ -65,10 +65,10 @@ igraph_integer_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new
     igraph_real_t p_add = ((1 - q) * (p / (1 - p)));
     igraph_vector_t add, delete, edges, newedges;
     igraph_real_t last;
-    igraph_integer_t p_e = 0, p_a = 0, p_d = 0, no_add, no_del;
+    igraph_long_t p_e = 0, p_a = 0, p_d = 0, no_add, no_del;
     igraph_real_t inf = IGRAPH_INFINITY;
     igraph_real_t next_e, next_a, next_d;
-    igraph_integer_t i;
+    igraph_long_t i;
 
     if (corr < -1 || corr > 1) {
         IGRAPH_ERROR("Correlation must be in [-1,1] in correlated "
@@ -97,9 +97,9 @@ igraph_integer_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new
         IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
         IGRAPH_CHECK(igraph_get_edgelist(old_graph, &edges, /* bycol= */ 0));
         if (permutation) {
-            igraph_integer_t newec = igraph_vector_size(&edges);
+            igraph_long_t newec = igraph_vector_size(&edges);
             for (i = 0; i < newec; i++) {
-                igraph_integer_t tmp = VECTOR(edges)[i];
+                igraph_long_t tmp = VECTOR(edges)[i];
                 VECTOR(edges)[i] = VECTOR(*permutation)[tmp];
             }
         }
@@ -159,9 +159,9 @@ igraph_integer_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new
     /* First we (re)code the edges to delete */
 
     for (i = 0; i < no_del; i++) {
-        igraph_integer_t td = VECTOR(delete)[i];
-        igraph_integer_t from = VECTOR(edges)[2 * td];
-        igraph_integer_t to = VECTOR(edges)[2 * td + 1];
+        igraph_long_t td = VECTOR(delete)[i];
+        igraph_long_t from = VECTOR(edges)[2 * td];
+        igraph_long_t to = VECTOR(edges)[2 * td + 1];
         VECTOR(delete)[i] = CODE(from, to);
     }
 
@@ -199,16 +199,16 @@ igraph_integer_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new
         } else {
 
             /* add an edge */
-            igraph_integer_t to, from;
+            igraph_long_t to, from;
             if (directed) {
-                to = (igraph_integer_t) floor(next_a / no_of_nodes);
-                from = (igraph_integer_t) (next_a - ((igraph_real_t)to) * no_of_nodes);
+                to = (igraph_long_t) floor(next_a / no_of_nodes);
+                from = (igraph_long_t) (next_a - ((igraph_real_t)to) * no_of_nodes);
                 if (from == to) {
                     to = no_of_nodes - 1;
                 }
             } else {
-                to = (igraph_integer_t) floor((sqrt(8 * next_a + 1) + 1) / 2);
-                from = (igraph_integer_t) (next_a - (((igraph_real_t)to) * (to - 1)) / 2);
+                to = (igraph_long_t) floor((sqrt(8 * next_a + 1) + 1) / 2);
+                from = (igraph_long_t) (next_a - (((igraph_real_t)to) * (to - 1)) / 2);
             }
             IGRAPH_CHECK(igraph_vector_push_back(&newedges, from));
             IGRAPH_CHECK(igraph_vector_push_back(&newedges, to));
@@ -223,9 +223,9 @@ igraph_integer_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new
     IGRAPH_FINALLY_CLEAN(3);
 
     if (permutation) {
-        igraph_integer_t newec = igraph_vector_size(&newedges);
+        igraph_long_t newec = igraph_vector_size(&newedges);
         for (i = 0; i < newec; i++) {
-            igraph_integer_t tmp = VECTOR(newedges)[i];
+            igraph_long_t tmp = VECTOR(newedges)[i];
             VECTOR(newedges)[i] = VECTOR(*permutation)[tmp];
         }
     }
@@ -269,8 +269,8 @@ igraph_integer_t igraph_correlated_game(const igraph_t *old_graph, igraph_t *new
  * \sa \ref igraph_correlated_game() for generating a correlated pair
  * to a given graph.
  */
-igraph_integer_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
-                                igraph_integer_t n, igraph_real_t corr, igraph_real_t p,
+igraph_long_t igraph_correlated_pair_game(igraph_t *graph1, igraph_t *graph2,
+                                igraph_long_t n, igraph_real_t corr, igraph_real_t p,
                                 igraph_bool_t directed,
                                 const igraph_vector_t *permutation) {
 
