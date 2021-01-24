@@ -73,7 +73,7 @@ DECLDIR igraph_long_t igraph_vector_ptr_resize(igraph_vector_ptr_t* v, igraph_lo
 DECLDIR void igraph_vector_ptr_copy_to(const igraph_vector_ptr_t *v, void** to);
 DECLDIR igraph_long_t igraph_vector_ptr_copy(igraph_vector_ptr_t *to, const igraph_vector_ptr_t *from);
 DECLDIR void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, igraph_long_t pos);
-DECLDIR void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, igraph_long_t(*compar)(const void*, const void*));
+DECLDIR void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int(*compar)(const void*, const void*));
 DECLDIR igraph_long_t igraph_vector_ptr_index_int(igraph_vector_ptr_t *v,
                                         const igraph_vector_long_t *idx);
 

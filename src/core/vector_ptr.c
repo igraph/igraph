@@ -543,7 +543,7 @@ void igraph_vector_ptr_remove(igraph_vector_ptr_t *v, igraph_long_t pos) {
  * vector, so they have to be double-dereferenced if one wants to get access
  * to the underlying object the address of which is stored in \c v .
  */
-void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, igraph_long_t (*compar)(const void*, const void*)) {
+void igraph_vector_ptr_sort(igraph_vector_ptr_t *v, int (*compar)(const void*, const void*)) {
     qsort(v->stor_begin, (size_t) igraph_vector_ptr_size(v), sizeof(void*),
           compar);
 }

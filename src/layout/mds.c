@@ -34,13 +34,13 @@
 #include "igraph_structural.h"
 
 static igraph_long_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
-                                    igraph_long_t n, void *extra);
+                                    int n, void *extra);
 
 static igraph_long_t igraph_i_layout_mds_single(const igraph_t* graph, igraph_matrix_t *res,
                                       igraph_matrix_t *dist, igraph_long_t dim);
 
 static igraph_long_t igraph_i_layout_mds_step(igraph_real_t *to, const igraph_real_t *from,
-                                    igraph_long_t n, void *extra) {
+                                    int n, void *extra) {
     igraph_matrix_t* matrix = (igraph_matrix_t*)extra;
     IGRAPH_UNUSED(n);
     igraph_blas_dgemv_array(0, 1, matrix, from, 0, to);

@@ -585,7 +585,7 @@ igraph_long_t igraph_i_feedback_arc_set_ip(const igraph_t *graph, igraph_vector_
             glp_add_rows(ip, (igraph_long_t)(n * (n - 1) / 2 + n * (n - 1) * (n - 2) / 3));
             m = 1;
             for (j = 0; j < n; j++) {
-                igraph_long_t ind[4];
+                int ind[4];
                 double val[4] = {0, 1, 1, -1};
                 for (k = j + 1; k < n; k++) {
                     ind[1] = (igraph_long_t) VAR2IDX(j, k);

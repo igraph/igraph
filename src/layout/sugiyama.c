@@ -675,7 +675,7 @@ static igraph_long_t igraph_i_layout_sugiyama_place_nodes_vertically(const igrap
             } else {
                 glp_set_row_bnds(ip, (igraph_long_t) i + 1, GLP_LO, 1, 1);
             }
-            glp_set_mat_row(ip, (igraph_long_t) i + 1, 2, ind, val);
+            glp_set_mat_row(ip, (igraph_long_t) i + 1, 2, (int)ind, (int)val);
         }
 
         /* Solve the problem */

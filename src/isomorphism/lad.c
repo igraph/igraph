@@ -469,7 +469,7 @@ static bool igraph_i_lad_matchVertex(igraph_long_t u, bool induced, Tdomain* D, 
 }
 
 
-static igraph_long_t igraph_i_lad_qcompare (void const *a, void const *b) {
+static int igraph_i_lad_qcompare (void const *a, void const *b) {
     /* function used by the qsort function */
     igraph_long_t pa = *((igraph_long_t*)a) - *((igraph_long_t*)b);
     return pa;

@@ -66,7 +66,7 @@ typedef struct ind_val {
     igraph_real_t val;
 } igraph_i_scg_indval_t;
 
-igraph_long_t igraph_i_compare_ind_val(const void *a, const void *b);
+int igraph_i_compare_ind_val(const void *a, const void *b);
 
 typedef struct groups {
     igraph_long_t ind;
@@ -116,9 +116,9 @@ igraph_long_t igraph_i_exact_coarse_graining(const igraph_real_t *v, igraph_long
 ------------DEFINED IN scg_utils.c-----------------
 ---------------------------------------------------*/
 
-igraph_long_t igraph_i_compare_groups(const void *a, const void *b);
-igraph_long_t igraph_i_compare_real(const void *a, const void *b);
-igraph_long_t igraph_i_compare_int(const void *a, const void *b);
+int igraph_i_compare_groups(const void *a, const void *b);
+int igraph_i_compare_real(const void *a, const void *b);
+int igraph_i_compare_int(const void *a, const void *b);
 
 igraph_real_t *igraph_i_real_sym_matrix(igraph_long_t size);
 #define igraph_i_real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]

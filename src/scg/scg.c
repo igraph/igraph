@@ -358,7 +358,7 @@ igraph_long_t igraph_scg_grouping(const igraph_matrix_t *V,
 
     igraph_long_t no_of_nodes = (igraph_long_t) igraph_matrix_nrow(V);
     igraph_long_t nev = (igraph_long_t) igraph_matrix_ncol(V);
-    igraph_matrix_int_t gr_mat;
+    igraph_matrix_long_t gr_mat;
     igraph_long_t i;
 
     if (nt_vec && igraph_vector_size(nt_vec) != 1 &&

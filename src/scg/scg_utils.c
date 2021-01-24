@@ -32,7 +32,7 @@
 #include "igraph_memory.h"
 
 /*to be used with qsort and struct ind_val arrays */
-igraph_long_t igraph_i_compare_ind_val(const void *a, const void *b) {
+int igraph_i_compare_ind_val(const void *a, const void *b) {
     igraph_i_scg_indval_t *arg1 = (igraph_i_scg_indval_t *) a;
     igraph_i_scg_indval_t *arg2 = (igraph_i_scg_indval_t *) b;
 
@@ -46,7 +46,7 @@ igraph_long_t igraph_i_compare_ind_val(const void *a, const void *b) {
 }
 
 /*to be used with qsort and struct groups*/
-igraph_long_t igraph_i_compare_groups(const void *a, const void *b) {
+int igraph_i_compare_groups(const void *a, const void *b) {
     igraph_i_scg_groups_t *arg1 = (igraph_i_scg_groups_t *) a;
     igraph_i_scg_groups_t *arg2 = (igraph_i_scg_groups_t *) b;
     igraph_long_t i;
@@ -61,7 +61,7 @@ igraph_long_t igraph_i_compare_groups(const void *a, const void *b) {
 }
 
 /*to be used with qsort and real_vectors */
-igraph_long_t igraph_i_compare_real(const void *a, const void *b) {
+int igraph_i_compare_real(const void *a, const void *b) {
     igraph_real_t arg1 = * (igraph_real_t *) a;
     igraph_real_t arg2 = * (igraph_real_t *) b;
 
@@ -75,7 +75,7 @@ igraph_long_t igraph_i_compare_real(const void *a, const void *b) {
 }
 
 /*to be used with qsort and integer vectors */
-igraph_long_t igraph_i_compare_int(const void *a, const void *b) {
+int igraph_i_compare_int(const void *a, const void *b) {
     igraph_long_t arg1 = * (igraph_long_t *) a;
     igraph_long_t arg2 = * (igraph_long_t *) b;
     return (arg1 - arg2);

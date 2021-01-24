@@ -152,7 +152,7 @@ static igraph_real_t igraph_i_graphml_parse_numeric(const char* char_data,
 
 static igraph_bool_t igraph_i_graphml_parse_boolean(const char* char_data,
                                                     igraph_bool_t default_value) {
-    igraph_long_t value;
+    igraph_bool_t value;
     if (char_data == 0) {
         return default_value;
     }
@@ -975,8 +975,8 @@ static void igraph_i_graphml_attribute_default_value_finish(
 
 static void igraph_i_graphml_sax_handler_start_element_ns(
         void *state0, const xmlChar* localname, const xmlChar* prefix,
-        const xmlChar* uri, igraph_long_t nb_namespaces, const xmlChar** namespaces,
-        igraph_long_t nb_attributes, igraph_long_t nb_defaulted, const xmlChar** attributes) {
+        const xmlChar* uri, int nb_namespaces, const xmlChar** namespaces,
+        int nb_attributes, int nb_defaulted, const xmlChar** attributes) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
     xmlChar** it;
@@ -1240,7 +1240,7 @@ static void igraph_i_graphml_sax_handler_end_element_ns(
     }
 }
 
-static void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, igraph_long_t len) {
+static void igraph_i_graphml_sax_handler_chars(void* state0, const xmlChar* ch, int len) {
     struct igraph_i_graphml_parser_state *state =
         (struct igraph_i_graphml_parser_state*)state0;
 

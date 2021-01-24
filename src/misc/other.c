@@ -260,7 +260,7 @@ igraph_long_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *r
 static const char* igraph_i_plfit_error_message = 0;
 
 static void igraph_i_plfit_error_handler_store(const char *reason, const char *file,
-        igraph_long_t line, igraph_long_t plfit_errno) {
+        int line, int plfit_errno) {
 
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
