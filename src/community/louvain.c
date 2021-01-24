@@ -69,7 +69,7 @@ typedef struct {
     igraph_long_t id;
 } igraph_i_multilevel_link;
 
-static igraph_long_t igraph_i_multilevel_link_cmp(const void *a, const void *b) {
+static int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
     igraph_long_t r = (((igraph_i_multilevel_link*)a)->from -
                   ((igraph_i_multilevel_link*)b)->from);
     if (r != 0) {
@@ -143,7 +143,7 @@ typedef struct {
     igraph_real_t weight;
 } igraph_i_multilevel_community_link;
 
-static igraph_long_t igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
+static int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
     return (igraph_long_t) (((igraph_i_multilevel_community_link*)a)->community -
                   ((igraph_i_multilevel_community_link*)b)->community);
 }

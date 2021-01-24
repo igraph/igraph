@@ -92,7 +92,7 @@ igraph_long_t igraph_community_optimal_modularity(const igraph_t *graph,
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_long_t no_of_variables = no_of_nodes * (no_of_nodes + 1) / 2;
     igraph_long_t i, j, k, l, st;
-    igraph_long_t idx[] = { 0, 0, 0, 0 };
+    int idx[] = { 0, 0, 0, 0 };
     double coef[] = { 0.0, 1.0, 1.0, -2.0 };
     igraph_real_t total_weight;
     igraph_vector_t indegree;

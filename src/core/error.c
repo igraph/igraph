@@ -172,7 +172,7 @@ igraph_long_t igraph_errorvf(const char *reason, const char *file, igraph_long_t
 #ifndef USING_R
 void igraph_error_handler_abort (const char *reason, const char *file,
                                  igraph_long_t line, igraph_long_t igraph_errno) {
-    fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
+    fprintf(stderr, "Error at %s:%li : %s, %s\n", file, line, reason,
             igraph_strerror(igraph_errno));
     igraph_abort();
 }
@@ -192,7 +192,7 @@ void igraph_error_handler_ignore (const char *reason, const char *file,
 void igraph_error_handler_printignore (const char *reason, const char *file,
                                        igraph_long_t line, igraph_long_t igraph_errno) {
     IGRAPH_FINALLY_FREE();
-    fprintf(stderr, "Error at %s:%i : %s, %s\n", file, line, reason,
+    fprintf(stderr, "Error at %s:%li : %s, %s\n", file, line, reason,
             igraph_strerror(igraph_errno));
 }
 #endif
@@ -290,7 +290,7 @@ void igraph_warning_handler_ignore (const char *reason, const char *file,
 void igraph_warning_handler_print (const char *reason, const char *file,
                                    igraph_long_t line, igraph_long_t igraph_errno) {
     IGRAPH_UNUSED(igraph_errno);
-    fprintf(stderr, "Warning: %s in file %s, line %i\n", reason, file, line);
+    fprintf(stderr, "Warning: %s in file %s, line %li\n", reason, file, line);
 }
 #endif
 
@@ -337,7 +337,7 @@ igraph_fatal_handler_t *igraph_set_fatal_handler(igraph_fatal_handler_t * new_ha
 
 #ifndef USING_R
 void igraph_fatal_handler_abort(const char *reason, const char *file, igraph_long_t line) {
-    fprintf(stderr, "Fatal error at %s:%i : %s\n", file, line, reason);
+    fprintf(stderr, "Fatal error at %s:%li : %s\n", file, line, reason);
     igraph_abort();
 }
 #endif

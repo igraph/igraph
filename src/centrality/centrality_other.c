@@ -86,7 +86,7 @@ static igraph_bool_t igraph_i_vector_mostly_negative(const igraph_vector_t *vect
 }
 
 static igraph_long_t igraph_i_eigenvector_centrality(igraph_real_t *to, const igraph_real_t *from,
-                                           igraph_long_t n, void *extra) {
+                                                     igraph_long_t n, void *extra) {
     igraph_adjlist_t *adjlist = extra;
     igraph_vector_long_t *neis;
     igraph_long_t i, j, nlen;
@@ -112,7 +112,7 @@ typedef struct igraph_i_eigenvector_centrality_t {
 } igraph_i_eigenvector_centrality_t;
 
 static igraph_long_t igraph_i_eigenvector_centrality2(igraph_real_t *to, const igraph_real_t *from,
-                                            igraph_long_t n, void *extra) {
+                                                      igraph_long_t n, void *extra) {
 
     igraph_i_eigenvector_centrality_t *data = extra;
     const igraph_t *graph = data->graph;

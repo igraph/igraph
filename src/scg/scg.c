@@ -401,8 +401,8 @@ igraph_long_t igraph_scg_grouping(const igraph_matrix_t *V,
 
 #define INVEC(i) (nt_vec ? VECTOR(*nt_vec)[i] : nt)
 
-    IGRAPH_CHECK(igraph_matrix_int_init(&gr_mat, no_of_nodes, nev));
-    IGRAPH_FINALLY(igraph_matrix_int_destroy, &gr_mat);
+    IGRAPH_CHECK(igraph_matrix_long_init(&gr_mat, no_of_nodes, nev));
+    IGRAPH_FINALLY(igraph_matrix_long_destroy, &gr_mat);
 
     switch (algo) {
     case IGRAPH_SCG_OPTIMUM:
@@ -453,7 +453,7 @@ igraph_long_t igraph_scg_grouping(const igraph_matrix_t *V,
                                    igraph_i_scg_groups_t);
         igraph_long_t gr_nb = 0;
 
-        IGRAPH_CHECK(igraph_matrix_int_transpose(&gr_mat));
+        IGRAPH_CHECK(igraph_matrix_long_transpose(&gr_mat));
         for (i = 0; i < no_of_nodes; i++) {
             g[i].ind = i;
             g[i].n = nev;
@@ -472,7 +472,7 @@ igraph_long_t igraph_scg_grouping(const igraph_matrix_t *V,
         igraph_Free(g);
     }
 
-    igraph_matrix_int_destroy(&gr_mat);
+    igraph_matrix_long_destroy(&gr_mat);
     IGRAPH_FINALLY_CLEAN(1);
 
     IGRAPH_CHECK(igraph_reindex_membership(groups, 0, 0));

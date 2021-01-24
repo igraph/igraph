@@ -617,7 +617,7 @@ igraph_long_t igraph_get_shortest_path_dijkstra(const igraph_t *graph,
  * in order. Assumes that both paths are pointers to igraph_vector_t
  * objects and that they are not empty
  */
-static igraph_long_t igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
+static int igraph_i_vector_tail_cmp(const void* path1, const void* path2) {
     return (igraph_long_t) (igraph_vector_tail(*(const igraph_vector_t**)path1) -
                   igraph_vector_tail(*(const igraph_vector_t**)path2));
 }

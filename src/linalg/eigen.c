@@ -446,7 +446,7 @@ typedef struct igraph_i_eigen_matrix_sym_arpack_data_t {
 
 static igraph_long_t igraph_i_eigen_matrix_sym_arpack_cb(igraph_real_t *to,
                                         const igraph_real_t *from,
-                                        int n, void *extra) {
+                                        igraph_long_t n, void *extra) {
 
     igraph_i_eigen_matrix_sym_arpack_data_t *data =
         (igraph_i_eigen_matrix_sym_arpack_data_t *) extra;
@@ -1339,7 +1339,7 @@ igraph_long_t igraph_eigen_matrix(const igraph_matrix_t *A,
 
 static igraph_long_t igraph_i_eigen_adjacency_arpack_sym_cb(igraph_real_t *to,
         const igraph_real_t *from,
-        int n, void *extra) {
+        igraph_long_t n, void *extra) {
     igraph_adjlist_t *adjlist = (igraph_adjlist_t *) extra;
     igraph_vector_long_t *neis;
     igraph_long_t i, j, nlen;

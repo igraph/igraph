@@ -96,7 +96,7 @@ void print_graph(const igraph_t *graph) {
 
 
 /* Edge comparisong function used for sorting in print_graph_canon(). */
-int edge_compare(const void *e1, const void *e2) {
+igraph_long_t edge_compare(const void *e1, const void *e2) {
     const igraph_real_t *edge1 = (igraph_real_t *) e1, *edge2 = (igraph_real_t *) e2;
     if (edge1[0] < edge2[0]) {
         return -1;

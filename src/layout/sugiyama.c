@@ -656,7 +656,7 @@ static igraph_long_t igraph_i_layout_sugiyama_place_nodes_vertically(const igrap
         IGRAPH_CHECK(igraph_vector_push_back(&feedback_edges, -1));
         j = 0;
         for (i = 0; i < no_of_edges; i++) {
-            igraph_long_t ind[3];
+            int ind[3];
             double val[3] = {0, -1, 1};
             ind[1] = IGRAPH_FROM(graph, i) + 1;
             ind[2] = IGRAPH_TO(graph, i) + 1;
@@ -675,7 +675,7 @@ static igraph_long_t igraph_i_layout_sugiyama_place_nodes_vertically(const igrap
             } else {
                 glp_set_row_bnds(ip, (igraph_long_t) i + 1, GLP_LO, 1, 1);
             }
-            glp_set_mat_row(ip, (igraph_long_t) i + 1, 2, (int)ind, (int)val);
+            glp_set_mat_row(ip, (igraph_long_t) i + 1, 2, ind, val);
         }
 
         /* Solve the problem */

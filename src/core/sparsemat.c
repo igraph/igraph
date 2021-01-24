@@ -1470,7 +1470,7 @@ igraph_long_t igraph_sparsemat_diag(igraph_sparsemat_t *A, int nzmax,
 
 static igraph_long_t igraph_i_sparsemat_arpack_multiply(igraph_real_t *to,
                                               const igraph_real_t *from,
-                                              int n,
+                                              igraph_long_t n,
                                               void *extra) {
     igraph_sparsemat_t *A = extra;
     igraph_vector_t vto, vfrom;
@@ -1490,7 +1490,7 @@ typedef struct igraph_i_sparsemat_arpack_rssolve_data_t {
 
 static igraph_long_t igraph_i_sparsemat_arpack_solve(igraph_real_t *to,
                                            const igraph_real_t *from,
-                                           int n,
+                                           igraph_long_t n,
                                            void *extra) {
 
     igraph_i_sparsemat_arpack_rssolve_data_t *data = extra;

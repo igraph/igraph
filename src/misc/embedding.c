@@ -42,7 +42,7 @@ typedef struct {
 /* Adjacency matrix, unweighted, undirected.
    Eigendecomposition is used */
 static igraph_long_t igraph_i_asembeddingu(igraph_real_t *to, const igraph_real_t *from,
-                          int n, void *extra) {
+                          igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
     const igraph_vector_t *cvec = data->cvec;
@@ -67,7 +67,7 @@ static igraph_long_t igraph_i_asembeddingu(igraph_real_t *to, const igraph_real_
 /* Adjacency matrix, weighted, undirected.
    Eigendecomposition is used. */
 static igraph_long_t igraph_i_asembeddinguw(igraph_real_t *to, const igraph_real_t *from,
-                           int n, void *extra) {
+                           igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
     const igraph_vector_t *cvec = data->cvec;
@@ -95,7 +95,7 @@ static igraph_long_t igraph_i_asembeddinguw(igraph_real_t *to, const igraph_real
 
 /* Adjacency matrix, unweighted, directed. SVD. */
 static igraph_long_t igraph_i_asembedding(igraph_real_t *to, const igraph_real_t *from,
-                         int n, void *extra) {
+                         igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
     igraph_adjlist_t *inlist = data->inlist;
@@ -133,7 +133,7 @@ static igraph_long_t igraph_i_asembedding(igraph_real_t *to, const igraph_real_t
 
 /* Adjacency matrix, unweighted, directed. SVD, right eigenvectors */
 static igraph_long_t igraph_i_asembedding_right(igraph_real_t *to, const igraph_real_t *from,
-                               int n, void *extra) {
+                               igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *inlist = data->inlist;
     const igraph_vector_t *cvec = data->cvec;
@@ -157,7 +157,7 @@ static igraph_long_t igraph_i_asembedding_right(igraph_real_t *to, const igraph_
 
 /* Adjacency matrix, weighted, directed. SVD. */
 static igraph_long_t igraph_i_asembeddingw(igraph_real_t *to, const igraph_real_t *from,
-                          int n, void *extra) {
+                          igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
     igraph_inclist_t *inlist = data->einlist;
@@ -229,7 +229,7 @@ static igraph_long_t igraph_i_asembeddingw_right(igraph_real_t *to, const igraph
 
 /* Laplacian D-A, unweighted, undirected. Eigendecomposition. */
 static igraph_long_t igraph_i_lsembedding_da(igraph_real_t *to, const igraph_real_t *from,
-                            int n, void *extra) {
+                            igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
     const igraph_vector_t *cvec = data->cvec;
@@ -253,7 +253,7 @@ static igraph_long_t igraph_i_lsembedding_da(igraph_real_t *to, const igraph_rea
 
 /* Laplacian D-A, weighted, undirected. Eigendecomposition. */
 static igraph_long_t igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_real_t *from,
-                             int n, void *extra) {
+                             igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
     const igraph_vector_t *cvec = data->cvec;
@@ -281,7 +281,7 @@ static igraph_long_t igraph_i_lsembedding_daw(igraph_real_t *to, const igraph_re
 
 /* Laplacian DAD, unweighted, undirected. Eigendecomposition. */
 static igraph_long_t igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_real_t *from,
-                             int n, void *extra) {
+                             igraph_long_t n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
@@ -315,7 +315,7 @@ static igraph_long_t igraph_i_lsembedding_dad(igraph_real_t *to, const igraph_re
 }
 
 static igraph_long_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_real_t *from,
-                              int n, void *extra) {
+                              igraph_long_t n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
@@ -372,7 +372,7 @@ static igraph_long_t igraph_i_lsembedding_dadw(igraph_real_t *to, const igraph_r
 
 /* Laplacian I-DAD, unweighted, undirected. Eigendecomposition. */
 static igraph_long_t igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_real_t *from,
-                              int n, void *extra) {
+                              igraph_long_t n, void *extra) {
 
     igraph_long_t i;
 
@@ -385,7 +385,7 @@ static igraph_long_t igraph_i_lsembedding_idad(igraph_real_t *to, const igraph_r
 }
 
 static igraph_long_t igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_real_t *from,
-                               int n, void *extra) {
+                               igraph_long_t n, void *extra) {
     igraph_long_t i;
 
     igraph_i_lsembedding_dadw(to, from, n, extra);
@@ -398,7 +398,7 @@ static igraph_long_t igraph_i_lsembedding_idadw(igraph_real_t *to, const igraph_
 
 /* Laplacian OAP, unweighted, directed. SVD. */
 static igraph_long_t igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_real_t *from,
-                              int n, void *extra) {
+                              igraph_long_t n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *outlist = data->outlist;
@@ -457,7 +457,7 @@ static igraph_long_t igraph_i_lseembedding_oap(igraph_real_t *to, const igraph_r
 /* Laplacian OAP, unweighted, directed. SVD, right eigenvectors. */
 static igraph_long_t igraph_i_lseembedding_oap_right(igraph_real_t *to,
                                     const igraph_real_t *from,
-                                    int n, void *extra) {
+                                    igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_adjlist_t *inlist = data->inlist;
     const igraph_vector_t *deg_in = data->cvec;
@@ -492,7 +492,7 @@ static igraph_long_t igraph_i_lseembedding_oap_right(igraph_real_t *to,
 
 /* Laplacian OAP, weighted, directed. SVD. */
 static igraph_long_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph_real_t *from,
-                               int n, void *extra) {
+                               igraph_long_t n, void *extra) {
 
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *outlist = data->eoutlist;
@@ -557,7 +557,7 @@ static igraph_long_t igraph_i_lseembedding_oapw(igraph_real_t *to, const igraph_
 /* Laplacian OAP, weighted, directed. SVD, right eigenvectors. */
 static igraph_long_t igraph_i_lseembedding_oapw_right(igraph_real_t *to,
                                      const igraph_real_t *from,
-                                     int n, void *extra) {
+                                     igraph_long_t n, void *extra) {
     igraph_i_asembedding_data_t *data = extra;
     igraph_inclist_t *inlist = data->einlist;
     const igraph_vector_t *deg_in = data->cvec;

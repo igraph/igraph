@@ -5,7 +5,7 @@
 igraph_fatal_handler_t hanlder;
 
 void handler(const char *reason, const char *file, igraph_long_t line) {
-    printf("Reason: %s\nFile: %s\nLine: %d\n", reason, file, line);
+    printf("Reason: %s\nFile: %s\nLine: %ld\n", reason, file, line);
     exit(0); /* We use exit(0) instead of abort() to allow the test to succeed. */
 }
 

@@ -375,7 +375,7 @@ static void igraph_i_fastgreedy_community_remove_nei(
 
 /* Auxiliary function to sort a community pair list with respect to the
  * `second` field */
-static igraph_long_t igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
+static int igraph_i_fastgreedy_commpair_cmp(const void* p1, const void* p2) {
     igraph_i_fastgreedy_commpair *cp1, *cp2;
     cp1 = *(igraph_i_fastgreedy_commpair**)p1;
     cp2 = *(igraph_i_fastgreedy_commpair**)p2;
