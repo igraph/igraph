@@ -58,7 +58,7 @@
 #include "core/interruption.h"
 #include "core/exceptions.h"
 
-static int igraph_i_community_spinglass_orig(
+static igraph_long_t igraph_i_community_spinglass_orig(
         const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
@@ -73,7 +73,7 @@ static int igraph_i_community_spinglass_orig(
         igraph_spincomm_update_t update_rule,
         igraph_real_t gamma);
 
-static int igraph_i_community_spinglass_negative(
+static igraph_long_t igraph_i_community_spinglass_negative(
         const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
@@ -185,7 +185,7 @@ static int igraph_i_community_spinglass_negative(
  *
  */
 
-int igraph_community_spinglass(const igraph_t *graph,
+igraph_long_t igraph_community_spinglass(const igraph_t *graph,
                                const igraph_vector_t *weights,
                                igraph_real_t *modularity,
                                igraph_real_t *temperature,
@@ -231,7 +231,7 @@ int igraph_community_spinglass(const igraph_t *graph,
     );
 }
 
-static int igraph_i_community_spinglass_orig(
+static igraph_long_t igraph_i_community_spinglass_orig(
         const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
@@ -412,9 +412,9 @@ static int igraph_i_community_spinglass_orig(
  * Time complexity: TODO.
  */
 
-int igraph_community_spinglass_single(const igraph_t *graph,
+igraph_long_t igraph_community_spinglass_single(const igraph_t *graph,
                                       const igraph_vector_t *weights,
-                                      igraph_int_t vertex,
+                                      igraph_long_t vertex,
                                       igraph_vector_t *community,
                                       igraph_real_t *cohesion,
                                       igraph_real_t *adhesion,
@@ -475,7 +475,7 @@ int igraph_community_spinglass_single(const igraph_t *graph,
         /* the initial conf is needed, because otherwise,
            the degree of the nodes is not in the weight property, stupid!!! */
         pm.assign_initial_conf(-1);
-        snprintf(startnode, 255, "%li", (long int)vertex + 1);
+        snprintf(startnode, 255, "%li", (igraph_long_t)vertex + 1);
         pm.FindCommunityFromStart(gamma, prob, startnode, community,
                                    cohesion, adhesion, inner_links, outer_links);
 
@@ -485,7 +485,7 @@ int igraph_community_spinglass_single(const igraph_t *graph,
     return 0;
 }
 
-static int igraph_i_community_spinglass_negative(
+static igraph_long_t igraph_i_community_spinglass_negative(
         const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_real_t *modularity,
