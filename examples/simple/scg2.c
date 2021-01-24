@@ -25,7 +25,7 @@
 
 #include "../../tests/unit/test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t ev;
@@ -66,7 +66,7 @@ int main() {
     } while (0)
 
 #define FIXSMALL(eps) do { \
-    long int i, j, ncol, nrow; \
+    igraph_integer_t i, j, ncol, nrow; \
     ncol = igraph_vector_complex_size(&eval); \
     for (i = 0; i < ncol; i++) { \
         if (fabs((double)IGRAPH_REAL(VECTOR(eval)[i])) < eps) { \

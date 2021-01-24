@@ -25,10 +25,10 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_stack_t st;
-    int i;
+    igraph_integer_t i;
 
     /* igraph_stack_init, igraph_stack_destroy */
     igraph_stack_init(&st, 0);

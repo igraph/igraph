@@ -24,21 +24,21 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
+        fprintf(f, " %li", (igraph_integer_t) VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t v, seq;
-    int ret;
+    igraph_integer_t ret;
     igraph_integer_t mdeg, nedges;
-    long int i;
-    long int ndeg;
+    igraph_integer_t i;
+    igraph_integer_t ndeg;
 
     /* Create graph */
     igraph_vector_init(&v, 8);
@@ -77,7 +77,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+        ndeg += (igraph_integer_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 1;
@@ -119,7 +119,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+        ndeg += (igraph_integer_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 2;
@@ -163,7 +163,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+        ndeg += (igraph_integer_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 6;
@@ -181,7 +181,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+        ndeg += (igraph_integer_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 8;
@@ -207,7 +207,7 @@ int main() {
     ndeg = 0;
     nedges = igraph_ecount(&g);
     for (i = 0; i < igraph_vector_size(&v); i++) {
-        ndeg += (long int) VECTOR(v)[i];
+        ndeg += (igraph_integer_t) VECTOR(v)[i];
     }
     if (ndeg != 2 * nedges) {
         return 12;

@@ -33,10 +33,10 @@
 #define INDEXINC      1
 
 void igraph_i_cutheap_switch(igraph_i_cutheap_t *ch,
-                             long int hidx1, long int hidx2) {
+                             igraph_integer_t hidx1, igraph_integer_t hidx2) {
     if (hidx1 != hidx2) {
-        long int idx1 = (long int) VECTOR(ch->index)[hidx1];
-        long int idx2 = (long int) VECTOR(ch->index)[hidx2];
+        igraph_integer_t idx1 = (igraph_integer_t) VECTOR(ch->index)[hidx1];
+        igraph_integer_t idx2 = (igraph_integer_t) VECTOR(ch->index)[hidx2];
 
         igraph_real_t tmp = VECTOR(ch->heap)[hidx1];
         VECTOR(ch->heap)[hidx1] = VECTOR(ch->heap)[hidx2];
@@ -50,8 +50,8 @@ void igraph_i_cutheap_switch(igraph_i_cutheap_t *ch,
     }
 }
 
-void igraph_i_cutheap_sink(igraph_i_cutheap_t *ch, long int hidx) {
-    long int size = igraph_vector_size(&ch->heap);
+void igraph_i_cutheap_sink(igraph_i_cutheap_t *ch, igraph_integer_t hidx) {
+    igraph_integer_t size = igraph_vector_size(&ch->heap);
     if (LEFTCHILD(hidx) >= size) {
         /* leaf node */
     } else if (RIGHTCHILD(hidx) == size ||
@@ -71,7 +71,7 @@ void igraph_i_cutheap_sink(igraph_i_cutheap_t *ch, long int hidx) {
     }
 }
 
-void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, long int hidx) {
+void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, igraph_integer_t hidx) {
     if (hidx == 0 || VECTOR(ch->heap)[hidx] < VECTOR(ch->heap)[PARENT(hidx)]) {
         /* at the top */
     } else {
@@ -80,7 +80,7 @@ void igraph_i_cutheap_shift_up(igraph_i_cutheap_t *ch, long int hidx) {
     }
 }
 
-int igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes) {
+igraph_integer_t igraph_i_cutheap_init(igraph_i_cutheap_t *ch, igraph_integer_t nodes) {
     ch->dnodes = nodes;
     IGRAPH_VECTOR_INIT_FINALLY(&ch->heap, nodes); /* all zero */
     IGRAPH_CHECK(igraph_vector_init_seq(&ch->index, 0, nodes - 1));
@@ -117,12 +117,12 @@ igraph_real_t igraph_i_cutheap_maxvalue(igraph_i_cutheap_t *ch) {
 }
 
 igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
-    long int size = igraph_vector_size(&ch->heap);
+    igraph_integer_t size = igraph_vector_size(&ch->heap);
     igraph_integer_t maxindex = (igraph_integer_t) VECTOR(ch->index)[0];
     /* put the last element to the top */
     igraph_i_cutheap_switch(ch, 0, size - 1);
     /* remove the last element */
-    VECTOR(ch->hptr)[(long int) igraph_vector_tail(&ch->index)] = INACTIVE;
+    VECTOR(ch->hptr)[(igraph_integer_t) igraph_vector_tail(&ch->index)] = INACTIVE;
     igraph_vector_pop_back(&ch->heap);
     igraph_vector_pop_back(&ch->index);
     igraph_i_cutheap_sink(ch, 0);
@@ -132,12 +132,12 @@ igraph_integer_t igraph_i_cutheap_popmax(igraph_i_cutheap_t *ch) {
 
 /* Update the value of an active vertex, if not active it will be ignored */
 
-int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
+igraph_integer_t igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
                             igraph_real_t add) {
-    igraph_real_t hidx = VECTOR(ch->hptr)[(long int)index];
+    igraph_real_t hidx = VECTOR(ch->hptr)[(igraph_integer_t)index];
     if (hidx != INACTIVE && hidx != UNDEFINED) {
-        long int hidx2 = (long int) (hidx - INDEXINC);
-        /*     printf("updating vertex %li, heap index %li\n", (long int) index, hidx2); */
+        igraph_integer_t hidx2 = (igraph_integer_t) (hidx - INDEXINC);
+        /*     printf("updating vertex %li, heap index %li\n", (igraph_integer_t) index, hidx2); */
         VECTOR(ch->heap)[hidx2] += add;
         igraph_i_cutheap_sink(ch, hidx2);
         igraph_i_cutheap_shift_up(ch, hidx2);
@@ -147,8 +147,8 @@ int igraph_i_cutheap_update(igraph_i_cutheap_t *ch, igraph_integer_t index,
 
 /* Reset the value of all vertices to zero and make them active */
 
-int igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, long int vertex) {
-    long int i, j, n = igraph_vector_size(&ch->hptr);
+igraph_integer_t igraph_i_cutheap_reset_undefine(igraph_i_cutheap_t *ch, igraph_integer_t vertex) {
+    igraph_integer_t i, j, n = igraph_vector_size(&ch->hptr);
     /* undefine */
     VECTOR(ch->hptr)[vertex] = UNDEFINED;
     ch->dnodes -= 1;

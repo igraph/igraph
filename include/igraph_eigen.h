@@ -57,16 +57,16 @@ igraph_eigen_which_position_t;
 
 typedef struct igraph_eigen_which_t {
     igraph_eigen_which_position_t pos;
-    int howmany;
-    int il, iu;
+    igraph_integer_t howmany;
+    igraph_integer_t il, iu;
     igraph_real_t vl, vu;
-    int vestimate;
+    igraph_integer_t vestimate;
     igraph_lapack_dgeevx_balance_t balance;
 } igraph_eigen_which_t;
 
-DECLDIR int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
+DECLDIR igraph_integer_t igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
         const igraph_sparsemat_t *sA,
-        igraph_arpack_function_t *fun, int n,
+        igraph_arpack_function_t *fun, igraph_integer_t n,
         void *extra,
         igraph_eigen_algorithm_t algorithm,
         const igraph_eigen_which_t *which,
@@ -75,9 +75,9 @@ DECLDIR int igraph_eigen_matrix_symmetric(const igraph_matrix_t *A,
         igraph_vector_t *values,
         igraph_matrix_t *vectors);
 
-DECLDIR int igraph_eigen_matrix(const igraph_matrix_t *A,
+DECLDIR igraph_integer_t igraph_eigen_matrix(const igraph_matrix_t *A,
                                 const igraph_sparsemat_t *sA,
-                                igraph_arpack_function_t *fun, int n,
+                                igraph_arpack_function_t *fun, igraph_integer_t n,
                                 void *extra,
                                 igraph_eigen_algorithm_t algorithm,
                                 const igraph_eigen_which_t *which,
@@ -86,7 +86,7 @@ DECLDIR int igraph_eigen_matrix(const igraph_matrix_t *A,
                                 igraph_vector_complex_t *values,
                                 igraph_matrix_complex_t *vectors);
 
-DECLDIR int igraph_eigen_adjacency(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_eigen_adjacency(const igraph_t *graph,
                                    igraph_eigen_algorithm_t algorithm,
                                    const igraph_eigen_which_t *which,
                                    igraph_arpack_options_t *options,
@@ -96,7 +96,7 @@ DECLDIR int igraph_eigen_adjacency(const igraph_t *graph,
                                    igraph_vector_complex_t *cmplxvalues,
                                    igraph_matrix_complex_t *cmplxvectors);
 
-DECLDIR int igraph_eigen_laplacian(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_eigen_laplacian(const igraph_t *graph,
                                    igraph_eigen_algorithm_t algorithm,
                                    const igraph_eigen_which_t *which,
                                    igraph_arpack_options_t *options,

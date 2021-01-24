@@ -31,17 +31,17 @@ typedef struct {
     igraph_vector_t *quantities;
     igraph_vector_t *strategies;
     igraph_neimode_t mode;
-    int retval;
+    igraph_integer_t retval;
 } strategy_test_t;
 
 /* Error tests, i.e. we expect errors to be raised for each test.
  */
-int error_tests() {
+igraph_integer_t error_tests() {
     igraph_t g, gzero, h;
     igraph_vector_t quant, quantnvert, quantzero;
     igraph_vector_t strat, stratnvert, stratzero;
     igraph_vector_t wgt, wgtnedge, wgtzero;
-    int i, n, nvert, ret;
+    igraph_integer_t i, n, nvert, ret;
     strategy_test_t *test;
 
     igraph_empty(&h, 0, 0);  /* empty graph */
@@ -109,7 +109,7 @@ int error_tests() {
         ret = igraph_moran_process(test->graph, test->weights, test->quantities,
                                    test->strategies, test->mode);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (int)(i + 1));
+            printf("Error test no. %d failed.\n", (igraph_integer_t)(i + 1));
             return IGRAPH_FAILURE;
         }
         i++;
@@ -133,7 +133,7 @@ int error_tests() {
 
 /* One iteration of the Moran process on a simple digraph.
  */
-int moran_one_test() {
+igraph_integer_t moran_one_test() {
     igraph_t g;
     igraph_integer_t u = -1;  /* vertex chosen for reproduction */
     igraph_integer_t v = -1;  /* clone of u */
@@ -142,7 +142,7 @@ int moran_one_test() {
     igraph_vector_t quant, quantcp;
     igraph_vector_t strat, stratcp;
     igraph_vector_t wgt;
-    long int i;
+    igraph_integer_t i;
 
     /* graph representing the game network; quantities and strategies vectors */
     igraph_small(&g, /*nvert*/ 0, IGRAPH_DIRECTED,
@@ -211,7 +211,7 @@ int moran_one_test() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+igraph_integer_t main() {
 
     IGRAPH_ASSERT(error_tests() == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(moran_one_test() == IGRAPH_SUCCESS);

@@ -60,13 +60,13 @@
  *
  * \example examples/simple/igraph_atlas.c
  */
-int igraph_atlas(igraph_t *graph, int number) {
+igraph_integer_t igraph_atlas(igraph_t *graph, igraph_integer_t number) {
 
     igraph_integer_t pos, n, e;
     igraph_vector_t v = IGRAPH_VECTOR_NULL;
 
     if (number < 0 ||
-        number >= (int) (sizeof(igraph_i_atlas_edges_pos) / sizeof(long int))) {
+        number >= (igraph_integer_t) (sizeof(igraph_i_atlas_edges_pos) / sizeof(igraph_integer_t))) {
         IGRAPH_ERROR("No such graph in atlas", IGRAPH_EINVAL);
     }
 

@@ -120,12 +120,12 @@
 /* ------------------------------------ */
 
 typedef struct {
-    int i, j;
-    long int x[31];
+    igraph_integer_t i, j;
+    igraph_integer_t x[31];
 } igraph_i_rng_glibc2_state_t;
 
-static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int *x) {
-    unsigned long int k;
+static unsigned igraph_integer_t igraph_i_rng_glibc2_get(igraph_integer_t *i, igraph_integer_t *j, igraph_integer_t n, igraph_integer_t *x) {
+    unsigned igraph_integer_t k;
 
     x[*i] += x[*j];
     k = (x[*i] >> 1) & 0x7FFFFFFF;
@@ -143,7 +143,7 @@ static unsigned long int igraph_i_rng_glibc2_get(int *i, int *j, int n, long int
     return k;
 }
 
-unsigned long int igraph_rng_glibc2_get(void *vstate) {
+unsigned igraph_integer_t igraph_rng_glibc2_get(void *vstate) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
     return igraph_i_rng_glibc2_get(&state->i, &state->j, 31, state->x);
@@ -155,32 +155,32 @@ igraph_real_t igraph_rng_glibc2_get_real(void *state) {
 
 /* this function is independent of the bit size */
 
-static void igraph_i_rng_glibc2_init(long int *x, int n,
-                                     unsigned long int s) {
-    int i;
+static void igraph_i_rng_glibc2_init(igraph_integer_t *x, igraph_integer_t n,
+                                     unsigned igraph_integer_t s) {
+    igraph_integer_t i;
 
     if (s == 0) {
         s = 1;
     }
 
-    x[0] = (long) s;
+    x[0] = (igraph_integer_t) s;
     for (i = 1 ; i < n ; i++) {
-        const long int h = s / 127773;
-        const long int t = 16807 * ((long) s - h * 127773) - h * 2836;
+        const igraph_integer_t h = s / 127773;
+        const igraph_integer_t t = 16807 * ((igraph_integer_t) s - h * 127773) - h * 2836;
         if (t < 0) {
-            s = (unsigned long) t + 2147483647 ;
+            s = (unsigned igraph_integer_t) t + 2147483647 ;
         } else {
-            s = (unsigned long) t ;
+            s = (unsigned igraph_integer_t) t ;
         }
 
-        x[i] = (long int) s ;
+        x[i] = (igraph_integer_t) s ;
     }
 }
 
-int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
+igraph_integer_t igraph_rng_glibc2_seed(void *vstate, unsigned igraph_integer_t seed) {
     igraph_i_rng_glibc2_state_t *state =
         (igraph_i_rng_glibc2_state_t*) vstate;
-    int i;
+    igraph_integer_t i;
 
     igraph_i_rng_glibc2_init(state->x, 31, seed);
 
@@ -194,7 +194,7 @@ int igraph_rng_glibc2_seed(void *vstate, unsigned long int seed) {
     return 0;
 }
 
-int igraph_rng_glibc2_init(void **state) {
+igraph_integer_t igraph_rng_glibc2_init(void **state) {
     igraph_i_rng_glibc2_state_t *st;
 
     st = igraph_Calloc(1, igraph_i_rng_glibc2_state_t);
@@ -244,10 +244,10 @@ const igraph_rng_type_t igraph_rngtype_glibc2 = {
 /* ------------------------------------ */
 
 typedef struct {
-    unsigned long int x;
+    unsigned igraph_integer_t x;
 } igraph_i_rng_rand_state_t;
 
-unsigned long int igraph_rng_rand_get(void *vstate) {
+unsigned igraph_integer_t igraph_rng_rand_get(void *vstate) {
     igraph_i_rng_rand_state_t *state = vstate;
     state->x = (1103515245 * state->x + 12345) & 0x7fffffffUL;
     return state->x;
@@ -257,13 +257,13 @@ igraph_real_t igraph_rng_rand_get_real(void *vstate) {
     return igraph_rng_rand_get (vstate) / 2147483648.0 ;
 }
 
-int igraph_rng_rand_seed(void *vstate, unsigned long int seed) {
+igraph_integer_t igraph_rng_rand_seed(void *vstate, unsigned igraph_integer_t seed) {
     igraph_i_rng_rand_state_t *state = vstate;
     state->x = seed;
     return 0;
 }
 
-int igraph_rng_rand_init(void **state) {
+igraph_integer_t igraph_rng_rand_init(void **state) {
     igraph_i_rng_rand_state_t *st;
 
     st = igraph_Calloc(1, igraph_i_rng_rand_state_t);
@@ -324,39 +324,39 @@ const igraph_rng_type_t igraph_rngtype_rand = {
 #define M 397
 
 /* most significant w-r bits */
-static const unsigned long UPPER_MASK = 0x80000000UL;
+static const unsigned igraph_integer_t UPPER_MASK = 0x80000000UL;
 
 /* least significant r bits */
-static const unsigned long LOWER_MASK = 0x7fffffffUL;
+static const unsigned igraph_integer_t LOWER_MASK = 0x7fffffffUL;
 
 typedef struct {
-    unsigned long mt[N];
-    int mti;
+    unsigned igraph_integer_t mt[N];
+    igraph_integer_t mti;
 } igraph_i_rng_mt19937_state_t;
 
-unsigned long int igraph_rng_mt19937_get(void *vstate) {
+unsigned igraph_integer_t igraph_rng_mt19937_get(void *vstate) {
     igraph_i_rng_mt19937_state_t *state = vstate;
 
-    unsigned long k ;
-    unsigned long int *const mt = state->mt;
+    unsigned igraph_integer_t k ;
+    unsigned igraph_integer_t *const mt = state->mt;
 
 #define MAGIC(y) (((y)&0x1) ? 0x9908b0dfUL : 0)
 
     if (state->mti >= N) {
         /* generate N words at one time */
-        int kk;
+        igraph_integer_t kk;
 
         for (kk = 0; kk < N - M; kk++) {
-            unsigned long y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
+            unsigned igraph_integer_t y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
             mt[kk] = mt[kk + M] ^ (y >> 1) ^ MAGIC(y);
         }
         for (; kk < N - 1; kk++) {
-            unsigned long y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
+            unsigned igraph_integer_t y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
             mt[kk] = mt[kk + (M - N)] ^ (y >> 1) ^ MAGIC(y);
         }
 
         {
-            unsigned long y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
+            unsigned igraph_integer_t y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
             mt[N - 1] = mt[M - 1] ^ (y >> 1) ^ MAGIC(y);
         }
 
@@ -382,9 +382,9 @@ igraph_real_t igraph_rng_mt19937_get_real(void *vstate) {
     return igraph_rng_mt19937_get (vstate) / 4294967296.0 ;
 }
 
-int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
+igraph_integer_t igraph_rng_mt19937_seed(void *vstate, unsigned igraph_integer_t seed) {
     igraph_i_rng_mt19937_state_t *state = vstate;
-    int i;
+    igraph_integer_t i;
 
     memset(state, 0, sizeof(igraph_i_rng_mt19937_state_t));
 
@@ -398,7 +398,7 @@ int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
            Ed. p.106 for multiplier. */
         state->mt[i] =
             (1812433253UL * (state->mt[i - 1] ^ (state->mt[i - 1] >> 30)) +
-             (unsigned long) i);
+             (unsigned igraph_integer_t) i);
         state->mt[i] &= 0xffffffffUL;
     }
 
@@ -406,7 +406,7 @@ int igraph_rng_mt19937_seed(void *vstate, unsigned long int seed) {
     return 0;
 }
 
-int igraph_rng_mt19937_init(void **state) {
+igraph_integer_t igraph_rng_mt19937_init(void **state) {
     igraph_i_rng_mt19937_state_t *st;
 
     st = igraph_Calloc(1, igraph_i_rng_mt19937_state_t);
@@ -535,7 +535,7 @@ double  Rf_rgeom(double);
 double  Rf_rbinom(double, double);
 double  Rf_rgamma(double, double);
 
-int igraph_rng_R_init(void **state) {
+igraph_integer_t igraph_rng_R_init(void **state) {
     IGRAPH_ERROR("R RNG error, unsupported function called",
                  IGRAPH_EINTERNAL);
     return 0;
@@ -546,14 +546,14 @@ void igraph_rng_R_destroy(void *state) {
                  __FILE__, __LINE__, IGRAPH_EINTERNAL);
 }
 
-int igraph_rng_R_seed(void *state, unsigned long int seed) {
+igraph_integer_t igraph_rng_R_seed(void *state, unsigned igraph_integer_t seed) {
     IGRAPH_ERROR("R RNG error, unsupported function called",
                  IGRAPH_EINTERNAL);
     return 0;
 }
 
-unsigned long int igraph_rng_R_get(void *state) {
-    return (unsigned long) (unif_rand() * 0x7FFFFFFFUL);
+unsigned igraph_integer_t igraph_rng_R_get(void *state) {
+    return (unsigned igraph_integer_t) (unif_rand() * 0x7FFFFFFFUL);
 }
 
 igraph_real_t igraph_rng_R_get_real(void *state) {
@@ -568,7 +568,7 @@ igraph_real_t igraph_rng_R_get_geom(void *state, igraph_real_t p) {
     return Rf_rgeom(p);
 }
 
-igraph_real_t igraph_rng_R_get_binom(void *state, long int n,
+igraph_real_t igraph_rng_R_get_binom(void *state, igraph_integer_t n,
                                      igraph_real_t p) {
     return Rf_rbinom(n, p);
 }
@@ -651,7 +651,7 @@ double igraph_rgamma(igraph_rng_t *rng, double shape, double scale);
  * it should be O(1).
  */
 
-int igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
+igraph_integer_t igraph_rng_init(igraph_rng_t *rng, const igraph_rng_type_t *type) {
     rng->type = type;
     IGRAPH_CHECK(rng->type->init(&rng->state));
     return 0;
@@ -682,7 +682,7 @@ void igraph_rng_destroy(igraph_rng_t *rng) {
  * Time complexity: usually O(1), but may depend on the type of the
  * RNG.
  */
-int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
+igraph_integer_t igraph_rng_seed(igraph_rng_t *rng, unsigned igraph_integer_t seed) {
     const igraph_rng_type_t *type = rng->type;
     rng->def = 0;
     IGRAPH_CHECK(type->seed(rng->state, seed));
@@ -700,7 +700,7 @@ int igraph_rng_seed(igraph_rng_t *rng, unsigned long int seed) {
  * Time complexity: O(1).
  */
 
-unsigned long int igraph_rng_max(igraph_rng_t *rng) {
+unsigned igraph_integer_t igraph_rng_max(igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
     return type->max;
 }
@@ -716,7 +716,7 @@ unsigned long int igraph_rng_max(igraph_rng_t *rng) {
  * Time complexity: O(1).
  */
 
-unsigned long int igraph_rng_min(igraph_rng_t *rng) {
+unsigned igraph_integer_t igraph_rng_min(igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
     return type->min;
 }
@@ -752,14 +752,14 @@ const char *igraph_rng_name(igraph_rng_t *rng) {
  * O(1).
  */
 
-long int igraph_rng_get_integer(igraph_rng_t *rng,
-                                long int l, long int h) {
+igraph_integer_t igraph_rng_get_integer(igraph_rng_t *rng,
+                                igraph_integer_t l, igraph_integer_t h) {
     const igraph_rng_type_t *type = rng->type;
     if (type->get_real) {
-        return (long int)(type->get_real(rng->state) * (h - l + 1) + l);
+        return (igraph_integer_t)(type->get_real(rng->state) * (h - l + 1) + l);
     } else if (type->get) {
-        unsigned long int max = type->max;
-        return (long int)(type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
+        unsigned igraph_integer_t max = type->max;
+        return (igraph_integer_t)(type->get(rng->state) / ((double)max + 1) * (h - l + 1) + l);
     }
     IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
 }
@@ -807,7 +807,7 @@ igraph_real_t igraph_rng_get_unif(igraph_rng_t *rng,
     if (type->get_real) {
         return type->get_real(rng->state) * (h - l) + l;
     } else if (type->get) {
-        unsigned long int max = type->max;
+        unsigned igraph_integer_t max = type->max;
         return type->get(rng->state) / ((double)max + 1) * (double)(h - l) + l;
     }
     IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
@@ -829,7 +829,7 @@ igraph_real_t igraph_rng_get_unif01(igraph_rng_t *rng) {
     if (type->get_real) {
         return type->get_real(rng->state);
     } else if (type->get) {
-        unsigned long int max = type->max;
+        unsigned igraph_integer_t max = type->max;
         return type->get(rng->state) / ((double)max + 1);
     }
     IGRAPH_ERROR("Internal random generator error", IGRAPH_EINTERNAL);
@@ -870,7 +870,7 @@ igraph_real_t igraph_rng_get_geom(igraph_rng_t *rng, igraph_real_t p) {
  * Time complexity: depends on the type of the RNG.
  */
 
-igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, long int n,
+igraph_real_t igraph_rng_get_binom(igraph_rng_t *rng, igraph_integer_t n,
                                    igraph_real_t p) {
     const igraph_rng_type_t *type = rng->type;
     if (type->get_binom) {
@@ -903,15 +903,15 @@ igraph_real_t igraph_rng_get_gamma(igraph_rng_t *rng, igraph_real_t shape,
     }
 }
 
-unsigned long int igraph_rng_get_int31(igraph_rng_t *rng) {
+unsigned igraph_integer_t igraph_rng_get_int31(igraph_rng_t *rng) {
     const igraph_rng_type_t *type = rng->type;
-    unsigned long int max = type->max;
+    unsigned igraph_integer_t max = type->max;
     if (type->get && max == 0x7FFFFFFFUL) {
         return type->get(rng->state);
     } else if (type->get_real) {
-        return (unsigned long int) (type->get_real(rng->state) * 0x7FFFFFFFUL);
+        return (unsigned igraph_integer_t) (type->get_real(rng->state) * 0x7FFFFFFFUL);
     } else {
-        return (unsigned long int) (igraph_rng_get_unif01(rng) * 0x7FFFFFFFUL);
+        return (unsigned igraph_integer_t) (igraph_rng_get_unif01(rng) * 0x7FFFFFFFUL);
     }
 }
 
@@ -971,7 +971,7 @@ float rintf (float x) {
  * result vector.
  */
 
-static int igraph_i_random_sample_alga(igraph_vector_t *res,
+static igraph_integer_t igraph_i_random_sample_alga(igraph_vector_t *res,
                                        igraph_integer_t l, igraph_integer_t h,
                                        igraph_integer_t length) {
     igraph_real_t N = h - l + 1;
@@ -1054,11 +1054,11 @@ static int igraph_i_random_sample_alga(igraph_vector_t *res,
  * \example examples/simple/igraph_random_sample.c
  */
 
-int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
+igraph_integer_t igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
                          igraph_integer_t length) {
     igraph_real_t N = h - l + 1;
     igraph_real_t n = length;
-    int retval;
+    igraph_integer_t retval;
 
     igraph_real_t nreal = length;
     igraph_real_t ninv = (nreal != 0) ? 1.0 / nreal : 0.0;
@@ -1090,7 +1090,7 @@ int igraph_random_sample(igraph_vector_t *res, igraph_real_t l, igraph_real_t h,
         return 0;
     }
     if (length == N) {
-        long int i = 0;
+        igraph_integer_t i = 0;
         IGRAPH_CHECK(igraph_vector_resize(res, length));
         for (i = 0; i < length; i++) {
             VECTOR(*res)[i] = l++;
@@ -1232,7 +1232,7 @@ double igraph_rgamma(igraph_rng_t *rng, double shape, double scale) {
  *  SYNOPSIS
  *
  *  double qnorm5(double p, double mu, double sigma,
- *            int lower_tail, int log_p)
+ *            igraph_integer_t lower_tail, igraph_integer_t log_p)
  *            {qnorm (..) is synonymous and preferred inside R}
  *
  *  DESCRIPTION
@@ -1325,8 +1325,8 @@ double igraph_rgamma(igraph_rng_t *rng, double shape, double scale) {
 
 /* Chebyshev Series */
 
-int chebyshev_init(double*, int, double);
-double  chebyshev_eval(double, const double *, const int);
+igraph_integer_t chebyshev_init(double*, igraph_integer_t, double);
+double  chebyshev_eval(double, const double *, const igraph_integer_t);
 
 /* Gamma and Related Functions */
 
@@ -1339,15 +1339,15 @@ double  lfastchoose(double, double);
 double  bd0(double, double);
 
 /* Consider adding these two to the API (Rmath.h): */
-double  dbinom_raw(double, double, double, double, int);
-double  dpois_raw (double, double, int);
-double  pnchisq_raw(double, double, double, double, double, int);
+double  dbinom_raw(double, double, double, double, igraph_integer_t);
+double  dpois_raw (double, double, igraph_integer_t);
+double  pnchisq_raw(double, double, double, double, double, igraph_integer_t);
 
-int i1mach(int);
+igraph_integer_t i1mach(igraph_integer_t);
 
 /* From toms708.c */
 void bratio(double a, double b, double x, double y,
-            double *w, double *w1, int *ierr);
+            double *w, double *w1, igraph_integer_t *ierr);
 
 
 #endif /* MATHLIB_PRIVATE_H */
@@ -1407,7 +1407,7 @@ void bratio(double a, double b, double x, double y,
 #define R_D_fexp(f,x)     (give_log ? -0.5*log(f)+(x) : exp(x)/sqrt(f))
 #define R_D_forceint(x)   floor((x) + 0.5)
 #define R_D_nonint(x)     (fabs((x) - floor((x)+0.5)) > 1e-7)
-/* [neg]ative or [non int]eger : */
+/* [neg]ative or [non igraph_integer_t]eger : */
 #define R_D_negInonint(x) (x < 0. || R_D_nonint(x))
 
 #define R_D_nonint_check(x)                 \
@@ -1416,7 +1416,7 @@ void bratio(double a, double b, double x, double y,
         return R_D__0;                  \
     }
 
-double igraph_qnorm5(double p, double mu, double sigma, int lower_tail, int log_p) {
+double igraph_qnorm5(double p, double mu, double sigma, igraph_integer_t lower_tail, igraph_integer_t log_p) {
     double p_, q, r, val;
 
 #ifdef IEEE_754
@@ -1443,7 +1443,7 @@ double igraph_qnorm5(double p, double mu, double sigma, int lower_tail, int log_
     q = p_ - 0.5;
 
     /*-- use AS 241 --- */
-    /* double ppnd16_(double *p, long *ifault)*/
+    /* double ppnd16_(double *p, igraph_integer_t *ifault)*/
     /*      ALGORITHM AS241  APPL. STATIST. (1988) VOL. 37, NO. 3
 
             Produces the normal deviate Z corresponding to a given lower
@@ -1525,11 +1525,11 @@ double fsign(double x, double y) {
     return ((y >= 0) ? fabs(x) : -fabs(x));
 }
 
-int imax2(int x, int y) {
+igraph_integer_t imax2(igraph_integer_t x, igraph_integer_t y) {
     return (x < y) ? y : x;
 }
 
-int imin2(int x, int y) {
+igraph_integer_t imin2(igraph_integer_t x, igraph_integer_t y) {
     return (x < y) ? x : y;
 }
 
@@ -1554,7 +1554,7 @@ int imin2(int x, int y) {
 #include <float.h>   /* needed later down below by _finite() */
 #endif
 
-int R_finite(double x) {
+igraph_integer_t R_finite(double x) {
 #if HAVE_WORKING_ISFINITE || HAVE_DECL_ISFINITE
     return isfinite(x);
 #elif HAVE_WORKING_FINITE || HAVE_FINITE
@@ -1572,12 +1572,12 @@ int R_finite(double x) {
 #endif
 }
 
-int R_isnancpp(double x) {
+igraph_integer_t R_isnancpp(double x) {
     return (isnan(x) != 0);
 }
 
 #ifdef __cplusplus
-    int R_isnancpp(double); /* in arithmetic.c */
+    igraph_integer_t R_isnancpp(double); /* in arithmetic.c */
     #define ISNAN(x)     R_isnancpp(x)
 #else
     #define ISNAN(x)     (isnan(x)!=0)
@@ -1590,7 +1590,7 @@ double igraph_norm_rand(igraph_rng_t *rng) {
 #define BIG 134217728 /* 2^27 */
     /* unif_rand() alone is not of high enough precision */
     u1 = igraph_rng_get_unif01(rng);
-    u1 = (int)(BIG * u1) + igraph_rng_get_unif01(rng);
+    u1 = (igraph_integer_t)(BIG * u1) + igraph_rng_get_unif01(rng);
     return igraph_qnorm5(u1 / BIG, 0.0, 1.0, 1, 0);
 }
 
@@ -1653,7 +1653,7 @@ double igraph_exp_rand(igraph_rng_t *rng) {
         1.0000000000000000
     };
     double a, u, ustar, umin;
-    int i;
+    igraph_integer_t i;
 
     a = 0.;
     /* precaution if u = 0 is ever returned */
@@ -1749,7 +1749,7 @@ double igraph_rpois(igraph_rng_t *rng, double mu) {
     };
 
     /* These are static --- persistent between calls for same mu : */
-    static IGRAPH_THREAD_LOCAL int l, m;
+    static IGRAPH_THREAD_LOCAL igraph_integer_t l, m;
 
     static IGRAPH_THREAD_LOCAL double b1, b2, c, c0, c1, c2, c3;
     static IGRAPH_THREAD_LOCAL double pp[36], p0, p, q, s, d, omega;
@@ -1759,7 +1759,7 @@ double igraph_rpois(igraph_rng_t *rng, double mu) {
     /* Local Vars  [initialize some for -Wall]: */
     double del, difmuk = 0., E = 0., fk = 0., fx, fy, g, px, py, t, u = 0., v, x;
     double pois = -1.;
-    int k, kflag, big_mu, new_big_mu = FALSE;
+    igraph_integer_t k, kflag, big_mu, new_big_mu = FALSE;
 
     if (!R_FINITE(mu)) {
         ML_ERR_return_NAN;
@@ -1794,7 +1794,7 @@ double igraph_rpois(igraph_rng_t *rng, double mu) {
             /*muprev = 0.;-* such that next time, mu != muprev ..*/
             if (mu != muprev) {
                 muprev = mu;
-                m = imax2(1, (int) mu);
+                m = imax2(1, (igraph_integer_t) mu);
                 l = 0; /* pp[] is already ok up to pp[l] */
                 q = p0 = p = exp(-mu);
             }
@@ -1905,7 +1905,7 @@ Step_F: /* 'subroutine' F : calculation of px,py,fx,fy. */
 
             if (pois < 10) { /* use factorials from table fact[] */
                 px = -mu;
-                py = pow(mu, pois) / fact[(int)pois];
+                py = pow(mu, pois) / fact[(igraph_integer_t)pois];
             } else {
                 /* Case pois >= 10 uses polynomial approximation
                    a0-a7 for accuracy when advisable */
@@ -1967,12 +1967,12 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
     static IGRAPH_THREAD_LOCAL double xl, xll, xlr, xm, xr;
 
     static IGRAPH_THREAD_LOCAL double psave = -1.0;
-    static IGRAPH_THREAD_LOCAL int nsave = -1;
-    static IGRAPH_THREAD_LOCAL int m;
+    static IGRAPH_THREAD_LOCAL igraph_integer_t nsave = -1;
+    static IGRAPH_THREAD_LOCAL igraph_integer_t m;
 
     double f, f1, f2, u, v, w, w2, x, x1, x2, z, z2;
     double p, q, np, g, r, al, alv, amaxp, ffm, ynorm;
-    int i, ix, k, n;
+    igraph_integer_t i, ix, k, n;
 
     if (!R_FINITE(nin)) {
         ML_ERR_return_NAN;
@@ -2018,7 +2018,7 @@ double igraph_rbinom(igraph_rng_t *rng, double nin, double pp) {
             m = ffm;
             fm = m;
             npq = np * q;
-            p1 = (int)(2.195 * sqrt(npq) - 4.6 * q) + 0.5;
+            p1 = (igraph_integer_t)(2.195 * sqrt(npq) - 4.6 * q) + 0.5;
             xm = fm + 0.5;
             xl = xm - p1;
             xr = xm + p1;
@@ -2171,7 +2171,7 @@ igraph_real_t igraph_rexp(igraph_rng_t *rng, double rate) {
  *
  *  SYNOPSIS
  *
- *      double dnorm4(double x, double mu, double sigma, int give_log)
+ *      double dnorm4(double x, double mu, double sigma, igraph_integer_t give_log)
  *            {dnorm (..) is synonymous and preferred inside R}
  *
  *  DESCRIPTION
@@ -2179,7 +2179,7 @@ igraph_real_t igraph_rexp(igraph_rng_t *rng, double rate) {
  *      Compute the density of the normal distribution.
  */
 
-double igraph_dnorm(double x, double mu, double sigma, int give_log) {
+double igraph_dnorm(double x, double mu, double sigma, igraph_integer_t give_log) {
 #ifdef IEEE_754
     if (ISNAN(x) || ISNAN(mu) || ISNAN(sigma)) {
         return x + mu + sigma;
@@ -2434,7 +2434,7 @@ double igraph_rgamma(igraph_rng_t *rng, double a, double scale) {
 
 #endif
 
-int igraph_rng_get_dirichlet(igraph_rng_t *rng,
+igraph_integer_t igraph_rng_get_dirichlet(igraph_rng_t *rng,
                              const igraph_vector_t *alpha,
                              igraph_vector_t *result) {
 
@@ -2472,9 +2472,9 @@ int igraph_rng_get_dirichlet(igraph_rng_t *rng,
  * Testing purposes                                       *
  *********************************************************/
 
-/* int main() { */
+/* igraph_integer_t main() { */
 
-/*   int i; */
+/*   igraph_integer_t i; */
 
 /*   RNG_BEGIN(); */
 

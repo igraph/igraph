@@ -33,9 +33,9 @@
  * them to trees.
  */
 
-static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+static igraph_integer_t igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     igraph_vector_int_t prufer;
-    long i;
+    igraph_integer_t i;
 
     if (directed) {
         IGRAPH_ERROR("The Prufer method for random tree generation does not support directed trees", IGRAPH_EINVAL);
@@ -74,11 +74,11 @@ static int igraph_i_tree_game_prufer(igraph_t *graph, igraph_integer_t n, igraph
         VECTOR(vec)[j] = temp; \
     }
 
-static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
+static igraph_integer_t igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed) {
     igraph_vector_t edges;
     igraph_vector_int_t vertices;
     igraph_vector_bool_t visited;
-    long i, j, k;
+    igraph_integer_t i, j, k;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 2 * (n - 1));
 
@@ -175,7 +175,7 @@ static int igraph_i_tree_game_loop_erased_random_walk(igraph_t *graph, igraph_in
  *
  */
 
-int igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
+igraph_integer_t igraph_tree_game(igraph_t *graph, igraph_integer_t n, igraph_bool_t directed, igraph_random_tree_t method) {
     if (n < 2) {
         IGRAPH_CHECK(igraph_empty(graph, n, directed));
         return IGRAPH_SUCCESS;

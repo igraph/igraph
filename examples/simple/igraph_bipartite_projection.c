@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include <stdlib.h>
 
-int check_projection(const igraph_t *graph,
+igraph_integer_t check_projection(const igraph_t *graph,
                      const igraph_vector_bool_t *types,
                      const igraph_t *proj1,
                      const igraph_t *proj2) {
@@ -46,12 +46,12 @@ int check_projection(const igraph_t *graph,
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g, p1, p2, full, ring;
     igraph_vector_bool_t types;
     igraph_bool_t iso;
-    long int i, m2 = 0, w, f, t;
+    igraph_integer_t i, m2 = 0, w, f, t;
     igraph_vector_t mult1, mult2;
 
     /*******************************************************/

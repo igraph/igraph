@@ -29,16 +29,16 @@
 #define TRANSIT_TRIEDGES
 #endif
 
-long int no_of_nodes = igraph_vcount(graph);
-long int node, i, j, nn;
+igraph_integer_t no_of_nodes = igraph_vcount(graph);
+igraph_integer_t node, i, j, nn;
 igraph_adjlist_t allneis;
 igraph_vector_int_t *neis1, *neis2;
-long int neilen1, neilen2;
-long int *neis;
-long int maxdegree;
+igraph_integer_t neilen1, neilen2;
+igraph_integer_t *neis;
+igraph_integer_t maxdegree;
 
 #ifdef TRANSIT_TRIEDGES
-long int deg1;
+igraph_integer_t deg1;
 #endif
 
 igraph_vector_int_t order;
@@ -51,7 +51,7 @@ IGRAPH_VECTOR_INIT_FINALLY(&degree, no_of_nodes);
 
 IGRAPH_CHECK(igraph_degree(graph, &degree, igraph_vss_all(), IGRAPH_ALL,
                            IGRAPH_LOOPS));
-maxdegree = (long int) igraph_vector_max(&degree) + 1;
+maxdegree = (igraph_integer_t) igraph_vector_max(&degree) + 1;
 igraph_vector_order1_int(&degree, &order, maxdegree);
 igraph_vector_int_init(&rank, no_of_nodes);
 IGRAPH_FINALLY(igraph_vector_int_destroy, &rank);
@@ -63,7 +63,7 @@ IGRAPH_CHECK(igraph_adjlist_init(graph, &allneis, IGRAPH_ALL));
 IGRAPH_FINALLY(igraph_adjlist_destroy, &allneis);
 IGRAPH_CHECK(igraph_i_trans4_al_simplify(&allneis, &rank));
 
-neis = igraph_Calloc(no_of_nodes, long int);
+neis = igraph_Calloc(no_of_nodes, igraph_integer_t);
 if (neis == 0) {
     IGRAPH_ERROR("undirected local transitivity failed", IGRAPH_ENOMEM);
 }
@@ -85,20 +85,20 @@ for (nn = no_of_nodes - 1; nn >= 0; nn--) {
     neilen1 = igraph_vector_int_size(neis1);
 
 #ifdef TRANSIT_TRIEDGES
-    deg1 = (long int) VECTOR(degree)[node];
+    deg1 = (igraph_integer_t) VECTOR(degree)[node];
 #endif
 
     /* Mark the neighbors of the node */
     for (i = 0; i < neilen1; i++) {
-        neis[ (long int) VECTOR(*neis1)[i] ] = node + 1;
+        neis[ (igraph_integer_t) VECTOR(*neis1)[i] ] = node + 1;
     }
 
     for (i = 0; i < neilen1; i++) {
-        long int nei = (long int) VECTOR(*neis1)[i];
+        igraph_integer_t nei = (igraph_integer_t) VECTOR(*neis1)[i];
         neis2 = igraph_adjlist_get(&allneis, nei);
         neilen2 = igraph_vector_int_size(neis2);
         for (j = 0; j < neilen2; j++) {
-            long int nei2 = (long int) VECTOR(*neis2)[j];
+            igraph_integer_t nei2 = (igraph_integer_t) VECTOR(*neis2)[j];
             if (neis[nei2] == node + 1) {
 #ifndef TRIANGLES
                 VECTOR(*res)[nei2] += 1;

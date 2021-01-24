@@ -5,9 +5,9 @@
 
 #include "test_utilities.inc"
 
-int random_permutation(igraph_vector_t *vec) {
+igraph_integer_t random_permutation(igraph_vector_t *vec) {
     /* We just do size(vec) * 2 swaps */
-    long int one, two, tmp, i, n = igraph_vector_size(vec);
+    igraph_integer_t one, two, tmp, i, n = igraph_vector_size(vec);
     for (i = 0; i < 2 * n; i++) {
         one = (double)rand() / RAND_MAX * n;
         two = (double)rand() / RAND_MAX * n;
@@ -20,7 +20,7 @@ int random_permutation(igraph_vector_t *vec) {
 
 
 void test3() {
-    int i, j;
+    igraph_integer_t i, j;
     igraph_vector_ptr_t graphs3;
 
     // Verify that no two 3-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
@@ -62,7 +62,7 @@ void test3() {
 
 
 void test4() {
-    int i, j;
+    igraph_integer_t i, j;
     igraph_vector_ptr_t graphs4;
 
     // Verify that no two 4-vertex graphs of distinct isoclasses are considered isomorphic by Bliss or VF2.
@@ -205,7 +205,7 @@ void test_bug_995() {
     igraph_destroy(&g2);
 }
 
-int main() {
+igraph_integer_t main() {
 
     test3();
     test4();

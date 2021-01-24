@@ -77,7 +77,7 @@
  * \example examples/simple/igraph_community_optimal_modularity.c
  */
 
-int igraph_community_optimal_modularity(const igraph_t *graph,
+igraph_integer_t igraph_community_optimal_modularity(const igraph_t *graph,
                                         igraph_real_t *modularity,
                                         igraph_vector_t *membership,
                                         const igraph_vector_t *weights) {
@@ -90,9 +90,9 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     igraph_integer_t no_of_nodes = (igraph_integer_t) igraph_vcount(graph);
     igraph_integer_t no_of_edges = (igraph_integer_t) igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
-    int no_of_variables = no_of_nodes * (no_of_nodes + 1) / 2;
-    int i, j, k, l, st;
-    int idx[] = { 0, 0, 0, 0 };
+    igraph_integer_t no_of_variables = no_of_nodes * (no_of_nodes + 1) / 2;
+    igraph_integer_t i, j, k, l, st;
+    igraph_integer_t idx[] = { 0, 0, 0, 0 };
     double coef[] = { 0.0, 1.0, 1.0, -2.0 };
     igraph_real_t total_weight;
     igraph_vector_t indegree;
@@ -163,7 +163,7 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
             IGRAPH_ALLOW_INTERRUPTION();
 
             for (k = j + 1; k < no_of_nodes; k++) {
-                int newrow = glp_add_rows(ip, 3);
+                igraph_integer_t newrow = glp_add_rows(ip, 3);
 
                 glp_set_row_bnds(ip, newrow, GLP_UP, 0.0, 1.0);
                 idx[1] = (st + IDX(i, j)); idx[2] = (st + IDX(j, k));
@@ -228,14 +228,14 @@ int igraph_community_optimal_modularity(const igraph_t *graph,
     }
 
     if (membership) {
-        long int comm = 0;   /* id of the last community that was found */
+        igraph_integer_t comm = 0;   /* id of the last community that was found */
         IGRAPH_CHECK(igraph_vector_resize(membership, no_of_nodes));
         for (i = 0; i < no_of_nodes; i++) {
 
             IGRAPH_ALLOW_INTERRUPTION();
 
             for (j = 0; j < i; j++) {
-                int val = (int) glp_mip_col_val(ip, st + IDX(j, i));
+                igraph_integer_t val = (igraph_integer_t) glp_mip_col_val(ip, st + IDX(j, i));
                 if (val == 1) {
                     VECTOR(*membership)[i] = VECTOR(*membership)[j];
                     break;

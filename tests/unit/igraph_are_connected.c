@@ -28,11 +28,11 @@
 
 /* Crash the library function here. We expect error codes to be returned here.
  */
-int error_test() {
+igraph_integer_t error_test() {
     igraph_t g;
     igraph_bool_t connected;
     igraph_integer_t nvert, u, v;
-    int ret;
+    igraph_integer_t ret;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
     igraph_small(&g, /*nvert*/ 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
@@ -53,7 +53,7 @@ int error_test() {
 
 /* Testing for two vertices being connected by an edge in various graphs.
  */
-int connected_test() {
+igraph_integer_t connected_test() {
     igraph_t gcomplete, gempty;
     igraph_bool_t connected;
     igraph_integer_t nvert, u, v;
@@ -95,8 +95,8 @@ int connected_test() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
-    int ret;
+igraph_integer_t main() {
+    igraph_integer_t ret;
 
     ret = error_test();
     if (ret) {

@@ -113,12 +113,12 @@ void test_2x2(igraph_real_t a, igraph_real_t b, igraph_real_t c, igraph_real_t d
     igraph_sparsemat_destroy(&B);
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_sparsemat_t A, B;
     igraph_matrix_t vectors, values2;
     igraph_vector_t values;
-    long int i;
+    igraph_integer_t i;
     igraph_arpack_options_t options;
     igraph_real_t min, max;
     igraph_t g1, g2, g3;

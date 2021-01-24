@@ -29,8 +29,8 @@
 
 #include "test_utilities.inc"
 
-int main () {
-    long int i;
+igraph_integer_t main () {
+    igraph_integer_t i;
     igraph_matrix_t m;
     igraph_real_t x, y, z, r;
 

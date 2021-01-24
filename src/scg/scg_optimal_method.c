@@ -41,11 +41,11 @@
 #include "igraph_matrix.h"
 #include "igraph_vector.h"
 
-int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
-                               int nt, int matrix, const igraph_real_t *p,
+igraph_integer_t igraph_i_optimal_partition(const igraph_real_t *v, igraph_integer_t *gr, igraph_integer_t n,
+                               igraph_integer_t nt, igraph_integer_t matrix, const igraph_real_t *p,
                                igraph_real_t *value) {
 
-    int i, non_ties, q, j, l, part_ind, col;
+    igraph_integer_t i, non_ties, q, j, l, part_ind, col;
     igraph_i_scg_indval_t *vs = igraph_Calloc(n, igraph_i_scg_indval_t);
     igraph_real_t *Cv, temp, sumOfSquares;
     igraph_vector_t ps;
@@ -108,7 +108,7 @@ int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
       -------Fills up matrices F and Q-------------------
       -------------------------------------------------*/
     /*here j also is a counter but the use of unsigned variables
-      is to be proscribed in "for (unsigned int j=...;j>=0;j--)",
+      is to be proscribed in "for (unsigned igraph_integer_t j=...;j>=0;j--)",
       for such loops never ends!*/
 
     IGRAPH_MATRIX_INIT_FINALLY(&F, nt, n);
@@ -181,12 +181,12 @@ int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n,
     return 0;
 }
 
-int igraph_i_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
-                         int n,  int matrix, const igraph_vector_t *ps) {
+igraph_integer_t igraph_i_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
+                         igraph_integer_t n,  igraph_integer_t matrix, const igraph_vector_t *ps) {
 
     /* if symmetric of Laplacian SCG -> same Cv */
     if (matrix == 1 || matrix == 2) {
-        int i, j;
+        igraph_integer_t i, j;
         igraph_vector_t w, w2;
 
         IGRAPH_VECTOR_INIT_FINALLY(&w, n + 1);
@@ -216,7 +216,7 @@ int igraph_i_cost_matrix(igraph_real_t*Cv, const igraph_i_scg_indval_t *vs,
     /* if stochastic */
     /* TODO: optimize it to O(n^2) instead of O(n^3) (as above) */
     if (matrix == 3) {
-        int i, j, k;
+        igraph_integer_t i, j, k;
         igraph_real_t t1, t2;
         for (i = 0; i < n; i++) {
             for (j = i + 1; j < n; j++) {

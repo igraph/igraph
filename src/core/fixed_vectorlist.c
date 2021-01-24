@@ -26,7 +26,7 @@
 #include "core/fixed_vectorlist.h"
 
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
-    long int i, n = igraph_vector_ptr_size(&l->v);
+    igraph_integer_t i, n = igraph_vector_ptr_size(&l->v);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(l->v)[i];
         if (v) {
@@ -37,12 +37,12 @@ void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l) {
     igraph_free(l->vecs);
 }
 
-int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
+igraph_integer_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     const igraph_vector_t *from,
-                                    long int size) {
+                                    igraph_integer_t size) {
 
     igraph_vector_t sizes;
-    long int i, no = igraph_vector_size(from);
+    igraph_integer_t i, no = igraph_vector_size(from);
 
     l->vecs = igraph_Calloc(size, igraph_vector_t);
     if (!l->vecs) {
@@ -55,19 +55,19 @@ int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
     IGRAPH_VECTOR_INIT_FINALLY(&sizes, size);
 
     for (i = 0; i < no; i++) {
-        long int to = (long int) VECTOR(*from)[i];
+        igraph_integer_t to = (igraph_integer_t) VECTOR(*from)[i];
         if (to >= 0) {
             VECTOR(sizes)[to] += 1;
         }
     }
     for (i = 0; i < size; i++) {
         igraph_vector_t *v = &(l->vecs[i]);
-        IGRAPH_CHECK(igraph_vector_init(v, (long int) VECTOR(sizes)[i]));
+        IGRAPH_CHECK(igraph_vector_init(v, (igraph_integer_t) VECTOR(sizes)[i]));
         igraph_vector_clear(v);
         VECTOR(l->v)[i] = v;
     }
     for (i = 0; i < no; i++) {
-        long int to = (long int) VECTOR(*from)[i];
+        igraph_integer_t to = (igraph_integer_t) VECTOR(*from)[i];
         if (to >= 0) {
             igraph_vector_t *v = &(l->vecs[to]);
             igraph_vector_push_back(v, i);

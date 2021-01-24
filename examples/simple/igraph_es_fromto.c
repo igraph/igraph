@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     const igraph_vector_t v = IGRAPH_VECTOR_NULL;
@@ -31,7 +31,7 @@ int main() {
     igraph_vector_t from, to;
     igraph_es_t it;
     igraph_integer_t size;
-    long int i;
+    igraph_integer_t i;
 
     igraph_vector_view(&v, edges1, sizeof(edges1) / sizeof(igraph_real_t));
 
@@ -53,7 +53,7 @@ int main() {
     igraph_vector_clear(&from);
     igraph_vector_clear(&to);
     igraph_es_size(&g, &it, &size);
-    printf("%ld\n", (long)size);
+    printf("%ld\n", (igraph_integer_t)size);
     while (!igraph_es_end(&g, &it)) {
         igraph_vector_push_back(&from, igraph_es_from(&g, &it));
         igraph_vector_push_back(&to, igraph_es_to(&g, &it));

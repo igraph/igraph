@@ -25,7 +25,7 @@
 #include <igraph.h>
 
 void print_matrix(igraph_matrix_t *m, FILE *f) {
-    long int i, j;
+    igraph_integer_t i, j;
     for (i = 0; i < igraph_matrix_nrow(m); i++) {
         for (j = 0; j < igraph_matrix_ncol(m); j++) {
             fprintf(f, " %.2f", MATRIX(*m, i, j));
@@ -35,10 +35,10 @@ void print_matrix(igraph_matrix_t *m, FILE *f) {
     fprintf(f, "==========\n");
 }
 
-int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
+igraph_integer_t check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
                       igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_vector_t pairs, res;
-    long int i, j, k, n;
+    igraph_integer_t i, j, k, n;
     igraph_eit_t eit;
 
     igraph_vector_init(&res, 0);
@@ -73,7 +73,7 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
     igraph_eit_create(g, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &eit);
     k = 0;
     while (!IGRAPH_EIT_END(eit)) {
-        long int eid = IGRAPH_EIT_GET(eit);
+        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         i = IGRAPH_FROM(g, eid);
         j = IGRAPH_TO(g, eid);
         if (fabs(VECTOR(res)[k] - MATRIX(*m, i, j)) > 1e-6) {
@@ -93,10 +93,10 @@ int check_jaccard_all(const igraph_t* g, igraph_matrix_t* m,
     return 0;
 }
 
-int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
+igraph_integer_t check_dice_all(const igraph_t* g, igraph_matrix_t* m,
                    igraph_neimode_t mode, igraph_bool_t loops) {
     igraph_vector_t pairs, res;
-    long int i, j, k, n;
+    igraph_integer_t i, j, k, n;
     igraph_eit_t eit;
 
     igraph_vector_init(&res, 0);
@@ -131,7 +131,7 @@ int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
     igraph_eit_create(g, igraph_ess_all(IGRAPH_EDGEORDER_FROM), &eit);
     k = 0;
     while (!IGRAPH_EIT_END(eit)) {
-        long int eid = IGRAPH_EIT_GET(eit);
+        igraph_integer_t eid = IGRAPH_EIT_GET(eit);
         i = IGRAPH_FROM(g, eid);
         j = IGRAPH_TO(g, eid);
         if (fabs(VECTOR(res)[k] - MATRIX(*m, i, j)) > 1e-6) {
@@ -151,11 +151,11 @@ int check_dice_all(const igraph_t* g, igraph_matrix_t* m,
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_matrix_t m;
-    int ret;
+    igraph_integer_t ret;
 
     igraph_small(&g, 0, IGRAPH_DIRECTED,
                  0, 1, 2, 1, 2, 0, 3, 0,

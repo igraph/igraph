@@ -62,65 +62,65 @@
 #include <stdlib.h>
 
 typedef struct ind_val {
-    int ind;
+    igraph_integer_t ind;
     igraph_real_t val;
 } igraph_i_scg_indval_t;
 
-int igraph_i_compare_ind_val(const void *a, const void *b);
+igraph_integer_t igraph_i_compare_ind_val(const void *a, const void *b);
 
 typedef struct groups {
-    int ind;
-    int n;
-    int* gr;
+    igraph_integer_t ind;
+    igraph_integer_t n;
+    igraph_integer_t* gr;
 } igraph_i_scg_groups_t;
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_approximate_methods.c---
 ---------------------------------------------------*/
 
-int igraph_i_breaks_computation(const igraph_vector_t *v,
-                                igraph_vector_t *breaks, int nb,
-                                int method);
-int igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, int *gr,
-                                   int n, int n_interv,
-                                   int maxiter);
-int igraph_i_intervals_method(const igraph_vector_t *v, int *gr,
-                              int n, int n_interv);
+igraph_integer_t igraph_i_breaks_computation(const igraph_vector_t *v,
+                                igraph_vector_t *breaks, igraph_integer_t nb,
+                                igraph_integer_t method);
+igraph_integer_t igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, igraph_integer_t *gr,
+                                   igraph_integer_t n, igraph_integer_t n_interv,
+                                   igraph_integer_t maxiter);
+igraph_integer_t igraph_i_intervals_method(const igraph_vector_t *v, igraph_integer_t *gr,
+                              igraph_integer_t n, igraph_integer_t n_interv);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_optimal_method.c--------
 ---------------------------------------------------*/
 
-int igraph_i_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs,
-                         int n, int matrix, const igraph_vector_t *ps);
-int igraph_i_optimal_partition(const igraph_real_t *v, int *gr, int n, int nt,
-                               int matrix, const igraph_real_t *p,
+igraph_integer_t igraph_i_cost_matrix(igraph_real_t *Cv, const igraph_i_scg_indval_t *vs,
+                         igraph_integer_t n, igraph_integer_t matrix, const igraph_vector_t *ps);
+igraph_integer_t igraph_i_optimal_partition(const igraph_real_t *v, igraph_integer_t *gr, igraph_integer_t n, igraph_integer_t nt,
+                               igraph_integer_t matrix, const igraph_real_t *p,
                                igraph_real_t *value);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_kmeans.c----------------
 ---------------------------------------------------*/
 
-int igraph_i_kmeans_Lloyd(const igraph_vector_t *x, int n,
-                          int p, igraph_vector_t *centers,
-                          int k, int *cl, int maxiter);
+igraph_integer_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_integer_t n,
+                          igraph_integer_t p, igraph_vector_t *centers,
+                          igraph_integer_t k, igraph_integer_t *cl, igraph_integer_t maxiter);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_exact_scg.c-------------
 ---------------------------------------------------*/
 
-int igraph_i_exact_coarse_graining(const igraph_real_t *v, int *gr,
-                                   int n);
+igraph_integer_t igraph_i_exact_coarse_graining(const igraph_real_t *v, igraph_integer_t *gr,
+                                   igraph_integer_t n);
 
 /*-------------------------------------------------
 ------------DEFINED IN scg_utils.c-----------------
 ---------------------------------------------------*/
 
-int igraph_i_compare_groups(const void *a, const void *b);
-int igraph_i_compare_real(const void *a, const void *b);
-int igraph_i_compare_int(const void *a, const void *b);
+igraph_integer_t igraph_i_compare_groups(const void *a, const void *b);
+igraph_integer_t igraph_i_compare_real(const void *a, const void *b);
+igraph_integer_t igraph_i_compare_int(const void *a, const void *b);
 
-igraph_real_t *igraph_i_real_sym_matrix(int size);
+igraph_real_t *igraph_i_real_sym_matrix(igraph_integer_t size);
 #define igraph_i_real_sym_mat_get(S,i,j) S[i+j*(j+1)/2]
 #define igraph_i_real_sym_mat_set(S,i,j,val) S[i+j*(j+1)/2] = val
 #define igraph_i_free_real_sym_matrix(S) igraph_Free(S)

@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
     igraph_t g;
     igraph_vector_t outdeg, indeg, vec;
     igraph_bool_t is_simple;

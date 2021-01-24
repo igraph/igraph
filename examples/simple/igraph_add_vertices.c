@@ -23,11 +23,11 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g1;
     igraph_vector_t v1;
-    int ret;
+    igraph_integer_t ret;
 
     /* Create a graph */
     igraph_vector_init(&v1, 8);

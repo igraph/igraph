@@ -26,18 +26,18 @@
 #include <stdlib.h>
 
 void print_vector(igraph_vector_t *v) {
-    long int i, l = igraph_vector_size(v);
+    igraph_integer_t i, l = igraph_vector_size(v);
     for (i = 0; i < l; i++) {
-        printf(" %li", (long int) VECTOR(*v)[i]);
+        printf(" %li", (igraph_integer_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
 
-int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
-                const igraph_vector_ptr_t *evecs, int error_code) {
+igraph_integer_t check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
+                const igraph_vector_ptr_t *evecs, igraph_integer_t error_code) {
 
     igraph_bool_t directed = igraph_is_directed(graph);
-    long int i, n = igraph_vector_ptr_size(vecs);
+    igraph_integer_t i, n = igraph_vector_ptr_size(vecs);
     if (igraph_vector_ptr_size(evecs) != n) {
         exit(error_code + 1);
     }
@@ -45,7 +45,7 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
     for (i = 0; i < n; i++) {
         igraph_vector_t *vvec = VECTOR(*vecs)[i];
         igraph_vector_t *evec = VECTOR(*evecs)[i];
-        long int j, n2 = igraph_vector_size(evec);
+        igraph_integer_t j, n2 = igraph_vector_size(evec);
         if (igraph_vector_size(vvec) == 0 && n2 == 0) {
             continue;
         }
@@ -53,21 +53,21 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
             exit(error_code + 2);
         }
         for (j = 0; j < n2; j++) {
-            long int edge = VECTOR(*evec)[j];
-            long int from = VECTOR(*vvec)[j];
-            long int to = VECTOR(*vvec)[j + 1];
+            igraph_integer_t edge = VECTOR(*evec)[j];
+            igraph_integer_t from = VECTOR(*vvec)[j];
+            igraph_integer_t to = VECTOR(*vvec)[j + 1];
             if (directed) {
                 if (from != IGRAPH_FROM(graph, edge) ||
                     to   != IGRAPH_TO  (graph, edge)) {
                     exit(error_code);
                 }
             } else {
-                long int from2 = IGRAPH_FROM(graph, edge);
-                long int to2 = IGRAPH_TO(graph, edge);
-                long int min1 = from < to ? from : to;
-                long int max1 = from < to ? to : from;
-                long int min2 = from2 < to2 ? from2 : to2;
-                long int max2 = from2 < to2 ? to2 : from2;
+                igraph_integer_t from2 = IGRAPH_FROM(graph, edge);
+                igraph_integer_t to2 = IGRAPH_TO(graph, edge);
+                igraph_integer_t min1 = from < to ? from : to;
+                igraph_integer_t max1 = from < to ? to : from;
+                igraph_integer_t min2 = from2 < to2 ? from2 : to2;
+                igraph_integer_t max2 = from2 < to2 ? to2 : from2;
                 if (min1 != min2 || max1 != max2) {
                     exit(error_code + 3);
                 }
@@ -78,9 +78,9 @@ int check_evecs(const igraph_t *graph, const igraph_vector_ptr_t *vecs,
     return 0;
 }
 
-int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
-                       const igraph_vector_long_t* inbound, int start, int error_code) {
-    long int i, n = igraph_vcount(graph);
+igraph_integer_t check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
+                       const igraph_vector_long_t* inbound, igraph_integer_t start, igraph_integer_t error_code) {
+    igraph_integer_t i, n = igraph_vcount(graph);
 
     if (igraph_vector_long_size(pred) != n ||
         igraph_vector_long_size(inbound) != n) {
@@ -104,10 +104,10 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
                 exit(error_code + 4);
             }
         } else {
-            long int eid = VECTOR(*inbound)[i];
-            long int u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
+            igraph_integer_t eid = VECTOR(*inbound)[i];
+            igraph_integer_t u = IGRAPH_FROM(graph, eid), v = IGRAPH_TO(graph, eid);
             if (v != i && !igraph_is_directed(graph)) {
-                long int dummy = u;
+                igraph_integer_t dummy = u;
                 u = v;
                 v = dummy;
             }
@@ -122,12 +122,12 @@ int check_pred_inbound(const igraph_t* graph, const igraph_vector_long_t* pred,
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_ptr_t vecs, evecs;
     igraph_vector_long_t pred, inbound;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t weights[] = { 1, 2, 3, 4, 5, 1, 1, 1, 1, 1 };
     igraph_real_t weights2[] = { 0, 2, 1, 0, 5, 2, 1, 1, 0, 2, 2, 8, 1, 1, 3, 1, 1, 4, 2, 1 };
     igraph_vector_t weights_vec;

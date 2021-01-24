@@ -25,13 +25,13 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_t g;
     igraph_vector_t tdist;
     igraph_matrix_t pmat;
     igraph_bool_t conn;
     igraph_vector_bool_t bs;
-    int i;
+    igraph_integer_t i;
 
     /* Symmetric preference game */
     igraph_vector_bool_init(&bs, 0);

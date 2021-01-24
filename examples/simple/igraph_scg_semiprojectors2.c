@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_matrix_t L, R;
@@ -50,7 +50,7 @@ int main() {
     igraph_matrix_complex_init(&V2, 0, 0);
     igraph_vector_init(&p, 0);
 
-    igraph_get_stochastic_sparsemat(&g, &stochastic, /*column-wise=*/ 0);  
+    igraph_get_stochastic_sparsemat(&g, &stochastic, /*column-wise=*/ 0);
 
     /* p is always the eigenvector corresponding to the 1-eigenvalue.
      * Since the graph is undirected, p is proportional to the degree vector. */

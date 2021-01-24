@@ -57,16 +57,16 @@
     #define igraphdsyrk_    dsyrk_
 #endif
 
-int igraphdgemv_(char *trans, int *m, int *n, igraph_real_t *alpha,
-                 igraph_real_t *a, int *lda, igraph_real_t *x, int *incx,
-                 igraph_real_t *beta, igraph_real_t *y, int *incy);
+igraph_integer_t igraphdgemv_(char *trans, igraph_integer_t *m, igraph_integer_t *n, igraph_real_t *alpha,
+                 igraph_real_t *a, igraph_integer_t *lda, igraph_real_t *x, igraph_integer_t *incx,
+                 igraph_real_t *beta, igraph_real_t *y, igraph_integer_t *incy);
 
-int igraphdgemm_(char *transa, char *transb, int *m, int *n, int *k,
-                 double *alpha, double *a, int *lda, double *b, int *ldb,
-                 double *beta, double *c__, int *ldc);
+igraph_integer_t igraphdgemm_(char *transa, char *transb, igraph_integer_t *m, igraph_integer_t *n, igraph_integer_t *k,
+                 double *alpha, double *a, igraph_integer_t *lda, double *b, igraph_integer_t *ldb,
+                 double *beta, double *c__, igraph_integer_t *ldc);
 
-double igraphdnrm2_(int *n, double *x, int *incx);
+double igraphdnrm2_(igraph_integer_t *n, double *x, igraph_integer_t *incx);
 
-double igraphddot_(int *n, double *dx, int *incx, double *dy, int *incy);
+double igraphddot_(igraph_integer_t *n, double *dx, igraph_integer_t *incx, double *dy, igraph_integer_t *incy);
 
 #endif

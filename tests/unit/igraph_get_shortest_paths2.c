@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     const igraph_real_t edges[] = { 0, 1, 0, 2, 1, 6, 2, 6, 1, 3, 1, 4, 1, 5,
                                     3, 2, 4, 2, 5, 2
                                   };
@@ -33,7 +33,7 @@ int main() {
     igraph_vector_t edgev;
     igraph_vector_ptr_t resvertices, resedges;
     igraph_vector_long_t predecessors, inbound_edges;
-    int vcount, i;
+    igraph_integer_t vcount, i;
 
     igraph_vector_view(&edgev, edges, sizeof(edges) / sizeof(igraph_real_t));
     vcount = igraph_vector_max(&edgev) + 1;

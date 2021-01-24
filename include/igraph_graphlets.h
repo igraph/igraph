@@ -31,21 +31,21 @@
 
 __BEGIN_DECLS
 
-DECLDIR int igraph_graphlets_candidate_basis(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_graphlets_candidate_basis(const igraph_t *graph,
         const igraph_vector_t *weights,
         igraph_vector_ptr_t *cliques,
         igraph_vector_t *thresholds);
 
-DECLDIR int igraph_graphlets_project(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_graphlets_project(const igraph_t *graph,
                                      const igraph_vector_t *weights,
                                      const igraph_vector_ptr_t *cliques,
                                      igraph_vector_t *Mu, igraph_bool_t startMu,
-                                     int niter);
+                                     igraph_integer_t niter);
 
-DECLDIR int igraph_graphlets(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_graphlets(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              igraph_vector_ptr_t *cliques,
-                             igraph_vector_t *Mu, int niter);
+                             igraph_vector_t *Mu, igraph_integer_t niter);
 
 __END_DECLS
 

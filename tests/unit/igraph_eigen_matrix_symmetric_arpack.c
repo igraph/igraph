@@ -27,11 +27,11 @@
 
 #define DIM 10
 
-int check_ev(const igraph_matrix_t *A, const igraph_vector_t *values,
-             const igraph_matrix_t *vectors, int err_off) {
+igraph_integer_t check_ev(const igraph_matrix_t *A, const igraph_vector_t *values,
+             const igraph_matrix_t *vectors, igraph_integer_t err_off) {
 
-    int i, n = igraph_matrix_nrow(A);
-    int ne = igraph_matrix_ncol(vectors);
+    igraph_integer_t i, n = igraph_matrix_nrow(A);
+    igraph_integer_t ne = igraph_matrix_ncol(vectors);
     igraph_vector_t v, lhs, rhs;
 
     if (ne != igraph_vector_size(values)) {
@@ -63,12 +63,12 @@ int check_ev(const igraph_matrix_t *A, const igraph_vector_t *values,
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_matrix_t A;
     igraph_vector_t values;
     igraph_matrix_t vectors;
-    int i, j;
+    igraph_integer_t i, j;
     igraph_eigen_which_t which;
     igraph_arpack_options_t options;
 

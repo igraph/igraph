@@ -33,12 +33,12 @@
 #define MIN 0
 #define MAX 10
 
-typedef int fun(igraph_sparsemat_t *A, igraph_vector_t *res,
+typedef igraph_integer_t fun(igraph_sparsemat_t *A, igraph_vector_t *res,
                 igraph_vector_int_t *pos);
 
-int doit(int which) {
+igraph_integer_t doit(igraph_integer_t which) {
 
-    int i;
+    igraph_integer_t i;
     igraph_sparsemat_t A, A2;
     igraph_vector_t vec;
     igraph_vector_int_t pos;
@@ -140,8 +140,8 @@ int doit(int which) {
 
     igraph_sparsemat_init(&A, /*rows=*/ N, /*cols=*/ M, /*nzmax=*/ NZ + 5);
     for (i = 0; i < NZ; i++) {
-        int r = igraph_rng_get_integer(igraph_rng_default(), 0, N - 1);
-        int c = igraph_rng_get_integer(igraph_rng_default(), 0, M - 1);
+        igraph_integer_t r = igraph_rng_get_integer(igraph_rng_default(), 0, N - 1);
+        igraph_integer_t c = igraph_rng_get_integer(igraph_rng_default(), 0, M - 1);
         igraph_real_t x = igraph_rng_get_integer(igraph_rng_default(),
                           -10, 10);
         igraph_sparsemat_entry(&A, r, c, x);
@@ -261,8 +261,8 @@ int doit(int which) {
     return 0;
 }
 
-int main() {
-    int res;
+igraph_integer_t main() {
+    igraph_integer_t res;
 
     res = doit(/*which=*/ MIN);
     if (res) {

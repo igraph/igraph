@@ -20,10 +20,10 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+igraph_integer_t main() {
     igraph_t left, right, uni;
     igraph_vector_ptr_t glist;
-    long int i, n;
+    igraph_integer_t i, n;
 
     igraph_small(&left, 4, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,3, -1);
     igraph_small(&right, 5, IGRAPH_UNDIRECTED, 0,1, 1,2, 2,2, 2,4, -1);

@@ -28,8 +28,8 @@
 #define NO_CLIQUES 10
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-int permutation(igraph_vector_t *vec) {
-    int i, r, tmp;
+igraph_integer_t permutation(igraph_vector_t *vec) {
+    igraph_integer_t i, r, tmp;
     for (i = 0; i < CLIQUE_SIZE; i++) {
         r = INT(NODES - 1);
         tmp = VECTOR(*vec)[i];
@@ -39,15 +39,15 @@ int permutation(igraph_vector_t *vec) {
     return 0;
 }
 
-int sort_cmp(const void *a, const void *b) {
+igraph_integer_t sort_cmp(const void *a, const void *b) {
     const igraph_vector_t **da = (const igraph_vector_t **) a;
     const igraph_vector_t **db = (const igraph_vector_t **) b;
-    int i, alen = igraph_vector_size(*da), blen = igraph_vector_size(*db);
+    igraph_integer_t i, alen = igraph_vector_size(*da), blen = igraph_vector_size(*db);
     if (alen != blen) {
         return (alen < blen) - (alen > blen);
     }
     for (i = 0; i < alen; i++) {
-        int ea = VECTOR(**da)[i], eb = VECTOR(**db)[i];
+        igraph_integer_t ea = VECTOR(**da)[i], eb = VECTOR(**db)[i];
         if (ea != eb) {
             return (ea > eb) - (ea < eb);
         }
@@ -56,7 +56,7 @@ int sort_cmp(const void *a, const void *b) {
 }
 
 void sort_cliques(igraph_vector_ptr_t *cliques) {
-    int i, n = igraph_vector_ptr_size(cliques);
+    igraph_integer_t i, n = igraph_vector_ptr_size(cliques);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
         igraph_vector_sort(v);
@@ -66,7 +66,7 @@ void sort_cliques(igraph_vector_ptr_t *cliques) {
 }
 
 void print_and_destroy_cliques(igraph_vector_ptr_t *cliques) {
-    int i;
+    igraph_integer_t i;
     sort_cliques(cliques);
     for (i = 0; i < igraph_vector_ptr_size(cliques); i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
@@ -76,13 +76,13 @@ void print_and_destroy_cliques(igraph_vector_ptr_t *cliques) {
     }
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g, g2, cli;
     igraph_vector_t perm;
     igraph_vector_ptr_t cliques;
     igraph_integer_t no;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

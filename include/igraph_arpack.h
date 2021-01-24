@@ -223,36 +223,36 @@ __BEGIN_DECLS
 typedef struct igraph_arpack_options_t {
     /* INPUT */
     char bmat[1];          /* I-standard problem, G-generalized */
-    int n;                 /* Dimension of the eigenproblem */
+    igraph_integer_t n;                 /* Dimension of the eigenproblem */
     char which[2];         /* LA, SA, LM, SM, BE */
-    int nev;               /* Number of eigenvalues to be computed */
+    igraph_integer_t nev;               /* Number of eigenvalues to be computed */
     igraph_real_t tol;     /* Stopping criterion */
-    int ncv;               /* Number of columns in V */
-    int ldv;               /* Leading dimension of V */
-    int ishift;            /* 0-reverse comm., 1-exact with tridiagonal */
-    int mxiter;            /* Maximum number of update iterations to take */
-    int nb;                /* Block size on the recurrence, only 1 works */
-    int mode;              /* The kind of problem to be solved (1-5)
+    igraph_integer_t ncv;               /* Number of columns in V */
+    igraph_integer_t ldv;               /* Leading dimension of V */
+    igraph_integer_t ishift;            /* 0-reverse comm., 1-exact with tridiagonal */
+    igraph_integer_t mxiter;            /* Maximum number of update iterations to take */
+    igraph_integer_t nb;                /* Block size on the recurrence, only 1 works */
+    igraph_integer_t mode;              /* The kind of problem to be solved (1-5)
                                1: A*x=l*x, A symmetric
                                2: A*x=l*M*x, A symm. M pos. def.
                                3: K*x = l*M*x, K symm., M pos. semidef.
                                4: K*x = l*KG*x, K s. pos. semidef. KG s. indef.
                                5: A*x = l*M*x, A symm., M symm. pos. semidef. */
-    int start;             /* 0: random, 1: use the supplied vector */
-    int lworkl;            /* Size of temporary storage, default is fine */
+    igraph_integer_t start;             /* 0: random, 1: use the supplied vector */
+    igraph_integer_t lworkl;            /* Size of temporary storage, default is fine */
     igraph_real_t sigma;   /* The shift for modes 3,4,5 */
     igraph_real_t sigmai;  /* The imaginary part of shift for rnsolve */
     /* OUTPUT */
-    int info;              /* What happened, see docs */
-    int ierr;              /* What happened  in the dseupd call */
-    int noiter;            /* The number of iterations taken */
-    int nconv;
-    int numop;             /* Number of OP*x operations */
-    int numopb;            /* Number of B*x operations if BMAT='G' */
-    int numreo;            /* Number of steps of re-orthogonalizations */
+    igraph_integer_t info;              /* What happened, see docs */
+    igraph_integer_t ierr;              /* What happened  in the dseupd call */
+    igraph_integer_t noiter;            /* The number of iterations taken */
+    igraph_integer_t nconv;
+    igraph_integer_t numop;             /* Number of OP*x operations */
+    igraph_integer_t numopb;            /* Number of B*x operations if BMAT='G' */
+    igraph_integer_t numreo;            /* Number of steps of re-orthogonalizations */
     /* INTERNAL */
-    int iparam[11];
-    int ipntr[14];
+    igraph_integer_t iparam[11];
+    igraph_integer_t ipntr[14];
 } igraph_arpack_options_t;
 
 /**
@@ -277,22 +277,22 @@ typedef struct igraph_arpack_options_t {
  */
 
 typedef struct igraph_arpack_storage_t {
-    int maxn, maxncv, maxldv;
+    igraph_integer_t maxn, maxncv, maxldv;
     igraph_real_t *v;
     igraph_real_t *workl;
     igraph_real_t *workd;
     igraph_real_t *d;
     igraph_real_t *resid;
     igraph_real_t *ax;
-    int *select;
+    igraph_integer_t *select;
     igraph_real_t *di;        /* These two only for non-symmetric problems */
     igraph_real_t *workev;
 } igraph_arpack_storage_t;
 
 DECLDIR void igraph_arpack_options_init(igraph_arpack_options_t *o);
 
-DECLDIR int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
-                                       long int maxncv, long int maxldv, igraph_bool_t symm);
+DECLDIR igraph_integer_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
+                                       igraph_integer_t maxncv, igraph_integer_t maxldv, igraph_bool_t symm);
 DECLDIR void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
 
 /**
@@ -312,21 +312,21 @@ DECLDIR void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s);
  *    this as an error, stops and calls the igraph error handler.
  */
 
-typedef int igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
-                                     int n, void *extra);
+typedef igraph_integer_t igraph_arpack_function_t(igraph_real_t *to, const igraph_real_t *from,
+                                     igraph_integer_t n, void *extra);
 
-DECLDIR int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
+DECLDIR igraph_integer_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                                   igraph_arpack_options_t *options,
                                   igraph_arpack_storage_t *storage,
                                   igraph_vector_t *values, igraph_matrix_t *vectors);
 
-DECLDIR int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
+DECLDIR igraph_integer_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                                   igraph_arpack_options_t *options,
                                   igraph_arpack_storage_t *storage,
                                   igraph_matrix_t *values, igraph_matrix_t *vectors);
 
-DECLDIR int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-        long int nev);
+DECLDIR igraph_integer_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
+        igraph_integer_t nev);
 
 __END_DECLS
 

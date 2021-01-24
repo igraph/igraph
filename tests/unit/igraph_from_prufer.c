@@ -5,7 +5,7 @@
 #include "test_utilities.inc"
 
 
-int main() {
+igraph_integer_t main() {
     igraph_t graph;
     igraph_integer_t prufer1[] = {2, 3, 2, 3};
     igraph_integer_t prufer2[] = {0, 2, 4, 1, 1, 0};

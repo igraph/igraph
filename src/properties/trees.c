@@ -54,14 +54,14 @@
  * Time complexity: O(n+m), linear in the number vertices and edges.
  *
  */
-int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
+igraph_integer_t igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
                        igraph_neimode_t mode, const igraph_vector_t *roots,
                        igraph_vector_t *vertex_index) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int no_of_roots = igraph_vector_size(roots);
-    long int tree_vertex_count = no_of_nodes;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_roots = igraph_vector_size(roots);
+    igraph_integer_t tree_vertex_count = no_of_nodes;
 
     igraph_vector_t edges;
     igraph_vector_bool_t seen_vertices;
@@ -70,7 +70,7 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
     igraph_dqueue_t Q;
     igraph_vector_t neis;
 
-    long int i, n, r, v_ptr = no_of_nodes;
+    igraph_integer_t i, n, r, v_ptr = no_of_nodes;
 
     /* TODO: handle not-connected graphs, multiple root vertices */
 
@@ -90,21 +90,21 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 
     for (r = 0; r < no_of_roots; r++) {
 
-        long int root = (long int) VECTOR(*roots)[r];
+        igraph_integer_t root = (igraph_integer_t) VECTOR(*roots)[r];
         VECTOR(seen_vertices)[root] = 1;
         igraph_dqueue_push(&Q, root);
 
         while (!igraph_dqueue_empty(&Q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&Q);
+            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&Q);
 
             IGRAPH_CHECK(igraph_incident(graph, &neis, (igraph_integer_t) actnode, mode));
             n = igraph_vector_size(&neis);
             for (i = 0; i < n; i++) {
 
-                long int edge = (long int) VECTOR(neis)[i];
-                long int from = IGRAPH_FROM(graph, edge);
-                long int to = IGRAPH_TO(graph, edge);
-                long int nei = IGRAPH_OTHER(graph, edge, actnode);
+                igraph_integer_t edge = (igraph_integer_t) VECTOR(neis)[i];
+                igraph_integer_t from = IGRAPH_FROM(graph, edge);
+                igraph_integer_t to = IGRAPH_TO(graph, edge);
+                igraph_integer_t nei = IGRAPH_OTHER(graph, edge, actnode);
 
                 if (! VECTOR(seen_edges)[edge]) {
 
@@ -157,10 +157,10 @@ int igraph_unfold_tree(const igraph_t *graph, igraph_t *tree,
 /* igraph_is_tree -- check if a graph is a tree */
 
 /* count the number of vertices reachable from the root */
-static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_t *al, igraph_integer_t *visited_count) {
+static igraph_integer_t igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_t *al, igraph_integer_t *visited_count) {
     igraph_stack_int_t stack;
     igraph_vector_bool_t visited;
-    long i;
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_vector_bool_init(&visited, igraph_adjlist_size(al)));
     IGRAPH_FINALLY(igraph_vector_bool_destroy, &visited);
@@ -176,7 +176,7 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
     while (! igraph_stack_int_empty(&stack)) {
         igraph_integer_t u;
         igraph_vector_int_t *neighbors;
-        long ncount;
+        igraph_integer_t ncount;
 
         /* take a vertex from the stack, mark it as visited */
         u = igraph_stack_int_pop(&stack);
@@ -243,7 +243,7 @@ static int igraph_i_is_tree_visitor(igraph_integer_t root, const igraph_adjlist_
  *
  * \example examples/simple/igraph_tree.c
  */
-int igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
+igraph_integer_t igraph_is_tree(const igraph_t *graph, igraph_bool_t *res, igraph_integer_t *root, igraph_neimode_t mode) {
     igraph_adjlist_t al;
     igraph_integer_t iroot = 0;
     igraph_integer_t visited_count;

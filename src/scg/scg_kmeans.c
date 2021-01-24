@@ -33,12 +33,12 @@
 
 #include "scg_headers.h"
 
-int igraph_i_kmeans_Lloyd(const igraph_vector_t *x, int n, int p,
-                          igraph_vector_t *cen, int k, int *cl, int maxiter) {
+igraph_integer_t igraph_i_kmeans_Lloyd(const igraph_vector_t *x, igraph_integer_t n, igraph_integer_t p,
+                          igraph_vector_t *cen, igraph_integer_t k, igraph_integer_t *cl, igraph_integer_t maxiter) {
 
-    int iter, i, j, c, it, inew = 0;
+    igraph_integer_t iter, i, j, c, it, inew = 0;
     igraph_real_t best, dd, tmp;
-    int updated;
+    igraph_integer_t updated;
     igraph_vector_int_t nc;
 
     IGRAPH_CHECK(igraph_vector_int_init(&nc, k));

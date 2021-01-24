@@ -59,8 +59,8 @@
  * Time complexity: O(\p len).
  */
 
-int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
-    long int i;
+igraph_integer_t igraph_strvector_init(igraph_strvector_t *sv, igraph_integer_t len) {
+    igraph_integer_t i;
     sv->data = igraph_Calloc(len, char*);
     if (sv->data == 0) {
         IGRAPH_ERROR("strvector init failed", IGRAPH_ENOMEM);
@@ -92,7 +92,7 @@ int igraph_strvector_init(igraph_strvector_t *sv, long int len) {
  */
 
 void igraph_strvector_destroy(igraph_strvector_t *sv) {
-    long int i;
+    igraph_integer_t i;
     IGRAPH_ASSERT(sv != 0);
     if (sv->data != 0) {
         for (i = 0; i < sv->len; i++) {
@@ -119,7 +119,7 @@ void igraph_strvector_destroy(igraph_strvector_t *sv) {
  * Time complexity: O(1).
  */
 
-void igraph_strvector_get(const igraph_strvector_t *sv, long int idx,
+void igraph_strvector_get(const igraph_strvector_t *sv, igraph_integer_t idx,
                           char **value) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
@@ -143,7 +143,7 @@ void igraph_strvector_get(const igraph_strvector_t *sv, long int idx,
  * depending on the memory management, if reallocation is needed.
  */
 
-int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
+igraph_integer_t igraph_strvector_set(igraph_strvector_t *sv, igraph_integer_t idx,
                          const char *value) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
@@ -180,8 +180,8 @@ int igraph_strvector_set(igraph_strvector_t *sv, long int idx,
  * Time complexity: O(l), the length of the new string. Maybe more,
  * depending on the memory management, if reallocation is needed.
  */
-int igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
-                          const char *value, int len) {
+igraph_integer_t igraph_strvector_set2(igraph_strvector_t *sv, igraph_integer_t idx,
+                          const char *value, igraph_integer_t len) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
     if (sv->data[idx] == 0) {
@@ -209,9 +209,9 @@ int igraph_strvector_set2(igraph_strvector_t *sv, long int idx,
  * \todo repair realloc
  */
 
-void igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
-                                     long int to) {
-    long int i;
+void igraph_strvector_remove_section(igraph_strvector_t *v, igraph_integer_t from,
+                                     igraph_integer_t to) {
+    igraph_integer_t i;
     /*   char **tmp; */
 
     IGRAPH_ASSERT(v != 0);
@@ -247,7 +247,7 @@ void igraph_strvector_remove_section(igraph_strvector_t *v, long int from,
  * Time complexity: O(n), the length of the string.
  */
 
-void igraph_strvector_remove(igraph_strvector_t *v, long int elem) {
+void igraph_strvector_remove(igraph_strvector_t *v, igraph_integer_t elem) {
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
     igraph_strvector_remove_section(v, elem, elem + 1);
@@ -259,9 +259,9 @@ void igraph_strvector_remove(igraph_strvector_t *v, long int elem) {
  * \brief Copies an interval of a string vector.
  */
 
-void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
-                                    long int end, long int to) {
-    long int i;
+void igraph_strvector_move_interval(igraph_strvector_t *v, igraph_integer_t begin,
+                                    igraph_integer_t end, igraph_integer_t to) {
+    igraph_integer_t i;
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
     for (i = to; i < to + end - begin; i++) {
@@ -291,9 +291,9 @@ void igraph_strvector_move_interval(igraph_strvector_t *v, long int begin,
  * Time complexity: O(l), the total length of the strings in \p from.
  */
 
-int igraph_strvector_copy(igraph_strvector_t *to,
+igraph_integer_t igraph_strvector_copy(igraph_strvector_t *to,
                           const igraph_strvector_t *from) {
-    long int i;
+    igraph_integer_t i;
     char *str;
     IGRAPH_ASSERT(from != 0);
     /*   IGRAPH_ASSERT(from->data != 0); */
@@ -304,7 +304,7 @@ int igraph_strvector_copy(igraph_strvector_t *to,
     to->len = from->len;
 
     for (i = 0; i < from->len; i++) {
-        int ret;
+        igraph_integer_t ret;
         igraph_strvector_get(from, i, &str);
         ret = igraph_strvector_set(to, i, str);
         if (ret != 0) {
@@ -329,10 +329,10 @@ int igraph_strvector_copy(igraph_strvector_t *to,
  * string vector.
  */
 
-int igraph_strvector_append(igraph_strvector_t *to,
+igraph_integer_t igraph_strvector_append(igraph_strvector_t *to,
                             const igraph_strvector_t *from) {
-    long int len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
-    long int i;
+    igraph_integer_t len1 = igraph_strvector_size(to), len2 = igraph_strvector_size(from);
+    igraph_integer_t i;
     igraph_bool_t error = 0;
     IGRAPH_CHECK(igraph_strvector_resize(to, len1 + len2));
     for (i = 0; i < len2; i++) {
@@ -364,7 +364,7 @@ int igraph_strvector_append(igraph_strvector_t *to,
  */
 
 void igraph_strvector_clear(igraph_strvector_t *sv) {
-    long int i, n = igraph_strvector_size(sv);
+    igraph_integer_t i, n = igraph_strvector_size(sv);
     char **tmp;
 
     for (i = 0; i < n; i++) {
@@ -394,10 +394,10 @@ void igraph_strvector_clear(igraph_strvector_t *sv) {
  * smaller, maybe less, depending on memory management.
  */
 
-int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
-    long int toadd = newsize - v->len, i, j;
+igraph_integer_t igraph_strvector_resize(igraph_strvector_t* v, igraph_integer_t newsize) {
+    igraph_integer_t toadd = newsize - v->len, i, j;
     char **tmp;
-    long int reallocsize = newsize;
+    igraph_integer_t reallocsize = newsize;
     if (reallocsize == 0) {
         reallocsize = 1;
     }
@@ -462,7 +462,7 @@ int igraph_strvector_resize(igraph_strvector_t* v, long int newsize) {
  * Time complexity: O(1).
  */
 
-long int igraph_strvector_size(const igraph_strvector_t *sv) {
+igraph_integer_t igraph_strvector_size(const igraph_strvector_t *sv) {
     IGRAPH_ASSERT(sv != 0);
     IGRAPH_ASSERT(sv->data != 0);
     return sv->len;
@@ -481,8 +481,8 @@ long int igraph_strvector_size(const igraph_strvector_t *sv) {
  * length of the new string.
  */
 
-int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
-    long int s = igraph_strvector_size(v);
+igraph_integer_t igraph_strvector_add(igraph_strvector_t *v, const char *value) {
+    igraph_integer_t s = igraph_strvector_size(v);
     char **tmp;
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
@@ -508,15 +508,15 @@ int igraph_strvector_add(igraph_strvector_t *v, const char *value) {
  */
 
 void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *index,
-                                 long int nremove) {
-    long int i;
+                                 igraph_integer_t nremove) {
+    igraph_integer_t i;
     char **tmp;
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
 
     for (i = 0; i < igraph_strvector_size(v); i++) {
         if (VECTOR(*index)[i] != 0) {
-            v->data[ (long int) VECTOR(*index)[i] - 1 ] = v->data[i];
+            v->data[ (igraph_integer_t) VECTOR(*index)[i] - 1 ] = v->data[i];
         } else {
             igraph_Free(v->data[i]);
         }
@@ -537,8 +537,8 @@ void igraph_strvector_permdelete(igraph_strvector_t *v, const igraph_vector_t *i
  */
 
 void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t *neg,
-                                    long int nremove) {
-    long int i, idx = 0;
+                                    igraph_integer_t nremove) {
+    igraph_integer_t i, idx = 0;
     char **tmp;
     IGRAPH_ASSERT(v != 0);
     IGRAPH_ASSERT(v->data != 0);
@@ -558,10 +558,10 @@ void igraph_strvector_remove_negidx(igraph_strvector_t *v, const igraph_vector_t
     v->len -= nremove;
 }
 
-int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
+igraph_integer_t igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
                            const char *sep) {
 
-    long int i, n = igraph_strvector_size(v);
+    igraph_integer_t i, n = igraph_strvector_size(v);
     if (n != 0) {
         fprintf(file, "%s", STR(*v, 0));
     }
@@ -572,15 +572,15 @@ int igraph_strvector_print(const igraph_strvector_t *v, FILE *file,
 
 }
 
-int igraph_strvector_index(const igraph_strvector_t *v,
+igraph_integer_t igraph_strvector_index(const igraph_strvector_t *v,
                            igraph_strvector_t *newv,
                            const igraph_vector_t *idx) {
 
-    long int i, newlen = igraph_vector_size(idx);
+    igraph_integer_t i, newlen = igraph_vector_size(idx);
     IGRAPH_CHECK(igraph_strvector_resize(newv, newlen));
 
     for (i = 0; i < newlen; i++) {
-        long int j = (long int) VECTOR(*idx)[i];
+        igraph_integer_t j = (igraph_integer_t) VECTOR(*idx)[i];
         char *str;
         igraph_strvector_get(v, j, &str);
         igraph_strvector_set(newv, i, str);

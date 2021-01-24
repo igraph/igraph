@@ -95,11 +95,11 @@
  *
  * Time complexity: exponential.
  */
-int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
+igraph_integer_t igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
                       igraph_bool_t *iso) {
 
-    long int nodes1 = igraph_vcount(graph1), nodes2 = igraph_vcount(graph2);
-    long int edges1 = igraph_ecount(graph1), edges2 = igraph_ecount(graph2);
+    igraph_integer_t nodes1 = igraph_vcount(graph1), nodes2 = igraph_vcount(graph2);
+    igraph_integer_t edges1 = igraph_ecount(graph1), edges2 = igraph_ecount(graph2);
     igraph_bool_t dir1 = igraph_is_directed(graph1), dir2 = igraph_is_directed(graph2);
     igraph_bool_t loop1, loop2, multi1, multi2;
 
@@ -146,7 +146,7 @@ int igraph_isomorphic(const igraph_t *graph1, const igraph_t *graph2,
  *
  * Time complexity: O(1).
  */
-int igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2,
+igraph_integer_t igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2,
                          igraph_bool_t *iso) {
 
     igraph_integer_t class1, class2;
@@ -173,7 +173,7 @@ int igraph_isomorphic_34(const igraph_t *graph1, const igraph_t *graph2,
  *
  * Time complexity: exponential.
  */
-int igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
+igraph_integer_t igraph_subisomorphic(const igraph_t *graph1, const igraph_t *graph2,
                          igraph_bool_t *iso) {
 
     return igraph_subisomorphic_vf2(graph1, graph2, 0, 0, 0, 0, iso, 0, 0, 0, 0, 0);

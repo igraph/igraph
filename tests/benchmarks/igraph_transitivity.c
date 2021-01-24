@@ -28,7 +28,7 @@
 #define N 6000
 #define M 2000000
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t trans;

@@ -28,11 +28,11 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_trie_t trie;
-    long int id;
-    int i;
+    igraph_integer_t id;
+    igraph_integer_t i;
     char *str;
 
     /* init */

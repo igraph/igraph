@@ -29,7 +29,7 @@
 #include "igraph_random.h"
 
 typedef struct {
-    long int no;
+    igraph_integer_t no;
     igraph_psumtree_t *sumtrees;
 } igraph_i_citing_cited_type_game_struct_t;
 
@@ -83,20 +83,20 @@ static void igraph_i_citing_cited_type_game_free (
  * Time complexity: O(|V|*a+|E|*log|V|), |V| is the number of vertices,
  * |E| is the total number of edges, a is the \p pagebins parameter.
  */
-int igraph_lastcit_game(igraph_t *graph,
+igraph_integer_t igraph_lastcit_game(igraph_t *graph,
                         igraph_integer_t nodes, igraph_integer_t edges_per_node,
                         igraph_integer_t pagebins,
                         const igraph_vector_t *preference,
                         igraph_bool_t directed) {
 
-    long int no_of_nodes = nodes;
+    igraph_integer_t no_of_nodes = nodes;
     igraph_psumtree_t sumtree;
     igraph_vector_t edges;
-    long int i, j, k;
-    long int *lastcit;
-    long int *index;
-    long int agebins = pagebins;
-    long int binwidth = no_of_nodes / agebins + 1;
+    igraph_integer_t i, j, k;
+    igraph_integer_t *lastcit;
+    igraph_integer_t *index;
+    igraph_integer_t agebins = pagebins;
+    igraph_integer_t binwidth = no_of_nodes / agebins + 1;
 
     if (agebins != igraph_vector_size(preference) - 1) {
         IGRAPH_ERROR("`preference' vector should be of length `agebins' plus one",
@@ -113,13 +113,13 @@ int igraph_lastcit_game(igraph_t *graph,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
 
-    lastcit = igraph_Calloc(no_of_nodes, long int);
+    lastcit = igraph_Calloc(no_of_nodes, igraph_integer_t);
     if (!lastcit) {
         IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
     }
     IGRAPH_FINALLY(igraph_free, lastcit);
 
-    index = igraph_Calloc(no_of_nodes + 1, long int);
+    index = igraph_Calloc(no_of_nodes + 1, igraph_integer_t);
     if (!index) {
         IGRAPH_ERROR("lastcit game failed", IGRAPH_ENOMEM);
     }
@@ -140,7 +140,7 @@ int igraph_lastcit_game(igraph_t *graph,
 
         /* Add new edges */
         for (j = 0; j < edges_per_node; j++) {
-            long int to;
+            igraph_integer_t to;
             igraph_real_t sum = igraph_psumtree_sum(&sumtree);
             igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
             igraph_vector_push_back(&edges, i);
@@ -156,10 +156,10 @@ int igraph_lastcit_game(igraph_t *graph,
         /* Update the preference of some vertices if they got to another bin.
            We need to know the citations of some older vertices, this is in the index. */
         for (k = 1; i - binwidth * k >= 1; k++) {
-            long int shnode = i - binwidth * k;
-            long int m = index[shnode], n = index[shnode + 1];
+            igraph_integer_t shnode = i - binwidth * k;
+            igraph_integer_t m = index[shnode], n = index[shnode + 1];
             for (j = 2 * m; j < 2 * n; j += 2) {
-                long int cnode = (long int) VECTOR(edges)[j + 1];
+                igraph_integer_t cnode = (igraph_integer_t) VECTOR(edges)[j + 1];
                 if (lastcit[cnode] == shnode + 1) {
                     igraph_psumtree_update(&sumtree, cnode, VECTOR(*preference)[k]);
                 }
@@ -217,7 +217,7 @@ int igraph_lastcit_game(igraph_t *graph,
  * vertices and edges, respectively.
  */
 
-int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_integer_t igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
                            const igraph_vector_t *types,
                            const igraph_vector_t *pref,
                            igraph_integer_t edges_per_step,
@@ -226,7 +226,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_t edges;
     igraph_vector_t cumsum;
     igraph_real_t sum;
-    long int i, j, nnval, type;
+    igraph_integer_t i, j, nnval, type;
 
     if (igraph_vector_size(types) != nodes) {
         IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
@@ -248,7 +248,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     /* first node */
     VECTOR(cumsum)[0] = 0;
-    type = (long int) VECTOR(*types)[0];
+    type = (igraph_integer_t) VECTOR(*types)[0];
     if (type >= igraph_vector_size(pref)) {
         IGRAPH_ERROR("pref is too short for the given types", IGRAPH_EINVAL);
     }
@@ -262,7 +262,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     for (i = 1; i < nodes; i++) {
         for (j = 0; j < edges_per_step; j++) {
-            long int to;
+            igraph_integer_t to;
             if (sum > 0) {
                 igraph_vector_binsearch(&cumsum, RNG_UNIF(0, sum), &to);
             } else {
@@ -271,7 +271,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
             igraph_vector_push_back(&edges, i);
             igraph_vector_push_back(&edges, to - 1);
         }
-        type = (long int) VECTOR(*types)[i];
+        type = (igraph_integer_t) VECTOR(*types)[i];
         if (type >= igraph_vector_size(pref)) {
             IGRAPH_ERROR("pref is too short for the given types", IGRAPH_EINVAL);
         }
@@ -295,7 +295,7 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 }
 
 static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game_struct_t *s) {
-    long int i;
+    igraph_integer_t i;
     if (!s->sumtrees) {
         return;
     }
@@ -342,7 +342,7 @@ static void igraph_i_citing_cited_type_game_free(igraph_i_citing_cited_type_game
  * vertices and edges, respectively.
  */
 
-int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_integer_t igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
                                   const igraph_vector_t *types,
                                   const igraph_matrix_t *pref,
                                   igraph_integer_t edges_per_step,
@@ -352,8 +352,8 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_i_citing_cited_type_game_struct_t str = { 0, 0 };
     igraph_psumtree_t *sumtrees;
     igraph_vector_t sums;
-    long int nocats;
-    long int i, j;
+    igraph_integer_t nocats;
+    igraph_integer_t i, j;
 
     if (igraph_vector_size(types) != nodes) {
         IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
@@ -386,7 +386,7 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     /* First node */
     for (i = 0; i < nocats; i++) {
-        long int type = (long int) VECTOR(*types)[0];
+        igraph_integer_t type = (igraph_integer_t) VECTOR(*types)[0];
         if ( MATRIX(*pref, i, type) < 0) {
             IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
         }
@@ -397,10 +397,10 @@ int igraph_citing_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     RNG_BEGIN();
 
     for (i = 1; i < nodes; i++) {
-        long int type = (long int) VECTOR(*types)[i];
+        igraph_integer_t type = (igraph_integer_t) VECTOR(*types)[i];
         igraph_real_t sum = VECTOR(sums)[type];
         for (j = 0; j < edges_per_step; j++) {
-            long int to;
+            igraph_integer_t to;
             igraph_psumtree_search(&sumtrees[type], &to, RNG_UNIF(0, sum));
             igraph_vector_push_back(&edges, i);
             igraph_vector_push_back(&edges, to);

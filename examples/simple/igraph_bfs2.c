@@ -30,17 +30,17 @@ igraph_bool_t bfs_callback(const igraph_t *graph,
                            igraph_integer_t rank,
                            igraph_integer_t dist,
                            void *extra) {
-    printf(" %li", (long int) vid);
+    printf(" %li", (igraph_integer_t) vid);
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t graph, ring;
     igraph_vector_t order, rank, father, pred, succ, dist;
     igraph_vector_t restricted;
     igraph_vector_t roots;
-    long int i;
+    igraph_integer_t i;
 
     igraph_ring(&ring, 10, /*directed=*/ 0, /*mutual=*/ 0, /*circular=*/ 1);
     igraph_disjoint_union(&graph, &ring, &ring);

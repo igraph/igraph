@@ -137,7 +137,7 @@ float igraph_i_layout_point_segment_dist2(float v_x, float v_y,
  *
  */
 
-int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
+igraph_integer_t igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
                                  igraph_bool_t use_seed, igraph_integer_t maxiter,
                                  igraph_integer_t fineiter, igraph_real_t cool_fact,
                                  igraph_real_t weight_node_dist, igraph_real_t weight_border,
@@ -261,7 +261,7 @@ int igraph_layout_davidson_harel(const igraph_t *graph, igraph_matrix_t *res,
 
             for (t = 0; t < no_tries; t++) {
                 float diff_energy = 0.0;
-                int ti = VECTOR(try_idx)[t];
+                igraph_integer_t ti = VECTOR(try_idx)[t];
 
                 /* Try moving it */
                 float old_x = MATRIX(*res, v, 0);

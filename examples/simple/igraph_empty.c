@@ -23,10 +23,10 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
-    int ret;
+    igraph_integer_t ret;
 
     /* empty directed graph, zero vertices */
     igraph_empty(&g, 0, 1);

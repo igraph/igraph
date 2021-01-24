@@ -3,7 +3,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t graph;
     igraph_vector_t edge_res, vertex_res;
@@ -12,7 +12,7 @@ int main() {
 
     igraph_vector_init(&edge_res, 0);
     igraph_vector_init(&vertex_res, 0);
-/*    
+/*
     igraph_eulerian_cycle(&graph, &edge_res, &vertex_res);
     print_vector_round(&edge_res);
     print_vector_round(&vertex_res);
@@ -178,6 +178,6 @@ int main() {
     igraph_vector_destroy(&vertex_res);
 
     VERIFY_FINALLY_STACK();
-    
+
     return 0;
 }

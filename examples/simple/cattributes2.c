@@ -24,10 +24,10 @@
 #include <igraph.h>
 
 void null_warning_handler (const char *reason, const char *file,
-                           int line, int igraph_errno) {
+                           igraph_integer_t line, igraph_integer_t igraph_errno) {
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t y;

@@ -40,19 +40,19 @@
 in J.C. Nash, `Compact Numerical Methods for Computers', 2nd edition,
 converted by p2c then re-crafted by B.D. Ripley */
 
-int
+igraph_integer_t
 igraph_bfgs(igraph_vector_t *b, igraph_real_t *Fmin,
             igraph_scalar_function_t fminfn, igraph_vector_function_t fmingr,
-            int maxit, int trace,
-            igraph_real_t abstol, igraph_real_t reltol, int nREPORT, void *ex,
+            igraph_integer_t maxit, igraph_integer_t trace,
+            igraph_real_t abstol, igraph_real_t reltol, igraph_integer_t nREPORT, void *ex,
             igraph_integer_t *fncount, igraph_integer_t *grcount) {
-    int n = (int) igraph_vector_size(b);
+    igraph_integer_t n = (igraph_integer_t) igraph_vector_size(b);
     igraph_bool_t accpoint, enough;
     igraph_vector_t g, t, X, c;
     igraph_matrix_t B;        /* Lmatrix really */
-    int   count, funcount, gradcount;
+    igraph_integer_t   count, funcount, gradcount;
     igraph_real_t f, gradproj;
-    int   i, j, ilast, iter = 0;
+    igraph_integer_t   i, j, ilast, iter = 0;
     igraph_real_t s, steplength;
     igraph_real_t D1, D2;
 

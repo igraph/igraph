@@ -23,8 +23,8 @@
 
 #include <igraph.h>
 
-int print_vector(const igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
+igraph_integer_t print_vector(const igraph_vector_t *v) {
+    igraph_integer_t i, n = igraph_vector_size(v);
     for (i = 0; i < n; i++) {
         printf("%.2g", (double)VECTOR(*v)[i]);
         if (i != n - 1) {
@@ -35,8 +35,8 @@ int print_vector(const igraph_vector_t *v) {
     return 0;
 }
 
-int print_matrix(const igraph_matrix_t *m) {
-    long int i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
+igraph_integer_t print_matrix(const igraph_matrix_t *m) {
+    igraph_integer_t i, j, nrow = igraph_matrix_nrow(m), ncol = igraph_matrix_ncol(m);
     for (i = 0; i < nrow; i++) {
         for (j = 0; j < ncol; j++) {
             printf("%.2g", (double)MATRIX(*m, i, j));
@@ -49,7 +49,7 @@ int print_matrix(const igraph_matrix_t *m) {
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_matrix_t merges;

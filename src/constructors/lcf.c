@@ -43,15 +43,15 @@
  * Time complexity: O(|V|+|E|), linear in the number of vertices plus
  * the number of edges.
  */
-int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
+igraph_integer_t igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
                       const igraph_vector_t *shifts,
                       igraph_integer_t repeats) {
 
     igraph_vector_t edges;
-    long int no_of_shifts = igraph_vector_size(shifts);
-    long int ptr = 0, i, sptr = 0;
-    long int no_of_nodes = n;
-    long int no_of_edges = n + no_of_shifts * repeats;
+    igraph_integer_t no_of_shifts = igraph_vector_size(shifts);
+    igraph_integer_t ptr = 0, i, sptr = 0;
+    igraph_integer_t no_of_nodes = n;
+    igraph_integer_t no_of_edges = n + no_of_shifts * repeats;
 
     if (repeats < 0) {
         IGRAPH_ERROR("number of repeats must be positive", IGRAPH_EINVAL);
@@ -69,9 +69,9 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
 
     /* Then add the rest */
     while (ptr < 2 * no_of_edges) {
-        long int sh = (long int) VECTOR(*shifts)[sptr % no_of_shifts];
-        long int from = sptr % no_of_nodes;
-        long int to = (no_of_nodes + sptr + sh) % no_of_nodes;
+        igraph_integer_t sh = (igraph_integer_t) VECTOR(*shifts)[sptr % no_of_shifts];
+        igraph_integer_t from = sptr % no_of_nodes;
+        igraph_integer_t to = (no_of_nodes + sptr + sh) % no_of_nodes;
         VECTOR(edges)[ptr++] = from;
         VECTOR(edges)[ptr++] = to;
         sptr++;
@@ -112,7 +112,7 @@ int igraph_lcf_vector(igraph_t *graph, igraph_integer_t n,
  *
  * \example examples/simple/igraph_lcf.c
  */
-int igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
+igraph_integer_t igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
     igraph_vector_t shifts;
     igraph_integer_t repeats;
     va_list ap;
@@ -121,7 +121,7 @@ int igraph_lcf(igraph_t *graph, igraph_integer_t n, ...) {
 
     va_start(ap, n);
     while (1) {
-        int num = va_arg(ap, int);
+        igraph_integer_t num = va_arg(ap, igraph_integer_t);
         if (num == 0) {
             break;
         }

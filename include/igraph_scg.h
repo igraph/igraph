@@ -48,7 +48,7 @@ typedef enum { IGRAPH_SCG_DIRECTION_DEFAULT = 1,
                IGRAPH_SCG_DIRECTION_RIGHT = 3
              } igraph_scg_direction_t;
 
-DECLDIR int igraph_scg_grouping(const igraph_matrix_t *V,
+DECLDIR igraph_integer_t igraph_scg_grouping(const igraph_matrix_t *V,
                                 igraph_vector_t *groups,
                                 igraph_integer_t nt,
                                 const igraph_vector_t *nt_vec,
@@ -57,7 +57,7 @@ DECLDIR int igraph_scg_grouping(const igraph_matrix_t *V,
                                 const igraph_vector_t *p,
                                 igraph_integer_t maxiter);
 
-DECLDIR int igraph_scg_semiprojectors(const igraph_vector_t *groups,
+DECLDIR igraph_integer_t igraph_scg_semiprojectors(const igraph_vector_t *groups,
                                       igraph_scg_matrix_t mtype,
                                       igraph_matrix_t *L,
                                       igraph_matrix_t *R,
@@ -66,14 +66,14 @@ DECLDIR int igraph_scg_semiprojectors(const igraph_vector_t *groups,
                                       const igraph_vector_t *p,
                                       igraph_scg_norm_t norm);
 
-DECLDIR int igraph_scg_norm_eps(const igraph_matrix_t *V,
+DECLDIR igraph_integer_t igraph_scg_norm_eps(const igraph_matrix_t *V,
                                 const igraph_vector_t *groups,
                                 igraph_vector_t *eps,
                                 igraph_scg_matrix_t mtype,
                                 const igraph_vector_t *p,
                                 igraph_scg_norm_t norm);
 
-DECLDIR int igraph_scg_adjacency(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_scg_adjacency(const igraph_t *graph,
                                  const igraph_matrix_t *matrix,
                                  const igraph_sparsemat_t *sparsemat,
                                  const igraph_vector_t *ev,
@@ -93,7 +93,7 @@ DECLDIR int igraph_scg_adjacency(const igraph_t *graph,
                                  igraph_sparsemat_t *Lsparse,
                                  igraph_sparsemat_t *Rsparse);
 
-DECLDIR int igraph_scg_stochastic(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_scg_stochastic(const igraph_t *graph,
                                   const igraph_matrix_t *matrix,
                                   const igraph_sparsemat_t *sparsemat,
                                   const igraph_vector_t *ev,
@@ -115,7 +115,7 @@ DECLDIR int igraph_scg_stochastic(const igraph_t *graph,
                                   igraph_sparsemat_t *Lsparse,
                                   igraph_sparsemat_t *Rsparse);
 
-DECLDIR int igraph_scg_laplacian(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_scg_laplacian(const igraph_t *graph,
                                  const igraph_matrix_t *matrix,
                                  const igraph_sparsemat_t *sparsemat,
                                  const igraph_vector_t *ev,

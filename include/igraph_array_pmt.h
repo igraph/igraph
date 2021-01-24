@@ -23,7 +23,7 @@
 
 typedef struct TYPE(igraph_array3) {
     TYPE(igraph_vector) data;
-    long int n1, n2, n3, n1n2;
+    igraph_integer_t n1, n2, n3, n1n2;
 } TYPE(igraph_array3);
 
 #ifndef IGRAPH_ARRAY3_INIT_FINALLY
@@ -36,16 +36,16 @@ typedef struct TYPE(igraph_array3) {
     #define ARRAY3(m,i,j,k) ((m).data.stor_begin[(m).n1n2*(k)+(m).n1*(j)+(i)])
 #endif
 
-DECLDIR int FUNCTION(igraph_array3, init)(TYPE(igraph_array3) *a, long int n1, long int n2,
-                                  long int n3);
+DECLDIR igraph_integer_t FUNCTION(igraph_array3, init)(TYPE(igraph_array3) *a, igraph_integer_t n1, igraph_integer_t n2,
+                                  igraph_integer_t n3);
 DECLDIR void FUNCTION(igraph_array3, destroy)(TYPE(igraph_array3) *a);
-DECLDIR long int FUNCTION(igraph_array3, size)(const TYPE(igraph_array3) *a);
-DECLDIR long int FUNCTION(igraph_array3, n)(const TYPE(igraph_array3) *a, long int idx);
-DECLDIR int FUNCTION(igraph_array3, resize)(TYPE(igraph_array3) *a, long int n1, long int n2,
-                                    long int n3);
+DECLDIR igraph_integer_t FUNCTION(igraph_array3, size)(const TYPE(igraph_array3) *a);
+DECLDIR igraph_integer_t FUNCTION(igraph_array3, n)(const TYPE(igraph_array3) *a, igraph_integer_t idx);
+DECLDIR igraph_integer_t FUNCTION(igraph_array3, resize)(TYPE(igraph_array3) *a, igraph_integer_t n1, igraph_integer_t n2,
+                                    igraph_integer_t n3);
 DECLDIR void FUNCTION(igraph_array3, null)(TYPE(igraph_array3) *a);
 DECLDIR BASE FUNCTION(igraph_array3, sum)(const TYPE(igraph_array3) *a);
 DECLDIR void FUNCTION(igraph_array3, scale)(TYPE(igraph_array3) *a, BASE by);
 DECLDIR void FUNCTION(igraph_array3, fill)(TYPE(igraph_array3) *a, BASE e);
-DECLDIR int FUNCTION(igraph_array3, update)(TYPE(igraph_array3) *to,
+DECLDIR igraph_integer_t FUNCTION(igraph_array3, update)(TYPE(igraph_array3) *to,
                                     const TYPE(igraph_array3) *from);

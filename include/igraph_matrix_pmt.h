@@ -23,19 +23,19 @@
 
 typedef struct TYPE(igraph_matrix) {
     TYPE(igraph_vector) data;
-    long int nrow, ncol;
+    igraph_integer_t nrow, ncol;
 } TYPE(igraph_matrix);
 
 /*---------------*/
 /* Allocation    */
 /*---------------*/
 
-DECLDIR int FUNCTION(igraph_matrix, init)(TYPE(igraph_matrix) *m,
-        long int nrow, long int ncol);
-DECLDIR int FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, init)(TYPE(igraph_matrix) *m,
+        igraph_integer_t nrow, igraph_integer_t ncol);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, copy)(TYPE(igraph_matrix) *to,
         const TYPE(igraph_matrix) *from);
 DECLDIR void FUNCTION(igraph_matrix, destroy)(TYPE(igraph_matrix) *m);
-DECLDIR long int FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m);
 
 /*--------------------*/
 /* Accessing elements */
@@ -43,10 +43,10 @@ DECLDIR long int FUNCTION(igraph_matrix, capacity)(const TYPE(igraph_matrix) *m)
 
 /* MATRIX */
 DECLDIR BASE FUNCTION(igraph_matrix, e)(const TYPE(igraph_matrix) *m,
-                                        long int row, long int col);
+                                        igraph_integer_t row, igraph_integer_t col);
 DECLDIR BASE* FUNCTION(igraph_matrix, e_ptr)(const TYPE(igraph_matrix) *m,
-                                     long int row, long int col);
-DECLDIR void FUNCTION(igraph_matrix, set)(TYPE(igraph_matrix)* m, long int row, long int col,
+                                     igraph_integer_t row, igraph_integer_t col);
+DECLDIR void FUNCTION(igraph_matrix, set)(TYPE(igraph_matrix)* m, igraph_integer_t row, igraph_integer_t col,
         BASE value);
 
 /*------------------------------*/
@@ -62,41 +62,41 @@ DECLDIR void FUNCTION(igraph_matrix, fill)(TYPE(igraph_matrix) *m, BASE e);
 
 DECLDIR const TYPE(igraph_matrix) *FUNCTION(igraph_matrix, view)(const TYPE(igraph_matrix) *m,
         const BASE *data,
-        long int nrow,
-        long int ncol);
+        igraph_integer_t nrow,
+        igraph_integer_t ncol);
 
 /*------------------*/
 /* Copying matrices */
 /*------------------*/
 
 DECLDIR void FUNCTION(igraph_matrix, copy_to)(const TYPE(igraph_matrix) *m, BASE *to);
-DECLDIR int FUNCTION(igraph_matrix, update)(TYPE(igraph_matrix) *to,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, update)(TYPE(igraph_matrix) *to,
         const TYPE(igraph_matrix) *from);
-DECLDIR int FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, rbind)(TYPE(igraph_matrix) *to,
         const TYPE(igraph_matrix) *from);
-DECLDIR int FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, cbind)(TYPE(igraph_matrix) *to,
         const TYPE(igraph_matrix) *from);
-DECLDIR int FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, swap)(TYPE(igraph_matrix) *m1, TYPE(igraph_matrix) *m2);
 
 /*--------------------------*/
 /* Copying rows and columns */
 /*--------------------------*/
 
-DECLDIR int FUNCTION(igraph_matrix, get_row)(const TYPE(igraph_matrix) *m,
-        TYPE(igraph_vector) *res, long int index);
-DECLDIR int FUNCTION(igraph_matrix, get_col)(const TYPE(igraph_matrix) *m,
-        TYPE(igraph_vector) *res, long int index);
-DECLDIR int FUNCTION(igraph_matrix, set_row)(TYPE(igraph_matrix) *m,
-        const TYPE(igraph_vector) *v, long int index);
-DECLDIR int FUNCTION(igraph_matrix, set_col)(TYPE(igraph_matrix) *m,
-        const TYPE(igraph_vector) *v, long int index);
-DECLDIR int FUNCTION(igraph_matrix, select_rows)(const TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, get_row)(const TYPE(igraph_matrix) *m,
+        TYPE(igraph_vector) *res, igraph_integer_t index);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, get_col)(const TYPE(igraph_matrix) *m,
+        TYPE(igraph_vector) *res, igraph_integer_t index);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, set_row)(TYPE(igraph_matrix) *m,
+        const TYPE(igraph_vector) *v, igraph_integer_t index);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, set_col)(TYPE(igraph_matrix) *m,
+        const TYPE(igraph_vector) *v, igraph_integer_t index);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, select_rows)(const TYPE(igraph_matrix) *m,
         TYPE(igraph_matrix) *res,
         const igraph_vector_t *rows);
-DECLDIR int FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, select_cols)(const TYPE(igraph_matrix) *m,
         TYPE(igraph_matrix) *res,
         const igraph_vector_t *cols);
-DECLDIR int FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matrix) *m,
         TYPE(igraph_matrix) *res,
         const igraph_vector_t *rows,
         const igraph_vector_t *cols);
@@ -105,25 +105,25 @@ DECLDIR int FUNCTION(igraph_matrix, select_rows_cols)(const TYPE(igraph_matrix) 
 /* Exchanging rows and columns */
 /*-----------------------------*/
 
-DECLDIR int FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
-        long int i, long int j);
-DECLDIR int FUNCTION(igraph_matrix, swap_cols)(TYPE(igraph_matrix) *m,
-        long int i, long int j);
-DECLDIR int FUNCTION(igraph_matrix, swap_rowcol)(TYPE(igraph_matrix) *m,
-        long int i, long int j);
-DECLDIR int FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, swap_rows)(TYPE(igraph_matrix) *m,
+        igraph_integer_t i, igraph_integer_t j);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, swap_cols)(TYPE(igraph_matrix) *m,
+        igraph_integer_t i, igraph_integer_t j);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, swap_rowcol)(TYPE(igraph_matrix) *m,
+        igraph_integer_t i, igraph_integer_t j);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, transpose)(TYPE(igraph_matrix) *m);
 
 /*-----------------------------*/
 /* Matrix operations           */
 /*-----------------------------*/
 
-DECLDIR int FUNCTION(igraph_matrix, add)(TYPE(igraph_matrix) *m1,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, add)(TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2);
-DECLDIR int FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, sub)(TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2);
-DECLDIR int FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, mul_elements)(TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2);
-DECLDIR int FUNCTION(igraph_matrix, div_elements)(TYPE(igraph_matrix) *m1,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, div_elements)(TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2);
 DECLDIR void FUNCTION(igraph_matrix, scale)(TYPE(igraph_matrix) *m, BASE by);
 DECLDIR void FUNCTION(igraph_matrix, add_constant)(TYPE(igraph_matrix) *m, BASE plus);
@@ -134,15 +134,15 @@ DECLDIR void FUNCTION(igraph_matrix, add_constant)(TYPE(igraph_matrix) *m, BASE 
 
 DECLDIR igraph_real_t FUNCTION(igraph_matrix, min)(const TYPE(igraph_matrix) *m);
 DECLDIR igraph_real_t FUNCTION(igraph_matrix, max)(const TYPE(igraph_matrix) *m);
-DECLDIR int FUNCTION(igraph_matrix, which_min)(const TYPE(igraph_matrix) *m,
-        long int *i, long int *j);
-DECLDIR int FUNCTION(igraph_matrix, which_max)(const TYPE(igraph_matrix) *m,
-        long int *i, long int *j);
-DECLDIR int FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, which_min)(const TYPE(igraph_matrix) *m,
+        igraph_integer_t *i, igraph_integer_t *j);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, which_max)(const TYPE(igraph_matrix) *m,
+        igraph_integer_t *i, igraph_integer_t *j);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, minmax)(const TYPE(igraph_matrix) *m,
         BASE *min, BASE *max);
-DECLDIR int FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
-        long int *imin, long int *jmin,
-        long int *imax, long int *jmax);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, which_minmax)(const TYPE(igraph_matrix) *m,
+        igraph_integer_t *imin, igraph_integer_t *jmin,
+        igraph_integer_t *imax, igraph_integer_t *jmax);
 
 /*------------------------------*/
 /* Comparison                   */
@@ -165,15 +165,15 @@ DECLDIR igraph_bool_t FUNCTION(igraph_matrix, all_ge)(const TYPE(igraph_matrix) 
 
 DECLDIR igraph_bool_t FUNCTION(igraph_matrix, isnull)(const TYPE(igraph_matrix) *m);
 DECLDIR igraph_bool_t FUNCTION(igraph_matrix, empty)(const TYPE(igraph_matrix) *m);
-DECLDIR long int FUNCTION(igraph_matrix, size)(const TYPE(igraph_matrix) *m);
-DECLDIR long int FUNCTION(igraph_matrix, nrow)(const TYPE(igraph_matrix) *m);
-DECLDIR long int FUNCTION(igraph_matrix, ncol)(const TYPE(igraph_matrix) *m);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, size)(const TYPE(igraph_matrix) *m);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, nrow)(const TYPE(igraph_matrix) *m);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, ncol)(const TYPE(igraph_matrix) *m);
 DECLDIR igraph_bool_t FUNCTION(igraph_matrix, is_symmetric)(const TYPE(igraph_matrix) *m);
 DECLDIR BASE FUNCTION(igraph_matrix, sum)(const TYPE(igraph_matrix) *m);
 DECLDIR BASE FUNCTION(igraph_matrix, prod)(const TYPE(igraph_matrix) *m);
-DECLDIR int FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, rowsum)(const TYPE(igraph_matrix) *m,
         TYPE(igraph_vector) *res);
-DECLDIR int FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, colsum)(const TYPE(igraph_matrix) *m,
         TYPE(igraph_vector) *res);
 DECLDIR igraph_bool_t FUNCTION(igraph_matrix, is_equal)(const TYPE(igraph_matrix) *m1,
         const TYPE(igraph_matrix) *m2);
@@ -187,53 +187,53 @@ DECLDIR igraph_real_t FUNCTION(igraph_matrix, maxdifference)(const TYPE(igraph_m
 DECLDIR igraph_bool_t FUNCTION(igraph_matrix, contains)(const TYPE(igraph_matrix) *m,
         BASE e);
 DECLDIR igraph_bool_t FUNCTION(igraph_matrix, search)(const TYPE(igraph_matrix) *m,
-        long int from, BASE what,
-        long int *pos,
-        long int *row, long int *col);
+        igraph_integer_t from, BASE what,
+        igraph_integer_t *pos,
+        igraph_integer_t *row, igraph_integer_t *col);
 
 /*------------------------*/
 /* Resizing operations    */
 /*------------------------*/
 
-DECLDIR int FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m,
-        long int nrow, long int ncol);
-DECLDIR int FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m);
-DECLDIR int FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, long int n);
-DECLDIR int FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, long int n);
-DECLDIR int FUNCTION(igraph_matrix, remove_col)(TYPE(igraph_matrix) *m, long int col);
-DECLDIR int FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, long int row);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, resize)(TYPE(igraph_matrix) *m,
+        igraph_integer_t nrow, igraph_integer_t ncol);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, resize_min)(TYPE(igraph_matrix) *m);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, add_cols)(TYPE(igraph_matrix) *m, igraph_integer_t n);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, add_rows)(TYPE(igraph_matrix) *m, igraph_integer_t n);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, remove_col)(TYPE(igraph_matrix) *m, igraph_integer_t col);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, remove_row)(TYPE(igraph_matrix) *m, igraph_integer_t row);
 
 /*------------------------*/
 /* Print as text          */
 /*------------------------*/
 
-DECLDIR int FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m);
-DECLDIR int FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, print)(const TYPE(igraph_matrix) *m);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, printf)(const TYPE(igraph_matrix) *m,
                                     const char *format);
-DECLDIR int FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, fprint)(const TYPE(igraph_matrix) *m,
                                     FILE *file);
 
 #ifdef BASE_COMPLEX
 
-DECLDIR int igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
+DECLDIR igraph_integer_t igraph_matrix_complex_real(const igraph_matrix_complex_t *v,
                                igraph_matrix_t *real);
-DECLDIR int igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
+DECLDIR igraph_integer_t igraph_matrix_complex_imag(const igraph_matrix_complex_t *v,
                                igraph_matrix_t *imag);
-DECLDIR int igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
+DECLDIR igraph_integer_t igraph_matrix_complex_realimag(const igraph_matrix_complex_t *v,
                                    igraph_matrix_t *real,
                                    igraph_matrix_t *imag);
-DECLDIR int igraph_matrix_complex_create(igraph_matrix_complex_t *v,
+DECLDIR igraph_integer_t igraph_matrix_complex_create(igraph_matrix_complex_t *v,
                                  const igraph_matrix_t *real,
                                  const igraph_matrix_t *imag);
-DECLDIR int igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
+DECLDIR igraph_integer_t igraph_matrix_complex_create_polar(igraph_matrix_complex_t *v,
                                        const igraph_matrix_t *r,
                                        const igraph_matrix_t *theta);
 
 #endif
 
-DECLDIR int FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m,
-        long int *index, long int nremove);
-DECLDIR int FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, permdelete_rows)(TYPE(igraph_matrix) *m,
+        igraph_integer_t *index, igraph_integer_t nremove);
+DECLDIR igraph_integer_t FUNCTION(igraph_matrix, delete_rows_neg)(TYPE(igraph_matrix) *m,
         const igraph_vector_t *neg,
-        long int nremove);
+        igraph_integer_t nremove);
 

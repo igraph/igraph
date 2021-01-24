@@ -32,7 +32,7 @@
  * IGRAPH_THREAD_LOCAL to the following declaration */
 igraph_attribute_table_t *igraph_i_attribute_table = 0;
 
-int igraph_i_attribute_init(igraph_t *graph, void *attr) {
+igraph_integer_t igraph_i_attribute_init(igraph_t *graph, void *attr) {
     graph->attr = 0;
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->init(graph, attr);
@@ -47,7 +47,7 @@ void igraph_i_attribute_destroy(igraph_t *graph) {
     }
 }
 
-int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
+igraph_integer_t igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igraph_bool_t ga,
                             igraph_bool_t va, igraph_bool_t ea) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->copy(to, from, ga, va, ea);
@@ -56,7 +56,7 @@ int igraph_i_attribute_copy(igraph_t *to, const igraph_t *from, igraph_bool_t ga
     }
 }
 
-int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr) {
+igraph_integer_t igraph_i_attribute_add_vertices(igraph_t *graph, igraph_integer_t nv, void *attr) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_vertices(graph, nv, attr);
     } else {
@@ -64,7 +64,7 @@ int igraph_i_attribute_add_vertices(igraph_t *graph, long int nv, void *attr) {
     }
 }
 
-int igraph_i_attribute_permute_vertices(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_permute_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_t *idx) {
 
@@ -75,7 +75,7 @@ int igraph_i_attribute_permute_vertices(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_combine_vertices(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_combine_vertices(const igraph_t *graph,
                                         igraph_t *newgraph,
                                         const igraph_vector_ptr_t *merges,
                                         const igraph_attribute_combination_t *comb) {
@@ -88,7 +88,7 @@ int igraph_i_attribute_combine_vertices(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_add_edges(igraph_t *graph,
+igraph_integer_t igraph_i_attribute_add_edges(igraph_t *graph,
                                  const igraph_vector_t *edges, void *attr) {
     if (igraph_i_attribute_table) {
         return igraph_i_attribute_table->add_edges(graph, edges, attr);
@@ -97,7 +97,7 @@ int igraph_i_attribute_add_edges(igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_permute_edges(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_permute_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_t *idx) {
     if (igraph_i_attribute_table) {
@@ -107,7 +107,7 @@ int igraph_i_attribute_permute_edges(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_combine_edges(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_combine_edges(const igraph_t *graph,
                                      igraph_t *newgraph,
                                      const igraph_vector_ptr_t *merges,
                                      const igraph_attribute_combination_t *comb) {
@@ -120,7 +120,7 @@ int igraph_i_attribute_combine_edges(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_info(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_info(const igraph_t *graph,
                                 igraph_strvector_t *gnames,
                                 igraph_vector_t *gtypes,
                                 igraph_strvector_t *vnames,
@@ -146,7 +146,7 @@ igraph_bool_t igraph_i_attribute_has_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_gettype(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_gettype(const igraph_t *graph,
                                igraph_attribute_type_t *type,
                                igraph_attribute_elemtype_t elemtype,
                                const char *name) {
@@ -158,7 +158,7 @@ int igraph_i_attribute_gettype(const igraph_t *graph,
 
 }
 
-int igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,
         const char *name,
         igraph_vector_t *value) {
     if (igraph_i_attribute_table) {
@@ -168,7 +168,7 @@ int igraph_i_attribute_get_numeric_graph_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_numeric_vertex_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_numeric_vertex_attr(const igraph_t *graph,
         const char *name,
         igraph_vs_t vs,
         igraph_vector_t *value) {
@@ -179,7 +179,7 @@ int igraph_i_attribute_get_numeric_vertex_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_numeric_edge_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_numeric_edge_attr(const igraph_t *graph,
         const char *name,
         igraph_es_t es,
         igraph_vector_t *value) {
@@ -190,7 +190,7 @@ int igraph_i_attribute_get_numeric_edge_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_string_graph_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_string_graph_attr(const igraph_t *graph,
         const char *name,
         igraph_strvector_t *value) {
     if (igraph_i_attribute_table) {
@@ -200,7 +200,7 @@ int igraph_i_attribute_get_string_graph_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_string_vertex_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_string_vertex_attr(const igraph_t *graph,
         const char *name,
         igraph_vs_t vs,
         igraph_strvector_t *value) {
@@ -211,7 +211,7 @@ int igraph_i_attribute_get_string_vertex_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
         const char *name,
         igraph_es_t es,
         igraph_strvector_t *value) {
@@ -222,7 +222,7 @@ int igraph_i_attribute_get_string_edge_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_bool_graph_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_bool_graph_attr(const igraph_t *graph,
         const char *name,
         igraph_vector_bool_t *value) {
     if (igraph_i_attribute_table) {
@@ -232,7 +232,7 @@ int igraph_i_attribute_get_bool_graph_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_bool_vertex_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_bool_vertex_attr(const igraph_t *graph,
         const char *name,
         igraph_vs_t vs,
         igraph_vector_bool_t *value) {
@@ -243,7 +243,7 @@ int igraph_i_attribute_get_bool_vertex_attr(const igraph_t *graph,
     }
 }
 
-int igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
+igraph_integer_t igraph_i_attribute_get_bool_edge_attr(const igraph_t *graph,
         const char *name,
         igraph_es_t es,
         igraph_vector_bool_t *value) {
@@ -282,13 +282,13 @@ igraph_bool_t igraph_has_attribute_table() {
     return igraph_i_attribute_table != 0;
 }
 
-int igraph_attribute_combination_init(igraph_attribute_combination_t *comb) {
+igraph_integer_t igraph_attribute_combination_init(igraph_attribute_combination_t *comb) {
     IGRAPH_CHECK(igraph_vector_ptr_init(&comb->list, 0));
     return 0;
 }
 
 void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) {
-    long int i, n = igraph_vector_ptr_size(&comb->list);
+    igraph_integer_t i, n = igraph_vector_ptr_size(&comb->list);
     for (i = 0; i < n; i++) {
         igraph_attribute_combination_record_t *rec = VECTOR(comb->list)[i];
         if (rec->name) {
@@ -299,11 +299,11 @@ void igraph_attribute_combination_destroy(igraph_attribute_combination_t *comb) 
     igraph_vector_ptr_destroy(&comb->list);
 }
 
-int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
+igraph_integer_t igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
                                      const char *name,
                                      igraph_attribute_combination_type_t type,
                                      igraph_function_pointer_t func) {
-    long int i, n = igraph_vector_ptr_size(&comb->list);
+    igraph_integer_t i, n = igraph_vector_ptr_size(&comb->list);
 
     /* Search, in case it is already there */
     for (i = 0; i < n; i++) {
@@ -341,9 +341,9 @@ int igraph_attribute_combination_add(igraph_attribute_combination_t *comb,
     return 0;
 }
 
-int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
+igraph_integer_t igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
                                         const char *name) {
-    long int i, n = igraph_vector_ptr_size(&comb->list);
+    igraph_integer_t i, n = igraph_vector_ptr_size(&comb->list);
 
     /* Search, in case it is already there */
     for (i = 0; i < n; i++) {
@@ -369,11 +369,11 @@ int igraph_attribute_combination_remove(igraph_attribute_combination_t *comb,
     return 0;
 }
 
-int igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
+igraph_integer_t igraph_attribute_combination_query(const igraph_attribute_combination_t *comb,
                                        const char *name,
                                        igraph_attribute_combination_type_t *type,
                                        igraph_function_pointer_t *func) {
-    long int i, def = -1, len = igraph_vector_ptr_size(&comb->list);
+    igraph_integer_t i, def = -1, len = igraph_vector_ptr_size(&comb->list);
 
     for (i = 0; i < len; i++) {
         igraph_attribute_combination_record_t *rec = VECTOR(comb->list)[i];
@@ -402,7 +402,7 @@ int igraph_attribute_combination_query(const igraph_attribute_combination_t *com
     return 0;
 }
 
-int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
+igraph_integer_t igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
 
     va_list ap;
 
@@ -420,7 +420,7 @@ int igraph_attribute_combination(igraph_attribute_combination_t *comb, ...) {
             break;
         }
 
-        type = (igraph_attribute_combination_type_t)va_arg(ap, int);
+        type = (igraph_attribute_combination_type_t)va_arg(ap, igraph_integer_t);
         if (type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
             func = va_arg(ap, igraph_function_pointer_t);
         }

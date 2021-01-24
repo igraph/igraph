@@ -40,14 +40,14 @@
  *
  * Time complexity: O(|V|), the number of vertices.
  */
-int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int width) {
-    long int i, no_of_nodes = igraph_vcount(graph);
+igraph_integer_t igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, igraph_integer_t width) {
+    igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
     igraph_real_t x, y;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 2));
 
     if (width <= 0) {
-        width = (long int) ceil(sqrt(no_of_nodes));
+        width = (igraph_integer_t) ceil(sqrt(no_of_nodes));
     }
 
     x = y = 0;
@@ -80,19 +80,19 @@ int igraph_layout_grid(const igraph_t *graph, igraph_matrix_t *res, long int wid
  *
  * Time complexity: O(|V|), the number of vertices.
  */
-int igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
-                          long int width, long int height) {
-    long int i, no_of_nodes = igraph_vcount(graph);
+igraph_integer_t igraph_layout_grid_3d(const igraph_t *graph, igraph_matrix_t *res,
+                          igraph_integer_t width, igraph_integer_t height) {
+    igraph_integer_t i, no_of_nodes = igraph_vcount(graph);
     igraph_real_t x, y, z;
 
     IGRAPH_CHECK(igraph_matrix_resize(res, no_of_nodes, 3));
 
     if (width <= 0 && height <= 0) {
-        width = height = (long int) ceil(pow(no_of_nodes, 1.0 / 3));
+        width = height = (igraph_integer_t) ceil(pow(no_of_nodes, 1.0 / 3));
     } else if (width <= 0) {
-        width = (long int) ceil(sqrt(no_of_nodes / (double)height));
+        width = (igraph_integer_t) ceil(sqrt(no_of_nodes / (double)height));
     } else if (height <= 0) {
-        height = (long int) ceil(sqrt(no_of_nodes / (double)width));
+        height = (igraph_integer_t) ceil(sqrt(no_of_nodes / (double)width));
     }
 
     x = y = z = 0;

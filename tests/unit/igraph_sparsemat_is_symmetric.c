@@ -29,11 +29,11 @@
 
 #define INT(a) (igraph_rng_get_integer(igraph_rng_default(), 0, (a)))
 
-int main() {
-    int runs = 100;
-    const int noelements = 20;
+igraph_integer_t main() {
+    igraph_integer_t runs = 100;
+    const igraph_integer_t noelements = 20;
     igraph_sparsemat_t A;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 
@@ -41,9 +41,9 @@ int main() {
 
         igraph_sparsemat_init(&A, DIM, DIM, noelements * 2);
         for (i = 0; i < noelements; i++) {
-            int row = INT(DIM - 1);
-            int col = INT(DIM - 1);
-            int val = INT(100);
+            igraph_integer_t row = INT(DIM - 1);
+            igraph_integer_t col = INT(DIM - 1);
+            igraph_integer_t val = INT(100);
             igraph_sparsemat_entry(&A, row, col, val);
             igraph_sparsemat_entry(&A, col, row, val);
         }

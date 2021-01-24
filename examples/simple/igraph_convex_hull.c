@@ -23,10 +23,10 @@
 
 #include <igraph.h>
 
-int check_convex_hull(igraph_matrix_t* coords) {
+igraph_integer_t check_convex_hull(igraph_matrix_t* coords) {
     igraph_vector_t result;
     igraph_matrix_t resmat;
-    long int i;
+    igraph_integer_t i;
 
     /* Testing with index output mode */
     igraph_vector_init(&result, 1);
@@ -35,7 +35,7 @@ int check_convex_hull(igraph_matrix_t* coords) {
     }
 
     for (i = 0; i < igraph_vector_size(&result); i++) {
-        printf("%ld ", (long)VECTOR(result)[i]);
+        printf("%ld ", (igraph_integer_t)VECTOR(result)[i]);
     }
     printf("\n");
     igraph_vector_destroy(&result);
@@ -56,13 +56,13 @@ int check_convex_hull(igraph_matrix_t* coords) {
     return 0;
 }
 
-int test_simple() {
+igraph_integer_t test_simple() {
     igraph_real_t coords_array[][2] = {
         {3, 2}, {5, 1}, {4, 4}, {6, 4}, {4, 3},
         {2, 5}, {1, 3}, {2, 4}, {6, 3}, {9, 2}
     };
     igraph_matrix_t coords;
-    int i, result;
+    igraph_integer_t i, result;
 
     printf("test_simple\n");
 
@@ -75,11 +75,11 @@ int test_simple() {
     return result;
 }
 
-int test_collinear() {
+igraph_integer_t test_collinear() {
     igraph_real_t coords_array[][2] =
     {{3, 2}, {5, 1}, {7, 0}, {9, -1}, {11, -2}};
     igraph_matrix_t coords;
-    int i, result;
+    igraph_integer_t i, result;
 
     printf("test_collinear\n");
 
@@ -92,9 +92,9 @@ int test_collinear() {
     return result;
 }
 
-int test_degenerate() {
+igraph_integer_t test_degenerate() {
     igraph_matrix_t coords;
-    int result;
+    igraph_integer_t result;
 
     printf("test_degenerate\n");
 
@@ -117,7 +117,7 @@ int test_degenerate() {
     return result;
 }
 
-int test_bug_805() {
+igraph_integer_t test_bug_805() {
     igraph_real_t coords_array[][2] = {
         {0, 0}, {1, 0}, {0.707, 0.707}, {0, 1}, {-0.707, 0.707}, {-1, 0},
         {-0.707, -0.707}, {0, -1}, {0.707, -0.707}, {2, 0}, {1.414, 1.414}, {0, 2},
@@ -127,7 +127,7 @@ int test_bug_805() {
         {-2.828, -2.828}, {0, -4}, {2.828, -2.828}
     };
     igraph_matrix_t coords;
-    int i, result;
+    igraph_integer_t i, result;
 
     printf("test_bug_805\n");
 
@@ -140,7 +140,7 @@ int test_bug_805() {
     return result;
 }
 
-int test_bug_1115() {
+igraph_integer_t test_bug_1115() {
     igraph_real_t coords_array[][2] = {
         {37, 52}, {49, 49}, {52, 64}, {20, 26}, {40, 30}, {21, 47}, {17, 63}, {31, 62},
         {52, 33}, {51, 21}, {42, 41}, {31, 32}, {5, 25}, {12, 42}, {36, 16}, {52, 41},
@@ -151,7 +151,7 @@ int test_bug_1115() {
         {48, 28}, {56, 37}, {30, 40}
     };
     igraph_matrix_t coords;
-    int i, result;
+    igraph_integer_t i, result;
 
     printf("test_bug_1115\n");
 
@@ -164,8 +164,8 @@ int test_bug_1115() {
     return result;
 }
 
-int main() {
-    int result;
+igraph_integer_t main() {
+    igraph_integer_t result;
 
     result = test_simple();
     if (result != 0) {

@@ -52,8 +52,8 @@ void simple_test_case_with_weights_undirected() {
     igraph_vector_init(&vector_actual_results, 0);
     igraph_vector_view(&vector_edges, real_edges, sizeof(real_edges)/sizeof(igraph_real_t));
     igraph_create(&g, &vector_edges, /*number of vertices*/ 2, IGRAPH_DIRECTED);
-    
-    igraph_vector_view(&vector_weights, real_weights, 
+
+    igraph_vector_view(&vector_weights, real_weights,
                        sizeof(real_weights)/sizeof(igraph_real_t));
 
     /* NOT NORMALISED TEST BELOW */
@@ -62,9 +62,9 @@ void simple_test_case_with_weights_undirected() {
                               /*calculating for all vectors in the graph*/ igraph_vss_all(),
                               IGRAPH_ALL  /*graph is "undirected"*/,
                               &vector_weights, /*not normalised*/ 0, /*cutoff*/ -1 /*calculating exact centrality*/);
- 
-    printf("Non normalised test below\n"); 
-    
+
+    printf("Non normalised test below\n");
+
     print_vector(&vector_actual_results);
 
     /* NORMALISED TEST BELOW */
@@ -92,7 +92,7 @@ void advanced_test_case_no_weights_undirected() {
 
     printf("\nAdvanced test case, no weights, undirected\n");
 
-    igraph_vector_init(&vector_actual_results, 0);   
+    igraph_vector_init(&vector_actual_results, 0);
 
     igraph_small(&g, 0, IGRAPH_DIRECTED, 1,0 , 0,5 , 5,6 , 5,4, 4,1 , 1,2 , 2,4 , 4,6 ,
                                  2,3 , 3,7 , 7,6 , 2,6 , -1);
@@ -107,7 +107,7 @@ void advanced_test_case_no_weights_undirected() {
                               NULL, /*not normalised*/ 0, /*cutoff*/ -1 /*calculating exact centrality*/);
 
     print_vector(&vector_actual_results);
- 
+
     /* NORMALISED TEST BELOW*/
 
     printf("\nNormalised test below\n");
@@ -130,7 +130,7 @@ void advanced_test_case_with_weights() {
 
     igraph_real_t real_edges[] = {1,0 , 0,5 , 5,6 , 5,4, 4,1 , 1,2 , 2,4 , 4,6 ,
                                  2,3 , 3,7 , 7,6 , 6,2};
-    
+
     igraph_real_t real_weights[] = {4, 9, 2, 2, 2, 3, 1, 1, 8, 7, 5, 5};
 
     printf("\nAdvanced test case, with weights\n");
@@ -180,7 +180,7 @@ void advanced_test_case_with_weights() {
     igraph_destroy(&g);
 }
 
-int main() {
+igraph_integer_t main() {
 
     simple_test_case_no_weights_undirected();
     simple_test_case_with_weights_undirected();

@@ -23,12 +23,12 @@
 
 #include <igraph.h>
 
-int mf(const igraph_strvector_t *input, char *output) {
+igraph_integer_t mf(const igraph_strvector_t *input, char *output) {
     /* TODO */
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g, g2;
     igraph_attribute_combination_t comb;

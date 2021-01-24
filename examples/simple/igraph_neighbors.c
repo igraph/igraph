@@ -24,18 +24,18 @@
 #include <igraph.h>
 
 void print_vector(igraph_vector_t *v, FILE *f) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < igraph_vector_size(v); i++) {
-        fprintf(f, " %li", (long int) VECTOR(*v)[i]);
+        fprintf(f, " %li", (igraph_integer_t) VECTOR(*v)[i]);
     }
     fprintf(f, "\n");
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t v;
-    int ret;
+    igraph_integer_t ret;
 
     igraph_vector_init(&v, 8);
     VECTOR(v)[0] = 0;

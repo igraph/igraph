@@ -33,9 +33,9 @@
 #include "igraph_memory.h"
 #include <math.h>
 
-int igraph_i_exact_coarse_graining(const igraph_real_t *v,
-                                   int *gr, int n) {
-    int i, gr_nb;
+igraph_integer_t igraph_i_exact_coarse_graining(const igraph_real_t *v,
+                                   igraph_integer_t *gr, igraph_integer_t n) {
+    igraph_integer_t i, gr_nb;
     igraph_i_scg_indval_t *w = igraph_Calloc(n, igraph_i_scg_indval_t);
 
     if (!w) {

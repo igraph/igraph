@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g, g2;
     igraph_attribute_combination_t comb;

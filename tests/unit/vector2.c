@@ -26,12 +26,12 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_vector_t v1, v2, v3;
     igraph_real_t min, max;
-    long int imin, imax;
-    int i;
+    igraph_integer_t imin, imax;
+    igraph_integer_t i;
 
     igraph_vector_init_seq(&v1, 1, 10);
     igraph_vector_init_seq(&v2, 0, 9);

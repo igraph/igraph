@@ -60,7 +60,7 @@
  * vertices, |E| is the number of edges in the graph.
  *
  */
-int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
+igraph_integer_t igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
                               igraph_real_t power,
                               igraph_integer_t window,
                               igraph_integer_t m,
@@ -69,15 +69,15 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
                               igraph_real_t zero_appeal,
                               igraph_bool_t directed) {
 
-    long int no_of_nodes = n;
-    long int no_of_neighbors = m;
-    long int no_of_edges;
+    igraph_integer_t no_of_nodes = n;
+    igraph_integer_t no_of_neighbors = m;
+    igraph_integer_t no_of_edges;
     igraph_vector_t edges;
-    long int i, j;
+    igraph_integer_t i, j;
     igraph_psumtree_t sumtree;
-    long int edgeptr = 0;
+    igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
-    long int time_window = window;
+    igraph_integer_t time_window = window;
     igraph_dqueue_t history;
 
     if (n < 0) {
@@ -117,13 +117,13 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     /* and the rest */
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
-        long int to;
+        igraph_integer_t to;
         if (outseq != 0 && igraph_vector_size(outseq) != 0) {
-            no_of_neighbors = (long int) VECTOR(*outseq)[i];
+            no_of_neighbors = (igraph_integer_t) VECTOR(*outseq)[i];
         }
 
         if (i >= time_window) {
-            while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
+            while ((j = (igraph_integer_t) igraph_dqueue_pop(&history)) != -1) {
                 VECTOR(degree)[j] -= 1;
                 igraph_psumtree_update(&sumtree, j,
                                        pow(VECTOR(degree)[j], power) + zero_appeal);
@@ -142,7 +142,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
 
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
-            long int nn = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
+            igraph_integer_t nn = (igraph_integer_t) VECTOR(edges)[edgeptr - 2 * j - 1];
             igraph_psumtree_update(&sumtree, nn,
                                    pow(VECTOR(degree)[nn], power) + zero_appeal);
         }
@@ -211,7 +211,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
  * Time complexity: O((|V|+|V|/aging_bin)*log(|V|)+|E|). |V| is the number
  * of vertices, |E| the number of edges.
  */
-int igraph_recent_degree_aging_game(igraph_t *graph,
+igraph_integer_t igraph_recent_degree_aging_game(igraph_t *graph,
                                     igraph_integer_t nodes,
                                     igraph_integer_t m,
                                     const igraph_vector_t *outseq,
@@ -223,14 +223,14 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
                                     igraph_real_t zero_appeal,
                                     igraph_bool_t directed) {
 
-    long int no_of_nodes = nodes;
-    long int no_of_neighbors = m;
-    long int binwidth = nodes / aging_bin + 1;
-    long int no_of_edges;
+    igraph_integer_t no_of_nodes = nodes;
+    igraph_integer_t no_of_neighbors = m;
+    igraph_integer_t binwidth = nodes / aging_bin + 1;
+    igraph_integer_t no_of_edges;
     igraph_vector_t edges;
-    long int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
-    long int edgeptr = 0;
+    igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
     igraph_dqueue_t history;
 
@@ -274,14 +274,14 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     /* and the rest */
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
-        long int to;
+        igraph_integer_t to;
         if (outseq != 0 && igraph_vector_size(outseq) != 0) {
-            no_of_neighbors = (long int) VECTOR(*outseq)[i];
+            no_of_neighbors = (igraph_integer_t) VECTOR(*outseq)[i];
         }
 
         if (i >= time_window) {
-            while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
-                long int age = (i - j) / binwidth;
+            while ((j = (igraph_integer_t) igraph_dqueue_pop(&history)) != -1) {
+                igraph_integer_t age = (i - j) / binwidth;
                 VECTOR(degree)[j] -= 1;
                 igraph_psumtree_update(&sumtree, j,
                                        (pow(VECTOR(degree)[j], pa_exp) + zero_appeal)*
@@ -301,8 +301,8 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
-            long int n = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
-            long int age = (i - n) / binwidth;
+            igraph_integer_t n = (igraph_integer_t) VECTOR(edges)[edgeptr - 2 * j - 1];
+            igraph_integer_t age = (i - n) / binwidth;
             igraph_psumtree_update(&sumtree, n,
                                    (pow(VECTOR(degree)[n], pa_exp) + zero_appeal)*
                                    pow(age + 1, aging_exp));
@@ -317,9 +317,9 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
 
         /* aging */
         for (k = 1; i - binwidth * k + 1 >= 1; k++) {
-            long int shnode = i - binwidth * k;
-            long int deg = (long int) VECTOR(degree)[shnode];
-            long int age = (i - shnode) / binwidth;
+            igraph_integer_t shnode = i - binwidth * k;
+            igraph_integer_t deg = (igraph_integer_t) VECTOR(degree)[shnode];
+            igraph_integer_t age = (i - shnode) / binwidth;
             igraph_psumtree_update(&sumtree, shnode,
                                    (pow(deg, pa_exp) + zero_appeal) *
                                    pow(age + 2, aging_exp));

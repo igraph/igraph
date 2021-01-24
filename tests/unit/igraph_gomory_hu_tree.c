@@ -25,20 +25,20 @@
 
 #include "test_utilities.inc"
 
-int validate_tree(const igraph_t *graph, const igraph_t *tree,
+igraph_integer_t validate_tree(const igraph_t *graph, const igraph_t *tree,
                   const igraph_vector_t *flow, const igraph_vector_t *capacity) {
     igraph_integer_t n = igraph_vcount(graph);
     igraph_vector_t edges;
     igraph_real_t min_weight, flow_value;
-    long int i, j, k, m;
+    igraph_integer_t i, j, k, m;
 
     if (igraph_vcount(tree) != n) {
-        printf("Gomory-Hu tree should have %ld vertices\n", (long int)n);
+        printf("Gomory-Hu tree should have %ld vertices\n", (igraph_integer_t)n);
         return IGRAPH_EINVAL;
     }
 
     if (igraph_ecount(tree) != n - 1) {
-        printf("Gomory-Hu tree should have %ld edges\n", (long int)n - 1);
+        printf("Gomory-Hu tree should have %ld edges\n", (igraph_integer_t)n - 1);
         return IGRAPH_EINVAL;
     }
 
@@ -61,10 +61,10 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
                 continue;
             }
 
-            min_weight = VECTOR(*flow)[(long int)VECTOR(edges)[0]];
+            min_weight = VECTOR(*flow)[(igraph_integer_t)VECTOR(edges)[0]];
             for (k = 1; k < m; k++) {
-                if (VECTOR(*flow)[(long int)VECTOR(edges)[k]] < min_weight) {
-                    min_weight = VECTOR(*flow)[(long int)VECTOR(edges)[k]];
+                if (VECTOR(*flow)[(igraph_integer_t)VECTOR(edges)[k]] < min_weight) {
+                    min_weight = VECTOR(*flow)[(igraph_integer_t)VECTOR(edges)[k]];
                 }
             }
 
@@ -83,7 +83,7 @@ int validate_tree(const igraph_t *graph, const igraph_t *tree,
     return IGRAPH_SUCCESS;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_t tree;

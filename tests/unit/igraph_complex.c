@@ -35,7 +35,7 @@
 #define BRE 6
 #define BIM 2
 
-int main() {
+igraph_integer_t main() {
 
     igraph_complex_t a = igraph_complex(ARE, AIM);
     igraph_complex_t b = igraph_complex(BRE, BIM);

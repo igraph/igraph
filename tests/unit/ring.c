@@ -28,7 +28,7 @@
 #include "test_utilities.inc"
 
 typedef struct {
-    int n, m;
+    igraph_integer_t n, m;
     igraph_bool_t directed, mutual, circular;
     igraph_real_t *edges;
 } ring_test_t;
@@ -98,7 +98,7 @@ ring_test_t *all_checks[] = { /*  1 */ &ring_uc_6,   /*  2 */ &ring_uc_0,
                                        0
                             };
 
-int check_ring_properties(const igraph_t *ring, igraph_bool_t directed,
+igraph_integer_t check_ring_properties(const igraph_t *ring, igraph_bool_t directed,
                           igraph_bool_t mutual, igraph_bool_t circular) {
 
     igraph_bool_t res;
@@ -130,11 +130,11 @@ int check_ring_properties(const igraph_t *ring, igraph_bool_t directed,
     return 0;
 }
 
-int check_ring(const ring_test_t *test) {
+igraph_integer_t check_ring(const ring_test_t *test) {
     igraph_t graph, othergraph;
     igraph_vector_t otheredges;
     igraph_bool_t iso;
-    int ret;
+    igraph_integer_t ret;
 
     /* Create ring */
     igraph_ring(&graph, test->n, test->directed, test->mutual, test->circular);
@@ -160,13 +160,13 @@ int check_ring(const ring_test_t *test) {
     return 0;
 }
 
-int main() {
-    int i, ret;
+igraph_integer_t main() {
+    igraph_integer_t i, ret;
 
     i = 0;
     while (all_checks[i]) {
         if ((ret = check_ring(all_checks[i]))) {
-            printf("Check no #%d failed.\n", (int) (i + 1));
+            printf("Check no #%d failed.\n", (igraph_integer_t) (i + 1));
             return ret;
         }
         i++;

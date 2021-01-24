@@ -24,11 +24,11 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t graph;
     igraph_vector_ptr_t separators;
-    long int i, n;
+    igraph_integer_t i, n;
 
     igraph_famous(&graph, "zachary");
     igraph_vector_ptr_init(&separators, 0);

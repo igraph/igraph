@@ -32,13 +32,13 @@ void custom_destructor(void* ptr) {
     igraph_vector_ptr_push_back(&custom_destructor_stack, ptr);
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_vector_ptr_t v1, v2;
     igraph_vector_ptr_t v3 = IGRAPH_VECTOR_PTR_NULL;
-    int i;
+    igraph_integer_t i;
     void ** ptr;
-    int d1 = 1, d2 = 2, d3 = 3, d4 = 4, d5 = 5;
+    igraph_integer_t d1 = 1, d2 = 2, d3 = 3, d4 = 4, d5 = 5;
     char *block1 = 0, *block2 = 0;
 
     /* igraph_vector_ptr_init, igraph_vector_ptr_destroy */
@@ -195,7 +195,7 @@ int main() {
     ptr[3] = &d4;
     ptr[4] = &d5;
     for (i = 0; i < igraph_vector_ptr_size(&v3); i++) {
-        if ( *((int*)VECTOR(v3)[i]) != i + 1) {
+        if ( *((igraph_integer_t*)VECTOR(v3)[i]) != i + 1) {
             return 17;
         }
     }
@@ -203,7 +203,7 @@ int main() {
     /* igraph_vector_ptr_init_copy */
     igraph_vector_ptr_init_copy(&v1, ptr, 5);
     for (i = 0; i < igraph_vector_ptr_size(&v1); i++) {
-        if ( *((int*)VECTOR(v1)[i]) != i + 1) {
+        if ( *((igraph_integer_t*)VECTOR(v1)[i]) != i + 1) {
             return 18;
         }
     }
@@ -211,7 +211,7 @@ int main() {
     /* igraph_vector_ptr_copy_to */
     igraph_vector_ptr_copy_to(&v1, ptr);
     for (i = 0; i < igraph_vector_ptr_size(&v1); i++) {
-        if ( *((int*)ptr[i]) != i + 1) {
+        if ( *((igraph_integer_t*)ptr[i]) != i + 1) {
             return 19;
         }
     }
@@ -228,7 +228,7 @@ int main() {
     igraph_vector_ptr_copy(&v2, &v1);
     igraph_vector_ptr_destroy(&v1);
     for (i = 0; i < igraph_vector_ptr_size(&v2); i++) {
-        if ( *((int*)VECTOR(v2)[i]) != i + 1) {
+        if ( *((igraph_integer_t*)VECTOR(v2)[i]) != i + 1) {
             return 20;
         }
     }
@@ -236,13 +236,13 @@ int main() {
     /* igraph_vector_ptr_remove */
     igraph_vector_ptr_remove(&v2, 0);
     igraph_vector_ptr_remove(&v2, 3);
-    if ( *((int*)VECTOR(v2)[0]) != 2) {
+    if ( *((igraph_integer_t*)VECTOR(v2)[0]) != 2) {
         return 21;
     }
-    if ( *((int*)VECTOR(v2)[1]) != 3) {
+    if ( *((igraph_integer_t*)VECTOR(v2)[1]) != 3) {
         return 22;
     }
-    if ( *((int*)VECTOR(v2)[2]) != 4) {
+    if ( *((igraph_integer_t*)VECTOR(v2)[2]) != 4) {
         return 23;
     }
 

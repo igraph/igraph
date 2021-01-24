@@ -34,8 +34,8 @@
 
 #include "core/trie.h"
 
-static int igraph_i_read_graph_graphdb_getword(FILE *instream) {
-    int b1, b2;
+static igraph_integer_t igraph_i_read_graph_graphdb_getword(FILE *instream) {
+    igraph_integer_t b1, b2;
     unsigned char c1, c2;
     b1 = fgetc(instream);
     b2 = fgetc(instream);
@@ -82,12 +82,12 @@ static int igraph_i_read_graph_graphdb_getword(FILE *instream) {
  * \example examples/simple/igraph_read_graph_graphdb.c
  */
 
-int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
+igraph_integer_t igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
                               igraph_bool_t directed) {
 
     igraph_vector_t edges;
-    long int nodes;
-    long int i, j;
+    igraph_integer_t nodes;
+    igraph_integer_t i, j;
     igraph_bool_t end = 0;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -97,13 +97,13 @@ int igraph_read_graph_graphdb(igraph_t *graph, FILE *instream,
         IGRAPH_ERROR("Can't read from file", IGRAPH_EFILE);
     }
     for (i = 0; !end && i < nodes; i++) {
-        long int len = igraph_i_read_graph_graphdb_getword(instream);
+        igraph_integer_t len = igraph_i_read_graph_graphdb_getword(instream);
         if (len < 0) {
             end = 1;
             break;
         }
         for (j = 0; ! end && j < len; j++) {
-            long int to = igraph_i_read_graph_graphdb_getword(instream);
+            igraph_integer_t to = igraph_i_read_graph_graphdb_getword(instream);
             if (to < 0) {
                 end = 1;
                 break;

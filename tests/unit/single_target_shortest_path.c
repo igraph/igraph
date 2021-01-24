@@ -26,11 +26,11 @@
 #include "test_utilities.inc"
 
 void igraph_warnings_ignore(const char *reason, const char *file,
-                            int line, int igraph_errno) {
+                            igraph_integer_t line, igraph_integer_t igraph_errno) {
     /* Do nothing */
 }
 
-int main() {
+igraph_integer_t main() {
     igraph_t g;
     igraph_vector_t vpath, epath;
     igraph_vector_t w;

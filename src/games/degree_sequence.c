@@ -35,18 +35,18 @@
 #include "core/interruption.h"
 #include "core/set.h"
 
-static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
+static igraph_integer_t igraph_i_degree_sequence_game_simple(igraph_t *graph,
                                        const igraph_vector_t *out_seq,
                                        const igraph_vector_t *in_seq) {
 
-    long int outsum = 0, insum = 0;
+    igraph_integer_t outsum = 0, insum = 0;
     igraph_bool_t directed = (in_seq != 0 && igraph_vector_size(in_seq) != 0);
     igraph_bool_t degseq_ok;
-    long int no_of_nodes, no_of_edges;
-    long int *bag1 = 0, *bag2 = 0;
-    long int bagp1 = 0, bagp2 = 0;
+    igraph_integer_t no_of_nodes, no_of_edges;
+    igraph_integer_t *bag1 = 0, *bag2 = 0;
+    igraph_integer_t bagp1 = 0, bagp2 = 0;
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    long int i, j;
+    igraph_integer_t i, j;
 
     IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_LOOPS_SW | IGRAPH_MULTI_SW, &degseq_ok));
     if (!degseq_ok) {
@@ -54,15 +54,15 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
                      "No undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
 
-    outsum = (long int) igraph_vector_sum(out_seq);
+    outsum = (igraph_integer_t) igraph_vector_sum(out_seq);
     if (directed) {
-        insum = (long int) igraph_vector_sum(in_seq);
+        insum = (igraph_integer_t) igraph_vector_sum(in_seq);
     }
 
     no_of_nodes = igraph_vector_size(out_seq);
     no_of_edges = directed ? outsum : outsum / 2;
 
-    bag1 = igraph_Calloc(outsum, long int);
+    bag1 = igraph_Calloc(outsum, igraph_integer_t);
     if (bag1 == 0) {
         IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
     }
@@ -74,7 +74,7 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
         }
     }
     if (directed) {
-        bag2 = igraph_Calloc(insum, long int);
+        bag2 = igraph_Calloc(insum, igraph_integer_t);
         if (bag2 == 0) {
             IGRAPH_ERROR("degree sequence game (simple)", IGRAPH_ENOMEM);
         }
@@ -93,8 +93,8 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
 
     if (directed) {
         for (i = 0; i < no_of_edges; i++) {
-            long int from = RNG_INTEGER(0, bagp1 - 1);
-            long int to = RNG_INTEGER(0, bagp2 - 1);
+            igraph_integer_t from = RNG_INTEGER(0, bagp1 - 1);
+            igraph_integer_t to = RNG_INTEGER(0, bagp2 - 1);
             igraph_vector_push_back(&edges, bag1[from]); /* safe, already reserved */
             igraph_vector_push_back(&edges, bag2[to]);   /* ditto */
             bag1[from] = bag1[bagp1 - 1];
@@ -103,8 +103,8 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
         }
     } else {
         for (i = 0; i < no_of_edges; i++) {
-            long int from = RNG_INTEGER(0, bagp1 - 1);
-            long int to;
+            igraph_integer_t from = RNG_INTEGER(0, bagp1 - 1);
+            igraph_integer_t to;
             igraph_vector_push_back(&edges, bag1[from]); /* safe, already reserved */
             bag1[from] = bag1[bagp1 - 1];
             bagp1--;
@@ -132,7 +132,7 @@ static int igraph_i_degree_sequence_game_simple(igraph_t *graph,
     return 0;
 }
 
-static int igraph_i_degree_sequence_game_no_multiple_undirected(
+static igraph_integer_t igraph_i_degree_sequence_game_no_multiple_undirected(
     igraph_t *graph, const igraph_vector_t *seq) {
 
     igraph_vector_t stubs = IGRAPH_VECTOR_NULL;
@@ -142,8 +142,8 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected(
     igraph_adjlist_t al;
     igraph_bool_t finished, failed;
     igraph_integer_t from, to, dummy;
-    long int i, j, k;
-    long int no_of_nodes, outsum = 0;
+    igraph_integer_t i, j, k;
+    igraph_integer_t no_of_nodes, outsum = 0;
     igraph_bool_t degseq_ok;
 
     IGRAPH_CHECK(igraph_is_graphical(seq, 0, IGRAPH_SIMPLE_SW, &degseq_ok));
@@ -152,7 +152,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected(
                      IGRAPH_EINVAL);
     }
 
-    outsum = (long int) igraph_vector_sum(seq);
+    outsum = (igraph_integer_t) igraph_vector_sum(seq);
     no_of_nodes = igraph_vector_size(seq);
 
     /* Allocate required data structures */
@@ -274,7 +274,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected(
     return IGRAPH_SUCCESS;
 }
 
-static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
+static igraph_integer_t igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
         const igraph_vector_t *out_seq, const igraph_vector_t *in_seq) {
     igraph_adjlist_t al;
     igraph_bool_t deg_seq_ok, failed, finished;
@@ -286,8 +286,8 @@ static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
     igraph_set_t incomplete_in_vertices;
     igraph_set_t incomplete_out_vertices;
     igraph_integer_t from, to;
-    long int i, j, k;
-    long int no_of_nodes, outsum;
+    igraph_integer_t i, j, k;
+    igraph_integer_t no_of_nodes, outsum;
 
     IGRAPH_CHECK(igraph_is_graphical(out_seq, in_seq, IGRAPH_SIMPLE_SW, &deg_seq_ok));
     if (!deg_seq_ok) {
@@ -295,7 +295,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
                      IGRAPH_EINVAL);
     }
 
-    outsum = (long int) igraph_vector_sum(out_seq);
+    outsum = (igraph_integer_t) igraph_vector_sum(out_seq);
     no_of_nodes = igraph_vector_size(out_seq);
 
     /* Allocate required data structures */
@@ -429,20 +429,20 @@ static int igraph_i_degree_sequence_game_no_multiple_directed(igraph_t *graph,
         VECTOR(vec)[j] = temp; \
     }
 
-static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, const igraph_vector_t *degseq) {
+static igraph_integer_t igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t *graph, const igraph_vector_t *degseq) {
     igraph_vector_int_t stubs;
     igraph_vector_t edges;
     igraph_bool_t degseq_ok;
     igraph_vector_ptr_t adjlist;
-    long i, j;
-    long vcount, ecount, stub_count;
+    igraph_integer_t i, j;
+    igraph_integer_t vcount, ecount, stub_count;
 
     IGRAPH_CHECK(igraph_is_graphical(degseq, NULL, IGRAPH_SIMPLE_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple undirected graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
 
-    stub_count = (long) igraph_vector_sum(degseq);
+    stub_count = (igraph_integer_t) igraph_vector_sum(degseq);
     ecount = stub_count / 2;
     vcount = igraph_vector_size(degseq);
 
@@ -451,9 +451,9 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t
 
     /* Fill stubs vector. */
     {
-        long k = 0;
+        igraph_integer_t k = 0;
         for (i = 0; i < vcount; ++i) {
-            long deg = (long) VECTOR(*degseq)[i];
+            igraph_integer_t deg = (igraph_integer_t) VECTOR(*degseq)[i];
             for (j = 0; j < deg; ++j) {
                 VECTOR(stubs)[k++] = i;
             }
@@ -471,7 +471,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
-        IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*degseq)[i]));
+        IGRAPH_CHECK(igraph_set_reserve(set, (igraph_integer_t) VECTOR(*degseq)[i]));
     }
 
     RNG_BEGIN();
@@ -481,7 +481,7 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t
 
         /* Shuffle stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
         for (i = 0; i < ecount; ++i) {
-            long k, from, to;
+            igraph_integer_t k, from, to;
 
             k = RNG_INTEGER(2*i, stub_count-1);
             SWAP_INT_ELEM(stubs, 2*i, k);
@@ -540,21 +540,21 @@ static int igraph_i_degree_sequence_game_no_multiple_undirected_uniform(igraph_t
 }
 
 
-static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
+static igraph_integer_t igraph_i_degree_sequence_game_no_multiple_directed_uniform(
     igraph_t *graph, const igraph_vector_t *out_deg, const igraph_vector_t *in_deg) {
     igraph_vector_int_t out_stubs, in_stubs;
     igraph_vector_t edges;
     igraph_bool_t degseq_ok;
     igraph_vector_ptr_t adjlist;
-    long i, j;
-    long vcount, ecount;
+    igraph_integer_t i, j;
+    igraph_integer_t vcount, ecount;
 
     IGRAPH_CHECK(igraph_is_graphical(out_deg, in_deg, IGRAPH_SIMPLE_SW, &degseq_ok));
     if (!degseq_ok) {
         IGRAPH_ERROR("No simple directed graph can realize the given degree sequence", IGRAPH_EINVAL);
     }
 
-    ecount = (long) igraph_vector_sum(out_deg);
+    ecount = (igraph_integer_t) igraph_vector_sum(out_deg);
     vcount = igraph_vector_size(out_deg);
 
     IGRAPH_VECTOR_INT_INIT_FINALLY(&out_stubs, ecount);
@@ -563,16 +563,16 @@ static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
 
     /* Fill in- and out-stubs vectors. */
     {
-        long k = 0, l = 0;
+        igraph_integer_t k = 0, l = 0;
         for (i = 0; i < vcount; ++i) {
-            long dout, din;
+            igraph_integer_t dout, din;
 
-            dout = (long) VECTOR(*out_deg)[i];
+            dout = (igraph_integer_t) VECTOR(*out_deg)[i];
             for (j = 0; j < dout; ++j) {
                 VECTOR(out_stubs)[k++] = i;
             }
 
-            din  = (long) VECTOR(*in_deg)[i];
+            din  = (igraph_integer_t) VECTOR(*in_deg)[i];
             for (j = 0; j < din; ++j) {
                 VECTOR(in_stubs)[l++] = i;
             }
@@ -590,7 +590,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
         }
         IGRAPH_CHECK(igraph_set_init(set, 0));
         VECTOR(adjlist)[i] = set;
-        IGRAPH_CHECK(igraph_set_reserve(set, (long) VECTOR(*out_deg)[i]));
+        IGRAPH_CHECK(igraph_set_reserve(set, (igraph_integer_t) VECTOR(*out_deg)[i]));
     }
 
     RNG_BEGIN();
@@ -600,7 +600,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
 
         /* Shuffle out-stubs vector with Fisher-Yates and check for self-loops and multi-edges as we go. */
         for (i = 0; i < ecount; ++i) {
-            long k, from, to;
+            igraph_integer_t k, from, to;
             igraph_set_t *set;
 
             k = RNG_INTEGER(i, ecount-1);
@@ -662,7 +662,7 @@ static int igraph_i_degree_sequence_game_no_multiple_directed_uniform(
 
 /* This is in gengraph_mr-connected.cpp */
 
-int igraph_degree_sequence_game_vl(igraph_t *graph,
+igraph_integer_t igraph_degree_sequence_game_vl(igraph_t *graph,
                                    const igraph_vector_t *out_seq,
                                    const igraph_vector_t *in_seq);
 
@@ -743,7 +743,7 @@ int igraph_degree_sequence_game_vl(igraph_t *graph,
  * \example examples/simple/igraph_degree_sequence_game.c
  */
 
-int igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
+igraph_integer_t igraph_degree_sequence_game(igraph_t *graph, const igraph_vector_t *out_deg,
                                 const igraph_vector_t *in_deg,
                                 igraph_degseq_t method) {
     if (in_deg && igraph_vector_empty(in_deg) && !igraph_vector_empty(out_deg)) {

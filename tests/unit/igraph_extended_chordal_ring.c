@@ -20,11 +20,11 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_t g, g_rev, g_test;
     igraph_bool_t same;
     igraph_matrix_t W;
-    int i, j;
+    igraph_integer_t i, j;
 
     /*    Directed, pentagram with ring, both clockwise    */
     igraph_matrix_init(&W, 1, 1);
@@ -34,7 +34,7 @@ int main() {
     IGRAPH_ASSERT(igraph_is_same_graph(&g, &g_test, &same) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(same);
 
-    /*     Use negative matrix value for same specification    */	
+    /*     Use negative matrix value for same specification    */
     igraph_matrix_set(&W, 0, 0, -3);
     IGRAPH_ASSERT(igraph_extended_chordal_ring(&g_rev, /* nodes */ 5, &W, 1 /*directed*/) == IGRAPH_SUCCESS);
     IGRAPH_ASSERT(igraph_is_same_graph(&g_rev, &g_test, &same) == IGRAPH_SUCCESS);
@@ -47,7 +47,7 @@ int main() {
 
     /*    From article, should give double edges for chords in igraph   */
     igraph_matrix_init(&W, 2, 2);
-    int m[2][2] = {{4, 2}, 
+    igraph_integer_t m[2][2] = {{4, 2},
                    {8, 10}};
     for (i=0; i < 2; i++) {
         for (j=0; j < 2; j++) {

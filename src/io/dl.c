@@ -27,10 +27,10 @@
 
 #include "io/dl-header.h"
 
-int igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
+igraph_integer_t igraph_dl_yylex_init_extra (igraph_i_dl_parsedata_t* user_defined,
                                 void* scanner);
 void igraph_dl_yylex_destroy (void *scanner );
-int igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
+igraph_integer_t igraph_dl_yyparse (igraph_i_dl_parsedata_t* context);
 void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
 
 /**
@@ -58,11 +58,11 @@ void igraph_dl_yyset_in  (FILE * in_str, void* yyscanner );
  * \example examples/simple/igraph_read_graph_dl.c
  */
 
-int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
+igraph_integer_t igraph_read_graph_dl(igraph_t *graph, FILE *instream,
                          igraph_bool_t directed) {
 
-    int i;
-    long int n, n2;
+    igraph_integer_t i;
+    igraph_integer_t n, n2;
     const igraph_strvector_t *namevec = 0;
     igraph_vector_ptr_t name, weight;
     igraph_vector_ptr_t *pname = 0, *pweight = 0;
@@ -108,7 +108,7 @@ int igraph_read_graph_dl(igraph_t *graph, FILE *instream,
 
     /* Check number of vertices */
     if (n2 > 0) {
-        n = (long int) igraph_vector_max(&context.edges);
+        n = (igraph_integer_t) igraph_vector_max(&context.edges);
     } else {
         n = 0;
     }

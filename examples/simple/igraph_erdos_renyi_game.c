@@ -1,7 +1,7 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
     igraph_t graph;
     igraph_vector_t component_sizes;
 

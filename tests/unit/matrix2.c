@@ -27,8 +27,8 @@
 #include "test_utilities.inc"
 
 void byrow(igraph_matrix_t *m) {
-    long int r = igraph_matrix_nrow(m), c = igraph_matrix_ncol(m);
-    long int n = 0, i, j;
+    igraph_integer_t r = igraph_matrix_nrow(m), c = igraph_matrix_ncol(m);
+    igraph_integer_t n = 0, i, j;
     for (i = 0; i < r; i++) {
         for (j = 0; j < c; j++) {
             MATRIX(*m, i, j) = n++;
@@ -45,10 +45,10 @@ void byrow(igraph_matrix_t *m) {
     }
 
 
-int main() {
+igraph_integer_t main() {
     igraph_matrix_t m, m2;
     igraph_vector_t v;
-    long int i, j, i2, j2;
+    igraph_integer_t i, j, i2, j2;
     igraph_real_t r1, r2;
 
     igraph_matrix_init(&m, 4, 3);
@@ -56,11 +56,11 @@ int main() {
 
     /* igraph_matrix_e */
     printf("igraph_matrix_e\n");
-    apply(m, printf("%i ", (int)igraph_matrix_e(&m, i, j)), printf("\n"));
+    apply(m, printf("%i ", (igraph_integer_t)igraph_matrix_e(&m, i, j)), printf("\n"));
 
     /* igraph_matrix_e_ptr */
     printf("igraph_matrix_e_ptr\n");
-    apply(m, printf("%i ", (int)igraph_matrix_e_ptr(&m, i, j)[0]), printf("\n"));
+    apply(m, printf("%i ", (igraph_integer_t)igraph_matrix_e_ptr(&m, i, j)[0]), printf("\n"));
 
     /* igraph_matrix_set */
     printf("igraph_matrix_set\n");

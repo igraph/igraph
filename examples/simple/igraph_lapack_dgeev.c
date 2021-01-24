@@ -26,14 +26,14 @@
 
 #define DIM 10
 
-int real_cplx_mult(const igraph_matrix_t *A,
+igraph_integer_t real_cplx_mult(const igraph_matrix_t *A,
                    const igraph_vector_t *v_real,
                    const igraph_vector_t *v_imag,
                    igraph_vector_t *res_real,
                    igraph_vector_t *res_imag) {
 
-    int n = igraph_vector_size(v_real);
-    int r, c;
+    igraph_integer_t n = igraph_vector_size(v_real);
+    igraph_integer_t r, c;
 
     if (igraph_matrix_nrow(A) != n ||
         igraph_matrix_ncol(A) != n ||
@@ -59,15 +59,15 @@ int real_cplx_mult(const igraph_matrix_t *A,
     return 0;
 }
 
-int sc_cplx_cplx_mult(igraph_real_t lambda_real,
+igraph_integer_t sc_cplx_cplx_mult(igraph_real_t lambda_real,
                       igraph_real_t lambda_imag,
                       const igraph_vector_t *v_real,
                       const igraph_vector_t *v_imag,
                       igraph_vector_t *res_real,
                       igraph_vector_t *res_imag) {
 
-    int r;
-    int n = igraph_vector_size(v_real);
+    igraph_integer_t r;
+    igraph_integer_t n = igraph_vector_size(v_real);
 
     if (igraph_vector_size(v_imag) != n) {
         printf("Wrong vector sizes");
@@ -94,7 +94,7 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
                        const igraph_matrix_t *vectors_right,
                        igraph_real_t tol) {
 
-    int i, n = igraph_matrix_nrow(A);
+    igraph_integer_t i, n = igraph_matrix_nrow(A);
     igraph_vector_t v_real, v_imag;
     igraph_vector_t AV_real, AV_imag, lv_real, lv_imag;
     igraph_vector_t null;
@@ -164,13 +164,13 @@ igraph_bool_t check_ev(const igraph_matrix_t *A,
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_matrix_t A;
     igraph_matrix_t vectors_left, vectors_right;
     igraph_vector_t values_real, values_imag;
-    int i, j;
-    int info = 1;
+    igraph_integer_t i, j;
+    igraph_integer_t info = 1;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

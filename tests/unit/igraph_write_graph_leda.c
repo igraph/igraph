@@ -25,8 +25,8 @@
 
 #include "test_utilities.inc"
 
-int main() {
-    int i;
+igraph_integer_t main() {
+    igraph_integer_t i;
     igraph_t g;
     igraph_vector_t values;
     igraph_strvector_t strvalues;

@@ -23,9 +23,9 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
 
-    int nodes = 10;
+    igraph_integer_t nodes = 10;
     igraph_t g;
     igraph_matrix_t L, R;
     igraph_sparsemat_t Lsparse, Rsparse;

@@ -34,7 +34,7 @@
 #  endif
 #endif
 
-int igraph_finite(double x) {
+igraph_integer_t igraph_finite(double x) {
 #if HAVE_DECL_ISFINITE
     return isfinite(x);
 #elif HAVE_FINITE == 1
@@ -54,8 +54,8 @@ double igraph_log2(const double a) {
     return log(a) / log(2.0);
 }
 
-int igraph_chebyshev_init(const double *dos, int nos, double eta) {
-    int i, ii;
+igraph_integer_t igraph_chebyshev_init(const double *dos, igraph_integer_t nos, double eta) {
+    igraph_integer_t i, ii;
     double err;
 
     if (nos < 1) {
@@ -74,9 +74,9 @@ int igraph_chebyshev_init(const double *dos, int nos, double eta) {
     return i;
 }
 
-double igraph_chebyshev_eval(double x, const double *a, const int n) {
+double igraph_chebyshev_eval(double x, const double *a, const igraph_integer_t n) {
     double b0, b1, b2, twox;
-    int i;
+    igraph_integer_t i;
 
     if (n < 1 || n > 1000) {
         IGRAPH_WARNING("chebyshev_eval: argument out of domain");
@@ -152,7 +152,7 @@ double igraph_log1p(double x) {
             +.63533936180236187354180266666666e-31,
         };
 
-    static IGRAPH_THREAD_LOCAL int nlnrel = 0;
+    static IGRAPH_THREAD_LOCAL igraph_integer_t nlnrel = 0;
     static IGRAPH_THREAD_LOCAL double xmin = 0.0;
 
     if (xmin == 0.0) {
@@ -225,8 +225,8 @@ double igraph_i_round(double X) {
  * when the number of characters needed by the output, excluding the
  * terminating '\0' is larger than count
  */
-int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
-    int n;
+igraph_integer_t igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
+    igraph_integer_t n;
     va_list args;
     if (count > 0) {
         va_start(args, format);
@@ -241,19 +241,19 @@ int igraph_i_snprintf(char *buffer, size_t count, const char *format, ...) {
 
 #endif
 
-int igraph_is_nan(double x) {
+igraph_integer_t igraph_is_nan(double x) {
     return isnan(x);
 }
 
-int igraph_is_inf(double x) {
+igraph_integer_t igraph_is_inf(double x) {
     return isinf(x) != 0;
 }
 
-int igraph_is_posinf(double x) {
+igraph_integer_t igraph_is_posinf(double x) {
     return isinf(x) && x > 0;
 }
 
-int igraph_is_neginf(double x) {
+igraph_integer_t igraph_is_neginf(double x) {
     return isinf(x) && x < 0;
 }
 
@@ -273,7 +273,7 @@ int igraph_is_neginf(double x) {
  * \return nonzero if the two floats are nearly equal to each other within
  *         the given level of tolerance, zero otherwise
  */
-int igraph_almost_equals(double a, double b, double eps) {
+igraph_integer_t igraph_almost_equals(double a, double b, double eps) {
     return igraph_cmp_epsilon(a, b, eps) == 0 ? 1 : 0;
 }
 
@@ -295,7 +295,7 @@ int igraph_almost_equals(double a, double b, double eps) {
  *         the given level of tolerance, positive number if the first float is
  *         larger, negative number if the second float is larger
  */
-int igraph_cmp_epsilon(double a, double b, double eps) {
+igraph_integer_t igraph_cmp_epsilon(double a, double b, double eps) {
     double diff;
     double abs_diff;
 

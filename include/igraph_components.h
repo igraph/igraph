@@ -37,24 +37,24 @@ __BEGIN_DECLS
 /* Components                                         */
 /* -------------------------------------------------- */
 
-DECLDIR int igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
+DECLDIR igraph_integer_t igraph_clusters(const igraph_t *graph, igraph_vector_t *membership,
                             igraph_vector_t *csize, igraph_integer_t *no,
                             igraph_connectedness_t mode);
-DECLDIR int igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
+DECLDIR igraph_integer_t igraph_is_connected(const igraph_t *graph, igraph_bool_t *res,
                                 igraph_connectedness_t mode);
 DECLDIR void igraph_decompose_destroy(igraph_vector_ptr_t *complist);
-DECLDIR int igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
+DECLDIR igraph_integer_t igraph_decompose(const igraph_t *graph, igraph_vector_ptr_t *components,
                              igraph_connectedness_t mode,
-                             long int maxcompno, long int minelements);
-DECLDIR int igraph_articulation_points(const igraph_t *graph,
+                             igraph_integer_t maxcompno, igraph_integer_t minelements);
+DECLDIR igraph_integer_t igraph_articulation_points(const igraph_t *graph,
                                        igraph_vector_t *res);
-DECLDIR int igraph_biconnected_components(const igraph_t *graph,
+DECLDIR igraph_integer_t igraph_biconnected_components(const igraph_t *graph,
         igraph_integer_t *no,
         igraph_vector_ptr_t *tree_edges,
         igraph_vector_ptr_t *component_edges,
         igraph_vector_ptr_t *components,
         igraph_vector_t *articulation_points);
-DECLDIR int igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges);
+DECLDIR igraph_integer_t igraph_bridges(const igraph_t *graph, igraph_vector_t *bridges);
 
 __END_DECLS
 

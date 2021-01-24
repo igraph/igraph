@@ -24,14 +24,14 @@
 #include <igraph.h>
 
 void vector_print(igraph_vector_t *v) {
-    long int i;
+    igraph_integer_t i;
     for (i = 0; i < igraph_vector_size(v); i++) {
-        printf(" %li", (long int) VECTOR(*v)[i]);
+        printf(" %li", (igraph_integer_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t vids, layers, parents;

@@ -51,11 +51,11 @@
  * the data vector.
  */
 
-int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
+igraph_integer_t igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
                         igraph_integer_t binwidth) {
 
     double sum = 0;
-    long int i;
+    igraph_integer_t i;
 
     /* Check */
     if (igraph_vector_size(data) < binwidth) {
@@ -64,7 +64,7 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
 
     /* Memory for result */
 
-    IGRAPH_CHECK(igraph_vector_resize(res, (long int)(igraph_vector_size(data) - binwidth + 1)));
+    IGRAPH_CHECK(igraph_vector_resize(res, (igraph_integer_t)(igraph_vector_size(data) - binwidth + 1)));
 
     /* Initial bin */
     for (i = 0; i < binwidth; i++) {
@@ -76,7 +76,7 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
     for (i = 1; i < igraph_vector_size(data) - binwidth + 1; i++) {
         IGRAPH_ALLOW_INTERRUPTION();
         sum -= VECTOR(*data)[i - 1];
-        sum += VECTOR(*data)[ (long int)(i + binwidth - 1)];
+        sum += VECTOR(*data)[ (igraph_integer_t)(i + binwidth - 1)];
         VECTOR(*res)[i] = sum / binwidth;
     }
 
@@ -115,10 +115,10 @@ int igraph_running_mean(const igraph_vector_t *data, igraph_vector_t *res,
  *
  * \example examples/simple/igraph_convex_hull.c
  */
-int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
+igraph_integer_t igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
                        igraph_matrix_t *rescoords) {
     igraph_integer_t no_of_nodes;
-    long int i, pivot_idx = 0, last_idx, before_last_idx, next_idx, j;
+    igraph_integer_t i, pivot_idx = 0, last_idx, before_last_idx, next_idx, j;
     igraph_vector_t angles, stack, order;
     igraph_real_t px, py, cp;
 
@@ -172,10 +172,10 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
     /* Check if two points have the same angle. If so, keep only the point that
      * is farthest from the pivot */
     j = 0;
-    last_idx = (long int) VECTOR(order)[0];
-    pivot_idx = (long int) VECTOR(order)[no_of_nodes - 1];
+    last_idx = (igraph_integer_t) VECTOR(order)[0];
+    pivot_idx = (igraph_integer_t) VECTOR(order)[no_of_nodes - 1];
     for (i = 1; i < no_of_nodes; i++) {
-        next_idx = (long int) VECTOR(order)[i];
+        next_idx = (igraph_integer_t) VECTOR(order)[i];
         if (VECTOR(angles)[last_idx] == VECTOR(angles)[next_idx]) {
             /* Keep the vertex that is farther from the pivot, drop the one that is
              * closer */
@@ -200,7 +200,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
     last_idx = -1;
     before_last_idx = -1;
     while (!igraph_vector_empty(&order)) {
-        next_idx = (long int)VECTOR(order)[igraph_vector_size(&order) - 1];
+        next_idx = (igraph_integer_t)VECTOR(order)[igraph_vector_size(&order) - 1];
         if (next_idx < 0) {
             /* This vertex should be skipped; was excluded in an earlier step */
             igraph_vector_pop_back(&order);
@@ -219,7 +219,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
         }
         /*
         printf("B L N cp: %ld, %ld, %ld, %f [", before_last_idx, last_idx, next_idx, (float)cp);
-        for (int k=0; k<j; k++) printf("%ld ", (long)VECTOR(stack)[k]);
+        for (igraph_integer_t k=0; k<j; k++) printf("%ld ", (igraph_integer_t)VECTOR(stack)[k]);
         printf("]\n");
         */
         if (cp < 0) {
@@ -234,7 +234,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
             igraph_vector_pop_back(&stack);
             j--;
             last_idx = before_last_idx;
-            before_last_idx = (j >= 2) ? (long int) VECTOR(stack)[j - 2] : -1;
+            before_last_idx = (j >= 2) ? (igraph_integer_t) VECTOR(stack)[j - 2] : -1;
         }
     }
 
@@ -260,7 +260,7 @@ int igraph_convex_hull(const igraph_matrix_t *data, igraph_vector_t *resverts,
 static const char* igraph_i_plfit_error_message = 0;
 
 static void igraph_i_plfit_error_handler_store(const char *reason, const char *file,
-        int line, int plfit_errno) {
+        igraph_integer_t line, igraph_integer_t plfit_errno) {
 
     IGRAPH_UNUSED(file);
     IGRAPH_UNUSED(line);
@@ -334,7 +334,7 @@ static void igraph_i_plfit_error_handler_store(const char *reason, const char *f
  *
  * \example examples/simple/igraph_power_law_fit.c
  */
-int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* result,
+igraph_integer_t igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* result,
                          igraph_real_t xmin, igraph_bool_t force_continuous) {
     plfit_error_handler_t* plfit_stored_error_handler;
     plfit_result_t plfit_result;
@@ -342,7 +342,7 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
     plfit_discrete_options_t disc_options;
     igraph_bool_t discrete = force_continuous ? 0 : 1;
     igraph_bool_t finite_size_correction;
-    int retval;
+    igraph_integer_t retval;
     size_t i, n;
 
     n = (size_t) igraph_vector_size(data);
@@ -351,7 +351,7 @@ int igraph_power_law_fit(const igraph_vector_t* data, igraph_plfit_result_t* res
     if (discrete) {
         /* Does the vector contain discrete values only? */
         for (i = 0; i < n; i++) {
-            if ((long int)(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
+            if ((igraph_integer_t)(VECTOR(*data)[i]) != VECTOR(*data)[i]) {
                 discrete = 0;
                 break;
             }

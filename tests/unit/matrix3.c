@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_matrix_t m;
 
     igraph_matrix_init(&m, 10, 10);

@@ -25,15 +25,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-int print_attributes(const igraph_t *g) {
+igraph_integer_t print_attributes(const igraph_t *g) {
 
     igraph_vector_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
-    long int i;
+    igraph_integer_t i;
 
     igraph_vector_t vec;
     igraph_strvector_t svec;
-    long int j;
+    igraph_integer_t j;
 
     igraph_vector_init(&gtypes, 0);
     igraph_vector_init(&vtypes, 0);
@@ -58,7 +58,7 @@ int print_attributes(const igraph_t *g) {
     printf("\n");
 
     for (i = 0; i < igraph_vcount(g); i++) {
-        long int j;
+        igraph_integer_t j;
         printf("Vertex %li: ", i);
         for (j = 0; j < igraph_strvector_size(&vnames); j++) {
             printf("%s=", STR(vnames, j));
@@ -73,8 +73,8 @@ int print_attributes(const igraph_t *g) {
     }
 
     for (i = 0; i < igraph_ecount(g); i++) {
-        long int j;
-        printf("Edge %li (%i-%i): ", i, (int)IGRAPH_FROM(g, i), (int)IGRAPH_TO(g, i));
+        igraph_integer_t j;
+        printf("Edge %li (%i-%i): ", i, (igraph_integer_t)IGRAPH_FROM(g, i), (igraph_integer_t)IGRAPH_TO(g, i));
         for (j = 0; j < igraph_strvector_size(&enames); j++) {
             printf("%s=", STR(enames, j));
             if (VECTOR(etypes)[j] == IGRAPH_ATTRIBUTE_NUMERIC) {
@@ -148,13 +148,13 @@ int print_attributes(const igraph_t *g) {
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g, g2;
     FILE *ifile;
     igraph_vector_t gtypes, vtypes, etypes;
     igraph_strvector_t gnames, vnames, enames;
-    long int i;
+    igraph_integer_t i;
     igraph_vector_t y;
     igraph_strvector_t id;
     igraph_vector_bool_t type;
@@ -183,17 +183,17 @@ int main() {
     /* List attribute names and types */
     printf("Graph attributes: ");
     for (i = 0; i < igraph_strvector_size(&gnames); i++) {
-        printf("%s (%i) ", STR(gnames, i), (int)VECTOR(gtypes)[i]);
+        printf("%s (%i) ", STR(gnames, i), (igraph_integer_t)VECTOR(gtypes)[i]);
     }
     printf("\n");
     printf("Vertex attributes: ");
     for (i = 0; i < igraph_strvector_size(&vnames); i++) {
-        printf("%s (%i) ", STR(vnames, i), (int)VECTOR(vtypes)[i]);
+        printf("%s (%i) ", STR(vnames, i), (igraph_integer_t)VECTOR(vtypes)[i]);
     }
     printf("\n");
     printf("Edge attributes: ");
     for (i = 0; i < igraph_strvector_size(&enames); i++) {
-        printf("%s (%i) ", STR(enames, i), (int)VECTOR(etypes)[i]);
+        printf("%s (%i) ", STR(enames, i), (igraph_integer_t)VECTOR(etypes)[i]);
     }
     printf("\n");
 

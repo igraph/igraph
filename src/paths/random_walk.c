@@ -59,7 +59,7 @@
  */
 
 
-int igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
+igraph_integer_t igraph_random_walk(const igraph_t *graph, igraph_vector_t *walk,
                        igraph_integer_t start, igraph_neimode_t mode,
                        igraph_integer_t steps,
                        igraph_random_walk_stuck_t stuck) {
@@ -156,7 +156,7 @@ static void vec_destr(igraph_vector_t *vec) {
  * \return Error code.
  *
  */
-int igraph_random_edge_walk(const igraph_t *graph,
+igraph_integer_t igraph_random_edge_walk(const igraph_t *graph,
                             const igraph_vector_t *weights,
                             igraph_vector_t *edgewalk,
                             igraph_integer_t start, igraph_neimode_t mode,
@@ -220,7 +220,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
     RNG_BEGIN();
 
     for (i = 0; i < steps; ++i) {
-        long degree, edge, idx;
+        igraph_integer_t degree, edge, idx;
         igraph_vector_int_t *edges = igraph_inclist_get(&il, start);
 
         degree = igraph_vector_int_size(edges);
@@ -241,7 +241,7 @@ int igraph_random_edge_walk(const igraph_t *graph,
 
             /* compute out-edge cdf for this node if not already done */
             if (IGRAPH_UNLIKELY(! *cd)) {
-                long j;
+                igraph_integer_t j;
 
                 *cd = igraph_malloc(sizeof(igraph_vector_t));
                 if (*cd == NULL) {

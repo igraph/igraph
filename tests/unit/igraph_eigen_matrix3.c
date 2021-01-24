@@ -30,19 +30,19 @@
         igraph_vector_complex_print(&values2);  \
     } while(0)
 
-int main() {
+igraph_integer_t main() {
 
-    const int nodes = 10, skip = 3;
+    const igraph_integer_t nodes = 10, skip = 3;
     igraph_matrix_t mat2;
     igraph_vector_complex_t values, values2;
     igraph_matrix_complex_t vectors, vectors2;
     igraph_eigen_which_t which;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
     igraph_matrix_init(&mat2, nodes, nodes);
     for (i = 0; i < nodes; i++) {
-        int j;
+        igraph_integer_t j;
         for (j = 0; j < nodes; j++) {
             MATRIX(mat2, i, j) = igraph_rng_get_integer(igraph_rng_default(), 1, 10);
         }
@@ -67,7 +67,7 @@ int main() {
                         /*options=*/ 0, /*storage=*/ 0, &values2, &vectors2);
 
     for (i = 0; i < nodes - skip * 2 + 1; i++) {
-        int j;
+        igraph_integer_t j;
         igraph_real_t d =
             igraph_complex_abs(igraph_complex_sub(VECTOR(values)[i],
                                VECTOR(values2)[i + skip - 1]));

@@ -70,13 +70,13 @@
  *     of the edges in a graph. See \ref igraph_betweenness_cutoff() to
  *     calculate the range-limited betweenness of the vertices in a graph.
  */
-int igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
+igraph_integer_t igraph_betweenness(const igraph_t *graph, igraph_vector_t *res,
                        const igraph_vs_t vids, igraph_bool_t directed,
                        const igraph_vector_t* weights) {
     return igraph_betweenness_cutoff(graph, res, vids, directed, weights, -1);
 }
 
-static int igraph_i_betweenness_cutoff_weighted(
+static igraph_integer_t igraph_i_betweenness_cutoff_weighted(
         const igraph_t *graph,
         igraph_vector_t *res,
         const igraph_vs_t vids,
@@ -89,13 +89,13 @@ static int igraph_i_betweenness_cutoff_weighted(
     igraph_2wheap_t Q;
     igraph_inclist_t inclist;
     igraph_adjlist_t fathers;
-    long int source, j;
+    igraph_integer_t source, j;
     igraph_stack_t S;
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
     igraph_vector_t dist, nrgeo, tmpscore;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_vit_t vit;
-    int cmp_result;
+    igraph_integer_t cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
 
     if (igraph_vector_size(weights) != no_of_edges) {
@@ -142,10 +142,10 @@ static int igraph_i_betweenness_cutoff_weighted(
         VECTOR(nrgeo)[source] = 1;
 
         while (!igraph_2wheap_empty(&Q)) {
-            long int minnei = igraph_2wheap_max_index(&Q);
+            igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
             igraph_vector_int_t *neis;
-            long int nlen;
+            igraph_integer_t nlen;
 
             /* Ignore vertices that are more distant than the cutoff */
             if (cutoff >= 0 && mindist > cutoff + 1.0) {
@@ -163,8 +163,8 @@ static int igraph_i_betweenness_cutoff_weighted(
             neis = igraph_inclist_get(&inclist, minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
-                long int to = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_integer_t edge = (igraph_integer_t) VECTOR(*neis)[j];
+                igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(dist)[to];
 
@@ -205,11 +205,11 @@ static int igraph_i_betweenness_cutoff_weighted(
         } /* !igraph_2wheap_empty(&Q) */
 
         while (!igraph_stack_empty(&S)) {
-            long int w = (long int) igraph_stack_pop(&S);
+            igraph_integer_t w = (igraph_integer_t) igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_adjlist_get(&fathers, w);
-            long int fatv_len = igraph_vector_int_size(fatv);
+            igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             for (j = 0; j < fatv_len; j++) {
-                long int f = (long int) VECTOR(*fatv)[j];
+                igraph_integer_t f = (igraph_integer_t) VECTOR(*fatv)[j];
                 VECTOR(tmpscore)[f] += VECTOR(nrgeo)[f] / VECTOR(nrgeo)[w] * (1 + VECTOR(tmpscore)[w]);
             }
             if (w != source) {
@@ -232,7 +232,7 @@ static int igraph_i_betweenness_cutoff_weighted(
 
         for (j = 0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), j++) {
-            long int node = IGRAPH_VIT_GET(vit);
+            igraph_integer_t node = IGRAPH_VIT_GET(vit);
             VECTOR(*res)[j] = VECTOR(*tmpres)[node];
         }
 
@@ -304,25 +304,25 @@ static int igraph_i_betweenness_cutoff_weighted(
  * \ref igraph_edge_betweenness_cutoff() to calculate the range-limited
  * edge betweenness.
  */
-int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+igraph_integer_t igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vs_t vids, igraph_bool_t directed,
                               const igraph_vector_t *weights, igraph_real_t cutoff) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
-    long int *distance;
+    igraph_integer_t *distance;
     /* Note: nrgeo holds the number of shortest paths, which may be very large in some cases,
      * e.g. in a grid graph. If using an integer type, this results in overflow.
-     * With a 'long long int', overflow already affects the result for a grid as small as 36*36.
-     * Therefore, we use a 'double' instead. While a 'double' holds fewer digits than a 'long long int',
+     * With a 'igraph_integer_t igraph_integer_t', overflow already affects the result for a grid as small as 36*36.
+     * Therefore, we use a 'double' instead. While a 'double' holds fewer digits than a 'igraph_integer_t igraph_integer_t',
      * i.e. its precision is lower, it is effectively immune to overflow. The impact on the precision
      * of the final result is negligible. The max betweenness is correct to 14 decimal digits,
      * i.e. the precision limit of 'double', even for a 101*101 grid graph. */
     double *nrgeo = 0;
     double *tmpscore;
     igraph_stack_t stack = IGRAPH_STACK_NULL;
-    long int source;
-    long int j, k, nneis;
+    igraph_integer_t source;
+    igraph_integer_t j, k, nneis;
     igraph_vector_int_t *neis;
     igraph_vector_t v_tmpres, *tmpres = &v_tmpres;
     igraph_vit_t vit;
@@ -365,7 +365,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
         igraph_vector_int_clear(igraph_adjlist_get(adjlist_in_p, j));
     }
 
-    distance = igraph_Calloc(no_of_nodes, long int);
+    distance = igraph_Calloc(no_of_nodes, igraph_integer_t);
     if (distance == 0) {
         IGRAPH_ERROR("betweenness failed", IGRAPH_ENOMEM);
     }
@@ -396,7 +396,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
         distance[source] = 1;
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
+            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
 
             /* Ignore vertices that are more distant than the cutoff */
             if (cutoff >= 0 && distance[actnode] > cutoff + 1) {
@@ -412,7 +412,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
             neis = igraph_adjlist_get(adjlist_out_p, actnode);
             nneis = igraph_vector_int_size(neis);
             for (j = 0; j < nneis; j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                igraph_integer_t neighbor = (igraph_integer_t) VECTOR(*neis)[j];
                 if (distance[neighbor] == 0) {
                     distance[neighbor] = distance[actnode] + 1;
                     IGRAPH_CHECK(igraph_dqueue_push(&q, neighbor));
@@ -432,11 +432,11 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
            shortest paths to them. Now we do an inverse search, starting
            with the farthest nodes. */
         while (!igraph_stack_empty(&stack)) {
-            long int actnode = (long int) igraph_stack_pop(&stack);
+            igraph_integer_t actnode = (igraph_integer_t) igraph_stack_pop(&stack);
             neis = igraph_adjlist_get(adjlist_in_p, actnode);
             nneis = igraph_vector_int_size(neis);
             for (j = 0; j < nneis; j++) {
-                long int neighbor = (long int) VECTOR(*neis)[j];
+                igraph_integer_t neighbor = (igraph_integer_t) VECTOR(*neis)[j];
                 tmpscore[neighbor] +=  (tmpscore[actnode] + 1) * nrgeo[neighbor] / nrgeo[actnode];
             }
 
@@ -472,7 +472,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
 
         for (k = 0, IGRAPH_VIT_RESET(vit); !IGRAPH_VIT_END(vit);
              IGRAPH_VIT_NEXT(vit), k++) {
-            long int node = IGRAPH_VIT_GET(vit);
+            igraph_integer_t node = IGRAPH_VIT_GET(vit);
             VECTOR(*res)[k] = VECTOR(*tmpres)[node];
         }
 
@@ -544,7 +544,7 @@ int igraph_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *res,
  *     of the edges in a graph.
  */
 
-int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
+igraph_integer_t igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
                                 const igraph_vs_t vids, igraph_bool_t directed,
                                 igraph_real_t cutoff, const igraph_vector_t *weights) {
     IGRAPH_WARNING("igraph_betweenness_estimate is deprecated, use igraph_betweenness_cutoff.");
@@ -553,7 +553,7 @@ int igraph_betweenness_estimate(const igraph_t *graph, igraph_vector_t *res,
 
 /***** Edge betweenness *****/
 
-static int igraph_i_edge_betweenness_cutoff_weighted(
+static igraph_integer_t igraph_i_edge_betweenness_cutoff_weighted(
         const igraph_t *graph,
         igraph_vector_t *result,
         igraph_bool_t directed,
@@ -568,8 +568,8 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
     igraph_neimode_t mode = directed ? IGRAPH_OUT : IGRAPH_ALL;
     igraph_vector_t distance, tmpscore;
     igraph_vector_long_t nrgeo;
-    long int source, j;
-    int cmp_result;
+    igraph_integer_t source, j;
+    igraph_integer_t cmp_result;
     const double eps = IGRAPH_SHORTEST_PATH_EPSILON;
     igraph_stack_t S;
 
@@ -616,10 +616,10 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
         VECTOR(nrgeo)[source] = 1;
 
         while (!igraph_2wheap_empty(&Q)) {
-            long int minnei = igraph_2wheap_max_index(&Q);
+            igraph_integer_t minnei = igraph_2wheap_max_index(&Q);
             igraph_real_t mindist = -igraph_2wheap_delete_max(&Q);
             igraph_vector_int_t *neis;
-            long int nlen;
+            igraph_integer_t nlen;
 
             /* printf("SP to %li is final, dist: %g, nrgeo: %li\n", minnei, */
             /* VECTOR(distance)[minnei]-1.0, VECTOR(nrgeo)[minnei]); */
@@ -639,8 +639,8 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
             neis = igraph_inclist_get(&inclist, minnei);
             nlen = igraph_vector_int_size(neis);
             for (j = 0; j < nlen; j++) {
-                long int edge = (long int) VECTOR(*neis)[j];
-                long int to = IGRAPH_OTHER(graph, edge, minnei);
+                igraph_integer_t edge = (igraph_integer_t) VECTOR(*neis)[j];
+                igraph_integer_t to = IGRAPH_OTHER(graph, edge, minnei);
                 igraph_real_t altdist = mindist + VECTOR(*weights)[edge];
                 igraph_real_t curdist = VECTOR(distance)[to];
 
@@ -684,13 +684,13 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
         } /* igraph_2wheap_empty(&Q) */
 
         while (!igraph_stack_empty(&S)) {
-            long int w = (long int) igraph_stack_pop(&S);
+            igraph_integer_t w = (igraph_integer_t) igraph_stack_pop(&S);
             igraph_vector_int_t *fatv = igraph_inclist_get(&fathers, w);
-            long int fatv_len = igraph_vector_int_size(fatv);
+            igraph_integer_t fatv_len = igraph_vector_int_size(fatv);
             /* printf("Popping %li.\n", w); */
             for (j = 0; j < fatv_len; j++) {
-                long int fedge = (long int) VECTOR(*fatv)[j];
-                long int neighbor = IGRAPH_OTHER(graph, fedge, w);
+                igraph_integer_t fedge = (igraph_integer_t) VECTOR(*fatv)[j];
+                igraph_integer_t neighbor = IGRAPH_OTHER(graph, fedge, w);
                 VECTOR(tmpscore)[neighbor] += ((double)VECTOR(nrgeo)[neighbor]) /
                                               VECTOR(nrgeo)[w] * (1.0 + VECTOR(tmpscore)[w]);
                 /* printf("Scoring %li (edge %li)\n", neighbor, fedge); */
@@ -762,7 +762,7 @@ static int igraph_i_edge_betweenness_cutoff_weighted(
  *     of the edges in a graph. See \ref igraph_edge_betweenness_cutoff() to
  *     compute the range-limited betweenness score of the edges in a graph.
  */
-int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
+igraph_integer_t igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
                             igraph_bool_t directed,
                             const igraph_vector_t *weights) {
     return igraph_edge_betweenness_cutoff(graph, result, directed,
@@ -803,24 +803,24 @@ int igraph_edge_betweenness(const igraph_t *graph, igraph_vector_t *result,
  * \sa \ref igraph_edge_betweenness() to compute the exact edge betweenness and
  * \ref igraph_betweenness_cutoff() to compute the range-limited vertex betweenness.
  */
-int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
+igraph_integer_t igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *result,
                                    igraph_bool_t directed,
                                    const igraph_vector_t *weights, igraph_real_t cutoff) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_dqueue_t q = IGRAPH_DQUEUE_NULL;
-    long int *distance;
+    igraph_integer_t *distance;
     double *nrgeo;
     double *tmpscore;
     igraph_stack_t stack = IGRAPH_STACK_NULL;
-    long int source;
-    long int j;
+    igraph_integer_t source;
+    igraph_integer_t j;
 
     igraph_inclist_t elist_out, elist_in;
     igraph_inclist_t *elist_out_p, *elist_in_p;
     igraph_vector_int_t *neip;
-    long int neino;
-    long int i;
+    igraph_integer_t neino;
+    igraph_integer_t i;
 
     if (weights) {
         return igraph_i_edge_betweenness_cutoff_weighted(graph, result,
@@ -841,7 +841,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
         elist_out_p = elist_in_p = &elist_out;
     }
 
-    distance = igraph_Calloc(no_of_nodes, long int);
+    distance = igraph_Calloc(no_of_nodes, igraph_integer_t);
     if (distance == 0) {
         IGRAPH_ERROR("edge betweenness failed", IGRAPH_ENOMEM);
     }
@@ -877,7 +877,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
         distance[source] = 0;
 
         while (!igraph_dqueue_empty(&q)) {
-            long int actnode = (long int) igraph_dqueue_pop(&q);
+            igraph_integer_t actnode = (igraph_integer_t) igraph_dqueue_pop(&q);
 
             if (cutoff >= 0 && distance[actnode] > cutoff ) {
                 /* Reset variables if node is too distant */
@@ -894,7 +894,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
             neino = igraph_vector_int_size(neip);
             for (i = 0; i < neino; i++) {
                 igraph_integer_t edge = (igraph_integer_t) VECTOR(*neip)[i];
-                long int neighbor = (long int) IGRAPH_OTHER(graph, edge, actnode);
+                igraph_integer_t neighbor = (igraph_integer_t) IGRAPH_OTHER(graph, edge, actnode);
                 if (nrgeo[neighbor] != 0) {
                     /* we've already seen this node, another shortest path? */
                     if (distance[neighbor] == distance[actnode] + 1) {
@@ -914,7 +914,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
            shortest paths to them. Now we do an inverse search, starting
            with the farthest nodes. */
         while (!igraph_stack_empty(&stack)) {
-            long int actnode = (long int) igraph_stack_pop(&stack);
+            igraph_integer_t actnode = (igraph_integer_t) igraph_stack_pop(&stack);
             if (distance[actnode] < 1) {
                 distance[actnode] = 0;
                 tmpscore[actnode] = 0;
@@ -926,7 +926,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
             neino = igraph_vector_int_size(neip);
             for (i = 0; i < neino; i++) {
                 igraph_integer_t edgeno = (igraph_integer_t) VECTOR(*neip)[i];
-                long int neighbor = (long int) IGRAPH_OTHER(graph, edgeno, actnode);
+                igraph_integer_t neighbor = (igraph_integer_t) IGRAPH_OTHER(graph, edgeno, actnode);
                 if (distance[neighbor] == distance[actnode] - 1 &&
                     nrgeo[neighbor] != 0) {
                     tmpscore[neighbor] +=
@@ -1011,7 +1011,7 @@ int igraph_edge_betweenness_cutoff(const igraph_t *graph, igraph_vector_t *resul
  *     See \ref igraph_betweenness() for calculating the betweenness score
  *     of the vertices in a graph.
  */
-int igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
+igraph_integer_t igraph_edge_betweenness_estimate(const igraph_t *graph, igraph_vector_t *result,
                                    igraph_bool_t directed, igraph_real_t cutoff,
                                    const igraph_vector_t *weights) {
     IGRAPH_WARNING("igraph_edge_betweenness_estimate is deprecated, use igraph_edge_betweenness_cutoff.");

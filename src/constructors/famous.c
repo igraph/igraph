@@ -24,7 +24,7 @@
 
 #include "igraph_constructors.h"
 
-#include "internal/hacks.h" 
+#include "internal/hacks.h"
 
 const igraph_real_t igraph_i_famous_bull[] = {
     5, 5, 0,
@@ -252,9 +252,9 @@ const igraph_real_t igraph_i_famous_zachary[] = {
     32, 33
 };
 
-static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
-    long int no_of_nodes = (long int) data[0];
-    long int no_of_edges = (long int) data[1];
+static igraph_integer_t igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
+    igraph_integer_t no_of_nodes = (igraph_integer_t) data[0];
+    igraph_integer_t no_of_edges = (igraph_integer_t) data[1];
     igraph_bool_t directed = (igraph_bool_t) data[2];
     igraph_vector_t edges;
 
@@ -424,7 +424,7 @@ static int igraph_i_famous(igraph_t *graph, const igraph_real_t *data) {
  * of edges in the graph.
  */
 
-int igraph_famous(igraph_t *graph, const char *name) {
+igraph_integer_t igraph_famous(igraph_t *graph, const char *name) {
 
     if (!strcasecmp(name, "bull")) {
         return igraph_i_famous(graph, igraph_i_famous_bull);

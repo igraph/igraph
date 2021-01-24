@@ -35,7 +35,7 @@
  *
  *  The ANSI C standard committee, for the C99 standard, specified the
  *  inclusion of a new standard include file called stdint.h.  This is
- *  a very useful and long desired include file which contains several
+ *  a very useful and igraph_integer_t desired include file which contains several
  *  very precise definitions for integer scalar types that is
  *  critically important for making portable several classes of
  *  applications including cryptography, hashing, variable length
@@ -44,9 +44,9 @@
  *
  *  The problem is that most compiler vendors have decided not to
  *  implement the C99 standard, and the next C++ language standard
- *  (which has a lot more mindshare these days) will be a long time in
+ *  (which has a lot more mindshare these days) will be a igraph_integer_t time in
  *  coming and its unknown whether or not it will include stdint.h or
- *  how much adoption it will have.  Either way, it will be a long time
+ *  how much adoption it will have.  Either way, it will be a igraph_integer_t time
  *  before all compilers come with a stdint.h and it also does nothing
  *  for the extremely large number of compilers available today which
  *  do not include this file, or anything comparable to it.
@@ -332,7 +332,7 @@
     #endif
     #ifndef uint16_t
         #if (UINT_MAX == UINT16_MAX) || defined (S_SPLINT_S)
-            typedef unsigned int uint16_t;
+            typedef unsigned igraph_integer_t uint16_t;
             #ifndef PRINTF_INT16_MODIFIER
                 #define PRINTF_INT16_MODIFIER ""
             #endif
@@ -356,7 +356,7 @@
     #endif
     #ifndef int16_t
         #if (INT_MAX == INT16_MAX) || defined (S_SPLINT_S)
-            typedef signed int int16_t;
+            typedef signed igraph_integer_t int16_t;
             #define INT16_C(v) ((int16_t) (v))
             #ifndef PRINTF_INT16_MODIFIER
                 #define PRINTF_INT16_MODIFIER ""
@@ -377,13 +377,13 @@
     #endif
     #ifndef uint32_t
         #if (ULONG_MAX == UINT32_MAX) || defined (S_SPLINT_S)
-            typedef unsigned long uint32_t;
+            typedef unsigned igraph_integer_t uint32_t;
             #define UINT32_C(v) v ## UL
             #ifndef PRINTF_INT32_MODIFIER
                 #define PRINTF_INT32_MODIFIER "l"
             #endif
         #elif (UINT_MAX == UINT32_MAX)
-            typedef unsigned int uint32_t;
+            typedef unsigned igraph_integer_t uint32_t;
             #ifndef PRINTF_INT32_MODIFIER
                 #define PRINTF_INT32_MODIFIER ""
             #endif
@@ -407,13 +407,13 @@
     #endif
     #ifndef int32_t
         #if (LONG_MAX == INT32_MAX) || defined (S_SPLINT_S)
-            typedef signed long int32_t;
+            typedef signed igraph_integer_t int32_t;
             #define INT32_C(v) v ## L
             #ifndef PRINTF_INT32_MODIFIER
                 #define PRINTF_INT32_MODIFIER "l"
             #endif
         #elif (INT_MAX == INT32_MAX)
-            typedef signed int int32_t;
+            typedef signed igraph_integer_t int32_t;
             #define INT32_C(v) v
             #ifndef PRINTF_INT32_MODIFIER
                 #define PRINTF_INT32_MODIFIER ""
@@ -440,8 +440,8 @@
     #if (defined(__STDC__) && defined(__STDC_VERSION__)) || defined (S_SPLINT_S)
         #if (__STDC__ && __STDC_VERSION >= 199901L) || defined (S_SPLINT_S)
             #define stdint_int64_defined
-            typedef long long int64_t;
-            typedef unsigned long long uint64_t;
+            typedef igraph_integer_t igraph_integer_t int64_t;
+            typedef unsigned igraph_integer_t igraph_integer_t uint64_t;
             #define UINT64_C(v) v ## ULL
             #define  INT64_C(v) v ## LL
             #ifndef PRINTF_INT64_MODIFIER
@@ -453,8 +453,8 @@
     #if !defined (stdint_int64_defined)
         #if defined(__GNUC__)
             #define stdint_int64_defined
-            __extension__ typedef long long int64_t;
-            __extension__ typedef unsigned long long uint64_t;
+            __extension__ typedef igraph_integer_t igraph_integer_t int64_t;
+            __extension__ typedef unsigned igraph_integer_t igraph_integer_t uint64_t;
             #define UINT64_C(v) v ## ULL
             #define  INT64_C(v) v ## LL
             #ifndef PRINTF_INT64_MODIFIER
@@ -462,8 +462,8 @@
             #endif
         #elif defined(__MWERKS__) || defined (__SUNPRO_C) || defined (__SUNPRO_CC) || defined (__APPLE_CC__) || defined (_LONG_LONG) || defined (_CRAYC) || defined (S_SPLINT_S)
             #define stdint_int64_defined
-            typedef long long int64_t;
-            typedef unsigned long long uint64_t;
+            typedef igraph_integer_t igraph_integer_t int64_t;
+            typedef unsigned igraph_integer_t igraph_integer_t uint64_t;
             #define UINT64_C(v) v ## ULL
             #define  INT64_C(v) v ## LL
             #ifndef PRINTF_INT64_MODIFIER
@@ -708,7 +708,7 @@
                 #define UINTPTR_C(x)                stdint_intptr_glue3(UINT,stdint_intptr_bits,_C)(x)
             #endif
             typedef stdint_intptr_glue3(uint, stdint_intptr_bits, _t) uintptr_t;
-            typedef stdint_intptr_glue3( int, stdint_intptr_bits, _t)  intptr_t;
+            typedef stdint_intptr_glue3( igraph_integer_t, stdint_intptr_bits, _t)  intptr_t;
         #else
             /* TODO -- This following is likely wrong for some platforms, and does
             nothing for the definition of uintptr_t. */
@@ -742,13 +742,13 @@
 #define glue3(x,y,z) glue3_aux(x,y,z)
 
 #define DECLU(bits) glue3(uint,bits,_t) glue3(u,bits,=) glue3(UINT,bits,_C) (0);
-#define DECLI(bits) glue3(int,bits,_t) glue3(i,bits,=) glue3(INT,bits,_C) (0);
+#define DECLI(bits) glue3(igraph_integer_t,bits,_t) glue3(i,bits,=) glue3(INT,bits,_C) (0);
 
 #define DECL(us,bits) glue3(DECL,us,) (bits)
 
 #define TESTUMAX(bits) glue3(u,bits,=) glue3(~,u,bits); if (glue3(UINT,bits,_MAX) glue3(!=,u,bits)) printf ("Something wrong with UINT%d_MAX\n", bits)
 
-int main () {
+igraph_integer_t main () {
     DECL(I, 8)
     DECL(U, 8)
     DECL(I, 16)

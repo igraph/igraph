@@ -43,7 +43,7 @@ __BEGIN_DECLS
  * into.</para>
  * <para>
  * An \emb interruption handler \eme is a function which is called regularly
- * by \a igraph during long calculations. A typical usage of the interruption
+ * by \a igraph during igraph_integer_t calculations. A typical usage of the interruption
  * handler is to check whether the user tried to interrupt the calculation
  * and return an appropriate value to signal this condition. For example,
  * in R, one must call an internal R function regularly to check for
@@ -73,7 +73,7 @@ __BEGIN_DECLS
  * of Ctrl-C and similar keypresses properly.
  * </para>
  * <para>
- * Your interruption handler will be called regularly during long operations
+ * Your interruption handler will be called regularly during igraph_integer_t operations
  * (so it is not guaranteed to be called during operations which tend to be
  * short, like adding single edges). An interruption handler accepts no
  * parameters and must return \c IGRAPH_SUCCESS if the calculation should go on. All
@@ -89,7 +89,7 @@ __BEGIN_DECLS
  *
  * <para>
  * There is practically a simple rule that should be obeyed when writing
- * \a igraph functions. If the calculation is expected to take a long time
+ * \a igraph functions. If the calculation is expected to take a igraph_integer_t time
  * in large graphs (a simple rule of thumb is to assume this for every
  * function with a time complexity of at least O(n^2)), call
  * \ref IGRAPH_ALLOW_INTERRUPTION in regular intervals like every 10th
@@ -106,7 +106,7 @@ __BEGIN_DECLS
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
 
-typedef int igraph_interruption_handler_t (void* data);
+typedef igraph_integer_t igraph_interruption_handler_t (void* data);
 
 /**
  * \function igraph_allow_interruption
@@ -119,7 +119,7 @@ typedef int igraph_interruption_handler_t (void* data);
  * \return \c IGRAPH_SUCCESS if the calculation should go on, anything else otherwise.
  */
 
-DECLDIR int igraph_allow_interruption(void* data);
+DECLDIR igraph_integer_t igraph_allow_interruption(void* data);
 
 DECLDIR igraph_interruption_handler_t * igraph_set_interruption_handler (igraph_interruption_handler_t * new_handler);
 

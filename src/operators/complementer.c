@@ -48,14 +48,14 @@
  *
  * \example examples/simple/igraph_complementer.c
  */
-int igraph_complementer(igraph_t *res, const igraph_t *graph,
+igraph_integer_t igraph_complementer(igraph_t *res, const igraph_t *graph,
                         igraph_bool_t loops) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t edges;
     igraph_vector_t neis;
-    long int i, j;
-    long int zero = 0, *limit;
+    igraph_integer_t i, j;
+    igraph_integer_t zero = 0, *limit;
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&neis, 0);

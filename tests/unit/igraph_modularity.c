@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_t graph;
     igraph_vector_t weights;
     igraph_vector_t membership;

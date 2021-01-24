@@ -6,7 +6,7 @@
 
 void realize1(igraph_vector_t *ods, igraph_vector_t *ids, igraph_edge_type_sw_t et, igraph_realize_degseq_t method) {
     igraph_t graph;
-    int err;
+    igraph_integer_t err;
     err = igraph_realize_degree_sequence(&graph, ods, ids, et, method);
     if (err == IGRAPH_SUCCESS) {
         printf("\n");
@@ -55,7 +55,7 @@ void directed_print_destroy(igraph_vector_t *ods, igraph_vector_t *ids) {
 }
 
 
-int main() {
+igraph_integer_t main() {
     igraph_vector_t ds, ods, ids;
 
     igraph_set_error_handler(&igraph_error_handler_ignore);

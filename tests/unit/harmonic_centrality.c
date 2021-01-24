@@ -3,12 +3,12 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_t graph;
     igraph_vector_t res;
     igraph_vector_t weights;
 
-    igraph_vector_init(&res, 0);    
+    igraph_vector_init(&res, 0);
 
     /* Path graph */
     igraph_ring(&graph, 7, IGRAPH_DIRECTED, 0, /* circular */ 0);
@@ -31,7 +31,7 @@ int main() {
     igraph_vector_fill(&weights, 1.0);
 
     printf("Unit-weighted undirected:\n");
-    igraph_harmonic_centrality(&graph, &res, igraph_vss_all(), IGRAPH_ALL, /* weights= */ &weights, /* normalized= */ 1);    
+    igraph_harmonic_centrality(&graph, &res, igraph_vss_all(), IGRAPH_ALL, /* weights= */ &weights, /* normalized= */ 1);
     print_vector(&res);
     printf("Unit-weighted directed:\n");
     igraph_harmonic_centrality(&graph, &res, igraph_vss_all(), IGRAPH_OUT, /* weights= */ &weights, /* normalized= */ 1);

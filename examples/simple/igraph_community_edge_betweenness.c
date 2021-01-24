@@ -23,7 +23,7 @@
 
 #include <igraph.h>
 
-int igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
+igraph_integer_t igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
                           const igraph_vector_t* hi) {
     return igraph_vector_all_le(lo, v) && igraph_vector_all_ge(hi, v);
 }
@@ -31,8 +31,8 @@ int igraph_vector_between(const igraph_vector_t* v, const igraph_vector_t* lo,
 void test_unweighted() {
     igraph_t g;
     igraph_vector_t edges, eb;
-    long int i;
-    long int no_of_edges;
+    igraph_integer_t i;
+    igraph_integer_t no_of_edges;
 
     /* Zachary Karate club */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
@@ -64,7 +64,7 @@ void test_unweighted() {
 
     no_of_edges = igraph_ecount(&g);
     for (i = 0; i < no_of_edges; i++) {
-        printf("%li ", (long int)VECTOR(edges)[i]);
+        printf("%li ", (igraph_integer_t)VECTOR(edges)[i]);
     }
     printf("\n");
 
@@ -168,7 +168,7 @@ void test_zero_edge_graph() {
     igraph_vector_init(&res, igraph_ecount(&g));
     igraph_vector_init(&eb, igraph_ecount(&g));
 
-    igraph_community_edge_betweenness(&g, 
+    igraph_community_edge_betweenness(&g,
         &res, // result
         &eb, // edge_betweenness result
         NULL, // merges result
@@ -177,7 +177,7 @@ void test_zero_edge_graph() {
         NULL, // membership
         IGRAPH_UNDIRECTED, // directed
         NULL // weights
-        );    
+        );
 
     igraph_vector_destroy(&eb);
     printf("No crash\n");
@@ -185,7 +185,7 @@ void test_zero_edge_graph() {
     igraph_destroy(&g);
 }
 
-int main() {
+igraph_integer_t main() {
     test_unweighted();
     test_weighted();
     test_zero_edge_graph();

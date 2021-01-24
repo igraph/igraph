@@ -61,7 +61,7 @@
  *
  * \example examples/simple/igraph_intersection.c
  */
-int igraph_intersection(igraph_t *res,
+igraph_integer_t igraph_intersection(igraph_t *res,
                         const igraph_t *left, const igraph_t *right,
                         igraph_vector_t *edge_map1,
                         igraph_vector_t *edge_map2) {
@@ -101,19 +101,19 @@ int igraph_intersection(igraph_t *res,
  * |E| is the number of edges in the smallest graph (i.e. the graph having
  * the less vertices).
  */
-int igraph_intersection_many(igraph_t *res,
+igraph_integer_t igraph_intersection_many(igraph_t *res,
                              const igraph_vector_ptr_t *graphs,
                              igraph_vector_ptr_t *edgemaps) {
 
-    long int no_of_graphs = igraph_vector_ptr_size(graphs);
-    long int no_of_nodes = 0;
+    igraph_integer_t no_of_graphs = igraph_vector_ptr_size(graphs);
+    igraph_integer_t no_of_nodes = 0;
     igraph_bool_t directed = 1;
     igraph_vector_t edges;
     igraph_vector_ptr_t edge_vects, order_vects;
-    long int i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto = -1;
+    igraph_integer_t i, j, tailfrom = no_of_graphs > 0 ? 0 : -1, tailto = -1;
     igraph_vector_long_t no_edges;
     igraph_bool_t allne = no_of_graphs == 0 ? 0 : 1, allsame = 0;
-    long int idx = 0;
+    igraph_integer_t idx = 0;
 
     /* Check directedness */
     if (no_of_graphs != 0) {
@@ -138,7 +138,7 @@ int igraph_intersection_many(igraph_t *res,
 
     /* Calculate number of nodes, query number of edges */
     for (i = 0; i < no_of_graphs; i++) {
-        long int n = igraph_vcount(VECTOR(*graphs)[i]);
+        igraph_integer_t n = igraph_vcount(VECTOR(*graphs)[i]);
         if (n > no_of_nodes) {
             no_of_nodes = n;
         }
@@ -179,14 +179,14 @@ int igraph_intersection_many(igraph_t *res,
 
     /* Query and sort the edge lists */
     for (i = 0; i < no_of_graphs; i++) {
-        long int k, j, n = VECTOR(no_edges)[i];
+        igraph_integer_t k, j, n = VECTOR(no_edges)[i];
         igraph_vector_t *edges = VECTOR(edge_vects)[i];
         igraph_vector_long_t *order = VECTOR(order_vects)[i];
         IGRAPH_CHECK(igraph_get_edgelist(VECTOR(*graphs)[i], edges, /*bycol=*/0));
         if (!directed) {
             for (k = 0, j = 0; k < n; k++, j += 2) {
                 if (VECTOR(*edges)[j] > VECTOR(*edges)[j + 1]) {
-                    long int tmp = VECTOR(*edges)[j];
+                    igraph_integer_t tmp = VECTOR(*edges)[j];
                     VECTOR(*edges)[j] = VECTOR(*edges)[j + 1];
                     VECTOR(*edges)[j + 1] = tmp;
                 }
@@ -209,10 +209,10 @@ int igraph_intersection_many(igraph_t *res,
 
         /* Look for the smallest tail element */
         for (j = 0, tailfrom = LONG_MAX, tailto = LONG_MAX; j < no_of_graphs; j++) {
-            long int edge = igraph_vector_long_tail(VECTOR(order_vects)[j]);
+            igraph_integer_t edge = igraph_vector_long_tail(VECTOR(order_vects)[j]);
             igraph_vector_t *ev = VECTOR(edge_vects)[j];
-            long int from = VECTOR(*ev)[2 * edge];
-            long int to = VECTOR(*ev)[2 * edge + 1];
+            igraph_integer_t from = VECTOR(*ev)[2 * edge];
+            igraph_integer_t to = VECTOR(*ev)[2 * edge + 1];
             if (from < tailfrom || (from == tailfrom && to < tailto)) {
                 tailfrom = from; tailto = to;
             }
@@ -221,9 +221,9 @@ int igraph_intersection_many(igraph_t *res,
         /* OK, now remove all elements from the tail(s) that are bigger
            than the smallest tail element. */
         for (j = 0, allsame = 1; j < no_of_graphs; j++) {
-            long int from = -1, to = -1;
+            igraph_integer_t from = -1, to = -1;
             while (1) {
-                long int edge = igraph_vector_long_tail(VECTOR(order_vects)[j]);
+                igraph_integer_t edge = igraph_vector_long_tail(VECTOR(order_vects)[j]);
                 igraph_vector_t *ev = VECTOR(edge_vects)[j];
                 from = VECTOR(*ev)[2 * edge];
                 to = VECTOR(*ev)[2 * edge + 1];
@@ -253,10 +253,10 @@ int igraph_intersection_many(igraph_t *res,
            from the order vectors, build edge maps */
         if (allne) {
             for (j = 0; j < no_of_graphs; j++) {
-                long int edge = igraph_vector_long_tail(VECTOR(order_vects)[j]);
+                igraph_integer_t edge = igraph_vector_long_tail(VECTOR(order_vects)[j]);
                 igraph_vector_t *ev = VECTOR(edge_vects)[j];
-                long int from = VECTOR(*ev)[2 * edge];
-                long int to = VECTOR(*ev)[2 * edge + 1];
+                igraph_integer_t from = VECTOR(*ev)[2 * edge];
+                igraph_integer_t to = VECTOR(*ev)[2 * edge + 1];
                 if (from == tailfrom && to == tailto) {
                     igraph_vector_long_pop_back(VECTOR(order_vects)[j]);
                     if (igraph_vector_long_empty(VECTOR(order_vects)[j])) {

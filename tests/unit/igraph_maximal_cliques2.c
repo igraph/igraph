@@ -25,15 +25,15 @@
 
 #include "test_utilities.inc"
 
-int sort_cmp(const void *a, const void *b) {
+igraph_integer_t sort_cmp(const void *a, const void *b) {
     const igraph_vector_t **da = (const igraph_vector_t **) a;
     const igraph_vector_t **db = (const igraph_vector_t **) b;
-    int i, alen = igraph_vector_size(*da), blen = igraph_vector_size(*db);
+    igraph_integer_t i, alen = igraph_vector_size(*da), blen = igraph_vector_size(*db);
     if (alen != blen) {
         return (alen < blen) - (alen > blen);
     }
     for (i = 0; i < alen; i++) {
-        int ea = VECTOR(**da)[i], eb = VECTOR(**db)[i];
+        igraph_integer_t ea = VECTOR(**da)[i], eb = VECTOR(**db)[i];
         if (ea != eb) {
             return (ea > eb) - (ea < eb);
         }
@@ -42,7 +42,7 @@ int sort_cmp(const void *a, const void *b) {
 }
 
 void sort_cliques(igraph_vector_ptr_t *cliques) {
-    int i, n = igraph_vector_ptr_size(cliques);
+    igraph_integer_t i, n = igraph_vector_ptr_size(cliques);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
         igraph_vector_sort(v);
@@ -51,8 +51,8 @@ void sort_cliques(igraph_vector_ptr_t *cliques) {
                  sizeof(igraph_vector_t *), sort_cmp);
 }
 
-int print_and_destroy(igraph_vector_ptr_t *cliques) {
-    int i, n = igraph_vector_ptr_size(cliques);
+igraph_integer_t print_and_destroy(igraph_vector_ptr_t *cliques) {
+    igraph_integer_t i, n = igraph_vector_ptr_size(cliques);
     sort_cliques(cliques);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
@@ -63,7 +63,7 @@ int print_and_destroy(igraph_vector_ptr_t *cliques) {
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
     igraph_t graph;
     igraph_vector_ptr_t cliques;
     igraph_integer_t no;

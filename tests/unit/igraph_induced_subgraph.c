@@ -25,7 +25,7 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_t g, sub;
     igraph_vector_t keep;
 

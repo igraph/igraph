@@ -24,15 +24,15 @@ void sort_and_print(igraph_vector_t *vec) {
     print_vector_round(vec);
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t cut, partition, partition2, capacity;
     igraph_real_t value;
-    int source = 0;
-    int target = 4;
-    int cut_edge;
-    int partition_vertex;
+    igraph_integer_t source = 0;
+    igraph_integer_t target = 4;
+    igraph_integer_t cut_edge;
+    igraph_integer_t partition_vertex;
 
     igraph_vector_init(&partition, 0);
     igraph_vector_init(&partition2, 0);

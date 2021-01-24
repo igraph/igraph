@@ -13,7 +13,7 @@
     igraph_destroy(&res); \
     igraph_destroy(&graph);
 
-int main() {
+igraph_integer_t main() {
     igraph_t graph, res;
     igraph_vector_int_t vcol, ecol;
 

@@ -21,7 +21,7 @@
 #include <igraph.h>
 #include <stdio.h>
 
-int main() {
+igraph_integer_t main() {
     igraph_t graph;
     igraph_vector_t membership;
     igraph_real_t modularity;
@@ -40,7 +40,7 @@ int main() {
                 &modularity);
 
     printf("%ld communities found; modularity score is %g.\n",
-           (long int) (igraph_vector_max(&membership) + 1),
+           (igraph_integer_t) (igraph_vector_max(&membership) + 1),
            modularity);
 
     /* Destroy data structures at the end. */

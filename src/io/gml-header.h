@@ -26,7 +26,7 @@
 
 typedef struct {
     void *scanner;
-    int eof;
+    igraph_integer_t eof;
     char errmsg[300];
     igraph_gml_tree_t *tree;
 } igraph_i_gml_parsedata_t;
@@ -34,7 +34,7 @@ typedef struct {
 /**
  * Initializes a GML parser context.
  */
-int igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context);
+igraph_integer_t igraph_i_gml_parsedata_init(igraph_i_gml_parsedata_t* context);
 
 /**
  * Destroys a GML parser context, freeing all memory currently used by the

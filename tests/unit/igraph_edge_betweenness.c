@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-int test_bug950() {
+igraph_integer_t test_bug950() {
     /* Testing the case of weighted graphs with multiple alternate
      * paths to the same node with slightly different weights due to
      * floating point inaccuracies. */
@@ -32,7 +32,7 @@ int test_bug950() {
     igraph_vector_t eb;
     igraph_vector_t weights;
     igraph_integer_t from, to;
-    long int i;
+    igraph_integer_t i;
 
     igraph_full(&g, 6, 0, 0);
     igraph_vector_init(&weights, igraph_ecount(&g));
@@ -56,7 +56,7 @@ int test_bug950() {
     return 0;
 }
 
-int test_bug1050() {
+igraph_integer_t test_bug1050() {
     /* compare cutoff = -1 with cutoff = 0 */
     igraph_t g;
     igraph_vector_t eb, eb2;
@@ -102,7 +102,7 @@ int test_bug1050() {
 
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t eb;

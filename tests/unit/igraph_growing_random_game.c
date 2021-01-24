@@ -21,11 +21,11 @@
 #include "test_utilities.inc"
 
 
-int main() {
+igraph_integer_t main() {
     igraph_t g;
     igraph_vector_t degree;
     igraph_bool_t tree;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 42);
 

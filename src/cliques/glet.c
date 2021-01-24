@@ -74,12 +74,12 @@ typedef struct {
     igraph_vector_int_t *resultids;
     igraph_t *result;
     igraph_vector_t *resultweights;
-    int nc;
+    igraph_integer_t nc;
 } igraph_i_subclique_next_free_t;
 
 static void igraph_i_subclique_next_free(void *ptr) {
     igraph_i_subclique_next_free_t *data = ptr;
-    int i;
+    igraph_integer_t i;
     if (data->resultids) {
         for (i = 0; i < data->nc; i++) {
             if (data->resultids + i) {
@@ -125,7 +125,7 @@ static void igraph_i_subclique_next_free(void *ptr) {
  *
  */
 
-static int igraph_i_subclique_next(const igraph_t *graph,
+static igraph_integer_t igraph_i_subclique_next(const igraph_t *graph,
                                    const igraph_vector_t *weights,
                                    const igraph_vector_int_t *ids,
                                    const igraph_vector_ptr_t *cliques,
@@ -297,7 +297,7 @@ static int igraph_i_subclique_next(const igraph_t *graph,
 }
 
 static void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
-    int i, n = igraph_vector_ptr_size(vl);
+    igraph_integer_t i, n = igraph_vector_ptr_size(vl);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = (igraph_vector_t*) VECTOR(*vl)[i];
         if (v) {
@@ -307,7 +307,7 @@ static void igraph_i_graphlets_destroy_vectorlist(igraph_vector_ptr_t *vl) {
     igraph_vector_ptr_destroy(vl);
 }
 
-static int igraph_i_graphlets(const igraph_t *graph,
+static igraph_integer_t igraph_i_graphlets(const igraph_t *graph,
                               const igraph_vector_t *weights,
                               igraph_vector_ptr_t *cliques,
                               igraph_vector_t *thresholds,
@@ -320,10 +320,10 @@ static int igraph_i_graphlets(const igraph_t *graph,
        'startthr' */
 
     igraph_vector_ptr_t mycliques;
-    int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t subv;
     igraph_t subg;
-    int i, nographs, nocliques;
+    igraph_integer_t i, nographs, nocliques;
     igraph_t *newgraphs = 0;
     igraph_vector_t *newweights = 0;
     igraph_vector_int_t *newids = 0;
@@ -369,9 +369,9 @@ static int igraph_i_graphlets(const igraph_t *graph,
     igraph_vector_append(thresholds, &clique_thr);
     for (i = 0; i < nocliques; i++) {
         igraph_vector_t *cl = (igraph_vector_t*) VECTOR(mycliques)[i];
-        int j, n = igraph_vector_size(cl);
+        igraph_integer_t j, n = igraph_vector_size(cl);
         for (j = 0; j < n; j++) {
-            int node = VECTOR(*cl)[j];
+            igraph_integer_t node = VECTOR(*cl)[j];
             VECTOR(*cl)[j] = VECTOR(*ids)[node];
         }
         igraph_vector_sort(cl);
@@ -403,14 +403,14 @@ typedef struct {
     const igraph_vector_t *thresholds;
 } igraph_i_graphlets_filter_t;
 
-static int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *b) {
+static igraph_integer_t igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *b) {
     igraph_i_graphlets_filter_t *ddata = (igraph_i_graphlets_filter_t *) data;
-    int *aa = (int*) a;
-    int *bb = (int*) b;
+    igraph_integer_t *aa = (igraph_integer_t*) a;
+    igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t t_a = VECTOR(*ddata->thresholds)[*aa];
     igraph_real_t t_b = VECTOR(*ddata->thresholds)[*bb];
     igraph_vector_t *v_a, *v_b;
-    int s_a, s_b;
+    igraph_integer_t s_a, s_b;
 
     if (t_a < t_b) {
         return -1;
@@ -432,7 +432,7 @@ static int igraph_i_graphlets_filter_cmp(void *data, const void *a, const void *
     }
 }
 
-static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
+static igraph_integer_t igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
                                      igraph_vector_t *thresholds) {
 
     /* Filter out non-maximal cliques. Every non-maximal clique is
@@ -443,7 +443,7 @@ static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
        superset, we only need to check the cliques next in the list,
        until their threshold is different. */
 
-    int i, iptr, nocliques = igraph_vector_ptr_size(cliques);
+    igraph_integer_t i, iptr, nocliques = igraph_vector_ptr_size(cliques);
     igraph_vector_int_t order;
     igraph_i_graphlets_filter_t sortdata = { cliques, thresholds };
 
@@ -453,21 +453,21 @@ static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
         VECTOR(order)[i] = i;
     }
 
-    igraph_qsort_r(VECTOR(order), nocliques, sizeof(int), &sortdata,
+    igraph_qsort_r(VECTOR(order), nocliques, sizeof(igraph_integer_t), &sortdata,
                    igraph_i_graphlets_filter_cmp);
 
     for (i = 0; i < nocliques - 1; i++) {
-        int ri = VECTOR(order)[i];
+        igraph_integer_t ri = VECTOR(order)[i];
         igraph_vector_t *needle = VECTOR(*cliques)[ri];
         igraph_real_t thr_i = VECTOR(*thresholds)[ri];
-        int n_i = igraph_vector_size(needle);
-        int j = i + 1;
+        igraph_integer_t n_i = igraph_vector_size(needle);
+        igraph_integer_t j = i + 1;
 
         for (j = i + 1; j < nocliques; j++) {
-            int rj = VECTOR(order)[j];
+            igraph_integer_t rj = VECTOR(order)[j];
             igraph_real_t thr_j = VECTOR(*thresholds)[rj];
             igraph_vector_t *hay;
-            int n_j, pi = 0, pj = 0;
+            igraph_integer_t n_j, pi = 0, pj = 0;
 
             /* Done, not found */
             if (thr_j != thr_i) {
@@ -483,8 +483,8 @@ static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
 
             /* Check if hay is a superset */
             while (pi < n_i && pj < n_j && n_i - pi <= n_j - pj) {
-                int ei = VECTOR(*needle)[pi];
-                int ej = VECTOR(*hay)[pj];
+                igraph_integer_t ei = VECTOR(*needle)[pi];
+                igraph_integer_t ej = VECTOR(*hay)[pj];
                 if (ei < ej) {
                     break;
                 } else if (ei > ej) {
@@ -540,17 +540,17 @@ static int igraph_i_graphlets_filter(igraph_vector_ptr_t *cliques,
  * See also: \ref igraph_graphlets() and \ref igraph_graphlets_project().
  */
 
-int igraph_graphlets_candidate_basis(const igraph_t *graph,
+igraph_integer_t igraph_graphlets_candidate_basis(const igraph_t *graph,
                                      const igraph_vector_t *weights,
                                      igraph_vector_ptr_t *cliques,
                                      igraph_vector_t *thresholds) {
 
-    int no_of_nodes = igraph_vcount(graph);
-    int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_real_t minthr;
     igraph_vector_int_t ids;
     igraph_bool_t simple;
-    int i;
+    igraph_integer_t i;
 
     /* Some checks */
     if (weights == NULL) {
@@ -586,18 +586,18 @@ int igraph_graphlets_candidate_basis(const igraph_t *graph,
 }
 
 /* TODO: not made static because it is used by the R interface */
-int igraph_i_graphlets_project(const igraph_t *graph,
+igraph_integer_t igraph_i_graphlets_project(const igraph_t *graph,
                                const igraph_vector_t *weights,
                                const igraph_vector_ptr_t *cliques,
                                igraph_vector_t *Mu, igraph_bool_t startMu,
-                               int niter, int vid1) {
+                               igraph_integer_t niter, igraph_integer_t vid1) {
 
-    int no_of_nodes = igraph_vcount(graph);
-    int no_of_edges = igraph_ecount(graph);
-    int no_cliques = igraph_vector_ptr_size(cliques);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_cliques = igraph_vector_ptr_size(cliques);
     igraph_vector_int_t vcl, vclidx, ecl, eclidx, cel, celidx;
     igraph_vector_t edgelist, newweights, normfact;
-    int i, total_vertices, e, ptr, total_edges;
+    igraph_integer_t i, total_vertices, e, ptr, total_edges;
     igraph_bool_t simple;
 
     /* Check arguments */
@@ -631,12 +631,12 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_int_destroy, &celidx);
     for (i = 0, total_vertices = 0, total_edges = 0; i < no_cliques; i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
-        int j, n = igraph_vector_size(v);
+        igraph_integer_t j, n = igraph_vector_size(v);
         total_vertices += n;
         total_edges += n * (n - 1) / 2;
         VECTOR(celidx)[i + 2] = total_edges;
         for (j = 0; j < n; j++) {
-            int vv = VECTOR(*v)[j] - vid1;
+            igraph_integer_t vv = VECTOR(*v)[j] - vid1;
             VECTOR(vclidx)[vv + 2] += 1;
         }
     }
@@ -652,10 +652,10 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_int_destroy, &vcl);
     for (i = 0; i < no_cliques; i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
-        int j, n = igraph_vector_size(v);
+        igraph_integer_t j, n = igraph_vector_size(v);
         for (j = 0; j < n; j++) {
-            int vv = VECTOR(*v)[j] - vid1;
-            int p = VECTOR(vclidx)[vv + 1];
+            igraph_integer_t vv = VECTOR(*v)[j] - vid1;
+            igraph_integer_t p = VECTOR(vclidx)[vv + 1];
             VECTOR(vcl)[p] = i;
             VECTOR(vclidx)[vv + 1] += 1;
         }
@@ -670,16 +670,16 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_destroy, &edgelist);
     IGRAPH_CHECK(igraph_get_edgelist(graph, &edgelist, /*by_col=*/ 0));
     for (i = 0, e = 0, ptr = 0; e < no_of_edges; e++) {
-        int from = VECTOR(edgelist)[i++];
-        int to = VECTOR(edgelist)[i++];
-        int from_s = VECTOR(vclidx)[from];
-        int from_e = VECTOR(vclidx)[from + 1];
-        int to_s = VECTOR(vclidx)[to];
-        int to_e = VECTOR(vclidx)[to + 1];
+        igraph_integer_t from = VECTOR(edgelist)[i++];
+        igraph_integer_t to = VECTOR(edgelist)[i++];
+        igraph_integer_t from_s = VECTOR(vclidx)[from];
+        igraph_integer_t from_e = VECTOR(vclidx)[from + 1];
+        igraph_integer_t to_s = VECTOR(vclidx)[to];
+        igraph_integer_t to_e = VECTOR(vclidx)[to + 1];
         VECTOR(eclidx)[e] = ptr;
         while (from_s < from_e && to_s < to_e) {
-            int from_v = VECTOR(vcl)[from_s];
-            int to_v = VECTOR(vcl)[to_s];
+            igraph_integer_t from_v = VECTOR(vcl)[from_s];
+            igraph_integer_t to_v = VECTOR(vcl)[to_s];
             if (from_v == to_v) {
                 VECTOR(ecl)[ptr++] = from_v;
                 from_s++; to_s++;
@@ -699,10 +699,10 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_CHECK(igraph_vector_int_init(&cel, total_edges));
     IGRAPH_FINALLY(igraph_vector_int_destroy, &cel);
     for (i = 0; i < no_of_edges; i++) {
-        int ecl_s = VECTOR(eclidx)[i], ecl_e = VECTOR(eclidx)[i + 1], j;
+        igraph_integer_t ecl_s = VECTOR(eclidx)[i], ecl_e = VECTOR(eclidx)[i + 1], j;
         for (j = ecl_s; j < ecl_e; j++) {
-            int cl = VECTOR(ecl)[j];
-            int epos = VECTOR(celidx)[cl + 1];
+            igraph_integer_t cl = VECTOR(ecl)[j];
+            igraph_integer_t epos = VECTOR(celidx)[cl + 1];
             VECTOR(cel)[epos] = i;
             VECTOR(celidx)[cl + 1] += 1;
         }
@@ -713,7 +713,7 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_destroy, &normfact);
     for (i = 0; i < no_cliques; i++) {
         igraph_vector_t *v = VECTOR(*cliques)[i];
-        int n = igraph_vector_size(v);
+        igraph_integer_t n = igraph_vector_size(v);
         VECTOR(normfact)[i] = n * (n + 1) / 2;
     }
 
@@ -722,20 +722,20 @@ int igraph_i_graphlets_project(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vector_destroy, &newweights);
     for (i = 0; i < niter; i++) {
         for (e = 0; e < no_of_edges; e++) {
-            int start = VECTOR(eclidx)[e];
-            int end = VECTOR(eclidx)[e + 1];
+            igraph_integer_t start = VECTOR(eclidx)[e];
+            igraph_integer_t end = VECTOR(eclidx)[e + 1];
             VECTOR(newweights)[e] = 0.0001;
             while (start < end) {
-                int clique = VECTOR(ecl)[start++];
+                igraph_integer_t clique = VECTOR(ecl)[start++];
                 VECTOR(newweights)[e] += VECTOR(*Mu)[clique];
             }
         }
         for (e = 0; e < no_cliques; e++) {
             igraph_real_t sumratio = 0;
-            int start = VECTOR(celidx)[e];
-            int end = VECTOR(celidx)[e + 1];
+            igraph_integer_t start = VECTOR(celidx)[e];
+            igraph_integer_t end = VECTOR(celidx)[e + 1];
             while (start < end) {
-                int edge = VECTOR(cel)[start++];
+                igraph_integer_t edge = VECTOR(cel)[start++];
                 sumratio += VECTOR(*weights)[edge] / VECTOR(newweights)[edge];
             }
             VECTOR(*Mu)[e] *= sumratio / VECTOR(normfact)[e];
@@ -782,11 +782,11 @@ int igraph_i_graphlets_project(const igraph_t *graph,
  * \ref igraph_graphlets_candidate_basis().
  */
 
-int igraph_graphlets_project(const igraph_t *graph,
+igraph_integer_t igraph_graphlets_project(const igraph_t *graph,
                              const igraph_vector_t *weights,
                              const igraph_vector_ptr_t *cliques,
                              igraph_vector_t *Mu, igraph_bool_t startMu,
-                             int niter) {
+                             igraph_integer_t niter) {
 
     return igraph_i_graphlets_project(graph, weights, cliques, Mu, startMu,
                                       niter, /*vid1=*/ 0);
@@ -797,10 +797,10 @@ typedef struct igraph_i_graphlets_order_t {
     const igraph_vector_t *Mu;
 } igraph_i_graphlets_order_t;
 
-static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b) {
+static igraph_integer_t igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b) {
     igraph_i_graphlets_order_t *ddata = (igraph_i_graphlets_order_t*) data;
-    int *aa = (int*) a;
-    int *bb = (int*) b;
+    igraph_integer_t *aa = (igraph_integer_t*) a;
+    igraph_integer_t *bb = (igraph_integer_t*) b;
     igraph_real_t Mu_a = VECTOR(*ddata->Mu)[*aa];
     igraph_real_t Mu_b = VECTOR(*ddata->Mu)[*bb];
 
@@ -836,12 +836,12 @@ static int igraph_i_graphlets_order_cmp(void *data, const void *a, const void *b
  * \ref igraph_graphlets_project().
  */
 
-int igraph_graphlets(const igraph_t *graph,
+igraph_integer_t igraph_graphlets(const igraph_t *graph,
                      const igraph_vector_t *weights,
                      igraph_vector_ptr_t *cliques,
-                     igraph_vector_t *Mu, int niter) {
+                     igraph_vector_t *Mu, igraph_integer_t niter) {
 
-    int i, nocliques;
+    igraph_integer_t i, nocliques;
     igraph_vector_t thresholds;
     igraph_vector_int_t order;
     igraph_i_graphlets_order_t sortdata = { cliques, Mu };
@@ -860,7 +860,7 @@ int igraph_graphlets(const igraph_t *graph,
     for (i = 0; i < nocliques; i++) {
         VECTOR(order)[i] = i;
     }
-    igraph_qsort_r(VECTOR(order), nocliques, sizeof(int), &sortdata,
+    igraph_qsort_r(VECTOR(order), nocliques, sizeof(igraph_integer_t), &sortdata,
                    igraph_i_graphlets_order_cmp);
 
     igraph_vector_ptr_index_int(cliques, &order);

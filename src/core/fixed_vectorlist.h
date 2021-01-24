@@ -47,13 +47,13 @@ __BEGIN_DECLS
 typedef struct igraph_fixed_vectorlist_t {
     igraph_vector_t *vecs;
     igraph_vector_ptr_t v;
-    long int length;
+    igraph_integer_t length;
 } igraph_fixed_vectorlist_t;
 
 void igraph_fixed_vectorlist_destroy(igraph_fixed_vectorlist_t *l);
-int igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
+igraph_integer_t igraph_fixed_vectorlist_convert(igraph_fixed_vectorlist_t *l,
                                     const igraph_vector_t *from,
-                                    long int size);
+                                    igraph_integer_t size);
 
 __END_DECLS
 

@@ -58,14 +58,14 @@
  * \example examples/simple/igraph_write_graph_leda.c
  */
 
-int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
+igraph_integer_t igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                             const char* vertex_attr_name,
                             const char* edge_attr_name) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t it;
-    long int i = 0;
-    int ret;
+    igraph_integer_t i = 0;
+    igraph_integer_t ret;
     igraph_attribute_type_t vertex_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
     igraph_attribute_type_t edge_attr_type = IGRAPH_ATTRIBUTE_DEFAULT;
     igraph_integer_t from, to, rev;
@@ -191,15 +191,15 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_i_attribute_get_numeric_edge_attr(
                          graph, edge_attr_name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &values));
         while (!IGRAPH_EIT_END(it)) {
-            long int eid = IGRAPH_EIT_GET(it);
+            igraph_integer_t eid = IGRAPH_EIT_GET(it);
             igraph_edge(graph, (igraph_integer_t) eid, &from, &to);
             igraph_get_eid(graph, &rev, to, from, 1, 0);
             if (rev == IGRAPH_EIT_GET(it)) {
                 rev = -1;
             }
             CHECK(fprintf(outstream, "%ld %ld %ld |{",
-                          (long int) from + 1, (long int) to + 1,
-                          (long int) rev + 1));
+                          (igraph_integer_t) from + 1, (igraph_integer_t) to + 1,
+                          (igraph_integer_t) rev + 1));
             CHECK(igraph_real_fprintf_precise(outstream, VECTOR(values)[eid]));
             CHECK(fprintf(outstream, "}|\n"));
             IGRAPH_EIT_NEXT(it);
@@ -214,7 +214,7 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
         IGRAPH_CHECK(igraph_i_attribute_get_string_edge_attr(
                          graph, edge_attr_name, igraph_ess_all(IGRAPH_EDGEORDER_ID), &values));
         while (!IGRAPH_EIT_END(it)) {
-            long int eid = IGRAPH_EIT_GET(it);
+            igraph_integer_t eid = IGRAPH_EIT_GET(it);
             const char* str = STR(values, eid);
             igraph_edge(graph, (igraph_integer_t) eid, &from, &to);
             igraph_get_eid(graph, &rev, to, from, 1, 0);
@@ -226,8 +226,8 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                              IGRAPH_EINVAL);
             }
             CHECK(fprintf(outstream, "%ld %ld %ld |{%s}|\n",
-                          (long int) from + 1, (long int) to + 1,
-                          (long int) rev + 1, str));
+                          (igraph_integer_t) from + 1, (igraph_integer_t) to + 1,
+                          (igraph_integer_t) rev + 1, str));
             IGRAPH_EIT_NEXT(it);
         }
         igraph_strvector_destroy(&values);
@@ -241,8 +241,8 @@ int igraph_write_graph_leda(const igraph_t *graph, FILE *outstream,
                 rev = -1;
             }
             CHECK(fprintf(outstream, "%ld %ld %ld |{}|\n",
-                          (long int) from + 1, (long int) to + 1,
-                          (long int) rev + 1));
+                          (igraph_integer_t) from + 1, (igraph_integer_t) to + 1,
+                          (igraph_integer_t) rev + 1));
             IGRAPH_EIT_NEXT(it);
         }
     }

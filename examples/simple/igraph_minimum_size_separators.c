@@ -23,8 +23,8 @@
 
 #include <igraph.h>
 
-int print_and_destroy(igraph_vector_ptr_t *ptr) {
-    long int i, n = igraph_vector_ptr_size(ptr);
+igraph_integer_t print_and_destroy(igraph_vector_ptr_t *ptr) {
+    igraph_integer_t i, n = igraph_vector_ptr_size(ptr);
     for (i = 0; i < n; i++) {
         igraph_vector_t *v = VECTOR(*ptr)[i];
         igraph_vector_print(v);
@@ -35,7 +35,7 @@ int print_and_destroy(igraph_vector_ptr_t *ptr) {
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
     igraph_t g, g2;
     igraph_vector_ptr_t sep;
     igraph_vs_t vs;

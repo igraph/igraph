@@ -39,7 +39,7 @@ typedef struct {
 
 /* Global community list structure */
 typedef struct {
-    long int communities_no, vertices_no;  /* Number of communities, number of vertices */
+    igraph_integer_t communities_no, vertices_no;  /* Number of communities, number of vertices */
     igraph_real_t weight_sum;              /* Sum of edges weight in the whole graph */
     igraph_i_multilevel_community *item;   /* List of communities */
     igraph_vector_t *membership;           /* Community IDs */
@@ -51,7 +51,7 @@ static igraph_real_t igraph_i_multilevel_community_modularity(
                                                               const igraph_i_multilevel_community_list *communities,
                                                               const igraph_real_t resolution) {
     igraph_real_t result = 0;
-    long int i;
+    igraph_integer_t i;
     igraph_real_t m = communities->weight_sum;
 
     for (i = 0; i < communities->vertices_no; i++) {
@@ -64,26 +64,26 @@ static igraph_real_t igraph_i_multilevel_community_modularity(
 }
 
 typedef struct {
-    long int from;
-    long int to;
-    long int id;
+    igraph_integer_t from;
+    igraph_integer_t to;
+    igraph_integer_t id;
 } igraph_i_multilevel_link;
 
-static int igraph_i_multilevel_link_cmp(const void *a, const void *b) {
-    long int r = (((igraph_i_multilevel_link*)a)->from -
+static igraph_integer_t igraph_i_multilevel_link_cmp(const void *a, const void *b) {
+    igraph_integer_t r = (((igraph_i_multilevel_link*)a)->from -
                   ((igraph_i_multilevel_link*)b)->from);
     if (r != 0) {
-        return (int) r;
+        return (igraph_integer_t) r;
     }
 
-    return (int) (((igraph_i_multilevel_link*)a)->to -
+    return (igraph_integer_t) (((igraph_i_multilevel_link*)a)->to -
                   ((igraph_i_multilevel_link*)b)->to);
 }
 
 /* removes multiple edges and returns new edge id's for each edge in |E|log|E| */
-static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids) {
-    long int ecount = igraph_ecount(graph);
-    long int i, l = -1, last_from = -1, last_to = -1;
+static igraph_integer_t igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_t *eids) {
+    igraph_integer_t ecount = igraph_ecount(graph);
+    igraph_integer_t i, l = -1, last_from = -1, last_to = -1;
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_vector_t edges;
     igraph_i_multilevel_link *links;
@@ -139,12 +139,12 @@ static int igraph_i_multilevel_simplify_multiple(igraph_t *graph, igraph_vector_
 }
 
 typedef struct {
-    long int community;
+    igraph_integer_t community;
     igraph_real_t weight;
 } igraph_i_multilevel_community_link;
 
-static int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
-    return (int) (((igraph_i_multilevel_community_link*)a)->community -
+static igraph_integer_t igraph_i_multilevel_community_link_cmp(const void *a, const void *b) {
+    return (igraph_integer_t) (((igraph_i_multilevel_community_link*)a)->community -
                   ((igraph_i_multilevel_community_link*)b)->community);
 }
 
@@ -161,17 +161,17 @@ static int igraph_i_multilevel_community_link_cmp(const void *a, const void *b) 
  *   communities incident on this vertex and the total weight of edges
  *   pointing to these communities
  */
-static int igraph_i_multilevel_community_links(
+static igraph_integer_t igraph_i_multilevel_community_links(
         const igraph_t *graph,
         const igraph_i_multilevel_community_list *communities,
         igraph_integer_t vertex, igraph_vector_t *edges,
         igraph_real_t *weight_all, igraph_real_t *weight_inside, igraph_real_t *weight_loop,
         igraph_vector_t *links_community, igraph_vector_t *links_weight) {
 
-    long int i, n, last = -1, c = -1;
+    igraph_integer_t i, n, last = -1, c = -1;
     igraph_real_t weight = 1;
-    long int to, to_community;
-    long int community = (long int) VECTOR(*(communities->membership))[(long int)vertex];
+    igraph_integer_t to, to_community;
+    igraph_integer_t community = (igraph_integer_t) VECTOR(*(communities->membership))[(igraph_integer_t)vertex];
     igraph_i_multilevel_community_link *links;
 
     *weight_all = *weight_inside = *weight_loop = 0;
@@ -190,7 +190,7 @@ static int igraph_i_multilevel_community_links(
     IGRAPH_FINALLY(igraph_free, links);
 
     for (i = 0; i < n; i++) {
-        long int eidx = (long int) VECTOR(*edges)[i];
+        igraph_integer_t eidx = (igraph_integer_t) VECTOR(*edges)[i];
         weight = VECTOR(*communities->weights)[eidx];
 
         to = IGRAPH_OTHER(graph, eidx, vertex);
@@ -204,7 +204,7 @@ static int igraph_i_multilevel_community_links(
             continue;
         }
 
-        to_community = (long int)VECTOR(*(communities->membership))[to];
+        to_community = (igraph_integer_t)VECTOR(*(communities->membership))[to];
         if (community == to_community) {
             *weight_inside += weight;
         }
@@ -243,7 +243,7 @@ static igraph_real_t igraph_i_multilevel_community_modularity_gain(
                                                                    const igraph_real_t resolution) {
     IGRAPH_UNUSED(vertex);
     return weight_inside -
-           resolution * communities->item[(long int)community].weight_all * weight_all / communities->weight_sum;
+           resolution * communities->item[(igraph_integer_t)community].weight_all * weight_all / communities->weight_sum;
 }
 
 /* Shrinks communities into single vertices, keeping all the edges.
@@ -252,13 +252,13 @@ static igraph_real_t igraph_i_multilevel_community_modularity_gain(
  * detection where a copy of the original graph is used anyway.
  * The membership vector will also be rewritten by the underlying
  * igraph_membership_reindex call */
-static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
+static igraph_integer_t igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membership) {
     igraph_vector_t edges;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_bool_t directed = igraph_is_directed(graph);
 
-    long int i;
+    igraph_integer_t i;
     igraph_eit_t eit;
 
     if (no_of_nodes == 0) {
@@ -281,8 +281,8 @@ static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membersh
     while (!IGRAPH_EIT_END(eit)) {
         igraph_integer_t from, to;
         IGRAPH_CHECK(igraph_edge(graph, IGRAPH_EIT_GET(eit), &from, &to));
-        VECTOR(edges)[i++] = VECTOR(*membership)[(long int) from];
-        VECTOR(edges)[i++] = VECTOR(*membership)[(long int) to];
+        VECTOR(edges)[i++] = VECTOR(*membership)[(igraph_integer_t) from];
+        VECTOR(edges)[i++] = VECTOR(*membership)[(igraph_integer_t) to];
         IGRAPH_EIT_NEXT(eit);
     }
     igraph_eit_destroy(&eit);
@@ -290,7 +290,7 @@ static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membersh
 
     /* Create the new graph */
     igraph_destroy(graph);
-    no_of_nodes = (long int) igraph_vector_max(membership) + 1;
+    no_of_nodes = (igraph_integer_t) igraph_vector_max(membership) + 1;
     IGRAPH_CHECK(igraph_create(graph, &edges, (igraph_integer_t) no_of_nodes,
                                directed));
 
@@ -327,18 +327,18 @@ static int igraph_i_multilevel_shrink(igraph_t *graph, igraph_vector_t *membersh
  *
  * Time complexity: in average near linear on sparse graphs.
  */
-static int igraph_i_community_multilevel_step(
+static igraph_integer_t igraph_i_community_multilevel_step(
         igraph_t *graph,
         igraph_vector_t *weights,
         igraph_vector_t *membership,
         igraph_real_t *modularity,
         const igraph_real_t resolution) {
 
-    long int i, j;
-    long int vcount = igraph_vcount(graph);
-    long int ecount = igraph_ecount(graph);
+    igraph_integer_t i, j;
+    igraph_integer_t vcount = igraph_vcount(graph);
+    igraph_integer_t ecount = igraph_ecount(graph);
     igraph_real_t q, pass_q;
-    int pass;
+    igraph_integer_t pass;
     igraph_bool_t changed = 0;
     igraph_vector_t links_community;
     igraph_vector_t links_weight;
@@ -395,10 +395,10 @@ static int igraph_i_community_multilevel_step(
         igraph_edge(graph, (igraph_integer_t) i, &ffrom, &fto);
 
         weight = VECTOR(*weights)[i];
-        communities.item[(long int) ffrom].weight_all += weight;
-        communities.item[(long int) fto].weight_all += weight;
+        communities.item[(igraph_integer_t) ffrom].weight_all += weight;
+        communities.item[(igraph_integer_t) fto].weight_all += weight;
         if (ffrom == fto) {
-            communities.item[(long int) ffrom].weight_inside += 2 * weight;
+            communities.item[(igraph_integer_t) ffrom].weight_inside += 2 * weight;
         }
     }
 
@@ -406,7 +406,7 @@ static int igraph_i_community_multilevel_step(
     pass = 1;
 
     do { /* Pass begin */
-        long int temp_communities_no = communities.communities_no;
+        igraph_integer_t temp_communities_no = communities.communities_no;
 
         pass_q = q;
         changed = 0;
@@ -421,7 +421,7 @@ static int igraph_i_community_multilevel_step(
             igraph_real_t weight_loop = 0;
             igraph_real_t max_q_gain = 0;
             igraph_real_t max_weight;
-            long int old_id, new_id, n;
+            igraph_integer_t old_id, new_id, n;
 
             igraph_i_multilevel_community_links(graph, &communities,
                                                 (igraph_integer_t) i, &edges,
@@ -429,7 +429,7 @@ static int igraph_i_community_multilevel_step(
                                                 &weight_loop, &links_community,
                                                 &links_weight);
 
-            old_id = (long int)VECTOR(*(communities.membership))[i];
+            old_id = (igraph_integer_t)VECTOR(*(communities.membership))[i];
             new_id = old_id;
 
             /* Update old community */
@@ -449,7 +449,7 @@ static int igraph_i_community_multilevel_step(
             n = igraph_vector_size(&links_community);
 
             for (j = 0; j < n; j++) {
-                long int c = (long int) VECTOR(links_community)[j];
+                igraph_integer_t c = (igraph_integer_t) VECTOR(links_community)[j];
                 igraph_real_t w = VECTOR(links_weight)[j];
 
                 igraph_real_t q_gain =
@@ -525,7 +525,7 @@ static int igraph_i_community_multilevel_step(
     igraph_vector_fill(weights, 0);
 
     for (i = 0; i < ecount; i++) {
-        VECTOR(*weights)[(long int)VECTOR(edges)[i]] += VECTOR(links_weight)[i];
+        VECTOR(*weights)[(igraph_integer_t)VECTOR(edges)[i]] += VECTOR(links_weight)[i];
     }
 
     igraph_free(communities.item);
@@ -594,7 +594,7 @@ static int igraph_i_community_multilevel_step(
  * \example examples/simple/igraph_community_multilevel.c
  */
 
-int igraph_community_multilevel(const igraph_t *graph,
+igraph_integer_t igraph_community_multilevel(const igraph_t *graph,
                                 const igraph_vector_t *weights,
                                 const igraph_real_t resolution,
                                 igraph_vector_t *membership,
@@ -603,8 +603,8 @@ int igraph_community_multilevel(const igraph_t *graph,
     igraph_t g;
     igraph_vector_t w, m, level_membership;
     igraph_real_t prev_q = -1, q = -1;
-    int i, level = 1;
-    long int vcount = igraph_vcount(graph);
+    igraph_integer_t i, level = 1;
+    igraph_integer_t vcount = igraph_vcount(graph);
 
     /* Make a copy of the original graph, we will do the merges on the copy */
     IGRAPH_CHECK(igraph_copy(&g, graph));
@@ -651,7 +651,7 @@ int igraph_community_multilevel(const igraph_t *graph,
         if (memberships || membership) {
             for (i = 0; i < vcount; i++) {
                 /* Readjust the membership vector */
-                VECTOR(level_membership)[i] = VECTOR(m)[(long int) VECTOR(level_membership)[i]];
+                VECTOR(level_membership)[i] = VECTOR(m)[(igraph_integer_t) VECTOR(level_membership)[i]];
             }
         }
 
@@ -667,7 +667,7 @@ int igraph_community_multilevel(const igraph_t *graph,
             IGRAPH_CHECK(igraph_matrix_set_row(memberships, &level_membership, level - 1));
         }
 
-        /* debug("Level: %d Communities: %ld Modularity: %f\n", level, (long int) igraph_vcount(&g),
+        /* debug("Level: %d Communities: %ld Modularity: %f\n", level, (igraph_integer_t) igraph_vcount(&g),
           (double) q); */
 
         /* Increase the level counter */
@@ -679,7 +679,7 @@ int igraph_community_multilevel(const igraph_t *graph,
     if (modularity && igraph_vector_size(modularity) == 0) {
         igraph_vector_t tmp;
         igraph_real_t mod;
-        int i;
+        igraph_integer_t i;
         IGRAPH_VECTOR_INIT_FINALLY(&tmp, vcount);
         for (i = 0; i < vcount; i++) {
             VECTOR(tmp)[i] = i;

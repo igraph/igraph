@@ -39,9 +39,9 @@
 #define REWIRE_ADJLIST_THRESHOLD 10
 
 /* Not declared static so that the testsuite can use it, but not part of the public API. */
-int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+igraph_integer_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     char message[256];
     igraph_integer_t a, b, c, d, dummy, num_swaps, num_successful_swaps;
     igraph_vector_t eids, edgevec, alledges;
@@ -174,7 +174,7 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
             /* If we are still okay, we can perform the rewiring */
             if (ok) {
                 /* printf("Deleting: %ld -> %ld, %ld -> %ld\n",
-                              (long)a, (long)b, (long)c, (long)d); */
+                              (igraph_integer_t)a, (igraph_integer_t)b, (igraph_integer_t)c, (igraph_integer_t)d); */
                 if (use_adjlist) {
                     /* Replace entry in sorted adjlist: */
                     IGRAPH_CHECK(igraph_adjlist_replace_edge(&al, a, b, d, directed));
@@ -187,7 +187,7 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
                     VECTOR(edgevec)[0] = a; VECTOR(edgevec)[1] = d;
                     VECTOR(edgevec)[2] = c; VECTOR(edgevec)[3] = b;
                     /* printf("Adding: %ld -> %ld, %ld -> %ld\n",
-                                (long)a, (long)d, (long)c, (long)b); */
+                                (igraph_integer_t)a, (igraph_integer_t)d, (igraph_integer_t)c, (igraph_integer_t)b); */
                     igraph_add_edges(graph, &edgevec, 0);
                 }
                 num_successful_swaps++;
@@ -262,7 +262,7 @@ int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode,
  *
  * Time complexity: TODO.
  */
-int igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
+igraph_integer_t igraph_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode) {
     igraph_bool_t use_adjlist = n >= REWIRE_ADJLIST_THRESHOLD;
     return igraph_i_rewire(graph, n, mode, use_adjlist);
 }

@@ -20,10 +20,10 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_t g1, g2;
     igraph_bool_t res;
-    int err;
+    igraph_integer_t err;
 
     /* undirected graphs */
     igraph_small(&g1, 4, 0,
@@ -40,7 +40,7 @@ int main() {
      * the direction of the edges (one is swapped in g2 */
     err = igraph_is_same_graph(&g1, &g2, &res);
     IGRAPH_ASSERT(!err);
-    IGRAPH_ASSERT(res);    
+    IGRAPH_ASSERT(res);
 
     /* end of undirected */
     igraph_destroy(&g1);

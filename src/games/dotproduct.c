@@ -56,12 +56,12 @@
  * for functions to generate the latent vectors.
  */
 
-int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
+igraph_integer_t igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
                             igraph_bool_t directed) {
 
     igraph_integer_t nrow = igraph_matrix_nrow(vecs);
     igraph_integer_t ncol = igraph_matrix_ncol(vecs);
-    int i, j;
+    igraph_integer_t i, j;
     igraph_vector_t edges;
     igraph_bool_t warned_neg = 0, warned_big = 0;
 
@@ -70,7 +70,7 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
     RNG_BEGIN();
 
     for (i = 0; i < ncol; i++) {
-        int from = directed ? 0 : i + 1;
+        igraph_integer_t from = directed ? 0 : i + 1;
         igraph_vector_t v1;
         igraph_vector_view(&v1, &MATRIX(*vecs, 0, i), nrow);
         for (j = from; j < ncol; j++) {
@@ -130,7 +130,7 @@ int igraph_dot_product_game(igraph_t *graph, const igraph_matrix_t *vecs,
  * igraph_sample_dirichlet() for other similar samplers.
  */
 
-int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
+igraph_integer_t igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
                                  igraph_real_t radius,
                                  igraph_bool_t positive,
                                  igraph_matrix_t *res) {
@@ -198,7 +198,7 @@ int igraph_sample_sphere_surface(igraph_integer_t dim, igraph_integer_t n,
  */
 
 
-int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
+igraph_integer_t igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
                                 igraph_real_t radius,
                                 igraph_bool_t positive,
                                 igraph_matrix_t *res) {
@@ -245,7 +245,7 @@ int igraph_sample_sphere_volume(igraph_integer_t dim, igraph_integer_t n,
  * latent vectors.
  */
 
-int igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
+igraph_integer_t igraph_sample_dirichlet(igraph_integer_t n, const igraph_vector_t *alpha,
                             igraph_matrix_t *res) {
 
     igraph_integer_t len = igraph_vector_size(alpha);

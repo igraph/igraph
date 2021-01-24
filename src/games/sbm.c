@@ -68,13 +68,13 @@
  *
  */
 
-int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
+igraph_integer_t igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
                     const igraph_matrix_t *pref_matrix,
                     const igraph_vector_int_t *block_sizes,
                     igraph_bool_t directed, igraph_bool_t loops) {
 
-    int no_blocks = igraph_matrix_nrow(pref_matrix);
-    int from, to, fromoff = 0;
+    igraph_integer_t no_blocks = igraph_matrix_nrow(pref_matrix);
+    igraph_integer_t from, to, fromoff = 0;
     igraph_real_t minp, maxp;
     igraph_vector_t edges;
 
@@ -120,8 +120,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
 
     for (from = 0; from < no_blocks; from++) {
         double fromsize = VECTOR(*block_sizes)[from];
-        int start = directed ? 0 : from;
-        int i, tooff = 0;
+        igraph_integer_t start = directed ? 0 : from;
+        igraph_integer_t i, tooff = 0;
         for (i = 0; i < start; i++) {
             tooff += VECTOR(*block_sizes)[i];
         }
@@ -132,8 +132,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             if (directed && loops) {
                 maxedges = fromsize * tosize;
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    igraph_integer_t vto = floor(last / fromsize);
+                    igraph_integer_t vfrom = last - (igraph_real_t)vto * fromsize;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -142,8 +142,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (directed && !loops && from != to) {
                 maxedges = fromsize * tosize;
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    igraph_integer_t vto = floor(last / fromsize);
+                    igraph_integer_t vfrom = last - (igraph_real_t)vto * fromsize;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -152,8 +152,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (directed && !loops && from == to) {
                 maxedges = fromsize * (fromsize - 1);
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    igraph_integer_t vto = floor(last / fromsize);
+                    igraph_integer_t vfrom = last - (igraph_real_t)vto * fromsize;
                     if (vfrom == vto) {
                         vto = fromsize - 1;
                     }
@@ -165,8 +165,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (!directed && loops && from != to) {
                 maxedges = fromsize * tosize;
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    igraph_integer_t vto = floor(last / fromsize);
+                    igraph_integer_t vfrom = last - (igraph_real_t)vto * fromsize;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -175,8 +175,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (!directed && loops && from == to) {
                 maxedges = fromsize * (fromsize + 1) / 2.0;
                 while (last < maxedges) {
-                    long int vto = floor((sqrt(8 * last + 1) - 1) / 2);
-                    long int vfrom = last - (((igraph_real_t)vto) * (vto + 1)) / 2;
+                    igraph_integer_t vto = floor((sqrt(8 * last + 1) - 1) / 2);
+                    igraph_integer_t vfrom = last - (((igraph_real_t)vto) * (vto + 1)) / 2;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -185,8 +185,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else if (!directed && !loops && from != to) {
                 maxedges = fromsize * tosize;
                 while (last < maxedges) {
-                    int vto = floor(last / fromsize);
-                    int vfrom = last - (igraph_real_t)vto * fromsize;
+                    igraph_integer_t vto = floor(last / fromsize);
+                    igraph_integer_t vfrom = last - (igraph_real_t)vto * fromsize;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -195,8 +195,8 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
             } else { /*!directed && !loops && from==to */
                 maxedges = fromsize * (fromsize - 1) / 2.0;
                 while (last < maxedges) {
-                    int vto = floor((sqrt(8 * last + 1) + 1) / 2);
-                    int vfrom = last - (((igraph_real_t)vto) * (vto - 1)) / 2;
+                    igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
+                    igraph_integer_t vfrom = last - (((igraph_real_t)vto) * (vto - 1)) / 2;
                     igraph_vector_push_back(&edges, fromoff + vfrom);
                     igraph_vector_push_back(&edges, tooff + vto);
                     last += RNG_GEOM(prob);
@@ -242,16 +242,16 @@ int igraph_sbm_game(igraph_t *graph, igraph_integer_t n,
  * \ref igraph_hsbm_list_game() for a more general version.
  */
 
-int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
+igraph_integer_t igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                      igraph_integer_t m, const igraph_vector_t *rho,
                      const igraph_matrix_t *C, igraph_real_t p) {
 
-    int b, i, k = igraph_vector_size(rho);
+    igraph_integer_t b, i, k = igraph_vector_size(rho);
     igraph_vector_t csizes;
     igraph_real_t sq_dbl_epsilon = sqrt(DBL_EPSILON);
-    int no_blocks = n / m;
+    igraph_integer_t no_blocks = n / m;
     igraph_vector_t edges;
-    int offset = 0;
+    igraph_integer_t offset = 0;
 
     if (n < 1) {
         IGRAPH_ERROR("`n' must be positive for HSBM", IGRAPH_EINVAL);
@@ -259,7 +259,7 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     if (m < 1) {
         IGRAPH_ERROR("`m' must be positive for HSBM", IGRAPH_EINVAL);
     }
-    if ((long) n  % (long) m) {
+    if ((igraph_integer_t) n  % (igraph_integer_t) m) {
         IGRAPH_ERROR("`n' must be a multiple of `m' for HSBM", IGRAPH_EINVAL);
     }
     if (!igraph_vector_isininterval(rho, 0, 1)) {
@@ -301,24 +301,24 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     /* Block models first */
 
     for (b = 0; b < no_blocks; b++) {
-        int from, to, fromoff = 0;
+        igraph_integer_t from, to, fromoff = 0;
 
         for (from = 0; from < k; from++) {
-            int fromsize = VECTOR(csizes)[from];
-            int i, tooff = 0;
+            igraph_integer_t fromsize = VECTOR(csizes)[from];
+            igraph_integer_t i, tooff = 0;
             for (i = 0; i < from; i++) {
                 tooff += VECTOR(csizes)[i];
             }
             for (to = from; to < k; to++) {
-                int tosize = VECTOR(csizes)[to];
+                igraph_integer_t tosize = VECTOR(csizes)[to];
                 igraph_real_t prob = MATRIX(*C, from, to);
                 igraph_real_t maxedges;
                 igraph_real_t last = RNG_GEOM(prob);
                 if (from != to) {
                     maxedges = fromsize * tosize;
                     while (last < maxedges) {
-                        int vto = floor(last / fromsize);
-                        int vfrom = last - (igraph_real_t)vto * fromsize;
+                        igraph_integer_t vto = floor(last / fromsize);
+                        igraph_integer_t vfrom = last - (igraph_real_t)vto * fromsize;
                         igraph_vector_push_back(&edges, offset + fromoff + vfrom);
                         igraph_vector_push_back(&edges, offset + tooff + vto);
                         last += RNG_GEOM(prob);
@@ -327,8 +327,8 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
                 } else { /* from==to */
                     maxedges = fromsize * (fromsize - 1) / 2.0;
                     while (last < maxedges) {
-                        int vto = floor((sqrt(8 * last + 1) + 1) / 2);
-                        int vfrom = last - (((igraph_real_t)vto) * (vto - 1)) / 2;
+                        igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
+                        igraph_integer_t vfrom = last - (((igraph_real_t)vto) * (vto - 1)) / 2;
                         igraph_vector_push_back(&edges, offset + fromoff + vfrom);
                         igraph_vector_push_back(&edges, offset + tooff + vto);
                         last += RNG_GEOM(prob);
@@ -347,11 +347,11 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
     /* And now the rest, if not a special case */
 
     if (p == 1) {
-        int fromoff = 0, tooff = m;
+        igraph_integer_t fromoff = 0, tooff = m;
         for (b = 0; b < no_blocks; b++) {
             igraph_real_t fromsize = m;
             igraph_real_t tosize = n - tooff;
-            int from, to;
+            igraph_integer_t from, to;
             for (from = 0; from < fromsize; from++) {
                 for (to = 0; to < tosize; to++) {
                     igraph_vector_push_back(&edges, fromoff + from);
@@ -362,15 +362,15 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
             tooff += m;
         }
     } else if (p > 0) {
-        int fromoff = 0, tooff = m;
+        igraph_integer_t fromoff = 0, tooff = m;
         for (b = 0; b < no_blocks; b++) {
             igraph_real_t fromsize = m;
             igraph_real_t tosize = n - tooff;
             igraph_real_t maxedges = fromsize * tosize;
             igraph_real_t last = RNG_GEOM(p);
             while (last < maxedges) {
-                int vto = floor(last / fromsize);
-                int vfrom = last - (igraph_real_t) vto * fromsize;
+                igraph_integer_t vto = floor(last / fromsize);
+                igraph_integer_t vfrom = last - (igraph_real_t) vto * fromsize;
                 igraph_vector_push_back(&edges, fromoff + vfrom);
                 igraph_vector_push_back(&edges, tooff + vto);
                 last += RNG_GEOM(p);
@@ -416,16 +416,16 @@ int igraph_hsbm_game(igraph_t *graph, igraph_integer_t n,
  * \ref igraph_hsbm_game() for a simpler general version.
  */
 
-int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
+igraph_integer_t igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                           const igraph_vector_int_t *mlist,
                           const igraph_vector_ptr_t *rholist,
                           const igraph_vector_ptr_t *Clist,
                           igraph_real_t p) {
 
-    int i, no_blocks = igraph_vector_ptr_size(rholist);
+    igraph_integer_t i, no_blocks = igraph_vector_ptr_size(rholist);
     igraph_real_t sq_dbl_epsilon = sqrt(DBL_EPSILON);
     igraph_vector_t csizes, edges;
-    int b, offset = 0;
+    igraph_integer_t b, offset = 0;
 
     if (n < 1) {
         IGRAPH_ERROR("`n' must be positive for HSBM", IGRAPH_EINVAL);
@@ -474,7 +474,7 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     for (i = 0; i < no_blocks; i++) {
         const igraph_vector_t *rho = VECTOR(*rholist)[i];
         const igraph_matrix_t *C = VECTOR(*Clist)[i];
-        int k = igraph_vector_size(rho);
+        igraph_integer_t k = igraph_vector_size(rho);
         if (igraph_matrix_nrow(C) != k || igraph_matrix_ncol(C) != k) {
             IGRAPH_ERROR("`C' dimensions must match `rho' dimensions in HSBM",
                          IGRAPH_EINVAL);
@@ -484,7 +484,7 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     for (i = 0; i < no_blocks; i++) {
         const igraph_vector_t *rho = VECTOR(*rholist)[i];
         igraph_real_t m = VECTOR(*mlist)[i];
-        int j, k = igraph_vector_size(rho);
+        igraph_integer_t j, k = igraph_vector_size(rho);
         for (j = 0; j < k; j++) {
             igraph_real_t s = VECTOR(*rho)[j] * m;
             if (fabs(round(s) - s) > sq_dbl_epsilon) {
@@ -501,11 +501,11 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     /* Block models first */
 
     for (b = 0; b < no_blocks; b++) {
-        int from, to, fromoff = 0;
+        igraph_integer_t from, to, fromoff = 0;
         const igraph_vector_t *rho = VECTOR(*rholist)[b];
         const igraph_matrix_t *C = VECTOR(*Clist)[b];
         igraph_real_t m = VECTOR(*mlist)[b];
-        int k = igraph_vector_size(rho);
+        igraph_integer_t k = igraph_vector_size(rho);
 
         igraph_vector_resize(&csizes, k);
         for (i = 0; i < k; i++) {
@@ -513,21 +513,21 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
         }
 
         for (from = 0; from < k; from++) {
-            int fromsize = VECTOR(csizes)[from];
-            int i, tooff = 0;
+            igraph_integer_t fromsize = VECTOR(csizes)[from];
+            igraph_integer_t i, tooff = 0;
             for (i = 0; i < from; i++) {
                 tooff += VECTOR(csizes)[i];
             }
             for (to = from; to < k; to++) {
-                int tosize = VECTOR(csizes)[to];
+                igraph_integer_t tosize = VECTOR(csizes)[to];
                 igraph_real_t prob = MATRIX(*C, from, to);
                 igraph_real_t maxedges;
                 igraph_real_t last = RNG_GEOM(prob);
                 if (from != to) {
                     maxedges = fromsize * tosize;
                     while (last < maxedges) {
-                        int vto = floor(last / fromsize);
-                        int vfrom = last - (igraph_real_t)vto * fromsize;
+                        igraph_integer_t vto = floor(last / fromsize);
+                        igraph_integer_t vfrom = last - (igraph_real_t)vto * fromsize;
                         igraph_vector_push_back(&edges, offset + fromoff + vfrom);
                         igraph_vector_push_back(&edges, offset + tooff + vto);
                         last += RNG_GEOM(prob);
@@ -536,8 +536,8 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
                 } else { /* from==to */
                     maxedges = fromsize * (fromsize - 1) / 2.0;
                     while (last < maxedges) {
-                        int vto = floor((sqrt(8 * last + 1) + 1) / 2);
-                        int vfrom = last - (((igraph_real_t)vto) * (vto - 1)) / 2;
+                        igraph_integer_t vto = floor((sqrt(8 * last + 1) + 1) / 2);
+                        igraph_integer_t vfrom = last - (((igraph_real_t)vto) * (vto - 1)) / 2;
                         igraph_vector_push_back(&edges, offset + fromoff + vfrom);
                         igraph_vector_push_back(&edges, offset + tooff + vto);
                         last += RNG_GEOM(prob);
@@ -556,11 +556,11 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
     /* And now the rest, if not a special case */
 
     if (p == 1) {
-        int fromoff = 0, tooff = VECTOR(*mlist)[0];
+        igraph_integer_t fromoff = 0, tooff = VECTOR(*mlist)[0];
         for (b = 0; b < no_blocks; b++) {
             igraph_real_t fromsize = VECTOR(*mlist)[b];
             igraph_real_t tosize = n - tooff;
-            int from, to;
+            igraph_integer_t from, to;
             for (from = 0; from < fromsize; from++) {
                 for (to = 0; to < tosize; to++) {
                     igraph_vector_push_back(&edges, fromoff + from);
@@ -573,15 +573,15 @@ int igraph_hsbm_list_game(igraph_t *graph, igraph_integer_t n,
             }
         }
     } else if (p > 0) {
-        int fromoff = 0, tooff = VECTOR(*mlist)[0];
+        igraph_integer_t fromoff = 0, tooff = VECTOR(*mlist)[0];
         for (b = 0; b < no_blocks; b++) {
             igraph_real_t fromsize = VECTOR(*mlist)[b];
             igraph_real_t tosize = n - tooff;
             igraph_real_t maxedges = fromsize * tosize;
             igraph_real_t last = RNG_GEOM(p);
             while (last < maxedges) {
-                int vto = floor(last / fromsize);
-                int vfrom = last - (igraph_real_t) vto * fromsize;
+                igraph_integer_t vto = floor(last / fromsize);
+                igraph_integer_t vfrom = last - (igraph_real_t) vto * fromsize;
                 igraph_vector_push_back(&edges, fromoff + vfrom);
                 igraph_vector_push_back(&edges, tooff + vto);
                 last += RNG_GEOM(p);

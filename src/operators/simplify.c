@@ -45,21 +45,21 @@
  * \example examples/simple/igraph_simplify.c
  */
 
-int igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
+igraph_integer_t igraph_simplify(igraph_t *graph, igraph_bool_t multiple,
                     igraph_bool_t loops,
                     const igraph_attribute_combination_t *edge_comb) {
 
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
-    long int edge;
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
+    igraph_integer_t edge;
     igraph_bool_t attr = edge_comb && igraph_has_attribute_table();
-    long int from, to, pfrom = -1, pto = -2;
+    igraph_integer_t from, to, pfrom = -1, pto = -2;
     igraph_t res;
     igraph_es_t es;
     igraph_eit_t eit;
     igraph_vector_t mergeinto;
-    long int actedge;
+    igraph_integer_t actedge;
 
     if (!multiple && !loops)
         /* nothing to do */

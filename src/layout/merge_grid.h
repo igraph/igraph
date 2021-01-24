@@ -31,25 +31,25 @@ __BEGIN_DECLS
 /* A type of grid used for merging layouts; each cell is owned by exactly one graph */
 
 typedef struct igraph_i_layout_mergegrid_t {
-    long int *data;
-    long int stepsx, stepsy;
+    igraph_integer_t *data;
+    igraph_integer_t stepsx, stepsy;
     igraph_real_t minx, maxx, deltax;
     igraph_real_t miny, maxy, deltay;
 } igraph_i_layout_mergegrid_t;
 
-int igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
-                                   igraph_real_t minx, igraph_real_t maxx, long int stepsx,
-                                   igraph_real_t miny, igraph_real_t maxy, long int stepsy);
+igraph_integer_t igraph_i_layout_mergegrid_init(igraph_i_layout_mergegrid_t *grid,
+                                   igraph_real_t minx, igraph_real_t maxx, igraph_integer_t stepsx,
+                                   igraph_real_t miny, igraph_real_t maxy, igraph_integer_t stepsy);
 void igraph_i_layout_mergegrid_destroy(igraph_i_layout_mergegrid_t *grid);
 
-int igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
+igraph_integer_t igraph_i_layout_merge_place_sphere(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y, igraph_real_t r,
-                                       long int id);
+                                       igraph_integer_t id);
 
-long int igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
+igraph_integer_t igraph_i_layout_mergegrid_get(igraph_i_layout_mergegrid_t *grid,
                                        igraph_real_t x, igraph_real_t y);
 
-long int igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
+igraph_integer_t igraph_i_layout_mergegrid_get_sphere(igraph_i_layout_mergegrid_t *g,
         igraph_real_t x, igraph_real_t y, igraph_real_t r);
 
 __END_DECLS

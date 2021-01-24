@@ -25,7 +25,7 @@
 
 #include "bench.h"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_real_t toremovev[] = {  2609,  2098, 14517,  7540, 19560,  8855,
@@ -35,7 +35,7 @@ int main() {
                                 };
     igraph_vector_t toremove;
     igraph_vector_ptr_t res;
-    int i, n;
+    igraph_integer_t i, n;
 
     igraph_vector_view(&toremove, toremovev,
                        sizeof(toremovev) / sizeof(igraph_real_t));

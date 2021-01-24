@@ -94,7 +94,7 @@
  * of \p vid.
  */
 
-int igraph_ecumulative_proportionate_values(const igraph_t *graph,
+igraph_integer_t igraph_ecumulative_proportionate_values(const igraph_t *graph,
         const igraph_vector_t *U,
         igraph_vector_t *V,
         igraph_bool_t islocal,
@@ -106,7 +106,7 @@ int igraph_ecumulative_proportionate_values(const igraph_t *graph,
     igraph_real_t C;  /* cumulative probability */
     igraph_real_t P;  /* probability */
     igraph_real_t S;  /* sum of values */
-    long int i;
+    igraph_integer_t i;
 
     /* Set the perspective. Let v be the vertex under consideration. The local */
     /* perspective for v consists of edges incident on it. In contrast, the */
@@ -243,7 +243,7 @@ int igraph_ecumulative_proportionate_values(const igraph_t *graph,
  * perspective of vid.
  */
 
-int igraph_vcumulative_proportionate_values(const igraph_t *graph,
+igraph_integer_t igraph_vcumulative_proportionate_values(const igraph_t *graph,
         const igraph_vector_t *U,
         igraph_vector_t *V,
         igraph_bool_t islocal,
@@ -255,7 +255,7 @@ int igraph_vcumulative_proportionate_values(const igraph_t *graph,
     igraph_real_t S;  /* sum of values */
     igraph_vit_t A;   /* all vertices in v's perspective */
     igraph_vs_t vs;
-    long int i;
+    igraph_integer_t i;
 
     /* Set the perspective. Let v be the vertex under consideration; it might */
     /* be that we want to update v's strategy. The local perspective for v */
@@ -417,7 +417,7 @@ int igraph_vcumulative_proportionate_values(const igraph_t *graph,
  *         \endclist
  */
 
-int igraph_microscopic_standard_tests(const igraph_t *graph,
+igraph_integer_t igraph_microscopic_standard_tests(const igraph_t *graph,
                                       igraph_integer_t vid,
                                       const igraph_vector_t *quantities,
                                       const igraph_vector_t *strategies,
@@ -572,7 +572,7 @@ int igraph_microscopic_standard_tests(const igraph_t *graph,
  * \example examples/simple/igraph_deterministic_optimal_imitation.c
  */
 
-int igraph_deterministic_optimal_imitation(const igraph_t *graph,
+igraph_integer_t igraph_deterministic_optimal_imitation(const igraph_t *graph,
         igraph_integer_t vid,
         igraph_optimal_t optimality,
         const igraph_vector_t *quantities,
@@ -725,7 +725,7 @@ int igraph_deterministic_optimal_imitation(const igraph_t *graph,
  * \endclist
  */
 
-int igraph_moran_process(const igraph_t *graph,
+igraph_integer_t igraph_moran_process(const igraph_t *graph,
                          const igraph_vector_t *weights,
                          igraph_vector_t *quantities,
                          igraph_vector_t *strategies,
@@ -741,7 +741,7 @@ int igraph_moran_process(const igraph_t *graph,
     igraph_eit_t eA;          /* edge list */
     igraph_vs_t vs;
     igraph_es_t es;
-    long int i;
+    igraph_integer_t i;
 
     /* don't test for vertex isolation, hence vid = -1 and islocal = 0 */
     IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, /*vid*/ -1,
@@ -964,7 +964,7 @@ int igraph_moran_process(const igraph_t *graph,
  * \example examples/simple/igraph_roulette_wheel_imitation.c
  */
 
-int igraph_roulette_wheel_imitation(const igraph_t *graph,
+igraph_integer_t igraph_roulette_wheel_imitation(const igraph_t *graph,
                                     igraph_integer_t vid,
                                     igraph_bool_t islocal,
                                     const igraph_vector_t *quantities,
@@ -976,7 +976,7 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
     igraph_vector_t V;  /* vector of cumulative proportionate quantities */
     igraph_vit_t A;     /* all vertices in v's perspective */
     igraph_vs_t vs;
-    long int i;
+    igraph_integer_t i;
 
     IGRAPH_CHECK(igraph_microscopic_standard_tests(graph, vid, quantities,
                  strategies, mode, &updates,
@@ -1126,7 +1126,7 @@ int igraph_roulette_wheel_imitation(const igraph_t *graph,
  * \example examples/simple/igraph_stochastic_imitation.c
  */
 
-int igraph_stochastic_imitation(const igraph_t *graph,
+igraph_integer_t igraph_stochastic_imitation(const igraph_t *graph,
                                 igraph_integer_t vid,
                                 igraph_imitate_algorithm_t algo,
                                 const igraph_vector_t *quantities,
@@ -1135,7 +1135,7 @@ int igraph_stochastic_imitation(const igraph_t *graph,
     igraph_bool_t updates;
     igraph_integer_t u;
     igraph_vector_t adj;
-    int i;
+    igraph_integer_t i;
 
     /* sanity checks */
     if (algo != IGRAPH_IMITATE_AUGMENTED &&
@@ -1164,7 +1164,7 @@ int igraph_stochastic_imitation(const igraph_t *graph,
     if (algo == IGRAPH_IMITATE_BLIND) {
         IGRAPH_CHECK(igraph_vector_push_back(&adj, vid));
         RNG_BEGIN();
-        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = (igraph_integer_t) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         VECTOR(*strategies)[vid] = VECTOR(*strategies)[u];
@@ -1176,7 +1176,7 @@ int igraph_stochastic_imitation(const igraph_t *graph,
     /* retains its current strategy. */
     else if (algo == IGRAPH_IMITATE_AUGMENTED) {
         RNG_BEGIN();
-        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = (igraph_integer_t) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         if (VECTOR(*quantities)[u] > VECTOR(*quantities)[vid]) {
@@ -1190,7 +1190,7 @@ int igraph_stochastic_imitation(const igraph_t *graph,
     /* Otherwise v retains its current strategy. */
     else if (algo == IGRAPH_IMITATE_CONTRACTED) {
         RNG_BEGIN();
-        i = (int) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
+        i = (igraph_integer_t) RNG_INTEGER(0, igraph_vector_size(&adj) - 1);
         RNG_END();
         u = (igraph_integer_t) VECTOR(adj)[i];
         if (VECTOR(*quantities)[u] < VECTOR(*quantities)[vid]) {

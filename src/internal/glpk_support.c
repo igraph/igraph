@@ -47,7 +47,7 @@ void igraph_i_glpk_interruption_hook(glp_tree *tree, void *info) {
     }
 }
 
-int igraph_i_glpk_check(int retval, const char* message) {
+igraph_integer_t igraph_i_glpk_check(igraph_integer_t retval, const char* message) {
     char* code = "none";
     char message_and_code[4096];
 
@@ -90,7 +90,7 @@ int igraph_i_glpk_check(int retval, const char* message) {
 
 #else
 
-int igraph_glpk_dummy() {
+igraph_integer_t igraph_glpk_dummy() {
     /* get rid of "ISO C requires a translation unit to contain at least one
      * declaration" warning */
     return 'd' + 'u' + 'm' + 'm' + 'y';

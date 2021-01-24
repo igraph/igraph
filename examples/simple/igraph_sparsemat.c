@@ -23,12 +23,12 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
 
     igraph_sparsemat_t A, B, C, D;
     igraph_t G, H;
     igraph_vector_t vect;
-    long int i;
+    igraph_integer_t i;
 
     /* Create, compress, destroy */
     igraph_sparsemat_init(&A, 100, 20, 50);

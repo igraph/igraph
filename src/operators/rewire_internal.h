@@ -3,6 +3,6 @@
 
 #include "igraph_interface.h"
 
-int igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist);
+igraph_integer_t igraph_i_rewire(igraph_t *graph, igraph_integer_t n, igraph_rewiring_t mode, igraph_bool_t use_adjlist);
 
 #endif

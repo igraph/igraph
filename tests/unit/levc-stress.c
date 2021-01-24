@@ -29,9 +29,9 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
-    int k;
+    igraph_integer_t k;
     for (k = 0; k < 20; k++) {
         igraph_t g;
         igraph_matrix_t merges;

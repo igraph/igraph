@@ -20,7 +20,7 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t capacity;
@@ -36,7 +36,7 @@ int main() {
     igraph_destroy(&g);
 
     IGRAPH_ASSERT(value == 7);
-    
+
     VERIFY_FINALLY_STACK();
     return 0;
 }

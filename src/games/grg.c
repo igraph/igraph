@@ -48,11 +48,11 @@
  *
  * \example examples/simple/igraph_grg_game.c
  */
-int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
+igraph_integer_t igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
                     igraph_real_t radius, igraph_bool_t torus,
                     igraph_vector_t *x, igraph_vector_t *y) {
 
-    long int i;
+    igraph_integer_t i;
     igraph_vector_t myx, myy, *xx = &myx, *yy = &myy, edges;
     igraph_real_t r2 = radius * radius;
 
@@ -87,7 +87,7 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
         for (i = 0; i < nodes; i++) {
             igraph_real_t xx1 = VECTOR(*xx)[i];
             igraph_real_t yy1 = VECTOR(*yy)[i];
-            long int j = i + 1;
+            igraph_integer_t j = i + 1;
             igraph_real_t dx, dy;
             while ( j < nodes && (dx = VECTOR(*xx)[j] - xx1) < radius) {
                 dy = VECTOR(*yy)[j] - yy1;
@@ -102,7 +102,7 @@ int igraph_grg_game(igraph_t *graph, igraph_integer_t nodes,
         for (i = 0; i < nodes; i++) {
             igraph_real_t xx1 = VECTOR(*xx)[i];
             igraph_real_t yy1 = VECTOR(*yy)[i];
-            long int j = i + 1;
+            igraph_integer_t j = i + 1;
             igraph_real_t dx, dy;
             while ( j < nodes && (dx = VECTOR(*xx)[j] - xx1) < radius) {
                 dy = fabs(VECTOR(*yy)[j] - yy1);

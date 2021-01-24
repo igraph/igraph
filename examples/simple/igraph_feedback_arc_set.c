@@ -25,7 +25,7 @@
 #include <igraph.h>
 #include <string.h>
 
-int main() {
+igraph_integer_t main() {
     igraph_t g;
     igraph_vector_t weights, result;
     igraph_bool_t dag;

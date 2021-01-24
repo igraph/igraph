@@ -48,19 +48,19 @@ typedef struct igraph_hashtable_t {
     igraph_strvector_t defaults;
 } igraph_hashtable_t;
 
-int igraph_hashtable_init(igraph_hashtable_t *ht);
+igraph_integer_t igraph_hashtable_init(igraph_hashtable_t *ht);
 void igraph_hashtable_destroy(igraph_hashtable_t *ht);
-int igraph_hashtable_addset(igraph_hashtable_t *ht,
+igraph_integer_t igraph_hashtable_addset(igraph_hashtable_t *ht,
                             const char *key, const char *def,
                             const char *elem);
-int igraph_hashtable_addset2(igraph_hashtable_t *ht,
+igraph_integer_t igraph_hashtable_addset2(igraph_hashtable_t *ht,
                              const char *key, const char *def,
-                             const char *elem, int elemlen);
-int igraph_hashtable_get(igraph_hashtable_t *ht,
+                             const char *elem, igraph_integer_t elemlen);
+igraph_integer_t igraph_hashtable_get(igraph_hashtable_t *ht,
                          const char *key, char **elem);
-int igraph_hashtable_getkeys(igraph_hashtable_t *ht,
+igraph_integer_t igraph_hashtable_getkeys(igraph_hashtable_t *ht,
                              const igraph_strvector_t **sv);
-int igraph_hashtable_reset(igraph_hashtable_t *ht);
+igraph_integer_t igraph_hashtable_reset(igraph_hashtable_t *ht);
 
 __END_DECLS
 

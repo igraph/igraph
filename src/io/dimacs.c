@@ -74,7 +74,7 @@
  *
  * \sa \ref igraph_write_graph_dimacs()
  */
-int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
+igraph_integer_t igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                              igraph_strvector_t *problem,
                              igraph_vector_t *label,
                              igraph_integer_t *source,
@@ -83,13 +83,13 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                              igraph_bool_t directed) {
 
     igraph_vector_t edges;
-    long int no_of_nodes = -1;
-    long int no_of_edges = -1;
-    long int tsource = -1;
-    long int ttarget = -1;
+    igraph_integer_t no_of_nodes = -1;
+    igraph_integer_t no_of_edges = -1;
+    igraph_integer_t tsource = -1;
+    igraph_integer_t ttarget = -1;
     char prob[21];
     char c;
-    int problem_type = 0;
+    igraph_integer_t problem_type = 0;
 
 #define PROBLEM_EDGE  1
 #define PROBLEM_MAX   2
@@ -100,7 +100,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
     }
 
     while (!feof(instream)) {
-        int read;
+        igraph_integer_t read;
         char str[3];
 
         IGRAPH_ALLOW_INTERRUPTION();
@@ -113,8 +113,8 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
             IGRAPH_ERROR("parsing dimacs file failed", IGRAPH_PARSEERROR);
         }
         switch (str[0]) {
-            long int tmp, tmp2;
-            long int from, to;
+            igraph_integer_t tmp, tmp2;
+            igraph_integer_t from, to;
             igraph_real_t cap;
 
         case 'c':
@@ -135,7 +135,7 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
                 /* edge list */
                 problem_type = PROBLEM_EDGE;
                 if (label) {
-                    long int i;
+                    igraph_integer_t i;
                     IGRAPH_CHECK(igraph_vector_resize(label, no_of_nodes));
                     for (i = 0; i < no_of_nodes; i++) {
                         VECTOR(*label)[i] = i + 1;
@@ -271,15 +271,15 @@ int igraph_read_graph_dimacs(igraph_t *graph, FILE *instream,
  *
  * \sa igraph_read_graph_dimacs()
  */
-int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
-                              long int source, long int target,
+igraph_integer_t igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
+                              igraph_integer_t source, igraph_integer_t target,
                               const igraph_vector_t *capacity) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_eit_t it;
-    long int i = 0;
-    int ret, ret1, ret2, ret3;
+    igraph_integer_t i = 0;
+    igraph_integer_t ret, ret1, ret2, ret3;
 
     if (igraph_vector_size(capacity) != no_of_edges) {
         IGRAPH_ERROR("invalid capacity vector length", IGRAPH_EINVAL);
@@ -303,7 +303,7 @@ int igraph_write_graph_dimacs(const igraph_t *graph, FILE *outstream,
         igraph_edge(graph, IGRAPH_EIT_GET(it), &from, &to);
         cap = VECTOR(*capacity)[i++];
         ret1 = fprintf(outstream, "a %li %li ",
-                       (long int) from + 1, (long int) to + 1);
+                       (igraph_integer_t) from + 1, (igraph_integer_t) to + 1);
         ret2 = igraph_real_fprintf_precise(outstream, cap);
         ret3 = fputc('\n', outstream);
         if (ret1 < 0 || ret2 < 0 || ret3 == EOF) {

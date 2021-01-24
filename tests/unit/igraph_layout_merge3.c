@@ -25,10 +25,10 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_t graph;
     igraph_matrix_t coords;
-    int i;
+    igraph_integer_t i;
 
     igraph_matrix_init(&coords, 0, 0);
 

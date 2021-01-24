@@ -30,15 +30,15 @@ typedef struct {
     igraph_vector_t *quantities;
     igraph_vector_t *strategies;
     igraph_neimode_t mode;
-    int retval;
+    igraph_integer_t retval;
 } strategy_test_t;
 
 /* Error tests. That is, we expect error codes to be returned from such tests.
  */
-int error_tests() {
+igraph_integer_t error_tests() {
     igraph_t g, h;
     igraph_vector_t quant, strat;
-    int i, n, ret;
+    igraph_integer_t i, n, ret;
     strategy_test_t *test;
 
     /* nonempty graph */
@@ -94,7 +94,7 @@ int error_tests() {
                     test->strategies,
                     test->mode);
             if (ret != test->retval) {
-                printf("Error test no. %d failed.\n", (int)(i + 1));
+                printf("Error test no. %d failed.\n", (igraph_integer_t)(i + 1));
                 return IGRAPH_FAILURE;
             }
             i++;
@@ -112,10 +112,10 @@ int error_tests() {
 /* Updating the strategy of an isolated vertex. In this case, the strategies
  * vector should not change at all.
  */
-int isolated_vertex_test() {
+igraph_integer_t isolated_vertex_test() {
     igraph_t g;
     igraph_vector_t quant, strat, v;
-    int i, ret;
+    igraph_integer_t i, ret;
 
     /* graph with one isolated vertex */
     igraph_small(&g, 0, IGRAPH_UNDIRECTED, 0, 1, 1, 2, 2, 0, -1);
@@ -163,10 +163,10 @@ int isolated_vertex_test() {
  * result vector, we reset the strategies vector to its default state and
  * repeat the game with another vertex.
  */
-int petersen_game_test() {
+igraph_integer_t petersen_game_test() {
     igraph_t g;
     igraph_vector_t known_max_v, known_min_v, quant, strat, stratcopy;
-    int i, nvert;
+    igraph_integer_t i, nvert;
 
     /* the Petersen graph */
     igraph_small(&g, /*n=*/ 0, IGRAPH_UNDIRECTED,
@@ -233,8 +233,8 @@ int petersen_game_test() {
     return IGRAPH_SUCCESS;
 }
 
-int main() {
-    int ret;
+igraph_integer_t main() {
+    igraph_integer_t ret;
 
     ret = error_tests();
     if (ret) {

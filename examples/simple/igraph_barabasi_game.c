@@ -23,11 +23,11 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t v, v2;
-    int i, ret;
+    igraph_integer_t i, ret;
 
     igraph_barabasi_game(&g, 10, /*power=*/ 1, 2, 0, 0, /*A=*/ 1, 1,
                          IGRAPH_BARABASI_BAG, /*start_from=*/ 0);

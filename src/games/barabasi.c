@@ -30,14 +30,14 @@
 #include "igraph_psumtree.h"
 #include "igraph_random.h"
 
-static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
+static igraph_integer_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
                                       igraph_integer_t m,
                                       const igraph_vector_t *outseq,
                                       igraph_bool_t outpref,
                                       igraph_bool_t directed,
                                       const igraph_t *start_from);
 
-static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
+static igraph_integer_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
                                                     igraph_integer_t n,
                                                     igraph_real_t power,
                                                     igraph_integer_t m,
@@ -47,7 +47,7 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
                                                     igraph_bool_t directed,
                                                     const igraph_t *start_from);
 
-static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
+static igraph_integer_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
                                            igraph_integer_t n,
                                            igraph_real_t power,
                                            igraph_integer_t m,
@@ -57,21 +57,21 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
                                            igraph_bool_t directed,
                                            const igraph_t *start_from);
 
-static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
+static igraph_integer_t igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
                                       igraph_integer_t m,
                                       const igraph_vector_t *outseq,
                                       igraph_bool_t outpref,
                                       igraph_bool_t directed,
                                       const igraph_t *start_from) {
 
-    long int no_of_nodes = n;
-    long int no_of_neighbors = m;
-    long int *bag;
-    long int bagp = 0;
+    igraph_integer_t no_of_nodes = n;
+    igraph_integer_t no_of_neighbors = m;
+    igraph_integer_t *bag;
+    igraph_integer_t bagp = 0;
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
-    long int resp;
-    long int i, j, k;
-    long int bagsize, start_nodes, start_edges, new_edges, no_of_edges;
+    igraph_integer_t resp;
+    igraph_integer_t i, j, k;
+    igraph_integer_t bagsize, start_nodes, start_edges, new_edges, no_of_edges;
 
     if (!directed) {
         outpref = 1;
@@ -81,7 +81,7 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     start_edges = start_from ? igraph_ecount(start_from) : 0;
     if (outseq) {
         if (igraph_vector_size(outseq) > 1) {
-            new_edges = (long int) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
+            new_edges = (igraph_integer_t) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
         } else {
             new_edges = 0;
         }
@@ -94,7 +94,7 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 
-    bag = igraph_Calloc(bagsize, long int);
+    bag = igraph_Calloc(bagsize, igraph_integer_t);
     if (bag == 0) {
         IGRAPH_ERROR("barabasi_game failed", IGRAPH_ENOMEM);
     }
@@ -103,14 +103,14 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     /* The first node(s) in the bag */
     if (start_from) {
         igraph_vector_t deg;
-        long int ii, jj, sn = igraph_vcount(start_from);
+        igraph_integer_t ii, jj, sn = igraph_vcount(start_from);
         igraph_neimode_t mm = outpref ? IGRAPH_ALL : IGRAPH_IN;
 
         IGRAPH_VECTOR_INIT_FINALLY(&deg, sn);
         IGRAPH_CHECK(igraph_degree(start_from, &deg, igraph_vss_all(), mm,
                                    IGRAPH_LOOPS));
         for (ii = 0; ii < sn; ii++) {
-            long int d = (long int) VECTOR(deg)[ii];
+            igraph_integer_t d = (igraph_integer_t) VECTOR(deg)[ii];
             for (jj = 0; jj <= d; jj++) {
                 bag[bagp++] = ii;
             }
@@ -136,17 +136,17 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
          i < no_of_nodes; i++, k++) {
         /* draw edges */
         if (outseq) {
-            no_of_neighbors = (long int) VECTOR(*outseq)[k];
+            no_of_neighbors = (igraph_integer_t) VECTOR(*outseq)[k];
         }
         for (j = 0; j < no_of_neighbors; j++) {
-            long int to = bag[RNG_INTEGER(0, bagp - 1)];
+            igraph_integer_t to = bag[RNG_INTEGER(0, bagp - 1)];
             VECTOR(edges)[resp++] = i;
             VECTOR(edges)[resp++] = to;
         }
         /* update bag */
         bag[bagp++] = i;
         for (j = 0; j < no_of_neighbors; j++) {
-            bag[bagp++] = (long int) VECTOR(edges)[resp - 2 * j - 1];
+            bag[bagp++] = (igraph_integer_t) VECTOR(edges)[resp - 2 * j - 1];
             if (outpref) {
                 bag[bagp++] = i;
             }
@@ -164,7 +164,7 @@ static int igraph_i_barabasi_game_bag(igraph_t *graph, igraph_integer_t n,
     return 0;
 }
 
-static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
+static igraph_integer_t igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
                                                     igraph_integer_t n,
                                                     igraph_real_t power,
                                                     igraph_integer_t m,
@@ -174,14 +174,14 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
                                                     igraph_bool_t directed,
                                                     const igraph_t *start_from) {
 
-    long int no_of_nodes = n;
-    long int no_of_neighbors = m;
+    igraph_integer_t no_of_nodes = n;
+    igraph_integer_t no_of_neighbors = m;
     igraph_vector_t edges;
-    long int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
-    long int edgeptr = 0;
+    igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
-    long int start_nodes, start_edges, new_edges, no_of_edges;
+    igraph_integer_t start_nodes, start_edges, new_edges, no_of_edges;
 
     if (!directed) {
         outpref = 1;
@@ -191,7 +191,7 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     start_edges = start_from ? igraph_ecount(start_from) : 0;
     if (outseq) {
         if (igraph_vector_size(outseq) > 1) {
-            new_edges = (long int) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
+            new_edges = (igraph_integer_t) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
         } else {
             new_edges = 0;
         }
@@ -208,7 +208,7 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
 
     /* first node(s) */
     if (start_from) {
-        long int ii, sn = igraph_vcount(start_from);
+        igraph_integer_t ii, sn = igraph_vcount(start_from);
         igraph_neimode_t mm = outpref ? IGRAPH_ALL : IGRAPH_IN;
         IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), mm,
                                    IGRAPH_LOOPS));
@@ -232,9 +232,9 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     for (i = (start_from ? start_nodes : 1), k = (start_from ? 0 : 1);
          i < no_of_nodes; i++, k++) {
         igraph_real_t sum = igraph_psumtree_sum(&sumtree);
-        long int to;
+        igraph_integer_t to;
         if (outseq) {
-            no_of_neighbors = (long int) VECTOR(*outseq)[k];
+            no_of_neighbors = (igraph_integer_t) VECTOR(*outseq)[k];
         }
         for (j = 0; j < no_of_neighbors; j++) {
             igraph_psumtree_search(&sumtree, &to, RNG_UNIF(0, sum));
@@ -244,7 +244,7 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
         }
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
-            long int nn = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
+            igraph_integer_t nn = (igraph_integer_t) VECTOR(edges)[edgeptr - 2 * j - 1];
             igraph_psumtree_update(&sumtree, nn,
                                    pow(VECTOR(degree)[nn], power) + A);
         }
@@ -270,7 +270,7 @@ static int igraph_i_barabasi_game_psumtree_multiple(igraph_t *graph,
     return 0;
 }
 
-static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
+static igraph_integer_t igraph_i_barabasi_game_psumtree(igraph_t *graph,
                                            igraph_integer_t n,
                                            igraph_real_t power,
                                            igraph_integer_t m,
@@ -280,14 +280,14 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
                                            igraph_bool_t directed,
                                            const igraph_t *start_from) {
 
-    long int no_of_nodes = n;
-    long int no_of_neighbors = m;
+    igraph_integer_t no_of_nodes = n;
+    igraph_integer_t no_of_neighbors = m;
     igraph_vector_t edges;
-    long int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
-    long int edgeptr = 0;
+    igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
-    long int start_nodes, start_edges, new_edges, no_of_edges;
+    igraph_integer_t start_nodes, start_edges, new_edges, no_of_edges;
 
     if (!directed) {
         outpref = 1;
@@ -297,7 +297,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
     start_edges = start_from ? igraph_ecount(start_from) : 0;
     if (outseq) {
         if (igraph_vector_size(outseq) > 1) {
-            new_edges = (long int) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
+            new_edges = (igraph_integer_t) (igraph_vector_sum(outseq) - VECTOR(*outseq)[0]);
         } else {
             new_edges = 0;
         }
@@ -317,7 +317,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
 
     /* first node(s) */
     if (start_from) {
-        long int ii, sn = igraph_vcount(start_from);
+        igraph_integer_t ii, sn = igraph_vcount(start_from);
         igraph_neimode_t mm = outpref ? IGRAPH_ALL : IGRAPH_IN;
         IGRAPH_CHECK(igraph_degree(start_from, &degree, igraph_vss_all(), mm,
                                    IGRAPH_LOOPS));
@@ -338,9 +338,9 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
     for (i = (start_from ? start_nodes : 1), k = (start_from ? 0 : 1);
          i < no_of_nodes; i++, k++) {
         igraph_real_t sum;
-        long int to;
+        igraph_integer_t to;
         if (outseq) {
-            no_of_neighbors = (long int) VECTOR(*outseq)[k];
+            no_of_neighbors = (igraph_integer_t) VECTOR(*outseq)[k];
         }
         if (no_of_neighbors >= i) {
             /* All existing vertices are cited */
@@ -363,7 +363,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
             }
             /* update probabilities */
             for (j = 0; j < no_of_neighbors; j++) {
-                long int nn = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
+                igraph_integer_t nn = (igraph_integer_t) VECTOR(edges)[edgeptr - 2 * j - 1];
                 igraph_psumtree_update(&sumtree, nn,
                                        pow(VECTOR(degree)[nn], power) + A);
             }
@@ -460,7 +460,7 @@ static int igraph_i_barabasi_game_psumtree(igraph_t *graph,
  * \example examples/simple/igraph_barabasi_game.c
  * \example examples/simple/igraph_barabasi_game2.c
  */
-int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
+igraph_integer_t igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
                          igraph_real_t power,
                          igraph_integer_t m,
                          const igraph_vector_t *outseq,
@@ -470,8 +470,8 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
                          igraph_barabasi_algorithm_t algo,
                          const igraph_t *start_from) {
 
-    long int start_nodes = start_from ? igraph_vcount(start_from) : 0;
-    long int newn = start_from ? n - start_nodes : n;
+    igraph_integer_t start_nodes = start_from ? igraph_vcount(start_from) : 0;
+    igraph_integer_t newn = start_from ? n - start_nodes : n;
 
     /* Fix obscure parameterizations */
     if (outseq && igraph_vector_size(outseq) == 0) {
@@ -599,7 +599,7 @@ int igraph_barabasi_game(igraph_t *graph, igraph_integer_t n,
  * Time complexity: O((|V|+|V|/aging_bin)*log(|V|)+|E|). |V| is the number
  * of vertices, |E| the number of edges.
  */
-int igraph_barabasi_aging_game(igraph_t *graph,
+igraph_integer_t igraph_barabasi_aging_game(igraph_t *graph,
                                igraph_integer_t nodes,
                                igraph_integer_t m,
                                const igraph_vector_t *outseq,
@@ -612,14 +612,14 @@ int igraph_barabasi_aging_game(igraph_t *graph,
                                igraph_real_t deg_coef,
                                igraph_real_t age_coef,
                                igraph_bool_t directed) {
-    long int no_of_nodes = nodes;
-    long int no_of_neighbors = m;
-    long int binwidth = nodes / aging_bin + 1;
-    long int no_of_edges;
+    igraph_integer_t no_of_nodes = nodes;
+    igraph_integer_t no_of_neighbors = m;
+    igraph_integer_t binwidth = nodes / aging_bin + 1;
+    igraph_integer_t no_of_edges;
     igraph_vector_t edges;
-    long int i, j, k;
+    igraph_integer_t i, j, k;
     igraph_psumtree_t sumtree;
-    long int edgeptr = 0;
+    igraph_integer_t edgeptr = 0;
     igraph_vector_t degree;
 
     if (no_of_nodes < 0) {
@@ -658,9 +658,9 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     /* and the rest */
     for (i = 1; i < no_of_nodes; i++) {
         igraph_real_t sum;
-        long int to;
+        igraph_integer_t to;
         if (outseq != 0 && igraph_vector_size(outseq) != 0) {
-            no_of_neighbors = (long int) VECTOR(*outseq)[i];
+            no_of_neighbors = (igraph_integer_t) VECTOR(*outseq)[i];
         }
         sum = igraph_psumtree_sum(&sumtree);
         for (j = 0; j < no_of_neighbors; j++) {
@@ -671,8 +671,8 @@ int igraph_barabasi_aging_game(igraph_t *graph,
         }
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
-            long int n = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
-            long int age = (i - n) / binwidth;
+            igraph_integer_t n = (igraph_integer_t) VECTOR(edges)[edgeptr - 2 * j - 1];
+            igraph_integer_t age = (i - n) / binwidth;
             igraph_psumtree_update(&sumtree, n,
                                    (deg_coef * pow(VECTOR(degree)[n], pa_exp)
                                     + zero_deg_appeal)*
@@ -689,9 +689,9 @@ int igraph_barabasi_aging_game(igraph_t *graph,
 
         /* aging */
         for (k = 1; i - binwidth * k + 1 >= 1; k++) {
-            long int shnode = i - binwidth * k;
-            long int deg = (long int) VECTOR(degree)[shnode];
-            long int age = (i - shnode) / binwidth;
+            igraph_integer_t shnode = i - binwidth * k;
+            igraph_integer_t deg = (igraph_integer_t) VECTOR(degree)[shnode];
+            igraph_integer_t age = (i - shnode) / binwidth;
             /* igraph_real_t old=igraph_psumtree_get(&sumtree, shnode); */
             igraph_psumtree_update(&sumtree, shnode,
                                    (deg_coef * pow(deg, pa_exp) + zero_deg_appeal) *

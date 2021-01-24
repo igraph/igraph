@@ -27,9 +27,9 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
     igraph_i_cutheap_t ch;
-    long int i;
+    igraph_integer_t i;
 
     igraph_i_cutheap_init(&ch, 10);
 
@@ -37,7 +37,7 @@ int main() {
         igraph_i_cutheap_update(&ch, i, i);
     }
     while (!igraph_i_cutheap_empty(&ch)) {
-        long int idx = igraph_i_cutheap_popmax(&ch);
+        igraph_integer_t idx = igraph_i_cutheap_popmax(&ch);
         printf("%li ", idx);
     }
     printf("\n");

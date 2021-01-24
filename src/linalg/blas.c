@@ -54,11 +54,11 @@ void igraph_blas_dgemv(igraph_bool_t transpose, igraph_real_t alpha,
                        const igraph_matrix_t* a, const igraph_vector_t* x,
                        igraph_real_t beta, igraph_vector_t* y) {
     char trans = transpose ? 'T' : 'N';
-    int m, n;
-    int inc = 1;
+    igraph_integer_t m, n;
+    igraph_integer_t inc = 1;
 
-    m = (int) igraph_matrix_nrow(a);
-    n = (int) igraph_matrix_ncol(a);
+    m = (igraph_integer_t) igraph_matrix_nrow(a);
+    n = (igraph_integer_t) igraph_matrix_ncol(a);
 
     IGRAPH_ASSERT(igraph_vector_size(x) == transpose ? m : n);
     IGRAPH_ASSERT(igraph_vector_size(y) == transpose ? n : m);
@@ -93,27 +93,27 @@ void igraph_blas_dgemv_array(igraph_bool_t transpose, igraph_real_t alpha,
                              const igraph_matrix_t* a, const igraph_real_t* x,
                              igraph_real_t beta, igraph_real_t* y) {
     char trans = transpose ? 'T' : 'N';
-    int m, n;
-    int inc = 1;
+    igraph_integer_t m, n;
+    igraph_integer_t inc = 1;
 
-    m = (int) igraph_matrix_nrow(a);
-    n = (int) igraph_matrix_ncol(a);
+    m = (igraph_integer_t) igraph_matrix_nrow(a);
+    n = (igraph_integer_t) igraph_matrix_ncol(a);
 
     igraphdgemv_(&trans, &m, &n, &alpha, VECTOR(a->data), &m,
                  (igraph_real_t*)x, &inc, &beta, y, &inc);
 }
 
 igraph_real_t igraph_blas_dnrm2(const igraph_vector_t *v) {
-    int n = igraph_vector_size(v);
-    int one = 1;
+    igraph_integer_t n = igraph_vector_size(v);
+    igraph_integer_t one = 1;
     return igraphdnrm2_(&n, VECTOR(*v), &one);
 }
 
-int igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
+igraph_integer_t igraph_blas_ddot(const igraph_vector_t *v1, const igraph_vector_t *v2,
                        igraph_real_t *res) {
 
-    int n = igraph_vector_size(v1);
-    int one = 1;
+    igraph_integer_t n = igraph_vector_size(v1);
+    igraph_integer_t one = 1;
 
     if (igraph_vector_size(v2) != n) {
         IGRAPH_ERROR("Dot product of vectors with different dimensions",

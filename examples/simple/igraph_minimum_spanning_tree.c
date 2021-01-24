@@ -23,11 +23,11 @@
 
 #include <igraph.h>
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g, tree;
     igraph_vector_t eb, edges;
-    long int i;
+    igraph_integer_t i;
 
     igraph_small(&g, 0, IGRAPH_UNDIRECTED,
                  0,  1,  0,  2,  0,  3,  0,  4,  0,  5,

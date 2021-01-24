@@ -27,7 +27,7 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g1, g2;
     igraph_t ring1, ring2;

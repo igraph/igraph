@@ -52,18 +52,18 @@
  * Time complexity: O(|V|+|E|), the
  * number of vertices plus the number of edges.
  */
-int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
+igraph_integer_t igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
                                igraph_integer_t m, igraph_bool_t directed,
                                igraph_bool_t citation) {
 
-    long int no_of_nodes = n;
-    long int no_of_neighbors = m;
-    long int no_of_edges;
+    igraph_integer_t no_of_nodes = n;
+    igraph_integer_t no_of_neighbors = m;
+    igraph_integer_t no_of_edges;
     igraph_vector_t edges = IGRAPH_VECTOR_NULL;
 
-    long int resp = 0;
+    igraph_integer_t resp = 0;
 
-    long int i, j;
+    igraph_integer_t i, j;
 
     if (n < 0) {
         IGRAPH_ERROR("Invalid number of vertices", IGRAPH_EINVAL);
@@ -81,12 +81,12 @@ int igraph_growing_random_game(igraph_t *graph, igraph_integer_t n,
     for (i = 1; i < no_of_nodes; i++) {
         for (j = 0; j < no_of_neighbors; j++) {
             if (citation) {
-                long int to = RNG_INTEGER(0, i - 1);
+                igraph_integer_t to = RNG_INTEGER(0, i - 1);
                 VECTOR(edges)[resp++] = i;
                 VECTOR(edges)[resp++] = to;
             } else {
-                long int from = RNG_INTEGER(0, i);
-                long int to = RNG_INTEGER(1, i);
+                igraph_integer_t from = RNG_INTEGER(0, i);
+                igraph_integer_t to = RNG_INTEGER(1, i);
                 VECTOR(edges)[resp++] = from;
                 VECTOR(edges)[resp++] = to;
             }

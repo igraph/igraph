@@ -28,7 +28,7 @@
 
 #include "core/grid.h"
 
-static int igraph_layout_i_fr(const igraph_t *graph,
+static igraph_integer_t igraph_layout_i_fr(const igraph_t *graph,
                               igraph_matrix_t *res,
                               igraph_bool_t use_seed,
                               igraph_integer_t niter,
@@ -188,7 +188,7 @@ static int igraph_layout_i_fr(const igraph_t *graph,
     return 0;
 }
 
-static int igraph_layout_i_grid_fr(
+static igraph_integer_t igraph_layout_i_grid_fr(
         const igraph_t *graph,
         igraph_matrix_t *res, igraph_bool_t use_seed,
         igraph_integer_t niter, igraph_real_t start_temp,
@@ -367,7 +367,7 @@ static int igraph_layout_i_grid_fr(
  * vertices in the graph.
  */
 
-int igraph_layout_fruchterman_reingold(const igraph_t *graph,
+igraph_integer_t igraph_layout_fruchterman_reingold(const igraph_t *graph,
                                        igraph_matrix_t *res,
                                        igraph_bool_t use_seed,
                                        igraph_integer_t niter,
@@ -480,7 +480,7 @@ int igraph_layout_fruchterman_reingold(const igraph_t *graph,
  *
  */
 
-int igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
+igraph_integer_t igraph_layout_fruchterman_reingold_3d(const igraph_t *graph,
         igraph_matrix_t *res,
         igraph_bool_t use_seed,
         igraph_integer_t niter,

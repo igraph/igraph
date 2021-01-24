@@ -38,7 +38,7 @@
  * graphs, at least one of k and the number of vertices must be even.
  *
  * </para><para>
- * Currently, this game simply uses \ref igraph_degree_sequence_game with 
+ * Currently, this game simply uses \ref igraph_degree_sequence_game with
  * the \c SIMPLE_NO_MULTIPLE method and appropriately constructed degree sequences.
  * Thefore, it does not sample uniformly: while it can generate all k-regular graphs
  * with the given number of vertices, it does not generate each one with the same
@@ -60,7 +60,7 @@
  *
  * Time complexity: O(|V|+|E|) if \c multiple is true, otherwise not known.
  */
-int igraph_k_regular_game(igraph_t *graph,
+igraph_integer_t igraph_k_regular_game(igraph_t *graph,
                           igraph_integer_t no_of_nodes, igraph_integer_t k,
                           igraph_bool_t directed, igraph_bool_t multiple) {
     igraph_vector_t degseq;

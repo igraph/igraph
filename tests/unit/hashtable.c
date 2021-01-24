@@ -26,12 +26,12 @@
 
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_hashtable_t ht;
     char *str;
     const igraph_strvector_t *keys;
-    long int i;
+    igraph_integer_t i;
 
     /* init and destroy */
     igraph_hashtable_init(&ht);

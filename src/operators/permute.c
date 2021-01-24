@@ -46,13 +46,13 @@
  * Time complexity: O(|V|+|E|), linear in terms of the number of
  * vertices and edges.
  */
-int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
+igraph_integer_t igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
                             const igraph_vector_t *permutation) {
 
-    long int no_of_nodes = igraph_vcount(graph);
-    long int no_of_edges = igraph_ecount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_edges = igraph_ecount(graph);
     igraph_vector_t edges;
-    long int i, p = 0;
+    igraph_integer_t i, p = 0;
 
     if (igraph_vector_size(permutation) != no_of_nodes) {
         IGRAPH_ERROR("Permute vertices: invalid permutation vector size", IGRAPH_EINVAL);
@@ -61,8 +61,8 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, no_of_edges * 2);
 
     for (i = 0; i < no_of_edges; i++) {
-        VECTOR(edges)[p++] = VECTOR(*permutation)[ (long int) IGRAPH_FROM(graph, i) ];
-        VECTOR(edges)[p++] = VECTOR(*permutation)[ (long int) IGRAPH_TO(graph, i) ];
+        VECTOR(edges)[p++] = VECTOR(*permutation)[ (igraph_integer_t) IGRAPH_FROM(graph, i) ];
+        VECTOR(edges)[p++] = VECTOR(*permutation)[ (igraph_integer_t) IGRAPH_TO(graph, i) ];
     }
 
     IGRAPH_CHECK(igraph_create(res, &edges, (igraph_integer_t) no_of_nodes,
@@ -79,7 +79,7 @@ int igraph_permute_vertices(const igraph_t *graph, igraph_t *res,
         if (igraph_vector_size(&vtypes) != 0) {
             IGRAPH_VECTOR_INIT_FINALLY(&index, no_of_nodes);
             for (i = 0; i < no_of_nodes; i++) {
-                VECTOR(index)[ (long int) VECTOR(*permutation)[i] ] = i;
+                VECTOR(index)[ (igraph_integer_t) VECTOR(*permutation)[i] ] = i;
             }
             IGRAPH_CHECK(igraph_i_attribute_permute_vertices(graph, res, &index));
             igraph_vector_destroy(&index);

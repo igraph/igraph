@@ -24,7 +24,7 @@
 #include <igraph.h>
 #include "test_utilities.inc"
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t bet, bet2, weights, edges;
@@ -225,7 +225,7 @@ int main() {
 
         if (!igraph_vector_all_e(&bet, &bet2)) {
             return 3;
-        }        
+        }
     }
 
     igraph_vector_destroy(&bet);

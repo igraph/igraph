@@ -70,7 +70,7 @@
  * graph.
  */
 
-int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
+igraph_integer_t igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
                                igraph_bool_t use_seed, igraph_integer_t maxiter,
                                igraph_real_t epsilon, igraph_real_t kkconst,
                                const igraph_vector_t *weights,
@@ -376,7 +376,7 @@ int igraph_layout_kamada_kawai(const igraph_t *graph, igraph_matrix_t *res,
  * graph.
  */
 
-int igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
+igraph_integer_t igraph_layout_kamada_kawai_3d(const igraph_t *graph, igraph_matrix_t *res,
                                   igraph_bool_t use_seed, igraph_integer_t maxiter,
                                   igraph_real_t epsilon, igraph_real_t kkconst,
                                   const igraph_vector_t *weights,

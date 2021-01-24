@@ -30,14 +30,14 @@ typedef struct {
     igraph_integer_t low;
     igraph_integer_t high;
     igraph_integer_t length;
-    int retval;
+    igraph_integer_t retval;
 } sampling_test_t;
 
 /* Error tests. Don't be afraid to crash the library function.
  */
-int error_test() {
+igraph_integer_t error_test() {
     igraph_vector_t V;
-    int i, n, ret;
+    igraph_integer_t i, n, ret;
     sampling_test_t *test;
 
     igraph_rng_seed(igraph_rng_default(), 42); /* make tests deterministic */
@@ -60,7 +60,7 @@ int error_test() {
         test = all_checks[i];
         ret = igraph_random_sample(&V, test->low, test->high, test->length);
         if (ret != test->retval) {
-            printf("Error test no. %d failed.\n", (int)(i + 1));
+            printf("Error test no. %d failed.\n", (igraph_integer_t)(i + 1));
             return IGRAPH_FAILURE;
         }
     }
@@ -73,7 +73,7 @@ int error_test() {
 
 /* Get a few random samples and test their properties.
  */
-int random_sample_test() {
+igraph_integer_t random_sample_test() {
     const igraph_integer_t min = -1000;
     const igraph_integer_t max = 1000;
     igraph_integer_t low;       /* lower limit */
@@ -83,7 +83,7 @@ int random_sample_test() {
     igraph_real_t sP;           /* population total sum */
     igraph_real_t ss;           /* sample total sum */
     igraph_vector_t V;
-    int i;
+    igraph_integer_t i;
 
     igraph_rng_seed(igraph_rng_default(), 57); /* make tests deterministic */
 
@@ -139,9 +139,9 @@ int random_sample_test() {
     return IGRAPH_SUCCESS;
 }
 
-int equal_test() {
+igraph_integer_t equal_test() {
     igraph_vector_t V;
-    int i;
+    igraph_integer_t i;
 
     igraph_vector_init(&V, 0);
 
@@ -174,7 +174,7 @@ int equal_test() {
     return 0;
 }
 
-int rare_test() {
+igraph_integer_t rare_test() {
     igraph_vector_t V;
 
     igraph_vector_init(&V, 0);
@@ -199,8 +199,8 @@ int rare_test() {
     return 0;
 }
 
-int main() {
-    int ret;
+igraph_integer_t main() {
+    igraph_integer_t ret;
 
     ret = error_test();
     if (ret) {

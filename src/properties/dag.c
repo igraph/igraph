@@ -59,13 +59,13 @@
  *
  * \example examples/simple/igraph_topological_sorting.c
  */
-int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
+igraph_integer_t igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
                                igraph_neimode_t mode) {
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t degrees, neis;
     igraph_dqueue_t sources;
     igraph_neimode_t deg_mode;
-    long int node, i, j;
+    igraph_integer_t node, i, j;
 
     if (mode == IGRAPH_ALL || !igraph_is_directed(graph)) {
         IGRAPH_ERROR("Topological sorting does not make sense for undirected graphs", IGRAPH_EINVAL);
@@ -94,7 +94,7 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
 
     /* Take all nodes with no incoming vertices and remove them */
     while (!igraph_dqueue_empty(&sources)) {
-        igraph_real_t tmp = igraph_dqueue_pop(&sources); node = (long) tmp;
+        igraph_real_t tmp = igraph_dqueue_pop(&sources); node = (igraph_integer_t) tmp;
         /* Add the node to the result vector */
         igraph_vector_push_back(res, node);
         /* Exclude the node from further source searches */
@@ -103,8 +103,8 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
         IGRAPH_CHECK(igraph_neighbors(graph, &neis, (igraph_integer_t) node, mode));
         j = igraph_vector_size(&neis);
         for (i = 0; i < j; i++) {
-            VECTOR(degrees)[(long)VECTOR(neis)[i]]--;
-            if (VECTOR(degrees)[(long)VECTOR(neis)[i]] == 0) {
+            VECTOR(degrees)[(igraph_integer_t)VECTOR(neis)[i]]--;
+            if (VECTOR(degrees)[(igraph_integer_t)VECTOR(neis)[i]] == 0) {
                 IGRAPH_CHECK(igraph_dqueue_push(&sources, VECTOR(neis)[i]));
             }
         }
@@ -140,11 +140,11 @@ int igraph_topological_sorting(const igraph_t* graph, igraph_vector_t *res,
  * \sa \ref igraph_topological_sorting() to get a possible topological
  *     sorting of a DAG.
  */
-int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
-    long int no_of_nodes = igraph_vcount(graph);
+igraph_integer_t igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t degrees, neis;
     igraph_dqueue_t sources;
-    long int node, i, j, nei, vertices_left;
+    igraph_integer_t node, i, j, nei, vertices_left;
 
     if (!igraph_is_directed(graph)) {
         *res = 0;
@@ -168,7 +168,7 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
 
     /* Take all nodes with no incoming edges and remove them */
     while (!igraph_dqueue_empty(&sources)) {
-        igraph_real_t tmp = igraph_dqueue_pop(&sources); node = (long) tmp;
+        igraph_real_t tmp = igraph_dqueue_pop(&sources); node = (igraph_integer_t) tmp;
         /* Exclude the node from further source searches */
         VECTOR(degrees)[node] = -1;
         vertices_left--;
@@ -177,7 +177,7 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
                                       IGRAPH_IN));
         j = igraph_vector_size(&neis);
         for (i = 0; i < j; i++) {
-            nei = (long)VECTOR(neis)[i];
+            nei = (igraph_integer_t)VECTOR(neis)[i];
             if (nei == node) {
                 continue;
             }
@@ -205,14 +205,14 @@ int igraph_is_dag(const igraph_t* graph, igraph_bool_t *res) {
    This is fairly simple, we just collect all ancestors of a vertex
    using a depth-first search.
  */
-int igraph_transitive_closure_dag(const igraph_t *graph,
+igraph_integer_t igraph_transitive_closure_dag(const igraph_t *graph,
                                   igraph_t *closure) {
 
-    long int no_of_nodes = igraph_vcount(graph);
+    igraph_integer_t no_of_nodes = igraph_vcount(graph);
     igraph_vector_t deg;
     igraph_vector_t new_edges;
     igraph_vector_t ancestors;
-    long int root;
+    igraph_integer_t root;
     igraph_vector_t neighbors;
     igraph_stack_t path;
     igraph_vector_bool_t done;
@@ -243,12 +243,12 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
         IGRAPH_CHECK(igraph_stack_push(&path, root));
 
         while (!igraph_stack_empty(&path)) {
-            long int node = (long int) igraph_stack_top(&path);
+            igraph_integer_t node = (igraph_integer_t) igraph_stack_top(&path);
             if (node == STAR) {
                 /* Leaving a node */
-                long int j, n;
+                igraph_integer_t j, n;
                 igraph_stack_pop(&path);
-                node = (long int) igraph_stack_pop(&path);
+                node = (igraph_integer_t) igraph_stack_pop(&path);
                 if (!VECTOR(done)[node]) {
                     igraph_vector_pop_back(&ancestors);
                     VECTOR(done)[node] = 1;
@@ -261,7 +261,7 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
                 }
             } else {
                 /* Getting into a node */
-                long int n, j;
+                igraph_integer_t n, j;
                 if (!VECTOR(done)[node]) {
                     IGRAPH_CHECK(igraph_vector_push_back(&ancestors, node));
                 }
@@ -270,7 +270,7 @@ int igraph_transitive_closure_dag(const igraph_t *graph,
                 n = igraph_vector_size(&neighbors);
                 IGRAPH_CHECK(igraph_stack_push(&path, STAR));
                 for (j = 0; j < n; j++) {
-                    long int nei = (long int) VECTOR(neighbors)[j];
+                    igraph_integer_t nei = (igraph_integer_t) VECTOR(neighbors)[j];
                     IGRAPH_CHECK(igraph_stack_push(&path, nei));
                 }
             }

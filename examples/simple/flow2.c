@@ -23,17 +23,17 @@
 
 #include <igraph.h>
 
-int check_flow(int errorinc,
+igraph_integer_t check_flow(igraph_integer_t errorinc,
                const igraph_t *graph, igraph_real_t flow_value,
                const igraph_vector_t *flow, const igraph_vector_t *cut,
                const igraph_vector_t *partition,
                const igraph_vector_t *partition2,
-               long int source, long int target,
+               igraph_integer_t source, igraph_integer_t target,
                const igraph_vector_t *capacity,
                igraph_bool_t print) {
 
-    long int i, n = igraph_vcount(graph), m = igraph_ecount(graph);
-    long int nc = igraph_vector_size(cut);
+    igraph_integer_t i, n = igraph_vcount(graph), m = igraph_ecount(graph);
+    igraph_integer_t nc = igraph_vector_size(cut);
     igraph_vector_t inedges, outedges;
     igraph_bool_t directed = igraph_is_directed(graph);
     igraph_real_t cutsize;
@@ -50,9 +50,9 @@ int check_flow(int errorinc,
         igraph_vector_print(partition2);
         printf("edges in the cut: ");
         for (i = 0; i < nc; i++) {
-            long int edge = VECTOR(*cut)[i];
-            long int from = IGRAPH_FROM(graph, edge);
-            long int to  = IGRAPH_TO  (graph, edge);
+            igraph_integer_t edge = VECTOR(*cut)[i];
+            igraph_integer_t from = IGRAPH_FROM(graph, edge);
+            igraph_integer_t to  = IGRAPH_TO  (graph, edge);
             if (!directed && from > to) {
                 igraph_integer_t tmp = from;
                 from = to;
@@ -79,18 +79,18 @@ int check_flow(int errorinc,
         igraph_vector_init(&outedges, 0);
 
         for (i = 0; i < n; i++) {
-            long int n1, n2, j;
+            igraph_integer_t n1, n2, j;
             igraph_real_t in_flow = 0.0, out_flow = 0.0;
             igraph_incident(graph, &inedges,  i, IGRAPH_IN);
             igraph_incident(graph, &outedges, i, IGRAPH_OUT);
             n1 = igraph_vector_size(&inedges);
             n2 = igraph_vector_size(&outedges);
             for (j = 0; j < n1; j++) {
-                long int e = VECTOR(inedges)[j];
+                igraph_integer_t e = VECTOR(inedges)[j];
                 in_flow += VECTOR(*flow)[e];
             }
             for (j = 0; j < n2; j++) {
-                long int e = VECTOR(outedges)[j];
+                igraph_integer_t e = VECTOR(outedges)[j];
                 out_flow += VECTOR(*flow)[e];
             }
             if (i == source) {
@@ -121,7 +121,7 @@ int check_flow(int errorinc,
 
     /* Check the minimum cut size*/
     for (i = 0, cutsize = 0.0; i < nc; i++) {
-        long int edge = VECTOR(*cut)[i];
+        igraph_integer_t edge = VECTOR(*cut)[i];
         cutsize += VECTOR(*capacity)[edge];
     }
     if (fabs(cutsize - flow_value) > 1e-14) {
@@ -143,7 +143,7 @@ int check_flow(int errorinc,
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_real_t flow_value;
@@ -151,11 +151,11 @@ int main() {
     igraph_vector_t capacity;
     igraph_vector_t partition, partition2;
     igraph_vector_t flow;
-    long int i, n;
+    igraph_integer_t i, n;
     igraph_integer_t source, target;
     FILE *infile;
     igraph_real_t flow_value2 = 0.0;
-    int check;
+    igraph_integer_t check;
     igraph_maxflow_stats_t stats;
 
     igraph_vector_init(&capacity, 0);
@@ -180,7 +180,7 @@ int main() {
 
     n = igraph_vector_size(&cut);
     for (i = 0; i < n; i++) {
-        long int e = VECTOR(cut)[i];
+        igraph_integer_t e = VECTOR(cut)[i];
         flow_value2 += VECTOR(capacity)[e];
     }
     if (flow_value != flow_value2) {

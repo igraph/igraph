@@ -69,10 +69,10 @@
 #include "igraph_types.h"
 #include "igraph_vector.h"
 
-int igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, int *gr,
-                                   int n, int n_interv,
-                                   int maxiter) {
-    int i;
+igraph_integer_t igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, igraph_integer_t *gr,
+                                   igraph_integer_t n, igraph_integer_t n_interv,
+                                   igraph_integer_t maxiter) {
+    igraph_integer_t i;
     igraph_vector_t centers;
 
     IGRAPH_VECTOR_INIT_FINALLY(&centers, n_interv);
@@ -92,11 +92,11 @@ int igraph_i_intervals_plus_kmeans(const igraph_vector_t *v, int *gr,
     return 0;
 }
 
-int igraph_i_intervals_method(const igraph_vector_t *v, int *gr, int n,
-                              int n_interv) {
-    int i, lo, hi, new;
-    const int lft = 1;
-    const int include_border = 1;
+igraph_integer_t igraph_i_intervals_method(const igraph_vector_t *v, igraph_integer_t *gr, igraph_integer_t n,
+                              igraph_integer_t n_interv) {
+    igraph_integer_t i, lo, hi, new;
+    const igraph_integer_t lft = 1;
+    const igraph_integer_t include_border = 1;
     igraph_vector_t breaks;
 
     IGRAPH_VECTOR_INIT_FINALLY(&breaks, n_interv + 1);
@@ -129,10 +129,10 @@ int igraph_i_intervals_method(const igraph_vector_t *v, int *gr, int n,
     return 0;
 }
 
-int igraph_i_breaks_computation(const igraph_vector_t *v,
+igraph_integer_t igraph_i_breaks_computation(const igraph_vector_t *v,
                                 igraph_vector_t *breaks,
-                                int nb, int method) {
-    int i;
+                                igraph_integer_t nb, igraph_integer_t method) {
+    igraph_integer_t i;
     igraph_real_t eps, vmin, vmax;
     igraph_vector_minmax(v, &vmin, &vmax);
 

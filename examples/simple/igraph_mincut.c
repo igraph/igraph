@@ -23,13 +23,13 @@
 
 #include <igraph.h>
 
-int print_mincut(const igraph_t *graph, igraph_real_t value,
+igraph_integer_t print_mincut(const igraph_t *graph, igraph_real_t value,
                  const igraph_vector_t *partition,
                  const igraph_vector_t *partition2,
                  const igraph_vector_t *cut,
                  const igraph_vector_t *capacity) {
 
-    long int i, nc = igraph_vector_size(cut);
+    igraph_integer_t i, nc = igraph_vector_size(cut);
     igraph_bool_t directed = igraph_is_directed(graph);
 
     printf("mincut value: %g\n", (double) value);
@@ -39,9 +39,9 @@ int print_mincut(const igraph_t *graph, igraph_real_t value,
     igraph_vector_print(partition2);
     printf("edges in the cut: ");
     for (i = 0; i < nc; i++) {
-        long int edge = VECTOR(*cut)[i];
-        long int from = IGRAPH_FROM(graph, edge);
-        long int to  = IGRAPH_TO  (graph, edge);
+        igraph_integer_t edge = VECTOR(*cut)[i];
+        igraph_integer_t from = IGRAPH_FROM(graph, edge);
+        igraph_integer_t to  = IGRAPH_TO  (graph, edge);
         if (!directed && from > to) {
             igraph_integer_t tmp = from;
             from = to;
@@ -54,7 +54,7 @@ int print_mincut(const igraph_t *graph, igraph_real_t value,
     return 0;
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_t weights, partition, partition2, cut;

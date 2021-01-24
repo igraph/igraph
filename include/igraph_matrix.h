@@ -93,7 +93,7 @@ DECLDIR igraph_bool_t igraph_matrix_all_e_tol(const igraph_matrix_t *lhs,
                                       const igraph_matrix_t *rhs,
                                       igraph_real_t tol);
 
-DECLDIR int igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
+DECLDIR igraph_integer_t igraph_matrix_zapsmall(igraph_matrix_t *m, igraph_real_t tol);
 
 __END_DECLS
 

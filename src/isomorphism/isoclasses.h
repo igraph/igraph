@@ -28,18 +28,18 @@
 
 __BEGIN_DECLS
 
-extern const unsigned int igraph_i_isoclass_3[];
-extern const unsigned int igraph_i_isoclass_4[];
-extern const unsigned int igraph_i_isoclass_3u[];
-extern const unsigned int igraph_i_isoclass_4u[];
-extern const unsigned int igraph_i_isoclass2_3[];
-extern const unsigned int igraph_i_isoclass2_4[];
-extern const unsigned int igraph_i_isoclass2_3u[];
-extern const unsigned int igraph_i_isoclass2_4u[];
-extern const unsigned int igraph_i_isoclass_3_idx[];
-extern const unsigned int igraph_i_isoclass_4_idx[];
-extern const unsigned int igraph_i_isoclass_3u_idx[];
-extern const unsigned int igraph_i_isoclass_4u_idx[];
+extern const unsigned igraph_integer_t igraph_i_isoclass_3[];
+extern const unsigned igraph_integer_t igraph_i_isoclass_4[];
+extern const unsigned igraph_integer_t igraph_i_isoclass_3u[];
+extern const unsigned igraph_integer_t igraph_i_isoclass_4u[];
+extern const unsigned igraph_integer_t igraph_i_isoclass2_3[];
+extern const unsigned igraph_integer_t igraph_i_isoclass2_4[];
+extern const unsigned igraph_integer_t igraph_i_isoclass2_3u[];
+extern const unsigned igraph_integer_t igraph_i_isoclass2_4u[];
+extern const unsigned igraph_integer_t igraph_i_isoclass_3_idx[];
+extern const unsigned igraph_integer_t igraph_i_isoclass_4_idx[];
+extern const unsigned igraph_integer_t igraph_i_isoclass_3u_idx[];
+extern const unsigned igraph_integer_t igraph_i_isoclass_4u_idx[];
 
 __END_DECLS
 

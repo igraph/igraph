@@ -26,7 +26,7 @@
 
 #include "test_utilities.inc"
 
-int test_from_prufer_back_to_prufer() {
+igraph_integer_t test_from_prufer_back_to_prufer() {
     igraph_t graph;
     igraph_integer_t prufer[] = {2, 3, 2, 3};
 
@@ -48,7 +48,7 @@ int test_from_prufer_back_to_prufer() {
     return success;
 }
 
-int test_from_prufer_back_to_prufer_with_resize() {
+igraph_integer_t test_from_prufer_back_to_prufer_with_resize() {
     igraph_t graph;
     igraph_integer_t prufer[] = {0, 2, 4, 1, 1, 0};
 
@@ -70,7 +70,7 @@ int test_from_prufer_back_to_prufer_with_resize() {
     return success;
 }
 
-int test_from_prufer_back_to_prufer_with_resize2() {
+igraph_integer_t test_from_prufer_back_to_prufer_with_resize2() {
     igraph_t graph;
     igraph_integer_t prufer[] = {2, 4, 5, 1, 3};
 
@@ -93,9 +93,9 @@ int test_from_prufer_back_to_prufer_with_resize2() {
     return success;
 }
 
-int random_tree(int size, igraph_t* tree, igraph_vector_int_t* prufer) {
-    int i, j;
-    int prufer_length;
+igraph_integer_t random_tree(igraph_integer_t size, igraph_t* tree, igraph_vector_int_t* prufer) {
+    igraph_integer_t i, j;
+    igraph_integer_t prufer_length;
 
     if (size < 0) {
         return IGRAPH_EINVAL;
@@ -118,7 +118,7 @@ int random_tree(int size, igraph_t* tree, igraph_vector_int_t* prufer) {
     return IGRAPH_SUCCESS;
 }
 
-int test_from_random_prufer_back_to_prufer(int tree_size) {
+igraph_integer_t test_from_random_prufer_back_to_prufer(igraph_integer_t tree_size) {
     igraph_t graph;
     igraph_vector_int_t expected_prufer, output_prufer;
 
@@ -143,14 +143,14 @@ int test_from_random_prufer_back_to_prufer(int tree_size) {
     return success;
 }
 
-int test_num = 0;
+igraph_integer_t test_num = 0;
 #define RUN_TEST(TEST) \
     test_num++; \
     if(!(TEST)) { \
         return test_num; \
     }
 
-int main() {
+igraph_integer_t main() {
     RUN_TEST(test_from_prufer_back_to_prufer());
     RUN_TEST(test_from_prufer_back_to_prufer_with_resize());
     RUN_TEST(test_from_prufer_back_to_prufer_with_resize2());

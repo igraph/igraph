@@ -25,23 +25,23 @@
 #include <stdlib.h>
 
 void sort_and_print_vector(igraph_vector_t *v) {
-    long int i, n = igraph_vector_size(v);
+    igraph_integer_t i, n = igraph_vector_size(v);
     igraph_vector_sort(v);
     for (i = 0; i < n; i++) {
-        printf(" %li", (long int) VECTOR(*v)[i]);
+        printf(" %li", (igraph_integer_t) VECTOR(*v)[i]);
     }
     printf("\n");
 }
 
-void warning_handler_ignore(const char* reason, const char* file, int line, int e) {
+void warning_handler_ignore(const char* reason, const char* file, igraph_integer_t line, igraph_integer_t e) {
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_t g;
     igraph_vector_ptr_t result;
     igraph_integer_t no;
-    long int i;
+    igraph_integer_t i;
 
     igraph_set_warning_handler(warning_handler_ignore);
 

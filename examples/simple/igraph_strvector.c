@@ -24,17 +24,17 @@
 #include <igraph.h>
 
 void strvector_print(const igraph_strvector_t *sv) {
-    long int i, s = igraph_strvector_size(sv);
+    igraph_integer_t i, s = igraph_strvector_size(sv);
     for (i = 0; i < s; i++) {
         printf("---%s---\n", STR(*sv, i));
     }
 }
 
-int main() {
+igraph_integer_t main() {
 
     igraph_strvector_t sv1, sv2;
     char *str1;
-    int i;
+    igraph_integer_t i;
 
     /* igraph_strvector_init, igraph_strvector_destroy */
     igraph_strvector_init(&sv1, 10);
