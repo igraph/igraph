@@ -126,92 +126,92 @@
 
 #ifdef HAVE_GFORTRAN
 
-igraph_integer_t igraphdsaupd_(igraph_integer_t *ido, char *bmat, igraph_integer_t *n,
-                  char *which, igraph_integer_t *nev, igraph_real_t *tol,
-                  igraph_real_t *resid, igraph_integer_t *ncv, igraph_real_t *v,
-                  igraph_integer_t *ldv, igraph_integer_t *iparam, igraph_integer_t *ipntr,
+int igraphdsaupd_(int *ido, char *bmat, int *n,
+                  char *which, int *nev, igraph_real_t *tol,
+                  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+                  int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
-                  igraph_integer_t *lworkl, igraph_integer_t *info,
-                  igraph_integer_t bmat_len, igraph_integer_t which_len);
+                  int *lworkl, int *info,
+                  int bmat_len, int which_len);
 
-igraph_integer_t igraphdseupd_(igraph_integer_t *rvec, char *howmny, igraph_integer_t *select,
-                  igraph_real_t *d, igraph_real_t *z, igraph_integer_t *ldz,
-                  igraph_real_t *sigma, char *bmat, igraph_integer_t *n,
-                  char *which, igraph_integer_t *nev, igraph_real_t *tol,
-                  igraph_real_t *resid, igraph_integer_t *ncv, igraph_real_t *v,
-                  igraph_integer_t *ldv, igraph_integer_t *iparam, igraph_integer_t *ipntr,
+int igraphdseupd_(int *rvec, char *howmny, int *select,
+                  igraph_real_t *d, igraph_real_t *z, int *ldz,
+                  igraph_real_t *sigma, char *bmat, int *n,
+                  char *which, int *nev, igraph_real_t *tol,
+                  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+                  int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
-                  igraph_integer_t *lworkl, igraph_integer_t *info,
-                  igraph_integer_t howmny_len, igraph_integer_t bmat_len, igraph_integer_t which_len);
+                  int *lworkl, int *info,
+                  int howmny_len, int bmat_len, int which_len);
 
-igraph_integer_t igraphdnaupd_(igraph_integer_t *ido, char *bmat, igraph_integer_t *n,
-                  char *which, igraph_integer_t *nev, igraph_real_t *tol,
-                  igraph_real_t *resid, igraph_integer_t *ncv, igraph_real_t *v,
-                  igraph_integer_t *ldv, igraph_integer_t *iparam, igraph_integer_t *ipntr,
+int igraphdnaupd_(int *ido, char *bmat, int *n,
+                  char *which, int *nev, igraph_real_t *tol,
+                  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+                  int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
-                  igraph_integer_t *lworkl, igraph_integer_t *info,
-                  igraph_integer_t bmat_len, igraph_integer_t which_len);
+                  int *lworkl, int *info,
+                  int bmat_len, int which_len);
 
-igraph_integer_t igraphdneupd_(igraph_integer_t *rvec, char *howmny, igraph_integer_t *select,
+int igraphdneupd_(int *rvec, char *howmny, int *select,
                   igraph_real_t *dr, igraph_real_t *di,
-                  igraph_real_t *z, igraph_integer_t *ldz,
+                  igraph_real_t *z, int *ldz,
                   igraph_real_t *sigmar, igraph_real_t *sigmai,
-                  igraph_real_t *workev, char *bmat, igraph_integer_t *n,
-                  char *which, igraph_integer_t *nev, igraph_real_t *tol,
-                  igraph_real_t *resid, igraph_integer_t *ncv, igraph_real_t *v,
-                  igraph_integer_t *ldv, igraph_integer_t *iparam, igraph_integer_t *ipntr,
+                  igraph_real_t *workev, char *bmat, int *n,
+                  char *which, int *nev, igraph_real_t *tol,
+                  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+                  int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
-                  igraph_integer_t *lworkl, igraph_integer_t *info,
-                  igraph_integer_t howmny_len, igraph_integer_t bmat_len, igraph_integer_t which_len);
+                  int *lworkl, int *info,
+                  int howmny_len, int bmat_len, int which_len);
 
-igraph_integer_t igraphdsortr_(char *which, igraph_integer_t *apply, igraph_integer_t* n, igraph_real_t *x1,
+int igraphdsortr_(char *which, int *apply, int* n, igraph_real_t *x1,
                   igraph_real_t *x2,
-                  igraph_integer_t which_len);
+                  int which_len);
 
-igraph_integer_t igraphdsortc_(char *which, igraph_integer_t *apply, igraph_integer_t* n, igraph_real_t *xreal,
+int igraphdsortc_(char *which, int *apply, int* n, igraph_real_t *xreal,
                   igraph_real_t *ximag, igraph_real_t *y,
-                  igraph_integer_t which_len);
+                  int which_len);
 
 #else
 
-igraph_integer_t igraphdsaupd_(igraph_integer_t *ido, char *bmat, igraph_integer_t *n,
-                  char *which, igraph_integer_t *nev, igraph_real_t *tol,
-                  igraph_real_t *resid, igraph_integer_t *ncv, igraph_real_t *v,
-                  igraph_integer_t *ldv, igraph_integer_t *iparam, igraph_integer_t *ipntr,
+int igraphdsaupd_(int *ido, char *bmat, int *n,
+                  char *which, int *nev, igraph_real_t *tol,
+                  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+                  int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
-                  igraph_integer_t *lworkl, igraph_integer_t *info);
+                  int *lworkl, int *info);
 
-igraph_integer_t igraphdseupd_(igraph_integer_t *rvec, char *howmny, igraph_integer_t *select,
-                  igraph_real_t *d, igraph_real_t *z, igraph_integer_t *ldz,
-                  igraph_real_t *sigma, char *bmat, igraph_integer_t *n,
-                  char *which, igraph_integer_t *nev, igraph_real_t *tol,
-                  igraph_real_t *resid, igraph_integer_t *ncv, igraph_real_t *v,
-                  igraph_integer_t *ldv, igraph_integer_t *iparam, igraph_integer_t *ipntr,
+int igraphdseupd_(int *rvec, char *howmny, int *select,
+                  igraph_real_t *d, igraph_real_t *z, int *ldz,
+                  igraph_real_t *sigma, char *bmat, int *n,
+                  char *which, int *nev, igraph_real_t *tol,
+                  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+                  int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
-                  igraph_integer_t *lworkl, igraph_integer_t *info);
+                  int *lworkl, int *info);
 
-igraph_integer_t igraphdnaupd_(igraph_integer_t *ido, char *bmat, igraph_integer_t *n,
-                  char *which, igraph_integer_t *nev, igraph_real_t *tol,
-                  igraph_real_t *resid, igraph_integer_t *ncv, igraph_real_t *v,
-                  igraph_integer_t *ldv, igraph_integer_t *iparam, igraph_integer_t *ipntr,
+int igraphdnaupd_(int *ido, char *bmat, int *n,
+                  char *which, int *nev, igraph_real_t *tol,
+                  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+                  int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
-                  igraph_integer_t *lworkl, igraph_integer_t *info);
+                  int *lworkl, int *info);
 
-igraph_integer_t igraphdneupd_(igraph_integer_t *rvec, char *howmny, igraph_integer_t *select,
+int igraphdneupd_(int *rvec, char *howmny, int *select,
                   igraph_real_t *dr, igraph_real_t *di,
-                  igraph_real_t *z, igraph_integer_t *ldz,
+                  igraph_real_t *z, int *ldz,
                   igraph_real_t *sigmar, igraph_real_t *sigmai,
-                  igraph_real_t *workev, char *bmat, igraph_integer_t *n,
-                  char *which, igraph_integer_t *nev, igraph_real_t *tol,
-                  igraph_real_t *resid, igraph_integer_t *ncv, igraph_real_t *v,
-                  igraph_integer_t *ldv, igraph_integer_t *iparam, igraph_integer_t *ipntr,
+                  igraph_real_t *workev, char *bmat, int *n,
+                  char *which, int *nev, igraph_real_t *tol,
+                  igraph_real_t *resid, int *ncv, igraph_real_t *v,
+                  int *ldv, int *iparam, int *ipntr,
                   igraph_real_t *workd, igraph_real_t *workl,
-                  igraph_integer_t *lworkl, igraph_integer_t *info);
+                  int *lworkl, int *info);
 
-igraph_integer_t igraphdsortr_(char *which, igraph_integer_t *apply, igraph_integer_t* n, igraph_real_t *x1,
+int igraphdsortr_(char *which, int *apply, int* n, igraph_real_t *x1,
                   igraph_real_t *x2);
 
-igraph_integer_t igraphdsortc_(char *which, igraph_integer_t *apply, igraph_integer_t* n, igraph_real_t *xreal,
+int igraphdsortc_(char *which, int *apply, int* n, igraph_real_t *xreal,
                   igraph_real_t *ximag, igraph_real_t *y);
 
 #endif

@@ -33,7 +33,7 @@
 
 /* The ARPACK example file dssimp.f is used as a template */
 
-static igraph_integer_t igraph_i_arpack_err_dsaupd(igraph_integer_t error) {
+static int igraph_i_arpack_err_dsaupd(int error) {
     switch (error) {
     case  1:      return IGRAPH_ARPACK_MAXIT;
     case  3:      return IGRAPH_ARPACK_NOSHIFT;
@@ -55,7 +55,7 @@ static igraph_integer_t igraph_i_arpack_err_dsaupd(igraph_integer_t error) {
     }
 }
 
-static igraph_integer_t igraph_i_arpack_err_dseupd(igraph_integer_t error) {
+static int igraph_i_arpack_err_dseupd(int error) {
     switch (error) {
     case -1:      return IGRAPH_ARPACK_NPOS;
     case -2:      return IGRAPH_ARPACK_NEVNPOS;
@@ -77,7 +77,7 @@ static igraph_integer_t igraph_i_arpack_err_dseupd(igraph_integer_t error) {
 
 }
 
-static igraph_integer_t igraph_i_arpack_err_dnaupd(igraph_integer_t error) {
+static int igraph_i_arpack_err_dnaupd(int error) {
     switch (error) {
     case  1:      return IGRAPH_ARPACK_MAXIT;
     case  3:      return IGRAPH_ARPACK_NOSHIFT;
@@ -98,7 +98,7 @@ static igraph_integer_t igraph_i_arpack_err_dnaupd(igraph_integer_t error) {
     }
 }
 
-static igraph_integer_t igraph_i_arpack_err_dneupd(igraph_integer_t error) {
+static int igraph_i_arpack_err_dneupd(int error) {
     switch (error) {
     case  1:      return IGRAPH_ARPACK_REORDER;
     case -1:      return IGRAPH_ARPACK_NPOS;
@@ -188,14 +188,14 @@ void igraph_arpack_options_init(igraph_arpack_options_t *o) {
  * Time complexity: O(maxncv*(maxldv+maxn)).
  */
 
-igraph_integer_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_integer_t maxn,
-                               igraph_integer_t maxncv, igraph_integer_t maxldv,
+int igraph_arpack_storage_init(igraph_arpack_storage_t *s, long int maxn,
+                               long int maxncv, long int maxldv,
                                igraph_bool_t symm) {
 
     /* TODO: check arguments */
-    s->maxn = (igraph_integer_t) maxn;
-    s->maxncv = (igraph_integer_t) maxncv;
-    s->maxldv = (igraph_integer_t) maxldv;
+    s->maxn = (int) maxn;
+    s->maxncv = (int) maxncv;
+    s->maxldv = (int) maxldv;
 
 #define CHECKMEM(x) \
     if (!x) { \
@@ -208,7 +208,7 @@ igraph_integer_t igraph_arpack_storage_init(igraph_arpack_storage_t *s, igraph_i
     s->d = igraph_Calloc(2 * maxncv, igraph_real_t); CHECKMEM(s->d);
     s->resid = igraph_Calloc(maxn, igraph_real_t); CHECKMEM(s->resid);
     s->ax = igraph_Calloc(maxn, igraph_real_t); CHECKMEM(s->ax);
-    s->select = igraph_Calloc(maxncv, igraph_integer_t); CHECKMEM(s->select);
+    s->select = igraph_Calloc(maxncv, int); CHECKMEM(s->select);
 
     if (symm) {
         s->workl = igraph_Calloc(maxncv * (maxncv + 8), igraph_real_t); CHECKMEM(s->workl);
@@ -259,11 +259,11 @@ void igraph_arpack_storage_destroy(igraph_arpack_storage_t *s) {
  * "Solver" for 1x1 eigenvalue problems since ARPACK sometimes blows up with
  * these.
  */
-static igraph_integer_t igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun, void *extra,
+static int igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options,
                                        igraph_vector_t* values, igraph_matrix_t* vectors) {
     igraph_real_t a, b;
-    igraph_integer_t nev = options->nev;
+    int nev = options->nev;
 
     if (nev <= 0) {
         IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
@@ -295,11 +295,11 @@ static igraph_integer_t igraph_i_arpack_rssolve_1x1(igraph_arpack_function_t *fu
  * "Solver" for 1x1 eigenvalue problems since ARPACK sometimes blows up with
  * these.
  */
-static igraph_integer_t igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
+static int igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options,
                                        igraph_matrix_t* values, igraph_matrix_t* vectors) {
     igraph_real_t a, b;
-    igraph_integer_t nev = options->nev;
+    int nev = options->nev;
 
     if (nev <= 0) {
         IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
@@ -331,7 +331,7 @@ static igraph_integer_t igraph_i_arpack_rnsolve_1x1(igraph_arpack_function_t *fu
  * "Solver" for 2x2 nonsymmetric eigenvalue problems since ARPACK sometimes
  * blows up with these.
  */
-static igraph_integer_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
+static int igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options, igraph_matrix_t* values,
                                        igraph_matrix_t* vectors) {
     igraph_real_t vec[2], mat[4];
@@ -341,7 +341,7 @@ static igraph_integer_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fu
     igraph_complex_t evec1[2], evec2[2];
     igraph_bool_t swap_evals = 0;
     igraph_bool_t complex_evals = 0;
-    igraph_integer_t nev = options->nev;
+    int nev = options->nev;
 
     if (nev <= 0) {
         IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
@@ -485,14 +485,14 @@ static igraph_integer_t igraph_i_arpack_rnsolve_2x2(igraph_arpack_function_t *fu
  * "Solver" for symmetric 2x2 eigenvalue problems since ARPACK sometimes blows
  * up with these.
  */
-static igraph_integer_t igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
+static int igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fun, void *extra,
                                        igraph_arpack_options_t* options, igraph_vector_t* values,
                                        igraph_matrix_t* vectors) {
     igraph_real_t vec[2], mat[4];
     igraph_real_t a, b, c, d;
     igraph_real_t trace, det, tsq4_minus_d;
     igraph_real_t eval1, eval2;
-    igraph_integer_t nev = options->nev;
+    int nev = options->nev;
 
     if (nev <= 0) {
         IGRAPH_ERROR("ARPACK error", IGRAPH_ARPACK_NEVNPOS);
@@ -576,16 +576,16 @@ static igraph_integer_t igraph_i_arpack_rssolve_2x2(igraph_arpack_function_t *fu
     return IGRAPH_SUCCESS;
 }
 
-igraph_integer_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
+int igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *vectors,
                          const igraph_arpack_options_t *options,
                          igraph_real_t *d, const igraph_real_t *v) {
 
     igraph_vector_t order;
     char sort[2];
-    igraph_integer_t apply = 1;
+    int apply = 1;
     unsigned int n = (unsigned int) options->n;
-    igraph_integer_t nconv = options->nconv;
-    igraph_integer_t nev = options->nev;
+    int nconv = options->nconv;
+    int nev = options->nev;
     unsigned int nans = (unsigned int) (nconv < nev ? nconv : nev);
     unsigned int i;
 
@@ -613,7 +613,7 @@ igraph_integer_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *
 
     /* BE is special */
     if (which('B', 'E')) {
-        igraph_integer_t w = 0, l1 = 0, l2 = nev - 1;
+        int w = 0, l1 = 0, l2 = nev - 1;
         igraph_vector_t order2, d2;
         IGRAPH_VECTOR_INIT_FINALLY(&order2, nev);
         IGRAPH_VECTOR_INIT_FINALLY(&d2, nev);
@@ -658,17 +658,17 @@ igraph_integer_t igraph_arpack_rssort(igraph_vector_t *values, igraph_matrix_t *
     return 0;
 }
 
-igraph_integer_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
+int igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *vectors,
                          const igraph_arpack_options_t *options,
                          igraph_real_t *dr, igraph_real_t *di,
                          igraph_real_t *v) {
 
     igraph_vector_t order;
     char sort[2];
-    igraph_integer_t apply = 1;
+    int apply = 1;
     unsigned int n = (unsigned int) options->n;
-    igraph_integer_t nconv = options->nconv;
-    igraph_integer_t nev = options->nev;
+    int nconv = options->nconv;
+    int nev = options->nev;
     unsigned int nans = (unsigned int) (nconv < nev ? nconv : nev);
     unsigned int i;
 
@@ -705,7 +705,7 @@ igraph_integer_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *
     }
 
     if (vectors) {
-        igraph_integer_t nc = 0, nr = 0, ncol, vx = 0;
+        int nc = 0, nr = 0, ncol, vx = 0;
         for (i = 0; i < nans; i++) {
             if (di[i] == 0) {
                 nr++;
@@ -783,7 +783,7 @@ igraph_integer_t igraph_arpack_rnsort(igraph_matrix_t *values, igraph_matrix_t *
 static void igraph_i_arpack_auto_ncv(igraph_arpack_options_t* options) {
     /* This is similar to how Octave determines the value of ncv, with some
      * modifications. */
-    igraph_integer_t min_ncv = options->nev * 2 + 1;
+    int min_ncv = options->nev * 2 + 1;
 
     /* Use twice the number of desired eigenvectors plus one by default */
     options->ncv = min_ncv;
@@ -855,20 +855,20 @@ static void igraph_i_arpack_report_no_convergence(const igraph_arpack_options_t*
  * are found in O(n) time as well.
  */
 
-igraph_integer_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
+int igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extra,
                           igraph_arpack_options_t *options,
                           igraph_arpack_storage_t *storage,
                           igraph_vector_t *values, igraph_matrix_t *vectors) {
 
     igraph_real_t *v, *workl, *workd, *d, *resid, *ax;
     igraph_bool_t free_them = 0;
-    igraph_integer_t *select, i;
+    int *select, i;
 
-    igraph_integer_t ido = 0;
-    igraph_integer_t rvec = vectors || storage ? 1 : 0; /* calculate eigenvectors? */
+    int ido = 0;
+    int rvec = vectors || storage ? 1 : 0; /* calculate eigenvectors? */
     char *all = "All";
 
-    igraph_integer_t origldv = options->ldv, origlworkl = options->lworkl,
+    int origldv = options->ldv, origlworkl = options->lworkl,
         orignev = options->nev, origncv = options->ncv;
     igraph_real_t origtol = options->tol;
     char origwhich[2];
@@ -934,7 +934,7 @@ igraph_integer_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extr
         d = igraph_Calloc(2 * options->ncv, igraph_real_t); CHECKMEM(d);
         resid = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
         ax = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(ax);
-        select = igraph_Calloc(options->ncv, igraph_integer_t); CHECKMEM(select);
+        select = igraph_Calloc(options->ncv, int); CHECKMEM(select);
 
 #undef CHECKMEM
 
@@ -1113,23 +1113,23 @@ igraph_integer_t igraph_arpack_rssolve(igraph_arpack_function_t *fun, void *extr
  * are found in O(n) time as well.
  */
 
-igraph_integer_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
+int igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extra,
                           igraph_arpack_options_t *options,
                           igraph_arpack_storage_t *storage,
                           igraph_matrix_t *values, igraph_matrix_t *vectors) {
 
     igraph_real_t *v, *workl, *workd, *dr, *di, *resid, *workev;
     igraph_bool_t free_them = 0;
-    igraph_integer_t *select, i;
+    int *select, i;
 
-    igraph_integer_t ido = 0;
-    igraph_integer_t rvec = vectors || storage ? 1 : 0;
+    int ido = 0;
+    int rvec = vectors || storage ? 1 : 0;
     char *all = "All";
 
-    igraph_integer_t origldv = options->ldv, origlworkl = options->lworkl,
+    int origldv = options->ldv, origlworkl = options->lworkl,
         orignev = options->nev, origncv = options->ncv;
     igraph_real_t origtol = options->tol;
-    igraph_integer_t d_size;
+    int d_size;
     char origwhich[2];
 
     origwhich[0] = options->which[0];
@@ -1196,7 +1196,7 @@ igraph_integer_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extr
         dr = igraph_Calloc(d_size, igraph_real_t); CHECKMEM(dr);
         di = igraph_Calloc(d_size, igraph_real_t); CHECKMEM(di);
         resid = igraph_Calloc(options->n, igraph_real_t); CHECKMEM(resid);
-        select = igraph_Calloc(options->ncv, igraph_integer_t); CHECKMEM(select);
+        select = igraph_Calloc(options->ncv, int); CHECKMEM(select);
         workev = igraph_Calloc(3 * options->ncv, igraph_real_t); CHECKMEM(workev);
 
 #undef CHECKMEM
@@ -1357,12 +1357,12 @@ igraph_integer_t igraph_arpack_rnsolve(igraph_arpack_function_t *fun, void *extr
  * matrix.
  */
 
-igraph_integer_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
-                                 igraph_integer_t nev) {
+int igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_matrix_t *values,
+                                 long int nev) {
 
-    igraph_integer_t nodes = igraph_matrix_nrow(vectors);
-    igraph_integer_t no_evs = igraph_matrix_nrow(values);
-    igraph_integer_t i, j, k, wh;
+    long int nodes = igraph_matrix_nrow(vectors);
+    long int no_evs = igraph_matrix_nrow(values);
+    long int i, j, k, wh;
     size_t colsize = (unsigned) nodes * sizeof(igraph_real_t);
 
     /* Error checks */
@@ -1424,7 +1424,7 @@ igraph_integer_t igraph_arpack_unpack_complex(igraph_matrix_t *vectors, igraph_m
                 j -= 2;
             } else {
                 /* Conjugate */
-                igraph_integer_t l;
+                int l;
                 for (l = 0; l < nodes; l++) {
                     MATRIX(*vectors, l, k) = - MATRIX(*vectors, l, k);
                 }
