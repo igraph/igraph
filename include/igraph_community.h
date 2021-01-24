@@ -95,7 +95,7 @@ DECLDIR igraph_long_t igraph_community_walktrap(const igraph_t *graph,
 DECLDIR igraph_long_t igraph_community_infomap(const igraph_t * graph,
                                      const igraph_vector_t *e_weights,
                                      const igraph_vector_t *v_weights,
-                                     igraph_long_t nb_trials,
+                                     igraph_int_t nb_trials,
                                      igraph_vector_t *membership,
                                      igraph_real_t *codelength);
 
