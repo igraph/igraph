@@ -116,15 +116,15 @@ using namespace igraph::walktrap;
  * \example examples/simple/walktrap.c
  */
 
-int igraph_community_walktrap(const igraph_t *graph,
+igraph_long_t igraph_community_walktrap(const igraph_t *graph,
                               const igraph_vector_t *weights,
-                              int steps,
+                              igraph_long_t steps,
                               igraph_matrix_t *merges,
                               igraph_vector_t *modularity,
                               igraph_vector_t *membership) {
 
-    long int no_of_nodes = (long int)igraph_vcount(graph);
-    int length = steps;
+    igraph_long_t no_of_nodes = (igraph_long_t)igraph_vcount(graph);
+    igraph_long_t length = steps;
     long max_memory = -1;
 
     if (membership && !(modularity && merges)) {
@@ -157,7 +157,7 @@ int igraph_community_walktrap(const igraph_t *graph,
     delete G;
 
     if (membership) {
-        long int m = igraph_vector_which_max(modularity);
+        igraph_long_t m = igraph_vector_which_max(modularity);
         IGRAPH_CHECK(igraph_community_to_membership(merges, no_of_nodes,
                      /*steps=*/ m,
                      membership,
