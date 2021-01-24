@@ -364,7 +364,7 @@ igraph_long_t igraph_vs_vector_small(igraph_vs_t *vs, ...) {
 
     va_start(ap, vs);
     while (1) {
-        igraph_long_t num = va_arg(ap, igraph_long_t);
+        igraph_int_t num = va_arg(ap, igraph_int_t);
         if (num == -1) {
             break;
         }
@@ -376,7 +376,7 @@ igraph_long_t igraph_vs_vector_small(igraph_vs_t *vs, ...) {
 
     va_start(ap, vs);
     for (i = 0; i < n; i++) {
-        VECTOR(*vs->data.vecptr)[i] = (igraph_real_t) va_arg(ap, igraph_long_t);
+        VECTOR(*vs->data.vecptr)[i] = (igraph_real_t) va_arg(ap, igraph_int_t);
     }
     va_end(ap);
 
@@ -1213,7 +1213,7 @@ igraph_long_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...
 
     va_start(ap, directed);
     while (1) {
-        igraph_long_t num = va_arg(ap, igraph_long_t);
+        igraph_int_t num = va_arg(ap, igraph_int_t);
         if (num == -1) {
             break;
         }
@@ -1225,7 +1225,7 @@ igraph_long_t igraph_es_pairs_small(igraph_es_t *es, igraph_bool_t directed, ...
 
     va_start(ap, directed);
     for (i = 0; i < n; i++) {
-        VECTOR(*es->data.path.ptr)[i] = (igraph_real_t) va_arg(ap, igraph_long_t);
+        VECTOR(*es->data.path.ptr)[i] = (igraph_real_t) va_arg(ap, igraph_int_t);
     }
     va_end(ap);
 
@@ -1282,7 +1282,7 @@ igraph_long_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...)
 
     va_start(ap, directed);
     while (1) {
-        igraph_long_t num = va_arg(ap, igraph_long_t);
+        igraph_int_t num = va_arg(ap, igraph_int_t);
         if (num == -1) {
             break;
         }
@@ -1294,7 +1294,7 @@ igraph_long_t igraph_es_path_small(igraph_es_t *es, igraph_bool_t directed, ...)
 
     va_start(ap, directed);
     for (i = 0; i < n; i++) {
-        VECTOR(*es->data.path.ptr)[i] = (igraph_real_t) va_arg(ap, igraph_long_t);
+        VECTOR(*es->data.path.ptr)[i] = (igraph_real_t) va_arg(ap, igraph_int_t);
     }
     va_end(ap);
 

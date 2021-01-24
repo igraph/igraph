@@ -134,7 +134,7 @@ igraph_long_t igraph_small(igraph_t *graph, igraph_long_t n, igraph_bool_t direc
 
     va_start(ap, directed);
     while (1) {
-        igraph_long_t num = va_arg(ap, igraph_long_t);
+        igraph_int_t num = va_arg(ap, igraph_int_t);
         if (num == -1) {
             break;
         }

@@ -420,7 +420,7 @@ igraph_long_t igraph_attribute_combination(igraph_attribute_combination_t *comb,
             break;
         }
 
-        type = (igraph_attribute_combination_type_t)va_arg(ap, igraph_long_t);
+        type = (igraph_attribute_combination_type_t)va_arg(ap, igraph_attribute_combination_type_t);
         if (type == IGRAPH_ATTRIBUTE_COMBINE_FUNCTION) {
             func = va_arg(ap, igraph_function_pointer_t);
         }

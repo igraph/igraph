@@ -121,7 +121,7 @@ igraph_long_t igraph_lcf(igraph_t *graph, igraph_long_t n, ...) {
 
     va_start(ap, n);
     while (1) {
-        igraph_long_t num = va_arg(ap, igraph_long_t);
+        igraph_int_t num = va_arg(ap, igraph_int_t);
         if (num == 0) {
             break;
         }
