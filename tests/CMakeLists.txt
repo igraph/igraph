@@ -642,6 +642,12 @@ add_legacy_tests(
   fatal_handler
 )
 
+# error output
+
+add_legacy_tests(
+  FOLDER tests/unit NAMES
+  error_macros
+)
 # regression and fuzzing tests
 
 add_legacy_tests(
