@@ -111,7 +111,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
     RNG_BEGIN();
 
     /* first node */
-    igraph_psumtree_update(&sumtree, 0, zero_appeal);
+    IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_appeal));
     igraph_dqueue_push(&history, -1);
 
     /* and the rest */
@@ -125,8 +125,7 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
         if (i >= time_window) {
             while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
                 VECTOR(degree)[j] -= 1;
-                igraph_psumtree_update(&sumtree, j,
-                                       pow(VECTOR(degree)[j], power) + zero_appeal);
+                IGRAPH_CHECK(igraph_psumtree_update(&sumtree, j, pow(VECTOR(degree)[j], power) + zero_appeal));
             }
         }
 
@@ -143,15 +142,13 @@ int igraph_recent_degree_game(igraph_t *graph, igraph_integer_t n,
         /* update probabilities */
         for (j = 0; j < no_of_neighbors; j++) {
             long int nn = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
-            igraph_psumtree_update(&sumtree, nn,
-                                   pow(VECTOR(degree)[nn], power) + zero_appeal);
+            IGRAPH_CHECK(igraph_psumtree_update(&sumtree, nn, pow(VECTOR(degree)[nn], power) + zero_appeal));
         }
         if (outpref) {
             VECTOR(degree)[i] += no_of_neighbors;
-            igraph_psumtree_update(&sumtree, i,
-                                   pow(VECTOR(degree)[i], power) + zero_appeal);
+            IGRAPH_CHECK(igraph_psumtree_update(&sumtree, i, pow(VECTOR(degree)[i], power) + zero_appeal));
         } else {
-            igraph_psumtree_update(&sumtree, i, zero_appeal);
+            IGRAPH_CHECK(igraph_psumtree_update(&sumtree, i, zero_appeal));
         }
     }
 
@@ -268,7 +265,7 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
     RNG_BEGIN();
 
     /* first node */
-    igraph_psumtree_update(&sumtree, 0, zero_appeal);
+    IGRAPH_CHECK(igraph_psumtree_update(&sumtree, 0, zero_appeal));
     igraph_dqueue_push(&history, -1);
 
     /* and the rest */
@@ -283,9 +280,10 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
             while ((j = (long int) igraph_dqueue_pop(&history)) != -1) {
                 long int age = (i - j) / binwidth;
                 VECTOR(degree)[j] -= 1;
-                igraph_psumtree_update(&sumtree, j,
-                                       (pow(VECTOR(degree)[j], pa_exp) + zero_appeal)*
-                                       pow(age + 1, aging_exp));
+                IGRAPH_CHECK(igraph_psumtree_update(
+                    &sumtree, j,
+                    (pow(VECTOR(degree)[j], pa_exp) + zero_appeal) * pow(age + 1, aging_exp)
+                ));
             }
         }
 
@@ -303,16 +301,19 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
         for (j = 0; j < no_of_neighbors; j++) {
             long int n = (long int) VECTOR(edges)[edgeptr - 2 * j - 1];
             long int age = (i - n) / binwidth;
-            igraph_psumtree_update(&sumtree, n,
-                                   (pow(VECTOR(degree)[n], pa_exp) + zero_appeal)*
-                                   pow(age + 1, aging_exp));
+            IGRAPH_CHECK(igraph_psumtree_update(
+                &sumtree, n,
+                (pow(VECTOR(degree)[n], pa_exp) + zero_appeal) * pow(age + 1, aging_exp)
+            ));
         }
         if (outpref) {
             VECTOR(degree)[i] += no_of_neighbors;
-            igraph_psumtree_update(&sumtree, i,
-                                   pow(VECTOR(degree)[i], pa_exp) + zero_appeal);
+            IGRAPH_CHECK(igraph_psumtree_update(
+                &sumtree, i,
+                pow(VECTOR(degree)[i], pa_exp) + zero_appeal
+            ));
         } else {
-            igraph_psumtree_update(&sumtree, i, zero_appeal);
+            IGRAPH_CHECK(igraph_psumtree_update(&sumtree, i, zero_appeal));
         }
 
         /* aging */
@@ -320,9 +321,10 @@ int igraph_recent_degree_aging_game(igraph_t *graph,
             long int shnode = i - binwidth * k;
             long int deg = (long int) VECTOR(degree)[shnode];
             long int age = (i - shnode) / binwidth;
-            igraph_psumtree_update(&sumtree, shnode,
-                                   (pow(deg, pa_exp) + zero_appeal) *
-                                   pow(age + 2, aging_exp));
+            IGRAPH_CHECK(igraph_psumtree_update(
+                &sumtree, shnode,
+                (pow(deg, pa_exp) + zero_appeal) * pow(age + 2, aging_exp)
+            ));
         }
     }
 

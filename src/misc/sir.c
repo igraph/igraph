@@ -191,12 +191,12 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
         }
 
         /* Rates */
-        igraph_psumtree_update(&tree, infected, gamma);
+        IGRAPH_CHECK(igraph_psumtree_update(&tree, infected, gamma));
         neis = igraph_adjlist_get(&adjlist, infected);
         neilen = igraph_vector_int_size(neis);
         for (i = 0; i < neilen; i++) {
             int nei = VECTOR(*neis)[i];
-            igraph_psumtree_update(&tree, nei, beta);
+            IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, beta));
         }
 
         while (ni > 0) {
@@ -217,24 +217,24 @@ int igraph_sir(const igraph_t *graph, igraph_real_t beta,
             if (VECTOR(status)[vchange] == S_I) {
                 VECTOR(status)[vchange] = S_R;
                 ni--; nr++;
-                igraph_psumtree_update(&tree, vchange, 0.0);
+                IGRAPH_CHECK(igraph_psumtree_update(&tree, vchange, 0.0));
                 for (i = 0; i < neilen; i++) {
                     int nei = VECTOR(*neis)[i];
                     if (VECTOR(status)[nei] == S_S) {
                         igraph_real_t rate = igraph_psumtree_get(&tree, nei);
-                        igraph_psumtree_update(&tree, nei, rate - beta);
+                        IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, rate - beta));
                     }
                 }
 
             } else { /* S_S */
                 VECTOR(status)[vchange] = S_I;
                 ns--; ni++;
-                igraph_psumtree_update(&tree, vchange, gamma);
+                IGRAPH_CHECK(igraph_psumtree_update(&tree, vchange, gamma));
                 for (i = 0; i < neilen; i++) {
                     int nei = VECTOR(*neis)[i];
                     if (VECTOR(status)[nei] == S_S) {
                         igraph_real_t rate = igraph_psumtree_get(&tree, nei);
-                        igraph_psumtree_update(&tree, nei, rate + beta);
+                        IGRAPH_CHECK(igraph_psumtree_update(&tree, nei, rate + beta));
                     }
                 }
             }
