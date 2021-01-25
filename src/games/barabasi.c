@@ -630,6 +630,12 @@ int igraph_barabasi_aging_game(igraph_t *graph,
     if (aging_bin <= 0) {
         IGRAPH_ERROR("Invalid aging bin", IGRAPH_EINVAL);
     }
+    if (deg_coef < 0) {
+        IGRAPH_ERROR("Degree coefficient must be non-negative", IGRAPH_EINVAL);
+    }
+    if (age_coef < 0) {
+        IGRAPH_ERROR("Age coefficient must be non-negative", IGRAPH_EINVAL);
+    }
 
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
         no_of_neighbors = m;
