@@ -23,10 +23,11 @@
 #include "igraph_conversion.h"
 #include "igraph_interface.h"
 #include "igraph_interrupt.h"
+#include "igraph_memory.h"
+#include "igraph_vector.h"
+#include "igraph_vector_ptr.h"
 
 #include "core/exceptions.h"
-
-#include "config.h"
 
 using namespace bliss;
 using namespace std;

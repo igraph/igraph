@@ -26,9 +26,6 @@
 #include "internal/gmp_internal.h"
 #endif
 
-#include "igraph_memory.h"
-#include "igraph_error.h"
-
 #include <cstdlib>
 #include "defs.hh"
 
