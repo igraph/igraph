@@ -470,6 +470,36 @@ DECLDIR int igraph_error(const char *reason, const char *file, int line,
                          int igraph_errno);
 
 /**
+ * \define IGRAPH_ERRORF
+ * \brief Trigger an error, with printf-like error output.
+ *
+ * \a igraph functions can use this macro when they notice an error and
+ * want to pass on extra information to the user about what went wrong.
+ * It calls \ref igraph_errorf() with the proper parameters and if that
+ * returns the macro returns the "calling" function as well, with the
+ * error code. If for some (suspicious) reason you want to call the
+ * error handler without returning from the current function, call
+ * \ref igraph_errorf() directly.
+ * \param reason Textual description of the error, a template string
+ *   with the same syntax as the standard printf C library function.
+ *   This should be something more descriptive than the text associated
+ *   with the error code. E.g. if the error code is \c IGRAPH_EINVAL,
+ *   its associated text (see  \ref igraph_strerror()) is "Invalid
+ *   value" and this string should explain which parameter was invalid
+ *   and maybe what was expected and what was recieved.
+ * \param igraph_errno The \a igraph error code.
+ * \param ... The additional arguments to be substituted into the
+ *   template string.
+ */
+
+#define IGRAPH_ERRORF(reason,igraph_errno, ...) \
+    do { \
+        igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                      igraph_errno, __VA_ARGS__) ; \
+        return igraph_errno; \
+    } while (0)
+
+/**
  * \function igraph_errorf
  * \brief Trigger an error, printf-like version.
  *
@@ -726,6 +756,28 @@ DECLDIR int igraph_warning(const char *reason, const char *file, int line,
                            int igraph_errno);
 
 /**
+ * \define IGRAPH_WARNINGF
+ * \brief Trigger a warning, with printf-like warning output.
+ *
+ * \a igraph functions can use this macro when they notice a warning and
+ * want to pass on extra information to the user about what went wrong.
+ * It calls \ref igraph_warningf() with the proper parameters and no
+ * error code.
+ * \param reason Textual description of the warning, a template string
+ *        with the same syntax as the standard printf C library function.
+ * \param ... The additional arguments to be substituted into the
+ *        template string.
+ */
+
+#define IGRAPH_WARNINGF(reason, ...) \
+    do { \
+        igraph_warningf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                        -1, __VA_ARGS__); \
+    } while (0)
+
+
+
+/**
  * \function igraph_warningf
  * \brief Trigger a warning, printf-like version.
  *
@@ -859,6 +911,25 @@ DECLDIR IGRAPH_NORETURN void igraph_fatal(const char *reason, const char *file, 
  */
 
 DECLDIR IGRAPH_NORETURN void igraph_fatalf(const char *reason, const char *file, int line, ...);
+
+/**
+ * \define IGRAPH_FATALF
+ * \brief Trigger a fatal error, with printf-like error output.
+ *
+ * \a igraph functions can use this macro when a fatal error occurs and
+ * want to pass on extra information to the user about what went wrong.
+ * It calls \ref igraph_fatalf() with the proper parameters.
+ * \param reason Textual description of the error, a template string
+ *        with the same syntax as the standard printf C library function.
+ * \param ... The additional arguments to be substituted into the
+ *        template string.
+ */
+
+#define IGRAPH_FATALF(reason, ...) \
+    do { \
+        igraph_fatalf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
+                      __VA_ARGS__); \
+    } while (0)
 
 /**
  * \define IGRAPH_FATAL
