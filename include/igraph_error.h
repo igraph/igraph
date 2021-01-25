@@ -441,7 +441,7 @@ typedef enum {
  * \param igraph_errno The \a igraph error code.
  */
 
-#define IGRAPH_ERROR(reason,igraph_errno) \
+#define IGRAPH_ERROR(reason, igraph_errno) \
     do { \
         igraph_error (reason, IGRAPH_FILE_BASENAME, __LINE__, igraph_errno) ; \
         return igraph_errno ; \
@@ -492,7 +492,7 @@ DECLDIR int igraph_error(const char *reason, const char *file, int line,
  *   template string.
  */
 
-#define IGRAPH_ERRORF(reason,igraph_errno, ...) \
+#define IGRAPH_ERRORF(reason, igraph_errno, ...) \
     do { \
         igraph_errorf(reason, IGRAPH_FILE_BASENAME, __LINE__, \
                       igraph_errno, __VA_ARGS__) ; \
@@ -619,7 +619,7 @@ DECLDIR int IGRAPH_FINALLY_STACK_SIZE(void);
  * prevent memory leaks.
  */
 
-#define IGRAPH_FINALLY(func,ptr) \
+#define IGRAPH_FINALLY(func, ptr) \
     do { \
         /* the following branch makes the compiler check the compatibility of \
          * func and ptr to detect cases when we are accidentally invoking an \
