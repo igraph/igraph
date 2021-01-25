@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "test_utilities.inc"
+#include "../unit/test_utilities.inc"
 
 void check_attr(igraph_t *graph, int offset) {
 

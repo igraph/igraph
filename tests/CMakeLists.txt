@@ -244,14 +244,17 @@ add_legacy_tests(
 add_legacy_tests(
   FOLDER tests/unit NAMES
   igraph_layout_grid
-  igraph_layout_kamada_kawai_3d_bug_1462
   igraph_layout_lgl
   igraph_layout_mds
   igraph_layout_merge2
   igraph_layout_merge3
-  igraph_layout_reingold_tilford_bug_879
   igraph_layout_reingold_tilford_extended
   igraph_layout_sugiyama
+)
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  igraph_layout_kamada_kawai_3d_bug_1462
+  igraph_layout_reingold_tilford_bug_879
 )
 if (BUILD_INTERNAL_TESTS)
   add_legacy_tests(
@@ -430,7 +433,6 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
-  bug-1149658
   community_leiden
   community_label_propagation
   igraph_community_infomap
@@ -438,6 +440,10 @@ add_legacy_tests(
   igraph_modularity
   levc-stress
   spinglass
+)
+add_legacy_tests(
+  FOLDER tests/regression NAMES
+  bug-1149658
 )
 
 # use a higher test timeout for the Infomap algorithm
@@ -483,9 +489,12 @@ add_legacy_tests(
 
 add_legacy_tests(
   FOLDER tests/unit NAMES
+  cattributes5
+)
+add_legacy_tests(
+  FOLDER tests/regression NAMES
   cattr_bool_bug
   cattr_bool_bug2
-  cattributes5
 )
 
 # arpack.at
@@ -536,7 +545,7 @@ add_legacy_tests(
   igraph_minimum_size_separators
 )
 add_legacy_tests(
-  FOLDER tests/unit NAMES
+  FOLDER tests/regression NAMES
   bug-1033045
 )
 
