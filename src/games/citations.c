@@ -246,11 +246,17 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
 
     igraph_vector_t edges;
     igraph_vector_t cumsum;
-    igraph_real_t sum;
-    long int i, j, nnval, type;
+    igraph_real_t sum, nnval;
+    long int i, j, type;
 
     if (igraph_vector_size(types) != nodes) {
-        IGRAPH_ERROR("Invalid size of types", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Size of types is %ld, number of nodes is %lld, but they should be equal.", IGRAPH_EINVAL,
+        igraph_vector_size(types), (long long) nodes);
+    }
+
+   if (igraph_vector_min(types) < 0) {
+        IGRAPH_ERRORF("Types should be non-negative, but found %f.", IGRAPH_EINVAL,
+        igraph_vector_min(types));
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
@@ -275,7 +281,8 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
     }
     nnval = VECTOR(*pref)[type];
     if (nnval < 0) {
-        IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+        IGRAPH_ERRORF("Preferences should be non-negative, but found %f.", IGRAPH_EINVAL,
+                      igraph_vector_min(pref));
     }
     sum = VECTOR(cumsum)[1] = nnval;
 
@@ -298,7 +305,8 @@ int igraph_cited_type_game(igraph_t *graph, igraph_integer_t nodes,
         }
         nnval = VECTOR(*pref)[type];
         if (nnval < 0) {
-            IGRAPH_ERROR("pref contains negative entries", IGRAPH_EINVAL);
+            IGRAPH_ERRORF("Preferences should be non-negative, but found %f.", IGRAPH_EINVAL,
+                          igraph_vector_min(pref));
         }
         sum += nnval;
         igraph_vector_push_back(&cumsum, sum);
