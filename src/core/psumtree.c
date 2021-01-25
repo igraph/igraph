@@ -83,14 +83,20 @@ int igraph_psumtree_update(igraph_psumtree_t *t, long int idx,
     const igraph_vector_t *tree = &t->v;
     igraph_real_t difference;
 
-    idx = idx + t->offset + 1;
-    difference = new_value - VECTOR(*tree)[idx - 1];
+    if (new_value >= 0) {
+        idx = idx + t->offset + 1;
+        difference = new_value - VECTOR(*tree)[idx - 1];
 
-    while ( idx >= 1 ) {
-        VECTOR(*tree)[idx - 1] += difference;
-        idx >>= 1;
+        while ( idx >= 1 ) {
+            VECTOR(*tree)[idx - 1] += difference;
+            idx >>= 1;
+        }
+
+        return IGRAPH_SUCCESS;
+    } else {
+        /* caters for negative values and NaN */
+        return IGRAPH_EINVAL;
     }
-    return IGRAPH_SUCCESS;
 }
 
 long int igraph_psumtree_size(const igraph_psumtree_t *t) {

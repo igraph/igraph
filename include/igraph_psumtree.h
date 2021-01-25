@@ -34,6 +34,18 @@ __BEGIN_DECLS
  * from a dynamic discrete distribution. The first part (0,...,offset - 1) of
  * the vector v contains the prefixes of the values contained in the latter part
  * (offset, offset + size - 1) of vector v.
+ *
+ * More precisely: the part between (offset, offset + size - 1) of vector v
+ * contains the values (not necessarily probabilities) corresponding to the
+ * individual items. For the part in front of it, it holds that the value at
+ * index i (zero-based) is the sum of values at index (2*i + 1) and index
+ * (2*i + 2). The item at index zero contains the sum of all values in the
+ * slice between (offset, offset + size - 1).
+ *
+ * In order for the partial prefix sum tree to be suitable for drawing values
+ * from a dynamic discrete distribution, it must hold that all the values in
+ * the tree must be non-negative. Since this is the only use-case that we use
+ * this data structure for, this condition is ensured when the tree is updated.
  */
 
 typedef struct {
