@@ -660,6 +660,11 @@ int igraph_barabasi_aging_game(igraph_t *graph,
                      zero_age_appeal);
     }
 
+    if (no_of_nodes == 0) {
+         igraph_empty(graph, 0, 0);
+         return IGRAPH_SUCCESS;
+    }
+
     if (outseq == 0 || igraph_vector_size(outseq) == 0) {
         no_of_neighbors = m;
         no_of_edges = (no_of_nodes - 1) * no_of_neighbors;

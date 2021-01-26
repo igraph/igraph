@@ -37,6 +37,19 @@ int main() {
     IGRAPH_ASSERT(!igraph_is_directed(&g));
     igraph_destroy(&g);
 
+    printf("No edges:\n");
+    IGRAPH_ASSERT(igraph_barabasi_aging_game(
+        &g, /*nodes*/ 5, /*m: edges_per_step*/ 0,
+        /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
+        /*pa_exp*/ 1, /*aging_exp*/ 1, /*aging_bin*/ 1,
+        /*zero_deg_appeal*/ 0, /*zero_age_appeal*/ 0, /*deg_coef*/ 1.0,
+        /*age_coef */ 1.0, /*directed*/ 0) == IGRAPH_SUCCESS);
+    print_graph(&g);
+    IGRAPH_ASSERT(igraph_vcount(&g) == 5);
+    IGRAPH_ASSERT(igraph_ecount(&g) == 0);
+    IGRAPH_ASSERT(!igraph_is_directed(&g));
+    igraph_destroy(&g);
+
     /*one edge per step makes a tree*/
     IGRAPH_ASSERT(igraph_barabasi_aging_game(
            &g, /*nodes*/ 10, /*m: edges_per_step*/ 1,
