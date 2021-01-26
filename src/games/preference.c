@@ -340,7 +340,7 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  * \brief Generates a graph with asymmetric vertex types and connection preferences
  *
  * </para><para>
- * This is the asymmetric variant of \ref igraph_preference_game() .
+ * This is the asymmetric variant of \ref igraph_preference_game().
  * A given number of vertices are generated. Every vertex is assigned to an
  * "incoming" and an "outgoing" vertex type according to the given joint
  * type probabilities. Finally, every vertex pair is evaluated and a
@@ -372,9 +372,10 @@ int igraph_preference_game(igraph_t *graph, igraph_integer_t nodes,
  */
 
 int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
-                                      igraph_integer_t types,
-                                      igraph_matrix_t *type_dist_matrix,
-                                      igraph_matrix_t *pref_matrix,
+                                      igraph_integer_t in_types,
+                                      igraph_integer_t out_types,
+                                      const igraph_matrix_t *type_dist_matrix,
+                                      const igraph_matrix_t *pref_matrix,
                                       igraph_vector_t *node_type_in_vec,
                                       igraph_vector_t *node_type_out_vec,
                                       igraph_bool_t loops) {
@@ -386,27 +387,26 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     igraph_vector_ptr_t vids_by_intype, vids_by_outtype;
     igraph_real_t maxcum, maxedges;
 
-    if (types < 1) {
-        IGRAPH_ERROR("types must be >= 1", IGRAPH_EINVAL);
-    }
-    if (nodes < 0) {
-        IGRAPH_ERROR("nodes must be >= 0", IGRAPH_EINVAL);
-    }
-    if (type_dist_matrix) {
-        if (igraph_matrix_nrow(type_dist_matrix) < types ||
-            igraph_matrix_ncol(type_dist_matrix) < types) {
-            IGRAPH_ERROR("type_dist_matrix too small", IGRAPH_EINVAL);
-        } else if (igraph_matrix_nrow(type_dist_matrix) > types ||
-                   igraph_matrix_ncol(type_dist_matrix) > types) {
-            IGRAPH_WARNING("type_dist_matrix will be trimmed");
-        }
-    }
-    if (igraph_matrix_nrow(pref_matrix) < types ||
-        igraph_matrix_ncol(pref_matrix) < types) {
-        IGRAPH_ERROR("pref_matrix too small", IGRAPH_EINVAL);
+    if(nodes < 0){
+        IGRAPH_ERROR("The number of vertices must be non-negative.", IGRAPH_EINVAL);
     }
 
-    IGRAPH_VECTOR_INIT_FINALLY(&cumdist, types * types + 1);
+    if (in_types < 1) {
+        IGRAPH_ERROR("The number of vertex in-types must be at least 1.", IGRAPH_EINVAL);
+    }
+
+    if (out_types < 1) {
+        IGRAPH_ERROR("The number of vertex out-types must be at least 1.", IGRAPH_EINVAL);
+    }
+
+    if (type_dist_matrix) {
+        if (igraph_matrix_nrow(type_dist_matrix) != out_types ||
+            igraph_matrix_ncol(type_dist_matrix) != in_types) {
+            IGRAPH_ERROR("The type distribution matrix must have dimensions out_types * in_types.", IGRAPH_EINVAL);
+        }
+    }
+
+    IGRAPH_VECTOR_INIT_FINALLY(&cumdist, in_types * out_types + 1);
 
     if (node_type_in_vec) {
         nodetypes_in = node_type_in_vec;
@@ -414,7 +414,7 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     } else {
         nodetypes_in = igraph_Calloc(1, igraph_vector_t);
         if (nodetypes_in == 0) {
-            IGRAPH_ERROR("asymmetric_preference_game failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
         IGRAPH_VECTOR_INIT_FINALLY(nodetypes_in, nodes);
     }
@@ -425,22 +425,27 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     } else {
         nodetypes_out = igraph_Calloc(1, igraph_vector_t);
         if (nodetypes_out == 0) {
-            IGRAPH_ERROR("asymmetric_preference_game failed", IGRAPH_ENOMEM);
+            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
         IGRAPH_VECTOR_INIT_FINALLY(nodetypes_out, nodes);
     }
 
-    IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_intype, types));
+    IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_intype, in_types));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vids_by_intype);
-    IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_outtype, types));
+    IGRAPH_CHECK(igraph_vector_ptr_init(&vids_by_outtype, out_types));
     IGRAPH_FINALLY(igraph_vector_ptr_destroy_all, &vids_by_outtype);
-    for (i = 0; i < types; i++) {
+    for (i = 0; i < in_types; i++) {
         VECTOR(vids_by_intype)[i] = igraph_Calloc(1, igraph_vector_t);
-        VECTOR(vids_by_outtype)[i] = igraph_Calloc(1, igraph_vector_t);
-        if (VECTOR(vids_by_intype)[i] == 0 || VECTOR(vids_by_outtype)[i] == 0) {
-            IGRAPH_ERROR("asymmetric_preference_game failed", IGRAPH_ENOMEM);
+        if (! VECTOR(vids_by_intype)[i]) {
+            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
         }
         IGRAPH_CHECK(igraph_vector_init(VECTOR(vids_by_intype)[i], 0));
+    }
+    for (i = 0; i < out_types; i++) {
+        VECTOR(vids_by_outtype)[i] = igraph_Calloc(1, igraph_vector_t);
+        if (! VECTOR(vids_by_outtype)[i]) {
+            IGRAPH_ERROR("Insufficient memory for asymmetric_preference_game.", IGRAPH_ENOMEM);
+        }
         IGRAPH_CHECK(igraph_vector_init(VECTOR(vids_by_outtype)[i], 0));
     }
     IGRAPH_FINALLY_CLEAN(2);   /* removing igraph_vector_ptr_destroy_all */
@@ -449,13 +454,13 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
 
     VECTOR(cumdist)[0] = 0;
     if (type_dist_matrix) {
-        for (i = 0, k = 0; i < types; i++) {
-            for (j = 0; j < types; j++, k++) {
+        for (i = 0, k = 0; i < out_types; i++) {
+            for (j = 0; j < in_types; j++, k++) {
                 VECTOR(cumdist)[k + 1] = VECTOR(cumdist)[k] + MATRIX(*type_dist_matrix, i, j);
             }
         }
     } else {
-        for (i = 0; i < types * types; i++) {
+        for (i = 0; i < out_types * in_types; i++) {
             VECTOR(cumdist)[i + 1] = i + 1;
         }
     }
@@ -467,8 +472,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
         long int type1, type2;
         igraph_real_t uni1 = RNG_UNIF(0, maxcum);
         igraph_vector_binsearch(&cumdist, uni1, &type1);
-        type2 = (type1 - 1) % (int)types;
-        type1 = (type1 - 1) / (int)types;
+        type2 = (type1 - 1) % (long int) out_types;
+        type1 = (type1 - 1) / (long int) out_types;
         VECTOR(*nodetypes_in)[i] = type1;
         VECTOR(*nodetypes_out)[i] = type2;
         IGRAPH_CHECK(igraph_vector_push_back(
@@ -483,8 +488,8 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_VECTOR_INIT_FINALLY(&edges, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&s, 0);
     IGRAPH_VECTOR_INIT_FINALLY(&intersect, 0);
-    for (i = 0; i < types; i++) {
-        for (j = 0; j < types; j++) {
+    for (i = 0; i < out_types; i++) {
+        for (j = 0; j < in_types; j++) {
             long int kk, l, c = 0;
             igraph_real_t p, last;
             igraph_vector_t *v1, *v2;
@@ -574,5 +579,6 @@ int igraph_asymmetric_preference_game(igraph_t *graph, igraph_integer_t nodes,
     IGRAPH_CHECK(igraph_create(graph, &edges, nodes, 1));
     igraph_vector_destroy(&edges);
     IGRAPH_FINALLY_CLEAN(1);
-    return 0;
+
+    return IGRAPH_SUCCESS;
 }

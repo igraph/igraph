@@ -146,7 +146,7 @@ int main() {
     MATRIX(pmat, 0, 1) = 1;
     MATRIX(pmat, 1, 0) = 1;
     MATRIX(pmat, 1, 1) = 1;
-    IGRAPH_CHECK(igraph_asymmetric_preference_game(&g, 100, 2, 0, &pmat, 0, 0, 0));
+    IGRAPH_CHECK(igraph_asymmetric_preference_game(&g, 100, 2, 2, NULL, &pmat, NULL, NULL, IGRAPH_NO_LOOPS));
     if (igraph_vcount(&g) != 100) {
         return 21;
     }
@@ -172,7 +172,7 @@ int main() {
     MATRIX(pmat, 0, 1) = 1;
     MATRIX(pmat, 1, 0) = 1;
     MATRIX(pmat, 1, 1) = 1;
-    IGRAPH_CHECK(igraph_asymmetric_preference_game(&g, 100, 2, 0, &pmat, 0, 0, 1));
+    IGRAPH_CHECK(igraph_asymmetric_preference_game(&g, 100, 2, 2, NULL, &pmat, NULL, NULL, IGRAPH_LOOPS));
     if (igraph_vcount(&g) != 100) {
         return 26;
     }
