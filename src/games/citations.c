@@ -106,12 +106,12 @@ int igraph_lastcit_game(igraph_t *graph,
                      agebins, igraph_vector_size(preference));
     }
     if (nodes < 0 ) {
-        IGRAPH_ERRORF("Number of nodes should be non-negative, recieved %d.",
+        IGRAPH_ERRORF("Number of nodes should be non-negative, received %d.",
                      IGRAPH_EINVAL,
                      nodes);
     }
     if (agebins < 1 ) {
-        IGRAPH_ERRORF("Number of age bins should be at least 1, recieved %d.",
+        IGRAPH_ERRORF("Number of age bins should be at least 1, received %d.",
                      IGRAPH_EINVAL,
                      agebins);
     }
