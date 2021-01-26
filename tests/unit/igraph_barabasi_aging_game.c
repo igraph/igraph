@@ -66,7 +66,7 @@ int main() {
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ NULL, /*outpref*/ 0,
         /*pa_exp*/ 0.0, /*aging_exp*/ -10, /*aging_bin*/ 1,
-        /*zero_deg_appeal*/ 0.0, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.0,
+        /*zero_deg_appeal*/ 0.1, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.1,
         /*age_coef */ 1, /*directed*/ 1) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
@@ -77,7 +77,7 @@ int main() {
         &g, /*nodes*/ 5, /*m: edges_per_step*/ 2,
         /*outseq: edges per step as vector*/ &outseq, /*outpref*/ 0,
         /*pa_exp*/ 0.1, /*aging_exp*/ -10, /*aging_bin*/ 1,
-        /*zero_deg_appeal*/ 0.0, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.0,
+        /*zero_deg_appeal*/ 0.1, /*zero_age_appeal*/ 0, /*deg_coef*/ 0.1,
         /*age_coef */ 10, /*directed*/ 1) == IGRAPH_SUCCESS);
     print_graph_canon(&g);
     igraph_destroy(&g);
