@@ -39,24 +39,45 @@
  * The closeness centrality of a vertex measures how easily other
  * vertices can be reached from it (or the other way: how easily it
  * can be reached from the other vertices). It is defined as
- * the number of vertices minus one divided by the sum of the
- * lengths of all geodesics from/to the given vertex.
+ * the inverse of the mean distance to (or from) all other vertices.
  *
  * </para><para>
- * If the graph is not connected, and there is no path between two
- * vertices, the number of vertices is used instead the length of the
- * geodesic. This is longer than the longest possible geodesic in case
- * of unweighted graphs, but may not be so in weighted graphs, so it is
- * best not to use this function on weighted graphs.
+ * Closeness centrality is meaningful only for connected graphs.
+ * If the graph is not connected, igraph computes the inverse of the
+ * mean distance to (or from) all \em reachable vertices. In undirected
+ * graphs, this is equivalent to computing the closeness separately in
+ * each connected component. The optional \p all_reachable output
+ * parameter is provided to help detect when the graph is disconnected.
  *
  * </para><para>
- * If the graph has a single vertex only, the closeness centrality of
- * that single vertex will be NaN (because we are essentially dividing
- * zero with zero).
+ * While there is no universally adopted definition of closeness centrality
+ * for disconnected graphs, there have been some attempts for generalizing
+ * the concept to the disconnected case. One type of approach considers the mean distance
+ * only to reachable vertices, then re-scales the obtained certrality score
+ * by a factor that depends on the number of reachable vertices
+ * (i.e. the size of the component in the undirected case).
+ * To facilitate computing these generalizations of closeness centrality,
+ * the number of reachable vertices (not including the starting vertex)
+ * is returned in \p reachable_count.
+ *
+ * </para><para>
+ * In disconnected graphs, consider using the harmonic centrality,
+ * computable using \ref igraph_harmonic_centrality().
+ *
+ * </para><para>
+ * For isolated vertices, i.e. those having no associated paths, NaN is returned.
  *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
  *        closeness centrality scores for the given vertices.
+ * \param reachable_count If not \c NULL, this vector will contain the number of
+ *        vertices reachable from each vertex for which the closeness is calculated
+ *        (not including that vertex).
+ * \param all_reachable Pointer to a Boolean. If not \c NULL, it indicates if all
+ *        vertices of the graph were reachable from each vertex in \p vids.
+ *        If false, the graph is non-connected If true, and the graph is undirected,
+ *        or if the graph is directed and \p vids contains all vertices, then the
+ *        graph is connected.
  * \param vids The vertices for which the closeness centrality will be computed.
  * \param mode The type of shortest paths to be used for the
  *        calculation in directed graphs. Possible values:
@@ -72,8 +93,9 @@
  * \param weights An optional vector containing edge weights for
  *        weighted closeness. No edge weight may be NaN. Supply a null
  *        pointer here for traditional, unweighted closeness.
- * \param normalized Boolean, whether to normalize results by multiplying
- *        by the number of vertices minus one.
+ * \param normalized If true, the inverse of the mean distance to reachable
+ *        vetices is returned. If false, the inverse of the sum of distances
+ *        is returned.
  * \return Error code:
  *        \clist
  *        \cli IGRAPH_ENOMEM
@@ -90,18 +112,22 @@
  * |E| is the number
  * of edges in the graph.
  *
- * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness().
+ * \sa Other centrality types: \ref igraph_degree(), \ref igraph_betweenness(),
+ *   \ref igraph_harmonic_centrality().
  *   See \ref igraph_closeness_cutoff() for the range-limited closeness centrality.
  */
 int igraph_closeness(const igraph_t *graph, igraph_vector_t *res,
+                     igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
                      const igraph_vs_t vids, igraph_neimode_t mode,
                      const igraph_vector_t *weights,
                      igraph_bool_t normalized) {
-    return igraph_closeness_cutoff(graph, res, vids, mode, weights, normalized, -1);
+    return igraph_closeness_cutoff(graph, res, reachable_count, all_reachable, vids, mode, weights, normalized, -1);
 }
 
 static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
                                                 igraph_vector_t *res,
+                                                igraph_vector_t *reachable_count,
+                                                igraph_bool_t *all_reachable,
                                                 const igraph_vs_t vids,
                                                 igraph_neimode_t mode,
                                                 igraph_real_t cutoff,
@@ -127,18 +153,16 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
     igraph_real_t mindist = 0;
 
-    igraph_bool_t warning_shown = 0;
-
     if (igraph_vector_size(weights) != no_of_edges) {
-        IGRAPH_ERROR("Invalid weight vector length", IGRAPH_EINVAL);
+        IGRAPH_ERROR("Invalid weight vector length.", IGRAPH_EINVAL);
     }
 
     if (no_of_edges > 0) {
         igraph_real_t minweight = igraph_vector_min(weights);
         if (minweight <= 0) {
-            IGRAPH_ERROR("Weight vector must be positive", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must be positive.", IGRAPH_EINVAL);
         } else if (igraph_is_nan(minweight)) {
-            IGRAPH_ERROR("Weight vector must not contain NaN values", IGRAPH_EINVAL);
+            IGRAPH_ERROR("Weight vector must not contain NaN values.", IGRAPH_EINVAL);
         }
     }
 
@@ -146,6 +170,14 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
     IGRAPH_FINALLY(igraph_vit_destroy, &vit);
 
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
+
+    if (reachable_count) {
+        igraph_vector_resize(reachable_count, nodes_to_calc);
+    }
+
+    if (all_reachable) {
+        *all_reachable = 1; /* be optimistic */
+    }
 
     IGRAPH_CHECK(igraph_2wheap_init(&Q, no_of_nodes));
     IGRAPH_FINALLY(igraph_2wheap_destroy, &Q);
@@ -203,22 +235,24 @@ static int igraph_i_closeness_cutoff_weighted(const igraph_t *graph,
 
         } /* !igraph_2wheap_empty(&Q) */
 
-        /* using igraph_real_t here instead of igraph_integer_t to avoid overflow */
-        VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes - nodes_reached));
-        VECTOR(*res)[i] = (no_of_nodes - 1) / VECTOR(*res)[i];
+        if (reachable_count) {
+            VECTOR(*reachable_count)[i] = nodes_reached - 1;
+        }
 
-        if (((cutoff >= 0 && mindist <= cutoff + 1.0) || (cutoff < 0)) &&
-            nodes_reached < no_of_nodes && !warning_shown) {
-            IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
-            warning_shown = 1;
+        if (normalized) {
+            /* compute the inverse of the average distance, considering only reachable nodes */
+            VECTOR(*res)[i] = VECTOR(*res)[i] == 0 ? IGRAPH_NAN : ((igraph_real_t) (nodes_reached-1)) / VECTOR(*res)[i];
+        } else {
+            /* compute the inverse of the sum of distances */
+            VECTOR(*res)[i] = VECTOR(*res)[i] == 0 ? IGRAPH_NAN : 1.0 / VECTOR(*res)[i];
+        }
+
+        if (all_reachable) {
+            if (nodes_reached < no_of_nodes) {
+                *all_reachable = 0 /* false */;
+            }
         }
     } /* !IGRAPH_VIT_END(vit) */
-
-    if (!normalized) {
-        for (i = 0; i < nodes_to_calc; i++) {
-            VECTOR(*res)[i] /= (no_of_nodes - 1);
-        }
-    }
 
     igraph_vector_long_destroy(&which);
     igraph_vector_destroy(&dist);
@@ -304,7 +338,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
                               const igraph_vector_t *weights,
                               igraph_bool_t normalized) {
     IGRAPH_WARNING("igraph_closeness_estimate is deprecated, use igraph_closeness_cutoff.");
-    return igraph_closeness_cutoff(graph, res, vids, mode, weights, normalized, cutoff);
+    return igraph_closeness_cutoff(graph, res, NULL, NULL, vids, mode, weights, normalized, cutoff);
 }
 
 
@@ -318,14 +352,15 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * by considering only those shortest paths whose length is no greater
  * then the given cutoff value.
  *
- * </para><para>
- * If the graph is not connected, and there is no such path between two
- * vertices, the number of vertices is used instead the length of the
- * geodesic. This is always longer than the longest possible geodesic.
- *
  * \param graph The graph object.
  * \param res The result of the computation, a vector containing the
- *        closeness centrality scores for the given vertices.
+ *        range-limited closeness centrality scores for the given vertices.
+ * \param reachable_count If not \c NULL, this vector will contain the number of
+ *        vertices reachable within the cutoff distance from each vertex for which
+ *        the range-limited closeness is calculated (not including that vertex).
+ * \param all_reachable Pointer to a Boolean. If not \c NULL, it indicates if all
+ *        vertices of the graph were reachable from each vertex in \p vids within
+ *        the given cutoff distance.
  * \param vids The vertices for which the range limited closeness centrality
  *             will be computed.
  * \param mode The type of shortest paths to be used for the
@@ -342,8 +377,9 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  * \param weights An optional vector containing edge weights for
  *        weighted closeness. No edge weight may be NaN. Supply a null
  *        pointer here for traditional, unweighted closeness.
- * \param normalized Boolean, whether to normalize results by multiplying
- *        by the number of vertices minus one.
+ * \param normalized If true, the inverse of the mean distance to vertices
+ *        reachable within the cutoff is returned. If false, the inverse
+ *        of the sum of distances is returned.
  * \param cutoff The maximal length of paths that will be considered.
  *        If negative, the exact closeness will be calculated (no upper
  *        limit on path lengths).
@@ -367,6 +403,7 @@ int igraph_closeness_estimate(const igraph_t *graph, igraph_vector_t *res,
  */
 
 int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
+                            igraph_vector_t *reachable_count, igraph_bool_t *all_reachable,
                             const igraph_vs_t vids, igraph_neimode_t mode,
                             const igraph_vector_t *weights,
                             igraph_bool_t normalized,
@@ -386,10 +423,8 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     long int nodes_to_calc;
     igraph_vit_t vit;
 
-    igraph_bool_t warning_shown = 0;
-
     if (weights) {
-        return igraph_i_closeness_cutoff_weighted(graph, res, vids, mode, cutoff,
+        return igraph_i_closeness_cutoff_weighted(graph, res, reachable_count, all_reachable, vids, mode, cutoff,
                 weights, normalized);
     }
 
@@ -398,9 +433,16 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
 
     nodes_to_calc = IGRAPH_VIT_SIZE(vit);
 
-    if (mode != IGRAPH_OUT && mode != IGRAPH_IN &&
-        mode != IGRAPH_ALL) {
-        IGRAPH_ERROR("calculating closeness", IGRAPH_EINVMODE);
+    if (reachable_count) {
+        igraph_vector_resize(reachable_count, nodes_to_calc);
+    }
+
+    if (all_reachable) {
+        *all_reachable = 1; /* be optimistic */
+    }
+
+    if (mode != IGRAPH_OUT && mode != IGRAPH_IN && mode != IGRAPH_ALL) {
+        IGRAPH_ERROR("Invalid mode for closeness.", IGRAPH_EINVMODE);
     }
 
     IGRAPH_VECTOR_INIT_FINALLY(&already_counted, no_of_nodes);
@@ -421,7 +463,7 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
         nodes_reached = 1;
         VECTOR(already_counted)[(long int)IGRAPH_VIT_GET(vit)] = i + 1;
 
-        IGRAPH_PROGRESS("Closeness: ", 100.0 * i / no_of_nodes, NULL);
+        IGRAPH_PROGRESS("Closeness: ", 100.0 * i / nodes_to_calc, NULL);
         IGRAPH_ALLOW_INTERRUPTION();
 
         while (!igraph_dqueue_empty(&q)) {
@@ -448,20 +490,22 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
             }
         }
 
-        /* using igraph_real_t here instead of igraph_integer_t to avoid overflow */
-        VECTOR(*res)[i] += ((igraph_real_t)no_of_nodes * (no_of_nodes - nodes_reached));
-        VECTOR(*res)[i] = (no_of_nodes - 1) / VECTOR(*res)[i];
-
-        if (((cutoff >= 0 && actdist <= cutoff) || cutoff < 0) &&
-            no_of_nodes > nodes_reached && !warning_shown) {
-            IGRAPH_WARNING("closeness centrality is not well-defined for disconnected graphs");
-            warning_shown = 1;
+        if (reachable_count) {
+            VECTOR(*reachable_count)[i] = nodes_reached - 1;
         }
-    }
 
-    if (!normalized) {
-        for (i = 0; i < nodes_to_calc; i++) {
-            VECTOR(*res)[i] /= (no_of_nodes - 1);
+        if (normalized) {
+            /* compute the inverse of the average distance, considering only reachable nodes */
+            VECTOR(*res)[i] = VECTOR(*res)[i] == 0 ? IGRAPH_NAN : ((igraph_real_t) (nodes_reached-1)) / VECTOR(*res)[i];
+        } else {
+            /* compute the inverse of the sum of distances */
+            VECTOR(*res)[i] = VECTOR(*res)[i] == 0 ? IGRAPH_NAN : 1.0 / VECTOR(*res)[i];
+        }
+
+        if (all_reachable) {
+            if (nodes_reached < no_of_nodes) {
+                *all_reachable = 0 /* false */;
+            }
         }
     }
 
@@ -474,7 +518,7 @@ int igraph_closeness_cutoff(const igraph_t *graph, igraph_vector_t *res,
     igraph_adjlist_destroy(&allneis);
     IGRAPH_FINALLY_CLEAN(4);
 
-    return 0;
+    return IGRAPH_SUCCESS;
 }
 
 
